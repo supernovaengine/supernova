@@ -1,0 +1,8 @@
+# Emscripten LLVM
+
+obj/
+
+*.map
+*.mem
+*.html
+*.js

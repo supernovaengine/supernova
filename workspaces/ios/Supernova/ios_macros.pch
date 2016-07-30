@@ -1,0 +1,25 @@
+#ifndef Supernova_pch
+#define Supernova_pch
+
+#ifndef SUPERNOVA_IOS
+#define SUPERNOVA_IOS
+#endif
+
+#define LOG_TAG "Supernova"
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "iosfopenpath.h"
+
+#define fopen(fname, mode) fopen(iosfopenpath(fname), mode)
+    
+    
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif /* Supernova_pch */
