@@ -45,25 +45,22 @@ bool Model::loadOBJ(const char * path){
                 this->submeshes.push_back(Submesh());
             }
             //printf("material[%ld].file = %s\n", i, materials[i].diffuse_texname.c_str());
-            //size_t len = strlen(materials[i].diffuse_texname.c_str());
-            //if (len > 0)
-                //this->submeshes[i].getTexture().loadFromFile(materials[i].diffuse_texname.c_str());
+            this->submeshes[i].getTexture()->loadFromFile(materials[i].diffuse_texname.c_str());
         }
-
-        //this->submeshes[0].getTexture()->loadFromFile("Jeep_glass_d.png");
-        //this->submeshes[1].getTexture()->loadFromFile("Jeep_outside_d.png");
-        //this->submeshes[2].getTexture()->loadFromFile("Jeep_inside_d.png");
-
 
         for (size_t i = 0; i < shapes.size(); i++) {
 
             assert((shapes[i].mesh.indices.size() % 3) == 0);
             for (size_t f = 0; f < shapes[i].mesh.material_ids.size(); f++) {
                 //printf("  idx[%ld] = %d, %d, %d. mat_id = %d\n", f, shapes[i].mesh.indices[3*f+0], shapes[i].mesh.indices[3*f+1], shapes[i].mesh.indices[3*f+2], shapes[i].mesh.material_ids[f]);
+                
+                int material_id = shapes[i].mesh.material_ids[f];
+                if (material_id < 0)
+                    material_id = 0;
 
-                this->submeshes[shapes[i].mesh.material_ids[f]].addIndex(shapes[i].mesh.indices[3*f+0]);
-                this->submeshes[shapes[i].mesh.material_ids[f]].addIndex(shapes[i].mesh.indices[3*f+1]);
-                this->submeshes[shapes[i].mesh.material_ids[f]].addIndex(shapes[i].mesh.indices[3*f+2]);
+                this->submeshes[material_id].addIndex(shapes[i].mesh.indices[3*f+0]);
+                this->submeshes[material_id].addIndex(shapes[i].mesh.indices[3*f+1]);
+                this->submeshes[material_id].addIndex(shapes[i].mesh.indices[3*f+2]);
 
             }
 

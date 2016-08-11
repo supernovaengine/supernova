@@ -2,7 +2,7 @@
 
 
 Texture::Texture(){
-    path = NULL;
+    path = "";
     used = false;
 }
 
@@ -33,7 +33,7 @@ void Texture::loadFromFile(const char* path){
 }
 
 const char* Texture::getFilePath(){
-    return path;
+    return path.c_str();
 }
 
 bool Texture::isUsed(){

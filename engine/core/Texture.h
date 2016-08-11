@@ -3,12 +3,13 @@
 
 #include <vector>
 #include <limits>
+#include <string>
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 
 class Texture{
 private:
-    const char* path;
+    std::string path;
     bool used;
 public:
     Texture();

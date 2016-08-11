@@ -56,7 +56,7 @@ bool GLES2Scene::load() {
     
     glEnable(GL_DEPTH_TEST);
     
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     
     //Activate transparency
     glEnable(GL_BLEND);
