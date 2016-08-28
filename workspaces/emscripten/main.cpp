@@ -76,6 +76,7 @@ int supernova_mouse_button(int button){
     if (button == GLFW_MOUSE_BUTTON_6) return S_MOUSE_BUTTON_6;
     if (button == GLFW_MOUSE_BUTTON_7) return S_MOUSE_BUTTON_7;
     if (button == GLFW_MOUSE_BUTTON_8) return S_MOUSE_BUTTON_8;
+    return -1;
 }
 
 static void on_mouse_callback(GLFWwindow* window, int button, int action, int modify){

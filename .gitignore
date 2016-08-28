@@ -1,3 +1,5 @@
+assets/*
+
 # --OSX--
 
 *.DS_Store

@@ -147,7 +147,7 @@ void Engine::onKeyUp(int inputKey){
 
 void Engine::onTextInput(const char* text){
     //printf("textinput %s\n", text);
-    //Log::Verbose("Eduardo","textinput %s\n", text);
+    Log::Verbose(LOG_TAG,"textinput %s\n", text);
 }
 
 int Engine::getScreenWidth(){

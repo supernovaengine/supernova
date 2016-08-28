@@ -1,10 +1,3 @@
-/*
- * Supernova.cpp
- *
- *  Created on: 20 de out de 2015
- *      Author: eduardolima
- */
-
 #include "Supernova.h"
 #include "platform/Log.h"
 

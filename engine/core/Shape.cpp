@@ -35,7 +35,7 @@ void Shape::generateTexcoords(){
     float min_Y = std::numeric_limits<float>::max();
     float max_Y = std::numeric_limits<float>::min();
 
-    for ( int i = 0; i < vertices.size(); i++){
+    for ( unsigned int i = 0; i < vertices.size(); i++){
         min_X = fmin(min_X, vertices[i].x);
         min_Y = fmin(min_Y, vertices[i].y);
         max_X = fmax(max_X, vertices[i].x);
@@ -47,7 +47,7 @@ void Shape::generateTexcoords(){
 
     float u = 0;
     float v = 0;
-    for ( int i = 0; i < vertices.size(); i++){
+    for ( unsigned int i = 0; i < vertices.size(); i++){
         u = (vertices[i].x - min_X) * k_X;
         v = (vertices[i].y - min_Y) * k_Y;
         texcoords.push_back(Vector2(u, v));
