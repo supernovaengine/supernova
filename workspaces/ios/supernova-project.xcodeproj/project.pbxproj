@@ -1,0 +1,439 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		71192EFD1CE1334000BD76EE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
+		713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */ = {isa = PBXBuildFile; fileRef = 713B79A11C0FD15000892EAC /* iosfopenpath.m */; };
+		713D30C51CFB306D00A4752F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* assets */; };
+		7151F2801CD4FA86001A3AC3 /* ioscallback.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7151F27F1CD4FA86001A3AC3 /* ioscallback.mm */; };
+		716AB5A71BEF9F3C001B672D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 716AB5A61BEF9F3C001B672D /* main.m */; };
+		716AB5AA1BEF9F3C001B672D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 716AB5A91BEF9F3C001B672D /* AppDelegate.m */; };
+		716AB5B11BEF9F3D001B672D /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 716AB5B01BEF9F3D001B672D /* GameViewController.mm */; };
+		716AB5B41BEF9F3D001B672D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B21BEF9F3D001B672D /* Main.storyboard */; };
+		716AB5B61BEF9F3D001B672D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B51BEF9F3D001B672D /* Assets.xcassets */; };
+		716AB5B91BEF9F3D001B672D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B71BEF9F3D001B672D /* LaunchScreen.storyboard */; };
+		717FA2091CA1843C009071DC /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 717FA2081CA1843C009071DC /* EAGLView.mm */; };
+		717FA20C1CA184FC009071DC /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 717FA20B1CA184FC009071DC /* QuartzCore.framework */; };
+		71D139811D75062900D1ED33 /* libsupernova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D1397E1D7505C300D1ED33 /* libsupernova.a */; };
+		71D13C871D75122F00D1ED33 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D13C861D75122F00D1ED33 /* libz.tbd */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		71D1397D1D7505C300D1ED33 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 71D139791D7505C200D1ED33 /* supernova.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 71D1396D1D7505C200D1ED33;
+			remoteInfo = supernova;
+		};
+		71D1397F1D75060D00D1ED33 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 71D139791D7505C200D1ED33 /* supernova.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 71D1396C1D7505C200D1ED33;
+			remoteInfo = supernova;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		71192EFB1CE1334000BD76EE /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		713B79A01C0FB5FD00892EAC /* ios_macros.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ios_macros.pch; sourceTree = "<group>"; };
+		713B79A11C0FD15000892EAC /* iosfopenpath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iosfopenpath.m; sourceTree = "<group>"; };
+		713B79A31C0FD16900892EAC /* iosfopenpath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iosfopenpath.h; sourceTree = "<group>"; };
+		713D30C41CFB306D00A4752F /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../assets; sourceTree = "<group>"; };
+		7151F27F1CD4FA86001A3AC3 /* ioscallback.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ioscallback.mm; sourceTree = "<group>"; };
+		7151F2811CD4FAAC001A3AC3 /* ioscallback.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ioscallback.h; sourceTree = "<group>"; };
+		716AB5A21BEF9F3C001B672D /* supernova-project.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "supernova-project.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		716AB5A61BEF9F3C001B672D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		716AB5A81BEF9F3C001B672D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		716AB5A91BEF9F3C001B672D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		716AB5AF1BEF9F3D001B672D /* GameViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
+		716AB5B01BEF9F3D001B672D /* GameViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GameViewController.mm; sourceTree = "<group>"; };
+		716AB5B31BEF9F3D001B672D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		716AB5B51BEF9F3D001B672D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		716AB5B81BEF9F3D001B672D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		716AB5BA1BEF9F3D001B672D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		717FA2081CA1843C009071DC /* EAGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EAGLView.mm; sourceTree = "<group>"; };
+		717FA20A1CA184B9009071DC /* EAGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
+		717FA20B1CA184FC009071DC /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		71D139791D7505C200D1ED33 /* supernova.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = supernova.xcodeproj; path = supernova/supernova.xcodeproj; sourceTree = "<group>"; };
+		71D13C861D75122F00D1ED33 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		716AB59F1BEF9F3C001B672D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71D13C871D75122F00D1ED33 /* libz.tbd in Frameworks */,
+				71D139811D75062900D1ED33 /* libsupernova.a in Frameworks */,
+				717FA20C1CA184FC009071DC /* QuartzCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		71192EFA1CE1334000BD76EE /* project */ = {
+			isa = PBXGroup;
+			children = (
+				71192EFB1CE1334000BD76EE /* main.cpp */,
+			);
+			name = project;
+			path = ../../project;
+			sourceTree = "<group>";
+		};
+		716AB5991BEF9F3C001B672D = {
+			isa = PBXGroup;
+			children = (
+				71D13C861D75122F00D1ED33 /* libz.tbd */,
+				71D139791D7505C200D1ED33 /* supernova.xcodeproj */,
+				717FA20B1CA184FC009071DC /* QuartzCore.framework */,
+				713D30C41CFB306D00A4752F /* assets */,
+				71192EFA1CE1334000BD76EE /* project */,
+				716AB5A41BEF9F3C001B672D /* supernova-project */,
+				716AB5A31BEF9F3C001B672D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		716AB5A31BEF9F3C001B672D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				716AB5A21BEF9F3C001B672D /* supernova-project.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		716AB5A41BEF9F3C001B672D /* supernova-project */ = {
+			isa = PBXGroup;
+			children = (
+				716AB5A81BEF9F3C001B672D /* AppDelegate.h */,
+				716AB5A91BEF9F3C001B672D /* AppDelegate.m */,
+				716AB5AF1BEF9F3D001B672D /* GameViewController.h */,
+				716AB5B01BEF9F3D001B672D /* GameViewController.mm */,
+				717FA20A1CA184B9009071DC /* EAGLView.h */,
+				717FA2081CA1843C009071DC /* EAGLView.mm */,
+				7151F2811CD4FAAC001A3AC3 /* ioscallback.h */,
+				7151F27F1CD4FA86001A3AC3 /* ioscallback.mm */,
+				713B79A31C0FD16900892EAC /* iosfopenpath.h */,
+				713B79A11C0FD15000892EAC /* iosfopenpath.m */,
+				716AB5B21BEF9F3D001B672D /* Main.storyboard */,
+				716AB5B51BEF9F3D001B672D /* Assets.xcassets */,
+				716AB5B71BEF9F3D001B672D /* LaunchScreen.storyboard */,
+				716AB5BA1BEF9F3D001B672D /* Info.plist */,
+				716AB5A51BEF9F3C001B672D /* Supporting Files */,
+			);
+			path = "supernova-project";
+			sourceTree = "<group>";
+		};
+		716AB5A51BEF9F3C001B672D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				716AB5A61BEF9F3C001B672D /* main.m */,
+				713B79A01C0FB5FD00892EAC /* ios_macros.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		71D1397A1D7505C200D1ED33 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				71D1397E1D7505C300D1ED33 /* libsupernova.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		716AB5A11BEF9F3C001B672D /* supernova-project */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 716AB5BD1BEF9F3D001B672D /* Build configuration list for PBXNativeTarget "supernova-project" */;
+			buildPhases = (
+				716AB59E1BEF9F3C001B672D /* Sources */,
+				716AB59F1BEF9F3C001B672D /* Frameworks */,
+				716AB5A01BEF9F3C001B672D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				71D139801D75060D00D1ED33 /* PBXTargetDependency */,
+			);
+			name = "supernova-project";
+			productName = Supernova;
+			productReference = 716AB5A21BEF9F3C001B672D /* supernova-project.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		716AB59A1BEF9F3C001B672D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = Deslon;
+				TargetAttributes = {
+					716AB5A11BEF9F3C001B672D = {
+						CreatedOnToolsVersion = 7.1;
+					};
+				};
+			};
+			buildConfigurationList = 716AB59D1BEF9F3C001B672D /* Build configuration list for PBXProject "supernova-project" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 716AB5991BEF9F3C001B672D;
+			productRefGroup = 716AB5A31BEF9F3C001B672D /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 71D1397A1D7505C200D1ED33 /* Products */;
+					ProjectRef = 71D139791D7505C200D1ED33 /* supernova.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				716AB5A11BEF9F3C001B672D /* supernova-project */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		71D1397E1D7505C300D1ED33 /* libsupernova.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libsupernova.a;
+			remoteRef = 71D1397D1D7505C300D1ED33 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		716AB5A01BEF9F3C001B672D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				716AB5B41BEF9F3D001B672D /* Main.storyboard in Resources */,
+				713D30C51CFB306D00A4752F /* assets in Resources */,
+				716AB5B61BEF9F3D001B672D /* Assets.xcassets in Resources */,
+				716AB5B91BEF9F3D001B672D /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		716AB59E1BEF9F3C001B672D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				716AB5AA1BEF9F3C001B672D /* AppDelegate.m in Sources */,
+				716AB5B11BEF9F3D001B672D /* GameViewController.mm in Sources */,
+				713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */,
+				716AB5A71BEF9F3C001B672D /* main.m in Sources */,
+				71192EFD1CE1334000BD76EE /* main.cpp in Sources */,
+				717FA2091CA1843C009071DC /* EAGLView.mm in Sources */,
+				7151F2801CD4FA86001A3AC3 /* ioscallback.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		71D139801D75060D00D1ED33 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = supernova;
+			targetProxy = 71D1397F1D75060D00D1ED33 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		716AB5B21BEF9F3D001B672D /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				716AB5B31BEF9F3D001B672D /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		716AB5B71BEF9F3D001B672D /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				716AB5B81BEF9F3D001B672D /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		716AB5BB1BEF9F3D001B672D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		716AB5BC1BEF9F3D001B672D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = "";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		716AB5BE1BEF9F3D001B672D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LIBRARY = "libc++";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_INPUT_FILETYPE = automatic;
+				GCC_PREFIX_HEADER = "supernova-project/ios_macros.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../engine/libs/lua",
+					"$(SRCROOT)/../../engine/core/**",
+				);
+				INFOPLIST_FILE = "supernova-project/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = Deslon.Supernova;
+				PRODUCT_NAME = "supernova-project";
+			};
+			name = Debug;
+		};
+		716AB5BF1BEF9F3D001B672D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LIBRARY = "libc++";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_INPUT_FILETYPE = automatic;
+				GCC_PREFIX_HEADER = "supernova-project/ios_macros.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../engine/libs/lua",
+					"$(SRCROOT)/../../engine/core/**",
+				);
+				INFOPLIST_FILE = "supernova-project/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = Deslon.Supernova;
+				PRODUCT_NAME = "supernova-project";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		716AB59D1BEF9F3C001B672D /* Build configuration list for PBXProject "supernova-project" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				716AB5BB1BEF9F3D001B672D /* Debug */,
+				716AB5BC1BEF9F3D001B672D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		716AB5BD1BEF9F3D001B672D /* Build configuration list for PBXNativeTarget "supernova-project" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				716AB5BE1BEF9F3D001B672D /* Debug */,
+				716AB5BF1BEF9F3D001B672D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 716AB59A1BEF9F3C001B672D /* Project object */;
+}
