@@ -10,5 +10,5 @@ add_library(
 
 target_link_libraries(
     supernova
-    lua png tinyobjloader
+    lua png tinyobjloader jpeg
 )

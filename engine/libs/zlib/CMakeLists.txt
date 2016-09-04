@@ -1,4 +1,4 @@
-
+# zlib 1.2.8 (http://zlib.net/)
 
 add_library(
     z
@@ -6,6 +6,7 @@ add_library(
     STATIC
 
     adler32.c
+    compress.c
     crc32.c
     deflate.c
     infback.c
@@ -13,5 +14,6 @@ add_library(
     inflate.c
     inftrees.c
     trees.c
+    uncompr.c
     zutil.c
 )

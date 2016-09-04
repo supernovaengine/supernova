@@ -6,10 +6,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "RawImage.h"
+#include "ImageRead.h"
 
 
-class PNGRead{
+class PNGRead: public ImageRead{
 
 private:
 
@@ -36,7 +36,7 @@ private:
 
 public:
 
-    RawImage getRawImage(const void* png_data, const int png_data_size);
+    RawImage getRawImage(FILE* file);
 
 };
 

@@ -1,5 +1,6 @@
 #include "PNGRead.h"
 #include "ColorType.h"
+#include "platform/log.h"
 
 
 void PNGRead::readPngDataCallback(png_structp png_ptr, png_byte* raw_data, png_size_t read_length) {
@@ -84,7 +85,15 @@ int PNGRead::getColorFormat(const int png_color_format) {
     return 0;
 }
 
-RawImage PNGRead::getRawImage(const void* png_data, const int png_data_size) {
+RawImage PNGRead::getRawImage(FILE* file) {
+    
+    fseek(file, 0, SEEK_END);
+    long png_data_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    
+    void* png_data = malloc(png_data_size);
+    fread(png_data, png_data_size, 1, file);
+    
     assert(png_data != NULL && png_data_size > 8);
     assert(png_sig_cmp((png_bytep)png_data, 0, 8) == 0);
 
@@ -97,7 +106,7 @@ RawImage PNGRead::getRawImage(const void* png_data, const int png_data_size) {
     png_set_read_fn(png_ptr, &png_data_handle, readPngDataCallback);
 
     if (setjmp(png_jmpbuf(png_ptr))) {
-        //  CRASH("Error reading PNG file!");
+        Log::Error(LOG_TAG, "Error reading PNG file!");
     }
 
     const PNGRead::PngInfo png_info = readAndUpdateInfo(png_ptr, info_ptr);
