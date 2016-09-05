@@ -1,6 +1,6 @@
 #include "PNGRead.h"
 #include "ColorType.h"
-#include "platform/log.h"
+#include "platform/Log.h"
 
 
 void PNGRead::readPngDataCallback(png_structp png_ptr, png_byte* raw_data, png_size_t read_length) {

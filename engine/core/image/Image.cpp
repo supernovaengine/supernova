@@ -2,7 +2,7 @@
 
 #include "PNGRead.h"
 #include "JPEGRead.h"
-#include "platform/log.h"
+#include "platform/Log.h"
 #include <assert.h>
 
 Image::Image() {
