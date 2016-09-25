@@ -2,7 +2,7 @@
 #define gles2texture_h
 
 #include "GLES2Header.h"
-#include "image/Image.h"
+#include "image/TextureLoader.h"
 
 class GLES2Texture{
 

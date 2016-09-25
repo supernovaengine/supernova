@@ -32,6 +32,7 @@ bool Model::loadOBJ(const char * path){
     std::vector<tinyobj::material_t> materials;
 
     std::string err;
+
     bool ret = tinyobj::LoadObj(shapes, materials, err, path);
 
     if (!err.empty()) {

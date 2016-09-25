@@ -12,8 +12,6 @@
 #define SUPERNOVA_ANDROID
 #endif
 
-//#define LUAINTF_LINK_LUA_COMPILED_IN_CXX 0
-
 #define LOG_TAG "Supernova"
 
 #define UNUSED(x) (void)(x)
@@ -24,7 +22,6 @@ extern "C" {
 
 
 #ifdef __ANDROID__
-#include <stdio.h>
 #include <android/log.h>
 #include "android_fopen.h"
 

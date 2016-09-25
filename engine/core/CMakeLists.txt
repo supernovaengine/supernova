@@ -1,3 +1,5 @@
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 file(GLOB_RECURSE SUPERNOVA_SRCS *.cpp)
 
 add_library(
@@ -10,5 +12,5 @@ add_library(
 
 target_link_libraries(
     supernova
-    lua png tinyobjloader jpeg
+    lua tinyobjloader jpeg png tiff
 )
