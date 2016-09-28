@@ -3,7 +3,8 @@
 
 #include "GLES2Header.h"
 #include "GLES2Util.h"
-#include "GLES2ShaderManager.h"
+#include "render/ShaderManager.h"
+#include "render/TextureManager.h"
 #include "math/Angle.h"
 
 std::vector<Light*> GLES2Scene::lights;
@@ -50,7 +51,8 @@ Vector3 GLES2Scene::getAmbientLight(){
 
 bool GLES2Scene::load() {
 
-	GLES2ShaderManager::clear();
+	ShaderManager::clear();
+    TextureManager::clear();
     
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     

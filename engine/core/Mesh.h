@@ -5,12 +5,12 @@
 #include "Object.h"
 #include "Texture.h"
 #include "math/Vector4.h"
-#include "render/MeshRender.h"
+#include "render/MeshManager.h"
 #include "Submesh.h"
 
 class Mesh: public Object {
 protected:
-    MeshRender mesh;
+    MeshManager mesh;
 
     Matrix4 modelViewMatrix;
     Matrix4 normalMatrix;

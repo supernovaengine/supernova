@@ -5,7 +5,7 @@
 #include "Object.h"
 #include "Camera.h"
 #include "Render.h"
-#include "render/SceneRender.h"
+#include "render/SceneManager.h"
 #include "Light.h"
 
 #include "math/Matrix4.h"
@@ -13,7 +13,7 @@
 class Scene: public Render {
 private:
 
-    SceneRender sceneRender;
+    SceneManager sceneManager;
 
     Matrix4 viewProjectionMatrix;
 

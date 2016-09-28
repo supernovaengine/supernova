@@ -1,23 +1,13 @@
-#include "GLES2ShaderManager.h"
 
-#include "platform/Log.h"
+#include "GLES2Program.h"
+
+#include <stdlib.h>
 #include "GLES2Shaders.h"
 #include "GLES2Util.h"
-#include <stddef.h>
-#include <stdlib.h>
+#include "platform/Log.h"
 
-std::vector<GLES2ShaderManager::ProgramStore> GLES2ShaderManager::programs;
 
-GLES2ShaderManager::GLES2ShaderManager() {
-    // TODO Auto-generated constructor stub
-
-}
-
-GLES2ShaderManager::~GLES2ShaderManager() {
-    // TODO Auto-generated destructor stub
-}
-
-const char* GLES2ShaderManager::getVertexShader(const char* name){
+const char* GLES2Program::getVertexShader(const char* name){
     if (strcmp(name,"color")==0){
         return gVertexShaderColor;
     }else if (strcmp(name,"texture")==0){
@@ -26,10 +16,10 @@ const char* GLES2ShaderManager::getVertexShader(const char* name){
         return gVertexShaderPerPixelLightTexture;
     }
     return NULL;
-
+    
 }
 
-const char* GLES2ShaderManager::getFragmentShader(const char* name){
+const char* GLES2Program::getFragmentShader(const char* name){
     if (strcmp(name,"color")==0){
         return gFragmentShaderColor;
     }else if (strcmp(name,"texture")==0){
@@ -41,7 +31,7 @@ const char* GLES2ShaderManager::getFragmentShader(const char* name){
 }
 
 
-GLuint GLES2ShaderManager::loadShader(GLenum shaderType, const char* pSource) {
+GLuint GLES2Program::loadShader(GLenum shaderType, const char* pSource) {
     GLuint shader = glCreateShader(shaderType);
     if (shader) {
         glShaderSource(shader, 1, &pSource, NULL);
@@ -66,16 +56,20 @@ GLuint GLES2ShaderManager::loadShader(GLenum shaderType, const char* pSource) {
     return shader;
 }
 
-GLuint GLES2ShaderManager::createProgram(const char* pVertexSource, const char* pFragmentSource) {
+void GLES2Program::createShader(std::string shaderName) {
+    
+    const char* pVertexSource = getVertexShader(shaderName.c_str());
+    const char* pFragmentSource = getFragmentShader(shaderName.c_str());
+
     GLuint vertexShader = loadShader(GL_VERTEX_SHADER, pVertexSource);
     if (!vertexShader) {
-        return 0;
+        Log::Error(LOG_TAG,"Could not load vertex shader: %s\n", shaderName.c_str());
     }
     GLuint pixelShader = loadShader(GL_FRAGMENT_SHADER, pFragmentSource);
     if (!pixelShader) {
-        return 0;
+        Log::Error(LOG_TAG,"Could not load fragment shader: %s\n", shaderName.c_str());
     }
-    GLuint program = glCreateProgram();
+    program = glCreateProgram();
     if (program) {
         glAttachShader(program, vertexShader);
         GLES2Util::checkGlError("glAttachShader");
@@ -101,39 +95,14 @@ GLuint GLES2ShaderManager::createProgram(const char* pVertexSource, const char* 
     }
     glDeleteShader(vertexShader);
     glDeleteShader(pixelShader);
+}
+
+void GLES2Program::deleteShader(){
+    glDeleteProgram(program);
+}
+
+
+
+GLuint GLES2Program::getShader(){
     return program;
-}
-
-GLuint GLES2ShaderManager::useProgram(const char* programName){
-
-    //Verify if there is a created program
-    for (unsigned i=0; i<programs.size(); i++){
-        if (strcmp(programs.at(i).key, programName)==0){
-            programs.at(i).reference = programs.at(i).reference + 1;
-            return programs.at(i).value;
-        }
-    }
-
-    //If no create a new program
-    GLuint program = createProgram(getVertexShader(programName), getFragmentShader(programName));
-    programs.push_back((ProgramStore){program, programName, 1});
-    return program;
-}
-
-void GLES2ShaderManager::detatchProgram(const char* programName){
-    for (unsigned i=0; i<programs.size(); i++){
-        if (programName!= NULL){
-            if (strcmp(programs.at(i).key, programName)==0){
-                programs.at(i).reference = programs.at(i).reference - 1;
-                if (programs.at(i).reference == 0){
-                    glDeleteProgram(programs.at(i).value);
-                }
-            }
-        }
-    }
-
-}
-
-void GLES2ShaderManager::clear(){
-	programs.clear();
 }

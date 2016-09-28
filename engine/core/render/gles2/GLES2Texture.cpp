@@ -18,7 +18,7 @@ GLenum GLES2Texture::getGlColorFormat(const int color_format) {
 }
 
 
-GLuint GLES2Texture::loadTexture(const GLsizei width, const GLsizei height, const GLenum type, const GLvoid* pixels) {
+GLuint GLES2Texture::getTextureObjectId(const GLsizei width, const GLsizei height, const GLenum type, const GLvoid* pixels) {
     GLuint texture_object_id;
 
     glGenTextures(1, &texture_object_id);
@@ -38,7 +38,7 @@ GLuint GLES2Texture::loadTexture(const GLsizei width, const GLsizei height, cons
 
 
 
-GLuint GLES2Texture::loadAssetIntoTexture(const char* relative_path) {
+void GLES2Texture::loadTexture(const char* relative_path) {
     //assert(relative_path != NULL);
 
     TextureLoader image(relative_path);
@@ -48,8 +48,17 @@ GLuint GLES2Texture::loadAssetIntoTexture(const char* relative_path) {
     const GLenum type = getGlColorFormat(image.getRawImage()->getColorFormat());
     const GLvoid* pixels = image.getRawImage()->getData();
 
-    const GLuint texture_object_id = loadTexture(width, height, type, pixels);
+    gTexture = getTextureObjectId(width, height, type, pixels);
+    
+    image.getRawImage()->releaseImageData();
 
-    return texture_object_id;
+}
 
+void GLES2Texture::deleteTexture(){
+    glDeleteTextures(1, &gTexture);
+}
+
+
+GLuint GLES2Texture::getTexture(){
+    return gTexture;
 }

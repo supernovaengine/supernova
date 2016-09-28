@@ -7,9 +7,12 @@
 #include "math/Matrix4.h"
 #include "math/Vector4.h"
 #include "math/Vector3.h"
+#include "render/TextureManager.h"
+#include "render/ShaderManager.h"
+#include "render/MeshRender.h"
 
 
-class GLES2Mesh {
+class GLES2Mesh : public MeshRender {
 private:
     GLuint gProgram;
 
@@ -55,7 +58,8 @@ private:
     std::vector<Submesh> submeshes;
     //TODO: struct submesh
     std::vector<GLuint> indiceBuffer;
-    std::vector<GLuint> gTexture;
+    //std::vector<GLuint> gTexture;
+    std::vector<GLuint> texture;
     std::vector<unsigned int> indicesSizes;
     std::vector<bool> textured;
 
@@ -66,9 +70,11 @@ private:
 
     const char* programName;
 
-
     bool lighting;
     bool loaded;
+    
+    TextureManager textureManager;
+    ShaderManager shaderManager;
 public:
 	GLES2Mesh();
 	virtual ~GLES2Mesh();

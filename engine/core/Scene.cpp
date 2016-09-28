@@ -20,7 +20,7 @@ void Scene::addObject(Object* obj){
 
 void Scene::addLight (Light* light){
     lights.push_back(light);
-    sceneRender.setLights(lights);
+    sceneManager.setLights(lights);
     //TODO: colocar para nao repetir
     //Log::Error(LOG_TAG, "Object has a parent already");
 }
@@ -28,12 +28,12 @@ void Scene::addLight (Light* light){
 void Scene::removeLight (Light* light){
     std::vector<Light*>::iterator i = std::remove(lights.begin(), lights.end(), light);
     lights.erase(i,lights.end());
-    sceneRender.setLights(lights);
+    sceneManager.setLights(lights);
 }
 
 void Scene::setAmbientLight(Vector3 ambientLight){
     this->ambientLight = ambientLight;
-    sceneRender.setAmbientLight(ambientLight);
+    sceneManager.setAmbientLight(ambientLight);
 }
 
 void Scene::setAmbientLight(const float ambientFactor){
@@ -55,7 +55,7 @@ Camera* Scene::getCamera(){
 }
 
 bool Scene::screenSize(int width, int height){
-    bool status = sceneRender.screenSize(width, height);
+    bool status = sceneManager.screenSize(width, height);
     if (this->camera != NULL){
         camera->updateScreenSize();
     }
@@ -75,7 +75,7 @@ void Scene::doCamera(){
 
 bool Scene::load(){
 
-    sceneRender.load();
+    sceneManager.load();
     baseObject.load();
 
     doCamera();
@@ -89,7 +89,7 @@ bool Scene::load(){
 
 bool Scene::draw(){
 
-    sceneRender.draw();
+    sceneManager.draw();
     baseObject.draw();
 
     return true;

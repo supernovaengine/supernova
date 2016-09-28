@@ -1,25 +1,18 @@
-#ifndef meshrender_h
-#define meshrender_h
+#ifndef MeshRender_h
+#define MeshRender_h
 
-#include <vector>
-#include "math/Vector3.h"
-#include "gles2/GLES2Mesh.h"
-#include "Submesh.h"
-#include "math/Matrix4.h"
-#include "math/Vector4.h"
 
 class MeshRender {
-private:
-    GLES2Mesh* mesh;
+    
 
-    void instanciateRender();
 public:
-	MeshRender();
-	virtual ~MeshRender();
-
-    bool load(std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes);
-	bool draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* modelViewProjectionMatrix, Vector3* cameraPosition, int mode);
-    void destroy();
+    
+    inline virtual ~MeshRender(){}
+    
+    virtual bool load(std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes) = 0;
+    virtual bool draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* modelViewProjectionMatrix, Vector3* cameraPosition, int mode) = 0;
+    virtual void destroy() = 0;
+    
 };
 
-#endif /* meshrender_h */
+#endif /* MeshRender_h */

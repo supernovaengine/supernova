@@ -122,6 +122,7 @@
 		715823FC1D93688F00AB1181 /* TIFFReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715823E81D93573B00AB1181 /* TIFFReader.cpp */; };
 		715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7125E32B1D7CC7470090B05E /* ImageReader.cpp */; };
 		715824001D96EB4600AB1181 /* BMPReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715823FE1D96EB4600AB1181 /* BMPReader.cpp */; };
+		715824031D9803EF00AB1181 /* TextureManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715824011D9803EF00AB1181 /* TextureManager.cpp */; };
 		715AC0D31D7B0A29003D7C8C /* lapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 713D2D011CFB2EFA00A4752F /* lapi.c */; };
 		715AC0D41D7B0A29003D7C8C /* lauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 713D2D041CFB2EFA00A4752F /* lauxlib.c */; };
 		715AC0D51D7B0A29003D7C8C /* lbaselib.c in Sources */ = {isa = PBXBuildFile; fileRef = 713D2D071CFB2EFA00A4752F /* lbaselib.c */; };
@@ -162,6 +163,8 @@
 		716AB5B61BEF9F3D001B672D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B51BEF9F3D001B672D /* Assets.xcassets */; };
 		716AB5B91BEF9F3D001B672D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B71BEF9F3D001B672D /* LaunchScreen.storyboard */; };
 		717FA2091CA1843C009071DC /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 717FA2081CA1843C009071DC /* EAGLView.mm */; };
+		7188F19E1D9B271800A2D04F /* ShaderManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F19C1D9B271800A2D04F /* ShaderManager.cpp */; };
+		7188F1A11D9B282300A2D04F /* GLES2Program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F19F1D9B282300A2D04F /* GLES2Program.cpp */; };
 		71CDC6FB1D7B13240060EEFF /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FA1D7B13240060EEFF /* libz.tbd */; };
 		71CDC6FD1D7B132B0060EEFF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */; };
 		71CDC6FF1D7B13350060EEFF /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */; };
@@ -192,11 +195,10 @@
 		71CDC7271D7B146D0060EEFF /* Vector3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A361CFB2EAD00A4752F /* Vector3.cpp */; };
 		71CDC7281D7B146D0060EEFF /* Vector4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A391CFB2EAD00A4752F /* Vector4.cpp */; };
 		71CDC7291D7B14720060EEFF /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A431CFB2EAD00A4752F /* Log.cpp */; };
-		71CDC72A1D7B14790060EEFF /* MeshRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A5D1CFB2EAD00A4752F /* MeshRender.cpp */; };
-		71CDC72B1D7B14790060EEFF /* SceneRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A601CFB2EAD00A4752F /* SceneRender.cpp */; };
+		71CDC72A1D7B14790060EEFF /* MeshManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A5D1CFB2EAD00A4752F /* MeshManager.cpp */; };
+		71CDC72B1D7B14790060EEFF /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A601CFB2EAD00A4752F /* SceneManager.cpp */; };
 		71CDC72C1D7B14860060EEFF /* GLES2Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A4D1CFB2EAD00A4752F /* GLES2Mesh.cpp */; };
 		71CDC72D1D7B14860060EEFF /* GLES2Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */; };
-		71CDC72E1D7B14860060EEFF /* GLES2ShaderManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A531CFB2EAD00A4752F /* GLES2ShaderManager.cpp */; };
 		71CDC72F1D7B14860060EEFF /* GLES2Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A571CFB2EAD00A4752F /* GLES2Texture.cpp */; };
 		71CDC7301D7B14860060EEFF /* GLES2Util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A5A1CFB2EAD00A4752F /* GLES2Util.cpp */; };
 		71CDC7381D7B14BA0060EEFF /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 715AC0CA1D7B09F4003D7C8C /* liblua.a */; };
@@ -363,17 +365,15 @@
 		713D2A4E1CFB2EAD00A4752F /* GLES2Mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Mesh.h; sourceTree = "<group>"; };
 		713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Scene.cpp; sourceTree = "<group>"; };
 		713D2A511CFB2EAD00A4752F /* GLES2Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Scene.h; sourceTree = "<group>"; };
-		713D2A531CFB2EAD00A4752F /* GLES2ShaderManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2ShaderManager.cpp; sourceTree = "<group>"; };
-		713D2A541CFB2EAD00A4752F /* GLES2ShaderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2ShaderManager.h; sourceTree = "<group>"; };
 		713D2A561CFB2EAD00A4752F /* GLES2Shaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Shaders.h; sourceTree = "<group>"; };
 		713D2A571CFB2EAD00A4752F /* GLES2Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Texture.cpp; sourceTree = "<group>"; };
 		713D2A581CFB2EAD00A4752F /* GLES2Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Texture.h; sourceTree = "<group>"; };
 		713D2A5A1CFB2EAD00A4752F /* GLES2Util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Util.cpp; sourceTree = "<group>"; };
 		713D2A5B1CFB2EAD00A4752F /* GLES2Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Util.h; sourceTree = "<group>"; };
-		713D2A5D1CFB2EAD00A4752F /* MeshRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MeshRender.cpp; sourceTree = "<group>"; };
-		713D2A5E1CFB2EAD00A4752F /* MeshRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshRender.h; sourceTree = "<group>"; };
-		713D2A601CFB2EAD00A4752F /* SceneRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneRender.cpp; sourceTree = "<group>"; };
-		713D2A611CFB2EAD00A4752F /* SceneRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneRender.h; sourceTree = "<group>"; };
+		713D2A5D1CFB2EAD00A4752F /* MeshManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MeshManager.cpp; sourceTree = "<group>"; };
+		713D2A5E1CFB2EAD00A4752F /* MeshManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshManager.h; sourceTree = "<group>"; };
+		713D2A601CFB2EAD00A4752F /* SceneManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SceneManager.cpp; sourceTree = "<group>"; };
+		713D2A611CFB2EAD00A4752F /* SceneManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneManager.h; sourceTree = "<group>"; };
 		713D2A631CFB2EAD00A4752F /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = "<group>"; };
 		713D2A641CFB2EAD00A4752F /* Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scene.h; sourceTree = "<group>"; };
 		713D2A661CFB2EAD00A4752F /* Shape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shape.cpp; sourceTree = "<group>"; };
@@ -610,6 +610,8 @@
 		715823E91D93573B00AB1181 /* TIFFReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TIFFReader.h; sourceTree = "<group>"; };
 		715823FE1D96EB4600AB1181 /* BMPReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BMPReader.cpp; sourceTree = "<group>"; };
 		715823FF1D96EB4600AB1181 /* BMPReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BMPReader.h; sourceTree = "<group>"; };
+		715824011D9803EF00AB1181 /* TextureManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureManager.cpp; sourceTree = "<group>"; };
+		715824021D9803EF00AB1181 /* TextureManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureManager.h; sourceTree = "<group>"; };
 		715AC0CA1D7B09F4003D7C8C /* liblua.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblua.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		716AB5A21BEF9F3C001B672D /* Supernova.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Supernova.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		716AB5A61BEF9F3C001B672D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -623,6 +625,14 @@
 		716AB5BA1BEF9F3D001B672D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		717FA2081CA1843C009071DC /* EAGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EAGLView.mm; sourceTree = "<group>"; };
 		717FA20A1CA184B9009071DC /* EAGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
+		7188F19C1D9B271800A2D04F /* ShaderManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderManager.cpp; sourceTree = "<group>"; };
+		7188F19D1D9B271800A2D04F /* ShaderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderManager.h; sourceTree = "<group>"; };
+		7188F19F1D9B282300A2D04F /* GLES2Program.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Program.cpp; sourceTree = "<group>"; };
+		7188F1A01D9B282300A2D04F /* GLES2Program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Program.h; sourceTree = "<group>"; };
+		7188F1A21D9B421800A2D04F /* MeshRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MeshRender.h; sourceTree = "<group>"; };
+		7188F1A31D9B436200A2D04F /* SceneRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneRender.h; sourceTree = "<group>"; };
+		7188F1A41D9B444600A2D04F /* TextureRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextureRender.h; sourceTree = "<group>"; };
+		7188F1A61D9B464900A2D04F /* ShaderRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderRender.h; sourceTree = "<group>"; };
 		71CDC6FA1D7B13240060EEFF /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -825,10 +835,18 @@
 			isa = PBXGroup;
 			children = (
 				713D2A4B1CFB2EAD00A4752F /* gles2 */,
-				713D2A5D1CFB2EAD00A4752F /* MeshRender.cpp */,
-				713D2A5E1CFB2EAD00A4752F /* MeshRender.h */,
-				713D2A601CFB2EAD00A4752F /* SceneRender.cpp */,
-				713D2A611CFB2EAD00A4752F /* SceneRender.h */,
+				713D2A5D1CFB2EAD00A4752F /* MeshManager.cpp */,
+				713D2A5E1CFB2EAD00A4752F /* MeshManager.h */,
+				713D2A601CFB2EAD00A4752F /* SceneManager.cpp */,
+				713D2A611CFB2EAD00A4752F /* SceneManager.h */,
+				715824011D9803EF00AB1181 /* TextureManager.cpp */,
+				715824021D9803EF00AB1181 /* TextureManager.h */,
+				7188F19C1D9B271800A2D04F /* ShaderManager.cpp */,
+				7188F19D1D9B271800A2D04F /* ShaderManager.h */,
+				7188F1A21D9B421800A2D04F /* MeshRender.h */,
+				7188F1A31D9B436200A2D04F /* SceneRender.h */,
+				7188F1A41D9B444600A2D04F /* TextureRender.h */,
+				7188F1A61D9B464900A2D04F /* ShaderRender.h */,
 			);
 			path = render;
 			sourceTree = "<group>";
@@ -841,13 +859,13 @@
 				713D2A4E1CFB2EAD00A4752F /* GLES2Mesh.h */,
 				713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */,
 				713D2A511CFB2EAD00A4752F /* GLES2Scene.h */,
-				713D2A531CFB2EAD00A4752F /* GLES2ShaderManager.cpp */,
-				713D2A541CFB2EAD00A4752F /* GLES2ShaderManager.h */,
 				713D2A561CFB2EAD00A4752F /* GLES2Shaders.h */,
 				713D2A571CFB2EAD00A4752F /* GLES2Texture.cpp */,
 				713D2A581CFB2EAD00A4752F /* GLES2Texture.h */,
 				713D2A5A1CFB2EAD00A4752F /* GLES2Util.cpp */,
 				713D2A5B1CFB2EAD00A4752F /* GLES2Util.h */,
+				7188F19F1D9B282300A2D04F /* GLES2Program.cpp */,
+				7188F1A01D9B282300A2D04F /* GLES2Program.h */,
 			);
 			path = gles2;
 			sourceTree = "<group>";
@@ -1578,11 +1596,10 @@
 				71CDC7161D7B14510060EEFF /* Object.cpp in Sources */,
 				715823F91D93688F00AB1181 /* JPEGReader.cpp in Sources */,
 				71CDC70E1D7B14510060EEFF /* Cube.cpp in Sources */,
-				71CDC72E1D7B14860060EEFF /* GLES2ShaderManager.cpp in Sources */,
 				71CDC7301D7B14860060EEFF /* GLES2Util.cpp in Sources */,
 				71CDC70D1D7B14510060EEFF /* Camera.cpp in Sources */,
-				71CDC72B1D7B14790060EEFF /* SceneRender.cpp in Sources */,
-				71CDC72A1D7B14790060EEFF /* MeshRender.cpp in Sources */,
+				71CDC72B1D7B14790060EEFF /* SceneManager.cpp in Sources */,
+				71CDC72A1D7B14790060EEFF /* MeshManager.cpp in Sources */,
 				715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */,
 				71CDC7251D7B146D0060EEFF /* Ray.cpp in Sources */,
 				71CDC72C1D7B14860060EEFF /* GLES2Mesh.cpp in Sources */,
@@ -1596,13 +1613,16 @@
 				71CDC71E1D7B14510060EEFF /* Texture.cpp in Sources */,
 				71CDC7281D7B146D0060EEFF /* Vector4.cpp in Sources */,
 				715823FB1D93688F00AB1181 /* TGAReader.cpp in Sources */,
+				7188F1A11D9B282300A2D04F /* GLES2Program.cpp in Sources */,
 				715824001D96EB4600AB1181 /* BMPReader.cpp in Sources */,
 				71CDC71B1D7B14510060EEFF /* SpotLight.cpp in Sources */,
 				71CDC7151D7B14510060EEFF /* Model.cpp in Sources */,
 				71CDC70F1D7B14510060EEFF /* DirectionalLight.cpp in Sources */,
 				71CDC7231D7B146D0060EEFF /* Matrix4.cpp in Sources */,
 				71CDC7101D7B14510060EEFF /* Engine.cpp in Sources */,
+				715824031D9803EF00AB1181 /* TextureManager.cpp in Sources */,
 				715823FC1D93688F00AB1181 /* TIFFReader.cpp in Sources */,
+				7188F19E1D9B271800A2D04F /* ShaderManager.cpp in Sources */,
 				71CDC71D1D7B14510060EEFF /* Supernova.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

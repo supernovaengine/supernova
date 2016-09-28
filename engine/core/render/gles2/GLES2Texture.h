@@ -3,18 +3,22 @@
 
 #include "GLES2Header.h"
 #include "image/TextureLoader.h"
+#include "render/TextureRender.h"
 
-class GLES2Texture{
+class GLES2Texture : public TextureRender{
 
 private:
-    static GLenum getGlColorFormat(const int color_format);
+    GLuint gTexture;
+    
+    GLenum getGlColorFormat(const int color_format);
+    GLuint getTextureObjectId(const GLsizei width, const GLsizei height, const GLenum type, const GLvoid* pixels);
 
 public:
 
-
-    static GLuint loadAssetIntoTexture(const char* relative_path);
-
-    static GLuint loadTexture(const GLsizei width, const GLsizei height, const GLenum type, const GLvoid* pixels);
+    void loadTexture(const char* relative_path);
+    void deleteTexture();
+    
+    GLuint getTexture();
 
 
 };

@@ -2,7 +2,6 @@
 
 #include "GLES2Header.h"
 #include "GLES2Util.h"
-#include "GLES2ShaderManager.h"
 #include "GLES2Scene.h"
 #include "platform/Log.h"
 #include "GLES2Texture.h"
@@ -72,8 +71,8 @@ bool GLES2Mesh::load(std::vector<Vector3> vertices, std::vector<Vector3> normals
     }
 
     programName = "perfragment";
-
-    gProgram = GLES2ShaderManager::useProgram(programName);
+    
+    gProgram = ((GLES2Program*)shaderManager.useShader(programName))->getShader();
 
     useLighting = glGetUniformLocation(gProgram, "uUseLighting");
     useTexture = glGetUniformLocation(gProgram, "uUseTexture");
@@ -96,10 +95,10 @@ bool GLES2Mesh::load(std::vector<Vector3> vertices, std::vector<Vector3> normals
         }
 
         if (textured[i]){
-            gTexture.push_back(GLES2Texture::loadAssetIntoTexture(submeshes[i].getTexture()->getFilePath()));
+            texture.push_back(((GLES2Texture*)(textureManager.loadTexture(submeshes[i].getTexture()->getFilePath())))->getTexture());
             uTextureUnitLocation = glGetUniformLocation(gProgram, "u_TextureUnit");
         }else{
-            gTexture.push_back(NULL);
+            texture.push_back(NULL);
             uColor = glGetUniformLocation(gProgram, "u_Color");
         }
     }
@@ -202,7 +201,7 @@ bool GLES2Mesh::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* model
 
         if (textured[i]){
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, gTexture[i]);
+            glBindTexture(GL_TEXTURE_2D, texture[i]);
             glUniform1i(uTextureUnitLocation, 0);
         }else{
             glUniform4fv(uColor, 1, submeshes[0].getColor()->ptr());
@@ -234,13 +233,14 @@ void GLES2Mesh::destroy(){
         glDeleteBuffers(1, &vertexBuffer);
         glDeleteBuffers(1, &uvBuffer);
         glDeleteBuffers(1, &normalBuffer);
-       // if (indicesSize > 0){
-        //    glDeleteBuffers(1, &indiceBuffer);
-        //}
-        //if (textured){
-        //    glDeleteTextures(1, &gTexture);
-        //}
-        GLES2ShaderManager::detatchProgram(programName);
+        for (unsigned int i = 0; i < submeshes.size(); i++){
+            if (indicesSizes[i] > 0)
+                glDeleteBuffers(1, &indiceBuffer[i]);
+            
+            if (textured[i])
+                textureManager.deleteTexture(submeshes[i].getTexture()->getFilePath());
+        }
+        shaderManager.deleteShader(programName);
     }
     loaded = false;
 }

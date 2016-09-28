@@ -1,26 +1,20 @@
-
-#ifndef scenerender_h
-#define scenerender_h
-
-#include "gles2/GLES2Scene.h"
-#include "Light.h"
-#include <vector>
+#ifndef SceneRender_h
+#define SceneRender_h
 
 class SceneRender {
-private:
-    GLES2Scene *scene;
-
-    void instanciateRender();
+    
+    
 public:
-    SceneRender();
-    virtual ~SceneRender();
+    
+    inline virtual ~SceneRender(){}
+    
+    virtual void setLights(std::vector<Light*> lights) = 0;
+    virtual void setAmbientLight(Vector3 ambientLight) = 0;
 
-    void setLights(std::vector<Light*> lights);
-    void setAmbientLight(Vector3 ambientLight);
-
-    bool load();
-    bool draw();
-    bool screenSize(int width, int height);
+    virtual bool load() = 0;
+    virtual bool draw() = 0;
+    virtual bool screenSize(int width, int height) = 0;
+    
 };
 
-#endif /* scenerender_h */
+#endif /* SceneRender_h */

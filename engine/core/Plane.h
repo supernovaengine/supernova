@@ -4,7 +4,6 @@
 #include <vector>
 #include "Mesh.h"
 #include "math/Vector3.h"
-#include "render/MeshRender.h"
 
 class Plane: public Mesh {
 public:

@@ -5,8 +5,9 @@
 #include "GLES2Header.h"
 #include "Light.h"
 #include <vector>
+#include "render/SceneRender.h"
 
-class GLES2Scene {
+class GLES2Scene : public SceneRender{
 private:
     static std::vector<Light*> lights;
     static Vector3 ambientLight;

@@ -1,19 +1,19 @@
-#include "MeshRender.h"
+#include "MeshManager.h"
 
 #include "Supernova.h"
 #include <stddef.h>
 
 
-MeshRender::MeshRender() {
+MeshManager::MeshManager() {
     mesh = NULL;
     instanciateRender();
 }
 
-MeshRender::~MeshRender() {
+MeshManager::~MeshManager() {
     delete mesh;
 }
 
-void MeshRender::instanciateRender(){
+void MeshManager::instanciateRender(){
     if (mesh == NULL){
         if (Supernova::getRenderAPI() == S_GLES2){
             mesh = new GLES2Mesh();
@@ -21,16 +21,16 @@ void MeshRender::instanciateRender(){
     }
 }
 
-bool MeshRender::load(std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes) {
+bool MeshManager::load(std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes) {
     instanciateRender();
     return mesh->load(vertices, normals, texcoords, submeshes);
 }
 
-bool MeshRender::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* modelViewProjectionMatrix, Vector3* cameraPosition, int mode) {
+bool MeshManager::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* modelViewProjectionMatrix, Vector3* cameraPosition, int mode) {
     return mesh->draw(modelMatrix, normalMatrix, modelViewProjectionMatrix, cameraPosition, mode);
 }
 
-void MeshRender::destroy(){
+void MeshManager::destroy(){
     if (mesh != NULL)
         mesh->destroy();
 }
