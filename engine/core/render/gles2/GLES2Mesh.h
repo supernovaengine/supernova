@@ -58,7 +58,6 @@ private:
     std::vector<Submesh> submeshes;
     //TODO: struct submesh
     std::vector<GLuint> indiceBuffer;
-    //std::vector<GLuint> gTexture;
     std::vector<GLuint> texture;
     std::vector<unsigned int> indicesSizes;
     std::vector<bool> textured;
@@ -70,7 +69,6 @@ private:
 
     const char* programName;
 
-    bool lighting;
     bool loaded;
     
     TextureManager textureManager;

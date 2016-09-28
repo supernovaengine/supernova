@@ -165,6 +165,7 @@
 		717FA2091CA1843C009071DC /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 717FA2081CA1843C009071DC /* EAGLView.mm */; };
 		7188F19E1D9B271800A2D04F /* ShaderManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F19C1D9B271800A2D04F /* ShaderManager.cpp */; };
 		7188F1A11D9B282300A2D04F /* GLES2Program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F19F1D9B282300A2D04F /* GLES2Program.cpp */; };
+		7188F1A91D9C841900A2D04F /* GLES2Lights.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1A71D9C841900A2D04F /* GLES2Lights.cpp */; };
 		71CDC6FB1D7B13240060EEFF /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FA1D7B13240060EEFF /* libz.tbd */; };
 		71CDC6FD1D7B132B0060EEFF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */; };
 		71CDC6FF1D7B13350060EEFF /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */; };
@@ -633,6 +634,8 @@
 		7188F1A31D9B436200A2D04F /* SceneRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneRender.h; sourceTree = "<group>"; };
 		7188F1A41D9B444600A2D04F /* TextureRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextureRender.h; sourceTree = "<group>"; };
 		7188F1A61D9B464900A2D04F /* ShaderRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderRender.h; sourceTree = "<group>"; };
+		7188F1A71D9C841900A2D04F /* GLES2Lights.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Lights.cpp; sourceTree = "<group>"; };
+		7188F1A81D9C841900A2D04F /* GLES2Lights.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Lights.h; sourceTree = "<group>"; };
 		71CDC6FA1D7B13240060EEFF /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -837,16 +840,16 @@
 				713D2A4B1CFB2EAD00A4752F /* gles2 */,
 				713D2A5D1CFB2EAD00A4752F /* MeshManager.cpp */,
 				713D2A5E1CFB2EAD00A4752F /* MeshManager.h */,
+				7188F1A21D9B421800A2D04F /* MeshRender.h */,
 				713D2A601CFB2EAD00A4752F /* SceneManager.cpp */,
 				713D2A611CFB2EAD00A4752F /* SceneManager.h */,
-				715824011D9803EF00AB1181 /* TextureManager.cpp */,
-				715824021D9803EF00AB1181 /* TextureManager.h */,
+				7188F1A31D9B436200A2D04F /* SceneRender.h */,
 				7188F19C1D9B271800A2D04F /* ShaderManager.cpp */,
 				7188F19D1D9B271800A2D04F /* ShaderManager.h */,
-				7188F1A21D9B421800A2D04F /* MeshRender.h */,
-				7188F1A31D9B436200A2D04F /* SceneRender.h */,
-				7188F1A41D9B444600A2D04F /* TextureRender.h */,
 				7188F1A61D9B464900A2D04F /* ShaderRender.h */,
+				715824011D9803EF00AB1181 /* TextureManager.cpp */,
+				715824021D9803EF00AB1181 /* TextureManager.h */,
+				7188F1A41D9B444600A2D04F /* TextureRender.h */,
 			);
 			path = render;
 			sourceTree = "<group>";
@@ -857,6 +860,8 @@
 				713D2A4C1CFB2EAD00A4752F /* GLES2Header.h */,
 				713D2A4D1CFB2EAD00A4752F /* GLES2Mesh.cpp */,
 				713D2A4E1CFB2EAD00A4752F /* GLES2Mesh.h */,
+				7188F19F1D9B282300A2D04F /* GLES2Program.cpp */,
+				7188F1A01D9B282300A2D04F /* GLES2Program.h */,
 				713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */,
 				713D2A511CFB2EAD00A4752F /* GLES2Scene.h */,
 				713D2A561CFB2EAD00A4752F /* GLES2Shaders.h */,
@@ -864,8 +869,8 @@
 				713D2A581CFB2EAD00A4752F /* GLES2Texture.h */,
 				713D2A5A1CFB2EAD00A4752F /* GLES2Util.cpp */,
 				713D2A5B1CFB2EAD00A4752F /* GLES2Util.h */,
-				7188F19F1D9B282300A2D04F /* GLES2Program.cpp */,
-				7188F1A01D9B282300A2D04F /* GLES2Program.h */,
+				7188F1A71D9C841900A2D04F /* GLES2Lights.cpp */,
+				7188F1A81D9C841900A2D04F /* GLES2Lights.h */,
 			);
 			path = gles2;
 			sourceTree = "<group>";
@@ -1591,6 +1596,7 @@
 				71CDC72F1D7B14860060EEFF /* GLES2Texture.cpp in Sources */,
 				71CDC7221D7B146D0060EEFF /* Angle.cpp in Sources */,
 				71CDC7261D7B146D0060EEFF /* Vector2.cpp in Sources */,
+				7188F1A91D9C841900A2D04F /* GLES2Lights.cpp in Sources */,
 				71CDC7181D7B14510060EEFF /* PointLight.cpp in Sources */,
 				71CDC72D1D7B14860060EEFF /* GLES2Scene.cpp in Sources */,
 				71CDC7161D7B14510060EEFF /* Object.cpp in Sources */,

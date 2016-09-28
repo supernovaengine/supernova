@@ -8,13 +8,13 @@
 #include "math/Vector2.h"
 #include "math/Angle.h"
 #include "PrimitiveMode.h"
+#include "GLES2Lights.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
 GLES2Mesh::GLES2Mesh() {
     programName = NULL;
     loaded = false;
-    lighting = false;
 }
 
 GLES2Mesh::~GLES2Mesh() {
@@ -66,10 +66,6 @@ bool GLES2Mesh::load(std::vector<Vector3> vertices, std::vector<Vector3> normals
         }
     }
 
-    if (GLES2Scene::getLights().size() > 0){
-        lighting = true;
-    }
-
     programName = "perfragment";
     
     gProgram = ((GLES2Program*)shaderManager.useShader(programName))->getShader();
@@ -103,7 +99,7 @@ bool GLES2Mesh::load(std::vector<Vector3> vertices, std::vector<Vector3> normals
         }
     }
 
-    if (lighting){
+    if (GLES2Scene::lighting){
         uEyePos = glGetUniformLocation(gProgram, "u_EyePos");
 
         u_AmbientLight = glGetUniformLocation(gProgram, "u_AmbientLight");
@@ -141,38 +137,38 @@ bool GLES2Mesh::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* model
     glUseProgram(gProgram);
     GLES2Util::checkGlError("glUseProgram");
 
-    glUniform1i(useLighting, lighting);
+    glUniform1i(useLighting, GLES2Scene::lighting);
 
     glUniformMatrix4fv(u_mvpMatrix, 1, GL_FALSE, (GLfloat*)modelViewProjectionMatrix);
     glUniformMatrix4fv(u_mMatrix, 1, GL_FALSE, (GLfloat*)modelMatrix);
     glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);
 
-    if (lighting){
+    if (GLES2Scene::lighting){
         glUniform3fv(uEyePos, 1, cameraPosition->ptr());
 
-        glUniform3fv(u_AmbientLight, 1, GLES2Scene::getAmbientLight().ptr());
+        glUniform3fv(u_AmbientLight, 1, GLES2Lights::ambientLight.ptr());
 
-        glUniform1i(u_NumPointLight, GLES2Scene::numPointLight);
-        if (GLES2Scene::numPointLight > 0){
-            glUniform3fv(u_PointLightPos, GLES2Scene::numPointLight, &GLES2Scene::pointLightPos.front());
-            glUniform1fv(u_PointLightPower, GLES2Scene::numPointLight, &GLES2Scene::pointLightPower.front());
-            glUniform3fv(u_PointLightColor, GLES2Scene::numPointLight, &GLES2Scene::pointLightColor.front());
+        glUniform1i(u_NumPointLight, GLES2Lights::numPointLight);
+        if (GLES2Lights::numPointLight > 0){
+            glUniform3fv(u_PointLightPos, GLES2Lights::numPointLight, &GLES2Lights::pointLightPos.front());
+            glUniform1fv(u_PointLightPower, GLES2Lights::numPointLight, &GLES2Lights::pointLightPower.front());
+            glUniform3fv(u_PointLightColor, GLES2Lights::numPointLight, &GLES2Lights::pointLightColor.front());
         }
 
-        glUniform1i(u_NumSpotLight, GLES2Scene::numSpotLight);
-        if (GLES2Scene::numSpotLight > 0){
-            glUniform3fv(u_SpotLightPos, GLES2Scene::numSpotLight, &GLES2Scene::spotLightPos.front());
-            glUniform1fv(u_SpotLightPower, GLES2Scene::numSpotLight, &GLES2Scene::spotLightPower.front());
-            glUniform3fv(u_SpotLightColor, GLES2Scene::numSpotLight, &GLES2Scene::spotLightColor.front());
-            glUniform3fv(u_SpotLightTarget, GLES2Scene::numSpotLight, &GLES2Scene::spotLightTarget.front());
-            glUniform1fv(u_SpotLightCutOff, GLES2Scene::numSpotLight, &GLES2Scene::spotLightCutOff.front());
+        glUniform1i(u_NumSpotLight, GLES2Lights::numSpotLight);
+        if (GLES2Lights::numSpotLight > 0){
+            glUniform3fv(u_SpotLightPos, GLES2Lights::numSpotLight, &GLES2Lights::spotLightPos.front());
+            glUniform1fv(u_SpotLightPower, GLES2Lights::numSpotLight, &GLES2Lights::spotLightPower.front());
+            glUniform3fv(u_SpotLightColor, GLES2Lights::numSpotLight, &GLES2Lights::spotLightColor.front());
+            glUniform3fv(u_SpotLightTarget, GLES2Lights::numSpotLight, &GLES2Lights::spotLightTarget.front());
+            glUniform1fv(u_SpotLightCutOff, GLES2Lights::numSpotLight, &GLES2Lights::spotLightCutOff.front());
         }
 
-        glUniform1i(u_NumDirectionalLight, GLES2Scene::numDirectionalLight);
-        if (GLES2Scene::numDirectionalLight > 0){
-            glUniform3fv(u_DirectionalLightDir, GLES2Scene::numDirectionalLight, &GLES2Scene::directionalLightDir.front());
-            glUniform1fv(u_DirectionalLightPower, GLES2Scene::numDirectionalLight, &GLES2Scene::directionalLightPower.front());
-            glUniform3fv(u_DirectionalLightColor, GLES2Scene::numDirectionalLight, &GLES2Scene::directionalLightColor.front());
+        glUniform1i(u_NumDirectionalLight, GLES2Lights::numDirectionalLight);
+        if (GLES2Lights::numDirectionalLight > 0){
+            glUniform3fv(u_DirectionalLightDir, GLES2Lights::numDirectionalLight, &GLES2Lights::directionalLightDir.front());
+            glUniform1fv(u_DirectionalLightPower, GLES2Lights::numDirectionalLight, &GLES2Lights::directionalLightPower.front());
+            glUniform3fv(u_DirectionalLightColor, GLES2Lights::numDirectionalLight, &GLES2Lights::directionalLightColor.front());
         }
 
     }
