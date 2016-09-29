@@ -22,11 +22,17 @@ void SceneManager::instanciateRender(){
 }
 
 void SceneManager::setLights(std::vector<Light*> lights){
-    scene->setLights(lights);
+    instanciateRender();
+    this->lights = lights;
+    if (scene)
+        scene->updateLights(this->lights, this->ambientLight);
 }
 
 void SceneManager::setAmbientLight(Vector3 ambientLight){
-    scene->setAmbientLight(ambientLight);
+    instanciateRender();
+    this->ambientLight = ambientLight;
+    if (scene)
+        scene->updateLights(this->lights, this->ambientLight);
 }
 
 bool SceneManager::load() {

@@ -10,6 +10,9 @@
 class SceneManager {
 private:
     SceneRender *scene;
+    
+    std::vector<Light*> lights;
+    Vector3 ambientLight;
 
     void instanciateRender();
 public:
