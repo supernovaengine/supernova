@@ -24,7 +24,7 @@ public:
 
     bool load();
     bool draw();
-    bool screenSize(int width, int height);
+    bool viewSize(int x, int y, int width, int height);
 };
 
 #endif /* scenemanager_h */

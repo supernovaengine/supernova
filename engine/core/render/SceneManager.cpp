@@ -44,7 +44,7 @@ bool SceneManager::draw() {
     return scene->draw();
 }
 
-bool SceneManager::screenSize(int width, int height){
+bool SceneManager::viewSize(int x, int y, int width, int height){
     instanciateRender();
-    return scene->screenSize(width, height);
+    return scene->viewSize(x, y, width, height);
 }

@@ -54,8 +54,51 @@ Camera* Scene::getCamera(){
     return camera;
 }
 
-bool Scene::screenSize(int width, int height){
-    bool status = sceneManager.screenSize(width, height);
+bool Scene::updateViewSize(){
+    
+    int viewX = 0;
+    int viewY = 0;
+    int viewWidth = Supernova::getScreenWidth();
+    int viewHeight = Supernova::getScreenHeight();
+    
+    float screenAspect = (float)Supernova::getScreenWidth() / (float)Supernova::getScreenHeight();
+    float canvasAspect = (float)Supernova::getPreferedCanvasWidth() / (float)Supernova::getPreferedCanvasHeight();
+    
+    //When canvas size is not changed
+    if (Supernova::getScalingMode() == S_SCALING_LETTERBOX){
+        if (screenAspect < canvasAspect){
+            float aspect = (float)Supernova::getScreenWidth() / (float)Supernova::getPreferedCanvasWidth();
+            int newHeight = (int)((float)Supernova::getPreferedCanvasHeight() * aspect);
+            int dif = Supernova::getScreenHeight() - newHeight;
+            viewY = (dif/2);
+            viewHeight = Supernova::getScreenHeight()-dif;
+        }else{
+            float aspect = (float)Supernova::getScreenHeight() / (float)Supernova::getPreferedCanvasHeight();
+            int newWidth = (int)((float)Supernova::getPreferedCanvasWidth() * aspect);
+            int dif = Supernova::getScreenWidth() - newWidth;
+            viewX = (dif/2);
+            viewWidth = Supernova::getScreenWidth()-dif;
+        }
+    }
+    
+    if (Supernova::getScalingMode() == S_SCALING_CROP){
+        if (screenAspect > canvasAspect){
+            float aspect = (float)Supernova::getScreenWidth() / (float)Supernova::getPreferedCanvasWidth();
+            int newHeight = (int)((float)Supernova::getPreferedCanvasHeight() * aspect);
+            int dif = Supernova::getScreenHeight() - newHeight;
+            viewY = (dif/2);
+            viewHeight = Supernova::getScreenHeight()-dif;
+        }else{
+            float aspect = (float)Supernova::getScreenHeight() / (float)Supernova::getPreferedCanvasHeight();
+            int newWidth = (int)((float)Supernova::getPreferedCanvasWidth() * aspect);
+            int dif = Supernova::getScreenWidth() - newWidth;
+            viewX = (dif/2);
+            viewWidth = Supernova::getScreenWidth()-dif;
+        }
+    }
+
+    
+    bool status = sceneManager.viewSize(viewX, viewY, viewWidth, viewHeight);
     if (this->camera != NULL){
         camera->updateScreenSize();
     }

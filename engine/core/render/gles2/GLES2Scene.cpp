@@ -121,10 +121,10 @@ bool GLES2Scene::draw() {
     return true;
 }
 
-bool GLES2Scene::screenSize(int width, int height){
+bool GLES2Scene::viewSize(int x, int y, int width, int height){
     
-    glViewport(0, 0, width, height);
-    //glScissor(0,0,width, height);
+    glViewport(x, y, width, height);
+    //glScissor(x, y, width, height);
     //glEnable(GL_SCISSOR_TEST);
     //checkGlError("glViewport");
     

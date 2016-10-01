@@ -46,7 +46,7 @@ public:
 
     void doCamera();
 
-    bool screenSize(int width, int height);
+    bool updateViewSize();
 
 	bool load();
 	bool draw();

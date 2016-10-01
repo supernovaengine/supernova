@@ -46,6 +46,7 @@ int Supernova::onKeyUpLuaFunc;
 int Supernova::renderAPI;
 bool Supernova::mouseAsTouch;
 bool Supernova::useDegrees;
+int Supernova::scalingMode;
 
 
 Supernova::Supernova() {
@@ -108,16 +109,25 @@ int Supernova::getCanvasHeight(){
 }
 
 void Supernova::setCanvasSize(int canvasWidth, int canvasHeight){
-
-    if ((Supernova::screenWidth != 0) && (Supernova::screenHeight != 0)){
+    
+    Supernova::canvasWidth = canvasWidth;
+    Supernova::canvasHeight = canvasHeight;
+    
+    if ((Supernova::screenWidth == 0) || (Supernova::screenHeight == 0)){
+        setScreenSize(canvasWidth, canvasHeight);
+    }
+    
+    //When canvas size is changed
+    if (scalingMode == S_SCALING_FITWIDTH){
         Supernova::canvasWidth = canvasWidth;
         Supernova::canvasHeight = screenHeight * canvasWidth / screenWidth;
-    }else{
-        setScreenSize(canvasWidth, canvasHeight);
-        Supernova::canvasWidth = canvasWidth;
-        Supernova::canvasHeight = canvasHeight;
     }
-
+    if (scalingMode == S_SCALING_FITHEIGHT){
+        Supernova::canvasHeight = canvasHeight;
+        Supernova::canvasWidth = screenWidth * canvasHeight / screenHeight;
+    }
+    // S_SCALING_STRETCH do not need nothing
+    
     if ((Supernova::preferedCanvasWidth == 0) && (Supernova::preferedCanvasHeight == 0)){
         setPreferedCanvasSize(canvasWidth, canvasHeight);
     }
@@ -145,6 +155,14 @@ void Supernova::setRenderAPI(int renderAPI){
 
 int Supernova::getRenderAPI(){
     return renderAPI;
+}
+
+void Supernova::setScalingMode(int scalingMode){
+    Supernova::scalingMode = scalingMode;
+}
+
+int Supernova::getScalingMode(){
+    return scalingMode;
 }
 
 void Supernova::setMouseAsTouch(bool mouseAsTouch){

@@ -43,6 +43,7 @@ void Engine::onStart(int width, int height){
     Supernova::setMouseAsTouch(true);
     Supernova::setUseDegrees(true);
     Supernova::setRenderAPI(S_GLES2);
+    Supernova::setScalingMode(S_SCALING_FITWIDTH);
 
     Supernova::setLuaState(luaL_newstate());
 
@@ -64,7 +65,7 @@ void Engine::onSurfaceChanged(int width, int height) {
     Supernova::setScreenSize(width, height);
 
     if (Supernova::getScene() != NULL){
-        (Supernova::getScene())->screenSize(Supernova::getScreenWidth(), Supernova::getScreenHeight());
+        (Supernova::getScene())->updateViewSize();
     }
 
 }

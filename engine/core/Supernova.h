@@ -3,6 +3,12 @@
 
 #define S_GLES2 1
 
+#define S_SCALING_FITWIDTH 1
+#define S_SCALING_FITHEIGHT 2
+#define S_SCALING_LETTERBOX 3
+#define S_SCALING_CROP 4
+#define S_SCALING_STRETCH 5
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -57,9 +63,10 @@ private:
     static int preferedCanvasWidth;
     static int preferedCanvasHeight;
 
-		static int renderAPI;
+    static int renderAPI;
     static bool mouseAsTouch;
     static bool useDegrees;
+    static int scalingMode;
 
     static void luaCallback(int nargs, int nresults, int msgh);
 
@@ -85,8 +92,11 @@ public:
     static int getPreferedCanvasHeight();
     static void setPreferedCanvasSize(int preferedCanvasWidth, int preferedCanvasHeight);
 
-		static void setRenderAPI(int renderAPI);
-		static int getRenderAPI();
+    static void setRenderAPI(int renderAPI);
+    static int getRenderAPI();
+    
+    static void setScalingMode(int scalingMode);
+    static int getScalingMode();
 
     static void setMouseAsTouch(bool mouseAsTouch);
     static bool isMouseAsTouch();
@@ -135,4 +145,4 @@ public:
     static void call_onKeyUp(int key);
 };
 
-#endif /* CORE_GAME_H_ */
+#endif /* supernova_h */

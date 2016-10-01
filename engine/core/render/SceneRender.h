@@ -11,7 +11,7 @@ public:
 
     virtual bool load() = 0;
     virtual bool draw() = 0;
-    virtual bool screenSize(int width, int height) = 0;
+    virtual bool viewSize(int x, int y, int width, int height) = 0;
     
 };
 
