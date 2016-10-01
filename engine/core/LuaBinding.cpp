@@ -75,6 +75,7 @@ void LuaBinding::bind(){
     .addStaticFunction("getCanvasHeight", &Supernova::getCanvasHeight)
     .addStaticFunction("setCanvasSize", &Supernova::setCanvasSize)
     .addStaticFunction("setMouseAsTouch", &Supernova::setMouseAsTouch)
+    .addStaticFunction("setScalingMode", &Supernova::setScalingMode)
     .addStaticFunction("onFrame", static_cast<int(*)(lua_State*)>(&Supernova::onFrame))
     .addStaticFunction("onTouchPress", static_cast<int(*)(lua_State*)>(&Supernova::onTouchPress))
     .addStaticFunction("onTouchUp", static_cast<int(*)(lua_State*)>(&Supernova::onTouchUp))
@@ -85,6 +86,11 @@ void LuaBinding::bind(){
     .addStaticFunction("onMouseMove", static_cast<int(*)(lua_State*)>(&Supernova::onMouseMove))
     .addStaticFunction("onKeyPress", static_cast<int(*)(lua_State*)>(&Supernova::onKeyPress))
     .addStaticFunction("onKeyUp", static_cast<int(*)(lua_State*)>(&Supernova::onKeyUp))
+    .addConstant("SCALING_FITWIDTH", S_SCALING_FITWIDTH)
+    .addConstant("SCALING_FITHEIGHT", S_SCALING_FITHEIGHT)
+    .addConstant("SCALING_LETTERBOX", S_SCALING_LETTERBOX)
+    .addConstant("SCALING_CROP", S_SCALING_CROP)
+    .addConstant("SCALING_STRETCH", S_SCALING_STRETCH)
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<Object>("Object")
