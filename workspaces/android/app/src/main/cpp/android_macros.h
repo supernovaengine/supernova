@@ -26,7 +26,7 @@ extern "C" {
 #include "android_fopen.h"
 
 #define fopen(name, mode) android_fopen(name, mode)
-
+/*
 #define printf(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define fprintf(stdout, ...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define perror(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
@@ -35,6 +35,8 @@ extern "C" {
 #define error_report(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define error_printf(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define error_vprintf(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
+*/
+
 #endif
 
 

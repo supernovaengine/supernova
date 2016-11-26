@@ -7,9 +7,12 @@
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/src/main/cpp/android_macros.h")
 
  set(COMPILE_ZLIB OFF)
+ set(COMPILE_OPENAL ON)
 
- if( ANDROID_ABI MATCHES "^armeabi(-v7a)?$" )
+ set(IS_ARM OFF)
+ if( ANDROID_ABI MATCHES "^arm(eabi)?(-v7a)?(64-v8a)?$" )
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon")
+    set(IS_ARM ON)
  endif()
 
  include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
@@ -32,6 +35,6 @@
 
  target_link_libraries(
      supernova-project
-     log android EGL GLESv2
+     log android EGL GLESv2 OpenSLES
      supernova
  )

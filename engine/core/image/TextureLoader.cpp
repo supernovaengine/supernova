@@ -32,7 +32,7 @@ void TextureLoader::loadRawImage(const char* relative_path) {
     ImageReader* imageReader = getImageFormat(relative_path, &ifs);
     
     if (imageReader==NULL){
-        Log::Error(LOG_TAG, "Not supported image type from: %s", relative_path);
+        Log::Error(LOG_TAG, "Not supported image format from: %s", relative_path);
     }
     assert(imageReader!=NULL);
 

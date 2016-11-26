@@ -23,6 +23,7 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "DirectionalLight.h"
+#include "Sound.h"
 #include <map>
 #include <unistd.h>
 
@@ -211,6 +212,13 @@ void LuaBinding::bind(){
     LuaIntf::LuaBinding(L).beginClass<Ray>("Ray")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>))
     .addFunction("intersectionPoint", &Ray::intersectionPoint)
+    .endClass();
+    
+    LuaIntf::LuaBinding(L).beginClass<Sound>("Sound")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
+    .addFunction("load", &Sound::load)
+    .addFunction("play", &Sound::play)
+    .addFunction("stop", &Sound::stop)
     .endClass();
 
     LuaIntf::LuaBinding(L).beginModule("Input")

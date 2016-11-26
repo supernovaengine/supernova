@@ -12,5 +12,12 @@ add_library(
 
 target_link_libraries(
     supernova
-    lua tinyobjloader jpeg png tiff
+    lua tinyobjloader jpeg png tiff mpg123
 )
+
+if (COMPILE_OPENAL)
+    target_link_libraries(
+        supernova
+        openal
+    )
+endif (COMPILE_OPENAL)
