@@ -172,6 +172,9 @@
 		7188F1B61DBD4A3400A2D04F /* AudioReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1B41DBD4A3400A2D04F /* AudioReader.cpp */; };
 		7188F1B91DBD4BAC00A2D04F /* AudioLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1B71DBD4BAC00A2D04F /* AudioLoader.cpp */; };
 		7188F1BC1DBD960000A2D04F /* WAVReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1BA1DBD960000A2D04F /* WAVReader.cpp */; };
+		71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */; };
+		71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28351DE8E96800C12A1D /* MP3Reader.cpp */; };
+		71A6FAC01DEA41A6003850A2 /* OpenalPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABE1DEA41A6003850A2 /* OpenalPlayer.cpp */; };
 		71BD28191DE8879100C12A1D /* dct64.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD26261DE886C200C12A1D /* dct64.c */; };
 		71BD281A1DE8879100C12A1D /* dither.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD26391DE886C200C12A1D /* dither.c */; };
 		71BD281B1DE8879100C12A1D /* equalizer.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD263C1DE886C200C12A1D /* equalizer.c */; };
@@ -197,7 +200,6 @@
 		71BD28301DE887C100C12A1D /* compat.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD260D1DE886C200C12A1D /* compat.c */; };
 		71BD28311DE887C100C12A1D /* compat_str.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD260F1DE886C200C12A1D /* compat_str.c */; };
 		71BD28321DE887E300C12A1D /* libmpg123.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BD254A1DE886B100C12A1D /* libmpg123.a */; };
-		71BD28371DE8E96800C12A1D /* MP3Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28351DE8E96800C12A1D /* MP3Reader.cpp */; };
 		71BD28391DE8EA1500C12A1D /* synth_8bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28381DE8EA1500C12A1D /* synth_8bit.c */; };
 		71CDC6FB1D7B13240060EEFF /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FA1D7B13240060EEFF /* libz.tbd */; };
 		71CDC6FD1D7B132B0060EEFF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */; };
@@ -689,6 +691,10 @@
 		7188F1B81DBD4BAC00A2D04F /* AudioLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioLoader.h; sourceTree = "<group>"; };
 		7188F1BA1DBD960000A2D04F /* WAVReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WAVReader.cpp; sourceTree = "<group>"; };
 		7188F1BB1DBD960000A2D04F /* WAVReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WAVReader.h; sourceTree = "<group>"; };
+		71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPlayer.cpp; sourceTree = "<group>"; };
+		71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
+		71A6FABE1DEA41A6003850A2 /* OpenalPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenalPlayer.cpp; sourceTree = "<group>"; };
+		71A6FABF1DEA41A6003850A2 /* OpenalPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenalPlayer.h; sourceTree = "<group>"; };
 		71BD254A1DE886B100C12A1D /* libmpg123.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmpg123.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BD260D1DE886C200C12A1D /* compat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = compat.c; sourceTree = "<group>"; };
 		71BD260E1DE886C200C12A1D /* compat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compat.h; sourceTree = "<group>"; };
@@ -1358,6 +1364,10 @@
 				7188F1B81DBD4BAC00A2D04F /* AudioLoader.h */,
 				7188F1BA1DBD960000A2D04F /* WAVReader.cpp */,
 				7188F1BB1DBD960000A2D04F /* WAVReader.h */,
+				71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */,
+				71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */,
+				71A6FABE1DEA41A6003850A2 /* OpenalPlayer.cpp */,
+				71A6FABF1DEA41A6003850A2 /* OpenalPlayer.h */,
 			);
 			path = audio;
 			sourceTree = "<group>";
@@ -1847,7 +1857,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				716AB5AA1BEF9F3C001B672D /* AppDelegate.m in Sources */,
-				71BD28371DE8E96800C12A1D /* MP3Reader.cpp in Sources */,
 				716AB5B11BEF9F3D001B672D /* GameViewController.mm in Sources */,
 				713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */,
 				716AB5A71BEF9F3C001B672D /* main.m in Sources */,
@@ -1916,9 +1925,11 @@
 				71CDC72B1D7B14790060EEFF /* SceneManager.cpp in Sources */,
 				71CDC72A1D7B14790060EEFF /* MeshManager.cpp in Sources */,
 				715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */,
+				71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */,
 				71CDC7251D7B146D0060EEFF /* Ray.cpp in Sources */,
 				71CDC72C1D7B14860060EEFF /* GLES2Mesh.cpp in Sources */,
 				71CDC7211D7B14680060EEFF /* TextureFile.cpp in Sources */,
+				71A6FAC01DEA41A6003850A2 /* OpenalPlayer.cpp in Sources */,
 				71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */,
 				71CDC7171D7B14510060EEFF /* Plane.cpp in Sources */,
 				71CDC7191D7B14510060EEFF /* Scene.cpp in Sources */,
@@ -1933,6 +1944,7 @@
 				71CDC71B1D7B14510060EEFF /* SpotLight.cpp in Sources */,
 				71CDC7151D7B14510060EEFF /* Model.cpp in Sources */,
 				71CDC70F1D7B14510060EEFF /* DirectionalLight.cpp in Sources */,
+				71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */,
 				71CDC7231D7B146D0060EEFF /* Matrix4.cpp in Sources */,
 				71CDC7101D7B14510060EEFF /* Engine.cpp in Sources */,
 				7188F1AC1DBBAB0B00A2D04F /* Sound.cpp in Sources */,
@@ -2143,7 +2155,7 @@
 		716AB5BB1BEF9F3D001B672D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -2189,7 +2201,7 @@
 		716AB5BC1BEF9F3D001B672D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
