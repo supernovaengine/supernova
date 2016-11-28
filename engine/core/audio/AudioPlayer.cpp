@@ -12,7 +12,7 @@ AudioPlayer::~AudioPlayer(){
     
 }
 
-void AudioPlayer::setFile(const char* filename){
+void AudioPlayer::setFile(std::string filename){
     this->filename = filename;
 }
 

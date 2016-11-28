@@ -22,6 +22,8 @@
 #include "Mesh.h"
 #include "Input.h"
 
+#include "audio/SoundManager.h"
+
 /*
 #include "Shape.h"
 void teste(){
@@ -77,6 +79,14 @@ void Engine::onDrawFrame() {
     if (Supernova::getScene() != NULL){
         (Supernova::getScene())->draw();
     }
+}
+
+void Engine::onPause(){
+    SoundManager::stopAll();
+}
+
+void Engine::onResume(){
+
 }
 
 void Engine::onTouchPress(float x, float y){

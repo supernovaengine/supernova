@@ -1,11 +1,11 @@
 
 #include "Sound.h"
 
-#include "audio/OpenalPlayer.h"
 
-Sound::Sound(const char* filename){
-    player = new OpenalPlayer();
-    player->setFile(filename);
+
+Sound::Sound(std::string filename){
+    this->filename = filename;
+    player = soundManager.loadPlayer(filename);
 }
 
 Sound::~Sound(){
@@ -15,6 +15,12 @@ Sound::~Sound(){
 int Sound::load(){
     
     return player->load();
+    
+}
+
+void Sound::destroy(){
+    
+    soundManager.deletePlayer(filename);
     
 }
 
@@ -30,8 +36,4 @@ int Sound::stop(){
     
 }
 
-void Sound::destroy(){
-    
-    player->destroy();
-    
-}
+

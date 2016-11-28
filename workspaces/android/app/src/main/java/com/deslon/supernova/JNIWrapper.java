@@ -17,7 +17,9 @@ public class JNIWrapper {
 
 	public static native void on_draw_frame();
 	
-	public static native void on_exit();
+	public static native void on_pause();
+
+	public static native void on_resume();
 	
 	public static native void init_native(Activity mainActivity, AssetManager assetManager);
 	

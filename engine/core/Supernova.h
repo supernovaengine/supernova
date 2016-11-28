@@ -143,6 +143,8 @@ public:
     static void onKeyUp(void (*onKeyUpFunc)(int));
     static int onKeyUp(lua_State *L);
     static void call_onKeyUp(int key);
+    
+    static void stopSounds();
 };
 
 #endif /* supernova_h */

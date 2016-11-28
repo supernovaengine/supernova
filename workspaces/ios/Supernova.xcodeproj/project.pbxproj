@@ -175,6 +175,7 @@
 		71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */; };
 		71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28351DE8E96800C12A1D /* MP3Reader.cpp */; };
 		71A6FAC01DEA41A6003850A2 /* OpenalPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABE1DEA41A6003850A2 /* OpenalPlayer.cpp */; };
+		71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FAC11DEB1924003850A2 /* SoundManager.cpp */; };
 		71BD28191DE8879100C12A1D /* dct64.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD26261DE886C200C12A1D /* dct64.c */; };
 		71BD281A1DE8879100C12A1D /* dither.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD26391DE886C200C12A1D /* dither.c */; };
 		71BD281B1DE8879100C12A1D /* equalizer.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD263C1DE886C200C12A1D /* equalizer.c */; };
@@ -695,6 +696,8 @@
 		71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 		71A6FABE1DEA41A6003850A2 /* OpenalPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenalPlayer.cpp; sourceTree = "<group>"; };
 		71A6FABF1DEA41A6003850A2 /* OpenalPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenalPlayer.h; sourceTree = "<group>"; };
+		71A6FAC11DEB1924003850A2 /* SoundManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundManager.cpp; sourceTree = "<group>"; };
+		71A6FAC21DEB1924003850A2 /* SoundManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
 		71BD254A1DE886B100C12A1D /* libmpg123.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libmpg123.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BD260D1DE886C200C12A1D /* compat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = compat.c; sourceTree = "<group>"; };
 		71BD260E1DE886C200C12A1D /* compat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compat.h; sourceTree = "<group>"; };
@@ -1368,6 +1371,8 @@
 				71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */,
 				71A6FABE1DEA41A6003850A2 /* OpenalPlayer.cpp */,
 				71A6FABF1DEA41A6003850A2 /* OpenalPlayer.h */,
+				71A6FAC11DEB1924003850A2 /* SoundManager.cpp */,
+				71A6FAC21DEB1924003850A2 /* SoundManager.h */,
 			);
 			path = audio;
 			sourceTree = "<group>";
@@ -1943,6 +1948,7 @@
 				715824001D96EB4600AB1181 /* BMPReader.cpp in Sources */,
 				71CDC71B1D7B14510060EEFF /* SpotLight.cpp in Sources */,
 				71CDC7151D7B14510060EEFF /* Model.cpp in Sources */,
+				71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */,
 				71CDC70F1D7B14510060EEFF /* DirectionalLight.cpp in Sources */,
 				71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */,
 				71CDC7231D7B146D0060EEFF /* Matrix4.cpp in Sources */,

@@ -11,6 +11,9 @@ public:
 	static void onSurfaceChanged(int width, int height);
 	static void onDrawFrame();
 
+	static void onPause();
+	static void onResume();
+
     static void onTouchPress(float x, float y);
     static void onTouchUp(float x, float y);
     static void onTouchDrag(float x, float y);

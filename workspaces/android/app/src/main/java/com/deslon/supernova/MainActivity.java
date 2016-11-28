@@ -137,6 +137,8 @@ public class MainActivity extends Activity {
 		if (rendererSet) {
 			glSurfaceView.onPause();
 		}
+
+		JNIWrapper.on_pause();
 	}
 	/*
 	public void onBackPressed() {
@@ -152,6 +154,8 @@ public class MainActivity extends Activity {
 		if (rendererSet) {
 			glSurfaceView.onResume();
 		}
+
+		JNIWrapper.on_resume();
 	}
 	
 	public void showInputText(java.lang.String buffer){

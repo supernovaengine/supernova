@@ -1,18 +1,20 @@
 #ifndef AudioPlayer_h
 #define AudioPlayer_h
 
+#include <string>
+
 class AudioPlayer{
     
 protected:
     
-    const char* filename;
+    std::string filename;
     bool isLoaded;
     
 public:
     AudioPlayer();
     virtual ~AudioPlayer();
     
-    void setFile(const char* filename);
+    void setFile(std::string filename);
     
     virtual int load() = 0;
     virtual int play() = 0;
