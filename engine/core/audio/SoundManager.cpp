@@ -42,6 +42,24 @@ void SoundManager::stopAll(){
     }
 }
 
+void SoundManager::pauseAll(){
+    for (unsigned i=0; i<players.size(); i++){
+        players.at(i).player->pause();
+    }
+}
+
+void SoundManager::resumeAll(){
+    for (unsigned i=0; i<players.size(); i++){
+        players.at(i).player->resume();
+    }
+}
+
+void SoundManager::playAll(){
+    for (unsigned i=0; i<players.size(); i++){
+        players.at(i).player->play();
+    }
+}
+
 void SoundManager::clear(){
     players.clear();
 }

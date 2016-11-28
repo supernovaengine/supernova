@@ -21,8 +21,11 @@ public:
     
     AudioPlayer* loadPlayer(std::string relative_path);
     void deletePlayer(std::string relative_path);
-    
+
+    static void playAll();
     static void stopAll();
+    static void pauseAll();
+    static void resumeAll();
     static void clear();
 };
 

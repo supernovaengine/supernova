@@ -82,11 +82,11 @@ void Engine::onDrawFrame() {
 }
 
 void Engine::onPause(){
-    SoundManager::stopAll();
+    SoundManager::pauseAll();
 }
 
 void Engine::onResume(){
-
+    SoundManager::resumeAll();
 }
 
 void Engine::onTouchPress(float x, float y){

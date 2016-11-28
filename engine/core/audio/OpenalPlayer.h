@@ -35,6 +35,8 @@ public:
     
     int load();
     int play();
+    int pause();
+    int resume();
     int stop();
     void destroy();
     

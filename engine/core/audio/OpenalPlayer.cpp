@@ -86,6 +86,34 @@ int OpenalPlayer::load(){
 
         audioLoader.getRawAudio()->releaseAudioData();
 
+
+        ALfloat listenerOri[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
+
+        alListener3f(AL_POSITION, 0, 0, 1.0f);
+        test_error("listener position");
+        alListener3f(AL_VELOCITY, 0, 0, 0);
+        test_error("listener velocity");
+        alListenerfv(AL_ORIENTATION, listenerOri);
+        test_error("listener orientation");
+
+        alGenSources((ALuint)1, &source);
+        test_error("source generation");
+
+        alSourcef(source, AL_PITCH, 1);
+        test_error("source pitch");
+        alSourcef(source, AL_GAIN, 1);
+        test_error("source gain");
+        alSource3f(source, AL_POSITION, 0, 0, 0);
+        test_error("source position");
+        alSource3f(source, AL_VELOCITY, 0, 0, 0);
+        test_error("source velocity");
+        alSourcei(source, AL_LOOPING, AL_FALSE);
+        test_error("source looping");
+
+
+        alSourcei(source, AL_BUFFER, buffer);
+        test_error("buffer binding");
+
         isLoaded = true;
     }
     return 0;
@@ -97,56 +125,47 @@ int OpenalPlayer::play(){
     if (!isLoaded)
         load();
 
-    ALfloat listenerOri[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
-
-    alListener3f(AL_POSITION, 0, 0, 1.0f);
-    test_error("listener position");
-    alListener3f(AL_VELOCITY, 0, 0, 0);
-    test_error("listener velocity");
-    alListenerfv(AL_ORIENTATION, listenerOri);
-    test_error("listener orientation");
-    
-    alGenSources((ALuint)1, &source);
-    test_error("source generation");
-    
-    alSourcef(source, AL_PITCH, 1);
-    test_error("source pitch");
-    alSourcef(source, AL_GAIN, 1);
-    test_error("source gain");
-    alSource3f(source, AL_POSITION, 0, 0, 0);
-    test_error("source position");
-    alSource3f(source, AL_VELOCITY, 0, 0, 0);
-    test_error("source velocity");
-    alSourcei(source, AL_LOOPING, AL_FALSE);
-    test_error("source looping");
-
-    
-    alSourcei(source, AL_BUFFER, buffer);
-    test_error("buffer binding");
-    
-    alSourcePlay(source);
-    test_error("source playing");
-
-    /*
-     ALint source_state;
-     alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-     test_error("source state get");
-     while (source_state == AL_PLAYING) {
-     alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-     test_error("source state get");
-     }
-     */
+    ALint source_state;
+    alGetSourcei(source, AL_SOURCE_STATE, &source_state);
+    if(source_state!=AL_PLAYING) {
+        alSourcePlay(source);
+        test_error("source playing");
+    }
 
     return 0;
     
 }
 
-int OpenalPlayer::stop(){
+int OpenalPlayer::resume(){
     ALint source_state;
     alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-    if(source_state==AL_PLAYING)
+    if(source_state==AL_PAUSED) {
+        alSourcePlay(source);
+        test_error("source resuming");
+    }
+
+    return 0;
+}
+
+int OpenalPlayer::stop() {
+    ALint source_state;
+    alGetSourcei(source, AL_SOURCE_STATE, &source_state);
+    if (source_state == AL_PLAYING){
         alSourceStop(source);
-    
+        test_error("source stopping");
+    }
+
+    return 0;
+}
+
+int OpenalPlayer::pause(){
+    ALint source_state;
+    alGetSourcei(source, AL_SOURCE_STATE, &source_state);
+    if(source_state==AL_PLAYING) {
+        alSourcePause(source);
+        test_error("source pausing");
+    }
+
     return 0;
 }
 
