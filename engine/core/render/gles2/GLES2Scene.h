@@ -16,7 +16,8 @@ public:
     GLES2Scene();
     virtual ~GLES2Scene();
     
-    void updateLights(std::vector<Light*> lights, Vector3 ambientLight);
+    void setAmbientLight(Vector3 ambientLight);
+    void updateLights(std::vector<Light*> lights);
 
     bool load();
     bool draw();

@@ -20,6 +20,7 @@ protected:
     Vector3 worldTarget;
 
     int type;
+    bool updated;
 
 public:
 
@@ -38,6 +39,8 @@ public:
 
     void setPower(float power);
     void setColor(Vector3 color);
+    
+    bool isUpdated();
 
     void update();
 

@@ -17,9 +17,14 @@ GLES2Scene::GLES2Scene() {
 GLES2Scene::~GLES2Scene() {
 }
 
-
-void GLES2Scene::updateLights(std::vector<Light*> lights, Vector3 ambientLight){
+void GLES2Scene::setAmbientLight(Vector3 ambientLight){
+    
     GLES2Lights::ambientLight = ambientLight;
+    
+}
+
+
+void GLES2Scene::updateLights(std::vector<Light*> lights){
     
     if ((int)lights.size() > 0){
         lighting = true;

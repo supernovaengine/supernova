@@ -8,6 +8,7 @@ Light::Light(){
     this->direction = Vector3(0.0, 0.0, 0.0);
     this->spotAngle = 20;
     this->power = 1;
+    this->updated = true;
 }
 
 Light::Light(int type){
@@ -54,10 +55,15 @@ Vector3 Light::getWorldTarget(){
     return this->worldTarget;
 }
 
+bool Light::isUpdated(){
+    return updated;
+}
+
 void Light::update(){
 
     Object::update();
 
     worldTarget = modelMatrix * (target - position);
-
+    
+    updated = false;
 }
