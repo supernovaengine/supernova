@@ -150,7 +150,7 @@ int OpenalPlayer::resume(){
 int OpenalPlayer::stop() {
     ALint source_state;
     alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-    if (source_state == AL_PLAYING){
+    if ((source_state == AL_PLAYING) || (source_state==AL_PAUSED)){
         alSourceStop(source);
         test_error("source stopping");
     }

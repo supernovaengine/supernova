@@ -23,18 +23,24 @@
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/libs/lua")
 
  add_library(
-     supernova-project
+     supernova
 
      SHARED
 
      src/main/cpp/supernova_android_jni.cpp
      src/main/cpp/android_fopen.cpp
      src/main/cpp/androidcallback.cpp
-     ../../../project/main.cpp
  )
 
+  add_library(
+      supernova-project
+      ../../../project/main.cpp
+  )
+
  target_link_libraries(
-     supernova-project
-     log android EGL GLESv2 OpenSLES
      supernova
+     log android EGL GLESv2 OpenSLES
+
+     supernova-core
+     supernova-project
  )

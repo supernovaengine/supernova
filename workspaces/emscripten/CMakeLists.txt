@@ -11,18 +11,23 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/libs/lua")
 
 add_executable(
-    supernova-project
+    supernova
     main.cpp
+)
+
+add_library(
+    supernova-project
     ../../project/main.cpp
 )
 
 set_target_properties(
-    supernova-project
+    supernova
     PROPERTIES LINK_FLAGS
     "-s USE_GLFW=3 --embed-file ../../../assets@/ -o supernova-project.html -s ALLOW_MEMORY_GROWTH=1"
 )
 
 target_link_libraries(
-    supernova-project
     supernova
+    supernova-core
+    supernova-project
 )

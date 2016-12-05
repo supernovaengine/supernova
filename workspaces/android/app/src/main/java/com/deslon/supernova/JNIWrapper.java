@@ -6,7 +6,7 @@ import android.content.res.AssetManager;
 public class JNIWrapper {
 	
     static {
-        System.loadLibrary("supernova-project");
+        System.loadLibrary("supernova");
     }
     
     public static native void on_start(int width, int height);
