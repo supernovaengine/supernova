@@ -349,6 +349,10 @@ void LuaBinding::bind(){
     if (luaL_loadfile(L, "lua/main.lua") == 0){
         if(lua_pcall(L, 0, LUA_MULTRET, 0) != 0){
             Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(L,-1));
+            lua_close(L);
         }
+    }else{
+        Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(L,-1));
+        lua_close(L);
     }
 }
