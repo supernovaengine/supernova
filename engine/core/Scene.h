@@ -47,7 +47,6 @@ public:
     void doCamera();
 
     bool updateViewSize();
-    void updateLights();
 
 	bool load();
 	bool draw();

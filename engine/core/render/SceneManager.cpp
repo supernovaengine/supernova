@@ -35,8 +35,17 @@ void SceneManager::setAmbientLight(Vector3 ambientLight){
 }
 
 void SceneManager::updateLights(){
-    if (scene)
-        scene->updateLights(this->lights);
+    bool needUpdate = false;
+    
+    for ( int i = 0; i < (int)lights.size(); i++)
+        if (!lights[i]->isUpdated()){
+            needUpdate = true;
+            lights[i]->setUpdated(true);
+        }
+    
+    if (needUpdate)
+        if (scene)
+            scene->updateLights(this->lights);
 }
 
 bool SceneManager::load() {
@@ -45,6 +54,7 @@ bool SceneManager::load() {
 }
 
 bool SceneManager::draw() {
+    updateLights();
     return scene->draw();
 }
 

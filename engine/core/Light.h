@@ -41,6 +41,7 @@ public:
     void setColor(Vector3 color);
     
     bool isUpdated();
+    void setUpdated(bool updated);
 
     void update();
 

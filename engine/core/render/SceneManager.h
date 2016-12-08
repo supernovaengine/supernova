@@ -15,14 +15,13 @@ private:
     Vector3 ambientLight;
 
     void instanciateRender();
+    void updateLights();
 public:
     SceneManager();
     virtual ~SceneManager();
 
     void setLights(std::vector<Light*> lights);
     void setAmbientLight(Vector3 ambientLight);
-    
-    void updateLights();
 
     bool load();
     bool draw();

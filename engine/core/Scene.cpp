@@ -44,17 +44,6 @@ Vector3 Scene::getAmbientLight(){
     return ambientLight;
 }
 
-void Scene::updateLights(){
-    bool needUpdate = false;
-    
-    for ( int i = 0; i < (int)lights.size(); i++)
-        if (!lights[i]->isUpdated())
-            needUpdate = true;
-    
-    if (needUpdate)
-        sceneManager.updateLights();
-}
-
 void Scene::setCamera(Camera* camera){
     this->camera = camera;
     this->camera->setSceneBaseObject(&baseObject);
@@ -143,7 +132,6 @@ bool Scene::load(){
 
 bool Scene::draw(){
     
-    updateLights();
     sceneManager.draw();
     baseObject.draw();
 

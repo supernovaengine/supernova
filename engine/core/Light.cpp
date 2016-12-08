@@ -59,6 +59,10 @@ bool Light::isUpdated(){
     return updated;
 }
 
+void Light::setUpdated(bool updated){
+    this->updated = updated;
+}
+
 void Light::update(){
 
     Object::update();

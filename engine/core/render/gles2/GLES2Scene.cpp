@@ -23,7 +23,6 @@ void GLES2Scene::setAmbientLight(Vector3 ambientLight){
     
 }
 
-
 void GLES2Scene::updateLights(std::vector<Light*> lights){
     
     if ((int)lights.size() > 0){
