@@ -14,7 +14,7 @@ OpenalPlayer::~OpenalPlayer(){
 ALenum OpenalPlayer::toAlFormat(short channels, short samples)
 {
     bool stereo = (channels > 1);
-    
+
     switch (samples) {
         case 16:
             if (stereo)
@@ -85,7 +85,7 @@ int OpenalPlayer::load(){
         test_error("failed to load buffer data");
 
         audioLoader.getRawAudio()->releaseAudioData();
-
+        
 
         ALfloat listenerOri[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
 
@@ -121,19 +121,15 @@ int OpenalPlayer::load(){
 
 
 int OpenalPlayer::play(){
-    
+
     if (!isLoaded)
         load();
 
-    ALint source_state;
-    alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-    if(source_state!=AL_PLAYING) {
-        alSourcePlay(source);
-        test_error("source playing");
-    }
+    alSourcePlay(source);
+    test_error("source playing");
 
     return 0;
-    
+
 }
 
 int OpenalPlayer::resume(){
