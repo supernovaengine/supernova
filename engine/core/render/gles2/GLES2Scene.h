@@ -17,10 +17,10 @@ public:
     virtual ~GLES2Scene();
     
     void setAmbientLight(Vector3 ambientLight);
-    void updateLights(std::vector<Light*> lights);
+    void setLights(std::vector<Light*> lights);
 
-    bool load();
-    bool draw();
+    bool load(bool childScene);
+    bool draw(bool childScene);
     bool viewSize(int x, int y, int width, int height);
 
 };

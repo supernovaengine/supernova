@@ -2,52 +2,58 @@
 #include "WAVReader.h"
 
 #include "AudioFile.h"
-#include <stdint.h>
 #include <string>
 #include <stdlib.h>
+#include "platform/Log.h"
+
+typedef struct header_file
+{
+    char chunk_id[4];
+    int chunk_size;
+    char format[4];
+    char subchunk1_id[4];
+    int subchunk1_size;
+    short int audio_format;
+    short int num_channels;
+    int sample_rate;
+    int byte_rate;
+    short int block_align;
+    short int bits_per_sample;
+    char subchunk2_id[4];
+    int subchunk2_size;
+} header;
+
+typedef struct header_file* header_p;
 
 
 AudioFile* WAVReader::getRawAudio(const char* relative_path, FILE* file){
     //FILE* fp = fopen(fname,"rb");
     if (file) {
-        char id[5];
+        char chunk_id[5], format[5];
         short* bufferData;
-        unsigned long size;
-        short format_tag, channels, block_align, bits_per_sample;
-        unsigned long format_length, sample_rate, avg_bytes_sec, data_size;
-        
-        fread(id, sizeof(uint8_t), 4, file);
-        id[4] = '\0';
-        
-        if (!strcmp(id, "RIFF")) {
-            fread(&size, sizeof(uint32_t), 1, file);
-            fread(id, sizeof(uint8_t), 4, file);
-            id[4] = '\0';
-            
-            if (!strcmp(id,"WAVE")) {
-                fread(id, sizeof(uint8_t), 4, file);
-                fread(&format_length, sizeof(uint32_t),1,file);
-                fread(&format_tag, sizeof(uint16_t), 1, file);
-                fread(&channels, sizeof(uint16_t),1,file);
-                fread(&sample_rate, sizeof(uint32_t), 1, file);
-                fread(&avg_bytes_sec, sizeof(uint32_t), 1, file);
-                fread(&block_align, sizeof(uint16_t), 1, file);
-                fread(&bits_per_sample, sizeof(uint16_t), 1, file);
-                fread(id, sizeof(uint8_t), 4, file);
-                fread(&data_size, sizeof(uint32_t), 1, file);
-                
-                bufferData = (short*) malloc(data_size);
-                fread(bufferData, sizeof(uint16_t), data_size/sizeof(uint16_t), file);
-            }
-            else {
-                //cout<<"Error: RIFF file but not a wave file\n";
-            }
+        int data_size;
+
+        header_p meta = (header_p)malloc(sizeof(header));
+        fread(meta, 1, sizeof(header), file);
+
+        for (int i=0; i<4; i++) {
+            chunk_id[i] = meta->chunk_id[i];
+            format[i] = meta->format[i];
         }
-        else {
-            //cout<<"Error: not a RIFF file\n";
+        chunk_id[4] = '\0';
+        format[4] = '\0';
+        data_size = meta->subchunk2_size;
+
+        if (!strcmp(chunk_id, "RIFF") && !strcmp(format,"WAVE")){
+            bufferData = (short*) malloc(data_size);
+            fread(bufferData, sizeof(short), data_size/sizeof(short), file);
+
+            return new AudioFile(meta->num_channels, meta->bits_per_sample, data_size, meta->sample_rate, (void*) bufferData);
+        }else {
+            Log::Error(LOG_TAG, "RIFF file but not a wave file!");
         }
-        
-       return new AudioFile(channels, bits_per_sample, data_size, sample_rate, (void*) bufferData);
+
+
     }
     
     return NULL;

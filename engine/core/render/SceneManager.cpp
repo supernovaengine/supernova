@@ -6,6 +6,7 @@
 
 SceneManager::SceneManager() {
     scene = NULL;
+    childScene = false;
     instanciateRender();
 }
 
@@ -30,32 +31,35 @@ void SceneManager::setLights(std::vector<Light*> lights){
 void SceneManager::setAmbientLight(Vector3 ambientLight){
     instanciateRender();
     this->ambientLight = ambientLight;
+    updateAmbientLight();
+}
+
+void SceneManager::updateLights(){
+    if (scene)
+        scene->setLights(this->lights);
+}
+
+void SceneManager::updateAmbientLight(){
     if (scene)
         scene->setAmbientLight(this->ambientLight);
 }
 
-void SceneManager::updateLights(){
-    bool needUpdate = false;
-    
-    for ( int i = 0; i < (int)lights.size(); i++)
-        if (!lights[i]->isUpdated()){
-            needUpdate = true;
-            lights[i]->setUpdated(true);
-        }
-    
-    if (needUpdate)
-        if (scene)
-            scene->updateLights(this->lights);
+bool SceneManager::isChildScene(){
+    return childScene;
+}
+
+void SceneManager::setChildScene(bool childScene){
+    this->childScene = childScene;
 }
 
 bool SceneManager::load() {
     instanciateRender();
-    return scene->load();
+    return scene->load(childScene);
 }
 
 bool SceneManager::draw() {
     updateLights();
-    return scene->draw();
+    return scene->draw(childScene);
 }
 
 bool SceneManager::viewSize(int x, int y, int width, int height){

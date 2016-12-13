@@ -188,6 +188,7 @@ void LuaBinding::bind(){
     LuaIntf::LuaBinding(L).beginClass<Scene>("Scene")
     .addConstructor(LUA_ARGS())
     .addFunction("setCamera", &Scene::setCamera)
+    .addFunction("setChildScene", &Scene::setChildScene)
     .addFunction("addObject", &Scene::addObject)
     .addFunction("addLight", &Scene::addLight)
     .addFunction("setAmbientLight", (void (Scene::*)(const float))&Scene::setAmbientLight)

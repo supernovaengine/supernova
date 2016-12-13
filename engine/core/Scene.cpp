@@ -6,6 +6,7 @@
 
 Scene::Scene() {
     camera = NULL;
+    childScene = NULL;
     userCamera = false;
     setAmbientLight(0.1);
 }
@@ -52,6 +53,15 @@ void Scene::setCamera(Camera* camera){
 
 Camera* Scene::getCamera(){
     return camera;
+}
+
+void Scene::setChildScene(Scene* childScene){
+    childScene->sceneManager.setChildScene(true);
+    this->childScene = childScene;
+}
+
+Scene* Scene::getChildScene(){
+    return childScene;
 }
 
 bool Scene::updateViewSize(){
@@ -102,6 +112,10 @@ bool Scene::updateViewSize(){
     if (this->camera != NULL){
         camera->updateScreenSize();
     }
+
+    if (childScene)
+        childScene->updateViewSize();
+
     return status;
 }
 
@@ -126,6 +140,9 @@ bool Scene::load(){
     baseObject.update();
     camera->update();
 
+    if (childScene)
+        childScene->load();
+
     return true;
 }
 
@@ -134,6 +151,9 @@ bool Scene::draw(){
     
     sceneManager.draw();
     baseObject.draw();
+
+    if (childScene)
+        childScene->draw();
 
     return true;
 }

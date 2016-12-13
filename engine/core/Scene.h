@@ -25,6 +25,8 @@ private:
 
     Object baseObject;
 
+	Scene* childScene;
+
 public:
 
 	Scene();
@@ -41,6 +43,9 @@ public:
 
     void setCamera(Camera* camera);
     Camera* getCamera();
+
+	void setChildScene(Scene* childScene);
+	Scene* getChildScene();
 
     Object* getBaseObject();
 

@@ -14,11 +14,18 @@ private:
     std::vector<Light*> lights;
     Vector3 ambientLight;
 
+    bool childScene;
+
     void instanciateRender();
     void updateLights();
+    void updateAmbientLight();
+
 public:
     SceneManager();
     virtual ~SceneManager();
+
+    bool isChildScene();
+    void setChildScene(bool childScene);
 
     void setLights(std::vector<Light*> lights);
     void setAmbientLight(Vector3 ambientLight);

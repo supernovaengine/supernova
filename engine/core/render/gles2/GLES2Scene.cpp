@@ -23,10 +23,12 @@ void GLES2Scene::setAmbientLight(Vector3 ambientLight){
     
 }
 
-void GLES2Scene::updateLights(std::vector<Light*> lights){
+void GLES2Scene::setLights(std::vector<Light*> lights){
     
     if ((int)lights.size() > 0){
         lighting = true;
+    }else{
+        lighting = false;
     }
     
     GLES2Lights::numPointLight = 0;
@@ -93,35 +95,37 @@ void GLES2Scene::updateLights(std::vector<Light*> lights){
 }
 
 
-bool GLES2Scene::load() {
+bool GLES2Scene::load(bool childScene) {
+    if (!childScene) {
+        ShaderManager::clear();
+        TextureManager::clear();
 
-	ShaderManager::clear();
-    TextureManager::clear();
-    
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    
-    glEnable(GL_DEPTH_TEST);
-    
-    //glEnable(GL_CULL_FACE);
-    
-    //Activate transparency
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    GLES2Util::checkGlError("Error on load scene GLES2");
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+        glEnable(GL_DEPTH_TEST);
+
+        //glEnable(GL_CULL_FACE);
+
+        //Activate transparency
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        GLES2Util::checkGlError("Error on load scene GLES2");
+    }
     
     return true;
 }
 
-bool GLES2Scene::draw() {
-    
-    glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
-    GLES2Util::checkGlError("glClearColor");
-    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    GLES2Util::checkGlError("glClear");
+bool GLES2Scene::draw(bool childScene) {
 
-    
+    if (!childScene) {
+        glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+        GLES2Util::checkGlError("glClearColor");
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GLES2Util::checkGlError("glClear");
+    }
+
     return true;
 }
 
