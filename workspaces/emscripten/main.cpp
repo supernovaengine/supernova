@@ -68,7 +68,6 @@ int main(int argc, char **argv) {
 	Engine::onSurfaceChanged(width, height);
 
     emscripten_set_main_loop(renderGame, 0, 1);
-
 }
 
 void window_size_callback(GLFWwindow* window, int nWidth, int nHeight) {
