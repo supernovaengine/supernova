@@ -23,7 +23,7 @@ add_library(
 set_target_properties(
     supernova
     PROPERTIES LINK_FLAGS
-    "-s USE_GLFW=3 --embed-file ../../../assets@/ -o supernova-project.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight', '_main']\""
+    "-s USE_GLFW=3 --embed-file ../../../assets@/ -o supernova-project.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_updateScreenSize','_main']\""
 )
 
 target_link_libraries(

@@ -26,6 +26,12 @@ extern "C" {
     int getScreenHeight() {
         return Engine::getScreenHeight();
     }
+    void updateScreenSize(int nWidth, int nHeight){
+        width = nWidth;
+        height = nHeight;
+
+        Engine::onSurfaceChanged(nWidth, nHeight);
+    }
 }
 
 int main(int argc, char **argv) {
@@ -71,10 +77,7 @@ int main(int argc, char **argv) {
 }
 
 void window_size_callback(GLFWwindow* window, int nWidth, int nHeight) {
-    width = nWidth;
-    height = nHeight;
-
-    Engine::onSurfaceChanged(nWidth, nHeight);
+    updateScreenSize(nWidth, nHeight);
 }
 
 void errorCallback(int error, const char *msg) {
