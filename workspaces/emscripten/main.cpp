@@ -7,7 +7,7 @@
 #include "Engine.h"
 #include "Input.h"
 
-
+void window_size_callback(GLFWwindow* window, int nWidth, int nHeight);
 void errorCallback(int error, const char *msg);
 void renderGame();
 static void on_mouse_callback(GLFWwindow* window, int button, int action, int modify);
@@ -19,6 +19,15 @@ GLFWwindow *window;
 int width, height;
 int mousePressed;
 
+extern "C" {
+    int getScreenWidth() {
+        return Engine::getScreenWidth();
+    }
+    int getScreenHeight() {
+        return Engine::getScreenHeight();
+    }
+}
+
 int main(int argc, char **argv) {
     glfwSetErrorCallback(errorCallback);
 
@@ -27,7 +36,11 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-	Engine::onStart();
+    if ((argv[1] != NULL && argv[1] != 0) && (argv[2] != NULL && argv[2] != 0)){
+        Engine::onStart(atoi(argv[1]), atoi(argv[2]));
+    }else{
+        Engine::onStart();
+    }
 
 	width = Engine::getScreenWidth();
 	height = Engine::getScreenHeight();
@@ -45,6 +58,7 @@ int main(int argc, char **argv) {
     glfwSetMouseButtonCallback(window, on_mouse_callback);
     glfwSetCursorPosCallback(window, on_mouse_move);
     glfwSetScrollCallback(window, on_mouse_wheel);
+    glfwSetWindowSizeCallback(window, window_size_callback);
 
     EMSCRIPTEN_RESULT ret = emscripten_set_keypress_callback(0, 0, 1, key_callback);
     ret = emscripten_set_keydown_callback(0, 0, 1, key_callback);
@@ -54,6 +68,14 @@ int main(int argc, char **argv) {
 	Engine::onSurfaceChanged(width, height);
 
     emscripten_set_main_loop(renderGame, 0, 1);
+
+}
+
+void window_size_callback(GLFWwindow* window, int nWidth, int nHeight) {
+    width = nWidth;
+    height = nHeight;
+
+    Engine::onSurfaceChanged(nWidth, nHeight);
 }
 
 void errorCallback(int error, const char *msg) {
