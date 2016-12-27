@@ -18,7 +18,7 @@ void PNGReader::readPngDataCallback( png_structp png_ptr, png_bytep out, png_siz
 
 PNGReader::PngInfo PNGReader::readAndUpdateInfo(const png_structp png_ptr, const png_infop info_ptr) {
     png_uint_32 width, height;
-    int bit_depth, color_type;
+    int bit_depth, color_type, channels;
 
     png_read_info(png_ptr, info_ptr);
     png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, NULL, NULL, NULL);
@@ -49,8 +49,9 @@ PNGReader::PngInfo PNGReader::readAndUpdateInfo(const png_structp png_ptr, const
 
     // Read the new color type after updates have been made.
     color_type = png_get_color_type(png_ptr, info_ptr);
+    channels = (int)png_get_channels(png_ptr, info_ptr);
 
-    return (PngInfo) {width, height, color_type};
+    return (PngInfo) {width, height, color_type, bit_depth, channels};
 }
 
 PNGReader::DataHandle PNGReader::readEntirePngImage(const png_structp png_ptr, const png_infop info_ptr, const png_uint_32 height) {
@@ -109,7 +110,8 @@ TextureFile* PNGReader::getRawImage(const char* relative_path, std::ifstream* if
 
     png_read_end(png_ptr, info_ptr);
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+    
 
-    return new TextureFile((int)png_info.width, (int)png_info.height, (int)raw_image.size, getColorFormat(png_info.color_type), (void*)raw_image.data);
+    return new TextureFile((int)png_info.width, (int)png_info.height, (int)raw_image.size, getColorFormat(png_info.color_type), (int)(png_info.bit_depth * png_info.channels), (void*)raw_image.data);
 
 }

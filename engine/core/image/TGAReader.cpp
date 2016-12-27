@@ -109,7 +109,7 @@ TextureFile* TGAReader::getRawImage(const char* relative_path, std::ifstream* if
         type = S_COLOR_RGB_ALPHA;
     }
 
-    return new TextureFile((int)width, (int)height, (int)size, type, imageData);
+    return new TextureFile((int)width, (int)height, (int)size, type, BitsPerPixel, imageData);
 }
 
 

@@ -12,6 +12,7 @@ private:
     std::string path;
     bool used;
 public:
+    
     Texture();
     Texture(const char* path);
     Texture(const Texture& v);

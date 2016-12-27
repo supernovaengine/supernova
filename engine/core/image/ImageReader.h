@@ -6,9 +6,6 @@
 #include <fstream>
 
 class ImageReader{
-    
-protected:
-    void flipVertical(unsigned char* inbuf, int width, int height, int bitsPerPixel);
 
 public:
 

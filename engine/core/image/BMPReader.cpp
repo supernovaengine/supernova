@@ -43,18 +43,19 @@ TextureFile* BMPReader::getRawImage(const char* relative_path, std::ifstream* if
     char temp;
     int pos;
     for (int i = 0; i < width*height; i++){
-        pos = i * 3;
+        pos = i * (BitsPerPixel / 8);
         temp = fileData[pos  ];
         fileData[pos  ] = fileData[pos+2];
         fileData[pos+2] = temp;
     }
-    
-    flipVertical((unsigned char*)fileData, width, height, BitsPerPixel);
     
     int type = S_COLOR_RGB;
     if (BitsPerPixel == 32){
         type = S_COLOR_RGB_ALPHA;
     }
     
-    return new TextureFile((int)width, (int)height, (int)size, type, fileData);
+    TextureFile* textureFile = new TextureFile((int)width, (int)height, (int)size, type, BitsPerPixel, fileData);
+    textureFile->flipVertical();
+    
+    return textureFile;
 }

@@ -27,6 +27,8 @@ private:
         const png_uint_32 width;
         const png_uint_32 height;
         const int color_type;
+        const int bit_depth;
+        const int channels;
     } PngInfo;
 
     static void readPngDataCallback( png_structp png_ptr, png_bytep out, png_size_t count );

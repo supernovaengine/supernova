@@ -4,6 +4,9 @@
 
 #include "gles2/GLES2Texture.h"
 #include "render/TextureRender.h"
+#include "image/TextureFile.h"
+#include <string>
+#include <vector>
 
 class TextureManager {
     
@@ -21,6 +24,7 @@ private:
 public:
     
     TextureRender* loadTexture(std::string relative_path);
+    TextureRender* loadTexture(TextureFile* textureFile, std::string id);
     void deleteTexture(std::string relative_path);
 
     static void clear();

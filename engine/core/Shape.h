@@ -11,7 +11,7 @@ public:
     Shape();
 	virtual ~Shape();
 
-	bool load ();
+	bool load();
 
     void generateTexcoords();
 

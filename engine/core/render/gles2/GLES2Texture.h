@@ -2,7 +2,6 @@
 #define gles2texture_h
 
 #include "GLES2Header.h"
-#include "image/TextureLoader.h"
 #include "render/TextureRender.h"
 
 class GLES2Texture : public TextureRender{
@@ -15,7 +14,7 @@ private:
 
 public:
 
-    void loadTexture(const char* relative_path);
+    void loadTexture(int width, int height, int type, void* data);
     void deleteTexture();
     
     GLuint getTexture();

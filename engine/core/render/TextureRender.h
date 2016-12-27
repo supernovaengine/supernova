@@ -8,7 +8,7 @@ public:
     
     inline virtual ~TextureRender(){}
     
-    virtual void loadTexture(const char* relative_path) = 0;
+    virtual void loadTexture(int width, int height, int type, void* data) = 0;
     virtual void deleteTexture() = 0;
     
 };

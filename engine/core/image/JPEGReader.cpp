@@ -14,7 +14,7 @@ TextureFile* JPEGReader::getRawImage(const char* relative_path, std::ifstream* i
     unsigned long data_size;
     unsigned char * jdata;
     
-    int channels;
+    int channels, bitssample;
     unsigned int type;
     unsigned char * rowptr[1];
     
@@ -44,6 +44,7 @@ TextureFile* JPEGReader::getRawImage(const char* relative_path, std::ifstream* i
     x = info.output_width;
     y = info.output_height;
     channels = info.num_components;
+    bitssample = info.data_precision;
 
     type = S_COLOR_RGB;
     if(channels == 4) type = S_COLOR_RGB_ALPHA;
@@ -61,6 +62,6 @@ TextureFile* JPEGReader::getRawImage(const char* relative_path, std::ifstream* i
     
     jpeg_finish_decompress(&info);
     
-    return new TextureFile((int)x, (int)y, (int)data_size, type, (void*)jdata);
+    return new TextureFile((int)x, (int)y, (int)data_size, type, channels * bitssample, (void*)jdata);
 
 }

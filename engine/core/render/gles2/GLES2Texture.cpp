@@ -38,19 +38,10 @@ GLuint GLES2Texture::getTextureObjectId(const GLsizei width, const GLsizei heigh
 
 
 
-void GLES2Texture::loadTexture(const char* relative_path) {
+void GLES2Texture::loadTexture(int width, int height, int type, void* data) {
     //assert(relative_path != NULL);
 
-    TextureLoader image(relative_path);
-
-    const GLsizei width = image.getRawImage()->getWidth();
-    const GLsizei height = image.getRawImage()->getHeight();
-    const GLenum type = getGlColorFormat(image.getRawImage()->getColorFormat());
-    const GLvoid* pixels = image.getRawImage()->getData();
-
-    gTexture = getTextureObjectId(width, height, type, pixels);
-    
-    image.getRawImage()->releaseImageData();
+    gTexture = getTextureObjectId(width, height, getGlColorFormat(type), data);
 
 }
 

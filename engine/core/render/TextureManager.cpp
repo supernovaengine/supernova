@@ -1,5 +1,6 @@
 
 #include "TextureManager.h"
+#include "image/TextureLoader.h"
 #include "Supernova.h"
 
 
@@ -18,21 +19,40 @@ TextureRender* TextureManager::loadTexture(std::string relative_path){
     
     //Verify if there is a created texture
     for (unsigned i=0; i<textures.size(); i++){
-        std::string teste =textures.at(i).key;
+        std::string teste = textures.at(i).key;
         if (teste == relative_path){
             textures.at(i).reference = textures.at(i).reference + 1;
             return textures.at(i).value;
         }
     }
     
+    TextureLoader image(relative_path.c_str());
     TextureRender* texture = getTextureRender();
-    texture->loadTexture(relative_path.c_str());
+    texture->loadTexture(image.getRawImage()->getWidth(), image.getRawImage()->getHeight(), image.getRawImage()->getColorFormat(), image.getRawImage()->getData());
     textures.push_back((TextureStore){texture, relative_path, 1});
     return texture;
 }
 
+TextureRender* TextureManager::loadTexture(TextureFile* textureFile, std::string id){
+    
+    //Verify if there is a created texture
+    for (unsigned i=0; i<textures.size(); i++){
+        std::string teste = textures.at(i).key;
+        if (teste == id){
+            textures.at(i).reference = textures.at(i).reference + 1;
+            return textures.at(i).value;
+        }
+    }
+    
+    TextureRender* texture = getTextureRender();
+    texture->loadTexture(textureFile->getWidth(), textureFile->getHeight(), textureFile->getColorFormat(), textureFile->getData());
+    textures.push_back((TextureStore){texture, id, 1});
+    return texture;
+    
+}
 
 void TextureManager::deleteTexture(std::string relative_path){
+    
     int remove = -1;
     
     for (unsigned i=0; i<textures.size(); i++){
@@ -47,7 +67,6 @@ void TextureManager::deleteTexture(std::string relative_path){
     
     if (remove > 0)
         textures.erase(textures.begin() + remove);
-    
 }
 
 void TextureManager::clear(){
