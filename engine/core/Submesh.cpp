@@ -1,8 +1,9 @@
 #include "Submesh.h"
-
+#include "render/TextureManager.h"
 
 Submesh::Submesh(){
-
+    this->texture = "";
+    this->loaded = false;
 }
 
 Submesh::~Submesh(){
@@ -23,7 +24,7 @@ Submesh& Submesh::operator = (const Submesh& s){
     return *this;
 }
 
-void Submesh::setTexture(Texture texture){
+void Submesh::setTexture(std::string texture){    
     this->texture = texture;
 }
 
@@ -39,8 +40,8 @@ void Submesh::addIndex(unsigned int index){
     this->indices.push_back(index);
 }
 
-Texture* Submesh::getTexture(){
-    return &texture;
+std::string Submesh::getTexture(){
+    return texture;
 }
 
 Vector4* Submesh::getColor(){

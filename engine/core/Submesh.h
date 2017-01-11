@@ -1,13 +1,16 @@
 #ifndef submesh_h
 #define submesh_h
 
-#include "Texture.h"
 #include "math/Vector4.h"
+#include <string>
+#include <vector>
 
 class Submesh {
 private:
+    
+    bool loaded;
 
-    Texture texture;
+    std::string texture;
     Vector4 color;
     std::vector<unsigned int> indices;
 
@@ -18,12 +21,12 @@ public:
 
     Submesh& operator = (const Submesh& s);
 
-    void setTexture(Texture texture);
+    void setTexture(std::string texture);
     void setColor(Vector4 color);
     void setIndices(std::vector<unsigned int> indices);
     void addIndex(unsigned int index);
 
-    Texture* getTexture();
+    std::string getTexture();
     Vector4* getColor();
     std::vector<unsigned int>* getIndices();
 

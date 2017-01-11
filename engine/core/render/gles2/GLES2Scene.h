@@ -2,7 +2,6 @@
 #ifndef gles2scene_h
 #define gles2scene_h
 
-#include "GLES2Header.h"
 #include "Light.h"
 #include <vector>
 #include "render/SceneRender.h"

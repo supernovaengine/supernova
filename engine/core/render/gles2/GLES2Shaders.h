@@ -58,6 +58,7 @@ const char gVertexShaderPerPixelLightTexture[] =
 
 const char gFragmentShaderPerPixelLightTexture[] =
 "#define numLights 8\n"
+
 "precision mediump float;\n"
 
 "uniform sampler2D u_TextureUnit;\n"

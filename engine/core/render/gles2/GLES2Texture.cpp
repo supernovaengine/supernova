@@ -1,6 +1,11 @@
 #include "GLES2Texture.h"
 #include "image/ColorType.h"
 
+
+GLES2Texture::GLES2Texture(){
+    
+}
+
 GLenum GLES2Texture::getGlColorFormat(const int color_format) {
 
     switch (color_format) {
@@ -48,7 +53,6 @@ void GLES2Texture::loadTexture(int width, int height, int type, void* data) {
 void GLES2Texture::deleteTexture(){
     glDeleteTextures(1, &gTexture);
 }
-
 
 GLuint GLES2Texture::getTexture(){
     return gTexture;

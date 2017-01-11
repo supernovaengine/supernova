@@ -30,17 +30,12 @@
      src/main/cpp/supernova_android_jni.cpp
      src/main/cpp/android_fopen.cpp
      src/main/cpp/androidcallback.cpp
+
+     ../../../project/main.cpp
  )
 
-  add_library(
-      supernova-project
-      ../../../project/main.cpp
+  target_link_libraries(
+       supernova
+       supernova-core
+       log android EGL GLESv2 OpenSLES
   )
-
- target_link_libraries(
-     supernova
-     log android EGL GLESv2 OpenSLES
-
-     supernova-core
-     supernova-project
- )

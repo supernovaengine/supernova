@@ -19,6 +19,10 @@
 #include "math/Quaternion.h"
 #include "Input.h"
 #include "Mesh.h"
+#include "Mesh2D.h"
+#include "Image.h"
+#include "GUIObject.h"
+#include "ImageTemplate.h"
 #include "Light.h"
 #include "PointLight.h"
 #include "SpotLight.h"
@@ -110,7 +114,7 @@ void LuaBinding::bind(){
     .addProperty("center", &Object::getCenter, (void (Object::*)(Vector3))&Object::setCenter)
     .addFunction("destroy", &Object::destroy)
     .endClass()
-    
+
     .beginExtendClass<Camera, Object>("Camera")
     .addConstructor(LUA_ARGS())
     .addFunction("setView", (void (Camera::*)(const float, const float, const float))&Camera::setView)
@@ -133,7 +137,7 @@ void LuaBinding::bind(){
     .addConstant("ORTHO", S_ORTHO)
     .addConstant("PERSPECTIVE", S_PERSPECTIVE)
     .endClass()
-    
+
     .beginExtendClass<Light, Object>("Light")
     .addConstructor(LUA_ARGS())
     .addFunction("getColor", &Light::getColor)
@@ -143,18 +147,18 @@ void LuaBinding::bind(){
     .addFunction("getSpotAngle", &Light::getSpotAngle)
     .addFunction("setPower", &Light::setPower)
     .endClass()
-    
+
     .beginExtendClass<PointLight, Light>("PointLight")
     .addConstructor(LUA_ARGS())
     .endClass()
-    
+
     .beginExtendClass<SpotLight, Light>("SpotLight")
     .addConstructor(LUA_ARGS())
     .addFunction("setTarget", (void (SpotLight::*)(const float, const float, const float))&SpotLight::setTarget)
     .addProperty("target", &SpotLight::getTarget, (void (SpotLight::*)(Vector3))&SpotLight::setTarget)
     .addFunction("setSpotAngle", &SpotLight::setSpotAngle)
     .endClass()
-    
+
     .beginExtendClass<DirectionalLight, Light>("DirectionalLight")
     .addConstructor(LUA_ARGS())
     .addFunction("setDirection", (void (DirectionalLight::*)(const float, const float, const float))&DirectionalLight::setDirection)
@@ -162,8 +166,20 @@ void LuaBinding::bind(){
     .endClass()
 
     .beginExtendClass<Mesh, Object>("Mesh")
-    .addFunction("loadTexture", &Mesh::loadTexture)
+    .addFunction("setTexture", (void (Mesh::*)(std::string))&Mesh::setTexture)
     .addFunction("setColor", &Mesh::setColor)
+    .endClass()
+
+    .beginExtendClass<Mesh2D, Mesh>("Mesh2D")
+    .addFunction("setSize", &Mesh2D::setSize)
+    .endClass()
+
+    .beginExtendClass<ImageTemplate, Mesh2D>("ImageTemplate")
+    .addConstructor(LUA_ARGS())
+    .endClass()
+    
+    .beginExtendClass<Image, Mesh2D>("Image")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
     .endClass()
 
     .beginExtendClass<Shape, Mesh>("Shape")
@@ -179,11 +195,11 @@ void LuaBinding::bind(){
     .beginExtendClass<Plane, Mesh>("Plane")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>))
     .endClass()
-    
+
     .beginExtendClass<Model, Mesh>("Model")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
     .endClass();
-    
+
 
     LuaIntf::LuaBinding(L).beginClass<Scene>("Scene")
     .addConstructor(LUA_ARGS())
@@ -214,7 +230,7 @@ void LuaBinding::bind(){
     .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>))
     .addFunction("intersectionPoint", &Ray::intersectionPoint)
     .endClass();
-    
+
     LuaIntf::LuaBinding(L).beginClass<Sound>("Sound")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
     .addFunction("load", &Sound::load)

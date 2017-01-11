@@ -9,8 +9,12 @@
 #include "math/Angle.h"
 #include "PrimitiveMode.h"
 #include "GLES2Lights.h"
+#include "Supernova.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+
+GLuint GLES2Mesh::emptyTexture;
+bool GLES2Mesh::emptyTextureLoaded;
 
 GLES2Mesh::GLES2Mesh() {
     programName = NULL;
@@ -24,15 +28,20 @@ GLES2Mesh::~GLES2Mesh() {
 bool GLES2Mesh::load(std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes) {
 
     loaded = true;
+    
+    if (vertices.size() <= 0){
+        return false;
+    }
 
     primitiveSize = (int)vertices.size();
 
     this->submeshes = submeshes;
 
+    textured.clear();
     for (unsigned int i = 0; i < submeshes.size(); i++){
         indicesSizes.push_back((int)submeshes[i].getIndices()->size());
 
-        if (submeshes[i].getTexture()->isUsed() && texcoords.size() > 0){
+        if (submeshes[i].getTexture()!="" && texcoords.size() > 0){
             textured.push_back(true);
         }else{
             textured.push_back(false);
@@ -67,21 +76,23 @@ bool GLES2Mesh::load(std::vector<Vector3> vertices, std::vector<Vector3> normals
     }
 
     programName = "perfragment";
-    
-    gProgram = ((GLES2Program*)shaderManager.useShader(programName))->getShader();
 
-    useLighting = glGetUniformLocation(gProgram, "uUseLighting");
-    useTexture = glGetUniformLocation(gProgram, "uUseTexture");
+    gProgram = ProgramManager::useProgram(programName, "");
+
+    useLighting = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "uUseLighting");
+    useTexture = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "uUseTexture");
 
     vertexBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, gPrimitiveVertices.size() * sizeof(GLfloat), &gPrimitiveVertices.front(), GL_STATIC_DRAW);
-    aPositionHandle = glGetAttribLocation(gProgram, "a_Position");
+    aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
 
     uvBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, guvMapping.size() * sizeof(GLfloat), &guvMapping.front(), GL_STATIC_DRAW);
-    aTextureCoordinatesLocation = glGetAttribLocation(gProgram, "a_TextureCoordinates");
+    aTextureCoordinatesLocation = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_TextureCoordinates");
 
     normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, gNormals.size() * sizeof(GLfloat), &gNormals.front(), GL_STATIC_DRAW);
-    aNormal = glGetAttribLocation(gProgram, "a_Normal");
+    aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
 
+    indiceBuffer.clear();
+    texture.clear();
     for (unsigned int i = 0; i < submeshes.size(); i++){
         if (indicesSizes[i] > 0){
             std::vector<unsigned int> gIndices = *submeshes[i].getIndices();
@@ -91,41 +102,58 @@ bool GLES2Mesh::load(std::vector<Vector3> vertices, std::vector<Vector3> normals
         }
 
         if (textured[i]){
-            texture.push_back(((GLES2Texture*)(textureManager.loadTexture(submeshes[i].getTexture()->getFilePath())))->getTexture());
-            uTextureUnitLocation = glGetUniformLocation(gProgram, "u_TextureUnit");
+            texture.push_back(TextureManager::loadTexture(submeshes[i].getTexture()));
+            uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
         }else{
-            texture.push_back(NULL);
-            uColor = glGetUniformLocation(gProgram, "u_Color");
+            
+            if (Supernova::getPlatform() == S_WEB){
+                //Fix Chrome warnings of no texture bound with an empty texture
+                if (!GLES2Mesh::emptyTextureLoaded){
+                    glGenTextures(1, &GLES2Mesh::emptyTexture);
+                    glBindTexture(GL_TEXTURE_2D, GLES2Mesh::emptyTexture);
+                    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1, 1, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                    GLES2Mesh::emptyTextureLoaded = true;
+                }
+                
+                texture.push_back(NULL);
+                uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
+            }else{
+                texture.push_back(NULL);
+            }
+            uColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_Color");
+            
         }
     }
 
     if (GLES2Scene::lighting){
-        uEyePos = glGetUniformLocation(gProgram, "u_EyePos");
+        uEyePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_EyePos");
 
-        u_AmbientLight = glGetUniformLocation(gProgram, "u_AmbientLight");
+        u_AmbientLight = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_AmbientLight");
 
-        u_NumPointLight = glGetUniformLocation(gProgram, "u_NumPointLight");
-        u_PointLightPos = glGetUniformLocation(gProgram, "u_PointLightPos");
-        u_PointLightPower = glGetUniformLocation(gProgram, "u_PointLightPower");
-        u_PointLightColor = glGetUniformLocation(gProgram, "u_PointLightColor");
+        u_NumPointLight = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_NumPointLight");
+        u_PointLightPos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_PointLightPos");
+        u_PointLightPower = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_PointLightPower");
+        u_PointLightColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_PointLightColor");
 
-        u_NumSpotLight = glGetUniformLocation(gProgram, "u_NumSpotLight");
-        u_SpotLightPos = glGetUniformLocation(gProgram, "u_SpotLightPos");
-        u_SpotLightPower = glGetUniformLocation(gProgram, "u_SpotLightPower");
-        u_SpotLightColor = glGetUniformLocation(gProgram, "u_SpotLightColor");
-        u_SpotLightTarget = glGetUniformLocation(gProgram, "u_SpotLightTarget");
-        u_SpotLightCutOff = glGetUniformLocation(gProgram, "u_SpotLightCutOff");
+        u_NumSpotLight = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_NumSpotLight");
+        u_SpotLightPos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_SpotLightPos");
+        u_SpotLightPower = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_SpotLightPower");
+        u_SpotLightColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_SpotLightColor");
+        u_SpotLightTarget = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_SpotLightTarget");
+        u_SpotLightCutOff = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_SpotLightCutOff");
 
-        u_NumDirectionalLight = glGetUniformLocation(gProgram, "u_NumDirectionalLight");
-        u_DirectionalLightDir = glGetUniformLocation(gProgram, "u_DirectionalLightDir");
-        u_DirectionalLightPower = glGetUniformLocation(gProgram, "u_DirectionalLightPower");
-        u_DirectionalLightColor = glGetUniformLocation(gProgram, "u_DirectionalLightColor");
+        u_NumDirectionalLight = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_NumDirectionalLight");
+        u_DirectionalLightDir = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_DirectionalLightDir");
+        u_DirectionalLightPower = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_DirectionalLightPower");
+        u_DirectionalLightColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_DirectionalLightColor");
 
     }
 
-    u_mvpMatrix = glGetUniformLocation(gProgram, "u_mvpMatrix");
-    u_mMatrix = glGetUniformLocation(gProgram, "u_mMatrix");
-    u_nMatrix = glGetUniformLocation(gProgram, "u_nMatrix");
+    u_mvpMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mvpMatrix");
+    u_mMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mMatrix");
+    u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
 
     GLES2Util::checkGlError("Error on load GLES2");
 
@@ -133,8 +161,12 @@ bool GLES2Mesh::load(std::vector<Vector3> vertices, std::vector<Vector3> normals
 }
 
 bool GLES2Mesh::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* modelViewProjectionMatrix, Vector3* cameraPosition, int mode) {
+    
+    if (gPrimitiveVertices.size() <= 0){
+        return false;
+    }
 
-    glUseProgram(gProgram);
+    glUseProgram(((GLES2Program*)gProgram.get())->getProgram());
     GLES2Util::checkGlError("glUseProgram");
 
     glUniform1i(useLighting, GLES2Scene::lighting);
@@ -197,10 +229,16 @@ bool GLES2Mesh::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* model
 
         if (textured[i]){
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, texture[i]);
+            glBindTexture(GL_TEXTURE_2D, ((GLES2Texture*)(texture[i].get()))->getTexture());
             glUniform1i(uTextureUnitLocation, 0);
         }else{
             glUniform4fv(uColor, 1, submeshes[0].getColor()->ptr());
+            if (Supernova::getPlatform() == S_WEB){
+                //Fix Chrome warnings of no texture bound
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, GLES2Mesh::emptyTexture);
+                glUniform1i(uTextureUnitLocation, 0);
+            }
         }
 
         if (indicesSizes[i] > 0){
@@ -232,11 +270,13 @@ void GLES2Mesh::destroy(){
         for (unsigned int i = 0; i < submeshes.size(); i++){
             if (indicesSizes[i] > 0)
                 glDeleteBuffers(1, &indiceBuffer[i]);
-            
+
             if (textured[i])
-                textureManager.deleteTexture(submeshes[i].getTexture()->getFilePath());
+                texture[i].reset();
+            TextureManager::deleteUnused();
         }
-        shaderManager.deleteShader(programName);
+        gProgram.reset();
+        ProgramManager::deleteUnused();
     }
     loaded = false;
 }

@@ -160,11 +160,3 @@ void Engine::onTextInput(const char* text){
     //printf("textinput %s\n", text);
     Log::Verbose(LOG_TAG,"textinput %s\n", text);
 }
-
-int Engine::getScreenWidth(){
-    return Supernova::getScreenWidth();
-}
-
-int Engine::getScreenHeight(){
-    return Supernova::getScreenHeight();
-}

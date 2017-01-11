@@ -181,6 +181,23 @@ bool Supernova::isUseDegrees(){
     return Supernova::useDegrees;
 }
 
+int Supernova::getPlatform(){
+    
+#ifdef SUPERNOVA_IOS
+    return S_IOS;
+#endif
+    
+#ifdef SUPERNOVA_ANDROID
+    return S_ANDROID;
+#endif
+    
+#ifdef SUPERNOVA_WEB
+    return S_WEB;
+#endif
+    
+    return 0;
+}
+
 void Supernova::onFrame(void (*onFrameFunc)()){
     Supernova::onFrameFunc = onFrameFunc;
 }

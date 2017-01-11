@@ -12,7 +12,7 @@ TextureLoader::TextureLoader() {
     rawImage = NULL;
 }
 
-TextureLoader::TextureLoader(const char* relative_path){
+TextureLoader::TextureLoader(std::string relative_path){
     loadRawImage(relative_path);
 }
 
@@ -20,32 +20,32 @@ TextureLoader::~TextureLoader() {
     delete rawImage;
 }
 
-void TextureLoader::loadRawImage(const char* relative_path) {
-    assert(relative_path != NULL);
+void TextureLoader::loadRawImage(std::string relative_path) {
+    assert(relative_path != "");
     
     std::ifstream ifs(relative_path, std::ios::binary);
     if (!ifs){
-        Log::Error(LOG_TAG, "Can`t load texture file: %s", relative_path);
+        Log::Error(LOG_TAG, "Can`t load texture file: %s", relative_path.c_str());
     }
     assert(ifs);
     
     ImageReader* imageReader = getImageFormat(relative_path, &ifs);
     
     if (imageReader==NULL){
-        Log::Error(LOG_TAG, "Not supported image format from: %s", relative_path);
+        Log::Error(LOG_TAG, "Not supported image format from: %s", relative_path.c_str());
     }
     assert(imageReader!=NULL);
 
     ifs.seekg(0, std::ios::beg);
     
-    rawImage = imageReader->getRawImage(relative_path, &ifs);
+    rawImage = imageReader->getRawImage(relative_path.c_str(), &ifs);
     
     ifs.close();
     delete imageReader;
 
 }
 
-ImageReader* TextureLoader::getImageFormat(const char* relative_path, std::ifstream* ifile){
+ImageReader* TextureLoader::getImageFormat(std::string relative_path, std::ifstream* ifile){
     
     
     static std::uint8_t DeCompressed[12] = {0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};

@@ -162,9 +162,12 @@
 		716AB5B41BEF9F3D001B672D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B21BEF9F3D001B672D /* Main.storyboard */; };
 		716AB5B61BEF9F3D001B672D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B51BEF9F3D001B672D /* Assets.xcassets */; };
 		716AB5B91BEF9F3D001B672D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B71BEF9F3D001B672D /* LaunchScreen.storyboard */; };
+		716E89AF1E22748800B03DD5 /* ImageTemplate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716E89AC1E22748300B03DD5 /* ImageTemplate.cpp */; };
 		716F76171E1186CB00FF9888 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716F76151E1186CB00FF9888 /* Image.cpp */; };
+		716F761A1E1293B800FF9888 /* GUIObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716F76181E1293B800FF9888 /* GUIObject.cpp */; };
+		716F761D1E1C736300FF9888 /* Mesh2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716F761B1E1C736300FF9888 /* Mesh2D.cpp */; };
 		717FA2091CA1843C009071DC /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 717FA2081CA1843C009071DC /* EAGLView.mm */; };
-		7188F19E1D9B271800A2D04F /* ShaderManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F19C1D9B271800A2D04F /* ShaderManager.cpp */; };
+		7188F19E1D9B271800A2D04F /* ProgramManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F19C1D9B271800A2D04F /* ProgramManager.cpp */; };
 		7188F1A11D9B282300A2D04F /* GLES2Program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F19F1D9B282300A2D04F /* GLES2Program.cpp */; };
 		7188F1A91D9C841900A2D04F /* GLES2Lights.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1A71D9C841900A2D04F /* GLES2Lights.cpp */; };
 		7188F1AC1DBBAB0B00A2D04F /* Sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */; };
@@ -222,7 +225,6 @@
 		71CDC71B1D7B14510060EEFF /* SpotLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713384DC1D2F560400DB73A5 /* SpotLight.cpp */; };
 		71CDC71C1D7B14510060EEFF /* Submesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71EC2E3E1D3D92F700E14D84 /* Submesh.cpp */; };
 		71CDC71D1D7B14510060EEFF /* Supernova.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A691CFB2EAD00A4752F /* Supernova.cpp */; };
-		71CDC71E1D7B14510060EEFF /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A6C1CFB2EAD00A4752F /* Texture.cpp */; };
 		71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A181CFB2EAD00A4752F /* TextureLoader.cpp */; };
 		71CDC7211D7B14680060EEFF /* TextureFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A1E1CFB2EAD00A4752F /* TextureFile.cpp */; };
 		71CDC7221D7B146D0060EEFF /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A271CFB2EAD00A4752F /* Angle.cpp */; };
@@ -427,8 +429,6 @@
 		713D2A671CFB2EAD00A4752F /* Shape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shape.h; sourceTree = "<group>"; };
 		713D2A691CFB2EAD00A4752F /* Supernova.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Supernova.cpp; sourceTree = "<group>"; };
 		713D2A6A1CFB2EAD00A4752F /* Supernova.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Supernova.h; sourceTree = "<group>"; };
-		713D2A6C1CFB2EAD00A4752F /* Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture.cpp; sourceTree = "<group>"; };
-		713D2A6D1CFB2EAD00A4752F /* Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
 		713D2D011CFB2EFA00A4752F /* lapi.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = lapi.c; sourceTree = "<group>"; };
 		713D2D021CFB2EFA00A4752F /* lapi.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = lapi.h; sourceTree = "<group>"; };
 		713D2D041CFB2EFA00A4752F /* lauxlib.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = lauxlib.c; sourceTree = "<group>"; };
@@ -670,18 +670,24 @@
 		716AB5B51BEF9F3D001B672D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		716AB5B81BEF9F3D001B672D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		716AB5BA1BEF9F3D001B672D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		716E89AC1E22748300B03DD5 /* ImageTemplate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageTemplate.cpp; sourceTree = "<group>"; };
+		716E89AD1E22748300B03DD5 /* ImageTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageTemplate.h; sourceTree = "<group>"; };
 		716F76151E1186CB00FF9888 /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Image.cpp; sourceTree = "<group>"; };
 		716F76161E1186CB00FF9888 /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
+		716F76181E1293B800FF9888 /* GUIObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIObject.cpp; sourceTree = "<group>"; };
+		716F76191E1293B800FF9888 /* GUIObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIObject.h; sourceTree = "<group>"; };
+		716F761B1E1C736300FF9888 /* Mesh2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mesh2D.cpp; sourceTree = "<group>"; };
+		716F761C1E1C736300FF9888 /* Mesh2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mesh2D.h; sourceTree = "<group>"; };
 		717FA2081CA1843C009071DC /* EAGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EAGLView.mm; sourceTree = "<group>"; };
 		717FA20A1CA184B9009071DC /* EAGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
-		7188F19C1D9B271800A2D04F /* ShaderManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderManager.cpp; sourceTree = "<group>"; };
-		7188F19D1D9B271800A2D04F /* ShaderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderManager.h; sourceTree = "<group>"; };
+		7188F19C1D9B271800A2D04F /* ProgramManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProgramManager.cpp; sourceTree = "<group>"; };
+		7188F19D1D9B271800A2D04F /* ProgramManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgramManager.h; sourceTree = "<group>"; };
 		7188F19F1D9B282300A2D04F /* GLES2Program.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Program.cpp; sourceTree = "<group>"; };
 		7188F1A01D9B282300A2D04F /* GLES2Program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Program.h; sourceTree = "<group>"; };
 		7188F1A21D9B421800A2D04F /* MeshRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MeshRender.h; sourceTree = "<group>"; };
 		7188F1A31D9B436200A2D04F /* SceneRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneRender.h; sourceTree = "<group>"; };
 		7188F1A41D9B444600A2D04F /* TextureRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextureRender.h; sourceTree = "<group>"; };
-		7188F1A61D9B464900A2D04F /* ShaderRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderRender.h; sourceTree = "<group>"; };
+		7188F1A61D9B464900A2D04F /* ProgramRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgramRender.h; sourceTree = "<group>"; };
 		7188F1A71D9C841900A2D04F /* GLES2Lights.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Lights.cpp; sourceTree = "<group>"; };
 		7188F1A81D9C841900A2D04F /* GLES2Lights.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Lights.h; sourceTree = "<group>"; };
 		7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sound.cpp; sourceTree = "<group>"; };
@@ -882,7 +888,13 @@
 				713384E01D3051FF00DB73A5 /* DirectionalLight.h */,
 				713D2A101CFB2EAD00A4752F /* Engine.cpp */,
 				713D2A111CFB2EAD00A4752F /* Engine.h */,
+				716F76181E1293B800FF9888 /* GUIObject.cpp */,
+				716F76191E1293B800FF9888 /* GUIObject.h */,
 				713D2A161CFB2EAD00A4752F /* image */,
+				716F76151E1186CB00FF9888 /* Image.cpp */,
+				716F76161E1186CB00FF9888 /* Image.h */,
+				716E89AC1E22748300B03DD5 /* ImageTemplate.cpp */,
+				716E89AD1E22748300B03DD5 /* ImageTemplate.h */,
 				713D2A211CFB2EAD00A4752F /* Input.h */,
 				71E1D2291D27358B001209C8 /* Light.cpp */,
 				71E1D22A1D27358B001209C8 /* Light.h */,
@@ -891,6 +903,8 @@
 				713D2A261CFB2EAD00A4752F /* math */,
 				713D2A0A1CFB2EAD00A4752F /* Mesh.cpp */,
 				713D2A0B1CFB2EAD00A4752F /* Mesh.h */,
+				716F761B1E1C736300FF9888 /* Mesh2D.cpp */,
+				716F761C1E1C736300FF9888 /* Mesh2D.h */,
 				71F149B61CFB793200B7552E /* Model.cpp */,
 				71F149B71CFB793200B7552E /* Model.h */,
 				713D2A3C1CFB2EAD00A4752F /* Object.cpp */,
@@ -907,18 +921,14 @@
 				713D2A641CFB2EAD00A4752F /* Scene.h */,
 				713D2A661CFB2EAD00A4752F /* Shape.cpp */,
 				713D2A671CFB2EAD00A4752F /* Shape.h */,
+				7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */,
+				7188F1AB1DBBAB0B00A2D04F /* Sound.h */,
 				713384DC1D2F560400DB73A5 /* SpotLight.cpp */,
 				713384DD1D2F560400DB73A5 /* SpotLight.h */,
 				71EC2E3E1D3D92F700E14D84 /* Submesh.cpp */,
 				71EC2E3F1D3D92F700E14D84 /* Submesh.h */,
 				713D2A691CFB2EAD00A4752F /* Supernova.cpp */,
 				713D2A6A1CFB2EAD00A4752F /* Supernova.h */,
-				713D2A6C1CFB2EAD00A4752F /* Texture.cpp */,
-				713D2A6D1CFB2EAD00A4752F /* Texture.h */,
-				7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */,
-				7188F1AB1DBBAB0B00A2D04F /* Sound.h */,
-				716F76151E1186CB00FF9888 /* Image.cpp */,
-				716F76161E1186CB00FF9888 /* Image.h */,
 			);
 			name = core;
 			path = ../../engine/core;
@@ -988,9 +998,9 @@
 				713D2A601CFB2EAD00A4752F /* SceneManager.cpp */,
 				713D2A611CFB2EAD00A4752F /* SceneManager.h */,
 				7188F1A31D9B436200A2D04F /* SceneRender.h */,
-				7188F19C1D9B271800A2D04F /* ShaderManager.cpp */,
-				7188F19D1D9B271800A2D04F /* ShaderManager.h */,
-				7188F1A61D9B464900A2D04F /* ShaderRender.h */,
+				7188F19C1D9B271800A2D04F /* ProgramManager.cpp */,
+				7188F19D1D9B271800A2D04F /* ProgramManager.h */,
+				7188F1A61D9B464900A2D04F /* ProgramRender.h */,
 				715824011D9803EF00AB1181 /* TextureManager.cpp */,
 				715824021D9803EF00AB1181 /* TextureManager.h */,
 				7188F1A41D9B444600A2D04F /* TextureRender.h */,
@@ -1936,6 +1946,7 @@
 				71CDC72A1D7B14790060EEFF /* MeshManager.cpp in Sources */,
 				715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */,
 				71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */,
+				716F761D1E1C736300FF9888 /* Mesh2D.cpp in Sources */,
 				71CDC7251D7B146D0060EEFF /* Ray.cpp in Sources */,
 				71CDC72C1D7B14860060EEFF /* GLES2Mesh.cpp in Sources */,
 				71CDC7211D7B14680060EEFF /* TextureFile.cpp in Sources */,
@@ -1947,11 +1958,11 @@
 				71CDC7271D7B146D0060EEFF /* Vector3.cpp in Sources */,
 				71CDC7131D7B14510060EEFF /* LuaBinding.cpp in Sources */,
 				716F76171E1186CB00FF9888 /* Image.cpp in Sources */,
-				71CDC71E1D7B14510060EEFF /* Texture.cpp in Sources */,
 				71CDC7281D7B146D0060EEFF /* Vector4.cpp in Sources */,
 				715823FB1D93688F00AB1181 /* TGAReader.cpp in Sources */,
 				7188F1A11D9B282300A2D04F /* GLES2Program.cpp in Sources */,
 				715824001D96EB4600AB1181 /* BMPReader.cpp in Sources */,
+				716F761A1E1293B800FF9888 /* GUIObject.cpp in Sources */,
 				71CDC71B1D7B14510060EEFF /* SpotLight.cpp in Sources */,
 				71CDC7151D7B14510060EEFF /* Model.cpp in Sources */,
 				71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */,
@@ -1960,10 +1971,11 @@
 				71CDC7231D7B146D0060EEFF /* Matrix4.cpp in Sources */,
 				71CDC7101D7B14510060EEFF /* Engine.cpp in Sources */,
 				7188F1AC1DBBAB0B00A2D04F /* Sound.cpp in Sources */,
+				716E89AF1E22748800B03DD5 /* ImageTemplate.cpp in Sources */,
 				715824031D9803EF00AB1181 /* TextureManager.cpp in Sources */,
 				715823FC1D93688F00AB1181 /* TIFFReader.cpp in Sources */,
 				7188F1B31DBD41A400A2D04F /* AudioFile.cpp in Sources */,
-				7188F19E1D9B271800A2D04F /* ShaderManager.cpp in Sources */,
+				7188F19E1D9B271800A2D04F /* ProgramManager.cpp in Sources */,
 				71CDC71D1D7B14510060EEFF /* Supernova.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -13,10 +13,13 @@ private:
     GLuint getTextureObjectId(const GLsizei width, const GLsizei height, const GLenum type, const GLvoid* pixels);
 
 public:
+    
+    GLES2Texture();
 
     void loadTexture(int width, int height, int type, void* data);
     void deleteTexture();
     
+    void setTexture(GLuint texture);
     GLuint getTexture();
 
 

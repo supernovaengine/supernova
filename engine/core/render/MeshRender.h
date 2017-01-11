@@ -1,6 +1,8 @@
 #ifndef MeshRender_h
 #define MeshRender_h
 
+#include "math/Vector2.h"
+
 
 class MeshRender {
     

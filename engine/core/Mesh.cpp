@@ -12,8 +12,22 @@ void Mesh::setColor(float red, float green, float blue, float alpha){
     submeshes[0].setColor(Vector4(red, green, blue, alpha));
 }
 
-void Mesh::loadTexture(const char* path){
-    submeshes[0].setTexture(Texture(path));
+void Mesh::setTexture(std::string texture){
+    setTexture(texture, 0);
+}
+
+void Mesh::setTexture(std::string texture, int submeshIndex){
+    if (texture != submeshes[submeshIndex].getTexture()){
+    
+        submeshes[submeshIndex].setTexture(texture);
+    
+        if (loaded){
+            loaded = false;
+            load();
+            TextureManager::deleteUnused();
+        }
+
+    }
 }
 
 std::vector<Vector3> Mesh::getVertices(){
@@ -30,6 +44,20 @@ std::vector<Vector2> Mesh::getTexcoords(){
 
 std::vector<Submesh> Mesh::getSubmeshes(){
     return submeshes;
+}
+
+std::string Mesh::getTexture(){
+    return getTexture(0);
+}
+
+std::string Mesh::getTexture(int submeshIndex){
+    return submeshes[submeshIndex].getTexture();
+}
+
+
+void Mesh::setTexcoords(std::vector<Vector2> texcoords){
+    this->texcoords.clear();
+    this->texcoords = texcoords;
 }
 
 //std::vector<unsigned int> Mesh::getMaterialsId(){

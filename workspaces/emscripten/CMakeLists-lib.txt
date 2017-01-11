@@ -12,6 +12,7 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/libs/lua")
 
 add_library(
     supernova
+    SHARED
     main.cpp
 )
 
@@ -20,18 +21,8 @@ target_link_libraries(
     supernova-core
 )
 
-add_executable(
-    supernova-project
-    ../../project/main.cpp
-)
-
 set_target_properties(
-    supernova-project
-    PROPERTIES LINK_FLAGS
-    "-g4 -s USE_GLFW=3 --embed-file ../../../assets@/ -o supernova-project.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_updateScreenSize','_main']\""
-)
-
-target_link_libraries(
-    supernova-project
     supernova
+    PROPERTIES LINK_FLAGS
+    "-o supernova.bc"
 )

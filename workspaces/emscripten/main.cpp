@@ -5,6 +5,7 @@
 #include <emscripten/html5.h>
 #include <string.h>
 #include "Engine.h"
+#include "Supernova.h"
 #include "Input.h"
 
 void window_size_callback(GLFWwindow* window, int nWidth, int nHeight);
@@ -21,10 +22,10 @@ int mousePressed;
 
 extern "C" {
     int getScreenWidth() {
-        return Engine::getScreenWidth();
+        return Supernova::getScreenWidth();
     }
     int getScreenHeight() {
-        return Engine::getScreenHeight();
+        return Supernova::getScreenHeight();
     }
     void updateScreenSize(int nWidth, int nHeight){
         width = nWidth;
@@ -48,8 +49,8 @@ int main(int argc, char **argv) {
         Engine::onStart();
     }
 
-	width = Engine::getScreenWidth();
-	height = Engine::getScreenHeight();
+	width = Supernova::getScreenWidth();
+	height = Supernova::getScreenHeight();
 
     window = glfwCreateWindow(width, height, "Supernova", NULL, NULL);
 

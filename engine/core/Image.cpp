@@ -6,20 +6,19 @@
 #include "render/TextureManager.h"
 
 
-Image::Image(): Mesh() {
+
+Image::Image(): Mesh2D() {
     primitiveMode = S_TRIANGLES;
-    this->width = 0;
-    this->height = 0;
 }
 
-Image::Image(int width, int height): Mesh() {
+Image::Image(int width, int height): Mesh2D() {
     primitiveMode = S_TRIANGLES;
-    setSizes(width, height);
+    setSize(width, height);
 }
 
-Image::Image(std::string image_path): Mesh() {
+Image::Image(std::string image_path): Mesh2D() {
     primitiveMode = S_TRIANGLES;
-    loadTexture(image_path.c_str());
+    setTexture(image_path);
 }
 
 Image::~Image() {
@@ -31,17 +30,17 @@ void Image::createVertices(){
     vertices.push_back(Vector3(width, 0, 0));
     vertices.push_back(Vector3(width,  height, 0));
     vertices.push_back(Vector3(0,  height, 0));
-    
+
     texcoords.push_back(Vector2(0.0f, 0.0f));
     texcoords.push_back(Vector2(1.0f, 0.0f));
     texcoords.push_back(Vector2(1.0f, 1.0f));
     texcoords.push_back(Vector2(0.0f, 1.0f));
-    
+
     static const unsigned int indices_array[] = {
         0,  1,  2,
         0,  2,  3
     };
-    
+
     std::vector<unsigned int> indices;
     indices.assign(indices_array, std::end(indices_array));
     submeshes[0].setIndices(indices);
@@ -54,39 +53,15 @@ void Image::createVertices(){
 
 
 bool Image::load(){
-    if (submeshes[0].getTexture() != NULL && !loaded){
-        submeshes[0].getTexture()->getFilePath();
-        TextureLoader image(submeshes[0].getTexture()->getFilePath());
+    if (submeshes[0].getTexture() != "" && !loaded && this->width == 0 && this->height == 0){
+        TextureLoader image(submeshes[0].getTexture());
         if (this->width == 0)
             this->width = image.getRawImage()->getWidth();
         if (this->height == 0)
             this->height = image.getRawImage()->getHeight();
-        TextureManager textureManager;
-        textureManager.loadTexture(image.getRawImage(), submeshes[0].getTexture()->getFilePath());
+        TextureManager::loadTexture(image.getRawImage(), submeshes[0].getTexture());
     }
+
     createVertices();
-    return Mesh::load();
-}
-
-
-void Image::setSizes(int width, int height){
-    this->width = width;
-    this->height = height;
-    load();
-}
-
-void Image::setWidth(int width){
-    setSizes(width, this->height);
-}
-
-int Image::getWidth(){
-    return width;
-}
-
-void Image::setHeight(int height){
-    setSizes(this->width, height);
-}
-
-int Image::getHeight(){
-    return height;
+    return Mesh2D::load();
 }

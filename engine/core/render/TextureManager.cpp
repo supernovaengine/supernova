@@ -15,58 +15,55 @@ TextureRender* TextureManager::getTextureRender(){
     return NULL;
 }
 
-TextureRender* TextureManager::loadTexture(std::string relative_path){
+std::shared_ptr<TextureRender> TextureManager::loadTexture(std::string relative_path){
     
-    //Verify if there is a created texture
-    for (unsigned i=0; i<textures.size(); i++){
-        std::string teste = textures.at(i).key;
-        if (teste == relative_path){
-            textures.at(i).reference = textures.at(i).reference + 1;
-            return textures.at(i).value;
-        }
-    }
-    
-    TextureLoader image(relative_path.c_str());
-    TextureRender* texture = getTextureRender();
-    texture->loadTexture(image.getRawImage()->getWidth(), image.getRawImage()->getHeight(), image.getRawImage()->getColorFormat(), image.getRawImage()->getData());
-    textures.push_back((TextureStore){texture, relative_path, 1});
-    return texture;
+    return loadTexture(NULL, relative_path);
 }
 
-TextureRender* TextureManager::loadTexture(TextureFile* textureFile, std::string id){
+std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureFile, std::string id){
     
     //Verify if there is a created texture
     for (unsigned i=0; i<textures.size(); i++){
         std::string teste = textures.at(i).key;
         if (teste == id){
-            textures.at(i).reference = textures.at(i).reference + 1;
             return textures.at(i).value;
         }
     }
     
+    TextureLoader image;
+    if (textureFile == NULL){
+        image.loadRawImage(id.c_str());
+        textureFile = image.getRawImage();
+    }
+    
     TextureRender* texture = getTextureRender();
+    textureFile->resamplePowerOfTwo();
     texture->loadTexture(textureFile->getWidth(), textureFile->getHeight(), textureFile->getColorFormat(), textureFile->getData());
-    textures.push_back((TextureStore){texture, id, 1});
-    return texture;
+    std::shared_ptr<TextureRender> texturePtr(texture);
+    textures.push_back((TextureStore){texturePtr, id});
+    
+    return textures.at(textures.size()-1).value;
     
 }
 
-void TextureManager::deleteTexture(std::string relative_path){
+void TextureManager::deleteUnused(){
     
-    int remove = -1;
-    
-    for (unsigned i=0; i<textures.size(); i++){
-        if (textures.at(i).key == relative_path){
-            textures.at(i).reference = textures.at(i).reference - 1;
-            if (textures.at(i).reference == 0){
-                remove = i;
-                textures.at(i).value->deleteTexture();
-            }
-        }
+    int remove = findToRemove();
+    while (remove >= 0){
+        textures.erase(textures.begin() + remove);
+        remove = findToRemove();
     }
     
-    if (remove > 0)
-        textures.erase(textures.begin() + remove);
+}
+
+int TextureManager::findToRemove(){
+    for (unsigned i=0; i<textures.size(); i++){
+        if (textures.at(i).value.use_count() <= 1){
+            textures.at(i).value.get()->deleteTexture();
+            return i;
+        }
+    }
+    return -1;
 }
 
 void TextureManager::clear(){

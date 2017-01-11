@@ -10,6 +10,8 @@ private:
     int color_format;
     int bitsPerPixel;
     void* data;
+    
+    int getNearestPowerOfTwo(int size);
 
 public:
 
@@ -22,6 +24,8 @@ public:
 
     void releaseImageData();
     void crop(int offsetX, int offsetY, int newWidth, int newHeight);
+    void resample(int newWidth, int newHeight);
+    void resamplePowerOfTwo();
     void flipVertical();
 
     int getWidth();

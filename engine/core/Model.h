@@ -9,6 +9,7 @@ class Model: public Mesh {
 private:
     const char* filename;
     bool loadOBJ(const char * path);
+    std::string getBaseDir (const std::string str);
 
     Mesh submesh;
 

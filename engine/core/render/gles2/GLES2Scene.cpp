@@ -3,7 +3,7 @@
 
 #include "GLES2Header.h"
 #include "GLES2Util.h"
-#include "render/ShaderManager.h"
+#include "render/ProgramManager.h"
 #include "render/TextureManager.h"
 #include "math/Angle.h"
 #include "GLES2Lights.h"
@@ -97,8 +97,8 @@ void GLES2Scene::setLights(std::vector<Light*> lights){
 
 bool GLES2Scene::load(bool childScene) {
     if (!childScene) {
-        ShaderManager::clear();
-        TextureManager::clear();
+        //ProgramManager::clear();
+        //TextureManager::clear();
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 

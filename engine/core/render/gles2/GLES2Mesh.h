@@ -8,13 +8,13 @@
 #include "math/Vector4.h"
 #include "math/Vector3.h"
 #include "render/TextureManager.h"
-#include "render/ShaderManager.h"
+#include "render/ProgramManager.h"
 #include "render/MeshRender.h"
 
 
 class GLES2Mesh : public MeshRender {
 private:
-    GLuint gProgram;
+    std::shared_ptr<ProgramRender> gProgram;
 
     GLuint aPositionHandle;
     GLuint aTextureCoordinatesLocation;
@@ -52,16 +52,17 @@ private:
     GLuint normalBuffer;
     GLuint uvBuffer;
 
+    static GLuint emptyTexture; //For web bug only
+    static bool emptyTextureLoaded;
 
     int primitiveSize;
 
     std::vector<Submesh> submeshes;
     //TODO: struct submesh
     std::vector<GLuint> indiceBuffer;
-    std::vector<GLuint> texture;
+    std::vector< std::shared_ptr<TextureRender> > texture;
     std::vector<unsigned int> indicesSizes;
     std::vector<bool> textured;
-
 
     std::vector<GLfloat> gPrimitiveVertices;
     std::vector<GLfloat> gNormals;
@@ -70,9 +71,7 @@ private:
     const char* programName;
 
     bool loaded;
-    
-    TextureManager textureManager;
-    ShaderManager shaderManager;
+
 public:
 	GLES2Mesh();
 	virtual ~GLES2Mesh();

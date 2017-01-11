@@ -11,21 +11,22 @@
 class TextureManager {
     
     typedef struct {
-        TextureRender* value;
+        std::shared_ptr<TextureRender> value;
         std::string key;
-        int reference;
     } TextureStore;
     
 private:
     
     static std::vector<TextureStore> textures;
     
-    TextureRender* getTextureRender();
+    static TextureRender* getTextureRender();
+    
+    static int findToRemove();
 public:
     
-    TextureRender* loadTexture(std::string relative_path);
-    TextureRender* loadTexture(TextureFile* textureFile, std::string id);
-    void deleteTexture(std::string relative_path);
+    static std::shared_ptr<TextureRender> loadTexture(std::string relative_path);
+    static std::shared_ptr<TextureRender> loadTexture(TextureFile* textureFile, std::string id);
+    static void deleteUnused();
 
     static void clear();
 };

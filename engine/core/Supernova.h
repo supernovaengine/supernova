@@ -9,6 +9,10 @@
 #define S_SCALING_CROP 4
 #define S_SCALING_STRETCH 5
 
+#define S_ANDROID 1
+#define S_IOS 2
+#define S_WEB 3
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -103,6 +107,8 @@ public:
 
     static void setUseDegrees(bool useDegrees);
     static bool isUseDegrees();
+    
+    static int getPlatform();
 
     static void onFrame(void (*onFrameFunc)());
     static int onFrame(lua_State *L);

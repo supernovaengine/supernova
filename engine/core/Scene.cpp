@@ -3,6 +3,7 @@
 #include "Supernova.h"
 
 #include "platform/Log.h"
+#include "GUIObject.h"
 
 Scene::Scene() {
     camera = NULL;
@@ -17,6 +18,10 @@ Scene::~Scene() {
 
 void Scene::addObject(Object* obj){
     baseObject.addObject(obj);
+    
+    GUIObject* aptr = dynamic_cast<GUIObject*>(obj);
+    if (aptr != NULL)
+        printf ("Encontrou!!!\n");
 }
 
 void Scene::addLight (Light* light){

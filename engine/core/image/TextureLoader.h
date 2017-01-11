@@ -2,20 +2,19 @@
 #define textureloader_h
 
 #include "ImageReader.h"
-#include "Texture.h"
 
 class TextureLoader{
 
 private:
     TextureFile* rawImage;
     
-    ImageReader* getImageFormat(const char* relative_path, std::ifstream* ifile);
+    ImageReader* getImageFormat(std::string relative_path, std::ifstream* ifile);
 public:
     TextureLoader();
-    TextureLoader(const char* relative_path);
+    TextureLoader(std::string relative_path);
     virtual ~TextureLoader();
 
-    void loadRawImage(const char* relative_path);
+    void loadRawImage(std::string relative_path);
 
     TextureFile* getRawImage();
 

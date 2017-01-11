@@ -56,10 +56,19 @@ GLuint GLES2Program::loadShader(GLenum shaderType, const char* pSource) {
     return shader;
 }
 
-void GLES2Program::createShader(std::string shaderName) {
+void GLES2Program::createProgram(std::string shaderName, std::string definitions) {
     
-    const char* pVertexSource = getVertexShader(shaderName.c_str());
-    const char* pFragmentSource = getFragmentShader(shaderName.c_str());
+    const char* pVertexSourceTemp = getVertexShader(shaderName.c_str());
+    const char* pFragmentSourceTemp = getFragmentShader(shaderName.c_str());
+    
+    char * pVertexSource = (char *) malloc(1 + strlen(definitions.c_str())+ strlen(pVertexSourceTemp) );
+    strcpy(pVertexSource,definitions.c_str());
+    strcat(pVertexSource,pVertexSourceTemp);
+    
+    char * pFragmentSource = (char *) malloc(1 + strlen(definitions.c_str())+ strlen(pFragmentSourceTemp) );
+    strcpy(pFragmentSource,definitions.c_str());
+    strcat(pFragmentSource,pFragmentSourceTemp);
+    
 
     GLuint vertexShader = loadShader(GL_VERTEX_SHADER, pVertexSource);
     if (!vertexShader) {
@@ -93,16 +102,18 @@ void GLES2Program::createShader(std::string shaderName) {
             program = 0;
         }
     }
+    free(pVertexSource);
+    free(pFragmentSource);
     glDeleteShader(vertexShader);
     glDeleteShader(pixelShader);
 }
 
-void GLES2Program::deleteShader(){
+void GLES2Program::deleteProgram(){
     glDeleteProgram(program);
 }
 
 
 
-GLuint GLES2Program::getShader(){
+GLuint GLES2Program::getProgram(){
     return program;
 }

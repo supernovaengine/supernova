@@ -28,9 +28,6 @@ public:
 
     static void onTextInput(const char* text);
 
-    static int getScreenWidth();
-    static int getScreenHeight();
-
 };
 
 #endif /* engine_h */

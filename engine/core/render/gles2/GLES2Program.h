@@ -3,11 +3,11 @@
 #define GLES2Program_h
 
 #include "GLES2Header.h"
-#include "render/ShaderRender.h"
+#include "render/ProgramRender.h"
 #include <string>
 
 
-class GLES2Program : public ShaderRender{
+class GLES2Program : public ProgramRender{
 
 private:
     
@@ -21,10 +21,10 @@ private:
     
 public:
 
-    void createShader(std::string shaderName);
-    void deleteShader();
+    void createProgram(std::string shaderName, std::string definitions);
+    void deleteProgram();
     
-    GLuint getShader();
+    GLuint getProgram();
 };
 
 #endif /* GLES2Program_h */

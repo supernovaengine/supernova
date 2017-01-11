@@ -52,6 +52,15 @@ void TextureFile::releaseImageData(){
     free((void*)data);
 }
 
+int TextureFile::getNearestPowerOfTwo(int size)
+{
+    int i;
+    for(i = 31; i >= 0; i--)
+        if ((size - 1) & (1<<i))
+            break;
+    return (1<<(i + 1));
+}
+
 void TextureFile::crop(int offsetX, int offsetY, int newWidth, int newHeight){
     
     int rowsize = width * (bitsPerPixel / 8);
@@ -78,6 +87,45 @@ void TextureFile::crop(int offsetX, int offsetY, int newWidth, int newHeight){
     height = newHeight;
     size = bufsize;
     data = newData;
+}
+
+void TextureFile::resamplePowerOfTwo(){
+    resample(getNearestPowerOfTwo(width), getNearestPowerOfTwo(height));
+}
+
+void TextureFile::resample(int newWidth, int newHeight){
+
+    if ((newWidth != width) || (newHeight != height)){
+    
+        int channels = (bitsPerPixel / 8);
+        int bufsize = newWidth * newHeight * channels;
+        unsigned char* newData = new unsigned char [bufsize];
+    
+        double scaleWidth =  (double)newWidth / (double)width;
+        double scaleHeight = (double)newHeight / (double)height;
+   
+        for(int cy = 0; cy < newHeight; cy++){
+            for(int cx = 0; cx < newWidth; cx++){
+                
+                int pixel = (cy * (newWidth *channels)) + (cx*channels);
+                int nearestMatch =  (((int)(cy / scaleHeight) * (width *channels)) + ((int)(cx / scaleWidth) *channels) );
+            
+                for (int color = 0; color < channels; color++){
+                    newData[pixel + color] =  ((unsigned char*)data)[nearestMatch + color];
+                }
+            
+            }
+        }
+
+        free((void*)data);
+    
+        width = newWidth;
+        height = newHeight;
+        size = bufsize;
+        data = newData;
+        
+    }
+
 }
 
 void TextureFile::flipVertical(){

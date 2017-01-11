@@ -26,14 +26,24 @@ bool Model::load(){
     return Mesh::load();
 }
 
+std::string Model::getBaseDir (const std::string str){
+    size_t found;
+
+    found=str.find_last_of("/\\");
+    
+    return str.substr(0,found);
+}
+
 bool Model::loadOBJ(const char * path){
 
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
 
     std::string err;
+    
+    std::string baseDir = getBaseDir(path);
 
-    bool ret = tinyobj::LoadObj(shapes, materials, err, path);
+    bool ret = tinyobj::LoadObj(shapes, materials, err, path, (baseDir+"/").c_str());
 
     if (!err.empty()) {
         Log::Error(LOG_TAG, "%s (%s)", err.c_str(), path);
@@ -45,8 +55,11 @@ bool Model::loadOBJ(const char * path){
             if (i > (this->submeshes.size()-1)){
                 this->submeshes.push_back(Submesh());
             }
+            //char str[80];
+            //strcpy(str, "jeep");
+            //strcat(str, materials[i].diffuse_texname.c_str());
             //printf("material[%ld].file = %s\n", i, materials[i].diffuse_texname.c_str());
-            this->submeshes[i].getTexture()->loadFromFile(materials[i].diffuse_texname.c_str());
+            this->setTexture(baseDir+"/"+materials[i].diffuse_texname, (int)i);
         }
 
         for (size_t i = 0; i < shapes.size(); i++) {
