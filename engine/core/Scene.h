@@ -10,7 +10,8 @@
 
 #include "math/Matrix4.h"
 
-class Scene: public Render {
+class Scene: public Object {
+    friend class Object;
 private:
 
     SceneManager sceneManager;
@@ -23,19 +24,15 @@ private:
     std::vector<Light*> lights;
     Vector3 ambientLight;
 
-    Object baseObject;
-
 	Scene* childScene;
+    
+    void addLight (Light* light);
+    void removeLight (Light* light);
 
 public:
 
 	Scene();
 	virtual ~Scene();
-
-    void addObject (Object* obj);
-
-    void addLight (Light* light);
-    void removeLight (Light* light);
 
     void setAmbientLight(Vector3 ambientLight);
     void setAmbientLight(const float ambientFactor);
@@ -46,8 +43,6 @@ public:
 
 	void setChildScene(Scene* childScene);
 	Scene* getChildScene();
-
-    Object* getBaseObject();
 
     void doCamera();
 

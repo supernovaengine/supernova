@@ -10,25 +10,27 @@ Scene::Scene() {
     childScene = NULL;
     userCamera = false;
     setAmbientLight(0.1);
+    scene = this;
 }
 
 Scene::~Scene() {
     destroy();
 }
 
-void Scene::addObject(Object* obj){
-    baseObject.addObject(obj);
+void Scene::addLight (Light* light){    
+    bool founded = false;
     
-    GUIObject* aptr = dynamic_cast<GUIObject*>(obj);
-    if (aptr != NULL)
-        printf ("Encontrou!!!\n");
-}
-
-void Scene::addLight (Light* light){
-    lights.push_back(light);
-    sceneManager.setLights(lights);
-    //TODO: colocar para nao repetir
-    //Log::Error(LOG_TAG, "Object has a parent already");
+    std::vector<Light*>::iterator it;
+    for (it = lights.begin(); it != lights.end(); ++it) {
+        if (light == (*it))
+            founded = true;
+    }
+    
+    if (!founded){
+        lights.push_back(light);
+        sceneManager.setLights(lights);
+    }
+        
 }
 
 void Scene::removeLight (Light* light){
@@ -52,7 +54,7 @@ Vector3 Scene::getAmbientLight(){
 
 void Scene::setCamera(Camera* camera){
     this->camera = camera;
-    this->camera->setSceneBaseObject(&baseObject);
+    this->camera->setSceneObject(this);
     userCamera = true;
 }
 
@@ -124,25 +126,21 @@ bool Scene::updateViewSize(){
     return status;
 }
 
-Object* Scene::getBaseObject(){
-    return &baseObject;
-}
-
 void Scene::doCamera(){
     if (this->camera == NULL){
         this->camera = new Camera(S_ORTHO);
-        this->camera->setSceneBaseObject(&baseObject);
+        this->camera->setSceneObject(this);
     }
 }
 
 bool Scene::load(){
 
     sceneManager.load();
-    baseObject.load();
+    Object::load();
 
     doCamera();
 
-    baseObject.update();
+    Object::update();
     camera->update();
 
     if (childScene)
@@ -155,7 +153,7 @@ bool Scene::load(){
 bool Scene::draw(){
     
     sceneManager.draw();
-    baseObject.draw();
+    Object::draw();
 
     if (childScene)
         childScene->draw();

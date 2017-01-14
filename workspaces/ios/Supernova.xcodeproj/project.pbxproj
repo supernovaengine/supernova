@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		71192EFD1CE1334000BD76EE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
+		71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71369C081E291E22006AE1D1 /* Button.cpp */; };
 		713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */ = {isa = PBXBuildFile; fileRef = 713B79A11C0FD15000892EAC /* iosfopenpath.m */; };
 		713D30C51CFB306D00A4752F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* assets */; };
 		7151F2801CD4FA86001A3AC3 /* ioscallback.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7151F27F1CD4FA86001A3AC3 /* ioscallback.mm */; };
@@ -366,6 +367,8 @@
 		713384DD1D2F560400DB73A5 /* SpotLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpotLight.h; sourceTree = "<group>"; };
 		713384DF1D3051FF00DB73A5 /* DirectionalLight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DirectionalLight.cpp; sourceTree = "<group>"; };
 		713384E01D3051FF00DB73A5 /* DirectionalLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DirectionalLight.h; sourceTree = "<group>"; };
+		71369C081E291E22006AE1D1 /* Button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Button.cpp; sourceTree = "<group>"; };
+		71369C091E291E22006AE1D1 /* Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Button.h; sourceTree = "<group>"; };
 		7137AEB71CFCF58900B271D5 /* tiny_obj_loader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_obj_loader.cc; sourceTree = "<group>"; };
 		7137AEB81CFCF58900B271D5 /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
 		713B79A01C0FB5FD00892EAC /* ios_macros.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ios_macros.pch; sourceTree = "<group>"; };
@@ -880,6 +883,8 @@
 			isa = PBXGroup;
 			children = (
 				7188F1B01DBD416000A2D04F /* audio */,
+				71369C081E291E22006AE1D1 /* Button.cpp */,
+				71369C091E291E22006AE1D1 /* Button.h */,
 				713D2A071CFB2EAD00A4752F /* Camera.cpp */,
 				713D2A081CFB2EAD00A4752F /* Camera.h */,
 				713D2A0D1CFB2EAD00A4752F /* Cube.cpp */,
@@ -1953,6 +1958,7 @@
 				71A6FAC01DEA41A6003850A2 /* OpenalPlayer.cpp in Sources */,
 				71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */,
 				71CDC7171D7B14510060EEFF /* Plane.cpp in Sources */,
+				71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */,
 				71CDC7191D7B14510060EEFF /* Scene.cpp in Sources */,
 				715823FA1D93688F00AB1181 /* PNGReader.cpp in Sources */,
 				71CDC7271D7B146D0060EEFF /* Vector3.cpp in Sources */,

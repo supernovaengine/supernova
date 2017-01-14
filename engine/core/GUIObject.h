@@ -10,6 +10,8 @@ private:
 public:
     GUIObject();
     virtual ~GUIObject();
+    
+    void onTouchPress(float x, float y);
 };
 
 #endif /* GUIObject_h */

@@ -12,12 +12,14 @@ class Object: public Render {
 private:
 
     void updateMatrices();
+    void setSceneAndConfigure(Object* scene);
 
 protected:
 
     std::vector<Object*> objects;
 
     Object* parent;
+    Object* scene;
 
     Matrix4* viewMatrix;
     Matrix4* viewProjectionMatrix;

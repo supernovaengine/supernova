@@ -39,7 +39,7 @@ protected:
 
     int projection;
 
-    Object* sceneBaseObject;
+    Object* sceneObject;
 
 public:
 
@@ -73,7 +73,7 @@ public:
     void walkForward(float distance);
     void slide(float distance);
 
-    void setSceneBaseObject(Object* baseObject);
+    void setSceneObject(Object* scene);
 
     void update();
 

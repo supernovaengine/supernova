@@ -31,7 +31,12 @@ std::string Model::getBaseDir (const std::string str){
 
     found=str.find_last_of("/\\");
     
-    return str.substr(0,found);
+    std::string result = str.substr(0,found);
+    
+    if (str == result)
+        result= "";
+    
+    return result;
 }
 
 bool Model::loadOBJ(const char * path){

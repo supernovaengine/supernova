@@ -22,7 +22,7 @@ Camera::Camera() : Object(){
 
     projection = S_PERSPECTIVE;
 
-    sceneBaseObject = NULL;
+    sceneObject = NULL;
 
 }
 
@@ -282,8 +282,8 @@ Ray Camera::pointsToRay(float x, float y) {
     return Ray(near_point_ray, vector_between);
 }
 
-void Camera::setSceneBaseObject(Object* baseObject){
-    this->sceneBaseObject = baseObject;
+void Camera::setSceneObject(Object* scene){
+    this->sceneObject = scene;
 }
 
 void Camera::update(){
@@ -308,8 +308,8 @@ void Camera::update(){
 
     viewProjectionMatrix = viewMatrix * projectionMatrix;
 
-    if (sceneBaseObject != NULL){
-        sceneBaseObject->transform(getViewMatrix(), getViewProjectionMatrix(), &worldPosition);
+    if (sceneObject != NULL){
+        sceneObject->transform(getViewMatrix(), getViewProjectionMatrix(), &worldPosition);
     }
 
 }

@@ -1,10 +1,14 @@
 #include "Object.h"
 #include "Supernova.h"
 #include "platform/Log.h"
+#include "GUIObject.h"
+#include "Light.h"
+
 
 Object::Object(){
     loaded = false;
     parent = NULL;
+    scene = NULL;
 
     viewMatrix = NULL;
     viewProjectionMatrix = NULL;
@@ -20,7 +24,23 @@ Object::~Object(){
     destroy();
 }
 
+void Object::setSceneAndConfigure(Object* scene){
+    this->scene = scene;
+    
+    std::vector<Object*>::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it) {
+        (*it)->setSceneAndConfigure(scene);
+    }
+    
+    if (Light* light_ptr = dynamic_cast<Light*>(this)){
+        ((Scene*)scene)->addLight(light_ptr);
+    }
+}
+
 void Object::addObject(Object* obj){
+    if (scene != NULL)
+        obj->setSceneAndConfigure(scene);
+    
     if (obj->parent == NULL){
         objects.push_back(obj);
         obj->parent = this;
@@ -36,6 +56,13 @@ void Object::addObject(Object* obj){
 }
 
 void Object::removeObject(Object* obj){
+    
+    if (scene != NULL){
+        if (Light* light_ptr = dynamic_cast<Light*>(this)){
+            ((Scene*)scene)->removeLight(light_ptr);
+        }
+    }
+    
     std::vector<Object*>::iterator i = std::remove(objects.begin(), objects.end(), obj);
     objects.erase(i,objects.end());
     obj->parent = NULL;

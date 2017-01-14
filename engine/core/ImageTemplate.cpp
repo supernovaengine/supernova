@@ -22,8 +22,6 @@ bool ImageTemplate::load(){
         if (!loaded || (rawImageWidth == 0 && rawImageHeight == 0)){
         
             TextureLoader image(submeshes[0].getTexture());
-
-            //TextureManager::loadTexture(image.getRawImage(), submeshes[0].getTexture());
             
             rawImageWidth = image.getRawImage()->getWidth();
             rawImageHeight = image.getRawImage()->getWidth();
