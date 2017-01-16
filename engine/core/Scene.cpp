@@ -7,7 +7,7 @@
 
 Scene::Scene() {
     camera = NULL;
-    childScene = NULL;
+    isChildScene = false;
     userCamera = false;
     setAmbientLight(0.1);
     scene = this;
@@ -39,6 +39,26 @@ void Scene::removeLight (Light* light){
     sceneManager.setLights(lights);
 }
 
+void Scene::addSubScene (Scene* scene){
+    bool founded = false;
+    
+    std::vector<Scene*>::iterator it;
+    for (it = subScenes.begin(); it != subScenes.end(); ++it) {
+        if (scene == (*it))
+            founded = true;
+    }
+    
+    if (!founded){
+        subScenes.push_back(scene);
+    }
+    
+}
+
+void Scene::removeSubScene (Scene* scene){
+    std::vector<Scene*>::iterator i = std::remove(subScenes.begin(), subScenes.end(), scene);
+    subScenes.erase(i,subScenes.end());
+}
+
 void Scene::setAmbientLight(Vector3 ambientLight){
     this->ambientLight = ambientLight;
     sceneManager.setAmbientLight(ambientLight);
@@ -52,6 +72,10 @@ Vector3 Scene::getAmbientLight(){
     return ambientLight;
 }
 
+void Scene::transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    Object::transform(getCamera()->getViewMatrix(), getCamera()->getViewProjectionMatrix(), new Vector3(getCamera()->getWorldPosition()));
+}
+
 void Scene::setCamera(Camera* camera){
     this->camera = camera;
     this->camera->setSceneObject(this);
@@ -60,15 +84,6 @@ void Scene::setCamera(Camera* camera){
 
 Camera* Scene::getCamera(){
     return camera;
-}
-
-void Scene::setChildScene(Scene* childScene){
-    childScene->sceneManager.setChildScene(true);
-    this->childScene = childScene;
-}
-
-Scene* Scene::getChildScene(){
-    return childScene;
 }
 
 bool Scene::updateViewSize(){
@@ -119,9 +134,11 @@ bool Scene::updateViewSize(){
     if (this->camera != NULL){
         camera->updateScreenSize();
     }
-
-    if (childScene)
-        childScene->updateViewSize();
+    
+    std::vector<Scene*>::iterator it;
+    for (it = subScenes.begin(); it != subScenes.end(); ++it) {
+        (*it)->updateViewSize();
+    }
 
     return status;
 }
@@ -134,6 +151,8 @@ void Scene::doCamera(){
 }
 
 bool Scene::load(){
+    
+    sceneManager.setChildScene(isChildScene);
 
     sceneManager.load();
     Object::load();
@@ -143,9 +162,6 @@ bool Scene::load(){
     Object::update();
     camera->update();
 
-    if (childScene)
-        childScene->load();
-
     return true;
 }
 
@@ -154,9 +170,6 @@ bool Scene::draw(){
     
     sceneManager.draw();
     Object::draw();
-
-    if (childScene)
-        childScene->draw();
 
     return true;
 }

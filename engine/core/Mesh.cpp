@@ -60,10 +60,6 @@ void Mesh::setTexcoords(std::vector<Vector2> texcoords){
     this->texcoords = texcoords;
 }
 
-//std::vector<unsigned int> Mesh::getMaterialsId(){
-//    return materialsId;
-//}
-
 void Mesh::setPrimitiveMode(int primitiveMode){
     this->primitiveMode = primitiveMode;
 }
@@ -95,16 +91,16 @@ void Mesh::update(){
 }
 
 bool Mesh::load(){
-
-    mesh.load(vertices, normals, texcoords, submeshes);
     Object::load();
+    mesh.load(vertices, normals, texcoords, submeshes);
+    
     return true;
 }
 
 bool Mesh::draw(){
-
-    mesh.draw(&modelMatrix, &normalMatrix, &modelViewProjectionMatrix, cameraPosition, primitiveMode);
     Object::draw();
+    mesh.draw(&modelMatrix, &normalMatrix, &modelViewProjectionMatrix, cameraPosition, primitiveMode);
+    
     return true;
 
 }

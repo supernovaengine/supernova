@@ -25,24 +25,32 @@ Object::~Object(){
 }
 
 void Object::setSceneAndConfigure(Object* scene){
-    this->scene = scene;
-    
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
+        (*it)->scene = scene;
         (*it)->setSceneAndConfigure(scene);
     }
     
     if (Light* light_ptr = dynamic_cast<Light*>(this)){
         ((Scene*)scene)->addLight(light_ptr);
     }
+    
+    if (Scene* scene_ptr = dynamic_cast<Scene*>(this)){
+        ((Scene*)scene)->addSubScene(scene_ptr);
+    }
 }
 
 void Object::addObject(Object* obj){
+    if (Scene* scene_ptr = dynamic_cast<Scene*>(obj)){
+        scene_ptr->isChildScene = true;
+    }
+    
     if (scene != NULL)
         obj->setSceneAndConfigure(scene);
     
     if (obj->parent == NULL){
         objects.push_back(obj);
+
         obj->parent = this;
 
         obj->viewMatrix = viewMatrix;
@@ -53,6 +61,7 @@ void Object::addObject(Object* obj){
     }else{
         Log::Error(LOG_TAG, "Object has a parent already");
     }
+    
 }
 
 void Object::removeObject(Object* obj){
@@ -61,11 +70,25 @@ void Object::removeObject(Object* obj){
         if (Light* light_ptr = dynamic_cast<Light*>(this)){
             ((Scene*)scene)->removeLight(light_ptr);
         }
+        if (Scene* scene_ptr = dynamic_cast<Scene*>(this)){
+            ((Scene*)scene)->removeSubScene(scene_ptr);
+        }
+    }
+    
+    if (Scene* scene_ptr = dynamic_cast<Scene*>(obj)){
+        scene_ptr->isChildScene = false;
     }
     
     std::vector<Object*>::iterator i = std::remove(objects.begin(), objects.end(), obj);
     objects.erase(i,objects.end());
+    
     obj->parent = NULL;
+    obj->scene = NULL;
+    
+    obj->viewMatrix = NULL;
+    obj->viewProjectionMatrix = NULL;
+    obj->cameraPosition = NULL;
+    
     obj->update();
 }
 

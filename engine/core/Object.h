@@ -42,7 +42,7 @@ public:
     void addObject(Object* obj);
     void removeObject(Object* obj);
 
-    void transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    virtual void transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
     Matrix4 getModelMatrix();
     Matrix4 getModelViewProjectMatrix();
 

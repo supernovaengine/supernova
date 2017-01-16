@@ -7,6 +7,7 @@
 #include "Render.h"
 #include "render/SceneManager.h"
 #include "Light.h"
+#include <vector>
 
 #include "math/Matrix4.h"
 
@@ -22,12 +23,18 @@ private:
     bool userCamera;
 
     std::vector<Light*> lights;
+    
+    std::vector<Scene*> subScenes;
+    
     Vector3 ambientLight;
 
-	Scene* childScene;
+    bool isChildScene;
     
     void addLight (Light* light);
     void removeLight (Light* light);
+    
+    void addSubScene (Scene* scene);
+    void removeSubScene (Scene* scene);
 
 public:
 
@@ -37,12 +44,11 @@ public:
     void setAmbientLight(Vector3 ambientLight);
     void setAmbientLight(const float ambientFactor);
     Vector3 getAmbientLight();
+    
+    void transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
     void setCamera(Camera* camera);
     Camera* getCamera();
-
-	void setChildScene(Scene* childScene);
-	Scene* getChildScene();
 
     void doCamera();
 
