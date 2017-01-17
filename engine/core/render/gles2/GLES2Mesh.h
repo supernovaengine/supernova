@@ -10,6 +10,7 @@
 #include "render/TextureManager.h"
 #include "render/ProgramManager.h"
 #include "render/MeshRender.h"
+#include "render/SceneRender.h"
 
 
 class GLES2Mesh : public MeshRender {
@@ -69,6 +70,8 @@ private:
     std::vector<GLfloat> guvMapping;
 
     const char* programName;
+    
+    SceneRender* sceneRender;
 
     bool loaded;
 
@@ -76,7 +79,7 @@ public:
 	GLES2Mesh();
 	virtual ~GLES2Mesh();
 
-    bool load(std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes);
+    bool load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes);
 	bool draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* modelViewProjectionMatrix, Vector3* cameraPosition, int mode);
     void destroy();
 };

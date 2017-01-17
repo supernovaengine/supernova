@@ -170,7 +170,6 @@
 		717FA2091CA1843C009071DC /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 717FA2081CA1843C009071DC /* EAGLView.mm */; };
 		7188F19E1D9B271800A2D04F /* ProgramManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F19C1D9B271800A2D04F /* ProgramManager.cpp */; };
 		7188F1A11D9B282300A2D04F /* GLES2Program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F19F1D9B282300A2D04F /* GLES2Program.cpp */; };
-		7188F1A91D9C841900A2D04F /* GLES2Lights.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1A71D9C841900A2D04F /* GLES2Lights.cpp */; };
 		7188F1AC1DBBAB0B00A2D04F /* Sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */; };
 		7188F1AF1DBC5A4100A2D04F /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7188F1AE1DBC5A4100A2D04F /* OpenAL.framework */; };
 		7188F1B31DBD41A400A2D04F /* AudioFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1B11DBD41A400A2D04F /* AudioFile.cpp */; };
@@ -691,8 +690,6 @@
 		7188F1A31D9B436200A2D04F /* SceneRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneRender.h; sourceTree = "<group>"; };
 		7188F1A41D9B444600A2D04F /* TextureRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextureRender.h; sourceTree = "<group>"; };
 		7188F1A61D9B464900A2D04F /* ProgramRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgramRender.h; sourceTree = "<group>"; };
-		7188F1A71D9C841900A2D04F /* GLES2Lights.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Lights.cpp; sourceTree = "<group>"; };
-		7188F1A81D9C841900A2D04F /* GLES2Lights.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Lights.h; sourceTree = "<group>"; };
 		7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sound.cpp; sourceTree = "<group>"; };
 		7188F1AB1DBBAB0B00A2D04F /* Sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sound.h; sourceTree = "<group>"; };
 		7188F1AE1DBC5A4100A2D04F /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
@@ -1028,8 +1025,6 @@
 				713D2A581CFB2EAD00A4752F /* GLES2Texture.h */,
 				713D2A5A1CFB2EAD00A4752F /* GLES2Util.cpp */,
 				713D2A5B1CFB2EAD00A4752F /* GLES2Util.h */,
-				7188F1A71D9C841900A2D04F /* GLES2Lights.cpp */,
-				7188F1A81D9C841900A2D04F /* GLES2Lights.h */,
 			);
 			path = gles2;
 			sourceTree = "<group>";
@@ -1936,7 +1931,6 @@
 				71CDC72F1D7B14860060EEFF /* GLES2Texture.cpp in Sources */,
 				71CDC7221D7B146D0060EEFF /* Angle.cpp in Sources */,
 				71CDC7261D7B146D0060EEFF /* Vector2.cpp in Sources */,
-				7188F1A91D9C841900A2D04F /* GLES2Lights.cpp in Sources */,
 				71CDC7181D7B14510060EEFF /* PointLight.cpp in Sources */,
 				7188F1B91DBD4BAC00A2D04F /* AudioLoader.cpp in Sources */,
 				71CDC72D1D7B14860060EEFF /* GLES2Scene.cpp in Sources */,

@@ -1,4 +1,6 @@
 #include "Mesh.h"
+#include "Scene.h"
+#include "render/TextureManager.h"
 
 Mesh::Mesh(): Object(){
     submeshes.push_back(Submesh());
@@ -92,9 +94,13 @@ void Mesh::update(){
 
 bool Mesh::load(){
     Object::load();
-    mesh.load(vertices, normals, texcoords, submeshes);
-    
-    return true;
+    if (scene != NULL){
+        mesh.load(((Scene*)scene)->sceneManager.getSceneRender(), vertices, normals, texcoords, submeshes);
+        //TODO: Permit load without scene - problem: lights
+        return true;
+    }else{
+        return false;
+    }
 }
 
 bool Mesh::draw(){

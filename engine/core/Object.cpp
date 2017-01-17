@@ -25,9 +25,11 @@ Object::~Object(){
 }
 
 void Object::setSceneAndConfigure(Object* scene){
+    if (this->scene == NULL)
+        this->scene = scene;
+    
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
-        (*it)->scene = scene;
         (*it)->setSceneAndConfigure(scene);
     }
     
@@ -38,15 +40,16 @@ void Object::setSceneAndConfigure(Object* scene){
     if (Scene* scene_ptr = dynamic_cast<Scene*>(this)){
         ((Scene*)scene)->addSubScene(scene_ptr);
     }
+    
+    if (GUIObject* guiobject_ptr = dynamic_cast<GUIObject*>(this)){
+        ((Scene*)scene)->addGUIObject(guiobject_ptr);
+    }
 }
 
 void Object::addObject(Object* obj){
     if (Scene* scene_ptr = dynamic_cast<Scene*>(obj)){
         scene_ptr->isChildScene = true;
     }
-    
-    if (scene != NULL)
-        obj->setSceneAndConfigure(scene);
     
     if (obj->parent == NULL){
         objects.insert(objects.begin(), obj);
@@ -56,6 +59,9 @@ void Object::addObject(Object* obj){
         obj->viewMatrix = viewMatrix;
         obj->viewProjectionMatrix = viewProjectionMatrix;
         obj->cameraPosition = cameraPosition;
+        
+        if (scene != NULL)
+            obj->setSceneAndConfigure(scene);
 
         obj->update();
     }else{
@@ -67,11 +73,17 @@ void Object::addObject(Object* obj){
 void Object::removeObject(Object* obj){
     
     if (scene != NULL){
+        
         if (Light* light_ptr = dynamic_cast<Light*>(this)){
             ((Scene*)scene)->removeLight(light_ptr);
         }
+        
         if (Scene* scene_ptr = dynamic_cast<Scene*>(this)){
             ((Scene*)scene)->removeSubScene(scene_ptr);
+        }
+        
+        if (GUIObject* guiobject_ptr = dynamic_cast<GUIObject*>(this)){
+            ((Scene*)scene)->removeGUIObject(guiobject_ptr);
         }
     }
     

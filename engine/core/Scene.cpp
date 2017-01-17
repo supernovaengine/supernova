@@ -30,7 +30,6 @@ void Scene::addLight (Light* light){
         lights.push_back(light);
         sceneManager.setLights(lights);
     }
-        
 }
 
 void Scene::removeLight (Light* light){
@@ -51,12 +50,30 @@ void Scene::addSubScene (Scene* scene){
     if (!founded){
         subScenes.push_back(scene);
     }
-    
 }
 
 void Scene::removeSubScene (Scene* scene){
     std::vector<Scene*>::iterator i = std::remove(subScenes.begin(), subScenes.end(), scene);
     subScenes.erase(i,subScenes.end());
+}
+
+void Scene::addGUIObject (GUIObject* guiobject){
+    bool founded = false;
+    
+    std::vector<GUIObject*>::iterator it;
+    for (it = guiObjects.begin(); it != guiObjects.end(); ++it) {
+        if (guiobject == (*it))
+            founded = true;
+    }
+    
+    if (!founded){
+        guiObjects.push_back(guiobject);
+    }
+}
+
+void Scene::removeGUIObject (GUIObject* guiobject){
+    std::vector<GUIObject*>::iterator i = std::remove(guiObjects.begin(), guiObjects.end(), scene);
+    guiObjects.erase(i,guiObjects.end());
 }
 
 void Scene::setAmbientLight(Vector3 ambientLight){

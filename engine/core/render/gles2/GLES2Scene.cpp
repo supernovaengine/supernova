@@ -6,9 +6,6 @@
 #include "render/ProgramManager.h"
 #include "render/TextureManager.h"
 #include "math/Angle.h"
-#include "GLES2Lights.h"
-
-bool GLES2Scene::lighting = false;
 
 
 GLES2Scene::GLES2Scene() {
@@ -19,7 +16,7 @@ GLES2Scene::~GLES2Scene() {
 
 void GLES2Scene::setAmbientLight(Vector3 ambientLight){
     
-    GLES2Lights::ambientLight = ambientLight;
+    this->ambientLight = ambientLight;
     
 }
 
@@ -31,65 +28,65 @@ void GLES2Scene::setLights(std::vector<Light*> lights){
         lighting = false;
     }
     
-    GLES2Lights::numPointLight = 0;
-    GLES2Lights::pointLightPos.clear();
-    GLES2Lights::pointLightColor.clear();
-    GLES2Lights::pointLightPower.clear();
-    GLES2Lights::numSpotLight = 0;
-    GLES2Lights::spotLightPos.clear();
-    GLES2Lights::spotLightColor.clear();
-    GLES2Lights::spotLightTarget.clear();
-    GLES2Lights::spotLightPower.clear();
-    GLES2Lights::spotLightCutOff.clear();
-    GLES2Lights::numDirectionalLight = 0;
-    GLES2Lights::directionalLightDir.clear();
-    GLES2Lights::directionalLightColor.clear();
-    GLES2Lights::directionalLightPower.clear();
+    this->numPointLight = 0;
+    this->pointLightPos.clear();
+    this->pointLightColor.clear();
+    this->pointLightPower.clear();
+    this->numSpotLight = 0;
+    this->spotLightPos.clear();
+    this->spotLightColor.clear();
+    this->spotLightTarget.clear();
+    this->spotLightPower.clear();
+    this->spotLightCutOff.clear();
+    this->numDirectionalLight = 0;
+    this->directionalLightDir.clear();
+    this->directionalLightColor.clear();
+    this->directionalLightPower.clear();
     for ( int i = 0; i < (int)lights.size(); i++){
         if (lights[i]->getType() == S_POINT_LIGHT){
-            GLES2Lights::numPointLight++;
+            this->numPointLight++;
             
-            GLES2Lights::pointLightPos.push_back(lights[i]->getWorldPosition().x);
-            GLES2Lights::pointLightPos.push_back(lights[i]->getWorldPosition().y);
-            GLES2Lights::pointLightPos.push_back(lights[i]->getWorldPosition().z);
+            this->pointLightPos.push_back(lights[i]->getWorldPosition().x);
+            this->pointLightPos.push_back(lights[i]->getWorldPosition().y);
+            this->pointLightPos.push_back(lights[i]->getWorldPosition().z);
             
-            GLES2Lights::pointLightColor.push_back(lights[i]->getColor().x);
-            GLES2Lights::pointLightColor.push_back(lights[i]->getColor().y);
-            GLES2Lights::pointLightColor.push_back(lights[i]->getColor().z);
+            this->pointLightColor.push_back(lights[i]->getColor().x);
+            this->pointLightColor.push_back(lights[i]->getColor().y);
+            this->pointLightColor.push_back(lights[i]->getColor().z);
             
-            GLES2Lights::pointLightPower.push_back(lights[i]->getPower());
+            this->pointLightPower.push_back(lights[i]->getPower());
         }
         if (lights[i]->getType() == S_SPOT_LIGHT){
-            GLES2Lights::numSpotLight++;
+            this->numSpotLight++;
             
-            GLES2Lights::spotLightPos.push_back(lights[i]->getWorldPosition().x);
-            GLES2Lights::spotLightPos.push_back(lights[i]->getWorldPosition().y);
-            GLES2Lights::spotLightPos.push_back(lights[i]->getWorldPosition().z);
+            this->spotLightPos.push_back(lights[i]->getWorldPosition().x);
+            this->spotLightPos.push_back(lights[i]->getWorldPosition().y);
+            this->spotLightPos.push_back(lights[i]->getWorldPosition().z);
             
-            GLES2Lights::spotLightColor.push_back(lights[i]->getColor().x);
-            GLES2Lights::spotLightColor.push_back(lights[i]->getColor().y);
-            GLES2Lights::spotLightColor.push_back(lights[i]->getColor().z);
+            this->spotLightColor.push_back(lights[i]->getColor().x);
+            this->spotLightColor.push_back(lights[i]->getColor().y);
+            this->spotLightColor.push_back(lights[i]->getColor().z);
             
-            GLES2Lights::spotLightTarget.push_back(lights[i]->getWorldTarget().x);
-            GLES2Lights::spotLightTarget.push_back(lights[i]->getWorldTarget().y);
-            GLES2Lights::spotLightTarget.push_back(lights[i]->getWorldTarget().z);
+            this->spotLightTarget.push_back(lights[i]->getWorldTarget().x);
+            this->spotLightTarget.push_back(lights[i]->getWorldTarget().y);
+            this->spotLightTarget.push_back(lights[i]->getWorldTarget().z);
             
-            GLES2Lights::spotLightPower.push_back(lights[i]->getPower());
+            this->spotLightPower.push_back(lights[i]->getPower());
             
-            GLES2Lights::spotLightCutOff.push_back(cos(Angle::defaultToRad(lights[i]->getSpotAngle() / 2.0)));
+            this->spotLightCutOff.push_back(cos(Angle::defaultToRad(lights[i]->getSpotAngle() / 2.0)));
         }
         if (lights[i]->getType() == S_DIRECTIONAL_LIGHT){
-            GLES2Lights::numDirectionalLight++;
+            this->numDirectionalLight++;
             
-            GLES2Lights::directionalLightDir.push_back(lights[i]->getDirection().x);
-            GLES2Lights::directionalLightDir.push_back(lights[i]->getDirection().y);
-            GLES2Lights::directionalLightDir.push_back(lights[i]->getDirection().z);
+            this->directionalLightDir.push_back(lights[i]->getDirection().x);
+            this->directionalLightDir.push_back(lights[i]->getDirection().y);
+            this->directionalLightDir.push_back(lights[i]->getDirection().z);
             
-            GLES2Lights::directionalLightColor.push_back(lights[i]->getColor().x);
-            GLES2Lights::directionalLightColor.push_back(lights[i]->getColor().y);
-            GLES2Lights::directionalLightColor.push_back(lights[i]->getColor().z);
+            this->directionalLightColor.push_back(lights[i]->getColor().x);
+            this->directionalLightColor.push_back(lights[i]->getColor().y);
+            this->directionalLightColor.push_back(lights[i]->getColor().z);
             
-            GLES2Lights::directionalLightPower.push_back(lights[i]->getPower());
+            this->directionalLightPower.push_back(lights[i]->getPower());
         }
     }
 }

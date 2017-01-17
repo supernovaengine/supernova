@@ -1,6 +1,8 @@
 #ifndef SceneRender_h
 #define SceneRender_h
 
+#include "Light.h"
+
 class SceneRender {
     
 public:

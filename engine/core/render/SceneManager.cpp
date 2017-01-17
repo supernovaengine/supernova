@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 
 #include "Supernova.h"
+#include "gles2/GLES2Scene.h"
 #include <stddef.h>
 
 
@@ -50,6 +51,11 @@ bool SceneManager::isChildScene(){
 
 void SceneManager::setChildScene(bool childScene){
     this->childScene = childScene;
+}
+
+SceneRender* SceneManager::getSceneRender(){
+    instanciateRender();
+    return scene;
 }
 
 bool SceneManager::load() {

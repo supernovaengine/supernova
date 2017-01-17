@@ -8,11 +8,13 @@
 #include "render/SceneManager.h"
 #include "Light.h"
 #include <vector>
+#include "GUIObject.h"
 
 #include "math/Matrix4.h"
 
 class Scene: public Object {
     friend class Object;
+    friend class Mesh;
 private:
 
     SceneManager sceneManager;
@@ -24,6 +26,7 @@ private:
 
     std::vector<Light*> lights;
     std::vector<Scene*> subScenes;
+    std::vector<GUIObject*> guiObjects;
     
     Vector3 ambientLight;
 
@@ -34,6 +37,9 @@ private:
     
     void addSubScene (Scene* scene);
     void removeSubScene (Scene* scene);
+    
+    void addGUIObject (GUIObject* guiobject);
+    void removeGUIObject (GUIObject* guiobject);
 
 public:
 
