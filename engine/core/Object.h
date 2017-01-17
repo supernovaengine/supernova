@@ -13,7 +13,8 @@ private:
 
     void updateMatrices();
     void setSceneAndConfigure(Object* scene);
-
+    int findObject(Object* object);
+    
 protected:
 
     std::vector<Object*> objects;
@@ -62,6 +63,11 @@ public:
     void setCenter(const float x, const float y, const float z);
     void setCenter(Vector3 center);
     Vector3 getCenter();
+    
+    void moveFront();
+    void moveLast();
+    void moveUp();
+    void moveDown();
 
     virtual void update();
 

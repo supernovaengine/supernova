@@ -23,7 +23,6 @@ private:
     bool userCamera;
 
     std::vector<Light*> lights;
-    
     std::vector<Scene*> subScenes;
     
     Vector3 ambientLight;

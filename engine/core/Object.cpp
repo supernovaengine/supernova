@@ -49,7 +49,7 @@ void Object::addObject(Object* obj){
         obj->setSceneAndConfigure(scene);
     
     if (obj->parent == NULL){
-        objects.push_back(obj);
+        objects.insert(objects.begin(), obj);
 
         obj->parent = this;
 
@@ -183,6 +183,69 @@ void Object::transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vecto
         (*it)->transform(viewMatrix, viewProjectionMatrix, cameraPosition);
     }
 
+}
+
+int Object::findObject(Object* object){
+    
+    for (int i=0; i < objects.size(); i++){
+        if (objects[i] == object){
+            return i;
+        }
+    }
+    
+    return -1;
+}
+
+void Object::moveFront(){
+    if (parent != NULL){
+        int pos = parent->findObject(this);
+    
+        if (pos > 0){
+            Object* temp = parent->objects[pos];
+            
+            for (int i = pos; i > 0; i--){
+                parent->objects[i] = parent->objects[i-1];
+            }
+            parent->objects[0] = temp;
+        }
+    }
+}
+void Object::moveLast(){
+    if (parent != NULL){
+        int pos = parent->findObject(this);
+        
+        if ((pos >= 0) && (pos < (parent->objects.size()-1))){
+            Object* temp = parent->objects[pos];
+            
+            for (int i = pos; i < (parent->objects.size()-1); i++){
+                parent->objects[i] = parent->objects[i+1];
+            }
+            parent->objects[parent->objects.size()-1] = temp;
+        }
+    }
+}
+void Object::moveUp(){
+    if (parent != NULL){
+        int pos = parent->findObject(this);
+        
+        if (pos > 0){
+            Object* temp = parent->objects[pos];
+            parent->objects[pos] = parent->objects[pos-1];
+            parent->objects[pos-1] = temp;
+        }
+    }
+    
+}
+void Object::moveDown(){
+    if (parent != NULL){
+        int pos = parent->findObject(this);
+        
+        if ((pos >= 0) && (pos < (parent->objects.size()-1))){
+            Object* temp = parent->objects[pos];
+            parent->objects[pos] = parent->objects[pos+1];
+            parent->objects[pos+1] = temp;
+        }
+    }
 }
 
 void Object::update(){
