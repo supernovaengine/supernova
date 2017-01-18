@@ -25,8 +25,11 @@ Object::~Object(){
 }
 
 void Object::setSceneAndConfigure(Object* scene){
-    if (this->scene == NULL)
+    if (this->scene == NULL){
         this->scene = scene;
+        if (loaded)
+            reload();
+    }
     
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
@@ -43,6 +46,15 @@ void Object::setSceneAndConfigure(Object* scene){
     
     if (GUIObject* guiobject_ptr = dynamic_cast<GUIObject*>(this)){
         ((Scene*)scene)->addGUIObject(guiobject_ptr);
+    }
+}
+
+void Object::removeScene(){
+    this->scene = NULL;
+    
+    std::vector<Object*>::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it) {
+        (*it)->removeScene();
     }
 }
 
@@ -95,7 +107,7 @@ void Object::removeObject(Object* obj){
     objects.erase(i,objects.end());
     
     obj->parent = NULL;
-    obj->scene = NULL;
+    obj->removeScene();
     
     obj->viewMatrix = NULL;
     obj->viewProjectionMatrix = NULL;
@@ -289,6 +301,13 @@ void Object::updateMatrices(){
     if (this->viewProjectionMatrix != NULL){
         this->modelViewProjectionMatrix = this->modelMatrix * (*this->viewProjectionMatrix);
     }
+}
+
+bool Object::reload(){
+    
+    loaded = false;
+    
+    return load();
 }
 
 bool Object::load(){

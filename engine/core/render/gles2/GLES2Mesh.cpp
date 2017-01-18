@@ -18,6 +18,7 @@ bool GLES2Mesh::emptyTextureLoaded;
 GLES2Mesh::GLES2Mesh() {
     programName = NULL;
     loaded = false;
+    lighting = false;
 }
 
 GLES2Mesh::~GLES2Mesh() {
@@ -25,13 +26,18 @@ GLES2Mesh::~GLES2Mesh() {
 }
 
 bool GLES2Mesh::load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes) {
-    
-    this->sceneRender = sceneRender;
 
     loaded = true;
     
     if (vertices.size() <= 0){
         return false;
+    }
+    
+    this->sceneRender = sceneRender;
+    
+    lighting = false;
+    if (sceneRender != NULL){
+        lighting = ((GLES2Scene*)sceneRender)->lighting;
     }
 
     primitiveSize = (int)vertices.size();
@@ -128,7 +134,7 @@ bool GLES2Mesh::load(SceneRender* sceneRender, std::vector<Vector3> vertices, st
         }
     }
 
-    if (((GLES2Scene*)sceneRender)->lighting){
+    if (this->lighting){
         uEyePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_EyePos");
 
         u_AmbientLight = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_AmbientLight");
@@ -170,13 +176,13 @@ bool GLES2Mesh::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* model
     glUseProgram(((GLES2Program*)gProgram.get())->getProgram());
     GLES2Util::checkGlError("glUseProgram");
 
-    glUniform1i(useLighting, ((GLES2Scene*)sceneRender)->lighting);
+    glUniform1i(useLighting, this->lighting);
 
     glUniformMatrix4fv(u_mvpMatrix, 1, GL_FALSE, (GLfloat*)modelViewProjectionMatrix);
     glUniformMatrix4fv(u_mMatrix, 1, GL_FALSE, (GLfloat*)modelMatrix);
     glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);
 
-    if (((GLES2Scene*)sceneRender)->lighting){
+    if (this->lighting){
         glUniform3fv(uEyePos, 1, cameraPosition->ptr());
 
         glUniform3fv(u_AmbientLight, 1, ((GLES2Scene*)sceneRender)->ambientLight.ptr());
@@ -233,7 +239,7 @@ bool GLES2Mesh::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* model
             glBindTexture(GL_TEXTURE_2D, ((GLES2Texture*)(texture[i].get()))->getTexture());
             glUniform1i(uTextureUnitLocation, 0);
         }else{
-            glUniform4fv(uColor, 1, submeshes[0].getColor()->ptr());
+            glUniform4fv(uColor, 1, submeshes[i].getColor()->ptr());
             if (Supernova::getPlatform() == S_WEB){
                 //Fix Chrome warnings of no texture bound
                 glActiveTexture(GL_TEXTURE0);

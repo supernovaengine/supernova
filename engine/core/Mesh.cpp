@@ -24,8 +24,7 @@ void Mesh::setTexture(std::string texture, int submeshIndex){
         submeshes[submeshIndex].setTexture(texture);
     
         if (loaded){
-            loaded = false;
-            load();
+            reload();
             TextureManager::deleteUnused();
         }
 
@@ -96,11 +95,10 @@ bool Mesh::load(){
     Object::load();
     if (scene != NULL){
         mesh.load(((Scene*)scene)->sceneManager.getSceneRender(), vertices, normals, texcoords, submeshes);
-        //TODO: Permit load without scene - problem: lights
-        return true;
     }else{
-        return false;
+        mesh.load(NULL, vertices, normals, texcoords, submeshes);
     }
+    return true;
 }
 
 bool Mesh::draw(){

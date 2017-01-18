@@ -13,6 +13,7 @@ private:
 
     void updateMatrices();
     void setSceneAndConfigure(Object* scene);
+    void removeScene();
     int findObject(Object* object);
     
 protected:
@@ -35,6 +36,8 @@ protected:
     Vector3 center;
 
     Vector3 worldPosition;
+    
+    bool reload();
 
 public:
     Object();

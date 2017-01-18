@@ -114,7 +114,6 @@ bool GLES2Scene::load(bool childScene) {
 }
 
 bool GLES2Scene::draw(bool childScene) {
-
     if (!childScene) {
         glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
         GLES2Util::checkGlError("glClearColor");

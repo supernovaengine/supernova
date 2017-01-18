@@ -55,6 +55,8 @@ private:
 
     static GLuint emptyTexture; //For web bug only
     static bool emptyTextureLoaded;
+    
+    bool lighting;
 
     int primitiveSize;
 
