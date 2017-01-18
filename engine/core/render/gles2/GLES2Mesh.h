@@ -76,6 +76,8 @@ private:
     SceneRender* sceneRender;
 
     bool loaded;
+    
+    void checkLighting();
 
 public:
 	GLES2Mesh();

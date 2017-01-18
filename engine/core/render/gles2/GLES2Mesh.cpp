@@ -25,6 +25,13 @@ GLES2Mesh::~GLES2Mesh() {
     destroy();
 }
 
+void GLES2Mesh::checkLighting(){
+    lighting = false;
+    if (sceneRender != NULL){
+        lighting = ((GLES2Scene*)sceneRender)->lighting;
+    }
+}
+
 bool GLES2Mesh::load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes) {
 
     loaded = true;
@@ -35,10 +42,7 @@ bool GLES2Mesh::load(SceneRender* sceneRender, std::vector<Vector3> vertices, st
     
     this->sceneRender = sceneRender;
     
-    lighting = false;
-    if (sceneRender != NULL){
-        lighting = ((GLES2Scene*)sceneRender)->lighting;
-    }
+    checkLighting();
 
     primitiveSize = (int)vertices.size();
 
@@ -172,6 +176,9 @@ bool GLES2Mesh::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* model
     if (gPrimitiveVertices.size() <= 0){
         return false;
     }
+    
+    //Fix IOS lighting set true in subscenes
+    checkLighting();
 
     glUseProgram(((GLES2Program*)gProgram.get())->getProgram());
     GLES2Util::checkGlError("glUseProgram");
