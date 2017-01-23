@@ -99,27 +99,32 @@ bool GLES2Scene::load(bool childScene) {
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-        glEnable(GL_DEPTH_TEST);
-
-        //glEnable(GL_CULL_FACE);
-
-        //Activate transparency
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         GLES2Util::checkGlError("Error on load scene GLES2");
     }
     
     return true;
 }
 
-bool GLES2Scene::draw(bool childScene) {
+bool GLES2Scene::draw(bool childScene, bool useDepth, bool useTransparency) {
     if (!childScene) {
         glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
         GLES2Util::checkGlError("glClearColor");
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         GLES2Util::checkGlError("glClear");
+    }
+
+    if (useDepth){
+        glEnable(GL_DEPTH_TEST);
+    }else{
+        glDisable(GL_DEPTH_TEST);
+    }
+
+    if (useTransparency){
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }else{
+        glDisable(GL_BLEND);
     }
 
     return true;

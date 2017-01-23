@@ -2,9 +2,10 @@
 #include "TextureManager.h"
 #include "image/TextureLoader.h"
 #include "Supernova.h"
+#include "image/ColorType.h"
 
 
-std::unordered_map<std::string, std::shared_ptr<TextureRender>> TextureManager::textures;
+std::unordered_map<std::string, TextureManager::TextureStore> TextureManager::textures;
 
 
 TextureRender* TextureManager::getTextureRender(){
@@ -23,8 +24,8 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(std::string relative_
 std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureFile, std::string id){
 
     //Verify if there is a created texture
-    if (textures[id]){
-        return textures[id];
+    if (textures[id].value){
+        return textures[id].value;
     }
 
     TextureLoader image;
@@ -39,10 +40,18 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
     texture->loadTexture(textureFile->getWidth(), textureFile->getHeight(), textureFile->getColorFormat(), textureFile->getData());
     std::shared_ptr<TextureRender> texturePtr(texture);
 
-    textures[id] = texturePtr;
+    bool useAlpha = false;
+    if (textureFile->getColorFormat() == S_COLOR_GRAY_ALPHA || textureFile->getColorFormat() == S_COLOR_RGB_ALPHA)
+        useAlpha = true;
 
-    return textures[id];
+    textures[id] = {texturePtr, useAlpha};
+
+    return textures[id].value;
     
+}
+
+bool TextureManager::hasAlphaChannel(std::string id){
+    return textures[id].hasAlphaChannel;
 }
 
 void TextureManager::deleteUnused(){
@@ -58,8 +67,8 @@ void TextureManager::deleteUnused(){
 TextureManager::it_type TextureManager::findToRemove(){
 
     for(TextureManager::it_type iterator = textures.begin(); iterator != textures.end(); iterator++) {
-        if (iterator->second.use_count() <= 1){
-            iterator->second.get()->deleteTexture();
+        if (iterator->second.value.use_count() <= 1){
+            iterator->second.value.get()->deleteTexture();
             return iterator;
         }
     }

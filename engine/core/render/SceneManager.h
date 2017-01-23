@@ -14,6 +14,8 @@ private:
     Vector3 ambientLight;
 
     bool childScene;
+    bool useDepth;
+    bool useTransparency;
 
     void instanciateRender();
     void updateLights();
@@ -25,6 +27,9 @@ public:
 
     bool isChildScene();
     void setChildScene(bool childScene);
+
+    void setUseDepth(bool useDepth);
+    void setUseTransparency(bool useTransparency);
 
     void setLights(std::vector<Light*> lights);
     void setAmbientLight(Vector3 ambientLight);

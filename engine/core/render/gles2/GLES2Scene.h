@@ -39,7 +39,7 @@ public:
     void setLights(std::vector<Light*> lights);
 
     bool load(bool childScene);
-    bool draw(bool childScene);
+    bool draw(bool childScene, bool useDepth, bool useTransparency);
     bool viewSize(int x, int y, int width, int height);
 
 };

@@ -34,6 +34,8 @@ private:
     Vector3 ambientLight;
 
     bool isChildScene;
+	bool useTransparency;
+	bool useDepth;
     
     void addLight (Light* light);
     void removeLight (Light* light);

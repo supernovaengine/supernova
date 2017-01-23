@@ -53,6 +53,14 @@ void SceneManager::setChildScene(bool childScene){
     this->childScene = childScene;
 }
 
+void SceneManager::setUseDepth(bool useDepth){
+    this->useDepth = useDepth;
+}
+
+void SceneManager::setUseTransparency(bool useTransparency){
+    this->useTransparency = useTransparency;
+}
+
 SceneRender* SceneManager::getSceneRender(){
     instanciateRender();
     return scene;
@@ -65,7 +73,7 @@ bool SceneManager::load() {
 
 bool SceneManager::draw() {
     updateLights();
-    return scene->draw(childScene);
+    return scene->draw(childScene, useDepth, useTransparency);
 }
 
 bool SceneManager::viewSize(int x, int y, int width, int height){

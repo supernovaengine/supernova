@@ -67,8 +67,8 @@ public:
     void setCenter(Vector3 center);
     Vector3 getCenter();
     
-    void moveFront();
-    void moveLast();
+    void moveToFront();
+    void moveToBack();
     void moveUp();
     void moveDown();
 

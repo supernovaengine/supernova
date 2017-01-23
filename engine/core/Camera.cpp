@@ -105,6 +105,10 @@ void Camera::setProjection(int projection){
     }
 }
 
+int Camera::getProjection(){
+    return projection;
+}
+
 void Camera::updateScreenSize(){
     float newRight = Supernova::getCanvasWidth();
     float newTop = Supernova::getCanvasHeight();

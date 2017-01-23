@@ -59,6 +59,7 @@ public:
     Vector3 getUp();
 
     void setProjection(int projection);
+    int getProjection();
     void updateScreenSize();
     void setOrtho(float left, float right, float bottom, float top, float near, float far);
     void setPerspective(float y_fov, float aspect, float near, float far);

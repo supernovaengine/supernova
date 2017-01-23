@@ -8,6 +8,8 @@
 Scene::Scene() {
     camera = NULL;
     isChildScene = false;
+    useTransparency = false;
+    useDepth = false;
     userCamera = false;
     setAmbientLight(0.1);
     scene = this;
@@ -97,6 +99,10 @@ void Scene::setCamera(Camera* camera){
     this->camera = camera;
     this->camera->setSceneObject(this);
     userCamera = true;
+
+    if (camera->getProjection() == S_PERSPECTIVE){
+        useDepth = true;
+    }
 }
 
 Camera* Scene::getCamera(){
@@ -186,6 +192,9 @@ bool Scene::load(){
 bool Scene::draw(){
     
     transparentMeshQueue.clear();
+
+    sceneManager.setUseDepth(useDepth);
+    sceneManager.setUseTransparency(useTransparency);
     
     sceneManager.draw();
     Object::draw();

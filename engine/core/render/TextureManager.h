@@ -12,14 +12,14 @@ class TextureManager {
     
     typedef struct {
         std::shared_ptr<TextureRender> value;
-        std::string key;
+        bool hasAlphaChannel;
     } TextureStore;
     
 private:
 
-    typedef std::unordered_map<std::string, std::shared_ptr<TextureRender>>::iterator it_type;
+    typedef std::unordered_map<std::string, TextureStore>::iterator it_type;
 
-    static std::unordered_map<std::string, std::shared_ptr<TextureRender>> textures;
+    static std::unordered_map<std::string, TextureStore> textures;
     
     static TextureRender* getTextureRender();
     
@@ -29,6 +29,8 @@ public:
     static std::shared_ptr<TextureRender> loadTexture(std::string relative_path);
     static std::shared_ptr<TextureRender> loadTexture(TextureFile* textureFile, std::string id);
     static void deleteUnused();
+
+    static bool hasAlphaChannel(std::string id);
 
     static void clear();
 };

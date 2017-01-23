@@ -111,12 +111,20 @@ void LuaBinding::bind(){
     .addProperty("scale", &Object::getScale, (void (Object::*)(Vector3))&Object::setScale)
     .addFunction("setCenter", (void (Object::*)(const float, const float, const float))&Object::setCenter)
     .addFunction("getCenter", &Object::getCenter)
-    .addFunction("moveFront", &Object::moveFront)
-    .addFunction("moveLast", &Object::moveLast)
+    .addFunction("moveToFront", &Object::moveToFront)
+    .addFunction("moveToBack", &Object::moveToBack)
     .addFunction("moveUp", &Object::moveUp)
     .addFunction("moveDown", &Object::moveDown)
     .addProperty("center", &Object::getCenter, (void (Object::*)(Vector3))&Object::setCenter)
     .addFunction("destroy", &Object::destroy)
+    .endClass()
+
+    .beginExtendClass<Scene, Object>("Scene")
+    .addConstructor(LUA_ARGS())
+    .addFunction("setCamera", &Scene::setCamera)
+    .addFunction("addObject", &Scene::addObject)
+    .addFunction("setAmbientLight", (void (Scene::*)(const float))&Scene::setAmbientLight)
+    .addProperty("ambientLight", &Scene::getAmbientLight, (void (Scene::*)(Vector3))&Scene::setAmbientLight)
     .endClass()
 
     .beginExtendClass<Camera, Object>("Camera")
@@ -202,15 +210,6 @@ void LuaBinding::bind(){
 
     .beginExtendClass<Model, Mesh>("Model")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
-    .endClass();
-
-
-    LuaIntf::LuaBinding(L).beginClass<Scene>("Scene")
-    .addConstructor(LUA_ARGS())
-    .addFunction("setCamera", &Scene::setCamera)
-    .addFunction("addObject", &Scene::addObject)
-    .addFunction("setAmbientLight", (void (Scene::*)(const float))&Scene::setAmbientLight)
-    .addProperty("ambientLight", &Scene::getAmbientLight, (void (Scene::*)(Vector3))&Scene::setAmbientLight)
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<Vector3>("Vector3")

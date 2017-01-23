@@ -121,6 +121,11 @@ void Object::setPosition(const float x, const float y, const float z){
 }
 
 void Object::setPosition(Vector3 position){
+    if (position.z != 0){
+        if (scene != NULL) {
+            ((Scene*)scene)->useDepth = true;
+        }
+    }
     if (this->position != position){
         this->position = position;
         update();
@@ -220,7 +225,22 @@ int Object::findObject(Object* object){
     return -1;
 }
 
-void Object::moveFront(){
+void Object::moveToFront(){
+    if (parent != NULL){
+        int pos = parent->findObject(this);
+
+        if ((pos >= 0) && (pos < (parent->objects.size()-1))){
+            Object* temp = parent->objects[pos];
+
+            for (int i = pos; i < (parent->objects.size()-1); i++){
+                parent->objects[i] = parent->objects[i+1];
+            }
+            parent->objects[parent->objects.size()-1] = temp;
+        }
+    }
+}
+
+void Object::moveToBack(){
     if (parent != NULL){
         int pos = parent->findObject(this);
     
@@ -234,21 +254,8 @@ void Object::moveFront(){
         }
     }
 }
-void Object::moveLast(){
-    if (parent != NULL){
-        int pos = parent->findObject(this);
-        
-        if ((pos >= 0) && (pos < (parent->objects.size()-1))){
-            Object* temp = parent->objects[pos];
-            
-            for (int i = pos; i < (parent->objects.size()-1); i++){
-                parent->objects[i] = parent->objects[i+1];
-            }
-            parent->objects[parent->objects.size()-1] = temp;
-        }
-    }
-}
-void Object::moveUp(){
+
+void Object::moveDown(){
     if (parent != NULL){
         int pos = parent->findObject(this);
         
@@ -260,7 +267,7 @@ void Object::moveUp(){
     }
     
 }
-void Object::moveDown(){
+void Object::moveUp(){
     if (parent != NULL){
         int pos = parent->findObject(this);
         

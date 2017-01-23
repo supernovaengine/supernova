@@ -37,6 +37,11 @@ void Submesh::setTexture(std::string texture){
 }
 
 void Submesh::setColor(Vector4 color){
+
+    if (color.w != 1){
+        transparent = true;
+    }
+
     this->color = color;
 }
 

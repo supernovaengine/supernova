@@ -53,12 +53,13 @@ public:
     std::string getTexture(int submeshIndex);
     
     void setTexcoords(std::vector<Vector2> texcoords);
+    void setTransparency(bool transparency);
 
     void setPrimitiveMode(int primitiveMode);
     void addVertex(Vector3 vertex);
     void addNormal(Vector3 normal);
     void addTexcoord(Vector2 texcoord);
-    
+
     bool meshDraw();
 
     void transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
