@@ -4,24 +4,21 @@
 
 #include "gles2/GLES2Program.h"
 #include "render/ProgramRender.h"
-#include <vector>
+#include <unordered_map>
 #include <string>
 
 
 class ProgramManager {
     
-    typedef struct {
-        std::shared_ptr<ProgramRender> value;
-        std::string key;
-    } ProgramStore;
-    
 private:
+
+    typedef std::unordered_map<std::string, std::shared_ptr<ProgramRender>>::iterator it_type;
     
-    static std::vector<ProgramStore> programs;
+    static std::unordered_map<std::string, std::shared_ptr<ProgramRender>> programs;
     
     static ProgramRender* getProgramRender();
     
-    static int findToRemove();
+    static ProgramManager::it_type findToRemove();
 public:
     
     static std::shared_ptr<ProgramRender> useProgram(std::string shaderName, std::string definitions);

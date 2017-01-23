@@ -4,7 +4,7 @@
 #include "GLES2Header.h"
 #include "../../Submesh.h"
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include "math/Matrix4.h"
 #include "math/Vector4.h"
 #include "math/Vector3.h"
@@ -71,7 +71,7 @@ private:
 
     std::vector<Submesh*>* submeshes;
     
-    std::map<Submesh*, SubmeshStruct> submeshesGles;
+    std::unordered_map<Submesh*, SubmeshStruct> submeshesGles;
 
     std::vector<GLfloat> gPrimitiveVertices;
     std::vector<GLfloat> gNormals;

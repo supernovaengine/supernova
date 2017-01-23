@@ -6,7 +6,7 @@
 #include "render/TextureRender.h"
 #include "image/TextureFile.h"
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 class TextureManager {
     
@@ -16,12 +16,14 @@ class TextureManager {
     } TextureStore;
     
 private:
-    
-    static std::vector<TextureStore> textures;
+
+    typedef std::unordered_map<std::string, std::shared_ptr<TextureRender>>::iterator it_type;
+
+    static std::unordered_map<std::string, std::shared_ptr<TextureRender>> textures;
     
     static TextureRender* getTextureRender();
     
-    static int findToRemove();
+    static TextureManager::it_type findToRemove();
 public:
     
     static std::shared_ptr<TextureRender> loadTexture(std::string relative_path);

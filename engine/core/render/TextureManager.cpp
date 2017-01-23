@@ -4,7 +4,7 @@
 #include "Supernova.h"
 
 
-std::vector<TextureManager::TextureStore> TextureManager::textures;
+std::unordered_map<std::string, std::shared_ptr<TextureRender>> TextureManager::textures;
 
 
 TextureRender* TextureManager::getTextureRender(){
@@ -21,49 +21,51 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(std::string relative_
 }
 
 std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureFile, std::string id){
-    
+
     //Verify if there is a created texture
-    for (unsigned i=0; i<textures.size(); i++){
-        std::string teste = textures.at(i).key;
-        if (teste == id){
-            return textures.at(i).value;
-        }
+    if (textures[id]){
+        return textures[id];
     }
-    
+
     TextureLoader image;
     if (textureFile == NULL){
         image.loadRawImage(id.c_str());
         textureFile = image.getRawImage();
     }
-    
+
+    //If no create a new texture
     TextureRender* texture = getTextureRender();
     textureFile->resamplePowerOfTwo();
     texture->loadTexture(textureFile->getWidth(), textureFile->getHeight(), textureFile->getColorFormat(), textureFile->getData());
     std::shared_ptr<TextureRender> texturePtr(texture);
-    textures.push_back((TextureStore){texturePtr, id});
-    
-    return textures.at(textures.size()-1).value;
+
+    textures[id] = texturePtr;
+
+    return textures[id];
     
 }
 
 void TextureManager::deleteUnused(){
-    
-    int remove = findToRemove();
-    while (remove >= 0){
-        textures.erase(textures.begin() + remove);
+
+    TextureManager::it_type remove = findToRemove();
+    while (remove != textures.end()){
+        textures.erase(remove);
         remove = findToRemove();
     }
-    
+
 }
 
-int TextureManager::findToRemove(){
-    for (unsigned i=0; i<textures.size(); i++){
-        if (textures.at(i).value.use_count() <= 1){
-            textures.at(i).value.get()->deleteTexture();
-            return i;
+TextureManager::it_type TextureManager::findToRemove(){
+
+    for(TextureManager::it_type iterator = textures.begin(); iterator != textures.end(); iterator++) {
+        if (iterator->second.use_count() <= 1){
+            iterator->second.get()->deleteTexture();
+            return iterator;
         }
     }
-    return -1;
+
+    return textures.end();
+
 }
 
 void TextureManager::clear(){

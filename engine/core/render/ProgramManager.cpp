@@ -3,7 +3,7 @@
 #include "Supernova.h"
 
 
-std::vector<ProgramManager::ProgramStore> ProgramManager::programs;
+std::unordered_map<std::string, std::shared_ptr<ProgramRender>> ProgramManager::programs;
 
 ProgramRender* ProgramManager::getProgramRender(){
     if (Supernova::getRenderAPI() == S_GLES2){
@@ -15,41 +15,43 @@ ProgramRender* ProgramManager::getProgramRender(){
 
 std::shared_ptr<ProgramRender> ProgramManager::useProgram(std::string shaderName, std::string definitions){
 
+    std::string key = shaderName + "|" + definitions;
+
     //Verify if there is a created program
-    for (unsigned i=0; i<programs.size(); i++){
-        if (programs.at(i).key == shaderName + "|" + definitions){
-            return programs.at(i).value;
-        }
+    if (programs[key]){
+        return programs[key];
     }
 
     //If no create a new program
     ProgramRender* program = getProgramRender();
     program->createProgram(shaderName, definitions);
     std::shared_ptr<ProgramRender> shaderPtr(program);
-    programs.push_back((ProgramStore){shaderPtr, shaderName + "|" + definitions});
-    
-    return programs.at(programs.size()-1).value;
+
+    programs[key] = shaderPtr;
+
+    return programs[key];
 }
 
 void ProgramManager::deleteUnused(){
-    
-    int remove = findToRemove();
-    while (remove >= 0){
-        programs.erase(programs.begin() + remove);
+
+    ProgramManager::it_type remove = findToRemove();
+    while (remove != programs.end()){
+        programs.erase(remove);
         remove = findToRemove();
     }
 
-    
 }
 
-int ProgramManager::findToRemove(){
-    for (unsigned i=0; i<programs.size(); i++){
-        if (programs.at(i).value.use_count() <= 1){
-            programs.at(i).value.get()->deleteProgram();
-            return i;
+ProgramManager::it_type ProgramManager::findToRemove(){
+
+    for(ProgramManager::it_type iterator = programs.begin(); iterator != programs.end(); iterator++) {
+        if (iterator->second.use_count() <= 1){
+            iterator->second.get()->deleteProgram();
+            return iterator;
         }
     }
-    return -1;
+
+    return programs.end();
 }
 
 void ProgramManager::clear(){
