@@ -4,6 +4,7 @@
 #include "GLES2Header.h"
 #include "../../Submesh.h"
 #include <vector>
+#include <map>
 #include "math/Matrix4.h"
 #include "math/Vector4.h"
 #include "math/Vector3.h"
@@ -14,6 +15,14 @@
 
 
 class GLES2Mesh : public MeshRender {
+    
+    typedef struct {
+        GLuint indiceBuffer;
+        std::shared_ptr<TextureRender> texture;
+        unsigned int indicesSizes;
+        bool textured;
+    } SubmeshStruct;
+    
 private:
     std::shared_ptr<ProgramRender> gProgram;
 
@@ -60,12 +69,9 @@ private:
 
     int primitiveSize;
 
-    std::vector<Submesh> submeshes;
-    //TODO: struct submesh
-    std::vector<GLuint> indiceBuffer;
-    std::vector< std::shared_ptr<TextureRender> > texture;
-    std::vector<unsigned int> indicesSizes;
-    std::vector<bool> textured;
+    std::vector<Submesh*>* submeshes;
+    
+    std::map<Submesh*, SubmeshStruct> submeshesGles;
 
     std::vector<GLfloat> gPrimitiveVertices;
     std::vector<GLfloat> gNormals;
@@ -83,7 +89,7 @@ public:
 	GLES2Mesh();
 	virtual ~GLES2Mesh();
 
-    bool load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes);
+    bool load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh*>* submeshes);
 	bool draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* modelViewProjectionMatrix, Vector3* cameraPosition, int mode);
     void destroy();
 };

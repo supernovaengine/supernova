@@ -22,7 +22,7 @@ void MeshManager::instanciateRender(){
     }
 }
 
-bool MeshManager::load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh> submeshes) {
+bool MeshManager::load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh*>* submeshes) {
     instanciateRender();
     return mesh->load(sceneRender, vertices, normals, texcoords, submeshes);
 }

@@ -3,13 +3,12 @@
 #include "platform/Log.h"
 #include "PrimitiveMode.h"
 #include <stdio.h>
+#include <algorithm>
 #include "tiny_obj_loader.h"
 #include "Supernova.h"
 
 Model::Model(): Mesh() {
     primitiveMode = S_TRIANGLES;
-    submesh.setPrimitiveMode(S_TRIANGLES);
-    addObject(&submesh);
 }
 
 Model::Model(const char * path): Model() {
@@ -58,12 +57,16 @@ bool Model::loadOBJ(const char * path){
 
         for (size_t i = 0; i < materials.size(); i++) {
             if (i > (this->submeshes.size()-1)){
-                this->submeshes.push_back(Submesh());
+                this->submeshes.push_back(new Submesh());
             }
             //char str[80];
             //strcpy(str, "jeep");
             //strcat(str, materials[i].diffuse_texname.c_str());
             //printf("material[%ld].file = %s\n", i, materials[i].diffuse_texname.c_str());
+            if (materials[i].dissolve < 1){
+                this->submeshes[this->submeshes.size()-1]->transparent = true;
+            }
+            
             this->setTexture(baseDir+"/"+materials[i].diffuse_texname, (int)i);
         }
 
@@ -77,9 +80,9 @@ bool Model::loadOBJ(const char * path){
                 if (material_id < 0)
                     material_id = 0;
 
-                this->submeshes[material_id].addIndex(shapes[i].mesh.indices[3*f+0]);
-                this->submeshes[material_id].addIndex(shapes[i].mesh.indices[3*f+1]);
-                this->submeshes[material_id].addIndex(shapes[i].mesh.indices[3*f+2]);
+                this->submeshes[material_id]->addIndex(shapes[i].mesh.indices[3*f+0]);
+                this->submeshes[material_id]->addIndex(shapes[i].mesh.indices[3*f+1]);
+                this->submeshes[material_id]->addIndex(shapes[i].mesh.indices[3*f+2]);
 
             }
 
@@ -104,7 +107,7 @@ bool Model::loadOBJ(const char * path){
                 //Invert V because OpenGL defaults
                 normals.push_back(Vector3(shapes[i].mesh.normals[3*n+0], shapes[i].mesh.normals[3*n+1], shapes[i].mesh.normals[3*n+2]));
             }
-
+            
         }
 
     }

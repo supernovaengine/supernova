@@ -8,6 +8,10 @@
 #include "Submesh.h"
 
 class Mesh: public Object {
+    
+private:
+    void removeAllSubmeshes();
+    
 protected:
     MeshManager mesh;
 
@@ -17,12 +21,19 @@ protected:
     std::vector<Vector3> vertices;
     std::vector<Vector3> normals;
     std::vector<Vector2> texcoords;
-    std::vector<Submesh> submeshes;
+    std::vector<Submesh*> submeshes;
 
     int primitiveMode;
     
-    void addSubmesh(Submesh submesh);
-    std::vector<Submesh> getSubmeshes();
+    bool transparent;
+    
+    void addSubmesh(Submesh* submesh);
+    std::vector<Submesh*> getSubmeshes();
+    
+    void updateDistanceToCamera();
+    void sortTransparentSubmeshes();
+    
+    float distanceToCamera;
     
 public:
     Mesh();
@@ -47,7 +58,10 @@ public:
     void addVertex(Vector3 vertex);
     void addNormal(Vector3 normal);
     void addTexcoord(Vector2 texcoord);
+    
+    bool meshDraw();
 
+    void transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
     void update();
 
     bool load();

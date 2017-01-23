@@ -11,8 +11,6 @@ private:
     bool loadOBJ(const char * path);
     std::string getBaseDir (const std::string str);
 
-    Mesh submesh;
-
 public:
     Model();
     Model(const char * path);

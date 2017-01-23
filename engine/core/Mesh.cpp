@@ -3,7 +3,9 @@
 #include "render/TextureManager.h"
 
 Mesh::Mesh(): Object(){
-    submeshes.push_back(Submesh());
+    submeshes.push_back(new Submesh());
+    transparent = true;
+    distanceToCamera = -1;
 }
 
 Mesh::~Mesh(){
@@ -11,7 +13,7 @@ Mesh::~Mesh(){
 }
 
 void Mesh::setColor(float red, float green, float blue, float alpha){
-    submeshes[0].setColor(Vector4(red, green, blue, alpha));
+    submeshes[0]->setColor(Vector4(red, green, blue, alpha));
 }
 
 void Mesh::setTexture(std::string texture){
@@ -19,9 +21,9 @@ void Mesh::setTexture(std::string texture){
 }
 
 void Mesh::setTexture(std::string texture, int submeshIndex){
-    if (texture != submeshes[submeshIndex].getTexture()){
+    if (texture != submeshes[submeshIndex]->getTexture()){
     
-        submeshes[submeshIndex].setTexture(texture);
+        submeshes[submeshIndex]->setTexture(texture);
     
         if (loaded){
             reload();
@@ -43,7 +45,7 @@ std::vector<Vector2> Mesh::getTexcoords(){
     return texcoords;
 }
 
-std::vector<Submesh> Mesh::getSubmeshes(){
+std::vector<Submesh*> Mesh::getSubmeshes(){
     return submeshes;
 }
 
@@ -52,7 +54,7 @@ std::string Mesh::getTexture(){
 }
 
 std::string Mesh::getTexture(int submeshIndex){
-    return submeshes[submeshIndex].getTexture();
+    return submeshes[submeshIndex]->getTexture();
 }
 
 
@@ -77,10 +79,50 @@ void Mesh::addTexcoord(Vector2 texcoord){
     texcoords.push_back(texcoord);
 }
 
-void Mesh::addSubmesh(Submesh submesh){
+void Mesh::addSubmesh(Submesh* submesh){
     submeshes.push_back(submesh);
 }
 
+void Mesh::sortTransparentSubmeshes(){
+    if (transparent){
+        for (size_t i = 0; i < submeshes.size(); i++) {
+            if (this->submeshes[i]->getIndices()->size() > 0){
+                Vector3 submeshFirstVertice = vertices[this->submeshes[i]->getIndex(0)];
+                submeshFirstVertice = modelMatrix * submeshFirstVertice;
+                
+                if (this->cameraPosition != NULL && this->submeshes[i]->transparent){
+                    this->submeshes[i]->distanceToCamera = ((*this->cameraPosition) - submeshFirstVertice).length();
+                }
+            }
+        }
+        
+        if (this->cameraPosition != NULL){
+            std::sort(submeshes.begin(), submeshes.end(),
+                      [](const Submesh* a, const Submesh* b) -> bool
+                      {
+                          if (a->distanceToCamera == -1)
+                              return true;
+                          if (b->distanceToCamera == -1)
+                              return false;
+                          return a->distanceToCamera > b->distanceToCamera;
+                      });
+            
+        }
+    }
+}
+
+void Mesh::updateDistanceToCamera(){
+    if (this->cameraPosition != NULL){
+        distanceToCamera = ((*this->cameraPosition) - this->getWorldPosition()).length();
+    }
+}
+
+void Mesh::transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    Object::transform(viewMatrix, viewProjectionMatrix, cameraPosition);
+    
+    updateDistanceToCamera();
+    sortTransparentSubmeshes();
+}
 
 void Mesh::update(){
     Object::update();
@@ -89,21 +131,47 @@ void Mesh::update(){
         this->modelViewMatrix = modelMatrix * (*this->viewMatrix);
         this->normalMatrix = modelMatrix.getInverse().getTranspose();
     }
+    
+    updateDistanceToCamera();
+    sortTransparentSubmeshes();
+}
+
+bool Mesh::meshDraw(){
+    mesh.draw(&modelMatrix, &normalMatrix, &modelViewProjectionMatrix, cameraPosition, primitiveMode);
+    
+    return true;
+}
+
+void Mesh::removeAllSubmeshes(){
+    for (std::vector<Submesh*>::iterator it = submeshes.begin() ; it != submeshes.end(); ++it)
+    {
+        delete (*it);
+    }
+    submeshes.clear();
 }
 
 bool Mesh::load(){
-    Object::load();
+    
     if (scene != NULL){
-        mesh.load(((Scene*)scene)->sceneManager.getSceneRender(), vertices, normals, texcoords, submeshes);
+        mesh.load(((Scene*)scene)->sceneManager.getSceneRender(), vertices, normals, texcoords, &submeshes);
     }else{
-        mesh.load(NULL, vertices, normals, texcoords, submeshes);
+        mesh.load(NULL, vertices, normals, texcoords, &submeshes);
     }
+    
+    Object::load();
+    
     return true;
 }
 
 bool Mesh::draw(){
+    
+    if ((transparent) && (scene != NULL) && (distanceToCamera >= 0)){
+        ((Scene*)scene)->transparentMeshQueue.insert(std::make_pair(distanceToCamera, this));
+    }else{
+        meshDraw();
+    }
+    
     Object::draw();
-    mesh.draw(&modelMatrix, &normalMatrix, &modelViewProjectionMatrix, cameraPosition, primitiveMode);
     
     return true;
 
@@ -111,5 +179,8 @@ bool Mesh::draw(){
 
 void Mesh::destroy(){
     Object::destroy();
+    
     mesh.destroy();
+    
+    removeAllSubmeshes();
 }

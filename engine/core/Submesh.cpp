@@ -4,6 +4,8 @@
 Submesh::Submesh(){
     this->texture = "";
     this->loaded = false;
+    this->distanceToCamera = -1;
+    this->transparent = false;
 }
 
 Submesh::~Submesh(){
@@ -14,12 +16,18 @@ Submesh::Submesh(const Submesh& s){
     this->texture = s.texture;
     this->color = s.color;
     this->indices = s.indices;
+    this->loaded = s.loaded;
+    this->distanceToCamera = s.distanceToCamera;
+    this->transparent = s.transparent;
 }
 
 Submesh& Submesh::operator = (const Submesh& s){
     this->texture = s.texture;
     this->color = s.color;
     this->indices = s.indices;
+    this->loaded = s.loaded;
+    this->distanceToCamera = s.distanceToCamera;
+    this->transparent = s.transparent;
 
     return *this;
 }
@@ -50,4 +58,8 @@ Vector4* Submesh::getColor(){
 
 std::vector<unsigned int>* Submesh::getIndices(){
     return &indices;
+}
+
+unsigned int Submesh::getIndex(int offset){
+    return indices[offset];
 }

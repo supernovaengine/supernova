@@ -6,13 +6,19 @@
 #include <vector>
 
 class Submesh {
+    friend class Mesh;
+    friend class Model;
 private:
     
     bool loaded;
+    
+    bool transparent;
 
     std::string texture;
     Vector4 color;
     std::vector<unsigned int> indices;
+    
+    float distanceToCamera;
 
 public:
     Submesh();
@@ -29,6 +35,7 @@ public:
     std::string getTexture();
     Vector4* getColor();
     std::vector<unsigned int>* getIndices();
+    unsigned int getIndex(int offset);
 
 };
 

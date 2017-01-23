@@ -64,7 +64,7 @@ void Object::addObject(Object* obj){
     }
     
     if (obj->parent == NULL){
-        objects.insert(objects.begin(), obj);
+        objects.push_back(obj);
 
         obj->parent = this;
 
@@ -326,9 +326,11 @@ bool Object::draw(){
 
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
-        if (!(*it)->loaded)
-            (*it)->load();
-        (*it)->draw();
+        if ((*it)->scene != (*it)){
+            if (!(*it)->loaded)
+                (*it)->load();
+            (*it)->draw();
+        }
     }
 
     return true;

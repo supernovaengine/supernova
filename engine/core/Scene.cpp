@@ -185,8 +185,20 @@ bool Scene::load(){
 
 bool Scene::draw(){
     
+    transparentMeshQueue.clear();
+    
     sceneManager.draw();
     Object::draw();
+    
+    std::multimap<float, Mesh*>::reverse_iterator it;
+    for (it = transparentMeshQueue.rbegin(); it != transparentMeshQueue.rend(); ++it) {
+        (*it).second->meshDraw();
+    }
+  
+    std::vector<Scene*>::iterator it2;
+    for (it2 = subScenes.begin(); it2 != subScenes.end(); ++it2) {
+        (*it2)->draw();
+    }
 
     return true;
 }

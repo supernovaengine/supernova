@@ -8,6 +8,7 @@
 #include "render/SceneManager.h"
 #include "Light.h"
 #include <vector>
+#include <map>
 #include "GUIObject.h"
 
 #include "math/Matrix4.h"
@@ -23,6 +24,8 @@ private:
 
     Camera* camera;
     bool userCamera;
+    
+    std::multimap<float, Mesh*> transparentMeshQueue;
 
     std::vector<Light*> lights;
     std::vector<Scene*> subScenes;

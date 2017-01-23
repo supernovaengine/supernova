@@ -43,7 +43,7 @@ void Image::createVertices(){
 
     std::vector<unsigned int> indices;
     indices.assign(indices_array, std::end(indices_array));
-    submeshes[0].setIndices(indices);
+    submeshes[0]->setIndices(indices);
 
     normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
     normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
@@ -53,13 +53,13 @@ void Image::createVertices(){
 
 
 bool Image::load(){
-    if (submeshes[0].getTexture() != "" && !loaded && this->width == 0 && this->height == 0){
-        TextureLoader image(submeshes[0].getTexture());
+    if (submeshes[0]->getTexture() != "" && !loaded && this->width == 0 && this->height == 0){
+        TextureLoader image(submeshes[0]->getTexture());
         if (this->width == 0)
             this->width = image.getRawImage()->getWidth();
         if (this->height == 0)
             this->height = image.getRawImage()->getHeight();
-        TextureManager::loadTexture(image.getRawImage(), submeshes[0].getTexture());
+        TextureManager::loadTexture(image.getRawImage(), submeshes[0]->getTexture());
     }
 
     createVertices();
