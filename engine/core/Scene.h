@@ -46,6 +46,10 @@ private:
     void addGUIObject (GUIObject* guiobject);
     void removeGUIObject (GUIObject* guiobject);
 
+	void resetSceneProperties();
+	void drawTransparentMeshes();
+	void drawChildTrees();
+
 public:
 
 	Scene();

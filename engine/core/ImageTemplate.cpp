@@ -24,10 +24,10 @@ bool ImageTemplate::load(){
             TextureLoader image(submeshes[0]->getTexture());
             
             rawImageWidth = image.getRawImage()->getWidth();
-            rawImageHeight = image.getRawImage()->getWidth();
+            rawImageHeight = image.getRawImage()->getHeight();
             
             cropWidth = rawImageWidth / 3;
-            cropHeight = rawImageWidth / 3;
+            cropHeight = rawImageHeight / 3;
             
             for (int x = 0; x < 3; x++){
                 for (int y = 0; y < 3; y++){
@@ -46,7 +46,7 @@ bool ImageTemplate::load(){
         
         if (cropWidth == 0 && cropHeight == 0){
             cropWidth = rawImageWidth / 3;
-            cropHeight = rawImageWidth / 3;
+            cropHeight = rawImageHeight / 3;
         }
 
         if (width == 0 && height == 0){
@@ -57,7 +57,7 @@ bool ImageTemplate::load(){
         if (width == 0)
             width = rawImageWidth;
         if (height == 0)
-            height = rawImageWidth;
+            height = rawImageHeight;
 
         if (width < (cropWidth * 2)){
             cropWidth = width / 2;

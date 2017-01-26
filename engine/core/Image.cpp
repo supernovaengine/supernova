@@ -54,12 +54,9 @@ void Image::createVertices(){
 
 bool Image::load(){
     if (submeshes[0]->getTexture() != "" && !loaded && this->width == 0 && this->height == 0){
-        TextureLoader image(submeshes[0]->getTexture());
-        if (this->width == 0)
-            this->width = image.getRawImage()->getWidth();
-        if (this->height == 0)
-            this->height = image.getRawImage()->getHeight();
-        TextureManager::loadTexture(image.getRawImage(), submeshes[0]->getTexture());
+        TextureManager::loadTexture(submeshes[0]->getTexture());
+        this->width = TextureManager::getTextureWidth(submeshes[0]->getTexture());
+        this->height = TextureManager::getTextureHeight(submeshes[0]->getTexture());
     }
 
     createVertices();

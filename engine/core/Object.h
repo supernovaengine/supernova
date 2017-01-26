@@ -15,6 +15,7 @@ private:
     void setSceneAndConfigure(Object* scene);
     void removeScene();
     int findObject(Object* object);
+    void setDepth(bool depth);
     
 protected:
 

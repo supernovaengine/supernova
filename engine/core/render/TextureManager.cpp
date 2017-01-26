@@ -44,7 +44,7 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
     if (textureFile->getColorFormat() == S_COLOR_GRAY_ALPHA || textureFile->getColorFormat() == S_COLOR_RGB_ALPHA)
         useAlpha = true;
 
-    textures[id] = {texturePtr, useAlpha};
+    textures[id] = {texturePtr, useAlpha, textureFile->getWidth(), textureFile->getHeight()};
 
     return textures[id].value;
     
@@ -52,6 +52,14 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
 
 bool TextureManager::hasAlphaChannel(std::string id){
     return textures[id].hasAlphaChannel;
+}
+
+int TextureManager::getTextureWidth(std::string id){
+    return textures[id].width;
+}
+
+int TextureManager::getTextureHeight(std::string id){
+    return textures[id].height;
 }
 
 void TextureManager::deleteUnused(){

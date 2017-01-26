@@ -34,8 +34,12 @@ TextureFile* TIFFReader::getRawImage(const char* relative_path, std::ifstream* i
         Log::Error(LOG_TAG, "Can`t read TIFF image: %s", relative_path);
         return NULL;
     }
+    int type = S_COLOR_RGB;
+    if (channels == 4){
+        type = S_COLOR_RGB_ALPHA;
+    }
 
-    return new TextureFile((int)width, (int)height, (int)npixels*sizeof(uint32), S_COLOR_RGB_ALPHA, (bitssample * channels), (void*)raster);
+    return new TextureFile((int)width, (int)height, (int)npixels*sizeof(uint32), type, (bitssample * channels), (void*)raster);
 
 
 }

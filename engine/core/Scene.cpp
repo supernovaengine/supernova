@@ -99,10 +99,6 @@ void Scene::setCamera(Camera* camera){
     this->camera = camera;
     this->camera->setSceneObject(this);
     userCamera = true;
-
-    if (camera->getProjection() == S_PERSPECTIVE){
-        useDepth = true;
-    }
 }
 
 Camera* Scene::getCamera(){
@@ -173,14 +169,37 @@ void Scene::doCamera(){
     }
 }
 
+void Scene::resetSceneProperties(){
+    useTransparency = false;
+    useDepth = false;
+    if (camera->getProjection() == S_PERSPECTIVE){
+        useDepth = true;
+    }
+}
+
+void Scene::drawTransparentMeshes(){
+    std::multimap<float, Mesh*>::reverse_iterator it;
+    for (it = transparentMeshQueue.rbegin(); it != transparentMeshQueue.rend(); ++it) {
+        (*it).second->meshDraw();
+    }
+}
+
+void Scene::drawChildTrees(){
+    std::vector<Scene*>::iterator it2;
+    for (it2 = subScenes.begin(); it2 != subScenes.end(); ++it2) {
+        (*it2)->draw();
+    }
+}
+
 bool Scene::load(){
     
     sceneManager.setChildScene(isChildScene);
 
-    sceneManager.load();
-    Object::load();
-
     doCamera();
+
+    sceneManager.load();
+    resetSceneProperties();
+    Object::load();
 
     Object::update();
     camera->update();
@@ -197,17 +216,11 @@ bool Scene::draw(){
     sceneManager.setUseTransparency(useTransparency);
     
     sceneManager.draw();
+    resetSceneProperties();
     Object::draw();
-    
-    std::multimap<float, Mesh*>::reverse_iterator it;
-    for (it = transparentMeshQueue.rbegin(); it != transparentMeshQueue.rend(); ++it) {
-        (*it).second->meshDraw();
-    }
-  
-    std::vector<Scene*>::iterator it2;
-    for (it2 = subScenes.begin(); it2 != subScenes.end(); ++it2) {
-        (*it2)->draw();
-    }
+
+    drawTransparentMeshes();
+    drawChildTrees();
 
     return true;
 }

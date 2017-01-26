@@ -13,6 +13,8 @@ class TextureManager {
     typedef struct {
         std::shared_ptr<TextureRender> value;
         bool hasAlphaChannel;
+        int width;
+        int height;
     } TextureStore;
     
 private:
@@ -31,6 +33,8 @@ public:
     static void deleteUnused();
 
     static bool hasAlphaChannel(std::string id);
+    static int getTextureWidth(std::string id);
+    static int getTextureHeight(std::string id);
 
     static void clear();
 };

@@ -116,16 +116,17 @@ void Object::removeObject(Object* obj){
     obj->update();
 }
 
+void Object::setDepth(bool depth){
+    if (scene != NULL) {
+        ((Scene*)scene)->useDepth = depth;
+    }
+}
+
 void Object::setPosition(const float x, const float y, const float z){
     setPosition(Vector3(x, y, z));
 }
 
 void Object::setPosition(Vector3 position){
-    if (position.z != 0){
-        if (scene != NULL) {
-            ((Scene*)scene)->useDepth = true;
-        }
-    }
     if (this->position != position){
         this->position = position;
         update();
@@ -319,6 +320,10 @@ bool Object::reload(){
 
 bool Object::load(){
 
+    if (position.z != 0){
+        setDepth(true);
+    }
+
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
         (*it)->load();
@@ -330,6 +335,10 @@ bool Object::load(){
 }
 
 bool Object::draw(){
+
+    if (position.z != 0){
+        setDepth(true);
+    }
 
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {

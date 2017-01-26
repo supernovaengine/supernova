@@ -13,7 +13,6 @@ Mesh::~Mesh(){
 }
 
 void Mesh::setTransparency(bool transparency){
-    transparent = transparency;
     if (scene != NULL && transparent == true) {
         ((Scene*)scene)->useTransparency = true;
     }
@@ -21,7 +20,9 @@ void Mesh::setTransparency(bool transparency){
 
 void Mesh::setColor(float red, float green, float blue, float alpha){
     if (alpha != 1){
-        setTransparency(true);
+        transparent = true;
+    }else{
+        transparent = false;
     }
     submeshes[0]->setColor(Vector4(red, green, blue, alpha));
 }
@@ -169,8 +170,9 @@ bool Mesh::load(){
     }
 
     if (submeshes[0]->getTexture() != "") {
-        setTransparency(TextureManager::hasAlphaChannel(submeshes[0]->getTexture()));
-    }else if (transparent){
+        transparent = TextureManager::hasAlphaChannel(submeshes[0]->getTexture());
+    }
+    if (transparent){
         setTransparency(true);
     }
     
@@ -185,6 +187,10 @@ bool Mesh::draw(){
         ((Scene*)scene)->transparentMeshQueue.insert(std::make_pair(distanceToCamera, this));
     }else{
         meshDraw();
+    }
+
+    if (transparent){
+        setTransparency(true);
     }
     
     Object::draw();
