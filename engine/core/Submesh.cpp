@@ -2,7 +2,6 @@
 #include "render/TextureManager.h"
 
 Submesh::Submesh(){
-    this->texture = "";
     this->loaded = false;
     this->distanceToCamera = -1;
     this->transparent = false;
@@ -13,7 +12,7 @@ Submesh::~Submesh(){
 }
 
 Submesh::Submesh(const Submesh& s){
-    this->texture = s.texture;
+    this->textures = s.textures;
     this->color = s.color;
     this->indices = s.indices;
     this->loaded = s.loaded;
@@ -22,7 +21,7 @@ Submesh::Submesh(const Submesh& s){
 }
 
 Submesh& Submesh::operator = (const Submesh& s){
-    this->texture = s.texture;
+    this->textures = s.textures;
     this->color = s.color;
     this->indices = s.indices;
     this->loaded = s.loaded;
@@ -32,8 +31,12 @@ Submesh& Submesh::operator = (const Submesh& s){
     return *this;
 }
 
-void Submesh::setTexture(std::string texture){    
-    this->texture = texture;
+void Submesh::setTexture(std::string texture){
+    if (textures.size() == 0){
+        textures.push_back(texture);
+    }else{
+        textures[0] = texture;
+    }
 }
 
 void Submesh::setColor(Vector4 color){
@@ -53,8 +56,8 @@ void Submesh::addIndex(unsigned int index){
     this->indices.push_back(index);
 }
 
-std::string Submesh::getTexture(){
-    return texture;
+std::vector<std::string> Submesh::getTextures(){
+    return textures;
 }
 
 Vector4* Submesh::getColor(){

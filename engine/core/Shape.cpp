@@ -57,7 +57,7 @@ void Shape::generateTexcoords(){
 
 bool Shape::load(){
 
-    if (submeshes[0]->getTexture()!="" && (texcoords.size()==0))
+    if (submeshes[0]->getTextures().size() > 0 && (texcoords.size()==0))
         generateTexcoords();
 
     return Mesh::load();

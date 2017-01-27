@@ -14,7 +14,7 @@ private:
     
     bool transparent;
 
-    std::string texture;
+    std::vector<std::string> textures;
     Vector4 color;
     std::vector<unsigned int> indices;
     
@@ -32,7 +32,7 @@ public:
     void setIndices(std::vector<unsigned int> indices);
     void addIndex(unsigned int index);
 
-    std::string getTexture();
+    std::vector<std::string> getTextures();
     Vector4* getColor();
     std::vector<unsigned int>* getIndices();
     unsigned int getIndex(int offset);

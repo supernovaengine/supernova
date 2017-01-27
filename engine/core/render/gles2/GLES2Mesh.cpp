@@ -53,7 +53,7 @@ bool GLES2Mesh::load(SceneRender* sceneRender, std::vector<Vector3> vertices, st
     for (unsigned int i = 0; i < submeshes->size(); i++){
         submeshesGles[(*submeshes)[i]].indicesSizes = (int)(*submeshes)[i]->getIndices()->size();
 
-        if ((*submeshes)[i]->getTexture()!="" && texcoords.size() > 0){
+        if ((*submeshes)[i]->getTextures().size() > 0 && texcoords.size() > 0){
             submeshesGles[(*submeshes)[i]].textured = true;
         }else{
             submeshesGles[(*submeshes)[i]].textured = false;
@@ -113,7 +113,7 @@ bool GLES2Mesh::load(SceneRender* sceneRender, std::vector<Vector3> vertices, st
         }
 
         if (submeshesGles[(*submeshes)[i]].textured){
-            submeshesGles[(*submeshes)[i]].texture = TextureManager::loadTexture((*submeshes)[i]->getTexture());
+            submeshesGles[(*submeshes)[i]].texture = TextureManager::loadTexture((*submeshes)[i]->getTextures()[0]);
             uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
         }else{
             

@@ -32,7 +32,13 @@ void Mesh::setTexture(std::string texture){
 }
 
 void Mesh::setTexture(std::string texture, int submeshIndex){
-    if (texture != submeshes[submeshIndex]->getTexture()){
+
+    std::string oldTexture = "";
+    if (submeshes[submeshIndex]->getTextures().size() > 0){
+        oldTexture = submeshes[submeshIndex]->getTextures()[0];
+    }
+
+    if (texture != oldTexture){
     
         submeshes[submeshIndex]->setTexture(texture);
     
@@ -65,7 +71,7 @@ std::string Mesh::getTexture(){
 }
 
 std::string Mesh::getTexture(int submeshIndex){
-    return submeshes[submeshIndex]->getTexture();
+    return submeshes[submeshIndex]->getTextures()[0];
 }
 
 
@@ -169,8 +175,8 @@ bool Mesh::load(){
         mesh.load(NULL, vertices, normals, texcoords, &submeshes);
     }
 
-    if (submeshes[0]->getTexture() != "") {
-        transparent = TextureManager::hasAlphaChannel(submeshes[0]->getTexture());
+    if (submeshes[0]->getTextures().size() > 0) {
+        transparent = TextureManager::hasAlphaChannel(submeshes[0]->getTextures()[0]);
     }
     if (transparent){
         setTransparency(true);
