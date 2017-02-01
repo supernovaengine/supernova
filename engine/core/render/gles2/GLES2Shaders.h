@@ -45,51 +45,69 @@ const char gVertexShaderPerPixelLightTexture[] =
 
 "varying vec3 v_Position;\n"
 "varying vec3 v_Normal;\n"
-"varying vec2 v_TextureCoordinates;\n"
+"varying vec3 v_TextureCoordinates;\n"
 
 "void main(){\n"
 "    v_Position = vec3(u_mMatrix * a_Position);\n"
-
 "    v_Normal = normalize(vec3(u_nMatrix * vec4(a_Normal, 0.0)));\n"
-"    v_TextureCoordinates = a_TextureCoordinates;\n"
+"    vec4 position = u_mvpMatrix * a_Position;\n"
 
-"    gl_Position = u_mvpMatrix * a_Position;\n"
+"#ifndef USE_TEXTURECUBE\n"
+"    v_TextureCoordinates = vec3(a_TextureCoordinates,0.0);\n"
+"#else\n"
+"    v_TextureCoordinates = vec3(a_Position);\n"
+"#endif\n"
+
+"#ifdef IS_SKY\n"
+"    position.z  = position.w;\n"
+"#endif\n"
+
+"    gl_Position = position;\n"
 "}\n";
 
 const char gFragmentShaderPerPixelLightTexture[] =
-"#define numLights 8\n"
-
 "precision mediump float;\n"
 
-"uniform sampler2D u_TextureUnit;\n"
+"#ifndef USE_TEXTURECUBE\n"
+"    uniform sampler2D u_TextureUnit;\n"
+"#else\n"
+"    uniform samplerCube u_TextureUnit;\n"
+"#endif\n"
+
 "uniform vec4 u_Color;\n"
-"uniform vec3 u_EyePos;\n"
 
 "uniform bool uUseTexture;\n"
-"uniform bool uUseLighting;\n"
 
-"uniform vec3 u_AmbientLight;\n"
+"#ifdef USE_LIGHTING\n"
 
-"uniform int u_NumPointLight;\n"
-"uniform vec3 u_PointLightPos[numLights];\n"
-"uniform vec3 u_PointLightColor[numLights];\n"
-"uniform float u_PointLightPower[numLights];\n"
+"  #define numLights 8\n"
 
-"uniform int u_NumSpotLight;\n"
-"uniform vec3 u_SpotLightPos[numLights];\n"
-"uniform vec3 u_SpotLightColor[numLights];\n"
-"uniform float u_SpotLightPower[numLights];\n"
-"uniform vec3 u_SpotLightTarget[numLights];\n"
-"uniform float u_SpotLightCutOff[numLights];\n"
+"  uniform vec3 u_EyePos;\n"
 
-"uniform int u_NumDirectionalLight;\n"
-"uniform vec3 u_DirectionalLightDir[numLights];\n"
-"uniform float u_DirectionalLightPower[numLights];\n"
-"uniform vec3 u_DirectionalLightColor[numLights];\n"
+"  uniform vec3 u_AmbientLight;\n"
+
+"  uniform int u_NumPointLight;\n"
+"  uniform vec3 u_PointLightPos[numLights];\n"
+"  uniform vec3 u_PointLightColor[numLights];\n"
+"  uniform float u_PointLightPower[numLights];\n"
+
+"  uniform int u_NumSpotLight;\n"
+"  uniform vec3 u_SpotLightPos[numLights];\n"
+"  uniform vec3 u_SpotLightColor[numLights];\n"
+"  uniform float u_SpotLightPower[numLights];\n"
+"  uniform vec3 u_SpotLightTarget[numLights];\n"
+"  uniform float u_SpotLightCutOff[numLights];\n"
+
+"  uniform int u_NumDirectionalLight;\n"
+"  uniform vec3 u_DirectionalLightDir[numLights];\n"
+"  uniform float u_DirectionalLightPower[numLights];\n"
+"  uniform vec3 u_DirectionalLightColor[numLights];\n"
+
+"#endif\n"
 
 "varying vec3 v_Position;\n"
 "varying vec3 v_Normal;\n"
-"varying vec2 v_TextureCoordinates;\n"
+"varying vec3 v_TextureCoordinates;\n"
 
 "void main(){\n"
 
@@ -99,14 +117,18 @@ const char gFragmentShaderPerPixelLightTexture[] =
     //Texture or color
 "   vec4 fragmentColor = vec4(0.0);\n"
 "   if (uUseTexture){\n"
-"       fragmentColor = texture2D(u_TextureUnit, v_TextureCoordinates);\n"
+"      #ifndef USE_TEXTURECUBE\n"
+"         fragmentColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy);\n"
+"      #else\n"
+"         fragmentColor = textureCube(u_TextureUnit, v_TextureCoordinates);\n"
+"      #endif\n"
 "   }else{\n"
 "       fragmentColor = u_Color;\n"
 "   }\n"
 
 "   vec3 FragColor = vec3(fragmentColor);\n"
 
-"   if (uUseLighting){\n"
+"   #ifdef USE_LIGHTING\n"
 "       FragColor = u_AmbientLight * FragColor;\n"
 "       vec3 EyeDirection = normalize( u_EyePos - v_Position );\n"
 
@@ -149,7 +171,7 @@ const char gFragmentShaderPerPixelLightTexture[] =
 "                   MaterialSpecularColor * u_DirectionalLightPower[i] * pow(DirectionalLightcosAlpha, MaterialShininess);\n"
 "           }\n"
 "       }\n"
-"   }\n"
+"   #endif\n"
 
 "   gl_FragColor = vec4(FragColor ,fragmentColor.a);\n"
 "}\n";

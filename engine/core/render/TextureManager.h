@@ -30,6 +30,7 @@ public:
     
     static std::shared_ptr<TextureRender> loadTexture(std::string relative_path);
     static std::shared_ptr<TextureRender> loadTexture(TextureFile* textureFile, std::string id);
+    static std::shared_ptr<TextureRender> loadTextureCube(std::vector<std::string> relative_paths, std::string id);
     static void deleteUnused();
 
     static bool hasAlphaChannel(std::string id);

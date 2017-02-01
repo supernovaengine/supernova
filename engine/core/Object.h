@@ -10,8 +10,6 @@
 class Object: public Render {
 
 private:
-
-    void updateMatrices();
     void setSceneAndConfigure(Object* scene);
     void removeScene();
     int findObject(Object* object);
@@ -39,6 +37,7 @@ protected:
     Vector3 worldPosition;
     
     bool reload();
+    virtual void updateMatrices();
 
 public:
     Object();
@@ -47,7 +46,7 @@ public:
     void addObject(Object* obj);
     void removeObject(Object* obj);
 
-    virtual void transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    virtual void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
     Matrix4 getModelMatrix();
     Matrix4 getModelViewProjectMatrix();
 

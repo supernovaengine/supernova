@@ -134,8 +134,8 @@ void Mesh::updateDistanceToCamera(){
     }
 }
 
-void Mesh::transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    Object::transform(viewMatrix, viewProjectionMatrix, cameraPosition);
+void Mesh::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    Object::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
     
     updateDistanceToCamera();
     sortTransparentSubmeshes();
@@ -199,10 +199,7 @@ bool Mesh::draw(){
         setTransparency(true);
     }
     
-    Object::draw();
-    
-    return true;
-
+    return Object::draw();
 }
 
 void Mesh::destroy(){

@@ -47,6 +47,10 @@ void Object::setSceneAndConfigure(Object* scene){
     if (GUIObject* guiobject_ptr = dynamic_cast<GUIObject*>(this)){
         ((Scene*)scene)->addGUIObject(guiobject_ptr);
     }
+
+    if (SkyBox* sky_ptr = dynamic_cast<SkyBox*>(this)){
+        ((Scene*)scene)->setSky(sky_ptr);
+    }
 }
 
 void Object::removeScene(){
@@ -200,7 +204,7 @@ Matrix4 Object::getModelViewProjectMatrix(){
     return modelViewProjectionMatrix;
 }
 
-void Object::transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+void Object::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
 
     this->viewMatrix = viewMatrix;
     this->viewProjectionMatrix = viewProjectionMatrix;
@@ -210,7 +214,7 @@ void Object::transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vecto
 
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
-        (*it)->transform(viewMatrix, viewProjectionMatrix, cameraPosition);
+        (*it)->transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
     }
 
 }

@@ -66,7 +66,7 @@ PNGReader::DataHandle PNGReader::readEntirePngImage(const png_structp png_ptr, c
 
     png_uint_32 i;
     for (i = 0; i < height; i++) {
-        row_ptrs[i] = raw_image + i * row_size;
+        row_ptrs[(height-1)-i] = raw_image + i * row_size;
     }
 
     png_read_image(png_ptr, &row_ptrs[0]);

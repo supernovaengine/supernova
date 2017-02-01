@@ -13,6 +13,7 @@ Scene::Scene() {
     userCamera = false;
     setAmbientLight(0.1);
     scene = this;
+    sky = NULL;
 }
 
 Scene::~Scene() {
@@ -78,6 +79,10 @@ void Scene::removeGUIObject (GUIObject* guiobject){
     guiObjects.erase(i,guiObjects.end());
 }
 
+void Scene::setSky(SkyBox* sky){
+    this->sky = sky;
+}
+
 void Scene::setAmbientLight(Vector3 ambientLight){
     this->ambientLight = ambientLight;
     sceneManager.setAmbientLight(ambientLight);
@@ -91,8 +96,8 @@ Vector3 Scene::getAmbientLight(){
     return ambientLight;
 }
 
-void Scene::transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    Object::transform(getCamera()->getViewMatrix(), getCamera()->getViewProjectionMatrix(), new Vector3(getCamera()->getWorldPosition()));
+void Scene::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    Object::transform(getCamera()->getViewMatrix(), getCamera()->getProjectionMatrix(), getCamera()->getViewProjectionMatrix(), new Vector3(getCamera()->getWorldPosition()));
 }
 
 void Scene::setCamera(Camera* camera){
@@ -184,11 +189,16 @@ void Scene::drawTransparentMeshes(){
     }
 }
 
-void Scene::drawChildTrees(){
+void Scene::drawChildScenes(){
     std::vector<Scene*>::iterator it2;
     for (it2 = subScenes.begin(); it2 != subScenes.end(); ++it2) {
         (*it2)->draw();
     }
+}
+
+void Scene::drawSky(){
+    if (sky != NULL)
+        sky->meshDraw();
 }
 
 bool Scene::load(){
@@ -218,10 +228,11 @@ bool Scene::draw(){
     sceneManager.draw();
     resetSceneProperties();
     Object::draw();
-
     drawTransparentMeshes();
-    drawChildTrees();
 
+    drawSky();
+
+    drawChildScenes();
     return true;
 }
 

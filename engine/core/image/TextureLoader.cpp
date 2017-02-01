@@ -23,6 +23,8 @@ TextureLoader::~TextureLoader() {
 void TextureLoader::loadRawImage(std::string relative_path) {
     assert(relative_path != "");
     
+    //Texture data orientation is bottom left (OpenGL defaults)
+    
     std::ifstream ifs(relative_path, std::ios::binary);
     if (!ifs){
         Log::Error(LOG_TAG, "Can`t load texture file: %s", relative_path.c_str());

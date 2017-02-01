@@ -37,7 +37,7 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
     //If no create a new texture
     TextureRender* texture = getTextureRender();
     textureFile->resamplePowerOfTwo();
-    texture->loadTexture(textureFile->getWidth(), textureFile->getHeight(), textureFile->getColorFormat(), textureFile->getData());
+    texture->loadTexture(textureFile);
     std::shared_ptr<TextureRender> texturePtr(texture);
 
     bool useAlpha = false;
@@ -47,7 +47,40 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
     textures[id] = {texturePtr, useAlpha, textureFile->getWidth(), textureFile->getHeight()};
 
     return textures[id].value;
+}
+
+std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::string> relative_paths, std::string id){
+    //Verify if there is a created texture
+    if (textures[id].value){
+        return textures[id].value;
+    }
     
+    TextureLoader image;
+    std::vector<TextureFile*> textureFiles;
+    bool useAlpha = false;
+    
+    for (int i = 0; i < relative_paths.size(); i++){
+        image.loadRawImage(relative_paths[i].c_str());
+        textureFiles.push_back(new TextureFile(*image.getRawImage()));
+        textureFiles.back()->resamplePowerOfTwo();
+        textureFiles.back()->flipVertical();
+        if (textureFiles.back()->getColorFormat() == S_COLOR_GRAY_ALPHA || textureFiles.back()->getColorFormat() == S_COLOR_RGB_ALPHA)
+            useAlpha = true;
+    }
+    
+    //If no create a new texture
+    TextureRender* texture = getTextureRender();
+    texture->loadTextureCube(textureFiles);
+    std::shared_ptr<TextureRender> texturePtr(texture);
+    
+    textures[id] = {texturePtr, useAlpha, -1, -1};
+    
+    std::vector<TextureFile*>::iterator it;
+    for (it = textureFiles.begin(); it != textureFiles.end(); ++it) {
+        delete (*it);
+    }
+    
+    return textures[id].value;
 }
 
 bool TextureManager::hasAlphaChannel(std::string id){

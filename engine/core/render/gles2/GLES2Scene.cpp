@@ -101,6 +101,9 @@ bool GLES2Scene::load(bool childScene) {
 
         GLES2Util::checkGlError("Error on load scene GLES2");
     }
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     
     return true;
 }
@@ -116,6 +119,7 @@ bool GLES2Scene::draw(bool childScene, bool useDepth, bool useTransparency) {
 
     if (useDepth){
         glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
     }else{
         glDisable(GL_DEPTH_TEST);
     }

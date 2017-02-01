@@ -3,8 +3,6 @@
 #include "platform/Log.h"
 #include "PrimitiveMode.h"
 
-#include <stdio.h>
-
 Cube::Cube(): Mesh() {
     primitiveMode = S_TRIANGLES;
 }

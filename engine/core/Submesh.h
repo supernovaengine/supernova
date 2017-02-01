@@ -1,6 +1,9 @@
 #ifndef submesh_h
 #define submesh_h
 
+#define S_TEXTURE_2D 1
+#define S_TEXTURE_CUBE 2
+
 #include "math/Vector4.h"
 #include <string>
 #include <vector>
@@ -17,6 +20,7 @@ private:
     std::vector<std::string> textures;
     Vector4 color;
     std::vector<unsigned int> indices;
+    int textureType;
     
     float distanceToCamera;
 
@@ -31,11 +35,14 @@ public:
     void setColor(Vector4 color);
     void setIndices(std::vector<unsigned int> indices);
     void addIndex(unsigned int index);
+    void setTextureType(int textureType);
+    void setTextureCube(std::string front, std::string back, std::string left, std::string right, std::string up, std::string down);
 
     std::vector<std::string> getTextures();
     Vector4* getColor();
     std::vector<unsigned int>* getIndices();
     unsigned int getIndex(int offset);
+    int getTextureType();
 
 };
 

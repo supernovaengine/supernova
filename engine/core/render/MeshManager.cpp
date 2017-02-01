@@ -8,6 +8,7 @@
 MeshManager::MeshManager() {
     mesh = NULL;
     instanciateRender();
+    isSky = false;
 }
 
 MeshManager::~MeshManager() {
@@ -22,9 +23,13 @@ void MeshManager::instanciateRender(){
     }
 }
 
+void MeshManager::setIsSky(bool isSky){
+    this->isSky = isSky;
+}
+
 bool MeshManager::load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh*>* submeshes) {
     instanciateRender();
-    return mesh->load(sceneRender, vertices, normals, texcoords, submeshes);
+    return mesh->load(sceneRender, vertices, normals, texcoords, submeshes, isSky);
 }
 
 bool MeshManager::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* modelViewProjectionMatrix, Vector3* cameraPosition, int mode) {

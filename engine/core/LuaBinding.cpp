@@ -28,6 +28,7 @@
 #include "SpotLight.h"
 #include "DirectionalLight.h"
 #include "Sound.h"
+#include "SkyBox.h"
 #include <map>
 #include <unistd.h>
 
@@ -180,6 +181,16 @@ void LuaBinding::bind(){
     .beginExtendClass<Mesh, Object>("Mesh")
     .addFunction("setTexture", (void (Mesh::*)(std::string))&Mesh::setTexture)
     .addFunction("setColor", &Mesh::setColor)
+    .endClass()
+
+    .beginExtendClass<SkyBox, Mesh>("SkyBox")
+    .addConstructor(LUA_ARGS())
+    .addFunction("setTextureFront", &SkyBox::setTextureFront)
+    .addFunction("setTextureBack", &SkyBox::setTextureBack)
+    .addFunction("setTextureLeft", &SkyBox::setTextureLeft)
+    .addFunction("setTextureRight", &SkyBox::setTextureRight)
+    .addFunction("setTextureUp", &SkyBox::setTextureUp)
+    .addFunction("setTextureDown", &SkyBox::setTextureDown)
     .endClass()
 
     .beginExtendClass<Mesh2D, Mesh>("Mesh2D")

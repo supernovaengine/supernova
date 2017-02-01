@@ -17,7 +17,7 @@ Camera::Camera() : Object(){
     y_fov = 0.75;
     aspect = (float) Supernova::getCanvasWidth() / (float) Supernova::getCanvasHeight();
 
-    near = 1;
+    near = 0.5;
     far = 5000;
 
     projection = S_PERSPECTIVE;
@@ -35,7 +35,6 @@ Camera::Camera(int projection): Camera(){
 }
 
 Camera::~Camera() {
-    // TODO Auto-generated destructor stub
 }
 
 Camera& Camera::operator=(const Camera &c){
@@ -313,7 +312,7 @@ void Camera::update(){
     viewProjectionMatrix = viewMatrix * projectionMatrix;
 
     if (sceneObject != NULL){
-        sceneObject->transform(getViewMatrix(), getViewProjectionMatrix(), &worldPosition);
+        sceneObject->transform(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
     }
 
 }

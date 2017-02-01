@@ -29,7 +29,7 @@ TextureFile* TIFFReader::getRawImage(const char* relative_path, std::ifstream* i
     }
     
     /* Read the image in one chunk into an RGBA array */
-    if (!TIFFReadRGBAImageOriented(in, width, height, raster, ORIENTATION_TOPLEFT, 0)) {
+    if (!TIFFReadRGBAImageOriented(in, width, height, raster, ORIENTATION_BOTLEFT, 0)) {
         _TIFFfree(raster);
         Log::Error(LOG_TAG, "Can`t read TIFF image: %s", relative_path);
         return NULL;

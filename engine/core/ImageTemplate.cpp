@@ -39,6 +39,8 @@ bool ImageTemplate::load(){
                     partImage.push_back(new Image());
                     partImage[partImage.size()-1]->setTexture(getTexture()+std::to_string(x)+"-"+std::to_string(y));
                     this->addObject(partImage[partImage.size()-1]);
+                    
+                    //TODO: delete textureFile
                 }
             }
             

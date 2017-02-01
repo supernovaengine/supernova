@@ -7,6 +7,7 @@
 #include "Render.h"
 #include "render/SceneManager.h"
 #include "Light.h"
+#include "SkyBox.h"
 #include <vector>
 #include <map>
 #include "GUIObject.h"
@@ -30,6 +31,7 @@ private:
     std::vector<Light*> lights;
     std::vector<Scene*> subScenes;
     std::vector<GUIObject*> guiObjects;
+    SkyBox* sky;
     
     Vector3 ambientLight;
 
@@ -46,9 +48,12 @@ private:
     void addGUIObject (GUIObject* guiobject);
     void removeGUIObject (GUIObject* guiobject);
 
-	void resetSceneProperties();
-	void drawTransparentMeshes();
-	void drawChildTrees();
+    void setSky(SkyBox* sky);
+
+    void resetSceneProperties();
+    void drawTransparentMeshes();
+    void drawChildScenes();
+    void drawSky();
 
 public:
 
@@ -59,7 +64,7 @@ public:
     void setAmbientLight(const float ambientFactor);
     Vector3 getAmbientLight();
     
-    void transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
     void setCamera(Camera* camera);
     Camera* getCamera();

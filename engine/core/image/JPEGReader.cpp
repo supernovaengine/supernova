@@ -62,6 +62,9 @@ TextureFile* JPEGReader::getRawImage(const char* relative_path, std::ifstream* i
     
     jpeg_finish_decompress(&info);
     
-    return new TextureFile((int)x, (int)y, (int)data_size, type, channels * bitssample, (void*)jdata);
+    TextureFile* textureFile  = new TextureFile((int)x, (int)y, (int)data_size, type, channels * bitssample, (void*)jdata);
+    textureFile->flipVertical();
+    
+    return textureFile;
 
 }

@@ -62,7 +62,7 @@ public:
 
     bool meshDraw();
 
-    void transform(Matrix4* viewMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
     void update();
 
     bool load();

@@ -26,17 +26,13 @@ class GLES2Mesh : public MeshRender {
 private:
     std::shared_ptr<ProgramRender> gProgram;
 
-    GLuint aPositionHandle;
-    GLuint aTextureCoordinatesLocation;
     GLuint uTextureUnitLocation;
     GLuint uColor;
     GLuint u_mvpMatrix;
     GLuint u_mMatrix;
     GLuint u_nMatrix;
-    GLuint aNormal;
     GLuint uEyePos;
 
-    GLuint useLighting;
     GLuint useTexture;
 
     GLuint u_NumPointLight;
@@ -66,6 +62,7 @@ private:
     static bool emptyTextureLoaded;
     
     bool lighting;
+    bool isSky;
 
     int primitiveSize;
 
@@ -76,8 +73,6 @@ private:
     std::vector<GLfloat> gPrimitiveVertices;
     std::vector<GLfloat> gNormals;
     std::vector<GLfloat> guvMapping;
-
-    const char* programName;
     
     SceneRender* sceneRender;
 
@@ -89,7 +84,7 @@ public:
 	GLES2Mesh();
 	virtual ~GLES2Mesh();
 
-    bool load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh*>* submeshes);
+    bool load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh*>* submeshes, bool isSky);
 	bool draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* modelViewProjectionMatrix, Vector3* cameraPosition, int mode);
     void destroy();
 };

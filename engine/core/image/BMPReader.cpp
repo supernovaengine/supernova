@@ -54,8 +54,5 @@ TextureFile* BMPReader::getRawImage(const char* relative_path, std::ifstream* if
         type = S_COLOR_RGB_ALPHA;
     }
     
-    TextureFile* textureFile = new TextureFile((int)width, (int)height, (int)size, type, BitsPerPixel, fileData);
-    textureFile->flipVertical();
-    
-    return textureFile;
+    return new TextureFile((int)width, (int)height, (int)size, type, BitsPerPixel, fileData);
 }
