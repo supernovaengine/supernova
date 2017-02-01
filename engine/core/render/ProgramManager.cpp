@@ -46,7 +46,8 @@ ProgramManager::it_type ProgramManager::findToRemove(){
 
     for(ProgramManager::it_type iterator = programs.begin(); iterator != programs.end(); iterator++) {
         if (iterator->second.use_count() <= 1){
-            iterator->second.get()->deleteProgram();
+            if (iterator->second.get() != NULL)
+                iterator->second.get()->deleteProgram();
             return iterator;
         }
     }

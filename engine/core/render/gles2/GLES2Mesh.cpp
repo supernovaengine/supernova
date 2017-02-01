@@ -107,10 +107,13 @@ bool GLES2Mesh::load(SceneRender* sceneRender, std::vector<Vector3> vertices, st
     useTexture = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "uUseTexture");
 
     vertexBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, gPrimitiveVertices.size() * sizeof(GLfloat), &gPrimitiveVertices.front(), GL_STATIC_DRAW);
-
+    aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
+    
     normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, gNormals.size() * sizeof(GLfloat), &gNormals.front(), GL_STATIC_DRAW);
+    aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
 
     uvBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, guvMapping.size() * sizeof(GLfloat), &guvMapping.front(), GL_STATIC_DRAW);
+    aTextureCoordinatesLocation = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_TextureCoordinates");
 
     for (unsigned int i = 0; i < submeshes->size(); i++){
         if (submeshesGles[(*submeshes)[i]].indicesSizes > 0){
@@ -241,15 +244,18 @@ bool GLES2Mesh::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* model
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+    if (aPositionHandle == -1) aPositionHandle = 0;
+    glVertexAttribPointer(aPositionHandle, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
 
     glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+    if (aNormal == -1) aNormal = 1;
+    glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
 
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    if (aTextureCoordinatesLocation == -1) aTextureCoordinatesLocation = 2;
+    glVertexAttribPointer(aTextureCoordinatesLocation, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
     GLenum modeGles = GL_TRIANGLES;
 
@@ -305,9 +311,10 @@ void GLES2Mesh::destroy(){
             if (submeshesGles[(*submeshes)[i]].indicesSizes > 0)
                 glDeleteBuffers(1, &submeshesGles[(*submeshes)[i]].indiceBuffer);
 
-            if (submeshesGles[(*submeshes)[i]].textured)
+            if (submeshesGles[(*submeshes)[i]].textured){
                 submeshesGles[(*submeshes)[i]].texture.reset();
-            TextureManager::deleteUnused();
+                TextureManager::deleteUnused();
+            }
         }
         gProgram.reset();
         ProgramManager::deleteUnused();

@@ -176,6 +176,7 @@
 		7188F1B61DBD4A3400A2D04F /* AudioReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1B41DBD4A3400A2D04F /* AudioReader.cpp */; };
 		7188F1B91DBD4BAC00A2D04F /* AudioLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1B71DBD4BAC00A2D04F /* AudioLoader.cpp */; };
 		7188F1BC1DBD960000A2D04F /* WAVReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1BA1DBD960000A2D04F /* WAVReader.cpp */; };
+		7193011D1E42943800BEE527 /* SkyBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7193011B1E42943800BEE527 /* SkyBox.cpp */; };
 		71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */; };
 		71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28351DE8E96800C12A1D /* MP3Reader.cpp */; };
 		71A6FAC01DEA41A6003850A2 /* OpenalPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABE1DEA41A6003850A2 /* OpenalPlayer.cpp */; };
@@ -701,6 +702,8 @@
 		7188F1B81DBD4BAC00A2D04F /* AudioLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioLoader.h; sourceTree = "<group>"; };
 		7188F1BA1DBD960000A2D04F /* WAVReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WAVReader.cpp; sourceTree = "<group>"; };
 		7188F1BB1DBD960000A2D04F /* WAVReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WAVReader.h; sourceTree = "<group>"; };
+		7193011B1E42943800BEE527 /* SkyBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkyBox.cpp; sourceTree = "<group>"; };
+		7193011C1E42943800BEE527 /* SkyBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyBox.h; sourceTree = "<group>"; };
 		71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPlayer.cpp; sourceTree = "<group>"; };
 		71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 		71A6FABE1DEA41A6003850A2 /* OpenalPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenalPlayer.cpp; sourceTree = "<group>"; };
@@ -923,6 +926,8 @@
 				713D2A641CFB2EAD00A4752F /* Scene.h */,
 				713D2A661CFB2EAD00A4752F /* Shape.cpp */,
 				713D2A671CFB2EAD00A4752F /* Shape.h */,
+				7193011B1E42943800BEE527 /* SkyBox.cpp */,
+				7193011C1E42943800BEE527 /* SkyBox.h */,
 				7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */,
 				7188F1AB1DBBAB0B00A2D04F /* Sound.h */,
 				713384DC1D2F560400DB73A5 /* SpotLight.cpp */,
@@ -1881,6 +1886,7 @@
 				713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */,
 				716AB5A71BEF9F3C001B672D /* main.m in Sources */,
 				71192EFD1CE1334000BD76EE /* main.cpp in Sources */,
+				7193011D1E42943800BEE527 /* SkyBox.cpp in Sources */,
 				717FA2091CA1843C009071DC /* EAGLView.mm in Sources */,
 				71BD28391DE8EA1500C12A1D /* synth_8bit.c in Sources */,
 				7151F2801CD4FA86001A3AC3 /* ioscallback.mm in Sources */,

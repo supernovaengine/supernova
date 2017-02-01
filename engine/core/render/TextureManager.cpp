@@ -109,7 +109,8 @@ TextureManager::it_type TextureManager::findToRemove(){
 
     for(TextureManager::it_type iterator = textures.begin(); iterator != textures.end(); iterator++) {
         if (iterator->second.value.use_count() <= 1){
-            iterator->second.value.get()->deleteTexture();
+            if (iterator->second.value.get() != NULL)
+                iterator->second.value.get()->deleteTexture();
             return iterator;
         }
     }

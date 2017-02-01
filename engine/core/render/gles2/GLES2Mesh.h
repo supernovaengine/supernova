@@ -26,6 +26,11 @@ class GLES2Mesh : public MeshRender {
 private:
     std::shared_ptr<ProgramRender> gProgram;
 
+    
+    GLint aPositionHandle;
+    GLint aTextureCoordinatesLocation;
+    GLint aNormal;
+    
     GLuint uTextureUnitLocation;
     GLuint uColor;
     GLuint u_mvpMatrix;
