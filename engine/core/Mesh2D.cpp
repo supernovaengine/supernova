@@ -5,10 +5,32 @@
 Mesh2D::Mesh2D(): Mesh(){
     this->width = 0;
     this->height = 0;
+    this->faceToCamera = false;
 }
 
 Mesh2D::~Mesh2D(){
 
+}
+
+void Mesh2D::update(){
+
+    if (faceToCamera) {
+        if (viewMatrix) {
+            rotation.fromRotationMatrix(viewMatrix->getInverse());
+            rotation = parent->getWorldRotation().inverse() * rotation;
+        }
+    }
+
+    Mesh::update();
+}
+
+void Mesh2D::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+
+    if (faceToCamera) {
+        update();
+    }
+
+    Mesh::transform( viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 }
 
 void Mesh2D::setSize(int width, int height){
@@ -19,6 +41,10 @@ void Mesh2D::setSize(int width, int height){
         if (loaded)
             load();
     }
+}
+
+void Mesh2D::setFaceToCamera(bool faceToCamera){
+    this->faceToCamera = faceToCamera;
 }
 
 void Mesh2D::setWidth(int width){

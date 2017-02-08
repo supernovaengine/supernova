@@ -166,6 +166,10 @@ Quaternion Object::getRotation(){
     return this->rotation;
 }
 
+Quaternion Object::getWorldRotation(){
+    return this->worldRotation;
+}
+
 void Object::setScale(const float factor){
     setScale(Vector3(factor,factor,factor));
 }
@@ -296,9 +300,14 @@ void Object::update(){
     if (parent != NULL){
         Matrix4 parentCenterMatrix = Matrix4::translateMatrix(parent->center);
         this->modelMatrix = this->modelMatrix * parentCenterMatrix * parent->modelMatrix;
+        worldRotation = parent->worldRotation * rotation;
+        worldPosition = modelMatrix * Vector3(0,0,0);
+    }else{
+        worldRotation = rotation;
+        worldPosition = position;
     }
 
-    worldPosition = modelMatrix * Vector3(0,0,0);
+
 
     updateMatrices();
 

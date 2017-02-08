@@ -35,6 +35,7 @@ protected:
     Vector3 center;
 
     Vector3 worldPosition;
+    Quaternion worldRotation;
     
     bool reload();
     virtual void updateMatrices();
@@ -58,6 +59,7 @@ public:
     void setRotation(const float xAngle, const float yAngle, const float zAngle);
     void setRotation(Quaternion rotation);
     Quaternion getRotation();
+    Quaternion getWorldRotation();
 
     void setScale(const float factor);
     void setScale(Vector3 scale);
