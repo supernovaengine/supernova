@@ -51,8 +51,24 @@ void Image::createVertices(){
     normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
 }
 
+void Image::update(){
+    //if (viewMatrix){
+    //    rotation.fromRotationMatrix(viewMatrix->getInverse());
+    //    rotation = parent->getRotation().inverse() * rotation;
+    //}
+
+    Mesh2D::update();
+}
+
+void Image::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+
+    //update();
+
+    Mesh2D::transform( viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+}
 
 bool Image::load(){
+
     if (submeshes[0]->getTextures().size() > 0 && !loaded && this->width == 0 && this->height == 0){
         TextureManager::loadTexture(submeshes[0]->getTextures()[0]);
         this->width = TextureManager::getTextureWidth(submeshes[0]->getTextures()[0]);

@@ -8,8 +8,10 @@
 #include "GLES2Header.h"
 
 class GLES2Scene : public SceneRender{
-
-public:
+    
+friend class GLES2Mesh;
+    
+private:
     
     Vector3 ambientLight;
     
@@ -31,7 +33,9 @@ public:
     std::vector<GLfloat> directionalLightColor;
 
     bool lighting;
-
+    
+public:
+    
     GLES2Scene();
     virtual ~GLES2Scene();
     

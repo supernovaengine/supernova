@@ -9,6 +9,7 @@
 
 
 GLES2Scene::GLES2Scene() {
+    lighting = false;
 }
 
 GLES2Scene::~GLES2Scene() {

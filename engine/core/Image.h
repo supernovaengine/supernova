@@ -4,8 +4,6 @@
 
 #include "Mesh2D.h"
 
-void testando2();
-
 class Image: public Mesh2D {
 
 private:
@@ -16,6 +14,9 @@ public:
     Image(int width, int height);
     Image(std::string image_path);
     virtual ~Image();
+
+    void update();
+    void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
     bool load();
 

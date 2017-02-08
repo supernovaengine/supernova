@@ -203,7 +203,7 @@ bool GLES2Mesh::draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* model
     }
 
     //Fix IOS lighting set true in subscenes
-    checkLighting();
+    //checkLighting();
 
     glUseProgram(((GLES2Program*)gProgram.get())->getProgram());
     GLES2Util::checkGlError("glUseProgram");
