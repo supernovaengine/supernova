@@ -1,5 +1,5 @@
-#ifndef gles2primitive_h
-#define gles2primitive_h
+#ifndef gles2draw_h
+#define gles2draw_h
 
 #include "GLES2Header.h"
 #include "../../Submesh.h"
@@ -10,11 +10,11 @@
 #include "math/Vector3.h"
 #include "render/TextureManager.h"
 #include "render/ProgramManager.h"
-#include "render/MeshRender.h"
+#include "render/DrawRender.h"
 #include "render/SceneRender.h"
 
 
-class GLES2Mesh : public MeshRender {
+class GLES2Draw : public DrawRender {
     
     typedef struct {
         GLuint indiceBuffer;
@@ -67,30 +67,21 @@ private:
     static bool emptyTextureLoaded;
     
     bool lighting;
-    bool isSky;
 
     int primitiveSize;
-
-    std::vector<Submesh*>* submeshes;
     
     std::unordered_map<Submesh*, SubmeshStruct> submeshesGles;
-
-    std::vector<GLfloat> gPrimitiveVertices;
-    std::vector<GLfloat> gNormals;
-    std::vector<GLfloat> guvMapping;
-    
-    SceneRender* sceneRender;
 
     bool loaded;
     
     void checkLighting();
 
 public:
-	GLES2Mesh();
-	virtual ~GLES2Mesh();
+	GLES2Draw();
+	virtual ~GLES2Draw();
 
-    bool load(SceneRender* sceneRender, std::vector<Vector3> vertices, std::vector<Vector3> normals, std::vector<Vector2> texcoords, std::vector<Submesh*>* submeshes, bool isSky);
-	bool draw(Matrix4* modelMatrix, Matrix4* normalMatrix, Matrix4* modelViewProjectionMatrix, Vector3* cameraPosition, int mode);
+    bool load();
+	bool draw();
     void destroy();
 };
 

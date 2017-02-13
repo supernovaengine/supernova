@@ -14,14 +14,14 @@ ImageTemplate::~ImageTemplate(){
 
 bool ImageTemplate::load(){
 
-    if (submeshes[0]->getTextures().size() > 0){
+    if (submeshes[0]->getMaterial()->getTextures().size() > 0){
         
         int cropWidth = 0;
         int cropHeight = 0;
         
         if (!loaded || (rawImageWidth == 0 && rawImageHeight == 0)){
         
-            TextureLoader image(submeshes[0]->getTextures()[0]);
+            TextureLoader image(submeshes[0]->getMaterial()->getTextures()[0]);
             
             rawImageWidth = image.getRawImage()->getWidth();
             rawImageHeight = image.getRawImage()->getHeight();

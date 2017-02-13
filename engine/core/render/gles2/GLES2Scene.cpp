@@ -105,7 +105,7 @@ bool GLES2Scene::load(bool childScene) {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    
+
     return true;
 }
 

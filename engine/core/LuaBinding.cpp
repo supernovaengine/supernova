@@ -9,6 +9,7 @@
 
 #include "Supernova.h"
 #include "Object.h"
+#include "ConcreteObject.h"
 #include "platform/Log.h"
 #include "Scene.h"
 #include "Shape.h"
@@ -178,9 +179,13 @@ void LuaBinding::bind(){
     .addProperty("target", &DirectionalLight::getDirection, (void (DirectionalLight::*)(Vector3))&DirectionalLight::setDirection)
     .endClass()
 
-    .beginExtendClass<Mesh, Object>("Mesh")
-    .addFunction("setTexture", (void (Mesh::*)(std::string))&Mesh::setTexture)
-    .addFunction("setColor", &Mesh::setColor)
+    .beginExtendClass<ConcreteObject, Object>("ConcreteObject")
+    .addFunction("setTexture", (void (ConcreteObject::*)(std::string))&ConcreteObject::setTexture)
+    .addFunction("setColor", &ConcreteObject::setColor)
+    .endClass()
+
+    .beginExtendClass<Mesh, ConcreteObject>("Mesh")
+    .addConstructor(LUA_ARGS())
     .endClass()
 
     .beginExtendClass<SkyBox, Mesh>("SkyBox")

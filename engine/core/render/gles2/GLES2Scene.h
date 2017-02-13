@@ -9,7 +9,7 @@
 
 class GLES2Scene : public SceneRender{
     
-friend class GLES2Mesh;
+friend class GLES2Draw;
     
 private:
     

@@ -9,6 +9,7 @@
 SkyBox::SkyBox(): Mesh() {
     
     primitiveMode = S_TRIANGLES;
+    objectType = S_DRAW_SKY;
     
     vertices.push_back(Vector3(-1.0f,  1.0f, -1.0f));
     vertices.push_back(Vector3(-1.0f, -1.0f, -1.0f));
@@ -51,8 +52,6 @@ SkyBox::SkyBox(): Mesh() {
     vertices.push_back(Vector3(1.0f, -1.0f, -1.0f));
     vertices.push_back(Vector3(-1.0f, -1.0f,  1.0f));
     vertices.push_back(Vector3(1.0f, -1.0f,  1.0f));
-
-    mesh.setIsSky(true);
 }
 
 SkyBox::~SkyBox() {
@@ -87,8 +86,9 @@ void SkyBox::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* 
 }
 
 bool SkyBox::load(){
-    this->submeshes[0]->setTextureCube(textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
-    return Mesh::load();
+    this->submeshes[0]->getMaterial()->setTextureCube(textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
+    Mesh::load();
+    return true;
 }
 
 bool SkyBox::draw(){

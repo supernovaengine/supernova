@@ -1,12 +1,10 @@
 #ifndef submesh_h
 #define submesh_h
 
-#define S_TEXTURE_2D 1
-#define S_TEXTURE_CUBE 2
-
 #include "math/Vector4.h"
 #include <string>
 #include <vector>
+#include "Material.h"
 
 class Submesh {
     friend class Mesh;
@@ -14,35 +12,31 @@ class Submesh {
 private:
     
     bool loaded;
-    
-    bool transparent;
 
-    std::vector<std::string> textures;
-    Vector4 color;
     std::vector<unsigned int> indices;
-    int textureType;
+    
+    Material* material;
+    bool newMaterial;
     
     float distanceToCamera;
 
 public:
     Submesh();
+    Submesh(Material* material);
     Submesh(const Submesh& s);
     virtual ~Submesh();
 
     Submesh& operator = (const Submesh& s);
 
-    void setTexture(std::string texture);
-    void setColor(Vector4 color);
     void setIndices(std::vector<unsigned int> indices);
     void addIndex(unsigned int index);
-    void setTextureType(int textureType);
-    void setTextureCube(std::string front, std::string back, std::string left, std::string right, std::string up, std::string down);
 
-    std::vector<std::string> getTextures();
-    Vector4* getColor();
     std::vector<unsigned int>* getIndices();
     unsigned int getIndex(int offset);
-    int getTextureType();
+
+    void createNewMaterial();
+    void setMaterial(Material* material);
+    Material* getMaterial();
 
 };
 
