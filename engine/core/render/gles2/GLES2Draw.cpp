@@ -85,11 +85,14 @@ bool GLES2Draw::load() {
     vertexBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, positions->size() * 3 * sizeof(GLfloat), &positions->front(), GL_STATIC_DRAW);
     aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
     
-    normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_STATIC_DRAW);
-    aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
-
     uvBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front(), GL_STATIC_DRAW);
     aTextureCoordinatesLocation = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_TextureCoordinates");
+    
+    if (this->lighting){
+        normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_STATIC_DRAW);
+        aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
+    }
+    
 
     for (unsigned int i = 0; i < submeshes->size(); i++){
         if (submeshesGles[(*submeshes)[i]].indicesSizes > 0){
@@ -160,8 +163,10 @@ bool GLES2Draw::load() {
     }
 
     u_mvpMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mvpMatrix");
-    u_mMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mMatrix");
-    u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
+    if (this->lighting){
+        u_mMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mMatrix");
+        u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
+    }
 
     GLES2Util::checkGlError("Error on load GLES2");
 
@@ -178,15 +183,14 @@ bool GLES2Draw::draw() {
        glDepthFunc(GL_LEQUAL);
     }
 
-    //Fix IOS lighting set true in subscenes
-    //checkLighting();
-
     glUseProgram(((GLES2Program*)gProgram.get())->getProgram());
     GLES2Util::checkGlError("glUseProgram");
 
     glUniformMatrix4fv(u_mvpMatrix, 1, GL_FALSE, (GLfloat*)modelViewProjectionMatrix);
-    glUniformMatrix4fv(u_mMatrix, 1, GL_FALSE, (GLfloat*)modelMatrix);
-    glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);
+    if (this->lighting){
+        glUniformMatrix4fv(u_mMatrix, 1, GL_FALSE, (GLfloat*)modelMatrix);
+        glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);
+    }
 
     if (this->lighting){
         glUniform3fv(uEyePos, 1, cameraPosition->ptr());
@@ -223,15 +227,17 @@ bool GLES2Draw::draw() {
     if (aPositionHandle == -1) aPositionHandle = 0;
     glVertexAttribPointer(aPositionHandle, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
 
-    glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-    if (aNormal == -1) aNormal = 1;
-    glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
-
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-    if (aTextureCoordinatesLocation == -1) aTextureCoordinatesLocation = 2;
+    if (aTextureCoordinatesLocation == -1) aTextureCoordinatesLocation = 1;
     glVertexAttribPointer(aTextureCoordinatesLocation, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    
+    if (this->lighting){
+        glEnableVertexAttribArray(2);
+        glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+        if (aNormal == -1) aNormal = 2;
+        glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+    }
 
     GLenum modeGles = GL_TRIANGLES;
 
@@ -291,7 +297,9 @@ void GLES2Draw::destroy(){
     if (loaded){
         glDeleteBuffers(1, &vertexBuffer);
         glDeleteBuffers(1, &uvBuffer);
-        glDeleteBuffers(1, &normalBuffer);
+        if (this->lighting){
+            glDeleteBuffers(1, &normalBuffer);
+        }
         for (unsigned int i = 0; i < submeshes->size(); i++){
             if (submeshesGles[(*submeshes)[i]].indicesSizes > 0)
                 glDeleteBuffers(1, &submeshesGles[(*submeshes)[i]].indiceBuffer);
