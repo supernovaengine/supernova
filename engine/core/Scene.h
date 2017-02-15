@@ -61,6 +61,8 @@ public:
 	Scene();
 	virtual ~Scene();
 
+	SceneRender* getSceneRender();
+
     void setAmbientLight(Vector3 ambientLight);
     void setAmbientLight(const float ambientFactor);
     Vector3 getAmbientLight();

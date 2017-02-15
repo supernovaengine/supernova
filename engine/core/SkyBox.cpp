@@ -87,11 +87,14 @@ void SkyBox::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* 
 
 bool SkyBox::load(){
     this->submeshes[0]->getMaterial()->setTextureCube(textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
-    Mesh::load();
-    return true;
+
+    return  Mesh::load();
 }
 
 bool SkyBox::draw(){
+
+    renderManager.getRender()->setModelViewProjectionMatrix(&skyViewProjectionMatrix);
+
     return true;
 }
 

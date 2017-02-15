@@ -70,7 +70,12 @@ private:
 
     int primitiveSize;
     
+    //--Use for mesh draw
     std::unordered_map<Submesh*, SubmeshStruct> submeshesGles;
+    //--Use for points draw
+    std::shared_ptr<TextureRender> texture;
+    bool textured;
+    //--end
 
     bool loaded;
     

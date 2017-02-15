@@ -79,6 +79,10 @@ void Scene::removeGUIObject (GUIObject* guiobject){
     guiObjects.erase(i,guiObjects.end());
 }
 
+SceneRender* Scene::getSceneRender(){
+    return sceneManager.getSceneRender();
+}
+
 void Scene::setSky(SkyBox* sky){
     this->sky = sky;
 }

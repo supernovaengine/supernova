@@ -69,6 +69,10 @@ const char gVertexShaderPerPixelLightTexture[] =
 "      position.z  = position.w;\n"
 "    #endif\n"
 
+"    #ifdef IS_POINTS\n"
+"      gl_PointSize = 30.0;\n"
+"    #endif\n"
+
 "    gl_Position = position;\n"
 "}\n";
 

@@ -50,6 +50,7 @@ public:
     bool render();
 
     bool load();
+    bool draw();
     void destroy();
 
 };

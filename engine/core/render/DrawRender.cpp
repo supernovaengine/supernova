@@ -13,6 +13,8 @@ DrawRender::DrawRender(){
     normalMatrix = NULL;
     modelViewProjectionMatrix = NULL;
     cameraPosition = NULL;
+    
+    material = NULL;
 }
 
 DrawRender::~DrawRender(){
@@ -60,4 +62,8 @@ void DrawRender::setPrimitiveMode(int primitiveMode){
 
 void DrawRender::setObjectType(int objectType){
     this->objectType = objectType;
+}
+
+void DrawRender::setMaterial(Material* material){
+    this->material = material;
 }

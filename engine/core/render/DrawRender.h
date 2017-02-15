@@ -26,6 +26,8 @@ protected:
     Matrix4* modelViewProjectionMatrix;
     Vector3* cameraPosition;
     
+    Material* material;
+    
     int primitiveMode;
     int objectType;
 
@@ -45,6 +47,7 @@ public:
     void setCameraPosition(Vector3* cameraPosition);
     void setPrimitiveMode(int primitiveMode);
     void setObjectType(int objectType);
+    void setMaterial(Material* material);
     
     virtual bool load() = 0;
     virtual bool draw() = 0;

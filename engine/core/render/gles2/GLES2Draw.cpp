@@ -44,35 +44,54 @@ bool GLES2Draw::load() {
     primitiveSize = (int)(*positions).size();
 
     submeshesGles.clear();
-    
-    for (unsigned int i = 0; i < submeshes->size(); i++){
-        submeshesGles[(*submeshes)[i]].indicesSizes = (int)(*submeshes)[i]->getIndices()->size();
+    //---> For meshes
+    if (submeshes){
+        for (unsigned int i = 0; i < submeshes->size(); i++){
+            submeshesGles[(*submeshes)[i]].indicesSizes = (int)(*submeshes)[i]->getIndices()->size();
 
-        if ((*submeshes)[i]->getMaterial()->getTextures().size() > 0){
-            submeshesGles[(*submeshes)[i]].textured = true;
+            if ((*submeshes)[i]->getMaterial()->getTextures().size() > 0){
+                submeshesGles[(*submeshes)[i]].textured = true;
+            }else{
+                submeshesGles[(*submeshes)[i]].textured = false;
+            }
+            if ((*submeshes)[i]->getMaterial()->getTextureType() == S_TEXTURE_2D &&  texcoords->size() == 0){
+                submeshesGles[(*submeshes)[i]].textured = false;
+            }
+        }
+    }
+    //---> For points
+    if (objectType == S_DRAW_POINTS){
+        if (material->getTextures().size() > 0){
+            textured = true;
         }else{
-            submeshesGles[(*submeshes)[i]].textured = false;
-        }
-        if ((*submeshes)[i]->getMaterial()->getTextureType() == S_TEXTURE_2D &&  texcoords->size() == 0){
-            submeshesGles[(*submeshes)[i]].textured = false;
+            textured = false;
         }
     }
     
-    while (positions->size() > normals->size()){
-        normals->push_back(Vector3(0,0,0));
-    }
+    if (texcoords){
+        while (positions->size() > texcoords->size()){
+            texcoords->push_back(Vector2(0,0));
+        }
+    }    
     
-    while (positions->size() > texcoords->size()){
-        texcoords->push_back(Vector2(0,0));
+    if (normals){
+        while (positions->size() > normals->size()){
+            normals->push_back(Vector3(0,0,0));
+        }
     }
 
     std::string programName = "perfragment";
     std::string programDefs = "";
-    if ((*submeshes)[0]->getMaterial()->getTextureType() == S_TEXTURE_CUBE){
-        programDefs += "#define USE_TEXTURECUBE\n";
+    if (submeshes){
+        if ((*submeshes)[0]->getMaterial()->getTextureType() == S_TEXTURE_CUBE){
+            programDefs += "#define USE_TEXTURECUBE\n";
+        }
     }
     if (objectType == S_DRAW_SKY){
         programDefs += "#define IS_SKY\n";
+    }
+    if (objectType == S_DRAW_POINTS){
+        programDefs += "#define IS_POINTS\n";
     }
     if (this->lighting){
         programDefs += "#define USE_LIGHTING\n";
@@ -85,56 +104,69 @@ bool GLES2Draw::load() {
     vertexBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, positions->size() * 3 * sizeof(GLfloat), &positions->front(), GL_STATIC_DRAW);
     aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
     
-    uvBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front(), GL_STATIC_DRAW);
-    aTextureCoordinatesLocation = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_TextureCoordinates");
+    if (texcoords){
+        uvBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front(), GL_STATIC_DRAW);
+        aTextureCoordinatesLocation = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_TextureCoordinates");
+    }
     
-    if (this->lighting){
+    if (normals && this->lighting){
         normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_STATIC_DRAW);
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
     }
     
-
-    for (unsigned int i = 0; i < submeshes->size(); i++){
-        if (submeshesGles[(*submeshes)[i]].indicesSizes > 0){
-            std::vector<unsigned int> gIndices = *(*submeshes)[i]->getIndices();
-            submeshesGles[(*submeshes)[i]].indiceBuffer = GLES2Util::createVBO(GL_ELEMENT_ARRAY_BUFFER, gIndices.size() * sizeof(unsigned int), &gIndices.front(), GL_STATIC_DRAW);
-        }else{
-            submeshesGles[(*submeshes)[i]].indiceBuffer = NULL;
-        }
-
-        if (submeshesGles[(*submeshes)[i]].textured){
-            if ((*submeshes)[i]->getMaterial()->getTextureType() == S_TEXTURE_CUBE){
-                std::vector<std::string> textures;
-                std::string id = "cube|";
-                for (int t = 0; t < (*submeshes)[i]->getMaterial()->getTextures().size(); t++){
-                    textures.push_back((*submeshes)[i]->getMaterial()->getTextures()[t]);
-                    id = id + "|" + textures.back();
-                }
-                submeshesGles[(*submeshes)[i]].texture = TextureManager::loadTextureCube(textures, id);
+    //---> For meshes
+    if (submeshes){
+        for (unsigned int i = 0; i < submeshes->size(); i++){
+            if (submeshesGles[(*submeshes)[i]].indicesSizes > 0){
+                std::vector<unsigned int> gIndices = *(*submeshes)[i]->getIndices();
+                submeshesGles[(*submeshes)[i]].indiceBuffer = GLES2Util::createVBO(GL_ELEMENT_ARRAY_BUFFER, gIndices.size() * sizeof(unsigned int), &gIndices.front(), GL_STATIC_DRAW);
             }else{
-                submeshesGles[(*submeshes)[i]].texture = TextureManager::loadTexture((*submeshes)[i]->getMaterial()->getTextures()[0]);
+                submeshesGles[(*submeshes)[i]].indiceBuffer = NULL;
             }
-            uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
-        }else{
-            
-            if (Supernova::getPlatform() == S_WEB){
-                //Fix Chrome warnings of no texture bound with an empty texture
-                if (!GLES2Draw::emptyTextureLoaded){
-                    glGenTextures(1, &GLES2Draw::emptyTexture);
-                    glBindTexture(GL_TEXTURE_2D, GLES2Draw::emptyTexture);
-                    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1, 1, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                    GLES2Draw::emptyTextureLoaded = true;
+
+            if (submeshesGles[(*submeshes)[i]].textured){
+                if ((*submeshes)[i]->getMaterial()->getTextureType() == S_TEXTURE_CUBE){
+                    std::vector<std::string> textures;
+                    std::string id = "cube|";
+                    for (int t = 0; t < (*submeshes)[i]->getMaterial()->getTextures().size(); t++){
+                        textures.push_back((*submeshes)[i]->getMaterial()->getTextures()[t]);
+                        id = id + "|" + textures.back();
+                    }
+                    submeshesGles[(*submeshes)[i]].texture = TextureManager::loadTextureCube(textures, id);
+                }else{
+                    submeshesGles[(*submeshes)[i]].texture = TextureManager::loadTexture((*submeshes)[i]->getMaterial()->getTextures()[0]);
                 }
-                
-                submeshesGles[(*submeshes)[i]].texture = NULL;
                 uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
             }else{
-                submeshesGles[(*submeshes)[i]].texture = NULL;
+                
+                if (Supernova::getPlatform() == S_WEB){
+                    //Fix Chrome warnings of no texture bound with an empty texture
+                    if (!GLES2Draw::emptyTextureLoaded){
+                        glGenTextures(1, &GLES2Draw::emptyTexture);
+                        glBindTexture(GL_TEXTURE_2D, GLES2Draw::emptyTexture);
+                        glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1, 1, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                        GLES2Draw::emptyTextureLoaded = true;
+                    }
+                    
+                    submeshesGles[(*submeshes)[i]].texture = NULL;
+                    uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
+                }else{
+                    submeshesGles[(*submeshes)[i]].texture = NULL;
+                }
+                uColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_Color");
+                
             }
+        }
+    }
+    //---> For points
+    if (objectType == S_DRAW_POINTS){
+        if (textured){
+            texture = TextureManager::loadTexture(material->getTextures()[0]);
+            uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
+        }else{
             uColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_Color");
-            
         }
     }
 
@@ -176,7 +208,7 @@ bool GLES2Draw::load() {
 bool GLES2Draw::draw() {
 
     if (!loaded){
-        //return false;
+        return false;
     }
 
     if (objectType == S_DRAW_SKY) {
@@ -227,12 +259,14 @@ bool GLES2Draw::draw() {
     if (aPositionHandle == -1) aPositionHandle = 0;
     glVertexAttribPointer(aPositionHandle, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
 
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-    if (aTextureCoordinatesLocation == -1) aTextureCoordinatesLocation = 1;
-    glVertexAttribPointer(aTextureCoordinatesLocation, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    if (texcoords){
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+        if (aTextureCoordinatesLocation == -1) aTextureCoordinatesLocation = 1;
+        glVertexAttribPointer(aTextureCoordinatesLocation, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    }
     
-    if (this->lighting){
+    if (normals && this->lighting){
         glEnableVertexAttribArray(2);
         glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
         if (aNormal == -1) aNormal = 2;
@@ -240,27 +274,50 @@ bool GLES2Draw::draw() {
     }
 
     GLenum modeGles = GL_TRIANGLES;
-
     if (primitiveMode == S_TRIANGLES_STRIP){
         modeGles = GL_TRIANGLE_STRIP;
     }
+    if (primitiveMode == S_POINTS){
+        modeGles = GL_POINTS;
+    }
 
-    for (int i = 0; i < submeshes->size(); i++){
+    if (submeshes){
+        for (int i = 0; i < submeshes->size(); i++){
 
-        //if ((*submeshes)[i]->getMaterial()->getTextures().size()>0) {
-        //    Log::Verbose(LOG_TAG, "Teste %s\n",
-        //                 (*submeshes)[i]->getMaterial()->getTextures()[0].c_str());
-        //    printf("Teste %s\n", (*submeshes)[i]->getMaterial()->getTextures()[0].c_str());
-        //}
+            glUniform1i(useTexture, submeshesGles[(*submeshes)[i]].textured);
 
-        glUniform1i(useTexture, submeshesGles[(*submeshes)[i]].textured);
+            if (submeshesGles[(*submeshes)[i]].textured){
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(((GLES2Texture*)(submeshesGles[(*submeshes)[i]].texture.get()))->getTextureType(), ((GLES2Texture*)(submeshesGles[(*submeshes)[i]].texture.get()))->getTexture());
+                glUniform1i(uTextureUnitLocation, 0);
+            }else{
+                glUniform4fv(uColor, 1, (*submeshes)[i]->getMaterial()->getColor()->ptr());
+                if (Supernova::getPlatform() == S_WEB){
+                    //Fix Chrome warnings of no texture bound
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, GLES2Draw::emptyTexture);
+                    glUniform1i(uTextureUnitLocation, 0);
+                }
+            }
 
-        if (submeshesGles[(*submeshes)[i]].textured){
+            if (submeshesGles[(*submeshes)[i]].indicesSizes > 0){
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, submeshesGles[(*submeshes)[i]].indiceBuffer);
+                glDrawElements(modeGles, submeshesGles[(*submeshes)[i]].indicesSizes, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+            }else{
+                glDrawArrays(modeGles, 0, primitiveSize);
+            }
+        }
+    }
+    
+    if (objectType == S_DRAW_POINTS){
+        glUniform1i(useTexture, textured);
+        
+        if (textured){
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(((GLES2Texture*)(submeshesGles[(*submeshes)[i]].texture.get()))->getTextureType(), ((GLES2Texture*)(submeshesGles[(*submeshes)[i]].texture.get()))->getTexture());
+            glBindTexture(((GLES2Texture*)(texture.get()))->getTextureType(), ((GLES2Texture*)(texture.get()))->getTexture());
             glUniform1i(uTextureUnitLocation, 0);
         }else{
-            glUniform4fv(uColor, 1, (*submeshes)[i]->getMaterial()->getColor()->ptr());
+            glUniform4fv(uColor, 1, material->getColor()->ptr());
             if (Supernova::getPlatform() == S_WEB){
                 //Fix Chrome warnings of no texture bound
                 glActiveTexture(GL_TEXTURE0);
@@ -268,14 +325,8 @@ bool GLES2Draw::draw() {
                 glUniform1i(uTextureUnitLocation, 0);
             }
         }
-
-        if (submeshesGles[(*submeshes)[i]].indicesSizes > 0){
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, submeshesGles[(*submeshes)[i]].indiceBuffer);
-            glDrawElements(modeGles, submeshesGles[(*submeshes)[i]].indicesSizes, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
-        }else{
-            glDrawArrays(modeGles, 0, primitiveSize);
-        }
-
+        
+        glDrawArrays(modeGles, 0, primitiveSize);
     }
 
     //Log::Verbose(LOG_TAG, "oi\n");
@@ -296,16 +347,26 @@ bool GLES2Draw::draw() {
 void GLES2Draw::destroy(){
     if (loaded){
         glDeleteBuffers(1, &vertexBuffer);
-        glDeleteBuffers(1, &uvBuffer);
-        if (this->lighting){
+        if (texcoords){
+            glDeleteBuffers(1, &uvBuffer);
+        }
+        if (normals && this->lighting){
             glDeleteBuffers(1, &normalBuffer);
         }
-        for (unsigned int i = 0; i < submeshes->size(); i++){
-            if (submeshesGles[(*submeshes)[i]].indicesSizes > 0)
-                glDeleteBuffers(1, &submeshesGles[(*submeshes)[i]].indiceBuffer);
+        if (submeshes){
+            for (unsigned int i = 0; i < submeshes->size(); i++){
+                if (submeshesGles[(*submeshes)[i]].indicesSizes > 0)
+                    glDeleteBuffers(1, &submeshesGles[(*submeshes)[i]].indiceBuffer);
 
-            if (submeshesGles[(*submeshes)[i]].textured){
-                submeshesGles[(*submeshes)[i]].texture.reset();
+                if (submeshesGles[(*submeshes)[i]].textured){
+                    submeshesGles[(*submeshes)[i]].texture.reset();
+                    TextureManager::deleteUnused();
+                }
+            }
+        }
+        if (objectType == S_DRAW_POINTS){
+            if (textured){
+                texture.reset();
                 TextureManager::deleteUnused();
             }
         }

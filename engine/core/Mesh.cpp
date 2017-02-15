@@ -95,15 +95,7 @@ void Mesh::update(){
 }
 
 bool Mesh::render(){
-
-    renderManager.getRender()->setModelMatrix(&modelMatrix);
-    renderManager.getRender()->setNormalMatrix(&normalMatrix);
-    renderManager.getRender()->setModelViewProjectionMatrix(&modelViewProjectionMatrix);
-    renderManager.getRender()->setCameraPosition(cameraPosition);
-    
-    renderManager.draw();
-    
-    return true;
+    return renderManager.draw();
 }
 
 void Mesh::removeAllSubmeshes(){
@@ -117,7 +109,7 @@ void Mesh::removeAllSubmeshes(){
 bool Mesh::load(){
 
     if (scene != NULL){
-        renderManager.getRender()->setSceneRender(((Scene*)scene)->sceneManager.getSceneRender());
+        renderManager.getRender()->setSceneRender(((Scene*)scene)->getSceneRender());
     }
     
     renderManager.getRender()->setPositions(&vertices);
@@ -131,6 +123,15 @@ bool Mesh::load(){
     renderManager.load();
 
     return ConcreteObject::load();
+}
+
+bool Mesh::draw(){
+    renderManager.getRender()->setModelMatrix(&modelMatrix);
+    renderManager.getRender()->setNormalMatrix(&normalMatrix);
+    renderManager.getRender()->setModelViewProjectionMatrix(&modelViewProjectionMatrix);
+    renderManager.getRender()->setCameraPosition(cameraPosition);
+
+    return ConcreteObject::draw();
 }
 
 void Mesh::destroy(){
