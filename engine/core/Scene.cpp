@@ -232,9 +232,8 @@ bool Scene::draw(){
     sceneManager.draw();
     resetSceneProperties();
     Object::draw();
-    drawTransparentMeshes();
-
     drawSky();
+    drawTransparentMeshes();
 
     drawChildScenes();
     return true;

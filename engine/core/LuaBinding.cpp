@@ -200,7 +200,7 @@ void LuaBinding::bind(){
 
     .beginExtendClass<Mesh2D, Mesh>("Mesh2D")
     .addFunction("setSize", &Mesh2D::setSize)
-    .addFunction("setFaceToCamera", &Mesh2D::setFaceToCamera)
+    .addFunction("setBillboard", &Mesh2D::setBillboard)
     .endClass()
 
     .beginExtendClass<ImageTemplate, Mesh2D>("ImageTemplate")

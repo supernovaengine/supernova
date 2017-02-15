@@ -5,7 +5,7 @@
 Mesh2D::Mesh2D(): Mesh(){
     this->width = 0;
     this->height = 0;
-    this->faceToCamera = false;
+    this->billboard = false;
 }
 
 Mesh2D::~Mesh2D(){
@@ -14,7 +14,7 @@ Mesh2D::~Mesh2D(){
 
 void Mesh2D::update(){
 
-    if (faceToCamera) {
+    if (billboard) {
         if (viewMatrix) {
             rotation.fromRotationMatrix(viewMatrix->getInverse());
             rotation = parent->getWorldRotation().inverse() * rotation;
@@ -26,7 +26,7 @@ void Mesh2D::update(){
 
 void Mesh2D::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
 
-    if (faceToCamera) {
+    if (billboard) {
         update();
     }
 
@@ -43,8 +43,8 @@ void Mesh2D::setSize(int width, int height){
     }
 }
 
-void Mesh2D::setFaceToCamera(bool faceToCamera){
-    this->faceToCamera = faceToCamera;
+void Mesh2D::setBillboard(bool billboard){
+    this->billboard = billboard;
 }
 
 void Mesh2D::setWidth(int width){

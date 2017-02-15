@@ -10,14 +10,14 @@ protected:
     int width;
     int height;
 
-    bool faceToCamera;
+    bool billboard;
 
 public:
     Mesh2D();
     ~Mesh2D();
 
     void setSize(int width, int height);
-    void setFaceToCamera(bool faceToCamera);
+    void setBillboard(bool billboard);
 
     void setWidth(int width);
     int getWidth();

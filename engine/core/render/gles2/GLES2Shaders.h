@@ -130,7 +130,13 @@ const char gFragmentShaderPerPixelLightTexture[] =
 "   vec4 fragmentColor = vec4(0.0);\n"
 "   if (uUseTexture){\n"
 "      #ifndef USE_TEXTURECUBE\n"
-"         fragmentColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy);\n"
+
+"        #ifndef IS_POINTS\n"
+"           fragmentColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy);\n"
+"        #else\n"
+"           fragmentColor = texture2D(u_TextureUnit, gl_PointCoord);\n"
+"        #endif\n"
+
 "      #else\n"
 "         fragmentColor = textureCube(u_TextureUnit, v_TextureCoordinates);\n"
 "      #endif\n"

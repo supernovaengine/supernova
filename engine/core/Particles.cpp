@@ -5,7 +5,9 @@
 
 Particles::Particles(){
 
-    positions.push_back(Vector3(50, 50, 0));
+    positions.push_back(Vector3(0, 5, 0));
+    positions.push_back(Vector3(0, 6, 0));
+    positions.push_back(Vector3(0, 7, 0));
 }
 
 Particles::~Particles(){

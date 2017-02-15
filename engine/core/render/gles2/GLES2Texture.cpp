@@ -63,6 +63,7 @@ void GLES2Texture::loadTextureCube(std::vector<TextureFile*> texturefiles){
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     //glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
     
     for(GLuint i = 0; i < texturefiles.size(); i++){
         int colorFormat = getGlColorFormat(texturefiles[i]->getColorFormat());
