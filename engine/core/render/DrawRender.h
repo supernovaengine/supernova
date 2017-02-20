@@ -49,6 +49,7 @@ public:
     void setObjectType(int objectType);
     void setMaterial(Material* material);
     
+    virtual void update() = 0;
     virtual bool load() = 0;
     virtual bool draw() = 0;
     virtual void destroy() = 0;

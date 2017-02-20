@@ -34,3 +34,11 @@ GLuint GLES2Util::createVBO(GLenum target, const GLsizeiptr size, const GLvoid* 
 }
 
 
+void GLES2Util::updateVBO(GLuint vbo_object, GLenum target, const GLsizeiptr size, const GLvoid* data) {
+    
+    glBindBuffer(target, vbo_object);
+    glBufferSubData(target, 0, size, data);
+    glBindBuffer(target, 0);
+
+}
+

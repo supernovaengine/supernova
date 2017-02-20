@@ -24,6 +24,11 @@ GLES2Draw::~GLES2Draw() {
     destroy();
 }
 
+void GLES2Draw::update(){
+    if (loaded)
+        GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, positions->size() * 3 * sizeof(GLfloat), &positions->front());
+}
+
 void GLES2Draw::checkLighting(){
     lighting = false;
     if ((sceneRender != NULL) && (objectType != S_DRAW_SKY)){

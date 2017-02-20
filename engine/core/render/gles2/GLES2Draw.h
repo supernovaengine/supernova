@@ -82,8 +82,10 @@ private:
     void checkLighting();
 
 public:
-	GLES2Draw();
-	virtual ~GLES2Draw();
+    GLES2Draw();
+    virtual ~GLES2Draw();
+    
+    void update();
 
     bool load();
 	bool draw();

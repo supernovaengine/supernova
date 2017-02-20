@@ -11,6 +11,7 @@ Object::Object(){
     scene = NULL;
 
     viewMatrix = NULL;
+    projectionMatrix = NULL;
     viewProjectionMatrix = NULL;
     cameraPosition = NULL;
 
@@ -73,8 +74,10 @@ void Object::addObject(Object* obj){
         obj->parent = this;
 
         obj->viewMatrix = viewMatrix;
+        obj->projectionMatrix = projectionMatrix;
         obj->viewProjectionMatrix = viewProjectionMatrix;
         obj->cameraPosition = cameraPosition;
+        obj->modelViewProjectionMatrix = modelViewProjectionMatrix;
         
         if (scene != NULL)
             obj->setSceneAndConfigure(scene);
@@ -211,6 +214,7 @@ Matrix4 Object::getModelViewProjectMatrix(){
 void Object::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
 
     this->viewMatrix = viewMatrix;
+    this->projectionMatrix = projectionMatrix;
     this->viewProjectionMatrix = viewProjectionMatrix;
     this->cameraPosition = cameraPosition;
 
@@ -306,8 +310,6 @@ void Object::update(){
         worldRotation = rotation;
         worldPosition = position;
     }
-
-
 
     updateMatrices();
 

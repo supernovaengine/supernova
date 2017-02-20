@@ -11,6 +11,8 @@ protected:
     int height;
 
     bool billboard;
+    bool fixedSizeBillboard;
+    float billboardScaleFactor;
 
 public:
     Mesh2D();
@@ -18,6 +20,8 @@ public:
 
     void setSize(int width, int height);
     void setBillboard(bool billboard);
+    void setFixedSizeBillboard(bool fixedSizeBillboard);
+    void setBillboardScaleFactor(float billboardScaleFactor);
 
     void setWidth(int width);
     int getWidth();
