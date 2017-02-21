@@ -21,7 +21,6 @@ protected:
     std::vector<Submesh*> submeshes;
 
     int primitiveMode;
-    int objectType;
     
     void addSubmesh(Submesh* submesh);
     std::vector<Submesh*> getSubmeshes();

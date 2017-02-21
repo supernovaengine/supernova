@@ -1,10 +1,6 @@
 #ifndef DrawRender_h
 #define DrawRender_h
 
-#define S_DRAW_MESH 0
-#define S_DRAW_SKY 1
-#define S_DRAW_POINTS 2
-
 #include "math/Vector2.h"
 #include "render/SceneRender.h"
 #include "Submesh.h"
@@ -27,10 +23,13 @@ protected:
     Vector3* cameraPosition;
     
     Material* material;
+
+    bool isPoints;
+    bool isSky;
+
+    int pointSize;
     
     int primitiveMode;
-    int objectType;
-
 public:
     
     DrawRender();
@@ -46,8 +45,10 @@ public:
     void setModelViewProjectionMatrix( Matrix4* modelViewProjectionMatrix);
     void setCameraPosition(Vector3* cameraPosition);
     void setPrimitiveMode(int primitiveMode);
-    void setObjectType(int objectType);
     void setMaterial(Material* material);
+    void setIsPoints(bool isPoints);
+    void setIsSky(bool isSky);
+    void setPointSize(int pointSize);
     
     virtual void update() = 0;
     virtual bool load() = 0;

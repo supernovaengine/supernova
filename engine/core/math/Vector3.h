@@ -75,7 +75,7 @@ public:
 
     float squaredDistance(const Vector3& rhs) const;
 
-    Vector3 & normalise();
+    Vector3 & normalize();
 
     Vector3 crossProduct( const Vector3& v ) const;
 

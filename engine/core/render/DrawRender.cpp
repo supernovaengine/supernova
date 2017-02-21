@@ -1,4 +1,5 @@
 #include "DrawRender.h"
+#include "PrimitiveMode.h"
 
 
 DrawRender::DrawRender(){
@@ -15,6 +16,13 @@ DrawRender::DrawRender(){
     cameraPosition = NULL;
     
     material = NULL;
+
+    isPoints = false;
+    isSky = false;
+
+    pointSize = 1;
+
+    primitiveMode = S_TRIANGLES;
 }
 
 DrawRender::~DrawRender(){
@@ -60,10 +68,18 @@ void DrawRender::setPrimitiveMode(int primitiveMode){
     this->primitiveMode = primitiveMode;
 }
 
-void DrawRender::setObjectType(int objectType){
-    this->objectType = objectType;
-}
-
 void DrawRender::setMaterial(Material* material){
     this->material = material;
+}
+
+void DrawRender::setIsPoints(bool isPoints){
+    this->isPoints = isPoints;
+}
+
+void DrawRender::setIsSky(bool isSky){
+    this->isSky = isSky;
+}
+
+void DrawRender::setPointSize(int pointSize){
+    this->pointSize = pointSize;
 }

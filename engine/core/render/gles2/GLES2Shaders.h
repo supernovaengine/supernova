@@ -50,6 +50,10 @@ const char gVertexShaderPerPixelLightTexture[] =
 "  varying vec3 v_Normal;\n"
 "#endif\n"
 
+"#ifdef IS_POINTS\n"
+"  uniform float u_PointSize;\n"
+"#endif\n"
+
 "void main(){\n"
 
 "    #ifdef USE_LIGHTING\n"
@@ -70,7 +74,7 @@ const char gVertexShaderPerPixelLightTexture[] =
 "    #endif\n"
 
 "    #ifdef IS_POINTS\n"
-"      gl_PointSize = 30.0;\n"
+"      gl_PointSize = u_PointSize;\n"
 "    #endif\n"
 
 "    gl_Position = position;\n"

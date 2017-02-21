@@ -460,11 +460,11 @@ Matrix4 Matrix4::scaleMatrix(const Vector3& sf){
  Matrix4 Matrix4::lookAtMatrix(Vector3 eye, Vector3 center, Vector3 up){
      Vector3 f;
      f = center - eye;
-     f = f.normalise();
+     f = f.normalize();
 
      Vector3 s;
      s = f.crossProduct(up);
-     s = s.normalise();
+     s = s.normalize();
 
      Vector3 t;
      t = s.crossProduct(f);

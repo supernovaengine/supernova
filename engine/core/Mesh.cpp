@@ -116,8 +116,7 @@ bool Mesh::load(){
     renderManager.getRender()->setNormals(&normals);
     renderManager.getRender()->setTexcoords(&texcoords);
     renderManager.getRender()->setSubmeshes(&submeshes);
-    
-    renderManager.getRender()->setObjectType(objectType);
+
     renderManager.getRender()->setPrimitiveMode(primitiveMode);
 
     renderManager.load();

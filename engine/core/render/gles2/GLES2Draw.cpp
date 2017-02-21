@@ -31,7 +31,7 @@ void GLES2Draw::update(){
 
 void GLES2Draw::checkLighting(){
     lighting = false;
-    if ((sceneRender != NULL) && (objectType != S_DRAW_SKY)){
+    if ((sceneRender != NULL) && (!isSky)){
         lighting = ((GLES2Scene*)sceneRender)->lighting;
     }
 }
@@ -65,7 +65,7 @@ bool GLES2Draw::load() {
         }
     }
     //---> For points
-    if (objectType == S_DRAW_POINTS){
+    if (isPoints){
         if (material->getTextures().size() > 0){
             textured = true;
         }else{
@@ -92,10 +92,10 @@ bool GLES2Draw::load() {
             programDefs += "#define USE_TEXTURECUBE\n";
         }
     }
-    if (objectType == S_DRAW_SKY){
+    if (isSky){
         programDefs += "#define IS_SKY\n";
     }
-    if (objectType == S_DRAW_POINTS){
+    if (isPoints){
         programDefs += "#define IS_POINTS\n";
     }
     if (this->lighting){
@@ -166,7 +166,9 @@ bool GLES2Draw::load() {
         }
     }
     //---> For points
-    if (objectType == S_DRAW_POINTS){
+    if (isPoints){
+        u_PointSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_PointSize");
+
         if (textured){
             texture = TextureManager::loadTexture(material->getTextures()[0]);
             uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
@@ -216,7 +218,7 @@ bool GLES2Draw::draw() {
         return false;
     }
 
-    if (objectType == S_DRAW_SKY) {
+    if (isSky) {
        glDepthFunc(GL_LEQUAL);
     }
 
@@ -314,7 +316,8 @@ bool GLES2Draw::draw() {
         }
     }
     
-    if (objectType == S_DRAW_POINTS){
+    if (isPoints){
+        glUniform1f(u_PointSize, pointSize);
         glUniform1i(useTexture, textured);
         
         if (textured){
@@ -369,7 +372,7 @@ void GLES2Draw::destroy(){
                 }
             }
         }
-        if (objectType == S_DRAW_POINTS){
+        if (isPoints){
             if (textured){
                 texture.reset();
                 TextureManager::deleteUnused();

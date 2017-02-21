@@ -59,6 +59,8 @@ private:
 
     GLuint u_AmbientLight;
 
+    GLuint u_PointSize;
+
     GLuint vertexBuffer;
     GLuint normalBuffer;
     GLuint uvBuffer;

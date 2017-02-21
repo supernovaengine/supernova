@@ -135,7 +135,7 @@ float Vector3::squaredDistance(const Vector3& rhs) const{
     return (*this - rhs).squaredLength();
 }
 
-Vector3& Vector3::normalise(){
+Vector3& Vector3::normalize(){
     float f = (float)sqrt( x * x + y * y + z * z );
     
     // Will also work for zero-sized vectors, but will change nothing
