@@ -19,7 +19,7 @@ void Shape::addVertex(Vector3 vertex){
         primitiveMode = S_TRIANGLES_STRIP;
     }
 
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
+    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
 }
 
 void Shape::addVertex(float x, float y){

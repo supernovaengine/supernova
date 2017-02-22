@@ -65,11 +65,6 @@ void ConcreteObject::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, M
 void ConcreteObject::update(){
     Object::update();
 
-    if (this->viewProjectionMatrix != NULL){
-        this->modelViewMatrix = modelMatrix * (*this->viewMatrix);
-        this->normalMatrix = modelMatrix.getInverse().getTranspose();
-    }
-
     updateDistanceToCamera();
 }
 

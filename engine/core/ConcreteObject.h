@@ -12,7 +12,6 @@ protected:
     
     bool transparent;
 
-    Matrix4 modelViewMatrix;
     Matrix4 normalMatrix;
 
     float distanceToCamera;

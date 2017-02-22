@@ -59,6 +59,7 @@ const char gVertexShaderPerPixelLightTexture[] =
 "    #ifdef USE_LIGHTING\n"
 "      v_Position = vec3(u_mMatrix * a_Position);\n"
 "      v_Normal = normalize(vec3(u_nMatrix * vec4(a_Normal, 0.0)));\n"
+//"      v_Normal = normalize(vec3(vec4(a_Normal, 0.0)));\n"
 "    #endif\n"
 
 "    vec4 position = u_mvpMatrix * a_Position;\n"

@@ -8,7 +8,7 @@
 class Particles: public ConcreteObject {
 
 private:
-    void updatePointDistance();
+    void updatePointScale();
 
 protected:
     DrawManager renderManager;

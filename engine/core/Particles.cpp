@@ -13,16 +13,20 @@ Particles::Particles(){
     minPointSize = 1;
     maxPointSize = 1000;
 
-    positions.push_back(Vector3(0, 5, 0));
-    positions.push_back(Vector3(0, 8, 0));
-    positions.push_back(Vector3(0, 10, 0));
+    positions.push_back(Vector3(-3, 1, 20));
+    positions.push_back(Vector3(0, 1, 20));
+    positions.push_back(Vector3(3, 1, 20));
+
+    normals.push_back(Vector3(0,0,1.0));
+    normals.push_back(Vector3(0,0,1.0));
+    normals.push_back(Vector3(0,0,1.0));
 }
 
 Particles::~Particles(){
 
 }
 
-void Particles::updatePointDistance(){
+void Particles::updatePointScale(){
     if (sizeAttenuation) {
         pointScale = 200 / (modelViewProjectionMatrix * Vector4(0, 0, 0, 1.0)).w;
     }else{
@@ -33,13 +37,17 @@ void Particles::updatePointDistance(){
 void Particles::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
     ConcreteObject::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
-    updatePointDistance();
+    updatePointScale();
 }
 
 void Particles::update(){
     ConcreteObject::update();
 
-    updatePointDistance();
+    if (this->viewMatrix){
+       this->normalMatrix = viewMatrix->getTranspose();
+    }
+
+    updatePointScale();
 }
 
 void Particles::setPointScale(float pointScale){

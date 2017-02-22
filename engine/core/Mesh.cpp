@@ -91,6 +91,8 @@ void Mesh::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* vi
 void Mesh::update(){
     ConcreteObject::update();
 
+    this->normalMatrix = modelMatrix.getInverse().getTranspose();
+
     sortTransparentSubmeshes();
 }
 
