@@ -39,6 +39,13 @@ public:
     void setMinPointSize(float minPointSize);
     void setMaxPointSize(float maxPointSize);
 
+    void addParticle();
+    void addParticle(Vector3 position);
+
+    void setParticlePosition(int particle, Vector3 position);
+    void setParticlePosition(int particle, float x, float y, float z);
+    void setParticleSize(int particle, float size);
+
     bool render();
     bool load();
     bool draw();

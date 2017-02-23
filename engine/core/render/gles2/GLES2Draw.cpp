@@ -101,7 +101,7 @@ bool GLES2Draw::load() {
         }
     }
     
-    if (isPoints){
+    if (pointSizes){
         while (positions->size() > pointSizes->size()){
             pointSizes->push_back(1);
         }
@@ -288,23 +288,28 @@ bool GLES2Draw::draw() {
     
     int attributePos = -1;
 
-    glEnableVertexAttribArray(++attributePos);
+    attributePos++;
+    glEnableVertexAttribArray(attributePos);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     if (aPositionHandle == -1) aPositionHandle = attributePos;
     glVertexAttribPointer(aPositionHandle, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
 
+    attributePos++;
+    glEnableVertexAttribArray(attributePos);
     if (texcoords){
-        glEnableVertexAttribArray(++attributePos);
         glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
         if (aTextureCoordinatesLocation == -1) aTextureCoordinatesLocation = attributePos;
         glVertexAttribPointer(aTextureCoordinatesLocation, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     }
-    
-    if (normals && this->lighting){
-        glEnableVertexAttribArray(++attributePos);
-        glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-        if (aNormal == -1) aNormal = attributePos;
-        glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+
+    if (this->lighting) {
+        attributePos++;
+        glEnableVertexAttribArray(attributePos);
+        if (normals && this->lighting) {
+            glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+            if (aNormal == -1) aNormal = attributePos;
+            glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+        }
     }
 
     GLenum modeGles = GL_TRIANGLES;
@@ -344,11 +349,14 @@ bool GLES2Draw::draw() {
     }
     
     if (isPoints){
-        
-        glEnableVertexAttribArray(++attributePos);
-        glBindBuffer(GL_ARRAY_BUFFER, pointSizeBuffer);
-        if (a_PointSize == -1) a_PointSize = attributePos;
-        glVertexAttribPointer(a_PointSize, 1, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+
+        attributePos++;
+        glEnableVertexAttribArray(attributePos);
+        if (pointSizes) {
+            glBindBuffer(GL_ARRAY_BUFFER, pointSizeBuffer);
+            if (a_PointSize == -1) a_PointSize = attributePos;
+            glVertexAttribPointer(a_PointSize, 1, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+        }
         
         glUniform1i(useTexture, textured);
         

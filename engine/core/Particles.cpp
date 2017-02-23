@@ -12,21 +12,43 @@ Particles::Particles(){
     minPointSize = 1;
     maxPointSize = 1000;
 
-    positions.push_back(Vector3(-3, 1, 20));
-    positions.push_back(Vector3(0, 1, 20));
-    positions.push_back(Vector3(3, 1, 20));
-    
-    pointSizes.push_back(30);
-    pointSizes.push_back(60);
-    pointSizes.push_back(30);
-
-    normals.push_back(Vector3(0,0,1.0));
-    normals.push_back(Vector3(0,0,1.0));
-    normals.push_back(Vector3(0,0,1.0));
 }
 
 Particles::~Particles(){
 
+}
+
+void Particles::addParticle(){
+    positions.push_back(Vector3(0.0, 0.0, 0.0));
+    pointSizes.push_back(1);
+    normals.push_back(Vector3(0.0, 0.0, 1.0));
+
+    fillScaledSizeVector();
+}
+
+void Particles::addParticle(Vector3 position){
+    addParticle();
+
+    setParticlePosition(positions.size()-1, position);
+}
+
+void Particles::setParticlePosition(int particle, Vector3 position){
+    if (particle >= 0 && particle < positions.size()){
+        positions[particle] = position;
+    }
+}
+
+void Particles::setParticlePosition(int particle, float x, float y, float z){
+    setParticlePosition(particle, Vector3(x, y, z));
+}
+
+void Particles::setParticleSize(int particle, float size){
+
+    if (particle >= 0 && particle < positions.size()){
+        pointSizes[particle] = size;
+    }
+
+    fillScaledSizeVector();
 }
 
 void Particles::updatePointScale(){
@@ -35,6 +57,8 @@ void Particles::updatePointScale(){
     }else{
         pointScale = 1;
     }
+
+    fillScaledSizeVector();
 }
 
 void Particles::fillScaledSizeVector(){
@@ -90,7 +114,7 @@ bool Particles::render(){
 }
 
 bool Particles::load(){
-    
+
     fillScaledSizeVector();
 
     if (scene != NULL){
@@ -112,8 +136,6 @@ bool Particles::load(){
 }
 
 bool Particles::draw(){
-    
-    fillScaledSizeVector();
 
     renderManager.getRender()->setModelMatrix(&modelMatrix);
     renderManager.getRender()->setNormalMatrix(&normalMatrix);
