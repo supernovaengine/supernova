@@ -26,6 +26,8 @@ protected:
 
     bool isPoints;
     bool isSky;
+    
+    std::vector<float>* pointSizes;
 
     int pointSize;
     
@@ -48,9 +50,12 @@ public:
     void setMaterial(Material* material);
     void setIsPoints(bool isPoints);
     void setIsSky(bool isSky);
-    void setPointSize(int pointSize);
+    void setPointSizes(std::vector<float>* pointSizes);
     
-    virtual void update() = 0;
+    virtual void updatePositions() = 0;
+    virtual void updateTexcoords() = 0;
+    virtual void updateNormals() = 0;
+    virtual void updatePointSizes() = 0;
     virtual bool load() = 0;
     virtual bool draw() = 0;
     virtual void destroy() = 0;

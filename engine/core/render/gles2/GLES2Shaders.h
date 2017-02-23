@@ -51,7 +51,7 @@ const char gVertexShaderPerPixelLightTexture[] =
 "#endif\n"
 
 "#ifdef IS_POINTS\n"
-"  uniform float u_PointSize;\n"
+"  attribute float a_PointSize;\n"
 "#endif\n"
 
 "void main(){\n"
@@ -75,7 +75,7 @@ const char gVertexShaderPerPixelLightTexture[] =
 "    #endif\n"
 
 "    #ifdef IS_POINTS\n"
-"      gl_PointSize = u_PointSize;\n"
+"      gl_PointSize = a_PointSize;\n"
 "    #endif\n"
 
 "    gl_Position = position;\n"

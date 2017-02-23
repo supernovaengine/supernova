@@ -24,9 +24,25 @@ GLES2Draw::~GLES2Draw() {
     destroy();
 }
 
-void GLES2Draw::update(){
+
+void GLES2Draw::updatePositions(){
     if (loaded)
         GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, positions->size() * 3 * sizeof(GLfloat), &positions->front());
+}
+
+void GLES2Draw::updateTexcoords(){
+    if (loaded)
+        GLES2Util::updateVBO(uvBuffer, GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front());
+}
+
+void GLES2Draw::updateNormals(){
+    if (loaded)
+        GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
+}
+
+void GLES2Draw::updatePointSizes(){
+    if (loaded)
+        GLES2Util::updateVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front());
 }
 
 void GLES2Draw::checkLighting(){
@@ -83,6 +99,13 @@ bool GLES2Draw::load() {
         while (positions->size() > normals->size()){
             normals->push_back(Vector3(0,0,0));
         }
+    }
+    
+    if (isPoints){
+        while (positions->size() > pointSizes->size()){
+            pointSizes->push_back(1);
+        }
+        
     }
 
     std::string programName = "perfragment";
@@ -167,7 +190,9 @@ bool GLES2Draw::load() {
     }
     //---> For points
     if (isPoints){
-        u_PointSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_PointSize");
+        
+        pointSizeBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front(), GL_DYNAMIC_DRAW);
+        a_PointSize = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_PointSize");
 
         if (textured){
             texture = TextureManager::loadTexture(material->getTextures()[0]);
@@ -260,23 +285,25 @@ bool GLES2Draw::draw() {
         }
 
     }
+    
+    int attributePos = -1;
 
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(++attributePos);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    if (aPositionHandle == -1) aPositionHandle = 0;
+    if (aPositionHandle == -1) aPositionHandle = attributePos;
     glVertexAttribPointer(aPositionHandle, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
 
     if (texcoords){
-        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(++attributePos);
         glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-        if (aTextureCoordinatesLocation == -1) aTextureCoordinatesLocation = 1;
+        if (aTextureCoordinatesLocation == -1) aTextureCoordinatesLocation = attributePos;
         glVertexAttribPointer(aTextureCoordinatesLocation, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     }
     
     if (normals && this->lighting){
-        glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(++attributePos);
         glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-        if (aNormal == -1) aNormal = 2;
+        if (aNormal == -1) aNormal = attributePos;
         glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
     }
 
@@ -317,7 +344,12 @@ bool GLES2Draw::draw() {
     }
     
     if (isPoints){
-        glUniform1f(u_PointSize, pointSize);
+        
+        glEnableVertexAttribArray(++attributePos);
+        glBindBuffer(GL_ARRAY_BUFFER, pointSizeBuffer);
+        if (a_PointSize == -1) a_PointSize = attributePos;
+        glVertexAttribPointer(a_PointSize, 1, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+        
         glUniform1i(useTexture, textured);
         
         if (textured){
@@ -340,9 +372,8 @@ bool GLES2Draw::draw() {
     //Log::Verbose(LOG_TAG, "oi\n");
     //printf("oi\n");
 
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-    glDisableVertexAttribArray(2);
+    for (int i = 0; i <= attributePos; i++)
+        glDisableVertexAttribArray(i);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

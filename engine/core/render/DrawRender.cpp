@@ -20,7 +20,7 @@ DrawRender::DrawRender(){
     isPoints = false;
     isSky = false;
 
-    pointSize = 1;
+    pointSizes = NULL;
 
     primitiveMode = S_TRIANGLES;
 }
@@ -80,6 +80,6 @@ void DrawRender::setIsSky(bool isSky){
     this->isSky = isSky;
 }
 
-void DrawRender::setPointSize(int pointSize){
-    this->pointSize = pointSize;
+void DrawRender::setPointSizes(std::vector<float>* pointSizes){
+    this->pointSizes = pointSizes;
 }

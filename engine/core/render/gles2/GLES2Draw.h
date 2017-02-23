@@ -31,6 +31,8 @@ private:
     GLint aTextureCoordinatesLocation;
     GLint aNormal;
     
+    GLuint a_PointSize;
+    
     GLuint uTextureUnitLocation;
     GLuint uColor;
     GLuint u_mvpMatrix;
@@ -59,11 +61,10 @@ private:
 
     GLuint u_AmbientLight;
 
-    GLuint u_PointSize;
-
     GLuint vertexBuffer;
     GLuint normalBuffer;
     GLuint uvBuffer;
+    GLuint pointSizeBuffer;
 
     static GLuint emptyTexture; //For web bug only
     static bool emptyTextureLoaded;
@@ -87,7 +88,10 @@ public:
     GLES2Draw();
     virtual ~GLES2Draw();
     
-    void update();
+    void updatePositions();
+    void updateTexcoords();
+    void updateNormals();
+    void updatePointSizes();
 
     bool load();
 	bool draw();

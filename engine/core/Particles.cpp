@@ -6,7 +6,6 @@
 Particles::Particles(){
 
     pointScale = 1.0;
-    pointSize = 30.0;
     sizeAttenuation = false;
     pointScaleFactor = 200;
 
@@ -16,6 +15,10 @@ Particles::Particles(){
     positions.push_back(Vector3(-3, 1, 20));
     positions.push_back(Vector3(0, 1, 20));
     positions.push_back(Vector3(3, 1, 20));
+    
+    pointSizes.push_back(30);
+    pointSizes.push_back(60);
+    pointSizes.push_back(30);
 
     normals.push_back(Vector3(0,0,1.0));
     normals.push_back(Vector3(0,0,1.0));
@@ -31,6 +34,18 @@ void Particles::updatePointScale(){
         pointScale = 200 / (modelViewProjectionMatrix * Vector4(0, 0, 0, 1.0)).w;
     }else{
         pointScale = 1;
+    }
+}
+
+void Particles::fillScaledSizeVector(){
+    pointSizesScaled.clear();
+    for (int i = 0; i < pointSizes.size(); i++){
+        float pointSizeScaledVal = pointSizes[i] * pointScale;
+        if (pointSizeScaledVal < minPointSize)
+            pointSizeScaledVal = minPointSize;
+        if (pointSizeScaledVal > maxPointSize)
+            pointSizeScaledVal = maxPointSize;
+        pointSizesScaled.push_back(pointSizeScaledVal);
     }
 }
 
@@ -54,10 +69,6 @@ void Particles::setPointScale(float pointScale){
     this->pointScale = pointScale;
 }
 
-void Particles::setPointSize(float pointSize){
-    this->pointSize = pointSize;
-}
-
 void Particles::setSizeAttenuation(bool sizeAttenuation){
     this->sizeAttenuation = sizeAttenuation;
 }
@@ -79,6 +90,8 @@ bool Particles::render(){
 }
 
 bool Particles::load(){
+    
+    fillScaledSizeVector();
 
     if (scene != NULL){
         renderManager.getRender()->setSceneRender(((Scene*)scene)->getSceneRender());
@@ -87,6 +100,8 @@ bool Particles::load(){
     renderManager.getRender()->setPositions(&positions);
     renderManager.getRender()->setNormals(&normals);
     renderManager.getRender()->setMaterial(&material);
+    
+    renderManager.getRender()->setPointSizes(&pointSizesScaled);
 
     renderManager.getRender()->setIsPoints(true);
     renderManager.getRender()->setPrimitiveMode(S_POINTS);
@@ -97,19 +112,15 @@ bool Particles::load(){
 }
 
 bool Particles::draw(){
-
-    float pointSizeScaled = pointSize * pointScale;
-    if (pointSizeScaled < minPointSize)
-        pointSizeScaled = minPointSize;
-    if (pointSizeScaled > maxPointSize)
-        pointSizeScaled = maxPointSize;
-
-    renderManager.getRender()->setPointSize(pointSizeScaled);
+    
+    fillScaledSizeVector();
 
     renderManager.getRender()->setModelMatrix(&modelMatrix);
     renderManager.getRender()->setNormalMatrix(&normalMatrix);
     renderManager.getRender()->setModelViewProjectionMatrix(&modelViewProjectionMatrix);
     renderManager.getRender()->setCameraPosition(cameraPosition);
+    
+    renderManager.getRender()->updatePointSizes();
 
     return ConcreteObject::draw();
 }

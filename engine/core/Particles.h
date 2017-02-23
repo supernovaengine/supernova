@@ -9,15 +9,17 @@ class Particles: public ConcreteObject {
 
 private:
     void updatePointScale();
+    void fillScaledSizeVector();
+    std::vector<float> pointSizesScaled;
 
 protected:
     DrawManager renderManager;
 
     std::vector<Vector3> positions;
     std::vector<Vector3> normals;
+    std::vector<float> pointSizes;
 
     float pointScale;
-    float pointSize;
     bool sizeAttenuation;
     float pointScaleFactor;
 
@@ -32,7 +34,6 @@ public:
     void update();
 
     void setPointScale(float pointScale);
-    void setPointSize(float pointSize);
     void setSizeAttenuation(bool sizeAttenuation);
     void setPointScaleFactor(float pointScaleFactor);
     void setMinPointSize(float minPointSize);

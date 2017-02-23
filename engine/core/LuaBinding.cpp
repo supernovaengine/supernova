@@ -192,7 +192,6 @@ void LuaBinding::bind(){
     .beginExtendClass<Particles, ConcreteObject>("Particles")
     .addConstructor(LUA_ARGS())
     .addFunction("setPointScale", &Particles::setPointScale)
-    .addFunction("setPointSize", &Particles::setPointSize)
     .addFunction("setSizeAttenuation", &Particles::setSizeAttenuation)
     .addFunction("setPointScaleFactor", &Particles::setPointScaleFactor)
     .addFunction("setMinPointSize", &Particles::setMinPointSize)
