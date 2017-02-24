@@ -2,6 +2,7 @@
 
 #include "PrimitiveMode.h"
 #include "Scene.h"
+#include "render/TextureManager.h"
 
 Particles::Particles(){
 
@@ -11,6 +12,10 @@ Particles::Particles(){
 
     minPointSize = 1;
     maxPointSize = 1000;
+
+    isTiled = false;
+    tilesX = 1;
+    tilesY = 1;
 
 }
 
@@ -73,6 +78,19 @@ void Particles::fillScaledSizeVector(){
     }
 }
 
+void Particles::setTiles(int tilesX, int tilesY){
+    if (tilesX >= 1 && tilesY >= 1){
+        this->tilesX = tilesX;
+        this->tilesY = tilesY;
+
+        if (tilesX > 1 || tilesY > 1){
+            isTiled = true;
+        }else{
+            isTiled = false;
+        }
+    }
+}
+
 void Particles::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
     ConcreteObject::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
@@ -131,6 +149,11 @@ bool Particles::load(){
     renderManager.getRender()->setPrimitiveMode(S_POINTS);
 
     renderManager.load();
+
+    if (material.getTextures().size() > 0){
+        int width = TextureManager::getTextureWidth(material.getTextures()[0]);
+        int height = TextureManager::getTextureHeight(material.getTextures()[0]);
+    }
 
     return ConcreteObject::load();
 }

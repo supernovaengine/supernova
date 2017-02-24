@@ -26,6 +26,10 @@ protected:
     float minPointSize;
     float maxPointSize;
 
+    bool isTiled;
+    int tilesX;
+    int tilesY;
+
 public:
     Particles();
     virtual ~Particles();
@@ -45,6 +49,8 @@ public:
     void setParticlePosition(int particle, Vector3 position);
     void setParticlePosition(int particle, float x, float y, float z);
     void setParticleSize(int particle, float size);
+
+    void setTiles(int tilesX, int tilesY);
 
     bool render();
     bool load();

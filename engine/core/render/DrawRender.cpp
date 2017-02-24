@@ -19,6 +19,13 @@ DrawRender::DrawRender(){
 
     isPoints = false;
     isSky = false;
+    isTiledTexture = false;
+
+    tileSizeWidth = 0;
+    tileSizeHeight = 0;
+
+    tilePosX = 0;
+    tilePosY = 0;
 
     pointSizes = NULL;
 
@@ -82,4 +89,18 @@ void DrawRender::setIsSky(bool isSky){
 
 void DrawRender::setPointSizes(std::vector<float>* pointSizes){
     this->pointSizes = pointSizes;
+}
+
+void DrawRender::setIsTiledTexture(bool isTiledTexture){
+    this->isTiledTexture = isTiledTexture;
+}
+
+void DrawRender::setTileSize(int tileSizeWidth, int tileSizeHeight){
+    this->tileSizeWidth = tileSizeWidth;
+    this->tileSizeHeight = tileSizeHeight;
+}
+
+void DrawRender::setTilePos(int tilePosX, int tilePosY){
+    this->tilePosX = tilePosX;
+    this->tilePosY = tilePosY;
 }

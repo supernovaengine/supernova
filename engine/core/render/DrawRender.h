@@ -26,6 +26,13 @@ protected:
 
     bool isPoints;
     bool isSky;
+    bool isTiledTexture;
+
+    int tileSizeWidth;
+    int tileSizeHeight;
+
+    int tilePosX;
+    int tilePosY;
     
     std::vector<float>* pointSizes;
 
@@ -51,6 +58,9 @@ public:
     void setIsPoints(bool isPoints);
     void setIsSky(bool isSky);
     void setPointSizes(std::vector<float>* pointSizes);
+    void setIsTiledTexture(bool isTiledTexture);
+    void setTileSize(int tileSizeWidth, int tileSizeHeight);
+    void setTilePos(int tilePosX, int tilePosY);
     
     virtual void updatePositions() = 0;
     virtual void updateTexcoords() = 0;

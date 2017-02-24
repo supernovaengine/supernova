@@ -312,6 +312,16 @@ bool GLES2Draw::draw() {
         }
     }
 
+    if (isPoints) {
+        attributePos++;
+        glEnableVertexAttribArray(attributePos);
+        if (pointSizes) {
+            glBindBuffer(GL_ARRAY_BUFFER, pointSizeBuffer);
+            if (a_PointSize == -1) a_PointSize = attributePos;
+            glVertexAttribPointer(a_PointSize, 1, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+        }
+    }
+
     GLenum modeGles = GL_TRIANGLES;
     if (primitiveMode == S_TRIANGLES_STRIP){
         modeGles = GL_TRIANGLE_STRIP;
@@ -349,16 +359,16 @@ bool GLES2Draw::draw() {
     }
     
     if (isPoints){
-
-        attributePos++;
-        glEnableVertexAttribArray(attributePos);
-        if (pointSizes) {
-            glBindBuffer(GL_ARRAY_BUFFER, pointSizeBuffer);
-            if (a_PointSize == -1) a_PointSize = attributePos;
-            glVertexAttribPointer(a_PointSize, 1, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-        }
         
         glUniform1i(useTexture, textured);
+
+        GLuint u_tileSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_tileSize");
+        GLuint u_tilePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_tilePos");
+        GLuint u_textureSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureSize");
+
+        glUniform2f(u_tileSize, 256, 256);
+        glUniform2f(u_tilePos, 0, 256);
+        glUniform2f(u_textureSize, 512, 512);
         
         if (textured){
             glActiveTexture(GL_TEXTURE0);

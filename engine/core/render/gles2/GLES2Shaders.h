@@ -54,6 +54,10 @@ const char gVertexShaderPerPixelLightTexture[] =
 "  attribute float a_PointSize;\n"
 "#endif\n"
 
+"uniform vec2 u_tileSize;\n"
+"uniform vec2 u_tilePos;\n"
+"uniform vec2 u_textureSize;\n"
+
 "void main(){\n"
 
 "    #ifdef USE_LIGHTING\n"
@@ -125,10 +129,18 @@ const char gFragmentShaderPerPixelLightTexture[] =
 
 "varying vec3 v_TextureCoordinates;\n"
 
+"uniform vec2 u_tileSize;\n"
+"uniform vec2 u_tilePos;\n"
+"uniform vec2 u_textureSize;\n"
+
 "void main(){\n"
 
 "   vec3 MaterialSpecularColor = vec3(1.0,1.0,1.0);\n"
 "   float MaterialShininess = 40.0;\n"
+
+//"vec2 v_tileSize = vec2(256, 256);\n"
+//"vec2 v_tilePos = vec2(256, 256);\n"
+//"vec2 v_textureSize = vec2(512, 512);\n"
 
     //Texture or color
 "   vec4 fragmentColor = vec4(0.0);\n"
@@ -138,7 +150,9 @@ const char gFragmentShaderPerPixelLightTexture[] =
 "        #ifndef IS_POINTS\n"
 "           fragmentColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy);\n"
 "        #else\n"
-"           fragmentColor = texture2D(u_TextureUnit, gl_PointCoord);\n"
+"           vec2 resultCoord = gl_PointCoord * (u_tileSize / u_textureSize) + ((u_tileSize / u_textureSize) * (u_tilePos / u_tileSize));\n"
+"           fragmentColor = texture2D(u_TextureUnit, resultCoord);\n"
+//"           fragmentColor = texture2D(u_TextureUnit, gl_PointCoord);\n"
 "        #endif\n"
 
 "      #else\n"
