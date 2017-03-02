@@ -4,6 +4,7 @@
 #include "math/Vector2.h"
 #include "render/SceneRender.h"
 #include "Submesh.h"
+#include <vector>
 
 
 class DrawRender {
@@ -26,13 +27,18 @@ protected:
 
     bool isPoints;
     bool isSky;
-    bool isTiledTexture;
+    bool isSpriteSheet;
 
-    int tileSizeWidth;
-    int tileSizeHeight;
+    int textureSizeWidth;
+    int textureSizeHeight;
+    
+    int spriteSizeWidth;
+    int spriteSizeHeight;
 
-    int tilePosX;
-    int tilePosY;
+    int spritePosX;
+    int spritePosY;
+    
+    std::vector< std::pair<int, int> >* pointSpritesPos;
     
     std::vector<float>* pointSizes;
 
@@ -58,14 +64,18 @@ public:
     void setIsPoints(bool isPoints);
     void setIsSky(bool isSky);
     void setPointSizes(std::vector<float>* pointSizes);
-    void setIsTiledTexture(bool isTiledTexture);
-    void setTileSize(int tileSizeWidth, int tileSizeHeight);
-    void setTilePos(int tilePosX, int tilePosY);
+    void setIsSpriteSheet(bool isSpriteSheet);
+    void setTextureSize(int textureSizeWidth, int textureSizeHeight);
+    void setSpriteSize(int spriteSizeWidth, int spriteSizeHeight);
+    void setSpritePos(int spritePosX, int spritePosY);
+    void setPointSpritesPos(std::vector< std::pair<int, int> >* pointSpritesPos);
     
     virtual void updatePositions() = 0;
     virtual void updateTexcoords() = 0;
     virtual void updateNormals() = 0;
     virtual void updatePointSizes() = 0;
+    virtual void updateSpritePos() = 0;
+    
     virtual bool load() = 0;
     virtual bool draw() = 0;
     virtual void destroy() = 0;

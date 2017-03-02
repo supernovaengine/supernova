@@ -24,6 +24,7 @@ class GLES2Draw : public DrawRender {
     } SubmeshStruct;
     
 private:
+    
     std::shared_ptr<ProgramRender> gProgram;
 
     
@@ -31,7 +32,8 @@ private:
     GLint aTextureCoordinatesLocation;
     GLint aNormal;
     
-    GLuint a_PointSize;
+    GLint a_PointSize;
+    GLint a_spritePos;
     
     GLuint uTextureUnitLocation;
     GLuint uColor;
@@ -60,11 +62,15 @@ private:
     GLuint u_DirectionalLightColor;
 
     GLuint u_AmbientLight;
+    
+    GLuint u_spriteSize;
+    GLuint u_textureSize;
 
     GLuint vertexBuffer;
     GLuint normalBuffer;
     GLuint uvBuffer;
     GLuint pointSizeBuffer;
+    GLuint spritePosBuffer;
 
     static GLuint emptyTexture; //For web bug only
     static bool emptyTextureLoaded;
@@ -92,6 +98,7 @@ public:
     void updateTexcoords();
     void updateNormals();
     void updatePointSizes();
+    void updateSpritePos();
 
     bool load();
 	bool draw();

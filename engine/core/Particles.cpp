@@ -12,10 +12,13 @@ Particles::Particles(){
 
     minPointSize = 1;
     maxPointSize = 1000;
+    
+    texWidth = 0;
+    texHeight = 0;
 
-    isTiled = false;
-    tilesX = 1;
-    tilesY = 1;
+    isSpriteSheet = false;
+    spritesX = 1;
+    spritesY = 1;
 
 }
 
@@ -27,14 +30,16 @@ void Particles::addParticle(){
     positions.push_back(Vector3(0.0, 0.0, 0.0));
     pointSizes.push_back(1);
     normals.push_back(Vector3(0.0, 0.0, 1.0));
+    sprites.push_back(0);
 
     fillScaledSizeVector();
+    fillSpritePosPixelsVector();
 }
 
 void Particles::addParticle(Vector3 position){
     addParticle();
 
-    setParticlePosition(positions.size()-1, position);
+    setParticlePosition((int)positions.size()-1, position);
 }
 
 void Particles::setParticlePosition(int particle, Vector3 position){
@@ -54,6 +59,11 @@ void Particles::setParticleSize(int particle, float size){
     }
 
     fillScaledSizeVector();
+}
+
+void Particles::setParticleSprite(int particle, int sprite){
+    sprites[particle] = sprite;
+    fillSpritePosPixelsVector();
 }
 
 void Particles::updatePointScale(){
@@ -78,15 +88,36 @@ void Particles::fillScaledSizeVector(){
     }
 }
 
-void Particles::setTiles(int tilesX, int tilesY){
-    if (tilesX >= 1 && tilesY >= 1){
-        this->tilesX = tilesX;
-        this->tilesY = tilesY;
+void Particles::setSpriteSheet(int spritesX, int spritesY){
+    if (spritesX >= 1 && spritesY >= 1){
+        this->spritesX = spritesX;
+        this->spritesY = spritesY;
 
-        if (tilesX > 1 || tilesY > 1){
-            isTiled = true;
+        if (spritesX > 1 || spritesY > 1){
+            isSpriteSheet = true;
+            fillSpritePosPixelsVector();
         }else{
-            isTiled = false;
+            isSpriteSheet = false;
+        }
+    }
+}
+
+void Particles::fillSpritePosPixelsVector(){
+    if (texWidth > 0 && texHeight > 0){
+        int spritesPosY;
+        int spritesPosX;
+        spritesPixelsPos.clear();
+        for (int i = 0; i < sprites.size(); i++){
+            
+            if (sprites[i] < spritesX * spritesY){
+                spritesPosY = floor(sprites[i] / spritesX);
+                spritesPosX = (sprites[i]) - (spritesX) * spritesPosY;
+            }else{
+                spritesPosY = 0;
+                spritesPosX = 0;
+            }
+            
+            spritesPixelsPos.push_back(std::make_pair(spritesPosX * texWidth / spritesX, spritesPosY * texHeight / spritesY));
         }
     }
 }
@@ -144,28 +175,35 @@ bool Particles::load(){
     renderManager.getRender()->setMaterial(&material);
     
     renderManager.getRender()->setPointSizes(&pointSizesScaled);
+    renderManager.getRender()->setPointSpritesPos(&spritesPixelsPos);
 
     renderManager.getRender()->setIsPoints(true);
     renderManager.getRender()->setPrimitiveMode(S_POINTS);
+    renderManager.getRender()->setIsSpriteSheet(isSpriteSheet);
 
     renderManager.load();
 
-    if (material.getTextures().size() > 0){
-        int width = TextureManager::getTextureWidth(material.getTextures()[0]);
-        int height = TextureManager::getTextureHeight(material.getTextures()[0]);
+    if ((material.getTextures().size() > 0) && (isSpriteSheet)){
+        texWidth = TextureManager::getTextureWidth(material.getTextures()[0]);
+        texHeight = TextureManager::getTextureHeight(material.getTextures()[0]);
+        
+        renderManager.getRender()->setTextureSize(texWidth, texHeight);
+        renderManager.getRender()->setSpriteSize(texWidth / spritesX, texHeight / spritesY);
+        fillSpritePosPixelsVector();
     }
 
     return ConcreteObject::load();
 }
 
 bool Particles::draw(){
-
+    
     renderManager.getRender()->setModelMatrix(&modelMatrix);
     renderManager.getRender()->setNormalMatrix(&normalMatrix);
     renderManager.getRender()->setModelViewProjectionMatrix(&modelViewProjectionMatrix);
     renderManager.getRender()->setCameraPosition(cameraPosition);
     
     renderManager.getRender()->updatePointSizes();
+    renderManager.getRender()->updateSpritePos();
 
     return ConcreteObject::draw();
 }

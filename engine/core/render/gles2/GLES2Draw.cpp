@@ -45,6 +45,16 @@ void GLES2Draw::updatePointSizes(){
         GLES2Util::updateVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front());
 }
 
+void GLES2Draw::updateSpritePos(){
+    if (loaded){
+        std::vector<float> spritePosFloat;
+        std::transform(pointSpritesPos->begin(), pointSpritesPos->end(), std::back_inserter(spritePosFloat), [&spritePosFloat](const std::pair<int, int> &p)
+                       { spritePosFloat.push_back(p.first); return p.second ;});
+        
+        GLES2Util::updateVBO(spritePosBuffer, GL_ARRAY_BUFFER, spritePosFloat.size() * sizeof(GLfloat), &spritePosFloat.front());
+    }
+}
+
 void GLES2Draw::checkLighting(){
     lighting = false;
     if ((sceneRender != NULL) && (!isSky)){
@@ -105,8 +115,14 @@ bool GLES2Draw::load() {
         while (positions->size() > pointSizes->size()){
             pointSizes->push_back(1);
         }
-        
     }
+    
+    if (pointSpritesPos){
+        while (positions->size() > pointSpritesPos->size()){
+            pointSpritesPos->push_back(std::make_pair(0,0));
+        }
+    }
+    
 
     std::string programName = "perfragment";
     std::string programDefs = "";
@@ -124,6 +140,9 @@ bool GLES2Draw::load() {
     if (this->lighting){
         programDefs += "#define USE_LIGHTING\n";
     }
+    if (isSpriteSheet){
+        programDefs += "#define IS_SPRITESHEET\n";
+    }
 
     gProgram = ProgramManager::useProgram(programName, programDefs);
 
@@ -140,6 +159,20 @@ bool GLES2Draw::load() {
     if (normals && this->lighting){
         normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_STATIC_DRAW);
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
+    }
+    
+    if (isPoints){
+        pointSizeBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front(), GL_DYNAMIC_DRAW);
+        a_PointSize = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_PointSize");
+    }
+    
+    if (isSpriteSheet){
+        std::vector<float> spritePosFloat;
+        std::transform(pointSpritesPos->begin(), pointSpritesPos->end(), std::back_inserter(spritePosFloat), [&spritePosFloat](const std::pair<int, int> &p)
+                       { spritePosFloat.push_back(p.first); return p.second ;});
+        
+        spritePosBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, spritePosFloat.size() * sizeof(GLfloat), &spritePosFloat.front(), GL_DYNAMIC_DRAW);
+        a_spritePos = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_spritePos");
     }
     
     //---> For meshes
@@ -190,9 +223,6 @@ bool GLES2Draw::load() {
     }
     //---> For points
     if (isPoints){
-        
-        pointSizeBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front(), GL_DYNAMIC_DRAW);
-        a_PointSize = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_PointSize");
 
         if (textured){
             texture = TextureManager::loadTexture(material->getTextures()[0]);
@@ -230,6 +260,11 @@ bool GLES2Draw::load() {
     if (this->lighting){
         u_mMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mMatrix");
         u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
+    }
+    
+    if (isSpriteSheet) {
+        u_spriteSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_spriteSize");
+        u_textureSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureSize");
     }
 
     GLES2Util::checkGlError("Error on load GLES2");
@@ -286,6 +321,11 @@ bool GLES2Draw::draw() {
 
     }
     
+    if (isSpriteSheet) {
+        glUniform2f(u_spriteSize, spriteSizeWidth, spriteSizeHeight);
+        glUniform2f(u_textureSize, textureSizeWidth, textureSizeHeight);
+    }
+    
     int attributePos = -1;
 
     attributePos++;
@@ -305,7 +345,7 @@ bool GLES2Draw::draw() {
     if (this->lighting) {
         attributePos++;
         glEnableVertexAttribArray(attributePos);
-        if (normals && this->lighting) {
+        if (normals) {
             glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
             if (aNormal == -1) aNormal = attributePos;
             glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
@@ -319,6 +359,16 @@ bool GLES2Draw::draw() {
             glBindBuffer(GL_ARRAY_BUFFER, pointSizeBuffer);
             if (a_PointSize == -1) a_PointSize = attributePos;
             glVertexAttribPointer(a_PointSize, 1, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+        }
+    }
+    
+    if (isSpriteSheet) {
+        attributePos++;
+        glEnableVertexAttribArray(attributePos);
+        if (pointSpritesPos) {
+            glBindBuffer(GL_ARRAY_BUFFER, spritePosBuffer);
+            if (a_spritePos == -1) a_spritePos = attributePos;
+            glVertexAttribPointer(a_spritePos, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
         }
     }
 
@@ -361,14 +411,6 @@ bool GLES2Draw::draw() {
     if (isPoints){
         
         glUniform1i(useTexture, textured);
-
-        GLuint u_tileSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_tileSize");
-        GLuint u_tilePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_tilePos");
-        GLuint u_textureSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureSize");
-
-        glUniform2f(u_tileSize, 256, 256);
-        glUniform2f(u_tilePos, 0, 256);
-        glUniform2f(u_textureSize, 512, 512);
         
         if (textured){
             glActiveTexture(GL_TEXTURE0);
@@ -407,8 +449,14 @@ void GLES2Draw::destroy(){
         if (texcoords){
             glDeleteBuffers(1, &uvBuffer);
         }
-        if (normals && this->lighting){
+        if (this->lighting && normals){
             glDeleteBuffers(1, &normalBuffer);
+        }
+        if (isPoints && pointSizes) {
+            glDeleteBuffers(1, &pointSizeBuffer);
+        }
+        if (isSpriteSheet && pointSpritesPos){
+            glDeleteBuffers(1, &spritePosBuffer);
         }
         if (submeshes){
             for (unsigned int i = 0; i < submeshes->size(); i++){

@@ -19,13 +19,15 @@ DrawRender::DrawRender(){
 
     isPoints = false;
     isSky = false;
-    isTiledTexture = false;
+    isSpriteSheet = false;
 
-    tileSizeWidth = 0;
-    tileSizeHeight = 0;
+    spriteSizeWidth = 0;
+    spriteSizeHeight = 0;
 
-    tilePosX = 0;
-    tilePosY = 0;
+    spritePosX = 0;
+    spritePosY = 0;
+    
+    pointSpritesPos = NULL;
 
     pointSizes = NULL;
 
@@ -91,16 +93,25 @@ void DrawRender::setPointSizes(std::vector<float>* pointSizes){
     this->pointSizes = pointSizes;
 }
 
-void DrawRender::setIsTiledTexture(bool isTiledTexture){
-    this->isTiledTexture = isTiledTexture;
+void DrawRender::setIsSpriteSheet(bool isSpriteSheet){
+    this->isSpriteSheet = isSpriteSheet;
 }
 
-void DrawRender::setTileSize(int tileSizeWidth, int tileSizeHeight){
-    this->tileSizeWidth = tileSizeWidth;
-    this->tileSizeHeight = tileSizeHeight;
+void DrawRender::setTextureSize(int textureSizeWidth, int textureSizeHeight){
+    this->textureSizeWidth = textureSizeWidth;
+    this->textureSizeHeight = textureSizeHeight;
 }
 
-void DrawRender::setTilePos(int tilePosX, int tilePosY){
-    this->tilePosX = tilePosX;
-    this->tilePosY = tilePosY;
+void DrawRender::setSpriteSize(int spriteSizeWidth, int spriteSizeHeight){
+    this->spriteSizeWidth = spriteSizeWidth;
+    this->spriteSizeHeight = spriteSizeHeight;
+}
+
+void DrawRender::setSpritePos(int spritePosX, int spritePosY){
+    this->spritePosX = spritePosX;
+    this->spritePosY = spritePosY;
+}
+
+void DrawRender::setPointSpritesPos(std::vector< std::pair<int, int> >* pointSpritesPos){
+    this->pointSpritesPos = pointSpritesPos;
 }
