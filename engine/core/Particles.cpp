@@ -11,7 +11,7 @@ Particles::Particles(){
     sizeAttenuation = false;
     pointScaleFactor = 100;
 
-    pointScalingMode = S_POINT_SCALING_WIDTH;
+    pointSizeReference = S_POINTSIZE_WIDTH;
 
     minPointSize = 1;
     maxPointSize = 1000;
@@ -86,9 +86,9 @@ void Particles::updatePointScale(){
         pointScale = 1;
     }
 
-    if (pointScalingMode == S_POINT_SCALING_HEIGHT)
+    if (pointSizeReference == S_POINTSIZE_HEIGHT)
         pointScale *= (float)Supernova::getScreenHeight() / (float)Supernova::getCanvasHeight();
-    if (pointScalingMode == S_POINT_SCALING_WIDTH)
+    if (pointSizeReference == S_POINTSIZE_WIDTH)
         pointScale *= (float)Supernova::getScreenWidth() / (float)Supernova::getCanvasWidth();
 
     fillScaledSizeVector();
@@ -169,8 +169,8 @@ void Particles::setPointScaleFactor(float pointScaleFactor){
     this->pointScaleFactor = pointScaleFactor;
 }
 
-void Particles::setPointScalingMode(int pointScalingMode){
-    this->pointScalingMode = pointScalingMode;
+void Particles::setPointSizeReference(int pointSizeReference){
+    this->pointSizeReference = pointSizeReference;
 }
 
 void Particles::setMinPointSize(float minPointSize){

@@ -2,9 +2,9 @@
 #ifndef PARTICLES_H
 #define PARTICLES_H
 
-#define S_POINT_SCALING_PIXEL 0
-#define S_POINT_SCALING_WIDTH 1
-#define S_POINT_SCALING_HEIGHT 2
+#define S_POINTSIZE_PIXEL 0
+#define S_POINTSIZE_WIDTH 1
+#define S_POINTSIZE_HEIGHT 2
 
 #include "ConcreteObject.h"
 #include "render/PointManager.h"
@@ -22,6 +22,10 @@ private:
     int texWidth;
     int texHeight;
 
+    float pointScale;
+
+    int pointSizeReference;
+
 protected:
     PointManager renderManager;
 
@@ -31,11 +35,8 @@ protected:
     std::vector<int> sprites;
     std::vector<Vector4> colors;
 
-    float pointScale;
-
     bool sizeAttenuation;
     float pointScaleFactor;
-    int pointScalingMode;
     float minPointSize;
     float maxPointSize;
 
@@ -52,7 +53,7 @@ public:
 
     void setSizeAttenuation(bool sizeAttenuation);
     void setPointScaleFactor(float pointScaleFactor);
-    void setPointScalingMode(int pointScalingMode);
+    void setPointSizeReference(int pointSizeReference);
     void setMinPointSize(float minPointSize);
     void setMaxPointSize(float maxPointSize);
 
