@@ -191,12 +191,10 @@ void LuaBinding::bind(){
 
     .beginExtendClass<Particles, ConcreteObject>("Particles")
     .addConstructor(LUA_ARGS())
-    .addFunction("setPointScale", &Particles::setPointScale)
     .addFunction("setSizeAttenuation", &Particles::setSizeAttenuation)
     .addFunction("setPointScaleFactor", &Particles::setPointScaleFactor)
     .addFunction("setMinPointSize", &Particles::setMinPointSize)
     .addFunction("setMaxPointSize", &Particles::setMaxPointSize)
-    .addFunction("setPointScale", &Particles::setPointScale)
     .endClass()
 
     .beginExtendClass<SkyBox, Mesh>("SkyBox")

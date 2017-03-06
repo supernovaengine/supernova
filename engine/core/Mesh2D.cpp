@@ -7,7 +7,7 @@ Mesh2D::Mesh2D(): Mesh(){
     this->height = 0;
     this->billboard = false;
     this->fixedSizeBillboard=false;
-    this->billboardScaleFactor=200;
+    this->billboardScaleFactor=100;
 }
 
 Mesh2D::~Mesh2D(){

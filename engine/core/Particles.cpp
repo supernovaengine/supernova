@@ -2,13 +2,16 @@
 
 #include "PrimitiveMode.h"
 #include "Scene.h"
+#include "Supernova.h"
 #include "render/TextureManager.h"
 
 Particles::Particles(){
 
     pointScale = 1.0;
     sizeAttenuation = false;
-    pointScaleFactor = 200;
+    pointScaleFactor = 100;
+
+    pointScalingMode = S_POINT_SCALING_WIDTH;
 
     minPointSize = 1;
     maxPointSize = 1000;
@@ -67,12 +70,26 @@ void Particles::setParticleSprite(int particle, int sprite){
     fillSpritePosPixelsVector();
 }
 
+void Particles::setParticleColor(int particle, Vector4 color){
+    colors[particle] = color;
+    renderManager.getRender()->updatePointColors();
+}
+
+void Particles::setParticleColor(int particle, float red, float green, float blue, float alpha){
+    setParticleColor(particle, Vector4(red, green, blue, alpha));
+}
+
 void Particles::updatePointScale(){
     if (sizeAttenuation) {
-        pointScale = 200 / (modelViewProjectionMatrix * Vector4(0, 0, 0, 1.0)).w;
+        pointScale = pointScaleFactor / (modelViewProjectionMatrix * Vector4(0, 0, 0, 1.0)).w;
     }else{
         pointScale = 1;
     }
+
+    if (pointScalingMode == S_POINT_SCALING_HEIGHT)
+        pointScale *= (float)Supernova::getScreenHeight() / (float)Supernova::getCanvasHeight();
+    if (pointScalingMode == S_POINT_SCALING_WIDTH)
+        pointScale *= (float)Supernova::getScreenWidth() / (float)Supernova::getCanvasWidth();
 
     fillScaledSizeVector();
 }
@@ -80,6 +97,7 @@ void Particles::updatePointScale(){
 void Particles::fillScaledSizeVector(){
     pointSizesScaled.clear();
     for (int i = 0; i < pointSizes.size(); i++){
+
         float pointSizeScaledVal = pointSizes[i] * pointScale;
         if (pointSizeScaledVal < minPointSize)
             pointSizeScaledVal = minPointSize;
@@ -143,16 +161,16 @@ void Particles::update(){
     updatePointScale();
 }
 
-void Particles::setPointScale(float pointScale){
-    this->pointScale = pointScale;
-}
-
 void Particles::setSizeAttenuation(bool sizeAttenuation){
     this->sizeAttenuation = sizeAttenuation;
 }
 
 void Particles::setPointScaleFactor(float pointScaleFactor){
     this->pointScaleFactor = pointScaleFactor;
+}
+
+void Particles::setPointScalingMode(int pointScalingMode){
+    this->pointScalingMode = pointScalingMode;
 }
 
 void Particles::setMinPointSize(float minPointSize){
@@ -207,8 +225,6 @@ bool Particles::draw(){
     renderManager.getRender()->setNormalMatrix(&normalMatrix);
     renderManager.getRender()->setModelViewProjectionMatrix(&modelViewProjectionMatrix);
     renderManager.getRender()->setCameraPosition(cameraPosition);
-    
-    renderManager.getRender()->updatePointColors();
 
     return ConcreteObject::draw();
 }
