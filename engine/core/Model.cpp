@@ -58,16 +58,17 @@ bool Model::loadOBJ(const char * path){
         for (size_t i = 0; i < materials.size(); i++) {
             if (i > (this->submeshes.size()-1)){
                 this->submeshes.push_back(new Submesh());
+                this->submeshes.back()->createNewMaterial();
             }
+
             //char str[80];
             //strcpy(str, "jeep");
             //strcat(str, materials[i].diffuse_texname.c_str());
             //printf("material[%ld].file = %s\n", i, materials[i].diffuse_texname.c_str());
+            this->submeshes.back()->getMaterial()->setTexture(baseDir+"/"+materials[i].diffuse_texname);
             if (materials[i].dissolve < 1){
-                this->submeshes[this->submeshes.size()-1]->transparent = true;
+                this->submeshes.back()->getMaterial()->transparent = true;
             }
-            
-            this->setTexture(baseDir+"/"+materials[i].diffuse_texname, (int)i);
         }
 
         for (size_t i = 0; i < shapes.size(); i++) {

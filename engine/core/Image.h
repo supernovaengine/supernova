@@ -4,8 +4,6 @@
 
 #include "Mesh2D.h"
 
-void testando2();
-
 class Image: public Mesh2D {
 
 private:

@@ -126,7 +126,16 @@ float Vector3::dotProduct(const Vector3& v) const{
     return x * v.x + y * v.y + z * v.z;
 }
 
-Vector3& Vector3::normalise(){
+float Vector3::distance(const Vector3& rhs) const{
+    return (*this - rhs).length();
+}
+
+
+float Vector3::squaredDistance(const Vector3& rhs) const{
+    return (*this - rhs).squaredLength();
+}
+
+Vector3& Vector3::normalize(){
     float f = (float)sqrt( x * x + y * y + z * z );
     
     // Will also work for zero-sized vectors, but will change nothing

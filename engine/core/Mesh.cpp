@@ -1,53 +1,14 @@
 #include "Mesh.h"
 #include "Scene.h"
 #include "render/TextureManager.h"
+#include "platform/Log.h"
 
-Mesh::Mesh(): Object(){
-    submeshes.push_back(new Submesh());
-    transparent = false;
-    distanceToCamera = -1;
+Mesh::Mesh(): ConcreteObject(){
+    submeshes.push_back(new Submesh(&material));
 }
 
 Mesh::~Mesh(){
     destroy();
-}
-
-void Mesh::setTransparency(bool transparency){
-    if (scene != NULL && transparent == true) {
-        ((Scene*)scene)->useTransparency = true;
-    }
-}
-
-void Mesh::setColor(float red, float green, float blue, float alpha){
-    if (alpha != 1){
-        transparent = true;
-    }else{
-        transparent = false;
-    }
-    submeshes[0]->setColor(Vector4(red, green, blue, alpha));
-}
-
-void Mesh::setTexture(std::string texture){
-    setTexture(texture, 0);
-}
-
-void Mesh::setTexture(std::string texture, int submeshIndex){
-
-    std::string oldTexture = "";
-    if (submeshes[submeshIndex]->getTextures().size() > 0){
-        oldTexture = submeshes[submeshIndex]->getTextures()[0];
-    }
-
-    if (texture != oldTexture){
-    
-        submeshes[submeshIndex]->setTexture(texture);
-    
-        if (loaded){
-            reload();
-            TextureManager::deleteUnused();
-        }
-
-    }
 }
 
 std::vector<Vector3> Mesh::getVertices(){
@@ -65,15 +26,6 @@ std::vector<Vector2> Mesh::getTexcoords(){
 std::vector<Submesh*> Mesh::getSubmeshes(){
     return submeshes;
 }
-
-std::string Mesh::getTexture(){
-    return getTexture(0);
-}
-
-std::string Mesh::getTexture(int submeshIndex){
-    return submeshes[submeshIndex]->getTextures()[0];
-}
-
 
 void Mesh::setTexcoords(std::vector<Vector2> texcoords){
     this->texcoords.clear();
@@ -101,13 +53,14 @@ void Mesh::addSubmesh(Submesh* submesh){
 }
 
 void Mesh::sortTransparentSubmeshes(){
+
     if (transparent){
         for (size_t i = 0; i < submeshes.size(); i++) {
             if (this->submeshes[i]->getIndices()->size() > 0){
                 Vector3 submeshFirstVertice = vertices[this->submeshes[i]->getIndex(0)];
                 submeshFirstVertice = modelMatrix * submeshFirstVertice;
                 
-                if (this->cameraPosition != NULL && this->submeshes[i]->transparent){
+                if (this->cameraPosition != NULL && this->submeshes[i]->getMaterial()->transparent){
                     this->submeshes[i]->distanceToCamera = ((*this->cameraPosition) - submeshFirstVertice).length();
                 }
             }
@@ -126,37 +79,25 @@ void Mesh::sortTransparentSubmeshes(){
             
         }
     }
-}
 
-void Mesh::updateDistanceToCamera(){
-    if (this->cameraPosition != NULL){
-        distanceToCamera = ((*this->cameraPosition) - this->getWorldPosition()).length();
-    }
 }
 
 void Mesh::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    Object::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
-    
-    updateDistanceToCamera();
+    ConcreteObject::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+
     sortTransparentSubmeshes();
 }
 
 void Mesh::update(){
-    Object::update();
+    ConcreteObject::update();
 
-    if (this->viewProjectionMatrix != NULL){
-        this->modelViewMatrix = modelMatrix * (*this->viewMatrix);
-        this->normalMatrix = modelMatrix.getInverse().getTranspose();
-    }
-    
-    updateDistanceToCamera();
+    this->normalMatrix = modelMatrix.getInverse().getTranspose();
+
     sortTransparentSubmeshes();
 }
 
-bool Mesh::meshDraw(){
-    mesh.draw(&modelMatrix, &normalMatrix, &modelViewProjectionMatrix, cameraPosition, primitiveMode);
-    
-    return true;
+bool Mesh::render(){
+    return renderManager.draw();
 }
 
 void Mesh::removeAllSubmeshes(){
@@ -168,44 +109,36 @@ void Mesh::removeAllSubmeshes(){
 }
 
 bool Mesh::load(){
-    
-    if (scene != NULL){
-        mesh.load(((Scene*)scene)->sceneManager.getSceneRender(), vertices, normals, texcoords, &submeshes);
-    }else{
-        mesh.load(NULL, vertices, normals, texcoords, &submeshes);
-    }
 
-    if (submeshes[0]->getTextures().size() > 0) {
-        transparent = TextureManager::hasAlphaChannel(submeshes[0]->getTextures()[0]);
-    }
-    if (transparent){
-        setTransparency(true);
+    if (scene != NULL){
+        renderManager.getRender()->setSceneRender(((Scene*)scene)->getSceneRender());
     }
     
-    Object::load();
-    
-    return true;
+    renderManager.getRender()->setPositions(&vertices);
+    renderManager.getRender()->setNormals(&normals);
+    renderManager.getRender()->setTexcoords(&texcoords);
+    renderManager.getRender()->setSubmeshes(&submeshes);
+
+    renderManager.getRender()->setPrimitiveMode(primitiveMode);
+
+    renderManager.load();
+
+    return ConcreteObject::load();
 }
 
 bool Mesh::draw(){
-    
-    if ((transparent) && (scene != NULL) && (((Scene*)scene)->useDepth) && (distanceToCamera >= 0)){
-        ((Scene*)scene)->transparentMeshQueue.insert(std::make_pair(distanceToCamera, this));
-    }else{
-        meshDraw();
-    }
+    renderManager.getRender()->setModelMatrix(&modelMatrix);
+    renderManager.getRender()->setNormalMatrix(&normalMatrix);
+    renderManager.getRender()->setModelViewProjectionMatrix(&modelViewProjectionMatrix);
+    renderManager.getRender()->setCameraPosition(cameraPosition);
 
-    if (transparent){
-        setTransparency(true);
-    }
-    
-    return Object::draw();
+    return ConcreteObject::draw();
 }
 
 void Mesh::destroy(){
-    Object::destroy();
+    ConcreteObject::destroy();
     
-    mesh.destroy();
+    renderManager.destroy();
     
     removeAllSubmeshes();
 }

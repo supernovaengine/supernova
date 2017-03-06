@@ -4,6 +4,7 @@
 #define SkyBox_h
 
 #include <vector>
+#include <string>
 #include "Mesh.h"
 #include "math/Vector3.h"
 

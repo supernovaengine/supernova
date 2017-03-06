@@ -16,7 +16,8 @@
 
 class Scene: public Object {
     friend class Object;
-    friend class Mesh;
+    friend class ConcreteObject;
+	friend class Mesh;
 private:
 
     SceneManager sceneManager;
@@ -26,7 +27,7 @@ private:
     Camera* camera;
     bool userCamera;
     
-    std::multimap<float, Mesh*> transparentMeshQueue;
+    std::multimap<float, ConcreteObject*> transparentQueue;
 
     std::vector<Light*> lights;
     std::vector<Scene*> subScenes;
@@ -59,6 +60,8 @@ public:
 
 	Scene();
 	virtual ~Scene();
+
+	SceneRender* getSceneRender();
 
     void setAmbientLight(Vector3 ambientLight);
     void setAmbientLight(const float ambientFactor);

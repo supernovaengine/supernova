@@ -12,7 +12,7 @@ add_library(
 
 target_link_libraries(
     supernova-core
-    lua tinyobjloader jpeg png tiff mpg123
+    lua tinyobjloader jpeg png tiff mpg123 freetype
 )
 
 if (COMPILE_OPENAL)

@@ -79,6 +79,10 @@ void Scene::removeGUIObject (GUIObject* guiobject){
     guiObjects.erase(i,guiObjects.end());
 }
 
+SceneRender* Scene::getSceneRender(){
+    return sceneManager.getSceneRender();
+}
+
 void Scene::setSky(SkyBox* sky){
     this->sky = sky;
 }
@@ -183,9 +187,9 @@ void Scene::resetSceneProperties(){
 }
 
 void Scene::drawTransparentMeshes(){
-    std::multimap<float, Mesh*>::reverse_iterator it;
-    for (it = transparentMeshQueue.rbegin(); it != transparentMeshQueue.rend(); ++it) {
-        (*it).second->meshDraw();
+    std::multimap<float, ConcreteObject*>::reverse_iterator it;
+    for (it = transparentQueue.rbegin(); it != transparentQueue.rend(); ++it) {
+        (*it).second->render();
     }
 }
 
@@ -198,7 +202,7 @@ void Scene::drawChildScenes(){
 
 void Scene::drawSky(){
     if (sky != NULL)
-        sky->meshDraw();
+        sky->render();
 }
 
 bool Scene::load(){
@@ -220,7 +224,7 @@ bool Scene::load(){
 
 bool Scene::draw(){
     
-    transparentMeshQueue.clear();
+    transparentQueue.clear();
 
     sceneManager.setUseDepth(useDepth);
     sceneManager.setUseTransparency(useTransparency);
@@ -228,9 +232,8 @@ bool Scene::draw(){
     sceneManager.draw();
     resetSceneProperties();
     Object::draw();
-    drawTransparentMeshes();
-
     drawSky();
+    drawTransparentMeshes();
 
     drawChildScenes();
     return true;

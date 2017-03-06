@@ -11,6 +11,7 @@ Object::Object(){
     scene = NULL;
 
     viewMatrix = NULL;
+    projectionMatrix = NULL;
     viewProjectionMatrix = NULL;
     cameraPosition = NULL;
 
@@ -73,8 +74,10 @@ void Object::addObject(Object* obj){
         obj->parent = this;
 
         obj->viewMatrix = viewMatrix;
+        obj->projectionMatrix = projectionMatrix;
         obj->viewProjectionMatrix = viewProjectionMatrix;
         obj->cameraPosition = cameraPosition;
+        obj->modelViewProjectionMatrix = modelViewProjectionMatrix;
         
         if (scene != NULL)
             obj->setSceneAndConfigure(scene);
@@ -166,6 +169,10 @@ Quaternion Object::getRotation(){
     return this->rotation;
 }
 
+Quaternion Object::getWorldRotation(){
+    return this->worldRotation;
+}
+
 void Object::setScale(const float factor){
     setScale(Vector3(factor,factor,factor));
 }
@@ -207,6 +214,7 @@ Matrix4 Object::getModelViewProjectMatrix(){
 void Object::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
 
     this->viewMatrix = viewMatrix;
+    this->projectionMatrix = projectionMatrix;
     this->viewProjectionMatrix = viewProjectionMatrix;
     this->cameraPosition = cameraPosition;
 
@@ -296,9 +304,12 @@ void Object::update(){
     if (parent != NULL){
         Matrix4 parentCenterMatrix = Matrix4::translateMatrix(parent->center);
         this->modelMatrix = this->modelMatrix * parentCenterMatrix * parent->modelMatrix;
+        worldRotation = parent->worldRotation * rotation;
+        worldPosition = modelMatrix * Vector3(0,0,0);
+    }else{
+        worldRotation = rotation;
+        worldPosition = position;
     }
-
-    worldPosition = modelMatrix * Vector3(0,0,0);
 
     updateMatrices();
 

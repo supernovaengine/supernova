@@ -207,10 +207,10 @@ void Camera::moveForward(float distance){
     if (distance != 0){
         Vector3 viewCenter(view.x - position.x, view.y - position.y, view.z - position.z);
 
-        viewCenter.normalise();
+        viewCenter.normalize();
 
-        view = view + (viewCenter.normalise() * distance);
-        position = position + (viewCenter.normalise() * distance);
+        view = view + (viewCenter.normalize() * distance);
+        position = position + (viewCenter.normalize() * distance);
 
         update();
     }
@@ -224,8 +224,8 @@ void Camera::walkForward(float distance){
 
         Vector3 walkVector = viewCenter - aux;
 
-        view = view + (walkVector.normalise() * distance);
-        position = position + (walkVector.normalise() * distance);
+        view = view + (walkVector.normalize() * distance);
+        position = position + (walkVector.normalize() * distance);
 
         update();
     }
@@ -237,8 +237,8 @@ void Camera::slide(float distance){
 
         Vector3 slideVector = viewCenter.crossProduct(up);
 
-        view = view + (slideVector.normalise() * distance);
-        position = position + (slideVector.normalise() * distance);
+        view = view + (slideVector.normalize() * distance);
+        position = position + (slideVector.normalize() * distance);
 
         update();
     }
@@ -301,7 +301,7 @@ void Camera::update(){
 
     if (parent != NULL){
         worldView = modelMatrix * (view - position);
-        worldUp = ((modelMatrix * up) - (modelMatrix * Vector3(0,0,0))).normalise();
+        worldUp = ((modelMatrix * up) - (modelMatrix * Vector3(0,0,0))).normalize();
     }else{
         worldView = view;
         worldUp = up;

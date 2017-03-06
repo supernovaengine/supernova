@@ -101,7 +101,7 @@
         float squaredDistance(const Vector2& rhs) const;
         float dotProduct(const Vector2& vec) const;
 
-        float normalise();
+        float normalize();
         Vector2 midPoint( const Vector2& vec ) const;
 
         bool operator < ( const Vector2& rhs ) const;
@@ -114,7 +114,7 @@
         Vector2 perpendicular(void) const;
         float crossProduct( const Vector2& rkVector ) const;
 
-        Vector2 normalisedCopy(void) const;
+        Vector2 normalizedCopy(void) const;
 
         Vector2 reflect(const Vector2& normal) const;
 

@@ -9,6 +9,7 @@
 
 #include "Supernova.h"
 #include "Object.h"
+#include "ConcreteObject.h"
 #include "platform/Log.h"
 #include "Scene.h"
 #include "Shape.h"
@@ -29,6 +30,7 @@
 #include "DirectionalLight.h"
 #include "Sound.h"
 #include "SkyBox.h"
+#include "Particles.h"
 #include <map>
 #include <unistd.h>
 
@@ -178,9 +180,21 @@ void LuaBinding::bind(){
     .addProperty("target", &DirectionalLight::getDirection, (void (DirectionalLight::*)(Vector3))&DirectionalLight::setDirection)
     .endClass()
 
-    .beginExtendClass<Mesh, Object>("Mesh")
-    .addFunction("setTexture", (void (Mesh::*)(std::string))&Mesh::setTexture)
-    .addFunction("setColor", &Mesh::setColor)
+    .beginExtendClass<ConcreteObject, Object>("ConcreteObject")
+    .addFunction("setTexture", (void (ConcreteObject::*)(std::string))&ConcreteObject::setTexture)
+    .addFunction("setColor", &ConcreteObject::setColor)
+    .endClass()
+
+    .beginExtendClass<Mesh, ConcreteObject>("Mesh")
+    .addConstructor(LUA_ARGS())
+    .endClass()
+
+    .beginExtendClass<Particles, ConcreteObject>("Particles")
+    .addConstructor(LUA_ARGS())
+    .addFunction("setSizeAttenuation", &Particles::setSizeAttenuation)
+    .addFunction("setPointScaleFactor", &Particles::setPointScaleFactor)
+    .addFunction("setMinPointSize", &Particles::setMinPointSize)
+    .addFunction("setMaxPointSize", &Particles::setMaxPointSize)
     .endClass()
 
     .beginExtendClass<SkyBox, Mesh>("SkyBox")
@@ -195,6 +209,9 @@ void LuaBinding::bind(){
 
     .beginExtendClass<Mesh2D, Mesh>("Mesh2D")
     .addFunction("setSize", &Mesh2D::setSize)
+    .addFunction("setBillboard", &Mesh2D::setBillboard)
+    .addFunction("setFixedSizeBillboard", &Mesh2D::setFixedSizeBillboard)
+    .addFunction("setBillboardScaleFactor", &Mesh2D::setBillboardScaleFactor)
     .endClass()
 
     .beginExtendClass<ImageTemplate, Mesh2D>("ImageTemplate")

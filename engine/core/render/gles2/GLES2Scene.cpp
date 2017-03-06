@@ -8,7 +8,7 @@
 #include "math/Angle.h"
 
 
-GLES2Scene::GLES2Scene() {
+GLES2Scene::GLES2Scene(): SceneRender() {
 }
 
 GLES2Scene::~GLES2Scene() {
@@ -104,7 +104,7 @@ bool GLES2Scene::load(bool childScene) {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    
+
     return true;
 }
 

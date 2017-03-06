@@ -229,7 +229,7 @@ float Vector2::dotProduct(const Vector2& vec) const{
 }
 
 
-float Vector2::normalise(){
+float Vector2::normalize(){
     float fLength = sqrt( x * x + y * y);
     
     if ( fLength > float(0.0f) )
@@ -281,9 +281,9 @@ float Vector2::crossProduct( const Vector2& rkVector ) const{
     return x * rkVector.y - y * rkVector.x;
 }
 
-Vector2 Vector2::normalisedCopy(void) const{
+Vector2 Vector2::normalizedCopy(void) const{
     Vector2 ret = *this;
-    ret.normalise();
+    ret.normalize();
     return ret;
 }
 

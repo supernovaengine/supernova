@@ -71,7 +71,11 @@ public:
 
     float dotProduct(const Vector3& v) const;
 
-    Vector3 & normalise();
+    float distance(const Vector3& rhs) const;
+
+    float squaredDistance(const Vector3& rhs) const;
+
+    Vector3 & normalize();
 
     Vector3 crossProduct( const Vector3& v ) const;
 

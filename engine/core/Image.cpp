@@ -4,6 +4,7 @@
 #include <string>
 #include "image/TextureLoader.h"
 #include "render/TextureManager.h"
+#include "platform/Log.h"
 
 
 
@@ -45,18 +46,18 @@ void Image::createVertices(){
     indices.assign(indices_array, std::end(indices_array));
     submeshes[0]->setIndices(indices);
 
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
+    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
 }
 
-
 bool Image::load(){
-    if (submeshes[0]->getTextures().size() > 0 && !loaded && this->width == 0 && this->height == 0){
-        TextureManager::loadTexture(submeshes[0]->getTextures()[0]);
-        this->width = TextureManager::getTextureWidth(submeshes[0]->getTextures()[0]);
-        this->height = TextureManager::getTextureHeight(submeshes[0]->getTextures()[0]);
+
+    if (submeshes[0]->getMaterial()->getTextures().size() > 0 && !loaded && this->width == 0 && this->height == 0){
+        TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
+        this->width = TextureManager::getTextureWidth(submeshes[0]->getMaterial()->getTextures()[0]);
+        this->height = TextureManager::getTextureHeight(submeshes[0]->getMaterial()->getTextures()[0]);
     }
 
     createVertices();

@@ -7,27 +7,23 @@
 #include "platform/Log.h"
 
 
-const char* GLES2Program::getVertexShader(const char* name){
-    if (strcmp(name,"color")==0){
-        return gVertexShaderColor;
-    }else if (strcmp(name,"texture")==0){
-        return gVertexShaderTexture;
-    }else if (strcmp(name,"perfragment")==0){
+std::string GLES2Program::getVertexShader(std::string name){
+    if (name == "perfragment"){
         return gVertexShaderPerPixelLightTexture;
+    }else if (name == "points_perfragment"){
+        return gVertexPointsPerPixelLightShader;
     }
-    return NULL;
+    return "";
     
 }
 
-const char* GLES2Program::getFragmentShader(const char* name){
-    if (strcmp(name,"color")==0){
-        return gFragmentShaderColor;
-    }else if (strcmp(name,"texture")==0){
-        return gFragmentShaderTexture;
-    }else if (strcmp(name,"perfragment")==0){
+std::string GLES2Program::getFragmentShader(std::string name){
+    if (name == "perfragment"){
         return gFragmentShaderPerPixelLightTexture;
+    }else if (name == "points_perfragment"){
+        return gFragmentPointsPerPixelLightShader;
     }
-    return NULL;
+    return "";
 }
 
 
@@ -58,23 +54,14 @@ GLuint GLES2Program::loadShader(GLenum shaderType, const char* pSource) {
 
 void GLES2Program::createProgram(std::string shaderName, std::string definitions) {
     
-    const char* pVertexSourceTemp = getVertexShader(shaderName.c_str());
-    const char* pFragmentSourceTemp = getFragmentShader(shaderName.c_str());
-    
-    char * pVertexSource = (char *) malloc(1 + strlen(definitions.c_str())+ strlen(pVertexSourceTemp) );
-    strcpy(pVertexSource,definitions.c_str());
-    strcat(pVertexSource,pVertexSourceTemp);
-    
-    char * pFragmentSource = (char *) malloc(1 + strlen(definitions.c_str())+ strlen(pFragmentSourceTemp) );
-    strcpy(pFragmentSource,definitions.c_str());
-    strcat(pFragmentSource,pFragmentSourceTemp);
-    
+    std::string pVertexSource = definitions + getVertexShader(shaderName);
+    std::string pFragmentSource = definitions + getFragmentShader(shaderName);
 
-    GLuint vertexShader = loadShader(GL_VERTEX_SHADER, pVertexSource);
+    GLuint vertexShader = loadShader(GL_VERTEX_SHADER, pVertexSource.c_str());
     if (!vertexShader) {
         Log::Error(LOG_TAG,"Could not load vertex shader: %s\n", shaderName.c_str());
     }
-    GLuint pixelShader = loadShader(GL_FRAGMENT_SHADER, pFragmentSource);
+    GLuint pixelShader = loadShader(GL_FRAGMENT_SHADER, pFragmentSource.c_str());
     if (!pixelShader) {
         Log::Error(LOG_TAG,"Could not load fragment shader: %s\n", shaderName.c_str());
     }
@@ -102,8 +89,8 @@ void GLES2Program::createProgram(std::string shaderName, std::string definitions
             program = 0;
         }
     }
-    free(pVertexSource);
-    free(pFragmentSource);
+    //free(pVertexSource);
+    //free(pFragmentSource);
     glDeleteShader(vertexShader);
     glDeleteShader(pixelShader);
 }
