@@ -8,8 +8,7 @@
 #include "math/Angle.h"
 
 
-GLES2Scene::GLES2Scene() {
-    lighting = false;
+GLES2Scene::GLES2Scene(): SceneRender() {
 }
 
 GLES2Scene::~GLES2Scene() {

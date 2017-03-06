@@ -13,8 +13,8 @@ private:
     
     GLuint program;
     
-    const char* getVertexShader(const char* name);
-    const char* getFragmentShader(const char* name);
+    std::string getVertexShader(std::string name);
+    std::string getFragmentShader(std::string name);
     
     GLuint loadShader(GLenum shaderType, const char* pSource);
     

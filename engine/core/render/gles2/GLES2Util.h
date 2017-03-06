@@ -9,8 +9,14 @@
 
 class GLES2Util {
 public:
+    
     GLES2Util();
     virtual ~GLES2Util();
+    
+    static GLuint emptyTexture; //For web bug only
+    static bool emptyTextureLoaded;
+    
+    static void generateEmptyTexture();
 
     static void checkGlError(const char* op);
     static GLuint createVBO(GLenum target, const GLsizeiptr size, const GLvoid* data, const GLenum usage);

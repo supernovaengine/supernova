@@ -10,6 +10,7 @@
 class GLES2Scene : public SceneRender{
     
 friend class GLES2Draw;
+friend class GLES2Point;
     
 private:
     
@@ -31,8 +32,6 @@ private:
     std::vector<GLfloat> directionalLightDir;
     std::vector<GLfloat> directionalLightPower;
     std::vector<GLfloat> directionalLightColor;
-
-    bool lighting;
     
 public:
     

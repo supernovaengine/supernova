@@ -3,7 +3,7 @@
 #define PARTICLES_H
 
 #include "ConcreteObject.h"
-#include "render/DrawManager.h"
+#include "render/PointManager.h"
 
 class Particles: public ConcreteObject {
 
@@ -19,12 +19,13 @@ private:
     int texHeight;
 
 protected:
-    DrawManager renderManager;
+    PointManager renderManager;
 
     std::vector<Vector3> positions;
     std::vector<Vector3> normals;
     std::vector<float> pointSizes;
     std::vector<int> sprites;
+    std::vector<Vector4> colors;
 
     float pointScale;
     bool sizeAttenuation;

@@ -5,9 +5,14 @@
 
 class SceneRender {
     
+protected:
+
+    
 public:
     
-    inline virtual ~SceneRender(){}
+    bool lighting;
+    
+    inline virtual ~SceneRender(){lighting = false;}
     
     virtual void setLights(std::vector<Light*> lights) = 0;
     virtual void setAmbientLight(Vector3 ambientLight) = 0;

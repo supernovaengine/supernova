@@ -1,22 +1,35 @@
-#ifndef DrawRender_h
-#define DrawRender_h
+#ifndef PointRender_h
+#define PointRender_h
 
 #include "math/Vector2.h"
 #include "render/SceneRender.h"
-#include "Submesh.h"
+#include "render/TextureRender.h"
+#include "Material.h"
 #include <vector>
 
 
-class DrawRender {
+class PointRender {
+    
+private:
+    
+    void checkLighting();
     
 protected:
+    
+    bool loaded;
+    bool lighting;
+    
+    int numPoints;
+    std::shared_ptr<TextureRender> texture;
+    bool textured;
     
     SceneRender* sceneRender;
     
     std::vector<Vector3>* positions;
     std::vector<Vector3>* normals;
-    std::vector<Vector2>* texcoords;
-    std::vector<Submesh*>* submeshes;
+    std::vector< std::pair<int, int> >* pointSpritesPos;
+    std::vector<float>* pointSizes;
+    std::vector<Vector4>* pointColors;
     
     Matrix4* modelMatrix;
     Matrix4* normalMatrix;
@@ -24,47 +37,31 @@ protected:
     Vector3* cameraPosition;
     
     Material* material;
-
-    bool isPoints;
-    bool isSky;
+    
     bool isSpriteSheet;
-
+    
     int textureSizeWidth;
     int textureSizeHeight;
     
     int spriteSizeWidth;
     int spriteSizeHeight;
-
+    
     int spritePosX;
     int spritePosY;
-    
-    std::vector< std::pair<int, int> >* pointSpritesPos;
-    
-    std::vector<float>* pointSizes;
-    
-    std::vector<Vector4>* pointColors;
 
-    int pointSize;
-    
-    int primitiveMode;
 public:
     
-    DrawRender();
-    virtual ~DrawRender();
+    PointRender();
+    virtual ~PointRender();
     
     void setSceneRender(SceneRender* sceneRender);
     void setPositions(std::vector<Vector3>* positions);
     void setNormals(std::vector<Vector3>* normals);
-    void setTexcoords(std::vector<Vector2>* texcoords);
-    void setSubmeshes(std::vector<Submesh*>* submeshes);
     void setModelMatrix(Matrix4* modelMatrix);
     void setNormalMatrix(Matrix4* normalMatrix);
     void setModelViewProjectionMatrix( Matrix4* modelViewProjectionMatrix);
     void setCameraPosition(Vector3* cameraPosition);
-    void setPrimitiveMode(int primitiveMode);
     void setMaterial(Material* material);
-    void setIsPoints(bool isPoints);
-    void setIsSky(bool isSky);
     void setPointSizes(std::vector<float>* pointSizes);
     void setIsSpriteSheet(bool isSpriteSheet);
     void setTextureSize(int textureSizeWidth, int textureSizeHeight);
@@ -74,16 +71,16 @@ public:
     void setPointColors(std::vector<Vector4>* pointColors);
     
     virtual void updatePositions() = 0;
-    virtual void updateTexcoords() = 0;
     virtual void updateNormals() = 0;
     virtual void updatePointSizes() = 0;
     virtual void updateSpritePos() = 0;
     virtual void updatePointColors() = 0;
     
-    virtual bool load() = 0;
+    virtual bool load();
     virtual bool draw() = 0;
     virtual void destroy() = 0;
     
 };
 
-#endif /* DrawRender_h */
+
+#endif /* PointRender_h */

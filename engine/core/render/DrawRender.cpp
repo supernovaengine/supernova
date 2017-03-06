@@ -20,6 +20,9 @@ DrawRender::DrawRender(){
     isPoints = false;
     isSky = false;
     isSpriteSheet = false;
+    
+    textureSizeWidth = 0;
+    textureSizeHeight = 0;
 
     spriteSizeWidth = 0;
     spriteSizeHeight = 0;
@@ -30,6 +33,8 @@ DrawRender::DrawRender(){
     pointSpritesPos = NULL;
 
     pointSizes = NULL;
+    
+    pointColors = NULL;
 
     primitiveMode = S_TRIANGLES;
 }
@@ -114,4 +119,8 @@ void DrawRender::setSpritePos(int spritePosX, int spritePosY){
 
 void DrawRender::setPointSpritesPos(std::vector< std::pair<int, int> >* pointSpritesPos){
     this->pointSpritesPos = pointSpritesPos;
+}
+
+void DrawRender::setPointColors(std::vector<Vector4>* pointColors){
+    this->pointColors = pointColors;
 }

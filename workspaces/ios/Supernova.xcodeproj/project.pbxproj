@@ -11,6 +11,7 @@
 		71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71369C081E291E22006AE1D1 /* Button.cpp */; };
 		713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */ = {isa = PBXBuildFile; fileRef = 713B79A11C0FD15000892EAC /* iosfopenpath.m */; };
 		713D30C51CFB306D00A4752F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* assets */; };
+		714D81D61E6C9B380038BE50 /* GLES2Point.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714D81D41E6C9B380038BE50 /* GLES2Point.cpp */; };
 		7151F2801CD4FA86001A3AC3 /* ioscallback.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7151F27F1CD4FA86001A3AC3 /* ioscallback.mm */; };
 		715821431D93528600AB1181 /* png.c in Sources */ = {isa = PBXBuildFile; fileRef = 715821021D93515F00AB1181 /* png.c */; };
 		715821441D93528600AB1181 /* pngerror.c in Sources */ = {isa = PBXBuildFile; fileRef = 715821081D93515F00AB1181 /* pngerror.c */; };
@@ -179,11 +180,13 @@
 		7193011F1E50ACF900BEE527 /* DrawRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7193011E1E50ACF900BEE527 /* DrawRender.cpp */; };
 		719301221E50F9CF00BEE527 /* ConcreteObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301201E50F9CF00BEE527 /* ConcreteObject.cpp */; };
 		719301251E51212800BEE527 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301231E51212800BEE527 /* Material.cpp */; };
-		719301281E53D4B000BEE527 /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301261E53D4B000BEE527 /* Particles.cpp */; };
 		71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */; };
 		71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28351DE8E96800C12A1D /* MP3Reader.cpp */; };
 		71A6FAC01DEA41A6003850A2 /* OpenalPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABE1DEA41A6003850A2 /* OpenalPlayer.cpp */; };
 		71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FAC11DEB1924003850A2 /* SoundManager.cpp */; };
+		71AC8B611E6B42C000DB33C3 /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301261E53D4B000BEE527 /* Particles.cpp */; };
+		71AC8B641E6C5F1400DB33C3 /* PointManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AC8B621E6C5F1400DB33C3 /* PointManager.cpp */; };
+		71AC8B671E6C5F4B00DB33C3 /* PointRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AC8B651E6C5F4B00DB33C3 /* PointRender.cpp */; };
 		71BCF6C21E476F42008E42A2 /* Text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BCF6C01E476F42008E42A2 /* Text.cpp */; };
 		71BCF6C31E476F49008E42A2 /* SkyBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7193011B1E42943800BEE527 /* SkyBox.cpp */; };
 		71BCFA4C1E47BF77008E42A2 /* autofit.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BCF75D1E47BF1D008E42A2 /* autofit.c */; };
@@ -556,6 +559,8 @@
 		713D2D6E1CFB2EFA00A4752F /* LuaState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaState.h; sourceTree = "<group>"; };
 		713D2D6F1CFB2EFA00A4752F /* QtLuaIntf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QtLuaIntf.h; sourceTree = "<group>"; };
 		713D30C41CFB306D00A4752F /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../assets; sourceTree = "<group>"; };
+		714D81D41E6C9B380038BE50 /* GLES2Point.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Point.cpp; sourceTree = "<group>"; };
+		714D81D51E6C9B380038BE50 /* GLES2Point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Point.h; sourceTree = "<group>"; };
 		7151F27F1CD4FA86001A3AC3 /* ioscallback.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ioscallback.mm; sourceTree = "<group>"; };
 		7151F2811CD4FAAC001A3AC3 /* ioscallback.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ioscallback.h; sourceTree = "<group>"; };
 		715820D01D9350DB00AB1181 /* libpng.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpng.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -767,6 +772,10 @@
 		71A6FABF1DEA41A6003850A2 /* OpenalPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenalPlayer.h; sourceTree = "<group>"; };
 		71A6FAC11DEB1924003850A2 /* SoundManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundManager.cpp; sourceTree = "<group>"; };
 		71A6FAC21DEB1924003850A2 /* SoundManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
+		71AC8B621E6C5F1400DB33C3 /* PointManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointManager.cpp; sourceTree = "<group>"; };
+		71AC8B631E6C5F1400DB33C3 /* PointManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointManager.h; sourceTree = "<group>"; };
+		71AC8B651E6C5F4B00DB33C3 /* PointRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointRender.cpp; sourceTree = "<group>"; };
+		71AC8B661E6C5F4B00DB33C3 /* PointRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointRender.h; sourceTree = "<group>"; };
 		71BCF6C01E476F42008E42A2 /* Text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Text.cpp; sourceTree = "<group>"; };
 		71BCF6C11E476F42008E42A2 /* Text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Text.h; sourceTree = "<group>"; };
 		71BCF6C81E47BF03008E42A2 /* libfreetype.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libfreetype.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1192,6 +1201,10 @@
 				713D2A5E1CFB2EAD00A4752F /* DrawManager.h */,
 				7193011E1E50ACF900BEE527 /* DrawRender.cpp */,
 				7188F1A21D9B421800A2D04F /* DrawRender.h */,
+				71AC8B621E6C5F1400DB33C3 /* PointManager.cpp */,
+				71AC8B631E6C5F1400DB33C3 /* PointManager.h */,
+				71AC8B651E6C5F4B00DB33C3 /* PointRender.cpp */,
+				71AC8B661E6C5F4B00DB33C3 /* PointRender.h */,
 				7188F19C1D9B271800A2D04F /* ProgramManager.cpp */,
 				7188F19D1D9B271800A2D04F /* ProgramManager.h */,
 				7188F1A61D9B464900A2D04F /* ProgramRender.h */,
@@ -1208,9 +1221,11 @@
 		713D2A4B1CFB2EAD00A4752F /* gles2 */ = {
 			isa = PBXGroup;
 			children = (
-				713D2A4C1CFB2EAD00A4752F /* GLES2Header.h */,
 				713D2A4D1CFB2EAD00A4752F /* GLES2Draw.cpp */,
 				713D2A4E1CFB2EAD00A4752F /* GLES2Draw.h */,
+				713D2A4C1CFB2EAD00A4752F /* GLES2Header.h */,
+				714D81D41E6C9B380038BE50 /* GLES2Point.cpp */,
+				714D81D51E6C9B380038BE50 /* GLES2Point.h */,
 				7188F19F1D9B282300A2D04F /* GLES2Program.cpp */,
 				7188F1A01D9B282300A2D04F /* GLES2Program.h */,
 				713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */,
@@ -2345,7 +2360,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				719301281E53D4B000BEE527 /* Particles.cpp in Sources */,
 				716AB5AA1BEF9F3C001B672D /* AppDelegate.m in Sources */,
 				716AB5B11BEF9F3D001B672D /* GameViewController.mm in Sources */,
 				713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */,
@@ -2428,6 +2442,7 @@
 				71CDC7291D7B14720060EEFF /* Log.cpp in Sources */,
 				719301221E50F9CF00BEE527 /* ConcreteObject.cpp in Sources */,
 				71CDC72F1D7B14860060EEFF /* GLES2Texture.cpp in Sources */,
+				71AC8B641E6C5F1400DB33C3 /* PointManager.cpp in Sources */,
 				719301251E51212800BEE527 /* Material.cpp in Sources */,
 				71CDC7221D7B146D0060EEFF /* Angle.cpp in Sources */,
 				71CDC7261D7B146D0060EEFF /* Vector2.cpp in Sources */,
@@ -2436,6 +2451,7 @@
 				71CDC72D1D7B14860060EEFF /* GLES2Scene.cpp in Sources */,
 				71CDC7161D7B14510060EEFF /* Object.cpp in Sources */,
 				715823F91D93688F00AB1181 /* JPEGReader.cpp in Sources */,
+				71AC8B671E6C5F4B00DB33C3 /* PointRender.cpp in Sources */,
 				7188F1BC1DBD960000A2D04F /* WAVReader.cpp in Sources */,
 				71CDC70E1D7B14510060EEFF /* Cube.cpp in Sources */,
 				71CDC7301D7B14860060EEFF /* GLES2Util.cpp in Sources */,
@@ -2444,7 +2460,9 @@
 				71CDC72B1D7B14790060EEFF /* SceneManager.cpp in Sources */,
 				71CDC72A1D7B14790060EEFF /* DrawManager.cpp in Sources */,
 				715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */,
+				714D81D61E6C9B380038BE50 /* GLES2Point.cpp in Sources */,
 				71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */,
+				71AC8B611E6B42C000DB33C3 /* Particles.cpp in Sources */,
 				716F761D1E1C736300FF9888 /* Mesh2D.cpp in Sources */,
 				71CDC7251D7B146D0060EEFF /* Ray.cpp in Sources */,
 				71CDC72C1D7B14860060EEFF /* GLES2Draw.cpp in Sources */,

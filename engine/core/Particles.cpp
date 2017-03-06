@@ -31,6 +31,7 @@ void Particles::addParticle(){
     pointSizes.push_back(1);
     normals.push_back(Vector3(0.0, 0.0, 1.0));
     sprites.push_back(0);
+    colors.push_back(*material.getColor());
 
     fillScaledSizeVector();
     fillSpritePosPixelsVector();
@@ -86,6 +87,8 @@ void Particles::fillScaledSizeVector(){
             pointSizeScaledVal = maxPointSize;
         pointSizesScaled.push_back(pointSizeScaledVal);
     }
+    
+    renderManager.getRender()->updatePointSizes();
 }
 
 void Particles::setSpriteSheet(int spritesX, int spritesY){
@@ -93,7 +96,7 @@ void Particles::setSpriteSheet(int spritesX, int spritesY){
         this->spritesX = spritesX;
         this->spritesY = spritesY;
 
-        if (spritesX > 1 || spritesY > 1){
+        if ((spritesX > 1 || spritesY > 1) && (material.getTextures().size() > 0)){
             isSpriteSheet = true;
             fillSpritePosPixelsVector();
         }else{
@@ -120,6 +123,8 @@ void Particles::fillSpritePosPixelsVector(){
             spritesPixelsPos.push_back(std::make_pair(spritesPosX * texWidth / spritesX, spritesPosY * texHeight / spritesY));
         }
     }
+    
+    renderManager.getRender()->updateSpritePos();
 }
 
 void Particles::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
@@ -176,9 +181,10 @@ bool Particles::load(){
     
     renderManager.getRender()->setPointSizes(&pointSizesScaled);
     renderManager.getRender()->setPointSpritesPos(&spritesPixelsPos);
+    renderManager.getRender()->setPointColors(&colors);
 
-    renderManager.getRender()->setIsPoints(true);
-    renderManager.getRender()->setPrimitiveMode(S_POINTS);
+    //renderManager.getRender()->setIsPoints(true);
+    //renderManager.getRender()->setPrimitiveMode(S_POINTS);
     renderManager.getRender()->setIsSpriteSheet(isSpriteSheet);
 
     renderManager.load();
@@ -202,8 +208,7 @@ bool Particles::draw(){
     renderManager.getRender()->setModelViewProjectionMatrix(&modelViewProjectionMatrix);
     renderManager.getRender()->setCameraPosition(cameraPosition);
     
-    renderManager.getRender()->updatePointSizes();
-    renderManager.getRender()->updateSpritePos();
+    renderManager.getRender()->updatePointColors();
 
     return ConcreteObject::draw();
 }
