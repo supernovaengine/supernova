@@ -1,9 +1,9 @@
-
-
-#ifndef GLES2Point_h
-#define GLES2Point_h
+#ifndef gles2mesh_h
+#define gles2mesh_h
 
 #include "GLES2Header.h"
+#include "GLES2Light.h"
+#include "../../Submesh.h"
 #include <vector>
 #include <unordered_map>
 #include "math/Matrix4.h"
@@ -11,57 +11,55 @@
 #include "math/Vector3.h"
 #include "render/TextureManager.h"
 #include "render/ProgramManager.h"
-#include "render/PointRender.h"
+#include "render/MeshRender.h"
 #include "render/SceneRender.h"
-#include "GLES2Light.h"
 
 
-class GLES2Point : public PointRender {
-    
+class GLES2Mesh : public MeshRender {
+
+    typedef struct {
+        GLuint indiceBuffer;
+    } SubmeshIndiceStruct;
+
 private:
 
     GLES2Light light;
     
     std::shared_ptr<ProgramRender> gProgram;
-
+    
     GLint aPositionHandle;
+    GLint aTextureCoordinatesLocation;
     GLint aNormal;
     
-    GLint a_PointSize;
-    GLint a_spritePos;
-    GLint a_pointColor;
-    
     GLuint uTextureUnitLocation;
+    GLuint uColor;
     GLuint u_mvpMatrix;
     GLuint u_mMatrix;
     GLuint u_nMatrix;
     GLuint uEyePos;
-    
+
     GLuint useTexture;
     
     GLuint u_spriteSize;
     GLuint u_textureSize;
-    
+
     GLuint vertexBuffer;
     GLuint normalBuffer;
-    GLuint pointSizeBuffer;
-    GLuint spritePosBuffer;
-    GLuint pointColorBuffer;
+    GLuint uvBuffer;
 
-    
+    std::unordered_map<Submesh*, SubmeshIndiceStruct> submeshesIndices;
+
 public:
-    GLES2Point();
-    virtual ~GLES2Point();
+    GLES2Mesh();
+    virtual ~GLES2Mesh();
     
     void updatePositions();
+    void updateTexcoords();
     void updateNormals();
-    void updatePointSizes();
-    void updateSpritePos();
-    void updatePointColors();
-    
+
     bool load();
-    bool draw();
+	bool draw();
     void destroy();
 };
 
-#endif /* GLES2Point_h */
+#endif

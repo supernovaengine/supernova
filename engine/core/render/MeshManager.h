@@ -1,29 +1,29 @@
-#ifndef drawmanager_h
-#define drawmanager_h
+#ifndef MeshManager_h
+#define MeshManager_h
 
 #include <vector>
 #include "math/Vector3.h"
 #include "Submesh.h"
 #include "math/Matrix4.h"
 #include "math/Vector4.h"
-#include "render/DrawRender.h"
+#include "render/MeshRender.h"
 #include "render/SceneRender.h"
 
 
-class DrawManager {
+class MeshManager {
 private:
-    DrawRender* render;
+    MeshRender* render;
 
     void instanciateRender();
 public:
-	DrawManager();
-	virtual ~DrawManager();
+	MeshManager();
+	virtual ~MeshManager();
     
-    DrawRender* getRender();
+    MeshRender* getRender();
 
     bool load();
 	bool draw();
     void destroy();
 };
 
-#endif /* drawmanager_h */
+#endif /* MeshManager_h */

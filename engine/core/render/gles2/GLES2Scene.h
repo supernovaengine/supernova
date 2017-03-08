@@ -9,37 +9,13 @@
 
 class GLES2Scene : public SceneRender{
     
-friend class GLES2Draw;
+friend class GLES2Mesh;
 friend class GLES2Point;
-    
-private:
-    
-    Vector3 ambientLight;
-    
-    int numPointLight;
-    std::vector<GLfloat> pointLightPos;
-    std::vector<GLfloat> pointLightPower;
-    std::vector<GLfloat> pointLightColor;
-    
-    int numSpotLight;
-    std::vector<GLfloat> spotLightPos;
-    std::vector<GLfloat> spotLightPower;
-    std::vector<GLfloat> spotLightColor;
-    std::vector<GLfloat> spotLightCutOff;
-    std::vector<GLfloat> spotLightTarget;
-    
-    int numDirectionalLight;
-    std::vector<GLfloat> directionalLightDir;
-    std::vector<GLfloat> directionalLightPower;
-    std::vector<GLfloat> directionalLightColor;
     
 public:
     
     GLES2Scene();
     virtual ~GLES2Scene();
-    
-    void setAmbientLight(Vector3 ambientLight);
-    void setLights(std::vector<Light*> lights);
 
     bool load(bool childScene);
     bool draw(bool childScene, bool useDepth, bool useTransparency);

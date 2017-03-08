@@ -4,7 +4,7 @@
 
 #include "ConcreteObject.h"
 #include "math/Vector4.h"
-#include "render/DrawManager.h"
+#include "render/MeshManager.h"
 #include "Submesh.h"
 
 class Mesh: public ConcreteObject {
@@ -13,7 +13,7 @@ private:
     void removeAllSubmeshes();
     
 protected:
-    DrawManager renderManager;
+    MeshManager renderManager;
 
     std::vector<Vector3> vertices;
     std::vector<Vector3> normals;

@@ -172,7 +172,7 @@ std::string gFragmentPointsPerPixelLightShader =
 
 
 
-std::string gVertexShaderPerPixelLightTexture =
+std::string gVertexMeshPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 
 "attribute vec4 a_Position;\n"
@@ -187,12 +187,6 @@ std::string gVertexShaderPerPixelLightTexture =
 "#ifdef IS_SPRITESHEET\n"
 "  attribute vec2 a_spritePos;\n"
 "  varying vec2 v_spritePos;\n"
-"#endif\n"
-
-"#ifdef IS_POINTS\n"
-"  attribute float a_PointSize;\n"
-"  attribute vec4 a_pointColor;\n"
-"  varying vec4 v_pointColor;\n"
 "#endif\n"
 
 "void main(){\n"
@@ -213,11 +207,6 @@ std::string gVertexShaderPerPixelLightTexture =
 "      position.z  = position.w;\n"
 "    #endif\n"
 
-"    #ifdef IS_POINTS\n"
-"      v_pointColor = a_pointColor;\n"
-"      gl_PointSize = a_PointSize;\n"
-"    #endif\n"
-
 "    #ifdef IS_SPRITESHEET\n"
 "      v_spritePos = a_spritePos;\n"
 "    #endif\n"
@@ -225,7 +214,7 @@ std::string gVertexShaderPerPixelLightTexture =
 "    gl_Position = position;\n"
 "}\n";
 
-std::string gFragmentShaderPerPixelLightTexture =
+std::string gFragmentMeshPerPixelLightShader =
 "precision mediump float;\n"
 
 "#ifndef USE_TEXTURECUBE\n"
@@ -235,10 +224,6 @@ std::string gFragmentShaderPerPixelLightTexture =
 "#endif\n"
 
 "uniform vec4 u_Color;\n"
-
-"#ifdef IS_POINTS\n"
-"  varying vec4 v_pointColor;\n"
-"#endif\n"
 
 "uniform bool uUseTexture;\n"
 
@@ -259,28 +244,13 @@ std::string gFragmentShaderPerPixelLightTexture =
     //Texture or color
 "   vec4 fragmentColor = vec4(0.0);\n"
 "   if (uUseTexture){\n"
-
-"     #ifndef USE_TEXTURECUBE\n"
-
-"       #ifndef IS_POINTS\n"
-"         #ifdef USE_TEXTURECOORDS\n"
-"           fragmentColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy);\n"
-"         #endif\n"
+"     #ifdef USE_TEXTURECOORDS\n"
+"       #ifndef USE_TEXTURECUBE\n"
+"         fragmentColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy);\n"
 "       #else\n"
-"         #ifdef IS_SPRITESHEET\n"
-"            vec2 resultCoord = gl_PointCoord * (u_spriteSize / u_textureSize) + ((u_spriteSize / u_textureSize) * (v_spritePos / u_spriteSize));\n"
-"         #else\n"
-"            vec2 resultCoord = gl_PointCoord;\n"
-"         #endif\n"
-"         fragmentColor = texture2D(u_TextureUnit, resultCoord);\n"
-"       #endif\n"
-
-"     #else\n"
-"       #ifdef USE_TEXTURECOORDS\n"
 "         fragmentColor = textureCube(u_TextureUnit, v_TextureCoordinates);\n"
 "       #endif\n"
 "     #endif\n"
-
 "   }else{\n"
 "       #ifndef IS_POINTS\n"
 "         fragmentColor = u_Color;\n"

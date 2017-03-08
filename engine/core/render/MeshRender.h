@@ -1,15 +1,32 @@
-#ifndef DrawRender_h
-#define DrawRender_h
+#ifndef MeshRender_h
+#define MeshRender_h
 
 #include "math/Vector2.h"
 #include "render/SceneRender.h"
+#include "render/TextureRender.h"
 #include "Submesh.h"
 #include <vector>
+#include <unordered_map>
 
 
-class DrawRender {
+class MeshRender {
+
+    typedef struct {
+        std::shared_ptr<TextureRender> texture;
+        unsigned int indicesSizes;
+        bool textured;
+    } SubmeshStruct;
+
+private:
+
+    void checkLighting();
     
 protected:
+
+    bool loaded;
+    bool lighting;
+
+    std::unordered_map<Submesh*, SubmeshStruct> submeshesGles;
     
     SceneRender* sceneRender;
     
@@ -25,7 +42,6 @@ protected:
     
     Material* material;
 
-    bool isPoints;
     bool isSky;
     bool isSpriteSheet;
 
@@ -38,19 +54,11 @@ protected:
     int spritePosX;
     int spritePosY;
     
-    std::vector< std::pair<int, int> >* pointSpritesPos;
-    
-    std::vector<float>* pointSizes;
-    
-    std::vector<Vector4>* pointColors;
-
-    int pointSize;
-    
     int primitiveMode;
 public:
     
-    DrawRender();
-    virtual ~DrawRender();
+    MeshRender();
+    virtual ~MeshRender();
     
     void setSceneRender(SceneRender* sceneRender);
     void setPositions(std::vector<Vector3>* positions);
@@ -63,27 +71,20 @@ public:
     void setCameraPosition(Vector3* cameraPosition);
     void setPrimitiveMode(int primitiveMode);
     void setMaterial(Material* material);
-    void setIsPoints(bool isPoints);
     void setIsSky(bool isSky);
-    void setPointSizes(std::vector<float>* pointSizes);
     void setIsSpriteSheet(bool isSpriteSheet);
     void setTextureSize(int textureSizeWidth, int textureSizeHeight);
     void setSpriteSize(int spriteSizeWidth, int spriteSizeHeight);
     void setSpritePos(int spritePosX, int spritePosY);
-    void setPointSpritesPos(std::vector< std::pair<int, int> >* pointSpritesPos);
-    void setPointColors(std::vector<Vector4>* pointColors);
     
     virtual void updatePositions() = 0;
     virtual void updateTexcoords() = 0;
     virtual void updateNormals() = 0;
-    virtual void updatePointSizes() = 0;
-    virtual void updateSpritePos() = 0;
-    virtual void updatePointColors() = 0;
     
-    virtual bool load() = 0;
+    virtual bool load();
     virtual bool draw() = 0;
     virtual void destroy() = 0;
     
 };
 
-#endif /* DrawRender_h */
+#endif /* MeshRender_h */

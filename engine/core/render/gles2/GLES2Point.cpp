@@ -73,6 +73,8 @@ bool GLES2Point::load() {
     }
     
     gProgram = ProgramManager::useProgram(programName, programDefs);
+
+    light.setProgram((GLES2Program*)gProgram.get());
     
     useTexture = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "uUseTexture");
     
@@ -109,34 +111,11 @@ bool GLES2Point::load() {
             uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
         }
     }
-
-    
-    if (this->lighting){
-        uEyePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_EyePos");
-        
-        u_AmbientLight = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_AmbientLight");
-        
-        u_NumPointLight = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_NumPointLight");
-        u_PointLightPos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_PointLightPos");
-        u_PointLightPower = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_PointLightPower");
-        u_PointLightColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_PointLightColor");
-        
-        u_NumSpotLight = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_NumSpotLight");
-        u_SpotLightPos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_SpotLightPos");
-        u_SpotLightPower = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_SpotLightPower");
-        u_SpotLightColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_SpotLightColor");
-        u_SpotLightTarget = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_SpotLightTarget");
-        u_SpotLightCutOff = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_SpotLightCutOff");
-        
-        u_NumDirectionalLight = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_NumDirectionalLight");
-        u_DirectionalLightDir = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_DirectionalLightDir");
-        u_DirectionalLightPower = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_DirectionalLightPower");
-        u_DirectionalLightColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_DirectionalLightColor");
-        
-    }
     
     u_mvpMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mvpMatrix");
     if (this->lighting){
+        light.getUniformLocations();
+        uEyePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_EyePos");
         u_mMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mMatrix");
         u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
     }
@@ -156,45 +135,16 @@ bool GLES2Point::draw() {
     if (!loaded){
         return false;
     }
-
     
     glUseProgram(((GLES2Program*)gProgram.get())->getProgram());
     GLES2Util::checkGlError("glUseProgram");
     
     glUniformMatrix4fv(u_mvpMatrix, 1, GL_FALSE, (GLfloat*)modelViewProjectionMatrix);
     if (this->lighting){
+        light.setUniformValues(sceneRender);
+        glUniform3fv(uEyePos, 1, cameraPosition->ptr());
         glUniformMatrix4fv(u_mMatrix, 1, GL_FALSE, (GLfloat*)modelMatrix);
         glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);
-    }
-    
-    if (this->lighting){
-        glUniform3fv(uEyePos, 1, cameraPosition->ptr());
-        
-        glUniform3fv(u_AmbientLight, 1, ((GLES2Scene*)sceneRender)->ambientLight.ptr());
-        
-        glUniform1i(u_NumPointLight, ((GLES2Scene*)sceneRender)->numPointLight);
-        if (((GLES2Scene*)sceneRender)->numPointLight > 0){
-            glUniform3fv(u_PointLightPos, ((GLES2Scene*)sceneRender)->numPointLight, &((GLES2Scene*)sceneRender)->pointLightPos.front());
-            glUniform1fv(u_PointLightPower, ((GLES2Scene*)sceneRender)->numPointLight, &((GLES2Scene*)sceneRender)->pointLightPower.front());
-            glUniform3fv(u_PointLightColor, ((GLES2Scene*)sceneRender)->numPointLight, &((GLES2Scene*)sceneRender)->pointLightColor.front());
-        }
-        
-        glUniform1i(u_NumSpotLight, ((GLES2Scene*)sceneRender)->numSpotLight);
-        if (((GLES2Scene*)sceneRender)->numSpotLight > 0){
-            glUniform3fv(u_SpotLightPos, ((GLES2Scene*)sceneRender)->numSpotLight, &((GLES2Scene*)sceneRender)->spotLightPos.front());
-            glUniform1fv(u_SpotLightPower, ((GLES2Scene*)sceneRender)->numSpotLight, &((GLES2Scene*)sceneRender)->spotLightPower.front());
-            glUniform3fv(u_SpotLightColor, ((GLES2Scene*)sceneRender)->numSpotLight, &((GLES2Scene*)sceneRender)->spotLightColor.front());
-            glUniform3fv(u_SpotLightTarget, ((GLES2Scene*)sceneRender)->numSpotLight, &((GLES2Scene*)sceneRender)->spotLightTarget.front());
-            glUniform1fv(u_SpotLightCutOff, ((GLES2Scene*)sceneRender)->numSpotLight, &((GLES2Scene*)sceneRender)->spotLightCutOff.front());
-        }
-        
-        glUniform1i(u_NumDirectionalLight, ((GLES2Scene*)sceneRender)->numDirectionalLight);
-        if (((GLES2Scene*)sceneRender)->numDirectionalLight > 0){
-            glUniform3fv(u_DirectionalLightDir, ((GLES2Scene*)sceneRender)->numDirectionalLight, &((GLES2Scene*)sceneRender)->directionalLightDir.front());
-            glUniform1fv(u_DirectionalLightPower, ((GLES2Scene*)sceneRender)->numDirectionalLight, &((GLES2Scene*)sceneRender)->directionalLightPower.front());
-            glUniform3fv(u_DirectionalLightColor, ((GLES2Scene*)sceneRender)->numDirectionalLight, &((GLES2Scene*)sceneRender)->directionalLightColor.front());
-        }
-        
     }
     
     if (isSpriteSheet) {
@@ -229,43 +179,39 @@ bool GLES2Point::draw() {
             glVertexAttribPointer(a_spritePos, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
         }
     }
-    
 
-        attributePos++;
-        glEnableVertexAttribArray(attributePos);
-        if (pointSizes) {
-            glBindBuffer(GL_ARRAY_BUFFER, pointSizeBuffer);
-            if (a_PointSize == -1) a_PointSize = attributePos;
-            glVertexAttribPointer(a_PointSize, 1, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-        }
+    attributePos++;
+    glEnableVertexAttribArray(attributePos);
+    if (pointSizes) {
+        glBindBuffer(GL_ARRAY_BUFFER, pointSizeBuffer);
+        if (a_PointSize == -1) a_PointSize = attributePos;
+        glVertexAttribPointer(a_PointSize, 1, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    }
         
-        attributePos++;
-        glEnableVertexAttribArray(attributePos);
-        if (pointColors) {
-            glBindBuffer(GL_ARRAY_BUFFER, pointColorBuffer);
-            if (a_pointColor == -1) a_pointColor = attributePos;
-            glVertexAttribPointer(a_pointColor, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-        }
-
-    
-
+    attributePos++;
+    glEnableVertexAttribArray(attributePos);
+    if (pointColors) {
+        glBindBuffer(GL_ARRAY_BUFFER, pointColorBuffer);
+        if (a_pointColor == -1) a_pointColor = attributePos;
+        glVertexAttribPointer(a_pointColor, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    }
         
-        glUniform1i(useTexture, textured);
+    glUniform1i(useTexture, textured);
         
-        if (textured){
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(((GLES2Texture*)(texture.get()))->getTextureType(), ((GLES2Texture*)(texture.get()))->getTexture());
-            glUniform1i(uTextureUnitLocation, 0);
-        }else{
-            if (Supernova::getPlatform() == S_WEB){
+    if (textured){
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(((GLES2Texture*)(texture.get()))->getTextureType(), ((GLES2Texture*)(texture.get()))->getTexture());
+        glUniform1i(uTextureUnitLocation, 0);
+    }else{
+        if (Supernova::getPlatform() == S_WEB){
                 //Fix Chrome warnings of no texture bound
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
-                glUniform1i(uTextureUnitLocation, 0);
-            }
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
+            glUniform1i(uTextureUnitLocation, 0);
         }
+    }
         
-        glDrawArrays(GL_POINTS, 0, numPoints);
+    glDrawArrays(GL_POINTS, 0, numPoints);
 
     
     for (int i = 0; i <= attributePos; i++)
@@ -289,17 +235,15 @@ void GLES2Point::destroy(){
             glDeleteBuffers(1, &spritePosBuffer);
         }
 
-            if (pointSizes)
-                glDeleteBuffers(1, &pointSizeBuffer);
-            if (pointColors)
-                glDeleteBuffers(1, &pointColorBuffer);
+        if (pointSizes)
+            glDeleteBuffers(1, &pointSizeBuffer);
+        if (pointColors)
+            glDeleteBuffers(1, &pointColorBuffer);
 
-
-
-            if (textured){
-                texture.reset();
-                TextureManager::deleteUnused();
-            }
+        if (textured){
+            texture.reset();
+            TextureManager::deleteUnused();
+        }
 
         gProgram.reset();
         ProgramManager::deleteUnused();
