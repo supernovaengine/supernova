@@ -153,3 +153,8 @@ bool MeshRender::load(){
 
     return true;
 }
+
+bool MeshRender::draw() {
+
+    return true;
+}

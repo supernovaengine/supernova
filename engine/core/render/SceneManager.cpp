@@ -7,7 +7,6 @@
 
 SceneManager::SceneManager() {
     scene = NULL;
-    childScene = false;
     instanciateRender();
 }
 
@@ -23,57 +22,18 @@ void SceneManager::instanciateRender(){
     }
 }
 
-void SceneManager::setLights(std::vector<Light*> lights){
-    instanciateRender();
-    this->lights = lights;
-    updateLights();
-}
-
-void SceneManager::setAmbientLight(Vector3 ambientLight){
-    instanciateRender();
-    this->ambientLight = ambientLight;
-    updateAmbientLight();
-}
-
-void SceneManager::updateLights(){
-    if (scene)
-        scene->setLights(this->lights);
-}
-
-void SceneManager::updateAmbientLight(){
-    if (scene)
-        scene->setAmbientLight(this->ambientLight);
-}
-
-bool SceneManager::isChildScene(){
-    return childScene;
-}
-
-void SceneManager::setChildScene(bool childScene){
-    this->childScene = childScene;
-}
-
-void SceneManager::setUseDepth(bool useDepth){
-    this->useDepth = useDepth;
-}
-
-void SceneManager::setUseTransparency(bool useTransparency){
-    this->useTransparency = useTransparency;
-}
-
-SceneRender* SceneManager::getSceneRender(){
+SceneRender* SceneManager::getRender(){
     instanciateRender();
     return scene;
 }
 
 bool SceneManager::load() {
     instanciateRender();
-    return scene->load(childScene);
+    return scene->load();
 }
 
 bool SceneManager::draw() {
-    updateLights();
-    return scene->draw(childScene, useDepth, useTransparency);
+    return scene->draw();
 }
 
 bool SceneManager::viewSize(int x, int y, int width, int height){

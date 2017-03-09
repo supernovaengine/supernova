@@ -35,7 +35,7 @@ void GLES2Light::getUniformLocations(){
 }
 
 void GLES2Light::setUniformValues(SceneRender* sceneRender){
-    glUniform3fv(u_AmbientLight, 1, sceneRender->ambientLight.ptr());
+    glUniform3fv(u_AmbientLight, 1, sceneRender->ambientLight->ptr());
 
     glUniform1i(u_NumPointLight, sceneRender->numPointLight);
     if (sceneRender->numPointLight > 0){

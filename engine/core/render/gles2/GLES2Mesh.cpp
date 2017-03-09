@@ -91,8 +91,6 @@ bool GLES2Mesh::load() {
         if (submeshesGles[(*submeshes)[i]].indicesSizes > 0){
             std::vector<unsigned int> gIndices = *(*submeshes)[i]->getIndices();
             submeshesIndices[(*submeshes)[i]].indiceBuffer = GLES2Util::createVBO(GL_ELEMENT_ARRAY_BUFFER, gIndices.size() * sizeof(unsigned int), &gIndices.front(), GL_STATIC_DRAW);
-        }else{
-            submeshesIndices[(*submeshes)[i]].indiceBuffer = NULL;
         }
 
         if (submeshesGles[(*submeshes)[i]].textured){
@@ -133,6 +131,10 @@ bool GLES2Mesh::load() {
 }
 
 bool GLES2Mesh::draw() {
+
+    if (!MeshRender::draw()){
+        return false;
+    }
 
     if (!loaded){
         return false;

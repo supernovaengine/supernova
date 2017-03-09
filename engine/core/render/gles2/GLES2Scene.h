@@ -17,8 +17,8 @@ public:
     GLES2Scene();
     virtual ~GLES2Scene();
 
-    bool load(bool childScene);
-    bool draw(bool childScene, bool useDepth, bool useTransparency);
+    bool load();
+    bool draw();
     bool viewSize(int x, int y, int width, int height);
 
 };

@@ -82,7 +82,7 @@ public:
     virtual void updateNormals() = 0;
     
     virtual bool load();
-    virtual bool draw() = 0;
+    virtual bool draw();
     virtual void destroy() = 0;
     
 };

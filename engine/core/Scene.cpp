@@ -31,14 +31,12 @@ void Scene::addLight (Light* light){
     
     if (!founded){
         lights.push_back(light);
-        sceneManager.setLights(lights);
     }
 }
 
 void Scene::removeLight (Light* light){
     std::vector<Light*>::iterator i = std::remove(lights.begin(), lights.end(), light);
     lights.erase(i,lights.end());
-    sceneManager.setLights(lights);
 }
 
 void Scene::addSubScene (Scene* scene){
@@ -80,7 +78,7 @@ void Scene::removeGUIObject (GUIObject* guiobject){
 }
 
 SceneRender* Scene::getSceneRender(){
-    return sceneManager.getSceneRender();
+    return sceneManager.getRender();
 }
 
 void Scene::setSky(SkyBox* sky){
@@ -89,7 +87,6 @@ void Scene::setSky(SkyBox* sky){
 
 void Scene::setAmbientLight(Vector3 ambientLight){
     this->ambientLight = ambientLight;
-    sceneManager.setAmbientLight(ambientLight);
 }
 
 void Scene::setAmbientLight(const float ambientFactor){
@@ -206,8 +203,10 @@ void Scene::drawSky(){
 }
 
 bool Scene::load(){
-    
-    sceneManager.setChildScene(isChildScene);
+
+    sceneManager.getRender()->setChildScene(isChildScene);
+    sceneManager.getRender()->setLights(&this->lights);
+    sceneManager.getRender()->setAmbientLight(&this->ambientLight);
 
     doCamera();
 
@@ -226,8 +225,8 @@ bool Scene::draw(){
     
     transparentQueue.clear();
 
-    sceneManager.setUseDepth(useDepth);
-    sceneManager.setUseTransparency(useTransparency);
+    sceneManager.getRender()->setUseDepth(useDepth);
+    sceneManager.getRender()->setUseTramsparency(useTransparency);
     
     sceneManager.draw();
     resetSceneProperties();

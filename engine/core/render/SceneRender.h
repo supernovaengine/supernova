@@ -6,10 +6,19 @@
 class SceneRender {
     
 protected:
+
+    bool childScene;
+    bool useDepth;
+    bool useTransparency;
+
+    void updateLights();
     
 public:
 
-    Vector3 ambientLight;
+    Vector3* ambientLight;
+    std::vector<Light*>* lights;
+    bool lighting;
+
 
     int numPointLight;
     std::vector<float> pointLightPos;
@@ -27,17 +36,18 @@ public:
     std::vector<float> directionalLightDir;
     std::vector<float> directionalLightPower;
     std::vector<float> directionalLightColor;
-    
-    bool lighting;
 
     SceneRender();
     virtual ~SceneRender();
     
-    void setLights(std::vector<Light*> lights);
-    void setAmbientLight(Vector3 ambientLight);
+    void setLights(std::vector<Light*>* lights);
+    void setAmbientLight(Vector3* ambientLight);
+    void setChildScene(bool childScene);
+    void setUseDepth(bool useDepth);
+    void setUseTramsparency(bool useTransparency);
 
-    virtual bool load(bool childScene) = 0;
-    virtual bool draw(bool childScene, bool useDepth, bool useTransparency) = 0;
+    virtual bool load();
+    virtual bool draw();
     virtual bool viewSize(int x, int y, int width, int height) = 0;
     
 };

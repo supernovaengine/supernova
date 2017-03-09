@@ -149,3 +149,8 @@ bool PointRender::load(){
     
     return true;
 }
+
+bool PointRender::draw() {
+
+    return true;
+}

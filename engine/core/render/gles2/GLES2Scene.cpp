@@ -15,7 +15,12 @@ GLES2Scene::~GLES2Scene() {
 }
 
 
-bool GLES2Scene::load(bool childScene) {
+bool GLES2Scene::load() {
+
+    if (!SceneRender::load()){
+        return false;
+    }
+
     if (!childScene) {
         //ProgramManager::clear();
         //TextureManager::clear();
@@ -31,7 +36,12 @@ bool GLES2Scene::load(bool childScene) {
     return true;
 }
 
-bool GLES2Scene::draw(bool childScene, bool useDepth, bool useTransparency) {
+bool GLES2Scene::draw() {
+
+    if (!SceneRender::draw()){
+        return false;
+    }
+
     if (!childScene) {
         glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
         GLES2Util::checkGlError("glClearColor");

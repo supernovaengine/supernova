@@ -131,6 +131,10 @@ bool GLES2Point::load() {
 }
 
 bool GLES2Point::draw() {
+
+    if (!PointRender::draw()){
+        return false;
+    }
     
     if (!loaded){
         return false;
