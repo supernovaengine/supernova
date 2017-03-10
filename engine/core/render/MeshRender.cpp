@@ -29,8 +29,7 @@ MeshRender::MeshRender(){
     spriteSizeWidth = 0;
     spriteSizeHeight = 0;
 
-    spritePosX = 0;
-    spritePosY = 0;
+    spritePos = NULL;
 
     primitiveMode = S_TRIANGLES;
 }
@@ -100,9 +99,8 @@ void MeshRender::setSpriteSize(int spriteSizeWidth, int spriteSizeHeight){
     this->spriteSizeHeight = spriteSizeHeight;
 }
 
-void MeshRender::setSpritePos(int spritePosX, int spritePosY){
-    this->spritePosX = spritePosX;
-    this->spritePosY = spritePosY;
+void MeshRender::setSpritePos(std::pair<int, int>* spritePos){
+    this->spritePos = spritePos;
 }
 
 void MeshRender::checkLighting(){

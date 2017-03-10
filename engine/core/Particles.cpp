@@ -129,15 +129,15 @@ void Particles::fillSpritePosPixelsVector(){
         int spritesPosX;
         spritesPixelsPos.clear();
         for (int i = 0; i < sprites.size(); i++){
-            
+
             if (sprites[i] < spritesX * spritesY){
                 spritesPosY = floor(sprites[i] / spritesX);
-                spritesPosX = (sprites[i]) - (spritesX) * spritesPosY;
+                spritesPosX = sprites[i] - spritesX * spritesPosY;
             }else{
                 spritesPosY = 0;
                 spritesPosX = 0;
             }
-            
+
             spritesPixelsPos.push_back(std::make_pair(spritesPosX * texWidth / spritesX, spritesPosY * texHeight / spritesY));
         }
     }
@@ -201,8 +201,6 @@ bool Particles::load(){
     renderManager.getRender()->setPointSpritesPos(&spritesPixelsPos);
     renderManager.getRender()->setPointColors(&colors);
 
-    //renderManager.getRender()->setIsPoints(true);
-    //renderManager.getRender()->setPrimitiveMode(S_POINTS);
     renderManager.getRender()->setIsSpriteSheet(isSpriteSheet);
 
     renderManager.load();

@@ -156,7 +156,7 @@ std::string gFragmentPointsPerPixelLightShader =
 "     #ifdef IS_SPRITESHEET\n"
 "       vec2 resultCoord = gl_PointCoord * (u_spriteSize / u_textureSize) + ((u_spriteSize / u_textureSize) * (v_spritePos / u_spriteSize));\n"
 "     #else\n"
-"        vec2 resultCoord = gl_PointCoord;\n"
+"       vec2 resultCoord = gl_PointCoord;\n"
 "     #endif\n"
 "     fragmentColor = texture2D(u_TextureUnit, resultCoord);\n"
 "   }else{\n"
@@ -185,8 +185,9 @@ std::string gVertexMeshPerPixelLightShader =
 + lightingVertexDec +
 
 "#ifdef IS_SPRITESHEET\n"
-"  attribute vec2 a_spritePos;\n"
-"  varying vec2 v_spritePos;\n"
+"  uniform vec2 u_spriteSize;\n"
+"  uniform vec2 u_textureSize;\n"
+"  uniform vec2 u_spritePos;\n"
 "#endif\n"
 
 "void main(){\n"
@@ -197,7 +198,13 @@ std::string gVertexMeshPerPixelLightShader =
 
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifndef USE_TEXTURECUBE\n"
-"        v_TextureCoordinates = vec3(a_TextureCoordinates,0.0);\n"
+"        #ifdef IS_SPRITESHEET\n"
+"          v_spritePos.y = ((u_textureSize.y / u_spriteSize.y) - (u_spritePos.y / u_spriteSize.y) - 1.0) * u_spriteSize.y;\n"
+"          vec2 resultCoords = (a_TextureCoordinates * (u_spriteSize / u_textureSize)) + v_spritePos / u_textureSize;\n"
+"        #else\n"
+"          vec2 resultCoords = a_TextureCoordinates;\n"
+"        #endif\n"
+"        v_TextureCoordinates = vec3(resultCoords,0.0);\n"
 "      #else\n"
 "        v_TextureCoordinates = vec3(a_Position);\n"
 "      #endif\n"
@@ -231,12 +238,6 @@ std::string gFragmentMeshPerPixelLightShader =
 
 "#ifdef USE_TEXTURECOORDS\n"
 "  varying vec3 v_TextureCoordinates;\n"
-"#endif\n"
-
-"#ifdef IS_SPRITESHEET\n"
-"  uniform vec2 u_spriteSize;\n"
-"  uniform vec2 u_textureSize;\n"
-"  varying vec2 v_spritePos;\n"
 "#endif\n"
 
 "void main(){\n"

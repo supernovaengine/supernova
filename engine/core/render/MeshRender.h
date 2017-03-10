@@ -51,8 +51,7 @@ protected:
     int spriteSizeWidth;
     int spriteSizeHeight;
 
-    int spritePosX;
-    int spritePosY;
+    std::pair<int, int>* spritePos;
     
     int primitiveMode;
 public:
@@ -75,7 +74,7 @@ public:
     void setIsSpriteSheet(bool isSpriteSheet);
     void setTextureSize(int textureSizeWidth, int textureSizeHeight);
     void setSpriteSize(int spriteSizeWidth, int spriteSizeHeight);
-    void setSpritePos(int spritePosX, int spritePosY);
+    void setSpritePos(std::pair<int, int>* spritePos);
     
     virtual void updatePositions() = 0;
     virtual void updateTexcoords() = 0;
