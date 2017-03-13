@@ -130,6 +130,7 @@
 		715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7125E32B1D7CC7470090B05E /* ImageReader.cpp */; };
 		715824001D96EB4600AB1181 /* BMPReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715823FE1D96EB4600AB1181 /* BMPReader.cpp */; };
 		715824031D9803EF00AB1181 /* TextureManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715824011D9803EF00AB1181 /* TextureManager.cpp */; };
+		71598C401E76203A000EDAC0 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71598C3D1E762037000EDAC0 /* Sprite.cpp */; };
 		715AC0D31D7B0A29003D7C8C /* lapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 713D2D011CFB2EFA00A4752F /* lapi.c */; };
 		715AC0D41D7B0A29003D7C8C /* lauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 713D2D041CFB2EFA00A4752F /* lauxlib.c */; };
 		715AC0D51D7B0A29003D7C8C /* lbaselib.c in Sources */ = {isa = PBXBuildFile; fileRef = 713D2D071CFB2EFA00A4752F /* lbaselib.c */; };
@@ -724,6 +725,8 @@
 		715823FF1D96EB4600AB1181 /* BMPReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BMPReader.h; sourceTree = "<group>"; };
 		715824011D9803EF00AB1181 /* TextureManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureManager.cpp; sourceTree = "<group>"; };
 		715824021D9803EF00AB1181 /* TextureManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureManager.h; sourceTree = "<group>"; };
+		71598C3D1E762037000EDAC0 /* Sprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sprite.cpp; sourceTree = "<group>"; };
+		71598C3E1E762037000EDAC0 /* Sprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sprite.h; sourceTree = "<group>"; };
 		715AC0CA1D7B09F4003D7C8C /* liblua.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblua.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		716AB5A21BEF9F3C001B672D /* Supernova.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Supernova.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		716AB5A61BEF9F3C001B672D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -1133,6 +1136,8 @@
 				7188F1AB1DBBAB0B00A2D04F /* Sound.h */,
 				713384DC1D2F560400DB73A5 /* SpotLight.cpp */,
 				713384DD1D2F560400DB73A5 /* SpotLight.h */,
+				71598C3D1E762037000EDAC0 /* Sprite.cpp */,
+				71598C3E1E762037000EDAC0 /* Sprite.h */,
 				71EC2E3E1D3D92F700E14D84 /* Submesh.cpp */,
 				71EC2E3F1D3D92F700E14D84 /* Submesh.h */,
 				713D2A691CFB2EAD00A4752F /* Supernova.cpp */,
@@ -2495,6 +2500,7 @@
 				71CDC7151D7B14510060EEFF /* Model.cpp in Sources */,
 				71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */,
 				71CDC70F1D7B14510060EEFF /* DirectionalLight.cpp in Sources */,
+				71598C401E76203A000EDAC0 /* Sprite.cpp in Sources */,
 				71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */,
 				71BCF6C21E476F42008E42A2 /* Text.cpp in Sources */,
 				71CDC7231D7B146D0060EEFF /* Matrix4.cpp in Sources */,

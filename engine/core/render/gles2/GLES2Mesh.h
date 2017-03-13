@@ -42,6 +42,7 @@ private:
     
     GLuint u_spriteSize;
     GLuint u_textureSize;
+    GLuint u_spritePos;
 
     GLuint vertexBuffer;
     GLuint normalBuffer;

@@ -27,9 +27,6 @@ PointRender::PointRender(){
     
     spriteSizeWidth = 0;
     spriteSizeHeight = 0;
-    
-    spritePosX = 0;
-    spritePosY = 0;
 }
 
 PointRender::~PointRender(){
@@ -83,11 +80,6 @@ void PointRender::setTextureSize(int textureSizeWidth, int textureSizeHeight){
 void PointRender::setSpriteSize(int spriteSizeWidth, int spriteSizeHeight){
     this->spriteSizeWidth = spriteSizeWidth;
     this->spriteSizeHeight = spriteSizeHeight;
-}
-
-void PointRender::setSpritePos(int spritePosX, int spritePosY){
-    this->spritePosX = spritePosX;
-    this->spritePosY = spritePosY;
 }
 
 void PointRender::setPointSpritesPos(std::vector< std::pair<int, int> >* pointSpritesPos){

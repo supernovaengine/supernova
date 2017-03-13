@@ -6,6 +6,8 @@ MeshRender::MeshRender(){
 
     loaded = false;
     lighting = false;
+    
+    submeshesGles.clear();
 
     sceneRender = NULL;
     
@@ -22,6 +24,7 @@ MeshRender::MeshRender(){
     material = NULL;
 
     isSky = false;
+    isSpriteSheet = false;
     
     textureSizeWidth = 0;
     textureSizeHeight = 0;

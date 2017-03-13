@@ -45,9 +45,6 @@ protected:
     
     int spriteSizeWidth;
     int spriteSizeHeight;
-    
-    int spritePosX;
-    int spritePosY;
 
 public:
     
@@ -66,7 +63,6 @@ public:
     void setIsSpriteSheet(bool isSpriteSheet);
     void setTextureSize(int textureSizeWidth, int textureSizeHeight);
     void setSpriteSize(int spriteSizeWidth, int spriteSizeHeight);
-    void setSpritePos(int spritePosX, int spritePosY);
     void setPointSpritesPos(std::vector< std::pair<int, int> >* pointSpritesPos);
     void setPointColors(std::vector<Vector4>* pointColors);
     

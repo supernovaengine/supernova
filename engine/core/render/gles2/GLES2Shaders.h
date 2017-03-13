@@ -199,8 +199,8 @@ std::string gVertexMeshPerPixelLightShader =
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifndef USE_TEXTURECUBE\n"
 "        #ifdef IS_SPRITESHEET\n"
-"          v_spritePos.y = ((u_textureSize.y / u_spriteSize.y) - (u_spritePos.y / u_spriteSize.y) - 1.0) * u_spriteSize.y;\n"
-"          vec2 resultCoords = (a_TextureCoordinates * (u_spriteSize / u_textureSize)) + v_spritePos / u_textureSize;\n"
+"          vec2 invSpritePos = vec2(u_spritePos.x, ((u_textureSize.y / u_spriteSize.y) - (u_spritePos.y / u_spriteSize.y) - 1.0) * u_spriteSize.y);\n"
+"          vec2 resultCoords = (a_TextureCoordinates * (u_spriteSize / u_textureSize)) + invSpritePos / u_textureSize;\n"
 "        #else\n"
 "          vec2 resultCoords = a_TextureCoordinates;\n"
 "        #endif\n"
@@ -212,10 +212,6 @@ std::string gVertexMeshPerPixelLightShader =
 
 "    #ifdef IS_SKY\n"
 "      position.z  = position.w;\n"
-"    #endif\n"
-
-"    #ifdef IS_SPRITESHEET\n"
-"      v_spritePos = a_spritePos;\n"
 "    #endif\n"
 
 "    gl_Position = position;\n"

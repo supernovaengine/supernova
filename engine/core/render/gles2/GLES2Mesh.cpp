@@ -124,6 +124,12 @@ bool GLES2Mesh::load() {
         u_mMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mMatrix");
         u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
     }
+    
+    if (isSpriteSheet) {
+        u_spriteSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_spriteSize");
+        u_textureSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureSize");
+        u_spritePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_spritePos");
+    }
 
     GLES2Util::checkGlError("Error on load GLES2");
 
@@ -156,7 +162,9 @@ bool GLES2Mesh::draw() {
     }
     
     if (isSpriteSheet) {
-
+        glUniform2f(u_spriteSize, spriteSizeWidth, spriteSizeHeight);
+        glUniform2f(u_textureSize, textureSizeWidth, textureSizeHeight);
+        glUniform2f(u_spritePos, spritePos->first, spritePos->second);
     }
     
     int attributePos = -1;
