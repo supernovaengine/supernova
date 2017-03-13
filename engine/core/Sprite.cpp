@@ -59,6 +59,11 @@ bool Sprite::load(){
         TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
         texWidth = TextureManager::getTextureWidth(submeshes[0]->getMaterial()->getTextures()[0]);
         texHeight = TextureManager::getTextureHeight(submeshes[0]->getMaterial()->getTextures()[0]);
+
+        if (this->width == 0 && this->height == 0){
+            this->width = texWidth / spritesX;
+            this->height = texHeight / spritesY;
+        }
     }
 
     renderManager.getRender()->setIsSpriteSheet(isSpriteSheet);
