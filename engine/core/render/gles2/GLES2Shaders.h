@@ -99,6 +99,21 @@ std::string lightingFragmentImp =
 "     }\n"
 "   #endif\n";
 
+std::string fogFragmentImp =
+"   vec3 fogColor = vec3(0.8, 0.8, 0.8);\n"
+"   float FogDensity = 0.0010;\n"
+"   float fogFactor = 0.1;\n"
+"   const float LOG2 = 1.442695;\n"
+
+"    #ifndef IS_SKY\n"
+"      float dist = (gl_FragCoord.z / gl_FragCoord.w);\n"
+//"      fogFactor = (800.0 - dist)/(800.0 - 300.0);\n"
+//"        fogFactor = exp2( -FogDensity * dist * LOG2);\n"
+"      fogFactor = exp2( -FogDensity * FogDensity * dist * dist * LOG2);\n"
+"      fogFactor = clamp( fogFactor, 0.1, 1.0);\n"
+"    #endif\n"
+
+"   FragColor = mix(fogColor, FragColor, fogFactor);\n";
 
 std::string gVertexPointsPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
@@ -165,7 +180,7 @@ std::string gFragmentPointsPerPixelLightShader =
 
 "   vec3 FragColor = vec3(fragmentColor);\n"
 
-+   lightingFragmentImp +
++   lightingFragmentImp + fogFragmentImp +
 
 "   gl_FragColor = vec4(FragColor ,fragmentColor.a);\n"
 "}\n";
@@ -258,7 +273,7 @@ std::string gFragmentMeshPerPixelLightShader =
 
 "   vec3 FragColor = vec3(fragmentColor);\n"
 
-+ lightingFragmentImp +
++ lightingFragmentImp + fogFragmentImp +
 
 "   gl_FragColor = vec4(FragColor ,fragmentColor.a);\n"
 "}\n";
