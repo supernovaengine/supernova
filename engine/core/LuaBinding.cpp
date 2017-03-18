@@ -125,7 +125,6 @@ void LuaBinding::bind(){
     .beginExtendClass<Scene, Object>("Scene")
     .addConstructor(LUA_ARGS())
     .addFunction("setCamera", &Scene::setCamera)
-    .addFunction("addObject", &Scene::addObject)
     .addFunction("setAmbientLight", (void (Scene::*)(const float))&Scene::setAmbientLight)
     .addProperty("ambientLight", &Scene::getAmbientLight, (void (Scene::*)(Vector3))&Scene::setAmbientLight)
     .endClass()

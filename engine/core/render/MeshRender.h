@@ -20,11 +20,13 @@ class MeshRender {
 private:
 
     void checkLighting();
+    void checkFog();
     
 protected:
 
     bool loaded;
     bool lighting;
+    bool hasfog;
 
     std::unordered_map<Submesh*, SubmeshStruct> submeshesGles;
     

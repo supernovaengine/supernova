@@ -54,8 +54,11 @@ bool GLES2Mesh::load() {
     if (isSky){
         programDefs += "#define IS_SKY\n";
     }
-    if (this->lighting){
+    if (lighting){
         programDefs += "#define USE_LIGHTING\n";
+    }
+    if (hasfog){
+        programDefs += "#define HAS_FOG\n";
     }
     if (isSpriteSheet){
         programDefs += "#define IS_SPRITESHEET\n";
@@ -67,6 +70,7 @@ bool GLES2Mesh::load() {
     gProgram = ProgramManager::useProgram(programName, programDefs);
 
     light.setProgram((GLES2Program*)gProgram.get());
+    fog.setProgram((GLES2Program*)gProgram.get());
 
     useTexture = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "uUseTexture");
 
@@ -78,7 +82,7 @@ bool GLES2Mesh::load() {
         aTextureCoordinatesLocation = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_TextureCoordinates");
     }
     
-    if (normals && this->lighting){
+    if (normals && lighting){
         normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_STATIC_DRAW);
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
     }
@@ -118,7 +122,7 @@ bool GLES2Mesh::load() {
     }
 
     u_mvpMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mvpMatrix");
-    if (this->lighting){
+    if (lighting){
         light.getUniformLocations();
         uEyePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_EyePos");
         u_mMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mMatrix");
@@ -129,6 +133,10 @@ bool GLES2Mesh::load() {
         u_spriteSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_spriteSize");
         u_textureSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureSize");
         u_spritePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_spritePos");
+    }
+    
+    if (hasfog){
+        fog.getUniformLocations();
     }
 
     GLES2Util::checkGlError("Error on load GLES2");
@@ -154,7 +162,7 @@ bool GLES2Mesh::draw() {
     GLES2Util::checkGlError("glUseProgram");
 
     glUniformMatrix4fv(u_mvpMatrix, 1, GL_FALSE, (GLfloat*)modelViewProjectionMatrix);
-    if (this->lighting){
+    if (lighting){
         light.setUniformValues(sceneRender);
         glUniform3fv(uEyePos, 1, cameraPosition->ptr());
         glUniformMatrix4fv(u_mMatrix, 1, GL_FALSE, (GLfloat*)modelMatrix);
@@ -166,6 +174,11 @@ bool GLES2Mesh::draw() {
         glUniform2f(u_textureSize, textureSizeWidth, textureSizeHeight);
         glUniform2f(u_spritePos, spritePos->first, spritePos->second);
     }
+    
+    if (hasfog){
+        fog.setUniformValues(sceneRender);
+    }
+
     
     int attributePos = -1;
 
@@ -183,7 +196,7 @@ bool GLES2Mesh::draw() {
         glVertexAttribPointer(aTextureCoordinatesLocation, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     }
 
-    if (this->lighting) {
+    if (lighting) {
         attributePos++;
         glEnableVertexAttribArray(attributePos);
         if (normals) {
@@ -244,7 +257,7 @@ void GLES2Mesh::destroy(){
         if (texcoords){
             glDeleteBuffers(1, &uvBuffer);
         }
-        if (this->lighting && normals){
+        if (lighting && normals){
             glDeleteBuffers(1, &normalBuffer);
         }
         if (submeshes){

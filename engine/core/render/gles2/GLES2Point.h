@@ -14,6 +14,7 @@
 #include "render/PointRender.h"
 #include "render/SceneRender.h"
 #include "GLES2Light.h"
+#include "GLES2Fog.h"
 
 
 class GLES2Point : public PointRender {
@@ -21,6 +22,7 @@ class GLES2Point : public PointRender {
 private:
 
     GLES2Light light;
+    GLES2Fog fog;
     
     std::shared_ptr<ProgramRender> gProgram;
 

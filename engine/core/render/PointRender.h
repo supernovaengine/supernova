@@ -13,11 +13,13 @@ class PointRender {
 private:
     
     void checkLighting();
+    void checkFog();
     
 protected:
     
     bool loaded;
     bool lighting;
+    bool hasfog;
     
     int numPoints;
     std::shared_ptr<TextureRender> texture;

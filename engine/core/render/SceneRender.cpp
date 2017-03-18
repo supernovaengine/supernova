@@ -9,6 +9,7 @@ SceneRender::SceneRender(){
 
     lights = NULL;
     ambientLight = NULL;
+    fog = NULL;
 }
 
 SceneRender::~SceneRender(){
@@ -102,6 +103,10 @@ void SceneRender::setUseDepth(bool useDepth){
 
 void SceneRender::setUseTramsparency(bool useTransparency){
     this->useTransparency = useTransparency;
+}
+
+void SceneRender::setFog(Fog* fog){
+    this->fog = fog;
 }
 
 bool SceneRender::load(){

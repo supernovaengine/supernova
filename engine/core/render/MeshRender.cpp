@@ -6,6 +6,7 @@ MeshRender::MeshRender(){
 
     loaded = false;
     lighting = false;
+    hasfog = false;
     
     submeshesGles.clear();
 
@@ -113,6 +114,13 @@ void MeshRender::checkLighting(){
     }
 }
 
+void MeshRender::checkFog(){
+    hasfog = false;
+    if ((sceneRender != NULL) && (sceneRender->fog != NULL)){
+        hasfog = true;
+    }
+}
+
 bool MeshRender::load(){
 
     if (positions->size() <= 0){
@@ -120,6 +128,7 @@ bool MeshRender::load(){
     }
 
     checkLighting();
+    checkFog();
 
     submeshesGles.clear();
     //---> For meshes

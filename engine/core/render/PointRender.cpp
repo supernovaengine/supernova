@@ -4,6 +4,7 @@ PointRender::PointRender(){
     
     loaded = false;
     lighting = false;
+    hasfog = false;
     
     sceneRender = NULL;
     
@@ -97,6 +98,13 @@ void PointRender::checkLighting(){
     }
 }
 
+void PointRender::checkFog(){
+    hasfog = false;
+    if ((sceneRender != NULL) && (sceneRender->fog != NULL)){
+        hasfog = true;
+    }
+}
+
 bool PointRender::load(){
     
     if (positions->size() <= 0){
@@ -104,6 +112,7 @@ bool PointRender::load(){
     }
     
     checkLighting();
+    checkFog();
     
     numPoints = (int)(*positions).size();
     

@@ -3,6 +3,7 @@
 
 #include "GLES2Header.h"
 #include "GLES2Light.h"
+#include "GLES2Fog.h"
 #include "../../Submesh.h"
 #include <vector>
 #include <unordered_map>
@@ -24,6 +25,7 @@ class GLES2Mesh : public MeshRender {
 private:
 
     GLES2Light light;
+    GLES2Fog fog;
     
     std::shared_ptr<ProgramRender> gProgram;
     
@@ -43,6 +45,13 @@ private:
     GLuint u_spriteSize;
     GLuint u_textureSize;
     GLuint u_spritePos;
+    
+    GLuint u_fogMode;
+    GLuint u_fogColor;
+    GLuint u_fogDensity;
+    GLuint u_fogVisibility;
+    GLuint u_fogStart;
+    GLuint u_fogEnd;
 
     GLuint vertexBuffer;
     GLuint normalBuffer;

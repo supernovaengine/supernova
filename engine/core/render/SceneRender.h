@@ -2,6 +2,7 @@
 #define SceneRender_h
 
 #include "Light.h"
+#include "Fog.h"
 
 class SceneRender {
     
@@ -17,8 +18,9 @@ public:
 
     Vector3* ambientLight;
     std::vector<Light*>* lights;
+    Fog* fog;
+    
     bool lighting;
-
 
     int numPointLight;
     std::vector<float> pointLightPos;
@@ -45,6 +47,7 @@ public:
     void setChildScene(bool childScene);
     void setUseDepth(bool useDepth);
     void setUseTramsparency(bool useTransparency);
+    void setFog(Fog* fog);
 
     virtual bool load();
     virtual bool draw();

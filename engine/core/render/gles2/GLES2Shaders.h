@@ -99,21 +99,37 @@ std::string lightingFragmentImp =
 "     }\n"
 "   #endif\n";
 
-std::string fogFragmentImp =
-"   vec3 fogColor = vec3(0.8, 0.8, 0.8);\n"
-"   float FogDensity = 0.0010;\n"
-"   float fogFactor = 0.1;\n"
-"   const float LOG2 = 1.442695;\n"
 
+std::string fogFragmentDec =
+"#ifdef HAS_FOG\n"
+"   uniform int u_fogMode;\n"
+"   uniform vec3 u_fogColor;\n"
+"   uniform float u_fogDensity;\n"
+"   uniform float u_fogVisibility;\n"
+"   uniform float u_fogStart;\n"
+"   uniform float u_fogEnd;\n"
+"#endif\n";
+
+std::string fogFragmentImp =
+"#ifdef HAS_FOG\n"
+"   float fogFactor = u_fogVisibility;\n"
 "    #ifndef IS_SKY\n"
-"      float dist = (gl_FragCoord.z / gl_FragCoord.w);\n"
-//"      fogFactor = (800.0 - dist)/(800.0 - 300.0);\n"
-//"        fogFactor = exp2( -FogDensity * dist * LOG2);\n"
-"      fogFactor = exp2( -FogDensity * FogDensity * dist * dist * LOG2);\n"
-"      fogFactor = clamp( fogFactor, 0.1, 1.0);\n"
+"      const float LOG2 = 1.442695;\n"
+"      float fogDensity = 0.001 * u_fogDensity;\n"
+"      float fogDist = (gl_FragCoord.z / gl_FragCoord.w);\n"
+"      if (u_fogMode == 0){\n"
+"          fogFactor = (u_fogEnd - fogDist)/(u_fogEnd - u_fogStart);\n"
+"      }else if (u_fogMode == 1){\n"
+"          fogFactor = exp2( -fogDensity * fogDist * LOG2);\n"
+"      }else if (u_fogMode == 2){\n"
+"          fogFactor = exp2( -fogDensity * fogDensity * fogDist * fogDist * LOG2);\n"
+"      }\n"
+"      fogFactor = clamp( fogFactor, u_fogVisibility, 1.0);\n"
 "    #endif\n"
 
-"   FragColor = mix(fogColor, FragColor, fogFactor);\n";
+"   FragColor = mix(u_fogColor, FragColor, fogFactor);\n"
+"#endif\n";
+
 
 std::string gVertexPointsPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
@@ -156,7 +172,7 @@ std::string gFragmentPointsPerPixelLightShader =
 
 "varying vec4 v_pointColor;\n"
 
-+ lightingFragmentDec +
++ lightingFragmentDec + fogFragmentDec +
 
 "#ifdef IS_SPRITESHEET\n"
 "  uniform vec2 u_spriteSize;\n"
@@ -245,7 +261,7 @@ std::string gFragmentMeshPerPixelLightShader =
 
 "uniform bool uUseTexture;\n"
 
-+ lightingFragmentDec +
++ lightingFragmentDec + fogFragmentDec +
 
 "#ifdef USE_TEXTURECOORDS\n"
 "  varying vec3 v_TextureCoordinates;\n"

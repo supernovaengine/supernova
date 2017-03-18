@@ -7,6 +7,7 @@
 #include "Render.h"
 #include "render/SceneManager.h"
 #include "Light.h"
+#include "Fog.h"
 #include "SkyBox.h"
 #include <vector>
 #include <map>
@@ -33,6 +34,7 @@ private:
     std::vector<Scene*> subScenes;
     std::vector<GUIObject*> guiObjects;
     SkyBox* sky;
+    Fog* fog;
     
     Vector3 ambientLight;
 
@@ -66,6 +68,8 @@ public:
     void setAmbientLight(Vector3 ambientLight);
     void setAmbientLight(const float ambientFactor);
     Vector3 getAmbientLight();
+    
+    void setFog(Fog* fog);
     
     void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 

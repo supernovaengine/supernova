@@ -14,6 +14,7 @@ Scene::Scene() {
     setAmbientLight(0.1);
     scene = this;
     sky = NULL;
+    fog = NULL;
 }
 
 Scene::~Scene() {
@@ -83,6 +84,10 @@ SceneRender* Scene::getSceneRender(){
 
 void Scene::setSky(SkyBox* sky){
     this->sky = sky;
+}
+
+void Scene::setFog(Fog* fog){
+    this->fog = fog;
 }
 
 void Scene::setAmbientLight(Vector3 ambientLight){
@@ -207,6 +212,7 @@ bool Scene::load(){
     sceneManager.getRender()->setChildScene(isChildScene);
     sceneManager.getRender()->setLights(&this->lights);
     sceneManager.getRender()->setAmbientLight(&this->ambientLight);
+    sceneManager.getRender()->setFog(fog);
 
     doCamera();
 
