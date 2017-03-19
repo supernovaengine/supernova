@@ -25,15 +25,15 @@ MeshRender::MeshRender(){
     material = NULL;
 
     isSky = false;
-    isSpriteSheet = false;
+    isSlicedImage = false;
     
     textureSizeWidth = 0;
     textureSizeHeight = 0;
 
-    spriteSizeWidth = 0;
-    spriteSizeHeight = 0;
+    sliceSizeWidth = 0;
+    sliceSizeHeight = 0;
 
-    spritePos = NULL;
+    slicePos = NULL;
 
     primitiveMode = S_TRIANGLES;
 }
@@ -89,8 +89,8 @@ void MeshRender::setIsSky(bool isSky){
     this->isSky = isSky;
 }
 
-void MeshRender::setIsSpriteSheet(bool isSpriteSheet){
-    this->isSpriteSheet = isSpriteSheet;
+void MeshRender::setIsSlicedImage(bool isSlicedImage){
+    this->isSlicedImage = isSlicedImage;
 }
 
 void MeshRender::setTextureSize(int textureSizeWidth, int textureSizeHeight){
@@ -98,13 +98,13 @@ void MeshRender::setTextureSize(int textureSizeWidth, int textureSizeHeight){
     this->textureSizeHeight = textureSizeHeight;
 }
 
-void MeshRender::setSpriteSize(int spriteSizeWidth, int spriteSizeHeight){
-    this->spriteSizeWidth = spriteSizeWidth;
-    this->spriteSizeHeight = spriteSizeHeight;
+void MeshRender::setSliceSize(int sliceSizeWidth, int sliceSizeHeight){
+    this->sliceSizeWidth = sliceSizeWidth;
+    this->sliceSizeHeight = sliceSizeHeight;
 }
 
-void MeshRender::setSpritePos(std::pair<int, int>* spritePos){
-    this->spritePos = spritePos;
+void MeshRender::setSlicePos(std::pair<int, int>* slicePos){
+    this->slicePos = slicePos;
 }
 
 void MeshRender::checkLighting(){

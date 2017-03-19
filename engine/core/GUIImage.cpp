@@ -1,18 +1,18 @@
 
-#include "ImageTemplate.h"
+#include "GUIImage.h"
 #include "PrimitiveMode.h"
 #include <string>
 #include "image/TextureLoader.h"
 #include "render/TextureManager.h"
 
-ImageTemplate::ImageTemplate(): Mesh2D(){
+GUIImage::GUIImage(): Mesh2D(){
 }
 
-ImageTemplate::~ImageTemplate(){
+GUIImage::~GUIImage(){
 
 }
 
-bool ImageTemplate::load(){
+bool GUIImage::load(){
 
     if (submeshes[0]->getMaterial()->getTextures().size() > 0){
         

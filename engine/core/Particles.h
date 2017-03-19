@@ -14,10 +14,10 @@ class Particles: public ConcreteObject {
 private:
     void updatePointScale();
     void fillScaledSizeVector();
-    void fillSpritePosPixelsVector();
+    void fillSlicesPosPixelsVector();
     
     std::vector<float> pointSizesScaled;
-    std::vector< std::pair<int, int> > spritesPixelsPos;
+    std::vector< std::pair<int, int> > slicesPos;
     
     int texWidth;
     int texHeight;
@@ -32,7 +32,7 @@ protected:
     std::vector<Vector3> positions;
     std::vector<Vector3> normals;
     std::vector<float> pointSizes;
-    std::vector<int> sprites;
+    std::vector<int> frames;
     std::vector<Vector4> colors;
 
     bool sizeAttenuation;
@@ -40,9 +40,9 @@ protected:
     float minPointSize;
     float maxPointSize;
 
-    bool isSpriteSheet;
-    int spritesX;
-    int spritesY;
+    bool isSlicedTexture;
+    int slicesX;
+    int slicesY;
 
 public:
     Particles();
@@ -63,11 +63,11 @@ public:
     void setParticlePosition(int particle, Vector3 position);
     void setParticlePosition(int particle, float x, float y, float z);
     void setParticleSize(int particle, float size);
-    void setParticleSprite(int particle, int sprite);
+    void setParticleFrame(int particle, int frame);
     void setParticleColor(int particle, Vector4 color);
     void setParticleColor(int particle, float red, float green, float blue, float alpha);
 
-    void setSpriteSheet(int spritesX, int spritesY);
+    void setTextureSlices(int slicesX, int slicesY);
 
     bool render();
     bool load();

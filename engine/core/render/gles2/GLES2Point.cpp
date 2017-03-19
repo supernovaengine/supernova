@@ -38,15 +38,15 @@ void GLES2Point::updatePointSizes(){
             GLES2Util::updateVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front());
 }
 
-void GLES2Point::updateSpritePos(){
+void GLES2Point::updateSlicesPos(){
     if (loaded){
-        if (isSpriteSheet && pointSpritesPos && textured){
-            std::vector<float> spritePosFloat;
-            std::transform(pointSpritesPos->begin(), pointSpritesPos->end(), std::back_inserter(spritePosFloat),
-                           [&spritePosFloat](const std::pair<int, int> &p)
-                           { spritePosFloat.push_back(p.first); return p.second ;});
+        if (isSlicedTexture && slicesPos && textured){
+            std::vector<float> slicesPosFloat;
+            std::transform(slicesPos->begin(), slicesPos->end(), std::back_inserter(slicesPosFloat),
+                           [&slicesPosFloat](const std::pair<int, int> &p)
+                           { slicesPosFloat.push_back(p.first); return p.second ;});
             
-            GLES2Util::updateVBO(spritePosBuffer, GL_ARRAY_BUFFER, spritePosFloat.size() * sizeof(GLfloat), &spritePosFloat.front());
+            GLES2Util::updateVBO(slicePosBuffer, GL_ARRAY_BUFFER, slicesPosFloat.size() * sizeof(GLfloat), &slicesPosFloat.front());
         }
     }
 }
@@ -71,8 +71,8 @@ bool GLES2Point::load() {
     if (hasfog){
         programDefs += "#define HAS_FOG\n";
     }
-    if (isSpriteSheet){
-        programDefs += "#define IS_SPRITESHEET\n";
+    if (isSlicedTexture){
+        programDefs += "#define IS_SLICEDTEXTURE\n";
     }
     
     gProgram = ProgramManager::useProgram(programName, programDefs);
@@ -90,13 +90,14 @@ bool GLES2Point::load() {
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
     }
     
-    if (isSpriteSheet){
-        std::vector<float> spritePosFloat;
-        std::transform(pointSpritesPos->begin(), pointSpritesPos->end(), std::back_inserter(spritePosFloat), [&spritePosFloat](const std::pair<int, int> &p)
-                       { spritePosFloat.push_back(p.first); return p.second ;});
+    if (isSlicedTexture){
+        std::vector<float> slicesPosFloat;
+        std::transform(slicesPos->begin(), slicesPos->end(), std::back_inserter(slicesPosFloat),
+                       [&slicesPosFloat](const std::pair<int, int> &p)
+                       { slicesPosFloat.push_back(p.first); return p.second ;});
         
-        spritePosBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, spritePosFloat.size() * sizeof(GLfloat), &spritePosFloat.front(), GL_DYNAMIC_DRAW);
-        a_spritePos = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_spritePos");
+        slicePosBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, slicesPosFloat.size() * sizeof(GLfloat), &slicesPosFloat.front(), GL_DYNAMIC_DRAW);
+        a_slicePos = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_slicePos");
     }
 
     pointSizeBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front(), GL_DYNAMIC_DRAW);
@@ -124,8 +125,8 @@ bool GLES2Point::load() {
         u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
     }
     
-    if (isSpriteSheet) {
-        u_spriteSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_spriteSize");
+    if (isSlicedTexture) {
+        u_sliceSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_sliceSize");
         u_textureSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureSize");
     }
     
@@ -160,8 +161,8 @@ bool GLES2Point::draw() {
         glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);
     }
     
-    if (isSpriteSheet) {
-        glUniform2f(u_spriteSize, spriteSizeWidth, spriteSizeHeight);
+    if (isSlicedTexture) {
+        glUniform2f(u_sliceSize, sliceSizeWidth, sliceSizeHeight);
         glUniform2f(u_textureSize, textureSizeWidth, textureSizeHeight);
     }
     
@@ -187,13 +188,13 @@ bool GLES2Point::draw() {
         }
     }
     
-    if (isSpriteSheet) {
+    if (isSlicedTexture) {
         attributePos++;
         glEnableVertexAttribArray(attributePos);
-        if (pointSpritesPos) {
-            glBindBuffer(GL_ARRAY_BUFFER, spritePosBuffer);
-            if (a_spritePos == -1) a_spritePos = attributePos;
-            glVertexAttribPointer(a_spritePos, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+        if (slicesPos) {
+            glBindBuffer(GL_ARRAY_BUFFER, slicePosBuffer);
+            if (a_slicePos == -1) a_slicePos = attributePos;
+            glVertexAttribPointer(a_slicePos, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
         }
     }
 
@@ -248,8 +249,8 @@ void GLES2Point::destroy(){
         if (lighting && normals){
             glDeleteBuffers(1, &normalBuffer);
         }
-        if (isSpriteSheet && pointSpritesPos){
-            glDeleteBuffers(1, &spritePosBuffer);
+        if (isSlicedTexture && slicesPos){
+            glDeleteBuffers(1, &slicePosBuffer);
         }
 
         if (pointSizes)

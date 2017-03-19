@@ -30,7 +30,7 @@ private:
     GLint aNormal;
     
     GLint a_PointSize;
-    GLint a_spritePos;
+    GLint a_slicePos;
     GLint a_pointColor;
     
     GLuint uTextureUnitLocation;
@@ -41,13 +41,13 @@ private:
     
     GLuint useTexture;
     
-    GLuint u_spriteSize;
+    GLuint u_sliceSize;
     GLuint u_textureSize;
     
     GLuint vertexBuffer;
     GLuint normalBuffer;
     GLuint pointSizeBuffer;
-    GLuint spritePosBuffer;
+    GLuint slicePosBuffer;
     GLuint pointColorBuffer;
 
     
@@ -58,7 +58,7 @@ public:
     void updatePositions();
     void updateNormals();
     void updatePointSizes();
-    void updateSpritePos();
+    void updateSlicesPos();
     void updatePointColors();
     
     bool load();

@@ -23,7 +23,7 @@
 #include "Mesh2D.h"
 #include "Image.h"
 #include "GUIObject.h"
-#include "ImageTemplate.h"
+#include "GUIImage.h"
 #include "Light.h"
 #include "PointLight.h"
 #include "SpotLight.h"
@@ -213,7 +213,7 @@ void LuaBinding::bind(){
     .addFunction("setBillboardScaleFactor", &Mesh2D::setBillboardScaleFactor)
     .endClass()
 
-    .beginExtendClass<ImageTemplate, Mesh2D>("ImageTemplate")
+    .beginExtendClass<GUIImage, Mesh2D>("GUIImage")
     .addConstructor(LUA_ARGS())
     .endClass()
     

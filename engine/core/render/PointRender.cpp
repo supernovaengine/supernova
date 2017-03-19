@@ -10,7 +10,7 @@ PointRender::PointRender(){
     
     positions = NULL;
     normals = NULL;
-    pointSpritesPos = NULL;
+    slicesPos = NULL;
     pointSizes = NULL;
     pointColors = NULL;
     
@@ -21,13 +21,13 @@ PointRender::PointRender(){
     
     material = NULL;
     
-    isSpriteSheet = false;
+    isSlicedTexture = false;
     
     textureSizeWidth = 0;
     textureSizeHeight = 0;
     
-    spriteSizeWidth = 0;
-    spriteSizeHeight = 0;
+    sliceSizeWidth = 0;
+    sliceSizeHeight = 0;
 }
 
 PointRender::~PointRender(){
@@ -69,8 +69,8 @@ void PointRender::setPointSizes(std::vector<float>* pointSizes){
     this->pointSizes = pointSizes;
 }
 
-void PointRender::setIsSpriteSheet(bool isSpriteSheet){
-    this->isSpriteSheet = isSpriteSheet;
+void PointRender::setIsSlicedTexture(bool isSlicedTexture){
+    this->isSlicedTexture = isSlicedTexture;
 }
 
 void PointRender::setTextureSize(int textureSizeWidth, int textureSizeHeight){
@@ -78,13 +78,13 @@ void PointRender::setTextureSize(int textureSizeWidth, int textureSizeHeight){
     this->textureSizeHeight = textureSizeHeight;
 }
 
-void PointRender::setSpriteSize(int spriteSizeWidth, int spriteSizeHeight){
-    this->spriteSizeWidth = spriteSizeWidth;
-    this->spriteSizeHeight = spriteSizeHeight;
+void PointRender::setSliceSize(int sliceSizeWidth, int sliceSizeHeight){
+    this->sliceSizeWidth = sliceSizeWidth;
+    this->sliceSizeHeight = sliceSizeHeight;
 }
 
-void PointRender::setPointSpritesPos(std::vector< std::pair<int, int> >* pointSpritesPos){
-    this->pointSpritesPos = pointSpritesPos;
+void PointRender::setSlicesPos(std::vector< std::pair<int, int> >* slicesPos){
+    this->slicesPos = slicesPos;
 }
 
 void PointRender::setPointColors(std::vector<Vector4>* pointColors){
@@ -128,9 +128,9 @@ bool PointRender::load(){
         }
     }
     
-    if (pointSpritesPos){
-        while (positions->size() > pointSpritesPos->size()){
-            pointSpritesPos->push_back(std::make_pair(0,0));
+    if (slicesPos){
+        while (positions->size() > slicesPos->size()){
+            slicesPos->push_back(std::make_pair(0,0));
         }
     }
     

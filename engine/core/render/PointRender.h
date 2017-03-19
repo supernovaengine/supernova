@@ -29,7 +29,7 @@ protected:
     
     std::vector<Vector3>* positions;
     std::vector<Vector3>* normals;
-    std::vector< std::pair<int, int> >* pointSpritesPos;
+    std::vector< std::pair<int, int> >* slicesPos;
     std::vector<float>* pointSizes;
     std::vector<Vector4>* pointColors;
     
@@ -40,13 +40,13 @@ protected:
     
     Material* material;
     
-    bool isSpriteSheet;
+    bool isSlicedTexture;
     
     int textureSizeWidth;
     int textureSizeHeight;
     
-    int spriteSizeWidth;
-    int spriteSizeHeight;
+    int sliceSizeWidth;
+    int sliceSizeHeight;
 
 public:
     
@@ -62,16 +62,16 @@ public:
     void setCameraPosition(Vector3* cameraPosition);
     void setMaterial(Material* material);
     void setPointSizes(std::vector<float>* pointSizes);
-    void setIsSpriteSheet(bool isSpriteSheet);
+    void setIsSlicedTexture(bool isSlicedTexture);
     void setTextureSize(int textureSizeWidth, int textureSizeHeight);
-    void setSpriteSize(int spriteSizeWidth, int spriteSizeHeight);
-    void setPointSpritesPos(std::vector< std::pair<int, int> >* pointSpritesPos);
+    void setSliceSize(int sliceSizeWidth, int sliceSizeHeight);
+    void setSlicesPos(std::vector< std::pair<int, int> >* slicesPos);
     void setPointColors(std::vector<Vector4>* pointColors);
     
     virtual void updatePositions() = 0;
     virtual void updateNormals() = 0;
     virtual void updatePointSizes() = 0;
-    virtual void updateSpritePos() = 0;
+    virtual void updateSlicesPos() = 0;
     virtual void updatePointColors() = 0;
     
     virtual bool load();

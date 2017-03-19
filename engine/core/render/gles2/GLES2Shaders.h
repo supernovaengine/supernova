@@ -138,9 +138,9 @@ std::string gVertexPointsPerPixelLightShader =
 
 + lightingVertexDec +
 
-"#ifdef IS_SPRITESHEET\n"
-"  attribute vec2 a_spritePos;\n"
-"  varying vec2 v_spritePos;\n"
+"#ifdef IS_SLICEDTEXTURE\n"
+"  attribute vec2 a_slicePos;\n"
+"  varying vec2 v_slicePos;\n"
 "#endif\n"
 
 "attribute float a_PointSize;\n"
@@ -156,8 +156,8 @@ std::string gVertexPointsPerPixelLightShader =
 "    v_pointColor = a_pointColor;\n"
 "    gl_PointSize = a_PointSize;\n"
 
-"    #ifdef IS_SPRITESHEET\n"
-"      v_spritePos = a_spritePos;\n"
+"    #ifdef IS_SLICEDTEXTURE\n"
+"      v_slicePos = a_slicePos;\n"
 "    #endif\n"
 
 "    gl_Position = position;\n"
@@ -174,18 +174,18 @@ std::string gFragmentPointsPerPixelLightShader =
 
 + lightingFragmentDec + fogFragmentDec +
 
-"#ifdef IS_SPRITESHEET\n"
-"  uniform vec2 u_spriteSize;\n"
+"#ifdef IS_SLICEDTEXTURE\n"
+"  uniform vec2 u_sliceSize;\n"
 "  uniform vec2 u_textureSize;\n"
-"  varying vec2 v_spritePos;\n"
+"  varying vec2 v_slicePos;\n"
 "#endif\n"
 
 "void main(){\n"
 "   vec4 fragmentColor = vec4(0.0);\n"
 
 "   if (uUseTexture){\n"
-"     #ifdef IS_SPRITESHEET\n"
-"       vec2 resultCoord = gl_PointCoord * (u_spriteSize / u_textureSize) + ((u_spriteSize / u_textureSize) * (v_spritePos / u_spriteSize));\n"
+"     #ifdef IS_SLICEDTEXTURE\n"
+"       vec2 resultCoord = gl_PointCoord * (u_sliceSize / u_textureSize) + ((u_sliceSize / u_textureSize) * (v_slicePos / u_sliceSize));\n"
 "     #else\n"
 "       vec2 resultCoord = gl_PointCoord;\n"
 "     #endif\n"
@@ -215,10 +215,10 @@ std::string gVertexMeshPerPixelLightShader =
 
 + lightingVertexDec +
 
-"#ifdef IS_SPRITESHEET\n"
-"  uniform vec2 u_spriteSize;\n"
+"#ifdef IS_SLICEDIMAGE\n"
+"  uniform vec2 u_sliceSize;\n"
 "  uniform vec2 u_textureSize;\n"
-"  uniform vec2 u_spritePos;\n"
+"  uniform vec2 u_slicePos;\n"
 "#endif\n"
 
 "void main(){\n"
@@ -229,9 +229,9 @@ std::string gVertexMeshPerPixelLightShader =
 
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifndef USE_TEXTURECUBE\n"
-"        #ifdef IS_SPRITESHEET\n"
-"          vec2 invSpritePos = vec2(u_spritePos.x, ((u_textureSize.y / u_spriteSize.y) - (u_spritePos.y / u_spriteSize.y) - 1.0) * u_spriteSize.y);\n"
-"          vec2 resultCoords = (a_TextureCoordinates * (u_spriteSize / u_textureSize)) + invSpritePos / u_textureSize;\n"
+"        #ifdef IS_SLICEDIMAGE\n"
+"          vec2 invSlicePos = vec2(u_slicePos.x, ((u_textureSize.y / u_sliceSize.y) - (u_slicePos.y / u_sliceSize.y) - 1.0) * u_sliceSize.y);\n"
+"          vec2 resultCoords = (a_TextureCoordinates * (u_sliceSize / u_textureSize)) + invSlicePos / u_textureSize;\n"
 "        #else\n"
 "          vec2 resultCoords = a_TextureCoordinates;\n"
 "        #endif\n"

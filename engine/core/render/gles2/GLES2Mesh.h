@@ -42,9 +42,9 @@ private:
 
     GLuint useTexture;
     
-    GLuint u_spriteSize;
+    GLuint u_sliceSize;
     GLuint u_textureSize;
-    GLuint u_spritePos;
+    GLuint u_slicePos;
     
     GLuint u_fogMode;
     GLuint u_fogColor;

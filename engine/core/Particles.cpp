@@ -19,9 +19,9 @@ Particles::Particles(){
     texWidth = 0;
     texHeight = 0;
 
-    isSpriteSheet = false;
-    spritesX = 1;
-    spritesY = 1;
+    isSlicedTexture = false;
+    slicesX = 1;
+    slicesY = 1;
 
 }
 
@@ -33,11 +33,11 @@ void Particles::addParticle(){
     positions.push_back(Vector3(0.0, 0.0, 0.0));
     pointSizes.push_back(1);
     normals.push_back(Vector3(0.0, 0.0, 1.0));
-    sprites.push_back(0);
+    frames.push_back(0);
     colors.push_back(*material.getColor());
 
     fillScaledSizeVector();
-    fillSpritePosPixelsVector();
+    fillSlicesPosPixelsVector();
 }
 
 void Particles::addParticle(Vector3 position){
@@ -65,9 +65,9 @@ void Particles::setParticleSize(int particle, float size){
     fillScaledSizeVector();
 }
 
-void Particles::setParticleSprite(int particle, int sprite){
-    sprites[particle] = sprite;
-    fillSpritePosPixelsVector();
+void Particles::setParticleFrame(int particle, int frame){
+    frames[particle] = frame;
+    fillSlicesPosPixelsVector();
 }
 
 void Particles::setParticleColor(int particle, Vector4 color){
@@ -109,40 +109,40 @@ void Particles::fillScaledSizeVector(){
     renderManager.getRender()->updatePointSizes();
 }
 
-void Particles::setSpriteSheet(int spritesX, int spritesY){
-    if (spritesX >= 1 && spritesY >= 1){
-        this->spritesX = spritesX;
-        this->spritesY = spritesY;
+void Particles::setTextureSlices(int slicesX, int slicesY){
+    if (slicesX >= 1 && slicesY >= 1){
+        this->slicesX = slicesX;
+        this->slicesY = slicesY;
 
-        if ((spritesX > 1 || spritesY > 1) && (material.getTextures().size() > 0)){
-            isSpriteSheet = true;
-            fillSpritePosPixelsVector();
+        if ((slicesX > 1 || slicesY > 1) && (material.getTextures().size() > 0)){
+            isSlicedTexture = true;
+            fillSlicesPosPixelsVector();
         }else{
-            isSpriteSheet = false;
+            isSlicedTexture = false;
         }
     }
 }
 
-void Particles::fillSpritePosPixelsVector(){
+void Particles::fillSlicesPosPixelsVector(){
     if (texWidth > 0 && texHeight > 0){
-        int spritesPosY;
-        int spritesPosX;
-        spritesPixelsPos.clear();
-        for (int i = 0; i < sprites.size(); i++){
+        int slicesPosY;
+        int slicesPosX;
+        slicesPos.clear();
+        for (int i = 0; i < frames.size(); i++){
 
-            if (sprites[i] < spritesX * spritesY){
-                spritesPosY = floor(sprites[i] / spritesX);
-                spritesPosX = sprites[i] - spritesX * spritesPosY;
+            if (frames[i] < slicesX * slicesY){
+                slicesPosY = floor(frames[i] / slicesX);
+                slicesPosX = frames[i] - slicesX * slicesPosY;
             }else{
-                spritesPosY = 0;
-                spritesPosX = 0;
+                slicesPosY = 0;
+                slicesPosX = 0;
             }
 
-            spritesPixelsPos.push_back(std::make_pair(spritesPosX * texWidth / spritesX, spritesPosY * texHeight / spritesY));
+            slicesPos.push_back(std::make_pair(slicesPosX * texWidth / slicesX, slicesPosY * texHeight / slicesY));
         }
     }
     
-    renderManager.getRender()->updateSpritePos();
+    renderManager.getRender()->updateSlicesPos();
 }
 
 void Particles::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
@@ -198,20 +198,20 @@ bool Particles::load(){
     renderManager.getRender()->setMaterial(&material);
     
     renderManager.getRender()->setPointSizes(&pointSizesScaled);
-    renderManager.getRender()->setPointSpritesPos(&spritesPixelsPos);
+    renderManager.getRender()->setSlicesPos(&slicesPos);
     renderManager.getRender()->setPointColors(&colors);
 
-    renderManager.getRender()->setIsSpriteSheet(isSpriteSheet);
+    renderManager.getRender()->setIsSlicedTexture(isSlicedTexture);
 
     renderManager.load();
 
-    if ((material.getTextures().size() > 0) && (isSpriteSheet)){
+    if ((material.getTextures().size() > 0) && (isSlicedTexture)){
         texWidth = TextureManager::getTextureWidth(material.getTextures()[0]);
         texHeight = TextureManager::getTextureHeight(material.getTextures()[0]);
         
         renderManager.getRender()->setTextureSize(texWidth, texHeight);
-        renderManager.getRender()->setSpriteSize(texWidth / spritesX, texHeight / spritesY);
-        fillSpritePosPixelsVector();
+        renderManager.getRender()->setSliceSize(texWidth / slicesX, texHeight / slicesY);
+        fillSlicesPosPixelsVector();
     }
 
     return ConcreteObject::load();

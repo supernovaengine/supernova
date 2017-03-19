@@ -60,8 +60,8 @@ bool GLES2Mesh::load() {
     if (hasfog){
         programDefs += "#define HAS_FOG\n";
     }
-    if (isSpriteSheet){
-        programDefs += "#define IS_SPRITESHEET\n";
+    if (isSlicedImage){
+        programDefs += "#define IS_SLICEDIMAGE\n";
     }
     if (texcoords){
         programDefs += "#define USE_TEXTURECOORDS\n";
@@ -85,10 +85,6 @@ bool GLES2Mesh::load() {
     if (normals && lighting){
         normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_STATIC_DRAW);
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
-    }
-    
-    if (isSpriteSheet){
-
     }
 
     for (unsigned int i = 0; i < submeshes->size(); i++){
@@ -129,10 +125,10 @@ bool GLES2Mesh::load() {
         u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
     }
     
-    if (isSpriteSheet) {
-        u_spriteSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_spriteSize");
+    if (isSlicedImage) {
+        u_sliceSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_sliceSize");
         u_textureSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureSize");
-        u_spritePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_spritePos");
+        u_slicePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_slicePos");
     }
     
     if (hasfog){
@@ -169,10 +165,10 @@ bool GLES2Mesh::draw() {
         glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);
     }
     
-    if (isSpriteSheet) {
-        glUniform2f(u_spriteSize, spriteSizeWidth, spriteSizeHeight);
+    if (isSlicedImage) {
+        glUniform2f(u_sliceSize, sliceSizeWidth, sliceSizeHeight);
         glUniform2f(u_textureSize, textureSizeWidth, textureSizeHeight);
-        glUniform2f(u_spritePos, spritePos->first, spritePos->second);
+        glUniform2f(u_slicePos, slicePos->first, slicePos->second);
     }
     
     if (hasfog){
