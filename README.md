@@ -1,6 +1,6 @@
 # Supernova Game Engine
 
-![Logo](http://www.supernovaengine.org/imgs/logos/supernova4.png)
+![Logo](http://www.supernovaengine.org/imgs/logos/supernova-quad.png)
 
 www.supernovaengine.org
 
