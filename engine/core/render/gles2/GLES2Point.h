@@ -30,7 +30,7 @@ private:
     GLint aNormal;
     
     GLint a_PointSize;
-    GLint a_slicePos;
+    GLint a_textureRect;
     GLint a_pointColor;
     
     GLuint uTextureUnitLocation;
@@ -41,14 +41,13 @@ private:
     
     GLuint useTexture;
     
-    GLuint u_sliceSize;
-    GLuint u_textureSize;
-    
     GLuint vertexBuffer;
     GLuint normalBuffer;
     GLuint pointSizeBuffer;
-    GLuint slicePosBuffer;
+    GLuint textureRectBuffer;
     GLuint pointColorBuffer;
+    
+    std::vector<float> rectsData();
 
     
 public:

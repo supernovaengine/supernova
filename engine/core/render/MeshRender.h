@@ -45,15 +45,15 @@ protected:
     Material* material;
 
     bool isSky;
-    bool isSlicedImage;
+    bool isRectImage;
 
     int textureSizeWidth;
     int textureSizeHeight;
     
-    int sliceSizeWidth;
-    int sliceSizeHeight;
+    int rectSizeWidth;
+    int rectSizeHeight;
 
-    std::pair<int, int>* slicePos;
+    std::pair<int, int>* rectPos;
     
     int primitiveMode;
 public:
@@ -73,10 +73,10 @@ public:
     void setPrimitiveMode(int primitiveMode);
     void setMaterial(Material* material);
     void setIsSky(bool isSky);
-    void setIsSlicedImage(bool isSlicedImage);
+    void setIsRectImage(bool isRectImage);
     void setTextureSize(int textureSizeWidth, int textureSizeHeight);
-    void setSliceSize(int sliceSizeWidth, int sliceSizeHeight);
-    void setSlicePos(std::pair<int, int>* slicePos);
+    void setRectSize(int rectSizeWidth, int rectSizeHeight);
+    void setRectPos(std::pair<int, int>* rectPos);
     
     virtual void updatePositions() = 0;
     virtual void updateTexcoords() = 0;

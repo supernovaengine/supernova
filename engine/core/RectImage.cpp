@@ -1,9 +1,9 @@
-#include "SlicedImage.h"
+#include "RectImage.h"
 
 #include "render/TextureManager.h"
 
 
-SlicedImage::SlicedImage(): Image(){
+RectImage::RectImage(): Image(){
     frame = 0;
     
     texWidth = 0;
@@ -14,11 +14,11 @@ SlicedImage::SlicedImage(): Image(){
     slicesY = 1;
 }
 
-SlicedImage::~SlicedImage(){
+RectImage::~RectImage(){
     
 }
 
-void SlicedImage::updateSlicePosPixels(){
+void RectImage::updateSlicePosPixels(){
     if (texWidth > 0 && texHeight > 0){
         int slicesPosY;
         int slicesPosX;
@@ -35,7 +35,7 @@ void SlicedImage::updateSlicePosPixels(){
     }
 }
 
-void SlicedImage::setSlices(int slicesX, int slicesY){
+void RectImage::setSlices(int slicesX, int slicesY){
     if (slicesX >= 1 && slicesY >= 1){
         this->slicesX = slicesX;
         this->slicesY = slicesY;
@@ -49,12 +49,12 @@ void SlicedImage::setSlices(int slicesX, int slicesY){
     }
 }
 
-void SlicedImage::setFrame(int frame){
+void RectImage::setFrame(int frame){
     this->frame = frame;
     updateSlicePosPixels();
 }
 
-bool SlicedImage::load(){
+bool RectImage::load(){
     
     if ((material.getTextures().size() > 0) && (isSliced)) {
         TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
@@ -68,13 +68,14 @@ bool SlicedImage::load(){
     }
     updateSlicePosPixels();
     
-    renderManager.getRender()->setIsSlicedImage(isSliced);
+    renderManager.getRender()->setIsRectImage(isSliced);
     renderManager.getRender()->setTextureSize(texWidth, texHeight);
-    renderManager.getRender()->setSliceSize(texWidth / slicesX, texHeight / slicesY);
-    renderManager.getRender()->setSlicePos(&slicePixelsPos);
+    renderManager.getRender()->setRectSize(texWidth / slicesX, texHeight / slicesY);
+    renderManager.getRender()->setRectPos(&slicePixelsPos);
     
     return Image::load();
 }
-bool SlicedImage::draw(){
+
+bool RectImage::draw(){
     return Image::draw();
 }

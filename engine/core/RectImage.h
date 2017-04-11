@@ -1,10 +1,10 @@
-#ifndef SlicedImage_h
-#define SlicedImage_h
+#ifndef RectImage_h
+#define RectImage_h
 
 #include "Image.h"
 
 
-class SlicedImage: public Image {
+class RectImage: public Image {
 private:
     int texWidth;
     int texHeight;
@@ -21,8 +21,8 @@ protected:
     int frame;
     
 public:
-    SlicedImage();
-    virtual ~SlicedImage();
+    RectImage();
+    virtual ~RectImage();
     
     void setFrame(int frame);
     void setSlices(int slicesX, int slicesY);
@@ -31,4 +31,4 @@ public:
     bool draw();
 };
 
-#endif /* SlicedImage_h */
+#endif /* RectImage_h */

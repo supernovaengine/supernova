@@ -10,7 +10,8 @@ PointRender::PointRender(){
     
     positions = NULL;
     normals = NULL;
-    slicesPos = NULL;
+    //slicesPos = NULL;
+    textureRects = NULL;
     pointSizes = NULL;
     pointColors = NULL;
     
@@ -20,14 +21,13 @@ PointRender::PointRender(){
     cameraPosition = NULL;
     
     material = NULL;
-    
-    isSlicedTexture = false;
-    
+  /*
     textureSizeWidth = 0;
     textureSizeHeight = 0;
     
     sliceSizeWidth = 0;
     sliceSizeHeight = 0;
+   */
 }
 
 PointRender::~PointRender(){
@@ -68,11 +68,7 @@ void PointRender::setMaterial(Material* material){
 void PointRender::setPointSizes(std::vector<float>* pointSizes){
     this->pointSizes = pointSizes;
 }
-
-void PointRender::setIsSlicedTexture(bool isSlicedTexture){
-    this->isSlicedTexture = isSlicedTexture;
-}
-
+/*
 void PointRender::setTextureSize(int textureSizeWidth, int textureSizeHeight){
     this->textureSizeWidth = textureSizeWidth;
     this->textureSizeHeight = textureSizeHeight;
@@ -85,6 +81,11 @@ void PointRender::setSliceSize(int sliceSizeWidth, int sliceSizeHeight){
 
 void PointRender::setSlicesPos(std::vector< std::pair<int, int> >* slicesPos){
     this->slicesPos = slicesPos;
+}
+*/
+
+void PointRender::setTextureRect(std::vector< TextureRect >* textureRects){
+    this->textureRects = textureRects;
 }
 
 void PointRender::setPointColors(std::vector<Vector4>* pointColors){
@@ -127,13 +128,18 @@ bool PointRender::load(){
             normals->push_back(Vector3(0,0,0));
         }
     }
-    
+/*
     if (slicesPos){
         while (positions->size() > slicesPos->size()){
             slicesPos->push_back(std::make_pair(0,0));
         }
     }
-    
+*/
+    if (textureRects){
+        while (positions->size() > textureRects->size()){
+            textureRects->push_back(TextureRect());
+        }
+    }
     if (pointSizes){
         while (positions->size() > pointSizes->size()){
             pointSizes->push_back(1);

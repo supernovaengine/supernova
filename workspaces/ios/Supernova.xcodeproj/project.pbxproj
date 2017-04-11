@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		71192EFD1CE1334000BD76EE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
+		7128E8241E8208F40039BFEA /* TextureRect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7128E8221E8208F40039BFEA /* TextureRect.cpp */; };
 		71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71369C081E291E22006AE1D1 /* Button.cpp */; };
 		713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */ = {isa = PBXBuildFile; fileRef = 713B79A11C0FD15000892EAC /* iosfopenpath.m */; };
 		713D30C51CFB306D00A4752F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* assets */; };
@@ -281,7 +282,7 @@
 		71CDC73C1D7B14D20060EEFF /* libsupernova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC7041D7B142D0060EEFF /* libsupernova.a */; };
 		71CDC74A1D7B16840060EEFF /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7137AEB71CFCF58900B271D5 /* tiny_obj_loader.cc */; };
 		71CDC74D1D7B16AA0060EEFF /* libtinyobjloader.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC7411D7B167C0060EEFF /* libtinyobjloader.a */; };
-		71E3E57A1E7EA92900468221 /* SlicedImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E3E5781E7EA92900468221 /* SlicedImage.cpp */; };
+		71E3E57A1E7EA92900468221 /* RectImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E3E5781E7EA92900468221 /* RectImage.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -422,6 +423,8 @@
 		71192EFB1CE1334000BD76EE /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		7125E3291D7CB2B20090B05E /* ImageReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageReader.h; sourceTree = "<group>"; };
 		7125E32B1D7CC7470090B05E /* ImageReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageReader.cpp; sourceTree = "<group>"; };
+		7128E8221E8208F40039BFEA /* TextureRect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureRect.cpp; sourceTree = "<group>"; };
+		7128E8231E8208F40039BFEA /* TextureRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureRect.h; sourceTree = "<group>"; };
 		713384DC1D2F560400DB73A5 /* SpotLight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpotLight.cpp; sourceTree = "<group>"; };
 		713384DD1D2F560400DB73A5 /* SpotLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpotLight.h; sourceTree = "<group>"; };
 		713384DF1D3051FF00DB73A5 /* DirectionalLight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DirectionalLight.cpp; sourceTree = "<group>"; };
@@ -981,8 +984,8 @@
 		71E1D22A1D27358B001209C8 /* Light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Light.h; sourceTree = "<group>"; };
 		71E1D22C1D2957AA001209C8 /* PointLight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointLight.cpp; sourceTree = "<group>"; };
 		71E1D22D1D2957AA001209C8 /* PointLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointLight.h; sourceTree = "<group>"; };
-		71E3E5781E7EA92900468221 /* SlicedImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SlicedImage.cpp; sourceTree = "<group>"; };
-		71E3E5791E7EA92900468221 /* SlicedImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SlicedImage.h; sourceTree = "<group>"; };
+		71E3E5781E7EA92900468221 /* RectImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RectImage.cpp; sourceTree = "<group>"; };
+		71E3E5791E7EA92900468221 /* RectImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RectImage.h; sourceTree = "<group>"; };
 		71EC2E3E1D3D92F700E14D84 /* Submesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Submesh.cpp; sourceTree = "<group>"; };
 		71EC2E3F1D3D92F700E14D84 /* Submesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Submesh.h; sourceTree = "<group>"; };
 		71F149B61CFB793200B7552E /* Model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Model.cpp; sourceTree = "<group>"; };
@@ -1143,8 +1146,8 @@
 				713D2A671CFB2EAD00A4752F /* Shape.h */,
 				7193011B1E42943800BEE527 /* SkyBox.cpp */,
 				7193011C1E42943800BEE527 /* SkyBox.h */,
-				71E3E5781E7EA92900468221 /* SlicedImage.cpp */,
-				71E3E5791E7EA92900468221 /* SlicedImage.h */,
+				71E3E5781E7EA92900468221 /* RectImage.cpp */,
+				71E3E5791E7EA92900468221 /* RectImage.h */,
 				7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */,
 				7188F1AB1DBBAB0B00A2D04F /* Sound.h */,
 				713384DC1D2F560400DB73A5 /* SpotLight.cpp */,
@@ -1165,6 +1168,8 @@
 		713D2A161CFB2EAD00A4752F /* image */ = {
 			isa = PBXGroup;
 			children = (
+				715823FE1D96EB4600AB1181 /* BMPReader.cpp */,
+				715823FF1D96EB4600AB1181 /* BMPReader.h */,
 				713D2A171CFB2EAD00A4752F /* ColorType.h */,
 				7125E32B1D7CC7470090B05E /* ImageReader.cpp */,
 				7125E3291D7CB2B20090B05E /* ImageReader.h */,
@@ -1176,12 +1181,12 @@
 				713D2A1F1CFB2EAD00A4752F /* TextureFile.h */,
 				713D2A181CFB2EAD00A4752F /* TextureLoader.cpp */,
 				713D2A191CFB2EAD00A4752F /* TextureLoader.h */,
+				7128E8221E8208F40039BFEA /* TextureRect.cpp */,
+				7128E8231E8208F40039BFEA /* TextureRect.h */,
 				715823E61D93573B00AB1181 /* TGAReader.cpp */,
 				715823E71D93573B00AB1181 /* TGAReader.h */,
 				715823E81D93573B00AB1181 /* TIFFReader.cpp */,
 				715823E91D93573B00AB1181 /* TIFFReader.h */,
-				715823FE1D96EB4600AB1181 /* BMPReader.cpp */,
-				715823FF1D96EB4600AB1181 /* BMPReader.h */,
 			);
 			path = image;
 			sourceTree = "<group>";
@@ -2467,7 +2472,7 @@
 				71CDC71A1D7B14510060EEFF /* Shape.cpp in Sources */,
 				71CDC7241D7B146D0060EEFF /* Quaternion.cpp in Sources */,
 				714D81E51E70C2B80038BE50 /* GLES2Mesh.cpp in Sources */,
-				71E3E57A1E7EA92900468221 /* SlicedImage.cpp in Sources */,
+				71E3E57A1E7EA92900468221 /* RectImage.cpp in Sources */,
 				71CDC71C1D7B14510060EEFF /* Submesh.cpp in Sources */,
 				71CDC7291D7B14720060EEFF /* Log.cpp in Sources */,
 				719301221E50F9CF00BEE527 /* ConcreteObject.cpp in Sources */,
@@ -2524,6 +2529,7 @@
 				71CDC7101D7B14510060EEFF /* Engine.cpp in Sources */,
 				7188F1AC1DBBAB0B00A2D04F /* Sound.cpp in Sources */,
 				714D81E91E70C2E40038BE50 /* SceneRender.cpp in Sources */,
+				7128E8241E8208F40039BFEA /* TextureRect.cpp in Sources */,
 				716E89AF1E22748800B03DD5 /* GUIImage.cpp in Sources */,
 				715824031D9803EF00AB1181 /* TextureManager.cpp in Sources */,
 				71598C461E7CDA80000EDAC0 /* GLES2Fog.cpp in Sources */,

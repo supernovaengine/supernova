@@ -4,6 +4,7 @@
 #include "math/Vector2.h"
 #include "render/SceneRender.h"
 #include "render/TextureRender.h"
+#include "image/TextureRect.h"
 #include "Material.h"
 #include <vector>
 
@@ -29,7 +30,8 @@ protected:
     
     std::vector<Vector3>* positions;
     std::vector<Vector3>* normals;
-    std::vector< std::pair<int, int> >* slicesPos;
+    //std::vector< std::pair<int, int> >* slicesPos;
+    std::vector< TextureRect >* textureRects;
     std::vector<float>* pointSizes;
     std::vector<Vector4>* pointColors;
     
@@ -40,13 +42,11 @@ protected:
     
     Material* material;
     
-    bool isSlicedTexture;
+    //int textureSizeWidth;
+    //int textureSizeHeight;
     
-    int textureSizeWidth;
-    int textureSizeHeight;
-    
-    int sliceSizeWidth;
-    int sliceSizeHeight;
+    //int sliceSizeWidth;
+    //int sliceSizeHeight;
 
 public:
     
@@ -62,10 +62,10 @@ public:
     void setCameraPosition(Vector3* cameraPosition);
     void setMaterial(Material* material);
     void setPointSizes(std::vector<float>* pointSizes);
-    void setIsSlicedTexture(bool isSlicedTexture);
-    void setTextureSize(int textureSizeWidth, int textureSizeHeight);
-    void setSliceSize(int sliceSizeWidth, int sliceSizeHeight);
-    void setSlicesPos(std::vector< std::pair<int, int> >* slicesPos);
+    //void setTextureSize(int textureSizeWidth, int textureSizeHeight);
+    //void setSliceSize(int sliceSizeWidth, int sliceSizeHeight);
+    //void setSlicesPos(std::vector< std::pair<int, int> >* slicesPos);
+    void setTextureRect(std::vector< TextureRect >* textureRects);
     void setPointColors(std::vector<Vector4>* pointColors);
     
     virtual void updatePositions() = 0;

@@ -2,7 +2,7 @@
 #include "render/TextureManager.h"
 
 
-Sprite::Sprite(): SlicedImage(){
+Sprite::Sprite(): RectImage(){
 
 }
 

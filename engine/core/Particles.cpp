@@ -35,6 +35,7 @@ void Particles::addParticle(){
     normals.push_back(Vector3(0.0, 0.0, 1.0));
     frames.push_back(0);
     colors.push_back(*material.getColor());
+    textureRects.push_back(TextureRect(0.0, 0.5, 1.0, 0.5));
 
     fillScaledSizeVector();
     fillSlicesPosPixelsVector();
@@ -198,10 +199,11 @@ bool Particles::load(){
     renderManager.getRender()->setMaterial(&material);
     
     renderManager.getRender()->setPointSizes(&pointSizesScaled);
-    renderManager.getRender()->setSlicesPos(&slicesPos);
+   // renderManager.getRender()->setSlicesPos(&slicesPos);
+    renderManager.getRender()->setTextureRect(&textureRects);
     renderManager.getRender()->setPointColors(&colors);
 
-    renderManager.getRender()->setIsSlicedTexture(isSlicedTexture);
+    //renderManager.getRender()->setIsSlicedTexture(isSlicedTexture);
 
     renderManager.load();
 
@@ -209,8 +211,8 @@ bool Particles::load(){
         texWidth = TextureManager::getTextureWidth(material.getTextures()[0]);
         texHeight = TextureManager::getTextureHeight(material.getTextures()[0]);
         
-        renderManager.getRender()->setTextureSize(texWidth, texHeight);
-        renderManager.getRender()->setSliceSize(texWidth / slicesX, texHeight / slicesY);
+       // renderManager.getRender()->setTextureSize(texWidth, texHeight);
+      //    renderManager.getRender()->setSliceSize(texWidth / slicesX, texHeight / slicesY);
         fillSlicesPosPixelsVector();
     }
 

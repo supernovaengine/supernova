@@ -1,10 +1,10 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include "SlicedImage.h"
+#include "RectImage.h"
 
 
-class Sprite: public SlicedImage {
+class Sprite: public RectImage {
 
 public:
     Sprite();

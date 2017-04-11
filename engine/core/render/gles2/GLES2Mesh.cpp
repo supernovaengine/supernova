@@ -60,8 +60,8 @@ bool GLES2Mesh::load() {
     if (hasfog){
         programDefs += "#define HAS_FOG\n";
     }
-    if (isSlicedImage){
-        programDefs += "#define IS_SLICEDIMAGE\n";
+    if (isRectImage){
+        programDefs += "#define IS_RECTIMAGE\n";
     }
     if (texcoords){
         programDefs += "#define USE_TEXTURECOORDS\n";
@@ -125,10 +125,10 @@ bool GLES2Mesh::load() {
         u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
     }
     
-    if (isSlicedImage) {
-        u_sliceSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_sliceSize");
+    if (isRectImage) {
+        u_rectSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_rectSize");
         u_textureSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureSize");
-        u_slicePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_slicePos");
+        u_rectPos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_rectPos");
     }
     
     if (hasfog){
@@ -165,10 +165,10 @@ bool GLES2Mesh::draw() {
         glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);
     }
     
-    if (isSlicedImage) {
-        glUniform2f(u_sliceSize, sliceSizeWidth, sliceSizeHeight);
+    if (isRectImage) {
+        glUniform2f(u_rectSize, rectSizeWidth, rectSizeHeight);
         glUniform2f(u_textureSize, textureSizeWidth, textureSizeHeight);
-        glUniform2f(u_slicePos, slicePos->first, slicePos->second);
+        glUniform2f(u_rectPos, rectPos->first, rectPos->second);
     }
     
     if (hasfog){

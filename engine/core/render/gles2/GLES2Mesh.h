@@ -42,9 +42,9 @@ private:
 
     GLuint useTexture;
     
-    GLuint u_sliceSize;
+    GLuint u_rectSize;
     GLuint u_textureSize;
-    GLuint u_slicePos;
+    GLuint u_rectPos;
     
     GLuint u_fogMode;
     GLuint u_fogColor;
