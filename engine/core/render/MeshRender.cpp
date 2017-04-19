@@ -26,7 +26,9 @@ MeshRender::MeshRender(){
 
     isSky = false;
     isRectImage = false;
-    
+
+    textureRect = NULL;
+    /*
     textureSizeWidth = 0;
     textureSizeHeight = 0;
 
@@ -34,7 +36,7 @@ MeshRender::MeshRender(){
     rectSizeHeight = 0;
 
     rectPos = NULL;
-
+*/
     primitiveMode = S_TRIANGLES;
 }
 
@@ -93,6 +95,11 @@ void MeshRender::setIsRectImage(bool isRectImage){
     this->isRectImage = isRectImage;
 }
 
+void MeshRender::setTextureRect(TextureRect* textureRect){
+    this->textureRect = textureRect;
+}
+
+/*
 void MeshRender::setTextureSize(int textureSizeWidth, int textureSizeHeight){
     this->textureSizeWidth = textureSizeWidth;
     this->textureSizeHeight = textureSizeHeight;
@@ -106,7 +113,7 @@ void MeshRender::setRectSize(int rectSizeWidth, int rectSizeHeight){
 void MeshRender::setRectPos(std::pair<int, int>* rectPos){
     this->rectPos = rectPos;
 }
-
+*/
 void MeshRender::checkLighting(){
     lighting = false;
     if ((sceneRender != NULL) && (!isSky)){

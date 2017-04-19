@@ -41,10 +41,8 @@ private:
     GLuint uEyePos;
 
     GLuint useTexture;
-    
-    GLuint u_rectSize;
-    GLuint u_textureSize;
-    GLuint u_rectPos;
+
+    GLuint u_textureRect;
     
     GLuint u_fogMode;
     GLuint u_fogColor;

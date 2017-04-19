@@ -7,6 +7,7 @@
 #include "Submesh.h"
 #include <vector>
 #include <unordered_map>
+#include "image/TextureRect.h"
 
 
 class MeshRender {
@@ -34,6 +35,7 @@ protected:
     
     std::vector<Vector3>* positions;
     std::vector<Vector3>* normals;
+
     std::vector<Vector2>* texcoords;
     std::vector<Submesh*>* submeshes;
     
@@ -47,6 +49,8 @@ protected:
     bool isSky;
     bool isRectImage;
 
+    TextureRect* textureRect;
+/*
     int textureSizeWidth;
     int textureSizeHeight;
     
@@ -54,7 +58,7 @@ protected:
     int rectSizeHeight;
 
     std::pair<int, int>* rectPos;
-    
+*/
     int primitiveMode;
 public:
     
@@ -74,9 +78,10 @@ public:
     void setMaterial(Material* material);
     void setIsSky(bool isSky);
     void setIsRectImage(bool isRectImage);
-    void setTextureSize(int textureSizeWidth, int textureSizeHeight);
-    void setRectSize(int rectSizeWidth, int rectSizeHeight);
-    void setRectPos(std::pair<int, int>* rectPos);
+    void setTextureRect(TextureRect* textureRect);
+    //void setTextureSize(int textureSizeWidth, int textureSizeHeight);
+    //void setRectSize(int rectSizeWidth, int rectSizeHeight);
+    //void setRectPos(std::pair<int, int>* rectPos);
     
     virtual void updatePositions() = 0;
     virtual void updateTexcoords() = 0;

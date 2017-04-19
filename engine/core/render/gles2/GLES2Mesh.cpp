@@ -126,9 +126,7 @@ bool GLES2Mesh::load() {
     }
     
     if (isRectImage) {
-        u_rectSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_rectSize");
-        u_textureSize = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureSize");
-        u_rectPos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_rectPos");
+        u_textureRect = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureRect");
     }
     
     if (hasfog){
@@ -166,9 +164,7 @@ bool GLES2Mesh::draw() {
     }
     
     if (isRectImage) {
-        glUniform2f(u_rectSize, rectSizeWidth, rectSizeHeight);
-        glUniform2f(u_textureSize, textureSizeWidth, textureSizeHeight);
-        glUniform2f(u_rectPos, rectPos->first, rectPos->second);
+        glUniform4f(u_textureRect, textureRect->getX(), textureRect->getY(), textureRect->getWidth(), textureRect->getHeight());
     }
     
     if (hasfog){

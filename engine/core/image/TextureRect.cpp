@@ -4,8 +4,8 @@
 TextureRect::TextureRect(){
     x = 0;
     y = 0;
-    width = 0;
-    height = 0;
+    width = 1;
+    height = 1;
 }
 
 TextureRect::TextureRect(float x, float y, float width, float height){
@@ -49,4 +49,11 @@ void TextureRect::setRect(float x, float y, float width, float height){
     this->y = y;
     this->width = width;
     this->height = height;
+}
+
+bool TextureRect::isNormalized(){
+    if ((x >= 0 && x <= 1) && (y >= 0 && y <= 1) && (width >= 0 && width <= 1) && (height >= 0 && height <= 1)){
+        return true;
+    }
+    return false;
 }

@@ -2,30 +2,28 @@
 #define RectImage_h
 
 #include "Image.h"
+#include "image/TextureRect.h"
 
 
 class RectImage: public Image {
 private:
     int texWidth;
     int texHeight;
-    
-    std::pair<int, int> slicePixelsPos;
-    
-    void updateSlicePosPixels();
+
+    TextureRect textureRect;
+    TextureRect normalizedRect;
     
 protected:
     bool isSliced;
-    int slicesX;
-    int slicesY;
-    
-    int frame;
+
+    void generateNormalizateRect();
     
 public:
     RectImage();
     virtual ~RectImage();
-    
-    void setFrame(int frame);
-    void setSlices(int slicesX, int slicesY);
+
+    void setRect(float x, float y, float width, float height);
+    void setRect(TextureRect textureRect);
     
     bool load();
     bool draw();

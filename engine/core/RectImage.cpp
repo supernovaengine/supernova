@@ -4,20 +4,51 @@
 
 
 RectImage::RectImage(): Image(){
-    frame = 0;
-    
     texWidth = 0;
     texHeight = 0;
     
     isSliced = false;
-    slicesX = 1;
-    slicesY = 1;
 }
 
 RectImage::~RectImage(){
     
 }
 
+void RectImage::setRect(float x, float y, float width, float height){
+    setRect(TextureRect(x, y, width, height));
+}
+
+void RectImage::setRect(TextureRect textureRect){
+    this->textureRect = textureRect;
+    if (!isSliced) {
+        isSliced = true;
+        if (loaded)
+            reload();
+    }
+    generateNormalizateRect();
+}
+
+void RectImage::generateNormalizateRect(){
+
+    if (textureRect.isNormalized()){
+
+        normalizedRect.setRect(textureRect.getX(),
+                               textureRect.getY(),
+                               textureRect.getWidth(),
+                               textureRect.getHeight());
+
+    }else {
+
+        if (this->texWidth != 0 && this->texHeight != 0) {
+            normalizedRect.setRect(textureRect.getX() / (float) texWidth,
+                                   textureRect.getY() / (float) texHeight,
+                                   textureRect.getWidth() / (float) texWidth,
+                                   textureRect.getHeight() / (float) texHeight);
+        }
+    }
+}
+
+/*
 void RectImage::updateSlicePosPixels(){
     if (texWidth > 0 && texHeight > 0){
         int slicesPosY;
@@ -53,25 +84,26 @@ void RectImage::setFrame(int frame){
     this->frame = frame;
     updateSlicePosPixels();
 }
-
+*/
 bool RectImage::load(){
     
-    if ((material.getTextures().size() > 0) && (isSliced)) {
+    if (material.getTextures().size() > 0) {
         TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
         texWidth = TextureManager::getTextureWidth(submeshes[0]->getMaterial()->getTextures()[0]);
         texHeight = TextureManager::getTextureHeight(submeshes[0]->getMaterial()->getTextures()[0]);
-        
-        if (this->width == 0 && this->height == 0){
-            this->width = texWidth / slicesX;
-            this->height = texHeight / slicesY;
+
+        if (isSliced) {
+            generateNormalizateRect();
+
+            if (this->width == 0 && this->height == 0) {
+                this->width = texWidth * normalizedRect.getWidth();
+                this->height = texHeight * normalizedRect.getHeight();
+            }
         }
     }
-    updateSlicePosPixels();
     
     renderManager.getRender()->setIsRectImage(isSliced);
-    renderManager.getRender()->setTextureSize(texWidth, texHeight);
-    renderManager.getRender()->setRectSize(texWidth / slicesX, texHeight / slicesY);
-    renderManager.getRender()->setRectPos(&slicePixelsPos);
+    renderManager.getRender()->setTextureRect(&normalizedRect);
     
     return Image::load();
 }

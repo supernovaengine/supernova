@@ -18,7 +18,7 @@ private:
     
     std::vector<float> pointSizesScaled;
     std::vector< std::pair<int, int> > slicesPos;
-    std::vector< TextureRect > textureRects;
+    std::vector<TextureRect> textureRects;
     
     int texWidth;
     int texHeight;
