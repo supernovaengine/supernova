@@ -12,6 +12,10 @@ ConcreteObject::~ConcreteObject(){
     
 }
 
+Matrix4 ConcreteObject::getNormalMatrix(){
+    return normalMatrix;
+}
+
 void ConcreteObject::setColor(float red, float green, float blue, float alpha){
     if (alpha != 1){
         transparent = true;

@@ -23,7 +23,7 @@ protected:
     int primitiveMode;
     
     void addSubmesh(Submesh* submesh);
-    std::vector<Submesh*> getSubmeshes();
+    
 
     void sortTransparentSubmeshes();
     
@@ -35,6 +35,7 @@ public:
     std::vector<Vector3> getVertices();
     std::vector<Vector3> getNormals();
     std::vector<Vector2> getTexcoords();
+    std::vector<Submesh*> getSubmeshes();
     
     void setTexcoords(std::vector<Vector2> texcoords);
 

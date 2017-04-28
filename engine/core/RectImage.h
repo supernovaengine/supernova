@@ -11,7 +11,7 @@ private:
     int texHeight;
 
     TextureRect textureRect;
-    TextureRect normalizedRect;
+    //TextureRect normalizedRect;
     
 protected:
     bool isSliced;

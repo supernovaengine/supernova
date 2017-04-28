@@ -27,6 +27,10 @@ std::vector<Submesh*> Mesh::getSubmeshes(){
     return submeshes;
 }
 
+int Mesh::getPrimitiveMode(){
+    return primitiveMode;
+}
+
 void Mesh::setTexcoords(std::vector<Vector2> texcoords){
     this->texcoords.clear();
     this->texcoords = texcoords;
@@ -114,12 +118,15 @@ bool Mesh::load(){
         renderManager.getRender()->setSceneRender(((Scene*)scene)->getSceneRender());
     }
     
-    renderManager.getRender()->setPositions(&vertices);
-    renderManager.getRender()->setNormals(&normals);
-    renderManager.getRender()->setTexcoords(&texcoords);
-    renderManager.getRender()->setSubmeshes(&submeshes);
-
-    renderManager.getRender()->setPrimitiveMode(primitiveMode);
+    while (vertices.size() > texcoords.size()){
+        texcoords.push_back(Vector2(0,0));
+    }
+    
+    while (vertices.size() > normals.size()){
+        normals.push_back(Vector3(0,0,0));
+    }
+    
+    renderManager.getRender()->setMesh(this);
 
     renderManager.load();
 
@@ -127,10 +134,6 @@ bool Mesh::load(){
 }
 
 bool Mesh::draw(){
-    renderManager.getRender()->setModelMatrix(&modelMatrix);
-    renderManager.getRender()->setNormalMatrix(&normalMatrix);
-    renderManager.getRender()->setModelViewProjectionMatrix(&modelViewProjectionMatrix);
-    renderManager.getRender()->setCameraPosition(cameraPosition);
 
     return ConcreteObject::draw();
 }

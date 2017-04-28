@@ -51,6 +51,7 @@ public:
     virtual void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
     Matrix4 getModelMatrix();
     Matrix4 getModelViewProjectMatrix();
+    Vector3 getCameraPosition();
 
     void setPosition(const float x, const float y, const float z);
     void setPosition(Vector3 position);

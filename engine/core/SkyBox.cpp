@@ -94,7 +94,7 @@ bool SkyBox::load(){
 
 bool SkyBox::draw(){
 
-    renderManager.getRender()->setModelViewProjectionMatrix(&skyViewProjectionMatrix);
+    //renderManager.getRender()->setModelViewProjectionMatrix(&skyViewProjectionMatrix);
 
     return true;
 }

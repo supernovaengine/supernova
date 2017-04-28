@@ -31,19 +31,19 @@ void RectImage::setRect(TextureRect textureRect){
 void RectImage::generateNormalizateRect(){
 
     if (textureRect.isNormalized()){
-
-        normalizedRect.setRect(textureRect.getX(),
-                               textureRect.getY(),
-                               textureRect.getWidth(),
-                               textureRect.getHeight());
+        
+        submeshes[0]->getMaterial()->setTextureRect(textureRect.getX(),
+                                                    textureRect.getY(),
+                                                    textureRect.getWidth(),
+                                                    textureRect.getHeight());
 
     }else {
 
         if (this->texWidth != 0 && this->texHeight != 0) {
-            normalizedRect.setRect(textureRect.getX() / (float) texWidth,
-                                   textureRect.getY() / (float) texHeight,
-                                   textureRect.getWidth() / (float) texWidth,
-                                   textureRect.getHeight() / (float) texHeight);
+            submeshes[0]->getMaterial()->setTextureRect(textureRect.getX() / (float) texWidth,
+                                                        textureRect.getY() / (float) texHeight,
+                                                        textureRect.getWidth() / (float) texWidth,
+                                                        textureRect.getHeight() / (float) texHeight);
         }
     }
 }
@@ -96,15 +96,15 @@ bool RectImage::load(){
             generateNormalizateRect();
 
             if (this->width == 0 && this->height == 0) {
-                this->width = texWidth * normalizedRect.getWidth();
-                this->height = texHeight * normalizedRect.getHeight();
+                this->width = texWidth * submeshes[0]->getMaterial()->getTextureRect().getWidth();
+                this->height = texHeight * submeshes[0]->getMaterial()->getTextureRect().getHeight();
             }
         }
     }
-    
+    /*
     renderManager.getRender()->setIsRectImage(isSliced);
     renderManager.getRender()->setTextureRect(&normalizedRect);
-    
+    */
     return Image::load();
 }
 

@@ -211,6 +211,10 @@ Matrix4 Object::getModelViewProjectMatrix(){
     return modelViewProjectionMatrix;
 }
 
+Vector3 Object::getCameraPosition(){
+    return *cameraPosition;
+}
+
 void Object::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
 
     this->viewMatrix = viewMatrix;

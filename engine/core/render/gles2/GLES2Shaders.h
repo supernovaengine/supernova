@@ -211,11 +211,9 @@ std::string gVertexMeshPerPixelLightShader =
 "  varying vec3 v_TextureCoordinates;\n"
 "#endif\n"
 
-+ lightingVertexDec +
+"uniform vec4 u_textureRect;\n"
 
-"#ifdef IS_RECTIMAGE\n"
-"  uniform vec4 u_textureRect;\n"
-"#endif\n"
++ lightingVertexDec +
 
 "void main(){\n"
 
@@ -225,12 +223,8 @@ std::string gVertexMeshPerPixelLightShader =
 
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifndef USE_TEXTURECUBE\n"
-"        #ifdef IS_RECTIMAGE\n"
-//"          vec2 invRectPos = vec2(u_rectPos.x, ((u_textureSize.y / u_rectSize.y) - (u_rectPos.y / u_rectSize.y) - 1.0) * u_rectSize.y);\n"
-"          vec2 resultCoords = a_TextureCoordinates * u_textureRect.zw + u_textureRect.xy;\n"
-"        #else\n"
-"          vec2 resultCoords = a_TextureCoordinates;\n"
-"        #endif\n"
+//"      vec2 invRectPos = vec2(u_rectPos.x, ((u_textureSize.y / u_rectSize.y) - (u_rectPos.y / u_rectSize.y) - 1.0) * u_rectSize.y);\n"
+"        vec2 resultCoords = a_TextureCoordinates * u_textureRect.zw + u_textureRect.xy;\n"
 "        v_TextureCoordinates = vec3(resultCoords,0.0);\n"
 "      #else\n"
 "        v_TextureCoordinates = vec3(a_Position);\n"
