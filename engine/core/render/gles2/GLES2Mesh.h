@@ -61,7 +61,7 @@ public:
     GLES2Mesh();
     virtual ~GLES2Mesh();
     
-    void updatePositions();
+    void updateVertices();
     void updateTexcoords();
     void updateNormals();
 

@@ -17,31 +17,38 @@ class MeshRender {
 
     typedef struct {
         std::shared_ptr<TextureRender> texture;
+        TextureRect textureRect;
         unsigned int indicesSizes;
         bool textured;
     } SubmeshStruct;
 
 private:
+    
+    Mesh* mesh;
 
     void checkLighting();
     void checkFog();
+    void fillMeshProperties();
     
 protected:
 
     bool loaded;
     bool lighting;
     bool hasfog;
-    
-    Mesh* mesh;
 
     std::unordered_map<Submesh*, SubmeshStruct> submeshesGles;
     
     SceneRender* sceneRender;
-
+    std::vector<Vector3>* vertices;
+    std::vector<Vector2>* texcoords;
+    std::vector<Vector3>* normals;
+    std::vector<Submesh*>* submeshes;
+    Matrix4 modelViewProjectMatrix;
+    Matrix4 modelMatrix;
+    Matrix4 normalMatrix;
+    Vector3 cameraPosition;
     bool isSky;
-    //bool isRectImage;
-
-    TextureRect* textureRect;
+    int primitiveMode;
     
 public:
     
@@ -50,13 +57,7 @@ public:
     
     void setMesh(Mesh* mesh);
     
-    void setSceneRender(SceneRender* sceneRender);
-
-    void setIsSky(bool isSky);
-    //void setIsRectImage(bool isRectImage);
-    //void setTextureRect(TextureRect* textureRect);
-    
-    virtual void updatePositions() = 0;
+    virtual void updateVertices() = 0;
     virtual void updateTexcoords() = 0;
     virtual void updateNormals() = 0;
     

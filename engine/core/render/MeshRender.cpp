@@ -1,6 +1,7 @@
 #include "MeshRender.h"
 #include "PrimitiveMode.h"
 #include "Mesh.h"
+#include "Scene.h"
 
 
 MeshRender::MeshRender(){
@@ -14,9 +15,7 @@ MeshRender::MeshRender(){
     sceneRender = NULL;
 
     isSky = false;
-    //isRectImage = false;
-
-    textureRect = NULL;
+    primitiveMode = 0;
 
 }
 
@@ -27,22 +26,6 @@ void MeshRender::setMesh(Mesh* mesh){
     this->mesh = mesh;
 }
 
-void MeshRender::setSceneRender(SceneRender* sceneRender){
-    this->sceneRender = sceneRender;
-}
-
-void MeshRender::setIsSky(bool isSky){
-    this->isSky = isSky;
-}
-/*
-void MeshRender::setIsRectImage(bool isRectImage){
-    this->isRectImage = isRectImage;
-}
-
-void MeshRender::setTextureRect(TextureRect* textureRect){
-    this->textureRect = textureRect;
-}
-*/
 void MeshRender::checkLighting(){
     lighting = false;
     if ((sceneRender != NULL) && (!isSky)){
@@ -57,27 +40,46 @@ void MeshRender::checkFog(){
     }
 }
 
+void MeshRender::fillMeshProperties(){
+    if (mesh->getScene() != NULL)
+        sceneRender = mesh->getScene()->getSceneRender();
+    
+    vertices = mesh->getVertices();
+    texcoords = mesh->getTexcoords();
+    normals = mesh->getNormals();
+    submeshes = mesh->getSubmeshes();
+    modelViewProjectMatrix = mesh->getModelViewProjectMatrix();
+    modelMatrix = mesh->getModelMatrix();
+    normalMatrix = mesh->getNormalMatrix();
+    cameraPosition = mesh->getCameraPosition();
+    isSky = mesh->isSky();
+    primitiveMode = mesh->getPrimitiveMode();
+}
+
 bool MeshRender::load(){
 
-    if (mesh->getVertices().size() <= 0){
+    if (mesh->getVertices()->size() <= 0){
         return false;
     }
-
+    
+    fillMeshProperties();
+    
     checkLighting();
     checkFog();
 
     submeshesGles.clear();
     //---> For meshes
-    for (unsigned int i = 0; i < mesh->getSubmeshes().size(); i++){
-        submeshesGles[mesh->getSubmeshes()[i]].indicesSizes = (int)mesh->getSubmeshes()[i]->getIndices()->size();
+    for (unsigned int i = 0; i < submeshes->size(); i++){
+        submeshesGles[submeshes->at(i)].indicesSizes = (int)submeshes->at(i)->getIndices()->size();
+        submeshesGles[submeshes->at(i)].textureRect = submeshes->at(i)->getMaterial()->getTextureRect();
 
-        if (mesh->getSubmeshes()[i]->getMaterial()->getTextures().size() > 0){
-            submeshesGles[mesh->getSubmeshes()[i]].textured = true;
+        if (submeshes->at(i)->getMaterial()->getTextures().size() > 0){
+            submeshesGles[submeshes->at(i)].textured = true;
         }else{
-            submeshesGles[mesh->getSubmeshes()[i]].textured = false;
+            submeshesGles[submeshes->at(i)].textured = false;
         }
-        if (mesh->getSubmeshes()[i]->getMaterial()->getTextureType() == S_TEXTURE_2D &&  mesh->getTexcoords().size() == 0){
-            submeshesGles[mesh->getSubmeshes()[i]].textured = false;
+        if (submeshes->at(i)->getMaterial()->getTextureType() == S_TEXTURE_2D &&  texcoords->size() == 0){
+            submeshesGles[submeshes->at(i)].textured = false;
         }
     }
 
@@ -87,6 +89,8 @@ bool MeshRender::load(){
 }
 
 bool MeshRender::draw() {
+    
+    fillMeshProperties();
 
     return true;
 }

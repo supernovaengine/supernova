@@ -19,6 +19,8 @@ protected:
     std::vector<Vector3> normals;
     std::vector<Vector2> texcoords;
     std::vector<Submesh*> submeshes;
+    
+    bool skymesh;
 
     int primitiveMode;
     
@@ -32,10 +34,11 @@ public:
     virtual ~Mesh();
 
     int getPrimitiveMode();
-    std::vector<Vector3> getVertices();
-    std::vector<Vector3> getNormals();
-    std::vector<Vector2> getTexcoords();
-    std::vector<Submesh*> getSubmeshes();
+    std::vector<Vector3>* getVertices();
+    std::vector<Vector3>* getNormals();
+    std::vector<Vector2>* getTexcoords();
+    std::vector<Submesh*>* getSubmeshes();
+    bool isSky();
     
     void setTexcoords(std::vector<Vector2> texcoords);
 

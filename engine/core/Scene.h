@@ -1,7 +1,6 @@
 #ifndef scene_h
 #define scene_h
 
-#include <vector>
 #include "Object.h"
 #include "Camera.h"
 #include "Render.h"

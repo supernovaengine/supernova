@@ -5,26 +5,31 @@
 
 Mesh::Mesh(): ConcreteObject(){
     submeshes.push_back(new Submesh(&material));
+    skymesh = false;
 }
 
 Mesh::~Mesh(){
     destroy();
 }
 
-std::vector<Vector3> Mesh::getVertices(){
-    return vertices;
+std::vector<Vector3>* Mesh::getVertices(){
+    return &vertices;
 }
 
-std::vector<Vector3> Mesh::getNormals(){
-    return normals;
+std::vector<Vector3>* Mesh::getNormals(){
+    return &normals;
 }
 
-std::vector<Vector2> Mesh::getTexcoords(){
-    return texcoords;
+std::vector<Vector2>* Mesh::getTexcoords(){
+    return &texcoords;
 }
 
-std::vector<Submesh*> Mesh::getSubmeshes(){
-    return submeshes;
+std::vector<Submesh*>* Mesh::getSubmeshes(){
+    return &submeshes;
+}
+
+bool Mesh::isSky(){
+    return skymesh;
 }
 
 int Mesh::getPrimitiveMode(){
@@ -115,7 +120,7 @@ void Mesh::removeAllSubmeshes(){
 bool Mesh::load(){
 
     if (scene != NULL){
-        renderManager.getRender()->setSceneRender(((Scene*)scene)->getSceneRender());
+        //renderManager.getRender()->setSceneRender(((Scene*)scene)->getSceneRender());
     }
     
     while (vertices.size() > texcoords.size()){

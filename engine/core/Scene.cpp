@@ -74,7 +74,7 @@ void Scene::addGUIObject (GUIObject* guiobject){
 }
 
 void Scene::removeGUIObject (GUIObject* guiobject){
-    std::vector<GUIObject*>::iterator i = std::remove(guiObjects.begin(), guiObjects.end(), scene);
+    std::vector<GUIObject*>::iterator i = std::remove(guiObjects.begin(), guiObjects.end(), guiobject);
     guiObjects.erase(i,guiObjects.end());
 }
 

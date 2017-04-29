@@ -223,8 +223,8 @@ std::string gVertexMeshPerPixelLightShader =
 
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifndef USE_TEXTURECUBE\n"
-//"      vec2 invRectPos = vec2(u_rectPos.x, ((u_textureSize.y / u_rectSize.y) - (u_rectPos.y / u_rectSize.y) - 1.0) * u_rectSize.y);\n"
-"        vec2 resultCoords = a_TextureCoordinates * u_textureRect.zw + u_textureRect.xy;\n"
+"        vec2 invRectPos = vec2(u_textureRect.x, 1.0 - u_textureRect.y - u_textureRect.w);\n"
+"        vec2 resultCoords = a_TextureCoordinates * u_textureRect.zw + invRectPos;\n"
 "        v_TextureCoordinates = vec3(resultCoords,0.0);\n"
 "      #else\n"
 "        v_TextureCoordinates = vec3(a_Position);\n"
