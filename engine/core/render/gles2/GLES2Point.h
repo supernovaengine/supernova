@@ -57,7 +57,7 @@ public:
     void updatePositions();
     void updateNormals();
     void updatePointSizes();
-    void updateSlicesPos();
+    void updateTextureRects();
     void updatePointColors();
     
     bool load();

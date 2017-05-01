@@ -14,7 +14,7 @@ private:
     
     std::vector<std::string> textures;
     Vector4 color;
-    TextureRect textureRect; //normalizaded
+    TextureRect* textureRect; //normalizaded
     int textureType;
     
 public:
@@ -35,7 +35,7 @@ public:
     std::vector<std::string> getTextures();
     Vector4* getColor();
     int getTextureType();
-    TextureRect getTextureRect();
+    TextureRect* getTextureRect();
     
 };
 

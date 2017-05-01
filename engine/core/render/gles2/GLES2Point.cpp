@@ -48,7 +48,7 @@ void GLES2Point::updatePointSizes(){
             GLES2Util::updateVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front());
 }
 
-void GLES2Point::updateSlicesPos(){
+void GLES2Point::updateTextureRects(){
     if (loaded){
         if (textureRects){
             GLES2Util::updateVBO(textureRectBuffer, GL_ARRAY_BUFFER, textureRects->size() * 4 * sizeof(GLfloat), &rectsData().front());
@@ -76,8 +76,8 @@ bool GLES2Point::load() {
     if (hasfog){
         programDefs += "#define HAS_FOG\n";
     }
-    if (textureRects){
-        programDefs += "#define IS_TEXTURERECT\n";
+    if (hasTextureRect){
+        programDefs += "#define HAS_TEXTURERECT\n";
     }
     
     gProgram = ProgramManager::useProgram(programName, programDefs);
@@ -90,12 +90,12 @@ bool GLES2Point::load() {
     vertexBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, positions->size() * 3 * sizeof(GLfloat), &positions->front(), GL_DYNAMIC_DRAW);
     aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
     
-    if (normals && lighting){
+    if (lighting && normals){
         normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_STATIC_DRAW);
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
     }
     
-    if (textureRects){
+    if (hasTextureRect && textureRects){
         textureRectBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, textureRects->size() * 4 * sizeof(GLfloat), &rectsData().front(), GL_DYNAMIC_DRAW);
         a_textureRect = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_textureRect");
     }
@@ -107,7 +107,7 @@ bool GLES2Point::load() {
     a_pointColor = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_pointColor");
 
     if (textured){
-        texture = TextureManager::loadTexture(material->getTextures()[0]);
+        texture = TextureManager::loadTexture(materialTexture);
         uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
     }else{
         texture = NULL;
@@ -151,7 +151,7 @@ bool GLES2Point::draw() {
     glUniformMatrix4fv(u_mvpMatrix, 1, GL_FALSE, (GLfloat*)modelViewProjectionMatrix);
     if (lighting){
         light.setUniformValues(sceneRender);
-        glUniform3fv(uEyePos, 1, cameraPosition->ptr());
+        glUniform3fv(uEyePos, 1, cameraPosition.ptr());
         glUniformMatrix4fv(u_mMatrix, 1, GL_FALSE, (GLfloat*)modelMatrix);
         glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);
     }
@@ -178,12 +178,14 @@ bool GLES2Point::draw() {
         }
     }
     
-    if (textureRects) {
+    if (hasTextureRect){
         attributePos++;
         glEnableVertexAttribArray(attributePos);
-        glBindBuffer(GL_ARRAY_BUFFER, textureRectBuffer);
-        if (a_textureRect == -1) a_textureRect = attributePos;
-        glVertexAttribPointer(a_textureRect, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+        if (textureRects) {
+            glBindBuffer(GL_ARRAY_BUFFER, textureRectBuffer);
+            if (a_textureRect == -1) a_textureRect = attributePos;
+            glVertexAttribPointer(a_textureRect, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+        }
     }
 
     attributePos++;
@@ -237,10 +239,9 @@ void GLES2Point::destroy(){
         if (lighting && normals){
             glDeleteBuffers(1, &normalBuffer);
         }
-        if (textureRects){
+        if (hasTextureRect && textureRects){
             glDeleteBuffers(1, &textureRectBuffer);
         }
-
         if (pointSizes)
             glDeleteBuffers(1, &pointSizeBuffer);
         if (pointColors)

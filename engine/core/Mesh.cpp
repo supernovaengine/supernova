@@ -118,10 +118,6 @@ void Mesh::removeAllSubmeshes(){
 }
 
 bool Mesh::load(){
-
-    if (scene != NULL){
-        //renderManager.getRender()->setSceneRender(((Scene*)scene)->getSceneRender());
-    }
     
     while (vertices.size() > texcoords.size()){
         texcoords.push_back(Vector2(0,0));

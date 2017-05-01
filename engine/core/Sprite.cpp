@@ -23,5 +23,5 @@ void Sprite::setFrame(std::string id){
 }
 
 void Sprite::setFrame(int id){
-    setRect(framesRect[std::to_string(id)]);
+    setFrame(std::to_string(id));
 }

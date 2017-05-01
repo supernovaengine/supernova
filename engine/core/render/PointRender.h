@@ -8,6 +8,8 @@
 #include "Material.h"
 #include <vector>
 
+class Particles;
+
 
 class PointRender {
     
@@ -15,12 +17,17 @@ private:
     
     void checkLighting();
     void checkFog();
+    void checkTextureRect();
+    void fillPointProperties();
     
 protected:
     
     bool loaded;
     bool lighting;
     bool hasfog;
+    bool hasTextureRect;
+    
+    Particles* particles;
     
     int numPoints;
     std::shared_ptr<TextureRender> texture;
@@ -30,48 +37,28 @@ protected:
     
     std::vector<Vector3>* positions;
     std::vector<Vector3>* normals;
-    //std::vector< std::pair<int, int> >* slicesPos;
-    std::vector< TextureRect >* textureRects;
+    std::vector<TextureRect>* textureRects;
     std::vector<float>* pointSizes;
     std::vector<Vector4>* pointColors;
     
-    Matrix4* modelMatrix;
-    Matrix4* normalMatrix;
-    Matrix4* modelViewProjectionMatrix;
-    Vector3* cameraPosition;
+    Matrix4 modelMatrix;
+    Matrix4 normalMatrix;
+    Matrix4 modelViewProjectionMatrix;
+    Vector3 cameraPosition;
     
-    Material* material;
-    
-    //int textureSizeWidth;
-    //int textureSizeHeight;
-    
-    //int sliceSizeWidth;
-    //int sliceSizeHeight;
+    std::string materialTexture;
 
 public:
     
     PointRender();
     virtual ~PointRender();
     
-    void setSceneRender(SceneRender* sceneRender);
-    void setPositions(std::vector<Vector3>* positions);
-    void setNormals(std::vector<Vector3>* normals);
-    void setModelMatrix(Matrix4* modelMatrix);
-    void setNormalMatrix(Matrix4* normalMatrix);
-    void setModelViewProjectionMatrix( Matrix4* modelViewProjectionMatrix);
-    void setCameraPosition(Vector3* cameraPosition);
-    void setMaterial(Material* material);
-    void setPointSizes(std::vector<float>* pointSizes);
-    //void setTextureSize(int textureSizeWidth, int textureSizeHeight);
-    //void setSliceSize(int sliceSizeWidth, int sliceSizeHeight);
-    //void setSlicesPos(std::vector< std::pair<int, int> >* slicesPos);
-    void setTextureRect(std::vector< TextureRect >* textureRects);
-    void setPointColors(std::vector<Vector4>* pointColors);
-    
+    void setParticles(Particles* particles);
+
     virtual void updatePositions() = 0;
     virtual void updateNormals() = 0;
     virtual void updatePointSizes() = 0;
-    virtual void updateSlicesPos() = 0;
+    virtual void updateTextureRects() = 0;
     virtual void updatePointColors() = 0;
     
     virtual bool load();

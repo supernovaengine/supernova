@@ -138,7 +138,7 @@ std::string gVertexPointsPerPixelLightShader =
 
 + lightingVertexDec +
 
-"#ifdef IS_TEXTURERECT\n"
+"#ifdef HAS_TEXTURERECT\n"
 "  attribute vec4 a_textureRect;\n"
 "  varying vec4 v_textureRect;\n"
 "#endif\n"
@@ -156,7 +156,7 @@ std::string gVertexPointsPerPixelLightShader =
 "    v_pointColor = a_pointColor;\n"
 "    gl_PointSize = a_PointSize;\n"
 
-"    #ifdef IS_TEXTURERECT\n"
+"    #ifdef HAS_TEXTURERECT\n"
 "      v_textureRect = a_textureRect;\n"
 "    #endif\n"
 
@@ -174,7 +174,7 @@ std::string gFragmentPointsPerPixelLightShader =
 
 + lightingFragmentDec + fogFragmentDec +
 
-"#ifdef IS_TEXTURERECT\n"
+"#ifdef HAS_TEXTURERECT\n"
 "  varying vec4 v_textureRect;\n"
 "#endif\n"
 
@@ -182,7 +182,7 @@ std::string gFragmentPointsPerPixelLightShader =
 "   vec4 fragmentColor = vec4(0.0);\n"
 
 "   if (uUseTexture){\n"
-"     #ifdef IS_TEXTURERECT\n"
+"     #ifdef HAS_TEXTURERECT\n"
 "       vec2 resultCoord = gl_PointCoord * v_textureRect.zw + v_textureRect.xy;\n"
 "     #else\n"
 "       vec2 resultCoord = gl_PointCoord;\n"
@@ -211,7 +211,9 @@ std::string gVertexMeshPerPixelLightShader =
 "  varying vec3 v_TextureCoordinates;\n"
 "#endif\n"
 
-"uniform vec4 u_textureRect;\n"
+"#ifdef HAS_TEXTURERECT\n"
+"  uniform vec4 u_textureRect;\n"
+"#endif\n"
 
 + lightingVertexDec +
 
@@ -223,8 +225,12 @@ std::string gVertexMeshPerPixelLightShader =
 
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifndef USE_TEXTURECUBE\n"
-"        vec2 invRectPos = vec2(u_textureRect.x, 1.0 - u_textureRect.y - u_textureRect.w);\n"
-"        vec2 resultCoords = a_TextureCoordinates * u_textureRect.zw + invRectPos;\n"
+"        #ifdef HAS_TEXTURERECT\n"
+"          vec2 invRectPos = vec2(u_textureRect.x, 1.0 - u_textureRect.y - u_textureRect.w);\n"
+"          vec2 resultCoords = a_TextureCoordinates * u_textureRect.zw + invRectPos;\n"
+"        #else\n"
+"          vec2 resultCoords = a_TextureCoordinates;\n"
+"        #endif\n"
 "        v_TextureCoordinates = vec3(resultCoords,0.0);\n"
 "      #else\n"
 "        v_TextureCoordinates = vec3(a_Position);\n"

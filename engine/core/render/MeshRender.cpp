@@ -9,8 +9,9 @@ MeshRender::MeshRender(){
     loaded = false;
     lighting = false;
     hasfog = false;
+    hasTextureRect = false;
     
-    submeshesGles.clear();
+    submeshesRender.clear();
 
     sceneRender = NULL;
 
@@ -40,6 +41,15 @@ void MeshRender::checkFog(){
     }
 }
 
+void MeshRender::checkTextureRect(){
+    hasTextureRect = false;
+    for (unsigned int i = 0; i < submeshes->size(); i++){
+        if (submeshes->at(i)->getMaterial()->getTextureRect()){
+            hasTextureRect = true;
+        }
+    }
+}
+
 void MeshRender::fillMeshProperties(){
     if (mesh->getScene() != NULL)
         sceneRender = mesh->getScene()->getSceneRender();
@@ -48,38 +58,39 @@ void MeshRender::fillMeshProperties(){
     texcoords = mesh->getTexcoords();
     normals = mesh->getNormals();
     submeshes = mesh->getSubmeshes();
+    
     modelViewProjectMatrix = mesh->getModelViewProjectMatrix();
     modelMatrix = mesh->getModelMatrix();
     normalMatrix = mesh->getNormalMatrix();
     cameraPosition = mesh->getCameraPosition();
+    
     isSky = mesh->isSky();
     primitiveMode = mesh->getPrimitiveMode();
 }
 
 bool MeshRender::load(){
+    
+    fillMeshProperties();
 
-    if (mesh->getVertices()->size() <= 0){
+    if (vertices->size() <= 0){
         return false;
     }
     
-    fillMeshProperties();
-    
     checkLighting();
     checkFog();
+    checkTextureRect();
 
-    submeshesGles.clear();
-    //---> For meshes
+    submeshesRender.clear();
     for (unsigned int i = 0; i < submeshes->size(); i++){
-        submeshesGles[submeshes->at(i)].indicesSizes = (int)submeshes->at(i)->getIndices()->size();
-        submeshesGles[submeshes->at(i)].textureRect = submeshes->at(i)->getMaterial()->getTextureRect();
+        submeshesRender[submeshes->at(i)].indicesSizes = (int)submeshes->at(i)->getIndices()->size();
 
         if (submeshes->at(i)->getMaterial()->getTextures().size() > 0){
-            submeshesGles[submeshes->at(i)].textured = true;
+            submeshesRender[submeshes->at(i)].textured = true;
         }else{
-            submeshesGles[submeshes->at(i)].textured = false;
+            submeshesRender[submeshes->at(i)].textured = false;
         }
         if (submeshes->at(i)->getMaterial()->getTextureType() == S_TEXTURE_2D &&  texcoords->size() == 0){
-            submeshesGles[submeshes->at(i)].textured = false;
+            submeshesRender[submeshes->at(i)].textured = false;
         }
     }
 

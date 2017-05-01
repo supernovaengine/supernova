@@ -9,12 +9,14 @@ class RectImage: public Image {
 private:
     int texWidth;
     int texHeight;
+    
+    bool useTextureRect;
 
     TextureRect textureRect;
     
 protected:
 
-    void generateNormalizateRect();
+    void normalizeTextureRect();
     
 public:
     RectImage();

@@ -9,7 +9,7 @@ ConcreteObject::ConcreteObject(): Object(){
 }
 
 ConcreteObject::~ConcreteObject(){
-    
+
 }
 
 Matrix4 ConcreteObject::getNormalMatrix(){
