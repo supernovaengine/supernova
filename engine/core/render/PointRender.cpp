@@ -1,6 +1,6 @@
 #include "PointRender.h"
 
-#include "Particles.h"
+#include "Points.h"
 #include "Scene.h"
 
 PointRender::PointRender(){
@@ -25,8 +25,8 @@ PointRender::PointRender(){
 PointRender::~PointRender(){
 }
 
-void PointRender::setParticles(Particles* particles){
-    this->particles = particles;
+void PointRender::setPoints(Points* points){
+    this->points = points;
 }
 
 void PointRender::checkLighting(){
@@ -51,21 +51,21 @@ void PointRender::checkTextureRect(){
 }
 
 void PointRender::fillPointProperties(){
-    if (particles->getScene() != NULL)
-        sceneRender = particles->getScene()->getSceneRender();
+    if (points->getScene() != NULL)
+        sceneRender = points->getScene()->getSceneRender();
     
-    positions = particles->getPositions();
-    normals = particles->getNormals();
-    textureRects = particles->getTextureRects();
-    pointSizes = particles->getPointSizes();
-    pointColors = particles->getColors();
+    positions = points->getPositions();
+    normals = points->getNormals();
+    textureRects = points->getTextureRects();
+    pointSizes = points->getPointSizes();
+    pointColors = points->getColors();
     
-    modelMatrix = particles->getModelMatrix();
-    normalMatrix = particles->getNormalMatrix();
-    modelViewProjectionMatrix = particles->getModelViewProjectMatrix();
-    cameraPosition = particles->getCameraPosition();
+    modelMatrix = points->getModelMatrix();
+    normalMatrix = points->getNormalMatrix();
+    modelViewProjectionMatrix = points->getModelViewProjectMatrix();
+    cameraPosition = points->getCameraPosition();
     
-    materialTexture = particles->getTexture();
+    materialTexture = points->getTexture();
 }
 
 bool PointRender::load(){

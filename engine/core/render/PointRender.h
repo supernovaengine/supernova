@@ -8,7 +8,7 @@
 #include "Material.h"
 #include <vector>
 
-class Particles;
+class Points;
 
 
 class PointRender {
@@ -27,7 +27,7 @@ protected:
     bool hasfog;
     bool hasTextureRect;
     
-    Particles* particles;
+    Points* points;
     
     int numPoints;
     std::shared_ptr<TextureRender> texture;
@@ -53,7 +53,7 @@ public:
     PointRender();
     virtual ~PointRender();
     
-    void setParticles(Particles* particles);
+    void setPoints(Points* points);
 
     virtual void updatePositions() = 0;
     virtual void updateNormals() = 0;

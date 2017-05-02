@@ -30,6 +30,7 @@
 #include "DirectionalLight.h"
 #include "Sound.h"
 #include "SkyBox.h"
+#include "Points.h"
 #include "Particles.h"
 #include <map>
 #include <unistd.h>
@@ -188,12 +189,16 @@ void LuaBinding::bind(){
     .addConstructor(LUA_ARGS())
     .endClass()
 
-    .beginExtendClass<Particles, ConcreteObject>("Particles")
+    .beginExtendClass<Points, ConcreteObject>("Points")
     .addConstructor(LUA_ARGS())
-    .addFunction("setSizeAttenuation", &Particles::setSizeAttenuation)
-    .addFunction("setPointScaleFactor", &Particles::setPointScaleFactor)
-    .addFunction("setMinPointSize", &Particles::setMinPointSize)
-    .addFunction("setMaxPointSize", &Particles::setMaxPointSize)
+    .addFunction("setSizeAttenuation", &Points::setSizeAttenuation)
+    .addFunction("setPointScaleFactor", &Points::setPointScaleFactor)
+    .addFunction("setMinPointSize", &Points::setMinPointSize)
+    .addFunction("setMaxPointSize", &Points::setMaxPointSize)
+    .endClass()
+    
+    .beginExtendClass<Particles, Points>("Particles")
+    .addConstructor(LUA_ARGS())
     .endClass()
 
     .beginExtendClass<SkyBox, Mesh>("SkyBox")
