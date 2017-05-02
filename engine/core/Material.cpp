@@ -4,10 +4,12 @@
 Material::Material(){
     this->textureType = S_TEXTURE_2D;
     transparent = false;
+    textureRect = NULL;
 }
 
 Material::~Material(){
-    
+    if (textureRect)
+        delete textureRect;
 }
 
 Material::Material(const Material& s){
@@ -56,6 +58,13 @@ void Material::setTextureCube(std::string front, std::string back, std::string l
     textures.push_back(front);
 }
 
+void Material::setTextureRect(float x, float y, float width, float height){
+    if (textureRect)
+        textureRect->setRect(x, y, width, height);
+    else
+        textureRect = new TextureRect(x, y, width, height);
+}
+
 std::vector<std::string> Material::getTextures(){
     return textures;
 }
@@ -66,4 +75,8 @@ Vector4* Material::getColor(){
 
 int Material::getTextureType(){
     return textureType;
+}
+
+TextureRect* Material::getTextureRect(){
+    return textureRect;
 }

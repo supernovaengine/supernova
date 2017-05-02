@@ -23,13 +23,14 @@
 #include "Mesh2D.h"
 #include "Image.h"
 #include "GUIObject.h"
-#include "ImageTemplate.h"
+#include "GUIImage.h"
 #include "Light.h"
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "DirectionalLight.h"
 #include "Sound.h"
 #include "SkyBox.h"
+#include "Points.h"
 #include "Particles.h"
 #include <map>
 #include <unistd.h>
@@ -125,7 +126,6 @@ void LuaBinding::bind(){
     .beginExtendClass<Scene, Object>("Scene")
     .addConstructor(LUA_ARGS())
     .addFunction("setCamera", &Scene::setCamera)
-    .addFunction("addObject", &Scene::addObject)
     .addFunction("setAmbientLight", (void (Scene::*)(const float))&Scene::setAmbientLight)
     .addProperty("ambientLight", &Scene::getAmbientLight, (void (Scene::*)(Vector3))&Scene::setAmbientLight)
     .endClass()
@@ -189,12 +189,16 @@ void LuaBinding::bind(){
     .addConstructor(LUA_ARGS())
     .endClass()
 
-    .beginExtendClass<Particles, ConcreteObject>("Particles")
+    .beginExtendClass<Points, ConcreteObject>("Points")
     .addConstructor(LUA_ARGS())
-    .addFunction("setSizeAttenuation", &Particles::setSizeAttenuation)
-    .addFunction("setPointScaleFactor", &Particles::setPointScaleFactor)
-    .addFunction("setMinPointSize", &Particles::setMinPointSize)
-    .addFunction("setMaxPointSize", &Particles::setMaxPointSize)
+    .addFunction("setSizeAttenuation", &Points::setSizeAttenuation)
+    .addFunction("setPointScaleFactor", &Points::setPointScaleFactor)
+    .addFunction("setMinPointSize", &Points::setMinPointSize)
+    .addFunction("setMaxPointSize", &Points::setMaxPointSize)
+    .endClass()
+    
+    .beginExtendClass<Particles, Points>("Particles")
+    .addConstructor(LUA_ARGS())
     .endClass()
 
     .beginExtendClass<SkyBox, Mesh>("SkyBox")
@@ -214,7 +218,7 @@ void LuaBinding::bind(){
     .addFunction("setBillboardScaleFactor", &Mesh2D::setBillboardScaleFactor)
     .endClass()
 
-    .beginExtendClass<ImageTemplate, Mesh2D>("ImageTemplate")
+    .beginExtendClass<GUIImage, Mesh2D>("GUIImage")
     .addConstructor(LUA_ARGS())
     .endClass()
     

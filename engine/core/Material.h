@@ -6,6 +6,7 @@
 
 #include <string>
 #include "math/Vector4.h"
+#include "image/TextureRect.h"
 #include <vector>
 
 class Material {
@@ -13,6 +14,7 @@ private:
     
     std::vector<std::string> textures;
     Vector4 color;
+    TextureRect* textureRect; //normalizaded
     int textureType;
     
 public:
@@ -28,10 +30,12 @@ public:
     void setColor(Vector4 color);
     void setTextureType(int textureType);
     void setTextureCube(std::string front, std::string back, std::string left, std::string right, std::string up, std::string down);
+    void setTextureRect(float x, float y, float width, float height);
     
     std::vector<std::string> getTextures();
     Vector4* getColor();
     int getTextureType();
+    TextureRect* getTextureRect();
     
 };
 

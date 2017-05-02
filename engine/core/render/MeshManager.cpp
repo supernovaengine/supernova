@@ -1,42 +1,42 @@
-#include "DrawManager.h"
+#include "MeshManager.h"
 
 #include "Supernova.h"
-#include "gles2/GLES2Draw.h"
+#include "render/gles2/GLES2Mesh.h"
 #include <stddef.h>
 
 
-DrawManager::DrawManager() {
+MeshManager::MeshManager() {
     render = NULL;
     instanciateRender();
 }
 
-DrawManager::~DrawManager() {
+MeshManager::~MeshManager() {
     delete render;
 }
 
-void DrawManager::instanciateRender(){
+void MeshManager::instanciateRender(){
     if (render == NULL){
         if (Supernova::getRenderAPI() == S_GLES2){
-            render = new GLES2Draw();
+            render = new GLES2Mesh();
         }
     }
 }
 
-DrawRender* DrawManager::getRender(){
+MeshRender* MeshManager::getRender(){
     instanciateRender();
     return render;
 }
 
-bool DrawManager::load() {
+bool MeshManager::load() {
     instanciateRender();
     return render->load();
 }
 
-bool DrawManager::draw() {
+bool MeshManager::draw() {
     return render->draw();
 }
 
-void DrawManager::destroy(){
+void MeshManager::destroy(){
     if (render != NULL)
         render->destroy();
 }

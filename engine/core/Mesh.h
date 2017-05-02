@@ -4,7 +4,7 @@
 
 #include "ConcreteObject.h"
 #include "math/Vector4.h"
-#include "render/DrawManager.h"
+#include "render/MeshManager.h"
 #include "Submesh.h"
 
 class Mesh: public ConcreteObject {
@@ -13,17 +13,19 @@ private:
     void removeAllSubmeshes();
     
 protected:
-    DrawManager renderManager;
+    MeshManager renderManager;
 
     std::vector<Vector3> vertices;
     std::vector<Vector3> normals;
     std::vector<Vector2> texcoords;
     std::vector<Submesh*> submeshes;
+    
+    bool skymesh;
 
     int primitiveMode;
     
     void addSubmesh(Submesh* submesh);
-    std::vector<Submesh*> getSubmeshes();
+    
 
     void sortTransparentSubmeshes();
     
@@ -32,9 +34,11 @@ public:
     virtual ~Mesh();
 
     int getPrimitiveMode();
-    std::vector<Vector3> getVertices();
-    std::vector<Vector3> getNormals();
-    std::vector<Vector2> getTexcoords();
+    std::vector<Vector3>* getVertices();
+    std::vector<Vector3>* getNormals();
+    std::vector<Vector2>* getTexcoords();
+    std::vector<Submesh*>* getSubmeshes();
+    bool isSky();
     
     void setTexcoords(std::vector<Vector2> texcoords);
 

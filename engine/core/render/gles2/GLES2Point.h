@@ -4,7 +4,6 @@
 #define GLES2Point_h
 
 #include "GLES2Header.h"
-#include "../../Submesh.h"
 #include <vector>
 #include <unordered_map>
 #include "math/Matrix4.h"
@@ -14,25 +13,27 @@
 #include "render/ProgramManager.h"
 #include "render/PointRender.h"
 #include "render/SceneRender.h"
+#include "GLES2Light.h"
+#include "GLES2Fog.h"
 
 
 class GLES2Point : public PointRender {
     
 private:
+
+    GLES2Light light;
+    GLES2Fog fog;
     
     std::shared_ptr<ProgramRender> gProgram;
-    
-    
+
     GLint aPositionHandle;
-    GLint aTextureCoordinatesLocation;
     GLint aNormal;
     
     GLint a_PointSize;
-    GLint a_spritePos;
+    GLint a_textureRect;
     GLint a_pointColor;
     
     GLuint uTextureUnitLocation;
-    GLuint uColor;
     GLuint u_mvpMatrix;
     GLuint u_mMatrix;
     GLuint u_nMatrix;
@@ -40,34 +41,13 @@ private:
     
     GLuint useTexture;
     
-    GLuint u_NumPointLight;
-    GLuint u_PointLightPos;
-    GLuint u_PointLightPower;
-    GLuint u_PointLightColor;
-    
-    GLuint u_NumSpotLight;
-    GLuint u_SpotLightPos;
-    GLuint u_SpotLightPower;
-    GLuint u_SpotLightColor;
-    GLuint u_SpotLightCutOff;
-    GLuint u_SpotLightTarget;
-    
-    GLuint u_NumDirectionalLight;
-    GLuint u_DirectionalLightDir;
-    GLuint u_DirectionalLightPower;
-    GLuint u_DirectionalLightColor;
-    
-    GLuint u_AmbientLight;
-    
-    GLuint u_spriteSize;
-    GLuint u_textureSize;
-    
     GLuint vertexBuffer;
     GLuint normalBuffer;
-    GLuint uvBuffer;
     GLuint pointSizeBuffer;
-    GLuint spritePosBuffer;
+    GLuint textureRectBuffer;
     GLuint pointColorBuffer;
+    
+    std::vector<float> rectsData();
 
     
 public:
@@ -77,7 +57,7 @@ public:
     void updatePositions();
     void updateNormals();
     void updatePointSizes();
-    void updateSpritePos();
+    void updateTextureRects();
     void updatePointColors();
     
     bool load();

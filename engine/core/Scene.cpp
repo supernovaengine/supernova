@@ -14,6 +14,7 @@ Scene::Scene() {
     setAmbientLight(0.1);
     scene = this;
     sky = NULL;
+    fog = NULL;
 }
 
 Scene::~Scene() {
@@ -31,14 +32,12 @@ void Scene::addLight (Light* light){
     
     if (!founded){
         lights.push_back(light);
-        sceneManager.setLights(lights);
     }
 }
 
 void Scene::removeLight (Light* light){
     std::vector<Light*>::iterator i = std::remove(lights.begin(), lights.end(), light);
     lights.erase(i,lights.end());
-    sceneManager.setLights(lights);
 }
 
 void Scene::addSubScene (Scene* scene){
@@ -75,21 +74,24 @@ void Scene::addGUIObject (GUIObject* guiobject){
 }
 
 void Scene::removeGUIObject (GUIObject* guiobject){
-    std::vector<GUIObject*>::iterator i = std::remove(guiObjects.begin(), guiObjects.end(), scene);
+    std::vector<GUIObject*>::iterator i = std::remove(guiObjects.begin(), guiObjects.end(), guiobject);
     guiObjects.erase(i,guiObjects.end());
 }
 
 SceneRender* Scene::getSceneRender(){
-    return sceneManager.getSceneRender();
+    return sceneManager.getRender();
 }
 
 void Scene::setSky(SkyBox* sky){
     this->sky = sky;
 }
 
+void Scene::setFog(Fog* fog){
+    this->fog = fog;
+}
+
 void Scene::setAmbientLight(Vector3 ambientLight){
     this->ambientLight = ambientLight;
-    sceneManager.setAmbientLight(ambientLight);
 }
 
 void Scene::setAmbientLight(const float ambientFactor){
@@ -206,8 +208,11 @@ void Scene::drawSky(){
 }
 
 bool Scene::load(){
-    
-    sceneManager.setChildScene(isChildScene);
+
+    sceneManager.getRender()->setChildScene(isChildScene);
+    sceneManager.getRender()->setLights(&this->lights);
+    sceneManager.getRender()->setAmbientLight(&this->ambientLight);
+    sceneManager.getRender()->setFog(fog);
 
     doCamera();
 
@@ -226,8 +231,8 @@ bool Scene::draw(){
     
     transparentQueue.clear();
 
-    sceneManager.setUseDepth(useDepth);
-    sceneManager.setUseTransparency(useTransparency);
+    sceneManager.getRender()->setUseDepth(useDepth);
+    sceneManager.getRender()->setUseTramsparency(useTransparency);
     
     sceneManager.draw();
     resetSceneProperties();

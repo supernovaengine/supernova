@@ -4,8 +4,11 @@
 #include "math/Vector2.h"
 #include "render/SceneRender.h"
 #include "render/TextureRender.h"
+#include "image/TextureRect.h"
 #include "Material.h"
 #include <vector>
+
+class Points;
 
 
 class PointRender {
@@ -13,11 +16,18 @@ class PointRender {
 private:
     
     void checkLighting();
+    void checkFog();
+    void checkTextureRect();
+    void fillPointProperties();
     
 protected:
     
     bool loaded;
     bool lighting;
+    bool hasfog;
+    bool hasTextureRect;
+    
+    Points* points;
     
     int numPoints;
     std::shared_ptr<TextureRender> texture;
@@ -27,57 +37,32 @@ protected:
     
     std::vector<Vector3>* positions;
     std::vector<Vector3>* normals;
-    std::vector< std::pair<int, int> >* pointSpritesPos;
+    std::vector<TextureRect>* textureRects;
     std::vector<float>* pointSizes;
     std::vector<Vector4>* pointColors;
     
-    Matrix4* modelMatrix;
-    Matrix4* normalMatrix;
-    Matrix4* modelViewProjectionMatrix;
-    Vector3* cameraPosition;
+    Matrix4 modelMatrix;
+    Matrix4 normalMatrix;
+    Matrix4 modelViewProjectionMatrix;
+    Vector3 cameraPosition;
     
-    Material* material;
-    
-    bool isSpriteSheet;
-    
-    int textureSizeWidth;
-    int textureSizeHeight;
-    
-    int spriteSizeWidth;
-    int spriteSizeHeight;
-    
-    int spritePosX;
-    int spritePosY;
+    std::string materialTexture;
 
 public:
     
     PointRender();
     virtual ~PointRender();
     
-    void setSceneRender(SceneRender* sceneRender);
-    void setPositions(std::vector<Vector3>* positions);
-    void setNormals(std::vector<Vector3>* normals);
-    void setModelMatrix(Matrix4* modelMatrix);
-    void setNormalMatrix(Matrix4* normalMatrix);
-    void setModelViewProjectionMatrix( Matrix4* modelViewProjectionMatrix);
-    void setCameraPosition(Vector3* cameraPosition);
-    void setMaterial(Material* material);
-    void setPointSizes(std::vector<float>* pointSizes);
-    void setIsSpriteSheet(bool isSpriteSheet);
-    void setTextureSize(int textureSizeWidth, int textureSizeHeight);
-    void setSpriteSize(int spriteSizeWidth, int spriteSizeHeight);
-    void setSpritePos(int spritePosX, int spritePosY);
-    void setPointSpritesPos(std::vector< std::pair<int, int> >* pointSpritesPos);
-    void setPointColors(std::vector<Vector4>* pointColors);
-    
+    void setPoints(Points* points);
+
     virtual void updatePositions() = 0;
     virtual void updateNormals() = 0;
     virtual void updatePointSizes() = 0;
-    virtual void updateSpritePos() = 0;
+    virtual void updateTextureRects() = 0;
     virtual void updatePointColors() = 0;
     
     virtual bool load();
-    virtual bool draw() = 0;
+    virtual bool draw();
     virtual void destroy() = 0;
     
 };

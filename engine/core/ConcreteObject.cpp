@@ -9,7 +9,11 @@ ConcreteObject::ConcreteObject(): Object(){
 }
 
 ConcreteObject::~ConcreteObject(){
-    
+
+}
+
+Matrix4 ConcreteObject::getNormalMatrix(){
+    return normalMatrix;
 }
 
 void ConcreteObject::setColor(float red, float green, float blue, float alpha){

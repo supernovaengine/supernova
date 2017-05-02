@@ -7,10 +7,12 @@
 #include "math/Vector3.h"
 #include "math/Quaternion.h"
 
+class Scene;
+
 class Object: public Render {
 
 private:
-    void setSceneAndConfigure(Object* scene);
+    void setSceneAndConfigure(Scene* scene);
     void removeScene();
     int findObject(Object* object);
     void setDepth(bool depth);
@@ -20,7 +22,7 @@ protected:
     std::vector<Object*> objects;
 
     Object* parent;
-    Object* scene;
+    Scene* scene;
 
     Matrix4* viewMatrix;
     Matrix4* projectionMatrix;
@@ -51,6 +53,7 @@ public:
     virtual void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
     Matrix4 getModelMatrix();
     Matrix4 getModelViewProjectMatrix();
+    Vector3 getCameraPosition();
 
     void setPosition(const float x, const float y, const float z);
     void setPosition(Vector3 position);
@@ -69,6 +72,8 @@ public:
     void setCenter(const float x, const float y, const float z);
     void setCenter(Vector3 center);
     Vector3 getCenter();
+    
+    Scene* getScene();
     
     void moveToFront();
     void moveToBack();
