@@ -27,6 +27,7 @@ add_library(
     src/core/soloud_fader.cpp
 
     src/backend/opensles/soloud_opensles.cpp
+    src/backend/sdl2_static/soloud_sdl2_static.cpp
 
     src/filter/soloud_bassboostfilter.cpp
     src/filter/soloud_dcremovalfilter.cpp
