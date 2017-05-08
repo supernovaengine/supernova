@@ -5,11 +5,22 @@
 
 #include "audio/SoundManager.h"
 #include "audio/AudioPlayer.h"
+#include "soloud.h"
+#include "soloud_wav.h"
+#include "soloud_speech.h"
+#include "soloud_thread.h"
+
 #include <string>
 
 class Sound{
     
 private:
+
+    // Define a couple of variables
+    SoLoud::Soloud soloud;  // SoLoud engine core
+    //SoLoud::Speech speech;  // A sound source (speech, in this case)
+    SoLoud::Wav sample;    // One sample
+    SoLoud::result loaded;
 
     SoundManager soundManager;
     AudioPlayer* player;
