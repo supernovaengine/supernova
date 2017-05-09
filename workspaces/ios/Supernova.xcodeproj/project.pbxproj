@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		71192EFD1CE1334000BD76EE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
+		712379201EC13C7E00BFD1F7 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */; };
+		712379231EC13CDA00BFD1F7 /* libstb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 712379111EC13C6000BFD1F7 /* libstb.a */; };
+		712379261EC13CEB00BFD1F7 /* SoLoudLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 712379241EC13CEB00BFD1F7 /* SoLoudLoader.cpp */; };
 		7128E8241E8208F40039BFEA /* TextureRect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7128E8221E8208F40039BFEA /* TextureRect.cpp */; };
 		71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71369C081E291E22006AE1D1 /* Button.cpp */; };
 		713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */ = {isa = PBXBuildFile; fileRef = 713B79A11C0FD15000892EAC /* iosfopenpath.m */; };
@@ -309,19 +312,18 @@
 		71F59C4E1EBFCB2700F49392 /* soloud_fftfilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59BCB1EBFCA5300F49392 /* soloud_fftfilter.cpp */; };
 		71F59C4F1EBFCB2700F49392 /* soloud_flangerfilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59BCC1EBFCA5300F49392 /* soloud_flangerfilter.cpp */; };
 		71F59C501EBFCB2700F49392 /* soloud_lofifilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59BCD1EBFCA5300F49392 /* soloud_lofifilter.cpp */; };
-		71F59C521EBFCB5D00F49392 /* soloud_wav.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B8F1EBFCA5300F49392 /* soloud_wav.cpp */; };
-		71F59C531EBFCB5D00F49392 /* soloud_wavstream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B901EBFCA5300F49392 /* soloud_wavstream.cpp */; };
-		71F59C541EBFCB5D00F49392 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B911EBFCA5300F49392 /* stb_vorbis.c */; };
-		71F59C551EBFCBF700F49392 /* darray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B7A1EBFCA5300F49392 /* darray.cpp */; };
-		71F59C561EBFCBF700F49392 /* klatt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B7D1EBFCA5300F49392 /* klatt.cpp */; };
-		71F59C571EBFCBF700F49392 /* resonator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B801EBFCA5300F49392 /* resonator.cpp */; };
-		71F59C581EBFCBF700F49392 /* soloud_speech.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B821EBFCA5300F49392 /* soloud_speech.cpp */; };
-		71F59C591EBFCBF700F49392 /* tts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B831EBFCA5300F49392 /* tts.cpp */; };
 		71F59C641EBFCF8800F49392 /* libsoloud.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F59B441EBFCA3100F49392 /* libsoloud.a */; };
 		71F59C681EBFD1BD00F49392 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F59C671EBFD1BD00F49392 /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		712379211EC13CD400BFD1F7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 716AB59A1BEF9F3C001B672D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 712379101EC13C6000BFD1F7;
+			remoteInfo = stb;
+		};
 		715823EE1D93583D00AB1181 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 716AB59A1BEF9F3C001B672D /* Project object */;
@@ -388,6 +390,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		7123790F1EC13C6000BFD1F7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		715820CE1D9350DB00AB1181 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -473,6 +484,11 @@
 
 /* Begin PBXFileReference section */
 		71192EFB1CE1334000BD76EE /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		712379111EC13C6000BFD1F7 /* libstb.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libstb.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_vorbis.c; sourceTree = "<group>"; };
+		7123791D1EC13C7500BFD1F7 /* stb_vorbis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_vorbis.h; sourceTree = "<group>"; };
+		712379241EC13CEB00BFD1F7 /* SoLoudLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoLoudLoader.cpp; sourceTree = "<group>"; };
+		712379251EC13CEB00BFD1F7 /* SoLoudLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoLoudLoader.h; sourceTree = "<group>"; };
 		7125E3291D7CB2B20090B05E /* ImageReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageReader.h; sourceTree = "<group>"; };
 		7125E32B1D7CC7470090B05E /* ImageReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageReader.cpp; sourceTree = "<group>"; };
 		7128E8221E8208F40039BFEA /* TextureRect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureRect.cpp; sourceTree = "<group>"; };
@@ -1073,19 +1089,6 @@
 		71F59B6B1EBFCA5300F49392 /* soloud_vic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = soloud_vic.h; sourceTree = "<group>"; };
 		71F59B6C1EBFCA5300F49392 /* soloud_wav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = soloud_wav.h; sourceTree = "<group>"; };
 		71F59B6D1EBFCA5300F49392 /* soloud_wavstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = soloud_wavstream.h; sourceTree = "<group>"; };
-		71F59B7A1EBFCA5300F49392 /* darray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = darray.cpp; sourceTree = "<group>"; };
-		71F59B7B1EBFCA5300F49392 /* darray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = darray.h; sourceTree = "<group>"; };
-		71F59B7D1EBFCA5300F49392 /* klatt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = klatt.cpp; sourceTree = "<group>"; };
-		71F59B7E1EBFCA5300F49392 /* klatt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = klatt.h; sourceTree = "<group>"; };
-		71F59B801EBFCA5300F49392 /* resonator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = resonator.cpp; sourceTree = "<group>"; };
-		71F59B811EBFCA5300F49392 /* resonator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resonator.h; sourceTree = "<group>"; };
-		71F59B821EBFCA5300F49392 /* soloud_speech.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = soloud_speech.cpp; sourceTree = "<group>"; };
-		71F59B831EBFCA5300F49392 /* tts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tts.cpp; sourceTree = "<group>"; };
-		71F59B841EBFCA5300F49392 /* tts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tts.h; sourceTree = "<group>"; };
-		71F59B8F1EBFCA5300F49392 /* soloud_wav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = soloud_wav.cpp; sourceTree = "<group>"; };
-		71F59B901EBFCA5300F49392 /* soloud_wavstream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = soloud_wavstream.cpp; sourceTree = "<group>"; };
-		71F59B911EBFCA5300F49392 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_vorbis.c; sourceTree = "<group>"; };
-		71F59B921EBFCA5300F49392 /* stb_vorbis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_vorbis.h; sourceTree = "<group>"; };
 		71F59B971EBFCA5300F49392 /* soloud_coreaudio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = soloud_coreaudio.cpp; sourceTree = "<group>"; };
 		71F59BB51EBFCA5300F49392 /* soloud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = soloud.cpp; sourceTree = "<group>"; };
 		71F59BB61EBFCA5300F49392 /* soloud_audiosource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = soloud_audiosource.cpp; sourceTree = "<group>"; };
@@ -1117,6 +1120,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		7123790E1EC13C6000BFD1F7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		715820CD1D9350DB00AB1181 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1176,6 +1186,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				712379231EC13CDA00BFD1F7 /* libstb.a in Frameworks */,
 				71F59C641EBFCF8800F49392 /* libsoloud.a in Frameworks */,
 				71BCFA9D1E47CA22008E42A2 /* libfreetype.a in Frameworks */,
 				71BD28321DE887E300C12A1D /* libmpg123.a in Frameworks */,
@@ -1211,6 +1222,15 @@
 			);
 			name = project;
 			path = ../../project;
+			sourceTree = "<group>";
+		};
+		7123791A1EC13C7500BFD1F7 /* stb */ = {
+			isa = PBXGroup;
+			children = (
+				7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */,
+				7123791D1EC13C7500BFD1F7 /* stb_vorbis.h */,
+			);
+			path = stb;
 			sourceTree = "<group>";
 		};
 		7137AEB61CFCF58900B271D5 /* tinyobjloader */ = {
@@ -1410,6 +1430,7 @@
 		713D2AAE1CFB2EF900A4752F /* libs */ = {
 			isa = PBXGroup;
 			children = (
+				7123791A1EC13C7500BFD1F7 /* stb */,
 				71F59B4D1EBFCA5300F49392 /* soloud */,
 				71BCF6D11E47BF1D008E42A2 /* freetype */,
 				71BD25531DE886C100C12A1D /* mpg123 */,
@@ -1708,6 +1729,7 @@
 				71BD254A1DE886B100C12A1D /* libmpg123.a */,
 				71BCF6C81E47BF03008E42A2 /* libfreetype.a */,
 				71F59B441EBFCA3100F49392 /* libsoloud.a */,
+				712379111EC13C6000BFD1F7 /* libstb.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1759,6 +1781,8 @@
 		7188F1B01DBD416000A2D04F /* audio */ = {
 			isa = PBXGroup;
 			children = (
+				712379241EC13CEB00BFD1F7 /* SoLoudLoader.cpp */,
+				712379251EC13CEB00BFD1F7 /* SoLoudLoader.h */,
 				71BD28351DE8E96800C12A1D /* MP3Reader.cpp */,
 				71BD28361DE8E96800C12A1D /* MP3Reader.h */,
 				7188F1B11DBD41A400A2D04F /* AudioFile.cpp */,
@@ -2165,48 +2189,11 @@
 		71F59B701EBFCA5300F49392 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				71F59B711EBFCA5300F49392 /* audiosource */,
 				71F59B931EBFCA5300F49392 /* backend */,
 				71F59BB41EBFCA5300F49392 /* core */,
 				71F59BC61EBFCA5300F49392 /* filter */,
 			);
 			path = src;
-			sourceTree = "<group>";
-		};
-		71F59B711EBFCA5300F49392 /* audiosource */ = {
-			isa = PBXGroup;
-			children = (
-				71F59B791EBFCA5300F49392 /* speech */,
-				71F59B8E1EBFCA5300F49392 /* wav */,
-			);
-			path = audiosource;
-			sourceTree = "<group>";
-		};
-		71F59B791EBFCA5300F49392 /* speech */ = {
-			isa = PBXGroup;
-			children = (
-				71F59B7A1EBFCA5300F49392 /* darray.cpp */,
-				71F59B7B1EBFCA5300F49392 /* darray.h */,
-				71F59B7D1EBFCA5300F49392 /* klatt.cpp */,
-				71F59B7E1EBFCA5300F49392 /* klatt.h */,
-				71F59B801EBFCA5300F49392 /* resonator.cpp */,
-				71F59B811EBFCA5300F49392 /* resonator.h */,
-				71F59B821EBFCA5300F49392 /* soloud_speech.cpp */,
-				71F59B831EBFCA5300F49392 /* tts.cpp */,
-				71F59B841EBFCA5300F49392 /* tts.h */,
-			);
-			path = speech;
-			sourceTree = "<group>";
-		};
-		71F59B8E1EBFCA5300F49392 /* wav */ = {
-			isa = PBXGroup;
-			children = (
-				71F59B8F1EBFCA5300F49392 /* soloud_wav.cpp */,
-				71F59B901EBFCA5300F49392 /* soloud_wavstream.cpp */,
-				71F59B911EBFCA5300F49392 /* stb_vorbis.c */,
-				71F59B921EBFCA5300F49392 /* stb_vorbis.h */,
-			);
-			path = wav;
 			sourceTree = "<group>";
 		};
 		71F59B931EBFCA5300F49392 /* backend */ = {
@@ -2266,6 +2253,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		712379101EC13C6000BFD1F7 /* stb */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 712379191EC13C6000BFD1F7 /* Build configuration list for PBXNativeTarget "stb" */;
+			buildPhases = (
+				7123790D1EC13C6000BFD1F7 /* Sources */,
+				7123790E1EC13C6000BFD1F7 /* Frameworks */,
+				7123790F1EC13C6000BFD1F7 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = stb;
+			productName = stb;
+			productReference = 712379111EC13C6000BFD1F7 /* libstb.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		715820CF1D9350DB00AB1181 /* png */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 715820D81D9350DB00AB1181 /* Build configuration list for PBXNativeTarget "png" */;
@@ -2397,6 +2401,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				712379221EC13CD400BFD1F7 /* PBXTargetDependency */,
 				71F59C631EBFCF8400F49392 /* PBXTargetDependency */,
 				71BCFA9C1E47CA1D008E42A2 /* PBXTargetDependency */,
 				71BCFA991E47C1F7008E42A2 /* PBXTargetDependency */,
@@ -2454,6 +2459,10 @@
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = Deslon;
 				TargetAttributes = {
+					712379101EC13C6000BFD1F7 = {
+						CreatedOnToolsVersion = 8.3.1;
+						ProvisioningStyle = Automatic;
+					};
 					715820CF1D9350DB00AB1181 = {
 						CreatedOnToolsVersion = 8.0;
 						ProvisioningStyle = Automatic;
@@ -2515,6 +2524,7 @@
 				71BD25491DE886B100C12A1D /* mpg123 */,
 				71BCF6C71E47BF03008E42A2 /* freetype */,
 				71F59B431EBFCA3100F49392 /* soloud */,
+				712379101EC13C6000BFD1F7 /* stb */,
 			);
 		};
 /* End PBXProject section */
@@ -2534,6 +2544,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7123790D1EC13C6000BFD1F7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				712379201EC13C7E00BFD1F7 /* stb_vorbis.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		715820CC1D9350DB00AB1181 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2704,6 +2722,7 @@
 				716AB5AA1BEF9F3C001B672D /* AppDelegate.m in Sources */,
 				716AB5B11BEF9F3D001B672D /* GameViewController.mm in Sources */,
 				713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */,
+				712379261EC13CEB00BFD1F7 /* SoLoudLoader.cpp in Sources */,
 				716AB5A71BEF9F3C001B672D /* main.m in Sources */,
 				71192EFD1CE1334000BD76EE /* main.cpp in Sources */,
 				717FA2091CA1843C009071DC /* EAGLView.mm in Sources */,
@@ -2863,25 +2882,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				71F59C441EBFCB1F00F49392 /* soloud_fader.cpp in Sources */,
-				71F59C531EBFCB5D00F49392 /* soloud_wavstream.cpp in Sources */,
-				71F59C541EBFCB5D00F49392 /* stb_vorbis.c in Sources */,
-				71F59C591EBFCBF700F49392 /* tts.cpp in Sources */,
-				71F59C551EBFCBF700F49392 /* darray.cpp in Sources */,
 				71F59C3D1EBFCB1F00F49392 /* soloud_core_basicops.cpp in Sources */,
 				71F59C4A1EBFCB2700F49392 /* soloud_bassboostfilter.cpp in Sources */,
 				71F59C4F1EBFCB2700F49392 /* soloud_flangerfilter.cpp in Sources */,
-				71F59C521EBFCB5D00F49392 /* soloud_wav.cpp in Sources */,
 				71F59C381EBFCB1500F49392 /* soloud_coreaudio.cpp in Sources */,
-				71F59C571EBFCBF700F49392 /* resonator.cpp in Sources */,
 				71F59C3C1EBFCB1F00F49392 /* soloud_core_3d.cpp in Sources */,
 				71F59C411EBFCB1F00F49392 /* soloud_core_setters.cpp in Sources */,
 				71F59C481EBFCB1F00F49392 /* soloud_filter.cpp in Sources */,
 				71F59C471EBFCB1F00F49392 /* soloud_file.cpp in Sources */,
 				71F59C391EBFCB1F00F49392 /* soloud.cpp in Sources */,
-				71F59C581EBFCBF700F49392 /* soloud_speech.cpp in Sources */,
 				71F59C451EBFCB1F00F49392 /* soloud_fft.cpp in Sources */,
 				71F59C3B1EBFCB1F00F49392 /* soloud_bus.cpp in Sources */,
-				71F59C561EBFCBF700F49392 /* klatt.cpp in Sources */,
 				71F59C461EBFCB1F00F49392 /* soloud_fft_lut.cpp in Sources */,
 				71F59C4D1EBFCB2700F49392 /* soloud_echofilter.cpp in Sources */,
 				71F59C3A1EBFCB1F00F49392 /* soloud_audiosource.cpp in Sources */,
@@ -2901,6 +2912,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		712379221EC13CD400BFD1F7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 712379101EC13C6000BFD1F7 /* stb */;
+			targetProxy = 712379211EC13CD400BFD1F7 /* PBXContainerItemProxy */;
+		};
 		715823EF1D93583D00AB1181 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 715820CF1D9350DB00AB1181 /* png */;
@@ -2968,6 +2984,42 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		712379171EC13C6000BFD1F7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		712379181EC13C6000BFD1F7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		715820D61D9350DB00AB1181 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3405,7 +3457,7 @@
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"WITH_COREAUDIO=1",
@@ -3428,7 +3480,7 @@
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				ENABLE_NS_ASSERTIONS = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PREPROCESSOR_DEFINITIONS = "WITH_COREAUDIO=1";
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/soloud/include/";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
@@ -3441,6 +3493,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		712379191EC13C6000BFD1F7 /* Build configuration list for PBXNativeTarget "stb" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				712379171EC13C6000BFD1F7 /* Debug */,
+				712379181EC13C6000BFD1F7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		715820D81D9350DB00AB1181 /* Build configuration list for PBXNativeTarget "png" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -3538,6 +3599,7 @@
 				71F59B4B1EBFCA3100F49392 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

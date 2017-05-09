@@ -6,14 +6,13 @@
 #include "audio/SoundManager.h"
 #include "audio/AudioPlayer.h"
 #include "soloud.h"
-#include "soloud_wav.h"
-#include "soloud_speech.h"
+#include "audio/SoLoudLoader.h"
 #include "soloud_thread.h"
 
 #include <string>
 
 class Sound{
-    
+
 private:
 
     // Define a couple of variables
@@ -25,7 +24,7 @@ private:
     SoundManager soundManager;
     AudioPlayer* player;
     std::string filename;
-    
+
 public:
     Sound(std::string filename);
     virtual ~Sound();

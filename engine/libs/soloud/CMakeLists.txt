@@ -37,15 +37,4 @@ add_library(
     src/filter/soloud_echofilter.cpp
     src/filter/soloud_flangerfilter.cpp
 
-    src/audiosource/wav/soloud_wav.cpp
-    src/audiosource/wav/soloud_wavstream.cpp
-    src/audiosource/wav/stb_vorbis.c
-    src/audiosource/wav/stb_vorbis.h
-
-    src/audiosource/speech/darray.cpp
-    src/audiosource/speech/klatt.cpp
-    src/audiosource/speech/resonator.cpp
-    src/audiosource/speech/soloud_speech.cpp
-    src/audiosource/speech/tts.cpp
-
 )

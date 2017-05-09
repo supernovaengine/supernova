@@ -15,6 +15,7 @@ Sound::~Sound(){
 int Sound::load(){
 
     loaded = sample.load(filename.c_str());
+    sample.setSingleInstance(true);
     soloud.init();
     //Wait for mixing thread
     SoLoud::Thread::sleep(10);
