@@ -8,26 +8,25 @@
 #include "soloud_file.h"
 #include "stb_vorbis.h"
 #include "mpg123.h"
-/*
+
+
 ssize_t s_read(void * handle, void *buffer, size_t size) {
-    SoLoud::File *fp = (SoLoud::File *)handle;
-    return fp->read((unsigned char*)buffer, size);
+    return ((SoLoud::File*)handle)->read((unsigned char*)buffer, size);
 }
 
 off_t s_lseek(void *handle, off_t offset, int whence) {
-    SoLoud::File *fp = (SoLoud::File *)handle;
     switch (whence)
     {
         case SEEK_CUR:
-            fp->seek(fp->pos() + offset);
+            ((SoLoud::File*)handle)->seek(((SoLoud::File*)handle)->pos() + offset);
             break;
         case SEEK_END:
-            fp->seek(fp->length() + offset);
+            ((SoLoud::File*)handle)->seek(((SoLoud::File*)handle)->length() + offset);
             break;
         default:
-            fp->seek(offset);
+            ((SoLoud::File*)handle)->seek(offset);
     }
-    return 0;
+    return ((SoLoud::File*)handle)->pos();
 }
 
 
@@ -35,24 +34,7 @@ void s_cleanup(void *handle) {
     //Not necessary to close handle here
     //fclose((FILE*)handle);
 }
-*/
 
-ssize_t s_read(void * handle, void *buffer, size_t size) {
-    return fread((char*)buffer, 1, size, (FILE*)handle);
-}
-
-off_t s_lseek(void *handle, off_t offset, int whence) {
-    if (fseek((FILE*)handle, offset, whence) == 0)
-        return ftell((FILE*)handle);
-
-    return (off_t)-1;
-}
-
-
-void s_cleanup(void *handle) {
-    //Not necessary to close handle here
-    //fclose((FILE*)handle);
-}
 namespace SoLoud
 {
 	WavInstance::WavInstance(Wav *aParent)
@@ -149,8 +131,6 @@ namespace SoLoud
 
     result Wav::loadmp3(File *aReader) {
 
-        FILE* fp = fopen("musica.mp3","rb");
-
         mpg123_handle *mh;
 
         int channels, encoding, bitsPerSample;
@@ -170,7 +150,7 @@ namespace SoLoud
 
         mpg123_replace_reader_handle(mh, s_read, s_lseek, s_cleanup);
 
-        if (mpg123_open_handle(mh, fp) != MPG123_OK) {
+        if (mpg123_open_handle(mh, aReader) != MPG123_OK) {
             mpg123_delete(mh);
             return NULL;
         }
