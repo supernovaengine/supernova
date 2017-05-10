@@ -3,6 +3,7 @@
  add_definitions("-D\"lua_getlocaledecpoint()='.'\"")
  add_definitions("-DLUA_ANSI")
  add_definitions("-DLUA_USE_C89")
+ add_definitions("-DWITH_OPENSLES") # For SoLoud
 
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/src/main/cpp/android_macros.h")
 
@@ -21,6 +22,8 @@
 
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core")
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/libs/lua")
+
+  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/libs/soloud/include") # RETIRAR
 
  add_library(
      supernova
