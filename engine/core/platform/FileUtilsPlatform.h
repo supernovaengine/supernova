@@ -15,7 +15,7 @@ public:
 
     virtual ~FileUtilsPlatform() {}
 
-    virtual FILE* platformFopen(const char* fname, const char* mode);
+    virtual FILE* platformFopen(const char* fname, const char* mode) = 0;
 };
 
 

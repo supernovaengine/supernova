@@ -10,17 +10,13 @@
 class AudioLoader{
     
 private:
-    AudioFile* audioFile;
-    
-    AudioReader* getAudioFormat(const char* relative_path, FILE* file);
+    AudioReader* getAudioFormat(Data* datafile);
 public:
     AudioLoader();
     AudioLoader(const char* relative_path);
     virtual ~AudioLoader();
-    
-    void loadRawAudio(const char* relative_path);
-    
-    AudioFile* getRawAudio();
+
+    AudioFile* loadAudio(const char* relative_path);
     
 };
 

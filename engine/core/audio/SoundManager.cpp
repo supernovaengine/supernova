@@ -1,6 +1,6 @@
 
 #include "SoundManager.h"
-#include "OpenalPlayer.h"
+#include "SoLoudPlayer.h"
 
 std::vector<SoundManager::PlayerStore> SoundManager::players;
 
@@ -14,7 +14,7 @@ AudioPlayer* SoundManager::loadPlayer(std::string relative_path){
         }
     }
     
-    AudioPlayer* player = new OpenalPlayer();
+    AudioPlayer* player = new SoLoudPlayer();
     player->setFile(relative_path);
     players.push_back((PlayerStore){player, relative_path});
     return player;

@@ -6,7 +6,6 @@
 class AudioPlayer{
     
 protected:
-    
     std::string filename;
     bool isLoaded;
     

@@ -3,6 +3,8 @@
 #define AudioReader_h
 
 #include "AudioFile.h"
+#include "SoLoudSource.h"
+#include "Data.h"
 #include <stdio.h>
 
 class AudioReader{
@@ -10,7 +12,7 @@ class AudioReader{
     
 public:
     
-    virtual AudioFile* getRawAudio(const char* relative_path, FILE* file) = 0;
+    virtual AudioFile* getRawAudio(Data* datafile) = 0;
     
     virtual ~AudioReader();
     

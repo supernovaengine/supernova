@@ -7,14 +7,16 @@ private:
     
     int channels;
     int bitsPerSample;
-    int size;
+    unsigned long samples;
+    unsigned long size;
     int sampleRate;
     void *data;
+    bool dataOwned;
     
 public:
     
     AudioFile();
-    AudioFile(int channels, int bitsPerSample, unsigned long size, unsigned long sampleRate, void* data);
+    AudioFile(int channels, int bitsPerSample, unsigned long samples, unsigned long size, int sampleRate, void* data);
     AudioFile(const AudioFile& v);
     AudioFile& operator = ( const AudioFile& v );
     virtual ~AudioFile();
@@ -24,7 +26,8 @@ public:
     
     int getChannels();
     int getBitsPerSample();
-    int getSize();
+    unsigned long getSamples();
+    unsigned long getSize();
     int getSampleRate();
     void* getData();
     
