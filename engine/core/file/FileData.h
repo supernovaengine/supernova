@@ -1,11 +1,11 @@
 
-#ifndef DATA_H
-#define DATA_H
+#ifndef FILEDATA_H
+#define FILEDATA_H
 
-#include "FileSystem.h"
 #include "File.h"
+#include "FileHandle.h"
 
-class Data: public FileSystem {
+class FileData: public File {
 
 protected:
     unsigned char *dataPtr;
@@ -14,8 +14,9 @@ protected:
     bool dataOwned;
 
 public:
-    Data();
-    virtual ~Data();
+    FileData();
+    FileData(unsigned char *aData, unsigned int aDataLength, bool aCopy=false, bool aTakeOwnership=true);
+    virtual ~FileData();
 
     virtual int eof();
     virtual unsigned int read(unsigned char *aDst, unsigned int aBytes);
@@ -26,7 +27,7 @@ public:
 
     unsigned int open(unsigned char *aData, unsigned int aDataLength, bool aCopy=false, bool aTakeOwnership=true);
     unsigned int open(const char *aFilename);
-    unsigned int open(File *aFile);
+    unsigned int open(FileHandle *aFile);
 };
 
 

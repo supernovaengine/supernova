@@ -4,7 +4,7 @@
 
 #include "AudioFile.h"
 #include "SoLoudSource.h"
-#include "Data.h"
+#include "FileData.h"
 #include <stdio.h>
 
 class AudioReader{
@@ -12,7 +12,7 @@ class AudioReader{
     
 public:
     
-    virtual AudioFile* getRawAudio(Data* datafile) = 0;
+    virtual AudioFile* getRawAudio(FileData* filedata) = 0;
     
     virtual ~AudioReader();
     

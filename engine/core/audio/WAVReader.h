@@ -8,7 +8,7 @@
 class WAVReader: public AudioReader{
     
 public:
-    AudioFile* getRawAudio(Data* datafile);
+    AudioFile* getRawAudio(FileData* filedata);
 };
 
 #endif /* WAVReader_h */

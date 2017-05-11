@@ -10,7 +10,7 @@
 class AudioLoader{
     
 private:
-    AudioReader* getAudioFormat(Data* datafile);
+    AudioReader* getAudioFormat(FileData* filedata);
 public:
     AudioLoader();
     AudioLoader(const char* relative_path);

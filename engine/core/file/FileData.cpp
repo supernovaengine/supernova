@@ -1,20 +1,24 @@
-#include "Data.h"
+#include "FileData.h"
 
 #include <string.h>
 
-Data::Data() {
+FileData::FileData() {
     dataPtr = NULL;
-    dataLength = NULL;
-    offset = NULL;
+    dataLength = 0;
+    offset = 0;
     dataOwned = false;
 }
 
-Data::~Data() {
+FileData::FileData(unsigned char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership){
+    open(aData, aDataLength, aCopy, aTakeOwnership);
+}
+
+FileData::~FileData() {
     if (dataOwned)
         delete[] dataPtr;
 }
 
-unsigned int Data::read(unsigned char *aDst, unsigned int aBytes) {
+unsigned int FileData::read(unsigned char *aDst, unsigned int aBytes) {
     if (offset + aBytes >= dataLength)
         aBytes = dataLength - offset;
 
@@ -24,11 +28,11 @@ unsigned int Data::read(unsigned char *aDst, unsigned int aBytes) {
     return aBytes;
 }
 
-unsigned int Data::length() {
+unsigned int FileData::length() {
     return dataLength;
 }
 
-void Data::seek(int aOffset) {
+void FileData::seek(int aOffset) {
     if (aOffset >= 0)
         offset = aOffset;
     else
@@ -37,15 +41,15 @@ void Data::seek(int aOffset) {
         offset = dataLength-1;
 }
 
-unsigned int Data::pos() {
+unsigned int FileData::pos() {
     return offset;
 }
 
-unsigned char * Data::getMemPtr() {
+unsigned char * FileData::getMemPtr() {
     return dataPtr;
 }
 
-unsigned int Data::open(unsigned char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership) {
+unsigned int FileData::open(unsigned char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership) {
     if (aData == NULL || aDataLength == 0)
         return 1;
 
@@ -71,7 +75,7 @@ unsigned int Data::open(unsigned char *aData, unsigned int aDataLength, bool aCo
     return 0;
 }
 
-unsigned int Data::open(const char *aFile) {
+unsigned int FileData::open(const char *aFile) {
     if (!aFile)
         return 1;
     if (dataOwned)
@@ -79,7 +83,7 @@ unsigned int Data::open(const char *aFile) {
     dataPtr = 0;
     offset = 0;
 
-    File df;
+    FileHandle df;
     int res = df.open(aFile);
     if (res != 0)
         return res;
@@ -93,7 +97,7 @@ unsigned int Data::open(const char *aFile) {
     return 0;
 }
 
-unsigned int Data::open(File *aFile) {
+unsigned int FileData::open(FileHandle *aFile) {
     if (dataOwned)
         delete[] dataPtr;
     dataPtr = 0;
@@ -108,7 +112,7 @@ unsigned int Data::open(File *aFile) {
     return 0;
 }
 
-int Data::eof() {
+int FileData::eof() {
     if (offset >= dataLength)
         return 1;
     return 0;

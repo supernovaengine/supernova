@@ -2,25 +2,19 @@
 #ifndef FILE_H
 #define FILE_H
 
-#include "FileSystem.h"
+#include <stdio.h>
 
-class File: public FileSystem {
-protected:
-    FILE *fileHandle;
-
+class File {
 public:
-
-    File();
-    File(FILE *fp);
     virtual ~File();
-
-    virtual int eof();
-    virtual unsigned int read(unsigned char *aDst, unsigned int aBytes);
-    virtual unsigned int length();
-    virtual void seek(int aOffset);
-    virtual unsigned int pos();
-    unsigned int open(const char *aFilename);
-    virtual FILE * getFilePtr();
+    unsigned int read8();
+    unsigned int read16();
+    unsigned int read32();
+    virtual int eof() = 0;
+    virtual unsigned int read(unsigned char *aDst, unsigned int aBytes) = 0;
+    virtual unsigned int length() = 0;
+    virtual void seek(int aOffset) = 0;
+    virtual unsigned int pos() = 0;
 };
 
 

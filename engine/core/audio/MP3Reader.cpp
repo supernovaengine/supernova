@@ -5,22 +5,22 @@
 
 
 ssize_t MP3Reader::s_read(void * handle, void *buffer, size_t size) {
-    return ((FileSystem*)handle)->read((unsigned char*)buffer, size);
+    return ((File*)handle)->read((unsigned char*)buffer, size);
 }
 
 off_t MP3Reader::s_lseek(void *handle, off_t offset, int whence) {
     switch (whence)
     {
         case SEEK_CUR:
-            ((FileSystem*)handle)->seek(((FileSystem*)handle)->pos() + offset);
+            ((File*)handle)->seek(((File*)handle)->pos() + offset);
             break;
         case SEEK_END:
-            ((FileSystem*)handle)->seek(((FileSystem*)handle)->length() + offset);
+            ((File*)handle)->seek(((File*)handle)->length() + offset);
             break;
         default:
-            ((FileSystem*)handle)->seek(offset);
+            ((File*)handle)->seek(offset);
     }
-    return ((FileSystem*)handle)->pos();
+    return ((File*)handle)->pos();
 }
 
 
@@ -30,13 +30,14 @@ void MP3Reader::s_cleanup(void *handle) {
 }
 
 
-AudioFile* MP3Reader::getRawAudio(Data* datafile){
+AudioFile* MP3Reader::getRawAudio(FileData* filedata){
 
     mpg123_handle *mh;
 
     int channels, encoding, bitsPerSample;
     long rate;
-    size_t size, done;
+    unsigned int size;
+    size_t done;
     off_t numSamples;
 
     mpg123_init();
@@ -51,7 +52,7 @@ AudioFile* MP3Reader::getRawAudio(Data* datafile){
 
     mpg123_replace_reader_handle(mh, s_read, s_lseek, s_cleanup);
 
-    if (mpg123_open_handle(mh, datafile) != MPG123_OK) {
+    if (mpg123_open_handle(mh, filedata) != MPG123_OK) {
         mpg123_delete(mh);
         return NULL;
     }
@@ -87,7 +88,7 @@ AudioFile* MP3Reader::getRawAudio(Data* datafile){
 
     if (err == MPG123_OK || err == MPG123_DONE){
 
-        Data tempData;
+        FileData tempData;
         tempData.open((unsigned char*)data, size, false, true);
 
         int i, j;
@@ -141,7 +142,9 @@ AudioFile* MP3Reader::getRawAudio(Data* datafile){
             }
         }
 
-        return new AudioFile(mChannels, bitsPerSample, numSamples, size, rate, (void*) mData);
+        FileData* data = new FileData((unsigned char*)mData, sizeof(float) * numSamples * readchannels);
+
+        return new AudioFile(mChannels, bitsPerSample, numSamples, rate, data);
     }
 
     return NULL;

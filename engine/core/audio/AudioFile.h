@@ -2,34 +2,34 @@
 #ifndef AudioFile_h
 #define AudioFile_h
 
+#include "file/FileData.h"
+
 class AudioFile {
 private:
-    
-    int channels;
-    int bitsPerSample;
-    unsigned long samples;
-    unsigned long size;
-    int sampleRate;
-    void *data;
+
+    unsigned int channels;
+    unsigned int bitsPerSample;
+    unsigned int samples;
+    unsigned int sampleRate;
+    FileData* filedata;
     bool dataOwned;
     
 public:
     
     AudioFile();
-    AudioFile(int channels, int bitsPerSample, unsigned long samples, unsigned long size, int sampleRate, void* data);
+    AudioFile(unsigned int channels, unsigned int bitsPerSample, unsigned int samples, unsigned int sampleRate, FileData* filedata);
     AudioFile(const AudioFile& v);
     AudioFile& operator = ( const AudioFile& v );
     virtual ~AudioFile();
     void copy(const AudioFile& v);
     
     void releaseAudioData();
-    
-    int getChannels();
-    int getBitsPerSample();
-    unsigned long getSamples();
-    unsigned long getSize();
-    int getSampleRate();
-    void* getData();
+
+    unsigned int getChannels();
+    unsigned int getBitsPerSample();
+    unsigned int getSamples();
+    unsigned int getSampleRate();
+    FileData* getFileData();
     
 };
 

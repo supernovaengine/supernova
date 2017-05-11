@@ -7,40 +7,40 @@
 #define MAKEDWORD(a,b,c,d) (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
 
 
-AudioFile* WAVReader::getRawAudio(Data* datafile){
+AudioFile* WAVReader::getRawAudio(FileData* filedata){
 
-    datafile->read32();
-    datafile->read32();
-    if (datafile->read32() != MAKEDWORD('W','A','V','E'))
+    filedata->read32();
+    filedata->read32();
+    if (filedata->read32() != MAKEDWORD('W','A','V','E'))
     {
         //return FILE_LOAD_FAILED;
         return NULL;
     }
-    int chunk = datafile->read32();
+    int chunk = filedata->read32();
     if (chunk == MAKEDWORD('J', 'U', 'N', 'K'))
     {
-        int size = datafile->read32();
+        int size = filedata->read32();
         if (size & 1)
         {
             size += 1;
         }
         int i;
         for (i = 0; i < size; i++)
-            datafile->read8();
-        chunk = datafile->read32();
+            filedata->read8();
+        chunk = filedata->read32();
     }
     if (chunk != MAKEDWORD('f', 'm', 't', ' '))
     {
         //return FILE_LOAD_FAILED;
         return NULL;
     }
-    int subchunk1size = datafile->read32();
-    int audioformat = datafile->read16();
-    int channels = datafile->read16();
-    int samplerate = datafile->read32();
-    /*int byterate =*/ datafile->read32();
-    /*int blockalign =*/ datafile->read16();
-    int bitspersample = datafile->read16();
+    unsigned int subchunk1size = filedata->read32();
+    unsigned int audioformat = filedata->read16();
+    unsigned int channels = filedata->read16();
+    unsigned int samplerate = filedata->read32();
+    /*int byterate =*/ filedata->read32();
+    /*int blockalign =*/ filedata->read16();
+    int bitspersample = filedata->read16();
 
     if (audioformat != 1 ||
         (bitspersample != 8 && bitspersample != 16))
@@ -50,17 +50,17 @@ AudioFile* WAVReader::getRawAudio(Data* datafile){
     }
 
     if (subchunk1size != 16)
-        datafile->seek(datafile->pos() + subchunk1size - 16);
+        filedata->seek(filedata->pos() + subchunk1size - 16);
 
-    chunk = datafile->read32();
+    chunk = filedata->read32();
 
     if (chunk == MAKEDWORD('L','I','S','T'))
     {
-        int size = datafile->read32();
+        int size = filedata->read32();
         int i;
         for (i = 0; i < size; i++)
-            datafile->read8();
-        chunk = datafile->read32();
+            filedata->read8();
+        chunk = filedata->read32();
     }
 
     if (chunk != MAKEDWORD('d','a','t','a'))
@@ -77,7 +77,7 @@ AudioFile* WAVReader::getRawAudio(Data* datafile){
         mChannels = 2;
     }
 
-    int subchunk2size = datafile->read32();
+    int subchunk2size = filedata->read32();
 
     int samples = (subchunk2size / (bitspersample / 8)) / channels;
 
@@ -92,17 +92,17 @@ AudioFile* WAVReader::getRawAudio(Data* datafile){
             {
                 if (j == 0)
                 {
-                    mData[i] = ((signed)datafile->read8() - 128) / (float)0x80;
+                    mData[i] = ((signed)filedata->read8() - 128) / (float)0x80;
                 }
                 else
                 {
                     if (readchannels > 1 && j == 1)
                     {
-                        mData[i + samples] = ((signed)datafile->read8() - 128) / (float)0x80;
+                        mData[i + samples] = ((signed)filedata->read8() - 128) / (float)0x80;
                     }
                     else
                     {
-                        datafile->read8();
+                        filedata->read8();
                     }
                 }
             }
@@ -117,23 +117,25 @@ AudioFile* WAVReader::getRawAudio(Data* datafile){
             {
                 if (j == 0)
                 {
-                    mData[i] = ((signed short)datafile->read16()) / (float)0x8000;
+                    mData[i] = ((signed short)filedata->read16()) / (float)0x8000;
                 }
                 else
                 {
                     if (readchannels > 1 && j == 1)
                     {
-                        mData[i + samples] = ((signed short)datafile->read16()) / (float)0x8000;
+                        mData[i + samples] = ((signed short)filedata->read16()) / (float)0x8000;
                     }
                     else
                     {
-                        datafile->read16();
+                        filedata->read16();
                     }
                 }
             }
         }
     }
 
-    return new AudioFile(mChannels, bitspersample, samples, subchunk2size, samplerate, (void*) mData);
+    FileData* data = new FileData((unsigned char*)mData, sizeof(float) * samples * readchannels);
+
+    return new AudioFile(mChannels, bitspersample, samples, samplerate, data);
 
 }
