@@ -9,7 +9,7 @@ FileData::FileData() {
     dataOwned = false;
 }
 
-FileData::FileData(unsigned char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership){
+FileData::FileData(unsigned char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership): FileData(){
     open(aData, aDataLength, aCopy, aTakeOwnership);
 }
 

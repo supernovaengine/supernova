@@ -41,9 +41,9 @@ AudioFile* OGGReader::getRawAudio(FileData* filedata){
         samples += n;
     }
 
-    FileData* data = new FileData((unsigned char*)mData, size);
-
     stb_vorbis_close(aVorbis);
+
+    FileData* data = new FileData((unsigned char*)mData, size);
 
     return new AudioFile(mChannels, bitspersample, mSampleCount, mBaseSamplerate, data);
 }

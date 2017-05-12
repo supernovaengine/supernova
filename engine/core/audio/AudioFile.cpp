@@ -48,7 +48,7 @@ void AudioFile::copy(const AudioFile& v){
     this->samples = v.samples;
     this->sampleRate = v.sampleRate;
     this->dataOwned = v.dataOwned;
-    this->filedata = new FileData(v.filedata->getMemPtr(), v.filedata->length(), true, false);
+    this->filedata = new FileData(v.filedata->getMemPtr(), v.filedata->length(), true);
 }
 
 AudioFile::~AudioFile(){
