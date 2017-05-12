@@ -39,8 +39,7 @@ AudioFile* AudioLoader::loadAudio(const char* relative_path){
 
     filedata->seek(0);
 
-    AudioFile* audioFile;
-    audioFile = audioReader->getRawAudio(filedata);
+    AudioFile* audioFile = audioReader->getRawAudio(filedata);
 
     delete filedata;
     delete audioReader;

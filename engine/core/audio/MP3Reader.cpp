@@ -69,17 +69,14 @@ AudioFile* MP3Reader::getRawAudio(FileData* filedata){
 
     size = numSamples * channels * mpg123_encsize(encoding);
 
-    int readchannels = 1;
-    int mChannels = channels;
+    int mChannels = 1;
     if (channels > 1)
     {
-        readchannels = 2;
-        channels = 2;
+        mChannels = 2;
     }
-    float* mData = new float[numSamples * readchannels];
 
+    float* mData = new float[numSamples * mChannels];
     void *data = malloc(size);
-
     err = mpg123_read(mh, (unsigned char*)data, size, &done );
 
     mpg123_close(mh);
@@ -90,59 +87,8 @@ AudioFile* MP3Reader::getRawAudio(FileData* filedata){
 
         FileData tempData;
         tempData.open((unsigned char*)data, size, false, true);
-
-        int i, j;
-        if (bitsPerSample == 8)
-        {
-            for (i = 0; i < numSamples; i++)
-            {
-                for (j = 0; j < channels; j++)
-                {
-                    if (j == 0)
-                    {
-                        mData[i] = ((signed)tempData.read8() - 128) / (float)0x80;
-                    }
-                    else
-                    {
-                        if (readchannels > 1 && j == 1)
-                        {
-                            mData[i + numSamples] = ((signed)tempData.read8() - 128) / (float)0x80;
-                        }
-                        else
-                        {
-                            tempData.read8();
-                        }
-                    }
-                }
-            }
-        }
-        else
-        if (bitsPerSample == 16)
-        {
-            for (i = 0; i < numSamples; i++)
-            {
-                for (j = 0; j < channels; j++)
-                {
-                    if (j == 0)
-                    {
-                        mData[i] = ((signed short)tempData.read16()) / (float)0x8000;
-                    }
-                    else
-                    {
-                        if (readchannels > 1 && j == 1)
-                        {
-                            mData[i + numSamples] = ((signed short)tempData.read16()) / (float)0x8000;
-                        }
-                        else
-                        {
-                            tempData.read16();
-                        }
-                    }
-                }
-            }
-        }
-
-        FileData* data = new FileData((unsigned char*)mData, sizeof(float) * numSamples * readchannels);
+        splitAudioChannels(&tempData, bitsPerSample, numSamples, channels, mChannels, &mData);
+        FileData* data = new FileData((unsigned char*)mData, sizeof(float) * numSamples * mChannels);
 
         return new AudioFile(mChannels, bitsPerSample, numSamples, rate, data);
     }

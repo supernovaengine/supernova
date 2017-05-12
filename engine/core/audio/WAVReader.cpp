@@ -69,72 +69,18 @@ AudioFile* WAVReader::getRawAudio(FileData* filedata){
         return NULL;
     }
 
-    int readchannels = 1;
-    int mChannels = channels;
+    int mChannels = 1;
     if (channels > 1)
     {
-        readchannels = 2;
         mChannels = 2;
     }
 
     int subchunk2size = filedata->read32();
-
     int samples = (subchunk2size / (bitspersample / 8)) / channels;
+    float* mData = new float[samples * mChannels];
+    splitAudioChannels(filedata, bitspersample, samples, channels, mChannels, &mData);
 
-    float* mData = new float[samples * readchannels];
-
-    int i, j;
-    if (bitspersample == 8)
-    {
-        for (i = 0; i < samples; i++)
-        {
-            for (j = 0; j < channels; j++)
-            {
-                if (j == 0)
-                {
-                    mData[i] = ((signed)filedata->read8() - 128) / (float)0x80;
-                }
-                else
-                {
-                    if (readchannels > 1 && j == 1)
-                    {
-                        mData[i + samples] = ((signed)filedata->read8() - 128) / (float)0x80;
-                    }
-                    else
-                    {
-                        filedata->read8();
-                    }
-                }
-            }
-        }
-    }
-    else
-    if (bitspersample == 16)
-    {
-        for (i = 0; i < samples; i++)
-        {
-            for (j = 0; j < channels; j++)
-            {
-                if (j == 0)
-                {
-                    mData[i] = ((signed short)filedata->read16()) / (float)0x8000;
-                }
-                else
-                {
-                    if (readchannels > 1 && j == 1)
-                    {
-                        mData[i + samples] = ((signed short)filedata->read16()) / (float)0x8000;
-                    }
-                    else
-                    {
-                        filedata->read16();
-                    }
-                }
-            }
-        }
-    }
-
-    FileData* data = new FileData((unsigned char*)mData, sizeof(float) * samples * readchannels);
+    FileData* data = new FileData((unsigned char*)mData, sizeof(float) * samples * mChannels);
 
     return new AudioFile(mChannels, bitspersample, samples, samplerate, data);
 

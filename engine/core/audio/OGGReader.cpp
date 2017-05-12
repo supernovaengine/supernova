@@ -9,17 +9,16 @@ AudioFile* OGGReader::getRawAudio(FileData* filedata){
     unsigned int mBaseSamplerate = (float)info.sample_rate;
     unsigned int samples = stb_vorbis_stream_length_in_samples(aVorbis);
 
-    int readchannels = 1;
-    int mChannels = info.channels;
+    int mChannels = 1;
     if (info.channels > 1)
     {
-        readchannels = 2;
         mChannels = 2;
     }
-    float* mData = new float[samples * readchannels];
     unsigned int mSampleCount = samples;
-    unsigned int size = sizeof(float) * mSampleCount * readchannels;
+    float* mData = new float[mSampleCount * mChannels];
+    unsigned int size = sizeof(float) * mSampleCount * mChannels;
     unsigned int bitspersample = size / mSampleCount * mChannels;
+
     samples = 0;
     while(1)
     {
@@ -29,7 +28,7 @@ AudioFile* OGGReader::getRawAudio(FileData* filedata){
         {
             break;
         }
-        if (readchannels == 1)
+        if (mChannels == 1)
         {
             memcpy(mData + samples, outputs[0],sizeof(float) * n);
         }

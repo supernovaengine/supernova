@@ -16,6 +16,7 @@ int SoLoudPlayer::load(){
 
     sample.load(audioFile);
     sample.setSingleInstance(true);
+    sample.setVolume(1.0);
 
     soloud.init();
 
