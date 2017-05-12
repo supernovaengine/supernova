@@ -33,7 +33,7 @@ protected:
 
     std::vector<Vector3> positions;
     std::vector<Vector3> normals;
-    std::vector<TextureRect> textureRects;
+    std::vector<TextureRect*> textureRects;
     std::vector<float> pointSizes;
     std::vector<Vector4> colors;
 
@@ -73,13 +73,14 @@ public:
     
     std::vector<Vector3>* getPositions();
     std::vector<Vector3>* getNormals();
-    std::vector<TextureRect>* getTextureRects();
+    std::vector<TextureRect*>* getTextureRects();
     std::vector<float>* getPointSizes();
     std::vector<Vector4>* getColors();
 
     bool render();
     bool load();
     bool draw();
+    void destroy();
 };
 
 

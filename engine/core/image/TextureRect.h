@@ -21,6 +21,7 @@ public:
     float getHeight();
     
     void setRect(float x, float y, float width, float height);
+    void setRect(TextureRect* textureRect);
 
     bool isNormalized();
 };

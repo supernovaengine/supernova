@@ -51,6 +51,10 @@ void TextureRect::setRect(float x, float y, float width, float height){
     this->height = height;
 }
 
+void TextureRect::setRect(TextureRect* textureRect){
+    setRect(textureRect->getX(), textureRect->getY(), textureRect->getWidth(), textureRect->getHeight());
+}
+
 bool TextureRect::isNormalized(){
     if ((x >= 0 && x <= 1) && (y >= 0 && y <= 1) && (width >= 0 && width <= 1) && (height >= 0 && height <= 1)){
         return true;

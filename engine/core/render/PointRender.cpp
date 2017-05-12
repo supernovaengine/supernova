@@ -48,6 +48,12 @@ void PointRender::checkTextureRect(){
     if (textureRects){
         hasTextureRect = true;
     }
+    hasTextureRect = false;
+    for (unsigned int i = 0; i < textureRects->size(); i++){
+        if (textureRects->at(i)){
+            hasTextureRect = true;
+        }
+    }
 }
 
 void PointRender::fillPointProperties(){

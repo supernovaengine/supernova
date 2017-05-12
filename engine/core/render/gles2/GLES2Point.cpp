@@ -23,10 +23,15 @@ GLES2Point::~GLES2Point() {
 std::vector<float> GLES2Point::rectsData(){
     std::vector<float> rects;
     for (int i = 0; i < textureRects->size(); i++){
-        rects.push_back(textureRects->at(i).getX());
-        rects.push_back(textureRects->at(i).getY());
-        rects.push_back(textureRects->at(i).getWidth());
-        rects.push_back(textureRects->at(i).getHeight());
+
+        TextureRect textureRect;
+        if (textureRects->at(i))
+            textureRect = *textureRects->at(i);
+
+        rects.push_back(textureRect.getX());
+        rects.push_back(textureRect.getY());
+        rects.push_back(textureRect.getWidth());
+        rects.push_back(textureRect.getHeight());
     }
     return rects;
 }

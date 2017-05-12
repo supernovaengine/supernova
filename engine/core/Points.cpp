@@ -24,7 +24,7 @@ Points::Points(){
 }
 
 Points::~Points(){
-
+    destroy();
 }
 
 void Points::addPoint(){
@@ -32,7 +32,7 @@ void Points::addPoint(){
     pointSizes.push_back(1);
     normals.push_back(Vector3(0.0, 0.0, 1.0));
     colors.push_back(*material.getColor());
-    textureRects.push_back(TextureRect());
+    textureRects.push_back(NULL);
 
     fillScaledSizeVector();
     normalizeTextureRects();
@@ -73,7 +73,11 @@ void Points::setPointColor(int point, float red, float green, float blue, float 
 }
 
 void Points::setPointSprite(int point, std::string id){
-    textureRects[point] = framesRect[id];
+    if (textureRects[point]){
+        textureRects[point]->setRect(&framesRect[id]);
+    }else {
+        textureRects[point] = new TextureRect(framesRect[id]);
+    }
     
     if (loaded && !useTextureRects){
         useTextureRects = true;
@@ -122,11 +126,13 @@ void Points::fillScaledSizeVector(){
 void Points::normalizeTextureRects(){
     if (this->texWidth != 0 && this->texHeight != 0) {
         for (int i=0; i < textureRects.size(); i++){
-            if (!textureRects[i].isNormalized()){
-                textureRects[i].setRect(textureRects[i].getX() / (float) texWidth,
-                                        textureRects[i].getY() / (float) texHeight,
-                                        textureRects[i].getWidth() / (float) texWidth,
-                                        textureRects[i].getHeight() / (float) texHeight);
+            if (textureRects[i]) {
+                if (!textureRects[i]->isNormalized()) {
+                    textureRects[i]->setRect(textureRects[i]->getX() / (float) texWidth,
+                                            textureRects[i]->getY() / (float) texHeight,
+                                            textureRects[i]->getWidth() / (float) texWidth,
+                                            textureRects[i]->getHeight() / (float) texHeight);
+                }
             }
         }
     }
@@ -184,12 +190,8 @@ std::vector<Vector3>* Points::getNormals(){
     return &normals;
 }
 
-std::vector<TextureRect>* Points::getTextureRects(){
-    if (useTextureRects){
-        return &textureRects;
-    }else{
-        return NULL;
-    }
+std::vector<TextureRect*>* Points::getTextureRects(){
+    return &textureRects;
 }
 
 std::vector<float>* Points::getPointSizes(){
@@ -213,7 +215,7 @@ bool Points::load(){
     }
     
     while (positions.size() > textureRects.size()){
-        textureRects.push_back(TextureRect());
+        textureRects.push_back(NULL);
     }
 
     while (positions.size() > pointSizes.size()){
@@ -247,4 +249,13 @@ bool Points::load(){
 bool Points::draw(){
 
     return ConcreteObject::draw();
+}
+
+
+void Points::destroy(){
+    for (int i=0; i < textureRects.size(); i++){
+        delete textureRects[i];
+    }
+
+    ConcreteObject::destroy();
 }
