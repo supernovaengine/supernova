@@ -6,9 +6,11 @@
 FileUtilsPlatform& FileUtilsPlatform::instance(){
 #ifdef SUPERNOVA_ANDROID
     static FileUtilsPlatform *instance = new FileUtilsGeneric();
-#elif SUPERNOVA_IOS
+#endif
+#ifdef  SUPERNOVA_IOS
     static FileUtilsPlatform *instance = new FileUtilsGeneric();
-#else
+#endif
+#ifdef  SUPERNOVA_WEB
     static FileUtilsPlatform *instance = new FileUtilsGeneric();
 #endif
 

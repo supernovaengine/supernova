@@ -5,7 +5,10 @@
 
 
 AudioPlayer::AudioPlayer(){
-    isLoaded = false;
+    filename = "";
+    loaded = false;
+    state = 0;
+    audioFile = NULL;
 }
 
 AudioPlayer::~AudioPlayer(){

@@ -9,21 +9,26 @@
 
 class SoLoudPlayer: public AudioPlayer {
 private:
-    SoLoud::Soloud soloud;
+    SoLoud::Soloud* soloud;
     SoLoudSource sample;
-    SoLoud::result loaded;
-
-    AudioFile* audioFile;
+    SoLoud::handle soundHandle;
 public:
     SoLoudPlayer();
     virtual ~SoLoudPlayer();
 
     int load();
+    void destroy();
+
     int play();
     int pause();
-    int resume();
     int stop();
-    void destroy();
+
+    double getLength();
+    double getStreamTime();
+
+    bool isPlaying();
+    bool isPaused();
+    bool isStopped();
 };
 
 

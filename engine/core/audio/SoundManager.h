@@ -2,31 +2,25 @@
 #ifndef SoundManager_h
 #define SoundManager_h
 
-#include "AudioPlayer.h"
-#include <vector>
-#include <string>
+#include "AudioFile.h"
+#include "soloud.h"
 
 class SoundManager {
-    
-    typedef struct {
-        AudioPlayer* player;
-        std::string key;
-    } PlayerStore;
-    
 private:
-    
-    static std::vector<PlayerStore> players;
+    static SoLoud::Soloud soloud;
+
+    static bool inited;
     
 public:
-    
-    AudioPlayer* loadPlayer(std::string relative_path);
-    void deletePlayer(std::string relative_path);
 
-    static void playAll();
+    static SoLoud::Soloud* init();
+    static void deInit();
+
+    static void checkActive();
+
     static void stopAll();
     static void pauseAll();
     static void resumeAll();
-    static void clear();
 };
 
 #endif /* SoundManager_h */

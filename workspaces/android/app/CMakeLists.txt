@@ -8,7 +8,6 @@
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/src/main/cpp/android_macros.h")
 
  set(COMPILE_ZLIB OFF)
- set(COMPILE_OPENAL ON)
 
  set(IS_ARM OFF)
  if( ANDROID_ABI MATCHES "^arm(eabi)?(-v7a)?(64-v8a)?$" )
@@ -22,8 +21,6 @@
 
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core")
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/libs/lua")
-
-  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/libs/soloud/include") # RETIRAR
 
  add_library(
      supernova

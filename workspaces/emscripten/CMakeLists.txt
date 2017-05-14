@@ -6,14 +6,11 @@ add_definitions("-s USE_SDL=2")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/web_macros.h")
 
 set(COMPILE_ZLIB ON)
-set(COMPILE_OPENAL OFF)
 
 add_subdirectory (../.. ${PROJECT_BINARY_DIR}/supernova)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/libs/lua")
-
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/libs/soloud/include") # Retirar
 
 add_library(
     supernova

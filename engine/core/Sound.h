@@ -3,18 +3,13 @@
 #ifndef Sound_h
 #define Sound_h
 
-#include "audio/SoundManager.h"
 #include "audio/AudioPlayer.h"
-#include "soloud.h"
-#include "audio/SoLoudSource.h"
-#include "soloud_thread.h"
 
 #include <string>
 
 class Sound{
 
 private:
-    SoundManager soundManager;
     AudioPlayer* player;
     std::string filename;
 
@@ -26,7 +21,15 @@ public:
     void destroy();
 
     int play();
+    int pause();
     int stop();
+
+    double getLength();
+    double getStreamTime();
+
+    bool isPlaying();
+    bool isPaused();
+    bool isStopped();
 
 };
 

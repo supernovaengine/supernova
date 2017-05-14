@@ -1,5 +1,6 @@
 #include "OGGReader.h"
 
+#include <string.h>
 #include "stb_vorbis.h"
 
 AudioFile* OGGReader::getRawAudio(FileData* filedata){

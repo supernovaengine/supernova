@@ -22,10 +22,3 @@ target_link_libraries(
     supernova-core
     lua tinyobjloader jpeg png tiff mpg123 freetype soloud stb
 )
-
-if (COMPILE_OPENAL)
-    target_link_libraries(
-        supernova-core
-        openal
-    )
-endif (COMPILE_OPENAL)

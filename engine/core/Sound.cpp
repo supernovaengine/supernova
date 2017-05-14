@@ -5,11 +5,12 @@
 
 Sound::Sound(std::string filename){
     this->filename = filename;
-    player = soundManager.loadPlayer(filename);
+    player = new SoLoudPlayer();
+    player->setFile(filename);
 }
 
 Sound::~Sound(){
-    destroy();
+    delete player;
 }
 
 int Sound::load(){
@@ -17,15 +18,38 @@ int Sound::load(){
 }
 
 void Sound::destroy(){
-    soundManager.deletePlayer(filename);
 }
 
 int Sound::play(){
     return player->play();
 }
 
+int Sound::pause(){
+    return player->pause();
+}
+
 int Sound::stop(){
     return player->stop();
+}
+
+double Sound::getLength(){
+    return player->getLength();
+}
+
+double Sound::getStreamTime(){
+    return player->getStreamTime();
+}
+
+bool Sound::isPlaying(){
+    return player->isPlaying();
+}
+
+bool Sound::isPaused(){
+    return player->isPaused();
+}
+
+bool Sound::isStopped(){
+    return player->isStopped();
 }
 
 

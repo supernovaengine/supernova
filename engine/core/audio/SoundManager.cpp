@@ -1,65 +1,52 @@
 
 #include "SoundManager.h"
-#include "SoLoudPlayer.h"
 
-std::vector<SoundManager::PlayerStore> SoundManager::players;
+SoLoud::Soloud SoundManager::soloud;
+bool SoundManager::inited = false;
 
+SoLoud::Soloud* SoundManager::init(){
+    if (!inited) {
+        soloud.init();
 
-AudioPlayer* SoundManager::loadPlayer(std::string relative_path){
-    
-    for (unsigned i=0; i<players.size(); i++){
-        std::string teste = players.at(i).key;
-        if (teste == relative_path){
-            return players.at(i).player;
-        }
+        //Wait for mixing thread
+        //SoLoud::Thread::sleep(10);
+
+        inited = true;
     }
-    
-    AudioPlayer* player = new SoLoudPlayer();
-    player->setFile(relative_path);
-    players.push_back((PlayerStore){player, relative_path});
-    return player;
+
+    return &soloud;
 }
 
+void SoundManager::deInit(){
+    if (inited){
+        soloud.deinit();
 
-void SoundManager::deletePlayer(std::string relative_path){
-    int remove = -1;
-    
-    for (unsigned i=0; i<players.size(); i++){
-        if (players.at(i).key == relative_path){
-            remove = i;
-            players.at(i).player->destroy();
+        inited = false;
+    }
+}
+
+void SoundManager::checkActive(){
+    if (inited) {
+        if (soloud.getVoiceCount() == 0){
+            deInit();
         }
     }
-    
-    if (remove > 0)
-        players.erase(players.begin() + remove);
-    
 }
 
 void SoundManager::stopAll(){
-    for (unsigned i=0; i<players.size(); i++){
-        players.at(i).player->stop();
+    if (inited){
+        soloud.stopAll();
     }
 }
 
 void SoundManager::pauseAll(){
-    for (unsigned i=0; i<players.size(); i++){
-        players.at(i).player->pause();
+    if (inited) {
+        soloud.setPauseAll(true);
     }
 }
 
 void SoundManager::resumeAll(){
-    for (unsigned i=0; i<players.size(); i++){
-        players.at(i).player->resume();
+    if (inited) {
+        soloud.setPauseAll(false);
     }
-}
-
-void SoundManager::playAll(){
-    for (unsigned i=0; i<players.size(); i++){
-        players.at(i).player->play();
-    }
-}
-
-void SoundManager::clear(){
-    players.clear();
 }

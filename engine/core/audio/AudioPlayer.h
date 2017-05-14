@@ -1,14 +1,20 @@
 #ifndef AudioPlayer_h
 #define AudioPlayer_h
 
+#include "AudioFile.h"
 #include <string>
+
+#define S_AUDIO_PLAYING 1
+#define S_AUDIO_STOPED 2
+#define S_AUDIO_PAUSED 3
 
 class AudioPlayer{
     
 protected:
     std::string filename;
-    bool isLoaded;
-    
+    bool loaded;
+    int state;
+    AudioFile* audioFile;
 public:
     AudioPlayer();
     virtual ~AudioPlayer();
@@ -20,8 +26,14 @@ public:
 
     virtual int play() = 0;
     virtual int pause() = 0;
-    virtual int resume() = 0;
     virtual int stop() = 0;
+
+    virtual double getLength() = 0;
+    virtual double getStreamTime() = 0;
+
+    virtual bool isPlaying() = 0;
+    virtual bool isPaused() = 0;
+    virtual bool isStopped() = 0;
     
 };
 
