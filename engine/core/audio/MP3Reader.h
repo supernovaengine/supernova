@@ -12,8 +12,7 @@ private:
     static off_t s_lseek(void *handle, off_t offset, int whence);
     static void s_cleanup(void *handle);
 public:
-    AudioFile* getRawAudio(const char* relative_path, FILE* file);
-    
+    AudioFile* getRawAudio(FileData* filedata);
 };
 
 #endif /* MP3Reader_h */

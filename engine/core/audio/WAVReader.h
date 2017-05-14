@@ -8,8 +8,7 @@
 class WAVReader: public AudioReader{
     
 public:
-    AudioFile* getRawAudio(const char* relative_path, FILE* file);
-    
+    AudioFile* getRawAudio(FileData* filedata);
 };
 
 #endif /* WAVReader_h */

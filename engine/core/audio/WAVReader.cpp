@@ -2,60 +2,86 @@
 #include "WAVReader.h"
 
 #include "AudioFile.h"
-#include <string>
-#include <stdlib.h>
 #include "platform/Log.h"
 
-typedef struct header_file
-{
-    char chunk_id[4];
-    int chunk_size;
-    char format[4];
-    char subchunk1_id[4];
-    int subchunk1_size;
-    short int audio_format;
-    short int num_channels;
-    int sample_rate;
-    int byte_rate;
-    short int block_align;
-    short int bits_per_sample;
-    char subchunk2_id[4];
-    int subchunk2_size;
-} header;
-
-typedef struct header_file* header_p;
+#define MAKEDWORD(a,b,c,d) (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
 
 
-AudioFile* WAVReader::getRawAudio(const char* relative_path, FILE* file){
-    //FILE* fp = fopen(fname,"rb");
-    if (file) {
-        char chunk_id[5], format[5];
-        short* bufferData;
-        int data_size;
+AudioFile* WAVReader::getRawAudio(FileData* filedata){
 
-        header_p meta = (header_p)malloc(sizeof(header));
-        fread(meta, 1, sizeof(header), file);
-
-        for (int i=0; i<4; i++) {
-            chunk_id[i] = meta->chunk_id[i];
-            format[i] = meta->format[i];
-        }
-        chunk_id[4] = '\0';
-        format[4] = '\0';
-        data_size = meta->subchunk2_size;
-
-        if (!strcmp(chunk_id, "RIFF") && !strcmp(format,"WAVE")){
-            bufferData = (short*) malloc(data_size);
-            fread(bufferData, sizeof(short), data_size/sizeof(short), file);
-
-            return new AudioFile(meta->num_channels, meta->bits_per_sample, data_size, meta->sample_rate, (void*) bufferData);
-        }else {
-            Log::Error(LOG_TAG, "RIFF file but not a wave file!");
-        }
-
-
+    filedata->read32();
+    filedata->read32();
+    if (filedata->read32() != MAKEDWORD('W','A','V','E'))
+    {
+        //return FILE_LOAD_FAILED;
+        return NULL;
     }
-    
-    return NULL;
-    //fclose(fp);
+    int chunk = filedata->read32();
+    if (chunk == MAKEDWORD('J', 'U', 'N', 'K'))
+    {
+        int size = filedata->read32();
+        if (size & 1)
+        {
+            size += 1;
+        }
+        int i;
+        for (i = 0; i < size; i++)
+            filedata->read8();
+        chunk = filedata->read32();
+    }
+    if (chunk != MAKEDWORD('f', 'm', 't', ' '))
+    {
+        //return FILE_LOAD_FAILED;
+        return NULL;
+    }
+    unsigned int subchunk1size = filedata->read32();
+    unsigned int audioformat = filedata->read16();
+    unsigned int channels = filedata->read16();
+    unsigned int samplerate = filedata->read32();
+    /*int byterate =*/ filedata->read32();
+    /*int blockalign =*/ filedata->read16();
+    int bitspersample = filedata->read16();
+
+    if (audioformat != 1 ||
+        (bitspersample != 8 && bitspersample != 16))
+    {
+        //return FILE_LOAD_FAILED;
+        return NULL;
+    }
+
+    if (subchunk1size != 16)
+        filedata->seek(filedata->pos() + subchunk1size - 16);
+
+    chunk = filedata->read32();
+
+    if (chunk == MAKEDWORD('L','I','S','T'))
+    {
+        int size = filedata->read32();
+        int i;
+        for (i = 0; i < size; i++)
+            filedata->read8();
+        chunk = filedata->read32();
+    }
+
+    if (chunk != MAKEDWORD('d','a','t','a'))
+    {
+        //return FILE_LOAD_FAILED;
+        return NULL;
+    }
+
+    int mChannels = 1;
+    if (channels > 1)
+    {
+        mChannels = 2;
+    }
+
+    int subchunk2size = filedata->read32();
+    int samples = (subchunk2size / (bitspersample / 8)) / channels;
+    float* mData = new float[samples * mChannels];
+    splitAudioChannels(filedata, bitspersample, samples, channels, mChannels, &mData);
+
+    FileData* data = new FileData((unsigned char*)mData, sizeof(float) * samples * mChannels);
+
+    return new AudioFile(mChannels, bitspersample, samples, samplerate, data);
+
 }

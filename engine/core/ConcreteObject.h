@@ -23,6 +23,8 @@ public:
     ConcreteObject();
     virtual ~ConcreteObject();
     
+    Matrix4 getNormalMatrix();
+    
     void setColor(float red, float green, float blue, float alpha);
     
     void setTexture(std::string texture);

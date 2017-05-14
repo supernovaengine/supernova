@@ -7,72 +7,76 @@
 AudioFile::AudioFile(){
     this->channels = 0;
     this->bitsPerSample = 0;
-    this->size = 0;
+    this->samples = 0;
     this->sampleRate = 0;
-    this->data = NULL;
-    
+    this->dataOwned = true;
+    this->filedata = NULL;
 }
 
-AudioFile::AudioFile(int channels, int bitsPerSample, unsigned long size, unsigned long sampleRate, void* data){
+AudioFile::AudioFile(unsigned int channels, unsigned int bitsPerSample, unsigned int samples, unsigned int sampleRate, FileData* filedata){
     this->channels = channels;
     this->bitsPerSample = bitsPerSample;
-    this->size = size;
+    this->samples = samples;
     this->sampleRate = sampleRate;
-    this->data = data;
+    this->dataOwned = true;
+    this->filedata = filedata;
 }
 
 AudioFile::AudioFile(const AudioFile& v){
     this->channels = v.channels;
     this->bitsPerSample = v.bitsPerSample;
-    this->size = v.size;
+    this->samples = v.samples;
     this->sampleRate = v.sampleRate;
-    this->data = v.data;
+    this->dataOwned = v.dataOwned;
+    this->filedata = v.filedata;
 }
 
 AudioFile& AudioFile::operator = ( const AudioFile& v ){
     this->channels = v.channels;
     this->bitsPerSample = v.bitsPerSample;
-    this->size = v.size;
+    this->samples = v.samples;
     this->sampleRate = v.sampleRate;
-    this->data = v.data;
-    
+    this->dataOwned = v.dataOwned;
+    this->filedata = v.filedata;
+
     return *this;
 }
 
 void AudioFile::copy(const AudioFile& v){
     this->channels = v.channels;
     this->bitsPerSample = v.bitsPerSample;
-    this->size = v.size;
+    this->samples = v.samples;
     this->sampleRate = v.sampleRate;
-    
-    this->data = (void *)malloc(this->size);
-    memcpy((void*)this->data, (void*)v.data, this->size);
+    this->dataOwned = v.dataOwned;
+    this->filedata = new FileData(v.filedata->getMemPtr(), v.filedata->length(), true);
 }
 
 AudioFile::~AudioFile(){
-    
+    if (dataOwned){
+        releaseAudioData();
+    }
 }
 
 void AudioFile::releaseAudioData(){
-    free((void*)data);
+    delete filedata;
 }
 
-int AudioFile::getChannels(){
+unsigned int AudioFile::getChannels(){
     return channels;
 }
 
-int AudioFile::getBitsPerSample(){
+unsigned int AudioFile::getBitsPerSample(){
     return bitsPerSample;
 }
 
-int AudioFile::getSize(){
-    return size;
+unsigned int AudioFile::getSamples(){
+    return samples;
 }
 
-int AudioFile::getSampleRate(){
+unsigned int AudioFile::getSampleRate(){
     return sampleRate;
 }
 
-void* AudioFile::getData(){
-    return data;
+FileData* AudioFile::getFileData(){
+    return filedata;
 }

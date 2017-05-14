@@ -3,6 +3,7 @@
 #include "platform/Log.h"
 #include "GUIObject.h"
 #include "Light.h"
+#include "Scene.h"
 
 
 Object::Object(){
@@ -25,7 +26,7 @@ Object::~Object(){
     destroy();
 }
 
-void Object::setSceneAndConfigure(Object* scene){
+void Object::setSceneAndConfigure(Scene* scene){
     if (this->scene == NULL){
         this->scene = scene;
         if (loaded)
@@ -209,6 +210,17 @@ Matrix4 Object::getModelMatrix(){
 
 Matrix4 Object::getModelViewProjectMatrix(){
     return modelViewProjectionMatrix;
+}
+
+Vector3 Object::getCameraPosition(){
+    if (cameraPosition != NULL)
+        return *cameraPosition;
+    else
+        return Vector3();
+}
+
+Scene* Object::getScene(){
+    return scene;
 }
 
 void Object::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){

@@ -22,16 +22,17 @@ add_subdirectory (engine/libs/libtiff)
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/libs/libjpeg")
 add_subdirectory (engine/libs/libjpeg)
 
-if (COMPILE_OPENAL)
-    include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/libs/openal-soft/include")
-    add_subdirectory (engine/libs/openal-soft)
-endif (COMPILE_OPENAL)
-
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/libs/mpg123/src/libmpg123")
 add_subdirectory (engine/libs/mpg123)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/libs/freetype/include")
 add_subdirectory (engine/libs/freetype)
+
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/libs/soloud/include")
+add_subdirectory (engine/libs/soloud)
+
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/libs/stb")
+add_subdirectory (engine/libs/stb)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/core")
 add_subdirectory (engine/core)

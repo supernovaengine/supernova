@@ -79,6 +79,8 @@ void Engine::onDrawFrame() {
     if (Supernova::getScene() != NULL){
         (Supernova::getScene())->draw();
     }
+
+    SoundManager::checkActive();
 }
 
 void Engine::onPause(){

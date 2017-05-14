@@ -1,11 +1,12 @@
 
 #include "Sound.h"
-
-
+#include "SoLoudPlayer.h"
+#include "platform/Log.h"
 
 Sound::Sound(std::string filename){
     this->filename = filename;
-    player = soundManager.loadPlayer(filename);
+    player = new SoLoudPlayer();
+    player->setFile(filename);
 }
 
 Sound::~Sound(){
@@ -13,27 +14,42 @@ Sound::~Sound(){
 }
 
 int Sound::load(){
-    
     return player->load();
-    
 }
 
 void Sound::destroy(){
-    
-    soundManager.deletePlayer(filename);
-    
 }
 
 int Sound::play(){
-
     return player->play();
+}
 
+int Sound::pause(){
+    return player->pause();
 }
 
 int Sound::stop(){
-    
     return player->stop();
-    
+}
+
+double Sound::getLength(){
+    return player->getLength();
+}
+
+double Sound::getStreamTime(){
+    return player->getStreamTime();
+}
+
+bool Sound::isPlaying(){
+    return player->isPlaying();
+}
+
+bool Sound::isPaused(){
+    return player->isPaused();
+}
+
+bool Sound::isStopped(){
+    return player->isStopped();
 }
 
 

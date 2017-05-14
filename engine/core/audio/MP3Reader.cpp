@@ -5,30 +5,39 @@
 
 
 ssize_t MP3Reader::s_read(void * handle, void *buffer, size_t size) {
-    return fread((char*)buffer, 1, size, (FILE*)handle);
+    return ((File*)handle)->read((unsigned char*)buffer, size);
 }
 
 off_t MP3Reader::s_lseek(void *handle, off_t offset, int whence) {
-    if (fseek((FILE*)handle, offset, whence) == 0)
-        return ftell((FILE*)handle);
-
-    return (off_t)-1;
+    switch (whence)
+    {
+        case SEEK_CUR:
+            ((File*)handle)->seek(((File*)handle)->pos() + offset);
+            break;
+        case SEEK_END:
+            ((File*)handle)->seek(((File*)handle)->length() + offset);
+            break;
+        default:
+            ((File*)handle)->seek(offset);
+    }
+    return ((File*)handle)->pos();
 }
 
 
 void MP3Reader::s_cleanup(void *handle) {
     //Not necessary to close handle here
-    //fclose((FILE*)handle);
+    //delete ((FileSystem*)handle);
 }
 
 
-AudioFile* MP3Reader::getRawAudio(const char* relative_path, FILE* file){
+AudioFile* MP3Reader::getRawAudio(FileData* filedata){
 
     mpg123_handle *mh;
 
     int channels, encoding, bitsPerSample;
     long rate;
-    size_t size, done;
+    unsigned int size;
+    size_t done;
     off_t numSamples;
 
     mpg123_init();
@@ -41,9 +50,9 @@ AudioFile* MP3Reader::getRawAudio(const char* relative_path, FILE* file){
         return NULL;
     }
 
-    mpg123_replace_reader_handle(mh, MP3Reader::s_read, MP3Reader::s_lseek, MP3Reader::s_cleanup);
+    mpg123_replace_reader_handle(mh, s_read, s_lseek, s_cleanup);
 
-    if (mpg123_open_handle(mh, file) != MPG123_OK) {
+    if (mpg123_open_handle(mh, filedata) != MPG123_OK) {
         mpg123_delete(mh);
         return NULL;
     }
@@ -60,8 +69,14 @@ AudioFile* MP3Reader::getRawAudio(const char* relative_path, FILE* file){
 
     size = numSamples * channels * mpg123_encsize(encoding);
 
-    void *data = malloc(size);
+    int mChannels = 1;
+    if (channels > 1)
+    {
+        mChannels = 2;
+    }
 
+    float* mData = new float[numSamples * mChannels];
+    void *data = malloc(size);
     err = mpg123_read(mh, (unsigned char*)data, size, &done );
 
     mpg123_close(mh);
@@ -70,7 +85,12 @@ AudioFile* MP3Reader::getRawAudio(const char* relative_path, FILE* file){
 
     if (err == MPG123_OK || err == MPG123_DONE){
 
-        return new AudioFile(channels, bitsPerSample, size, rate, (void*) data);
+        FileData tempData;
+        tempData.open((unsigned char*)data, size, false, true);
+        splitAudioChannels(&tempData, bitsPerSample, numSamples, channels, mChannels, &mData);
+        FileData* data = new FileData((unsigned char*)mData, sizeof(float) * numSamples * mChannels);
+
+        return new AudioFile(mChannels, bitsPerSample, numSamples, rate, data);
     }
 
     return NULL;

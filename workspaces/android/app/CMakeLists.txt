@@ -3,11 +3,11 @@
  add_definitions("-D\"lua_getlocaledecpoint()='.'\"")
  add_definitions("-DLUA_ANSI")
  add_definitions("-DLUA_USE_C89")
+ add_definitions("-DWITH_OPENSLES") # For SoLoud
 
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/src/main/cpp/android_macros.h")
 
  set(COMPILE_ZLIB OFF)
- set(COMPILE_OPENAL ON)
 
  set(IS_ARM OFF)
  if( ANDROID_ABI MATCHES "^arm(eabi)?(-v7a)?(64-v8a)?$" )

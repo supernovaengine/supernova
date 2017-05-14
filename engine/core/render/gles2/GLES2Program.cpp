@@ -8,8 +8,8 @@
 
 
 std::string GLES2Program::getVertexShader(std::string name){
-    if (name == "perfragment"){
-        return gVertexShaderPerPixelLightTexture;
+    if (name == "mesh_perfragment"){
+        return gVertexMeshPerPixelLightShader;
     }else if (name == "points_perfragment"){
         return gVertexPointsPerPixelLightShader;
     }
@@ -18,8 +18,8 @@ std::string GLES2Program::getVertexShader(std::string name){
 }
 
 std::string GLES2Program::getFragmentShader(std::string name){
-    if (name == "perfragment"){
-        return gFragmentShaderPerPixelLightTexture;
+    if (name == "mesh_perfragment"){
+        return gFragmentMeshPerPixelLightShader;
     }else if (name == "points_perfragment"){
         return gFragmentPointsPerPixelLightShader;
     }
