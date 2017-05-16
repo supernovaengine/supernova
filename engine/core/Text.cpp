@@ -1,7 +1,6 @@
 #include "Text.h"
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include "stb_truetype.h"
 
 
 #include "PrimitiveMode.h"
@@ -67,6 +66,33 @@ bool Text::load(){
         this->height = TextureManager::getTextureHeight(submeshes[0]->getTextures()[0]);
     }
 */
-    createVertices();
-    return Mesh2D::load();
+    
+    int atlasWidth = 512;
+    int atlasHeight = 512;
+    const int oversampleX = 2;
+    const int oversampleY = 2;
+    const int firstChar = ' ';
+    const int charCount = '~' - ' ';
+    
+    uint8_t* atlasData = new uint8_t[atlasWidth * atlasHeight];
+    stbtt_packedchar* charInfo = new stbtt_packedchar[charCount];
+    
+    stbtt_pack_context context;
+    if (!stbtt_PackBegin(&context, atlasData, atlasWidth, atlasHeight, 0, 1, nullptr))
+        Log::Error(LOG_TAG, "Failed to initialize font");
+    
+        
+        
+        /*
+    unsigned char ttf_buffer[1<<20];
+    unsigned char temp_bitmap[512*512];
+    stbtt_bakedchar cdata[96]; // ASCII 32..126 is 95 glyphs
+    
+    fread(ttf_buffer, 1, 1<<20, fopen("arial.ttf", "rb"));
+    stbtt_BakeFontBitmap(ttf_buffer,0, 32.0, temp_bitmap,512,512, 32,96, cdata); // no guarantee this fits!
+*/
+    
+    //createVertices();
+    //return Mesh2D::load();
+    return 0;
 }

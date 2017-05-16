@@ -291,6 +291,7 @@
 		71CE95031EC8A3C8008CCF3C /* SoLoudSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE94E81EC8A35E008CCF3C /* SoLoudSource.cpp */; };
 		71CE950C1EC8A435008CCF3C /* FileUtilsPlatform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE95041EC8A430008CCF3C /* FileUtilsPlatform.cpp */; };
 		71CE950D1EC8A43C008CCF3C /* FileUtilsGeneric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE95071EC8A430008CCF3C /* FileUtilsGeneric.cpp */; };
+		71CE95111ECA6048008CCF3C /* stb_truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 71CE950E1ECA6043008CCF3C /* stb_truetype.c */; };
 		71E3E57A1E7EA92900468221 /* RectImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E3E5781E7EA92900468221 /* RectImage.cpp */; };
 		71EC38B41EB82871008654E8 /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71EC38B21EB82871008654E8 /* Particles.cpp */; };
 		71F59C381EBFCB1500F49392 /* soloud_coreaudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B971EBFCA5300F49392 /* soloud_coreaudio.cpp */; };
@@ -1066,6 +1067,8 @@
 		71CE95051EC8A430008CCF3C /* FileUtilsPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUtilsPlatform.h; sourceTree = "<group>"; };
 		71CE95071EC8A430008CCF3C /* FileUtilsGeneric.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileUtilsGeneric.cpp; sourceTree = "<group>"; };
 		71CE95081EC8A430008CCF3C /* FileUtilsGeneric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUtilsGeneric.h; sourceTree = "<group>"; };
+		71CE950E1ECA6043008CCF3C /* stb_truetype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_truetype.c; sourceTree = "<group>"; };
+		71CE950F1ECA6043008CCF3C /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
 		71E1D2291D27358B001209C8 /* Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Light.cpp; sourceTree = "<group>"; };
 		71E1D22A1D27358B001209C8 /* Light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Light.h; sourceTree = "<group>"; };
 		71E1D22C1D2957AA001209C8 /* PointLight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointLight.cpp; sourceTree = "<group>"; };
@@ -1245,6 +1248,8 @@
 		7123791A1EC13C7500BFD1F7 /* stb */ = {
 			isa = PBXGroup;
 			children = (
+				71CE950E1ECA6043008CCF3C /* stb_truetype.c */,
+				71CE950F1ECA6043008CCF3C /* stb_truetype.h */,
 				7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */,
 				7123791D1EC13C7500BFD1F7 /* stb_vorbis.h */,
 			);
@@ -2603,6 +2608,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				712379201EC13C7E00BFD1F7 /* stb_vorbis.c in Sources */,
+				71CE95111ECA6048008CCF3C /* stb_truetype.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

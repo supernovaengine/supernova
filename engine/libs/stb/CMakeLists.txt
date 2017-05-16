@@ -5,5 +5,6 @@ add_library(
     STATIC
 
     stb_vorbis.c
+    stb_truetype.c
 
 )
