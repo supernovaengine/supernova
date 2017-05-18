@@ -216,14 +216,13 @@ bool GLES2Mesh::draw() {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(((GLES2Texture*)(submeshesRender[submeshes->at(i)].texture.get()))->getTextureType(), ((GLES2Texture*)(submeshesRender[submeshes->at(i)].texture.get()))->getTexture());
             glUniform1i(uTextureUnitLocation, 0);
-        }else{
-            glUniform4fv(uColor, 1, submeshes->at(i)->getMaterial()->getColor()->ptr());
-            if (Supernova::getPlatform() == S_WEB){
-                //Fix Chrome warnings of no texture bound
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
-                glUniform1i(uTextureUnitLocation, 0);
-            }
+        }
+        glUniform4fv(uColor, 1, submeshes->at(i)->getMaterial()->getColor()->ptr());
+        if (Supernova::getPlatform() == S_WEB){
+            //Fix Chrome warnings of no texture bound
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
+            glUniform1i(uTextureUnitLocation, 0);
         }
 
         if (submeshesRender[submeshes->at(i)].indicesSizes > 0){

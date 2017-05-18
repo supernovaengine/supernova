@@ -1,25 +1,16 @@
 #include "Text.h"
 
 #include "stb_truetype.h"
-
-
 #include "PrimitiveMode.h"
 #include <string>
 #include "image/TextureLoader.h"
 #include "render/TextureManager.h"
 #include "platform/Log.h"
+#include "image/ColorType.h"
+#include "FileData.h"
 
 Text::Text(): Mesh2D() {
     primitiveMode = S_TRIANGLES;
-/*
-    FT_Library ft;
-    if (FT_Init_FreeType(&ft))
-        Log::Error(LOG_TAG, "FREETYPE: Could not init FreeType Library");
-
-    FT_Face face;
-    if (FT_New_Face(ft, "teste.ttf", 0, &face))
-        Log::Error(LOG_TAG, "FREETYPE: Failed to load font");
-*/
 }
 
 Text::Text(std::string text): Mesh2D() {
@@ -37,6 +28,7 @@ void Text::createVertices(){
     vertices.push_back(Vector3(width,  height, 0));
     vertices.push_back(Vector3(0,  height, 0));
 
+    texcoords.clear();
     texcoords.push_back(Vector2(0.0f, 0.0f));
     texcoords.push_back(Vector2(1.0f, 0.0f));
     texcoords.push_back(Vector2(1.0f, 1.0f));
@@ -51,37 +43,100 @@ void Text::createVertices(){
     indices.assign(indices_array, std::end(indices_array));
     submeshes[0]->setIndices(indices);
 
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
+    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
 }
 
 
 bool Text::load(){
-    /*
-    if (submeshes[0]->getTextures().size() > 0 && !loaded && this->width == 0 && this->height == 0){
-        TextureManager::loadTexture(submeshes[0]->getTextures()[0]);
-        this->width = TextureManager::getTextureWidth(submeshes[0]->getTextures()[0]);
-        this->height = TextureManager::getTextureHeight(submeshes[0]->getTextures()[0]);
-    }
-*/
+
+    const unsigned int size = 80;
+    const unsigned int atlasWidth = 512;
+    const unsigned int atlasHeight = 512;
+    const unsigned int oversampleX = 2;
+    const unsigned int oversampleY = 2;
+    const unsigned int firstChar = ' ';
+    const unsigned int charCount = '~' - ' ';
+
+
+    //if (!loaded && this->width == 0 && this->height == 0){
+        //TextureManager::loadTexture(submeshes[0]->getTextures()[0]);
+        //this->width = atlasWidth;
+        //this->height = atlasHeight;
+    //}
+
+    FileData* fontData = new FileData();
+    fontData->open("arial.ttf");
     
-    int atlasWidth = 512;
-    int atlasHeight = 512;
-    const int oversampleX = 2;
-    const int oversampleY = 2;
-    const int firstChar = ' ';
-    const int charCount = '~' - ' ';
-    
-    uint8_t* atlasData = new uint8_t[atlasWidth * atlasHeight];
+    unsigned char* atlasData = new unsigned char[atlasWidth * atlasHeight];
     stbtt_packedchar* charInfo = new stbtt_packedchar[charCount];
     
     stbtt_pack_context context;
     if (!stbtt_PackBegin(&context, atlasData, atlasWidth, atlasHeight, 0, 1, nullptr))
         Log::Error(LOG_TAG, "Failed to initialize font");
-    
-        
+
+
+    stbtt_PackSetOversampling(&context, oversampleX, oversampleY);
+    if (!stbtt_PackFontRange(&context, fontData->getMemPtr(), 0, size, firstChar, charCount, charInfo))
+        Log::Error(LOG_TAG, "Failed to pack font");
+
+    stbtt_PackEnd(&context);
+
+
+    TextureFile* textureFile  = new TextureFile(atlasWidth, atlasHeight, (int)(atlasWidth * atlasHeight * sizeof(unsigned char)), S_COLOR_GRAY_ALPHA, 8, (void*)atlasData);
+    textureFile->flipVertical();
+    TextureManager::loadTexture(textureFile, "font");
+
+    setTexture("font");
+
+    createVertices();
+/*
+    float offsetX = 0;
+    float offsetY = 0;
+    const char text = 'A';
+    stbtt_aligned_quad quad;
+    stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, text - firstChar, &offsetX,
+                        &offsetY, &quad, 1);
+    texcoords.clear();
+    texcoords.push_back(Vector2(quad.s0, quad.t0));
+    texcoords.push_back(Vector2(quad.s1, quad.t0));
+    texcoords.push_back(Vector2(quad.s1, quad.t1));
+    texcoords.push_back(Vector2(quad.s0, quad.t1));
+*/
+    /*
+    float offsetX = 0;
+    float offsetY = 0;
+    const char *text = "A";
+
+    vertices.clear();
+    texcoords.clear();
+
+    while (*text) {
+        if (*text >= firstChar && *text < firstChar + charCount) {
+            stbtt_aligned_quad quad;
+            stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, *text - firstChar, &offsetX,
+                                &offsetY, &quad, 1);
+            float auxt0 = quad.t0;
+            quad.t0 = 1 - quad.t1;
+            quad.t1 = 1 - auxt0;
+
+            vertices.push_back(Vector3(quad.x0, quad.y0, 0));
+            vertices.push_back(Vector3(quad.x1, quad.y0, 0));
+            vertices.push_back(Vector3(quad.x1, quad.y1, 0));
+            vertices.push_back(Vector3(quad.x0, quad.y1, 0));
+
+            texcoords.push_back(Vector2(quad.s0, quad.t0));
+            texcoords.push_back(Vector2(quad.s1, quad.t0));
+            texcoords.push_back(Vector2(quad.s1, quad.t1));
+            texcoords.push_back(Vector2(quad.s0, quad.t1));
+
+        }
+        ++text;
+    }
+*/
+
         
         /*
     unsigned char ttf_buffer[1<<20];
@@ -92,7 +147,6 @@ bool Text::load(){
     stbtt_BakeFontBitmap(ttf_buffer,0, 32.0, temp_bitmap,512,512, 32,96, cdata); // no guarantee this fits!
 */
     
-    //createVertices();
-    //return Mesh2D::load();
-    return 0;
+
+    return Mesh2D::load();
 }

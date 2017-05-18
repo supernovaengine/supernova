@@ -17,6 +17,8 @@ GLenum GLES2Texture::getGlColorFormat(const int color_format) {
             return GL_RGB;
         case S_COLOR_GRAY_ALPHA:
             return GL_LUMINANCE_ALPHA;
+        case S_COLOR_ALPHA:
+            return GL_ALPHA;
     }
 
     return 0;
