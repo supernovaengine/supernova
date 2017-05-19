@@ -13,12 +13,17 @@ Text::Text(): Mesh2D() {
     primitiveMode = S_TRIANGLES;
 }
 
-Text::Text(std::string text): Mesh2D() {
+Text::Text(std::string font): Mesh2D() {
     primitiveMode = S_TRIANGLES;
-    setTexture(text);
+    setFont(font);
 }
 
 Text::~Text() {
+}
+
+void Text::setFont(std::string font){
+    this->font = font;
+    setTexture(font);
 }
 
 void Text::createVertices(){
@@ -52,13 +57,14 @@ void Text::createVertices(){
 
 bool Text::load(){
 
-    const unsigned int size = 80;
-    const unsigned int atlasWidth = 512;
-    const unsigned int atlasHeight = 512;
+    const unsigned int size = 60;
+    const unsigned int atlasWidth = 2048;
+    const unsigned int atlasHeight = 2048;
     const unsigned int oversampleX = 2;
     const unsigned int oversampleY = 2;
     const unsigned int firstChar = ' ';
-    const unsigned int charCount = '~' - ' ';
+    //const unsigned int charCount = '~' - ' ';
+    const unsigned int charCount = 223;
 
 
     //if (!loaded && this->width == 0 && this->height == 0){
@@ -68,7 +74,7 @@ bool Text::load(){
     //}
 
     FileData* fontData = new FileData();
-    fontData->open("arial.ttf");
+    fontData->open(font.c_str());
     
     unsigned char* atlasData = new unsigned char[atlasWidth * atlasHeight];
     stbtt_packedchar* charInfo = new stbtt_packedchar[charCount];
@@ -84,12 +90,10 @@ bool Text::load(){
 
     stbtt_PackEnd(&context);
 
-
-    TextureFile* textureFile  = new TextureFile(atlasWidth, atlasHeight, (int)(atlasWidth * atlasHeight * sizeof(unsigned char)), S_COLOR_GRAY_ALPHA, 8, (void*)atlasData);
+    unsigned int textureSize = atlasWidth * atlasHeight * sizeof(unsigned char);
+    TextureFile* textureFile  = new TextureFile(atlasWidth, atlasHeight, textureSize, S_COLOR_ALPHA, 8, (void*)atlasData);
     textureFile->flipVertical();
-    TextureManager::loadTexture(textureFile, "font");
-
-    setTexture("font");
+    TextureManager::loadTexture(textureFile, font);
 
     createVertices();
 /*
@@ -97,30 +101,37 @@ bool Text::load(){
     float offsetY = 0;
     const char text = 'A';
     stbtt_aligned_quad quad;
-    stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, text - firstChar, &offsetX,
-                        &offsetY, &quad, 1);
+    stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, text - firstChar, &offsetX, &offsetY, &quad, 1);
+    float auxt0 = quad.t0;
+    quad.t0 = 1 - quad.t1;
+    quad.t1 = 1 - auxt0;
     texcoords.clear();
     texcoords.push_back(Vector2(quad.s0, quad.t0));
     texcoords.push_back(Vector2(quad.s1, quad.t0));
     texcoords.push_back(Vector2(quad.s1, quad.t1));
     texcoords.push_back(Vector2(quad.s0, quad.t1));
 */
-    /*
+  
     float offsetX = 0;
     float offsetY = 0;
-    const char *text = "A";
+    const unsigned char text[] = "test";
 
     vertices.clear();
     texcoords.clear();
+    std::vector<unsigned int> indices;
 
-    while (*text) {
-        if (*text >= firstChar && *text < firstChar + charCount) {
+    for(int i=0; text[i]!='\0'; i++){
+        int intchar = text[i];
+        if (intchar >= firstChar && intchar < firstChar + charCount) {
             stbtt_aligned_quad quad;
-            stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, *text - firstChar, &offsetX,
-                                &offsetY, &quad, 1);
+            stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, intchar - firstChar, &offsetX, &offsetY, &quad, 1);
             float auxt0 = quad.t0;
             quad.t0 = 1 - quad.t1;
             quad.t1 = 1 - auxt0;
+            
+            float auxy0 = quad.y0;
+            quad.y0 = -quad.y1;
+            quad.y1 = -auxy0;
 
             vertices.push_back(Vector3(quad.x0, quad.y0, 0));
             vertices.push_back(Vector3(quad.x1, quad.y0, 0));
@@ -131,21 +142,19 @@ bool Text::load(){
             texcoords.push_back(Vector2(quad.s1, quad.t0));
             texcoords.push_back(Vector2(quad.s1, quad.t1));
             texcoords.push_back(Vector2(quad.s0, quad.t1));
+            
+            int ind = i * 4;
+            indices.push_back(ind);
+            indices.push_back(ind+1);
+            indices.push_back(ind+2);
+            indices.push_back(ind);
+            indices.push_back(ind+2);
+            indices.push_back(ind+3);
 
         }
-        ++text;
     }
-*/
-
-        
-        /*
-    unsigned char ttf_buffer[1<<20];
-    unsigned char temp_bitmap[512*512];
-    stbtt_bakedchar cdata[96]; // ASCII 32..126 is 95 glyphs
     
-    fread(ttf_buffer, 1, 1<<20, fopen("arial.ttf", "rb"));
-    stbtt_BakeFontBitmap(ttf_buffer,0, 32.0, temp_bitmap,512,512, 32,96, cdata); // no guarantee this fits!
-*/
+    submeshes[0]->setIndices(indices);
     
 
     return Mesh2D::load();

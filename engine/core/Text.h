@@ -8,11 +8,15 @@ class Text: public Mesh2D {
 
 private:
     void createVertices();
+    
+    std::string font;
 
 public:
     Text();
-    Text(std::string text);
+    Text(std::string font);
     virtual ~Text();
+    
+    void setFont(std::string font);
 
     bool load();
 };
