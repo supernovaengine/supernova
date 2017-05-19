@@ -7,8 +7,7 @@
 class Text: public Mesh2D {
 
 private:
-    void createVertices();
-    
+
     std::string font;
 
 public:

@@ -8,6 +8,7 @@
 #include "platform/Log.h"
 #include "image/ColorType.h"
 #include "FileData.h"
+#include <codecvt>
 
 Text::Text(): Mesh2D() {
     primitiveMode = S_TRIANGLES;
@@ -26,46 +27,18 @@ void Text::setFont(std::string font){
     setTexture(font);
 }
 
-void Text::createVertices(){
-    vertices.clear();
-    vertices.push_back(Vector3(0, 0, 0));
-    vertices.push_back(Vector3(width, 0, 0));
-    vertices.push_back(Vector3(width,  height, 0));
-    vertices.push_back(Vector3(0,  height, 0));
-
-    texcoords.clear();
-    texcoords.push_back(Vector2(0.0f, 0.0f));
-    texcoords.push_back(Vector2(1.0f, 0.0f));
-    texcoords.push_back(Vector2(1.0f, 1.0f));
-    texcoords.push_back(Vector2(0.0f, 1.0f));
-
-    static const unsigned int indices_array[] = {
-        0,  1,  2,
-        0,  2,  3
-    };
-
-    std::vector<unsigned int> indices;
-    indices.assign(indices_array, std::end(indices_array));
-    submeshes[0]->setIndices(indices);
-
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-}
-
 
 bool Text::load(){
 
-    const unsigned int size = 60;
-    const unsigned int atlasWidth = 2048;
-    const unsigned int atlasHeight = 2048;
+    unsigned int size = 60;
+    unsigned int atlasWidth = 512;
+    unsigned int atlasHeight = 512;
+
     const unsigned int oversampleX = 2;
     const unsigned int oversampleY = 2;
-    const unsigned int firstChar = ' ';
-    //const unsigned int charCount = '~' - ' ';
-    const unsigned int charCount = 223;
-
+    const unsigned int firstChar = 32;
+    const unsigned int lastChar = 255;
+    const unsigned int charCount = lastChar - firstChar;
 
     //if (!loaded && this->width == 0 && this->height == 0){
         //TextureManager::loadTexture(submeshes[0]->getTextures()[0]);
@@ -75,19 +48,32 @@ bool Text::load(){
 
     FileData* fontData = new FileData();
     fontData->open(font.c_str());
-    
-    unsigned char* atlasData = new unsigned char[atlasWidth * atlasHeight];
-    stbtt_packedchar* charInfo = new stbtt_packedchar[charCount];
-    
+
+    bool fitBitmap = false;
+
+    unsigned char *atlasData = NULL;
+    stbtt_packedchar *charInfo = new stbtt_packedchar[charCount];
+
     stbtt_pack_context context;
-    if (!stbtt_PackBegin(&context, atlasData, atlasWidth, atlasHeight, 0, 1, nullptr))
-        Log::Error(LOG_TAG, "Failed to initialize font");
+    while (!fitBitmap && atlasWidth <= 32768) {
+        if (atlasData) delete[] atlasData;
+        atlasData = new unsigned char[atlasWidth * atlasHeight];
 
+        if (!stbtt_PackBegin(&context, atlasData, atlasWidth, atlasHeight, 0, 1, nullptr))
+            Log::Error(LOG_TAG, "Failed to initialize font");
 
-    stbtt_PackSetOversampling(&context, oversampleX, oversampleY);
-    if (!stbtt_PackFontRange(&context, fontData->getMemPtr(), 0, size, firstChar, charCount, charInfo))
-        Log::Error(LOG_TAG, "Failed to pack font");
+        stbtt_PackSetOversampling(&context, oversampleX, oversampleY);
+        if (!stbtt_PackFontRange(&context, fontData->getMemPtr(), 0, size, firstChar, charCount, charInfo)){
+            Log::Error(LOG_TAG, "Failed to pack font");
 
+            atlasWidth = atlasWidth * 2;
+            atlasHeight = atlasHeight * 2;
+
+        }else{
+            fitBitmap = true;
+        }
+
+    }
     stbtt_PackEnd(&context);
 
     unsigned int textureSize = atlasWidth * atlasHeight * sizeof(unsigned char);
@@ -95,40 +81,32 @@ bool Text::load(){
     textureFile->flipVertical();
     TextureManager::loadTexture(textureFile, font);
 
-    createVertices();
-/*
+    delete[] atlasData;
+
+    delete fontData;
+
+    std::string text = "Eduardo Dória Lima";
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+    std::wstring utf16String = convert.from_bytes( text );
+
     float offsetX = 0;
     float offsetY = 0;
-    const char text = 'A';
-    stbtt_aligned_quad quad;
-    stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, text - firstChar, &offsetX, &offsetY, &quad, 1);
-    float auxt0 = quad.t0;
-    quad.t0 = 1 - quad.t1;
-    quad.t1 = 1 - auxt0;
-    texcoords.clear();
-    texcoords.push_back(Vector2(quad.s0, quad.t0));
-    texcoords.push_back(Vector2(quad.s1, quad.t0));
-    texcoords.push_back(Vector2(quad.s1, quad.t1));
-    texcoords.push_back(Vector2(quad.s0, quad.t1));
-*/
-  
-    float offsetX = 0;
-    float offsetY = 0;
-    const unsigned char text[] = "test";
 
     vertices.clear();
     texcoords.clear();
     std::vector<unsigned int> indices;
+    int ind = 0;
 
-    for(int i=0; text[i]!='\0'; i++){
-        int intchar = text[i];
-        if (intchar >= firstChar && intchar < firstChar + charCount) {
+    for(auto c : utf16String) {
+        int intchar = uint_least32_t(c);
+        if (intchar >= firstChar && intchar <= lastChar) {
             stbtt_aligned_quad quad;
             stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, intchar - firstChar, &offsetX, &offsetY, &quad, 1);
             float auxt0 = quad.t0;
             quad.t0 = 1 - quad.t1;
             quad.t1 = 1 - auxt0;
-            
+
             float auxy0 = quad.y0;
             quad.y0 = -quad.y1;
             quad.y1 = -auxy0;
@@ -142,15 +120,19 @@ bool Text::load(){
             texcoords.push_back(Vector2(quad.s1, quad.t0));
             texcoords.push_back(Vector2(quad.s1, quad.t1));
             texcoords.push_back(Vector2(quad.s0, quad.t1));
-            
-            int ind = i * 4;
+
+            normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+            normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+            normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+            normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+
             indices.push_back(ind);
             indices.push_back(ind+1);
             indices.push_back(ind+2);
             indices.push_back(ind);
             indices.push_back(ind+2);
             indices.push_back(ind+3);
-
+            ind = ind + 4;
         }
     }
     
