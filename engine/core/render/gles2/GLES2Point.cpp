@@ -37,31 +37,34 @@ std::vector<float> GLES2Point::rectsData(){
 }
 
 void GLES2Point::updatePositions(){
+    PointRender::updatePositions();
     if (loaded)
         GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, positions->size() * 3 * sizeof(GLfloat), &positions->front());
 }
 
 void GLES2Point::updateNormals(){
+    PointRender::updateNormals();
     if (loaded)
-        if (normals)
+        if (lighting && normals)
             GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
 }
 
 void GLES2Point::updatePointSizes(){
+    PointRender::updatePointSizes();
     if (loaded)
         if (pointSizes)
             GLES2Util::updateVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front());
 }
 
 void GLES2Point::updateTextureRects(){
-    if (loaded){
-        if (textureRects){
+    PointRender::updateTextureRects();
+    if (loaded)
+        if (hasTextureRect && textureRects)
             GLES2Util::updateVBO(textureRectBuffer, GL_ARRAY_BUFFER, textureRects->size() * 4 * sizeof(GLfloat), &rectsData().front());
-        }
-    }
 }
 
 void GLES2Point::updatePointColors(){
+    PointRender::updatePointColors();
     if (loaded)
         if (pointColors)
             GLES2Util::updateVBO(pointColorBuffer, GL_ARRAY_BUFFER, pointColors->size() * 4 * sizeof(GLfloat), &pointColors->front());

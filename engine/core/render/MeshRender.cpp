@@ -28,6 +28,24 @@ void MeshRender::setMesh(Mesh* mesh){
     this->mesh = mesh;
 }
 
+void MeshRender::updateVertices(){
+    
+}
+
+void MeshRender::updateTexcoords(){
+    
+}
+
+void MeshRender::updateNormals(){
+    
+}
+
+void MeshRender::updateIndices(){
+    for (unsigned int i = 0; i < submeshes->size(); i++){
+        submeshesRender[submeshes->at(i)].indicesSizes = (int)submeshes->at(i)->getIndices()->size();
+    }
+}
+
 void MeshRender::checkLighting(){
     lighting = false;
     if ((sceneRender != NULL) && (!isSky)){

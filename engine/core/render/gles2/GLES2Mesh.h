@@ -64,6 +64,7 @@ public:
     void updateVertices();
     void updateTexcoords();
     void updateNormals();
+    void updateIndices();
 
     bool load();
 	bool draw();

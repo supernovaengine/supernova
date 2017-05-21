@@ -61,9 +61,10 @@ public:
     
     void setMesh(Mesh* mesh);
     
-    virtual void updateVertices() = 0;
-    virtual void updateTexcoords() = 0;
-    virtual void updateNormals() = 0;
+    virtual void updateVertices();
+    virtual void updateTexcoords();
+    virtual void updateNormals();
+    virtual void updateIndices();
     
     virtual bool load();
     virtual bool draw();

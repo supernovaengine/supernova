@@ -25,6 +25,26 @@ PointRender::PointRender(){
 PointRender::~PointRender(){
 }
 
+void PointRender::updatePositions(){
+    
+}
+
+void PointRender::updateNormals(){
+    
+}
+
+void PointRender::updatePointSizes(){
+    
+}
+
+void PointRender::updateTextureRects(){
+    
+}
+
+void PointRender::updatePointColors(){
+    
+}
+
 void PointRender::setPoints(Points* points){
     this->points = points;
 }

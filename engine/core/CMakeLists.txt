@@ -9,6 +9,9 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/platform/android")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/platform/web")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/file")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/audio")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/text")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/image")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/render")
 
 add_library(
     supernova-core

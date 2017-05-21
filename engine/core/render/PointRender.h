@@ -55,11 +55,11 @@ public:
     
     void setPoints(Points* points);
 
-    virtual void updatePositions() = 0;
-    virtual void updateNormals() = 0;
-    virtual void updatePointSizes() = 0;
-    virtual void updateTextureRects() = 0;
-    virtual void updatePointColors() = 0;
+    virtual void updatePositions();
+    virtual void updateNormals();
+    virtual void updatePointSizes();
+    virtual void updateTextureRects();
+    virtual void updatePointColors();
     
     virtual bool load();
     virtual bool draw();

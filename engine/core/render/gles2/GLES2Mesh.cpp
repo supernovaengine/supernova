@@ -22,20 +22,35 @@ GLES2Mesh::~GLES2Mesh() {
 
 
 void GLES2Mesh::updateVertices(){
+    MeshRender::updateVertices();
     if (loaded)
         GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, vertices->size() * 3 * sizeof(GLfloat), &vertices->front());
 }
 
 void GLES2Mesh::updateTexcoords(){
+    MeshRender::updateTexcoords();
     if (loaded)
         if (texcoords)
             GLES2Util::updateVBO(uvBuffer, GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front());
 }
 
 void GLES2Mesh::updateNormals(){
+    MeshRender::updateNormals();
     if (loaded)
-        if (normals)
+        if (lighting && normals)
             GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
+}
+
+void GLES2Mesh::updateIndices(){
+    MeshRender::updateIndices();
+    if (loaded){
+        for (unsigned int i = 0; i < submeshes->size(); i++){
+            if (submeshesRender[submeshes->at(i)].indicesSizes > 0){
+                std::vector<unsigned int>* gIndices = submeshes->at(i)->getIndices();
+                GLES2Util::updateVBO(submeshesIndices[submeshes->at(i)].indiceBuffer, GL_ELEMENT_ARRAY_BUFFER, gIndices->size() * sizeof(unsigned int), &gIndices->front());
+            }
+        }
+    }
 }
 
 bool GLES2Mesh::load() {
@@ -99,8 +114,8 @@ bool GLES2Mesh::load() {
     
     for (unsigned int i = 0; i < submeshes->size(); i++){
         if (submeshesRender[submeshes->at(i)].indicesSizes > 0){
-            std::vector<unsigned int> gIndices = *submeshes->at(i)->getIndices();
-            submeshesIndices[submeshes->at(i)].indiceBuffer = GLES2Util::createVBO(GL_ELEMENT_ARRAY_BUFFER, gIndices.size() * sizeof(unsigned int), &gIndices.front(), GL_STATIC_DRAW);
+            std::vector<unsigned int>* gIndices = submeshes->at(i)->getIndices();
+            submeshesIndices[submeshes->at(i)].indiceBuffer = GLES2Util::createVBO(GL_ELEMENT_ARRAY_BUFFER, gIndices->size() * sizeof(unsigned int), &gIndices->front(), usageBuffer);
         }
 
         if (submeshesRender[submeshes->at(i)].textured){
