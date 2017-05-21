@@ -5,6 +5,7 @@
 #include <vector>
 #include "math/Vector2.h"
 #include "math/Vector3.h"
+#include "stb_rect_pack.h"
 #include "stb_truetype.h"
 
 class STBText {
@@ -29,7 +30,7 @@ public:
     virtual ~STBText();
 
     bool load(std::string font);
-    void createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords, std::vector<unsigned int>* indices);
+    void createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords, std::vector<unsigned int>* indices, int* width, int* height);
     
 };
 

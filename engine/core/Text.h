@@ -24,6 +24,8 @@ public:
     bool operator == ( const char* v ) const;
     bool operator != ( const char* v ) const;
     
+    void setSize(int width, int height);
+    
     void setFont(std::string font);
     void setText(std::string text);
     

@@ -51,24 +51,27 @@ void Text::setText(std::string text){
     }
 }
 
+void Text::setSize(int width, int height){
+    Log::Error(LOG_TAG, "Can't set size of text");
+}
+
 void Text::drawText(){
     vertices.clear();
     texcoords.clear();
     normals.clear();
     std::vector<unsigned int> indices;
     
-    stbtext->createText(text, &vertices, &normals, &texcoords, &indices);
+    int textWidth, textHeight;
+    
+    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &textWidth, &textHeight);
+    
+    this->width = textWidth;
+    this->height = textHeight;
     
     submeshes[0]->setIndices(indices);
 }
 
 bool Text::load(){
-
-    //if (!loaded && this->width == 0 && this->height == 0){
-        //TextureManager::loadTexture(submeshes[0]->getTextures()[0]);
-        //this->width = atlasWidth;
-        //this->height = atlasHeight;
-    //}
 
     stbtext->load(font);
     

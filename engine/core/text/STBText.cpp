@@ -65,11 +65,13 @@ bool STBText::load(std::string font){
     return true;
 }
 
-void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords, std::vector<unsigned int>* indices){
+void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords, std::vector<unsigned int>* indices, int* width, int* height){
     
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
     std::wstring utf16String = convert.from_bytes( text );
     
+    (*width) = 0;
+    (*height) = 0;
     float offsetX = 0;
     float offsetY = 0;
     
@@ -79,6 +81,7 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
         if (intchar >= firstChar && intchar <= lastChar) {
             stbtt_aligned_quad quad;
             stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, intchar - firstChar, &offsetX, &offsetY, &quad, 1);
+
             float auxt0 = quad.t0;
             quad.t0 = 1 - quad.t1;
             quad.t1 = 1 - auxt0;
@@ -109,6 +112,11 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
             indices->push_back(ind+2);
             indices->push_back(ind+3);
             ind = ind + 4;
+            
+            if ((*height) < (quad.y1 - quad.y0)){
+                (*height) = (quad.y1 - quad.y0);
+            }
         }
     }
+    (*width) = offsetX;
 }
