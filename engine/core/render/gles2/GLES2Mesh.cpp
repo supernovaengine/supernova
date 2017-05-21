@@ -73,15 +73,20 @@ bool GLES2Mesh::load() {
     fog.setProgram((GLES2Program*)gProgram.get());
 
     useTexture = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "uUseTexture");
+    
+    GLenum usageBuffer = GL_STATIC_DRAW;
+    if (isDynamic){
+        usageBuffer = GL_DYNAMIC_DRAW;
+    }
 
-    vertexBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, vertices->size() * 3 * sizeof(GLfloat), &vertices->front(), GL_STATIC_DRAW);
+    vertexBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, vertices->size() * 3 * sizeof(GLfloat), &vertices->front(), usageBuffer);
     aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
 
-    uvBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front(), GL_STATIC_DRAW);
+    uvBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front(), usageBuffer);
     aTextureCoordinatesLocation = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_TextureCoordinates");
     
     if (lighting){
-        normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_STATIC_DRAW);
+        normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), usageBuffer);
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
     }
     

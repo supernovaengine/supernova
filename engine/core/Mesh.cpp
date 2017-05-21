@@ -6,6 +6,7 @@
 Mesh::Mesh(): ConcreteObject(){
     submeshes.push_back(new Submesh(&material));
     skymesh = false;
+    dynamic = false;
 }
 
 Mesh::~Mesh(){
@@ -30,6 +31,10 @@ std::vector<Submesh*>* Mesh::getSubmeshes(){
 
 bool Mesh::isSky(){
     return skymesh;
+}
+
+bool Mesh::isDynamic(){
+    return dynamic;
 }
 
 int Mesh::getPrimitiveMode(){

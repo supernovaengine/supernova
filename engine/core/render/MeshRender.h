@@ -51,6 +51,7 @@ protected:
     Vector3 cameraPosition;
     
     bool isSky;
+    bool isDynamic;
     int primitiveMode;
     
 public:

@@ -1,6 +1,5 @@
 #include "Text.h"
 
-#include "stb_truetype.h"
 #include "PrimitiveMode.h"
 #include <string>
 #include "image/TextureLoader.h"
@@ -8,10 +7,12 @@
 #include "platform/Log.h"
 #include "image/ColorType.h"
 #include "FileData.h"
+#include "stb_truetype.h"
 #include <codecvt>
 
 Text::Text(): Mesh2D() {
     primitiveMode = S_TRIANGLES;
+    dynamic = true;
 }
 
 Text::Text(std::string font): Mesh2D() {
@@ -34,6 +35,7 @@ bool Text::load(){
     unsigned int atlasWidth = 512;
     unsigned int atlasHeight = 512;
 
+    const unsigned int atlasLimit = 32768;
     const unsigned int oversampleX = 2;
     const unsigned int oversampleY = 2;
     const unsigned int firstChar = 32;
@@ -55,7 +57,7 @@ bool Text::load(){
     stbtt_packedchar *charInfo = new stbtt_packedchar[charCount];
 
     stbtt_pack_context context;
-    while (!fitBitmap && atlasWidth <= 32768) {
+    while (!fitBitmap && atlasWidth <= atlasLimit) {
         if (atlasData) delete[] atlasData;
         atlasData = new unsigned char[atlasWidth * atlasHeight];
 
@@ -64,15 +66,14 @@ bool Text::load(){
 
         stbtt_PackSetOversampling(&context, oversampleX, oversampleY);
         if (!stbtt_PackFontRange(&context, fontData->getMemPtr(), 0, size, firstChar, charCount, charInfo)){
-            Log::Error(LOG_TAG, "Failed to pack font");
-
             atlasWidth = atlasWidth * 2;
             atlasHeight = atlasHeight * 2;
-
         }else{
             fitBitmap = true;
         }
-
+    }
+    if (atlasWidth > atlasLimit){
+        Log::Error(LOG_TAG, "Failed to pack font");
     }
     stbtt_PackEnd(&context);
 
