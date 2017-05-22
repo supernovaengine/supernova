@@ -3,6 +3,7 @@
 #include "image/TextureLoader.h"
 #include "Supernova.h"
 #include "image/ColorType.h"
+#include "gles2/GLES2Texture.h"
 
 
 std::unordered_map<std::string, TextureManager::TextureStore> TextureManager::textures;
