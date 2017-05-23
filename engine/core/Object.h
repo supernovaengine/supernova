@@ -74,6 +74,7 @@ public:
     Vector3 getCenter();
     
     Scene* getScene();
+    Object* getParent();
     
     void moveToFront();
     void moveToBack();

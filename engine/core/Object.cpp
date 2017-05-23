@@ -223,6 +223,10 @@ Scene* Object::getScene(){
     return scene;
 }
 
+Object* Object::getParent(){
+    return parent;
+}
+
 void Object::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
 
     this->viewMatrix = viewMatrix;
