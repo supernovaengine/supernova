@@ -1,25 +1,25 @@
-#include "TextureRect.h"
+#include "Rect.h"
 
 
-TextureRect::TextureRect(){
+Rect::Rect(){
     x = 0;
     y = 0;
     width = 1;
     height = 1;
 }
 
-TextureRect::TextureRect(float x, float y, float width, float height){
+Rect::Rect(float x, float y, float width, float height){
     setRect(x, y, width, height);
 }
 
-TextureRect::TextureRect(const TextureRect& t){
+Rect::Rect(const Rect& t){
     this->x = t.x;
     this->y = t.y;
     this->width = t.width;
     this->height = t.height;
 }
 
-TextureRect& TextureRect::operator = (const TextureRect& t){
+Rect& Rect::operator = (const Rect& t){
     this->x = t.x;
     this->y = t.y;
     this->width = t.width;
@@ -28,34 +28,34 @@ TextureRect& TextureRect::operator = (const TextureRect& t){
     return *this;
 }
 
-float TextureRect::getX(){
+float Rect::getX(){
     return x;
 }
 
-float TextureRect::getY(){
+float Rect::getY(){
     return y;
 }
 
-float TextureRect::getWidth(){
+float Rect::getWidth(){
     return width;
 }
 
-float TextureRect::getHeight(){
+float Rect::getHeight(){
     return height;
 }
 
-void TextureRect::setRect(float x, float y, float width, float height){
+void Rect::setRect(float x, float y, float width, float height){
     this->x = x;
     this->y = y;
     this->width = width;
     this->height = height;
 }
 
-void TextureRect::setRect(TextureRect* textureRect){
-    setRect(textureRect->getX(), textureRect->getY(), textureRect->getWidth(), textureRect->getHeight());
+void Rect::setRect(Rect* rect){
+    setRect(rect->getX(), rect->getY(), rect->getWidth(), rect->getHeight());
 }
 
-bool TextureRect::isNormalized(){
+bool Rect::isNormalized(){
     if ((x >= 0 && x <= 1) && (y >= 0 && y <= 1) && (width >= 0 && width <= 1) && (height >= 0 && height <= 1)){
         return true;
     }

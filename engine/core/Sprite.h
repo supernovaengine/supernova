@@ -8,7 +8,7 @@
 class Sprite: public RectImage {
 
 protected:
-    std::unordered_map <std::string, TextureRect> framesRect;
+    std::unordered_map <std::string, Rect> framesRect;
 
 public:
     Sprite();

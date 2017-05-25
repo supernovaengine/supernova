@@ -62,7 +62,7 @@ void Material::setTextureRect(float x, float y, float width, float height){
     if (textureRect)
         textureRect->setRect(x, y, width, height);
     else
-        textureRect = new TextureRect(x, y, width, height);
+        textureRect = new Rect(x, y, width, height);
 }
 
 std::vector<std::string> Material::getTextures(){
@@ -77,6 +77,6 @@ int Material::getTextureType(){
     return textureType;
 }
 
-TextureRect* Material::getTextureRect(){
+Rect* Material::getTextureRect(){
     return textureRect;
 }

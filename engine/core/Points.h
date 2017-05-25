@@ -33,7 +33,7 @@ protected:
 
     std::vector<Vector3> positions;
     std::vector<Vector3> normals;
-    std::vector<TextureRect*> textureRects;
+    std::vector<Rect*> textureRects;
     std::vector<float> pointSizes;
     std::vector<Vector4> colors;
 
@@ -42,7 +42,7 @@ protected:
     float minPointSize;
     float maxPointSize;
     
-    std::unordered_map <std::string, TextureRect> framesRect;
+    std::unordered_map <std::string, Rect> framesRect;
 
 public:
     Points();
@@ -73,7 +73,7 @@ public:
     
     std::vector<Vector3>* getPositions();
     std::vector<Vector3>* getNormals();
-    std::vector<TextureRect*>* getTextureRects();
+    std::vector<Rect*>* getTextureRects();
     std::vector<float>* getPointSizes();
     std::vector<Vector4>* getColors();
 

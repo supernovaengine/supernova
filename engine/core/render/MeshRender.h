@@ -7,7 +7,7 @@
 #include "Submesh.h"
 #include <vector>
 #include <unordered_map>
-#include "image/TextureRect.h"
+#include "Rect.h"
 
 
 class Mesh;

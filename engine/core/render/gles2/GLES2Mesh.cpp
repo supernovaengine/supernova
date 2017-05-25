@@ -223,7 +223,7 @@ bool GLES2Mesh::draw() {
     for (int i = 0; i < submeshes->size(); i++){
         
         if (hasTextureRect){
-            TextureRect textureRect;
+            Rect textureRect;
             if (submeshes->at(i)->getMaterial()->getTextureRect())
                 textureRect = *submeshes->at(i)->getMaterial()->getTextureRect();
         

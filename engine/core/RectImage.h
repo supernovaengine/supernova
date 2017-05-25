@@ -2,7 +2,7 @@
 #define RectImage_h
 
 #include "Image.h"
-#include "image/TextureRect.h"
+#include "Rect.h"
 
 
 class RectImage: public Image {
@@ -12,7 +12,7 @@ private:
     
     bool useTextureRect;
 
-    TextureRect textureRect;
+    Rect textureRect;
     
 protected:
 
@@ -23,7 +23,7 @@ public:
     virtual ~RectImage();
 
     void setRect(float x, float y, float width, float height);
-    void setRect(TextureRect textureRect);
+    void setRect(Rect textureRect);
     
     bool load();
     bool draw();

@@ -24,7 +24,7 @@ std::vector<float> GLES2Point::rectsData(){
     std::vector<float> rects;
     for (int i = 0; i < textureRects->size(); i++){
 
-        TextureRect textureRect;
+        Rect textureRect;
         if (textureRects->at(i))
             textureRect = *textureRects->at(i);
 

@@ -4,7 +4,7 @@
 #include "math/Vector2.h"
 #include "render/SceneRender.h"
 #include "render/TextureRender.h"
-#include "image/TextureRect.h"
+#include "Rect.h"
 #include "Material.h"
 #include <vector>
 
@@ -37,7 +37,7 @@ protected:
     
     std::vector<Vector3>* positions;
     std::vector<Vector3>* normals;
-    std::vector<TextureRect*>* textureRects;
+    std::vector<Rect*>* textureRects;
     std::vector<float>* pointSizes;
     std::vector<Vector4>* pointColors;
     
