@@ -66,7 +66,7 @@ void Object::removeScene(){
 
 void Object::addObject(Object* obj){
     if (Scene* scene_ptr = dynamic_cast<Scene*>(obj)){
-        scene_ptr->isChildScene = true;
+        scene_ptr->childScene = true;
     }
     
     if (obj->parent == NULL){
@@ -108,7 +108,7 @@ void Object::removeObject(Object* obj){
     }
     
     if (Scene* scene_ptr = dynamic_cast<Scene*>(obj)){
-        scene_ptr->isChildScene = false;
+        scene_ptr->childScene = false;
     }
     
     std::vector<Object*>::iterator i = std::remove(objects.begin(), objects.end(), obj);

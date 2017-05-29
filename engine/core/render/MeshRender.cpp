@@ -55,7 +55,7 @@ void MeshRender::checkLighting(){
 
 void MeshRender::checkFog(){
     hasfog = false;
-    if ((sceneRender != NULL) && (sceneRender->fog != NULL)){
+    if ((sceneRender != NULL) && (sceneRender->getFog() != NULL)){
         hasfog = true;
     }
 }

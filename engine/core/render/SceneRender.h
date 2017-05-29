@@ -3,51 +3,41 @@
 
 #include "Light.h"
 #include "Fog.h"
+#include "LightRender.h"
+
+class Scene;
 
 class SceneRender {
+    
+private:
+    void fillSceneProperties();
+    
+    Vector3* ambientLight;
+    std::vector<Light*>* lights;
+    Fog* fog;
     
 protected:
 
     bool childScene;
     bool useDepth;
     bool useTransparency;
+    
+    Scene* scene;
+    
+    LightRender lightRender;
 
     void updateLights();
     
 public:
-
-    Vector3* ambientLight;
-    std::vector<Light*>* lights;
-    Fog* fog;
-    
     bool lighting;
-
-    int numPointLight;
-    std::vector<float> pointLightPos;
-    std::vector<float> pointLightPower;
-    std::vector<float> pointLightColor;
-
-    int numSpotLight;
-    std::vector<float> spotLightPos;
-    std::vector<float> spotLightPower;
-    std::vector<float> spotLightColor;
-    std::vector<float> spotLightCutOff;
-    std::vector<float> spotLightTarget;
-
-    int numDirectionalLight;
-    std::vector<float> directionalLightDir;
-    std::vector<float> directionalLightPower;
-    std::vector<float> directionalLightColor;
 
     SceneRender();
     virtual ~SceneRender();
     
-    void setLights(std::vector<Light*>* lights);
-    void setAmbientLight(Vector3* ambientLight);
-    void setChildScene(bool childScene);
-    void setUseDepth(bool useDepth);
-    void setUseTramsparency(bool useTransparency);
-    void setFog(Fog* fog);
+    void setScene(Scene* scene);
+    
+    LightRender* getLightRender();
+    Fog* getFog();
 
     virtual bool load();
     virtual bool draw();

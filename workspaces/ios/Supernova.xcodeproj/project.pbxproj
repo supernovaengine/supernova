@@ -13,7 +13,6 @@
 		71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71369C081E291E22006AE1D1 /* Button.cpp */; };
 		713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */ = {isa = PBXBuildFile; fileRef = 713B79A11C0FD15000892EAC /* iosfopenpath.m */; };
 		713D30C51CFB306D00A4752F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* assets */; };
-		714C89061ED7711A0028DCE0 /* Rect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89051ED7711A0028DCE0 /* Rect.cpp */; };
 		714D81D61E6C9B380038BE50 /* GLES2Point.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714D81D41E6C9B380038BE50 /* GLES2Point.cpp */; };
 		714D81E51E70C2B80038BE50 /* GLES2Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714D81D91E70BF380038BE50 /* GLES2Mesh.cpp */; };
 		714D81E61E70C2C00038BE50 /* GLES2Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714D81D71E70BF380038BE50 /* GLES2Light.cpp */; };
@@ -190,6 +189,8 @@
 		7188F1BC1DBD960000A2D04F /* WAVReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1BA1DBD960000A2D04F /* WAVReader.cpp */; };
 		719301221E50F9CF00BEE527 /* ConcreteObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301201E50F9CF00BEE527 /* ConcreteObject.cpp */; };
 		719301251E51212800BEE527 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301231E51212800BEE527 /* Material.cpp */; };
+		719330B41EDB16100043E282 /* LightRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719330B21EDB16100043E282 /* LightRender.cpp */; };
+		719330B51EDB161B0043E282 /* Rect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89051ED7711A0028DCE0 /* Rect.cpp */; };
 		71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */; };
 		71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28351DE8E96800C12A1D /* MP3Reader.cpp */; };
 		71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FAC11DEB1924003850A2 /* SoundManager.cpp */; };
@@ -838,6 +839,8 @@
 		719301241E51212800BEE527 /* Material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Material.h; sourceTree = "<group>"; };
 		719301261E53D4B000BEE527 /* Points.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Points.cpp; sourceTree = "<group>"; };
 		719301271E53D4B000BEE527 /* Points.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Points.h; sourceTree = "<group>"; };
+		719330B21EDB16100043E282 /* LightRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LightRender.cpp; sourceTree = "<group>"; };
+		719330B31EDB16100043E282 /* LightRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LightRender.h; sourceTree = "<group>"; };
 		71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPlayer.cpp; sourceTree = "<group>"; };
 		71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 		71A6FAC11DEB1924003850A2 /* SoundManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundManager.cpp; sourceTree = "<group>"; };
@@ -1285,6 +1288,8 @@
 			isa = PBXGroup;
 			children = (
 				713D2A4B1CFB2EAD00A4752F /* gles2 */,
+				719330B21EDB16100043E282 /* LightRender.cpp */,
+				719330B31EDB16100043E282 /* LightRender.h */,
 				714D81DD1E70BF4B0038BE50 /* MeshManager.cpp */,
 				714D81DE1E70BF4B0038BE50 /* MeshManager.h */,
 				714D81DF1E70BF4B0038BE50 /* MeshRender.cpp */,
@@ -2423,7 +2428,6 @@
 				71E34E241ED1CEBF0005DEF2 /* STBText.cpp in Sources */,
 				716AB5B11BEF9F3D001B672D /* GameViewController.mm in Sources */,
 				713B79A21C0FD15000892EAC /* iosfopenpath.m in Sources */,
-				714C89061ED7711A0028DCE0 /* Rect.cpp in Sources */,
 				716AB5A71BEF9F3C001B672D /* main.m in Sources */,
 				71192EFD1CE1334000BD76EE /* main.cpp in Sources */,
 				717FA2091CA1843C009071DC /* EAGLView.mm in Sources */,
@@ -2479,6 +2483,7 @@
 				71CDC71A1D7B14510060EEFF /* Shape.cpp in Sources */,
 				71CE94F81EC8A3B2008CCF3C /* FileData.cpp in Sources */,
 				71CDC7241D7B146D0060EEFF /* Quaternion.cpp in Sources */,
+				719330B41EDB16100043E282 /* LightRender.cpp in Sources */,
 				714D81E51E70C2B80038BE50 /* GLES2Mesh.cpp in Sources */,
 				71E3E57A1E7EA92900468221 /* RectImage.cpp in Sources */,
 				71CDC71C1D7B14510060EEFF /* Submesh.cpp in Sources */,
@@ -2512,6 +2517,7 @@
 				71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */,
 				71AC8B611E6B42C000DB33C3 /* Points.cpp in Sources */,
 				716F761D1E1C736300FF9888 /* Mesh2D.cpp in Sources */,
+				719330B51EDB161B0043E282 /* Rect.cpp in Sources */,
 				71CDC7251D7B146D0060EEFF /* Ray.cpp in Sources */,
 				71CDC7211D7B14680060EEFF /* TextureFile.cpp in Sources */,
 				71CE94F91EC8A3B2008CCF3C /* FileHandle.cpp in Sources */,

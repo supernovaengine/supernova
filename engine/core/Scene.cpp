@@ -7,7 +7,7 @@
 
 Scene::Scene() {
     camera = NULL;
-    isChildScene = false;
+    childScene = false;
     useTransparency = false;
     useDepth = false;
     userCamera = false;
@@ -98,8 +98,24 @@ void Scene::setAmbientLight(const float ambientFactor){
     setAmbientLight(Vector3(ambientFactor, ambientFactor, ambientFactor));
 }
 
-Vector3 Scene::getAmbientLight(){
-    return ambientLight;
+Vector3* Scene::getAmbientLight(){
+    return &ambientLight;
+}
+
+std::vector<Light*>* Scene::getLights(){
+    return &lights;
+}
+
+bool Scene::isChildScene(){
+    return childScene;
+}
+
+bool Scene::isUseDepth(){
+    return useDepth;
+}
+
+bool Scene::isUseTransparency(){
+    return useTransparency;
 }
 
 void Scene::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
@@ -209,10 +225,7 @@ void Scene::drawSky(){
 
 bool Scene::load(){
 
-    sceneManager.getRender()->setChildScene(isChildScene);
-    sceneManager.getRender()->setLights(&this->lights);
-    sceneManager.getRender()->setAmbientLight(&this->ambientLight);
-    sceneManager.getRender()->setFog(fog);
+    sceneManager.getRender()->setScene(this);
 
     doCamera();
 
@@ -230,9 +243,6 @@ bool Scene::load(){
 bool Scene::draw(){
     
     transparentQueue.clear();
-
-    sceneManager.getRender()->setUseDepth(useDepth);
-    sceneManager.getRender()->setUseTramsparency(useTransparency);
     
     sceneManager.draw();
     resetSceneProperties();

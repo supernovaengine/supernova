@@ -58,7 +58,7 @@ void PointRender::checkLighting(){
 
 void PointRender::checkFog(){
     hasfog = false;
-    if ((sceneRender != NULL) && (sceneRender->fog != NULL)){
+    if ((sceneRender != NULL) && (sceneRender->getFog() != NULL)){
         hasfog = true;
     }
 }

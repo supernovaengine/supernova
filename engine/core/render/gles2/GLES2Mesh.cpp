@@ -175,7 +175,7 @@ bool GLES2Mesh::draw() {
 
     glUniformMatrix4fv(u_mvpMatrix, 1, GL_FALSE, (GLfloat*)modelViewProjectMatrix);
     if (lighting){
-        light.setUniformValues(sceneRender);
+        light.setUniformValues(sceneRender->getLightRender());
         glUniform3fv(uEyePos, 1, cameraPosition.ptr());
         glUniformMatrix4fv(u_mMatrix, 1, GL_FALSE, (GLfloat*)modelMatrix);
         glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);

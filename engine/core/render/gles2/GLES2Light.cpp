@@ -34,7 +34,7 @@ void GLES2Light::getUniformLocations(){
     u_DirectionalLightColor = glGetUniformLocation(program->getProgram(), "u_DirectionalLightColor");
 }
 
-void GLES2Light::setUniformValues(SceneRender* sceneRender){
+void GLES2Light::setUniformValues(LightRender* sceneRender){
     glUniform3fv(u_AmbientLight, 1, sceneRender->ambientLight->ptr());
 
     glUniform1i(u_NumPointLight, sceneRender->numPointLight);
