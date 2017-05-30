@@ -19,7 +19,7 @@ public:
 
     bool load();
     bool draw();
-    bool viewSize(int x, int y, int width, int height);
+    bool viewSize(Rect rect);
 
 };
 

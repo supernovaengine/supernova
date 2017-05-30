@@ -4,6 +4,7 @@
 #include "Light.h"
 #include "Fog.h"
 #include "LightRender.h"
+#include "Rect.h"
 
 class Scene;
 
@@ -41,7 +42,7 @@ public:
 
     virtual bool load();
     virtual bool draw();
-    virtual bool viewSize(int x, int y, int width, int height) = 0;
+    virtual bool viewSize(Rect rect) = 0;
     
 };
 

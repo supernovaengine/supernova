@@ -36,7 +36,7 @@ bool SceneManager::draw() {
     return scene->draw();
 }
 
-bool SceneManager::viewSize(int x, int y, int width, int height){
+bool SceneManager::viewSize(Rect rect){
     instanciateRender();
-    return scene->viewSize(x, y, width, height);
+    return scene->viewSize(rect);
 }

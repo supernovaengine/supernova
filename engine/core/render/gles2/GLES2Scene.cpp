@@ -67,9 +67,9 @@ bool GLES2Scene::draw() {
     return true;
 }
 
-bool GLES2Scene::viewSize(int x, int y, int width, int height){
+bool GLES2Scene::viewSize(Rect rect){
     
-    glViewport(x, y, width, height);
+    glViewport(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
     //glScissor(x, y, width, height);
     //glEnable(GL_SCISSOR_TEST);
     //checkGlError("glViewport");

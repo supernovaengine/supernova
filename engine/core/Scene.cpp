@@ -176,7 +176,7 @@ bool Scene::updateViewSize(){
     }
 
     
-    bool status = sceneManager.viewSize(viewX, viewY, viewWidth, viewHeight);
+    bool status = sceneManager.viewSize(Rect(viewX, viewY, viewWidth, viewHeight));
     if (this->camera != NULL){
         camera->updateScreenSize();
     }
