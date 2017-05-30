@@ -3,8 +3,8 @@
 
 #include "Light.h"
 #include "Fog.h"
-#include "LightRender.h"
-#include "Rect.h"
+#include "LightData.h"
+#include "math/Rect.h"
 
 class Scene;
 
@@ -13,9 +13,8 @@ class SceneRender {
 private:
     void fillSceneProperties();
     
-    Vector3* ambientLight;
-    std::vector<Light*>* lights;
     Fog* fog;
+    LightData lightData;
     
 protected:
 
@@ -24,8 +23,6 @@ protected:
     bool useTransparency;
     
     Scene* scene;
-    
-    LightRender lightRender;
 
     void updateLights();
     
@@ -36,14 +33,18 @@ public:
     virtual ~SceneRender();
     
     void setScene(Scene* scene);
-    
-    LightRender* getLightRender();
+
+    LightData* getLightData();
     Fog* getFog();
 
     virtual bool load();
     virtual bool draw();
     virtual bool viewSize(Rect rect) = 0;
-    
+    virtual bool enableScissor(Rect rect) = 0;
+    virtual bool disableScissor() = 0;
+
+    virtual bool isEnabledScissor() = 0;
+    virtual Rect getActiveScissor() = 0;
 };
 
 #endif /* SceneRender_h */

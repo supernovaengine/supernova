@@ -1,13 +1,16 @@
 
 #include "Mesh2D.h"
-
+#include "Supernova.h"
 
 Mesh2D::Mesh2D(): Mesh(){
     this->width = 0;
     this->height = 0;
+
     this->billboard = false;
     this->fixedSizeBillboard=false;
     this->billboardScaleFactor=100;
+
+    this->clipping = false;
 }
 
 Mesh2D::~Mesh2D(){
@@ -64,6 +67,10 @@ void Mesh2D::setBillboardScaleFactor(float billboardScaleFactor){
     this->billboardScaleFactor = billboardScaleFactor;
 }
 
+void Mesh2D::setClipping(bool clipping){
+    this->clipping = clipping;
+}
+
 void Mesh2D::setWidth(int width){
     setSize(width, this->height);
 }
@@ -78,4 +85,59 @@ void Mesh2D::setHeight(int height){
 
 int Mesh2D::getHeight(){
     return height;
+}
+
+bool Mesh2D::draw(){
+    if (clipping) {
+
+        float scaleX = scale.x;
+        float scaleY = scale.y;
+        Object *parent = this->parent;
+        while (parent) {
+            scaleX *= parent->getScale().x;
+            scaleY *= parent->getScale().y;
+            parent = parent->getParent();
+        }
+
+        int objScreenPosX = (int)(getWorldPosition().x * ((float) Supernova::getScreenWidth() /
+                                                    (float) Supernova::getCanvasWidth()));
+        int objScreenPosY = (int)(getWorldPosition().y * ((float) Supernova::getScreenHeight() /
+                                                    (float) Supernova::getCanvasHeight()));
+        int objScreenWidth = (int)(width * scaleX * ((float) Supernova::getScreenWidth() /
+                                               (float) Supernova::getCanvasWidth()));
+        int objScreenHeight = (int)(height * scaleY * ((float) Supernova::getScreenHeight() /
+                                                 (float) Supernova::getCanvasHeight()));
+
+        SceneRender* sceneRender = scene->getSceneRender();
+
+        bool on = sceneRender->isEnabledScissor();
+
+        Rect rect = sceneRender->getActiveScissor();
+
+        if (on) {
+            if (objScreenPosX < rect.getX())
+                objScreenPosX = rect.getX();
+
+            if (objScreenPosY < rect.getY())
+                objScreenPosY = rect.getY();
+
+            if (objScreenPosX + objScreenWidth >= rect.getX() + rect.getWidth())
+                objScreenWidth = rect.getX() + rect.getWidth() - objScreenPosX;
+
+            if (objScreenPosY + objScreenHeight >= rect.getY() + rect.getHeight())
+                objScreenHeight = rect.getY() + rect.getHeight() - objScreenPosY;
+        }
+
+        sceneRender->enableScissor(Rect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight));
+
+        bool drawReturn = Mesh::draw();
+
+        if (!on)
+            sceneRender->disableScissor();
+
+        return drawReturn;
+
+    }else{
+        return Mesh::draw();
+    }
 }

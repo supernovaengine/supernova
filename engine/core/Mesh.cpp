@@ -111,7 +111,7 @@ void Mesh::update(){
 }
 
 bool Mesh::render(){
-    return renderManager.draw();
+    return renderManager.getRender()->draw();
 }
 
 void Mesh::removeAllSubmeshes(){
@@ -134,7 +134,7 @@ bool Mesh::load(){
     
     renderManager.getRender()->setMesh(this);
 
-    renderManager.load();
+    renderManager.getRender()->load();
 
     return ConcreteObject::load();
 }
@@ -147,7 +147,7 @@ bool Mesh::draw(){
 void Mesh::destroy(){
     ConcreteObject::destroy();
     
-    renderManager.destroy();
+    renderManager.getRender()->destroy();
     
     removeAllSubmeshes();
 }

@@ -158,7 +158,7 @@ bool GLES2Point::draw() {
     
     glUniformMatrix4fv(u_mvpMatrix, 1, GL_FALSE, (GLfloat*)modelViewProjectionMatrix);
     if (lighting){
-        light.setUniformValues(sceneRender->getLightRender());
+        light.setUniformValues(sceneRender);
         glUniform3fv(uEyePos, 1, cameraPosition.ptr());
         glUniformMatrix4fv(u_mMatrix, 1, GL_FALSE, (GLfloat*)modelMatrix);
         glUniformMatrix4fv(u_nMatrix, 1, GL_FALSE, (GLfloat*)normalMatrix);

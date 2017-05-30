@@ -6,7 +6,7 @@
 
 #include <string>
 #include "math/Vector4.h"
-#include "Rect.h"
+#include "math/Rect.h"
 #include <vector>
 
 class Material {

@@ -1,16 +1,16 @@
-#include "LightRender.h"
+#include "LightData.h"
 #include "Angle.h"
 
 
-LightRender::LightRender(){
+LightData::LightData(){
     ambientLight = NULL;
 }
 
-LightRender::~LightRender(){
+LightData::~LightData(){
     
 }
 
-bool LightRender::updateLights(std::vector<Light*>* lights, Vector3* ambientLight){
+bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight){
     
     this->ambientLight = ambientLight;
     

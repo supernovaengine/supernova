@@ -25,17 +25,3 @@ PointRender* PointManager::getRender(){
     instanciateRender();
     return render;
 }
-
-bool PointManager::load() {
-    instanciateRender();
-    return render->load();
-}
-
-bool PointManager::draw() {
-    return render->draw();
-}
-
-void PointManager::destroy(){
-    if (render != NULL)
-        render->destroy();
-}

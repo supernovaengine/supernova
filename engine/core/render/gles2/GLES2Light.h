@@ -3,7 +3,7 @@
 
 #include "GLES2Header.h"
 #include "GLES2Program.h"
-#include "render/LightRender.h"
+#include "render/SceneRender.h"
 
 class GLES2Light {
 
@@ -37,7 +37,7 @@ public:
 
     void setProgram(GLES2Program* program);
     void getUniformLocations();
-    void setUniformValues(LightRender* sceneRender);
+    void setUniformValues(SceneRender* sceneRender);
 
 };
 

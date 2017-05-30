@@ -70,9 +70,32 @@ bool GLES2Scene::draw() {
 bool GLES2Scene::viewSize(Rect rect){
     
     glViewport(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
-    //glScissor(x, y, width, height);
-    //glEnable(GL_SCISSOR_TEST);
-    //checkGlError("glViewport");
+    GLES2Util::checkGlError("glViewport");
     
     return true;
+}
+
+bool GLES2Scene::enableScissor(Rect rect){
+    glScissor(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+    GLES2Util::checkGlError("glScissor");
+    glEnable(GL_SCISSOR_TEST);
+
+    return true;
+}
+
+bool GLES2Scene::disableScissor(){
+    glDisable(GL_SCISSOR_TEST);
+
+    return true;
+}
+
+bool GLES2Scene::isEnabledScissor(){
+    return glIsEnabled(GL_SCISSOR_TEST);
+}
+
+Rect GLES2Scene::getActiveScissor(){
+    int rect[4];
+    glGetIntegerv(GL_SCISSOR_BOX, rect);
+
+    return Rect(rect[0], rect[1], rect[2], rect[3]);
 }

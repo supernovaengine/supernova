@@ -8,8 +8,6 @@ SceneRender::SceneRender(){
     useDepth = false;
     useTransparency = false;
 
-    lights = NULL;
-    ambientLight = NULL;
     fog = NULL;
 }
 
@@ -21,15 +19,14 @@ void SceneRender::setScene(Scene* scene){
 }
 
 void SceneRender::fillSceneProperties(){
-    this->lights = scene->getLights();
-    this->ambientLight = scene->getAmbientLight();
+    this->lighting = this->lightData.updateLights(scene->getLights(), scene->getAmbientLight());
     this->childScene = scene->isChildScene();
     this->useDepth = scene->isUseDepth();
     this->useTransparency = scene->isUseTransparency();
 }
 
-LightRender* SceneRender::getLightRender(){
-    return &lightRender;
+LightData* SceneRender::getLightData(){
+    return &lightData;
 }
 
 Fog* SceneRender::getFog(){
@@ -38,13 +35,11 @@ Fog* SceneRender::getFog(){
 
 bool SceneRender::load(){
     fillSceneProperties();
-    lighting = lightRender.updateLights(lights, ambientLight);
 
     return true;
 }
 bool SceneRender::draw(){
     fillSceneProperties();
-    lighting = lightRender.updateLights(lights, ambientLight);
 
     return true;
 }

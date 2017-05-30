@@ -176,7 +176,7 @@ bool Scene::updateViewSize(){
     }
 
     
-    bool status = sceneManager.viewSize(Rect(viewX, viewY, viewWidth, viewHeight));
+    bool status = sceneManager.getRender()->viewSize(Rect(viewX, viewY, viewWidth, viewHeight));
     if (this->camera != NULL){
         camera->updateScreenSize();
     }
@@ -229,7 +229,7 @@ bool Scene::load(){
 
     doCamera();
 
-    sceneManager.load();
+    sceneManager.getRender()->load();
     resetSceneProperties();
     Object::load();
 
@@ -244,7 +244,7 @@ bool Scene::draw(){
     
     transparentQueue.clear();
     
-    sceneManager.draw();
+    sceneManager.getRender()->draw();
     resetSceneProperties();
     Object::draw();
     drawSky();

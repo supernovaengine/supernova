@@ -7,7 +7,7 @@
 #include "Submesh.h"
 #include <vector>
 #include <unordered_map>
-#include "Rect.h"
+#include "math/Rect.h"
 
 
 class Mesh;

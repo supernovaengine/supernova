@@ -1,7 +1,6 @@
 #include "RectImage.h"
 
 #include "render/TextureManager.h"
-#include "Supernova.h"
 
 
 RectImage::RectImage(): Image(){
@@ -74,63 +73,6 @@ bool RectImage::load(){
 }
 
 bool RectImage::draw(){
-    
-    
- /*
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(getWorldPosition().x, getWorldPosition().y, width, height);
-    printf("inicia %i %i\n", width, height);
 
-  Image::draw();
-    
-    //glDisable(GL_SCISSOR_TEST);
-    printf("finaliza %i %i\n", width, height);
-  */
-    /*
-    float scaleX = scale.x;
-    float scaleY = scale.y;
-    Object *parent = this->parent;
-    while (parent) {
-        scaleX *= parent->getScale().x;
-        scaleY *= parent->getScale().y;
-        parent = parent->getParent();
-    }
-    
-    int objScreenPosX = getWorldPosition().x * ((float)Supernova::getScreenWidth() / (float)Supernova::getCanvasWidth());
-    int objScreenPosY = getWorldPosition().y * ((float)Supernova::getScreenHeight() / (float)Supernova::getCanvasHeight());
-    int objScreenWidth = width * scaleX * ((float)Supernova::getScreenWidth() / (float)Supernova::getCanvasWidth());
-    int objScreenHeight = height * scaleY * ((float)Supernova::getScreenHeight() / (float)Supernova::getCanvasHeight());
-    
-    bool on = glIsEnabled(GL_SCISSOR_TEST);
-    int rect[4];
-    glGetIntegerv(GL_SCISSOR_BOX, rect);
-    
-    if (on){
-        if (objScreenPosX < rect[0])
-            objScreenPosX = rect[0];
-    
-        if (objScreenPosY < rect[1])
-            objScreenPosY = rect[1];
-    
-        if (objScreenWidth > rect[2])
-            objScreenWidth = rect[2];
-        
-        if (objScreenPosX+objScreenWidth >= rect[0]+rect[2])
-            objScreenWidth = rect[0]+rect[2]-objScreenPosX;
-    
-        if (objScreenPosY+objScreenHeight >= rect[1]+rect[3])
-            objScreenHeight = rect[1]+rect[3]-objScreenPosY;
-    }
-    
-    glScissor(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight);
-    glEnable(GL_SCISSOR_TEST);
-
-    Image::draw();
-
-    if(!on)
-        glDisable(GL_SCISSOR_TEST);
-    
-    return true;
-    */
     return Image::draw();
 }

@@ -2,7 +2,7 @@
 #define RectImage_h
 
 #include "Image.h"
-#include "Rect.h"
+#include "math/Rect.h"
 
 
 class RectImage: public Image {

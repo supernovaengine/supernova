@@ -1,11 +1,11 @@
-#ifndef LightRender_h
-#define LightRender_h
+#ifndef LightData_h
+#define LightData_h
 
 #include <vector>
-#include <Vector3.h>
+#include "math/Vector3.h"
 #include <Light.h>
 
-class LightRender {
+class LightData {
     
 public:
     
@@ -27,12 +27,12 @@ public:
     std::vector<float> directionalLightDir;
     std::vector<float> directionalLightPower;
     std::vector<float> directionalLightColor;
-    
-    
-    LightRender();
-    virtual ~LightRender();
+
+
+    LightData();
+    virtual ~LightData();
     
     bool updateLights(std::vector<Light*>* lights, Vector3* ambientLight);
 };
 
-#endif /* LightRender_h */
+#endif /* LightData_h */

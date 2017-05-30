@@ -26,17 +26,3 @@ SceneRender* SceneManager::getRender(){
     instanciateRender();
     return scene;
 }
-
-bool SceneManager::load() {
-    instanciateRender();
-    return scene->load();
-}
-
-bool SceneManager::draw() {
-    return scene->draw();
-}
-
-bool SceneManager::viewSize(Rect rect){
-    instanciateRender();
-    return scene->viewSize(rect);
-}

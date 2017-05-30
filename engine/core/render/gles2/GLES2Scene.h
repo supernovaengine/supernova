@@ -20,7 +20,11 @@ public:
     bool load();
     bool draw();
     bool viewSize(Rect rect);
+    bool enableScissor(Rect rect);
+    bool disableScissor();
 
+    bool isEnabledScissor();
+    Rect getActiveScissor();
 };
 
 #endif /* gles2scene_h */

@@ -203,7 +203,7 @@ std::vector<Vector4>* Points::getColors(){
 }
 
 bool Points::render(){
-    return renderManager.draw();
+    return renderManager.getRender()->draw();
 }
 
 bool Points::load(){
@@ -241,7 +241,7 @@ bool Points::load(){
         normalizeTextureRects();
     }
     
-    renderManager.load();
+    renderManager.getRender()->load();
 
     return ConcreteObject::load();
 }
@@ -256,6 +256,8 @@ void Points::destroy(){
     for (int i=0; i < textureRects.size(); i++){
         delete textureRects[i];
     }
+
+    renderManager.getRender()->destroy();
 
     ConcreteObject::destroy();
 }
