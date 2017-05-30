@@ -8,7 +8,7 @@ class TextureLoader{
 private:
     TextureFile* rawImage;
     
-    ImageReader* getImageFormat(std::string relative_path, std::ifstream* ifile);
+    ImageReader* getImageFormat(FileData* filedata);
 public:
     TextureLoader();
     TextureLoader(std::string relative_path);

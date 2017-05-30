@@ -24,5 +24,5 @@ add_library(
 
 target_link_libraries(
     supernova-core
-    lua tinyobjloader jpeg png tiff mpg123 soloud stb
+    lua tinyobjloader mpg123 soloud stb
 )
