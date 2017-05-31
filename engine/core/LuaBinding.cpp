@@ -7,6 +7,8 @@
 
 #include "LuaIntf.h"
 
+#include "FileData.h"
+
 #include "Supernova.h"
 #include "Object.h"
 #include "ConcreteObject.h"
@@ -44,6 +46,40 @@ namespace LuaIntf
 }
 */
 
+int module_loader(lua_State *L){
+
+    const char* filename = lua_tostring(L, 1);
+    filename = luaL_gsub(L, filename, ".", LUA_DIRSEP);
+
+    std::string filepath;
+    FileData filedata;
+
+    filepath = std::string("lua/") + filename + ".lua";
+    filedata.open(filepath.c_str());
+    if (filedata.getMemPtr()!=NULL) {
+
+        luaL_loadbuffer(L, (const char *) filedata.getMemPtr(), filedata.length(),
+                        filepath.c_str());
+
+        return 1;
+    }
+
+    filepath = std::string("") + filename + ".lua";
+    filedata.open(filepath.c_str());
+    if (filedata.getMemPtr()!=NULL) {
+
+        luaL_loadbuffer(L, (const char *) filedata.getMemPtr(), filedata.length(),
+                        filepath.c_str());
+
+        return 1;
+    }
+
+    lua_pushstring(L, "\n\tno file in assets directory");
+
+    return 1;
+
+}
+
 LuaBinding::LuaBinding() {
     // TODO Auto-generated constructor stub
 
@@ -53,12 +89,53 @@ LuaBinding::~LuaBinding() {
     // TODO Auto-generated destructor stub
 }
 
+int setLuaSearcher(lua_CFunction f, bool cleanSearchers = false)
+{
+
+    lua_State *L = Supernova::getLuaState();
+
+    // Add the package loader to the package.loaders table.
+    lua_getglobal(L, "package");
+    if(lua_isnil(L, -1))
+        return luaL_error(L, "package table does not exist.");
+
+    lua_getfield(L, -1, "searchers");
+    if(lua_isnil(L, -1))
+        return luaL_error(L, "package.loaders table does not exist.");
+
+    int numloaders = lua_rawlen(L, -1);
+
+    if (cleanSearchers) {
+        //remove preconfigured loaders
+        for (int i = 0; i < numloaders; i++) {
+            lua_pushnil(L);
+            lua_rawseti(L, -2, i + 1);
+        }
+        //add new loader
+        lua_pushcfunction(L, f);
+        lua_rawseti(L, -2, 1);
+    }else{
+        lua_pushcfunction(L, f);
+        lua_rawseti(L, -2, numloaders+1);
+    }
+
+    lua_pop(L, 1);
+
+    return 0;
+}
+
 int LuaBinding::setLuaPath(const char* path)
 {
     lua_State *L = Supernova::getLuaState();
 
     lua_getglobal( L, "package" );
+    if(lua_isnil(L, -1))
+        return luaL_error(L, "package table does not exist.");
+
     lua_getfield( L, -1, "path" );
+    if(lua_isnil(L, -1))
+        return luaL_error(L, "package.path table does not exist.");
+
     std::string cur_path = lua_tostring( L, -1 );
     cur_path.append( ";" );
     cur_path.append( path );
@@ -66,6 +143,7 @@ int LuaBinding::setLuaPath(const char* path)
     lua_pushstring( L, cur_path.c_str() );
     lua_setfield( L, -2, "path" );
     lua_pop( L, 1 );
+
     return 0;
 }
 
@@ -394,9 +472,15 @@ void LuaBinding::bind(){
 
 
     setLuaPath("lua/?.lua");
+    setLuaSearcher(module_loader, true);
+
+    const char* luafile = "lua/main.lua";
+
+    FileData filedata;
+    filedata.open(luafile);
 
     //int luaL_dofile (lua_State *L, const char *filename);
-    if (luaL_loadfile(L, "lua/main.lua") == 0){
+    if (luaL_loadbuffer(L,(const char*)filedata.getMemPtr(),filedata.length(), luafile) == 0){
         if(lua_pcall(L, 0, LUA_MULTRET, 0) != 0){
             Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(L,-1));
             lua_close(L);
