@@ -16,6 +16,7 @@ protected:
 public:
     FileData();
     FileData(unsigned char *aData, unsigned int aDataLength, bool aCopy=false, bool aTakeOwnership=true);
+    FileData(const char *aFilename);
     virtual ~FileData();
 
     virtual int eof();

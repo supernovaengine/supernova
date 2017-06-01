@@ -4,7 +4,7 @@
 #include "math/Vector2.h"
 #include "render/SceneRender.h"
 #include "render/TextureRender.h"
-#include "Rect.h"
+#include "math/Rect.h"
 #include "Material.h"
 #include <vector>
 

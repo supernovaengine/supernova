@@ -8,6 +8,10 @@
 class File {
 public:
     virtual ~File();
+
+    static File* newFile(bool useHandle = false);
+    static File* newFile(const char *aFilename, bool useHandle = false);
+
     unsigned int read8();
     unsigned int read16();
     unsigned int read32();
@@ -17,6 +21,7 @@ public:
     virtual unsigned int length() = 0;
     virtual void seek(int aOffset) = 0;
     virtual unsigned int pos() = 0;
+    virtual unsigned int open(const char *aFilename) = 0;
 };
 
 

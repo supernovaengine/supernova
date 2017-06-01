@@ -99,7 +99,8 @@ bool Model::loadOBJ(const char * path){
             for (size_t t = 0; t < shapes[i].mesh.texcoords.size() / 2; t++) {
                 //printf("  tx[%ld] = (%f, %f)\n", t,shapes[i].mesh.texcoords[2*t+0],shapes[i].mesh.texcoords[2*t+1]);
                 //Invert V because OpenGL defaults
-                texcoords.push_back(Vector2(shapes[i].mesh.texcoords[2*t+0], 1 - shapes[i].mesh.texcoords[2*t+1]));
+                //texcoords.push_back(Vector2(shapes[i].mesh.texcoords[2*t+0], 1 - shapes[i].mesh.texcoords[2*t+1]));
+                texcoords.push_back(Vector2(shapes[i].mesh.texcoords[2*t+0], shapes[i].mesh.texcoords[2*t+1]));
             }
 
             assert((shapes[i].mesh.normals.size() % 3) == 0);
