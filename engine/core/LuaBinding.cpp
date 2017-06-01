@@ -1,13 +1,10 @@
 
 #include "LuaBinding.h"
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-
 #include "LuaIntf.h"
 
 #include "FileData.h"
+#include <locale>
 
 #include "Supernova.h"
 #include "Object.h"
@@ -46,51 +43,50 @@ namespace LuaIntf
 }
 */
 
-int module_loader(lua_State *L){
+extern "C" {
+    int module_loader(lua_State *L) {
 
-    const char* filename = lua_tostring(L, 1);
-    filename = luaL_gsub(L, filename, ".", LUA_DIRSEP);
+        const char *filename = lua_tostring(L, 1);
+        filename = luaL_gsub(L, filename, ".", LUA_DIRSEP);
 
-    std::string filepath;
-    FileData filedata;
+        std::string filepath;
+        FileData filedata;
 
-    filepath = std::string("lua/") + filename + ".lua";
-    filedata.open(filepath.c_str());
-    if (filedata.getMemPtr()!=NULL) {
+        filepath = std::string("lua") + LUA_DIRSEP + filename + ".lua";
+        filedata.open(filepath.c_str());
+        if (filedata.getMemPtr() != NULL) {
 
-        luaL_loadbuffer(L, (const char *) filedata.getMemPtr(), filedata.length(),
-                        filepath.c_str());
+            luaL_loadbuffer(L, (const char *) filedata.getMemPtr(), filedata.length(),
+                            filepath.c_str());
+
+            return 1;
+        }
+
+        filepath = std::string("") + filename + ".lua";
+        filedata.open(filepath.c_str());
+        if (filedata.getMemPtr() != NULL) {
+
+            luaL_loadbuffer(L, (const char *) filedata.getMemPtr(), filedata.length(),
+                            filepath.c_str());
+
+            return 1;
+        }
+
+        lua_pushstring(L, "\n\tno file in assets directory");
 
         return 1;
     }
-
-    filepath = std::string("") + filename + ".lua";
-    filedata.open(filepath.c_str());
-    if (filedata.getMemPtr()!=NULL) {
-
-        luaL_loadbuffer(L, (const char *) filedata.getMemPtr(), filedata.length(),
-                        filepath.c_str());
-
-        return 1;
-    }
-
-    lua_pushstring(L, "\n\tno file in assets directory");
-
-    return 1;
-
 }
 
 LuaBinding::LuaBinding() {
-    // TODO Auto-generated constructor stub
 
 }
 
 LuaBinding::~LuaBinding() {
-    // TODO Auto-generated destructor stub
+
 }
 
-int setLuaSearcher(lua_CFunction f, bool cleanSearchers = false)
-{
+int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
 
     lua_State *L = Supernova::getLuaState();
 
@@ -146,7 +142,6 @@ int LuaBinding::setLuaPath(const char* path)
 
     return 0;
 }
-
 
 void LuaBinding::bind(){
 
@@ -470,11 +465,12 @@ void LuaBinding::bind(){
     .addConstant("MOUSE_BUTTON_MIDDLE", S_MOUSE_BUTTON_MIDDLE)
     .endModule();
 
+    std::string luadir = std::string("lua") + LUA_DIRSEP;
 
-    setLuaPath("lua/?.lua");
+    setLuaPath(std::string(luadir+"?.lua").c_str());
     setLuaSearcher(module_loader, true);
 
-    const char* luafile = "lua/main.lua";
+    const char* luafile = std::string(luadir+"main.lua").c_str();
 
     FileData filedata;
     filedata.open(luafile);
