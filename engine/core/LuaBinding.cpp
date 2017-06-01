@@ -43,41 +43,6 @@ namespace LuaIntf
 }
 */
 
-extern "C" {
-    int module_loader(lua_State *L) {
-
-        const char *filename = lua_tostring(L, 1);
-        filename = luaL_gsub(L, filename, ".", LUA_DIRSEP);
-
-        std::string filepath;
-        FileData filedata;
-
-        filepath = std::string("lua") + LUA_DIRSEP + filename + ".lua";
-        filedata.open(filepath.c_str());
-        if (filedata.getMemPtr() != NULL) {
-
-            luaL_loadbuffer(L, (const char *) filedata.getMemPtr(), filedata.length(),
-                            filepath.c_str());
-
-            return 1;
-        }
-
-        filepath = std::string("") + filename + ".lua";
-        filedata.open(filepath.c_str());
-        if (filedata.getMemPtr() != NULL) {
-
-            luaL_loadbuffer(L, (const char *) filedata.getMemPtr(), filedata.length(),
-                            filepath.c_str());
-
-            return 1;
-        }
-
-        lua_pushstring(L, "\n\tno file in assets directory");
-
-        return 1;
-    }
-}
-
 LuaBinding::LuaBinding() {
 
 }
@@ -99,7 +64,7 @@ int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
     if(lua_isnil(L, -1))
         return luaL_error(L, "package.loaders table does not exist.");
 
-    int numloaders = lua_rawlen(L, -1);
+    size_t numloaders = lua_rawlen(L, -1);
 
     if (cleanSearchers) {
         //remove preconfigured loaders
@@ -141,6 +106,39 @@ int LuaBinding::setLuaPath(const char* path)
     lua_pop( L, 1 );
 
     return 0;
+}
+
+int LuaBinding::moduleLoader(lua_State *L) {
+    
+    const char *filename = lua_tostring(L, 1);
+    filename = luaL_gsub(L, filename, ".", LUA_DIRSEP);
+    
+    std::string filepath;
+    FileData filedata;
+    
+    filepath = std::string("lua") + LUA_DIRSEP + filename + ".lua";
+    filedata.open(filepath.c_str());
+    if (filedata.getMemPtr() != NULL) {
+        
+        luaL_loadbuffer(L, (const char *) filedata.getMemPtr(), filedata.length(),
+                        filepath.c_str());
+        
+        return 1;
+    }
+    
+    filepath = std::string("") + filename + ".lua";
+    filedata.open(filepath.c_str());
+    if (filedata.getMemPtr() != NULL) {
+        
+        luaL_loadbuffer(L, (const char *) filedata.getMemPtr(), filedata.length(),
+                        filepath.c_str());
+        
+        return 1;
+    }
+    
+    lua_pushstring(L, "\n\tno file in assets directory");
+    
+    return 1;
 }
 
 void LuaBinding::bind(){
@@ -468,7 +466,7 @@ void LuaBinding::bind(){
     std::string luadir = std::string("lua") + LUA_DIRSEP;
 
     setLuaPath(std::string(luadir+"?.lua").c_str());
-    setLuaSearcher(module_loader, true);
+    setLuaSearcher(moduleLoader, true);
 
     const char* luafile = std::string(luadir+"main.lua").c_str();
 

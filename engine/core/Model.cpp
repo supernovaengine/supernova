@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "tiny_obj_loader.h"
 #include "Supernova.h"
+#include "FileData.h"
 
 Model::Model(): Mesh() {
     primitiveMode = S_TRIANGLES;
@@ -38,7 +39,12 @@ std::string Model::getBaseDir (const std::string str){
     return result;
 }
 
-bool Model::loadOBJ(const char * path){
+std::string Model::readDataFile(const char* filename){
+    FileData filedata(filename);
+    return filedata.readString();
+}
+
+bool Model::loadOBJ(const char* path){
 
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
@@ -46,6 +52,8 @@ bool Model::loadOBJ(const char * path){
     std::string err;
     
     std::string baseDir = getBaseDir(path);
+    
+    tinyobj::fileReaderFunc = readDataFile;
 
     bool ret = tinyobj::LoadObj(shapes, materials, err, path, (baseDir+"/").c_str());
 

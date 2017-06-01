@@ -49,6 +49,8 @@
 
 namespace tinyobj {
 
+std::string (*fileReaderFunc)(const char*);
+    
 typedef struct {
   std::string name;
 
@@ -946,7 +948,11 @@ bool MaterialFileReader::operator()(const std::string &matId,
     filepath = matId;
   }
 
+#ifdef TINY_OBJ_FILE_READER_FUNC
+  std::istringstream matIStream(fileReaderFunc(filepath.c_str()));
+#else
   std::ifstream matIStream(filepath.c_str());
+#endif
   LoadMtl(matMap, materials, matIStream);
   if (!matIStream) {
     std::stringstream ss;
@@ -965,8 +971,11 @@ bool LoadObj(std::vector<shape_t> &shapes,       // [output]
   shapes.clear();
 
   std::stringstream errss;
-
+#ifdef TINY_OBJ_FILE_READER_FUNC
+  std::istringstream ifs(fileReaderFunc(filename));
+#else
   std::ifstream ifs(filename);
+#endif
 
   if (!ifs) {
     errss << "Cannot open file [" << filename << "]" << std::endl;

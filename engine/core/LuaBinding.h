@@ -17,6 +17,9 @@ public:
     
     static int setLuaPath(const char* path);
     static int setLuaSearcher(lua_CFunction f, bool cleanSearchers = false);
+    
+    static int moduleLoader(lua_State *L);
+    
     static void bind();
 };
 
