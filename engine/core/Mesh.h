@@ -21,6 +21,7 @@ protected:
     std::vector<Submesh*> submeshes;
     
     bool skymesh;
+    bool dynamic;
 
     int primitiveMode;
     
@@ -39,6 +40,7 @@ public:
     std::vector<Vector2>* getTexcoords();
     std::vector<Submesh*>* getSubmeshes();
     bool isSky();
+    bool isDynamic();
     
     void setTexcoords(std::vector<Vector2> texcoords);
 

@@ -32,6 +32,7 @@ void Image::createVertices(){
     vertices.push_back(Vector3(width,  height, 0));
     vertices.push_back(Vector3(0,  height, 0));
 
+    texcoords.clear();
     texcoords.push_back(Vector2(0.0f, 0.0f));
     texcoords.push_back(Vector2(1.0f, 0.0f));
     texcoords.push_back(Vector2(1.0f, 1.0f));

@@ -14,14 +14,18 @@ protected:
     bool fixedSizeBillboard;
     float billboardScaleFactor;
 
+    bool clipping;
+
 public:
     Mesh2D();
     ~Mesh2D();
 
-    void setSize(int width, int height);
+    virtual void setSize(int width, int height);
     void setBillboard(bool billboard);
     void setFixedSizeBillboard(bool fixedSizeBillboard);
     void setBillboardScaleFactor(float billboardScaleFactor);
+
+    void setClipping(bool clipping);
 
     void setWidth(int width);
     int getWidth();
@@ -31,6 +35,8 @@ public:
 
     void update();
     void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+
+    bool draw();
 };
 
 #endif /* _Mesh2D_hpp */

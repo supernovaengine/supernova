@@ -1,5 +1,5 @@
 #import "GameViewController.h"
-#import "EAGLview.h"
+#import "EAGLView.h"
 #include "Engine.h"
 
 

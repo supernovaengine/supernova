@@ -37,7 +37,7 @@ private:
     
     Vector3 ambientLight;
 
-    bool isChildScene;
+    bool childScene;
 	bool useTransparency;
 	bool useDepth;
     
@@ -66,7 +66,13 @@ public:
 
     void setAmbientLight(Vector3 ambientLight);
     void setAmbientLight(const float ambientFactor);
-    Vector3 getAmbientLight();
+    
+    Vector3* getAmbientLight();
+    std::vector<Light*>* getLights();
+    
+    bool isChildScene();
+    bool isUseDepth();
+    bool isUseTransparency();
     
     void setFog(Fog* fog);
     

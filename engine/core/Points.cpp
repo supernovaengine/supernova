@@ -76,7 +76,7 @@ void Points::setPointSprite(int point, std::string id){
     if (textureRects[point]){
         textureRects[point]->setRect(&framesRect[id]);
     }else {
-        textureRects[point] = new TextureRect(framesRect[id]);
+        textureRects[point] = new Rect(framesRect[id]);
     }
     
     if (loaded && !useTextureRects){
@@ -175,7 +175,7 @@ void Points::setMaxPointSize(float maxPointSize){
 }
 
 void Points::addSpriteFrame(std::string id, float x, float y, float width, float height){
-    framesRect[id] = TextureRect(x, y, width, height);
+    framesRect[id] = Rect(x, y, width, height);
 }
 
 void Points::removeSpriteFrame(std::string id){
@@ -190,7 +190,7 @@ std::vector<Vector3>* Points::getNormals(){
     return &normals;
 }
 
-std::vector<TextureRect*>* Points::getTextureRects(){
+std::vector<Rect*>* Points::getTextureRects(){
     return &textureRects;
 }
 
@@ -203,7 +203,7 @@ std::vector<Vector4>* Points::getColors(){
 }
 
 bool Points::render(){
-    return renderManager.draw();
+    return renderManager.getRender()->draw();
 }
 
 bool Points::load(){
@@ -241,7 +241,7 @@ bool Points::load(){
         normalizeTextureRects();
     }
     
-    renderManager.load();
+    renderManager.getRender()->load();
 
     return ConcreteObject::load();
 }
@@ -256,6 +256,8 @@ void Points::destroy(){
     for (int i=0; i < textureRects.size(); i++){
         delete textureRects[i];
     }
+
+    renderManager.getRender()->destroy();
 
     ConcreteObject::destroy();
 }

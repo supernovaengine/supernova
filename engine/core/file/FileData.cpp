@@ -13,6 +13,10 @@ FileData::FileData(unsigned char *aData, unsigned int aDataLength, bool aCopy, b
     open(aData, aDataLength, aCopy, aTakeOwnership);
 }
 
+FileData::FileData(const char *aFilename){
+    open(aFilename);
+}
+
 FileData::~FileData() {
     if (dataOwned)
         delete[] dataPtr;
@@ -75,8 +79,8 @@ unsigned int FileData::open(unsigned char *aData, unsigned int aDataLength, bool
     return 0;
 }
 
-unsigned int FileData::open(const char *aFile) {
-    if (!aFile)
+unsigned int FileData::open(const char *aFilename) {
+    if (!aFilename)
         return 1;
     if (dataOwned)
         delete[] dataPtr;
@@ -84,7 +88,7 @@ unsigned int FileData::open(const char *aFile) {
     offset = 0;
 
     FileHandle df;
-    int res = df.open(aFile);
+    int res = df.open(aFilename);
     if (res != 0)
         return res;
 

@@ -26,17 +26,3 @@ MeshRender* MeshManager::getRender(){
     instanciateRender();
     return render;
 }
-
-bool MeshManager::load() {
-    instanciateRender();
-    return render->load();
-}
-
-bool MeshManager::draw() {
-    return render->draw();
-}
-
-void MeshManager::destroy(){
-    if (render != NULL)
-        render->destroy();
-}

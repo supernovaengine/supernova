@@ -12,6 +12,7 @@ public:
 
     FileHandle();
     FileHandle(FILE *fp);
+    FileHandle(const char *aFilename);
     virtual ~FileHandle();
 
     virtual int eof();

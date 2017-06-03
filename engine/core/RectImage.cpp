@@ -15,10 +15,10 @@ RectImage::~RectImage(){
 }
 
 void RectImage::setRect(float x, float y, float width, float height){
-    setRect(TextureRect(x, y, width, height));
+    setRect(Rect(x, y, width, height));
 }
 
-void RectImage::setRect(TextureRect textureRect){
+void RectImage::setRect(Rect textureRect){
     this->textureRect = textureRect;
     
     if (loaded && !useTextureRect){
@@ -73,5 +73,6 @@ bool RectImage::load(){
 }
 
 bool RectImage::draw(){
+
     return Image::draw();
 }

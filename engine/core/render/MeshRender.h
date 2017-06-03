@@ -7,7 +7,7 @@
 #include "Submesh.h"
 #include <vector>
 #include <unordered_map>
-#include "image/TextureRect.h"
+#include "math/Rect.h"
 
 
 class Mesh;
@@ -51,6 +51,7 @@ protected:
     Vector3 cameraPosition;
     
     bool isSky;
+    bool isDynamic;
     int primitiveMode;
     
 public:
@@ -60,9 +61,10 @@ public:
     
     void setMesh(Mesh* mesh);
     
-    virtual void updateVertices() = 0;
-    virtual void updateTexcoords() = 0;
-    virtual void updateNormals() = 0;
+    virtual void updateVertices();
+    virtual void updateTexcoords();
+    virtual void updateNormals();
+    virtual void updateIndices();
     
     virtual bool load();
     virtual bool draw();

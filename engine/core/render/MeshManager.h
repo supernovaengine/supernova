@@ -20,10 +20,6 @@ public:
 	virtual ~MeshManager();
     
     MeshRender* getRender();
-
-    bool load();
-	bool draw();
-    void destroy();
 };
 
 #endif /* MeshManager_h */

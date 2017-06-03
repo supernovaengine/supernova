@@ -13,10 +13,6 @@ public:
     virtual ~PointManager();
     
     PointRender* getRender();
-    
-    bool load();
-    bool draw();
-    void destroy();
 };
 
 #endif /* PointManager_h */

@@ -11,6 +11,10 @@ FileHandle::FileHandle(FILE *fp) {
     this->fileHandle = fp;
 }
 
+FileHandle::FileHandle(const char *aFilename){
+    open(aFilename);
+}
+
 FileHandle::~FileHandle() {
     if (fileHandle)
         fclose(fileHandle);

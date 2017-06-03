@@ -4,7 +4,7 @@
 #include "math/Vector2.h"
 #include "render/SceneRender.h"
 #include "render/TextureRender.h"
-#include "image/TextureRect.h"
+#include "math/Rect.h"
 #include "Material.h"
 #include <vector>
 
@@ -37,7 +37,7 @@ protected:
     
     std::vector<Vector3>* positions;
     std::vector<Vector3>* normals;
-    std::vector<TextureRect*>* textureRects;
+    std::vector<Rect*>* textureRects;
     std::vector<float>* pointSizes;
     std::vector<Vector4>* pointColors;
     
@@ -55,11 +55,11 @@ public:
     
     void setPoints(Points* points);
 
-    virtual void updatePositions() = 0;
-    virtual void updateNormals() = 0;
-    virtual void updatePointSizes() = 0;
-    virtual void updateTextureRects() = 0;
-    virtual void updatePointColors() = 0;
+    virtual void updatePositions();
+    virtual void updateNormals();
+    virtual void updatePointSizes();
+    virtual void updateTextureRects();
+    virtual void updatePointColors();
     
     virtual bool load();
     virtual bool draw();

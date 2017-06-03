@@ -16,6 +16,7 @@ MeshRender::MeshRender(){
     sceneRender = NULL;
 
     isSky = false;
+    isDynamic = false;
     primitiveMode = 0;
 
 }
@@ -27,6 +28,24 @@ void MeshRender::setMesh(Mesh* mesh){
     this->mesh = mesh;
 }
 
+void MeshRender::updateVertices(){
+    
+}
+
+void MeshRender::updateTexcoords(){
+    
+}
+
+void MeshRender::updateNormals(){
+    
+}
+
+void MeshRender::updateIndices(){
+    for (unsigned int i = 0; i < submeshes->size(); i++){
+        submeshesRender[submeshes->at(i)].indicesSizes = (int)submeshes->at(i)->getIndices()->size();
+    }
+}
+
 void MeshRender::checkLighting(){
     lighting = false;
     if ((sceneRender != NULL) && (!isSky)){
@@ -36,7 +55,7 @@ void MeshRender::checkLighting(){
 
 void MeshRender::checkFog(){
     hasfog = false;
-    if ((sceneRender != NULL) && (sceneRender->fog != NULL)){
+    if ((sceneRender != NULL) && (sceneRender->getFog() != NULL)){
         hasfog = true;
     }
 }
@@ -65,6 +84,7 @@ void MeshRender::fillMeshProperties(){
     cameraPosition = mesh->getCameraPosition();
     
     isSky = mesh->isSky();
+    isDynamic = mesh->isDynamic();
     primitiveMode = mesh->getPrimitiveMode();
 }
 

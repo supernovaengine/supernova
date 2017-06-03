@@ -24,7 +24,7 @@ std::vector<float> GLES2Point::rectsData(){
     std::vector<float> rects;
     for (int i = 0; i < textureRects->size(); i++){
 
-        TextureRect textureRect;
+        Rect textureRect;
         if (textureRects->at(i))
             textureRect = *textureRects->at(i);
 
@@ -37,31 +37,34 @@ std::vector<float> GLES2Point::rectsData(){
 }
 
 void GLES2Point::updatePositions(){
+    PointRender::updatePositions();
     if (loaded)
         GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, positions->size() * 3 * sizeof(GLfloat), &positions->front());
 }
 
 void GLES2Point::updateNormals(){
+    PointRender::updateNormals();
     if (loaded)
-        if (normals)
+        if (lighting && normals)
             GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
 }
 
 void GLES2Point::updatePointSizes(){
+    PointRender::updatePointSizes();
     if (loaded)
         if (pointSizes)
             GLES2Util::updateVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front());
 }
 
 void GLES2Point::updateTextureRects(){
-    if (loaded){
-        if (textureRects){
+    PointRender::updateTextureRects();
+    if (loaded)
+        if (hasTextureRect && textureRects)
             GLES2Util::updateVBO(textureRectBuffer, GL_ARRAY_BUFFER, textureRects->size() * 4 * sizeof(GLfloat), &rectsData().front());
-        }
-    }
 }
 
 void GLES2Point::updatePointColors(){
+    PointRender::updatePointColors();
     if (loaded)
         if (pointColors)
             GLES2Util::updateVBO(pointColorBuffer, GL_ARRAY_BUFFER, pointColors->size() * 4 * sizeof(GLfloat), &pointColors->front());
@@ -96,7 +99,7 @@ bool GLES2Point::load() {
     aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
     
     if (lighting && normals){
-        normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_STATIC_DRAW);
+        normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_DYNAMIC_DRAW);
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
     }
     

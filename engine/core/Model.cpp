@@ -2,10 +2,10 @@
 
 #include "platform/Log.h"
 #include "PrimitiveMode.h"
-#include <stdio.h>
 #include <algorithm>
 #include "tiny_obj_loader.h"
 #include "Supernova.h"
+#include "FileData.h"
 
 Model::Model(): Mesh() {
     primitiveMode = S_TRIANGLES;
@@ -38,16 +38,24 @@ std::string Model::getBaseDir (const std::string str){
     return result;
 }
 
-bool Model::loadOBJ(const char * path){
+std::string Model::readDataFile(const char* filename){
+    FileData filedata(filename);
+    return filedata.readString();
+}
 
+bool Model::loadOBJ(const char* path){
+
+    tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
 
     std::string err;
     
     std::string baseDir = getBaseDir(path);
+    
+    tinyobj::FileReader::externalFunc = readDataFile;
 
-    bool ret = tinyobj::LoadObj(shapes, materials, err, path, (baseDir+"/").c_str());
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path, (baseDir+"/").c_str());
 
     if (!err.empty()) {
         Log::Error(LOG_TAG, "%s (%s)", err.c_str(), path);
@@ -61,10 +69,6 @@ bool Model::loadOBJ(const char * path){
                 this->submeshes.back()->createNewMaterial();
             }
 
-            //char str[80];
-            //strcpy(str, "jeep");
-            //strcat(str, materials[i].diffuse_texname.c_str());
-            //printf("material[%ld].file = %s\n", i, materials[i].diffuse_texname.c_str());
             this->submeshes.back()->getMaterial()->setTexture(baseDir+"/"+materials[i].diffuse_texname);
             if (materials[i].dissolve < 1){
                 this->submeshes.back()->getMaterial()->transparent = true;
@@ -73,44 +77,28 @@ bool Model::loadOBJ(const char * path){
 
         for (size_t i = 0; i < shapes.size(); i++) {
 
-            assert((shapes[i].mesh.indices.size() % 3) == 0);
-            for (size_t f = 0; f < shapes[i].mesh.material_ids.size(); f++) {
-                //printf("  idx[%ld] = %d, %d, %d. mat_id = %d\n", f, shapes[i].mesh.indices[3*f+0], shapes[i].mesh.indices[3*f+1], shapes[i].mesh.indices[3*f+2], shapes[i].mesh.material_ids[f]);
-                
+            size_t index_offset = 0;
+            for (size_t f = 0; f < shapes[i].mesh.num_face_vertices.size(); f++) {
+                size_t fnum = shapes[i].mesh.num_face_vertices[f];
+
                 int material_id = shapes[i].mesh.material_ids[f];
                 if (material_id < 0)
                     material_id = 0;
 
-                this->submeshes[material_id]->addIndex(shapes[i].mesh.indices[3*f+0]);
-                this->submeshes[material_id]->addIndex(shapes[i].mesh.indices[3*f+1]);
-                this->submeshes[material_id]->addIndex(shapes[i].mesh.indices[3*f+2]);
+                // For each vertex in the face
+                for (size_t v = 0; v < fnum; v++) {
+                    tinyobj::index_t idx = shapes[i].mesh.indices[index_offset + v];
 
-            }
+                    this->submeshes[material_id]->addIndex(vertices.size());
 
-            //printf("shape[%ld].vertices: %ld\n", i, shapes[i].mesh.positions.size());
-            assert((shapes[i].mesh.positions.size() % 3) == 0);
-            for (size_t v = 0; v < shapes[i].mesh.positions.size() / 3; v++) {
-                //printf("  v[%ld] = (%f, %f, %f)\n", v,shapes[i].mesh.positions[3*v+0],shapes[i].mesh.positions[3*v+1],shapes[i].mesh.positions[3*v+2]);
-                vertices.push_back(Vector3(shapes[i].mesh.positions[3*v+0],shapes[i].mesh.positions[3*v+1],shapes[i].mesh.positions[3*v+2]));
-            }
+                    vertices.push_back(Vector3(attrib.vertices[3*idx.vertex_index+0],attrib.vertices[3*idx.vertex_index+1],attrib.vertices[3*idx.vertex_index+2]));
+                    texcoords.push_back(Vector2(attrib.texcoords[2*idx.texcoord_index+0], attrib.texcoords[2*idx.texcoord_index+1]));
+                    normals.push_back(Vector3(attrib.normals[3*idx.normal_index+0], attrib.normals[3*idx.normal_index+1], attrib.normals[3*idx.normal_index+2]));
+                }
 
-            //printf("shape[%ld].texcoords: %ld\n", i, shapes[i].mesh.texcoords.size());
-            assert((shapes[i].mesh.texcoords.size() % 2) == 0);
-            for (size_t t = 0; t < shapes[i].mesh.texcoords.size() / 2; t++) {
-                //printf("  tx[%ld] = (%f, %f)\n", t,shapes[i].mesh.texcoords[2*t+0],shapes[i].mesh.texcoords[2*t+1]);
-                //Invert V because OpenGL defaults
-                texcoords.push_back(Vector2(shapes[i].mesh.texcoords[2*t+0], 1 - shapes[i].mesh.texcoords[2*t+1]));
+                index_offset += fnum;
             }
-
-            assert((shapes[i].mesh.normals.size() % 3) == 0);
-            for (size_t n = 0; n < shapes[i].mesh.normals.size() / 3; n++) {
-                //printf("  tx[%ld] = (%f, %f, %f)\n", n,shapes[i].mesh.normals[3*n+0], shapes[i].mesh.normals[3*n+1], shapes[i].mesh.normals[3*n+2]);
-                //Invert V because OpenGL defaults
-                normals.push_back(Vector3(shapes[i].mesh.normals[3*n+0], shapes[i].mesh.normals[3*n+1], shapes[i].mesh.normals[3*n+2]));
-            }
-            
         }
-
     }
 
 

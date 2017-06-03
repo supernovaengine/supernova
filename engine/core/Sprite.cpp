@@ -11,7 +11,7 @@ Sprite::~Sprite(){
 }
 
 void Sprite::addFrame(std::string id, float x, float y, float width, float height){
-    framesRect[id] = TextureRect(x, y, width, height);
+    framesRect[id] = Rect(x, y, width, height);
 }
 
 void Sprite::removeFrame(std::string id){

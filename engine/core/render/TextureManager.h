@@ -2,7 +2,6 @@
 #ifndef TextureManager_h
 #define TextureManager_h
 
-#include "gles2/GLES2Texture.h"
 #include "render/TextureRender.h"
 #include "image/TextureFile.h"
 #include <string>

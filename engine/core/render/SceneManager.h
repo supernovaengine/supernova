@@ -17,10 +17,6 @@ public:
     virtual ~SceneManager();
 
     SceneRender* getRender();
-
-    bool load();
-    bool draw();
-    bool viewSize(int x, int y, int width, int height);
 };
 
 #endif /* scenemanager_h */

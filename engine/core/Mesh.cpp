@@ -6,6 +6,7 @@
 Mesh::Mesh(): ConcreteObject(){
     submeshes.push_back(new Submesh(&material));
     skymesh = false;
+    dynamic = false;
 }
 
 Mesh::~Mesh(){
@@ -30,6 +31,10 @@ std::vector<Submesh*>* Mesh::getSubmeshes(){
 
 bool Mesh::isSky(){
     return skymesh;
+}
+
+bool Mesh::isDynamic(){
+    return dynamic;
 }
 
 int Mesh::getPrimitiveMode(){
@@ -106,7 +111,7 @@ void Mesh::update(){
 }
 
 bool Mesh::render(){
-    return renderManager.draw();
+    return renderManager.getRender()->draw();
 }
 
 void Mesh::removeAllSubmeshes(){
@@ -129,7 +134,7 @@ bool Mesh::load(){
     
     renderManager.getRender()->setMesh(this);
 
-    renderManager.load();
+    renderManager.getRender()->load();
 
     return ConcreteObject::load();
 }
@@ -142,7 +147,7 @@ bool Mesh::draw(){
 void Mesh::destroy(){
     ConcreteObject::destroy();
     
-    renderManager.destroy();
+    renderManager.getRender()->destroy();
     
     removeAllSubmeshes();
 }
