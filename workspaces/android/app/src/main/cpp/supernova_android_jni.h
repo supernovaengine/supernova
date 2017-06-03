@@ -1,10 +1,3 @@
-/*
- * supernova_android_jni.h
- *
- *  Created on: 1 de mai de 2016
- *      Author: eduardolima
- */
-
 #ifndef JNI_SUPERNOVA_ANDROID_JNI_H_
 #define JNI_SUPERNOVA_ANDROID_JNI_H_
 

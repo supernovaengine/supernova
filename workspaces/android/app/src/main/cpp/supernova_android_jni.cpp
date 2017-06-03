@@ -5,13 +5,9 @@
 
 #include "platform/Log.h"
 #include "Engine.h"
-//#include "config.h"
-#include "android_fopen.h"
-#include "androidcallback.h"
+#include "SupernovaAndroid.h"
 
-
-
-//static AAssetManager* asset_manager;
+#define UNUSED(x) (void)(x)
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1start(JNIEnv * env, jclass cls, jint width, jint height) {
 	UNUSED(env);
@@ -53,13 +49,12 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1resume(JNIEnv * 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_init_1native(JNIEnv * env, jclass cls, jobject main_activity, jobject java_asset_manager) {
 	UNUSED(cls);
 
-	AndroidCallback::envRef = env;
-	AndroidCallback::mainActivityClsRef = env->FindClass("com/deslon/supernova/MainActivity");
-	AndroidCallback::showInputTextRef = env->GetMethodID(AndroidCallback::mainActivityClsRef, "showInputText", "(Ljava/lang/String;)V");
-	AndroidCallback::mainActivityObjRef = env->NewGlobalRef(main_activity);
+	SupernovaAndroid::envRef = env;
+	SupernovaAndroid::mainActivityClsRef = env->FindClass("com/deslon/supernova/MainActivity");
+	SupernovaAndroid::showInputTextRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "showInputText", "(Ljava/lang/String;)V");
+	SupernovaAndroid::mainActivityObjRef = env->NewGlobalRef(main_activity);
 
-	//asset_manager = AAssetManager_fromJava(env, java_asset_manager);
-	android_fopen_set_asset_manager(AAssetManager_fromJava(env, java_asset_manager));
+    SupernovaAndroid::android_asset_manager = AAssetManager_fromJava(env, java_asset_manager);
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1press(JNIEnv * env, jclass cls, jfloat x, jfloat y) {
@@ -93,13 +88,7 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1key_1up(JNIEnv *
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1text_1input(JNIEnv * env, jclass cls, jstring text) {
-	//UNUSED(env);
 	UNUSED(cls);
 	const char *nativeString = env->GetStringUTFChars(text, 0);
 	Engine::onTextInput(nativeString);
 }
-
-
-//void showSoftKeyboard(){
-//	envRef->CallVoidMethod(mainActivityObjRef, showInputTextRef);
-//}
