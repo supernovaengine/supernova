@@ -425,6 +425,7 @@ static std::istream &safeGetline(std::istream &is, std::string &t) {
       }
     }
   }
+  return is;
 }
 
 #define IS_SPACE(x) (((x) == ' ') || ((x) == '\t'))
