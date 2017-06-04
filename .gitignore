@@ -1,5 +1,7 @@
-assets/*
+
 project/*
+!project/assets
+project/assets/*
 
 # --OSX--
 
