@@ -6,11 +6,13 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+#include "Scene.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
-#include "Supernova.h"
+#include "Events.h"
 #include "platform/Log.h"
 
 #include "LuaBinding.h"
@@ -24,12 +26,163 @@
 
 #include "audio/SoundManager.h"
 
-/*
-#include "Shape.h"
-void teste(){
-    printf("oiii \n");
+lua_State *Engine::luastate;
+Scene *Engine::mainScene;
+
+int Engine::screenWidth;
+int Engine::screenHeight;
+
+int Engine::canvasWidth;
+int Engine::canvasHeight;
+
+int Engine::preferedCanvasWidth;
+int Engine::preferedCanvasHeight;
+
+int Engine::renderAPI;
+bool Engine::mouseAsTouch;
+bool Engine::useDegrees;
+int Engine::scalingMode;
+
+
+Engine::Engine() {
 }
-*/
+
+Engine::~Engine() {
+    
+}
+
+void Engine::setLuaState(lua_State* luastate){
+    Engine::luastate = luastate;
+}
+
+lua_State* Engine::getLuaState(){
+    return luastate;
+}
+
+void Engine::setScene(Scene *mainScene){
+    Engine::mainScene = mainScene;
+}
+
+Scene* Engine::getScene(){
+    return mainScene;
+}
+
+int Engine::getScreenWidth(){
+    return Engine::screenWidth;
+}
+
+int Engine::getScreenHeight(){
+    return Engine::screenHeight;
+}
+
+void Engine::setScreenSize(int screenWidth, int screenHeight){
+    
+    Engine::screenWidth = screenWidth;
+    Engine::screenHeight = screenHeight;
+    
+    if ((Engine::preferedCanvasWidth != 0) && (Engine::preferedCanvasHeight != 0)){
+        setCanvasSize(preferedCanvasWidth, preferedCanvasHeight);
+    }
+    
+}
+
+int Engine::getCanvasWidth(){
+    return Engine::canvasWidth;
+}
+
+int Engine::getCanvasHeight(){
+    return Engine::canvasHeight;
+}
+
+void Engine::setCanvasSize(int canvasWidth, int canvasHeight){
+    
+    Engine::canvasWidth = canvasWidth;
+    Engine::canvasHeight = canvasHeight;
+    
+    if ((Engine::screenWidth == 0) || (Engine::screenHeight == 0)){
+        setScreenSize(canvasWidth, canvasHeight);
+    }
+    
+    //When canvas size is changed
+    if (scalingMode == S_SCALING_FITWIDTH){
+        Engine::canvasWidth = canvasWidth;
+        Engine::canvasHeight = screenHeight * canvasWidth / screenWidth;
+    }
+    if (scalingMode == S_SCALING_FITHEIGHT){
+        Engine::canvasHeight = canvasHeight;
+        Engine::canvasWidth = screenWidth * canvasHeight / screenHeight;
+    }
+    // S_SCALING_STRETCH do not need nothing
+    
+    if ((Engine::preferedCanvasWidth == 0) && (Engine::preferedCanvasHeight == 0)){
+        setPreferedCanvasSize(canvasWidth, canvasHeight);
+    }
+    
+}
+
+int Engine::getPreferedCanvasWidth(){
+    return Engine::preferedCanvasWidth;
+}
+
+int Engine::getPreferedCanvasHeight(){
+    return Engine::preferedCanvasHeight;
+}
+
+void Engine::setPreferedCanvasSize(int preferedCanvasWidth, int preferedCanvasHeight){
+    if ((Engine::preferedCanvasWidth == 0) && (Engine::preferedCanvasHeight == 0)){
+        Engine::preferedCanvasWidth = preferedCanvasWidth;
+        Engine::preferedCanvasHeight = preferedCanvasHeight;
+    }
+}
+
+void Engine::setRenderAPI(int renderAPI){
+    Engine::renderAPI = renderAPI;
+}
+
+int Engine::getRenderAPI(){
+    return renderAPI;
+}
+
+void Engine::setScalingMode(int scalingMode){
+    Engine::scalingMode = scalingMode;
+}
+
+int Engine::getScalingMode(){
+    return scalingMode;
+}
+
+void Engine::setMouseAsTouch(bool mouseAsTouch){
+    Engine::mouseAsTouch = mouseAsTouch;
+}
+
+bool Engine::isMouseAsTouch(){
+    return Engine::mouseAsTouch;
+}
+
+void Engine::setUseDegrees(bool useDegrees){
+    Engine::useDegrees = useDegrees;
+}
+
+bool Engine::isUseDegrees(){
+    return Engine::useDegrees;
+}
+
+int Engine::getPlatform(){
+    
+#ifdef SUPERNOVA_IOS
+    return S_IOS;
+#endif
+    
+#ifdef SUPERNOVA_ANDROID
+    return S_ANDROID;
+#endif
+    
+#ifdef SUPERNOVA_WEB
+    return S_WEB;
+#endif
+    
+    return 0;
+}
 
 
 void Engine::onStart(){
@@ -40,14 +193,14 @@ void Engine::onStart(){
 
 void Engine::onStart(int width, int height){
 
-    Supernova::setScreenSize(width, height);
+    Engine::setScreenSize(width, height);
 
-    Supernova::setMouseAsTouch(true);
-    Supernova::setUseDegrees(true);
-    Supernova::setRenderAPI(S_GLES2);
-    Supernova::setScalingMode(S_SCALING_FITWIDTH);
+    Engine::setMouseAsTouch(true);
+    Engine::setUseDegrees(true);
+    Engine::setRenderAPI(S_GLES2);
+    Engine::setScalingMode(S_SCALING_FITWIDTH);
 
-    Supernova::setLuaState(luaL_newstate());
+    Engine::setLuaState(luaL_newstate());
 
     LuaBinding::bind();
 
@@ -56,28 +209,28 @@ void Engine::onStart(int width, int height){
 
 void Engine::onSurfaceCreated(){
 
-    if (Supernova::getScene() != NULL){
-        (Supernova::getScene())->load();
+    if (Engine::getScene() != NULL){
+        (Engine::getScene())->load();
     }
 
 }
 
 void Engine::onSurfaceChanged(int width, int height) {
 
-    Supernova::setScreenSize(width, height);
+    Engine::setScreenSize(width, height);
 
-    if (Supernova::getScene() != NULL){
-        (Supernova::getScene())->updateViewSize();
+    if (Engine::getScene() != NULL){
+        (Engine::getScene())->updateViewSize();
     }
 
 }
 
 void Engine::onDrawFrame() {
 
-	Supernova::call_onFrame();
+	Events::call_onFrame();
 
-    if (Supernova::getScene() != NULL){
-        (Supernova::getScene())->draw();
+    if (Engine::getScene() != NULL){
+        (Engine::getScene())->draw();
     }
 
     SoundManager::checkActive();
@@ -92,69 +245,69 @@ void Engine::onResume(){
 }
 
 void Engine::onTouchPress(float x, float y){
-    x = (Supernova::getCanvasWidth() * (x+1)) / 2;
-    y = (Supernova::getCanvasHeight() * (y+1)) / 2;
+    x = (Engine::getCanvasWidth() * (x+1)) / 2;
+    y = (Engine::getCanvasHeight() * (y+1)) / 2;
 
-    Supernova::call_onTouchPress(x, y);
+    Events::call_onTouchPress(x, y);
 }
 
 void Engine::onTouchUp(float x, float y){
-    x = (Supernova::getCanvasWidth() * (x+1)) / 2;
-    y = (Supernova::getCanvasHeight() * (y+1)) / 2;
+    x = (Engine::getCanvasWidth() * (x+1)) / 2;
+    y = (Engine::getCanvasHeight() * (y+1)) / 2;
 
-    Supernova::call_onTouchUp(x, y);
+    Events::call_onTouchUp(x, y);
 }
 
 void Engine::onTouchDrag(float x, float y){
-    x = (Supernova::getCanvasWidth() * (x+1)) / 2;
-    y = (Supernova::getCanvasHeight() * (y+1)) / 2;
+    x = (Engine::getCanvasWidth() * (x+1)) / 2;
+    y = (Engine::getCanvasHeight() * (y+1)) / 2;
 
-    Supernova::call_onTouchDrag(x, y);
+    Events::call_onTouchDrag(x, y);
 }
 
 void Engine::onMousePress(int button, float x, float y){
-    x = (Supernova::getCanvasWidth() * (x+1)) / 2;
-    y = (Supernova::getCanvasHeight() * (y+1)) / 2;
+    x = (Engine::getCanvasWidth() * (x+1)) / 2;
+    y = (Engine::getCanvasHeight() * (y+1)) / 2;
 
-    Supernova::call_onMousePress(button, x, y);
-    if ((Supernova::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
-        Supernova::call_onTouchPress(x, y);
+    Events::call_onMousePress(button, x, y);
+    if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+        Events::call_onTouchPress(x, y);
     }
 }
 void Engine::onMouseUp(int button, float x, float y){
-    x = (Supernova::getCanvasWidth() * (x+1)) / 2;
-    y = (Supernova::getCanvasHeight() * (y+1)) / 2;
+    x = (Engine::getCanvasWidth() * (x+1)) / 2;
+    y = (Engine::getCanvasHeight() * (y+1)) / 2;
 
-    Supernova::call_onMouseUp(button, x, y);
-    if ((Supernova::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
-        Supernova::call_onTouchUp(x, y);
+    Events::call_onMouseUp(button, x, y);
+    if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+        Events::call_onTouchUp(x, y);
     }
 }
 
 void Engine::onMouseDrag(int button, float x, float y){
-    x = (Supernova::getCanvasWidth() * (x+1)) / 2;
-    y = (Supernova::getCanvasHeight() * (y+1)) / 2;
+    x = (Engine::getCanvasWidth() * (x+1)) / 2;
+    y = (Engine::getCanvasHeight() * (y+1)) / 2;
 
-    Supernova::call_onMouseDrag(button, x, y);
-    if ((Supernova::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
-        Supernova::call_onTouchDrag(x, y);
+    Events::call_onMouseDrag(button, x, y);
+    if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+        Events::call_onTouchDrag(x, y);
     }
 }
 
 void Engine::onMouseMove(float x, float y){
-    x = (Supernova::getCanvasWidth() * (x+1)) / 2;
-    y = (Supernova::getCanvasHeight() * (y+1)) / 2;
+    x = (Engine::getCanvasWidth() * (x+1)) / 2;
+    y = (Engine::getCanvasHeight() * (y+1)) / 2;
 
-    Supernova::call_onMouseMove(x, y);
+    Events::call_onMouseMove(x, y);
 }
 
 void Engine::onKeyPress(int inputKey){
-    Supernova::call_onKeyPress(inputKey);
+    Events::call_onKeyPress(inputKey);
     //printf("keypress %i\n", inputKey);
 }
 
 void Engine::onKeyUp(int inputKey){
-    Supernova::call_onKeyUp(inputKey);
+    Events::call_onKeyUp(inputKey);
     //printf("keyup %i\n", inputKey);
 }
 

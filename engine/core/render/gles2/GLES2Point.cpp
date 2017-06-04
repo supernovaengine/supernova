@@ -9,7 +9,7 @@
 #include "math/Vector2.h"
 #include "math/Angle.h"
 #include "PrimitiveMode.h"
-#include "Supernova.h"
+#include "Engine.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
@@ -119,7 +119,7 @@ bool GLES2Point::load() {
         uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
     }else{
         texture = NULL;
-        if (Supernova::getPlatform() == S_WEB){
+        if (Engine::getPlatform() == S_WEB){
             GLES2Util::generateEmptyTexture();
             uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
         }
@@ -219,7 +219,7 @@ bool GLES2Point::draw() {
         glBindTexture(((GLES2Texture*)(texture.get()))->getTextureType(), ((GLES2Texture*)(texture.get()))->getTexture());
         glUniform1i(uTextureUnitLocation, 0);
     }else{
-        if (Supernova::getPlatform() == S_WEB){
+        if (Engine::getPlatform() == S_WEB){
                 //Fix Chrome warnings of no texture bound
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);

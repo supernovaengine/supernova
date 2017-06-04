@@ -1,9 +1,15 @@
 
 #include "FileUtilsPlatform.h"
 
-#include "FileUtilsGeneric.h"
-#include "FileUtilsIOS.h"
+#ifdef SUPERNOVA_ANDROID
 #include "FileUtilsAndroid.h"
+#endif
+#ifdef  SUPERNOVA_IOS
+#include "FileUtilsIOS.h"
+#endif
+#ifdef  SUPERNOVA_WEB
+#include "FileUtilsGeneric.h"
+#endif
 
 FileUtilsPlatform& FileUtilsPlatform::instance(){
 #ifdef SUPERNOVA_ANDROID

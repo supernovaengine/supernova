@@ -22,7 +22,6 @@
  add_subdirectory (../../.. ${PROJECT_BINARY_DIR}/supernova)
 
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core")
- include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/libs/lua")
 
  add_library(
      supernova

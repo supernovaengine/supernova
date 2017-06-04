@@ -1,6 +1,7 @@
 
 #include "Mesh2D.h"
-#include "Supernova.h"
+#include "Engine.h"
+#include "Scene.h"
 
 Mesh2D::Mesh2D(): Mesh(){
     this->width = 0;
@@ -99,14 +100,14 @@ bool Mesh2D::draw(){
             parent = parent->getParent();
         }
 
-        int objScreenPosX = (int)(getWorldPosition().x * ((float) Supernova::getScreenWidth() /
-                                                    (float) Supernova::getCanvasWidth()));
-        int objScreenPosY = (int)(getWorldPosition().y * ((float) Supernova::getScreenHeight() /
-                                                    (float) Supernova::getCanvasHeight()));
-        int objScreenWidth = (int)(width * scaleX * ((float) Supernova::getScreenWidth() /
-                                               (float) Supernova::getCanvasWidth()));
-        int objScreenHeight = (int)(height * scaleY * ((float) Supernova::getScreenHeight() /
-                                                 (float) Supernova::getCanvasHeight()));
+        int objScreenPosX = (int)(getWorldPosition().x * ((float) Engine::getScreenWidth() /
+                                                    (float) Engine::getCanvasWidth()));
+        int objScreenPosY = (int)(getWorldPosition().y * ((float) Engine::getScreenHeight() /
+                                                    (float) Engine::getCanvasHeight()));
+        int objScreenWidth = (int)(width * scaleX * ((float) Engine::getScreenWidth() /
+                                               (float) Engine::getCanvasWidth()));
+        int objScreenHeight = (int)(height * scaleY * ((float) Engine::getScreenHeight() /
+                                                 (float) Engine::getCanvasHeight()));
 
         SceneRender* sceneRender = scene->getSceneRender();
 

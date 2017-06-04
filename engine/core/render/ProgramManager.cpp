@@ -1,12 +1,12 @@
 
 #include "ProgramManager.h"
-#include "Supernova.h"
+#include "Engine.h"
 
 
 std::unordered_map<std::string, std::shared_ptr<ProgramRender>> ProgramManager::programs;
 
 ProgramRender* ProgramManager::getProgramRender(){
-    if (Supernova::getRenderAPI() == S_GLES2){
+    if (Engine::getRenderAPI() == S_GLES2){
         return new GLES2Program();
     }
 

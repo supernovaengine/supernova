@@ -1,6 +1,6 @@
 #include "Scene.h"
 
-#include "Supernova.h"
+#include "Engine.h"
 
 #include "platform/Log.h"
 #include "GUIObject.h"
@@ -136,42 +136,42 @@ bool Scene::updateViewSize(){
     
     int viewX = 0;
     int viewY = 0;
-    int viewWidth = Supernova::getScreenWidth();
-    int viewHeight = Supernova::getScreenHeight();
+    int viewWidth = Engine::getScreenWidth();
+    int viewHeight = Engine::getScreenHeight();
     
-    float screenAspect = (float)Supernova::getScreenWidth() / (float)Supernova::getScreenHeight();
-    float canvasAspect = (float)Supernova::getPreferedCanvasWidth() / (float)Supernova::getPreferedCanvasHeight();
+    float screenAspect = (float)Engine::getScreenWidth() / (float)Engine::getScreenHeight();
+    float canvasAspect = (float)Engine::getPreferedCanvasWidth() / (float)Engine::getPreferedCanvasHeight();
     
     //When canvas size is not changed
-    if (Supernova::getScalingMode() == S_SCALING_LETTERBOX){
+    if (Engine::getScalingMode() == S_SCALING_LETTERBOX){
         if (screenAspect < canvasAspect){
-            float aspect = (float)Supernova::getScreenWidth() / (float)Supernova::getPreferedCanvasWidth();
-            int newHeight = (int)((float)Supernova::getPreferedCanvasHeight() * aspect);
-            int dif = Supernova::getScreenHeight() - newHeight;
+            float aspect = (float)Engine::getScreenWidth() / (float)Engine::getPreferedCanvasWidth();
+            int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
+            int dif = Engine::getScreenHeight() - newHeight;
             viewY = (dif/2);
-            viewHeight = Supernova::getScreenHeight()-dif;
+            viewHeight = Engine::getScreenHeight()-dif;
         }else{
-            float aspect = (float)Supernova::getScreenHeight() / (float)Supernova::getPreferedCanvasHeight();
-            int newWidth = (int)((float)Supernova::getPreferedCanvasWidth() * aspect);
-            int dif = Supernova::getScreenWidth() - newWidth;
+            float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
+            int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
+            int dif = Engine::getScreenWidth() - newWidth;
             viewX = (dif/2);
-            viewWidth = Supernova::getScreenWidth()-dif;
+            viewWidth = Engine::getScreenWidth()-dif;
         }
     }
     
-    if (Supernova::getScalingMode() == S_SCALING_CROP){
+    if (Engine::getScalingMode() == S_SCALING_CROP){
         if (screenAspect > canvasAspect){
-            float aspect = (float)Supernova::getScreenWidth() / (float)Supernova::getPreferedCanvasWidth();
-            int newHeight = (int)((float)Supernova::getPreferedCanvasHeight() * aspect);
-            int dif = Supernova::getScreenHeight() - newHeight;
+            float aspect = (float)Engine::getScreenWidth() / (float)Engine::getPreferedCanvasWidth();
+            int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
+            int dif = Engine::getScreenHeight() - newHeight;
             viewY = (dif/2);
-            viewHeight = Supernova::getScreenHeight()-dif;
+            viewHeight = Engine::getScreenHeight()-dif;
         }else{
-            float aspect = (float)Supernova::getScreenHeight() / (float)Supernova::getPreferedCanvasHeight();
-            int newWidth = (int)((float)Supernova::getPreferedCanvasWidth() * aspect);
-            int dif = Supernova::getScreenWidth() - newWidth;
+            float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
+            int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
+            int dif = Engine::getScreenWidth() - newWidth;
             viewX = (dif/2);
-            viewWidth = Supernova::getScreenWidth()-dif;
+            viewWidth = Engine::getScreenWidth()-dif;
         }
     }
 

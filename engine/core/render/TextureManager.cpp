@@ -1,7 +1,7 @@
 
 #include "TextureManager.h"
 #include "image/TextureLoader.h"
-#include "Supernova.h"
+#include "Engine.h"
 #include "image/ColorType.h"
 #include "gles2/GLES2Texture.h"
 
@@ -10,7 +10,7 @@ std::unordered_map<std::string, TextureManager::TextureStore> TextureManager::te
 
 
 TextureRender* TextureManager::getTextureRender(){
-    if (Supernova::getRenderAPI() == S_GLES2){
+    if (Engine::getRenderAPI() == S_GLES2){
         return new GLES2Texture();
     }
     

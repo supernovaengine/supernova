@@ -6,7 +6,8 @@
 #include "FileData.h"
 #include <locale>
 
-#include "Supernova.h"
+#include "Events.h"
+#include "Engine.h"
 #include "Object.h"
 #include "ConcreteObject.h"
 #include "platform/Log.h"
@@ -53,7 +54,7 @@ LuaBinding::~LuaBinding() {
 
 int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
 
-    lua_State *L = Supernova::getLuaState();
+    lua_State *L = Engine::getLuaState();
 
     // Add the package loader to the package.loaders table.
     lua_getglobal(L, "package");
@@ -87,7 +88,7 @@ int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
 
 int LuaBinding::setLuaPath(const char* path)
 {
-    lua_State *L = Supernova::getLuaState();
+    lua_State *L = Engine::getLuaState();
 
     lua_getglobal( L, "package" );
     if(lua_isnil(L, -1))
@@ -144,33 +145,36 @@ int LuaBinding::moduleLoader(lua_State *L) {
 void LuaBinding::bind(){
 
 
-    lua_State *L = Supernova::getLuaState();
+    lua_State *L = Engine::getLuaState();
     luaL_openlibs(L);
 
-
-    LuaIntf::LuaBinding(L).beginClass<Supernova>("Supernova")
+    LuaIntf::LuaBinding(L).beginClass<Engine>("Engine")
     .addConstructor(LUA_ARGS())
-    .addStaticFunction("setScene", &Supernova::setScene)
-    .addStaticFunction("getCanvasWidth", &Supernova::getCanvasWidth)
-    .addStaticFunction("getCanvasHeight", &Supernova::getCanvasHeight)
-    .addStaticFunction("setCanvasSize", &Supernova::setCanvasSize)
-    .addStaticFunction("setMouseAsTouch", &Supernova::setMouseAsTouch)
-    .addStaticFunction("setScalingMode", &Supernova::setScalingMode)
-    .addStaticFunction("onFrame", static_cast<int(*)(lua_State*)>(&Supernova::onFrame))
-    .addStaticFunction("onTouchPress", static_cast<int(*)(lua_State*)>(&Supernova::onTouchPress))
-    .addStaticFunction("onTouchUp", static_cast<int(*)(lua_State*)>(&Supernova::onTouchUp))
-    .addStaticFunction("onTouchDrag", static_cast<int(*)(lua_State*)>(&Supernova::onTouchDrag))
-    .addStaticFunction("onMousePress", static_cast<int(*)(lua_State*)>(&Supernova::onMousePress))
-    .addStaticFunction("onMouseUp", static_cast<int(*)(lua_State*)>(&Supernova::onMouseUp))
-    .addStaticFunction("onMouseDrag", static_cast<int(*)(lua_State*)>(&Supernova::onMouseDrag))
-    .addStaticFunction("onMouseMove", static_cast<int(*)(lua_State*)>(&Supernova::onMouseMove))
-    .addStaticFunction("onKeyPress", static_cast<int(*)(lua_State*)>(&Supernova::onKeyPress))
-    .addStaticFunction("onKeyUp", static_cast<int(*)(lua_State*)>(&Supernova::onKeyUp))
+    .addStaticFunction("setScene", &Engine::setScene)
+    .addStaticFunction("getCanvasWidth", &Engine::getCanvasWidth)
+    .addStaticFunction("getCanvasHeight", &Engine::getCanvasHeight)
+    .addStaticFunction("setCanvasSize", &Engine::setCanvasSize)
+    .addStaticFunction("setMouseAsTouch", &Engine::setMouseAsTouch)
+    .addStaticFunction("setScalingMode", &Engine::setScalingMode)
     .addConstant("SCALING_FITWIDTH", S_SCALING_FITWIDTH)
     .addConstant("SCALING_FITHEIGHT", S_SCALING_FITHEIGHT)
     .addConstant("SCALING_LETTERBOX", S_SCALING_LETTERBOX)
     .addConstant("SCALING_CROP", S_SCALING_CROP)
     .addConstant("SCALING_STRETCH", S_SCALING_STRETCH)
+    .endClass();
+
+    LuaIntf::LuaBinding(L).beginClass<Events>("Events")
+    .addConstructor(LUA_ARGS())
+    .addStaticFunction("onFrame", static_cast<int(*)(lua_State*)>(&Events::onFrame))
+    .addStaticFunction("onTouchPress", static_cast<int(*)(lua_State*)>(&Events::onTouchPress))
+    .addStaticFunction("onTouchUp", static_cast<int(*)(lua_State*)>(&Events::onTouchUp))
+    .addStaticFunction("onTouchDrag", static_cast<int(*)(lua_State*)>(&Events::onTouchDrag))
+    .addStaticFunction("onMousePress", static_cast<int(*)(lua_State*)>(&Events::onMousePress))
+    .addStaticFunction("onMouseUp", static_cast<int(*)(lua_State*)>(&Events::onMouseUp))
+    .addStaticFunction("onMouseDrag", static_cast<int(*)(lua_State*)>(&Events::onMouseDrag))
+    .addStaticFunction("onMouseMove", static_cast<int(*)(lua_State*)>(&Events::onMouseMove))
+    .addStaticFunction("onKeyPress", static_cast<int(*)(lua_State*)>(&Events::onKeyPress))
+    .addStaticFunction("onKeyUp", static_cast<int(*)(lua_State*)>(&Events::onKeyUp))
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<Object>("Object")

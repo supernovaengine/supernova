@@ -22,10 +22,10 @@ int mousePressed;
 
 extern "C" {
     int getScreenWidth() {
-        return Supernova::getScreenWidth();
+        return Engine::getScreenWidth();
     }
     int getScreenHeight() {
-        return Supernova::getScreenHeight();
+        return Engine::getScreenHeight();
     }
     void updateScreenSize(int nWidth, int nHeight){
         width = nWidth;
@@ -49,8 +49,8 @@ int main(int argc, char **argv) {
         Engine::onStart();
     }
 
-	width = Supernova::getScreenWidth();
-	height = Supernova::getScreenHeight();
+	width = Engine::getScreenWidth();
+	height = Engine::getScreenHeight();
 
     window = glfwCreateWindow(width, height, "Supernova", NULL, NULL);
 

@@ -1,6 +1,6 @@
 #include "SceneManager.h"
 
-#include "Supernova.h"
+#include "Engine.h"
 #include "gles2/GLES2Scene.h"
 #include <stddef.h>
 
@@ -16,7 +16,7 @@ SceneManager::~SceneManager() {
 
 void SceneManager::instanciateRender(){
     if (scene == NULL){
-        if (Supernova::getRenderAPI() == S_GLES2){
+        if (Engine::getRenderAPI() == S_GLES2){
             scene = new GLES2Scene();
         }
     }

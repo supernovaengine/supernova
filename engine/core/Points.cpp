@@ -2,7 +2,7 @@
 
 #include "PrimitiveMode.h"
 #include "Scene.h"
-#include "Supernova.h"
+#include "Engine.h"
 #include "render/TextureManager.h"
 
 Points::Points(){
@@ -101,9 +101,9 @@ void Points::updatePointScale(){
     }
 
     if (pointSizeReference == S_POINTSIZE_HEIGHT)
-        pointScale *= (float)Supernova::getScreenHeight() / (float)Supernova::getCanvasHeight();
+        pointScale *= (float)Engine::getScreenHeight() / (float)Engine::getCanvasHeight();
     if (pointSizeReference == S_POINTSIZE_WIDTH)
-        pointScale *= (float)Supernova::getScreenWidth() / (float)Supernova::getCanvasWidth();
+        pointScale *= (float)Engine::getScreenWidth() / (float)Engine::getCanvasWidth();
 
     fillScaledSizeVector();
 }

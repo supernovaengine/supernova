@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "Supernova.h"
+#include "Engine.h"
 
 Camera::Camera() : Object(){
 
@@ -9,13 +9,13 @@ Camera::Camera() : Object(){
 
     //ORTHO
     left = 0;
-    right = Supernova::getCanvasWidth();
+    right = Engine::getCanvasWidth();
     bottom = 0;
-    top = Supernova::getCanvasHeight();
+    top = Engine::getCanvasHeight();
 
     //PERSPECTIVE
     y_fov = 0.75;
-    aspect = (float) Supernova::getCanvasWidth() / (float) Supernova::getCanvasHeight();
+    aspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
 
     near = 0.5;
     far = 5000;
@@ -109,9 +109,9 @@ int Camera::getProjection(){
 }
 
 void Camera::updateScreenSize(){
-    float newRight = Supernova::getCanvasWidth();
-    float newTop = Supernova::getCanvasHeight();
-    float newAspect = (float) Supernova::getCanvasWidth() / (float) Supernova::getCanvasHeight();
+    float newRight = Engine::getCanvasWidth();
+    float newTop = Engine::getCanvasHeight();
+    float newAspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
 
     if ((right != newRight) || (top !=newTop) || (aspect != newAspect)){
         right = newRight;
@@ -262,8 +262,8 @@ Ray Camera::pointsToRay(float x, float y) {
 
     float normalized_x, normalized_y;
 
-    normalized_x = ((2 * x) / Supernova::getCanvasWidth()) -1;
-    normalized_y = ((2 * y) / Supernova::getCanvasHeight()) -1;
+    normalized_x = ((2 * x) / Engine::getCanvasWidth()) -1;
+    normalized_y = ((2 * y) / Engine::getCanvasHeight()) -1;
 
     Vector4 near_point_ndc = {normalized_x, normalized_y, -1, 1};
     Vector4 far_point_ndc = {normalized_x, normalized_y,  1, 1};

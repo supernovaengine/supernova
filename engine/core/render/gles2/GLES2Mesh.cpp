@@ -8,7 +8,7 @@
 #include "math/Vector2.h"
 #include "math/Angle.h"
 #include "PrimitiveMode.h"
-#include "Supernova.h"
+#include "Engine.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
@@ -132,7 +132,7 @@ bool GLES2Mesh::load() {
             }
         }else{
             //Fix Chrome warnings of no texture bound with an empty texture
-            if (Supernova::getPlatform() == S_WEB){
+            if (Engine::getPlatform() == S_WEB){
                 GLES2Util::generateEmptyTexture();
             }
             submeshesRender[submeshes->at(i)].texture = NULL;
@@ -237,7 +237,7 @@ bool GLES2Mesh::draw() {
             glBindTexture(((GLES2Texture*)(submeshesRender[submeshes->at(i)].texture.get()))->getTextureType(), ((GLES2Texture*)(submeshesRender[submeshes->at(i)].texture.get()))->getTexture());
             glUniform1i(uTextureUnitLocation, 0);
         }else{
-            if (Supernova::getPlatform() == S_WEB){
+            if (Engine::getPlatform() == S_WEB){
                 //Fix Chrome warnings of no texture bound
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
