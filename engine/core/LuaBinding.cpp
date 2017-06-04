@@ -466,13 +466,9 @@ void LuaBinding::bind(){
     .addConstant("MOUSE_BUTTON_RIGHT", S_MOUSE_BUTTON_RIGHT)
     .addConstant("MOUSE_BUTTON_MIDDLE", S_MOUSE_BUTTON_MIDDLE)
     .endModule();
+    
 
-    std::string luadir = std::string("lua") + LUA_DIRSEP;
-
-    setLuaPath(std::string(luadir+"?.lua").c_str());
-    setLuaSearcher(moduleLoader, true);
-
-    const char* luafile = std::string(luadir+"main.lua").c_str();
+    const char* luafile = std::string("main.lua").c_str();
 
     FileData filedata;
     filedata.open(luafile);
