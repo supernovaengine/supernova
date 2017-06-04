@@ -35,7 +35,7 @@ android {
 
     sourceSets {
         main {
-            assets.srcDirs = ['../../../project']
+            assets.srcDirs = ['../../../project/assets']
         }
     }
 

@@ -31,7 +31,7 @@ add_executable(
 set_target_properties(
     supernova-project
     PROPERTIES LINK_FLAGS
-    "-g4 -s ALLOW_MEMORY_GROWTH=1 -s USE_GLFW=3 --embed-file ../../../project@/ -o supernova-project.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_updateScreenSize','_main']\""
+    "-g4 -s ALLOW_MEMORY_GROWTH=1 -s USE_GLFW=3 --embed-file ../../../project/assets@/ -o supernova-project.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_updateScreenSize','_main']\""
 )
 
 target_link_libraries(

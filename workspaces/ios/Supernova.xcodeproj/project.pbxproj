@@ -11,7 +11,7 @@
 		712379201EC13C7E00BFD1F7 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */; };
 		712379231EC13CDA00BFD1F7 /* libstb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 712379111EC13C6000BFD1F7 /* libstb.a */; };
 		71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71369C081E291E22006AE1D1 /* Button.cpp */; };
-		713D30C51CFB306D00A4752F /* project in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* project */; };
+		713D30C51CFB306D00A4752F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* assets */; };
 		714C890A1EDE113C0028DCE0 /* LightData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89071EDE11360028DCE0 /* LightData.cpp */; };
 		714C890B1EDE129A0028DCE0 /* stb_rect_pack.c in Sources */ = {isa = PBXBuildFile; fileRef = 71E34E251ED217CD0005DEF2 /* stb_rect_pack.c */; };
 		714C890F1EDE12AF0028DCE0 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = 714C890C1EDE12AA0028DCE0 /* stb_image.c */; };
@@ -439,7 +439,7 @@
 		713D2D6D1CFB2EFA00A4752F /* LuaRef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaRef.h; sourceTree = "<group>"; };
 		713D2D6E1CFB2EFA00A4752F /* LuaState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaState.h; sourceTree = "<group>"; };
 		713D2D6F1CFB2EFA00A4752F /* QtLuaIntf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QtLuaIntf.h; sourceTree = "<group>"; };
-		713D30C41CFB306D00A4752F /* project */ = {isa = PBXFileReference; lastKnownFileType = folder; name = project; path = ../../project; sourceTree = "<group>"; };
+		713D30C41CFB306D00A4752F /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../project/assets; sourceTree = "<group>"; };
 		714C89041ED7711A0028DCE0 /* Rect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rect.h; sourceTree = "<group>"; };
 		714C89051ED7711A0028DCE0 /* Rect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rect.cpp; sourceTree = "<group>"; };
 		714C89071EDE11360028DCE0 /* LightData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LightData.cpp; sourceTree = "<group>"; };
@@ -1092,7 +1092,7 @@
 				71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */,
 				71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */,
 				71CDC6FA1D7B13240060EEFF /* libz.tbd */,
-				713D30C41CFB306D00A4752F /* project */,
+				713D30C41CFB306D00A4752F /* assets */,
 				71192EFA1CE1334000BD76EE /* project */,
 				713D2AAE1CFB2EF900A4752F /* libs */,
 				713D2A051CFB2EAD00A4752F /* core */,
@@ -1619,7 +1619,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				716AB5B41BEF9F3D001B672D /* Main.storyboard in Resources */,
-				713D30C51CFB306D00A4752F /* project in Resources */,
+				713D30C51CFB306D00A4752F /* assets in Resources */,
 				716AB5B61BEF9F3D001B672D /* Assets.xcassets in Resources */,
 				716AB5B91BEF9F3D001B672D /* LaunchScreen.storyboard in Resources */,
 			);
