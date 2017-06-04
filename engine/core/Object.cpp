@@ -1,5 +1,4 @@
 #include "Object.h"
-#include "Supernova.h"
 #include "platform/Log.h"
 #include "GUIObject.h"
 #include "Light.h"

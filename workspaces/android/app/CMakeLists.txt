@@ -23,6 +23,8 @@
 
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core")
 
+ file(GLOB_RECURSE SUPERNOVA_PROJECT_SRCS ../../../project/*.cpp)
+
  add_library(
      supernova
 
@@ -31,7 +33,7 @@
      src/main/cpp/supernova_android_jni.cpp
      src/main/cpp/SupernovaAndroid.cpp
 
-     ../../../project/main.cpp
+     ${SUPERNOVA_PROJECT_SRCS}
  )
 
   target_link_libraries(

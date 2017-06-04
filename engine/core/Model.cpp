@@ -4,7 +4,6 @@
 #include "PrimitiveMode.h"
 #include <algorithm>
 #include "tiny_obj_loader.h"
-#include "Supernova.h"
 #include "FileData.h"
 
 Model::Model(): Mesh() {

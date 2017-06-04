@@ -11,6 +11,8 @@ add_subdirectory (../.. ${PROJECT_BINARY_DIR}/supernova)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core")
 
+file(GLOB_RECURSE SUPERNOVA_PROJECT_SRCS ../../project/*.cpp)
+
 add_library(
     supernova
     main.cpp
@@ -23,13 +25,13 @@ target_link_libraries(
 
 add_executable(
     supernova-project
-    ../../project/main.cpp
+    ${SUPERNOVA_PROJECT_SRCS}
 )
 
 set_target_properties(
     supernova-project
     PROPERTIES LINK_FLAGS
-    "-g4 -s ALLOW_MEMORY_GROWTH=1 -s USE_GLFW=3 --embed-file ../../../project/assets@/ -o supernova-project.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_updateScreenSize','_main']\""
+    "-g4 -s ALLOW_MEMORY_GROWTH=1 -s USE_GLFW=3 --embed-file ../../../project@/ -o supernova-project.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_updateScreenSize','_main']\""
 )
 
 target_link_libraries(
