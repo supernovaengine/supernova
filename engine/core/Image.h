@@ -6,7 +6,7 @@
 
 class Image: public Mesh2D {
 
-private:
+protected:
     void createVertices();
 
 public:
@@ -15,6 +15,8 @@ public:
     Image(std::string image_path);
     virtual ~Image();
 
+    virtual void setSize(int width, int height);
+    
     bool load();
 
 };

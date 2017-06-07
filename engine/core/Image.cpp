@@ -25,6 +25,23 @@ Image::Image(std::string image_path): Mesh2D() {
 Image::~Image() {
 }
 
+void Image::setSize(int width, int height){
+    
+    if ((this->width != width || this->height != height) && this->width >= 0 && this->height >= 0){
+        
+        Mesh2D::setSize(width, height);
+        
+        createVertices();
+        
+        renderManager.getRender()->updateVertices();
+        renderManager.getRender()->updateTexcoords();
+        renderManager.getRender()->updateNormals();
+        renderManager.getRender()->updateIndices();
+        
+    }
+
+}
+
 void Image::createVertices(){
     vertices.clear();
     vertices.push_back(Vector3(0, 0, 0));
@@ -47,6 +64,7 @@ void Image::createVertices(){
     indices.assign(indices_array, std::end(indices_array));
     submeshes[0]->setIndices(indices);
 
+    normals.clear();
     normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
     normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
     normals.push_back(Vector3(0.0f, 0.0f, 1.0f));

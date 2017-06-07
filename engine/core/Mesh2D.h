@@ -21,6 +21,7 @@ public:
     ~Mesh2D();
 
     virtual void setSize(int width, int height);
+    
     void setBillboard(bool billboard);
     void setFixedSizeBillboard(bool fixedSizeBillboard);
     void setBillboardScaleFactor(float billboardScaleFactor);

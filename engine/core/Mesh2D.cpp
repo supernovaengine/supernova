@@ -47,13 +47,8 @@ void Mesh2D::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* 
 }
 
 void Mesh2D::setSize(int width, int height){
-
-    if ((this->width != width || this->height != height) && this->width >= 0 && this->height >= 0){
-        this->width = width;
-        this->height = height;
-        if (loaded)
-            load();
-    }
+    this->width = width;
+    this->height = height;
 }
 
 void Mesh2D::setBillboard(bool billboard){
