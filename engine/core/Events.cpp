@@ -1,6 +1,7 @@
 #include "Events.h"
 #include "platform/Log.h"
 #include "Engine.h"
+#include "LuaBind.h"
 
 #include "lua.h"
 #include "lualib.h"
@@ -45,9 +46,9 @@ Events::~Events() {
 }
 
 void Events::luaCallback(int nargs, int nresults, int msgh){
-    int status = lua_pcall(Engine::getLuaState(), nargs, nresults, msgh);
+    int status = lua_pcall(LuaBind::getLuaState(), nargs, nresults, msgh);
     if (status != 0){
-        Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(Engine::getLuaState(),-1));
+        Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
     }
 }
 
@@ -71,7 +72,7 @@ void Events::call_onFrame(){
     }
     if (onFrameLuaFunc != 0){
         /* your function is once again on the top of the stack! */
-        lua_rawgeti(Engine::getLuaState(), LUA_REGISTRYINDEX, Events::onFrameLuaFunc);
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onFrameLuaFunc);
         luaCallback(0, 0, 0);
     }
 }
@@ -96,9 +97,9 @@ void Events::call_onTouchPress(float x, float y){
     }
     if (onTouchPressLuaFunc != 0){
         /* your function is once again on the top of the stack! */
-        lua_rawgeti(Engine::getLuaState(), LUA_REGISTRYINDEX, Events::onTouchPressLuaFunc);
-        lua_pushnumber(Engine::getLuaState(), x);
-        lua_pushnumber(Engine::getLuaState(), y);
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onTouchPressLuaFunc);
+        lua_pushnumber(LuaBind::getLuaState(), x);
+        lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(2, 0, 0);
     }
 }
@@ -123,9 +124,9 @@ void Events::call_onTouchUp(float x, float y){
     }
     if (onTouchUpLuaFunc != 0){
         /* your function is once again on the top of the stack! */
-        lua_rawgeti(Engine::getLuaState(), LUA_REGISTRYINDEX, Events::onTouchUpLuaFunc);
-        lua_pushnumber(Engine::getLuaState(), x);
-        lua_pushnumber(Engine::getLuaState(), y);
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onTouchUpLuaFunc);
+        lua_pushnumber(LuaBind::getLuaState(), x);
+        lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(2, 0, 0);
     }
 }
@@ -150,9 +151,9 @@ void Events::call_onTouchDrag(float x, float y){
     }
     if (onTouchDragLuaFunc != 0){
         /* your function is once again on the top of the stack! */
-        lua_rawgeti(Engine::getLuaState(), LUA_REGISTRYINDEX, Events::onTouchDragLuaFunc);
-        lua_pushnumber(Engine::getLuaState(), x);
-        lua_pushnumber(Engine::getLuaState(), y);
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onTouchDragLuaFunc);
+        lua_pushnumber(LuaBind::getLuaState(), x);
+        lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(2, 0, 0);
     }
 }
@@ -177,10 +178,10 @@ void Events::call_onMousePress(int button, float x, float y){
     }
     if (onMousePressLuaFunc != 0){
         /* your function is once again on the top of the stack! */
-        lua_rawgeti(Engine::getLuaState(), LUA_REGISTRYINDEX, Events::onMousePressLuaFunc);
-        lua_pushnumber(Engine::getLuaState(), button);
-        lua_pushnumber(Engine::getLuaState(), x);
-        lua_pushnumber(Engine::getLuaState(), y);
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onMousePressLuaFunc);
+        lua_pushnumber(LuaBind::getLuaState(), button);
+        lua_pushnumber(LuaBind::getLuaState(), x);
+        lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(3, 0, 0);
     }
 }
@@ -205,10 +206,10 @@ void Events::call_onMouseUp(int button, float x, float y){
     }
     if (onMouseUpLuaFunc != 0){
         /* your function is once again on the top of the stack! */
-        lua_rawgeti(Engine::getLuaState(), LUA_REGISTRYINDEX, Events::onMouseUpLuaFunc);
-        lua_pushnumber(Engine::getLuaState(), button);
-        lua_pushnumber(Engine::getLuaState(), x);
-        lua_pushnumber(Engine::getLuaState(), y);
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onMouseUpLuaFunc);
+        lua_pushnumber(LuaBind::getLuaState(), button);
+        lua_pushnumber(LuaBind::getLuaState(), x);
+        lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(3, 0, 0);
     }
 }
@@ -233,10 +234,10 @@ void Events::call_onMouseDrag(int button, float x, float y){
     }
     if (onMouseDragLuaFunc != 0){
         /* your function is once again on the top of the stack! */
-        lua_rawgeti(Engine::getLuaState(), LUA_REGISTRYINDEX, Events::onMouseDragLuaFunc);
-        lua_pushnumber(Engine::getLuaState(), button);
-        lua_pushnumber(Engine::getLuaState(), x);
-        lua_pushnumber(Engine::getLuaState(), y);
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onMouseDragLuaFunc);
+        lua_pushnumber(LuaBind::getLuaState(), button);
+        lua_pushnumber(LuaBind::getLuaState(), x);
+        lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(3, 0, 0);
     }
 }
@@ -261,9 +262,9 @@ void Events::call_onMouseMove(float x, float y){
     }
     if (onMouseMoveLuaFunc != 0){
         /* your function is once again on the top of the stack! */
-        lua_rawgeti(Engine::getLuaState(), LUA_REGISTRYINDEX, Events::onMouseMoveLuaFunc);
-        lua_pushnumber(Engine::getLuaState(), x);
-        lua_pushnumber(Engine::getLuaState(), y);
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onMouseMoveLuaFunc);
+        lua_pushnumber(LuaBind::getLuaState(), x);
+        lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(2, 0, 0);
     }
 }
@@ -288,8 +289,8 @@ void Events::call_onKeyPress(int key){
     }
     if (onKeyPressLuaFunc != 0){
         /* your function is once again on the top of the stack! */
-        lua_rawgeti(Engine::getLuaState(), LUA_REGISTRYINDEX, Events::onKeyPressLuaFunc);
-        lua_pushnumber(Engine::getLuaState(), key);
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onKeyPressLuaFunc);
+        lua_pushnumber(LuaBind::getLuaState(), key);
         luaCallback(1, 0, 0);
     }
 }
@@ -314,8 +315,8 @@ void Events::call_onKeyUp(int key){
     }
     if (onKeyUpLuaFunc != 0){
         /* your function is once again on the top of the stack! */
-        lua_rawgeti(Engine::getLuaState(), LUA_REGISTRYINDEX, Events::onKeyUpLuaFunc);
-        lua_pushnumber(Engine::getLuaState(), key);
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onKeyUpLuaFunc);
+        lua_pushnumber(LuaBind::getLuaState(), key);
         luaCallback(1, 0, 0);
     }
 }

@@ -14,14 +14,11 @@
 #define S_IOS 2
 #define S_WEB 3
 
-typedef struct lua_State lua_State;
-
 class Scene;
 
 class Engine {
     
 private:
-    static lua_State *luastate;
     static Scene *mainScene;
     
     static int screenWidth;
@@ -44,9 +41,6 @@ public:
     virtual ~Engine();
     
     //-----Supernova config-----
-    static void setLuaState(lua_State*);
-    static lua_State* getLuaState();
-    
     static void setScene(Scene *mainScene);
     static Scene* getScene();
     

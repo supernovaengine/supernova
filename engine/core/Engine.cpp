@@ -15,7 +15,7 @@
 #include "Events.h"
 #include "platform/Log.h"
 
-#include "LuaBinding.h"
+#include "LuaBind.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -26,7 +26,6 @@
 
 #include "audio/SoundManager.h"
 
-lua_State *Engine::luastate;
 Scene *Engine::mainScene;
 
 int Engine::screenWidth;
@@ -49,14 +48,6 @@ Engine::Engine() {
 
 Engine::~Engine() {
     
-}
-
-void Engine::setLuaState(lua_State* luastate){
-    Engine::luastate = luastate;
-}
-
-lua_State* Engine::getLuaState(){
-    return luastate;
 }
 
 void Engine::setScene(Scene *mainScene){
@@ -200,9 +191,8 @@ void Engine::onStart(int width, int height){
     Engine::setRenderAPI(S_GLES2);
     Engine::setScalingMode(S_SCALING_FITWIDTH);
 
-    Engine::setLuaState(luaL_newstate());
-
-    LuaBinding::bind();
+    LuaBind::createLuaState();
+    LuaBind::bind();
 
     init();
 }

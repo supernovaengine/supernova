@@ -1,10 +1,11 @@
 
-#include "LuaBinding.h"
+#include "LuaBind.h"
+
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 
 #include "LuaIntf.h"
-
-#include "FileData.h"
-#include <locale>
 
 #include "Events.h"
 #include "Engine.h"
@@ -32,8 +33,10 @@
 #include "SkyBox.h"
 #include "Points.h"
 #include "Particles.h"
+
 #include <map>
 #include <unistd.h>
+#include <locale>
 
 /*
 namespace LuaIntf
@@ -44,17 +47,46 @@ namespace LuaIntf
 }
 */
 
-LuaBinding::LuaBinding() {
+lua_State *LuaBind::luastate;
+
+
+LuaBind::LuaBind() {
 
 }
 
-LuaBinding::~LuaBinding() {
+LuaBind::~LuaBind() {
 
 }
 
-int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
 
-    lua_State *L = Engine::getLuaState();
+void LuaBind::createLuaState(){
+    LuaBind::luastate = luaL_newstate();
+}
+
+lua_State* LuaBind::getLuaState(){
+    return luastate;
+}
+
+void LuaBind::setObject(const char* global, Object* object){
+    lua_State *L = LuaBind::getLuaState();
+    LuaIntf::Lua::setGlobal(L, global, object);
+}
+
+Object* LuaBind::getObject(const char* global){
+    lua_State *L = LuaBind::getLuaState();
+    
+    Object* object = NULL;
+    
+    lua_getglobal(L, global);
+    if (lua_isuserdata(L, -1))
+        object = LuaIntf::CppObject::get<Object>(L, -1, false);
+    
+    return object;
+}
+
+int LuaBind::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
+
+    lua_State *L = LuaBind::getLuaState();
 
     // Add the package loader to the package.loaders table.
     lua_getglobal(L, "package");
@@ -86,9 +118,9 @@ int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
     return 0;
 }
 
-int LuaBinding::setLuaPath(const char* path)
+int LuaBind::setLuaPath(const char* path)
 {
-    lua_State *L = Engine::getLuaState();
+    lua_State *L = LuaBind::getLuaState();
 
     lua_getglobal( L, "package" );
     if(lua_isnil(L, -1))
@@ -109,7 +141,7 @@ int LuaBinding::setLuaPath(const char* path)
     return 0;
 }
 
-int LuaBinding::moduleLoader(lua_State *L) {
+int LuaBind::moduleLoader(lua_State *L) {
     
     const char *filename = lua_tostring(L, 1);
     filename = luaL_gsub(L, filename, ".", LUA_DIRSEP);
@@ -142,10 +174,9 @@ int LuaBinding::moduleLoader(lua_State *L) {
     return 1;
 }
 
-void LuaBinding::bind(){
+void LuaBind::bind(){
 
-
-    lua_State *L = Engine::getLuaState();
+    lua_State *L = LuaBind::getLuaState();
     luaL_openlibs(L);
 
     LuaIntf::LuaBinding(L).beginClass<Engine>("Engine")
