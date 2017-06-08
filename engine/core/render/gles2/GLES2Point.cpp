@@ -38,34 +38,34 @@ std::vector<float> GLES2Point::rectsData(){
 
 void GLES2Point::updatePositions(){
     PointRender::updatePositions();
-    if (loaded)
+    if (isLoaded)
         GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, positions->size() * 3 * sizeof(GLfloat), &positions->front());
 }
 
 void GLES2Point::updateNormals(){
     PointRender::updateNormals();
-    if (loaded)
+    if (isLoaded)
         if (lighting && normals)
             GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
 }
 
 void GLES2Point::updatePointSizes(){
     PointRender::updatePointSizes();
-    if (loaded)
+    if (isLoaded)
         if (pointSizes)
             GLES2Util::updateVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front());
 }
 
 void GLES2Point::updateTextureRects(){
     PointRender::updateTextureRects();
-    if (loaded)
+    if (isLoaded)
         if (hasTextureRect && textureRects)
             GLES2Util::updateVBO(textureRectBuffer, GL_ARRAY_BUFFER, textureRects->size() * 4 * sizeof(GLfloat), &rectsData().front());
 }
 
 void GLES2Point::updatePointColors(){
     PointRender::updatePointColors();
-    if (loaded)
+    if (isLoaded)
         if (pointColors)
             GLES2Util::updateVBO(pointColorBuffer, GL_ARRAY_BUFFER, pointColors->size() * 4 * sizeof(GLfloat), &pointColors->front());
 }
@@ -149,7 +149,7 @@ bool GLES2Point::draw() {
         return false;
     }
     
-    if (!loaded){
+    if (!isLoaded){
         return false;
     }
     
@@ -242,7 +242,7 @@ bool GLES2Point::draw() {
 }
 
 void GLES2Point::destroy(){
-    if (loaded){
+    if (isLoaded){
         glDeleteBuffers(1, &vertexBuffer);
         if (lighting && normals){
             glDeleteBuffers(1, &normalBuffer);
@@ -263,5 +263,4 @@ void GLES2Point::destroy(){
         gProgram.reset();
         ProgramManager::deleteUnused();
     }
-    loaded = false;
 }

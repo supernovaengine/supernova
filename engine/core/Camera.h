@@ -76,7 +76,7 @@ public:
 
     void setSceneObject(Object* scene);
 
-    void update();
+    virtual void update();
 
     Matrix4* getViewMatrix();
     Matrix4* getProjectionMatrix();

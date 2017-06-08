@@ -37,8 +37,8 @@ public:
 
     virtual bool render() = 0;
 
-    bool load();
-    bool draw();
+    virtual bool load();
+    virtual bool draw();
 
 };
 

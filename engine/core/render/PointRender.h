@@ -22,7 +22,6 @@ private:
     
 protected:
     
-    bool loaded;
     bool lighting;
     bool hasfog;
     bool hasTextureRect;
@@ -46,6 +45,8 @@ protected:
     Matrix4 modelViewProjectionMatrix;
     Vector3 cameraPosition;
     
+    bool isLoaded;
+    
     std::string materialTexture;
 
 public:
@@ -63,7 +64,7 @@ public:
     
     virtual bool load();
     virtual bool draw();
-    virtual void destroy() = 0;
+    virtual void destroy();
     
 };
 

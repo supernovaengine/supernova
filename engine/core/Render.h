@@ -4,9 +4,6 @@
 
 class Render {
 
-protected:
-    bool loaded;
-
 public:
 
     virtual bool load() = 0;

@@ -31,7 +31,7 @@ public:
     
     void drawText();
 
-    bool load();
+    virtual bool load();
 };
 
 #endif /* Text_h */

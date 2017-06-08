@@ -11,12 +11,12 @@ public:
     Shape();
 	virtual ~Shape();
 
-	bool load();
-
     void generateTexcoords();
 
 	void addVertex(Vector3 vertex);
     void addVertex(float x, float y);
+    
+    virtual bool load();
 };
 
 #endif /* shape_h */

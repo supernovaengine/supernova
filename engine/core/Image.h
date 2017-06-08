@@ -17,7 +17,7 @@ public:
 
     virtual void setSize(int width, int height);
     
-    bool load();
+    virtual bool load();
 
 };
 

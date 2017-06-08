@@ -5,7 +5,6 @@
 
 PointRender::PointRender(){
     
-    loaded = false;
     lighting = false;
     hasfog = false;
     hasTextureRect = false;
@@ -17,6 +16,8 @@ PointRender::PointRender(){
     textureRects = NULL;
     pointSizes = NULL;
     pointColors = NULL;
+    
+    isLoaded = false;
     
     materialTexture = "";
 
@@ -91,6 +92,8 @@ void PointRender::fillPointProperties(){
     modelViewProjectionMatrix = points->getModelViewProjectMatrix();
     cameraPosition = points->getCameraPosition();
     
+    isLoaded = points->isLoaded();
+    
     materialTexture = points->getTexture();
 }
 
@@ -114,8 +117,6 @@ bool PointRender::load(){
         textured = false;
     }
     
-    loaded = true;
-    
     return true;
 }
 
@@ -124,4 +125,10 @@ bool PointRender::draw() {
     fillPointProperties();
 
     return true;
+}
+
+void PointRender::destroy(){
+    
+    fillPointProperties();
+    
 }

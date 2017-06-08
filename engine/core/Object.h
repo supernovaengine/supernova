@@ -18,6 +18,8 @@ private:
     void setDepth(bool depth);
     
 protected:
+    
+    bool loaded;
 
     std::vector<Object*> objects;
 
@@ -76,6 +78,8 @@ public:
     Scene* getScene();
     Object* getParent();
     
+    bool isLoaded();
+    
     void moveToFront();
     void moveToBack();
     void moveUp();
@@ -83,9 +87,9 @@ public:
 
     virtual void update();
 
-  	bool load();
-    bool draw();
-    void destroy();
+  	virtual bool load();
+    virtual bool draw();
+    virtual void destroy();
 
 };
 

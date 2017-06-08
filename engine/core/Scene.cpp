@@ -18,7 +18,6 @@ Scene::Scene() {
 }
 
 Scene::~Scene() {
-    destroy();
 }
 
 void Scene::addLight (Light* light){    

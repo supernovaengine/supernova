@@ -22,6 +22,8 @@ Object::Object(){
 }
 
 Object::~Object(){
+    if (parent)
+        parent->removeObject(this);
     destroy();
 }
 
@@ -341,9 +343,13 @@ void Object::updateMatrices(){
     }
 }
 
+bool Object::isLoaded(){
+    return loaded;
+}
+
 bool Object::reload(){
     
-    loaded = false;
+    destroy();
     
     return load();
 }
@@ -383,8 +389,6 @@ bool Object::draw(){
 }
 
 void Object::destroy(){
-
-    parent->removeObject(this);
 
     while (objects.size() > 0){
         objects.back()->destroy();

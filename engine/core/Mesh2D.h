@@ -18,7 +18,7 @@ protected:
 
 public:
     Mesh2D();
-    ~Mesh2D();
+    virtual ~Mesh2D();
 
     virtual void setSize(int width, int height);
     
@@ -37,7 +37,7 @@ public:
     void update();
     void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
-    bool draw();
+    virtual bool draw();
 };
 
 #endif /* _Mesh2D_hpp */

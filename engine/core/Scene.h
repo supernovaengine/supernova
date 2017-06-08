@@ -76,7 +76,7 @@ public:
     
     void setFog(Fog* fog);
     
-    void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    virtual void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
     void setCamera(Camera* camera);
     Camera* getCamera();
@@ -85,9 +85,9 @@ public:
 
     bool updateViewSize();
 
-	bool load();
-	bool draw();
-    void destroy();
+	virtual bool load();
+	virtual bool draw();
+    virtual void destroy();
 };
 
 #endif /* scene_h */

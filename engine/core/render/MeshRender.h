@@ -31,14 +31,14 @@ private:
     void fillMeshProperties();
     
 protected:
-
-    bool loaded;
+    
     bool lighting;
     bool hasfog;
     bool hasTextureRect;
 
     std::unordered_map<Submesh*, SubmeshStruct> submeshesRender;
     
+    //-------begin mesh properties-------
     SceneRender* sceneRender;
     std::vector<Vector3>* vertices;
     std::vector<Vector2>* texcoords;
@@ -50,9 +50,12 @@ protected:
     Matrix4 normalMatrix;
     Vector3 cameraPosition;
     
+    bool isLoaded;
     bool isSky;
     bool isDynamic;
+    
     int primitiveMode;
+    //------------end------------
     
 public:
     
@@ -68,7 +71,7 @@ public:
     
     virtual bool load();
     virtual bool draw();
-    virtual void destroy() = 0;
+    virtual void destroy();
     
 };
 

@@ -32,8 +32,8 @@ public:
 
     void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
     
-    bool load();
-    bool draw();
+    virtual bool load();
+    virtual bool draw();
     
 };
 

@@ -54,9 +54,9 @@ public:
 
     bool render();
 
-    bool load();
-    bool draw();
-    void destroy();
+    virtual bool load();
+    virtual bool draw();
+    virtual void destroy();
 
 };
 

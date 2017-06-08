@@ -6,7 +6,6 @@ Button::Button(): GUIObject(){
 }
 
 Button::~Button(){
-    
 }
 
 void GUIObject::onTouchPress(float x, float y){

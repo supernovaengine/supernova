@@ -241,9 +241,12 @@ bool Points::load(){
         normalizeTextureRects();
     }
     
-    renderManager.getRender()->load();
+    bool renderloaded = renderManager.getRender()->load();
 
-    return ConcreteObject::load();
+    if (renderloaded)
+        return ConcreteObject::load();
+    else
+        return false;
 }
 
 bool Points::draw(){
@@ -253,11 +256,13 @@ bool Points::draw(){
 
 
 void Points::destroy(){
+    
+    ConcreteObject::destroy();
+    
+    renderManager.getRender()->destroy();
+    
     for (int i=0; i < textureRects.size(); i++){
         delete textureRects[i];
     }
-
-    renderManager.getRender()->destroy();
-
-    ConcreteObject::destroy();
+    
 }

@@ -10,7 +10,7 @@ Mesh::Mesh(): ConcreteObject(){
 }
 
 Mesh::~Mesh(){
-    destroy();
+
 }
 
 std::vector<Vector3>* Mesh::getVertices(){
@@ -134,9 +134,12 @@ bool Mesh::load(){
     
     renderManager.getRender()->setMesh(this);
 
-    renderManager.getRender()->load();
-
-    return ConcreteObject::load();
+    bool renderloaded = renderManager.getRender()->load();
+    
+    if (renderloaded)
+        return ConcreteObject::load();
+    else
+        return false;
 }
 
 bool Mesh::draw(){

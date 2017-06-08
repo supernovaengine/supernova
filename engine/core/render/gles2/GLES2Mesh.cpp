@@ -23,27 +23,27 @@ GLES2Mesh::~GLES2Mesh() {
 
 void GLES2Mesh::updateVertices(){
     MeshRender::updateVertices();
-    if (loaded)
+    if (isLoaded)
         GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, vertices->size() * 3 * sizeof(GLfloat), &vertices->front());
 }
 
 void GLES2Mesh::updateTexcoords(){
     MeshRender::updateTexcoords();
-    if (loaded)
+    if (isLoaded)
         if (texcoords)
             GLES2Util::updateVBO(uvBuffer, GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front());
 }
 
 void GLES2Mesh::updateNormals(){
     MeshRender::updateNormals();
-    if (loaded)
+    if (isLoaded)
         if (lighting && normals)
             GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
 }
 
 void GLES2Mesh::updateIndices(){
     MeshRender::updateIndices();
-    if (loaded){
+    if (isLoaded){
         for (unsigned int i = 0; i < submeshes->size(); i++){
             if (submeshesRender[submeshes->at(i)].indicesSizes > 0){
                 std::vector<unsigned int>* gIndices = submeshes->at(i)->getIndices();
@@ -162,7 +162,7 @@ bool GLES2Mesh::draw() {
         return false;
     }
 
-    if (!loaded){
+    if (!isLoaded){
         return false;
     }
 
@@ -267,7 +267,10 @@ bool GLES2Mesh::draw() {
 }
 
 void GLES2Mesh::destroy(){
-    if (loaded){
+    
+    MeshRender::destroy();
+    
+    if (isLoaded){
         glDeleteBuffers(1, &vertexBuffer);
         if (texcoords){
             glDeleteBuffers(1, &uvBuffer);
@@ -289,5 +292,4 @@ void GLES2Mesh::destroy(){
         gProgram.reset();
         ProgramManager::deleteUnused();
     }
-    loaded = false;
 }

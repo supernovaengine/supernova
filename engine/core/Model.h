@@ -18,7 +18,7 @@ public:
     Model(const char * path);
     virtual ~Model();
 
-    bool load();
+    virtual bool load();
 
 };
 

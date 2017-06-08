@@ -6,7 +6,6 @@
 
 MeshRender::MeshRender(){
 
-    loaded = false;
     lighting = false;
     hasfog = false;
     hasTextureRect = false;
@@ -15,8 +14,10 @@ MeshRender::MeshRender(){
 
     sceneRender = NULL;
 
+    isLoaded = false;
     isSky = false;
     isDynamic = false;
+    
     primitiveMode = 0;
 
 }
@@ -41,8 +42,10 @@ void MeshRender::updateNormals(){
 }
 
 void MeshRender::updateIndices(){
-    for (unsigned int i = 0; i < submeshes->size(); i++){
-        submeshesRender[submeshes->at(i)].indicesSizes = (int)submeshes->at(i)->getIndices()->size();
+    if (isLoaded){
+        for (unsigned int i = 0; i < submeshes->size(); i++){
+            submeshesRender[submeshes->at(i)].indicesSizes = (int)submeshes->at(i)->getIndices()->size();
+        }
     }
 }
 
@@ -83,9 +86,12 @@ void MeshRender::fillMeshProperties(){
     normalMatrix = mesh->getNormalMatrix();
     cameraPosition = mesh->getCameraPosition();
     
+    isLoaded = mesh->isLoaded();
     isSky = mesh->isSky();
     isDynamic = mesh->isDynamic();
+    
     primitiveMode = mesh->getPrimitiveMode();
+    
 }
 
 bool MeshRender::load(){
@@ -114,8 +120,6 @@ bool MeshRender::load(){
         }
     }
 
-    loaded = true;
-
     return true;
 }
 
@@ -124,4 +128,10 @@ bool MeshRender::draw() {
     fillMeshProperties();
 
     return true;
+}
+
+void MeshRender::destroy() {
+    
+    fillMeshProperties();
+    
 }
