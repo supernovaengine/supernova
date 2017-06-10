@@ -12,6 +12,9 @@ class Scene;
 class Object: public Render {
 
 private:
+    
+    bool firstLoad;
+    
     void setSceneAndConfigure(Scene* scene);
     void removeScene();
     int findObject(Object* object);
@@ -43,6 +46,7 @@ protected:
     Quaternion worldRotation;
     
     bool reload();
+
     virtual void updateMatrices();
 
 public:

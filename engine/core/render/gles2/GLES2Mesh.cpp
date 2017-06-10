@@ -111,7 +111,7 @@ bool GLES2Mesh::load() {
     uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
     uColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_Color");
     
-    
+    submeshesIndices.clear();
     for (unsigned int i = 0; i < submeshes->size(); i++){
         if (submeshesRender[submeshes->at(i)].indicesSizes > 0){
             std::vector<unsigned int>* gIndices = submeshes->at(i)->getIndices();

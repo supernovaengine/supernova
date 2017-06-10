@@ -7,6 +7,8 @@
 
 Object::Object(){
     loaded = false;
+    firstLoad = false;
+    
     parent = NULL;
     scene = NULL;
 
@@ -22,6 +24,10 @@ Object::Object(){
 }
 
 Object::~Object(){
+    
+    if (parent)
+        parent->removeObject(this);
+    
     destroy();
 }
 
@@ -78,6 +84,8 @@ void Object::addObject(Object* obj){
         obj->viewProjectionMatrix = viewProjectionMatrix;
         obj->cameraPosition = cameraPosition;
         obj->modelViewProjectionMatrix = modelViewProjectionMatrix;
+        
+        obj->firstLoad = false;
         
         if (scene != NULL)
             obj->setSceneAndConfigure(scene);
@@ -364,6 +372,7 @@ bool Object::load(){
     }
 
     loaded = true;
+    firstLoad = true;
 
     return true;
 }
@@ -377,9 +386,13 @@ bool Object::draw(){
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
         if ((*it)->scene != (*it)){
-            if (!(*it)->loaded)
+            
+            if (!(*it)->firstLoad)
                 (*it)->load();
-            (*it)->draw();
+            
+            if ((*it)->loaded)
+                (*it)->draw();
+            
         }
     }
 
@@ -387,12 +400,10 @@ bool Object::draw(){
 }
 
 void Object::destroy(){
-    
-    if (parent)
-        parent->removeObject(this);
 
-    while (objects.size() > 0){
-        objects.back()->destroy();
+    std::vector<Object*>::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it){
+        (*it)->destroy();
     }
 
     loaded = false;

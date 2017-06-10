@@ -38,7 +38,6 @@ void ConcreteObject::setTexture(std::string texture){
         
         if (loaded){
             reload();
-            TextureManager::deleteUnused();
         }
         
     }

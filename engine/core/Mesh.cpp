@@ -11,6 +11,7 @@ Mesh::Mesh(): ConcreteObject(){
 
 Mesh::~Mesh(){
     destroy();
+    removeAllSubmeshes();
 }
 
 std::vector<Vector3>* Mesh::getVertices(){
@@ -151,6 +152,4 @@ void Mesh::destroy(){
     ConcreteObject::destroy();
     
     renderManager.getRender()->destroy();
-    
-    removeAllSubmeshes();
 }
