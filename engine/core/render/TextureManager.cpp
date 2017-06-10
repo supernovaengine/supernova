@@ -4,6 +4,7 @@
 #include "Engine.h"
 #include "image/ColorType.h"
 #include "gles2/GLES2Texture.h"
+#include "platform/Log.h"
 
 
 std::unordered_map<std::string, TextureManager::TextureStore> TextureManager::textures;
@@ -42,10 +43,14 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
     std::shared_ptr<TextureRender> texturePtr(texture);
 
     bool useAlpha = false;
-    if (textureFile->getColorFormat() == S_COLOR_GRAY_ALPHA || textureFile->getColorFormat() == S_COLOR_RGB_ALPHA)
+    if (textureFile->getColorFormat() == S_COLOR_GRAY_ALPHA ||
+        textureFile->getColorFormat() == S_COLOR_RGB_ALPHA ||
+        textureFile->getColorFormat() == S_COLOR_ALPHA)
         useAlpha = true;
 
     textures[id] = {texturePtr, useAlpha, textureFile->getWidth(), textureFile->getHeight()};
+    
+    Log::Debug(LOG_TAG, "Load texture (texture map size: %lu)", textures.size());
 
     return textures[id].value;
 }
@@ -81,6 +86,8 @@ std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::
         delete (*it);
     }
     
+    Log::Debug(LOG_TAG, "Load texture cube (texture map size: %lu)", textures.size());
+    
     return textures[id].value;
 }
 
@@ -103,6 +110,8 @@ void TextureManager::deleteUnused(){
         textures.erase(remove);
         remove = findToRemove();
     }
+    
+    Log::Debug(LOG_TAG, "Delete texture (texture map size: %lu)", textures.size());
 
 }
 

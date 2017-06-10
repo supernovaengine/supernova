@@ -263,4 +263,6 @@ void GLES2Point::destroy(){
         gProgram.reset();
         ProgramManager::deleteUnused();
     }
+    
+    PointRender::destroy();
 }

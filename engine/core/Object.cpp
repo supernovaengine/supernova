@@ -22,8 +22,6 @@ Object::Object(){
 }
 
 Object::~Object(){
-    if (parent)
-        parent->removeObject(this);
     destroy();
 }
 
@@ -389,6 +387,9 @@ bool Object::draw(){
 }
 
 void Object::destroy(){
+    
+    if (parent)
+        parent->removeObject(this);
 
     while (objects.size() > 0){
         objects.back()->destroy();

@@ -268,8 +268,6 @@ bool GLES2Mesh::draw() {
 
 void GLES2Mesh::destroy(){
     
-    MeshRender::destroy();
-    
     if (isLoaded){
         glDeleteBuffers(1, &vertexBuffer);
         if (texcoords){
@@ -292,4 +290,6 @@ void GLES2Mesh::destroy(){
         gProgram.reset();
         ProgramManager::deleteUnused();
     }
+    
+    MeshRender::destroy();
 }

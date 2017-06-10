@@ -10,7 +10,7 @@ Mesh::Mesh(): ConcreteObject(){
 }
 
 Mesh::~Mesh(){
-
+    destroy();
 }
 
 std::vector<Vector3>* Mesh::getVertices(){
