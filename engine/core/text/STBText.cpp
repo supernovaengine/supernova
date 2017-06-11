@@ -55,7 +55,6 @@ bool STBText::load(std::string font){
 
     unsigned int textureSize = atlasWidth * atlasHeight * sizeof(unsigned char);
     TextureFile* textureFile  = new TextureFile(atlasWidth, atlasHeight, textureSize, S_COLOR_ALPHA, 8, (void*)atlasData);
-    textureFile->flipVertical();
     TextureManager::loadTexture(textureFile, font);
 
     delete[] atlasData;
@@ -81,14 +80,6 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
         if (intchar >= firstChar && intchar <= lastChar) {
             stbtt_aligned_quad quad;
             stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, intchar - firstChar, &offsetX, &offsetY, &quad, 1);
-
-            float auxt0 = quad.t0;
-            quad.t0 = 1 - quad.t1;
-            quad.t1 = 1 - auxt0;
-            
-            float auxy0 = quad.y0;
-            quad.y0 = -quad.y1;
-            quad.y1 = -auxy0;
             
             vertices->push_back(Vector3(quad.x0, quad.y0, 0));
             vertices->push_back(Vector3(quad.x1, quad.y0, 0));

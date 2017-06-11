@@ -5,7 +5,7 @@
 
 TextureFile* STBImageReader::getRawImage(FileData* filedata){
     
-    stbi_set_flip_vertically_on_load(true);
+    //stbi_set_flip_vertically_on_load(true);
     
     int x,y,channels;
     

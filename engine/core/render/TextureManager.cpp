@@ -69,7 +69,6 @@ std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::
         image.loadRawImage(relative_paths[i].c_str());
         textureFiles.push_back(new TextureFile(*image.getRawImage()));
         textureFiles.back()->resamplePowerOfTwo();
-        textureFiles.back()->flipVertical();
         if (textureFiles.back()->getColorFormat() == S_COLOR_GRAY_ALPHA || textureFiles.back()->getColorFormat() == S_COLOR_RGB_ALPHA)
             useAlpha = true;
     }

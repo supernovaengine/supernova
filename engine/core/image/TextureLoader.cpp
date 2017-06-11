@@ -20,7 +20,7 @@ void TextureLoader::loadRawImage(std::string relative_path) {
     
     assert(relative_path != "");
     
-    //Texture data orientation is bottom left (OpenGL defaults)
+    //Texture data orientation is top left (first loaded bytes as lower-valued V coordinates)
     
     FileData* filedata = new FileData();
     filedata->open(relative_path.c_str());

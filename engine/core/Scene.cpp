@@ -177,7 +177,7 @@ bool Scene::updateViewSize(){
     
     bool status = sceneManager.getRender()->viewSize(Rect(viewX, viewY, viewWidth, viewHeight));
     if (this->camera != NULL){
-        camera->updateScreenSize();
+        camera->updateAutomaticSizes();
     }
     
     std::vector<Scene*>::iterator it;

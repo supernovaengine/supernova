@@ -10,8 +10,8 @@ Camera::Camera() : Object(){
     //ORTHO
     left = 0;
     right = Engine::getCanvasWidth();
-    bottom = 0;
-    top = Engine::getCanvasHeight();
+    top = 0;
+    bottom = Engine::getCanvasHeight();
 
     //PERSPECTIVE
     y_fov = 0.75;
@@ -21,6 +21,8 @@ Camera::Camera() : Object(){
     far = 5000;
 
     projection = S_PERSPECTIVE;
+    
+    automatic = true;
 
     sceneObject = NULL;
 
@@ -61,6 +63,8 @@ Camera& Camera::operator=(const Camera &c){
 
     this->near = c.near;
     this->far = c.far;
+    
+    this->automatic = c.automatic;
 
     this->projection = c.projection;
 
@@ -108,16 +112,18 @@ int Camera::getProjection(){
     return projection;
 }
 
-void Camera::updateScreenSize(){
-    float newRight = Engine::getCanvasWidth();
-    float newTop = Engine::getCanvasHeight();
-    float newAspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
+void Camera::updateAutomaticSizes(){
+    if (automatic){
+        float newRight = Engine::getCanvasWidth();
+        float newBottom = Engine::getCanvasHeight();
+        float newAspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
 
-    if ((right != newRight) || (top !=newTop) || (aspect != newAspect)){
-        right = newRight;
-        top = newTop;
-        aspect = newAspect;
-        update();
+        if ((right != newRight) || (top !=newBottom) || (aspect != newAspect)){
+            right = newRight;
+            bottom = newBottom;
+            aspect = newAspect;
+            update();
+        }
     }
 }
 
@@ -131,6 +137,8 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
     this->top = top;
     this->near = near;
     this->far = far;
+    
+    automatic = false;
 
     update();
 }
@@ -143,6 +151,8 @@ void Camera::setPerspective(float y_fov, float aspect, float near, float far){
     this->aspect = aspect;
     this->near = near;
     this->far = far;
+    
+    automatic = false;
 
     update();
 }
