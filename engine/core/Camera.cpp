@@ -10,15 +10,16 @@ Camera::Camera() : Object(){
     //ORTHO
     left = 0;
     right = Engine::getCanvasWidth();
-    top = 0;
-    bottom = Engine::getCanvasHeight();
+    bottom = 0;
+    top = Engine::getCanvasHeight();
+    orthoNear = -10;
+    orthoFar = 10;
 
     //PERSPECTIVE
     y_fov = 0.75;
     aspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
-
-    near = 0.5;
-    far = 5000;
+    perspectiveNear = 0.5;
+    perspectiveFar = 5000;
 
     projection = S_PERSPECTIVE;
     
@@ -57,12 +58,13 @@ Camera& Camera::operator=(const Camera &c){
     this->right = c.right;
     this->bottom = c.bottom;
     this->top = c.top;
+    this->orthoNear = c.orthoNear;
+    this->orthoFar = c.orthoFar;
 
     this->y_fov = c.y_fov;
     this->aspect = c.aspect;
-
-    this->near = c.near;
-    this->far = c.far;
+    this->perspectiveNear = c.perspectiveNear;
+    this->perspectiveFar = c.perspectiveFar;
     
     this->automatic = c.automatic;
 
@@ -115,12 +117,12 @@ int Camera::getProjection(){
 void Camera::updateAutomaticSizes(){
     if (automatic){
         float newRight = Engine::getCanvasWidth();
-        float newBottom = Engine::getCanvasHeight();
+        float newTop = Engine::getCanvasHeight();
         float newAspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
 
-        if ((right != newRight) || (top !=newBottom) || (aspect != newAspect)){
+        if ((right != newRight) || (top != newTop) || (aspect != newAspect)){
             right = newRight;
-            bottom = newBottom;
+            top = newTop;
             aspect = newAspect;
             update();
         }
@@ -135,8 +137,8 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
     this->right = right;
     this->bottom = bottom;
     this->top = top;
-    this->near = near;
-    this->far = far;
+    this->orthoNear = near;
+    this->orthoFar = far;
     
     automatic = false;
 
@@ -149,8 +151,8 @@ void Camera::setPerspective(float y_fov, float aspect, float near, float far){
 
     this->y_fov = y_fov;
     this->aspect = aspect;
-    this->near = near;
-    this->far = far;
+    this->perspectiveNear = near;
+    this->perspectiveFar = far;
     
     automatic = false;
 
@@ -304,9 +306,9 @@ void Camera::update(){
     Object::update();
 
     if (projection == S_ORTHO){
-        projectionMatrix = Matrix4::orthoMatrix(left, right, bottom, top, near, far);
+        projectionMatrix = Matrix4::orthoMatrix(left, right, bottom, top, orthoNear, orthoFar);
     }else if (projection == S_PERSPECTIVE){
-        projectionMatrix = Matrix4::perspectiveMatrix(y_fov, aspect, near, far);
+        projectionMatrix = Matrix4::perspectiveMatrix(y_fov, aspect, perspectiveNear, perspectiveFar);
     }
 
     if (parent != NULL){

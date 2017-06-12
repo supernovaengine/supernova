@@ -30,12 +30,13 @@ protected:
     float right;
     float bottom;
     float top;
+    float orthoNear;
+    float orthoFar;
 
     float y_fov;
     float aspect;
-
-    float near;
-    float far;
+    float perspectiveNear;
+    float perspectiveFar;
 
     int projection;
     
