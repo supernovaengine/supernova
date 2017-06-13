@@ -1,8 +1,9 @@
 #ifndef camera_h
 #define camera_h
 
-#define S_ORTHO 1
-#define S_PERSPECTIVE 2
+#define S_CAMERA_2D 0
+#define S_CAMERA_ORTHO 1
+#define S_CAMERA_PERSPECTIVE 2
 
 
 #include "math/Matrix4.h"

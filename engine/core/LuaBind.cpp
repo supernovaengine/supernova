@@ -255,8 +255,9 @@ void LuaBind::bind(){
     .addFunction("moveForward", &Camera::moveForward)
     .addFunction("walkForward", &Camera::walkForward)
     .addFunction("slide", &Camera::slide)
-    .addConstant("ORTHO", S_ORTHO)
-    .addConstant("PERSPECTIVE", S_PERSPECTIVE)
+    .addConstant("CAMERA_2D", S_CAMERA_2D)
+    .addConstant("CAMERA_ORTHO", S_CAMERA_ORTHO)
+    .addConstant("CAMERA_PERSPECTIVE", S_CAMERA_PERSPECTIVE)
     .endClass()
 
     .beginExtendClass<Light, Object>("Light")

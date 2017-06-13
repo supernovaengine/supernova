@@ -190,7 +190,7 @@ bool Scene::updateViewSize(){
 
 void Scene::doCamera(){
     if (this->camera == NULL){
-        this->camera = new Camera(S_ORTHO);
+        this->camera = new Camera(S_CAMERA_2D);
         this->camera->setSceneObject(this);
     }
 }
@@ -198,7 +198,7 @@ void Scene::doCamera(){
 void Scene::resetSceneProperties(){
     useTransparency = false;
     useDepth = false;
-    if (camera->getProjection() == S_PERSPECTIVE){
+    if (camera->getProjection() == S_CAMERA_PERSPECTIVE){
         useDepth = true;
     }
 }

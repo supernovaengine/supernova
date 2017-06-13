@@ -21,7 +21,7 @@ Camera::Camera() : Object(){
     perspectiveNear = 0.5;
     perspectiveFar = 5000;
 
-    projection = S_PERSPECTIVE;
+    projection = S_CAMERA_PERSPECTIVE;
     
     automatic = true;
 
@@ -131,7 +131,7 @@ void Camera::updateAutomaticSizes(){
 
 void Camera::setOrtho(float left, float right, float bottom, float top, float near, float far){
 
-    projection = S_ORTHO;
+    projection = S_CAMERA_ORTHO;
 
     this->left = left;
     this->right = right;
@@ -147,7 +147,7 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
 
 void Camera::setPerspective(float y_fov, float aspect, float near, float far){
 
-    projection = S_PERSPECTIVE;
+    projection = S_CAMERA_PERSPECTIVE;
 
     this->y_fov = y_fov;
     this->aspect = aspect;
@@ -305,9 +305,11 @@ void Camera::update(){
 
     Object::update();
 
-    if (projection == S_ORTHO){
+    if (projection == S_CAMERA_2D){
+        projectionMatrix = Matrix4::orthoMatrix(left, right, top, bottom, orthoNear, orthoFar);
+    }else if (projection == S_CAMERA_ORTHO){
         projectionMatrix = Matrix4::orthoMatrix(left, right, bottom, top, orthoNear, orthoFar);
-    }else if (projection == S_PERSPECTIVE){
+    }else if (projection == S_CAMERA_PERSPECTIVE){
         projectionMatrix = Matrix4::perspectiveMatrix(y_fov, aspect, perspectiveNear, perspectiveFar);
     }
 
@@ -318,8 +320,12 @@ void Camera::update(){
         worldView = view;
         worldUp = up;
     }
-
-    viewMatrix = Matrix4::lookAtMatrix(worldPosition, worldView, worldUp);
+    
+    if (projection == S_CAMERA_2D){
+        viewMatrix.identity();
+    }else{
+        viewMatrix = Matrix4::lookAtMatrix(worldPosition, worldView, worldUp);
+    }
 
     viewProjectionMatrix = viewMatrix * projectionMatrix;
 
