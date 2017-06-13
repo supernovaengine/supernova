@@ -39,7 +39,7 @@ protected:
     float perspectiveNear;
     float perspectiveFar;
 
-    int projection;
+    int type;
     
     bool automatic;
 
@@ -49,7 +49,7 @@ public:
 
     Camera();
     Camera(const Camera &camera);
-    Camera(int projection);
+    Camera(int type);
     virtual ~Camera();
 
     Camera& operator=(const Camera &c);
@@ -62,8 +62,8 @@ public:
     void setUp(Vector3 up);
     Vector3 getUp();
 
-    void setProjection(int projection);
-    int getProjection();
+    void setType(int type);
+    int getType();
     
     void updateAutomaticSizes();
     

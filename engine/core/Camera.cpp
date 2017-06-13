@@ -21,7 +21,7 @@ Camera::Camera() : Object(){
     perspectiveNear = 0.5;
     perspectiveFar = 5000;
 
-    projection = S_CAMERA_PERSPECTIVE;
+    type = S_CAMERA_PERSPECTIVE;
     
     automatic = true;
 
@@ -33,8 +33,8 @@ Camera::Camera(const Camera &camera){
     (*this) = camera;
 }
 
-Camera::Camera(int projection): Camera(){
-    setProjection(projection);
+Camera::Camera(int type): Camera(){
+    setType(type);
 }
 
 Camera::~Camera() {
@@ -68,7 +68,7 @@ Camera& Camera::operator=(const Camera &c){
     
     this->automatic = c.automatic;
 
-    this->projection = c.projection;
+    this->type = c.type;
 
     return *this;
 }
@@ -103,15 +103,15 @@ Vector3 Camera::getUp(){
     return up;
 }
 
-void Camera::setProjection(int projection){
-    if (this->projection != projection){
-        this->projection = projection;
+void Camera::setType(int type){
+    if (this->type != type){
+        this->type = type;
         update();
     }
 }
 
-int Camera::getProjection(){
-    return projection;
+int Camera::getType(){
+    return type;
 }
 
 void Camera::updateAutomaticSizes(){
@@ -131,7 +131,7 @@ void Camera::updateAutomaticSizes(){
 
 void Camera::setOrtho(float left, float right, float bottom, float top, float near, float far){
 
-    projection = S_CAMERA_ORTHO;
+    type = S_CAMERA_ORTHO;
 
     this->left = left;
     this->right = right;
@@ -147,7 +147,7 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
 
 void Camera::setPerspective(float y_fov, float aspect, float near, float far){
 
-    projection = S_CAMERA_PERSPECTIVE;
+    type = S_CAMERA_PERSPECTIVE;
 
     this->y_fov = y_fov;
     this->aspect = aspect;
@@ -305,11 +305,11 @@ void Camera::update(){
 
     Object::update();
 
-    if (projection == S_CAMERA_2D){
+    if (type == S_CAMERA_2D){
         projectionMatrix = Matrix4::orthoMatrix(left, right, top, bottom, orthoNear, orthoFar);
-    }else if (projection == S_CAMERA_ORTHO){
+    }else if (type == S_CAMERA_ORTHO){
         projectionMatrix = Matrix4::orthoMatrix(left, right, bottom, top, orthoNear, orthoFar);
-    }else if (projection == S_CAMERA_PERSPECTIVE){
+    }else if (type == S_CAMERA_PERSPECTIVE){
         projectionMatrix = Matrix4::perspectiveMatrix(y_fov, aspect, perspectiveNear, perspectiveFar);
     }
 
@@ -321,7 +321,7 @@ void Camera::update(){
         worldUp = up;
     }
     
-    if (projection == S_CAMERA_2D){
+    if (type == S_CAMERA_2D){
         viewMatrix.identity();
     }else{
         viewMatrix = Matrix4::lookAtMatrix(worldPosition, worldView, worldUp);

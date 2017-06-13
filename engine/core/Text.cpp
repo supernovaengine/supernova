@@ -43,7 +43,7 @@ void Text::setFont(std::string font){
 void Text::setText(std::string text){
     this->text = text;
     if (loaded){
-        drawText();
+        createText();
         renderManager.getRender()->updateVertices();
         renderManager.getRender()->updateTexcoords();
         renderManager.getRender()->updateNormals();
@@ -55,7 +55,16 @@ void Text::setSize(int width, int height){
     Log::Error(LOG_TAG, "Can't set size of text");
 }
 
-void Text::drawText(){
+void Text::setInvert(bool invert){
+    Mesh2D::setInvert(invert);
+    if (loaded) {
+        createText();
+        renderManager.getRender()->updateVertices();
+        renderManager.getRender()->updateTexcoords();
+    }
+}
+
+void Text::createText(){
     vertices.clear();
     texcoords.clear();
     normals.clear();
@@ -63,7 +72,7 @@ void Text::drawText(){
     
     int textWidth, textHeight;
     
-    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &textWidth, &textHeight);
+    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &textWidth, &textHeight, invert);
     
     this->width = textWidth;
     this->height = textHeight;
@@ -72,10 +81,10 @@ void Text::drawText(){
 }
 
 bool Text::load(){
+    Mesh2D::load();
 
     stbtext->load(font);
+    createText();
     
-    drawText();
-    
-    return Mesh2D::load();
+    return true;
 }

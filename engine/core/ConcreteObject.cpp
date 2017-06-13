@@ -72,6 +72,7 @@ void ConcreteObject::update(){
 }
 
 bool ConcreteObject::load(){
+    Object::load();
 
     if (material.getTextures().size() > 0) {
         transparent = TextureManager::hasAlphaChannel(material.getTextures()[0]);
@@ -80,7 +81,7 @@ bool ConcreteObject::load(){
         setTransparency(true);
     }
 
-    return Object::load();
+    return true;
 }
 
 bool ConcreteObject::draw(){

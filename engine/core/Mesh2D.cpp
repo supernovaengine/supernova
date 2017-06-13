@@ -12,6 +12,7 @@ Mesh2D::Mesh2D(): Mesh(){
     this->billboardScaleFactor=100;
 
     this->clipping = false;
+    this->invert = false;
 }
 
 Mesh2D::~Mesh2D(){
@@ -51,6 +52,10 @@ void Mesh2D::setSize(int width, int height){
     this->height = height;
 }
 
+void Mesh2D::setInvert(bool invert){
+    this->invert = invert;
+}
+
 void Mesh2D::setBillboard(bool billboard){
     this->billboard = billboard;
 }
@@ -83,7 +88,16 @@ int Mesh2D::getHeight(){
     return height;
 }
 
+bool Mesh2D::load(){
+    if (scene && scene->getScene()->getOrientation() == S_ORIENTATION_Y_UP){
+        setInvert(true);
+    }
+
+    return Mesh::load();
+}
+
 bool Mesh2D::draw(){
+
     if (clipping) {
 
         float scaleX = scale.x;
@@ -96,13 +110,16 @@ bool Mesh2D::draw(){
         }
 
         int objScreenPosX = (int)(getWorldPosition().x * ((float) Engine::getScreenWidth() /
-                                                    (float) Engine::getCanvasWidth()));
+                                                          (float) Engine::getCanvasWidth()));
         int objScreenPosY = (int)(getWorldPosition().y * ((float) Engine::getScreenHeight() /
-                                                    (float) Engine::getCanvasHeight()));
+                                                          (float) Engine::getCanvasHeight()));
         int objScreenWidth = (int)(width * scaleX * ((float) Engine::getScreenWidth() /
-                                               (float) Engine::getCanvasWidth()));
+                                                     (float) Engine::getCanvasWidth()));
         int objScreenHeight = (int)(height * scaleY * ((float) Engine::getScreenHeight() /
-                                                 (float) Engine::getCanvasHeight()));
+                                                       (float) Engine::getCanvasHeight()));
+
+        if (scene && scene->getScene()->getOrientation() == S_ORIENTATION_Y_DOWN)
+            objScreenPosY = (float)Engine::getScreenHeight()-objScreenHeight-objScreenPosY;
 
         SceneRender* sceneRender = scene->getSceneRender();
 

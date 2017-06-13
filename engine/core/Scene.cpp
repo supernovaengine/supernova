@@ -131,6 +131,16 @@ Camera* Scene::getCamera(){
     return camera;
 }
 
+int Scene::getOrientation(){
+    if (this->camera != NULL){
+        if (this->camera->getType() != S_CAMERA_2D){
+            return S_ORIENTATION_Y_UP;
+        }
+    }
+
+    return S_ORIENTATION_Y_DOWN;
+}
+
 bool Scene::updateViewSize(){
     
     int viewX = 0;
@@ -198,7 +208,7 @@ void Scene::doCamera(){
 void Scene::resetSceneProperties(){
     useTransparency = false;
     useDepth = false;
-    if (camera->getProjection() == S_CAMERA_PERSPECTIVE){
+    if (camera->getType() == S_CAMERA_PERSPECTIVE){
         useDepth = true;
     }
 }

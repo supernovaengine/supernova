@@ -26,20 +26,22 @@ Image::~Image() {
 }
 
 void Image::setSize(int width, int height){
-    
-    if ((this->width != width || this->height != height) && this->width >= 0 && this->height >= 0){
-        
-        Mesh2D::setSize(width, height);
-        
+    Mesh2D::setSize(width, height);
+    if (loaded) {
         createVertices();
-        
         renderManager.getRender()->updateVertices();
         renderManager.getRender()->updateTexcoords();
         renderManager.getRender()->updateNormals();
         renderManager.getRender()->updateIndices();
-        
     }
+}
 
+void Image::setInvert(bool invert){
+    Mesh2D::setInvert(invert);
+    if (loaded) {
+        createVertices();
+        renderManager.getRender()->updateTexcoords();
+    }
 }
 
 void Image::createVertices(){
@@ -54,6 +56,13 @@ void Image::createVertices(){
     texcoords.push_back(Vector2(1.0f, 0.0f));
     texcoords.push_back(Vector2(1.0f, 1.0f));
     texcoords.push_back(Vector2(0.0f, 1.0f));
+
+    if (invert){
+        for (int i = 0; i < texcoords.size(); i++){
+            texcoords[i].y = 1 - texcoords[i].y;
+        }
+    }
+
 
     static const unsigned int indices_array[] = {
         0,  1,  2,
@@ -72,6 +81,7 @@ void Image::createVertices(){
 }
 
 bool Image::load(){
+    Mesh2D::load();
 
     if (submeshes[0]->getMaterial()->getTextures().size() > 0 && this->width == 0 && this->height == 0){
         TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
@@ -80,5 +90,5 @@ bool Image::load(){
     }
 
     createVertices();
-    return Mesh2D::load();
+    return true;
 }

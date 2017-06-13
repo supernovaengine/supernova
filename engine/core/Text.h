@@ -24,12 +24,13 @@ public:
     bool operator == ( const char* v ) const;
     bool operator != ( const char* v ) const;
     
-    void setSize(int width, int height);
+    virtual void setSize(int width, int height);
+    virtual void setInvert(bool invert);
     
     void setFont(std::string font);
     void setText(std::string text);
     
-    void drawText();
+    void createText();
 
     virtual bool load();
 };

@@ -48,7 +48,7 @@ void Shape::generateTexcoords(){
     for ( unsigned int i = 0; i < vertices.size(); i++){
         u = (vertices[i].x - min_X) * k_X;
         v = (vertices[i].y - min_Y) * k_Y;
-        texcoords.push_back(Vector2(u, v));
+        texcoords.push_back(Vector2(u, 1.0 - v));
     }
 
 }

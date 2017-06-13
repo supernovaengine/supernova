@@ -16,6 +16,7 @@ public:
     virtual ~Image();
 
     virtual void setSize(int width, int height);
+    virtual void setInvert(bool invert);
     
     virtual bool load();
 

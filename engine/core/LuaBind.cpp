@@ -244,7 +244,7 @@ void LuaBind::bind(){
     .addFunction("setUp", (void (Camera::*)(const float, const float, const float))&Camera::setUp)
     .addFunction("getUp", &Camera::getUp)
     .addProperty("up", &Camera::getUp, (void (Camera::*)(Vector3))&Camera::setUp)
-    .addFunction("setProjection", &Camera::setProjection)
+    .addFunction("setType", &Camera::setType)
     .addFunction("setPerspective", &Camera::setPerspective)
     .addFunction("setOrtho", &Camera::setOrtho)
     .addFunction("pointsToRay", &Camera::pointsToRay)

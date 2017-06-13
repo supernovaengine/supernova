@@ -1,6 +1,9 @@
 #ifndef scene_h
 #define scene_h
 
+#define S_ORIENTATION_Y_DOWN 1
+#define S_ORIENTATION_Y_UP 2
+
 #include "Object.h"
 #include "Camera.h"
 #include "Render.h"
@@ -75,6 +78,8 @@ public:
     bool isUseTransparency();
     
     void setFog(Fog* fog);
+
+	int getOrientation();
     
     virtual void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
