@@ -47,7 +47,7 @@ protected:
     
     bool reload();
 
-    virtual void updateMatrices();
+    virtual void updateMVPMatrix();
 
 public:
     Object();
@@ -56,7 +56,6 @@ public:
     void addObject(Object* obj);
     void removeObject(Object* obj);
 
-    virtual void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
     Matrix4 getModelMatrix();
     Matrix4 getModelViewProjectMatrix();
     Vector3 getCameraPosition();
@@ -88,8 +87,9 @@ public:
     void moveToBack();
     void moveUp();
     void moveDown();
-
-    virtual void update();
+    
+    virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    virtual void updateMatrix();
 
   	virtual bool load();
     virtual bool draw();

@@ -138,14 +138,14 @@ void Points::normalizeTextureRects(){
     }
 }
 
-void Points::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    ConcreteObject::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+void Points::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    ConcreteObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     updatePointScale();
 }
 
-void Points::update(){
-    ConcreteObject::update();
+void Points::updateMatrix(){
+    ConcreteObject::updateMatrix();
 
     if (this->viewMatrix){
        this->normalMatrix = viewMatrix->getTranspose();

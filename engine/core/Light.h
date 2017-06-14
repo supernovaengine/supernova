@@ -39,7 +39,7 @@ public:
     void setPower(float power);
     void setColor(Vector3 color);
 
-    virtual void update();
+    virtual void updateMatrix();
 
 };
 

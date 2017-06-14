@@ -21,9 +21,6 @@ public:
     Mesh2D();
     virtual ~Mesh2D();
 
-    virtual void setSize(int width, int height);
-    virtual void setInvert(bool invert);
-
     void setBillboard(bool billboard);
     void setFixedSizeBillboard(bool fixedSizeBillboard);
     void setBillboardScaleFactor(float billboardScaleFactor);
@@ -35,9 +32,12 @@ public:
 
     void setHeight(int height);
     int getHeight();
-
-    void update();
-    void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    
+    virtual void setSize(int width, int height);
+    virtual void setInvert(bool invert);
+    
+    virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    virtual void updateMatrix();
 
     virtual bool load();
     virtual bool draw();

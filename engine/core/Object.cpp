@@ -90,7 +90,7 @@ void Object::addObject(Object* obj){
         if (scene != NULL)
             obj->setSceneAndConfigure(scene);
 
-        obj->update();
+        obj->updateMatrix();
     }else{
         Log::Error(LOG_TAG, "Object has a parent already");
     }
@@ -128,7 +128,7 @@ void Object::removeObject(Object* obj){
     obj->viewProjectionMatrix = NULL;
     obj->cameraPosition = NULL;
     
-    obj->update();
+    obj->updateMatrix();
 }
 
 void Object::setDepth(bool depth){
@@ -144,7 +144,7 @@ void Object::setPosition(const float x, const float y, const float z){
 void Object::setPosition(Vector3 position){
     if (this->position != position){
         this->position = position;
-        update();
+        updateMatrix();
     }
 }
 
@@ -169,7 +169,7 @@ void Object::setRotation(const float xAngle, const float yAngle, const float zAn
 void Object::setRotation(Quaternion rotation){
     if (this->rotation != rotation){
         this->rotation = rotation;
-        update();
+        updateMatrix();
     }
 }
 
@@ -188,7 +188,7 @@ void Object::setScale(const float factor){
 void Object::setScale(Vector3 scale){
     if (this->scale != scale){
         this->scale = scale;
-        update();
+        updateMatrix();
     }
 }
 
@@ -203,7 +203,7 @@ void Object::setCenter(const float x, const float y, const float z){
 void Object::setCenter(Vector3 center){
     if (this->center != center){
         this->center = center;
-        update();
+        updateMatrix();
     }
 }
 
@@ -232,22 +232,6 @@ Scene* Object::getScene(){
 
 Object* Object::getParent(){
     return parent;
-}
-
-void Object::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-
-    this->viewMatrix = viewMatrix;
-    this->projectionMatrix = projectionMatrix;
-    this->viewProjectionMatrix = viewProjectionMatrix;
-    this->cameraPosition = cameraPosition;
-
-    updateMatrices();
-
-    std::vector<Object*>::iterator it;
-    for (it = objects.begin(); it != objects.end(); ++it) {
-        (*it)->transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
-    }
-
 }
 
 int Object::findObject(Object* object){
@@ -315,7 +299,23 @@ void Object::moveUp(){
     }
 }
 
-void Object::update(){
+void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    
+    this->viewMatrix = viewMatrix;
+    this->projectionMatrix = projectionMatrix;
+    this->viewProjectionMatrix = viewProjectionMatrix;
+    this->cameraPosition = cameraPosition;
+    
+    updateMVPMatrix();
+    
+    std::vector<Object*>::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it) {
+        (*it)->updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+    }
+    
+}
+
+void Object::updateMatrix(){
 
     Matrix4 centerMatrix = Matrix4::translateMatrix(-center);
     Matrix4 scaleMatrix = Matrix4::scaleMatrix(scale);
@@ -334,16 +334,16 @@ void Object::update(){
         worldPosition = position;
     }
 
-    updateMatrices();
+    updateMVPMatrix();
 
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
-        (*it)->update();
+        (*it)->updateMatrix();
     }
 
 }
 
-void Object::updateMatrices(){
+void Object::updateMVPMatrix(){
     if (this->viewProjectionMatrix != NULL){
         this->modelViewProjectionMatrix = this->modelMatrix * (*this->viewProjectionMatrix);
     }

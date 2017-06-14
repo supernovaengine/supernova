@@ -59,14 +59,16 @@ void ConcreteObject::setTransparency(bool transparency){
     }
 }
 
-void ConcreteObject::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    Object::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+void ConcreteObject::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    Object::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     updateDistanceToCamera();
 }
 
-void ConcreteObject::update(){
-    Object::update();
+void ConcreteObject::updateMatrix(){
+    Object::updateMatrix();
+    
+    this->normalMatrix.identity();
 
     updateDistanceToCamera();
 }

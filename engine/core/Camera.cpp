@@ -80,7 +80,7 @@ void Camera::setView(const float x, const float y, const float z){
 void Camera::setView(Vector3 view){
     if (this->view != view){
         this->view = view;
-        update();
+        updateMatrix();
     }
 }
 
@@ -95,7 +95,7 @@ void Camera::setUp(const float x, const float y, const float z){
 void Camera::setUp(Vector3 up){
     if (this->up != up){
         this->up = up;
-        update();
+        updateMatrix();
     }
 }
 
@@ -106,7 +106,7 @@ Vector3 Camera::getUp(){
 void Camera::setType(int type){
     if (this->type != type){
         this->type = type;
-        update();
+        updateMatrix();
     }
 }
 
@@ -124,7 +124,7 @@ void Camera::updateAutomaticSizes(){
             right = newRight;
             top = newTop;
             aspect = newAspect;
-            update();
+            updateMatrix();
         }
     }
 }
@@ -142,7 +142,7 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
     
     automatic = false;
 
-    update();
+    updateMatrix();
 }
 
 void Camera::setPerspective(float y_fov, float aspect, float near, float far){
@@ -156,7 +156,7 @@ void Camera::setPerspective(float y_fov, float aspect, float near, float far){
     
     automatic = false;
 
-    update();
+    updateMatrix();
 }
 
 void Camera::rotateView(float angle){
@@ -169,7 +169,7 @@ void Camera::rotateView(float angle){
 
         view = Vector3(viewCenter.x + position.x, viewCenter.y + position.y, viewCenter.z + position.z);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -183,7 +183,7 @@ void Camera::rotatePosition(float angle){
 
         position = Vector3(positionCenter.x + view.x, positionCenter.y + view.y, positionCenter.z + view.z);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -197,7 +197,7 @@ void Camera::elevateView(float angle){
 
         view = Vector3(viewCenter.x + position.x, viewCenter.y + position.y, viewCenter.z + position.z);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -211,7 +211,7 @@ void Camera::elevatePosition(float angle){
 
         position = Vector3(positionCenter.x + view.x, positionCenter.y + view.y, positionCenter.z + view.z);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -224,7 +224,7 @@ void Camera::moveForward(float distance){
         view = view + (viewCenter.normalize() * distance);
         position = position + (viewCenter.normalize() * distance);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -239,7 +239,7 @@ void Camera::walkForward(float distance){
         view = view + (walkVector.normalize() * distance);
         position = position + (walkVector.normalize() * distance);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -252,7 +252,7 @@ void Camera::slide(float distance){
         view = view + (slideVector.normalize() * distance);
         position = position + (slideVector.normalize() * distance);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -301,11 +301,10 @@ void Camera::setSceneObject(Object* scene){
     this->sceneObject = scene;
 }
 
-void Camera::update(){
+void Camera::updateMatrix(){
+    Object::updateMatrix();
 
-    Object::update();
-
-    if (type == S_CAMERA_2D){
+    if (type == S_CAMERA_2D){ //use top-left orientation
         projectionMatrix = Matrix4::orthoMatrix(left, right, top, bottom, orthoNear, orthoFar);
     }else if (type == S_CAMERA_ORTHO){
         projectionMatrix = Matrix4::orthoMatrix(left, right, bottom, top, orthoNear, orthoFar);
@@ -330,7 +329,6 @@ void Camera::update(){
     viewProjectionMatrix = viewMatrix * projectionMatrix;
 
     if (sceneObject != NULL){
-        sceneObject->transform(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
+        sceneObject->updateVPMatrix(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
     }
-
 }

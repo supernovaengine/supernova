@@ -64,7 +64,7 @@ public:
 
 	Scene();
 	virtual ~Scene();
-
+    
 	SceneRender* getSceneRender();
 
     void setAmbientLight(Vector3 ambientLight);
@@ -80,8 +80,6 @@ public:
     void setFog(Fog* fog);
 
 	int getOrientation();
-    
-    virtual void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
     void setCamera(Camera* camera);
     Camera* getCamera();
@@ -89,6 +87,8 @@ public:
     void doCamera();
 
     bool updateViewSize();
+    
+    virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
 	virtual bool load();
 	virtual bool draw();

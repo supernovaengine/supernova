@@ -82,7 +82,7 @@ public:
 
     void setSceneObject(Object* scene);
 
-    virtual void update();
+    virtual void updateMatrix();
 
     Matrix4* getViewMatrix();
     Matrix4* getProjectionMatrix();

@@ -14,7 +14,7 @@ SpotLight::~SpotLight(){
 void SpotLight::setTarget(Vector3 target){
     if (this->target != target){
         this->target = target;
-        update();
+        updateMatrix();
     }
 }
 

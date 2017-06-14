@@ -27,7 +27,6 @@ protected:
     
     void addSubmesh(Submesh* submesh);
     
-
     void sortTransparentSubmeshes();
     
 public:
@@ -49,10 +48,10 @@ public:
     void addNormal(Vector3 normal);
     void addTexcoord(Vector2 texcoord);
 
-    void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
-    void update();
+    virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    virtual void updateMatrix();
 
-    bool render();
+    virtual bool render();
 
     virtual bool load();
     virtual bool draw();

@@ -16,7 +16,7 @@ private:
     Matrix4 skyViewMatrix;
 
 protected:
-    void updateMatrices();
+    virtual void updateMVPMatrix();
     
 public:
     SkyBox();
@@ -30,7 +30,7 @@ public:
     void setTextureUp(std::string texture);
     void setTextureDown(std::string texture);
 
-    void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
     
     virtual bool load();
     virtual bool draw();

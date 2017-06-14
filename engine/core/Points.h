@@ -48,9 +48,6 @@ public:
     Points();
     virtual ~Points();
 
-    void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
-    void update();
-
     void setSizeAttenuation(bool sizeAttenuation);
     void setPointScaleFactor(float pointScaleFactor);
     void setPointSizeReference(int pointSizeReference);
@@ -76,11 +73,15 @@ public:
     std::vector<Rect*>* getTextureRects();
     std::vector<float>* getPointSizes();
     std::vector<Vector4>* getColors();
+    
+    virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    virtual void updateMatrix();
 
-    bool render();
-    bool load();
-    bool draw();
-    void destroy();
+    virtual bool render();
+    
+    virtual bool load();
+    virtual bool draw();
+    virtual void destroy();
 };
 
 

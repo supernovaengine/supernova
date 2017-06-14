@@ -19,7 +19,7 @@ Mesh2D::~Mesh2D(){
 
 }
 
-void Mesh2D::update(){
+void Mesh2D::updateMatrix(){
 
     if (billboard) {
         if (viewMatrix) {
@@ -35,15 +35,15 @@ void Mesh2D::update(){
         }
     }
 
-    Mesh::update();
+    Mesh::updateMatrix();
 }
 
-void Mesh2D::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+void Mesh2D::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
 
-    Mesh::transform( viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+    Mesh::updateVPMatrix( viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     if (billboard) {
-        update();
+        updateMatrix();
     }
 }
 

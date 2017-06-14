@@ -31,9 +31,9 @@ public:
     std::string getTexture();
 
     void setTransparency(bool transparency);
-
-    void transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
-    void update();
+    
+    virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+    virtual void updateMatrix();
 
     virtual bool render() = 0;
 

@@ -58,13 +58,13 @@ SkyBox::SkyBox(): Mesh() {
 SkyBox::~SkyBox() {
 }
 
-void SkyBox::updateMatrices(){
+void SkyBox::updateMVPMatrix(){
     if (this->viewProjectionMatrix != NULL){
         this->modelViewProjectionMatrix = (*this->viewProjectionMatrix);
     }
 }
 
-void SkyBox::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition) {
+void SkyBox::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition) {
 
     skyViewMatrix = *viewMatrix;
 
@@ -83,7 +83,7 @@ void SkyBox::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* 
 
     this->cameraPosition = cameraPosition;
 
-    updateMatrices();
+    updateMVPMatrix();
 }
 
 bool SkyBox::load(){

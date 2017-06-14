@@ -117,8 +117,8 @@ bool Scene::isUseTransparency(){
     return useTransparency;
 }
 
-void Scene::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    Object::transform(getCamera()->getViewMatrix(), getCamera()->getProjectionMatrix(), getCamera()->getViewProjectionMatrix(), new Vector3(getCamera()->getWorldPosition()));
+void Scene::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    Object::updateVPMatrix(getCamera()->getViewMatrix(), getCamera()->getProjectionMatrix(), getCamera()->getViewProjectionMatrix(), new Vector3(getCamera()->getWorldPosition()));
 }
 
 void Scene::setCamera(Camera* camera){
@@ -242,8 +242,8 @@ bool Scene::load(){
     resetSceneProperties();
     Object::load();
 
-    Object::update();
-    camera->update();
+    Object::updateMatrix();
+    camera->updateMatrix();
 
     return true;
 }

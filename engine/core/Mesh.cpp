@@ -97,15 +97,15 @@ void Mesh::sortTransparentSubmeshes(){
 
 }
 
-void Mesh::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    ConcreteObject::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+void Mesh::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    ConcreteObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     sortTransparentSubmeshes();
 }
 
-void Mesh::update(){
-    ConcreteObject::update();
-
+void Mesh::updateMatrix(){
+    ConcreteObject::updateMatrix();
+    
     this->normalMatrix = modelMatrix.getInverse().getTranspose();
 
     sortTransparentSubmeshes();
