@@ -111,10 +111,6 @@ void Mesh::updateMatrix(){
     sortTransparentSubmeshes();
 }
 
-bool Mesh::render(){
-    return renderManager.getRender()->draw();
-}
-
 void Mesh::removeAllSubmeshes(){
     for (std::vector<Submesh*>::iterator it = submeshes.begin() ; it != submeshes.end(); ++it)
     {
@@ -144,8 +140,10 @@ bool Mesh::load(){
 }
 
 bool Mesh::draw(){
+    if (!ConcreteObject::draw())
+        return false;
 
-    return ConcreteObject::draw();
+    return renderManager.getRender()->draw();
 }
 
 void Mesh::destroy(){

@@ -92,9 +92,9 @@ bool SkyBox::load(){
     return  Mesh::load();
 }
 
-bool SkyBox::draw(){
-
-    return true;
+void SkyBox::update(){
+    //Nothing to do
+    //Scene will call draw()
 }
 
 

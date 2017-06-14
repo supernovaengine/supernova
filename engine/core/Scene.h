@@ -57,8 +57,9 @@ private:
 
     void resetSceneProperties();
     void drawTransparentMeshes();
-    void drawChildScenes();
     void drawSky();
+
+    void updateChildScenes();
 
 public:
 
@@ -90,6 +91,7 @@ public:
     
     virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
+	virtual void update();
 	virtual bool load();
 	virtual bool draw();
     virtual void destroy();

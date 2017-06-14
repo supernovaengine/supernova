@@ -216,20 +216,33 @@ void Scene::resetSceneProperties(){
 void Scene::drawTransparentMeshes(){
     std::multimap<float, ConcreteObject*>::reverse_iterator it;
     for (it = transparentQueue.rbegin(); it != transparentQueue.rend(); ++it) {
-        (*it).second->render();
+        (*it).second->draw();
     }
 }
 
-void Scene::drawChildScenes(){
+void Scene::updateChildScenes(){
     std::vector<Scene*>::iterator it2;
     for (it2 = subScenes.begin(); it2 != subScenes.end(); ++it2) {
-        (*it2)->draw();
+        (*it2)->update();
     }
 }
 
 void Scene::drawSky(){
     if (sky != NULL)
-        sky->render();
+        sky->draw();
+}
+
+void Scene::update() {
+    transparentQueue.clear();
+    draw();
+    resetSceneProperties();
+
+    Object::update();
+
+    drawSky();
+    drawTransparentMeshes();
+
+    updateChildScenes();
 }
 
 bool Scene::load(){
@@ -240,6 +253,7 @@ bool Scene::load(){
 
     sceneManager.getRender()->load();
     resetSceneProperties();
+
     Object::load();
 
     Object::updateMatrix();
@@ -250,20 +264,15 @@ bool Scene::load(){
 
 
 bool Scene::draw(){
-    
-    transparentQueue.clear();
-    
-    sceneManager.getRender()->draw();
-    resetSceneProperties();
-    Object::draw();
-    drawSky();
-    drawTransparentMeshes();
+    if (!Object::draw())
+        return false;
 
-    drawChildScenes();
-    return true;
+    return sceneManager.getRender()->draw();
 }
 
 void Scene::destroy(){
+    Object::destroy();
+
     if (!userCamera){
         delete camera;
     }

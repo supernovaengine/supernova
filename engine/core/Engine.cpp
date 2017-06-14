@@ -220,7 +220,7 @@ void Engine::onDrawFrame() {
 	Events::call_onFrame();
 
     if (Engine::getScene() != NULL){
-        (Engine::getScene())->draw();
+        (Engine::getScene())->update();
     }
 
     SoundManager::checkActive();

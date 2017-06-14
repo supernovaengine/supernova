@@ -73,6 +73,21 @@ void ConcreteObject::updateMatrix(){
     updateDistanceToCamera();
 }
 
+void ConcreteObject::update(){
+
+    if ((transparent) && (scene != NULL) && (((Scene*)scene)->useDepth) && (distanceToCamera >= 0)){
+        ((Scene*)scene)->transparentQueue.insert(std::make_pair(distanceToCamera, this));
+    }else{
+        draw();
+    }
+
+    if (transparent){
+        setTransparency(true);
+    }
+
+    Object::update();
+}
+
 bool ConcreteObject::load(){
     Object::load();
 
@@ -87,15 +102,9 @@ bool ConcreteObject::load(){
 }
 
 bool ConcreteObject::draw(){
-    if ((transparent) && (scene != NULL) && (((Scene*)scene)->useDepth) && (distanceToCamera >= 0)){
-        ((Scene*)scene)->transparentQueue.insert(std::make_pair(distanceToCamera, this));
-    }else{
-        render();
-    }
 
-    if (transparent){
-        setTransparency(true);
-    }
+    if (!Object::draw())
+        return false;
 
-    return Object::draw();
+    return true;
 }

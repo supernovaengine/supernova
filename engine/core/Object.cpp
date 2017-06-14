@@ -360,6 +360,19 @@ bool Object::reload(){
     return load();
 }
 
+void Object::update(){
+    if (position.z != 0){
+        setDepth(true);
+    }
+
+    std::vector<Object*>::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it) {
+        if ((*it)->scene != (*it)){ //if not a scene object
+            (*it)->update();
+        }
+    }
+}
+
 bool Object::load(){
 
     if (position.z != 0){
@@ -375,28 +388,16 @@ bool Object::load(){
     firstLoad = true;
 
     return true;
+
 }
 
 bool Object::draw(){
 
-    if (position.z != 0){
-        setDepth(true);
-    }
+    if (!firstLoad)
+        load();
 
-    std::vector<Object*>::iterator it;
-    for (it = objects.begin(); it != objects.end(); ++it) {
-        if ((*it)->scene != (*it)){
-            
-            if (!(*it)->firstLoad)
-                (*it)->load();
-            
-            if ((*it)->loaded)
-                (*it)->draw();
-            
-        }
-    }
+    return loaded;
 
-    return true;
 }
 
 void Object::destroy(){

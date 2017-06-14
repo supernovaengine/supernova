@@ -35,8 +35,7 @@ public:
     virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
     virtual void updateMatrix();
 
-    virtual bool render() = 0;
-
+    virtual void update();
     virtual bool load();
     virtual bool draw();
 
