@@ -3,6 +3,10 @@
 
 #include <math.h>
 
+namespace Supernova { class Vector3; }
+Supernova::Vector3 operator * ( float f, const Supernova::Vector3& v );
+
+
 namespace Supernova {
 
     class Vector3
@@ -56,8 +60,7 @@ namespace Supernova {
 
         Vector3 operator - () const;
 
-        friend Vector3 operator * ( float f, const Vector3& v );
-
+        friend Vector3 (::operator *) ( float f, const Vector3& v );
 
         Vector3& operator += ( const Vector3& v );
 

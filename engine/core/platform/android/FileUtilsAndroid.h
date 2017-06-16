@@ -4,12 +4,15 @@
 
 #include "FileUtilsPlatform.h"
 
-class FileUtilsAndroid: public FileUtilsPlatform {
+namespace Supernova {
 
-public:
+    class FileUtilsAndroid : public FileUtilsPlatform {
 
-    virtual FILE* platformFopen(const char* fname, const char* mode);
-};
+    public:
 
+        virtual FILE *platformFopen(const char *fname, const char *mode);
+    };
+
+}
 
 #endif

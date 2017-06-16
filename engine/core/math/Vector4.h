@@ -7,6 +7,15 @@
 #include <assert.h>
 #include <math.h>
 
+namespace Supernova { class Vector4; }
+Supernova::Vector4 operator * ( const float fScalar, const Supernova::Vector4& rkVector );
+Supernova::Vector4 operator / ( const float fScalar, const Supernova::Vector4& rkVector );
+Supernova::Vector4 operator + (const Supernova::Vector4& lhs, const float rhs);
+Supernova::Vector4 operator + (const float lhs, const Supernova::Vector4& rhs);
+Supernova::Vector4 operator - (const Supernova::Vector4& lhs, float rhs);
+Supernova::Vector4 operator - (const float lhs, const Supernova::Vector4& rhs);
+
+
 namespace Supernova {
 
     class Vector4
@@ -69,18 +78,12 @@ namespace Supernova {
 
         Vector4 operator - () const;
 
-        friend Vector4 operator * ( const float fScalar, const Vector4& rkVector );
-
-        friend Vector4 operator / ( const float fScalar, const Vector4& rkVector );
-
-        friend Vector4 operator + (const Vector4& lhs, const float rhs);
-
-        friend Vector4 operator + (const float lhs, const Vector4& rhs);
-
-        friend Vector4 operator - (const Vector4& lhs, float rhs);
-
-        friend Vector4 operator - (const float lhs, const Vector4& rhs);
-
+        friend Vector4 (::operator *) ( const float fScalar, const Vector4& rkVector );
+        friend Vector4 (::operator /) ( const float fScalar, const Vector4& rkVector );
+        friend Vector4 (::operator +) (const Vector4& lhs, const float rhs);
+        friend Vector4 (::operator +) (const float lhs, const Vector4& rhs);
+        friend Vector4 (::operator -) (const Vector4& lhs, float rhs);
+        friend Vector4 (::operator -) (const float lhs, const Vector4& rhs);
 
         Vector4& operator += ( const Vector4& rkVector );
 

@@ -232,6 +232,7 @@ void Camera::moveForward(float distance){
 
 void Camera::walkForward(float distance){
     if (distance != 0){
+
         Vector3 viewCenter(view.x - position.x, view.y - position.y, view.z - position.z);
 
         Vector3 aux = viewCenter.dotProduct(up) * up / up.squaredLength();
@@ -242,6 +243,7 @@ void Camera::walkForward(float distance){
         position = position + (walkVector.normalize() * distance);
 
         updateMatrix();
+
     }
 }
 

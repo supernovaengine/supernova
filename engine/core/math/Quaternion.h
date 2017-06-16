@@ -4,6 +4,9 @@
 #include "Vector3.h"
 #include "Matrix4.h"
 
+namespace Supernova { class Quaternion; }
+Supernova::Quaternion operator * (float fScalar, const Supernova::Quaternion& rkQ);
+
 namespace Supernova {
 
     class Quaternion
@@ -33,7 +36,9 @@ namespace Supernova {
         Quaternion operator + ( const Quaternion& rhs ) const;
         Quaternion operator - ( const Quaternion& rhs ) const;
         Quaternion operator * ( float fScalar ) const;
-        friend Quaternion operator * (float fScalar, const Quaternion& rkQ);
+
+        friend Quaternion (::operator *) (float fScalar, const Quaternion& rkQ);
+
         Quaternion operator * ( const Quaternion& rhs) const;
         Vector3 operator * (const Vector3& v) const;
         const Quaternion& operator + () const;

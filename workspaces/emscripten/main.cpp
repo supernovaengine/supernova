@@ -22,16 +22,16 @@ int mousePressed;
 
 extern "C" {
     int getScreenWidth() {
-        return Engine::getScreenWidth();
+        return Supernova::Engine::getScreenWidth();
     }
     int getScreenHeight() {
-        return Engine::getScreenHeight();
+        return Supernova::Engine::getScreenHeight();
     }
     void updateScreenSize(int nWidth, int nHeight){
         width = nWidth;
         height = nHeight;
 
-        Engine::onSurfaceChanged(nWidth, nHeight);
+        Supernova::Engine::onSurfaceChanged(nWidth, nHeight);
     }
 }
 
@@ -44,13 +44,13 @@ int main(int argc, char **argv) {
     }
 
     if ((argv[1] != NULL && argv[1] != 0) && (argv[2] != NULL && argv[2] != 0)){
-        Engine::onStart(atoi(argv[1]), atoi(argv[2]));
+        Supernova::Engine::onStart(atoi(argv[1]), atoi(argv[2]));
     }else{
-        Engine::onStart();
+        Supernova::Engine::onStart();
     }
 
-	width = Engine::getScreenWidth();
-	height = Engine::getScreenHeight();
+	width = Supernova::Engine::getScreenWidth();
+	height = Supernova::Engine::getScreenHeight();
 
     window = glfwCreateWindow(width, height, "Supernova", NULL, NULL);
 
@@ -71,8 +71,8 @@ int main(int argc, char **argv) {
     ret = emscripten_set_keydown_callback(0, 0, 1, key_callback);
     ret = emscripten_set_keyup_callback(0, 0, 1, key_callback);
 
-	Engine::onSurfaceCreated();
-	Engine::onSurfaceChanged(width, height);
+	Supernova::Engine::onSurfaceCreated();
+	Supernova::Engine::onSurfaceChanged(width, height);
 
     emscripten_set_main_loop(renderGame, 0, 1);
 }
@@ -86,7 +86,7 @@ void errorCallback(int error, const char *msg) {
 }
 
 void renderGame(){
-    Engine::onDrawFrame();
+    Supernova::Engine::onDrawFrame();
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -113,10 +113,10 @@ static void on_mouse_callback(GLFWwindow* window, int button, int action, int mo
 
     if (action == GLFW_PRESS) {
         mousePressed = supernova_mouse_button(button);
-        Engine::onMousePress(supernova_mouse_button(button), normalized_x, normalized_y);
+        Supernova::Engine::onMousePress(supernova_mouse_button(button), normalized_x, normalized_y);
     } else if (action == GLFW_RELEASE) {
         mousePressed = 0;
-        Engine::onMouseUp(supernova_mouse_button(button), normalized_x, normalized_y);
+        Supernova::Engine::onMouseUp(supernova_mouse_button(button), normalized_x, normalized_y);
     }
 }
 
@@ -125,9 +125,9 @@ static void on_mouse_move(GLFWwindow* window, double x, double y)
         const float normalized_x = (x / (float) width) * 2.f - 1.f;
         const float normalized_y = -((y / (float) height) * 2.f - 1.f);
 
-        Engine::onMouseMove(normalized_x, normalized_y);
+        Supernova::Engine::onMouseMove(normalized_x, normalized_y);
         if (mousePressed > 0) {
-            Engine::onMouseDrag(mousePressed, normalized_x, normalized_y);
+            Supernova::Engine::onMouseDrag(mousePressed, normalized_x, normalized_y);
         }
 
 }
@@ -399,16 +399,16 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
    if ((!strcmp(key,"Escape"))||(*key=='\e')) skey=8;
 
    if (eventType == EMSCRIPTEN_EVENT_KEYDOWN){
-       Engine::onKeyPress(code);
-       if (skey==1) Engine::onTextInput("\t");
-       if (skey==2) Engine::onTextInput("\b");
-       if (skey==4) Engine::onTextInput("\r");
-       if (skey==8) Engine::onTextInput("\e");
+       Supernova::Engine::onKeyPress(code);
+       if (skey==1) Supernova::Engine::onTextInput("\t");
+       if (skey==2) Supernova::Engine::onTextInput("\b");
+       if (skey==4) Supernova::Engine::onTextInput("\r");
+       if (skey==8) Supernova::Engine::onTextInput("\e");
    }else if (eventType == EMSCRIPTEN_EVENT_KEYUP){
-       Engine::onKeyUp(code);
+       Supernova::Engine::onKeyUp(code);
    }else if (eventType == EMSCRIPTEN_EVENT_KEYPRESS){
        if ((utf8len(key)==1)&&(!skey)){
-           Engine::onTextInput(key);
+           Supernova::Engine::onTextInput(key);
        }
     }
 

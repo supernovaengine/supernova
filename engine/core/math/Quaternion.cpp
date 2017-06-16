@@ -115,7 +115,7 @@ Quaternion Quaternion::operator * ( float fScalar ) const
     return Quaternion(w * fScalar, x * fScalar, y * fScalar, z * fScalar);
 }
 
-Quaternion Supernova::operator * (float fScalar, const Quaternion& rkQ){
+Quaternion operator * (float fScalar, const Quaternion& rkQ){
     return Quaternion(fScalar * rkQ.w, fScalar * rkQ.x, fScalar * rkQ.y, fScalar * rkQ.z);
 }
 
