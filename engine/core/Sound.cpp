@@ -3,6 +3,8 @@
 #include "SoLoudPlayer.h"
 #include "platform/Log.h"
 
+using namespace Supernova;
+
 Sound::Sound(std::string filename){
     this->filename = filename;
     player = new SoLoudPlayer();

@@ -4,17 +4,21 @@
 #include "Light.h"
 #include "math/Vector3.h"
 
-class SpotLight: public Light {
+namespace Supernova {
 
-public:
+    class SpotLight: public Light {
 
-    SpotLight();
-    virtual ~SpotLight();
+    public:
 
-    void setTarget(Vector3 target);
-    void setTarget(float x, float y, float z);
-    void setSpotAngle(float angle);
+        SpotLight();
+        virtual ~SpotLight();
 
-};
+        void setTarget(Vector3 target);
+        void setTarget(float x, float y, float z);
+        void setSpotAngle(float angle);
+
+    };
+    
+}
 
 #endif /* SpotLight_h */

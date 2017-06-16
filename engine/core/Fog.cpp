@@ -1,5 +1,6 @@
 #include "Fog.h"
 
+using namespace Supernova;
 
 Fog::Fog(){
     mode = 2;

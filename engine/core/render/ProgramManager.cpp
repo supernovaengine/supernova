@@ -2,6 +2,7 @@
 #include "ProgramManager.h"
 #include "Engine.h"
 
+using namespace Supernova;
 
 std::unordered_map<std::string, std::shared_ptr<ProgramRender>> ProgramManager::programs;
 

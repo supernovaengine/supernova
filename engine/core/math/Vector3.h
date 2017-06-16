@@ -3,94 +3,98 @@
 
 #include <math.h>
 
-class Vector3
-{
-public:
-	float x, y, z;
+namespace Supernova {
 
-    static const Vector3 ZERO;
-    static const Vector3 UNIT_X;
-    static const Vector3 UNIT_Y;
-    static const Vector3 UNIT_Z;
-    static const Vector3 UNIT_SCALE;
+    class Vector3
+    {
+    public:
+        float x, y, z;
 
-
-    Vector3();
-
-    Vector3( float nx, float ny, float nz );
-
-    Vector3( float v[3] );
-
-    Vector3( int v[3] );
-
-    Vector3( const float* const v );
-
-    Vector3( const Vector3& v );
-
-    float operator [] ( unsigned i ) const;
-
-    float& operator [] ( unsigned i );
-
-    float* ptr();
-
-    const float* ptr() const;
-
-    Vector3& operator = ( const Vector3& v );
-
-    bool operator == ( const Vector3& v ) const;
-
-    bool operator != ( const Vector3& v ) const;
+        static const Vector3 ZERO;
+        static const Vector3 UNIT_X;
+        static const Vector3 UNIT_Y;
+        static const Vector3 UNIT_Z;
+        static const Vector3 UNIT_SCALE;
 
 
-    Vector3 operator + ( const Vector3& v ) const;
+        Vector3();
 
-    Vector3 operator - ( const Vector3& v ) const;
+        Vector3( float nx, float ny, float nz );
 
-    Vector3 operator * ( float f ) const;
+        Vector3( float v[3] );
 
-    Vector3 operator * ( const Vector3& v) const;
+        Vector3( int v[3] );
 
-    Vector3 operator / ( float f ) const;
+        Vector3( const float* const v );
 
-    Vector3 operator - () const;
+        Vector3( const Vector3& v );
 
-    friend Vector3 operator * ( float f, const Vector3& v );
+        float operator [] ( unsigned i ) const;
+
+        float& operator [] ( unsigned i );
+
+        float* ptr();
+
+        const float* ptr() const;
+
+        Vector3& operator = ( const Vector3& v );
+
+        bool operator == ( const Vector3& v ) const;
+
+        bool operator != ( const Vector3& v ) const;
 
 
-    Vector3& operator += ( const Vector3& v );
+        Vector3 operator + ( const Vector3& v ) const;
 
-    Vector3& operator -= ( const Vector3& v );
+        Vector3 operator - ( const Vector3& v ) const;
 
-    Vector3& operator *= ( float f );
+        Vector3 operator * ( float f ) const;
 
-    Vector3& operator /= ( float f );
+        Vector3 operator * ( const Vector3& v) const;
 
-    float length () const;
+        Vector3 operator / ( float f ) const;
 
-    float squaredLength () const;
+        Vector3 operator - () const;
 
-    float dotProduct(const Vector3& v) const;
+        friend Vector3 operator * ( float f, const Vector3& v );
 
-    float distance(const Vector3& rhs) const;
 
-    float squaredDistance(const Vector3& rhs) const;
+        Vector3& operator += ( const Vector3& v );
 
-    Vector3 & normalize();
+        Vector3& operator -= ( const Vector3& v );
 
-    Vector3 crossProduct( const Vector3& v ) const;
+        Vector3& operator *= ( float f );
 
-    Vector3 midPoint( const Vector3& v ) const;
+        Vector3& operator /= ( float f );
 
-    bool operator < ( const Vector3& v ) const;
+        float length () const;
 
-    bool operator > ( const Vector3& v ) const;
+        float squaredLength () const;
 
-    void makeFloor( const Vector3& v );
+        float dotProduct(const Vector3& v) const;
 
-    void makeCeil( const Vector3& v );
+        float distance(const Vector3& rhs) const;
 
-    Vector3 perpendicular(void);
+        float squaredDistance(const Vector3& rhs) const;
 
-};
+        Vector3 & normalize();
+
+        Vector3 crossProduct( const Vector3& v ) const;
+
+        Vector3 midPoint( const Vector3& v ) const;
+
+        bool operator < ( const Vector3& v ) const;
+
+        bool operator > ( const Vector3& v ) const;
+
+        void makeFloor( const Vector3& v );
+
+        void makeCeil( const Vector3& v );
+
+        Vector3 perpendicular(void);
+
+    };
+    
+}
 
 #endif

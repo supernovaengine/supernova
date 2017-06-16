@@ -3,6 +3,8 @@
 #include "Points.h"
 #include "Scene.h"
 
+using namespace Supernova;
+
 PointRender::PointRender(){
     
     lighting = false;

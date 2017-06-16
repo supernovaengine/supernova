@@ -7,30 +7,34 @@
 
 #include <string>
 
-class Sound{
+namespace Supernova {
 
-private:
-    AudioPlayer* player;
-    std::string filename;
+    class Sound{
 
-public:
-    Sound(std::string filename);
-    virtual ~Sound();
+    private:
+        AudioPlayer* player;
+        std::string filename;
 
-    int load();
-    void destroy();
+    public:
+        Sound(std::string filename);
+        virtual ~Sound();
 
-    int play();
-    int pause();
-    int stop();
+        int load();
+        void destroy();
 
-    double getLength();
-    double getStreamTime();
+        int play();
+        int pause();
+        int stop();
 
-    bool isPlaying();
-    bool isPaused();
-    bool isStopped();
+        double getLength();
+        double getStreamTime();
 
-};
+        bool isPlaying();
+        bool isPaused();
+        bool isStopped();
+
+    };
+    
+}
 
 #endif /* Sound_h */

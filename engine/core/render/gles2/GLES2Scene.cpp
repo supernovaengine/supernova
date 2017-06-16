@@ -8,6 +8,8 @@
 #include "math/Angle.h"
 
 
+using namespace Supernova;
+
 GLES2Scene::GLES2Scene(): SceneRender() {
 }
 

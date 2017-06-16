@@ -2,16 +2,20 @@
 #ifndef angle_h
 #define angle_h
 
-class Angle{
+namespace Supernova {
 
-public:
+    class Angle{
 
-    static float radToDefault(float radians);
-    static float degToDefault(float degrees);
-    static float defaultToRad(float angle);
-    static float defaultToDeg(float angle);
-    static float radToDeg(float radians);
-    static float degToRad(float degrees);
-};
+    public:
+
+        static float radToDefault(float radians);
+        static float degToDefault(float degrees);
+        static float defaultToRad(float angle);
+        static float defaultToDeg(float angle);
+        static float radToDeg(float radians);
+        static float degToRad(float degrees);
+    };
+    
+}
 
 #endif

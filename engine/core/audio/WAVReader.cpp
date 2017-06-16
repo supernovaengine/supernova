@@ -6,6 +6,7 @@
 
 #define MAKEDWORD(a,b,c,d) (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
 
+using namespace Supernova;
 
 AudioFile* WAVReader::getRawAudio(FileData* filedata){
 

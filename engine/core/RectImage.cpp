@@ -3,6 +3,8 @@
 #include "render/TextureManager.h"
 
 
+using namespace Supernova;
+
 RectImage::RectImage(): Image(){
     texWidth = 0;
     texHeight = 0;

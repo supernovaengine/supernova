@@ -1,6 +1,8 @@
 #include "Material.h"
 
 
+using namespace Supernova;
+
 Material::Material(){
     this->textureType = S_TEXTURE_2D;
     transparent = false;

@@ -1,6 +1,8 @@
 #include "Rect.h"
 
 
+using namespace Supernova;
+
 Rect::Rect(){
     x = 0;
     y = 0;

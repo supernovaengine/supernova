@@ -5,6 +5,8 @@
 #include "SoundManager.h"
 #include "platform/Log.h"
 
+using namespace Supernova;
+
 SoLoudPlayer::SoLoudPlayer(): AudioPlayer(){
 }
 

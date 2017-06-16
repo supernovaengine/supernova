@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 
+using namespace Supernova;
 
 Matrix4::Matrix4()
 {

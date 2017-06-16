@@ -2,6 +2,8 @@
 #include "GUIObject.h"
 #include "PrimitiveMode.h"
 
+using namespace Supernova;
+
 GUIObject::GUIObject(): Mesh2D(){
 }
 

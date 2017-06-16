@@ -6,6 +6,8 @@
 #include "platform/Log.h"
 #include "STBText.h"
 
+using namespace Supernova;
+
 Text::Text(): Mesh2D() {
     primitiveMode = S_TRIANGLES;
     dynamic = true;

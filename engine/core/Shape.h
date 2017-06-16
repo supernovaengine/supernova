@@ -5,18 +5,22 @@
 #include "Mesh.h"
 #include "math/Vector3.h"
 
-class Shape: public Mesh {
+namespace Supernova {
 
-public:
-    Shape();
-	virtual ~Shape();
+    class Shape: public Mesh {
 
-    void generateTexcoords();
+    public:
+        Shape();
+        virtual ~Shape();
 
-	void addVertex(Vector3 vertex);
-    void addVertex(float x, float y);
+        void generateTexcoords();
+
+        void addVertex(Vector3 vertex);
+        void addVertex(float x, float y);
+        
+        virtual bool load();
+    };
     
-    virtual bool load();
-};
+}
 
 #endif /* shape_h */

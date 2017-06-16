@@ -1,6 +1,8 @@
 #include "Camera.h"
 #include "Engine.h"
 
+using namespace Supernova;
+
 Camera::Camera() : Object(){
 
     position = Vector3(0,0,1);

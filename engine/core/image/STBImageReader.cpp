@@ -3,6 +3,8 @@
 #include "stb_image.h"
 #include "ColorType.h"
 
+using namespace Supernova;
+
 TextureFile* STBImageReader::getRawImage(FileData* filedata){
     
     //stbi_set_flip_vertically_on_load(true);

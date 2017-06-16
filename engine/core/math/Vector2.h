@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <math.h>
 
+namespace Supernova {
+
     class Vector2
     {
     public:
@@ -66,7 +68,7 @@
 
         Vector2 operator - () const;
 
-        friend Vector2 operator * ( const float fScalar, const Vector2& rkVector );
+        //Vector2 operator * ( const float fScalar, const Vector2& rkVector );
 
         friend Vector2 operator / ( const float fScalar, const Vector2& rkVector );
 
@@ -120,5 +122,6 @@
 
     };
 
+}
 
 #endif

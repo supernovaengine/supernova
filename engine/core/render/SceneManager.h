@@ -6,17 +6,21 @@
 #include <vector>
 #include "render/SceneRender.h"
 
-class SceneManager {
-private:
-    SceneRender* scene;
+namespace Supernova {
 
-    void instanciateRender();
+    class SceneManager {
+    private:
+        SceneRender* scene;
 
-public:
-    SceneManager();
-    virtual ~SceneManager();
+        void instanciateRender();
 
-    SceneRender* getRender();
-};
+    public:
+        SceneManager();
+        virtual ~SceneManager();
+
+        SceneRender* getRender();
+    };
+
+}
 
 #endif /* scenemanager_h */

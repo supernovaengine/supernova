@@ -38,6 +38,8 @@
 #include <unistd.h>
 #include <locale>
 
+using namespace Supernova;
+
 /*
 namespace LuaIntf
 {

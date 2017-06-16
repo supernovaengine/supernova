@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "Supernova.h"
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -25,6 +27,8 @@
 #include "Input.h"
 
 #include "audio/SoundManager.h"
+
+using namespace Supernova;
 
 Scene *Engine::mainScene;
 

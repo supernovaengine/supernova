@@ -1,6 +1,7 @@
 
 #include "Button.h"
 
+using namespace Supernova;
 
 Button::Button(): GUIObject(){
 }

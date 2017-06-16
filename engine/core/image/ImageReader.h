@@ -6,15 +6,19 @@
 #include "FileData.h"
 #include <fstream>
 
-class ImageReader{
+namespace Supernova {
 
-public:
+    class ImageReader{
 
-    virtual TextureFile* getRawImage(FileData* filedata) = 0;
+    public:
 
-    virtual ~ImageReader();
+        virtual TextureFile* getRawImage(FileData* filedata) = 0;
 
-};
+        virtual ~ImageReader();
+
+    };
+    
+}
 
 
 #endif /* ImageRead_h */

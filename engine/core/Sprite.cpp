@@ -1,6 +1,7 @@
 #include "Sprite.h"
 #include "render/TextureManager.h"
 
+using namespace Supernova;
 
 Sprite::Sprite(): RectImage(){
 

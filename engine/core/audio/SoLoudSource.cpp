@@ -6,6 +6,7 @@
 #include "soloud.h"
 #include "SoLoudSource.h"
 
+using namespace Supernova;
 
 SoLoudSourceInstance::SoLoudSourceInstance(SoLoudSource *aParent)
 {

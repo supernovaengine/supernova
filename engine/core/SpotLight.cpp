@@ -1,6 +1,6 @@
 #include "SpotLight.h"
 
-
+using namespace Supernova;
 
 SpotLight::SpotLight(): Light(){
     type = S_SPOT_LIGHT;

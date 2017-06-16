@@ -4,27 +4,31 @@
 #include "GLES2Header.h"
 #include "render/TextureRender.h"
 
-class GLES2Texture : public TextureRender{
+namespace Supernova {
 
-private:
-    GLuint gTexture;
-    GLenum textureType;
+    class GLES2Texture : public TextureRender{
+
+    private:
+        GLuint gTexture;
+        GLenum textureType;
+        
+        GLenum getGlColorFormat(const int color_format);
+        void assignTexture(const GLenum target, const GLsizei width, const GLsizei height, const GLenum type, const GLvoid* pixels);
+
+    public:
+        
+        GLES2Texture();
+
+        void loadTexture(TextureFile* texturefile);
+        void loadTextureCube(std::vector<TextureFile*> texturefiles);
+        void deleteTexture();
+        
+        void setTexture(GLuint texture);
+        GLuint getTexture();
+        GLenum getTextureType();
+
+    };
     
-    GLenum getGlColorFormat(const int color_format);
-    void assignTexture(const GLenum target, const GLsizei width, const GLsizei height, const GLenum type, const GLvoid* pixels);
-
-public:
-    
-    GLES2Texture();
-
-    void loadTexture(TextureFile* texturefile);
-    void loadTextureCube(std::vector<TextureFile*> texturefiles);
-    void deleteTexture();
-    
-    void setTexture(GLuint texture);
-    GLuint getTexture();
-    GLenum getTextureType();
-
-};
+}
 
 #endif /* gles2_texture_h */

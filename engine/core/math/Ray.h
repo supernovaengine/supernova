@@ -3,29 +3,33 @@
 
 #include "math/Vector3.h"
 
-class Ray{
+namespace Supernova {
 
-private:
+    class Ray{
 
-    Vector3 point;
-    Vector3 vector;
+    private:
 
-public:
+        Vector3 point;
+        Vector3 vector;
 
-    Ray();
-    Ray(const Ray &ray);
-    Ray(Vector3 point, Vector3 vector);
+    public:
 
-    Ray &operator=(const Ray &);
+        Ray();
+        Ray(const Ray &ray);
+        Ray(Vector3 point, Vector3 vector);
 
-    void setPoint(Vector3 point);
-    Vector3 getPoint();
+        Ray &operator=(const Ray &);
 
-    void setVector(Vector3 vector);
-    Vector3 getVector();
+        void setPoint(Vector3 point);
+        Vector3 getPoint();
 
-    Vector3 intersectionPoint(Vector3 planePoint, Vector3 planeNormal);
-};
+        void setVector(Vector3 vector);
+        Vector3 getVector();
+
+        Vector3 intersectionPoint(Vector3 planePoint, Vector3 planeNormal);
+    };
+    
+}
 
 
 #endif /* ray_h */

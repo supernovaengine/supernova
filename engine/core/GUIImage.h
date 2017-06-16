@@ -5,16 +5,20 @@
 #include "Mesh2D.h"
 #include "Image.h"
 
-class GUIImage: public Mesh2D {
-private:
+namespace Supernova {
 
-    std::vector<Image*> partImage;
-    int rawImageWidth, rawImageHeight;
-public:
-    GUIImage();
-    virtual ~GUIImage();
+    class GUIImage: public Mesh2D {
+    private:
 
-    bool load();
-};
+        std::vector<Image*> partImage;
+        int rawImageWidth, rawImageHeight;
+    public:
+        GUIImage();
+        virtual ~GUIImage();
+
+        bool load();
+    };
+    
+}
 
 #endif /* GUIImage_h */

@@ -5,6 +5,8 @@
 #include "platform/Log.h"
 #include "GUIObject.h"
 
+using namespace Supernova;
+
 Scene::Scene() {
     camera = NULL;
     childScene = false;

@@ -2,6 +2,8 @@
 #include "image/ColorType.h"
 
 
+using namespace Supernova;
+
 GLES2Texture::GLES2Texture(){
     
 }

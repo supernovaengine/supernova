@@ -3,12 +3,16 @@
 
 #include "ImageReader.h"
 
-class STBImageReader: public ImageReader{
+namespace Supernova {
+
+    class STBImageReader: public ImageReader{
+        
+    public:
+        
+        TextureFile* getRawImage(FileData* filedata);
+        
+    };
     
-public:
-    
-    TextureFile* getRawImage(FileData* filedata);
-    
-};
+}
 
 #endif /* STBImageReader_h */

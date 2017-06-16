@@ -2,6 +2,8 @@
 #include "math/Angle.h"
 #include "Scene.h"
 
+using namespace Supernova;
+
 SceneRender::SceneRender(){
     lighting = false;
     childScene = false;

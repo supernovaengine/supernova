@@ -4,22 +4,25 @@
 #include "RectImage.h"
 #include <unordered_map>
 
+namespace Supernova {
 
-class Sprite: public RectImage {
+    class Sprite: public RectImage {
 
-protected:
-    std::unordered_map <std::string, Rect> framesRect;
+    protected:
+        std::unordered_map <std::string, Rect> framesRect;
 
-public:
-    Sprite();
-    virtual ~Sprite();
+    public:
+        Sprite();
+        virtual ~Sprite();
 
-    void addFrame(std::string id, float x, float y, float width, float height);
-    void removeFrame(std::string id);
+        void addFrame(std::string id, float x, float y, float width, float height);
+        void removeFrame(std::string id);
 
-    void setFrame(std::string id);
-    void setFrame(int id);
-};
+        void setFrame(std::string id);
+        void setFrame(int id);
+    };
+    
+}
 
 
 #endif //SPRITE_H

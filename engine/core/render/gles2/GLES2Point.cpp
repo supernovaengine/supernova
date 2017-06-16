@@ -12,6 +12,9 @@
 #include "Engine.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#define BUFFER_OFFSET(i) ((void*)(i))
+
+using namespace Supernova;
 
 GLES2Point::GLES2Point(): PointRender() {
 }

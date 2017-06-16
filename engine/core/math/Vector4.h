@@ -7,6 +7,8 @@
 #include <assert.h>
 #include <math.h>
 
+namespace Supernova {
+
     class Vector4
     {
     public:
@@ -104,6 +106,8 @@
         bool isNaN() const;
 
     };
+    
+}
 
 
 #endif

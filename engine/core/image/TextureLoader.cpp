@@ -4,6 +4,8 @@
 #include "platform/Log.h"
 #include <assert.h>
 
+using namespace Supernova;
+
 TextureLoader::TextureLoader() {
     rawImage = NULL;
 }

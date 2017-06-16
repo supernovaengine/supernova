@@ -1,6 +1,8 @@
 
 #include "FileUtilsPlatform.h"
 
+using namespace Supernova;
+
 #ifdef SUPERNOVA_ANDROID
 #include "FileUtilsAndroid.h"
 #endif

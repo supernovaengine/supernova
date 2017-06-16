@@ -4,6 +4,8 @@
 #include <limits>
 #include <algorithm>
 
+using namespace Supernova;
+
 GLuint GLES2Util::emptyTexture;
 bool GLES2Util::emptyTextureLoaded;
 

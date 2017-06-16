@@ -5,6 +5,8 @@
 #include "Scene.h"
 
 
+using namespace Supernova;
+
 Object::Object(){
     loaded = false;
     firstLoad = false;

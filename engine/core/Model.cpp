@@ -6,6 +6,8 @@
 #include "tiny_obj_loader.h"
 #include "FileData.h"
 
+using namespace Supernova;
+
 Model::Model(): Mesh() {
     primitiveMode = S_TRIANGLES;
 }

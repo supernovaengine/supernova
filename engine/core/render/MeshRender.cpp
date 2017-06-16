@@ -3,6 +3,7 @@
 #include "Mesh.h"
 #include "Scene.h"
 
+using namespace Supernova;
 
 MeshRender::MeshRender(){
 

@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "gles2/GLES2Point.h"
 
+using namespace Supernova;
 
 PointManager::PointManager() {
     render = NULL;

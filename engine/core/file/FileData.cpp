@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+using namespace Supernova;
+
 FileData::FileData() {
     dataPtr = NULL;
     dataLength = 0;

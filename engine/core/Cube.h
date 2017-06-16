@@ -5,12 +5,16 @@
 #include "Mesh.h"
 #include "math/Vector3.h"
 
-class Cube: public Mesh {
-public:
-    Cube();
-    Cube(float width, float height, float depth);
-	virtual ~Cube();
+namespace Supernova {
 
-};
+    class Cube: public Mesh {
+    public:
+        Cube();
+        Cube(float width, float height, float depth);
+        virtual ~Cube();
+
+    };
+    
+}
 
 #endif /* cube_h */

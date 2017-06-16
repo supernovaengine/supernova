@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+using namespace Supernova;
+
 AudioFile::AudioFile(){
     this->channels = 0;
     this->bitsPerSample = 0;

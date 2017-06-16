@@ -4,35 +4,39 @@
 
 #include "Mesh2D.h"
 
-class STBText;
+namespace Supernova {
 
-class Text: public Mesh2D {
+    class STBText;
 
-private:
-    
-    STBText* stbtext;
+    class Text: public Mesh2D {
 
-    std::string font;
-    std::string text;
+    private:
+        
+        STBText* stbtext;
 
-public:
-    Text();
-    Text(std::string font);
-    virtual ~Text();
-    
-    Text& operator = ( const char* v );
-    bool operator == ( const char* v ) const;
-    bool operator != ( const char* v ) const;
-    
-    virtual void setSize(int width, int height);
-    virtual void setInvert(bool invert);
-    
-    void setFont(std::string font);
-    void setText(std::string text);
-    
-    void createText();
+        std::string font;
+        std::string text;
 
-    virtual bool load();
-};
+    public:
+        Text();
+        Text(std::string font);
+        virtual ~Text();
+        
+        Text& operator = ( const char* v );
+        bool operator == ( const char* v ) const;
+        bool operator != ( const char* v ) const;
+        
+        virtual void setSize(int width, int height);
+        virtual void setInvert(bool invert);
+        
+        void setFont(std::string font);
+        void setText(std::string text);
+        
+        void createText();
+
+        virtual bool load();
+    };
+    
+}
 
 #endif /* Text_h */

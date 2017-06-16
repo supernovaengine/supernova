@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include <math.h>
 
+using namespace Supernova;
 
 float Angle::radToDefault(float radians){
     if (Engine::isUseDegrees()){

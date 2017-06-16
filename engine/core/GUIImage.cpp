@@ -5,6 +5,8 @@
 #include "image/TextureLoader.h"
 #include "render/TextureManager.h"
 
+using namespace Supernova;
+
 GUIImage::GUIImage(): Mesh2D(){
 }
 

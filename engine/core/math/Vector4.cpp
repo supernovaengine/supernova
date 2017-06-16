@@ -1,5 +1,7 @@
 #include "Vector4.h"
 
+using namespace Supernova;
+
 const Vector4 Vector4::ZERO( 0, 0, 0, 0 );
 
 

@@ -8,30 +8,34 @@
 #include "stb_rect_pack.h"
 #include "stb_truetype.h"
 
-class STBText {
+namespace Supernova {
 
-private:
+    class STBText {
 
-    const unsigned int atlasLimit = 32768;
-    const unsigned int oversampleX = 2;
-    const unsigned int oversampleY = 2;
-    const unsigned int firstChar = 32;
-    const unsigned int lastChar = 255;
-    const unsigned int charCount = lastChar - firstChar;
+    private:
+
+        const unsigned int atlasLimit = 32768;
+        const unsigned int oversampleX = 2;
+        const unsigned int oversampleY = 2;
+        const unsigned int firstChar = 32;
+        const unsigned int lastChar = 255;
+        const unsigned int charCount = lastChar - firstChar;
+        
+        stbtt_packedchar *charInfo;
+        
+        unsigned int size;
+        unsigned int atlasWidth;
+        unsigned int atlasHeight;
+
+    public:
+        STBText();
+        virtual ~STBText();
+
+        bool load(std::string font);
+        void createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords, std::vector<unsigned int>* indices, int* width, int* height, bool invert);
+        
+    };
     
-    stbtt_packedchar *charInfo;
-    
-    unsigned int size;
-    unsigned int atlasWidth;
-    unsigned int atlasHeight;
-
-public:
-    STBText();
-    virtual ~STBText();
-
-    bool load(std::string font);
-    void createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords, std::vector<unsigned int>* indices, int* width, int* height, bool invert);
-    
-};
+}
 
 #endif /* Text_h */

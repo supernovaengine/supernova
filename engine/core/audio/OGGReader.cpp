@@ -3,6 +3,8 @@
 #include <string.h>
 #include "stb_vorbis.h"
 
+using namespace Supernova;
+
 AudioFile* OGGReader::getRawAudio(FileData* filedata){
     int e = 0;
     stb_vorbis *aVorbis = stb_vorbis_open_memory(filedata->getMemPtr(), filedata->length(), &e, 0);

@@ -1,5 +1,6 @@
 #include "DirectionalLight.h"
 
+using namespace Supernova;
 
 DirectionalLight::DirectionalLight(): Light(){
     type = S_DIRECTIONAL_LIGHT;

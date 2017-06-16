@@ -4,6 +4,7 @@
 #include "gles2/GLES2Scene.h"
 #include <stddef.h>
 
+using namespace Supernova;
 
 SceneManager::SceneManager() {
     scene = NULL;

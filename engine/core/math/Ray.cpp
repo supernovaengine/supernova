@@ -1,5 +1,7 @@
 #include "Ray.h"
 
+using namespace Supernova;
+
 Ray::Ray(){
 
 }

@@ -3,6 +3,8 @@
 #include "Engine.h"
 #include "Scene.h"
 
+using namespace Supernova;
+
 Mesh2D::Mesh2D(): Mesh(){
     this->width = 0;
     this->height = 0;

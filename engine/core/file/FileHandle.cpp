@@ -2,6 +2,7 @@
 
 #include "FileUtilsPlatform.h"
 
+using namespace Supernova;
 
 FileHandle::FileHandle(){
     fileHandle = NULL;

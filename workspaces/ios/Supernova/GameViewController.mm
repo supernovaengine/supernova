@@ -22,7 +22,7 @@
     
     CGFloat screenScale = [UIScreen mainScreen].scale;
     
-    Engine::onStart(width*screenScale, height*screenScale);
+    Supernova::Engine::onStart(width*screenScale, height*screenScale);
     
     self.glView = [[EAGLView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
     if([[UIScreen mainScreen] respondsToSelector:@selector(scale)]) {
@@ -47,7 +47,7 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
     UITouch* touchEvent = [touches anyObject];
     CGPoint locationInView = [touchEvent locationInView:self.view];
     CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    Engine::onTouchPress(normalizedPoint.x, normalizedPoint.y);
+    Supernova::Engine::onTouchPress(normalizedPoint.x, normalizedPoint.y);
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -56,7 +56,7 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
     UITouch* touchEvent = [touches anyObject];
     CGPoint locationInView = [touchEvent locationInView:self.view];
     CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    Engine::onTouchDrag(normalizedPoint.x, normalizedPoint.y);
+    Supernova::Engine::onTouchDrag(normalizedPoint.x, normalizedPoint.y);
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -65,7 +65,7 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
     UITouch* touchEvent = [touches anyObject];
     CGPoint locationInView = [touchEvent locationInView:self.view];
     CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    Engine::onTouchUp(normalizedPoint.x, normalizedPoint.y);
+    Supernova::Engine::onTouchUp(normalizedPoint.x, normalizedPoint.y);
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event

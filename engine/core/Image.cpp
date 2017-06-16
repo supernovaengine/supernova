@@ -6,7 +6,7 @@
 #include "render/TextureManager.h"
 #include "platform/Log.h"
 
-
+using namespace Supernova;
 
 Image::Image(): Mesh2D() {
     primitiveMode = S_TRIANGLES;

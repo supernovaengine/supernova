@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <float.h>
 
+using namespace Supernova;
 
 Quaternion::Quaternion()
     : w(1), x(0), y(0), z(0){
@@ -114,7 +115,7 @@ Quaternion Quaternion::operator * ( float fScalar ) const
     return Quaternion(w * fScalar, x * fScalar, y * fScalar, z * fScalar);
 }
 
-Quaternion operator * (float fScalar, const Quaternion& rkQ){
+Quaternion Supernova::operator * (float fScalar, const Quaternion& rkQ){
     return Quaternion(fScalar * rkQ.w, fScalar * rkQ.x, fScalar * rkQ.y, fScalar * rkQ.z);
 }
 
@@ -433,7 +434,6 @@ bool Quaternion::equals(const Quaternion& rhs) const
 
     return ( fabs(matching-1.0) < 0.001 );
 }
-
 
 Quaternion Quaternion::slerp (float fT, const Quaternion& rkP, const Quaternion& rkQ, bool shortestPath)
 {

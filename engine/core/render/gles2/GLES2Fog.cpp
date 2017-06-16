@@ -1,5 +1,6 @@
 #include "GLES2Fog.h"
 
+using namespace Supernova;
 
 GLES2Fog::GLES2Fog(){
     program = NULL;

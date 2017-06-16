@@ -8,65 +8,68 @@
 #include "Material.h"
 #include <vector>
 
-class Points;
+namespace Supernova {
 
+    class Points;
 
-class PointRender {
-    
-private:
-    
-    void checkLighting();
-    void checkFog();
-    void checkTextureRect();
-    void fillPointProperties();
-    
-protected:
-    
-    bool lighting;
-    bool hasfog;
-    bool hasTextureRect;
-    
-    Points* points;
-    
-    int numPoints;
-    std::shared_ptr<TextureRender> texture;
-    bool textured;
-    
-    SceneRender* sceneRender;
-    
-    std::vector<Vector3>* positions;
-    std::vector<Vector3>* normals;
-    std::vector<Rect*>* textureRects;
-    std::vector<float>* pointSizes;
-    std::vector<Vector4>* pointColors;
-    
-    Matrix4 modelMatrix;
-    Matrix4 normalMatrix;
-    Matrix4 modelViewProjectionMatrix;
-    Vector3 cameraPosition;
-    
-    bool isLoaded;
-    
-    std::string materialTexture;
+    class PointRender {
+        
+    private:
+        
+        void checkLighting();
+        void checkFog();
+        void checkTextureRect();
+        void fillPointProperties();
+        
+    protected:
+        
+        bool lighting;
+        bool hasfog;
+        bool hasTextureRect;
+        
+        Points* points;
+        
+        int numPoints;
+        std::shared_ptr<TextureRender> texture;
+        bool textured;
+        
+        SceneRender* sceneRender;
+        
+        std::vector<Vector3>* positions;
+        std::vector<Vector3>* normals;
+        std::vector<Rect*>* textureRects;
+        std::vector<float>* pointSizes;
+        std::vector<Vector4>* pointColors;
+        
+        Matrix4 modelMatrix;
+        Matrix4 normalMatrix;
+        Matrix4 modelViewProjectionMatrix;
+        Vector3 cameraPosition;
+        
+        bool isLoaded;
+        
+        std::string materialTexture;
 
-public:
-    
-    PointRender();
-    virtual ~PointRender();
-    
-    void setPoints(Points* points);
+    public:
+        
+        PointRender();
+        virtual ~PointRender();
+        
+        void setPoints(Points* points);
 
-    virtual void updatePositions();
-    virtual void updateNormals();
-    virtual void updatePointSizes();
-    virtual void updateTextureRects();
-    virtual void updatePointColors();
+        virtual void updatePositions();
+        virtual void updateNormals();
+        virtual void updatePointSizes();
+        virtual void updateTextureRects();
+        virtual void updatePointColors();
+        
+        virtual bool load();
+        virtual bool draw();
+        virtual void destroy();
+        
+    };
     
-    virtual bool load();
-    virtual bool draw();
-    virtual void destroy();
-    
-};
+}
 
 
 #endif /* PointRender_h */

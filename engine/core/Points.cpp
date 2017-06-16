@@ -5,6 +5,8 @@
 #include "Engine.h"
 #include "render/TextureManager.h"
 
+using namespace Supernova;
+
 Points::Points(){
 
     pointScale = 1.0;

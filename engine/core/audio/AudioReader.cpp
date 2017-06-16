@@ -1,6 +1,7 @@
 
 #include "AudioReader.h"
 
+using namespace Supernova;
 
 AudioReader::~AudioReader(){
     

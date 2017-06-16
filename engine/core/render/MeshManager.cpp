@@ -4,6 +4,7 @@
 #include "render/gles2/GLES2Mesh.h"
 #include <stddef.h>
 
+using namespace Supernova;
 
 MeshManager::MeshManager() {
     render = NULL;

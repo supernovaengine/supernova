@@ -7,6 +7,8 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+using namespace Supernova;
+
 
 void (*Events::onFrameFunc)();
 int Events::onFrameLuaFunc;

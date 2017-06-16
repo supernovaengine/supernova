@@ -6,6 +6,7 @@
 #include "gles2/GLES2Texture.h"
 #include "platform/Log.h"
 
+using namespace Supernova;
 
 std::unordered_map<std::string, TextureManager::TextureStore> TextureManager::textures;
 

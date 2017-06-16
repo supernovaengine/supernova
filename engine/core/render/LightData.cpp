@@ -2,6 +2,8 @@
 #include "Angle.h"
 
 
+using namespace Supernova;
+
 LightData::LightData(){
     ambientLight = NULL;
 }

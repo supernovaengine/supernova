@@ -2,9 +2,10 @@
 
 #include "SkyBox.h"
 
-
 #include "platform/Log.h"
 #include "PrimitiveMode.h"
+
+using namespace Supernova;
 
 SkyBox::SkyBox(): Mesh() {
     

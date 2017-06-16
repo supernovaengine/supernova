@@ -3,6 +3,8 @@
 #include "render/TextureManager.h"
 #include "platform/Log.h"
 
+using namespace Supernova;
+
 Mesh::Mesh(): ConcreteObject(){
     submeshes.push_back(new Submesh(&material));
     skymesh = false;

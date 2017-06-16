@@ -1,6 +1,8 @@
 #include "File.h"
 #include "FileData.h"
 
+using namespace Supernova;
+
 File::~File(){
 
 }

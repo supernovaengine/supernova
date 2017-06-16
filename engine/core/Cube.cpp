@@ -3,6 +3,8 @@
 #include "platform/Log.h"
 #include "PrimitiveMode.h"
 
+using namespace Supernova;
+
 Cube::Cube(): Mesh() {
     primitiveMode = S_TRIANGLES;
 }

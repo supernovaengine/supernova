@@ -1,5 +1,6 @@
 #include "Light.h"
 
+using namespace Supernova;
 
 Light::Light(){
     this->type = S_POINT_LIGHT;

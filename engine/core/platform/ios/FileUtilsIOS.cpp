@@ -3,6 +3,8 @@
 #include "FileUtilsIOS.h"
 #include "SupernovaIOS.h"
 
+using namespace Supernova;
+
 
 FILE* FileUtilsIOS::platformFopen(const char* fname, const char* mode){
     

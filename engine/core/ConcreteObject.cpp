@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "render/TextureManager.h"
 
+using namespace Supernova;
 
 ConcreteObject::ConcreteObject(): Object(){
     transparent = false;

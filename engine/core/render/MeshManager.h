@@ -9,17 +9,20 @@
 #include "render/MeshRender.h"
 #include "render/SceneRender.h"
 
+namespace Supernova {
 
-class MeshManager {
-private:
-    MeshRender* render;
+    class MeshManager {
+    private:
+        MeshRender* render;
 
-    void instanciateRender();
-public:
-	MeshManager();
-	virtual ~MeshManager();
-    
-    MeshRender* getRender();
-};
+        void instanciateRender();
+    public:
+        MeshManager();
+        virtual ~MeshManager();
+        
+        MeshRender* getRender();
+    };
+
+}
 
 #endif /* MeshManager_h */

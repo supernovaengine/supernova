@@ -9,6 +9,8 @@
 #include "FileData.h"
 #include <codecvt>
 
+using namespace Supernova;
+
 STBText::STBText() {
     size = 60;
     atlasWidth = 512;

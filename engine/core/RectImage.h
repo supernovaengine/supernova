@@ -4,29 +4,32 @@
 #include "Image.h"
 #include "math/Rect.h"
 
+namespace Supernova {
 
-class RectImage: public Image {
-private:
-    int texWidth;
-    int texHeight;
-    
-    bool useTextureRect;
+    class RectImage: public Image {
+    private:
+        int texWidth;
+        int texHeight;
+        
+        bool useTextureRect;
 
-    Rect textureRect;
-    
-protected:
+        Rect textureRect;
+        
+    protected:
 
-    void normalizeTextureRect();
-    
-public:
-    RectImage();
-    virtual ~RectImage();
+        void normalizeTextureRect();
+        
+    public:
+        RectImage();
+        virtual ~RectImage();
 
-    void setRect(float x, float y, float width, float height);
-    void setRect(Rect textureRect);
+        void setRect(float x, float y, float width, float height);
+        void setRect(Rect textureRect);
+        
+        bool load();
+        bool draw();
+    };
     
-    bool load();
-    bool draw();
-};
+}
 
 #endif /* RectImage_h */

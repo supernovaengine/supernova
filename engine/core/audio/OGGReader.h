@@ -4,10 +4,14 @@
 
 #include "AudioReader.h"
 
-class OGGReader: public AudioReader {
-public:
-    AudioFile* getRawAudio(FileData* filedata);
-};
+namespace Supernova {
+    
+    class OGGReader: public AudioReader {
+    public:
+        AudioFile* getRawAudio(FileData* filedata);
+    };
+    
+}
 
 
 #endif

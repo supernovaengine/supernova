@@ -5,42 +5,46 @@
 
 #include "Mesh.h"
 
-class Mesh2D: public Mesh {
-protected:
-    int width;
-    int height;
+namespace Supernova {
 
-    bool billboard;
-    bool fixedSizeBillboard;
-    float billboardScaleFactor;
+    class Mesh2D: public Mesh {
+    protected:
+        int width;
+        int height;
 
-    bool clipping;
-    bool invert;
+        bool billboard;
+        bool fixedSizeBillboard;
+        float billboardScaleFactor;
 
-public:
-    Mesh2D();
-    virtual ~Mesh2D();
+        bool clipping;
+        bool invert;
 
-    void setBillboard(bool billboard);
-    void setFixedSizeBillboard(bool fixedSizeBillboard);
-    void setBillboardScaleFactor(float billboardScaleFactor);
+    public:
+        Mesh2D();
+        virtual ~Mesh2D();
 
-    void setClipping(bool clipping);
+        void setBillboard(bool billboard);
+        void setFixedSizeBillboard(bool fixedSizeBillboard);
+        void setBillboardScaleFactor(float billboardScaleFactor);
 
-    void setWidth(int width);
-    int getWidth();
+        void setClipping(bool clipping);
 
-    void setHeight(int height);
-    int getHeight();
+        void setWidth(int width);
+        int getWidth();
+
+        void setHeight(int height);
+        int getHeight();
+        
+        virtual void setSize(int width, int height);
+        virtual void setInvert(bool invert);
+        
+        virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+        virtual void updateMatrix();
+
+        virtual bool load();
+        virtual bool draw();
+    };
     
-    virtual void setSize(int width, int height);
-    virtual void setInvert(bool invert);
-    
-    virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
-    virtual void updateMatrix();
-
-    virtual bool load();
-    virtual bool draw();
-};
+}
 
 #endif /* _Mesh2D_hpp */

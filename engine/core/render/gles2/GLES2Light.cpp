@@ -1,5 +1,6 @@
 #include "GLES2Light.h"
 
+using namespace Supernova;
 
 GLES2Light::GLES2Light(){
     program = NULL;
