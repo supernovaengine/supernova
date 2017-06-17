@@ -20,7 +20,8 @@ namespace Supernova {
     class GLES2Mesh : public MeshRender {
 
         typedef struct {
-            GLuint indiceBuffer;
+            GLuint indexBuffer;
+            GLuint indexBufferSize;
         } SubmeshIndiceStruct;
 
     private:
@@ -55,8 +56,19 @@ namespace Supernova {
         GLuint vertexBuffer;
         GLuint normalBuffer;
         GLuint uvBuffer;
+        
+        GLuint vertexBufferSize;
+        GLuint normalBufferSize;
+        GLuint uvBufferSize;
+        
+        GLenum usageBuffer;
 
         std::unordered_map<Submesh*, SubmeshIndiceStruct> submeshesIndices;
+        
+        void useVerticesBuffer();
+        void useTexcoordsBuffer();
+        void useNormalsBuffer();
+        void useIndicesBuffer();
 
     public:
         GLES2Mesh();
