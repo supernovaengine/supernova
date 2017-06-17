@@ -36,6 +36,13 @@ namespace Supernova {
         static bool mouseAsTouch;
         static bool useDegrees;
         static int scalingMode;
+        
+        static unsigned long lastTime;
+        
+        static unsigned long frameTime;
+        static unsigned int targetFramerate;
+        static float deltatime;
+        static float framerate;
 
     public:
         
@@ -71,6 +78,7 @@ namespace Supernova {
         static bool isUseDegrees();
         
         static int getPlatform();
+        static float getFramerate();
         
         //-----Supernova API events-----
         static void onStart();

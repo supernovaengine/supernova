@@ -15,7 +15,7 @@ Text::Text(): Mesh2D() {
     text = "";
 }
 
-Text::Text(std::string font): Text() {
+Text::Text(const char* font): Text() {
     setFont(font);
 }
 
@@ -37,12 +37,12 @@ bool Text::operator != ( const char* v ) const{
     return ( text != v );
 }
 
-void Text::setFont(std::string font){
+void Text::setFont(const char* font){
     this->font = font;
     setTexture(font);
 }
 
-void Text::setText(std::string text){
+void Text::setText(const char* text){
     this->text = text;
     if (loaded){
         createText();

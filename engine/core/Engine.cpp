@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #include "Events.h"
 #include "platform/Log.h"
@@ -27,6 +28,7 @@
 #include "Input.h"
 
 #include "audio/SoundManager.h"
+
 
 using namespace Supernova;
 
@@ -46,8 +48,16 @@ bool Engine::mouseAsTouch;
 bool Engine::useDegrees;
 int Engine::scalingMode;
 
+unsigned long Engine::lastTime;
+
+unsigned long Engine::frameTime;
+unsigned int Engine::targetFramerate;
+float Engine::deltatime;
+float Engine::framerate;
+
 
 Engine::Engine() {
+    
 }
 
 Engine::~Engine() {
@@ -179,6 +189,10 @@ int Engine::getPlatform(){
     return 0;
 }
 
+float Engine::getFramerate(){
+    return framerate;
+}
+
 
 void Engine::onStart(){
 
@@ -197,6 +211,9 @@ void Engine::onStart(int width, int height){
 
     LuaBind::createLuaState();
     LuaBind::bind();
+    
+    lastTime = (float)clock() / CLOCKS_PER_SEC * 1000;
+    targetFramerate = 15;
 
     init();
 }
@@ -220,7 +237,7 @@ void Engine::onSurfaceChanged(int width, int height) {
 }
 
 void Engine::onDrawFrame() {
-
+    
 	Events::call_onFrame();
 
     if (Engine::getScene() != NULL){
@@ -228,6 +245,14 @@ void Engine::onDrawFrame() {
     }
 
     SoundManager::checkActive();
+    
+    unsigned long newTime = (float)clock() / CLOCKS_PER_SEC * 1000;
+    frameTime = newTime - lastTime;
+    lastTime = newTime;
+    
+    float frameTimeSeconds = (float)frameTime / 1000;
+    framerate = 1 / frameTimeSeconds;
+    deltatime = targetFramerate / framerate;
 }
 
 void Engine::onPause(){

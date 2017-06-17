@@ -74,25 +74,26 @@ void MeshRender::checkTextureRect(){
 }
 
 void MeshRender::fillMeshProperties(){
-    if (mesh->getScene() != NULL)
-        sceneRender = mesh->getScene()->getSceneRender();
-    
-    vertices = mesh->getVertices();
-    texcoords = mesh->getTexcoords();
-    normals = mesh->getNormals();
-    submeshes = mesh->getSubmeshes();
-    
-    modelViewProjectMatrix = mesh->getModelViewProjectMatrix();
-    modelMatrix = mesh->getModelMatrix();
-    normalMatrix = mesh->getNormalMatrix();
-    cameraPosition = mesh->getCameraPosition();
-    
-    isLoaded = mesh->isLoaded();
-    isSky = mesh->isSky();
-    isDynamic = mesh->isDynamic();
-    
-    primitiveMode = mesh->getPrimitiveMode();
-    
+    if (mesh){
+        if (mesh->getScene() != NULL)
+            sceneRender = mesh->getScene()->getSceneRender();
+        
+        vertices = mesh->getVertices();
+        texcoords = mesh->getTexcoords();
+        normals = mesh->getNormals();
+        submeshes = mesh->getSubmeshes();
+        
+        modelViewProjectMatrix = mesh->getModelViewProjectMatrix();
+        modelMatrix = mesh->getModelMatrix();
+        normalMatrix = mesh->getNormalMatrix();
+        cameraPosition = mesh->getCameraPosition();
+        
+        isLoaded = mesh->isLoaded();
+        isSky = mesh->isSky();
+        isDynamic = mesh->isDynamic();
+        
+        primitiveMode = mesh->getPrimitiveMode();
+    }
 }
 
 bool MeshRender::load(){

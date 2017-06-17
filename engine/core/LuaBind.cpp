@@ -33,6 +33,7 @@
 #include "SkyBox.h"
 #include "Points.h"
 #include "Particles.h"
+#include "Text.h"
 
 #include <map>
 #include <unistd.h>
@@ -189,6 +190,7 @@ void LuaBind::bind(){
     .addStaticFunction("setCanvasSize", &Engine::setCanvasSize)
     .addStaticFunction("setMouseAsTouch", &Engine::setMouseAsTouch)
     .addStaticFunction("setScalingMode", &Engine::setScalingMode)
+    .addStaticFunction("getFramerate", &Engine::getFramerate)
     .addConstant("SCALING_FITWIDTH", S_SCALING_FITWIDTH)
     .addConstant("SCALING_FITHEIGHT", S_SCALING_FITHEIGHT)
     .addConstant("SCALING_LETTERBOX", S_SCALING_LETTERBOX)
@@ -325,6 +327,12 @@ void LuaBind::bind(){
     .addFunction("setBillboard", &Mesh2D::setBillboard)
     .addFunction("setFixedSizeBillboard", &Mesh2D::setFixedSizeBillboard)
     .addFunction("setBillboardScaleFactor", &Mesh2D::setBillboardScaleFactor)
+    .endClass()
+    
+    .beginExtendClass<Text, Mesh2D>("Text")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
+    .addFunction("setText", &Text::setText)
+    .addFunction("setFont", &Text::setFont)
     .endClass()
 
     .beginExtendClass<GUIImage, Mesh2D>("GUIImage")

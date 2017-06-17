@@ -16,10 +16,13 @@ namespace Supernova {
 
         std::string font;
         std::string text;
+        
+    protected:
+        void createText();
 
     public:
         Text();
-        Text(std::string font);
+        Text(const char* font);
         virtual ~Text();
         
         Text& operator = ( const char* v );
@@ -29,10 +32,8 @@ namespace Supernova {
         virtual void setSize(int width, int height);
         virtual void setInvert(bool invert);
         
-        void setFont(std::string font);
-        void setText(std::string text);
-        
-        void createText();
+        void setFont(const char* font);
+        void setText(const char* text);
 
         virtual bool load();
     };

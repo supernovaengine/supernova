@@ -80,23 +80,25 @@ void PointRender::checkTextureRect(){
 }
 
 void PointRender::fillPointProperties(){
-    if (points->getScene() != NULL)
-        sceneRender = points->getScene()->getSceneRender();
-    
-    positions = points->getPositions();
-    normals = points->getNormals();
-    textureRects = points->getTextureRects();
-    pointSizes = points->getPointSizes();
-    pointColors = points->getColors();
-    
-    modelMatrix = points->getModelMatrix();
-    normalMatrix = points->getNormalMatrix();
-    modelViewProjectionMatrix = points->getModelViewProjectMatrix();
-    cameraPosition = points->getCameraPosition();
-    
-    isLoaded = points->isLoaded();
-    
-    materialTexture = points->getTexture();
+    if (points){
+        if (points->getScene() != NULL)
+            sceneRender = points->getScene()->getSceneRender();
+        
+        positions = points->getPositions();
+        normals = points->getNormals();
+        textureRects = points->getTextureRects();
+        pointSizes = points->getPointSizes();
+        pointColors = points->getColors();
+        
+        modelMatrix = points->getModelMatrix();
+        normalMatrix = points->getNormalMatrix();
+        modelViewProjectionMatrix = points->getModelViewProjectMatrix();
+        cameraPosition = points->getCameraPosition();
+        
+        isLoaded = points->isLoaded();
+        
+        materialTexture = points->getTexture();
+    }
 }
 
 bool PointRender::load(){
