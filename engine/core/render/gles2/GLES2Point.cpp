@@ -53,56 +53,50 @@ void GLES2Point::useVerticesBuffer(){
 }
 
 void GLES2Point::useNormalsBuffer(){
-    if (lighting && normals){
-        if (normalBufferSize == 0){
-            normalBuffer = GLES2Util::createVBO();
-        }
-        if (normalBufferSize >= normals->size()){
-            GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
-        }else{
-            normalBufferSize = (unsigned int)normals->size();
-            GLES2Util::dataVBO(normalBuffer, GL_ARRAY_BUFFER, normalBufferSize * 3 * sizeof(GLfloat), &normals->front(), usageBuffer);
-        }
+    if (normalBufferSize == 0){
+        normalBuffer = GLES2Util::createVBO();
+    }
+    if (normalBufferSize >= normals->size()){
+        GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
+    }else{
+        normalBufferSize = (unsigned int)normals->size();
+        GLES2Util::dataVBO(normalBuffer, GL_ARRAY_BUFFER, normalBufferSize * 3 * sizeof(GLfloat), &normals->front(), usageBuffer);
     }
 }
 
 void GLES2Point::usePointSizesBuffer(){
-    if (pointSizes){
-        if (pointSizeBufferSize == 0){
-            pointSizeBuffer = GLES2Util::createVBO();
-        }
-        if (pointSizeBufferSize >= pointSizes->size()){
-            GLES2Util::updateVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front());
-        }else{
-            pointSizeBufferSize = (unsigned int)pointSizes->size();
-            GLES2Util::dataVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizeBufferSize * sizeof(GLfloat), &pointSizes->front(), usageBuffer);
-        }
+    if (pointSizeBufferSize == 0){
+        pointSizeBuffer = GLES2Util::createVBO();
+    }
+    if (pointSizeBufferSize >= pointSizes->size()){
+        GLES2Util::updateVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front());
+    }else{
+        pointSizeBufferSize = (unsigned int)pointSizes->size();
+        GLES2Util::dataVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizeBufferSize * sizeof(GLfloat), &pointSizes->front(), usageBuffer);
     }
 }
+
 void GLES2Point::useTextureRectsBuffer(){
-    if (hasTextureRect && textureRects){
-        if (textureRectBufferSize == 0){
-            textureRectBuffer = GLES2Util::createVBO();
-        }
-        if (textureRectBufferSize >= textureRects->size()){
-            GLES2Util::updateVBO(textureRectBuffer, GL_ARRAY_BUFFER, textureRects->size() * 4 * sizeof(GLfloat), &rectsData().front());
-        }else{
-            textureRectBufferSize = (unsigned int)textureRects->size();
-            GLES2Util::dataVBO(textureRectBuffer, GL_ARRAY_BUFFER, textureRectBufferSize * 4 * sizeof(GLfloat), &rectsData().front(), usageBuffer);
-        }
+    if (textureRectBufferSize == 0){
+        textureRectBuffer = GLES2Util::createVBO();
+    }
+    if (textureRectBufferSize >= textureRects->size()){
+        GLES2Util::updateVBO(textureRectBuffer, GL_ARRAY_BUFFER, textureRects->size() * 4 * sizeof(GLfloat), &rectsData().front());
+    }else{
+        textureRectBufferSize = (unsigned int)textureRects->size();
+        GLES2Util::dataVBO(textureRectBuffer, GL_ARRAY_BUFFER, textureRectBufferSize * 4 * sizeof(GLfloat), &rectsData().front(), usageBuffer);
     }
 }
+
 void GLES2Point::usePointColorsBuffer(){
-    if (pointColors){
-        if (pointColorBufferSize == 0){
-            pointColorBuffer = GLES2Util::createVBO();
-        }
-        if (pointColorBufferSize >= pointColors->size()){
-            GLES2Util::updateVBO(pointColorBuffer, GL_ARRAY_BUFFER, pointColors->size() * 4 * sizeof(GLfloat), &pointColors->front());
-        }else{
-            pointColorBufferSize = (unsigned int)pointColors->size();
-            GLES2Util::dataVBO(pointColorBuffer, GL_ARRAY_BUFFER, pointColorBufferSize * 4 * sizeof(GLfloat), &pointColors->front(), usageBuffer);
-        }
+    if (pointColorBufferSize == 0){
+        pointColorBuffer = GLES2Util::createVBO();
+    }
+    if (pointColorBufferSize >= pointColors->size()){
+        GLES2Util::updateVBO(pointColorBuffer, GL_ARRAY_BUFFER, pointColors->size() * 4 * sizeof(GLfloat), &pointColors->front());
+    }else{
+        pointColorBufferSize = (unsigned int)pointColors->size();
+        GLES2Util::dataVBO(pointColorBuffer, GL_ARRAY_BUFFER, pointColorBufferSize * 4 * sizeof(GLfloat), &pointColors->front(), usageBuffer);
     }
 }
 
@@ -115,7 +109,8 @@ void GLES2Point::updatePositions(){
 void GLES2Point::updateNormals(){
     PointRender::updateNormals();
     if (isLoaded)
-        useNormalsBuffer();
+        if (lighting)
+            useNormalsBuffer();
 }
 
 void GLES2Point::updatePointSizes(){
@@ -127,7 +122,8 @@ void GLES2Point::updatePointSizes(){
 void GLES2Point::updateTextureRects(){
     PointRender::updateTextureRects();
     if (isLoaded)
-        useTextureRectsBuffer();
+        if (hasTextureRect)
+            useTextureRectsBuffer();
 }
 
 void GLES2Point::updatePointColors(){
@@ -168,19 +164,22 @@ bool GLES2Point::load() {
     pointColorBufferSize = 0;
     
     useVerticesBuffer();
-    useNormalsBuffer();
-    usePointSizesBuffer();
-    useTextureRectsBuffer();
-    usePointColorsBuffer();
-    
     aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
-    if (normalBufferSize > 0){
+    
+    if (lighting){
+        useNormalsBuffer();
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
     }
-    if (textureRectBufferSize > 0){
+    
+    usePointSizesBuffer();
+    a_PointSize = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_PointSize");
+    
+    if (hasTextureRect){
+        useTextureRectsBuffer();
         a_textureRect = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_textureRect");
     }
-    a_PointSize = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_PointSize");
+
+    usePointColorsBuffer();
     a_pointColor = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_pointColor");
 
     if (textured){

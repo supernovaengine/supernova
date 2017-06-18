@@ -35,32 +35,33 @@ void GLES2Mesh::useVerticesBuffer(){
         GLES2Util::dataVBO(vertexBuffer, GL_ARRAY_BUFFER, vertexBufferSize * 3 * sizeof(GLfloat), &vertices->front(), usageBuffer);
     }
 }
+
 void GLES2Mesh::useTexcoordsBuffer(){
-    if (texcoords){
-        if (uvBufferSize == 0){
-            uvBuffer = GLES2Util::createVBO();
-        }
-        if (uvBufferSize >= texcoords->size()){
-            GLES2Util::updateVBO(uvBuffer, GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front());
-        }else{
-            uvBufferSize = (unsigned int)texcoords->size();
-            GLES2Util::dataVBO(uvBuffer, GL_ARRAY_BUFFER, uvBufferSize * 2 * sizeof(GLfloat), &texcoords->front(), usageBuffer);
-        }
+    if (uvBufferSize == 0){
+        uvBuffer = GLES2Util::createVBO();
+    }
+    if (uvBufferSize >= texcoords->size()){
+        GLES2Util::updateVBO(uvBuffer, GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front());
+    }else{
+        uvBufferSize = (unsigned int)texcoords->size();
+        GLES2Util::dataVBO(uvBuffer, GL_ARRAY_BUFFER, uvBufferSize * 2 * sizeof(GLfloat), &texcoords->front(), usageBuffer);
     }
 }
+
 void GLES2Mesh::useNormalsBuffer(){
-    if (lighting && normals){
-        if (normalBuffer == 0){
-            normalBuffer = GLES2Util::createVBO();
-        }
-        if (normalBufferSize >= normals->size()){
-            GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
-        }else{
-            normalBufferSize = (unsigned int)normals->size();
-            GLES2Util::dataVBO(normalBuffer, GL_ARRAY_BUFFER, normalBufferSize * 3 * sizeof(GLfloat), &normals->front(), usageBuffer);
-        }
+    if (normals){
+    if (normalBufferSize == 0){
+        normalBuffer = GLES2Util::createVBO();
+    }
+    if (normalBufferSize >= normals->size()){
+        GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
+    }else{
+        normalBufferSize = (unsigned int)normals->size();
+        GLES2Util::dataVBO(normalBuffer, GL_ARRAY_BUFFER, normalBufferSize * 3 * sizeof(GLfloat), &normals->front(), usageBuffer);
+    }
     }
 }
+
 void GLES2Mesh::useIndicesBuffer(){
     for (unsigned int i = 0; i < submeshes->size(); i++){
         if (submeshesRender[submeshes->at(i)].indicesSizes > 0){
@@ -98,7 +99,8 @@ void GLES2Mesh::updateTexcoords(){
 void GLES2Mesh::updateNormals(){
     MeshRender::updateNormals();
     if (isLoaded)
-        useNormalsBuffer();
+        if (lighting)
+            useNormalsBuffer();
 }
 
 void GLES2Mesh::updateIndices(){
@@ -146,18 +148,19 @@ bool GLES2Mesh::load() {
     if (isDynamic){
         usageBuffer = GL_DYNAMIC_DRAW;
     }
-    
+
     vertexBufferSize = 0;
     uvBufferSize = 0;
     normalBufferSize = 0;
     
     useVerticesBuffer();
-    useTexcoordsBuffer();
-    useNormalsBuffer();
-    
     aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
+    
+    useTexcoordsBuffer();
     aTextureCoordinatesLocation = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_TextureCoordinates");
-    if (normalBufferSize > 0){
+    
+    if (lighting){
+        useNormalsBuffer();
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
     }
     
@@ -172,7 +175,7 @@ bool GLES2Mesh::load() {
         if (submeshesRender[submeshes->at(i)].indicesSizes > 0){
             submeshesIndices[submeshes->at(i)].indexBufferSize = 0;
         }
-
+        
         if (submeshesRender[submeshes->at(i)].textured){
             if (submeshes->at(i)->getMaterial()->getTextureType() == S_TEXTURE_CUBE){
                 std::vector<std::string> textures;

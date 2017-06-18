@@ -25,7 +25,7 @@ void GLES2Util::checkGlError(const char* op) {
     }
 }
 
-void GLES2Util::generateEmptyTexture(){
+void GLES2Util::generateEmptyTexture() {
     if (!GLES2Util::emptyTextureLoaded){
         glGenTextures(1, &GLES2Util::emptyTexture);
         glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
