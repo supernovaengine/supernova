@@ -19,8 +19,8 @@ namespace Supernova {
         static void generateEmptyTexture();
 
         static void checkGlError(const char* op);
-        static GLuint createVBO(GLenum target, const GLsizeiptr size, const GLvoid* data, const GLenum usage);
-        static GLuint create2VBO();
+
+        static GLuint createVBO();
         static void dataVBO(GLuint vbo_object, GLenum target, const GLsizeiptr size, const GLvoid* data, const GLenum usage);
         static void updateVBO(GLuint vbo_object, GLenum target, const GLsizeiptr size, const GLvoid* data);
 

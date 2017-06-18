@@ -48,8 +48,21 @@ namespace Supernova {
         GLuint textureRectBuffer;
         GLuint pointColorBuffer;
         
+        GLuint vertexBufferSize;
+        GLuint normalBufferSize;
+        GLuint pointSizeBufferSize;
+        GLuint textureRectBufferSize;
+        GLuint pointColorBufferSize;
+        
+        GLenum usageBuffer;
+        
         std::vector<float> rectsData();
 
+        void useVerticesBuffer();
+        void useNormalsBuffer();
+        void usePointSizesBuffer();
+        void useTextureRectsBuffer();
+        void usePointColorsBuffer();
         
     public:
         GLES2Point();
