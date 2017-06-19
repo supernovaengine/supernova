@@ -15,11 +15,12 @@ SubmeshRender::~SubmeshRender(){
     
 }
 
-SubmeshRender* SubmeshRender::newInstance(){
-    if (Engine::getRenderAPI() == S_GLES2){
-        return new GLES2Submesh();
+void SubmeshRender::newInstance(SubmeshRender** render) {
+    if (*render == NULL) {
+        if (Engine::getRenderAPI() == S_GLES2) {
+            *render = new GLES2Submesh();
+        }
     }
-    return NULL;
 }
 
 void SubmeshRender::fillSubmeshProperties(){
@@ -34,7 +35,8 @@ void SubmeshRender::fillSubmeshProperties(){
         
         material = submesh->getMaterial();
         indices = submesh->getIndices();
-        isLoaded = submesh->isLoaded();
+
+        isDynamic = submesh->isDynamic();
     }
 }
 

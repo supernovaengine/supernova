@@ -50,7 +50,6 @@ void GLES2Mesh::useTexcoordsBuffer(){
 }
 
 void GLES2Mesh::useNormalsBuffer(){
-    if (normals){
     if (normalBufferSize == 0){
         normalBuffer = GLES2Util::createVBO();
     }
@@ -60,35 +59,30 @@ void GLES2Mesh::useNormalsBuffer(){
         normalBufferSize = (unsigned int)normals->size();
         GLES2Util::dataVBO(normalBuffer, GL_ARRAY_BUFFER, normalBufferSize * 3 * sizeof(GLfloat), &normals->front(), usageBuffer);
     }
-    }
 }
 
 void GLES2Mesh::updateVertices(){
     MeshRender::updateVertices();
-    if (isLoaded)
-        useVerticesBuffer();
+    useVerticesBuffer();
 }
 
 void GLES2Mesh::updateTexcoords(){
     MeshRender::updateTexcoords();
-    if (isLoaded)
+    if (hasTexture)
         useTexcoordsBuffer();
 }
 
 void GLES2Mesh::updateNormals(){
     MeshRender::updateNormals();
-    if (isLoaded)
-        if (lighting)
-            useNormalsBuffer();
+    if (lighting)
+        useNormalsBuffer();
 }
 
 void GLES2Mesh::updateIndices(){
     MeshRender::updateIndices();
-    if (isLoaded){
-        for (unsigned int i = 0; i < submeshes->size(); i++){
-            GLES2Submesh* submeshRender = (GLES2Submesh*)submeshes->at(i)->getSubmeshRender();
-            submeshRender->useIndicesBuffer();
-        }
+    for (unsigned int i = 0; i < submeshes->size(); i++){
+        GLES2Submesh* submeshRender = (GLES2Submesh*)submeshes->at(i)->getSubmeshRender();
+        submeshRender->useIndicesBuffer();
     }
 }
 
@@ -100,10 +94,8 @@ bool GLES2Mesh::load() {
 
     std::string programName = "mesh_perfragment";
     std::string programDefs = "";
-    if (submeshes){
-        if (submeshes->at(0)->getMaterial()->getTextureType() == S_TEXTURE_CUBE){
-            programDefs += "#define USE_TEXTURECUBE\n";
-        }
+    if (hasTextureCube){
+        programDefs += "#define USE_TEXTURECUBE\n";
     }
     if (isSky){
         programDefs += "#define IS_SKY\n";
@@ -114,8 +106,8 @@ bool GLES2Mesh::load() {
     if (hasfog){
         programDefs += "#define HAS_FOG\n";
     }
-    if (texcoords){
-        programDefs += "#define USE_TEXTURECOORDS\n"; //TODO!
+    if (hasTexture){
+        programDefs += "#define USE_TEXTURECOORDS\n";
     }
     if (hasTextureRect){
         programDefs += "#define HAS_TEXTURERECT\n";
@@ -138,9 +130,11 @@ bool GLES2Mesh::load() {
     
     useVerticesBuffer();
     aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
-    
-    useTexcoordsBuffer();
-    aTextureCoordinatesLocation = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_TextureCoordinates");
+
+    if (hasTexture) {
+        useTexcoordsBuffer();
+        aTextureCoordinates = glGetAttribLocation(((GLES2Program *) gProgram.get())->getProgram(), "a_TextureCoordinates");
+    }
     
     if (lighting){
         useNormalsBuffer();
@@ -176,10 +170,6 @@ bool GLES2Mesh::draw() {
         return false;
     }
 
-    if (!isLoaded){
-        return false;
-    }
-
     if (isSky) {
        glDepthFunc(GL_LEQUAL);
     }
@@ -208,12 +198,12 @@ bool GLES2Mesh::draw() {
     if (aPositionHandle == -1) aPositionHandle = attributePos;
     glVertexAttribPointer(aPositionHandle, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
 
-    if (texcoords){
+    if (hasTexture){
         attributePos++;
         glEnableVertexAttribArray(attributePos);
         glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-        if (aTextureCoordinatesLocation == -1) aTextureCoordinatesLocation = attributePos;
-        glVertexAttribPointer(aTextureCoordinatesLocation, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+        if (aTextureCoordinates == -1) aTextureCoordinates = attributePos;
+        glVertexAttribPointer(aTextureCoordinates, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     }
 
     if (lighting) {
@@ -284,18 +274,16 @@ bool GLES2Mesh::draw() {
 }
 
 void GLES2Mesh::destroy(){
-    
-    if (isLoaded){
-        glDeleteBuffers(1, &vertexBuffer);
-        if (texcoords){
-            glDeleteBuffers(1, &uvBuffer);
-        }
-        if (lighting && normals){
-            glDeleteBuffers(1, &normalBuffer);
-        }
-        gProgram.reset();
-        ProgramManager::deleteUnused();
+
+    glDeleteBuffers(1, &vertexBuffer);
+    if (texcoords){
+        glDeleteBuffers(1, &uvBuffer);
     }
+    if (lighting && normals){
+        glDeleteBuffers(1, &normalBuffer);
+    }
+    gProgram.reset();
+    ProgramManager::deleteUnused();
     
     MeshRender::destroy();
 }

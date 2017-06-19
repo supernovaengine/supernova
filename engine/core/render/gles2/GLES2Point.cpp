@@ -102,34 +102,29 @@ void GLES2Point::usePointColorsBuffer(){
 
 void GLES2Point::updatePositions(){
     PointRender::updatePositions();
-    if (isLoaded)
-        useVerticesBuffer();
+    useVerticesBuffer();
 }
 
 void GLES2Point::updateNormals(){
     PointRender::updateNormals();
-    if (isLoaded)
-        if (lighting)
-            useNormalsBuffer();
+    if (lighting)
+        useNormalsBuffer();
 }
 
 void GLES2Point::updatePointSizes(){
     PointRender::updatePointSizes();
-    if (isLoaded)
-        usePointSizesBuffer();
+    usePointSizesBuffer();
 }
 
 void GLES2Point::updateTextureRects(){
     PointRender::updateTextureRects();
-    if (isLoaded)
-        if (hasTextureRect)
-            useTextureRectsBuffer();
+    if (hasTextureRect)
+        useTextureRectsBuffer();
 }
 
 void GLES2Point::updatePointColors(){
     PointRender::updatePointColors();
-    if (isLoaded)
-        usePointColorsBuffer();
+    usePointColorsBuffer();
 }
 
 bool GLES2Point::load() {
@@ -214,10 +209,6 @@ bool GLES2Point::load() {
 bool GLES2Point::draw() {
 
     if (!PointRender::draw()){
-        return false;
-    }
-    
-    if (!isLoaded){
         return false;
     }
     
@@ -310,27 +301,25 @@ bool GLES2Point::draw() {
 }
 
 void GLES2Point::destroy(){
-    if (isLoaded){
-        glDeleteBuffers(1, &vertexBuffer);
-        if (lighting && normals){
-            glDeleteBuffers(1, &normalBuffer);
-        }
-        if (hasTextureRect && textureRects){
-            glDeleteBuffers(1, &textureRectBuffer);
-        }
-        if (pointSizes)
-            glDeleteBuffers(1, &pointSizeBuffer);
-        if (pointColors)
-            glDeleteBuffers(1, &pointColorBuffer);
-
-        if (textured){
-            texture.reset();
-            TextureManager::deleteUnused();
-        }
-
-        gProgram.reset();
-        ProgramManager::deleteUnused();
+    glDeleteBuffers(1, &vertexBuffer);
+    if (lighting && normals){
+        glDeleteBuffers(1, &normalBuffer);
     }
+    if (hasTextureRect && textureRects){
+        glDeleteBuffers(1, &textureRectBuffer);
+    }
+    if (pointSizes)
+        glDeleteBuffers(1, &pointSizeBuffer);
+    if (pointColors)
+        glDeleteBuffers(1, &pointColorBuffer);
+
+    if (textured){
+        texture.reset();
+        TextureManager::deleteUnused();
+    }
+
+    gProgram.reset();
+    ProgramManager::deleteUnused();
     
     PointRender::destroy();
 }

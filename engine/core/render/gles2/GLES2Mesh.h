@@ -27,7 +27,7 @@ namespace Supernova {
         std::shared_ptr<ProgramRender> gProgram;
         
         GLint aPositionHandle;
-        GLint aTextureCoordinatesLocation;
+        GLint aTextureCoordinates;
         GLint aNormal;
         
         GLuint uTextureUnitLocation;

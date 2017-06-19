@@ -4,10 +4,11 @@
 using namespace Supernova;
 
 Submesh::Submesh(){
-    this->loaded = false;
     this->distanceToCamera = -1;
     this->material = NULL;
     this->newMaterial = false;
+
+    this->render = NULL;
 }
 
 Submesh::Submesh(Material* material): Submesh() {
@@ -15,9 +16,6 @@ Submesh::Submesh(Material* material): Submesh() {
 }
 
 Submesh::~Submesh(){
-    
-    destroy();
-    
     if (newMaterial)
         delete material;
     
@@ -27,16 +25,24 @@ Submesh::~Submesh(){
 
 Submesh::Submesh(const Submesh& s){
     this->indices = s.indices;
-    this->loaded = s.loaded;
     this->distanceToCamera = s.distanceToCamera;
+    this->newMaterial = s.newMaterial;
+    this->material = s.material;
+    this->render = s.render;
 }
 
 Submesh& Submesh::operator = (const Submesh& s){
     this->indices = s.indices;
-    this->loaded = s.loaded;
     this->distanceToCamera = s.distanceToCamera;
+    this->newMaterial = s.newMaterial;
+    this->material = s.material;
+    this->render = s.render;
 
     return *this;
+}
+
+bool Submesh::isDynamic(){
+    return dynamic;
 }
 
 void Submesh::setIndices(std::vector<unsigned int> indices){
@@ -72,14 +78,8 @@ SubmeshRender* Submesh::getSubmeshRender(){
     return render;
 }
 
-bool Submesh::isLoaded(){
-    return loaded;
-}
-
 bool Submesh::load(){
-    render = SubmeshRender::newInstance();
-    
-    loaded  = true;
+    SubmeshRender::newInstance(&render);
         
     render->setSubmesh(this);
     render->load();
@@ -92,8 +92,5 @@ bool Submesh::draw(){
 }
 
 void Submesh::destroy(){
-    
-    loaded = false;
-    
     render->destroy();
 }

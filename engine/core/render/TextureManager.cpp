@@ -28,10 +28,6 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
 
     //Verify if there is a created texture
     if (textures[id].value){
-        Log::Debug(LOG_TAG, "Load texture (texture map size: %lu)", textures.size());
-        for(TextureManager::it_type iterator = textures.begin(); iterator != textures.end(); iterator++) {
-            Log::Debug(LOG_TAG, "Texture (%s: %lu)", iterator->first.c_str(), iterator->second.value.use_count());
-        }
         return textures[id].value;
     }
 
@@ -56,10 +52,6 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
     textures[id] = {texturePtr, useAlpha, textureFile->getWidth(), textureFile->getHeight()};
     
     Log::Debug(LOG_TAG, "Load texture (texture map size: %lu)", textures.size());
-    
-    for(TextureManager::it_type iterator = textures.begin(); iterator != textures.end(); iterator++) {
-        Log::Debug(LOG_TAG, "Texture (%s: %lu)", iterator->first.c_str(), iterator->second.value.use_count());
-    }
 
     return textures[id].value;
 }
@@ -67,10 +59,6 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
 std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::string> relative_paths, std::string id){
     //Verify if there is a created texture
     if (textures[id].value){
-        Log::Debug(LOG_TAG, "Load texture (texture map size: %lu)", textures.size());
-        for(TextureManager::it_type iterator = textures.begin(); iterator != textures.end(); iterator++) {
-            Log::Debug(LOG_TAG, "Texture (%s: %lu)", iterator->first.c_str(), iterator->second.value.use_count());
-        }
         return textures[id].value;
     }
     
@@ -100,10 +88,6 @@ std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::
     
     Log::Debug(LOG_TAG, "Load texture cube (texture map size: %lu)", textures.size());
     
-    for(TextureManager::it_type iterator = textures.begin(); iterator != textures.end(); iterator++) {
-        Log::Debug(LOG_TAG, "Texture (%s: %lu)", iterator->first.c_str(), iterator->second.value.use_count());
-    }
-    
     return textures[id].value;
 }
 
@@ -128,11 +112,6 @@ void TextureManager::deleteUnused(){
     }
     
     Log::Debug(LOG_TAG, "Delete texture (texture map size: %lu)", textures.size());
-    
-    for(TextureManager::it_type iterator = textures.begin(); iterator != textures.end(); iterator++) {
-        Log::Debug(LOG_TAG, "Texture (%s: %lu)", iterator->first.c_str(), iterator->second.value.use_count());
-    }
-
 }
 
 TextureManager::it_type TextureManager::findToRemove(){

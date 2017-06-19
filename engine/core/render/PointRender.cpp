@@ -19,8 +19,6 @@ PointRender::PointRender(){
     pointSizes = NULL;
     pointColors = NULL;
     
-    isLoaded = false;
-    
     materialTexture = "";
 
 }
@@ -95,8 +93,6 @@ void PointRender::fillPointProperties(){
         modelViewProjectionMatrix = points->getModelViewProjectMatrix();
         cameraPosition = points->getCameraPosition();
         
-        isLoaded = points->isLoaded();
-        
         materialTexture = points->getTexture();
     }
 }
@@ -134,7 +130,5 @@ bool PointRender::draw() {
 void PointRender::destroy(){
     
     fillPointProperties();
-    
-    isLoaded = false;
     
 }

@@ -46,8 +46,6 @@ namespace Supernova {
         Matrix4 modelViewProjectionMatrix;
         Vector3 cameraPosition;
         
-        bool isLoaded;
-        
         std::string materialTexture;
 
     public:

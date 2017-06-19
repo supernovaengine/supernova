@@ -11,20 +11,20 @@
 namespace Supernova {
 
     class Submesh: public Render {
+
         friend class Mesh;
         friend class Model;
+
     private:
-        
-        bool loaded;
-        
+
         SubmeshRender* render;
 
         std::vector<unsigned int> indices;
         
         Material* material;
         bool newMaterial;
-        
         float distanceToCamera;
+        bool dynamic;
 
     public:
         Submesh();
@@ -43,8 +43,8 @@ namespace Supernova {
         void createNewMaterial();
         void setMaterial(Material* material);
         Material* getMaterial();
-        
-        bool isLoaded();
+
+        bool isDynamic();
         
         SubmeshRender* getSubmeshRender();
         

@@ -133,12 +133,13 @@ bool Mesh::load(){
     
     renderManager.getRender()->setMesh(this);
 
-    bool renderloaded = renderManager.getRender()->load();
-    
     for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->dynamic = dynamic;
         submeshes[i]->load();
     }
-    
+
+    bool renderloaded = renderManager.getRender()->load();
+
     if (renderloaded)
         return ConcreteObject::load();
     else

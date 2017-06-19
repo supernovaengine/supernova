@@ -21,7 +21,7 @@ namespace Supernova {
 
         void checkLighting();
         void checkFog();
-        void checkTextureRect();
+        void checkSubmeshProperties();
         void fillMeshProperties();
         
     protected:
@@ -29,6 +29,8 @@ namespace Supernova {
         bool lighting;
         bool hasfog;
         bool hasTextureRect;
+        bool hasTexture;
+        bool hasTextureCube;
         
         //-------begin mesh properties-------
         SceneRender* sceneRender;
@@ -41,8 +43,7 @@ namespace Supernova {
         Matrix4 modelMatrix;
         Matrix4 normalMatrix;
         Vector3 cameraPosition;
-        
-        bool isLoaded;
+
         bool isSky;
         bool isDynamic;
         

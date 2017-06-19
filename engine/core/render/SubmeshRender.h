@@ -26,8 +26,9 @@ namespace Supernova {
         bool textured;
         Material* material;
         std::vector<unsigned int>* indices;
-        
-        bool isLoaded;
+
+        bool isDynamic;
+
         //------------end------------
         
     public:
@@ -35,7 +36,7 @@ namespace Supernova {
         SubmeshRender();
         virtual ~SubmeshRender();
         
-        static SubmeshRender* newInstance();
+        static void newInstance(SubmeshRender** render);
         
         void setSubmesh(Submesh* submesh);
         

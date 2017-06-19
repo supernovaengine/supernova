@@ -8,6 +8,8 @@
 using namespace Supernova;
 
 GLES2Submesh::GLES2Submesh(){
+
+    usageBuffer = GL_STATIC_DRAW;
     
 }
 
@@ -25,16 +27,20 @@ void GLES2Submesh::useIndicesBuffer(){
             GLES2Util::updateVBO(indexBuffer,GL_ELEMENT_ARRAY_BUFFER, indices->size() * sizeof(unsigned int), &indices->front());
         }else{
             indexBufferSize = (unsigned int)indices->size();
-            //TODO usageBuffer
-            GLES2Util::dataVBO(indexBuffer, GL_ELEMENT_ARRAY_BUFFER, indexBufferSize * sizeof(unsigned int), &indices->front(), GL_STATIC_DRAW);
+            GLES2Util::dataVBO(indexBuffer, GL_ELEMENT_ARRAY_BUFFER, indexBufferSize * sizeof(unsigned int), &indices->front(), usageBuffer);
             
         }
     }
 }
 
 bool GLES2Submesh::load(){
+
     if (!SubmeshRender::load()){
         return false;
+    }
+
+    if (isDynamic){
+        usageBuffer = GL_DYNAMIC_DRAW;
     }
     
     if (indicesSizes > 0){
@@ -43,10 +49,6 @@ bool GLES2Submesh::load(){
     }
     
     if (textured){
-        if (isLoaded){
-            texture.reset();
-            TextureManager::deleteUnused();
-        }
         if (material->getTextureType() == S_TEXTURE_CUBE){
             std::vector<std::string> textures;
             std::string id = "cube|";
@@ -70,15 +72,13 @@ bool GLES2Submesh::load(){
 }
 
 void GLES2Submesh::destroy(){
-    
-    if (isLoaded){
-        if (indicesSizes > 0)
-            glDeleteBuffers(1, &indexBuffer);
+
+    if (indicesSizes > 0)
+        glDeleteBuffers(1, &indexBuffer);
         
-        if (textured){
-            texture.reset();
-            TextureManager::deleteUnused();
-        }
+    if (textured){
+        texture.reset();
+        TextureManager::deleteUnused();
     }
     
     SubmeshRender::destroy();

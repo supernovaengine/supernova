@@ -67,7 +67,8 @@ void Points::setPointSize(int point, float size){
 
 void Points::setPointColor(int point, Vector4 color){
     colors[point] = color;
-    renderManager.getRender()->updatePointColors();
+    if (loaded)
+        renderManager.getRender()->updatePointColors();
 }
 
 void Points::setPointColor(int point, float red, float green, float blue, float alpha){
@@ -87,7 +88,8 @@ void Points::setPointSprite(int point, std::string id){
     }else{
         useTextureRects = true;
         normalizeTextureRects();
-        renderManager.getRender()->updateTextureRects();
+        if (loaded)
+            renderManager.getRender()->updateTextureRects();
     }
 }
 
@@ -121,8 +123,9 @@ void Points::fillScaledSizeVector(){
             pointSizeScaledVal = maxPointSize;
         pointSizesScaled.push_back(pointSizeScaledVal);
     }
-    
-    renderManager.getRender()->updatePointSizes();
+
+    if (loaded)
+        renderManager.getRender()->updatePointSizes();
 }
 
 void Points::normalizeTextureRects(){

@@ -10,10 +10,11 @@ MeshRender::MeshRender(){
     lighting = false;
     hasfog = false;
     hasTextureRect = false;
+    hasTexture = false;
+    hasTextureCube = false;
 
     sceneRender = NULL;
 
-    isLoaded = false;
     isSky = false;
     isDynamic = false;
     
@@ -58,11 +59,19 @@ void MeshRender::checkFog(){
     }
 }
 
-void MeshRender::checkTextureRect(){
+void MeshRender::checkSubmeshProperties(){
     hasTextureRect = false;
+    hasTexture = false;
+    hasTextureCube = false;
     for (unsigned int i = 0; i < submeshes->size(); i++){
         if (submeshes->at(i)->getMaterial()->getTextureRect()){
             hasTextureRect = true;
+        }
+        if (submeshes->at(i)->getMaterial()->getTextures().size() > 0){
+            hasTexture = true;
+        }
+        if (submeshes->at(i)->getMaterial()->getTextureType() == S_TEXTURE_CUBE){
+            hasTextureCube = true;
         }
     }
 }
@@ -81,8 +90,7 @@ void MeshRender::fillMeshProperties(){
         modelMatrix = mesh->getModelMatrix();
         normalMatrix = mesh->getNormalMatrix();
         cameraPosition = mesh->getCameraPosition();
-        
-        isLoaded = mesh->isLoaded();
+
         isSky = mesh->isSky();
         isDynamic = mesh->isDynamic();
         
@@ -100,7 +108,7 @@ bool MeshRender::load(){
     
     checkLighting();
     checkFog();
-    checkTextureRect();
+    checkSubmeshProperties();
 
     return true;
 }
@@ -115,7 +123,5 @@ bool MeshRender::draw() {
 void MeshRender::destroy() {
     
     fillMeshProperties();
-    
-    isLoaded = false;
     
 }

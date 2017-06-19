@@ -21,6 +21,8 @@ namespace Supernova {
         
         GLuint indexBuffer;
         GLuint indexBufferSize;
+
+        GLenum usageBuffer;
         
         virtual bool load();
         virtual void destroy();
