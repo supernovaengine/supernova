@@ -32,7 +32,8 @@ namespace Supernova {
         int numPoints;
         std::shared_ptr<TextureRender> texture;
         bool textured;
-        
+
+        //-------begin points properties-------
         SceneRender* sceneRender;
         
         std::vector<Vector3>* positions;
@@ -47,11 +48,14 @@ namespace Supernova {
         Vector3 cameraPosition;
         
         std::string materialTexture;
+        //------------end------------
 
     public:
         
         PointRender();
         virtual ~PointRender();
+
+        static void newInstance(PointRender** render);
         
         void setPoints(Points* points);
 

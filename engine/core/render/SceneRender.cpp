@@ -1,6 +1,8 @@
 #include "SceneRender.h"
 #include "math/Angle.h"
 #include "Scene.h"
+#include "Engine.h"
+#include "gles2/GLES2Scene.h"
 
 using namespace Supernova;
 
@@ -14,6 +16,15 @@ SceneRender::SceneRender(){
 }
 
 SceneRender::~SceneRender(){
+
+}
+
+void SceneRender::newInstance(SceneRender** render){
+    if (*render == NULL){
+        if (Engine::getRenderAPI() == S_GLES2){
+            *render = new GLES2Scene();
+        }
+    }
 }
 
 void SceneRender::setScene(Scene* scene){

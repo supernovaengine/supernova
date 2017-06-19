@@ -2,6 +2,8 @@
 #include "PrimitiveMode.h"
 #include "Mesh.h"
 #include "Scene.h"
+#include "Engine.h"
+#include "render/gles2/GLES2Mesh.h"
 
 using namespace Supernova;
 
@@ -23,6 +25,15 @@ MeshRender::MeshRender(){
 }
 
 MeshRender::~MeshRender(){
+
+}
+
+void MeshRender::newInstance(MeshRender** render){
+    if (*render == NULL){
+        if (Engine::getRenderAPI() == S_GLES2){
+            *render = new GLES2Mesh();
+        }
+    }
 }
 
 void MeshRender::setMesh(Mesh* mesh){

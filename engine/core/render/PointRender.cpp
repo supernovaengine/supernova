@@ -2,6 +2,8 @@
 
 #include "Points.h"
 #include "Scene.h"
+#include "Engine.h"
+#include "gles2/GLES2Point.h"
 
 using namespace Supernova;
 
@@ -24,6 +26,15 @@ PointRender::PointRender(){
 }
 
 PointRender::~PointRender(){
+
+}
+
+void PointRender::newInstance(PointRender** render){
+    if (*render == NULL){
+        if (Engine::getRenderAPI() == S_GLES2){
+            *render = new GLES2Point();
+        }
+    }
 }
 
 void PointRender::updatePositions(){

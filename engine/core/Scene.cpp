@@ -17,9 +17,13 @@ Scene::Scene() {
     scene = this;
     sky = NULL;
     fog = NULL;
+
+    render = NULL;
 }
 
 Scene::~Scene() {
+    if (render)
+        delete render;
 }
 
 void Scene::addLight (Light* light){    
@@ -80,7 +84,7 @@ void Scene::removeGUIObject (GUIObject* guiobject){
 }
 
 SceneRender* Scene::getSceneRender(){
-    return sceneManager.getRender();
+    return render;
 }
 
 void Scene::setSky(SkyBox* sky){
@@ -186,8 +190,8 @@ bool Scene::updateViewSize(){
         }
     }
 
-    
-    bool status = sceneManager.getRender()->viewSize(Rect(viewX, viewY, viewWidth, viewHeight));
+    SceneRender::newInstance(&render);
+    bool status = render->viewSize(Rect(viewX, viewY, viewWidth, viewHeight));
     if (this->camera != NULL){
         camera->updateAutomaticSizes();
     }
@@ -249,11 +253,12 @@ void Scene::update() {
 
 bool Scene::load(){
 
-    sceneManager.getRender()->setScene(this);
+    SceneRender::newInstance(&render);
+    render->setScene(this);
 
     doCamera();
 
-    sceneManager.getRender()->load();
+    render->load();
     resetSceneProperties();
 
     Object::load();
@@ -269,7 +274,7 @@ bool Scene::draw(){
     if (!Object::draw())
         return false;
 
-    return sceneManager.getRender()->draw();
+    return render->draw();
 }
 
 void Scene::destroy(){

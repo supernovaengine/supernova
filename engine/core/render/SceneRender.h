@@ -33,6 +33,8 @@ namespace Supernova {
 
         SceneRender();
         virtual ~SceneRender();
+
+        static void newInstance(SceneRender** render);
         
         void setScene(Scene* scene);
 

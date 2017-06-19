@@ -26,6 +26,8 @@ namespace Supernova {
         float distanceToCamera;
         bool dynamic;
 
+        bool loaded;
+
     public:
         Submesh();
         Submesh(Material* material);

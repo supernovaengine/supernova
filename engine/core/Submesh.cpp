@@ -7,6 +7,9 @@ Submesh::Submesh(){
     this->distanceToCamera = -1;
     this->material = NULL;
     this->newMaterial = false;
+    this->dynamic = false;
+
+    this->loaded = false;
 
     this->render = NULL;
 }
@@ -21,6 +24,9 @@ Submesh::~Submesh(){
     
     if (render)
         delete render;
+
+    if (loaded)
+        destroy();
 }
 
 Submesh::Submesh(const Submesh& s){
@@ -28,6 +34,8 @@ Submesh::Submesh(const Submesh& s){
     this->distanceToCamera = s.distanceToCamera;
     this->newMaterial = s.newMaterial;
     this->material = s.material;
+    this->dynamic = s.dynamic;
+    this->loaded = s.loaded;
     this->render = s.render;
 }
 
@@ -36,6 +44,8 @@ Submesh& Submesh::operator = (const Submesh& s){
     this->distanceToCamera = s.distanceToCamera;
     this->newMaterial = s.newMaterial;
     this->material = s.material;
+    this->dynamic = s.dynamic;
+    this->loaded = s.loaded;
     this->render = s.render;
 
     return *this;
@@ -83,6 +93,8 @@ bool Submesh::load(){
         
     render->setSubmesh(this);
     render->load();
+
+    loaded = true;
     
     return true;
 }
@@ -93,4 +105,6 @@ bool Submesh::draw(){
 
 void Submesh::destroy(){
     render->destroy();
+
+    loaded = false;
 }

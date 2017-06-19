@@ -54,6 +54,8 @@ namespace Supernova {
         
         MeshRender();
         virtual ~MeshRender();
+
+        static void newInstance(MeshRender** render);
         
         void setMesh(Mesh* mesh);
         

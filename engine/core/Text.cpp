@@ -46,10 +46,10 @@ void Text::setText(const char* text){
     this->text = text;
     if (loaded){
         createText();
-        renderManager.getRender()->updateVertices();
-        renderManager.getRender()->updateTexcoords();
-        renderManager.getRender()->updateNormals();
-        renderManager.getRender()->updateIndices();
+        render->updateVertices();
+        render->updateTexcoords();
+        render->updateNormals();
+        render->updateIndices();
     }
 }
 
@@ -61,8 +61,8 @@ void Text::setInvert(bool invert){
     Mesh2D::setInvert(invert);
     if (loaded) {
         createText();
-        renderManager.getRender()->updateVertices();
-        renderManager.getRender()->updateTexcoords();
+        render->updateVertices();
+        render->updateTexcoords();
     }
 }
 

@@ -7,7 +7,7 @@
 #include "Object.h"
 #include "Camera.h"
 #include "Render.h"
-#include "render/SceneManager.h"
+#include "render/SceneRender.h"
 #include "Light.h"
 #include "Fog.h"
 #include "SkyBox.h"
@@ -25,7 +25,7 @@ namespace Supernova {
         friend class Mesh;
     private:
 
-        SceneManager sceneManager;
+        SceneRender* render;
 
         Matrix4 viewProjectionMatrix;
 

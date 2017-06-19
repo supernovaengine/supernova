@@ -7,7 +7,7 @@
 #define S_POINTSIZE_HEIGHT 2
 
 #include "ConcreteObject.h"
-#include "render/PointManager.h"
+#include "render/PointRender.h"
 #include <unordered_map>
 
 namespace Supernova {
@@ -31,7 +31,7 @@ namespace Supernova {
         bool useTextureRects;
 
     protected:
-        PointManager renderManager;
+        PointRender* render;
 
         std::vector<Vector3> positions;
         std::vector<Vector3> normals;

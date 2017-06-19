@@ -23,10 +23,14 @@ Points::Points(){
     
     useTextureRects = false;
 
+    render = NULL;
 }
 
 Points::~Points(){
     destroy();
+
+    if (render)
+        delete render;
 }
 
 void Points::addPoint(){
@@ -68,7 +72,7 @@ void Points::setPointSize(int point, float size){
 void Points::setPointColor(int point, Vector4 color){
     colors[point] = color;
     if (loaded)
-        renderManager.getRender()->updatePointColors();
+        render->updatePointColors();
 }
 
 void Points::setPointColor(int point, float red, float green, float blue, float alpha){
@@ -89,7 +93,7 @@ void Points::setPointSprite(int point, std::string id){
         useTextureRects = true;
         normalizeTextureRects();
         if (loaded)
-            renderManager.getRender()->updateTextureRects();
+            render->updateTextureRects();
     }
 }
 
@@ -125,7 +129,7 @@ void Points::fillScaledSizeVector(){
     }
 
     if (loaded)
-        renderManager.getRender()->updatePointSizes();
+        render->updatePointSizes();
 }
 
 void Points::normalizeTextureRects(){
@@ -228,8 +232,9 @@ bool Points::load(){
 
     fillScaledSizeVector();
 
+    PointRender::newInstance(&render);
 
-    renderManager.getRender()->setPoints(this);
+    render->setPoints(this);
 
     if ((material.getTextures().size() > 0) && (textureRects.size() > 0)){
         TextureManager::loadTexture(material.getTextures()[0]);
@@ -240,7 +245,7 @@ bool Points::load(){
         normalizeTextureRects();
     }
     
-    bool renderloaded = renderManager.getRender()->load();
+    bool renderloaded = render->load();
 
     if (renderloaded)
         return ConcreteObject::load();
@@ -252,15 +257,15 @@ bool Points::draw(){
     if (!ConcreteObject::draw())
         return false;
 
-    return renderManager.getRender()->draw();
+    return render->draw();
 }
 
 
 void Points::destroy(){
     
     ConcreteObject::destroy();
-    
-    renderManager.getRender()->destroy();
+
+    render->destroy();
     
     for (int i=0; i < textureRects.size(); i++){
         delete textureRects[i];

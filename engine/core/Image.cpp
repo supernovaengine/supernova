@@ -29,10 +29,10 @@ void Image::setSize(int width, int height){
     Mesh2D::setSize(width, height);
     if (loaded) {
         createVertices();
-        renderManager.getRender()->updateVertices();
-        renderManager.getRender()->updateTexcoords();
-        renderManager.getRender()->updateNormals();
-        renderManager.getRender()->updateIndices();
+        render->updateVertices();
+        render->updateTexcoords();
+        render->updateNormals();
+        render->updateIndices();
     }
 }
 
@@ -40,7 +40,7 @@ void Image::setInvert(bool invert){
     Mesh2D::setInvert(invert);
     if (loaded) {
         createVertices();
-        renderManager.getRender()->updateTexcoords();
+        render->updateTexcoords();
     }
 }
 

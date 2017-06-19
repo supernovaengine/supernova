@@ -9,11 +9,16 @@ Mesh::Mesh(): ConcreteObject(){
     submeshes.push_back(new Submesh(&material));
     skymesh = false;
     dynamic = false;
+
+    render = NULL;
 }
 
 Mesh::~Mesh(){
     destroy();
     removeAllSubmeshes();
+
+    if (render)
+        delete render;
 }
 
 std::vector<Vector3>* Mesh::getVertices(){
@@ -130,15 +135,17 @@ bool Mesh::load(){
     while (vertices.size() > normals.size()){
         normals.push_back(Vector3(0,0,0));
     }
+
+    MeshRender::newInstance(&render);
     
-    renderManager.getRender()->setMesh(this);
+    render->setMesh(this);
 
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
         submeshes[i]->load();
     }
 
-    bool renderloaded = renderManager.getRender()->load();
+    bool renderloaded = render->load();
 
     if (renderloaded)
         return ConcreteObject::load();
@@ -154,7 +161,7 @@ bool Mesh::draw(){
         submeshes[i]->draw();
     }
 
-    return renderManager.getRender()->draw();
+    return render->draw();
 }
 
 void Mesh::destroy(){
@@ -164,5 +171,5 @@ void Mesh::destroy(){
         submeshes[i]->destroy();
     }
     
-    renderManager.getRender()->destroy();
+    render->destroy();
 }
