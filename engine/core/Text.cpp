@@ -83,10 +83,9 @@ void Text::createText(){
 }
 
 bool Text::load(){
-    Mesh2D::load();
 
     stbtext->load(font);
     createText();
     
-    return true;
+    return Mesh2D::load();
 }

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		71192EFD1CE1334000BD76EE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
+		7119BD4A1EF70BFB007BD613 /* SubmeshRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119BD481EF70BFB007BD613 /* SubmeshRender.cpp */; };
+		7119BD4D1EF71105007BD613 /* GLES2Submesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119BD4B1EF71105007BD613 /* GLES2Submesh.cpp */; };
 		712379201EC13C7E00BFD1F7 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */; };
 		712379231EC13CDA00BFD1F7 /* libstb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 712379111EC13C6000BFD1F7 /* libstb.a */; };
 		71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71369C081E291E22006AE1D1 /* Button.cpp */; };
@@ -299,6 +301,10 @@
 
 /* Begin PBXFileReference section */
 		71192EFB1CE1334000BD76EE /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		7119BD481EF70BFB007BD613 /* SubmeshRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SubmeshRender.cpp; sourceTree = "<group>"; };
+		7119BD491EF70BFB007BD613 /* SubmeshRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubmeshRender.h; sourceTree = "<group>"; };
+		7119BD4B1EF71105007BD613 /* GLES2Submesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Submesh.cpp; sourceTree = "<group>"; };
+		7119BD4C1EF71105007BD613 /* GLES2Submesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Submesh.h; sourceTree = "<group>"; };
 		712379111EC13C6000BFD1F7 /* libstb.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libstb.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_vorbis.c; sourceTree = "<group>"; };
 		7123791D1EC13C7500BFD1F7 /* stb_vorbis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_vorbis.h; sourceTree = "<group>"; };
@@ -945,6 +951,8 @@
 				713D2A611CFB2EAD00A4752F /* SceneManager.h */,
 				714D81E11E70BF4B0038BE50 /* SceneRender.cpp */,
 				7188F1A31D9B436200A2D04F /* SceneRender.h */,
+				7119BD481EF70BFB007BD613 /* SubmeshRender.cpp */,
+				7119BD491EF70BFB007BD613 /* SubmeshRender.h */,
 				715824011D9803EF00AB1181 /* TextureManager.cpp */,
 				715824021D9803EF00AB1181 /* TextureManager.h */,
 				7188F1A41D9B444600A2D04F /* TextureRender.h */,
@@ -955,6 +963,8 @@
 		713D2A4B1CFB2EAD00A4752F /* gles2 */ = {
 			isa = PBXGroup;
 			children = (
+				71598C441E7CDA80000EDAC0 /* GLES2Fog.cpp */,
+				71598C451E7CDA80000EDAC0 /* GLES2Fog.h */,
 				713D2A4C1CFB2EAD00A4752F /* GLES2Header.h */,
 				714D81D71E70BF380038BE50 /* GLES2Light.cpp */,
 				714D81D81E70BF380038BE50 /* GLES2Light.h */,
@@ -967,12 +977,12 @@
 				713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */,
 				713D2A511CFB2EAD00A4752F /* GLES2Scene.h */,
 				713D2A561CFB2EAD00A4752F /* GLES2Shaders.h */,
+				7119BD4B1EF71105007BD613 /* GLES2Submesh.cpp */,
+				7119BD4C1EF71105007BD613 /* GLES2Submesh.h */,
 				713D2A571CFB2EAD00A4752F /* GLES2Texture.cpp */,
 				713D2A581CFB2EAD00A4752F /* GLES2Texture.h */,
 				713D2A5A1CFB2EAD00A4752F /* GLES2Util.cpp */,
 				713D2A5B1CFB2EAD00A4752F /* GLES2Util.h */,
-				71598C441E7CDA80000EDAC0 /* GLES2Fog.cpp */,
-				71598C451E7CDA80000EDAC0 /* GLES2Fog.h */,
 			);
 			path = gles2;
 			sourceTree = "<group>";
@@ -1765,6 +1775,7 @@
 				714D81D61E6C9B380038BE50 /* GLES2Point.cpp in Sources */,
 				71C5764A1EE45167002F537B /* Events.cpp in Sources */,
 				714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */,
+				7119BD4D1EF71105007BD613 /* GLES2Submesh.cpp in Sources */,
 				71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */,
 				71AC8B611E6B42C000DB33C3 /* Points.cpp in Sources */,
 				716F761D1E1C736300FF9888 /* Mesh2D.cpp in Sources */,
@@ -1789,6 +1800,7 @@
 				716F761A1E1293B800FF9888 /* GUIObject.cpp in Sources */,
 				71CDC71B1D7B14510060EEFF /* SpotLight.cpp in Sources */,
 				71CDC7151D7B14510060EEFF /* Model.cpp in Sources */,
+				7119BD4A1EF70BFB007BD613 /* SubmeshRender.cpp in Sources */,
 				71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */,
 				71CDC70F1D7B14510060EEFF /* DirectionalLight.cpp in Sources */,
 				71598C401E76203A000EDAC0 /* Sprite.cpp in Sources */,

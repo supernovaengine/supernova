@@ -10,8 +10,6 @@ MeshRender::MeshRender(){
     lighting = false;
     hasfog = false;
     hasTextureRect = false;
-    
-    submeshesRender.clear();
 
     sceneRender = NULL;
 
@@ -43,11 +41,7 @@ void MeshRender::updateNormals(){
 }
 
 void MeshRender::updateIndices(){
-    if (isLoaded){
-        for (unsigned int i = 0; i < submeshes->size(); i++){
-            submeshesRender[submeshes->at(i)].indicesSizes = (int)submeshes->at(i)->getIndices()->size();
-        }
-    }
+
 }
 
 void MeshRender::checkLighting(){
@@ -108,20 +102,6 @@ bool MeshRender::load(){
     checkFog();
     checkTextureRect();
 
-    submeshesRender.clear();
-    for (unsigned int i = 0; i < submeshes->size(); i++){
-        submeshesRender[submeshes->at(i)].indicesSizes = (int)submeshes->at(i)->getIndices()->size();
-
-        if (submeshes->at(i)->getMaterial()->getTextures().size() > 0){
-            submeshesRender[submeshes->at(i)].textured = true;
-        }else{
-            submeshesRender[submeshes->at(i)].textured = false;
-        }
-        if (submeshes->at(i)->getMaterial()->getTextureType() == S_TEXTURE_2D &&  texcoords->size() == 0){
-            submeshesRender[submeshes->at(i)].textured = false;
-        }
-    }
-
     return true;
 }
 
@@ -135,5 +115,7 @@ bool MeshRender::draw() {
 void MeshRender::destroy() {
     
     fillMeshProperties();
+    
+    isLoaded = false;
     
 }

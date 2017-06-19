@@ -15,8 +15,14 @@ Submesh::Submesh(Material* material): Submesh() {
 }
 
 Submesh::~Submesh(){
+    
+    destroy();
+    
     if (newMaterial)
         delete material;
+    
+    if (render)
+        delete render;
 }
 
 Submesh::Submesh(const Submesh& s){
@@ -60,4 +66,34 @@ void Submesh::setMaterial(Material* material){
 
 Material* Submesh::getMaterial(){
     return this->material;
+}
+
+SubmeshRender* Submesh::getSubmeshRender(){
+    return render;
+}
+
+bool Submesh::isLoaded(){
+    return loaded;
+}
+
+bool Submesh::load(){
+    render = SubmeshRender::newInstance();
+    
+    loaded  = true;
+        
+    render->setSubmesh(this);
+    render->load();
+    
+    return true;
+}
+
+bool Submesh::draw(){
+    return render->draw();
+}
+
+void Submesh::destroy(){
+    
+    loaded = false;
+    
+    render->destroy();
 }

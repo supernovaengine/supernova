@@ -81,8 +81,6 @@ void Image::createVertices(){
 }
 
 bool Image::load(){
-    Mesh2D::load();
-
     if (submeshes[0]->getMaterial()->getTextures().size() > 0 && this->width == 0 && this->height == 0){
         TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
         this->width = TextureManager::getTextureWidth(submeshes[0]->getMaterial()->getTextures()[0]);
@@ -90,5 +88,6 @@ bool Image::load(){
     }
 
     createVertices();
-    return true;
+    
+    return Mesh2D::load();;
 }

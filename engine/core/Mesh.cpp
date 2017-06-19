@@ -135,6 +135,10 @@ bool Mesh::load(){
 
     bool renderloaded = renderManager.getRender()->load();
     
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->load();
+    }
+    
     if (renderloaded)
         return ConcreteObject::load();
     else
@@ -144,12 +148,20 @@ bool Mesh::load(){
 bool Mesh::draw(){
     if (!ConcreteObject::draw())
         return false;
+    
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->draw();
+    }
 
     return renderManager.getRender()->draw();
 }
 
 void Mesh::destroy(){
     ConcreteObject::destroy();
+    
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->destroy();
+    }
     
     renderManager.getRender()->destroy();
 }

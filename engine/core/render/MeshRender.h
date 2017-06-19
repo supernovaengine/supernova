@@ -15,12 +15,6 @@ namespace Supernova {
 
     class MeshRender {
 
-        typedef struct {
-            std::shared_ptr<TextureRender> texture;
-            unsigned int indicesSizes;
-            bool textured;
-        } SubmeshStruct;
-
     private:
         
         Mesh* mesh;
@@ -35,8 +29,6 @@ namespace Supernova {
         bool lighting;
         bool hasfog;
         bool hasTextureRect;
-
-        std::unordered_map<Submesh*, SubmeshStruct> submeshesRender;
         
         //-------begin mesh properties-------
         SceneRender* sceneRender;

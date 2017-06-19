@@ -135,4 +135,6 @@ void PointRender::destroy(){
     
     fillPointProperties();
     
+    isLoaded = false;
+    
 }

@@ -5,15 +5,19 @@
 #include <string>
 #include <vector>
 #include "Material.h"
+#include "render/SubmeshRender.h"
+#include "Render.h"
 
 namespace Supernova {
 
-    class Submesh {
+    class Submesh: public Render {
         friend class Mesh;
         friend class Model;
     private:
         
         bool loaded;
+        
+        SubmeshRender* render;
 
         std::vector<unsigned int> indices;
         
@@ -39,7 +43,14 @@ namespace Supernova {
         void createNewMaterial();
         void setMaterial(Material* material);
         Material* getMaterial();
-
+        
+        bool isLoaded();
+        
+        SubmeshRender* getSubmeshRender();
+        
+        virtual bool load();
+        virtual bool draw();
+        virtual void destroy();
     };
     
 }
