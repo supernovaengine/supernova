@@ -76,7 +76,7 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
     float offsetX = 0;
     float offsetY = 0;
 
-    int ind = 0;
+    int ind = 0; 
     for(auto c : utf16String) {
         int intchar = uint_least32_t(c);
         if (intchar >= firstChar && intchar <= lastChar) {

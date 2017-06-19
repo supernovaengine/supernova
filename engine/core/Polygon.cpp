@@ -1,18 +1,18 @@
-#include "Shape.h"
+#include "Polygon.h"
 
 #include "platform/Log.h"
 #include "PrimitiveMode.h"
 
 using namespace Supernova;
 
-Shape::Shape(): Mesh() {
+Polygon::Polygon(): Mesh() {
 	primitiveMode = S_TRIANGLES;
 }
 
-Shape::~Shape() {
+Polygon::~Polygon() {
 }
 
-void Shape::addVertex(Vector3 vertex){
+void Polygon::addVertex(Vector3 vertex){
 	vertices.push_back(vertex);
 
     if (vertices.size() > 3){
@@ -22,13 +22,13 @@ void Shape::addVertex(Vector3 vertex){
     normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
 }
 
-void Shape::addVertex(float x, float y){
+void Polygon::addVertex(float x, float y){
 
    addVertex(Vector3(x, y, 0));
 
 }
 
-void Shape::generateTexcoords(){
+void Polygon::generateTexcoords(){
 
     float min_X = std::numeric_limits<float>::max();
     float max_X = std::numeric_limits<float>::min();
@@ -55,7 +55,7 @@ void Shape::generateTexcoords(){
 
 }
 
-bool Shape::load(){
+bool Polygon::load(){
 
     if (submeshes[0]->getMaterial()->getTextures().size() > 0 && (texcoords.size()==0))
         generateTexcoords();

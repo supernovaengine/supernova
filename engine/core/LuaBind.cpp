@@ -13,7 +13,7 @@
 #include "ConcreteObject.h"
 #include "platform/Log.h"
 #include "Scene.h"
-#include "Shape.h"
+#include "Polygon.h"
 #include "Cube.h"
 #include "Plane.h"
 #include "Model.h"
@@ -190,7 +190,9 @@ void LuaBind::bind(){
     .addStaticFunction("setCanvasSize", &Engine::setCanvasSize)
     .addStaticFunction("setMouseAsTouch", &Engine::setMouseAsTouch)
     .addStaticFunction("setScalingMode", &Engine::setScalingMode)
+    .addStaticFunction("setUpdateTime", &Engine::setUpdateTime)
     .addStaticFunction("getFramerate", &Engine::getFramerate)
+    .addStaticFunction("getDeltatime", &Engine::getDeltatime)
     .addConstant("SCALING_FITWIDTH", S_SCALING_FITWIDTH)
     .addConstant("SCALING_FITHEIGHT", S_SCALING_FITHEIGHT)
     .addConstant("SCALING_LETTERBOX", S_SCALING_LETTERBOX)
@@ -201,6 +203,7 @@ void LuaBind::bind(){
     LuaIntf::LuaBinding(L).beginClass<Events>("Events")
     .addConstructor(LUA_ARGS())
     .addStaticFunction("onFrame", static_cast<int(*)(lua_State*)>(&Events::onFrame))
+    .addStaticFunction("onUpdate", static_cast<int(*)(lua_State*)>(&Events::onUpdate))
     .addStaticFunction("onTouchPress", static_cast<int(*)(lua_State*)>(&Events::onTouchPress))
     .addStaticFunction("onTouchUp", static_cast<int(*)(lua_State*)>(&Events::onTouchUp))
     .addStaticFunction("onTouchDrag", static_cast<int(*)(lua_State*)>(&Events::onTouchDrag))
@@ -343,10 +346,10 @@ void LuaBind::bind(){
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
     .endClass()
 
-    .beginExtendClass<Shape, Mesh>("Shape")
+    .beginExtendClass<Polygon, Mesh>("Polygon")
     .addConstructor(LUA_ARGS())
-    .addFunction("addVertex", (void (Shape::*)(float, float))&Shape::addVertex)
-    //.addFunction("addVertex", LUA_FN(void, Shape::addVertex, float))
+    .addFunction("addVertex", (void (Polygon::*)(float, float))&Polygon::addVertex)
+    //.addFunction("addVertex", LUA_FN(void, Polygon::addVertex, float))
     .endClass()
 
     .beginExtendClass<Cube, Mesh>("Cube")

@@ -7,11 +7,11 @@
 
 namespace Supernova {
 
-    class Shape: public Mesh {
+    class Polygon: public Mesh {
 
     public:
-        Shape();
-        virtual ~Shape();
+        Polygon();
+        virtual ~Polygon();
 
         void generateTexcoords();
 

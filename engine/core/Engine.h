@@ -38,9 +38,10 @@ namespace Supernova {
         static int scalingMode;
         
         static unsigned long lastTime;
+        static unsigned long updateTimeCount;
         
         static unsigned long frameTime;
-        static unsigned int targetFramerate;
+        static unsigned int updateTime;
         static float deltatime;
         static float framerate;
 
@@ -77,8 +78,12 @@ namespace Supernova {
         static void setUseDegrees(bool useDegrees);
         static bool isUseDegrees();
         
+        static void setUpdateTime(unsigned int updateTime);
+        static unsigned int getUpdateTime();
+        
         static int getPlatform();
         static float getFramerate();
+        static float getDeltatime();
         
         //-----Supernova API events-----
         static void onStart();

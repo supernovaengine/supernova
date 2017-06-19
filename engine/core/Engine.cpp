@@ -48,10 +48,11 @@ bool Engine::mouseAsTouch;
 bool Engine::useDegrees;
 int Engine::scalingMode;
 
-unsigned long Engine::lastTime;
+unsigned long Engine::lastTime = 0;
+unsigned long Engine::updateTimeCount = 0;
 
 unsigned long Engine::frameTime;
-unsigned int Engine::targetFramerate;
+unsigned int Engine::updateTime = 20;
 float Engine::deltatime;
 float Engine::framerate;
 
@@ -172,6 +173,14 @@ bool Engine::isUseDegrees(){
     return Engine::useDegrees;
 }
 
+void Engine::setUpdateTime(unsigned int updateTime){
+    Engine::updateTime = updateTime;
+}
+
+unsigned int Engine::getUpdateTime(){
+    return Engine::updateTime;
+}
+
 int Engine::getPlatform(){
     
 #ifdef SUPERNOVA_IOS
@@ -193,6 +202,9 @@ float Engine::getFramerate(){
     return framerate;
 }
 
+float Engine::getDeltatime(){
+    return deltatime;
+}
 
 void Engine::onStart(){
 
@@ -211,9 +223,6 @@ void Engine::onStart(int width, int height){
 
     LuaBind::createLuaState();
     LuaBind::bind();
-    
-    lastTime = (float)clock() / CLOCKS_PER_SEC * 1000;
-    targetFramerate = 15;
 
     init();
 }
@@ -238,21 +247,36 @@ void Engine::onSurfaceChanged(int width, int height) {
 
 void Engine::onDrawFrame() {
     
-	Events::call_onFrame();
-
+    if (lastTime == 0){
+        lastTime = (float)clock() / CLOCKS_PER_SEC * 1000;
+    }
+    
     if (Engine::getScene() != NULL){
         (Engine::getScene())->update();
     }
-
-    SoundManager::checkActive();
     
     unsigned long newTime = (float)clock() / CLOCKS_PER_SEC * 1000;
     frameTime = newTime - lastTime;
     lastTime = newTime;
     
+    deltatime = (float)frameTime / updateTime;
+    
     float frameTimeSeconds = (float)frameTime / 1000;
     framerate = 1 / frameTimeSeconds;
-    deltatime = targetFramerate / framerate;
+    
+    updateTimeCount += frameTime;
+    if (updateTimeCount > updateTime){
+        unsigned int updateCallCount = floor((float)updateTimeCount / updateTime);
+        for (int i = 0; i < updateCallCount; i++){
+            Events::call_onUpdate();
+        }
+        updateTimeCount -= updateTime;
+    }
+    
+    Events::call_onFrame();
+    
+    SoundManager::checkActive();
+    
 }
 
 void Engine::onPause(){
