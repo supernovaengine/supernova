@@ -13,6 +13,8 @@ Text::Text(): Mesh2D() {
     dynamic = true;
     stbtext = new STBText();
     text = "";
+
+    setMinBufferSize(50);
 }
 
 Text::Text(const char* font): Text() {
@@ -35,6 +37,11 @@ bool Text::operator == ( const char* v ) const{
 
 bool Text::operator != ( const char* v ) const{
     return ( text != v );
+}
+
+void Text::setMinBufferSize(unsigned int characters){
+    this->minBufferSize = characters * 4;
+    this->submeshes[0]->minBufferSize = characters * 6;
 }
 
 void Text::setFont(const char* font){

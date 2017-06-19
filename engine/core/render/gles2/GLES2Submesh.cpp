@@ -26,7 +26,7 @@ void GLES2Submesh::useIndicesBuffer(){
         if (indexBufferSize >= indices->size()){
             GLES2Util::updateVBO(indexBuffer,GL_ELEMENT_ARRAY_BUFFER, indices->size() * sizeof(unsigned int), &indices->front());
         }else{
-            indexBufferSize = (unsigned int)indices->size();
+            indexBufferSize = std::max((unsigned int)indices->size(), minBufferSize);
             GLES2Util::dataVBO(indexBuffer, GL_ELEMENT_ARRAY_BUFFER, indexBufferSize * sizeof(unsigned int), &indices->front(), usageBuffer);
             
         }

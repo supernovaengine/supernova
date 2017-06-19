@@ -8,7 +8,13 @@ using namespace Supernova;
 
 
 SubmeshRender::SubmeshRender(){
-    
+    indicesSizes = 0;
+    textured = false;
+    material = NULL;
+
+    isDynamic = false;
+
+    minBufferSize = 0;
 }
 
 SubmeshRender::~SubmeshRender(){
@@ -37,6 +43,8 @@ void SubmeshRender::fillSubmeshProperties(){
         indices = submesh->getIndices();
 
         isDynamic = submesh->isDynamic();
+
+        minBufferSize = submesh->getMinBufferSize();
     }
 }
 

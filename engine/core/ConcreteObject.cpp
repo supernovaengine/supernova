@@ -7,6 +7,8 @@ using namespace Supernova;
 ConcreteObject::ConcreteObject(): Object(){
     transparent = false;
     distanceToCamera = -1;
+
+    minBufferSize = 0;
 }
 
 ConcreteObject::~ConcreteObject(){
@@ -15,6 +17,10 @@ ConcreteObject::~ConcreteObject(){
 
 Matrix4 ConcreteObject::getNormalMatrix(){
     return normalMatrix;
+}
+
+unsigned int ConcreteObject::getMinBufferSize(){
+    return minBufferSize;
 }
 
 void ConcreteObject::setColor(float red, float green, float blue, float alpha){

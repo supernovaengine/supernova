@@ -10,6 +10,7 @@
 #include "PrimitiveMode.h"
 #include "Engine.h"
 #include "GLES2Submesh.h"
+#include <algorithm>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define BUFFER_OFFSET(i) ((void*)(i))
@@ -32,7 +33,7 @@ void GLES2Mesh::useVerticesBuffer(){
     if (vertexBufferSize >= vertices->size()){
         GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, vertices->size() * 3 * sizeof(GLfloat), &vertices->front());
     }else{
-        vertexBufferSize = (unsigned int)vertices->size();
+        vertexBufferSize = std::max((unsigned int)vertices->size(), minBufferSize);
         GLES2Util::dataVBO(vertexBuffer, GL_ARRAY_BUFFER, vertexBufferSize * 3 * sizeof(GLfloat), &vertices->front(), usageBuffer);
     }
 }
@@ -44,7 +45,7 @@ void GLES2Mesh::useTexcoordsBuffer(){
     if (uvBufferSize >= texcoords->size()){
         GLES2Util::updateVBO(uvBuffer, GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front());
     }else{
-        uvBufferSize = (unsigned int)texcoords->size();
+        uvBufferSize = std::max((unsigned int)texcoords->size(), minBufferSize);
         GLES2Util::dataVBO(uvBuffer, GL_ARRAY_BUFFER, uvBufferSize * 2 * sizeof(GLfloat), &texcoords->front(), usageBuffer);
     }
 }
@@ -56,7 +57,7 @@ void GLES2Mesh::useNormalsBuffer(){
     if (normalBufferSize >= normals->size()){
         GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
     }else{
-        normalBufferSize = (unsigned int)normals->size();
+        normalBufferSize = std::max((unsigned int)normals->size(), minBufferSize);
         GLES2Util::dataVBO(normalBuffer, GL_ARRAY_BUFFER, normalBufferSize * 3 * sizeof(GLfloat), &normals->front(), usageBuffer);
     }
 }

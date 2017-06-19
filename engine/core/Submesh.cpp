@@ -4,6 +4,8 @@
 using namespace Supernova;
 
 Submesh::Submesh(){
+    this->render = NULL;
+
     this->distanceToCamera = -1;
     this->material = NULL;
     this->newMaterial = false;
@@ -11,7 +13,7 @@ Submesh::Submesh(){
 
     this->loaded = false;
 
-    this->render = NULL;
+    this->minBufferSize = 0;
 }
 
 Submesh::Submesh(Material* material): Submesh() {
@@ -37,6 +39,7 @@ Submesh::Submesh(const Submesh& s){
     this->dynamic = s.dynamic;
     this->loaded = s.loaded;
     this->render = s.render;
+    this->minBufferSize = s.minBufferSize;
 }
 
 Submesh& Submesh::operator = (const Submesh& s){
@@ -47,12 +50,17 @@ Submesh& Submesh::operator = (const Submesh& s){
     this->dynamic = s.dynamic;
     this->loaded = s.loaded;
     this->render = s.render;
+    this->minBufferSize = s.minBufferSize;
 
     return *this;
 }
 
 bool Submesh::isDynamic(){
     return dynamic;
+}
+
+unsigned int Submesh::getMinBufferSize(){
+    return minBufferSize;
 }
 
 void Submesh::setIndices(std::vector<unsigned int> indices){

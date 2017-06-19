@@ -14,6 +14,7 @@ namespace Supernova {
 
         friend class Mesh;
         friend class Model;
+        friend class Text;
 
     private:
 
@@ -25,6 +26,8 @@ namespace Supernova {
         bool newMaterial;
         float distanceToCamera;
         bool dynamic;
+
+        unsigned int minBufferSize;
 
         bool loaded;
 
@@ -47,6 +50,7 @@ namespace Supernova {
         Material* getMaterial();
 
         bool isDynamic();
+        unsigned int getMinBufferSize();
         
         SubmeshRender* getSubmeshRender();
         

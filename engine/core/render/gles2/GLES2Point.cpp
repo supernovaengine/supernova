@@ -10,6 +10,7 @@
 #include "math/Angle.h"
 #include "PrimitiveMode.h"
 #include "Engine.h"
+#include <algorithm>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define BUFFER_OFFSET(i) ((void*)(i))
@@ -47,7 +48,7 @@ void GLES2Point::useVerticesBuffer(){
     if (vertexBufferSize >= positions->size()){
         GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, positions->size() * 3 * sizeof(GLfloat), &positions->front());
     }else{
-        vertexBufferSize = (unsigned int)positions->size();
+        vertexBufferSize = std::max((unsigned int)positions->size(), minBufferSize);
         GLES2Util::dataVBO(vertexBuffer, GL_ARRAY_BUFFER, vertexBufferSize * 3 * sizeof(GLfloat), &positions->front(), usageBuffer);
     }
 }
@@ -59,7 +60,7 @@ void GLES2Point::useNormalsBuffer(){
     if (normalBufferSize >= normals->size()){
         GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
     }else{
-        normalBufferSize = (unsigned int)normals->size();
+        normalBufferSize = std::max((unsigned int)normals->size(), minBufferSize);
         GLES2Util::dataVBO(normalBuffer, GL_ARRAY_BUFFER, normalBufferSize * 3 * sizeof(GLfloat), &normals->front(), usageBuffer);
     }
 }
@@ -71,7 +72,7 @@ void GLES2Point::usePointSizesBuffer(){
     if (pointSizeBufferSize >= pointSizes->size()){
         GLES2Util::updateVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizes->size() * sizeof(GLfloat), &pointSizes->front());
     }else{
-        pointSizeBufferSize = (unsigned int)pointSizes->size();
+        pointSizeBufferSize = std::max((unsigned int)pointSizes->size(), minBufferSize);
         GLES2Util::dataVBO(pointSizeBuffer, GL_ARRAY_BUFFER, pointSizeBufferSize * sizeof(GLfloat), &pointSizes->front(), usageBuffer);
     }
 }
@@ -83,7 +84,7 @@ void GLES2Point::useTextureRectsBuffer(){
     if (textureRectBufferSize >= textureRects->size()){
         GLES2Util::updateVBO(textureRectBuffer, GL_ARRAY_BUFFER, textureRects->size() * 4 * sizeof(GLfloat), &rectsData().front());
     }else{
-        textureRectBufferSize = (unsigned int)textureRects->size();
+        textureRectBufferSize = std::max((unsigned int)textureRects->size(), minBufferSize);
         GLES2Util::dataVBO(textureRectBuffer, GL_ARRAY_BUFFER, textureRectBufferSize * 4 * sizeof(GLfloat), &rectsData().front(), usageBuffer);
     }
 }
@@ -95,7 +96,7 @@ void GLES2Point::usePointColorsBuffer(){
     if (pointColorBufferSize >= pointColors->size()){
         GLES2Util::updateVBO(pointColorBuffer, GL_ARRAY_BUFFER, pointColors->size() * 4 * sizeof(GLfloat), &pointColors->front());
     }else{
-        pointColorBufferSize = (unsigned int)pointColors->size();
+        pointColorBufferSize = std::max((unsigned int)pointColors->size(), minBufferSize);
         GLES2Util::dataVBO(pointColorBuffer, GL_ARRAY_BUFFER, pointColorBufferSize * 4 * sizeof(GLfloat), &pointColors->front(), usageBuffer);
     }
 }

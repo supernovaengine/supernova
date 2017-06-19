@@ -48,6 +48,8 @@ namespace Supernova {
         bool isDynamic;
         
         int primitiveMode;
+
+        unsigned int minBufferSize;
         //------------end------------
         
     public:

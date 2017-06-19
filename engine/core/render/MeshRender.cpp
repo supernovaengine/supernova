@@ -22,6 +22,8 @@ MeshRender::MeshRender(){
     
     primitiveMode = 0;
 
+    minBufferSize = 0;
+
 }
 
 MeshRender::~MeshRender(){
@@ -106,6 +108,8 @@ void MeshRender::fillMeshProperties(){
         isDynamic = mesh->isDynamic();
         
         primitiveMode = mesh->getPrimitiveMode();
+
+        minBufferSize = mesh->getMinBufferSize();
     }
 }
 

@@ -31,6 +31,8 @@ namespace Supernova {
         
         virtual void setSize(int width, int height);
         virtual void setInvert(bool invert);
+
+        void setMinBufferSize(unsigned int characters);
         
         void setFont(const char* font);
         void setText(const char* text);

@@ -23,6 +23,8 @@ PointRender::PointRender(){
     
     materialTexture = "";
 
+    minBufferSize = 0;
+
 }
 
 PointRender::~PointRender(){
@@ -105,6 +107,8 @@ void PointRender::fillPointProperties(){
         cameraPosition = points->getCameraPosition();
         
         materialTexture = points->getTexture();
+
+        minBufferSize = points->getMinBufferSize();
     }
 }
 

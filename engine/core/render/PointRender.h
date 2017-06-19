@@ -48,6 +48,8 @@ namespace Supernova {
         Vector3 cameraPosition;
         
         std::string materialTexture;
+
+        unsigned int minBufferSize;
         //------------end------------
 
     public:

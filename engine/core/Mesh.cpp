@@ -6,11 +6,11 @@
 using namespace Supernova;
 
 Mesh::Mesh(): ConcreteObject(){
+    render = NULL;
+
     submeshes.push_back(new Submesh(&material));
     skymesh = false;
     dynamic = false;
-
-    render = NULL;
 }
 
 Mesh::~Mesh(){

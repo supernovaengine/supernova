@@ -11,12 +11,13 @@ namespace Supernova {
         
     protected:
         Material material;
-        
-        bool transparent;
 
         Matrix4 normalMatrix;
 
+        bool transparent;
         float distanceToCamera;
+
+        unsigned int minBufferSize;
 
         void updateDistanceToCamera();
 
@@ -33,6 +34,8 @@ namespace Supernova {
         std::string getTexture();
 
         void setTransparency(bool transparency);
+
+        unsigned int getMinBufferSize();
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();
