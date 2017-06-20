@@ -51,10 +51,11 @@ int Engine::scalingMode;
 unsigned long Engine::lastTime = 0;
 unsigned long Engine::updateTimeCount = 0;
 
-unsigned long Engine::frameTime;
+unsigned long Engine::frameTime = 0;
+float Engine::deltatime = 0;
+float Engine::framerate = 0;
+
 unsigned int Engine::updateTime = 20;
-float Engine::deltatime;
-float Engine::framerate;
 
 
 Engine::Engine() {
@@ -223,6 +224,8 @@ void Engine::onStart(int width, int height){
 
     LuaBind::createLuaState();
     LuaBind::bind();
+    
+    lastTime = (float)clock() / CLOCKS_PER_SEC * 1000;
 
     init();
 }
@@ -247,10 +250,6 @@ void Engine::onSurfaceChanged(int width, int height) {
 
 void Engine::onDrawFrame() {
     
-    if (lastTime == 0){
-        lastTime = (float)clock() / CLOCKS_PER_SEC * 1000;
-    }
-    
     if (Engine::getScene() != NULL){
         (Engine::getScene())->update();
     }
@@ -270,7 +269,7 @@ void Engine::onDrawFrame() {
         for (int i = 0; i < updateCallCount; i++){
             Events::call_onUpdate();
         }
-        updateTimeCount -= updateTime;
+        updateTimeCount -= (updateTime * updateCallCount);
     }
     
     Events::call_onFrame();

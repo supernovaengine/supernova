@@ -41,9 +41,10 @@ namespace Supernova {
         static unsigned long updateTimeCount;
         
         static unsigned long frameTime;
-        static unsigned int updateTime;
         static float deltatime;
         static float framerate;
+        
+        static unsigned int updateTime;
 
     public:
         
