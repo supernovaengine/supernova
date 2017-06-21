@@ -1,24 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <GLFW/glfw3.h>
+
+#include <SDL/SDL.h>
+
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
 #include <string.h>
+
 #include "Engine.h"
 #include "Supernova.h"
 #include "Input.h"
 
-void window_size_callback(GLFWwindow* window, int nWidth, int nHeight);
-void errorCallback(int error, const char *msg);
-void renderGame();
-static void on_mouse_callback(GLFWwindow* window, int button, int action, int modify);
-static void on_mouse_move(GLFWwindow* window, double x, double y);
-static void on_mouse_wheel(GLFWwindow* window, double x, double y);
-EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData);
 
-GLFWwindow *window;
+void renderLoop();
+EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData);
+EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChangeEvent *e, void *userData);
+EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData);
+EM_BOOL wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData);
+
 int width, height;
-int mousePressed;
+int originalWidth, originalHeight;
 
 extern "C" {
     int getScreenWidth() {
@@ -36,12 +37,13 @@ extern "C" {
 }
 
 int main(int argc, char **argv) {
-    glfwSetErrorCallback(errorCallback);
 
-    if (!glfwInit()) {
-        fputs("Failed to initialize GLFW3!", stderr);
-        exit(EXIT_FAILURE);
+    if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
+        printf("Unable to initialize SDL: %s\n", SDL_GetError());
+        return 1;
     }
+
+    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
     if ((argv[1] != NULL && argv[1] != 0) && (argv[2] != NULL && argv[2] != 0)){
         Supernova::Engine::onStart(atoi(argv[1]), atoi(argv[2]));
@@ -49,94 +51,125 @@ int main(int argc, char **argv) {
         Supernova::Engine::onStart();
     }
 
-	width = Supernova::Engine::getScreenWidth();
-	height = Supernova::Engine::getScreenHeight();
+    width = Supernova::Engine::getScreenWidth();
+    height = Supernova::Engine::getScreenHeight();
+    originalWidth = width;
+    originalHeight = height;
 
-    window = glfwCreateWindow(width, height, "Supernova", NULL, NULL);
-
-    if (!window) {
-        fputs("Failed to create GLFW3 window!", stderr);
-        glfwTerminate();
-        exit(EXIT_FAILURE);
+    SDL_Surface *screen = SDL_SetVideoMode( width, height, 16, SDL_OPENGL );
+    if ( !screen ) {
+        printf("Unable to set video mode: %s\n", SDL_GetError());
+        return 1;
     }
-
-    glfwMakeContextCurrent(window);
-
-    glfwSetMouseButtonCallback(window, on_mouse_callback);
-    glfwSetCursorPosCallback(window, on_mouse_move);
-    glfwSetScrollCallback(window, on_mouse_wheel);
-    glfwSetWindowSizeCallback(window, window_size_callback);
 
     EMSCRIPTEN_RESULT ret = emscripten_set_keypress_callback(0, 0, 1, key_callback);
     ret = emscripten_set_keydown_callback(0, 0, 1, key_callback);
     ret = emscripten_set_keyup_callback(0, 0, 1, key_callback);
+    ret = emscripten_set_fullscreenchange_callback(0, 0, 1, fullscreenchange_callback);
+    ret = emscripten_set_click_callback(0, 0, 1, mouse_callback);
+    ret = emscripten_set_mousedown_callback(0, 0, 1, mouse_callback);
+    ret = emscripten_set_mouseup_callback(0, 0, 1, mouse_callback);
+    ret = emscripten_set_dblclick_callback(0, 0, 1, mouse_callback);
+    ret = emscripten_set_mousemove_callback(0, 0, 1, mouse_callback);
+    ret = emscripten_set_wheel_callback(0, 0, 1, wheel_callback);
 
-	Supernova::Engine::onSurfaceCreated();
-	Supernova::Engine::onSurfaceChanged(width, height);
+    Supernova::Engine::onSurfaceCreated();
+    Supernova::Engine::onSurfaceChanged(width, height);
 
-    emscripten_set_main_loop(renderGame, 0, 1);
+    emscripten_set_main_loop(renderLoop, 0, 1);
+
+    SDL_Quit();
+
+    return 0;
 }
 
-void window_size_callback(GLFWwindow* window, int nWidth, int nHeight) {
-    updateScreenSize(nWidth, nHeight);
-}
-
-void errorCallback(int error, const char *msg) {
-    printf("%d: %s\n", error, msg);
-}
-
-void renderGame(){
+void renderLoop(){
     Supernova::Engine::onDrawFrame();
 
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+    SDL_Event event;
+    int haveEvent = SDL_PollEvent(&event);
+    if (haveEvent) {
+        //if(e.type == SDL_QUIT) std::terminate();
+        if(event.type == SDL_WINDOWEVENT){
+            switch (event.window.event) {
+                case SDL_WINDOWEVENT_RESIZED:
+                    printf("mudou de tamanho\n");
+                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                    printf("mudou de tamanho\n");
+            }
+        }
+    }
+
+    SDL_GL_SwapBuffers();
+}
+
+EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChangeEvent *e, void *userData) {
+    if (e->isFullscreen){
+        int w, h, fs;
+        emscripten_get_canvas_size(&w, &h, &fs);
+        originalWidth = w;
+        originalHeight = h;
+
+        emscripten_set_canvas_size(e->screenWidth, e->screenHeight);
+        updateScreenSize(e->screenWidth, e->screenHeight);
+    }else{
+        emscripten_set_canvas_size(originalWidth, originalHeight);
+        updateScreenSize(originalWidth, originalHeight);
+    }
+
+    return 0;
 }
 
 int supernova_mouse_button(int button){
-    if (button == GLFW_MOUSE_BUTTON_1) return S_MOUSE_BUTTON_1;
-    if (button == GLFW_MOUSE_BUTTON_2) return S_MOUSE_BUTTON_2;
-    if (button == GLFW_MOUSE_BUTTON_3) return S_MOUSE_BUTTON_3;
-    if (button == GLFW_MOUSE_BUTTON_4) return S_MOUSE_BUTTON_4;
-    if (button == GLFW_MOUSE_BUTTON_5) return S_MOUSE_BUTTON_5;
-    if (button == GLFW_MOUSE_BUTTON_6) return S_MOUSE_BUTTON_6;
-    if (button == GLFW_MOUSE_BUTTON_7) return S_MOUSE_BUTTON_7;
-    if (button == GLFW_MOUSE_BUTTON_8) return S_MOUSE_BUTTON_8;
+    if (button == 0) return S_MOUSE_BUTTON_1;
+    if (button == 1) return S_MOUSE_BUTTON_2;
+    if (button == 2) return S_MOUSE_BUTTON_3;
+    if (button == 3) return S_MOUSE_BUTTON_4;
+    if (button == 4) return S_MOUSE_BUTTON_5;
+    if (button == 5) return S_MOUSE_BUTTON_6;
+    if (button == 6) return S_MOUSE_BUTTON_7;
+    if (button == 7) return S_MOUSE_BUTTON_8;
     return -1;
 }
 
-static void on_mouse_callback(GLFWwindow* window, int button, int action, int modify){
+EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData) {
 
-    double x_pos, y_pos;
-    glfwGetCursorPos(window, &x_pos, &y_pos);
-    const float normalized_x = (x_pos / (float) width) * 2.f - 1.f;
-    const float normalized_y = -((y_pos / (float) height) * 2.f - 1.f);
+    if (e->canvasX < 0) return 0;
+    if (e->canvasY < 0) return 0;
+    if (e->canvasX > width) return 0;
+    if (e->canvasY > height) return 0;
 
-    if (action == GLFW_PRESS) {
-        mousePressed = supernova_mouse_button(button);
-        Supernova::Engine::onMousePress(supernova_mouse_button(button), normalized_x, normalized_y);
-    } else if (action == GLFW_RELEASE) {
-        mousePressed = 0;
-        Supernova::Engine::onMouseUp(supernova_mouse_button(button), normalized_x, normalized_y);
+    const float normalized_x = (e->canvasX / (float) width) * 2.f - 1.f;
+    const float normalized_y = -((e->canvasY / (float) height) * 2.f - 1.f);
+
+    Supernova::Engine::onMouseMove(normalized_x, normalized_y);
+    if ((e->movementX != 0 || e->movementY != 0) && e->buttons != 0) {
+        Supernova::Engine::onMouseDrag(supernova_mouse_button(e->button), normalized_x, normalized_y);
     }
+
+    if (eventType == EMSCRIPTEN_EVENT_MOUSEDOWN && e->buttons != 0){
+        Supernova::Engine::onMousePress(supernova_mouse_button(e->button), normalized_x, normalized_y);
+    }
+    if (eventType == EMSCRIPTEN_EVENT_MOUSEUP){
+        Supernova::Engine::onMouseUp(supernova_mouse_button(e->button), normalized_x, normalized_y);
+    }
+    if (eventType == EMSCRIPTEN_EVENT_DBLCLICK){
+    }
+
+    return 0;
 }
 
-static void on_mouse_move(GLFWwindow* window, double x, double y)
-{
-        const float normalized_x = (x / (float) width) * 2.f - 1.f;
-        const float normalized_y = -((y / (float) height) * 2.f - 1.f);
+EM_BOOL wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData) {
+    /*
+  printf("mouse_wheel, screen: (%ld,%ld), client: (%ld,%ld),%s%s%s%s button: %hu, buttons: %hu, canvas: (%ld,%ld), target: (%ld, %ld), delta:(%g,%g,%g), deltaMode:%lu\n",
+    e->mouse.screenX, e->mouse.screenY, e->mouse.clientX, e->mouse.clientY,
+    e->mouse.ctrlKey ? " CTRL" : "", e->mouse.shiftKey ? " SHIFT" : "", e->mouse.altKey ? " ALT" : "", e->mouse.metaKey ? " META" : "",
+    e->mouse.button, e->mouse.buttons, e->mouse.canvasX, e->mouse.canvasY, e->mouse.targetX, e->mouse.targetY,
+    (float)e->deltaX, (float)e->deltaY, (float)e->deltaZ, e->deltaMode);
+    */
 
-        Supernova::Engine::onMouseMove(normalized_x, normalized_y);
-        if (mousePressed > 0) {
-            Supernova::Engine::onMouseDrag(mousePressed, normalized_x, normalized_y);
-        }
-
+  return 0;
 }
-
-static void on_mouse_wheel(GLFWwindow* window, double x, double y)
-{
-        //printf("Test on_mouse_wheel: %f %f OK\n",x,y);
-}
-
 
 void unicode_to_utf8(char *b, unsigned long c) {
 	if (c<0x80) *b++=c;
