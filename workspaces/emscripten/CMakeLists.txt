@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_definitions("-DWITH_SDL2_STATIC") # For SoLoud
-add_definitions("-s USE_SDL=2")
+add_definitions("-DWITH_SDL_STATIC") # For SoLoud
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/web_macros.h")
 
