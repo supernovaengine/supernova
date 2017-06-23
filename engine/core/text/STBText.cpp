@@ -56,7 +56,7 @@ bool STBText::load(const char* font, unsigned int fontSize){
 
     unsigned int textureSize = atlasWidth * atlasHeight * sizeof(unsigned char);
     TextureFile* textureFile  = new TextureFile(atlasWidth, atlasHeight, textureSize, S_COLOR_ALPHA, 8, (void*)atlasData);
-    TextureManager::loadTexture(textureFile, font);
+    TextureManager::loadTexture(textureFile, font + std::to_string('-') + std::to_string(fontSize));
 
     delete[] atlasData;
 

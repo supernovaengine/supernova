@@ -47,11 +47,12 @@ void Text::setMinBufferSize(unsigned int characters){
 
 void Text::setFont(const char* font){
     this->font = font;
-    setTexture(font);
+    setTexture(font + std::to_string('-') + std::to_string(fontSize));
 }
 
 void Text::setFontSize(unsigned int fontSize){
     this->fontSize = fontSize;
+    setTexture(font + std::to_string('-') + std::to_string(fontSize));
     if (loaded){
         reload();
     }
