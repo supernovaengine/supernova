@@ -31,7 +31,7 @@ namespace Supernova {
         virtual int stop() = 0;
 
         virtual double getLength() = 0;
-        virtual double getStreamTime() = 0;
+        virtual double getPlayingTime() = 0;
 
         virtual bool isPlaying() = 0;
         virtual bool isPaused() = 0;

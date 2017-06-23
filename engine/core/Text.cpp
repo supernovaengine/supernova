@@ -13,6 +13,7 @@ Text::Text(): Mesh2D() {
     dynamic = true;
     stbtext = new STBText();
     text = "";
+    fontSize = 40;
 
     setMinBufferSize(50);
 }
@@ -47,6 +48,13 @@ void Text::setMinBufferSize(unsigned int characters){
 void Text::setFont(const char* font){
     this->font = font;
     setTexture(font);
+}
+
+void Text::setFontSize(unsigned int fontSize){
+    this->fontSize = fontSize;
+    if (loaded){
+        reload();
+    }
 }
 
 void Text::setText(const char* text){
@@ -91,7 +99,7 @@ void Text::createText(){
 
 bool Text::load(){
 
-    stbtext->load(font);
+    stbtext->load(font.c_str(), fontSize);
     createText();
     
     return Mesh2D::load();

@@ -22,8 +22,7 @@ namespace Supernova {
         const unsigned int charCount = lastChar - firstChar;
         
         stbtt_packedchar *charInfo;
-        
-        unsigned int size;
+
         unsigned int atlasWidth;
         unsigned int atlasHeight;
 
@@ -31,7 +30,7 @@ namespace Supernova {
         STBText();
         virtual ~STBText();
 
-        bool load(std::string font);
+        bool load(const char* font, unsigned int fontSize);
         void createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords, std::vector<unsigned int>* indices, int* width, int* height, bool invert);
         
     };

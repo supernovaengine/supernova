@@ -71,7 +71,7 @@ double SoLoudPlayer::getLength(){
         return 0;
 }
 
-double SoLoudPlayer::getStreamTime(){
+double SoLoudPlayer::getPlayingTime(){
     if (soloud)
         return soloud->getStreamTime(soundHandle);
     else
@@ -79,7 +79,7 @@ double SoLoudPlayer::getStreamTime(){
 }
 
 bool SoLoudPlayer::isPlaying(){
-    if ((getLength() > getStreamTime()) && (getStreamTime() != 0) && (state == S_AUDIO_PLAYING)) {
+    if ((getLength() > getPlayingTime()) && (getPlayingTime() != 0) && (state == S_AUDIO_PLAYING)) {
         return true;
     }
     return false;

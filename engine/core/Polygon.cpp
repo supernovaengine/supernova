@@ -5,11 +5,23 @@
 
 using namespace Supernova;
 
-Polygon::Polygon(): Mesh() {
+Polygon::Polygon(): Mesh2D() {
 	primitiveMode = S_TRIANGLES;
 }
 
 Polygon::~Polygon() {
+}
+
+void Polygon::setSize(int width, int height){
+    Log::Error(LOG_TAG, "Can't set size of Polygon");
+}
+
+void Polygon::setInvert(bool invert){
+    Mesh2D::setInvert(invert);
+    if (loaded) {
+        generateTexcoords();
+        render->updateTexcoords();
+    }
 }
 
 void Polygon::addVertex(Vector3 vertex){
@@ -47,18 +59,24 @@ void Polygon::generateTexcoords(){
 
     float u = 0;
     float v = 0;
+    texcoords.clear();
     for ( unsigned int i = 0; i < vertices.size(); i++){
         u = (vertices[i].x - min_X) * k_X;
         v = (vertices[i].y - min_Y) * k_Y;
-        texcoords.push_back(Vector2(u, 1.0 - v));
+        if (invert) {
+            texcoords.push_back(Vector2(u, 1.0 - v));
+        }else{
+            texcoords.push_back(Vector2(u, v));
+        }
     }
 
+    width = (int)(max_X - min_X);
+    height = (int)(max_Y - min_Y);
 }
 
 bool Polygon::load(){
 
-    if (submeshes[0]->getMaterial()->getTextures().size() > 0 && (texcoords.size()==0))
-        generateTexcoords();
+    generateTexcoords();
 
     return Mesh::load();
 

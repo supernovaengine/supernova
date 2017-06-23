@@ -38,8 +38,8 @@ double Sound::getLength(){
     return player->getLength();
 }
 
-double Sound::getStreamTime(){
-    return player->getStreamTime();
+double Sound::getPlayingTime(){
+    return player->getPlayingTime();
 }
 
 bool Sound::isPlaying(){

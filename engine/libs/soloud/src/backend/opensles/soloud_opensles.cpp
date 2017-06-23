@@ -287,7 +287,6 @@ namespace SoLoud
 
 		}
 
-		//
 		aSoloud->postinit(aSamplerate,data->bufferSize,aFlags,2);
 		aSoloud->mBackendCleanupFunc = soloud_opensles_deinit;
 

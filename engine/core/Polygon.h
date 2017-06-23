@@ -2,18 +2,21 @@
 #define shape_h
 
 #include <vector>
-#include "Mesh.h"
+#include "Mesh2D.h"
 #include "math/Vector3.h"
 
 namespace Supernova {
 
-    class Polygon: public Mesh {
+    class Polygon: public Mesh2D {
 
     public:
         Polygon();
         virtual ~Polygon();
 
         void generateTexcoords();
+
+        virtual void setSize(int width, int height);
+        virtual void setInvert(bool invert);
 
         void addVertex(Vector3 vertex);
         void addVertex(float x, float y);

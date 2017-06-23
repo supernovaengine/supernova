@@ -336,6 +336,7 @@ void LuaBind::bind(){
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
     .addFunction("setText", &Text::setText)
     .addFunction("setFont", &Text::setFont)
+    .addFunction("setFontSize", &Text::setFontSize)
     .endClass()
 
     .beginExtendClass<GUIImage, Mesh2D>("GUIImage")
@@ -346,7 +347,7 @@ void LuaBind::bind(){
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
     .endClass()
 
-    .beginExtendClass<Polygon, Mesh>("Polygon")
+    .beginExtendClass<Polygon, Mesh2D>("Polygon")
     .addConstructor(LUA_ARGS())
     .addFunction("addVertex", (void (Polygon::*)(float, float))&Polygon::addVertex)
     //.addFunction("addVertex", LUA_FN(void, Polygon::addVertex, float))

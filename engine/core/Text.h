@@ -16,6 +16,7 @@ namespace Supernova {
 
         std::string font;
         std::string text;
+        unsigned int fontSize;
         
     protected:
         void createText();
@@ -36,6 +37,7 @@ namespace Supernova {
         
         void setFont(const char* font);
         void setText(const char* text);
+        void setFontSize(unsigned int fontSize);
 
         virtual bool load();
     };

@@ -12,7 +12,6 @@
 using namespace Supernova;
 
 STBText::STBText() {
-    size = 60;
     atlasWidth = 512;
     atlasHeight = 512;
 }
@@ -21,10 +20,10 @@ STBText::~STBText() {
 }
 
 
-bool STBText::load(std::string font){
+bool STBText::load(const char* font, unsigned int fontSize){
 
     FileData* fontData = new FileData();
-    fontData->open(font.c_str());
+    fontData->open(font);
 
     bool fitBitmap = false;
 
@@ -42,7 +41,7 @@ bool STBText::load(std::string font){
         }
 
         stbtt_PackSetOversampling(&context, oversampleX, oversampleY);
-        if (!stbtt_PackFontRange(&context, fontData->getMemPtr(), 0, size, firstChar, charCount, charInfo)){
+        if (!stbtt_PackFontRange(&context, fontData->getMemPtr(), 0, fontSize, firstChar, charCount, charInfo)){
             atlasWidth = atlasWidth * 2;
             atlasHeight = atlasHeight * 2;
         }else{

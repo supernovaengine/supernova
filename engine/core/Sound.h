@@ -27,7 +27,7 @@ namespace Supernova {
         int stop();
 
         double getLength();
-        double getStreamTime();
+        double getPlayingTime();
 
         bool isPlaying();
         bool isPaused();
