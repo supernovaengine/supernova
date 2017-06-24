@@ -89,5 +89,5 @@ bool Image::load(){
 
     createVertices();
     
-    return Mesh2D::load();;
+    return Mesh2D::load();
 }

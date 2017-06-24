@@ -9,7 +9,7 @@ using namespace Supernova;
 
 Object::Object(){
     loaded = false;
-    firstLoad = false;
+    firstLoaded = false;
     
     parent = NULL;
     scene = NULL;
@@ -87,7 +87,7 @@ void Object::addObject(Object* obj){
         obj->cameraPosition = cameraPosition;
         obj->modelViewProjectionMatrix = modelViewProjectionMatrix;
         
-        obj->firstLoad = false;
+        obj->firstLoaded = false;
         
         if (scene != NULL)
             obj->setSceneAndConfigure(scene);
@@ -362,19 +362,6 @@ bool Object::reload(){
     return load();
 }
 
-void Object::update(){
-    if (position.z != 0){
-        setDepth(true);
-    }
-
-    std::vector<Object*>::iterator it;
-    for (it = objects.begin(); it != objects.end(); ++it) {
-        if ((*it)->scene != (*it)){ //if not a scene object
-            (*it)->update();
-        }
-    }
-}
-
 bool Object::load(){
 
     if (position.z != 0){
@@ -387,19 +374,27 @@ bool Object::load(){
     }
 
     loaded = true;
-    firstLoad = true;
+    firstLoaded = true;
 
-    return true;
+    return loaded;
 
 }
 
 bool Object::draw(){
-
-    if (!firstLoad)
-        load();
-
+    if (position.z != 0){
+        setDepth(true);
+    }
+    
+    std::vector<Object*>::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it) {
+        if ((*it)->scene != (*it)){ //if not a scene object
+            if (!(*it)->firstLoaded)
+                (*it)->load();
+            (*it)->draw();
+        }
+    }
+    
     return loaded;
-
 }
 
 void Object::destroy(){

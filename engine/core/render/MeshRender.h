@@ -45,6 +45,7 @@ namespace Supernova {
         Vector3 cameraPosition;
 
         bool isSky;
+        bool isText;
         bool isDynamic;
         
         int primitiveMode;

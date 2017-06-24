@@ -10,6 +10,7 @@ Mesh::Mesh(): ConcreteObject(){
 
     submeshes.push_back(new Submesh(&material));
     skymesh = false;
+    textmesh = false;
     dynamic = false;
 }
 
@@ -39,6 +40,10 @@ std::vector<Submesh*>* Mesh::getSubmeshes(){
 
 bool Mesh::isSky(){
     return skymesh;
+}
+
+bool Mesh::isText(){
+    return textmesh;
 }
 
 bool Mesh::isDynamic(){
@@ -153,8 +158,8 @@ bool Mesh::load(){
         return false;
 }
 
-bool Mesh::draw(){
-    if (!ConcreteObject::draw())
+bool Mesh::renderDraw(){
+    if (!ConcreteObject::renderDraw())
         return false;
     
     for (size_t i = 0; i < submeshes.size(); i++) {

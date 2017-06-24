@@ -16,9 +16,5 @@ GUIImage::~GUIImage(){
 
 bool GUIImage::load(){
 
-    if (submeshes[0]->getMaterial()->getTextures().size() > 0){
-
-    }
-
     return Mesh2D::load();
 }

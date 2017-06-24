@@ -1,8 +1,8 @@
 #ifndef scene_h
 #define scene_h
 
-#define S_ORIENTATION_Y_DOWN 1
-#define S_ORIENTATION_Y_UP 2
+#define S_ORIENTATION_TOPLEFT 1
+#define S_ORIENTATION_BOTTOMLEFT 2
 
 #include "Object.h"
 #include "Camera.h"
@@ -61,7 +61,7 @@ namespace Supernova {
         void drawTransparentMeshes();
         void drawSky();
 
-        void updateChildScenes();
+        void drawChildScenes();
 
     public:
 
@@ -93,7 +93,6 @@ namespace Supernova {
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
-        virtual void update();
         virtual bool load();
         virtual bool draw();
         virtual void destroy();

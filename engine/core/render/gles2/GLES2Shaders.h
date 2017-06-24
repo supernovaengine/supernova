@@ -179,7 +179,7 @@ std::string gFragmentPointsPerPixelLightShader =
 "#endif\n"
 
 "void main(){\n"
-"   vec4 fragmentColor = vec4(0.0);\n"
+"   vec4 fragmentColor = v_pointColor;\n"
 
 "   if (uUseTexture){\n"
 "     #ifdef HAS_TEXTURERECT\n"
@@ -187,9 +187,7 @@ std::string gFragmentPointsPerPixelLightShader =
 "     #else\n"
 "       vec2 resultCoord = gl_PointCoord;\n"
 "     #endif\n"
-"     fragmentColor = texture2D(u_TextureUnit, resultCoord);\n"
-"   }else{\n"
-"         fragmentColor = v_pointColor;\n"
+"     fragmentColor *= texture2D(u_TextureUnit, resultCoord);\n"
 "   }\n"
 
 "   vec3 FragColor = vec3(fragmentColor);\n"
@@ -224,15 +222,15 @@ std::string gVertexMeshPerPixelLightShader =
 "    vec4 position = u_mvpMatrix * a_Position;\n"
 
 "    #ifdef USE_TEXTURECOORDS\n"
-"      #ifndef USE_TEXTURECUBE\n"
+"      #ifdef USE_TEXTURECUBE\n"
+"        v_TextureCoordinates = vec3(a_Position);\n"
+"      #else\n"
 "        #ifdef HAS_TEXTURERECT\n"
 "          vec2 resultCoords = a_TextureCoordinates * u_textureRect.zw + u_textureRect.xy;\n"
 "        #else\n"
 "          vec2 resultCoords = a_TextureCoordinates;\n"
 "        #endif\n"
 "        v_TextureCoordinates = vec3(resultCoords,0.0);\n"
-"      #else\n"
-"        v_TextureCoordinates = vec3(a_Position);\n"
 "      #endif\n"
 "    #endif\n"
 
@@ -246,10 +244,10 @@ std::string gVertexMeshPerPixelLightShader =
 std::string gFragmentMeshPerPixelLightShader =
 "precision mediump float;\n"
 
-"#ifndef USE_TEXTURECUBE\n"
-"  uniform sampler2D u_TextureUnit;\n"
-"#else\n"
+"#ifdef USE_TEXTURECUBE\n"
 "  uniform samplerCube u_TextureUnit;\n"
+"#else\n"
+"  uniform sampler2D u_TextureUnit;\n"
 "#endif\n"
 
 "uniform vec4 u_Color;\n"
@@ -265,17 +263,20 @@ std::string gFragmentMeshPerPixelLightShader =
 "void main(){\n"
 
     //Texture or color
-"   vec4 fragmentColor = vec4(0.0);\n"
+"   vec4 fragmentColor = u_Color;\n"
+
 "   if (uUseTexture){\n"
 "     #ifdef USE_TEXTURECOORDS\n"
-"       #ifndef USE_TEXTURECUBE\n"
-"         fragmentColor = texture2D(u_TextureUnit, v_TextureCoordinates.xy) + u_Color;\n"
+"       #ifdef USE_TEXTURECUBE\n"
+"         fragmentColor *= textureCube(u_TextureUnit, v_TextureCoordinates);\n"
 "       #else\n"
-"         fragmentColor = textureCube(u_TextureUnit, v_TextureCoordinates) + u_Color;\n"
+"         #ifdef IS_TEXT\n"
+"           fragmentColor *= vec4(1.0, 1.0, 1.0, texture2D(u_TextureUnit, v_TextureCoordinates.xy).a);\n"
+"         #else\n"
+"           fragmentColor *= texture2D(u_TextureUnit, v_TextureCoordinates.xy);\n"
+"         #endif\n"
 "       #endif\n"
 "     #endif\n"
-"   }else{\n"
-"     fragmentColor = u_Color;\n"
 "   }\n"
 
 "   vec3 FragColor = vec3(fragmentColor);\n"

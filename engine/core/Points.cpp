@@ -211,6 +211,13 @@ std::vector<Vector4>* Points::getColors(){
     return &colors;
 }
 
+bool Points::renderDraw(){
+    if (!ConcreteObject::renderDraw())
+        return false;
+    
+    return render->draw();
+}
+
 bool Points::load(){
 
     while (positions.size() > normals.size()){
@@ -252,14 +259,6 @@ bool Points::load(){
     else
         return false;
 }
-
-bool Points::draw(){
-    if (!ConcreteObject::draw())
-        return false;
-
-    return render->draw();
-}
-
 
 void Points::destroy(){
     

@@ -73,8 +73,3 @@ bool RectImage::load(){
 
     return Image::load();
 }
-
-bool RectImage::draw(){
-
-    return Image::draw();
-}

@@ -16,6 +16,7 @@
 #include <time.h>
 
 #include "Events.h"
+#include "math/Rect.h"
 #include "platform/Log.h"
 
 #include "LuaBind.h"
@@ -42,6 +43,8 @@ int Engine::canvasHeight;
 
 int Engine::preferedCanvasWidth;
 int Engine::preferedCanvasHeight;
+
+Rect Engine::viewRect;
 
 int Engine::renderAPI;
 bool Engine::mouseAsTouch;
@@ -119,7 +122,6 @@ void Engine::setCanvasSize(int canvasWidth, int canvasHeight){
         Engine::canvasHeight = canvasHeight;
         Engine::canvasWidth = screenWidth * canvasHeight / screenHeight;
     }
-    // S_SCALING_STRETCH do not need nothing
     
     if ((Engine::preferedCanvasWidth == 0) && (Engine::preferedCanvasHeight == 0)){
         setPreferedCanvasSize(canvasWidth, canvasHeight);
@@ -140,6 +142,10 @@ void Engine::setPreferedCanvasSize(int preferedCanvasWidth, int preferedCanvasHe
         Engine::preferedCanvasWidth = preferedCanvasWidth;
         Engine::preferedCanvasHeight = preferedCanvasHeight;
     }
+}
+
+Rect* Engine::getViewRect(){
+    return &viewRect;
 }
 
 void Engine::setRenderAPI(int renderAPI){
@@ -241,6 +247,51 @@ void Engine::onSurfaceCreated(){
 void Engine::onSurfaceChanged(int width, int height) {
 
     Engine::setScreenSize(width, height);
+    
+    int viewX = 0;
+    int viewY = 0;
+    int viewWidth = Engine::getScreenWidth();
+    int viewHeight = Engine::getScreenHeight();
+    
+    float screenAspect = (float)Engine::getScreenWidth() / (float)Engine::getScreenHeight();
+    float canvasAspect = (float)Engine::getPreferedCanvasWidth() / (float)Engine::getPreferedCanvasHeight();
+    
+    //When canvas size is not changed
+    if (Engine::getScalingMode() == S_SCALING_LETTERBOX){
+        if (screenAspect < canvasAspect){
+            float aspect = (float)Engine::getScreenWidth() / (float)Engine::getPreferedCanvasWidth();
+            int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
+            int dif = Engine::getScreenHeight() - newHeight;
+            viewY = (dif/2);
+            viewHeight = Engine::getScreenHeight()-dif;
+        }else{
+            float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
+            int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
+            int dif = Engine::getScreenWidth() - newWidth;
+            viewX = (dif/2);
+            viewWidth = Engine::getScreenWidth()-dif;
+        }
+    }
+    
+    if (Engine::getScalingMode() == S_SCALING_CROP){
+        if (screenAspect > canvasAspect){
+            float aspect = (float)Engine::getScreenWidth() / (float)Engine::getPreferedCanvasWidth();
+            int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
+            int dif = Engine::getScreenHeight() - newHeight;
+            viewY = (dif/2);
+            viewHeight = Engine::getScreenHeight()-dif;
+        }else{
+            float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
+            int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
+            int dif = Engine::getScreenWidth() - newWidth;
+            viewX = (dif/2);
+            viewWidth = Engine::getScreenWidth()-dif;
+        }
+    }
+    
+    // S_SCALING_STRETCH do not need nothing
+    
+    viewRect.setRect(viewX, viewY, viewWidth, viewHeight);
 
     if (Engine::getScene() != NULL){
         (Engine::getScene())->updateViewSize();
@@ -251,7 +302,7 @@ void Engine::onSurfaceChanged(int width, int height) {
 void Engine::onDrawFrame() {
     
     if (Engine::getScene() != NULL){
-        (Engine::getScene())->update();
+        (Engine::getScene())->draw();
     }
     
     unsigned long newTime = (float)clock() / CLOCKS_PER_SEC * 1000;
@@ -286,61 +337,65 @@ void Engine::onResume(){
     SoundManager::resumeAll();
 }
 
+bool Engine::transformCoordPos(float& x, float& y){
+    x = (x * (float)screenWidth / viewRect.getWidth());
+    y = (y * (float)screenHeight / viewRect.getHeight());
+    
+    x = ((float)Engine::getCanvasWidth() * (x+1)) / 2;
+    y = ((float)Engine::getCanvasHeight() * (y+1)) / 2;
+    
+    return ((x >= 0) && (x <= Engine::getCanvasWidth()) && (y >= 0) && (y <= Engine::getCanvasHeight()));
+}
+
 void Engine::onTouchPress(float x, float y){
-    x = (Engine::getCanvasWidth() * (x+1)) / 2;
-    y = (Engine::getCanvasHeight() * (y+1)) / 2;
-
-    Events::call_onTouchPress(x, y);
-}
-
-void Engine::onTouchUp(float x, float y){
-    x = (Engine::getCanvasWidth() * (x+1)) / 2;
-    y = (Engine::getCanvasHeight() * (y+1)) / 2;
-
-    Events::call_onTouchUp(x, y);
-}
-
-void Engine::onTouchDrag(float x, float y){
-    x = (Engine::getCanvasWidth() * (x+1)) / 2;
-    y = (Engine::getCanvasHeight() * (y+1)) / 2;
-
-    Events::call_onTouchDrag(x, y);
-}
-
-void Engine::onMousePress(int button, float x, float y){
-    x = (Engine::getCanvasWidth() * (x+1)) / 2;
-    y = (Engine::getCanvasHeight() * (y+1)) / 2;
-
-    Events::call_onMousePress(button, x, y);
-    if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+    if (transformCoordPos(x, y)){
+        printf("teste %f %f \n", x, y);
         Events::call_onTouchPress(x, y);
     }
 }
-void Engine::onMouseUp(int button, float x, float y){
-    x = (Engine::getCanvasWidth() * (x+1)) / 2;
-    y = (Engine::getCanvasHeight() * (y+1)) / 2;
 
-    Events::call_onMouseUp(button, x, y);
-    if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+void Engine::onTouchUp(float x, float y){
+    if (transformCoordPos(x, y)){
         Events::call_onTouchUp(x, y);
     }
 }
 
-void Engine::onMouseDrag(int button, float x, float y){
-    x = (Engine::getCanvasWidth() * (x+1)) / 2;
-    y = (Engine::getCanvasHeight() * (y+1)) / 2;
-
-    Events::call_onMouseDrag(button, x, y);
-    if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+void Engine::onTouchDrag(float x, float y){
+    if (transformCoordPos(x, y)){
         Events::call_onTouchDrag(x, y);
     }
 }
 
-void Engine::onMouseMove(float x, float y){
-    x = (Engine::getCanvasWidth() * (x+1)) / 2;
-    y = (Engine::getCanvasHeight() * (y+1)) / 2;
+void Engine::onMousePress(int button, float x, float y){
+    if (transformCoordPos(x, y)){
+        Events::call_onMousePress(button, x, y);
+        if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+            Events::call_onTouchPress(x, y);
+        }
+    }
+}
+void Engine::onMouseUp(int button, float x, float y){
+    if (transformCoordPos(x, y)){
+        Events::call_onMouseUp(button, x, y);
+        if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+            Events::call_onTouchUp(x, y);
+        }
+    }
+}
 
-    Events::call_onMouseMove(x, y);
+void Engine::onMouseDrag(int button, float x, float y){
+    if (transformCoordPos(x, y)){
+        Events::call_onMouseDrag(button, x, y);
+        if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+            Events::call_onTouchDrag(x, y);
+        }
+    }
+}
+
+void Engine::onMouseMove(float x, float y){
+    if (transformCoordPos(x, y)){
+        Events::call_onMouseMove(x, y);
+    }
 }
 
 void Engine::onKeyPress(int inputKey){

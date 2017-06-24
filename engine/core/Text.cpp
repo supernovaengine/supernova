@@ -11,6 +11,7 @@ using namespace Supernova;
 Text::Text(): Mesh2D() {
     primitiveMode = S_TRIANGLES;
     dynamic = true;
+    textmesh = true;
     stbtext = new STBText();
     text = "";
     fontSize = 40;

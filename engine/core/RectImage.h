@@ -27,7 +27,6 @@ namespace Supernova {
         void setRect(Rect textureRect);
         
         bool load();
-        bool draw();
     };
     
 }

@@ -7,7 +7,7 @@ Material::Material(){
     this->textureType = S_TEXTURE_2D;
     transparent = false;
     textureRect = NULL;
-    color = Vector4(0.0, 0.0, 0.0, 0.0);
+    color = Vector4(1.0, 1.0, 1.0, 1.0);
 }
 
 Material::~Material(){

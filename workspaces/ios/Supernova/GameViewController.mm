@@ -37,7 +37,7 @@
 static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
 {
     const float normalizedX = (locationInView.x / view.bounds.size.width) * 2.f - 1.f;
-    const float normalizedY = -((locationInView.y / view.bounds.size.height) * 2.f - 1.f);
+    const float normalizedY = (locationInView.y / view.bounds.size.height) * 2.f - 1.f;
     return CGPointMake(normalizedX, normalizedY);
 }
 

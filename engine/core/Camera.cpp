@@ -278,8 +278,13 @@ Ray Camera::pointsToRay(float x, float y) {
 
     float normalized_x, normalized_y;
 
-    normalized_x = ((2 * x) / Engine::getCanvasWidth()) -1;
-    normalized_y = ((2 * y) / Engine::getCanvasHeight()) -1;
+    if (type == S_CAMERA_2D){
+        normalized_x = ((2 * x) / Engine::getCanvasWidth()) -1;
+        normalized_y = ((2 * y) / Engine::getCanvasHeight()) -1;
+    }else{
+        normalized_x = ((2 * x) / Engine::getCanvasWidth()) -1;
+        normalized_y = -(((2 * y) / Engine::getCanvasHeight()) -1);
+    }
 
     Vector4 near_point_ndc = {normalized_x, normalized_y, -1, 1};
     Vector4 far_point_ndc = {normalized_x, normalized_y,  1, 1};

@@ -17,6 +17,7 @@
 namespace Supernova {
 
     class Scene;
+    class Rect;
 
     class Engine {
         
@@ -32,11 +33,13 @@ namespace Supernova {
         static int preferedCanvasWidth;
         static int preferedCanvasHeight;
         
+        static Rect viewRect;
+        
         static int renderAPI;
         static bool mouseAsTouch;
         static bool useDegrees;
         static int scalingMode;
-        
+
         static unsigned long lastTime;
         static unsigned long updateTimeCount;
         
@@ -45,6 +48,8 @@ namespace Supernova {
         static float framerate;
         
         static unsigned int updateTime;
+        
+        static bool transformCoordPos(float& x, float& y);
 
     public:
         
@@ -66,6 +71,8 @@ namespace Supernova {
         static int getPreferedCanvasWidth();
         static int getPreferedCanvasHeight();
         static void setPreferedCanvasSize(int preferedCanvasWidth, int preferedCanvasHeight);
+        
+        static Rect* getViewRect();
         
         static void setRenderAPI(int renderAPI);
         static int getRenderAPI();

@@ -140,58 +140,17 @@ Camera* Scene::getCamera(){
 int Scene::getOrientation(){
     if (this->camera != NULL){
         if (this->camera->getType() != S_CAMERA_2D){
-            return S_ORIENTATION_Y_UP;
+            return S_ORIENTATION_BOTTOMLEFT;
         }
     }
 
-    return S_ORIENTATION_Y_DOWN;
+    return S_ORIENTATION_TOPLEFT;
 }
 
 bool Scene::updateViewSize(){
-    
-    int viewX = 0;
-    int viewY = 0;
-    int viewWidth = Engine::getScreenWidth();
-    int viewHeight = Engine::getScreenHeight();
-    
-    float screenAspect = (float)Engine::getScreenWidth() / (float)Engine::getScreenHeight();
-    float canvasAspect = (float)Engine::getPreferedCanvasWidth() / (float)Engine::getPreferedCanvasHeight();
-    
-    //When canvas size is not changed
-    if (Engine::getScalingMode() == S_SCALING_LETTERBOX){
-        if (screenAspect < canvasAspect){
-            float aspect = (float)Engine::getScreenWidth() / (float)Engine::getPreferedCanvasWidth();
-            int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
-            int dif = Engine::getScreenHeight() - newHeight;
-            viewY = (dif/2);
-            viewHeight = Engine::getScreenHeight()-dif;
-        }else{
-            float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
-            int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
-            int dif = Engine::getScreenWidth() - newWidth;
-            viewX = (dif/2);
-            viewWidth = Engine::getScreenWidth()-dif;
-        }
-    }
-    
-    if (Engine::getScalingMode() == S_SCALING_CROP){
-        if (screenAspect > canvasAspect){
-            float aspect = (float)Engine::getScreenWidth() / (float)Engine::getPreferedCanvasWidth();
-            int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
-            int dif = Engine::getScreenHeight() - newHeight;
-            viewY = (dif/2);
-            viewHeight = Engine::getScreenHeight()-dif;
-        }else{
-            float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
-            int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
-            int dif = Engine::getScreenWidth() - newWidth;
-            viewX = (dif/2);
-            viewWidth = Engine::getScreenWidth()-dif;
-        }
-    }
 
     SceneRender::newInstance(&render);
-    bool status = render->viewSize(Rect(viewX, viewY, viewWidth, viewHeight));
+    bool status = render->viewSize(*Engine::getViewRect());
     if (this->camera != NULL){
         camera->updateAutomaticSizes();
     }
@@ -222,33 +181,35 @@ void Scene::resetSceneProperties(){
 void Scene::drawTransparentMeshes(){
     std::multimap<float, ConcreteObject*>::reverse_iterator it;
     for (it = transparentQueue.rbegin(); it != transparentQueue.rend(); ++it) {
-        (*it).second->draw();
+        (*it).second->renderDraw();
     }
 }
 
-void Scene::updateChildScenes(){
+void Scene::drawChildScenes(){
     std::vector<Scene*>::iterator it2;
     for (it2 = subScenes.begin(); it2 != subScenes.end(); ++it2) {
-        (*it2)->update();
+        (*it2)->draw();
     }
 }
 
 void Scene::drawSky(){
     if (sky != NULL)
-        sky->draw();
+        sky->renderDraw();
 }
 
-void Scene::update() {
+bool Scene::draw() {
     transparentQueue.clear();
-    draw();
+    bool drawreturn = render->draw();
     resetSceneProperties();
 
-    Object::update();
+    Object::draw();
 
     drawSky();
     drawTransparentMeshes();
 
-    updateChildScenes();
+    drawChildScenes();
+    
+    return drawreturn;
 }
 
 bool Scene::load(){
@@ -261,20 +222,12 @@ bool Scene::load(){
     render->load();
     resetSceneProperties();
 
-    Object::load();
+    bool loadreturn = Object::load();
 
     Object::updateMatrix();
     camera->updateMatrix();
 
-    return true;
-}
-
-
-bool Scene::draw(){
-    if (!Object::draw())
-        return false;
-
-    return render->draw();
+    return loadreturn;
 }
 
 void Scene::destroy(){

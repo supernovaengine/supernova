@@ -18,8 +18,7 @@ EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChang
 EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData);
 EM_BOOL wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData);
 
-int width, height;
-int originalWidth, originalHeight;
+int originalWidth = 800, originalHeight = 600;
 
 extern "C" {
     int getScreenWidth() {
@@ -29,9 +28,6 @@ extern "C" {
         return Supernova::Engine::getScreenHeight();
     }
     void updateScreenSize(int nWidth, int nHeight){
-        width = nWidth;
-        height = nHeight;
-
         Supernova::Engine::onSurfaceChanged(nWidth, nHeight);
     }
 }
@@ -51,10 +47,8 @@ int main(int argc, char **argv) {
         Supernova::Engine::onStart();
     }
 
-    width = Supernova::Engine::getScreenWidth();
-    height = Supernova::Engine::getScreenHeight();
-    originalWidth = width;
-    originalHeight = height;
+    int width = Supernova::Engine::getScreenWidth();
+    int height = Supernova::Engine::getScreenHeight();
 
     SDL_Surface *screen = SDL_SetVideoMode( width, height, 16, SDL_OPENGL );
     if ( !screen ) {
@@ -134,13 +128,16 @@ int supernova_mouse_button(int button){
 
 EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData) {
 
+    int width = Supernova::Engine::getScreenWidth();
+    int height = Supernova::Engine::getScreenHeight();
+
     if (e->canvasX < 0) return 0;
     if (e->canvasY < 0) return 0;
     if (e->canvasX > width) return 0;
     if (e->canvasY > height) return 0;
 
     const float normalized_x = (e->canvasX / (float) width) * 2.f - 1.f;
-    const float normalized_y = -((e->canvasY / (float) height) * 2.f - 1.f);
+    const float normalized_y = (e->canvasY / (float) height) * 2.f - 1.f;
 
     Supernova::Engine::onMouseMove(normalized_x, normalized_y);
     if ((e->movementX != 0 || e->movementY != 0) && e->buttons != 0) {

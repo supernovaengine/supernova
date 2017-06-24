@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
 				public boolean onTouch(View v, MotionEvent event) {
 	                if (event != null) {           
 	                    final float normalizedX = (event.getX() / (float) v.getWidth()) * 2 - 1;
-	                    final float normalizedY = -((event.getY() / (float) v.getHeight()) * 2 - 1);
+	                    final float normalizedY = (event.getY() / (float) v.getHeight()) * 2 - 1;
 	                    
 	                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
 	                        glSurfaceView.queueEvent(new Runnable() {

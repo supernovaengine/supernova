@@ -101,6 +101,9 @@ bool GLES2Mesh::load() {
     if (isSky){
         programDefs += "#define IS_SKY\n";
     }
+    if (isText){
+        programDefs += "#define IS_TEXT\n";
+    }
     if (lighting){
         programDefs += "#define USE_LIGHTING\n";
     }

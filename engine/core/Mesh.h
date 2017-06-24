@@ -23,6 +23,7 @@ namespace Supernova {
         std::vector<Submesh*> submeshes;
         
         bool skymesh;
+        bool textmesh;
         bool dynamic;
 
         int primitiveMode;
@@ -41,6 +42,7 @@ namespace Supernova {
         std::vector<Vector2>* getTexcoords();
         std::vector<Submesh*>* getSubmeshes();
         bool isSky();
+        bool isText();
         bool isDynamic();
         
         void setTexcoords(std::vector<Vector2> texcoords);
@@ -53,8 +55,9 @@ namespace Supernova {
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();
 
+        virtual bool renderDraw();
+        
         virtual bool load();
-        virtual bool draw();
         virtual void destroy();
 
     };

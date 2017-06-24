@@ -79,8 +79,9 @@ namespace Supernova {
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();
         
+        virtual bool renderDraw();
+        
         virtual bool load();
-        virtual bool draw();
         virtual void destroy();
     };
     

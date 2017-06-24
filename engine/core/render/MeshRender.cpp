@@ -18,6 +18,7 @@ MeshRender::MeshRender(){
     sceneRender = NULL;
 
     isSky = false;
+    isText = false;
     isDynamic = false;
     
     primitiveMode = 0;
@@ -105,6 +106,7 @@ void MeshRender::fillMeshProperties(){
         cameraPosition = mesh->getCameraPosition();
 
         isSky = mesh->isSky();
+        isText = mesh->isText();
         isDynamic = mesh->isDynamic();
         
         primitiveMode = mesh->getPrimitiveMode();

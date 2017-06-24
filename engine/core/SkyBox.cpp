@@ -87,17 +87,17 @@ void SkyBox::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     updateMVPMatrix();
 }
 
+bool SkyBox::draw(){
+    //Nothing to do
+    //Scene will call draw()
+    return true;
+}
+
 bool SkyBox::load(){
     this->submeshes[0]->getMaterial()->setTextureCube(textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
 
     return  Mesh::load();
 }
-
-void SkyBox::update(){
-    //Nothing to do
-    //Scene will call draw()
-}
-
 
 void SkyBox::setTextureFront(std::string texture){
     this->textureFront = texture;

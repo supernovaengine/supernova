@@ -91,7 +91,7 @@ int Mesh2D::getHeight(){
 }
 
 bool Mesh2D::load(){
-    if (scene && scene->getScene()->getOrientation() == S_ORIENTATION_Y_UP){
+    if (scene && scene->getScene()->getOrientation() == S_ORIENTATION_BOTTOMLEFT){
         setInvert(true);
     }
 
@@ -110,17 +110,16 @@ bool Mesh2D::draw(){
             scaleY *= parent->getScale().y;
             parent = parent->getParent();
         }
+        
+        float tempX = (2 * getWorldPosition().x / (float)Engine::getCanvasWidth()) - 1;
+        float tempY = (2 * getWorldPosition().y / (float)Engine::getCanvasHeight()) - 1;
+        
+        int objScreenPosX = (tempX * Engine::getViewRect()->getWidth() + (float)Engine::getScreenWidth()) / 2;
+        int objScreenPosY = (tempY * Engine::getViewRect()->getHeight() + (float)Engine::getScreenHeight()) / 2;
+        int objScreenWidth = width * scaleX * (Engine::getViewRect()->getWidth() / (float) Engine::getCanvasWidth());
+        int objScreenHeight = height * scaleY * (Engine::getViewRect()->getHeight() / (float) Engine::getCanvasHeight());
 
-        int objScreenPosX = (int)(getWorldPosition().x * ((float) Engine::getScreenWidth() /
-                                                          (float) Engine::getCanvasWidth()));
-        int objScreenPosY = (int)(getWorldPosition().y * ((float) Engine::getScreenHeight() /
-                                                          (float) Engine::getCanvasHeight()));
-        int objScreenWidth = (int)(width * scaleX * ((float) Engine::getScreenWidth() /
-                                                     (float) Engine::getCanvasWidth()));
-        int objScreenHeight = (int)(height * scaleY * ((float) Engine::getScreenHeight() /
-                                                       (float) Engine::getCanvasHeight()));
-
-        if (scene && scene->getScene()->getOrientation() == S_ORIENTATION_Y_DOWN)
+        if (scene && scene->getScene()->getOrientation() == S_ORIENTATION_BOTTOMLEFT)
             objScreenPosY = (float)Engine::getScreenHeight()-objScreenHeight-objScreenPosY;
 
         SceneRender* sceneRender = scene->getSceneRender();

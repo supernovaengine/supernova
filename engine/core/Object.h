@@ -15,7 +15,7 @@ namespace Supernova {
 
     private:
         
-        bool firstLoad;
+        bool firstLoaded;
         
         void setSceneAndConfigure(Scene* scene);
         void removeScene();
@@ -93,7 +93,6 @@ namespace Supernova {
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();
 
-        virtual void update();
         virtual bool load();
         virtual bool draw();
         virtual void destroy();
