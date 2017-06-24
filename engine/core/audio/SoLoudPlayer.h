@@ -6,30 +6,33 @@
 #include "SoLoudSource.h"
 #include "soloud.h"
 
+namespace Supernova {
 
-class SoLoudPlayer: public AudioPlayer {
-private:
-    SoLoud::Soloud* soloud;
-    SoLoudSource sample;
-    SoLoud::handle soundHandle;
-public:
-    SoLoudPlayer();
-    virtual ~SoLoudPlayer();
+    class SoLoudPlayer: public AudioPlayer {
+    private:
+        SoLoud::Soloud* soloud;
+        SoLoudSource sample;
+        SoLoud::handle soundHandle;
+    public:
+        SoLoudPlayer();
+        virtual ~SoLoudPlayer();
 
-    int load();
-    void destroy();
+        int load();
+        void destroy();
 
-    int play();
-    int pause();
-    int stop();
+        int play();
+        int pause();
+        int stop();
 
-    double getLength();
-    double getStreamTime();
+        double getLength();
+        double getPlayingTime();
 
-    bool isPlaying();
-    bool isPaused();
-    bool isStopped();
-};
+        bool isPlaying();
+        bool isPaused();
+        bool isStopped();
+    };
+    
+}
 
 
 #endif //SOLOUDPLAYER_H

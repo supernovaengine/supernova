@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_definitions("-DWITH_SDL2_STATIC") # For SoLoud
-add_definitions("-s USE_SDL=2")
+add_definitions("-DWITH_SDL_STATIC") # For SoLoud
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/web_macros.h")
 
-set(COMPILE_ZLIB ON)
+set(COMPILE_ZLIB OFF)
 
 add_subdirectory (../.. ${PROJECT_BINARY_DIR}/supernova)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core")
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/libs/lua")
+
+file(GLOB_RECURSE SUPERNOVA_PROJECT_SRCS ../../project/*.cpp)
 
 add_library(
     supernova
@@ -24,13 +24,13 @@ target_link_libraries(
 
 add_executable(
     supernova-project
-    ../../project/main.cpp
+    ${SUPERNOVA_PROJECT_SRCS}
 )
 
 set_target_properties(
     supernova-project
     PROPERTIES LINK_FLAGS
-    "-g4 -s ALLOW_MEMORY_GROWTH=1 -s USE_GLFW=3 --embed-file ../../../assets@/ -o supernova-project.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_updateScreenSize','_main']\""
+    "-g4 -s ALLOW_MEMORY_GROWTH=1 --embed-file ../../../project/assets@/ -o supernova-project.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_updateScreenSize','_main']\""
 )
 
 target_link_libraries(

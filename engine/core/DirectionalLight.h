@@ -4,16 +4,20 @@
 #include "Light.h"
 #include "math/Vector3.h"
 
-class DirectionalLight: public Light {
+namespace Supernova {
 
-public:
+    class DirectionalLight: public Light {
 
-    DirectionalLight();
-    virtual ~DirectionalLight();
+    public:
 
-    void setDirection(Vector3 direction);
-    void setDirection(float x, float y, float z);
+        DirectionalLight();
+        virtual ~DirectionalLight();
 
-};
+        void setDirection(Vector3 direction);
+        void setDirection(float x, float y, float z);
+
+    };
+    
+}
 
 #endif /* directionallight_h */

@@ -8,34 +8,83 @@
 #include "math/Vector2.h"
 #include "math/Angle.h"
 #include "PrimitiveMode.h"
-#include "Supernova.h"
+#include "Engine.h"
+#include "GLES2Submesh.h"
+#include <algorithm>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#define BUFFER_OFFSET(i) ((void*)(i))
+
+using namespace Supernova;
 
 GLES2Mesh::GLES2Mesh(): MeshRender() {
     lighting = false;
+    usageBuffer = GL_STATIC_DRAW;
 }
 
 GLES2Mesh::~GLES2Mesh() {
     destroy();
 }
 
+void GLES2Mesh::useVerticesBuffer(){
+    if (vertexBufferSize == 0){
+        vertexBuffer = GLES2Util::createVBO();
+    }
+    if (vertexBufferSize >= vertices->size()){
+        GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, vertices->size() * 3 * sizeof(GLfloat), &vertices->front());
+    }else{
+        vertexBufferSize = std::max((unsigned int)vertices->size(), minBufferSize);
+        GLES2Util::dataVBO(vertexBuffer, GL_ARRAY_BUFFER, vertexBufferSize * 3 * sizeof(GLfloat), &vertices->front(), usageBuffer);
+    }
+}
+
+void GLES2Mesh::useTexcoordsBuffer(){
+    if (uvBufferSize == 0){
+        uvBuffer = GLES2Util::createVBO();
+    }
+    if (uvBufferSize >= texcoords->size()){
+        GLES2Util::updateVBO(uvBuffer, GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front());
+    }else{
+        uvBufferSize = std::max((unsigned int)texcoords->size(), minBufferSize);
+        GLES2Util::dataVBO(uvBuffer, GL_ARRAY_BUFFER, uvBufferSize * 2 * sizeof(GLfloat), &texcoords->front(), usageBuffer);
+    }
+}
+
+void GLES2Mesh::useNormalsBuffer(){
+    if (normalBufferSize == 0){
+        normalBuffer = GLES2Util::createVBO();
+    }
+    if (normalBufferSize >= normals->size()){
+        GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
+    }else{
+        normalBufferSize = std::max((unsigned int)normals->size(), minBufferSize);
+        GLES2Util::dataVBO(normalBuffer, GL_ARRAY_BUFFER, normalBufferSize * 3 * sizeof(GLfloat), &normals->front(), usageBuffer);
+    }
+}
 
 void GLES2Mesh::updateVertices(){
-    if (loaded)
-        GLES2Util::updateVBO(vertexBuffer, GL_ARRAY_BUFFER, vertices->size() * 3 * sizeof(GLfloat), &vertices->front());
+    MeshRender::updateVertices();
+    useVerticesBuffer();
 }
 
 void GLES2Mesh::updateTexcoords(){
-    if (loaded)
-        if (texcoords)
-            GLES2Util::updateVBO(uvBuffer, GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front());
+    MeshRender::updateTexcoords();
+    if (hasTexture)
+        useTexcoordsBuffer();
 }
 
 void GLES2Mesh::updateNormals(){
-    if (loaded)
-        if (normals)
-            GLES2Util::updateVBO(normalBuffer, GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front());
+    MeshRender::updateNormals();
+    if (lighting)
+        useNormalsBuffer();
+}
+
+void GLES2Mesh::updateIndices(){
+    MeshRender::updateIndices();
+    for (unsigned int i = 0; i < submeshes->size(); i++){
+        GLES2Submesh* submeshRender = (GLES2Submesh*)submeshes->at(i)->getSubmeshRender();
+        submeshRender->useIndicesBuffer();
+    }
 }
 
 bool GLES2Mesh::load() {
@@ -46,13 +95,14 @@ bool GLES2Mesh::load() {
 
     std::string programName = "mesh_perfragment";
     std::string programDefs = "";
-    if (submeshes){
-        if (submeshes->at(0)->getMaterial()->getTextureType() == S_TEXTURE_CUBE){
-            programDefs += "#define USE_TEXTURECUBE\n";
-        }
+    if (hasTextureCube){
+        programDefs += "#define USE_TEXTURECUBE\n";
     }
     if (isSky){
         programDefs += "#define IS_SKY\n";
+    }
+    if (isText){
+        programDefs += "#define IS_TEXT\n";
     }
     if (lighting){
         programDefs += "#define USE_LIGHTING\n";
@@ -60,8 +110,8 @@ bool GLES2Mesh::load() {
     if (hasfog){
         programDefs += "#define HAS_FOG\n";
     }
-    if (texcoords){
-        programDefs += "#define USE_TEXTURECOORDS\n"; //TODO!
+    if (hasTexture){
+        programDefs += "#define USE_TEXTURECOORDS\n";
     }
     if (hasTextureRect){
         programDefs += "#define HAS_TEXTURERECT\n";
@@ -73,15 +123,25 @@ bool GLES2Mesh::load() {
     fog.setProgram((GLES2Program*)gProgram.get());
 
     useTexture = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "uUseTexture");
+    
+    if (isDynamic){
+        usageBuffer = GL_DYNAMIC_DRAW;
+    }
 
-    vertexBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, vertices->size() * 3 * sizeof(GLfloat), &vertices->front(), GL_STATIC_DRAW);
+    vertexBufferSize = 0;
+    uvBufferSize = 0;
+    normalBufferSize = 0;
+    
+    useVerticesBuffer();
     aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
 
-    uvBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, texcoords->size() * 2 * sizeof(GLfloat), &texcoords->front(), GL_STATIC_DRAW);
-    aTextureCoordinatesLocation = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_TextureCoordinates");
+    if (hasTexture) {
+        useTexcoordsBuffer();
+        aTextureCoordinates = glGetAttribLocation(((GLES2Program *) gProgram.get())->getProgram(), "a_TextureCoordinates");
+    }
     
     if (lighting){
-        normalBuffer = GLES2Util::createVBO(GL_ARRAY_BUFFER, normals->size() * 3 * sizeof(GLfloat), &normals->front(), GL_STATIC_DRAW);
+        useNormalsBuffer();
         aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
     }
     
@@ -90,34 +150,6 @@ bool GLES2Mesh::load() {
     }
     uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
     uColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_Color");
-    
-    
-    for (unsigned int i = 0; i < submeshes->size(); i++){
-        if (submeshesRender[submeshes->at(i)].indicesSizes > 0){
-            std::vector<unsigned int> gIndices = *submeshes->at(i)->getIndices();
-            submeshesIndices[submeshes->at(i)].indiceBuffer = GLES2Util::createVBO(GL_ELEMENT_ARRAY_BUFFER, gIndices.size() * sizeof(unsigned int), &gIndices.front(), GL_STATIC_DRAW);
-        }
-
-        if (submeshesRender[submeshes->at(i)].textured){
-            if (submeshes->at(i)->getMaterial()->getTextureType() == S_TEXTURE_CUBE){
-                std::vector<std::string> textures;
-                std::string id = "cube|";
-                for (int t = 0; t < submeshes->at(i)->getMaterial()->getTextures().size(); t++){
-                    textures.push_back(submeshes->at(i)->getMaterial()->getTextures()[t]);
-                    id = id + "|" + textures.back();
-                }
-                submeshesRender[submeshes->at(i)].texture = TextureManager::loadTextureCube(textures, id);
-            }else{
-                submeshesRender[submeshes->at(i)].texture = TextureManager::loadTexture(submeshes->at(i)->getMaterial()->getTextures()[0]);
-            }
-        }else{
-            //Fix Chrome warnings of no texture bound with an empty texture
-            if (Supernova::getPlatform() == S_WEB){
-                GLES2Util::generateEmptyTexture();
-            }
-            submeshesRender[submeshes->at(i)].texture = NULL;
-        }
-    }
 
     u_mvpMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mvpMatrix");
     if (lighting){
@@ -139,10 +171,6 @@ bool GLES2Mesh::load() {
 bool GLES2Mesh::draw() {
 
     if (!MeshRender::draw()){
-        return false;
-    }
-
-    if (!loaded){
         return false;
     }
 
@@ -174,12 +202,12 @@ bool GLES2Mesh::draw() {
     if (aPositionHandle == -1) aPositionHandle = attributePos;
     glVertexAttribPointer(aPositionHandle, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
 
-    if (texcoords){
+    if (hasTexture){
         attributePos++;
         glEnableVertexAttribArray(attributePos);
         glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-        if (aTextureCoordinatesLocation == -1) aTextureCoordinatesLocation = attributePos;
-        glVertexAttribPointer(aTextureCoordinatesLocation, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+        if (aTextureCoordinates == -1) aTextureCoordinates = attributePos;
+        glVertexAttribPointer(aTextureCoordinates, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     }
 
     if (lighting) {
@@ -202,38 +230,42 @@ bool GLES2Mesh::draw() {
 
     for (int i = 0; i < submeshes->size(); i++){
         
-        if (hasTextureRect){
-            TextureRect textureRect;
-            if (submeshes->at(i)->getMaterial()->getTextureRect())
-                textureRect = *submeshes->at(i)->getMaterial()->getTextureRect();
+        GLES2Submesh* submeshRender = (GLES2Submesh*)submeshes->at(i)->getSubmeshRender();
         
+        if (hasTextureRect){
+            Rect textureRect;
+            if (submeshRender->material->getTextureRect())
+                textureRect = *submeshRender->material->getTextureRect();
+            
             glUniform4f(u_textureRect, textureRect.getX(), textureRect.getY(), textureRect.getWidth(), textureRect.getHeight());
         }
-
-        glUniform1i(useTexture, submeshesRender[submeshes->at(i)].textured);
-
-        if (submeshesRender[submeshes->at(i)].textured){
+        
+        glUniform1i(useTexture, submeshRender->textured);
+        
+        if (submeshRender->textured){
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(((GLES2Texture*)(submeshesRender[submeshes->at(i)].texture.get()))->getTextureType(), ((GLES2Texture*)(submeshesRender[submeshes->at(i)].texture.get()))->getTexture());
+            glBindTexture(((GLES2Texture*)(submeshRender->texture.get()))->getTextureType(), ((GLES2Texture*)(submeshRender->texture.get()))->getTexture());
             glUniform1i(uTextureUnitLocation, 0);
         }else{
-            glUniform4fv(uColor, 1, submeshes->at(i)->getMaterial()->getColor()->ptr());
-            if (Supernova::getPlatform() == S_WEB){
+            if (Engine::getPlatform() == S_WEB){
                 //Fix Chrome warnings of no texture bound
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
                 glUniform1i(uTextureUnitLocation, 0);
             }
         }
-
-        if (submeshesRender[submeshes->at(i)].indicesSizes > 0){
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, submeshesIndices[submeshes->at(i)].indiceBuffer);
-            glDrawElements(modeGles, submeshesRender[submeshes->at(i)].indicesSizes, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+        glUniform4fv(uColor, 1, submeshRender->material->getColor()->ptr());
+        
+        
+        if (submeshRender->indicesSizes > 0){
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, submeshRender->indexBuffer);
+            glDrawElements(modeGles, submeshRender->indicesSizes, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
         }else{
             glDrawArrays(modeGles, 0, (int)vertices->size());
         }
     }
-
+    
+    
     for (int i = 0; i <= attributePos; i++)
         glDisableVertexAttribArray(i);
 
@@ -246,27 +278,16 @@ bool GLES2Mesh::draw() {
 }
 
 void GLES2Mesh::destroy(){
-    if (loaded){
-        glDeleteBuffers(1, &vertexBuffer);
-        if (texcoords){
-            glDeleteBuffers(1, &uvBuffer);
-        }
-        if (lighting && normals){
-            glDeleteBuffers(1, &normalBuffer);
-        }
-        if (submeshes){
-            for (unsigned int i = 0; i < submeshes->size(); i++){
-                if (submeshesRender[submeshes->at(i)].indicesSizes > 0)
-                    glDeleteBuffers(1, &submeshesIndices[submeshes->at(i)].indiceBuffer);
 
-                if (submeshesRender[submeshes->at(i)].textured){
-                    submeshesRender[submeshes->at(i)].texture.reset();
-                    TextureManager::deleteUnused();
-                }
-            }
-        }
-        gProgram.reset();
-        ProgramManager::deleteUnused();
+    glDeleteBuffers(1, &vertexBuffer);
+    if (texcoords){
+        glDeleteBuffers(1, &uvBuffer);
     }
-    loaded = false;
+    if (lighting && normals){
+        glDeleteBuffers(1, &normalBuffer);
+    }
+    gProgram.reset();
+    ProgramManager::deleteUnused();
+    
+    MeshRender::destroy();
 }

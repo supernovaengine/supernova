@@ -1,5 +1,7 @@
 #include "Log.h"
 
+using namespace Supernova;
+
 #include <stdarg.h>
 
 #ifdef ANDROID

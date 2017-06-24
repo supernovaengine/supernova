@@ -8,30 +8,34 @@
 
 struct stb_vorbis;
 
-class SoLoudSource;
+namespace Supernova {
 
-class SoLoudSourceInstance : public SoLoud::AudioSourceInstance {
-    SoLoudSource *mParent;
-	unsigned int mOffset;
-public:
-	SoLoudSourceInstance(SoLoudSource *aParent);
-	virtual void getAudio(float *aBuffer, unsigned int aSamples);
-	virtual SoLoud::result rewind();
-	virtual bool hasEnded();
-};
+    class SoLoudSource;
 
-class SoLoudSource : public SoLoud::AudioSource {
-public:
-	float *mData;
-	unsigned int mSampleCount;
+    class SoLoudSourceInstance : public SoLoud::AudioSourceInstance {
+        SoLoudSource *mParent;
+        unsigned int mOffset;
+    public:
+        SoLoudSourceInstance(SoLoudSource *aParent);
+        virtual void getAudio(float *aBuffer, unsigned int aSamples);
+        virtual SoLoud::result rewind();
+        virtual bool hasEnded();
+    };
 
-	SoLoudSource();
-	virtual ~SoLoudSource();
-	SoLoud::result load(AudioFile* audioFile);
+    class SoLoudSource : public SoLoud::AudioSource {
+    public:
+        float *mData;
+        unsigned int mSampleCount;
 
-	virtual SoLoud::AudioSourceInstance *createInstance();
-	SoLoud::time getLength();
-};
+        SoLoudSource();
+        virtual ~SoLoudSource();
+        SoLoud::result load(AudioFile* audioFile);
+
+        virtual SoLoud::AudioSourceInstance *createInstance();
+        SoLoud::time getLength();
+    };
+    
+}
 
 
 #endif

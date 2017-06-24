@@ -7,17 +7,21 @@
 #include "AudioFile.h"
 #include <stdio.h>
 
-class AudioLoader{
-    
-private:
-    AudioReader* getAudioFormat(FileData* filedata);
-public:
-    AudioLoader();
-    AudioLoader(const char* relative_path);
-    virtual ~AudioLoader();
+namespace Supernova {
 
-    AudioFile* loadAudio(const char* relative_path);
+    class AudioLoader{
+        
+    private:
+        AudioReader* getAudioFormat(FileData* filedata);
+    public:
+        AudioLoader();
+        AudioLoader(const char* relative_path);
+        virtual ~AudioLoader();
+
+        AudioFile* loadAudio(const char* relative_path);
+        
+    };
     
-};
+}
 
 #endif /* AudioLoader_h */

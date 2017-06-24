@@ -3,6 +3,8 @@
 #include "SoLoudPlayer.h"
 #include "platform/Log.h"
 
+using namespace Supernova;
+
 Sound::Sound(std::string filename){
     this->filename = filename;
     player = new SoLoudPlayer();
@@ -36,8 +38,8 @@ double Sound::getLength(){
     return player->getLength();
 }
 
-double Sound::getStreamTime(){
-    return player->getStreamTime();
+double Sound::getPlayingTime(){
+    return player->getPlayingTime();
 }
 
 bool Sound::isPlaying(){

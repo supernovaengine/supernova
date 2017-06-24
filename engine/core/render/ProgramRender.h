@@ -3,15 +3,19 @@
 
 #include <string>
 
-class ProgramRender {
+namespace Supernova {
+
+    class ProgramRender {
+        
+    public:
+        
+        inline virtual ~ProgramRender(){}
+        
+        virtual void createProgram(std::string shaderName, std::string definitions) = 0;
+        virtual void deleteProgram() = 0;
+        
+    };
     
-public:
-    
-    inline virtual ~ProgramRender(){}
-    
-    virtual void createProgram(std::string shaderName, std::string definitions) = 0;
-    virtual void deleteProgram() = 0;
-    
-};
+}
 
 #endif /* ProgramRender_h */

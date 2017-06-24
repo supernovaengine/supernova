@@ -4,19 +4,22 @@
 
 #include <stdio.h>
 
-class FileUtilsPlatform {
-protected:
+namespace Supernova {
 
-    FileUtilsPlatform() {}
+    class FileUtilsPlatform {
+    protected:
 
-public:
+        FileUtilsPlatform() {}
 
-    static FileUtilsPlatform& instance();
+    public:
 
-    virtual ~FileUtilsPlatform() {}
+        static FileUtilsPlatform& instance();
 
-    virtual FILE* platformFopen(const char* fname, const char* mode) = 0;
-};
+        virtual ~FileUtilsPlatform() {}
 
+        virtual FILE* platformFopen(const char* fname, const char* mode) = 0;
+    };
+
+}
 
 #endif //FILEUTILSPLATFORM_H

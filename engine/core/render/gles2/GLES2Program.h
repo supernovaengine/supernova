@@ -6,25 +6,28 @@
 #include "render/ProgramRender.h"
 #include <string>
 
+namespace Supernova {
 
-class GLES2Program : public ProgramRender{
+    class GLES2Program : public ProgramRender{
 
-private:
-    
-    GLuint program;
-    
-    std::string getVertexShader(std::string name);
-    std::string getFragmentShader(std::string name);
-    
-    GLuint loadShader(GLenum shaderType, const char* pSource);
-    
-    
-public:
+    private:
+        
+        GLuint program;
+        
+        std::string getVertexShader(std::string name);
+        std::string getFragmentShader(std::string name);
+        
+        GLuint loadShader(GLenum shaderType, const char* pSource);
+        
+        
+    public:
 
-    void createProgram(std::string shaderName, std::string definitions);
-    void deleteProgram();
+        void createProgram(std::string shaderName, std::string definitions);
+        void deleteProgram();
+        
+        GLuint getProgram();
+    };
     
-    GLuint getProgram();
-};
+}
 
 #endif /* GLES2Program_h */

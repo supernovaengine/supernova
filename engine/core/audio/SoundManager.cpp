@@ -1,6 +1,8 @@
 
 #include "SoundManager.h"
 
+using namespace Supernova;
+
 SoLoud::Soloud SoundManager::soloud;
 bool SoundManager::inited = false;
 

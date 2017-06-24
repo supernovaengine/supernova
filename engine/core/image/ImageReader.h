@@ -3,17 +3,22 @@
 #define ImageReader_h
 
 #include "TextureFile.h"
+#include "FileData.h"
 #include <fstream>
 
-class ImageReader{
+namespace Supernova {
 
-public:
+    class ImageReader{
 
-    virtual TextureFile* getRawImage(const char* relative_path, std::ifstream* ifile) = 0;
+    public:
 
-    virtual ~ImageReader();
+        virtual TextureFile* getRawImage(FileData* filedata) = 0;
 
-};
+        virtual ~ImageReader();
+
+    };
+    
+}
 
 
 #endif /* ImageRead_h */

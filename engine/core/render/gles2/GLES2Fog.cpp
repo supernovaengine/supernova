@@ -1,5 +1,6 @@
 #include "GLES2Fog.h"
 
+using namespace Supernova;
 
 GLES2Fog::GLES2Fog(){
     program = NULL;
@@ -23,10 +24,10 @@ void GLES2Fog::getUniformLocations(){
 }
 
 void GLES2Fog::setUniformValues(SceneRender* sceneRender){
-    glUniform1i(u_fogMode, sceneRender->fog->getMode());
-    glUniform3fv(u_fogColor, 1, sceneRender->fog->getColor().ptr());
-    glUniform1f(u_fogDensity, sceneRender->fog->getDensity());
-    glUniform1f(u_fogVisibility, sceneRender->fog->getVisibility());
-    glUniform1f(u_fogStart, sceneRender->fog->getLinearStart());
-    glUniform1f(u_fogEnd, sceneRender->fog->getLinearEnd());
+    glUniform1i(u_fogMode, sceneRender->getFog()->getMode());
+    glUniform3fv(u_fogColor, 1, sceneRender->getFog()->getColor().ptr());
+    glUniform1f(u_fogDensity, sceneRender->getFog()->getDensity());
+    glUniform1f(u_fogVisibility, sceneRender->getFog()->getVisibility());
+    glUniform1f(u_fogStart, sceneRender->getFog()->getLinearStart());
+    glUniform1f(u_fogEnd, sceneRender->getFog()->getLinearEnd());
 }

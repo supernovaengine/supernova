@@ -3,22 +3,26 @@
 
 #include "ImageReader.h"
 
-class TextureLoader{
+namespace Supernova {
 
-private:
-    TextureFile* rawImage;
+    class TextureLoader{
+
+    private:
+        TextureFile* rawImage;
+        
+        ImageReader* getImageFormat(FileData* filedata);
+    public:
+        TextureLoader();
+        TextureLoader(std::string relative_path);
+        virtual ~TextureLoader();
+
+        void loadRawImage(std::string relative_path);
+
+        TextureFile* getRawImage();
+
+    };
     
-    ImageReader* getImageFormat(std::string relative_path, std::ifstream* ifile);
-public:
-    TextureLoader();
-    TextureLoader(std::string relative_path);
-    virtual ~TextureLoader();
-
-    void loadRawImage(std::string relative_path);
-
-    TextureFile* getRawImage();
-
-};
+}
 
 
 #endif /* textureloader_h */

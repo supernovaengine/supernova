@@ -3,13 +3,17 @@
 
 #include "Light.h"
 
-class PointLight: public Light {
+namespace Supernova {
 
-public:
+    class PointLight: public Light {
 
-    PointLight();
-    virtual ~PointLight();
+    public:
 
-};
+        PointLight();
+        virtual ~PointLight();
+
+    };
+    
+}
 
 #endif /* PointLight_hpp */

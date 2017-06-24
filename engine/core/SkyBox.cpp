@@ -2,9 +2,10 @@
 
 #include "SkyBox.h"
 
-
 #include "platform/Log.h"
 #include "PrimitiveMode.h"
+
+using namespace Supernova;
 
 SkyBox::SkyBox(): Mesh() {
     
@@ -58,13 +59,13 @@ SkyBox::SkyBox(): Mesh() {
 SkyBox::~SkyBox() {
 }
 
-void SkyBox::updateMatrices(){
+void SkyBox::updateMVPMatrix(){
     if (this->viewProjectionMatrix != NULL){
         this->modelViewProjectionMatrix = (*this->viewProjectionMatrix);
     }
 }
 
-void SkyBox::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition) {
+void SkyBox::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition) {
 
     skyViewMatrix = *viewMatrix;
 
@@ -83,7 +84,13 @@ void SkyBox::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* 
 
     this->cameraPosition = cameraPosition;
 
-    updateMatrices();
+    updateMVPMatrix();
+}
+
+bool SkyBox::draw(){
+    //Nothing to do
+    //Scene will call draw()
+    return true;
 }
 
 bool SkyBox::load(){
@@ -91,12 +98,6 @@ bool SkyBox::load(){
 
     return  Mesh::load();
 }
-
-bool SkyBox::draw(){
-
-    return true;
-}
-
 
 void SkyBox::setTextureFront(std::string texture){
     this->textureFront = texture;

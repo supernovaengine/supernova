@@ -1,2 +1,3 @@
 #define TINYOBJLOADER_IMPLEMENTATION
+#define TINYOBJLOADER_EXTERNAL_READER_FUNC
 #include "tiny_obj_loader.h"

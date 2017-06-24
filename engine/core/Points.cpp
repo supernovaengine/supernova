@@ -2,8 +2,10 @@
 
 #include "PrimitiveMode.h"
 #include "Scene.h"
-#include "Supernova.h"
+#include "Engine.h"
 #include "render/TextureManager.h"
+
+using namespace Supernova;
 
 Points::Points(){
 
@@ -21,10 +23,14 @@ Points::Points(){
     
     useTextureRects = false;
 
+    render = NULL;
 }
 
 Points::~Points(){
     destroy();
+
+    if (render)
+        delete render;
 }
 
 void Points::addPoint(){
@@ -65,7 +71,8 @@ void Points::setPointSize(int point, float size){
 
 void Points::setPointColor(int point, Vector4 color){
     colors[point] = color;
-    renderManager.getRender()->updatePointColors();
+    if (loaded)
+        render->updatePointColors();
 }
 
 void Points::setPointColor(int point, float red, float green, float blue, float alpha){
@@ -76,7 +83,7 @@ void Points::setPointSprite(int point, std::string id){
     if (textureRects[point]){
         textureRects[point]->setRect(&framesRect[id]);
     }else {
-        textureRects[point] = new TextureRect(framesRect[id]);
+        textureRects[point] = new Rect(framesRect[id]);
     }
     
     if (loaded && !useTextureRects){
@@ -85,7 +92,8 @@ void Points::setPointSprite(int point, std::string id){
     }else{
         useTextureRects = true;
         normalizeTextureRects();
-        renderManager.getRender()->updateTextureRects();
+        if (loaded)
+            render->updateTextureRects();
     }
 }
 
@@ -101,9 +109,9 @@ void Points::updatePointScale(){
     }
 
     if (pointSizeReference == S_POINTSIZE_HEIGHT)
-        pointScale *= (float)Supernova::getScreenHeight() / (float)Supernova::getCanvasHeight();
+        pointScale *= (float)Engine::getScreenHeight() / (float)Engine::getCanvasHeight();
     if (pointSizeReference == S_POINTSIZE_WIDTH)
-        pointScale *= (float)Supernova::getScreenWidth() / (float)Supernova::getCanvasWidth();
+        pointScale *= (float)Engine::getScreenWidth() / (float)Engine::getCanvasWidth();
 
     fillScaledSizeVector();
 }
@@ -119,8 +127,9 @@ void Points::fillScaledSizeVector(){
             pointSizeScaledVal = maxPointSize;
         pointSizesScaled.push_back(pointSizeScaledVal);
     }
-    
-    renderManager.getRender()->updatePointSizes();
+
+    if (loaded)
+        render->updatePointSizes();
 }
 
 void Points::normalizeTextureRects(){
@@ -138,14 +147,14 @@ void Points::normalizeTextureRects(){
     }
 }
 
-void Points::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    ConcreteObject::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+void Points::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    ConcreteObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     updatePointScale();
 }
 
-void Points::update(){
-    ConcreteObject::update();
+void Points::updateMatrix(){
+    ConcreteObject::updateMatrix();
 
     if (this->viewMatrix){
        this->normalMatrix = viewMatrix->getTranspose();
@@ -175,7 +184,7 @@ void Points::setMaxPointSize(float maxPointSize){
 }
 
 void Points::addSpriteFrame(std::string id, float x, float y, float width, float height){
-    framesRect[id] = TextureRect(x, y, width, height);
+    framesRect[id] = Rect(x, y, width, height);
 }
 
 void Points::removeSpriteFrame(std::string id){
@@ -190,7 +199,7 @@ std::vector<Vector3>* Points::getNormals(){
     return &normals;
 }
 
-std::vector<TextureRect*>* Points::getTextureRects(){
+std::vector<Rect*>* Points::getTextureRects(){
     return &textureRects;
 }
 
@@ -202,13 +211,14 @@ std::vector<Vector4>* Points::getColors(){
     return &colors;
 }
 
-bool Points::render(){
-    return renderManager.draw();
+bool Points::renderDraw(){
+    if (!ConcreteObject::renderDraw())
+        return false;
+    
+    return render->draw();
 }
 
 bool Points::load(){
-    
-    
 
     while (positions.size() > normals.size()){
         normals.push_back(Vector3(0,0,0));
@@ -229,8 +239,9 @@ bool Points::load(){
 
     fillScaledSizeVector();
 
+    PointRender::newInstance(&render);
 
-    renderManager.getRender()->setPoints(this);
+    render->setPoints(this);
 
     if ((material.getTextures().size() > 0) && (textureRects.size() > 0)){
         TextureManager::loadTexture(material.getTextures()[0]);
@@ -241,21 +252,22 @@ bool Points::load(){
         normalizeTextureRects();
     }
     
-    renderManager.load();
+    bool renderloaded = render->load();
 
-    return ConcreteObject::load();
+    if (renderloaded)
+        return ConcreteObject::load();
+    else
+        return false;
 }
-
-bool Points::draw(){
-
-    return ConcreteObject::draw();
-}
-
 
 void Points::destroy(){
+    
+    ConcreteObject::destroy();
+
+    render->destroy();
+    
     for (int i=0; i < textureRects.size(); i++){
         delete textureRects[i];
     }
-
-    ConcreteObject::destroy();
+    
 }

@@ -7,6 +7,8 @@
 #include "platform/Log.h"
 
 
+using namespace Supernova;
+
 std::string GLES2Program::getVertexShader(std::string name){
     if (name == "mesh_perfragment"){
         return gVertexMeshPerPixelLightShader;

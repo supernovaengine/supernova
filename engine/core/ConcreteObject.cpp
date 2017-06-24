@@ -2,10 +2,13 @@
 #include "Scene.h"
 #include "render/TextureManager.h"
 
+using namespace Supernova;
 
 ConcreteObject::ConcreteObject(): Object(){
     transparent = false;
     distanceToCamera = -1;
+
+    minBufferSize = 0;
 }
 
 ConcreteObject::~ConcreteObject(){
@@ -14,6 +17,10 @@ ConcreteObject::~ConcreteObject(){
 
 Matrix4 ConcreteObject::getNormalMatrix(){
     return normalMatrix;
+}
+
+unsigned int ConcreteObject::getMinBufferSize(){
+    return minBufferSize;
 }
 
 void ConcreteObject::setColor(float red, float green, float blue, float alpha){
@@ -38,7 +45,6 @@ void ConcreteObject::setTexture(std::string texture){
         
         if (loaded){
             reload();
-            TextureManager::deleteUnused();
         }
         
     }
@@ -60,19 +66,37 @@ void ConcreteObject::setTransparency(bool transparency){
     }
 }
 
-void ConcreteObject::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    Object::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+void ConcreteObject::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    Object::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     updateDistanceToCamera();
 }
 
-void ConcreteObject::update(){
-    Object::update();
+void ConcreteObject::updateMatrix(){
+    Object::updateMatrix();
+    
+    this->normalMatrix.identity();
 
     updateDistanceToCamera();
+}
+
+bool ConcreteObject::draw(){
+
+    if ((transparent) && (scene != NULL) && (((Scene*)scene)->useDepth) && (distanceToCamera >= 0)){
+        ((Scene*)scene)->transparentQueue.insert(std::make_pair(distanceToCamera, this));
+    }else{
+        renderDraw();
+    }
+
+    if (transparent){
+        setTransparency(true);
+    }
+
+    return Object::draw();
 }
 
 bool ConcreteObject::load(){
+    Object::load();
 
     if (material.getTextures().size() > 0) {
         transparent = TextureManager::hasAlphaChannel(material.getTextures()[0]);
@@ -81,19 +105,10 @@ bool ConcreteObject::load(){
         setTransparency(true);
     }
 
-    return Object::load();
+    return true;
 }
 
-bool ConcreteObject::draw(){
-    if ((transparent) && (scene != NULL) && (((Scene*)scene)->useDepth) && (distanceToCamera >= 0)){
-        ((Scene*)scene)->transparentQueue.insert(std::make_pair(distanceToCamera, this));
-    }else{
-        render();
-    }
+bool ConcreteObject::renderDraw(){
 
-    if (transparent){
-        setTransparency(true);
-    }
-
-    return Object::draw();
+    return true;
 }

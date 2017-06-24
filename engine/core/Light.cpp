@@ -1,5 +1,6 @@
 #include "Light.h"
 
+using namespace Supernova;
 
 Light::Light(){
     this->type = S_POINT_LIGHT;
@@ -54,9 +55,8 @@ Vector3 Light::getWorldTarget(){
     return this->worldTarget;
 }
 
-void Light::update(){
-
-    Object::update();
+void Light::updateMatrix(){
+    Object::updateMatrix();
 
     worldTarget = modelMatrix * (target - position);
 }

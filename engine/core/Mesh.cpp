@@ -3,13 +3,23 @@
 #include "render/TextureManager.h"
 #include "platform/Log.h"
 
+using namespace Supernova;
+
 Mesh::Mesh(): ConcreteObject(){
+    render = NULL;
+
     submeshes.push_back(new Submesh(&material));
     skymesh = false;
+    textmesh = false;
+    dynamic = false;
 }
 
 Mesh::~Mesh(){
     destroy();
+    removeAllSubmeshes();
+
+    if (render)
+        delete render;
 }
 
 std::vector<Vector3>* Mesh::getVertices(){
@@ -30,6 +40,14 @@ std::vector<Submesh*>* Mesh::getSubmeshes(){
 
 bool Mesh::isSky(){
     return skymesh;
+}
+
+bool Mesh::isText(){
+    return textmesh;
+}
+
+bool Mesh::isDynamic(){
+    return dynamic;
 }
 
 int Mesh::getPrimitiveMode(){
@@ -91,22 +109,18 @@ void Mesh::sortTransparentSubmeshes(){
 
 }
 
-void Mesh::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    ConcreteObject::transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+void Mesh::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    ConcreteObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     sortTransparentSubmeshes();
 }
 
-void Mesh::update(){
-    ConcreteObject::update();
-
+void Mesh::updateMatrix(){
+    ConcreteObject::updateMatrix();
+    
     this->normalMatrix = modelMatrix.getInverse().getTranspose();
 
     sortTransparentSubmeshes();
-}
-
-bool Mesh::render(){
-    return renderManager.draw();
 }
 
 void Mesh::removeAllSubmeshes(){
@@ -126,23 +140,41 @@ bool Mesh::load(){
     while (vertices.size() > normals.size()){
         normals.push_back(Vector3(0,0,0));
     }
+
+    MeshRender::newInstance(&render);
     
-    renderManager.getRender()->setMesh(this);
+    render->setMesh(this);
 
-    renderManager.load();
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->dynamic = dynamic;
+        submeshes[i]->load();
+    }
 
-    return ConcreteObject::load();
+    bool renderloaded = render->load();
+
+    if (renderloaded)
+        return ConcreteObject::load();
+    else
+        return false;
 }
 
-bool Mesh::draw(){
+bool Mesh::renderDraw(){
+    if (!ConcreteObject::renderDraw())
+        return false;
+    
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->draw();
+    }
 
-    return ConcreteObject::draw();
+    return render->draw();
 }
 
 void Mesh::destroy(){
     ConcreteObject::destroy();
     
-    renderManager.destroy();
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->destroy();
+    }
     
-    removeAllSubmeshes();
+    render->destroy();
 }

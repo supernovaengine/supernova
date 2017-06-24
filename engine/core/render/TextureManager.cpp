@@ -1,15 +1,18 @@
 
 #include "TextureManager.h"
 #include "image/TextureLoader.h"
-#include "Supernova.h"
+#include "Engine.h"
 #include "image/ColorType.h"
+#include "gles2/GLES2Texture.h"
+#include "platform/Log.h"
 
+using namespace Supernova;
 
 std::unordered_map<std::string, TextureManager::TextureStore> TextureManager::textures;
 
 
 TextureRender* TextureManager::getTextureRender(){
-    if (Supernova::getRenderAPI() == S_GLES2){
+    if (Engine::getRenderAPI() == S_GLES2){
         return new GLES2Texture();
     }
     
@@ -41,10 +44,14 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
     std::shared_ptr<TextureRender> texturePtr(texture);
 
     bool useAlpha = false;
-    if (textureFile->getColorFormat() == S_COLOR_GRAY_ALPHA || textureFile->getColorFormat() == S_COLOR_RGB_ALPHA)
+    if (textureFile->getColorFormat() == S_COLOR_GRAY_ALPHA ||
+        textureFile->getColorFormat() == S_COLOR_RGB_ALPHA ||
+        textureFile->getColorFormat() == S_COLOR_ALPHA)
         useAlpha = true;
 
     textures[id] = {texturePtr, useAlpha, textureFile->getWidth(), textureFile->getHeight()};
+    
+    Log::Debug(LOG_TAG, "Load texture (texture map size: %lu)", textures.size());
 
     return textures[id].value;
 }
@@ -63,7 +70,6 @@ std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::
         image.loadRawImage(relative_paths[i].c_str());
         textureFiles.push_back(new TextureFile(*image.getRawImage()));
         textureFiles.back()->resamplePowerOfTwo();
-        textureFiles.back()->flipVertical();
         if (textureFiles.back()->getColorFormat() == S_COLOR_GRAY_ALPHA || textureFiles.back()->getColorFormat() == S_COLOR_RGB_ALPHA)
             useAlpha = true;
     }
@@ -79,6 +85,8 @@ std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::
     for (it = textureFiles.begin(); it != textureFiles.end(); ++it) {
         delete (*it);
     }
+    
+    Log::Debug(LOG_TAG, "Load texture cube (texture map size: %lu)", textures.size());
     
     return textures[id].value;
 }
@@ -102,7 +110,8 @@ void TextureManager::deleteUnused(){
         textures.erase(remove);
         remove = findToRemove();
     }
-
+    
+    Log::Debug(LOG_TAG, "Delete texture (texture map size: %lu)", textures.size());
 }
 
 TextureManager::it_type TextureManager::findToRemove(){

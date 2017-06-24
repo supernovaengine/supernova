@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+using namespace Supernova;
+
 TextureFile::TextureFile() {
     this->width = 0;
     this->height = 0;

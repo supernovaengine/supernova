@@ -1,5 +1,7 @@
 #include "Camera.h"
-#include "Supernova.h"
+#include "Engine.h"
+
+using namespace Supernova;
 
 Camera::Camera() : Object(){
 
@@ -9,18 +11,21 @@ Camera::Camera() : Object(){
 
     //ORTHO
     left = 0;
-    right = Supernova::getCanvasWidth();
+    right = Engine::getCanvasWidth();
     bottom = 0;
-    top = Supernova::getCanvasHeight();
+    top = Engine::getCanvasHeight();
+    orthoNear = -10;
+    orthoFar = 10;
 
     //PERSPECTIVE
     y_fov = 0.75;
-    aspect = (float) Supernova::getCanvasWidth() / (float) Supernova::getCanvasHeight();
+    aspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
+    perspectiveNear = 0.5;
+    perspectiveFar = 5000;
 
-    near = 0.5;
-    far = 5000;
-
-    projection = S_PERSPECTIVE;
+    type = S_CAMERA_PERSPECTIVE;
+    
+    automatic = true;
 
     sceneObject = NULL;
 
@@ -30,8 +35,8 @@ Camera::Camera(const Camera &camera){
     (*this) = camera;
 }
 
-Camera::Camera(int projection): Camera(){
-    setProjection(projection);
+Camera::Camera(int type): Camera(){
+    setType(type);
 }
 
 Camera::~Camera() {
@@ -55,14 +60,17 @@ Camera& Camera::operator=(const Camera &c){
     this->right = c.right;
     this->bottom = c.bottom;
     this->top = c.top;
+    this->orthoNear = c.orthoNear;
+    this->orthoFar = c.orthoFar;
 
     this->y_fov = c.y_fov;
     this->aspect = c.aspect;
+    this->perspectiveNear = c.perspectiveNear;
+    this->perspectiveFar = c.perspectiveFar;
+    
+    this->automatic = c.automatic;
 
-    this->near = c.near;
-    this->far = c.far;
-
-    this->projection = c.projection;
+    this->type = c.type;
 
     return *this;
 }
@@ -74,7 +82,7 @@ void Camera::setView(const float x, const float y, const float z){
 void Camera::setView(Vector3 view){
     if (this->view != view){
         this->view = view;
-        update();
+        updateMatrix();
     }
 }
 
@@ -89,7 +97,7 @@ void Camera::setUp(const float x, const float y, const float z){
 void Camera::setUp(Vector3 up){
     if (this->up != up){
         this->up = up;
-        update();
+        updateMatrix();
     }
 }
 
@@ -97,54 +105,60 @@ Vector3 Camera::getUp(){
     return up;
 }
 
-void Camera::setProjection(int projection){
-    if (this->projection != projection){
-        this->projection = projection;
-        update();
+void Camera::setType(int type){
+    if (this->type != type){
+        this->type = type;
+        updateMatrix();
     }
 }
 
-int Camera::getProjection(){
-    return projection;
+int Camera::getType(){
+    return type;
 }
 
-void Camera::updateScreenSize(){
-    float newRight = Supernova::getCanvasWidth();
-    float newTop = Supernova::getCanvasHeight();
-    float newAspect = (float) Supernova::getCanvasWidth() / (float) Supernova::getCanvasHeight();
+void Camera::updateAutomaticSizes(){
+    if (automatic){
+        float newRight = Engine::getCanvasWidth();
+        float newTop = Engine::getCanvasHeight();
+        float newAspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
 
-    if ((right != newRight) || (top !=newTop) || (aspect != newAspect)){
-        right = newRight;
-        top = newTop;
-        aspect = newAspect;
-        update();
+        if ((right != newRight) || (top != newTop) || (aspect != newAspect)){
+            right = newRight;
+            top = newTop;
+            aspect = newAspect;
+            updateMatrix();
+        }
     }
 }
 
 void Camera::setOrtho(float left, float right, float bottom, float top, float near, float far){
 
-    projection = S_ORTHO;
+    type = S_CAMERA_ORTHO;
 
     this->left = left;
     this->right = right;
     this->bottom = bottom;
     this->top = top;
-    this->near = near;
-    this->far = far;
+    this->orthoNear = near;
+    this->orthoFar = far;
+    
+    automatic = false;
 
-    update();
+    updateMatrix();
 }
 
 void Camera::setPerspective(float y_fov, float aspect, float near, float far){
 
-    projection = S_PERSPECTIVE;
+    type = S_CAMERA_PERSPECTIVE;
 
     this->y_fov = y_fov;
     this->aspect = aspect;
-    this->near = near;
-    this->far = far;
+    this->perspectiveNear = near;
+    this->perspectiveFar = far;
+    
+    automatic = false;
 
-    update();
+    updateMatrix();
 }
 
 void Camera::rotateView(float angle){
@@ -157,7 +171,7 @@ void Camera::rotateView(float angle){
 
         view = Vector3(viewCenter.x + position.x, viewCenter.y + position.y, viewCenter.z + position.z);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -171,7 +185,7 @@ void Camera::rotatePosition(float angle){
 
         position = Vector3(positionCenter.x + view.x, positionCenter.y + view.y, positionCenter.z + view.z);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -185,7 +199,7 @@ void Camera::elevateView(float angle){
 
         view = Vector3(viewCenter.x + position.x, viewCenter.y + position.y, viewCenter.z + position.z);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -199,7 +213,7 @@ void Camera::elevatePosition(float angle){
 
         position = Vector3(positionCenter.x + view.x, positionCenter.y + view.y, positionCenter.z + view.z);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -212,12 +226,13 @@ void Camera::moveForward(float distance){
         view = view + (viewCenter.normalize() * distance);
         position = position + (viewCenter.normalize() * distance);
 
-        update();
+        updateMatrix();
     }
 }
 
 void Camera::walkForward(float distance){
     if (distance != 0){
+
         Vector3 viewCenter(view.x - position.x, view.y - position.y, view.z - position.z);
 
         Vector3 aux = viewCenter.dotProduct(up) * up / up.squaredLength();
@@ -227,7 +242,8 @@ void Camera::walkForward(float distance){
         view = view + (walkVector.normalize() * distance);
         position = position + (walkVector.normalize() * distance);
 
-        update();
+        updateMatrix();
+
     }
 }
 
@@ -240,7 +256,7 @@ void Camera::slide(float distance){
         view = view + (slideVector.normalize() * distance);
         position = position + (slideVector.normalize() * distance);
 
-        update();
+        updateMatrix();
     }
 }
 
@@ -262,8 +278,13 @@ Ray Camera::pointsToRay(float x, float y) {
 
     float normalized_x, normalized_y;
 
-    normalized_x = ((2 * x) / Supernova::getCanvasWidth()) -1;
-    normalized_y = ((2 * y) / Supernova::getCanvasHeight()) -1;
+    if (type == S_CAMERA_2D){
+        normalized_x = ((2 * x) / Engine::getCanvasWidth()) -1;
+        normalized_y = ((2 * y) / Engine::getCanvasHeight()) -1;
+    }else{
+        normalized_x = ((2 * x) / Engine::getCanvasWidth()) -1;
+        normalized_y = -(((2 * y) / Engine::getCanvasHeight()) -1);
+    }
 
     Vector4 near_point_ndc = {normalized_x, normalized_y, -1, 1};
     Vector4 far_point_ndc = {normalized_x, normalized_y,  1, 1};
@@ -289,14 +310,15 @@ void Camera::setSceneObject(Object* scene){
     this->sceneObject = scene;
 }
 
-void Camera::update(){
+void Camera::updateMatrix(){
+    Object::updateMatrix();
 
-    Object::update();
-
-    if (projection == S_ORTHO){
-        projectionMatrix = Matrix4::orthoMatrix(left, right, bottom, top, near, far);
-    }else if (projection == S_PERSPECTIVE){
-        projectionMatrix = Matrix4::perspectiveMatrix(y_fov, aspect, near, far);
+    if (type == S_CAMERA_2D){ //use top-left orientation
+        projectionMatrix = Matrix4::orthoMatrix(left, right, top, bottom, orthoNear, orthoFar);
+    }else if (type == S_CAMERA_ORTHO){
+        projectionMatrix = Matrix4::orthoMatrix(left, right, bottom, top, orthoNear, orthoFar);
+    }else if (type == S_CAMERA_PERSPECTIVE){
+        projectionMatrix = Matrix4::perspectiveMatrix(y_fov, aspect, perspectiveNear, perspectiveFar);
     }
 
     if (parent != NULL){
@@ -306,13 +328,16 @@ void Camera::update(){
         worldView = view;
         worldUp = up;
     }
-
-    viewMatrix = Matrix4::lookAtMatrix(worldPosition, worldView, worldUp);
+    
+    if (type == S_CAMERA_2D){
+        viewMatrix.identity();
+    }else{
+        viewMatrix = Matrix4::lookAtMatrix(worldPosition, worldView, worldUp);
+    }
 
     viewProjectionMatrix = viewMatrix * projectionMatrix;
 
     if (sceneObject != NULL){
-        sceneObject->transform(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
+        sceneObject->updateVPMatrix(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
     }
-
 }

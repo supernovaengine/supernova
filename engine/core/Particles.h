@@ -3,12 +3,15 @@
 
 #include "Points.h"
 
-class Particles: public Points{
-public:
-    Particles();
-    virtual ~Particles();
-};
+namespace Supernova {
 
+    class Particles: public Points{
+    public:
+        Particles();
+        virtual ~Particles();
+    };
+
+}
 
 
 #endif /* Particles_h */

@@ -3,6 +3,7 @@
 
 #include "AudioLoader.h"
 
+using namespace Supernova;
 
 AudioPlayer::AudioPlayer(){
     filename = "";

@@ -4,20 +4,27 @@
 
 #include "Mesh2D.h"
 
-class Image: public Mesh2D {
+namespace Supernova {
 
-private:
-    void createVertices();
+    class Image: public Mesh2D {
 
-public:
-    Image();
-    Image(int width, int height);
-    Image(std::string image_path);
-    virtual ~Image();
+    protected:
+        void createVertices();
 
-    bool load();
+    public:
+        Image();
+        Image(int width, int height);
+        Image(std::string image_path);
+        virtual ~Image();
 
-};
+        virtual void setSize(int width, int height);
+        virtual void setInvert(bool invert);
+        
+        virtual bool load();
+
+    };
+    
+}
 
 
 #endif /* Image_h */

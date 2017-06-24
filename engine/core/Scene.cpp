@@ -1,13 +1,15 @@
 #include "Scene.h"
 
-#include "Supernova.h"
+#include "Engine.h"
 
 #include "platform/Log.h"
 #include "GUIObject.h"
 
+using namespace Supernova;
+
 Scene::Scene() {
     camera = NULL;
-    isChildScene = false;
+    childScene = false;
     useTransparency = false;
     useDepth = false;
     userCamera = false;
@@ -15,10 +17,13 @@ Scene::Scene() {
     scene = this;
     sky = NULL;
     fog = NULL;
+
+    render = NULL;
 }
 
 Scene::~Scene() {
-    destroy();
+    if (render)
+        delete render;
 }
 
 void Scene::addLight (Light* light){    
@@ -79,7 +84,7 @@ void Scene::removeGUIObject (GUIObject* guiobject){
 }
 
 SceneRender* Scene::getSceneRender(){
-    return sceneManager.getRender();
+    return render;
 }
 
 void Scene::setSky(SkyBox* sky){
@@ -98,12 +103,28 @@ void Scene::setAmbientLight(const float ambientFactor){
     setAmbientLight(Vector3(ambientFactor, ambientFactor, ambientFactor));
 }
 
-Vector3 Scene::getAmbientLight(){
-    return ambientLight;
+Vector3* Scene::getAmbientLight(){
+    return &ambientLight;
 }
 
-void Scene::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    Object::transform(getCamera()->getViewMatrix(), getCamera()->getProjectionMatrix(), getCamera()->getViewProjectionMatrix(), new Vector3(getCamera()->getWorldPosition()));
+std::vector<Light*>* Scene::getLights(){
+    return &lights;
+}
+
+bool Scene::isChildScene(){
+    return childScene;
+}
+
+bool Scene::isUseDepth(){
+    return useDepth;
+}
+
+bool Scene::isUseTransparency(){
+    return useTransparency;
+}
+
+void Scene::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    Object::updateVPMatrix(getCamera()->getViewMatrix(), getCamera()->getProjectionMatrix(), getCamera()->getViewProjectionMatrix(), new Vector3(getCamera()->getWorldPosition()));
 }
 
 void Scene::setCamera(Camera* camera){
@@ -116,53 +137,22 @@ Camera* Scene::getCamera(){
     return camera;
 }
 
-bool Scene::updateViewSize(){
-    
-    int viewX = 0;
-    int viewY = 0;
-    int viewWidth = Supernova::getScreenWidth();
-    int viewHeight = Supernova::getScreenHeight();
-    
-    float screenAspect = (float)Supernova::getScreenWidth() / (float)Supernova::getScreenHeight();
-    float canvasAspect = (float)Supernova::getPreferedCanvasWidth() / (float)Supernova::getPreferedCanvasHeight();
-    
-    //When canvas size is not changed
-    if (Supernova::getScalingMode() == S_SCALING_LETTERBOX){
-        if (screenAspect < canvasAspect){
-            float aspect = (float)Supernova::getScreenWidth() / (float)Supernova::getPreferedCanvasWidth();
-            int newHeight = (int)((float)Supernova::getPreferedCanvasHeight() * aspect);
-            int dif = Supernova::getScreenHeight() - newHeight;
-            viewY = (dif/2);
-            viewHeight = Supernova::getScreenHeight()-dif;
-        }else{
-            float aspect = (float)Supernova::getScreenHeight() / (float)Supernova::getPreferedCanvasHeight();
-            int newWidth = (int)((float)Supernova::getPreferedCanvasWidth() * aspect);
-            int dif = Supernova::getScreenWidth() - newWidth;
-            viewX = (dif/2);
-            viewWidth = Supernova::getScreenWidth()-dif;
-        }
-    }
-    
-    if (Supernova::getScalingMode() == S_SCALING_CROP){
-        if (screenAspect > canvasAspect){
-            float aspect = (float)Supernova::getScreenWidth() / (float)Supernova::getPreferedCanvasWidth();
-            int newHeight = (int)((float)Supernova::getPreferedCanvasHeight() * aspect);
-            int dif = Supernova::getScreenHeight() - newHeight;
-            viewY = (dif/2);
-            viewHeight = Supernova::getScreenHeight()-dif;
-        }else{
-            float aspect = (float)Supernova::getScreenHeight() / (float)Supernova::getPreferedCanvasHeight();
-            int newWidth = (int)((float)Supernova::getPreferedCanvasWidth() * aspect);
-            int dif = Supernova::getScreenWidth() - newWidth;
-            viewX = (dif/2);
-            viewWidth = Supernova::getScreenWidth()-dif;
+int Scene::getOrientation(){
+    if (this->camera != NULL){
+        if (this->camera->getType() != S_CAMERA_2D){
+            return S_ORIENTATION_BOTTOMLEFT;
         }
     }
 
-    
-    bool status = sceneManager.viewSize(viewX, viewY, viewWidth, viewHeight);
+    return S_ORIENTATION_TOPLEFT;
+}
+
+bool Scene::updateViewSize(){
+
+    SceneRender::newInstance(&render);
+    bool status = render->viewSize(*Engine::getViewRect());
     if (this->camera != NULL){
-        camera->updateScreenSize();
+        camera->updateAutomaticSizes();
     }
     
     std::vector<Scene*>::iterator it;
@@ -175,7 +165,7 @@ bool Scene::updateViewSize(){
 
 void Scene::doCamera(){
     if (this->camera == NULL){
-        this->camera = new Camera(S_ORTHO);
+        this->camera = new Camera(S_CAMERA_2D);
         this->camera->setSceneObject(this);
     }
 }
@@ -183,7 +173,7 @@ void Scene::doCamera(){
 void Scene::resetSceneProperties(){
     useTransparency = false;
     useDepth = false;
-    if (camera->getProjection() == S_PERSPECTIVE){
+    if (camera->getType() == S_CAMERA_PERSPECTIVE){
         useDepth = true;
     }
 }
@@ -191,7 +181,7 @@ void Scene::resetSceneProperties(){
 void Scene::drawTransparentMeshes(){
     std::multimap<float, ConcreteObject*>::reverse_iterator it;
     for (it = transparentQueue.rbegin(); it != transparentQueue.rend(); ++it) {
-        (*it).second->render();
+        (*it).second->renderDraw();
     }
 }
 
@@ -204,47 +194,45 @@ void Scene::drawChildScenes(){
 
 void Scene::drawSky(){
     if (sky != NULL)
-        sky->render();
+        sky->renderDraw();
 }
 
-bool Scene::load(){
-
-    sceneManager.getRender()->setChildScene(isChildScene);
-    sceneManager.getRender()->setLights(&this->lights);
-    sceneManager.getRender()->setAmbientLight(&this->ambientLight);
-    sceneManager.getRender()->setFog(fog);
-
-    doCamera();
-
-    sceneManager.load();
-    resetSceneProperties();
-    Object::load();
-
-    Object::update();
-    camera->update();
-
-    return true;
-}
-
-
-bool Scene::draw(){
-    
+bool Scene::draw() {
     transparentQueue.clear();
-
-    sceneManager.getRender()->setUseDepth(useDepth);
-    sceneManager.getRender()->setUseTramsparency(useTransparency);
-    
-    sceneManager.draw();
+    bool drawreturn = render->draw();
     resetSceneProperties();
+
     Object::draw();
+
     drawSky();
     drawTransparentMeshes();
 
     drawChildScenes();
-    return true;
+    
+    return drawreturn;
+}
+
+bool Scene::load(){
+
+    SceneRender::newInstance(&render);
+    render->setScene(this);
+
+    doCamera();
+
+    render->load();
+    resetSceneProperties();
+
+    bool loadreturn = Object::load();
+
+    Object::updateMatrix();
+    camera->updateMatrix();
+
+    return loadreturn;
 }
 
 void Scene::destroy(){
+    Object::destroy();
+
     if (!userCamera){
         delete camera;
     }

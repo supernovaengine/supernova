@@ -4,6 +4,8 @@
 #include <limits>
 #include <algorithm>
 
+using namespace Supernova;
+
 GLuint GLES2Util::emptyTexture;
 bool GLES2Util::emptyTextureLoaded;
 
@@ -23,7 +25,7 @@ void GLES2Util::checkGlError(const char* op) {
     }
 }
 
-void GLES2Util::generateEmptyTexture(){
+void GLES2Util::generateEmptyTexture() {
     if (!GLES2Util::emptyTextureLoaded){
         glGenTextures(1, &GLES2Util::emptyTexture);
         glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
@@ -34,19 +36,22 @@ void GLES2Util::generateEmptyTexture(){
     }
 }
 
-GLuint GLES2Util::createVBO(GLenum target, const GLsizeiptr size, const GLvoid* data, const GLenum usage) {
+GLuint GLES2Util::createVBO() {
     //assert(data != NULL);
-	GLuint vbo_object;
-	glGenBuffers(1, &vbo_object);
-	//assert(vbo_object != 0);
-
-	glBindBuffer(target, vbo_object);
-	glBufferData(target, size, data, usage);
-	glBindBuffer(target, 0);
-
-	return vbo_object;
+    GLuint vbo_object;
+    glGenBuffers(1, &vbo_object);
+    //assert(vbo_object != 0);
+    
+    return vbo_object;
 }
 
+void GLES2Util::dataVBO(GLuint vbo_object, GLenum target, const GLsizeiptr size, const GLvoid* data, const GLenum usage) {
+    
+    glBindBuffer(target, vbo_object);
+    glBufferData(target, size, data, usage);
+    glBindBuffer(target, 0);
+    
+}
 
 void GLES2Util::updateVBO(GLuint vbo_object, GLenum target, const GLsizeiptr size, const GLvoid* data) {
     

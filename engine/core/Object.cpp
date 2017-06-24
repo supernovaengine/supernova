@@ -1,13 +1,16 @@
 #include "Object.h"
-#include "Supernova.h"
 #include "platform/Log.h"
 #include "GUIObject.h"
 #include "Light.h"
 #include "Scene.h"
 
 
+using namespace Supernova;
+
 Object::Object(){
     loaded = false;
+    firstLoaded = false;
+    
     parent = NULL;
     scene = NULL;
 
@@ -23,6 +26,10 @@ Object::Object(){
 }
 
 Object::~Object(){
+    
+    if (parent)
+        parent->removeObject(this);
+    
     destroy();
 }
 
@@ -66,7 +73,7 @@ void Object::removeScene(){
 
 void Object::addObject(Object* obj){
     if (Scene* scene_ptr = dynamic_cast<Scene*>(obj)){
-        scene_ptr->isChildScene = true;
+        scene_ptr->childScene = true;
     }
     
     if (obj->parent == NULL){
@@ -80,10 +87,12 @@ void Object::addObject(Object* obj){
         obj->cameraPosition = cameraPosition;
         obj->modelViewProjectionMatrix = modelViewProjectionMatrix;
         
+        obj->firstLoaded = false;
+        
         if (scene != NULL)
             obj->setSceneAndConfigure(scene);
 
-        obj->update();
+        obj->updateMatrix();
     }else{
         Log::Error(LOG_TAG, "Object has a parent already");
     }
@@ -108,7 +117,7 @@ void Object::removeObject(Object* obj){
     }
     
     if (Scene* scene_ptr = dynamic_cast<Scene*>(obj)){
-        scene_ptr->isChildScene = false;
+        scene_ptr->childScene = false;
     }
     
     std::vector<Object*>::iterator i = std::remove(objects.begin(), objects.end(), obj);
@@ -121,7 +130,7 @@ void Object::removeObject(Object* obj){
     obj->viewProjectionMatrix = NULL;
     obj->cameraPosition = NULL;
     
-    obj->update();
+    obj->updateMatrix();
 }
 
 void Object::setDepth(bool depth){
@@ -137,7 +146,7 @@ void Object::setPosition(const float x, const float y, const float z){
 void Object::setPosition(Vector3 position){
     if (this->position != position){
         this->position = position;
-        update();
+        updateMatrix();
     }
 }
 
@@ -162,7 +171,7 @@ void Object::setRotation(const float xAngle, const float yAngle, const float zAn
 void Object::setRotation(Quaternion rotation){
     if (this->rotation != rotation){
         this->rotation = rotation;
-        update();
+        updateMatrix();
     }
 }
 
@@ -181,7 +190,7 @@ void Object::setScale(const float factor){
 void Object::setScale(Vector3 scale){
     if (this->scale != scale){
         this->scale = scale;
-        update();
+        updateMatrix();
     }
 }
 
@@ -196,7 +205,7 @@ void Object::setCenter(const float x, const float y, const float z){
 void Object::setCenter(Vector3 center){
     if (this->center != center){
         this->center = center;
-        update();
+        updateMatrix();
     }
 }
 
@@ -223,20 +232,8 @@ Scene* Object::getScene(){
     return scene;
 }
 
-void Object::transform(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-
-    this->viewMatrix = viewMatrix;
-    this->projectionMatrix = projectionMatrix;
-    this->viewProjectionMatrix = viewProjectionMatrix;
-    this->cameraPosition = cameraPosition;
-
-    updateMatrices();
-
-    std::vector<Object*>::iterator it;
-    for (it = objects.begin(); it != objects.end(); ++it) {
-        (*it)->transform(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
-    }
-
+Object* Object::getParent(){
+    return parent;
 }
 
 int Object::findObject(Object* object){
@@ -304,7 +301,23 @@ void Object::moveUp(){
     }
 }
 
-void Object::update(){
+void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    
+    this->viewMatrix = viewMatrix;
+    this->projectionMatrix = projectionMatrix;
+    this->viewProjectionMatrix = viewProjectionMatrix;
+    this->cameraPosition = cameraPosition;
+    
+    updateMVPMatrix();
+    
+    std::vector<Object*>::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it) {
+        (*it)->updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+    }
+    
+}
+
+void Object::updateMatrix(){
 
     Matrix4 centerMatrix = Matrix4::translateMatrix(-center);
     Matrix4 scaleMatrix = Matrix4::scaleMatrix(scale);
@@ -323,24 +336,28 @@ void Object::update(){
         worldPosition = position;
     }
 
-    updateMatrices();
+    updateMVPMatrix();
 
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
-        (*it)->update();
+        (*it)->updateMatrix();
     }
 
 }
 
-void Object::updateMatrices(){
+void Object::updateMVPMatrix(){
     if (this->viewProjectionMatrix != NULL){
         this->modelViewProjectionMatrix = this->modelMatrix * (*this->viewProjectionMatrix);
     }
 }
 
+bool Object::isLoaded(){
+    return loaded;
+}
+
 bool Object::reload(){
     
-    loaded = false;
+    destroy();
     
     return load();
 }
@@ -357,34 +374,34 @@ bool Object::load(){
     }
 
     loaded = true;
+    firstLoaded = true;
 
-    return true;
+    return loaded;
+
 }
 
 bool Object::draw(){
-
     if (position.z != 0){
         setDepth(true);
     }
-
+    
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
-        if ((*it)->scene != (*it)){
-            if (!(*it)->loaded)
+        if ((*it)->scene != (*it)){ //if not a scene object
+            if (!(*it)->firstLoaded)
                 (*it)->load();
             (*it)->draw();
         }
     }
-
-    return true;
+    
+    return loaded;
 }
 
 void Object::destroy(){
 
-    parent->removeObject(this);
-
-    while (objects.size() > 0){
-        objects.back()->destroy();
+    std::vector<Object*>::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it){
+        (*it)->destroy();
     }
 
     loaded = false;

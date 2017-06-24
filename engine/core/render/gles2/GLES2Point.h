@@ -16,53 +16,69 @@
 #include "GLES2Light.h"
 #include "GLES2Fog.h"
 
+namespace Supernova {
 
-class GLES2Point : public PointRender {
-    
-private:
+    class GLES2Point : public PointRender {
+        
+    private:
 
-    GLES2Light light;
-    GLES2Fog fog;
-    
-    std::shared_ptr<ProgramRender> gProgram;
+        GLES2Light light;
+        GLES2Fog fog;
+        
+        std::shared_ptr<ProgramRender> gProgram;
 
-    GLint aPositionHandle;
-    GLint aNormal;
-    
-    GLint a_PointSize;
-    GLint a_textureRect;
-    GLint a_pointColor;
-    
-    GLuint uTextureUnitLocation;
-    GLuint u_mvpMatrix;
-    GLuint u_mMatrix;
-    GLuint u_nMatrix;
-    GLuint uEyePos;
-    
-    GLuint useTexture;
-    
-    GLuint vertexBuffer;
-    GLuint normalBuffer;
-    GLuint pointSizeBuffer;
-    GLuint textureRectBuffer;
-    GLuint pointColorBuffer;
-    
-    std::vector<float> rectsData();
+        GLint aPositionHandle;
+        GLint aNormal;
+        
+        GLint a_PointSize;
+        GLint a_textureRect;
+        GLint a_pointColor;
+        
+        GLuint uTextureUnitLocation;
+        GLuint u_mvpMatrix;
+        GLuint u_mMatrix;
+        GLuint u_nMatrix;
+        GLuint uEyePos;
+        
+        GLuint useTexture;
+        
+        GLuint vertexBuffer;
+        GLuint normalBuffer;
+        GLuint pointSizeBuffer;
+        GLuint textureRectBuffer;
+        GLuint pointColorBuffer;
+        
+        GLuint vertexBufferSize;
+        GLuint normalBufferSize;
+        GLuint pointSizeBufferSize;
+        GLuint textureRectBufferSize;
+        GLuint pointColorBufferSize;
+        
+        GLenum usageBuffer;
+        
+        std::vector<float> rectsData();
 
+        void useVerticesBuffer();
+        void useNormalsBuffer();
+        void usePointSizesBuffer();
+        void useTextureRectsBuffer();
+        void usePointColorsBuffer();
+        
+    public:
+        GLES2Point();
+        virtual ~GLES2Point();
+        
+        void updatePositions();
+        void updateNormals();
+        void updatePointSizes();
+        void updateTextureRects();
+        void updatePointColors();
+        
+        bool load();
+        bool draw();
+        void destroy();
+    };
     
-public:
-    GLES2Point();
-    virtual ~GLES2Point();
-    
-    void updatePositions();
-    void updateNormals();
-    void updatePointSizes();
-    void updateTextureRects();
-    void updatePointColors();
-    
-    bool load();
-    bool draw();
-    void destroy();
-};
+}
 
 #endif /* GLES2Point_h */

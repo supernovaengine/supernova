@@ -1,5 +1,6 @@
 #include "GLES2Light.h"
 
+using namespace Supernova;
 
 GLES2Light::GLES2Light(){
     program = NULL;
@@ -35,28 +36,31 @@ void GLES2Light::getUniformLocations(){
 }
 
 void GLES2Light::setUniformValues(SceneRender* sceneRender){
-    glUniform3fv(u_AmbientLight, 1, sceneRender->ambientLight->ptr());
 
-    glUniform1i(u_NumPointLight, sceneRender->numPointLight);
-    if (sceneRender->numPointLight > 0){
-        glUniform3fv(u_PointLightPos, sceneRender->numPointLight, &sceneRender->pointLightPos.front());
-        glUniform1fv(u_PointLightPower, sceneRender->numPointLight, &sceneRender->pointLightPower.front());
-        glUniform3fv(u_PointLightColor, sceneRender->numPointLight, &sceneRender->pointLightColor.front());
+    LightData* lightData = sceneRender->getLightData();
+
+    glUniform3fv(u_AmbientLight, 1, lightData->ambientLight->ptr());
+
+    glUniform1i(u_NumPointLight, lightData->numPointLight);
+    if (lightData->numPointLight > 0){
+        glUniform3fv(u_PointLightPos, lightData->numPointLight, &lightData->pointLightPos.front());
+        glUniform1fv(u_PointLightPower, lightData->numPointLight, &lightData->pointLightPower.front());
+        glUniform3fv(u_PointLightColor, lightData->numPointLight, &lightData->pointLightColor.front());
     }
 
-    glUniform1i(u_NumSpotLight, sceneRender->numSpotLight);
-    if (sceneRender->numSpotLight > 0){
-        glUniform3fv(u_SpotLightPos, sceneRender->numSpotLight, &sceneRender->spotLightPos.front());
-        glUniform1fv(u_SpotLightPower, sceneRender->numSpotLight, &sceneRender->spotLightPower.front());
-        glUniform3fv(u_SpotLightColor, sceneRender->numSpotLight, &sceneRender->spotLightColor.front());
-        glUniform3fv(u_SpotLightTarget, sceneRender->numSpotLight, &sceneRender->spotLightTarget.front());
-        glUniform1fv(u_SpotLightCutOff, sceneRender->numSpotLight, &sceneRender->spotLightCutOff.front());
+    glUniform1i(u_NumSpotLight, lightData->numSpotLight);
+    if (lightData->numSpotLight > 0){
+        glUniform3fv(u_SpotLightPos, lightData->numSpotLight, &lightData->spotLightPos.front());
+        glUniform1fv(u_SpotLightPower, lightData->numSpotLight, &lightData->spotLightPower.front());
+        glUniform3fv(u_SpotLightColor, lightData->numSpotLight, &lightData->spotLightColor.front());
+        glUniform3fv(u_SpotLightTarget, lightData->numSpotLight, &lightData->spotLightTarget.front());
+        glUniform1fv(u_SpotLightCutOff, lightData->numSpotLight, &lightData->spotLightCutOff.front());
     }
 
-    glUniform1i(u_NumDirectionalLight, sceneRender->numDirectionalLight);
-    if (sceneRender->numDirectionalLight > 0){
-        glUniform3fv(u_DirectionalLightDir, sceneRender->numDirectionalLight, &sceneRender->directionalLightDir.front());
-        glUniform1fv(u_DirectionalLightPower, sceneRender->numDirectionalLight, &sceneRender->directionalLightPower.front());
-        glUniform3fv(u_DirectionalLightColor, sceneRender->numDirectionalLight, &sceneRender->directionalLightColor.front());
+    glUniform1i(u_NumDirectionalLight, lightData->numDirectionalLight);
+    if (lightData->numDirectionalLight > 0){
+        glUniform3fv(u_DirectionalLightDir, lightData->numDirectionalLight, &lightData->directionalLightDir.front());
+        glUniform1fv(u_DirectionalLightPower, lightData->numDirectionalLight, &lightData->directionalLightPower.front());
+        glUniform3fv(u_DirectionalLightColor, lightData->numDirectionalLight, &lightData->directionalLightColor.front());
     }
 }

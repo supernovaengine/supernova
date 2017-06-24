@@ -3,6 +3,7 @@
 
 #include "mpg123.h"
 
+using namespace Supernova;
 
 ssize_t MP3Reader::s_read(void * handle, void *buffer, size_t size) {
     return ((File*)handle)->read((unsigned char*)buffer, size);

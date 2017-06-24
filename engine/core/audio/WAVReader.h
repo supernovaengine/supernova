@@ -5,10 +5,14 @@
 
 #include "AudioReader.h"
 
-class WAVReader: public AudioReader{
+namespace Supernova {
+
+    class WAVReader: public AudioReader{
+        
+    public:
+        AudioFile* getRawAudio(FileData* filedata);
+    };
     
-public:
-    AudioFile* getRawAudio(FileData* filedata);
-};
+}
 
 #endif /* WAVReader_h */

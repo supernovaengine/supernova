@@ -1,11 +1,19 @@
 #include "Submesh.h"
 #include "render/TextureManager.h"
 
+using namespace Supernova;
+
 Submesh::Submesh(){
-    this->loaded = false;
+    this->render = NULL;
+
     this->distanceToCamera = -1;
     this->material = NULL;
     this->newMaterial = false;
+    this->dynamic = false;
+
+    this->loaded = false;
+
+    this->minBufferSize = 0;
 }
 
 Submesh::Submesh(Material* material): Submesh() {
@@ -15,20 +23,44 @@ Submesh::Submesh(Material* material): Submesh() {
 Submesh::~Submesh(){
     if (newMaterial)
         delete material;
+    
+    if (render)
+        delete render;
+
+    if (loaded)
+        destroy();
 }
 
 Submesh::Submesh(const Submesh& s){
     this->indices = s.indices;
-    this->loaded = s.loaded;
     this->distanceToCamera = s.distanceToCamera;
+    this->newMaterial = s.newMaterial;
+    this->material = s.material;
+    this->dynamic = s.dynamic;
+    this->loaded = s.loaded;
+    this->render = s.render;
+    this->minBufferSize = s.minBufferSize;
 }
 
 Submesh& Submesh::operator = (const Submesh& s){
     this->indices = s.indices;
-    this->loaded = s.loaded;
     this->distanceToCamera = s.distanceToCamera;
+    this->newMaterial = s.newMaterial;
+    this->material = s.material;
+    this->dynamic = s.dynamic;
+    this->loaded = s.loaded;
+    this->render = s.render;
+    this->minBufferSize = s.minBufferSize;
 
     return *this;
+}
+
+bool Submesh::isDynamic(){
+    return dynamic;
+}
+
+unsigned int Submesh::getMinBufferSize(){
+    return minBufferSize;
 }
 
 void Submesh::setIndices(std::vector<unsigned int> indices){
@@ -58,4 +90,29 @@ void Submesh::setMaterial(Material* material){
 
 Material* Submesh::getMaterial(){
     return this->material;
+}
+
+SubmeshRender* Submesh::getSubmeshRender(){
+    return render;
+}
+
+bool Submesh::load(){
+    SubmeshRender::newInstance(&render);
+        
+    render->setSubmesh(this);
+    render->load();
+
+    loaded = true;
+    
+    return true;
+}
+
+bool Submesh::draw(){
+    return render->draw();
+}
+
+void Submesh::destroy(){
+    render->destroy();
+
+    loaded = false;
 }

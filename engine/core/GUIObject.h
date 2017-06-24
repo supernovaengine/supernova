@@ -4,14 +4,18 @@
 
 #include "Mesh2D.h"
 
-class GUIObject: public Mesh2D {
-private:
+namespace Supernova {
 
-public:
-    GUIObject();
-    virtual ~GUIObject();
+    class GUIObject: public Mesh2D {
+    private:
+
+    public:
+        GUIObject();
+        virtual ~GUIObject();
+        
+        void onTouchPress(float x, float y);
+    };
     
-    void onTouchPress(float x, float y);
-};
+}
 
 #endif /* GUIObject_h */

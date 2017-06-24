@@ -3,12 +3,14 @@
 
 #include "GUIObject.h"
 
-class Button: public GUIObject {
-private:
+namespace Supernova {
+
+    class Button: public GUIObject {
+    public:
+        Button();
+        virtual ~Button();
+    };
     
-public:
-    Button();
-    virtual ~Button();
-};
+}
 
 #endif /* Button_h */

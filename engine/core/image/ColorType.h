@@ -5,6 +5,7 @@
 #define S_COLOR_RGB_ALPHA  2
 #define S_COLOR_GRAY_ALPHA  3
 #define S_COLOR_RGB  4
+#define S_COLOR_ALPHA 5
 
 
 

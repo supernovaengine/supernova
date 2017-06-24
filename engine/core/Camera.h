@@ -1,9 +1,9 @@
 #ifndef camera_h
 #define camera_h
 
-#define S_ORTHO 1
-#define S_PERSPECTIVE 2
-
+#define S_CAMERA_2D 0
+#define S_CAMERA_ORTHO 1
+#define S_CAMERA_PERSPECTIVE 2
 
 #include "math/Matrix4.h"
 #include "math/Vector4.h"
@@ -11,78 +11,87 @@
 #include "math/Ray.h"
 #include "Object.h"
 
-class Camera: public Object {
+namespace Supernova {
 
-private:
-    Matrix4 projectionMatrix;
-    Matrix4 viewMatrix;
-    Matrix4 viewProjectionMatrix;
+    class Camera: public Object {
 
-protected:
+    private:
+        Matrix4 projectionMatrix;
+        Matrix4 viewMatrix;
+        Matrix4 viewProjectionMatrix;
 
-    Vector3 view;
-    Vector3 up;
+    protected:
 
-    Vector3 worldView;
-    Vector3 worldUp;
+        Vector3 view;
+        Vector3 up;
 
-    float left;
-    float right;
-    float bottom;
-    float top;
+        Vector3 worldView;
+        Vector3 worldUp;
 
-    float y_fov;
-    float aspect;
+        float left;
+        float right;
+        float bottom;
+        float top;
+        float orthoNear;
+        float orthoFar;
 
-    float near;
-    float far;
+        float y_fov;
+        float aspect;
+        float perspectiveNear;
+        float perspectiveFar;
 
-    int projection;
+        int type;
+        
+        bool automatic;
 
-    Object* sceneObject;
+        Object* sceneObject;
 
-public:
+    public:
 
-    Camera();
-    Camera(const Camera &camera);
-    Camera(int projection);
-    virtual ~Camera();
+        Camera();
+        Camera(const Camera &camera);
+        Camera(int type);
+        virtual ~Camera();
 
-    Camera& operator=(const Camera &c);
+        Camera& operator=(const Camera &c);
 
-    void setView(const float x, const float y, const float z);
-    void setView(Vector3 view);
-    Vector3 getView();
+        void setView(const float x, const float y, const float z);
+        void setView(Vector3 view);
+        Vector3 getView();
 
-    void setUp(const float x, const float y, const float z);
-    void setUp(Vector3 up);
-    Vector3 getUp();
+        void setUp(const float x, const float y, const float z);
+        void setUp(Vector3 up);
+        Vector3 getUp();
 
-    void setProjection(int projection);
-    int getProjection();
-    void updateScreenSize();
-    void setOrtho(float left, float right, float bottom, float top, float near, float far);
-    void setPerspective(float y_fov, float aspect, float near, float far);
+        void setType(int type);
+        int getType();
+        
+        void updateAutomaticSizes();
+        
+        void setOrtho(float left, float right, float bottom, float top, float near, float far);
+        void setPerspective(float y_fov, float aspect, float near, float far);
 
-    void rotateView(float angle);
-    void rotatePosition(float angle);
+        void rotateView(float angle);
+        void rotatePosition(float angle);
 
-    void elevateView(float angle);
-    void elevatePosition(float angle);
+        void elevateView(float angle);
+        void elevatePosition(float angle);
 
-    void moveForward(float distance);
-    void walkForward(float distance);
-    void slide(float distance);
+        void moveForward(float distance);
+        void walkForward(float distance);
+        void slide(float distance);
 
-    void setSceneObject(Object* scene);
+        void setSceneObject(Object* scene);
 
-    void update();
+        virtual void updateMatrix();
 
-    Matrix4* getViewMatrix();
-    Matrix4* getProjectionMatrix();
-    Matrix4* getViewProjectionMatrix();
+        Matrix4* getViewMatrix();
+        Matrix4* getProjectionMatrix();
+        Matrix4* getViewProjectionMatrix();
 
-    Ray pointsToRay(float normalized_x, float normalized_y);
+        Ray pointsToRay(float normalized_x, float normalized_y);
 
-};
+    };
+    
+}
 #endif /* camera_h */

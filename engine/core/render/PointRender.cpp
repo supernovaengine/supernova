@@ -2,10 +2,13 @@
 
 #include "Points.h"
 #include "Scene.h"
+#include "Engine.h"
+#include "gles2/GLES2Point.h"
+
+using namespace Supernova;
 
 PointRender::PointRender(){
     
-    loaded = false;
     lighting = false;
     hasfog = false;
     hasTextureRect = false;
@@ -20,9 +23,40 @@ PointRender::PointRender(){
     
     materialTexture = "";
 
+    minBufferSize = 0;
+
 }
 
 PointRender::~PointRender(){
+
+}
+
+void PointRender::newInstance(PointRender** render){
+    if (*render == NULL){
+        if (Engine::getRenderAPI() == S_GLES2){
+            *render = new GLES2Point();
+        }
+    }
+}
+
+void PointRender::updatePositions(){
+    
+}
+
+void PointRender::updateNormals(){
+    
+}
+
+void PointRender::updatePointSizes(){
+    
+}
+
+void PointRender::updateTextureRects(){
+    
+}
+
+void PointRender::updatePointColors(){
+    
 }
 
 void PointRender::setPoints(Points* points){
@@ -38,7 +72,7 @@ void PointRender::checkLighting(){
 
 void PointRender::checkFog(){
     hasfog = false;
-    if ((sceneRender != NULL) && (sceneRender->fog != NULL)){
+    if ((sceneRender != NULL) && (sceneRender->getFog() != NULL)){
         hasfog = true;
     }
 }
@@ -57,21 +91,25 @@ void PointRender::checkTextureRect(){
 }
 
 void PointRender::fillPointProperties(){
-    if (points->getScene() != NULL)
-        sceneRender = points->getScene()->getSceneRender();
-    
-    positions = points->getPositions();
-    normals = points->getNormals();
-    textureRects = points->getTextureRects();
-    pointSizes = points->getPointSizes();
-    pointColors = points->getColors();
-    
-    modelMatrix = points->getModelMatrix();
-    normalMatrix = points->getNormalMatrix();
-    modelViewProjectionMatrix = points->getModelViewProjectMatrix();
-    cameraPosition = points->getCameraPosition();
-    
-    materialTexture = points->getTexture();
+    if (points){
+        if (points->getScene() != NULL)
+            sceneRender = points->getScene()->getSceneRender();
+        
+        positions = points->getPositions();
+        normals = points->getNormals();
+        textureRects = points->getTextureRects();
+        pointSizes = points->getPointSizes();
+        pointColors = points->getColors();
+        
+        modelMatrix = points->getModelMatrix();
+        normalMatrix = points->getNormalMatrix();
+        modelViewProjectionMatrix = points->getModelViewProjectMatrix();
+        cameraPosition = points->getCameraPosition();
+        
+        materialTexture = points->getTexture();
+
+        minBufferSize = points->getMinBufferSize();
+    }
 }
 
 bool PointRender::load(){
@@ -94,8 +132,6 @@ bool PointRender::load(){
         textured = false;
     }
     
-    loaded = true;
-    
     return true;
 }
 
@@ -104,4 +140,10 @@ bool PointRender::draw() {
     fillPointProperties();
 
     return true;
+}
+
+void PointRender::destroy(){
+    
+    fillPointProperties();
+    
 }

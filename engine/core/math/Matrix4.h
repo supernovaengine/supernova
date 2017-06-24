@@ -6,63 +6,67 @@
 #include "math/Vector4.h"
 
 
-class Matrix4{
+namespace Supernova {
 
-private:
+    class Matrix4{
 
-    float matrix[4][4]; //[col][row]
+    private:
 
-public:
+        float matrix[4][4]; //[col][row]
 
-    Matrix4();
-    Matrix4(const Matrix4 &matrix);
-    Matrix4 (float fEntry00, float fEntry10, float fEntry20, float fEntry30,
-                      float fEntry01, float fEntry11, float fEntry21, float fEntry31,
-                      float fEntry02, float fEntry12, float fEntry22, float fEntry32,
-                      float fEntry03, float fEntry13, float fEntry23, float fEntry33);
-    Matrix4(const float **matrix);
+    public:
 
-    Matrix4 &operator=(const Matrix4 &);
-    Matrix4  operator*(const Matrix4 &) const;
-    Matrix4  operator+(const Matrix4 &) const;
-    Matrix4 &operator*=(const Matrix4 &);
-    Vector3 operator*(const Vector3 &) const;
-    Vector4 operator*(const Vector4 &) const;
-    const float *operator[](int iCol) const;
-    float *operator[](int iCol);
-    bool operator==(const Matrix4 &) const;
-    bool operator!=(const Matrix4 &) const;
-    operator float * ();
-    operator const float * () const;
+        Matrix4();
+        Matrix4(const Matrix4 &matrix);
+        Matrix4 (float fEntry00, float fEntry10, float fEntry20, float fEntry30,
+                          float fEntry01, float fEntry11, float fEntry21, float fEntry31,
+                          float fEntry02, float fEntry12, float fEntry22, float fEntry32,
+                          float fEntry03, float fEntry13, float fEntry23, float fEntry33);
+        Matrix4(const float **matrix);
 
-    Vector4 row(const unsigned int row) const;
-    Vector4 column(const unsigned int column) const;
-    void set(const int col,const int row,const float val);
-    float get(const int col,const int row) const;
+        Matrix4 &operator=(const Matrix4 &);
+        Matrix4  operator*(const Matrix4 &) const;
+        Matrix4  operator+(const Matrix4 &) const;
+        Matrix4 &operator*=(const Matrix4 &);
+        Vector3 operator*(const Vector3 &) const;
+        Vector4 operator*(const Vector4 &) const;
+        const float *operator[](int iCol) const;
+        float *operator[](int iCol);
+        bool operator==(const Matrix4 &) const;
+        bool operator!=(const Matrix4 &) const;
+        operator float * ();
+        operator const float * () const;
 
-    void identity();
-    void translateInPlace(float x, float y, float z);
+        Vector4 row(const unsigned int row) const;
+        Vector4 column(const unsigned int column) const;
+        void set(const int col,const int row,const float val);
+        float get(const int col,const int row) const;
 
-    Matrix4 getInverse();
-    Matrix4 getTranspose();
+        void identity();
+        void translateInPlace(float x, float y, float z);
 
-    static Matrix4 translateMatrix(float x, float y, float z);
-    static Matrix4 translateMatrix(const Vector3& position);
+        Matrix4 getInverse();
+        Matrix4 getTranspose();
 
-    static Matrix4 rotateMatrix(const float angle, const Vector3 &axis);
-    static Matrix4 rotateMatrix(const float azimuth, const float elevation);
-    static Matrix4 rotateXMatrix(const float angle);
-    static Matrix4 rotateYMatrix(const float angle);
-    static Matrix4 rotateZMatrix(const float angle);
+        static Matrix4 translateMatrix(float x, float y, float z);
+        static Matrix4 translateMatrix(const Vector3& position);
 
-    static Matrix4 scaleMatrix(const float sf);
-    static Matrix4 scaleMatrix(const Vector3& sf);
+        static Matrix4 rotateMatrix(const float angle, const Vector3 &axis);
+        static Matrix4 rotateMatrix(const float azimuth, const float elevation);
+        static Matrix4 rotateXMatrix(const float angle);
+        static Matrix4 rotateYMatrix(const float angle);
+        static Matrix4 rotateZMatrix(const float angle);
 
-    static Matrix4 lookAtMatrix(Vector3 eye, Vector3 center, Vector3 up);
-    static Matrix4 frustumMatrix(float left, float right, float bottom, float top, float near, float far);
-    static Matrix4 orthoMatrix(float l, float r, float b, float t, float n, float f);
-    static Matrix4 perspectiveMatrix(float y_fov, float aspect, float near, float far);
+        static Matrix4 scaleMatrix(const float sf);
+        static Matrix4 scaleMatrix(const Vector3& sf);
 
-};
+        static Matrix4 lookAtMatrix(Vector3 eye, Vector3 center, Vector3 up);
+        static Matrix4 frustumMatrix(float left, float right, float bottom, float top, float near, float far);
+        static Matrix4 orthoMatrix(float l, float r, float b, float t, float n, float f);
+        static Matrix4 perspectiveMatrix(float y_fov, float aspect, float near, float far);
+
+    };
+    
+}
 
 #endif

@@ -4,9 +4,15 @@
 
 #include "FileUtilsPlatform.h"
 
-class FileUtilsGeneric: public FileUtilsPlatform {
+namespace Supernova {
 
-    virtual FILE* platformFopen(const char* fname, const char* mode);
-};
+    class FileUtilsGeneric: public FileUtilsPlatform {
+        
+    public:
+
+        virtual FILE* platformFopen(const char* fname, const char* mode);
+    };
+    
+}
 
 #endif //FILEUTILSGENERIC_H

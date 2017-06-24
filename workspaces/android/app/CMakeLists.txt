@@ -17,10 +17,13 @@
 
  include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
 
+ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp")
+
  add_subdirectory (../../.. ${PROJECT_BINARY_DIR}/supernova)
 
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core")
- include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/libs/lua")
+
+ file(GLOB_RECURSE SUPERNOVA_PROJECT_SRCS ../../../project/*.cpp)
 
  add_library(
      supernova
@@ -28,10 +31,9 @@
      SHARED
 
      src/main/cpp/supernova_android_jni.cpp
-     src/main/cpp/android_fopen.cpp
-     src/main/cpp/androidcallback.cpp
+     src/main/cpp/SupernovaAndroid.cpp
 
-     ../../../project/main.cpp
+     ${SUPERNOVA_PROJECT_SRCS}
  )
 
   target_link_libraries(

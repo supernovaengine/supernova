@@ -73,20 +73,24 @@ namespace SoLoud
 	{
 		SDL_AudioSpec as;
 		as.freq = aSamplerate;
-		as.format = AUDIO_F32;
 		as.channels = aChannels;
 		as.samples = aBuffer;
 		as.callback = soloud_sdlstatic_audiomixer;
 		as.userdata = (void*)aSoloud;
 
+#ifndef __EMSCRIPTEN__
+		as.format = AUDIO_F32;
 		if (SDL_OpenAudio(&as, &gActiveAudioSpec) < 0)
 		{
+#endif
 			as.format = AUDIO_S16;
 			if (SDL_OpenAudio(&as, &gActiveAudioSpec) < 0 || gActiveAudioSpec.format != AUDIO_S16)
 			{
 				return UNKNOWN_ERROR;
 			}
+#ifndef __EMSCRIPTEN__
 		}
+#endif
 
 		aSoloud->postinit(gActiveAudioSpec.freq, gActiveAudioSpec.samples, aFlags, gActiveAudioSpec.channels);
 

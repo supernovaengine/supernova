@@ -7,40 +7,44 @@
 
 #include "Object.h"
 
-class Light: public Object {
+namespace Supernova {
 
-protected:
+    class Light: public Object {
 
-    Vector3 color;
-    Vector3 target;
-    Vector3 direction;
-    float power;
-    float spotAngle;
+    protected:
 
-    Vector3 worldTarget;
+        Vector3 color;
+        Vector3 target;
+        Vector3 direction;
+        float power;
+        float spotAngle;
 
-    int type;
+        Vector3 worldTarget;
 
-public:
+        int type;
 
-    Light();
-    Light(int type);
-    virtual ~Light();
+    public:
 
-    int getType();
-    Vector3 getColor();
-    Vector3 getTarget();
-    Vector3 getDirection();
-    float getPower();
-    float getSpotAngle();
+        Light();
+        Light(int type);
+        virtual ~Light();
 
-    Vector3 getWorldTarget();
+        int getType();
+        Vector3 getColor();
+        Vector3 getTarget();
+        Vector3 getDirection();
+        float getPower();
+        float getSpotAngle();
 
-    void setPower(float power);
-    void setColor(Vector3 color);
+        Vector3 getWorldTarget();
 
-    void update();
+        void setPower(float power);
+        void setColor(Vector3 color);
 
-};
+        virtual void updateMatrix();
+
+    };
+    
+}
 
 #endif /* light_hpp */

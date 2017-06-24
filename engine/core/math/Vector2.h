@@ -6,6 +6,16 @@
 #include <assert.h>
 #include <math.h>
 
+namespace Supernova { class Vector2; }
+Supernova::Vector2 operator * ( const float fScalar, const Supernova::Vector2& rkVector );
+Supernova::Vector2 operator / ( const float fScalar, const Supernova::Vector2& rkVector );
+Supernova::Vector2 operator + (const Supernova::Vector2& lhs, const float rhs);
+Supernova::Vector2 operator + (const float lhs, const Supernova::Vector2& rhs);
+Supernova::Vector2 operator - (const Supernova::Vector2& lhs, const float rhs);
+Supernova::Vector2 operator - (const float lhs, const Supernova::Vector2& rhs);
+
+namespace Supernova {
+
     class Vector2
     {
     public:
@@ -66,17 +76,12 @@
 
         Vector2 operator - () const;
 
-        friend Vector2 operator * ( const float fScalar, const Vector2& rkVector );
-
-        friend Vector2 operator / ( const float fScalar, const Vector2& rkVector );
-
-        friend Vector2 operator + (const Vector2& lhs, const float rhs);
-
-        friend Vector2 operator + (const float lhs, const Vector2& rhs);
-
-        friend Vector2 operator - (const Vector2& lhs, const float rhs);
-
-        friend Vector2 operator - (const float lhs, const Vector2& rhs);
+        friend Vector2 (::operator *) ( const float fScalar, const Vector2& rkVector );
+        friend Vector2 (::operator /) ( const float fScalar, const Vector2& rkVector );
+        friend Vector2 (::operator +) (const Vector2& lhs, const float rhs);
+        friend Vector2 (::operator +) (const float lhs, const Vector2& rhs);
+        friend Vector2 (::operator -) (const Vector2& lhs, const float rhs);
+        friend Vector2 (::operator -) (const float lhs, const Vector2& rhs);
 
         Vector2& operator += ( const Vector2& rkVector );
 
@@ -120,5 +125,6 @@
 
     };
 
+}
 
 #endif

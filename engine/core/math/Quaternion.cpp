@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <float.h>
 
+using namespace Supernova;
 
 Quaternion::Quaternion()
     : w(1), x(0), y(0), z(0){
@@ -433,7 +434,6 @@ bool Quaternion::equals(const Quaternion& rhs) const
 
     return ( fabs(matching-1.0) < 0.001 );
 }
-
 
 Quaternion Quaternion::slerp (float fT, const Quaternion& rkP, const Quaternion& rkQ, bool shortestPath)
 {

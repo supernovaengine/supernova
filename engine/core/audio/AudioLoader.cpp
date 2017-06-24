@@ -8,6 +8,8 @@
 #include "MP3Reader.h"
 #include "OGGReader.h"
 
+using namespace Supernova;
+
 AudioLoader::AudioLoader() {
 }
 
