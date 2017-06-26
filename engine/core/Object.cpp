@@ -371,7 +371,7 @@ bool Object::reload(){
 
 bool Object::load(){
 
-    if (position.z != 0){
+    if ((position.z != 0) && isIn3DScene()){
         setDepth(true);
     }
 
@@ -397,7 +397,8 @@ bool Object::draw(){
         if ((*it)->scene != (*it)){ //if not a scene object
             if (!(*it)->firstLoaded)
                 (*it)->load();
-            (*it)->draw();
+            if ((*it)->loaded)
+                (*it)->draw();
         }
     }
     

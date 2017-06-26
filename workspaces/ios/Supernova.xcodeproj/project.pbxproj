@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7108B9211F00A0DE005B7783 /* synth_8bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28381DE8EA1500C12A1D /* synth_8bit.c */; };
 		71192EFD1CE1334000BD76EE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
 		7119BD4A1EF70BFB007BD613 /* SubmeshRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119BD481EF70BFB007BD613 /* SubmeshRender.cpp */; };
 		7119BD4D1EF71105007BD613 /* GLES2Submesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119BD4B1EF71105007BD613 /* GLES2Submesh.cpp */; };
@@ -117,7 +118,6 @@
 		71BD28301DE887C100C12A1D /* compat.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD260D1DE886C200C12A1D /* compat.c */; };
 		71BD28311DE887C100C12A1D /* compat_str.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD260F1DE886C200C12A1D /* compat_str.c */; };
 		71BD28321DE887E300C12A1D /* libmpg123.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BD254A1DE886B100C12A1D /* libmpg123.a */; };
-		71BD28391DE8EA1500C12A1D /* synth_8bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28381DE8EA1500C12A1D /* synth_8bit.c */; };
 		71C576441EE2F111002F537B /* FileUtilsIOS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C576421EE2F111002F537B /* FileUtilsIOS.cpp */; };
 		71C5764A1EE45167002F537B /* Events.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C576481EE45167002F537B /* Events.cpp */; };
 		71CDC6FD1D7B132B0060EEFF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */; };
@@ -1683,7 +1683,6 @@
 				716AB5A71BEF9F3C001B672D /* main.m in Sources */,
 				71192EFD1CE1334000BD76EE /* main.cpp in Sources */,
 				717FA2091CA1843C009071DC /* EAGLView.mm in Sources */,
-				71BD28391DE8EA1500C12A1D /* synth_8bit.c in Sources */,
 				7151F2801CD4FA86001A3AC3 /* SupernovaIOS.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1698,6 +1697,7 @@
 				71BD28261DE8879100C12A1D /* layer3.c in Sources */,
 				71BD28221DE8879100C12A1D /* id3.c in Sources */,
 				71BD28201DE8879100C12A1D /* icy.c in Sources */,
+				7108B9211F00A0DE005B7783 /* synth_8bit.c in Sources */,
 				71BD282F1DE8879100C12A1D /* tabinit.c in Sources */,
 				71BD281C1DE8879100C12A1D /* feature.c in Sources */,
 				71BD28211DE8879100C12A1D /* icy2utf8.c in Sources */,
