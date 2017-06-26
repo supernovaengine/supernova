@@ -34,6 +34,6 @@ public class RendererWrapper implements Renderer{
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		JNIWrapper.on_draw_frame();
+		JNIWrapper.on_draw();
 	}
 }

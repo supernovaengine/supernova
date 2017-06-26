@@ -28,10 +28,10 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1surface_1changed
 
 }
 
-JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1draw_1frame(JNIEnv * env, jclass cls) {
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1draw(JNIEnv * env, jclass cls) {
 	UNUSED(env);
 	UNUSED(cls);
-	Supernova::Engine::onDrawFrame();
+	Supernova::Engine::onDraw();
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1pause(JNIEnv * env, jclass cls){

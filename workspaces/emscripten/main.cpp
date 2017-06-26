@@ -78,22 +78,8 @@ int main(int argc, char **argv) {
 }
 
 void renderLoop(){
-    Supernova::Engine::onDrawFrame();
-
-    SDL_Event event;
-    int haveEvent = SDL_PollEvent(&event);
-    if (haveEvent) {
-        //if(e.type == SDL_QUIT) std::terminate();
-        if(event.type == SDL_WINDOWEVENT){
-            switch (event.window.event) {
-                case SDL_WINDOWEVENT_RESIZED:
-                    printf("mudou de tamanho\n");
-                case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    printf("mudou de tamanho\n");
-            }
-        }
-    }
-
+    Supernova::Engine::onDraw();
+    
     SDL_GL_SwapBuffers();
 }
 

@@ -10,8 +10,8 @@
 using namespace Supernova;
 
 
-void (*Events::onFrameFunc)();
-int Events::onFrameLuaFunc;
+void (*Events::onDrawFunc)();
+int Events::onDrawLuaFunc;
 
 void (*Events::onUpdateFunc)();
 int Events::onUpdateLuaFunc;
@@ -57,26 +57,26 @@ void Events::luaCallback(int nargs, int nresults, int msgh){
     }
 }
 
-void Events::onFrame(void (*onFrameFunc)()){
-    Events::onFrameFunc = onFrameFunc;
+void Events::onDraw(void (*onDrawFunc)()){
+    Events::onDrawFunc = onDrawFunc;
 }
 
-int Events::onFrame(lua_State *L){
+int Events::onDraw(lua_State *L){
     
     if (lua_type(L, 2) == LUA_TFUNCTION){
-        Events::onFrameLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
+        Events::onDrawLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
         //TODO: return error in Lua
     }
     return 0;
 }
 
-void Events::call_onFrame(){
-    if (onFrameFunc != NULL){
-        onFrameFunc();
+void Events::call_onDraw(){
+    if (onDrawFunc != NULL){
+        onDrawFunc();
     }
-    if (onFrameLuaFunc != 0){
-        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onFrameLuaFunc);
+    if (onDrawLuaFunc != 0){
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onDrawLuaFunc);
         luaCallback(0, 0, 0);
     }
 }

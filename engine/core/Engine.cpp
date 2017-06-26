@@ -299,7 +299,7 @@ void Engine::onSurfaceChanged(int width, int height) {
 
 }
 
-void Engine::onDrawFrame() {
+void Engine::onDraw() {
     
     if (Engine::getScene() != NULL){
         (Engine::getScene())->draw();
@@ -323,7 +323,7 @@ void Engine::onDrawFrame() {
         updateTimeCount -= (updateTime * updateCallCount);
     }
     
-    Events::call_onFrame();
+    Events::call_onDraw();
     
     SoundManager::checkActive();
     

@@ -98,7 +98,7 @@ namespace Supernova {
         static void onStart(int width, int height);
         static void onSurfaceCreated();
         static void onSurfaceChanged(int width, int height);
-        static void onDrawFrame();
+        static void onDraw();
 
         static void onPause();
         static void onResume();

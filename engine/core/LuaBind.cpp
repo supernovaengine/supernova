@@ -202,7 +202,7 @@ void LuaBind::bind(){
 
     LuaIntf::LuaBinding(L).beginClass<Events>("Events")
     .addConstructor(LUA_ARGS())
-    .addStaticFunction("onFrame", static_cast<int(*)(lua_State*)>(&Events::onFrame))
+    .addStaticFunction("onDraw", static_cast<int(*)(lua_State*)>(&Events::onDraw))
     .addStaticFunction("onUpdate", static_cast<int(*)(lua_State*)>(&Events::onUpdate))
     .addStaticFunction("onTouchPress", static_cast<int(*)(lua_State*)>(&Events::onTouchPress))
     .addStaticFunction("onTouchUp", static_cast<int(*)(lua_State*)>(&Events::onTouchUp))
