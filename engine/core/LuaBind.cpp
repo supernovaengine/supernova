@@ -34,6 +34,7 @@
 #include "Points.h"
 #include "Particles.h"
 #include "Text.h"
+#include "InputMap.h"
 
 #include <map>
 #include <unistd.h>
@@ -214,6 +215,15 @@ void LuaBind::bind(){
     .addStaticFunction("onKeyPress", static_cast<int(*)(lua_State*)>(&Events::onKeyPress))
     .addStaticFunction("onKeyUp", static_cast<int(*)(lua_State*)>(&Events::onKeyUp))
     .endClass();
+    
+    LuaIntf::LuaBinding(L).beginClass<InputMap>("InputMap")
+    .addConstructor(LUA_ARGS())
+    .addStaticFunction("isKeyPressed", &InputMap::isKeyPressed)
+    .addStaticFunction("isMousePressed", &InputMap::isMousePressed)
+    .addStaticFunction("isTouch", &InputMap::isTouch)
+    .addStaticFunction("getMousePosition", &InputMap::getMousePosition)
+    .addStaticFunction("getTouchPosition", &InputMap::getTouchPosition)
+    .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<Object>("Object")
     .addFunction("addObject", &Object::addObject)
@@ -363,6 +373,12 @@ void LuaBind::bind(){
 
     .beginExtendClass<Model, Mesh>("Model")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
+    .endClass();
+    
+    LuaIntf::LuaBinding(L).beginClass<Vector2>("Vector2")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addVariable("x", &Vector2::x)
+    .addVariable("y", &Vector2::y)
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<Vector3>("Vector3")

@@ -19,6 +19,7 @@
 		714C890B1EDE129A0028DCE0 /* stb_rect_pack.c in Sources */ = {isa = PBXBuildFile; fileRef = 71E34E251ED217CD0005DEF2 /* stb_rect_pack.c */; };
 		714C890F1EDE12AF0028DCE0 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = 714C890C1EDE12AA0028DCE0 /* stb_image.c */; };
 		714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89101EDE12F20028DCE0 /* STBImageReader.cpp */; };
+		714C89151F01BCB30028DCE0 /* InputMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89131F01BCB30028DCE0 /* InputMap.cpp */; };
 		714D81D61E6C9B380038BE50 /* GLES2Point.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714D81D41E6C9B380038BE50 /* GLES2Point.cpp */; };
 		714D81E51E70C2B80038BE50 /* GLES2Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714D81D91E70BF380038BE50 /* GLES2Mesh.cpp */; };
 		714D81E61E70C2C00038BE50 /* GLES2Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714D81D71E70BF380038BE50 /* GLES2Light.cpp */; };
@@ -449,6 +450,8 @@
 		714C890D1EDE12AA0028DCE0 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
 		714C89101EDE12F20028DCE0 /* STBImageReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STBImageReader.cpp; sourceTree = "<group>"; };
 		714C89111EDE12F20028DCE0 /* STBImageReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STBImageReader.h; sourceTree = "<group>"; };
+		714C89131F01BCB30028DCE0 /* InputMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InputMap.cpp; sourceTree = "<group>"; };
+		714C89141F01BCB30028DCE0 /* InputMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputMap.h; sourceTree = "<group>"; };
 		714D81D41E6C9B380038BE50 /* GLES2Point.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Point.cpp; sourceTree = "<group>"; };
 		714D81D51E6C9B380038BE50 /* GLES2Point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Point.h; sourceTree = "<group>"; };
 		714D81D71E70BF380038BE50 /* GLES2Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Light.cpp; sourceTree = "<group>"; };
@@ -817,6 +820,8 @@
 				716F76151E1186CB00FF9888 /* Image.cpp */,
 				716F76161E1186CB00FF9888 /* Image.h */,
 				713D2A211CFB2EAD00A4752F /* Input.h */,
+				714C89131F01BCB30028DCE0 /* InputMap.cpp */,
+				714C89141F01BCB30028DCE0 /* InputMap.h */,
 				71E1D2291D27358B001209C8 /* Light.cpp */,
 				71E1D22A1D27358B001209C8 /* Light.h */,
 				713D2A231CFB2EAD00A4752F /* LuaBind.cpp */,
@@ -841,6 +846,8 @@
 				71E1D22D1D2957AA001209C8 /* PointLight.h */,
 				719301261E53D4B000BEE527 /* Points.cpp */,
 				719301271E53D4B000BEE527 /* Points.h */,
+				713D2A661CFB2EAD00A4752F /* Polygon.cpp */,
+				713D2A671CFB2EAD00A4752F /* Polygon.h */,
 				713D2A491CFB2EAD00A4752F /* PrimitiveMode.h */,
 				71E3E5781E7EA92900468221 /* RectImage.cpp */,
 				71E3E5791E7EA92900468221 /* RectImage.h */,
@@ -848,8 +855,6 @@
 				713D2A061CFB2EAD00A4752F /* Render.h */,
 				713D2A631CFB2EAD00A4752F /* Scene.cpp */,
 				713D2A641CFB2EAD00A4752F /* Scene.h */,
-				713D2A661CFB2EAD00A4752F /* Polygon.cpp */,
-				713D2A671CFB2EAD00A4752F /* Polygon.h */,
 				7193011B1E42943800BEE527 /* SkyBox.cpp */,
 				7193011C1E42943800BEE527 /* SkyBox.h */,
 				7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */,
@@ -1726,6 +1731,7 @@
 				71CDC7141D7B14510060EEFF /* Mesh.cpp in Sources */,
 				719330B61EDBB8200043E282 /* STBText.cpp in Sources */,
 				71CDC7121D7B14510060EEFF /* Light.cpp in Sources */,
+				714C89151F01BCB30028DCE0 /* InputMap.cpp in Sources */,
 				71CDC71A1D7B14510060EEFF /* Polygon.cpp in Sources */,
 				71CE94F81EC8A3B2008CCF3C /* FileData.cpp in Sources */,
 				71CDC7241D7B146D0060EEFF /* Quaternion.cpp in Sources */,
