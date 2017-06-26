@@ -1,9 +1,6 @@
 #ifndef scene_h
 #define scene_h
 
-#define S_ORIENTATION_TOPLEFT 1
-#define S_ORIENTATION_BOTTOMLEFT 2
-
 #include "Object.h"
 #include "Camera.h"
 #include "Render.h"
@@ -82,7 +79,7 @@ namespace Supernova {
         
         void setFog(Fog* fog);
 
-        int getOrientation();
+        bool is3D();
 
         void setCamera(Camera* camera);
         Camera* getCamera();

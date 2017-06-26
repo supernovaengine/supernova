@@ -351,6 +351,13 @@ void Object::updateMVPMatrix(){
     }
 }
 
+bool Object::isIn3DScene(){
+    if (scene && scene->is3D())
+        return true;
+    
+    return false;
+}
+
 bool Object::isLoaded(){
     return loaded;
 }

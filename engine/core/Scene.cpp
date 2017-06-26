@@ -137,14 +137,13 @@ Camera* Scene::getCamera(){
     return camera;
 }
 
-int Scene::getOrientation(){
-    if (this->camera != NULL){
-        if (this->camera->getType() != S_CAMERA_2D){
-            return S_ORIENTATION_BOTTOMLEFT;
-        }
+bool Scene::is3D(){
+    if (camera){
+        if (camera->getType() != S_CAMERA_2D)
+            return true;
     }
 
-    return S_ORIENTATION_TOPLEFT;
+    return false;
 }
 
 bool Scene::updateViewSize(){

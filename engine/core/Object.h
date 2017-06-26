@@ -83,6 +83,7 @@ namespace Supernova {
         Scene* getScene();
         Object* getParent();
         
+        bool isIn3DScene();
         bool isLoaded();
         
         void moveToFront();

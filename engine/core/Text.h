@@ -31,7 +31,7 @@ namespace Supernova {
         bool operator != ( const char* v ) const;
         
         virtual void setSize(int width, int height);
-        virtual void setInvert(bool invert);
+        virtual void setInvertTexture(bool invertTexture);
 
         void setMinBufferSize(unsigned int characters);
         

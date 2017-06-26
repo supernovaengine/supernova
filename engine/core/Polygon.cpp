@@ -16,8 +16,8 @@ void Polygon::setSize(int width, int height){
     Log::Error(LOG_TAG, "Can't set size of Polygon");
 }
 
-void Polygon::setInvert(bool invert){
-    Mesh2D::setInvert(invert);
+void Polygon::setInvertTexture(bool invertTexture){
+    Mesh2D::setInvertTexture(invertTexture);
     if (loaded) {
         generateTexcoords();
         render->updateTexcoords();
@@ -35,9 +35,7 @@ void Polygon::addVertex(Vector3 vertex){
 }
 
 void Polygon::addVertex(float x, float y){
-
    addVertex(Vector3(x, y, 0));
-
 }
 
 void Polygon::generateTexcoords(){
@@ -63,7 +61,7 @@ void Polygon::generateTexcoords(){
     for ( unsigned int i = 0; i < vertices.size(); i++){
         u = (vertices[i].x - min_X) * k_X;
         v = (vertices[i].y - min_Y) * k_Y;
-        if (invert) {
+        if (invertTexture) {
             texcoords.push_back(Vector2(u, 1.0 - v));
         }else{
             texcoords.push_back(Vector2(u, v));
@@ -76,6 +74,7 @@ void Polygon::generateTexcoords(){
 
 bool Polygon::load(){
 
+    setInvertTexture(isIn3DScene());
     generateTexcoords();
 
     return Mesh::load();

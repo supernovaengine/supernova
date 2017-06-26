@@ -18,7 +18,7 @@ namespace Supernova {
         virtual ~Image();
 
         virtual void setSize(int width, int height);
-        virtual void setInvert(bool invert);
+        virtual void setInvertTexture(bool invertTexture);
         
         virtual bool load();
 

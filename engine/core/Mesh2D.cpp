@@ -14,7 +14,7 @@ Mesh2D::Mesh2D(): Mesh(){
     this->billboardScaleFactor=100;
 
     this->clipping = false;
-    this->invert = false;
+    this->invertTexture = false;
 }
 
 Mesh2D::~Mesh2D(){
@@ -54,8 +54,8 @@ void Mesh2D::setSize(int width, int height){
     this->height = height;
 }
 
-void Mesh2D::setInvert(bool invert){
-    this->invert = invert;
+void Mesh2D::setInvertTexture(bool invertTexture){
+    this->invertTexture = invertTexture;
 }
 
 void Mesh2D::setBillboard(bool billboard){
@@ -90,14 +90,6 @@ int Mesh2D::getHeight(){
     return height;
 }
 
-bool Mesh2D::load(){
-    if (scene && scene->getScene()->getOrientation() == S_ORIENTATION_BOTTOMLEFT){
-        setInvert(true);
-    }
-
-    return Mesh::load();
-}
-
 bool Mesh2D::draw(){
 
     if (clipping) {
@@ -119,7 +111,7 @@ bool Mesh2D::draw(){
         int objScreenWidth = width * scaleX * (Engine::getViewRect()->getWidth() / (float) Engine::getCanvasWidth());
         int objScreenHeight = height * scaleY * (Engine::getViewRect()->getHeight() / (float) Engine::getCanvasHeight());
 
-        if (scene && scene->getScene()->getOrientation() == S_ORIENTATION_BOTTOMLEFT)
+        if (scene && scene->getScene()->is3D())
             objScreenPosY = (float)Engine::getScreenHeight()-objScreenHeight-objScreenPosY;
 
         SceneRender* sceneRender = scene->getSceneRender();

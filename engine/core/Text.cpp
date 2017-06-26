@@ -74,8 +74,8 @@ void Text::setSize(int width, int height){
     Log::Error(LOG_TAG, "Can't set size of text");
 }
 
-void Text::setInvert(bool invert){
-    Mesh2D::setInvert(invert);
+void Text::setInvertTexture(bool invertTexture){
+    Mesh2D::setInvertTexture(invertTexture);
     if (loaded) {
         createText();
         render->updateVertices();
@@ -91,7 +91,7 @@ void Text::createText(){
     
     int textWidth, textHeight;
     
-    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &textWidth, &textHeight, invert);
+    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &textWidth, &textHeight, invertTexture);
     
     this->width = textWidth;
     this->height = textHeight;
@@ -102,6 +102,7 @@ void Text::createText(){
 bool Text::load(){
 
     stbtext->load(font.c_str(), fontSize);
+    setInvertTexture(isIn3DScene());
     createText();
     
     return Mesh2D::load();

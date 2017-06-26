@@ -36,8 +36,8 @@ void Image::setSize(int width, int height){
     }
 }
 
-void Image::setInvert(bool invert){
-    Mesh2D::setInvert(invert);
+void Image::setInvertTexture(bool invertTexture){
+    Mesh2D::setInvertTexture(invertTexture);
     if (loaded) {
         createVertices();
         render->updateTexcoords();
@@ -57,12 +57,11 @@ void Image::createVertices(){
     texcoords.push_back(Vector2(1.0f, 1.0f));
     texcoords.push_back(Vector2(0.0f, 1.0f));
 
-    if (invert){
+    if (invertTexture){
         for (int i = 0; i < texcoords.size(); i++){
             texcoords[i].y = 1 - texcoords[i].y;
         }
     }
-
 
     static const unsigned int indices_array[] = {
         0,  1,  2,
@@ -86,7 +85,8 @@ bool Image::load(){
         this->width = TextureManager::getTextureWidth(submeshes[0]->getMaterial()->getTextures()[0]);
         this->height = TextureManager::getTextureHeight(submeshes[0]->getMaterial()->getTextures()[0]);
     }
-
+    
+    setInvertTexture(isIn3DScene());
     createVertices();
     
     return Mesh2D::load();
