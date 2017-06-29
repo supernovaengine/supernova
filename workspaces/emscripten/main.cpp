@@ -9,7 +9,7 @@
 
 #include "Engine.h"
 #include "Supernova.h"
-#include "Input.h"
+#include "InputCode.h"
 
 
 void renderLoop();
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 
 void renderLoop(){
     Supernova::Engine::onDraw();
-    
+
     SDL_GL_SwapBuffers();
 }
 

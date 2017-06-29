@@ -19,7 +19,7 @@
 #include "Model.h"
 #include "math/Ray.h"
 #include "math/Quaternion.h"
-#include "Input.h"
+#include "InputCode.h"
 #include "Mesh.h"
 #include "Mesh2D.h"
 #include "Image.h"
@@ -34,7 +34,7 @@
 #include "Points.h"
 #include "Particles.h"
 #include "Text.h"
-#include "InputMap.h"
+#include "Input.h"
 
 #include <map>
 #include <unistd.h>
@@ -216,13 +216,13 @@ void LuaBind::bind(){
     .addStaticFunction("onKeyUp", static_cast<int(*)(lua_State*)>(&Events::onKeyUp))
     .endClass();
     
-    LuaIntf::LuaBinding(L).beginClass<InputMap>("InputMap")
+    LuaIntf::LuaBinding(L).beginClass<Input>("Input")
     .addConstructor(LUA_ARGS())
-    .addStaticFunction("isKeyPressed", &InputMap::isKeyPressed)
-    .addStaticFunction("isMousePressed", &InputMap::isMousePressed)
-    .addStaticFunction("isTouch", &InputMap::isTouch)
-    .addStaticFunction("getMousePosition", &InputMap::getMousePosition)
-    .addStaticFunction("getTouchPosition", &InputMap::getTouchPosition)
+    .addStaticFunction("isKeyPressed", &Input::isKeyPressed)
+    .addStaticFunction("isMousePressed", &Input::isMousePressed)
+    .addStaticFunction("isTouch", &Input::isTouch)
+    .addStaticFunction("getMousePosition", &Input::getMousePosition)
+    .addStaticFunction("getTouchPosition", &Input::getTouchPosition)
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<Object>("Object")
@@ -408,7 +408,7 @@ void LuaBind::bind(){
     .addFunction("stop", &Sound::stop)
     .endClass();
 
-    LuaIntf::LuaBinding(L).beginModule("Input")
+    LuaIntf::LuaBinding(L).beginModule("InputCode")
     .addConstant("KEY_SPACE", S_KEY_SPACE)
     .addConstant("KEY_APOSTROPHE", S_KEY_APOSTROPHE)
     .addConstant("KEY_COMMA", S_KEY_COMMA)

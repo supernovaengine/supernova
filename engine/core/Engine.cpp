@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 #include "Mesh.h"
-#include "Input.h"
+#include "InputCode.h"
 
 #include "audio/SoundManager.h"
 
