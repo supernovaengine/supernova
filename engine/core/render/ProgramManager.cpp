@@ -19,7 +19,7 @@ std::shared_ptr<ProgramRender> ProgramManager::useProgram(std::string shaderName
     std::string key = shaderName + "|" + definitions;
 
     //Verify if there is a created program
-    if (programs[key]){
+    if (programs.count(key) > 0){
         return programs[key];
     }
 

@@ -2,12 +2,12 @@
 #ifndef GUIImage_h
 #define GUIImage_h
 
-#include "Mesh2D.h"
+#include "GUIObject.h"
 #include "Image.h"
 
 namespace Supernova {
 
-    class GUIImage: public Mesh2D {
+    class GUIImage: public GUIObject {
     private:
 
         std::vector<Image*> partImage;
@@ -15,6 +15,9 @@ namespace Supernova {
     public:
         GUIImage();
         virtual ~GUIImage();
+        
+        void setSize(int width, int height);
+        void createVertices();
 
         bool load();
     };

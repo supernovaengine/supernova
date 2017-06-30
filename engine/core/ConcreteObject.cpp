@@ -99,7 +99,8 @@ bool ConcreteObject::load(){
     Object::load();
 
     if (material.getTextures().size() > 0) {
-        transparent = TextureManager::hasAlphaChannel(material.getTextures()[0]);
+        if (material.getTextureType() == S_TEXTURE_2D)
+            transparent = TextureManager::hasAlphaChannel(material.getTextures()[0]);
     }
     if (transparent){
         setTransparency(true);

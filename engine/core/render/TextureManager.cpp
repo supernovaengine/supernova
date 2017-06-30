@@ -27,7 +27,7 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(std::string relative_
 std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureFile, std::string id){
 
     //Verify if there is a created texture
-    if (textures[id].value){
+    if (textures.count(id) > 0){
         return textures[id].value;
     }
 
@@ -58,7 +58,7 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureFile* textureF
 
 std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::string> relative_paths, std::string id){
     //Verify if there is a created texture
-    if (textures[id].value){
+    if (textures.count(id) > 0){
         return textures[id].value;
     }
     
@@ -92,15 +92,24 @@ std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::
 }
 
 bool TextureManager::hasAlphaChannel(std::string id){
-    return textures[id].hasAlphaChannel;
+    if (textures.count(id) > 0){
+        return textures[id].hasAlphaChannel;
+    }
+    return false;
 }
 
 int TextureManager::getTextureWidth(std::string id){
-    return textures[id].width;
+    if (textures.count(id) > 0){
+        return textures[id].width;
+    }
+    return false;
 }
 
 int TextureManager::getTextureHeight(std::string id){
-    return textures[id].height;
+    if (textures.count(id) > 0){
+        return textures[id].height;
+    }
+    return false;
 }
 
 void TextureManager::deleteUnused(){
