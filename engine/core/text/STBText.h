@@ -15,8 +15,6 @@ namespace Supernova {
     private:
 
         const unsigned int atlasLimit = 32768;
-        const unsigned int oversampleX = 2;
-        const unsigned int oversampleY = 2;
         const unsigned int firstChar = 32;
         const unsigned int lastChar = 255;
         const unsigned int charCount = lastChar - firstChar;
@@ -25,6 +23,10 @@ namespace Supernova {
 
         unsigned int atlasWidth;
         unsigned int atlasHeight;
+
+        int lineHeight;
+
+        void tryFindBitmapSize(const stbtt_fontinfo *info, float scale);
 
     public:
         STBText();

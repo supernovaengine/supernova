@@ -12,25 +12,74 @@
 using namespace Supernova;
 
 STBText::STBText() {
-    atlasWidth = 512;
-    atlasHeight = 512;
+    atlasWidth = 0;
+    atlasHeight = 0;
+
+    lineHeight = 0;
 }
 
 STBText::~STBText() {
 }
 
+void STBText::tryFindBitmapSize(const stbtt_fontinfo *info, float scale){
+
+    atlasWidth = 512;
+    atlasHeight = 512;
+
+    int x0; int y0; int x1; int y1;
+
+    stbtt_GetFontBoundingBox(info, &x0, &y0, &x1, &y1);
+    int gfh = (y1-y0) * scale;
+
+    bool fitBitmap = false;
+    while (!fitBitmap && atlasWidth <= atlasLimit){
+
+        int xOffset = 0;
+        int yOffset = 0;
+
+        for (int i = firstChar; (i < lastChar && yOffset <= atlasHeight && xOffset <= atlasWidth); i++){
+            stbtt_GetCodepointBox(info, i, &x0, &y0, &x1, &y1);
+            int gw = (x1-x0) * scale;
+            xOffset += gw+1;
+            if (xOffset > atlasWidth){
+                xOffset = 0;
+                yOffset += gfh;
+            }
+        }
+
+        if (yOffset > atlasHeight || xOffset > atlasWidth){
+            atlasWidth = 2 * atlasWidth;
+            atlasHeight = 2 * atlasHeight;
+        }else {
+            fitBitmap = true;
+        }
+    }
+}
 
 bool STBText::load(const char* font, unsigned int fontSize){
 
     FileData* fontData = new FileData();
     fontData->open(font);
 
-    bool fitBitmap = false;
+    stbtt_fontinfo info;
+    if (!stbtt_InitFont(&info, fontData->getMemPtr(), 0)) {
+        Log::Error(LOG_TAG, "Failed to initialize font");
+        return false;
+    }
+    float scale = stbtt_ScaleForPixelHeight(&info, fontSize);
+
+    int ascent, descent, lineGap;
+    stbtt_GetFontVMetrics(&info, &ascent, &descent, &lineGap);
+    lineHeight = (ascent - descent + lineGap) * scale;
+
+    tryFindBitmapSize(&info, scale);
 
     unsigned char *atlasData = NULL;
     charInfo = new stbtt_packedchar[charCount];
 
     stbtt_pack_context context;
+
+    bool fitBitmap = false;
     while (!fitBitmap && atlasWidth <= atlasLimit) {
         if (atlasData) delete[] atlasData;
         atlasData = new unsigned char[atlasWidth * atlasHeight];
@@ -40,7 +89,7 @@ bool STBText::load(const char* font, unsigned int fontSize){
             return false;
         }
 
-        stbtt_PackSetOversampling(&context, oversampleX, oversampleY);
+        //stbtt_PackSetOversampling(&context, oversampleX, oversampleY);
         if (!stbtt_PackFontRange(&context, fontData->getMemPtr(), 0, fontSize, firstChar, charCount, charInfo)){
             atlasWidth = atlasWidth * 2;
             atlasHeight = atlasHeight * 2;

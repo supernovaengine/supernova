@@ -54,9 +54,7 @@ void Text::setFont(const char* font){
 void Text::setFontSize(unsigned int fontSize){
     this->fontSize = fontSize;
     setTexture(font + std::to_string('-') + std::to_string(fontSize));
-    if (loaded){
-        reload();
-    }
+    //Its not necessary to reload, setTexture do it
 }
 
 void Text::setText(const char* text){
