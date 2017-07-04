@@ -30,9 +30,6 @@ void Image::setSize(int width, int height){
     if (loaded) {
         createVertices();
         render->updateVertices();
-        render->updateTexcoords();
-        render->updateNormals();
-        render->updateIndices();
     }
 }
 

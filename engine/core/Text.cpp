@@ -15,6 +15,7 @@ Text::Text(): Mesh2D() {
     stbtext = new STBText();
     text = "";
     fontSize = 40;
+    multiline = true;
 
     setMinBufferSize(50);
 }
@@ -49,6 +50,7 @@ void Text::setMinBufferSize(unsigned int characters){
 void Text::setFont(const char* font){
     this->font = font;
     setTexture(font + std::to_string('-') + std::to_string(fontSize));
+    //Its not necessary to reload, setTexture do it
 }
 
 void Text::setFontSize(unsigned int fontSize){
@@ -69,7 +71,12 @@ void Text::setText(const char* text){
 }
 
 void Text::setSize(int width, int height){
-    Log::Error(LOG_TAG, "Can't set size of text");
+    Mesh2D::setSize(width, height);
+    if (loaded) {
+        createText();
+        render->updateVertices();
+        render->updateTexcoords();
+    }
 }
 
 void Text::setInvertTexture(bool invertTexture){
@@ -81,18 +88,45 @@ void Text::setInvertTexture(bool invertTexture){
     }
 }
 
+float Text::getAscent(){
+    if (!stbtext)
+        return 0;
+    else
+        return stbtext->getAscent();
+}
+
+float Text::getDescent(){
+    if (!stbtext)
+        return 0;
+    else
+        return stbtext->getDescent();
+}
+
+float Text::getLineGap(){
+    if (!stbtext)
+        return 0;
+    else
+        return stbtext->getLineGap();
+}
+
+int Text::getLineHeight(){
+    if (!stbtext)
+        return 0;
+    else
+        return stbtext->getLineHeight();
+}
+
+void Text::setMultiline(bool multiline){
+    this->multiline = multiline;
+}
+
 void Text::createText(){
     vertices.clear();
     texcoords.clear();
     normals.clear();
     std::vector<unsigned int> indices;
     
-    int textWidth, textHeight;
-    
-    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &textWidth, &textHeight, invertTexture);
-    
-    this->width = textWidth;
-    this->height = textHeight;
+    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &width, &height, multiline, invertTexture);
     
     submeshes[0]->setIndices(indices);
 }

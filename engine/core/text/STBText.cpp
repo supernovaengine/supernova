@@ -15,6 +15,9 @@ STBText::STBText() {
     atlasWidth = 0;
     atlasHeight = 0;
 
+    ascent = 0;
+    descent = 0;
+    lineGap = 0;
     lineHeight = 0;
 }
 
@@ -56,6 +59,22 @@ void STBText::tryFindBitmapSize(const stbtt_fontinfo *info, float scale){
     }
 }
 
+float STBText::getAscent(){
+    return ascent;
+}
+
+float STBText::getDescent(){
+    return descent;
+}
+
+float STBText::getLineGap(){
+    return lineGap;
+}
+
+int STBText::getLineHeight(){
+    return lineHeight;
+}
+
 bool STBText::load(const char* font, unsigned int fontSize){
 
     FileData* fontData = new FileData();
@@ -70,7 +89,11 @@ bool STBText::load(const char* font, unsigned int fontSize){
 
     int ascent, descent, lineGap;
     stbtt_GetFontVMetrics(&info, &ascent, &descent, &lineGap);
-    lineHeight = (ascent - descent + lineGap) * scale;
+
+    this->ascent = ascent * scale;
+    this->descent = descent * scale;
+    this->lineGap = lineGap * scale;
+    this->lineHeight = (ascent - descent + lineGap) * scale;
 
     tryFindBitmapSize(&info, scale);
 
@@ -114,18 +137,17 @@ bool STBText::load(const char* font, unsigned int fontSize){
     return true;
 }
 
-void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords, std::vector<unsigned int>* indices, int* width, int* height, bool invert){
+void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords,
+                         std::vector<unsigned int>* indices, int* width, int* height, bool multiline, bool invert){
     
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
     std::wstring utf16String = convert.from_bytes( text );
-
-    (*width) = 130;
-    (*height) = 0;
     
     float offsetX = 0;
     float offsetY = 0;
-    
-    if (*width > 0){
+
+    if (multiline && *width > 0){
+
         int lastSpace = 0;
         for (int i = 0; i < utf16String.size(); i++){
             int intchar = uint_least32_t(utf16String[i]);
@@ -133,7 +155,6 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
                 lastSpace = i;
             }
             if (intchar == 10){ //\n
-                offsetY += lineHeight;
                 offsetX = 0;
             }
             if (intchar >= firstChar && intchar <= lastChar) {
@@ -145,31 +166,28 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
                         utf16String[lastSpace] = '\n';
                         i = lastSpace;
                         lastSpace = 0;
-                        offsetX = 0;
                     }else{
                         utf16String.insert(i, { '\n' });
-                        offsetX = 0;
                     }
-                    
+                    offsetX = 0;
                 }
             }
         }
-    }
-    
-    offsetX = 0;
-    offsetY = 0;
-    
-    int minX0 = 0, maxX1 = 0, minY0 = 0, maxY1 = 0;
 
+        offsetX = 0;
+        offsetY = 0;
+    }
+
+    int minX0 = 0, maxX1 = 0, minY0 = 0, maxY1 = 0;
     int ind = 0;
+    int lineCount = 1;
+
     for (int i = 0; i < utf16String.size(); i++){
         int intchar = uint_least32_t(utf16String[i]);
-        if (intchar == 32){ //space
-            lastSpace = i;
-        }
         if (intchar == 10){ //\n
             offsetY += lineHeight;
             offsetX = 0;
+            lineCount++;
         }
         if (intchar >= firstChar && intchar <= lastChar) {
             stbtt_aligned_quad quad;
@@ -219,17 +237,11 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
                 ind = ind + 4;
             }
             
-            //if (*width > 0 && offsetX > *width){
-            //    offsetY += lineHeight;
-            //    offsetX = 0;
-            //    i--;
-            //}
-            
         }
     }
     if (*width == 0)
         (*width) = maxX1 - minX0;
     if (*height == 0)
-        (*height) = maxY1 - minY0;
+        (*height) = lineCount * lineHeight;
 
 }

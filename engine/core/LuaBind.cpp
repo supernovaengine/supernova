@@ -344,9 +344,14 @@ void LuaBind::bind(){
     
     .beginExtendClass<Text, Mesh2D>("Text")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
+    .addFunction("getAscent", &Text::getAscent)
+    .addFunction("getDescent", &Text::getDescent)
+    .addFunction("getLineGap", &Text::getLineGap)
+    .addFunction("getLineHeight", &Text::getLineHeight)
     .addFunction("setText", &Text::setText)
     .addFunction("setFont", &Text::setFont)
     .addFunction("setFontSize", &Text::setFontSize)
+    .addFunction("setMultiline", &Text::setMultiline)
     .endClass()
 
     .beginExtendClass<GUIImage, Mesh2D>("GUIImage")
