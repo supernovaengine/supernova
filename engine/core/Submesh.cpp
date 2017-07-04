@@ -8,7 +8,7 @@ Submesh::Submesh(){
 
     this->distanceToCamera = -1;
     this->material = NULL;
-    this->newMaterial = false;
+    this->materialOwned = false;
     this->dynamic = false;
 
     this->loaded = false;
@@ -21,7 +21,7 @@ Submesh::Submesh(Material* material): Submesh() {
 }
 
 Submesh::~Submesh(){
-    if (newMaterial)
+    if (materialOwned)
         delete material;
     
     if (render)
@@ -34,7 +34,7 @@ Submesh::~Submesh(){
 Submesh::Submesh(const Submesh& s){
     this->indices = s.indices;
     this->distanceToCamera = s.distanceToCamera;
-    this->newMaterial = s.newMaterial;
+    this->materialOwned = s.materialOwned;
     this->material = s.material;
     this->dynamic = s.dynamic;
     this->loaded = s.loaded;
@@ -45,7 +45,7 @@ Submesh::Submesh(const Submesh& s){
 Submesh& Submesh::operator = (const Submesh& s){
     this->indices = s.indices;
     this->distanceToCamera = s.distanceToCamera;
-    this->newMaterial = s.newMaterial;
+    this->materialOwned = s.materialOwned;
     this->material = s.material;
     this->dynamic = s.dynamic;
     this->loaded = s.loaded;
@@ -81,7 +81,7 @@ unsigned int Submesh::getIndex(int offset){
 
 void Submesh::createNewMaterial(){
     this->material = new Material();
-    this->newMaterial = true;
+    this->materialOwned = true;
 }
 
 void Submesh::setMaterial(Material* material){

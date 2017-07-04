@@ -23,7 +23,7 @@ namespace Supernova {
         std::vector<unsigned int> indices;
         
         Material* material;
-        bool newMaterial;
+        bool materialOwned;
         float distanceToCamera;
         bool dynamic;
 
