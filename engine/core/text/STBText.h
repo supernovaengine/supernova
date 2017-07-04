@@ -42,7 +42,7 @@ namespace Supernova {
 
         bool load(const char* font, unsigned int fontSize);
         void createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords,
-                        std::vector<unsigned int>* indices, int* width, int* height, bool multiline, bool invert);
+                        std::vector<unsigned int>* indices, int* width, int* height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert);
         
     };
     

@@ -348,6 +348,8 @@ void LuaBind::bind(){
     .addFunction("getDescent", &Text::getDescent)
     .addFunction("getLineGap", &Text::getLineGap)
     .addFunction("getLineHeight", &Text::getLineHeight)
+    .addFunction("setWidth", &Text::setWidth)
+    .addFunction("setHeight", &Text::setHeight)
     .addFunction("setText", &Text::setText)
     .addFunction("setFont", &Text::setFont)
     .addFunction("setFontSize", &Text::setFontSize)

@@ -19,6 +19,9 @@ namespace Supernova {
         unsigned int fontSize;
         bool multiline;
         
+        bool userDefinedWidth;
+        bool userDefinedHeight;
+        
     protected:
         void createText();
 
@@ -33,6 +36,9 @@ namespace Supernova {
         
         virtual void setSize(int width, int height);
         virtual void setInvertTexture(bool invertTexture);
+        
+        void setWidth(int width);
+        void setHeight(int height);
 
         void setMinBufferSize(unsigned int characters);
 

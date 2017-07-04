@@ -16,6 +16,9 @@ Text::Text(): Mesh2D() {
     text = "";
     fontSize = 40;
     multiline = true;
+    
+    userDefinedWidth = false;
+    userDefinedHeight = false;
 
     setMinBufferSize(50);
 }
@@ -72,6 +75,28 @@ void Text::setText(const char* text){
 
 void Text::setSize(int width, int height){
     Mesh2D::setSize(width, height);
+    userDefinedWidth = true;
+    userDefinedHeight = true;
+    if (loaded) {
+        createText();
+        render->updateVertices();
+        render->updateTexcoords();
+    }
+}
+
+void Text::setWidth(int width){
+    Mesh2D::setSize(width, height);
+    userDefinedWidth = true;
+    if (loaded) {
+        createText();
+        render->updateVertices();
+        render->updateTexcoords();
+    }
+}
+
+void Text::setHeight(int height){
+    Mesh2D::setSize(width, height);
+    userDefinedHeight = true;
     if (loaded) {
         createText();
         render->updateVertices();
@@ -126,7 +151,7 @@ void Text::createText(){
     normals.clear();
     std::vector<unsigned int> indices;
     
-    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &width, &height, multiline, invertTexture);
+    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &width, &height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
     
     submeshes[0]->setIndices(indices);
 }

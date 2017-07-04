@@ -138,7 +138,7 @@ bool STBText::load(const char* font, unsigned int fontSize){
 }
 
 void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords,
-                         std::vector<unsigned int>* indices, int* width, int* height, bool multiline, bool invert){
+                         std::vector<unsigned int>* indices, int* width, int* height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert){
     
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
     std::wstring utf16String = convert.from_bytes( text );
@@ -146,7 +146,7 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
     float offsetX = 0;
     float offsetY = 0;
 
-    if (multiline && *width > 0){
+    if (multiline && userDefinedWidth){
 
         int lastSpace = 0;
         for (int i = 0; i < utf16String.size(); i++){
@@ -212,7 +212,7 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
             if (quad.y1 > maxY1)
                 maxY1 = quad.y1;
             
-            if ((*width == 0 || offsetX <= *width) && (*height == 0 || offsetY <= *height)){
+            if ((!userDefinedWidth || offsetX <= *width) && (!userDefinedHeight || offsetY <= *height)){
                 vertices->push_back(Vector3(quad.x0, quad.y0, 0));
                 vertices->push_back(Vector3(quad.x1, quad.y0, 0));
                 vertices->push_back(Vector3(quad.x1, quad.y1, 0));
@@ -239,9 +239,9 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
             
         }
     }
-    if (*width == 0)
+    if (!userDefinedWidth)
         (*width) = maxX1 - minX0;
-    if (*height == 0)
+    if (!userDefinedHeight)
         (*height) = lineCount * lineHeight;
 
 }
