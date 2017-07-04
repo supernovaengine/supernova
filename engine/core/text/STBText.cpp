@@ -119,18 +119,62 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
     std::wstring utf16String = convert.from_bytes( text );
 
-    (*width) = 0;
+    (*width) = 130;
     (*height) = 0;
+    
     float offsetX = 0;
     float offsetY = 0;
+    
+    if (*width > 0){
+        int lastSpace = 0;
+        for (int i = 0; i < utf16String.size(); i++){
+            int intchar = uint_least32_t(utf16String[i]);
+            if (intchar == 32){ //space
+                lastSpace = i;
+            }
+            if (intchar == 10){ //\n
+                offsetY += lineHeight;
+                offsetX = 0;
+            }
+            if (intchar >= firstChar && intchar <= lastChar) {
+                stbtt_aligned_quad quad;
+                stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, intchar - firstChar, &offsetX, &offsetY, &quad, 1);
+                
+                if (offsetX > (*width)){
+                    if (lastSpace > 0){
+                        utf16String[lastSpace] = '\n';
+                        i = lastSpace;
+                        lastSpace = 0;
+                        offsetX = 0;
+                    }else{
+                        utf16String.insert(i, { '\n' });
+                        offsetX = 0;
+                    }
+                    
+                }
+            }
+        }
+    }
+    
+    offsetX = 0;
+    offsetY = 0;
+    
+    int minX0 = 0, maxX1 = 0, minY0 = 0, maxY1 = 0;
 
-    int ind = 0; 
-    for(auto c : utf16String) {
-        int intchar = uint_least32_t(c);
+    int ind = 0;
+    for (int i = 0; i < utf16String.size(); i++){
+        int intchar = uint_least32_t(utf16String[i]);
+        if (intchar == 32){ //space
+            lastSpace = i;
+        }
+        if (intchar == 10){ //\n
+            offsetY += lineHeight;
+            offsetX = 0;
+        }
         if (intchar >= firstChar && intchar <= lastChar) {
             stbtt_aligned_quad quad;
             stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, intchar - firstChar, &offsetX, &offsetY, &quad, 1);
-
+            
             if (invert) {
                 float auxt0 = quad.t0;
                 quad.t0 = quad.t1;
@@ -140,35 +184,52 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
                 quad.y0 = -quad.y1;
                 quad.y1 = -auxy0;
             }
-
-            vertices->push_back(Vector3(quad.x0, quad.y0, 0));
-            vertices->push_back(Vector3(quad.x1, quad.y0, 0));
-            vertices->push_back(Vector3(quad.x1, quad.y1, 0));
-            vertices->push_back(Vector3(quad.x0, quad.y1, 0));
             
-            texcoords->push_back(Vector2(quad.s0, quad.t0));
-            texcoords->push_back(Vector2(quad.s1, quad.t0));
-            texcoords->push_back(Vector2(quad.s1, quad.t1));
-            texcoords->push_back(Vector2(quad.s0, quad.t1));
+            if (quad.x0 < minX0)
+                minX0 = quad.x0;
+            if (quad.y0 < minY0)
+                minY0 = quad.y0;
+            if (quad.x1 > maxX1)
+                maxX1 = quad.x1;
+            if (quad.y1 > maxY1)
+                maxY1 = quad.y1;
             
-            normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
-            normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
-            normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
-            normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
-            
-            indices->push_back(ind);
-            indices->push_back(ind+1);
-            indices->push_back(ind+2);
-            indices->push_back(ind);
-            indices->push_back(ind+2);
-            indices->push_back(ind+3);
-            ind = ind + 4;
-            
-            if ((*height) < (quad.y1 - quad.y0)){
-                (*height) = (quad.y1 - quad.y0);
+            if ((*width == 0 || offsetX <= *width) && (*height == 0 || offsetY <= *height)){
+                vertices->push_back(Vector3(quad.x0, quad.y0, 0));
+                vertices->push_back(Vector3(quad.x1, quad.y0, 0));
+                vertices->push_back(Vector3(quad.x1, quad.y1, 0));
+                vertices->push_back(Vector3(quad.x0, quad.y1, 0));
+                
+                texcoords->push_back(Vector2(quad.s0, quad.t0));
+                texcoords->push_back(Vector2(quad.s1, quad.t0));
+                texcoords->push_back(Vector2(quad.s1, quad.t1));
+                texcoords->push_back(Vector2(quad.s0, quad.t1));
+                
+                normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
+                normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
+                normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
+                normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
+                
+                indices->push_back(ind);
+                indices->push_back(ind+1);
+                indices->push_back(ind+2);
+                indices->push_back(ind);
+                indices->push_back(ind+2);
+                indices->push_back(ind+3);
+                ind = ind + 4;
             }
+            
+            //if (*width > 0 && offsetX > *width){
+            //    offsetY += lineHeight;
+            //    offsetX = 0;
+            //    i--;
+            //}
+            
         }
     }
-    (*width) = offsetX;
+    if (*width == 0)
+        (*width) = maxX1 - minX0;
+    if (*height == 0)
+        (*height) = maxY1 - minY0;
 
 }
