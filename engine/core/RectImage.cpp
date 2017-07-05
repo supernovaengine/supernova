@@ -57,9 +57,9 @@ void RectImage::normalizeTextureRect(){
 bool RectImage::load(){
     
     if (material.getTextures().size() > 0) {
-        TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
-        texWidth = TextureManager::getTextureWidth(submeshes[0]->getMaterial()->getTextures()[0]);
-        texHeight = TextureManager::getTextureHeight(submeshes[0]->getMaterial()->getTextures()[0]);
+        Texture texture = TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
+        texWidth = texture.getWidth();
+        texHeight = texture.getHeight();
 
         normalizeTextureRect();
 

@@ -4,7 +4,7 @@
 
 using namespace Supernova;
 
-std::unordered_map<std::string, std::shared_ptr<ProgramRender>> ProgramManager::programs;
+std::unordered_map<std::string, Program> ProgramManager::programs;
 
 ProgramRender* ProgramManager::getProgramRender(){
     if (Engine::getRenderAPI() == S_GLES2){
@@ -14,7 +14,7 @@ ProgramRender* ProgramManager::getProgramRender(){
     return NULL;
 }
 
-std::shared_ptr<ProgramRender> ProgramManager::useProgram(std::string shaderName, std::string definitions){
+Program ProgramManager::useProgram(std::string shaderName, std::string definitions){
 
     std::string key = shaderName + "|" + definitions;
 
@@ -28,7 +28,7 @@ std::shared_ptr<ProgramRender> ProgramManager::useProgram(std::string shaderName
     program->createProgram(shaderName, definitions);
     std::shared_ptr<ProgramRender> shaderPtr(program);
 
-    programs[key] = shaderPtr;
+    programs[key] = { shaderPtr };
 
     return programs[key];
 }
@@ -46,9 +46,9 @@ void ProgramManager::deleteUnused(){
 ProgramManager::it_type ProgramManager::findToRemove(){
 
     for(ProgramManager::it_type iterator = programs.begin(); iterator != programs.end(); iterator++) {
-        if (iterator->second.use_count() <= 1){
-            if (iterator->second.get() != NULL)
-                iterator->second.get()->deleteProgram();
+        if (iterator->second.getProgramRender().use_count() <= 1){
+            if (iterator->second.getProgramRender().get() != NULL)
+                iterator->second.getProgramRender().get()->deleteProgram();
             return iterator;
         }
     }

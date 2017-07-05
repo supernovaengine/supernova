@@ -6,6 +6,7 @@
 #include "render/TextureRender.h"
 #include "math/Rect.h"
 #include "Material.h"
+#include "Texture.h"
 #include <vector>
 
 namespace Supernova {
@@ -30,7 +31,7 @@ namespace Supernova {
         Points* points;
         
         int numPoints;
-        std::shared_ptr<TextureRender> texture;
+        Texture texture;
         bool textured;
 
         //-------begin points properties-------
@@ -52,9 +53,10 @@ namespace Supernova {
         unsigned int minBufferSize;
         //------------end------------
 
-    public:
-        
         PointRender();
+
+    public:
+
         virtual ~PointRender();
 
         static void newInstance(PointRender** render);

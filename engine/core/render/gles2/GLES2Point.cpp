@@ -147,11 +147,12 @@ bool GLES2Point::load() {
     }
     
     gProgram = ProgramManager::useProgram(programName, programDefs);
+    GLuint glesProgram = ((GLES2Program*)gProgram.getProgramRender().get())->getProgram();
 
-    light.setProgram((GLES2Program*)gProgram.get());
-    fog.setProgram((GLES2Program*)gProgram.get());
+    light.setProgram((GLES2Program*)gProgram.getProgramRender().get());
+    fog.setProgram((GLES2Program*)gProgram.getProgramRender().get());
     
-    useTexture = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "uUseTexture");
+    useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
     
     vertexBufferSize = 0;
     normalBufferSize = 0;
@@ -160,41 +161,41 @@ bool GLES2Point::load() {
     pointColorBufferSize = 0;
     
     useVerticesBuffer();
-    aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
+    aPositionHandle = glGetAttribLocation(glesProgram, "a_Position");
     
     if (lighting){
         useNormalsBuffer();
-        aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
+        aNormal = glGetAttribLocation(glesProgram, "a_Normal");
     }
     
     usePointSizesBuffer();
-    a_PointSize = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_PointSize");
+    a_PointSize = glGetAttribLocation(glesProgram, "a_PointSize");
     
     if (hasTextureRect){
         useTextureRectsBuffer();
-        a_textureRect = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_textureRect");
+        a_textureRect = glGetAttribLocation(glesProgram, "a_textureRect");
     }
 
     usePointColorsBuffer();
-    a_pointColor = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_pointColor");
+    a_pointColor = glGetAttribLocation(glesProgram, "a_pointColor");
 
     if (textured){
         texture = TextureManager::loadTexture(materialTexture);
-        uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
+        uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
     }else{
-        texture = NULL;
         if (Engine::getPlatform() == S_WEB){
             GLES2Util::generateEmptyTexture();
-            uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
+            uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
         }
+        texture.setTextureRender(NULL);
     }
     
-    u_mvpMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mvpMatrix");
+    u_mvpMatrix = glGetUniformLocation(glesProgram, "u_mvpMatrix");
     if (lighting){
         light.getUniformLocations();
-        uEyePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_EyePos");
-        u_mMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mMatrix");
-        u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
+        uEyePos = glGetUniformLocation(glesProgram, "u_EyePos");
+        u_mMatrix = glGetUniformLocation(glesProgram, "u_mMatrix");
+        u_nMatrix = glGetUniformLocation(glesProgram, "u_nMatrix");
     }
     
     if (hasfog){
@@ -212,8 +213,8 @@ bool GLES2Point::draw() {
     if (!PointRender::draw()){
         return false;
     }
-    
-    glUseProgram(((GLES2Program*)gProgram.get())->getProgram());
+    GLuint glesProgram = ((GLES2Program*)gProgram.getProgramRender().get())->getProgram();
+    glUseProgram(glesProgram);
     GLES2Util::checkGlError("glUseProgram");
     
     glUniformMatrix4fv(u_mvpMatrix, 1, GL_FALSE, (GLfloat*)modelViewProjectionMatrix);
@@ -276,7 +277,8 @@ bool GLES2Point::draw() {
         
     if (textured){
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(((GLES2Texture*)(texture.get()))->getTextureType(), ((GLES2Texture*)(texture.get()))->getTexture());
+        glBindTexture(((GLES2Texture*)(texture.getTextureRender().get()))->getTextureType(),
+                      ((GLES2Texture*)(texture.getTextureRender().get()))->getTexture());
         glUniform1i(uTextureUnitLocation, 0);
     }else{
         if (Engine::getPlatform() == S_WEB){
@@ -315,12 +317,10 @@ void GLES2Point::destroy(){
         glDeleteBuffers(1, &pointColorBuffer);
 
     if (textured){
-        texture.reset();
-        TextureManager::deleteUnused();
+        texture.destroy();
     }
 
-    gProgram.reset();
-    ProgramManager::deleteUnused();
+    gProgram.destroy();
     
     PointRender::destroy();
 }

@@ -138,9 +138,9 @@ void GUIImage::createVertices(){
 bool GUIImage::load(){
     
     if (submeshes[0]->getMaterial()->getTextures().size() > 0){
-        TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
-        texWidth = TextureManager::getTextureWidth(submeshes[0]->getMaterial()->getTextures()[0]);
-        texHeight = TextureManager::getTextureHeight(submeshes[0]->getMaterial()->getTextures()[0]);
+        Texture texture = TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
+        texWidth = texture.getWidth();
+        texHeight = texture.getHeight();
     }
     if (this->width == 0 && this->height == 0){
         this->width = texWidth;

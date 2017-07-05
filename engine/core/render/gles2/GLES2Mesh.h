@@ -24,7 +24,7 @@ namespace Supernova {
         GLES2Light light;
         GLES2Fog fog;
         
-        std::shared_ptr<ProgramRender> gProgram;
+        Program gProgram;
         
         GLint aPositionHandle;
         GLint aTextureCoordinates;

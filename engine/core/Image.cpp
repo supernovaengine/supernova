@@ -78,9 +78,9 @@ void Image::createVertices(){
 
 bool Image::load(){
     if (submeshes[0]->getMaterial()->getTextures().size() > 0 && this->width == 0 && this->height == 0){
-        TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
-        this->width = TextureManager::getTextureWidth(submeshes[0]->getMaterial()->getTextures()[0]);
-        this->height = TextureManager::getTextureHeight(submeshes[0]->getMaterial()->getTextures()[0]);
+        Texture texture = TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
+        this->width = texture.getWidth();
+        this->height = texture.getHeight();
     }
     
     setInvertTexture(isIn3DScene());

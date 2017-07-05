@@ -27,11 +27,12 @@ namespace Supernova {
         Scene* scene;
 
         void updateLights();
+
+        SceneRender();
         
     public:
         bool lighting;
 
-        SceneRender();
         virtual ~SceneRender();
 
         static void newInstance(SceneRender** render);

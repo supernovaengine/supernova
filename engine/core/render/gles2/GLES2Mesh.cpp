@@ -118,11 +118,12 @@ bool GLES2Mesh::load() {
     }
 
     gProgram = ProgramManager::useProgram(programName, programDefs);
+    GLuint glesProgram = ((GLES2Program*)gProgram.getProgramRender().get())->getProgram();
 
-    light.setProgram((GLES2Program*)gProgram.get());
-    fog.setProgram((GLES2Program*)gProgram.get());
+    light.setProgram((GLES2Program*)gProgram.getProgramRender().get());
+    fog.setProgram((GLES2Program*)gProgram.getProgramRender().get());
 
-    useTexture = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "uUseTexture");
+    useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
     
     if (isDynamic){
         usageBuffer = GL_DYNAMIC_DRAW;
@@ -133,30 +134,30 @@ bool GLES2Mesh::load() {
     normalBufferSize = 0;
     
     useVerticesBuffer();
-    aPositionHandle = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Position");
+    aPositionHandle = glGetAttribLocation(glesProgram, "a_Position");
 
     if (hasTexture) {
         useTexcoordsBuffer();
-        aTextureCoordinates = glGetAttribLocation(((GLES2Program *) gProgram.get())->getProgram(), "a_TextureCoordinates");
+        aTextureCoordinates = glGetAttribLocation(glesProgram, "a_TextureCoordinates");
     }
     
     if (lighting){
         useNormalsBuffer();
-        aNormal = glGetAttribLocation(((GLES2Program*)gProgram.get())->getProgram(), "a_Normal");
+        aNormal = glGetAttribLocation(glesProgram, "a_Normal");
     }
     
     if (hasTextureRect){
-        u_textureRect = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_textureRect");
+        u_textureRect = glGetUniformLocation(glesProgram, "u_textureRect");
     }
-    uTextureUnitLocation = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_TextureUnit");
-    uColor = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_Color");
+    uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
+    uColor = glGetUniformLocation(glesProgram, "u_Color");
 
-    u_mvpMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mvpMatrix");
+    u_mvpMatrix = glGetUniformLocation(glesProgram, "u_mvpMatrix");
     if (lighting){
         light.getUniformLocations();
-        uEyePos = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_EyePos");
-        u_mMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_mMatrix");
-        u_nMatrix = glGetUniformLocation(((GLES2Program*)gProgram.get())->getProgram(), "u_nMatrix");
+        uEyePos = glGetUniformLocation(glesProgram, "u_EyePos");
+        u_mMatrix = glGetUniformLocation(glesProgram, "u_mMatrix");
+        u_nMatrix = glGetUniformLocation(glesProgram, "u_nMatrix");
     }
     
     if (hasfog){
@@ -177,8 +178,8 @@ bool GLES2Mesh::draw() {
     if (isSky) {
        glDepthFunc(GL_LEQUAL);
     }
-
-    glUseProgram(((GLES2Program*)gProgram.get())->getProgram());
+    GLuint glesProgram = ((GLES2Program*)gProgram.getProgramRender().get())->getProgram();
+    glUseProgram(glesProgram);
     GLES2Util::checkGlError("glUseProgram");
 
     glUniformMatrix4fv(u_mvpMatrix, 1, GL_FALSE, (GLfloat*)modelViewProjectMatrix);
@@ -244,7 +245,8 @@ bool GLES2Mesh::draw() {
         
         if (submeshRender->textured){
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(((GLES2Texture*)(submeshRender->texture.get()))->getTextureType(), ((GLES2Texture*)(submeshRender->texture.get()))->getTexture());
+            glBindTexture(((GLES2Texture*)(submeshRender->texture.getTextureRender().get()))->getTextureType(),
+                          ((GLES2Texture*)(submeshRender->texture.getTextureRender().get()))->getTexture());
             glUniform1i(uTextureUnitLocation, 0);
         }else{
             if (Engine::getPlatform() == S_WEB){
@@ -286,8 +288,8 @@ void GLES2Mesh::destroy(){
     if (lighting && normals){
         glDeleteBuffers(1, &normalBuffer);
     }
-    gProgram.reset();
-    ProgramManager::deleteUnused();
+
+    gProgram.destroy();
     
     MeshRender::destroy();
 }

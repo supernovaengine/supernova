@@ -52,10 +52,11 @@ namespace Supernova {
 
         unsigned int minBufferSize;
         //------------end------------
+
+        MeshRender();
         
     public:
-        
-        MeshRender();
+
         virtual ~MeshRender();
 
         static void newInstance(MeshRender** render);

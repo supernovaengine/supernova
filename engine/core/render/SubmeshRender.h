@@ -3,6 +3,7 @@
 #define SubmeshRender_h
 
 #include "render/TextureRender.h"
+#include "Texture.h"
 #include "Material.h"
 
 namespace Supernova {
@@ -19,7 +20,7 @@ namespace Supernova {
         
     protected:
         
-        std::shared_ptr<TextureRender> texture;
+        Texture texture;
         
         //-------begin sybmesh properties-------
         unsigned int indicesSizes;

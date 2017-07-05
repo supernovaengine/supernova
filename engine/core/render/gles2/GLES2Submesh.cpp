@@ -65,7 +65,7 @@ bool GLES2Submesh::load(){
         if (Engine::getPlatform() == S_WEB){
             GLES2Util::generateEmptyTexture();
         }
-        texture = NULL;
+        texture.setTextureRender(NULL);
     }
     
     return true;
@@ -75,10 +75,9 @@ void GLES2Submesh::destroy(){
 
     if (indicesSizes > 0)
         glDeleteBuffers(1, &indexBuffer);
-        
+
     if (textured){
-        texture.reset();
-        TextureManager::deleteUnused();
+        texture.destroy();
     }
     
     SubmeshRender::destroy();

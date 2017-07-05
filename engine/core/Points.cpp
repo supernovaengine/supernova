@@ -244,10 +244,10 @@ bool Points::load(){
     render->setPoints(this);
 
     if ((material.getTextures().size() > 0) && (textureRects.size() > 0)){
-        TextureManager::loadTexture(material.getTextures()[0]);
+        Texture texture = TextureManager::loadTexture(material.getTextures()[0]);
         
-        texWidth = TextureManager::getTextureWidth(material.getTextures()[0]);
-        texHeight = TextureManager::getTextureHeight(material.getTextures()[0]);
+        texWidth = texture.getWidth();
+        texHeight = texture.getHeight();
         
         normalizeTextureRects();
     }
