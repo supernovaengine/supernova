@@ -4,25 +4,18 @@
 
 #include "render/TextureRender.h"
 #include "image/TextureData.h"
+#include "image/Texture.h"
 #include <string>
 #include <unordered_map>
 
 namespace Supernova {
 
     class TextureManager {
-        
-        typedef struct {
-            std::shared_ptr<TextureRender> value;
-            bool hasAlphaChannel;
-            int width;
-            int height;
-        } TextureStore;
-        
     private:
 
-        typedef std::unordered_map<std::string, TextureStore>::iterator it_type;
+        typedef std::unordered_map<std::string, Texture>::iterator it_type;
 
-        static std::unordered_map<std::string, TextureStore> textures;
+        static std::unordered_map<std::string, Texture> textures;
         
         static TextureRender* getTextureRender();
         

@@ -87,6 +87,7 @@
 		719301251E51212800BEE527 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301231E51212800BEE527 /* Material.cpp */; };
 		719330B51EDB161B0043E282 /* Rect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89051ED7711A0028DCE0 /* Rect.cpp */; };
 		719330B61EDBB8200043E282 /* STBText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E34E221ED1CEBF0005DEF2 /* STBText.cpp */; };
+		719C08961F0C74FA00F0BAF0 /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719C08941F0C74FA00F0BAF0 /* Texture.cpp */; };
 		71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */; };
 		71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28351DE8E96800C12A1D /* MP3Reader.cpp */; };
 		71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FAC11DEB1924003850A2 /* SoundManager.cpp */; };
@@ -518,6 +519,8 @@
 		719301241E51212800BEE527 /* Material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Material.h; sourceTree = "<group>"; };
 		719301261E53D4B000BEE527 /* Points.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Points.cpp; sourceTree = "<group>"; };
 		719301271E53D4B000BEE527 /* Points.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Points.h; sourceTree = "<group>"; };
+		719C08941F0C74FA00F0BAF0 /* Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture.cpp; sourceTree = "<group>"; };
+		719C08951F0C74FA00F0BAF0 /* Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
 		71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPlayer.cpp; sourceTree = "<group>"; };
 		71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 		71A6FAC11DEB1924003850A2 /* SoundManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundManager.cpp; sourceTree = "<group>"; };
@@ -886,6 +889,8 @@
 				713D2A191CFB2EAD00A4752F /* TextureLoader.h */,
 				714C89101EDE12F20028DCE0 /* STBImageReader.cpp */,
 				714C89111EDE12F20028DCE0 /* STBImageReader.h */,
+				719C08941F0C74FA00F0BAF0 /* Texture.cpp */,
+				719C08951F0C74FA00F0BAF0 /* Texture.h */,
 			);
 			path = image;
 			sourceTree = "<group>";
@@ -1760,6 +1765,7 @@
 				7188F1B61DBD4A3400A2D04F /* AudioReader.cpp in Sources */,
 				71CE950C1EC8A435008CCF3C /* FileUtilsPlatform.cpp in Sources */,
 				715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */,
+				719C08961F0C74FA00F0BAF0 /* Texture.cpp in Sources */,
 				714D81D61E6C9B380038BE50 /* GLES2Point.cpp in Sources */,
 				71C5764A1EE45167002F537B /* Events.cpp in Sources */,
 				714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */,

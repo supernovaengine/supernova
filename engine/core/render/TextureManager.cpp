@@ -8,7 +8,7 @@
 
 using namespace Supernova;
 
-std::unordered_map<std::string, TextureManager::TextureStore> TextureManager::textures;
+std::unordered_map<std::string, Texture> TextureManager::textures;
 
 
 TextureRender* TextureManager::getTextureRender(){
@@ -28,7 +28,7 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureData* textureD
 
     //Verify if there is a created texture
     if (textures.count(id) > 0){
-        return textures[id].value;
+        return textures[id].getTextureRender();
     }
 
     TextureLoader image;
@@ -53,13 +53,13 @@ std::shared_ptr<TextureRender> TextureManager::loadTexture(TextureData* textureD
     
     Log::Debug(LOG_TAG, "Load texture (texture map size: %lu)", textures.size());
 
-    return textures[id].value;
+    return textures[id].getTextureRender();
 }
 
 std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::string> relative_paths, std::string id){
     //Verify if there is a created texture
     if (textures.count(id) > 0){
-        return textures[id].value;
+        return textures[id].getTextureRender();
     }
     
     TextureLoader image;
@@ -88,26 +88,26 @@ std::shared_ptr<TextureRender> TextureManager::loadTextureCube(std::vector<std::
     
     Log::Debug(LOG_TAG, "Load texture cube (texture map size: %lu)", textures.size());
     
-    return textures[id].value;
+    return textures[id].getTextureRender();
 }
 
 bool TextureManager::hasAlphaChannel(std::string id){
     if (textures.count(id) > 0){
-        return textures[id].hasAlphaChannel;
+        return textures[id].hasAlphaChannel();
     }
     return false;
 }
 
 int TextureManager::getTextureWidth(std::string id){
     if (textures.count(id) > 0){
-        return textures[id].width;
+        return textures[id].getWidth();
     }
     return false;
 }
 
 int TextureManager::getTextureHeight(std::string id){
     if (textures.count(id) > 0){
-        return textures[id].height;
+        return textures[id].getHeight();
     }
     return false;
 }
@@ -126,9 +126,9 @@ void TextureManager::deleteUnused(){
 TextureManager::it_type TextureManager::findToRemove(){
 
     for(TextureManager::it_type iterator = textures.begin(); iterator != textures.end(); iterator++) {
-        if (iterator->second.value.use_count() <= 1){
-            if (iterator->second.value.get() != NULL)
-                iterator->second.value.get()->deleteTexture();
+        if (iterator->second.getTextureRender().use_count() <= 1){
+            if (iterator->second.getTextureRender().get() != NULL)
+                iterator->second.getTextureRender().get()->deleteTexture();
             return iterator;
         }
     }
