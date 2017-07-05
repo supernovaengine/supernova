@@ -32,7 +32,7 @@ void GLES2Texture::assignTexture(const GLenum target, const GLsizei width, const
     
 }
 
-void GLES2Texture::loadTexture(TextureFile* texturefile) {
+void GLES2Texture::loadTexture(TextureData* texturedata) {
     GLuint texture_object_id;
     
     glGenTextures(1, &texture_object_id);
@@ -43,7 +43,7 @@ void GLES2Texture::loadTexture(TextureFile* texturefile) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
-    assignTexture(GL_TEXTURE_2D, texturefile->getWidth(), texturefile->getHeight(), getGlColorFormat(texturefile->getColorFormat()), texturefile->getData());
+    assignTexture(GL_TEXTURE_2D, texturedata->getWidth(), texturedata->getHeight(), getGlColorFormat(texturedata->getColorFormat()), texturedata->getData());
     
     glGenerateMipmap(GL_TEXTURE_2D);
     
@@ -54,7 +54,7 @@ void GLES2Texture::loadTexture(TextureFile* texturefile) {
     gTexture = texture_object_id;
 }
 
-void GLES2Texture::loadTextureCube(std::vector<TextureFile*> texturefiles){
+void GLES2Texture::loadTextureCube(std::vector<TextureData*> texturesdata){
     GLuint texture_object_id;
     
     glGenTextures(1, &texture_object_id);
@@ -69,9 +69,9 @@ void GLES2Texture::loadTextureCube(std::vector<TextureFile*> texturefiles){
     //glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     //glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
     
-    for(GLuint i = 0; i < texturefiles.size(); i++){
-        int colorFormat = getGlColorFormat(texturefiles[i]->getColorFormat());
-        assignTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, texturefiles[i]->getWidth(), texturefiles[i]->getHeight(), colorFormat, texturefiles[i]->getData());
+    for(GLuint i = 0; i < texturesdata.size(); i++){
+        int colorFormat = getGlColorFormat(texturesdata[i]->getColorFormat());
+        assignTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, texturesdata[i]->getWidth(), texturesdata[i]->getHeight(), colorFormat, texturesdata[i]->getData());
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     

@@ -3,7 +3,7 @@
 #define TextureManager_h
 
 #include "render/TextureRender.h"
-#include "image/TextureFile.h"
+#include "image/TextureData.h"
 #include <string>
 #include <unordered_map>
 
@@ -30,7 +30,7 @@ namespace Supernova {
     public:
         
         static std::shared_ptr<TextureRender> loadTexture(std::string relative_path);
-        static std::shared_ptr<TextureRender> loadTexture(TextureFile* textureFile, std::string id);
+        static std::shared_ptr<TextureRender> loadTexture(TextureData* textureData, std::string id);
         static std::shared_ptr<TextureRender> loadTextureCube(std::vector<std::string> relative_paths, std::string id);
         static void deleteUnused();
 

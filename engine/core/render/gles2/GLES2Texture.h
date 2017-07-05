@@ -19,8 +19,8 @@ namespace Supernova {
         
         GLES2Texture();
 
-        void loadTexture(TextureFile* texturefile);
-        void loadTextureCube(std::vector<TextureFile*> texturefiles);
+        void loadTexture(TextureData* texturedata);
+        void loadTextureCube(std::vector<TextureData*> texturesdata);
         void deleteTexture();
         
         void setTexture(GLuint texture);

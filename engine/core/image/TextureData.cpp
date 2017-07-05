@@ -1,11 +1,11 @@
-#include "TextureFile.h"
+#include "TextureData.h"
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 
 using namespace Supernova;
 
-TextureFile::TextureFile() {
+TextureData::TextureData() {
     this->width = 0;
     this->height = 0;
     this->size = 0;
@@ -14,7 +14,7 @@ TextureFile::TextureFile() {
     this->data = NULL;
 }
 
-TextureFile::TextureFile(int width, int height, int size, int color_format, int bitsPerPixel, void* data){
+TextureData::TextureData(int width, int height, int size, int color_format, int bitsPerPixel, void* data){
     this->width = width;
     this->height = height;
     this->size = size;
@@ -23,19 +23,17 @@ TextureFile::TextureFile(int width, int height, int size, int color_format, int 
     this->data = data;
 }
 
-TextureFile::TextureFile(const TextureFile& v){
+TextureData::TextureData(const TextureData& v){
     this->copy(v);
 }
 
-TextureFile& TextureFile::operator = ( const TextureFile& v )
-{
+TextureData& TextureData::operator = ( const TextureData& v ){
     this->copy(v);
 
     return *this;
 }
 
-void TextureFile::copy ( const TextureFile& v )
-{
+void TextureData::copy ( const TextureData& v ){
     this->width = v.width;
     this->height = v.height;
     this->size = v.size;
@@ -46,16 +44,15 @@ void TextureFile::copy ( const TextureFile& v )
     memcpy((void*)this->data, (void*)v.data, this->size);
 }
 
-TextureFile::~TextureFile() {
+TextureData::~TextureData() {
     releaseImageData();
 }
 
-void TextureFile::releaseImageData(){
+void TextureData::releaseImageData(){
     free((void*)data);
 }
 
-int TextureFile::getNearestPowerOfTwo(int size)
-{
+int TextureData::getNearestPowerOfTwo(int size){
     int i;
     for(i = 31; i >= 0; i--)
         if ((size - 1) & (1<<i))
@@ -63,7 +60,7 @@ int TextureFile::getNearestPowerOfTwo(int size)
     return (1<<(i + 1));
 }
 
-void TextureFile::crop(int offsetX, int offsetY, int newWidth, int newHeight){
+void TextureData::crop(int offsetX, int offsetY, int newWidth, int newHeight){
     
     int rowsize = width * (bitsPerPixel / 8);
     int newRowsize = newWidth * (bitsPerPixel / 8);
@@ -91,11 +88,11 @@ void TextureFile::crop(int offsetX, int offsetY, int newWidth, int newHeight){
     data = newData;
 }
 
-void TextureFile::resamplePowerOfTwo(){
+void TextureData::resamplePowerOfTwo(){
     resample(getNearestPowerOfTwo(width), getNearestPowerOfTwo(height));
 }
 
-void TextureFile::resample(int newWidth, int newHeight){
+void TextureData::resample(int newWidth, int newHeight){
 
     if ((newWidth != width) || (newHeight != height)){
     
@@ -130,7 +127,7 @@ void TextureFile::resample(int newWidth, int newHeight){
 
 }
 
-void TextureFile::flipVertical(){
+void TextureData::flipVertical(){
     
     int bufsize=width * (bitsPerPixel / 8);
     
@@ -156,26 +153,26 @@ void TextureFile::flipVertical(){
     
 }
 
-int TextureFile::getWidth(){
+int TextureData::getWidth(){
     return width;
 }
 
-int TextureFile::getHeight(){
+int TextureData::getHeight(){
     return height;
 }
 
-int TextureFile::getSize(){
+int TextureData::getSize(){
     return size;
 }
 
-int TextureFile::getColorFormat(){
+int TextureData::getColorFormat(){
     return color_format;
 }
 
-int TextureFile::getBitsPerPixel(){
+int TextureData::getBitsPerPixel(){
     return bitsPerPixel;
 }
 
-void* TextureFile::getData(){
+void* TextureData::getData(){
     return data;
 }

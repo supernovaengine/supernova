@@ -78,6 +78,6 @@ ImageReader* TextureLoader::getImageFormat(FileData* filedata){
     return NULL;
 }
 
-TextureFile* TextureLoader::getRawImage(){
+TextureData* TextureLoader::getRawImage(){
     return rawImage;
 }
