@@ -1,7 +1,6 @@
 #include "GLES2Submesh.h"
 
 #include "Material.h"
-#include "render/TextureManager.h"
 #include "Engine.h"
 #include "GLES2Util.h"
 
@@ -48,24 +47,11 @@ bool GLES2Submesh::load(){
         useIndicesBuffer();
     }
     
-    if (textured){
-        if (material->getTextureType() == S_TEXTURE_CUBE){
-            std::vector<std::string> textures;
-            std::string id = "cube|";
-            for (int t = 0; t < material->getTextures().size(); t++){
-                textures.push_back(material->getTextures()[t]);
-                id = id + "|" + textures.back();
-            }
-            texture = TextureManager::loadTextureCube(textures, id);
-        }else{
-            texture = TextureManager::loadTexture(material->getTextures()[0]);
-        }
-    }else{
+    if (!textured){
         //Fix Chrome warnings of no texture bound with an empty texture
         if (Engine::getPlatform() == S_WEB){
             GLES2Util::generateEmptyTexture();
         }
-        texture.setTextureRender(NULL);
     }
     
     return true;
@@ -75,10 +61,6 @@ void GLES2Submesh::destroy(){
 
     if (indicesSizes > 0)
         glDeleteBuffers(1, &indexBuffer);
-
-    if (textured){
-        texture.destroy();
-    }
     
     SubmeshRender::destroy();
 }

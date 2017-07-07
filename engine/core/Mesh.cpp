@@ -1,6 +1,5 @@
 #include "Mesh.h"
 #include "Scene.h"
-#include "render/TextureManager.h"
 #include "platform/Log.h"
 
 using namespace Supernova;

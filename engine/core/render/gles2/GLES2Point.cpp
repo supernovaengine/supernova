@@ -180,14 +180,12 @@ bool GLES2Point::load() {
     a_pointColor = glGetAttribLocation(glesProgram, "a_pointColor");
 
     if (textured){
-        texture = TextureManager::loadTexture(materialTexture);
         uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
     }else{
         if (Engine::getPlatform() == S_WEB){
             GLES2Util::generateEmptyTexture();
             uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
         }
-        texture.setTextureRender(NULL);
     }
     
     u_mvpMatrix = glGetUniformLocation(glesProgram, "u_mvpMatrix");
@@ -277,8 +275,8 @@ bool GLES2Point::draw() {
         
     if (textured){
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(((GLES2Texture*)(texture.getTextureRender().get()))->getTextureType(),
-                      ((GLES2Texture*)(texture.getTextureRender().get()))->getTexture());
+        glBindTexture(((GLES2Texture*)(texture->getTextureRender().get()))->getTextureType(),
+                      ((GLES2Texture*)(texture->getTextureRender().get()))->getTexture());
         glUniform1i(uTextureUnitLocation, 0);
     }else{
         if (Engine::getPlatform() == S_WEB){
@@ -315,10 +313,6 @@ void GLES2Point::destroy(){
         glDeleteBuffers(1, &pointSizeBuffer);
     if (pointColors)
         glDeleteBuffers(1, &pointColorBuffer);
-
-    if (textured){
-        texture.destroy();
-    }
 
     gProgram.destroy();
     

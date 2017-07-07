@@ -3,7 +3,6 @@
 #include "PrimitiveMode.h"
 #include "Scene.h"
 #include "Engine.h"
-#include "render/TextureManager.h"
 
 using namespace Supernova;
 
@@ -243,12 +242,11 @@ bool Points::load(){
 
     render->setPoints(this);
 
-    if ((material.getTextures().size() > 0) && (textureRects.size() > 0)){
-        Texture texture = TextureManager::loadTexture(material.getTextures()[0]);
-        
-        texWidth = texture.getWidth();
-        texHeight = texture.getHeight();
-        
+    if ((material.getTexture()) && (textureRects.size() > 0)){
+        material.getTexture()->load();
+        texWidth = material.getTexture()->getWidth();
+        texHeight = material.getTexture()->getHeight();
+
         normalizeTextureRects();
     }
     

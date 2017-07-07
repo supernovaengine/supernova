@@ -20,8 +20,6 @@ namespace Supernova {
         
     protected:
         
-        Texture texture;
-        
         //-------begin sybmesh properties-------
         unsigned int indicesSizes;
         bool textured;

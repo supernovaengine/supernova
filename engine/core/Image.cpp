@@ -3,7 +3,6 @@
 #include "PrimitiveMode.h"
 #include <string>
 #include "image/TextureLoader.h"
-#include "render/TextureManager.h"
 #include "platform/Log.h"
 
 using namespace Supernova;
@@ -77,10 +76,10 @@ void Image::createVertices(){
 }
 
 bool Image::load(){
-    if (submeshes[0]->getMaterial()->getTextures().size() > 0 && this->width == 0 && this->height == 0){
-        Texture texture = TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
-        this->width = texture.getWidth();
-        this->height = texture.getHeight();
+    if (submeshes[0]->getMaterial()->getTexture() && this->width == 0 && this->height == 0){
+        submeshes[0]->getMaterial()->getTexture()->load();
+        this->width = submeshes[0]->getMaterial()->getTexture()->getWidth();
+        this->height = submeshes[0]->getMaterial()->getTexture()->getHeight();
     }
     
     setInvertTexture(isIn3DScene());

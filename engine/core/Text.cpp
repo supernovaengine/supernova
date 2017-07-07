@@ -2,7 +2,6 @@
 
 #include "PrimitiveMode.h"
 #include <string>
-#include "render/TextureManager.h"
 #include "platform/Log.h"
 #include "STBText.h"
 
@@ -158,7 +157,7 @@ void Text::createText(){
 
 bool Text::load(){
 
-    stbtext->load(font.c_str(), fontSize);
+    stbtext->load(font.c_str(), fontSize, submeshes[0]->getMaterial()->getTexture());
     setInvertTexture(isIn3DScene());
     createText();
     

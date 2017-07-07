@@ -81,12 +81,14 @@ void MeshRender::checkSubmeshProperties(){
         if (submeshes->at(i)->getMaterial()->getTextureRect()){
             hasTextureRect = true;
         }
-        if (submeshes->at(i)->getMaterial()->getTextures().size() > 0){
+        if (submeshes->at(i)->getMaterial()->getTexture()){
             hasTexture = true;
-        }
-        if (submeshes->at(i)->getMaterial()->getTextureType() == S_TEXTURE_CUBE){
+            
+            if (submeshes->at(i)->getMaterial()->getTexture()->getType() == S_TEXTURE_CUBE){
             hasTextureCube = true;
+            }
         }
+        
     }
 }
 

@@ -7,18 +7,14 @@
 using namespace Supernova;
 
 TextureLoader::TextureLoader() {
-    rawImage = NULL;
-}
-
-TextureLoader::TextureLoader(std::string relative_path){
-    loadRawImage(relative_path);
 }
 
 TextureLoader::~TextureLoader() {
-    delete rawImage;
 }
 
-void TextureLoader::loadRawImage(std::string relative_path) {
+TextureData* TextureLoader::loadTextureData(std::string relative_path) {
+    
+    TextureData* rawImage;
     
     assert(relative_path != "");
     
@@ -46,6 +42,8 @@ void TextureLoader::loadRawImage(std::string relative_path) {
     
     delete filedata;
     delete imageReader;
+    
+    return rawImage;
 
 }
 
@@ -76,8 +74,4 @@ ImageReader* TextureLoader::getImageFormat(FileData* filedata){
     }
     
     return NULL;
-}
-
-TextureData* TextureLoader::getRawImage(){
-    return rawImage;
 }

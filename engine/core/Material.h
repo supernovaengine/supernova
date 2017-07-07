@@ -1,9 +1,8 @@
 #ifndef Material_h
 #define Material_h
 
-#define S_TEXTURE_2D 1
-#define S_TEXTURE_CUBE 2
 
+#include "Texture.h"
 #include <string>
 #include "math/Vector4.h"
 #include "math/Rect.h"
@@ -14,10 +13,9 @@ namespace Supernova {
     class Material {
     private:
         
-        std::vector<std::string> textures;
+        Texture* texture;
         Vector4 color;
         Rect* textureRect; //normalizaded
-        int textureType;
         
     public:
         Material();
@@ -28,15 +26,14 @@ namespace Supernova {
         
         Material& operator = (const Material& s);
         
-        void setTexture(std::string texture);
+        void setTexturePath(std::string texture_path);
         void setColor(Vector4 color);
-        void setTextureType(int textureType);
         void setTextureCube(std::string front, std::string back, std::string left, std::string right, std::string up, std::string down);
         void setTextureRect(float x, float y, float width, float height);
         
-        std::vector<std::string> getTextures();
+        std::string getTexturePath();
+        Texture* getTexture();
         Vector4* getColor();
-        int getTextureType();
         Rect* getTextureRect();
         
     };

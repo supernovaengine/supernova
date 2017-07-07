@@ -10,7 +10,6 @@
 #include "math/Matrix4.h"
 #include "math/Vector4.h"
 #include "math/Vector3.h"
-#include "render/TextureManager.h"
 #include "render/ProgramManager.h"
 #include "render/MeshRender.h"
 #include "render/SceneRender.h"

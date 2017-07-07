@@ -21,7 +21,7 @@ PointRender::PointRender(){
     pointSizes = NULL;
     pointColors = NULL;
     
-    materialTexture = "";
+    texture = NULL;
 
     minBufferSize = 0;
 
@@ -106,7 +106,13 @@ void PointRender::fillPointProperties(){
         modelViewProjectionMatrix = points->getModelViewProjectMatrix();
         cameraPosition = points->getCameraPosition();
         
-        materialTexture = points->getTexture();
+        texture = points->getMaterial()->getTexture();
+        
+        if (texture){
+            textured = true;
+        }else{
+            textured = false;
+        }
 
         minBufferSize = points->getMinBufferSize();
     }
@@ -126,10 +132,8 @@ bool PointRender::load(){
     
     numPoints = (int)positions->size();
     
-    if (materialTexture != ""){
-        textured = true;
-    }else{
-        textured = false;
+    if (textured){
+        texture->load();
     }
     
     return true;
@@ -145,5 +149,9 @@ bool PointRender::draw() {
 void PointRender::destroy(){
     
     fillPointProperties();
+    
+    if (textured){
+        texture->destroy();
+    }
     
 }

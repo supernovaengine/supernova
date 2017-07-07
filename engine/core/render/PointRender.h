@@ -31,7 +31,6 @@ namespace Supernova {
         Points* points;
         
         int numPoints;
-        Texture texture;
         bool textured;
 
         //-------begin points properties-------
@@ -48,7 +47,7 @@ namespace Supernova {
         Matrix4 modelViewProjectionMatrix;
         Vector3 cameraPosition;
         
-        std::string materialTexture;
+        Texture* texture;
 
         unsigned int minBufferSize;
         //------------end------------

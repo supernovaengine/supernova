@@ -7,6 +7,7 @@
 #include "math/Vector3.h"
 #include "stb_rect_pack.h"
 #include "stb_truetype.h"
+#include "Texture.h"
 
 namespace Supernova {
 
@@ -40,7 +41,7 @@ namespace Supernova {
         float getLineGap();
         int getLineHeight();
 
-        bool load(const char* font, unsigned int fontSize);
+        bool load(const char* font, unsigned int fontSize, Texture* texture);
         void createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords,
                         std::vector<unsigned int>* indices, int* width, int* height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert);
         

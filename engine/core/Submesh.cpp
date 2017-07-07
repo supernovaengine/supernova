@@ -1,5 +1,4 @@
 #include "Submesh.h"
-#include "render/TextureManager.h"
 
 using namespace Supernova;
 

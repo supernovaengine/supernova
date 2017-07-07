@@ -3,7 +3,6 @@
 #include "PrimitiveMode.h"
 #include <string>
 #include "image/TextureLoader.h"
-#include "render/TextureManager.h"
 #include "platform/Log.h"
 #include "image/ColorType.h"
 #include "FileData.h"
@@ -75,7 +74,7 @@ int STBText::getLineHeight(){
     return lineHeight;
 }
 
-bool STBText::load(const char* font, unsigned int fontSize){
+bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
 
     FileData* fontData = new FileData();
     fontData->open(font);
@@ -128,9 +127,10 @@ bool STBText::load(const char* font, unsigned int fontSize){
 
     unsigned int textureSize = atlasWidth * atlasHeight * sizeof(unsigned char);
     TextureData* textureData  = new TextureData(atlasWidth, atlasHeight, textureSize, S_COLOR_ALPHA, 8, (void*)atlasData);
-    TextureManager::loadTexture(textureData, font + std::to_string('-') + std::to_string(fontSize));
-
-    delete[] atlasData;
+    
+    texture->setId(font + std::to_string('-') + std::to_string(fontSize));
+    texture->setTextureData(textureData);
+    texture->load();
 
     delete fontData;
 

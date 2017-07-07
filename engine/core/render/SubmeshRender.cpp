@@ -33,7 +33,7 @@ void SubmeshRender::fillSubmeshProperties(){
     if (submesh){
         indicesSizes = (unsigned int)submesh->getIndices()->size();
         
-        if (submesh->getMaterial()->getTextures().size() > 0){
+        if (submesh->getMaterial()->getTexture()){
             textured = true;
         }else{
             textured = false;
@@ -56,6 +56,10 @@ bool SubmeshRender::load(){
     
     fillSubmeshProperties();
     
+    if (textured){
+        material->getTexture()->load();
+    }
+    
     return true;
 }
 
@@ -69,5 +73,9 @@ bool SubmeshRender::draw(){
 void SubmeshRender::destroy(){
     
     fillSubmeshProperties();
+    
+    if (textured){
+        material->getTexture()->destroy();
+    }
 
 }

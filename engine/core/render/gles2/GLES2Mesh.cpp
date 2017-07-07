@@ -245,8 +245,8 @@ bool GLES2Mesh::draw() {
         
         if (submeshRender->textured){
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(((GLES2Texture*)(submeshRender->texture.getTextureRender().get()))->getTextureType(),
-                          ((GLES2Texture*)(submeshRender->texture.getTextureRender().get()))->getTexture());
+            glBindTexture(((GLES2Texture*)(submeshRender->material->getTexture()->getTextureRender().get()))->getTextureType(),
+                          ((GLES2Texture*)(submeshRender->material->getTexture()->getTextureRender().get()))->getTexture());
             glUniform1i(uTextureUnitLocation, 0);
         }else{
             if (Engine::getPlatform() == S_WEB){

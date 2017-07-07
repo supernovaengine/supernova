@@ -1,20 +1,83 @@
 #include "Texture.h"
+#include "image/TextureLoader.h"
 
-#include "render/TextureManager.h"
 
 using namespace Supernova;
 
 Texture::Texture(){
-    colorFormat = false;
-    width = 0;
-    height = 0;
+    this->textureRender = NULL;
+    
+    this->texturesData.push_back(NULL);
+    this->type = S_TEXTURE_2D;
+    
+    this->id = "";
 }
 
-Texture::Texture(std::shared_ptr<TextureRender> textureRender, int colorFormat, int width, int height){
-    this->textureRender = textureRender;
-    this->colorFormat = colorFormat;
-    this->width = width;
-    this->height = height;
+Texture::Texture(std::string path_id): Texture(){
+    this->id = path_id;
+}
+
+Texture::Texture(TextureData* textureData, std::string id): Texture(){
+    this->texturesData.push_back(textureData);
+    this->id = id;
+}
+
+Texture::Texture(std::vector<TextureData*> texturesData, std::string id){
+    this->texturesData = texturesData;
+    this->id = id;
+}
+
+void Texture::setId(std::string path_id){
+    this->id = path_id;
+}
+
+void Texture::setTextureData(TextureData* textureData){
+    texturesData[0] = textureData;
+}
+
+void Texture::setType(int type){
+    this->type = type;
+}
+
+bool Texture::load(){
+
+    textureRender = TextureRender::instance(id);
+
+    if (!textureRender.get()->isLoaded()){
+
+        if (type == S_TEXTURE_2D){
+            
+            TextureLoader image;
+            if (texturesData[0] == NULL){
+                texturesData[0] = image.loadTextureData(id.c_str());
+            }
+            
+            texturesData[0]->resamplePowerOfTwo();
+            textureRender.get()->loadTexture(texturesData[0]);
+            
+            delete texturesData[0];
+            
+            return true;
+            
+        }else if (type == S_TEXTURE_CUBE){
+
+            for (int i = 0; i < texturesData.size(); i++){
+                texturesData[i]->resamplePowerOfTwo();
+            }
+            
+            textureRender.get()->loadTextureCube(texturesData);
+            
+            for (int i = 0; i < texturesData.size(); i++){
+                delete texturesData[i];
+            }
+            
+            return true;
+        }
+        
+    }
+    
+    return false;
+
 }
 
 Texture::~Texture(){
@@ -23,31 +86,26 @@ Texture::~Texture(){
 
 Texture::Texture(const Texture& t){
     this->textureRender = t.textureRender;
-    this->colorFormat = t.colorFormat;
-    this->width = t.width;
-    this->height = t.height;
+    this->texturesData = t.texturesData;
+    this->type = t.type;
+    this->id = t.id;
 }
 
 Texture& Texture::operator = (const Texture& t){
     this->textureRender = t.textureRender;
-    this->colorFormat = t.colorFormat;
-    this->width = t.width;
-    this->height = t.height;
+    this->texturesData = t.texturesData;
+    this->type = t.type;
+    this->id = t.id;
 
     return *this;
 }
 
-void Texture::setTextureRender(std::shared_ptr<TextureRender> textureRender){
-    this->textureRender = textureRender;
+std::string Texture::getId(){
+    return id;
 }
 
-void Texture::setColorFormat(int colorFormat){
-    this->colorFormat = colorFormat;
-}
-
-void Texture::setSize(int width, int height){
-    this->width = width;
-    this->height = height;
+int Texture::getType(){
+    return type;
 }
 
 std::shared_ptr<TextureRender> Texture::getTextureRender(){
@@ -55,10 +113,15 @@ std::shared_ptr<TextureRender> Texture::getTextureRender(){
 }
 
 int Texture::getColorFormat(){
-    return colorFormat;
+    if (textureRender)
+        return textureRender.get()->getColorFormat();
+    
+    return -1;
 }
 
 bool Texture::hasAlphaChannel(){
+    
+    int colorFormat = getColorFormat();
 
     if (colorFormat == S_COLOR_GRAY_ALPHA ||
         colorFormat == S_COLOR_RGB_ALPHA ||
@@ -69,14 +132,21 @@ bool Texture::hasAlphaChannel(){
 }
 
 int Texture::getWidth(){
-    return width;
+    if (textureRender)
+        return textureRender.get()->getWidth();
+    
+    return -1;
 }
 
 int Texture::getHeight(){
-    return height;
+    if (textureRender)
+        return textureRender.get()->getHeight();
+    
+    return -1;
 }
 
 void Texture::destroy(){
     textureRender.reset();
-    TextureManager::deleteUnused();
+    this->textureRender = NULL;
+    TextureRender::deleteUnused();
 }

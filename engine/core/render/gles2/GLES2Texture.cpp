@@ -33,6 +33,8 @@ void GLES2Texture::assignTexture(const GLenum target, const GLsizei width, const
 }
 
 void GLES2Texture::loadTexture(TextureData* texturedata) {
+    TextureRender::loadTexture(texturedata);
+    
     GLuint texture_object_id;
     
     glGenTextures(1, &texture_object_id);
@@ -55,6 +57,8 @@ void GLES2Texture::loadTexture(TextureData* texturedata) {
 }
 
 void GLES2Texture::loadTextureCube(std::vector<TextureData*> texturesdata){
+    TextureRender::loadTextureCube(texturesdata);
+    
     GLuint texture_object_id;
     
     glGenTextures(1, &texture_object_id);
@@ -83,7 +87,10 @@ void GLES2Texture::loadTextureCube(std::vector<TextureData*> texturesdata){
 }
 
 void GLES2Texture::deleteTexture(){
+    
     glDeleteTextures(1, &gTexture);
+    
+    TextureRender::deleteTexture();
 }
 
 GLuint GLES2Texture::getTexture(){

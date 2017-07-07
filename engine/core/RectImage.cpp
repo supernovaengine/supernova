@@ -1,7 +1,5 @@
 #include "RectImage.h"
 
-#include "render/TextureManager.h"
-
 
 using namespace Supernova;
 
@@ -56,10 +54,10 @@ void RectImage::normalizeTextureRect(){
 
 bool RectImage::load(){
     
-    if (material.getTextures().size() > 0) {
-        Texture texture = TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
-        texWidth = texture.getWidth();
-        texHeight = texture.getHeight();
+    if (submeshes[0]->getMaterial()->getTexture()) {
+        submeshes[0]->getMaterial()->getTexture()->load();
+        texWidth = submeshes[0]->getMaterial()->getTexture()->getWidth();
+        texHeight = submeshes[0]->getMaterial()->getTexture()->getHeight();
 
         normalizeTextureRect();
 

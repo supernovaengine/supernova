@@ -3,7 +3,6 @@
 #include "PrimitiveMode.h"
 #include <string>
 #include "image/TextureLoader.h"
-#include "render/TextureManager.h"
 
 using namespace Supernova;
 
@@ -137,10 +136,10 @@ void GUIImage::createVertices(){
 
 bool GUIImage::load(){
     
-    if (submeshes[0]->getMaterial()->getTextures().size() > 0){
-        Texture texture = TextureManager::loadTexture(submeshes[0]->getMaterial()->getTextures()[0]);
-        texWidth = texture.getWidth();
-        texHeight = texture.getHeight();
+    if (submeshes[0]->getMaterial()->getTexture()){
+        submeshes[0]->getMaterial()->getTexture()->load();
+        texWidth = submeshes[0]->getMaterial()->getTexture()->getWidth();
+        texHeight = submeshes[0]->getMaterial()->getTexture()->getHeight();
     }
     if (this->width == 0 && this->height == 0){
         this->width = texWidth;
