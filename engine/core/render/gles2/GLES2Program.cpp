@@ -55,6 +55,7 @@ GLuint GLES2Program::loadShader(GLenum shaderType, const char* pSource) {
 }
 
 void GLES2Program::createProgram(std::string shaderName, std::string definitions) {
+    ProgramRender::createProgram(shaderName, definitions);
     
     std::string pVertexSource = definitions + getVertexShader(shaderName);
     std::string pFragmentSource = definitions + getFragmentShader(shaderName);
@@ -99,6 +100,7 @@ void GLES2Program::createProgram(std::string shaderName, std::string definitions
 
 void GLES2Program::deleteProgram(){
     glDeleteProgram(program);
+    ProgramRender::deleteProgram();
 }
 
 

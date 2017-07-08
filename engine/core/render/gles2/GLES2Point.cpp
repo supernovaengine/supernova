@@ -146,7 +146,10 @@ bool GLES2Point::load() {
         programDefs += "#define HAS_TEXTURERECT\n";
     }
     
-    gProgram = ProgramManager::useProgram(programName, programDefs);
+    gProgram.setShader(programName);
+    gProgram.setDefinitions(programDefs);
+    gProgram.load();
+    
     GLuint glesProgram = ((GLES2Program*)gProgram.getProgramRender().get())->getProgram();
 
     light.setProgram((GLES2Program*)gProgram.getProgramRender().get());

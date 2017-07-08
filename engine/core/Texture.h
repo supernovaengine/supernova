@@ -38,6 +38,7 @@ namespace Supernova{
         std::string getId();
         int getType();
         std::shared_ptr<TextureRender> getTextureRender();
+        
         int getColorFormat();
         bool hasAlphaChannel();
         int getWidth();

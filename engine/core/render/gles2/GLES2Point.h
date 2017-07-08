@@ -9,7 +9,7 @@
 #include "math/Matrix4.h"
 #include "math/Vector4.h"
 #include "math/Vector3.h"
-#include "render/ProgramManager.h"
+#include "Program.h"
 #include "render/PointRender.h"
 #include "render/SceneRender.h"
 #include "GLES2Light.h"

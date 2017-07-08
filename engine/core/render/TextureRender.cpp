@@ -20,7 +20,7 @@ TextureRender::~TextureRender(){
     
 }
 
-std::shared_ptr<TextureRender> TextureRender::instance(std::string id){
+std::shared_ptr<TextureRender> TextureRender::sharedInstance(std::string id){
     
     if (texturesRender.count(id) > 0){
         return texturesRender[id];

@@ -3,7 +3,6 @@
 
 #include "GLES2Header.h"
 #include "GLES2Util.h"
-#include "render/ProgramManager.h"
 #include "math/Angle.h"
 #include "Engine.h"
 

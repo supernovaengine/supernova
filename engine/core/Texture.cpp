@@ -41,7 +41,7 @@ void Texture::setType(int type){
 
 bool Texture::load(){
 
-    textureRender = TextureRender::instance(id);
+    textureRender = TextureRender::sharedInstance(id);
 
     if (!textureRender.get()->isLoaded()){
 

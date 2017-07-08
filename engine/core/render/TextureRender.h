@@ -32,7 +32,7 @@ namespace Supernova {
         
         virtual ~TextureRender();
         
-        static std::shared_ptr<TextureRender> instance(std::string id);
+        static std::shared_ptr<TextureRender> sharedInstance(std::string id);
         static void deleteUnused();
         
         bool isLoaded();
