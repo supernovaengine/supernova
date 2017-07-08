@@ -11,6 +11,8 @@ Texture::Texture(){
     this->type = S_TEXTURE_2D;
     
     this->id = "";
+    
+    this->dataOwned = false;
 }
 
 Texture::Texture(std::string path_id): Texture(){
@@ -39,6 +41,10 @@ void Texture::setType(int type){
     this->type = type;
 }
 
+void Texture::setDataOwned(bool dataOwned){
+    this->dataOwned = dataOwned;
+}
+
 bool Texture::load(){
 
     textureRender = TextureRender::sharedInstance(id);
@@ -50,14 +56,12 @@ bool Texture::load(){
             TextureLoader image;
             if (texturesData[0] == NULL){
                 texturesData[0] = image.loadTextureData(id.c_str());
+                dataOwned = true;
             }
             
             texturesData[0]->resamplePowerOfTwo();
             textureRender.get()->loadTexture(texturesData[0]);
             
-            delete texturesData[0];
-            
-            return true;
             
         }else if (type == S_TEXTURE_CUBE){
 
@@ -66,13 +70,18 @@ bool Texture::load(){
             }
             
             textureRender.get()->loadTextureCube(texturesData);
-            
+
+        }
+        
+        if (dataOwned){
             for (int i = 0; i < texturesData.size(); i++){
                 delete texturesData[i];
             }
-            
-            return true;
+            this->texturesData.clear();
+            this->texturesData.push_back(NULL);
         }
+        
+        return true;
         
     }
     
@@ -89,6 +98,7 @@ Texture::Texture(const Texture& t){
     this->texturesData = t.texturesData;
     this->type = t.type;
     this->id = t.id;
+    this->dataOwned = t.dataOwned;
 }
 
 Texture& Texture::operator = (const Texture& t){
@@ -96,6 +106,7 @@ Texture& Texture::operator = (const Texture& t){
     this->texturesData = t.texturesData;
     this->type = t.type;
     this->id = t.id;
+    this->dataOwned = t.dataOwned;
 
     return *this;
 }
@@ -106,6 +117,10 @@ std::string Texture::getId(){
 
 int Texture::getType(){
     return type;
+}
+
+bool Texture::getDataOwned(){
+    return dataOwned;
 }
 
 std::shared_ptr<TextureRender> Texture::getTextureRender(){

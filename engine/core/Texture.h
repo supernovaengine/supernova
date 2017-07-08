@@ -20,6 +20,8 @@ namespace Supernova{
         std::string id;
         std::vector<TextureData*> texturesData;
         
+        bool dataOwned;
+        
     public:
         Texture();
         Texture(std::string path_id);
@@ -34,10 +36,12 @@ namespace Supernova{
         void setId(std::string path_id);
         void setTextureData(TextureData* textureData);
         void setType(int type);
+        void setDataOwned(bool dataOwned);
 
         std::string getId();
         int getType();
         std::shared_ptr<TextureRender> getTextureRender();
+        bool getDataOwned();
         
         int getColorFormat();
         bool hasAlphaChannel();

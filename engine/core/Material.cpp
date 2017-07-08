@@ -35,7 +35,11 @@ Material& Material::operator = (const Material& s){
 }
 
 void Material::setTexturePath(std::string texture_path){
+    if (this->texture)
+        delete this->texture;
+    
     this->texture = new Texture(texture_path);
+    this->texture->setDataOwned(true);
 }
 
 void Material::setColor(Vector4 color){
@@ -67,8 +71,12 @@ void Material::setTextureCube(std::string front, std::string back, std::string l
         id = id + "|" + textures[i];
     }
     
+    if (this->texture)
+        delete this->texture;
+    
     this->texture = new Texture(texturesData, id);
     this->texture->setType(S_TEXTURE_CUBE);
+    this->texture->setDataOwned(true);
 }
 
 void Material::setTextureRect(float x, float y, float width, float height){

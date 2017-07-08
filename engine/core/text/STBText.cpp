@@ -130,6 +130,7 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
     
     texture->setId(font + std::to_string('-') + std::to_string(fontSize));
     texture->setTextureData(textureData);
+    texture->setDataOwned(true);
     texture->load();
 
     delete fontData;

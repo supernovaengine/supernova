@@ -26,9 +26,6 @@ namespace Supernova{
         bool load();
         void destroy();
         
-        
-        
-        Program(std::shared_ptr<ProgramRender> programRender);
         Program(const Program& p);
         virtual ~Program();
 
