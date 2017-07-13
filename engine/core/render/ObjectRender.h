@@ -13,24 +13,20 @@
 namespace Supernova {
     class ObjectRender {
 
-        struct vertexProperty{
-            unsigned long size;
-            void* data;
-        };
-
-    private:
-
-        std::unordered_map<int, vertexProperty> vertexProperties;
-
     protected:
+        
+        unsigned int minBufferSize;
+        
         ObjectRender();
 
     public:
         virtual ~ObjectRender();
+        
+        void setVertexSize(unsigned int vertexSize);
+        void setMinBufferSize(unsigned int minBufferSize);
 
-        void useVertexProperty(int type, unsigned long size, void* data);
-
-        virtual void updateVertexProperty(int type, unsigned long size);
+        virtual void loadVertexProperty(int type, unsigned int count, unsigned long size, void* data);
+        virtual void loadIndex(int type, unsigned long size, void* data);
 
         virtual bool load();
         virtual bool draw();
