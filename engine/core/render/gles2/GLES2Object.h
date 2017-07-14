@@ -9,7 +9,7 @@
 namespace Supernova {
     class GLES2Object: public ObjectRender{
         
-        struct bufferProperty{
+        struct bufferData{
             GLuint buffer;
             GLuint size;
         };
@@ -17,14 +17,19 @@ namespace Supernova {
     private:
         
         GLenum usageBuffer;
-        std::unordered_map<int, bufferProperty> bufferProperties;
+        
+        std::unordered_map<int, bufferData> vertexAttributes;
+        bufferData indexAttribute;
+        std::unordered_map<int, GLuint> properties;
 
     public:
         GLES2Object();
         virtual ~GLES2Object();
 
-        virtual void loadVertexProperty(int type, unsigned int count, unsigned long size, void* data);
-        virtual void loadIndex(int type, unsigned long size, void* data);
+        virtual void loadVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);
+        virtual void loadIndex(unsigned long size, void* data);
+        
+        virtual void setProperty(int type, int datatype, unsigned long size, void* data);
 
         virtual bool load();
         virtual bool draw();

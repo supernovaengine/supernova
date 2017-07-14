@@ -16,11 +16,15 @@ void ObjectRender::setMinBufferSize(unsigned int minBufferSize){
     this->minBufferSize = minBufferSize;
 }
 
-void ObjectRender::loadVertexProperty(int type, unsigned int count, unsigned long size, void* data){
+void ObjectRender::loadVertexAttribute(int type, unsigned int elements, unsigned long size, void* data){
     
 }
 
-void ObjectRender::loadIndex(int type, unsigned long size, void* data){
+void ObjectRender::loadIndex(unsigned long size, void* data){
+    
+}
+
+void ObjectRender::setProperty(int type, int datatype, unsigned long size, void* data){
     
 }
 
