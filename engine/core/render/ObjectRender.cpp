@@ -5,6 +5,7 @@ using namespace Supernova;
 
 ObjectRender::ObjectRender(){
     minBufferSize = 0;
+    indexAttribute.data = NULL;
 }
 
 
@@ -16,16 +17,16 @@ void ObjectRender::setMinBufferSize(unsigned int minBufferSize){
     this->minBufferSize = minBufferSize;
 }
 
-void ObjectRender::loadVertexAttribute(int type, unsigned int elements, unsigned long size, void* data){
-    
+void ObjectRender::addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data){
+    vertexAttributes[type] = { elements, size, data };
 }
 
-void ObjectRender::loadIndex(unsigned long size, void* data){
-    
+void ObjectRender::addIndex(unsigned long size, void* data){
+    indexAttribute = { 1, size, data };
 }
 
-void ObjectRender::setProperty(int type, int datatype, unsigned long size, void* data){
-    
+void ObjectRender::addProperty(int type, int datatype, unsigned long size, void* data){
+    properties[type] = { datatype, size, data };
 }
 
 bool ObjectRender::load(){

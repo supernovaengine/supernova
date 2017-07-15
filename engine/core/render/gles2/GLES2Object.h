@@ -12,24 +12,27 @@ namespace Supernova {
         struct bufferData{
             GLuint buffer;
             GLuint size;
+            GLint handle;
         };
         
     private:
         
         GLenum usageBuffer;
         
-        std::unordered_map<int, bufferData> vertexAttributes;
-        bufferData indexAttribute;
-        std::unordered_map<int, GLuint> properties;
+        std::unordered_map<int, bufferData> attributeBuffers;
+        bufferData indexBuffer;
+        std::unordered_map<int, GLuint> propertyBuffers;
+        
+    protected:
+        
+        void loadVertexAttribute(int type, attributeData att);
+        void loadIndex(attributeData att);
+        
+        void useProperty(int type, propertyData prop);
 
     public:
         GLES2Object();
         virtual ~GLES2Object();
-
-        virtual void loadVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);
-        virtual void loadIndex(unsigned long size, void* data);
-        
-        virtual void setProperty(int type, int datatype, unsigned long size, void* data);
 
         virtual bool load();
         virtual bool draw();

@@ -25,11 +25,30 @@
 #define S_PROPERTYDATA_MATRIX4 11
 
 #include <unordered_map>
+#include "Program.h"
 
 namespace Supernova {
     class ObjectRender {
-
+    
     protected:
+        
+        struct attributeData{
+            unsigned int elements;
+            unsigned long size;
+            void* data;
+        };
+        
+        struct propertyData{
+            int datatype;
+            unsigned long size;
+            void* data;
+        };
+        
+        std::unordered_map<int, attributeData> vertexAttributes;
+        attributeData indexAttribute;
+        std::unordered_map<int, propertyData> properties;
+        
+        Program program;
         
         unsigned int minBufferSize;
         
@@ -41,10 +60,9 @@ namespace Supernova {
         void setVertexSize(unsigned int vertexSize);
         void setMinBufferSize(unsigned int minBufferSize);
 
-        virtual void loadVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);
-        virtual void loadIndex(unsigned long size, void* data);
-        
-        virtual void setProperty(int type, int datatype, unsigned long size, void* data);
+        void addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);
+        void addIndex(unsigned long size, void* data);
+        void addProperty(int type, int datatype, unsigned long size, void* data);
 
         virtual bool load();
         virtual bool draw();
