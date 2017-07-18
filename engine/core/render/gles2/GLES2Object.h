@@ -2,6 +2,8 @@
 #define GLES2OBJECT_H
 
 #include "render/ObjectRender.h"
+#include "GLES2Light.h"
+#include "GLES2Fog.h"
 
 #include "GLES2Header.h"
 #include <unordered_map>
@@ -9,7 +11,7 @@
 namespace Supernova {
     class GLES2Object: public ObjectRender{
         
-        struct bufferData{
+        struct attributeGlData{
             GLuint buffer;
             GLuint size;
             GLint handle;
@@ -19,9 +21,14 @@ namespace Supernova {
         
         GLenum usageBuffer;
         
-        std::unordered_map<int, bufferData> attributeBuffers;
-        bufferData indexBuffer;
-        std::unordered_map<int, GLuint> propertyBuffers;
+        GLES2Light light;
+        GLES2Fog fog;
+        
+        GLuint useTexture;
+        
+        std::unordered_map<int, attributeGlData> attributeBuffers;
+        attributeGlData indexBuffer;
+        std::unordered_map<int, GLuint> propertyHandle;
         
     protected:
         

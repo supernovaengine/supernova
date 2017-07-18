@@ -6,6 +6,13 @@ using namespace Supernova;
 ObjectRender::ObjectRender(){
     minBufferSize = 0;
     indexAttribute.data = NULL;
+    
+    lighting = false;
+    hasfog = false;
+    
+    sceneRender = NULL;
+    texture = NULL;
+    program = NULL;
 }
 
 
@@ -29,7 +36,25 @@ void ObjectRender::addProperty(int type, int datatype, unsigned long size, void*
     properties[type] = { datatype, size, data };
 }
 
+void ObjectRender::checkLighting(){
+    lighting = false;
+    if (sceneRender != NULL){
+        lighting = sceneRender->lighting;
+    }
+}
+
+void ObjectRender::checkFog(){
+    hasfog = false;
+    if ((sceneRender != NULL) && (sceneRender->getFog() != NULL)){
+        hasfog = true;
+    }
+}
+
 bool ObjectRender::load(){
+    
+    checkLighting();
+    checkFog();
+    
     return true;
 }
 

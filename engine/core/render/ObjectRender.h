@@ -26,9 +26,16 @@
 
 #include <unordered_map>
 #include "Program.h"
+#include "SceneRender.h"
+#include "Texture.h"
 
 namespace Supernova {
     class ObjectRender {
+        
+    private:
+        
+        void checkLighting();
+        void checkFog();
     
     protected:
         
@@ -48,7 +55,12 @@ namespace Supernova {
         attributeData indexAttribute;
         std::unordered_map<int, propertyData> properties;
         
-        Program program;
+        bool lighting;
+        bool hasfog;
+        
+        SceneRender* sceneRender;
+        Texture* texture;
+        Program* program;
         
         unsigned int minBufferSize;
         
