@@ -7,10 +7,10 @@
 #define S_VERTEXATTRIBUTE_POINTCOLORS 11
 #define S_VERTEXATTRIBUTE_TEXTURERECTS 12
 
-#define S_PROPERTY_MVP_MATRIX 1
-#define S_PROPERTY_M_MATRIX 2
-#define S_PROPERTY_N_MATRIX 3
-#define S_PROPERTY_EYEPOS 4
+#define S_PROPERTY_MVPMATRIX 1
+#define S_PROPERTY_MODELMATRIX 2
+#define S_PROPERTY_NORMALMATRIX 3
+#define S_PROPERTY_CAMERAPOS 4
 
 #define S_PROPERTYDATA_FLOAT1 1
 #define S_PROPERTYDATA_FLOAT2 2
@@ -67,9 +67,11 @@ namespace Supernova {
         ObjectRender();
 
     public:
+        static ObjectRender* newInstance();
+        
         virtual ~ObjectRender();
         
-        void setVertexSize(unsigned int vertexSize);
+        void setTexture(Texture* texture);
         void setMinBufferSize(unsigned int minBufferSize);
 
         void addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);

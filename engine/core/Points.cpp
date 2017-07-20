@@ -70,8 +70,8 @@ void Points::setPointSize(int point, float size){
 
 void Points::setPointColor(int point, Vector4 color){
     colors[point] = color;
-    if (loaded)
-        render->updatePointColors();
+    //if (loaded)
+        //render->updatePointColors();
 }
 
 void Points::setPointColor(int point, float red, float green, float blue, float alpha){
@@ -91,8 +91,8 @@ void Points::setPointSprite(int point, std::string id){
     }else{
         useTextureRects = true;
         normalizeTextureRects();
-        if (loaded)
-            render->updateTextureRects();
+        //if (loaded)
+            //render->updateTextureRects();
     }
 }
 
@@ -127,8 +127,8 @@ void Points::fillScaledSizeVector(){
         pointSizesScaled.push_back(pointSizeScaledVal);
     }
 
-    if (loaded)
-        render->updatePointSizes();
+    //if (loaded)
+        //render->updatePointSizes();
 }
 
 void Points::normalizeTextureRects(){
@@ -238,9 +238,21 @@ bool Points::load(){
 
     fillScaledSizeVector();
 
-    PointRender::newInstance(&render);
-
-    render->setPoints(this);
+    if (render == NULL)
+        render = ObjectRender::newInstance();
+    
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, positions.size(), &positions);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1, pointSizes.size(), &pointSizes);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4, colors.size(), &colors);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4, textureRects.size(), &textureRects);
+    
+    render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
+    render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
+    render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
+    
+    render->setTexture(material.getTexture());
 
     if ((material.getTexture()) && (textureRects.size() > 0)){
         material.getTexture()->load();

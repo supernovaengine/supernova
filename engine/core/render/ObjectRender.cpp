@@ -1,5 +1,8 @@
 #include "ObjectRender.h"
 
+#include "Engine.h"
+#include "gles2/GLES2Object.h"
+
 using namespace Supernova;
 
 
@@ -15,9 +18,20 @@ ObjectRender::ObjectRender(){
     program = NULL;
 }
 
+ObjectRender* ObjectRender::newInstance(){
+    if (Engine::getRenderAPI() == S_GLES2){
+        return new GLES2Object();
+    }
+    
+    return NULL;
+}
 
 ObjectRender::~ObjectRender(){
 
+}
+
+void ObjectRender::setTexture(Texture* texture){
+    this->texture = texture;
 }
 
 void ObjectRender::setMinBufferSize(unsigned int minBufferSize){
@@ -51,9 +65,14 @@ void ObjectRender::checkFog(){
 }
 
 bool ObjectRender::load(){
-    
     checkLighting();
     checkFog();
+    
+    if (!program)
+        program = new Program();
+    
+    if (texture)
+        texture->load();
     
     return true;
 }
@@ -63,5 +82,6 @@ bool ObjectRender::draw(){
 }
 
 void ObjectRender::destroy(){
-
+    if (texture)
+        texture->destroy();
 }

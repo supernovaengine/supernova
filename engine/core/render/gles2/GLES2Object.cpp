@@ -1,7 +1,11 @@
 #include "GLES2Object.h"
 #include "GLES2Util.h"
 #include "GLES2Program.h"
+#include "GLES2Texture.h"
 #include "Engine.h"
+
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#define BUFFER_OFFSET(i) ((void*)(i))
 
 using namespace Supernova;
 
@@ -90,9 +94,9 @@ bool GLES2Object::load(){
     if (hasfog){
         programDefs += "#define HAS_FOG\n";
     }
-    //if (hasTextureRect){
-    //    programDefs += "#define HAS_TEXTURERECT\n";
-    //}
+    if (vertexAttributes.count(S_VERTEXATTRIBUTE_TEXTURERECTS)){
+        programDefs += "#define HAS_TEXTURERECT\n";
+    }
     
     program->setShader(programName);
     program->setDefinitions(programDefs);
@@ -127,6 +131,8 @@ bool GLES2Object::load(){
         attributeBuffers[type].handle = glGetAttribLocation(glesProgram, attribName.c_str());
     }
     
+    //TODO: load index
+    
     if (!texture){
         if (Engine::getPlatform() == S_WEB){
             GLES2Util::generateEmptyTexture();
@@ -139,13 +145,13 @@ bool GLES2Object::load(){
         
         std::string propertyName;
         
-        if (type == S_PROPERTY_MVP_MATRIX){
+        if (type == S_PROPERTY_MVPMATRIX){
             propertyName = "u_mvpMatrix";
-        }else if (type == S_PROPERTY_M_MATRIX){
+        }else if (type == S_PROPERTY_MODELMATRIX){
             propertyName = "u_mMatrix";
-        }else if (type == S_PROPERTY_N_MATRIX){
+        }else if (type == S_PROPERTY_NORMALMATRIX){
             propertyName = "u_nMatrix";
-        }else if (type == S_PROPERTY_EYEPOS){
+        }else if (type == S_PROPERTY_CAMERAPOS){
             propertyName = "u_EyePos";
         }
         
@@ -159,6 +165,8 @@ bool GLES2Object::load(){
     if (hasfog){
         fog.getUniformLocations();
     }
+    
+    GLES2Util::checkGlError("Error on load GLES2");
 
     return true;
 }
@@ -167,6 +175,64 @@ bool GLES2Object::draw(){
     if (!ObjectRender::draw()){
         return false;
     }
+    
+    GLuint glesProgram = ((GLES2Program*)program->getProgramRender().get())->getProgram();
+    
+    glUseProgram(glesProgram);
+    GLES2Util::checkGlError("glUseProgram");
+    
+    for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
+    {
+        useProperty(it->first, it->second);
+    }
+    
+    if (lighting){
+        light.setUniformValues(sceneRender);
+    }
+    
+    if (hasfog){
+        fog.setUniformValues(sceneRender);
+    }
+    
+    int attributePos = 0;
+    
+    for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
+    {
+        attributeGlData att = attributeBuffers[it->first];
+        
+        glEnableVertexAttribArray(attributePos);
+        glBindBuffer(GL_ARRAY_BUFFER, att.buffer);
+        if (att.handle == -1) att.handle = attributePos;
+        glVertexAttribPointer(att.handle, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+    
+        attributePos++;
+    }
+    
+    glUniform1i(useTexture, (texture?true:false));
+    
+    if (texture){
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(((GLES2Texture*)(texture->getTextureRender().get()))->getTextureType(),
+                      ((GLES2Texture*)(texture->getTextureRender().get()))->getTexture());
+    }else{
+        if (Engine::getPlatform() == S_WEB){
+            //Fix Chrome warnings of no texture bound
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
+        }
+    }
+    
+    //LEMBRAR: alterar unitlocation no shader
+    
+    glDrawArrays(GL_POINTS, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
+    
+    for (int i = 0; i <= (attributePos-1); i++)
+        glDisableVertexAttribArray(i);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    
+    GLES2Util::checkGlError("Error on draw GLES2");
 
     return true;
 }
