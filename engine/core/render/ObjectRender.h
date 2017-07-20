@@ -72,6 +72,7 @@ namespace Supernova {
         virtual ~ObjectRender();
         
         void setTexture(Texture* texture);
+        void setSceneRender(SceneRender* sceneRender);
         void setMinBufferSize(unsigned int minBufferSize);
 
         void addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);

@@ -25,6 +25,7 @@ namespace Supernova {
         GLES2Fog fog;
         
         GLuint useTexture;
+        GLuint uTextureUnitLocation;
         
         std::unordered_map<int, attributeGlData> attributeBuffers;
         attributeGlData indexBuffer;

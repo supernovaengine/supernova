@@ -245,7 +245,7 @@ bool Points::load(){
     render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals);
     render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1, pointSizes.size(), &pointSizes);
     render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4, colors.size(), &colors);
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4, textureRects.size(), &textureRects);
+    //render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4, textureRects.size(), &textureRects);
     
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
@@ -253,6 +253,8 @@ bool Points::load(){
     render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
     
     render->setTexture(material.getTexture());
+    if (scene)
+        render->setSceneRender(scene->getSceneRender());
 
     if ((material.getTexture()) && (textureRects.size() > 0)){
         material.getTexture()->load();

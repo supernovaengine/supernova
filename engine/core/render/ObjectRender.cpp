@@ -34,6 +34,10 @@ void ObjectRender::setTexture(Texture* texture){
     this->texture = texture;
 }
 
+void ObjectRender::setSceneRender(SceneRender* sceneRender){
+    this->sceneRender = sceneRender;
+}
+
 void ObjectRender::setMinBufferSize(unsigned int minBufferSize){
     this->minBufferSize = minBufferSize;
 }

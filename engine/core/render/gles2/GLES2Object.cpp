@@ -33,6 +33,8 @@ void GLES2Object::loadVertexAttribute(int type, attributeData att){
         vp.size = std::max((unsigned int)att.size, minBufferSize);
         GLES2Util::dataVBO(vp.buffer, GL_ARRAY_BUFFER, vp.size * att.elements * sizeof(GLfloat), att.data, usageBuffer);
     }
+
+    attributeBuffers[type] = vp;
 }
 
 void GLES2Object::loadIndex(attributeData att){
@@ -47,8 +49,9 @@ void GLES2Object::loadIndex(attributeData att){
     }else{
         ib.size = std::max((unsigned int)att.size, minBufferSize);
         GLES2Util::dataVBO(ib.buffer, GL_ELEMENT_ARRAY_BUFFER, ib.size * sizeof(unsigned int), att.data, usageBuffer);
-        
     }
+
+    indexBuffer = ib;
 }
 
 void GLES2Object::useProperty(int type, propertyData prop){
@@ -78,6 +81,8 @@ void GLES2Object::useProperty(int type, propertyData prop){
     }else if (prop.datatype == S_PROPERTYDATA_MATRIX4){
         glUniformMatrix4fv(pb, (GLsizei)prop.size, GL_FALSE, (GLfloat*)prop.data);
     }
+
+    propertyHandle[type] = pb;
     
 }
 
@@ -133,9 +138,12 @@ bool GLES2Object::load(){
     
     //TODO: load index
     
-    if (!texture){
+    if (texture) {
+        uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
+    }else{
         if (Engine::getPlatform() == S_WEB){
             GLES2Util::generateEmptyTexture();
+            uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
         }
     }
     
@@ -203,22 +211,28 @@ bool GLES2Object::draw(){
         glEnableVertexAttribArray(attributePos);
         glBindBuffer(GL_ARRAY_BUFFER, att.buffer);
         if (att.handle == -1) att.handle = attributePos;
-        glVertexAttribPointer(att.handle, 3, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+        glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+
+        attributeBuffers[it->first] = att;
     
         attributePos++;
     }
+
+    bool isUsedTexture = (texture?true:false);
     
-    glUniform1i(useTexture, (texture?true:false));
+    glUniform1i(useTexture, isUsedTexture);
     
     if (texture){
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(((GLES2Texture*)(texture->getTextureRender().get()))->getTextureType(),
                       ((GLES2Texture*)(texture->getTextureRender().get()))->getTexture());
+        glUniform1i(uTextureUnitLocation, 0);
     }else{
         if (Engine::getPlatform() == S_WEB){
             //Fix Chrome warnings of no texture bound
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
+            glUniform1i(uTextureUnitLocation, 0);
         }
     }
     
