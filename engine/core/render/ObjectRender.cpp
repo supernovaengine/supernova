@@ -10,7 +10,7 @@ ObjectRender::ObjectRender(){
     minBufferSize = 0;
     indexAttribute.data = NULL;
     
-    lighting = false;
+    haslight = false;
     hasfog = false;
     
     sceneRender = NULL;
@@ -43,21 +43,24 @@ void ObjectRender::setMinBufferSize(unsigned int minBufferSize){
 }
 
 void ObjectRender::addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data){
-    vertexAttributes[type] = { elements, size, data };
+    if (data)
+        vertexAttributes[type] = { elements, size, data };
 }
 
 void ObjectRender::addIndex(unsigned long size, void* data){
-    indexAttribute = { 1, size, data };
+    if (data)
+        indexAttribute = { 1, size, data };
 }
 
 void ObjectRender::addProperty(int type, int datatype, unsigned long size, void* data){
-    properties[type] = { datatype, size, data };
+    if (data)
+        properties[type] = { datatype, size, data };
 }
 
 void ObjectRender::checkLighting(){
-    lighting = false;
+    haslight = false;
     if (sceneRender != NULL){
-        lighting = sceneRender->lighting;
+        haslight = sceneRender->lighting;
     }
 }
 

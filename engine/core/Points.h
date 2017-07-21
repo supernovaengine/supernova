@@ -15,11 +15,13 @@ namespace Supernova {
     class Points: public ConcreteObject {
 
     private:
+        void updateNormalizedRectsData();
         void updatePointScale();
         void fillScaledSizeVector();
         void normalizeTextureRects();
         
         std::vector<float> pointSizesScaled;
+        std::vector<float> rectsData;
         
         int texWidth;
         int texHeight;

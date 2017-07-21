@@ -55,7 +55,7 @@ namespace Supernova {
         attributeData indexAttribute;
         std::unordered_map<int, propertyData> properties;
         
-        bool lighting;
+        bool haslight;
         bool hasfog;
         
         SceneRender* sceneRender;

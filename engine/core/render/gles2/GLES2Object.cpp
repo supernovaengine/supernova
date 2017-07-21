@@ -12,7 +12,7 @@ using namespace Supernova;
 
 GLES2Object::GLES2Object(){
 
-    usageBuffer = GL_STATIC_DRAW;
+    usageBuffer = GL_DYNAMIC_DRAW;
     
 }
 
@@ -93,7 +93,7 @@ bool GLES2Object::load(){
     
     std::string programName = "points_perfragment";
     std::string programDefs = "";
-    if (lighting){
+    if (haslight){
         programDefs += "#define USE_LIGHTING\n";
     }
     if (hasfog){
@@ -125,7 +125,7 @@ bool GLES2Object::load(){
         }else if (type == S_VERTEXATTRIBUTE_NORMALS){
             attribName = "a_Normal";
         }else if (type == S_VERTEXATTRIBUTE_POINTSIZES){
-            attribName = "a_PointSize";
+            attribName = "a_pointSize";
         }else if (type == S_VERTEXATTRIBUTE_POINTCOLORS){
             attribName = "a_pointColor";
         }else if (type == S_VERTEXATTRIBUTE_TEXTURERECTS){
@@ -166,7 +166,7 @@ bool GLES2Object::load(){
         propertyHandle[type] = glGetUniformLocation(glesProgram, propertyName.c_str());
     }
     
-    if (lighting){
+    if (haslight){
         light.getUniformLocations();
     }
     
@@ -194,7 +194,7 @@ bool GLES2Object::draw(){
         useProperty(it->first, it->second);
     }
     
-    if (lighting){
+    if (haslight){
         light.setUniformValues(sceneRender);
     }
     
@@ -235,8 +235,6 @@ bool GLES2Object::draw(){
             glUniform1i(uTextureUnitLocation, 0);
         }
     }
-    
-    //LEMBRAR: alterar unitlocation no shader
     
     glDrawArrays(GL_POINTS, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
     

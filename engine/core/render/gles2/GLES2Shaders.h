@@ -143,7 +143,7 @@ std::string gVertexPointsPerPixelLightShader =
 "  varying vec4 v_textureRect;\n"
 "#endif\n"
 
-"attribute float a_PointSize;\n"
+"attribute float a_pointSize;\n"
 "attribute vec4 a_pointColor;\n"
 "varying vec4 v_pointColor;\n"
 
@@ -154,7 +154,7 @@ std::string gVertexPointsPerPixelLightShader =
 "    vec4 position = u_mvpMatrix * a_Position;\n"
 
 "    v_pointColor = a_pointColor;\n"
-"    gl_PointSize = a_PointSize;\n"
+"    gl_PointSize = a_pointSize;\n"
 
 "    #ifdef HAS_TEXTURERECT\n"
 "      v_textureRect = a_textureRect;\n"
