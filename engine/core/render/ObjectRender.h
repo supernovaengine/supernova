@@ -1,17 +1,6 @@
 #ifndef OBJECTRENDER_H
 #define OBJECTRENDER_H
 
-#define S_VERTEXATTRIBUTE_VERTICES 1
-#define S_VERTEXATTRIBUTE_NORMALS 3
-#define S_VERTEXATTRIBUTE_POINTSIZES 10
-#define S_VERTEXATTRIBUTE_POINTCOLORS 11
-#define S_VERTEXATTRIBUTE_TEXTURERECTS 12
-
-#define S_PROPERTY_MVPMATRIX 1
-#define S_PROPERTY_MODELMATRIX 2
-#define S_PROPERTY_NORMALMATRIX 3
-#define S_PROPERTY_CAMERAPOS 4
-
 #define S_PROPERTYDATA_FLOAT1 1
 #define S_PROPERTYDATA_FLOAT2 2
 #define S_PROPERTYDATA_FLOAT3 3
@@ -23,6 +12,11 @@
 #define S_PROPERTYDATA_MATRIX2 9
 #define S_PROPERTYDATA_MATRIX3 10
 #define S_PROPERTYDATA_MATRIX4 11
+
+#define S_PRIMITIVE_TRIANGLES  1
+#define S_PRIMITIVE_TRIANGLES_STRIP  2
+#define S_PRIMITIVE_POINTS  3
+//TODO: Remover primitiveMode.h
 
 #include <unordered_map>
 #include "Program.h"
@@ -36,6 +30,7 @@ namespace Supernova {
         
         void checkLighting();
         void checkFog();
+        void checkTextureRect();
     
     protected:
         
@@ -55,14 +50,19 @@ namespace Supernova {
         attributeData indexAttribute;
         std::unordered_map<int, propertyData> properties;
         
-        bool haslight;
-        bool hasfog;
+        bool hasLight;
+        bool hasFog;
+        bool hasTextureRect;
         
         SceneRender* sceneRender;
         Texture* texture;
         Program* program;
         
         unsigned int minBufferSize;
+        int primitiveType;
+        bool programOwned;
+        int programShader;
+        bool dynamicBuffer;
         
         ObjectRender();
 
@@ -72,12 +72,18 @@ namespace Supernova {
         virtual ~ObjectRender();
         
         void setTexture(Texture* texture);
+        void setProgram(Program* program);
         void setSceneRender(SceneRender* sceneRender);
         void setMinBufferSize(unsigned int minBufferSize);
+        void setPrimitiveType(int primitiveType);
+        void setProgramShader(int programShader);
+        void setDynamicBuffer(bool dynamicBuffer);
 
         void addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);
         void addIndex(unsigned long size, void* data);
         void addProperty(int type, int datatype, unsigned long size, void* data);
+        
+        virtual void updateVertexAttribute(int type, unsigned long size);
 
         virtual bool load();
         virtual bool draw();

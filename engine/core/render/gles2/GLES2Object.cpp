@@ -12,7 +12,7 @@ using namespace Supernova;
 
 GLES2Object::GLES2Object(){
 
-    usageBuffer = GL_DYNAMIC_DRAW;
+    usageBuffer = GL_STATIC_DRAW;
     
 }
 
@@ -86,26 +86,22 @@ void GLES2Object::useProperty(int type, propertyData prop){
     
 }
 
+void GLES2Object::updateVertexAttribute(int type, unsigned long size){
+    ObjectRender::updateVertexAttribute(type, size);
+    
+    loadVertexAttribute(type, vertexAttributes[type]);
+}
+
 bool GLES2Object::load(){
     if (!ObjectRender::load()){
         return false;
     }
     
-    std::string programName = "points_perfragment";
-    std::string programDefs = "";
-    if (haslight){
-        programDefs += "#define USE_LIGHTING\n";
-    }
-    if (hasfog){
-        programDefs += "#define HAS_FOG\n";
-    }
-    if (vertexAttributes.count(S_VERTEXATTRIBUTE_TEXTURERECTS)){
-        programDefs += "#define HAS_TEXTURERECT\n";
-    }
+    attributeBuffers.clear();
+    propertyHandle.clear();
     
-    program->setShader(programName);
-    program->setDefinitions(programDefs);
-    program->load();
+    if (dynamicBuffer)
+        usageBuffer = GL_DYNAMIC_DRAW;
     
     GLuint glesProgram = ((GLES2Program*)program->getProgramRender().get())->getProgram();
     
@@ -136,7 +132,8 @@ bool GLES2Object::load(){
         attributeBuffers[type].handle = glGetAttribLocation(glesProgram, attribName.c_str());
     }
     
-    //TODO: load index
+    if (indexAttribute.data)
+        loadIndex(indexAttribute);
     
     if (texture) {
         uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
@@ -166,11 +163,11 @@ bool GLES2Object::load(){
         propertyHandle[type] = glGetUniformLocation(glesProgram, propertyName.c_str());
     }
     
-    if (haslight){
+    if (hasLight){
         light.getUniformLocations();
     }
     
-    if (hasfog){
+    if (hasFog){
         fog.getUniformLocations();
     }
     
@@ -194,11 +191,11 @@ bool GLES2Object::draw(){
         useProperty(it->first, it->second);
     }
     
-    if (haslight){
+    if (hasLight){
         light.setUniformValues(sceneRender);
     }
     
-    if (hasfog){
+    if (hasFog){
         fog.setUniformValues(sceneRender);
     }
     
@@ -212,15 +209,15 @@ bool GLES2Object::draw(){
         glBindBuffer(GL_ARRAY_BUFFER, att.buffer);
         if (att.handle == -1) att.handle = attributePos;
         glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
-
-        attributeBuffers[it->first] = att;
     
         attributePos++;
     }
-
-    bool isUsedTexture = (texture?true:false);
     
-    glUniform1i(useTexture, isUsedTexture);
+    if (indexAttribute.data){
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+    }
+    
+    glUniform1i(useTexture, (texture?true:false));
     
     if (texture){
         glActiveTexture(GL_TEXTURE0);
@@ -236,7 +233,19 @@ bool GLES2Object::draw(){
         }
     }
     
-    glDrawArrays(GL_POINTS, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
+    GLenum modeGles = GL_TRIANGLES;
+    if (primitiveType == S_PRIMITIVE_TRIANGLES_STRIP){
+        modeGles = GL_TRIANGLE_STRIP;
+    }
+    if (primitiveType == S_PRIMITIVE_POINTS){
+        modeGles = GL_POINTS;
+    }
+    
+    if (indexAttribute.data){
+        glDrawElements(modeGles, (GLsizei)indexAttribute.size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+    }else{
+        glDrawArrays(modeGles, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
+    }
     
     for (int i = 0; i <= (attributePos-1); i++)
         glDisableVertexAttribArray(i);

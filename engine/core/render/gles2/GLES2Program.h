@@ -17,13 +17,17 @@ namespace Supernova {
         std::string getVertexShader(std::string name);
         std::string getFragmentShader(std::string name);
         
+        std::string getVertexShader(int shaderType);
+        std::string getFragmentShader(int shaderType);
+        
         GLuint loadShader(GLenum shaderType, const char* pSource);
         
         
     public:
 
-        void createProgram(std::string shaderName, std::string definitions);
-        void deleteProgram();
+        virtual void createProgram(std::string shaderName, std::string definitions);
+        virtual void createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureRect);
+        virtual void deleteProgram();
         
         GLuint getProgram();
     };

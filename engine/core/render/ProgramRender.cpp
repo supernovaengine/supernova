@@ -61,6 +61,10 @@ void ProgramRender::createProgram(std::string shaderName, std::string definition
     loaded = true;
 }
 
+void ProgramRender::createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureRect){
+    loaded = true;
+}
+
 void ProgramRender::deleteProgram(){
     loaded = false;
 }

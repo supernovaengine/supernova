@@ -70,8 +70,8 @@ void Points::setPointSize(int point, float size){
 
 void Points::setPointColor(int point, Vector4 color){
     colors[point] = color;
-    //if (loaded)
-        //render->updatePointColors();
+    if (loaded)
+        render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, colors.size());
 }
 
 void Points::setPointColor(int point, float red, float green, float blue, float alpha){
@@ -91,8 +91,8 @@ void Points::setPointSprite(int point, std::string id){
     }else{
         useTextureRects = true;
         updateNormalizedRectsData();
-        //if (loaded)
-            //render->updateTextureRects();
+        if (loaded)
+            render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, rectsData.size()/4);
     }
 }
 
@@ -127,8 +127,8 @@ void Points::fillScaledSizeVector(){
         pointSizesScaled.push_back(pointSizeScaledVal);
     }
 
-    //if (loaded)
-        //render->updatePointSizes();
+    if (loaded)
+        render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, pointSizes.size());
 }
 
 void Points::updateNormalizedRectsData(){
@@ -247,6 +247,10 @@ bool Points::load(){
 
     if (render == NULL)
         render = ObjectRender::newInstance();
+    
+    render->setPrimitiveType(S_PRIMITIVE_POINTS);
+    render->setProgramShader(S_SHADER_POINTS);
+    render->setDynamicBuffer(true);
     
     render->setTexture(material.getTexture());
     if (scene)
