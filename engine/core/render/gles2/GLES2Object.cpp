@@ -118,6 +118,8 @@ bool GLES2Object::load(){
         
         if (type == S_VERTEXATTRIBUTE_VERTICES){
             attribName = "a_Position";
+        }else if (type == S_VERTEXATTRIBUTE_TEXTURECOORDS){
+            attribName = "a_TextureCoordinates";
         }else if (type == S_VERTEXATTRIBUTE_NORMALS){
             attribName = "a_Normal";
         }else if (type == S_VERTEXATTRIBUTE_POINTSIZES){
@@ -158,6 +160,10 @@ bool GLES2Object::load(){
             propertyName = "u_nMatrix";
         }else if (type == S_PROPERTY_CAMERAPOS){
             propertyName = "u_EyePos";
+        }else if (type == S_PROPERTY_TEXTURERECT){
+            propertyName = "u_textureRect";
+        }else if (type == S_PROPERTY_COLOR){
+            propertyName = "u_Color";
         }
         
         propertyHandle[type] = glGetUniformLocation(glesProgram, propertyName.c_str());

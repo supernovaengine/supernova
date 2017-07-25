@@ -83,6 +83,10 @@ void ObjectRender::addProperty(int type, int datatype, unsigned long size, void*
         properties[type] = { datatype, size, data };
 }
 
+Program* ObjectRender::getProgram(){
+    return program;
+}
+
 void ObjectRender::updateVertexAttribute(int type, unsigned long size){
     if (size > 0)
         vertexAttributes[type].size = size;
@@ -119,11 +123,13 @@ bool ObjectRender::load(){
         programOwned = true;
     }
     
-    if (programShader != -1)
-        program->setShader(programShader);
-    
-    program->setDefinitions(hasLight, hasFog, hasTextureRect);
-    program->load();
+    if (programOwned){
+        if (programShader != -1)
+            program->setShader(programShader);
+        
+        program->setDefinitions(hasLight, hasFog, hasTextureRect);
+        program->load();
+    }
     
     if (texture)
         texture->load();

@@ -139,10 +139,23 @@ bool Mesh::load(){
     while (vertices.size() > normals.size()){
         normals.push_back(Vector3(0,0,0));
     }
-
-    MeshRender::newInstance(&render);
     
-    render->setMesh(this);
+    
+    if (render == NULL)
+        render = ObjectRender::newInstance();
+    
+    render->setPrimitiveType(primitiveMode);
+    render->setProgramShader(S_SHADER_MESH);
+    render->setDynamicBuffer(dynamic);
+    
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 3, texcoords.size(), &texcoords.front());
+    
+    render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
+    render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
+    render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
 
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;

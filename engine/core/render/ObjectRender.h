@@ -83,6 +83,8 @@ namespace Supernova {
         void addIndex(unsigned long size, void* data);
         void addProperty(int type, int datatype, unsigned long size, void* data);
         
+        Program* getProgram();
+        
         virtual void updateVertexAttribute(int type, unsigned long size);
 
         virtual bool load();
