@@ -28,7 +28,7 @@ void Image::setSize(int width, int height){
     Mesh2D::setSize(width, height);
     if (loaded) {
         createVertices();
-        render->updateVertices();
+        render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size());
     }
 }
 
@@ -36,7 +36,7 @@ void Image::setInvertTexture(bool invertTexture){
     Mesh2D::setInvertTexture(invertTexture);
     if (loaded) {
         createVertices();
-        render->updateTexcoords();
+        render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, texcoords.size());
     }
 }
 

@@ -92,6 +92,12 @@ void GLES2Object::updateVertexAttribute(int type, unsigned long size){
     loadVertexAttribute(type, vertexAttributes[type]);
 }
 
+void GLES2Object::updateIndex(unsigned long size){
+    ObjectRender::updateIndex(size);
+    
+    loadIndex(indexAttribute);
+}
+
 bool GLES2Object::load(){
     if (!ObjectRender::load()){
         return false;
@@ -247,14 +253,17 @@ bool GLES2Object::draw(){
         modeGles = GL_POINTS;
     }
     
-    if (indexAttribute.data){
-        glDrawElements(modeGles, (GLsizei)indexAttribute.size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
-    }else{
-        glDrawArrays(modeGles, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
+    if (renderDraw){
+        if (indexAttribute.data){
+            glDrawElements(modeGles, (GLsizei)indexAttribute.size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+        }else{
+            glDrawArrays(modeGles, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
+        }
+        
+        //TODO: ver aonde fica melhor colocar isso
+        for (int i = 0; i <= (attributePos-1); i++)
+            glDisableVertexAttribArray(i);
     }
-    
-    for (int i = 0; i <= (attributePos-1); i++)
-        glDisableVertexAttribArray(i);
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

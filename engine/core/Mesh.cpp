@@ -140,6 +140,21 @@ bool Mesh::load(){
         normals.push_back(Vector3(0,0,0));
     }
     
+    bool hasTextureRect = false;
+    bool hasTextureCoords = false;
+    bool hasTextureCube = false;
+    for (unsigned int i = 0; i < submeshes.size(); i++){
+        if (submeshes.at(i)->getMaterial()->getTextureRect()){
+            hasTextureRect = true;
+        }
+        if (submeshes.at(i)->getMaterial()->getTexture()){
+            hasTextureCoords = true;
+            
+            if (submeshes.at(i)->getMaterial()->getTexture()->getType() == S_TEXTURE_CUBE){
+                hasTextureCube = true;
+            }
+        }
+    }
     
     if (render == NULL)
         render = ObjectRender::newInstance();
@@ -147,22 +162,31 @@ bool Mesh::load(){
     render->setPrimitiveType(primitiveMode);
     render->setProgramShader(S_SHADER_MESH);
     render->setDynamicBuffer(dynamic);
+    render->setHasTextureCoords(hasTextureCoords);
+    render->setHasTextureRect(hasTextureRect);
+    render->setHasTextureCube(hasTextureCube);
+    render->setIsSky(isSky());
+    render->setIsText(isText());
     
     render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
     render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 3, texcoords.size(), &texcoords.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2, texcoords.size(), &texcoords.front());
     
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
     render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
     render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
-
-    for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->dynamic = dynamic;
-        submeshes[i]->load();
-    }
+    
+    if (scene)
+        render->setSceneRender(scene->getSceneRender());
 
     bool renderloaded = render->load();
+    
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->dynamic = dynamic;
+        submeshes[i]->getSubmeshRender()->setProgram(render->getProgram());
+        submeshes[i]->load();
+    }
 
     if (renderloaded)
         return ConcreteObject::load();
@@ -174,11 +198,13 @@ bool Mesh::renderDraw(){
     if (!ConcreteObject::renderDraw())
         return false;
     
+    bool renderdrawed = render->draw();
+    
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->draw();
     }
 
-    return render->draw();
+    return renderdrawed;
 }
 
 void Mesh::destroy(){

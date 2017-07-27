@@ -13,7 +13,11 @@ Program::Program(){
     this->shaderType = 0;
     this->hasLight = false;
     this->hasFog = false;
+    this->hasTextureCoords = false;
     this->hasTextureRect = false;
+    this->hasTextureCube = false;
+    this->isSky = false;
+    this->isText = false;
 }
 
 Program::Program(std::string shader, std::string definitions): Program(){
@@ -34,10 +38,14 @@ void Program::setDefinitions(std::string definitions){
     this->definitions = definitions;
 }
 
-void Program::setDefinitions(bool hasLight, bool hasFog, bool hasTextureRect){
+void Program::setDefinitions(bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText){
     this->hasLight = hasLight;
     this->hasFog = hasFog;
+    this->hasTextureCoords = hasTextureCoords;
     this->hasTextureRect = hasTextureRect;
+    this->hasTextureCube = hasTextureCube;
+    this->isSky = isSky;
+    this->isText = isText;
 }
 
 std::string Program::getShader(){
@@ -60,7 +68,11 @@ Program::Program(const Program& p){
     shaderType = p.shaderType;
     hasLight = p.hasLight;
     hasFog = p.hasFog;
+    hasTextureCoords = p.hasTextureCoords;
     hasTextureRect = p.hasTextureRect;
+    hasTextureCube = p.hasTextureCube;
+    isSky = p.isSky;
+    isText = p.isText;
 }
 
 Program& Program::operator = (const Program& p){
@@ -71,7 +83,11 @@ Program& Program::operator = (const Program& p){
     shaderType = p.shaderType;
     hasLight = p.hasLight;
     hasFog = p.hasFog;
+    hasTextureCoords = p.hasTextureCoords;
     hasTextureRect = p.hasTextureRect;
+    hasTextureCube = p.hasTextureCube;
+    isSky = p.isSky;
+    isText = p.isText;
     
     return *this;
 }
@@ -114,14 +130,20 @@ bool Program::load(){
             shaderStr += "|hasLight";
         if (hasFog)
             shaderStr += "|hasFog";
+        if (hasTextureCoords)
+            shaderStr += "|hasTextureCoords";
         if (hasTextureRect)
             shaderStr += "|hasTextureRect";
+        if (isSky)
+            shaderStr += "|isSky";
+        if (isText)
+            shaderStr += "|isText";
         
         programRender = ProgramRender::sharedInstance(shaderStr);
         
         if (!programRender.get()->isLoaded()){
             
-            programRender.get()->createProgram(shaderType, hasLight, hasFog, hasTextureRect);
+            programRender.get()->createProgram(shaderType, hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
             
             shaderVertexAttributes.clear();
             shaderProperties.clear();
@@ -135,6 +157,17 @@ bool Program::load(){
                 shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_POINTCOLORS);
                 if (hasTextureRect){
                     shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_TEXTURERECTS);
+                }
+            }
+            
+            if (shaderType == S_SHADER_MESH){
+                if (hasTextureCoords){
+                    shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+                }
+                
+                shaderProperties.push_back(S_PROPERTY_COLOR);
+                if (hasTextureRect){
+                    shaderProperties.push_back(S_PROPERTY_TEXTURERECT);
                 }
             }
             

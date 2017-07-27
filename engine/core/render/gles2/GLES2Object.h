@@ -43,6 +43,7 @@ namespace Supernova {
         virtual ~GLES2Object();
         
         virtual void updateVertexAttribute(int type, unsigned long size);
+        virtual void updateIndex(unsigned long size);
 
         virtual bool load();
         virtual bool draw();

@@ -34,7 +34,11 @@ namespace Supernova{
         int shaderType;
         bool hasLight;
         bool hasFog;
+        bool hasTextureCoords;
         bool hasTextureRect;
+        bool hasTextureCube;
+        bool isSky;
+        bool isText;
         
         std::vector<int> shaderVertexAttributes;
         std::vector<int> shaderProperties;
@@ -46,7 +50,7 @@ namespace Supernova{
         void setShader(std::string shader);
         void setShader(int shaderType);
         void setDefinitions(std::string definitions);
-        void setDefinitions(bool hasLight, bool hasFog, bool hasTextureRect);
+        void setDefinitions(bool hasLight = false, bool hasFog = false, bool hasTexture = false, bool hasTextureRect = false, bool hasTextureCube = false, bool isSky = false, bool isText = false);
         
         std::string getShader();
         std::string getDefinitions();

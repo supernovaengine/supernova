@@ -14,9 +14,15 @@ ObjectRender::ObjectRender(){
     programShader = -1;
     dynamicBuffer = false;
     
+    renderDraw = true;
+    
     hasLight = false;
     hasFog = false;
+    hasTextureCoords = false;
     hasTextureRect = false;
+    hasTextureCube = false;
+    isSky = false;
+    isText = false;
     
     sceneRender = NULL;
     texture = NULL;
@@ -73,6 +79,30 @@ void ObjectRender::setDynamicBuffer(bool dynamicBuffer){
     this->dynamicBuffer = dynamicBuffer;
 }
 
+void ObjectRender::setHasTextureCoords(bool hasTextureCoords){
+    this->hasTextureCoords = hasTextureCoords;
+}
+
+void ObjectRender::setHasTextureRect(bool hasTextureRect){
+    this->hasTextureRect = hasTextureRect;
+}
+
+void ObjectRender::setHasTextureCube(bool hasTextureCube){
+    this->hasTextureCube = hasTextureCube;
+}
+
+void ObjectRender::setIsSky(bool isSky){
+    this->isSky = isSky;
+}
+
+void ObjectRender::setIsText(bool isText){
+    this->isText = isText;
+}
+
+void ObjectRender::setRenderDraw(bool renderDraw){
+    this->renderDraw = renderDraw;
+}
+
 void ObjectRender::addIndex(unsigned long size, void* data){
     if (data && (size > 0))
         indexAttribute = { 1, size, data };
@@ -92,31 +122,50 @@ void ObjectRender::updateVertexAttribute(int type, unsigned long size){
         vertexAttributes[type].size = size;
 }
 
+void ObjectRender::updateIndex(unsigned long size){
+    if (size > 0)
+        indexAttribute.size = size;
+}
+
 void ObjectRender::checkLighting(){
-    hasLight = false;
     if (sceneRender != NULL){
         hasLight = sceneRender->lighting;
     }
 }
 
 void ObjectRender::checkFog(){
-    hasFog = false;
     if ((sceneRender != NULL) && (sceneRender->getFog() != NULL)){
         hasFog = true;
     }
 }
 
+void ObjectRender::checkTextureCoords(){
+    if (texture){
+        hasTextureCoords = true;
+    }
+}
+
 void ObjectRender::checkTextureRect(){
-    hasTextureRect = false;
     if (vertexAttributes.count(S_VERTEXATTRIBUTE_TEXTURERECTS)){
         hasTextureRect = true;
+    }
+    if (properties.count(S_PROPERTY_TEXTURERECT)){
+        hasTextureRect = true;
+    }
+}
+
+void ObjectRender::checkTextureCube(){
+    if (texture && texture->getType() == S_TEXTURE_CUBE){
+        hasTextureCube = true;
     }
 }
 
 bool ObjectRender::load(){
     checkLighting();
     checkFog();
+    checkTextureCoords();
     checkTextureRect();
+    checkTextureCube();
     
     if (!program){
         program = new Program();
@@ -127,7 +176,7 @@ bool ObjectRender::load(){
         if (programShader != -1)
             program->setShader(programShader);
         
-        program->setDefinitions(hasLight, hasFog, hasTextureRect);
+        program->setDefinitions(hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
         program->load();
     }
     

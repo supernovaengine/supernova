@@ -30,7 +30,10 @@ namespace Supernova {
         
         void checkLighting();
         void checkFog();
+        void checkTextureCoords();
         void checkTextureRect();
+        void checkTextureCube();
+        
     
     protected:
         
@@ -52,7 +55,11 @@ namespace Supernova {
         
         bool hasLight;
         bool hasFog;
+        bool hasTextureCoords;
         bool hasTextureRect;
+        bool hasTextureCube;
+        bool isSky;
+        bool isText;
         
         SceneRender* sceneRender;
         Texture* texture;
@@ -63,6 +70,8 @@ namespace Supernova {
         bool programOwned;
         int programShader;
         bool dynamicBuffer;
+        
+        bool renderDraw;
         
         ObjectRender();
 
@@ -78,6 +87,13 @@ namespace Supernova {
         void setPrimitiveType(int primitiveType);
         void setProgramShader(int programShader);
         void setDynamicBuffer(bool dynamicBuffer);
+        void setHasTextureCoords(bool hasTextureCoords);
+        void setHasTextureRect(bool hasTextureRect);
+        void setHasTextureCube(bool hasTextureCube);
+        void setIsSky(bool isSky);
+        void setIsText(bool isText);
+        
+        void setRenderDraw(bool renderDraw);
 
         void addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);
         void addIndex(unsigned long size, void* data);
@@ -86,6 +102,7 @@ namespace Supernova {
         Program* getProgram();
         
         virtual void updateVertexAttribute(int type, unsigned long size);
+        virtual void updateIndex(unsigned long size);
 
         virtual bool load();
         virtual bool draw();

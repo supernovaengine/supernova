@@ -91,19 +91,33 @@ Material* Submesh::getMaterial(){
     return this->material;
 }
 
-SubmeshRender* Submesh::getSubmeshRender(){
+ObjectRender* Submesh::getSubmeshRender(){
+    if (render == NULL)
+        render = ObjectRender::newInstance();
+    
     return render;
 }
 
 bool Submesh::load(){
-    SubmeshRender::newInstance(&render);
-        
-    render->setSubmesh(this);
-    render->load();
-
-    loaded = true;
     
-    return true;
+    if (render == NULL)
+        render = ObjectRender::newInstance();
+    
+    render->setRenderDraw(false);
+    render->setDynamicBuffer(dynamic);
+    
+    render->addIndex(indices.size(), &indices.front());
+    
+    render->setTexture(material->getTexture());
+    render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor()->ptr());
+    //render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, <#unsigned long size#>, <#void *data#>)
+    
+    bool renderloaded = render->load();
+    
+    if (renderloaded)
+        loaded = true;
+    
+    return renderloaded;
 }
 
 bool Submesh::draw(){

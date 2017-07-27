@@ -117,8 +117,8 @@ void GLES2Program::createProgram(std::string shaderName, std::string definitions
     glDeleteShader(pixelShader);
 }
 
-void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureRect){
-    ProgramRender::createProgram(shaderType, hasLight, hasFog, hasTextureRect);
+void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText){
+    ProgramRender::createProgram(shaderType, hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
     
     std::string shaderName = "";
     if (shaderType == S_SHADER_MESH){
@@ -134,8 +134,20 @@ void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, boo
     if (hasFog){
         definitions += "#define HAS_FOG\n";
     }
+    if (hasTextureCoords){
+        definitions += "#define USE_TEXTURECOORDS\n";
+    }
     if (hasTextureRect){
         definitions += "#define HAS_TEXTURERECT\n";
+    }
+    if (hasTextureCube){
+        definitions += "#define USE_TEXTURECUBE\n";
+    }
+    if (isSky){
+        definitions += "#define IS_SKY\n";
+    }
+    if (isText){
+        definitions += "#define IS_TEXT\n";
     }
     
     std::string pVertexSource = definitions + getVertexShader(shaderType);
