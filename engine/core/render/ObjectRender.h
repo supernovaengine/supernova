@@ -43,6 +43,11 @@ namespace Supernova {
             void* data;
         };
         
+        struct indexData{
+            unsigned long size;
+            void* data;
+        };
+        
         struct propertyData{
             int datatype;
             unsigned long size;
@@ -50,7 +55,7 @@ namespace Supernova {
         };
         
         std::unordered_map<int, attributeData> vertexAttributes;
-        attributeData indexAttribute;
+        indexData indexAttribute;
         std::unordered_map<int, propertyData> properties;
         
         bool hasLight;

@@ -159,7 +159,6 @@ bool Mesh::load(){
     if (render == NULL)
         render = ObjectRender::newInstance();
     
-    render->setPrimitiveType(primitiveMode);
     render->setProgramShader(S_SHADER_MESH);
     render->setDynamicBuffer(dynamic);
     render->setHasTextureCoords(hasTextureCoords);
@@ -167,6 +166,7 @@ bool Mesh::load(){
     render->setHasTextureCube(hasTextureCube);
     render->setIsSky(isSky());
     render->setIsText(isText());
+    render->setRenderDraw(false);
     
     render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
     render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals.front());
@@ -185,6 +185,7 @@ bool Mesh::load(){
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
         submeshes[i]->getSubmeshRender()->setProgram(render->getProgram());
+        submeshes[i]->getSubmeshRender()->setPrimitiveType(primitiveMode);
         submeshes[i]->load();
     }
 

@@ -103,14 +103,13 @@ bool Submesh::load(){
     if (render == NULL)
         render = ObjectRender::newInstance();
     
-    render->setRenderDraw(false);
     render->setDynamicBuffer(dynamic);
     
     render->addIndex(indices.size(), &indices.front());
     
     render->setTexture(material->getTexture());
     render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor()->ptr());
-    //render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, <#unsigned long size#>, <#void *data#>)
+    //render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, unsigned long size, void *data)
     
     bool renderloaded = render->load();
     

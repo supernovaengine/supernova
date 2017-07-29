@@ -9,7 +9,9 @@ using namespace Supernova;
 ObjectRender::ObjectRender(){
     minBufferSize = 0;
     primitiveType = 0;
+    vertexAttributes.clear();
     indexAttribute.data = NULL;
+    properties.clear();
     programOwned = false;
     programShader = -1;
     dynamicBuffer = false;
@@ -75,6 +77,16 @@ void ObjectRender::addVertexAttribute(int type, unsigned int elements, unsigned 
         vertexAttributes[type] = { elements, size, data };
 }
 
+void ObjectRender::addIndex(unsigned long size, void* data){
+    if (data && (size > 0))
+        indexAttribute = { size, data };
+}
+
+void ObjectRender::addProperty(int type, int datatype, unsigned long size, void* data){
+    if (data && (size > 0))
+        properties[type] = { datatype, size, data };
+}
+
 void ObjectRender::setDynamicBuffer(bool dynamicBuffer){
     this->dynamicBuffer = dynamicBuffer;
 }
@@ -101,16 +113,6 @@ void ObjectRender::setIsText(bool isText){
 
 void ObjectRender::setRenderDraw(bool renderDraw){
     this->renderDraw = renderDraw;
-}
-
-void ObjectRender::addIndex(unsigned long size, void* data){
-    if (data && (size > 0))
-        indexAttribute = { 1, size, data };
-}
-
-void ObjectRender::addProperty(int type, int datatype, unsigned long size, void* data){
-    if (data && (size > 0))
-        properties[type] = { datatype, size, data };
 }
 
 Program* ObjectRender::getProgram(){

@@ -3,14 +3,17 @@
 #include "GLES2Program.h"
 #include "GLES2Texture.h"
 #include "Engine.h"
+#include "platform/Log.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define BUFFER_OFFSET(i) ((void*)(i))
 
+
+
 using namespace Supernova;
 
 
-GLES2Object::GLES2Object(){
+GLES2Object::GLES2Object(): ObjectRender(){
 
     usageBuffer = GL_STATIC_DRAW;
     
@@ -22,7 +25,7 @@ GLES2Object::~GLES2Object(){
 
 void GLES2Object::loadVertexAttribute(int type, attributeData att){
     
-    attributeGlData vp = attributeBuffers[type];
+    attributeGlData vp = attributesGL[type];
 
     if (vp.size == 0){
         vp.buffer = GLES2Util::createVBO();
@@ -34,12 +37,12 @@ void GLES2Object::loadVertexAttribute(int type, attributeData att){
         GLES2Util::dataVBO(vp.buffer, GL_ARRAY_BUFFER, vp.size * att.elements * sizeof(GLfloat), att.data, usageBuffer);
     }
 
-    attributeBuffers[type] = vp;
+    attributesGL[type] = vp;
 }
 
-void GLES2Object::loadIndex(attributeData att){
+void GLES2Object::loadIndex(indexData att){
     
-    attributeGlData ib = indexBuffer;
+    attributeGlData ib = indexGL;
     
     if (ib.size == 0){
         ib.buffer = GLES2Util::createVBO();
@@ -51,38 +54,38 @@ void GLES2Object::loadIndex(attributeData att){
         GLES2Util::dataVBO(ib.buffer, GL_ELEMENT_ARRAY_BUFFER, ib.size * sizeof(unsigned int), att.data, usageBuffer);
     }
 
-    indexBuffer = ib;
+    indexGL = ib;
 }
 
 void GLES2Object::useProperty(int type, propertyData prop){
     
-    GLuint pb = propertyHandle[type];
+    propertyGlData pb = propertyGL[type];
     
     if (prop.datatype == S_PROPERTYDATA_FLOAT1){
-        glUniform1fv(pb, (GLsizei)prop.size, (GLfloat*)prop.data);
+        glUniform1fv(pb.handle, (GLsizei)prop.size, (GLfloat*)prop.data);
     }else if (prop.datatype == S_PROPERTYDATA_FLOAT2){
-        glUniform2fv(pb, (GLsizei)prop.size, (GLfloat*)prop.data);
+        glUniform2fv(pb.handle, (GLsizei)prop.size, (GLfloat*)prop.data);
     }else if (prop.datatype == S_PROPERTYDATA_FLOAT3){
-        glUniform3fv(pb, (GLsizei)prop.size, (GLfloat*)prop.data);
+        glUniform3fv(pb.handle, (GLsizei)prop.size, (GLfloat*)prop.data);
     }else if (prop.datatype == S_PROPERTYDATA_FLOAT4){
-        glUniform4fv(pb, (GLsizei)prop.size, (GLfloat*)prop.data);
+        glUniform4fv(pb.handle, (GLsizei)prop.size, (GLfloat*)prop.data);
     }else if (prop.datatype == S_PROPERTYDATA_INT1){
-        glUniform1iv(pb, (GLsizei)prop.size, (GLint*)prop.data);
+        glUniform1iv(pb.handle, (GLsizei)prop.size, (GLint*)prop.data);
     }else if (prop.datatype == S_PROPERTYDATA_INT2){
-        glUniform2iv(pb, (GLsizei)prop.size, (GLint*)prop.data);
+        glUniform2iv(pb.handle, (GLsizei)prop.size, (GLint*)prop.data);
     }else if (prop.datatype == S_PROPERTYDATA_INT3){
-        glUniform3iv(pb, (GLsizei)prop.size, (GLint*)prop.data);
+        glUniform3iv(pb.handle, (GLsizei)prop.size, (GLint*)prop.data);
     }else if (prop.datatype == S_PROPERTYDATA_INT4){
-        glUniform4iv(pb, (GLsizei)prop.size, (GLint*)prop.data);
+        glUniform4iv(pb.handle, (GLsizei)prop.size, (GLint*)prop.data);
     }else if (prop.datatype == S_PROPERTYDATA_MATRIX2){
-        glUniformMatrix2fv(pb, (GLsizei)prop.size, GL_FALSE, (GLfloat*)prop.data);
+        glUniformMatrix2fv(pb.handle, (GLsizei)prop.size, GL_FALSE, (GLfloat*)prop.data);
     }else if (prop.datatype == S_PROPERTYDATA_MATRIX3){
-        glUniformMatrix3fv(pb, (GLsizei)prop.size, GL_FALSE, (GLfloat*)prop.data);
+        glUniformMatrix3fv(pb.handle, (GLsizei)prop.size, GL_FALSE, (GLfloat*)prop.data);
     }else if (prop.datatype == S_PROPERTYDATA_MATRIX4){
-        glUniformMatrix4fv(pb, (GLsizei)prop.size, GL_FALSE, (GLfloat*)prop.data);
+        glUniformMatrix4fv(pb.handle, (GLsizei)prop.size, GL_FALSE, (GLfloat*)prop.data);
     }
 
-    propertyHandle[type] = pb;
+    propertyGL[type] = pb;
     
 }
 
@@ -103,8 +106,10 @@ bool GLES2Object::load(){
         return false;
     }
     
-    attributeBuffers.clear();
-    propertyHandle.clear();
+    //Log::Debug(LOG_TAG, "Start load object");
+    
+    attributesGL.clear();
+    propertyGL.clear();
     
     if (dynamicBuffer)
         usageBuffer = GL_DYNAMIC_DRAW;
@@ -114,7 +119,9 @@ bool GLES2Object::load(){
     light.setProgram((GLES2Program*)program->getProgramRender().get());
     fog.setProgram((GLES2Program*)program->getProgramRender().get());
     
-    useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
+    if (renderDraw){
+        useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
+    }
     
     for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
     {
@@ -137,11 +144,16 @@ bool GLES2Object::load(){
         }
         
         loadVertexAttribute(type, it->second);
-        attributeBuffers[type].handle = glGetAttribLocation(glesProgram, attribName.c_str());
+        attributesGL[type].handle = glGetAttribLocation(glesProgram, attribName.c_str());
+        
+        //Log::Debug(LOG_TAG, "Load attribute buffer: %s, size: %lu, handle %i", attribName.c_str(), it->second.size, attributesGL[type].handle);
     }
     
-    if (indexAttribute.data)
+    if (indexAttribute.data){
         loadIndex(indexAttribute);
+        
+        //Log::Debug(LOG_TAG, "Load index, size: %lu", indexAttribute.size);
+    }
     
     if (texture) {
         uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
@@ -172,7 +184,9 @@ bool GLES2Object::load(){
             propertyName = "u_Color";
         }
         
-        propertyHandle[type] = glGetUniformLocation(glesProgram, propertyName.c_str());
+        propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());
+        
+        //Log::Debug(LOG_TAG, "Get property handle: %s, size: %lu, handle %i", propertyName.c_str(), it->second.size, propertyGL[type].handle);
     }
     
     if (hasLight){
@@ -193,6 +207,8 @@ bool GLES2Object::draw(){
         return false;
     }
     
+    //Log::Debug(LOG_TAG, "Start draw object");
+    
     GLuint glesProgram = ((GLES2Program*)program->getProgramRender().get())->getProgram();
     
     glUseProgram(glesProgram);
@@ -201,6 +217,8 @@ bool GLES2Object::draw(){
     for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
     {
         useProperty(it->first, it->second);
+        
+        //Log::Debug(LOG_TAG, "Use property handle: %i", propertyGL[it->first].handle);
     }
     
     if (hasLight){
@@ -215,21 +233,21 @@ bool GLES2Object::draw(){
     
     for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
     {
-        attributeGlData att = attributeBuffers[it->first];
+        attributeGlData att = attributesGL[it->first];
         
-        glEnableVertexAttribArray(attributePos);
+        glEnableVertexAttribArray(att.handle);
         glBindBuffer(GL_ARRAY_BUFFER, att.buffer);
-        if (att.handle == -1) att.handle = attributePos;
+        //if (att.handle == -1) att.handle = attributePos;
         glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
     
         attributePos++;
+        
+        //Log::Debug(LOG_TAG, "Use attribute handle: %i", att.handle);
     }
     
     if (indexAttribute.data){
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexGL.buffer);
     }
-    
-    glUniform1i(useTexture, (texture?true:false));
     
     if (texture){
         glActiveTexture(GL_TEXTURE0);
@@ -245,28 +263,33 @@ bool GLES2Object::draw(){
         }
     }
     
-    GLenum modeGles = GL_TRIANGLES;
-    if (primitiveType == S_PRIMITIVE_TRIANGLES_STRIP){
-        modeGles = GL_TRIANGLE_STRIP;
-    }
-    if (primitiveType == S_PRIMITIVE_POINTS){
-        modeGles = GL_POINTS;
-    }
-    
     if (renderDraw){
+        
+        glUniform1i(useTexture, (texture?true:false));
+        
+        GLenum modeGles = GL_TRIANGLES;
+        if (primitiveType == S_PRIMITIVE_TRIANGLES_STRIP){
+            modeGles = GL_TRIANGLE_STRIP;
+        }
+        if (primitiveType == S_PRIMITIVE_POINTS){
+            modeGles = GL_POINTS;
+        }
+        
         if (indexAttribute.data){
             glDrawElements(modeGles, (GLsizei)indexAttribute.size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
         }else{
             glDrawArrays(modeGles, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
+          //  glDrawArrays(modeGles, 0, 3);
         }
         
-        //TODO: ver aonde fica melhor colocar isso
-        for (int i = 0; i <= (attributePos-1); i++)
-            glDisableVertexAttribArray(i);
     }
     
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    //TODO: ver aonde fica melhor colocar isso
+    //for (int i = 0; i <= (attributePos-1); i++)
+    //    glDisableVertexAttribArray(i);
+    
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
     GLES2Util::checkGlError("Error on draw GLES2");
 
