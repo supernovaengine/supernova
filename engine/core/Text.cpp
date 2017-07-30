@@ -65,10 +65,10 @@ void Text::setText(const char* text){
     this->text = text;
     if (loaded){
         createText();
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, texcoords.size(), &texcoords.front());
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, normals.size(), &normals.front());
-        submeshes[0]->getSubmeshRender()->updateIndex(submeshes[0]->getIndices()->size(), &(submeshes[0]->getIndices()->front()));
+        updateVertices();
+        updateNormals();
+        updateTexcoords();
+        updateIndices();
     }
 }
 
@@ -78,8 +78,8 @@ void Text::setSize(int width, int height){
     userDefinedHeight = true;
     if (loaded) {
         createText();
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, texcoords.size(), &texcoords.front());
+        updateVertices();
+        updateTexcoords();
     }
 }
 
@@ -88,8 +88,8 @@ void Text::setWidth(int width){
     userDefinedWidth = true;
     if (loaded) {
         createText();
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, texcoords.size(), &texcoords.front());
+        updateVertices();
+        updateTexcoords();
     }
 }
 
@@ -98,8 +98,8 @@ void Text::setHeight(int height){
     userDefinedHeight = true;
     if (loaded) {
         createText();
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, texcoords.size(), &texcoords.front());
+        updateVertices();
+        updateTexcoords();
     }
 }
 
@@ -107,8 +107,8 @@ void Text::setInvertTexture(bool invertTexture){
     Mesh2D::setInvertTexture(invertTexture);
     if (loaded) {
         createText();
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, texcoords.size(), &texcoords.front());
+        updateVertices();
+        updateTexcoords();
     }
 }
 

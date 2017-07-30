@@ -14,7 +14,7 @@ std::string lightingVertexDec =
 
 std::string lightingVertexImp =
 "    #ifdef USE_LIGHTING\n"
-"      v_Position = vec3(u_mMatrix * a_Position);\n"
+"      v_Position = vec3(u_mMatrix * vec4(a_Position, 1.0));\n"
 "      v_Normal = normalize(vec3(u_nMatrix * vec4(a_Normal, 0.0)));\n"
 "    #endif\n";
 
@@ -134,7 +134,7 @@ std::string fogFragmentImp =
 std::string gVertexPointsPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 
-"attribute vec4 a_Position;\n"
+"attribute vec3 a_Position;\n"
 
 + lightingVertexDec +
 
@@ -151,7 +151,7 @@ std::string gVertexPointsPerPixelLightShader =
 
 +    lightingVertexImp +
 
-"    vec4 position = u_mvpMatrix * a_Position;\n"
+"    vec4 position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
 
 "    v_pointColor = a_pointColor;\n"
 "    gl_PointSize = a_pointSize;\n"
@@ -202,7 +202,7 @@ std::string gFragmentPointsPerPixelLightShader =
 std::string gVertexMeshPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 
-"attribute vec4 a_Position;\n"
+"attribute vec3 a_Position;\n"
 
 "#ifdef USE_TEXTURECOORDS\n"
 "  attribute vec2 a_TextureCoordinates;\n"
@@ -219,11 +219,11 @@ std::string gVertexMeshPerPixelLightShader =
 
 + lightingVertexImp +
 
-"    vec4 position = u_mvpMatrix * a_Position;\n"
+"    vec4 position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
 
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifdef USE_TEXTURECUBE\n"
-"        v_TextureCoordinates = vec3(a_Position);\n"
+"        v_TextureCoordinates = a_Position;\n"
 "      #else\n"
 "        #ifdef HAS_TEXTURERECT\n"
 "          vec2 resultCoords = a_TextureCoordinates * u_textureRect.zw + u_textureRect.xy;\n"
@@ -235,7 +235,7 @@ std::string gVertexMeshPerPixelLightShader =
 "    #endif\n"
 
 "    #ifdef IS_SKY\n"
-"      position.z  = position.w;\n"
+"      position.z = position.w;\n"
 "    #endif\n"
 
 "    gl_Position = position;\n"

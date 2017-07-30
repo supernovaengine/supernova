@@ -20,7 +20,7 @@ void Polygon::setInvertTexture(bool invertTexture){
     Mesh2D::setInvertTexture(invertTexture);
     if (loaded) {
         generateTexcoords();
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, texcoords.size(), &texcoords.front());
+        updateVertices();
     }
 }
 

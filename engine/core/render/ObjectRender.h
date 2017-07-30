@@ -77,8 +77,6 @@ namespace Supernova {
         int programShader;
         bool dynamicBuffer;
         
-        bool renderDraw;
-        
         ObjectRender();
 
     public:
@@ -98,8 +96,6 @@ namespace Supernova {
         void setHasTextureCube(bool hasTextureCube);
         void setIsSky(bool isSky);
         void setIsText(bool isText);
-        
-        void setRenderDraw(bool renderDraw);
 
         void addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);
         void addIndex(unsigned long size, void* data);

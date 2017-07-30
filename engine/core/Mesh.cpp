@@ -78,6 +78,24 @@ void Mesh::addSubmesh(Submesh* submesh){
     submeshes.push_back(submesh);
 }
 
+void Mesh::updateVertices(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
+}
+
+void Mesh::updateNormals(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, texcoords.size(), &texcoords.front());
+}
+
+void Mesh::updateTexcoords(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, normals.size(), &normals.front());
+}
+
+void Mesh::updateIndices(){
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->getSubmeshRender()->updateIndex(submeshes[i]->getIndices()->size(), &(submeshes[i]->getIndices()->front()));
+    }
+}
+
 void Mesh::sortTransparentSubmeshes(){
 
     if (transparent){
@@ -149,7 +167,6 @@ bool Mesh::load(){
         }
         if (submeshes.at(i)->getMaterial()->getTexture()){
             hasTextureCoords = true;
-            
             if (submeshes.at(i)->getMaterial()->getTexture()->getType() == S_TEXTURE_CUBE){
                 hasTextureCube = true;
             }
@@ -166,7 +183,6 @@ bool Mesh::load(){
     render->setHasTextureCube(hasTextureCube);
     render->setIsSky(isSky());
     render->setIsText(isText());
-    render->setRenderDraw(false);
     
     render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
     render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals.front());

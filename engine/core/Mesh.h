@@ -34,6 +34,11 @@ namespace Supernova {
         
         void sortTransparentSubmeshes();
         
+        void updateVertices();
+        void updateNormals();
+        void updateTexcoords();
+        void updateIndices();
+        
     public:
         Mesh();
         virtual ~Mesh();

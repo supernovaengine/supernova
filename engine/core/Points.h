@@ -47,6 +47,12 @@ namespace Supernova {
         float maxPointSize;
         
         std::unordered_map <std::string, Rect> framesRect;
+        
+        void updatePositions();
+        void updateNormals();
+        void updatePointColors();
+        void updatePointSizes();
+        void updateTextureRects();
 
     public:
         Points();

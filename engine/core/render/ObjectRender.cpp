@@ -16,8 +16,6 @@ ObjectRender::ObjectRender(){
     programShader = -1;
     dynamicBuffer = false;
     
-    renderDraw = true;
-    
     hasLight = false;
     hasFog = false;
     hasTextureCoords = false;
@@ -121,10 +119,6 @@ void ObjectRender::setIsText(bool isText){
     this->isText = isText;
 }
 
-void ObjectRender::setRenderDraw(bool renderDraw){
-    this->renderDraw = renderDraw;
-}
-
 Program* ObjectRender::getProgram(){
     
     loadProgram();
@@ -166,12 +160,16 @@ void ObjectRender::checkTextureCube(){
 }
 
 void ObjectRender::loadProgram(){
+    checkLighting();
+    checkFog();
+    checkTextureCoords();
+    checkTextureRect();
+    checkTextureCube();
+    
     if (!program){
         program = new Program();
         programOwned = true;
-    }
-    
-    if (programOwned){
+        
         if (programShader != -1)
             program->setShader(programShader);
         
@@ -181,11 +179,6 @@ void ObjectRender::loadProgram(){
 }
 
 bool ObjectRender::load(){
-    checkLighting();
-    checkFog();
-    checkTextureCoords();
-    checkTextureRect();
-    checkTextureCube();
     
     loadProgram();
     

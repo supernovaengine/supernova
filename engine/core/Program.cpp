@@ -144,44 +144,45 @@ bool Program::load(){
         if (!programRender.get()->isLoaded()){
             
             programRender.get()->createProgram(shaderType, hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
-            
-            shaderVertexAttributes.clear();
-            shaderProperties.clear();
-            
-            // Attributes of program
-            shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_VERTICES);
-            if (hasLight){
-               shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_NORMALS);
-            }
-            if (shaderType == S_SHADER_POINTS){
-                shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_POINTSIZES);
-                shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_POINTCOLORS);
-                if (hasTextureRect){
-                    shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_TEXTURERECTS);
-                }
-            }
-            if (shaderType == S_SHADER_MESH){
-                if (hasTextureCoords){
-                    shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-                }
-            }
-            
-            // Properties of program
-            if (shaderType == S_SHADER_MESH){
-                shaderProperties.push_back(S_PROPERTY_COLOR);
-                if (hasTextureRect){
-                    shaderProperties.push_back(S_PROPERTY_TEXTURERECT);
-                }
-            }
-            shaderProperties.push_back(S_PROPERTY_MVPMATRIX);
-            if (hasLight){
-                shaderProperties.push_back(S_PROPERTY_MODELMATRIX);
-                shaderProperties.push_back(S_PROPERTY_NORMALMATRIX);
-                shaderProperties.push_back(S_PROPERTY_CAMERAPOS);
-            }
-            
-            return true;
+
         }
+        
+        shaderVertexAttributes.clear();
+        shaderProperties.clear();
+        
+        // Attributes of program
+        shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_VERTICES);
+        if (hasLight){
+            shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_NORMALS);
+        }
+        if (shaderType == S_SHADER_POINTS){
+            shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_POINTSIZES);
+            shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_POINTCOLORS);
+            if (hasTextureRect){
+                shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_TEXTURERECTS);
+            }
+        }
+        if (shaderType == S_SHADER_MESH){
+            if (hasTextureCoords){
+                shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+            }
+        }
+        
+        // Properties of program
+        if (shaderType == S_SHADER_MESH){
+            shaderProperties.push_back(S_PROPERTY_COLOR);
+            if (hasTextureRect){
+                shaderProperties.push_back(S_PROPERTY_TEXTURERECT);
+            }
+        }
+        shaderProperties.push_back(S_PROPERTY_MVPMATRIX);
+        if (hasLight){
+            shaderProperties.push_back(S_PROPERTY_MODELMATRIX);
+            shaderProperties.push_back(S_PROPERTY_NORMALMATRIX);
+            shaderProperties.push_back(S_PROPERTY_CAMERAPOS);
+        }
+        
+        return true;
     }
     
     return false;

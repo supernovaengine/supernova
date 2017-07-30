@@ -106,6 +106,5 @@ bool Model::loadOBJ(const char* path){
         }
     }
 
-
     return true;
 }

@@ -216,6 +216,7 @@ bool GLES2Object::prepareDraw(){
         
         //Log::Debug(LOG_TAG, "Use property handle: %i", propertyGL[it->first].handle);
     }
+    GLES2Util::checkGlError("Error on use property on draw");
     
     if (hasLight){
         light.setUniformValues(sceneRender);
@@ -227,18 +228,22 @@ bool GLES2Object::prepareDraw(){
     
     for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
     {
-        attributeGlData att = attributesGL[it->first];
         
-        glEnableVertexAttribArray(att.handle);
-        glBindBuffer(GL_ARRAY_BUFFER, att.buffer);
-        glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+        attributeGlData att = attributesGL[it->first];
+        if (att.handle != -1){
+            glEnableVertexAttribArray(att.handle);
+            glBindBuffer(GL_ARRAY_BUFFER, att.buffer);
+            glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+        }
         
         //Log::Debug(LOG_TAG, "Use attribute handle: %i", att.handle);
     }
+    GLES2Util::checkGlError("Error on bind attribute vertex buffer");
     
     if (indexAttribute.data){
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexGL.buffer);
     }
+    GLES2Util::checkGlError("Error on bind index buffer");
     
     if (texture){
         glActiveTexture(GL_TEXTURE0);
@@ -253,6 +258,7 @@ bool GLES2Object::prepareDraw(){
             glUniform1i(uTextureUnitLocation, 0);
         }
     }
+    GLES2Util::checkGlError("Error on bind texture");
     
     return true;
 }
@@ -283,7 +289,6 @@ bool GLES2Object::draw(){
         glDrawElements(modeGles, (GLsizei)indexAttribute.size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
     }else{
         glDrawArrays(modeGles, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
-      //  glDrawArrays(modeGles, 0, 3);
     }
     
     GLES2Util::checkGlError("Error on draw GLES2");
@@ -296,11 +301,12 @@ bool GLES2Object::finishDraw(){
         return false;
     }
     
-    //for (std::unordered_map<int, attributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it)
-    //    glDisableVertexAttribArray(it->second.handle);
+    for (std::unordered_map<int, attributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it)
+        if (it->second.handle != -1)
+            glDisableVertexAttribArray(it->second.handle);
     
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
     return true;
 }

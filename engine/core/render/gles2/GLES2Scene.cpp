@@ -28,9 +28,6 @@ bool GLES2Scene::load() {
         GLES2Util::checkGlError("Error on load scene GLES2");
     }
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-
     return true;
 }
 
@@ -50,7 +47,7 @@ bool GLES2Scene::draw() {
 
     if (useDepth){
         glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
+        glDepthFunc(GL_LEQUAL);
     }else{
         glDisable(GL_DEPTH_TEST);
     }
