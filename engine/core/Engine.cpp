@@ -349,7 +349,6 @@ bool Engine::transformCoordPos(float& x, float& y){
 
 void Engine::onTouchPress(float x, float y){
     if (transformCoordPos(x, y)){
-        printf("teste %f %f \n", x, y);
         Events::call_onTouchPress(x, y);
     }
 }

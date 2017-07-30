@@ -42,7 +42,7 @@ void GLES2Object::loadVertexAttribute(int type, attributeData att){
 
 void GLES2Object::loadIndex(indexData att){
     
-    attributeGlData ib = indexGL;
+    indexGlData ib = indexGL;
     
     if (ib.size == 0){
         ib.buffer = GLES2Util::createVBO();
@@ -89,16 +89,16 @@ void GLES2Object::useProperty(int type, propertyData prop){
     
 }
 
-void GLES2Object::updateVertexAttribute(int type, unsigned long size){
-    ObjectRender::updateVertexAttribute(type, size);
-    
-    loadVertexAttribute(type, vertexAttributes[type]);
+void GLES2Object::updateVertexAttribute(int type, unsigned long size, void* data){
+    ObjectRender::updateVertexAttribute(type, size, data);
+    if (vertexAttributes.count(type))
+        loadVertexAttribute(type, vertexAttributes[type]);
 }
 
-void GLES2Object::updateIndex(unsigned long size){
-    ObjectRender::updateIndex(size);
-    
-    loadIndex(indexAttribute);
+void GLES2Object::updateIndex(unsigned long size, void* data){
+    ObjectRender::updateIndex(size, data);
+    if (indexAttribute.data)
+        loadIndex(indexAttribute);
 }
 
 bool GLES2Object::load(){
@@ -119,9 +119,7 @@ bool GLES2Object::load(){
     light.setProgram((GLES2Program*)program->getProgramRender().get());
     fog.setProgram((GLES2Program*)program->getProgramRender().get());
     
-    if (renderDraw){
-        useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
-    }
+    useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
     
     for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
     {
@@ -202,12 +200,10 @@ bool GLES2Object::load(){
     return true;
 }
 
-bool GLES2Object::draw(){
-    if (!ObjectRender::draw()){
+bool GLES2Object::prepareDraw(){
+    if (!ObjectRender::prepareDraw()){
         return false;
     }
-    
-    //Log::Debug(LOG_TAG, "Start draw object");
     
     GLuint glesProgram = ((GLES2Program*)program->getProgramRender().get())->getProgram();
     
@@ -229,18 +225,13 @@ bool GLES2Object::draw(){
         fog.setUniformValues(sceneRender);
     }
     
-    int attributePos = 0;
-    
     for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
     {
         attributeGlData att = attributesGL[it->first];
         
         glEnableVertexAttribArray(att.handle);
         glBindBuffer(GL_ARRAY_BUFFER, att.buffer);
-        //if (att.handle == -1) att.handle = attributePos;
         glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
-    
-        attributePos++;
         
         //Log::Debug(LOG_TAG, "Use attribute handle: %i", att.handle);
     }
@@ -263,36 +254,54 @@ bool GLES2Object::draw(){
         }
     }
     
-    if (renderDraw){
-        
-        glUniform1i(useTexture, (texture?true:false));
-        
-        GLenum modeGles = GL_TRIANGLES;
-        if (primitiveType == S_PRIMITIVE_TRIANGLES_STRIP){
-            modeGles = GL_TRIANGLE_STRIP;
-        }
-        if (primitiveType == S_PRIMITIVE_POINTS){
-            modeGles = GL_POINTS;
-        }
-        
-        if (indexAttribute.data){
-            glDrawElements(modeGles, (GLsizei)indexAttribute.size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
-        }else{
-            glDrawArrays(modeGles, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
-          //  glDrawArrays(modeGles, 0, 3);
-        }
-        
+    return true;
+}
+
+bool GLES2Object::draw(){
+    if (!ObjectRender::draw()){
+        return false;
     }
     
-    //TODO: ver aonde fica melhor colocar isso
-    //for (int i = 0; i <= (attributePos-1); i++)
-    //    glDisableVertexAttribArray(i);
+    //Log::Debug(LOG_TAG, "Start draw object");
+    
+    if ((!vertexAttributes.count(S_VERTEXATTRIBUTE_VERTICES)) and (indexAttribute.size == 0)){
+        Log::Debug(LOG_TAG, "Cannot draw object: no vertices or indices");
+        return false;
+    }
+        
+    glUniform1i(useTexture, (texture?true:false));
+        
+    GLenum modeGles = GL_TRIANGLES;
+    if (primitiveType == S_PRIMITIVE_TRIANGLES_STRIP){
+        modeGles = GL_TRIANGLE_STRIP;
+    }
+    if (primitiveType == S_PRIMITIVE_POINTS){
+        modeGles = GL_POINTS;
+    }
+    
+    if (indexAttribute.data){
+        glDrawElements(modeGles, (GLsizei)indexAttribute.size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+    }else{
+        glDrawArrays(modeGles, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
+      //  glDrawArrays(modeGles, 0, 3);
+    }
+    
+    GLES2Util::checkGlError("Error on draw GLES2");
+
+    return true;
+}
+
+bool GLES2Object::finishDraw(){
+    if (!ObjectRender::finishDraw()){
+        return false;
+    }
+    
+    //for (std::unordered_map<int, attributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it)
+    //    glDisableVertexAttribArray(it->second.handle);
     
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
-    GLES2Util::checkGlError("Error on draw GLES2");
-
     return true;
 }
 

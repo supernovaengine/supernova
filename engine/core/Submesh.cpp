@@ -11,6 +11,7 @@ Submesh::Submesh(){
     this->dynamic = false;
 
     this->loaded = false;
+    this->renderOwned = true;
 
     this->minBufferSize = 0;
 }
@@ -21,12 +22,12 @@ Submesh::Submesh(Material* material): Submesh() {
 
 Submesh::~Submesh(){
     if (materialOwned)
-        delete material;
+        delete this->material;
     
-    if (render)
-        delete render;
+    if (this->render && this->renderOwned)
+        delete this->render;
 
-    if (loaded)
+    if (this->loaded)
         destroy();
 }
 
@@ -37,6 +38,7 @@ Submesh::Submesh(const Submesh& s){
     this->material = s.material;
     this->dynamic = s.dynamic;
     this->loaded = s.loaded;
+    this->renderOwned = s.renderOwned;
     this->render = s.render;
     this->minBufferSize = s.minBufferSize;
 }
@@ -48,6 +50,7 @@ Submesh& Submesh::operator = (const Submesh& s){
     this->material = s.material;
     this->dynamic = s.dynamic;
     this->loaded = s.loaded;
+    this->renderOwned = s.renderOwned;
     this->render = s.render;
     this->minBufferSize = s.minBufferSize;
 
@@ -91,6 +94,15 @@ Material* Submesh::getMaterial(){
     return this->material;
 }
 
+void Submesh::setSubmeshRender(ObjectRender* render){
+    if (this->render && this->renderOwned)
+        delete this->render;
+    
+    this->render = render;
+    renderOwned = false;
+    
+}
+
 ObjectRender* Submesh::getSubmeshRender(){
     if (render == NULL)
         render = ObjectRender::newInstance();
@@ -100,8 +112,7 @@ ObjectRender* Submesh::getSubmeshRender(){
 
 bool Submesh::load(){
     
-    if (render == NULL)
-        render = ObjectRender::newInstance();
+    render = getSubmeshRender();
     
     render->setDynamicBuffer(dynamic);
     
@@ -109,9 +120,13 @@ bool Submesh::load(){
     
     render->setTexture(material->getTexture());
     render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor()->ptr());
-    //render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, unsigned long size, void *data)
+    if (material->getTextureRect())
+        render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect()->ptr());
     
-    bool renderloaded = render->load();
+    bool renderloaded = true;
+    
+    if (renderOwned)
+        renderloaded = render->load();
     
     if (renderloaded)
         loaded = true;
@@ -120,7 +135,15 @@ bool Submesh::load(){
 }
 
 bool Submesh::draw(){
-    return render->draw();
+    if (renderOwned)
+        render->prepareDraw();
+    
+    render->draw();
+    
+    if (renderOwned)
+        render->finishDraw();
+    
+    return true;
 }
 
 void Submesh::destroy(){

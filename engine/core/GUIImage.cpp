@@ -26,7 +26,7 @@ void GUIImage::setSize(int width, int height){
     Mesh2D::setSize(width, height);
     if (loaded) {
         createVertices();
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size());
+        render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
     }
 }
 

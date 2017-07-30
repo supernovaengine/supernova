@@ -71,7 +71,7 @@ void Points::setPointSize(int point, float size){
 void Points::setPointColor(int point, Vector4 color){
     colors[point] = color;
     if (loaded)
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, colors.size());
+        render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, colors.size(), &colors.front());
 }
 
 void Points::setPointColor(int point, float red, float green, float blue, float alpha){
@@ -92,7 +92,7 @@ void Points::setPointSprite(int point, std::string id){
         useTextureRects = true;
         updateNormalizedRectsData();
         if (loaded)
-            render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, rectsData.size()/4);
+            render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, rectsData.size()/4, &rectsData.front());
     }
 }
 
@@ -128,7 +128,7 @@ void Points::fillScaledSizeVector(){
     }
 
     if (loaded)
-        render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, pointSizes.size());
+        render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, pointSizes.size(), &pointSizes.front());
 }
 
 void Points::updateNormalizedRectsData(){
@@ -222,7 +222,11 @@ bool Points::renderDraw(){
     if (!ConcreteObject::renderDraw())
         return false;
     
-    return render->draw();
+    render->prepareDraw();
+    render->draw();
+    render->finishDraw();
+    
+    return true;
 }
 
 bool Points::load(){

@@ -33,6 +33,7 @@ namespace Supernova {
         void checkTextureCoords();
         void checkTextureRect();
         void checkTextureCube();
+        void loadProgram();
         
     
     protected:
@@ -106,11 +107,13 @@ namespace Supernova {
         
         Program* getProgram();
         
-        virtual void updateVertexAttribute(int type, unsigned long size);
-        virtual void updateIndex(unsigned long size);
+        virtual void updateVertexAttribute(int type, unsigned long size, void* data);
+        virtual void updateIndex(unsigned long size, void* data);
 
         virtual bool load();
+        virtual bool prepareDraw();
         virtual bool draw();
+        virtual bool finishDraw();
         virtual void destroy();
     };
 }

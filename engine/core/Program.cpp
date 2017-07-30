@@ -148,6 +148,7 @@ bool Program::load(){
             shaderVertexAttributes.clear();
             shaderProperties.clear();
             
+            // Attributes of program
             shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_VERTICES);
             if (hasLight){
                shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_NORMALS);
@@ -159,18 +160,19 @@ bool Program::load(){
                     shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_TEXTURERECTS);
                 }
             }
-            
             if (shaderType == S_SHADER_MESH){
                 if (hasTextureCoords){
                     shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_TEXTURECOORDS);
                 }
-                
+            }
+            
+            // Properties of program
+            if (shaderType == S_SHADER_MESH){
                 shaderProperties.push_back(S_PROPERTY_COLOR);
                 if (hasTextureRect){
                     shaderProperties.push_back(S_PROPERTY_TEXTURERECT);
                 }
             }
-            
             shaderProperties.push_back(S_PROPERTY_MVPMATRIX);
             if (hasLight){
                 shaderProperties.push_back(S_PROPERTY_MODELMATRIX);

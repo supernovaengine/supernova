@@ -29,6 +29,7 @@ namespace Supernova {
 
         unsigned int minBufferSize;
 
+        bool renderOwned;
         bool loaded;
 
     public:
@@ -52,6 +53,7 @@ namespace Supernova {
         bool isDynamic();
         unsigned int getMinBufferSize();
         
+        void setSubmeshRender(ObjectRender* render);
         ObjectRender* getSubmeshRender();
         
         virtual bool load();

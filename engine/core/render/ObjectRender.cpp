@@ -77,7 +77,7 @@ void ObjectRender::addVertexAttribute(int type, unsigned int elements, unsigned 
         vertexAttributes[type] = { elements, size, data };
 }
 
-void ObjectRender::addIndex(unsigned long size, void* data){
+void ObjectRender::addIndex(unsigned long size, void* data){    
     if (data && (size > 0))
         indexAttribute = { size, data };
 }
@@ -85,6 +85,16 @@ void ObjectRender::addIndex(unsigned long size, void* data){
 void ObjectRender::addProperty(int type, int datatype, unsigned long size, void* data){
     if (data && (size > 0))
         properties[type] = { datatype, size, data };
+}
+
+void ObjectRender::updateVertexAttribute(int type, unsigned long size, void* data){
+    if (vertexAttributes.count(type))
+        addVertexAttribute(type, vertexAttributes[type].elements, size, data);
+}
+
+void ObjectRender::updateIndex(unsigned long size, void* data){
+    if (indexAttribute.data)
+        addIndex(size, data);
 }
 
 void ObjectRender::setDynamicBuffer(bool dynamicBuffer){
@@ -116,17 +126,10 @@ void ObjectRender::setRenderDraw(bool renderDraw){
 }
 
 Program* ObjectRender::getProgram(){
+    
+    loadProgram();
+    
     return program;
-}
-
-void ObjectRender::updateVertexAttribute(int type, unsigned long size){
-    if (size > 0)
-        vertexAttributes[type].size = size;
-}
-
-void ObjectRender::updateIndex(unsigned long size){
-    if (size > 0)
-        indexAttribute.size = size;
 }
 
 void ObjectRender::checkLighting(){
@@ -162,13 +165,7 @@ void ObjectRender::checkTextureCube(){
     }
 }
 
-bool ObjectRender::load(){
-    checkLighting();
-    checkFog();
-    checkTextureCoords();
-    checkTextureRect();
-    checkTextureCube();
-    
+void ObjectRender::loadProgram(){
     if (!program){
         program = new Program();
         programOwned = true;
@@ -181,6 +178,16 @@ bool ObjectRender::load(){
         program->setDefinitions(hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
         program->load();
     }
+}
+
+bool ObjectRender::load(){
+    checkLighting();
+    checkFog();
+    checkTextureCoords();
+    checkTextureRect();
+    checkTextureCube();
+    
+    loadProgram();
     
     if (texture)
         texture->load();
@@ -206,7 +213,15 @@ bool ObjectRender::load(){
     return true;
 }
 
+bool ObjectRender::prepareDraw(){
+    return true;
+}
+
 bool ObjectRender::draw(){
+    return true;
+}
+
+bool ObjectRender::finishDraw(){
     return true;
 }
 

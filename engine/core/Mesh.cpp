@@ -179,15 +179,20 @@ bool Mesh::load(){
     
     if (scene)
         render->setSceneRender(scene->getSceneRender());
-
-    bool renderloaded = render->load();
     
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
-        submeshes[i]->getSubmeshRender()->setProgram(render->getProgram());
+        if (submeshes.size() == 1){
+            //Use the same render for submesh
+            submeshes[i]->setSubmeshRender(render);
+        }else{
+            submeshes[i]->getSubmeshRender()->setProgram(render->getProgram());
+        }
         submeshes[i]->getSubmeshRender()->setPrimitiveType(primitiveMode);
         submeshes[i]->load();
     }
+    
+    bool renderloaded = render->load();
 
     if (renderloaded)
         return ConcreteObject::load();
@@ -199,13 +204,15 @@ bool Mesh::renderDraw(){
     if (!ConcreteObject::renderDraw())
         return false;
     
-    bool renderdrawed = render->draw();
+    render->prepareDraw();
     
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->draw();
     }
+    
+    render->finishDraw();
 
-    return renderdrawed;
+    return true;
 }
 
 void Mesh::destroy(){

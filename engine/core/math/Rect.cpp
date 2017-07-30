@@ -46,6 +46,10 @@ float Rect::getHeight(){
     return height;
 }
 
+float* Rect::ptr(){
+    return &x;
+}
+
 void Rect::setRect(float x, float y, float width, float height){
     this->x = x;
     this->y = y;
