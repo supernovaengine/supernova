@@ -169,10 +169,12 @@ void ObjectRender::loadProgram(){
     if (!program){
         program = new Program();
         programOwned = true;
-        
+    }
+    
+    if (programOwned){
         if (programShader != -1)
             program->setShader(programShader);
-        
+    
         program->setDefinitions(hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
         program->load();
     }
@@ -221,4 +223,7 @@ bool ObjectRender::finishDraw(){
 void ObjectRender::destroy(){
     if (texture)
         texture->destroy();
+    
+    if (program)
+        program->destroy();
 }

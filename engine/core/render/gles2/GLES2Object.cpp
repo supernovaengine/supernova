@@ -312,5 +312,13 @@ bool GLES2Object::finishDraw(){
 }
 
 void GLES2Object::destroy(){
+    
+    for (std::unordered_map<int, attributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it)
+        if (it->second.handle != -1)
+            glDeleteBuffers(1, &it->second.buffer);
+    
+    if (indexAttribute.data)
+        glDeleteBuffers(1, &indexGL.buffer);
 
+    ObjectRender::destroy();
 }

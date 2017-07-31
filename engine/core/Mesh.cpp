@@ -196,13 +196,15 @@ bool Mesh::load(){
     if (scene)
         render->setSceneRender(scene->getSceneRender());
     
+    Program* mainProgram = render->getProgram();
+    
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
         if (submeshes.size() == 1){
             //Use the same render for submesh
             submeshes[i]->setSubmeshRender(render);
         }else{
-            submeshes[i]->getSubmeshRender()->setProgram(render->getProgram());
+            submeshes[i]->getSubmeshRender()->setProgram(mainProgram);
         }
         submeshes[i]->getSubmeshRender()->setPrimitiveType(primitiveMode);
         submeshes[i]->load();
