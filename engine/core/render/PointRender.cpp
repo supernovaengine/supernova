@@ -64,17 +64,21 @@ void PointRender::setPoints(Points* points){
 }
 
 void PointRender::checkLighting(){
+    /*
     lighting = false;
     if (sceneRender != NULL){
         lighting = sceneRender->lighting;
     }
+     */
 }
 
 void PointRender::checkFog(){
+    /*
     hasfog = false;
     if ((sceneRender != NULL) && (sceneRender->getFog() != NULL)){
         hasfog = true;
     }
+     */
 }
 
 void PointRender::checkTextureRect(){

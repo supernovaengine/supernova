@@ -11,7 +11,7 @@
 #include <vector>
 #include <map>
 #include "GUIObject.h"
-
+#include "render/LightData.h"
 #include "math/Matrix4.h"
 
 namespace Supernova {
@@ -23,6 +23,10 @@ namespace Supernova {
     private:
 
         SceneRender* render;
+        ObjectRender* lightRender;
+        ObjectRender* fogRender;
+        
+        LightData lightData;
 
         Matrix4 viewProjectionMatrix;
 
@@ -42,6 +46,7 @@ namespace Supernova {
         bool childScene;
         bool useTransparency;
         bool useDepth;
+        bool useLight;
         
         void addLight (Light* light);
         void removeLight (Light* light);
@@ -66,6 +71,8 @@ namespace Supernova {
         virtual ~Scene();
         
         SceneRender* getSceneRender();
+        ObjectRender* getLightRender();
+        ObjectRender* getFogRender();
 
         void setAmbientLight(Vector3 ambientLight);
         void setAmbientLight(const float ambientFactor);
@@ -75,6 +82,7 @@ namespace Supernova {
         
         bool isChildScene();
         bool isUseDepth();
+        bool isUseLight();
         bool isUseTransparency();
         
         void setFog(Fog* fog);

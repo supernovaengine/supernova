@@ -25,6 +25,9 @@ ObjectRender::ObjectRender(){
     isText = false;
     
     sceneRender = NULL;
+    lightRender = NULL;
+    fogRender = NULL;
+    
     texture = NULL;
     program = NULL;
 }
@@ -40,6 +43,12 @@ ObjectRender* ObjectRender::newInstance(){
 ObjectRender::~ObjectRender(){
     if (program && programOwned)
         delete program;
+
+    if (lightRender)
+        delete lightRender;
+
+    if (fogRender)
+        delete fogRender;
 }
 
 void ObjectRender::setTexture(Texture* texture){
@@ -56,6 +65,22 @@ void ObjectRender::setProgram(Program* program){
 
 void ObjectRender::setSceneRender(SceneRender* sceneRender){
     this->sceneRender = sceneRender;
+}
+
+void ObjectRender::setLightRender(ObjectRender* lightRender){
+    if (lightRender){
+        if (!this->lightRender)
+            this->lightRender = ObjectRender::newInstance();
+        this->lightRender->properties = lightRender->properties;
+    }
+}
+
+void ObjectRender::setFogRender(ObjectRender* fogRender) {
+    if (fogRender){
+        if (!this->fogRender)
+            this->fogRender = ObjectRender::newInstance();
+        this->fogRender->properties = fogRender->properties;
+    }
 }
 
 void ObjectRender::setMinBufferSize(unsigned int minBufferSize){
@@ -127,13 +152,13 @@ Program* ObjectRender::getProgram(){
 }
 
 void ObjectRender::checkLighting(){
-    if (sceneRender != NULL){
-        hasLight = sceneRender->lighting;
+    if (lightRender != NULL && !isSky){
+        hasLight = true;
     }
 }
 
 void ObjectRender::checkFog(){
-    if ((sceneRender != NULL) && (sceneRender->getFog() != NULL)){
+    if (fogRender != NULL){
         hasFog = true;
     }
 }
@@ -204,15 +229,36 @@ bool ObjectRender::load(){
             it++;
         }
     }
+
+    if (hasLight){
+        lightRender->setProgram(program);
+        lightRender->load();
+    }
+
+    if (hasFog){
+        fogRender->setProgram(program);
+        fogRender->load();
+    }
     
     return true;
 }
 
 bool ObjectRender::prepareDraw(){
+
     return true;
 }
 
 bool ObjectRender::draw(){
+
+    //hasLight and hasFog need to be called after main rander use program
+    if (hasLight){
+        lightRender->prepareDraw();
+    }
+
+    if (hasFog){
+        fogRender->prepareDraw();
+    }
+
     return true;
 }
 

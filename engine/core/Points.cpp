@@ -277,8 +277,11 @@ bool Points::load(){
     render->setDynamicBuffer(true);
     
     render->setTexture(material.getTexture());
-    if (scene)
+    if (scene){
         render->setSceneRender(scene->getSceneRender());
+        render->setLightRender(scene->getLightRender());
+        render->setFogRender(scene->getFogRender());
+    }
 
     if ((material.getTexture()) && (textureRects.size() > 0)){
         material.getTexture()->load();

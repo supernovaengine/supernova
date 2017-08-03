@@ -193,8 +193,11 @@ bool Mesh::load(){
     render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
     render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
     
-    if (scene)
+    if (scene){
         render->setSceneRender(scene->getSceneRender());
+        render->setLightRender(scene->getLightRender());
+        render->setFogRender(scene->getFogRender());
+    }
     
     Program* mainProgram = render->getProgram();
     

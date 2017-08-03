@@ -2,8 +2,6 @@
 #define GLES2OBJECT_H
 
 #include "render/ObjectRender.h"
-#include "GLES2Light.h"
-#include "GLES2Fog.h"
 
 #include "GLES2Header.h"
 #include <unordered_map>
@@ -30,9 +28,6 @@ namespace Supernova {
         
         GLenum usageBuffer;
         
-        GLES2Light light;
-        GLES2Fog fog;
-        
         GLuint useTexture;
         GLuint uTextureUnitLocation;
         
@@ -44,8 +39,6 @@ namespace Supernova {
         
         void loadVertexAttribute(int type, attributeData att);
         void loadIndex(indexData att);
-        
-        void useProperty(int type, propertyData prop);
 
     public:
         GLES2Object();

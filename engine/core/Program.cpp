@@ -180,6 +180,36 @@ bool Program::load(){
             shaderProperties.push_back(S_PROPERTY_MODELMATRIX);
             shaderProperties.push_back(S_PROPERTY_NORMALMATRIX);
             shaderProperties.push_back(S_PROPERTY_CAMERAPOS);
+            
+            shaderProperties.push_back(S_PROPERTY_AMBIENTLIGHT);
+            
+            shaderProperties.push_back(S_PROPERTY_NUMPOINTLIGHT);
+            shaderProperties.push_back(S_PROPERTY_POINTLIGHT_POS);
+            shaderProperties.push_back(S_PROPERTY_POINTLIGHT_POWER);
+            shaderProperties.push_back(S_PROPERTY_POINTLIGHT_COLOR);
+            
+            shaderProperties.push_back(S_PROPERTY_NUMSPOTLIGHT);
+            shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_POS);
+            shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_POWER);
+            shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_COLOR);
+            shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_TARGET);
+            shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_CUTOFF);
+            
+            shaderProperties.push_back(S_PROPERTY_NUMDIRLIGHT);
+            shaderProperties.push_back(S_PROPERTY_DIRLIGHT_DIR);
+            shaderProperties.push_back(S_PROPERTY_DIRLIGHT_POWER);
+            shaderProperties.push_back(S_PROPERTY_DIRLIGHT_COLOR);
+        }
+        
+        if (hasFog){
+            
+            shaderProperties.push_back(S_PROPERTY_FOG_MODE);
+            shaderProperties.push_back(S_PROPERTY_FOG_COLOR);
+            shaderProperties.push_back(S_PROPERTY_FOG_VISIBILITY);
+            shaderProperties.push_back(S_PROPERTY_FOG_DENSITY);
+            shaderProperties.push_back(S_PROPERTY_FOG_START);
+            shaderProperties.push_back(S_PROPERTY_FOG_END);
+             
         }
         
         return true;

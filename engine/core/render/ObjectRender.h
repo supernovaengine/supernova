@@ -68,6 +68,9 @@ namespace Supernova {
         bool isText;
         
         SceneRender* sceneRender;
+        ObjectRender* lightRender;
+        ObjectRender* fogRender;
+        
         Texture* texture;
         Program* program;
         
@@ -87,6 +90,9 @@ namespace Supernova {
         void setTexture(Texture* texture);
         void setProgram(Program* program);
         void setSceneRender(SceneRender* sceneRender);
+        void setLightRender(ObjectRender* lightRender);
+        void setFogRender(ObjectRender* fogRender);
+        
         void setMinBufferSize(unsigned int minBufferSize);
         void setPrimitiveType(int primitiveType);
         void setProgramShader(int programShader);

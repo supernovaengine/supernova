@@ -5,6 +5,7 @@
 #include "Fog.h"
 #include "LightData.h"
 #include "math/Rect.h"
+//#include "ObjectRender.h"
 
 namespace Supernova {
 
@@ -14,9 +15,6 @@ namespace Supernova {
         
     private:
         void fillSceneProperties();
-        
-        Fog* fog;
-        LightData lightData;
         
     protected:
 
@@ -39,8 +37,8 @@ namespace Supernova {
         
         void setScene(Scene* scene);
 
-        LightData* getLightData();
-        Fog* getFog();
+        //LightData* getLightData();
+        //Fog* getFog();
 
         virtual bool load();
         virtual bool draw();

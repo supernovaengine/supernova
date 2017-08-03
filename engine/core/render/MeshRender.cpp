@@ -60,17 +60,21 @@ void MeshRender::updateIndices(){
 }
 
 void MeshRender::checkLighting(){
+    /*
     lighting = false;
     if ((sceneRender != NULL) && (!isSky)){
         lighting = sceneRender->lighting;
     }
+     */
 }
 
 void MeshRender::checkFog(){
+    /*
     hasfog = false;
     if ((sceneRender != NULL) && (sceneRender->getFog() != NULL)){
         hasfog = true;
     }
+     */
 }
 
 void MeshRender::checkSubmeshProperties(){

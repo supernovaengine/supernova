@@ -15,6 +15,7 @@ void GLES2Light::setProgram(GLES2Program* program){
 }
 
 void GLES2Light::getUniformLocations(){
+    /*
     u_AmbientLight = glGetUniformLocation(program->getProgram(), "u_AmbientLight");
 
     u_NumPointLight = glGetUniformLocation(program->getProgram(), "u_NumPointLight");
@@ -33,10 +34,11 @@ void GLES2Light::getUniformLocations(){
     u_DirectionalLightDir = glGetUniformLocation(program->getProgram(), "u_DirectionalLightDir");
     u_DirectionalLightPower = glGetUniformLocation(program->getProgram(), "u_DirectionalLightPower");
     u_DirectionalLightColor = glGetUniformLocation(program->getProgram(), "u_DirectionalLightColor");
+     */
 }
 
 void GLES2Light::setUniformValues(SceneRender* sceneRender){
-
+/*
     LightData* lightData = sceneRender->getLightData();
 
     glUniform3fv(u_AmbientLight, 1, lightData->ambientLight->ptr());
@@ -63,4 +65,5 @@ void GLES2Light::setUniformValues(SceneRender* sceneRender){
         glUniform1fv(u_DirectionalLightPower, lightData->numDirectionalLight, &lightData->directionalLightPower.front());
         glUniform3fv(u_DirectionalLightColor, lightData->numDirectionalLight, &lightData->directionalLightColor.front());
     }
+ */
 }
