@@ -5,19 +5,14 @@
 #include "Fog.h"
 #include "LightData.h"
 #include "math/Rect.h"
-//#include "ObjectRender.h"
 
 namespace Supernova {
 
-    class Scene;
-
     class SceneRender {
-        
-    private:
-        void fillSceneProperties();
         
     protected:
 
+        bool useLight;
         bool childScene;
         bool useDepth;
         bool useTransparency;
@@ -29,16 +24,14 @@ namespace Supernova {
         SceneRender();
         
     public:
-        bool lighting;
+        static SceneRender* newInstance();
 
         virtual ~SceneRender();
 
-        static void newInstance(SceneRender** render);
-        
-        void setScene(Scene* scene);
-
-        //LightData* getLightData();
-        //Fog* getFog();
+        void setUseLight(bool useLight);
+        void setChildScene(bool childScene);
+        void setUseDepth(bool useDepth);
+        void setUseTransparency(bool useTransparency);
 
         virtual bool load();
         virtual bool draw();

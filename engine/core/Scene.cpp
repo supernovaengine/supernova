@@ -169,7 +169,9 @@ bool Scene::is3D(){
 
 bool Scene::updateViewSize(){
 
-    SceneRender::newInstance(&render);
+    if (!render)
+        render = SceneRender::newInstance();
+
     bool status = render->viewSize(*Engine::getViewRect());
     if (this->camera != NULL){
         camera->updateAutomaticSizes();
@@ -220,14 +222,18 @@ void Scene::drawSky(){
 
 bool Scene::draw() {
     transparentQueue.clear();
+
+    render->setUseTransparency(isUseTransparency());
+    render->setUseLight(isUseLight());
+    render->setChildScene(isChildScene());
+    render->setUseDepth(isUseDepth());
+
     bool drawreturn = render->draw();
     resetSceneProperties();
 
     Object::draw();
-
     drawSky();
     drawTransparentMeshes();
-
     drawChildScenes();
     
     return drawreturn;
@@ -235,8 +241,13 @@ bool Scene::draw() {
 
 bool Scene::load(){
 
-    SceneRender::newInstance(&render);
-    render->setScene(this);
+    if (!render)
+        render = SceneRender::newInstance();
+
+    render->setUseTransparency(isUseTransparency());
+    render->setUseLight(isUseLight());
+    render->setChildScene(isChildScene());
+    render->setUseDepth(isUseDepth());
 
     doCamera();
 
