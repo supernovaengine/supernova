@@ -147,7 +147,8 @@ bool Submesh::draw(){
 }
 
 void Submesh::destroy(){
-    render->destroy();
+    if (render)
+        render->destroy();
 
     loaded = false;
 }

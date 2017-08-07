@@ -35,6 +35,7 @@
 #include "Particles.h"
 #include "Text.h"
 #include "Input.h"
+#include "Sprite.h"
 
 #include <map>
 #include <unistd.h>
@@ -42,14 +43,14 @@
 
 using namespace Supernova;
 
-/*
+
 namespace LuaIntf
 {
 	LUA_USING_SHARED_PTR_TYPE(std::shared_ptr)
     LUA_USING_LIST_TYPE(std::vector)
     LUA_USING_MAP_TYPE(std::map)
 }
-*/
+
 
 lua_State *LuaBind::luastate;
 
@@ -362,6 +363,17 @@ void LuaBind::bind(){
     
     .beginExtendClass<Image, Mesh2D>("Image")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
+    .addFunction("setRect", (void (Image::*)(float, float, float, float))&Image::setRect)
+    .addFunction("setSize", &Image::setSize)
+    .addFunction("setInvertTexture", &Image::setInvertTexture)
+    .endClass()
+    
+    .beginExtendClass<Sprite, Image>("Sprite")
+    .addConstructor(LUA_ARGS())
+    .addFunction("addFrame", &Sprite::addFrame)
+    .addFunction("removeFrame", &Sprite::removeFrame)
+    .addFunction("setFrame", (void (Sprite::*)(std::string))&Sprite::setFrame)
+    .addFunction("animate", &Sprite::animate)
     .endClass()
 
     .beginExtendClass<Polygon, Mesh2D>("Polygon")

@@ -314,7 +314,8 @@ void Points::destroy(){
     
     ConcreteObject::destroy();
 
-    render->destroy();
+    if (render)
+        render->destroy();
     
     for (int i=0; i < textureRects.size(); i++){
         delete textureRects[i];

@@ -51,10 +51,10 @@ bool Engine::mouseAsTouch;
 bool Engine::useDegrees;
 int Engine::scalingMode;
 
-unsigned long Engine::lastTime = 0;
-unsigned long Engine::updateTimeCount = 0;
+unsigned int Engine::lastTime = 0;
+unsigned int Engine::updateTimeCount = 0;
 
-unsigned long Engine::frameTime = 0;
+unsigned int Engine::frameTime = 0;
 float Engine::deltatime = 0;
 float Engine::framerate = 0;
 
@@ -213,6 +213,10 @@ float Engine::getDeltatime(){
     return deltatime;
 }
 
+unsigned int Engine::getFrameTime(){
+    return frameTime;
+}
+
 void Engine::onStart(){
 
     onStart(0, 0);
@@ -305,7 +309,7 @@ void Engine::onDraw() {
         (Engine::getScene())->draw();
     }
     
-    unsigned long newTime = (float)clock() / CLOCKS_PER_SEC * 1000;
+    unsigned int newTime = (float)clock() / CLOCKS_PER_SEC * 1000;
     frameTime = newTime - lastTime;
     lastTime = newTime;
     

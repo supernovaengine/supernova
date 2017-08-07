@@ -243,5 +243,6 @@ void Mesh::destroy(){
         submeshes[i]->destroy();
     }
     
-    render->destroy();
+    if (render)
+        render->destroy();
 }
