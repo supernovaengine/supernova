@@ -7,6 +7,12 @@
 namespace Supernova {
 
     class Sprite: public Image {
+        
+    private:
+        
+        bool inAnimation;
+        int animationFrame;
+        unsigned int animationAcc;
 
     protected:
         
@@ -20,8 +26,6 @@ namespace Supernova {
         std::unordered_map <std::string, Rect> framesRect;
         
         animationData animation;
-        
-        unsigned int animationAcc;
         
     public:
         Sprite();

@@ -5,6 +5,8 @@
 using namespace Supernova;
 
 Sprite::Sprite(): Image(){
+    inAnimation = false;
+    animationFrame = 0;
     animationAcc = 0;
 }
 
@@ -36,25 +38,43 @@ void Sprite::setFrame(int id){
 
 void Sprite::animate(std::vector<int> framesTime, int startFrame, int endFrame, bool loop){
     
-    if (startFrame >= 0 && startFrame < framesRect.size()){
+    inAnimation = true;
+    
+    if (startFrame < 0 && startFrame >= framesRect.size()){
+        inAnimation = false;
         Log::Error(LOG_TAG, "Incorrect range of startFrame");
-    }else if (endFrame >= 0 && endFrame < framesRect.size()){
+    }else if (endFrame < 0 && endFrame >= framesRect.size()){
+        inAnimation = false;
         Log::Error(LOG_TAG, "Incorrect range of endFrame");
     }
     
-    animation.framesTime = framesTime;
-    animation.startFrame = startFrame;
-    animation.endFrame = endFrame;
-    animation.loop = loop;
+    if (inAnimation){
+        animation.framesTime = framesTime;
+        animation.startFrame = startFrame;
+        animation.endFrame = endFrame;
+        animation.loop = loop;
+        
+        animationFrame = startFrame;
+        
+        setFrame(animationFrame);
+    }
 }
 
 bool Sprite::draw(){
-    /*
-    animationAcc += Engine::getFrameTime();
-    while (animationAcc >= 10000){
-        printf("teste %u \n", Engine::getFrameTime());
-        animationAcc -= 10000;
+    
+    if (inAnimation){
+        animationAcc += Engine::getFrameTime();
+        while (animationAcc >= 100){
+            
+            animationFrame += 1;
+            if (animationFrame >= framesRect.size() || animationFrame > animation.endFrame)
+                animationFrame = animation.startFrame;
+            
+            setFrame(animationFrame);
+            
+            animationAcc -= 100;
+        }
     }
-    */
+    
     return Image::draw();
 }
