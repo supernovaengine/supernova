@@ -51,7 +51,7 @@ bool Engine::mouseAsTouch;
 bool Engine::useDegrees;
 int Engine::scalingMode;
 
-unsigned int Engine::lastTime = 0;
+unsigned long Engine::lastTime = 0;
 unsigned int Engine::updateTimeCount = 0;
 
 unsigned int Engine::frameTime = 0;
@@ -235,7 +235,8 @@ void Engine::onStart(int width, int height){
     LuaBind::createLuaState();
     LuaBind::bind();
     
-    lastTime = (float)clock() / CLOCKS_PER_SEC * 1000;
+    auto now = std::chrono::steady_clock::now();
+    lastTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 
     init();
 }
@@ -309,8 +310,10 @@ void Engine::onDraw() {
         (Engine::getScene())->draw();
     }
     
-    unsigned int newTime = (float)clock() / CLOCKS_PER_SEC * 1000;
-    frameTime = newTime - lastTime;
+    auto now = std::chrono::steady_clock::now();
+    unsigned long newTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    
+    frameTime = (unsigned int)(newTime - lastTime);
     lastTime = newTime;
     
     deltatime = (float)frameTime / updateTime;

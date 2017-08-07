@@ -5,7 +5,7 @@
 using namespace Supernova;
 
 Sprite::Sprite(): Image(){
-
+    animationAcc = 0;
 }
 
 Sprite::~Sprite(){
@@ -46,13 +46,15 @@ void Sprite::animate(std::vector<int> framesTime, int startFrame, int endFrame, 
     animation.startFrame = startFrame;
     animation.endFrame = endFrame;
     animation.loop = loop;
-    
-    //printf("teste %i %i\n", framesTime[0], framesTime[1]);
 }
 
 bool Sprite::draw(){
-    
-    //printf("teste2 %u \n", Engine::getFrameTime());
-    
+    /*
+    animationAcc += Engine::getFrameTime();
+    while (animationAcc >= 10000){
+        printf("teste %u \n", Engine::getFrameTime());
+        animationAcc -= 10000;
+    }
+    */
     return Image::draw();
 }

@@ -40,7 +40,7 @@ namespace Supernova {
         static bool useDegrees;
         static int scalingMode;
 
-        static unsigned int lastTime;
+        static unsigned long lastTime;
         static unsigned int updateTimeCount;
         
         static unsigned int frameTime;

@@ -20,6 +20,9 @@ namespace Supernova {
         std::unordered_map <std::string, Rect> framesRect;
         
         animationData animation;
+        
+        unsigned int animationAcc;
+        
     public:
         Sprite();
         virtual ~Sprite();
