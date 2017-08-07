@@ -1,12 +1,12 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include "RectImage.h"
+#include "Image.h"
 #include <unordered_map>
 
 namespace Supernova {
 
-    class Sprite: public RectImage {
+    class Sprite: public Image {
 
     protected:
         std::unordered_map <std::string, Rect> framesRect;

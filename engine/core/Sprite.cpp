@@ -2,7 +2,7 @@
 
 using namespace Supernova;
 
-Sprite::Sprite(): RectImage(){
+Sprite::Sprite(): Image(){
 
 }
 
@@ -19,9 +19,15 @@ void Sprite::removeFrame(std::string id){
 }
 
 void Sprite::setFrame(std::string id){
-    setRect(framesRect[id]);
+    if (framesRect.count(id)){
+        setRect(framesRect[id]);
+    }
 }
 
 void Sprite::setFrame(int id){
-    setFrame(std::to_string(id));
+    std::unordered_map<std::string, Rect>::iterator it = framesRect.begin();
+    if (id >= 0 && id < framesRect.size()){
+        std::advance(it,id);
+        setRect(it->second);
+    }
 }

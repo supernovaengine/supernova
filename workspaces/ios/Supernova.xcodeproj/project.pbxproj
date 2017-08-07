@@ -160,7 +160,6 @@
 		71CE950C1EC8A435008CCF3C /* FileUtilsPlatform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE95041EC8A430008CCF3C /* FileUtilsPlatform.cpp */; };
 		71CE950D1EC8A43C008CCF3C /* FileUtilsGeneric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE95071EC8A430008CCF3C /* FileUtilsGeneric.cpp */; };
 		71CE95111ECA6048008CCF3C /* stb_truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 71CE950E1ECA6043008CCF3C /* stb_truetype.c */; };
-		71E3E57A1E7EA92900468221 /* RectImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E3E5781E7EA92900468221 /* RectImage.cpp */; };
 		71EC38B41EB82871008654E8 /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71EC38B21EB82871008654E8 /* Particles.cpp */; };
 		71F59C381EBFCB1500F49392 /* soloud_coreaudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B971EBFCA5300F49392 /* soloud_coreaudio.cpp */; };
 		71F59C391EBFCB1F00F49392 /* soloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59BB51EBFCA5300F49392 /* soloud.cpp */; };
@@ -614,8 +613,6 @@
 		71E34E231ED1CEBF0005DEF2 /* STBText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STBText.h; sourceTree = "<group>"; };
 		71E34E251ED217CD0005DEF2 /* stb_rect_pack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_rect_pack.c; sourceTree = "<group>"; };
 		71E34E261ED217CD0005DEF2 /* stb_rect_pack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_rect_pack.h; sourceTree = "<group>"; };
-		71E3E5781E7EA92900468221 /* RectImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RectImage.cpp; sourceTree = "<group>"; };
-		71E3E5791E7EA92900468221 /* RectImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RectImage.h; sourceTree = "<group>"; };
 		71EC2E3E1D3D92F700E14D84 /* Submesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Submesh.cpp; sourceTree = "<group>"; };
 		71EC2E3F1D3D92F700E14D84 /* Submesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Submesh.h; sourceTree = "<group>"; };
 		71EC38B21EB82871008654E8 /* Particles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particles.cpp; sourceTree = "<group>"; };
@@ -839,8 +836,6 @@
 				713D2A491CFB2EAD00A4752F /* PrimitiveMode.h */,
 				719C08971F0DCFC300F0BAF0 /* Program.cpp */,
 				719C08981F0DCFC300F0BAF0 /* Program.h */,
-				71E3E5781E7EA92900468221 /* RectImage.cpp */,
-				71E3E5791E7EA92900468221 /* RectImage.h */,
 				713D2A4A1CFB2EAD00A4752F /* render */,
 				713D2A061CFB2EAD00A4752F /* Render.h */,
 				713D2A631CFB2EAD00A4752F /* Scene.cpp */,
@@ -1712,7 +1707,6 @@
 				71CDC71A1D7B14510060EEFF /* Polygon.cpp in Sources */,
 				71CE94F81EC8A3B2008CCF3C /* FileData.cpp in Sources */,
 				71CDC7241D7B146D0060EEFF /* Quaternion.cpp in Sources */,
-				71E3E57A1E7EA92900468221 /* RectImage.cpp in Sources */,
 				71CDC71C1D7B14510060EEFF /* Submesh.cpp in Sources */,
 				71CDC7291D7B14720060EEFF /* Log.cpp in Sources */,
 				719301221E50F9CF00BEE527 /* ConcreteObject.cpp in Sources */,

@@ -7,15 +7,27 @@
 namespace Supernova {
 
     class Image: public Mesh2D {
+        
+    private:
+        int texWidth;
+        int texHeight;
+        
+        bool useTextureRect;
+        
+        Rect textureRect;
 
     protected:
         void createVertices();
+        void normalizeTextureRect();
 
     public:
         Image();
         Image(int width, int height);
         Image(std::string image_path);
         virtual ~Image();
+        
+        void setRect(float x, float y, float width, float height);
+        void setRect(Rect textureRect);
 
         virtual void setSize(int width, int height);
         virtual void setInvertTexture(bool invertTexture);
