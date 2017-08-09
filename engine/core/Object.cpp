@@ -301,6 +301,31 @@ void Object::moveUp(){
     }
 }
 
+
+void Object::addTimeline (Timeline* timeline){
+    bool founded = false;
+
+    std::vector<Timeline*>::iterator it;
+    for (it = timelines.begin(); it != timelines.end(); ++it) {
+        if (timeline == (*it))
+            founded = true;
+    }
+
+    if (!founded){
+        timelines.push_back(timeline);
+    }
+}
+
+void Object::removeTimeline (Timeline* timeline){
+    std::vector<Timeline*>::iterator i = std::remove(timelines.begin(), timelines.end(), timeline);
+    timelines.erase(i,timelines.end());
+}
+
+void Object::play(Timeline* timeline){
+    addTimeline(timeline);
+    timeline->start();
+}
+
 void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
     
     this->viewMatrix = viewMatrix;
@@ -390,6 +415,14 @@ bool Object::load(){
 bool Object::draw(){
     if (position.z != 0){
         setDepth(true);
+    }
+
+    for (int i = 0; i < timelines.size(); i++){
+        if (timelines[i]->isStarted()) {
+            timelines[i]->step();
+        }else{
+            removeTimeline(timelines[i]);
+        }
     }
     
     std::vector<Object*>::iterator it;

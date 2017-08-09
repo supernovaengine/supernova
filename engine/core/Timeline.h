@@ -8,32 +8,33 @@
 namespace Supernova{
 
     class Timeline{
+
+        friend class Object;
         
     private:
-        
-        int function;
         bool started;
         
         unsigned int timecount;
+
+        void start();
+        void stop();
         
     protected:
         
-        int duration;
+        float duration;
         bool loop;
+        int function;
         
         float time;
         float value;
         
     public:
         Timeline();
-        Timeline(int duration, bool loop);
-        Timeline(int duration, bool loop, int function);
+        Timeline(float duration, bool loop);
+        Timeline(float duration, bool loop, int function);
         virtual ~Timeline();
         
         bool isStarted();
-        
-        void start();
-        void stop();
         
         virtual void step();
     };

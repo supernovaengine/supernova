@@ -1,6 +1,7 @@
 #include "Timeline.h"
 #include "Engine.h"
 #include "Scene.h"
+#include "platform/Log.h"
 
 #include <stdio.h>
 
@@ -16,7 +17,7 @@ Timeline::Timeline(){
     this->value = 0;
 }
 
-Timeline::Timeline(int duration, bool loop){
+Timeline::Timeline(float duration, bool loop){
     this->function = S_TIMELINE_LINEAR;
     this->duration = duration;
     this->loop = loop;
@@ -26,7 +27,7 @@ Timeline::Timeline(int duration, bool loop){
     this->value = 0;
 }
 
-Timeline::Timeline(int duration, bool loop, int function){
+Timeline::Timeline(float duration, bool loop, int function){
     this->function = function;
     this->duration = duration;
     this->loop = loop;
@@ -54,24 +55,25 @@ void Timeline::stop(){
 }
 
 void Timeline::step(){
+    int durationms = (int)(duration * 1000);
+
     if (started){
         timecount += Engine::getFrametime();
-        if (timecount >= duration){
+        if (timecount >= durationms){
             if (!loop){
                 stop();
-                timecount = duration;
+                timecount = durationms;
             }else{
-                timecount -= duration;
+                timecount -= durationms;
             }
         }
     }
     
-    time = (float)timecount / duration;
+    time = (float)timecount / durationms;
     if (S_TIMELINE_LINEAR){
         value = time;
     }else if (S_TIMELINE_EXPONENTIAL){
         value = time;
     }
-    
-    printf("step time %f value %f \n", time, value);
+    //Log::Debug(LOG_TAG, "step time %f value %f \n", time, value);
 }

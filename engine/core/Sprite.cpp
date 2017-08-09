@@ -58,15 +58,26 @@ void Sprite::animate(std::vector<int> framesTime, int startFrame, int endFrame, 
         
         setFrame(animationFrame);
     }
+
+    int duration = 0;
+    for(std::vector<int>::iterator it = framesTime.begin(); it != framesTime.end(); ++it)
+        duration += *it;
+
+    this->duration = (float)duration / 1000;
+    this->loop = loop;
+    this->function = S_TIMELINE_LINEAR;
+
+    this->play(this);
 }
 
 void Sprite::step(){
     Timeline::step();
-    
+
+    Log::Debug(LOG_TAG, "sprite step time %f value %f \n", time, value);
 }
 
 bool Sprite::draw(){
-    
+    /*
     if (inAnimation){
         animationAcc += Engine::getFrametime();
         while (animationAcc >= 100){
@@ -80,6 +91,6 @@ bool Sprite::draw(){
             animationAcc -= 100;
         }
     }
-    
+    */
     return Image::draw();
 }

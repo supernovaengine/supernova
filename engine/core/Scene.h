@@ -7,7 +7,6 @@
 #include "render/SceneRender.h"
 #include "Light.h"
 #include "Fog.h"
-#include "Timeline.h"
 #include "SkyBox.h"
 #include <vector>
 #include <map>
@@ -37,7 +36,6 @@ namespace Supernova {
         std::multimap<float, ConcreteObject*> transparentQueue;
 
         std::vector<Light*> lights;
-        std::vector<Timeline*> timelines;
         std::vector<Scene*> subScenes;
         std::vector<GUIObject*> guiObjects;
         SkyBox* sky;
@@ -78,9 +76,6 @@ namespace Supernova {
 
         void setAmbientLight(Vector3 ambientLight);
         void setAmbientLight(const float ambientFactor);
-        
-        void addTimeline (Timeline* timeline);
-        void removeTimeline (Timeline* timeline);
         
         Vector3* getAmbientLight();
         std::vector<Light*>* getLights();

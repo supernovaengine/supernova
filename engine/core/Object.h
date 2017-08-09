@@ -6,6 +6,7 @@
 #include "math/Matrix4.h"
 #include "math/Vector3.h"
 #include "math/Quaternion.h"
+#include "Timeline.h"
 
 namespace Supernova {
 
@@ -21,12 +22,17 @@ namespace Supernova {
         void removeScene();
         int findObject(Object* object);
         void setDepth(bool depth);
+
+        void addTimeline (Timeline* timeline);
+        void removeTimeline (Timeline* timeline);
         
     protected:
         
         bool loaded;
 
         std::vector<Object*> objects;
+
+        std::vector<Timeline*> timelines;
 
         Object* parent;
         Scene* scene;
@@ -90,6 +96,8 @@ namespace Supernova {
         void moveToBack();
         void moveUp();
         void moveDown();
+
+        void play(Timeline* timeline);
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();
