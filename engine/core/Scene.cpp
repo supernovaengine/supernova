@@ -54,6 +54,25 @@ void Scene::removeLight (Light* light){
     lights.erase(i,lights.end());
 }
 
+void Scene::addTimeline (Timeline* timeline){
+    bool founded = false;
+    
+    std::vector<Timeline*>::iterator it;
+    for (it = timelines.begin(); it != timelines.end(); ++it) {
+        if (timeline == (*it))
+            founded = true;
+    }
+    
+    if (!founded){
+        timelines.push_back(timeline);
+    }
+}
+
+void Scene::removeTimeline (Timeline* timeline){
+    std::vector<Timeline*>::iterator i = std::remove(timelines.begin(), timelines.end(), timeline);
+    timelines.erase(i,timelines.end());
+}
+
 void Scene::addSubScene (Scene* scene){
     bool founded = false;
     
@@ -230,6 +249,11 @@ bool Scene::draw() {
 
     bool drawreturn = render->draw();
     resetSceneProperties();
+    
+    for (int i = 0; i < timelines.size(); i++){
+        if (timelines[i]->isStarted())
+            timelines[i]->step();
+    }
 
     Object::draw();
     drawSky();

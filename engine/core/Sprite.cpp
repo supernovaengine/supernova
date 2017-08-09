@@ -60,10 +60,15 @@ void Sprite::animate(std::vector<int> framesTime, int startFrame, int endFrame, 
     }
 }
 
+void Sprite::step(){
+    Timeline::step();
+    
+}
+
 bool Sprite::draw(){
     
     if (inAnimation){
-        animationAcc += Engine::getFrameTime();
+        animationAcc += Engine::getFrametime();
         while (animationAcc >= 100){
             
             animationFrame += 1;

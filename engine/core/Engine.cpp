@@ -54,7 +54,7 @@ int Engine::scalingMode;
 unsigned long Engine::lastTime = 0;
 unsigned int Engine::updateTimeCount = 0;
 
-unsigned int Engine::frameTime = 0;
+unsigned int Engine::frametime = 0;
 float Engine::deltatime = 0;
 float Engine::framerate = 0;
 
@@ -213,8 +213,8 @@ float Engine::getDeltatime(){
     return deltatime;
 }
 
-unsigned int Engine::getFrameTime(){
-    return frameTime;
+unsigned int Engine::getFrametime(){
+    return frametime;
 }
 
 void Engine::onStart(){
@@ -313,15 +313,15 @@ void Engine::onDraw() {
     auto now = std::chrono::steady_clock::now();
     unsigned long newTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     
-    frameTime = (unsigned int)(newTime - lastTime);
+    frametime = (unsigned int)(newTime - lastTime);
     lastTime = newTime;
     
-    deltatime = (float)frameTime / updateTime;
+    deltatime = (float)frametime / updateTime;
     
-    float frameTimeSeconds = (float)frameTime / 1000;
+    float frameTimeSeconds = (float)frametime / 1000;
     framerate = 1 / frameTimeSeconds;
     
-    updateTimeCount += frameTime;
+    updateTimeCount += frametime;
     if (updateTimeCount > updateTime){
         unsigned int updateCallCount = floor((float)updateTimeCount / updateTime);
         for (int i = 0; i < updateCallCount; i++){

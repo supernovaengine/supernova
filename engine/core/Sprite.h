@@ -2,11 +2,12 @@
 #define SPRITE_H
 
 #include "Image.h"
+#include "Timeline.h"
 #include <unordered_map>
 
 namespace Supernova {
 
-    class Sprite: public Image {
+    class Sprite: public Image, Timeline {
         
     private:
         
@@ -38,6 +39,8 @@ namespace Supernova {
         void setFrame(int id);
         
         void animate(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
+        
+        virtual void step();
         
         virtual bool draw();
     };

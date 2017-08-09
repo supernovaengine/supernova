@@ -43,7 +43,7 @@ namespace Supernova {
         static unsigned long lastTime;
         static unsigned int updateTimeCount;
         
-        static unsigned int frameTime;
+        static unsigned int frametime;
         static float deltatime;
         static float framerate;
         
@@ -92,7 +92,7 @@ namespace Supernova {
         static int getPlatform();
         static float getFramerate();
         static float getDeltatime();
-        static unsigned int getFrameTime();
+        static unsigned int getFrametime();
         
         //-----Supernova API events-----
         static void onStart();
