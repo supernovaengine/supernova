@@ -2,18 +2,15 @@
 #define SPRITE_H
 
 #include "Image.h"
-#include "Timeline.h"
 #include <unordered_map>
 
 namespace Supernova {
 
-    class Sprite: public Image, Timeline {
+    class Sprite: public Image {
         
     private:
         
         bool inAnimation;
-        int animationFrame;
-        unsigned int animationAcc;
 
     protected:
         
@@ -22,6 +19,9 @@ namespace Supernova {
             int startFrame;
             int endFrame;
             bool loop;
+            int actualFrame;
+            int actualFramesTime;
+            int timecount;
         };
         
         std::unordered_map <std::string, Rect> framesRect;
@@ -39,8 +39,6 @@ namespace Supernova {
         void setFrame(int id);
         
         void animate(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
-        
-        virtual void step();
         
         virtual bool draw();
     };

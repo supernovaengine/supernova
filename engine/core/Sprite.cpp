@@ -6,8 +6,6 @@ using namespace Supernova;
 
 Sprite::Sprite(): Image(){
     inAnimation = false;
-    animationFrame = 0;
-    animationAcc = 0;
 }
 
 Sprite::~Sprite(){
@@ -31,7 +29,7 @@ void Sprite::setFrame(std::string id){
 void Sprite::setFrame(int id){
     std::unordered_map<std::string, Rect>::iterator it = framesRect.begin();
     if (id >= 0 && id < framesRect.size()){
-        std::advance(it,id);
+        std::advance(it,(framesRect.size()-id-1));
         setRect(it->second);
     }
 }
@@ -53,44 +51,44 @@ void Sprite::animate(std::vector<int> framesTime, int startFrame, int endFrame, 
         animation.startFrame = startFrame;
         animation.endFrame = endFrame;
         animation.loop = loop;
+        animation.actualFrame = startFrame;
+        animation.actualFramesTime = 0;
+        animation.timecount = 0;
         
-        animationFrame = startFrame;
-        
-        setFrame(animationFrame);
+        setFrame(animation.actualFrame);
     }
 
-    int duration = 0;
-    for(std::vector<int>::iterator it = framesTime.begin(); it != framesTime.end(); ++it)
-        duration += *it;
-
-    this->duration = (float)duration / 1000;
-    this->loop = loop;
-    this->function = S_TIMELINE_LINEAR;
-
-    this->play(this);
-}
-
-void Sprite::step(){
-    Timeline::step();
-
-    Log::Debug(LOG_TAG, "sprite step time %f value %f \n", time, value);
 }
 
 bool Sprite::draw(){
-    /*
+    
     if (inAnimation){
-        animationAcc += Engine::getFrametime();
-        while (animationAcc >= 100){
+        animation.timecount += Engine::getFrametime();
+        while ((animation.timecount >= animation.framesTime[animation.actualFramesTime]) && (inAnimation)){
             
-            animationFrame += 1;
-            if (animationFrame >= framesRect.size() || animationFrame > animation.endFrame)
-                animationFrame = animation.startFrame;
+            animation.timecount -= animation.framesTime[animation.actualFramesTime];
             
-            setFrame(animationFrame);
+            animation.actualFrame++;
+            animation.actualFramesTime++;
             
-            animationAcc -= 100;
+            if (animation.actualFrame == animation.endFrame){
+                if (!animation.loop){
+                    inAnimation = false;
+                }else{
+                    animation.actualFrame = animation.startFrame;
+                }
+            }
+            
+            if (animation.actualFrame >= framesRect.size())
+                animation.actualFrame = 0;
+            
+            if (animation.actualFramesTime >= animation.framesTime.size())
+                animation.actualFramesTime = 0;
+            
+            setFrame(animation.actualFrame);
+        
         }
     }
-    */
+    
     return Image::draw();
 }
