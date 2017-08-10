@@ -7,17 +7,17 @@
 
 namespace Supernova{
 
+    class Object;
+
     class Timeline{
 
         friend class Object;
         
     private:
         bool started;
-        
-        unsigned int timecount;
+        Object* parent;
 
-        void start();
-        void stop();
+        unsigned int timecount;
         
     protected:
         
@@ -35,6 +35,9 @@ namespace Supernova{
         virtual ~Timeline();
         
         bool isStarted();
+
+        void start();
+        void stop();
         
         virtual void step();
     };

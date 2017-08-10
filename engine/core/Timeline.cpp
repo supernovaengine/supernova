@@ -1,6 +1,6 @@
 #include "Timeline.h"
 #include "Engine.h"
-#include "Scene.h"
+#include "Object.h"
 #include "platform/Log.h"
 
 #include <stdio.h>
@@ -8,6 +8,7 @@
 using namespace Supernova;
 
 Timeline::Timeline(){
+    this->parent = NULL;
     this->function = S_TIMELINE_LINEAR;
     this->duration = 0;
     this->loop = false;
@@ -18,6 +19,7 @@ Timeline::Timeline(){
 }
 
 Timeline::Timeline(float duration, bool loop){
+    this->parent = NULL;
     this->function = S_TIMELINE_LINEAR;
     this->duration = duration;
     this->loop = loop;
@@ -28,6 +30,7 @@ Timeline::Timeline(float duration, bool loop){
 }
 
 Timeline::Timeline(float duration, bool loop, int function){
+    this->parent = NULL;
     this->function = function;
     this->duration = duration;
     this->loop = loop;
@@ -39,7 +42,8 @@ Timeline::Timeline(float duration, bool loop, int function){
 
 
 Timeline::~Timeline(){
-    
+    if (parent)
+        parent->removeTimeline(this);
 }
 
 bool Timeline::isStarted(){
@@ -75,5 +79,5 @@ void Timeline::step(){
     }else if (S_TIMELINE_EXPONENTIAL){
         value = time;
     }
-    //Log::Debug(LOG_TAG, "step time %f value %f \n", time, value);
+    Log::Debug(LOG_TAG, "step time %f value %f \n", time, value);
 }

@@ -312,18 +312,19 @@ void Object::addTimeline (Timeline* timeline){
     }
 
     if (!founded){
-        timelines.push_back(timeline);
+        if (!timeline->parent) {
+            timelines.push_back(timeline);
+            timeline->parent = this;
+        }else{
+            Log::Error(LOG_TAG, "This timeline is attached to other object");
+        }
     }
 }
 
 void Object::removeTimeline (Timeline* timeline){
     std::vector<Timeline*>::iterator i = std::remove(timelines.begin(), timelines.end(), timeline);
     timelines.erase(i,timelines.end());
-}
-
-void Object::play(Timeline* timeline){
-    addTimeline(timeline);
-    timeline->start();
+    timeline->parent = NULL;
 }
 
 void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){

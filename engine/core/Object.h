@@ -22,9 +22,6 @@ namespace Supernova {
         void removeScene();
         int findObject(Object* object);
         void setDepth(bool depth);
-
-        void addTimeline (Timeline* timeline);
-        void removeTimeline (Timeline* timeline);
         
     protected:
         
@@ -64,6 +61,9 @@ namespace Supernova {
         void addObject(Object* obj);
         void removeObject(Object* obj);
 
+        void addTimeline (Timeline* timeline);
+        void removeTimeline (Timeline* timeline);
+
         Matrix4 getModelMatrix();
         Matrix4 getModelViewProjectMatrix();
         Vector3 getCameraPosition();
@@ -96,8 +96,6 @@ namespace Supernova {
         void moveToBack();
         void moveUp();
         void moveDown();
-
-        void play(Timeline* timeline);
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();
