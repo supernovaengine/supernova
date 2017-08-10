@@ -25,11 +25,11 @@ Image::Image(std::string image_path): Image() {
 Image::~Image() {
 }
 
-void Image::setRect(float x, float y, float width, float height){
-    setRect(Rect(x, y, width, height));
+void Image::setTectureRect(float x, float y, float width, float height){
+    setTectureRect(Rect(x, y, width, height));
 }
 
-void Image::setRect(Rect textureRect){
+void Image::setTectureRect(Rect textureRect){
     this->textureRect = textureRect;
     
     if (loaded && !useTextureRect){

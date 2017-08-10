@@ -363,7 +363,7 @@ void LuaBind::bind(){
     
     .beginExtendClass<Image, Mesh2D>("Image")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
-    .addFunction("setRect", (void (Image::*)(float, float, float, float))&Image::setRect)
+    .addFunction("setTectureRect", (void (Image::*)(float, float, float, float))&Image::setTectureRect)
     .addFunction("setSize", &Image::setSize)
     .addFunction("setInvertTexture", &Image::setInvertTexture)
     .endClass()
@@ -373,7 +373,7 @@ void LuaBind::bind(){
     .addFunction("addFrame", &Sprite::addFrame)
     .addFunction("removeFrame", &Sprite::removeFrame)
     .addFunction("setFrame", (void (Sprite::*)(std::string))&Sprite::setFrame)
-    .addFunction("animate", &Sprite::animate)
+    .addFunction("animate", (void (Sprite::*)(std::vector<int>, std::vector<int>, bool))&Sprite::animate)
     .endClass()
 
     .beginExtendClass<Polygon, Mesh2D>("Polygon")

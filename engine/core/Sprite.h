@@ -15,12 +15,11 @@ namespace Supernova {
     protected:
         
         struct animationData{
+            std::vector<int> frames;
             std::vector<int> framesTime;
-            int startFrame;
-            int endFrame;
+            int framesIndex;
+            int framesTimeIndex;
             bool loop;
-            int actualFrame;
-            int actualFramesTime;
             int timecount;
         };
         
@@ -37,8 +36,10 @@ namespace Supernova {
 
         void setFrame(std::string id);
         void setFrame(int id);
-        
+
+        void animate(std::vector<int> framesTime, std::vector<int> frames, bool loop);
         void animate(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
+        void animate(int interval, int startFrame, int endFrame, bool loop);
         
         virtual bool draw();
     };
