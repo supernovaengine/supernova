@@ -6,7 +6,7 @@
 #include "math/Matrix4.h"
 #include "math/Vector3.h"
 #include "math/Quaternion.h"
-#include "Timeline.h"
+#include "Action.h"
 
 namespace Supernova {
 
@@ -29,7 +29,7 @@ namespace Supernova {
 
         std::vector<Object*> objects;
 
-        std::vector<Timeline*> timelines;
+        std::vector<Action*> actions;
 
         Object* parent;
         Scene* scene;
@@ -61,8 +61,8 @@ namespace Supernova {
         void addObject(Object* obj);
         void removeObject(Object* obj);
 
-        void addTimeline (Timeline* timeline);
-        void removeTimeline (Timeline* timeline);
+        void addAction(Action* action);
+        void removeAction(Action* action);
 
         Matrix4 getModelMatrix();
         Matrix4 getModelViewProjectMatrix();

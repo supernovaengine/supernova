@@ -301,30 +301,33 @@ void Object::moveUp(){
     }
 }
 
-
-void Object::addTimeline (Timeline* timeline){
+void Object::addAction(Action* action){
     bool founded = false;
 
-    std::vector<Timeline*>::iterator it;
-    for (it = timelines.begin(); it != timelines.end(); ++it) {
-        if (timeline == (*it))
+    std::vector<Action*>::iterator it;
+    for (it = actions.begin(); it != actions.end(); ++it) {
+        if (action == (*it))
             founded = true;
     }
 
     if (!founded){
-        if (!timeline->parent) {
-            timelines.push_back(timeline);
-            timeline->parent = this;
+        if (!action->object) {
+            actions.push_back(action);
+            action->object = this;
         }else{
-            Log::Error(LOG_TAG, "This timeline is attached to other object");
+            Log::Error(LOG_TAG, "This action is attached to other object");
         }
     }
 }
 
-void Object::removeTimeline (Timeline* timeline){
-    std::vector<Timeline*>::iterator i = std::remove(timelines.begin(), timelines.end(), timeline);
-    timelines.erase(i,timelines.end());
-    timeline->parent = NULL;
+void Object::removeAction(Action* action){
+    if (action->object == this){
+        std::vector<Action*>::iterator i = std::remove(actions.begin(), actions.end(), action);
+        actions.erase(i,actions.end());
+        action->object = NULL;
+    }else{
+        Log::Error(LOG_TAG, "This action is attached to other object");
+    }
 }
 
 void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
@@ -418,11 +421,9 @@ bool Object::draw(){
         setDepth(true);
     }
 
-    for (int i = 0; i < timelines.size(); i++){
-        if (timelines[i]->isStarted()) {
-            timelines[i]->step();
-        }else{
-            removeTimeline(timelines[i]);
+    for (int i = 0; i < actions.size(); i++){
+        if (actions[i]->isStarted()) {
+            actions[i]->step();
         }
     }
     

@@ -75,7 +75,8 @@
 		7188F1B91DBD4BAC00A2D04F /* AudioLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1B71DBD4BAC00A2D04F /* AudioLoader.cpp */; };
 		7188F1BC1DBD960000A2D04F /* WAVReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1BA1DBD960000A2D04F /* WAVReader.cpp */; };
 		718C7BD21F34054B001AA8C2 /* LightData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 718C7BD01F34054B001AA8C2 /* LightData.cpp */; };
-		718C7BD51F3A5D7A001AA8C2 /* Timeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 718C7BD31F3A5D7A001AA8C2 /* Timeline.cpp */; };
+		718C7BD51F3A5D7A001AA8C2 /* Action.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 718C7BD31F3A5D7A001AA8C2 /* Action.cpp */; };
+		718C7BDA1F3E5422001AA8C2 /* MoveAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 718C7BD71F3E541A001AA8C2 /* MoveAction.cpp */; };
 		719301221E50F9CF00BEE527 /* ConcreteObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301201E50F9CF00BEE527 /* ConcreteObject.cpp */; };
 		719301251E51212800BEE527 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301231E51212800BEE527 /* Material.cpp */; };
 		719330B51EDB161B0043E282 /* Rect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89051ED7711A0028DCE0 /* Rect.cpp */; };
@@ -489,8 +490,10 @@
 		7188F1BB1DBD960000A2D04F /* WAVReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WAVReader.h; sourceTree = "<group>"; };
 		718C7BD01F34054B001AA8C2 /* LightData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LightData.cpp; sourceTree = "<group>"; };
 		718C7BD11F34054B001AA8C2 /* LightData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LightData.h; sourceTree = "<group>"; };
-		718C7BD31F3A5D7A001AA8C2 /* Timeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Timeline.cpp; sourceTree = "<group>"; };
-		718C7BD41F3A5D7A001AA8C2 /* Timeline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timeline.h; sourceTree = "<group>"; };
+		718C7BD31F3A5D7A001AA8C2 /* Action.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Action.cpp; sourceTree = "<group>"; };
+		718C7BD41F3A5D7A001AA8C2 /* Action.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Action.h; sourceTree = "<group>"; };
+		718C7BD71F3E541A001AA8C2 /* MoveAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MoveAction.cpp; sourceTree = "<group>"; };
+		718C7BD81F3E541A001AA8C2 /* MoveAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoveAction.h; sourceTree = "<group>"; };
 		7193011B1E42943800BEE527 /* SkyBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkyBox.cpp; sourceTree = "<group>"; };
 		7193011C1E42943800BEE527 /* SkyBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyBox.h; sourceTree = "<group>"; };
 		719301201E50F9CF00BEE527 /* ConcreteObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConcreteObject.cpp; sourceTree = "<group>"; };
@@ -780,6 +783,9 @@
 		713D2A051CFB2EAD00A4752F /* core */ = {
 			isa = PBXGroup;
 			children = (
+				718C7BD61F3E541A001AA8C2 /* action */,
+				718C7BD31F3A5D7A001AA8C2 /* Action.cpp */,
+				718C7BD41F3A5D7A001AA8C2 /* Action.h */,
 				7188F1B01DBD416000A2D04F /* audio */,
 				71369C081E291E22006AE1D1 /* Button.cpp */,
 				71369C091E291E22006AE1D1 /* Button.h */,
@@ -859,8 +865,6 @@
 				71BCF6C11E476F42008E42A2 /* Text.h */,
 				719C08991F0DCFC300F0BAF0 /* Texture.cpp */,
 				719C089A1F0DCFC400F0BAF0 /* Texture.h */,
-				718C7BD31F3A5D7A001AA8C2 /* Timeline.cpp */,
-				718C7BD41F3A5D7A001AA8C2 /* Timeline.h */,
 			);
 			name = core;
 			path = ../../engine/core;
@@ -1159,6 +1163,15 @@
 				71A6FAC21DEB1924003850A2 /* SoundManager.h */,
 			);
 			path = audio;
+			sourceTree = "<group>";
+		};
+		718C7BD61F3E541A001AA8C2 /* action */ = {
+			isa = PBXGroup;
+			children = (
+				718C7BD71F3E541A001AA8C2 /* MoveAction.cpp */,
+				718C7BD81F3E541A001AA8C2 /* MoveAction.h */,
+			);
+			path = action;
 			sourceTree = "<group>";
 		};
 		71BD25531DE886C100C12A1D /* mpg123 */ = {
@@ -1722,7 +1735,7 @@
 				71CE95021EC8A3C8008CCF3C /* SoLoudPlayer.cpp in Sources */,
 				71CDC7261D7B146D0060EEFF /* Vector2.cpp in Sources */,
 				71CDC7181D7B14510060EEFF /* PointLight.cpp in Sources */,
-				718C7BD51F3A5D7A001AA8C2 /* Timeline.cpp in Sources */,
+				718C7BD51F3A5D7A001AA8C2 /* Action.cpp in Sources */,
 				7188F1B91DBD4BAC00A2D04F /* AudioLoader.cpp in Sources */,
 				71CDC72D1D7B14860060EEFF /* GLES2Scene.cpp in Sources */,
 				71CDC7161D7B14510060EEFF /* Object.cpp in Sources */,
@@ -1777,6 +1790,7 @@
 				714D81E91E70C2E40038BE50 /* SceneRender.cpp in Sources */,
 				716E89AF1E22748800B03DD5 /* GUIImage.cpp in Sources */,
 				71BCF6C31E476F49008E42A2 /* SkyBox.cpp in Sources */,
+				718C7BDA1F3E5422001AA8C2 /* MoveAction.cpp in Sources */,
 				7188F1B31DBD41A400A2D04F /* AudioFile.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
