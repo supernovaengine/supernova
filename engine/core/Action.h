@@ -34,9 +34,33 @@ namespace Supernova{
         static float quadEaseIn(float time);
         static float quadEaseOut(float time);
         static float quadEaseInOut(float time);
+        static float cubicEaseIn(float time);
+        static float cubicEaseOut(float time);
+        static float cubicEaseInOut(float time);
+        static float quartEaseIn(float time);
+        static float quartEaseOut(float time);
+        static float quartEaseInOut(float time);
+        static float quintEaseIn(float time);
+        static float quintEaseOut(float time);
+        static float quintEaseInOut(float time);
+        static float sineEaseIn(float time);
+        static float sineEaseOut(float time);
+        static float sineEaseInOut(float time);
+        static float expoEaseIn(float time);
+        static float expoEaseOut(float time);
+        static float expoEaseInOut(float time);
+        static float circEaseIn(float time);
+        static float circEaseOut(float time);
+        static float circEaseInOut(float time);
         static float elasticEaseIn(float time);
         static float elasticEaseOut(float time);
         static float elasticEaseInOut(float time);
+        static float backEaseIn(float time);
+        static float backEaseOut(float time);
+        static float backEaseInOut(float time);
+        static float bounceEaseIn(float time);
+        static float bounceEaseOut(float time);
+        static float bounceEaseInOut(float time);
         
         void setFunction(float (*function)(float));
         
