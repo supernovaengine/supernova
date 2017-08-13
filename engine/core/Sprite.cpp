@@ -34,22 +34,30 @@ void Sprite::setFrame(int id){
     }
 }
 
+unsigned int Sprite::getFramesSize(){
+    return (unsigned int)framesRect.size();
+}
+
+bool Sprite::isInAnimation(){
+    return inAnimation;
+}
+
 void Sprite::animate(std::vector<int> framesTime, std::vector<int> frames, bool loop){
     inAnimation = true;
 
     if (framesTime.size() == 0){
         inAnimation = false;
-        Log::Error(LOG_TAG, "Incorrect: no framesTime");
+        Log::Error(LOG_TAG, "Incorrect sprite animation: no framesTime");
     }else if (frames.size() == 0){
         inAnimation = false;
-        Log::Error(LOG_TAG, "Incorrect: no frames");
+        Log::Error(LOG_TAG, "Incorrect sprite animation: no frames");
     }
 
     animation.frames = frames;
     animation.framesTime = framesTime;
     animation.loop = loop;
     animation.framesIndex = 0;
-    animation.framesTimeIndex = framesTime.size()-1; //Duration time
+    animation.framesTimeIndex = (int)framesTime.size()-1; //Duration time
     animation.timecount = 0;
 
     if (inAnimation) {
@@ -63,10 +71,10 @@ void Sprite::animate(std::vector<int> framesTime, int startFrame, int endFrame, 
     
     if (startFrame < 0 && startFrame >= framesRect.size()){
         inAnimation = false;
-        Log::Error(LOG_TAG, "Incorrect range of startFrame");
+        Log::Error(LOG_TAG, "Incorrect sprite animation: range of startFrame");
     }else if (endFrame < 0 && endFrame >= framesRect.size()){
         inAnimation = false;
-        Log::Error(LOG_TAG, "Incorrect range of endFrame");
+        Log::Error(LOG_TAG, "Incorrect sprite animation: range of endFrame");
     }
     
     if (inAnimation){
@@ -104,6 +112,10 @@ void Sprite::animate(int interval, int startFrame, int endFrame, bool loop){
 
         animate(framesTime, startFrame, endFrame, loop);
     }
+}
+
+void Sprite::stop(){
+    inAnimation = false;
 }
 
 bool Sprite::draw(){

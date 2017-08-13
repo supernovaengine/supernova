@@ -77,6 +77,8 @@ bool GLES2Object::load(){
     //Log::Debug(LOG_TAG, "Start load object");
     attributesGL.clear();
     propertyGL.clear();
+    indexGL.buffer = -1;
+    indexGL.size = 0;
     
     if (dynamicBuffer)
         usageBuffer = GL_DYNAMIC_DRAW;
@@ -323,11 +325,18 @@ bool GLES2Object::finishDraw(){
 void GLES2Object::destroy(){
     
     for (std::unordered_map<int, attributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it)
-        if (it->second.handle != -1)
+        if (it->second.handle != -1){
             glDeleteBuffers(1, &it->second.buffer);
+            it->second.handle = -1;
+            it->second.buffer = -1;
+            it->second.size = 0;
+        }
     
-    if (indexAttribute.data)
+    if (indexAttribute.data){
         glDeleteBuffers(1, &indexGL.buffer);
+        indexGL.buffer = -1;
+        indexGL.size = 0;
+    }
 
     ObjectRender::destroy();
 }

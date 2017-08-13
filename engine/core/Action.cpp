@@ -361,7 +361,7 @@ bool Action::isStarted(){
     return started;
 }
 
-void Action::start(){
+void Action::play(){
     started = true;
     if (time == 1){
         reset();
@@ -383,12 +383,14 @@ void Action::step(){
 
     if (started){
         timecount += Engine::getFrametime();
-        if (timecount >= durationms){
-            if (!loop){
-                stop();
-                timecount = durationms;
-            }else{
-                timecount -= durationms;
+        if (durationms >= 0){
+            if (timecount >= durationms){
+                if (!loop){
+                    stop();
+                    timecount = durationms;
+                }else{
+                    timecount -= durationms;
+                }
             }
         }
     }

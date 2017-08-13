@@ -103,7 +103,7 @@ namespace Supernova{
         
         bool isStarted();
 
-        virtual void start();
+        virtual void play();
         virtual void stop();
         virtual void reset();
         

@@ -392,9 +392,7 @@ bool Object::isLoaded(){
 }
 
 bool Object::reload(){
-    
     destroy();
-    
     return load();
 }
 

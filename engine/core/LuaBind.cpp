@@ -38,6 +38,7 @@
 #include "Sprite.h"
 #include "Action.h"
 #include "action/MoveAction.h"
+#include "action/SpriteAnimation.h"
 
 #include <map>
 #include <unistd.h>
@@ -462,7 +463,7 @@ void LuaBind::bind(){
     .addConstant("BOUNCE_EASEIN", S_BOUNCE_EASEIN)
     .addConstant("BOUNCE_EASEOUT", S_BOUNCE_EASEOUT)
     .addConstant("BOUNCE_EASEINOUT", S_BOUNCE_EASEINOUT)
-    .addFunction("start", &Action::start)
+    .addFunction("play", &Action::play)
     .addFunction("stop", &Action::stop)
     .addFunction("reset", &Action::reset)
     .addFunction("isStarted", &Action::isStarted)
@@ -472,6 +473,10 @@ void LuaBind::bind(){
     
     .beginExtendClass<MoveAction, Action>("MoveAction")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
+    .endClass()
+    
+    .beginExtendClass<SpriteAnimation, Action>("SpriteAnimation")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<std::vector<int>>, LuaIntf::_opt<std::vector<int>>, LuaIntf::_opt<bool>))
     .endClass();
 
     LuaIntf::LuaBinding(L).beginModule("InputCode")
