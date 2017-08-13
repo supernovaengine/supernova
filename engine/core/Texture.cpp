@@ -59,7 +59,7 @@ bool Texture::load(){
                 dataOwned = true;
             }
             
-            texturesData[0]->resamplePowerOfTwo();
+            texturesData[0]->fitPowerOfTwo();
             textureRender.get()->loadTexture(texturesData[0]);
             
             
