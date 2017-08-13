@@ -5,6 +5,12 @@
 #include "platform/Log.h"
 #include <math.h>
 
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+
+#include "LuaBind.h"
+
 #include <stdio.h>
 
 using namespace Supernova;
@@ -234,6 +240,7 @@ float Action::bounceEaseInOut(float time){
 Action::Action(){
     this->object = NULL;
     this->function = Action::linear;
+    this->functionLua = 0;
     this->duration = 0;
     this->loop = false;
     this->started = false;
@@ -245,6 +252,7 @@ Action::Action(){
 Action::Action(float duration, bool loop){
     this->object = NULL;
     this->function = Action::linear;
+    this->functionLua = 0;
     this->duration = duration;
     this->loop = loop;
     this->started = false;
@@ -256,6 +264,7 @@ Action::Action(float duration, bool loop){
 Action::Action(float duration, bool loop, float (*function)(float)){
     this->object = NULL;
     this->function = function;
+    this->functionLua = 0;
     this->duration = duration;
     this->loop = loop;
     this->started = false;
@@ -271,7 +280,81 @@ Action::~Action(){
 }
 
 void Action::setFunction(float (*function)(float)){
+    this->functionLua = 0;
     this->function = function;
+}
+
+int Action::setFunction(lua_State* L){
+    this->function = NULL;
+    if (lua_type(L, 2) == LUA_TFUNCTION){
+        functionLua = luaL_ref(L, LUA_REGISTRYINDEX);
+    }else{
+        Log::Error(LOG_TAG, "Lua Error: is not a function\n");
+    }
+    return 0;
+}
+
+void Action::setFunctionType(int functionType){
+    
+    functionLua = 0;
+    
+    if (functionType == S_LINEAR){
+        function = Action::linear;
+    }else if(functionType == S_QUAD_EASEIN){
+        function = Action::quadEaseIn;
+    }else if(functionType == S_QUAD_EASEOUT){
+        function = Action::quadEaseOut;
+    }else if(functionType == S_QUAD_EASEINOUT){
+        function = Action::quadEaseInOut;
+    }else if(functionType == S_CUBIC_EASEIN){
+        function = Action::cubicEaseIn;
+    }else if(functionType == S_CUBIC_EASEOUT){
+        function = Action::cubicEaseOut;
+    }else if(functionType == S_CUBIC_EASEINOUT){
+        function = Action::cubicEaseInOut;
+    }else if(functionType == S_QUART_EASEIN){
+        function = Action::quartEaseIn;
+    }else if(functionType == S_QUART_EASEOUT){
+        function = Action::quartEaseOut;
+    }else if(functionType == S_QUART_EASEINOUT){
+        function = Action::quartEaseInOut;
+    }else if(functionType == S_QUINT_EASEIN){
+        function = Action::quintEaseIn;
+    }else if(functionType == S_QUINT_EASEOUT){
+        function = Action::quintEaseOut;
+    }else if(functionType == S_QUINT_EASEINOUT){
+        function = Action::quintEaseInOut;
+    }else if(functionType == S_SINE_EASEIN){
+        function = Action::sineEaseIn;
+    }else if(functionType == S_SINE_EASEOUT){
+        function = Action::sineEaseOut;
+    }else if(functionType == S_SINE_EASEINOUT){
+        function = Action::sineEaseInOut;
+    }else if(functionType == S_EXPO_EASEIN){
+        function = Action::expoEaseIn;
+    }else if(functionType == S_EXPO_EASEOUT){
+        function = Action::expoEaseOut;
+    }else if(functionType == S_EXPO_EASEINOUT){
+        function = Action::expoEaseInOut;
+    }else if(functionType == S_ELASTIC_EASEIN){
+        function = Action::elasticEaseIn;
+    }else if(functionType == S_ELASTIC_EASEOUT){
+        function = Action::elasticEaseOut;
+    }else if(functionType == S_ELASTIC_EASEINOUT){
+        function = Action::elasticEaseInOut;
+    }else if(functionType == S_BACK_EASEIN){
+        function = Action::backEaseIn;
+    }else if(functionType == S_BACK_EASEOUT){
+        function = Action::backEaseOut;
+    }else if(functionType == S_BACK_EASEINOUT){
+        function = Action::backEaseInOut;
+    }else if(functionType == S_BOUNCE_EASEIN){
+        function = Action::bounceEaseIn;
+    }else if(functionType == S_BOUNCE_EASEOUT){
+        function = Action::bounceEaseOut;
+    }else if(functionType == S_BOUNCE_EASEINOUT){
+        function = Action::bounceEaseInOut;
+    }
 }
 
 bool Action::isStarted(){
@@ -280,13 +363,19 @@ bool Action::isStarted(){
 
 void Action::start(){
     started = true;
-    time = 0;
-    value = 0;
-    timecount = 0;
+    if (time == 1){
+        reset();
+    }
 }
 
 void Action::stop(){
     started = false;
+}
+
+void Action::reset(){
+    time = 0;
+    value = 0;
+    timecount = 0;
 }
 
 void Action::step(){
@@ -305,8 +394,20 @@ void Action::step(){
     }
     
     time = (float)timecount / durationms;
-    if (function)
+    if (function){
         value = function(time);
-    
-    Log::Debug(LOG_TAG, "step time %f value %f \n", time, value);
+    }else if(functionLua != 0){
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, functionLua);
+        lua_pushnumber(LuaBind::getLuaState(), time);
+        int status = lua_pcall(LuaBind::getLuaState(), 1, 1, 0);
+        if (status != 0){
+            Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
+        }
+
+        if (!lua_isnumber(LuaBind::getLuaState(), -1))
+            Log::Error(LOG_TAG, "Lua Error: function in Action must return a number\n");
+        value = lua_tonumber(LuaBind::getLuaState(), -1);
+        lua_pop(LuaBind::getLuaState(), 1);
+    }
+    //Log::Debug(LOG_TAG, "step time %f value %f \n", time, value);
 }

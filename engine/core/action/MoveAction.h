@@ -9,12 +9,14 @@ namespace Supernova{
     class MoveAction: public Action{
 
     protected:
-        Vector3 position;
-        
+        Vector3 endPosition;
         Vector3 startPosition;
         
+        bool objectStartPosition;
+        
     public:
-        MoveAction(Vector3 position, float duration, bool loop);
+        MoveAction(Vector3 endPosition, float duration, bool loop);
+        MoveAction(Vector3 startPosition, Vector3 endPosition, float duration, bool loop);
         virtual ~MoveAction();
         
         virtual void start();

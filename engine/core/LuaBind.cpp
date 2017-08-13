@@ -36,6 +36,8 @@
 #include "Text.h"
 #include "Input.h"
 #include "Sprite.h"
+#include "Action.h"
+#include "action/MoveAction.h"
 
 #include <map>
 #include <unistd.h>
@@ -228,6 +230,9 @@ void LuaBind::bind(){
 
     LuaIntf::LuaBinding(L).beginClass<Object>("Object")
     .addFunction("addObject", &Object::addObject)
+    .addFunction("removeObject", &Object::removeObject)
+    .addFunction("addAction", &Object::addAction)
+    .addFunction("removeAction", &Object::removeAction)
     .addFunction("setPosition", (void (Object::*)(const float, const float, const float))&Object::setPosition)
     .addFunction("getPosition", &Object::getPosition)
     .addProperty("position", &Object::getPosition, (void (Object::*)(Vector3))&Object::setPosition)
@@ -425,6 +430,48 @@ void LuaBind::bind(){
     .addFunction("load", &Sound::load)
     .addFunction("play", &Sound::play)
     .addFunction("stop", &Sound::stop)
+    .endClass();
+    
+    LuaIntf::LuaBinding(L).beginClass<Action>("Action")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
+    .addConstant("LINEAR", S_LINEAR)
+    .addConstant("QUAD_EASEIN", S_QUAD_EASEIN)
+    .addConstant("QUAD_EASEOUT", S_QUAD_EASEOUT)
+    .addConstant("QUAD_EASEINOUT", S_QUAD_EASEINOUT)
+    .addConstant("CUBIC_EASEIN", S_CUBIC_EASEIN)
+    .addConstant("CUBIC_EASEOUT", S_CUBIC_EASEOUT)
+    .addConstant("CUBIC_EASEINOUT", S_CUBIC_EASEINOUT)
+    .addConstant("QUART_EASEIN", S_QUART_EASEIN)
+    .addConstant("QUART_EASEOUT", S_QUART_EASEOUT)
+    .addConstant("QUART_EASEINOUT", S_QUART_EASEINOUT)
+    .addConstant("QUINT_EASEIN", S_QUINT_EASEIN)
+    .addConstant("QUINT_EASEOUT", S_QUINT_EASEOUT)
+    .addConstant("QUINT_EASEINOUT", S_QUINT_EASEINOUT)
+    .addConstant("SINE_EASEIN", S_SINE_EASEIN)
+    .addConstant("SINE_EASEOUT", S_SINE_EASEOUT)
+    .addConstant("SINE_EASEINOUT", S_SINE_EASEINOUT)
+    .addConstant("EXPO_EASEIN", S_EXPO_EASEIN)
+    .addConstant("EXPO_EASEOUT", S_EXPO_EASEOUT)
+    .addConstant("EXPO_EASEINOUT", S_EXPO_EASEINOUT)
+    .addConstant("ELASTIC_EASEIN", S_ELASTIC_EASEIN)
+    .addConstant("ELASTIC_EASEOUT", S_ELASTIC_EASEOUT)
+    .addConstant("ELASTIC_EASEINOUT", S_ELASTIC_EASEINOUT)
+    .addConstant("BACK_EASEIN", S_BACK_EASEIN)
+    .addConstant("BACK_EASEOUT", S_BACK_EASEOUT)
+    .addConstant("BACK_EASEINOUT", S_BACK_EASEINOUT)
+    .addConstant("BOUNCE_EASEIN", S_BOUNCE_EASEIN)
+    .addConstant("BOUNCE_EASEOUT", S_BOUNCE_EASEOUT)
+    .addConstant("BOUNCE_EASEINOUT", S_BOUNCE_EASEINOUT)
+    .addFunction("start", &Action::start)
+    .addFunction("stop", &Action::stop)
+    .addFunction("reset", &Action::reset)
+    .addFunction("isStarted", &Action::isStarted)
+    .addFunction("setFunction", (int (Action::*)(lua_State*))&Action::setFunction)
+    .addFunction("setFunctionType", &Action::setFunctionType)
+    .endClass()
+    
+    .beginExtendClass<MoveAction, Action>("MoveAction")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
     .endClass();
 
     LuaIntf::LuaBinding(L).beginModule("InputCode")
