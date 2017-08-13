@@ -5,7 +5,7 @@
 
 using namespace Supernova;
 
-TextureFile* STBImageReader::getRawImage(FileData* filedata){
+TextureData* STBImageReader::getRawImage(FileData* filedata){
     
     //stbi_set_flip_vertically_on_load(true);
     
@@ -20,9 +20,9 @@ TextureFile* STBImageReader::getRawImage(FileData* filedata){
     
     int size = x * y * channels; //in bytes
     
-    TextureFile* textureFile  = new TextureFile((int)x, (int)y, (int)size, type, channels * 8, (void*)data);
+    TextureData* textureData  = new TextureData((int)x, (int)y, (int)size, type, channels * 8, (void*)data);
     //textureFile->flipVertical();
     //stbi_image_free(data);
     
-    return textureFile;
+    return textureData;
 }

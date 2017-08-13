@@ -22,6 +22,8 @@ namespace Supernova {
         float getWidth();
         float getHeight();
         
+        float* ptr();
+        
         void setRect(float x, float y, float width, float height);
         void setRect(Rect* rect);
 

@@ -17,7 +17,7 @@ namespace Supernova {
         float billboardScaleFactor;
 
         bool clipping;
-        bool invert;
+        bool invertTexture;
 
     public:
         Mesh2D();
@@ -36,12 +36,11 @@ namespace Supernova {
         int getHeight();
         
         virtual void setSize(int width, int height);
-        virtual void setInvert(bool invert);
+        virtual void setInvertTexture(bool invertTexture);
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();
 
-        virtual bool load();
         virtual bool draw();
     };
     

@@ -8,17 +8,13 @@ namespace Supernova {
     class TextureLoader{
 
     private:
-        TextureFile* rawImage;
         
         ImageReader* getImageFormat(FileData* filedata);
     public:
         TextureLoader();
-        TextureLoader(std::string relative_path);
         virtual ~TextureLoader();
 
-        void loadRawImage(std::string relative_path);
-
-        TextureFile* getRawImage();
+        TextureData* loadTextureData(std::string relative_path);
 
     };
     

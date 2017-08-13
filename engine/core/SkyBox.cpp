@@ -60,9 +60,11 @@ SkyBox::~SkyBox() {
 }
 
 void SkyBox::updateMVPMatrix(){
+    
     if (this->viewProjectionMatrix != NULL){
         this->modelViewProjectionMatrix = (*this->viewProjectionMatrix);
     }
+    
 }
 
 void SkyBox::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition) {
@@ -96,7 +98,7 @@ bool SkyBox::draw(){
 bool SkyBox::load(){
     this->submeshes[0]->getMaterial()->setTextureCube(textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
 
-    return  Mesh::load();
+    return Mesh::load();
 }
 
 void SkyBox::setTextureFront(std::string texture){

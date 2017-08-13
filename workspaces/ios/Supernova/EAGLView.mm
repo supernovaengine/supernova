@@ -87,7 +87,7 @@
 
 - (void)render:(CADisplayLink*)displayLink {
 
-    Supernova::Engine::onDrawFrame();
+    Supernova::Engine::onDraw();
     
     [_context presentRenderbuffer:GL_RENDERBUFFER];
     

@@ -41,9 +41,9 @@ namespace Supernova {
         static int scalingMode;
 
         static unsigned long lastTime;
-        static unsigned long updateTimeCount;
+        static unsigned int updateTimeCount;
         
-        static unsigned long frameTime;
+        static unsigned int frametime;
         static float deltatime;
         static float framerate;
         
@@ -92,13 +92,14 @@ namespace Supernova {
         static int getPlatform();
         static float getFramerate();
         static float getDeltatime();
+        static unsigned int getFrametime();
         
         //-----Supernova API events-----
         static void onStart();
         static void onStart(int width, int height);
         static void onSurfaceCreated();
         static void onSurfaceChanged(int width, int height);
-        static void onDrawFrame();
+        static void onDraw();
 
         static void onPause();
         static void onResume();

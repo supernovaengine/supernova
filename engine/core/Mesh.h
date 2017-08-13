@@ -4,7 +4,9 @@
 
 #include "ConcreteObject.h"
 #include "math/Vector4.h"
-#include "render/MeshRender.h"
+#include "math/Vector3.h"
+#include "math/Vector2.h"
+#include "render/ObjectRender.h"
 #include "Submesh.h"
 
 namespace Supernova {
@@ -15,7 +17,7 @@ namespace Supernova {
         void removeAllSubmeshes();
         
     protected:
-        MeshRender* render;
+        ObjectRender* render;
 
         std::vector<Vector3> vertices;
         std::vector<Vector3> normals;
@@ -31,6 +33,11 @@ namespace Supernova {
         void addSubmesh(Submesh* submesh);
         
         void sortTransparentSubmeshes();
+        
+        void updateVertices();
+        void updateNormals();
+        void updateTexcoords();
+        void updateIndices();
         
     public:
         Mesh();

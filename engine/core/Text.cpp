@@ -2,7 +2,6 @@
 
 #include "PrimitiveMode.h"
 #include <string>
-#include "render/TextureManager.h"
 #include "platform/Log.h"
 #include "STBText.h"
 
@@ -15,6 +14,10 @@ Text::Text(): Mesh2D() {
     stbtext = new STBText();
     text = "";
     fontSize = 40;
+    multiline = true;
+    
+    userDefinedWidth = false;
+    userDefinedHeight = false;
 
     setMinBufferSize(50);
 }
@@ -49,38 +52,96 @@ void Text::setMinBufferSize(unsigned int characters){
 void Text::setFont(const char* font){
     this->font = font;
     setTexture(font + std::to_string('-') + std::to_string(fontSize));
+    //Its not necessary to reload, setTexture do it
 }
 
 void Text::setFontSize(unsigned int fontSize){
     this->fontSize = fontSize;
     setTexture(font + std::to_string('-') + std::to_string(fontSize));
-    if (loaded){
-        reload();
-    }
+    //Its not necessary to reload, setTexture do it
 }
 
 void Text::setText(const char* text){
     this->text = text;
     if (loaded){
         createText();
-        render->updateVertices();
-        render->updateTexcoords();
-        render->updateNormals();
-        render->updateIndices();
+        updateVertices();
+        updateNormals();
+        updateTexcoords();
+        updateIndices();
     }
 }
 
 void Text::setSize(int width, int height){
-    Log::Error(LOG_TAG, "Can't set size of text");
-}
-
-void Text::setInvert(bool invert){
-    Mesh2D::setInvert(invert);
+    Mesh2D::setSize(width, height);
+    userDefinedWidth = true;
+    userDefinedHeight = true;
     if (loaded) {
         createText();
-        render->updateVertices();
-        render->updateTexcoords();
+        updateVertices();
+        updateTexcoords();
     }
+}
+
+void Text::setWidth(int width){
+    Mesh2D::setSize(width, height);
+    userDefinedWidth = true;
+    if (loaded) {
+        createText();
+        updateVertices();
+        updateTexcoords();
+    }
+}
+
+void Text::setHeight(int height){
+    Mesh2D::setSize(width, height);
+    userDefinedHeight = true;
+    if (loaded) {
+        createText();
+        updateVertices();
+        updateTexcoords();
+    }
+}
+
+void Text::setInvertTexture(bool invertTexture){
+    Mesh2D::setInvertTexture(invertTexture);
+    if (loaded) {
+        createText();
+        updateVertices();
+        updateTexcoords();
+    }
+}
+
+float Text::getAscent(){
+    if (!stbtext)
+        return 0;
+    else
+        return stbtext->getAscent();
+}
+
+float Text::getDescent(){
+    if (!stbtext)
+        return 0;
+    else
+        return stbtext->getDescent();
+}
+
+float Text::getLineGap(){
+    if (!stbtext)
+        return 0;
+    else
+        return stbtext->getLineGap();
+}
+
+int Text::getLineHeight(){
+    if (!stbtext)
+        return 0;
+    else
+        return stbtext->getLineHeight();
+}
+
+void Text::setMultiline(bool multiline){
+    this->multiline = multiline;
 }
 
 void Text::createText(){
@@ -89,19 +150,15 @@ void Text::createText(){
     normals.clear();
     std::vector<unsigned int> indices;
     
-    int textWidth, textHeight;
-    
-    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &textWidth, &textHeight, invert);
-    
-    this->width = textWidth;
-    this->height = textHeight;
+    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &width, &height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
     
     submeshes[0]->setIndices(indices);
 }
 
 bool Text::load(){
 
-    stbtext->load(font.c_str(), fontSize);
+    stbtext->load(font.c_str(), fontSize, submeshes[0]->getMaterial()->getTexture());
+    setInvertTexture(isIn3DScene());
     createText();
     
     return Mesh2D::load();

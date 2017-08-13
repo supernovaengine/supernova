@@ -301,6 +301,35 @@ void Object::moveUp(){
     }
 }
 
+void Object::addAction(Action* action){
+    bool founded = false;
+
+    std::vector<Action*>::iterator it;
+    for (it = actions.begin(); it != actions.end(); ++it) {
+        if (action == (*it))
+            founded = true;
+    }
+
+    if (!founded){
+        if (!action->object) {
+            actions.push_back(action);
+            action->object = this;
+        }else{
+            Log::Error(LOG_TAG, "This action is attached to other object");
+        }
+    }
+}
+
+void Object::removeAction(Action* action){
+    if (action->object == this){
+        std::vector<Action*>::iterator i = std::remove(actions.begin(), actions.end(), action);
+        actions.erase(i,actions.end());
+        action->object = NULL;
+    }else{
+        Log::Error(LOG_TAG, "This action is attached to other object");
+    }
+}
+
 void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
     
     this->viewMatrix = viewMatrix;
@@ -351,6 +380,13 @@ void Object::updateMVPMatrix(){
     }
 }
 
+bool Object::isIn3DScene(){
+    if (scene && scene->is3D())
+        return true;
+    
+    return false;
+}
+
 bool Object::isLoaded(){
     return loaded;
 }
@@ -364,7 +400,7 @@ bool Object::reload(){
 
 bool Object::load(){
 
-    if (position.z != 0){
+    if ((position.z != 0) && isIn3DScene()){
         setDepth(true);
     }
 
@@ -384,13 +420,20 @@ bool Object::draw(){
     if (position.z != 0){
         setDepth(true);
     }
+
+    for (int i = 0; i < actions.size(); i++){
+        if (actions[i]->isStarted()) {
+            actions[i]->step();
+        }
+    }
     
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
         if ((*it)->scene != (*it)){ //if not a scene object
             if (!(*it)->firstLoaded)
                 (*it)->load();
-            (*it)->draw();
+            if ((*it)->loaded)
+                (*it)->draw();
         }
     }
     

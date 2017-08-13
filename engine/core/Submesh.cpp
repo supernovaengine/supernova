@@ -1,5 +1,4 @@
 #include "Submesh.h"
-#include "render/TextureManager.h"
 
 using namespace Supernova;
 
@@ -8,10 +7,11 @@ Submesh::Submesh(){
 
     this->distanceToCamera = -1;
     this->material = NULL;
-    this->newMaterial = false;
+    this->materialOwned = false;
     this->dynamic = false;
 
     this->loaded = false;
+    this->renderOwned = true;
 
     this->minBufferSize = 0;
 }
@@ -21,23 +21,24 @@ Submesh::Submesh(Material* material): Submesh() {
 }
 
 Submesh::~Submesh(){
-    if (newMaterial)
-        delete material;
+    if (materialOwned)
+        delete this->material;
     
-    if (render)
-        delete render;
+    if (this->render && this->renderOwned)
+        delete this->render;
 
-    if (loaded)
+    if (this->loaded)
         destroy();
 }
 
 Submesh::Submesh(const Submesh& s){
     this->indices = s.indices;
     this->distanceToCamera = s.distanceToCamera;
-    this->newMaterial = s.newMaterial;
+    this->materialOwned = s.materialOwned;
     this->material = s.material;
     this->dynamic = s.dynamic;
     this->loaded = s.loaded;
+    this->renderOwned = s.renderOwned;
     this->render = s.render;
     this->minBufferSize = s.minBufferSize;
 }
@@ -45,10 +46,11 @@ Submesh::Submesh(const Submesh& s){
 Submesh& Submesh::operator = (const Submesh& s){
     this->indices = s.indices;
     this->distanceToCamera = s.distanceToCamera;
-    this->newMaterial = s.newMaterial;
+    this->materialOwned = s.materialOwned;
     this->material = s.material;
     this->dynamic = s.dynamic;
     this->loaded = s.loaded;
+    this->renderOwned = s.renderOwned;
     this->render = s.render;
     this->minBufferSize = s.minBufferSize;
 
@@ -81,7 +83,7 @@ unsigned int Submesh::getIndex(int offset){
 
 void Submesh::createNewMaterial(){
     this->material = new Material();
-    this->newMaterial = true;
+    this->materialOwned = true;
 }
 
 void Submesh::setMaterial(Material* material){
@@ -92,27 +94,61 @@ Material* Submesh::getMaterial(){
     return this->material;
 }
 
-SubmeshRender* Submesh::getSubmeshRender(){
+void Submesh::setSubmeshRender(ObjectRender* render){
+    if (this->render && this->renderOwned)
+        delete this->render;
+    
+    this->render = render;
+    renderOwned = false;
+    
+}
+
+ObjectRender* Submesh::getSubmeshRender(){
+    if (render == NULL)
+        render = ObjectRender::newInstance();
+    
     return render;
 }
 
 bool Submesh::load(){
-    SubmeshRender::newInstance(&render);
-        
-    render->setSubmesh(this);
-    render->load();
+    
+    render = getSubmeshRender();
+    
+    render->setDynamicBuffer(dynamic);
+    
+    render->addIndex(indices.size(), &indices.front());
+    
+    render->setTexture(material->getTexture());
+    render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor()->ptr());
+    if (material->getTextureRect())
+        render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect()->ptr());
+    
+    bool renderloaded = true;
+    
+    if (renderOwned)
+        renderloaded = render->load();
+    
+    if (renderloaded)
+        loaded = true;
+    
+    return renderloaded;
+}
 
-    loaded = true;
+bool Submesh::draw(){
+    if (renderOwned)
+        render->prepareDraw();
+    
+    render->draw();
+    
+    if (renderOwned)
+        render->finishDraw();
     
     return true;
 }
 
-bool Submesh::draw(){
-    return render->draw();
-}
-
 void Submesh::destroy(){
-    render->destroy();
+    if (render)
+        render->destroy();
 
     loaded = false;
 }

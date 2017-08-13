@@ -1,6 +1,5 @@
 #include "Mesh.h"
 #include "Scene.h"
-#include "render/TextureManager.h"
 #include "platform/Log.h"
 
 using namespace Supernova;
@@ -79,6 +78,24 @@ void Mesh::addSubmesh(Submesh* submesh){
     submeshes.push_back(submesh);
 }
 
+void Mesh::updateVertices(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
+}
+
+void Mesh::updateNormals(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, texcoords.size(), &texcoords.front());
+}
+
+void Mesh::updateTexcoords(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, normals.size(), &normals.front());
+}
+
+void Mesh::updateIndices(){
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->getSubmeshRender()->updateIndex(submeshes[i]->getIndices()->size(), &(submeshes[i]->getIndices()->front()));
+    }
+}
+
 void Mesh::sortTransparentSubmeshes(){
 
     if (transparent){
@@ -140,16 +157,62 @@ bool Mesh::load(){
     while (vertices.size() > normals.size()){
         normals.push_back(Vector3(0,0,0));
     }
-
-    MeshRender::newInstance(&render);
     
-    render->setMesh(this);
-
+    bool hasTextureRect = false;
+    bool hasTextureCoords = false;
+    bool hasTextureCube = false;
+    for (unsigned int i = 0; i < submeshes.size(); i++){
+        if (submeshes.at(i)->getMaterial()->getTextureRect()){
+            hasTextureRect = true;
+        }
+        if (submeshes.at(i)->getMaterial()->getTexture()){
+            hasTextureCoords = true;
+            if (submeshes.at(i)->getMaterial()->getTexture()->getType() == S_TEXTURE_CUBE){
+                hasTextureCube = true;
+            }
+        }
+    }
+    
+    if (render == NULL)
+        render = ObjectRender::newInstance();
+    
+    render->setProgramShader(S_SHADER_MESH);
+    render->setDynamicBuffer(dynamic);
+    render->setHasTextureCoords(hasTextureCoords);
+    render->setHasTextureRect(hasTextureRect);
+    render->setHasTextureCube(hasTextureCube);
+    render->setIsSky(isSky());
+    render->setIsText(isText());
+    
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2, texcoords.size(), &texcoords.front());
+    
+    render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
+    render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
+    render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
+    
+    if (scene){
+        render->setSceneRender(scene->getSceneRender());
+        render->setLightRender(scene->getLightRender());
+        render->setFogRender(scene->getFogRender());
+    }
+    
+    Program* mainProgram = render->getProgram();
+    
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
+        if (submeshes.size() == 1){
+            //Use the same render for submesh
+            submeshes[i]->setSubmeshRender(render);
+        }else{
+            submeshes[i]->getSubmeshRender()->setProgram(mainProgram);
+        }
+        submeshes[i]->getSubmeshRender()->setPrimitiveType(primitiveMode);
         submeshes[i]->load();
     }
-
+    
     bool renderloaded = render->load();
 
     if (renderloaded)
@@ -162,11 +225,15 @@ bool Mesh::renderDraw(){
     if (!ConcreteObject::renderDraw())
         return false;
     
+    render->prepareDraw();
+    
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->draw();
     }
+    
+    render->finishDraw();
 
-    return render->draw();
+    return true;
 }
 
 void Mesh::destroy(){
@@ -176,5 +243,6 @@ void Mesh::destroy(){
         submeshes[i]->destroy();
     }
     
-    render->destroy();
+    if (render)
+        render->destroy();
 }

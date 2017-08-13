@@ -12,6 +12,7 @@ Scene::Scene() {
     childScene = false;
     useTransparency = false;
     useDepth = false;
+    useLight = false;
     userCamera = false;
     setAmbientLight(0.1);
     scene = this;
@@ -19,11 +20,19 @@ Scene::Scene() {
     fog = NULL;
 
     render = NULL;
+    lightRender = NULL;
+    fogRender = NULL;
 }
 
 Scene::~Scene() {
     if (render)
         delete render;
+    
+    if (lightRender)
+        delete lightRender;
+    
+    if (fogRender)
+        delete fogRender;
 }
 
 void Scene::addLight (Light* light){    
@@ -87,6 +96,14 @@ SceneRender* Scene::getSceneRender(){
     return render;
 }
 
+ObjectRender* Scene::getLightRender(){
+    return lightRender;
+}
+
+ObjectRender* Scene::getFogRender(){
+    return fogRender;
+}
+
 void Scene::setSky(SkyBox* sky){
     this->sky = sky;
 }
@@ -119,6 +136,10 @@ bool Scene::isUseDepth(){
     return useDepth;
 }
 
+bool Scene::isUseLight(){
+    return useLight;
+}
+
 bool Scene::isUseTransparency(){
     return useTransparency;
 }
@@ -137,19 +158,20 @@ Camera* Scene::getCamera(){
     return camera;
 }
 
-int Scene::getOrientation(){
-    if (this->camera != NULL){
-        if (this->camera->getType() != S_CAMERA_2D){
-            return S_ORIENTATION_BOTTOMLEFT;
-        }
+bool Scene::is3D(){
+    if (camera){
+        if (camera->getType() != S_CAMERA_2D)
+            return true;
     }
 
-    return S_ORIENTATION_TOPLEFT;
+    return false;
 }
 
 bool Scene::updateViewSize(){
 
-    SceneRender::newInstance(&render);
+    if (!render)
+        render = SceneRender::newInstance();
+
     bool status = render->viewSize(*Engine::getViewRect());
     if (this->camera != NULL){
         camera->updateAutomaticSizes();
@@ -176,6 +198,7 @@ void Scene::resetSceneProperties(){
     if (camera->getType() == S_CAMERA_PERSPECTIVE){
         useDepth = true;
     }
+    useLight = lightData.updateLights(scene->getLights(), scene->getAmbientLight());
 }
 
 void Scene::drawTransparentMeshes(){
@@ -199,14 +222,18 @@ void Scene::drawSky(){
 
 bool Scene::draw() {
     transparentQueue.clear();
+
+    render->setUseTransparency(isUseTransparency());
+    render->setUseLight(isUseLight());
+    render->setChildScene(isChildScene());
+    render->setUseDepth(isUseDepth());
+
     bool drawreturn = render->draw();
     resetSceneProperties();
 
     Object::draw();
-
     drawSky();
     drawTransparentMeshes();
-
     drawChildScenes();
     
     return drawreturn;
@@ -214,13 +241,55 @@ bool Scene::draw() {
 
 bool Scene::load(){
 
-    SceneRender::newInstance(&render);
-    render->setScene(this);
+    if (!render)
+        render = SceneRender::newInstance();
+
+    render->setUseTransparency(isUseTransparency());
+    render->setUseLight(isUseLight());
+    render->setChildScene(isChildScene());
+    render->setUseDepth(isUseDepth());
 
     doCamera();
 
     render->load();
     resetSceneProperties();
+    
+    if (useLight){
+        if (!lightRender)
+            lightRender = ObjectRender::newInstance();
+        
+        lightRender->addProperty(S_PROPERTY_AMBIENTLIGHT, S_PROPERTYDATA_FLOAT3, 1, ambientLight.ptr());
+        
+        lightRender->addProperty(S_PROPERTY_NUMPOINTLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numPointLight);
+        lightRender->addProperty(S_PROPERTY_POINTLIGHT_POS, S_PROPERTYDATA_FLOAT3, lightData.numPointLight, &lightData.pointLightPos.front());
+        lightRender->addProperty(S_PROPERTY_POINTLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numPointLight, &lightData.pointLightPower.front());
+        lightRender->addProperty(S_PROPERTY_POINTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numPointLight, &lightData.pointLightColor.front());
+        
+        lightRender->addProperty(S_PROPERTY_NUMSPOTLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numSpotLight);
+        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_POS, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightPos.front());
+        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightPower.front());
+        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightColor.front());
+        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_TARGET, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightTarget.front());
+        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_CUTOFF, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightCutOff.front());
+        
+        lightRender->addProperty(S_PROPERTY_NUMDIRLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numDirectionalLight);
+        lightRender->addProperty(S_PROPERTY_DIRLIGHT_DIR, S_PROPERTYDATA_FLOAT3, lightData.numDirectionalLight, &lightData.directionalLightDir.front());
+        lightRender->addProperty(S_PROPERTY_DIRLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numDirectionalLight, &lightData.directionalLightPower.front());
+        lightRender->addProperty(S_PROPERTY_DIRLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numDirectionalLight, &lightData.directionalLightColor.front());
+    }
+    
+    if (fog){
+        if (!fogRender)
+            fogRender = ObjectRender::newInstance();
+        
+        fogRender->addProperty(S_PROPERTY_FOG_MODE, S_PROPERTYDATA_INT1, 1, &(fog->mode));
+        fogRender->addProperty(S_PROPERTY_FOG_COLOR, S_PROPERTYDATA_FLOAT3, 1, fog->color.ptr());
+        fogRender->addProperty(S_PROPERTY_FOG_VISIBILITY, S_PROPERTYDATA_FLOAT1, 1, &(fog->visibility));
+        fogRender->addProperty(S_PROPERTY_FOG_DENSITY, S_PROPERTYDATA_FLOAT1, 1, &(fog->density));
+        fogRender->addProperty(S_PROPERTY_FOG_START, S_PROPERTYDATA_FLOAT1, 1, &(fog->linearStart));
+        fogRender->addProperty(S_PROPERTY_FOG_END, S_PROPERTYDATA_FLOAT1, 1, &(fog->linearEnd));
+    }
+    
 
     bool loadreturn = Object::load();
 

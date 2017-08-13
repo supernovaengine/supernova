@@ -17,6 +17,10 @@ namespace Supernova {
         std::string font;
         std::string text;
         unsigned int fontSize;
+        bool multiline;
+        
+        bool userDefinedWidth;
+        bool userDefinedHeight;
         
     protected:
         void createText();
@@ -31,13 +35,22 @@ namespace Supernova {
         bool operator != ( const char* v ) const;
         
         virtual void setSize(int width, int height);
-        virtual void setInvert(bool invert);
+        virtual void setInvertTexture(bool invertTexture);
+        
+        void setWidth(int width);
+        void setHeight(int height);
 
         void setMinBufferSize(unsigned int characters);
+
+        float getAscent();
+        float getDescent();
+        float getLineGap();
+        int getLineHeight();
         
         void setFont(const char* font);
         void setText(const char* text);
         void setFontSize(unsigned int fontSize);
+        void setMultiline(bool multiline);
 
         virtual bool load();
     };

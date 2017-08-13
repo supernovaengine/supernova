@@ -2,6 +2,7 @@
 #include "platform/Log.h"
 #include "Engine.h"
 #include "LuaBind.h"
+#include "Input.h"
 
 #include "lua.h"
 #include "lualib.h"
@@ -10,8 +11,8 @@
 using namespace Supernova;
 
 
-void (*Events::onFrameFunc)();
-int Events::onFrameLuaFunc;
+void (*Events::onDrawFunc)();
+int Events::onDrawLuaFunc;
 
 void (*Events::onUpdateFunc)();
 int Events::onUpdateLuaFunc;
@@ -57,26 +58,26 @@ void Events::luaCallback(int nargs, int nresults, int msgh){
     }
 }
 
-void Events::onFrame(void (*onFrameFunc)()){
-    Events::onFrameFunc = onFrameFunc;
+void Events::onDraw(void (*onDrawFunc)()){
+    Events::onDrawFunc = onDrawFunc;
 }
 
-int Events::onFrame(lua_State *L){
+int Events::onDraw(lua_State *L){
     
     if (lua_type(L, 2) == LUA_TFUNCTION){
-        Events::onFrameLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
+        Events::onDrawLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
         //TODO: return error in Lua
     }
     return 0;
 }
 
-void Events::call_onFrame(){
-    if (onFrameFunc != NULL){
-        onFrameFunc();
+void Events::call_onDraw(){
+    if (onDrawFunc != NULL){
+        onDrawFunc();
     }
-    if (onFrameLuaFunc != 0){
-        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onFrameLuaFunc);
+    if (onDrawLuaFunc != 0){
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onDrawLuaFunc);
         luaCallback(0, 0, 0);
     }
 }
@@ -129,6 +130,8 @@ void Events::call_onTouchPress(float x, float y){
         lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(2, 0, 0);
     }
+    Input::addTouchPressed();
+    Input::setTouchPosition(x, y);
 }
 
 void Events::onTouchUp(void (*onTouchUpFunc)(float, float)){
@@ -155,6 +158,8 @@ void Events::call_onTouchUp(float x, float y){
         lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(2, 0, 0);
     }
+    Input::releaseTouchPressed();
+    Input::setTouchPosition(x, y);
 }
 
 void Events::onTouchDrag(void (*onTouchDragFunc)(float, float)){
@@ -181,6 +186,7 @@ void Events::call_onTouchDrag(float x, float y){
         lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(2, 0, 0);
     }
+    Input::setTouchPosition(x, y);
 }
 
 void Events::onMousePress(void (*onMousePressFunc)(int, float, float)){
@@ -208,6 +214,8 @@ void Events::call_onMousePress(int button, float x, float y){
         lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(3, 0, 0);
     }
+    Input::addMousePressed(button);
+    Input::setMousePosition(x, y);
 }
 
 void Events::onMouseUp(void (*onMouseUpFunc)(int, float, float)){
@@ -235,6 +243,8 @@ void Events::call_onMouseUp(int button, float x, float y){
         lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(3, 0, 0);
     }
+    Input::releaseMousePressed(button);
+    Input::setMousePosition(x, y);
 }
 
 void Events::onMouseDrag(void (*onMouseDragFunc)(int, float, float)){
@@ -262,6 +272,7 @@ void Events::call_onMouseDrag(int button, float x, float y){
         lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(3, 0, 0);
     }
+    Input::setMousePosition(x, y);
 }
 
 void Events::onMouseMove(void (*onMouseMoveFunc)(float, float)){
@@ -288,6 +299,7 @@ void Events::call_onMouseMove(float x, float y){
         lua_pushnumber(LuaBind::getLuaState(), y);
         luaCallback(2, 0, 0);
     }
+    Input::setMousePosition(x, y);
 }
 
 void Events::onKeyPress(void (*onKeyPressFunc)(int)){
@@ -313,6 +325,7 @@ void Events::call_onKeyPress(int key){
         lua_pushnumber(LuaBind::getLuaState(), key);
         luaCallback(1, 0, 0);
     }
+    Input::addKeyPressed(key);
 }
 
 void Events::onKeyUp(void (*onKeyUpFunc)(int)){
@@ -338,4 +351,5 @@ void Events::call_onKeyUp(int key){
         lua_pushnumber(LuaBind::getLuaState(), key);
         luaCallback(1, 0, 0);
     }
+    Input::releaseKeyPressed(key);
 }

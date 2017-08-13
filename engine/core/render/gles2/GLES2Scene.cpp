@@ -3,8 +3,6 @@
 
 #include "GLES2Header.h"
 #include "GLES2Util.h"
-#include "render/ProgramManager.h"
-#include "render/TextureManager.h"
 #include "math/Angle.h"
 #include "Engine.h"
 
@@ -25,16 +23,10 @@ bool GLES2Scene::load() {
     }
 
     if (!childScene) {
-        //ProgramManager::clear();
-        //TextureManager::clear();
-
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         GLES2Util::checkGlError("Error on load scene GLES2");
     }
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
 
     return true;
 }
@@ -55,7 +47,7 @@ bool GLES2Scene::draw() {
 
     if (useDepth){
         glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
+        glDepthFunc(GL_LEQUAL);
     }else{
         glDisable(GL_DEPTH_TEST);
     }

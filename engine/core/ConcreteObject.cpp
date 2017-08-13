@@ -1,6 +1,5 @@
 #include "ConcreteObject.h"
 #include "Scene.h"
-#include "render/TextureManager.h"
 
 using namespace Supernova;
 
@@ -33,15 +32,12 @@ void ConcreteObject::setColor(float red, float green, float blue, float alpha){
 }
 
 void ConcreteObject::setTexture(std::string texture){
-    std::string oldTexture = "";
     
-    if (material.getTextures().size() > 0){
-        oldTexture = material.getTextures().front();
-    }
+    std::string oldTexture = material.getTexturePath();
     
     if (texture != oldTexture){
         
-        material.setTexture(texture);
+        material.setTexturePath(texture);
         
         if (loaded){
             reload();
@@ -50,8 +46,12 @@ void ConcreteObject::setTexture(std::string texture){
     }
 }
 
+Material* ConcreteObject::getMaterial(){
+    return &this->material;
+}
+
 std::string ConcreteObject::getTexture(){
-    return material.getTextures().front();
+    return material.getTexturePath();
 }
 
 void ConcreteObject::updateDistanceToCamera(){
@@ -98,8 +98,9 @@ bool ConcreteObject::draw(){
 bool ConcreteObject::load(){
     Object::load();
 
-    if (material.getTextures().size() > 0) {
-        transparent = TextureManager::hasAlphaChannel(material.getTextures()[0]);
+    if (material.getTexture()) {
+        if (material.getTexture()->getType() == S_TEXTURE_2D)
+            transparent = material.getTexture()->hasAlphaChannel();
     }
     if (transparent){
         setTransparency(true);

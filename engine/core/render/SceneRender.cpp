@@ -1,58 +1,48 @@
 #include "SceneRender.h"
 #include "math/Angle.h"
-#include "Scene.h"
 #include "Engine.h"
 #include "gles2/GLES2Scene.h"
 
 using namespace Supernova;
 
 SceneRender::SceneRender(){
-    lighting = false;
+    useLight = false;
     childScene = false;
     useDepth = false;
     useTransparency = false;
-
-    fog = NULL;
 }
 
 SceneRender::~SceneRender(){
 
 }
 
-void SceneRender::newInstance(SceneRender** render){
-    if (*render == NULL){
-        if (Engine::getRenderAPI() == S_GLES2){
-            *render = new GLES2Scene();
-        }
+SceneRender* SceneRender::newInstance(){
+    if (Engine::getRenderAPI() == S_GLES2){
+        return new GLES2Scene();
     }
+
+    return NULL;
 }
 
-void SceneRender::setScene(Scene* scene){
-    this->scene = scene;
+void SceneRender::setUseLight(bool useLight){
+    this->useLight = useLight;
 }
 
-void SceneRender::fillSceneProperties(){
-    this->lighting = this->lightData.updateLights(scene->getLights(), scene->getAmbientLight());
-    this->childScene = scene->isChildScene();
-    this->useDepth = scene->isUseDepth();
-    this->useTransparency = scene->isUseTransparency();
+void SceneRender::setChildScene(bool childScene){
+    this->childScene = childScene;
 }
 
-LightData* SceneRender::getLightData(){
-    return &lightData;
+void SceneRender::setUseDepth(bool useDepth){
+    this->useDepth = useDepth;
 }
 
-Fog* SceneRender::getFog(){
-    return fog;
+void SceneRender::setUseTransparency(bool useTransparency){
+    this->useTransparency = useTransparency;
 }
 
 bool SceneRender::load(){
-    fillSceneProperties();
-
     return true;
 }
 bool SceneRender::draw(){
-    fillSceneProperties();
-
     return true;
 }

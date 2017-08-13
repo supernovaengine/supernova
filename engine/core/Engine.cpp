@@ -26,7 +26,7 @@
 #include <stdlib.h>
 
 #include "Mesh.h"
-#include "Input.h"
+#include "InputCode.h"
 
 #include "audio/SoundManager.h"
 
@@ -52,9 +52,9 @@ bool Engine::useDegrees;
 int Engine::scalingMode;
 
 unsigned long Engine::lastTime = 0;
-unsigned long Engine::updateTimeCount = 0;
+unsigned int Engine::updateTimeCount = 0;
 
-unsigned long Engine::frameTime = 0;
+unsigned int Engine::frametime = 0;
 float Engine::deltatime = 0;
 float Engine::framerate = 0;
 
@@ -213,6 +213,10 @@ float Engine::getDeltatime(){
     return deltatime;
 }
 
+unsigned int Engine::getFrametime(){
+    return frametime;
+}
+
 void Engine::onStart(){
 
     onStart(0, 0);
@@ -231,7 +235,8 @@ void Engine::onStart(int width, int height){
     LuaBind::createLuaState();
     LuaBind::bind();
     
-    lastTime = (float)clock() / CLOCKS_PER_SEC * 1000;
+    auto now = std::chrono::steady_clock::now();
+    lastTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 
     init();
 }
@@ -299,22 +304,24 @@ void Engine::onSurfaceChanged(int width, int height) {
 
 }
 
-void Engine::onDrawFrame() {
+void Engine::onDraw() {
     
     if (Engine::getScene() != NULL){
         (Engine::getScene())->draw();
     }
     
-    unsigned long newTime = (float)clock() / CLOCKS_PER_SEC * 1000;
-    frameTime = newTime - lastTime;
+    auto now = std::chrono::steady_clock::now();
+    unsigned long newTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    
+    frametime = (unsigned int)(newTime - lastTime);
     lastTime = newTime;
     
-    deltatime = (float)frameTime / updateTime;
+    deltatime = (float)frametime / updateTime;
     
-    float frameTimeSeconds = (float)frameTime / 1000;
+    float frameTimeSeconds = (float)frametime / 1000;
     framerate = 1 / frameTimeSeconds;
     
-    updateTimeCount += frameTime;
+    updateTimeCount += frametime;
     if (updateTimeCount > updateTime){
         unsigned int updateCallCount = floor((float)updateTimeCount / updateTime);
         for (int i = 0; i < updateCallCount; i++){
@@ -323,7 +330,7 @@ void Engine::onDrawFrame() {
         updateTimeCount -= (updateTime * updateCallCount);
     }
     
-    Events::call_onFrame();
+    Events::call_onDraw();
     
     SoundManager::checkActive();
     
@@ -349,7 +356,6 @@ bool Engine::transformCoordPos(float& x, float& y){
 
 void Engine::onTouchPress(float x, float y){
     if (transformCoordPos(x, y)){
-        printf("teste %f %f \n", x, y);
         Events::call_onTouchPress(x, y);
     }
 }

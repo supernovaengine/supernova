@@ -7,7 +7,7 @@
 #define S_POINTSIZE_HEIGHT 2
 
 #include "ConcreteObject.h"
-#include "render/PointRender.h"
+#include "render/ObjectRender.h"
 #include <unordered_map>
 
 namespace Supernova {
@@ -15,11 +15,13 @@ namespace Supernova {
     class Points: public ConcreteObject {
 
     private:
+        void updateNormalizedRectsData();
         void updatePointScale();
         void fillScaledSizeVector();
         void normalizeTextureRects();
         
         std::vector<float> pointSizesScaled;
+        std::vector<float> rectsData;
         
         int texWidth;
         int texHeight;
@@ -31,7 +33,7 @@ namespace Supernova {
         bool useTextureRects;
 
     protected:
-        PointRender* render;
+        ObjectRender* render;
 
         std::vector<Vector3> positions;
         std::vector<Vector3> normals;
@@ -45,6 +47,12 @@ namespace Supernova {
         float maxPointSize;
         
         std::unordered_map <std::string, Rect> framesRect;
+        
+        void updatePositions();
+        void updateNormals();
+        void updatePointColors();
+        void updatePointSizes();
+        void updateTextureRects();
 
     public:
         Points();

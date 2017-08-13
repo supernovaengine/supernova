@@ -32,6 +32,8 @@ namespace Supernova {
         
         void setTexture(std::string texture);
         std::string getTexture();
+        
+        Material* getMaterial();
 
         void setTransparency(bool transparency);
 

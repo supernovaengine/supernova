@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include "Material.h"
-#include "render/SubmeshRender.h"
+#include "render/ObjectRender.h"
 #include "Render.h"
 
 namespace Supernova {
@@ -18,17 +18,18 @@ namespace Supernova {
 
     private:
 
-        SubmeshRender* render;
+        ObjectRender* render;
 
         std::vector<unsigned int> indices;
         
         Material* material;
-        bool newMaterial;
+        bool materialOwned;
         float distanceToCamera;
         bool dynamic;
 
         unsigned int minBufferSize;
 
+        bool renderOwned;
         bool loaded;
 
     public:
@@ -52,7 +53,8 @@ namespace Supernova {
         bool isDynamic();
         unsigned int getMinBufferSize();
         
-        SubmeshRender* getSubmeshRender();
+        void setSubmeshRender(ObjectRender* render);
+        ObjectRender* getSubmeshRender();
         
         virtual bool load();
         virtual bool draw();

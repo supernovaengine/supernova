@@ -70,7 +70,7 @@ bool Model::loadOBJ(const char* path){
                 this->submeshes.back()->createNewMaterial();
             }
 
-            this->submeshes.back()->getMaterial()->setTexture(baseDir+"/"+materials[i].diffuse_texname);
+            this->submeshes.back()->getMaterial()->setTexturePath(baseDir+"/"+materials[i].diffuse_texname);
             if (materials[i].dissolve < 1){
                 this->submeshes.back()->getMaterial()->transparent = true;
             }
@@ -105,7 +105,6 @@ bool Model::loadOBJ(const char* path){
             }
         }
     }
-
 
     return true;
 }

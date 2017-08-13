@@ -10,8 +10,8 @@ namespace Supernova {
     private:
         static void luaCallback(int nargs, int nresults, int msgh);
         
-        static void (*onFrameFunc)();
-        static int onFrameLuaFunc;
+        static void (*onDrawFunc)();
+        static int onDrawLuaFunc;
         
         static void (*onUpdateFunc)();
         static int onUpdateLuaFunc;
@@ -47,9 +47,9 @@ namespace Supernova {
         Events();
         virtual ~Events();
         
-        static void onFrame(void (*onFrameFunc)());
-        static int onFrame(lua_State *L);
-        static void call_onFrame();
+        static void onDraw(void (*onDrawFunc)());
+        static int onDraw(lua_State *L);
+        static void call_onDraw();
         
         static void onUpdate(void (*onUpdateFunc)());
         static int onUpdate(lua_State *L);

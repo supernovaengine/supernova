@@ -3,7 +3,6 @@
 #include "PrimitiveMode.h"
 #include "Scene.h"
 #include "Engine.h"
-#include "render/TextureManager.h"
 
 using namespace Supernova;
 
@@ -33,6 +32,26 @@ Points::~Points(){
         delete render;
 }
 
+void Points::updatePositions(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, positions.size(), &positions.front());
+}
+
+void Points::updateNormals(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, normals.size(), &normals.front());
+}
+
+void Points::updatePointColors(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, colors.size(), &colors.front());
+}
+
+void Points::updatePointSizes(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, pointSizes.size(), &pointSizes.front());
+}
+
+void Points::updateTextureRects(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, rectsData.size()/4, &rectsData.front());
+}
+
 void Points::addPoint(){
     positions.push_back(Vector3(0.0, 0.0, 0.0));
     pointSizes.push_back(1);
@@ -41,7 +60,7 @@ void Points::addPoint(){
     textureRects.push_back(NULL);
 
     fillScaledSizeVector();
-    normalizeTextureRects();
+    updateNormalizedRectsData();
 }
 
 void Points::addPoint(Vector3 position){
@@ -72,7 +91,7 @@ void Points::setPointSize(int point, float size){
 void Points::setPointColor(int point, Vector4 color){
     colors[point] = color;
     if (loaded)
-        render->updatePointColors();
+        updatePointColors();
 }
 
 void Points::setPointColor(int point, float red, float green, float blue, float alpha){
@@ -91,9 +110,9 @@ void Points::setPointSprite(int point, std::string id){
         reload();
     }else{
         useTextureRects = true;
-        normalizeTextureRects();
+        updateNormalizedRectsData();
         if (loaded)
-            render->updateTextureRects();
+            updateTextureRects();
     }
 }
 
@@ -129,21 +148,29 @@ void Points::fillScaledSizeVector(){
     }
 
     if (loaded)
-        render->updatePointSizes();
+        updatePointSizes();
 }
 
-void Points::normalizeTextureRects(){
+void Points::updateNormalizedRectsData(){
     if (this->texWidth != 0 && this->texHeight != 0) {
+        
+        rectsData.clear();
         for (int i=0; i < textureRects.size(); i++){
             if (textureRects[i]) {
                 if (!textureRects[i]->isNormalized()) {
-                    textureRects[i]->setRect(textureRects[i]->getX() / (float) texWidth,
-                                            textureRects[i]->getY() / (float) texHeight,
-                                            textureRects[i]->getWidth() / (float) texWidth,
-                                            textureRects[i]->getHeight() / (float) texHeight);
+                    rectsData.push_back(textureRects[i]->getX() / (float) texWidth);
+                    rectsData.push_back(textureRects[i]->getY() / (float) texHeight);
+                    rectsData.push_back(textureRects[i]->getWidth() / (float) texWidth);
+                    rectsData.push_back(textureRects[i]->getHeight() / (float) texHeight);
+                }else{
+                    rectsData.push_back(textureRects[i]->getX());
+                    rectsData.push_back(textureRects[i]->getY());
+                    rectsData.push_back(textureRects[i]->getWidth());
+                    rectsData.push_back(textureRects[i]->getHeight());
                 }
             }
         }
+        
     }
 }
 
@@ -215,7 +242,11 @@ bool Points::renderDraw(){
     if (!ConcreteObject::renderDraw())
         return false;
     
-    return render->draw();
+    render->prepareDraw();
+    render->draw();
+    render->finishDraw();
+    
+    return true;
 }
 
 bool Points::load(){
@@ -236,21 +267,40 @@ bool Points::load(){
         colors.push_back(Vector4(0.0, 0.0, 0.0, 1.0));
     }
 
-
     fillScaledSizeVector();
 
-    PointRender::newInstance(&render);
-
-    render->setPoints(this);
-
-    if ((material.getTextures().size() > 0) && (textureRects.size() > 0)){
-        TextureManager::loadTexture(material.getTextures()[0]);
-        
-        texWidth = TextureManager::getTextureWidth(material.getTextures()[0]);
-        texHeight = TextureManager::getTextureHeight(material.getTextures()[0]);
-        
-        normalizeTextureRects();
+    if (render == NULL)
+        render = ObjectRender::newInstance();
+    
+    render->setPrimitiveType(S_PRIMITIVE_POINTS);
+    render->setProgramShader(S_SHADER_POINTS);
+    render->setDynamicBuffer(true);
+    
+    render->setTexture(material.getTexture());
+    if (scene){
+        render->setSceneRender(scene->getSceneRender());
+        render->setLightRender(scene->getLightRender());
+        render->setFogRender(scene->getFogRender());
     }
+
+    if ((material.getTexture()) && (textureRects.size() > 0)){
+        material.getTexture()->load();
+        texWidth = material.getTexture()->getWidth();
+        texHeight = material.getTexture()->getHeight();
+
+        updateNormalizedRectsData();
+    }
+    
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, positions.size(), &positions.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1, pointSizesScaled.size(), &pointSizesScaled.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4, colors.size(), &colors.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4, rectsData.size()/4, &rectsData.front());
+    
+    render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
+    render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
+    render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
     
     bool renderloaded = render->load();
 
@@ -264,7 +314,8 @@ void Points::destroy(){
     
     ConcreteObject::destroy();
 
-    render->destroy();
+    if (render)
+        render->destroy();
     
     for (int i=0; i < textureRects.size(); i++){
         delete textureRects[i];

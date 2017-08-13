@@ -8,18 +8,11 @@
 
 namespace Supernova {
 
-    class Scene;
-
     class SceneRender {
-        
-    private:
-        void fillSceneProperties();
-        
-        Fog* fog;
-        LightData lightData;
         
     protected:
 
+        bool useLight;
         bool childScene;
         bool useDepth;
         bool useTransparency;
@@ -27,19 +20,18 @@ namespace Supernova {
         Scene* scene;
 
         void updateLights();
-        
-    public:
-        bool lighting;
 
         SceneRender();
+        
+    public:
+        static SceneRender* newInstance();
+
         virtual ~SceneRender();
 
-        static void newInstance(SceneRender** render);
-        
-        void setScene(Scene* scene);
-
-        LightData* getLightData();
-        Fog* getFog();
+        void setUseLight(bool useLight);
+        void setChildScene(bool childScene);
+        void setUseDepth(bool useDepth);
+        void setUseTransparency(bool useTransparency);
 
         virtual bool load();
         virtual bool draw();

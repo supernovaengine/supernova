@@ -1,9 +1,9 @@
-#ifndef texturefile_h
-#define texturefile_h
+#ifndef texturedata_h
+#define texturedata_h
 
 namespace Supernova {
 
-    class TextureFile {
+    class TextureData {
     private:
 
         int width;
@@ -17,12 +17,12 @@ namespace Supernova {
 
     public:
 
-        TextureFile();
-        TextureFile(int width, int height, int size, int color_format, int bitsPerPixel, void* data);
-        TextureFile(const TextureFile& v);
-        TextureFile& operator = ( const TextureFile& v );
-        virtual ~TextureFile();
-        void copy(const TextureFile& v);
+        TextureData();
+        TextureData(int width, int height, int size, int color_format, int bitsPerPixel, void* data);
+        TextureData(const TextureData& v);
+        TextureData& operator = ( const TextureData& v );
+        virtual ~TextureData();
+        void copy(const TextureData& v);
 
         void releaseImageData();
         void crop(int offsetX, int offsetY, int newWidth, int newHeight);
@@ -42,4 +42,4 @@ namespace Supernova {
 }
 
 
-#endif /* texturefile_h */
+#endif /* texturedata_h */

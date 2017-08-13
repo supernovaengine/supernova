@@ -10,6 +10,9 @@
 namespace Supernova {
 
     class Fog {
+
+        friend class Scene;
+
     private:
         int mode;
         float linearStart;
