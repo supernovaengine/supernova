@@ -50,6 +50,7 @@ int Engine::renderAPI;
 bool Engine::mouseAsTouch;
 bool Engine::useDegrees;
 int Engine::scalingMode;
+bool Engine::nearestScaleTexture;
 
 unsigned long Engine::lastTime = 0;
 unsigned int Engine::updateTimeCount = 0;
@@ -180,6 +181,14 @@ bool Engine::isUseDegrees(){
     return Engine::useDegrees;
 }
 
+void Engine::setNearestScaleTexture(bool nearestScaleTexture){
+    Engine::nearestScaleTexture = nearestScaleTexture;
+}
+
+bool Engine::isNearestScaleTexture(){
+    return nearestScaleTexture;
+}
+
 void Engine::setUpdateTime(unsigned int updateTime){
     Engine::updateTime = updateTime;
 }
@@ -231,6 +240,7 @@ void Engine::onStart(int width, int height){
     Engine::setUseDegrees(true);
     Engine::setRenderAPI(S_GLES2);
     Engine::setScalingMode(S_SCALING_FITWIDTH);
+    Engine::setNearestScaleTexture(false);
 
     LuaBind::createLuaState();
     LuaBind::bind();

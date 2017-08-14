@@ -195,6 +195,7 @@ void LuaBind::bind(){
     .addStaticFunction("setCanvasSize", &Engine::setCanvasSize)
     .addStaticFunction("setMouseAsTouch", &Engine::setMouseAsTouch)
     .addStaticFunction("setScalingMode", &Engine::setScalingMode)
+    .addStaticFunction("setNearestScaleTexture", &Engine::setNearestScaleTexture)
     .addStaticFunction("setUpdateTime", &Engine::setUpdateTime)
     .addStaticFunction("getFramerate", &Engine::getFramerate)
     .addStaticFunction("getDeltatime", &Engine::getDeltatime)

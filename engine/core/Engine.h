@@ -39,6 +39,7 @@ namespace Supernova {
         static bool mouseAsTouch;
         static bool useDegrees;
         static int scalingMode;
+        static bool nearestScaleTexture;
 
         static unsigned long lastTime;
         static unsigned int updateTimeCount;
@@ -85,6 +86,9 @@ namespace Supernova {
         
         static void setUseDegrees(bool useDegrees);
         static bool isUseDegrees();
+        
+        static void setNearestScaleTexture(bool nearestScaleTexture);
+        static bool isNearestScaleTexture();
         
         static void setUpdateTime(unsigned int updateTime);
         static unsigned int getUpdateTime();
