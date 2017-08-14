@@ -51,6 +51,24 @@ SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, boo
     this->endFrame = endFrame;
 }
 
+SpriteAnimation::SpriteAnimation(int interval, std::vector<int> frames, bool loop): Action(-1, loop){
+    std::vector<int> framesTime;
+    framesTime.push_back(interval);
+
+    this->function = NULL;
+    this->functionLua = 0;
+
+    this->spriteFrameCount = 0;
+    this->framesIndex = 0;
+    this->framesTimeIndex = (int)framesTime.size()-1; //Actual sprite frame with the last frameTime
+
+    this->framesTime = framesTime;
+    this->frames = frames;
+
+    this->startFrame = 0;
+    this->endFrame = 0;
+}
+
 SpriteAnimation::~SpriteAnimation(){
     
 }
@@ -77,7 +95,7 @@ void SpriteAnimation::play(){
         }
 
         if (!erro) {
-            if (startFrame >= 0 || endFrame >= 0) {
+            if (startFrame > 0 || endFrame > 0) {
                 std::vector<int> frames;
                 int actualFrame = startFrame;
                 bool finaliza = false;
