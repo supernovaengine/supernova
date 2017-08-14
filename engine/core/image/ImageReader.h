@@ -3,7 +3,7 @@
 #define ImageReader_h
 
 #include "TextureData.h"
-#include "FileData.h"
+#include "file/FileData.h"
 #include <fstream>
 
 namespace Supernova {

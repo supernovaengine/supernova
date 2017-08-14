@@ -11,6 +11,9 @@ namespace Supernova{
     protected:
         std::vector<int> framesTime;
         std::vector<int> frames;
+        int framesIndex;
+        int framesTimeIndex;
+        unsigned int spriteFrameCount;
         
         int startFrame;
         int endFrame;
@@ -23,6 +26,7 @@ namespace Supernova{
         
         virtual void play();
         virtual void stop();
+        virtual void reset();
         
         virtual void step();
     };

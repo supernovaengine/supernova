@@ -3,7 +3,7 @@
 #include "PrimitiveMode.h"
 #include <string>
 #include "platform/Log.h"
-#include "STBText.h"
+#include "text/STBText.h"
 
 using namespace Supernova;
 

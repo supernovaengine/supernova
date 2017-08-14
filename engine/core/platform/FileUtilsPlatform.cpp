@@ -4,13 +4,13 @@
 using namespace Supernova;
 
 #ifdef SUPERNOVA_ANDROID
-#include "FileUtilsAndroid.h"
+#include "android/FileUtilsAndroid.h"
 #endif
 #ifdef  SUPERNOVA_IOS
-#include "FileUtilsIOS.h"
+#include "ios/FileUtilsIOS.h"
 #endif
 #ifdef  SUPERNOVA_WEB
-#include "FileUtilsGeneric.h"
+#include "generic/FileUtilsGeneric.h"
 #endif
 
 FileUtilsPlatform& FileUtilsPlatform::instance(){

@@ -51,8 +51,9 @@ namespace Supernova{
         int functionLua;
         
         unsigned int timecount;
+        unsigned int steptime;
         
-        bool started;
+        bool running;
         Object* object;
         
         float time;
@@ -101,7 +102,7 @@ namespace Supernova{
         
         void setFunctionType(int functionType);
         
-        bool isStarted();
+        bool isRunning();
 
         virtual void play();
         virtual void stop();

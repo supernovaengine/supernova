@@ -4,7 +4,7 @@
 #include "PrimitiveMode.h"
 #include <algorithm>
 #include "tiny_obj_loader.h"
-#include "FileData.h"
+#include "file/FileData.h"
 
 using namespace Supernova;
 

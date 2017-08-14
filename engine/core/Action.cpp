@@ -243,7 +243,7 @@ Action::Action(){
     this->functionLua = 0;
     this->duration = 0;
     this->loop = false;
-    this->started = false;
+    this->running = false;
     this->timecount = 0;
     this->time = 0;
     this->value = 0;
@@ -255,7 +255,7 @@ Action::Action(float duration, bool loop){
     this->functionLua = 0;
     this->duration = duration;
     this->loop = loop;
-    this->started = false;
+    this->running = false;
     this->timecount = 0;
     this->time = 0;
     this->value = 0;
@@ -267,7 +267,7 @@ Action::Action(float duration, bool loop, float (*function)(float)){
     this->functionLua = 0;
     this->duration = duration;
     this->loop = loop;
-    this->started = false;
+    this->running = false;
     this->timecount = 0;
     this->time = 0;
     this->value = 0;
@@ -357,19 +357,20 @@ void Action::setFunctionType(int functionType){
     }
 }
 
-bool Action::isStarted(){
-    return started;
+bool Action::isRunning(){
+    return running;
 }
 
 void Action::play(){
-    started = true;
+    running = true;
+
     if (time == 1){
         reset();
     }
 }
 
 void Action::stop(){
-    started = false;
+    running = false;
 }
 
 void Action::reset(){
@@ -379,11 +380,14 @@ void Action::reset(){
 }
 
 void Action::step(){
-    int durationms = (int)(duration * 1000);
 
-    if (started){
-        timecount += Engine::getFrametime();
-        if (durationms >= 0){
+    if (duration >= 0) {
+
+        int durationms = (int)(duration * 1000);
+
+        if (running){
+            steptime = Engine::getFrametime();
+            timecount += steptime;
             if (timecount >= durationms){
                 if (!loop){
                     stop();
@@ -393,9 +397,10 @@ void Action::step(){
                 }
             }
         }
+
+        time = (float) timecount / durationms;
     }
-    
-    time = (float)timecount / durationms;
+
     if (function){
         value = function(time);
     }else if(functionLua != 0){

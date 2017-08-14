@@ -3,30 +3,17 @@
 
 #include "Image.h"
 #include <unordered_map>
+#include "action/SpriteAnimation.h"
 
 namespace Supernova {
 
     class Sprite: public Image {
-        
-    private:
-        
-        bool inAnimation;
 
     protected:
         
-        struct animationData{
-            std::vector<int> frames;
-            std::vector<int> framesTime;
-            int framesIndex;
-            int framesTimeIndex;
-            bool loop;
-            int timecount;
-        };
-        
         std::unordered_map <std::string, Rect> framesRect;
-        
-        animationData animation;
-        
+        SpriteAnimation* defaultAnimation;
+
     public:
         Sprite();
         virtual ~Sprite();
@@ -38,12 +25,12 @@ namespace Supernova {
         void setFrame(int id);
         
         unsigned int getFramesSize();
-        bool isInAnimation();
+        bool isAnimation();
 
-        void animate(std::vector<int> framesTime, std::vector<int> frames, bool loop);
-        void animate(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
-        void animate(int interval, int startFrame, int endFrame, bool loop);
-        void stop();
+        void playAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop);
+        void playAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
+        void playAnimation(int interval, int startFrame, int endFrame, bool loop);
+        void stopAnimation();
         
         virtual bool draw();
     };
