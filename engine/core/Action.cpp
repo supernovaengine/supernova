@@ -245,6 +245,7 @@ Action::Action(){
     this->loop = false;
     this->running = false;
     this->timecount = 0;
+    this->steptime = 0;
     this->time = 0;
     this->value = 0;
 }
@@ -257,6 +258,7 @@ Action::Action(float duration, bool loop){
     this->loop = loop;
     this->running = false;
     this->timecount = 0;
+    this->steptime = 0;
     this->time = 0;
     this->value = 0;
 }
@@ -269,6 +271,7 @@ Action::Action(float duration, bool loop, float (*function)(float)){
     this->loop = loop;
     this->running = false;
     this->timecount = 0;
+    this->steptime = 0;
     this->time = 0;
     this->value = 0;
 }
@@ -381,13 +384,14 @@ void Action::reset(){
 
 void Action::step(){
 
-    if (duration >= 0) {
-
-        int durationms = (int)(duration * 1000);
-
-        if (running){
-            steptime = Engine::getFrametime();
-            timecount += steptime;
+    if (running){
+        steptime = Engine::getFrametime();
+        timecount += steptime;
+        
+        if (duration >= 0) {
+            
+            int durationms = (int)(duration * 1000);
+            
             if (timecount >= durationms){
                 if (!loop){
                     stop();
@@ -396,9 +400,10 @@ void Action::step(){
                     timecount -= durationms;
                 }
             }
+            
+            time = (float) timecount / durationms;
         }
-
-        time = (float) timecount / durationms;
+        
     }
 
     if (function){

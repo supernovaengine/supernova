@@ -370,7 +370,7 @@ void LuaBind::bind(){
     
     .beginExtendClass<Image, Mesh2D>("Image")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
-    .addFunction("setTectureRect", (void (Image::*)(float, float, float, float))&Image::setTectureRect)
+    .addFunction("setTextureRect", (void (Image::*)(float, float, float, float))&Image::setTextureRect)
     .addFunction("setSize", &Image::setSize)
     .addFunction("setInvertTexture", &Image::setInvertTexture)
     .endClass()

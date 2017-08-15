@@ -9,10 +9,11 @@ Material::Material(){
     transparent = false;
     textureRect = NULL;
     color = Vector4(1.0, 1.0, 1.0, 1.0);
+    textureOwned = true;
 }
 
 Material::~Material(){
-    if (texture)
+    if (texture && textureOwned)
         delete texture;
     if (textureRect)
         delete textureRect;
@@ -23,6 +24,7 @@ Material::Material(const Material& s){
     this->color = s.color;
     this->textureRect = s.textureRect;
     this->transparent = s.transparent;
+    this->textureOwned = s.textureOwned;
 }
 
 Material& Material::operator = (const Material& s){
@@ -30,15 +32,25 @@ Material& Material::operator = (const Material& s){
     this->color = s.color;
     this->textureRect = s.textureRect;
     this->transparent = s.transparent;
+    this->textureOwned = s.textureOwned;
     
     return *this;
 }
 
+void Material::setTexture(Texture* texture){
+    if (this->texture && textureOwned)
+        delete this->texture;
+    
+    this->texture = texture;
+    this->textureOwned = false;
+}
+
 void Material::setTexturePath(std::string texture_path){
-    if (this->texture)
+    if (this->texture && textureOwned)
         delete this->texture;
     
     this->texture = new Texture(texture_path);
+    this->textureOwned = true;
     this->texture->setDataOwned(true);
 }
 
@@ -71,7 +83,7 @@ void Material::setTextureCube(std::string front, std::string back, std::string l
         id = id + "|" + textures[i];
     }
     
-    if (this->texture)
+    if (this->texture && textureOwned)
         delete this->texture;
     
     this->texture = new Texture(texturesData, id);

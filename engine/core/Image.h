@@ -26,8 +26,8 @@ namespace Supernova {
         Image(std::string image_path);
         virtual ~Image();
         
-        void setTectureRect(float x, float y, float width, float height);
-        void setTectureRect(Rect textureRect);
+        void setTextureRect(float x, float y, float width, float height);
+        void setTextureRect(Rect textureRect);
 
         virtual void setSize(int width, int height);
         virtual void setInvertTexture(bool invertTexture);
