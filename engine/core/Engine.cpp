@@ -278,13 +278,13 @@ void Engine::onSurfaceChanged(int width, int height) {
             int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
             int dif = Engine::getScreenHeight() - newHeight;
             viewY = (dif/2);
-            viewHeight = Engine::getScreenHeight()-dif;
+            viewHeight = Engine::getScreenHeight()-(viewY*2); //diff could be odd, for this use view*2
         }else{
             float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
             int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
             int dif = Engine::getScreenWidth() - newWidth;
             viewX = (dif/2);
-            viewWidth = Engine::getScreenWidth()-dif;
+            viewWidth = Engine::getScreenWidth()-(viewX*2);
         }
     }
     
@@ -294,13 +294,13 @@ void Engine::onSurfaceChanged(int width, int height) {
             int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
             int dif = Engine::getScreenHeight() - newHeight;
             viewY = (dif/2);
-            viewHeight = Engine::getScreenHeight()-dif;
+            viewHeight = Engine::getScreenHeight()-(viewY*2);
         }else{
             float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
             int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
             int dif = Engine::getScreenWidth() - newWidth;
             viewX = (dif/2);
-            viewWidth = Engine::getScreenWidth()-dif;
+            viewWidth = Engine::getScreenWidth()-(viewX*2);
         }
     }
     
