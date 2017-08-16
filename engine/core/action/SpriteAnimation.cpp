@@ -10,7 +10,7 @@ SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, std::vector<int> f
 
     this->spriteFrameCount = 0;
     this->framesIndex = 0;
-    this->framesTimeIndex = (int)framesTime.size()-1; //Actual sprite frame with the last frameTime
+    this->framesTimeIndex = 0; //Actual sprite frame with the last frameTime
 
     this->framesTime = framesTime;
     this->frames = frames;
@@ -25,7 +25,7 @@ SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, int startFrame, in
 
     this->spriteFrameCount = 0;
     this->framesIndex = 0;
-    this->framesTimeIndex = (int)framesTime.size()-1; //Actual sprite frame with the last frameTime
+    this->framesTimeIndex = 0;
 
     this->framesTime = framesTime;
     
@@ -43,7 +43,7 @@ SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, boo
 
     this->spriteFrameCount = 0;
     this->framesIndex = 0;
-    this->framesTimeIndex = (int)framesTime.size()-1; //Actual sprite frame with the last frameTime
+    this->framesTimeIndex = 0;
     
     this->framesTime = framesTime;
     
@@ -60,7 +60,7 @@ SpriteAnimation::SpriteAnimation(int interval, std::vector<int> frames, bool loo
 
     this->spriteFrameCount = 0;
     this->framesIndex = 0;
-    this->framesTimeIndex = (int)framesTime.size()-1; //Actual sprite frame with the last frameTime
+    this->framesTimeIndex = 0;
 
     this->framesTime = framesTime;
     this->frames = frames;
@@ -131,7 +131,7 @@ void SpriteAnimation::reset(){
 
     this->spriteFrameCount = 0;
     this->framesIndex = 0;
-    this->framesTimeIndex = (int)framesTime.size()-1; //Duration time
+    this->framesTimeIndex = 0;
 }
 
 void SpriteAnimation::step(){
@@ -143,23 +143,23 @@ void SpriteAnimation::step(){
         while ((spriteFrameCount >= framesTime[framesTimeIndex]) && (isRunning())) {
 
             spriteFrameCount -= framesTime[framesTimeIndex];
-
-            ((Sprite*)object)->setFrame(frames[framesIndex]);
-
+            
             framesIndex++;
             framesTimeIndex++;
-
+            
             if (framesIndex == frames.size() - 1) {
                 if (!loop) {
                     stop();
                 }
             }
-
+            
             if (framesIndex >= frames.size())
                 framesIndex = 0;
-
+            
             if (framesTimeIndex >= framesTime.size())
                 framesTimeIndex = 0;
+
+            ((Sprite*)object)->setFrame(frames[framesIndex]);
 
         }
 
