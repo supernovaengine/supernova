@@ -59,7 +59,7 @@ unsigned int Engine::frametime = 0;
 float Engine::deltatime = 0;
 float Engine::framerate = 0;
 
-unsigned int Engine::updateTime = 20;
+unsigned int Engine::updateTime = 16;
 
 
 Engine::Engine() {
@@ -332,12 +332,9 @@ void Engine::onDraw() {
     framerate = 1 / frameTimeSeconds;
     
     updateTimeCount += frametime;
-    if (updateTimeCount > updateTime){
-        unsigned int updateCallCount = floor((float)updateTimeCount / updateTime);
-        for (int i = 0; i < updateCallCount; i++){
-            Events::call_onUpdate();
-        }
-        updateTimeCount -= (updateTime * updateCallCount);
+    while (updateTimeCount >= updateTime){
+        updateTimeCount -= updateTime;
+        Events::call_onUpdate();
     }
     
     Events::call_onDraw();
