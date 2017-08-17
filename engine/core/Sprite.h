@@ -24,6 +24,7 @@ namespace Supernova {
 
         void addFrame(std::string id, float x, float y, float width, float height);
         void addFrame(float x, float y, float width, float height);
+        void addFrame(Rect rect);
         void removeFrame(std::string id);
         void removeFrame(int index);
 

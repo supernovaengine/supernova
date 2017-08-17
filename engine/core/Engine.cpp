@@ -59,7 +59,7 @@ unsigned int Engine::frametime = 0;
 float Engine::deltatime = 0;
 float Engine::framerate = 0;
 
-unsigned int Engine::updateTime = 16;
+unsigned int Engine::updateTime = 32;
 
 
 Engine::Engine() {
@@ -246,7 +246,7 @@ void Engine::onStart(int width, int height){
     LuaBind::bind();
     
     auto now = std::chrono::steady_clock::now();
-    lastTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    lastTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 
     init();
 }
@@ -321,7 +321,7 @@ void Engine::onDraw() {
     }
     
     auto now = std::chrono::steady_clock::now();
-    unsigned long newTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    unsigned long newTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     
     frametime = (unsigned int)(newTime - lastTime);
     lastTime = newTime;

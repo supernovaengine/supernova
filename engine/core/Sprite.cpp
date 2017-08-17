@@ -31,6 +31,10 @@ void Sprite::addFrame(std::string id, float x, float y, float width, float heigh
     framesRect.push_back({id, Rect(x, y, width, height)});
 }
 
+void Sprite::addFrame(Rect rect){
+    addFrame(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+}
+
 void Sprite::removeFrame(int index){
     framesRect.erase(framesRect.begin() + index);
 }
