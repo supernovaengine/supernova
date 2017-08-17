@@ -30,6 +30,14 @@ Rect& Rect::operator = (const Rect& t){
     return *this;
 }
 
+bool Rect::operator == (const Rect& t){
+    return ((this->x == t.x) && (this->y == t.y) && (this->width == t.width) && (this->height == t.height));
+}
+
+bool Rect::operator != (const Rect& t){
+    return ((this->x != t.x) || (this->y != t.y) || (this->width != t.width) || (this->height != t.height));
+}
+
 float Rect::getX(){
     return x;
 }

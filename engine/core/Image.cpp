@@ -30,15 +30,21 @@ void Image::setTextureRect(float x, float y, float width, float height){
 }
 
 void Image::setTextureRect(Rect textureRect){
-    this->textureRect = textureRect;
-    
-    if (loaded && !useTextureRect){
-        useTextureRect = true;
-        reload();
-    }else{
-        useTextureRect = true;
-        normalizeTextureRect();
+    if ( this->textureRect != textureRect) {
+        this->textureRect = textureRect;
+
+        if (loaded && !useTextureRect) {
+            useTextureRect = true;
+            reload();
+        } else {
+            useTextureRect = true;
+            normalizeTextureRect();
+        }
     }
+}
+
+Rect Image::getTextureRect(){
+    return this->textureRect;
 }
 
 void Image::normalizeTextureRect(){

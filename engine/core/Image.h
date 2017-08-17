@@ -28,6 +28,7 @@ namespace Supernova {
         
         void setTextureRect(float x, float y, float width, float height);
         void setTextureRect(Rect textureRect);
+        Rect getTextureRect();
 
         virtual void setSize(int width, int height);
         virtual void setInvertTexture(bool invertTexture);

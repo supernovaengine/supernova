@@ -16,6 +16,8 @@ namespace Supernova {
         Rect(const Rect& t);
         
         Rect& operator = (const Rect& t);
+        bool operator == (const Rect& t);
+        bool operator != (const Rect& t);
         
         float getX();
         float getY();

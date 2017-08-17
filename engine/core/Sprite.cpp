@@ -52,14 +52,13 @@ void Sprite::removeFrame(std::string id){
 void Sprite::setFrame(std::string id){
     std::vector<int> frameslist = findFramesByString(id);
     if (frameslist.size() > 0){
-        setTextureRect(framesRect[frameslist[0]].rect);
+        setFrame(frameslist[0]);
     }
 }
 
 void Sprite::setFrame(int id){
-    if (id >= 0 && id < framesRect.size()){
+    if (id >= 0 && id < framesRect.size())
         setTextureRect(framesRect[id].rect);
-    }
 }
 
 unsigned int Sprite::getFramesSize(){
