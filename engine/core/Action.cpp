@@ -385,7 +385,7 @@ void Action::reset(){
 void Action::step(){
 
     if (running){
-        steptime = Engine::getFrametime();
+        steptime = Engine::getDeltatime();
         timecount += steptime;
         
         if (duration >= 0) {

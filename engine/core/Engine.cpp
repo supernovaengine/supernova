@@ -55,11 +55,10 @@ bool Engine::nearestScaleTexture;
 unsigned long Engine::lastTime = 0;
 unsigned int Engine::updateTimeCount = 0;
 
-unsigned int Engine::frametime = 0;
-float Engine::deltatime = 0;
+unsigned int Engine::deltatime = 0;
 float Engine::framerate = 0;
 
-unsigned int Engine::updateTime = 32;
+unsigned int Engine::updateTime = 30;
 
 
 Engine::Engine() {
@@ -222,10 +221,6 @@ float Engine::getDeltatime(){
     return deltatime;
 }
 
-unsigned int Engine::getFrametime(){
-    return frametime;
-}
-
 void Engine::onStart(){
 
     onStart(0, 0);
@@ -323,17 +318,16 @@ void Engine::onDraw() {
     auto now = std::chrono::steady_clock::now();
     unsigned long newTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     
-    frametime = (unsigned int)(newTime - lastTime);
+    deltatime = (unsigned int)(newTime - lastTime);
     lastTime = newTime;
+    framerate = 1 / (float)deltatime * 1000;
     
-    deltatime = (float)frametime / updateTime;
-    
-    float frameTimeSeconds = (float)frametime / 1000;
-    framerate = 1 / frameTimeSeconds;
-    
-    updateTimeCount += frametime;
-    while (updateTimeCount >= updateTime){
+    int updateLoops = 0;
+    updateTimeCount += deltatime;
+    while (updateTimeCount >= updateTime && updateLoops <= 5){
+        updateLoops++;
         updateTimeCount -= updateTime;
+        
         Events::call_onUpdate();
     }
     
