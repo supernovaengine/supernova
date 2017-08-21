@@ -30,7 +30,8 @@ namespace Supernova {
         
         void setColor(float red, float green, float blue, float alpha);
         
-        void setTexture(std::string texture);
+        void setTexture(Texture* texture);
+        void setTexture(std::string texturepath);
         std::string getTexture();
         
         Material* getMaterial();

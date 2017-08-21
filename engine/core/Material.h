@@ -17,6 +17,8 @@ namespace Supernova {
         Vector4 color;
         Rect* textureRect; //normalizaded
         
+        bool textureOwned;
+        
     public:
         Material();
         Material(const Material& s);
@@ -26,6 +28,7 @@ namespace Supernova {
         
         Material& operator = (const Material& s);
         
+        void setTexture(Texture* texture);
         void setTexturePath(std::string texture_path);
         void setColor(Vector4 color);
         void setTextureCube(std::string front, std::string back, std::string left, std::string right, std::string up, std::string down);

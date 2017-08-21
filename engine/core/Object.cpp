@@ -392,9 +392,7 @@ bool Object::isLoaded(){
 }
 
 bool Object::reload(){
-    
     destroy();
-    
     return load();
 }
 
@@ -422,7 +420,7 @@ bool Object::draw(){
     }
 
     for (int i = 0; i < actions.size(); i++){
-        if (actions[i]->isStarted()) {
+        if (actions[i]->isRunning()) {
             actions[i]->step();
         }
     }

@@ -127,6 +127,42 @@ void TextureData::resample(int newWidth, int newHeight){
 
 }
 
+void TextureData::fitPowerOfTwo(){
+    fitSize(getNearestPowerOfTwo(width), getNearestPowerOfTwo(height));
+}
+
+void TextureData::fitSize(int newWidth, int newHeight){
+    
+    if ((newWidth != width) || (newHeight != height)){
+        
+        int channels = (bitsPerPixel / 8);
+        int bufsize = newWidth * newHeight * channels;
+        unsigned char* newData = new unsigned char [bufsize];
+        
+        int xOffset = 0;
+        int yOffset = 0;
+        
+        for( unsigned int i = 0; i < bufsize; ++i )
+        {
+            newData[i] = 0;
+        }
+        
+        for( unsigned int i = 0; i < height; ++i )
+        {
+            memcpy( (unsigned char*)newData + channels * ( newWidth * ( yOffset + i ) + xOffset ), (unsigned char*)data + width * i * channels, width * channels );
+        }
+        
+        free((void*)data);
+        
+        width = newWidth;
+        height = newHeight;
+        size = bufsize;
+        data = newData;
+        
+    }
+    
+}
+
 void TextureData::flipVertical(){
     
     int bufsize=width * (bitsPerPixel / 8);

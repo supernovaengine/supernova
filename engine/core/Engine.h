@@ -39,12 +39,12 @@ namespace Supernova {
         static bool mouseAsTouch;
         static bool useDegrees;
         static int scalingMode;
+        static bool nearestScaleTexture;
 
         static unsigned long lastTime;
         static unsigned int updateTimeCount;
         
-        static unsigned int frametime;
-        static float deltatime;
+        static unsigned int deltatime;
         static float framerate;
         
         static unsigned int updateTime;
@@ -86,13 +86,15 @@ namespace Supernova {
         static void setUseDegrees(bool useDegrees);
         static bool isUseDegrees();
         
+        static void setNearestScaleTexture(bool nearestScaleTexture);
+        static bool isNearestScaleTexture();
+        
         static void setUpdateTime(unsigned int updateTime);
         static unsigned int getUpdateTime();
         
         static int getPlatform();
         static float getFramerate();
         static float getDeltatime();
-        static unsigned int getFrametime();
         
         //-----Supernova API events-----
         static void onStart();

@@ -19,8 +19,8 @@ MoveAction::~MoveAction(){
     
 }
 
-void MoveAction::start(){
-    Action::start();
+void MoveAction::play(){
+    Action::play();
     
     if (object && objectStartPosition){
         startPosition = object->getPosition();

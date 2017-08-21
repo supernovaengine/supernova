@@ -31,13 +31,28 @@ void ConcreteObject::setColor(float red, float green, float blue, float alpha){
     material.setColor(Vector4(red, green, blue, alpha));
 }
 
-void ConcreteObject::setTexture(std::string texture){
+void ConcreteObject::setTexture(Texture* texture){
     
-    std::string oldTexture = material.getTexturePath();
+    Texture* oldTexture = material.getTexture();
     
     if (texture != oldTexture){
         
-        material.setTexturePath(texture);
+        material.setTexture(texture);
+        
+        if (loaded){
+            reload();
+        }
+        
+    }
+}
+
+void ConcreteObject::setTexture(std::string texturepath){
+    
+    std::string oldTexture = material.getTexturePath();
+    
+    if (texturepath != oldTexture){
+        
+        material.setTexturePath(texturepath);
         
         if (loaded){
             reload();

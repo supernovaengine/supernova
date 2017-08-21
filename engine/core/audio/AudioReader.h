@@ -3,8 +3,8 @@
 #define AudioReader_h
 
 #include "AudioFile.h"
-#include "SoLoudSource.h"
-#include "FileData.h"
+#include "audio/SoLoudSource.h"
+#include "file/FileData.h"
 #include <stdio.h>
 
 namespace Supernova {

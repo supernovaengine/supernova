@@ -50,15 +50,15 @@ int Engine::renderAPI;
 bool Engine::mouseAsTouch;
 bool Engine::useDegrees;
 int Engine::scalingMode;
+bool Engine::nearestScaleTexture;
 
 unsigned long Engine::lastTime = 0;
 unsigned int Engine::updateTimeCount = 0;
 
-unsigned int Engine::frametime = 0;
-float Engine::deltatime = 0;
+unsigned int Engine::deltatime = 0;
 float Engine::framerate = 0;
 
-unsigned int Engine::updateTime = 20;
+unsigned int Engine::updateTime = 30;
 
 
 Engine::Engine() {
@@ -180,6 +180,14 @@ bool Engine::isUseDegrees(){
     return Engine::useDegrees;
 }
 
+void Engine::setNearestScaleTexture(bool nearestScaleTexture){
+    Engine::nearestScaleTexture = nearestScaleTexture;
+}
+
+bool Engine::isNearestScaleTexture(){
+    return nearestScaleTexture;
+}
+
 void Engine::setUpdateTime(unsigned int updateTime){
     Engine::updateTime = updateTime;
 }
@@ -213,10 +221,6 @@ float Engine::getDeltatime(){
     return deltatime;
 }
 
-unsigned int Engine::getFrametime(){
-    return frametime;
-}
-
 void Engine::onStart(){
 
     onStart(0, 0);
@@ -231,12 +235,13 @@ void Engine::onStart(int width, int height){
     Engine::setUseDegrees(true);
     Engine::setRenderAPI(S_GLES2);
     Engine::setScalingMode(S_SCALING_FITWIDTH);
+    Engine::setNearestScaleTexture(false);
 
     LuaBind::createLuaState();
     LuaBind::bind();
     
     auto now = std::chrono::steady_clock::now();
-    lastTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    lastTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 
     init();
 }
@@ -268,13 +273,13 @@ void Engine::onSurfaceChanged(int width, int height) {
             int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
             int dif = Engine::getScreenHeight() - newHeight;
             viewY = (dif/2);
-            viewHeight = Engine::getScreenHeight()-dif;
+            viewHeight = Engine::getScreenHeight()-(viewY*2); //diff could be odd, for this use view*2
         }else{
             float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
             int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
             int dif = Engine::getScreenWidth() - newWidth;
             viewX = (dif/2);
-            viewWidth = Engine::getScreenWidth()-dif;
+            viewWidth = Engine::getScreenWidth()-(viewX*2);
         }
     }
     
@@ -284,13 +289,13 @@ void Engine::onSurfaceChanged(int width, int height) {
             int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
             int dif = Engine::getScreenHeight() - newHeight;
             viewY = (dif/2);
-            viewHeight = Engine::getScreenHeight()-dif;
+            viewHeight = Engine::getScreenHeight()-(viewY*2);
         }else{
             float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
             int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
             int dif = Engine::getScreenWidth() - newWidth;
             viewX = (dif/2);
-            viewWidth = Engine::getScreenWidth()-dif;
+            viewWidth = Engine::getScreenWidth()-(viewX*2);
         }
     }
     
@@ -311,23 +316,19 @@ void Engine::onDraw() {
     }
     
     auto now = std::chrono::steady_clock::now();
-    unsigned long newTime = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    unsigned long newTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     
-    frametime = (unsigned int)(newTime - lastTime);
+    deltatime = (unsigned int)(newTime - lastTime);
     lastTime = newTime;
+    framerate = 1 / (float)deltatime * 1000;
     
-    deltatime = (float)frametime / updateTime;
-    
-    float frameTimeSeconds = (float)frametime / 1000;
-    framerate = 1 / frameTimeSeconds;
-    
-    updateTimeCount += frametime;
-    if (updateTimeCount > updateTime){
-        unsigned int updateCallCount = floor((float)updateTimeCount / updateTime);
-        for (int i = 0; i < updateCallCount; i++){
-            Events::call_onUpdate();
-        }
-        updateTimeCount -= (updateTime * updateCallCount);
+    int updateLoops = 0;
+    updateTimeCount += deltatime;
+    while (updateTimeCount >= updateTime && updateLoops <= 5){
+        updateLoops++;
+        updateTimeCount -= updateTime;
+        
+        Events::call_onUpdate();
     }
     
     Events::call_onDraw();

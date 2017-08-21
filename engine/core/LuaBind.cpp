@@ -38,6 +38,7 @@
 #include "Sprite.h"
 #include "Action.h"
 #include "action/MoveAction.h"
+#include "action/SpriteAnimation.h"
 
 #include <map>
 #include <unistd.h>
@@ -194,6 +195,7 @@ void LuaBind::bind(){
     .addStaticFunction("setCanvasSize", &Engine::setCanvasSize)
     .addStaticFunction("setMouseAsTouch", &Engine::setMouseAsTouch)
     .addStaticFunction("setScalingMode", &Engine::setScalingMode)
+    .addStaticFunction("setNearestScaleTexture", &Engine::setNearestScaleTexture)
     .addStaticFunction("setUpdateTime", &Engine::setUpdateTime)
     .addStaticFunction("getFramerate", &Engine::getFramerate)
     .addStaticFunction("getDeltatime", &Engine::getDeltatime)
@@ -368,17 +370,23 @@ void LuaBind::bind(){
     
     .beginExtendClass<Image, Mesh2D>("Image")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<const char *>))
-    .addFunction("setTectureRect", (void (Image::*)(float, float, float, float))&Image::setTectureRect)
+    .addFunction("setTextureRect", (void (Image::*)(float, float, float, float))&Image::setTextureRect)
     .addFunction("setSize", &Image::setSize)
     .addFunction("setInvertTexture", &Image::setInvertTexture)
     .endClass()
     
     .beginExtendClass<Sprite, Image>("Sprite")
     .addConstructor(LUA_ARGS())
-    .addFunction("addFrame", &Sprite::addFrame)
-    .addFunction("removeFrame", &Sprite::removeFrame)
-    .addFunction("setFrame", (void (Sprite::*)(std::string))&Sprite::setFrame)
-    .addFunction("animate", (void (Sprite::*)(std::vector<int>, std::vector<int>, bool))&Sprite::animate)
+    .addFunction("addFrame", (void (Sprite::*)(float, float, float, float))&Sprite::addFrame)
+    .addFunction("addFrameString", (void (Sprite::*)(std::string, float, float, float, float))&Sprite::addFrame)
+    .addFunction("removeFrame", (void (Sprite::*)(int))&Sprite::removeFrame)
+    .addFunction("removeFrameString", (void (Sprite::*)(std::string))&Sprite::removeFrame)
+    .addFunction("setFrame", (void (Sprite::*)(int))&Sprite::setFrame)
+    .addFunction("setFrameString", (void (Sprite::*)(std::string))&Sprite::setFrame)
+    .addFunction("findFramesByString", &Sprite::findFramesByString)
+    .addFunction("isAnimation", &Sprite::isAnimation)
+    .addFunction("playAnimation", (void (Sprite::*)(std::vector<int>, std::vector<int>, bool))&Sprite::playAnimation)
+    .addFunction("stopAnimation", &Sprite::stopAnimation)
     .endClass()
 
     .beginExtendClass<Polygon, Mesh2D>("Polygon")
@@ -462,16 +470,20 @@ void LuaBind::bind(){
     .addConstant("BOUNCE_EASEIN", S_BOUNCE_EASEIN)
     .addConstant("BOUNCE_EASEOUT", S_BOUNCE_EASEOUT)
     .addConstant("BOUNCE_EASEINOUT", S_BOUNCE_EASEINOUT)
-    .addFunction("start", &Action::start)
+    .addFunction("play", &Action::play)
     .addFunction("stop", &Action::stop)
     .addFunction("reset", &Action::reset)
-    .addFunction("isStarted", &Action::isStarted)
+    .addFunction("isRunning", &Action::isRunning)
     .addFunction("setFunction", (int (Action::*)(lua_State*))&Action::setFunction)
     .addFunction("setFunctionType", &Action::setFunctionType)
     .endClass()
     
     .beginExtendClass<MoveAction, Action>("MoveAction")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
+    .endClass()
+    
+    .beginExtendClass<SpriteAnimation, Action>("SpriteAnimation")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<std::vector<int>>, LuaIntf::_opt<std::vector<int>>, LuaIntf::_opt<bool>))
     .endClass();
 
     LuaIntf::LuaBinding(L).beginModule("InputCode")

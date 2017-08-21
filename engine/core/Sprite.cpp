@@ -5,134 +5,119 @@
 using namespace Supernova;
 
 Sprite::Sprite(): Image(){
-    inAnimation = false;
 }
 
 Sprite::~Sprite(){
+    if (defaultAnimation)
+        delete defaultAnimation;
+}
 
+std::vector<int> Sprite::findFramesByString(std::string id){
+    std::vector<int> frameslist;
+    for (int i = 0; i < framesRect.size(); i++){
+
+        std::size_t found = framesRect[i].id.find(id);
+        if (found!=std::string::npos)
+            frameslist.push_back(i);
+    }
+    return frameslist;
+}
+
+void Sprite::addFrame(float x, float y, float width, float height){
+    framesRect.push_back({"", Rect(x, y, width, height)});
 }
 
 void Sprite::addFrame(std::string id, float x, float y, float width, float height){
-    framesRect[id] = Rect(x, y, width, height);
+    framesRect.push_back({id, Rect(x, y, width, height)});
+}
+
+void Sprite::addFrame(Rect rect){
+    addFrame(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+}
+
+void Sprite::removeFrame(int index){
+    framesRect.erase(framesRect.begin() + index);
 }
 
 void Sprite::removeFrame(std::string id){
-    framesRect.erase(id);
+    std::vector<int> frameslist = findFramesByString(id);
+
+    while (frameslist.size() > 0) {
+        framesRect.erase(framesRect.begin() + frameslist[0]);
+        frameslist.clear();
+        frameslist = findFramesByString(id);
+    }
 }
 
 void Sprite::setFrame(std::string id){
-    if (framesRect.count(id)){
-        setTectureRect(framesRect[id]);
+    std::vector<int> frameslist = findFramesByString(id);
+    if (frameslist.size() > 0){
+        setFrame(frameslist[0]);
     }
 }
 
 void Sprite::setFrame(int id){
-    std::unordered_map<std::string, Rect>::iterator it = framesRect.begin();
-    if (id >= 0 && id < framesRect.size()){
-        std::advance(it,(framesRect.size()-id-1));
-        setTectureRect(it->second);
-    }
+    if (id >= 0 && id < framesRect.size())
+        setTextureRect(framesRect[id].rect);
 }
 
-void Sprite::animate(std::vector<int> framesTime, std::vector<int> frames, bool loop){
-    inAnimation = true;
-
-    if (framesTime.size() == 0){
-        inAnimation = false;
-        Log::Error(LOG_TAG, "Incorrect: no framesTime");
-    }else if (frames.size() == 0){
-        inAnimation = false;
-        Log::Error(LOG_TAG, "Incorrect: no frames");
-    }
-
-    animation.frames = frames;
-    animation.framesTime = framesTime;
-    animation.loop = loop;
-    animation.framesIndex = 0;
-    animation.framesTimeIndex = framesTime.size()-1; //Duration time
-    animation.timecount = 0;
-
-    if (inAnimation) {
-        setFrame(animation.frames[animation.framesIndex]);
-    }
+unsigned int Sprite::getFramesSize(){
+    return (unsigned int)framesRect.size();
 }
 
-void Sprite::animate(std::vector<int> framesTime, int startFrame, int endFrame, bool loop){
-    
-    inAnimation = true;
-    
-    if (startFrame < 0 && startFrame >= framesRect.size()){
-        inAnimation = false;
-        Log::Error(LOG_TAG, "Incorrect range of startFrame");
-    }else if (endFrame < 0 && endFrame >= framesRect.size()){
-        inAnimation = false;
-        Log::Error(LOG_TAG, "Incorrect range of endFrame");
-    }
-    
-    if (inAnimation){
-        std::vector<int> frames;
-        int actualFrame = startFrame;
-        bool finaliza = false;
-        while (!finaliza){
+bool Sprite::isAnimation(){
+    if (defaultAnimation)
+        return defaultAnimation->isRunning();
 
-            if (actualFrame >= framesRect.size())
-                actualFrame = 0;
-
-            frames.push_back(actualFrame);
-
-            if (actualFrame == endFrame)
-                finaliza = true;
-
-            actualFrame++;
-        }
-
-        animate(framesTime, frames, loop);
-    }
+    return false;
 }
 
-void Sprite::animate(int interval, int startFrame, int endFrame, bool loop){
-    inAnimation = true;
-
-    if (interval <= 0) {
-        inAnimation = false;
-        Log::Error(LOG_TAG, "Incorrect interval");
+void Sprite::playAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop){
+    if (defaultAnimation) {
+        delete defaultAnimation;
     }
 
-    if (inAnimation) {
-        std::vector<int> framesTime;
-        framesTime.push_back(interval);
+    defaultAnimation = new SpriteAnimation(framesTime, frames, loop);
+    addAction(defaultAnimation);
+    defaultAnimation->play();
+}
 
-        animate(framesTime, startFrame, endFrame, loop);
+void Sprite::playAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop){
+    if (defaultAnimation) {
+        delete defaultAnimation;
     }
+
+    defaultAnimation = new SpriteAnimation(framesTime, startFrame, endFrame, loop);
+    addAction(defaultAnimation);
+    defaultAnimation->play();
+}
+
+void Sprite::playAnimation(int interval, int startFrame, int endFrame, bool loop){
+    if (defaultAnimation) {
+        delete defaultAnimation;
+    }
+
+    defaultAnimation = new SpriteAnimation(interval, startFrame, endFrame, loop);
+    addAction(defaultAnimation);
+    defaultAnimation->play();
+}
+
+void Sprite::playAnimation(int interval, std::vector<int> frames, bool loop){
+    if (defaultAnimation) {
+        delete defaultAnimation;
+    }
+
+    defaultAnimation = new SpriteAnimation(interval, frames, loop);
+    addAction(defaultAnimation);
+    defaultAnimation->play();
+}
+
+void Sprite::stopAnimation(){
+    if (defaultAnimation)
+        defaultAnimation->stop();
 }
 
 bool Sprite::draw(){
-    
-    if (inAnimation){
-        animation.timecount += Engine::getFrametime();
-        while ((animation.timecount >= animation.framesTime[animation.framesTimeIndex]) && (inAnimation)){
-
-            animation.timecount -= animation.framesTime[animation.framesTimeIndex];
-
-            setFrame(animation.frames[animation.framesIndex]);
-
-            animation.framesIndex++;
-            animation.framesTimeIndex++;
-
-            if (animation.framesIndex == animation.frames.size()-1){
-                if (!animation.loop){
-                    inAnimation = false;
-                }
-            }
-
-            if (animation.framesIndex >= animation.frames.size())
-                animation.framesIndex = 0;
-
-            if (animation.framesTimeIndex >= animation.framesTime.size())
-                animation.framesTimeIndex = 0;
-        
-        }
-    }
     
     return Image::draw();
 }

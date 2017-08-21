@@ -2,7 +2,7 @@
 #ifndef FILEUTILSANDROID_H
 #define FILEUTILSANDROID_H
 
-#include "FileUtilsPlatform.h"
+#include "platform/FileUtilsPlatform.h"
 
 namespace Supernova {
 

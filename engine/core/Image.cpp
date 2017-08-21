@@ -4,6 +4,7 @@
 #include <string>
 #include "image/TextureLoader.h"
 #include "platform/Log.h"
+#include <math.h>
 
 using namespace Supernova;
 
@@ -25,20 +26,26 @@ Image::Image(std::string image_path): Image() {
 Image::~Image() {
 }
 
-void Image::setTectureRect(float x, float y, float width, float height){
-    setTectureRect(Rect(x, y, width, height));
+void Image::setTextureRect(float x, float y, float width, float height){
+    setTextureRect(Rect(x, y, width, height));
 }
 
-void Image::setTectureRect(Rect textureRect){
-    this->textureRect = textureRect;
-    
-    if (loaded && !useTextureRect){
-        useTextureRect = true;
-        reload();
-    }else{
-        useTextureRect = true;
-        normalizeTextureRect();
+void Image::setTextureRect(Rect textureRect){
+    if ( this->textureRect != textureRect) {
+        this->textureRect = textureRect;
+
+        if (loaded && !useTextureRect) {
+            useTextureRect = true;
+            reload();
+        } else {
+            useTextureRect = true;
+            normalizeTextureRect();
+        }
     }
+}
+
+Rect Image::getTextureRect(){
+    return this->textureRect;
 }
 
 void Image::normalizeTextureRect(){
@@ -54,10 +61,11 @@ void Image::normalizeTextureRect(){
         }else {
             
             if (this->texWidth != 0 && this->texHeight != 0) {
-                submeshes[0]->getMaterial()->setTextureRect(textureRect.getX() / (float) texWidth,
-                                                            textureRect.getY() / (float) texHeight,
-                                                            textureRect.getWidth() / (float) texWidth,
-                                                            textureRect.getHeight() / (float) texHeight);
+                // 0.1 and 0.2 to work with small and pixel perfect textures
+                submeshes[0]->getMaterial()->setTextureRect((textureRect.getX()+0.1) / (float) texWidth,
+                                                            (textureRect.getY()+0.1) / (float) texHeight,
+                                                            (textureRect.getWidth()-0.2) / (float) texWidth,
+                                                            (textureRect.getHeight()-0.2) / (float) texHeight);
             }
         }
     }
@@ -125,8 +133,8 @@ bool Image::load(){
         
         if (this->width == 0 && this->height == 0) {
             if (submeshes[0]->getMaterial()->getTextureRect()){
-                this->width = texWidth * submeshes[0]->getMaterial()->getTextureRect()->getWidth();
-                this->height = texHeight * submeshes[0]->getMaterial()->getTextureRect()->getHeight();
+                this->width = ceil(texWidth * submeshes[0]->getMaterial()->getTextureRect()->getWidth());
+                this->height = ceil(texHeight * submeshes[0]->getMaterial()->getTextureRect()->getHeight());
             }else{
                 this->width = texWidth;
                 this->height = texHeight;

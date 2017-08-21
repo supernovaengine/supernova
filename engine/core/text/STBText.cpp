@@ -5,7 +5,7 @@
 #include "image/TextureLoader.h"
 #include "platform/Log.h"
 #include "image/ColorType.h"
-#include "FileData.h"
+#include "file/FileData.h"
 #include <codecvt>
 
 using namespace Supernova;

@@ -25,9 +25,12 @@ namespace Supernova {
         void copy(const TextureData& v);
 
         void releaseImageData();
+        
         void crop(int offsetX, int offsetY, int newWidth, int newHeight);
-        void resample(int newWidth, int newHeight);
         void resamplePowerOfTwo();
+        void fitPowerOfTwo();
+        void resample(int newWidth, int newHeight);
+        void fitSize(int newWidth, int newHeight);
         void flipVertical();
 
         int getWidth();

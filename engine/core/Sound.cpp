@@ -1,6 +1,6 @@
 
 #include "Sound.h"
-#include "SoLoudPlayer.h"
+#include "audio/SoLoudPlayer.h"
 #include "platform/Log.h"
 
 using namespace Supernova;

@@ -2,44 +2,45 @@
 #define SPRITE_H
 
 #include "Image.h"
-#include <unordered_map>
+#include "action/SpriteAnimation.h"
 
 namespace Supernova {
 
     class Sprite: public Image {
-        
-    private:
-        
-        bool inAnimation;
 
     protected:
-        
-        struct animationData{
-            std::vector<int> frames;
-            std::vector<int> framesTime;
-            int framesIndex;
-            int framesTimeIndex;
-            bool loop;
-            int timecount;
+
+        struct framesData{
+            std::string id;
+            Rect rect;
         };
         
-        std::unordered_map <std::string, Rect> framesRect;
-        
-        animationData animation;
-        
+        std::vector<framesData> framesRect;
+        SpriteAnimation* defaultAnimation;
+
     public:
         Sprite();
         virtual ~Sprite();
 
         void addFrame(std::string id, float x, float y, float width, float height);
+        void addFrame(float x, float y, float width, float height);
+        void addFrame(Rect rect);
         void removeFrame(std::string id);
+        void removeFrame(int index);
 
         void setFrame(std::string id);
         void setFrame(int id);
 
-        void animate(std::vector<int> framesTime, std::vector<int> frames, bool loop);
-        void animate(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
-        void animate(int interval, int startFrame, int endFrame, bool loop);
+        std::vector<int> findFramesByString(std::string id);
+        
+        unsigned int getFramesSize();
+        bool isAnimation();
+
+        void playAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop);
+        void playAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
+        void playAnimation(int interval, int startFrame, int endFrame, bool loop);
+        void playAnimation(int interval, std::vector<int> frames, bool loop);
+        void stopAnimation();
         
         virtual bool draw();
     };
