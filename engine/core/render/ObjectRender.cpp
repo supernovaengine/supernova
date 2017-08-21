@@ -244,20 +244,20 @@ bool ObjectRender::load(){
 }
 
 bool ObjectRender::prepareDraw(){
+    
+    //hasLight and hasFog need to be called after main rander use program
+    if (hasLight){
+        lightRender->prepareDraw();
+    }
+    
+    if (hasFog){
+        fogRender->prepareDraw();
+    }
 
     return true;
 }
 
 bool ObjectRender::draw(){
-
-    //hasLight and hasFog need to be called after main rander use program
-    if (hasLight){
-        lightRender->prepareDraw();
-    }
-
-    if (hasFog){
-        fogRender->prepareDraw();
-    }
 
     return true;
 }

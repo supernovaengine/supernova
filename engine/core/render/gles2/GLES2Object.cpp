@@ -73,8 +73,8 @@ bool GLES2Object::load(){
     if (!ObjectRender::load()){
         return false;
     }
+    //Log::Debug(LOG_TAG, "Start load");
     
-    //Log::Debug(LOG_TAG, "Start load object");
     attributesGL.clear();
     propertyGL.clear();
     indexGL.buffer = -1;
@@ -198,15 +198,17 @@ bool GLES2Object::load(){
 }
 
 bool GLES2Object::prepareDraw(){
-    if (!ObjectRender::prepareDraw()){
-        return false;
-    }
     
     GLuint glesProgram = ((GLES2Program*)program->getProgramRender().get())->getProgram();
     if (programOwned){
         glUseProgram(glesProgram);
         GLES2Util::checkGlError("glUseProgram");
     }
+    
+    if (!ObjectRender::prepareDraw()){
+        return false;
+    }
+    //Log::Debug(LOG_TAG, "Start prepare");
     
     for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
     {
@@ -279,10 +281,10 @@ bool GLES2Object::draw(){
     if (!ObjectRender::draw()){
         return false;
     }
+    //Log::Debug(LOG_TAG, "Start draw");
     
-    //Log::Debug(LOG_TAG, "Start draw object");
     if ((!vertexAttributes.count(S_VERTEXATTRIBUTE_VERTICES)) and (indexAttribute.size == 0)){
-        Log::Debug(LOG_TAG, "Cannot draw object: no vertices or indices");
+        Log::Error(LOG_TAG, "Cannot draw object: no vertices or indices");
         return false;
     }
         
