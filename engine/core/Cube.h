@@ -8,10 +8,24 @@
 namespace Supernova {
 
     class Cube: public Mesh {
+
+    private:
+        void createVertices();
+        void createTexcoords();
+        void createIndices();
+        void createNormals();
+
+    protected:
+        float width;
+        float height;
+        float depth;
+
     public:
         Cube();
         Cube(float width, float height, float depth);
         virtual ~Cube();
+
+        virtual bool load();
 
     };
     
