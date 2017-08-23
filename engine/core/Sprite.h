@@ -25,11 +25,11 @@ namespace Supernova {
         void addFrame(std::string id, float x, float y, float width, float height);
         void addFrame(float x, float y, float width, float height);
         void addFrame(Rect rect);
-        void removeFrame(std::string id);
         void removeFrame(int index);
+        void removeFrame(std::string id);
 
+        void setFrame(int index);
         void setFrame(std::string id);
-        void setFrame(int id);
 
         std::vector<int> findFramesByString(std::string id);
         

@@ -33,53 +33,57 @@ Points::~Points(){
 }
 
 void Points::updatePositions(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, positions.size(), &positions.front());
+    fillPointsData();
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, points.size(), positionsData);
+    updateNormals();
+    clearPoints();
 }
 
 void Points::updateNormals(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, normals.size(), &normals.front());
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_NORMALS,points.size(), normalsData);
 }
 
 void Points::updatePointColors(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, colors.size(), &colors.front());
+    fillPointsData();
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, points.size(), colorsData);
+    clearPoints();
 }
 
 void Points::updatePointSizes(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, pointSizes.size(), &pointSizes.front());
+    fillPointsData();
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, points.size(), sizesData);
+    clearPoints();
 }
 
 void Points::updateTextureRects(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, rectsData.size()/4, &rectsData.front());
+    fillPointsData();
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, points.size(), textureRectsData);
+    clearPoints();
 }
 
 void Points::addPoint(){
-    positions.push_back(Vector3(0.0, 0.0, 0.0));
-    pointSizes.push_back(1);
-    normals.push_back(Vector3(0.0, 0.0, 1.0));
-    colors.push_back(*material.getColor());
-    textureRects.push_back(NULL);
 
-    fillScaledSizeVector();
-    updateNormalizedRectsData();
+    points.push_back({Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0), NULL, 1, *material.getColor()});
+
 }
 
 void Points::addPoint(Vector3 position){
     addPoint();
 
-    setPointPosition((int)positions.size()-1, position);
+    setPointPosition((int)points.size()-1, position);
 }
 
 void Points::clearPoints(){
-    positions.clear();
-    pointSizes.clear();
-    normals.clear();
-    colors.clear();
-    textureRects.clear();
+    points.clear();
 }
 
 void Points::setPointPosition(int point, Vector3 position){
-    if (point >= 0 && point < positions.size()){
-        positions[point] = position;
+    if (point >= 0 && point < points.size()){
+
+        points[point].position = position;
+
+        if (loaded)
+            updatePositions();
     }
 }
 
@@ -88,44 +92,54 @@ void Points::setPointPosition(int point, float x, float y, float z){
 }
 
 void Points::setPointSize(int point, float size){
+    if (point >= 0 && point < points.size()){
 
-    if (point >= 0 && point < positions.size()){
-        pointSizes[point] = size;
+        points[point].size = size;
+
+        if (loaded)
+            updatePointSizes();
     }
-
-    fillScaledSizeVector();
 }
 
 void Points::setPointColor(int point, Vector4 color){
-    colors[point] = color;
-    if (loaded)
-        updatePointColors();
+    if (point >= 0 && point < points.size()) {
+
+        points[point].color = color;
+
+        if (loaded)
+            updatePointColors();
+    }
 }
 
 void Points::setPointColor(int point, float red, float green, float blue, float alpha){
     setPointColor(point, Vector4(red, green, blue, alpha));
 }
 
-void Points::setPointSprite(int point, std::string id){
-    if (textureRects[point]){
-        textureRects[point]->setRect(&framesRect[id]);
+void Points::setPointSprite(int point, int index){
+    if (points[point].textureRect){
+        points[point].textureRect->setRect(&framesRect[index].rect);
     }else {
-        textureRects[point] = new Rect(framesRect[id]);
+        points[point].textureRect = new Rect(framesRect[index].rect);
     }
-    
-    if (loaded && !useTextureRects){
+
+    if (!useTextureRects){
         useTextureRects = true;
-        reload();
+
+        if (loaded)
+            reload();
     }else{
         useTextureRects = true;
-        updateNormalizedRectsData();
+
         if (loaded)
             updateTextureRects();
     }
 }
 
-void Points::setPointSprite(int point, int id){
-    setPointSprite(point, std::to_string(id));
+void Points::setPointSprite(int point, std::string id){
+    std::vector<int> frameslist = findFramesByString(id);
+    if (frameslist.size() > 0){
+        setPointSprite(point, frameslist[0]);
+    }
 }
 
 void Points::updatePointScale(){
@@ -140,46 +154,8 @@ void Points::updatePointScale(){
     if (pointSizeReference == S_POINTSIZE_WIDTH)
         pointScale *= (float)Engine::getScreenWidth() / (float)Engine::getCanvasWidth();
 
-    fillScaledSizeVector();
-}
-
-void Points::fillScaledSizeVector(){
-    pointSizesScaled.clear();
-    for (int i = 0; i < pointSizes.size(); i++){
-
-        float pointSizeScaledVal = pointSizes[i] * pointScale;
-        if (pointSizeScaledVal < minPointSize)
-            pointSizeScaledVal = minPointSize;
-        if (pointSizeScaledVal > maxPointSize)
-            pointSizeScaledVal = maxPointSize;
-        pointSizesScaled.push_back(pointSizeScaledVal);
-    }
-
     if (loaded)
         updatePointSizes();
-}
-
-void Points::updateNormalizedRectsData(){
-    if (this->texWidth != 0 && this->texHeight != 0) {
-        
-        rectsData.clear();
-        for (int i=0; i < textureRects.size(); i++){
-            if (textureRects[i]) {
-                if (!textureRects[i]->isNormalized()) {
-                    rectsData.push_back(textureRects[i]->getX() / (float) texWidth);
-                    rectsData.push_back(textureRects[i]->getY() / (float) texHeight);
-                    rectsData.push_back(textureRects[i]->getWidth() / (float) texWidth);
-                    rectsData.push_back(textureRects[i]->getHeight() / (float) texHeight);
-                }else{
-                    rectsData.push_back(textureRects[i]->getX());
-                    rectsData.push_back(textureRects[i]->getY());
-                    rectsData.push_back(textureRects[i]->getWidth());
-                    rectsData.push_back(textureRects[i]->getHeight());
-                }
-            }
-        }
-        
-    }
 }
 
 void Points::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
@@ -218,32 +194,98 @@ void Points::setMaxPointSize(float maxPointSize){
     this->maxPointSize = maxPointSize;
 }
 
+std::vector<int> Points::findFramesByString(std::string id){
+    std::vector<int> frameslist;
+    for (int i = 0; i < framesRect.size(); i++){
+
+        std::size_t found = framesRect[i].id.find(id);
+        if (found!=std::string::npos)
+            frameslist.push_back(i);
+    }
+    return frameslist;
+}
+
 void Points::addSpriteFrame(std::string id, float x, float y, float width, float height){
-    framesRect[id] = Rect(x, y, width, height);
+    framesRect.push_back({id, Rect(x, y, width, height)});
+}
+
+void Points::addSpriteFrame(float x, float y, float width, float height){
+    addSpriteFrame("", x, y,  width, height);
+}
+
+void Points::addSpriteFrame(Rect rect){
+    addSpriteFrame(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+}
+
+void Points::removeSpriteFrame(int index){
+    framesRect.erase(framesRect.begin() + index);
 }
 
 void Points::removeSpriteFrame(std::string id){
-    framesRect.erase(id);
+    std::vector<int> frameslist = findFramesByString(id);
+
+    while (frameslist.size() > 0) {
+        framesRect.erase(framesRect.begin() + frameslist[0]);
+        frameslist.clear();
+        frameslist = findFramesByString(id);
+    }
 }
 
-std::vector<Vector3>* Points::getPositions(){
-    return &positions;
+void Points::fillPointsData(){
+    positionsData = new float[points.size() * 3];
+    normalsData = new float[points.size() * 3];
+    textureRectsData = new float[points.size() * 4];
+    sizesData = new float[points.size() * 1];
+    colorsData = new float[points.size() * 4];
+
+    for (int i=0; i < points.size(); i++){
+
+        positionsData[3*i + 0] = points[i].position.x;
+        positionsData[3*i + 1] = points[i].position.y;
+        positionsData[3*i + 2] = points[i].position.z;
+
+        normalsData[3*i + 0] = points[i].normal.x;
+        normalsData[3*i + 1] = points[i].normal.y;
+        normalsData[3*i + 2] = points[i].normal.z;
+
+        if (points[i].textureRect && this->texWidth != 0 && this->texHeight != 0) {
+
+            if (!points[i].textureRect->isNormalized()) {
+                textureRectsData[4 * i + 0] = points[i].textureRect->getX() / (float) texWidth;
+                textureRectsData[4 * i + 1] = points[i].textureRect->getY() / (float) texHeight;
+                textureRectsData[4 * i + 2] = points[i].textureRect->getWidth() / (float) texWidth;
+                textureRectsData[4 * i + 3] = points[i].textureRect->getHeight() / (float) texHeight;
+            }else{
+                textureRectsData[4 * i + 0] = points[i].textureRect->getX();
+                textureRectsData[4 * i + 1] = points[i].textureRect->getY();
+                textureRectsData[4 * i + 2] = points[i].textureRect->getWidth();
+                textureRectsData[4 * i + 3] = points[i].textureRect->getHeight();
+            }
+
+        }
+
+        float pointSizeScaledVal = points[i].size * pointScale;
+        if (pointSizeScaledVal < minPointSize)
+            pointSizeScaledVal = minPointSize;
+        if (pointSizeScaledVal > maxPointSize)
+            pointSizeScaledVal = maxPointSize;
+        sizesData[i] = pointSizeScaledVal;
+
+        colorsData[4*i + 0] = points[i].color.x;
+        colorsData[4*i + 1] = points[i].color.y;
+        colorsData[4*i + 2] = points[i].color.z;
+        colorsData[4*i + 3] = points[i].color.w;
+    }
 }
 
-std::vector<Vector3>* Points::getNormals(){
-    return &normals;
-}
-
-std::vector<Rect*>* Points::getTextureRects(){
-    return &textureRects;
-}
-
-std::vector<float>* Points::getPointSizes(){
-    return &pointSizes;
-}
-
-std::vector<Vector4>* Points::getColors(){
-    return &colors;
+void Points::deletePointsData(){
+    if (points.size() > 0) {
+        delete[] positionsData;
+        delete[] normalsData;
+        delete[] textureRectsData;
+        delete[] sizesData;
+        delete[] colorsData;
+    }
 }
 
 bool Points::renderDraw(){
@@ -259,24 +301,6 @@ bool Points::renderDraw(){
 
 bool Points::load(){
 
-    while (positions.size() > normals.size()){
-        normals.push_back(Vector3(0,0,0));
-    }
-    
-    while (positions.size() > textureRects.size()){
-        textureRects.push_back(NULL);
-    }
-
-    while (positions.size() > pointSizes.size()){
-        pointSizes.push_back(1);
-    }
-
-    while (positions.size() > colors.size()){
-        colors.push_back(Vector4(0.0, 0.0, 0.0, 1.0));
-    }
-
-    fillScaledSizeVector();
-
     if (render == NULL)
         render = ObjectRender::newInstance();
     
@@ -291,19 +315,19 @@ bool Points::load(){
         render->setFogRender(scene->getFogRender());
     }
 
-    if ((material.getTexture()) && (textureRects.size() > 0)){
+    if ((material.getTexture()) && (useTextureRects)){
         material.getTexture()->load();
         texWidth = material.getTexture()->getWidth();
         texHeight = material.getTexture()->getHeight();
-
-        updateNormalizedRectsData();
     }
+
+    fillPointsData();
     
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, positions.size(), &positions.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1, pointSizesScaled.size(), &pointSizesScaled.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4, colors.size(), &colors.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4, rectsData.size()/4, &rectsData.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, points.size(), positionsData);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, points.size(), normalsData);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1, points.size(), sizesData);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4, points.size(), colorsData);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4, points.size(), textureRectsData);
     
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
@@ -311,6 +335,8 @@ bool Points::load(){
     render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
     
     bool renderloaded = render->load();
+
+    deletePointsData();
 
     if (renderloaded)
         return ConcreteObject::load();
@@ -325,8 +351,8 @@ void Points::destroy(){
     if (render)
         render->destroy();
     
-    for (int i=0; i < textureRects.size(); i++){
-        delete textureRects[i];
+    for (int i=0; i < points.size(); i++){
+        delete points[i].textureRect;
     }
     
 }
