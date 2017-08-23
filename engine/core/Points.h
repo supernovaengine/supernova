@@ -66,6 +66,8 @@ namespace Supernova {
 
         void addPoint();
         void addPoint(Vector3 position);
+        
+        void clearPoints();
 
         void setPointPosition(int point, Vector3 position);
         void setPointPosition(int point, float x, float y, float z);

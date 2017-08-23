@@ -69,6 +69,14 @@ void Points::addPoint(Vector3 position){
     setPointPosition((int)positions.size()-1, position);
 }
 
+void Points::clearPoints(){
+    positions.clear();
+    pointSizes.clear();
+    normals.clear();
+    colors.clear();
+    textureRects.clear();
+}
+
 void Points::setPointPosition(int point, Vector3 position){
     if (point >= 0 && point < positions.size()){
         positions[point] = position;
