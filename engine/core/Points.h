@@ -15,8 +15,6 @@ namespace Supernova {
     class Points: public ConcreteObject {
 
     private:
-        //std::vector<float> pointSizesScaled;
-        //std::vector<float> rectsData;
         
         int texWidth;
         int texHeight;
@@ -30,6 +28,7 @@ namespace Supernova {
         void updatePointScale();
         void fillPointsData();
         void deletePointsData();
+        void sortTransparentPoints();
         std::vector<int> findFramesByString(std::string id);
 
     protected:
@@ -45,6 +44,8 @@ namespace Supernova {
             Rect* textureRect;
             float size;
             Vector4 color;
+            
+            float distanceToCamera;
         };
 
         ObjectRender* render;

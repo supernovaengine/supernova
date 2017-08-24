@@ -97,8 +97,8 @@ void ConcreteObject::updateMatrix(){
 
 bool ConcreteObject::draw(){
 
-    if ((transparent) && (scene != NULL) && (((Scene*)scene)->useDepth) && (distanceToCamera >= 0)){
-        ((Scene*)scene)->transparentQueue.insert(std::make_pair(distanceToCamera, this));
+    if (transparent && scene && scene->useDepth && distanceToCamera >= 0){
+        scene->transparentQueue.insert(std::make_pair(distanceToCamera, this));
     }else{
         renderDraw();
     }

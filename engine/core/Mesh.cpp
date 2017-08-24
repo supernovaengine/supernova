@@ -98,7 +98,8 @@ void Mesh::updateIndices(){
 
 void Mesh::sortTransparentSubmeshes(){
 
-    if (transparent){
+    if (transparent && scene && scene->isUseDepth()){
+        bool needSort = false;
         for (size_t i = 0; i < submeshes.size(); i++) {
             if (this->submeshes[i]->getIndices()->size() > 0){
                 Vector3 submeshFirstVertice = vertices[this->submeshes[i]->getIndex(0)];
@@ -106,11 +107,12 @@ void Mesh::sortTransparentSubmeshes(){
                 
                 if (this->cameraPosition != NULL && this->submeshes[i]->getMaterial()->transparent){
                     this->submeshes[i]->distanceToCamera = ((*this->cameraPosition) - submeshFirstVertice).length();
+                    needSort = true;
                 }
             }
         }
         
-        if (this->cameraPosition != NULL){
+        if (needSort){
             std::sort(submeshes.begin(), submeshes.end(),
                       [](const Submesh* a, const Submesh* b) -> bool
                       {
