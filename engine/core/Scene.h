@@ -11,7 +11,7 @@
 #include <vector>
 #include <map>
 #include "GUIObject.h"
-#include "LightData.h"
+#include "data/LightData.h"
 #include "math/Matrix4.h"
 
 namespace Supernova {

@@ -33,34 +33,31 @@ Points::~Points(){
 }
 
 void Points::updatePositions(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, points.size(), positionsData);
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, points.size(), &pointData.positions.front());
 }
 
 void Points::updateNormals(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_NORMALS,points.size(), normalsData);
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_NORMALS,points.size(), &pointData.normals.front());
 }
 
 void Points::updatePointColors(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, points.size(), colorsData);
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, points.size(), &pointData.colors.front());
 }
 
 void Points::updatePointSizes(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, points.size(), sizesData);
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, points.size(), &pointData.sizes.front());
 }
 
 void Points::updateTextureRects(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, points.size(), textureRectsData);
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, points.size(), &pointData.textureRects.front());
 }
 
 void Points::addPoint(){
-
     points.push_back({Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0), NULL, 1, *material.getColor(), -1});
-
 }
 
 void Points::addPoint(Vector3 position){
     addPoint();
-
     setPointPosition((int)points.size()-1, position);
 }
 
@@ -74,10 +71,10 @@ void Points::setPointPosition(int point, Vector3 position){
         points[point].position = position;
 
         if (loaded){
-            fillPointsData();
+            updatePointsData();
+            
             updatePositions();
             updateNormals();
-            deletePointsData();
         }
     }
 }
@@ -92,9 +89,9 @@ void Points::setPointSize(int point, float size){
         points[point].size = size;
 
         if (loaded){
-            fillPointsData();
+            updatePointsData();
+            
             updatePointSizes();
-            deletePointsData();
         }
     }
 }
@@ -105,9 +102,9 @@ void Points::setPointColor(int point, Vector4 color){
         points[point].color = color;
 
         if (loaded){
-            fillPointsData();
+            updatePointsData();
+            
             updatePointColors();
-            deletePointsData();
         }
     }
 }
@@ -132,9 +129,9 @@ void Points::setPointSprite(int point, int index){
         useTextureRects = true;
 
         if (loaded){
-            fillPointsData();
+            updatePointsData();
+            
             updateTextureRects();
-            deletePointsData();
         }
     }
 }
@@ -147,21 +144,28 @@ void Points::setPointSprite(int point, std::string id){
 }
 
 void Points::updatePointScale(){
+    float newPointScale;
+    
     if (sizeAttenuation) {
-        pointScale = pointScaleFactor / (modelViewProjectionMatrix * Vector4(0, 0, 0, 1.0)).w;
+        newPointScale = pointScaleFactor / (modelViewProjectionMatrix * Vector4(0, 0, 0, 1.0)).w;
     }else{
-        pointScale = 1;
+        newPointScale = 1;
     }
     
     if (pointSizeReference == S_POINTSIZE_HEIGHT)
-        pointScale *= (float)Engine::getScreenHeight() / (float)Engine::getCanvasHeight();
+        newPointScale *= (float)Engine::getScreenHeight() / (float)Engine::getCanvasHeight();
     if (pointSizeReference == S_POINTSIZE_WIDTH)
-        pointScale *= (float)Engine::getScreenWidth() / (float)Engine::getCanvasWidth();
+        newPointScale *= (float)Engine::getScreenWidth() / (float)Engine::getCanvasWidth();
 
-    if (loaded){
-        fillPointsData();
-        updatePointSizes();
-        deletePointsData();
+    if (newPointScale != pointScale){
+    
+        pointScale = newPointScale;
+        
+        if (loaded){
+            updatePointsData();
+        
+            updatePointSizes();
+        }
     }
 }
 
@@ -172,7 +176,11 @@ void Points::sortTransparentPoints(){
         for (int i=0; i < points.size(); i++){
             if (this->cameraPosition != NULL){
                 points[i].distanceToCamera = ((*this->cameraPosition) - (modelMatrix * points[i].position)).length();
-                needSort = true;
+                
+                if (i > 0){
+                    if (points[i-1].distanceToCamera < points[i].distanceToCamera)
+                        needSort = true;
+                }
             }
         }
         
@@ -188,12 +196,12 @@ void Points::sortTransparentPoints(){
                       });
             
             if (loaded){
-                fillPointsData();
+                updatePointsData();
+                
                 updatePositions();
                 updatePointColors();
                 updatePointSizes();
                 updateTextureRects();
-                deletePointsData();
             }
         }
         
@@ -275,35 +283,31 @@ void Points::removeSpriteFrame(std::string id){
     }
 }
 
-void Points::fillPointsData(){
-    positionsData = new float[points.size() * 3];
-    normalsData = new float[points.size() * 3];
-    textureRectsData = new float[points.size() * 4];
-    sizesData = new float[points.size() * 1];
-    colorsData = new float[points.size() * 4];
+void Points::updatePointsData(){
+    pointData.clearPoints();
 
     for (int i=0; i < points.size(); i++){
 
-        positionsData[3*i + 0] = points[i].position.x;
-        positionsData[3*i + 1] = points[i].position.y;
-        positionsData[3*i + 2] = points[i].position.z;
+        pointData.positions.push_back(points[i].position.x);
+        pointData.positions.push_back(points[i].position.y);
+        pointData.positions.push_back(points[i].position.z);
 
-        normalsData[3*i + 0] = points[i].normal.x;
-        normalsData[3*i + 1] = points[i].normal.y;
-        normalsData[3*i + 2] = points[i].normal.z;
+        pointData.normals.push_back(points[i].normal.x);
+        pointData.normals.push_back(points[i].normal.y);
+        pointData.normals.push_back(points[i].normal.z);
 
         if (points[i].textureRect && this->texWidth != 0 && this->texHeight != 0) {
 
             if (!points[i].textureRect->isNormalized()) {
-                textureRectsData[4 * i + 0] = points[i].textureRect->getX() / (float) texWidth;
-                textureRectsData[4 * i + 1] = points[i].textureRect->getY() / (float) texHeight;
-                textureRectsData[4 * i + 2] = points[i].textureRect->getWidth() / (float) texWidth;
-                textureRectsData[4 * i + 3] = points[i].textureRect->getHeight() / (float) texHeight;
+                pointData.textureRects.push_back(points[i].textureRect->getX() / (float) texWidth);
+                pointData.textureRects.push_back(points[i].textureRect->getY() / (float) texHeight);
+                pointData.textureRects.push_back(points[i].textureRect->getWidth() / (float) texWidth);
+                pointData.textureRects.push_back(points[i].textureRect->getHeight() / (float) texHeight);
             }else{
-                textureRectsData[4 * i + 0] = points[i].textureRect->getX();
-                textureRectsData[4 * i + 1] = points[i].textureRect->getY();
-                textureRectsData[4 * i + 2] = points[i].textureRect->getWidth();
-                textureRectsData[4 * i + 3] = points[i].textureRect->getHeight();
+                pointData.textureRects.push_back(points[i].textureRect->getX());
+                pointData.textureRects.push_back(points[i].textureRect->getY());
+                pointData.textureRects.push_back(points[i].textureRect->getWidth());
+                pointData.textureRects.push_back(points[i].textureRect->getHeight());
             }
 
         }
@@ -313,22 +317,12 @@ void Points::fillPointsData(){
             pointSizeScaledVal = minPointSize;
         if (pointSizeScaledVal > maxPointSize)
             pointSizeScaledVal = maxPointSize;
-        sizesData[i] = pointSizeScaledVal;
+        pointData.sizes.push_back(pointSizeScaledVal);
 
-        colorsData[4*i + 0] = points[i].color.x;
-        colorsData[4*i + 1] = points[i].color.y;
-        colorsData[4*i + 2] = points[i].color.z;
-        colorsData[4*i + 3] = points[i].color.w;
-    }
-}
-
-void Points::deletePointsData(){
-    if (points.size() > 0) {
-        delete[] positionsData;
-        delete[] normalsData;
-        delete[] textureRectsData;
-        delete[] sizesData;
-        delete[] colorsData;
+        pointData.colors.push_back(points[i].color.x);
+        pointData.colors.push_back(points[i].color.y);
+        pointData.colors.push_back(points[i].color.z);
+        pointData.colors.push_back(points[i].color.w);
     }
 }
 
@@ -365,14 +359,14 @@ bool Points::load(){
         texHeight = material.getTexture()->getHeight();
     }
 
-    fillPointsData();
+    updatePointsData();
     
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, points.size(), positionsData);
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, points.size(), normalsData);
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1, points.size(), sizesData);
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4, points.size(), colorsData);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, points.size(), &pointData.positions.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, points.size(), &pointData.normals.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1, points.size(), &pointData.sizes.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4, points.size(), &pointData.colors.front());
     if (useTextureRects)
-        render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4, points.size(), textureRectsData);
+        render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4, points.size(), &pointData.textureRects.front());
     
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
@@ -380,8 +374,6 @@ bool Points::load(){
     render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
     
     bool renderloaded = render->load();
-    
-    deletePointsData();
     
     if (!ConcreteObject::load())
         return false;

@@ -8,6 +8,7 @@
 
 #include "ConcreteObject.h"
 #include "render/ObjectRender.h"
+#include "data/PointData.h"
 #include <unordered_map>
 
 namespace Supernova {
@@ -26,8 +27,7 @@ namespace Supernova {
         bool useTextureRects;
 
         void updatePointScale();
-        void fillPointsData();
-        void deletePointsData();
+        void updatePointsData();
         void sortTransparentPoints();
         std::vector<int> findFramesByString(std::string id);
 
@@ -44,19 +44,13 @@ namespace Supernova {
             Rect* textureRect;
             float size;
             Vector4 color;
-            
             float distanceToCamera;
         };
 
         ObjectRender* render;
 
         std::vector<Point> points;
-
-        float* positionsData;
-        float* normalsData;
-        float* textureRectsData;
-        float* sizesData;
-        float* colorsData;
+        PointData pointData;
 
         bool sizeAttenuation;
         float pointScaleFactor;
