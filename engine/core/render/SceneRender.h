@@ -3,7 +3,6 @@
 
 #include "Light.h"
 #include "Fog.h"
-#include "LightData.h"
 #include "math/Rect.h"
 
 namespace Supernova {

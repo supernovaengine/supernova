@@ -53,7 +53,7 @@ void Points::updateTextureRects(){
 }
 
 void Points::addPoint(){
-    points.push_back({Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0), NULL, 1, *material.getColor(), -1});
+    points.push_back({Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0), NULL, 1, *material.getColor(), -1, true});
 }
 
 void Points::addPoint(Vector3 position){
@@ -67,10 +67,14 @@ void Points::clearPoints(){
 
 void Points::setPointPosition(int point, Vector3 position){
     if (point >= 0 && point < points.size()){
+        
+        bool changed = false;
+        if (points[point].position != position)
+            changed = true;
 
         points[point].position = position;
 
-        if (loaded){
+        if (loaded && changed){
             updatePointsData();
             
             updatePositions();
@@ -85,10 +89,14 @@ void Points::setPointPosition(int point, float x, float y, float z){
 
 void Points::setPointSize(int point, float size){
     if (point >= 0 && point < points.size()){
+        
+        bool changed = false;
+        if (points[point].size != size)
+            changed = true;
 
         points[point].size = size;
 
-        if (loaded){
+        if (loaded && changed){
             updatePointsData();
             
             updatePointSizes();
@@ -98,10 +106,14 @@ void Points::setPointSize(int point, float size){
 
 void Points::setPointColor(int point, Vector4 color){
     if (point >= 0 && point < points.size()) {
+        
+        bool changed = false;
+        if (points[point].color != color)
+            changed = true;
 
         points[point].color = color;
 
-        if (loaded){
+        if (loaded && changed){
             updatePointsData();
             
             updatePointColors();
@@ -114,25 +126,36 @@ void Points::setPointColor(int point, float red, float green, float blue, float 
 }
 
 void Points::setPointSprite(int point, int index){
-    if (points[point].textureRect){
-        points[point].textureRect->setRect(&framesRect[index].rect);
-    }else {
-        points[point].textureRect = new Rect(framesRect[index].rect);
-    }
-
-    if (!useTextureRects){
-        useTextureRects = true;
-
-        if (loaded)
-            reload();
-    }else{
-        useTextureRects = true;
-
-        if (loaded){
-            updatePointsData();
+    if (point >= 0 && point < points.size()) {
+        
+        bool changed = false;
+        
+        if (points[point].textureRect){
             
-            updateTextureRects();
+            if ((*points[point].textureRect) != framesRect[index].rect)
+                changed = true;
+            
+            points[point].textureRect->setRect(&framesRect[index].rect);
+        }else {
+            changed = true;
+            points[point].textureRect = new Rect(framesRect[index].rect);
         }
+
+        if (!useTextureRects){
+            useTextureRects = true;
+
+            if (loaded)
+                reload();
+        }else{
+            useTextureRects = true;
+
+            if (loaded && changed){
+                updatePointsData();
+                
+                updateTextureRects();
+            }
+        }
+        
     }
 }
 
@@ -141,6 +164,52 @@ void Points::setPointSprite(int point, std::string id){
     if (frameslist.size() > 0){
         setPointSprite(point, frameslist[0]);
     }
+}
+
+void Points::setPointVisible(int point, bool visible){
+    if (point >= 0 && point < points.size()) {
+        
+        bool changed = false;
+        if (points[point].visible != visible)
+            changed = true;
+        
+        points[point].visible = visible;
+        
+        if (loaded && changed){
+            updatePointsData();
+            
+            updatePositions();
+            updateNormals();
+            updatePointColors();
+            updatePointSizes();
+            updateTextureRects();
+        }
+        
+    }
+}
+
+Vector3 Points::getPointPosition(int point){
+    if (point >= 0 && point < points.size()){
+        return points[point].position;
+    }
+    
+    return Vector3(0,0,0);
+}
+
+float Points::getPointSize(int point){
+    if (point >= 0 && point < points.size()){
+        return points[point].size;
+    }
+    
+    return -1;
+}
+
+Vector4 Points::getPointColor(int point){
+    if (point >= 0 && point < points.size()){
+        return points[point].color;
+    }
+    
+    return Vector4(0,0,0,0);
 }
 
 void Points::updatePointScale(){
@@ -199,6 +268,7 @@ void Points::sortTransparentPoints(){
                 updatePointsData();
                 
                 updatePositions();
+                updateNormals();
                 updatePointColors();
                 updatePointSizes();
                 updateTextureRects();
@@ -288,41 +358,45 @@ void Points::updatePointsData(){
 
     for (int i=0; i < points.size(); i++){
 
-        pointData.positions.push_back(points[i].position.x);
-        pointData.positions.push_back(points[i].position.y);
-        pointData.positions.push_back(points[i].position.z);
+        if (points[i].visible){
+            
+            pointData.positions.push_back(points[i].position.x);
+            pointData.positions.push_back(points[i].position.y);
+            pointData.positions.push_back(points[i].position.z);
 
-        pointData.normals.push_back(points[i].normal.x);
-        pointData.normals.push_back(points[i].normal.y);
-        pointData.normals.push_back(points[i].normal.z);
+            pointData.normals.push_back(points[i].normal.x);
+            pointData.normals.push_back(points[i].normal.y);
+            pointData.normals.push_back(points[i].normal.z);
 
-        if (points[i].textureRect && this->texWidth != 0 && this->texHeight != 0) {
+            if (points[i].textureRect && this->texWidth != 0 && this->texHeight != 0) {
 
-            if (!points[i].textureRect->isNormalized()) {
-                pointData.textureRects.push_back(points[i].textureRect->getX() / (float) texWidth);
-                pointData.textureRects.push_back(points[i].textureRect->getY() / (float) texHeight);
-                pointData.textureRects.push_back(points[i].textureRect->getWidth() / (float) texWidth);
-                pointData.textureRects.push_back(points[i].textureRect->getHeight() / (float) texHeight);
-            }else{
-                pointData.textureRects.push_back(points[i].textureRect->getX());
-                pointData.textureRects.push_back(points[i].textureRect->getY());
-                pointData.textureRects.push_back(points[i].textureRect->getWidth());
-                pointData.textureRects.push_back(points[i].textureRect->getHeight());
+                if (!points[i].textureRect->isNormalized()) {
+                    pointData.textureRects.push_back(points[i].textureRect->getX() / (float) texWidth);
+                    pointData.textureRects.push_back(points[i].textureRect->getY() / (float) texHeight);
+                    pointData.textureRects.push_back(points[i].textureRect->getWidth() / (float) texWidth);
+                    pointData.textureRects.push_back(points[i].textureRect->getHeight() / (float) texHeight);
+                }else{
+                    pointData.textureRects.push_back(points[i].textureRect->getX());
+                    pointData.textureRects.push_back(points[i].textureRect->getY());
+                    pointData.textureRects.push_back(points[i].textureRect->getWidth());
+                    pointData.textureRects.push_back(points[i].textureRect->getHeight());
+                }
+
             }
 
+            float pointSizeScaledVal = points[i].size * pointScale;
+            if (pointSizeScaledVal < minPointSize)
+                pointSizeScaledVal = minPointSize;
+            if (pointSizeScaledVal > maxPointSize)
+                pointSizeScaledVal = maxPointSize;
+            pointData.sizes.push_back(pointSizeScaledVal);
+
+            pointData.colors.push_back(points[i].color.x);
+            pointData.colors.push_back(points[i].color.y);
+            pointData.colors.push_back(points[i].color.z);
+            pointData.colors.push_back(points[i].color.w);
+            
         }
-
-        float pointSizeScaledVal = points[i].size * pointScale;
-        if (pointSizeScaledVal < minPointSize)
-            pointSizeScaledVal = minPointSize;
-        if (pointSizeScaledVal > maxPointSize)
-            pointSizeScaledVal = maxPointSize;
-        pointData.sizes.push_back(pointSizeScaledVal);
-
-        pointData.colors.push_back(points[i].color.x);
-        pointData.colors.push_back(points[i].color.y);
-        pointData.colors.push_back(points[i].color.z);
-        pointData.colors.push_back(points[i].color.w);
     }
 }
 

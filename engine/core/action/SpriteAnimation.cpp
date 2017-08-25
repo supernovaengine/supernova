@@ -8,9 +8,7 @@ SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, std::vector<int> f
     this->function = NULL;
     this->functionLua = 0;
 
-    this->spriteFrameCount = 0;
-    this->framesIndex = 0;
-    this->framesTimeIndex = 0; //Actual sprite frame with the last frameTime
+    reset();
 
     this->framesTime = framesTime;
     this->frames = frames;
@@ -23,9 +21,7 @@ SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, int startFrame, in
     this->function = NULL;
     this->functionLua = 0;
 
-    this->spriteFrameCount = 0;
-    this->framesIndex = 0;
-    this->framesTimeIndex = 0;
+    reset();
 
     this->framesTime = framesTime;
     
@@ -41,9 +37,7 @@ SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, boo
     this->function = NULL;
     this->functionLua = 0;
 
-    this->spriteFrameCount = 0;
-    this->framesIndex = 0;
-    this->framesTimeIndex = 0;
+    reset();
     
     this->framesTime = framesTime;
     
@@ -58,9 +52,7 @@ SpriteAnimation::SpriteAnimation(int interval, std::vector<int> frames, bool loo
     this->function = NULL;
     this->functionLua = 0;
 
-    this->spriteFrameCount = 0;
-    this->framesIndex = 0;
-    this->framesTimeIndex = 0;
+    reset();
 
     this->framesTime = framesTime;
     this->frames = frames;
@@ -76,7 +68,7 @@ SpriteAnimation::~SpriteAnimation(){
 void SpriteAnimation::play(){
     Action::play();
 
-    if (object) {
+    if (dynamic_cast<Sprite*>(object)) {
 
         bool erro = false;
 
@@ -117,6 +109,7 @@ void SpriteAnimation::play(){
 
             ((Sprite *) object)->setFrame(frames[framesIndex]);
         }else{
+            Log::Error(LOG_TAG, "Object in SpriteAnimation must be a Sprite type");
             stop();
         }
     }

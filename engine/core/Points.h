@@ -27,7 +27,6 @@ namespace Supernova {
         bool useTextureRects;
 
         void updatePointScale();
-        void updatePointsData();
         void sortTransparentPoints();
         std::vector<int> findFramesByString(std::string id);
 
@@ -44,7 +43,9 @@ namespace Supernova {
             Rect* textureRect;
             float size;
             Vector4 color;
+            
             float distanceToCamera;
+            bool visible;
         };
 
         ObjectRender* render;
@@ -58,6 +59,8 @@ namespace Supernova {
         float maxPointSize;
 
         std::vector<FramesData> framesRect;
+        
+        void updatePointsData();
         
         void updatePositions();
         void updateNormals();
@@ -75,10 +78,9 @@ namespace Supernova {
         void setMinPointSize(float minPointSize);
         void setMaxPointSize(float maxPointSize);
 
-        void addPoint();
-        void addPoint(Vector3 position);
-        
-        void clearPoints();
+        virtual void addPoint();
+        virtual void addPoint(Vector3 position);
+        virtual void clearPoints();
 
         void setPointPosition(int point, Vector3 position);
         void setPointPosition(int point, float x, float y, float z);
@@ -87,6 +89,11 @@ namespace Supernova {
         void setPointColor(int point, float red, float green, float blue, float alpha);
         void setPointSprite(int point, int index);
         void setPointSprite(int point, std::string id);
+        void setPointVisible(int point, bool visible);
+        
+        Vector3 getPointPosition(int point);
+        float getPointSize(int point);
+        Vector4 getPointColor(int point);
         
         void addSpriteFrame(std::string id, float x, float y, float width, float height);
         void addSpriteFrame(float x, float y, float width, float height);
