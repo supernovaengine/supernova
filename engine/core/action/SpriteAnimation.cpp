@@ -68,7 +68,7 @@ SpriteAnimation::~SpriteAnimation(){
 void SpriteAnimation::play(){
     Action::play();
 
-    if (dynamic_cast<Sprite*>(object)) {
+    if (Sprite* sprite = dynamic_cast<Sprite*>(object)) {
 
         bool erro = false;
 
@@ -78,10 +78,10 @@ void SpriteAnimation::play(){
         }else if (frames.size() == 0 && startFrame == 0 && endFrame == 0){
             Log::Error(LOG_TAG, "Incorrect sprite animation: no frames");
             erro = true;
-        }else if (startFrame < 0 && startFrame >= ((Sprite *) object)->getFramesSize()){
+        }else if (startFrame < 0 && startFrame >= sprite->getFramesSize()){
             Log::Error(LOG_TAG, "Incorrect sprite animation: range of startFrame");
             erro = true;
-        }else if (endFrame < 0 && endFrame >= ((Sprite *) object)->getFramesSize()){
+        }else if (endFrame < 0 && endFrame >= sprite->getFramesSize()){
             Log::Error(LOG_TAG, "Incorrect sprite animation: range of endFrame");
             erro = true;
         }
@@ -93,7 +93,7 @@ void SpriteAnimation::play(){
                 bool finaliza = false;
                 while (!finaliza) {
 
-                    if (actualFrame >= ((Sprite *) object)->getFramesSize())
+                    if (actualFrame >= sprite->getFramesSize())
                         actualFrame = 0;
 
                     frames.push_back(actualFrame);
@@ -107,7 +107,7 @@ void SpriteAnimation::play(){
                 this->frames = frames;
             }
 
-            ((Sprite *) object)->setFrame(frames[framesIndex]);
+            sprite->setFrame(frames[framesIndex]);
         }else{
             Log::Error(LOG_TAG, "Object in SpriteAnimation must be a Sprite type");
             stop();
@@ -130,7 +130,7 @@ void SpriteAnimation::reset(){
 void SpriteAnimation::step(){
     Action::step();
     
-    if (object){
+    if (Sprite* sprite = dynamic_cast<Sprite*>(object)){
 
         spriteFrameCount += steptime;
         while ((spriteFrameCount >= framesTime[framesTimeIndex]) && (isRunning())) {
@@ -152,7 +152,7 @@ void SpriteAnimation::step(){
             if (framesTimeIndex >= framesTime.size())
                 framesTimeIndex = 0;
 
-            ((Sprite*)object)->setFrame(frames[framesIndex]);
+            sprite->setFrame(frames[framesIndex]);
 
         }
 

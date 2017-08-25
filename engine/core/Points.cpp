@@ -357,46 +357,48 @@ void Points::updatePointsData(){
     pointData.clearPoints();
 
     for (int i=0; i < points.size(); i++){
-
-        if (points[i].visible){
             
-            pointData.positions.push_back(points[i].position.x);
-            pointData.positions.push_back(points[i].position.y);
-            pointData.positions.push_back(points[i].position.z);
+        pointData.positions.push_back(points[i].position.x);
+        pointData.positions.push_back(points[i].position.y);
+        pointData.positions.push_back(points[i].position.z);
 
-            pointData.normals.push_back(points[i].normal.x);
-            pointData.normals.push_back(points[i].normal.y);
-            pointData.normals.push_back(points[i].normal.z);
+        pointData.normals.push_back(points[i].normal.x);
+        pointData.normals.push_back(points[i].normal.y);
+        pointData.normals.push_back(points[i].normal.z);
 
-            if (points[i].textureRect && this->texWidth != 0 && this->texHeight != 0) {
+        if (points[i].textureRect && this->texWidth != 0 && this->texHeight != 0) {
 
-                if (!points[i].textureRect->isNormalized()) {
-                    pointData.textureRects.push_back(points[i].textureRect->getX() / (float) texWidth);
-                    pointData.textureRects.push_back(points[i].textureRect->getY() / (float) texHeight);
-                    pointData.textureRects.push_back(points[i].textureRect->getWidth() / (float) texWidth);
-                    pointData.textureRects.push_back(points[i].textureRect->getHeight() / (float) texHeight);
-                }else{
-                    pointData.textureRects.push_back(points[i].textureRect->getX());
-                    pointData.textureRects.push_back(points[i].textureRect->getY());
-                    pointData.textureRects.push_back(points[i].textureRect->getWidth());
-                    pointData.textureRects.push_back(points[i].textureRect->getHeight());
-                }
-
+            if (!points[i].textureRect->isNormalized()) {
+                pointData.textureRects.push_back(points[i].textureRect->getX() / (float) texWidth);
+                pointData.textureRects.push_back(points[i].textureRect->getY() / (float) texHeight);
+                pointData.textureRects.push_back(points[i].textureRect->getWidth() / (float) texWidth);
+                pointData.textureRects.push_back(points[i].textureRect->getHeight() / (float) texHeight);
+            }else{
+                pointData.textureRects.push_back(points[i].textureRect->getX());
+                pointData.textureRects.push_back(points[i].textureRect->getY());
+                pointData.textureRects.push_back(points[i].textureRect->getWidth());
+                pointData.textureRects.push_back(points[i].textureRect->getHeight());
             }
 
+        }
+
+        if (points[i].visible) {
             float pointSizeScaledVal = points[i].size * pointScale;
             if (pointSizeScaledVal < minPointSize)
                 pointSizeScaledVal = minPointSize;
             if (pointSizeScaledVal > maxPointSize)
                 pointSizeScaledVal = maxPointSize;
             pointData.sizes.push_back(pointSizeScaledVal);
-
-            pointData.colors.push_back(points[i].color.x);
-            pointData.colors.push_back(points[i].color.y);
-            pointData.colors.push_back(points[i].color.z);
-            pointData.colors.push_back(points[i].color.w);
-            
+        }else{
+            pointData.sizes.push_back(0);
         }
+
+        pointData.colors.push_back(points[i].color.x);
+        pointData.colors.push_back(points[i].color.y);
+        pointData.colors.push_back(points[i].color.z);
+        pointData.colors.push_back(points[i].color.w);
+            
+
     }
 }
 

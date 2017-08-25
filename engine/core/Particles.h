@@ -17,18 +17,22 @@ namespace Supernova {
         struct ParticleData{
             float life;
             Vector3 velocity;
+            Vector3 acceleration;
         };
 
         std::vector<ParticleData> particles;
-        int numParticles;
+        int maxParticles;
+        int minRate; //per second
+        int maxRate;
+        float lifeTime;
         
     public:
         Particles();
         Particles(int numParticles);
         virtual ~Particles();
         
-        void setNumParticles(int numParticles);
-        int getNumParticles();
+        void setMaxParticles(int maxParticles);
+        int getMaxParticles();
         
         virtual void addPoint();
         virtual void addPoint(Vector3 position);
@@ -44,18 +48,30 @@ namespace Supernova {
         void setParticleColor(int particle, Vector4 color);
         void setParticleColor(int particle, float red, float green, float blue, float alpha);
         void setParticleSprite(int particle, int index);
-        void setParticleSprite(int particle, std::string id);
+        void setParticleVisible(int particle, bool visible);
         void setParticleLife(int particle, float life);
         void setParticleVelocity(int particle, Vector3 velocity);
+        void setParticleAcceleration(int particle, Vector3 acceleration);
         
         Vector3 getParticlePosition(int particle);
         float getParticleSize(int particle);
         Vector4 getParticleColor(int particle);
         float getParticleLife(int particle);
         Vector3 getParticleVelocity(int particle);
+        Vector3 getParticleAcceleration(int particle);
+
+        void setRate(int minRate);
+        void setRate(int minRate, int maxRate);
+        void setLifeTime(float lifeTime);
+
+        int getMinRate();
+        int getMaxRate();
+        float getLifeTime();
         
         int findUnusedParticle();
-        
+
+        void updateParticles();
+
         virtual bool load();
         virtual bool draw();
     };
