@@ -25,7 +25,7 @@ namespace Supernova{
         SpriteAnimation(int interval, std::vector<int> frames, bool loop);
         virtual ~SpriteAnimation();
         
-        virtual void play();
+        virtual void start();
         virtual void stop();
         virtual void reset();
         

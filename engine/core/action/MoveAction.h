@@ -19,7 +19,7 @@ namespace Supernova{
         MoveAction(Vector3 startPosition, Vector3 endPosition, float duration, bool loop);
         virtual ~MoveAction();
         
-        virtual void play();
+        virtual void start();
         
         virtual void step();
     };

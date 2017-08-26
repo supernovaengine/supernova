@@ -198,14 +198,14 @@ float Particles::getLifeTime(){
 int Particles::findUnusedParticle(){
     
     for (int i=lastUsedParticle; i<maxParticles; i++){
-        if (particles[i].life < 0){
+        if (particles[i].life <= 0){
             lastUsedParticle = i;
             return i;
         }
     }
     
     for (int i=0; i<lastUsedParticle; i++){
-        if (particles[i].life < 0){
+        if (particles[i].life <= 0){
             lastUsedParticle = i;
             return i;
         }

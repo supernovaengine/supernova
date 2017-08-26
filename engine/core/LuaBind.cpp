@@ -385,7 +385,7 @@ void LuaBind::bind(){
     .addFunction("setFrameString", (void (Sprite::*)(std::string))&Sprite::setFrame)
     .addFunction("findFramesByString", &Sprite::findFramesByString)
     .addFunction("isAnimation", &Sprite::isAnimation)
-    .addFunction("playAnimation", (void (Sprite::*)(std::vector<int>, std::vector<int>, bool))&Sprite::playAnimation)
+    .addFunction("startAnimation", (void (Sprite::*)(std::vector<int>, std::vector<int>, bool))&Sprite::startAnimation)
     .addFunction("stopAnimation", &Sprite::stopAnimation)
     .endClass()
 
@@ -470,7 +470,7 @@ void LuaBind::bind(){
     .addConstant("BOUNCE_EASEIN", S_BOUNCE_EASEIN)
     .addConstant("BOUNCE_EASEOUT", S_BOUNCE_EASEOUT)
     .addConstant("BOUNCE_EASEINOUT", S_BOUNCE_EASEINOUT)
-    .addFunction("play", &Action::play)
+    .addFunction("start", &Action::start)
     .addFunction("stop", &Action::stop)
     .addFunction("reset", &Action::reset)
     .addFunction("isRunning", &Action::isRunning)

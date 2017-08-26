@@ -23,8 +23,9 @@ namespace Supernova{
         void addInit(ParticleAnimationInit* particleInit);
         void removeInit(ParticleAnimationInit* particleInit);
         
-        virtual void play();
+        virtual void start();
         virtual void stop();
+        void stopEmitter();
         virtual void reset();
         
         virtual void step();

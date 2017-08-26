@@ -72,44 +72,44 @@ bool Sprite::isAnimation(){
     return false;
 }
 
-void Sprite::playAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop){
+void Sprite::startAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop){
     if (defaultAnimation) {
         delete defaultAnimation;
     }
 
     defaultAnimation = new SpriteAnimation(framesTime, frames, loop);
     addAction(defaultAnimation);
-    defaultAnimation->play();
+    defaultAnimation->start();
 }
 
-void Sprite::playAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop){
+void Sprite::startAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop){
     if (defaultAnimation) {
         delete defaultAnimation;
     }
 
     defaultAnimation = new SpriteAnimation(framesTime, startFrame, endFrame, loop);
     addAction(defaultAnimation);
-    defaultAnimation->play();
+    defaultAnimation->start();
 }
 
-void Sprite::playAnimation(int interval, int startFrame, int endFrame, bool loop){
+void Sprite::startAnimation(int interval, int startFrame, int endFrame, bool loop){
     if (defaultAnimation) {
         delete defaultAnimation;
     }
 
     defaultAnimation = new SpriteAnimation(interval, startFrame, endFrame, loop);
     addAction(defaultAnimation);
-    defaultAnimation->play();
+    defaultAnimation->start();
 }
 
-void Sprite::playAnimation(int interval, std::vector<int> frames, bool loop){
+void Sprite::startAnimation(int interval, std::vector<int> frames, bool loop){
     if (defaultAnimation) {
         delete defaultAnimation;
     }
 
     defaultAnimation = new SpriteAnimation(interval, frames, loop);
     addAction(defaultAnimation);
-    defaultAnimation->play();
+    defaultAnimation->start();
 }
 
 void Sprite::stopAnimation(){

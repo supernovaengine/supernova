@@ -65,8 +65,8 @@ SpriteAnimation::~SpriteAnimation(){
     
 }
 
-void SpriteAnimation::play(){
-    Action::play();
+void SpriteAnimation::start(){
+    Action::start();
 
     if (Sprite* sprite = dynamic_cast<Sprite*>(object)) {
 

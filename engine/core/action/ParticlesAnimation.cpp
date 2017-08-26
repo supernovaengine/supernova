@@ -24,13 +24,11 @@ void ParticlesAnimation::removeInit(ParticleAnimationInit* particleInit){
     particlesInit.erase(i,particlesInit.end());
 }
 
-void ParticlesAnimation::play(){
-    Action::play();
+void ParticlesAnimation::start(){
+    Action::start();
     
     if (Particles* particles = dynamic_cast<Particles*>(object)) {
-        for (int i = 0; i < particles->getMaxParticles(); i++) {
-            particles->setParticleLife(i, 0);
-        }
+        //Nothing to do
     }else{
         Log::Error(LOG_TAG, "Object in ParticlesAnimation must be a Particles type");
         stop();
@@ -41,8 +39,20 @@ void ParticlesAnimation::stop(){
     Action::stop();
 }
 
+void ParticlesAnimation::stopEmitter(){
+    
+}
+
 void ParticlesAnimation::reset(){
     Action::reset();
+    
+    if (Particles* particles = dynamic_cast<Particles*>(object)){
+        for (int i = 0; i < particles->getMaxParticles(); i++) {
+            particles->setParticleLife(i, -1);
+        }
+        
+        particles->updateParticles();
+    }
 
     newParticlesCount = 0;
 }

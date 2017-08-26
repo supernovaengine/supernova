@@ -364,7 +364,7 @@ bool Action::isRunning(){
     return running;
 }
 
-void Action::play(){
+void Action::start(){
     running = true;
 
     if (time == 1){
