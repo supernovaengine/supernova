@@ -15,6 +15,7 @@ namespace Supernova{
         std::vector<ParticleAnimationInit*> particlesInit;
 
         float newParticlesCount;
+        bool emitter;
         
     public:
         ParticlesAnimation();
@@ -23,12 +24,12 @@ namespace Supernova{
         void addInit(ParticleAnimationInit* particleInit);
         void removeInit(ParticleAnimationInit* particleInit);
         
-        virtual void start();
-        virtual void stop();
-        void stopEmitter();
-        virtual void reset();
+        virtual bool run();
+        virtual bool pause();
+        virtual bool stop();
+        bool stopAll();
         
-        virtual void step();
+        virtual bool step();
     };
     
 }

@@ -36,10 +36,10 @@ namespace Supernova {
         unsigned int getFramesSize();
         bool isAnimation();
 
-        void startAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop);
-        void startAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
-        void startAnimation(int interval, int startFrame, int endFrame, bool loop);
-        void startAnimation(int interval, std::vector<int> frames, bool loop);
+        void runAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop);
+        void runAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
+        void runAnimation(int interval, int startFrame, int endFrame, bool loop);
+        void runAnimation(int interval, std::vector<int> frames, bool loop);
         void stopAnimation();
         
         virtual bool draw();

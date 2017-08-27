@@ -166,6 +166,7 @@
 		71D6EFDC1F4F77B800241F0C /* LightData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFDA1F4F77B800241F0C /* LightData.cpp */; };
 		71D6EFE41F50E08700241F0C /* ParticleAnimationInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFDE1F50E08200241F0C /* ParticleAnimationInit.cpp */; };
 		71D6EFE51F50E08B00241F0C /* ParticleVelocityInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFE01F50E08200241F0C /* ParticleVelocityInit.cpp */; };
+		71D6EFE81F53551F00241F0C /* TimeAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFE61F53551F00241F0C /* TimeAction.cpp */; };
 		71E170521F4D088C006D207B /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E170501F4D088C006D207B /* ParticlesAnimation.cpp */; };
 		71EC38B41EB82871008654E8 /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71EC38B21EB82871008654E8 /* Particles.cpp */; };
 		71F59C381EBFCB1500F49392 /* soloud_coreaudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B971EBFCA5300F49392 /* soloud_coreaudio.cpp */; };
@@ -624,6 +625,8 @@
 		71D6EFDF1F50E08200241F0C /* ParticleAnimationInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleAnimationInit.h; sourceTree = "<group>"; };
 		71D6EFE01F50E08200241F0C /* ParticleVelocityInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleVelocityInit.cpp; sourceTree = "<group>"; };
 		71D6EFE11F50E08200241F0C /* ParticleVelocityInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleVelocityInit.h; sourceTree = "<group>"; };
+		71D6EFE61F53551F00241F0C /* TimeAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TimeAction.cpp; sourceTree = "<group>"; };
+		71D6EFE71F53551F00241F0C /* TimeAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeAction.h; sourceTree = "<group>"; };
 		71E170501F4D088C006D207B /* ParticlesAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlesAnimation.cpp; sourceTree = "<group>"; };
 		71E170511F4D088C006D207B /* ParticlesAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimation.h; sourceTree = "<group>"; };
 		71E1D2291D27358B001209C8 /* Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Light.cpp; sourceTree = "<group>"; };
@@ -1182,13 +1185,15 @@
 		718C7BD61F3E541A001AA8C2 /* action */ = {
 			isa = PBXGroup;
 			children = (
-				71D6EFDD1F50E08200241F0C /* particle */,
 				718C7BD71F3E541A001AA8C2 /* MoveAction.cpp */,
 				718C7BD81F3E541A001AA8C2 /* MoveAction.h */,
-				71D6EFD01F40A00E00241F0C /* SpriteAnimation.cpp */,
-				71D6EFD11F40A00E00241F0C /* SpriteAnimation.h */,
+				71D6EFDD1F50E08200241F0C /* particle */,
 				71E170501F4D088C006D207B /* ParticlesAnimation.cpp */,
 				71E170511F4D088C006D207B /* ParticlesAnimation.h */,
+				71D6EFD01F40A00E00241F0C /* SpriteAnimation.cpp */,
+				71D6EFD11F40A00E00241F0C /* SpriteAnimation.h */,
+				71D6EFE61F53551F00241F0C /* TimeAction.cpp */,
+				71D6EFE71F53551F00241F0C /* TimeAction.h */,
 			);
 			path = action;
 			sourceTree = "<group>";
@@ -1768,6 +1773,7 @@
 				71CDC7241D7B146D0060EEFF /* Quaternion.cpp in Sources */,
 				71CDC71C1D7B14510060EEFF /* Submesh.cpp in Sources */,
 				71CDC7291D7B14720060EEFF /* Log.cpp in Sources */,
+				71D6EFE81F53551F00241F0C /* TimeAction.cpp in Sources */,
 				719301221E50F9CF00BEE527 /* ConcreteObject.cpp in Sources */,
 				71CE94F71EC8A3B2008CCF3C /* File.cpp in Sources */,
 				71CDC72F1D7B14860060EEFF /* GLES2Texture.cpp in Sources */,

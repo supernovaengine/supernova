@@ -4,12 +4,10 @@
 
 using namespace Supernova;
 
-SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop): Action(-1, loop){
-    this->function = NULL;
-    this->functionLua = 0;
-
-    reset();
-
+SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop): Action(){
+    stop();
+    this->loop = loop;
+    
     this->framesTime = framesTime;
     this->frames = frames;
     
@@ -17,11 +15,9 @@ SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, std::vector<int> f
     this->endFrame = 0;
 }
 
-SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop): Action(-1, loop){
-    this->function = NULL;
-    this->functionLua = 0;
-
-    reset();
+SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop): Action(){
+    stop();
+    this->loop = loop;
 
     this->framesTime = framesTime;
     
@@ -30,14 +26,12 @@ SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, int startFrame, in
     
 }
 
-SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, bool loop): Action(-1, loop){
+SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, bool loop): Action(){
+    stop();
+    this->loop = loop;
+    
     std::vector<int> framesTime;
     framesTime.push_back(interval);
-    
-    this->function = NULL;
-    this->functionLua = 0;
-
-    reset();
     
     this->framesTime = framesTime;
     
@@ -45,14 +39,12 @@ SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, boo
     this->endFrame = endFrame;
 }
 
-SpriteAnimation::SpriteAnimation(int interval, std::vector<int> frames, bool loop): Action(-1, loop){
+SpriteAnimation::SpriteAnimation(int interval, std::vector<int> frames, bool loop): Action(){
+    stop();
+    this->loop = loop;
+    
     std::vector<int> framesTime;
     framesTime.push_back(interval);
-
-    this->function = NULL;
-    this->functionLua = 0;
-
-    reset();
 
     this->framesTime = framesTime;
     this->frames = frames;
@@ -65,8 +57,9 @@ SpriteAnimation::~SpriteAnimation(){
     
 }
 
-void SpriteAnimation::start(){
-    Action::start();
+bool SpriteAnimation::run(){
+    if (!Action::run())
+        return false;
 
     if (Sprite* sprite = dynamic_cast<Sprite*>(object)) {
 
@@ -113,22 +106,28 @@ void SpriteAnimation::start(){
             stop();
         }
     }
+    
+    return true;
 }
 
-void SpriteAnimation::stop(){
-    Action::stop();
+bool SpriteAnimation::pause(){
+    return Action::pause();
 }
 
-void SpriteAnimation::reset(){
-    Action::reset();
+bool SpriteAnimation::stop(){
+    if (!Action::stop())
+        return false;
 
     this->spriteFrameCount = 0;
     this->framesIndex = 0;
     this->framesTimeIndex = 0;
+    
+    return true;
 }
 
-void SpriteAnimation::step(){
-    Action::step();
+bool SpriteAnimation::step(){
+    if (!Action::step())
+        return false;
     
     if (Sprite* sprite = dynamic_cast<Sprite*>(object)){
 
@@ -157,4 +156,6 @@ void SpriteAnimation::step(){
         }
 
     }
+    
+    return true;
 }
