@@ -9,6 +9,7 @@
 #include "math/Vector4.h"
 #include "math/Vector3.h"
 #include "math/Ray.h"
+#include "math/Rect.h"
 #include "Object.h"
 
 namespace Supernova {
@@ -66,7 +67,7 @@ namespace Supernova {
         void setType(int type);
         int getType();
         
-        void updateAutomaticSizes();
+        void updateAutomaticSizes(Rect rect);
         
         void setOrtho(float left, float right, float bottom, float top, float near, float far);
         void setPerspective(float y_fov, float aspect, float near, float far);

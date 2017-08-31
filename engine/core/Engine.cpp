@@ -199,15 +199,15 @@ unsigned int Engine::getUpdateTime(){
 int Engine::getPlatform(){
     
 #ifdef SUPERNOVA_IOS
-    return S_IOS;
+    return S_PLATFORM_IOS;
 #endif
     
 #ifdef SUPERNOVA_ANDROID
-    return S_ANDROID;
+    return S_PLATFORM_ANDROID;
 #endif
     
 #ifdef SUPERNOVA_WEB
-    return S_WEB;
+    return S_PLATFORM_WEB;
 #endif
     
     return 0;
@@ -304,7 +304,7 @@ void Engine::onSurfaceChanged(int width, int height) {
     viewRect.setRect(viewX, viewY, viewWidth, viewHeight);
 
     if (Engine::getScene() != NULL){
-        (Engine::getScene())->updateViewSize();
+        (Engine::getScene())->updateCameraSize(Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight()));
     }
 
 }

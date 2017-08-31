@@ -4,6 +4,7 @@
 
 #include "platform/Log.h"
 #include "GUIObject.h"
+#include <stdlib.h>
 
 using namespace Supernova;
 
@@ -22,6 +23,7 @@ Scene::Scene() {
     render = NULL;
     lightRender = NULL;
     fogRender = NULL;
+    textureRender = NULL;
 }
 
 Scene::~Scene() {
@@ -167,22 +169,25 @@ bool Scene::is3D(){
     return false;
 }
 
-bool Scene::updateViewSize(){
+bool Scene::updateCameraSize(Rect cameraRect){
 
     if (!render)
         render = SceneRender::newInstance();
 
-    bool status = render->viewSize(*Engine::getViewRect());
     if (this->camera != NULL){
-        camera->updateAutomaticSizes();
+        camera->updateAutomaticSizes(cameraRect);
     }
     
     std::vector<Scene*>::iterator it;
     for (it = subScenes.begin(); it != subScenes.end(); ++it) {
-        (*it)->updateViewSize();
+        if ((*it)->textureRender == NULL) {
+            (*it)->updateCameraSize(cameraRect);
+        }else{
+            (*it)->updateCameraSize(Rect(0, 0, (*it)->textureRender->getTextureFrameWidth(), (*it)->textureRender->getTextureFrameHeight()));
+        }
     }
 
-    return status;
+    return true;
 }
 
 void Scene::doCamera(){
@@ -198,7 +203,8 @@ void Scene::resetSceneProperties(){
     if (camera->getType() == S_CAMERA_PERSPECTIVE){
         useDepth = true;
     }
-    useLight = lightData.updateLights(scene->getLights(), scene->getAmbientLight());
+
+    useLight = lightData.updateLights(getLights(), getAmbientLight());
 }
 
 void Scene::drawTransparentMeshes(){
@@ -220,7 +226,47 @@ void Scene::drawSky(){
         sky->renderDraw();
 }
 
+Texture* Scene::getTextureRender(){
+    return textureRender;
+}
+
+void Scene::setTextureRender(Texture* textureRender){
+
+    if (textureRender != NULL){
+
+        char rand_id[10];
+        static const char alphanum[] =
+                "0123456789"
+                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                        "abcdefghijklmnopqrstuvwxyz";
+        for (int i = 0; i < 10; ++i) {
+            rand_id[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+        }
+
+        textureRender->setId("scene|"+std::string(rand_id));
+        textureRender->setType(S_TEXTURE_FRAME);
+
+        if (textureRender->getTextureFrameWidth() == 0 || textureRender->getTextureFrameHeight() == 0){
+            textureRender->setTextureFrameSize(512,512);
+        }
+
+        this->textureRender = textureRender;
+    }
+}
+
 bool Scene::draw() {
+
+    if (textureRender == NULL) {
+        render->viewSize(*Engine::getViewRect());
+        if (!childScene)
+            render->clear();
+    }else{
+        textureRender->getTextureRender()->initTextureFrame();
+
+        render->viewSize(Rect(0, 0, textureRender->getTextureFrameWidth(), textureRender->getTextureFrameHeight()), false);
+        render->clear();
+    }
+
     transparentQueue.clear();
 
     render->setUseTransparency(isUseTransparency());
@@ -235,7 +281,11 @@ bool Scene::draw() {
     drawSky();
     drawTransparentMeshes();
     drawChildScenes();
-    
+
+    if (textureRender != NULL) {
+        textureRender->getTextureRender()->endTextureFrame();
+    }
+
     return drawreturn;
 }
 
@@ -253,35 +303,35 @@ bool Scene::load(){
 
     render->load();
     resetSceneProperties();
-    
+
     if (useLight){
         if (!lightRender)
             lightRender = ObjectRender::newInstance();
-        
+
         lightRender->addProperty(S_PROPERTY_AMBIENTLIGHT, S_PROPERTYDATA_FLOAT3, 1, ambientLight.ptr());
-        
+
         lightRender->addProperty(S_PROPERTY_NUMPOINTLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numPointLight);
         lightRender->addProperty(S_PROPERTY_POINTLIGHT_POS, S_PROPERTYDATA_FLOAT3, lightData.numPointLight, &lightData.pointLightPos.front());
         lightRender->addProperty(S_PROPERTY_POINTLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numPointLight, &lightData.pointLightPower.front());
         lightRender->addProperty(S_PROPERTY_POINTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numPointLight, &lightData.pointLightColor.front());
-        
+
         lightRender->addProperty(S_PROPERTY_NUMSPOTLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numSpotLight);
         lightRender->addProperty(S_PROPERTY_SPOTLIGHT_POS, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightPos.front());
         lightRender->addProperty(S_PROPERTY_SPOTLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightPower.front());
         lightRender->addProperty(S_PROPERTY_SPOTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightColor.front());
         lightRender->addProperty(S_PROPERTY_SPOTLIGHT_TARGET, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightTarget.front());
         lightRender->addProperty(S_PROPERTY_SPOTLIGHT_CUTOFF, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightCutOff.front());
-        
+
         lightRender->addProperty(S_PROPERTY_NUMDIRLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numDirectionalLight);
         lightRender->addProperty(S_PROPERTY_DIRLIGHT_DIR, S_PROPERTYDATA_FLOAT3, lightData.numDirectionalLight, &lightData.directionalLightDir.front());
         lightRender->addProperty(S_PROPERTY_DIRLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numDirectionalLight, &lightData.directionalLightPower.front());
         lightRender->addProperty(S_PROPERTY_DIRLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numDirectionalLight, &lightData.directionalLightColor.front());
     }
-    
+
     if (fog){
         if (!fogRender)
             fogRender = ObjectRender::newInstance();
-        
+
         fogRender->addProperty(S_PROPERTY_FOG_MODE, S_PROPERTYDATA_INT1, 1, &(fog->mode));
         fogRender->addProperty(S_PROPERTY_FOG_COLOR, S_PROPERTYDATA_FLOAT3, 1, fog->color.ptr());
         fogRender->addProperty(S_PROPERTY_FOG_VISIBILITY, S_PROPERTYDATA_FLOAT1, 1, &(fog->visibility));
@@ -289,12 +339,16 @@ bool Scene::load(){
         fogRender->addProperty(S_PROPERTY_FOG_START, S_PROPERTYDATA_FLOAT1, 1, &(fog->linearStart));
         fogRender->addProperty(S_PROPERTY_FOG_END, S_PROPERTYDATA_FLOAT1, 1, &(fog->linearEnd));
     }
-    
+
 
     bool loadreturn = Object::load();
 
     Object::updateMatrix();
     camera->updateMatrix();
+
+    if (textureRender != NULL) {
+        textureRender->load();
+    }
 
     return loadreturn;
 }

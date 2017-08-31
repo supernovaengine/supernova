@@ -10,9 +10,9 @@
 #define S_SCALING_CROP 4
 #define S_SCALING_STRETCH 5
 
-#define S_ANDROID 1
-#define S_IOS 2
-#define S_WEB 3
+#define S_PLATFORM_ANDROID 1
+#define S_PLATFORM_IOS 2
+#define S_PLATFORM_WEB 3
 
 namespace Supernova {
 

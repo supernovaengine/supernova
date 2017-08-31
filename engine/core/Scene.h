@@ -25,6 +25,7 @@ namespace Supernova {
         SceneRender* render;
         ObjectRender* lightRender;
         ObjectRender* fogRender;
+        Texture* textureRender;
         
         LightData lightData;
 
@@ -94,8 +95,11 @@ namespace Supernova {
 
         void doCamera();
 
-        bool updateViewSize();
-        
+        void setTextureRender(Texture* textureRender);
+        Texture* getTextureRender();
+
+        bool updateCameraSize(Rect cameraRect);
+
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
         virtual bool load();

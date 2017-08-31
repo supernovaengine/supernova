@@ -6,6 +6,9 @@ using namespace Supernova;
 
 Texture::Texture(){
     this->textureRender = NULL;
+
+    this->textureFrameWidth = 0;
+    this->textureFrameHeight = 0;
     
     this->texturesData.push_back(NULL);
     this->type = S_TEXTURE_2D;
@@ -24,13 +27,20 @@ Texture::Texture(TextureData* textureData, std::string id): Texture(){
     this->id = id;
 }
 
-Texture::Texture(std::vector<TextureData*> texturesData, std::string id){
+Texture::Texture(std::vector<TextureData*> texturesData, std::string id): Texture(){
     this->texturesData = texturesData;
     this->id = id;
 }
 
-void Texture::setId(std::string path_id){
-    this->id = path_id;
+Texture::Texture(int textureFrameWidth, int textureFrameHeight, std::string id): Texture(){
+    this->type = S_TEXTURE_FRAME;
+    this->textureFrameWidth = textureFrameWidth;
+    this->textureFrameHeight = textureFrameHeight;
+    this->id = id;
+}
+
+void Texture::setId(std::string id){
+    this->id = id;
 }
 
 void Texture::setTextureData(TextureData* textureData){
@@ -43,6 +53,11 @@ void Texture::setType(int type){
 
 void Texture::setDataOwned(bool dataOwned){
     this->dataOwned = dataOwned;
+}
+
+void Texture::setTextureFrameSize(int textureFrameWidth, int textureFrameHeight){
+    this->textureFrameWidth = textureFrameWidth;
+    this->textureFrameHeight = textureFrameHeight;
 }
 
 bool Texture::load(){
@@ -71,6 +86,10 @@ bool Texture::load(){
             
             textureRender.get()->loadTextureCube(texturesData);
 
+        }else if (type == S_TEXTURE_FRAME){
+            
+            textureRender.get()->loadTextureFrame(textureFrameWidth, textureFrameHeight);
+            
         }
         
         if (dataOwned){
@@ -121,6 +140,14 @@ int Texture::getType(){
 
 bool Texture::getDataOwned(){
     return dataOwned;
+}
+
+int Texture::getTextureFrameWidth(){
+    return textureFrameWidth;
+}
+
+int Texture::getTextureFrameHeight(){
+    return textureFrameHeight;
 }
 
 std::shared_ptr<TextureRender> Texture::getTextureRender(){

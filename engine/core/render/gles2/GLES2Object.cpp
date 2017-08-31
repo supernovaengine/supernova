@@ -8,8 +8,6 @@
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define BUFFER_OFFSET(i) ((void*)(i))
 
-
-
 using namespace Supernova;
 
 
@@ -120,7 +118,7 @@ bool GLES2Object::load(){
     if (texture) {
         uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
     }else{
-        if (Engine::getPlatform() == S_WEB){
+        if (Engine::getPlatform() == S_PLATFORM_WEB){
             GLES2Util::generateEmptyTexture();
             uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
         }
@@ -265,7 +263,7 @@ bool GLES2Object::prepareDraw(){
                       ((GLES2Texture*)(texture->getTextureRender().get()))->getTexture());
         glUniform1i(uTextureUnitLocation, 0);
     }else{
-        if (Engine::getPlatform() == S_WEB){
+        if (Engine::getPlatform() == S_PLATFORM_WEB){
             //Fix Chrome warnings of no texture bound
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
@@ -281,6 +279,7 @@ bool GLES2Object::draw(){
     if (!ObjectRender::draw()){
         return false;
     }
+
     //Log::Debug(LOG_TAG, "Start draw");
     
     if ((!vertexAttributes.count(S_VERTEXATTRIBUTE_VERTICES)) and (indexAttribute.size == 0)){

@@ -44,22 +44,7 @@ void Object::setSceneAndConfigure(Scene* scene){
     for (it = objects.begin(); it != objects.end(); ++it) {
         (*it)->setSceneAndConfigure(scene);
     }
-    
-    if (Light* light_ptr = dynamic_cast<Light*>(this)){
-        ((Scene*)scene)->addLight(light_ptr);
-    }
-    
-    if (Scene* scene_ptr = dynamic_cast<Scene*>(this)){
-        ((Scene*)scene)->addSubScene(scene_ptr);
-    }
-    
-    if (GUIObject* guiobject_ptr = dynamic_cast<GUIObject*>(this)){
-        ((Scene*)scene)->addGUIObject(guiobject_ptr);
-    }
 
-    if (SkyBox* sky_ptr = dynamic_cast<SkyBox*>(this)){
-        ((Scene*)scene)->setSky(sky_ptr);
-    }
 }
 
 void Object::removeScene(){
@@ -76,7 +61,7 @@ void Object::addObject(Object* obj){
         scene_ptr->childScene = true;
     }
     
-    if (obj->parent == NULL){
+    if (obj->parent == NULL) {
         objects.push_back(obj);
 
         obj->parent = this;
@@ -86,11 +71,29 @@ void Object::addObject(Object* obj){
         obj->viewProjectionMatrix = viewProjectionMatrix;
         obj->cameraPosition = cameraPosition;
         obj->modelViewProjectionMatrix = modelViewProjectionMatrix;
-        
+
         obj->firstLoaded = false;
-        
+
         if (scene != NULL)
             obj->setSceneAndConfigure(scene);
+
+        if (this == scene){
+            if (Light *light_ptr = dynamic_cast<Light *>(obj)) {
+                ((Scene *) scene)->addLight(light_ptr);
+            }
+
+            if (Scene *scene_ptr = dynamic_cast<Scene *>(obj)) {
+                ((Scene *) scene)->addSubScene(scene_ptr);
+            }
+
+            if (GUIObject *guiobject_ptr = dynamic_cast<GUIObject *>(obj)) {
+                ((Scene *) scene)->addGUIObject(guiobject_ptr);
+            }
+
+            if (SkyBox *sky_ptr = dynamic_cast<SkyBox *>(obj)) {
+                ((Scene *) scene)->setSky(sky_ptr);
+            }
+        }
 
         obj->updateMatrix();
     }else{

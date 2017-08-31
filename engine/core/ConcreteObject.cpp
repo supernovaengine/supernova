@@ -40,7 +40,8 @@ void ConcreteObject::setTexture(Texture* texture){
         material.setTexture(texture);
         
         if (loaded){
-            reload();
+            //TODO: Not working with reload() because destroy delete new texture
+            load();
         }
         
     }
@@ -55,7 +56,8 @@ void ConcreteObject::setTexture(std::string texturepath){
         material.setTexturePath(texturepath);
         
         if (loaded){
-            reload();
+            //TODO: Not working with reload() because destroy delete new texture
+            load();
         }
         
     }

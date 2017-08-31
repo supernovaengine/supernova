@@ -21,7 +21,7 @@ TextureRender::~TextureRender(){
 }
 
 std::shared_ptr<TextureRender> TextureRender::sharedInstance(std::string id){
-    
+
     if (texturesRender.count(id) > 0){
         return texturesRender[id];
     }else{
@@ -91,6 +91,14 @@ void TextureRender::loadTextureCube(std::vector<TextureData*> texturesdata){
     colorFormat = -1;
     width = -1;
     height = -1;
+}
+
+void TextureRender::loadTextureFrame(int width, int height){
+    loaded = true;
+    
+    colorFormat = -1;
+    this->width = width;
+    this->height = height;
 }
 
 void TextureRender::deleteTexture(){

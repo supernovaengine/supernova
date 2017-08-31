@@ -116,13 +116,17 @@ int Camera::getType(){
     return type;
 }
 
-void Camera::updateAutomaticSizes(){
+void Camera::updateAutomaticSizes(Rect rect){
     if (automatic){
-        float newRight = Engine::getCanvasWidth();
-        float newTop = Engine::getCanvasHeight();
-        float newAspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
+        float newLeft = rect.getX();
+        float newBottom = rect.getY();
+        float newRight = rect.getWidth();
+        float newTop = rect.getHeight();
+        float newAspect = rect.getWidth() / rect.getHeight();
 
-        if ((right != newRight) || (top != newTop) || (aspect != newAspect)){
+        if ((left != newLeft) || (bottom != newBottom) || (right != newRight) || (top != newTop) || (aspect != newAspect)){
+            left = newLeft;
+            bottom = newBottom;
             right = newRight;
             top = newTop;
             aspect = newAspect;
