@@ -45,6 +45,25 @@ void Object::setSceneAndConfigure(Scene* scene){
         (*it)->setSceneAndConfigure(scene);
     }
 
+    //This is for not add object in scene and subscenes
+    if (this->scene == scene) {
+        if (Light *light_ptr = dynamic_cast<Light *>(this)) {
+            scene->addLight(light_ptr);
+        }
+
+        if (GUIObject *guiobject_ptr = dynamic_cast<GUIObject *>(this)) {
+            scene->addGUIObject(guiobject_ptr);
+        }
+
+        if (SkyBox *sky_ptr = dynamic_cast<SkyBox *>(this)) {
+            scene->setSky(sky_ptr);
+        }
+    }
+
+    if (Scene *scene_ptr = dynamic_cast<Scene *>(this)) {
+        scene->addSubScene(scene_ptr);
+    }
+
 }
 
 void Object::removeScene(){
@@ -76,24 +95,6 @@ void Object::addObject(Object* obj){
 
         if (scene != NULL)
             obj->setSceneAndConfigure(scene);
-
-        if (this == scene){
-            if (Light *light_ptr = dynamic_cast<Light *>(obj)) {
-                ((Scene *) scene)->addLight(light_ptr);
-            }
-
-            if (Scene *scene_ptr = dynamic_cast<Scene *>(obj)) {
-                ((Scene *) scene)->addSubScene(scene_ptr);
-            }
-
-            if (GUIObject *guiobject_ptr = dynamic_cast<GUIObject *>(obj)) {
-                ((Scene *) scene)->addGUIObject(guiobject_ptr);
-            }
-
-            if (SkyBox *sky_ptr = dynamic_cast<SkyBox *>(obj)) {
-                ((Scene *) scene)->setSky(sky_ptr);
-            }
-        }
 
         obj->updateMatrix();
     }else{
