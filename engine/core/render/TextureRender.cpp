@@ -93,7 +93,7 @@ void TextureRender::loadTextureCube(std::vector<TextureData*> texturesdata){
     height = -1;
 }
 
-void TextureRender::loadTextureFrame(int width, int height){
+void TextureRender::loadTextureFrame(int width, int height, bool depthframe){
     loaded = true;
     
     colorFormat = -1;

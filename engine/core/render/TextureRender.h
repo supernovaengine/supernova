@@ -43,7 +43,7 @@ namespace Supernova {
         
         virtual void loadTexture(TextureData* texturedata);
         virtual void loadTextureCube(std::vector<TextureData*> texturesdata);
-        virtual void loadTextureFrame(int width, int height);
+        virtual void loadTextureFrame(int width, int height, bool depthframe);
         
         virtual void initTextureFrame() = 0;
         virtual void endTextureFrame() = 0;

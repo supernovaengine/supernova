@@ -100,29 +100,30 @@ void GLES2Texture::loadTextureCube(std::vector<TextureData*> texturesdata){
     gTexture = texture_object_id;
 }
 
-void GLES2Texture::loadTextureFrame(int width, int height){
-    TextureRender::loadTextureFrame(width, height);
+void GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
+    TextureRender::loadTextureFrame(width, height, depthframe);
 
     const char* extensions = (char*)glGetString(GL_EXTENSIONS);
-    
-    if(!strstr(extensions, "depth_texture")){
-        Log::Error(LOG_TAG,"This device has no support to depth_texture");
-    }else{
         
-        GLuint FramebufferName = 0;
-        glGenFramebuffers(1, &FramebufferName);
-        glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+    GLuint FramebufferName = 0;
+    glGenFramebuffers(1, &FramebufferName);
+    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 
-        GLuint depthTexture;
-        glGenTextures(1, &depthTexture);
-        glBindTexture(GL_TEXTURE_2D, depthTexture);
+    GLuint depthTexture;
+    glGenTextures(1, &depthTexture);
+    glBindTexture(GL_TEXTURE_2D, depthTexture);
         
-
+    if (Engine::isNearestScaleTexture()){
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }else{
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+    if (!depthframe){
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
         
         GLuint renderbuffer;
@@ -132,16 +133,18 @@ void GLES2Texture::loadTextureFrame(int width, int height){
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer);
         
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, depthTexture, 0);
+    }else{
+        if(!strstr(extensions, "depth_texture")){
+            Log::Error(LOG_TAG,"This device has no support to depth_texture");
+        }else{
+            glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+        }
+    }
 
-        //glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
-        //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
-    
-        GLES2Util::checkGlError("Error on framebuffer");
-        
-       // Log::Verbose(LOG_TAG,"Loading framebuffer");
-
-        if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            Log::Error(LOG_TAG,"Error on creating framebuffer");
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+        Log::Error(LOG_TAG,"Error on creating framebuffer");
+    }else{
         
         if (Engine::getPlatform()==S_PLATFORM_IOS){
             glBindFramebuffer(GL_FRAMEBUFFER, 1);
@@ -155,7 +158,6 @@ void GLES2Texture::loadTextureFrame(int width, int height){
         textureType = GL_TEXTURE_2D;
         gTexture = depthTexture;
         frameBuffer = FramebufferName;
-    
     }
 
 }
