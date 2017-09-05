@@ -65,6 +65,7 @@ namespace Supernova {
         void drawSky();
 
         void drawChildScenes();
+        bool renderDraw();
 
     public:
 
@@ -98,7 +99,7 @@ namespace Supernova {
         void setTextureRender(Texture* textureRender);
         Texture* getTextureRender();
 
-        bool updateCameraSize(Rect cameraRect);
+        bool updateCameraSize();
 
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 

@@ -13,10 +13,7 @@ namespace Supernova {
     private:
         
         GLuint program;
-        
-        std::string getVertexShader(std::string name);
-        std::string getFragmentShader(std::string name);
-        
+
         std::string getVertexShader(int shaderType);
         std::string getFragmentShader(int shaderType);
         
@@ -25,7 +22,6 @@ namespace Supernova {
         
     public:
 
-        virtual void createProgram(std::string shaderName, std::string definitions);
         virtual void createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText);
         virtual void deleteProgram();
         

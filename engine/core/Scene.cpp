@@ -151,9 +151,13 @@ void Scene::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matri
 }
 
 void Scene::setCamera(Camera* camera){
-    this->camera = camera;
-    this->camera->setSceneObject(this);
-    userCamera = true;
+    if (camera) {
+        this->camera = camera;
+        this->camera->setSceneObject(this);
+        userCamera = true;
+        if (loaded)
+            this->camera->updateMatrix();
+    }
 }
 
 Camera* Scene::getCamera(){
@@ -169,10 +173,17 @@ bool Scene::is3D(){
     return false;
 }
 
-bool Scene::updateCameraSize(Rect cameraRect){
+bool Scene::updateCameraSize(){
 
     if (!render)
         render = SceneRender::newInstance();
+
+    Rect cameraRect;
+    if (textureRender == NULL) {
+        cameraRect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
+    }else{
+        cameraRect = Rect(0, 0, textureRender->getTextureFrameWidth(), textureRender->getTextureFrameHeight());
+    }
 
     if (this->camera != NULL){
         camera->updateAutomaticSizes(cameraRect);
@@ -180,11 +191,7 @@ bool Scene::updateCameraSize(Rect cameraRect){
     
     std::vector<Scene*>::iterator it;
     for (it = subScenes.begin(); it != subScenes.end(); ++it) {
-        if ((*it)->textureRender == NULL) {
-            (*it)->updateCameraSize(cameraRect);
-        }else{
-            (*it)->updateCameraSize(Rect(0, 0, (*it)->textureRender->getTextureFrameWidth(), (*it)->textureRender->getTextureFrameHeight()));
-        }
+        (*it)->updateCameraSize();
     }
 
     return true;
@@ -243,19 +250,23 @@ void Scene::setTextureRender(Texture* textureRender){
             rand_id[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
         }
 
-        textureRender->setId("scene|"+std::string(rand_id));
-        textureRender->setType(S_TEXTURE_FRAME);
+        if (textureRender->getId() == "")
+            textureRender->setId("scene|"+std::string(rand_id));
+
+        if (textureRender->getType() == 0)
+            textureRender->setType(S_TEXTURE_FRAME);
 
         if (textureRender->getTextureFrameWidth() == 0 || textureRender->getTextureFrameHeight() == 0){
             textureRender->setTextureFrameSize(512,512);
         }
 
         this->textureRender = textureRender;
+    }else{
+        this->textureRender = NULL;
     }
 }
 
-bool Scene::draw() {
-
+bool Scene::renderDraw(){
     if (textureRender == NULL) {
         render->viewSize(*Engine::getViewRect());
         if (!childScene)
@@ -287,6 +298,21 @@ bool Scene::draw() {
     }
 
     return drawreturn;
+}
+
+bool Scene::draw() {
+
+    Camera* originalCamera = this->camera;
+    Texture* originalTextureRender = this->textureRender;
+
+    this->setTextureRender(lights[0]->getShadowMap());
+    this->setCamera(lights[0]->getCameraView());
+    renderDraw();
+
+    this->setCamera(originalCamera);
+    this->setTextureRender(originalTextureRender);
+    return renderDraw();
+
 }
 
 bool Scene::load(){
@@ -348,6 +374,7 @@ bool Scene::load(){
 
     if (textureRender != NULL) {
         textureRender->load();
+        updateCameraSize();
     }
 
     return loadreturn;

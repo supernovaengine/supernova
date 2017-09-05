@@ -30,9 +30,9 @@ namespace Supernova{
     public:
         Texture();
         Texture(std::string path_id);
-        Texture(TextureData* textureData, std::string id);
-        Texture(std::vector<TextureData*> texturesData, std::string id);
-        Texture(int textureFrameWidth, int textureFrameHeight, std::string id);
+        Texture(TextureData* textureData, std::string id = "");
+        Texture(std::vector<TextureData*> texturesData, std::string id = "");
+        Texture(int textureFrameWidth, int textureFrameHeight, std::string id = "");
         Texture(const Texture& t);
         
         virtual ~Texture();

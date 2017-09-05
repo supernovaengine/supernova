@@ -193,6 +193,7 @@ bool Mesh::load(){
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
     render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    render->addProperty(S_PROPERTY_DEPTHMVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, scene->getLights()->at(0)->getDepthBiasMVP());
     render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
     
     if (scene){

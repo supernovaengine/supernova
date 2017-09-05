@@ -286,5 +286,17 @@ std::string gFragmentMeshPerPixelLightShader =
 "   gl_FragColor = vec4(FragColor ,fragmentColor.a);\n"
 "}\n";
 
+std::string gVertexDepthRTTShader =
+"uniform mat4 u_mvpMatrix;\n"
+"attribute vec3 a_Position;\n"
+"void main(){\n"
+"    gl_Position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
+"}\n";
+
+std::string gFragmentDepthRTTShader =
+"precision mediump float;\n"
+"void main(){\n"
+//"   gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n"
+"}\n";
 
 #endif /* gles2_shaders_h */

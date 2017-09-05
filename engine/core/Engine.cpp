@@ -304,7 +304,7 @@ void Engine::onSurfaceChanged(int width, int height) {
     viewRect.setRect(viewX, viewY, viewWidth, viewHeight);
 
     if (Engine::getScene() != NULL){
-        (Engine::getScene())->updateCameraSize(Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight()));
+        (Engine::getScene())->updateCameraSize();
     }
 
 }

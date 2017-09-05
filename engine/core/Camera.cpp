@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Engine.h"
+#include "math/Angle.h"
 
 using namespace Supernova;
 
@@ -155,7 +156,7 @@ void Camera::setPerspective(float y_fov, float aspect, float near, float far){
 
     type = S_CAMERA_PERSPECTIVE;
 
-    this->y_fov = y_fov;
+    this->y_fov = Angle::defaultToRad(y_fov);
     this->aspect = aspect;
     this->perspectiveNear = near;
     this->perspectiveFar = far;
