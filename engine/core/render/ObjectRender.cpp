@@ -30,6 +30,7 @@ ObjectRender::ObjectRender(){
     
     texture = NULL;
     program = NULL;
+    shadowsMap = NULL;
 }
 
 ObjectRender* ObjectRender::newInstance(){
@@ -61,6 +62,10 @@ void ObjectRender::setProgram(Program* program){
     
     this->program = program;
     programOwned = false;
+}
+
+void ObjectRender::setShadowsMap(std::vector<Texture*>* shadowsMap){
+    this->shadowsMap = shadowsMap;
 }
 
 void ObjectRender::setSceneRender(SceneRender* sceneRender){

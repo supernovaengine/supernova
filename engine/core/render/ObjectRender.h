@@ -73,6 +73,7 @@ namespace Supernova {
         
         Texture* texture;
         Program* program;
+        std::vector<Texture*>* shadowsMap;
         
         unsigned int minBufferSize;
         int primitiveType;
@@ -89,6 +90,7 @@ namespace Supernova {
         
         void setTexture(Texture* texture);
         void setProgram(Program* program);
+        void setShadowsMap(std::vector<Texture*>* shadowsMap);
         void setSceneRender(SceneRender* sceneRender);
         void setLightRender(ObjectRender* lightRender);
         void setFogRender(ObjectRender* fogRender);

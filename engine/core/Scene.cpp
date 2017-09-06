@@ -305,12 +305,26 @@ bool Scene::draw() {
     Camera* originalCamera = this->camera;
     Texture* originalTextureRender = this->textureRender;
 
-    this->setTextureRender(lights[0]->getShadowMap());
-    this->setCamera(lights[0]->getCameraView());
-    renderDraw();
+    mappedShadowsMap.clear();
+    mappedShadowsMVP.clear();
 
-    this->setCamera(originalCamera);
-    this->setTextureRender(originalTextureRender);
+    for (int i=0; i<lights.size(); i++) {
+        if (lights[i]->isUseShadow()) {
+            this->setTextureRender(lights[i]->getShadowMap());
+            this->setCamera(lights[i]->getCameraView());
+
+            renderDraw();
+
+            mappedShadowsMap.push_back(lights[i]->getShadowMap());
+            mappedShadowsMVP.push_back(*lights[i]->getDepthBiasMVP());
+        }
+    }
+
+    if (mappedShadowsMap.size() > 0) {
+        this->setCamera(originalCamera);
+        this->setTextureRender(originalTextureRender);
+    }
+
     return renderDraw();
 
 }

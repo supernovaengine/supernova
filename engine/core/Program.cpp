@@ -175,6 +175,8 @@ bool Program::load(){
 
         }
 
+        shaderProperties.push_back(S_PROPERTY_DEPTHMVPMATRIX);
+
     }else if (shaderType == S_SHADER_DEPTH_RTT){
 
         shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_VERTICES);

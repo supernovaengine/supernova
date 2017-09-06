@@ -209,6 +209,9 @@ std::string gVertexMeshPerPixelLightShader =
 "  varying vec3 v_TextureCoordinates;\n"
 "#endif\n"
 
+"uniform mat4 u_ShadowMVP;\n"
+"varying vec4 v_ShadowCoordinates;\n"
+
 "#ifdef HAS_TEXTURERECT\n"
 "  uniform vec4 u_textureRect;\n"
 "#endif\n"
@@ -220,6 +223,7 @@ std::string gVertexMeshPerPixelLightShader =
 + lightingVertexImp +
 
 "    vec4 position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
+"    v_ShadowCoordinates = u_ShadowMVP * vec4(a_Position, 1.0);\n"
 
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifdef USE_TEXTURECUBE\n"
@@ -249,6 +253,9 @@ std::string gFragmentMeshPerPixelLightShader =
 "#else\n"
 "  uniform sampler2D u_TextureUnit;\n"
 "#endif\n"
+
+"uniform sampler2D u_shadowsMap;\n"
+"varying vec4 v_ShadowCoordinates;\n"
 
 "uniform vec4 u_Color;\n"
 
@@ -282,6 +289,16 @@ std::string gFragmentMeshPerPixelLightShader =
 "   vec3 FragColor = vec3(fragmentColor);\n"
 
 + lightingFragmentImp + fogFragmentImp +
+
+//"   float visibility = 1.0;\n"
+//"   if ( texture2D( u_shadowsMap, v_ShadowCoordinates.xy ).z  <  v_ShadowCoordinates.z){\n"
+//"     visibility = 0.5;\n"
+//"   }\n"
+
+"vec3 shadowCoord = (v_ShadowCoordinates.xyz/v_ShadowCoordinates.w);\n"
+"float visibility = (v_ShadowCoordinates.z > texture2D(u_shadowsMap, shadowCoord.xy).z) ? 0.5 : 1.0;\n"
+
+"   FragColor = vec3(0.5,0.5,0.5) * visibility;\n"
 
 "   gl_FragColor = vec4(FragColor ,fragmentColor.a);\n"
 "}\n";

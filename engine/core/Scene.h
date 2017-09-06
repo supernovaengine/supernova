@@ -26,6 +26,9 @@ namespace Supernova {
         ObjectRender* lightRender;
         ObjectRender* fogRender;
         Texture* textureRender;
+
+        std::vector<Texture*> mappedShadowsMap;
+        std::vector<Matrix4> mappedShadowsMVP;
         
         LightData lightData;
 

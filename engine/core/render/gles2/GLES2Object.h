@@ -30,6 +30,8 @@ namespace Supernova {
         
         GLuint useTexture;
         GLuint uTextureUnitLocation;
+
+        GLuint uShadowsMapLocation;
         
         std::unordered_map<int, attributeGlData> attributesGL;
         indexGlData indexGL;

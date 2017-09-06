@@ -12,7 +12,7 @@ Light::Light(){
     this->direction = Vector3(0.0, 0.0, 0.0);
     this->spotAngle = 20;
     this->power = 1;
-    this->mapShadow = true;
+    this->useShadow = true;
     this->shadowMapWidth = 512;
     this->shadowMapHeight = 512;
 }
@@ -56,8 +56,8 @@ float Light::getSpotAngle(){
     return spotAngle;
 }
 
-bool Light::isMapShadow(){
-    return mapShadow;
+bool Light::isUseShadow(){
+    return useShadow;
 }
 
 Camera* Light::getCameraView(){
@@ -80,9 +80,9 @@ void Light::setColor(Vector3 color){
     this->color = color;
 }
 
-void Light::setMapShadow(bool mapShadow){
-    if (mapShadow != this->mapShadow){
-        this->mapShadow = mapShadow;
+void Light::setUseShadow(bool useShadow){
+    if (this->useShadow != useShadow){
+        this->useShadow = useShadow;
         if (loaded)
             load();
     }
@@ -125,7 +125,28 @@ void Light::updateCameraView(){
     biasMatrix.set(3, 2, 0.0);
     biasMatrix.set(3, 3, 1.0);
 
-    depthBiasMVP = biasMatrix*(*cameraView->getViewProjectionMatrix());
+    Matrix4 modelMatrix2;
+    modelMatrix2.set(0, 0, 1.0);
+    modelMatrix2.set(0, 1, 1.0);
+    modelMatrix2.set(0, 2, 1.0);
+    modelMatrix2.set(0, 3, 1.0);
+
+    modelMatrix2.set(1, 0, 1.0);
+    modelMatrix2.set(1, 1, 1.0);
+    modelMatrix2.set(1, 2, 1.0);
+    modelMatrix2.set(1, 3, 1.0);
+
+    modelMatrix2.set(2, 0, 1.0);
+    modelMatrix2.set(2, 1, 1.0);
+    modelMatrix2.set(2, 2, 1.0);
+    modelMatrix2.set(2, 3, 1.0);
+
+    modelMatrix2.set(3, 0, 1.0);
+    modelMatrix2.set(3, 1, 1.0);
+    modelMatrix2.set(3, 2, 1.0);
+    modelMatrix2.set(3, 3, 1.0);
+
+    depthBiasMVP = ((*cameraView->getProjectionMatrix()) * (*cameraView->getViewMatrix()) * modelMatrix);
 }
 
 void Light::updateMatrix(){
@@ -133,13 +154,13 @@ void Light::updateMatrix(){
 
     worldTarget = modelMatrix * (target - position);
 
-    if (mapShadow && loaded){
+    if (useShadow && loaded){
         updateCameraView();
     }
 }
 
 bool Light::load(){
-    if (mapShadow){
+    if (useShadow){
         if (!cameraView)
             cameraView = new Camera();
         updateCameraView();
@@ -157,7 +178,7 @@ bool Light::load(){
             }
 
             shadowMap->setId("shadowMap|" + std::string(rand_id));
-            shadowMap->setType(S_TEXTURE_FRAME);
+            shadowMap->setType(S_TEXTURE_DEPTH_FRAME);
         }
         shadowMap->load();
     }
