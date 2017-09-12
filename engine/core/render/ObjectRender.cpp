@@ -23,6 +23,7 @@ ObjectRender::ObjectRender(){
     hasTextureCube = false;
     isSky = false;
     isText = false;
+    hasShadows = false;
     
     sceneRender = NULL;
     lightRender = NULL;
@@ -30,7 +31,7 @@ ObjectRender::ObjectRender(){
     
     texture = NULL;
     program = NULL;
-    shadowsMap = NULL;
+    shadowsMap.clear();
 }
 
 ObjectRender* ObjectRender::newInstance(){
@@ -64,7 +65,7 @@ void ObjectRender::setProgram(Program* program){
     programOwned = false;
 }
 
-void ObjectRender::setShadowsMap(std::vector<Texture*>* shadowsMap){
+void ObjectRender::setShadowsMap(std::vector<Texture*> shadowsMap){
     this->shadowsMap = shadowsMap;
 }
 
@@ -149,6 +150,10 @@ void ObjectRender::setIsText(bool isText){
     this->isText = isText;
 }
 
+void ObjectRender::setHasShadows(bool hasShadows){
+    this->hasShadows = hasShadows;
+}
+
 Program* ObjectRender::getProgram(){
     
     loadProgram();
@@ -205,7 +210,7 @@ void ObjectRender::loadProgram(){
         if (programShader != -1)
             program->setShader(programShader);
     
-        program->setDefinitions(hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
+        program->setDefinitions(hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows);
         program->load();
     }
 }
@@ -216,6 +221,9 @@ bool ObjectRender::load(){
     
     if (texture)
         texture->load();
+
+    for (int i = 0; i < shadowsMap.size(); i++)
+        shadowsMap[i]->load();
     
     for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end();)
     {

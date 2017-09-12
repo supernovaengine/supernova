@@ -30,6 +30,10 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
     this->directionalLightDir.clear();
     this->directionalLightColor.clear();
     this->directionalLightPower.clear();
+    this->shadowsMap.clear();
+    this->shadowsVPMatrix.clear();
+
+
     for ( int i = 0; i < (int)lights->size(); i++){
         if (lights->at(i)->getType() == S_POINT_LIGHT){
             this->numPointLight++;
@@ -75,6 +79,11 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
             this->directionalLightColor.push_back(lights->at(i)->getColor().z);
             
             this->directionalLightPower.push_back(lights->at(i)->getPower());
+        }
+
+        if (lights->at(i)->isUseShadow()){
+            this->shadowsMap.push_back(lights->at(i)->getShadowMap());
+            this->shadowsVPMatrix.push_back(lights->at(i)->getDepthVPMatrix());
         }
     }
     

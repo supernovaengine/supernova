@@ -15,7 +15,7 @@
 #include "Scene.h"
 #include "Polygon.h"
 #include "Cube.h"
-#include "Plane.h"
+#include "PlaneTerrain.h"
 #include "Model.h"
 #include "math/Ray.h"
 #include "math/Quaternion.h"
@@ -400,7 +400,7 @@ void LuaBind::bind(){
     .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>))
     .endClass()
 
-    .beginExtendClass<Plane, Mesh>("Plane")
+    .beginExtendClass<PlaneTerrain, Mesh>("PlaneTerrain")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>))
     .endClass()
 

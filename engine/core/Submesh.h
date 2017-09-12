@@ -19,6 +19,7 @@ namespace Supernova {
     private:
 
         ObjectRender* render;
+        ObjectRender* shadowRender;
 
         std::vector<unsigned int> indices;
         
@@ -30,6 +31,7 @@ namespace Supernova {
         unsigned int minBufferSize;
 
         bool renderOwned;
+        bool shadowRenderOwned;
         bool loaded;
 
     public:
@@ -55,6 +57,12 @@ namespace Supernova {
         
         void setSubmeshRender(ObjectRender* render);
         ObjectRender* getSubmeshRender();
+
+        void setSubmeshShadowRender(ObjectRender* shadowRender);
+        ObjectRender* getSubmeshShadowRender();
+
+        bool shadowLoad();
+        bool shadowDraw();
         
         virtual bool load();
         virtual bool draw();

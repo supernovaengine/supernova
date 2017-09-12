@@ -15,13 +15,15 @@ Program::Program(){
     this->hasTextureCube = false;
     this->isSky = false;
     this->isText = false;
+    this->hasShadows = false;
 }
 
 void Program::setShader(int shaderType){
     this->shaderType = shaderType;
 }
 
-void Program::setDefinitions(bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText){
+void Program::setDefinitions(bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect,
+                             bool hasTextureCube, bool isSky, bool isText, bool hasShadows){
     this->hasLight = hasLight;
     this->hasFog = hasFog;
     this->hasTextureCoords = hasTextureCoords;
@@ -29,6 +31,7 @@ void Program::setDefinitions(bool hasLight, bool hasFog, bool hasTextureCoords, 
     this->hasTextureCube = hasTextureCube;
     this->isSky = isSky;
     this->isText = isText;
+    this->hasShadows = hasShadows;
 }
 
 Program::~Program(){
@@ -46,6 +49,7 @@ Program::Program(const Program& p){
     hasTextureCube = p.hasTextureCube;
     isSky = p.isSky;
     isText = p.isText;
+    hasShadows = p.hasShadows;
 }
 
 Program& Program::operator = (const Program& p){
@@ -59,6 +63,7 @@ Program& Program::operator = (const Program& p){
     hasTextureCube = p.hasTextureCube;
     isSky = p.isSky;
     isText = p.isText;
+    hasShadows = p.hasShadows;
     
     return *this;
 }
@@ -99,12 +104,14 @@ bool Program::load(){
         shaderStr += "|isSky";
     if (isText)
         shaderStr += "|isText";
+    if (hasShadows)
+        shaderStr += "|hasShadows";
 
     programRender = ProgramRender::sharedInstance(shaderStr);
 
     if (!programRender.get()->isLoaded()){
 
-        programRender.get()->createProgram(shaderType, hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
+        programRender.get()->createProgram(shaderType, hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows);
 
     }
 
@@ -165,17 +172,17 @@ bool Program::load(){
         }
 
         if (hasFog) {
-
             shaderProperties.push_back(S_PROPERTY_FOG_MODE);
             shaderProperties.push_back(S_PROPERTY_FOG_COLOR);
             shaderProperties.push_back(S_PROPERTY_FOG_VISIBILITY);
             shaderProperties.push_back(S_PROPERTY_FOG_DENSITY);
             shaderProperties.push_back(S_PROPERTY_FOG_START);
             shaderProperties.push_back(S_PROPERTY_FOG_END);
-
         }
 
-        shaderProperties.push_back(S_PROPERTY_DEPTHMVPMATRIX);
+        if (hasShadows) {
+            shaderProperties.push_back(S_PROPERTY_DEPTHVPMATRIX);
+        }
 
     }else if (shaderType == S_SHADER_DEPTH_RTT){
 

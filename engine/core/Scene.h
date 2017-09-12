@@ -26,9 +26,6 @@ namespace Supernova {
         ObjectRender* lightRender;
         ObjectRender* fogRender;
         Texture* textureRender;
-
-        std::vector<Texture*> mappedShadowsMap;
-        std::vector<Matrix4> mappedShadowsMVP;
         
         LightData lightData;
 
@@ -47,6 +44,7 @@ namespace Supernova {
         
         Vector3 ambientLight;
 
+        bool shadowMode;
         bool childScene;
         bool useTransparency;
         bool useDepth;
@@ -84,7 +82,8 @@ namespace Supernova {
         
         Vector3* getAmbientLight();
         std::vector<Light*>* getLights();
-        
+
+        bool isShadowMode();
         bool isChildScene();
         bool isUseDepth();
         bool isUseLight();

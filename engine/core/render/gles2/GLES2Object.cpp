@@ -124,7 +124,7 @@ bool GLES2Object::load(){
         }
     }
 
-    if (shadowsMap){
+    if (shadowsMap.size() > 0){
         uShadowsMapLocation = glGetUniformLocation(glesProgram, "u_shadowsMap");
     }
     
@@ -140,8 +140,8 @@ bool GLES2Object::load(){
             propertyName = "u_mMatrix";
         }else if (type == S_PROPERTY_NORMALMATRIX){
             propertyName = "u_nMatrix";
-        }else if (type == S_PROPERTY_DEPTHMVPMATRIX){
-            propertyName = "u_ShadowMVP";
+        }else if (type == S_PROPERTY_DEPTHVPMATRIX){
+            propertyName = "u_ShadowVP";
         }else if (type == S_PROPERTY_CAMERAPOS){
             propertyName = "u_EyePos";
         }else if (type == S_PROPERTY_TEXTURERECT){
@@ -277,13 +277,13 @@ bool GLES2Object::prepareDraw(){
         }
     }
 
-    if (shadowsMap && shadowsMap->size()>0){
+    if (shadowsMap.size() > 0){
 
-        TextureRender* teste = shadowsMap->at(0)->getTextureRender().get();
+        TextureRender* teste = shadowsMap.at(0)->getTextureRender().get();
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(((GLES2Texture*)(shadowsMap->at(0)->getTextureRender().get()))->getTextureType(),
-                      ((GLES2Texture*)(shadowsMap->at(0)->getTextureRender().get()))->getTexture());
+        glBindTexture(((GLES2Texture*)(shadowsMap.at(0)->getTextureRender().get()))->getTextureType(),
+                      ((GLES2Texture*)(shadowsMap.at(0)->getTextureRender().get()))->getTexture());
         glUniform1i(uShadowsMapLocation, 1);
     }
 

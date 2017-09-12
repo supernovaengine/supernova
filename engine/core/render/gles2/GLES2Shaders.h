@@ -3,6 +3,7 @@
 
 std::string lightingVertexDec =
 "#ifdef USE_LIGHTING\n"
+
 "  uniform mat4 u_mMatrix;\n"
 "  uniform mat4 u_nMatrix;\n"
 
@@ -10,13 +11,25 @@ std::string lightingVertexDec =
 
 "  varying vec3 v_Position;\n"
 "  varying vec3 v_Normal;\n"
+
+"  #ifdef HAS_SHADOWS\n"
+"    uniform mat4 u_ShadowVP;\n"
+"    varying vec4 v_ShadowCoordinates;\n"
+"  #endif\n"
+
 "#endif\n";
 
 std::string lightingVertexImp =
-"    #ifdef USE_LIGHTING\n"
-"      v_Position = vec3(u_mMatrix * vec4(a_Position, 1.0));\n"
-"      v_Normal = normalize(vec3(u_nMatrix * vec4(a_Normal, 0.0)));\n"
-"    #endif\n";
+"#ifdef USE_LIGHTING\n"
+
+"  v_Position = vec3(u_mMatrix * vec4(a_Position, 0.0));\n"
+"  v_Normal = normalize(vec3(u_nMatrix * vec4(a_Normal, 0.0)));\n"
+
+"  #ifdef HAS_SHADOWS\n"
+"    v_ShadowCoordinates = u_ShadowVP * vec4(vec3(u_mMatrix * vec4(a_Position, 1.0)), 1.0);\n"
+"  #endif\n"
+
+"#endif\n";
 
 std::string lightingFragmentDec =
 "#ifdef USE_LIGHTING\n"
@@ -47,15 +60,21 @@ std::string lightingFragmentDec =
 "  varying vec3 v_Position;\n"
 "  varying vec3 v_Normal;\n"
 
+"  #ifdef HAS_SHADOWS\n"
+"    uniform sampler2D u_shadowsMap;\n"
+"    varying vec4 v_ShadowCoordinates;\n"
+"  #endif\n"
+
 "#endif\n";
 
 std::string lightingFragmentImp =
 "   #ifdef USE_LIGHTING\n"
 
 "     vec3 MaterialSpecularColor = vec3(1.0,1.0,1.0);\n"
-"     float MaterialShininess = 40.0;\n"
+"     float MaterialShininess = 80.0;\n"
 
 "     FragColor = u_AmbientLight * FragColor;\n"
+"     vec3 shadow_FragColor = FragColor;"
 "     vec3 EyeDirection = normalize( u_EyePos - v_Position );\n"
 
 "     for(int i=0;i<numLights;++i){\n"
@@ -64,7 +83,11 @@ std::string lightingFragmentImp =
 "             float PointLightDistance = length(u_PointLightPos[i] - v_Position);\n"
 "             vec3 PointLightDirection = normalize( u_PointLightPos[i] - v_Position );\n"
 "             float PointLightcosTheta = clamp( dot( v_Normal,PointLightDirection ), 0.0,1.0 );\n"
-"             float PointLightcosAlpha = clamp( dot( EyeDirection, reflect(-PointLightDirection,v_Normal) ), 0.0,1.0 );\n"
+
+"             float PointLightcosAlpha = 0.0;\n"
+"             if (PointLightcosTheta > 0.0){\n"
+"                 float PointLightcosAlpha = clamp( dot( EyeDirection, reflect(-PointLightDirection,v_Normal) ), 0.0,1.0 );\n"
+"             }\n"
 
 "             FragColor = FragColor +\n"
 "                 u_PointLightColor[i] * vec3(fragmentColor) * u_PointLightPower[i] * PointLightcosTheta / (PointLightDistance) +\n"
@@ -76,27 +99,49 @@ std::string lightingFragmentImp =
 "             float SpotLightDistance = length(u_SpotLightPos[i] - v_Position);\n"
 "             vec3 SpotLightDirection = normalize( u_SpotLightPos[i] - v_Position );\n"
 "             float SpotLightcosTheta = clamp( dot( v_Normal,SpotLightDirection ), 0.0,1.0 );\n"
-"             float SpotLightcosAlpha = clamp( dot( EyeDirection, reflect(-SpotLightDirection,v_Normal) ), 0.0,1.0 );\n"
-"             vec3 SpotLightTargetNorm = normalize( u_SpotLightTarget[i] - u_SpotLightPos[i] );\n"
 
-"             if ( dot( SpotLightTargetNorm, -SpotLightDirection ) > u_SpotLightCutOff[i] ) {\n"
-"                 FragColor = FragColor +\n"
-"                     u_SpotLightColor[i] * vec3(fragmentColor) * u_SpotLightPower[i] * SpotLightcosTheta / (SpotLightDistance) +\n"
-"                     MaterialSpecularColor * u_SpotLightPower[i] * pow(SpotLightcosAlpha, MaterialShininess) / (SpotLightDistance);\n"
+"             float SpotLightcosAlpha = 0.0;\n"
+"             if (SpotLightcosTheta > 0.0){\n"
+"                 SpotLightcosAlpha = clamp( dot( EyeDirection, reflect(-SpotLightDirection,v_Normal) ), 0.0,1.0 );\n"
 "             }\n"
+
+"             vec3 SpotLightTargetNorm = normalize( u_SpotLightTarget[i] - u_SpotLightPos[i] );\n"
+"             float u_SpotLightouterCutOff = u_SpotLightCutOff[i] - 0.002;\n"
+"             float SpotLightepsilon = (u_SpotLightCutOff[i] - u_SpotLightouterCutOff);\n"
+"             float SpotLightintensity = clamp((dot( SpotLightTargetNorm, -SpotLightDirection ) - u_SpotLightouterCutOff) / SpotLightepsilon, 0.0, 1.0);\n"
+//"             if ( dot( SpotLightTargetNorm, -SpotLightDirection ) > u_SpotLightCutOff[i] ) {\n"
+"             FragColor = FragColor +\n"
+"                 u_SpotLightColor[i] * vec3(fragmentColor) * SpotLightintensity * u_SpotLightPower[i] * SpotLightcosTheta / (SpotLightDistance) + \n"
+"                 MaterialSpecularColor * u_SpotLightPower[i] * SpotLightintensity * pow(SpotLightcosAlpha, MaterialShininess) / (SpotLightDistance);\n"
+//"             }\n"
 "         }\n"
 
 //DirectionalLight
 "         if (i < int(u_NumDirectionalLight)){ \n"
 "             vec3 DirectionalLightDirection = normalize( -u_DirectionalLightDir[i] );\n"
 "             float DirectionalLightcosTheta = clamp( dot( v_Normal,DirectionalLightDirection ), 0.0,1.0 );\n"
-"             float DirectionalLightcosAlpha = clamp( dot( EyeDirection, reflect(-DirectionalLightDirection,v_Normal) ), 0.0,1.0 );\n"
+
+"             float DirectionalLightcosAlpha = 0.0;\n"
+"             if (DirectionalLightcosTheta > 0.0){\n"
+"                 DirectionalLightcosAlpha = clamp( dot( EyeDirection, reflect(-DirectionalLightDirection,v_Normal) ), 0.0,1.0 );\n"
+"             }\n"
 
 "             FragColor = FragColor +\n"
 "                 u_DirectionalLightColor[i] * vec3(fragmentColor) * u_DirectionalLightPower[i] * DirectionalLightcosTheta +\n"
 "                 MaterialSpecularColor * u_DirectionalLightPower[i] * pow(DirectionalLightcosAlpha, MaterialShininess);\n"
 "         }\n"
 "     }\n"
+
+"     #ifdef HAS_SHADOWS\n"
+"       vec3 shadowCoord = (v_ShadowCoordinates.xyz/v_ShadowCoordinates.w)/2.0 + 0.5;\n"
+"       vec4 rgbaDepth = texture2D(u_shadowsMap, shadowCoord.xy);\n"
+//"     float depth = unpackDepth(rgbaDepth);\n"
+"       float depth = rgbaDepth.r;\n"
+"       if (shadowCoord.z > depth + 0.00015){\n"
+"           FragColor = shadow_FragColor;\n"
+"       }\n"
+"     #endif\n"
+
 "   #endif\n";
 
 
@@ -209,9 +254,6 @@ std::string gVertexMeshPerPixelLightShader =
 "  varying vec3 v_TextureCoordinates;\n"
 "#endif\n"
 
-"uniform mat4 u_ShadowMVP;\n"
-"varying vec4 v_ShadowCoordinates;\n"
-
 "#ifdef HAS_TEXTURERECT\n"
 "  uniform vec4 u_textureRect;\n"
 "#endif\n"
@@ -223,7 +265,6 @@ std::string gVertexMeshPerPixelLightShader =
 + lightingVertexImp +
 
 "    vec4 position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
-"    v_ShadowCoordinates = u_ShadowMVP * vec4(a_Position, 1.0);\n"
 
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifdef USE_TEXTURECUBE\n"
@@ -254,9 +295,6 @@ std::string gFragmentMeshPerPixelLightShader =
 "  uniform sampler2D u_TextureUnit;\n"
 "#endif\n"
 
-"uniform sampler2D u_shadowsMap;\n"
-"varying vec4 v_ShadowCoordinates;\n"
-
 "uniform vec4 u_Color;\n"
 
 "uniform bool uUseTexture;\n"
@@ -267,10 +305,17 @@ std::string gFragmentMeshPerPixelLightShader =
 "  varying vec3 v_TextureCoordinates;\n"
 "#endif\n"
 
+"float unpackDepth(const in vec4 rgbaDepth) {\n"
+"    const vec4 bitShift = vec4(1.0, 1.0/256.0, 1.0/(256.0 * 256.0), 1.0/(256.0*256.0*256.0));\n"
+"    float depth = dot(rgbaDepth, bitShift);\n"
+"    return depth;\n"
+"}\n"
+
 "void main(){\n"
 
     //Texture or color
 "   vec4 fragmentColor = u_Color;\n"
+"   fragmentColor = vec4(0.5,0.5,0.5,1.0);\n"
 
 "   if (uUseTexture){\n"
 "     #ifdef USE_TEXTURECOORDS\n"
@@ -290,16 +335,6 @@ std::string gFragmentMeshPerPixelLightShader =
 
 + lightingFragmentImp + fogFragmentImp +
 
-//"   float visibility = 1.0;\n"
-//"   if ( texture2D( u_shadowsMap, v_ShadowCoordinates.xy ).z  <  v_ShadowCoordinates.z){\n"
-//"     visibility = 0.5;\n"
-//"   }\n"
-
-"vec3 shadowCoord = (v_ShadowCoordinates.xyz/v_ShadowCoordinates.w);\n"
-"float visibility = (v_ShadowCoordinates.z > texture2D(u_shadowsMap, shadowCoord.xy).z) ? 0.5 : 1.0;\n"
-
-"   FragColor = vec3(0.5,0.5,0.5) * visibility;\n"
-
 "   gl_FragColor = vec4(FragColor ,fragmentColor.a);\n"
 "}\n";
 
@@ -312,8 +347,13 @@ std::string gVertexDepthRTTShader =
 
 std::string gFragmentDepthRTTShader =
 "precision mediump float;\n"
+"varying vec4 v_position;\n"
 "void main(){\n"
-//"   gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n"
+"    const vec4 bitShift = vec4(1.0, 256.0, 256.0 * 256.0, 256.0 * 256.0 * 256.0);\n"
+"    const vec4 bitMask = vec4(1.0/256.0, 1.0/256.0, 1.0/256.0, 0.0);\n"
+"    vec4 rgbaDepth = fract(gl_FragCoord.z * bitShift);\n"
+"    rgbaDepth -= rgbaDepth.gbaa * bitMask;\n"
+//"    gl_FragColor = rgbaDepth;\n"
 "}\n";
 
 #endif /* gles2_shaders_h */

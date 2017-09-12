@@ -137,7 +137,7 @@ void GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
         if(!strstr(extensions, "depth_texture")){
             Log::Error(LOG_TAG,"This device has no support to depth_texture");
         }else{
-            glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
+            glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, 0);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
         }
     }

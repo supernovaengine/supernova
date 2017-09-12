@@ -27,8 +27,8 @@ bool GLES2Scene::load() {
     return true;
 }
 
-bool GLES2Scene::clear() {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+bool GLES2Scene::clear(float value) {
+    glClearColor(value, value, value, 1.0f);
     GLES2Util::checkGlError("glClearColor");
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -42,6 +42,8 @@ bool GLES2Scene::draw() {
     if (!SceneRender::draw()){
         return false;
     }
+    
+    //glCullFace(GL_FRONT);
 
     if (useDepth){
         glEnable(GL_DEPTH_TEST);

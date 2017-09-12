@@ -10,6 +10,7 @@ using namespace Supernova;
 
 Scene::Scene() {
     camera = NULL;
+    shadowMode = false;
     childScene = false;
     useTransparency = false;
     useDepth = false;
@@ -128,6 +129,10 @@ Vector3* Scene::getAmbientLight(){
 
 std::vector<Light*>* Scene::getLights(){
     return &lights;
+}
+
+bool Scene::isShadowMode(){
+    return shadowMode;
 }
 
 bool Scene::isChildScene(){
@@ -275,7 +280,7 @@ bool Scene::renderDraw(){
         textureRender->getTextureRender()->initTextureFrame();
 
         render->viewSize(Rect(0, 0, textureRender->getTextureFrameWidth(), textureRender->getTextureFrameHeight()), false);
-        render->clear();
+        render->clear(1.0);
     }
 
     transparentQueue.clear();
@@ -305,22 +310,18 @@ bool Scene::draw() {
     Camera* originalCamera = this->camera;
     Texture* originalTextureRender = this->textureRender;
 
-    mappedShadowsMap.clear();
-    mappedShadowsMVP.clear();
-
     for (int i=0; i<lights.size(); i++) {
         if (lights[i]->isUseShadow()) {
+            shadowMode = true;
             this->setTextureRender(lights[i]->getShadowMap());
-            this->setCamera(lights[i]->getCameraView());
+            this->setCamera(lights[i]->getLightCamera());
 
             renderDraw();
-
-            mappedShadowsMap.push_back(lights[i]->getShadowMap());
-            mappedShadowsMVP.push_back(*lights[i]->getDepthBiasMVP());
         }
     }
 
-    if (mappedShadowsMap.size() > 0) {
+    if (shadowMode) {
+        shadowMode = false;
         this->setCamera(originalCamera);
         this->setTextureRender(originalTextureRender);
     }
@@ -338,6 +339,12 @@ bool Scene::load(){
     render->setUseLight(isUseLight());
     render->setChildScene(isChildScene());
     render->setUseDepth(isUseDepth());
+
+    for (int i=0; i<lights.size(); i++) {
+        if (lights[i]->isUseShadow()) {
+            lights[i]->loadShadow();
+        }
+    }
 
     doCamera();
 

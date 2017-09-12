@@ -15,7 +15,7 @@
 #define S_PROPERTY_MVPMATRIX 1
 #define S_PROPERTY_MODELMATRIX 2
 #define S_PROPERTY_NORMALMATRIX 3
-#define S_PROPERTY_DEPTHMVPMATRIX 4
+#define S_PROPERTY_DEPTHVPMATRIX 4
 #define S_PROPERTY_CAMERAPOS 5
 #define S_PROPERTY_TEXTURERECT 6
 #define S_PROPERTY_COLOR 7
@@ -64,6 +64,7 @@ namespace Supernova{
         bool hasTextureCube;
         bool isSky;
         bool isText;
+        bool hasShadows;
         
         std::vector<int> shaderVertexAttributes;
         std::vector<int> shaderProperties;
@@ -72,7 +73,8 @@ namespace Supernova{
         Program();
 
         void setShader(int shaderType);
-        void setDefinitions(bool hasLight = false, bool hasFog = false, bool hasTexture = false, bool hasTextureRect = false, bool hasTextureCube = false, bool isSky = false, bool isText = false);
+        void setDefinitions(bool hasLight = false, bool hasFog = false, bool hasTexture = false, bool hasTextureRect = false,
+                            bool hasTextureCube = false, bool isSky = false, bool isText = false, bool hasShadows = false);
         
         bool existVertexAttribute(int vertexAttribute);
         bool existProperty(int property);

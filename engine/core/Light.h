@@ -27,14 +27,14 @@ namespace Supernova {
 
         bool useShadow;
         Texture* shadowMap;
-        Camera* cameraView;
+        Camera* lightCamera;
 
         int shadowMapWidth;
         int shadowMapHeight;
 
-        Matrix4 depthBiasMVP;
+        Matrix4 depthVPMatrix;
 
-        void updateCameraView();
+        void updateLightCamera();
 
     public:
 
@@ -49,9 +49,9 @@ namespace Supernova {
         float getPower();
         float getSpotAngle();
         bool isUseShadow();
-        Camera* getCameraView();
+        Camera* getLightCamera();
         Texture* getShadowMap();
-        Matrix4* getDepthBiasMVP();
+        Matrix4 getDepthVPMatrix();
 
         Vector3 getWorldTarget();
 
@@ -61,7 +61,7 @@ namespace Supernova {
 
         virtual void updateMatrix();
 
-        virtual bool load();
+        bool loadShadow();
 
     };
     

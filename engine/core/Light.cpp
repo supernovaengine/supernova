@@ -23,8 +23,8 @@ Light::Light(int type){
 
 Light::~Light() {
 
-    if (cameraView)
-        delete cameraView;
+    if (lightCamera)
+        delete lightCamera;
 
     if (shadowMap)
         delete shadowMap;
@@ -60,16 +60,16 @@ bool Light::isUseShadow(){
     return useShadow;
 }
 
-Camera* Light::getCameraView(){
-    return cameraView;
+Camera* Light::getLightCamera(){
+    return lightCamera;
 }
 
 Texture* Light::getShadowMap(){
     return shadowMap;
 }
 
-Matrix4* Light::getDepthBiasMVP(){
-    return &depthBiasMVP;
+Matrix4 Light::getDepthVPMatrix(){
+    return depthVPMatrix;
 }
 
 void Light::setPower(float power){
@@ -92,61 +92,19 @@ Vector3 Light::getWorldTarget(){
     return this->worldTarget;
 }
 
-void Light::updateCameraView(){
-    cameraView->setPosition(getWorldPosition());
-    cameraView->setView(getWorldTarget());
-    cameraView->setPerspective(spotAngle, (float)shadowMapWidth / (float)shadowMapHeight, 0.0001, 500);
+void Light::updateLightCamera(){
+    lightCamera->setPosition(getWorldPosition());
+    lightCamera->setView(getWorldTarget());
+    lightCamera->setPerspective(spotAngle, (float)shadowMapWidth / (float)shadowMapHeight, 1, 300);
 
-    Vector3 cameraDirection = (cameraView->getPosition() - cameraView->getView()).normalize();
+    Vector3 cameraDirection = (lightCamera->getPosition() - lightCamera->getView()).normalize();
     if (cameraDirection == Vector3(0,1,0)){
-        cameraView->setUp(0, 0, 1);
+        lightCamera->setUp(0, 0, 1);
     }else{
-        cameraView->setUp(0, 1, 0);
+        lightCamera->setUp(0, 1, 0);
     }
 
-    Matrix4 biasMatrix;
-    biasMatrix.set(0, 0, 0.5);
-    biasMatrix.set(0, 1, 0.0);
-    biasMatrix.set(0, 2, 0.0);
-    biasMatrix.set(0, 3, 0.5);
-
-    biasMatrix.set(1, 0, 0.0);
-    biasMatrix.set(1, 1, 0.5);
-    biasMatrix.set(1, 2, 0.0);
-    biasMatrix.set(1, 3, 0.5);
-
-    biasMatrix.set(2, 0, 0.0);
-    biasMatrix.set(2, 1, 0.0);
-    biasMatrix.set(2, 2, 0.5);
-    biasMatrix.set(2, 3, 0.5);
-
-    biasMatrix.set(3, 0, 0.0);
-    biasMatrix.set(3, 1, 0.0);
-    biasMatrix.set(3, 2, 0.0);
-    biasMatrix.set(3, 3, 1.0);
-
-    Matrix4 modelMatrix2;
-    modelMatrix2.set(0, 0, 1.0);
-    modelMatrix2.set(0, 1, 1.0);
-    modelMatrix2.set(0, 2, 1.0);
-    modelMatrix2.set(0, 3, 1.0);
-
-    modelMatrix2.set(1, 0, 1.0);
-    modelMatrix2.set(1, 1, 1.0);
-    modelMatrix2.set(1, 2, 1.0);
-    modelMatrix2.set(1, 3, 1.0);
-
-    modelMatrix2.set(2, 0, 1.0);
-    modelMatrix2.set(2, 1, 1.0);
-    modelMatrix2.set(2, 2, 1.0);
-    modelMatrix2.set(2, 3, 1.0);
-
-    modelMatrix2.set(3, 0, 1.0);
-    modelMatrix2.set(3, 1, 1.0);
-    modelMatrix2.set(3, 2, 1.0);
-    modelMatrix2.set(3, 3, 1.0);
-
-    depthBiasMVP = ((*cameraView->getProjectionMatrix()) * (*cameraView->getViewMatrix()) * modelMatrix);
+    depthVPMatrix = (*lightCamera->getViewProjectionMatrix());
 }
 
 void Light::updateMatrix(){
@@ -155,15 +113,15 @@ void Light::updateMatrix(){
     worldTarget = modelMatrix * (target - position);
 
     if (useShadow && loaded){
-        updateCameraView();
+        updateLightCamera();
     }
 }
 
-bool Light::load(){
+bool Light::loadShadow(){
     if (useShadow){
-        if (!cameraView)
-            cameraView = new Camera();
-        updateCameraView();
+        if (!lightCamera)
+            lightCamera = new Camera();
+        updateLightCamera();
 
         if (!shadowMap) {
             shadowMap = new Texture(shadowMapWidth, shadowMapHeight);
@@ -183,5 +141,5 @@ bool Light::load(){
         shadowMap->load();
     }
 
-    return Object::load();
+    return true;
 }

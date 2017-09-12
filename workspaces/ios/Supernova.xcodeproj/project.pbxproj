@@ -129,7 +129,7 @@
 		71CDC7141D7B14510060EEFF /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A0A1CFB2EAD00A4752F /* Mesh.cpp */; };
 		71CDC7151D7B14510060EEFF /* Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F149B61CFB793200B7552E /* Model.cpp */; };
 		71CDC7161D7B14510060EEFF /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A3C1CFB2EAD00A4752F /* Object.cpp */; };
-		71CDC7171D7B14510060EEFF /* Plane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A3F1CFB2EAD00A4752F /* Plane.cpp */; };
+		71CDC7171D7B14510060EEFF /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A3F1CFB2EAD00A4752F /* PlaneTerrain.cpp */; };
 		71CDC7181D7B14510060EEFF /* PointLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E1D22C1D2957AA001209C8 /* PointLight.cpp */; };
 		71CDC7191D7B14510060EEFF /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A631CFB2EAD00A4752F /* Scene.cpp */; };
 		71CDC71A1D7B14510060EEFF /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A661CFB2EAD00A4752F /* Polygon.cpp */; };
@@ -197,7 +197,7 @@
 		71F59C641EBFCF8800F49392 /* libsoloud.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F59B441EBFCA3100F49392 /* libsoloud.a */; };
 		71F59C681EBFD1BD00F49392 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F59C671EBFD1BD00F49392 /* AudioToolbox.framework */; };
 		71FA3F651F5E2FEE0015BEFE /* Plane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FA3F631F5E2FEE0015BEFE /* Plane.cpp */; };
-		71FA3F681F5E35100015BEFE /* BoundingBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FA3F661F5E35100015BEFE /* BoundingBox.cpp */; };
+		71FA3F681F5E35100015BEFE /* AlignedBoundingBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FA3F661F5E35100015BEFE /* AlignedBoundingBox.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -351,8 +351,8 @@
 		713D2A3A1CFB2EAD00A4752F /* Vector4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector4.h; sourceTree = "<group>"; };
 		713D2A3C1CFB2EAD00A4752F /* Object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Object.cpp; sourceTree = "<group>"; };
 		713D2A3D1CFB2EAD00A4752F /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
-		713D2A3F1CFB2EAD00A4752F /* Plane.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Plane.cpp; sourceTree = "<group>"; };
-		713D2A401CFB2EAD00A4752F /* Plane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Plane.h; sourceTree = "<group>"; };
+		713D2A3F1CFB2EAD00A4752F /* PlaneTerrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaneTerrain.cpp; sourceTree = "<group>"; };
+		713D2A401CFB2EAD00A4752F /* PlaneTerrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaneTerrain.h; sourceTree = "<group>"; };
 		713D2A431CFB2EAD00A4752F /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
 		713D2A441CFB2EAD00A4752F /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		713D2A491CFB2EAD00A4752F /* PrimitiveMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrimitiveMode.h; sourceTree = "<group>"; };
@@ -704,8 +704,8 @@
 		71F59C671EBFD1BD00F49392 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		71FA3F631F5E2FEE0015BEFE /* Plane.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Plane.cpp; sourceTree = "<group>"; };
 		71FA3F641F5E2FEE0015BEFE /* Plane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Plane.h; sourceTree = "<group>"; };
-		71FA3F661F5E35100015BEFE /* BoundingBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BoundingBox.cpp; sourceTree = "<group>"; };
-		71FA3F671F5E35100015BEFE /* BoundingBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoundingBox.h; sourceTree = "<group>"; };
+		71FA3F661F5E35100015BEFE /* AlignedBoundingBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlignedBoundingBox.cpp; sourceTree = "<group>"; };
+		71FA3F671F5E35100015BEFE /* AlignedBoundingBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlignedBoundingBox.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -856,8 +856,8 @@
 				713D2A3D1CFB2EAD00A4752F /* Object.h */,
 				71EC38B21EB82871008654E8 /* Particles.cpp */,
 				71EC38B31EB82871008654E8 /* Particles.h */,
-				713D2A3F1CFB2EAD00A4752F /* Plane.cpp */,
-				713D2A401CFB2EAD00A4752F /* Plane.h */,
+				713D2A3F1CFB2EAD00A4752F /* PlaneTerrain.cpp */,
+				713D2A401CFB2EAD00A4752F /* PlaneTerrain.h */,
 				713D2A421CFB2EAD00A4752F /* platform */,
 				71E1D22C1D2957AA001209C8 /* PointLight.cpp */,
 				71E1D22D1D2957AA001209C8 /* PointLight.h */,
@@ -930,8 +930,8 @@
 				713D2A3A1CFB2EAD00A4752F /* Vector4.h */,
 				71FA3F631F5E2FEE0015BEFE /* Plane.cpp */,
 				71FA3F641F5E2FEE0015BEFE /* Plane.h */,
-				71FA3F661F5E35100015BEFE /* BoundingBox.cpp */,
-				71FA3F671F5E35100015BEFE /* BoundingBox.h */,
+				71FA3F661F5E35100015BEFE /* AlignedBoundingBox.cpp */,
+				71FA3F671F5E35100015BEFE /* AlignedBoundingBox.h */,
 			);
 			path = math;
 			sourceTree = "<group>";
@@ -1804,7 +1804,7 @@
 				71CDC70E1D7B14510060EEFF /* Cube.cpp in Sources */,
 				71CDC7301D7B14860060EEFF /* GLES2Util.cpp in Sources */,
 				71CDC70D1D7B14510060EEFF /* Camera.cpp in Sources */,
-				71FA3F681F5E35100015BEFE /* BoundingBox.cpp in Sources */,
+				71FA3F681F5E35100015BEFE /* AlignedBoundingBox.cpp in Sources */,
 				7188F1B61DBD4A3400A2D04F /* AudioReader.cpp in Sources */,
 				714C89171F0EDF370028DCE0 /* TextureRender.cpp in Sources */,
 				71CE950C1EC8A435008CCF3C /* FileUtilsPlatform.cpp in Sources */,
@@ -1822,7 +1822,7 @@
 				71CE94F91EC8A3B2008CCF3C /* FileHandle.cpp in Sources */,
 				71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */,
 				719C08A81F16C82C00F0BAF0 /* GLES2Object.cpp in Sources */,
-				71CDC7171D7B14510060EEFF /* Plane.cpp in Sources */,
+				71CDC7171D7B14510060EEFF /* PlaneTerrain.cpp in Sources */,
 				719C089E1F0DCFCB00F0BAF0 /* Texture.cpp in Sources */,
 				71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */,
 				71CDC7191D7B14510060EEFF /* Scene.cpp in Sources */,

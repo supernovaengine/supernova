@@ -6,6 +6,7 @@ using namespace Supernova;
 
 Mesh::Mesh(): ConcreteObject(){
     render = NULL;
+    shadowRender = NULL;
 
     submeshes.push_back(new Submesh(&material));
     skymesh = false;
@@ -19,6 +20,9 @@ Mesh::~Mesh(){
 
     if (render)
         delete render;
+
+    if (shadowRender)
+        delete shadowRender;
 }
 
 std::vector<Vector3>* Mesh::getVertices(){
@@ -80,6 +84,8 @@ void Mesh::addSubmesh(Submesh* submesh){
 
 void Mesh::updateVertices(){
     render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
+    if (shadowRender)
+        shadowRender->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
 }
 
 void Mesh::updateNormals(){
@@ -93,6 +99,8 @@ void Mesh::updateTexcoords(){
 void Mesh::updateIndices(){
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->getSubmeshRender()->updateIndex(submeshes[i]->getIndices()->size(), &(submeshes[i]->getIndices()->front()));
+        if (shadowRender)
+            submeshes[i]->getSubmeshShadowRender()->updateIndex(submeshes[i]->getIndices()->size(), &(submeshes[i]->getIndices()->front()));
     }
 }
 
@@ -150,6 +158,34 @@ void Mesh::removeAllSubmeshes(){
     submeshes.clear();
 }
 
+bool Mesh::shadowLoad(){
+    if (!ConcreteObject::shadowLoad())
+        return false;
+    
+    if (shadowRender == NULL)
+        shadowRender = ObjectRender::newInstance();
+    shadowRender->setProgramShader(S_SHADER_DEPTH_RTT);
+    shadowRender->setDynamicBuffer(dynamic);
+    shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
+    shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    
+    Program* shadowProgram = shadowRender->getProgram();
+    
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->dynamic = dynamic;
+        if (submeshes.size() == 1){
+            //Use the same render for submesh
+            submeshes[i]->setSubmeshShadowRender(shadowRender);
+        }else{
+            submeshes[i]->getSubmeshShadowRender()->setProgram(shadowProgram);
+        }
+        submeshes[i]->getSubmeshShadowRender()->setPrimitiveType(primitiveMode);
+        submeshes[i]->shadowLoad();
+    }
+    
+    return shadowRender->load();
+}
+
 bool Mesh::load(){
     
     while (vertices.size() > texcoords.size()){
@@ -163,6 +199,7 @@ bool Mesh::load(){
     bool hasTextureRect = false;
     bool hasTextureCoords = false;
     bool hasTextureCube = false;
+    bool hasShadows = false;
     for (unsigned int i = 0; i < submeshes.size(); i++){
         if (submeshes.at(i)->getMaterial()->getTextureRect()){
             hasTextureRect = true;
@@ -174,10 +211,13 @@ bool Mesh::load(){
             }
         }
     }
+    if (scene && scene->lightData.shadowsMap.size() > 0){
+        hasShadows = true;
+    }
     
     if (render == NULL)
         render = ObjectRender::newInstance();
-    
+
     render->setProgramShader(S_SHADER_MESH);
     render->setDynamicBuffer(dynamic);
     render->setHasTextureCoords(hasTextureCoords);
@@ -185,6 +225,7 @@ bool Mesh::load(){
     render->setHasTextureCube(hasTextureCube);
     render->setIsSky(isSky());
     render->setIsText(isText());
+    render->setHasShadows(hasShadows);
     
     render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
     render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals.front());
@@ -194,18 +235,16 @@ bool Mesh::load(){
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
     render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
     render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
-    
+
     if (scene){
         render->setSceneRender(scene->getSceneRender());
         render->setLightRender(scene->getLightRender());
         render->setFogRender(scene->getFogRender());
 
-        render->setShadowsMap(&scene->mappedShadowsMap);
-
-        render->addProperty(S_PROPERTY_DEPTHMVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, scene->getLights()->at(0)->getDepthBiasMVP());
-
+        render->setShadowsMap(scene->lightData.shadowsMap);
+        render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &scene->lightData.shadowsVPMatrix.front());
     }
-    
+
     Program* mainProgram = render->getProgram();
     
     for (size_t i = 0; i < submeshes.size(); i++) {
@@ -228,16 +267,31 @@ bool Mesh::load(){
         return false;
 }
 
+bool Mesh::shadowDraw(){
+    if (!ConcreteObject::shadowDraw())
+        return false;
+
+    shadowRender->prepareDraw();
+
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->shadowDraw();
+    }
+
+    shadowRender->finishDraw();
+ 
+    return true;
+}
+
 bool Mesh::renderDraw(){
     if (!ConcreteObject::renderDraw())
         return false;
-    
+
     render->prepareDraw();
-    
+
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->draw();
     }
-    
+
     render->finishDraw();
 
     return true;
