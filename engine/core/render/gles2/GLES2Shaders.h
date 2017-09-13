@@ -4,6 +4,8 @@
 std::string lightingVertexDec =
 "#ifdef USE_LIGHTING\n"
 
+"  #define MAXLIGHTS 8\n"
+
 "  uniform mat4 u_mMatrix;\n"
 "  uniform mat4 u_nMatrix;\n"
 
@@ -13,7 +15,7 @@ std::string lightingVertexDec =
 "  varying vec3 v_Normal;\n"
 
 "  #ifdef HAS_SHADOWS\n"
-"    uniform mat4 u_ShadowVP;\n"
+"    uniform mat4 u_ShadowVP[MAXLIGHTS];\n"
 "    varying vec4 v_ShadowCoordinates;\n"
 "  #endif\n"
 
@@ -26,7 +28,7 @@ std::string lightingVertexImp =
 "  v_Normal = normalize(vec3(u_nMatrix * vec4(a_Normal, 0.0)));\n"
 
 "  #ifdef HAS_SHADOWS\n"
-"    v_ShadowCoordinates = u_ShadowVP * vec4(vec3(u_mMatrix * vec4(a_Position, 1.0)), 1.0);\n"
+"    v_ShadowCoordinates = u_ShadowVP[0] * vec4(vec3(u_mMatrix * vec4(a_Position, 1.0)), 1.0);\n"
 "  #endif\n"
 
 "#endif\n";
@@ -34,34 +36,34 @@ std::string lightingVertexImp =
 std::string lightingFragmentDec =
 "#ifdef USE_LIGHTING\n"
 
-"  #define numLights 8\n"
+"  #define MAXLIGHTS 8\n"
 
 "  uniform vec3 u_EyePos;\n"
 
 "  uniform vec3 u_AmbientLight;\n"
 
 "  uniform int u_NumPointLight;\n"
-"  uniform vec3 u_PointLightPos[numLights];\n"
-"  uniform vec3 u_PointLightColor[numLights];\n"
-"  uniform float u_PointLightPower[numLights];\n"
+"  uniform vec3 u_PointLightPos[MAXLIGHTS];\n"
+"  uniform vec3 u_PointLightColor[MAXLIGHTS];\n"
+"  uniform float u_PointLightPower[MAXLIGHTS];\n"
 
 "  uniform int u_NumSpotLight;\n"
-"  uniform vec3 u_SpotLightPos[numLights];\n"
-"  uniform vec3 u_SpotLightColor[numLights];\n"
-"  uniform float u_SpotLightPower[numLights];\n"
-"  uniform vec3 u_SpotLightTarget[numLights];\n"
-"  uniform float u_SpotLightCutOff[numLights];\n"
+"  uniform vec3 u_SpotLightPos[MAXLIGHTS];\n"
+"  uniform vec3 u_SpotLightColor[MAXLIGHTS];\n"
+"  uniform float u_SpotLightPower[MAXLIGHTS];\n"
+"  uniform vec3 u_SpotLightTarget[MAXLIGHTS];\n"
+"  uniform float u_SpotLightCutOff[MAXLIGHTS];\n"
 
 "  uniform int u_NumDirectionalLight;\n"
-"  uniform vec3 u_DirectionalLightDir[numLights];\n"
-"  uniform float u_DirectionalLightPower[numLights];\n"
-"  uniform vec3 u_DirectionalLightColor[numLights];\n"
+"  uniform vec3 u_DirectionalLightDir[MAXLIGHTS];\n"
+"  uniform float u_DirectionalLightPower[MAXLIGHTS];\n"
+"  uniform vec3 u_DirectionalLightColor[MAXLIGHTS];\n"
 
 "  varying vec3 v_Position;\n"
 "  varying vec3 v_Normal;\n"
 
 "  #ifdef HAS_SHADOWS\n"
-"    uniform sampler2D u_shadowsMap;\n"
+"    uniform sampler2D u_shadowsMap[MAXLIGHTS];\n"
 "    varying vec4 v_ShadowCoordinates;\n"
 "  #endif\n"
 
@@ -77,64 +79,64 @@ std::string lightingFragmentImp =
 "     vec3 shadow_FragColor = FragColor;"
 "     vec3 EyeDirection = normalize( u_EyePos - v_Position );\n"
 
-"     for(int i=0;i<numLights;++i){\n"
+"     int numLights = u_NumPointLight + u_NumSpotLight + u_NumDirectionalLight;\n"
+
 //PointLight
-"         if (i < int(u_NumPointLight)){ \n"
-"             float PointLightDistance = length(u_PointLightPos[i] - v_Position);\n"
-"             vec3 PointLightDirection = normalize( u_PointLightPos[i] - v_Position );\n"
-"             float PointLightcosTheta = clamp( dot( v_Normal,PointLightDirection ), 0.0,1.0 );\n"
+"     for(int i=0;i<u_NumPointLight;++i){\n"
+"         float PointLightDistance = length(u_PointLightPos[i] - v_Position);\n"
+"         vec3 PointLightDirection = normalize( u_PointLightPos[i] - v_Position );\n"
+"         float PointLightcosTheta = clamp( dot( v_Normal,PointLightDirection ), 0.0,1.0 );\n"
 
-"             float PointLightcosAlpha = 0.0;\n"
-"             if (PointLightcosTheta > 0.0){\n"
-"                 float PointLightcosAlpha = clamp( dot( EyeDirection, reflect(-PointLightDirection,v_Normal) ), 0.0,1.0 );\n"
-"             }\n"
-
-"             FragColor = FragColor +\n"
-"                 u_PointLightColor[i] * vec3(fragmentColor) * u_PointLightPower[i] * PointLightcosTheta / (PointLightDistance) +\n"
-"                 MaterialSpecularColor * u_PointLightPower[i] * pow(PointLightcosAlpha, MaterialShininess) / (PointLightDistance);\n"
+"         float PointLightcosAlpha = 0.0;\n"
+"         if (PointLightcosTheta > 0.0){\n"
+"             float PointLightcosAlpha = clamp( dot( EyeDirection, reflect(-PointLightDirection,v_Normal) ), 0.0,1.0 );\n"
 "         }\n"
+
+"         FragColor = FragColor +\n"
+"             u_PointLightColor[i] * vec3(fragmentColor) * u_PointLightPower[i] * PointLightcosTheta / (PointLightDistance) +\n"
+"             MaterialSpecularColor * u_PointLightPower[i] * pow(PointLightcosAlpha, MaterialShininess) / (PointLightDistance);\n"
+"     }\n"
 
 //SpotLight
-"         if (i < int(u_NumSpotLight)){ \n"
-"             float SpotLightDistance = length(u_SpotLightPos[i] - v_Position);\n"
-"             vec3 SpotLightDirection = normalize( u_SpotLightPos[i] - v_Position );\n"
-"             float SpotLightcosTheta = clamp( dot( v_Normal,SpotLightDirection ), 0.0,1.0 );\n"
+"     for(int i=0;i<u_NumSpotLight;++i){\n"
+"         float SpotLightDistance = length(u_SpotLightPos[i] - v_Position);\n"
+"         vec3 SpotLightDirection = normalize( u_SpotLightPos[i] - v_Position );\n"
+"         float SpotLightcosTheta = clamp( dot( v_Normal,SpotLightDirection ), 0.0,1.0 );\n"
 
-"             float SpotLightcosAlpha = 0.0;\n"
-"             if (SpotLightcosTheta > 0.0){\n"
-"                 SpotLightcosAlpha = clamp( dot( EyeDirection, reflect(-SpotLightDirection,v_Normal) ), 0.0,1.0 );\n"
-"             }\n"
-
-"             vec3 SpotLightTargetNorm = normalize( u_SpotLightTarget[i] - u_SpotLightPos[i] );\n"
-"             float u_SpotLightouterCutOff = u_SpotLightCutOff[i] - 0.002;\n"
-"             float SpotLightepsilon = (u_SpotLightCutOff[i] - u_SpotLightouterCutOff);\n"
-"             float SpotLightintensity = clamp((dot( SpotLightTargetNorm, -SpotLightDirection ) - u_SpotLightouterCutOff) / SpotLightepsilon, 0.0, 1.0);\n"
-//"             if ( dot( SpotLightTargetNorm, -SpotLightDirection ) > u_SpotLightCutOff[i] ) {\n"
-"             FragColor = FragColor +\n"
-"                 u_SpotLightColor[i] * vec3(fragmentColor) * SpotLightintensity * u_SpotLightPower[i] * SpotLightcosTheta / (SpotLightDistance) + \n"
-"                 MaterialSpecularColor * u_SpotLightPower[i] * SpotLightintensity * pow(SpotLightcosAlpha, MaterialShininess) / (SpotLightDistance);\n"
-//"             }\n"
+"         float SpotLightcosAlpha = 0.0;\n"
+"         if (SpotLightcosTheta > 0.0){\n"
+"             SpotLightcosAlpha = clamp( dot( EyeDirection, reflect(-SpotLightDirection,v_Normal) ), 0.0,1.0 );\n"
 "         }\n"
+
+"         vec3 SpotLightTargetNorm = normalize( u_SpotLightTarget[i] - u_SpotLightPos[i] );\n"
+"         float u_SpotLightouterCutOff = u_SpotLightCutOff[i] - 0.002;\n"
+"         float SpotLightepsilon = (u_SpotLightCutOff[i] - u_SpotLightouterCutOff);\n"
+"         float SpotLightintensity = clamp((dot( SpotLightTargetNorm, -SpotLightDirection ) - u_SpotLightouterCutOff) / SpotLightepsilon, 0.0, 1.0);\n"
+//"       if ( dot( SpotLightTargetNorm, -SpotLightDirection ) > u_SpotLightCutOff[i] ) {\n"
+"         FragColor = FragColor +\n"
+"             u_SpotLightColor[i] * vec3(fragmentColor) * SpotLightintensity * u_SpotLightPower[i] * SpotLightcosTheta / (SpotLightDistance) + \n"
+"             MaterialSpecularColor * u_SpotLightPower[i] * SpotLightintensity * pow(SpotLightcosAlpha, MaterialShininess) / (SpotLightDistance);\n"
+//"       }\n"
+"     }\n"
 
 //DirectionalLight
-"         if (i < int(u_NumDirectionalLight)){ \n"
-"             vec3 DirectionalLightDirection = normalize( -u_DirectionalLightDir[i] );\n"
-"             float DirectionalLightcosTheta = clamp( dot( v_Normal,DirectionalLightDirection ), 0.0,1.0 );\n"
+"     for(int i=0;i<u_NumDirectionalLight;++i){\n"
+"         vec3 DirectionalLightDirection = normalize( -u_DirectionalLightDir[i] );\n"
+"         float DirectionalLightcosTheta = clamp( dot( v_Normal,DirectionalLightDirection ), 0.0,1.0 );\n"
 
-"             float DirectionalLightcosAlpha = 0.0;\n"
-"             if (DirectionalLightcosTheta > 0.0){\n"
-"                 DirectionalLightcosAlpha = clamp( dot( EyeDirection, reflect(-DirectionalLightDirection,v_Normal) ), 0.0,1.0 );\n"
-"             }\n"
-
-"             FragColor = FragColor +\n"
-"                 u_DirectionalLightColor[i] * vec3(fragmentColor) * u_DirectionalLightPower[i] * DirectionalLightcosTheta +\n"
-"                 MaterialSpecularColor * u_DirectionalLightPower[i] * pow(DirectionalLightcosAlpha, MaterialShininess);\n"
+"         float DirectionalLightcosAlpha = 0.0;\n"
+"         if (DirectionalLightcosTheta > 0.0){\n"
+"             DirectionalLightcosAlpha = clamp( dot( EyeDirection, reflect(-DirectionalLightDirection,v_Normal) ), 0.0,1.0 );\n"
 "         }\n"
+
+"         FragColor = FragColor +\n"
+"             u_DirectionalLightColor[i] * vec3(fragmentColor) * u_DirectionalLightPower[i] * DirectionalLightcosTheta +\n"
+"             MaterialSpecularColor * u_DirectionalLightPower[i] * pow(DirectionalLightcosAlpha, MaterialShininess);\n"
 "     }\n"
 
 "     #ifdef HAS_SHADOWS\n"
 "       vec3 shadowCoord = (v_ShadowCoordinates.xyz/v_ShadowCoordinates.w)/2.0 + 0.5;\n"
-"       vec4 rgbaDepth = texture2D(u_shadowsMap, shadowCoord.xy);\n"
+"       vec4 rgbaDepth = texture2D(u_shadowsMap[0], shadowCoord.xy);\n"
 //"     float depth = unpackDepth(rgbaDepth);\n"
 "       float depth = rgbaDepth.r;\n"
 "       if (shadowCoord.z > depth + 0.00015){\n"
