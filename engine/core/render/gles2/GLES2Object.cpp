@@ -148,6 +148,8 @@ bool GLES2Object::load(){
             propertyName = "u_textureRect";
         }else if (type == S_PROPERTY_COLOR){
             propertyName = "u_Color";
+        }else if (type == S_PROPERTY_NUMSHADOWS){
+            propertyName = "u_NumShadows";
         }else if (type == S_PROPERTY_AMBIENTLIGHT){
             propertyName = "u_AmbientLight";
         }else if (type == S_PROPERTY_NUMPOINTLIGHT){
@@ -284,7 +286,7 @@ bool GLES2Object::prepareDraw(){
         int shadowsSize = (int)shadowsMap.size();
         if (shadowsSize > 7) shadowsSize = 7;
         
-        for (int i = 0; i < shadowsMap.size(); i++){
+        for (int i = 0; i < shadowsSize; i++){
             shadowsMapLoc.push_back(i + 1);
             
             glActiveTexture(GL_TEXTURE1 + i);
@@ -292,7 +294,7 @@ bool GLES2Object::prepareDraw(){
                           ((GLES2Texture*)(shadowsMap.at(0)->getTextureRender().get()))->getTexture());
         }
 
-        glUniform1iv(uShadowsMapLocation, (int)shadowsMapLoc.size(), &shadowsMapLoc.front());
+        glUniform1iv(uShadowsMapLocation, shadowsSize, &shadowsMapLoc.front());
     }
 
     GLES2Util::checkGlError("Error on bind texture");

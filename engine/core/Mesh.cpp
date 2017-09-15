@@ -242,7 +242,8 @@ bool Mesh::load(){
         render->setFogRender(scene->getFogRender());
 
         render->setShadowsMap(scene->lightData.shadowsMap);
-        render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->lightData.shadowsVPMatrix.size(), &scene->lightData.shadowsVPMatrix.front());
+        render->addProperty(S_PROPERTY_NUMSHADOWS, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows);
+        render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows, &scene->getLightData()->shadowsVPMatrix.front());
     }
 
     Program* mainProgram = render->getProgram();

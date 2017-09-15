@@ -82,6 +82,7 @@ namespace Supernova {
         
         Vector3* getAmbientLight();
         std::vector<Light*>* getLights();
+        LightData* getLightData();
 
         bool isShadowMode();
         bool isChildScene();

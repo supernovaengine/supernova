@@ -4,8 +4,6 @@
 std::string lightingVertexDec =
 "#ifdef USE_LIGHTING\n"
 
-"  #define MAXLIGHTS 8\n"
-
 "  uniform mat4 u_mMatrix;\n"
 "  uniform mat4 u_nMatrix;\n"
 
@@ -15,8 +13,9 @@ std::string lightingVertexDec =
 "  varying vec3 v_Normal;\n"
 
 "  #ifdef HAS_SHADOWS\n"
+"    uniform highp int u_NumShadows;\n"
 "    uniform mat4 u_ShadowVP[MAXLIGHTS];\n"
-"    varying vec4 v_ShadowCoordinates;\n"
+"    varying vec4 v_ShadowCoordinates[MAXLIGHTS];\n"
 "  #endif\n"
 
 "#endif\n";
@@ -28,15 +27,18 @@ std::string lightingVertexImp =
 "  v_Normal = normalize(vec3(u_nMatrix * vec4(a_Normal, 0.0)));\n"
 
 "  #ifdef HAS_SHADOWS\n"
-"    v_ShadowCoordinates = u_ShadowVP[0] * vec4(vec3(u_mMatrix * vec4(a_Position, 1.0)), 1.0);\n"
+"    for(int i=0;i<u_NumShadows;++i){\n"
+"        v_ShadowCoordinates[i] = u_ShadowVP[i] * vec4(v_Position, 1.0);\n"
+"    }\n"
+"    for(int i=u_NumShadows;i<MAXLIGHTS;++i){\n"
+"        v_ShadowCoordinates[i] = vec4(0.0);\n"
+"    }\n"
 "  #endif\n"
 
 "#endif\n";
 
 std::string lightingFragmentDec =
 "#ifdef USE_LIGHTING\n"
-
-"  #define MAXLIGHTS 8\n"
 
 "  uniform vec3 u_EyePos;\n"
 
@@ -63,8 +65,9 @@ std::string lightingFragmentDec =
 "  varying vec3 v_Normal;\n"
 
 "  #ifdef HAS_SHADOWS\n"
+"    uniform highp int u_NumShadows;\n"
 "    uniform sampler2D u_shadowsMap[MAXLIGHTS];\n"
-"    varying vec4 v_ShadowCoordinates;\n"
+"    varying vec4 v_ShadowCoordinates[MAXLIGHTS];\n"
 "  #endif\n"
 
 "#endif\n";
@@ -135,12 +138,14 @@ std::string lightingFragmentImp =
 "     }\n"
 
 "     #ifdef HAS_SHADOWS\n"
-"       vec3 shadowCoord = (v_ShadowCoordinates.xyz/v_ShadowCoordinates.w)/2.0 + 0.5;\n"
-"       vec4 rgbaDepth = texture2D(u_shadowsMap[0], shadowCoord.xy);\n"
-//"     float depth = unpackDepth(rgbaDepth);\n"
-"       float depth = rgbaDepth.r;\n"
-"       if (shadowCoord.z > depth + 0.00015){\n"
-"           FragColor = shadow_FragColor;\n"
+"       for(int i=0;i<u_NumShadows;++i){\n"
+"           vec3 shadowCoord = (v_ShadowCoordinates[i].xyz/v_ShadowCoordinates[i].w)/2.0 + 0.5;\n"
+"           vec4 rgbaDepth = texture2D(u_shadowsMap[i], shadowCoord.xy);\n"
+//"         float depth = unpackDepth(rgbaDepth);\n"
+"           float depth = rgbaDepth.r;\n"
+"           if (shadowCoord.z > depth + 0.00015){\n"
+"               FragColor = shadow_FragColor;\n"
+"           }\n"
 "       }\n"
 "     #endif\n"
 

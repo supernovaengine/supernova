@@ -103,6 +103,10 @@ ObjectRender* Scene::getLightRender(){
     return lightRender;
 }
 
+LightData* Scene::getLightData(){
+    return &lightData;
+}
+
 ObjectRender* Scene::getFogRender(){
     return fogRender;
 }

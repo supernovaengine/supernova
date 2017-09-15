@@ -20,16 +20,20 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
     this->pointLightPos.clear();
     this->pointLightColor.clear();
     this->pointLightPower.clear();
+    
     this->numSpotLight = 0;
     this->spotLightPos.clear();
     this->spotLightColor.clear();
     this->spotLightTarget.clear();
     this->spotLightPower.clear();
     this->spotLightCutOff.clear();
+    
     this->numDirectionalLight = 0;
     this->directionalLightDir.clear();
     this->directionalLightColor.clear();
     this->directionalLightPower.clear();
+    
+    this->numShadows = 0;
     this->shadowsMap.clear();
     this->shadowsVPMatrix.clear();
 
@@ -82,6 +86,7 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
         }
 
         if (lights->at(i)->isUseShadow()){
+            this->numShadows++;
             this->shadowsMap.push_back(lights->at(i)->getShadowMap());
             this->shadowsVPMatrix.push_back(lights->at(i)->getDepthVPMatrix());
         }

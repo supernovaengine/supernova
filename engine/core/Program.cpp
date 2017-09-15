@@ -182,6 +182,7 @@ bool Program::load(){
 
         if (hasShadows) {
             shaderProperties.push_back(S_PROPERTY_DEPTHVPMATRIX);
+            shaderProperties.push_back(S_PROPERTY_NUMSHADOWS);
         }
 
     }else if (shaderType == S_SHADER_DEPTH_RTT){
