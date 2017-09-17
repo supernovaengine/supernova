@@ -43,7 +43,8 @@ bool GLES2Scene::draw() {
         return false;
     }
     
-    //glCullFace(GL_FRONT);
+    if (drawingShadow)
+        glCullFace(GL_FRONT);
 
     if (useDepth){
         glEnable(GL_DEPTH_TEST);

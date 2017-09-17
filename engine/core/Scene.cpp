@@ -10,7 +10,7 @@ using namespace Supernova;
 
 Scene::Scene() {
     camera = NULL;
-    shadowMode = false;
+    drawingShadow = false;
     childScene = false;
     useTransparency = false;
     useDepth = false;
@@ -135,8 +135,8 @@ std::vector<Light*>* Scene::getLights(){
     return &lights;
 }
 
-bool Scene::isShadowMode(){
-    return shadowMode;
+bool Scene::isDrawingShadow(){
+    return drawingShadow;
 }
 
 bool Scene::isChildScene(){
@@ -288,19 +288,28 @@ bool Scene::renderDraw(){
     }
 
     transparentQueue.clear();
-
-    render->setUseTransparency(isUseTransparency());
-    render->setUseLight(isUseLight());
-    render->setChildScene(isChildScene());
+    
+    if (!drawingShadow) {
+        render->setUseTransparency(isUseTransparency());
+        render->setUseLight(isUseLight());
+        render->setChildScene(isChildScene());
+    }else{
+        render->setUseTransparency(false);
+        render->setUseLight(false);
+        render->setChildScene(false);
+    }
     render->setUseDepth(isUseDepth());
+    render->setDrawingShadow(drawingShadow);
 
     bool drawreturn = render->draw();
     resetSceneProperties();
 
     Object::draw();
-    drawSky();
-    drawTransparentMeshes();
-    drawChildScenes();
+    if (!drawingShadow) {
+        drawSky();
+        drawTransparentMeshes();
+        drawChildScenes();
+    }
 
     if (textureRender != NULL) {
         textureRender->getTextureRender()->endTextureFrame();
@@ -316,7 +325,7 @@ bool Scene::draw() {
 
     for (int i=0; i<lights.size(); i++) {
         if (lights[i]->isUseShadow()) {
-            shadowMode = true;
+            drawingShadow = true;
             this->setTextureRender(lights[i]->getShadowMap());
             this->setCamera(lights[i]->getLightCamera());
 
@@ -324,8 +333,8 @@ bool Scene::draw() {
         }
     }
 
-    if (shadowMode) {
-        shadowMode = false;
+    if (drawingShadow) {
+        drawingShadow = false;
         this->setCamera(originalCamera);
         this->setTextureRender(originalTextureRender);
     }

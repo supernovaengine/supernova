@@ -290,8 +290,8 @@ bool GLES2Object::prepareDraw(){
             shadowsMapLoc.push_back(i + 1);
             
             glActiveTexture(GL_TEXTURE1 + i);
-            glBindTexture(((GLES2Texture*)(shadowsMap.at(0)->getTextureRender().get()))->getTextureType(),
-                          ((GLES2Texture*)(shadowsMap.at(0)->getTextureRender().get()))->getTexture());
+            glBindTexture(((GLES2Texture*)(shadowsMap.at(i)->getTextureRender().get()))->getTextureType(),
+                          ((GLES2Texture*)(shadowsMap.at(i)->getTextureRender().get()))->getTexture());
         }
 
         glUniform1iv(uShadowsMapLocation, shadowsSize, &shadowsMapLoc.front());

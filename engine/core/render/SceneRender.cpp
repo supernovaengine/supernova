@@ -10,6 +10,7 @@ SceneRender::SceneRender(){
     childScene = false;
     useDepth = false;
     useTransparency = false;
+    drawingShadow = false;
 }
 
 SceneRender::~SceneRender(){
@@ -38,6 +39,10 @@ void SceneRender::setUseDepth(bool useDepth){
 
 void SceneRender::setUseTransparency(bool useTransparency){
     this->useTransparency = useTransparency;
+}
+
+void SceneRender::setDrawingShadow(bool drawingShadow){
+    this->drawingShadow = drawingShadow;
 }
 
 bool SceneRender::load(){

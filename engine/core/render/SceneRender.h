@@ -15,6 +15,7 @@ namespace Supernova {
         bool childScene;
         bool useDepth;
         bool useTransparency;
+        bool drawingShadow;
         
         Scene* scene;
 
@@ -31,6 +32,7 @@ namespace Supernova {
         void setChildScene(bool childScene);
         void setUseDepth(bool useDepth);
         void setUseTransparency(bool useTransparency);
+        void setDrawingShadow(bool drawingShadow);
 
         virtual bool load();
         virtual bool draw();

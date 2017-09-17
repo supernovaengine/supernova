@@ -99,7 +99,7 @@ void ConcreteObject::updateMatrix(){
 
 bool ConcreteObject::draw(){
 
-    if (scene && scene->shadowMode){
+    if (scene && scene->isDrawingShadow()){
         shadowDraw();
     }else{
         if (transparent && scene && scene->useDepth && distanceToCamera >= 0){
