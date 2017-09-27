@@ -160,6 +160,8 @@ bool GLES2Object::load(){
             propertyName = "u_PointLightPower";
         }else if (type == S_PROPERTY_POINTLIGHT_COLOR){
             propertyName = "u_PointLightColor";
+        }else if (type == S_PROPERTY_POINTLIGHT_SHADOWIDX){
+            propertyName = "u_PointLightShadowIdx";
         }else if (type == S_PROPERTY_NUMSPOTLIGHT){
             propertyName = "u_NumSpotLight";
         }else if (type == S_PROPERTY_SPOTLIGHT_POS){
@@ -172,6 +174,8 @@ bool GLES2Object::load(){
             propertyName = "u_SpotLightTarget";
         }else if (type == S_PROPERTY_SPOTLIGHT_CUTOFF){
             propertyName = "u_SpotLightCutOff";
+        }else if (type == S_PROPERTY_SPOTLIGHT_SHADOWIDX){
+            propertyName = "u_SpotLightShadowIdx";
         }else if (type == S_PROPERTY_NUMDIRLIGHT){
             propertyName = "u_NumDirectionalLight";
         }else if (type == S_PROPERTY_DIRLIGHT_DIR){
@@ -180,6 +184,8 @@ bool GLES2Object::load(){
             propertyName = "u_DirectionalLightPower";
         }else if (type == S_PROPERTY_DIRLIGHT_COLOR){
             propertyName = "u_DirectionalLightColor";
+        }else if (type == S_PROPERTY_DIRLIGHT_SHADOWIDX){
+            propertyName = "u_DirectionalLightShadowIdx";
         }else if (type == S_PROPERTY_FOG_MODE){
             propertyName = "u_fogMode";
         }else if (type == S_PROPERTY_FOG_COLOR){

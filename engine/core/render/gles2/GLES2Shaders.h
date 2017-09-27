@@ -48,6 +48,7 @@ std::string lightingFragmentDec =
 "  uniform vec3 u_PointLightPos[MAXLIGHTS];\n"
 "  uniform vec3 u_PointLightColor[MAXLIGHTS];\n"
 "  uniform float u_PointLightPower[MAXLIGHTS];\n"
+"  uniform int u_PointLightShadowIdx[MAXLIGHTS];\n"
 
 "  uniform int u_NumSpotLight;\n"
 "  uniform vec3 u_SpotLightPos[MAXLIGHTS];\n"
@@ -55,11 +56,13 @@ std::string lightingFragmentDec =
 "  uniform float u_SpotLightPower[MAXLIGHTS];\n"
 "  uniform vec3 u_SpotLightTarget[MAXLIGHTS];\n"
 "  uniform float u_SpotLightCutOff[MAXLIGHTS];\n"
+"  uniform int u_SpotLightShadowIdx[MAXLIGHTS];\n"
 
 "  uniform int u_NumDirectionalLight;\n"
 "  uniform vec3 u_DirectionalLightDir[MAXLIGHTS];\n"
 "  uniform float u_DirectionalLightPower[MAXLIGHTS];\n"
 "  uniform vec3 u_DirectionalLightColor[MAXLIGHTS];\n"
+"  uniform int u_DirectionalShadowIdx[MAXLIGHTS];\n"
 
 "  varying vec3 v_Position;\n"
 "  varying vec3 v_Normal;\n"
@@ -68,11 +71,24 @@ std::string lightingFragmentDec =
 "    uniform highp int u_NumShadows;\n"
 "    uniform sampler2D u_shadowsMap[MAXLIGHTS];\n"
 "    varying vec4 v_ShadowCoordinates[MAXLIGHTS];\n"
+
+"    bool checkShadow(int idx) {\n"
+"       if (idx < 0) return false;\n"
+"       vec3 shadowCoord = (v_ShadowCoordinates[idx].xyz/v_ShadowCoordinates[idx].w)/2.0 + 0.5;\n"
+"       vec4 rgbaDepth = texture2D(u_shadowsMap[idx], shadowCoord.xy);\n"
+//"     float depth = unpackDepth(rgbaDepth);\n"
+"       float depth = rgbaDepth.r;\n"
+"       if (shadowCoord.z > depth + 0.00005){\n"
+"           return true;\n"
+"       }\n"
+"        return false;\n"
+"    }\n"
 "  #endif\n"
 
 "#endif\n";
 
 std::string lightingFragmentImp =
+
 "   #ifdef USE_LIGHTING\n"
 
 "     vec3 MaterialSpecularColor = vec3(1.0,1.0,1.0);\n"
@@ -95,9 +111,16 @@ std::string lightingFragmentImp =
 "             float PointLightcosAlpha = clamp( dot( EyeDirection, reflect(-PointLightDirection,v_Normal) ), 0.0,1.0 );\n"
 "         }\n"
 
-"         FragColor = FragColor +\n"
-"             u_PointLightColor[i] * vec3(fragmentColor) * u_PointLightPower[i] * PointLightcosTheta / (PointLightDistance) +\n"
-"             MaterialSpecularColor * u_PointLightPower[i] * pow(PointLightcosAlpha, MaterialShininess) / (PointLightDistance);\n"
+"         bool inShadow = false;\n"
+"         #ifdef HAS_SHADOWS\n"
+"           inShadow = checkShadow(u_PointLightShadowIdx[i]);\n"
+"         #endif\n"
+
+"         if (!inShadow) {\n"
+"             FragColor = FragColor +\n"
+"                 u_PointLightColor[i] * vec3(fragmentColor) * u_PointLightPower[i] * PointLightcosTheta / (PointLightDistance) +\n"
+"                 MaterialSpecularColor * u_PointLightPower[i] * pow(PointLightcosAlpha, MaterialShininess) / (PointLightDistance);\n"
+"         }\n"
 "     }\n"
 
 //SpotLight
@@ -115,11 +138,18 @@ std::string lightingFragmentImp =
 "         float u_SpotLightouterCutOff = u_SpotLightCutOff[i] - 0.002;\n"
 "         float SpotLightepsilon = (u_SpotLightCutOff[i] - u_SpotLightouterCutOff);\n"
 "         float SpotLightintensity = clamp((dot( SpotLightTargetNorm, -SpotLightDirection ) - u_SpotLightouterCutOff) / SpotLightepsilon, 0.0, 1.0);\n"
+
+"         bool inShadow = false;\n"
+"         #ifdef HAS_SHADOWS\n"
+"           inShadow = checkShadow(u_SpotLightShadowIdx[i]);\n"
+"         #endif\n"
+
 //"       if ( dot( SpotLightTargetNorm, -SpotLightDirection ) > u_SpotLightCutOff[i] ) {\n"
-"         FragColor = FragColor +\n"
-"             u_SpotLightColor[i] * vec3(fragmentColor) * SpotLightintensity * u_SpotLightPower[i] * SpotLightcosTheta / (SpotLightDistance) + \n"
-"             MaterialSpecularColor * u_SpotLightPower[i] * SpotLightintensity * pow(SpotLightcosAlpha, MaterialShininess) / (SpotLightDistance);\n"
-//"       }\n"
+"         if (!inShadow) {\n"
+"             FragColor = FragColor +\n"
+"                 u_SpotLightColor[i] * vec3(fragmentColor) * SpotLightintensity * u_SpotLightPower[i] * SpotLightcosTheta / (SpotLightDistance) + \n"
+"                 MaterialSpecularColor * u_SpotLightPower[i] * SpotLightintensity * pow(SpotLightcosAlpha, MaterialShininess) / (SpotLightDistance);\n"
+"         }\n"
 "     }\n"
 
 //DirectionalLight
@@ -132,22 +162,17 @@ std::string lightingFragmentImp =
 "             DirectionalLightcosAlpha = clamp( dot( EyeDirection, reflect(-DirectionalLightDirection,v_Normal) ), 0.0,1.0 );\n"
 "         }\n"
 
-"         FragColor = FragColor +\n"
-"             u_DirectionalLightColor[i] * vec3(fragmentColor) * u_DirectionalLightPower[i] * DirectionalLightcosTheta +\n"
-"             MaterialSpecularColor * u_DirectionalLightPower[i] * pow(DirectionalLightcosAlpha, MaterialShininess);\n"
-"     }\n"
+"         bool inShadow = false;\n"
+"         #ifdef HAS_SHADOWS\n"
+"           inShadow = checkShadow(u_DirectionalShadowIdx[i]);\n"
+"         #endif\n"
 
-"     #ifdef HAS_SHADOWS\n"
-"       for(int i=0;i<u_NumShadows;++i){\n"
-"           vec3 shadowCoord = (v_ShadowCoordinates[i].xyz/v_ShadowCoordinates[i].w)/2.0 + 0.5;\n"
-"           vec4 rgbaDepth = texture2D(u_shadowsMap[i], shadowCoord.xy);\n"
-//"         float depth = unpackDepth(rgbaDepth);\n"
-"           float depth = rgbaDepth.r;\n"
-"           if (shadowCoord.z > depth + 0.00015){\n"
-"               FragColor = shadow_FragColor;\n"
-"           }\n"
-"       }\n"
-"     #endif\n"
+"         if (!inShadow) {\n"
+"             FragColor = FragColor +\n"
+"                 u_DirectionalLightColor[i] * vec3(fragmentColor) * u_DirectionalLightPower[i] * DirectionalLightcosTheta +\n"
+"                 MaterialSpecularColor * u_DirectionalLightPower[i] * pow(DirectionalLightcosAlpha, MaterialShininess);\n"
+"         }\n"
+"     }\n"
 
 "   #endif\n";
 

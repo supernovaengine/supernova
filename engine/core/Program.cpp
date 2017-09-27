@@ -157,6 +157,7 @@ bool Program::load(){
             shaderProperties.push_back(S_PROPERTY_POINTLIGHT_POS);
             shaderProperties.push_back(S_PROPERTY_POINTLIGHT_POWER);
             shaderProperties.push_back(S_PROPERTY_POINTLIGHT_COLOR);
+            shaderProperties.push_back(S_PROPERTY_POINTLIGHT_SHADOWIDX);
 
             shaderProperties.push_back(S_PROPERTY_NUMSPOTLIGHT);
             shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_POS);
@@ -164,11 +165,13 @@ bool Program::load(){
             shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_COLOR);
             shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_TARGET);
             shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_CUTOFF);
+            shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_SHADOWIDX);
 
             shaderProperties.push_back(S_PROPERTY_NUMDIRLIGHT);
             shaderProperties.push_back(S_PROPERTY_DIRLIGHT_DIR);
             shaderProperties.push_back(S_PROPERTY_DIRLIGHT_POWER);
             shaderProperties.push_back(S_PROPERTY_DIRLIGHT_COLOR);
+            shaderProperties.push_back(S_PROPERTY_DIRLIGHT_SHADOWIDX);
         }
 
         if (hasFog) {
