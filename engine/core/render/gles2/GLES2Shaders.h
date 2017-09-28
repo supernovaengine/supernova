@@ -95,7 +95,6 @@ std::string lightingFragmentImp =
 "     float MaterialShininess = 80.0;\n"
 
 "     FragColor = u_AmbientLight * FragColor;\n"
-"     vec3 shadow_FragColor = FragColor;"
 "     vec3 EyeDirection = normalize( u_EyePos - v_Position );\n"
 
 "     int numLights = u_NumPointLight + u_NumSpotLight + u_NumDirectionalLight;\n"
@@ -347,7 +346,6 @@ std::string gFragmentMeshPerPixelLightShader =
 
     //Texture or color
 "   vec4 fragmentColor = u_Color;\n"
-"   fragmentColor = vec4(0.5,0.5,0.5,1.0);\n"
 
 "   if (uUseTexture){\n"
 "     #ifdef USE_TEXTURECOORDS\n"
