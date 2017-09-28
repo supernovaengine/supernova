@@ -23,8 +23,8 @@ std::string lightingVertexDec =
 std::string lightingVertexImp =
 "#ifdef USE_LIGHTING\n"
 
-"  v_Position = vec3(u_mMatrix * vec4(a_Position, 0.0));\n"
-"  v_Normal = normalize(vec3(u_nMatrix * vec4(a_Normal, 0.0)));\n"
+"  v_Position = vec3(u_mMatrix * vec4(a_Position, 1.0));\n"
+"  v_Normal = normalize(mat3(u_nMatrix) * a_Normal);\n"
 
 "  #ifdef HAS_SHADOWS\n"
 "    for(int i=0;i<u_NumShadows;++i){\n"
