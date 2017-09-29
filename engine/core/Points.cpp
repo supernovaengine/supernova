@@ -421,12 +421,17 @@ bool Points::load(){
     render->setPrimitiveType(S_PRIMITIVE_POINTS);
     render->setProgramShader(S_SHADER_POINTS);
     render->setDynamicBuffer(true);
+    render->setHasShadows((scene && scene->getLightData()->shadowsMap.size() > 0));
     
     render->setTexture(material.getTexture());
     if (scene){
         render->setSceneRender(scene->getSceneRender());
         render->setLightRender(scene->getLightRender());
         render->setFogRender(scene->getFogRender());
+        
+        render->setShadowsMap(scene->getLightData()->shadowsMap);
+        render->addProperty(S_PROPERTY_NUMSHADOWS, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows);
+        render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows, &scene->getLightData()->shadowsVPMatrix.front());
     }
 
     if ((material.getTexture()) && (useTextureRects)){

@@ -211,7 +211,7 @@ bool Mesh::load(){
             }
         }
     }
-    if (scene && scene->lightData.shadowsMap.size() > 0){
+    if (scene && scene->getLightData()->shadowsMap.size() > 0){
         hasShadows = true;
     }
     
