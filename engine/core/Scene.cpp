@@ -406,8 +406,9 @@ bool Scene::load(){
 
     bool loadreturn = Object::load();
 
-    Object::updateMatrix();
+
     camera->updateMatrix();
+    Object::updateMatrix();
 
     if (textureRender != NULL) {
         textureRender->load();
