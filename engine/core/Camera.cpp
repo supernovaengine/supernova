@@ -22,7 +22,7 @@ Camera::Camera() : Object(){
     y_fov = 0.75;
     aspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
     perspectiveNear = 1;
-    perspectiveFar = 1000;
+    perspectiveFar = 5000;
 
     type = S_CAMERA_PERSPECTIVE;
     
