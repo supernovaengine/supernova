@@ -78,7 +78,7 @@ std::string lightingFragmentDec =
 "       vec4 rgbaDepth = texture2D(shadowMap, shadowCoord.xy);\n"
 //"     float depth = unpackDepth(rgbaDepth);\n"
 "       float depth = rgbaDepth.r;\n"
-"       float bias = 0.00005*tan(acos(cosTheta));\n"
+"       float bias = 0.00008*tan(acos(cosTheta));\n"
 "       bias = clamp(bias, 0.0, 0.01);\n"
 "       if (shadowCoord.z > depth + bias){\n"
 "           return true;\n"
@@ -146,7 +146,7 @@ std::string lightingFragmentImp =
 "             }\n"
 
 "             vec3 SpotLightTargetNorm = normalize( u_SpotLightTarget[i] - u_SpotLightPos[i] );\n"
-"             float u_SpotLightouterCutOff = u_SpotLightCutOff[i] - 0.002;\n"
+"             float u_SpotLightouterCutOff = u_SpotLightCutOff[i] - 0.005;\n"
 "             float SpotLightepsilon = (u_SpotLightCutOff[i] - u_SpotLightouterCutOff);\n"
 "             float SpotLightintensity = clamp((dot( SpotLightTargetNorm, -SpotLightDirection ) - u_SpotLightouterCutOff) / SpotLightepsilon, 0.0, 1.0);\n"
 
