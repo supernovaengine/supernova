@@ -17,7 +17,7 @@ Object::Object(){
     viewMatrix = NULL;
     projectionMatrix = NULL;
     viewProjectionMatrix = NULL;
-    cameraPosition = NULL;
+    cameraPosition = Vector3(0,0,0);
 
     scale = Vector3(1,1,1);
     position = Vector3(0,0,0);
@@ -132,7 +132,6 @@ void Object::removeObject(Object* obj){
     
     obj->viewMatrix = NULL;
     obj->viewProjectionMatrix = NULL;
-    obj->cameraPosition = NULL;
     
     obj->updateMatrix();
 }
@@ -226,10 +225,7 @@ Matrix4 Object::getModelViewProjectMatrix(){
 }
 
 Vector3 Object::getCameraPosition(){
-    if (cameraPosition != NULL)
-        return *cameraPosition;
-    else
-        return Vector3();
+    return cameraPosition;
 }
 
 Scene* Object::getScene(){
@@ -339,7 +335,7 @@ void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     this->viewMatrix = viewMatrix;
     this->projectionMatrix = projectionMatrix;
     this->viewProjectionMatrix = viewProjectionMatrix;
-    this->cameraPosition = cameraPosition;
+    this->cameraPosition = *cameraPosition;
     
     updateMVPMatrix();
     

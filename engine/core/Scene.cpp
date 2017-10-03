@@ -403,9 +403,7 @@ bool Scene::load(){
         fogRender->addProperty(S_PROPERTY_FOG_END, S_PROPERTYDATA_FLOAT1, 1, &(fog->linearEnd));
     }
 
-
     bool loadreturn = Object::load();
-
 
     camera->updateMatrix();
     Object::updateMatrix();

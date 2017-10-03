@@ -72,9 +72,7 @@ std::string ConcreteObject::getTexture(){
 }
 
 void ConcreteObject::updateDistanceToCamera(){
-    if (this->cameraPosition != NULL){
-        distanceToCamera = ((*this->cameraPosition) - this->getWorldPosition()).length();
-    }
+    distanceToCamera = (this->cameraPosition - this->getWorldPosition()).length();
 }
 
 void ConcreteObject::setTransparency(bool transparency){

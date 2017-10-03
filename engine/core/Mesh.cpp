@@ -113,8 +113,8 @@ void Mesh::sortTransparentSubmeshes(){
                 Vector3 submeshFirstVertice = vertices[this->submeshes[i]->getIndex(0)];
                 submeshFirstVertice = modelMatrix * submeshFirstVertice;
                 
-                if (this->cameraPosition != NULL && this->submeshes[i]->getMaterial()->transparent){
-                    this->submeshes[i]->distanceToCamera = ((*this->cameraPosition) - submeshFirstVertice).length();
+                if (this->submeshes[i]->getMaterial()->transparent){
+                    this->submeshes[i]->distanceToCamera = (this->cameraPosition - submeshFirstVertice).length();
                     needSort = true;
                 }
             }

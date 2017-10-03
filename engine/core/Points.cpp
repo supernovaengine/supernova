@@ -243,13 +243,11 @@ void Points::sortTransparentPoints(){
         
         bool needSort = false;
         for (int i=0; i < points.size(); i++){
-            if (this->cameraPosition != NULL){
-                points[i].distanceToCamera = ((*this->cameraPosition) - (modelMatrix * points[i].position)).length();
+            points[i].distanceToCamera = (this->cameraPosition - (modelMatrix * points[i].position)).length();
                 
-                if (i > 0){
-                    if (points[i-1].distanceToCamera < points[i].distanceToCamera)
-                        needSort = true;
-                }
+            if (i > 0){
+                if (points[i-1].distanceToCamera < points[i].distanceToCamera)
+                    needSort = true;
             }
         }
         

@@ -84,7 +84,7 @@ void SkyBox::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
 
     this->viewProjectionMatrix = &skyViewProjectionMatrix;
 
-    this->cameraPosition = cameraPosition;
+    this->cameraPosition = *cameraPosition;
 
     updateMVPMatrix();
 }
