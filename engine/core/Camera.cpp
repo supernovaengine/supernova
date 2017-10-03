@@ -340,7 +340,7 @@ void Camera::updateMatrix(){
         viewMatrix = Matrix4::lookAtMatrix(worldPosition, worldView, worldUp);
     }
 
-    viewProjectionMatrix = viewMatrix * projectionMatrix;
+    viewProjectionMatrix = projectionMatrix * viewMatrix;
 
     if (sceneObject != NULL){
         sceneObject->updateVPMatrix(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);

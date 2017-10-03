@@ -357,11 +357,11 @@ void Object::updateMatrix(){
     Matrix4 translateMatrix = Matrix4::translateMatrix(position);
     Matrix4 rotationMatrix = rotation.getRotationMatrix();
 
-    this->modelMatrix = centerMatrix * scaleMatrix * rotationMatrix * translateMatrix;
+    this->modelMatrix = translateMatrix * rotationMatrix * scaleMatrix * centerMatrix;
 
     if (parent != NULL){
         Matrix4 parentCenterMatrix = Matrix4::translateMatrix(parent->center);
-        this->modelMatrix = this->modelMatrix * parentCenterMatrix * parent->modelMatrix;
+        this->modelMatrix = parent->modelMatrix * parentCenterMatrix * this->modelMatrix;
         worldRotation = parent->worldRotation * rotation;
         worldPosition = modelMatrix * Vector3(0,0,0);
     }else{
@@ -380,7 +380,7 @@ void Object::updateMatrix(){
 
 void Object::updateMVPMatrix(){
     if (this->viewProjectionMatrix != NULL){
-        this->modelViewProjectionMatrix = this->modelMatrix * (*this->viewProjectionMatrix);
+        this->modelViewProjectionMatrix = (*this->viewProjectionMatrix) * this->modelMatrix;
     }
 }
 

@@ -80,7 +80,7 @@ void SkyBox::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     this->viewMatrix->set(1,3,0);
     this->viewMatrix->set(0,3,0);
 
-    skyViewProjectionMatrix = (*this->viewMatrix) * (*projectionMatrix);
+    skyViewProjectionMatrix = (*projectionMatrix) * (*this->viewMatrix);
 
     this->viewProjectionMatrix = &skyViewProjectionMatrix;
 
