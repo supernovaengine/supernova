@@ -101,6 +101,14 @@ void TextureRender::loadTextureFrame(int width, int height, bool depthframe){
     this->height = height;
 }
 
+void TextureRender::loadTextureFrameCube(int width, int height, bool depthframe){
+    loaded = true;
+    
+    colorFormat = -1;
+    this->width = width;
+    this->height = height;
+}
+
 void TextureRender::deleteTexture(){
     loaded = false;
 }

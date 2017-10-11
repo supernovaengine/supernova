@@ -1,10 +1,12 @@
 #ifndef Texture_h
 #define Texture_h
 
-#define S_TEXTURE_2D 1
-#define S_TEXTURE_CUBE 2
-#define S_TEXTURE_FRAME 3
-#define S_TEXTURE_DEPTH_FRAME 4
+#define S_TEXTURE_2D 0
+#define S_TEXTURE_CUBE 1
+#define S_TEXTURE_FRAME 2
+#define S_TEXTURE_DEPTH_FRAME 3
+#define S_TEXTURE_FRAME_CUBE 4
+#define S_TEXTURE_DEPTH_FRAME_CUBE 5
 
 #include "render/TextureRender.h"
 #include "image/ColorType.h"
