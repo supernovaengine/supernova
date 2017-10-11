@@ -1,5 +1,7 @@
 #include "SpotLight.h"
 
+#include "math/Angle.h"
+
 using namespace Supernova;
 
 SpotLight::SpotLight(): Light(){
@@ -9,6 +11,10 @@ SpotLight::SpotLight(): Light(){
 
 SpotLight::~SpotLight(){
 
+}
+
+void SpotLight::updateLightCamera(){
+    Light::updateLightCamera();
 }
 
 void SpotLight::setTarget(Vector3 target){
@@ -23,5 +29,5 @@ void SpotLight::setTarget(float x, float y, float z){
 }
 
 void SpotLight::setSpotAngle(float angle){
-    this->spotAngle = angle;
+    this->spotAngle = Angle::defaultToRad(angle);
 }

@@ -28,13 +28,14 @@ namespace Supernova {
         bool useShadow;
         Texture* shadowMap;
         Camera* lightCamera;
+        std::vector<Camera*> lightsCamera;
 
         int shadowMapWidth;
         int shadowMapHeight;
 
         Matrix4 depthVPMatrix;
 
-        void updateLightCamera();
+        virtual void updateLightCamera();
 
     public:
 

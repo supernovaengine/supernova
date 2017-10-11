@@ -78,7 +78,7 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
             
             this->spotLightPower.push_back(lights->at(i)->getPower());
             
-            this->spotLightCutOff.push_back(cos(Angle::defaultToRad(lights->at(i)->getSpotAngle() / 2.0)));
+            this->spotLightCutOff.push_back(cos(lights->at(i)->getSpotAngle() / 2.0));
             
             if (lights->at(i)->isUseShadow()){
                 spotLightShadowIdx.push_back(this->numShadows);

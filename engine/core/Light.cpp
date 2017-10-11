@@ -10,13 +10,15 @@ Light::Light(){
     this->color = Vector3(1.0, 1.0, 1.0);
     this->target = Vector3(0.0, 0.0, 0.0);
     this->direction = Vector3(0.0, 0.0, 0.0);
-    this->spotAngle = 20;
+    this->spotAngle = Angle::degToRad(20);
     this->power = 1;
     this->useShadow = true;
     this->lightCamera = NULL;
     this->shadowMap = NULL;
     this->shadowMapWidth = 1024;
     this->shadowMapHeight = 1024;
+
+    this->lightsCamera.clear();
 }
 
 Light::Light(int type){
@@ -97,7 +99,7 @@ Vector3 Light::getWorldTarget(){
 void Light::updateLightCamera(){
     lightCamera->setPosition(getWorldPosition());
     lightCamera->setView(getWorldTarget());
-    lightCamera->setPerspective(spotAngle, (float)shadowMapWidth / (float)shadowMapHeight, 1, 100 * power);
+    lightCamera->setPerspective(Angle::radToDefault(spotAngle), (float)shadowMapWidth / (float)shadowMapHeight, 1, 100 * power);
 
     Vector3 cameraDirection = (lightCamera->getPosition() - lightCamera->getView()).normalize();
     if (cameraDirection == Vector3(0,1,0)){
