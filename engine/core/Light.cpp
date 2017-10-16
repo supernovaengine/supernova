@@ -13,12 +13,9 @@ Light::Light(){
     this->spotAngle = Angle::degToRad(20);
     this->power = 1;
     this->useShadow = true;
-    this->lightCamera = NULL;
     this->shadowMap = NULL;
     this->shadowMapWidth = 1024;
     this->shadowMapHeight = 1024;
-
-    this->lightsCamera.clear();
 }
 
 Light::Light(int type){
@@ -26,9 +23,10 @@ Light::Light(int type){
 }
 
 Light::~Light() {
-
-    if (lightCamera)
-        delete lightCamera;
+    for (int i = 0; i < lightCameras.size(); i++){
+        delete lightCameras[i];
+    }
+    lightCameras.clear();
 
     if (shadowMap)
         delete shadowMap;
@@ -65,7 +63,7 @@ bool Light::isUseShadow(){
 }
 
 Camera* Light::getLightCamera(){
-    return lightCamera;
+    return lightCameras[0];
 }
 
 Texture* Light::getShadowMap(){
@@ -97,18 +95,18 @@ Vector3 Light::getWorldTarget(){
 }
 
 void Light::updateLightCamera(){
-    lightCamera->setPosition(getWorldPosition());
-    lightCamera->setView(getWorldTarget());
-    lightCamera->setPerspective(Angle::radToDefault(spotAngle), (float)shadowMapWidth / (float)shadowMapHeight, 1, 100 * power);
+    lightCameras[0]->setPosition(getWorldPosition());
+    lightCameras[0]->setView(getWorldTarget());
+    lightCameras[0]->setPerspective(Angle::radToDefault(spotAngle), (float)shadowMapWidth / (float)shadowMapHeight, 1, 100 * power);
 
-    Vector3 cameraDirection = (lightCamera->getPosition() - lightCamera->getView()).normalize();
+    Vector3 cameraDirection = (lightCameras[0]->getPosition() - lightCameras[0]->getView()).normalize();
     if (cameraDirection == Vector3(0,1,0)){
-        lightCamera->setUp(0, 0, 1);
+        lightCameras[0]->setUp(0, 0, 1);
     }else{
-        lightCamera->setUp(0, 1, 0);
+        lightCameras[0]->setUp(0, 1, 0);
     }
 
-    depthVPMatrix = (*lightCamera->getViewProjectionMatrix());
+    depthVPMatrix = (*lightCameras[0]->getViewProjectionMatrix());
 }
 
 void Light::updateMatrix(){
@@ -123,8 +121,8 @@ void Light::updateMatrix(){
 
 bool Light::loadShadow(){
     if (useShadow){
-        if (!lightCamera)
-            lightCamera = new Camera();
+        if (lightCameras.size()==0)
+            lightCameras.push_back(new Camera());
         updateLightCamera();
 
         if (!shadowMap) {
