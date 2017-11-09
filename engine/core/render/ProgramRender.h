@@ -30,9 +30,8 @@ namespace Supernova {
         static void deleteUnused();
         
         bool isLoaded();
-        
-        virtual void createProgram(std::string shaderName, std::string definitions);
-        virtual void createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText);
+
+        virtual void createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows);
         virtual void deleteProgram();
         
     };

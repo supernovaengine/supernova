@@ -20,9 +20,12 @@ GLES2Util::~GLES2Util() {
 
 
 void GLES2Util::checkGlError(const char* op) {
-    for (GLint error = glGetError(); error; error = glGetError()) {
-        Log::Error(LOG_TAG,"after %s() glError (0x%x)\n", op, error);
-    }
+    // TODO: Activate only in debug mode
+    // Can cause slow render
+    
+    //for (GLint error = glGetError(); error; error = glGetError()) {
+    //    Log::Error(LOG_TAG,"after %s() glError (0x%x)\n", op, error);
+    //}
 }
 
 void GLES2Util::generateEmptyTexture() {

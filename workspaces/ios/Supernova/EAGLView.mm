@@ -10,6 +10,8 @@
     
     GLint backingWidth;
     GLint backingHeight;
+    
+    GLuint framebuffer;
 }
 
 + (Class) layerClass
@@ -51,6 +53,8 @@
         NSLog(@"Failed to set current OpenGL context");
         exit(1);
     }
+    
+    glGenFramebuffers(1, &framebuffer);
 }
 
 - (void)deleteBuffers {
@@ -71,8 +75,6 @@
 }
 
 - (void)setupFrameBuffer {
-    GLuint framebuffer;
-    glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _colorRenderBuffer);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRenderBuffer);

@@ -15,7 +15,7 @@
 #include "Scene.h"
 #include "Polygon.h"
 #include "Cube.h"
-#include "Plane.h"
+#include "PlaneTerrain.h"
 #include "Model.h"
 #include "math/Ray.h"
 #include "math/Quaternion.h"
@@ -37,6 +37,7 @@
 #include "Input.h"
 #include "Sprite.h"
 #include "Action.h"
+#include "action/TimeAction.h"
 #include "action/MoveAction.h"
 #include "action/SpriteAnimation.h"
 
@@ -385,7 +386,7 @@ void LuaBind::bind(){
     .addFunction("setFrameString", (void (Sprite::*)(std::string))&Sprite::setFrame)
     .addFunction("findFramesByString", &Sprite::findFramesByString)
     .addFunction("isAnimation", &Sprite::isAnimation)
-    .addFunction("playAnimation", (void (Sprite::*)(std::vector<int>, std::vector<int>, bool))&Sprite::playAnimation)
+    .addFunction("runAnimation", (void (Sprite::*)(std::vector<int>, std::vector<int>, bool))&Sprite::runAnimation)
     .addFunction("stopAnimation", &Sprite::stopAnimation)
     .endClass()
 
@@ -399,7 +400,7 @@ void LuaBind::bind(){
     .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>))
     .endClass()
 
-    .beginExtendClass<Plane, Mesh>("Plane")
+    .beginExtendClass<PlaneTerrain, Mesh>("PlaneTerrain")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>))
     .endClass()
 
@@ -441,6 +442,15 @@ void LuaBind::bind(){
     .endClass();
     
     LuaIntf::LuaBinding(L).beginClass<Action>("Action")
+    .addConstructor(LUA_ARGS())
+    .addFunction("run", &Action::run)
+    .addFunction("pause", &Action::pause)
+    .addFunction("stop", &Action::stop)
+    .addFunction("isRunning", &Action::isRunning)
+
+    .endClass()
+    
+    .beginExtendClass<TimeAction, Action>("TimeAction")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
     .addConstant("LINEAR", S_LINEAR)
     .addConstant("QUAD_EASEIN", S_QUAD_EASEIN)
@@ -470,15 +480,11 @@ void LuaBind::bind(){
     .addConstant("BOUNCE_EASEIN", S_BOUNCE_EASEIN)
     .addConstant("BOUNCE_EASEOUT", S_BOUNCE_EASEOUT)
     .addConstant("BOUNCE_EASEINOUT", S_BOUNCE_EASEINOUT)
-    .addFunction("play", &Action::play)
-    .addFunction("stop", &Action::stop)
-    .addFunction("reset", &Action::reset)
-    .addFunction("isRunning", &Action::isRunning)
-    .addFunction("setFunction", (int (Action::*)(lua_State*))&Action::setFunction)
-    .addFunction("setFunctionType", &Action::setFunctionType)
+    .addFunction("setFunction", (int (Action::*)(lua_State*))&TimeAction::setFunction)
+    .addFunction("setFunctionType", &TimeAction::setFunctionType)
     .endClass()
     
-    .beginExtendClass<MoveAction, Action>("MoveAction")
+    .beginExtendClass<MoveAction, TimeAction>("MoveAction")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
     .endClass()
     

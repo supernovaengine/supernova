@@ -8,8 +8,6 @@
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define BUFFER_OFFSET(i) ((void*)(i))
 
-
-
 using namespace Supernova;
 
 
@@ -120,10 +118,14 @@ bool GLES2Object::load(){
     if (texture) {
         uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
     }else{
-        if (Engine::getPlatform() == S_WEB){
+        if (Engine::getPlatform() == S_PLATFORM_WEB){
             GLES2Util::generateEmptyTexture();
             uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
         }
+    }
+
+    if (shadowsMap.size() > 0){
+        uShadowsMapLocation = glGetUniformLocation(glesProgram, "u_shadowsMap");
     }
     
     for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
@@ -138,12 +140,16 @@ bool GLES2Object::load(){
             propertyName = "u_mMatrix";
         }else if (type == S_PROPERTY_NORMALMATRIX){
             propertyName = "u_nMatrix";
+        }else if (type == S_PROPERTY_DEPTHVPMATRIX){
+            propertyName = "u_ShadowVP";
         }else if (type == S_PROPERTY_CAMERAPOS){
             propertyName = "u_EyePos";
         }else if (type == S_PROPERTY_TEXTURERECT){
             propertyName = "u_textureRect";
         }else if (type == S_PROPERTY_COLOR){
             propertyName = "u_Color";
+        }else if (type == S_PROPERTY_NUMSHADOWS){
+            propertyName = "u_NumShadows";
         }else if (type == S_PROPERTY_AMBIENTLIGHT){
             propertyName = "u_AmbientLight";
         }else if (type == S_PROPERTY_NUMPOINTLIGHT){
@@ -154,6 +160,8 @@ bool GLES2Object::load(){
             propertyName = "u_PointLightPower";
         }else if (type == S_PROPERTY_POINTLIGHT_COLOR){
             propertyName = "u_PointLightColor";
+        }else if (type == S_PROPERTY_POINTLIGHT_SHADOWIDX){
+            propertyName = "u_PointLightShadowIdx";
         }else if (type == S_PROPERTY_NUMSPOTLIGHT){
             propertyName = "u_NumSpotLight";
         }else if (type == S_PROPERTY_SPOTLIGHT_POS){
@@ -166,6 +174,8 @@ bool GLES2Object::load(){
             propertyName = "u_SpotLightTarget";
         }else if (type == S_PROPERTY_SPOTLIGHT_CUTOFF){
             propertyName = "u_SpotLightCutOff";
+        }else if (type == S_PROPERTY_SPOTLIGHT_SHADOWIDX){
+            propertyName = "u_SpotLightShadowIdx";
         }else if (type == S_PROPERTY_NUMDIRLIGHT){
             propertyName = "u_NumDirectionalLight";
         }else if (type == S_PROPERTY_DIRLIGHT_DIR){
@@ -174,6 +184,8 @@ bool GLES2Object::load(){
             propertyName = "u_DirectionalLightPower";
         }else if (type == S_PROPERTY_DIRLIGHT_COLOR){
             propertyName = "u_DirectionalLightColor";
+        }else if (type == S_PROPERTY_DIRLIGHT_SHADOWIDX){
+            propertyName = "u_DirectionalLightShadowIdx";
         }else if (type == S_PROPERTY_FOG_MODE){
             propertyName = "u_fogMode";
         }else if (type == S_PROPERTY_FOG_COLOR){
@@ -265,13 +277,32 @@ bool GLES2Object::prepareDraw(){
                       ((GLES2Texture*)(texture->getTextureRender().get()))->getTexture());
         glUniform1i(uTextureUnitLocation, 0);
     }else{
-        if (Engine::getPlatform() == S_WEB){
+        if (Engine::getPlatform() == S_PLATFORM_WEB){
             //Fix Chrome warnings of no texture bound
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
             glUniform1i(uTextureUnitLocation, 0);
         }
     }
+
+    if (shadowsMap.size() > 0){
+        
+        std::vector<int> shadowsMapLoc;
+        
+        int shadowsSize = (int)shadowsMap.size();
+        if (shadowsSize > 7) shadowsSize = 7;
+        
+        for (int i = 0; i < shadowsSize; i++){
+            shadowsMapLoc.push_back(i + 1);
+            
+            glActiveTexture(GL_TEXTURE1 + i);
+            glBindTexture(((GLES2Texture*)(shadowsMap.at(i)->getTextureRender().get()))->getTextureType(),
+                          ((GLES2Texture*)(shadowsMap.at(i)->getTextureRender().get()))->getTexture());
+        }
+
+        glUniform1iv(uShadowsMapLocation, shadowsSize, &shadowsMapLoc.front());
+    }
+
     GLES2Util::checkGlError("Error on bind texture");
     
     return true;
@@ -281,6 +312,7 @@ bool GLES2Object::draw(){
     if (!ObjectRender::draw()){
         return false;
     }
+
     //Log::Debug(LOG_TAG, "Start draw");
     
     if ((!vertexAttributes.count(S_VERTEXATTRIBUTE_VERTICES)) and (indexAttribute.size == 0)){

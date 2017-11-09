@@ -1,12 +1,12 @@
 #ifndef MoveAction_h
 #define MoveAction_h
 
-#include "Action.h"
+#include "TimeAction.h"
 #include "math/Vector3.h"
 
 namespace Supernova{
 
-    class MoveAction: public Action{
+    class MoveAction: public TimeAction{
 
     protected:
         Vector3 endPosition;
@@ -19,9 +19,9 @@ namespace Supernova{
         MoveAction(Vector3 startPosition, Vector3 endPosition, float duration, bool loop);
         virtual ~MoveAction();
         
-        virtual void play();
+        virtual bool run();
         
-        virtual void step();
+        virtual bool step();
     };
 }
 

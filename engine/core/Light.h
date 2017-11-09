@@ -6,6 +6,8 @@
 #define S_SPOT_LIGHT 3
 
 #include "Object.h"
+#include "Texture.h"
+#include "Camera.h"
 
 namespace Supernova {
 
@@ -23,6 +25,17 @@ namespace Supernova {
 
         int type;
 
+        bool useShadow;
+        Texture* shadowMap;
+        std::vector<Camera*> lightCameras;
+
+        int shadowMapWidth;
+        int shadowMapHeight;
+
+        Matrix4 depthVPMatrix;
+
+        virtual void updateLightCamera();
+
     public:
 
         Light();
@@ -35,13 +48,20 @@ namespace Supernova {
         Vector3 getDirection();
         float getPower();
         float getSpotAngle();
+        bool isUseShadow();
+        Camera* getLightCamera();
+        Texture* getShadowMap();
+        Matrix4 getDepthVPMatrix();
 
         Vector3 getWorldTarget();
 
         void setPower(float power);
         void setColor(Vector3 color);
+        void setUseShadow(bool useShadow);
 
         virtual void updateMatrix();
+
+        bool loadShadow();
 
     };
     

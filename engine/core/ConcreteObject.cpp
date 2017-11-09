@@ -40,7 +40,8 @@ void ConcreteObject::setTexture(Texture* texture){
         material.setTexture(texture);
         
         if (loaded){
-            reload();
+            //TODO: Not working with reload() because destroy delete new texture
+            load();
         }
         
     }
@@ -55,7 +56,8 @@ void ConcreteObject::setTexture(std::string texturepath){
         material.setTexturePath(texturepath);
         
         if (loaded){
-            reload();
+            //TODO: Not working with reload() because destroy delete new texture
+            load();
         }
         
     }
@@ -70,9 +72,7 @@ std::string ConcreteObject::getTexture(){
 }
 
 void ConcreteObject::updateDistanceToCamera(){
-    if (this->cameraPosition != NULL){
-        distanceToCamera = ((*this->cameraPosition) - this->getWorldPosition()).length();
-    }
+    distanceToCamera = (this->cameraPosition - this->getWorldPosition()).length();
 }
 
 void ConcreteObject::setTransparency(bool transparency){
@@ -97,14 +97,18 @@ void ConcreteObject::updateMatrix(){
 
 bool ConcreteObject::draw(){
 
-    if ((transparent) && (scene != NULL) && (((Scene*)scene)->useDepth) && (distanceToCamera >= 0)){
-        ((Scene*)scene)->transparentQueue.insert(std::make_pair(distanceToCamera, this));
+    if (scene && scene->isDrawingShadow()){
+        shadowDraw();
     }else{
-        renderDraw();
-    }
+        if (transparent && scene && scene->useDepth && distanceToCamera >= 0){
+            scene->transparentQueue.insert(std::make_pair(distanceToCamera, this));
+        }else{
+            renderDraw();
+        }
 
-    if (transparent){
-        setTransparency(true);
+        if (transparent){
+            setTransparency(true);
+        }
     }
 
     return Object::draw();
@@ -120,6 +124,18 @@ bool ConcreteObject::load(){
     if (transparent){
         setTransparency(true);
     }
+    
+    shadowLoad();
+
+    return true;
+}
+
+bool ConcreteObject::shadowLoad(){
+    
+    return true;
+}
+
+bool ConcreteObject::shadowDraw(){
 
     return true;
 }

@@ -8,6 +8,10 @@ namespace Supernova {
 
     class SpotLight: public Light {
 
+    protected:
+
+        virtual void updateLightCamera();
+
     public:
 
         SpotLight();

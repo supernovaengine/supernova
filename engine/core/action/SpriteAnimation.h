@@ -9,6 +9,7 @@ namespace Supernova{
     class SpriteAnimation: public Action{
         
     protected:
+        bool loop;
         std::vector<int> framesTime;
         std::vector<int> frames;
         int framesIndex;
@@ -25,11 +26,11 @@ namespace Supernova{
         SpriteAnimation(int interval, std::vector<int> frames, bool loop);
         virtual ~SpriteAnimation();
         
-        virtual void play();
-        virtual void stop();
-        virtual void reset();
+        virtual bool run();
+        virtual bool pause();
+        virtual bool stop();
         
-        virtual void step();
+        virtual bool step();
     };
 }
 

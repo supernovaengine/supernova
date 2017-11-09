@@ -22,6 +22,8 @@ TextureData* TextureLoader::loadTextureData(std::string relative_path) {
     
     FileData* filedata = new FileData();
     filedata->open(relative_path.c_str());
+
+    //TODO
     /*
     if (!ifs){
         Log::Error(LOG_TAG, "Can`t load texture file: %s", relative_path.c_str());

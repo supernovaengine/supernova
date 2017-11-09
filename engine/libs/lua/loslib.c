@@ -123,14 +123,20 @@
 
 
 static int os_execute (lua_State *L) {
-  const char *cmd = luaL_optstring(L, 1, NULL);
-  int stat = system(cmd);
-  if (cmd != NULL)
-    return luaL_execresult(L, stat);
-  else {
-    lua_pushboolean(L, stat);  /* true if there is a shell */
+    //TODO: Remove this whe Lua update: Call to unavailable function 'system': not available on iOS
+#if defined(TVOS) || defined(IOS) || defined(SUPERNOVA_IOS)
+    lua_pushinteger(L, -1);
     return 1;
-  }
+#else
+    const char *cmd = luaL_optstring(L, 1, NULL);
+    int stat = system(cmd);
+    if (cmd != NULL)
+        return luaL_execresult(L, stat);
+    else {
+        lua_pushboolean(L, stat);  /* true if there is a shell */
+        return 1;
+    }
+#endif
 }
 
 

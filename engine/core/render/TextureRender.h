@@ -7,6 +7,13 @@
 #include <string>
 #include <unordered_map>
 
+#define TEXTURE_CUBE_FACE_POSITIVE_X 0
+#define TEXTURE_CUBE_FACE_NEGATIVE_X 1
+#define TEXTURE_CUBE_FACE_POSITIVE_Y 2
+#define TEXTURE_CUBE_FACE_NEGATIVE_Y 3
+#define TEXTURE_CUBE_FACE_POSITIVE_Z 4
+#define TEXTURE_CUBE_FACE_NEGATIVE_Z 5
+
 namespace Supernova {
 
     class TextureRender {
@@ -43,6 +50,12 @@ namespace Supernova {
         
         virtual void loadTexture(TextureData* texturedata);
         virtual void loadTextureCube(std::vector<TextureData*> texturesdata);
+        virtual void loadTextureFrame(int width, int height, bool depthframe);
+        virtual void loadTextureFrameCube(int width, int height, bool depthframe);
+        
+        virtual void initTextureFrame() = 0;
+        virtual void endTextureFrame() = 0;
+        
         virtual void deleteTexture();
         
     };

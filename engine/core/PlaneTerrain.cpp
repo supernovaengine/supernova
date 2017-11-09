@@ -1,15 +1,15 @@
-#include "Plane.h"
+#include "PlaneTerrain.h"
 
 #include "platform/Log.h"
 #include "PrimitiveMode.h"
 
 using namespace Supernova;
 
-Plane::Plane(): Mesh() {
+PlaneTerrain::PlaneTerrain(): Mesh() {
     primitiveMode = S_TRIANGLES_STRIP;
 }
 
-Plane::Plane(float width, float depth): Plane() {
+PlaneTerrain::PlaneTerrain(float width, float depth): PlaneTerrain() {
     vertices.push_back(Vector3(0, 0, 0));
     vertices.push_back(Vector3(0, 0, depth));
     vertices.push_back(Vector3(width, 0, 0));
@@ -26,5 +26,5 @@ Plane::Plane(float width, float depth): Plane() {
     normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
 }
 
-Plane::~Plane() {
+PlaneTerrain::~PlaneTerrain() {
 }

@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Engine.h"
+#include "math/Angle.h"
 
 using namespace Supernova;
 
@@ -20,7 +21,7 @@ Camera::Camera() : Object(){
     //PERSPECTIVE
     y_fov = 0.75;
     aspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
-    perspectiveNear = 0.5;
+    perspectiveNear = 1;
     perspectiveFar = 5000;
 
     type = S_CAMERA_PERSPECTIVE;
@@ -116,13 +117,17 @@ int Camera::getType(){
     return type;
 }
 
-void Camera::updateAutomaticSizes(){
+void Camera::updateAutomaticSizes(Rect rect){
     if (automatic){
-        float newRight = Engine::getCanvasWidth();
-        float newTop = Engine::getCanvasHeight();
-        float newAspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
+        float newLeft = rect.getX();
+        float newBottom = rect.getY();
+        float newRight = rect.getWidth();
+        float newTop = rect.getHeight();
+        float newAspect = rect.getWidth() / rect.getHeight();
 
-        if ((right != newRight) || (top != newTop) || (aspect != newAspect)){
+        if ((left != newLeft) || (bottom != newBottom) || (right != newRight) || (top != newTop) || (aspect != newAspect)){
+            left = newLeft;
+            bottom = newBottom;
             right = newRight;
             top = newTop;
             aspect = newAspect;
@@ -151,7 +156,7 @@ void Camera::setPerspective(float y_fov, float aspect, float near, float far){
 
     type = S_CAMERA_PERSPECTIVE;
 
-    this->y_fov = y_fov;
+    this->y_fov = Angle::defaultToRad(y_fov);
     this->aspect = aspect;
     this->perspectiveNear = near;
     this->perspectiveFar = far;
@@ -335,7 +340,7 @@ void Camera::updateMatrix(){
         viewMatrix = Matrix4::lookAtMatrix(worldPosition, worldView, worldUp);
     }
 
-    viewProjectionMatrix = viewMatrix * projectionMatrix;
+    viewProjectionMatrix = projectionMatrix * viewMatrix;
 
     if (sceneObject != NULL){
         sceneObject->updateVPMatrix(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
