@@ -21,6 +21,8 @@ namespace Supernova {
         void setTarget(float x, float y, float z);
         void setSpotAngle(float angle);
 
+        virtual bool loadShadow();
+
     };
     
 }

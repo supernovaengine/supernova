@@ -1,4 +1,5 @@
 #include "DirectionalLight.h"
+#include "math/Angle.h"
 
 using namespace Supernova;
 
@@ -9,6 +10,10 @@ DirectionalLight::DirectionalLight(): Light(){
 
 DirectionalLight::~DirectionalLight(){
 
+}
+
+void DirectionalLight::updateLightCamera(){
+    Light::updateLightCamera();
 }
 
 void DirectionalLight::setDirection(Vector3 direction){

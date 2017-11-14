@@ -8,6 +8,10 @@ namespace Supernova {
 
     class DirectionalLight: public Light {
 
+    protected:
+
+        virtual void updateLightCamera();
+
     public:
 
         DirectionalLight();

@@ -50,6 +50,7 @@ namespace Supernova {
         float getSpotAngle();
         bool isUseShadow();
         Camera* getLightCamera();
+        Camera* getLightCamera(int index);
         Texture* getShadowMap();
         Matrix4 getDepthVPMatrix();
 
@@ -61,7 +62,7 @@ namespace Supernova {
 
         virtual void updateMatrix();
 
-        bool loadShadow();
+        virtual bool loadShadow();
 
     };
     
