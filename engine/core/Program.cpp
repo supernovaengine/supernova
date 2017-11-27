@@ -194,6 +194,11 @@ bool Program::load(){
 
         shaderProperties.push_back(S_PROPERTY_MVPMATRIX);
 
+        shaderProperties.push_back(S_PROPERTY_SHADOWLIGHT_POS);
+        shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_FAR);
+
+        shaderProperties.push_back(S_PROPERTY_ISPOINTSHADOW);
+
     }
     return true;
 }

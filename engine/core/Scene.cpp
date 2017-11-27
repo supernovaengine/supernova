@@ -111,6 +111,10 @@ ObjectRender* Scene::getFogRender(){
     return fogRender;
 }
 
+Vector3 Scene::getShadowLightPos(){
+    return shadowLightPos;
+}
+
 void Scene::setSky(SkyBox* sky){
     this->sky = sky;
 }
@@ -328,6 +332,9 @@ bool Scene::draw() {
             drawingShadow = true;
             this->setTextureRender(lights[i]->getShadowMap());
             this->setCamera(lights[i]->getLightCamera());
+            this->shadowLightPos = lights[i]->getPosition();
+            this->shadowCameraFar = lights[i]->getLightCamera()->getFarPlane();
+
 
             renderDraw();
         }

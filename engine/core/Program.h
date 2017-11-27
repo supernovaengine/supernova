@@ -51,6 +51,11 @@
 #define S_PROPERTY_FOG_START 31
 #define S_PROPERTY_FOG_END 32
 
+#define S_PROPERTY_SHADOWLIGHT_POS 33
+#define S_PROPERTY_SHADOWCAMERA_FAR 34
+
+#define S_PROPERTY_ISPOINTSHADOW 35
+
 #include "render/ProgramRender.h"
 #include <string>
 #include <vector>

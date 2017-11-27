@@ -117,6 +117,13 @@ int Camera::getType(){
     return type;
 }
 
+float Camera::getFarPlane(){
+    if (type==S_CAMERA_PERSPECTIVE)
+        return perspectiveFar;
+    else
+        return orthoFar;
+}
+
 void Camera::updateAutomaticSizes(Rect rect){
     if (automatic){
         float newLeft = rect.getX();

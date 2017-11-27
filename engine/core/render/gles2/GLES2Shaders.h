@@ -409,6 +409,9 @@ std::string gVertexDepthRTTShader =
 std::string gFragmentDepthRTTShader =
 "precision mediump float;\n"
 "varying vec4 v_position;\n"
+"attribute vec3 u_shadowLightPos;\n"
+"attribute float u_shadowCameraFar;\n"
+"uniform bool u_isPointShadow;\n"
 "void main(){\n"
 "    const vec4 bitShift = vec4(1.0, 256.0, 256.0 * 256.0, 256.0 * 256.0 * 256.0);\n"
 "    const vec4 bitMask = vec4(1.0/256.0, 1.0/256.0, 1.0/256.0, 0.0);\n"

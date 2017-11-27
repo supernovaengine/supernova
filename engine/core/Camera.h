@@ -66,6 +66,8 @@ namespace Supernova {
 
         void setType(int type);
         int getType();
+
+        float getFarPlane();
         
         void updateAutomaticSizes(Rect rect);
         

@@ -168,6 +168,10 @@ bool Mesh::shadowLoad(){
     shadowRender->setDynamicBuffer(dynamic);
     shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
     shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    if (scene){
+        shadowRender->addProperty(S_PROPERTY_SHADOWLIGHT_POS, S_PROPERTYDATA_FLOAT3, 1, &scene->shadowLightPos);
+        shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_FAR, S_PROPERTYDATA_FLOAT1, 1, &scene->shadowCameraFar);
+    }
     
     Program* shadowProgram = shadowRender->getProgram();
     
