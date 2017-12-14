@@ -20,6 +20,14 @@ void SpotLight::updateLightCamera(){
     lightCameras[0]->setView(getWorldTarget());
     lightCameras[0]->setPerspective(Angle::radToDefault(spotAngle), (float)shadowMapWidth / (float)shadowMapHeight, 1, 100 * power);
 
+    //TODO: Check this
+    Vector3 cameraDirection = (lightCameras[0]->getPosition() - lightCameras[0]->getView()).normalize();
+    if (cameraDirection == Vector3(0, 1, 0)) {
+        lightCameras[0]->setUp(0, 0, 1);
+    } else {
+        lightCameras[0]->setUp(0, 1, 0);
+    }
+
     depthVPMatrix = (*lightCameras[0]->getViewProjectionMatrix());
 
     Light::updateLightCamera();

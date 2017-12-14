@@ -29,6 +29,7 @@ namespace Supernova {
 
         Vector3 shadowLightPos;
         float shadowCameraFar;
+        bool isPointShadow;
         
         LightData lightData;
 
@@ -69,7 +70,7 @@ namespace Supernova {
         void drawSky();
 
         void drawChildScenes();
-        bool renderDraw();
+        bool renderDraw(bool cubeMap=false, int cubeFace=0);
 
     public:
 

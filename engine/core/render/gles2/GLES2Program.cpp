@@ -59,8 +59,8 @@ GLuint GLES2Program::loadShader(GLenum shaderType, const char* pSource) {
     return shader;
 }
 
-void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows){
-    ProgramRender::createProgram(shaderType, hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows);
+void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows, bool hasShadowsCube){
+    ProgramRender::createProgram(shaderType, hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows, hasShadowsCube);
     
     std::string shaderName = "";
     if (shaderType == S_SHADER_MESH){
@@ -94,6 +94,9 @@ void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, boo
     }
     if (hasShadows){
         definitions += "#define HAS_SHADOWS\n";
+    }
+    if (hasShadowsCube){
+        definitions += "#define HAS_SHADOWSCUBE\n";
     }
     
     std::string pVertexSource = definitions + getVertexShader(shaderType);

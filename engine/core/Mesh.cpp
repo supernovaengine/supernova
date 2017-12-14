@@ -168,9 +168,11 @@ bool Mesh::shadowLoad(){
     shadowRender->setDynamicBuffer(dynamic);
     shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
     shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    shadowRender->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     if (scene){
         shadowRender->addProperty(S_PROPERTY_SHADOWLIGHT_POS, S_PROPERTYDATA_FLOAT3, 1, &scene->shadowLightPos);
         shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_FAR, S_PROPERTYDATA_FLOAT1, 1, &scene->shadowCameraFar);
+        shadowRender->addProperty(S_PROPERTY_ISPOINTSHADOW, S_PROPERTYDATA_INT1, 1, &scene->isPointShadow);
     }
     
     Program* shadowProgram = shadowRender->getProgram();
@@ -203,7 +205,6 @@ bool Mesh::load(){
     bool hasTextureRect = false;
     bool hasTextureCoords = false;
     bool hasTextureCube = false;
-    bool hasShadows = false;
     for (unsigned int i = 0; i < submeshes.size(); i++){
         if (submeshes.at(i)->getMaterial()->getTextureRect()){
             hasTextureRect = true;
@@ -214,9 +215,6 @@ bool Mesh::load(){
                 hasTextureCube = true;
             }
         }
-    }
-    if (scene && scene->getLightData()->shadowsMap.size() > 0){
-        hasShadows = true;
     }
     
     if (render == NULL)
@@ -229,7 +227,6 @@ bool Mesh::load(){
     render->setHasTextureCube(hasTextureCube);
     render->setIsSky(isSky());
     render->setIsText(isText());
-    render->setHasShadows(hasShadows);
     
     render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
     render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals.front());
@@ -238,14 +235,19 @@ bool Mesh::load(){
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
     render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
-    render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
+    render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition); //TODO: put cameraPosition on Scene
 
     if (scene){
+
+        render->setHasShadows(scene->getLightData()->shadowsMap.size() > 0);
+        render->setHasShadowsCube(scene->getLightData()->shadowsMapCube.size() > 0);
+
         render->setSceneRender(scene->getSceneRender());
         render->setLightRender(scene->getLightRender());
         render->setFogRender(scene->getFogRender());
 
         render->setShadowsMap(scene->getLightData()->shadowsMap);
+        render->setShadowsMapCube(scene->getLightData()->shadowsMapCube);
         render->addProperty(S_PROPERTY_NUMSHADOWS, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows);
         render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows, &scene->getLightData()->shadowsVPMatrix.front());
     }

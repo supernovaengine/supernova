@@ -7,10 +7,16 @@ namespace Supernova {
 
     class PointLight: public Light {
 
+    protected:
+
+        virtual void updateLightCamera();
+
     public:
 
         PointLight();
         virtual ~PointLight();
+
+        virtual bool loadShadow();
 
     };
     

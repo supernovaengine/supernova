@@ -31,7 +31,7 @@ namespace Supernova {
         
         bool isLoaded();
 
-        virtual void createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows);
+        virtual void createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows, bool hasShadowsCube);
         virtual void deleteProgram();
         
     };

@@ -54,6 +54,7 @@ namespace Supernova {
         virtual void loadTextureFrameCube(int width, int height, bool depthframe);
         
         virtual void initTextureFrame() = 0;
+        virtual void initTextureFrame(int cubeFace) = 0;
         virtual void endTextureFrame() = 0;
         
         virtual void deleteTexture();

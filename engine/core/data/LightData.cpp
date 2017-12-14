@@ -35,9 +35,11 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
     this->directionalLightColor.clear();
     this->directionalLightPower.clear();
     this->directionalLightShadowIdx.clear();
-    
+
     this->numShadows = 0;
+    this->numShadowsCube = 0;
     this->shadowsMap.clear();
+    this->shadowsMapCube.clear();
     this->shadowsVPMatrix.clear();
 
 
@@ -56,7 +58,7 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
             this->pointLightPower.push_back(lights->at(i)->getPower());
             
             if (lights->at(i)->isUseShadow()){
-                spotLightShadowIdx.push_back(this->numShadows);
+                spotLightShadowIdx.push_back(this->numShadowsCube);
             }else{
                 spotLightShadowIdx.push_back(-1);
             }
@@ -107,9 +109,15 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
         }
 
         if (lights->at(i)->isUseShadow()){
-            this->numShadows++;
-            this->shadowsMap.push_back(lights->at(i)->getShadowMap());
-            this->shadowsVPMatrix.push_back(lights->at(i)->getDepthVPMatrix());
+
+            if (lights->at(i)->getType() != S_POINT_LIGHT) {
+                this->numShadows++;
+                this->shadowsMap.push_back(lights->at(i)->getShadowMap());
+                this->shadowsVPMatrix.push_back(lights->at(i)->getDepthVPMatrix());
+            }else {
+                this->numShadowsCube++;
+                this->shadowsMapCube.push_back(lights->at(i)->getShadowMap());
+            }
         }
     }
     

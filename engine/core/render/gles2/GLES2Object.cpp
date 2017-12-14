@@ -127,6 +127,9 @@ bool GLES2Object::load(){
     if (shadowsMap.size() > 0){
         uShadowsMapLocation = glGetUniformLocation(glesProgram, "u_shadowsMap");
     }
+    if (shadowsMapCube.size() > 0){
+        uShadowsMapCubeLocation = glGetUniformLocation(glesProgram, "u_shadowsMapCube");
+    }
     
     for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
     {
@@ -202,6 +205,8 @@ bool GLES2Object::load(){
             propertyName = "u_shadowLightPos";
         }else if (type == S_PROPERTY_SHADOWCAMERA_FAR){
             propertyName = "u_shadowCameraFar";
+        }else if (type == S_PROPERTY_ISPOINTSHADOW){
+            propertyName = "u_isPointShadow";
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());
@@ -294,7 +299,7 @@ bool GLES2Object::prepareDraw(){
         std::vector<int> shadowsMapLoc;
         
         int shadowsSize = (int)shadowsMap.size();
-        if (shadowsSize > 7) shadowsSize = 7;
+        if (shadowsSize > 4) shadowsSize = 4;
         
         for (int i = 0; i < shadowsSize; i++){
             shadowsMapLoc.push_back(i + 1);
@@ -304,7 +309,36 @@ bool GLES2Object::prepareDraw(){
                           ((GLES2Texture*)(shadowsMap.at(i)->getTextureRender().get()))->getTexture());
         }
 
+        //ATTENTION: Should be the same value os MAXLIGHTS
+        while (shadowsMapLoc.size() < 4) {
+            shadowsMapLoc.push_back(shadowsMapLoc[0]);
+        }
+
         glUniform1iv(uShadowsMapLocation, shadowsSize, &shadowsMapLoc.front());
+    }
+
+    if (shadowsMapCube.size() > 0){
+
+        std::vector<int> shadowsMapCubeLoc;
+
+        int shadowsSize = (int)shadowsMap.size();
+        int shadowsSizeCube = (int)shadowsMapCube.size();
+        if (shadowsSizeCube > 4) shadowsSize = 4;
+
+        for (int i = 0; i < shadowsSizeCube; i++){
+            shadowsMapCubeLoc.push_back(1 + i + shadowsSize);
+
+            glActiveTexture(GL_TEXTURE1 + i + shadowsSize);
+            glBindTexture(((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTextureType(),
+                          ((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTexture());
+        }
+
+        //ATTENTION: Should be the same value os MAXLIGHTS
+        while (shadowsMapCubeLoc.size() < 4) {
+            shadowsMapCubeLoc.push_back(shadowsMapCubeLoc[0]);
+        }
+
+        glUniform1iv(uShadowsMapCubeLocation, shadowsMapCubeLoc.size(), &shadowsMapCubeLoc.front());
     }
 
     GLES2Util::checkGlError("Error on bind texture");

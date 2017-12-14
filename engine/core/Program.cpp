@@ -16,6 +16,7 @@ Program::Program(){
     this->isSky = false;
     this->isText = false;
     this->hasShadows = false;
+    this->hasShadowsCube = false;
 }
 
 void Program::setShader(int shaderType){
@@ -23,7 +24,7 @@ void Program::setShader(int shaderType){
 }
 
 void Program::setDefinitions(bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect,
-                             bool hasTextureCube, bool isSky, bool isText, bool hasShadows){
+                             bool hasTextureCube, bool isSky, bool isText, bool hasShadows, bool hasShadowsCube){
     this->hasLight = hasLight;
     this->hasFog = hasFog;
     this->hasTextureCoords = hasTextureCoords;
@@ -32,6 +33,7 @@ void Program::setDefinitions(bool hasLight, bool hasFog, bool hasTextureCoords, 
     this->isSky = isSky;
     this->isText = isText;
     this->hasShadows = hasShadows;
+    this->hasShadowsCube = hasShadowsCube;
 }
 
 Program::~Program(){
@@ -50,6 +52,7 @@ Program::Program(const Program& p){
     isSky = p.isSky;
     isText = p.isText;
     hasShadows = p.hasShadows;
+    hasShadowsCube = p.hasShadowsCube;
 }
 
 Program& Program::operator = (const Program& p){
@@ -64,6 +67,7 @@ Program& Program::operator = (const Program& p){
     isSky = p.isSky;
     isText = p.isText;
     hasShadows = p.hasShadows;
+    hasShadowsCube = p.hasShadowsCube;
     
     return *this;
 }
@@ -111,7 +115,7 @@ bool Program::load(){
 
     if (!programRender.get()->isLoaded()){
 
-        programRender.get()->createProgram(shaderType, hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows);
+        programRender.get()->createProgram(shaderType, hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows, hasShadowsCube);
 
     }
 
@@ -193,6 +197,7 @@ bool Program::load(){
         shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_VERTICES);
 
         shaderProperties.push_back(S_PROPERTY_MVPMATRIX);
+        shaderProperties.push_back(S_PROPERTY_MODELMATRIX);
 
         shaderProperties.push_back(S_PROPERTY_SHADOWLIGHT_POS);
         shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_FAR);

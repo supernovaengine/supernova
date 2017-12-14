@@ -279,13 +279,17 @@ void Scene::setTextureRender(Texture* textureRender){
     }
 }
 
-bool Scene::renderDraw(){
+bool Scene::renderDraw(bool cubeMap, int cubeFace){
     if (textureRender == NULL) {
         render->viewSize(*Engine::getViewRect());
         if (!childScene)
             render->clear();
     }else{
-        textureRender->getTextureRender()->initTextureFrame();
+        if (cubeMap) {
+            textureRender->getTextureRender()->initTextureFrame(cubeFace);
+        }else{
+            textureRender->getTextureRender()->initTextureFrame();
+        }
 
         render->viewSize(Rect(0, 0, textureRender->getTextureFrameWidth(), textureRender->getTextureFrameHeight()), false);
         render->clear(1.0);
@@ -331,12 +335,26 @@ bool Scene::draw() {
         if (lights[i]->isUseShadow()) {
             drawingShadow = true;
             this->setTextureRender(lights[i]->getShadowMap());
-            this->setCamera(lights[i]->getLightCamera());
             this->shadowLightPos = lights[i]->getPosition();
-            this->shadowCameraFar = lights[i]->getLightCamera()->getFarPlane();
 
+            if (lights[i]->getType()==S_POINT_LIGHT) {
+                this->isPointShadow = true;
 
-            renderDraw();
+                for (int cam = 0; cam < 6; cam++){
+                    this->setCamera(lights[i]->getLightCamera(cam));
+                    this->shadowCameraFar = lights[i]->getLightCamera(cam)->getFarPlane();
+
+                    renderDraw(true, TEXTURE_CUBE_FACE_POSITIVE_X + cam);
+                }
+            }else{
+                this->isPointShadow = false;
+
+                this->setCamera(lights[i]->getLightCamera());
+                this->shadowCameraFar = lights[i]->getLightCamera()->getFarPlane();
+
+                renderDraw();
+            }
+
         }
     }
 

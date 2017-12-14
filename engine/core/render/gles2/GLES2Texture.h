@@ -12,7 +12,7 @@ namespace Supernova {
         GLuint gTexture;
         GLenum textureType;
         GLuint frameBuffer;
-        GLuint cubeShadowMap;
+        GLuint renderbuffer;
         
         GLenum getGlColorFormat(const int color_format);
         void assignTexture(const GLenum target, const GLsizei width, const GLsizei height, const GLenum type, const GLvoid* pixels);

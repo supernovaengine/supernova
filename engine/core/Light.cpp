@@ -100,14 +100,6 @@ Vector3 Light::getWorldTarget(){
 
 void Light::updateLightCamera(){
 
-    for (int i=0; i< lightCameras.size(); i++) {
-        Vector3 cameraDirection = (lightCameras[i]->getPosition() - lightCameras[i]->getView()).normalize();
-        if (cameraDirection == Vector3(0, 1, 0)) {
-            lightCameras[i]->setUp(0, 0, 1);
-        } else {
-            lightCameras[i]->setUp(0, 1, 0);
-        }
-    }
 }
 
 void Light::updateMatrix(){
