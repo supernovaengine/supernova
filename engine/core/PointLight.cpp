@@ -72,7 +72,7 @@ bool PointLight::loadShadow(){
             }
 
             shadowMap->setId("shadowCubeMap|" + std::string(rand_id));
-            shadowMap->setType(S_TEXTURE_DEPTH_FRAME_CUBE);
+            shadowMap->setType(S_TEXTURE_FRAME_CUBE);
         }
     }
 

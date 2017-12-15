@@ -203,8 +203,8 @@ bool GLES2Object::load(){
             propertyName = "u_fogEnd";
         }else if (type == S_PROPERTY_SHADOWLIGHT_POS){
             propertyName = "u_shadowLightPos";
-        }else if (type == S_PROPERTY_SHADOWCAMERA_FAR){
-            propertyName = "u_shadowCameraFar";
+        }else if (type == S_PROPERTY_SHADOWCAMERA_NEARFAR){
+            propertyName = "u_shadowCameraNearFar";
         }else if (type == S_PROPERTY_ISPOINTSHADOW){
             propertyName = "u_isPointShadow";
         }

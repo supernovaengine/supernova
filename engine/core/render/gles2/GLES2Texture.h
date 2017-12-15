@@ -12,7 +12,6 @@ namespace Supernova {
         GLuint gTexture;
         GLenum textureType;
         GLuint frameBuffer;
-        GLuint renderbuffer;
         
         GLenum getGlColorFormat(const int color_format);
         void assignTexture(const GLenum target, const GLsizei width, const GLsizei height, const GLenum type, const GLvoid* pixels);
@@ -24,7 +23,7 @@ namespace Supernova {
         virtual void loadTexture(TextureData* texturedata);
         virtual void loadTextureCube(std::vector<TextureData*> texturesdata);
         virtual void loadTextureFrame(int width, int height, bool depthframe);
-        virtual void loadTextureFrameCube(int width, int height, bool depthframe);
+        virtual void loadTextureFrameCube(int width, int height);
         virtual void deleteTexture();
         
         virtual void initTextureFrame();

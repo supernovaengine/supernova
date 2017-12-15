@@ -96,11 +96,7 @@ bool Texture::load(){
             
         }else if (type == S_TEXTURE_FRAME_CUBE){
             
-            textureRender.get()->loadTextureFrameCube(textureFrameWidth, textureFrameHeight, false);
-            
-        }else if (type == S_TEXTURE_DEPTH_FRAME_CUBE){
-            
-            textureRender.get()->loadTextureFrameCube(textureFrameWidth, textureFrameHeight, true);
+            textureRender.get()->loadTextureFrameCube(textureFrameWidth, textureFrameHeight);
             
         }
         

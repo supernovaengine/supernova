@@ -171,7 +171,7 @@ bool Mesh::shadowLoad(){
     shadowRender->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     if (scene){
         shadowRender->addProperty(S_PROPERTY_SHADOWLIGHT_POS, S_PROPERTYDATA_FLOAT3, 1, &scene->shadowLightPos);
-        shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_FAR, S_PROPERTYDATA_FLOAT1, 1, &scene->shadowCameraFar);
+        shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR, S_PROPERTYDATA_FLOAT2, 1, &scene->shadowCameraNearFar);
         shadowRender->addProperty(S_PROPERTY_ISPOINTSHADOW, S_PROPERTYDATA_INT1, 1, &scene->isPointShadow);
     }
     
@@ -250,6 +250,7 @@ bool Mesh::load(){
         render->setShadowsMapCube(scene->getLightData()->shadowsMapCube);
         render->addProperty(S_PROPERTY_NUMSHADOWS, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows);
         render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows, &scene->getLightData()->shadowsVPMatrix.front());
+        render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR, S_PROPERTYDATA_FLOAT2, 1, &scene->shadowCameraNearFar);
     }
 
     Program* mainProgram = render->getProgram();

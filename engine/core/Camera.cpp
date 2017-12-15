@@ -117,11 +117,11 @@ int Camera::getType(){
     return type;
 }
 
-float Camera::getFarPlane(){
+Vector2 Camera::getNearFarPlane(){
     if (type==S_CAMERA_PERSPECTIVE)
-        return perspectiveFar;
+        return Vector2(perspectiveNear, perspectiveFar);
     else
-        return orthoFar;
+        return Vector2(orthoNear, orthoFar);
 }
 
 void Camera::updateAutomaticSizes(Rect rect){

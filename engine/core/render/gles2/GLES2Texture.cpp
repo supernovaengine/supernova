@@ -124,7 +124,8 @@ void GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
 
     if (!depthframe){
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-        
+
+        GLuint renderbuffer;
         glGenRenderbuffers(1, &renderbuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
@@ -159,11 +160,9 @@ void GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
     }
 }
 
-void GLES2Texture::loadTextureFrameCube(int width, int height, bool depthframe){
-    TextureRender::loadTextureFrameCube(width, height, depthframe);
-    
-    const char* extensions = (char*)glGetString(GL_EXTENSIONS);
-    
+void GLES2Texture::loadTextureFrameCube(int width, int height){
+    TextureRender::loadTextureFrameCube(width, height);
+
     GLuint FramebufferName = 0;
     glGenFramebuffers(1, &FramebufferName);
     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
@@ -171,20 +170,21 @@ void GLES2Texture::loadTextureFrameCube(int width, int height, bool depthframe){
     GLuint cubeShadowMap;
     glGenTextures(1, &cubeShadowMap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeShadowMap);
-    //if (Engine::isNearestScaleTexture()){
-    //    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    //    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    //}else{
+    if (Engine::isNearestScaleTexture()){
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }else{
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //}
+    }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     
     for (unsigned int i = 0 ; i < 6 ; i++) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     }
-        
+
+    GLuint renderbuffer;
     glGenRenderbuffers(1, &renderbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
@@ -215,10 +215,8 @@ void GLES2Texture::initTextureFrame(){
 
 void GLES2Texture::initTextureFrame(int cubeFace){
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, gTexture, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer);
 }
 
 void GLES2Texture::endTextureFrame(){

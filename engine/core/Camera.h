@@ -8,6 +8,7 @@
 #include "math/Matrix4.h"
 #include "math/Vector4.h"
 #include "math/Vector3.h"
+#include "math/Vector2.h"
 #include "math/Ray.h"
 #include "math/Rect.h"
 #include "Object.h"
@@ -67,7 +68,7 @@ namespace Supernova {
         void setType(int type);
         int getType();
 
-        float getFarPlane();
+        Vector2 getNearFarPlane();
         
         void updateAutomaticSizes(Rect rect);
         

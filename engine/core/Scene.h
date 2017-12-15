@@ -20,6 +20,7 @@ namespace Supernova {
         friend class Object;
         friend class ConcreteObject;
         friend class Mesh;
+        friend class Points;
     private:
 
         SceneRender* render;
@@ -28,7 +29,7 @@ namespace Supernova {
         Texture* textureRender;
 
         Vector3 shadowLightPos;
-        float shadowCameraFar;
+        Vector2 shadowCameraNearFar;
         bool isPointShadow;
         
         LightData lightData;

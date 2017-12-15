@@ -6,7 +6,6 @@
 #define S_TEXTURE_FRAME 2
 #define S_TEXTURE_DEPTH_FRAME 3
 #define S_TEXTURE_FRAME_CUBE 4
-#define S_TEXTURE_DEPTH_FRAME_CUBE 5
 
 #include "render/TextureRender.h"
 #include "image/ColorType.h"

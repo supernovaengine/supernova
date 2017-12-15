@@ -25,6 +25,10 @@ Scene::Scene() {
     lightRender = NULL;
     fogRender = NULL;
     textureRender = NULL;
+
+    shadowLightPos = Vector3();
+    shadowCameraNearFar = Vector2();
+    isPointShadow = false;
 }
 
 Scene::~Scene() {
@@ -342,7 +346,7 @@ bool Scene::draw() {
 
                 for (int cam = 0; cam < 6; cam++){
                     this->setCamera(lights[i]->getLightCamera(cam));
-                    this->shadowCameraFar = lights[i]->getLightCamera(cam)->getFarPlane();
+                    this->shadowCameraNearFar = lights[i]->getLightCamera(cam)->getNearFarPlane();
 
                     renderDraw(true, TEXTURE_CUBE_FACE_POSITIVE_X + cam);
                 }
@@ -350,7 +354,7 @@ bool Scene::draw() {
                 this->isPointShadow = false;
 
                 this->setCamera(lights[i]->getLightCamera());
-                this->shadowCameraFar = lights[i]->getLightCamera()->getFarPlane();
+                this->shadowCameraNearFar = lights[i]->getLightCamera()->getNearFarPlane();
 
                 renderDraw();
             }

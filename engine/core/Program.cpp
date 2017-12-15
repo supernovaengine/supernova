@@ -192,6 +192,10 @@ bool Program::load(){
             shaderProperties.push_back(S_PROPERTY_NUMSHADOWS);
         }
 
+        if (hasShadowsCube) {
+            shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_NEARFAR);
+        }
+
     }else if (shaderType == S_SHADER_DEPTH_RTT){
 
         shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_VERTICES);
@@ -200,7 +204,7 @@ bool Program::load(){
         shaderProperties.push_back(S_PROPERTY_MODELMATRIX);
 
         shaderProperties.push_back(S_PROPERTY_SHADOWLIGHT_POS);
-        shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_FAR);
+        shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_NEARFAR);
 
         shaderProperties.push_back(S_PROPERTY_ISPOINTSHADOW);
 
