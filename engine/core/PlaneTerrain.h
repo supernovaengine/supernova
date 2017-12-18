@@ -8,10 +8,15 @@
 namespace Supernova {
 
     class PlaneTerrain: public Mesh {
+    private:
+        float depth;
+        float width;
     public:
         PlaneTerrain();
         PlaneTerrain(float width, float depth);
         virtual ~PlaneTerrain();
+
+        virtual bool load();
 
     };
     

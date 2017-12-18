@@ -36,7 +36,7 @@ namespace Supernova {
         
         Material* getMaterial();
 
-        void setTransparency(bool transparency);
+        void setSceneTransparency(bool transparency);
 
         unsigned int getMinBufferSize();
         

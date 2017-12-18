@@ -87,7 +87,7 @@ std::string lightingFragmentDec =
 "    bool checkShadow(vec4 shadowCoordinates, sampler2D shadowMap, float cosTheta) {\n"
 "       vec3 shadowCoord = (shadowCoordinates.xyz/shadowCoordinates.w)/2.0 + 0.5;\n"
 "       vec4 rgbaDepth = texture2D(shadowMap, shadowCoord.xy);\n"
-//"     float depth = unpackDepth(rgbaDepth);\n"
+//"       float depth = unpackDepth(rgbaDepth);\n"
 "       float depth = rgbaDepth.r;\n"
 "       float bias = 0.0001*tan(acos(cosTheta));\n"
 "       bias = clamp(bias, 0.0, 0.01);\n"
@@ -444,11 +444,12 @@ std::string gFragmentDepthRTTShader =
 "}\n"
 
 "void main(){\n"
-//"  gl_FragColor = packDepth(gl_FragCoord.z);\n"
 "    if (u_isPointShadow){\n"
 "        float lightDistance = length(v_position - u_shadowLightPos);\n"
 "        lightDistance = (lightDistance - u_shadowCameraNearFar.x) / (u_shadowCameraNearFar.y - u_shadowCameraNearFar.x);\n"
 "        gl_FragColor = packDepth(lightDistance);\n"
+"    }else{\n"
+//"        gl_FragColor = packDepth(gl_FragCoord.z);\n"
 "    }\n"
 "}\n";
 

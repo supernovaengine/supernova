@@ -305,6 +305,8 @@ bool Scene::renderDraw(bool cubeMap, int cubeFace){
         render->setUseTransparency(isUseTransparency());
         render->setUseLight(isUseLight());
         render->setChildScene(isChildScene());
+
+        resetSceneProperties();
     }else{
         render->setUseTransparency(false);
         render->setUseLight(false);
@@ -314,7 +316,6 @@ bool Scene::renderDraw(bool cubeMap, int cubeFace){
     render->setDrawingShadow(drawingShadow);
 
     bool drawreturn = render->draw();
-    resetSceneProperties();
 
     Object::draw();
     if (!drawingShadow) {

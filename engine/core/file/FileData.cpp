@@ -84,8 +84,6 @@ unsigned int FileData::open(unsigned char *aData, unsigned int aDataLength, bool
 unsigned int FileData::open(const char *aFilename) {
     if (!aFilename)
         return 1;
-    if (dataOwned)
-        delete[] dataPtr;
     dataPtr = 0;
     offset = 0;
 

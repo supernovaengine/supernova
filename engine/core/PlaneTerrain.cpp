@@ -10,6 +10,15 @@ PlaneTerrain::PlaneTerrain(): Mesh() {
 }
 
 PlaneTerrain::PlaneTerrain(float width, float depth): PlaneTerrain() {
+    this->width = width;
+    this->depth = depth;
+}
+
+PlaneTerrain::~PlaneTerrain() {
+}
+
+bool PlaneTerrain::load(){
+
     vertices.push_back(Vector3(0, 0, 0));
     vertices.push_back(Vector3(0, 0, depth));
     vertices.push_back(Vector3(width, 0, 0));
@@ -24,7 +33,6 @@ PlaneTerrain::PlaneTerrain(float width, float depth): PlaneTerrain() {
     normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
     normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
     normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
-}
 
-PlaneTerrain::~PlaneTerrain() {
+    return Mesh::load();
 }

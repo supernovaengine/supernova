@@ -75,9 +75,9 @@ void ConcreteObject::updateDistanceToCamera(){
     distanceToCamera = (this->cameraPosition - this->getWorldPosition()).length();
 }
 
-void ConcreteObject::setTransparency(bool transparency){
-    if (scene != NULL && transparent == true) {
-        ((Scene*)scene)->useTransparency = true;
+void ConcreteObject::setSceneTransparency(bool transparency){
+    if (scene) {
+        scene->useTransparency = transparency;
     }
 }
 
@@ -107,7 +107,7 @@ bool ConcreteObject::draw(){
         }
 
         if (transparent){
-            setTransparency(true);
+            setSceneTransparency(true);
         }
     }
 
@@ -121,8 +121,9 @@ bool ConcreteObject::load(){
         if (material.getTexture()->getType() == S_TEXTURE_2D)
             transparent = material.getTexture()->hasAlphaChannel();
     }
+
     if (transparent){
-        setTransparency(true);
+        setSceneTransparency(true);
     }
     
     shadowLoad();
