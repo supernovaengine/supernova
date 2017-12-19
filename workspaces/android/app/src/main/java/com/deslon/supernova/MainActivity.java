@@ -58,10 +58,8 @@ public class MainActivity extends Activity {
 		if (supportsEs2) {
 			glSurfaceView = new GLSurfaceView(this);
 
-			if (isProbablyEmulator()) {
-				// Avoids crashes on startup with some emulator images.
-				glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-			}
+			//if (isProbablyEmulator())
+			glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 24, 0);
 
 			DisplayMetrics dm = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(dm);

@@ -89,7 +89,7 @@ std::string lightingFragmentDec =
 "       vec4 rgbaDepth = texture2D(shadowMap, shadowCoord.xy);\n"
 //"       float depth = unpackDepth(rgbaDepth);\n"
 "       float depth = rgbaDepth.r;\n"
-"       float bias = 0.0001*tan(acos(cosTheta));\n"
+"       float bias = 0.00005*tan(acos(cosTheta));\n"
 "       bias = clamp(bias, 0.0, 0.01);\n"
 "       if (shadowCoord.z > depth + bias){\n"
 "           return true;\n"
@@ -297,7 +297,7 @@ std::string gVertexPointsPerPixelLightShader =
 
 
 std::string gFragmentPointsPerPixelLightShader =
-"precision mediump float;\n"
+"precision highp float;\n"
 
 "uniform sampler2D u_TextureUnit;\n"
 "uniform bool uUseTexture;\n"
@@ -374,7 +374,7 @@ std::string gVertexMeshPerPixelLightShader =
 "}\n";
 
 std::string gFragmentMeshPerPixelLightShader =
-"precision mediump float;\n"
+"precision highp float;\n"
 
 "#ifdef USE_TEXTURECUBE\n"
 "  uniform samplerCube u_TextureUnit;\n"
@@ -429,7 +429,8 @@ std::string gVertexDepthRTTShader =
 "}\n";
 
 std::string gFragmentDepthRTTShader =
-"precision mediump float;\n"
+"precision highp float;\n"
+
 "varying vec3 v_position;\n"
 "uniform vec3 u_shadowLightPos;\n"
 "uniform vec2 u_shadowCameraNearFar;\n"

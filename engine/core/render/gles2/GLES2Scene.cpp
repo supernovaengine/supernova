@@ -5,6 +5,7 @@
 #include "GLES2Util.h"
 #include "math/Angle.h"
 #include "Engine.h"
+#include "platform/Log.h"
 
 
 using namespace Supernova;
@@ -21,6 +22,10 @@ bool GLES2Scene::load() {
     if (!SceneRender::load()){
         return false;
     }
+
+    //GLint depthBits = 0;
+    //glGetIntegerv(GL_DEPTH_BITS, &depthBits);
+    //Log::Debug(LOG_TAG, "Depth bits: %i", depthBits);
 
     GLES2Util::checkGlError("Error on load scene GLES2");
 
