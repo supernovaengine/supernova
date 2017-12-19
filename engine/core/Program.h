@@ -20,7 +20,7 @@
 #define S_PROPERTY_TEXTURERECT 6
 #define S_PROPERTY_COLOR 7
 
-#define S_PROPERTY_NUMSHADOWS 8
+#define S_PROPERTY_NUMSHADOWS2D 8
 
 #define S_PROPERTY_AMBIENTLIGHT 9
 
@@ -56,6 +56,9 @@
 
 #define S_PROPERTY_ISPOINTSHADOW 35
 
+#define S_PROPERTY_SHADOWBIAS2D 36
+#define S_PROPERTY_SHADOWBIASCUBE 37
+
 #include "render/ProgramRender.h"
 #include <string>
 #include <vector>
@@ -74,7 +77,7 @@ namespace Supernova{
         bool hasTextureCube;
         bool isSky;
         bool isText;
-        bool hasShadows;
+        bool hasShadows2D;
         bool hasShadowsCube;
         
         std::vector<int> shaderVertexAttributes;
@@ -85,7 +88,7 @@ namespace Supernova{
 
         void setShader(int shaderType);
         void setDefinitions(bool hasLight = false, bool hasFog = false, bool hasTexture = false, bool hasTextureRect = false,
-                            bool hasTextureCube = false, bool isSky = false, bool isText = false, bool hasShadows = false, bool hasShadowsCube = false);
+                            bool hasTextureCube = false, bool isSky = false, bool isText = false, bool hasShadows2D = false, bool hasShadowsCube = false);
         
         bool existVertexAttribute(int vertexAttribute);
         bool existProperty(int property);

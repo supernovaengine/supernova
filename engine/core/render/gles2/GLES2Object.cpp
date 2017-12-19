@@ -124,8 +124,8 @@ bool GLES2Object::load(){
         }
     }
 
-    if (shadowsMap.size() > 0){
-        uShadowsMapLocation = glGetUniformLocation(glesProgram, "u_shadowsMap");
+    if (shadowsMap2D.size() > 0){
+        uShadowsMap2DLocation = glGetUniformLocation(glesProgram, "u_shadowsMap2D");
     }
     if (shadowsMapCube.size() > 0){
         uShadowsMapCubeLocation = glGetUniformLocation(glesProgram, "u_shadowsMapCube");
@@ -151,8 +151,8 @@ bool GLES2Object::load(){
             propertyName = "u_textureRect";
         }else if (type == S_PROPERTY_COLOR){
             propertyName = "u_Color";
-        }else if (type == S_PROPERTY_NUMSHADOWS){
-            propertyName = "u_NumShadows";
+        }else if (type == S_PROPERTY_NUMSHADOWS2D){
+            propertyName = "u_NumShadows2D";
         }else if (type == S_PROPERTY_AMBIENTLIGHT){
             propertyName = "u_AmbientLight";
         }else if (type == S_PROPERTY_NUMPOINTLIGHT){
@@ -207,6 +207,10 @@ bool GLES2Object::load(){
             propertyName = "u_shadowCameraNearFar";
         }else if (type == S_PROPERTY_ISPOINTSHADOW){
             propertyName = "u_isPointShadow";
+        }else if (type == S_PROPERTY_SHADOWBIAS2D){
+            propertyName = "u_shadowBias2D";
+        }else if (type == S_PROPERTY_SHADOWBIASCUBE){
+            propertyName = "u_shadowBiasCube";
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());
@@ -294,19 +298,19 @@ bool GLES2Object::prepareDraw(){
         }
     }
 
-    if (shadowsMap.size() > 0){
+    if (shadowsMap2D.size() > 0){
         
         std::vector<int> shadowsMapLoc;
         
-        int shadowsSize = (int)shadowsMap.size();
-        if (shadowsSize > 4) shadowsSize = 4;
+        int shadowsSize2D = (int)shadowsMap2D.size();
+        if (shadowsSize2D > 4) shadowsSize2D = 4;
         
-        for (int i = 0; i < shadowsSize; i++){
+        for (int i = 0; i < shadowsSize2D; i++){
             shadowsMapLoc.push_back(i + 1);
             
             glActiveTexture(GL_TEXTURE1 + i);
-            glBindTexture(((GLES2Texture*)(shadowsMap.at(i)->getTextureRender().get()))->getTextureType(),
-                          ((GLES2Texture*)(shadowsMap.at(i)->getTextureRender().get()))->getTexture());
+            glBindTexture(((GLES2Texture*)(shadowsMap2D.at(i)->getTextureRender().get()))->getTextureType(),
+                          ((GLES2Texture*)(shadowsMap2D.at(i)->getTextureRender().get()))->getTexture());
         }
 
         //ATTENTION: Should be the same value os MAXLIGHTS
@@ -314,21 +318,21 @@ bool GLES2Object::prepareDraw(){
             shadowsMapLoc.push_back(shadowsMapLoc[0]);
         }
 
-        glUniform1iv(uShadowsMapLocation, shadowsSize, &shadowsMapLoc.front());
+        glUniform1iv(uShadowsMap2DLocation, shadowsSize2D, &shadowsMapLoc.front());
     }
 
     if (shadowsMapCube.size() > 0){
 
         std::vector<int> shadowsMapCubeLoc;
 
-        int shadowsSize = (int)shadowsMap.size();
+        int shadowsSize2D = (int)shadowsMap2D.size();
         int shadowsSizeCube = (int)shadowsMapCube.size();
-        if (shadowsSizeCube > 4) shadowsSize = 4;
+        if (shadowsSizeCube > 4) shadowsSize2D = 4;
 
         for (int i = 0; i < shadowsSizeCube; i++){
-            shadowsMapCubeLoc.push_back(1 + i + shadowsSize);
+            shadowsMapCubeLoc.push_back(1 + i + shadowsSize2D);
 
-            glActiveTexture(GL_TEXTURE1 + i + shadowsSize);
+            glActiveTexture(GL_TEXTURE1 + i + shadowsSize2D);
             glBindTexture(((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTextureType(),
                           ((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTexture());
         }

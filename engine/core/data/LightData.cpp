@@ -36,11 +36,13 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
     this->directionalLightPower.clear();
     this->directionalLightShadowIdx.clear();
 
-    this->numShadows = 0;
+    this->numShadows2D = 0;
     this->numShadowsCube = 0;
-    this->shadowsMap.clear();
+    this->shadowsMap2D.clear();
     this->shadowsMapCube.clear();
     this->shadowsVPMatrix.clear();
+    this->shadowsBias2D.clear();
+    this->shadowsBiasCube.clear();
 
 
     for ( int i = 0; i < (int)lights->size(); i++){
@@ -83,7 +85,7 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
             this->spotLightCutOff.push_back(cos(lights->at(i)->getSpotAngle() / 2.0));
             
             if (lights->at(i)->isUseShadow()){
-                spotLightShadowIdx.push_back(this->numShadows);
+                spotLightShadowIdx.push_back(this->numShadows2D);
             }else{
                 spotLightShadowIdx.push_back(-1);
             }
@@ -102,7 +104,7 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
             this->directionalLightPower.push_back(lights->at(i)->getPower());
             
             if (lights->at(i)->isUseShadow()){
-                spotLightShadowIdx.push_back(this->numShadows);
+                spotLightShadowIdx.push_back(this->numShadows2D);
             }else{
                 spotLightShadowIdx.push_back(-1);
             }
@@ -111,12 +113,14 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
         if (lights->at(i)->isUseShadow()){
 
             if (lights->at(i)->getType() != S_POINT_LIGHT) {
-                this->numShadows++;
-                this->shadowsMap.push_back(lights->at(i)->getShadowMap());
+                this->numShadows2D++;
+                this->shadowsMap2D.push_back(lights->at(i)->getShadowMap());
                 this->shadowsVPMatrix.push_back(lights->at(i)->getDepthVPMatrix());
+                this->shadowsBias2D.push_back(lights->at(i)->getShadowBias());
             }else {
                 this->numShadowsCube++;
                 this->shadowsMapCube.push_back(lights->at(i)->getShadowMap());
+                this->shadowsBiasCube.push_back(lights->at(i)->getShadowBias());
             }
         }
     }

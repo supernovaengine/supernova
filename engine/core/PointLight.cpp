@@ -6,6 +6,7 @@ using namespace Supernova;
 PointLight::PointLight(): Light(){
     type = S_POINT_LIGHT;
     this->power = 50;
+    this->shadowBias = 0.0001;
 }
 
 PointLight::~PointLight(){

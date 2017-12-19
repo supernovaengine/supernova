@@ -28,6 +28,7 @@ namespace Supernova {
         bool useShadow;
         Texture* shadowMap;
         std::vector<Camera*> lightCameras;
+        float shadowBias;
 
         int shadowMapWidth;
         int shadowMapHeight;
@@ -53,12 +54,14 @@ namespace Supernova {
         Camera* getLightCamera(int index);
         Texture* getShadowMap();
         Matrix4 getDepthVPMatrix();
+        float getShadowBias();
 
         Vector3 getWorldTarget();
 
         void setPower(float power);
         void setColor(Vector3 color);
         void setUseShadow(bool useShadow);
+        void setShadowBias(float shadowBias);
 
         virtual void updateMatrix();
 

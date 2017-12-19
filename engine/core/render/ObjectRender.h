@@ -66,7 +66,7 @@ namespace Supernova {
         bool hasTextureCube;
         bool isSky;
         bool isText;
-        bool hasShadows;
+        bool hasShadows2D;
         bool hasShadowsCube;
         
         SceneRender* sceneRender;
@@ -75,7 +75,7 @@ namespace Supernova {
         
         Texture* texture;
         Program* program;
-        std::vector<Texture*> shadowsMap;
+        std::vector<Texture*> shadowsMap2D;
         std::vector<Texture*> shadowsMapCube;
         
         unsigned int minBufferSize;
@@ -93,7 +93,7 @@ namespace Supernova {
         
         void setTexture(Texture* texture);
         void setProgram(Program* program);
-        void setShadowsMap(std::vector<Texture*> shadowsMap);
+        void setShadowsMap2D(std::vector<Texture*> shadowsMap2D);
         void setShadowsMapCube(std::vector<Texture*> shadowsMapCube);
         void setSceneRender(SceneRender* sceneRender);
         void setLightRender(ObjectRender* lightRender);
@@ -108,7 +108,7 @@ namespace Supernova {
         void setHasTextureCube(bool hasTextureCube);
         void setIsSky(bool isSky);
         void setIsText(bool isText);
-        void setHasShadows(bool hasShadows);
+        void setHasShadows2D(bool hasShadows2D);
         void setHasShadowsCube(bool hasShadowsCube);
 
         void addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);

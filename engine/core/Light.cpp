@@ -16,6 +16,7 @@ Light::Light(){
     this->shadowMap = NULL;
     this->shadowMapWidth = 1024;
     this->shadowMapHeight = 1024;
+    this->shadowBias = 0.001;
 }
 
 Light::Light(int type){
@@ -94,8 +95,20 @@ void Light::setUseShadow(bool useShadow){
     }
 }
 
+void Light::setShadowBias(float shadowBias){
+    if (this->shadowBias != shadowBias){
+        this->shadowBias = shadowBias;
+        if (loaded)
+            load();
+    }
+}
+
 Vector3 Light::getWorldTarget(){
     return this->worldTarget;
+}
+
+float Light::getShadowBias(){
+    return shadowBias;
 }
 
 void Light::updateLightCamera(){

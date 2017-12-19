@@ -22,7 +22,7 @@ namespace Supernova {
         
     public:
 
-        virtual void createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows, bool hasShadowsCube);
+        virtual void createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows2D, bool hasShadowsCube);
         virtual void deleteProgram();
         
         GLuint getProgram();

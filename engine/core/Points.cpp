@@ -422,18 +422,21 @@ bool Points::load(){
     
     render->setTexture(material.getTexture());
     if (scene){
-        render->setHasShadows(scene->getLightData()->shadowsMap.size() > 0);
+        render->setHasShadows2D(scene->getLightData()->shadowsMap2D.size() > 0);
         render->setHasShadowsCube(scene->getLightData()->shadowsMapCube.size() > 0);
 
         render->setSceneRender(scene->getSceneRender());
         render->setLightRender(scene->getLightRender());
         render->setFogRender(scene->getFogRender());
         
-        render->setShadowsMap(scene->getLightData()->shadowsMap);
+        render->setShadowsMap2D(scene->getLightData()->shadowsMap2D);
+        render->addProperty(S_PROPERTY_NUMSHADOWS2D, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows2D);
+        render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsVPMatrix.front());
+        render->addProperty(S_PROPERTY_SHADOWBIAS2D, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsBias2D.front());
+
         render->setShadowsMapCube(scene->getLightData()->shadowsMapCube);
-        render->addProperty(S_PROPERTY_NUMSHADOWS, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows);
-        render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows, &scene->getLightData()->shadowsVPMatrix.front());
         render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR, S_PROPERTYDATA_FLOAT2, 1, &scene->shadowCameraNearFar);
+        render->addProperty(S_PROPERTY_SHADOWBIASCUBE, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsBiasCube.front());
     }
 
     if ((material.getTexture()) && (useTextureRects)){

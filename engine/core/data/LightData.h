@@ -33,11 +33,14 @@ namespace Supernova {
         std::vector<float> directionalLightColor;
         std::vector<int> directionalLightShadowIdx;
 
-        int numShadows;
-        int numShadowsCube;
-        std::vector<Texture*> shadowsMap;
-        std::vector<Texture*> shadowsMapCube;
+        int numShadows2D;
+        std::vector<Texture*> shadowsMap2D;
         std::vector<Matrix4> shadowsVPMatrix;
+        std::vector<float> shadowsBias2D;
+
+        int numShadowsCube;
+        std::vector<Texture*> shadowsMapCube;
+        std::vector<float> shadowsBiasCube;
 
 
         LightData();

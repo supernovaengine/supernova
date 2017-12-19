@@ -23,7 +23,7 @@ ObjectRender::ObjectRender(){
     hasTextureCube = false;
     isSky = false;
     isText = false;
-    hasShadows = false;
+    hasShadows2D = false;
     hasShadowsCube = false;
     
     sceneRender = NULL;
@@ -32,7 +32,7 @@ ObjectRender::ObjectRender(){
     
     texture = NULL;
     program = NULL;
-    shadowsMap.clear();
+    shadowsMap2D.clear();
     shadowsMapCube.clear();
 }
 
@@ -67,8 +67,8 @@ void ObjectRender::setProgram(Program* program){
     programOwned = false;
 }
 
-void ObjectRender::setShadowsMap(std::vector<Texture*> shadowsMap){
-    this->shadowsMap = shadowsMap;
+void ObjectRender::setShadowsMap2D(std::vector<Texture*> shadowsMap2D){
+    this->shadowsMap2D = shadowsMap2D;
 }
 
 void ObjectRender::setShadowsMapCube(std::vector<Texture*> shadowsMapCube){
@@ -156,8 +156,8 @@ void ObjectRender::setIsText(bool isText){
     this->isText = isText;
 }
 
-void ObjectRender::setHasShadows(bool hasShadows){
-    this->hasShadows = hasShadows;
+void ObjectRender::setHasShadows2D(bool hasShadows2D){
+    this->hasShadows2D = hasShadows2D;
 }
 
 void ObjectRender::setHasShadowsCube(bool hasShadowsCube){
@@ -220,7 +220,7 @@ void ObjectRender::loadProgram(){
         if (programShader != -1)
             program->setShader(programShader);
     
-        program->setDefinitions(hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows, hasShadowsCube);
+        program->setDefinitions(hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows2D, hasShadowsCube);
         program->load();
     }
 }
@@ -232,9 +232,9 @@ bool ObjectRender::load(){
     if (texture)
         texture->load();
 
-    for (int i = 0; i < shadowsMap.size(); i++)
-        if (shadowsMap[i])
-            shadowsMap[i]->load();
+    for (int i = 0; i < shadowsMap2D.size(); i++)
+        if (shadowsMap2D[i])
+            shadowsMap2D[i]->load();
 
     for (int i = 0; i < shadowsMapCube.size(); i++)
         if (shadowsMapCube[i])
