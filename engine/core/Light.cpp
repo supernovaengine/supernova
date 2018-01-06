@@ -2,6 +2,7 @@
 
 #include "math/Angle.h"
 #include <stdlib.h>
+#include "Scene.h"
 
 using namespace Supernova;
 
@@ -113,6 +114,11 @@ float Light::getShadowBias(){
 
 void Light::updateLightCamera(){
 
+}
+
+void Light::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    if (scene && !scene->isDrawingShadow())
+        Object::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 }
 
 void Light::updateMatrix(){

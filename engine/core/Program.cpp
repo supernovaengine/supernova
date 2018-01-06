@@ -196,8 +196,11 @@ bool Program::load(){
         }
 
         if (hasShadowsCube) {
-            shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_NEARFAR);
             shaderProperties.push_back(S_PROPERTY_SHADOWBIASCUBE);
+        }
+
+        if (hasShadows2D || hasShadowsCube) {
+            shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_NEARFAR);
         }
 
     }else if (shaderType == S_SHADER_DEPTH_RTT){

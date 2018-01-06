@@ -1,6 +1,7 @@
 #include "Scene.h"
 
 #include "Engine.h"
+#include "DirectionalLight.h"
 
 #include "platform/Log.h"
 #include "GUIObject.h"
@@ -168,9 +169,11 @@ void Scene::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matri
 }
 
 void Scene::setCamera(Camera* camera){
-    if (camera) {
+    if (camera && (camera != this->camera)) {
+        if (this->camera)
+            this->camera->setLinkedScene(NULL);
         this->camera = camera;
-        this->camera->setSceneObject(this);
+        this->camera->setLinkedScene(this);
         userCamera = true;
         if (loaded)
             this->camera->updateMatrix();
@@ -217,7 +220,7 @@ bool Scene::updateCameraSize(){
 void Scene::doCamera(){
     if (this->camera == NULL){
         this->camera = new Camera(S_CAMERA_2D);
-        this->camera->setSceneObject(this);
+        this->camera->setLinkedScene(this);
     }
 }
 
@@ -305,14 +308,15 @@ bool Scene::renderDraw(bool cubeMap, int cubeFace){
         render->setUseTransparency(isUseTransparency());
         render->setUseLight(isUseLight());
         render->setChildScene(isChildScene());
+        render->setUseDepth(isUseDepth());
 
         resetSceneProperties();
     }else{
         render->setUseTransparency(false);
         render->setUseLight(false);
         render->setChildScene(false);
+        render->setUseDepth(true);
     }
-    render->setUseDepth(isUseDepth());
     render->setDrawingShadow(drawingShadow);
 
     bool drawreturn = render->draw();
@@ -355,7 +359,11 @@ bool Scene::draw() {
                 this->isPointShadow = false;
 
                 this->setCamera(lights[i]->getLightCamera());
-                this->shadowCameraNearFar = lights[i]->getLightCamera()->getNearFarPlane();
+                if (lights[i]->getType()==S_DIRECTIONAL_LIGHT) {
+                    this->shadowCameraNearFar = ((DirectionalLight*)lights[i])->getShadowCameraNearFar();
+                }else{
+                    this->shadowCameraNearFar = lights[i]->getLightCamera()->getNearFarPlane();
+                }
 
                 renderDraw();
             }

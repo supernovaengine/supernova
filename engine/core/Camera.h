@@ -15,6 +15,8 @@
 
 namespace Supernova {
 
+    class Scene;
+
     class Camera: public Object {
 
     private:
@@ -46,7 +48,7 @@ namespace Supernova {
         
         bool automatic;
 
-        Object* sceneObject;
+        Scene* linkedScene;
 
     public:
 
@@ -68,6 +70,14 @@ namespace Supernova {
         void setType(int type);
         int getType();
 
+        float getFOV();
+        float getAspect();
+        float getTop();
+        float getBottom();
+        float getLeft();
+        float getRight();
+        float getNear();
+        float getFar();
         Vector2 getNearFarPlane();
         
         void updateAutomaticSizes(Rect rect);
@@ -85,7 +95,7 @@ namespace Supernova {
         void walkForward(float distance);
         void slide(float distance);
 
-        void setSceneObject(Object* scene);
+        void setLinkedScene(Scene* linkedScene);
 
         virtual void updateMatrix();
 

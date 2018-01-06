@@ -11,6 +11,26 @@
 using namespace Supernova;
 
 GLES2Scene::GLES2Scene(): SceneRender() {
+
+    GLint redBits = 0;
+    GLint greenBits = 0;
+    GLint blueBits = 0;
+    GLint alphaBits = 0;
+    GLint stencilBits = 0;
+    GLint depthBits = 0;
+    glGetIntegerv(GL_RED_BITS, &redBits);
+    glGetIntegerv(GL_GREEN_BITS, &greenBits);
+    glGetIntegerv(GL_BLUE_BITS, &blueBits);
+    glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
+    glGetIntegerv(GL_STENCIL_BITS, &stencilBits);
+    glGetIntegerv(GL_DEPTH_BITS, &depthBits);
+    Log::Debug(LOG_TAG, "Red bits: %i", redBits);
+    Log::Debug(LOG_TAG, "Green bits: %i", greenBits);
+    Log::Debug(LOG_TAG, "Blue bits: %i", blueBits);
+    Log::Debug(LOG_TAG, "Alpha bits: %i", alphaBits);
+    Log::Debug(LOG_TAG, "Stencil bits: %i", stencilBits);
+    Log::Debug(LOG_TAG, "Depth bits: %i", depthBits);
+
 }
 
 GLES2Scene::~GLES2Scene() {
@@ -22,10 +42,6 @@ bool GLES2Scene::load() {
     if (!SceneRender::load()){
         return false;
     }
-
-    //GLint depthBits = 0;
-    //glGetIntegerv(GL_DEPTH_BITS, &depthBits);
-    //Log::Debug(LOG_TAG, "Depth bits: %i", depthBits);
 
     GLES2Util::checkGlError("Error on load scene GLES2");
 

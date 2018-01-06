@@ -303,7 +303,7 @@ bool GLES2Object::prepareDraw(){
         std::vector<int> shadowsMapLoc;
         
         int shadowsSize2D = (int)shadowsMap2D.size();
-        if (shadowsSize2D > 4) shadowsSize2D = 4;
+        if (shadowsSize2D > 8) shadowsSize2D = 8;
         
         for (int i = 0; i < shadowsSize2D; i++){
             shadowsMapLoc.push_back(i + 1);
@@ -313,8 +313,8 @@ bool GLES2Object::prepareDraw(){
                           ((GLES2Texture*)(shadowsMap2D.at(i)->getTextureRender().get()))->getTexture());
         }
 
-        //ATTENTION: Should be the same value os MAXLIGHTS
-        while (shadowsMapLoc.size() < 4) {
+        //ATTENTION: Should be the same value os MAXSHADOWS
+        while (shadowsMapLoc.size() < 8) {
             shadowsMapLoc.push_back(shadowsMapLoc[0]);
         }
 
@@ -327,7 +327,7 @@ bool GLES2Object::prepareDraw(){
 
         int shadowsSize2D = (int)shadowsMap2D.size();
         int shadowsSizeCube = (int)shadowsMapCube.size();
-        if (shadowsSizeCube > 4) shadowsSize2D = 4;
+        if ((shadowsSizeCube + shadowsSize2D) > 8) shadowsSizeCube = 8 - shadowsSize2D;
 
         for (int i = 0; i < shadowsSizeCube; i++){
             shadowsMapCubeLoc.push_back(1 + i + shadowsSize2D);
@@ -337,8 +337,8 @@ bool GLES2Object::prepareDraw(){
                           ((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTexture());
         }
 
-        //ATTENTION: Should be the same value os MAXLIGHTS
-        while (shadowsMapCubeLoc.size() < 4) {
+        //ATTENTION: Should be the same value os MAXSHADOWS
+        while (shadowsMapCubeLoc.size() < 8) {
             shadowsMapCubeLoc.push_back(shadowsMapCubeLoc[0]);
         }
 

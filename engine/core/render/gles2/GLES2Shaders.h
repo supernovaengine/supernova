@@ -14,8 +14,9 @@ std::string lightingVertexDec =
 
 "  #ifdef HAS_SHADOWS2D\n"
 "    uniform int u_NumShadows2D;\n"
-"    uniform mat4 u_ShadowVP[MAXLIGHTS];\n"
-"    varying vec4 v_ShadowCoordinates[MAXLIGHTS];\n"
+"    uniform mat4 u_ShadowVP[MAXSHADOWS];\n"
+"    varying vec4 v_ShadowCoordinates[MAXSHADOWS];\n"
+"    varying float v_ClipSpacePosZ;\n"
 "  #endif\n"
 
 "#endif\n";
@@ -27,13 +28,14 @@ std::string lightingVertexImp =
 "  v_Normal = normalize(mat3(u_nMatrix) * a_Normal);\n"
 
 "  #ifdef HAS_SHADOWS2D\n"
-"    for(int i=0; i<MAXLIGHTS; ++i){\n"
+"    for(int i=0; i<MAXSHADOWS; ++i){\n"
 "        if (i < u_NumShadows2D){\n"
 "            v_ShadowCoordinates[i] = u_ShadowVP[i] * vec4(v_Position, 1.0);\n"
 "        }else{\n"
 "            v_ShadowCoordinates[i] = vec4(0.0);\n"
 "        }\n"
 "    }\n"
+"    v_ClipSpacePosZ = position.z;\n"
 "  #endif\n"
 
 "#endif\n";
@@ -69,14 +71,16 @@ std::string lightingFragmentDec =
 "  varying vec3 v_Normal;\n"
 
 "  #ifdef HAS_SHADOWS2D\n"
-"    varying vec4 v_ShadowCoordinates[MAXLIGHTS];\n"
-"    uniform sampler2D u_shadowsMap2D[MAXLIGHTS];\n"
-"    uniform float u_shadowBias2D[MAXLIGHTS];\n"
+"    uniform sampler2D u_shadowsMap2D[MAXSHADOWS];\n"
+"    uniform float u_shadowBias2D[MAXSHADOWS];\n"
+"    varying vec4 v_ShadowCoordinates[MAXSHADOWS];\n"
+"    varying float v_ClipSpacePosZ;\n"
+"    uniform vec2 u_shadowCameraNearFar;\n"
 "  #endif\n"
 "  #ifdef HAS_SHADOWSCUBE\n"
-"    uniform samplerCube u_shadowsMapCube[MAXLIGHTS];\n"
+"    uniform samplerCube u_shadowsMapCube[MAXSHADOWS];\n"
+"    uniform float u_shadowBiasCube[MAXSHADOWS];\n"
 "    uniform vec2 u_shadowCameraNearFar;\n"
-"    uniform float u_shadowBiasCube[MAXLIGHTS];\n"
 "  #endif\n"
 
 "    float unpackDepth(in vec4 color) {\n"
@@ -91,8 +95,8 @@ std::string lightingFragmentDec =
 //"       float depth = unpackDepth(rgbaDepth);\n"
 "       float depth = rgbaDepth.r;\n"
 "       float bias = shadowBias*tan(acos(cosTheta));\n"
-"       bias = clamp(bias, 0.0, 0.01);\n"
-"       if (shadowCoord.z > depth + bias){\n"
+"       bias = clamp(bias, 0.0000001, 0.01);\n"
+"       if ((v_ClipSpacePosZ <= u_shadowCameraNearFar.y) && (shadowCoord.z > depth + bias)){\n"
 "           return true;\n"
 "       }\n"
 "        return false;\n"
@@ -100,11 +104,11 @@ std::string lightingFragmentDec =
 "  #endif\n"
 
 "  #ifdef HAS_SHADOWSCUBE\n"
-"    bool checkShadowCube(vec3 vPosition, vec3 lightPos, samplerCube shadowMap, float shadowBias, vec2 shadowCameraNearFar) {\n"
+"    bool checkShadowCube(vec3 lightPos, samplerCube shadowMap, float shadowBias) {\n"
 "        lightPos = vec3(lightPos.x, lightPos.y, lightPos.z);\n"
-"        vec3 fragToLight = vPosition - lightPos;\n"
+"        vec3 fragToLight = v_Position - lightPos;\n"
 "        float lenDepthMap = unpackDepth(textureCube(shadowMap, fragToLight));\n"
-"        float lenToLight = (length(fragToLight) - shadowCameraNearFar.x) / (shadowCameraNearFar.y - shadowCameraNearFar.x);\n"
+"        float lenToLight = (length(fragToLight) - u_shadowCameraNearFar.x) / (u_shadowCameraNearFar.y - u_shadowCameraNearFar.x);\n"
 "        float bias = shadowBias;\n"
 "        if ((lenToLight < 1.0 - bias) && (lenToLight > lenDepthMap + bias)){\n"
 "            return true;\n"
@@ -142,11 +146,11 @@ std::string lightingFragmentImp =
 "             bool inShadow = false;\n"
 "             #ifdef HAS_SHADOWSCUBE\n"
 "               if (u_PointLightShadowIdx[i] == i){\n"
-"                   inShadow = checkShadowCube(v_Position, u_PointLightPos[i], u_shadowsMapCube[i], u_shadowBiasCube[i], u_shadowCameraNearFar);\n"
+"                   inShadow = checkShadowCube(u_PointLightPos[i], u_shadowsMapCube[i], u_shadowBiasCube[i]);\n"
 "               }else{\n"
-"                   for(int j = 0; j < MAXLIGHTS; ++j){\n"
+"                   for(int j = 0; j < MAXSHADOWS; ++j){\n"
 "                       if (u_PointLightShadowIdx[i] == j){\n"
-"                           inShadow = checkShadowCube(v_Position, u_PointLightPos[i], u_shadowsMapCube[j], u_shadowBiasCube[j], u_shadowCameraNearFar);\n"
+"                           inShadow = checkShadowCube(u_PointLightPos[i], u_shadowsMapCube[j], u_shadowBiasCube[j]);\n"
 "                           break;\n"
 "                       }\n"
 "                   }\n"
@@ -181,7 +185,7 @@ std::string lightingFragmentImp =
 "               if (u_SpotLightShadowIdx[i] == i){\n"
 "                   inShadow = checkShadow(v_ShadowCoordinates[i], u_shadowsMap2D[i], u_shadowBias2D[i], SpotLightcosTheta);\n"
 "               }else{\n"
-"                   for(int j = 0; j < MAXLIGHTS; ++j){\n"
+"                   for(int j = 0; j < MAXSHADOWS; ++j){\n"
 "                       if (u_SpotLightShadowIdx[i] == j){\n"
 "                           inShadow = checkShadow(v_ShadowCoordinates[j], u_shadowsMap2D[j], u_shadowBias2D[j], SpotLightcosTheta);\n"
 "                           break;\n"
@@ -213,7 +217,7 @@ std::string lightingFragmentImp =
 "               if (u_DirectionalShadowIdx[i] == i){\n"
 "                   inShadow = checkShadow(v_ShadowCoordinates[i], u_shadowsMap2D[i], u_shadowBias2D[i], DirectionalLightcosTheta);\n"
 "               }else{\n"
-"                   for(int j = 0; j < MAXLIGHTS; ++j){\n"
+"                   for(int j = 0; j < MAXSHADOWS; ++j){\n"
 "                       if (u_DirectionalShadowIdx[i] == j){\n"
 "                           inShadow = checkShadow(v_ShadowCoordinates[j], u_shadowsMap2D[j], u_shadowBias2D[j], DirectionalLightcosTheta);\n"
 "                           break;\n"
@@ -282,8 +286,6 @@ std::string gVertexPointsPerPixelLightShader =
 
 "void main(){\n"
 
-+    lightingVertexImp +
-
 "    vec4 position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
 
 "    v_pointColor = a_pointColor;\n"
@@ -292,6 +294,8 @@ std::string gVertexPointsPerPixelLightShader =
 "    #ifdef HAS_TEXTURERECT\n"
 "      v_textureRect = a_textureRect;\n"
 "    #endif\n"
+
++    lightingVertexImp +
 
 "    gl_Position = position;\n"
 "}\n";
@@ -350,8 +354,6 @@ std::string gVertexMeshPerPixelLightShader =
 
 "void main(){\n"
 
-+ lightingVertexImp +
-
 "    vec4 position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
 
 "    #ifdef USE_TEXTURECOORDS\n"
@@ -371,7 +373,10 @@ std::string gVertexMeshPerPixelLightShader =
 "      position.z = position.w;\n"
 "    #endif\n"
 
++ lightingVertexImp +
+
 "    gl_Position = position;\n"
+
 "}\n";
 
 std::string gFragmentMeshPerPixelLightShader =

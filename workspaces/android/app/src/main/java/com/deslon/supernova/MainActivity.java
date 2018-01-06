@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
 			glSurfaceView = new GLSurfaceView(this);
 
 			//if (isProbablyEmulator())
-			glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 24, 0);
+			glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 24, 8);
 
 			DisplayMetrics dm = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(dm);

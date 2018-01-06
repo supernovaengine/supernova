@@ -73,6 +73,7 @@ void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, boo
     if (hasLight){
         definitions += "#define USE_LIGHTING\n";
         definitions += "#define MAXLIGHTS 4\n";
+        definitions += "#define MAXSHADOWS 8\n";
     }
     if (hasFog){
         definitions += "#define HAS_FOG\n";

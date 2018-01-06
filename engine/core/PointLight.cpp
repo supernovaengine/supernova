@@ -1,5 +1,6 @@
 #include "PointLight.h"
 #include "math/Angle.h"
+#include "Scene.h"
 
 using namespace Supernova;
 

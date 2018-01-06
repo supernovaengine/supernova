@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "Engine.h"
 #include "math/Angle.h"
+#include "Scene.h"
 
 using namespace Supernova;
 
@@ -20,15 +21,21 @@ Camera::Camera() : Object(){
 
     //PERSPECTIVE
     y_fov = 0.75;
-    aspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
+
+    if (Engine::getCanvasWidth() != 0 && Engine::getCanvasHeight() != 0) {
+        aspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
+    }else{
+        aspect = 1.0;
+    }
+
     perspectiveNear = 1;
-    perspectiveFar = 5000;
+    perspectiveFar = 2000;
 
     type = S_CAMERA_PERSPECTIVE;
     
     automatic = true;
 
-    sceneObject = NULL;
+    linkedScene = NULL;
 
 }
 
@@ -117,8 +124,46 @@ int Camera::getType(){
     return type;
 }
 
+float Camera::getFOV(){
+    return y_fov;
+}
+
+float Camera::getAspect(){
+    return aspect;
+}
+
+float Camera::getTop(){
+    return top;
+}
+
+float Camera::getBottom(){
+    return bottom;
+}
+
+float Camera::getLeft(){
+    return left;
+}
+
+float Camera::getRight(){
+    return right;
+}
+
+float Camera::getNear(){
+    if (type == S_CAMERA_PERSPECTIVE)
+        return perspectiveNear;
+    else
+        return orthoNear;
+}
+
+float Camera::getFar(){
+    if (type == S_CAMERA_PERSPECTIVE)
+        return perspectiveFar;
+    else
+        return orthoFar;
+}
+
 Vector2 Camera::getNearFarPlane(){
-    if (type==S_CAMERA_PERSPECTIVE)
+    if (type == S_CAMERA_PERSPECTIVE)
         return Vector2(perspectiveNear, perspectiveFar);
     else
         return Vector2(orthoNear, orthoFar);
@@ -318,8 +363,8 @@ Ray Camera::pointsToRay(float x, float y) {
     return Ray(near_point_ray, vector_between);
 }
 
-void Camera::setSceneObject(Object* scene){
-    this->sceneObject = scene;
+void Camera::setLinkedScene(Scene* linkedScene){
+    this->linkedScene = linkedScene;
 }
 
 void Camera::updateMatrix(){
@@ -349,7 +394,7 @@ void Camera::updateMatrix(){
 
     viewProjectionMatrix = projectionMatrix * viewMatrix;
 
-    if (sceneObject != NULL){
-        sceneObject->updateVPMatrix(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
+    if (linkedScene && (linkedScene->getCamera() == this)){
+        linkedScene->updateVPMatrix(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
     }
 }
