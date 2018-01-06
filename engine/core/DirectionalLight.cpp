@@ -113,34 +113,41 @@ void DirectionalLight::configLightOrthoCamera(Camera* lightCamera, Camera* scene
 
 void DirectionalLight::updateLightCamera(){
 
-    if (scene){
+    if (lightCameras.size() > 0) {
+        if (scene && !scene->isDrawingShadow()) {
 
-        lightCameras[0]->setPosition(Vector3(0,0,0));
-        lightCameras[0]->setView(getDirection());
+            lightCameras[0]->setPosition(Vector3(0, 0, 0));
+            lightCameras[0]->setView(getDirection());
 
-        //TODO: Check this
-        Vector3 cameraDirection = (lightCameras[0]->getPosition() - lightCameras[0]->getView()).normalize();
-        if (cameraDirection == Vector3(0, 1, 0)) {
-            lightCameras[0]->setUp(0, 0, 1);
-        } else {
-            lightCameras[0]->setUp(0, 1, 0);
+            //TODO: Check this
+            Vector3 cameraDirection = (lightCameras[0]->getPosition() - lightCameras[0]->getView()).normalize();
+            if (cameraDirection == Vector3(0, 1, 0)) {
+                lightCameras[0]->setUp(0, 0, 1);
+            } else {
+                lightCameras[0]->setUp(0, 1, 0);
+            }
+
+            configLightOrthoCamera(lightCameras[0], scene->getCamera());
+
         }
 
-        configLightOrthoCamera(lightCameras[0], scene->getCamera());
-
+        depthVPMatrix = (*lightCameras[0]->getViewProjectionMatrix());
     }
-
-    depthVPMatrix = (*lightCameras[0]->getViewProjectionMatrix());
 
     Light::updateLightCamera();
 }
 
 void DirectionalLight::setDirection(Vector3 direction){
-    this->direction = direction;
+    if (this->direction != direction) {
+        this->direction = direction;
+
+        updateLightCamera();
+
+    }
 }
 
 void DirectionalLight::setDirection(float x, float y, float z){
-    this->direction = Vector3(x, y, z);
+    setDirection(Vector3(x, y, z));
 }
 
 Vector2 DirectionalLight::getShadowCameraNearFar(){
@@ -150,9 +157,12 @@ Vector2 DirectionalLight::getShadowCameraNearFar(){
 void DirectionalLight::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
     Light::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
-    if (scene && !scene->isDrawingShadow())
-        if (lightCameras.size() > 0)
+    if (scene && !scene->isDrawingShadow()) {
+        if (sceneCameraViewProjection != *viewProjectionMatrix) {
+            sceneCameraViewProjection = *viewProjectionMatrix;
             updateLightCamera();
+        }
+    }
 }
 
 bool DirectionalLight::loadShadow(){

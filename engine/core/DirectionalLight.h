@@ -10,6 +10,8 @@ namespace Supernova {
 
     private:
 
+        Matrix4 sceneCameraViewProjection;
+
         void configLightOrthoCamera(Camera* lightCamera, Camera* sceneCamera);
 
     protected:
