@@ -13,6 +13,7 @@ namespace Supernova {
         Matrix4 sceneCameraViewProjection;
 
         void configLightOrthoCamera(Camera* lightCamera, Matrix4 sceneCameraInv);
+        float lerp(float a, float b, float fraction);
 
     protected:
 

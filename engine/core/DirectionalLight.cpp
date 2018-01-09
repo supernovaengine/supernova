@@ -57,19 +57,23 @@ void DirectionalLight::configLightOrthoCamera(Camera* lightCamera, Matrix4 scene
 
 }
 
+float DirectionalLight::lerp(float a, float b, float fraction) {
+    return (a * (1.0f - fraction)) + (b * fraction);
+}
+
 void DirectionalLight::updateLightCamera(){
 
     if (lightCameras.size() > 0) {
 
         if (scene && !scene->isDrawingShadow()) {
 
-            float zFar = 500;
-            float zNear = 0;
+            float zFar = 1000;
+            float zNear = 1;
             float fov = 0;
             float ratio = 1;
 
-            auto splitFar = std::vector<float> { 50, 200, 1000 };
-            auto splitNear = std::vector<float> { 1, 50, 200 };
+            std::vector<float> splitFar;
+            std::vector<float> splitNear;
 
             if (scene->getCamera()->getType() == S_CAMERA_PERSPECTIVE) {
 
@@ -91,23 +95,20 @@ void DirectionalLight::updateLightCamera(){
                 fov = atanf(1.f / projection[1][1]) * 2.f;
                 ratio = projection[1][1] / projection[0][0];
 
-                //https://github.com/aerys/minko/blob/master/framework/src/minko/component/DirectionalLight.cpp
-                /*
-                int numShadowCascades = 4;
-                auto splitFar = std::vector<float> { zFar, zFar, zFar, zFar };
-                auto splitNear = std::vector<float> { zNear, zNear, zNear, zNear };
+                splitFar = std::vector<float> { zFar, zFar, zFar };
+                splitNear = std::vector<float> { zNear, zNear, zNear };
                 float lambda = .5f;
                 float j = 1.f;
                 for (auto i = 0u; i < numShadowCascades - 1; ++i, j+= 1.f)
                 {
-                    splitFar[i] = math::mix(
+                    splitFar[i] = lerp(
                             zNear + (j / (float)numShadowCascades) * (zFar - zNear),
                             zNear * powf(zFar / zNear, j / (float)numShadowCascades),
                             lambda
                     );
                     splitNear[i + 1] = splitFar[i];
                 }
-                */
+
             }
 
             for (int ca = 0; ca < numShadowCascades; ca++) {
@@ -129,7 +130,6 @@ void DirectionalLight::updateLightCamera(){
 
                     Matrix4 cameraProjection = Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca], splitFar[ca]);
                     sceneCameraInv = (cameraProjection * *scene->getCamera()->getViewMatrix()).getInverse();
-                    //sceneCameraInv = (*scene->getCamera()->getViewMatrix()).getInverse();
 
                     cascadeCameraNearFar[ca] = Vector2(splitNear[ca], splitFar[ca]);
 
