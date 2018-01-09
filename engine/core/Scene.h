@@ -28,9 +28,9 @@ namespace Supernova {
         ObjectRender* fogRender;
         Texture* textureRender;
 
-        Vector3 shadowLightPos;
-        Vector2 shadowCameraNearFar;
-        bool isPointShadow;
+        Vector3 drawShadowLightPos;
+        Vector2 drawShadowCameraNearFar;
+        bool drawIsPointShadow;
         
         LightData lightData;
 
@@ -81,7 +81,7 @@ namespace Supernova {
         SceneRender* getSceneRender();
         ObjectRender* getLightRender();
         ObjectRender* getFogRender();
-        Vector3 getShadowLightPos();
+        Vector3 getDrawShadowLightPos();
 
         void setAmbientLight(Vector3 ambientLight);
         void setAmbientLight(const float ambientFactor);

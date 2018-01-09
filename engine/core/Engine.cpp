@@ -62,7 +62,7 @@ unsigned int Engine::updateTime = 30;
 
 
 Engine::Engine() {
-    
+    this->mainScene = NULL;
 }
 
 Engine::~Engine() {

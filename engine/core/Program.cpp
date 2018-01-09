@@ -171,6 +171,7 @@ bool Program::load(){
             shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_COLOR);
             shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_TARGET);
             shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_CUTOFF);
+            shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_OUTERCUTOFF);
             shaderProperties.push_back(S_PROPERTY_SPOTLIGHT_SHADOWIDX);
 
             shaderProperties.push_back(S_PROPERTY_NUMDIRLIGHT);
@@ -193,14 +194,13 @@ bool Program::load(){
             shaderProperties.push_back(S_PROPERTY_DEPTHVPMATRIX);
             shaderProperties.push_back(S_PROPERTY_NUMSHADOWS2D);
             shaderProperties.push_back(S_PROPERTY_SHADOWBIAS2D);
+            shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_NEARFAR2D);
+            shaderProperties.push_back(S_PROPERTY_NUMCASCADES2D);
         }
 
         if (hasShadowsCube) {
             shaderProperties.push_back(S_PROPERTY_SHADOWBIASCUBE);
-        }
-
-        if (hasShadows2D || hasShadowsCube) {
-            shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_NEARFAR);
+            shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_NEARFARCUBE);
         }
 
     }else if (shaderType == S_SHADER_DEPTH_RTT){

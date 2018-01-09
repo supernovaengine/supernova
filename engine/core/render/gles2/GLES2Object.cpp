@@ -177,6 +177,8 @@ bool GLES2Object::load(){
             propertyName = "u_SpotLightTarget";
         }else if (type == S_PROPERTY_SPOTLIGHT_CUTOFF){
             propertyName = "u_SpotLightCutOff";
+        }else if (type == S_PROPERTY_SPOTLIGHT_OUTERCUTOFF){
+            propertyName = "u_SpotLightOuterCutOff";
         }else if (type == S_PROPERTY_SPOTLIGHT_SHADOWIDX){
             propertyName = "u_SpotLightShadowIdx";
         }else if (type == S_PROPERTY_NUMDIRLIGHT){
@@ -211,6 +213,12 @@ bool GLES2Object::load(){
             propertyName = "u_shadowBias2D";
         }else if (type == S_PROPERTY_SHADOWBIASCUBE){
             propertyName = "u_shadowBiasCube";
+        }else if (type == S_PROPERTY_SHADOWCAMERA_NEARFAR2D){
+            propertyName = "u_shadowCameraNearFar2D";
+        }else if (type == S_PROPERTY_SHADOWCAMERA_NEARFARCUBE){
+            propertyName = "u_shadowCameraNearFarCube";
+        }else if (type == S_PROPERTY_NUMCASCADES2D){
+            propertyName = "u_shadowNumCascades2D";
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());
@@ -303,7 +311,7 @@ bool GLES2Object::prepareDraw(){
         std::vector<int> shadowsMapLoc;
         
         int shadowsSize2D = (int)shadowsMap2D.size();
-        if (shadowsSize2D > 8) shadowsSize2D = 8;
+        if (shadowsSize2D > MAXSHADOWS_GLES2) shadowsSize2D = MAXSHADOWS_GLES2;
         
         for (int i = 0; i < shadowsSize2D; i++){
             shadowsMapLoc.push_back(i + 1);
@@ -313,8 +321,7 @@ bool GLES2Object::prepareDraw(){
                           ((GLES2Texture*)(shadowsMap2D.at(i)->getTextureRender().get()))->getTexture());
         }
 
-        //ATTENTION: Should be the same value os MAXSHADOWS
-        while (shadowsMapLoc.size() < 8) {
+        while (shadowsMapLoc.size() < MAXSHADOWS_GLES2) {
             shadowsMapLoc.push_back(shadowsMapLoc[0]);
         }
 
@@ -327,7 +334,7 @@ bool GLES2Object::prepareDraw(){
 
         int shadowsSize2D = (int)shadowsMap2D.size();
         int shadowsSizeCube = (int)shadowsMapCube.size();
-        if ((shadowsSizeCube + shadowsSize2D) > 8) shadowsSizeCube = 8 - shadowsSize2D;
+        if ((shadowsSizeCube + shadowsSize2D) > MAXSHADOWS_GLES2) shadowsSizeCube = MAXSHADOWS_GLES2 - shadowsSize2D;
 
         for (int i = 0; i < shadowsSizeCube; i++){
             shadowsMapCubeLoc.push_back(1 + i + shadowsSize2D);
@@ -337,8 +344,7 @@ bool GLES2Object::prepareDraw(){
                           ((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTexture());
         }
 
-        //ATTENTION: Should be the same value os MAXSHADOWS
-        while (shadowsMapCubeLoc.size() < 8) {
+        while (shadowsMapCubeLoc.size() < MAXSHADOWS_GLES2) {
             shadowsMapCubeLoc.push_back(shadowsMapCubeLoc[0]);
         }
 

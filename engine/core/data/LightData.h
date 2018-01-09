@@ -21,10 +21,11 @@ namespace Supernova {
         
         int numSpotLight;
         std::vector<float> spotLightPos;
-        std::vector<float> spotLightPower;
         std::vector<float> spotLightColor;
-        std::vector<float> spotLightCutOff;
         std::vector<float> spotLightTarget;
+        std::vector<float> spotLightPower;
+        std::vector<float> spotLightCutOff;
+        std::vector<float> spotLightOuterCutOff;
         std::vector<int> spotLightShadowIdx;
         
         int numDirectionalLight;
@@ -37,10 +38,13 @@ namespace Supernova {
         std::vector<Texture*> shadowsMap2D;
         std::vector<Matrix4> shadowsVPMatrix;
         std::vector<float> shadowsBias2D;
+        std::vector<Vector2> shadowsCameraNearFar2D;
+        std::vector<int> shadowNumCascades2D;
 
         int numShadowsCube;
         std::vector<Texture*> shadowsMapCube;
         std::vector<float> shadowsBiasCube;
+        std::vector<Vector2> shadowsCameraNearFarCube;
 
 
         LightData();

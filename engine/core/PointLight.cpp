@@ -59,10 +59,9 @@ bool PointLight::loadShadow(){
             lightCameras.push_back(new Camera());
             lightCameras.push_back(new Camera());
         }
-        updateLightCamera();
 
-        if (!shadowMap) {
-            shadowMap = new Texture(shadowMapWidth, shadowMapHeight);
+        if (shadowMap.size()==0) {
+            shadowMap.push_back(new Texture(shadowMapWidth, shadowMapHeight));
 
             char rand_id[10];
             static const char alphanum[] =
@@ -73,9 +72,11 @@ bool PointLight::loadShadow(){
                 rand_id[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
             }
 
-            shadowMap->setId("shadowCubeMap|" + std::string(rand_id));
-            shadowMap->setType(S_TEXTURE_FRAME_CUBE);
+            shadowMap[0]->setId("shadowCubeMap|" + std::string(rand_id));
+            shadowMap[0]->setType(S_TEXTURE_FRAME_CUBE);
         }
+
+        updateLightCamera();
     }
 
     return Light::loadShadow();

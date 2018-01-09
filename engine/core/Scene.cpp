@@ -27,9 +27,9 @@ Scene::Scene() {
     fogRender = NULL;
     textureRender = NULL;
 
-    shadowLightPos = Vector3();
-    shadowCameraNearFar = Vector2();
-    isPointShadow = false;
+    drawShadowLightPos = Vector3();
+    drawShadowCameraNearFar = Vector2();
+    drawIsPointShadow = false;
 }
 
 Scene::~Scene() {
@@ -116,8 +116,8 @@ ObjectRender* Scene::getFogRender(){
     return fogRender;
 }
 
-Vector3 Scene::getShadowLightPos(){
-    return shadowLightPos;
+Vector3 Scene::getDrawShadowLightPos(){
+    return drawShadowLightPos;
 }
 
 void Scene::setSky(SkyBox* sky){
@@ -343,29 +343,43 @@ bool Scene::draw() {
     for (int i=0; i<lights.size(); i++) {
         if (lights[i]->isUseShadow()) {
             drawingShadow = true;
-            this->setTextureRender(lights[i]->getShadowMap());
-            this->shadowLightPos = lights[i]->getPosition();
 
-            if (lights[i]->getType()==S_POINT_LIGHT) {
-                this->isPointShadow = true;
+            this->drawShadowLightPos = lights[i]->getPosition();
 
+            if (lights[i]->getType() == S_POINT_LIGHT) {
+
+                this->drawIsPointShadow = true;
+
+                this->setTextureRender(lights[i]->getShadowMap());
                 for (int cam = 0; cam < 6; cam++){
                     this->setCamera(lights[i]->getLightCamera(cam));
-                    this->shadowCameraNearFar = lights[i]->getLightCamera(cam)->getNearFarPlane();
+                    this->drawShadowCameraNearFar = lights[i]->getLightCamera(cam)->getNearFarPlane();
 
                     renderDraw(true, TEXTURE_CUBE_FACE_POSITIVE_X + cam);
                 }
-            }else{
-                this->isPointShadow = false;
 
+            }else if (lights[i]->getType() == S_SPOT_LIGHT) {
+
+                this->drawIsPointShadow = false;
+
+                this->setTextureRender(lights[i]->getShadowMap());
                 this->setCamera(lights[i]->getLightCamera());
-                if (lights[i]->getType()==S_DIRECTIONAL_LIGHT) {
-                    this->shadowCameraNearFar = ((DirectionalLight*)lights[i])->getShadowCameraNearFar();
-                }else{
-                    this->shadowCameraNearFar = lights[i]->getLightCamera()->getNearFarPlane();
-                }
+                this->drawShadowCameraNearFar = lights[i]->getLightCamera()->getNearFarPlane();
 
                 renderDraw();
+
+            }else if (lights[i]->getType() == S_DIRECTIONAL_LIGHT) {
+
+                this->drawIsPointShadow = false;
+
+                for (int ca = 0; ca < ((DirectionalLight*)lights[i])->getNumShadowCasdades(); ca++) {
+                    this->setTextureRender(lights[i]->getShadowMap(ca));
+                    this->setCamera(lights[i]->getLightCamera(ca));
+                    this->drawShadowCameraNearFar = lights[i]->getLightCamera(ca)->getNearFarPlane();
+
+                    renderDraw();
+                }
+
             }
 
         }
@@ -420,6 +434,7 @@ bool Scene::load(){
         lightRender->addProperty(S_PROPERTY_SPOTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightColor.front());
         lightRender->addProperty(S_PROPERTY_SPOTLIGHT_TARGET, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightTarget.front());
         lightRender->addProperty(S_PROPERTY_SPOTLIGHT_CUTOFF, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightCutOff.front());
+        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_OUTERCUTOFF, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightOuterCutOff.front());
         lightRender->addProperty(S_PROPERTY_SPOTLIGHT_SHADOWIDX, S_PROPERTYDATA_INT1, lightData.numSpotLight, &lightData.spotLightShadowIdx.front());
 
         lightRender->addProperty(S_PROPERTY_NUMDIRLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numDirectionalLight);

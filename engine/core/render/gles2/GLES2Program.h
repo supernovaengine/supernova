@@ -2,6 +2,10 @@
 #ifndef GLES2Program_h
 #define GLES2Program_h
 
+#define MAXLIGHTS_GLES2 4
+#define MAXSHADOWS_GLES2 7
+#define MAXCASCADES_GLES2 3
+
 #include "GLES2Header.h"
 #include "render/ProgramRender.h"
 #include <string>

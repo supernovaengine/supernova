@@ -5,7 +5,8 @@ using namespace Supernova;
 const Vector4 Vector4::ZERO( 0, 0, 0, 0 );
 
 
-Vector4::Vector4(){
+Vector4::Vector4()
+        : x(0), y(0), z(0), w(0){
 }
 
 Vector4::Vector4( const float fX, const float fY, const float fZ, const float fW ): x( fX ), y( fY ), z( fZ ), w( fW){

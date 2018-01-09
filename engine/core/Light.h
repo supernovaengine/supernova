@@ -20,20 +20,20 @@ namespace Supernova {
         Vector3 direction;
         float power;
         float spotAngle;
+        float spotOuterAngle;
 
         Vector3 worldTarget;
 
         int type;
 
         bool useShadow;
-        Texture* shadowMap;
+        std::vector<Texture*> shadowMap;
         std::vector<Camera*> lightCameras;
+        std::vector<Matrix4> depthVPMatrix;
         float shadowBias;
 
         int shadowMapWidth;
         int shadowMapHeight;
-
-        Matrix4 depthVPMatrix;
 
         virtual void updateLightCamera();
 
@@ -49,11 +49,14 @@ namespace Supernova {
         Vector3 getDirection();
         float getPower();
         float getSpotAngle();
+        float getSpotOuterAngle();
         bool isUseShadow();
         Camera* getLightCamera();
         Camera* getLightCamera(int index);
         Texture* getShadowMap();
+        Texture* getShadowMap(int index);
         Matrix4 getDepthVPMatrix();
+        Matrix4 getDepthVPMatrix(int index);
         float getShadowBias();
 
         Vector3 getWorldTarget();

@@ -12,12 +12,16 @@ Light::Light(){
     this->target = Vector3(0.0, 0.0, 0.0);
     this->direction = Vector3(0.0, 0.0, 0.0);
     this->spotAngle = Angle::degToRad(20);
+    this->spotOuterAngle = Angle::degToRad(20);
     this->power = 1;
     this->useShadow = true;
-    this->shadowMap = NULL;
     this->shadowMapWidth = 1024;
     this->shadowMapHeight = 1024;
     this->shadowBias = 0.001;
+
+    this->shadowMap.clear();
+    this->lightCameras.clear();
+    this->depthVPMatrix.clear();
 }
 
 Light::Light(int type){
@@ -30,8 +34,9 @@ Light::~Light() {
     }
     lightCameras.clear();
 
-    if (shadowMap)
-        delete shadowMap;
+    if (shadowMap.size() > 0)
+        for (int i = 0; i < shadowMap.size(); i++)
+            delete shadowMap[i];
 
     destroy();
 }
@@ -60,6 +65,10 @@ float Light::getSpotAngle(){
     return spotAngle;
 }
 
+float Light::getSpotOuterAngle(){
+    return spotOuterAngle;
+}
+
 bool Light::isUseShadow(){
     return useShadow;
 }
@@ -73,11 +82,19 @@ Camera* Light::getLightCamera(int index){
 }
 
 Texture* Light::getShadowMap(){
-    return shadowMap;
+    return shadowMap[0];
+}
+
+Texture* Light::getShadowMap(int index){
+    return shadowMap[index];
 }
 
 Matrix4 Light::getDepthVPMatrix(){
-    return depthVPMatrix;
+    return depthVPMatrix[0];
+}
+
+Matrix4 Light::getDepthVPMatrix(int index){
+    return depthVPMatrix[index];
 }
 
 void Light::setPower(float power){
@@ -133,7 +150,9 @@ void Light::updateMatrix(){
 
 bool Light::loadShadow(){
     if (useShadow){
-        shadowMap->load();
+        if (shadowMap.size() > 0)
+            for (int i = 0; i < shadowMap.size(); i++)
+                shadowMap[i]->load();
     }
 
     return true;

@@ -1,4 +1,5 @@
 #include "LightData.h"
+#include "DirectionalLight.h"
 #include "math/Angle.h"
 
 
@@ -28,6 +29,7 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
     this->spotLightTarget.clear();
     this->spotLightPower.clear();
     this->spotLightCutOff.clear();
+    this->spotLightOuterCutOff.clear();
     this->spotLightShadowIdx.clear();
     
     this->numDirectionalLight = 0;
@@ -43,7 +45,9 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
     this->shadowsVPMatrix.clear();
     this->shadowsBias2D.clear();
     this->shadowsBiasCube.clear();
-
+    this->shadowsCameraNearFar2D.clear();
+    this->shadowsCameraNearFarCube.clear();
+    this->shadowNumCascades2D.clear();
 
     for ( int i = 0; i < (int)lights->size(); i++){
         if (lights->at(i)->getType() == S_POINT_LIGHT){
@@ -60,9 +64,9 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
             this->pointLightPower.push_back(lights->at(i)->getPower());
             
             if (lights->at(i)->isUseShadow()){
-                spotLightShadowIdx.push_back(this->numShadowsCube);
+                this->pointLightShadowIdx.push_back(this->numShadowsCube);
             }else{
-                spotLightShadowIdx.push_back(-1);
+                this->pointLightShadowIdx.push_back(-1);
             }
         }
         if (lights->at(i)->getType() == S_SPOT_LIGHT){
@@ -83,11 +87,12 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
             this->spotLightPower.push_back(lights->at(i)->getPower());
             
             this->spotLightCutOff.push_back(cos(lights->at(i)->getSpotAngle() / 2.0));
+            this->spotLightOuterCutOff.push_back(cos(lights->at(i)->getSpotOuterAngle() / 2.0));
             
             if (lights->at(i)->isUseShadow()){
-                spotLightShadowIdx.push_back(this->numShadows2D);
+                this->spotLightShadowIdx.push_back(this->numShadows2D);
             }else{
-                spotLightShadowIdx.push_back(-1);
+                this->spotLightShadowIdx.push_back(-1);
             }
         }
         if (lights->at(i)->getType() == S_DIRECTIONAL_LIGHT){
@@ -104,24 +109,38 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
             this->directionalLightPower.push_back(lights->at(i)->getPower());
             
             if (lights->at(i)->isUseShadow()){
-                spotLightShadowIdx.push_back(this->numShadows2D);
+                this->directionalLightShadowIdx.push_back(this->numShadows2D);
             }else{
-                spotLightShadowIdx.push_back(-1);
+                this->directionalLightShadowIdx.push_back(-1);
             }
         }
 
         if (lights->at(i)->isUseShadow()){
 
-            if (lights->at(i)->getType() != S_POINT_LIGHT) {
+            if (lights->at(i)->getType() == S_SPOT_LIGHT) {
                 this->numShadows2D++;
                 this->shadowsMap2D.push_back(lights->at(i)->getShadowMap());
                 this->shadowsVPMatrix.push_back(lights->at(i)->getDepthVPMatrix());
                 this->shadowsBias2D.push_back(lights->at(i)->getShadowBias());
-            }else {
+                this->shadowsCameraNearFar2D.push_back(lights->at(i)->getLightCamera()->getNearFarPlane());
+                this->shadowNumCascades2D.push_back(0);
+
+            }else if (lights->at(i)->getType() == S_DIRECTIONAL_LIGHT) {
+                for (int ca = 0; ca < ((DirectionalLight*)lights->at(i))->getNumShadowCasdades(); ca++) {
+                    this->numShadows2D++;
+                    this->shadowsMap2D.push_back(lights->at(i)->getShadowMap(ca));
+                    this->shadowsVPMatrix.push_back(lights->at(i)->getDepthVPMatrix(ca));
+                    this->shadowsBias2D.push_back(lights->at(i)->getShadowBias());
+                    this->shadowsCameraNearFar2D.push_back(((DirectionalLight *) lights->at(i))->getCascadeCameraNearFar(ca));
+                    this->shadowNumCascades2D.push_back(((DirectionalLight *) lights->at(i))->getNumShadowCasdades());
+                }
+            }else if (lights->at(i)->getType() == S_POINT_LIGHT) {
                 this->numShadowsCube++;
                 this->shadowsMapCube.push_back(lights->at(i)->getShadowMap());
                 this->shadowsBiasCube.push_back(lights->at(i)->getShadowBias());
+                this->shadowsCameraNearFarCube.push_back(lights->at(i)->getLightCamera()->getNearFarPlane());
             }
+
         }
     }
     

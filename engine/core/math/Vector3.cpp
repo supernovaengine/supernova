@@ -9,7 +9,9 @@ const Vector3 Vector3::UNIT_Z( 0, 0, 1 );
 const Vector3 Vector3::UNIT_SCALE(1, 1, 1);
 
 
-Vector3::Vector3() {}
+Vector3::Vector3()
+        : x(0), y(0), z(0) {
+}
 
 Vector3::Vector3( float nx, float ny, float nz ) : x(nx), y(ny), z(nz) {}
 

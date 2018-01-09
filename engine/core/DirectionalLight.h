@@ -12,11 +12,12 @@ namespace Supernova {
 
         Matrix4 sceneCameraViewProjection;
 
-        void configLightOrthoCamera(Camera* lightCamera, Camera* sceneCamera);
+        void configLightOrthoCamera(Camera* lightCamera, Matrix4 sceneCameraInv);
 
     protected:
 
-        Vector2 shadowCameraNearFar;
+        int numShadowCascades;
+        std::vector<Vector2> cascadeCameraNearFar;
 
         virtual void updateLightCamera();
 
@@ -28,7 +29,8 @@ namespace Supernova {
         void setDirection(Vector3 direction);
         void setDirection(float x, float y, float z);
 
-        Vector2 getShadowCameraNearFar();
+        Vector2 getCascadeCameraNearFar(int index);
+        int getNumShadowCasdades();
 
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 

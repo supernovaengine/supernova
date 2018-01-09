@@ -11,7 +11,7 @@
 using namespace Supernova;
 
 GLES2Scene::GLES2Scene(): SceneRender() {
-
+/*
     GLint redBits = 0;
     GLint greenBits = 0;
     GLint blueBits = 0;
@@ -30,7 +30,7 @@ GLES2Scene::GLES2Scene(): SceneRender() {
     Log::Debug(LOG_TAG, "Alpha bits: %i", alphaBits);
     Log::Debug(LOG_TAG, "Stencil bits: %i", stencilBits);
     Log::Debug(LOG_TAG, "Depth bits: %i", depthBits);
-
+*/
 }
 
 GLES2Scene::~GLES2Scene() {
