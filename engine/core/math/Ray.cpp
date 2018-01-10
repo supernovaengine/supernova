@@ -37,7 +37,6 @@ void Ray::setVector(Vector3 vector){
 
 Vector3 Ray::getVector(){
     return vector;
-
 }
 
 Vector3 Ray::intersectionPoint(Vector3 planePoint, Vector3 planeNormal) {

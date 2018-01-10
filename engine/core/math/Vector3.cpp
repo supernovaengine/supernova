@@ -130,6 +130,10 @@ float Vector3::dotProduct(const Vector3& v) const{
     return x * v.x + y * v.y + z * v.z;
 }
 
+float Vector3::absDotProduct(const Vector3& v) const{
+    return abs(x * v.x) + abs(y * v.y) + abs(z * v.z);
+}
+
 float Vector3::distance(const Vector3& rhs) const{
     return (*this - rhs).length();
 }
