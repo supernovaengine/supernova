@@ -1,6 +1,7 @@
 
 #include "GLES2Program.h"
 
+#include <algorithm>
 #include <stdlib.h>
 #include "GLES2Shaders.h"
 #include "GLES2Util.h"
@@ -70,10 +71,16 @@ void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, boo
     }
     
     std::string definitions = "";
+
+    maxLights = std::min(MAXLIGHTS_GLES2, maxLights);
+    maxShadows2D = std::min(MAXLIGHTS_GLES2, maxShadows2D);
+    maxShadowsCube = std::min(MAXLIGHTS_GLES2 - maxShadows2D, maxShadowsCube);
+
     if (hasLight){
         definitions += "#define USE_LIGHTING\n";
-        definitions += "#define MAXLIGHTS " + std::to_string(MAXLIGHTS_GLES2) + "\n";
-        definitions += "#define MAXSHADOWS " + std::to_string(MAXSHADOWS_GLES2) + "\n";
+        definitions += "#define MAXLIGHTS " + std::to_string(maxLights) + "\n";
+        definitions += "#define MAXSHADOWS2D " + std::to_string(maxShadows2D) + "\n";
+        definitions += "#define MAXSHADOWSCUBE " + std::to_string(maxShadowsCube) + "\n";
         definitions += "#define MAXCASCADES " + std::to_string(MAXCASCADES_GLES2) + "\n";
     }
     if (hasFog){

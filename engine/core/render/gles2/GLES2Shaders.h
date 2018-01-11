@@ -14,8 +14,8 @@ std::string lightingVertexDec =
 
 "  #ifdef HAS_SHADOWS2D\n"
 "    uniform int u_NumShadows2D;\n"
-"    uniform mat4 u_ShadowVP[MAXSHADOWS];\n"
-"    varying vec4 v_ShadowCoordinates[MAXSHADOWS];\n"
+"    uniform mat4 u_ShadowVP[MAXSHADOWS2D];\n"
+"    varying vec4 v_ShadowCoordinates[MAXSHADOWS2D];\n"
 "    varying float v_ClipSpacePosZ;\n"
 "  #endif\n"
 
@@ -28,7 +28,7 @@ std::string lightingVertexImp =
 "  v_Normal = normalize(mat3(u_nMatrix) * a_Normal);\n"
 
 "  #ifdef HAS_SHADOWS2D\n"
-"    for(int i=0; i<MAXSHADOWS; ++i){\n"
+"    for(int i=0; i<MAXSHADOWS2D; ++i){\n"
 "        if (i < u_NumShadows2D){\n"
 "            v_ShadowCoordinates[i] = u_ShadowVP[i] * vec4(v_Position, 1.0);\n"
 "        }else{\n"
@@ -72,17 +72,17 @@ std::string lightingFragmentDec =
 "  varying vec3 v_Normal;\n"
 
 "  #ifdef HAS_SHADOWS2D\n"
-"    uniform sampler2D u_shadowsMap2D[MAXSHADOWS];\n"
-"    uniform float u_shadowBias2D[MAXSHADOWS];\n"
-"    uniform vec2 u_shadowCameraNearFar2D[MAXSHADOWS];\n"
-"    uniform int u_shadowNumCascades2D[MAXSHADOWS];\n"
-"    varying vec4 v_ShadowCoordinates[MAXSHADOWS];\n"
+"    uniform sampler2D u_shadowsMap2D[MAXSHADOWS2D];\n"
+"    uniform float u_shadowBias2D[MAXSHADOWS2D];\n"
+"    uniform vec2 u_shadowCameraNearFar2D[MAXSHADOWS2D];\n"
+"    uniform int u_shadowNumCascades2D[MAXSHADOWS2D];\n"
+"    varying vec4 v_ShadowCoordinates[MAXSHADOWS2D];\n"
 "    varying float v_ClipSpacePosZ;\n"
 "  #endif\n"
 "  #ifdef HAS_SHADOWSCUBE\n"
-"    uniform samplerCube u_shadowsMapCube[MAXSHADOWS];\n"
-"    uniform float u_shadowBiasCube[MAXSHADOWS];\n"
-"    uniform vec2 u_shadowCameraNearFarCube[MAXSHADOWS];\n"
+"    uniform samplerCube u_shadowsMapCube[MAXSHADOWSCUBE];\n"
+"    uniform float u_shadowBiasCube[MAXSHADOWSCUBE];\n"
+"    uniform vec2 u_shadowCameraNearFarCube[MAXSHADOWSCUBE];\n"
 "  #endif\n"
 
 "  float unpackDepth(in vec4 color) {\n"
@@ -149,7 +149,7 @@ std::string lightingFragmentImp =
 
 "             bool inShadow = false;\n"
 "             #ifdef HAS_SHADOWSCUBE\n"
-"               for(int j = 0; j < MAXSHADOWS; j++){\n"
+"               for(int j = 0; j < MAXSHADOWSCUBE; j++){\n"
 "                   if (u_PointLightShadowIdx[i] == j){\n"
 "                       inShadow = checkShadowCube(u_PointLightPos[i], u_shadowsMapCube[j], u_shadowBiasCube[j], u_shadowCameraNearFarCube[j]);\n"
 "                       break;\n"
@@ -181,7 +181,7 @@ std::string lightingFragmentImp =
 
 "             bool inShadow = false;\n"
 "             #ifdef HAS_SHADOWS2D\n"
-"               for(int j = 0; j < MAXSHADOWS; j++){\n"
+"               for(int j = 0; j < MAXSHADOWS2D; j++){\n"
 "                   if (u_SpotLightShadowIdx[i] == j){\n"
 "                       inShadow = checkShadow(v_ShadowCoordinates[j], u_shadowsMap2D[j], u_shadowBias2D[j], u_shadowCameraNearFar2D[j], SpotLightcosTheta);\n"
 "                       break;\n"
@@ -209,7 +209,7 @@ std::string lightingFragmentImp =
 
 "             int nShadows = 0;\n"
 "             #ifdef HAS_SHADOWS2D\n"
-"               for(int j = 0; j < MAXSHADOWS; j++){\n"
+"               for(int j = 0; j < MAXSHADOWS2D; j++){\n"
 "                   if (u_DirectionalLightShadowIdx[i] == j){\n"
 "                       for (int ca = 0; ca < MAXCASCADES; ca++){\n"
 "                           if (ca == u_shadowNumCascades2D[j]) break;\n"

@@ -19,6 +19,10 @@ namespace Supernova {
         static ProgramRender::it_type findToRemove();
         
     protected:
+
+        int maxLights;
+        int maxShadows2D;
+        int maxShadowsCube;
         
         ProgramRender();
         
@@ -30,6 +34,9 @@ namespace Supernova {
         static void deleteUnused();
         
         bool isLoaded();
+
+        int getMaxShadows2D();
+        int getMaxShadowsCube();
 
         virtual void createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows2D, bool hasShadowsCube);
         virtual void deleteProgram();

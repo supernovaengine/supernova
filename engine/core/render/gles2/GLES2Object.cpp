@@ -231,8 +231,9 @@ bool GLES2Object::load(){
 }
 
 bool GLES2Object::prepareDraw(){
-    
-    GLuint glesProgram = ((GLES2Program*)program->getProgramRender().get())->getProgram();
+
+    GLES2Program* programRender = (GLES2Program*)program->getProgramRender().get();
+    GLuint glesProgram = programRender->getProgram();
     if (programOwned){
         glUseProgram(glesProgram);
         GLES2Util::checkGlError("glUseProgram");
@@ -309,9 +310,11 @@ bool GLES2Object::prepareDraw(){
     if (shadowsMap2D.size() > 0){
         
         std::vector<int> shadowsMapLoc;
+
+        int maxShadows2D = programRender->getMaxShadows2D();
         
         int shadowsSize2D = (int)shadowsMap2D.size();
-        if (shadowsSize2D > MAXSHADOWS_GLES2) shadowsSize2D = MAXSHADOWS_GLES2;
+        if (shadowsSize2D > maxShadows2D) shadowsSize2D = maxShadows2D;
         
         for (int i = 0; i < shadowsSize2D; i++){
             shadowsMapLoc.push_back(i + 1);
@@ -321,7 +324,7 @@ bool GLES2Object::prepareDraw(){
                           ((GLES2Texture*)(shadowsMap2D.at(i)->getTextureRender().get()))->getTexture());
         }
 
-        while (shadowsMapLoc.size() < MAXSHADOWS_GLES2) {
+        while (shadowsMapLoc.size() < maxShadows2D) {
             shadowsMapLoc.push_back(shadowsMapLoc[0]);
         }
 
@@ -332,9 +335,10 @@ bool GLES2Object::prepareDraw(){
 
         std::vector<int> shadowsMapCubeLoc;
 
+        int maxShadowsCube = programRender->getMaxShadowsCube();
+
         int shadowsSize2D = (int)shadowsMap2D.size();
         int shadowsSizeCube = (int)shadowsMapCube.size();
-        if ((shadowsSizeCube + shadowsSize2D) > MAXSHADOWS_GLES2) shadowsSizeCube = MAXSHADOWS_GLES2 - shadowsSize2D;
 
         for (int i = 0; i < shadowsSizeCube; i++){
             shadowsMapCubeLoc.push_back(1 + i + shadowsSize2D);
@@ -344,7 +348,7 @@ bool GLES2Object::prepareDraw(){
                           ((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTexture());
         }
 
-        while (shadowsMapCubeLoc.size() < MAXSHADOWS_GLES2) {
+        while (shadowsMapCubeLoc.size() < maxShadowsCube) {
             shadowsMapCubeLoc.push_back(shadowsMapCubeLoc[0]);
         }
 
