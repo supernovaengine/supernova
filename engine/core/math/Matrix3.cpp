@@ -2,6 +2,7 @@
 
 #include "math/Angle.h"
 #include <string>
+#include <assert.h>
 
 using namespace Supernova;
 
