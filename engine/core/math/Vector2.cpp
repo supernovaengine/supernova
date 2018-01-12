@@ -10,7 +10,8 @@ const Vector2 Vector2::NEGATIVE_UNIT_X( -1,  0);
 const Vector2 Vector2::NEGATIVE_UNIT_Y(  0, -1);
 const Vector2 Vector2::UNIT_SCALE(1, 1);
 
-Vector2::Vector2(){
+Vector2::Vector2()
+        : x(0), y(0){
 }
 
 Vector2::Vector2(const float fX, const float fY )

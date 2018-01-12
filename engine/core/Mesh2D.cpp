@@ -2,6 +2,7 @@
 #include "Mesh2D.h"
 #include "Engine.h"
 #include "Scene.h"
+#include "platform/Log.h"
 
 using namespace Supernova;
 
@@ -92,7 +93,7 @@ int Mesh2D::getHeight(){
 
 bool Mesh2D::draw(){
 
-    if (clipping) {
+    if (clipping && scene && scene->getCamera()->getType()!=S_CAMERA_2D && scene->getTextureRender()==NULL) {
 
         float scaleX = scale.x;
         float scaleY = scale.y;
@@ -132,6 +133,12 @@ bool Mesh2D::draw(){
 
             if (objScreenPosY + objScreenHeight >= rect.getY() + rect.getHeight())
                 objScreenHeight = rect.getY() + rect.getHeight() - objScreenPosY;
+
+        }else if (clipping){
+
+            clipping = false;
+            Log::Error(LOG_TAG, "Can not clipping object with 2D camera or textureRender scene");
+
         }
 
         sceneRender->enableScissor(Rect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight));

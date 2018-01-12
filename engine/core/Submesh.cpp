@@ -4,6 +4,7 @@ using namespace Supernova;
 
 Submesh::Submesh(){
     this->render = NULL;
+    this->shadowRender = NULL;
 
     this->distanceToCamera = -1;
     this->material = NULL;
@@ -12,6 +13,7 @@ Submesh::Submesh(){
 
     this->loaded = false;
     this->renderOwned = true;
+    this->shadowRenderOwned = true;
 
     this->minBufferSize = 0;
 }
@@ -27,6 +29,9 @@ Submesh::~Submesh(){
     if (this->render && this->renderOwned)
         delete this->render;
 
+    if (this->shadowRender && this->shadowRenderOwned)
+        delete this->shadowRender;
+
     if (this->loaded)
         destroy();
 }
@@ -39,7 +44,9 @@ Submesh::Submesh(const Submesh& s){
     this->dynamic = s.dynamic;
     this->loaded = s.loaded;
     this->renderOwned = s.renderOwned;
+    this->shadowRenderOwned = s.shadowRenderOwned;
     this->render = s.render;
+    this->shadowRender = s.shadowRender;
     this->minBufferSize = s.minBufferSize;
 }
 
@@ -51,7 +58,9 @@ Submesh& Submesh::operator = (const Submesh& s){
     this->dynamic = s.dynamic;
     this->loaded = s.loaded;
     this->renderOwned = s.renderOwned;
+    this->shadowRenderOwned = s.shadowRenderOwned;
     this->render = s.render;
+    this->shadowRender = s.shadowRender;
     this->minBufferSize = s.minBufferSize;
 
     return *this;
@@ -100,7 +109,6 @@ void Submesh::setSubmeshRender(ObjectRender* render){
     
     this->render = render;
     renderOwned = false;
-    
 }
 
 ObjectRender* Submesh::getSubmeshRender(){
@@ -108,6 +116,35 @@ ObjectRender* Submesh::getSubmeshRender(){
         render = ObjectRender::newInstance();
     
     return render;
+}
+
+void Submesh::setSubmeshShadowRender(ObjectRender* shadowRender){
+    if (this->shadowRender && this->shadowRenderOwned)
+        delete this->shadowRender;
+
+    this->shadowRender = shadowRender;
+    shadowRenderOwned = false;
+}
+
+ObjectRender* Submesh::getSubmeshShadowRender(){
+    if (shadowRender == NULL)
+        shadowRender = ObjectRender::newInstance();
+
+    return shadowRender;
+}
+
+bool Submesh::shadowLoad(){
+    
+    shadowRender = getSubmeshShadowRender();
+    shadowRender->setDynamicBuffer(dynamic);
+    shadowRender->addIndex(indices.size(), &indices.front());
+    
+    bool shadowloaded = true;
+    
+    if (shadowRenderOwned)
+        shadowloaded = shadowRender->load();
+    
+    return shadowloaded;
 }
 
 bool Submesh::load(){
@@ -143,6 +180,18 @@ bool Submesh::draw(){
     if (renderOwned)
         render->finishDraw();
     
+    return true;
+}
+
+bool Submesh::shadowDraw(){
+    if (shadowRenderOwned)
+        shadowRender->prepareDraw();
+
+    shadowRender->draw();
+
+    if (shadowRenderOwned)
+        shadowRender->finishDraw();
+
     return true;
 }
 

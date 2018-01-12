@@ -142,7 +142,7 @@ bool Image::load(){
         }
     }
     
-    setInvertTexture(isIn3DScene());
+    //setInvertTexture(isIn3DScene());
     createVertices();
     
     return Mesh2D::load();

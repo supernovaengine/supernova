@@ -19,14 +19,15 @@ namespace Supernova {
         GLES2Scene();
         virtual ~GLES2Scene();
 
-        bool load();
-        bool draw();
-        bool viewSize(Rect rect);
-        bool enableScissor(Rect rect);
-        bool disableScissor();
+        virtual bool load();
+        virtual bool draw();
+        virtual bool clear(float value = 0);
+        virtual bool viewSize(Rect rect, bool adjustY=true);
+        virtual bool enableScissor(Rect rect);
+        virtual bool disableScissor();
 
-        bool isEnabledScissor();
-        Rect getActiveScissor();
+        virtual bool isEnabledScissor();
+        virtual Rect getActiveScissor();
     };
     
 }

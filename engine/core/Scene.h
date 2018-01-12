@@ -11,7 +11,7 @@
 #include <vector>
 #include <map>
 #include "GUIObject.h"
-#include "LightData.h"
+#include "data/LightData.h"
 #include "math/Matrix4.h"
 
 namespace Supernova {
@@ -20,11 +20,17 @@ namespace Supernova {
         friend class Object;
         friend class ConcreteObject;
         friend class Mesh;
+        friend class Points;
     private:
 
         SceneRender* render;
         ObjectRender* lightRender;
         ObjectRender* fogRender;
+        Texture* textureRender;
+
+        Vector3 drawShadowLightPos;
+        Vector2 drawShadowCameraNearFar;
+        bool drawIsPointShadow;
         
         LightData lightData;
 
@@ -43,6 +49,7 @@ namespace Supernova {
         
         Vector3 ambientLight;
 
+        bool drawingShadow;
         bool childScene;
         bool useTransparency;
         bool useDepth;
@@ -64,6 +71,7 @@ namespace Supernova {
         void drawSky();
 
         void drawChildScenes();
+        bool renderDraw(bool cubeMap=false, int cubeFace=0);
 
     public:
 
@@ -73,13 +81,16 @@ namespace Supernova {
         SceneRender* getSceneRender();
         ObjectRender* getLightRender();
         ObjectRender* getFogRender();
+        Vector3 getDrawShadowLightPos();
 
         void setAmbientLight(Vector3 ambientLight);
         void setAmbientLight(const float ambientFactor);
         
         Vector3* getAmbientLight();
         std::vector<Light*>* getLights();
-        
+        LightData* getLightData();
+
+        bool isDrawingShadow();
         bool isChildScene();
         bool isUseDepth();
         bool isUseLight();
@@ -94,8 +105,11 @@ namespace Supernova {
 
         void doCamera();
 
-        bool updateViewSize();
-        
+        void setTextureRender(Texture* textureRender);
+        Texture* getTextureRender();
+
+        bool updateCameraSize();
+
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
         virtual bool load();

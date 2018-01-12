@@ -17,7 +17,7 @@ Object::Object(){
     viewMatrix = NULL;
     projectionMatrix = NULL;
     viewProjectionMatrix = NULL;
-    cameraPosition = NULL;
+    cameraPosition = Vector3(0,0,0);
 
     scale = Vector3(1,1,1);
     position = Vector3(0,0,0);
@@ -44,22 +44,26 @@ void Object::setSceneAndConfigure(Scene* scene){
     for (it = objects.begin(); it != objects.end(); ++it) {
         (*it)->setSceneAndConfigure(scene);
     }
-    
-    if (Light* light_ptr = dynamic_cast<Light*>(this)){
-        ((Scene*)scene)->addLight(light_ptr);
-    }
-    
-    if (Scene* scene_ptr = dynamic_cast<Scene*>(this)){
-        ((Scene*)scene)->addSubScene(scene_ptr);
-    }
-    
-    if (GUIObject* guiobject_ptr = dynamic_cast<GUIObject*>(this)){
-        ((Scene*)scene)->addGUIObject(guiobject_ptr);
+
+    //This is for not add object in scene and subscenes
+    if (this->scene == scene) {
+        if (Light *light_ptr = dynamic_cast<Light *>(this)) {
+            scene->addLight(light_ptr);
+        }
+
+        if (GUIObject *guiobject_ptr = dynamic_cast<GUIObject *>(this)) {
+            scene->addGUIObject(guiobject_ptr);
+        }
+
+        if (SkyBox *sky_ptr = dynamic_cast<SkyBox *>(this)) {
+            scene->setSky(sky_ptr);
+        }
     }
 
-    if (SkyBox* sky_ptr = dynamic_cast<SkyBox*>(this)){
-        ((Scene*)scene)->setSky(sky_ptr);
+    if (Scene *scene_ptr = dynamic_cast<Scene *>(this)) {
+        scene->addSubScene(scene_ptr);
     }
+
 }
 
 void Object::removeScene(){
@@ -76,7 +80,7 @@ void Object::addObject(Object* obj){
         scene_ptr->childScene = true;
     }
     
-    if (obj->parent == NULL){
+    if (obj->parent == NULL) {
         objects.push_back(obj);
 
         obj->parent = this;
@@ -86,9 +90,9 @@ void Object::addObject(Object* obj){
         obj->viewProjectionMatrix = viewProjectionMatrix;
         obj->cameraPosition = cameraPosition;
         obj->modelViewProjectionMatrix = modelViewProjectionMatrix;
-        
+
         obj->firstLoaded = false;
-        
+
         if (scene != NULL)
             obj->setSceneAndConfigure(scene);
 
@@ -128,7 +132,6 @@ void Object::removeObject(Object* obj){
     
     obj->viewMatrix = NULL;
     obj->viewProjectionMatrix = NULL;
-    obj->cameraPosition = NULL;
     
     obj->updateMatrix();
 }
@@ -222,10 +225,7 @@ Matrix4 Object::getModelViewProjectMatrix(){
 }
 
 Vector3 Object::getCameraPosition(){
-    if (cameraPosition != NULL)
-        return *cameraPosition;
-    else
-        return Vector3();
+    return cameraPosition;
 }
 
 Scene* Object::getScene(){
@@ -335,7 +335,7 @@ void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     this->viewMatrix = viewMatrix;
     this->projectionMatrix = projectionMatrix;
     this->viewProjectionMatrix = viewProjectionMatrix;
-    this->cameraPosition = cameraPosition;
+    this->cameraPosition = *cameraPosition;
     
     updateMVPMatrix();
     
@@ -353,11 +353,11 @@ void Object::updateMatrix(){
     Matrix4 translateMatrix = Matrix4::translateMatrix(position);
     Matrix4 rotationMatrix = rotation.getRotationMatrix();
 
-    this->modelMatrix = centerMatrix * scaleMatrix * rotationMatrix * translateMatrix;
+    this->modelMatrix = translateMatrix * rotationMatrix * scaleMatrix * centerMatrix;
 
     if (parent != NULL){
         Matrix4 parentCenterMatrix = Matrix4::translateMatrix(parent->center);
-        this->modelMatrix = this->modelMatrix * parentCenterMatrix * parent->modelMatrix;
+        this->modelMatrix = parent->modelMatrix * parentCenterMatrix * this->modelMatrix;
         worldRotation = parent->worldRotation * rotation;
         worldPosition = modelMatrix * Vector3(0,0,0);
     }else{
@@ -376,7 +376,7 @@ void Object::updateMatrix(){
 
 void Object::updateMVPMatrix(){
     if (this->viewProjectionMatrix != NULL){
-        this->modelViewProjectionMatrix = this->modelMatrix * (*this->viewProjectionMatrix);
+        this->modelViewProjectionMatrix = (*this->viewProjectionMatrix) * this->modelMatrix;
     }
 }
 

@@ -2,6 +2,7 @@
 
 #include "gles2/GLES2Program.h"
 #include "Engine.h"
+#include "Scene.h"
 
 using namespace Supernova;
 
@@ -57,12 +58,20 @@ ProgramRender::it_type ProgramRender::findToRemove(){
     return programsRender.end();
 }
 
-void ProgramRender::createProgram(std::string shaderName, std::string definitions){
-    loaded = true;
+int ProgramRender::getMaxShadows2D(){
+    return maxShadows2D;
 }
 
-void ProgramRender::createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText){
+int ProgramRender::getMaxShadowsCube(){
+    return maxShadowsCube;
+}
+
+void ProgramRender::createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows2D, bool hasShadowsCube){
     loaded = true;
+
+    maxLights = (int)Engine::getScene()->getLights()->size();
+    maxShadows2D = Engine::getScene()->getLightData()->numShadows2D;
+    maxShadowsCube = Engine::getScene()->getLightData()->numShadowsCube;
 }
 
 void ProgramRender::deleteProgram(){

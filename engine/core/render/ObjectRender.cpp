@@ -23,6 +23,8 @@ ObjectRender::ObjectRender(){
     hasTextureCube = false;
     isSky = false;
     isText = false;
+    hasShadows2D = false;
+    hasShadowsCube = false;
     
     sceneRender = NULL;
     lightRender = NULL;
@@ -30,6 +32,8 @@ ObjectRender::ObjectRender(){
     
     texture = NULL;
     program = NULL;
+    shadowsMap2D.clear();
+    shadowsMapCube.clear();
 }
 
 ObjectRender* ObjectRender::newInstance(){
@@ -61,6 +65,14 @@ void ObjectRender::setProgram(Program* program){
     
     this->program = program;
     programOwned = false;
+}
+
+void ObjectRender::setShadowsMap2D(std::vector<Texture*> shadowsMap2D){
+    this->shadowsMap2D = shadowsMap2D;
+}
+
+void ObjectRender::setShadowsMapCube(std::vector<Texture*> shadowsMapCube){
+    this->shadowsMapCube = shadowsMapCube;
 }
 
 void ObjectRender::setSceneRender(SceneRender* sceneRender){
@@ -144,6 +156,14 @@ void ObjectRender::setIsText(bool isText){
     this->isText = isText;
 }
 
+void ObjectRender::setHasShadows2D(bool hasShadows2D){
+    this->hasShadows2D = hasShadows2D;
+}
+
+void ObjectRender::setHasShadowsCube(bool hasShadowsCube){
+    this->hasShadowsCube = hasShadowsCube;
+}
+
 Program* ObjectRender::getProgram(){
     
     loadProgram();
@@ -200,7 +220,7 @@ void ObjectRender::loadProgram(){
         if (programShader != -1)
             program->setShader(programShader);
     
-        program->setDefinitions(hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
+        program->setDefinitions(hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows2D, hasShadowsCube);
         program->load();
     }
 }
@@ -211,6 +231,14 @@ bool ObjectRender::load(){
     
     if (texture)
         texture->load();
+
+    for (int i = 0; i < shadowsMap2D.size(); i++)
+        if (shadowsMap2D[i])
+            shadowsMap2D[i]->load();
+
+    for (int i = 0; i < shadowsMapCube.size(); i++)
+        if (shadowsMapCube[i])
+            shadowsMapCube[i]->load();
     
     for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end();)
     {

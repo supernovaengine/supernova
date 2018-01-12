@@ -62,10 +62,10 @@ Matrix4 Matrix4::operator *(const Matrix4 &m) const
     for (int c=0;c<4;c++)
         for (int r=0;r<4;r++)
             prod.set(c,r,
-                get(c,0)*m.get(0,r) +
-                get(c,1)*m.get(1,r) +
-                get(c,2)*m.get(2,r) +
-                get(c,3)*m.get(3,r));
+                m.get(c,0)*get(0,r) +
+                m.get(c,1)*get(1,r) +
+                m.get(c,2)*get(2,r) +
+                m.get(c,3)*get(3,r));
 
     return prod;
 }

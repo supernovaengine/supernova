@@ -76,6 +76,8 @@ namespace Supernova {
 
         float dotProduct(const Vector3& v) const;
 
+        float absDotProduct(const Vector3& v) const;
+
         float distance(const Vector3& rhs) const;
 
         float squaredDistance(const Vector3& rhs) const;

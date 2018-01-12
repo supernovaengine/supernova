@@ -8,10 +8,14 @@
 #include "math/Matrix4.h"
 #include "math/Vector4.h"
 #include "math/Vector3.h"
+#include "math/Vector2.h"
 #include "math/Ray.h"
+#include "math/Rect.h"
 #include "Object.h"
 
 namespace Supernova {
+
+    class Scene;
 
     class Camera: public Object {
 
@@ -44,7 +48,7 @@ namespace Supernova {
         
         bool automatic;
 
-        Object* sceneObject;
+        Scene* linkedScene;
 
     public:
 
@@ -65,8 +69,18 @@ namespace Supernova {
 
         void setType(int type);
         int getType();
+
+        float getFOV();
+        float getAspect();
+        float getTop();
+        float getBottom();
+        float getLeft();
+        float getRight();
+        float getNear();
+        float getFar();
+        Vector2 getNearFarPlane();
         
-        void updateAutomaticSizes();
+        void updateAutomaticSizes(Rect rect);
         
         void setOrtho(float left, float right, float bottom, float top, float near, float far);
         void setPerspective(float y_fov, float aspect, float near, float far);
@@ -81,7 +95,7 @@ namespace Supernova {
         void walkForward(float distance);
         void slide(float distance);
 
-        void setSceneObject(Object* scene);
+        void setLinkedScene(Scene* linkedScene);
 
         virtual void updateMatrix();
 

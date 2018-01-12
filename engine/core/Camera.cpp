@@ -1,5 +1,7 @@
 #include "Camera.h"
 #include "Engine.h"
+#include "math/Angle.h"
+#include "Scene.h"
 
 using namespace Supernova;
 
@@ -19,15 +21,21 @@ Camera::Camera() : Object(){
 
     //PERSPECTIVE
     y_fov = 0.75;
-    aspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
-    perspectiveNear = 0.5;
-    perspectiveFar = 5000;
+
+    if (Engine::getCanvasWidth() != 0 && Engine::getCanvasHeight() != 0) {
+        aspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
+    }else{
+        aspect = 1.0;
+    }
+
+    perspectiveNear = 1;
+    perspectiveFar = 2000;
 
     type = S_CAMERA_PERSPECTIVE;
     
     automatic = true;
 
-    sceneObject = NULL;
+    linkedScene = NULL;
 
 }
 
@@ -116,13 +124,62 @@ int Camera::getType(){
     return type;
 }
 
-void Camera::updateAutomaticSizes(){
-    if (automatic){
-        float newRight = Engine::getCanvasWidth();
-        float newTop = Engine::getCanvasHeight();
-        float newAspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
+float Camera::getFOV(){
+    return y_fov;
+}
 
-        if ((right != newRight) || (top != newTop) || (aspect != newAspect)){
+float Camera::getAspect(){
+    return aspect;
+}
+
+float Camera::getTop(){
+    return top;
+}
+
+float Camera::getBottom(){
+    return bottom;
+}
+
+float Camera::getLeft(){
+    return left;
+}
+
+float Camera::getRight(){
+    return right;
+}
+
+float Camera::getNear(){
+    if (type == S_CAMERA_PERSPECTIVE)
+        return perspectiveNear;
+    else
+        return orthoNear;
+}
+
+float Camera::getFar(){
+    if (type == S_CAMERA_PERSPECTIVE)
+        return perspectiveFar;
+    else
+        return orthoFar;
+}
+
+Vector2 Camera::getNearFarPlane(){
+    if (type == S_CAMERA_PERSPECTIVE)
+        return Vector2(perspectiveNear, perspectiveFar);
+    else
+        return Vector2(orthoNear, orthoFar);
+}
+
+void Camera::updateAutomaticSizes(Rect rect){
+    if (automatic){
+        float newLeft = rect.getX();
+        float newBottom = rect.getY();
+        float newRight = rect.getWidth();
+        float newTop = rect.getHeight();
+        float newAspect = rect.getWidth() / rect.getHeight();
+
+        if ((left != newLeft) || (bottom != newBottom) || (right != newRight) || (top != newTop) || (aspect != newAspect)){
+            left = newLeft;
+            bottom = newBottom;
             right = newRight;
             top = newTop;
             aspect = newAspect;
@@ -151,7 +208,7 @@ void Camera::setPerspective(float y_fov, float aspect, float near, float far){
 
     type = S_CAMERA_PERSPECTIVE;
 
-    this->y_fov = y_fov;
+    this->y_fov = Angle::defaultToRad(y_fov);
     this->aspect = aspect;
     this->perspectiveNear = near;
     this->perspectiveFar = far;
@@ -306,8 +363,8 @@ Ray Camera::pointsToRay(float x, float y) {
     return Ray(near_point_ray, vector_between);
 }
 
-void Camera::setSceneObject(Object* scene){
-    this->sceneObject = scene;
+void Camera::setLinkedScene(Scene* linkedScene){
+    this->linkedScene = linkedScene;
 }
 
 void Camera::updateMatrix(){
@@ -335,9 +392,9 @@ void Camera::updateMatrix(){
         viewMatrix = Matrix4::lookAtMatrix(worldPosition, worldView, worldUp);
     }
 
-    viewProjectionMatrix = viewMatrix * projectionMatrix;
+    viewProjectionMatrix = projectionMatrix * viewMatrix;
 
-    if (sceneObject != NULL){
-        sceneObject->updateVPMatrix(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
+    if (linkedScene && (linkedScene->getCamera() == this)){
+        linkedScene->updateVPMatrix(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
     }
 }

@@ -9,7 +9,9 @@ const Vector3 Vector3::UNIT_Z( 0, 0, 1 );
 const Vector3 Vector3::UNIT_SCALE(1, 1, 1);
 
 
-Vector3::Vector3() {}
+Vector3::Vector3()
+        : x(0), y(0), z(0) {
+}
 
 Vector3::Vector3( float nx, float ny, float nz ) : x(nx), y(ny), z(nz) {}
 
@@ -126,6 +128,10 @@ float Vector3::squaredLength () const{
 
 float Vector3::dotProduct(const Vector3& v) const{
     return x * v.x + y * v.y + z * v.z;
+}
+
+float Vector3::absDotProduct(const Vector3& v) const{
+    return abs(x * v.x) + abs(y * v.y) + abs(z * v.z);
 }
 
 float Vector3::distance(const Vector3& rhs) const{

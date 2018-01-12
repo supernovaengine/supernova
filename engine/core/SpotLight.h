@@ -8,6 +8,12 @@ namespace Supernova {
 
     class SpotLight: public Light {
 
+    protected:
+
+        float smooth;
+
+        virtual void updateLightCamera();
+
     public:
 
         SpotLight();
@@ -16,6 +22,9 @@ namespace Supernova {
         void setTarget(Vector3 target);
         void setTarget(float x, float y, float z);
         void setSpotAngle(float angle);
+        void setSmooth(float angle);
+
+        virtual bool loadShadow();
 
     };
     

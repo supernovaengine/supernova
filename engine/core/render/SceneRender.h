@@ -3,7 +3,6 @@
 
 #include "Light.h"
 #include "Fog.h"
-#include "LightData.h"
 #include "math/Rect.h"
 
 namespace Supernova {
@@ -16,6 +15,7 @@ namespace Supernova {
         bool childScene;
         bool useDepth;
         bool useTransparency;
+        bool drawingShadow;
         
         Scene* scene;
 
@@ -32,10 +32,12 @@ namespace Supernova {
         void setChildScene(bool childScene);
         void setUseDepth(bool useDepth);
         void setUseTransparency(bool useTransparency);
+        void setDrawingShadow(bool drawingShadow);
 
         virtual bool load();
         virtual bool draw();
-        virtual bool viewSize(Rect rect) = 0;
+        virtual bool clear(float value = 0) = 0;
+        virtual bool viewSize(Rect rect, bool adjustY=true) = 0;
         virtual bool enableScissor(Rect rect) = 0;
         virtual bool disableScissor() = 0;
 

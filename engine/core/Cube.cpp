@@ -84,7 +84,6 @@ void Cube::createTexcoords(){
     texcoords.push_back(Vector2(1.0f, 1.0f));
     texcoords.push_back(Vector2(0.0f, 1.0f));
 
-
     texcoords.push_back(Vector2(0.0f, 0.0f));
     texcoords.push_back(Vector2(1.0f, 0.0f));
     texcoords.push_back(Vector2(1.0f, 1.0f));
@@ -134,27 +133,27 @@ void Cube::createNormals(){
     normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
     normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
     normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-
+    
     normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
     normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
     normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
     normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-
+    
     normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
     normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
     normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
     normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
-
+    
     normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
     normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
     normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
     normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
-
+    
     normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
     normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
     normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
     normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
-
+    
     normals.push_back(Vector3(0.0f, -1.0f, 0.0f));
     normals.push_back(Vector3(0.0f, -1.0f, 0.0f));
     normals.push_back(Vector3(0.0f, -1.0f, 0.0f));

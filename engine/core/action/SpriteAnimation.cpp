@@ -4,14 +4,10 @@
 
 using namespace Supernova;
 
-SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop): Action(-1, loop){
-    this->function = NULL;
-    this->functionLua = 0;
-
-    this->spriteFrameCount = 0;
-    this->framesIndex = 0;
-    this->framesTimeIndex = 0; //Actual sprite frame with the last frameTime
-
+SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop): Action(){
+    stop();
+    this->loop = loop;
+    
     this->framesTime = framesTime;
     this->frames = frames;
     
@@ -19,13 +15,9 @@ SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, std::vector<int> f
     this->endFrame = 0;
 }
 
-SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop): Action(-1, loop){
-    this->function = NULL;
-    this->functionLua = 0;
-
-    this->spriteFrameCount = 0;
-    this->framesIndex = 0;
-    this->framesTimeIndex = 0;
+SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop): Action(){
+    stop();
+    this->loop = loop;
 
     this->framesTime = framesTime;
     
@@ -34,16 +26,12 @@ SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, int startFrame, in
     
 }
 
-SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, bool loop): Action(-1, loop){
+SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, bool loop): Action(){
+    stop();
+    this->loop = loop;
+    
     std::vector<int> framesTime;
     framesTime.push_back(interval);
-    
-    this->function = NULL;
-    this->functionLua = 0;
-
-    this->spriteFrameCount = 0;
-    this->framesIndex = 0;
-    this->framesTimeIndex = 0;
     
     this->framesTime = framesTime;
     
@@ -51,16 +39,12 @@ SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, boo
     this->endFrame = endFrame;
 }
 
-SpriteAnimation::SpriteAnimation(int interval, std::vector<int> frames, bool loop): Action(-1, loop){
+SpriteAnimation::SpriteAnimation(int interval, std::vector<int> frames, bool loop): Action(){
+    stop();
+    this->loop = loop;
+    
     std::vector<int> framesTime;
     framesTime.push_back(interval);
-
-    this->function = NULL;
-    this->functionLua = 0;
-
-    this->spriteFrameCount = 0;
-    this->framesIndex = 0;
-    this->framesTimeIndex = 0;
 
     this->framesTime = framesTime;
     this->frames = frames;
@@ -73,10 +57,11 @@ SpriteAnimation::~SpriteAnimation(){
     
 }
 
-void SpriteAnimation::play(){
-    Action::play();
+bool SpriteAnimation::run(){
+    if (!Action::run())
+        return false;
 
-    if (object) {
+    if (Sprite* sprite = dynamic_cast<Sprite*>(object)) {
 
         bool erro = false;
 
@@ -86,10 +71,10 @@ void SpriteAnimation::play(){
         }else if (frames.size() == 0 && startFrame == 0 && endFrame == 0){
             Log::Error(LOG_TAG, "Incorrect sprite animation: no frames");
             erro = true;
-        }else if (startFrame < 0 && startFrame >= ((Sprite *) object)->getFramesSize()){
+        }else if (startFrame < 0 && startFrame >= sprite->getFramesSize()){
             Log::Error(LOG_TAG, "Incorrect sprite animation: range of startFrame");
             erro = true;
-        }else if (endFrame < 0 && endFrame >= ((Sprite *) object)->getFramesSize()){
+        }else if (endFrame < 0 && endFrame >= sprite->getFramesSize()){
             Log::Error(LOG_TAG, "Incorrect sprite animation: range of endFrame");
             erro = true;
         }
@@ -101,7 +86,7 @@ void SpriteAnimation::play(){
                 bool finaliza = false;
                 while (!finaliza) {
 
-                    if (actualFrame >= ((Sprite *) object)->getFramesSize())
+                    if (actualFrame >= sprite->getFramesSize())
                         actualFrame = 0;
 
                     frames.push_back(actualFrame);
@@ -115,29 +100,36 @@ void SpriteAnimation::play(){
                 this->frames = frames;
             }
 
-            ((Sprite *) object)->setFrame(frames[framesIndex]);
+            sprite->setFrame(frames[framesIndex]);
         }else{
+            Log::Error(LOG_TAG, "Object in SpriteAnimation must be a Sprite type");
             stop();
         }
     }
+    
+    return true;
 }
 
-void SpriteAnimation::stop(){
-    Action::stop();
+bool SpriteAnimation::pause(){
+    return Action::pause();
 }
 
-void SpriteAnimation::reset(){
-    Action::reset();
+bool SpriteAnimation::stop(){
+    if (!Action::stop())
+        return false;
 
     this->spriteFrameCount = 0;
     this->framesIndex = 0;
     this->framesTimeIndex = 0;
+    
+    return true;
 }
 
-void SpriteAnimation::step(){
-    Action::step();
+bool SpriteAnimation::step(){
+    if (!Action::step())
+        return false;
     
-    if (object){
+    if (Sprite* sprite = dynamic_cast<Sprite*>(object)){
 
         spriteFrameCount += steptime;
         while ((spriteFrameCount >= framesTime[framesTimeIndex]) && (isRunning())) {
@@ -159,9 +151,11 @@ void SpriteAnimation::step(){
             if (framesTimeIndex >= framesTime.size())
                 framesTimeIndex = 0;
 
-            ((Sprite*)object)->setFrame(frames[framesIndex]);
+            sprite->setFrame(frames[framesIndex]);
 
         }
 
     }
+    
+    return true;
 }

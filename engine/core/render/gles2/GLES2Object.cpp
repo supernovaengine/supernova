@@ -8,8 +8,6 @@
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define BUFFER_OFFSET(i) ((void*)(i))
 
-
-
 using namespace Supernova;
 
 
@@ -120,10 +118,17 @@ bool GLES2Object::load(){
     if (texture) {
         uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
     }else{
-        if (Engine::getPlatform() == S_WEB){
+        if (Engine::getPlatform() == S_PLATFORM_WEB){
             GLES2Util::generateEmptyTexture();
             uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
         }
+    }
+
+    if (shadowsMap2D.size() > 0){
+        uShadowsMap2DLocation = glGetUniformLocation(glesProgram, "u_shadowsMap2D");
+    }
+    if (shadowsMapCube.size() > 0){
+        uShadowsMapCubeLocation = glGetUniformLocation(glesProgram, "u_shadowsMapCube");
     }
     
     for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
@@ -138,12 +143,16 @@ bool GLES2Object::load(){
             propertyName = "u_mMatrix";
         }else if (type == S_PROPERTY_NORMALMATRIX){
             propertyName = "u_nMatrix";
+        }else if (type == S_PROPERTY_DEPTHVPMATRIX){
+            propertyName = "u_ShadowVP";
         }else if (type == S_PROPERTY_CAMERAPOS){
             propertyName = "u_EyePos";
         }else if (type == S_PROPERTY_TEXTURERECT){
             propertyName = "u_textureRect";
         }else if (type == S_PROPERTY_COLOR){
             propertyName = "u_Color";
+        }else if (type == S_PROPERTY_NUMSHADOWS2D){
+            propertyName = "u_NumShadows2D";
         }else if (type == S_PROPERTY_AMBIENTLIGHT){
             propertyName = "u_AmbientLight";
         }else if (type == S_PROPERTY_NUMPOINTLIGHT){
@@ -154,6 +163,8 @@ bool GLES2Object::load(){
             propertyName = "u_PointLightPower";
         }else if (type == S_PROPERTY_POINTLIGHT_COLOR){
             propertyName = "u_PointLightColor";
+        }else if (type == S_PROPERTY_POINTLIGHT_SHADOWIDX){
+            propertyName = "u_PointLightShadowIdx";
         }else if (type == S_PROPERTY_NUMSPOTLIGHT){
             propertyName = "u_NumSpotLight";
         }else if (type == S_PROPERTY_SPOTLIGHT_POS){
@@ -166,6 +177,10 @@ bool GLES2Object::load(){
             propertyName = "u_SpotLightTarget";
         }else if (type == S_PROPERTY_SPOTLIGHT_CUTOFF){
             propertyName = "u_SpotLightCutOff";
+        }else if (type == S_PROPERTY_SPOTLIGHT_OUTERCUTOFF){
+            propertyName = "u_SpotLightOuterCutOff";
+        }else if (type == S_PROPERTY_SPOTLIGHT_SHADOWIDX){
+            propertyName = "u_SpotLightShadowIdx";
         }else if (type == S_PROPERTY_NUMDIRLIGHT){
             propertyName = "u_NumDirectionalLight";
         }else if (type == S_PROPERTY_DIRLIGHT_DIR){
@@ -174,6 +189,8 @@ bool GLES2Object::load(){
             propertyName = "u_DirectionalLightPower";
         }else if (type == S_PROPERTY_DIRLIGHT_COLOR){
             propertyName = "u_DirectionalLightColor";
+        }else if (type == S_PROPERTY_DIRLIGHT_SHADOWIDX){
+            propertyName = "u_DirectionalLightShadowIdx";
         }else if (type == S_PROPERTY_FOG_MODE){
             propertyName = "u_fogMode";
         }else if (type == S_PROPERTY_FOG_COLOR){
@@ -186,6 +203,22 @@ bool GLES2Object::load(){
             propertyName = "u_fogStart";
         }else if (type == S_PROPERTY_FOG_END){
             propertyName = "u_fogEnd";
+        }else if (type == S_PROPERTY_SHADOWLIGHT_POS){
+            propertyName = "u_shadowLightPos";
+        }else if (type == S_PROPERTY_SHADOWCAMERA_NEARFAR){
+            propertyName = "u_shadowCameraNearFar";
+        }else if (type == S_PROPERTY_ISPOINTSHADOW){
+            propertyName = "u_isPointShadow";
+        }else if (type == S_PROPERTY_SHADOWBIAS2D){
+            propertyName = "u_shadowBias2D";
+        }else if (type == S_PROPERTY_SHADOWBIASCUBE){
+            propertyName = "u_shadowBiasCube";
+        }else if (type == S_PROPERTY_SHADOWCAMERA_NEARFAR2D){
+            propertyName = "u_shadowCameraNearFar2D";
+        }else if (type == S_PROPERTY_SHADOWCAMERA_NEARFARCUBE){
+            propertyName = "u_shadowCameraNearFarCube";
+        }else if (type == S_PROPERTY_NUMCASCADES2D){
+            propertyName = "u_shadowNumCascades2D";
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());
@@ -198,8 +231,9 @@ bool GLES2Object::load(){
 }
 
 bool GLES2Object::prepareDraw(){
-    
-    GLuint glesProgram = ((GLES2Program*)program->getProgramRender().get())->getProgram();
+
+    GLES2Program* programRender = (GLES2Program*)program->getProgramRender().get();
+    GLuint glesProgram = programRender->getProgram();
     if (programOwned){
         glUseProgram(glesProgram);
         GLES2Util::checkGlError("glUseProgram");
@@ -265,13 +299,62 @@ bool GLES2Object::prepareDraw(){
                       ((GLES2Texture*)(texture->getTextureRender().get()))->getTexture());
         glUniform1i(uTextureUnitLocation, 0);
     }else{
-        if (Engine::getPlatform() == S_WEB){
+        if (Engine::getPlatform() == S_PLATFORM_WEB){
             //Fix Chrome warnings of no texture bound
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
             glUniform1i(uTextureUnitLocation, 0);
         }
     }
+
+    if (shadowsMap2D.size() > 0){
+        
+        std::vector<int> shadowsMapLoc;
+
+        int maxShadows2D = programRender->getMaxShadows2D();
+        
+        int shadowsSize2D = (int)shadowsMap2D.size();
+        if (shadowsSize2D > maxShadows2D) shadowsSize2D = maxShadows2D;
+        
+        for (int i = 0; i < shadowsSize2D; i++){
+            shadowsMapLoc.push_back(i + 1);
+            
+            glActiveTexture(GL_TEXTURE1 + i);
+            glBindTexture(((GLES2Texture*)(shadowsMap2D.at(i)->getTextureRender().get()))->getTextureType(),
+                          ((GLES2Texture*)(shadowsMap2D.at(i)->getTextureRender().get()))->getTexture());
+        }
+
+        while (shadowsMapLoc.size() < maxShadows2D) {
+            shadowsMapLoc.push_back(shadowsMapLoc[0]);
+        }
+
+        glUniform1iv(uShadowsMap2DLocation, shadowsSize2D, &shadowsMapLoc.front());
+    }
+
+    if (shadowsMapCube.size() > 0){
+
+        std::vector<int> shadowsMapCubeLoc;
+
+        int maxShadowsCube = programRender->getMaxShadowsCube();
+
+        int shadowsSize2D = (int)shadowsMap2D.size();
+        int shadowsSizeCube = (int)shadowsMapCube.size();
+
+        for (int i = 0; i < shadowsSizeCube; i++){
+            shadowsMapCubeLoc.push_back(1 + i + shadowsSize2D);
+
+            glActiveTexture(GL_TEXTURE1 + i + shadowsSize2D);
+            glBindTexture(((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTextureType(),
+                          ((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTexture());
+        }
+
+        while (shadowsMapCubeLoc.size() < maxShadowsCube) {
+            shadowsMapCubeLoc.push_back(shadowsMapCubeLoc[0]);
+        }
+
+        glUniform1iv(uShadowsMapCubeLocation, shadowsMapCubeLoc.size(), &shadowsMapCubeLoc.front());
+    }
+
     GLES2Util::checkGlError("Error on bind texture");
     
     return true;
@@ -281,6 +364,7 @@ bool GLES2Object::draw(){
     if (!ObjectRender::draw()){
         return false;
     }
+
     //Log::Debug(LOG_TAG, "Start draw");
     
     if ((!vertexAttributes.count(S_VERTEXATTRIBUTE_VERTICES)) and (indexAttribute.size == 0)){

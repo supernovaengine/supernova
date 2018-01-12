@@ -5,11 +5,32 @@
 #include "GLES2Util.h"
 #include "math/Angle.h"
 #include "Engine.h"
+#include "platform/Log.h"
 
 
 using namespace Supernova;
 
 GLES2Scene::GLES2Scene(): SceneRender() {
+/*
+    GLint redBits = 0;
+    GLint greenBits = 0;
+    GLint blueBits = 0;
+    GLint alphaBits = 0;
+    GLint stencilBits = 0;
+    GLint depthBits = 0;
+    glGetIntegerv(GL_RED_BITS, &redBits);
+    glGetIntegerv(GL_GREEN_BITS, &greenBits);
+    glGetIntegerv(GL_BLUE_BITS, &blueBits);
+    glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
+    glGetIntegerv(GL_STENCIL_BITS, &stencilBits);
+    glGetIntegerv(GL_DEPTH_BITS, &depthBits);
+    Log::Debug(LOG_TAG, "Red bits: %i", redBits);
+    Log::Debug(LOG_TAG, "Green bits: %i", greenBits);
+    Log::Debug(LOG_TAG, "Blue bits: %i", blueBits);
+    Log::Debug(LOG_TAG, "Alpha bits: %i", alphaBits);
+    Log::Debug(LOG_TAG, "Stencil bits: %i", stencilBits);
+    Log::Debug(LOG_TAG, "Depth bits: %i", depthBits);
+*/
 }
 
 GLES2Scene::~GLES2Scene() {
@@ -22,11 +43,17 @@ bool GLES2Scene::load() {
         return false;
     }
 
-    if (!childScene) {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    GLES2Util::checkGlError("Error on load scene GLES2");
 
-        GLES2Util::checkGlError("Error on load scene GLES2");
-    }
+    return true;
+}
+
+bool GLES2Scene::clear(float value) {
+    glClearColor(value, value, value, 1.0f);
+    GLES2Util::checkGlError("glClearColor");
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLES2Util::checkGlError("glClear");
 
     return true;
 }
@@ -36,14 +63,9 @@ bool GLES2Scene::draw() {
     if (!SceneRender::draw()){
         return false;
     }
-
-    if (!childScene) {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        GLES2Util::checkGlError("glClearColor");
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        GLES2Util::checkGlError("glClear");
-    }
+    
+    if (drawingShadow)
+        glCullFace(GL_FRONT);
 
     if (useDepth){
         glEnable(GL_DEPTH_TEST);
@@ -62,9 +84,15 @@ bool GLES2Scene::draw() {
     return true;
 }
 
-bool GLES2Scene::viewSize(Rect rect){
+bool GLES2Scene::viewSize(Rect rect, bool adjustY){
     //Convert top-left orientation to botton-left (OpenGL default)
-    glViewport(rect.getX(), Engine::getScreenHeight() - rect.getY() - rect.getHeight(), rect.getWidth(), rect.getHeight());
+    if (adjustY) {
+        glViewport(rect.getX(), Engine::getScreenHeight() - rect.getY() - rect.getHeight(),
+                   rect.getWidth(), rect.getHeight());
+    } else{
+        glViewport(rect.getX(), rect.getY(),
+                   rect.getWidth(), rect.getHeight());
+    }
     GLES2Util::checkGlError("glViewport");
     
     return true;

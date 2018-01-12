@@ -8,6 +8,7 @@
 
 #include "ConcreteObject.h"
 #include "render/ObjectRender.h"
+#include "data/PointData.h"
 #include <unordered_map>
 
 namespace Supernova {
@@ -15,13 +16,6 @@ namespace Supernova {
     class Points: public ConcreteObject {
 
     private:
-        void updateNormalizedRectsData();
-        void updatePointScale();
-        void fillScaledSizeVector();
-        void normalizeTextureRects();
-        
-        std::vector<float> pointSizesScaled;
-        std::vector<float> rectsData;
         
         int texWidth;
         int texHeight;
@@ -32,21 +26,41 @@ namespace Supernova {
         
         bool useTextureRects;
 
+        void updatePointScale();
+        void sortTransparentPoints();
+        std::vector<int> findFramesByString(std::string id);
+
     protected:
+
+        struct FramesData{
+            std::string id;
+            Rect rect;
+        };
+
+        struct Point{
+            Vector3 position;
+            Vector3 normal;
+            Rect* textureRect;
+            float size;
+            Vector4 color;
+            
+            float distanceToCamera;
+            bool visible;
+        };
+
         ObjectRender* render;
 
-        std::vector<Vector3> positions;
-        std::vector<Vector3> normals;
-        std::vector<Rect*> textureRects;
-        std::vector<float> pointSizes;
-        std::vector<Vector4> colors;
+        std::vector<Point> points;
+        PointData pointData;
 
         bool sizeAttenuation;
         float pointScaleFactor;
         float minPointSize;
         float maxPointSize;
+
+        std::vector<FramesData> framesRect;
         
-        std::unordered_map <std::string, Rect> framesRect;
+        void updatePointsData();
         
         void updatePositions();
         void updateNormals();
@@ -64,25 +78,28 @@ namespace Supernova {
         void setMinPointSize(float minPointSize);
         void setMaxPointSize(float maxPointSize);
 
-        void addPoint();
-        void addPoint(Vector3 position);
+        virtual void addPoint();
+        virtual void addPoint(Vector3 position);
+        virtual void clearPoints();
 
         void setPointPosition(int point, Vector3 position);
         void setPointPosition(int point, float x, float y, float z);
         void setPointSize(int point, float size);
         void setPointColor(int point, Vector4 color);
         void setPointColor(int point, float red, float green, float blue, float alpha);
+        void setPointSprite(int point, int index);
         void setPointSprite(int point, std::string id);
-        void setPointSprite(int point, int id);
+        void setPointVisible(int point, bool visible);
+        
+        Vector3 getPointPosition(int point);
+        float getPointSize(int point);
+        Vector4 getPointColor(int point);
         
         void addSpriteFrame(std::string id, float x, float y, float width, float height);
+        void addSpriteFrame(float x, float y, float width, float height);
+        void addSpriteFrame(Rect rect);
+        void removeSpriteFrame(int index);
         void removeSpriteFrame(std::string id);
-        
-        std::vector<Vector3>* getPositions();
-        std::vector<Vector3>* getNormals();
-        std::vector<Rect*>* getTextureRects();
-        std::vector<float>* getPointSizes();
-        std::vector<Vector4>* getColors();
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();
