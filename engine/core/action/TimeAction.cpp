@@ -20,15 +20,15 @@ float TimeAction::linear(float time){
     return time;
 }
 
-float TimeAction::quadEaseIn(float time){
+float TimeAction::easeInQuad(float time){
     return time * time;
 }
 
-float TimeAction::quadEaseOut(float time){
+float TimeAction::easeOutQuad(float time){
     return time * (2 - time);
 }
 
-float TimeAction::quadEaseInOut(float time){
+float TimeAction::easeInOutQuad(float time){
     if ((time *= 2) < 1) {
         return 0.5 * time * time;
     }
@@ -37,16 +37,16 @@ float TimeAction::quadEaseInOut(float time){
     return - 0.5 * (time * (time - 2) - 1);
 }
 
-float TimeAction::cubicEaseIn(float time){
+float TimeAction::easeInCubic(float time){
     return time * time * time;
 }
 
-float TimeAction::cubicEaseOut(float time){
+float TimeAction::easeOutCubic(float time){
     time--;
     return time * time * time + 1;
 }
 
-float TimeAction::cubicEaseInOut(float time){
+float TimeAction::easeInOutCubic(float time){
     if ((time *= 2) < 1) {
         return 0.5 * time * time * time;
     }
@@ -54,16 +54,16 @@ float TimeAction::cubicEaseInOut(float time){
     return 0.5 * (time * time * time + 2);
 }
 
-float TimeAction::quartEaseIn(float time){
+float TimeAction::easeInQuart(float time){
     return time * time * time * time;
 }
 
-float TimeAction::quartEaseOut(float time){
+float TimeAction::easeOutQuart(float time){
     time--;
     return 1 - (time * time * time * time);
 }
 
-float TimeAction::quartEaseInOut(float time){
+float TimeAction::easeInOutQuart(float time){
     if ((time *= 2) < 1) {
         return 0.5 * time * time * time * time;
     }
@@ -71,16 +71,16 @@ float TimeAction::quartEaseInOut(float time){
     return - 0.5 * (time * time * time * time - 2);
 }
 
-float TimeAction::quintEaseIn(float time){
+float TimeAction::easeInQuint(float time){
     return time * time * time * time * time;
 }
 
-float TimeAction::quintEaseOut(float time){
+float TimeAction::easeOutQuint(float time){
     time--;
     return time * time * time * time * time + 1;
 }
 
-float TimeAction::quintEaseInOut(float time){
+float TimeAction::easeInOutQuint(float time){
     if ((time *= 2) < 1) {
         return 0.5 * time * time * time * time * time;
     }
@@ -89,27 +89,27 @@ float TimeAction::quintEaseInOut(float time){
     return 0.5 * (time * time * time * time * time + 2);
 }
 
-float TimeAction::sineEaseIn(float time){
+float TimeAction::easeInSine(float time){
     return 1 - cos(time * M_PI / 2);
 }
 
-float TimeAction::sineEaseOut(float time){
+float TimeAction::easeOutSine(float time){
     return sin(time * M_PI / 2);
 }
 
-float TimeAction::sineEaseInOut(float time){
+float TimeAction::easeInOutSine(float time){
     return 0.5 * (1 - cos(M_PI * time));
 }
 
-float TimeAction::expoEaseIn(float time){
+float TimeAction::easeInExpo(float time){
     return time == 0 ? 0 : pow(1024, time - 1);
 }
 
-float TimeAction::expoEaseOut(float time){
+float TimeAction::easeOutExpo(float time){
     return time == 1 ? 1 : 1 - pow(2, - 10 * time);
 }
 
-float TimeAction::expoEaseInOut(float time){
+float TimeAction::easeInOutExpo(float time){
     if (time == 0) {
         return 0;
     }
@@ -125,16 +125,16 @@ float TimeAction::expoEaseInOut(float time){
     return 0.5 * (- pow(2, - 10 * (time - 1)) + 2);
 }
 
-float TimeAction::circEaseIn(float time){
+float TimeAction::easeInCirc(float time){
     return 1 - sqrt(1 - time * time);
 }
 
-float TimeAction::circEaseOut(float time){
+float TimeAction::easeOutCirc(float time){
     time--;
     return sqrt(1 - (time * time));
 }
 
-float TimeAction::circEaseInOut(float time){
+float TimeAction::easeInOutCirc(float time){
     if ((time *= 2) < 1) {
         return - 0.5 * (sqrt(1 - time * time) - 1);
     }
@@ -143,7 +143,7 @@ float TimeAction::circEaseInOut(float time){
     return 0.5 * (sqrt(1 - time * time) + 1);
 }
 
-float TimeAction::elasticEaseIn(float time){
+float TimeAction::easeInElastic(float time){
     if (time == 0) {
         return 0;
     }
@@ -155,7 +155,7 @@ float TimeAction::elasticEaseIn(float time){
     return -pow(2, 10 * (time - 1)) * sin((time - 1.1) * 5 * M_PI);
 }
 
-float TimeAction::elasticEaseOut(float time){
+float TimeAction::easeOutElastic(float time){
     if (time == 0) {
         return 0;
     }
@@ -167,7 +167,7 @@ float TimeAction::elasticEaseOut(float time){
     return pow(2, -10 * time) * sin((time - 0.1) * 5 * M_PI) + 1;
 }
 
-float TimeAction::elasticEaseInOut(float time){
+float TimeAction::easeInOutElastic(float time){
     if (time == 0) {
         return 0;
     }
@@ -185,20 +185,20 @@ float TimeAction::elasticEaseInOut(float time){
     return 0.5 * pow(2, -10 * (time - 1)) * sin((time - 1.1) * 5 * M_PI) + 1;
 }
 
-float TimeAction::backEaseIn(float time){
+float TimeAction::easeInBack(float time){
     float s = 1.70158;
     
     return time * time * ((s + 1) * time - s);
 }
 
-float TimeAction::backEaseOut(float time){
+float TimeAction::easeOutBack(float time){
     float s = 1.70158;
     
     time--;
     return time * time * ((s + 1) * time + s) + 1;
 }
 
-float TimeAction::backEaseInOut(float time){
+float TimeAction::easeInOutBack(float time){
     float s = 1.70158 * 1.525;
     
     if ((time *= 2) < 1) {
@@ -209,11 +209,11 @@ float TimeAction::backEaseInOut(float time){
     return 0.5 * (time * time * ((s + 1) * time + s) + 2);
 }
 
-float TimeAction::bounceEaseIn(float time){
-    return 1 - bounceEaseOut(1 - time);
+float TimeAction::easeInBounce(float time){
+    return 1 - easeOutBounce(1 - time);
 }
 
-float TimeAction::bounceEaseOut(float time){
+float TimeAction::easeOutBounce(float time){
     if (time < (1 / 2.75)) {
         return 7.5625 * time * time;
     } else if (time < (2 / 2.75)) {
@@ -228,12 +228,12 @@ float TimeAction::bounceEaseOut(float time){
     }
 }
 
-float TimeAction::bounceEaseInOut(float time){
+float TimeAction::easeInOutBounce(float time){
     if (time < 0.5) {
-        return bounceEaseIn(time * 2) * 0.5;
+        return easeInBounce(time * 2) * 0.5;
     }
     
-    return bounceEaseOut(time * 2 - 1) * 0.5 + 0.5;
+    return easeOutBounce(time * 2 - 1) * 0.5 + 0.5;
 }
 
 
@@ -289,60 +289,66 @@ void TimeAction::setFunctionType(int functionType){
     
     if (functionType == S_LINEAR){
         function = TimeAction::linear;
-    }else if(functionType == S_QUAD_EASEIN){
-        function = TimeAction::quadEaseIn;
-    }else if(functionType == S_QUAD_EASEOUT){
-        function = TimeAction::quadEaseOut;
-    }else if(functionType == S_QUAD_EASEINOUT){
-        function = TimeAction::quadEaseInOut;
-    }else if(functionType == S_CUBIC_EASEIN){
-        function = TimeAction::cubicEaseIn;
-    }else if(functionType == S_CUBIC_EASEOUT){
-        function = TimeAction::cubicEaseOut;
-    }else if(functionType == S_CUBIC_EASEINOUT){
-        function = TimeAction::cubicEaseInOut;
-    }else if(functionType == S_QUART_EASEIN){
-        function = TimeAction::quartEaseIn;
-    }else if(functionType == S_QUART_EASEOUT){
-        function = TimeAction::quartEaseOut;
-    }else if(functionType == S_QUART_EASEINOUT){
-        function = TimeAction::quartEaseInOut;
-    }else if(functionType == S_QUINT_EASEIN){
-        function = TimeAction::quintEaseIn;
-    }else if(functionType == S_QUINT_EASEOUT){
-        function = TimeAction::quintEaseOut;
-    }else if(functionType == S_QUINT_EASEINOUT){
-        function = TimeAction::quintEaseInOut;
-    }else if(functionType == S_SINE_EASEIN){
-        function = TimeAction::sineEaseIn;
-    }else if(functionType == S_SINE_EASEOUT){
-        function = TimeAction::sineEaseOut;
-    }else if(functionType == S_SINE_EASEINOUT){
-        function = TimeAction::sineEaseInOut;
-    }else if(functionType == S_EXPO_EASEIN){
-        function = TimeAction::expoEaseIn;
-    }else if(functionType == S_EXPO_EASEOUT){
-        function = TimeAction::expoEaseOut;
-    }else if(functionType == S_EXPO_EASEINOUT){
-        function = TimeAction::expoEaseInOut;
-    }else if(functionType == S_ELASTIC_EASEIN){
-        function = TimeAction::elasticEaseIn;
-    }else if(functionType == S_ELASTIC_EASEOUT){
-        function = TimeAction::elasticEaseOut;
-    }else if(functionType == S_ELASTIC_EASEINOUT){
-        function = TimeAction::elasticEaseInOut;
-    }else if(functionType == S_BACK_EASEIN){
-        function = TimeAction::backEaseIn;
-    }else if(functionType == S_BACK_EASEOUT){
-        function = TimeAction::backEaseOut;
-    }else if(functionType == S_BACK_EASEINOUT){
-        function = TimeAction::backEaseInOut;
-    }else if(functionType == S_BOUNCE_EASEIN){
-        function = TimeAction::bounceEaseIn;
-    }else if(functionType == S_BOUNCE_EASEOUT){
-        function = TimeAction::bounceEaseOut;
-    }else if(functionType == S_BOUNCE_EASEINOUT){
-        function = TimeAction::bounceEaseInOut;
+    }else if(functionType == S_EASE_QUAD_IN){
+        function = TimeAction::easeInQuad;
+    }else if(functionType == S_EASE_QUAD_OUT){
+        function = TimeAction::easeOutQuad;
+    }else if(functionType == S_EASE_QUAD_IN_OUT){
+        function = TimeAction::easeInOutQuad;
+    }else if(functionType == S_EASE_CUBIC_IN){
+        function = TimeAction::easeInCubic;
+    }else if(functionType == S_EASE_CUBIC_OUT){
+        function = TimeAction::easeOutCubic;
+    }else if(functionType == S_EASE_CUBIC_IN_OUT){
+        function = TimeAction::easeInOutCubic;
+    }else if(functionType == S_EASE_QUART_IN){
+        function = TimeAction::easeInQuart;
+    }else if(functionType == S_EASE_QUART_OUT){
+        function = TimeAction::easeOutQuart;
+    }else if(functionType == S_EASE_QUART_IN_OUT){
+        function = TimeAction::easeInOutQuart;
+    }else if(functionType == S_EASE_QUINT_IN){
+        function = TimeAction::easeInQuint;
+    }else if(functionType == S_EASE_QUINT_OUT){
+        function = TimeAction::easeOutQuint;
+    }else if(functionType == S_EASE_QUINT_IN_OUT){
+        function = TimeAction::easeInOutQuint;
+    }else if(functionType == S_EASE_SINE_IN){
+        function = TimeAction::easeInSine;
+    }else if(functionType == S_EASE_SINE_OUT){
+        function = TimeAction::easeOutSine;
+    }else if(functionType == S_EASE_SINE_IN_OUT){
+        function = TimeAction::easeInOutSine;
+    }else if(functionType == S_EASE_EXPO_IN){
+        function = TimeAction::easeInExpo;
+    }else if(functionType == S_EASE_EXPO_OUT){
+        function = TimeAction::easeOutExpo;
+    }else if(functionType == S_EASE_EXPO_IN_OUT){
+        function = TimeAction::easeInOutExpo;
+    }else if(functionType == S_EASE_CIRC_IN){
+        function = TimeAction::easeInCirc;
+    }else if(functionType == S_EASE_CIRC_OUT){
+        function = TimeAction::easeOutCirc;
+    }else if(functionType == S_EASE_CIRC_IN_OUT){
+        function = TimeAction::easeInOutCirc;
+    }else if(functionType == S_EASE_ELASTIC_IN){
+        function = TimeAction::easeInElastic;
+    }else if(functionType == S_EASE_ELASTIC_OUT){
+        function = TimeAction::easeOutElastic;
+    }else if(functionType == S_EASE_ELASTIC_IN_OUT){
+        function = TimeAction::easeInOutElastic;
+    }else if(functionType == S_EASE_BACK_IN){
+        function = TimeAction::easeInBack;
+    }else if(functionType == S_EASE_BACK_OUT){
+        function = TimeAction::easeOutBack;
+    }else if(functionType == S_EASE_BACK_IN_OUT){
+        function = TimeAction::easeInOutBack;
+    }else if(functionType == S_EASE_BOUNCE_IN){
+        function = TimeAction::easeInBounce;
+    }else if(functionType == S_EASE_BOUNCE_OUT){
+        function = TimeAction::easeOutBounce;
+    }else if(functionType == S_EASE_BOUNCE_IN_OUT){
+        function = TimeAction::easeInOutBounce;
     }
 }
 

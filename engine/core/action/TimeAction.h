@@ -4,33 +4,36 @@
 #include "Action.h"
 
 #define S_LINEAR 0
-#define S_QUAD_EASEIN 1
-#define S_QUAD_EASEOUT 2
-#define S_QUAD_EASEINOUT 3
-#define S_CUBIC_EASEIN 4
-#define S_CUBIC_EASEOUT 5
-#define S_CUBIC_EASEINOUT 6
-#define S_QUART_EASEIN 7
-#define S_QUART_EASEOUT 8
-#define S_QUART_EASEINOUT 9
-#define S_QUINT_EASEIN 10
-#define S_QUINT_EASEOUT 11
-#define S_QUINT_EASEINOUT 12
-#define S_SINE_EASEIN 13
-#define S_SINE_EASEOUT 14
-#define S_SINE_EASEINOUT 15
-#define S_EXPO_EASEIN 16
-#define S_EXPO_EASEOUT 17
-#define S_EXPO_EASEINOUT 18
-#define S_ELASTIC_EASEIN 19
-#define S_ELASTIC_EASEOUT 20
-#define S_ELASTIC_EASEINOUT 21
-#define S_BACK_EASEIN 22
-#define S_BACK_EASEOUT 23
-#define S_BACK_EASEINOUT 24
-#define S_BOUNCE_EASEIN 25
-#define S_BOUNCE_EASEOUT 26
-#define S_BOUNCE_EASEINOUT 27
+#define S_EASE_QUAD_IN 1
+#define S_EASE_QUAD_OUT 2
+#define S_EASE_QUAD_IN_OUT 3
+#define S_EASE_CUBIC_IN 4
+#define S_EASE_CUBIC_OUT 5
+#define S_EASE_CUBIC_IN_OUT 6
+#define S_EASE_QUART_IN 7
+#define S_EASE_QUART_OUT 8
+#define S_EASE_QUART_IN_OUT 9
+#define S_EASE_QUINT_IN 10
+#define S_EASE_QUINT_OUT 11
+#define S_EASE_QUINT_IN_OUT 12
+#define S_EASE_SINE_IN 13
+#define S_EASE_SINE_OUT 14
+#define S_EASE_SINE_IN_OUT 15
+#define S_EASE_EXPO_IN 16
+#define S_EASE_EXPO_OUT 17
+#define S_EASE_EXPO_IN_OUT 18
+#define S_EASE_CIRC_IN 19
+#define S_EASE_CIRC_OUT 20
+#define S_EASE_CIRC_IN_OUT 21
+#define S_EASE_ELASTIC_IN 22
+#define S_EASE_ELASTIC_OUT 23
+#define S_EASE_ELASTIC_IN_OUT 24
+#define S_EASE_BACK_IN 25
+#define S_EASE_BACK_OUT 26
+#define S_EASE_BACK_IN_OUT 27
+#define S_EASE_BOUNCE_IN 28
+#define S_EASE_BOUNCE_OUT 29
+#define S_EASE_BOUNCE_IN_OUT 30
 
 typedef struct lua_State lua_State;
 
@@ -58,36 +61,36 @@ namespace Supernova{
         virtual ~TimeAction();
         
         static float linear(float time);
-        static float quadEaseIn(float time);
-        static float quadEaseOut(float time);
-        static float quadEaseInOut(float time);
-        static float cubicEaseIn(float time);
-        static float cubicEaseOut(float time);
-        static float cubicEaseInOut(float time);
-        static float quartEaseIn(float time);
-        static float quartEaseOut(float time);
-        static float quartEaseInOut(float time);
-        static float quintEaseIn(float time);
-        static float quintEaseOut(float time);
-        static float quintEaseInOut(float time);
-        static float sineEaseIn(float time);
-        static float sineEaseOut(float time);
-        static float sineEaseInOut(float time);
-        static float expoEaseIn(float time);
-        static float expoEaseOut(float time);
-        static float expoEaseInOut(float time);
-        static float circEaseIn(float time);
-        static float circEaseOut(float time);
-        static float circEaseInOut(float time);
-        static float elasticEaseIn(float time);
-        static float elasticEaseOut(float time);
-        static float elasticEaseInOut(float time);
-        static float backEaseIn(float time);
-        static float backEaseOut(float time);
-        static float backEaseInOut(float time);
-        static float bounceEaseIn(float time);
-        static float bounceEaseOut(float time);
-        static float bounceEaseInOut(float time);
+        static float easeInQuad(float time);
+        static float easeOutQuad(float time);
+        static float easeInOutQuad(float time);
+        static float easeInCubic(float time);
+        static float easeOutCubic(float time);
+        static float easeInOutCubic(float time);
+        static float easeInQuart(float time);
+        static float easeOutQuart(float time);
+        static float easeInOutQuart(float time);
+        static float easeInQuint(float time);
+        static float easeOutQuint(float time);
+        static float easeInOutQuint(float time);
+        static float easeInSine(float time);
+        static float easeOutSine(float time);
+        static float easeInOutSine(float time);
+        static float easeInExpo(float time);
+        static float easeOutExpo(float time);
+        static float easeInOutExpo(float time);
+        static float easeInCirc(float time);
+        static float easeOutCirc(float time);
+        static float easeInOutCirc(float time);
+        static float easeInElastic(float time);
+        static float easeOutElastic(float time);
+        static float easeInOutElastic(float time);
+        static float easeInBack(float time);
+        static float easeOutBack(float time);
+        static float easeInOutBack(float time);
+        static float easeInBounce(float time);
+        static float easeOutBounce(float time);
+        static float easeInOutBounce(float time);
         
         void setFunction(float (*function)(float));
         int setFunction(lua_State* L);
