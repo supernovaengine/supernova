@@ -5,6 +5,7 @@
 #include "Render.h"
 #include "math/Matrix4.h"
 #include "math/Vector3.h"
+#include "math/Vector2.h"
 #include "math/Quaternion.h"
 #include "Action.h"
 
@@ -69,7 +70,9 @@ namespace Supernova {
         Vector3 getCameraPosition();
 
         void setPosition(const float x, const float y, const float z);
+        void setPosition(const float x, const float y);
         void setPosition(Vector3 position);
+        void setPosition(Vector2 position);
         Vector3 getPosition();
         Vector3 getWorldPosition();
 

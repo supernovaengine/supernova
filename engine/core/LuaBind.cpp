@@ -237,6 +237,7 @@ void LuaBind::bind(){
     .addFunction("addAction", &Object::addAction)
     .addFunction("removeAction", &Object::removeAction)
     .addFunction("setPosition", (void (Object::*)(const float, const float, const float))&Object::setPosition)
+    .addFunction("setPosition2D", (void (Object::*)(const float, const float))&Object::setPosition)
     .addFunction("getPosition", &Object::getPosition)
     .addProperty("position", &Object::getPosition, (void (Object::*)(Vector3))&Object::setPosition)
     .addFunction("setRotation", (void (Object::*)(const float, const float, const float))&Object::setRotation)

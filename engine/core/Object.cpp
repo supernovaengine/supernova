@@ -146,6 +146,14 @@ void Object::setPosition(const float x, const float y, const float z){
     setPosition(Vector3(x, y, z));
 }
 
+void Object::setPosition(const float x, const float y){
+    setPosition(Vector3(x, y, 0));
+}
+
+void Object::setPosition(Vector2 position){
+    setPosition(Vector3(position.x, position.y, 0));
+}
+
 void Object::setPosition(Vector3 position){
     if (this->position != position){
         this->position = position;
