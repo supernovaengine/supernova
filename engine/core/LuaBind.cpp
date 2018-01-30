@@ -19,6 +19,7 @@
 #include "Model.h"
 #include "math/Ray.h"
 #include "math/Quaternion.h"
+#include "math/Plane.h"
 #include "Mesh.h"
 #include "Mesh2D.h"
 #include "Image.h"
@@ -548,9 +549,13 @@ void LuaBind::bind(){
     .addVariable("z", &Quaternion::z)
     .endClass();
 
+    LuaIntf::LuaBinding(L).beginClass<Plane>("Plane")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>))
+    .endClass();
+
     LuaIntf::LuaBinding(L).beginClass<Ray>("Ray")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>))
-    .addFunction("intersectionPoint", &Ray::intersectionPoint)
+    .addFunction("intersectionPointPlane", (Vector3 (Ray::*)(Plane))&Ray::intersectionPoint)
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<Sound>("Sound")

@@ -2,6 +2,8 @@
 #define ray_h
 
 #include "math/Vector3.h"
+#include "math/Plane.h"
+#include "math/AlignedBox.h"
 
 namespace Supernova {
 
@@ -9,24 +11,31 @@ namespace Supernova {
 
     private:
 
-        Vector3 point;
-        Vector3 vector;
+        Vector3 origin;
+        Vector3 direction;
 
     public:
 
         Ray();
         Ray(const Ray &ray);
-        Ray(Vector3 point, Vector3 vector);
+        Ray(Vector3 origin, Vector3 direction);
 
         Ray &operator=(const Ray &);
+        Vector3 operator*(float t);
 
-        void setPoint(Vector3 point);
-        Vector3 getPoint();
+        void setOrigin(Vector3 point);
+        Vector3 getOrigin();
 
-        void setVector(Vector3 vector);
-        Vector3 getVector();
+        void setDirection(Vector3 direction);
+        Vector3 getDirection();
 
-        Vector3 intersectionPoint(Vector3 planePoint, Vector3 planeNormal);
+        Vector3 getPoint(float distance);
+
+        float intersects(Plane plane);
+        float intersects(AlignedBox box);
+
+        Vector3 intersectionPoint(Plane plane);
+        Vector3 intersectionPoint(AlignedBox box);
     };
     
 }
