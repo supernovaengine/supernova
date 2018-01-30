@@ -14,6 +14,8 @@ namespace Supernova {
         static File* newFile(bool useHandle = false);
         static File* newFile(const char *aFilename, bool useHandle = false);
 
+        static char getDirSeparator();
+
         unsigned int read8();
         unsigned int read16();
         unsigned int read32();

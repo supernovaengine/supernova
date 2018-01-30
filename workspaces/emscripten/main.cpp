@@ -9,7 +9,7 @@
 
 #include "Engine.h"
 #include "Supernova.h"
-#include "InputCode.h"
+#include "Input.h"
 
 
 void renderLoop();
@@ -102,13 +102,14 @@ EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChang
 
 int supernova_mouse_button(int button){
     if (button == 0) return S_MOUSE_BUTTON_1;
-    if (button == 1) return S_MOUSE_BUTTON_2;
-    if (button == 2) return S_MOUSE_BUTTON_3;
+    if (button == 2) return S_MOUSE_BUTTON_2;
+    if (button == 1) return S_MOUSE_BUTTON_3;
     if (button == 3) return S_MOUSE_BUTTON_4;
     if (button == 4) return S_MOUSE_BUTTON_5;
     if (button == 5) return S_MOUSE_BUTTON_6;
     if (button == 6) return S_MOUSE_BUTTON_7;
     if (button == 7) return S_MOUSE_BUTTON_8;
+
     return -1;
 }
 

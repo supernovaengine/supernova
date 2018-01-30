@@ -1,7 +1,5 @@
 #include "Input.h"
 
-#include "InputCode.h"
-
 using namespace Supernova;
 
 std::map<int,bool> Input::keyPressed;

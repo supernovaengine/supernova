@@ -25,8 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Mesh.h"
-#include "InputCode.h"
+//#include "Mesh.h"
 
 #include "audio/SoundManager.h"
 
@@ -376,7 +375,7 @@ void Engine::onTouchDrag(float x, float y){
 void Engine::onMousePress(int button, float x, float y){
     if (transformCoordPos(x, y)){
         Events::call_onMousePress(button, x, y);
-        if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+        if (Engine::isMouseAsTouch()){
             Events::call_onTouchPress(x, y);
         }
     }
@@ -384,7 +383,7 @@ void Engine::onMousePress(int button, float x, float y){
 void Engine::onMouseUp(int button, float x, float y){
     if (transformCoordPos(x, y)){
         Events::call_onMouseUp(button, x, y);
-        if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+        if (Engine::isMouseAsTouch()){
             Events::call_onTouchUp(x, y);
         }
     }
@@ -393,7 +392,7 @@ void Engine::onMouseUp(int button, float x, float y){
 void Engine::onMouseDrag(int button, float x, float y){
     if (transformCoordPos(x, y)){
         Events::call_onMouseDrag(button, x, y);
-        if ((Engine::isMouseAsTouch()) && (button == S_MOUSE_BUTTON_LEFT)){
+        if (Engine::isMouseAsTouch()){
             Events::call_onTouchDrag(x, y);
         }
     }

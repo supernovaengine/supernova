@@ -39,6 +39,14 @@ unsigned int File::read32(){
     return d;
 }
 
+char File::getDirSeparator(){
+#if defined(_WIN32)
+    return '\\';
+#else
+    return '/';
+#endif
+}
+
 std::string File::readString(){
     unsigned int stringlen = length();
     std::string s( stringlen, '\0' );
