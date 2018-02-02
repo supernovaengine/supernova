@@ -75,15 +75,15 @@ namespace Supernova{
         std::shared_ptr<ProgramRender> programRender;
         
         int shaderType;
-        bool numLights;
+        int numLights;
+        int numShadows2D;
+        int numShadowsCube;
         bool hasFog;
         bool hasTextureCoords;
         bool hasTextureRect;
         bool hasTextureCube;
         bool isSky;
         bool isText;
-        bool numShadows2D;
-        bool numShadowsCube;
         
         std::vector<int> shaderVertexAttributes;
         std::vector<int> shaderProperties;

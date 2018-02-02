@@ -414,6 +414,7 @@ void LuaBind::bind(){
     .addFunction("getPower", &Light::getPower)
     .addFunction("getSpotAngle", &Light::getSpotAngle)
     .addFunction("setPower", &Light::setPower)
+    .addFunction("setShadow", &Light::setShadow)
     .endClass()
 
     .beginExtendClass<PointLight, Light>("PointLight")
