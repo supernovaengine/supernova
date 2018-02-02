@@ -58,6 +58,10 @@ ProgramRender::it_type ProgramRender::findToRemove(){
     return programsRender.end();
 }
 
+int ProgramRender::getMaxLights(){
+    return maxLights;
+}
+
 int ProgramRender::getMaxShadows2D(){
     return maxShadows2D;
 }
@@ -66,12 +70,8 @@ int ProgramRender::getMaxShadowsCube(){
     return maxShadowsCube;
 }
 
-void ProgramRender::createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows2D, bool hasShadowsCube){
+void ProgramRender::createProgram(int shaderType, int numLights, int numShadows2D, int numShadowsCube, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText){
     loaded = true;
-
-    maxLights = (int)Engine::getScene()->getLights()->size();
-    maxShadows2D = Engine::getScene()->getLightData()->numShadows2D;
-    maxShadowsCube = Engine::getScene()->getLightData()->numShadowsCube;
 }
 
 void ProgramRender::deleteProgram(){

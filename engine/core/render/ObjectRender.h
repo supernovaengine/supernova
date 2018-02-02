@@ -59,15 +59,15 @@ namespace Supernova {
         indexData indexAttribute;
         std::unordered_map<int, propertyData> properties;
         
-        bool hasLight;
+        int numLights;
+        int numShadows2D;
+        int numShadowsCube;
         bool hasFog;
         bool hasTextureCoords;
         bool hasTextureRect;
         bool hasTextureCube;
         bool isSky;
         bool isText;
-        bool hasShadows2D;
-        bool hasShadowsCube;
         
         SceneRender* sceneRender;
         ObjectRender* lightRender;
@@ -103,13 +103,14 @@ namespace Supernova {
         void setPrimitiveType(int primitiveType);
         void setProgramShader(int programShader);
         void setDynamicBuffer(bool dynamicBuffer);
+        void setNumLights(int numLights);
+        void setNumShadows2D(int numShadows2D);
+        void setNumShadowsCube(int numShadowsCube);
         void setHasTextureCoords(bool hasTextureCoords);
         void setHasTextureRect(bool hasTextureRect);
         void setHasTextureCube(bool hasTextureCube);
         void setIsSky(bool isSky);
         void setIsText(bool isText);
-        void setHasShadows2D(bool hasShadows2D);
-        void setHasShadowsCube(bool hasShadowsCube);
 
         void addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);
         void addIndex(unsigned long size, void* data);

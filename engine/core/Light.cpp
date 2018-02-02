@@ -14,7 +14,7 @@ Light::Light(){
     this->spotAngle = Angle::degToRad(20);
     this->spotOuterAngle = Angle::degToRad(20);
     this->power = 1;
-    this->useShadow = true;
+    this->useShadow = false;
     this->shadowMapWidth = 1024;
     this->shadowMapHeight = 1024;
     this->shadowBias = 0.001;
@@ -105,7 +105,7 @@ void Light::setColor(Vector3 color){
     this->color = color;
 }
 
-void Light::setUseShadow(bool useShadow){
+void Light::setShadow(bool useShadow){
     if (this->useShadow != useShadow){
         this->useShadow = useShadow;
         if (loaded)

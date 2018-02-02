@@ -9,8 +9,7 @@ Supernova::Quaternion operator * (float fScalar, const Supernova::Quaternion& rk
 
 namespace Supernova {
 
-    class Quaternion
-    {
+    class Quaternion {
     public:
 
         float w, x, y, z;

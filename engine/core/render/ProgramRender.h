@@ -35,10 +35,11 @@ namespace Supernova {
         
         bool isLoaded();
 
+        int getMaxLights();
         int getMaxShadows2D();
         int getMaxShadowsCube();
 
-        virtual void createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows2D, bool hasShadowsCube);
+        virtual void createProgram(int shaderType, int numLights, int numShadows2D, int numShadowsCube, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText);
         virtual void deleteProgram();
         
     };

@@ -63,7 +63,7 @@ namespace Supernova {
 
         void setPower(float power);
         void setColor(Vector3 color);
-        void setUseShadow(bool useShadow);
+        void setShadow(bool useShadow);
         void setShadowBias(float shadowBias);
 
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);

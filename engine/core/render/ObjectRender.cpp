@@ -16,15 +16,15 @@ ObjectRender::ObjectRender(){
     programShader = -1;
     dynamicBuffer = false;
     
-    hasLight = false;
+    numLights = 0;
+    numShadows2D = 0;
+    numShadowsCube = 0;
     hasFog = false;
     hasTextureCoords = false;
     hasTextureRect = false;
     hasTextureCube = false;
     isSky = false;
     isText = false;
-    hasShadows2D = false;
-    hasShadowsCube = false;
     
     sceneRender = NULL;
     lightRender = NULL;
@@ -136,6 +136,18 @@ void ObjectRender::setDynamicBuffer(bool dynamicBuffer){
     this->dynamicBuffer = dynamicBuffer;
 }
 
+void ObjectRender::setNumLights(int numLights){
+    this->numLights = numLights;
+}
+
+void ObjectRender::setNumShadows2D(int numShadows2D){
+    this->numShadows2D = numShadows2D;
+}
+
+void ObjectRender::setNumShadowsCube(int numShadowsCube){
+    this->numShadowsCube = numShadowsCube;
+}
+
 void ObjectRender::setHasTextureCoords(bool hasTextureCoords){
     this->hasTextureCoords = hasTextureCoords;
 }
@@ -156,14 +168,6 @@ void ObjectRender::setIsText(bool isText){
     this->isText = isText;
 }
 
-void ObjectRender::setHasShadows2D(bool hasShadows2D){
-    this->hasShadows2D = hasShadows2D;
-}
-
-void ObjectRender::setHasShadowsCube(bool hasShadowsCube){
-    this->hasShadowsCube = hasShadowsCube;
-}
-
 Program* ObjectRender::getProgram(){
     
     loadProgram();
@@ -172,8 +176,8 @@ Program* ObjectRender::getProgram(){
 }
 
 void ObjectRender::checkLighting(){
-    if (lightRender != NULL && !isSky){
-        hasLight = true;
+    if (lightRender == NULL || isSky){
+        numLights = 0;
     }
 }
 
@@ -220,7 +224,7 @@ void ObjectRender::loadProgram(){
         if (programShader != -1)
             program->setShader(programShader);
     
-        program->setDefinitions(hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows2D, hasShadowsCube);
+        program->setDefinitions(numLights, numShadows2D, numShadowsCube, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
         program->load();
     }
 }
@@ -258,7 +262,7 @@ bool ObjectRender::load(){
         }
     }
 
-    if (hasLight){
+    if (numLights > 0){
         lightRender->setProgram(program);
         lightRender->load();
     }
@@ -273,8 +277,8 @@ bool ObjectRender::load(){
 
 bool ObjectRender::prepareDraw(){
     
-    //hasLight and hasFog need to be called after main rander use program
-    if (hasLight){
+    //lightRender and fogRender need to be called after main rander use program
+    if (numLights > 0){
         lightRender->prepareDraw();
     }
     

@@ -336,7 +336,8 @@ bool Scene::renderDraw(bool cubeMap, int cubeFace){
 }
 
 bool Scene::draw() {
-
+    //TODO: alert if not loaded
+    
     Camera* originalCamera = this->camera;
     Texture* originalTextureRender = this->textureRender;
 

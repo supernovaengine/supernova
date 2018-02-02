@@ -547,6 +547,8 @@ void LuaBind::bind(){
     .addVariable("x", &Quaternion::x)
     .addVariable("y", &Quaternion::y)
     .addVariable("z", &Quaternion::z)
+    .addFunction("fromAxes", (void (Quaternion::*)(const Vector3&, const Vector3&, const Vector3&))&Quaternion::fromAxes)
+    .addFunction("fromAngleAxis", (void (Quaternion::*)(const float, const Vector3&))&Quaternion::fromAngleAxis)
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<Plane>("Plane")

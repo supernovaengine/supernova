@@ -60,8 +60,8 @@ GLuint GLES2Program::loadShader(GLenum shaderType, const char* pSource) {
     return shader;
 }
 
-void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText, bool hasShadows2D, bool hasShadowsCube){
-    ProgramRender::createProgram(shaderType, hasLight, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText, hasShadows2D, hasShadowsCube);
+void GLES2Program::createProgram(int shaderType, int numLights, int numShadows2D, int numShadowsCube, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText){
+    ProgramRender::createProgram(shaderType, numLights, numShadows2D, numShadowsCube, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
     
     std::string shaderName = "";
     if (shaderType == S_SHADER_MESH){
@@ -72,11 +72,11 @@ void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, boo
     
     std::string definitions = "";
 
-    maxLights = std::min(MAXLIGHTS_GLES2, maxLights);
-    maxShadows2D = std::min(MAXLIGHTS_GLES2, maxShadows2D);
-    maxShadowsCube = std::min(MAXLIGHTS_GLES2 - maxShadows2D, maxShadowsCube);
+    maxLights = std::min(MAXLIGHTS_GLES2, numLights);
+    maxShadows2D = std::min(MAXLIGHTS_GLES2, numShadows2D);
+    maxShadowsCube = std::min(MAXLIGHTS_GLES2 - numShadows2D, numShadowsCube);
 
-    if (hasLight){
+    if (numLights > 0){
         definitions += "#define USE_LIGHTING\n";
         definitions += "#define MAXLIGHTS " + std::to_string(maxLights) + "\n";
         definitions += "#define MAXSHADOWS2D " + std::to_string(maxShadows2D) + "\n";
@@ -101,10 +101,10 @@ void GLES2Program::createProgram(int shaderType, bool hasLight, bool hasFog, boo
     if (isText){
         definitions += "#define IS_TEXT\n";
     }
-    if (hasShadows2D){
+    if (numShadows2D > 0){
         definitions += "#define HAS_SHADOWS2D\n";
     }
-    if (hasShadowsCube){
+    if (numShadowsCube > 0){
         definitions += "#define HAS_SHADOWSCUBE\n";
     }
     

@@ -239,8 +239,9 @@ bool Mesh::load(){
 
     if (scene){
 
-        render->setHasShadows2D(scene->getLightData()->shadowsMap2D.size() > 0);
-        render->setHasShadowsCube(scene->getLightData()->shadowsMapCube.size() > 0);
+        render->setNumLights((int)scene->getLights()->size());
+        render->setNumShadows2D((int)scene->getLightData()->shadowsMap2D.size());
+        render->setNumShadowsCube((int)scene->getLightData()->shadowsMapCube.size());
 
         render->setSceneRender(scene->getSceneRender());
         render->setLightRender(scene->getLightRender());

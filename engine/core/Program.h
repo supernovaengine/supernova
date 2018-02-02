@@ -75,15 +75,15 @@ namespace Supernova{
         std::shared_ptr<ProgramRender> programRender;
         
         int shaderType;
-        bool hasLight;
+        bool numLights;
         bool hasFog;
         bool hasTextureCoords;
         bool hasTextureRect;
         bool hasTextureCube;
         bool isSky;
         bool isText;
-        bool hasShadows2D;
-        bool hasShadowsCube;
+        bool numShadows2D;
+        bool numShadowsCube;
         
         std::vector<int> shaderVertexAttributes;
         std::vector<int> shaderProperties;
@@ -92,8 +92,9 @@ namespace Supernova{
         Program();
 
         void setShader(int shaderType);
-        void setDefinitions(bool hasLight = false, bool hasFog = false, bool hasTexture = false, bool hasTextureRect = false,
-                            bool hasTextureCube = false, bool isSky = false, bool isText = false, bool hasShadows2D = false, bool hasShadowsCube = false);
+        void setDefinitions(int numLights = 0, int numShadows2D = 0, int numShadowsCube = 0, bool hasFog = false,
+                            bool hasTexture = false, bool hasTextureRect = false, bool hasTextureCube = false,
+                            bool isSky = false, bool isText = false);
         
         bool existVertexAttribute(int vertexAttribute);
         bool existProperty(int property);
