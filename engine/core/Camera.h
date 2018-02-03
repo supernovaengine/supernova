@@ -76,7 +76,11 @@ namespace Supernova {
         float getBottom();
         float getLeft();
         float getRight();
+
+        void setNear(float near);
         float getNear();
+
+        void setFar(float far);
         float getFar();
         Vector2 getNearFarPlane();
         

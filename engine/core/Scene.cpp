@@ -286,7 +286,7 @@ void Scene::setTextureRender(Texture* textureRender){
     }
 }
 
-bool Scene::renderDraw(bool cubeMap, int cubeFace){
+bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
     if (textureRender == NULL) {
         render->viewSize(*Engine::getViewRect());
         if (!childScene)
@@ -299,7 +299,10 @@ bool Scene::renderDraw(bool cubeMap, int cubeFace){
         }
 
         render->viewSize(Rect(0, 0, textureRender->getTextureFrameWidth(), textureRender->getTextureFrameHeight()), false);
-        render->clear(1.0);
+        if (shadowMap)
+            render->clear(1.0);
+        else
+            render->clear();
     }
 
     transparentQueue.clear();
@@ -356,7 +359,7 @@ bool Scene::draw() {
                     this->setCamera(lights[i]->getLightCamera(cam));
                     this->drawShadowCameraNearFar = lights[i]->getLightCamera(cam)->getNearFarPlane();
 
-                    renderDraw(true, TEXTURE_CUBE_FACE_POSITIVE_X + cam);
+                    renderDraw(true, true, TEXTURE_CUBE_FACE_POSITIVE_X + cam);
                 }
 
             }else if (lights[i]->getType() == S_SPOT_LIGHT) {
@@ -367,7 +370,7 @@ bool Scene::draw() {
                 this->setCamera(lights[i]->getLightCamera());
                 this->drawShadowCameraNearFar = lights[i]->getLightCamera()->getNearFarPlane();
 
-                renderDraw();
+                renderDraw(true);
 
             }else if (lights[i]->getType() == S_DIRECTIONAL_LIGHT) {
 
@@ -378,7 +381,7 @@ bool Scene::draw() {
                     this->setCamera(lights[i]->getLightCamera(ca));
                     this->drawShadowCameraNearFar = lights[i]->getLightCamera(ca)->getNearFarPlane();
 
-                    renderDraw();
+                    renderDraw(true);
                 }
 
             }

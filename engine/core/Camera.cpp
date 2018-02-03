@@ -148,11 +148,39 @@ float Camera::getRight(){
     return right;
 }
 
+void Camera::setNear(float near){
+    if (type == S_CAMERA_PERSPECTIVE) {
+        if (this->perspectiveNear != near) {
+            this->perspectiveNear = near;
+            updateMatrix();
+        }
+    } else {
+        if (this->orthoNear != near) {
+            this->orthoNear = near;
+            updateMatrix();
+        }
+    }
+}
+
 float Camera::getNear(){
     if (type == S_CAMERA_PERSPECTIVE)
         return perspectiveNear;
     else
         return orthoNear;
+}
+
+void Camera::setFar(float far){
+    if (type == S_CAMERA_PERSPECTIVE) {
+        if (this->perspectiveFar != far) {
+            this->perspectiveFar = far;
+            updateMatrix();
+        }
+    } else {
+        if (this->orthoFar != far) {
+            this->orthoFar = far;
+            updateMatrix();
+        }
+    }
 }
 
 float Camera::getFar(){

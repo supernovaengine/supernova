@@ -71,7 +71,7 @@ namespace Supernova {
         void drawSky();
 
         void drawChildScenes();
-        bool renderDraw(bool cubeMap=false, int cubeFace=0);
+        bool renderDraw(bool shadowMap=false, bool cubeMap=false, int cubeFace=0);
 
     public:
 

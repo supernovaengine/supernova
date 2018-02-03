@@ -11,6 +11,7 @@ DirectionalLight::DirectionalLight(): Light(){
     this->power = 1;
 
     this->numShadowCascades = 3;
+    this->shadowSplitLogFactor = .8f;
     this->cascadeCameraNearFar.clear();
 
 }
@@ -97,14 +98,13 @@ void DirectionalLight::updateLightCamera(){
 
                 splitFar = std::vector<float> { zFar, zFar, zFar };
                 splitNear = std::vector<float> { zNear, zNear, zNear };
-                float lambda = .5f;
                 float j = 1.f;
                 for (auto i = 0u; i < numShadowCascades - 1; ++i, j+= 1.f)
                 {
                     splitFar[i] = lerp(
                             zNear + (j / (float)numShadowCascades) * (zFar - zNear),
                             zNear * powf(zFar / zNear, j / (float)numShadowCascades),
-                            lambda
+                            shadowSplitLogFactor
                     );
                     splitNear[i + 1] = splitFar[i];
                 }
@@ -172,6 +172,10 @@ Vector2 DirectionalLight::getCascadeCameraNearFar(int index){
 
 int DirectionalLight::getNumShadowCasdades(){
     return numShadowCascades;
+}
+
+float DirectionalLight::getShadowSplitLogFactor(){
+    return shadowSplitLogFactor;
 }
 
 void DirectionalLight::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){

@@ -18,6 +18,7 @@ namespace Supernova {
     protected:
 
         int numShadowCascades;
+        float shadowSplitLogFactor;
         std::vector<Vector2> cascadeCameraNearFar;
 
         virtual void updateLightCamera();
@@ -32,6 +33,7 @@ namespace Supernova {
 
         Vector2 getCascadeCameraNearFar(int index);
         int getNumShadowCasdades();
+        float getShadowSplitLogFactor();
 
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
