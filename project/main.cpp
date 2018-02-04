@@ -1,5 +1,7 @@
 #include "Supernova.h"
 
-void init(){
+using namespace Supernova;
+
+void init() {
 
 }
