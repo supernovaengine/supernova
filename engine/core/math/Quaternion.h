@@ -60,14 +60,14 @@ namespace Supernova {
         Quaternion exp () const;
         Quaternion log () const;
 
-        Quaternion slerp (float fT, const Quaternion& rkP, const Quaternion& rkQ, bool shortestPath);
+        Quaternion slerp (float fT, const Quaternion& rkP, const Quaternion& rkQ, bool shortestPath = false);
         Quaternion slerpExtraSpins (float fT, const Quaternion& rkP, const Quaternion& rkQ, int iExtraSpins);
-        Quaternion squad (float fT, const Quaternion& rkP, const Quaternion& rkA, const Quaternion& rkB, const Quaternion& rkQ, bool shortestPath);
+        Quaternion squad (float fT, const Quaternion& rkP, const Quaternion& rkA, const Quaternion& rkB, const Quaternion& rkQ, bool shortestPath = false);
+        Quaternion nlerp(float fT, const Quaternion& rkP, const Quaternion& rkQ, bool shortestPath = false);
         float normalise(void);
         float getRoll() const;
         float getPitch() const;
         float getYaw() const;
-        Quaternion nlerp(float fT, const Quaternion& rkP, const Quaternion& rkQ, bool shortestPath);
 
     };
     

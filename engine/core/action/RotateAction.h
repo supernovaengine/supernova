@@ -14,11 +14,15 @@ namespace Supernova {
         Quaternion startRotation;
 
         bool objectStartRotation;
+        bool shortestPath;
 
     public:
         RotateAction(Quaternion endRotation, float duration, bool loop);
         RotateAction(Quaternion startRotation, Quaternion endRotation, float duration, bool loop);
         virtual ~RotateAction();
+
+        bool isShortestPath();
+        void setShortestPath(bool shortestPath);
 
         virtual bool run();
 

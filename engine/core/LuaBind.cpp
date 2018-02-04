@@ -39,6 +39,7 @@
 #include "Action.h"
 #include "action/TimeAction.h"
 #include "action/MoveAction.h"
+#include "action/RotateAction.h"
 #include "action/SpriteAnimation.h"
 
 #include <map>
@@ -616,6 +617,12 @@ void LuaBind::bind(){
     
     .beginExtendClass<MoveAction, TimeAction>("MoveAction")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
+    .endClass()
+
+    .beginExtendClass<RotateAction, TimeAction>("RotateAction")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<Quaternion>, LuaIntf::_opt<Quaternion>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
+    .addFunction("isShortestPath", &RotateAction::isShortestPath)
+    .addFunction("setShortestPath", &RotateAction::setShortestPath)
     .endClass()
     
     .beginExtendClass<SpriteAnimation, Action>("SpriteAnimation")
