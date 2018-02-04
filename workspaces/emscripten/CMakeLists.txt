@@ -9,6 +9,15 @@ set(COMPILE_ZLIB OFF)
 add_subdirectory (../.. ${PROJECT_BINARY_DIR}/supernova)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/action")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/audio")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/data")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/file")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/image")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/math")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/platform")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/render")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/text")
 
 file(GLOB_RECURSE SUPERNOVA_PROJECT_SRCS ../../project/*.cpp)
 

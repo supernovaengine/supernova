@@ -613,6 +613,10 @@ void LuaBind::bind(){
     .addConstant("EASE_BOUNCE_IN_OUT", S_EASE_BOUNCE_IN_OUT)
     .addFunction("setFunction", (int (Action::*)(lua_State*))&TimeAction::setFunction)
     .addFunction("setFunctionType", &TimeAction::setFunctionType)
+    .addFunction("getDuration", &TimeAction::getDuration)
+    .addFunction("setDuration", &TimeAction::setDuration)
+    .addFunction("isLoop", &TimeAction::isLoop)
+    .addFunction("setLoop", &TimeAction::setLoop)
     .endClass()
     
     .beginExtendClass<MoveAction, TimeAction>("MoveAction")

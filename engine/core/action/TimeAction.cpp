@@ -266,6 +266,23 @@ TimeAction::TimeAction(float duration, bool loop, float (*function)(float)): Act
 
 
 TimeAction::~TimeAction(){
+
+}
+
+float TimeAction::getDuration(){
+    return duration;
+};
+
+void TimeAction::setDuration(float duration){
+     this->duration = duration;
+}
+
+bool TimeAction::isLoop(){
+    return loop;
+}
+
+void TimeAction::setLoop(bool loop){
+    this->loop = loop;
 }
 
 void TimeAction::setFunction(float (*function)(float)){

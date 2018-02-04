@@ -96,6 +96,12 @@ namespace Supernova{
         int setFunction(lua_State* L);
         
         void setFunctionType(int functionType);
+
+        float getDuration();
+        void setDuration(float duration);
+
+        bool isLoop();
+        void setLoop(bool loop);
         
         virtual bool run();
         virtual bool pause();
