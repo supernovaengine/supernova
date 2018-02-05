@@ -394,6 +394,7 @@ bool TimeAction::step(){
     
     if ((time == 1) && !loop){
         stop();
+        call_onFinish();
         return false;
     }
     

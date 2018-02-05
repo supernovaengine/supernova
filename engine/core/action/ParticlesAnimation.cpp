@@ -8,7 +8,8 @@ using namespace Supernova;
 
 
 ParticlesAnimation::ParticlesAnimation(): Action(){
-    stopAll();
+    newParticlesCount = 0;
+    emitter = true;
 }
 
 ParticlesAnimation::~ParticlesAnimation(){
@@ -44,6 +45,7 @@ bool ParticlesAnimation::pause(){
 
 bool ParticlesAnimation::stop(){
     emitter = false;
+    call_onStop();
     
     return true;
 }
@@ -62,6 +64,7 @@ bool ParticlesAnimation::stopAll(){
     
     newParticlesCount = 0;
     emitter = true;
+    call_onFinish();
     
     return true;
 }

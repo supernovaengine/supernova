@@ -5,7 +5,10 @@
 using namespace Supernova;
 
 SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop): Action(){
-    stop();
+    this->spriteFrameCount = 0;
+    this->framesIndex = 0;
+    this->framesTimeIndex = 0;
+
     this->loop = loop;
     
     this->framesTime = framesTime;
@@ -16,7 +19,10 @@ SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, std::vector<int> f
 }
 
 SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop): Action(){
-    stop();
+    this->spriteFrameCount = 0;
+    this->framesIndex = 0;
+    this->framesTimeIndex = 0;
+
     this->loop = loop;
 
     this->framesTime = framesTime;
@@ -27,7 +33,10 @@ SpriteAnimation::SpriteAnimation(std::vector<int> framesTime, int startFrame, in
 }
 
 SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, bool loop): Action(){
-    stop();
+    this->spriteFrameCount = 0;
+    this->framesIndex = 0;
+    this->framesTimeIndex = 0;
+
     this->loop = loop;
     
     std::vector<int> framesTime;
@@ -40,7 +49,10 @@ SpriteAnimation::SpriteAnimation(int interval, int startFrame, int endFrame, boo
 }
 
 SpriteAnimation::SpriteAnimation(int interval, std::vector<int> frames, bool loop): Action(){
-    stop();
+    this->spriteFrameCount = 0;
+    this->framesIndex = 0;
+    this->framesTimeIndex = 0;
+
     this->loop = loop;
     
     std::vector<int> framesTime;
@@ -142,6 +154,7 @@ bool SpriteAnimation::step(){
             if (framesIndex == frames.size() - 1) {
                 if (!loop) {
                     stop();
+                    call_onFinish();
                 }
             }
             

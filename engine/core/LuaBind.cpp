@@ -575,7 +575,12 @@ void LuaBind::bind(){
     .addFunction("pause", &Action::pause)
     .addFunction("stop", &Action::stop)
     .addFunction("isRunning", &Action::isRunning)
-
+    .addFunction("onStart", (int (Action::*)(lua_State*))&Action::onStart)
+    .addFunction("onRun", (int (Action::*)(lua_State*))&Action::onRun)
+    .addFunction("onPause", (int (Action::*)(lua_State*))&Action::onPause)
+    .addFunction("onStop", (int (Action::*)(lua_State*))&Action::onStop)
+    .addFunction("onFinish", (int (Action::*)(lua_State*))&Action::onFinish)
+    .addFunction("onStep", (int (Action::*)(lua_State*))&Action::onStep)
     .endClass()
     
     .beginExtendClass<TimeAction, Action>("TimeAction")
