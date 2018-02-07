@@ -1,6 +1,5 @@
 #include "Points.h"
 
-#include "PrimitiveMode.h"
 #include "Scene.h"
 #include "Engine.h"
 

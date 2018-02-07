@@ -17,8 +17,8 @@ namespace Supernova {
         bool shortestPath;
 
     public:
-        RotateAction(Quaternion endRotation, float duration, bool loop);
-        RotateAction(Quaternion startRotation, Quaternion endRotation, float duration, bool loop);
+        RotateAction(Quaternion endRotation, float duration, bool loop=false);
+        RotateAction(Quaternion startRotation, Quaternion endRotation, float duration, bool loop=false);
         virtual ~RotateAction();
 
         bool isShortestPath();

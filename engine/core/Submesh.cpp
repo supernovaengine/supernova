@@ -156,9 +156,9 @@ bool Submesh::load(){
     render->addIndex(indices.size(), &indices.front());
     
     render->setTexture(material->getTexture());
-    render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor()->ptr());
+    render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor());
     if (material->getTextureRect())
-        render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect()->ptr());
+        render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect());
     
     bool renderloaded = true;
     

@@ -1,12 +1,12 @@
 #include "Polygon.h"
 
 #include "platform/Log.h"
-#include "PrimitiveMode.h"
+#include "render/ObjectRender.h"
 
 using namespace Supernova;
 
 Polygon::Polygon(): Mesh2D() {
-	primitiveMode = S_TRIANGLES;
+	primitiveType = S_PRIMITIVE_TRIANGLES;
 }
 
 Polygon::~Polygon() {
@@ -28,7 +28,7 @@ void Polygon::addVertex(Vector3 vertex){
 	vertices.push_back(vertex);
 
     if (vertices.size() > 3){
-        primitiveMode = S_TRIANGLES_STRIP;
+        primitiveType = S_PRIMITIVE_TRIANGLES_STRIP;
     }
 
     normals.push_back(Vector3(0.0f, 0.0f, 1.0f));

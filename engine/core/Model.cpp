@@ -1,7 +1,7 @@
 #include "Model.h"
 
 #include "platform/Log.h"
-#include "PrimitiveMode.h"
+#include "render/ObjectRender.h"
 #include <algorithm>
 #include "tiny_obj_loader.h"
 #include "file/FileData.h"
@@ -9,7 +9,7 @@
 using namespace Supernova;
 
 Model::Model(): Mesh() {
-    primitiveMode = S_TRIANGLES;
+    primitiveType = S_PRIMITIVE_TRIANGLES;
 }
 
 Model::Model(const char * path): Model() {

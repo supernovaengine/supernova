@@ -27,8 +27,10 @@ namespace Supernova {
         virtual ~ConcreteObject();
         
         Matrix4 getNormalMatrix();
-        
+
+        void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);
+        Vector4 getColor();
         
         void setTexture(Texture* texture);
         void setTexture(std::string texturepath);

@@ -1,14 +1,14 @@
 #include "Text.h"
 
-#include "PrimitiveMode.h"
+#include "render/ObjectRender.h"
 #include <string>
 #include "platform/Log.h"
-#include "text/STBText.h"
+#include "util/STBText.h"
 
 using namespace Supernova;
 
 Text::Text(): Mesh2D() {
-    primitiveMode = S_TRIANGLES;
+    primitiveType = S_PRIMITIVE_TRIANGLES;
     dynamic = true;
     textmesh = true;
     stbtext = new STBText();

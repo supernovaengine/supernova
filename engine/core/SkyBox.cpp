@@ -3,13 +3,13 @@
 #include "SkyBox.h"
 
 #include "platform/Log.h"
-#include "PrimitiveMode.h"
+#include "render/ObjectRender.h"
 
 using namespace Supernova;
 
 SkyBox::SkyBox(): Mesh() {
     
-    primitiveMode = S_TRIANGLES;
+    primitiveType = S_PRIMITIVE_TRIANGLES;
     
     skymesh = true;
     

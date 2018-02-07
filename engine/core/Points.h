@@ -8,7 +8,7 @@
 
 #include "ConcreteObject.h"
 #include "render/ObjectRender.h"
-#include "data/PointData.h"
+#include "util/PointData.h"
 #include <unordered_map>
 
 namespace Supernova {

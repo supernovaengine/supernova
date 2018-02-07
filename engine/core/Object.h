@@ -7,7 +7,7 @@
 #include "math/Vector3.h"
 #include "math/Vector2.h"
 #include "math/Quaternion.h"
-#include "Action.h"
+#include "action/Action.h"
 
 namespace Supernova {
 

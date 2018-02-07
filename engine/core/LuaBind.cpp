@@ -36,7 +36,7 @@
 #include "Text.h"
 #include "Input.h"
 #include "Sprite.h"
-#include "Action.h"
+#include "action/Action.h"
 #include "action/TimeAction.h"
 #include "action/MoveAction.h"
 #include "action/RotateAction.h"
@@ -437,7 +437,8 @@ void LuaBind::bind(){
 
     .beginExtendClass<ConcreteObject, Object>("ConcreteObject")
     .addFunction("setTexture", (void (ConcreteObject::*)(std::string))&ConcreteObject::setTexture)
-    .addFunction("setColor", &ConcreteObject::setColor)
+    .addFunction("setColor", (void (ConcreteObject::*)(float, float, float, float))&ConcreteObject::setColor)
+    .addFunction("setColorVector", (void (ConcreteObject::*)(Vector4))&ConcreteObject::setColor)
     .endClass()
 
     .beginExtendClass<Mesh, ConcreteObject>("Mesh")
@@ -541,6 +542,14 @@ void LuaBind::bind(){
     .addVariable("x", &Vector3::x)
     .addVariable("y", &Vector3::y)
     .addVariable("z", &Vector3::z)
+    .endClass();
+
+    LuaIntf::LuaBinding(L).beginClass<Vector4>("Vector4")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addVariable("x", &Vector4::x)
+    .addVariable("y", &Vector4::y)
+    .addVariable("z", &Vector4::z)
+    .addVariable("w", &Vector4::w)
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<Quaternion>("Quaternion")

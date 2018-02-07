@@ -16,7 +16,6 @@
 #define S_PRIMITIVE_TRIANGLES  1
 #define S_PRIMITIVE_TRIANGLES_STRIP  2
 #define S_PRIMITIVE_POINTS  3
-//TODO: Remover primitiveMode.h
 
 #include <unordered_map>
 #include "Program.h"

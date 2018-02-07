@@ -1,13 +1,13 @@
 
 #include "GUIImage.h"
-#include "PrimitiveMode.h"
+#include "render/ObjectRender.h"
 #include <string>
 #include "image/TextureLoader.h"
 
 using namespace Supernova;
 
 GUIImage::GUIImage(): GUIObject(){
-    primitiveMode = S_TRIANGLES;
+    primitiveType = S_PRIMITIVE_TRIANGLES;
     
     texWidth = 0;
     texHeight = 0;

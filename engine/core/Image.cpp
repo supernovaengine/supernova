@@ -1,6 +1,6 @@
 
 #include "Image.h"
-#include "PrimitiveMode.h"
+#include "render/ObjectRender.h"
 #include <string>
 #include "image/TextureLoader.h"
 #include "platform/Log.h"
@@ -9,7 +9,7 @@
 using namespace Supernova;
 
 Image::Image(): Mesh2D() {
-    primitiveMode = S_TRIANGLES;
+    primitiveType = S_PRIMITIVE_TRIANGLES;
     texWidth = 0;
     texHeight = 0;
     useTextureRect = false;

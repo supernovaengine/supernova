@@ -53,8 +53,8 @@ bool Mesh::isDynamic(){
     return dynamic;
 }
 
-int Mesh::getPrimitiveMode(){
-    return primitiveMode;
+int Mesh::getPrimitiveType(){
+    return primitiveType;
 }
 
 void Mesh::setTexcoords(std::vector<Vector2> texcoords){
@@ -62,8 +62,8 @@ void Mesh::setTexcoords(std::vector<Vector2> texcoords){
     this->texcoords = texcoords;
 }
 
-void Mesh::setPrimitiveMode(int primitiveMode){
-    this->primitiveMode = primitiveMode;
+void Mesh::setPrimitiveType(int primitiveType){
+    this->primitiveType = primitiveType;
 }
 
 void Mesh::addVertex(Vector3 vertex){
@@ -185,7 +185,7 @@ bool Mesh::shadowLoad(){
         }else{
             submeshes[i]->getSubmeshShadowRender()->setProgram(shadowProgram);
         }
-        submeshes[i]->getSubmeshShadowRender()->setPrimitiveType(primitiveMode);
+        submeshes[i]->getSubmeshShadowRender()->setPrimitiveType(primitiveType);
         submeshes[i]->shadowLoad();
     }
     
@@ -269,7 +269,7 @@ bool Mesh::load(){
         }else{
             submeshes[i]->getSubmeshRender()->setProgram(mainProgram);
         }
-        submeshes[i]->getSubmeshRender()->setPrimitiveType(primitiveMode);
+        submeshes[i]->getSubmeshRender()->setPrimitiveType(primitiveType);
         submeshes[i]->load();
     }
     

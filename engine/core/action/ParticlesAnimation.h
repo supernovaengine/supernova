@@ -1,7 +1,7 @@
 #ifndef ParticlesAnimation_h
 #define ParticlesAnimation_h
 
-#include "Action.h"
+#include "action/Action.h"
 #include "particle/ParticleAnimationInit.h"
 
 #include "particle/ParticleVelocityInit.h"

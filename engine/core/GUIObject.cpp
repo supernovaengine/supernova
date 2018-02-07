@@ -1,6 +1,5 @@
 
 #include "GUIObject.h"
-#include "PrimitiveMode.h"
 
 using namespace Supernova;
 

@@ -1,12 +1,12 @@
 #include "PlaneTerrain.h"
 
 #include "platform/Log.h"
-#include "PrimitiveMode.h"
+#include "render/ObjectRender.h"
 
 using namespace Supernova;
 
 PlaneTerrain::PlaneTerrain(): Mesh() {
-    primitiveMode = S_TRIANGLES_STRIP;
+    primitiveType = S_PRIMITIVE_TRIANGLES_STRIP;
 }
 
 PlaneTerrain::PlaneTerrain(float width, float depth): PlaneTerrain() {

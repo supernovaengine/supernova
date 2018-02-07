@@ -22,13 +22,21 @@ unsigned int ConcreteObject::getMinBufferSize(){
     return minBufferSize;
 }
 
-void ConcreteObject::setColor(float red, float green, float blue, float alpha){
-    if (alpha != 1){
+void ConcreteObject::setColor(Vector4 color){
+    if (color.w != 1){
         transparent = true;
     }else{
         transparent = false;
     }
-    material.setColor(Vector4(red, green, blue, alpha));
+    material.setColor(color);
+}
+
+void ConcreteObject::setColor(float red, float green, float blue, float alpha){
+    setColor(Vector4(red, green, blue, alpha));
+}
+
+Vector4 ConcreteObject::getColor(){
+    return *material.getColor();
 }
 
 void ConcreteObject::setTexture(Texture* texture){

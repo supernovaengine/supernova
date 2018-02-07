@@ -1,12 +1,12 @@
 #include "Cube.h"
 
 #include "platform/Log.h"
-#include "PrimitiveMode.h"
+#include "render/ObjectRender.h"
 
 using namespace Supernova;
 
 Cube::Cube(): Mesh() {
-    primitiveMode = S_TRIANGLES;
+    primitiveType = S_PRIMITIVE_TRIANGLES;
 
     width = 0;
     height = 0;

@@ -29,7 +29,7 @@ namespace Supernova {
         bool textmesh;
         bool dynamic;
 
-        int primitiveMode;
+        int primitiveType;
         
         void addSubmesh(Submesh* submesh);
         
@@ -44,7 +44,7 @@ namespace Supernova {
         Mesh();
         virtual ~Mesh();
 
-        int getPrimitiveMode();
+        int getPrimitiveType();
         std::vector<Vector3>* getVertices();
         std::vector<Vector3>* getNormals();
         std::vector<Vector2>* getTexcoords();
@@ -55,7 +55,7 @@ namespace Supernova {
         
         void setTexcoords(std::vector<Vector2> texcoords);
 
-        void setPrimitiveMode(int primitiveMode);
+        void setPrimitiveType(int primitiveType);
         void addVertex(Vector3 vertex);
         void addNormal(Vector3 normal);
         void addTexcoord(Vector2 texcoord);

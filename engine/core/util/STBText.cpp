@@ -1,6 +1,5 @@
 #include "STBText.h"
 
-#include "PrimitiveMode.h"
 #include <string>
 #include "image/TextureLoader.h"
 #include "platform/Log.h"
