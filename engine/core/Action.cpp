@@ -9,6 +9,8 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+#include "LuaIntf.h"
+
 using namespace Supernova;
 
 Action::Action(){
@@ -16,6 +18,24 @@ Action::Action(){
     this->running = false;
     this->timecount = 0;
     this->steptime = 0;
+
+    onStartFunc = NULL;
+    onStartLuaFunc = 0;
+
+    onRunFunc = NULL;
+    onRunLuaFunc = 0;
+
+    onPauseFunc = NULL;
+    onPauseLuaFunc = 0;
+
+    onStopFunc = NULL;
+    onStopLuaFunc = 0;
+
+    onFinishFunc = NULL;
+    onFinishLuaFunc = 0;
+
+    onStepFunc = NULL;
+    onStepLuaFunc = 0;
 }
 
 Action::~Action(){
@@ -30,11 +50,7 @@ void Action::luaCallback(int nargs, int nresults, int msgh){
     }
 }
 
-bool Action::isRunning(){
-    return running;
-}
-
-void Action::onStart(void (*onStartFunc)()){
+void Action::onStart(void (*onStartFunc)(Object*)){
     this->onStartFunc = onStartFunc;
 }
 
@@ -49,15 +65,16 @@ int Action::onStart(lua_State *L){
 
 void Action::call_onStart(){
     if (onStartFunc != NULL){
-        onStartFunc();
+        onStartFunc(object);
     }
     if (onStartLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onStartLuaFunc);
-        luaCallback(0, 0, 0);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), object);
+        luaCallback(1, 0, 0);
     }
 }
 
-void Action::onRun(void (*onRunFunc)()){
+void Action::onRun(void (*onRunFunc)(Object*)){
     this->onRunFunc = onRunFunc;
 }
 
@@ -72,15 +89,16 @@ int Action::onRun(lua_State *L){
 
 void Action::call_onRun(){
     if (onRunFunc != NULL){
-        onRunFunc();
+        onRunFunc(object);
     }
     if (onRunLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onRunLuaFunc);
-        luaCallback(0, 0, 0);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), object);
+        luaCallback(1, 0, 0);
     }
 }
 
-void Action::onPause(void (*onPauseFunc)()){
+void Action::onPause(void (*onPauseFunc)(Object*)){
     this->onPauseFunc = onPauseFunc;
 }
 
@@ -95,15 +113,16 @@ int Action::onPause(lua_State *L){
 
 void Action::call_onPause(){
     if (onPauseFunc != NULL){
-        onPauseFunc();
+        onPauseFunc(object);
     }
     if (onPauseLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onPauseLuaFunc);
-        luaCallback(0, 0, 0);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), object);
+        luaCallback(1, 0, 0);
     }
 }
 
-void Action::onStop(void (*onStopFunc)()){
+void Action::onStop(void (*onStopFunc)(Object*)){
     this->onStopFunc = onStopFunc;
 }
 
@@ -118,15 +137,16 @@ int Action::onStop(lua_State *L){
 
 void Action::call_onStop(){
     if (onStopFunc != NULL){
-        onStopFunc();
+        onStopFunc(object);
     }
     if (onStopLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onStopLuaFunc);
-        luaCallback(0, 0, 0);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), object);
+        luaCallback(1, 0, 0);
     }
 }
 
-void Action::onFinish(void (*onFinishFunc)()){
+void Action::onFinish(void (*onFinishFunc)(Object*)){
     this->onFinishFunc = onFinishFunc;
 }
 
@@ -141,15 +161,16 @@ int Action::onFinish(lua_State *L){
 
 void Action::call_onFinish(){
     if (onFinishFunc != NULL){
-        onFinishFunc();
+        onFinishFunc(object);
     }
     if (onFinishLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onFinishLuaFunc);
-        luaCallback(0, 0, 0);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), object);
+        luaCallback(1, 0, 0);
     }
 }
 
-void Action::onStep(void (*onStepFunc)()){
+void Action::onStep(void (*onStepFunc)(Object*)){
     this->onStepFunc = onStepFunc;
 }
 
@@ -164,12 +185,21 @@ int Action::onStep(lua_State *L){
 
 void Action::call_onStep(){
     if (onStepFunc != NULL){
-        onStepFunc();
+        onStepFunc(object);
     }
     if (onStepLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onStepLuaFunc);
-        luaCallback(0, 0, 0);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), object);
+        luaCallback(1, 0, 0);
     }
+}
+
+Object* Action::getObject(){
+    return object;
+}
+
+bool Action::isRunning(){
+    return running;
 }
 
 bool Action::run(){

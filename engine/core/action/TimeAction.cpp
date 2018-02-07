@@ -369,6 +369,14 @@ void TimeAction::setFunctionType(int functionType){
     }
 }
 
+float TimeAction::getTime(){
+    return time;
+}
+
+float TimeAction::getValue(){
+    return value;
+}
+
 bool TimeAction::run(){
     return Action::run();
 }

@@ -13,22 +13,22 @@ namespace Supernova{
 
     private:
 
-        void (*onStartFunc)();
+        void (*onStartFunc)(Object*);
         int onStartLuaFunc;
 
-        void (*onRunFunc)();
+        void (*onRunFunc)(Object*);
         int onRunLuaFunc;
 
-        void (*onPauseFunc)();
+        void (*onPauseFunc)(Object*);
         int onPauseLuaFunc;
 
-        void (*onStopFunc)();
+        void (*onStopFunc)(Object*);
         int onStopLuaFunc;
 
-        void (*onFinishFunc)();
+        void (*onFinishFunc)(Object*);
         int onFinishLuaFunc;
 
-        void (*onStepFunc)();
+        void (*onStepFunc)(Object*);
         int onStepLuaFunc;
 
         void luaCallback(int nargs, int nresults, int msgh);
@@ -51,26 +51,28 @@ namespace Supernova{
     public:
         Action();
         virtual ~Action();
-        
-        bool isRunning();
 
-        void onStart(void (*onStartFunc)());
+        void onStart(void (*onStartFunc)(Object*));
         int onStart(lua_State *L);
 
-        void onRun(void (*onRunFunc)());
+        void onRun(void (*onRunFunc)(Object*));
         int onRun(lua_State *L);
 
-        void onPause(void (*onPauseFunc)());
+        void onPause(void (*onPauseFunc)(Object*));
         int onPause(lua_State *L);
 
-        void onStop(void (*onStopFunc)());
+        void onStop(void (*onStopFunc)(Object*));
         int onStop(lua_State *L);
 
-        void onFinish(void (*onFinishFunc)());
+        void onFinish(void (*onFinishFunc)(Object*));
         int onFinish(lua_State *L);
 
-        void onStep(void (*onFinishFunc)());
+        void onStep(void (*onStepFunc)(Object*));
         int onStep(lua_State *L);
+
+        Object* getObject();
+
+        bool isRunning();
 
         virtual bool run();
         virtual bool pause();

@@ -102,6 +102,9 @@ namespace Supernova{
 
         bool isLoop();
         void setLoop(bool loop);
+
+        float getTime();
+        float getValue();
         
         virtual bool run();
         virtual bool pause();

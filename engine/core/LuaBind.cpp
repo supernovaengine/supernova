@@ -575,6 +575,7 @@ void LuaBind::bind(){
     .addFunction("pause", &Action::pause)
     .addFunction("stop", &Action::stop)
     .addFunction("isRunning", &Action::isRunning)
+    .addFunction("getObject", &Action::getObject)
     .addFunction("onStart", (int (Action::*)(lua_State*))&Action::onStart)
     .addFunction("onRun", (int (Action::*)(lua_State*))&Action::onRun)
     .addFunction("onPause", (int (Action::*)(lua_State*))&Action::onPause)
@@ -622,6 +623,8 @@ void LuaBind::bind(){
     .addFunction("setDuration", &TimeAction::setDuration)
     .addFunction("isLoop", &TimeAction::isLoop)
     .addFunction("setLoop", &TimeAction::setLoop)
+    .addFunction("getTime", &TimeAction::getTime)
+    .addFunction("getValue", &TimeAction::getValue)
     .endClass()
     
     .beginExtendClass<MoveAction, TimeAction>("MoveAction")
