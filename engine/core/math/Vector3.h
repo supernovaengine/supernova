@@ -37,10 +37,6 @@ namespace Supernova {
 
         float& operator [] ( unsigned i );
 
-        float* ptr();
-
-        const float* ptr() const;
-
         Vector3& operator = ( const Vector3& v );
 
         bool operator == ( const Vector3& v ) const;

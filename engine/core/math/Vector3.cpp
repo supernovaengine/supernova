@@ -31,14 +31,6 @@ float& Vector3::operator [] ( unsigned i ){
     return *(&x+i);
 }
 
-float* Vector3::ptr(){
-    return &x;
-}
-
-const float* Vector3::ptr() const{
-    return &x;
-}
-
 Vector3& Vector3::operator = ( const Vector3& v ){
     x = v.x;
     y = v.y;

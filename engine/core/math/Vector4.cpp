@@ -51,15 +51,6 @@ float& Vector4::operator [] ( const size_t i ){
     return *(&x+i);
 }
 
-float* Vector4::ptr(){
-    return &x;
-}
-
-const float* Vector4::ptr() const{
-    return &x;
-}
-
-
 Vector4& Vector4::operator = ( const Vector4& rkVector ){
     x = rkVector.x;
     y = rkVector.y;

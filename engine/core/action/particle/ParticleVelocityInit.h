@@ -1,11 +1,11 @@
 #ifndef PARTICLEVELOCITYINIT_H
 #define PARTICLEVELOCITYINIT_H
 
-#include "ParticleAnimationInit.h"
+#include "ParticleInit.h"
 
 namespace Supernova {
 
-    class ParticleVelocityInit: public ParticleAnimationInit {
+    class ParticleVelocityInit: public ParticleInit {
 
     public:
 

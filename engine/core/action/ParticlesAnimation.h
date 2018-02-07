@@ -2,7 +2,7 @@
 #define ParticlesAnimation_h
 
 #include "action/Action.h"
-#include "particle/ParticleAnimationInit.h"
+#include "action/particle/ParticleInit.h"
 
 #include "particle/ParticleVelocityInit.h"
 
@@ -12,7 +12,7 @@ namespace Supernova{
 
     protected:
 
-        std::vector<ParticleAnimationInit*> particlesInit;
+        std::vector<ParticleInit*> particlesInit;
 
         float newParticlesCount;
         bool emitter;
@@ -21,8 +21,8 @@ namespace Supernova{
         ParticlesAnimation();
         virtual ~ParticlesAnimation();
 
-        void addInit(ParticleAnimationInit* particleInit);
-        void removeInit(ParticleAnimationInit* particleInit);
+        void addInit(ParticleInit* particleInit);
+        void removeInit(ParticleInit* particleInit);
         
         virtual bool run();
         virtual bool pause();

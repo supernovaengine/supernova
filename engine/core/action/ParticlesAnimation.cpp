@@ -16,12 +16,12 @@ ParticlesAnimation::~ParticlesAnimation(){
     
 }
 
-void ParticlesAnimation::addInit(ParticleAnimationInit* particleInit){
+void ParticlesAnimation::addInit(ParticleInit* particleInit){
     particlesInit.push_back(particleInit);
 }
 
-void ParticlesAnimation::removeInit(ParticleAnimationInit* particleInit){
-    std::vector<ParticleAnimationInit*>::iterator i = std::remove(particlesInit.begin(), particlesInit.end(), particleInit);
+void ParticlesAnimation::removeInit(ParticleInit* particleInit){
+    std::vector<ParticleInit*>::iterator i = std::remove(particlesInit.begin(), particlesInit.end(), particleInit);
     particlesInit.erase(i,particlesInit.end());
 }
 

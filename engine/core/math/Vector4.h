@@ -46,11 +46,6 @@ namespace Supernova {
 
         float& operator [] ( const size_t i );
 
-
-        float* ptr();
-
-        const float* ptr() const;
-
         Vector4& operator = ( const Vector4& rkVector );
 
         Vector4& operator = ( const float fScalar);
