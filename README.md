@@ -1,8 +1,4 @@
-# Supernova Game Engine
-
 ![Logo](http://www.supernovaengine.org/img/logo_black.png)
-
-supernovaengine.org
 
 Supernova is a **free** and open source cross-platform game engine for create 2D and 3D projects with Lua or C++. It is lightweight and promote the simplest way to do the best results.
 
