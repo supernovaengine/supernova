@@ -13,6 +13,7 @@ namespace Supernova{
         Vector4 startColor;
 
         bool objectStartColor;
+        bool useAlpha;
 
     public:
         ColorAction(Vector4 endColor, float duration, bool loop=false);

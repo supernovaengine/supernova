@@ -289,8 +289,12 @@ Matrix4 Quaternion::getRotationMatrix(){
     return mat;
 }
 
-void Quaternion::fromAngleAxis (const float angle, const Vector3& rkAxis)
-{
+void Quaternion::fromAngle (const float angle) {
+
+    fromAngleAxis(angle, Vector3(0, 0, 1));
+}
+
+void Quaternion::fromAngleAxis (const float angle, const Vector3& rkAxis) {
 
     float defAngle = Angle::defaultToRad(angle);
 
@@ -302,8 +306,7 @@ void Quaternion::fromAngleAxis (const float angle, const Vector3& rkAxis)
     z = fSin*rkAxis.z;
 }
 
-Vector3 Quaternion::xAxis(void) const
-{
+Vector3 Quaternion::xAxis(void) const {
     float fTy  = 2.0f*y;
     float fTz  = 2.0f*z;
     float fTwy = fTy*w;

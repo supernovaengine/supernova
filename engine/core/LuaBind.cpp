@@ -40,6 +40,9 @@
 #include "action/TimeAction.h"
 #include "action/MoveAction.h"
 #include "action/RotateAction.h"
+#include "action/ScaleAction.h"
+#include "action/ColorAction.h"
+#include "action/AlphaAction.h"
 #include "action/SpriteAnimation.h"
 
 #include <map>
@@ -559,6 +562,7 @@ void LuaBind::bind(){
     .addVariable("y", &Quaternion::y)
     .addVariable("z", &Quaternion::z)
     .addFunction("fromAxes", (void (Quaternion::*)(const Vector3&, const Vector3&, const Vector3&))&Quaternion::fromAxes)
+    .addFunction("fromAngle", (void (Quaternion::*)(const float))&Quaternion::fromAngle)
     .addFunction("fromAngleAxis", (void (Quaternion::*)(const float, const Vector3&))&Quaternion::fromAngleAxis)
     .endClass();
 
@@ -644,6 +648,18 @@ void LuaBind::bind(){
     .addConstructor(LUA_ARGS(LuaIntf::_opt<Quaternion>, LuaIntf::_opt<Quaternion>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
     .addFunction("isShortestPath", &RotateAction::isShortestPath)
     .addFunction("setShortestPath", &RotateAction::setShortestPath)
+    .endClass()
+
+    .beginExtendClass<ScaleAction, TimeAction>("ScaleAction")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
+    .endClass()
+
+    .beginExtendClass<ColorAction, TimeAction>("ColorAction")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
+    .endClass()
+
+    .beginExtendClass<AlphaAction, TimeAction>("AlphaAction")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
     .endClass()
     
     .beginExtendClass<SpriteAnimation, Action>("SpriteAnimation")

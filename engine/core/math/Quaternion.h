@@ -47,6 +47,7 @@ namespace Supernova {
         void fromAxes (const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);
         void fromRotationMatrix (const Matrix4& kRot);
         Matrix4 getRotationMatrix();
+        void fromAngle (const float angle);
         void fromAngleAxis (const float angle, const Vector3& rkAxis);
 
         Vector3 xAxis(void) const;
