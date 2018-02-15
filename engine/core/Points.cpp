@@ -215,7 +215,7 @@ void Points::updatePointScale(){
     float newPointScale;
     
     if (sizeAttenuation) {
-        newPointScale = pointScaleFactor / (modelViewProjectionMatrix * Vector4(0, 0, 0, 1.0)).w;
+        newPointScale = pointScaleFactor / (modelViewProjectionMatrix * Vector4(0.0, 0.0, 0.0, 1.0)).w;
     }else{
         newPointScale = 1;
     }

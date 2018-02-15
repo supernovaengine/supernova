@@ -10,7 +10,6 @@ Particles::Particles(): Points(){
     this->maxParticles = 100;
     this->minRate = 10;
     this->maxRate = 5;
-    this->lifeTime = 10;
 }
 
 Particles::Particles(int numParticles): Particles(){
@@ -179,20 +178,12 @@ void Particles::setRate(int minRate, int maxRate){
         this->maxRate = maxRate;
 }
 
-void Particles::setLifeTime(float lifeTime){
-    this->lifeTime = lifeTime;
-}
-
 int Particles::getMinRate(){
     return minRate;
 }
 
 int Particles::getMaxRate(){
     return maxRate;
-}
-
-float Particles::getLifeTime(){
-    return lifeTime;
 }
 
 int Particles::findUnusedParticle(){

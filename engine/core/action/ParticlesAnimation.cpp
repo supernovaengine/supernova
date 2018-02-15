@@ -10,9 +10,13 @@ using namespace Supernova;
 ParticlesAnimation::ParticlesAnimation(): Action(){
     newParticlesCount = 0;
     emitter = true;
+
+    initOwned = true;
 }
 
 ParticlesAnimation::~ParticlesAnimation(){
+    if (initOwned)
+        deleteInits();
     
 }
 
@@ -23,6 +27,17 @@ void ParticlesAnimation::addInit(ParticleInit* particleInit){
 void ParticlesAnimation::removeInit(ParticleInit* particleInit){
     std::vector<ParticleInit*>::iterator i = std::remove(particlesInit.begin(), particlesInit.end(), particleInit);
     particlesInit.erase(i,particlesInit.end());
+}
+
+void ParticlesAnimation::deleteInits(){
+    for (std::vector<ParticleInit*>::iterator it = particlesInit.begin() ; it != particlesInit.end(); ++it) {
+        delete (*it);
+    }
+    particlesInit.clear();
+}
+
+void ParticlesAnimation::setInitOwned(bool initOwned){
+    this->initOwned = initOwned;
 }
 
 bool ParticlesAnimation::run(){
@@ -44,13 +59,6 @@ bool ParticlesAnimation::pause(){
 }
 
 bool ParticlesAnimation::stop(){
-    emitter = false;
-    call_onStop();
-    
-    return true;
-}
-
-bool ParticlesAnimation::stopAll(){
     if (!Action::stop())
         return false;
     
@@ -64,9 +72,24 @@ bool ParticlesAnimation::stopAll(){
     
     newParticlesCount = 0;
     emitter = true;
-    call_onFinish();
     
     return true;
+}
+
+void ParticlesAnimation::startEmitter(){
+    if (!running) {
+        emitter = true;
+    }else{
+        run();
+    }
+}
+
+void ParticlesAnimation::stopEmitter(){
+    emitter = false;
+}
+
+bool ParticlesAnimation::isEmitting(){
+    return emitter;
 }
 
 bool ParticlesAnimation::step(){
@@ -91,15 +114,16 @@ bool ParticlesAnimation::step(){
                 
                 if (particleIndex >= 0){
 
+                    particles->setParticleLife(particleIndex, 10);
+                    particles->setParticlePosition(particleIndex, Vector3(0,0,0));
+                    particles->setParticleVelocity(particleIndex, Vector3(0,0,0));
+                    particles->setParticleAcceleration(particleIndex, Vector3(0,0,0));
+                    particles->setParticleColor(particleIndex, Vector4(1,1,1,1));
+                    particles->setParticleSize(particleIndex, 1);
+
                     for (int init=0; init < particlesInit.size(); init++){
                         particlesInit[init]->execute(particles, particleIndex);
                     }
-
-                    particles->setParticleLife(particleIndex, 10.0f);
-                    particles->setParticlePosition(particleIndex, 5, 0, 0);
-                    particles->setParticleAcceleration(particleIndex, Vector3(0.0f,9.81f * 5, 0.0f));
-                    particles->setParticleColor(particleIndex, (rand() % 256 / (float)255), (rand() % 256 / (float)255), (rand() % 256 / (float)255), 1.0);
-                    particles->setParticleSize(particleIndex, 10);
                     
                 }
             }
@@ -131,7 +155,8 @@ bool ParticlesAnimation::step(){
         }
         
         if (!existParticles && !emitter){
-            stopAll();
+            stop();
+            call_onFinish();
         }
 
         particles->updateParticles();

@@ -24,7 +24,6 @@ namespace Supernova {
         int maxParticles;
         int minRate; //per second
         int maxRate;
-        float lifeTime;
         
     public:
         Particles();
@@ -62,11 +61,9 @@ namespace Supernova {
 
         void setRate(int minRate);
         void setRate(int minRate, int maxRate);
-        void setLifeTime(float lifeTime);
 
         int getMinRate();
         int getMaxRate();
-        float getLifeTime();
         
         int findUnusedParticle();
 
