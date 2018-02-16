@@ -3,6 +3,7 @@
 
 #include "action/Action.h"
 #include "action/ParticleInit.h"
+#include "action/ParticleMod.h"
 
 namespace Supernova{
     
@@ -11,12 +12,14 @@ namespace Supernova{
     protected:
 
         std::vector<ParticleInit*> particlesInit;
+        std::vector<ParticleMod*> particlesMod;
 
         float newParticlesCount;
         bool emitter;
 
         bool initOwned;
-        
+        bool modOwned;
+
     public:
         ParticlesAnimation();
         virtual ~ParticlesAnimation();
@@ -25,6 +28,11 @@ namespace Supernova{
         void removeInit(ParticleInit* particleInit);
         void deleteInits();
         void setInitOwned(bool initOwned);
+
+        void addMod(ParticleMod* particleMod);
+        void removeMod(ParticleMod* particleMod);
+        void deleteMods();
+        void setModOwned(bool modOwned);
         
         virtual bool run();
         virtual bool pause();

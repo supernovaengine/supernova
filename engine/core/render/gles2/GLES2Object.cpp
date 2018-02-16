@@ -101,6 +101,8 @@ bool GLES2Object::load(){
             attribName = "a_pointSize";
         }else if (type == S_VERTEXATTRIBUTE_POINTCOLORS){
             attribName = "a_pointColor";
+        }else if (type == S_VERTEXATTRIBUTE_POINTROTATIONS){
+            attribName = "a_pointRotation";
         }else if (type == S_VERTEXATTRIBUTE_TEXTURERECTS){
             attribName = "a_textureRect";            
         }

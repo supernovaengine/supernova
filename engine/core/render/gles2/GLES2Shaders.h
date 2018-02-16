@@ -277,13 +277,17 @@ std::string gVertexPointsPerPixelLightShader =
 
 "attribute float a_pointSize;\n"
 "attribute vec4 a_pointColor;\n"
+"attribute float a_pointRotation;\n"
+
 "varying vec4 v_pointColor;\n"
+"varying float v_pointRotation;\n"
 
 "void main(){\n"
 
 "    vec4 position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
 
 "    v_pointColor = a_pointColor;\n"
+"    v_pointRotation = a_pointRotation;\n"
 "    gl_PointSize = a_pointSize;\n"
 
 "    #ifdef HAS_TEXTURERECT\n"
@@ -303,6 +307,7 @@ std::string gFragmentPointsPerPixelLightShader =
 "uniform bool uUseTexture;\n"
 
 "varying vec4 v_pointColor;\n"
+"varying float v_pointRotation;\n"
 
 + lightingFragmentDec + fogFragmentDec +
 
@@ -314,11 +319,17 @@ std::string gFragmentPointsPerPixelLightShader =
 "   vec4 fragmentColor = v_pointColor;\n"
 
 "   if (uUseTexture){\n"
+"     vec2 resultCoord = gl_PointCoord;\n"
+
+"     if (v_pointRotation != 0.0){\n"
+"         resultCoord = vec2(cos(v_pointRotation) * (resultCoord.x - 0.5) + sin(v_pointRotation) * (resultCoord.y - 0.5) + 0.5,\n"
+"                            cos(v_pointRotation) * (resultCoord.y - 0.5) - sin(v_pointRotation) * (resultCoord.x - 0.5) + 0.5);\n"
+"     }\n"
+
 "     #ifdef HAS_TEXTURERECT\n"
-"       vec2 resultCoord = gl_PointCoord * v_textureRect.zw + v_textureRect.xy;\n"
-"     #else\n"
-"       vec2 resultCoord = gl_PointCoord;\n"
+"       resultCoord = resultCoord * v_textureRect.zw + v_textureRect.xy;\n"
 "     #endif\n"
+
 "     fragmentColor *= texture2D(u_TextureUnit, resultCoord);\n"
 "   }\n"
 

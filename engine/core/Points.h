@@ -23,8 +23,6 @@ namespace Supernova {
         float pointScale;
 
         int pointSizeReference;
-        
-        bool useTextureRects;
 
         void updatePointScale();
         void sortTransparentPoints();
@@ -40,9 +38,10 @@ namespace Supernova {
         struct Point{
             Vector3 position;
             Vector3 normal;
-            Rect* textureRect;
+            Rect textureRect;
             float size;
             Vector4 color;
+            float rotation;
             
             float distanceToCamera;
             bool visible;
@@ -58,6 +57,8 @@ namespace Supernova {
         float minPointSize;
         float maxPointSize;
 
+        bool useTextureRects;
+
         std::vector<FramesData> framesRect;
         
         void updatePointsData();
@@ -67,6 +68,7 @@ namespace Supernova {
         void updatePointColors();
         void updatePointSizes();
         void updateTextureRects();
+        void updatePointRotations();
 
     public:
         Points();
@@ -87,6 +89,7 @@ namespace Supernova {
         void setPointSize(int point, float size);
         void setPointColor(int point, Vector4 color);
         void setPointColor(int point, float red, float green, float blue, float alpha);
+        void setPointRotation(int point, float rotation);
         void setPointSprite(int point, int index);
         void setPointSprite(int point, std::string id);
         void setPointVisible(int point, bool visible);
@@ -94,6 +97,7 @@ namespace Supernova {
         Vector3 getPointPosition(int point);
         float getPointSize(int point);
         Vector4 getPointColor(int point);
+        float getPointRotation(int point);
         
         void addSpriteFrame(std::string id, float x, float y, float width, float height);
         void addSpriteFrame(float x, float y, float width, float height);

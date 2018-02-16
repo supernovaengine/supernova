@@ -46,6 +46,7 @@ namespace Supernova {
         void setParticleSize(int particle, float size);
         void setParticleColor(int particle, Vector4 color);
         void setParticleColor(int particle, float red, float green, float blue, float alpha);
+        void setParticleRotation(int particle, float rotation);
         void setParticleSprite(int particle, int index);
         void setParticleVisible(int particle, bool visible);
         void setParticleLife(int particle, float life);
@@ -55,12 +56,15 @@ namespace Supernova {
         Vector3 getParticlePosition(int particle);
         float getParticleSize(int particle);
         Vector4 getParticleColor(int particle);
+        float getParticleRotation(int particle);
         float getParticleLife(int particle);
         Vector3 getParticleVelocity(int particle);
         Vector3 getParticleAcceleration(int particle);
 
         void setRate(int minRate);
         void setRate(int minRate, int maxRate);
+
+        void useSpritesFrame(bool useSpritesFrame);
 
         int getMinRate();
         int getMaxRate();

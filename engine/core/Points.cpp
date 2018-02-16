@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "Engine.h"
+#include "math/Angle.h"
 
 using namespace Supernova;
 
@@ -51,8 +52,12 @@ void Points::updateTextureRects(){
     render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, points.size(), &pointData.textureRects.front());
 }
 
+void Points::updatePointRotations(){
+    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, points.size(), &pointData.rotations.front());
+}
+
 void Points::addPoint(){
-    points.push_back({Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0), NULL, 1, *material.getColor(), -1, true});
+    points.push_back({Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0), Rect(0.0, 0.0, 1.0, 1.0), 1, *material.getColor(), 0.0, -1, true});
 }
 
 void Points::addPoint(Vector3 position){
@@ -120,41 +125,49 @@ void Points::setPointColor(int point, Vector4 color){
     }
 }
 
+void Points::setPointRotation(int point, float rotation){
+    if (point >= 0 && point < points.size()) {
+
+        bool changed = false;
+        if (points[point].rotation != Angle::defaultToRad(rotation))
+            changed = true;
+
+        points[point].rotation = Angle::defaultToRad(rotation);
+
+        if (loaded && changed){
+            updatePointsData();
+
+            updatePointRotations();
+        }
+    }
+}
+
 void Points::setPointColor(int point, float red, float green, float blue, float alpha){
     setPointColor(point, Vector4(red, green, blue, alpha));
 }
 
 void Points::setPointSprite(int point, int index){
     if (point >= 0 && point < points.size()) {
-        
-        bool changed = false;
-        
-        if (points[point].textureRect){
-            
-            if ((*points[point].textureRect) != framesRect[index].rect)
+        if ((index >= 0) && (index < framesRect.size())) {
+
+            bool changed = false;
+
+            if (points[point].textureRect != framesRect[index].rect) {
                 changed = true;
-            
-            points[point].textureRect->setRect(&framesRect[index].rect);
-        }else {
-            changed = true;
-            points[point].textureRect = new Rect(framesRect[index].rect);
-        }
+                points[point].textureRect.setRect(&framesRect[index].rect);
+            }
 
-        if (!useTextureRects){
-            useTextureRects = true;
-
-            if (loaded)
-                reload();
-        }else{
-            useTextureRects = true;
-
-            if (loaded && changed){
-                updatePointsData();
-                
-                updateTextureRects();
+            if (!useTextureRects) {
+                useTextureRects = true;
+                if (loaded)
+                    reload();
+            } else {
+                if (loaded && changed) {
+                    updatePointsData();
+                    updateTextureRects();
+                }
             }
         }
-        
     }
 }
 
@@ -209,6 +222,14 @@ Vector4 Points::getPointColor(int point){
     }
     
     return Vector4(0,0,0,0);
+}
+
+float Points::getPointRotation(int point){
+    if (point >= 0 && point < points.size()){
+        return Angle::radToDefault(points[point].rotation);
+    }
+
+    return 0.0;
 }
 
 void Points::updatePointScale(){
@@ -363,18 +384,18 @@ void Points::updatePointsData(){
         pointData.normals.push_back(points[i].normal.y);
         pointData.normals.push_back(points[i].normal.z);
 
-        if (points[i].textureRect && this->texWidth != 0 && this->texHeight != 0) {
+        if (useTextureRects && this->texWidth != 0 && this->texHeight != 0) {
 
-            if (!points[i].textureRect->isNormalized()) {
-                pointData.textureRects.push_back(points[i].textureRect->getX() / (float) texWidth);
-                pointData.textureRects.push_back(points[i].textureRect->getY() / (float) texHeight);
-                pointData.textureRects.push_back(points[i].textureRect->getWidth() / (float) texWidth);
-                pointData.textureRects.push_back(points[i].textureRect->getHeight() / (float) texHeight);
+            if (!points[i].textureRect.isNormalized()) {
+                pointData.textureRects.push_back(points[i].textureRect.getX() / (float) texWidth);
+                pointData.textureRects.push_back(points[i].textureRect.getY() / (float) texHeight);
+                pointData.textureRects.push_back(points[i].textureRect.getWidth() / (float) texWidth);
+                pointData.textureRects.push_back(points[i].textureRect.getHeight() / (float) texHeight);
             }else{
-                pointData.textureRects.push_back(points[i].textureRect->getX());
-                pointData.textureRects.push_back(points[i].textureRect->getY());
-                pointData.textureRects.push_back(points[i].textureRect->getWidth());
-                pointData.textureRects.push_back(points[i].textureRect->getHeight());
+                pointData.textureRects.push_back(points[i].textureRect.getX());
+                pointData.textureRects.push_back(points[i].textureRect.getY());
+                pointData.textureRects.push_back(points[i].textureRect.getWidth());
+                pointData.textureRects.push_back(points[i].textureRect.getHeight());
             }
 
         }
@@ -395,7 +416,7 @@ void Points::updatePointsData(){
         pointData.colors.push_back(points[i].color.z);
         pointData.colors.push_back(points[i].color.w);
             
-
+        pointData.rotations.push_back(points[i].rotation);
     }
 }
 
@@ -453,6 +474,7 @@ bool Points::load(){
     render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, points.size(), &pointData.normals.front());
     render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1, points.size(), &pointData.sizes.front());
     render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4, points.size(), &pointData.colors.front());
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, 1, points.size(), &pointData.rotations.front());
     if (useTextureRects)
         render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4, points.size(), &pointData.textureRects.front());
     
@@ -475,9 +497,5 @@ void Points::destroy(){
 
     if (render)
         render->destroy();
-    
-    for (int i=0; i < points.size(); i++){
-        delete points[i].textureRect;
-    }
     
 }

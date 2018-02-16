@@ -133,6 +133,7 @@ bool Program::load(){
         if (shaderType == S_SHADER_POINTS) {
             shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_POINTSIZES);
             shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_POINTCOLORS);
+            shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_POINTROTATIONS);
             if (hasTextureRect) {
                 shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_TEXTURERECTS);
             }

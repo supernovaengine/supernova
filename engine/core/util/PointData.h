@@ -14,6 +14,7 @@ namespace Supernova{
         std::vector<float> textureRects;
         std::vector<float> sizes;
         std::vector<float> colors;
+        std::vector<float> rotations;
         
         PointData();
         virtual ~PointData();

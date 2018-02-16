@@ -1,6 +1,7 @@
 #include "Particles.h"
 
 #include "platform/Log.h"
+#include "math/Angle.h"
 
 using namespace Supernova;
 
@@ -83,14 +84,19 @@ void Particles::setParticleColor(int particle, float red, float green, float blu
     setParticleColor(particle, Vector4(red, green, blue, alpha));
 }
 
+void Particles::setParticleRotation(int particle, float rotation){
+    if ((particle >= 0) && (particle < points.size())){
+        points[particle].rotation = Angle::defaultToRad(rotation);
+    }
+}
+
 void Particles::setParticleSprite(int particle, int index){
     if ((particle >= 0) && (particle < points.size())){
-        if (points[particle].textureRect){
-            points[particle].textureRect->setRect(&framesRect[index].rect);
-        }else {
-            points[particle].textureRect = new Rect(framesRect[index].rect);
+        if ((index >= 0) && (index < framesRect.size())) {
+            points[particle].textureRect.setRect(&framesRect[index].rect);
         }
     }
+    useSpritesFrame(true);
 }
 
 void Particles::setParticleVisible(int particle, bool visible){
@@ -136,6 +142,10 @@ Vector4 Particles::getParticleColor(int particle){
     return getPointColor(particle);
 }
 
+float Particles::getParticleRotation(int particle){
+    return getPointRotation(particle);
+}
+
 float Particles::getParticleLife(int particle){
     if ((particle >= 0) && (particle < particles.size())){
         return particles[particle].life;
@@ -178,6 +188,18 @@ void Particles::setRate(int minRate, int maxRate){
         this->maxRate = maxRate;
 }
 
+void Particles::useSpritesFrame(bool useSpritesFrame){
+    if (useSpritesFrame) {
+        if (!useTextureRects) {
+            useTextureRects = true;
+            if (loaded)
+                reload();
+        }
+    }else{
+        useTextureRects = false;
+    }
+}
+
 int Particles::getMinRate(){
     return minRate;
 }
@@ -211,6 +233,7 @@ void Particles::updateParticles(){
     updatePositions();
     updateNormals();
     updatePointColors();
+    updatePointRotations();
     updatePointSizes();
     updateTextureRects();
 }

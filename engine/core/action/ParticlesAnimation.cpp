@@ -12,11 +12,15 @@ ParticlesAnimation::ParticlesAnimation(): Action(){
     emitter = true;
 
     initOwned = true;
+    modOwned = true;
 }
 
 ParticlesAnimation::~ParticlesAnimation(){
     if (initOwned)
         deleteInits();
+
+    if (modOwned)
+        deleteMods();
     
 }
 
@@ -38,6 +42,26 @@ void ParticlesAnimation::deleteInits(){
 
 void ParticlesAnimation::setInitOwned(bool initOwned){
     this->initOwned = initOwned;
+}
+
+void ParticlesAnimation::addMod(ParticleMod* particleMod){
+    particlesMod.push_back(particleMod);
+}
+
+void ParticlesAnimation::removeMod(ParticleMod* particleMod){
+    std::vector<ParticleMod*>::iterator i = std::remove(particlesMod.begin(), particlesMod.end(), particleMod);
+    particlesMod.erase(i,particlesMod.end());
+}
+
+void ParticlesAnimation::deleteMods(){
+    for (std::vector<ParticleMod*>::iterator it = particlesMod.begin() ; it != particlesMod.end(); ++it) {
+        delete (*it);
+    }
+    particlesMod.clear();
+}
+
+void ParticlesAnimation::setModOwned(bool modOwned){
+    this->modOwned = modOwned;
 }
 
 bool ParticlesAnimation::run(){
@@ -135,6 +159,10 @@ bool ParticlesAnimation::step(){
             float life = particles->getParticleLife(i);
             
             if(life > 0.0f){
+
+                for (int mod=0; mod < particlesMod.size(); mod++){
+                    particlesMod[mod]->execute(particles, i, life);
+                }
                 
                 Vector3 velocity = particles->getParticleVelocity(i);
                 Vector3 position = particles->getParticlePosition(i);
