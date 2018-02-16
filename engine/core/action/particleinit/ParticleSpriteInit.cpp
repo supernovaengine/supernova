@@ -16,6 +16,10 @@ ParticleSpriteInit::ParticleSpriteInit(int minFrame, int maxFrame){
     }
 }
 
+ParticleSpriteInit::ParticleSpriteInit(int frame){
+    frames.push_back(frame);
+}
+
 ParticleSpriteInit::ParticleSpriteInit(const ParticleSpriteInit &particleInit){
     (*this) = particleInit;
 }

@@ -27,7 +27,7 @@ namespace Supernova {
         float* ptr();
         
         void setRect(float x, float y, float width, float height);
-        void setRect(Rect* rect);
+        void setRect(Rect rect);
 
         bool isNormalized();
     };

@@ -65,8 +65,8 @@ void Rect::setRect(float x, float y, float width, float height){
     this->height = height;
 }
 
-void Rect::setRect(Rect* rect){
-    setRect(rect->getX(), rect->getY(), rect->getWidth(), rect->getHeight());
+void Rect::setRect(Rect rect){
+    setRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
 }
 
 bool Rect::isNormalized(){

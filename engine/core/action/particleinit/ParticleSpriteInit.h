@@ -14,6 +14,7 @@ namespace Supernova {
 
         ParticleSpriteInit(std::vector<int> frames);
         ParticleSpriteInit(int minFrame, int maxFrame);
+        ParticleSpriteInit(int frame);
         ParticleSpriteInit(const ParticleSpriteInit &particleInit);
         virtual ~ParticleSpriteInit();
 

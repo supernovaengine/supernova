@@ -144,6 +144,7 @@ bool ParticlesAnimation::step(){
                     particles->setParticleAcceleration(particleIndex, Vector3(0,0,0));
                     particles->setParticleColor(particleIndex, Vector4(1,1,1,1));
                     particles->setParticleSize(particleIndex, 1);
+                    particles->setParticleSprite(particleIndex, -1);
 
                     for (int init=0; init < particlesInit.size(); init++){
                         particlesInit[init]->execute(particles, particleIndex);

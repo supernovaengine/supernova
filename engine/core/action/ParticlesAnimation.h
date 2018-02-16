@@ -2,8 +2,8 @@
 #define ParticlesAnimation_h
 
 #include "action/Action.h"
-#include "action/ParticleInit.h"
-#include "action/ParticleMod.h"
+#include "action/particleinit/ParticleInit.h"
+#include "action/particlemod/ParticleMod.h"
 
 namespace Supernova{
     

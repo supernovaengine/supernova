@@ -48,7 +48,7 @@ Vector3 ParticleVelocityMod::getToVelocity(){
 void ParticleVelocityMod::execute(Particles* particles, int particle, float life) {
     ParticleMod::execute(particles, particle, life);
 
-    if (value > 0 && value <= 1){
+    if (value >= 0 && value <= 1){
         Vector3 velocity = fromVelocity + ((toVelocity - fromVelocity) * value);
         particles->setParticleVelocity(particle, velocity);
     }

@@ -50,8 +50,11 @@ void Sprite::removeFrame(std::string id){
 }
 
 void Sprite::setFrame(int index){
-    if (index >= 0 && index < framesRect.size())
+    if (index >= 0 && index < framesRect.size()) {
         setTextureRect(framesRect[index].rect);
+    }else{
+        setTextureRect(Rect(0, 0, 1, 1));
+    }
 }
 
 void Sprite::setFrame(std::string id){

@@ -148,13 +148,16 @@ void Points::setPointColor(int point, float red, float green, float blue, float 
 
 void Points::setPointSprite(int point, int index){
     if (point >= 0 && point < points.size()) {
-        if ((index >= 0) && (index < framesRect.size())) {
 
             bool changed = false;
-
-            if (points[point].textureRect != framesRect[index].rect) {
+            if (index >= 0 && index < framesRect.size()) {
+                if (points[point].textureRect != framesRect[index].rect) {
+                    changed = true;
+                    points[point].textureRect.setRect(framesRect[index].rect);
+                }
+            }else{
                 changed = true;
-                points[point].textureRect.setRect(&framesRect[index].rect);
+                points[point].textureRect.setRect(Rect(0, 0, 1, 1));
             }
 
             if (!useTextureRects) {
@@ -167,7 +170,7 @@ void Points::setPointSprite(int point, int index){
                     updateTextureRects();
                 }
             }
-        }
+
     }
 }
 

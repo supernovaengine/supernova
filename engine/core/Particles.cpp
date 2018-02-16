@@ -92,8 +92,10 @@ void Particles::setParticleRotation(int particle, float rotation){
 
 void Particles::setParticleSprite(int particle, int index){
     if ((particle >= 0) && (particle < points.size())){
-        if ((index >= 0) && (index < framesRect.size())) {
-            points[particle].textureRect.setRect(&framesRect[index].rect);
+        if (index >= 0 && index < framesRect.size()) {
+            points[particle].textureRect.setRect(framesRect[index].rect);
+        }else{
+            points[particle].textureRect.setRect(Rect(0, 0, 1, 1));
         }
     }
     useSpritesFrame(true);
