@@ -23,6 +23,8 @@
 
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core")
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/action")
+ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/action/particleinit")
+ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/action/particlemod")
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/audio")
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/file")
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core/image")

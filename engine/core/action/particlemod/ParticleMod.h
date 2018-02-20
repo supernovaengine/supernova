@@ -2,16 +2,22 @@
 #define PARTICLEMOD_H
 
 #include "Particles.h"
+#include "action/Ease.h"
+
+typedef struct lua_State lua_State;
 
 namespace Supernova {
 
-    class ParticleMod {
+    class ParticleMod: public Ease {
 
     protected:
         float fromLife;
         float toLife;
 
         float value;
+
+        float (*function)(float);
+        int functionLua;
 
     public:
         ParticleMod();

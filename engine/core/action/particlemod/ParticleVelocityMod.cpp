@@ -1,6 +1,5 @@
 #include "ParticleVelocityMod.h"
 
-
 using namespace Supernova;
 
 ParticleVelocityMod::ParticleVelocityMod(float fromLife, float toLife, Vector3 fromVelocity, Vector3 toVelocity): ParticleMod(fromLife, toLife){

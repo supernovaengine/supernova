@@ -1,6 +1,5 @@
 #include "ParticleSpriteMod.h"
 
-
 using namespace Supernova;
 
 ParticleSpriteMod::ParticleSpriteMod(float fromLife, float toLife, std::vector<int> frames): ParticleMod(fromLife, toLife){

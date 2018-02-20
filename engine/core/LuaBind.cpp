@@ -37,6 +37,7 @@
 #include "Input.h"
 #include "Sprite.h"
 #include "action/Action.h"
+#include "action/Ease.h"
 #include "action/TimeAction.h"
 #include "action/MoveAction.h"
 #include "action/RotateAction.h"
@@ -595,10 +596,7 @@ void LuaBind::bind(){
     .addFunction("onStop", (int (Action::*)(lua_State*))&Action::onStop)
     .addFunction("onFinish", (int (Action::*)(lua_State*))&Action::onFinish)
     .addFunction("onStep", (int (Action::*)(lua_State*))&Action::onStep)
-    .endClass()
-    
-    .beginExtendClass<TimeAction, Action>("TimeAction")
-    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
+
     .addConstant("LINEAR", S_LINEAR)
     .addConstant("EASE_QUAD_IN", S_EASE_QUAD_IN)
     .addConstant("EASE_QUAD_OUT", S_EASE_QUAD_OUT)
@@ -630,7 +628,11 @@ void LuaBind::bind(){
     .addConstant("EASE_BOUNCE_IN", S_EASE_BOUNCE_IN)
     .addConstant("EASE_BOUNCE_OUT", S_EASE_BOUNCE_OUT)
     .addConstant("EASE_BOUNCE_IN_OUT", S_EASE_BOUNCE_IN_OUT)
-    .addFunction("setFunction", (int (Action::*)(lua_State*))&TimeAction::setFunction)
+    .endClass()
+    
+    .beginExtendClass<TimeAction, Action>("TimeAction")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
+    .addFunction("setFunction", (int (TimeAction::*)(lua_State*))&TimeAction::setFunction)
     .addFunction("setFunctionType", &TimeAction::setFunctionType)
     .addFunction("getDuration", &TimeAction::getDuration)
     .addFunction("setDuration", &TimeAction::setDuration)

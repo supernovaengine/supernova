@@ -64,7 +64,7 @@ namespace Supernova {
         void setRate(int minRate);
         void setRate(int minRate, int maxRate);
 
-        void useSpritesFrame(bool useSpritesFrame);
+        void useSpriteFrames(bool useSpriteFrames);
 
         int getMinRate();
         int getMaxRate();

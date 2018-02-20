@@ -1,14 +1,23 @@
 #include "ParticleMod.h"
 
+#include "platform/Log.h"
+#include "action/TimeAction.h"
+
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+
+#include "LuaBind.h"
+
 using namespace Supernova;
 
-ParticleMod::ParticleMod(){
+ParticleMod::ParticleMod(): Ease(){
     this->fromLife = 0;
     this->toLife = 0;
     this->value = -1;
 }
 
-ParticleMod::ParticleMod(float fromLife, float toLife){
+ParticleMod::ParticleMod(float fromLife, float toLife): Ease(){
     this->fromLife = fromLife;
     this->toLife = toLife;
     this->value = -1;
@@ -19,9 +28,12 @@ ParticleMod::~ParticleMod(){
 }
 
 void ParticleMod::execute(Particles* particles, int particle, float life){
+    float time;
     if ((fromLife != toLife) && (life <= fromLife) && (life >= toLife)) {
-        value = (life - fromLife) / (toLife - fromLife);
+        time = (life - fromLife) / (toLife - fromLife);
     }else{
-        value = -1;
+        time = -1;
     }
+
+    value = call_Function(time);
 }

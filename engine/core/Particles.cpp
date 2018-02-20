@@ -98,7 +98,7 @@ void Particles::setParticleSprite(int particle, int index){
             points[particle].textureRect.setRect(Rect(0, 0, 1, 1));
         }
     }
-    useSpritesFrame(true);
+    useSpriteFrames(true);
 }
 
 void Particles::setParticleVisible(int particle, bool visible){
@@ -190,8 +190,8 @@ void Particles::setRate(int minRate, int maxRate){
         this->maxRate = maxRate;
 }
 
-void Particles::useSpritesFrame(bool useSpritesFrame){
-    if (useSpritesFrame) {
+void Particles::useSpriteFrames(bool useSpriteFrames){
+    if (useSpriteFrames) {
         if (!useTextureRects) {
             useTextureRects = true;
             if (loaded)
