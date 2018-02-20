@@ -16,9 +16,6 @@ namespace Supernova {
 
         float value;
 
-        float (*function)(float);
-        int functionLua;
-
     public:
         ParticleMod();
         ParticleMod(float fromLife, float toLife);
