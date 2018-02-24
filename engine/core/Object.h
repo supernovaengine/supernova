@@ -22,7 +22,7 @@ namespace Supernova {
         void setSceneAndConfigure(Scene* scene);
         void removeScene();
         int findObject(Object* object);
-        void setDepth(bool depth);
+        void setSceneDepth(bool depth);
         
     protected:
         

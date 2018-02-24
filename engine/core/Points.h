@@ -59,6 +59,8 @@ namespace Supernova {
 
         bool useTextureRects;
 
+        bool automaticUpdate;
+
         std::vector<FramesData> framesRect;
         
         void updatePointsData();

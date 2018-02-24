@@ -8,8 +8,13 @@
 namespace Supernova {
 
     class ConcreteObject: public Object {
+
+    private:
+
+        void setSceneTransparency(bool transparency);
         
     protected:
+
         Material material;
 
         Matrix4 normalMatrix;
@@ -37,8 +42,6 @@ namespace Supernova {
         std::string getTexture();
         
         Material* getMaterial();
-
-        void setSceneTransparency(bool transparency);
 
         unsigned int getMinBufferSize();
         

@@ -72,7 +72,8 @@ bool Model::loadOBJ(const char* path){
 
             this->submeshes.back()->getMaterial()->setTexturePath(baseDir+"/"+materials[i].diffuse_texname);
             if (materials[i].dissolve < 1){
-                this->submeshes.back()->getMaterial()->transparent = true;
+                // TODO: Add this check on isTransparent Material method
+                transparent = true;
             }
         }
 

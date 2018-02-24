@@ -7,8 +7,13 @@
 #define S_TEXTURE_DEPTH_FRAME 3
 #define S_TEXTURE_FRAME_CUBE 4
 
+#define S_COLOR_GRAY  1
+#define S_COLOR_RGB_ALPHA  2
+#define S_COLOR_GRAY_ALPHA  3
+#define S_COLOR_RGB  4
+#define S_COLOR_ALPHA 5
+
 #include "render/TextureRender.h"
-#include "image/ColorType.h"
 #include <string>
 
 

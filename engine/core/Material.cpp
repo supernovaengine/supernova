@@ -6,7 +6,6 @@ using namespace Supernova;
 
 Material::Material(){
     texture = NULL;
-    transparent = false;
     textureRect = NULL;
     color = Vector4(1.0, 1.0, 1.0, 1.0);
     textureOwned = true;
@@ -23,7 +22,6 @@ Material::Material(const Material& s){
     this->texture = s.texture;
     this->color = s.color;
     this->textureRect = s.textureRect;
-    this->transparent = s.transparent;
     this->textureOwned = s.textureOwned;
 }
 
@@ -31,7 +29,6 @@ Material& Material::operator = (const Material& s){
     this->texture = s.texture;
     this->color = s.color;
     this->textureRect = s.textureRect;
-    this->transparent = s.transparent;
     this->textureOwned = s.textureOwned;
     
     return *this;
@@ -55,11 +52,6 @@ void Material::setTexturePath(std::string texture_path){
 }
 
 void Material::setColor(Vector4 color){
-    
-    if (color.w != 1){
-        transparent = true;
-    }
-    
     this->color = color;
 }
 
@@ -115,4 +107,14 @@ Vector4* Material::getColor(){
 
 Rect* Material::getTextureRect(){
     return textureRect;
+}
+
+bool Material::isTransparent(){
+    if (texture && texture->getType() == S_TEXTURE_2D && texture->hasAlphaChannel()) {
+        return true;
+    }
+    if (color.w != 1){
+        return true;
+    }
+    return false;
 }

@@ -25,8 +25,6 @@ unsigned int ConcreteObject::getMinBufferSize(){
 void ConcreteObject::setColor(Vector4 color){
     if (color.w != 1){
         transparent = true;
-    }else{
-        transparent = false;
     }
     material.setColor(color);
 }
@@ -85,7 +83,8 @@ void ConcreteObject::updateDistanceToCamera(){
 
 void ConcreteObject::setSceneTransparency(bool transparency){
     if (scene) {
-        scene->useTransparency = transparency;
+        if (scene->getUserDefinedTransparency() != S_OPTION_NO)
+            scene->useTransparency = transparency;
     }
 }
 
@@ -125,12 +124,8 @@ bool ConcreteObject::draw(){
 bool ConcreteObject::load(){
     Object::load();
 
-    if (material.getTexture()) {
-        if (material.getTexture()->getType() == S_TEXTURE_2D)
-            transparent = material.getTexture()->hasAlphaChannel();
-    }
-
-    if (transparent){
+    if (material.isTransparent()){
+        transparent = true;
         setSceneTransparency(true);
     }
     

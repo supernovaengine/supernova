@@ -11,7 +11,7 @@ std::unordered_map< std::string, std::shared_ptr<TextureRender> > TextureRender:
 TextureRender::TextureRender(){
     this->loaded = false;
     
-    this->colorFormat = false;
+    this->colorFormat = -1;
     this->width = 0;
     this->height = 0;
 }

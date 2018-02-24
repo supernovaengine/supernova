@@ -30,6 +30,9 @@ Scene::Scene() {
     drawShadowLightPos = Vector3();
     drawShadowCameraNearFar = Vector2();
     drawIsPointShadow = false;
+
+    userDefinedTransparency = S_OPTION_AUTOMATIC;
+    userDefinedDepth = S_OPTION_AUTOMATIC;
 }
 
 Scene::~Scene() {
@@ -164,6 +167,28 @@ bool Scene::isUseTransparency(){
     return useTransparency;
 }
 
+void Scene::setTransparency(bool transparency){
+    if (transparency)
+        userDefinedTransparency = S_OPTION_YES;
+    else
+        userDefinedTransparency = S_OPTION_NO;
+}
+
+void Scene::setDepth(bool depth){
+    if (depth)
+        userDefinedDepth = S_OPTION_YES;
+    else
+        userDefinedDepth = S_OPTION_NO;
+}
+
+int Scene::getUserDefinedTransparency(){
+    return userDefinedTransparency;
+}
+
+int Scene::getUserDefinedDepth(){
+    return userDefinedDepth;
+}
+
 void Scene::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
     Object::updateVPMatrix(getCamera()->getViewMatrix(), getCamera()->getProjectionMatrix(), getCamera()->getViewProjectionMatrix(), new Vector3(getCamera()->getWorldPosition()));
 }
@@ -227,8 +252,14 @@ void Scene::doCamera(){
 void Scene::resetSceneProperties(){
     useTransparency = false;
     useDepth = false;
-    if (camera->getType() == S_CAMERA_PERSPECTIVE){
+
+    if (camera->getType() == S_CAMERA_PERSPECTIVE && userDefinedDepth == S_OPTION_AUTOMATIC) {
         useDepth = true;
+    }else if (userDefinedDepth == S_OPTION_YES){
+        useDepth = true;
+    }
+    if (userDefinedTransparency == S_OPTION_YES){
+        useTransparency = true;
     }
 
     useLight = lightData.updateLights(getLights(), getAmbientLight());

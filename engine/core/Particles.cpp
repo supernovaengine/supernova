@@ -11,6 +11,8 @@ Particles::Particles(): Points(){
     this->maxParticles = 100;
     this->minRate = 10;
     this->maxRate = 5;
+
+    this->automaticUpdate = false;
 }
 
 Particles::Particles(int numParticles): Particles(){
@@ -59,9 +61,8 @@ int Particles::getMaxParticles(){
 }
 
 void Particles::setParticlePosition(int particle, Vector3 position){
-    if ((particle >= 0) && (particle < points.size())){
-        points[particle].position = position;
-    }
+    if ((particle >= 0) && (particle < particles.size()))
+        setPointPosition(particle, position);
 }
 
 void Particles::setParticlePosition(int particle, float x, float y, float z){
@@ -69,42 +70,33 @@ void Particles::setParticlePosition(int particle, float x, float y, float z){
 }
 
 void Particles::setParticleSize(int particle, float size){
-    if ((particle >= 0) && (particle < points.size())){
-        points[particle].size = size;
-    }
+    if ((particle >= 0) && (particle < particles.size()))
+        setPointSize(particle, size);
 }
 
 void Particles::setParticleColor(int particle, Vector4 color){
-    if ((particle >= 0) && (particle < points.size())){
-        points[particle].color = color;
-    }
+    if ((particle >= 0) && (particle < particles.size()))
+        setPointColor(particle, color);
 }
 
 void Particles::setParticleColor(int particle, float red, float green, float blue, float alpha){
-    setParticleColor(particle, Vector4(red, green, blue, alpha));
+    if ((particle >= 0) && (particle < particles.size()))
+        setPointColor(particle, Vector4(red, green, blue, alpha));
 }
 
 void Particles::setParticleRotation(int particle, float rotation){
-    if ((particle >= 0) && (particle < points.size())){
-        points[particle].rotation = Angle::defaultToRad(rotation);
-    }
+    if ((particle >= 0) && (particle < particles.size()))
+        setPointRotation(particle, rotation);
 }
 
 void Particles::setParticleSprite(int particle, int index){
-    if ((particle >= 0) && (particle < points.size())){
-        if (index >= 0 && index < framesRect.size()) {
-            points[particle].textureRect.setRect(framesRect[index].rect);
-        }else{
-            points[particle].textureRect.setRect(Rect(0, 0, 1, 1));
-        }
-    }
-    useSpriteFrames(true);
+    if ((particle >= 0) && (particle < particles.size()))
+        setPointSprite(particle, index);
 }
 
 void Particles::setParticleVisible(int particle, bool visible){
-    if ((particle >= 0) && (particle < points.size())){
-        points[particle].visible = visible;
-    }
+    if ((particle >= 0) && (particle < particles.size()))
+        setPointVisible(particle, visible);
 }
 
 void Particles::setParticleLife(int particle, float life){

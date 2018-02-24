@@ -136,9 +136,10 @@ void Object::removeObject(Object* obj){
     obj->updateMatrix();
 }
 
-void Object::setDepth(bool depth){
-    if (scene != NULL) {
-        ((Scene*)scene)->useDepth = depth;
+void Object::setSceneDepth(bool depth){
+    if (scene) {
+        if (scene->getUserDefinedDepth() != S_OPTION_NO)
+            scene->useDepth = depth;
     }
 }
 
@@ -407,7 +408,7 @@ bool Object::reload(){
 bool Object::load(){
 
     if ((position.z != 0) && isIn3DScene()){
-        setDepth(true);
+        setSceneDepth(true);
     }
 
     std::vector<Object*>::iterator it;
@@ -424,7 +425,7 @@ bool Object::load(){
 
 bool Object::draw(){
     if (position.z != 0){
-        setDepth(true);
+        setSceneDepth(true);
     }
 
     for (int i = 0; i < actions.size(); i++){

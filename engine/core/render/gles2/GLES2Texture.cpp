@@ -1,5 +1,4 @@
 #include "GLES2Texture.h"
-#include "image/ColorType.h"
 #include "Engine.h"
 #include "Scene.h"
 #include "platform/Log.h"

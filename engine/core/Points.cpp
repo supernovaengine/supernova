@@ -22,6 +22,8 @@ Points::Points(){
     
     useTextureRects = false;
 
+    automaticUpdate = true;
+
     render = NULL;
 }
 
@@ -78,7 +80,7 @@ void Points::setPointPosition(int point, Vector3 position){
 
         points[point].position = position;
 
-        if (loaded && changed){
+        if (loaded && changed && automaticUpdate){
             updatePointsData();
             
             updatePositions();
@@ -100,7 +102,7 @@ void Points::setPointSize(int point, float size){
 
         points[point].size = size;
 
-        if (loaded && changed){
+        if (loaded && changed && automaticUpdate){
             updatePointsData();
             
             updatePointSizes();
@@ -117,12 +119,20 @@ void Points::setPointColor(int point, Vector4 color){
 
         points[point].color = color;
 
-        if (loaded && changed){
+        if (color.w != 1){
+            transparent = true;
+        }
+
+        if (loaded && changed && automaticUpdate){
             updatePointsData();
             
             updatePointColors();
         }
     }
+}
+
+void Points::setPointColor(int point, float red, float green, float blue, float alpha){
+    setPointColor(point, Vector4(red, green, blue, alpha));
 }
 
 void Points::setPointRotation(int point, float rotation){
@@ -134,16 +144,12 @@ void Points::setPointRotation(int point, float rotation){
 
         points[point].rotation = Angle::defaultToRad(rotation);
 
-        if (loaded && changed){
+        if (loaded && changed && automaticUpdate){
             updatePointsData();
 
             updatePointRotations();
         }
     }
-}
-
-void Points::setPointColor(int point, float red, float green, float blue, float alpha){
-    setPointColor(point, Vector4(red, green, blue, alpha));
 }
 
 void Points::setPointSprite(int point, int index){
@@ -165,7 +171,7 @@ void Points::setPointSprite(int point, int index){
                 if (loaded)
                     reload();
             } else {
-                if (loaded && changed) {
+                if (loaded && changed && automaticUpdate) {
                     updatePointsData();
                     updateTextureRects();
                 }
@@ -190,7 +196,7 @@ void Points::setPointVisible(int point, bool visible){
         
         points[point].visible = visible;
         
-        if (loaded && changed){
+        if (loaded && changed && automaticUpdate){
             updatePointsData();
             
             updatePositions();
@@ -262,7 +268,7 @@ void Points::updatePointScale(){
 }
 
 void Points::sortTransparentPoints(){
-    if (transparent && scene && scene->isUseDepth()){
+    if (transparent && scene && scene->isUseDepth() && scene->getUserDefinedTransparency() != S_OPTION_NO){
         
         bool needSort = false;
         for (int i=0; i < points.size(); i++){

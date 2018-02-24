@@ -1,7 +1,7 @@
 #include "STBImageReader.h"
 
 #include "stb_image.h"
-#include "ColorType.h"
+#include "Texture.h"
 
 using namespace Supernova;
 

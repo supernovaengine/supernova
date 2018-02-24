@@ -105,15 +105,15 @@ void Mesh::updateIndices(){
 }
 
 void Mesh::sortTransparentSubmeshes(){
+    if (transparent && scene && scene->isUseDepth() && scene->getUserDefinedTransparency() != S_OPTION_NO){
 
-    if (transparent && scene && scene->isUseDepth()){
         bool needSort = false;
         for (size_t i = 0; i < submeshes.size(); i++) {
             if (this->submeshes[i]->getIndices()->size() > 0){
                 Vector3 submeshFirstVertice = vertices[this->submeshes[i]->getIndex(0)];
                 submeshFirstVertice = modelMatrix * submeshFirstVertice;
-                
-                if (this->submeshes[i]->getMaterial()->transparent){
+
+                if (this->submeshes[i]->getMaterial()->isTransparent()){
                     this->submeshes[i]->distanceToCamera = (this->cameraPosition - submeshFirstVertice).length();
                     needSort = true;
                 }
@@ -214,6 +214,9 @@ bool Mesh::load(){
             if (submeshes.at(i)->getMaterial()->getTexture()->getType() == S_TEXTURE_CUBE){
                 hasTextureCube = true;
             }
+        }
+        if (submeshes.at(i)->getMaterial()->isTransparent()) {
+            transparent = true;
         }
     }
     

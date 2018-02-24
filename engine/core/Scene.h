@@ -1,6 +1,10 @@
 #ifndef scene_h
 #define scene_h
 
+#define S_OPTION_NO 0
+#define S_OPTION_YES 1
+#define S_OPTION_AUTOMATIC 2
+
 #include "Object.h"
 #include "Camera.h"
 #include "Render.h"
@@ -54,6 +58,10 @@ namespace Supernova {
         bool useTransparency;
         bool useDepth;
         bool useLight;
+
+        // S_OPTION
+        int userDefinedTransparency;
+        int userDefinedDepth;
         
         void addLight (Light* light);
         void removeLight (Light* light);
@@ -95,6 +103,12 @@ namespace Supernova {
         bool isUseDepth();
         bool isUseLight();
         bool isUseTransparency();
+
+        void setTransparency(bool transparency);
+        void setDepth(bool depth);
+
+        int getUserDefinedTransparency();
+        int getUserDefinedDepth();
         
         void setFog(Fog* fog);
 

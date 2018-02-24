@@ -24,8 +24,6 @@ namespace Supernova {
         Material(const Material& s);
         virtual ~Material();
         
-        bool transparent; //TODO: not public
-        
         Material& operator = (const Material& s);
         
         void setTexture(Texture* texture);
@@ -38,6 +36,8 @@ namespace Supernova {
         Texture* getTexture();
         Vector4* getColor();
         Rect* getTextureRect();
+
+        bool isTransparent();
         
     };
         
