@@ -122,9 +122,27 @@
 		71C27737202BCE1F005B3EDC /* ColorAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C27715202BC3DA005B3EDC /* ColorAction.cpp */; };
 		71C27738202BCE1F005B3EDC /* RotateAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C277122023C680005B3EDC /* RotateAction.cpp */; };
 		71C27739202BCE1F005B3EDC /* ScaleAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C2771F202BC3E2005B3EDC /* ScaleAction.cpp */; };
-		71C2773A202BCE28005B3EDC /* ParticleInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C27721202BC3F1005B3EDC /* ParticleInit.cpp */; };
 		71C2773C202BCE6C005B3EDC /* AlignedBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714E167D2006DF8700548DA2 /* AlignedBox.cpp */; };
 		71C2773D202BCE6C005B3EDC /* Matrix3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714E167E2006DF8700548DA2 /* Matrix3.cpp */; };
+		71C39E0F2041889B00863AB6 /* Ease.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E0C2041889600863AB6 /* Ease.cpp */; };
+		71C39E48204188B000863AB6 /* ParticleAccelerationInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E22204188A500863AB6 /* ParticleAccelerationInit.cpp */; };
+		71C39E49204188B000863AB6 /* ParticleAlphaInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E24204188A500863AB6 /* ParticleAlphaInit.cpp */; };
+		71C39E4A204188B000863AB6 /* ParticleColorInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E26204188A500863AB6 /* ParticleColorInit.cpp */; };
+		71C39E4B204188B000863AB6 /* ParticleInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E28204188A500863AB6 /* ParticleInit.cpp */; };
+		71C39E4C204188B000863AB6 /* ParticleLifeInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E2A204188A500863AB6 /* ParticleLifeInit.cpp */; };
+		71C39E4D204188B000863AB6 /* ParticlePositionInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E2C204188A500863AB6 /* ParticlePositionInit.cpp */; };
+		71C39E4E204188B000863AB6 /* ParticleRotationInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E2E204188A500863AB6 /* ParticleRotationInit.cpp */; };
+		71C39E4F204188B000863AB6 /* ParticleSizeInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E30204188A500863AB6 /* ParticleSizeInit.cpp */; };
+		71C39E50204188B000863AB6 /* ParticleSpriteInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E32204188A500863AB6 /* ParticleSpriteInit.cpp */; };
+		71C39E51204188B000863AB6 /* ParticleVelocityInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E34204188A500863AB6 /* ParticleVelocityInit.cpp */; };
+		71C39E52204188BC00863AB6 /* ParticleAlphaMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E11204188A500863AB6 /* ParticleAlphaMod.cpp */; };
+		71C39E53204188BC00863AB6 /* ParticleColorMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E13204188A500863AB6 /* ParticleColorMod.cpp */; };
+		71C39E54204188BC00863AB6 /* ParticleMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E15204188A500863AB6 /* ParticleMod.cpp */; };
+		71C39E55204188BC00863AB6 /* ParticlePositionMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E17204188A500863AB6 /* ParticlePositionMod.cpp */; };
+		71C39E56204188BC00863AB6 /* ParticleRotationMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E19204188A500863AB6 /* ParticleRotationMod.cpp */; };
+		71C39E57204188BC00863AB6 /* ParticleSizeMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E1B204188A500863AB6 /* ParticleSizeMod.cpp */; };
+		71C39E58204188BC00863AB6 /* ParticleSpriteMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E1D204188A500863AB6 /* ParticleSpriteMod.cpp */; };
+		71C39E59204188BC00863AB6 /* ParticleVelocityMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E1F204188A500863AB6 /* ParticleVelocityMod.cpp */; };
 		71C576441EE2F111002F537B /* FileUtilsIOS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C576421EE2F111002F537B /* FileUtilsIOS.cpp */; };
 		71C5764A1EE45167002F537B /* Events.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C576481EE45167002F537B /* Events.cpp */; };
 		71CDC6FD1D7B132B0060EEFF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */; };
@@ -171,7 +189,6 @@
 		71CE950D1EC8A43C008CCF3C /* FileUtilsGeneric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE95071EC8A430008CCF3C /* FileUtilsGeneric.cpp */; };
 		71CE95111ECA6048008CCF3C /* stb_truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 71CE950E1ECA6043008CCF3C /* stb_truetype.c */; };
 		71D6EFD21F40A00E00241F0C /* SpriteAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFD01F40A00E00241F0C /* SpriteAnimation.cpp */; };
-		71D6EFE51F50E08B00241F0C /* ParticleVelocityInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFE01F50E08200241F0C /* ParticleVelocityInit.cpp */; };
 		71D6EFE81F53551F00241F0C /* TimeAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFE61F53551F00241F0C /* TimeAction.cpp */; };
 		71E170521F4D088C006D207B /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E170501F4D088C006D207B /* ParticlesAnimation.cpp */; };
 		71EC38B41EB82871008654E8 /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71EC38B21EB82871008654E8 /* Particles.cpp */; };
@@ -332,7 +349,6 @@
 		713D2A0E1CFB2EAD00A4752F /* Cube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cube.h; sourceTree = "<group>"; };
 		713D2A101CFB2EAD00A4752F /* Engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
 		713D2A111CFB2EAD00A4752F /* Engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
-		713D2A171CFB2EAD00A4752F /* ColorType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorType.h; sourceTree = "<group>"; };
 		713D2A181CFB2EAD00A4752F /* TextureLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureLoader.cpp; sourceTree = "<group>"; };
 		713D2A191CFB2EAD00A4752F /* TextureLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureLoader.h; sourceTree = "<group>"; };
 		713D2A1E1CFB2EAD00A4752F /* TextureData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureData.cpp; sourceTree = "<group>"; };
@@ -605,14 +621,50 @@
 		71C2771A202BC3DB005B3EDC /* AlphaAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlphaAction.cpp; sourceTree = "<group>"; };
 		71C2771E202BC3E2005B3EDC /* ScaleAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScaleAction.h; sourceTree = "<group>"; };
 		71C2771F202BC3E2005B3EDC /* ScaleAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScaleAction.cpp; sourceTree = "<group>"; };
-		71C27721202BC3F1005B3EDC /* ParticleInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleInit.cpp; sourceTree = "<group>"; };
-		71C27722202BC3F1005B3EDC /* ParticleInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleInit.h; sourceTree = "<group>"; };
 		71C27725202BC405005B3EDC /* LightData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LightData.cpp; sourceTree = "<group>"; };
 		71C27726202BC405005B3EDC /* LightData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LightData.h; sourceTree = "<group>"; };
 		71C27727202BC405005B3EDC /* PointData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointData.cpp; sourceTree = "<group>"; };
 		71C27728202BC405005B3EDC /* PointData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointData.h; sourceTree = "<group>"; };
 		71C27729202BC405005B3EDC /* STBText.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STBText.cpp; sourceTree = "<group>"; };
 		71C2772A202BC405005B3EDC /* STBText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STBText.h; sourceTree = "<group>"; };
+		71C39E0C2041889600863AB6 /* Ease.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Ease.cpp; sourceTree = "<group>"; };
+		71C39E0D2041889700863AB6 /* Ease.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ease.h; sourceTree = "<group>"; };
+		71C39E11204188A500863AB6 /* ParticleAlphaMod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleAlphaMod.cpp; sourceTree = "<group>"; };
+		71C39E12204188A500863AB6 /* ParticleAlphaMod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleAlphaMod.h; sourceTree = "<group>"; };
+		71C39E13204188A500863AB6 /* ParticleColorMod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleColorMod.cpp; sourceTree = "<group>"; };
+		71C39E14204188A500863AB6 /* ParticleColorMod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleColorMod.h; sourceTree = "<group>"; };
+		71C39E15204188A500863AB6 /* ParticleMod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleMod.cpp; sourceTree = "<group>"; };
+		71C39E16204188A500863AB6 /* ParticleMod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleMod.h; sourceTree = "<group>"; };
+		71C39E17204188A500863AB6 /* ParticlePositionMod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlePositionMod.cpp; sourceTree = "<group>"; };
+		71C39E18204188A500863AB6 /* ParticlePositionMod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlePositionMod.h; sourceTree = "<group>"; };
+		71C39E19204188A500863AB6 /* ParticleRotationMod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleRotationMod.cpp; sourceTree = "<group>"; };
+		71C39E1A204188A500863AB6 /* ParticleRotationMod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleRotationMod.h; sourceTree = "<group>"; };
+		71C39E1B204188A500863AB6 /* ParticleSizeMod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleSizeMod.cpp; sourceTree = "<group>"; };
+		71C39E1C204188A500863AB6 /* ParticleSizeMod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleSizeMod.h; sourceTree = "<group>"; };
+		71C39E1D204188A500863AB6 /* ParticleSpriteMod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleSpriteMod.cpp; sourceTree = "<group>"; };
+		71C39E1E204188A500863AB6 /* ParticleSpriteMod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleSpriteMod.h; sourceTree = "<group>"; };
+		71C39E1F204188A500863AB6 /* ParticleVelocityMod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleVelocityMod.cpp; sourceTree = "<group>"; };
+		71C39E20204188A500863AB6 /* ParticleVelocityMod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleVelocityMod.h; sourceTree = "<group>"; };
+		71C39E22204188A500863AB6 /* ParticleAccelerationInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleAccelerationInit.cpp; sourceTree = "<group>"; };
+		71C39E23204188A500863AB6 /* ParticleAccelerationInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleAccelerationInit.h; sourceTree = "<group>"; };
+		71C39E24204188A500863AB6 /* ParticleAlphaInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleAlphaInit.cpp; sourceTree = "<group>"; };
+		71C39E25204188A500863AB6 /* ParticleAlphaInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleAlphaInit.h; sourceTree = "<group>"; };
+		71C39E26204188A500863AB6 /* ParticleColorInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleColorInit.cpp; sourceTree = "<group>"; };
+		71C39E27204188A500863AB6 /* ParticleColorInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleColorInit.h; sourceTree = "<group>"; };
+		71C39E28204188A500863AB6 /* ParticleInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleInit.cpp; sourceTree = "<group>"; };
+		71C39E29204188A500863AB6 /* ParticleInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleInit.h; sourceTree = "<group>"; };
+		71C39E2A204188A500863AB6 /* ParticleLifeInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleLifeInit.cpp; sourceTree = "<group>"; };
+		71C39E2B204188A500863AB6 /* ParticleLifeInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleLifeInit.h; sourceTree = "<group>"; };
+		71C39E2C204188A500863AB6 /* ParticlePositionInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlePositionInit.cpp; sourceTree = "<group>"; };
+		71C39E2D204188A500863AB6 /* ParticlePositionInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlePositionInit.h; sourceTree = "<group>"; };
+		71C39E2E204188A500863AB6 /* ParticleRotationInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleRotationInit.cpp; sourceTree = "<group>"; };
+		71C39E2F204188A500863AB6 /* ParticleRotationInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleRotationInit.h; sourceTree = "<group>"; };
+		71C39E30204188A500863AB6 /* ParticleSizeInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleSizeInit.cpp; sourceTree = "<group>"; };
+		71C39E31204188A500863AB6 /* ParticleSizeInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleSizeInit.h; sourceTree = "<group>"; };
+		71C39E32204188A500863AB6 /* ParticleSpriteInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleSpriteInit.cpp; sourceTree = "<group>"; };
+		71C39E33204188A500863AB6 /* ParticleSpriteInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleSpriteInit.h; sourceTree = "<group>"; };
+		71C39E34204188A500863AB6 /* ParticleVelocityInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleVelocityInit.cpp; sourceTree = "<group>"; };
+		71C39E35204188A500863AB6 /* ParticleVelocityInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleVelocityInit.h; sourceTree = "<group>"; };
 		71C576421EE2F111002F537B /* FileUtilsIOS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileUtilsIOS.cpp; sourceTree = "<group>"; };
 		71C576431EE2F111002F537B /* FileUtilsIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUtilsIOS.h; sourceTree = "<group>"; };
 		71C576481EE45167002F537B /* Events.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Events.cpp; sourceTree = "<group>"; };
@@ -642,8 +694,6 @@
 		71CE950F1ECA6043008CCF3C /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
 		71D6EFD01F40A00E00241F0C /* SpriteAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteAnimation.cpp; sourceTree = "<group>"; };
 		71D6EFD11F40A00E00241F0C /* SpriteAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteAnimation.h; sourceTree = "<group>"; };
-		71D6EFE01F50E08200241F0C /* ParticleVelocityInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleVelocityInit.cpp; sourceTree = "<group>"; };
-		71D6EFE11F50E08200241F0C /* ParticleVelocityInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleVelocityInit.h; sourceTree = "<group>"; };
 		71D6EFE61F53551F00241F0C /* TimeAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TimeAction.cpp; sourceTree = "<group>"; };
 		71D6EFE71F53551F00241F0C /* TimeAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeAction.h; sourceTree = "<group>"; };
 		71E170501F4D088C006D207B /* ParticlesAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlesAnimation.cpp; sourceTree = "<group>"; };
@@ -904,7 +954,6 @@
 		713D2A161CFB2EAD00A4752F /* image */ = {
 			isa = PBXGroup;
 			children = (
-				713D2A171CFB2EAD00A4752F /* ColorType.h */,
 				7125E32B1D7CC7470090B05E /* ImageReader.cpp */,
 				7125E3291D7CB2B20090B05E /* ImageReader.h */,
 				713D2A1E1CFB2EAD00A4752F /* TextureData.cpp */,
@@ -1211,9 +1260,12 @@
 				71C27718202BC3DB005B3EDC /* AlphaAction.h */,
 				71C27715202BC3DA005B3EDC /* ColorAction.cpp */,
 				71C27717202BC3DB005B3EDC /* ColorAction.h */,
+				71C39E0C2041889600863AB6 /* Ease.cpp */,
+				71C39E0D2041889700863AB6 /* Ease.h */,
 				718C7BD71F3E541A001AA8C2 /* MoveAction.cpp */,
 				718C7BD81F3E541A001AA8C2 /* MoveAction.h */,
-				71D6EFDD1F50E08200241F0C /* particle */,
+				71C39E21204188A500863AB6 /* particleinit */,
+				71C39E10204188A500863AB6 /* particlemod */,
 				71E170501F4D088C006D207B /* ParticlesAnimation.cpp */,
 				71E170511F4D088C006D207B /* ParticlesAnimation.h */,
 				71C277122023C680005B3EDC /* RotateAction.cpp */,
@@ -1334,6 +1386,56 @@
 			path = util;
 			sourceTree = "<group>";
 		};
+		71C39E10204188A500863AB6 /* particlemod */ = {
+			isa = PBXGroup;
+			children = (
+				71C39E11204188A500863AB6 /* ParticleAlphaMod.cpp */,
+				71C39E12204188A500863AB6 /* ParticleAlphaMod.h */,
+				71C39E13204188A500863AB6 /* ParticleColorMod.cpp */,
+				71C39E14204188A500863AB6 /* ParticleColorMod.h */,
+				71C39E15204188A500863AB6 /* ParticleMod.cpp */,
+				71C39E16204188A500863AB6 /* ParticleMod.h */,
+				71C39E17204188A500863AB6 /* ParticlePositionMod.cpp */,
+				71C39E18204188A500863AB6 /* ParticlePositionMod.h */,
+				71C39E19204188A500863AB6 /* ParticleRotationMod.cpp */,
+				71C39E1A204188A500863AB6 /* ParticleRotationMod.h */,
+				71C39E1B204188A500863AB6 /* ParticleSizeMod.cpp */,
+				71C39E1C204188A500863AB6 /* ParticleSizeMod.h */,
+				71C39E1D204188A500863AB6 /* ParticleSpriteMod.cpp */,
+				71C39E1E204188A500863AB6 /* ParticleSpriteMod.h */,
+				71C39E1F204188A500863AB6 /* ParticleVelocityMod.cpp */,
+				71C39E20204188A500863AB6 /* ParticleVelocityMod.h */,
+			);
+			path = particlemod;
+			sourceTree = "<group>";
+		};
+		71C39E21204188A500863AB6 /* particleinit */ = {
+			isa = PBXGroup;
+			children = (
+				71C39E22204188A500863AB6 /* ParticleAccelerationInit.cpp */,
+				71C39E23204188A500863AB6 /* ParticleAccelerationInit.h */,
+				71C39E24204188A500863AB6 /* ParticleAlphaInit.cpp */,
+				71C39E25204188A500863AB6 /* ParticleAlphaInit.h */,
+				71C39E26204188A500863AB6 /* ParticleColorInit.cpp */,
+				71C39E27204188A500863AB6 /* ParticleColorInit.h */,
+				71C39E28204188A500863AB6 /* ParticleInit.cpp */,
+				71C39E29204188A500863AB6 /* ParticleInit.h */,
+				71C39E2A204188A500863AB6 /* ParticleLifeInit.cpp */,
+				71C39E2B204188A500863AB6 /* ParticleLifeInit.h */,
+				71C39E2C204188A500863AB6 /* ParticlePositionInit.cpp */,
+				71C39E2D204188A500863AB6 /* ParticlePositionInit.h */,
+				71C39E2E204188A500863AB6 /* ParticleRotationInit.cpp */,
+				71C39E2F204188A500863AB6 /* ParticleRotationInit.h */,
+				71C39E30204188A500863AB6 /* ParticleSizeInit.cpp */,
+				71C39E31204188A500863AB6 /* ParticleSizeInit.h */,
+				71C39E32204188A500863AB6 /* ParticleSpriteInit.cpp */,
+				71C39E33204188A500863AB6 /* ParticleSpriteInit.h */,
+				71C39E34204188A500863AB6 /* ParticleVelocityInit.cpp */,
+				71C39E35204188A500863AB6 /* ParticleVelocityInit.h */,
+			);
+			path = particleinit;
+			sourceTree = "<group>";
+		};
 		71CE94ED1EC8A38E008CCF3C /* file */ = {
 			isa = PBXGroup;
 			children = (
@@ -1363,17 +1465,6 @@
 				71C576431EE2F111002F537B /* FileUtilsIOS.h */,
 			);
 			path = ios;
-			sourceTree = "<group>";
-		};
-		71D6EFDD1F50E08200241F0C /* particle */ = {
-			isa = PBXGroup;
-			children = (
-				71C27721202BC3F1005B3EDC /* ParticleInit.cpp */,
-				71C27722202BC3F1005B3EDC /* ParticleInit.h */,
-				71D6EFE01F50E08200241F0C /* ParticleVelocityInit.cpp */,
-				71D6EFE11F50E08200241F0C /* ParticleVelocityInit.h */,
-			);
-			path = particle;
 			sourceTree = "<group>";
 		};
 		71F59B4D1EBFCA5300F49392 /* soloud */ = {
@@ -1792,25 +1883,33 @@
 				714C89151F01BCB30028DCE0 /* Input.cpp in Sources */,
 				71C2773D202BCE6C005B3EDC /* Matrix3.cpp in Sources */,
 				71CDC71A1D7B14510060EEFF /* Polygon.cpp in Sources */,
+				71C39E50204188B000863AB6 /* ParticleSpriteInit.cpp in Sources */,
 				71CE94F81EC8A3B2008CCF3C /* FileData.cpp in Sources */,
+				71C39E4E204188B000863AB6 /* ParticleRotationInit.cpp in Sources */,
 				71CDC7241D7B146D0060EEFF /* Quaternion.cpp in Sources */,
 				71CDC71C1D7B14510060EEFF /* Submesh.cpp in Sources */,
 				71CDC7291D7B14720060EEFF /* Log.cpp in Sources */,
+				71C39E54204188BC00863AB6 /* ParticleMod.cpp in Sources */,
 				71FA3F651F5E2FEE0015BEFE /* Plane.cpp in Sources */,
 				71D6EFE81F53551F00241F0C /* TimeAction.cpp in Sources */,
 				719301221E50F9CF00BEE527 /* ConcreteObject.cpp in Sources */,
 				71CE94F71EC8A3B2008CCF3C /* File.cpp in Sources */,
 				71CDC72F1D7B14860060EEFF /* GLES2Texture.cpp in Sources */,
+				71C39E56204188BC00863AB6 /* ParticleRotationMod.cpp in Sources */,
+				71C39E55204188BC00863AB6 /* ParticlePositionMod.cpp in Sources */,
 				719301251E51212800BEE527 /* Material.cpp in Sources */,
 				71CDC7221D7B146D0060EEFF /* Angle.cpp in Sources */,
 				71CE95021EC8A3C8008CCF3C /* SoLoudPlayer.cpp in Sources */,
-				71D6EFE51F50E08B00241F0C /* ParticleVelocityInit.cpp in Sources */,
 				71CDC7261D7B146D0060EEFF /* Vector2.cpp in Sources */,
 				71CDC7181D7B14510060EEFF /* PointLight.cpp in Sources */,
+				71C39E58204188BC00863AB6 /* ParticleSpriteMod.cpp in Sources */,
 				71C27736202BCE1F005B3EDC /* AlphaAction.cpp in Sources */,
 				7188F1B91DBD4BAC00A2D04F /* AudioLoader.cpp in Sources */,
 				71CDC72D1D7B14860060EEFF /* GLES2Scene.cpp in Sources */,
+				71C39E48204188B000863AB6 /* ParticleAccelerationInit.cpp in Sources */,
 				71CDC7161D7B14510060EEFF /* Object.cpp in Sources */,
+				71C39E49204188B000863AB6 /* ParticleAlphaInit.cpp in Sources */,
+				71C39E53204188BC00863AB6 /* ParticleColorMod.cpp in Sources */,
 				719C08A41F16C7D000F0BAF0 /* ObjectRender.cpp in Sources */,
 				7188F1BC1DBD960000A2D04F /* WAVReader.cpp in Sources */,
 				71CE950D1EC8A43C008CCF3C /* FileUtilsGeneric.cpp in Sources */,
@@ -1819,7 +1918,6 @@
 				71CDC7301D7B14860060EEFF /* GLES2Util.cpp in Sources */,
 				71CDC70D1D7B14510060EEFF /* Camera.cpp in Sources */,
 				7188F1B61DBD4A3400A2D04F /* AudioReader.cpp in Sources */,
-				71C2773A202BCE28005B3EDC /* ParticleInit.cpp in Sources */,
 				714C89171F0EDF370028DCE0 /* TextureRender.cpp in Sources */,
 				71CE950C1EC8A435008CCF3C /* FileUtilsPlatform.cpp in Sources */,
 				715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */,
@@ -1837,7 +1935,9 @@
 				71CE94F91EC8A3B2008CCF3C /* FileHandle.cpp in Sources */,
 				71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */,
 				719C08A81F16C82C00F0BAF0 /* GLES2Object.cpp in Sources */,
+				71C39E4F204188B000863AB6 /* ParticleSizeInit.cpp in Sources */,
 				71CDC7171D7B14510060EEFF /* PlaneTerrain.cpp in Sources */,
+				71C39E4B204188B000863AB6 /* ParticleInit.cpp in Sources */,
 				71C2772F202BCE0F005B3EDC /* PointData.cpp in Sources */,
 				719C089E1F0DCFCB00F0BAF0 /* Texture.cpp in Sources */,
 				71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */,
@@ -1862,16 +1962,24 @@
 				71CE95011EC8A3C8008CCF3C /* OGGReader.cpp in Sources */,
 				71C27738202BCE1F005B3EDC /* RotateAction.cpp in Sources */,
 				71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */,
+				71C39E4C204188B000863AB6 /* ParticleLifeInit.cpp in Sources */,
 				71BCF6C21E476F42008E42A2 /* Text.cpp in Sources */,
+				71C39E4A204188B000863AB6 /* ParticleColorInit.cpp in Sources */,
 				71598C431E7CA245000EDAC0 /* Fog.cpp in Sources */,
 				71C27737202BCE1F005B3EDC /* ColorAction.cpp in Sources */,
+				71C39E52204188BC00863AB6 /* ParticleAlphaMod.cpp in Sources */,
+				71C39E51204188B000863AB6 /* ParticleVelocityInit.cpp in Sources */,
 				71CDC7231D7B146D0060EEFF /* Matrix4.cpp in Sources */,
 				71CDC7101D7B14510060EEFF /* Engine.cpp in Sources */,
 				7188F1AC1DBBAB0B00A2D04F /* Sound.cpp in Sources */,
 				71C27730202BCE0F005B3EDC /* STBText.cpp in Sources */,
 				714D81E91E70C2E40038BE50 /* SceneRender.cpp in Sources */,
 				716E89AF1E22748800B03DD5 /* GUIImage.cpp in Sources */,
+				71C39E59204188BC00863AB6 /* ParticleVelocityMod.cpp in Sources */,
+				71C39E4D204188B000863AB6 /* ParticlePositionInit.cpp in Sources */,
+				71C39E57204188BC00863AB6 /* ParticleSizeMod.cpp in Sources */,
 				71BCF6C31E476F49008E42A2 /* SkyBox.cpp in Sources */,
+				71C39E0F2041889B00863AB6 /* Ease.cpp in Sources */,
 				718C7BDA1F3E5422001AA8C2 /* MoveAction.cpp in Sources */,
 				7188F1B31DBD41A400A2D04F /* AudioFile.cpp in Sources */,
 			);
