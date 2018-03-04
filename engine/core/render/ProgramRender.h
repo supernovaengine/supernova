@@ -3,6 +3,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <regex>
 
 namespace Supernova {
 
@@ -23,6 +24,11 @@ namespace Supernova {
         int maxLights;
         int maxShadows2D;
         int maxShadowsCube;
+
+
+        std::string regexReplace(std::string_view haystack, const std::regex& rx, std::function<std::string(const std::cmatch&)> f);
+        std::string replaceAll(std::string source, const std::string from, const std::string to);
+        std::string unrollLoops(std::string source);
         
         ProgramRender();
         

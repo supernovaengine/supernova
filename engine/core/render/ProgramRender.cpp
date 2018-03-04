@@ -58,6 +58,59 @@ ProgramRender::it_type ProgramRender::findToRemove(){
     return programsRender.end();
 }
 
+std::string ProgramRender::regexReplace(std::string_view haystack, const std::regex& rx, std::function<std::string(const std::cmatch&)> f) {
+    std::string result;
+    const char *begin = haystack.data();
+    const char *end = begin + haystack.size();
+    std::cmatch m, lastm;
+    if (!std::regex_search(begin, end, m, rx)) {
+        return std::string(haystack);
+    }
+    do {
+        lastm = m;
+        result.append(m.prefix());
+        result.append(f(m));
+        begin = m[0].second;
+        begin += (begin != end && m[0].length() == 0);
+        if (begin == end) break;
+    } while (std::regex_search(begin, end, m, rx,
+                               std::regex_constants::match_prev_avail));
+    result.append(lastm.suffix());
+    return result;
+}
+
+std::string ProgramRender::replaceAll(std::string source, const std::string from, const std::string to){
+    std::string::size_type n = 0;
+    while ( ( n = source.find( from, n ) ) != std::string::npos )
+    {
+        source.replace( n, from.size(), to );
+        n += to.size();
+    }
+    return source;
+}
+
+std::string ProgramRender::unrollLoops(std::string source){
+    return regexReplace(source, std::regex{"[^ ]*#pragma unroll_loop[\\s]+?for\\s*\\(\\s*[a-z]*\\s*([a-z])\\s*\\=\\s*(\\d+)s*;\\s*([a-z])\\s*\\<\\s*(\\d+)s*;\\s*([a-z])\\s*\\+\\+\\s*\\)s*\\{([\\s\\S]+?)(?=\\})\\}"},
+                                   [](std::cmatch m)->std::string {
+
+                                       int from = std::stoi(m.str(2));
+                                       int to = std::stoi(m.str(4));
+
+                                       std::regex reg1 ("\\[\\s*j\\s*\\]");
+                                       std::regex reg2 ("\\(\\s*j\\s*\\)");
+                                       std::string result;
+
+                                       for (int i = from; i < to; i++){
+                                           std::string body = m.str(6);
+                                           body = std::regex_replace (body,reg1,"["+std::to_string(i)+"]");
+                                           body = std::regex_replace (body,reg2,"("+std::to_string(i)+")");
+                                           result = result + body;
+                                       }
+
+                                       return result;
+                                   });
+}
+
 int ProgramRender::getMaxLights(){
     return maxLights;
 }

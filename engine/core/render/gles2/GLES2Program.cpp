@@ -8,7 +8,6 @@
 #include "platform/Log.h"
 #include "Program.h"
 
-
 using namespace Supernova;
 
 std::string GLES2Program::getVertexShader(int shaderType){
@@ -69,7 +68,7 @@ void GLES2Program::createProgram(int shaderType, int numLights, int numShadows2D
     }else if (shaderType == S_SHADER_POINTS){
         shaderName = "Points";
     }
-    
+
     std::string definitions = "";
 
     maxLights = std::min(MAXLIGHTS_GLES2, numLights);
@@ -78,10 +77,6 @@ void GLES2Program::createProgram(int shaderType, int numLights, int numShadows2D
 
     if (numLights > 0){
         definitions += "#define USE_LIGHTING\n";
-        definitions += "#define MAXLIGHTS " + std::to_string(maxLights) + "\n";
-        definitions += "#define MAXSHADOWS2D " + std::to_string(maxShadows2D) + "\n";
-        definitions += "#define MAXSHADOWSCUBE " + std::to_string(maxShadowsCube) + "\n";
-        definitions += "#define MAXCASCADES " + std::to_string(MAXCASCADES_GLES2) + "\n";
     }
     if (hasFog){
         definitions += "#define HAS_FOG\n";
@@ -110,7 +105,23 @@ void GLES2Program::createProgram(int shaderType, int numLights, int numShadows2D
     
     std::string pVertexSource = definitions + getVertexShader(shaderType);
     std::string pFragmentSource = definitions + getFragmentShader(shaderType);
-    
+
+    if (numLights > 0){
+        pVertexSource = replaceAll(pVertexSource, "MAXLIGHTS", std::to_string(maxLights));
+        pFragmentSource = replaceAll(pFragmentSource, "MAXLIGHTS", std::to_string(maxLights));
+
+        pVertexSource = replaceAll(pVertexSource, "MAXSHADOWS2D", std::to_string(maxShadows2D));
+        pFragmentSource = replaceAll(pFragmentSource, "MAXSHADOWS2D", std::to_string(maxShadows2D));
+
+        pVertexSource = replaceAll(pVertexSource, "MAXSHADOWSCUBE", std::to_string(maxShadowsCube));
+        pFragmentSource = replaceAll(pFragmentSource, "MAXSHADOWSCUBE", std::to_string(maxShadowsCube));
+
+        pVertexSource = replaceAll(pVertexSource, "MAXCASCADES", std::to_string(MAXCASCADES_GLES2));
+        pFragmentSource = replaceAll(pFragmentSource, "MAXCASCADES", std::to_string(MAXCASCADES_GLES2));
+    }
+
+    pFragmentSource = unrollLoops(pFragmentSource);
+
     GLuint vertexShader = loadShader(GL_VERTEX_SHADER, pVertexSource.c_str());
     if (!vertexShader) {
         Log::Error(LOG_TAG,"Could not load vertex shader: %s\n", shaderName.c_str());

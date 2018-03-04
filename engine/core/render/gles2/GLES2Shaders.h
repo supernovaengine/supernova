@@ -149,11 +149,10 @@ std::string lightingFragmentImp =
 
 "             bool inShadow = false;\n"
 "             #ifdef HAS_SHADOWSCUBE\n"
+"               #pragma unroll_loop\n"
 "               for(int j = 0; j < MAXSHADOWSCUBE; j++){\n"
-"                   if (u_PointLightShadowIdx[i] == j){\n"
+"                   if (u_PointLightShadowIdx[i] == (j))\n"
 "                       inShadow = checkShadowCube(u_PointLightPos[i], u_shadowsMapCube[j], u_shadowBiasCube[j], u_shadowCameraNearFarCube[j]);\n"
-"                       break;\n"
-"                   }\n"
 "               }\n"
 "             #endif\n"
 
@@ -181,11 +180,10 @@ std::string lightingFragmentImp =
 
 "             bool inShadow = false;\n"
 "             #ifdef HAS_SHADOWS2D\n"
+"               #pragma unroll_loop\n"
 "               for(int j = 0; j < MAXSHADOWS2D; j++){\n"
-"                   if (u_SpotLightShadowIdx[i] == j){\n"
+"                   if (u_SpotLightShadowIdx[i] == (j))\n"
 "                       inShadow = checkShadow(v_ShadowCoordinates[j], u_shadowsMap2D[j], u_shadowBias2D[j], u_shadowCameraNearFar2D[j], SpotLightcosTheta);\n"
-"                       break;\n"
-"                   }\n"
 "               }\n"
 "             #endif\n"
 
@@ -209,15 +207,11 @@ std::string lightingFragmentImp =
 
 "             int nShadows = 0;\n"
 "             #ifdef HAS_SHADOWS2D\n"
+"               #pragma unroll_loop\n"
 "               for(int j = 0; j < MAXSHADOWS2D; j++){\n"
-"                   if (u_DirectionalLightShadowIdx[i] == j){\n"
-"                       for (int ca = 0; ca < MAXCASCADES; ca++){\n"
-"                           if (ca == u_shadowNumCascades2D[j]) break;\n"
-"                           if (checkShadow(v_ShadowCoordinates[j+ca], u_shadowsMap2D[j+ca], u_shadowBias2D[j+ca], u_shadowCameraNearFar2D[j+ca], DirectionalLightcosTheta))\n"
-"                               nShadows += 1;\n"
-"                       }\n"
-"                       break;\n"
-"                   }\n"
+"                   if ((u_DirectionalLightShadowIdx[i] <= (j)) && ((u_DirectionalLightShadowIdx[i] + u_shadowNumCascades2D[j]) > (j)))\n"
+"                       if (checkShadow(v_ShadowCoordinates[j], u_shadowsMap2D[j], u_shadowBias2D[j], u_shadowCameraNearFar2D[j], DirectionalLightcosTheta))\n"
+"                           nShadows += 1;\n"
 "               }\n"
 "             #endif\n"
 
