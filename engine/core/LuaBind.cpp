@@ -45,6 +45,17 @@
 #include "action/ColorAction.h"
 #include "action/AlphaAction.h"
 #include "action/SpriteAnimation.h"
+#include "action/ParticlesAnimation.h"
+#include "action/particleinit/ParticleInit.h"
+#include "action/particleinit/ParticleAccelerationInit.h"
+#include "action/particleinit/ParticleAlphaInit.h"
+#include "action/particleinit/ParticleColorInit.h"
+#include "action/particleinit/ParticleLifeInit.h"
+#include "action/particleinit/ParticlePositionInit.h"
+#include "action/particleinit/ParticleRotationInit.h"
+#include "action/particleinit/ParticleSizeInit.h"
+#include "action/particleinit/ParticleSpriteInit.h"
+#include "action/particleinit/ParticleVelocityInit.h"
 
 #include <map>
 #include <unistd.h>
@@ -456,9 +467,12 @@ void LuaBind::bind(){
     .addFunction("setMinPointSize", &Points::setMinPointSize)
     .addFunction("setMaxPointSize", &Points::setMaxPointSize)
     .endClass()
-    
+
     .beginExtendClass<Particles, Points>("Particles")
     .addConstructor(LUA_ARGS())
+    .addFunction("setRate", (void (Particles::*)(int))&Particles::setRate)
+    .addFunction("setRateMinMax", (void (Particles::*)(int, int))&Particles::setRate)
+    .addFunction("setMaxParticles", &Particles::setMaxParticles)
     .endClass()
 
     .beginExtendClass<SkyBox, Mesh>("SkyBox")
@@ -666,7 +680,41 @@ void LuaBind::bind(){
     
     .beginExtendClass<SpriteAnimation, Action>("SpriteAnimation")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<std::vector<int>>, LuaIntf::_opt<std::vector<int>>, LuaIntf::_opt<bool>))
+    .endClass()
+
+    .beginExtendClass<ParticlesAnimation, Action>("ParticlesAnimation")
+    .addConstructor(LUA_ARGS())
+    .addFunction("addInit", &ParticlesAnimation::addInit)
+    .addFunction("addMod", &ParticlesAnimation::addMod)
     .endClass();
+
+    LuaIntf::LuaBinding(L).beginClass<ParticleInit>("ParticleInit")
+    .endClass()
+
+    .beginExtendClass<ParticleAccelerationInit, ParticleInit>("ParticleAccelerationInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>))
+    .addFunction("setAcceleration", (void (ParticleAccelerationInit::*)(Vector3))&ParticleAccelerationInit::setAcceleration)
+    .addFunction("setAccelerationMinMax", (void (ParticleAccelerationInit::*)(Vector3, Vector3))&ParticleAccelerationInit::setAcceleration)
+    .addFunction("getMinAcceleration", &ParticleAccelerationInit::getMinAcceleration)
+    .addFunction("getMaxAcceleration", &ParticleAccelerationInit::getMaxAcceleration)
+    .endClass()
+
+    .beginExtendClass<ParticleVelocityInit, ParticleInit>("ParticleVelocityInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>))
+    .addFunction("setVelocity", (void (ParticleVelocityInit::*)(Vector3))&ParticleVelocityInit::setVelocity)
+    .addFunction("setVelocityMinMax", (void (ParticleVelocityInit::*)(Vector3, Vector3))&ParticleVelocityInit::setVelocity)
+    .addFunction("getMinVelocity", &ParticleVelocityInit::getMinVelocity)
+    .addFunction("getMaxVelocity", &ParticleVelocityInit::getMaxVelocity)
+    .endClass()
+
+    .beginExtendClass<ParticleSizeInit, ParticleInit>("ParticleSizeInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<int>, LuaIntf::_opt<int>))
+    .endClass()
+
+    .beginExtendClass<ParticleLifeInit, ParticleInit>("ParticleLifeInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<int>, LuaIntf::_opt<int>))
+    .endClass();
+
 
     std::string luadir = std::string("lua") + File::getDirSeparator();
 
