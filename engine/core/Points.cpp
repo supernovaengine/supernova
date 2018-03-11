@@ -153,7 +153,7 @@ void Points::setPointRotation(int point, float rotation){
 }
 
 void Points::setPointSprite(int point, int index){
-    if (point >= 0 && point < points.size()) {
+    if (point >= 0 && point < points.size() && index >= 0) {
 
             bool changed = false;
             if (index >= 0 && index < framesRect.size()) {

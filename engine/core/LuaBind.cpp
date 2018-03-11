@@ -56,6 +56,14 @@
 #include "action/particleinit/ParticleSizeInit.h"
 #include "action/particleinit/ParticleSpriteInit.h"
 #include "action/particleinit/ParticleVelocityInit.h"
+#include "action/particlemod/ParticleMod.h"
+#include "action/particlemod/ParticleAlphaMod.h"
+#include "action/particlemod/ParticleColorMod.h"
+#include "action/particlemod/ParticlePositionMod.h"
+#include "action/particlemod/ParticleRotationMod.h"
+#include "action/particlemod/ParticleSizeMod.h"
+#include "action/particlemod/ParticleSpriteMod.h"
+#include "action/particlemod/ParticleVelocityMod.h"
 
 #include <map>
 #include <unistd.h>
@@ -698,23 +706,121 @@ void LuaBind::bind(){
     .addFunction("getMinAcceleration", &ParticleAccelerationInit::getMinAcceleration)
     .addFunction("getMaxAcceleration", &ParticleAccelerationInit::getMaxAcceleration)
     .endClass()
+    
+    .beginExtendClass<ParticleAlphaInit, ParticleInit>("ParticleAlphaInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addFunction("setAlpha", (void (ParticleAlphaInit::*)(float))&ParticleAlphaInit::setAlpha)
+    .addFunction("setAlphaMinMax", (void (ParticleAlphaInit::*)(float, float))&ParticleAlphaInit::setAlpha)
+    .addFunction("getMinAlpha", &ParticleAlphaInit::getMinAlpha)
+    .addFunction("getMaxAlpha", &ParticleAlphaInit::getMaxAlpha)
+    .endClass()
 
+    .beginExtendClass<ParticleColorInit, ParticleInit>("ParticleColorInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addFunction("setColor", (void (ParticleColorInit::*)(float, float, float))&ParticleColorInit::setColor)
+    .addFunction("setColorMinMax", (void (ParticleColorInit::*)(float, float, float, float, float, float))&ParticleColorInit::setColor)
+    .addFunction("getMinColor", &ParticleColorInit::getMinColor)
+    .addFunction("getMaxColor", &ParticleColorInit::getMaxColor)
+    .endClass()
+    
+    .beginExtendClass<ParticleLifeInit, ParticleInit>("ParticleLifeInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addFunction("setLife", (void (ParticleLifeInit::*)(float))&ParticleLifeInit::setLife)
+    .addFunction("setLifeMinMax", (void (ParticleLifeInit::*)(float, float))&ParticleLifeInit::setLife)
+    .addFunction("getMinLife", &ParticleLifeInit::getMinLife)
+    .addFunction("getMaxLife", &ParticleLifeInit::getMaxLife)
+    .endClass()
+    
+    .beginExtendClass<ParticlePositionInit, ParticleInit>("ParticlePositionInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>))
+    .addFunction("setPosition", (void (ParticlePositionInit::*)(Vector3))&ParticlePositionInit::setPosition)
+    .addFunction("setPositionMinMax", (void (ParticlePositionInit::*)(Vector3, Vector3))&ParticlePositionInit::setPosition)
+    .addFunction("getMinPosition", &ParticlePositionInit::getMinPosition)
+    .addFunction("getMaxPosition", &ParticlePositionInit::getMaxPosition)
+    .endClass()
+    
+    .beginExtendClass<ParticleRotationInit, ParticleInit>("ParticleRotationInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addFunction("setRotation", (void (ParticleRotationInit::*)(float))&ParticleRotationInit::setRotation)
+    .addFunction("setRotationMinMax", (void (ParticleRotationInit::*)(float, float))&ParticleRotationInit::setRotation)
+    .addFunction("getMinRotation", &ParticleRotationInit::getMinRotation)
+    .addFunction("getMaxRotation", &ParticleRotationInit::getMaxRotation)
+    .endClass()
+    
+    .beginExtendClass<ParticleSizeInit, ParticleInit>("ParticleSizeInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addFunction("setSize", (void (ParticleSizeInit::*)(float))&ParticleSizeInit::setSize)
+    .addFunction("setSizeMinMax", (void (ParticleSizeInit::*)(float, float))&ParticleSizeInit::setSize)
+    .addFunction("getMinSize", &ParticleSizeInit::getMinSize)
+    .addFunction("getMaxSize", &ParticleSizeInit::getMaxSize)
+    .endClass()
+    
+    .beginExtendClass<ParticleSpriteInit, ParticleInit>("ParticleSpriteInit")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<std::vector<int>>))
+    .addFunction("setFrames", (void (ParticleSpriteInit::*)(std::vector<int>))&ParticleSpriteInit::setFrames)
+    .addFunction("setFramesMinMax", (void (ParticleSpriteInit::*)(int, int))&ParticleSpriteInit::setFrames)
+    .addFunction("getFrames", &ParticleSpriteInit::getFrames)
+    .endClass()
+    
     .beginExtendClass<ParticleVelocityInit, ParticleInit>("ParticleVelocityInit")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>))
     .addFunction("setVelocity", (void (ParticleVelocityInit::*)(Vector3))&ParticleVelocityInit::setVelocity)
     .addFunction("setVelocityMinMax", (void (ParticleVelocityInit::*)(Vector3, Vector3))&ParticleVelocityInit::setVelocity)
     .addFunction("getMinVelocity", &ParticleVelocityInit::getMinVelocity)
     .addFunction("getMaxVelocity", &ParticleVelocityInit::getMaxVelocity)
-    .endClass()
-
-    .beginExtendClass<ParticleSizeInit, ParticleInit>("ParticleSizeInit")
-    .addConstructor(LUA_ARGS(LuaIntf::_opt<int>, LuaIntf::_opt<int>))
-    .endClass()
-
-    .beginExtendClass<ParticleLifeInit, ParticleInit>("ParticleLifeInit")
-    .addConstructor(LUA_ARGS(LuaIntf::_opt<int>, LuaIntf::_opt<int>))
     .endClass();
-
+    
+    LuaIntf::LuaBinding(L).beginClass<ParticleMod>("ParticleMod")
+    .endClass()
+    
+    .beginExtendClass<ParticleAlphaMod, ParticleMod>("ParticleAlphaMod")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addFunction("setAlpha", (void (ParticleAlphaMod::*)(float, float))&ParticleAlphaMod::setAlpha)
+    .addFunction("getFromAlpha", &ParticleAlphaMod::getFromAlpha)
+    .addFunction("getToAlpha", &ParticleAlphaMod::getToAlpha)
+    .endClass()
+    
+    .beginExtendClass<ParticleColorMod, ParticleMod>("ParticleColorMod")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addFunction("setColor", (void (ParticleColorMod::*)(float, float, float, float, float, float))&ParticleColorMod::setColor)
+    .addFunction("getFromColor", &ParticleColorMod::getFromColor)
+    .addFunction("getToColor", &ParticleColorMod::getToColor)
+    .endClass()
+    
+    .beginExtendClass<ParticlePositionMod, ParticleMod>("ParticlePositionMod")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>))
+    .addFunction("setPosition", (void (ParticlePositionMod::*)(Vector3, Vector3))&ParticlePositionMod::setPosition)
+    .addFunction("getFromPosition", &ParticlePositionMod::getFromPosition)
+    .addFunction("getToPosition", &ParticlePositionMod::getToPosition)
+    .endClass()
+    
+    .beginExtendClass<ParticleRotationMod, ParticleMod>("ParticleRotationMod")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addFunction("setRotation", (void (ParticleRotationMod::*)(float, float))&ParticleRotationMod::setRotation)
+    .addFunction("getFromRotation", &ParticleRotationMod::getFromRotation)
+    .addFunction("getToRotation", &ParticleRotationMod::getToRotation)
+    .endClass()
+    
+    .beginExtendClass<ParticleSizeMod, ParticleMod>("ParticleSizeMod")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<float>))
+    .addFunction("setSize", (void (ParticleSizeMod::*)(float, float))&ParticleSizeMod::setSize)
+    .addFunction("getFromSize", &ParticleSizeMod::getFromSize)
+    .addFunction("getToSize", &ParticleSizeMod::getToSize)
+    .endClass()
+    
+    .beginExtendClass<ParticleSpriteMod, ParticleMod>("ParticleSpriteMod")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<std::vector<int>>))
+    .addFunction("setSize", (void (ParticleSpriteMod::*)(std::vector<int>))&ParticleSpriteMod::setFrames)
+    .addFunction("getFrames", &ParticleSpriteMod::getFrames)
+    .endClass()
+    
+    .beginExtendClass<ParticleVelocityMod, ParticleMod>("ParticleVelocityMod")
+    .addConstructor(LUA_ARGS(LuaIntf::_opt<float>, LuaIntf::_opt<float>, LuaIntf::_opt<Vector3>, LuaIntf::_opt<Vector3>))
+    .addFunction("setVelocity", (void (ParticleVelocityMod::*)(Vector3, Vector3))&ParticleVelocityMod::setVelocity)
+    .addFunction("getFromVelocity", &ParticleVelocityMod::getFromVelocity)
+    .addFunction("getToVelocity", &ParticleVelocityMod::getToVelocity)
+    .endClass();
+    
 
     std::string luadir = std::string("lua") + File::getDirSeparator();
 

@@ -401,6 +401,7 @@ bool Object::isLoaded(){
 }
 
 bool Object::reload(){
+    //TODO: Check if it is really necessary
     destroy();
     return load();
 }
