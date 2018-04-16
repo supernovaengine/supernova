@@ -74,7 +74,9 @@ bool Texture::load(){
                 dataOwned = true;
             }
             
-            texturesData[0]->fitPowerOfTwo();
+            //TODO: Add engine option to fit or resample 
+            //texturesData[0]->fitPowerOfTwo();
+            texturesData[0]->resamplePowerOfTwo();
             textureRender.get()->loadTexture(texturesData[0]);
             
             
