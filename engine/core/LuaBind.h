@@ -29,6 +29,7 @@ namespace Supernova {
         virtual ~LuaBind();
         
         static lua_State* getLuaState();
+        static void luaCallback(int nargs, int nresults, int msgh);
         
         static void setObject(const char* global, Object* object);
         static Object* getObject(const char* global);

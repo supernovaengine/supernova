@@ -51,13 +51,6 @@ Events::Events() {
 Events::~Events() {
 }
 
-void Events::luaCallback(int nargs, int nresults, int msgh){
-    int status = lua_pcall(LuaBind::getLuaState(), nargs, nresults, msgh);
-    if (status != 0){
-        Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
-    }
-}
-
 void Events::onDraw(void (*onDrawFunc)()){
     Events::onDrawFunc = onDrawFunc;
 }
@@ -78,7 +71,7 @@ void Events::call_onDraw(){
     }
     if (onDrawLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onDrawLuaFunc);
-        luaCallback(0, 0, 0);
+        LuaBind::luaCallback(0, 0, 0);
     }
 }
 
@@ -102,7 +95,7 @@ void Events::call_onUpdate(){
     }
     if (onUpdateLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onUpdateLuaFunc);
-        luaCallback(0, 0, 0);
+        LuaBind::luaCallback(0, 0, 0);
     }
 }
 
@@ -128,7 +121,7 @@ void Events::call_onTouchPress(float x, float y){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onTouchPressLuaFunc);
         lua_pushnumber(LuaBind::getLuaState(), x);
         lua_pushnumber(LuaBind::getLuaState(), y);
-        luaCallback(2, 0, 0);
+        LuaBind::luaCallback(2, 0, 0);
     }
     Input::addTouchPressed();
     Input::setTouchPosition(x, y);
@@ -156,7 +149,7 @@ void Events::call_onTouchUp(float x, float y){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onTouchUpLuaFunc);
         lua_pushnumber(LuaBind::getLuaState(), x);
         lua_pushnumber(LuaBind::getLuaState(), y);
-        luaCallback(2, 0, 0);
+        LuaBind::luaCallback(2, 0, 0);
     }
     Input::releaseTouchPressed();
     Input::setTouchPosition(x, y);
@@ -184,7 +177,7 @@ void Events::call_onTouchDrag(float x, float y){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onTouchDragLuaFunc);
         lua_pushnumber(LuaBind::getLuaState(), x);
         lua_pushnumber(LuaBind::getLuaState(), y);
-        luaCallback(2, 0, 0);
+        LuaBind::luaCallback(2, 0, 0);
     }
     Input::setTouchPosition(x, y);
 }
@@ -212,7 +205,7 @@ void Events::call_onMousePress(int button, float x, float y){
         lua_pushnumber(LuaBind::getLuaState(), button);
         lua_pushnumber(LuaBind::getLuaState(), x);
         lua_pushnumber(LuaBind::getLuaState(), y);
-        luaCallback(3, 0, 0);
+        LuaBind::luaCallback(3, 0, 0);
     }
     Input::addMousePressed(button);
     Input::setMousePosition(x, y);
@@ -241,7 +234,7 @@ void Events::call_onMouseUp(int button, float x, float y){
         lua_pushnumber(LuaBind::getLuaState(), button);
         lua_pushnumber(LuaBind::getLuaState(), x);
         lua_pushnumber(LuaBind::getLuaState(), y);
-        luaCallback(3, 0, 0);
+        LuaBind::luaCallback(3, 0, 0);
     }
     Input::releaseMousePressed(button);
     Input::setMousePosition(x, y);
@@ -270,7 +263,7 @@ void Events::call_onMouseDrag(int button, float x, float y){
         lua_pushnumber(LuaBind::getLuaState(), button);
         lua_pushnumber(LuaBind::getLuaState(), x);
         lua_pushnumber(LuaBind::getLuaState(), y);
-        luaCallback(3, 0, 0);
+        LuaBind::luaCallback(3, 0, 0);
     }
     Input::setMousePosition(x, y);
 }
@@ -297,7 +290,7 @@ void Events::call_onMouseMove(float x, float y){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onMouseMoveLuaFunc);
         lua_pushnumber(LuaBind::getLuaState(), x);
         lua_pushnumber(LuaBind::getLuaState(), y);
-        luaCallback(2, 0, 0);
+        LuaBind::luaCallback(2, 0, 0);
     }
     Input::setMousePosition(x, y);
 }
@@ -323,7 +316,7 @@ void Events::call_onKeyPress(int key){
     if (onKeyPressLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onKeyPressLuaFunc);
         lua_pushnumber(LuaBind::getLuaState(), key);
-        luaCallback(1, 0, 0);
+        LuaBind::luaCallback(1, 0, 0);
     }
     Input::addKeyPressed(key);
 }
@@ -349,7 +342,7 @@ void Events::call_onKeyUp(int key){
     if (onKeyUpLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, Events::onKeyUpLuaFunc);
         lua_pushnumber(LuaBind::getLuaState(), key);
-        luaCallback(1, 0, 0);
+        LuaBind::luaCallback(1, 0, 0);
     }
     Input::releaseKeyPressed(key);
 }

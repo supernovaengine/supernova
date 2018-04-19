@@ -43,13 +43,6 @@ Action::~Action(){
         object->removeAction(this);
 }
 
-void Action::luaCallback(int nargs, int nresults, int msgh){
-    int status = lua_pcall(LuaBind::getLuaState(), nargs, nresults, msgh);
-    if (status != 0){
-        Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
-    }
-}
-
 void Action::onStart(void (*onStartFunc)(Object*)){
     this->onStartFunc = onStartFunc;
 }
@@ -70,7 +63,7 @@ void Action::call_onStart(){
     if (onStartLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onStartLuaFunc);
         LuaIntf::Lua::push(LuaBind::getLuaState(), object);
-        luaCallback(1, 0, 0);
+        LuaBind::luaCallback(1, 0, 0);
     }
 }
 
@@ -94,7 +87,7 @@ void Action::call_onRun(){
     if (onRunLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onRunLuaFunc);
         LuaIntf::Lua::push(LuaBind::getLuaState(), object);
-        luaCallback(1, 0, 0);
+        LuaBind::luaCallback(1, 0, 0);
     }
 }
 
@@ -118,7 +111,7 @@ void Action::call_onPause(){
     if (onPauseLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onPauseLuaFunc);
         LuaIntf::Lua::push(LuaBind::getLuaState(), object);
-        luaCallback(1, 0, 0);
+        LuaBind::luaCallback(1, 0, 0);
     }
 }
 
@@ -142,7 +135,7 @@ void Action::call_onStop(){
     if (onStopLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onStopLuaFunc);
         LuaIntf::Lua::push(LuaBind::getLuaState(), object);
-        luaCallback(1, 0, 0);
+        LuaBind::luaCallback(1, 0, 0);
     }
 }
 
@@ -166,7 +159,7 @@ void Action::call_onFinish(){
     if (onFinishLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onFinishLuaFunc);
         LuaIntf::Lua::push(LuaBind::getLuaState(), object);
-        luaCallback(1, 0, 0);
+        LuaBind::luaCallback(1, 0, 0);
     }
 }
 
@@ -190,7 +183,7 @@ void Action::call_onStep(){
     if (onStepLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onStepLuaFunc);
         LuaIntf::Lua::push(LuaBind::getLuaState(), object);
-        luaCallback(1, 0, 0);
+        LuaBind::luaCallback(1, 0, 0);
     }
 }
 

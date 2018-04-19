@@ -9,11 +9,16 @@ namespace Supernova {
     class GUIObject: public Mesh2D {
     private:
 
+        void (*onPressFunc)();
+        int onPressLuaFunc;
+
     public:
         GUIObject();
         virtual ~GUIObject();
-        
-        void onTouchPress(float x, float y);
+
+        void onPress(void (*onPressFunc)());
+        int onPress(lua_State *L);
+        virtual void call_onPress();
     };
     
 }

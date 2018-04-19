@@ -21,6 +21,7 @@
 namespace Supernova {
 
     class Scene: public Object {
+        friend class Engine;
         friend class Object;
         friend class ConcreteObject;
         friend class Mesh;

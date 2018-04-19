@@ -30,8 +30,6 @@ namespace Supernova{
 
         void (*onStepFunc)(Object*);
         int onStepLuaFunc;
-
-        void luaCallback(int nargs, int nresults, int msgh);
         
     protected:
         

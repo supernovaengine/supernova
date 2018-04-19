@@ -8,7 +8,6 @@ namespace Supernova {
     class Events {
         
     private:
-        static void luaCallback(int nargs, int nresults, int msgh);
         
         static void (*onDrawFunc)();
         static int onDrawLuaFunc;

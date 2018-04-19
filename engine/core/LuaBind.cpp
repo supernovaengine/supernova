@@ -100,6 +100,13 @@ lua_State* LuaBind::getLuaState(){
     return luastate;
 }
 
+void LuaBind::luaCallback(int nargs, int nresults, int msgh){
+    int status = lua_pcall(LuaBind::getLuaState(), nargs, nresults, msgh);
+    if (status != 0){
+        Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
+    }
+}
+
 void LuaBind::setObject(const char* global, Object* object){
     lua_State *L = LuaBind::getLuaState();
     LuaIntf::Lua::setGlobal(L, global, object);

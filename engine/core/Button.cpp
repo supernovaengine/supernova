@@ -3,12 +3,12 @@
 
 using namespace Supernova;
 
-Button::Button(): GUIObject(){
+Button::Button(): GUIImage(){
 }
 
 Button::~Button(){
 }
 
-void GUIObject::onTouchPress(float x, float y){
-    printf("Encontrou button");
+void Button::call_onPress(){
+    GUIObject::call_onPress();
 }
