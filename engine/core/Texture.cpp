@@ -63,6 +63,8 @@ void Texture::setTextureFrameSize(int textureFrameWidth, int textureFrameHeight)
 bool Texture::load(){
 
     textureRender = TextureRender::sharedInstance(id);
+    
+    bool renderNotPrepared = false;
 
     if (!textureRender.get()->isLoaded()){
 
@@ -77,8 +79,9 @@ bool Texture::load(){
             //TODO: Add engine option to fit or resample 
             //texturesData[0]->fitPowerOfTwo();
             texturesData[0]->resamplePowerOfTwo();
-            textureRender.get()->loadTexture(texturesData[0]);
-            
+            if (!textureRender.get()->loadTexture(texturesData[0])){
+                renderNotPrepared = true;
+            }
             
         }else if (type == S_TEXTURE_CUBE){
 
@@ -86,20 +89,34 @@ bool Texture::load(){
                 texturesData[i]->resamplePowerOfTwo();
             }
             
-            textureRender.get()->loadTextureCube(texturesData);
+            if (!textureRender.get()->loadTextureCube(texturesData)){
+                renderNotPrepared = true;
+            }
 
         }else if (type == S_TEXTURE_FRAME){
             
-            textureRender.get()->loadTextureFrame(textureFrameWidth, textureFrameHeight, false);
+            if (!textureRender.get()->loadTextureFrame(textureFrameWidth, textureFrameHeight, false)){
+                renderNotPrepared = true;
+            }
             
         }else if (type == S_TEXTURE_DEPTH_FRAME){
             
-            textureRender.get()->loadTextureFrame(textureFrameWidth, textureFrameHeight, true);
+            if (!textureRender.get()->loadTextureFrame(textureFrameWidth, textureFrameHeight, true)){
+                renderNotPrepared = true;
+            }
             
         }else if (type == S_TEXTURE_FRAME_CUBE){
             
-            textureRender.get()->loadTextureFrameCube(textureFrameWidth, textureFrameHeight);
+            if (!textureRender.get()->loadTextureFrameCube(textureFrameWidth, textureFrameHeight)){
+                renderNotPrepared = true;
+            }
             
+        }
+        
+        if (renderNotPrepared){
+            this->textureRender = NULL;
+            TextureRender::deleteUnused();
+            return false;
         }
         
         if (dataOwned){

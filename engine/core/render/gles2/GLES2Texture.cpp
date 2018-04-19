@@ -34,13 +34,16 @@ void GLES2Texture::assignTexture(const GLenum target, const GLsizei width, const
     
 }
 
-void GLES2Texture::loadTexture(TextureData* texturedata) {
-    TextureRender::loadTexture(texturedata);
+bool GLES2Texture::loadTexture(TextureData* texturedata) {
+    if (!TextureRender::loadTexture(texturedata))
+        return false;
     
     GLuint texture_object_id;
     
     glGenTextures(1, &texture_object_id);
-    //assert(texture_object_id != 0);
+
+    if (texture_object_id <= 0 or texture_object_id >= 512)
+        return false;
     
     glBindTexture(GL_TEXTURE_2D, texture_object_id);
     
@@ -61,15 +64,20 @@ void GLES2Texture::loadTexture(TextureData* texturedata) {
     textureType = GL_TEXTURE_2D;
     
     gTexture = texture_object_id;
+    
+    return true;
 }
 
-void GLES2Texture::loadTextureCube(std::vector<TextureData*> texturesdata){
-    TextureRender::loadTextureCube(texturesdata);
+bool GLES2Texture::loadTextureCube(std::vector<TextureData*> texturesdata){
+    if (!TextureRender::loadTextureCube(texturesdata))
+        return false;
     
     GLuint texture_object_id;
     
     glGenTextures(1, &texture_object_id);
-    //assert(texture_object_id != 0);
+
+    if (texture_object_id <= 0 or texture_object_id >= 512)
+        return false;
     
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture_object_id);
     
@@ -96,10 +104,13 @@ void GLES2Texture::loadTextureCube(std::vector<TextureData*> texturesdata){
     textureType = GL_TEXTURE_CUBE_MAP;
     
     gTexture = texture_object_id;
+    
+    return true;
 }
 
-void GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
-    TextureRender::loadTextureFrame(width, height, depthframe);
+bool GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
+    if (!TextureRender::loadTextureFrame(width, height, depthframe))
+        return false;
 
     const char* extensions = (char*)glGetString(GL_EXTENSIONS);
         
@@ -134,6 +145,7 @@ void GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
     }else{
         if(!strstr(extensions, "depth_texture")){
             Log::Error(LOG_TAG,"This device has no support to depth_texture");
+            return false;
         }else{
             glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, 0);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
@@ -142,6 +154,7 @@ void GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
         Log::Error(LOG_TAG,"Error on creating framebuffer");
+        return false;
     }else{
         
         if (Engine::getPlatform()==S_PLATFORM_IOS){
@@ -157,10 +170,13 @@ void GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
         gTexture = depthTexture;
         frameBuffer = FramebufferName;
     }
+    
+    return true;
 }
 
-void GLES2Texture::loadTextureFrameCube(int width, int height){
-    TextureRender::loadTextureFrameCube(width, height);
+bool GLES2Texture::loadTextureFrameCube(int width, int height){
+    if (!TextureRender::loadTextureFrameCube(width, height))
+        return false;
 
     GLuint FramebufferName = 0;
     glGenFramebuffers(1, &FramebufferName);
@@ -191,6 +207,7 @@ void GLES2Texture::loadTextureFrameCube(int width, int height){
     
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
         Log::Error(LOG_TAG,"Error on creating cube framebuffer");
+        return false;
     }else{
         
         if (Engine::getPlatform()==S_PLATFORM_IOS){
@@ -206,6 +223,8 @@ void GLES2Texture::loadTextureFrameCube(int width, int height){
         gTexture = cubeShadowMap;
         frameBuffer = FramebufferName;
     }
+    
+    return true;
 }
 
 void GLES2Texture::initTextureFrame(){

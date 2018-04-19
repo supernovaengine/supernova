@@ -77,36 +77,44 @@ int TextureRender::getHeight(){
     return height;
 }
 
-void TextureRender::loadTexture(TextureData* texturedata){
+bool TextureRender::loadTexture(TextureData* texturedata){
     loaded = true;
     
     colorFormat = texturedata->getColorFormat();
     width = texturedata->getWidth();
     height = texturedata->getHeight();
+    
+    return true;
 }
 
-void TextureRender::loadTextureCube(std::vector<TextureData*> texturesdata){
+bool TextureRender::loadTextureCube(std::vector<TextureData*> texturesdata){
     loaded = true;
     
     colorFormat = -1;
     width = -1;
     height = -1;
+    
+    return true;
 }
 
-void TextureRender::loadTextureFrame(int width, int height, bool depthframe){
+bool TextureRender::loadTextureFrame(int width, int height, bool depthframe){
     loaded = true;
     
     colorFormat = -1;
     this->width = width;
     this->height = height;
+    
+    return true;
 }
 
-void TextureRender::loadTextureFrameCube(int width, int height){
+bool TextureRender::loadTextureFrameCube(int width, int height){
     loaded = true;
     
     colorFormat = -1;
     this->width = width;
     this->height = height;
+    
+    return true;
 }
 
 void TextureRender::deleteTexture(){
