@@ -7,6 +7,9 @@ Button::Button(): GUIImage(){
     ownedTextureNormal = true;
     ownedTexturePressed = true;
     ownedTextureDisabled = true;
+
+    label.setMultiline(false);
+    addObject(&label);
 }
 
 Button::~Button(){
@@ -18,6 +21,26 @@ Button::~Button(){
     
     if (textureDisabled and ownedTextureDisabled)
         delete textureDisabled;
+}
+
+void Button::setLabelText(std::string text){
+    label.setText(text.c_str());
+}
+
+void Button::setLabelFont(std::string font){
+    label.setFont(font.c_str());
+}
+
+void Button::setLabelSize(unsigned int size){
+    label.setFontSize(size);
+}
+
+void Button::setLabelColor(Vector4 color){
+    label.setColor(color);
+}
+
+Text* Button::getLabel(){
+    return &label;
 }
 
 void Button::setTextureNormal(Texture* texture){
@@ -108,14 +131,31 @@ void Button::call_onUp(){
 }
 
 bool Button::load(){
-    if (textureNormal)
+    if (textureNormal) {
         textureNormal->load();
+    }else{
+        textureNormal = new Texture(getMaterial()->getTexture()->getId());
+        ownedTextureNormal = false;
+    }
     
     if (texturePressed)
         texturePressed->load();
     
     if (textureDisabled)
         textureDisabled->load();
+
+    label.load();
+
+    float labelX = 0;
+    float labelY = (height / 2) + (label.getHeight() / 2) - border_bottom;
+
+    if (label.getWidth() > (width - border_right)) {
+        labelX = border_left;
+        label.setWidth(width - border_right);
+    }else{
+        labelX = (width / 2) - (label.getWidth() / 2);
+    }
+    label.setPosition(labelX, labelY, 0);
 
     return GUIImage::load();
 }

@@ -74,6 +74,9 @@ int STBText::getLineHeight(){
 
 bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
 
+    if (*font == 0)
+        return false;
+
     FileData* fontData = new FileData();
     fontData->open(font);
 

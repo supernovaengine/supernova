@@ -8,8 +8,12 @@
 namespace Supernova {
 
     class GUIImage: public GUIObject {
+
     private:
-        
+        std::vector<Image*> partImage;
+        int rawImageWidth, rawImageHeight;
+
+    protected:
         int texWidth;
         int texHeight;
         
@@ -18,8 +22,6 @@ namespace Supernova {
         int border_top;
         int border_bottom;
 
-        std::vector<Image*> partImage;
-        int rawImageWidth, rawImageHeight;
     public:
         GUIImage();
         virtual ~GUIImage();

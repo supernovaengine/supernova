@@ -2,6 +2,7 @@
 #define Button_h
 
 #include "GUIImage.h"
+#include "Text.h"
 
 namespace Supernova {
 
@@ -14,13 +15,18 @@ namespace Supernova {
         Texture* textureNormal;
         Texture* texturePressed;
         Texture* textureDisabled;
+
+        Text label;
         
     public:
         Button();
         virtual ~Button();
         
-        void setTexturePressed();
-        void setTextureDisabled();
+        void setLabelText(std::string text);
+        void setLabelFont(std::string font);
+        void setLabelSize(unsigned int size);
+        void setLabelColor(Vector4 color);
+        Text* getLabel();
         
         void setTextureNormal(Texture* texture);
         void setTextureNormal(std::string texturepath);

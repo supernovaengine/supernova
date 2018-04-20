@@ -64,11 +64,15 @@ void Text::setFontSize(unsigned int fontSize){
 void Text::setText(const char* text){
     this->text = text;
     if (loaded){
-        createText();
-        updateVertices();
-        updateNormals();
-        updateTexcoords();
-        updateIndices();
+        if (vertices.size() > 0) {
+            createText();
+            updateVertices();
+            updateNormals();
+            updateTexcoords();
+            updateIndices();
+        }else{
+            load();
+        }
     }
 }
 
@@ -157,9 +161,12 @@ void Text::createText(){
 
 bool Text::load(){
 
-    stbtext->load(font.c_str(), fontSize, submeshes[0]->getMaterial()->getTexture());
-    setInvertTexture(isIn3DScene());
-    createText();
+    if (stbtext->load(font.c_str(), fontSize, submeshes[0]->getMaterial()->getTexture())) {
+        setInvertTexture(isIn3DScene());
+        createText();
+    }else{
+        Log::Error(LOG_TAG, "Can`t load font");
+    }
     
     return Mesh2D::load();
 }
