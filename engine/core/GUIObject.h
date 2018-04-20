@@ -11,6 +11,9 @@ namespace Supernova {
 
         void (*onPressFunc)();
         int onPressLuaFunc;
+        
+        void (*onUpFunc)();
+        int onUpLuaFunc;
 
     public:
         GUIObject();
@@ -19,6 +22,10 @@ namespace Supernova {
         void onPress(void (*onPressFunc)());
         int onPress(lua_State *L);
         virtual void call_onPress();
+        
+        void onUp(void (*onUpFunc)());
+        int onUp(lua_State *L);
+        virtual void call_onUp();
     };
     
 }
