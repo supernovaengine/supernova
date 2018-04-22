@@ -354,7 +354,7 @@ bool GLES2Object::prepareDraw(){
             shadowsMapCubeLoc.push_back(shadowsMapCubeLoc[0]);
         }
 
-        glUniform1iv(uShadowsMapCubeLocation, shadowsMapCubeLoc.size(), &shadowsMapCubeLoc.front());
+        glUniform1iv(uShadowsMapCubeLocation, (GLsizei)shadowsMapCubeLoc.size(), &shadowsMapCubeLoc.front());
     }
 
     GLES2Util::checkGlError("Error on bind texture");

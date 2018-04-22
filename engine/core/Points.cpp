@@ -440,6 +440,18 @@ bool Points::renderDraw(){
     return true;
 }
 
+bool Points::textureLoad(){
+    if (!ConcreteObject::textureLoad())
+        return false;
+    
+    if (render){
+        material.getTexture()->load();
+        render->setTexture(material.getTexture());
+    }
+    
+    return true;
+}
+
 bool Points::load(){
 
     if (render == NULL)

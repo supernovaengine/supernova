@@ -61,6 +61,7 @@ namespace Supernova {
         void setSubmeshShadowRender(ObjectRender* shadowRender);
         ObjectRender* getSubmeshShadowRender();
 
+        bool textureLoad();
         bool shadowLoad();
         bool shadowDraw();
         

@@ -133,6 +133,15 @@ ObjectRender* Submesh::getSubmeshShadowRender(){
     return shadowRender;
 }
 
+bool Submesh::textureLoad(){
+    if (material && render){
+        material->getTexture()->load();
+        render->setTexture(material->getTexture());
+    }
+    
+    return true;
+}
+
 bool Submesh::shadowLoad(){
     
     shadowRender = getSubmeshShadowRender();

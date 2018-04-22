@@ -112,6 +112,8 @@ namespace Supernova {
         
         virtual bool renderDraw();
         
+        virtual bool textureLoad();
+        
         virtual bool load();
         virtual void destroy();
     };

@@ -358,32 +358,31 @@ bool Engine::transformCoordPos(float& x, float& y){
 void Engine::onTouchPress(float x, float y){
     if (transformCoordPos(x, y)){
         Events::call_onTouchPress(x, y);
-    }
-
-    std::vector<GUIObject*>::iterator it;
-    for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-        if (x >= (*it)->getPosition().x and
+        
+        std::vector<GUIObject*>::iterator it;
+        for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
+            if (x >= (*it)->getPosition().x and
                 x <= ((*it)->getPosition().x + (*it)->getWidth()) and
                 y >= (*it)->getPosition().y and
                 y <= ((*it)->getPosition().y + (*it)->getHeight())) {
-            (*it)->call_onPress();
+                (*it)->call_onPress();
+            }
         }
     }
-
 }
 
 void Engine::onTouchUp(float x, float y){
     if (transformCoordPos(x, y)){
         Events::call_onTouchUp(x, y);
-    }
-    
-    std::vector<GUIObject*>::iterator it;
-    for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-        if (x >= (*it)->getPosition().x and
-            x <= ((*it)->getPosition().x + (*it)->getWidth()) and
-            y >= (*it)->getPosition().y and
-            y <= ((*it)->getPosition().y + (*it)->getHeight())) {
-            (*it)->call_onUp();
+        
+        std::vector<GUIObject*>::iterator it;
+        for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
+            if (x >= (*it)->getPosition().x and
+                x <= ((*it)->getPosition().x + (*it)->getWidth()) and
+                y >= (*it)->getPosition().y and
+                y <= ((*it)->getPosition().y + (*it)->getHeight())) {
+                (*it)->call_onUp();
+            }
         }
     }
 }
@@ -399,6 +398,16 @@ void Engine::onMousePress(int button, float x, float y){
         Events::call_onMousePress(button, x, y);
         if (Engine::isMouseAsTouch()){
             Events::call_onTouchPress(x, y);
+        }else{
+            std::vector<GUIObject*>::iterator it;
+            for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
+                if (x >= (*it)->getPosition().x and
+                    x <= ((*it)->getPosition().x + (*it)->getWidth()) and
+                    y >= (*it)->getPosition().y and
+                    y <= ((*it)->getPosition().y + (*it)->getHeight())) {
+                    (*it)->call_onPress();
+                }
+            }
         }
     }
 }
@@ -407,6 +416,16 @@ void Engine::onMouseUp(int button, float x, float y){
         Events::call_onMouseUp(button, x, y);
         if (Engine::isMouseAsTouch()){
             Events::call_onTouchUp(x, y);
+        }else{
+            std::vector<GUIObject*>::iterator it;
+            for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
+                if (x >= (*it)->getPosition().x and
+                    x <= ((*it)->getPosition().x + (*it)->getWidth()) and
+                    y >= (*it)->getPosition().y and
+                    y <= ((*it)->getPosition().y + (*it)->getHeight())) {
+                    (*it)->call_onUp();
+                }
+            }
         }
     }
 }

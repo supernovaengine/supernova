@@ -158,6 +158,17 @@ void Mesh::removeAllSubmeshes(){
     submeshes.clear();
 }
 
+bool Mesh::textureLoad(){
+    if (!ConcreteObject::textureLoad())
+        return false;
+    
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->textureLoad();
+    }
+    
+    return true;
+}
+
 bool Mesh::shadowLoad(){
     if (!ConcreteObject::shadowLoad())
         return false;
