@@ -6,6 +6,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/web_macro
 
 set(COMPILE_ZLIB OFF)
 
+set(CMAKE_EXECUTABLE_SUFFIX ".html")
+
 add_subdirectory (../.. ${PROJECT_BINARY_DIR}/supernova)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core")
