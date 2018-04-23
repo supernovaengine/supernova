@@ -437,6 +437,9 @@ void Engine::onKeyUp(int inputKey){
 }
 
 void Engine::onTextInput(const char* text){
-    //printf("textinput %s\n", text);
-    Log::Verbose(LOG_TAG,"textinput %s\n", text);
+    //Log::Verbose(LOG_TAG,"textinput %s\n", text);
+    std::vector<GUIObject*>::iterator it;
+    for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
+        (*it)->engine_onTextInput(text);
+    }
 }

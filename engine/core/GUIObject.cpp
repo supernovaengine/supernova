@@ -82,3 +82,6 @@ void GUIObject::engine_onPress(float x, float y){
 
 void GUIObject::engine_onUp(float x, float y){
 }
+
+void GUIObject::engine_onTextInput(const char* text){
+}

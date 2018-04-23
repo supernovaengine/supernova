@@ -36,6 +36,7 @@ namespace Supernova {
 
         virtual void engine_onPress(float x, float y);
         virtual void engine_onUp(float x, float y);
+        virtual void engine_onTextInput(const char* text);
     };
     
 }
