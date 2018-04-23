@@ -118,20 +118,26 @@ std::string Button::getTextureDisabled(){
         return NULL;
 }
 
-void Button::call_onPress(){
-    state = S_BUTTON_PRESSED;
-    if (texturePressed){
-        setTexture(texturePressed);
+void Button::engine_onPress(float x, float y){
+    if (isCoordInside(x, y)) {
+        state = S_BUTTON_PRESSED;
+        if (texturePressed) {
+            setTexture(texturePressed);
+        }
+        call_onPress();
     }
-    GUIObject::call_onPress();
+    GUIObject::engine_onPress(x, y);
 }
 
-void Button::call_onUp(){
-    state = S_BUTTON_NORMAL;
-    if (textureNormal && texturePressed){
-        setTexture(textureNormal);
+void Button::engine_onUp(float x, float y){
+    if (state == S_BUTTON_PRESSED) {
+        state = S_BUTTON_NORMAL;
+        if (textureNormal && texturePressed) {
+            setTexture(textureNormal);
+        }
+        call_onUp();
     }
-    GUIObject::call_onUp();
+    GUIObject::engine_onUp(x, y);
 }
 
 bool Button::load(){

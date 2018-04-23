@@ -16,6 +16,9 @@ namespace Supernova {
 
     protected:
         int state;
+
+        void call_onPress();
+        void call_onUp();
         
     public:
         GUIObject();
@@ -25,11 +28,14 @@ namespace Supernova {
 
         void onPress(void (*onPressFunc)());
         int onPress(lua_State *L);
-        virtual void call_onPress();
         
         void onUp(void (*onUpFunc)());
         int onUp(lua_State *L);
-        virtual void call_onUp();
+
+        bool isCoordInside(float x, float y);
+
+        virtual void engine_onPress(float x, float y);
+        virtual void engine_onUp(float x, float y);
     };
     
 }

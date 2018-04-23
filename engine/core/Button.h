@@ -44,8 +44,8 @@ namespace Supernova {
         void setTextureDisabled(std::string texturepath);
         std::string getTextureDisabled();
 
-        virtual void call_onPress();
-        virtual void call_onUp();
+        virtual void engine_onPress(float x, float y);
+        virtual void engine_onUp(float x, float y);
         
         virtual bool load();
     };

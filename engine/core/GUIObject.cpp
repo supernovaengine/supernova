@@ -66,3 +66,19 @@ void GUIObject::call_onUp(){
         LuaBind::luaCallback(0, 0, 0);
     }
 }
+
+bool GUIObject::isCoordInside(float x, float y){
+    if (x >= getPosition().x and
+        x <= (getPosition().x + getWidth()) and
+        y >= getPosition().y and
+        y <= (getPosition().y + getHeight())) {
+        return true;
+    }
+    return false;
+}
+
+void GUIObject::engine_onPress(float x, float y){
+}
+
+void GUIObject::engine_onUp(float x, float y){
+}

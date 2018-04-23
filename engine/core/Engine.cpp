@@ -362,12 +362,7 @@ void Engine::onTouchPress(float x, float y){
         
         std::vector<GUIObject*>::iterator it;
         for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-            if (x >= (*it)->getPosition().x and
-                x <= ((*it)->getPosition().x + (*it)->getWidth()) and
-                y >= (*it)->getPosition().y and
-                y <= ((*it)->getPosition().y + (*it)->getHeight())) {
-                (*it)->call_onPress();
-            }
+            (*it)->engine_onPress(x, y);
         }
     }
 }
@@ -378,9 +373,7 @@ void Engine::onTouchUp(float x, float y){
         
         std::vector<GUIObject*>::iterator it;
         for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-            if ((*it)->getState() == S_BUTTON_PRESSED) {
-                (*it)->call_onUp();
-            }
+            (*it)->engine_onUp(x, y);
         }
     }
 }
@@ -397,15 +390,10 @@ void Engine::onMousePress(int button, float x, float y){
         if (Engine::isMouseAsTouch()){
             Events::call_onTouchPress(x, y);
         }
-        
+
         std::vector<GUIObject*>::iterator it;
         for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-            if (x >= (*it)->getPosition().x and
-                x <= ((*it)->getPosition().x + (*it)->getWidth()) and
-                y >= (*it)->getPosition().y and
-                y <= ((*it)->getPosition().y + (*it)->getHeight())) {
-                (*it)->call_onPress();
-            }
+            (*it)->engine_onPress(x, y);
         }
     }
 }
@@ -415,12 +403,10 @@ void Engine::onMouseUp(int button, float x, float y){
         if (Engine::isMouseAsTouch()){
             Events::call_onTouchUp(x, y);
         }
-        
+
         std::vector<GUIObject*>::iterator it;
         for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-            if ((*it)->getState() == S_BUTTON_PRESSED) {
-                (*it)->call_onUp();
-            }
+            (*it)->engine_onUp(x, y);
         }
     }
 }
