@@ -10,6 +10,8 @@ Button::Button(): GUIImage(){
 
     label.setMultiline(false);
     addObject(&label);
+    
+    state = S_BUTTON_NORMAL;
 }
 
 Button::~Button(){
@@ -117,6 +119,7 @@ std::string Button::getTextureDisabled(){
 }
 
 void Button::call_onPress(){
+    state = S_BUTTON_PRESSED;
     if (texturePressed){
         setTexture(texturePressed);
     }
@@ -124,7 +127,8 @@ void Button::call_onPress(){
 }
 
 void Button::call_onUp(){
-    if (textureNormal){
+    state = S_BUTTON_NORMAL;
+    if (textureNormal && texturePressed){
         setTexture(textureNormal);
     }
     GUIObject::call_onUp();

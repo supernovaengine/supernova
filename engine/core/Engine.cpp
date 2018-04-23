@@ -18,6 +18,7 @@
 #include "Events.h"
 #include "math/Rect.h"
 #include "platform/Log.h"
+#include "Button.h"
 
 #include "LuaBind.h"
 
@@ -377,10 +378,7 @@ void Engine::onTouchUp(float x, float y){
         
         std::vector<GUIObject*>::iterator it;
         for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-            if (x >= (*it)->getPosition().x and
-                x <= ((*it)->getPosition().x + (*it)->getWidth()) and
-                y >= (*it)->getPosition().y and
-                y <= ((*it)->getPosition().y + (*it)->getHeight())) {
+            if ((*it)->getState() == S_BUTTON_PRESSED) {
                 (*it)->call_onUp();
             }
         }
@@ -420,10 +418,7 @@ void Engine::onMouseUp(int button, float x, float y){
         
         std::vector<GUIObject*>::iterator it;
         for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-            if (x >= (*it)->getPosition().x and
-                x <= ((*it)->getPosition().x + (*it)->getWidth()) and
-                y >= (*it)->getPosition().y and
-                y <= ((*it)->getPosition().y + (*it)->getHeight())) {
+            if ((*it)->getState() == S_BUTTON_PRESSED) {
                 (*it)->call_onUp();
             }
         }

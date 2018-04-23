@@ -10,10 +10,15 @@
 using namespace Supernova;
 
 GUIObject::GUIObject(): Mesh2D(){
+    state = 0;
 }
 
 GUIObject::~GUIObject(){
 
+}
+
+int GUIObject::getState(){
+    return state;
 }
 
 void GUIObject::onPress(void (*onPressFunc)()){

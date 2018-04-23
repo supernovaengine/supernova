@@ -1,6 +1,10 @@
 #ifndef Button_h
 #define Button_h
 
+#define S_BUTTON_NORMAL 10
+#define S_BUTTON_PRESSED 11
+#define S_BUTTON_DISABLED 12
+
 #include "GUIImage.h"
 #include "Text.h"
 
