@@ -1,6 +1,7 @@
 #include "TextEdit.h"
 
-#include "SupernovaAndroid.h"
+//#include "SupernovaAndroid.h"
+//#include "SupernovaIOS.h"
 
 using namespace Supernova;
 
@@ -33,7 +34,8 @@ Text* TextEdit::getTextObject(){
 }
 
 void TextEdit::engine_onPress(float x, float y){
-    SupernovaAndroid::showTextInput("teste");
+    //SupernovaAndroid::showTextInput("teste");
+    //SupernovaIOS::showSoftKeyboard();
     GUIObject::engine_onPress(x, y);
 }
 
