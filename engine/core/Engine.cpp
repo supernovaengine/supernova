@@ -359,10 +359,12 @@ bool Engine::transformCoordPos(float& x, float& y){
 void Engine::onTouchPress(float x, float y){
     if (transformCoordPos(x, y)){
         Events::call_onTouchPress(x, y);
-        
-        std::vector<GUIObject*>::iterator it;
-        for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-            (*it)->engine_onPress(x, y);
+
+        if (mainScene) {
+            std::vector<GUIObject *>::iterator it;
+            for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
+                (*it)->engine_onPress(x, y);
+            }
         }
     }
 }
@@ -370,10 +372,12 @@ void Engine::onTouchPress(float x, float y){
 void Engine::onTouchUp(float x, float y){
     if (transformCoordPos(x, y)){
         Events::call_onTouchUp(x, y);
-        
-        std::vector<GUIObject*>::iterator it;
-        for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-            (*it)->engine_onUp(x, y);
+
+        if (mainScene) {
+            std::vector<GUIObject *>::iterator it;
+            for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
+                (*it)->engine_onUp(x, y);
+            }
         }
     }
 }
@@ -391,9 +395,11 @@ void Engine::onMousePress(int button, float x, float y){
             Events::call_onTouchPress(x, y);
         }
 
-        std::vector<GUIObject*>::iterator it;
-        for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-            (*it)->engine_onPress(x, y);
+        if (mainScene) {
+            std::vector<GUIObject *>::iterator it;
+            for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
+                (*it)->engine_onPress(x, y);
+            }
         }
     }
 }
@@ -404,9 +410,11 @@ void Engine::onMouseUp(int button, float x, float y){
             Events::call_onTouchUp(x, y);
         }
 
-        std::vector<GUIObject*>::iterator it;
-        for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-            (*it)->engine_onUp(x, y);
+        if (mainScene) {
+            std::vector<GUIObject *>::iterator it;
+            for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
+                (*it)->engine_onUp(x, y);
+            }
         }
     }
 }
@@ -438,8 +446,10 @@ void Engine::onKeyUp(int inputKey){
 
 void Engine::onTextInput(const char* text){
     //Log::Verbose(LOG_TAG,"textinput %s\n", text);
-    std::vector<GUIObject*>::iterator it;
-    for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it){
-        (*it)->engine_onTextInput(text);
+    if (mainScene) {
+        std::vector<GUIObject*>::iterator it;
+        for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
+            (*it)->engine_onTextInput(text);
+        }
     }
 }
