@@ -10,13 +10,15 @@ class SupernovaAndroid {
 public:
 
 	static jclass mainActivityClsRef;
-	static jmethodID showInputTextRef;
+	static jmethodID showSoftKeyboardRef;
+	static jmethodID hideSoftKeyboardRef;
 	static jobject mainActivityObjRef;
 	static JNIEnv * envRef;
 
 	static AAssetManager* android_asset_manager;
 
-	static void showTextInput(const char* buffer);
+	static void showSoftKeyboard();
+	static void hideSoftKeyboard();
     static FILE* androidFopen(const char* fname, const char* mode);
 };
 

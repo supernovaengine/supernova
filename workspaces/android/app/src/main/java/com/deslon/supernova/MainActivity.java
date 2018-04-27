@@ -32,12 +32,19 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.FrameLayout;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+
 
 @SuppressLint("ClickableViewAccessibility")
 public class MainActivity extends Activity {
     
 	private GLSurfaceView glSurfaceView;
 	private boolean rendererSet;
+
+	private FrameLayout layout;
+	private TextInput edittext;
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +75,22 @@ public class MainActivity extends Activity {
 			glSurfaceView.setEGLContextClientVersion(2);
 			glSurfaceView.setPreserveEGLContextOnPause(true);
 			glSurfaceView.setRenderer(rendererWrapper);
+			glSurfaceView.setFocusableInTouchMode(true);
 			rendererSet = true;
-			setContentView(glSurfaceView);
+			//setContentView(glSurfaceView);
+
+			layout = new FrameLayout(this);
+			layout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+			setContentView(layout);
+
+			edittext = new TextInput(this);
+			edittext.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			edittext.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+			layout.addView(edittext);
+			//addContentView(edittext, new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+			layout.addView(glSurfaceView);
+			edittext.setView(glSurfaceView);
 			
 			glSurfaceView.setOnKeyListener(new KeyListener(glSurfaceView));
 			
@@ -155,8 +176,12 @@ public class MainActivity extends Activity {
 
 		JNIWrapper.on_resume();
 	}
-	
-	public void showInputText(java.lang.String buffer){
-		new TextInput(this, buffer).show();
+
+	public void showSoftKeyboard(){
+		edittext.showKeyboard();
+	}
+
+	public void hideSoftKeyboard(){
+		edittext.hideKeyboard();
 	}
 }

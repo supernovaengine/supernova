@@ -34,7 +34,7 @@ Text* TextEdit::getTextObject(){
 }
 
 void TextEdit::engine_onPress(float x, float y){
-    //SupernovaAndroid::showTextInput("teste");
+    //SupernovaAndroid::showSoftKeyboard();
     //SupernovaIOS::showSoftKeyboard();
     GUIObject::engine_onPress(x, y);
 }

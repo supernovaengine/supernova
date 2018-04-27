@@ -20,17 +20,21 @@ static int android_close(void* cookie) {
 }
 
 jclass SupernovaAndroid::mainActivityClsRef;
-jmethodID SupernovaAndroid::showInputTextRef;
+jmethodID SupernovaAndroid::showSoftKeyboardRef;
+jmethodID SupernovaAndroid::hideSoftKeyboardRef;
 jobject SupernovaAndroid::mainActivityObjRef;
 JNIEnv * SupernovaAndroid::envRef;
 
 AAssetManager* SupernovaAndroid::android_asset_manager;
 
 
-void SupernovaAndroid::showTextInput(const char* buffer){
 
-	jstring jstr = envRef->NewStringUTF(buffer);
-	envRef->CallVoidMethod(mainActivityObjRef, showInputTextRef, jstr);
+void SupernovaAndroid::showSoftKeyboard(){
+    envRef->CallVoidMethod(mainActivityObjRef, showSoftKeyboardRef);
+}
+
+void SupernovaAndroid::hideSoftKeyboard(){
+    envRef->CallVoidMethod(mainActivityObjRef, hideSoftKeyboardRef);
 }
 
 FILE* SupernovaAndroid::androidFopen(const char* fname, const char* mode) {

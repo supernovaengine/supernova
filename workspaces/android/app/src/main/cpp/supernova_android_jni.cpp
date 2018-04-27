@@ -51,8 +51,10 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_init_1native(JNIEnv 
 
 	SupernovaAndroid::envRef = env;
 	SupernovaAndroid::mainActivityClsRef = env->FindClass("com/deslon/supernova/MainActivity");
-	SupernovaAndroid::showInputTextRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "showInputText", "(Ljava/lang/String;)V");
-	SupernovaAndroid::mainActivityObjRef = env->NewGlobalRef(main_activity);
+	//SupernovaAndroid::showInputTextRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "showInputText", "(Ljava/lang/String;)V");
+    SupernovaAndroid::showSoftKeyboardRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "showSoftKeyboard", "()V");
+    SupernovaAndroid::hideSoftKeyboardRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "hideSoftKeyboard", "()V");
+    SupernovaAndroid::mainActivityObjRef = env->NewGlobalRef(main_activity);
 
     SupernovaAndroid::android_asset_manager = AAssetManager_fromJava(env, java_asset_manager);
 }
