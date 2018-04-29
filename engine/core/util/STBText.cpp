@@ -238,8 +238,25 @@ void STBText::createText(std::string text, std::vector<Vector3>* vertices, std::
                 indices->push_back(ind+3);
                 ind = ind + 4;
             }
-            
         }
+    }
+    //Empty text
+    if (utf16String.size() == 0){
+        vertices->push_back(Vector3(0.0f, 0.0f, 0.0f));
+        vertices->push_back(Vector3(0.0f, 0.0f, 0.0f));
+        vertices->push_back(Vector3(0.0f, 0.0f, 0.0f));
+        
+        texcoords->push_back(Vector2(0.0f, 0.0f));
+        texcoords->push_back(Vector2(0.0f, 0.0f));
+        texcoords->push_back(Vector2(0.0f, 0.0f));
+        
+        normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
+        normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
+        normals->push_back(Vector3(0.0f, 0.0f, 1.0f));
+        
+        indices->push_back(0);
+        indices->push_back(1);
+        indices->push_back(2);
     }
     if (!userDefinedWidth)
         (*width) = maxX1 - minX0;

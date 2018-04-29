@@ -22,7 +22,7 @@ Text::Text(): Mesh2D() {
     setMinBufferSize(50);
 }
 
-Text::Text(const char* font): Text() {
+Text::Text(std::string font): Text() {
     setFont(font);
 }
 
@@ -49,7 +49,7 @@ void Text::setMinBufferSize(unsigned int characters){
     this->submeshes[0]->minBufferSize = characters * 6;
 }
 
-void Text::setFont(const char* font){
+void Text::setFont(std::string font){
     this->font = font;
     setTexture(font + std::to_string('-') + std::to_string(fontSize));
     //Its not necessary to reload, setTexture do it
@@ -61,17 +61,19 @@ void Text::setFontSize(unsigned int fontSize){
     //Its not necessary to reload, setTexture do it
 }
 
-void Text::setText(const char* text){
-    this->text = text;
-    if (loaded){
-        if (vertices.size() > 0) {
-            createText();
-            updateVertices();
-            updateNormals();
-            updateTexcoords();
-            updateIndices();
-        }else{
-            load();
+void Text::setText(std::string text){
+    if (this->text != text){
+        this->text = text;
+        if (loaded){
+            if (vertices.size() > 0) {
+                createText();
+                updateVertices();
+                updateNormals();
+                updateTexcoords();
+                updateIndices();
+            }else{
+                load();
+            }
         }
     }
 }
@@ -166,7 +168,8 @@ void Text::createText(){
 bool Text::load(){
 
     if (stbtext->load(font.c_str(), fontSize, submeshes[0]->getMaterial()->getTexture())) {
-        setInvertTexture(isIn3DScene());
+        if (!loaded)
+            setInvertTexture(isIn3DScene());
         createText();
     }else{
         Log::Error(LOG_TAG, "Can`t load font");

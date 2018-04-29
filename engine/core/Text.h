@@ -27,7 +27,7 @@ namespace Supernova {
 
     public:
         Text();
-        Text(const char* font);
+        Text(std::string font);
         virtual ~Text();
         
         Text& operator = ( const char* v );
@@ -48,8 +48,8 @@ namespace Supernova {
         int getLineHeight();
         std::string getText();
         
-        void setFont(const char* font);
-        void setText(const char* text);
+        void setFont(std::string font);
+        void setText(std::string text);
         void setFontSize(unsigned int fontSize);
         void setMultiline(bool multiline);
 

@@ -48,10 +48,12 @@ void TextEdit::engine_onUp(float x, float y){
 }
 
 void TextEdit::engine_onTextInput(std::string text){
-    std::string newText;
+    std::string newText = text;
 
     if (text == "\b") {
         newText = getText().substr(0, getText().size()-1);
+    }else if (text == "\n") {
+        //SupernovaIOS::hideSoftKeyboard();
     }else{
         newText = getText() + text;
     }
@@ -61,18 +63,14 @@ void TextEdit::engine_onTextInput(std::string text){
 }
 
 bool TextEdit::load(){
+    
+    setClipping(true);
 
     text.load();
 
-    float labelX = 0;
+    float labelX = border_left;
     float labelY = (height / 2) + (text.getHeight() / 2) - border_bottom;
 
-    //if (text.getWidth() > (width - border_right)) {
-        labelX = border_left;
-        text.setWidth(width - border_right);
-    //}else{
-    //    labelX = (width / 2) - (text.getWidth() / 2);
-    //}
     text.setPosition(labelX, labelY, 0);
 
     return GUIImage::load();
