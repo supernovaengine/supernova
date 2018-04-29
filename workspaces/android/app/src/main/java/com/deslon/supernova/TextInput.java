@@ -136,9 +136,6 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 			});
 		}
 
-		if (actionId == EditorInfo.IME_ACTION_DONE) {
-			this.view.requestFocus();
-		}
 		return false;
 	}
 

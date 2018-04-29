@@ -144,6 +144,10 @@ int Text::getLineHeight(){
         return stbtext->getLineHeight();
 }
 
+std::string Text::getText(){
+    return text;
+}
+
 void Text::setMultiline(bool multiline){
     this->multiline = multiline;
 }

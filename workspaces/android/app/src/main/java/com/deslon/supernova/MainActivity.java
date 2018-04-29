@@ -85,9 +85,34 @@ public class MainActivity extends Activity {
 
 			edittext = new TextInput(this);
 			edittext.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-			edittext.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+			//edittext.setRawInputType(InputType.TYPE_CLASS_TEXT);
+			edittext.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+			edittext.setSingleLine(true);
 			layout.addView(edittext);
 			//addContentView(edittext, new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+			edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+				@Override
+				public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                    if (id == EditorInfo.IME_ACTION_NEXT) {
+                        hideSoftKeyboard();
+                        return true;
+                    } else if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_ACTION_SEND || id == EditorInfo.IME_ACTION_SEARCH || id == EditorInfo.IME_ACTION_GO) {
+                        hideSoftKeyboard();
+                    }
+                    return false;
+				}
+			});
+
+			edittext.setOnKeyListener(new View.OnKeyListener() {
+				@Override
+				public boolean onKey(View v, int keyCode, KeyEvent event) {
+					if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+						hideSoftKeyboard();
+					}
+					return false;
+				}
+			});
 
 			layout.addView(glSurfaceView);
 			edittext.setView(glSurfaceView);

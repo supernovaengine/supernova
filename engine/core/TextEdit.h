@@ -19,11 +19,12 @@ namespace Supernova {
         void setTextFont(std::string font);
         void setTextSize(unsigned int size);
         void setTextColor(Vector4 color);
+        std::string getText();
         Text* getTextObject();
 
         virtual void engine_onPress(float x, float y);
         virtual void engine_onUp(float x, float y);
-        virtual void engine_onTextInput(const char* text);
+        virtual void engine_onTextInput(std::string text);
 
         virtual bool load();
     };

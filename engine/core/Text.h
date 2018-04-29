@@ -46,6 +46,7 @@ namespace Supernova {
         float getDescent();
         float getLineGap();
         int getLineHeight();
+        std::string getText();
         
         void setFont(const char* font);
         void setText(const char* text);
