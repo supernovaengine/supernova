@@ -8,8 +8,10 @@ namespace Supernova {
 
     class TextEdit: public GUIImage {
     private:
-
         Text text;
+
+    protected:
+        void adjustText();
 
     public:
         TextEdit();

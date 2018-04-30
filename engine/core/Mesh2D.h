@@ -8,6 +8,7 @@
 namespace Supernova {
 
     class Mesh2D: public Mesh {
+
     protected:
         int width;
         int height;

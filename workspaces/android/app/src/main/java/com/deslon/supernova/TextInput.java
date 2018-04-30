@@ -96,7 +96,6 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -107,7 +106,7 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 				@Override
 				public void run() {
 					if (before < count) {
-						JNIWrapper.on_text_input(String.valueOf(s.charAt(before)));
+						JNIWrapper.on_text_input(String.valueOf(s.charAt(start + before)));
 					} else {
 						JNIWrapper.on_text_input("\b");
 					}
@@ -120,7 +119,6 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 	@Override
 	public void afterTextChanged(Editable s) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override

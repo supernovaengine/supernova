@@ -1,5 +1,8 @@
 #include "TextEdit.h"
 
+#include <locale>
+#include <codecvt>
+
 //#include "SupernovaAndroid.h"
 //#include "SupernovaIOS.h"
 
@@ -13,8 +16,19 @@ TextEdit::TextEdit(): GUIImage(){
 TextEdit::~TextEdit(){
 }
 
+void TextEdit::adjustText(){
+    float posX = border_left;
+    float posY = (height / 2) + (this->text.getHeight() / 2) - border_bottom;
+    if (this->text.getWidth() > getWidth()){
+        posX = getWidth() - this->text.getWidth();
+    }
+    this->text.setPosition(posX, posY);
+}
+
 void TextEdit::setText(std::string text){
     this->text.setText(text.c_str());
+
+    adjustText();
 }
 
 void TextEdit::setTextFont(std::string font){
@@ -48,16 +62,25 @@ void TextEdit::engine_onUp(float x, float y){
 }
 
 void TextEdit::engine_onTextInput(std::string text){
-    std::string newText = text;
 
-    if (text == "\b") {
-        newText = getText().substr(0, getText().size()-1);
-    }else if (text == "\n") {
-        //SupernovaIOS::hideSoftKeyboard();
-    }else{
-        newText = getText() + text;
+    std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
+
+    std::wstring utf16Text = convert.from_bytes( text );
+    std::wstring utf16OldText = convert.from_bytes( getText() );
+
+    for (int i = 0; i < utf16Text.size(); i++){
+        std::string newText = "";
+        if (utf16Text[i] == '\b') {
+            newText = convert.to_bytes(utf16OldText.substr(0, utf16OldText.size()-1));
+            setText(newText);
+        }else if (utf16Text[i] == '\n') {
+            //SupernovaAndroid::hideSoftKeyboard();
+            //SupernovaIOS::hideSoftKeyboard();
+        }else{
+            newText = getText() + convert.to_bytes(utf16Text[i]);
+            setText(newText);
+        }
     }
-    setText(newText);
 
     GUIObject::engine_onTextInput(text);
 }
@@ -68,10 +91,7 @@ bool TextEdit::load(){
 
     text.load();
 
-    float labelX = border_left;
-    float labelY = (height / 2) + (text.getHeight() / 2) - border_bottom;
-
-    text.setPosition(labelX, labelY, 0);
+    adjustText();
 
     return GUIImage::load();
 }

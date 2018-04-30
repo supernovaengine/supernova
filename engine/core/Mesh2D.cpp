@@ -91,9 +91,9 @@ int Mesh2D::getHeight(){
     return height;
 }
 
-bool Mesh2D::draw(){
+bool Mesh2D::draw() {
 
-    if (clipping && scene && scene->getCamera()->getType()!=S_CAMERA_2D && scene->getTextureRender()==NULL) {
+    if (clipping && scene && scene->getCamera()->getType() == S_CAMERA_2D && scene->getTextureRender() == NULL) {
 
         float scaleX = scale.x;
         float scaleY = scale.y;
@@ -103,17 +103,17 @@ bool Mesh2D::draw(){
             scaleY *= parent->getScale().y;
             parent = parent->getParent();
         }
-        
-        float tempX = (2 * getWorldPosition().x / (float)Engine::getCanvasWidth()) - 1;
-        float tempY = (2 * getWorldPosition().y / (float)Engine::getCanvasHeight()) - 1;
-        
-        int objScreenPosX = (tempX * Engine::getViewRect()->getWidth() + (float)Engine::getScreenWidth()) / 2;
-        int objScreenPosY = (tempY * Engine::getViewRect()->getHeight() + (float)Engine::getScreenHeight()) / 2;
+
+        float tempX = (2 * getWorldPosition().x / (float) Engine::getCanvasWidth()) - 1;
+        float tempY = (2 * getWorldPosition().y / (float) Engine::getCanvasHeight()) - 1;
+
+        int objScreenPosX = (tempX * Engine::getViewRect()->getWidth() + (float) Engine::getScreenWidth()) / 2;
+        int objScreenPosY = (tempY * Engine::getViewRect()->getHeight() + (float) Engine::getScreenHeight()) / 2;
         int objScreenWidth = width * scaleX * (Engine::getViewRect()->getWidth() / (float) Engine::getCanvasWidth());
         int objScreenHeight = height * scaleY * (Engine::getViewRect()->getHeight() / (float) Engine::getCanvasHeight());
 
         if (scene && scene->getScene()->is3D())
-            objScreenPosY = (float)Engine::getScreenHeight()-objScreenHeight-objScreenPosY;
+            objScreenPosY = (float) Engine::getScreenHeight() - objScreenHeight - objScreenPosY;
 
         SceneRender* sceneRender = scene->getSceneRender();
 
@@ -133,12 +133,6 @@ bool Mesh2D::draw(){
 
             if (objScreenPosY + objScreenHeight >= rect.getY() + rect.getHeight())
                 objScreenHeight = rect.getY() + rect.getHeight() - objScreenPosY;
-
-        }else if (clipping){
-
-            clipping = false;
-            Log::Error(LOG_TAG, "Can not clipping object with 2D camera or textureRender scene");
-
         }
 
         sceneRender->enableScissor(Rect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight));
@@ -150,6 +144,10 @@ bool Mesh2D::draw(){
 
         return drawReturn;
 
+    }else if (clipping){
+        clipping = false;
+        Log::Error(LOG_TAG, "Can not clipping object with 2D camera or textureRender scene");
+        return Mesh::draw();
     }else{
         return Mesh::draw();
     }
