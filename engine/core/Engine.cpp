@@ -236,9 +236,6 @@ void Engine::onStart(int width, int height){
     Engine::setRenderAPI(S_GLES2);
     Engine::setScalingMode(S_SCALING_FITWIDTH);
     Engine::setNearestScaleTexture(false);
-
-    LuaBind::createLuaState();
-    LuaBind::bind();
     
     auto now = std::chrono::steady_clock::now();
     lastTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
@@ -246,6 +243,9 @@ void Engine::onStart(int width, int height){
 }
 
 void Engine::onSurfaceCreated(){
+    
+    LuaBind::createLuaState();
+    LuaBind::bind();
     
     init();
 

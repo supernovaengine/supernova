@@ -16,6 +16,7 @@ Texture::Texture(){
     this->id = "";
     
     this->dataOwned = false;
+    this->resampleToPowerOfTwo = false;
 }
 
 Texture::Texture(std::string path_id): Texture(){
@@ -60,6 +61,10 @@ void Texture::setTextureFrameSize(int textureFrameWidth, int textureFrameHeight)
     this->textureFrameHeight = textureFrameHeight;
 }
 
+void Texture::setResampleToPowerOfTwo(bool resampleToPowerOfTwo){
+    this->resampleToPowerOfTwo = resampleToPowerOfTwo;
+}
+
 bool Texture::load(){
 
     textureRender = TextureRender::sharedInstance(id);
@@ -76,9 +81,12 @@ bool Texture::load(){
                 dataOwned = true;
             }
             
-            //TODO: Add engine option to fit or resample 
-            //texturesData[0]->fitPowerOfTwo();
-            texturesData[0]->resamplePowerOfTwo();
+            if (resampleToPowerOfTwo){
+                texturesData[0]->resamplePowerOfTwo();
+            }else{
+                texturesData[0]->fitPowerOfTwo();
+            }
+            
             if (!textureRender.get()->loadTexture(texturesData[0])){
                 renderNotPrepared = true;
             }
@@ -175,6 +183,10 @@ int Texture::getTextureFrameWidth(){
 
 int Texture::getTextureFrameHeight(){
     return textureFrameHeight;
+}
+
+bool Texture::getResampleToPowerOfTwo(){
+    return this->resampleToPowerOfTwo;
 }
 
 std::shared_ptr<TextureRender> Texture::getTextureRender(){

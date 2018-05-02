@@ -32,6 +32,7 @@ namespace Supernova{
         std::vector<TextureData*> texturesData;
         
         bool dataOwned;
+        bool resampleToPowerOfTwo;
         
     public:
         Texture();
@@ -50,6 +51,7 @@ namespace Supernova{
         void setType(int type);
         void setDataOwned(bool dataOwned);
         void setTextureFrameSize(int textureFrameWidth, int textureFrameHeight);
+        void setResampleToPowerOfTwo(bool resampleToPowerOfTwo);
 
         std::string getId();
         int getType();
@@ -57,6 +59,7 @@ namespace Supernova{
         bool getDataOwned();
         int getTextureFrameWidth();
         int getTextureFrameHeight();
+        bool getResampleToPowerOfTwo();
         
         int getColorFormat();
         bool hasAlphaChannel();
