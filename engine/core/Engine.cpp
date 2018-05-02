@@ -356,22 +356,22 @@ bool Engine::transformCoordPos(float& x, float& y){
     return ((x >= 0) && (x <= Engine::getCanvasWidth()) && (y >= 0) && (y <= Engine::getCanvasHeight()));
 }
 
-void Engine::onTouchPress(float x, float y){
+void Engine::onTouchStart(float x, float y){
     if (transformCoordPos(x, y)){
-        Events::call_onTouchPress(x, y);
+        Events::call_onTouchStart(x, y);
 
         if (mainScene) {
             std::vector<GUIObject *>::iterator it;
             for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
-                (*it)->engine_onPress(x, y);
+                (*it)->engine_onDown(x, y);
             }
         }
     }
 }
 
-void Engine::onTouchUp(float x, float y){
+void Engine::onTouchEnd(float x, float y){
     if (transformCoordPos(x, y)){
-        Events::call_onTouchUp(x, y);
+        Events::call_onTouchEnd(x, y);
 
         if (mainScene) {
             std::vector<GUIObject *>::iterator it;
@@ -388,17 +388,17 @@ void Engine::onTouchDrag(float x, float y){
     }
 }
 
-void Engine::onMousePress(int button, float x, float y){
+void Engine::onMouseDown(int button, float x, float y){
     if (transformCoordPos(x, y)){
-        Events::call_onMousePress(button, x, y);
+        Events::call_onMouseDown(button, x, y);
         if (Engine::isMouseAsTouch()){
-            Events::call_onTouchPress(x, y);
+            Events::call_onTouchStart(x, y);
         }
 
         if (mainScene) {
             std::vector<GUIObject *>::iterator it;
             for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
-                (*it)->engine_onPress(x, y);
+                (*it)->engine_onDown(x, y);
             }
         }
     }
@@ -407,7 +407,7 @@ void Engine::onMouseUp(int button, float x, float y){
     if (transformCoordPos(x, y)){
         Events::call_onMouseUp(button, x, y);
         if (Engine::isMouseAsTouch()){
-            Events::call_onTouchUp(x, y);
+            Events::call_onTouchEnd(x, y);
         }
 
         if (mainScene) {
@@ -434,8 +434,8 @@ void Engine::onMouseMove(float x, float y){
     }
 }
 
-void Engine::onKeyPress(int inputKey){
-    Events::call_onKeyPress(inputKey);
+void Engine::onKeyDown(int inputKey){
+    Events::call_onKeyDown(inputKey);
     //printf("keypress %i\n", inputKey);
 }
 

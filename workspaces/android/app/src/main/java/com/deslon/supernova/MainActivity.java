@@ -130,14 +130,14 @@ public class MainActivity extends Activity {
 	                        glSurfaceView.queueEvent(new Runnable() {
 	                            @Override
 	                            public void run() {
-	                            	JNIWrapper.on_touch_press(normalizedX, normalizedY);
+	                            	JNIWrapper.on_touch_start(normalizedX, normalizedY);
 	                            }
 	                        });
 	                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
 	                    	glSurfaceView.queueEvent(new Runnable() {
 	                    		@Override
 		                        public void run() {
-	                    			JNIWrapper.on_touch_up(normalizedX, normalizedY);
+	                    			JNIWrapper.on_touch_end(normalizedX, normalizedY);
 		                        }
 	                    	});
 	                    } else if (event.getAction() == MotionEvent.ACTION_MOVE) {

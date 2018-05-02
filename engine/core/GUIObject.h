@@ -8,8 +8,8 @@ namespace Supernova {
 
     class GUIObject: public Mesh2D {
     private:
-        void (*onPressFunc)();
-        int onPressLuaFunc;
+        void (*onDownFunc)();
+        int onDownLuaFunc;
         
         void (*onUpFunc)();
         int onUpLuaFunc;
@@ -17,7 +17,7 @@ namespace Supernova {
     protected:
         int state;
 
-        void call_onPress();
+        void call_onDown();
         void call_onUp();
         
     public:
@@ -26,15 +26,15 @@ namespace Supernova {
         
         int getState();
 
-        void onPress(void (*onPressFunc)());
-        int onPress(lua_State *L);
+        void onDown(void (*onDownFunc)());
+        int onDown(lua_State *L);
         
         void onUp(void (*onUpFunc)());
         int onUp(lua_State *L);
 
         bool isCoordInside(float x, float y);
 
-        virtual void engine_onPress(float x, float y);
+        virtual void engine_onDown(float x, float y);
         virtual void engine_onUp(float x, float y);
         virtual void engine_onTextInput(std::string text);
     };

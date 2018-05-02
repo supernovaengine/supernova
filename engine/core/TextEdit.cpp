@@ -51,10 +51,10 @@ Text* TextEdit::getTextObject(){
     return &text;
 }
 
-void TextEdit::engine_onPress(float x, float y){
+void TextEdit::engine_onDown(float x, float y){
     //SupernovaAndroid::showSoftKeyboard();
     //SupernovaIOS::showSoftKeyboard();
-    GUIObject::engine_onPress(x, y);
+    GUIObject::engine_onDown(x, y);
 }
 
 void TextEdit::engine_onUp(float x, float y){

@@ -21,25 +21,25 @@ int GUIObject::getState(){
     return state;
 }
 
-void GUIObject::onPress(void (*onPressFunc)()){
-    this->onPressFunc = onPressFunc;
+void GUIObject::onDown(void (*onDownFunc)()){
+    this->onDownFunc = onDownFunc;
 }
 
-int GUIObject::onPress(lua_State *L){
+int GUIObject::onDown(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
-        this->onPressLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
+        this->onDownLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
         //TODO: return error in Lua
     }
     return 0;
 }
 
-void GUIObject::call_onPress(){
-    if (onPressFunc != NULL){
-        onPressFunc();
+void GUIObject::call_onDown(){
+    if (onDownFunc != NULL){
+        onDownFunc();
     }
-    if (onPressLuaFunc != 0){
-        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onPressLuaFunc);
+    if (onDownLuaFunc != 0){
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onDownLuaFunc);
         LuaBind::luaCallback(0, 0, 0);
     }
 }
@@ -77,7 +77,7 @@ bool GUIObject::isCoordInside(float x, float y){
     return false;
 }
 
-void GUIObject::engine_onPress(float x, float y){
+void GUIObject::engine_onDown(float x, float y){
 }
 
 void GUIObject::engine_onUp(float x, float y){

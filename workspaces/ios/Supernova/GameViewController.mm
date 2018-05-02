@@ -47,7 +47,7 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
     UITouch* touchEvent = [touches anyObject];
     CGPoint locationInView = [touchEvent locationInView:self.view];
     CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    Supernova::Engine::onTouchPress(normalizedPoint.x, normalizedPoint.y);
+    Supernova::Engine::onTouchStart(normalizedPoint.x, normalizedPoint.y);
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -65,7 +65,7 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
     UITouch* touchEvent = [touches anyObject];
     CGPoint locationInView = [touchEvent locationInView:self.view];
     CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    Supernova::Engine::onTouchUp(normalizedPoint.x, normalizedPoint.y);
+    Supernova::Engine::onTouchEnd(normalizedPoint.x, normalizedPoint.y);
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event

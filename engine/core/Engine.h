@@ -106,16 +106,16 @@ namespace Supernova {
         static void onPause();
         static void onResume();
 
-        static void onTouchPress(float x, float y);
-        static void onTouchUp(float x, float y);
+        static void onTouchStart(float x, float y);
+        static void onTouchEnd(float x, float y);
         static void onTouchDrag(float x, float y);
 
-        static void onMousePress(int button, float x, float y);
+        static void onMouseDown(int button, float x, float y);
         static void onMouseUp(int button, float x, float y);
         static void onMouseDrag(int button, float x, float y);
         static void onMouseMove(float x, float y);
 
-        static void onKeyPress(int inputKey);
+        static void onKeyDown(int inputKey);
         static void onKeyUp(int inputKey);
 
         static void onTextInput(const char* text);

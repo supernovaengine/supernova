@@ -24,7 +24,7 @@ namespace Supernova {
         std::string getText();
         Text* getTextObject();
 
-        virtual void engine_onPress(float x, float y);
+        virtual void engine_onDown(float x, float y);
         virtual void engine_onUp(float x, float y);
         virtual void engine_onTextInput(std::string text);
 

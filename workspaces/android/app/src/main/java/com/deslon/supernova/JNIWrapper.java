@@ -23,13 +23,13 @@ public class JNIWrapper {
 	
 	public static native void init_native(Activity mainActivity, AssetManager assetManager);
 	
-	public static native void on_touch_press(float x, float y);
+	public static native void on_touch_start(float x, float y);
 	
-	public static native void on_touch_up(float x, float y);
+	public static native void on_touch_end(float x, float y);
 	
 	public static native void on_touch_drag(float x, float y);
 	
-	public static native void on_key_press(int key);
+	public static native void on_key_down(int key);
 	
 	public static native void on_key_up(int key);
 	

@@ -31,7 +31,7 @@ public class KeyListener implements OnKeyListener {
             glSurfaceView.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                	JNIWrapper.on_key_press(convertToSupernova(keyCode));
+                	JNIWrapper.on_key_down(convertToSupernova(keyCode));
                 }
             });
         }else if(event.getAction() == KeyEvent.ACTION_UP) {

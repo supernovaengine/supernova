@@ -59,16 +59,16 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_init_1native(JNIEnv 
     SupernovaAndroid::android_asset_manager = AAssetManager_fromJava(env, java_asset_manager);
 }
 
-JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1press(JNIEnv * env, jclass cls, jfloat x, jfloat y) {
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1start(JNIEnv * env, jclass cls, jfloat x, jfloat y) {
 	UNUSED(env);
 	UNUSED(cls);
-    Supernova::Engine::onTouchPress(x, y);
+    Supernova::Engine::onTouchStart(x, y);
 }
 
-JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1up(JNIEnv * env, jclass cls, jfloat x, jfloat y) {
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1end(JNIEnv * env, jclass cls, jfloat x, jfloat y) {
 	UNUSED(env);
 	UNUSED(cls);
-    Supernova::Engine::onTouchUp(x, y);
+    Supernova::Engine::onTouchEnd(x, y);
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1drag(JNIEnv * env, jclass cls, jfloat x, jfloat y) {
@@ -77,10 +77,10 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1drag(JNIE
     Supernova::Engine::onTouchDrag(x, y);
 }
 
-JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1key_1press(JNIEnv * env, jclass cls, int key) {
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1key_1down(JNIEnv * env, jclass cls, int key) {
 	UNUSED(env);
 	UNUSED(cls);
-    Supernova::Engine::onKeyPress(key);
+    Supernova::Engine::onKeyDown(key);
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1key_1up(JNIEnv * env, jclass cls, int key) {

@@ -133,13 +133,13 @@ namespace Supernova {
         friend class Events;
         
     private:
+        
         static std::map<int,bool> keyPressed;
         static std::map<int,bool> mousePressed;
-        static bool touchPressed;
+        static bool touchStarted;
         
         static Vector2 mousePosition;
         static Vector2 touchPosition;
-        
         
         static void addKeyPressed(int key);
         static void releaseKeyPressed(int key);
@@ -148,8 +148,8 @@ namespace Supernova {
         static void releaseMousePressed(int key);
         static void setMousePosition(float x, float y);
         
-        static void addTouchPressed();
-        static void releaseTouchPressed();
+        static void addTouchStarted();
+        static void releaseTouchStarted();
         static void setTouchPosition(float x, float y);
         
     public:

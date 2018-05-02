@@ -118,15 +118,15 @@ std::string Button::getTextureDisabled(){
         return NULL;
 }
 
-void Button::engine_onPress(float x, float y){
+void Button::engine_onDown(float x, float y){
     if (isCoordInside(x, y)) {
         state = S_BUTTON_PRESSED;
         if (texturePressed) {
             setTexture(texturePressed);
         }
-        call_onPress();
+        call_onDown();
     }
-    GUIObject::engine_onPress(x, y);
+    GUIObject::engine_onDown(x, y);
 }
 
 void Button::engine_onUp(float x, float y){

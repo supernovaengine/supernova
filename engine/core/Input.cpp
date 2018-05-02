@@ -4,7 +4,7 @@ using namespace Supernova;
 
 std::map<int,bool> Input::keyPressed;
 std::map<int,bool> Input::mousePressed;
-bool Input::touchPressed;
+bool Input::touchStarted;
 
 Vector2 Input::mousePosition;
 Vector2 Input::touchPosition;
@@ -31,12 +31,12 @@ void Input::setMousePosition(float x, float y){
     mousePosition.y = y;
 }
 
-void Input::addTouchPressed(){
-    touchPressed = true;
+void Input::addTouchStarted(){
+    touchStarted = true;
 }
 
-void Input::releaseTouchPressed(){
-    touchPressed = false;
+void Input::releaseTouchStarted(){
+    touchStarted = false;
 }
 
 void Input::setTouchPosition(float x, float y){
@@ -59,7 +59,7 @@ bool Input::isMousePressed(int key){
 }
 
 bool Input::isTouch(){
-    if (touchPressed)
+    if (touchStarted)
         return true;
     
     return false;

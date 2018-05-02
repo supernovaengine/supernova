@@ -131,7 +131,7 @@ EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userD
     }
 
     if (eventType == EMSCRIPTEN_EVENT_MOUSEDOWN && e->buttons != 0){
-        Supernova::Engine::onMousePress(supernova_mouse_button(e->button), normalized_x, normalized_y);
+        Supernova::Engine::onMouseDown(supernova_mouse_button(e->button), normalized_x, normalized_y);
     }
     if (eventType == EMSCRIPTEN_EVENT_MOUSEUP){
         Supernova::Engine::onMouseUp(supernova_mouse_button(e->button), normalized_x, normalized_y);
@@ -415,7 +415,7 @@ EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *user
    if ((!strcmp(key,"Escape"))||(*key=='\e')) skey=8;
 
    if (eventType == EMSCRIPTEN_EVENT_KEYDOWN){
-       Supernova::Engine::onKeyPress(code);
+       Supernova::Engine::onKeyDown(code);
        if (skey==1) Supernova::Engine::onTextInput("\t");
        if (skey==2) Supernova::Engine::onTextInput("\b");
        if (skey==4) Supernova::Engine::onTextInput("\r");

@@ -12,10 +12,10 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1draw(JNIEnv * env, jclass cls);
 	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1pause(JNIEnv * env, jclass cls);
 	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1resume(JNIEnv * env, jclass cls);
-	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1press(JNIEnv * env, jclass cls, jfloat x, jfloat y);
-	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1up(JNIEnv * env, jclass cls, jfloat x, jfloat y);
+	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1start(JNIEnv * env, jclass cls, jfloat x, jfloat y);
+	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1end(JNIEnv * env, jclass cls, jfloat x, jfloat y);
 	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1touch_1drag(JNIEnv * env, jclass cls, jfloat x, jfloat y);
-	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1key_1press(JNIEnv * env, jclass cls, int key);
+	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1key_1down(JNIEnv * env, jclass cls, int key);
 	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1key_1up(JNIEnv * env, jclass cls, int key);
 	JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_on_1text_1input(JNIEnv * env, jclass cls, jstring text);
 }

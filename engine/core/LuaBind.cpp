@@ -242,14 +242,14 @@ void LuaBind::bind(){
     .addConstructor(LUA_ARGS())
     .addStaticFunction("onDraw", static_cast<int(*)(lua_State*)>(&Events::onDraw))
     .addStaticFunction("onUpdate", static_cast<int(*)(lua_State*)>(&Events::onUpdate))
-    .addStaticFunction("onTouchPress", static_cast<int(*)(lua_State*)>(&Events::onTouchPress))
-    .addStaticFunction("onTouchUp", static_cast<int(*)(lua_State*)>(&Events::onTouchUp))
+    .addStaticFunction("onTouchStart", static_cast<int(*)(lua_State*)>(&Events::onTouchStart))
+    .addStaticFunction("onTouchEnd", static_cast<int(*)(lua_State*)>(&Events::onTouchEnd))
     .addStaticFunction("onTouchDrag", static_cast<int(*)(lua_State*)>(&Events::onTouchDrag))
-    .addStaticFunction("onMousePress", static_cast<int(*)(lua_State*)>(&Events::onMousePress))
+    .addStaticFunction("onMouseDown", static_cast<int(*)(lua_State*)>(&Events::onMouseDown))
     .addStaticFunction("onMouseUp", static_cast<int(*)(lua_State*)>(&Events::onMouseUp))
     .addStaticFunction("onMouseDrag", static_cast<int(*)(lua_State*)>(&Events::onMouseDrag))
     .addStaticFunction("onMouseMove", static_cast<int(*)(lua_State*)>(&Events::onMouseMove))
-    .addStaticFunction("onKeyPress", static_cast<int(*)(lua_State*)>(&Events::onKeyPress))
+    .addStaticFunction("onKeyDown", static_cast<int(*)(lua_State*)>(&Events::onKeyDown))
     .addStaticFunction("onKeyUp", static_cast<int(*)(lua_State*)>(&Events::onKeyUp))
     .endClass();
     
