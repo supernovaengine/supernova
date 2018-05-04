@@ -1,6 +1,6 @@
 #include "ParticleMod.h"
 
-#include "platform/Log.h"
+#include "Log.h"
 #include "action/TimeAction.h"
 
 #include "lua.h"

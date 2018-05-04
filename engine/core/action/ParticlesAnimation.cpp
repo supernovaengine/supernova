@@ -1,6 +1,6 @@
 #include "ParticlesAnimation.h"
 #include "Particles.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 #include <stdlib.h> 
 
@@ -71,7 +71,7 @@ bool ParticlesAnimation::run(){
     if (Particles* particles = dynamic_cast<Particles*>(object)) {
         emitter = true;
     }else{
-        Log::Error(LOG_TAG, "Object in ParticlesAnimation must be a Particles type");
+        Log::Error("Object in ParticlesAnimation must be a Particles type");
         stop();
     }
     

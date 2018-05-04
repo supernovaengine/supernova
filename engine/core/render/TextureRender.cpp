@@ -2,7 +2,7 @@
 
 #include "Engine.h"
 #include "gles2/GLES2Texture.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 using namespace Supernova;
 
@@ -28,7 +28,7 @@ std::shared_ptr<TextureRender> TextureRender::sharedInstance(std::string id){
     
         if (Engine::getRenderAPI() == S_GLES2){
             texturesRender[id] = std::shared_ptr<TextureRender>(new GLES2Texture());
-            Log::Debug(LOG_TAG, "Load texture (texture map size: %lu)", texturesRender.size());
+            Log::Debug("Load texture (texture map size: %lu)", texturesRender.size());
             return texturesRender[id];
         }
     }
@@ -41,7 +41,7 @@ void TextureRender::deleteUnused(){
     TextureRender::it_type remove = findToRemove();
     while (remove != texturesRender.end()){
         texturesRender.erase(remove);
-        Log::Debug(LOG_TAG, "Delete texture (texture map size: %lu)", texturesRender.size());
+        Log::Debug("Delete texture (texture map size: %lu)", texturesRender.size());
         remove = findToRemove();
     }
     

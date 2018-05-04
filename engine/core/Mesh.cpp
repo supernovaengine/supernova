@@ -1,6 +1,6 @@
 #include "Mesh.h"
 #include "Scene.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 using namespace Supernova;
 

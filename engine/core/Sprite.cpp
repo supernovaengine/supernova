@@ -1,5 +1,5 @@
 #include "Sprite.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include "Engine.h"
 
 using namespace Supernova;

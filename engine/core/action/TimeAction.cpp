@@ -2,7 +2,7 @@
 
 #include "Engine.h"
 #include "Object.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include <math.h>
 
 #include <stdio.h>
@@ -107,7 +107,7 @@ bool TimeAction::step(){
     }
 
     value = call_Function(time);
-    //Log::Debug(LOG_TAG, "step time %f value %f \n", time, value);
+    //Log::Debug("step time %f value %f \n", time, value);
     
     return true;
 }

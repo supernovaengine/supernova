@@ -2,7 +2,7 @@
 
 #include "render/ObjectRender.h"
 #include <string>
-#include "platform/Log.h"
+#include "Log.h"
 #include "util/STBText.h"
 
 using namespace Supernova;
@@ -172,7 +172,7 @@ bool Text::load(){
             setInvertTexture(isIn3DScene());
         createText();
     }else{
-        Log::Error(LOG_TAG, "Can`t load font");
+        Log::Error("Can`t load font");
     }
     
     return Mesh2D::load();

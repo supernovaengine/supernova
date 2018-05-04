@@ -2,7 +2,7 @@
 
 #include <string>
 #include "image/TextureLoader.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include "file/FileData.h"
 #include <codecvt>
 
@@ -82,7 +82,7 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
 
     stbtt_fontinfo info;
     if (!stbtt_InitFont(&info, fontData->getMemPtr(), 0)) {
-        Log::Error(LOG_TAG, "Failed to initialize font");
+        Log::Error("Failed to initialize font");
         return false;
     }
     float scale = stbtt_ScaleForPixelHeight(&info, fontSize);
@@ -108,7 +108,7 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
         atlasData = new unsigned char[atlasWidth * atlasHeight];
 
         if (!stbtt_PackBegin(&context, atlasData, atlasWidth, atlasHeight, 0, 1, nullptr)){
-            Log::Error(LOG_TAG, "Failed to initialize font");
+            Log::Error("Failed to initialize font");
             return false;
         }
 
@@ -121,7 +121,7 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
         }
     }
     if (atlasWidth > atlasLimit){
-        Log::Error(LOG_TAG, "Failed to pack font");
+        Log::Error("Failed to pack font");
         return false;
     }
     stbtt_PackEnd(&context);

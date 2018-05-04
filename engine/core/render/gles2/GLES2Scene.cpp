@@ -5,7 +5,7 @@
 #include "GLES2Util.h"
 #include "math/Angle.h"
 #include "Engine.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 
 using namespace Supernova;
@@ -24,12 +24,12 @@ GLES2Scene::GLES2Scene(): SceneRender() {
     glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
     glGetIntegerv(GL_STENCIL_BITS, &stencilBits);
     glGetIntegerv(GL_DEPTH_BITS, &depthBits);
-    Log::Debug(LOG_TAG, "Red bits: %i", redBits);
-    Log::Debug(LOG_TAG, "Green bits: %i", greenBits);
-    Log::Debug(LOG_TAG, "Blue bits: %i", blueBits);
-    Log::Debug(LOG_TAG, "Alpha bits: %i", alphaBits);
-    Log::Debug(LOG_TAG, "Stencil bits: %i", stencilBits);
-    Log::Debug(LOG_TAG, "Depth bits: %i", depthBits);
+    Log::Debug("Red bits: %i", redBits);
+    Log::Debug("Green bits: %i", greenBits);
+    Log::Debug("Blue bits: %i", blueBits);
+    Log::Debug("Alpha bits: %i", alphaBits);
+    Log::Debug("Stencil bits: %i", stencilBits);
+    Log::Debug("Depth bits: %i", depthBits);
 */
 }
 

@@ -1,7 +1,7 @@
 #include "TextureLoader.h"
 
 #include "STBImageReader.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include <assert.h>
 
 using namespace Supernova;
@@ -26,7 +26,7 @@ TextureData* TextureLoader::loadTextureData(std::string relative_path) {
     //TODO
     /*
     if (!ifs){
-        Log::Error(LOG_TAG, "Can`t load texture file: %s", relative_path.c_str());
+        Log::Error("Can`t load texture file: %s", relative_path.c_str());
     }
     assert(ifs);
     */
@@ -34,7 +34,7 @@ TextureData* TextureLoader::loadTextureData(std::string relative_path) {
     ImageReader* imageReader = getImageFormat(filedata);
     
     if (imageReader==NULL){
-        Log::Error(LOG_TAG, "Not supported image format from: %s", relative_path.c_str());
+        Log::Error("Not supported image format from: %s", relative_path.c_str());
     }
     assert(imageReader!=NULL);
 

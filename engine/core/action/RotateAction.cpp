@@ -1,7 +1,7 @@
 #include "RotateAction.h"
 
 #include "Object.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 using namespace Supernova;
 

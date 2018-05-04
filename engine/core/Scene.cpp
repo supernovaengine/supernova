@@ -3,7 +3,7 @@
 #include "Engine.h"
 #include "DirectionalLight.h"
 
-#include "platform/Log.h"
+#include "Log.h"
 #include "GUIObject.h"
 #include <stdlib.h>
 

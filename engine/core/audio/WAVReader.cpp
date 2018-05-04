@@ -2,7 +2,7 @@
 #include "WAVReader.h"
 
 #include "AudioFile.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 #define MAKEDWORD(a,b,c,d) (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
 

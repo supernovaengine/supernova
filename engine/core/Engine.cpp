@@ -17,7 +17,7 @@
 
 #include "Events.h"
 #include "math/Rect.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include "Button.h"
 
 #include "LuaBind.h"
@@ -445,7 +445,7 @@ void Engine::onKeyUp(int inputKey){
 }
 
 void Engine::onTextInput(const char* text){
-    //Log::Verbose(LOG_TAG,"textinput %s\n", text);
+    //Log::Verbose("textinput %s\n", text);
     if (mainScene) {
         std::vector<GUIObject*>::iterator it;
         for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {

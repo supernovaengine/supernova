@@ -1,7 +1,7 @@
 #include "AlignedBox.h"
 
 #include "Plane.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 using namespace Supernova;
 

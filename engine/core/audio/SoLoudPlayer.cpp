@@ -3,7 +3,7 @@
 #include "AudioLoader.h"
 #include "soloud_thread.h"
 #include "SoundManager.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 using namespace Supernova;
 

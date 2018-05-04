@@ -3,7 +3,7 @@
 #include "GLES2Program.h"
 #include "GLES2Texture.h"
 #include "Engine.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define BUFFER_OFFSET(i) ((void*)(i))
@@ -71,7 +71,7 @@ bool GLES2Object::load(){
     if (!ObjectRender::load()){
         return false;
     }
-    //Log::Debug(LOG_TAG, "Start load");
+    //Log::Debug("Start load");
     
     attributesGL.clear();
     propertyGL.clear();
@@ -109,12 +109,12 @@ bool GLES2Object::load(){
         
         loadVertexAttribute(type, it->second);
         attributesGL[type].handle = glGetAttribLocation(glesProgram, attribName.c_str());
-        //Log::Debug(LOG_TAG, "Load attribute buffer: %s, size: %lu, handle %i", attribName.c_str(), it->second.size, attributesGL[type].handle);
+        //Log::Debug("Load attribute buffer: %s, size: %lu, handle %i", attribName.c_str(), it->second.size, attributesGL[type].handle);
     }
     
     if (indexAttribute.data){
         loadIndex(indexAttribute);
-        //Log::Debug(LOG_TAG, "Load index, size: %lu", indexAttribute.size);
+        //Log::Debug("Load index, size: %lu", indexAttribute.size);
     }
     
     if (texture) {
@@ -224,7 +224,7 @@ bool GLES2Object::load(){
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());
-        //Log::Debug(LOG_TAG, "Get property handle: %s, size: %lu, handle %i", propertyName.c_str(), it->second.size, propertyGL[type].handle);
+        //Log::Debug("Get property handle: %s, size: %lu, handle %i", propertyName.c_str(), it->second.size, propertyGL[type].handle);
     }
     
     GLES2Util::checkGlError("Error on load GLES2");
@@ -244,7 +244,7 @@ bool GLES2Object::prepareDraw(){
     if (!ObjectRender::prepareDraw()){
         return false;
     }
-    //Log::Debug(LOG_TAG, "Start prepare");
+    //Log::Debug("Start prepare");
     
     for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
     {
@@ -274,7 +274,7 @@ bool GLES2Object::prepareDraw(){
                 glUniformMatrix4fv(pb.handle, (GLsizei)it->second.size, GL_FALSE, (GLfloat*)it->second.data);
             }
         }
-        //Log::Debug(LOG_TAG, "Use property handle: %i", propertyGL[it->first].handle);
+        //Log::Debug("Use property handle: %i", propertyGL[it->first].handle);
     }
     GLES2Util::checkGlError("Error on use property on draw");
     
@@ -286,7 +286,7 @@ bool GLES2Object::prepareDraw(){
             glBindBuffer(GL_ARRAY_BUFFER, att.buffer);
             glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
         }
-        //Log::Debug(LOG_TAG, "Use attribute handle: %i", att.handle);
+        //Log::Debug("Use attribute handle: %i", att.handle);
     }
     GLES2Util::checkGlError("Error on bind attribute vertex buffer");
     
@@ -367,10 +367,10 @@ bool GLES2Object::draw(){
         return false;
     }
 
-    //Log::Debug(LOG_TAG, "Start draw");
+    //Log::Debug("Start draw");
     
     if ((!vertexAttributes.count(S_VERTEXATTRIBUTE_VERTICES)) and (indexAttribute.size == 0)){
-        Log::Error(LOG_TAG, "Cannot draw object: no vertices or indices");
+        Log::Error("Cannot draw object: no vertices or indices");
         return false;
     }
         

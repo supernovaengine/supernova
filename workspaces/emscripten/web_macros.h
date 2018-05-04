@@ -5,6 +5,4 @@
 #define SUPERNOVA_WEB
 #endif
 
-#define LOG_TAG "Supernova"
-
 #endif /* Supernova_pch */

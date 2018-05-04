@@ -1,6 +1,6 @@
 #include "Ease.h"
 
-#include "platform/Log.h"
+#include "Log.h"
 
 #include "lua.h"
 #include "lualib.h"
@@ -249,7 +249,7 @@ int Ease::setFunction(lua_State* L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         functionLua = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        Log::Error(LOG_TAG, "Lua Error: is not a function\n");
+        Log::Error("Lua Error: is not a function\n");
     }
     return 0;
 }
@@ -331,11 +331,11 @@ float Ease::call_Function(float time){
         lua_pushnumber(LuaBind::getLuaState(), time);
         int status = lua_pcall(LuaBind::getLuaState(), 1, 1, 0);
         if (status != 0){
-            Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
+            Log::Error("Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
         }
 
         if (!lua_isnumber(LuaBind::getLuaState(), -1))
-            Log::Error(LOG_TAG, "Lua Error: function in Action must return a number\n");
+            Log::Error("Lua Error: function in Action must return a number\n");
         float value = lua_tonumber(LuaBind::getLuaState(), -1);
         lua_pop(LuaBind::getLuaState(), 1);
         return value;

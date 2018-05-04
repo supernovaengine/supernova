@@ -2,7 +2,7 @@
 
 #include "SkyBox.h"
 
-#include "platform/Log.h"
+#include "Log.h"
 #include "render/ObjectRender.h"
 
 using namespace Supernova;

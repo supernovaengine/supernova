@@ -1,6 +1,6 @@
 #include "Polygon.h"
 
-#include "platform/Log.h"
+#include "Log.h"
 #include "render/ObjectRender.h"
 
 using namespace Supernova;
@@ -13,7 +13,7 @@ Polygon::~Polygon() {
 }
 
 void Polygon::setSize(int width, int height){
-    Log::Error(LOG_TAG, "Can't set size of Polygon");
+    Log::Error("Can't set size of Polygon");
 }
 
 void Polygon::setInvertTexture(bool invertTexture){

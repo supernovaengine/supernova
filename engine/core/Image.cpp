@@ -3,7 +3,7 @@
 #include "render/ObjectRender.h"
 #include <string>
 #include "image/TextureLoader.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include <math.h>
 
 using namespace Supernova;

@@ -1,6 +1,6 @@
 #include "GLES2Util.h"
 
-#include "platform/Log.h"
+#include "Log.h"
 #include <limits>
 #include <algorithm>
 
@@ -24,7 +24,7 @@ void GLES2Util::checkGlError(const char* op) {
     // Can cause slow render
     
     //for (GLint error = glGetError(); error; error = glGetError()) {
-    //    Log::Error(LOG_TAG,"after %s() glError (0x%x)\n", op, error);
+    //    Log::Error("after %s() glError (0x%x)\n", op, error);
     //}
 }
 

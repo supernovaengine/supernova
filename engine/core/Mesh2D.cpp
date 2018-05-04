@@ -2,7 +2,7 @@
 #include "Mesh2D.h"
 #include "Engine.h"
 #include "Scene.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 using namespace Supernova;
 
@@ -146,7 +146,7 @@ bool Mesh2D::draw() {
 
     }else if (clipping){
         clipping = false;
-        Log::Error(LOG_TAG, "Can not clipping object with 2D camera or textureRender scene");
+        Log::Error("Can not clipping object with 2D camera or textureRender scene");
         return Mesh::draw();
     }else{
         return Mesh::draw();

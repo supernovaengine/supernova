@@ -1,6 +1,6 @@
 #include "Model.h"
 
-#include "platform/Log.h"
+#include "Log.h"
 #include "render/ObjectRender.h"
 #include <algorithm>
 #include "tiny_obj_loader.h"
@@ -59,7 +59,7 @@ bool Model::loadOBJ(const char* path){
     bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path, (baseDir+"/").c_str());
 
     if (!err.empty()) {
-        Log::Error(LOG_TAG, "%s (%s)", err.c_str(), path);
+        Log::Error("%s (%s)", err.c_str(), path);
     }
 
     if (ret) {

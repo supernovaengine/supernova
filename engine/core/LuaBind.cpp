@@ -11,7 +11,7 @@
 #include "Engine.h"
 #include "Object.h"
 #include "ConcreteObject.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include "Scene.h"
 #include "Polygon.h"
 #include "Cube.h"
@@ -103,7 +103,7 @@ lua_State* LuaBind::getLuaState(){
 void LuaBind::luaCallback(int nargs, int nresults, int msgh){
     int status = lua_pcall(LuaBind::getLuaState(), nargs, nresults, msgh);
     if (status != 0){
-        Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
+        Log::Error("Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
     }
 }
 
@@ -842,11 +842,11 @@ void LuaBind::bind(){
     //int luaL_dofile (lua_State *L, const char *filename);
     if (luaL_loadbuffer(L,(const char*)filedata.getMemPtr(),filedata.length(), luafile.c_str()) == 0){
         if(lua_pcall(L, 0, LUA_MULTRET, 0) != 0){
-            Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(L,-1));
+            Log::Error("Lua Error: %s\n", lua_tostring(L,-1));
             lua_close(L);
         }
     }else{
-        Log::Error(LOG_TAG, "Lua Error: %s\n", lua_tostring(L,-1));
+        Log::Error("Lua Error: %s\n", lua_tostring(L,-1));
         lua_close(L);
     }
 

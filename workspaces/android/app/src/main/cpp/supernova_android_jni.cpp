@@ -1,9 +1,7 @@
 #include "supernova_android_jni.h"
 
-#include <android/log.h>
 #include <android/asset_manager_jni.h>
 
-#include "platform/Log.h"
 #include "Engine.h"
 #include "SupernovaAndroid.h"
 

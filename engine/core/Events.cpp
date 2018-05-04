@@ -1,5 +1,5 @@
 #include "Events.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include "Engine.h"
 #include "LuaBind.h"
 #include "Input.h"

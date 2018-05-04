@@ -1,6 +1,6 @@
 #include "SpriteAnimation.h"
 #include "Sprite.h"
-#include "platform/Log.h"
+#include "Log.h"
 
 using namespace Supernova;
 
@@ -78,16 +78,16 @@ bool SpriteAnimation::run(){
         bool erro = false;
 
         if (framesTime.size() == 0){
-            Log::Error(LOG_TAG, "Incorrect sprite animation: no framesTime");
+            Log::Error("Incorrect sprite animation: no framesTime");
             erro = true;
         }else if (frames.size() == 0 && startFrame == 0 && endFrame == 0){
-            Log::Error(LOG_TAG, "Incorrect sprite animation: no frames");
+            Log::Error("Incorrect sprite animation: no frames");
             erro = true;
         }else if (startFrame < 0 && startFrame >= sprite->getFramesSize()){
-            Log::Error(LOG_TAG, "Incorrect sprite animation: range of startFrame");
+            Log::Error("Incorrect sprite animation: range of startFrame");
             erro = true;
         }else if (endFrame < 0 && endFrame >= sprite->getFramesSize()){
-            Log::Error(LOG_TAG, "Incorrect sprite animation: range of endFrame");
+            Log::Error("Incorrect sprite animation: range of endFrame");
             erro = true;
         }
 
@@ -114,7 +114,7 @@ bool SpriteAnimation::run(){
 
             sprite->setFrame(frames[framesIndex]);
         }else{
-            Log::Error(LOG_TAG, "Object in SpriteAnimation must be a Sprite type");
+            Log::Error("Object in SpriteAnimation must be a Sprite type");
             stop();
         }
     }

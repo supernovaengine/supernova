@@ -2,7 +2,7 @@
 
 #include "Engine.h"
 #include "Object.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include "LuaBind.h"
 
 #include "lua.h"

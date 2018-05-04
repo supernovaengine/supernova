@@ -3,9 +3,8 @@
 
 #define SUPERNOVA_ANDROID
 
-#define LOG_TAG "Supernova"
-
 /*
+#define LOG_TAG "Supernova"
 #define printf(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define fprintf(stdout, ...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define perror(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)

@@ -2,7 +2,7 @@
 #include "AudioLoader.h"
 
 #include <assert.h>
-#include "platform/Log.h"
+#include "Log.h"
 
 #include "WAVReader.h"
 #include "MP3Reader.h"
@@ -27,7 +27,7 @@ AudioFile* AudioLoader::loadAudio(const char* relative_path){
     filedata->open(relative_path);
     /*
     if (!fp) {
-        Log::Error(LOG_TAG, "Can`t load audio file: %s", relative_path);
+        Log::Error("Can`t load audio file: %s", relative_path);
     }
     assert(fp);
     */
@@ -35,7 +35,7 @@ AudioFile* AudioLoader::loadAudio(const char* relative_path){
     AudioReader* audioReader = getAudioFormat(filedata);
 
     if (audioReader==NULL){
-        Log::Error(LOG_TAG, "Not supported audio format from: %s", relative_path);
+        Log::Error("Not supported audio format from: %s", relative_path);
     }
     assert(audioReader!=NULL);
 

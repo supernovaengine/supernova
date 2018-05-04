@@ -1,7 +1,7 @@
 #include "GLES2Texture.h"
 #include "Engine.h"
 #include "Scene.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include "GLES2Util.h"
 
 using namespace Supernova;
@@ -144,7 +144,7 @@ bool GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, depthTexture, 0);
     }else{
         if(!strstr(extensions, "depth_texture")){
-            Log::Error(LOG_TAG,"This device has no support to depth_texture");
+            Log::Error("This device has no support to depth_texture");
             return false;
         }else{
             glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, 0);
@@ -153,7 +153,7 @@ bool GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
     }
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-        Log::Error(LOG_TAG,"Error on creating framebuffer");
+        Log::Error("Error on creating framebuffer");
         return false;
     }else{
         
@@ -206,7 +206,7 @@ bool GLES2Texture::loadTextureFrameCube(int width, int height){
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer);
     
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-        Log::Error(LOG_TAG,"Error on creating cube framebuffer");
+        Log::Error("Error on creating cube framebuffer");
         return false;
     }else{
         

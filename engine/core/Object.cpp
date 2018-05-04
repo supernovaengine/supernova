@@ -1,5 +1,5 @@
 #include "Object.h"
-#include "platform/Log.h"
+#include "Log.h"
 #include "GUIObject.h"
 #include "Light.h"
 #include "Scene.h"
@@ -98,7 +98,7 @@ void Object::addObject(Object* obj){
 
         obj->updateMatrix();
     }else{
-        Log::Error(LOG_TAG, "Object has a parent already");
+        Log::Error("Object has a parent already");
     }
     
 }
@@ -324,7 +324,7 @@ void Object::addAction(Action* action){
             actions.push_back(action);
             action->object = this;
         }else{
-            Log::Error(LOG_TAG, "This action is attached to other object");
+            Log::Error("This action is attached to other object");
         }
     }
 }
@@ -335,7 +335,7 @@ void Object::removeAction(Action* action){
         actions.erase(i,actions.end());
         action->object = NULL;
     }else{
-        Log::Error(LOG_TAG, "This action is attached to other object");
+        Log::Error("This action is attached to other object");
     }
 }
 

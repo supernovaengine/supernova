@@ -1,6 +1,6 @@
 #include "Particles.h"
 
-#include "platform/Log.h"
+#include "Log.h"
 #include "math/Angle.h"
 
 using namespace Supernova;
@@ -25,15 +25,15 @@ Particles::~Particles(){
 }
 
 void Particles::addPoint(){
-    Log::Error(LOG_TAG, "Can't add point in Particles type, use addParticle() instead");
+    Log::Error("Can't add point in Particles type, use addParticle() instead");
 }
 
 void Particles::addPoint(Vector3 position){
-    Log::Error(LOG_TAG, "Can't add point in Particles type, use addParticle() instead");
+    Log::Error("Can't add point in Particles type, use addParticle() instead");
 }
 
 void Particles::clearPoints(){
-    Log::Error(LOG_TAG, "Can't clear point in Particles type, use clearParticles() instead");
+    Log::Error("Can't clear point in Particles type, use clearParticles() instead");
 }
 
 void Particles::addParticle(){

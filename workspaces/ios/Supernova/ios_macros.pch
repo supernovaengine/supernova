@@ -3,7 +3,4 @@
 
 #define SUPERNOVA_IOS
 
-#define LOG_TAG "Supernova"
-
-
 #endif /* Supernova_pch */
