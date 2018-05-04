@@ -240,14 +240,14 @@ void Engine::onStart(int width, int height){
     auto now = std::chrono::steady_clock::now();
     lastTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     
-}
-
-void Engine::onSurfaceCreated(){
-    
     LuaBind::createLuaState();
     LuaBind::bind();
     
     init();
+    
+}
+
+void Engine::onSurfaceCreated(){
 
     if (Engine::getScene() != NULL){
         (Engine::getScene())->load();
