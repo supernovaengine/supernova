@@ -29,15 +29,15 @@ AAssetManager* SupernovaAndroid::android_asset_manager;
 
 
 
-void SupernovaAndroid::showSoftKeyboard(){
+void SupernovaAndroid::showVirtualKeyboard(){
     envRef->CallVoidMethod(mainActivityObjRef, showSoftKeyboardRef);
 }
 
-void SupernovaAndroid::hideSoftKeyboard(){
+void SupernovaAndroid::hideVirtualKeyboard(){
     envRef->CallVoidMethod(mainActivityObjRef, hideSoftKeyboardRef);
 }
 
-FILE* SupernovaAndroid::androidFopen(const char* fname, const char* mode) {
+FILE* SupernovaAndroid::platformFopen(const char* fname, const char* mode) {
     if(mode[0] == 'w') return NULL;
 
     AAsset* asset = AAssetManager_open(android_asset_manager, fname, 0);

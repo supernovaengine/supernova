@@ -1,6 +1,6 @@
 #include "FileHandle.h"
 
-#include "platform/FileUtilsPlatform.h"
+#include "platform/SystemPlatform.h"
 
 using namespace Supernova;
 
@@ -48,7 +48,7 @@ FILE *FileHandle::getFilePtr() {
 unsigned int FileHandle::open(const char *aFilename){
     if (!aFilename)
         return 1;
-    fileHandle = FileUtilsPlatform::instance().platformFopen(aFilename, "rb");
+    fileHandle = SystemPlatform::instance().platformFopen(aFilename, "rb");
     if (!fileHandle)
         return 2;
     return 0;

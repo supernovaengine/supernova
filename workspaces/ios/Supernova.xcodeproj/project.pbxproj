@@ -13,6 +13,7 @@
 		712379231EC13CDA00BFD1F7 /* libstb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 712379111EC13C6000BFD1F7 /* libstb.a */; };
 		71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71369C081E291E22006AE1D1 /* Button.cpp */; };
 		713D30C51CFB306D00A4752F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* assets */; };
+		714C6CF7209BEC0B0002F031 /* SystemPlatform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */; };
 		714C890B1EDE129A0028DCE0 /* stb_rect_pack.c in Sources */ = {isa = PBXBuildFile; fileRef = 71E34E251ED217CD0005DEF2 /* stb_rect_pack.c */; };
 		714C890F1EDE12AF0028DCE0 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = 714C890C1EDE12AA0028DCE0 /* stb_image.c */; };
 		714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89101EDE12F20028DCE0 /* STBImageReader.cpp */; };
@@ -144,7 +145,6 @@
 		71C39E57204188BC00863AB6 /* ParticleSizeMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E1B204188A500863AB6 /* ParticleSizeMod.cpp */; };
 		71C39E58204188BC00863AB6 /* ParticleSpriteMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E1D204188A500863AB6 /* ParticleSpriteMod.cpp */; };
 		71C39E59204188BC00863AB6 /* ParticleVelocityMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E1F204188A500863AB6 /* ParticleVelocityMod.cpp */; };
-		71C576441EE2F111002F537B /* FileUtilsIOS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C576421EE2F111002F537B /* FileUtilsIOS.cpp */; };
 		71C5764A1EE45167002F537B /* Events.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C576481EE45167002F537B /* Events.cpp */; };
 		71CDC6FD1D7B132B0060EEFF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */; };
 		71CDC6FF1D7B13350060EEFF /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */; };
@@ -186,8 +186,6 @@
 		71CE95011EC8A3C8008CCF3C /* OGGReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE94E41EC8A35E008CCF3C /* OGGReader.cpp */; };
 		71CE95021EC8A3C8008CCF3C /* SoLoudPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE94E61EC8A35E008CCF3C /* SoLoudPlayer.cpp */; };
 		71CE95031EC8A3C8008CCF3C /* SoLoudSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE94E81EC8A35E008CCF3C /* SoLoudSource.cpp */; };
-		71CE950C1EC8A435008CCF3C /* FileUtilsPlatform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE95041EC8A430008CCF3C /* FileUtilsPlatform.cpp */; };
-		71CE950D1EC8A43C008CCF3C /* FileUtilsGeneric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE95071EC8A430008CCF3C /* FileUtilsGeneric.cpp */; };
 		71CE95111ECA6048008CCF3C /* stb_truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 71CE950E1ECA6043008CCF3C /* stb_truetype.c */; };
 		71D6EFD21F40A00E00241F0C /* SpriteAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFD01F40A00E00241F0C /* SpriteAnimation.cpp */; };
 		71D6EFE81F53551F00241F0C /* TimeAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFE61F53551F00241F0C /* TimeAction.cpp */; };
@@ -463,6 +461,8 @@
 		713D2D6E1CFB2EFA00A4752F /* LuaState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaState.h; sourceTree = "<group>"; };
 		713D2D6F1CFB2EFA00A4752F /* QtLuaIntf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QtLuaIntf.h; sourceTree = "<group>"; };
 		713D30C41CFB306D00A4752F /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../project/assets; sourceTree = "<group>"; };
+		714C6CF5209BEC0A0002F031 /* SystemPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemPlatform.h; sourceTree = "<group>"; };
+		714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SystemPlatform.cpp; sourceTree = "<group>"; };
 		714C89041ED7711A0028DCE0 /* Rect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rect.h; sourceTree = "<group>"; };
 		714C89051ED7711A0028DCE0 /* Rect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rect.cpp; sourceTree = "<group>"; };
 		714C890C1EDE12AA0028DCE0 /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image.c; sourceTree = "<group>"; };
@@ -668,8 +668,6 @@
 		71C39E33204188A500863AB6 /* ParticleSpriteInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleSpriteInit.h; sourceTree = "<group>"; };
 		71C39E34204188A500863AB6 /* ParticleVelocityInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleVelocityInit.cpp; sourceTree = "<group>"; };
 		71C39E35204188A500863AB6 /* ParticleVelocityInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleVelocityInit.h; sourceTree = "<group>"; };
-		71C576421EE2F111002F537B /* FileUtilsIOS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileUtilsIOS.cpp; sourceTree = "<group>"; };
-		71C576431EE2F111002F537B /* FileUtilsIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUtilsIOS.h; sourceTree = "<group>"; };
 		71C576481EE45167002F537B /* Events.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Events.cpp; sourceTree = "<group>"; };
 		71C576491EE45167002F537B /* Events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Events.h; sourceTree = "<group>"; };
 		71CDC6FA1D7B13240060EEFF /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -689,10 +687,6 @@
 		71CE94F11EC8A38E008CCF3C /* FileData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileData.h; sourceTree = "<group>"; };
 		71CE94F21EC8A38E008CCF3C /* FileHandle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileHandle.cpp; sourceTree = "<group>"; };
 		71CE94F31EC8A38E008CCF3C /* FileHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileHandle.h; sourceTree = "<group>"; };
-		71CE95041EC8A430008CCF3C /* FileUtilsPlatform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileUtilsPlatform.cpp; sourceTree = "<group>"; };
-		71CE95051EC8A430008CCF3C /* FileUtilsPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUtilsPlatform.h; sourceTree = "<group>"; };
-		71CE95071EC8A430008CCF3C /* FileUtilsGeneric.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileUtilsGeneric.cpp; sourceTree = "<group>"; };
-		71CE95081EC8A430008CCF3C /* FileUtilsGeneric.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUtilsGeneric.h; sourceTree = "<group>"; };
 		71CE950E1ECA6043008CCF3C /* stb_truetype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_truetype.c; sourceTree = "<group>"; };
 		71CE950F1ECA6043008CCF3C /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
 		71D6EFD01F40A00E00241F0C /* SpriteAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteAnimation.cpp; sourceTree = "<group>"; };
@@ -1003,12 +997,10 @@
 		713D2A421CFB2EAD00A4752F /* platform */ = {
 			isa = PBXGroup;
 			children = (
-				71CE95041EC8A430008CCF3C /* FileUtilsPlatform.cpp */,
-				71CE95051EC8A430008CCF3C /* FileUtilsPlatform.h */,
-				71CE95061EC8A430008CCF3C /* generic */,
-				71CE95091EC8A430008CCF3C /* ios */,
 				713D2A431CFB2EAD00A4752F /* Log.cpp */,
 				713D2A441CFB2EAD00A4752F /* Log.h */,
+				714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */,
+				714C6CF5209BEC0A0002F031 /* SystemPlatform.h */,
 			);
 			path = platform;
 			sourceTree = "<group>";
@@ -1454,24 +1446,6 @@
 			path = file;
 			sourceTree = "<group>";
 		};
-		71CE95061EC8A430008CCF3C /* generic */ = {
-			isa = PBXGroup;
-			children = (
-				71CE95071EC8A430008CCF3C /* FileUtilsGeneric.cpp */,
-				71CE95081EC8A430008CCF3C /* FileUtilsGeneric.h */,
-			);
-			path = generic;
-			sourceTree = "<group>";
-		};
-		71CE95091EC8A430008CCF3C /* ios */ = {
-			isa = PBXGroup;
-			children = (
-				71C576421EE2F111002F537B /* FileUtilsIOS.cpp */,
-				71C576431EE2F111002F537B /* FileUtilsIOS.h */,
-			);
-			path = ios;
-			sourceTree = "<group>";
-		};
 		71F59B4D1EBFCA5300F49392 /* soloud */ = {
 			isa = PBXGroup;
 			children = (
@@ -1913,19 +1887,18 @@
 				7188F1B91DBD4BAC00A2D04F /* AudioLoader.cpp in Sources */,
 				71CDC72D1D7B14860060EEFF /* GLES2Scene.cpp in Sources */,
 				71C39E48204188B000863AB6 /* ParticleAccelerationInit.cpp in Sources */,
+				714C6CF7209BEC0B0002F031 /* SystemPlatform.cpp in Sources */,
 				71CDC7161D7B14510060EEFF /* Object.cpp in Sources */,
 				71C39E49204188B000863AB6 /* ParticleAlphaInit.cpp in Sources */,
 				71C39E53204188BC00863AB6 /* ParticleColorMod.cpp in Sources */,
 				719C08A41F16C7D000F0BAF0 /* ObjectRender.cpp in Sources */,
 				7188F1BC1DBD960000A2D04F /* WAVReader.cpp in Sources */,
-				71CE950D1EC8A43C008CCF3C /* FileUtilsGeneric.cpp in Sources */,
 				71C2773C202BCE6C005B3EDC /* AlignedBox.cpp in Sources */,
 				71CDC70E1D7B14510060EEFF /* Cube.cpp in Sources */,
 				71CDC7301D7B14860060EEFF /* GLES2Util.cpp in Sources */,
 				71CDC70D1D7B14510060EEFF /* Camera.cpp in Sources */,
 				7188F1B61DBD4A3400A2D04F /* AudioReader.cpp in Sources */,
 				714C89171F0EDF370028DCE0 /* TextureRender.cpp in Sources */,
-				71CE950C1EC8A435008CCF3C /* FileUtilsPlatform.cpp in Sources */,
 				715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */,
 				71C5764A1EE45167002F537B /* Events.cpp in Sources */,
 				714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */,
@@ -1954,7 +1927,6 @@
 				71CDC7131D7B14510060EEFF /* LuaBind.cpp in Sources */,
 				716F76171E1186CB00FF9888 /* Image.cpp in Sources */,
 				71EC38B41EB82871008654E8 /* Particles.cpp in Sources */,
-				71C576441EE2F111002F537B /* FileUtilsIOS.cpp in Sources */,
 				71CDC7281D7B146D0060EEFF /* Vector4.cpp in Sources */,
 				7188F1A11D9B282300A2D04F /* GLES2Program.cpp in Sources */,
 				716F761A1E1293B800FF9888 /* GUIObject.cpp in Sources */,

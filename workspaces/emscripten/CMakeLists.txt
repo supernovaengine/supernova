@@ -8,6 +8,8 @@ set(COMPILE_ZLIB OFF)
 
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
 
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}")
+
 add_subdirectory (../.. ${PROJECT_BINARY_DIR}/supernova)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core")
@@ -24,28 +26,22 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core/util")
 
 file(GLOB_RECURSE SUPERNOVA_PROJECT_SRCS ../../project/*.cpp)
 
-add_library(
-    supernova
-    main.cpp
-)
-
-target_link_libraries(
-    supernova
-    supernova-core
-)
-
 add_executable(
-    supernova-project
+    supernova
+
+    main.cpp
+    SupernovaWeb.cpp
+
     ${SUPERNOVA_PROJECT_SRCS}
 )
 
 set_target_properties(
-    supernova-project
+    supernova
     PROPERTIES LINK_FLAGS
     "-g4 -s ALLOW_MEMORY_GROWTH=1 --embed-file ../../../project/assets@/ -o supernova-project.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_updateScreenSize','_main']\""
 )
 
 target_link_libraries(
-    supernova-project
     supernova
+    supernova-core
 )

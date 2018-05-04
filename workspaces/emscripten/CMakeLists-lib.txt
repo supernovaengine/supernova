@@ -10,8 +10,11 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core")
 
 add_library(
     supernova
+
     SHARED
+    
     main.cpp
+    SupernovaWeb.cpp
 )
 
 target_link_libraries(

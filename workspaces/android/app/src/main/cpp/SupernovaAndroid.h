@@ -4,8 +4,9 @@
 #include <jni.h>
 #include <android/asset_manager.h>
 #include <stdio.h>
+#include "platform/SystemPlatform.h"
 
-class SupernovaAndroid {
+class SupernovaAndroid: public Supernova::SystemPlatform {
 
 public:
 
@@ -17,9 +18,9 @@ public:
 
 	static AAssetManager* android_asset_manager;
 
-	static void showSoftKeyboard();
-	static void hideSoftKeyboard();
-    static FILE* androidFopen(const char* fname, const char* mode);
+	virtual void showVirtualKeyboard();
+	virtual void hideVirtualKeyboard();
+    virtual FILE* platformFopen(const char* fname, const char* mode);
 };
 
 #endif /* SupernovaAndroid_H_ */

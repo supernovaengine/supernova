@@ -2,9 +2,7 @@
 
 #include <locale>
 #include <codecvt>
-
-//#include "SupernovaAndroid.h"
-//#include "SupernovaIOS.h"
+#include "platform/SystemPlatform.h"
 
 using namespace Supernova;
 
@@ -52,8 +50,7 @@ Text* TextEdit::getTextObject(){
 }
 
 void TextEdit::engine_onDown(float x, float y){
-    //SupernovaAndroid::showSoftKeyboard();
-    //SupernovaIOS::showSoftKeyboard();
+    SystemPlatform::instance().showVirtualKeyboard();
     GUIObject::engine_onDown(x, y);
 }
 
@@ -74,8 +71,7 @@ void TextEdit::engine_onTextInput(std::string text){
             newText = convert.to_bytes(utf16OldText.substr(0, utf16OldText.size()-1));
             setText(newText);
         }else if (utf16Text[i] == '\n') {
-            //SupernovaAndroid::hideSoftKeyboard();
-            //SupernovaIOS::hideSoftKeyboard();
+            SystemPlatform::instance().hideVirtualKeyboard();
         }else{
             newText = getText() + convert.to_bytes(utf16Text[i]);
             setText(newText);
