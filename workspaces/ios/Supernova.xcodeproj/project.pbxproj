@@ -14,6 +14,7 @@
 		71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71369C081E291E22006AE1D1 /* Button.cpp */; };
 		713D30C51CFB306D00A4752F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* assets */; };
 		714C6CF7209BEC0B0002F031 /* SystemPlatform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */; };
+		714C6CFA209DF09E0002F031 /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CF8209DF09D0002F031 /* Log.cpp */; };
 		714C890B1EDE129A0028DCE0 /* stb_rect_pack.c in Sources */ = {isa = PBXBuildFile; fileRef = 71E34E251ED217CD0005DEF2 /* stb_rect_pack.c */; };
 		714C890F1EDE12AF0028DCE0 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = 714C890C1EDE12AA0028DCE0 /* stb_image.c */; };
 		714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89101EDE12F20028DCE0 /* STBImageReader.cpp */; };
@@ -172,7 +173,6 @@
 		71CDC7261D7B146D0060EEFF /* Vector2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A331CFB2EAD00A4752F /* Vector2.cpp */; };
 		71CDC7271D7B146D0060EEFF /* Vector3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A361CFB2EAD00A4752F /* Vector3.cpp */; };
 		71CDC7281D7B146D0060EEFF /* Vector4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A391CFB2EAD00A4752F /* Vector4.cpp */; };
-		71CDC7291D7B14720060EEFF /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A431CFB2EAD00A4752F /* Log.cpp */; };
 		71CDC72D1D7B14860060EEFF /* GLES2Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */; };
 		71CDC72F1D7B14860060EEFF /* GLES2Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A571CFB2EAD00A4752F /* GLES2Texture.cpp */; };
 		71CDC7301D7B14860060EEFF /* GLES2Util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A5A1CFB2EAD00A4752F /* GLES2Util.cpp */; };
@@ -372,8 +372,6 @@
 		713D2A3D1CFB2EAD00A4752F /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
 		713D2A3F1CFB2EAD00A4752F /* PlaneTerrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaneTerrain.cpp; sourceTree = "<group>"; };
 		713D2A401CFB2EAD00A4752F /* PlaneTerrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaneTerrain.h; sourceTree = "<group>"; };
-		713D2A431CFB2EAD00A4752F /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
-		713D2A441CFB2EAD00A4752F /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		713D2A4C1CFB2EAD00A4752F /* GLES2Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Header.h; sourceTree = "<group>"; };
 		713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Scene.cpp; sourceTree = "<group>"; };
 		713D2A511CFB2EAD00A4752F /* GLES2Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Scene.h; sourceTree = "<group>"; };
@@ -463,6 +461,8 @@
 		713D30C41CFB306D00A4752F /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../project/assets; sourceTree = "<group>"; };
 		714C6CF5209BEC0A0002F031 /* SystemPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemPlatform.h; sourceTree = "<group>"; };
 		714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SystemPlatform.cpp; sourceTree = "<group>"; };
+		714C6CF8209DF09D0002F031 /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
+		714C6CF9209DF09E0002F031 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		714C89041ED7711A0028DCE0 /* Rect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rect.h; sourceTree = "<group>"; };
 		714C89051ED7711A0028DCE0 /* Rect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rect.cpp; sourceTree = "<group>"; };
 		714C890C1EDE12AA0028DCE0 /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image.c; sourceTree = "<group>"; };
@@ -897,6 +897,8 @@
 				714C89141F01BCB30028DCE0 /* Input.h */,
 				71E1D2291D27358B001209C8 /* Light.cpp */,
 				71E1D22A1D27358B001209C8 /* Light.h */,
+				714C6CF8209DF09D0002F031 /* Log.cpp */,
+				714C6CF9209DF09E0002F031 /* Log.h */,
 				713D2A231CFB2EAD00A4752F /* LuaBind.cpp */,
 				713D2A241CFB2EAD00A4752F /* LuaBind.h */,
 				719301231E51212800BEE527 /* Material.cpp */,
@@ -997,8 +999,6 @@
 		713D2A421CFB2EAD00A4752F /* platform */ = {
 			isa = PBXGroup;
 			children = (
-				713D2A431CFB2EAD00A4752F /* Log.cpp */,
-				713D2A441CFB2EAD00A4752F /* Log.h */,
 				714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */,
 				714C6CF5209BEC0A0002F031 /* SystemPlatform.h */,
 			);
@@ -1867,7 +1867,6 @@
 				71C39E4E204188B000863AB6 /* ParticleRotationInit.cpp in Sources */,
 				71CDC7241D7B146D0060EEFF /* Quaternion.cpp in Sources */,
 				71CDC71C1D7B14510060EEFF /* Submesh.cpp in Sources */,
-				71CDC7291D7B14720060EEFF /* Log.cpp in Sources */,
 				71C39E54204188BC00863AB6 /* ParticleMod.cpp in Sources */,
 				71FA3F651F5E2FEE0015BEFE /* Plane.cpp in Sources */,
 				71D6EFE81F53551F00241F0C /* TimeAction.cpp in Sources */,
@@ -1899,6 +1898,7 @@
 				71CDC70D1D7B14510060EEFF /* Camera.cpp in Sources */,
 				7188F1B61DBD4A3400A2D04F /* AudioReader.cpp in Sources */,
 				714C89171F0EDF370028DCE0 /* TextureRender.cpp in Sources */,
+				714C6CFA209DF09E0002F031 /* Log.cpp in Sources */,
 				715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */,
 				71C5764A1EE45167002F537B /* Events.cpp in Sources */,
 				714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */,
