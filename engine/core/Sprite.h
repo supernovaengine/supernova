@@ -10,12 +10,12 @@ namespace Supernova {
 
     protected:
 
-        struct framesData{
+        struct frameData{
             std::string id;
             Rect rect;
         };
         
-        std::vector<framesData> framesRect;
+        std::vector<frameData> framesRect;
         SpriteAnimation* defaultAnimation;
 
     public:

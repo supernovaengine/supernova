@@ -7,23 +7,27 @@ namespace Supernova{
     class TileMap: public Mesh2D {
     protected:
         
-        struct tilesRectData{
+        struct tileRectData{
             std::string id;
             Rect rect;
         };
         
-        struct tilesData{
+        struct tileData{
             std::string id;
             int rectId;
             Vector2 position;
             float width;
             float height;
         };
+
+        float texWidth;
+        float texHeight;
         
-        std::vector<tilesRectData> tilesRect;
-        std::vector<tilesData> tiles;
+        std::vector<tileRectData> tilesRect;
+        std::vector<tileData> tiles;
         
         void createTiles();
+        Rect normalizeTileRect(Rect tileRect);
         
     public:
         TileMap();
@@ -40,8 +44,12 @@ namespace Supernova{
         
         void addTile(std::string id, int rectId, Vector2 position, float width, float height);
         void addTile(int rectId, Vector2 position, float width, float height);
+        void addTile(std::string id, std::string rectString, Vector2 position, float width, float height);
+        void addTile(std::string rectString, Vector2 position, float width, float height);
         void removeTile(int index);
         void removeTile(std::string id);
+
+        virtual bool load();
         
     };
 }

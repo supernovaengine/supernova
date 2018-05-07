@@ -9,14 +9,13 @@ namespace Supernova {
     class Image: public Mesh2D {
         
     private:
-        int texWidth;
-        int texHeight;
-        
         bool useTextureRect;
-        
         Rect textureRect;
 
     protected:
+        int texWidth;
+        int texHeight;
+
         void createVertices();
         void normalizeTextureRect();
 
