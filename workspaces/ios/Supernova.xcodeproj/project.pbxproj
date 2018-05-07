@@ -15,6 +15,7 @@
 		713D30C51CFB306D00A4752F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* assets */; };
 		714C6CF7209BEC0B0002F031 /* SystemPlatform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */; };
 		714C6CFA209DF09E0002F031 /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CF8209DF09D0002F031 /* Log.cpp */; };
+		714C6CFD209FCC1A0002F031 /* TileMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CFB209FCC1A0002F031 /* TileMap.cpp */; };
 		714C890B1EDE129A0028DCE0 /* stb_rect_pack.c in Sources */ = {isa = PBXBuildFile; fileRef = 71E34E251ED217CD0005DEF2 /* stb_rect_pack.c */; };
 		714C890F1EDE12AF0028DCE0 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = 714C890C1EDE12AA0028DCE0 /* stb_image.c */; };
 		714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89101EDE12F20028DCE0 /* STBImageReader.cpp */; };
@@ -463,6 +464,8 @@
 		714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SystemPlatform.cpp; sourceTree = "<group>"; };
 		714C6CF8209DF09D0002F031 /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
 		714C6CF9209DF09E0002F031 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
+		714C6CFB209FCC1A0002F031 /* TileMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TileMap.cpp; sourceTree = "<group>"; };
+		714C6CFC209FCC1A0002F031 /* TileMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TileMap.h; sourceTree = "<group>"; };
 		714C89041ED7711A0028DCE0 /* Rect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rect.h; sourceTree = "<group>"; };
 		714C89051ED7711A0028DCE0 /* Rect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rect.cpp; sourceTree = "<group>"; };
 		714C890C1EDE12AA0028DCE0 /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image.c; sourceTree = "<group>"; };
@@ -946,6 +949,8 @@
 				716CFDF120900FFA00A85CA1 /* TextEdit.h */,
 				719C08991F0DCFC300F0BAF0 /* Texture.cpp */,
 				719C089A1F0DCFC400F0BAF0 /* Texture.h */,
+				714C6CFB209FCC1A0002F031 /* TileMap.cpp */,
+				714C6CFC209FCC1A0002F031 /* TileMap.h */,
 				71C27724202BC405005B3EDC /* util */,
 			);
 			name = core;
@@ -1914,6 +1919,7 @@
 				71CE94F91EC8A3B2008CCF3C /* FileHandle.cpp in Sources */,
 				71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */,
 				719C08A81F16C82C00F0BAF0 /* GLES2Object.cpp in Sources */,
+				714C6CFD209FCC1A0002F031 /* TileMap.cpp in Sources */,
 				71C39E4F204188B000863AB6 /* ParticleSizeInit.cpp in Sources */,
 				71CDC7171D7B14510060EEFF /* PlaneTerrain.cpp in Sources */,
 				71C39E4B204188B000863AB6 /* ParticleInit.cpp in Sources */,
