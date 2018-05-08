@@ -18,7 +18,6 @@
  include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
 
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp")
-  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/libs/box2d/Box2D")
 
  add_subdirectory (../../.. ${PROJECT_BINARY_DIR}/supernova)
 
