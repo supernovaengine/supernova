@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7105A9E720A258130028DCC7 /* PhysicsWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A9E320A258120028DCC7 /* PhysicsWorld.cpp */; };
+		7105A9E820A258130028DCC7 /* PhysicsWorld2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */; };
 		7108B9211F00A0DE005B7783 /* synth_8bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28381DE8EA1500C12A1D /* synth_8bit.c */; };
 		71192EFD1CE1334000BD76EE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
 		712379201EC13C7E00BFD1F7 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */; };
@@ -388,6 +390,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7105A9E320A258120028DCC7 /* PhysicsWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PhysicsWorld.cpp; sourceTree = "<group>"; };
+		7105A9E420A258120028DCC7 /* PhysicsWorld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhysicsWorld.h; sourceTree = "<group>"; };
+		7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PhysicsWorld2D.cpp; sourceTree = "<group>"; };
+		7105A9E620A258120028DCC7 /* PhysicsWorld2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhysicsWorld2D.h; sourceTree = "<group>"; };
 		71192EFB1CE1334000BD76EE /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		712379111EC13C6000BFD1F7 /* libstb.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libstb.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_vorbis.c; sourceTree = "<group>"; };
@@ -997,6 +1003,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7105A9E220A258120028DCC7 /* physics */ = {
+			isa = PBXGroup;
+			children = (
+				7105A9E320A258120028DCC7 /* PhysicsWorld.cpp */,
+				7105A9E420A258120028DCC7 /* PhysicsWorld.h */,
+				7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */,
+				7105A9E620A258120028DCC7 /* PhysicsWorld2D.h */,
+			);
+			path = physics;
+			sourceTree = "<group>";
+		};
 		71192EFA1CE1334000BD76EE /* project */ = {
 			isa = PBXGroup;
 			children = (
@@ -1080,6 +1097,7 @@
 				713D2A3D1CFB2EAD00A4752F /* Object.h */,
 				71EC38B21EB82871008654E8 /* Particles.cpp */,
 				71EC38B31EB82871008654E8 /* Particles.h */,
+				7105A9E220A258120028DCC7 /* physics */,
 				713D2A3F1CFB2EAD00A4752F /* PlaneTerrain.cpp */,
 				713D2A401CFB2EAD00A4752F /* PlaneTerrain.h */,
 				713D2A421CFB2EAD00A4752F /* platform */,
@@ -2362,7 +2380,9 @@
 				71C27730202BCE0F005B3EDC /* STBText.cpp in Sources */,
 				714D81E91E70C2E40038BE50 /* SceneRender.cpp in Sources */,
 				716E89AF1E22748800B03DD5 /* GUIImage.cpp in Sources */,
+				7105A9E720A258130028DCC7 /* PhysicsWorld.cpp in Sources */,
 				71C39E59204188BC00863AB6 /* ParticleVelocityMod.cpp in Sources */,
+				7105A9E820A258130028DCC7 /* PhysicsWorld2D.cpp in Sources */,
 				71C39E4D204188B000863AB6 /* ParticlePositionInit.cpp in Sources */,
 				71C39E57204188BC00863AB6 /* ParticleSizeMod.cpp in Sources */,
 				71BCF6C31E476F49008E42A2 /* SkyBox.cpp in Sources */,
