@@ -62,7 +62,7 @@ void Scene::addLight (Light* light){
 
 void Scene::removeLight (Light* light){
     std::vector<Light*>::iterator i = std::remove(lights.begin(), lights.end(), light);
-    lights.erase(i,lights.end());
+    lights.erase(i, lights.end());
 }
 
 void Scene::addSubScene (Scene* scene){
@@ -81,7 +81,7 @@ void Scene::addSubScene (Scene* scene){
 
 void Scene::removeSubScene (Scene* scene){
     std::vector<Scene*>::iterator i = std::remove(subScenes.begin(), subScenes.end(), scene);
-    subScenes.erase(i,subScenes.end());
+    subScenes.erase(i, subScenes.end());
 }
 
 void Scene::addGUIObject (GUIObject* guiobject){
@@ -100,7 +100,26 @@ void Scene::addGUIObject (GUIObject* guiobject){
 
 void Scene::removeGUIObject (GUIObject* guiobject){
     std::vector<GUIObject*>::iterator i = std::remove(guiObjects.begin(), guiObjects.end(), guiobject);
-    guiObjects.erase(i,guiObjects.end());
+    guiObjects.erase(i, guiObjects.end());
+}
+
+void Scene::addPhysics (PhysicsWorld* physics){
+    bool founded = false;
+
+    std::vector<PhysicsWorld*>::iterator it;
+    for (it = physicsWorlds.begin(); it != physicsWorlds.end(); ++it) {
+        if (physics == (*it))
+            founded = true;
+    }
+
+    if (!founded){
+        physicsWorlds.push_back(physics);
+    }
+}
+
+void Scene::removePhysics (PhysicsWorld* physics){
+    std::vector<PhysicsWorld*>::iterator i = std::remove(physicsWorlds.begin(), physicsWorlds.end(), physics);
+    physicsWorlds.erase(i, physicsWorlds.end());
 }
 
 SceneRender* Scene::getSceneRender(){
@@ -371,6 +390,10 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
 
 bool Scene::draw() {
     //TODO: alert if not loaded
+
+    for (int p=0; p<physicsWorlds.size(); p++) {
+        physicsWorlds[p]->step(Engine::getDeltatime() / 1000.0f);
+    }
     
     Camera* originalCamera = this->camera;
     Texture* originalTextureRender = this->textureRender;

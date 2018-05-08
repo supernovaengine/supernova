@@ -17,6 +17,7 @@
 #include "GUIObject.h"
 #include "util/LightData.h"
 #include "math/Matrix4.h"
+#include "physics/PhysicsWorld.h"
 
 namespace Supernova {
 
@@ -49,6 +50,7 @@ namespace Supernova {
         std::vector<Light*> lights;
         std::vector<Scene*> subScenes;
         std::vector<GUIObject*> guiObjects;
+        std::vector<PhysicsWorld*> physicsWorlds;
         SkyBox* sky;
         Fog* fog;
         
@@ -94,6 +96,9 @@ namespace Supernova {
 
         void setAmbientLight(Vector3 ambientLight);
         void setAmbientLight(const float ambientFactor);
+
+        void addPhysics (PhysicsWorld* physics);
+        void removePhysics (PhysicsWorld* physics);
         
         Vector3* getAmbientLight();
         std::vector<Light*>* getLights();
