@@ -23,7 +23,6 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/libs/stb")
 add_subdirectory (engine/libs/stb)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/libs/box2d")
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/libs/box2d/Box2D")
 add_subdirectory (engine/libs/box2d)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/core")

@@ -1,5 +1,7 @@
 # Box2D - https://github.com/erincatto/Box2D
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 add_library(
 
     box2d
