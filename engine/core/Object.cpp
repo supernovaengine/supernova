@@ -148,11 +148,11 @@ void Object::setPosition(const float x, const float y, const float z){
 }
 
 void Object::setPosition(const float x, const float y){
-    setPosition(Vector3(x, y, 0));
+    setPosition(Vector3(x, y, this->position.z));
 }
 
 void Object::setPosition(Vector2 position){
-    setPosition(Vector3(position.x, position.y, 0));
+    setPosition(Vector3(position.x, position.y, this->position.z));
 }
 
 void Object::setPosition(Vector3 position){

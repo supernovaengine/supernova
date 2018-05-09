@@ -4,6 +4,7 @@
 
 #include "Object.h"
 #include "Material.h"
+#include "physics/Body2D.h"
 
 namespace Supernova {
 
@@ -18,6 +19,8 @@ namespace Supernova {
         Material material;
 
         Matrix4 normalMatrix;
+
+        Body* body;
 
         bool transparent;
         float distanceToCamera;
@@ -42,6 +45,9 @@ namespace Supernova {
         std::string getTexture();
         
         Material* getMaterial();
+
+        void attachBody(Body* body);
+        void detachBody();
 
         unsigned int getMinBufferSize();
         

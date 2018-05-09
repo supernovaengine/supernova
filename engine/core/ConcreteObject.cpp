@@ -8,6 +8,8 @@ ConcreteObject::ConcreteObject(): Object(){
     distanceToCamera = -1;
 
     minBufferSize = 0;
+
+    body = NULL;
 }
 
 ConcreteObject::~ConcreteObject(){
@@ -75,6 +77,14 @@ std::string ConcreteObject::getTexture(){
     return material.getTexturePath();
 }
 
+void ConcreteObject::attachBody(Body* body){
+    this->body = body;
+}
+
+void ConcreteObject::detachBody(){
+    this->body = NULL;
+}
+
 void ConcreteObject::updateDistanceToCamera(){
     distanceToCamera = (this->cameraPosition - this->getWorldPosition()).length();
 }
@@ -101,6 +111,9 @@ void ConcreteObject::updateMatrix(){
 }
 
 bool ConcreteObject::draw(){
+
+    if (body)
+        body->updateObject(this);
 
     if (scene && scene->isDrawingShadow()){
         shadowDraw();
