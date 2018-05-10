@@ -10,7 +10,12 @@ using namespace Supernova;
 
 Body::Body(){
     center = Vector3(0.0f, 0.0f, 0.0f);
+    attachedObject = NULL;
 };
+
+Body::~Body(){
+    attachedObject->detachBody();
+}
 
 void Body::setCenter(Vector3 center){
     this->center = center;
@@ -26,11 +31,15 @@ Vector3 Body::getCenter(){
 }
 
 void Body::updateObject(ConcreteObject* object){
-    Vector3 position = getPosition();
-    if (is3D){
-        object->setPosition(position);
-    }else{
-        object->setPosition(position.x, position.y);
+    attachedObject = object;
+
+    if (object) {
+        Vector3 position = getPosition();
+        if (is3D) {
+            object->setPosition(position);
+        } else {
+            object->setPosition(position.x, position.y);
+        }
+        object->setRotation(getRotation());
     }
-    object->setRotation(getRotation());
 }

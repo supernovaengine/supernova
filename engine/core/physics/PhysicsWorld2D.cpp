@@ -17,8 +17,7 @@ PhysicsWorld2D::PhysicsWorld2D(): PhysicsWorld(){
 }
 
 void PhysicsWorld2D::addBody(Body2D* body){
-    body->body = world->CreateBody(body->bodyDef);
-    body->body->CreateFixture(body->fixtureDef);
+    body->createBody(this->world);
 }
 
 void PhysicsWorld2D::removeBody(Body2D* body){

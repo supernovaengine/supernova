@@ -79,10 +79,12 @@ std::string ConcreteObject::getTexture(){
 
 void ConcreteObject::attachBody(Body* body){
     this->body = body;
+    body->updateObject(this);
 }
 
 void ConcreteObject::detachBody(){
     this->body = NULL;
+    body->updateObject(NULL);
 }
 
 void ConcreteObject::updateDistanceToCamera(){

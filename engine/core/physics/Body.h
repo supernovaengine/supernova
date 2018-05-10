@@ -16,12 +16,15 @@ namespace Supernova {
     protected:
         bool is3D;
         Vector3 center;
+        ConcreteObject* attachedObject;
 
         Body();
 
         virtual void computeShape() = 0;
 
     public:
+        virtual ~Body();
+
         virtual Vector3 getPosition() = 0;
         virtual Quaternion getRotation() = 0;
 
