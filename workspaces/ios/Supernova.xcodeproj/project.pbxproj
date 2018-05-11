@@ -18,6 +18,8 @@
 		714C6CF7209BEC0B0002F031 /* SystemPlatform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */; };
 		714C6CFA209DF09E0002F031 /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CF8209DF09D0002F031 /* Log.cpp */; };
 		714C6CFD209FCC1A0002F031 /* TileMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CFB209FCC1A0002F031 /* TileMap.cpp */; };
+		714C6D0220A525F20002F031 /* Body2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CFF20A525F10002F031 /* Body2D.cpp */; };
+		714C6D0320A525F20002F031 /* Body.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6D0120A525F20002F031 /* Body.cpp */; };
 		714C890B1EDE129A0028DCE0 /* stb_rect_pack.c in Sources */ = {isa = PBXBuildFile; fileRef = 71E34E251ED217CD0005DEF2 /* stb_rect_pack.c */; };
 		714C890F1EDE12AF0028DCE0 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = 714C890C1EDE12AA0028DCE0 /* stb_image.c */; };
 		714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89101EDE12F20028DCE0 /* STBImageReader.cpp */; };
@@ -535,6 +537,10 @@
 		714C6CF9209DF09E0002F031 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		714C6CFB209FCC1A0002F031 /* TileMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TileMap.cpp; sourceTree = "<group>"; };
 		714C6CFC209FCC1A0002F031 /* TileMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TileMap.h; sourceTree = "<group>"; };
+		714C6CFE20A525F10002F031 /* Body2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Body2D.h; sourceTree = "<group>"; };
+		714C6CFF20A525F10002F031 /* Body2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Body2D.cpp; sourceTree = "<group>"; };
+		714C6D0020A525F10002F031 /* Body.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Body.h; sourceTree = "<group>"; };
+		714C6D0120A525F20002F031 /* Body.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Body.cpp; sourceTree = "<group>"; };
 		714C89041ED7711A0028DCE0 /* Rect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rect.h; sourceTree = "<group>"; };
 		714C89051ED7711A0028DCE0 /* Rect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rect.cpp; sourceTree = "<group>"; };
 		714C890C1EDE12AA0028DCE0 /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image.c; sourceTree = "<group>"; };
@@ -1006,6 +1012,10 @@
 		7105A9E220A258120028DCC7 /* physics */ = {
 			isa = PBXGroup;
 			children = (
+				714C6D0120A525F20002F031 /* Body.cpp */,
+				714C6D0020A525F10002F031 /* Body.h */,
+				714C6CFF20A525F10002F031 /* Body2D.cpp */,
+				714C6CFE20A525F10002F031 /* Body2D.h */,
 				7105A9E320A258120028DCC7 /* PhysicsWorld.cpp */,
 				7105A9E420A258120028DCC7 /* PhysicsWorld.h */,
 				7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */,
@@ -2329,6 +2339,7 @@
 				71C5764A1EE45167002F537B /* Events.cpp in Sources */,
 				714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */,
 				71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */,
+				714C6D0320A525F20002F031 /* Body.cpp in Sources */,
 				71AC8B611E6B42C000DB33C3 /* Points.cpp in Sources */,
 				71D6EFD21F40A00E00241F0C /* SpriteAnimation.cpp in Sources */,
 				71C27739202BCE1F005B3EDC /* ScaleAction.cpp in Sources */,
@@ -2361,6 +2372,7 @@
 				71CDC7151D7B14510060EEFF /* Model.cpp in Sources */,
 				71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */,
 				71CDC70F1D7B14510060EEFF /* DirectionalLight.cpp in Sources */,
+				714C6D0220A525F20002F031 /* Body2D.cpp in Sources */,
 				71598C401E76203A000EDAC0 /* Sprite.cpp in Sources */,
 				719C08A01F11128E00F0BAF0 /* ProgramRender.cpp in Sources */,
 				719C089D1F0DCFCB00F0BAF0 /* Program.cpp in Sources */,

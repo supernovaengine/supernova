@@ -63,6 +63,7 @@ namespace Supernova {
         float getDensity();
         float getFriction();
         bool getFixedRotation();
+        Vector2 getLinearVelocity();
 
         void applyForce(const Vector2 force, const Vector2 point);
 

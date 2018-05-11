@@ -130,6 +130,15 @@ bool Body2D::getFixedRotation(){
     return bodyDef->fixedRotation;
 }
 
+Vector2 Body2D::getLinearVelocity(){
+    if (body){
+        b2Vec2 linearVelocity = body->GetLinearVelocity();
+        return Vector2(linearVelocity.x, linearVelocity.y);
+    }else{
+        return Vector2(0.0f, 0.0f);
+    }
+}
+
 void Body2D::computeShape(){
     if (shapeType == S_BODY2D_SHAPE_BOX){
 
@@ -154,7 +163,7 @@ void Body2D::computeShape(){
                 b2Vertices[i] = b2Mul(xf, b2Vertices[i]);
             }
 
-            ((b2PolygonShape *) shape)->Set(b2Vertices, vertices.size());
+            ((b2PolygonShape *) shape)->Set(b2Vertices, (int)vertices.size());
 
         }else if (vertices.size() == 0){
             Log::Error("Cannot create shape because number of vertices is 0");
