@@ -9,6 +9,7 @@
 using namespace Supernova;
 
 Body::Body(){
+    name = "";
     center = Vector3(0.0f, 0.0f, 0.0f);
     attachedObject = NULL;
 };
@@ -28,6 +29,14 @@ void Body::setCenter(const float x, const float y, const float z){
 
 Vector3 Body::getCenter(){
     return center;
+}
+
+void Body::setName(std::string name){
+    this->name = name;
+}
+
+std::string Body::getName(){
+    return name;
 }
 
 void Body::updateObject(ConcreteObject* object){

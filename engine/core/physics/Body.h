@@ -3,6 +3,7 @@
 
 #include "math/Vector3.h"
 #include "math/Quaternion.h"
+#include <string>
 
 //
 // (c) 2018 Eduardo Doria.
@@ -12,6 +13,9 @@ namespace Supernova {
     class ConcreteObject;
 
     class Body {
+
+    private:
+        std::string name;
 
     protected:
         bool is3D;
@@ -31,6 +35,9 @@ namespace Supernova {
         void setCenter(Vector3 center);
         void setCenter(const float x, const float y, const float z);
         Vector3 getCenter();
+
+        void setName(std::string name);
+        std::string getName();
 
         virtual void updateObject(ConcreteObject* object);
     };

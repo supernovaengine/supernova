@@ -39,6 +39,7 @@ Body2D::~Body2D(){
 void Body2D::createBody(b2World* world){
     body = world->CreateBody(bodyDef);
     body->CreateFixture(fixtureDef);
+    body->SetUserData(this);
 }
 
 void Body2D::setPosition(Vector2 position){
@@ -118,6 +119,10 @@ void Body2D::setFixedRotation(bool fixedRotation){
     bodyDef->fixedRotation = fixedRotation;
 }
 
+void Body2D::setLinearVelocity(Vector2 linearVelocity){
+    bodyDef->linearVelocity = b2Vec2(linearVelocity.x, linearVelocity.y);
+}
+
 float Body2D::getDensity(){
     return fixtureDef->density;
 }
@@ -131,12 +136,8 @@ bool Body2D::getFixedRotation(){
 }
 
 Vector2 Body2D::getLinearVelocity(){
-    if (body){
-        b2Vec2 linearVelocity = body->GetLinearVelocity();
-        return Vector2(linearVelocity.x, linearVelocity.y);
-    }else{
-        return Vector2(0.0f, 0.0f);
-    }
+    b2Vec2 linearVelocity = bodyDef->linearVelocity;
+    return Vector2(linearVelocity.x, linearVelocity.y);
 }
 
 void Body2D::computeShape(){

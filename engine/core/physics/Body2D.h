@@ -59,6 +59,7 @@ namespace Supernova {
         void setDensity(float density);
         void setFriction(float friction);
         void setFixedRotation(bool fixedRotation);
+        void setLinearVelocity(Vector2 linearVelocity);
 
         float getDensity();
         float getFriction();

@@ -9,23 +9,28 @@
 #include "Body2D.h"
 
 class b2World;
-//class b2BodyDef;
-//class b2Body;
-//class b2PolygonShape;
-//class b2FixtureDef;
+class b2ContactListener;
 
 namespace Supernova {
     class PhysicsWorld2D: public PhysicsWorld {
     private:
         b2World* world;
 
+        b2ContactListener* contactListener;
+
+        int pointToMeterRatio;
+
         int velocityIterations;
         int positionIterations;
     public:
         PhysicsWorld2D();
+        virtual ~PhysicsWorld2D();
 
         void addBody(Body2D* body);
         void removeBody(Body2D* body);
+
+        void setPointToMeterRatio(int pointToMeterRatio);
+        int getPointToMeterRatio();
 
         void setGravity(Vector2 gravity);
         void setGravity(float gravityX, float gravityY);
