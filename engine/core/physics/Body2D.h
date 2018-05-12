@@ -6,6 +6,7 @@
 #define S_BODY2D_SHAPE_CIRCLE 2
 
 #include "Body.h"
+#include "CollisionShape2D.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include <vector>
@@ -14,11 +15,9 @@
 // (c) 2018 Eduardo Doria.
 //
 
-class b2World;
 class b2BodyDef;
 class b2Body;
-class b2Shape;
-class b2FixtureDef;
+class b2World;
 
 namespace Supernova {
     class Body2D: public Body {
@@ -28,20 +27,10 @@ namespace Supernova {
     private:
         b2Body* body;
         b2BodyDef* bodyDef;
-        b2Shape* shape;
-        b2FixtureDef* fixtureDef;
 
         bool dynamic;
-        int shapeType;
 
-        std::vector<Vector2> vertices;
-        float boxWidth;
-        float boxHeight;
-        Vector2 circleCenter;
-        float circleRadius;
-
-    protected:
-        virtual void computeShape();
+        std::vector<CollisionShape2D*> shapes;
 
     public:
         Body2D();
@@ -49,21 +38,16 @@ namespace Supernova {
 
         void createBody(b2World* world);
 
+        void addCollisionShape(CollisionShape2D* shape);
+        void removeCollisionShape(CollisionShape2D* shape);
+
         void setDynamic(bool dynamic);
         void setPosition(Vector2 position);
-        void setShapeBox(float width, float height);
-        void setShapeVertices(std::vector<Vector2> vertices);
-        void setShapeVertices(std::vector<Vector3> vertices);
-        void setShapeCircle(Vector2 center, float radius);
 
-        void setDensity(float density);
-        void setFriction(float friction);
         void setFixedRotation(bool fixedRotation);
-        void setLinearVelocity(Vector2 linearVelocity);
-
-        float getDensity();
-        float getFriction();
         bool getFixedRotation();
+
+        void setLinearVelocity(Vector2 linearVelocity);
         Vector2 getLinearVelocity();
 
         void applyForce(const Vector2 force, const Vector2 point);

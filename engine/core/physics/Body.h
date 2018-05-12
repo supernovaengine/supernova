@@ -24,17 +24,11 @@ namespace Supernova {
 
         Body();
 
-        virtual void computeShape() = 0;
-
     public:
         virtual ~Body();
 
         virtual Vector3 getPosition() = 0;
         virtual Quaternion getRotation() = 0;
-
-        void setCenter(Vector3 center);
-        void setCenter(const float x, const float y, const float z);
-        Vector3 getCenter();
 
         void setName(std::string name);
         std::string getName();

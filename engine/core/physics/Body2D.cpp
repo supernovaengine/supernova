@@ -13,33 +13,52 @@ using namespace Supernova;
 Body2D::Body2D(): Body() {
     is3D = false;
     dynamic = false;
-    shapeType = S_BODY2D_SHAPE_BOX;
 
     body = NULL;
     bodyDef = new b2BodyDef();
-    shape = NULL;
-    fixtureDef = new b2FixtureDef();
-
-    boxWidth = 0.0f;
-    boxHeight = 0.0f;
-    circleCenter = Vector2();
-    circleRadius = 0.0f;
 }
 
 Body2D::~Body2D(){
     if (body){
         body->GetWorld()->DestroyBody(body);
     }
-    delete bodyDef;
-    delete shape;
-    delete fixtureDef;
-
+    //delete bodyDef;
 }
 
 void Body2D::createBody(b2World* world){
     body = world->CreateBody(bodyDef);
-    body->CreateFixture(fixtureDef);
     body->SetUserData(this);
+
+    for (int i = 0; i < shapes.size(); i++){
+        shapes[i]->createFixture(this->body);
+    }
+}
+
+void Body2D::addCollisionShape(CollisionShape2D* shape){
+    bool founded = false;
+
+    std::vector<CollisionShape2D*>::iterator it;
+    for (it = shapes.begin(); it != shapes.end(); ++it) {
+        if (shape == (*it))
+            founded = true;
+    }
+
+    if (!founded){
+        shapes.push_back(shape);
+
+        if (body){
+            shape->createFixture(this->body);
+        }
+    }
+}
+
+void Body2D::removeCollisionShape(CollisionShape2D* shape){
+    std::vector<CollisionShape2D*>::iterator i = std::remove(shapes.begin(), shapes.end(), shape);
+    shapes.erase(i, shapes.end());
+
+    if (body){
+        body->DestroyFixture(shape->fixture);
+    }
 }
 
 void Body2D::setPosition(Vector2 position){
@@ -55,133 +74,21 @@ void Body2D::setDynamic(bool dynamic){
     }
 }
 
-void Body2D::setShapeBox(float width, float height){
-    this->boxWidth = width/2.0f;
-    this->boxHeight = height/2.0f;
-
-    if (shape)
-        delete shape;
-
-    shapeType = S_BODY2D_SHAPE_BOX;
-    shape = new b2PolygonShape();
-    fixtureDef->shape = shape;
-
-    computeShape();
-}
-
-void Body2D::setShapeVertices(std::vector<Vector2> vertices){
-    this->vertices = vertices;
-
-    if (shape)
-        delete shape;
-
-    shapeType = S_BODY2D_SHAPE_VERTICES;
-    shape = new b2PolygonShape();
-    fixtureDef->shape = shape;
-
-    computeShape();
-}
-
-void Body2D::setShapeCircle(Vector2 center, float radius){
-    this->circleCenter = center;
-    this->circleRadius = radius;
-
-    if (shape)
-        delete shape;
-
-    shapeType = S_BODY2D_SHAPE_CIRCLE;
-    shape = new b2CircleShape();
-    fixtureDef->shape = shape;
-
-    computeShape();
-}
-
-void Body2D::setShapeVertices(std::vector<Vector3> vertices){
-    this->vertices.clear();
-    for (int i = 0; i < vertices.size(); i++){
-        this->vertices.push_back(Vector2(vertices[i].x, vertices[i].y));
-    }
-
-    shapeType = S_BODY2D_SHAPE_VERTICES;
-
-    computeShape();
-}
-
-void Body2D::setDensity(float density){
-    fixtureDef->density = density;
-}
-
-void Body2D::setFriction(float friction){
-    fixtureDef->friction = friction;
-}
-
 void Body2D::setFixedRotation(bool fixedRotation){
     bodyDef->fixedRotation = fixedRotation;
-}
-
-void Body2D::setLinearVelocity(Vector2 linearVelocity){
-    bodyDef->linearVelocity = b2Vec2(linearVelocity.x, linearVelocity.y);
-}
-
-float Body2D::getDensity(){
-    return fixtureDef->density;
-}
-
-float Body2D::getFriction(){
-    return fixtureDef->friction;
 }
 
 bool Body2D::getFixedRotation(){
     return bodyDef->fixedRotation;
 }
 
+void Body2D::setLinearVelocity(Vector2 linearVelocity){
+    bodyDef->linearVelocity = b2Vec2(linearVelocity.x, linearVelocity.y);
+}
+
 Vector2 Body2D::getLinearVelocity(){
     b2Vec2 linearVelocity = bodyDef->linearVelocity;
     return Vector2(linearVelocity.x, linearVelocity.y);
-}
-
-void Body2D::computeShape(){
-    if (shapeType == S_BODY2D_SHAPE_BOX){
-
-        if (boxWidth > 0 && boxHeight > 0) {
-            ((b2PolygonShape *) shape)->SetAsBox(boxWidth, boxHeight, b2Vec2(boxWidth - center.x, boxHeight - center.y), 0);
-        }else{
-            Log::Error("Cannot create shape box with size 0");
-        }
-
-    }else if (shapeType == S_BODY2D_SHAPE_VERTICES) {
-
-        if (b2_maxPolygonVertices >= vertices.size() && vertices.size() > 0) {
-
-            b2Vec2 b2Vertices[b2_maxPolygonVertices];
-
-            b2Transform xf;
-            xf.p = b2Vec2(center.x, center.y);
-            xf.q.Set(0);
-
-            for (int i = 0; i < vertices.size(); i++){
-                b2Vertices[i].Set(vertices[i].x, vertices[i].y);
-                b2Vertices[i] = b2Mul(xf, b2Vertices[i]);
-            }
-
-            ((b2PolygonShape *) shape)->Set(b2Vertices, (int)vertices.size());
-
-        }else if (vertices.size() == 0){
-            Log::Error("Cannot create shape because number of vertices is 0");
-        }else{
-            Log::Error("Cannot create shape because number of vertices must be less or equal than %i", b2_maxPolygonVertices);
-        }
-
-    }else if (shapeType == S_BODY2D_SHAPE_CIRCLE) {
-
-        if (circleRadius > 0){
-            ((b2CircleShape *) shape)->m_p.Set(circleCenter.x, circleCenter.y);
-            ((b2CircleShape *) shape)->m_radius = circleRadius;
-        }else{
-            Log::Error("Cannot create shape circle with radius 0");
-        }
-
-    }
 }
 
 void Body2D::applyForce(const Vector2 force, const Vector2 point){

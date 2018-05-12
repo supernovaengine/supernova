@@ -11,6 +11,7 @@
 		7105A9E820A258130028DCC7 /* PhysicsWorld2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */; };
 		7108B9211F00A0DE005B7783 /* synth_8bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28381DE8EA1500C12A1D /* synth_8bit.c */; };
 		71192EFD1CE1334000BD76EE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
+		7119E6AB20A6A0B80016AEF2 /* CollisionShape2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119E6AA20A6A0B80016AEF2 /* CollisionShape2D.cpp */; };
 		712379201EC13C7E00BFD1F7 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */; };
 		712379231EC13CDA00BFD1F7 /* libstb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 712379111EC13C6000BFD1F7 /* libstb.a */; };
 		71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71369C081E291E22006AE1D1 /* Button.cpp */; };
@@ -397,6 +398,8 @@
 		7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PhysicsWorld2D.cpp; sourceTree = "<group>"; };
 		7105A9E620A258120028DCC7 /* PhysicsWorld2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhysicsWorld2D.h; sourceTree = "<group>"; };
 		71192EFB1CE1334000BD76EE /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		7119E6A920A6A0B80016AEF2 /* CollisionShape2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollisionShape2D.h; sourceTree = "<group>"; };
+		7119E6AA20A6A0B80016AEF2 /* CollisionShape2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CollisionShape2D.cpp; sourceTree = "<group>"; };
 		712379111EC13C6000BFD1F7 /* libstb.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libstb.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_vorbis.c; sourceTree = "<group>"; };
 		7123791D1EC13C7500BFD1F7 /* stb_vorbis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_vorbis.h; sourceTree = "<group>"; };
@@ -1016,6 +1019,8 @@
 				714C6D0020A525F10002F031 /* Body.h */,
 				714C6CFF20A525F10002F031 /* Body2D.cpp */,
 				714C6CFE20A525F10002F031 /* Body2D.h */,
+				7119E6AA20A6A0B80016AEF2 /* CollisionShape2D.cpp */,
+				7119E6A920A6A0B80016AEF2 /* CollisionShape2D.h */,
 				7105A9E320A258120028DCC7 /* PhysicsWorld.cpp */,
 				7105A9E420A258120028DCC7 /* PhysicsWorld.h */,
 				7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */,
@@ -2356,6 +2361,7 @@
 				71CDC7171D7B14510060EEFF /* PlaneTerrain.cpp in Sources */,
 				71C39E4B204188B000863AB6 /* ParticleInit.cpp in Sources */,
 				71C2772F202BCE0F005B3EDC /* PointData.cpp in Sources */,
+				7119E6AB20A6A0B80016AEF2 /* CollisionShape2D.cpp in Sources */,
 				719C089E1F0DCFCB00F0BAF0 /* Texture.cpp in Sources */,
 				71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */,
 				71CDC7191D7B14510060EEFF /* Scene.cpp in Sources */,

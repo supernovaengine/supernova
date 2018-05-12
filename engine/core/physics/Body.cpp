@@ -18,19 +18,6 @@ Body::~Body(){
     attachedObject->detachBody();
 }
 
-void Body::setCenter(Vector3 center){
-    this->center = center;
-    computeShape();
-}
-
-void Body::setCenter(const float x, const float y, const float z){
-    setCenter(Vector3(x, y, z));
-}
-
-Vector3 Body::getCenter(){
-    return center;
-}
-
 void Body::setName(std::string name){
     this->name = name;
 }
