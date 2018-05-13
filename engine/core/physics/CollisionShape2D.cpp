@@ -28,7 +28,11 @@ CollisionShape2D::CollisionShape2D(): CollisionShape(){
 }
 
 CollisionShape2D::~CollisionShape2D(){
+    if (fixture)
+        fixture->GetBody()->DestroyFixture(fixture);
 
+    delete fixtureDef;
+    delete shape;
 }
 
 void CollisionShape2D::createFixture(Body2D* body){
@@ -39,7 +43,8 @@ void CollisionShape2D::createFixture(Body2D* body){
 
 void CollisionShape2D::destroyFixture(){
     body->getBox2DBody()->DestroyFixture(fixture);
-    this->body = NULL;
+    fixture = NULL;
+    body = NULL;
 }
 
 b2Fixture* CollisionShape2D::getBox2DFixture(){

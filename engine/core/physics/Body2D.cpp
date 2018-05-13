@@ -25,7 +25,7 @@ Body2D::~Body2D(){
     if (body){
         body->GetWorld()->DestroyBody(body);
     }
-    //delete bodyDef;
+    delete bodyDef;
 }
 
 void Body2D::createBody(PhysicsWorld2D* world){
@@ -40,6 +40,7 @@ void Body2D::createBody(PhysicsWorld2D* world){
 
 void Body2D::destroyBody(){
     world->getBox2DWorld()->DestroyBody(body);
+    body = NULL;
     world = NULL;
 }
 
@@ -78,21 +79,24 @@ void Body2D::removeCollisionShape(CollisionShape2D* shape){
     }
 }
 
-void Body2D::setPosition(Vector2 position){
-    bodyDef->position.Set(position.x / S_POINTS_TO_METER_RATIO, position.y / S_POINTS_TO_METER_RATIO);
-}
-
 void Body2D::setDynamic(bool dynamic){
     this->dynamic = dynamic;
-    if (this->dynamic){
+
+    if (this->dynamic) {
         bodyDef->type = b2_dynamicBody;
-    } else{
+        if (body)
+            body->SetType(b2_dynamicBody);
+    } else {
         bodyDef->type = b2_staticBody;
+        if (body)
+            body->SetType(b2_staticBody);
     }
 }
 
 void Body2D::setFixedRotation(bool fixedRotation){
     bodyDef->fixedRotation = fixedRotation;
+    if (body)
+        body->SetFixedRotation(fixedRotation);
 }
 
 bool Body2D::getFixedRotation(){
@@ -100,12 +104,17 @@ bool Body2D::getFixedRotation(){
 }
 
 void Body2D::setLinearVelocity(Vector2 linearVelocity){
-    bodyDef->linearVelocity = b2Vec2(linearVelocity.x / S_POINTS_TO_METER_RATIO,
-                                     linearVelocity.y / S_POINTS_TO_METER_RATIO);
+    b2Vec2 nLinearVelocity(linearVelocity.x / S_POINTS_TO_METER_RATIO, linearVelocity.y / S_POINTS_TO_METER_RATIO);
+
+    bodyDef->linearVelocity = nLinearVelocity;
+    if (body)
+        body->SetLinearVelocity(nLinearVelocity);
 }
 
 Vector2 Body2D::getLinearVelocity(){
     b2Vec2 linearVelocity = bodyDef->linearVelocity;
+    if (body)
+        linearVelocity = body->GetLinearVelocity();
     return Vector2(linearVelocity.x * S_POINTS_TO_METER_RATIO,
                    linearVelocity.y * S_POINTS_TO_METER_RATIO);
 }
@@ -117,13 +126,35 @@ void Body2D::applyForce(const Vector2 force, const Vector2 point){
     }
 }
 
+void Body2D::setPosition(Vector2 position){
+    b2Vec2 nPosition(position.x / S_POINTS_TO_METER_RATIO, position.y / S_POINTS_TO_METER_RATIO);
+
+    bodyDef->position = nPosition;
+    if (body)
+        body->SetTransform(nPosition, body->GetAngle());
+}
+
+void Body2D::setPosition(Vector3 position){
+    setPosition(Vector2(position.x, position.y));
+}
+
+void Body2D::setRotation(float angle){
+    float nAngle = Angle::defaultToRad(angle);
+
+    bodyDef->angle = nAngle;
+    if (body)
+        body->SetTransform(body->GetPosition(), nAngle);
+}
+
+void Body2D::setRotation(Quaternion rotation){
+    setRotation(rotation.getRoll());
+}
+
 Vector3 Body2D::getPosition(){
-    if (body) {
-        b2Vec2 position = body->GetPosition();
-        return Vector3(position.x * S_POINTS_TO_METER_RATIO, position.y * S_POINTS_TO_METER_RATIO, 0.0f);
-    }else{
-        return Vector3(0.0f, 0.0f, 0.0f);
-    }
+    b2Vec2 position = bodyDef->position;
+    if (body)
+        position = body->GetPosition();
+    return Vector3(position.x * S_POINTS_TO_METER_RATIO, position.y * S_POINTS_TO_METER_RATIO, 0.0f);
 }
 
 Quaternion Body2D::getRotation(){

@@ -48,7 +48,6 @@ namespace Supernova {
         void removeCollisionShape(CollisionShape2D* shape);
 
         void setDynamic(bool dynamic);
-        void setPosition(Vector2 position);
 
         void setFixedRotation(bool fixedRotation);
         bool getFixedRotation();
@@ -58,7 +57,12 @@ namespace Supernova {
 
         void applyForce(const Vector2 force, const Vector2 point);
 
+        void setPosition(Vector2 position);
+        virtual void setPosition(Vector3 position);
         virtual Vector3 getPosition();
+
+        void setRotation(float angle);
+        virtual void setRotation(Quaternion rotation);
         virtual Quaternion getRotation();
     };
 }

@@ -27,7 +27,10 @@ namespace Supernova {
     public:
         virtual ~Body();
 
+        virtual void setPosition(Vector3 position) = 0;
         virtual Vector3 getPosition() = 0;
+
+        virtual void setRotation(Quaternion rotation) = 0;
         virtual Quaternion getRotation() = 0;
 
         void setName(std::string name);
