@@ -1,6 +1,7 @@
 #include "PhysicsWorld2D.h"
 
 #include "Log.h"
+#include "CollisionShape.h"
 #include <Box2D/Box2D.h>
 
 //
@@ -19,17 +20,17 @@ public:
     }
 
     virtual void BeginContact(b2Contact* contact){
-        Body* bodyA = (Body*)contact->GetFixtureA()->GetBody()->GetUserData();
-        Body* bodyB = (Body*)contact->GetFixtureB()->GetBody()->GetUserData();
+        CollisionShape* shapeA = (CollisionShape2D*)contact->GetFixtureA()->GetUserData();
+        CollisionShape* shapeB = (CollisionShape2D*)contact->GetFixtureB()->GetUserData();
 
-        world->call_onBeginContact(bodyA, bodyB);
+        world->call_onBeginContact(shapeA, shapeB);
     }
 
     virtual void EndContact(b2Contact* contact){
-        Body* bodyA = (Body*)contact->GetFixtureA()->GetBody()->GetUserData();
-        Body* bodyB = (Body*)contact->GetFixtureB()->GetBody()->GetUserData();
+        CollisionShape* shapeA = (CollisionShape2D*)contact->GetFixtureA()->GetUserData();
+        CollisionShape* shapeB = (CollisionShape2D*)contact->GetFixtureB()->GetUserData();
 
-        world->call_onEndContact(bodyA, bodyB);
+        world->call_onEndContact(shapeA, shapeB);
     }
 
 };
@@ -41,8 +42,6 @@ PhysicsWorld2D::PhysicsWorld2D(): PhysicsWorld(){
     contactListener = new World2DContactListener(this);
     world->SetContactListener(contactListener);
 
-    pointToMeterRatio = 32;
-
     velocityIterations = 8;
     positionIterations = 3;
 }
@@ -52,20 +51,16 @@ PhysicsWorld2D::~PhysicsWorld2D(){
     delete world;
 }
 
+b2World* PhysicsWorld2D::getBox2DWorld(){
+    return world;
+}
+
 void PhysicsWorld2D::addBody(Body2D* body){
-    body->createBody(this->world);
+    body->createBody(this);
 }
 
 void PhysicsWorld2D::removeBody(Body2D* body){
-    world->DestroyBody(body->body);
-}
-
-void PhysicsWorld2D::setPointToMeterRatio(int pointToMeterRatio){
-    this->pointToMeterRatio = pointToMeterRatio;
-}
-
-int PhysicsWorld2D::getPointToMeterRatio(){
-    return pointToMeterRatio;
+    body->destroyBody();
 }
 
 void PhysicsWorld2D::setGravity(Vector2 gravity){
@@ -73,7 +68,7 @@ void PhysicsWorld2D::setGravity(Vector2 gravity){
 }
 
 void PhysicsWorld2D::setGravity(float gravityX, float gravityY){
-    world->SetGravity(b2Vec2(gravityX, gravityY));
+    world->SetGravity(b2Vec2(gravityX / S_POINTS_TO_METER_RATIO, gravityY / S_POINTS_TO_METER_RATIO));
 }
 
 void PhysicsWorld2D::setVelocityIterations(int velocityIterations){
@@ -86,7 +81,7 @@ void PhysicsWorld2D::setPositionIterations(int positionIterations){
 
 Vector2 PhysicsWorld2D::getGravity(){
     b2Vec2 gravity = world->GetGravity();
-    return Vector2(gravity.x, gravity.y);
+    return Vector2(gravity.x * S_POINTS_TO_METER_RATIO, gravity.y * S_POINTS_TO_METER_RATIO);
 }
 
 int PhysicsWorld2D::getVelocityIterations(){

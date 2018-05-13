@@ -17,16 +17,18 @@
 
 class b2BodyDef;
 class b2Body;
-class b2World;
 
 namespace Supernova {
-    class Body2D: public Body {
 
-        friend class PhysicsWorld2D;
+    class PhysicsWorld2D;
+
+    class Body2D: public Body {
 
     private:
         b2Body* body;
         b2BodyDef* bodyDef;
+
+        PhysicsWorld2D* world;
 
         bool dynamic;
 
@@ -36,7 +38,11 @@ namespace Supernova {
         Body2D();
         virtual ~Body2D();
 
-        void createBody(b2World* world);
+        void createBody(PhysicsWorld2D* world);
+        void destroyBody();
+
+        b2Body* getBox2DBody();
+        PhysicsWorld2D* getWorld();
 
         void addCollisionShape(CollisionShape2D* shape);
         void removeCollisionShape(CollisionShape2D* shape);

@@ -1,6 +1,8 @@
 #ifndef PHYSICSWORLD2D_H
 #define PHYSICSWORLD2D_H
 
+#define S_POINTS_TO_METER_RATIO 128
+
 //
 // (c) 2018 Eduardo Doria.
 //
@@ -18,19 +20,16 @@ namespace Supernova {
 
         b2ContactListener* contactListener;
 
-        int pointToMeterRatio;
-
         int velocityIterations;
         int positionIterations;
     public:
         PhysicsWorld2D();
         virtual ~PhysicsWorld2D();
 
+        b2World* getBox2DWorld();
+
         void addBody(Body2D* body);
         void removeBody(Body2D* body);
-
-        void setPointToMeterRatio(int pointToMeterRatio);
-        int getPointToMeterRatio();
 
         void setGravity(Vector2 gravity);
         void setGravity(float gravityX, float gravityY);

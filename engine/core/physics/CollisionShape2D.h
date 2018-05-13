@@ -1,6 +1,7 @@
 #ifndef COLLISIONHAPE2D_H
 #define COLLISIONHAPE2D_H
 
+#include "CollisionShape.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include <vector>
@@ -17,20 +18,21 @@
 class b2Fixture;
 class b2FixtureDef;
 class b2Shape;
-class b2Body;
 
 namespace Supernova {
-    class CollisionShape2D {
 
-        friend class Body2D;
+    class Body2D;
+
+    class CollisionShape2D: public CollisionShape {
 
     private:
         b2Fixture* fixture;
         b2FixtureDef* fixtureDef;
         b2Shape* shape;
 
+        Body2D* body;
+
         int shapeType;
-        std::string name;
 
         std::vector<Vector2> vertices;
         float boxWidth;
@@ -46,7 +48,11 @@ namespace Supernova {
         CollisionShape2D();
         virtual ~CollisionShape2D();
 
-        void createFixture(b2Body* body);
+        void createFixture(Body2D* body);
+        void destroyFixture();
+
+        b2Fixture* getBox2DFixture();
+        Body2D* getBody();
 
         void setShapeBox(float width, float height);
         void setShapeVertices(std::vector<Vector2> vertices);
@@ -63,8 +69,6 @@ namespace Supernova {
         void setCenter(const float x, const float y);
         Vector2 getCenter();
 
-        void setName(std::string name);
-        std::string getName();
     };
 }
 

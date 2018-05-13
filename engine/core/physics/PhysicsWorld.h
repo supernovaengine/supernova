@@ -2,7 +2,7 @@
 #ifndef PHYSICSWORLD_H
 #define PHYSICSWORLD_H
 
-#include "Body.h"
+#include "CollisionShape.h"
 
 typedef struct lua_State lua_State;
 
@@ -13,22 +13,23 @@ typedef struct lua_State lua_State;
 namespace Supernova {
     class PhysicsWorld {
     private:
-        void (*onBeginContactFunc)(Body*, Body*);
+        void (*onBeginContactFunc)(CollisionShape*, CollisionShape*);
         int onBeginContactLuaFunc;
 
-        void (*onEndContactFunc)(Body*, Body*);
+        void (*onEndContactFunc)(CollisionShape*, CollisionShape*);
         int onEndContactLuaFunc;
 
-    public:
+    protected:
         PhysicsWorld();
 
-        void call_onBeginContact(Body* bodyA, Body* bodyB);
-        void call_onEndContact(Body* bodyA, Body* bodyB);
+    public:
+        void call_onBeginContact(CollisionShape* shapeA, CollisionShape* shapeB);
+        void call_onEndContact(CollisionShape* shapeA, CollisionShape* shapeB);
 
-        void onBeginContact(void (*onBeginContactFunc)(Body*, Body*));
+        void onBeginContact(void (*onBeginContactFunc)(CollisionShape*, CollisionShape*));
         int onBeginContact(lua_State *L);
 
-        void onEndContact(void (*onEndContactFunc)(Body*, Body*));
+        void onEndContact(void (*onEndContactFunc)(CollisionShape*, CollisionShape*));
         int onEndContact(lua_State *L);
 
         virtual void step(float timeStep) = 0;

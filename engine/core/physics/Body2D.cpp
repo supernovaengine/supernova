@@ -1,6 +1,7 @@
 #include "Body2D.h"
 
 #include <Box2D/Box2D.h>
+#include "PhysicsWorld2D.h"
 #include "math/Angle.h"
 #include "Log.h"
 
@@ -14,6 +15,8 @@ Body2D::Body2D(): Body() {
     is3D = false;
     dynamic = false;
 
+    world = NULL;
+
     body = NULL;
     bodyDef = new b2BodyDef();
 }
@@ -25,13 +28,27 @@ Body2D::~Body2D(){
     //delete bodyDef;
 }
 
-void Body2D::createBody(b2World* world){
-    body = world->CreateBody(bodyDef);
+void Body2D::createBody(PhysicsWorld2D* world){
+    body = world->getBox2DWorld()->CreateBody(bodyDef);
     body->SetUserData(this);
+    this->world = world;
 
     for (int i = 0; i < shapes.size(); i++){
-        shapes[i]->createFixture(this->body);
+        shapes[i]->createFixture(this);
     }
+}
+
+void Body2D::destroyBody(){
+    world->getBox2DWorld()->DestroyBody(body);
+    world = NULL;
+}
+
+b2Body* Body2D::getBox2DBody(){
+    return body;
+}
+
+PhysicsWorld2D* Body2D::getWorld(){
+    return world;
 }
 
 void Body2D::addCollisionShape(CollisionShape2D* shape){
@@ -47,7 +64,7 @@ void Body2D::addCollisionShape(CollisionShape2D* shape){
         shapes.push_back(shape);
 
         if (body){
-            shape->createFixture(this->body);
+            shape->createFixture(this);
         }
     }
 }
@@ -57,12 +74,12 @@ void Body2D::removeCollisionShape(CollisionShape2D* shape){
     shapes.erase(i, shapes.end());
 
     if (body){
-        body->DestroyFixture(shape->fixture);
+        shape->destroyFixture();
     }
 }
 
 void Body2D::setPosition(Vector2 position){
-    bodyDef->position.Set(position.x, position.y);
+    bodyDef->position.Set(position.x / S_POINTS_TO_METER_RATIO, position.y / S_POINTS_TO_METER_RATIO);
 }
 
 void Body2D::setDynamic(bool dynamic){
@@ -83,24 +100,27 @@ bool Body2D::getFixedRotation(){
 }
 
 void Body2D::setLinearVelocity(Vector2 linearVelocity){
-    bodyDef->linearVelocity = b2Vec2(linearVelocity.x, linearVelocity.y);
+    bodyDef->linearVelocity = b2Vec2(linearVelocity.x / S_POINTS_TO_METER_RATIO,
+                                     linearVelocity.y / S_POINTS_TO_METER_RATIO);
 }
 
 Vector2 Body2D::getLinearVelocity(){
     b2Vec2 linearVelocity = bodyDef->linearVelocity;
-    return Vector2(linearVelocity.x, linearVelocity.y);
+    return Vector2(linearVelocity.x * S_POINTS_TO_METER_RATIO,
+                   linearVelocity.y * S_POINTS_TO_METER_RATIO);
 }
 
 void Body2D::applyForce(const Vector2 force, const Vector2 point){
     if (body){
-        body->ApplyForce(b2Vec2(force.x, force.y), b2Vec2(point.x, point.y), true);
+        body->ApplyForce(b2Vec2(force.x / S_POINTS_TO_METER_RATIO, force.y / S_POINTS_TO_METER_RATIO),
+                         b2Vec2(point.x / S_POINTS_TO_METER_RATIO, point.y / S_POINTS_TO_METER_RATIO), true);
     }
 }
 
 Vector3 Body2D::getPosition(){
     if (body) {
         b2Vec2 position = body->GetPosition();
-        return Vector3(position.x, position.y, 0.0f);
+        return Vector3(position.x * S_POINTS_TO_METER_RATIO, position.y * S_POINTS_TO_METER_RATIO, 0.0f);
     }else{
         return Vector3(0.0f, 0.0f, 0.0f);
     }

@@ -22,31 +22,31 @@ PhysicsWorld::PhysicsWorld(){
     onEndContactLuaFunc = 0;
 }
 
-void PhysicsWorld::call_onBeginContact(Body* bodyA, Body* bodyB){
+void PhysicsWorld::call_onBeginContact(CollisionShape* shapeA, CollisionShape* shapeB){
     if (onBeginContactFunc != NULL){
-        onBeginContactFunc(bodyA, bodyB);
+        onBeginContactFunc(shapeA, shapeB);
     }
     if (onBeginContactLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onBeginContactLuaFunc);
-        LuaIntf::Lua::push(LuaBind::getLuaState(), bodyA);
-        LuaIntf::Lua::push(LuaBind::getLuaState(), bodyB);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), shapeA);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), shapeB);
         LuaBind::luaCallback(2, 0, 0);
     }
 }
 
-void PhysicsWorld::call_onEndContact(Body* bodyA, Body* bodyB){
+void PhysicsWorld::call_onEndContact(CollisionShape* shapeA, CollisionShape* shapeB){
     if (onEndContactFunc != NULL){
-        onEndContactFunc(bodyA, bodyB);
+        onEndContactFunc(shapeA, shapeB);
     }
     if (onEndContactLuaFunc != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, onEndContactLuaFunc);
-        LuaIntf::Lua::push(LuaBind::getLuaState(), bodyA);
-        LuaIntf::Lua::push(LuaBind::getLuaState(), bodyB);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), shapeA);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), shapeB);
         LuaBind::luaCallback(2, 0, 0);
     }
 }
 
-void PhysicsWorld::onBeginContact(void (*onBeginContactFunc)(Body*, Body*)){
+void PhysicsWorld::onBeginContact(void (*onBeginContactFunc)(CollisionShape*, CollisionShape*)){
     this->onBeginContactFunc = onBeginContactFunc;
 }
 
@@ -59,7 +59,7 @@ int PhysicsWorld::onBeginContact(lua_State *L){
     return 0;
 }
 
-void PhysicsWorld::onEndContact(void (*onEndContactFunc)(Body*, Body*)){
+void PhysicsWorld::onEndContact(void (*onEndContactFunc)(CollisionShape*, CollisionShape*)){
     this->onEndContactFunc = onEndContactFunc;
 }
 
