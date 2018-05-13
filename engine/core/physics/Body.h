@@ -4,6 +4,8 @@
 #include "math/Vector3.h"
 #include "math/Quaternion.h"
 #include <string>
+#include <vector>
+#include "CollisionShape.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -21,6 +23,8 @@ namespace Supernova {
         bool is3D;
         Vector3 center;
         ConcreteObject* attachedObject;
+        std::vector<CollisionShape*> shapes;
+        bool ownedShapes;
 
         Body();
 
@@ -36,7 +40,10 @@ namespace Supernova {
         void setName(std::string name);
         std::string getName();
 
-        virtual void updateObject(ConcreteObject* object);
+        void setOwnedShapes(bool ownedShapes);
+        bool isOwnedShapes();
+
+        void updateObject(ConcreteObject* object);
     };
 }
 

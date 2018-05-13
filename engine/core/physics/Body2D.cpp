@@ -22,9 +22,8 @@ Body2D::Body2D(): Body() {
 }
 
 Body2D::~Body2D(){
-    if (body){
-        body->GetWorld()->DestroyBody(body);
-    }
+    destroyBody();
+
     delete bodyDef;
 }
 
@@ -34,14 +33,19 @@ void Body2D::createBody(PhysicsWorld2D* world){
     this->world = world;
 
     for (int i = 0; i < shapes.size(); i++){
-        shapes[i]->createFixture(this);
+        ((CollisionShape2D*)shapes[i])->createFixture(this);
     }
 }
 
 void Body2D::destroyBody(){
-    world->getBox2DWorld()->DestroyBody(body);
-    body = NULL;
-    world = NULL;
+    if (body && world) {
+        for (int i = 0; i < shapes.size(); i++){
+            ((CollisionShape2D*)shapes[i])->destroyFixture();
+        }
+        world->getBox2DWorld()->DestroyBody(body);
+        body = NULL;
+        world = NULL;
+    }
 }
 
 b2Body* Body2D::getBox2DBody(){
@@ -55,7 +59,7 @@ PhysicsWorld2D* Body2D::getWorld(){
 void Body2D::addCollisionShape(CollisionShape2D* shape){
     bool founded = false;
 
-    std::vector<CollisionShape2D*>::iterator it;
+    std::vector<CollisionShape*>::iterator it;
     for (it = shapes.begin(); it != shapes.end(); ++it) {
         if (shape == (*it))
             founded = true;
@@ -71,7 +75,7 @@ void Body2D::addCollisionShape(CollisionShape2D* shape){
 }
 
 void Body2D::removeCollisionShape(CollisionShape2D* shape){
-    std::vector<CollisionShape2D*>::iterator i = std::remove(shapes.begin(), shapes.end(), shape);
+    std::vector<CollisionShape*>::iterator i = std::remove(shapes.begin(), shapes.end(), shape);
     shapes.erase(i, shapes.end());
 
     if (body){

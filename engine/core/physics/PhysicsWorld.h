@@ -3,6 +3,8 @@
 #define PHYSICSWORLD_H
 
 #include "CollisionShape.h"
+#include "Body.h"
+#include <vector>
 
 typedef struct lua_State lua_State;
 
@@ -11,6 +13,8 @@ typedef struct lua_State lua_State;
 //
 
 namespace Supernova {
+    class Scene;
+
     class PhysicsWorld {
     private:
         void (*onBeginContactFunc)(CollisionShape*, CollisionShape*);
@@ -20,9 +24,15 @@ namespace Supernova {
         int onEndContactLuaFunc;
 
     protected:
+        std::vector<Body*> bodies;
+        bool ownedBodies;
+        Scene* attachedScene;
+
         PhysicsWorld();
 
     public:
+        virtual ~PhysicsWorld();
+
         void call_onBeginContact(CollisionShape* shapeA, CollisionShape* shapeB);
         void call_onEndContact(CollisionShape* shapeA, CollisionShape* shapeB);
 
@@ -31,6 +41,11 @@ namespace Supernova {
 
         void onEndContact(void (*onEndContactFunc)(CollisionShape*, CollisionShape*));
         int onEndContact(lua_State *L);
+
+        void setOwnedBodies(bool ownedBodies);
+        bool isOwnedBodies();
+
+        void updateScene(Scene* scene);
 
         virtual void step(float timeStep) = 0;
     };

@@ -22,6 +22,7 @@ namespace Supernova {
 
         int velocityIterations;
         int positionIterations;
+
     public:
         PhysicsWorld2D();
         virtual ~PhysicsWorld2D();

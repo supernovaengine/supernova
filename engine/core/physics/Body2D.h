@@ -32,8 +32,6 @@ namespace Supernova {
 
         bool dynamic;
 
-        std::vector<CollisionShape2D*> shapes;
-
     public:
         Body2D();
         virtual ~Body2D();

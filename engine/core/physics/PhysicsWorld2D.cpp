@@ -47,6 +47,9 @@ PhysicsWorld2D::PhysicsWorld2D(): PhysicsWorld(){
 }
 
 PhysicsWorld2D::~PhysicsWorld2D(){
+    for (int i = 0; i < bodies.size(); i++){
+        ((Body2D*)bodies[i])->destroyBody();
+    }
     delete contactListener;
     delete world;
 }
@@ -56,10 +59,25 @@ b2World* PhysicsWorld2D::getBox2DWorld(){
 }
 
 void PhysicsWorld2D::addBody(Body2D* body){
-    body->createBody(this);
+    bool founded = false;
+
+    std::vector<Body*>::iterator it;
+    for (it = bodies.begin(); it != bodies.end(); ++it) {
+        if (body == (*it))
+            founded = true;
+    }
+
+    if (!founded){
+        bodies.push_back(body);
+
+        body->createBody(this);
+    }
 }
 
 void PhysicsWorld2D::removeBody(Body2D* body){
+    std::vector<Body*>::iterator i = std::remove(bodies.begin(), bodies.end(), body);
+    bodies.erase(i, bodies.end());
+
     body->destroyBody();
 }
 

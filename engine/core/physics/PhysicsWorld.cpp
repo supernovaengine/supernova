@@ -1,5 +1,6 @@
 #include "PhysicsWorld.h"
 
+#include "Scene.h"
 #include "LuaBind.h"
 
 #include "lua.h"
@@ -20,6 +21,19 @@ PhysicsWorld::PhysicsWorld(){
 
     onEndContactFunc = NULL;
     onEndContactLuaFunc = 0;
+
+    ownedBodies = true;
+    attachedScene = NULL;
+}
+
+PhysicsWorld::~PhysicsWorld(){
+    if (attachedScene)
+        attachedScene->removePhysics(this);
+
+    if (ownedBodies){
+        for (int i = 0; i < bodies.size(); i++)
+            delete bodies[i];
+    }
 }
 
 void PhysicsWorld::call_onBeginContact(CollisionShape* shapeA, CollisionShape* shapeB){
@@ -70,4 +84,16 @@ int PhysicsWorld::onEndContact(lua_State *L){
         //TODO: return error in Lua
     }
     return 0;
+}
+
+void PhysicsWorld::setOwnedBodies(bool ownedBodies){
+    this->ownedBodies = ownedBodies;
+}
+
+bool PhysicsWorld::isOwnedBodies(){
+    return ownedBodies;
+}
+
+void PhysicsWorld::updateScene(Scene* scene){
+    attachedScene = scene;
 }
