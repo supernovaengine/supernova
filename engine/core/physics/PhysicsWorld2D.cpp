@@ -45,7 +45,7 @@ PhysicsWorld2D::PhysicsWorld2D(): PhysicsWorld(){
     velocityIterations = 8;
     positionIterations = 3;
 
-    pointsToMeterScale = 128;
+    pointsToMeterScale = 64;
 }
 
 PhysicsWorld2D::PhysicsWorld2D(int pointsToMeterScale): PhysicsWorld2D(){

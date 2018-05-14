@@ -36,11 +36,11 @@ CollisionShape2D::~CollisionShape2D(){
 }
 
 void CollisionShape2D::createFixture(Body2D* body){
+    computeShape(body->getWorld()->getPointsToMeterScale());
+
     fixture = body->getBox2DBody()->CreateFixture(fixtureDef);
     fixture->SetUserData(this);
     this->body = body;
-
-    //computeShape();
 }
 
 void CollisionShape2D::destroyFixture(){
@@ -70,34 +70,22 @@ void CollisionShape2D::setShapeBox(float width, float height){
     shape = new b2PolygonShape();
     fixtureDef->shape = shape;
 
-    computeShape();
+    if (fixture)
+        Log::Error("Can not edit the Shape after it is added to a Body2D");
 }
 
 void CollisionShape2D::setShapeVertices(std::vector<Vector2> vertices){
     this->vertices = vertices;
-
+    
     if (shape)
         delete shape;
-
+    
     shapeType = S_COLLISIONSHAPE2D_VERTICES;
     shape = new b2PolygonShape();
     fixtureDef->shape = shape;
-
-    computeShape();
-}
-
-void CollisionShape2D::setShapeCircle(Vector2 center, float radius){
-    this->circleCenter = center;
-    this->circleRadius = radius;
-
-    if (shape)
-        delete shape;
-
-    shapeType = S_COLLISIONSHAPE2D_CIRCLE;
-    shape = new b2CircleShape();
-    fixtureDef->shape = shape;
-
-    computeShape();
+    
+    if (fixture)
+        Log::Error("Can not edit the Shape after it is added to a Body2D");
 }
 
 void CollisionShape2D::setShapeVertices(std::vector<Vector3> vertices){
@@ -106,16 +94,33 @@ void CollisionShape2D::setShapeVertices(std::vector<Vector3> vertices){
         this->vertices.push_back(Vector2(vertices[i].x, vertices[i].y));
     }
 
+    if (shape)
+        delete shape;
+    
     shapeType = S_COLLISIONSHAPE2D_VERTICES;
+    shape = new b2PolygonShape();
+    fixtureDef->shape = shape;
 
-    computeShape();
+    if (fixture)
+        Log::Error("Can not edit the Shape after it is added to a Body2D");
 }
 
-void CollisionShape2D::computeShape(){
+void CollisionShape2D::setShapeCircle(Vector2 center, float radius){
+    this->circleCenter = center;
+    this->circleRadius = radius;
+    
+    if (shape)
+        delete shape;
+    
+    shapeType = S_COLLISIONSHAPE2D_CIRCLE;
+    shape = new b2CircleShape();
+    fixtureDef->shape = shape;
+    
+    if (fixture)
+        Log::Error("Can not edit the Shape after it is added to a Body2D");
+}
 
-    int scale = 128;
-    if (body && body->getWorld())
-        scale = body->getWorld()->getPointsToMeterScale();
+void CollisionShape2D::computeShape(int scale){
 
     if (shapeType == S_COLLISIONSHAPE2D_BOX){
 
@@ -125,7 +130,7 @@ void CollisionShape2D::computeShape(){
                                                  b2Vec2((boxWidth - center.x) / scale, (boxHeight - center.y) / scale),
                                                  0);
         }else{
-            Log::Error("Cannot create shape box with size 0");
+            Log::Error("Can not create shape box with size 0");
         }
 
     }else if (shapeType == S_COLLISIONSHAPE2D_VERTICES) {
@@ -146,9 +151,9 @@ void CollisionShape2D::computeShape(){
             ((b2PolygonShape *) shape)->Set(b2Vertices, (int)vertices.size());
 
         }else if (vertices.size() == 0){
-            Log::Error("Cannot create shape because number of vertices is 0");
+            Log::Error("Can not create shape because number of vertices is 0");
         }else{
-            Log::Error("Cannot create shape because number of vertices must be less or equal than %i", b2_maxPolygonVertices);
+            Log::Error("Can not create shape because number of vertices must be less or equal than %i", b2_maxPolygonVertices);
         }
 
     }else if (shapeType == S_COLLISIONSHAPE2D_CIRCLE) {
@@ -157,7 +162,7 @@ void CollisionShape2D::computeShape(){
             ((b2CircleShape *) shape)->m_p.Set(circleCenter.x / scale, circleCenter.y / scale);
             ((b2CircleShape *) shape)->m_radius = circleRadius / scale;
         }else{
-            Log::Error("Cannot create shape circle with radius 0");
+            Log::Error("Can not create shape circle with radius 0");
         }
 
     }
@@ -221,7 +226,9 @@ bool CollisionShape2D::isSensor(){
 
 void CollisionShape2D::setCenter(Vector2 center){
     this->center = center;
-    computeShape();
+    
+    if (fixture)
+        Log::Error("Can not edit center after it is added to a Body2D");
 }
 
 void CollisionShape2D::setCenter(const float x, const float y){

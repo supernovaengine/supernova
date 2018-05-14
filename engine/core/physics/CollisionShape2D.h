@@ -42,7 +42,7 @@ namespace Supernova {
 
         Vector2 center;
 
-        void computeShape();
+        void computeShape(int scale = 1);
 
     public:
         CollisionShape2D();
