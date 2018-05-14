@@ -65,6 +65,12 @@ namespace Supernova {
         void setFriction(float friction);
         float getFriction();
 
+        void setRestituition(int restituition);
+        int getRestituition();
+
+        void setSensor(bool sensor);
+        bool isSensor();
+
         void setCenter(Vector2 center);
         void setCenter(const float x, const float y);
         Vector2 getCenter();

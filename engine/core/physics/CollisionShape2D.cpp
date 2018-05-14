@@ -12,6 +12,7 @@
 using namespace Supernova;
 
 CollisionShape2D::CollisionShape2D(): CollisionShape(){
+    fixture = NULL;
     shape = NULL;
     fixtureDef = new b2FixtureDef();
 
@@ -38,6 +39,8 @@ void CollisionShape2D::createFixture(Body2D* body){
     fixture = body->getBox2DBody()->CreateFixture(fixtureDef);
     fixture->SetUserData(this);
     this->body = body;
+
+    //computeShape();
 }
 
 void CollisionShape2D::destroyFixture(){
@@ -110,12 +113,16 @@ void CollisionShape2D::setShapeVertices(std::vector<Vector3> vertices){
 
 void CollisionShape2D::computeShape(){
 
+    int scale = 128;
+    if (body && body->getWorld())
+        scale = body->getWorld()->getPointsToMeterScale();
+
     if (shapeType == S_COLLISIONSHAPE2D_BOX){
 
         if (boxWidth > 0 && boxHeight > 0) {
-            ((b2PolygonShape *) shape)->SetAsBox(boxWidth / S_POINTS_TO_METER_RATIO,
-                                                 boxHeight / S_POINTS_TO_METER_RATIO,
-                                                 b2Vec2((boxWidth - center.x) / S_POINTS_TO_METER_RATIO, (boxHeight - center.y) / S_POINTS_TO_METER_RATIO),
+            ((b2PolygonShape *) shape)->SetAsBox(boxWidth / scale,
+                                                 boxHeight / scale,
+                                                 b2Vec2((boxWidth - center.x) / scale, (boxHeight - center.y) / scale),
                                                  0);
         }else{
             Log::Error("Cannot create shape box with size 0");
@@ -132,7 +139,7 @@ void CollisionShape2D::computeShape(){
             xf.q.Set(0);
 
             for (int i = 0; i < vertices.size(); i++){
-                b2Vertices[i].Set(vertices[i].x / S_POINTS_TO_METER_RATIO, vertices[i].y / S_POINTS_TO_METER_RATIO);
+                b2Vertices[i].Set(vertices[i].x / scale, vertices[i].y / scale);
                 b2Vertices[i] = b2Mul(xf, b2Vertices[i]);
             }
 
@@ -147,8 +154,8 @@ void CollisionShape2D::computeShape(){
     }else if (shapeType == S_COLLISIONSHAPE2D_CIRCLE) {
 
         if (circleRadius > 0){
-            ((b2CircleShape *) shape)->m_p.Set(circleCenter.x / S_POINTS_TO_METER_RATIO, circleCenter.y / S_POINTS_TO_METER_RATIO);
-            ((b2CircleShape *) shape)->m_radius = circleRadius / S_POINTS_TO_METER_RATIO;
+            ((b2CircleShape *) shape)->m_p.Set(circleCenter.x / scale, circleCenter.y / scale);
+            ((b2CircleShape *) shape)->m_radius = circleRadius / scale;
         }else{
             Log::Error("Cannot create shape circle with radius 0");
         }
@@ -158,18 +165,58 @@ void CollisionShape2D::computeShape(){
 
 void CollisionShape2D::setDensity(float density){
     fixtureDef->density = density;
+    if (fixture)
+        fixture->SetDensity(density);
 }
 
 float CollisionShape2D::getDensity(){
-    return fixtureDef->density;
+    int density = fixtureDef->density;
+    if (fixture)
+        density = fixture->GetDensity();
+
+    return density;
 }
 
 void CollisionShape2D::setFriction(float friction){
     fixtureDef->friction = friction;
+    if (fixture)
+        fixture->SetFriction(friction);
 }
 
 float CollisionShape2D::getFriction(){
-    return fixtureDef->friction;
+    int friction = fixtureDef->friction;
+    if (fixture)
+        friction = fixture->GetFriction();
+
+    return friction;
+}
+
+void CollisionShape2D::setRestituition(int restituition){
+    fixtureDef->restitution = restituition;
+    if (fixture)
+        fixture->SetRestitution(restituition);
+}
+
+int CollisionShape2D::getRestituition(){
+    int restituition = fixtureDef->restitution;
+    if (fixture)
+        restituition = fixture->GetRestitution();
+
+    return restituition;
+}
+
+void CollisionShape2D::setSensor(bool sensor){
+    fixtureDef->isSensor = sensor;
+    if (fixture)
+        fixture->SetSensor(sensor);
+}
+
+bool CollisionShape2D::isSensor(){
+    bool sensor = fixtureDef->isSensor;
+    if (fixture)
+        sensor = fixture->IsSensor();
+
+    return sensor;
 }
 
 void CollisionShape2D::setCenter(Vector2 center){

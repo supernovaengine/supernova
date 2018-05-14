@@ -1,8 +1,6 @@
 #ifndef PHYSICSWORLD2D_H
 #define PHYSICSWORLD2D_H
 
-#define S_POINTS_TO_METER_RATIO 128
-
 //
 // (c) 2018 Eduardo Doria.
 //
@@ -23,8 +21,12 @@ namespace Supernova {
         int velocityIterations;
         int positionIterations;
 
+        //Cannot be changed after creation
+        int pointsToMeterScale;
+
     public:
         PhysicsWorld2D();
+        PhysicsWorld2D(int pointsToMeterScale);
         virtual ~PhysicsWorld2D();
 
         b2World* getBox2DWorld();
@@ -40,6 +42,8 @@ namespace Supernova {
         Vector2 getGravity();
         int getVelocityIterations();
         int getPositionIterations();
+
+        int getPointsToMeterScale();
 
         virtual void step(float timeStep);
     };

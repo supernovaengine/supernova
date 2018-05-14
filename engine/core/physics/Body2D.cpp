@@ -13,7 +13,6 @@ using namespace Supernova;
 
 Body2D::Body2D(): Body() {
     is3D = false;
-    dynamic = false;
 
     world = NULL;
 
@@ -28,6 +27,9 @@ Body2D::~Body2D(){
 }
 
 void Body2D::createBody(PhysicsWorld2D* world){
+    int scale = world->getPointsToMeterScale();
+    bodyDef->position = b2Vec2(bodyDef->position.x / scale, bodyDef->position.y / scale);
+
     body = world->getBox2DWorld()->CreateBody(bodyDef);
     body->SetUserData(this);
     this->world = world;
@@ -42,6 +44,9 @@ void Body2D::destroyBody(){
         for (int i = 0; i < shapes.size(); i++){
             ((CollisionShape2D*)shapes[i])->destroyFixture();
         }
+        int scale = world->getPointsToMeterScale();
+        bodyDef->position = b2Vec2(bodyDef->position.x * scale, bodyDef->position.y * scale);
+
         world->getBox2DWorld()->DestroyBody(body);
         body = NULL;
         world = NULL;
@@ -83,18 +88,41 @@ void Body2D::removeCollisionShape(CollisionShape2D* shape){
     }
 }
 
-void Body2D::setDynamic(bool dynamic){
-    this->dynamic = dynamic;
-
-    if (this->dynamic) {
-        bodyDef->type = b2_dynamicBody;
-        if (body)
-            body->SetType(b2_dynamicBody);
-    } else {
+void Body2D::setType(int type){
+    if (type == S_BODY2D_STATIC){
         bodyDef->type = b2_staticBody;
         if (body)
             body->SetType(b2_staticBody);
     }
+    if (type == S_BODY2D_DYNAMIC){
+        bodyDef->type = b2_dynamicBody;
+        if (body)
+            body->SetType(b2_dynamicBody);
+    }
+    if (type == S_BODY2D_KINEMATIC){
+        bodyDef->type = b2_kinematicBody;
+        if (body)
+            body->SetType(b2_kinematicBody);
+    }
+}
+
+int Body2D::getType(){
+    if (body){
+        if (body->GetType() == b2_staticBody)
+            return S_BODY2D_STATIC;
+        if (body->GetType() == b2_dynamicBody)
+            return S_BODY2D_DYNAMIC;
+        if (body->GetType() == b2_kinematicBody)
+            return S_BODY2D_KINEMATIC;
+    }
+    if (bodyDef->type == b2_staticBody)
+        return S_BODY2D_STATIC;
+    if (bodyDef->type == b2_dynamicBody)
+        return S_BODY2D_DYNAMIC;
+    if (bodyDef->type == b2_kinematicBody)
+        return S_BODY2D_KINEMATIC;
+
+    return S_BODY2D_STATIC;
 }
 
 void Body2D::setFixedRotation(bool fixedRotation){
@@ -108,7 +136,7 @@ bool Body2D::getFixedRotation(){
 }
 
 void Body2D::setLinearVelocity(Vector2 linearVelocity){
-    b2Vec2 nLinearVelocity(linearVelocity.x / S_POINTS_TO_METER_RATIO, linearVelocity.y / S_POINTS_TO_METER_RATIO);
+    b2Vec2 nLinearVelocity(linearVelocity.x, linearVelocity.y);
 
     bodyDef->linearVelocity = nLinearVelocity;
     if (body)
@@ -119,19 +147,70 @@ Vector2 Body2D::getLinearVelocity(){
     b2Vec2 linearVelocity = bodyDef->linearVelocity;
     if (body)
         linearVelocity = body->GetLinearVelocity();
-    return Vector2(linearVelocity.x * S_POINTS_TO_METER_RATIO,
-                   linearVelocity.y * S_POINTS_TO_METER_RATIO);
+
+    return Vector2(linearVelocity.x,
+                   linearVelocity.y);
+}
+
+void Body2D::setAngularVelocity(float angularVelocity){
+    bodyDef->angularVelocity = angularVelocity;
+    if (body)
+        body->SetAngularVelocity(angularVelocity);
+}
+
+float Body2D::getAngularVelocity(){
+    float angularVelocity = bodyDef->angularVelocity;
+    if (body)
+        angularVelocity = body->GetAngularVelocity();
+
+    return angularVelocity;
+}
+
+float Body2D::getMass(){
+    if (body)
+        return body->GetMass();
+
+    return 0;
 }
 
 void Body2D::applyForce(const Vector2 force, const Vector2 point){
-    if (body){
-        body->ApplyForce(b2Vec2(force.x / S_POINTS_TO_METER_RATIO, force.y / S_POINTS_TO_METER_RATIO),
-                         b2Vec2(point.x / S_POINTS_TO_METER_RATIO, point.y / S_POINTS_TO_METER_RATIO), true);
-    }
+    if (body)
+        body->ApplyForce(b2Vec2(force.x, force.y),
+                         b2Vec2(point.x, point.y), true);
+}
+
+void Body2D::applyForceToCenter(const Vector2 force){
+    if (body)
+        body->ApplyForceToCenter(b2Vec2(force.x, force.y), true);
+}
+
+void Body2D::applyAngularImpulse(float impulse){
+    if (body)
+        body->ApplyAngularImpulse(impulse, true);
+}
+
+void Body2D::applyLinearImpulse(const Vector2 impulse, const Vector2 point){
+    if (body)
+        body->ApplyLinearImpulse(b2Vec2(impulse.x, impulse.y),
+                                 b2Vec2(point.x, point.y), true);
+}
+
+void Body2D::applyLinearImpulseToCenter(const Vector2 impulse){
+    if (body)
+        body->ApplyLinearImpulseToCenter(b2Vec2(impulse.x, impulse.y), true);
+}
+
+void Body2D::applyTorque(const float torque){
+    if (body)
+        body->ApplyTorque(torque, true);
 }
 
 void Body2D::setPosition(Vector2 position){
-    b2Vec2 nPosition(position.x / S_POINTS_TO_METER_RATIO, position.y / S_POINTS_TO_METER_RATIO);
+    int scale = 1;
+    if (world)
+        scale = world->getPointsToMeterScale();
+
+    b2Vec2 nPosition(position.x / scale, position.y / scale);
 
     bodyDef->position = nPosition;
     if (body)
@@ -155,19 +234,26 @@ void Body2D::setRotation(Quaternion rotation){
 }
 
 Vector3 Body2D::getPosition(){
+    int scale = 1;
+    if (world)
+        scale = world->getPointsToMeterScale();
+
     b2Vec2 position = bodyDef->position;
-    if (body)
+    if (body) {
         position = body->GetPosition();
-    return Vector3(position.x * S_POINTS_TO_METER_RATIO, position.y * S_POINTS_TO_METER_RATIO, 0.0f);
+    }
+    Vector3 teste = Vector3(position.x * scale, position.y * scale, 0.0f);
+
+    return Vector3(position.x * scale, position.y * scale, 0.0f);
 }
 
 Quaternion Body2D::getRotation(){
+    float angle = bodyDef->angle;
+    Quaternion rotation;
     if (body) {
-        float angle = body->GetAngle();
-        Quaternion rotation;
-        rotation.fromAngle(Angle::radToDefault(angle));
-        return rotation;
-    }else{
-        return Quaternion();
+        angle = body->GetAngle();
     }
+    rotation.fromAngle(Angle::radToDefault(angle));
+
+    return rotation;
 }

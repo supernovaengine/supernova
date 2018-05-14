@@ -1,9 +1,9 @@
 #ifndef BODY2D_H
 #define BODY2D_H
 
-#define S_BODY2D_SHAPE_BOX 0
-#define S_BODY2D_SHAPE_VERTICES 1
-#define S_BODY2D_SHAPE_CIRCLE 2
+#define S_BODY2D_STATIC 0
+#define S_BODY2D_DYNAMIC 1
+#define S_BODY2D_KINEMATIC 2
 
 #include "Body.h"
 #include "CollisionShape2D.h"
@@ -30,8 +30,6 @@ namespace Supernova {
 
         PhysicsWorld2D* world;
 
-        bool dynamic;
-
     public:
         Body2D();
         virtual ~Body2D();
@@ -45,7 +43,8 @@ namespace Supernova {
         void addCollisionShape(CollisionShape2D* shape);
         void removeCollisionShape(CollisionShape2D* shape);
 
-        void setDynamic(bool dynamic);
+        void setType(int type);
+        int getType();
 
         void setFixedRotation(bool fixedRotation);
         bool getFixedRotation();
@@ -53,7 +52,17 @@ namespace Supernova {
         void setLinearVelocity(Vector2 linearVelocity);
         Vector2 getLinearVelocity();
 
+        void setAngularVelocity(float angularVelocity);
+        float getAngularVelocity();
+
+        float getMass();
+
         void applyForce(const Vector2 force, const Vector2 point);
+        void applyForceToCenter(const Vector2 force);
+        void applyAngularImpulse(const float impulse);
+        void applyLinearImpulse(const Vector2 impulse, const Vector2 point);
+        void applyLinearImpulseToCenter(const Vector2 impulse);
+        void applyTorque(const float torque);
 
         void setPosition(Vector2 position);
         virtual void setPosition(Vector3 position);

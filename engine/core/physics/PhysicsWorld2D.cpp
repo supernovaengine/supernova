@@ -44,6 +44,12 @@ PhysicsWorld2D::PhysicsWorld2D(): PhysicsWorld(){
 
     velocityIterations = 8;
     positionIterations = 3;
+
+    pointsToMeterScale = 128;
+}
+
+PhysicsWorld2D::PhysicsWorld2D(int pointsToMeterScale): PhysicsWorld2D(){
+    this->pointsToMeterScale = pointsToMeterScale;
 }
 
 PhysicsWorld2D::~PhysicsWorld2D(){
@@ -86,7 +92,7 @@ void PhysicsWorld2D::setGravity(Vector2 gravity){
 }
 
 void PhysicsWorld2D::setGravity(float gravityX, float gravityY){
-    world->SetGravity(b2Vec2(gravityX / S_POINTS_TO_METER_RATIO, gravityY / S_POINTS_TO_METER_RATIO));
+    world->SetGravity(b2Vec2(gravityX, gravityY));
 }
 
 void PhysicsWorld2D::setVelocityIterations(int velocityIterations){
@@ -99,7 +105,7 @@ void PhysicsWorld2D::setPositionIterations(int positionIterations){
 
 Vector2 PhysicsWorld2D::getGravity(){
     b2Vec2 gravity = world->GetGravity();
-    return Vector2(gravity.x * S_POINTS_TO_METER_RATIO, gravity.y * S_POINTS_TO_METER_RATIO);
+    return Vector2(gravity.x, gravity.y);
 }
 
 int PhysicsWorld2D::getVelocityIterations(){
@@ -108,6 +114,10 @@ int PhysicsWorld2D::getVelocityIterations(){
 
 int PhysicsWorld2D::getPositionIterations(){
     return positionIterations;
+}
+
+int PhysicsWorld2D::getPointsToMeterScale(){
+    return pointsToMeterScale;
 }
 
 void PhysicsWorld2D::step(float timeStep){
