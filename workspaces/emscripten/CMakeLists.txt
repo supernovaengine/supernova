@@ -25,15 +25,11 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core/platform")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core/render")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core/util")
 
-file(GLOB_RECURSE SUPERNOVA_PROJECT_SRCS ../../project/*.cpp)
-
 add_executable(
     supernova
 
     main.cpp
     SupernovaWeb.cpp
-
-    ${SUPERNOVA_PROJECT_SRCS}
 )
 
 set_target_properties(
@@ -44,5 +40,7 @@ set_target_properties(
 
 target_link_libraries(
     supernova
+
     supernova-core
+    supernova-project
 )

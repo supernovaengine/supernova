@@ -27,3 +27,5 @@ add_subdirectory (engine/libs/box2d)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/engine/core")
 add_subdirectory (engine/core)
+
+add_subdirectory (project)
