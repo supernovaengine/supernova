@@ -3,7 +3,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 file(GLOB_RECURSE SUPERNOVA_SRCS *.cpp)
 
 add_library(
-    supernova-core
+    supernova
 
     STATIC
 
@@ -11,6 +11,6 @@ add_library(
 )
 
 target_link_libraries(
-    supernova-core
+    supernova
     lua tinyobjloader mpg123 soloud stb box2d
 )
