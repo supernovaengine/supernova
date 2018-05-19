@@ -10,7 +10,6 @@
 		7105A9E720A258130028DCC7 /* PhysicsWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A9E320A258120028DCC7 /* PhysicsWorld.cpp */; };
 		7105A9E820A258130028DCC7 /* PhysicsWorld2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */; };
 		7108B9211F00A0DE005B7783 /* synth_8bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28381DE8EA1500C12A1D /* synth_8bit.c */; };
-		71192EFD1CE1334000BD76EE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
 		7119E6AB20A6A0B80016AEF2 /* CollisionShape2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119E6AA20A6A0B80016AEF2 /* CollisionShape2D.cpp */; };
 		7119E6AE20AA2A440016AEF2 /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119E6AC20AA2A440016AEF2 /* CollisionShape.cpp */; };
 		712379201EC13C7E00BFD1F7 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */; };
@@ -144,6 +143,11 @@
 		71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28351DE8E96800C12A1D /* MP3Reader.cpp */; };
 		71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FAC11DEB1924003850A2 /* SoundManager.cpp */; };
 		71AC8B611E6B42C000DB33C3 /* Points.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301261E53D4B000BEE527 /* Points.cpp */; };
+		71B818C120B095A10069E8FA /* Boy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71B818AF20B08F480069E8FA /* Boy.cpp */; };
+		71B818C220B095A10069E8FA /* Map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71B818AE20B08F480069E8FA /* Map.cpp */; };
+		71B818C320B095A10069E8FA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
+		71B818C420B095BD0069E8FA /* libsupernova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC7041D7B142D0060EEFF /* libsupernova.a */; };
+		71B818C520B095CC0069E8FA /* libsupernova-project.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71B818B720B094930069E8FA /* libsupernova-project.a */; };
 		71BCF6C21E476F42008E42A2 /* Text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BCF6C01E476F42008E42A2 /* Text.cpp */; };
 		71BCF6C31E476F49008E42A2 /* SkyBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7193011B1E42943800BEE527 /* SkyBox.cpp */; };
 		71BD28191DE8879100C12A1D /* dct64.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD26261DE886C200C12A1D /* dct64.c */; };
@@ -290,6 +294,20 @@
 			remoteGlobalIDString = 717E665120A10EF100ABC488;
 			remoteInfo = box2d;
 		};
+		71B818C620B09B400069E8FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 716AB59A1BEF9F3C001B672D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 71CDC7031D7B142D0060EEFF;
+			remoteInfo = supernova;
+		};
+		71B818C820B09B4C0069E8FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 716AB59A1BEF9F3C001B672D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 71B818B620B094930069E8FA;
+			remoteInfo = "supernova-project";
+		};
 		71BCFA981E47C1F7008E42A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 716AB59A1BEF9F3C001B672D /* Project object */;
@@ -347,6 +365,15 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		717E665020A10EF100ABC488 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71B818B520B094930069E8FA /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
@@ -568,7 +595,7 @@
 		71598C411E7CA245000EDAC0 /* Fog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Fog.cpp; sourceTree = "<group>"; };
 		71598C421E7CA245000EDAC0 /* Fog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Fog.h; sourceTree = "<group>"; };
 		715AC0CA1D7B09F4003D7C8C /* liblua.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblua.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		716AB5A21BEF9F3C001B672D /* Supernova.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Supernova.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		716AB5A21BEF9F3C001B672D /* supernova-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "supernova-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		716AB5A61BEF9F3C001B672D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		716AB5A81BEF9F3C001B672D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		716AB5A91BEF9F3C001B672D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -723,6 +750,11 @@
 		71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 		71A6FAC11DEB1924003850A2 /* SoundManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundManager.cpp; sourceTree = "<group>"; };
 		71A6FAC21DEB1924003850A2 /* SoundManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
+		71B818AD20B08F470069E8FA /* Boy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Boy.h; sourceTree = "<group>"; };
+		71B818AE20B08F480069E8FA /* Map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Map.cpp; sourceTree = "<group>"; };
+		71B818AF20B08F480069E8FA /* Boy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Boy.cpp; sourceTree = "<group>"; };
+		71B818B020B08F480069E8FA /* Map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Map.h; sourceTree = "<group>"; };
+		71B818B720B094930069E8FA /* libsupernova-project.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libsupernova-project.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BCF6C01E476F42008E42A2 /* Text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Text.cpp; sourceTree = "<group>"; };
 		71BCF6C11E476F42008E42A2 /* Text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Text.h; sourceTree = "<group>"; };
 		71BCFC181E47DCC8008E42A2 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -963,9 +995,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71CDC73C1D7B14D20060EEFF /* libsupernova.a in Frameworks */,
+				71B818C520B095CC0069E8FA /* libsupernova-project.a in Frameworks */,
 				71F59C681EBFD1BD00F49392 /* AudioToolbox.framework in Frameworks */,
 				7188F1AF1DBC5A4100A2D04F /* OpenAL.framework in Frameworks */,
-				71CDC73C1D7B14D20060EEFF /* libsupernova.a in Frameworks */,
 				71CDC6FF1D7B13350060EEFF /* OpenGLES.framework in Frameworks */,
 				71CDC6FD1D7B132B0060EEFF /* QuartzCore.framework in Frameworks */,
 			);
@@ -975,6 +1008,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71B818B420B094930069E8FA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71B818C420B095BD0069E8FA /* libsupernova.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1037,6 +1078,10 @@
 		71192EFA1CE1334000BD76EE /* project */ = {
 			isa = PBXGroup;
 			children = (
+				71B818AF20B08F480069E8FA /* Boy.cpp */,
+				71B818AD20B08F470069E8FA /* Boy.h */,
+				71B818AE20B08F480069E8FA /* Map.cpp */,
+				71B818B020B08F480069E8FA /* Map.h */,
 				71192EFB1CE1334000BD76EE /* main.cpp */,
 			);
 			name = project;
@@ -1375,7 +1420,7 @@
 		716AB5A31BEF9F3C001B672D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				716AB5A21BEF9F3C001B672D /* Supernova.app */,
+				716AB5A21BEF9F3C001B672D /* supernova-ios.app */,
 				715AC0CA1D7B09F4003D7C8C /* liblua.a */,
 				71CDC7041D7B142D0060EEFF /* libsupernova.a */,
 				71CDC7411D7B167C0060EEFF /* libtinyobjloader.a */,
@@ -1383,6 +1428,7 @@
 				71F59B441EBFCA3100F49392 /* libsoloud.a */,
 				712379111EC13C6000BFD1F7 /* libstb.a */,
 				717E665220A10EF100ABC488 /* libbox2d.a */,
+				71B818B720B094930069E8FA /* libsupernova-project.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1961,9 +2007,9 @@
 			productReference = 715AC0CA1D7B09F4003D7C8C /* liblua.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		716AB5A11BEF9F3C001B672D /* Supernova */ = {
+		716AB5A11BEF9F3C001B672D /* supernova-ios */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 716AB5BD1BEF9F3D001B672D /* Build configuration list for PBXNativeTarget "Supernova" */;
+			buildConfigurationList = 716AB5BD1BEF9F3D001B672D /* Build configuration list for PBXNativeTarget "supernova-ios" */;
 			buildPhases = (
 				716AB59E1BEF9F3C001B672D /* Sources */,
 				716AB59F1BEF9F3C001B672D /* Frameworks */,
@@ -1972,11 +2018,12 @@
 			buildRules = (
 			);
 			dependencies = (
+				71B818C920B09B4C0069E8FA /* PBXTargetDependency */,
 				71CDC73B1D7B14CE0060EEFF /* PBXTargetDependency */,
 			);
-			name = Supernova;
+			name = "supernova-ios";
 			productName = Supernova;
-			productReference = 716AB5A21BEF9F3C001B672D /* Supernova.app */;
+			productReference = 716AB5A21BEF9F3C001B672D /* supernova-ios.app */;
 			productType = "com.apple.product-type.application";
 		};
 		717E665120A10EF100ABC488 /* box2d */ = {
@@ -1994,6 +2041,24 @@
 			name = box2d;
 			productName = box2d;
 			productReference = 717E665220A10EF100ABC488 /* libbox2d.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		71B818B620B094930069E8FA /* supernova-project */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 71B818BB20B094940069E8FA /* Build configuration list for PBXNativeTarget "supernova-project" */;
+			buildPhases = (
+				71B818B320B094930069E8FA /* Sources */,
+				71B818B420B094930069E8FA /* Frameworks */,
+				71B818B520B094930069E8FA /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				71B818C720B09B400069E8FA /* PBXTargetDependency */,
+			);
+			name = "supernova-project";
+			productName = "supernova-project";
+			productReference = 71B818B720B094930069E8FA /* libsupernova-project.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		71BD25491DE886B100C12A1D /* mpg123 */ = {
@@ -2076,7 +2141,8 @@
 		716AB59A1BEF9F3C001B672D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0810;
+				LastSwiftUpdateCheck = 0930;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = Deslon;
 				TargetAttributes = {
 					712379101EC13C6000BFD1F7 = {
@@ -2091,6 +2157,10 @@
 					};
 					717E665120A10EF100ABC488 = {
 						CreatedOnToolsVersion = 9.3;
+						ProvisioningStyle = Automatic;
+					};
+					71B818B620B094930069E8FA = {
+						CreatedOnToolsVersion = 9.3.1;
 						ProvisioningStyle = Automatic;
 					};
 					71BD25491DE886B100C12A1D = {
@@ -2122,9 +2192,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				716AB5A11BEF9F3C001B672D /* Supernova */,
-				715AC0C91D7B09F4003D7C8C /* lua */,
+				716AB5A11BEF9F3C001B672D /* supernova-ios */,
 				71CDC7031D7B142D0060EEFF /* supernova */,
+				71B818B620B094930069E8FA /* supernova-project */,
+				715AC0C91D7B09F4003D7C8C /* lua */,
 				71CDC7401D7B167C0060EEFF /* tinyobjloader */,
 				71BD25491DE886B100C12A1D /* mpg123 */,
 				71F59B431EBFCA3100F49392 /* soloud */,
@@ -2207,7 +2278,6 @@
 				716AB5AA1BEF9F3C001B672D /* AppDelegate.m in Sources */,
 				716AB5B11BEF9F3D001B672D /* GameViewController.mm in Sources */,
 				716AB5A71BEF9F3C001B672D /* main.m in Sources */,
-				71192EFD1CE1334000BD76EE /* main.cpp in Sources */,
 				717FA2091CA1843C009071DC /* EAGLView.mm in Sources */,
 				7151F2801CD4FA86001A3AC3 /* SupernovaIOS.mm in Sources */,
 			);
@@ -2263,6 +2333,16 @@
 				717E66DA20A10F1400ABC488 /* b2WorldCallbacks.cpp in Sources */,
 				717E66E520A10F1400ABC488 /* b2FrictionJoint.cpp in Sources */,
 				717E66E320A10F1400ABC488 /* b2PolygonContact.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71B818B320B094930069E8FA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71B818C220B095A10069E8FA /* Map.cpp in Sources */,
+				71B818C120B095A10069E8FA /* Boy.cpp in Sources */,
+				71B818C320B095A10069E8FA /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2469,6 +2549,16 @@
 			target = 717E665120A10EF100ABC488 /* box2d */;
 			targetProxy = 717E66F220A10F5A00ABC488 /* PBXContainerItemProxy */;
 		};
+		71B818C720B09B400069E8FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 71CDC7031D7B142D0060EEFF /* supernova */;
+			targetProxy = 71B818C620B09B400069E8FA /* PBXContainerItemProxy */;
+		};
+		71B818C920B09B4C0069E8FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 71B818B620B094930069E8FA /* supernova-project */;
+			targetProxy = 71B818C820B09B4C0069E8FA /* PBXContainerItemProxy */;
+		};
 		71BCFA991E47C1F7008E42A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 71BD25491DE886B100C12A1D /* mpg123 */;
@@ -2583,14 +2673,22 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -2633,14 +2731,22 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -2776,6 +2882,75 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 				USE_HEADERMAP = YES;
+			};
+			name = Release;
+		};
+		71B818BC20B094940069E8FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/core";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		71B818BD20B094940069E8FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/core";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -2960,7 +3135,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		716AB5BD1BEF9F3D001B672D /* Build configuration list for PBXNativeTarget "Supernova" */ = {
+		716AB5BD1BEF9F3D001B672D /* Build configuration list for PBXNativeTarget "supernova-ios" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				716AB5BE1BEF9F3D001B672D /* Debug */,
@@ -2974,6 +3149,15 @@
 			buildConfigurations = (
 				717E665820A10EF100ABC488 /* Debug */,
 				717E665920A10EF100ABC488 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		71B818BB20B094940069E8FA /* Build configuration list for PBXNativeTarget "supernova-project" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				71B818BC20B094940069E8FA /* Debug */,
+				71B818BD20B094940069E8FA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
