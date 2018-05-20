@@ -46,6 +46,7 @@ namespace Supernova {
 
     public:
         CollisionShape2D();
+        CollisionShape2D(float boxWidth, float boxHeight);
         virtual ~CollisionShape2D();
 
         void createFixture(Body2D* body);

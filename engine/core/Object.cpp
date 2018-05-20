@@ -4,6 +4,9 @@
 #include "Light.h"
 #include "Scene.h"
 
+//
+// (c) 2018 Eduardo Doria.
+//
 
 using namespace Supernova;
 

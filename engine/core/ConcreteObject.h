@@ -2,6 +2,10 @@
 #ifndef ConcreteObject_h
 #define ConcreteObject_h
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 #include "Object.h"
 #include "Material.h"
 #include "physics/Body2D.h"
@@ -35,6 +39,12 @@ namespace Supernova {
         virtual ~ConcreteObject();
         
         Matrix4 getNormalMatrix();
+
+        using Object::setPosition; //add all setPosition overrides
+        virtual void setPosition(Vector3 position);
+        
+        using Object::setRotation; //add all setRotation overrides
+        virtual void setRotation(Quaternion rotation);
 
         void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);

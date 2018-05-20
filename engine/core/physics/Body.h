@@ -15,6 +15,8 @@ namespace Supernova {
     class ConcreteObject;
 
     class Body {
+        
+        friend class ConcreteObject;
 
     private:
         std::string name;
@@ -43,7 +45,7 @@ namespace Supernova {
         void setOwnedShapes(bool ownedShapes);
         bool isOwnedShapes();
 
-        void updateObject(ConcreteObject* object);
+        void updateObject();
     };
 }
 

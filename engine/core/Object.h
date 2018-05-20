@@ -1,6 +1,10 @@
 #ifndef object_h
 #define object_h
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 #include <vector>
 #include "Render.h"
 #include "math/Matrix4.h"
@@ -69,15 +73,15 @@ namespace Supernova {
         Matrix4 getModelViewProjectMatrix();
         Vector3 getCameraPosition();
 
+        virtual void setPosition(Vector3 position);
         void setPosition(const float x, const float y, const float z);
         void setPosition(const float x, const float y);
-        void setPosition(Vector3 position);
         void setPosition(Vector2 position);
         Vector3 getPosition();
         Vector3 getWorldPosition();
 
+        virtual void setRotation(Quaternion rotation);
         void setRotation(const float xAngle, const float yAngle, const float zAngle);
-        void setRotation(Quaternion rotation);
         Quaternion getRotation();
         Quaternion getWorldRotation();
 

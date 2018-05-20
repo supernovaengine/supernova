@@ -41,16 +41,14 @@ bool Body::isOwnedShapes(){
     return ownedShapes;
 }
 
-void Body::updateObject(ConcreteObject* object){
-    attachedObject = object;
-
-    if (object) {
+void Body::updateObject(){
+    if (attachedObject) {
         Vector3 position = getPosition();
         if (is3D) {
-            object->setPosition(position);
+            attachedObject->setPosition(position);
         } else {
-            object->setPosition(position.x, position.y);
+            attachedObject->setPosition(position.x, position.y);
         }
-        object->setRotation(getRotation());
+        attachedObject->setRotation(getRotation());
     }
 }

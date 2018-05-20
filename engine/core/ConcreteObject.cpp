@@ -1,5 +1,10 @@
 #include "ConcreteObject.h"
 #include "Scene.h"
+#include "Log.h"
+
+//
+// (c) 2018 Eduardo Doria.
+//
 
 using namespace Supernova;
 
@@ -22,6 +27,20 @@ Matrix4 ConcreteObject::getNormalMatrix(){
 
 unsigned int ConcreteObject::getMinBufferSize(){
     return minBufferSize;
+}
+
+void ConcreteObject::setPosition(Vector3 position){
+    if (body)
+        body->setPosition(position);
+    
+    Object::setPosition(position);
+}
+
+void ConcreteObject::setRotation(Quaternion rotation){
+    if (body)
+        body->setRotation(rotation);
+    
+    Object::setRotation(rotation);
 }
 
 void ConcreteObject::setColor(Vector4 color){
@@ -78,12 +97,19 @@ std::string ConcreteObject::getTexture(){
 }
 
 void ConcreteObject::attachBody(Body* body){
-    this->body = body;
-    this->body->updateObject(this);
+    if (!body->attachedObject){
+        this->body = body;
+        body->attachedObject = this;
+    
+        body->setPosition(position);
+        body->setRotation(rotation);
+    }else{
+        Log::Error("Body is attached with other object already");
+    }
 }
 
 void ConcreteObject::detachBody(){
-    this->body->updateObject(NULL);
+    this->body->attachedObject = NULL;
     this->body = NULL;
 }
 
@@ -115,7 +141,7 @@ void ConcreteObject::updateMatrix(){
 bool ConcreteObject::draw(){
 
     if (body)
-        body->updateObject(this);
+        body->updateObject();
 
     if (scene && scene->isDrawingShadow()){
         shadowDraw();

@@ -28,6 +28,10 @@ CollisionShape2D::CollisionShape2D(): CollisionShape(){
     center = Vector2(0.0f, 0.0f);
 }
 
+CollisionShape2D::CollisionShape2D(float boxWidth, float boxHeight): CollisionShape2D(){
+    setShapeBox(boxWidth, boxHeight);
+}
+
 CollisionShape2D::~CollisionShape2D(){
     destroyFixture();
 
