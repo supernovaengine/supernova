@@ -75,8 +75,8 @@ namespace Supernova {
 
         virtual void setPosition(Vector3 position);
         void setPosition(const float x, const float y, const float z);
-        void setPosition(const float x, const float y);
         void setPosition(Vector2 position);
+        void setPosition(const float x, const float y);
         Vector3 getPosition();
         Vector3 getWorldPosition();
 
@@ -91,6 +91,8 @@ namespace Supernova {
 
         void setCenter(const float x, const float y, const float z);
         void setCenter(Vector3 center);
+        void setCenter(const float x, const float y);
+        void setCenter(Vector2 center);
         Vector3 getCenter();
         
         Scene* getScene();

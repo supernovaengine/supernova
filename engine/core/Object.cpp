@@ -214,7 +214,7 @@ Vector3 Object::getScale(){
 }
 
 void Object::setCenter(const float x, const float y, const float z){
-    this->center = Vector3(x, y, z);
+    setCenter(Vector3(x, y, z));
 }
 
 void Object::setCenter(Vector3 center){
@@ -222,6 +222,14 @@ void Object::setCenter(Vector3 center){
         this->center = center;
         updateMatrix();
     }
+}
+
+void Object::setCenter(const float x, const float y){
+    setCenter(Vector3(x, y, getCenter().z));
+}
+
+void Object::setCenter(Vector2 center){
+    setCenter(Vector3(center.x, center.y, getCenter().z));
 }
 
 Vector3 Object::getCenter(){

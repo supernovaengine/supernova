@@ -140,10 +140,6 @@ void TileMap::createTiles(){
             height = tiles[i].position.y + tiles[i].height;
 
         Rect tileRect = normalizeTileRect(tilesRect[tiles[i].rectId].rect);
-        //texcoords.push_back(Vector2(0.0f, 0.0f));
-        //texcoords.push_back(Vector2(1.0f, 0.0f));
-        //texcoords.push_back(Vector2(1.0f, 1.0f));
-        //texcoords.push_back(Vector2(0.0f, 1.0f));
         texcoords.push_back(Vector2(tileRect.getX(), tileRect.getY()));
         texcoords.push_back(Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()));
         texcoords.push_back(Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()+tileRect.getHeight()));
