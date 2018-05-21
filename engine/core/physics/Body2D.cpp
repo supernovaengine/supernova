@@ -3,6 +3,7 @@
 #include <Box2D/Box2D.h>
 #include "PhysicsWorld2D.h"
 #include "math/Angle.h"
+#include "ConcreteObject.h"
 #include "Log.h"
 
 //
@@ -12,8 +13,6 @@
 using namespace Supernova;
 
 Body2D::Body2D(): Body() {
-    is3D = false;
-
     world = NULL;
 
     body = NULL;
@@ -242,9 +241,12 @@ Vector3 Body2D::getPosition(){
     if (body) {
         position = body->GetPosition();
     }
-    Vector3 teste = Vector3(position.x * scale, position.y * scale, 0.0f);
+    
+    float objectZ = 0;
+    if (attachedObject)
+        objectZ =  attachedObject->getPosition().z;
 
-    return Vector3(position.x * scale, position.y * scale, 0.0f);
+    return Vector3(position.x * scale, position.y * scale, objectZ);
 }
 
 Quaternion Body2D::getRotation(){

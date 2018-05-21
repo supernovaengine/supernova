@@ -44,8 +44,6 @@ namespace Supernova {
 
         void setOwnedShapes(bool ownedShapes);
         bool isOwnedShapes();
-
-        void updateObject();
     };
 }
 

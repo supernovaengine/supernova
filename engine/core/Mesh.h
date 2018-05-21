@@ -2,6 +2,10 @@
 #ifndef mesh_h
 #define mesh_h
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 #include "ConcreteObject.h"
 #include "math/Vector4.h"
 #include "math/Vector3.h"
@@ -45,10 +49,10 @@ namespace Supernova {
         virtual ~Mesh();
 
         int getPrimitiveType();
-        std::vector<Vector3>* getVertices();
-        std::vector<Vector3>* getNormals();
-        std::vector<Vector2>* getTexcoords();
-        std::vector<Submesh*>* getSubmeshes();
+        std::vector<Vector3> getVertices();
+        std::vector<Vector3> getNormals();
+        std::vector<Vector2> getTexcoords();
+        std::vector<Submesh*> getSubmeshes();
         bool isSky();
         bool isText();
         bool isDynamic();

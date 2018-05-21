@@ -1,5 +1,9 @@
 #include "TileMap.h"
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 using namespace Supernova;
 
 TileMap::TileMap(): Mesh2D(){
@@ -102,6 +106,17 @@ Rect TileMap::normalizeTileRect(Rect tileRect){
     return normalized;
 }
 
+std::vector<Vector2> TileMap::getTileVertices(int index){
+    std::vector<Vector2> vertices;
+    
+    vertices.push_back(Vector2(tiles[index].position.x, tiles[index].position.y));
+    vertices.push_back(Vector2(tiles[index].position.x + tiles[index].width, tiles[index].position.y));
+    vertices.push_back(Vector2(tiles[index].position.x + tiles[index].width, tiles[index].position.y + tiles[index].height));
+    vertices.push_back(Vector2(tiles[index].position.x,  tiles[index].position.y + tiles[index].height));
+    
+    return vertices;
+}
+
 void TileMap::createTiles(){
     vertices.clear();
     texcoords.clear();
@@ -111,11 +126,13 @@ void TileMap::createTiles(){
     height = 0;
     
     for (int i = 0; i < tiles.size(); i++){
+        
+        std::vector<Vector2> tileVertices = getTileVertices(i);
 
-        vertices.push_back(Vector3(tiles[i].position.x, tiles[i].position.y, 0));
-        vertices.push_back(Vector3(tiles[i].position.x + tiles[i].width, tiles[i].position.y, 0));
-        vertices.push_back(Vector3(tiles[i].position.x + tiles[i].width, tiles[i].position.y + tiles[i].height, 0));
-        vertices.push_back(Vector3(tiles[i].position.x,  tiles[i].position.y + tiles[i].height, 0));
+        vertices.push_back(Vector3(tileVertices[0].x, tileVertices[0].y, 0));
+        vertices.push_back(Vector3(tileVertices[1].x, tileVertices[1].y, 0));
+        vertices.push_back(Vector3(tileVertices[2].x, tileVertices[2].y, 0));
+        vertices.push_back(Vector3(tileVertices[3].x, tileVertices[3].y, 0));
 
         if (width < tiles[i].position.x + tiles[i].width)
             width = tiles[i].position.x + tiles[i].width;

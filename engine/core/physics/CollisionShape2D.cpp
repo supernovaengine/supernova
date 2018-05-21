@@ -32,6 +32,19 @@ CollisionShape2D::CollisionShape2D(float boxWidth, float boxHeight): CollisionSh
     setShapeBox(boxWidth, boxHeight);
 }
 
+CollisionShape2D::CollisionShape2D(float boxWidth, float boxHeight, Vector2 center): CollisionShape2D(){
+    setShapeBox(boxWidth, boxHeight);
+    setCenter(center);
+}
+
+CollisionShape2D::CollisionShape2D(std::vector<Vector2> vertices): CollisionShape2D(){
+    setShapeVertices(vertices);
+}
+
+CollisionShape2D::CollisionShape2D(Vector2 circleCenter, float circleRadius): CollisionShape2D(){
+    setShapeCircle(circleCenter, circleRadius);
+}
+
 CollisionShape2D::~CollisionShape2D(){
     destroyFixture();
 

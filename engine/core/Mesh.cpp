@@ -2,6 +2,10 @@
 #include "Scene.h"
 #include "Log.h"
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 using namespace Supernova;
 
 Mesh::Mesh(): ConcreteObject(){
@@ -25,20 +29,20 @@ Mesh::~Mesh(){
         delete shadowRender;
 }
 
-std::vector<Vector3>* Mesh::getVertices(){
-    return &vertices;
+std::vector<Vector3> Mesh::getVertices(){
+    return vertices;
 }
 
-std::vector<Vector3>* Mesh::getNormals(){
-    return &normals;
+std::vector<Vector3> Mesh::getNormals(){
+    return normals;
 }
 
-std::vector<Vector2>* Mesh::getTexcoords(){
-    return &texcoords;
+std::vector<Vector2> Mesh::getTexcoords(){
+    return texcoords;
 }
 
-std::vector<Submesh*>* Mesh::getSubmeshes(){
-    return &submeshes;
+std::vector<Submesh*> Mesh::getSubmeshes(){
+    return submeshes;
 }
 
 bool Mesh::isSky(){

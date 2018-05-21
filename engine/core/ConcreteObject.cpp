@@ -140,8 +140,24 @@ void ConcreteObject::updateMatrix(){
 
 bool ConcreteObject::draw(){
 
-    if (body)
-        body->updateObject();
+    if (body){
+        bool needUpdate = false;
+        Vector3 bodyPosition = body->getPosition();
+        Quaternion bodyRotation = body->getRotation();
+        
+        if (getPosition() != bodyPosition){
+            position = bodyPosition;
+            needUpdate = true;
+        }
+        
+        if (getRotation() != bodyRotation){
+            rotation = bodyRotation;
+            needUpdate = true;
+        }
+        
+        if (needUpdate)
+            updateMatrix();
+    }
 
     if (scene && scene->isDrawingShadow()){
         shadowDraw();

@@ -40,15 +40,3 @@ void Body::setOwnedShapes(bool ownedShapes){
 bool Body::isOwnedShapes(){
     return ownedShapes;
 }
-
-void Body::updateObject(){
-    if (attachedObject) {
-        Vector3 position = getPosition();
-        if (is3D) {
-            attachedObject->setPosition(position);
-        } else {
-            attachedObject->setPosition(position.x, position.y);
-        }
-        attachedObject->setRotation(getRotation());
-    }
-}

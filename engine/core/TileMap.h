@@ -1,6 +1,10 @@
 #ifndef TileMap_h
 #define TileMap_h
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 #include "Mesh2D.h"
 
 namespace Supernova{
@@ -48,6 +52,8 @@ namespace Supernova{
         void addTile(std::string rectString, Vector2 position, float width, float height);
         void removeTile(int index);
         void removeTile(std::string id);
+        
+        std::vector<Vector2> getTileVertices(int index);
 
         virtual bool load();
         
