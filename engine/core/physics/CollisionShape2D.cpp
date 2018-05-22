@@ -157,7 +157,7 @@ void CollisionShape2D::computeShape(int scale){
             b2Vec2 b2Vertices[b2_maxPolygonVertices];
 
             b2Transform xf;
-            xf.p = b2Vec2(center.x, center.y);
+            xf.p = b2Vec2(-center.x / scale, -center.y / scale);
             xf.q.Set(0);
 
             for (int i = 0; i < vertices.size(); i++){
