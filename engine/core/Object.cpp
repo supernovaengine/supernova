@@ -379,7 +379,7 @@ void Object::updateMatrix(){
         Matrix4 parentCenterMatrix = Matrix4::translateMatrix(parent->center);
         this->modelMatrix = parent->modelMatrix * parentCenterMatrix * this->modelMatrix;
         worldRotation = parent->worldRotation * rotation;
-        worldPosition = modelMatrix * Vector3(0,0,0);
+        worldPosition = modelMatrix * center;
     }else{
         worldRotation = rotation;
         worldPosition = position;
