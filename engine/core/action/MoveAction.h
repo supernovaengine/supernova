@@ -15,9 +15,13 @@ namespace Supernova{
         bool objectStartPosition;
         
     public:
+        MoveAction(float duration, bool loop=false);
         MoveAction(Vector3 endPosition, float duration, bool loop=false);
         MoveAction(Vector3 startPosition, Vector3 endPosition, float duration, bool loop=false);
         virtual ~MoveAction();
+
+        void setEndPosition(Vector3 endPosition);
+        void setStartPosition(Vector3 startPosition);
         
         virtual bool run();
         

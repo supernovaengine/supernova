@@ -71,6 +71,8 @@ namespace Supernova {
         void setRotation(float angle);
         virtual void setRotation(Quaternion rotation);
         virtual Quaternion getRotation();
+
+        virtual void updateObject();
     };
 }
 

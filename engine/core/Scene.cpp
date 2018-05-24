@@ -394,13 +394,16 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
     return drawreturn;
 }
 
+void Scene::updatePhysics(){
+    for (int p=0; p<physicsWorlds.size(); p++) {
+        physicsWorlds[p]->step(Engine::getDeltatime() / 1000.0f);
+        physicsWorlds[p]->updateBodyObjects();
+    }
+}
+
 bool Scene::draw() {
     //TODO: alert if not loaded
 
-    for (int p=0; p<physicsWorlds.size(); p++) {
-        physicsWorlds[p]->step(Engine::getDeltatime() / 1000.0f);
-    }
-    
     Camera* originalCamera = this->camera;
     Texture* originalTextureRender = this->textureRender;
 

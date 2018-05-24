@@ -138,26 +138,28 @@ void ConcreteObject::updateMatrix(){
     updateDistanceToCamera();
 }
 
-bool ConcreteObject::draw(){
-
+void ConcreteObject::updateFromBody(){
     if (body){
         bool needUpdate = false;
         Vector3 bodyPosition = body->getPosition();
         Quaternion bodyRotation = body->getRotation();
-        
+
         if (getPosition() != bodyPosition){
             position = bodyPosition;
             needUpdate = true;
         }
-        
+
         if (getRotation() != bodyRotation){
             rotation = bodyRotation;
             needUpdate = true;
         }
-        
+
         if (needUpdate)
             updateMatrix();
     }
+}
+
+bool ConcreteObject::draw(){
 
     if (scene && scene->isDrawingShadow()){
         shadowDraw();

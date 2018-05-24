@@ -311,10 +311,9 @@ void Engine::onSurfaceChanged(int width, int height) {
 }
 
 void Engine::onDraw() {
-    
-    if (Engine::getScene() != NULL){
-        (Engine::getScene())->draw();
-    }
+
+    if (Engine::getScene())
+        (Engine::getScene())->updatePhysics();
     
     auto now = std::chrono::steady_clock::now();
     unsigned long newTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
@@ -328,11 +327,14 @@ void Engine::onDraw() {
     while (updateTimeCount >= updateTime && updateLoops <= 5){
         updateLoops++;
         updateTimeCount -= updateTime;
-        
+
         Events::call_onUpdate();
     }
-    
+
     Events::call_onDraw();
+
+    if (Engine::getScene())
+        (Engine::getScene())->draw();
     
     SoundManager::checkActive();
     

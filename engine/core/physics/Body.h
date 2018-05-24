@@ -39,6 +39,8 @@ namespace Supernova {
         virtual void setRotation(Quaternion rotation) = 0;
         virtual Quaternion getRotation() = 0;
 
+        virtual void updateObject() = 0;
+
         void setName(std::string name);
         std::string getName();
 

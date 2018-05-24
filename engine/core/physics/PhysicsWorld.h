@@ -46,6 +46,7 @@ namespace Supernova {
         bool isOwnedBodies();
 
         void updateScene(Scene* scene);
+        void updateBodyObjects();
 
         virtual void step(float timeStep) = 0;
     };

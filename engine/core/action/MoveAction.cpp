@@ -5,6 +5,10 @@
 
 using namespace Supernova;
 
+MoveAction::MoveAction(float duration, bool loop): TimeAction(duration, loop){
+    this->objectStartPosition = true;
+}
+
 MoveAction::MoveAction(Vector3 endPosition, float duration, bool loop): TimeAction(duration, loop){
     this->endPosition = endPosition;
     this->objectStartPosition = true;
@@ -18,6 +22,15 @@ MoveAction::MoveAction(Vector3 startPosition, Vector3 endPosition, float duratio
 
 MoveAction::~MoveAction(){
     
+}
+
+void MoveAction::setEndPosition(Vector3 endPosition){
+    this->endPosition = endPosition;
+}
+
+void MoveAction::setStartPosition(Vector3 startPosition){
+    this->startPosition = startPosition;
+    this->objectStartPosition = false;
 }
 
 bool MoveAction::run(){
