@@ -51,6 +51,7 @@ bool Engine::mouseAsTouch;
 bool Engine::useDegrees;
 int Engine::scalingMode;
 bool Engine::nearestScaleTexture;
+bool Engine::fixedTimePhysics;
 
 unsigned long Engine::lastTime = 0;
 unsigned int Engine::updateTimeCount = 0;
@@ -188,6 +189,14 @@ bool Engine::isNearestScaleTexture(){
     return nearestScaleTexture;
 }
 
+void Engine::setFixedTimePhysics(bool fixedTimePhysics){
+    Engine::nearestScaleTexture = fixedTimePhysics;
+}
+
+bool Engine::isFixedTimePhysics(){
+    return fixedTimePhysics;
+}
+
 void Engine::setUpdateTime(unsigned int updateTime){
     Engine::updateTime = updateTime;
 }
@@ -236,6 +245,7 @@ void Engine::onStart(int width, int height){
     Engine::setRenderAPI(S_GLES2);
     Engine::setScalingMode(S_SCALING_FITWIDTH);
     Engine::setNearestScaleTexture(false);
+    Engine::setFixedTimePhysics(false);
     
     auto now = std::chrono::steady_clock::now();
     lastTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
@@ -312,8 +322,8 @@ void Engine::onSurfaceChanged(int width, int height) {
 
 void Engine::onDraw() {
 
-    if (Engine::getScene())
-        (Engine::getScene())->updatePhysics();
+    if (!fixedTimePhysics && Engine::getScene())
+        (Engine::getScene())->updatePhysics(Engine::getDeltatime() / 1000.0f);
     
     auto now = std::chrono::steady_clock::now();
     unsigned long newTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
@@ -327,6 +337,9 @@ void Engine::onDraw() {
     while (updateTimeCount >= updateTime && updateLoops <= 5){
         updateLoops++;
         updateTimeCount -= updateTime;
+
+        if (fixedTimePhysics && Engine::getScene())
+            (Engine::getScene())->updatePhysics(updateTime / 1000.0f);
 
         Events::call_onUpdate();
     }

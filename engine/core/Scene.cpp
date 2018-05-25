@@ -394,9 +394,9 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
     return drawreturn;
 }
 
-void Scene::updatePhysics(){
+void Scene::updatePhysics(float time){
     for (int p=0; p<physicsWorlds.size(); p++) {
-        physicsWorlds[p]->step(Engine::getDeltatime() / 1000.0f);
+        physicsWorlds[p]->step(time);
         physicsWorlds[p]->updateBodyObjects();
     }
 }

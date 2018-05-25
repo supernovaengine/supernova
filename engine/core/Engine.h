@@ -40,6 +40,7 @@ namespace Supernova {
         static bool useDegrees;
         static int scalingMode;
         static bool nearestScaleTexture;
+        static bool fixedTimePhysics;
 
         static unsigned long lastTime;
         static unsigned int updateTimeCount;
@@ -88,6 +89,9 @@ namespace Supernova {
         
         static void setNearestScaleTexture(bool nearestScaleTexture);
         static bool isNearestScaleTexture();
+
+        static void setFixedTimePhysics(bool fixedTimePhysics);
+        static bool isFixedTimePhysics();
         
         static void setUpdateTime(unsigned int updateTime);
         static unsigned int getUpdateTime();
