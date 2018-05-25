@@ -259,8 +259,3 @@ Quaternion Body2D::getRotation(){
 
     return rotation;
 }
-
-void Body2D::updateObject(){
-    if (attachedObject)
-        attachedObject->updateFromBody();
-}

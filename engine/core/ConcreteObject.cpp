@@ -29,20 +29,6 @@ unsigned int ConcreteObject::getMinBufferSize(){
     return minBufferSize;
 }
 
-void ConcreteObject::setPosition(Vector3 position){
-    if (body)
-        body->setPosition(position);
-    
-    Object::setPosition(position);
-}
-
-void ConcreteObject::setRotation(Quaternion rotation){
-    if (body)
-        body->setRotation(rotation);
-    
-    Object::setRotation(rotation);
-}
-
 void ConcreteObject::setColor(Vector4 color){
     if (color.w != 1){
         transparent = true;
@@ -96,23 +82,6 @@ std::string ConcreteObject::getTexture(){
     return material.getTexturePath();
 }
 
-void ConcreteObject::attachBody(Body* body){
-    if (!body->attachedObject){
-        this->body = body;
-        body->attachedObject = this;
-    
-        body->setPosition(position);
-        body->setRotation(rotation);
-    }else{
-        Log::Error("Body is attached with other object already");
-    }
-}
-
-void ConcreteObject::detachBody(){
-    this->body->attachedObject = NULL;
-    this->body = NULL;
-}
-
 void ConcreteObject::updateDistanceToCamera(){
     distanceToCamera = (this->cameraPosition - this->getWorldPosition()).length();
 }
@@ -136,27 +105,6 @@ void ConcreteObject::updateMatrix(){
     this->normalMatrix.identity();
 
     updateDistanceToCamera();
-}
-
-void ConcreteObject::updateFromBody(){
-    if (body){
-        bool needUpdate = false;
-        Vector3 bodyPosition = body->getPosition();
-        Quaternion bodyRotation = body->getRotation();
-
-        if (getPosition() != bodyPosition){
-            position = bodyPosition;
-            needUpdate = true;
-        }
-
-        if (getRotation() != bodyRotation){
-            rotation = bodyRotation;
-            needUpdate = true;
-        }
-
-        if (needUpdate)
-            updateMatrix();
-    }
 }
 
 bool ConcreteObject::draw(){

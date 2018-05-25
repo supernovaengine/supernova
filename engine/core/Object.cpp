@@ -17,6 +17,8 @@ Object::Object(){
     parent = NULL;
     scene = NULL;
 
+    ownedBodies = false;
+
     viewMatrix = NULL;
     projectionMatrix = NULL;
     viewProjectionMatrix = NULL;
@@ -32,6 +34,11 @@ Object::~Object(){
     
     if (parent)
         parent->removeObject(this);
+
+    if (ownedBodies)
+        delete body;
+    else
+        body->attachedObject = NULL;
     
     destroy();
 }
@@ -159,6 +166,9 @@ void Object::setPosition(Vector2 position){
 }
 
 void Object::setPosition(Vector3 position){
+    if (body)
+        body->setPosition(position);
+
     if (this->position != position){
         this->position = position;
         updateMatrix();
@@ -184,6 +194,9 @@ void Object::setRotation(const float xAngle, const float yAngle, const float zAn
 }
 
 void Object::setRotation(Quaternion rotation){
+    if (body)
+        body->setRotation(rotation);
+
     if (this->rotation != rotation){
         this->rotation = rotation;
         updateMatrix();
@@ -405,6 +418,52 @@ bool Object::isIn3DScene(){
         return true;
     
     return false;
+}
+
+bool Object::isOwnedBodies(){
+    return ownedBodies;
+}
+
+void Object::setOwnedBodies(bool ownedBodies){
+    this->ownedBodies = ownedBodies;
+}
+
+void Object::attachBody(Body* body){
+    if (!body->attachedObject){
+        this->body = body;
+        body->attachedObject = this;
+
+        body->setPosition(position);
+        body->setRotation(rotation);
+    }else{
+        Log::Error("Body is attached with other object already");
+    }
+}
+
+void Object::detachBody(){
+    this->body->attachedObject = NULL;
+    this->body = NULL;
+}
+
+void Object::updateFromBody(){
+    if (body){
+        bool needUpdate = false;
+        Vector3 bodyPosition = body->getPosition();
+        Quaternion bodyRotation = body->getRotation();
+
+        if (getPosition() != bodyPosition){
+            position = bodyPosition;
+            needUpdate = true;
+        }
+
+        if (getRotation() != bodyRotation){
+            rotation = bodyRotation;
+            needUpdate = true;
+        }
+
+        if (needUpdate)
+            updateMatrix();
+    }
 }
 
 bool Object::isLoaded(){

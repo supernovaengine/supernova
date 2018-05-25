@@ -12,11 +12,11 @@
 //
 
 namespace Supernova {
-    class ConcreteObject;
+    class Object;
 
     class Body {
-        
-        friend class ConcreteObject;
+
+        friend class Object;
 
     private:
         std::string name;
@@ -24,7 +24,7 @@ namespace Supernova {
     protected:
         bool is3D;
         Vector3 center;
-        ConcreteObject* attachedObject;
+        Object* attachedObject;
         std::vector<CollisionShape*> shapes;
         bool ownedShapes;
 
@@ -39,13 +39,14 @@ namespace Supernova {
         virtual void setRotation(Quaternion rotation) = 0;
         virtual Quaternion getRotation() = 0;
 
-        virtual void updateObject() = 0;
+        void updateObject();
 
         void setName(std::string name);
         std::string getName();
 
         void setOwnedShapes(bool ownedShapes);
         bool isOwnedShapes();
+
     };
 }
 

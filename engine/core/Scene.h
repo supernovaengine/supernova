@@ -62,6 +62,8 @@ namespace Supernova {
         bool useDepth;
         bool useLight;
 
+        bool ownedPhysics;
+
         // S_OPTION
         int userDefinedTransparency;
         int userDefinedDepth;
@@ -131,6 +133,9 @@ namespace Supernova {
         bool updateCameraSize();
 
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+
+        bool isOwnedPhysics();
+        void setOwnedPhysics(bool ownedPhysics);
 
         void updatePhysics(float time);
 

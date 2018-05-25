@@ -8,7 +8,6 @@
 
 #include "Object.h"
 #include "Material.h"
-#include "physics/Body2D.h"
 
 namespace Supernova {
 
@@ -24,8 +23,6 @@ namespace Supernova {
 
         Matrix4 normalMatrix;
 
-        Body* body;
-
         bool transparent;
         float distanceToCamera;
 
@@ -40,12 +37,6 @@ namespace Supernova {
         
         Matrix4 getNormalMatrix();
 
-        using Object::setPosition; //add all setPosition overrides
-        virtual void setPosition(Vector3 position);
-        
-        using Object::setRotation; //add all setRotation overrides
-        virtual void setRotation(Quaternion rotation);
-
         void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);
         Vector4 getColor();
@@ -56,14 +47,10 @@ namespace Supernova {
         
         Material* getMaterial();
 
-        void attachBody(Body* body);
-        void detachBody();
-
         unsigned int getMinBufferSize();
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();
-        void updateFromBody();
         
         virtual bool textureLoad();
         virtual bool shadowLoad();

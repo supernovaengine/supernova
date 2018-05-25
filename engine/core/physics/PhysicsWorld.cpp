@@ -94,10 +94,6 @@ bool PhysicsWorld::isOwnedBodies(){
     return ownedBodies;
 }
 
-void PhysicsWorld::updateScene(Scene* scene){
-    attachedScene = scene;
-}
-
 void PhysicsWorld::updateBodyObjects(){
     for (int i =0; i < bodies.size(); i++){
         bodies[i]->updateObject();

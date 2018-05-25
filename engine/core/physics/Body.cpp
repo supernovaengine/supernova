@@ -1,6 +1,6 @@
 #include "Body.h"
 
-#include "ConcreteObject.h"
+#include "Object.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -39,4 +39,9 @@ void Body::setOwnedShapes(bool ownedShapes){
 
 bool Body::isOwnedShapes(){
     return ownedShapes;
+}
+
+void Body::updateObject(){
+    if (attachedObject)
+        attachedObject->updateFromBody();
 }

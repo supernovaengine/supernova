@@ -16,6 +16,9 @@ namespace Supernova {
     class Scene;
 
     class PhysicsWorld {
+
+        friend class Scene;
+
     private:
         void (*onBeginContactFunc)(CollisionShape*, CollisionShape*);
         int onBeginContactLuaFunc;
@@ -45,7 +48,6 @@ namespace Supernova {
         void setOwnedBodies(bool ownedBodies);
         bool isOwnedBodies();
 
-        void updateScene(Scene* scene);
         void updateBodyObjects();
 
         virtual void step(float timeStep) = 0;

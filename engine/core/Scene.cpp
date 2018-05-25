@@ -27,6 +27,8 @@ Scene::Scene() {
     fogRender = NULL;
     textureRender = NULL;
 
+    ownedPhysics = true;
+
     drawShadowLightPos = Vector3();
     drawShadowCameraNearFar = Vector2();
     drawIsPointShadow = false;
@@ -46,7 +48,10 @@ Scene::~Scene() {
         delete fogRender;
 
     for (int p=0; p<physicsWorlds.size(); p++) {
-        physicsWorlds[p]->updateScene(NULL);
+        if (ownedPhysics)
+            delete physicsWorlds[p];
+        else
+            physicsWorlds[p]->attachedScene = NULL;
     }
 }
 
@@ -118,14 +123,16 @@ void Scene::addPhysics (PhysicsWorld* physics){
 
     if (!founded){
         physicsWorlds.push_back(physics);
-        physics->updateScene(this);
+        physics->attachedScene = this;
     }
 }
 
 void Scene::removePhysics (PhysicsWorld* physics){
-    std::vector<PhysicsWorld*>::iterator i = std::remove(physicsWorlds.begin(), physicsWorlds.end(), physics);
-    physicsWorlds.erase(i, physicsWorlds.end());
-    physics->updateScene(NULL);
+    if (physics->attachedScene == this) {
+        std::vector<PhysicsWorld *>::iterator i = std::remove(physicsWorlds.begin(), physicsWorlds.end(), physics);
+        physicsWorlds.erase(i, physicsWorlds.end());
+        physics->attachedScene = NULL;
+    }
 }
 
 SceneRender* Scene::getSceneRender(){
@@ -392,6 +399,14 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
     }
 
     return drawreturn;
+}
+
+bool Scene::isOwnedPhysics(){
+    return ownedPhysics;
+}
+
+void Scene::setOwnedPhysics(bool ownedPhysics){
+    this->ownedPhysics = ownedPhysics;
 }
 
 void Scene::updatePhysics(float time){

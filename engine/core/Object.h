@@ -12,6 +12,7 @@
 #include "math/Vector2.h"
 #include "math/Quaternion.h"
 #include "action/Action.h"
+#include "physics/Body2D.h"
 
 namespace Supernova {
 
@@ -22,6 +23,8 @@ namespace Supernova {
     private:
         
         bool firstLoaded;
+
+        bool ownedBodies;
         
         void setSceneAndConfigure(Scene* scene);
         void removeScene();
@@ -54,6 +57,8 @@ namespace Supernova {
 
         Vector3 worldPosition;
         Quaternion worldRotation;
+
+        Body* body;
         
         bool reload();
 
@@ -105,6 +110,13 @@ namespace Supernova {
         void moveToBack();
         void moveUp();
         void moveDown();
+
+        bool isOwnedBodies();
+        void setOwnedBodies(bool ownedBodies);
+
+        void attachBody(Body* body);
+        void detachBody();
+        void updateFromBody();
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();
