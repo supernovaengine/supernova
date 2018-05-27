@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <GL/glfw.h>
+#include <SDL/SDL.h>
 
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
@@ -34,11 +34,11 @@ extern "C" {
 
 int main(int argc, char **argv) {
 
-    if (glfwInit() != GL_TRUE) {
-        printf("glfwInit() failed\n");
-        glfwTerminate();
-        return 1;
-    }
+    //If it is called SDL overrides HTML input events and keypress dont work
+    //if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
+    //    printf("Unable to initialize SDL: %s\n", SDL_GetError());
+    //    return 1;
+    //}
 
     if ((argv[1] != NULL && argv[1] != 0) && (argv[2] != NULL && argv[2] != 0)){
         Supernova::Engine::onStart(atoi(argv[1]), atoi(argv[2]));
@@ -49,9 +49,10 @@ int main(int argc, char **argv) {
     int width = Supernova::Engine::getScreenWidth();
     int height = Supernova::Engine::getScreenHeight();
 
-    if (glfwOpenWindow(width, height, 8, 8, 8, 8, 16, 0, GLFW_WINDOW) != GL_TRUE){
-        printf("glfwOpenWindow() failed\n");
-        glfwTerminate();
+    //Need SDL because Soloud uses SDL and can cause fullscreen error
+    SDL_Surface *screen = SDL_SetVideoMode( width, height, 16, SDL_OPENGL );
+    if ( !screen ) {
+        printf("Unable to set video mode: %s\n", SDL_GetError());
         return 1;
     }
 
@@ -71,7 +72,7 @@ int main(int argc, char **argv) {
 
     emscripten_set_main_loop(renderLoop, 0, 1);
 
-    glfwTerminate();
+    SDL_Quit();
 
     return 0;
 }
@@ -79,7 +80,7 @@ int main(int argc, char **argv) {
 void renderLoop(){
     Supernova::Engine::onDraw();
 
-    glfwSwapBuffers();
+    SDL_GL_SwapBuffers();
 }
 
 EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChangeEvent *e, void *userData) {
