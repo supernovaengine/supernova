@@ -16,7 +16,7 @@ Texture::Texture(){
     this->id = "";
     
     this->dataOwned = false;
-    this->resampleToPowerOfTwo = false;
+    this->resampleToPowerOfTwo = true;
 }
 
 Texture::Texture(std::string path_id): Texture(){

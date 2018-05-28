@@ -120,6 +120,15 @@ void Sprite::stopAnimation(){
         defaultAnimation->stop();
 }
 
+bool Sprite::load(){
+
+    if (submeshes[0]->getMaterial()->getTexture()) {
+        submeshes[0]->getMaterial()->getTexture()->setResampleToPowerOfTwo(false);
+    }
+
+    return Image::load();
+}
+
 bool Sprite::draw(){
     
     return Image::draw();

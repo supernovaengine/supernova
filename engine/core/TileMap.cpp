@@ -190,6 +190,7 @@ void TileMap::createTiles(){
 bool TileMap::load(){
 
     if (submeshes[0]->getMaterial()->getTexture()) {
+        submeshes[0]->getMaterial()->getTexture()->setResampleToPowerOfTwo(false);
         submeshes[0]->getMaterial()->getTexture()->load();
         texWidth = submeshes[0]->getMaterial()->getTexture()->getWidth();
         texHeight = submeshes[0]->getMaterial()->getTexture()->getHeight();
