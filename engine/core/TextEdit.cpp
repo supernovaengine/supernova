@@ -49,13 +49,13 @@ Text* TextEdit::getTextObject(){
     return &text;
 }
 
-void TextEdit::engine_onDown(float x, float y){
+void TextEdit::engine_onDown(int pointer, float x, float y){
     SystemPlatform::instance().showVirtualKeyboard();
-    GUIObject::engine_onDown(x, y);
+    GUIObject::engine_onDown(pointer, x, y);
 }
 
-void TextEdit::engine_onUp(float x, float y){
-    GUIObject::engine_onUp(x, y);
+void TextEdit::engine_onUp(int pointer, float x, float y){
+    GUIObject::engine_onUp(pointer, x, y);
 }
 
 void TextEdit::engine_onTextInput(std::string text){

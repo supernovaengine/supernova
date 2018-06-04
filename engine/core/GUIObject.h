@@ -34,8 +34,8 @@ namespace Supernova {
 
         bool isCoordInside(float x, float y);
 
-        virtual void engine_onDown(float x, float y);
-        virtual void engine_onUp(float x, float y);
+        virtual void engine_onDown(int pointer, float x, float y);
+        virtual void engine_onUp(int pointer, float x, float y);
         virtual void engine_onTextInput(std::string text);
     };
     

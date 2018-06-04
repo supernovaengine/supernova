@@ -106,9 +106,9 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 				@Override
 				public void run() {
 					if (before < count) {
-						JNIWrapper.on_text_input(String.valueOf(s.charAt(start + before)));
+						JNIWrapper.system_text_input(String.valueOf(s.charAt(start + before)));
 					} else {
-						JNIWrapper.on_text_input("\b");
+						JNIWrapper.system_text_input("\b");
 					}
 				}
 			});
@@ -129,7 +129,7 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 			view.queueEvent(new Runnable() {
 				@Override
 				public void run() {
-					JNIWrapper.on_text_input(characters);
+					JNIWrapper.system_text_input(characters);
 				}
 			});
 		}

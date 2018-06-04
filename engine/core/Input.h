@@ -130,7 +130,7 @@ namespace Supernova {
     
     class Input {
         
-        friend class Events;
+        friend class Engine;
         
     private:
         

@@ -6,6 +6,9 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+
+#include "Log.h"
+
 #include <cmath>
 
 using namespace Supernova;
@@ -30,7 +33,8 @@ int GUIObject::onDown(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         this->onDownLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        //TODO: return error in Lua
+        Log::Error("Error setting GUI onDown is not lua function");
+        return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }
@@ -53,7 +57,8 @@ int GUIObject::onUp(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         this->onUpLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        //TODO: return error in Lua
+        Log::Error("Error setting GUI onUp is not lua function");
+        return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }
@@ -80,10 +85,10 @@ bool GUIObject::isCoordInside(float x, float y){
     return false;
 }
 
-void GUIObject::engine_onDown(float x, float y){
+void GUIObject::engine_onDown(int pointer, float x, float y){
 }
 
-void GUIObject::engine_onUp(float x, float y){
+void GUIObject::engine_onUp(int pointer, float x, float y){
 }
 
 void GUIObject::engine_onTextInput(std::string text){

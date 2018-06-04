@@ -51,7 +51,8 @@ int Action::onStart(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         this->onStartLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        //TODO: return error in Lua
+        Log::Error("Error setting Action onStart is not lua function");
+        return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }
@@ -75,7 +76,8 @@ int Action::onRun(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         this->onRunLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        //TODO: return error in Lua
+        Log::Error("Error setting Action onRun is not lua function");
+        return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }
@@ -99,7 +101,8 @@ int Action::onPause(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         this->onPauseLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        //TODO: return error in Lua
+        Log::Error("Error setting Action onPause is not lua function");
+        return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }
@@ -123,7 +126,8 @@ int Action::onStop(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         this->onStopLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        //TODO: return error in Lua
+        Log::Error("Error setting Action onStop is not lua function");
+        return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }
@@ -147,7 +151,8 @@ int Action::onFinish(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         this->onFinishLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        //TODO: return error in Lua
+        Log::Error("Error setting Action onFinish is not lua function");
+        return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }
@@ -171,7 +176,8 @@ int Action::onStep(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         this->onStepLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        //TODO: return error in Lua
+        Log::Error("Error setting Action onStep is not lua function");
+        return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }

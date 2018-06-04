@@ -2,7 +2,6 @@
 #define supernova_h
 
 #include "Engine.h"
-#include "Events.h"
 
 void init();
 

@@ -131,13 +131,17 @@ bool Image::load(){
         
         normalizeTextureRect();
         
-        if (this->width == 0 && this->height == 0) {
+        if (this->width == 0 || this->height == 0) {
             if (submeshes[0]->getMaterial()->getTextureRect()){
-                this->width = ceil(texWidth * submeshes[0]->getMaterial()->getTextureRect()->getWidth());
-                this->height = ceil(texHeight * submeshes[0]->getMaterial()->getTextureRect()->getHeight());
+                if (this->width == 0)
+                    this->width = ceil(texWidth * submeshes[0]->getMaterial()->getTextureRect()->getWidth());
+                if (this->height == 0)
+                    this->height = ceil(texHeight * submeshes[0]->getMaterial()->getTextureRect()->getHeight());
             }else{
-                this->width = texWidth;
-                this->height = texHeight;
+                if (this->width == 0)
+                    this->width = texWidth;
+                if (this->height == 0)
+                    this->height = texHeight;
             }
         }
     }

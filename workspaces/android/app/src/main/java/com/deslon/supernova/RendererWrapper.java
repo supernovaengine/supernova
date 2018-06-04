@@ -23,17 +23,17 @@ public class RendererWrapper implements Renderer{
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		JNIWrapper.init_native(mainActivity, assetManager);
-		JNIWrapper.on_start(displayWidth, displayHeight);
-		JNIWrapper.on_surface_created();
+		JNIWrapper.system_start(displayWidth, displayHeight);
+		JNIWrapper.system_surface_created();
 	}
 
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
-		JNIWrapper.on_surface_changed(width, height);
+		JNIWrapper.system_surface_changed(width, height);
 	}
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		JNIWrapper.on_draw();
+		JNIWrapper.system_draw();
 	}
 }

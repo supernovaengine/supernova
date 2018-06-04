@@ -7,7 +7,6 @@
 
 #include "LuaIntf.h"
 
-#include "Events.h"
 #include "Engine.h"
 #include "Object.h"
 #include "ConcreteObject.h"
@@ -236,21 +235,17 @@ void LuaBind::bind(){
     .addConstant("SCALING_LETTERBOX", S_SCALING_LETTERBOX)
     .addConstant("SCALING_CROP", S_SCALING_CROP)
     .addConstant("SCALING_STRETCH", S_SCALING_STRETCH)
-    .endClass();
-
-    LuaIntf::LuaBinding(L).beginClass<Events>("Events")
-    .addConstructor(LUA_ARGS())
-    .addStaticFunction("onDraw", static_cast<int(*)(lua_State*)>(&Events::onDraw))
-    .addStaticFunction("onUpdate", static_cast<int(*)(lua_State*)>(&Events::onUpdate))
-    .addStaticFunction("onTouchStart", static_cast<int(*)(lua_State*)>(&Events::onTouchStart))
-    .addStaticFunction("onTouchEnd", static_cast<int(*)(lua_State*)>(&Events::onTouchEnd))
-    .addStaticFunction("onTouchDrag", static_cast<int(*)(lua_State*)>(&Events::onTouchDrag))
-    .addStaticFunction("onMouseDown", static_cast<int(*)(lua_State*)>(&Events::onMouseDown))
-    .addStaticFunction("onMouseUp", static_cast<int(*)(lua_State*)>(&Events::onMouseUp))
-    .addStaticFunction("onMouseDrag", static_cast<int(*)(lua_State*)>(&Events::onMouseDrag))
-    .addStaticFunction("onMouseMove", static_cast<int(*)(lua_State*)>(&Events::onMouseMove))
-    .addStaticFunction("onKeyDown", static_cast<int(*)(lua_State*)>(&Events::onKeyDown))
-    .addStaticFunction("onKeyUp", static_cast<int(*)(lua_State*)>(&Events::onKeyUp))
+    .addStaticFunction("onDraw", static_cast<int(*)(lua_State*)>(&Engine::onDraw))
+    .addStaticFunction("onUpdate", static_cast<int(*)(lua_State*)>(&Engine::onUpdate))
+    .addStaticFunction("onTouchStart", static_cast<int(*)(lua_State*)>(&Engine::onTouchStart))
+    .addStaticFunction("onTouchEnd", static_cast<int(*)(lua_State*)>(&Engine::onTouchEnd))
+    .addStaticFunction("onTouchDrag", static_cast<int(*)(lua_State*)>(&Engine::onTouchDrag))
+    .addStaticFunction("onMouseDown", static_cast<int(*)(lua_State*)>(&Engine::onMouseDown))
+    .addStaticFunction("onMouseUp", static_cast<int(*)(lua_State*)>(&Engine::onMouseUp))
+    .addStaticFunction("onMouseDrag", static_cast<int(*)(lua_State*)>(&Engine::onMouseDrag))
+    .addStaticFunction("onMouseMove", static_cast<int(*)(lua_State*)>(&Engine::onMouseMove))
+    .addStaticFunction("onKeyDown", static_cast<int(*)(lua_State*)>(&Engine::onKeyDown))
+    .addStaticFunction("onKeyUp", static_cast<int(*)(lua_State*)>(&Engine::onKeyUp))
     .endClass();
     
     LuaIntf::LuaBinding(L).beginClass<Input>("Input")

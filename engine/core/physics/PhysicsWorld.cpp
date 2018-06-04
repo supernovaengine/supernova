@@ -7,6 +7,8 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+#include "Log.h"
+
 #include "LuaIntf.h"
 
 //
@@ -68,7 +70,8 @@ int PhysicsWorld::onBeginContact(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         onBeginContactLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        //TODO: return error in Lua
+        Log::Error("Error setting Physics onBeginContact is not lua function");
+        return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }
@@ -81,7 +84,8 @@ int PhysicsWorld::onEndContact(lua_State *L){
     if (lua_type(L, 2) == LUA_TFUNCTION){
         onEndContactLuaFunc = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        //TODO: return error in Lua
+        Log::Error("Error setting Physics onEndContact is not lua function");
+        return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }

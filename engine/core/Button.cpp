@@ -9,6 +9,7 @@ Button::Button(): GUIImage(){
     ownedTextureDisabled = true;
 
     down = false;
+    pointerDown = -1;
 
     label.setMultiline(false);
     
@@ -122,7 +123,7 @@ std::string Button::getTextureDisabled(){
         return NULL;
 }
 
-void Button::engine_onDown(float x, float y){
+void Button::engine_onDown(int pointer, float x, float y){
     if (isCoordInside(x, y)) {
         state = S_BUTTON_PRESSED;
         if (texturePressed) {
@@ -130,20 +131,24 @@ void Button::engine_onDown(float x, float y){
         }
         call_onDown();
         down = true;
+        pointerDown = pointer;
     }
-    GUIObject::engine_onDown(x, y);
+    GUIObject::engine_onDown(pointer, x, y);
 }
 
-void Button::engine_onUp(float x, float y){
-    if (state == S_BUTTON_PRESSED) {
-        state = S_BUTTON_NORMAL;
-        if (textureNormal && texturePressed) {
-            setTexture(textureNormal);
+void Button::engine_onUp(int pointer, float x, float y){
+    if (pointerDown == pointer) {
+        if (state == S_BUTTON_PRESSED) {
+            state = S_BUTTON_NORMAL;
+            if (textureNormal && texturePressed) {
+                setTexture(textureNormal);
+            }
+            call_onUp();
         }
-        call_onUp();
+        down = false;
+        pointerDown = -1;
     }
-    down = false;
-    GUIObject::engine_onUp(x, y);
+    GUIObject::engine_onUp(pointer, x, y);
 }
 
 bool Button::isDown(){

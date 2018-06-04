@@ -80,13 +80,13 @@ bool Texture::load(){
                 texturesData[0] = image.loadTextureData(id.c_str());
                 dataOwned = true;
             }
-            
+
             if (resampleToPowerOfTwo){
                 texturesData[0]->resamplePowerOfTwo();
             }else{
                 texturesData[0]->fitPowerOfTwo();
             }
-            
+
             if (!textureRender.get()->loadTexture(texturesData[0])){
                 renderNotPrepared = true;
             }

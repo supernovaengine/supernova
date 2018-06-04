@@ -55,6 +55,8 @@ public class MainActivity extends Activity {
 	            WindowManager.LayoutParams.FLAG_FULLSCREEN,
 	            WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
 		ActivityManager activityManager 
 			= (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
@@ -122,32 +124,45 @@ public class MainActivity extends Activity {
 			glSurfaceView.setOnTouchListener(new OnTouchListener() {
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
-	                if (event != null) {           
-	                    final float normalizedX = (event.getX() / (float) v.getWidth()) * 2 - 1;
-	                    final float normalizedY = (event.getY() / (float) v.getHeight()) * 2 - 1;
-	                    
-	                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-	                        glSurfaceView.queueEvent(new Runnable() {
-	                            @Override
-	                            public void run() {
-	                            	JNIWrapper.on_touch_start(normalizedX, normalizedY);
-	                            }
-	                        });
-	                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
-	                    	glSurfaceView.queueEvent(new Runnable() {
-	                    		@Override
-		                        public void run() {
-	                    			JNIWrapper.on_touch_end(normalizedX, normalizedY);
-		                        }
-	                    	});
-	                    } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-	                        glSurfaceView.queueEvent(new Runnable() {
-	                            @Override
-	                            public void run() {
-	                            	JNIWrapper.on_touch_drag(normalizedX, normalizedY);
-	                            }
-	                        });
-	                    }                    
+	                if (event != null) {
+
+						int pointerIndex = event.getActionIndex();
+
+						final int pointerId = event.getPointerId(pointerIndex);
+	                    final float normalizedX = (event.getX(pointerIndex) / (float) v.getWidth()) * 2 - 1;
+	                    final float normalizedY = (event.getY(pointerIndex) / (float) v.getHeight()) * 2 - 1;
+
+						switch (event.getActionMasked()) {
+							case MotionEvent.ACTION_DOWN:
+							case MotionEvent.ACTION_POINTER_DOWN: {
+								glSurfaceView.queueEvent(new Runnable() {
+									@Override
+									public void run() {
+										JNIWrapper.system_touch_start(pointerId, normalizedX, normalizedY);
+									}
+								});
+								break;
+							}
+							case MotionEvent.ACTION_UP:
+							case MotionEvent.ACTION_POINTER_UP: {
+								glSurfaceView.queueEvent(new Runnable() {
+									@Override
+									public void run() {
+										JNIWrapper.system_touch_end(pointerId, normalizedX, normalizedY);
+									}
+								});
+								break;
+							}
+							case MotionEvent.ACTION_MOVE: {
+								glSurfaceView.queueEvent(new Runnable() {
+									@Override
+									public void run() {
+										JNIWrapper.system_touch_drag(pointerId, normalizedX, normalizedY);
+									}
+								});
+								break;
+							}
+						}
 
 	                    return true;                    
 	                } else {
@@ -182,7 +197,7 @@ public class MainActivity extends Activity {
 			glSurfaceView.onPause();
 		}
 
-		JNIWrapper.on_pause();
+		JNIWrapper.system_pause();
 	}
 	/*
 	public void onBackPressed() {
@@ -199,7 +214,7 @@ public class MainActivity extends Activity {
 			glSurfaceView.onResume();
 		}
 
-		JNIWrapper.on_resume();
+		JNIWrapper.system_resume();
 	}
 
 	public void showSoftKeyboard(){

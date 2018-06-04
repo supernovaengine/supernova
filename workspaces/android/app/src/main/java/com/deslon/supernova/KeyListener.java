@@ -31,14 +31,14 @@ public class KeyListener implements OnKeyListener {
             glSurfaceView.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                	JNIWrapper.on_key_down(convertToSupernova(keyCode));
+                	JNIWrapper.system_key_down(convertToSupernova(keyCode));
                 }
             });
         }else if(event.getAction() == KeyEvent.ACTION_UP) {
             glSurfaceView.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                	JNIWrapper.on_key_up(convertToSupernova(keyCode));
+                	JNIWrapper.system_key_up(convertToSupernova(keyCode));
                 }
             });
         }
