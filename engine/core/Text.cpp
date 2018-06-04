@@ -146,6 +146,10 @@ int Text::getLineHeight(){
         return stbtext->getLineHeight();
 }
 
+std::string Text::getFont(){
+    return font;
+}
+
 std::string Text::getText(){
     return text;
 }

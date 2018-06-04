@@ -20,6 +20,8 @@ namespace Supernova {
         Texture* texturePressed;
         Texture* textureDisabled;
 
+        bool down;
+
         Text label;
         
     public:
@@ -46,6 +48,8 @@ namespace Supernova {
 
         virtual void engine_onDown(float x, float y);
         virtual void engine_onUp(float x, float y);
+
+        bool isDown();
         
         virtual bool load();
     };

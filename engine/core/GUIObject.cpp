@@ -6,6 +6,7 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#include <cmath>
 
 using namespace Supernova;
 
@@ -68,10 +69,12 @@ void GUIObject::call_onUp(){
 }
 
 bool GUIObject::isCoordInside(float x, float y){
-    if (x >= getPosition().x and
-        x <= (getPosition().x + getWidth()) and
-        y >= getPosition().y and
-        y <= (getPosition().y + getHeight())) {
+    Vector3 point = worldRotation.getRotationMatrix() * Vector3(x, y, 0);
+
+    if (point.x >= (getWorldPosition().x - getCenter().x) and
+        point.x <= (getWorldPosition().x - getCenter().x + abs(getWidth() * getWorldScale().x)) and
+        point.y >= (getWorldPosition().y - getCenter().y) and
+        point.y <= (getWorldPosition().y - getCenter().y + abs(getHeight() * getWorldScale().y))) {
         return true;
     }
     return false;

@@ -8,8 +8,9 @@ Button::Button(): GUIImage(){
     ownedTexturePressed = true;
     ownedTextureDisabled = true;
 
+    down = false;
+
     label.setMultiline(false);
-    addObject(&label);
     
     state = S_BUTTON_NORMAL;
 }
@@ -30,7 +31,10 @@ void Button::setLabelText(std::string text){
 }
 
 void Button::setLabelFont(std::string font){
-    label.setFont(font.c_str());
+    if (font != "") {
+        label.setFont(font.c_str());
+        addObject(&label);
+    }
 }
 
 void Button::setLabelSize(unsigned int size){
@@ -125,6 +129,7 @@ void Button::engine_onDown(float x, float y){
             setTexture(texturePressed);
         }
         call_onDown();
+        down = true;
     }
     GUIObject::engine_onDown(x, y);
 }
@@ -137,7 +142,12 @@ void Button::engine_onUp(float x, float y){
         }
         call_onUp();
     }
+    down = false;
     GUIObject::engine_onUp(x, y);
+}
+
+bool Button::isDown(){
+    return down;
 }
 
 bool Button::load(){
@@ -154,18 +164,20 @@ bool Button::load(){
     if (textureDisabled)
         textureDisabled->load();
 
-    label.load();
+    if (!label.getFont().empty()) {
+        label.load();
 
-    float labelX = 0;
-    float labelY = (height / 2) + (label.getHeight() / 2) - border_bottom;
+        float labelX = 0;
+        float labelY = (height / 2) + (label.getHeight() / 2) - border_bottom;
 
-    if (label.getWidth() > (width - border_right)) {
-        labelX = border_left;
-        label.setWidth(width - border_right);
-    }else{
-        labelX = (width / 2) - (label.getWidth() / 2);
+        if (label.getWidth() > (width - border_right)) {
+            labelX = border_left;
+            label.setWidth(width - border_right);
+        } else {
+            labelX = (width / 2) - (label.getWidth() / 2);
+        }
+        label.setPosition(labelX, labelY, 0);
     }
-    label.setPosition(labelX, labelY, 0);
 
     return GUIImage::load();
 }

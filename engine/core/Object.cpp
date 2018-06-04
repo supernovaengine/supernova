@@ -226,6 +226,10 @@ Vector3 Object::getScale(){
     return this->scale;
 }
 
+Vector3 Object::getWorldScale(){
+    return this->worldScale;
+}
+
 void Object::setCenter(const float x, const float y, const float z){
     setCenter(Vector3(x, y, z));
 }
@@ -392,9 +396,11 @@ void Object::updateMatrix(){
         Matrix4 parentCenterMatrix = Matrix4::translateMatrix(parent->center);
         this->modelMatrix = parent->modelMatrix * parentCenterMatrix * this->modelMatrix;
         worldRotation = parent->worldRotation * rotation;
+        worldScale = Vector3(parent->worldScale.x * scale.x, parent->worldScale.y * scale.y, parent->worldScale.z * scale.z);
         worldPosition = modelMatrix * center;
     }else{
         worldRotation = rotation;
+        worldScale = scale;
         worldPosition = position;
     }
 

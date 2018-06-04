@@ -57,6 +57,7 @@ namespace Supernova {
 
         Vector3 worldPosition;
         Quaternion worldRotation;
+        Vector3 worldScale;
 
         Body* body;
         
@@ -93,6 +94,7 @@ namespace Supernova {
         void setScale(const float factor);
         void setScale(Vector3 scale);
         Vector3 getScale();
+        Vector3 getWorldScale();
 
         void setCenter(const float x, const float y, const float z);
         void setCenter(Vector3 center);
