@@ -14,6 +14,8 @@ TextureRender::TextureRender(){
     this->colorFormat = -1;
     this->width = 0;
     this->height = 0;
+
+    this->nearestScale = false;
 }
 
 TextureRender::~TextureRender(){
@@ -75,6 +77,10 @@ int TextureRender::getWidth(){
 
 int TextureRender::getHeight(){
     return height;
+}
+
+void TextureRender::setNearestScale(bool nearestScale){
+    this->nearestScale = nearestScale;
 }
 
 bool TextureRender::loadTexture(TextureData* texturedata){

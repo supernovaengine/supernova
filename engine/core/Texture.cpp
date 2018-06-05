@@ -1,5 +1,6 @@
 #include "Texture.h"
 #include "image/TextureLoader.h"
+#include "Engine.h"
 
 
 using namespace Supernova;
@@ -16,7 +17,8 @@ Texture::Texture(){
     this->id = "";
     
     this->dataOwned = false;
-    this->resampleToPowerOfTwo = true;
+    this->resampleToPowerOfTwo = Engine::isDefaultResampleToPOTTexture();
+    this->nearestScale = Engine::isDefaultNearestScaleTexture();
 }
 
 Texture::Texture(std::string path_id): Texture(){
@@ -65,9 +67,15 @@ void Texture::setResampleToPowerOfTwo(bool resampleToPowerOfTwo){
     this->resampleToPowerOfTwo = resampleToPowerOfTwo;
 }
 
+void Texture::setNearestScale(bool nearestScale){
+    this->nearestScale = nearestScale;
+}
+
 bool Texture::load(){
 
     textureRender = TextureRender::sharedInstance(id);
+
+    textureRender.get()->setNearestScale(nearestScale);
     
     bool renderNotPrepared = false;
 
@@ -187,6 +195,10 @@ int Texture::getTextureFrameHeight(){
 
 bool Texture::getResampleToPowerOfTwo(){
     return this->resampleToPowerOfTwo;
+}
+
+bool Texture::getNearestScale(){
+    return this->nearestScale;
 }
 
 std::shared_ptr<TextureRender> Texture::getTextureRender(){

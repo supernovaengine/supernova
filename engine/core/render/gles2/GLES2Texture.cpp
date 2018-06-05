@@ -47,7 +47,7 @@ bool GLES2Texture::loadTexture(TextureData* texturedata) {
     
     glBindTexture(GL_TEXTURE_2D, texture_object_id);
     
-    if (Engine::isNearestScaleTexture()){
+    if (nearestScale){
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }else{
@@ -81,7 +81,7 @@ bool GLES2Texture::loadTextureCube(std::vector<TextureData*> texturesdata){
     
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture_object_id);
     
-    if (Engine::isNearestScaleTexture()){
+    if (nearestScale){
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }else{
@@ -122,7 +122,7 @@ bool GLES2Texture::loadTextureFrame(int width, int height, bool depthframe){
     glGenTextures(1, &depthTexture);
     glBindTexture(GL_TEXTURE_2D, depthTexture);
         
-    if (Engine::isNearestScaleTexture()){
+    if (nearestScale){
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }else{
@@ -185,7 +185,7 @@ bool GLES2Texture::loadTextureFrameCube(int width, int height){
     GLuint cubeShadowMap;
     glGenTextures(1, &cubeShadowMap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeShadowMap);
-    if (Engine::isNearestScaleTexture()){
+    if (nearestScale){
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }else{

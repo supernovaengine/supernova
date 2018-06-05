@@ -33,6 +33,7 @@ namespace Supernova{
         
         bool dataOwned;
         bool resampleToPowerOfTwo;
+        bool nearestScale;
         
     public:
         Texture();
@@ -52,6 +53,7 @@ namespace Supernova{
         void setDataOwned(bool dataOwned);
         void setTextureFrameSize(int textureFrameWidth, int textureFrameHeight);
         void setResampleToPowerOfTwo(bool resampleToPowerOfTwo);
+        void setNearestScale(bool nearestScale);
 
         std::string getId();
         int getType();
@@ -60,6 +62,7 @@ namespace Supernova{
         int getTextureFrameWidth();
         int getTextureFrameHeight();
         bool getResampleToPowerOfTwo();
+        bool getNearestScale();
         
         int getColorFormat();
         bool hasAlphaChannel();

@@ -36,7 +36,6 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1surface_1cha
 	UNUSED(env);
 	UNUSED(cls);
 	Supernova::Engine::systemSurfaceChanged(width, height);
-
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1draw(JNIEnv * env, jclass cls) {

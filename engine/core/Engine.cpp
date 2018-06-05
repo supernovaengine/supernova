@@ -51,7 +51,8 @@ int Engine::renderAPI;
 bool Engine::mouseAsTouch;
 bool Engine::useDegrees;
 int Engine::scalingMode;
-bool Engine::nearestScaleTexture;
+bool Engine::defaultNearestScaleTexture;
+bool Engine::defaultResampleToPOTTexture;
 bool Engine::fixedTimePhysics;
 
 unsigned long Engine::lastTime = 0;
@@ -222,16 +223,24 @@ bool Engine::isUseDegrees(){
     return Engine::useDegrees;
 }
 
-void Engine::setNearestScaleTexture(bool nearestScaleTexture){
-    Engine::nearestScaleTexture = nearestScaleTexture;
+void Engine::setDefaultNearestScaleTexture(bool defaultNearestScaleTexture){
+    Engine::defaultNearestScaleTexture = defaultNearestScaleTexture;
 }
 
-bool Engine::isNearestScaleTexture(){
-    return nearestScaleTexture;
+bool Engine::isDefaultNearestScaleTexture(){
+    return defaultNearestScaleTexture;
+}
+
+void Engine::setDefaultResampleToPOTTexture(bool defaultResampleToPOTTexture){
+    Engine::defaultResampleToPOTTexture = defaultResampleToPOTTexture;
+}
+
+bool Engine::isDefaultResampleToPOTTexture(){
+    return defaultResampleToPOTTexture;
 }
 
 void Engine::setFixedTimePhysics(bool fixedTimePhysics){
-    Engine::nearestScaleTexture = fixedTimePhysics;
+    Engine::fixedTimePhysics = fixedTimePhysics;
 }
 
 bool Engine::isFixedTimePhysics(){
@@ -285,7 +294,8 @@ void Engine::systemStart(int width, int height){
     Engine::setUseDegrees(true);
     Engine::setRenderAPI(S_GLES2);
     Engine::setScalingMode(S_SCALING_FITWIDTH);
-    Engine::setNearestScaleTexture(false);
+    Engine::setDefaultNearestScaleTexture(false);
+    Engine::setDefaultResampleToPOTTexture(true);
     Engine::setFixedTimePhysics(false);
     
     auto now = std::chrono::steady_clock::now();

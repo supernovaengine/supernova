@@ -32,6 +32,8 @@ namespace Supernova {
         static TextureRender::it_type findToRemove();
         
     protected:
+
+        bool nearestScale;
         
         TextureRender();
         
@@ -47,6 +49,8 @@ namespace Supernova {
         int getColorFormat();
         int getWidth();
         int getHeight();
+
+        void setNearestScale(bool nearestScale);
         
         virtual bool loadTexture(TextureData* texturedata);
         virtual bool loadTextureCube(std::vector<TextureData*> texturesdata);
