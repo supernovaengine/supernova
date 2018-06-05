@@ -119,7 +119,7 @@ public class MainActivity extends Activity {
 			layout.addView(glSurfaceView);
 			edittext.setView(glSurfaceView);
 			
-			glSurfaceView.setOnKeyListener(new KeyListener(glSurfaceView));
+			glSurfaceView.setOnKeyListener(new KeyListener(this, glSurfaceView));
 			
 			glSurfaceView.setOnTouchListener(new OnTouchListener() {
 				@Override
@@ -199,13 +199,7 @@ public class MainActivity extends Activity {
 
 		JNIWrapper.system_pause();
 	}
-	/*
-	public void onBackPressed() {
-        Log.v("Eduardo", "oii");
 
-        return;
-    } 
-	 */
 	@Override
 	protected void onResume() {
 		super.onResume();

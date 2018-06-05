@@ -21,10 +21,10 @@
 
 - (void)insertText:(NSString *)text {
     const char *ctext=[text UTF8String];
-    Supernova::Engine::onTextInput(ctext);
+    Supernova::Engine::systemTextInput(ctext);
 }
 - (void)deleteBackward {
-    Supernova::Engine::onTextInput("\b");
+    Supernova::Engine::systemTextInput("\b");
 }
 - (BOOL)hasText {
     return YES;
@@ -89,7 +89,7 @@
 
 - (void)render:(CADisplayLink*)displayLink {
 
-    Supernova::Engine::onDraw();
+    Supernova::Engine::systemDraw();
     
     [_context presentRenderbuffer:GL_RENDERBUFFER];
     
@@ -107,7 +107,7 @@
     [self setupRenderBuffer];
     [self setupFrameBuffer];
     
-    Supernova::Engine::onSurfaceChanged(backingWidth, backingHeight);
+    Supernova::Engine::systemSurfaceChanged(backingWidth, backingHeight);
     
     [self render:nil];
 }
@@ -121,7 +121,7 @@
         [self setupLayer];
         [self setupContext];
         
-        Supernova::Engine::onSurfaceCreated();
+        Supernova::Engine::systemSurfaceCreated();
         
         [self setupDisplayLink];
     }

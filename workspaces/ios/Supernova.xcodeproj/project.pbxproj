@@ -143,8 +143,6 @@
 		71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28351DE8E96800C12A1D /* MP3Reader.cpp */; };
 		71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FAC11DEB1924003850A2 /* SoundManager.cpp */; };
 		71AC8B611E6B42C000DB33C3 /* Points.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301261E53D4B000BEE527 /* Points.cpp */; };
-		71B818C120B095A10069E8FA /* Boy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71B818AF20B08F480069E8FA /* Boy.cpp */; };
-		71B818C220B095A10069E8FA /* Map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71B818AE20B08F480069E8FA /* Map.cpp */; };
 		71B818C320B095A10069E8FA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
 		71B818C420B095BD0069E8FA /* libsupernova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC7041D7B142D0060EEFF /* libsupernova.a */; };
 		71B818C520B095CC0069E8FA /* libsupernova-project.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71B818B720B094930069E8FA /* libsupernova-project.a */; };
@@ -204,7 +202,6 @@
 		71C39E57204188BC00863AB6 /* ParticleSizeMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E1B204188A500863AB6 /* ParticleSizeMod.cpp */; };
 		71C39E58204188BC00863AB6 /* ParticleSpriteMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E1D204188A500863AB6 /* ParticleSpriteMod.cpp */; };
 		71C39E59204188BC00863AB6 /* ParticleVelocityMod.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E1F204188A500863AB6 /* ParticleVelocityMod.cpp */; };
-		71C5764A1EE45167002F537B /* Events.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C576481EE45167002F537B /* Events.cpp */; };
 		71CDC6FD1D7B132B0060EEFF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */; };
 		71CDC6FF1D7B13350060EEFF /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */; };
 		71CDC70D1D7B14510060EEFF /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A071CFB2EAD00A4752F /* Camera.cpp */; };
@@ -750,10 +747,6 @@
 		71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 		71A6FAC11DEB1924003850A2 /* SoundManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundManager.cpp; sourceTree = "<group>"; };
 		71A6FAC21DEB1924003850A2 /* SoundManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
-		71B818AD20B08F470069E8FA /* Boy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Boy.h; sourceTree = "<group>"; };
-		71B818AE20B08F480069E8FA /* Map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Map.cpp; sourceTree = "<group>"; };
-		71B818AF20B08F480069E8FA /* Boy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Boy.cpp; sourceTree = "<group>"; };
-		71B818B020B08F480069E8FA /* Map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Map.h; sourceTree = "<group>"; };
 		71B818B720B094930069E8FA /* libsupernova-project.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libsupernova-project.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BCF6C01E476F42008E42A2 /* Text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Text.cpp; sourceTree = "<group>"; };
 		71BCF6C11E476F42008E42A2 /* Text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Text.h; sourceTree = "<group>"; };
@@ -878,8 +871,6 @@
 		71C39E33204188A500863AB6 /* ParticleSpriteInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleSpriteInit.h; sourceTree = "<group>"; };
 		71C39E34204188A500863AB6 /* ParticleVelocityInit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleVelocityInit.cpp; sourceTree = "<group>"; };
 		71C39E35204188A500863AB6 /* ParticleVelocityInit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleVelocityInit.h; sourceTree = "<group>"; };
-		71C576481EE45167002F537B /* Events.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Events.cpp; sourceTree = "<group>"; };
-		71C576491EE45167002F537B /* Events.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Events.h; sourceTree = "<group>"; };
 		71CDC6FA1D7B13240060EEFF /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -1078,10 +1069,6 @@
 		71192EFA1CE1334000BD76EE /* project */ = {
 			isa = PBXGroup;
 			children = (
-				71B818AF20B08F480069E8FA /* Boy.cpp */,
-				71B818AD20B08F470069E8FA /* Boy.h */,
-				71B818AE20B08F480069E8FA /* Map.cpp */,
-				71B818B020B08F480069E8FA /* Map.h */,
 				71192EFB1CE1334000BD76EE /* main.cpp */,
 			);
 			name = project;
@@ -1129,8 +1116,6 @@
 				713384E01D3051FF00DB73A5 /* DirectionalLight.h */,
 				713D2A101CFB2EAD00A4752F /* Engine.cpp */,
 				713D2A111CFB2EAD00A4752F /* Engine.h */,
-				71C576481EE45167002F537B /* Events.cpp */,
-				71C576491EE45167002F537B /* Events.h */,
 				71CE94ED1EC8A38E008CCF3C /* file */,
 				71598C411E7CA245000EDAC0 /* Fog.cpp */,
 				71598C421E7CA245000EDAC0 /* Fog.h */,
@@ -2340,8 +2325,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71B818C220B095A10069E8FA /* Map.cpp in Sources */,
-				71B818C120B095A10069E8FA /* Boy.cpp in Sources */,
 				71B818C320B095A10069E8FA /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2426,7 +2409,6 @@
 				714C89171F0EDF370028DCE0 /* TextureRender.cpp in Sources */,
 				714C6CFA209DF09E0002F031 /* Log.cpp in Sources */,
 				715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */,
-				71C5764A1EE45167002F537B /* Events.cpp in Sources */,
 				714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */,
 				71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */,
 				714C6D0320A525F20002F031 /* Body.cpp in Sources */,

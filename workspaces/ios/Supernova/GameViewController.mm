@@ -22,7 +22,7 @@
     
     CGFloat screenScale = [UIScreen mainScreen].scale;
     
-    Supernova::Engine::onStart(width*screenScale, height*screenScale);
+    Supernova::Engine::systemStart(width*screenScale, height*screenScale);
     
     self.glView = [[EAGLView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
     if([[UIScreen mainScreen] respondsToSelector:@selector(scale)]) {
@@ -32,6 +32,7 @@
     self.view = self.glView;
     
     self.view.userInteractionEnabled = YES;
+    self.view.multipleTouchEnabled = YES;
 }
 
 static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
@@ -44,28 +45,35 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesBegan:touches withEvent:event];
-    UITouch* touchEvent = [touches anyObject];
-    CGPoint locationInView = [touchEvent locationInView:self.view];
-    CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    Supernova::Engine::onTouchStart(normalizedPoint.x, normalizedPoint.y);
+    int id = 0;
+    for (UITouch *touch in touches) {
+        //NSValue *touchValue = [NSValue valueWithPointer:touch];
+        CGPoint locationInView = [touch locationInView:self.view];
+        CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
+        Supernova::Engine::systemTouchStart(id++, normalizedPoint.x, normalizedPoint.y);
+    }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesMoved:touches withEvent:event];
-    UITouch* touchEvent = [touches anyObject];
-    CGPoint locationInView = [touchEvent locationInView:self.view];
-    CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    Supernova::Engine::onTouchDrag(normalizedPoint.x, normalizedPoint.y);
+    int id = 0;
+    for (UITouch *touch in touches) {
+        CGPoint locationInView = [touch locationInView:self.view];
+        CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
+        Supernova::Engine::systemTouchDrag(id++, normalizedPoint.x, normalizedPoint.y);
+    }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesEnded:touches withEvent:event];
-    UITouch* touchEvent = [touches anyObject];
-    CGPoint locationInView = [touchEvent locationInView:self.view];
-    CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-    Supernova::Engine::onTouchEnd(normalizedPoint.x, normalizedPoint.y);
+    int id = 0;
+    for (UITouch *touch in touches) {
+        CGPoint locationInView = [touch locationInView:self.view];
+        CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
+        Supernova::Engine::systemTouchEnd(id++, normalizedPoint.x, normalizedPoint.y);
+    }
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event

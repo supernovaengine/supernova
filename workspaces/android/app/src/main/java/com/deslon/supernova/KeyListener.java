@@ -1,15 +1,18 @@
 package com.deslon.supernova;
 
+import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
 
 public class KeyListener implements OnKeyListener {
-	
+
+	private Activity activity;
 	private GLSurfaceView glSurfaceView;
 	
-	public KeyListener(GLSurfaceView glSurfaceView){
+	public KeyListener(Activity activity, GLSurfaceView glSurfaceView){
+		this.activity = activity;
 		this.glSurfaceView = glSurfaceView;
 	}
 	
@@ -27,6 +30,11 @@ public class KeyListener implements OnKeyListener {
 
 	@Override
 	public boolean onKey(View v, final int keyCode, KeyEvent event) {
+
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP){
+			activity.finish();
+		}
+
         if(event.getAction() == KeyEvent.ACTION_DOWN) {
             glSurfaceView.queueEvent(new Runnable() {
                 @Override
