@@ -16,6 +16,7 @@ Object::Object(){
     
     parent = NULL;
     scene = NULL;
+    body = NULL;
 
     ownedBodies = false;
 
@@ -35,10 +36,12 @@ Object::~Object(){
     if (parent)
         parent->removeObject(this);
 
-    if (ownedBodies)
-        delete body;
-    else
-        body->attachedObject = NULL;
+    if (body) {
+        if (ownedBodies)
+            delete body;
+        else
+            body->attachedObject = NULL;
+    }
     
     destroy();
 }
