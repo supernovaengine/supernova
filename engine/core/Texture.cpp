@@ -17,8 +17,12 @@ Texture::Texture(){
     this->id = "";
     
     this->dataOwned = false;
-    this->resampleToPowerOfTwo = Engine::isDefaultResampleToPOTTexture();
-    this->nearestScale = Engine::isDefaultNearestScaleTexture();
+
+    this->resampleToPowerOfTwo = false;
+    this->nearestScale = false;
+
+    this->userResampleToPowerOfTwo = false;
+    this->userNearestScale = false;
 }
 
 Texture::Texture(std::string path_id): Texture(){
@@ -65,16 +69,27 @@ void Texture::setTextureFrameSize(int textureFrameWidth, int textureFrameHeight)
 
 void Texture::setResampleToPowerOfTwo(bool resampleToPowerOfTwo){
     this->resampleToPowerOfTwo = resampleToPowerOfTwo;
+    this->userResampleToPowerOfTwo = true;
 }
 
 void Texture::setNearestScale(bool nearestScale){
     this->nearestScale = nearestScale;
+    this->userNearestScale = true;
+}
+
+void Texture::setDefaults(){
+    if (!userResampleToPowerOfTwo)
+        resampleToPowerOfTwo = Engine::isDefaultResampleToPOTTexture();
+
+    if (!userNearestScale)
+        nearestScale = Engine::isDefaultNearestScaleTexture();
 }
 
 bool Texture::load(){
 
     textureRender = TextureRender::sharedInstance(id);
 
+    setDefaults();
     textureRender.get()->setNearestScale(nearestScale);
     
     bool renderNotPrepared = false;

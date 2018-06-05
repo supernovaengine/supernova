@@ -32,8 +32,14 @@ namespace Supernova{
         std::vector<TextureData*> texturesData;
         
         bool dataOwned;
+
         bool resampleToPowerOfTwo;
         bool nearestScale;
+
+        bool userResampleToPowerOfTwo;
+        bool userNearestScale;
+
+        void setDefaults();
         
     public:
         Texture();
