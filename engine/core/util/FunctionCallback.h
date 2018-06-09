@@ -63,17 +63,12 @@ namespace Supernova {
 
 
         std::function<Ret(Args...)> cFunction;
-        LuaFunction* luaFunction;
+        LuaFunction luaFunction;
 
     public:
 
         FunctionCallback() {
             cFunction = NULL;
-            luaFunction = new LuaFunction();
-        }
-
-        virtual ~FunctionCallback(){
-            delete luaFunction;
         }
 
         FunctionCallback(const FunctionCallback& t){
@@ -89,7 +84,7 @@ namespace Supernova {
         }
 
         int set(lua_State *L) {
-            return luaFunction->set(L);
+            return luaFunction.set(L);
         }
 
         bool set(std::function<Ret(Args...)> function) {
@@ -117,7 +112,7 @@ namespace Supernova {
 
         bool remove() {
             cFunction = NULL;
-            luaFunction->reset();
+            luaFunction.reset();
             return true;
         }
 
@@ -125,7 +120,7 @@ namespace Supernova {
             if (cFunction)
                 cFunction(args...);
 
-            luaFunction->call(args...);
+            luaFunction.call(args...);
         }
 
         int operator()(lua_State *L) {
