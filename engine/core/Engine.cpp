@@ -80,6 +80,7 @@ FunctionCallback<void(int,float,float)> Engine::onMouseDrag;
 FunctionCallback<void(float,float)> Engine::onMouseMove;
 FunctionCallback<void(int)> Engine::onKeyDown;
 FunctionCallback<void(int)> Engine::onKeyUp;
+FunctionCallback<void(std::string)> Engine::onTextInput;
 
 
 Engine::Engine() {
@@ -531,7 +532,8 @@ void Engine::systemKeyUp(int inputKey){
 }
 
 void Engine::systemTextInput(const char* text){
-    //Log::Verbose("textinput %s\n", text);
+    onTextInput.call(text);
+
     if (mainScene) {
         std::vector<GUIObject*>::iterator it;
         for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {

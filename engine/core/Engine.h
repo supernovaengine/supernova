@@ -150,6 +150,7 @@ namespace Supernova {
         static FunctionCallback<void(float,float)> onMouseMove;
         static FunctionCallback<void(int)> onKeyDown;
         static FunctionCallback<void(int)> onKeyUp;
+        static FunctionCallback<void(std::string)> onTextInput;
 
     };
     

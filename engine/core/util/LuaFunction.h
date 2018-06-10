@@ -33,6 +33,7 @@ namespace Supernova {
         void call(float p1, float p2);
         void call(int p1, float p2, float p3);
         void call(Object* p1);
+        void call(std::string p1);
 
     };
 }
