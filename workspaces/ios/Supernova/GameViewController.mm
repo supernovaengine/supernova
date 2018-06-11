@@ -2,6 +2,7 @@
 #import "EAGLView.h"
 #include "Engine.h"
 
+#define MAX_TOUCHES 10
 
 @interface GameViewController ()
 
@@ -10,6 +11,8 @@
 @end
 
 @implementation GameViewController
+
+static UITouch* touches[MAX_TOUCHES];
 
 - (void)viewDidLoad
 {
@@ -42,43 +45,70 @@ static CGPoint getNormalizedPoint(UIView* view, CGPoint locationInView)
     return CGPointMake(normalizedX, normalizedY);
 }
 
+static int getTouchId(UITouch *touch, bool remove = false)
+{
+    int next = -1;
+    for (int i = 0; i < MAX_TOUCHES; i++) {
+        if (touches[i] == touch){
+            if (remove)
+                touches[i] = NULL;
+            return i;
+        }
+        if (next == -1 && touches[i] == NULL) {
+            next = i;
+        }
+    }
+    
+    if (next != -1) {
+        touches[next] = touch;
+        return next;
+    }
+    
+    return -1;
+}
+
+static void clearTouches()
+{
+    for (int i = 0; i < MAX_TOUCHES; i++) {
+        touches[i] = NULL;
+    }
+}
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesBegan:touches withEvent:event];
-    int id = 0;
     for (UITouch *touch in touches) {
         //NSValue *touchValue = [NSValue valueWithPointer:touch];
         CGPoint locationInView = [touch locationInView:self.view];
         CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-        Supernova::Engine::systemTouchStart(id++, normalizedPoint.x, normalizedPoint.y);
+        Supernova::Engine::systemTouchStart(getTouchId(touch), normalizedPoint.x, normalizedPoint.y);
     }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesMoved:touches withEvent:event];
-    int id = 0;
     for (UITouch *touch in touches) {
         CGPoint locationInView = [touch locationInView:self.view];
         CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-        Supernova::Engine::systemTouchDrag(id++, normalizedPoint.x, normalizedPoint.y);
+        Supernova::Engine::systemTouchDrag(getTouchId(touch), normalizedPoint.x, normalizedPoint.y);
     }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesEnded:touches withEvent:event];
-    int id = 0;
     for (UITouch *touch in touches) {
         CGPoint locationInView = [touch locationInView:self.view];
         CGPoint normalizedPoint = getNormalizedPoint(self.view, locationInView);
-        Supernova::Engine::systemTouchEnd(id++, normalizedPoint.x, normalizedPoint.y);
+        Supernova::Engine::systemTouchEnd(getTouchId(touch, true), normalizedPoint.x, normalizedPoint.y);
     }
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesCancelled:touches withEvent:event];
+    clearTouches();
 }
 
 - (void) showSoftKeyboard{
