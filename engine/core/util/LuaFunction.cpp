@@ -9,6 +9,9 @@
 #include "LuaBind.h"
 #include "Log.h"
 
+#include "Object.h"
+#include "physics/CollisionShape.h"
+
 //
 // (c) 2018 Eduardo Doria.
 //
@@ -30,60 +33,68 @@ LuaFunction& LuaFunction::operator = (const LuaFunction& t){
 }
 
 int LuaFunction::set(lua_State *L){
-    if (lua_type(L, 2) == LUA_TFUNCTION){
+    if (lua_type(L, lua_gettop(L)) == LUA_TFUNCTION){
+        // The function to store is on the top of stack L
         function = luaL_ref(L, LUA_REGISTRYINDEX);
     }else{
-        Log::Error("Error setting not a Lua function");
         return luaL_error(L, "This is not a valid function");
     }
     return 0;
 }
 
-void LuaFunction::reset(){
+void LuaFunction::remove(){
     function = 0;
 }
 
-void LuaFunction::call() {
-    if (function != 0) {
+template<>
+void LuaFunction::call(){
+    if (function != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
         LuaBind::luaCallback(0, 0, 0);
     }
-}
+};
 
+template<>
 void LuaFunction::call(int p1){
-    if (function != 0) {
+    if (function != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
         lua_pushnumber(LuaBind::getLuaState(), p1);
         LuaBind::luaCallback(1, 0, 0);
     }
-}
+};
 
+template<>
 void LuaFunction::call(int p1, int p2){
-    if (function != 0) {
+    if (function != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
         lua_pushnumber(LuaBind::getLuaState(), p1);
         lua_pushnumber(LuaBind::getLuaState(), p2);
         LuaBind::luaCallback(2, 0, 0);
     }
-}
+};
 
+
+template<>
 void LuaFunction::call(float p1){
-    if (function != 0) {
+    if (function != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
         lua_pushnumber(LuaBind::getLuaState(), p1);
         LuaBind::luaCallback(1, 0, 0);
     }
-}
+};
 
+template<>
 void LuaFunction::call(float p1, float p2){
-    if (function != 0) {
+    if (function != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
         lua_pushnumber(LuaBind::getLuaState(), p1);
         lua_pushnumber(LuaBind::getLuaState(), p2);
         LuaBind::luaCallback(2, 0, 0);
     }
-}
+};
 
+
+template<>
 void LuaFunction::call(int p1, float p2, float p3){
     if (function != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
@@ -92,20 +103,50 @@ void LuaFunction::call(int p1, float p2, float p3){
         lua_pushnumber(LuaBind::getLuaState(), p3);
         LuaBind::luaCallback(3, 0, 0);
     }
-}
+};
 
+
+template<>
 void LuaFunction::call(Object* p1){
-    if (function != 0) {
+    if (function != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
         LuaIntf::Lua::push(LuaBind::getLuaState(), p1);
         LuaBind::luaCallback(1, 0, 0);
     }
-}
+};
 
+template<>
 void LuaFunction::call(std::string p1){
-    if (function != 0) {
+    if (function != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
         LuaIntf::Lua::push(LuaBind::getLuaState(), p1);
         LuaBind::luaCallback(1, 0, 0);
     }
+};
+
+template<>
+void LuaFunction::call(CollisionShape* p1, CollisionShape* p2){
+    if (function != 0){
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), p1);
+        LuaIntf::Lua::push(LuaBind::getLuaState(), p2);
+        LuaBind::luaCallback(2, 0, 0);
+    }
+};
+
+template<>
+float LuaFunction::call(float p1){
+    lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
+    lua_pushnumber(LuaBind::getLuaState(), p1);
+    int status = lua_pcall(LuaBind::getLuaState(), 1, 1, 0);
+    if (status != 0){
+        Log::Error("Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
+    }
+    LuaBind::luaCallback(1, 1, 0);
+
+    if (!lua_isnumber(LuaBind::getLuaState(), -1))
+        Log::Error("Lua Error: function in Action must return a number\n");
+    float value = lua_tonumber(LuaBind::getLuaState(), -1);
+    lua_pop(LuaBind::getLuaState(), 1);
+    return value;
 }

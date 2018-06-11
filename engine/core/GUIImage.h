@@ -2,6 +2,10 @@
 #ifndef GUIImage_h
 #define GUIImage_h
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 #include "GUIObject.h"
 #include "Image.h"
 

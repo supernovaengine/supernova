@@ -5,8 +5,7 @@
 #include "CollisionShape.h"
 #include "Body.h"
 #include <vector>
-
-typedef struct lua_State lua_State;
+#include "util/FunctionCallback.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -19,13 +18,6 @@ namespace Supernova {
 
         friend class Scene;
 
-    private:
-        void (*onBeginContactFunc)(CollisionShape*, CollisionShape*);
-        int onBeginContactLuaFunc;
-
-        void (*onEndContactFunc)(CollisionShape*, CollisionShape*);
-        int onEndContactLuaFunc;
-
     protected:
         std::vector<Body*> bodies;
         bool ownedBodies;
@@ -36,14 +28,8 @@ namespace Supernova {
     public:
         virtual ~PhysicsWorld();
 
-        void call_onBeginContact(CollisionShape* shapeA, CollisionShape* shapeB);
-        void call_onEndContact(CollisionShape* shapeA, CollisionShape* shapeB);
-
-        void onBeginContact(void (*onBeginContactFunc)(CollisionShape*, CollisionShape*));
-        int onBeginContact(lua_State *L);
-
-        void onEndContact(void (*onEndContactFunc)(CollisionShape*, CollisionShape*));
-        int onEndContact(lua_State *L);
+        FunctionCallback<void(CollisionShape*, CollisionShape*)> onBeginContact;
+        FunctionCallback<void(CollisionShape*, CollisionShape*)> onEndContact;
 
         void setOwnedBodies(bool ownedBodies);
         bool isOwnedBodies();

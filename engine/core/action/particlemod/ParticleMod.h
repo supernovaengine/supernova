@@ -4,8 +4,6 @@
 #include "Particles.h"
 #include "action/Ease.h"
 
-typedef struct lua_State lua_State;
-
 namespace Supernova {
 
     class ParticleMod: public Ease {

@@ -23,14 +23,14 @@ public:
         CollisionShape* shapeA = (CollisionShape2D*)contact->GetFixtureA()->GetUserData();
         CollisionShape* shapeB = (CollisionShape2D*)contact->GetFixtureB()->GetUserData();
 
-        world->call_onBeginContact(shapeA, shapeB);
+        world->onBeginContact.call(shapeA, shapeB);
     }
 
     virtual void EndContact(b2Contact* contact){
         CollisionShape* shapeA = (CollisionShape2D*)contact->GetFixtureA()->GetUserData();
         CollisionShape* shapeB = (CollisionShape2D*)contact->GetFixtureB()->GetUserData();
 
-        world->call_onEndContact(shapeA, shapeB);
+        world->onEndContact.call(shapeA, shapeB);
     }
 
 };

@@ -12,7 +12,6 @@ using namespace Supernova;
 
 Ease::Ease(){
     this->function = Ease::linear;
-    this->functionLua = 0;
 }
 
 Ease::~Ease(){
@@ -239,24 +238,19 @@ float Ease::easeInOutBounce(float time){
     return easeOutBounce(time * 2 - 1) * 0.5 + 0.5;
 }
 
-void Ease::setFunction(float (*function)(float)){
-    this->functionLua = 0;
+void Ease::setFunction(std::function<float(float)> function){
+    this->function.remove();
     this->function = function;
 }
 
 int Ease::setFunction(lua_State* L){
-    this->function = NULL;
-    if (lua_type(L, 2) == LUA_TFUNCTION){
-        functionLua = luaL_ref(L, LUA_REGISTRYINDEX);
-    }else{
-        Log::Error("Lua Error: is not a function\n");
-    }
-    return 0;
+    this->function.remove();
+    return this->function.set(L);
 }
 
 void Ease::setFunctionType(int functionType){
 
-    functionLua = 0;
+    function.remove();
 
     if (functionType == S_LINEAR){
         function = Ease::linear;
@@ -321,25 +315,5 @@ void Ease::setFunctionType(int functionType){
     }else if(functionType == S_EASE_BOUNCE_IN_OUT){
         function = Ease::easeInOutBounce;
     }
-}
 
-float Ease::call_Function(float time){
-    if (function){
-        return function(time);
-    }else if(functionLua != 0){
-        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, functionLua);
-        lua_pushnumber(LuaBind::getLuaState(), time);
-        int status = lua_pcall(LuaBind::getLuaState(), 1, 1, 0);
-        if (status != 0){
-            Log::Error("Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
-        }
-
-        if (!lua_isnumber(LuaBind::getLuaState(), -1))
-            Log::Error("Lua Error: function in Action must return a number\n");
-        float value = lua_tonumber(LuaBind::getLuaState(), -1);
-        lua_pop(LuaBind::getLuaState(), 1);
-        return value;
-    }
-
-    return 0;
 }

@@ -19,8 +19,6 @@
 #define S_PLATFORM_IOS 2
 #define S_PLATFORM_WEB 3
 
-typedef struct lua_State lua_State;
-
 namespace Supernova {
 
     class Scene;

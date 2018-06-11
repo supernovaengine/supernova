@@ -1,15 +1,18 @@
 #ifndef LUAFUNCTION_H
 #define LUAFUNCTION_H
 
-#include "Object.h"
-
 //
 // (c) 2018 Eduardo Doria.
 //
 
+#include <string>
+
 typedef struct lua_State lua_State;
 
 namespace Supernova {
+
+    class Object;
+    class CollisionShape;
 
     class LuaFunction {
 
@@ -24,16 +27,10 @@ namespace Supernova {
         LuaFunction& operator = (const LuaFunction& t);
 
         int set(lua_State *L);
-        void reset();
+        void remove();
 
-        void call();
-        void call(int p1);
-        void call(int p1, int p2);
-        void call(float p1);
-        void call(float p1, float p2);
-        void call(int p1, float p2, float p3);
-        void call(Object* p1);
-        void call(std::string p1);
+        template<typename Ret, typename ...Args>
+        Ret call(Args... args);
 
     };
 }

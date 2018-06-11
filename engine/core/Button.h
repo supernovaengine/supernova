@@ -5,6 +5,10 @@
 #define S_BUTTON_PRESSED 11
 #define S_BUTTON_DISABLED 12
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 #include "GUIImage.h"
 #include "Text.h"
 
@@ -47,8 +51,8 @@ namespace Supernova {
         void setTextureDisabled(std::string texturepath);
         std::string getTextureDisabled();
 
-        virtual void engine_onDown(int pointer, float x, float y);
-        virtual void engine_onUp(int pointer, float x, float y);
+        virtual void engineOnDown(int pointer, float x, float y);
+        virtual void engineOnUp(int pointer, float x, float y);
 
         bool isDown();
         

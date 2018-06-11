@@ -1,6 +1,10 @@
 
 #include "Button.h"
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 using namespace Supernova;
 
 Button::Button(): GUIImage(){
@@ -123,32 +127,32 @@ std::string Button::getTextureDisabled(){
         return NULL;
 }
 
-void Button::engine_onDown(int pointer, float x, float y){
+void Button::engineOnDown(int pointer, float x, float y){
     if (isCoordInside(x, y)) {
         state = S_BUTTON_PRESSED;
         if (texturePressed) {
             setTexture(texturePressed);
         }
-        call_onDown();
+        onDown.call();
         down = true;
         pointerDown = pointer;
     }
-    GUIObject::engine_onDown(pointer, x, y);
+    GUIObject::engineOnDown(pointer, x, y);
 }
 
-void Button::engine_onUp(int pointer, float x, float y){
+void Button::engineOnUp(int pointer, float x, float y){
     if (pointerDown == pointer) {
         if (state == S_BUTTON_PRESSED) {
             state = S_BUTTON_NORMAL;
             if (textureNormal && texturePressed) {
                 setTexture(textureNormal);
             }
-            call_onUp();
+            onUp.call();
         }
         down = false;
         pointerDown = -1;
     }
-    GUIObject::engine_onUp(pointer, x, y);
+    GUIObject::engineOnUp(pointer, x, y);
 }
 
 bool Button::isDown(){

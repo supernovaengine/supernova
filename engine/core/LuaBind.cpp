@@ -107,6 +107,28 @@ void LuaBind::luaCallback(int nargs, int nresults, int msgh){
     }
 }
 
+void LuaBind::stackDump (lua_State *L) {
+    int i = lua_gettop(L);
+    Log::Debug(" ----------------  Stack Dump ----------------" );
+    while(  i   ) {
+        int t = lua_type(L, i);
+        switch (t) {
+            case LUA_TSTRING:
+                Log::Debug("%d:`%s'", i, lua_tostring(L, i));
+                break;
+            case LUA_TBOOLEAN:
+                Log::Debug("%d: %s",i,lua_toboolean(L, i) ? "true" : "false");
+                break;
+            case LUA_TNUMBER:
+                Log::Debug("%d: %g",  i, lua_tonumber(L, i));
+                break;
+            default: Log::Debug("%d: %s", i, lua_typename(L, t)); break;
+        }
+        i--;
+    }
+    Log::Debug("--------------- Stack Dump Finished ---------------" );
+}
+
 void LuaBind::setObject(const char* global, Object* object){
     lua_State *L = LuaBind::getLuaState();
     LuaIntf::Lua::setGlobal(L, global, object);
@@ -237,68 +259,88 @@ void LuaBind::bind(){
     .addConstant("SCALING_LETTERBOX", S_SCALING_LETTERBOX)
     .addConstant("SCALING_CROP", S_SCALING_CROP)
     .addConstant("SCALING_STRETCH", S_SCALING_STRETCH)
-    .addStaticVariableRef("onCanvasLoaded", &Engine::onCanvasLoaded)
-    .addStaticVariableRef("onCanvasChanged", &Engine::onCanvasChanged)
-    .addStaticVariableRef("onDraw", &Engine::onDraw)
-    .addStaticVariableRef("onUpdate", &Engine::onUpdate)
-    .addStaticVariableRef("onTouchStart", &Engine::onTouchStart)
-    .addStaticVariableRef("onTouchEnd", &Engine::onTouchEnd)
-    .addStaticVariableRef("onTouchDrag", &Engine::onTouchDrag)
-    .addStaticVariableRef("onMouseDown", &Engine::onMouseDown)
-    .addStaticVariableRef("onMouseUp", &Engine::onMouseUp)
-    .addStaticVariableRef("onMouseDrag", &Engine::onMouseDrag)
-    .addStaticVariableRef("onMouseMove", &Engine::onMouseMove)
-    .addStaticVariableRef("onKeyDown", &Engine::onKeyDown)
-    .addStaticVariableRef("onKeyUp", &Engine::onKeyUp)
-    .addStaticVariableRef("onTextInput", &Engine::onTextInput)
+    .addStaticProperty("onCanvasLoaded", [] () { return &Engine::onCanvasLoaded; }, [] (lua_State* L) { Engine::onCanvasLoaded.set(L); })
+    .addStaticProperty("onCanvasChanged", [] () { return &Engine::onCanvasChanged; }, [] (lua_State* L) { Engine::onCanvasChanged.set(L); })
+    .addStaticProperty("onDraw", [] () { return &Engine::onDraw; }, [] (lua_State* L) { Engine::onDraw.set(L); })
+    .addStaticProperty("onUpdate", [] () { return &Engine::onUpdate; }, [] (lua_State* L) { Engine::onUpdate.set(L); })
+    .addStaticProperty("onTouchStart", [] () { return &Engine::onTouchStart; }, [] (lua_State* L) { Engine::onTouchStart.set(L); })
+    .addStaticProperty("onTouchEnd", [] () { return &Engine::onTouchEnd; }, [] (lua_State* L) { Engine::onTouchEnd.set(L); })
+    .addStaticProperty("onTouchDrag", [] () { return &Engine::onTouchDrag; }, [] (lua_State* L) { Engine::onTouchDrag.set(L); })
+    .addStaticProperty("onMouseDown", [] () { return &Engine::onMouseDown; }, [] (lua_State* L) { Engine::onMouseDown.set(L); })
+    .addStaticProperty("onMouseUp", [] () { return &Engine::onMouseUp; }, [] (lua_State* L) { Engine::onMouseUp.set(L); })
+    .addStaticProperty("onMouseDrag", [] () { return &Engine::onMouseDrag; }, [] (lua_State* L) { Engine::onMouseDrag.set(L); })
+    .addStaticProperty("onMouseMove", [] () { return &Engine::onMouseMove; }, [] (lua_State* L) { Engine::onMouseMove.set(L); })
+    .addStaticProperty("onKeyDown", [] () { return &Engine::onKeyDown; }, [] (lua_State* L) { Engine::onKeyDown.set(L); })
+    .addStaticProperty("onKeyUp", [] () { return &Engine::onKeyUp; }, [] (lua_State* L) { Engine::onKeyUp.set(L); })
+    .addStaticProperty("onTextInput", [] () { return &Engine::onTextInput; }, [] (lua_State* L) { Engine::onTextInput.set(L); })
     .endClass();
 
-    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void()>>("FunctionCallback")
-    .addFunction("__call", (int (FunctionCallback<void()>::*)(lua_State*))&FunctionCallback<void()>::set)
-    .addFunction("set", (int (FunctionCallback<void()>::*)(lua_State*))&FunctionCallback<void()>::set)
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void()>>("FunctionCallback_V")
+    .addFunction("__call", &FunctionCallback<void()>::call)
     .addFunction("call", &FunctionCallback<void()>::call)
+    .addFunction("set", (int (FunctionCallback<void()>::*)(lua_State*))&FunctionCallback<void()>::set)
     .endClass();
 
-    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(int)>>("FunctionCallback_Int")
-    .addFunction("__call", (int (FunctionCallback<void(int)>::*)(lua_State*))&FunctionCallback<void(int)>::set)
-    .addFunction("set", (int (FunctionCallback<void(int)>::*)(lua_State*))&FunctionCallback<void(int)>::set)
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(int)>>("FunctionCallback_V_I")
+    .addFunction("__call", &FunctionCallback<void(int)>::call)
     .addFunction("call", &FunctionCallback<void(int)>::call)
+    .addFunction("set", (int (FunctionCallback<void(int)>::*)(lua_State*))&FunctionCallback<void(int)>::set)
     .endClass();
 
-    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(int,int)>>("FunctionCallback_IntInt")
-    .addFunction("__call", (int (FunctionCallback<void(int,int)>::*)(lua_State*))&FunctionCallback<void(int,int)>::set)
-    .addFunction("set", (int (FunctionCallback<void(int,int)>::*)(lua_State*))&FunctionCallback<void(int,int)>::set)
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(int,int)>>("FunctionCallback_V_II")
+    .addFunction("__call", &FunctionCallback<void(int,int)>::call)
     .addFunction("call", &FunctionCallback<void(int,int)>::call)
+    .addFunction("set", (int (FunctionCallback<void(int,int)>::*)(lua_State*))&FunctionCallback<void(int,int)>::set)
+
     .endClass();
 
-    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(float)>>("FunctionCallback_Float")
-    .addFunction("__call", (int (FunctionCallback<void(float)>::*)(lua_State*))&FunctionCallback<void(float)>::set)
-    .addFunction("set", (int (FunctionCallback<void(float)>::*)(lua_State*))&FunctionCallback<void(float)>::set)
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(float)>>("FunctionCallback_V_F")
+    .addFunction("__call", &FunctionCallback<void(float)>::call)
     .addFunction("call", &FunctionCallback<void(float)>::call)
+    .addFunction("set", (int (FunctionCallback<void(float)>::*)(lua_State*))&FunctionCallback<void(float)>::set)
+
     .endClass();
 
-    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(float,float)>>("FunctionCallback_FloatFloat")
-    .addFunction("__call", (int (FunctionCallback<void(float,float)>::*)(lua_State*))&FunctionCallback<void(float,float)>::set)
-    .addFunction("set", (int (FunctionCallback<void(float,float)>::*)(lua_State*))&FunctionCallback<void(float,float)>::set)
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(float,float)>>("FunctionCallback_V_FF")
+    .addFunction("__call", &FunctionCallback<void(float,float)>::call)
     .addFunction("call", &FunctionCallback<void(float,float)>::call)
+    .addFunction("set", (int (FunctionCallback<void(float,float)>::*)(lua_State*))&FunctionCallback<void(float,float)>::set)
+
     .endClass();
 
-    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(int,float,float)>>("FunctionCallback_IntFloatFloat")
-    .addFunction("__call", (int (FunctionCallback<void(int,float,float)>::*)(lua_State*))&FunctionCallback<void(int,float,float)>::set)
-    .addFunction("set", (int (FunctionCallback<void(int,float,float)>::*)(lua_State*))&FunctionCallback<void(int,float,float)>::set)
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(int,float,float)>>("FunctionCallback_V_IFF")
+    .addFunction("__call", &FunctionCallback<void(int,float,float)>::call)
     .addFunction("call", &FunctionCallback<void(int,float,float)>::call)
+    .addFunction("set", (int (FunctionCallback<void(int,float,float)>::*)(lua_State*))&FunctionCallback<void(int,float,float)>::set)
+
     .endClass();
 
-    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(Object*)>>("FunctionCallback_Object")
-    .addFunction("__call", (int (FunctionCallback<void(Object*)>::*)(lua_State*))&FunctionCallback<void(Object*)>::set)
-    .addFunction("set", (int (FunctionCallback<void(Object*)>::*)(lua_State*))&FunctionCallback<void(Object*)>::set)
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(Object*)>>("FunctionCallback_V_Obj")
+    .addFunction("__call", &FunctionCallback<void(Object*)>::call)
     .addFunction("call", &FunctionCallback<void(Object*)>::call)
+    .addFunction("set", (int (FunctionCallback<void(Object*)>::*)(lua_State*))&FunctionCallback<void(Object*)>::set)
+
     .endClass();
 
-    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(std::string)>>("FunctionCallback_String")
-    .addFunction("__call", (int (FunctionCallback<void(std::string)>::*)(lua_State*))&FunctionCallback<void(std::string)>::set)
-    .addFunction("set", (int (FunctionCallback<void(std::string)>::*)(lua_State*))&FunctionCallback<void(std::string)>::set)
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(std::string)>>("FunctionCallback_V_S")
+    .addFunction("__call", &FunctionCallback<void(std::string)>::call)
     .addFunction("call", &FunctionCallback<void(std::string)>::call)
+    .addFunction("set", (int (FunctionCallback<void(std::string)>::*)(lua_State*))&FunctionCallback<void(std::string)>::set)
+
+    .endClass();
+
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(CollisionShape*, CollisionShape*)>>("FunctionCallback_V_CSCS")
+    .addFunction("__call", &FunctionCallback<void(CollisionShape*, CollisionShape*)>::call)
+    .addFunction("call", &FunctionCallback<void(CollisionShape*, CollisionShape*)>::call)
+    .addFunction("set", (int (FunctionCallback<void(CollisionShape*, CollisionShape*)>::*)(lua_State*))&FunctionCallback<void(CollisionShape*, CollisionShape*)>::set)
+
+    .endClass();
+
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<float(float)>>("FunctionCallback_F_F")
+    .addFunction("__call", &FunctionCallback<float(float)>::call)
+    .addFunction("call", &FunctionCallback<float(float)>::call)
+    .addFunction("set", (int (FunctionCallback<float(float)>::*)(lua_State*))&FunctionCallback<float(float)>::set)
+
     .endClass();
     
     LuaIntf::LuaBinding(L).beginClass<Input>("Input")
@@ -667,13 +709,12 @@ void LuaBind::bind(){
     .addFunction("stop", &Action::stop)
     .addFunction("isRunning", &Action::isRunning)
     .addFunction("getObject", &Action::getObject)
-    .addFunction("onStart", (int (Action::*)(lua_State*))&Action::onStart)
-    .addFunction("onRun", (int (Action::*)(lua_State*))&Action::onRun)
-    .addFunction("onPause", (int (Action::*)(lua_State*))&Action::onPause)
-    .addFunction("onStop", (int (Action::*)(lua_State*))&Action::onStop)
-    .addFunction("onFinish", (int (Action::*)(lua_State*))&Action::onFinish)
-    .addFunction("onStep", (int (Action::*)(lua_State*))&Action::onStep)
-
+    .addProperty("onStart", [] (Action* action) { return &action->onStart; }, [] (Action* action, lua_State* L) { action->onStart.set(L); })
+    .addProperty("onRun", [] (Action* action) { return &action->onRun; }, [] (Action* action, lua_State* L) { action->onRun.set(L); })
+    .addProperty("onPause", [] (Action* action) { return &action->onPause; }, [] (Action* action, lua_State* L) { action->onPause.set(L); })
+    .addProperty("onStop", [] (Action* action) { return &action->onStop; }, [] (Action* action, lua_State* L) { action->onStop.set(L); })
+    .addProperty("onFinish", [] (Action* action) { return &action->onFinish; }, [] (Action* action, lua_State* L) { action->onFinish.set(L); })
+    .addProperty("onStep", [] (Action* action) { return &action->onStep; }, [] (Action* action, lua_State* L) { action->onStep.set(L); })
     .addConstant("LINEAR", S_LINEAR)
     .addConstant("EASE_QUAD_IN", S_EASE_QUAD_IN)
     .addConstant("EASE_QUAD_OUT", S_EASE_QUAD_OUT)

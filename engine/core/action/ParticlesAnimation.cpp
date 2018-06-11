@@ -185,7 +185,7 @@ bool ParticlesAnimation::step(){
         
         if (!existParticles && !emitter){
             stop();
-            call_onFinish();
+            onFinish.call(object);
         }
 
         particles->updateParticles();

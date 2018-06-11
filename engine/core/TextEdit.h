@@ -1,6 +1,10 @@
 #ifndef TEXTEDIT_H
 #define TEXTEDIT_H
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 #include "GUIImage.h"
 #include "Text.h"
 
@@ -24,9 +28,9 @@ namespace Supernova {
         std::string getText();
         Text* getTextObject();
 
-        virtual void engine_onDown(int pointer, float x, float y);
-        virtual void engine_onUp(int pointer, float x, float y);
-        virtual void engine_onTextInput(std::string text);
+        virtual void engineOnDown(int pointer, float x, float y);
+        virtual void engineOnUp(int pointer, float x, float y);
+        virtual void engineOnTextInput(std::string text);
 
         virtual bool load();
     };

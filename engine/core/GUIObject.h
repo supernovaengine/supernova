@@ -3,22 +3,13 @@
 #define GUIObject_h
 
 #include "Mesh2D.h"
+#include "util/FunctionCallback.h"
 
 namespace Supernova {
 
     class GUIObject: public Mesh2D {
-    private:
-        void (*onDownFunc)();
-        int onDownLuaFunc;
-        
-        void (*onUpFunc)();
-        int onUpLuaFunc;
-
     protected:
         int state;
-
-        void call_onDown();
-        void call_onUp();
         
     public:
         GUIObject();
@@ -26,17 +17,14 @@ namespace Supernova {
         
         int getState();
 
-        void onDown(void (*onDownFunc)());
-        int onDown(lua_State *L);
-        
-        void onUp(void (*onUpFunc)());
-        int onUp(lua_State *L);
+        FunctionCallback<void()> onDown;
+        FunctionCallback<void()> onUp;
 
         bool isCoordInside(float x, float y);
 
-        virtual void engine_onDown(int pointer, float x, float y);
-        virtual void engine_onUp(int pointer, float x, float y);
-        virtual void engine_onTextInput(std::string text);
+        virtual void engineOnDown(int pointer, float x, float y);
+        virtual void engineOnUp(int pointer, float x, float y);
+        virtual void engineOnTextInput(std::string text);
     };
     
 }

@@ -87,7 +87,7 @@ bool TimeAction::step(){
     
     if ((time == 1) && !loop){
         stop();
-        call_onFinish();
+        onFinish.call(object);
         return false;
     }
     
@@ -106,7 +106,7 @@ bool TimeAction::step(){
         time = (float) timecount / durationms;
     }
 
-    value = call_Function(time);
+    value = function.call(time);
     //Log::Debug("step time %f value %f \n", time, value);
     
     return true;

@@ -1,6 +1,8 @@
 #ifndef EASE_H
 #define EASE_H
 
+#include "util/FunctionCallback.h"
+
 #define S_LINEAR 0
 #define S_EASE_QUAD_IN 1
 #define S_EASE_QUAD_OUT 2
@@ -33,16 +35,13 @@
 #define S_EASE_BOUNCE_OUT 29
 #define S_EASE_BOUNCE_IN_OUT 30
 
-typedef struct lua_State lua_State;
-
 namespace Supernova {
 
     class Ease {
 
     protected:
 
-        float (*function)(float);
-        int functionLua;
+        FunctionCallback<float(float)> function;
 
     public:
 
@@ -81,12 +80,10 @@ namespace Supernova {
         static float easeOutBounce(float time);
         static float easeInOutBounce(float time);
 
-        void setFunction(float (*function)(float));
+        void setFunction(std::function<float(float)> function);
         int setFunction(lua_State* L);
 
         void setFunctionType(int functionType);
-
-        float call_Function(float time);
 
     };
 }

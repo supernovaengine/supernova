@@ -35,5 +35,5 @@ void ParticleMod::execute(Particles* particles, int particle, float life){
         time = -1;
     }
 
-    value = call_Function(time);
+    value = function.call(time);
 }

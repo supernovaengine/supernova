@@ -154,7 +154,7 @@ bool SpriteAnimation::step(){
             if (framesIndex == frames.size() - 1) {
                 if (!loop) {
                     stop();
-                    call_onFinish();
+                    onFinish.call(object);
                 }
             }
             

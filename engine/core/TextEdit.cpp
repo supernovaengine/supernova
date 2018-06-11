@@ -4,6 +4,10 @@
 #include <codecvt>
 #include "platform/SystemPlatform.h"
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 using namespace Supernova;
 
 TextEdit::TextEdit(): GUIImage(){
@@ -49,16 +53,16 @@ Text* TextEdit::getTextObject(){
     return &text;
 }
 
-void TextEdit::engine_onDown(int pointer, float x, float y){
+void TextEdit::engineOnDown(int pointer, float x, float y){
     SystemPlatform::instance().showVirtualKeyboard();
-    GUIObject::engine_onDown(pointer, x, y);
+    GUIObject::engineOnDown(pointer, x, y);
 }
 
-void TextEdit::engine_onUp(int pointer, float x, float y){
-    GUIObject::engine_onUp(pointer, x, y);
+void TextEdit::engineOnUp(int pointer, float x, float y){
+    GUIObject::engineOnUp(pointer, x, y);
 }
 
-void TextEdit::engine_onTextInput(std::string text){
+void TextEdit::engineOnTextInput(std::string text){
 
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
 
@@ -78,7 +82,7 @@ void TextEdit::engine_onTextInput(std::string text){
         }
     }
 
-    GUIObject::engine_onTextInput(text);
+    GUIObject::engineOnTextInput(text);
 }
 
 bool TextEdit::load(){

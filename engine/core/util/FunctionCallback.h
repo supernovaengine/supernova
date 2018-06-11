@@ -86,6 +86,18 @@ namespace Supernova {
             return *this;
         }
 
+        FunctionCallback& operator = (lua_State *L){
+            this->set(L);
+
+            return *this;
+        }
+
+        FunctionCallback& operator = (std::function<Ret(Args...)> function){
+            this->set(function);
+
+            return *this;
+        }
+
         int set(lua_State *L) {
             return luaFunction.set(L);
         }
@@ -115,23 +127,19 @@ namespace Supernova {
 
         bool remove() {
             cFunction = NULL;
-            luaFunction.reset();
+            luaFunction.remove();
             return true;
         }
 
-        void call(Args... args){
+        Ret call(Args... args){
             if (cFunction)
-                cFunction(args...);
+                return cFunction(args...);
 
-            luaFunction.call(args...);
+            return luaFunction.call<Ret,Args...>(args...);
         }
 
-        int operator()(lua_State *L) {
-            return set(L);
-        }
-
-        void operator()(std::function<Ret(Args...)> function) {
-            set(function);
+        Ret operator()(Args... args) {
+            return call(args...);
         }
     };
 }

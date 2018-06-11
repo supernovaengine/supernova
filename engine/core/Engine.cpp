@@ -414,7 +414,7 @@ void Engine::systemTouchStart(int pointer, float x, float y){
         if (mainScene) {
             std::vector<GUIObject *>::iterator it;
             for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
-                (*it)->engine_onDown(pointer, x, y);
+                (*it)->engineOnDown(pointer, x, y);
             }
         }
     }
@@ -431,7 +431,7 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
         if (mainScene) {
             std::vector<GUIObject *>::iterator it;
             for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
-                (*it)->engine_onUp(pointer, x, y);
+                (*it)->engineOnUp(pointer, x, y);
             }
         }
     }
@@ -455,7 +455,7 @@ void Engine::systemMouseDown(int button, float x, float y){
         //-----------------
         if (Engine::isMouseAsTouch()){
             //-----------------
-            Engine::onTouchStart.call(button, x, y);
+            Engine::onTouchStart.call(100, x, y);
             Input::addTouchStarted();
             Input::setTouchPosition(x, y);
             //-----------------
@@ -464,7 +464,7 @@ void Engine::systemMouseDown(int button, float x, float y){
         if (mainScene) {
             std::vector<GUIObject *>::iterator it;
             for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
-                (*it)->engine_onDown(button, x, y);
+                (*it)->engineOnDown(button, x, y);
             }
         }
     }
@@ -478,7 +478,7 @@ void Engine::systemMouseUp(int button, float x, float y){
         //-----------------
         if (Engine::isMouseAsTouch()){
             //-----------------
-            Engine::onTouchEnd.call(button, x, y);
+            Engine::onTouchEnd.call(100, x, y);
             Input::releaseTouchStarted();
             Input::setTouchPosition(x, y);
             //-----------------
@@ -487,7 +487,7 @@ void Engine::systemMouseUp(int button, float x, float y){
         if (mainScene) {
             std::vector<GUIObject *>::iterator it;
             for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
-                (*it)->engine_onUp(button, x, y);
+                (*it)->engineOnUp(button, x, y);
             }
         }
     }
@@ -501,7 +501,7 @@ void Engine::systemMouseDrag(int button, float x, float y){
         //-----------------
         if (Engine::isMouseAsTouch()){
             //-----------------
-            Engine::onTouchDrag.call(button, x, y);
+            Engine::onTouchDrag.call(100, x, y);
             Input::setTouchPosition(x, y);
             //-----------------
         }
@@ -537,7 +537,7 @@ void Engine::systemTextInput(const char* text){
     if (mainScene) {
         std::vector<GUIObject*>::iterator it;
         for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
-            (*it)->engine_onTextInput(text);
+            (*it)->engineOnTextInput(text);
         }
     }
 }
