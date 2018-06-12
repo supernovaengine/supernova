@@ -136,17 +136,17 @@ void LuaFunction::call(CollisionShape* p1, CollisionShape* p2){
 
 template<>
 float LuaFunction::call(float p1){
-    lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
-    lua_pushnumber(LuaBind::getLuaState(), p1);
-    int status = lua_pcall(LuaBind::getLuaState(), 1, 1, 0);
-    if (status != 0){
-        Log::Error("Lua Error: %s\n", lua_tostring(LuaBind::getLuaState(),-1));
-    }
-    LuaBind::luaCallback(1, 1, 0);
+    if (function != 0){
+        lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
+        lua_pushnumber(LuaBind::getLuaState(), p1);
+        LuaBind::luaCallback(1, 1, 0);
 
-    if (!lua_isnumber(LuaBind::getLuaState(), -1))
-        Log::Error("Lua Error: function in Action must return a number\n");
-    float value = lua_tonumber(LuaBind::getLuaState(), -1);
-    lua_pop(LuaBind::getLuaState(), 1);
-    return value;
+        if (!lua_isnumber(LuaBind::getLuaState(), -1))
+            Log::Error("Lua Error: function in Action must return a number\n");
+        float value = lua_tonumber(LuaBind::getLuaState(), -1);
+        lua_pop(LuaBind::getLuaState(), 1);
+
+        return value;
+    }
+    return 0;
 }
