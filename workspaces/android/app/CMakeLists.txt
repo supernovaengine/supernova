@@ -5,6 +5,7 @@
  add_definitions("-DLUA_USE_C89")
  add_definitions("-DWITH_OPENSLES") # For SoLoud
 
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/src/main/cpp/android_macros.h")
  set(COMPILE_ZLIB OFF)
  set(IS_ARM OFF)

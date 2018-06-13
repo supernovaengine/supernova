@@ -13,30 +13,14 @@
 #include <string>
 #include <vector>
 #include "LuaFunction.h"
-
-/*
-template<int ...>
-struct ints
-{
-};
-
-template<int N, int... Is>
-struct int_seq : int_seq<N - 1, N, Is...>
-{
-};
-
-template<int... Is>
-struct int_seq<0, Is...>
-{
-    using type = ints<0, Is...>;
-};
+#include "IntegerSequence.h"
 
 template<size_t>
 struct MyPlaceholder {};
 
 template<size_t N>
 struct std::is_placeholder<MyPlaceholder<N>> : public std::integral_constant<size_t, N> {};
-*/
+
 namespace Supernova {
 
     template<typename T>
@@ -51,11 +35,9 @@ namespace Supernova {
             this->cFunction = function;
             return true;
         }
-/*
- * Removed to compile project without -std=c++11
  
         template<typename T, size_t... Idx>
-        std::function<Ret(Args...)> bindImpl(T *obj, Ret(T::*funcPtr)(Args...), ints<Idx...>) {
+        std::function<Ret(Args...)> bindImpl(T *obj, Ret(T::*funcPtr)(Args...), index_sequence<Idx...>) {
             return std::bind(funcPtr, obj, getPlaceholder<Idx>()...);
         }
 
@@ -63,7 +45,6 @@ namespace Supernova {
         MyPlaceholder<N + 1> getPlaceholder() {
             return {};
         }
-*/
 
         std::function<Ret(Args...)> cFunction;
         LuaFunction luaFunction;
@@ -112,16 +93,28 @@ namespace Supernova {
             addImpl(funcPtr);
             return true;
         }
-/*
+
         template<typename T, Ret(T::*funcPtr)(Args...)>
         bool set(std::shared_ptr<T> obj) {
-            addImpl(bindImpl(obj.get(), funcPtr, int_seq<sizeof...(Args)>{}));
+            addImpl(bindImpl(obj.get(), funcPtr, index_sequence_for<Args...>{}));
             return true;
         }
-*/
+
+        template<typename T, Ret(T::*funcPtr)(Args...)>
+        bool set(T *obj) {
+            addImpl(bindImpl(obj, funcPtr, index_sequence_for<Args...>{}));
+            return true;
+        }
+
         template<typename T>
         bool set(std::shared_ptr<T> t) {
             addImpl(*t.get());
+            return true;
+        }
+
+        template<typename T>
+        bool set(T* t) {
+            addImpl(*t);
             return true;
         }
 

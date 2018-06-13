@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 add_definitions("-DWITH_SDL_STATIC") # For SoLoud
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-extensions")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/web_macros.h")
 set(COMPILE_ZLIB OFF)
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
