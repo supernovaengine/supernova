@@ -3,6 +3,10 @@
 #ifndef luabind_h
 #define luabind_h
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 #include "Object.h"
 
 typedef struct lua_State lua_State;

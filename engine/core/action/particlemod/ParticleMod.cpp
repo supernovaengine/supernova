@@ -3,12 +3,6 @@
 #include "Log.h"
 #include "action/TimeAction.h"
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-
-#include "LuaBind.h"
-
 using namespace Supernova;
 
 ParticleMod::ParticleMod(): Ease(){

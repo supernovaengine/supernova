@@ -8,9 +8,8 @@
 
 #include "LuaBind.h"
 #include "Log.h"
-
 #include "Object.h"
-#include "physics/CollisionShape.h"
+#include "physics/Contact2D.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -125,12 +124,11 @@ void LuaFunction::call(std::string p1){
 };
 
 template<>
-void LuaFunction::call(CollisionShape* p1, CollisionShape* p2){
+void LuaFunction::call(Contact2D* p1){
     if (function != 0){
         lua_rawgeti(LuaBind::getLuaState(), LUA_REGISTRYINDEX, function);
         LuaIntf::Lua::push(LuaBind::getLuaState(), p1);
-        LuaIntf::Lua::push(LuaBind::getLuaState(), p2);
-        LuaBind::luaCallback(2, 0, 0);
+        LuaBind::luaCallback(1, 0, 0);
     }
 };
 

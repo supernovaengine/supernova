@@ -2,11 +2,7 @@
 
 #include "Log.h"
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-
-#include "LuaBind.h"
+#include <math.h>
 
 using namespace Supernova;
 

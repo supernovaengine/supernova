@@ -1,15 +1,7 @@
 #include "PhysicsWorld.h"
 
 #include "Scene.h"
-#include "LuaBind.h"
-
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-
 #include "Log.h"
-
-#include "LuaIntf.h"
 
 //
 // (c) 2018 Eduardo Doria.

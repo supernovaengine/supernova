@@ -20,17 +20,14 @@ public:
     }
 
     virtual void BeginContact(b2Contact* contact){
-        CollisionShape* shapeA = (CollisionShape2D*)contact->GetFixtureA()->GetUserData();
-        CollisionShape* shapeB = (CollisionShape2D*)contact->GetFixtureB()->GetUserData();
-
-        world->onBeginContact.call(shapeA, shapeB);
+        Contact2D contact2d(contact);
+        world->onBeginContact.call(&contact2d);
     }
 
     virtual void EndContact(b2Contact* contact){
-        CollisionShape* shapeA = (CollisionShape2D*)contact->GetFixtureA()->GetUserData();
-        CollisionShape* shapeB = (CollisionShape2D*)contact->GetFixtureB()->GetUserData();
-
-        world->onEndContact.call(shapeA, shapeB);
+        //Contact2D contact2d(contact);
+        Contact2D* contact2d = new Contact2D(contact);
+        world->onEndContact.call(contact2d);
     }
 
 };

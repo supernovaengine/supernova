@@ -4,10 +4,6 @@
 
 #include "Supernova.h"
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-
 #include "Scene.h"
 
 #include <stdio.h>
@@ -18,7 +14,6 @@
 #include "math/Rect.h"
 #include "Log.h"
 #include "Button.h"
-
 #include "LuaBind.h"
 
 #include <assert.h>

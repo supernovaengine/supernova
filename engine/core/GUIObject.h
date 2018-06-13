@@ -2,6 +2,10 @@
 #ifndef GUIObject_h
 #define GUIObject_h
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 #include "Mesh2D.h"
 #include "util/FunctionCallback.h"
 

@@ -28,9 +28,6 @@ namespace Supernova {
     public:
         virtual ~PhysicsWorld();
 
-        FunctionCallback<void(CollisionShape*, CollisionShape*)> onBeginContact;
-        FunctionCallback<void(CollisionShape*, CollisionShape*)> onEndContact;
-
         void setOwnedBodies(bool ownedBodies);
         bool isOwnedBodies();
 

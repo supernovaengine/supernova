@@ -1,6 +1,10 @@
 
 #include "LuaBind.h"
 
+//
+// (c) 2018 Eduardo Doria.
+//
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -36,6 +40,7 @@
 #include "Input.h"
 #include "Sprite.h"
 #include "util/FunctionCallback.h"
+#include "physics/Contact2D.h"
 #include "action/Action.h"
 #include "action/Ease.h"
 #include "action/TimeAction.h"
@@ -291,56 +296,48 @@ void LuaBind::bind(){
     .addFunction("__call", &FunctionCallback<void(int,int)>::call)
     .addFunction("call", &FunctionCallback<void(int,int)>::call)
     .addFunction("set", (int (FunctionCallback<void(int,int)>::*)(lua_State*))&FunctionCallback<void(int,int)>::set)
-
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(float)>>("FunctionCallback_V_F")
     .addFunction("__call", &FunctionCallback<void(float)>::call)
     .addFunction("call", &FunctionCallback<void(float)>::call)
     .addFunction("set", (int (FunctionCallback<void(float)>::*)(lua_State*))&FunctionCallback<void(float)>::set)
-
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(float,float)>>("FunctionCallback_V_FF")
     .addFunction("__call", &FunctionCallback<void(float,float)>::call)
     .addFunction("call", &FunctionCallback<void(float,float)>::call)
     .addFunction("set", (int (FunctionCallback<void(float,float)>::*)(lua_State*))&FunctionCallback<void(float,float)>::set)
-
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(int,float,float)>>("FunctionCallback_V_IFF")
     .addFunction("__call", &FunctionCallback<void(int,float,float)>::call)
     .addFunction("call", &FunctionCallback<void(int,float,float)>::call)
     .addFunction("set", (int (FunctionCallback<void(int,float,float)>::*)(lua_State*))&FunctionCallback<void(int,float,float)>::set)
-
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(Object*)>>("FunctionCallback_V_Obj")
     .addFunction("__call", &FunctionCallback<void(Object*)>::call)
     .addFunction("call", &FunctionCallback<void(Object*)>::call)
     .addFunction("set", (int (FunctionCallback<void(Object*)>::*)(lua_State*))&FunctionCallback<void(Object*)>::set)
-
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(std::string)>>("FunctionCallback_V_S")
     .addFunction("__call", &FunctionCallback<void(std::string)>::call)
     .addFunction("call", &FunctionCallback<void(std::string)>::call)
     .addFunction("set", (int (FunctionCallback<void(std::string)>::*)(lua_State*))&FunctionCallback<void(std::string)>::set)
-
     .endClass();
 
-    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(CollisionShape*, CollisionShape*)>>("FunctionCallback_V_CSCS")
-    .addFunction("__call", &FunctionCallback<void(CollisionShape*, CollisionShape*)>::call)
-    .addFunction("call", &FunctionCallback<void(CollisionShape*, CollisionShape*)>::call)
-    .addFunction("set", (int (FunctionCallback<void(CollisionShape*, CollisionShape*)>::*)(lua_State*))&FunctionCallback<void(CollisionShape*, CollisionShape*)>::set)
-
+    LuaIntf::LuaBinding(L).beginClass<FunctionCallback<void(Contact2D*)>>("FunctionCallback_V_Contact2D")
+    .addFunction("__call", &FunctionCallback<void(Contact2D*)>::call)
+    .addFunction("call", &FunctionCallback<void(Contact2D*)>::call)
+    .addFunction("set", (int (FunctionCallback<void(Contact2D*)>::*)(lua_State*))&FunctionCallback<void(Contact2D*)>::set)
     .endClass();
 
     LuaIntf::LuaBinding(L).beginClass<FunctionCallback<float(float)>>("FunctionCallback_F_F")
     .addFunction("__call", &FunctionCallback<float(float)>::call)
     .addFunction("call", &FunctionCallback<float(float)>::call)
     .addFunction("set", (int (FunctionCallback<float(float)>::*)(lua_State*))&FunctionCallback<float(float)>::set)
-
     .endClass();
     
     LuaIntf::LuaBinding(L).beginClass<Input>("Input")

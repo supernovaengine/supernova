@@ -1,11 +1,8 @@
-
 #include "GUIObject.h"
 
-#include "LuaBind.h"
-
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+//
+// (c) 2018 Eduardo Doria.
+//
 
 #include "Log.h"
 

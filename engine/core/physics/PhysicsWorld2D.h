@@ -7,6 +7,7 @@
 
 #include "PhysicsWorld.h"
 #include "Body2D.h"
+#include "Contact2D.h"
 
 class b2World;
 class b2ContactListener;
@@ -28,6 +29,9 @@ namespace Supernova {
         PhysicsWorld2D();
         PhysicsWorld2D(int pointsToMeterScale);
         virtual ~PhysicsWorld2D();
+        
+        FunctionCallback<void(Contact2D*)> onBeginContact;
+        FunctionCallback<void(Contact2D*)> onEndContact;
 
         b2World* getBox2DWorld();
 
