@@ -174,6 +174,7 @@
 		71BD28301DE887C100C12A1D /* compat.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD260D1DE886C200C12A1D /* compat.c */; };
 		71BD28311DE887C100C12A1D /* compat_str.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD260F1DE886C200C12A1D /* compat_str.c */; };
 		71BD28321DE887E300C12A1D /* libmpg123.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BD254A1DE886B100C12A1D /* libmpg123.a */; };
+		71BF18F020D099F900804467 /* Contact2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BF18EE20D099F800804467 /* Contact2D.cpp */; };
 		71C2772E202BCE0F005B3EDC /* LightData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C27725202BC405005B3EDC /* LightData.cpp */; };
 		71C2772F202BCE0F005B3EDC /* PointData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C27727202BC405005B3EDC /* PointData.cpp */; };
 		71C27730202BCE0F005B3EDC /* STBText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C27729202BC405005B3EDC /* STBText.cpp */; };
@@ -821,6 +822,9 @@
 		71BD28351DE8E96800C12A1D /* MP3Reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MP3Reader.cpp; sourceTree = "<group>"; };
 		71BD28361DE8E96800C12A1D /* MP3Reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MP3Reader.h; sourceTree = "<group>"; };
 		71BD28381DE8EA1500C12A1D /* synth_8bit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = synth_8bit.c; sourceTree = "<group>"; };
+		71BF18EE20D099F800804467 /* Contact2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Contact2D.cpp; sourceTree = "<group>"; };
+		71BF18EF20D099F800804467 /* Contact2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Contact2D.h; sourceTree = "<group>"; };
+		71BF18FA20D2034D00804467 /* IntegerSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IntegerSequence.h; sourceTree = "<group>"; };
 		71C277122023C680005B3EDC /* RotateAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RotateAction.cpp; sourceTree = "<group>"; };
 		71C277132023C680005B3EDC /* RotateAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotateAction.h; sourceTree = "<group>"; };
 		71C27715202BC3DA005B3EDC /* ColorAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ColorAction.cpp; sourceTree = "<group>"; };
@@ -1062,6 +1066,8 @@
 				7119E6AD20AA2A440016AEF2 /* CollisionShape.h */,
 				7119E6AA20A6A0B80016AEF2 /* CollisionShape2D.cpp */,
 				7119E6A920A6A0B80016AEF2 /* CollisionShape2D.h */,
+				71BF18EE20D099F800804467 /* Contact2D.cpp */,
+				71BF18EF20D099F800804467 /* Contact2D.h */,
 				7105A9E320A258120028DCC7 /* PhysicsWorld.cpp */,
 				7105A9E420A258120028DCC7 /* PhysicsWorld.h */,
 				7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */,
@@ -1781,6 +1787,7 @@
 			isa = PBXGroup;
 			children = (
 				71B130C020CD8F4D007A42A9 /* FunctionCallback.h */,
+				71BF18FA20D2034D00804467 /* IntegerSequence.h */,
 				71C27725202BC405005B3EDC /* LightData.cpp */,
 				71C27726202BC405005B3EDC /* LightData.h */,
 				71B130C120CD8F4D007A42A9 /* LuaFunction.cpp */,
@@ -2010,8 +2017,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				71B818C920B09B4C0069E8FA /* PBXTargetDependency */,
 				71CDC73B1D7B14CE0060EEFF /* PBXTargetDependency */,
+				71B818C920B09B4C0069E8FA /* PBXTargetDependency */,
 			);
 			name = "supernova-ios";
 			productName = Supernova;
@@ -2436,6 +2443,7 @@
 				71CDC7171D7B14510060EEFF /* PlaneTerrain.cpp in Sources */,
 				71C39E4B204188B000863AB6 /* ParticleInit.cpp in Sources */,
 				71C2772F202BCE0F005B3EDC /* PointData.cpp in Sources */,
+				71BF18F020D099F900804467 /* Contact2D.cpp in Sources */,
 				7119E6AB20A6A0B80016AEF2 /* CollisionShape2D.cpp in Sources */,
 				719C089E1F0DCFCB00F0BAF0 /* Texture.cpp in Sources */,
 				71369C0A1E291E22006AE1D1 /* Button.cpp in Sources */,
@@ -2771,7 +2779,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/core/**";
 				INFOPLIST_FILE = Supernova/Info.plist;
@@ -2792,7 +2800,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/core/**";
 				INFOPLIST_FILE = Supernova/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -2883,7 +2891,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -2918,7 +2926,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
