@@ -276,7 +276,7 @@ Object* Object::getParent(){
     return parent;
 }
 
-int Object::findObject(Object* object){
+int Object::find(Object* object){
     
     for (int i=0; i < objects.size(); i++){
         if (objects[i] == object){
@@ -287,39 +287,42 @@ int Object::findObject(Object* object){
     return -1;
 }
 
-void Object::moveToFront(){
+void Object::moveTo(int index){
     if (parent != NULL){
-        int pos = parent->findObject(this);
+        int pos = parent->find(this);
+        if ((pos >= 0) && (pos < (parent->objects.size()-1))) {
+            if (pos < index) {
+                Object *temp = parent->objects[pos];
 
-        if ((pos >= 0) && (pos < (parent->objects.size()-1))){
-            Object* temp = parent->objects[pos];
-
-            for (int i = pos; i < (parent->objects.size()-1); i++){
-                parent->objects[i] = parent->objects[i+1];
+                for (int i = pos; i < index; i++) {
+                    parent->objects[i] = parent->objects[i + 1];
+                }
+                parent->objects[index] = temp;
             }
-            parent->objects[parent->objects.size()-1] = temp;
+
+            if (pos > index) {
+                Object *temp = parent->objects[pos];
+
+                for (int i = pos; i > index; i--) {
+                    parent->objects[i] = parent->objects[i - 1];
+                }
+                parent->objects[index] = temp;
+            }
         }
     }
 }
 
-void Object::moveToBack(){
-    if (parent != NULL){
-        int pos = parent->findObject(this);
-    
-        if (pos > 0){
-            Object* temp = parent->objects[pos];
-            
-            for (int i = pos; i > 0; i--){
-                parent->objects[i] = parent->objects[i-1];
-            }
-            parent->objects[0] = temp;
-        }
-    }
+void Object::moveToFirst(){
+    moveTo(parent->objects.size()-1);
+}
+
+void Object::moveToLast(){
+    moveTo(0);
 }
 
 void Object::moveDown(){
     if (parent != NULL){
-        int pos = parent->findObject(this);
+        int pos = parent->find(this);
         
         if (pos > 0){
             Object* temp = parent->objects[pos];
@@ -331,7 +334,7 @@ void Object::moveDown(){
 }
 void Object::moveUp(){
     if (parent != NULL){
-        int pos = parent->findObject(this);
+        int pos = parent->find(this);
         
         if ((pos >= 0) && (pos < (parent->objects.size()-1))){
             Object* temp = parent->objects[pos];

@@ -28,7 +28,6 @@ namespace Supernova {
         
         void setSceneAndConfigure(Scene* scene);
         void removeScene();
-        int findObject(Object* object);
         void setSceneDepth(bool depth);
         
     protected:
@@ -107,9 +106,11 @@ namespace Supernova {
         
         bool isIn3DScene();
         bool isLoaded();
-        
-        void moveToFront();
-        void moveToBack();
+
+        int find(Object* object);
+        void moveTo(int index);
+        void moveToFirst();
+        void moveToLast();
         void moveUp();
         void moveDown();
 

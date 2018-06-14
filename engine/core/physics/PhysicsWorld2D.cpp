@@ -24,6 +24,16 @@ public:
         world->onBeginContact.call(&contact2D);
     }
 
+    virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold){
+        Contact2D contact2D(contact);
+        world->onPreSolve.call(&contact2D);
+    }
+
+    virtual void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse){
+        Contact2D contact2D(contact);
+        world->onPostSolve.call(&contact2D);
+    }
+
     virtual void EndContact(b2Contact* contact){
         Contact2D contact2D(contact);
         world->onEndContact.call(&contact2D);
