@@ -1,5 +1,6 @@
 #include "File.h"
 #include "FileData.h"
+#include <stack>
 
 using namespace Supernova;
 
@@ -45,6 +46,70 @@ char File::getDirSeparator(){
 #else
     return '/';
 #endif
+}
+
+std::string File::getBaseDir(std::string filepath){
+    size_t found;
+
+    found=filepath.find_last_of(getDirSeparator());
+
+    std::string result = filepath.substr(0,found);
+
+    if (filepath == result)
+        result= "";
+
+    return result + getDirSeparator();
+}
+
+std::string File::simplifyPath(std::string path) {
+
+    std::stack<std::string> st;
+
+    std::string dir;
+
+    std::string res;
+
+    int len_path = path.length();
+
+    for (int i = 0; i < len_path; i++) {
+
+        dir.clear();
+
+        while (path[i] == getDirSeparator())
+            i++;
+
+        while (i < len_path && path[i] != getDirSeparator()) {
+            dir.push_back(path[i]);
+            i++;
+        }
+
+        if (dir.compare("..") == 0) {
+            if (!st.empty())
+                st.pop();
+        }
+        else if (dir.compare(".") == 0)
+            continue;
+        else if (dir.length() != 0)
+            st.push(dir);
+    }
+
+    std::stack<std::string> st1;
+    while (!st.empty()) {
+        st1.push(st.top());
+        st.pop();
+    }
+
+    while (!st1.empty()) {
+        std::string temp = st1.top();
+        if (st1.size() != 1)
+            res.append(temp + getDirSeparator());
+        else
+            res.append(temp);
+
+        st1.pop();
+    }
+
+    return res;
 }
 
 std::string File::readString(){

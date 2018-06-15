@@ -26,19 +26,6 @@ bool Model::load(){
     return Mesh::load();
 }
 
-std::string Model::getBaseDir (const std::string str){
-    size_t found;
-
-    found=str.find_last_of("/\\");
-    
-    std::string result = str.substr(0,found);
-    
-    if (str == result)
-        result= "";
-    
-    return result;
-}
-
 std::string Model::readDataFile(const char* filename){
     FileData filedata(filename);
     return filedata.readString();
@@ -52,11 +39,11 @@ bool Model::loadOBJ(const char* path){
 
     std::string err;
     
-    std::string baseDir = getBaseDir(path);
+    std::string baseDir = File::getBaseDir(path);
     
     tinyobj::FileReader::externalFunc = readDataFile;
 
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path, (baseDir+"/").c_str());
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path, baseDir.c_str());
 
     if (!err.empty()) {
         Log::Error("%s (%s)", err.c_str(), path);
@@ -70,7 +57,7 @@ bool Model::loadOBJ(const char* path){
                 this->submeshes.back()->createNewMaterial();
             }
 
-            this->submeshes.back()->getMaterial()->setTexturePath(baseDir+"/"+materials[i].diffuse_texname);
+            this->submeshes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir+materials[i].diffuse_texname));
             if (materials[i].dissolve < 1){
                 // TODO: Add this check on isTransparent Material method
                 transparent = true;

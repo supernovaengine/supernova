@@ -15,6 +15,8 @@ namespace Supernova {
         static File* newFile(const char *aFilename, bool useHandle = false);
 
         static char getDirSeparator();
+        static std::string getBaseDir(std::string filepath);
+        static std::string simplifyPath(std::string path);
 
         unsigned int read8();
         unsigned int read16();

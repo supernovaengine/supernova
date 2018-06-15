@@ -11,7 +11,6 @@ namespace Supernova {
     private:
         const char* filename;
         bool loadOBJ(const char * path);
-        std::string getBaseDir (const std::string str);
         
         static std::string readDataFile(const char* filename);
 
