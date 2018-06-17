@@ -3,6 +3,7 @@
 
 #include "Image.h"
 #include "action/SpriteAnimation.h"
+#include <map>
 
 namespace Supernova {
 
@@ -11,27 +12,28 @@ namespace Supernova {
     protected:
 
         struct frameData{
-            std::string id;
+            std::string name;
             Rect rect;
         };
         
-        std::vector<frameData> framesRect;
+        std::map<int,frameData> framesRect;
         SpriteAnimation* defaultAnimation;
 
     public:
         Sprite();
         virtual ~Sprite();
 
-        void addFrame(std::string id, float x, float y, float width, float height);
+        void addFrame(int id, std::string name, Rect rect);
+        void addFrame(std::string name, float x, float y, float width, float height);
         void addFrame(float x, float y, float width, float height);
         void addFrame(Rect rect);
-        void removeFrame(int index);
-        void removeFrame(std::string id);
+        void removeFrame(int id);
+        void removeFrame(std::string name);
 
-        void setFrame(int index);
-        void setFrame(std::string id);
+        void setFrame(int id);
+        void setFrame(std::string name);
 
-        std::vector<int> findFramesByString(std::string id);
+        std::vector<int> findFramesByString(std::string name);
         
         unsigned int getFramesSize();
         bool isAnimation();

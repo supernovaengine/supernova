@@ -9,7 +9,7 @@
 #include "ConcreteObject.h"
 #include "render/ObjectRender.h"
 #include "util/PointData.h"
-#include <unordered_map>
+#include <map>
 
 namespace Supernova {
 
@@ -61,7 +61,7 @@ namespace Supernova {
 
         bool automaticUpdate;
 
-        std::vector<FramesData> framesRect;
+        std::map<int,FramesData> framesRect;
         
         void updatePointsData();
         
@@ -92,20 +92,21 @@ namespace Supernova {
         void setPointColor(int point, Vector4 color);
         void setPointColor(int point, float red, float green, float blue, float alpha);
         void setPointRotation(int point, float rotation);
-        void setPointSprite(int point, int index);
-        void setPointSprite(int point, std::string id);
+        void setPointSprite(int point, int id);
+        void setPointSprite(int point, std::string name);
         void setPointVisible(int point, bool visible);
         
         Vector3 getPointPosition(int point);
         float getPointSize(int point);
         Vector4 getPointColor(int point);
         float getPointRotation(int point);
-        
-        void addSpriteFrame(std::string id, float x, float y, float width, float height);
+
+        void addSpriteFrame(int id, std::string name, Rect rect);
+        void addSpriteFrame(std::string name, float x, float y, float width, float height);
         void addSpriteFrame(float x, float y, float width, float height);
         void addSpriteFrame(Rect rect);
-        void removeSpriteFrame(int index);
-        void removeSpriteFrame(std::string id);
+        void removeSpriteFrame(int id);
+        void removeSpriteFrame(std::string name);
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();

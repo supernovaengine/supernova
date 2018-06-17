@@ -152,14 +152,14 @@ void Points::setPointRotation(int point, float rotation){
     }
 }
 
-void Points::setPointSprite(int point, int index){
-    if (point >= 0 && point < points.size() && index >= 0) {
+void Points::setPointSprite(int point, int id){
+    if (point >= 0 && point < points.size() && id >= 0) {
 
             bool changed = false;
-            if (index >= 0 && index < framesRect.size()) {
-                if (points[point].textureRect != framesRect[index].rect) {
+            if (framesRect.count(id) > 0) {
+                if (points[point].textureRect != framesRect[id].rect) {
                     changed = true;
-                    points[point].textureRect.setRect(framesRect[index].rect);
+                    points[point].textureRect.setRect(framesRect[id].rect);
                 }
             }else{
                 changed = true;
@@ -180,8 +180,8 @@ void Points::setPointSprite(int point, int index){
     }
 }
 
-void Points::setPointSprite(int point, std::string id){
-    std::vector<int> frameslist = findFramesByString(id);
+void Points::setPointSprite(int point, std::string name){
+    std::vector<int> frameslist = findFramesByString(name);
     if (frameslist.size() > 0){
         setPointSprite(point, frameslist[0]);
     }
@@ -354,8 +354,17 @@ std::vector<int> Points::findFramesByString(std::string id){
     return frameslist;
 }
 
-void Points::addSpriteFrame(std::string id, float x, float y, float width, float height){
-    framesRect.push_back({id, Rect(x, y, width, height)});
+void Points::addSpriteFrame(int id, std::string name, Rect rect){
+    framesRect[id] = {name, rect};
+}
+
+void Points::addSpriteFrame(std::string name, float x, float y, float width, float height){
+    int id = 0;
+    while ( framesRect.count(id) > 0 ) {
+        id++;
+    }
+    framesRect[id] = {name, Rect(x, y, width, height)};
+    addSpriteFrame(id, name, Rect(x, y, width, height));
 }
 
 void Points::addSpriteFrame(float x, float y, float width, float height){
@@ -366,17 +375,17 @@ void Points::addSpriteFrame(Rect rect){
     addSpriteFrame(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
 }
 
-void Points::removeSpriteFrame(int index){
-    framesRect.erase(framesRect.begin() + index);
+void Points::removeSpriteFrame(int id){
+    framesRect.erase(id);
 }
 
-void Points::removeSpriteFrame(std::string id){
-    std::vector<int> frameslist = findFramesByString(id);
+void Points::removeSpriteFrame(std::string name){
+    std::vector<int> frameslist = findFramesByString(name);
 
     while (frameslist.size() > 0) {
-        framesRect.erase(framesRect.begin() + frameslist[0]);
+        framesRect.erase(frameslist[0]);
         frameslist.clear();
-        frameslist = findFramesByString(id);
+        frameslist = findFramesByString(name);
     }
 }
 

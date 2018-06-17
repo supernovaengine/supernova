@@ -14,30 +14,40 @@ TileMap::~TileMap(){
     
 }
 
-int TileMap::findRectByString(std::string id){
-    std::vector<int> frameslist;
-    for (int i = 0; i < tilesRect.size(); i++){
-        
-        std::size_t found = tilesRect[i].id.find(id);
+int TileMap::findRectByString(std::string name){
+    std::map<int,tileRectData>::iterator it = tilesRect.begin();
+    for (std::pair<int,tileRectData> tileRect : tilesRect) {
+
+        std::size_t found = tileRect.second.name.find(name);
         if (found!=std::string::npos)
-            return i;
+            return tileRect.first;
+
     }
     return -1;
 }
 
-int TileMap::findTileByString(std::string id){
-    std::vector<int> frameslist;
-    for (int i = 0; i < tiles.size(); i++){
-        
-        std::size_t found = tiles[i].id.find(id);
+int TileMap::findTileByString(std::string name){
+    std::map<int,tileData>::iterator it = tiles.begin();
+    for (std::pair<int,tileData> tile : tiles) {
+
+        std::size_t found = tile.second.name.find(name);
         if (found!=std::string::npos)
-            return i;
+            return tile.first;
+
     }
     return -1;
 }
 
-void TileMap::addRect(std::string id, float x, float y, float width, float height){
-    tilesRect.push_back({id, Rect(x, y, width, height)});
+void TileMap::addRect(int id, std::string name, Rect rect){
+    tilesRect[id] = {name, rect};
+}
+
+void TileMap::addRect(std::string name, float x, float y, float width, float height){
+    int id = 0;
+    while ( tilesRect.count(id) > 0 ) {
+        id++;
+    }
+    addRect(id, name, Rect(x, y, width, height));
 }
 
 void TileMap::addRect(float x, float y, float width, float height){
@@ -48,18 +58,18 @@ void TileMap::addRect(Rect rect){
     addRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
 }
 
-void TileMap::removeRect(int index){
-    tilesRect.erase(tilesRect.begin() + index);
+void TileMap::removeRect(int id){
+    tilesRect.erase(id);
 }
 
-void TileMap::removeRect(std::string id){
-    int rect = findRectByString(id);
+void TileMap::removeRect(std::string name){
+    int rect = findRectByString(name);
     if (rect >= 0)
         removeRect(rect);
 }
 
-void TileMap::addTile(std::string id, int rectId, Vector2 position, float width, float height){
-    tiles.push_back({id, rectId, position, width, height});
+void TileMap::addTile(int id, std::string name, int rectId, Vector2 position, float width, float height){
+    tiles[id] = {name, rectId, position, width, height};
 
     if (loaded){
         createTiles();
@@ -70,24 +80,32 @@ void TileMap::addTile(std::string id, int rectId, Vector2 position, float width,
     }
 }
 
+void TileMap::addTile(std::string name, int rectId, Vector2 position, float width, float height){
+    int id = 0;
+    while ( tiles.count(id) > 0 ) {
+        id++;
+    }
+    addTile(id, name, rectId, position, width, height);
+}
+
 void TileMap::addTile(int rectId, Vector2 position, float width, float height){
     addTile("", rectId, position, width, height);
 }
 
-void TileMap::addTile(std::string id, std::string rectString, Vector2 position, float width, float height){
-    addTile(id, findRectByString(rectString), position, width, height);
+void TileMap::addTile(std::string name, std::string rectString, Vector2 position, float width, float height){
+    addTile(name, findRectByString(rectString), position, width, height);
 }
 
 void TileMap::addTile(std::string rectString, Vector2 position, float width, float height){
     addTile("", findRectByString(rectString), position, width, height);
 }
 
-void TileMap::removeTile(int index){
-    tiles.erase(tiles.begin() + index);
+void TileMap::removeTile(int id){
+    tiles.erase(id);
 }
 
-void TileMap::removeTile(std::string id){
-    int tile = findTileByString(id);
+void TileMap::removeTile(std::string name){
+    int tile = findTileByString(name);
     if (tile >= 0)
         removeTile(tile);
 }

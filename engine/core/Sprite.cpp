@@ -12,19 +12,29 @@ Sprite::~Sprite(){
         delete defaultAnimation;
 }
 
-std::vector<int> Sprite::findFramesByString(std::string id){
+std::vector<int> Sprite::findFramesByString(std::string name){
     std::vector<int> frameslist;
-    for (int i = 0; i < framesRect.size(); i++){
 
-        std::size_t found = framesRect[i].id.find(id);
+    std::map<int,frameData>::iterator it = framesRect.begin();
+    for (std::pair<int,frameData> frameRect : framesRect) {
+        std::size_t found = frameRect.second.name.find(name);
         if (found!=std::string::npos)
-            frameslist.push_back(i);
+            frameslist.push_back(frameRect.first);
     }
+
     return frameslist;
 }
 
-void Sprite::addFrame(std::string id, float x, float y, float width, float height){
-    framesRect.push_back({id, Rect(x, y, width, height)});
+void Sprite::addFrame(int id, std::string name, Rect rect){
+    framesRect[id] = {name, rect};
+}
+
+void Sprite::addFrame(std::string name, float x, float y, float width, float height){
+    int id = 0;
+    while ( framesRect.count(id) > 0 ) {
+        id++;
+    }
+    addFrame(id, name, Rect(x, y, width, height));
 }
 
 void Sprite::addFrame(float x, float y, float width, float height){
@@ -35,30 +45,30 @@ void Sprite::addFrame(Rect rect){
     addFrame(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
 }
 
-void Sprite::removeFrame(int index){
-    framesRect.erase(framesRect.begin() + index);
+void Sprite::removeFrame(int id){
+    framesRect.erase(id);
 }
 
-void Sprite::removeFrame(std::string id){
-    std::vector<int> frameslist = findFramesByString(id);
+void Sprite::removeFrame(std::string name){
+    std::vector<int> frameslist = findFramesByString(name);
 
     while (frameslist.size() > 0) {
-        framesRect.erase(framesRect.begin() + frameslist[0]);
+        framesRect.erase(frameslist[0]);
         frameslist.clear();
-        frameslist = findFramesByString(id);
+        frameslist = findFramesByString(name);
     }
 }
 
-void Sprite::setFrame(int index){
-    if (index >= 0 && index < framesRect.size()) {
-        setTextureRect(framesRect[index].rect);
+void Sprite::setFrame(int id){
+    if (framesRect.count(id) > 0) {
+        setTextureRect(framesRect[id].rect);
     }else{
         setTextureRect(Rect(0, 0, 1, 1));
     }
 }
 
-void Sprite::setFrame(std::string id){
-    std::vector<int> frameslist = findFramesByString(id);
+void Sprite::setFrame(std::string name){
+    std::vector<int> frameslist = findFramesByString(name);
     if (frameslist.size() > 0){
         setFrame(frameslist[0]);
     }
