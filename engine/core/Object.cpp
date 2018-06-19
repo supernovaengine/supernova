@@ -290,7 +290,7 @@ int Object::find(Object* object){
 void Object::moveTo(int index){
     if (parent != NULL){
         int pos = parent->find(this);
-        if ((pos >= 0) && (pos < (parent->objects.size()-1))) {
+        if ((index >= 0) && (index <= (parent->objects.size()-1))) {
             if (pos < index) {
                 Object *temp = parent->objects[pos];
 
