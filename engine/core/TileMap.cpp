@@ -38,8 +38,33 @@ int TileMap::findTileByString(std::string name){
     return -1;
 }
 
+void TileMap::addRect(int id, std::string name, std::string texture, Rect rect){
+    int submeshId = 0;
+    if (!texture.empty()) {
+        bool textureFound = false;
+        for (int s = 0; s < submeshes.size(); s++){
+            if (texture == submeshes[s]->getMaterial()->getTexturePath())
+                textureFound = true;
+        }
+
+        if (!textureFound) {
+            this->submeshes.push_back(new Submesh());
+            this->submeshes.back()->createNewMaterial();
+            this->submeshes.back()->getMaterial()->setTexturePath(texture);
+
+            submeshId = submeshes.size() - 1;
+        }
+
+        if (loaded) {
+            loadTextures();
+        }
+    }
+
+    tilesRect[id] = {name, submeshId, rect};
+}
+
 void TileMap::addRect(int id, std::string name, Rect rect){
-    tilesRect[id] = {name, rect};
+    addRect(id, name, "", rect);
 }
 
 void TileMap::addRect(std::string name, float x, float y, float width, float height){
@@ -110,10 +135,18 @@ void TileMap::removeTile(std::string name){
         removeTile(tile);
 }
 
-Rect TileMap::normalizeTileRect(Rect tileRect){
+Rect TileMap::normalizeTileRect(Rect tileRect, int submeshId){
     Rect normalized = tileRect;
+
+    int texWidth = -1;
+    int texHeight = -1;
+    if (submeshes[submeshId]->getMaterial()->getTexture()) {
+        texWidth = submeshes[submeshId]->getMaterial()->getTexture()->getWidth();
+        texHeight = submeshes[submeshId]->getMaterial()->getTexture()->getHeight();
+    }
+
     if (!tileRect.isNormalized()){
-        if (this->texWidth != 0 && this->texHeight != 0) {
+        if (texWidth != -1 && texHeight != -1) {
             // 0.1 and 0.2 to work with small and pixel perfect texture
             normalized.setRect((tileRect.getX()+0.1) / (float) texWidth,
                                (tileRect.getY()+0.1) / (float) texHeight,
@@ -121,6 +154,7 @@ Rect TileMap::normalizeTileRect(Rect tileRect){
                                (tileRect.getHeight()-0.2) / (float) texHeight);
         }
     }
+
     return normalized;
 }
 
@@ -139,7 +173,9 @@ void TileMap::createTiles(){
     vertices.clear();
     texcoords.clear();
     normals.clear();
-    std::vector<unsigned int> indices;
+    for (int s = 0; s < submeshes.size(); s++){
+        submeshes[s]->getIndices()->clear();
+    }
     width = 0;
     height = 0;
     
@@ -157,7 +193,7 @@ void TileMap::createTiles(){
         if (height < tiles[i].position.y + tiles[i].height)
             height = tiles[i].position.y + tiles[i].height;
 
-        Rect tileRect = normalizeTileRect(tilesRect[tiles[i].rectId].rect);
+        Rect tileRect = normalizeTileRect(tilesRect[tiles[i].rectId].rect, tilesRect[tiles[i].rectId].submeshId);
         texcoords.push_back(Vector2(tileRect.getX(), tileRect.getY()));
         texcoords.push_back(Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()));
         texcoords.push_back(Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()+tileRect.getHeight()));
@@ -174,46 +210,38 @@ void TileMap::createTiles(){
             }
         }
 
-        indices.push_back(0 + (i*4));
-        indices.push_back(1 + (i*4));
-        indices.push_back(2 + (i*4));
-        indices.push_back(0 + (i*4));
-        indices.push_back(2 + (i*4));
-        indices.push_back(3 + (i*4));
+        std::vector<unsigned int>* indices = submeshes[tilesRect[tiles[i].rectId].submeshId]->getIndices();
+
+        indices->push_back(0 + (i*4));
+        indices->push_back(1 + (i*4));
+        indices->push_back(2 + (i*4));
+        indices->push_back(0 + (i*4));
+        indices->push_back(2 + (i*4));
+        indices->push_back(3 + (i*4));
+
     }
 
-    //Empty
-    if (tiles.size() == 0){
-        vertices.push_back(Vector3(0.0f, 0.0f, 0.0f));
-        vertices.push_back(Vector3(0.0f, 0.0f, 0.0f));
-        vertices.push_back(Vector3(0.0f, 0.0f, 0.0f));
-
-        texcoords.push_back(Vector2(0.0f, 0.0f));
-        texcoords.push_back(Vector2(0.0f, 0.0f));
-        texcoords.push_back(Vector2(0.0f, 0.0f));
-
-        normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-        normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-        normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-
-        indices.push_back(0);
-        indices.push_back(1);
-        indices.push_back(2);
+    for (int s =submeshes.size()-1; s >= 0; s--){
+        if (submeshes[s]->getIndices()->size() == 0) {
+            submeshes[s]->setVisible(false);
+        } else {
+            submeshes[s]->setVisible(true);
+        }
     }
+}
 
-    submeshes[0]->setIndices(indices);
-    
+void TileMap::loadTextures(){
+    for (int s = 0; s < submeshes.size(); s++) {
+        if (submeshes[s]->getMaterial()->getTexture()) {
+            submeshes[s]->getMaterial()->getTexture()->setResampleToPowerOfTwo(false);
+            submeshes[s]->getMaterial()->getTexture()->load();
+        }
+    }
 }
 
 bool TileMap::load(){
 
-    if (submeshes[0]->getMaterial()->getTexture()) {
-        submeshes[0]->getMaterial()->getTexture()->setResampleToPowerOfTwo(false);
-        submeshes[0]->getMaterial()->getTexture()->load();
-        texWidth = submeshes[0]->getMaterial()->getTexture()->getWidth();
-        texHeight = submeshes[0]->getMaterial()->getTexture()->getHeight();
-    }
-
+    loadTextures();
     createTiles();
 
     return Mesh2D::load();

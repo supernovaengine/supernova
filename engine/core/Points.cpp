@@ -441,6 +441,9 @@ void Points::updatePointsData(){
 bool Points::renderDraw(){
     if (!ConcreteObject::renderDraw())
         return false;
+
+    if (!visible)
+        return false;
     
     render->prepareDraw();
     render->draw();

@@ -23,6 +23,7 @@ namespace Supernova {
 
         Matrix4 normalMatrix;
 
+        bool visible;
         bool transparent;
         float distanceToCamera;
 
@@ -44,6 +45,9 @@ namespace Supernova {
         void setTexture(Texture* texture);
         void setTexture(std::string texturepath);
         std::string getTexture();
+
+        void setVisible(bool visible);
+        bool isVisible();
         
         Material* getMaterial();
 

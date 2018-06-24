@@ -14,6 +14,7 @@ namespace Supernova{
         
         struct tileRectData{
             std::string name;
+            int submeshId;
             Rect rect;
         };
         
@@ -24,15 +25,13 @@ namespace Supernova{
             float width;
             float height;
         };
-
-        float texWidth;
-        float texHeight;
         
         std::map<int,tileRectData> tilesRect;
         std::map<int,tileData> tiles;
         
         void createTiles();
-        Rect normalizeTileRect(Rect tileRect);
+        void loadTextures();
+        Rect normalizeTileRect(Rect tileRect, int submeshId);
         
     public:
         TileMap();
@@ -41,6 +40,7 @@ namespace Supernova{
         int findRectByString(std::string name);
         int findTileByString(std::string name);
 
+        void addRect(int id, std::string name, std::string texture, Rect rect);
         void addRect(int id, std::string name, Rect rect);
         void addRect(std::string name, float x, float y, float width, float height);
         void addRect(float x, float y, float width, float height);

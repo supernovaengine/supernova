@@ -9,6 +9,7 @@
 using namespace Supernova;
 
 ConcreteObject::ConcreteObject(): Object(){
+    visible = true;
     transparent = false;
     distanceToCamera = -1;
 
@@ -42,6 +43,14 @@ void ConcreteObject::setColor(float red, float green, float blue, float alpha){
 
 Vector4 ConcreteObject::getColor(){
     return *material.getColor();
+}
+
+void ConcreteObject::setVisible(bool visible){
+    this->visible = visible;
+}
+
+bool ConcreteObject::isVisible(){
+    return visible;
 }
 
 void ConcreteObject::setTexture(Texture* texture){

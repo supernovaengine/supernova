@@ -30,6 +30,7 @@ namespace Supernova {
 
         unsigned int minBufferSize;
 
+        bool visible;
         bool renderOwned;
         bool shadowRenderOwned;
         bool loaded;
@@ -60,6 +61,9 @@ namespace Supernova {
 
         void setSubmeshShadowRender(ObjectRender* shadowRender);
         ObjectRender* getSubmeshShadowRender();
+
+        void setVisible(bool visible);
+        bool isVisible();
 
         bool textureLoad();
         bool shadowLoad();

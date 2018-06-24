@@ -30,7 +30,7 @@ std::shared_ptr<TextureRender> TextureRender::sharedInstance(std::string id){
     
         if (Engine::getRenderAPI() == S_GLES2){
             texturesRender[id] = std::shared_ptr<TextureRender>(new GLES2Texture());
-            Log::Debug("Load texture (texture map size: %lu)", texturesRender.size());
+            Log::Debug("Load texture (texture map size: %lu): %s", texturesRender.size(), id.c_str());
             return texturesRender[id];
         }
     }

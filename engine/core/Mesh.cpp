@@ -303,6 +303,9 @@ bool Mesh::shadowDraw(){
     if (!ConcreteObject::shadowDraw())
         return false;
 
+    if (!visible)
+        return false;
+
     shadowRender->prepareDraw();
 
     for (size_t i = 0; i < submeshes.size(); i++) {
@@ -316,6 +319,9 @@ bool Mesh::shadowDraw(){
 
 bool Mesh::renderDraw(){
     if (!ConcreteObject::renderDraw())
+        return false;
+
+    if (!visible)
         return false;
 
     render->prepareDraw();

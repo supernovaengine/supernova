@@ -11,6 +11,7 @@ Submesh::Submesh(){
     this->materialOwned = false;
     this->dynamic = false;
 
+    this->visible = true;
     this->loaded = false;
     this->renderOwned = true;
     this->shadowRenderOwned = true;
@@ -42,6 +43,7 @@ Submesh::Submesh(const Submesh& s){
     this->materialOwned = s.materialOwned;
     this->material = s.material;
     this->dynamic = s.dynamic;
+    this->visible = s.visible;
     this->loaded = s.loaded;
     this->renderOwned = s.renderOwned;
     this->shadowRenderOwned = s.shadowRenderOwned;
@@ -56,6 +58,7 @@ Submesh& Submesh::operator = (const Submesh& s){
     this->materialOwned = s.materialOwned;
     this->material = s.material;
     this->dynamic = s.dynamic;
+    this->visible = s.visible;
     this->loaded = s.loaded;
     this->renderOwned = s.renderOwned;
     this->shadowRenderOwned = s.shadowRenderOwned;
@@ -133,6 +136,14 @@ ObjectRender* Submesh::getSubmeshShadowRender(){
     return shadowRender;
 }
 
+void Submesh::setVisible(bool visible){
+    this->visible = visible;
+}
+
+bool Submesh::isVisible(){
+    return visible;
+}
+
 bool Submesh::textureLoad(){
     if (material && render){
         material->getTexture()->load();
@@ -181,6 +192,9 @@ bool Submesh::load(){
 }
 
 bool Submesh::draw(){
+    if (!visible)
+        return false;
+
     if (renderOwned)
         render->prepareDraw();
     
@@ -193,6 +207,9 @@ bool Submesh::draw(){
 }
 
 bool Submesh::shadowDraw(){
+    if (!visible)
+        return false;
+
     if (shadowRenderOwned)
         shadowRender->prepareDraw();
 
