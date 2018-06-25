@@ -43,8 +43,10 @@ void TileMap::addRect(int id, std::string name, std::string texture, Rect rect){
     if (!texture.empty()) {
         bool textureFound = false;
         for (int s = 0; s < submeshes.size(); s++){
-            if (texture == submeshes[s]->getMaterial()->getTexturePath())
+            if (texture == submeshes[s]->getMaterial()->getTexturePath()) {
                 textureFound = true;
+                submeshId = s;
+            }
         }
 
         if (!textureFound) {
