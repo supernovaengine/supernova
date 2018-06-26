@@ -54,7 +54,7 @@ PhysicsWorld2D::PhysicsWorld2D(): PhysicsWorld(){
     pointsToMeterScale = 64;
 }
 
-PhysicsWorld2D::PhysicsWorld2D(int pointsToMeterScale): PhysicsWorld2D(){
+PhysicsWorld2D::PhysicsWorld2D(float pointsToMeterScale): PhysicsWorld2D(){
     this->pointsToMeterScale = pointsToMeterScale;
 }
 
@@ -122,7 +122,7 @@ int PhysicsWorld2D::getPositionIterations(){
     return positionIterations;
 }
 
-int PhysicsWorld2D::getPointsToMeterScale(){
+float PhysicsWorld2D::getPointsToMeterScale(){
     return pointsToMeterScale;
 }
 

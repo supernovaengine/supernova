@@ -137,7 +137,7 @@ void CollisionShape2D::setShapeCircle(Vector2 center, float radius){
         Log::Error("Can not edit the Shape after it is added to a Body2D");
 }
 
-void CollisionShape2D::computeShape(int scale){
+void CollisionShape2D::computeShape(float scale){
 
     if (shapeType == S_COLLISIONSHAPE2D_BOX){
 

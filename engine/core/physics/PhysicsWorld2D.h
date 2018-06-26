@@ -23,11 +23,11 @@ namespace Supernova {
         int positionIterations;
 
         //Cannot be changed after creation
-        int pointsToMeterScale;
+        float pointsToMeterScale;
 
     public:
         PhysicsWorld2D();
-        PhysicsWorld2D(int pointsToMeterScale);
+        PhysicsWorld2D(float pointsToMeterScale);
         virtual ~PhysicsWorld2D();
         
         FunctionCallback<void(Contact2D*)> onBeginContact;
@@ -49,7 +49,7 @@ namespace Supernova {
         int getVelocityIterations();
         int getPositionIterations();
 
-        int getPointsToMeterScale();
+        float getPointsToMeterScale();
 
         virtual void step(float timeStep);
     };
