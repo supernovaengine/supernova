@@ -62,10 +62,10 @@ void Image::normalizeTextureRect(){
             
             if (this->texWidth != 0 && this->texHeight != 0) {
                 // 0.1 and 0.2 to work with small and pixel perfect textures
-                submeshes[0]->getMaterial()->setTextureRect((textureRect.getX()+0.1) / (float) texWidth,
-                                                            (textureRect.getY()+0.1) / (float) texHeight,
-                                                            (textureRect.getWidth()-0.2) / (float) texWidth,
-                                                            (textureRect.getHeight()-0.2) / (float) texHeight);
+                submeshes[0]->getMaterial()->setTextureRect((textureRect.getX()+0.01) / (float) texWidth,
+                                                            (textureRect.getY()+0.01) / (float) texHeight,
+                                                            (textureRect.getWidth()-0.02) / (float) texWidth,
+                                                            (textureRect.getHeight()-0.02) / (float) texHeight);
             }
         }
     }
@@ -95,10 +95,10 @@ void Image::createVertices(){
     vertices.push_back(Vector3(0,  height, 0));
 
     texcoords.clear();
-    texcoords.push_back(Vector2(0.0f, 0.0f));
-    texcoords.push_back(Vector2(1.0f, 0.0f));
-    texcoords.push_back(Vector2(1.0f, 1.0f));
-    texcoords.push_back(Vector2(0.0f, 1.0f));
+    texcoords.push_back(Vector2(0.01f, 0.01f));
+    texcoords.push_back(Vector2(0.99f, 0.01f));
+    texcoords.push_back(Vector2(0.99f, 0.99f));
+    texcoords.push_back(Vector2(0.01f, 0.99f));
 
     if (invertTexture){
         for (int i = 0; i < texcoords.size(); i++){
