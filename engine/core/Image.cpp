@@ -62,10 +62,10 @@ void Image::normalizeTextureRect(){
             
             if (this->texWidth != 0 && this->texHeight != 0) {
                 // 0.1 and 0.2 to work with small and pixel perfect textures
-                submeshes[0]->getMaterial()->setTextureRect((textureRect.getX()+0.01) / (float) texWidth,
-                                                            (textureRect.getY()+0.01) / (float) texHeight,
-                                                            (textureRect.getWidth()-0.02) / (float) texWidth,
-                                                            (textureRect.getHeight()-0.02) / (float) texHeight);
+                submeshes[0]->getMaterial()->setTextureRect((textureRect.getX()+0.1) / (float) texWidth,
+                                                            (textureRect.getY()+0.1) / (float) texHeight,
+                                                            (textureRect.getWidth()-0.2) / (float) texWidth,
+                                                            (textureRect.getHeight()-0.2) / (float) texHeight);
             }
         }
     }
