@@ -55,13 +55,13 @@ void GLES2Object::loadIndex(indexData att){
     indexGL = ib;
 }
 
-void GLES2Object::updateVertexAttribute(int type, unsigned long size, void* data){
+void GLES2Object::updateVertexAttribute(int type, unsigned int size, void* data){
     ObjectRender::updateVertexAttribute(type, size, data);
     if (vertexAttributes.count(type))
         loadVertexAttribute(type, vertexAttributes[type]);
 }
 
-void GLES2Object::updateIndex(unsigned long size, void* data){
+void GLES2Object::updateIndex(unsigned int size, void* data){
     ObjectRender::updateIndex(size, data);
     if (indexAttribute.data)
         loadIndex(indexAttribute);
@@ -284,7 +284,7 @@ bool GLES2Object::prepareDraw(){
         if (att.handle != -1){
             glEnableVertexAttribArray(att.handle);
             glBindBuffer(GL_ARRAY_BUFFER, att.buffer);
-            glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(0));
+            glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(it->second.offset));
         }
         //Log::Debug("Use attribute handle: %i", att.handle);
     }

@@ -107,27 +107,27 @@ void ObjectRender::setProgramShader(int programShader){
     this->programShader = programShader;
 }
 
-void ObjectRender::addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data){
+void ObjectRender::addVertexAttribute(int type, unsigned int elements, unsigned int size, void* data, size_t offset){
     if (data && (size > 0))
-        vertexAttributes[type] = { elements, size, data };
+        vertexAttributes[type] = { elements, size, data, offset};
 }
 
-void ObjectRender::addIndex(unsigned long size, void* data){    
+void ObjectRender::addIndex(unsigned int size, void* data){
     if (data && (size > 0))
         indexAttribute = { size, data };
 }
 
-void ObjectRender::addProperty(int type, int datatype, unsigned long size, void* data){
+void ObjectRender::addProperty(int type, int datatype, unsigned int size, void* data){
     if (data && (size > 0))
         properties[type] = { datatype, size, data };
 }
 
-void ObjectRender::updateVertexAttribute(int type, unsigned long size, void* data){
+void ObjectRender::updateVertexAttribute(int type, unsigned int size, void* data){
     if (vertexAttributes.count(type))
         addVertexAttribute(type, vertexAttributes[type].elements, size, data);
 }
 
-void ObjectRender::updateIndex(unsigned long size, void* data){
+void ObjectRender::updateIndex(unsigned int size, void* data){
     if (indexAttribute.data)
         addIndex(size, data);
 }

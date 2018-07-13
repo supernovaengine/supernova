@@ -39,18 +39,19 @@ namespace Supernova {
         
         struct attributeData{
             unsigned int elements;
-            unsigned long size;
+            unsigned int size;
             void* data;
+            size_t offset;
         };
         
         struct indexData{
-            unsigned long size;
+            unsigned int size;
             void* data;
         };
         
         struct propertyData{
             int datatype;
-            unsigned long size;
+            unsigned int size;
             void* data;
         };
         
@@ -111,14 +112,14 @@ namespace Supernova {
         void setIsSky(bool isSky);
         void setIsText(bool isText);
 
-        void addVertexAttribute(int type, unsigned int elements, unsigned long size, void* data);
-        void addIndex(unsigned long size, void* data);
-        void addProperty(int type, int datatype, unsigned long size, void* data);
+        void addVertexAttribute(int type, unsigned int elements, unsigned int size, void* data, size_t offset = 0);
+        void addIndex(unsigned int size, void* data);
+        void addProperty(int type, int datatype, unsigned int size, void* data);
         
         Program* getProgram();
         
-        virtual void updateVertexAttribute(int type, unsigned long size, void* data);
-        virtual void updateIndex(unsigned long size, void* data);
+        virtual void updateVertexAttribute(int type, unsigned int size, void* data);
+        virtual void updateIndex(unsigned int size, void* data);
 
         virtual bool load();
         virtual bool prepareDraw();
