@@ -14,8 +14,8 @@ ObjectRender::ObjectRender(){
     properties.clear();
     programOwned = false;
     programShader = -1;
-    dynamicBuffer = false;
-    
+
+    vertexSize = 0;
     numLights = 0;
     numShadows2D = 0;
     numShadowsCube = 0;
@@ -95,6 +95,10 @@ void ObjectRender::setFogRender(ObjectRender* fogRender) {
     }
 }
 
+void ObjectRender::setVertexSize(unsigned int vertexSize){
+    this->vertexSize = vertexSize;
+}
+
 void ObjectRender::setMinBufferSize(unsigned int minBufferSize){
     this->minBufferSize = minBufferSize;
 }
@@ -107,14 +111,19 @@ void ObjectRender::setProgramShader(int programShader){
     this->programShader = programShader;
 }
 
-void ObjectRender::addVertexAttribute(int type, unsigned int elements, unsigned int size, void* data, size_t offset){
+void ObjectRender::addVertexBuffer(std::string name, unsigned int size, void* data, bool dynamic){
     if (data && (size > 0))
-        vertexAttributes[type] = { elements, size, data, offset};
+        vertexBuffers[name] = { size, data, dynamic };
 }
 
-void ObjectRender::addIndex(unsigned int size, void* data){
+void ObjectRender::addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride, size_t offset){
+    if ((!buffer.empty()) && (elements > 0))
+        vertexAttributes[type] = { buffer, elements, stride, offset};
+}
+
+void ObjectRender::addIndex(unsigned int size, void* data, bool dynamic){
     if (data && (size > 0))
-        indexAttribute = { size, data };
+        indexAttribute = { size, data, dynamic };
 }
 
 void ObjectRender::addProperty(int type, int datatype, unsigned int size, void* data){
@@ -122,18 +131,14 @@ void ObjectRender::addProperty(int type, int datatype, unsigned int size, void* 
         properties[type] = { datatype, size, data };
 }
 
-void ObjectRender::updateVertexAttribute(int type, unsigned int size, void* data){
-    if (vertexAttributes.count(type))
-        addVertexAttribute(type, vertexAttributes[type].elements, size, data);
+void ObjectRender::updateVertexBuffer(std::string name, unsigned int size, void* data){
+    if (vertexBuffers.count(name))
+        addVertexBuffer(name, size, data);
 }
 
 void ObjectRender::updateIndex(unsigned int size, void* data){
     if (indexAttribute.data)
         addIndex(size, data);
-}
-
-void ObjectRender::setDynamicBuffer(bool dynamicBuffer){
-    this->dynamicBuffer = dynamicBuffer;
 }
 
 void ObjectRender::setNumLights(int numLights){

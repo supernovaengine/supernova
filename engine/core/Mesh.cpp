@@ -87,17 +87,20 @@ void Mesh::addSubmesh(Submesh* submesh){
 }
 
 void Mesh::updateVertices(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
-    if (shadowRender)
-        shadowRender->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, vertices.size(), &vertices.front());
+    render->setVertexSize(vertices.size());
+    render->updateVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front());
+    if (shadowRender) {
+        shadowRender->setVertexSize(vertices.size());
+        shadowRender->updateVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front());
+    }
 }
 
 void Mesh::updateNormals(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, texcoords.size(), &texcoords.front());
+    render->updateVertexBuffer("normals", normals.size() * 3 * sizeof(float), &normals.front());
 }
 
 void Mesh::updateTexcoords(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, normals.size(), &normals.front());
+    render->updateVertexBuffer("texcoords", texcoords.size() * 2 * sizeof(float), &texcoords.front());
 }
 
 void Mesh::updateIndices(){
@@ -180,8 +183,9 @@ bool Mesh::shadowLoad(){
     if (shadowRender == NULL)
         shadowRender = ObjectRender::newInstance();
     shadowRender->setProgramShader(S_SHADER_DEPTH_RTT);
-    shadowRender->setDynamicBuffer(dynamic);
-    shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
+    shadowRender->setVertexSize(vertices.size());
+    shadowRender->addVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front(), dynamic);
+    shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, "vertices", 3);
     shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
     shadowRender->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     if (scene){
@@ -239,16 +243,20 @@ bool Mesh::load(){
         render = ObjectRender::newInstance();
 
     render->setProgramShader(S_SHADER_MESH);
-    render->setDynamicBuffer(dynamic);
     render->setHasTextureCoords(hasTextureCoords);
     render->setHasTextureRect(hasTextureRect);
     render->setHasTextureCube(hasTextureCube);
     render->setIsSky(isSky());
     render->setIsText(isText());
-    
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, vertices.size(), &vertices.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, normals.size(), &normals.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2, texcoords.size(), &texcoords.front());
+
+    render->setVertexSize(vertices.size());
+
+    render->addVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front(), dynamic);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES,"vertices", 3);
+    render->addVertexBuffer("normals", normals.size() * 3 * sizeof(float), &normals.front(), dynamic);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, "normals", 3);
+    render->addVertexBuffer("texcoords", texcoords.size() * 2 * sizeof(float), &texcoords.front(), dynamic);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, "texcoords", 2);
     
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);

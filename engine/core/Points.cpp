@@ -35,27 +35,33 @@ Points::~Points(){
 }
 
 void Points::updatePositions(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, points.size(), &pointData.positions.front());
+    render->setVertexSize(points.size());
+    render->updateVertexBuffer("positions", points.size() * 3 * sizeof(float), &pointData.positions.front());
 }
 
 void Points::updateNormals(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_NORMALS,points.size(), &pointData.normals.front());
+    render->setVertexSize(points.size());
+    render->updateVertexBuffer("normals", points.size() * 3 * sizeof(float), &pointData.normals.front());
 }
 
 void Points::updatePointColors(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, points.size(), &pointData.colors.front());
+    render->setVertexSize(points.size());
+    render->updateVertexBuffer("colors", points.size() * 4 * sizeof(float), &pointData.colors.front());
 }
 
 void Points::updatePointSizes(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, points.size(), &pointData.sizes.front());
-}
-
-void Points::updateTextureRects(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, points.size(), &pointData.textureRects.front());
+    render->setVertexSize(points.size());
+    render->updateVertexBuffer("sizes", points.size() * 1 * sizeof(float), &pointData.sizes.front());
 }
 
 void Points::updatePointRotations(){
-    render->updateVertexAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, points.size(), &pointData.rotations.front());
+    render->setVertexSize(points.size());
+    render->updateVertexBuffer("rotations", points.size() * 1 * sizeof(float), &pointData.rotations.front());
+}
+
+void Points::updateTextureRects(){
+    render->setVertexSize(points.size());
+    render->updateVertexBuffer("textureRects", points.size() * 4 * sizeof(float), &pointData.textureRects.front());
 }
 
 void Points::addPoint(){
@@ -471,7 +477,6 @@ bool Points::load(){
     
     render->setPrimitiveType(S_PRIMITIVE_POINTS);
     render->setProgramShader(S_SHADER_POINTS);
-    render->setDynamicBuffer(true);
     
     render->setTexture(material.getTexture());
     if (scene){
@@ -502,14 +507,23 @@ bool Points::load(){
     }
 
     updatePointsData();
-    
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, 3, points.size(), &pointData.positions.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, 3, points.size(), &pointData.normals.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1, points.size(), &pointData.sizes.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4, points.size(), &pointData.colors.front());
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, 1, points.size(), &pointData.rotations.front());
-    if (useTextureRects)
-        render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4, points.size(), &pointData.textureRects.front());
+
+    render->setVertexSize(points.size());
+
+    render->addVertexBuffer("positions", points.size() * 3 * sizeof(float), &pointData.positions.front(), true);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, "positions", 3);
+    render->addVertexBuffer("normals", points.size() * 3 * sizeof(float), &pointData.normals.front(), true);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, "normals", 3);
+    render->addVertexBuffer("sizes", points.size() * 1 * sizeof(float), &pointData.sizes.front(), true);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, "sizes", 1);
+    render->addVertexBuffer("colors", points.size() * 4 * sizeof(float), &pointData.colors.front(), true);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, "colors", 4);
+    render->addVertexBuffer("rotations", points.size() * 1 * sizeof(float), &pointData.rotations.front(), true);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, "rotations", 1);
+    if (useTextureRects) {
+        render->addVertexBuffer("textureRects", points.size() * 4 * sizeof(float), &pointData.textureRects.front(), true);
+        render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, "textureRects", 4);
+    }
     
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);

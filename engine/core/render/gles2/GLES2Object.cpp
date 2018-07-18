@@ -12,8 +12,6 @@ using namespace Supernova;
 
 
 GLES2Object::GLES2Object(): ObjectRender(){
-
-    usageBuffer = GL_STATIC_DRAW;
     
 }
 
@@ -21,44 +19,52 @@ GLES2Object::~GLES2Object(){
 
 }
 
-void GLES2Object::loadVertexAttribute(int type, attributeData att){
-    
-    attributeGlData vp = attributesGL[type];
+void GLES2Object::loadVertexBuffer(std::string name, bufferData buff){
 
-    if (vp.size == 0){
-        vp.buffer = GLES2Util::createVBO();
+    bufferGlData vb = vertexBuffersGL[name];
+
+    GLenum usageBuffer = GL_STATIC_DRAW;
+    if (buff.dynamic)
+        usageBuffer = GL_DYNAMIC_DRAW;
+
+    if (vb.size == 0){
+        vb.buffer = GLES2Util::createVBO();
     }
-    if (vp.size >= att.size){
-        GLES2Util::updateVBO(vp.buffer, GL_ARRAY_BUFFER, att.size * att.elements * sizeof(GLfloat), att.data);
+    if (vb.size >= buff.size){
+        GLES2Util::updateVBO(vb.buffer, GL_ARRAY_BUFFER, buff.size, buff.data);
     }else{
-        vp.size = std::max((unsigned int)att.size, minBufferSize);
-        GLES2Util::dataVBO(vp.buffer, GL_ARRAY_BUFFER, vp.size * att.elements * sizeof(GLfloat), att.data, usageBuffer);
+        vb.size = std::max((unsigned int)buff.size, minBufferSize);
+        GLES2Util::dataVBO(vb.buffer, GL_ARRAY_BUFFER, vb.size, buff.data, usageBuffer);
     }
 
-    attributesGL[type] = vp;
+    vertexBuffersGL[name] = vb;
 }
 
-void GLES2Object::loadIndex(indexData att){
+void GLES2Object::loadIndex(indexData ibuff){
     
     indexGlData ib = indexGL;
+
+    GLenum usageBuffer = GL_STATIC_DRAW;
+    if (ibuff.dynamic)
+        usageBuffer = GL_DYNAMIC_DRAW;
     
     if (ib.size == 0){
         ib.buffer = GLES2Util::createVBO();
     }
-    if (ib.size >= att.size){
-        GLES2Util::updateVBO(ib.buffer,GL_ELEMENT_ARRAY_BUFFER, att.size * sizeof(unsigned int), att.data);
+    if (ib.size >= ibuff.size){
+        GLES2Util::updateVBO(ib.buffer,GL_ELEMENT_ARRAY_BUFFER, ibuff.size * sizeof(unsigned int), ibuff.data);
     }else{
-        ib.size = std::max((unsigned int)att.size, minBufferSize);
-        GLES2Util::dataVBO(ib.buffer, GL_ELEMENT_ARRAY_BUFFER, ib.size * sizeof(unsigned int), att.data, usageBuffer);
+        ib.size = std::max((unsigned int)ibuff.size, minBufferSize);
+        GLES2Util::dataVBO(ib.buffer, GL_ELEMENT_ARRAY_BUFFER, ib.size * sizeof(unsigned int), ibuff.data, usageBuffer);
     }
 
     indexGL = ib;
 }
 
-void GLES2Object::updateVertexAttribute(int type, unsigned int size, void* data){
-    ObjectRender::updateVertexAttribute(type, size, data);
-    if (vertexAttributes.count(type))
-        loadVertexAttribute(type, vertexAttributes[type]);
+void GLES2Object::updateVertexBuffer(std::string name, unsigned int size, void* data){
+    ObjectRender::updateVertexBuffer(name, size, data);
+    if (vertexBuffers.count(name))
+        loadVertexBuffer(name, vertexBuffers[name]);
 }
 
 void GLES2Object::updateIndex(unsigned int size, void* data){
@@ -78,12 +84,17 @@ bool GLES2Object::load(){
     indexGL.buffer = -1;
     indexGL.size = 0;
     
-    if (dynamicBuffer)
-        usageBuffer = GL_DYNAMIC_DRAW;
-    
     GLuint glesProgram = ((GLES2Program*)program->getProgramRender().get())->getProgram();
     
     useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
+
+    for (std::unordered_map<std::string, bufferData>::iterator it = vertexBuffers.begin(); it != vertexBuffers.end(); ++it)
+    {
+        std::string name = it->first;
+
+        loadVertexBuffer(name, it->second);
+        //Log::Debug("Load vertex buffer: %s, size: %lu", name.c_str(), it->second.size);
+    }
     
     for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
     {
@@ -106,10 +117,9 @@ bool GLES2Object::load(){
         }else if (type == S_VERTEXATTRIBUTE_TEXTURERECTS){
             attribName = "a_textureRect";            
         }
-        
-        loadVertexAttribute(type, it->second);
+
         attributesGL[type].handle = glGetAttribLocation(glesProgram, attribName.c_str());
-        //Log::Debug("Load attribute buffer: %s, size: %lu, handle %i", attribName.c_str(), it->second.size, attributesGL[type].handle);
+        //Log::Debug("Load attribute: %s,handle %i", attribName.c_str(), attributesGL[type].handle);
     }
     
     if (indexAttribute.data){
@@ -283,7 +293,7 @@ bool GLES2Object::prepareDraw(){
         attributeGlData att = attributesGL[it->first];
         if (att.handle != -1){
             glEnableVertexAttribArray(att.handle);
-            glBindBuffer(GL_ARRAY_BUFFER, att.buffer);
+            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffersGL[it->second.bufferName].buffer);
             glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(it->second.offset));
         }
         //Log::Debug("Use attribute handle: %i", att.handle);
@@ -387,7 +397,11 @@ bool GLES2Object::draw(){
     if (indexAttribute.data){
         glDrawElements(modeGles, (GLsizei)indexAttribute.size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
     }else{
-        glDrawArrays(modeGles, 0, (GLsizei)vertexAttributes[S_VERTEXATTRIBUTE_VERTICES].size);
+        if (vertexSize > 0) {
+            glDrawArrays(modeGles, 0, (GLsizei) vertexSize);
+        }else{
+            Log::Error("Cannot draw object, vertex size is 0");
+        }
     }
     
     GLES2Util::checkGlError("Error on draw GLES2");
@@ -411,14 +425,20 @@ bool GLES2Object::finishDraw(){
 }
 
 void GLES2Object::destroy(){
-    
-    for (std::unordered_map<int, attributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it)
-        if (it->second.handle != -1){
+
+    for (std::unordered_map<std::string, bufferGlData>::iterator it = vertexBuffersGL.begin(); it != vertexBuffersGL.end(); ++it) {
+        if (vertexBuffers[it->first].data) {
             glDeleteBuffers(1, &it->second.buffer);
-            it->second.handle = -1;
             it->second.buffer = -1;
             it->second.size = 0;
         }
+    }
+    
+    for (std::unordered_map<int, attributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it) {
+        if (it->second.handle != -1) {
+            it->second.handle = -1;
+        }
+    }
     
     if (indexAttribute.data){
         glDeleteBuffers(1, &indexGL.buffer);

@@ -156,8 +156,7 @@ bool Submesh::textureLoad(){
 bool Submesh::shadowLoad(){
     
     shadowRender = getSubmeshShadowRender();
-    shadowRender->setDynamicBuffer(dynamic);
-    shadowRender->addIndex(indices.size(), &indices.front());
+    shadowRender->addIndex(indices.size(), &indices.front(), dynamic);
     
     bool shadowloaded = true;
     
@@ -171,9 +170,7 @@ bool Submesh::load(){
     
     render = getSubmeshRender();
     
-    render->setDynamicBuffer(dynamic);
-    
-    render->addIndex(indices.size(), &indices.front());
+    render->addIndex(indices.size(), &indices.front(), dynamic);
     
     render->setTexture(material->getTexture());
     render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor());

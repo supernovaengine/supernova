@@ -36,17 +36,24 @@ namespace Supernova {
         
     
     protected:
-        
-        struct attributeData{
-            unsigned int elements;
+
+        struct bufferData{
             unsigned int size;
             void* data;
+            bool dynamic;
+        };
+        
+        struct attributeData{
+            std::string bufferName;
+            unsigned int elements;
+            unsigned int stride;
             size_t offset;
         };
         
         struct indexData{
             unsigned int size;
             void* data;
+            bool dynamic;
         };
         
         struct propertyData{
@@ -54,11 +61,13 @@ namespace Supernova {
             unsigned int size;
             void* data;
         };
-        
+
+        std::unordered_map<std::string, bufferData> vertexBuffers;
         std::unordered_map<int, attributeData> vertexAttributes;
         indexData indexAttribute;
         std::unordered_map<int, propertyData> properties;
-        
+
+        unsigned int vertexSize;
         int numLights;
         int numShadows2D;
         int numShadowsCube;
@@ -82,7 +91,6 @@ namespace Supernova {
         int primitiveType;
         bool programOwned;
         int programShader;
-        bool dynamicBuffer;
         
         ObjectRender();
 
@@ -98,7 +106,8 @@ namespace Supernova {
         void setSceneRender(SceneRender* sceneRender);
         void setLightRender(ObjectRender* lightRender);
         void setFogRender(ObjectRender* fogRender);
-        
+
+        void setVertexSize(unsigned int vertexSize);
         void setMinBufferSize(unsigned int minBufferSize);
         void setPrimitiveType(int primitiveType);
         void setProgramShader(int programShader);
@@ -112,13 +121,14 @@ namespace Supernova {
         void setIsSky(bool isSky);
         void setIsText(bool isText);
 
-        void addVertexAttribute(int type, unsigned int elements, unsigned int size, void* data, size_t offset = 0);
-        void addIndex(unsigned int size, void* data);
+        void addVertexBuffer(std::string name, unsigned int size, void* data, bool dynamic = false);
+        void addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride = 0, size_t offset = 0);
+        void addIndex(unsigned int size, void* data, bool dynamic = false);
         void addProperty(int type, int datatype, unsigned int size, void* data);
         
         Program* getProgram();
-        
-        virtual void updateVertexAttribute(int type, unsigned int size, void* data);
+
+        virtual void updateVertexBuffer(std::string name, unsigned int size, void* data);
         virtual void updateIndex(unsigned int size, void* data);
 
         virtual bool load();
