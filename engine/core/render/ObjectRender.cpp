@@ -9,6 +9,7 @@ using namespace Supernova;
 ObjectRender::ObjectRender(){
     minBufferSize = 0;
     primitiveType = 0;
+    vertexBuffers.clear();
     vertexAttributes.clear();
     indexAttribute.data = NULL;
     properties.clear();

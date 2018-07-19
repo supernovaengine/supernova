@@ -156,6 +156,7 @@ bool Submesh::textureLoad(){
 bool Submesh::shadowLoad(){
     
     shadowRender = getSubmeshShadowRender();
+
     shadowRender->addIndex(indices.size(), &indices.front(), dynamic);
     
     bool shadowloaded = true;

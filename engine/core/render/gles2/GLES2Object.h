@@ -10,7 +10,7 @@ namespace Supernova {
     class GLES2Object: public ObjectRender{
 
         struct bufferGlData{
-            GLuint buffer = -1;
+            GLuint buffer = 0;
             GLuint size = 0;
         };
         
@@ -19,7 +19,7 @@ namespace Supernova {
         };
         
         struct indexGlData{
-            GLuint buffer = -1;
+            GLuint buffer = 0;
             GLuint size = 0;
         };
         

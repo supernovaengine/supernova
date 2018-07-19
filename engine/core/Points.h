@@ -8,7 +8,6 @@
 
 #include "ConcreteObject.h"
 #include "render/ObjectRender.h"
-#include "util/PointData.h"
 #include <map>
 
 namespace Supernova {
@@ -42,15 +41,12 @@ namespace Supernova {
             float size;
             Vector4 color;
             float rotation;
-            
-            float distanceToCamera;
             bool visible;
         };
 
         ObjectRender* render;
 
         std::vector<Point> points;
-        PointData pointData;
 
         bool sizeAttenuation;
         float pointScaleFactor;
@@ -60,17 +56,11 @@ namespace Supernova {
         bool useTextureRects;
 
         bool automaticUpdate;
+        bool pertmitSortTransparentPoints;
 
         std::map<int,FramesData> framesRect;
         
-        void updatePointsData();
-        
-        void updatePositions();
-        void updateNormals();
-        void updatePointColors();
-        void updatePointSizes();
-        void updateTextureRects();
-        void updatePointRotations();
+        void updatePoints();
 
     public:
         Points();
@@ -107,6 +97,9 @@ namespace Supernova {
         void addSpriteFrame(Rect rect);
         void removeSpriteFrame(int id);
         void removeSpriteFrame(std::string name);
+
+        void setPertmitSortTransparentPoints(bool pertmitSortTransparentPoints);
+        bool isPertmitSortTransparentPoints();
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();

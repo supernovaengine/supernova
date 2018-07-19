@@ -222,14 +222,7 @@ int Particles::findUnusedParticle(){
 }
 
 void Particles::updateParticles(){
-    updatePointsData();
-
-    updatePositions();
-    updateNormals();
-    updatePointColors();
-    updatePointRotations();
-    updatePointSizes();
-    updateTextureRects();
+    updatePoints();
 }
 
 bool Particles::load(){

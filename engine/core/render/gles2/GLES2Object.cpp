@@ -78,10 +78,11 @@ bool GLES2Object::load(){
         return false;
     }
     //Log::Debug("Start load");
-    
+
+    vertexBuffersGL.clear();
     attributesGL.clear();
     propertyGL.clear();
-    indexGL.buffer = -1;
+    indexGL.buffer = 0;
     indexGL.size = 0;
     
     GLuint glesProgram = ((GLES2Program*)program->getProgramRender().get())->getProgram();
@@ -287,14 +288,21 @@ bool GLES2Object::prepareDraw(){
         //Log::Debug("Use property handle: %i", propertyGL[it->first].handle);
     }
     GLES2Util::checkGlError("Error on use property on draw");
-    
+
+    GLuint lastBuffer = 0;
+    GLuint actualBuffer = 0;
     for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
     {
         attributeGlData att = attributesGL[it->first];
         if (att.handle != -1){
             glEnableVertexAttribArray(att.handle);
-            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffersGL[it->second.bufferName].buffer);
-            glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, 0,  BUFFER_OFFSET(it->second.offset));
+
+            actualBuffer = vertexBuffersGL[it->second.bufferName].buffer;
+            if (actualBuffer != lastBuffer)
+                glBindBuffer(GL_ARRAY_BUFFER, actualBuffer);
+            lastBuffer = actualBuffer;
+
+            glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, it->second.stride, BUFFER_OFFSET(it->second.offset));
         }
         //Log::Debug("Use attribute handle: %i", att.handle);
     }
