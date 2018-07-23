@@ -4,7 +4,6 @@
 #include "render/ObjectRender.h"
 #include <algorithm>
 #include "tiny_obj_loader.h"
-#include "file/FileData.h"
 
 using namespace Supernova;
 
@@ -21,14 +20,109 @@ Model::~Model() {
 
 bool Model::load(){
 
-    loadOBJ(filename);
+    vertices.clear();
+    texcoords.clear();
+    normals.clear();
+
+    baseDir = File::getBaseDir(filename);
+
+    if (!loadSMODEL(filename))
+        loadOBJ(filename);
 
     return Mesh::load();
 }
 
-std::string Model::readDataFile(const char* filename){
+std::string Model::readFileToString(const char* filename){
     FileData filedata(filename);
     return filedata.readString();
+}
+
+void Model::readMeshVerticesVector(FileData& file, std::vector<MeshVertex> &vec){
+    typename std::vector<MeshVertex>::size_type size = 0;
+    file.read((unsigned char*)&size, sizeof(size));
+    vec.resize(size);
+    file.read((unsigned char*)&vec[0], vec.size() * sizeof(MeshVertex));
+}
+
+void Model::readIndicesVector(FileData& file, std::vector<unsigned int> &vec){
+    typename std::vector<unsigned int>::size_type size = 0;
+    file.read((unsigned char*)&size, sizeof(size));
+    vec.resize(size);
+    file.read((unsigned char*)&vec[0], vec.size() * sizeof(unsigned int));
+}
+
+void Model::readString(FileData& file, std::string &str){
+    typename std::string::size_type size = 0;
+    file.read((unsigned char*)&size, sizeof(size));
+    str.resize(size);
+    file.read((unsigned char*)&str[0], size);
+}
+
+void Model::readMeshMaterialsVector(FileData& file, std::vector<MeshMaterial> &vec){
+    typename std::vector<MeshMaterial>::size_type size = 0;
+    file.read((unsigned char*)&size, sizeof(size));
+    vec.resize(size);
+
+    for (typename std::vector<MeshNode>::size_type i = 0; i < size; ++i){
+        file.read((unsigned char*)&vec[i].type, sizeof(int));
+        readString(file, vec[i].texture);
+    }
+}
+
+void Model::readMeshNodesVector(FileData& file, std::vector<MeshNode> &vec){
+    typename std::vector<MeshVertex>::size_type size = 0;
+    file.read((unsigned char*)&size, sizeof(size));
+    vec.resize(size);
+
+    for (typename std::vector<MeshNode>::size_type i = 0; i < size; ++i){
+        readMeshVerticesVector(file, vec[i].meshVertices);
+        readIndicesVector(file, vec[i].indices);
+        readMeshMaterialsVector(file, vec[i].materials);
+    }
+}
+
+bool Model::loadSMODEL(const char* path) {
+    char* sig= new char[6];
+    int readversion;
+    MeshData meshData;
+
+    FileData file(path);
+
+    file.read((unsigned char*)sig, sizeof(char) * 6);
+    file.read((unsigned char*)&readversion, sizeof(int));
+
+    if (std::string(sig)!="SMODEL")
+        return false;
+
+    readMeshNodesVector(file, meshData.meshNodes);
+
+    int indexOffset = 0;
+
+    for (size_t i = 0; i < meshData.meshNodes.size(); i++){
+        if (i > (this->submeshes.size()-1)){
+            this->submeshes.push_back(new Submesh());
+            this->submeshes.back()->createNewMaterial();
+        }
+
+        for (size_t v = 0; v < meshData.meshNodes[i].meshVertices.size(); v++){
+            vertices.push_back(meshData.meshNodes[i].meshVertices[v].vertex);
+            texcoords.push_back(meshData.meshNodes[i].meshVertices[v].texcoord);
+            normals.push_back(meshData.meshNodes[i].meshVertices[v].normal);
+        }
+
+        this->submeshes[i]->getIndices()->clear();
+
+        for (size_t j = 0; j < meshData.meshNodes[i].indices.size(); j++) {
+            this->submeshes[i]->addIndex(meshData.meshNodes[i].indices[j] + indexOffset);
+        }
+
+        indexOffset += meshData.meshNodes[i].meshVertices.size();
+
+        this->submeshes[i]->getMaterial()->setTexturePath(File::simplifyPath(baseDir+meshData.meshNodes[i].materials[0].texture));
+
+    }
+
+    return true;
 }
 
 bool Model::loadOBJ(const char* path){
@@ -39,9 +133,7 @@ bool Model::loadOBJ(const char* path){
 
     std::string err;
     
-    std::string baseDir = File::getBaseDir(path);
-    
-    tinyobj::FileReader::externalFunc = readDataFile;
+    tinyobj::FileReader::externalFunc = readFileToString;
 
     bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path, baseDir.c_str());
 
