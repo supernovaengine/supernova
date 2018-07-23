@@ -75,6 +75,7 @@ void Model::readMeshNodesVector(FileData& file, std::vector<MeshNode> &vec){
     vec.resize(size);
 
     for (typename std::vector<MeshNode>::size_type i = 0; i < size; ++i){
+        readString(file, vec[i].name);
         readMeshVerticesVector(file, vec[i].meshVertices);
         readIndicesVector(file, vec[i].indices);
         readMeshMaterialsVector(file, vec[i].materials);
@@ -99,27 +100,29 @@ bool Model::loadSMODEL(const char* path) {
     int indexOffset = 0;
 
     for (size_t i = 0; i < meshData.meshNodes.size(); i++){
-        if (i > (this->submeshes.size()-1)){
-            this->submeshes.push_back(new Submesh());
-            this->submeshes.back()->createNewMaterial();
+        if (i == 0) {
+            if (i > (this->submeshes.size() - 1)) {
+                this->submeshes.push_back(new Submesh());
+                this->submeshes.back()->createNewMaterial();
+            }
+
+            for (size_t v = 0; v < meshData.meshNodes[i].meshVertices.size(); v++) {
+                vertices.push_back(meshData.meshNodes[i].meshVertices[v].vertex);
+                texcoords.push_back(meshData.meshNodes[i].meshVertices[v].texcoord);
+                normals.push_back(meshData.meshNodes[i].meshVertices[v].normal);
+            }
+
+            this->submeshes.back()->getIndices()->clear();
+
+            for (size_t j = 0; j < meshData.meshNodes[i].indices.size(); j++) {
+                this->submeshes.back()->addIndex(meshData.meshNodes[i].indices[j] + indexOffset);
+            }
+
+            indexOffset += meshData.meshNodes[i].meshVertices.size();
+
+            if (meshData.meshNodes[i].materials.size() > 0)
+                this->submeshes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir + meshData.meshNodes[i].materials[0].texture));
         }
-
-        for (size_t v = 0; v < meshData.meshNodes[i].meshVertices.size(); v++){
-            vertices.push_back(meshData.meshNodes[i].meshVertices[v].vertex);
-            texcoords.push_back(meshData.meshNodes[i].meshVertices[v].texcoord);
-            normals.push_back(meshData.meshNodes[i].meshVertices[v].normal);
-        }
-
-        this->submeshes[i]->getIndices()->clear();
-
-        for (size_t j = 0; j < meshData.meshNodes[i].indices.size(); j++) {
-            this->submeshes[i]->addIndex(meshData.meshNodes[i].indices[j] + indexOffset);
-        }
-
-        indexOffset += meshData.meshNodes[i].meshVertices.size();
-
-        this->submeshes[i]->getMaterial()->setTexturePath(File::simplifyPath(baseDir+meshData.meshNodes[i].materials[0].texture));
-
     }
 
     return true;

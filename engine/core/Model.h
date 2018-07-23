@@ -25,6 +25,7 @@ namespace Supernova {
         };
 
         struct MeshNode {
+            std::string name;
             std::vector<MeshVertex> meshVertices;
             std::vector<unsigned int> indices;
             std::vector<MeshMaterial> materials;
