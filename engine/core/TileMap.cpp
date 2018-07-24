@@ -39,22 +39,22 @@ int TileMap::findTileByString(std::string name){
 }
 
 void TileMap::addRect(int id, std::string name, std::string texture, Rect rect){
-    int submeshId = 0;
+    int meshnodeId = 0;
     if (!texture.empty()) {
         bool textureFound = false;
-        for (int s = 0; s < submeshes.size(); s++){
-            if (texture == submeshes[s]->getMaterial()->getTexturePath()) {
+        for (int s = 0; s < meshnodes.size(); s++){
+            if (texture == meshnodes[s]->getMaterial()->getTexturePath()) {
                 textureFound = true;
-                submeshId = s;
+                meshnodeId = s;
             }
         }
 
         if (!textureFound) {
-            this->submeshes.push_back(new Submesh());
-            this->submeshes.back()->createNewMaterial();
-            this->submeshes.back()->getMaterial()->setTexturePath(texture);
+            this->meshnodes.push_back(new MeshNode());
+            this->meshnodes.back()->createNewMaterial();
+            this->meshnodes.back()->getMaterial()->setTexturePath(texture);
 
-            submeshId = submeshes.size() - 1;
+            meshnodeId = meshnodes.size() - 1;
         }
 
         if (loaded) {
@@ -62,7 +62,7 @@ void TileMap::addRect(int id, std::string name, std::string texture, Rect rect){
         }
     }
 
-    tilesRect[id] = {name, submeshId, rect};
+    tilesRect[id] = {name, meshnodeId, rect};
 }
 
 void TileMap::addRect(int id, std::string name, Rect rect){
@@ -137,14 +137,14 @@ void TileMap::removeTile(std::string name){
         removeTile(tile);
 }
 
-Rect TileMap::normalizeTileRect(Rect tileRect, int submeshId){
+Rect TileMap::normalizeTileRect(Rect tileRect, int meshnodeId){
     Rect normalized = tileRect;
 
     int texWidth = -1;
     int texHeight = -1;
-    if (submeshes[submeshId]->getMaterial()->getTexture()) {
-        texWidth = submeshes[submeshId]->getMaterial()->getTexture()->getWidth();
-        texHeight = submeshes[submeshId]->getMaterial()->getTexture()->getHeight();
+    if (meshnodes[meshnodeId]->getMaterial()->getTexture()) {
+        texWidth = meshnodes[meshnodeId]->getMaterial()->getTexture()->getWidth();
+        texHeight = meshnodes[meshnodeId]->getMaterial()->getTexture()->getHeight();
     }
 
     if (!tileRect.isNormalized()){
@@ -175,8 +175,8 @@ void TileMap::createTiles(){
     vertices.clear();
     texcoords.clear();
     normals.clear();
-    for (int s = 0; s < submeshes.size(); s++){
-        submeshes[s]->getIndices()->clear();
+    for (int s = 0; s < meshnodes.size(); s++){
+        meshnodes[s]->getIndices()->clear();
     }
     width = 0;
     height = 0;
@@ -195,7 +195,7 @@ void TileMap::createTiles(){
         if (height < tiles[i].position.y + tiles[i].height)
             height = tiles[i].position.y + tiles[i].height;
 
-        Rect tileRect = normalizeTileRect(tilesRect[tiles[i].rectId].rect, tilesRect[tiles[i].rectId].submeshId);
+        Rect tileRect = normalizeTileRect(tilesRect[tiles[i].rectId].rect, tilesRect[tiles[i].rectId].meshnodeId);
         texcoords.push_back(Vector2(tileRect.getX(), tileRect.getY()));
         texcoords.push_back(Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()));
         texcoords.push_back(Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()+tileRect.getHeight()));
@@ -212,7 +212,7 @@ void TileMap::createTiles(){
             }
         }
 
-        std::vector<unsigned int>* indices = submeshes[tilesRect[tiles[i].rectId].submeshId]->getIndices();
+        std::vector<unsigned int>* indices = meshnodes[tilesRect[tiles[i].rectId].meshnodeId]->getIndices();
 
         indices->push_back(0 + (i*4));
         indices->push_back(1 + (i*4));
@@ -223,20 +223,20 @@ void TileMap::createTiles(){
 
     }
 
-    for (int s =submeshes.size()-1; s >= 0; s--){
-        if (submeshes[s]->getIndices()->size() == 0) {
-            submeshes[s]->setVisible(false);
+    for (int s = meshnodes.size()-1; s >= 0; s--){
+        if (meshnodes[s]->getIndices()->size() == 0) {
+            meshnodes[s]->setVisible(false);
         } else {
-            submeshes[s]->setVisible(true);
+            meshnodes[s]->setVisible(true);
         }
     }
 }
 
 void TileMap::loadTextures(){
-    for (int s = 0; s < submeshes.size(); s++) {
-        if (submeshes[s]->getMaterial()->getTexture()) {
-            submeshes[s]->getMaterial()->getTexture()->setResampleToPowerOfTwo(false);
-            submeshes[s]->getMaterial()->getTexture()->load();
+    for (int s = 0; s < meshnodes.size(); s++) {
+        if (meshnodes[s]->getMaterial()->getTexture()) {
+            meshnodes[s]->getMaterial()->getTexture()->setResampleToPowerOfTwo(false);
+            meshnodes[s]->getMaterial()->getTexture()->load();
         }
     }
 }

@@ -46,7 +46,7 @@ bool Text::operator != ( const char* v ) const{
 
 void Text::setMinBufferSize(unsigned int characters){
     this->minBufferSize = characters * 4;
-    this->submeshes[0]->minBufferSize = characters * 6;
+    this->meshnodes[0]->minBufferSize = characters * 6;
 }
 
 void Text::setFont(std::string font){
@@ -165,13 +165,13 @@ void Text::createText(){
     std::vector<unsigned int> indices;
     
     stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &width, &height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
-    
-    submeshes[0]->setIndices(indices);
+
+    meshnodes[0]->setIndices(indices);
 }
 
 bool Text::load(){
 
-    if (stbtext->load(font.c_str(), fontSize, submeshes[0]->getMaterial()->getTexture())) {
+    if (stbtext->load(font.c_str(), fontSize, meshnodes[0]->getMaterial()->getTexture())) {
         if (!loaded)
             setInvertTexture(isIn3DScene());
         createText();

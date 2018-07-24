@@ -1,5 +1,5 @@
-#ifndef submesh_h
-#define submesh_h
+#ifndef MeshNode_h
+#define MeshNode_h
 
 #include "math/Vector4.h"
 #include <string>
@@ -10,7 +10,7 @@
 
 namespace Supernova {
 
-    class Submesh: public Render {
+    class MeshNode: public Render {
 
         friend class Mesh;
         friend class Model;
@@ -36,12 +36,12 @@ namespace Supernova {
         bool loaded;
 
     public:
-        Submesh();
-        Submesh(Material* material);
-        Submesh(const Submesh& s);
-        virtual ~Submesh();
+        MeshNode();
+        MeshNode(Material* material);
+        MeshNode(const MeshNode& s);
+        virtual ~MeshNode();
 
-        Submesh& operator = (const Submesh& s);
+        MeshNode& operator = (const MeshNode& s);
 
         void setIndices(std::vector<unsigned int> indices);
         void addIndex(unsigned int index);
@@ -56,11 +56,11 @@ namespace Supernova {
         bool isDynamic();
         unsigned int getMinBufferSize();
         
-        void setSubmeshRender(ObjectRender* render);
-        ObjectRender* getSubmeshRender();
+        void setMeshNodeRender(ObjectRender* render);
+        ObjectRender* getMeshNodeRender();
 
-        void setSubmeshShadowRender(ObjectRender* shadowRender);
-        ObjectRender* getSubmeshShadowRender();
+        void setMeshNodeShadowRender(ObjectRender* shadowRender);
+        ObjectRender* getMeshNodeShadowRender();
 
         void setVisible(bool visible);
         bool isVisible();
@@ -76,4 +76,4 @@ namespace Supernova {
     
 }
 
-#endif /* Submesh_h */
+#endif /* MeshNode_h */

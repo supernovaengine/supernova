@@ -12,7 +12,7 @@ Mesh::Mesh(): ConcreteObject(){
     render = NULL;
     shadowRender = NULL;
 
-    submeshes.push_back(new Submesh(&material));
+    meshnodes.push_back(new MeshNode(&material));
     skymesh = false;
     textmesh = false;
     dynamic = false;
@@ -20,7 +20,7 @@ Mesh::Mesh(): ConcreteObject(){
 
 Mesh::~Mesh(){
     destroy();
-    removeAllSubmeshes();
+    removeAllMeshNodes();
 
     if (render)
         delete render;
@@ -41,8 +41,8 @@ std::vector<Vector2> Mesh::getTexcoords(){
     return texcoords;
 }
 
-std::vector<Submesh*> Mesh::getSubmeshes(){
-    return submeshes;
+std::vector<MeshNode*> Mesh::getMeshNodes(){
+    return meshnodes;
 }
 
 bool Mesh::isSky(){
@@ -82,8 +82,8 @@ void Mesh::addTexcoord(Vector2 texcoord){
     texcoords.push_back(texcoord);
 }
 
-void Mesh::addSubmesh(Submesh* submesh){
-    submeshes.push_back(submesh);
+void Mesh::addMeshNode(MeshNode* meshnode){
+    meshnodes.push_back(meshnode);
 }
 
 void Mesh::updateVertices(){
@@ -104,32 +104,32 @@ void Mesh::updateTexcoords(){
 }
 
 void Mesh::updateIndices(){
-    for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->getSubmeshRender()->updateIndex(submeshes[i]->getIndices()->size(), &(submeshes[i]->getIndices()->front()));
+    for (size_t i = 0; i < meshnodes.size(); i++) {
+        meshnodes[i]->getMeshNodeRender()->updateIndex(meshnodes[i]->getIndices()->size(), &(meshnodes[i]->getIndices()->front()));
         if (shadowRender)
-            submeshes[i]->getSubmeshShadowRender()->updateIndex(submeshes[i]->getIndices()->size(), &(submeshes[i]->getIndices()->front()));
+            meshnodes[i]->getMeshNodeShadowRender()->updateIndex(meshnodes[i]->getIndices()->size(), &(meshnodes[i]->getIndices()->front()));
     }
 }
 
-void Mesh::sortTransparentSubmeshes(){
+void Mesh::sortTransparentMeshNodes(){
     if (transparent && scene && scene->isUseDepth() && scene->getUserDefinedTransparency() != S_OPTION_NO){
 
         bool needSort = false;
-        for (size_t i = 0; i < submeshes.size(); i++) {
-            if (this->submeshes[i]->getIndices()->size() > 0){
-                Vector3 submeshFirstVertice = vertices[this->submeshes[i]->getIndex(0)];
-                submeshFirstVertice = modelMatrix * submeshFirstVertice;
+        for (size_t i = 0; i < meshnodes.size(); i++) {
+            if (this->meshnodes[i]->getIndices()->size() > 0){
+                Vector3 meshnodeFirstVertice = vertices[this->meshnodes[i]->getIndex(0)];
+                meshnodeFirstVertice = modelMatrix * meshnodeFirstVertice;
 
-                if (this->submeshes[i]->getMaterial()->isTransparent()){
-                    this->submeshes[i]->distanceToCamera = (this->cameraPosition - submeshFirstVertice).length();
+                if (this->meshnodes[i]->getMaterial()->isTransparent()){
+                    this->meshnodes[i]->distanceToCamera = (this->cameraPosition - meshnodeFirstVertice).length();
                     needSort = true;
                 }
             }
         }
         
         if (needSort){
-            std::sort(submeshes.begin(), submeshes.end(),
-                      [](const Submesh* a, const Submesh* b) -> bool
+            std::sort(meshnodes.begin(), meshnodes.end(),
+                      [](const MeshNode* a, const MeshNode* b) -> bool
                       {
                           if (a->distanceToCamera == -1)
                               return true;
@@ -146,7 +146,7 @@ void Mesh::sortTransparentSubmeshes(){
 void Mesh::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
     ConcreteObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
-    sortTransparentSubmeshes();
+    sortTransparentMeshNodes();
 }
 
 void Mesh::updateMatrix(){
@@ -154,23 +154,23 @@ void Mesh::updateMatrix(){
     
     this->normalMatrix = modelMatrix.getInverse().getTranspose();
 
-    sortTransparentSubmeshes();
+    sortTransparentMeshNodes();
 }
 
-void Mesh::removeAllSubmeshes(){
-    for (std::vector<Submesh*>::iterator it = submeshes.begin() ; it != submeshes.end(); ++it)
+void Mesh::removeAllMeshNodes(){
+    for (std::vector<MeshNode*>::iterator it = meshnodes.begin() ; it != meshnodes.end(); ++it)
     {
         delete (*it);
     }
-    submeshes.clear();
+    meshnodes.clear();
 }
 
 bool Mesh::textureLoad(){
     if (!ConcreteObject::textureLoad())
         return false;
     
-    for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->textureLoad();
+    for (size_t i = 0; i < meshnodes.size(); i++) {
+        meshnodes[i]->textureLoad();
     }
     
     return true;
@@ -196,16 +196,16 @@ bool Mesh::shadowLoad(){
     
     Program* shadowProgram = shadowRender->getProgram();
     
-    for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->dynamic = dynamic;
-        if (submeshes.size() == 1){
-            //Use the same render for submesh
-            submeshes[i]->setSubmeshShadowRender(shadowRender);
+    for (size_t i = 0; i < meshnodes.size(); i++) {
+        meshnodes[i]->dynamic = dynamic;
+        if (meshnodes.size() == 1){
+            //Use the same render for meshnode
+            meshnodes[i]->setMeshNodeShadowRender(shadowRender);
         }else{
-            submeshes[i]->getSubmeshShadowRender()->setProgram(shadowProgram);
+            meshnodes[i]->getMeshNodeShadowRender()->setProgram(shadowProgram);
         }
-        submeshes[i]->getSubmeshShadowRender()->setPrimitiveType(primitiveType);
-        submeshes[i]->shadowLoad();
+        meshnodes[i]->getMeshNodeShadowRender()->setPrimitiveType(primitiveType);
+        meshnodes[i]->shadowLoad();
     }
     
     return shadowRender->load();
@@ -224,17 +224,17 @@ bool Mesh::load(){
     bool hasTextureRect = false;
     bool hasTextureCoords = false;
     bool hasTextureCube = false;
-    for (unsigned int i = 0; i < submeshes.size(); i++){
-        if (submeshes.at(i)->getMaterial()->getTextureRect()){
+    for (unsigned int i = 0; i < meshnodes.size(); i++){
+        if (meshnodes.at(i)->getMaterial()->getTextureRect()){
             hasTextureRect = true;
         }
-        if (submeshes.at(i)->getMaterial()->getTexture()){
+        if (meshnodes.at(i)->getMaterial()->getTexture()){
             hasTextureCoords = true;
-            if (submeshes.at(i)->getMaterial()->getTexture()->getType() == S_TEXTURE_CUBE){
+            if (meshnodes.at(i)->getMaterial()->getTexture()->getType() == S_TEXTURE_CUBE){
                 hasTextureCube = true;
             }
         }
-        if (submeshes.at(i)->getMaterial()->isTransparent()) {
+        if (meshnodes.at(i)->getMaterial()->isTransparent()) {
             transparent = true;
         }
     }
@@ -287,16 +287,16 @@ bool Mesh::load(){
 
     Program* mainProgram = render->getProgram();
     
-    for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->dynamic = dynamic;
-        if (submeshes.size() == 1){
-            //Use the same render for submesh
-            submeshes[i]->setSubmeshRender(render);
+    for (size_t i = 0; i < meshnodes.size(); i++) {
+        meshnodes[i]->dynamic = dynamic;
+        if (meshnodes.size() == 1){
+            //Use the same render for meshnode
+            meshnodes[i]->setMeshNodeRender(render);
         }else{
-            submeshes[i]->getSubmeshRender()->setProgram(mainProgram);
+            meshnodes[i]->getMeshNodeRender()->setProgram(mainProgram);
         }
-        submeshes[i]->getSubmeshRender()->setPrimitiveType(primitiveType);
-        submeshes[i]->load();
+        meshnodes[i]->getMeshNodeRender()->setPrimitiveType(primitiveType);
+        meshnodes[i]->load();
     }
     
     bool renderloaded = render->load();
@@ -316,8 +316,8 @@ bool Mesh::shadowDraw(){
 
     shadowRender->prepareDraw();
 
-    for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->shadowDraw();
+    for (size_t i = 0; i < meshnodes.size(); i++) {
+        meshnodes[i]->shadowDraw();
     }
 
     shadowRender->finishDraw();
@@ -334,8 +334,8 @@ bool Mesh::renderDraw(){
 
     render->prepareDraw();
 
-    for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->draw();
+    for (size_t i = 0; i < meshnodes.size(); i++) {
+        meshnodes[i]->draw();
     }
 
     render->finishDraw();
@@ -346,8 +346,8 @@ bool Mesh::renderDraw(){
 void Mesh::destroy(){
     ConcreteObject::destroy();
     
-    for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->destroy();
+    for (size_t i = 0; i < meshnodes.size(); i++) {
+        meshnodes[i]->destroy();
     }
     
     if (render)

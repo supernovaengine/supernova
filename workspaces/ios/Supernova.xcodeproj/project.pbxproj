@@ -177,7 +177,6 @@
 		71BD28321DE887E300C12A1D /* libmpg123.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BD254A1DE886B100C12A1D /* libmpg123.a */; };
 		71BF18F020D099F900804467 /* Contact2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BF18EE20D099F800804467 /* Contact2D.cpp */; };
 		71C2772E202BCE0F005B3EDC /* LightData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C27725202BC405005B3EDC /* LightData.cpp */; };
-		71C2772F202BCE0F005B3EDC /* PointData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C27727202BC405005B3EDC /* PointData.cpp */; };
 		71C27730202BCE0F005B3EDC /* STBText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C27729202BC405005B3EDC /* STBText.cpp */; };
 		71C27735202BCE1F005B3EDC /* Action.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C27716202BC3DA005B3EDC /* Action.cpp */; };
 		71C27736202BCE1F005B3EDC /* AlphaAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C2771A202BC3DB005B3EDC /* AlphaAction.cpp */; };
@@ -186,6 +185,7 @@
 		71C27739202BCE1F005B3EDC /* ScaleAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C2771F202BC3E2005B3EDC /* ScaleAction.cpp */; };
 		71C2773C202BCE6C005B3EDC /* AlignedBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714E167D2006DF8700548DA2 /* AlignedBox.cpp */; };
 		71C2773D202BCE6C005B3EDC /* Matrix3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714E167E2006DF8700548DA2 /* Matrix3.cpp */; };
+		71C2794D2106BE39004BFA17 /* MeshNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C2794B2106BE39004BFA17 /* MeshNode.cpp */; };
 		71C39E0F2041889B00863AB6 /* Ease.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E0C2041889600863AB6 /* Ease.cpp */; };
 		71C39E48204188B000863AB6 /* ParticleAccelerationInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E22204188A500863AB6 /* ParticleAccelerationInit.cpp */; };
 		71C39E49204188B000863AB6 /* ParticleAlphaInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E24204188A500863AB6 /* ParticleAlphaInit.cpp */; };
@@ -221,7 +221,6 @@
 		71CDC7191D7B14510060EEFF /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A631CFB2EAD00A4752F /* Scene.cpp */; };
 		71CDC71A1D7B14510060EEFF /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A661CFB2EAD00A4752F /* Polygon.cpp */; };
 		71CDC71B1D7B14510060EEFF /* SpotLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713384DC1D2F560400DB73A5 /* SpotLight.cpp */; };
-		71CDC71C1D7B14510060EEFF /* Submesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71EC2E3E1D3D92F700E14D84 /* Submesh.cpp */; };
 		71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A181CFB2EAD00A4752F /* TextureLoader.cpp */; };
 		71CDC7211D7B14680060EEFF /* TextureData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A1E1CFB2EAD00A4752F /* TextureData.cpp */; };
 		71CDC7221D7B146D0060EEFF /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A271CFB2EAD00A4752F /* Angle.cpp */; };
@@ -840,10 +839,10 @@
 		71C2771F202BC3E2005B3EDC /* ScaleAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScaleAction.cpp; sourceTree = "<group>"; };
 		71C27725202BC405005B3EDC /* LightData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LightData.cpp; sourceTree = "<group>"; };
 		71C27726202BC405005B3EDC /* LightData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LightData.h; sourceTree = "<group>"; };
-		71C27727202BC405005B3EDC /* PointData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointData.cpp; sourceTree = "<group>"; };
-		71C27728202BC405005B3EDC /* PointData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointData.h; sourceTree = "<group>"; };
 		71C27729202BC405005B3EDC /* STBText.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STBText.cpp; sourceTree = "<group>"; };
 		71C2772A202BC405005B3EDC /* STBText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STBText.h; sourceTree = "<group>"; };
+		71C2794B2106BE39004BFA17 /* MeshNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MeshNode.cpp; sourceTree = "<group>"; };
+		71C2794C2106BE39004BFA17 /* MeshNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshNode.h; sourceTree = "<group>"; };
 		71C39E0C2041889600863AB6 /* Ease.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Ease.cpp; sourceTree = "<group>"; };
 		71C39E0D2041889700863AB6 /* Ease.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ease.h; sourceTree = "<group>"; };
 		71C39E11204188A500863AB6 /* ParticleAlphaMod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleAlphaMod.cpp; sourceTree = "<group>"; };
@@ -913,8 +912,6 @@
 		71E1D22D1D2957AA001209C8 /* PointLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointLight.h; sourceTree = "<group>"; };
 		71E34E251ED217CD0005DEF2 /* stb_rect_pack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_rect_pack.c; sourceTree = "<group>"; };
 		71E34E261ED217CD0005DEF2 /* stb_rect_pack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_rect_pack.h; sourceTree = "<group>"; };
-		71EC2E3E1D3D92F700E14D84 /* Submesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Submesh.cpp; sourceTree = "<group>"; };
-		71EC2E3F1D3D92F700E14D84 /* Submesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Submesh.h; sourceTree = "<group>"; };
 		71EC38B21EB82871008654E8 /* Particles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particles.cpp; sourceTree = "<group>"; };
 		71EC38B31EB82871008654E8 /* Particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particles.h; sourceTree = "<group>"; };
 		71F149B61CFB793200B7552E /* Model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Model.cpp; sourceTree = "<group>"; };
@@ -1156,6 +1153,8 @@
 				713D2A0B1CFB2EAD00A4752F /* Mesh.h */,
 				716F761B1E1C736300FF9888 /* Mesh2D.cpp */,
 				716F761C1E1C736300FF9888 /* Mesh2D.h */,
+				71C2794B2106BE39004BFA17 /* MeshNode.cpp */,
+				71C2794C2106BE39004BFA17 /* MeshNode.h */,
 				71F149B61CFB793200B7552E /* Model.cpp */,
 				71F149B71CFB793200B7552E /* Model.h */,
 				713D2A3C1CFB2EAD00A4752F /* Object.cpp */,
@@ -1186,8 +1185,6 @@
 				713384DD1D2F560400DB73A5 /* SpotLight.h */,
 				71598C3D1E762037000EDAC0 /* Sprite.cpp */,
 				71598C3E1E762037000EDAC0 /* Sprite.h */,
-				71EC2E3E1D3D92F700E14D84 /* Submesh.cpp */,
-				71EC2E3F1D3D92F700E14D84 /* Submesh.h */,
 				713D2A6A1CFB2EAD00A4752F /* Supernova.h */,
 				71BCF6C01E476F42008E42A2 /* Text.cpp */,
 				71BCF6C11E476F42008E42A2 /* Text.h */,
@@ -1797,8 +1794,6 @@
 				71C27726202BC405005B3EDC /* LightData.h */,
 				71B130C120CD8F4D007A42A9 /* LuaFunction.cpp */,
 				71B130C220CD8F4D007A42A9 /* LuaFunction.h */,
-				71C27727202BC405005B3EDC /* PointData.cpp */,
-				71C27728202BC405005B3EDC /* PointData.h */,
 				71C27729202BC405005B3EDC /* STBText.cpp */,
 				71C2772A202BC405005B3EDC /* STBText.h */,
 			);
@@ -2395,7 +2390,6 @@
 				71C39E4E204188B000863AB6 /* ParticleRotationInit.cpp in Sources */,
 				71CDC7241D7B146D0060EEFF /* Quaternion.cpp in Sources */,
 				718FFC7A20E9CD7D00EEE535 /* Joint2D.cpp in Sources */,
-				71CDC71C1D7B14510060EEFF /* Submesh.cpp in Sources */,
 				71C39E54204188BC00863AB6 /* ParticleMod.cpp in Sources */,
 				71FA3F651F5E2FEE0015BEFE /* Plane.cpp in Sources */,
 				71D6EFE81F53551F00241F0C /* TimeAction.cpp in Sources */,
@@ -2448,7 +2442,6 @@
 				71C39E4F204188B000863AB6 /* ParticleSizeInit.cpp in Sources */,
 				71CDC7171D7B14510060EEFF /* PlaneTerrain.cpp in Sources */,
 				71C39E4B204188B000863AB6 /* ParticleInit.cpp in Sources */,
-				71C2772F202BCE0F005B3EDC /* PointData.cpp in Sources */,
 				71BF18F020D099F900804467 /* Contact2D.cpp in Sources */,
 				7119E6AB20A6A0B80016AEF2 /* CollisionShape2D.cpp in Sources */,
 				719C089E1F0DCFCB00F0BAF0 /* Texture.cpp in Sources */,
@@ -2474,6 +2467,7 @@
 				71CE95011EC8A3C8008CCF3C /* OGGReader.cpp in Sources */,
 				71C27738202BCE1F005B3EDC /* RotateAction.cpp in Sources */,
 				71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */,
+				71C2794D2106BE39004BFA17 /* MeshNode.cpp in Sources */,
 				71C39E4C204188B000863AB6 /* ParticleLifeInit.cpp in Sources */,
 				71BCF6C21E476F42008E42A2 /* Text.cpp in Sources */,
 				71C39E4A204188B000863AB6 /* ParticleColorInit.cpp in Sources */,

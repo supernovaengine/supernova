@@ -52,8 +52,8 @@ void Image::normalizeTextureRect(){
     
     if (useTextureRect){
         if (textureRect.isNormalized()){
-            
-            submeshes[0]->getMaterial()->setTextureRect(textureRect.getX(),
+
+            meshnodes[0]->getMaterial()->setTextureRect(textureRect.getX(),
                                                         textureRect.getY(),
                                                         textureRect.getWidth(),
                                                         textureRect.getHeight());
@@ -62,7 +62,7 @@ void Image::normalizeTextureRect(){
             
             if (this->texWidth != 0 && this->texHeight != 0) {
                 // 0.1 and 0.2 to work with small and pixel perfect textures
-                submeshes[0]->getMaterial()->setTextureRect((textureRect.getX()+0.1) / (float) texWidth,
+                meshnodes[0]->getMaterial()->setTextureRect((textureRect.getX()+0.1) / (float) texWidth,
                                                             (textureRect.getY()+0.1) / (float) texHeight,
                                                             (textureRect.getWidth()-0.2) / (float) texWidth,
                                                             (textureRect.getHeight()-0.2) / (float) texHeight);
@@ -113,7 +113,7 @@ void Image::createVertices(){
 
     std::vector<unsigned int> indices;
     indices.assign(indices_array, std::end(indices_array));
-    submeshes[0]->setIndices(indices);
+    meshnodes[0]->setIndices(indices);
 
     normals.clear();
     normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
@@ -124,19 +124,19 @@ void Image::createVertices(){
 
 bool Image::load(){
     
-    if (submeshes[0]->getMaterial()->getTexture()) {
-        submeshes[0]->getMaterial()->getTexture()->load();
-        texWidth = submeshes[0]->getMaterial()->getTexture()->getWidth();
-        texHeight = submeshes[0]->getMaterial()->getTexture()->getHeight();
+    if (meshnodes[0]->getMaterial()->getTexture()) {
+        meshnodes[0]->getMaterial()->getTexture()->load();
+        texWidth = meshnodes[0]->getMaterial()->getTexture()->getWidth();
+        texHeight = meshnodes[0]->getMaterial()->getTexture()->getHeight();
         
         normalizeTextureRect();
         
         if (this->width == 0 || this->height == 0) {
-            if (submeshes[0]->getMaterial()->getTextureRect()){
+            if (meshnodes[0]->getMaterial()->getTextureRect()){
                 if (this->width == 0)
-                    this->width = ceil(texWidth * submeshes[0]->getMaterial()->getTextureRect()->getWidth());
+                    this->width = ceil(texWidth * meshnodes[0]->getMaterial()->getTextureRect()->getWidth());
                 if (this->height == 0)
-                    this->height = ceil(texHeight * submeshes[0]->getMaterial()->getTextureRect()->getHeight());
+                    this->height = ceil(texHeight * meshnodes[0]->getMaterial()->getTextureRect()->getHeight());
             }else{
                 if (this->width == 0)
                     this->width = texWidth;

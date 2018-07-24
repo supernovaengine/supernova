@@ -11,7 +11,7 @@ namespace Supernova {
     class Model: public Mesh {
     private:
 
-        struct MeshVertex {
+        struct MeshVertexData {
             Vector3 vertex;
             Vector2 texcoord;
             Vector3 normal;
@@ -19,30 +19,30 @@ namespace Supernova {
             Vector3 bitangent;
         };
 
-        struct MeshMaterial {
+        struct MeshMaterialData {
             int type;
             std::string texture;
         };
 
-        struct MeshNode {
+        struct MeshNodeData {
             std::string name;
-            std::vector<MeshVertex> meshVertices;
+            std::vector<MeshVertexData> meshVertices;
             std::vector<unsigned int> indices;
-            std::vector<MeshMaterial> materials;
+            std::vector<MeshMaterialData> materials;
         };
 
         struct MeshData {
-            std::vector<MeshNode> meshNodes;
+            std::vector<MeshNodeData> meshNodesData;
         };
 
         const char* filename;
         std::string baseDir;
 
-        void readMeshVerticesVector(FileData& file, std::vector<MeshVertex> &vec);
+        void readMeshVerticesVector(FileData& file, std::vector<MeshVertexData> &vec);
         void readIndicesVector(FileData& file, std::vector<unsigned int> &vec);
         void readString(FileData& file, std::string &str);
-        void readMeshMaterialsVector(FileData& file, std::vector<MeshMaterial> &vec);
-        void readMeshNodesVector(FileData& file, std::vector<MeshNode> &vec);
+        void readMeshMaterialsVector(FileData& file, std::vector<MeshMaterialData> &vec);
+        void readMeshNodesVector(FileData& file, std::vector<MeshNodeData> &vec);
 
         bool loadOBJ(const char * path);
         bool loadSMODEL(const char* path);

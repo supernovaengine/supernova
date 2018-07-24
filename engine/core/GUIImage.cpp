@@ -130,7 +130,7 @@ void GUIImage::createVertices(){
     
     std::vector<unsigned int> indices;
     indices.assign(indices_array, std::end(indices_array));
-    submeshes[0]->setIndices(indices);
+    meshnodes[0]->setIndices(indices);
     
     normals.clear();
     for (int i = 0; i < texcoords.size(); i++){
@@ -140,10 +140,10 @@ void GUIImage::createVertices(){
 
 bool GUIImage::load(){
     
-    if (submeshes[0]->getMaterial()->getTexture()){
-        submeshes[0]->getMaterial()->getTexture()->load();
-        texWidth = submeshes[0]->getMaterial()->getTexture()->getWidth();
-        texHeight = submeshes[0]->getMaterial()->getTexture()->getHeight();
+    if (meshnodes[0]->getMaterial()->getTexture()){
+        meshnodes[0]->getMaterial()->getTexture()->load();
+        texWidth = meshnodes[0]->getMaterial()->getTexture()->getWidth();
+        texHeight = meshnodes[0]->getMaterial()->getTexture()->getHeight();
     }
     if (this->width == 0 && this->height == 0){
         this->width = texWidth;

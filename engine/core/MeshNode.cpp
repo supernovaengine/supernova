@@ -1,8 +1,8 @@
-#include "Submesh.h"
+#include "MeshNode.h"
 
 using namespace Supernova;
 
-Submesh::Submesh(){
+MeshNode::MeshNode(){
     this->render = NULL;
     this->shadowRender = NULL;
 
@@ -19,11 +19,11 @@ Submesh::Submesh(){
     this->minBufferSize = 0;
 }
 
-Submesh::Submesh(Material* material): Submesh() {
+MeshNode::MeshNode(Material* material): MeshNode() {
     this->material = material;
 }
 
-Submesh::~Submesh(){
+MeshNode::~MeshNode(){
     if (materialOwned)
         delete this->material;
     
@@ -37,7 +37,7 @@ Submesh::~Submesh(){
         destroy();
 }
 
-Submesh::Submesh(const Submesh& s){
+MeshNode::MeshNode(const MeshNode& s){
     this->indices = s.indices;
     this->distanceToCamera = s.distanceToCamera;
     this->materialOwned = s.materialOwned;
@@ -52,7 +52,7 @@ Submesh::Submesh(const Submesh& s){
     this->minBufferSize = s.minBufferSize;
 }
 
-Submesh& Submesh::operator = (const Submesh& s){
+MeshNode& MeshNode::operator = (const MeshNode& s){
     this->indices = s.indices;
     this->distanceToCamera = s.distanceToCamera;
     this->materialOwned = s.materialOwned;
@@ -69,44 +69,44 @@ Submesh& Submesh::operator = (const Submesh& s){
     return *this;
 }
 
-bool Submesh::isDynamic(){
+bool MeshNode::isDynamic(){
     return dynamic;
 }
 
-unsigned int Submesh::getMinBufferSize(){
+unsigned int MeshNode::getMinBufferSize(){
     return minBufferSize;
 }
 
-void Submesh::setIndices(std::vector<unsigned int> indices){
+void MeshNode::setIndices(std::vector<unsigned int> indices){
     this->indices = indices;
 }
 
-void Submesh::addIndex(unsigned int index){
+void MeshNode::addIndex(unsigned int index){
     this->indices.push_back(index);
 }
 
-std::vector<unsigned int>* Submesh::getIndices(){
+std::vector<unsigned int>* MeshNode::getIndices(){
     return &indices;
 }
 
-unsigned int Submesh::getIndex(int offset){
+unsigned int MeshNode::getIndex(int offset){
     return indices[offset];
 }
 
-void Submesh::createNewMaterial(){
+void MeshNode::createNewMaterial(){
     this->material = new Material();
     this->materialOwned = true;
 }
 
-void Submesh::setMaterial(Material* material){
+void MeshNode::setMaterial(Material* material){
     this->material = material;
 }
 
-Material* Submesh::getMaterial(){
+Material* MeshNode::getMaterial(){
     return this->material;
 }
 
-void Submesh::setSubmeshRender(ObjectRender* render){
+void MeshNode::setMeshNodeRender(ObjectRender* render){
     if (this->render && this->renderOwned)
         delete this->render;
     
@@ -114,14 +114,14 @@ void Submesh::setSubmeshRender(ObjectRender* render){
     renderOwned = false;
 }
 
-ObjectRender* Submesh::getSubmeshRender(){
+ObjectRender* MeshNode::getMeshNodeRender(){
     if (render == NULL)
         render = ObjectRender::newInstance();
     
     return render;
 }
 
-void Submesh::setSubmeshShadowRender(ObjectRender* shadowRender){
+void MeshNode::setMeshNodeShadowRender(ObjectRender* shadowRender){
     if (this->shadowRender && this->shadowRenderOwned)
         delete this->shadowRender;
 
@@ -129,22 +129,22 @@ void Submesh::setSubmeshShadowRender(ObjectRender* shadowRender){
     shadowRenderOwned = false;
 }
 
-ObjectRender* Submesh::getSubmeshShadowRender(){
+ObjectRender* MeshNode::getMeshNodeShadowRender(){
     if (shadowRender == NULL)
         shadowRender = ObjectRender::newInstance();
 
     return shadowRender;
 }
 
-void Submesh::setVisible(bool visible){
+void MeshNode::setVisible(bool visible){
     this->visible = visible;
 }
 
-bool Submesh::isVisible(){
+bool MeshNode::isVisible(){
     return visible;
 }
 
-bool Submesh::textureLoad(){
+bool MeshNode::textureLoad(){
     if (material && render){
         material->getTexture()->load();
         render->setTexture(material->getTexture());
@@ -153,9 +153,9 @@ bool Submesh::textureLoad(){
     return true;
 }
 
-bool Submesh::shadowLoad(){
+bool MeshNode::shadowLoad(){
     
-    shadowRender = getSubmeshShadowRender();
+    shadowRender = getMeshNodeShadowRender();
 
     shadowRender->addIndex(indices.size(), &indices.front(), dynamic);
     
@@ -167,9 +167,9 @@ bool Submesh::shadowLoad(){
     return shadowloaded;
 }
 
-bool Submesh::load(){
+bool MeshNode::load(){
     
-    render = getSubmeshRender();
+    render = getMeshNodeRender();
     
     render->addIndex(indices.size(), &indices.front(), dynamic);
     
@@ -189,7 +189,7 @@ bool Submesh::load(){
     return renderloaded;
 }
 
-bool Submesh::draw(){
+bool MeshNode::draw(){
     if (!visible)
         return false;
 
@@ -204,7 +204,7 @@ bool Submesh::draw(){
     return true;
 }
 
-bool Submesh::shadowDraw(){
+bool MeshNode::shadowDraw(){
     if (!visible)
         return false;
 
@@ -219,7 +219,7 @@ bool Submesh::shadowDraw(){
     return true;
 }
 
-void Submesh::destroy(){
+void MeshNode::destroy(){
     if (render)
         render->destroy();
 
