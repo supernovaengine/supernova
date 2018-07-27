@@ -82,10 +82,14 @@ bool GLES2Object::load(){
     vertexBuffersGL.clear();
     attributesGL.clear();
     propertyGL.clear();
+    texturesGL.clear();
     indexGL.buffer = 0;
     indexGL.size = 0;
-    
-    GLuint glesProgram = ((GLES2Program*)program->getProgramRender().get())->getProgram();
+
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
+
+    GLES2Program* programRender = (GLES2Program*)program->getProgramRender().get();
+    GLuint glesProgram = programRender->getProgram();
     
     useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
 
@@ -127,23 +131,27 @@ bool GLES2Object::load(){
         loadIndex(indexAttribute);
         //Log::Debug("Load index, size: %lu", indexAttribute.size);
     }
-    
-    if (texture) {
-        uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
-    }else{
-        if (Engine::getPlatform() == S_PLATFORM_WEB){
-            GLES2Util::generateEmptyTexture();
-            uTextureUnitLocation = glGetUniformLocation(glesProgram, "u_TextureUnit");
+
+    for ( const auto &p : textures ) {
+        int type = p.first;
+
+        std::string samplerName;
+        unsigned int arraySize = 1;
+
+        if (type == S_TEXTURESAMPLER_DIFFUSE){
+            samplerName = "u_TextureUnit";
+        }else if (type == S_TEXTURESAMPLER_SHADOWMAP2D){
+            samplerName = "u_shadowsMap2D";
+            arraySize = programRender->getMaxShadows2D();
+        }else if (type == S_TEXTURESAMPLER_SHADOWMAPCUBE){
+            samplerName = "u_shadowsMapCube";
+            arraySize = programRender->getMaxShadowsCube();
         }
+
+        texturesGL[type].location = glGetUniformLocation(glesProgram, samplerName.c_str());
+        texturesGL[type].arraySize = arraySize;
     }
 
-    if (shadowsMap2D.size() > 0){
-        uShadowsMap2DLocation = glGetUniformLocation(glesProgram, "u_shadowsMap2D");
-    }
-    if (shadowsMapCube.size() > 0){
-        uShadowsMapCubeLocation = glGetUniformLocation(glesProgram, "u_shadowsMapCube");
-    }
-    
     for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
     {
         int type = it->first;
@@ -312,67 +320,47 @@ bool GLES2Object::prepareDraw(){
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexGL.buffer);
     }
     GLES2Util::checkGlError("Error on bind index buffer");
-    
-    if (texture){
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(((GLES2Texture*)(texture->getTextureRender().get()))->getTextureType(),
-                      ((GLES2Texture*)(texture->getTextureRender().get()))->getTexture());
-        glUniform1i(uTextureUnitLocation, 0);
+
+    if (parent){
+        textureIndex = ((GLES2Object*)parent)->textureIndex;
     }else{
-        if (Engine::getPlatform() == S_PLATFORM_WEB){
-            //Fix Chrome warnings of no texture bound
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, GLES2Util::emptyTexture);
-            glUniform1i(uTextureUnitLocation, 0);
-        }
+        textureIndex = 0;
     }
 
-    if (shadowsMap2D.size() > 0){
-        
-        std::vector<int> shadowsMapLoc;
+    for ( const auto &p : textures ) {
+        std::vector<int> texturesLoc;
+        textureGlData textureData = texturesGL[p.first];
 
-        int maxShadows2D = programRender->getMaxShadows2D();
-        
-        int shadowsSize2D = (int)shadowsMap2D.size();
-        if (shadowsSize2D > maxShadows2D) shadowsSize2D = maxShadows2D;
-        
-        for (int i = 0; i < shadowsSize2D; i++){
-            shadowsMapLoc.push_back(i + 1);
-            
-            glActiveTexture(GL_TEXTURE1 + i);
-            glBindTexture(((GLES2Texture*)(shadowsMap2D.at(i)->getTextureRender().get()))->getTextureType(),
-                          ((GLES2Texture*)(shadowsMap2D.at(i)->getTextureRender().get()))->getTexture());
+        if (textureData.location >= 0) {
+            for (size_t i = 0; i < p.second.size(); i++) {
+                if (textureIndex < maxTextureUnits) {
+                    texturesLoc.push_back(textureIndex);
+
+                    glActiveTexture(GL_TEXTURE0 + textureIndex);
+                    glBindTexture(
+                            ((GLES2Texture *) (p.second[i]->getTextureRender().get()))->getTextureType(),
+                            ((GLES2Texture *) (p.second[i]->getTextureRender().get()))->getTexture());
+
+                    textureIndex++;
+                } else {
+                    Log::Error("Exceeding max texture units: %i", maxTextureUnits);
+                }
+            }
+
+            if (texturesLoc.size() > 0) {
+                if (texturesLoc.size() <= textureData.arraySize) {
+
+                    while (texturesLoc.size() < textureData.arraySize) {
+                        texturesLoc.push_back(texturesLoc[0]);
+                    }
+
+                    glUniform1iv(textureData.location, (GLsizei) texturesLoc.size(), &texturesLoc.front());
+
+                } else {
+                    Log::Error("Exceeding texture limit of location: %i", textureData.location);
+                }
+            }
         }
-
-        while (shadowsMapLoc.size() < maxShadows2D) {
-            shadowsMapLoc.push_back(shadowsMapLoc[0]);
-        }
-
-        glUniform1iv(uShadowsMap2DLocation, shadowsSize2D, &shadowsMapLoc.front());
-    }
-
-    if (shadowsMapCube.size() > 0){
-
-        std::vector<int> shadowsMapCubeLoc;
-
-        int maxShadowsCube = programRender->getMaxShadowsCube();
-
-        int shadowsSize2D = (int)shadowsMap2D.size();
-        int shadowsSizeCube = (int)shadowsMapCube.size();
-
-        for (int i = 0; i < shadowsSizeCube; i++){
-            shadowsMapCubeLoc.push_back(1 + i + shadowsSize2D);
-
-            glActiveTexture(GL_TEXTURE1 + i + shadowsSize2D);
-            glBindTexture(((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTextureType(),
-                          ((GLES2Texture*)(shadowsMapCube.at(i)->getTextureRender().get()))->getTexture());
-        }
-
-        while (shadowsMapCubeLoc.size() < maxShadowsCube) {
-            shadowsMapCubeLoc.push_back(shadowsMapCubeLoc[0]);
-        }
-
-        glUniform1iv(uShadowsMapCubeLocation, (GLsizei)shadowsMapCubeLoc.size(), &shadowsMapCubeLoc.front());
     }
 
     GLES2Util::checkGlError("Error on bind texture");
@@ -392,7 +380,7 @@ bool GLES2Object::draw(){
         return false;
     }
         
-    glUniform1i(useTexture, (texture?true:false));
+    glUniform1i(useTexture, (textures.count(S_TEXTURESAMPLER_DIFFUSE)?true:false));
         
     GLenum modeGles = GL_TRIANGLES;
     if (primitiveType == S_PRIMITIVE_TRIANGLES_STRIP){

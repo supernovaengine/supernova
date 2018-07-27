@@ -40,6 +40,20 @@ void Points::updatePoints(){
     render->updateVertexBuffer("points", points.size() * sizeof(Point), &points.front());
 }
 
+void Points::normalizeTextureRects(){
+    if (useTextureRects && this->texWidth != 0 && this->texHeight != 0) {
+        for (int i=0; i < points.size(); i++) {
+            if (!points[i].textureRect.isNormalized()) {
+                points[i].textureRect.setRect(points[i].textureRect.getX() / (float) texWidth,
+                                              points[i].textureRect.getY() / (float) texHeight,
+                                              points[i].textureRect.getWidth() / (float) texWidth,
+                                              points[i].textureRect.getHeight() / (float) texHeight);
+            }
+
+        }
+    }
+}
+
 void Points::addPoint(){
     points.push_back({Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0), Rect(0.0, 0.0, 1.0, 1.0), 1, *material.getColor(), 0.0, true});
 }
@@ -145,6 +159,7 @@ void Points::setPointSprite(int point, int id){
                     reload();
             } else {
                 if (loaded && changed && automaticUpdate) {
+                    normalizeTextureRects();
                     updatePoints();
                 }
             }
@@ -361,7 +376,7 @@ bool Points::textureLoad(){
     
     if (render){
         material.getTexture()->load();
-        render->setTexture(material.getTexture());
+        render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material.getTexture());
     }
     
     return true;
@@ -374,8 +389,9 @@ bool Points::load(){
     
     render->setPrimitiveType(S_PRIMITIVE_POINTS);
     render->setProgramShader(S_SHADER_POINTS);
-    
-    render->setTexture(material.getTexture());
+
+    render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material.getTexture());
+
     if (scene){
         render->setNumLights((int)scene->getLights()->size());
         render->setNumShadows2D((int)scene->getLightData()->shadowsMap2D.size());
@@ -384,15 +400,15 @@ bool Points::load(){
         render->setSceneRender(scene->getSceneRender());
         render->setLightRender(scene->getLightRender());
         render->setFogRender(scene->getFogRender());
-        
-        render->setShadowsMap2D(scene->getLightData()->shadowsMap2D);
+
+        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAP2D, scene->getLightData()->shadowsMap2D);
         render->addProperty(S_PROPERTY_NUMSHADOWS2D, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows2D);
         render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsVPMatrix.front());
         render->addProperty(S_PROPERTY_SHADOWBIAS2D, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsBias2D.front());
         render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR2D, S_PROPERTYDATA_FLOAT2, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsCameraNearFar2D.front());
         render->addProperty(S_PROPERTY_NUMCASCADES2D, S_PROPERTYDATA_INT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowNumCascades2D.front());
 
-        render->setShadowsMapCube(scene->getLightData()->shadowsMapCube);
+        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAPCUBE, scene->getLightData()->shadowsMapCube);
         render->addProperty(S_PROPERTY_SHADOWBIASCUBE, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsBiasCube.front());
         render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFARCUBE, S_PROPERTYDATA_FLOAT2, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsCameraNearFarCube.front());
     }
@@ -401,6 +417,7 @@ bool Points::load(){
         material.getTexture()->load();
         texWidth = material.getTexture()->getWidth();
         texHeight = material.getTexture()->getHeight();
+        normalizeTextureRects();
     }
 
     render->setVertexSize(points.size());
@@ -413,7 +430,7 @@ bool Points::load(){
     render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, "points", 4, sizeof(Point), offsetof(Point, color));
     render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, "points", 1, sizeof(Point), offsetof(Point, rotation));
     if (useTextureRects) {
-        render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, "textureRects", 4, sizeof(Point), offsetof(Point, textureRect));
+        render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, "points", 4, sizeof(Point), offsetof(Point, textureRect));
     }
 
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);

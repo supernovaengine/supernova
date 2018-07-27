@@ -61,6 +61,7 @@ namespace Supernova {
         std::map<int,FramesData> framesRect;
         
         void updatePoints();
+        void normalizeTextureRects();
 
     public:
         Points();

@@ -273,19 +273,17 @@ bool Mesh::load(){
         render->setLightRender(scene->getLightRender());
         render->setFogRender(scene->getFogRender());
 
-        render->setShadowsMap2D(scene->getLightData()->shadowsMap2D);
+        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAP2D, scene->getLightData()->shadowsMap2D);
         render->addProperty(S_PROPERTY_NUMSHADOWS2D, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows2D);
         render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsVPMatrix.front());
         render->addProperty(S_PROPERTY_SHADOWBIAS2D, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsBias2D.front());
         render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR2D, S_PROPERTYDATA_FLOAT2, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsCameraNearFar2D.front());
         render->addProperty(S_PROPERTY_NUMCASCADES2D, S_PROPERTYDATA_INT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowNumCascades2D.front());
 
-        render->setShadowsMapCube(scene->getLightData()->shadowsMapCube);
+        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAPCUBE, scene->getLightData()->shadowsMapCube);
         render->addProperty(S_PROPERTY_SHADOWBIASCUBE, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsBiasCube.front());
         render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFARCUBE, S_PROPERTYDATA_FLOAT2, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsCameraNearFarCube.front());
     }
-
-    Program* mainProgram = render->getProgram();
     
     for (size_t i = 0; i < meshnodes.size(); i++) {
         meshnodes[i]->dynamic = dynamic;
@@ -293,7 +291,7 @@ bool Mesh::load(){
             //Use the same render for meshnode
             meshnodes[i]->setMeshNodeRender(render);
         }else{
-            meshnodes[i]->getMeshNodeRender()->setProgram(mainProgram);
+            meshnodes[i]->getMeshNodeRender()->setParent(render);
         }
         meshnodes[i]->getMeshNodeRender()->setPrimitiveType(primitiveType);
         meshnodes[i]->load();

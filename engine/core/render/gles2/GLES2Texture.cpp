@@ -42,8 +42,10 @@ bool GLES2Texture::loadTexture(TextureData* texturedata) {
     
     glGenTextures(1, &texture_object_id);
 
-    if (texture_object_id <= 0 or texture_object_id >= 512)
+    if (texture_object_id <= 0 or texture_object_id >= MAXTEXTUREID_GLES2) {
+        Log::Error("GLES2 generation texture id outside range 0 to %i: %i", MAXTEXTUREID_GLES2, texture_object_id);
         return false;
+    }
     
     glBindTexture(GL_TEXTURE_2D, texture_object_id);
     
@@ -76,8 +78,10 @@ bool GLES2Texture::loadTextureCube(std::vector<TextureData*> texturesdata){
     
     glGenTextures(1, &texture_object_id);
 
-    if (texture_object_id <= 0 or texture_object_id >= 512)
+    if (texture_object_id <= 0 or texture_object_id >= MAXTEXTUREID_GLES2) {
+        Log::Error("GLES2 generation texture id outside range 0 to %i: %i", MAXTEXTUREID_GLES2, texture_object_id);
         return false;
+    }
     
     glBindTexture(GL_TEXTURE_CUBE_MAP, texture_object_id);
     

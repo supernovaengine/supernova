@@ -1,6 +1,8 @@
 #ifndef gles2texture_h
 #define gles2texture_h
 
+#define MAXTEXTUREID_GLES2 4096
+
 #include "GLES2Header.h"
 #include "render/TextureRender.h"
 

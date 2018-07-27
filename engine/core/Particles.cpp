@@ -43,7 +43,8 @@ void Particles::addParticle(){
 }
 
 void Particles::addParticle(Vector3 position){
-    Points::addPoint(position);
+    Points::addPoint();
+    setParticlePosition(points.size()-1, position);
     setParticleVisible(points.size()-1, false);
     particles.push_back({-1, Vector3(0,0,0), Vector3(0,0,0)});
 }

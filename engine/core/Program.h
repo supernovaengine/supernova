@@ -65,6 +65,10 @@
 
 #define S_PROPERTY_NUMCASCADES2D 41
 
+#define S_TEXTURESAMPLER_DIFFUSE 1
+#define S_TEXTURESAMPLER_SHADOWMAP2D 2
+#define S_TEXTURESAMPLER_SHADOWMAPCUBE 3
+
 #include "render/ProgramRender.h"
 #include <string>
 #include <vector>

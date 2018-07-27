@@ -66,6 +66,7 @@ namespace Supernova {
         std::unordered_map<int, attributeData> vertexAttributes;
         indexData indexAttribute;
         std::unordered_map<int, propertyData> properties;
+        std::unordered_map<int, std::vector<Texture*>> textures;
 
         unsigned int vertexSize;
         int numLights;
@@ -81,12 +82,10 @@ namespace Supernova {
         SceneRender* sceneRender;
         ObjectRender* lightRender;
         ObjectRender* fogRender;
-        
-        Texture* texture;
+
         Program* program;
-        std::vector<Texture*> shadowsMap2D;
-        std::vector<Texture*> shadowsMapCube;
-        
+        ObjectRender* parent;
+
         unsigned int minBufferSize;
         int primitiveType;
         bool programOwned;
@@ -98,11 +97,9 @@ namespace Supernova {
         static ObjectRender* newInstance();
         
         virtual ~ObjectRender();
-        
-        void setTexture(Texture* texture);
+
         void setProgram(Program* program);
-        void setShadowsMap2D(std::vector<Texture*> shadowsMap2D);
-        void setShadowsMapCube(std::vector<Texture*> shadowsMapCube);
+        void setParent(ObjectRender* parent);
         void setSceneRender(SceneRender* sceneRender);
         void setLightRender(ObjectRender* lightRender);
         void setFogRender(ObjectRender* fogRender);
@@ -125,6 +122,8 @@ namespace Supernova {
         void addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride = 0, size_t offset = 0);
         void addIndex(unsigned int size, void* data, bool dynamic = false);
         void addProperty(int type, int datatype, unsigned int size, void* data);
+        void addTexture(int type, Texture* texture);
+        void addTextureVector(int type, std::vector<Texture*> texturesVec);
         
         Program* getProgram();
 

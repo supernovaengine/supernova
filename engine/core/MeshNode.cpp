@@ -147,7 +147,7 @@ bool MeshNode::isVisible(){
 bool MeshNode::textureLoad(){
     if (material && render){
         material->getTexture()->load();
-        render->setTexture(material->getTexture());
+        render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
     }
     
     return true;
@@ -168,18 +168,18 @@ bool MeshNode::shadowLoad(){
 }
 
 bool MeshNode::load(){
-    
+
     render = getMeshNodeRender();
-    
+
     render->addIndex(indices.size(), &indices.front(), dynamic);
-    
-    render->setTexture(material->getTexture());
+
+    render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
     render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor());
     if (material->getTextureRect())
         render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect());
-    
+
     bool renderloaded = true;
-    
+
     if (renderOwned)
         renderloaded = render->load();
     

@@ -11,6 +11,7 @@ ObjectRender::ObjectRender(){
     primitiveType = 0;
     vertexBuffers.clear();
     vertexAttributes.clear();
+    textures.clear();
     indexAttribute.data = NULL;
     properties.clear();
     programOwned = false;
@@ -30,11 +31,9 @@ ObjectRender::ObjectRender(){
     sceneRender = NULL;
     lightRender = NULL;
     fogRender = NULL;
-    
-    texture = NULL;
+
     program = NULL;
-    shadowsMap2D.clear();
-    shadowsMapCube.clear();
+    parent = NULL;
 }
 
 ObjectRender* ObjectRender::newInstance(){
@@ -56,10 +55,6 @@ ObjectRender::~ObjectRender(){
         delete fogRender;
 }
 
-void ObjectRender::setTexture(Texture* texture){
-    this->texture = texture;
-}
-
 void ObjectRender::setProgram(Program* program){
     if (this->program && programOwned)
         delete this->program;
@@ -68,12 +63,9 @@ void ObjectRender::setProgram(Program* program){
     programOwned = false;
 }
 
-void ObjectRender::setShadowsMap2D(std::vector<Texture*> shadowsMap2D){
-    this->shadowsMap2D = shadowsMap2D;
-}
-
-void ObjectRender::setShadowsMapCube(std::vector<Texture*> shadowsMapCube){
-    this->shadowsMapCube = shadowsMapCube;
+void ObjectRender::setParent(ObjectRender* parent){
+    this->parent = parent;
+    this->program = parent->getProgram();
 }
 
 void ObjectRender::setSceneRender(SceneRender* sceneRender){
@@ -130,6 +122,17 @@ void ObjectRender::addIndex(unsigned int size, void* data, bool dynamic){
 void ObjectRender::addProperty(int type, int datatype, unsigned int size, void* data){
     if (data && (size > 0))
         properties[type] = { datatype, size, data };
+}
+
+void ObjectRender::addTexture(int type, Texture* texture){
+    if (texture) {
+        textures[type].clear();
+        textures[type].push_back(texture);
+    }
+}
+
+void ObjectRender::addTextureVector(int type, std::vector<Texture*> texturesVec){
+    textures[type] = texturesVec;
 }
 
 void ObjectRender::updateVertexBuffer(std::string name, unsigned int size, void* data){
@@ -194,9 +197,9 @@ void ObjectRender::checkFog(){
 }
 
 void ObjectRender::checkTextureCoords(){
-    if (texture){
-        hasTextureCoords = true;
-    }
+    if (textures.count(S_TEXTURESAMPLER_DIFFUSE))
+        if (textures[S_TEXTURESAMPLER_DIFFUSE].size() > 0)
+            hasTextureCoords = true;
 }
 
 void ObjectRender::checkTextureRect(){
@@ -209,8 +212,11 @@ void ObjectRender::checkTextureRect(){
 }
 
 void ObjectRender::checkTextureCube(){
-    if (texture && texture->getType() == S_TEXTURE_CUBE){
-        hasTextureCube = true;
+    if (textures.count(S_TEXTURESAMPLER_DIFFUSE)) {
+        for (size_t i = 0; i < textures[S_TEXTURESAMPLER_DIFFUSE].size(); i++) {
+            if (textures[S_TEXTURESAMPLER_DIFFUSE][i]->getType() == S_TEXTURE_CUBE)
+                hasTextureCube = true;
+        }
     }
 }
 
@@ -238,18 +244,12 @@ void ObjectRender::loadProgram(){
 bool ObjectRender::load(){
     
     loadProgram();
-    
-    if (texture)
-        texture->load();
+    for ( const auto &p : textures ) {
+        for (size_t i = 0; i < p.second.size(); i++) {
+            p.second[i]->load();
+        }
+    }
 
-    for (int i = 0; i < shadowsMap2D.size(); i++)
-        if (shadowsMap2D[i])
-            shadowsMap2D[i]->load();
-
-    for (int i = 0; i < shadowsMapCube.size(); i++)
-        if (shadowsMapCube[i])
-            shadowsMapCube[i]->load();
-    
     for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end();)
     {
         if (!program->existVertexAttribute(it->first)){
@@ -305,8 +305,10 @@ bool ObjectRender::finishDraw(){
 }
 
 void ObjectRender::destroy(){
-    if (texture)
-        texture->destroy();
+
+    for (size_t i = 0; i < textures[S_TEXTURESAMPLER_DIFFUSE].size(); i++) {
+        textures[S_TEXTURESAMPLER_DIFFUSE][i]->destroy();
+    }
     
     if (program)
         program->destroy();

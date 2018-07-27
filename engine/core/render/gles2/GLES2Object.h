@@ -26,21 +26,26 @@ namespace Supernova {
         struct propertyGlData{
             GLint handle = -1;
         };
+
+        struct textureGlData{
+            GLint location = -1;
+            unsigned int arraySize = 1;
+        };
         
     private:
         
         GLuint useTexture;
-        GLuint uTextureUnitLocation;
-
-        GLuint uShadowsMap2DLocation;
-        GLuint uShadowsMapCubeLocation;
+        GLint maxTextureUnits;
 
         std::unordered_map<std::string, bufferGlData> vertexBuffersGL;
         std::unordered_map<int, attributeGlData> attributesGL;
         indexGlData indexGL;
         std::unordered_map<int, propertyGlData> propertyGL;
+        std::unordered_map<int, textureGlData> texturesGL;
         
     protected:
+
+        int textureIndex;
 
         void loadVertexBuffer(std::string name, bufferData buff);
         void loadIndex(indexData ibuff);

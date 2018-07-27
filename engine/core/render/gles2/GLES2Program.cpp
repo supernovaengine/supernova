@@ -72,8 +72,8 @@ void GLES2Program::createProgram(int shaderType, int numLights, int numShadows2D
     std::string definitions = "";
 
     maxLights = std::min(MAXLIGHTS_GLES2, numLights);
-    maxShadows2D = std::min(MAXLIGHTS_GLES2, numShadows2D);
-    maxShadowsCube = std::min(MAXLIGHTS_GLES2 - numShadows2D, numShadowsCube);
+    maxShadows2D = std::min(MAXSHADOWS_GLES2, numShadows2D);
+    maxShadowsCube = std::min(MAXSHADOWS_GLES2 - numShadows2D, numShadowsCube);
 
     if (numLights > 0){
         definitions += "#define USE_LIGHTING\n";
@@ -96,10 +96,10 @@ void GLES2Program::createProgram(int shaderType, int numLights, int numShadows2D
     if (isText){
         definitions += "#define IS_TEXT\n";
     }
-    if (numShadows2D > 0){
+    if (maxShadows2D > 0){
         definitions += "#define HAS_SHADOWS2D\n";
     }
-    if (numShadowsCube > 0){
+    if (maxShadowsCube > 0){
         definitions += "#define HAS_SHADOWSCUBE\n";
     }
     
