@@ -24,6 +24,12 @@ void Polygon::setInvertTexture(bool invertTexture){
     }
 }
 
+void Polygon::clear(){
+    vertices.clear();
+    normals.clear();
+    texcoords.clear();
+}
+
 void Polygon::addVertex(Vector3 vertex){
 	vertices.push_back(vertex);
 

@@ -7,10 +7,10 @@ using namespace Supernova;
 
 TextureData* STBImageReader::getRawImage(FileData* filedata){
     
-    //stbi_set_flip_vertically_on_load(true);
-    
     int x,y,channels;
-    
+
+    //stbi_set_flip_vertically_on_load(true);
+
     unsigned char *data = stbi_load_from_memory((stbi_uc const *)filedata->getMemPtr(), filedata->length(), &x, &y, &channels, 0);
     
     int type = S_COLOR_GRAY;

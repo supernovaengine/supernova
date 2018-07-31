@@ -89,31 +89,34 @@ void Object::removeScene(){
 }
 
 void Object::addObject(Object* obj){
-    if (Scene* scene_ptr = dynamic_cast<Scene*>(obj)){
-        scene_ptr->childScene = true;
-    }
-    
-    if (obj->parent == NULL) {
-        objects.push_back(obj);
+    if (obj != NULL) {
+        if (Scene *scene_ptr = dynamic_cast<Scene *>(obj)) {
+            scene_ptr->childScene = true;
+        }
 
-        obj->parent = this;
+        if (obj->parent == NULL) {
+            objects.push_back(obj);
 
-        obj->viewMatrix = viewMatrix;
-        obj->projectionMatrix = projectionMatrix;
-        obj->viewProjectionMatrix = viewProjectionMatrix;
-        obj->cameraPosition = cameraPosition;
-        obj->modelViewProjectionMatrix = modelViewProjectionMatrix;
+            obj->parent = this;
 
-        obj->firstLoaded = false;
+            obj->viewMatrix = viewMatrix;
+            obj->projectionMatrix = projectionMatrix;
+            obj->viewProjectionMatrix = viewProjectionMatrix;
+            obj->cameraPosition = cameraPosition;
+            obj->modelViewProjectionMatrix = modelViewProjectionMatrix;
 
-        if (scene != NULL)
-            obj->setSceneAndConfigure(scene);
+            obj->firstLoaded = false;
 
-        obj->updateMatrix();
+            if (scene != NULL)
+                obj->setSceneAndConfigure(scene);
+
+            obj->updateMatrix();
+        } else {
+            Log::Error("Object has a parent already");
+        }
     }else{
-        Log::Error("Object has a parent already");
+        Log::Error("Can not add a NULL object");
     }
-    
 }
 
 void Object::removeObject(Object* obj){

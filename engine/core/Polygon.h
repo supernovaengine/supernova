@@ -18,6 +18,7 @@ namespace Supernova {
         virtual void setSize(int width, int height);
         virtual void setInvertTexture(bool invertTexture);
 
+        void clear();
         void addVertex(Vector3 vertex);
         void addVertex(float x, float y);
         

@@ -24,7 +24,9 @@ public class KeyListener implements OnKeyListener {
 		if (key == KeyEvent.KEYCODE_DPAD_RIGHT)
 			return 262;
 		if (key == KeyEvent.KEYCODE_DPAD_LEFT)
-			return 263;		
+			return 263;
+		if (key == KeyEvent.KEYCODE_D)
+			return 68;
 		return 0;
 	}
 

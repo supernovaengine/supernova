@@ -5,6 +5,7 @@
 using namespace Supernova;
 
 Sprite::Sprite(): Image(){
+    defaultAnimation = NULL;
 }
 
 Sprite::~Sprite(){
