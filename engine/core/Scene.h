@@ -50,7 +50,8 @@ namespace Supernova {
         std::vector<Light*> lights;
         std::vector<Scene*> subScenes;
         std::vector<GUIObject*> guiObjects;
-        std::vector<PhysicsWorld*> physicsWorlds;
+
+        PhysicsWorld* physicsWorld;
         SkyBox* sky;
         Fog* fog;
         
@@ -99,8 +100,11 @@ namespace Supernova {
         void setAmbientLight(Vector3 ambientLight);
         void setAmbientLight(const float ambientFactor);
 
-        void addPhysics (PhysicsWorld* physics);
-        void removePhysics (PhysicsWorld* physics);
+        void createPhysicsWorld2D();
+        void createPhysicsWorld3D();
+
+        void setPhysicsWorld(PhysicsWorld* physicsWorld);
+        PhysicsWorld* getPhysicsWorld();
         
         Vector3* getAmbientLight();
         std::vector<Light*>* getLights();

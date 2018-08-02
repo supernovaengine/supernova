@@ -6,6 +6,8 @@
 #include "Body.h"
 #include <vector>
 #include "util/FunctionCallback.h"
+#include "math/Vector2.h"
+#include "math/Vector3.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -30,6 +32,14 @@ namespace Supernova {
 
         void setOwnedBodies(bool ownedBodies);
         bool isOwnedBodies();
+
+        virtual bool addBody(Body* body);
+        virtual void removeBody(Body* body);
+
+        virtual void setGravity(Vector3 gravity) = 0;
+        virtual void setGravity(Vector2 gravity) = 0;
+        virtual void setGravity(float gravityX, float gravityY) = 0;
+        virtual void setGravity(float gravityX, float gravityY, float gravityZ) = 0;
 
         void updateBodyObjects();
 

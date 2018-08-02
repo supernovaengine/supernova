@@ -40,6 +40,15 @@ namespace Supernova {
         b2Body* getBox2DBody();
         PhysicsWorld2D* getWorld();
 
+        void createBox(float boxWidth, float boxHeight, Vector2 center = Vector2(0.0, 0.0));
+        void createCircle(Vector2 center, float radius);
+
+        //-------For all shapes
+        void setDensity(float density);
+        void setFriction(float friction);
+        void setRestituition(int restituition);
+        //-------
+
         void addCollisionShape(CollisionShape2D* shape);
         void removeCollisionShape(CollisionShape2D* shape);
 

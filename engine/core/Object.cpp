@@ -3,6 +3,7 @@
 #include "GUIObject.h"
 #include "Light.h"
 #include "Scene.h"
+#include "physics/PhysicsWorld2D.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -133,6 +134,10 @@ void Object::removeObject(Object* obj){
         
         if (GUIObject* guiobject_ptr = dynamic_cast<GUIObject*>(this)){
             ((Scene*)scene)->removeGUIObject(guiobject_ptr);
+        }
+
+        if (body && scene->physicsWorld){
+            scene->getPhysicsWorld()->removeBody(body);
         }
     }
     
@@ -501,6 +506,9 @@ bool Object::load(){
     for (it = objects.begin(); it != objects.end(); ++it) {
         (*it)->load();
     }
+
+    if (scene && body && scene->physicsWorld)
+        scene->getPhysicsWorld()->addBody(body);
 
     loaded = true;
     firstLoaded = true;

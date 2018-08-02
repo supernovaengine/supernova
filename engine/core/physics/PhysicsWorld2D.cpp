@@ -70,35 +70,36 @@ b2World* PhysicsWorld2D::getBox2DWorld(){
     return world;
 }
 
-void PhysicsWorld2D::addBody(Body2D* body){
-    bool founded = false;
+bool PhysicsWorld2D::addBody(Body* body){
+    if (PhysicsWorld::addBody(body)){
+        ((Body2D*)body)->createBody((PhysicsWorld2D*)this);
 
-    std::vector<Body*>::iterator it;
-    for (it = bodies.begin(); it != bodies.end(); ++it) {
-        if (body == (*it))
-            founded = true;
+        return true;
     }
 
-    if (!founded){
-        bodies.push_back(body);
-
-        body->createBody(this);
-    }
+    return false;
 }
 
-void PhysicsWorld2D::removeBody(Body2D* body){
-    std::vector<Body*>::iterator i = std::remove(bodies.begin(), bodies.end(), body);
-    bodies.erase(i, bodies.end());
+void PhysicsWorld2D::removeBody(Body* body){
+    PhysicsWorld::removeBody(body);
 
-    body->destroyBody();
+    ((Body2D*)body)->destroyBody();
+}
+
+void PhysicsWorld2D::setGravity(Vector3 gravity){
+    world->SetGravity(b2Vec2(gravity.x, gravity.y));
 }
 
 void PhysicsWorld2D::setGravity(Vector2 gravity){
-    setGravity(gravity.x, gravity.y);
+    setGravity(Vector3(gravity.x, gravity.y, 0));
 }
 
 void PhysicsWorld2D::setGravity(float gravityX, float gravityY){
-    world->SetGravity(b2Vec2(gravityX, gravityY));
+    setGravity(Vector3(gravityX, gravityY, 0));
+}
+
+void PhysicsWorld2D::setGravity(float gravityX, float gravityY, float gravityZ){
+    setGravity(Vector3(gravityX, gravityY, gravityZ));
 }
 
 void PhysicsWorld2D::setVelocityIterations(int velocityIterations){

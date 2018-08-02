@@ -37,11 +37,14 @@ namespace Supernova {
 
         b2World* getBox2DWorld();
 
-        void addBody(Body2D* body);
-        void removeBody(Body2D* body);
+        virtual bool addBody(Body* body);
+        virtual void removeBody(Body* body);
 
-        void setGravity(Vector2 gravity);
-        void setGravity(float gravityX, float gravityY);
+        virtual void setGravity(Vector3 gravity);
+        virtual void setGravity(Vector2 gravity);
+        virtual void setGravity(float gravityX, float gravityY);
+        virtual void setGravity(float gravityX, float gravityY, float gravityZ);
+
         void setVelocityIterations(int velocityIterations);
         void setPositionIterations(int positionIterations);
 

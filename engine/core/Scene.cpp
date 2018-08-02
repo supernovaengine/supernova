@@ -2,6 +2,7 @@
 
 #include "Engine.h"
 #include "DirectionalLight.h"
+#include "physics/PhysicsWorld2D.h"
 
 #include "Log.h"
 #include "GUIObject.h"
@@ -47,12 +48,10 @@ Scene::~Scene() {
     if (fogRender)
         delete fogRender;
 
-    for (int p=0; p<physicsWorlds.size(); p++) {
-        if (ownedPhysics)
-            delete physicsWorlds[p];
-        else
-            physicsWorlds[p]->attachedScene = NULL;
-    }
+    if (ownedPhysics)
+        delete physicsWorld;
+    else
+        physicsWorld->attachedScene = NULL;
 }
 
 void Scene::addLight (Light* light){    
@@ -112,27 +111,22 @@ void Scene::removeGUIObject (GUIObject* guiobject){
     guiObjects.erase(i, guiObjects.end());
 }
 
-void Scene::addPhysics (PhysicsWorld* physics){
-    bool founded = false;
-
-    std::vector<PhysicsWorld*>::iterator it;
-    for (it = physicsWorlds.begin(); it != physicsWorlds.end(); ++it) {
-        if (physics == (*it))
-            founded = true;
-    }
-
-    if (!founded){
-        physicsWorlds.push_back(physics);
-        physics->attachedScene = this;
-    }
+void Scene::createPhysicsWorld2D(){
+    physicsWorld = new PhysicsWorld2D();
 }
 
-void Scene::removePhysics (PhysicsWorld* physics){
-    if (physics->attachedScene == this) {
-        std::vector<PhysicsWorld *>::iterator i = std::remove(physicsWorlds.begin(), physicsWorlds.end(), physics);
-        physicsWorlds.erase(i, physicsWorlds.end());
-        physics->attachedScene = NULL;
-    }
+void Scene::createPhysicsWorld3D(){
+    //physicsWorld = new PhysicsWorld2D();
+}
+
+void Scene::setPhysicsWorld (PhysicsWorld* physicsWorld){
+    this->physicsWorld = physicsWorld;
+}
+PhysicsWorld* Scene::getPhysicsWorld(){
+    if (!physicsWorld)
+        Log::Error("Physics is not created on scene");
+
+    return physicsWorld;
 }
 
 SceneRender* Scene::getSceneRender(){
@@ -410,10 +404,8 @@ void Scene::setOwnedPhysics(bool ownedPhysics){
 }
 
 void Scene::updatePhysics(float time){
-    for (int p=0; p<physicsWorlds.size(); p++) {
-        physicsWorlds[p]->step(time);
-        physicsWorlds[p]->updateBodyObjects();
-    }
+    physicsWorld->step(time);
+    physicsWorld->updateBodyObjects();
 }
 
 bool Scene::draw() {

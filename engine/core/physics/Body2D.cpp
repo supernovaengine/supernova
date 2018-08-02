@@ -42,6 +42,7 @@ void Body2D::destroyBody(){
     if (body && world) {
         for (int i = 0; i < shapes.size(); i++){
             ((CollisionShape2D*)shapes[i])->destroyFixture();
+            delete shapes[i];
         }
         float scale = world->getPointsToMeterScale();
         bodyDef->position = b2Vec2(bodyDef->position.x * scale, bodyDef->position.y * scale);
@@ -58,6 +59,40 @@ b2Body* Body2D::getBox2DBody(){
 
 PhysicsWorld2D* Body2D::getWorld(){
     return world;
+}
+
+void Body2D::createBox(float boxWidth, float boxHeight, Vector2 center){
+    CollisionShape2D *shape = new CollisionShape2D();
+    shape->setShapeBox(boxWidth, boxHeight);
+    shape->setCenter(center);
+
+    addCollisionShape(shape);
+}
+
+void Body2D::createCircle(Vector2 center, float radius){
+    CollisionShape2D *shape = new CollisionShape2D();
+    shape->setShapeCircle(center, radius);
+    shape->setCenter(center);
+
+    addCollisionShape(shape);
+}
+
+void Body2D::setDensity(float density){
+    for (int i = 0; i < shapes.size(); i++){
+        ((CollisionShape2D*)shapes[i])->setDensity(density);
+    }
+}
+
+void Body2D::setFriction(float friction){
+    for (int i = 0; i < shapes.size(); i++){
+        ((CollisionShape2D*)shapes[i])->setFriction(friction);
+    }
+}
+
+void Body2D::setRestituition(int restituition){
+    for (int i = 0; i < shapes.size(); i++){
+        ((CollisionShape2D*)shapes[i])->setRestituition(restituition);
+    }
 }
 
 void Body2D::addCollisionShape(CollisionShape2D* shape){
