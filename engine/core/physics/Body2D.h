@@ -34,8 +34,8 @@ namespace Supernova {
         Body2D();
         virtual ~Body2D();
 
-        void createBody(PhysicsWorld2D* world);
-        void destroyBody();
+        void create(PhysicsWorld2D* world);
+        void destroy();
 
         b2Body* getBox2DBody();
         PhysicsWorld2D* getWorld();

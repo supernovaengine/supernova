@@ -20,12 +20,12 @@ Body2D::Body2D(): Body() {
 }
 
 Body2D::~Body2D(){
-    destroyBody();
+    destroy();
 
     delete bodyDef;
 }
 
-void Body2D::createBody(PhysicsWorld2D* world){
+void Body2D::create(PhysicsWorld2D* world){
     float scale = world->getPointsToMeterScale();
     bodyDef->position = b2Vec2(bodyDef->position.x / scale, bodyDef->position.y / scale);
 
@@ -34,14 +34,14 @@ void Body2D::createBody(PhysicsWorld2D* world){
     this->world = world;
 
     for (int i = 0; i < shapes.size(); i++){
-        ((CollisionShape2D*)shapes[i])->createFixture(this);
+        ((CollisionShape2D*)shapes[i])->create(this);
     }
 }
 
-void Body2D::destroyBody(){
+void Body2D::destroy(){
     if (body && world) {
         for (int i = 0; i < shapes.size(); i++){
-            ((CollisionShape2D*)shapes[i])->destroyFixture();
+            ((CollisionShape2D*)shapes[i])->destroy();
             delete shapes[i];
         }
         float scale = world->getPointsToMeterScale();
@@ -108,7 +108,7 @@ void Body2D::addCollisionShape(CollisionShape2D* shape){
         shapes.push_back(shape);
 
         if (body){
-            shape->createFixture(this);
+            shape->create(this);
         }
     }
 }
@@ -118,7 +118,7 @@ void Body2D::removeCollisionShape(CollisionShape2D* shape){
     shapes.erase(i, shapes.end());
 
     if (body){
-        shape->destroyFixture();
+        shape->destroy();
     }
 }
 

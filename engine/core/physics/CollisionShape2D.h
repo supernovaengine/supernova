@@ -37,7 +37,6 @@ namespace Supernova {
         std::vector<Vector2> vertices;
         float boxWidth;
         float boxHeight;
-        Vector2 circleCenter;
         float circleRadius;
 
         Vector2 center;
@@ -53,8 +52,8 @@ namespace Supernova {
         
         virtual ~CollisionShape2D();
 
-        void createFixture(Body2D* body);
-        void destroyFixture();
+        void create(Body2D* body);
+        void destroy();
 
         b2Fixture* getBox2DFixture();
         Body2D* getBody();

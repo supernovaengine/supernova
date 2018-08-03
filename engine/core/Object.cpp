@@ -19,7 +19,7 @@ Object::Object(){
     scene = NULL;
     body = NULL;
 
-    ownedBodies = false;
+    ownedBody = true;
 
     viewMatrix = NULL;
     projectionMatrix = NULL;
@@ -38,7 +38,7 @@ Object::~Object(){
         parent->removeObject(this);
 
     if (body) {
-        if (ownedBodies)
+        if (ownedBody)
             delete body;
         else
             body->attachedObject = NULL;
@@ -108,8 +108,13 @@ void Object::addObject(Object* obj){
 
             obj->firstLoaded = false;
 
-            if (scene != NULL)
+            if (scene != NULL) {
                 obj->setSceneAndConfigure(scene);
+
+                if (body && scene->physicsWorld){
+                    scene->getPhysicsWorld()->addBody(body);
+                }
+            }
 
             obj->updateMatrix();
         } else {
@@ -440,30 +445,43 @@ bool Object::isIn3DScene(){
     return false;
 }
 
-bool Object::isOwnedBodies(){
-    return ownedBodies;
+void Object::setOwnedBody(bool ownedBody){
+    this->ownedBody = ownedBody;
 }
 
-void Object::setOwnedBodies(bool ownedBodies){
-    this->ownedBodies = ownedBodies;
+Body2D* Object::createBody2D(){
+    setBody(new Body2D());
+    return (Body2D*)getBody();
 }
 
-void Object::attachBody(Body* body){
+//void Object::createBody3D(){
+//    setBody(new Body3D());
+//}
+
+void Object::setBody(Body* body){
+    if (!body && this->body){
+        this->body->attachedObject = NULL;
+    }
     if (!body->attachedObject){
-        this->body = body;
-        body->attachedObject = this;
+        if (this->body != body) {
+            if (ownedBody)
+                delete this->body;
 
-        body->setPosition(position);
-        body->setRotation(rotation);
+            this->body = body;
+            body->attachedObject = this;
+
+            body->setPosition(position);
+            body->setRotation(rotation);
+        }
     }else{
         Log::Error("Body is attached with other object already");
     }
 }
 
-void Object::detachBody(){
-    this->body->attachedObject = NULL;
-    this->body = NULL;
+Body* Object::getBody(){
+    return body;
 }
+
 
 void Object::updateFromBody(){
     if (body){

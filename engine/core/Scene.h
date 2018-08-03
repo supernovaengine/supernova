@@ -63,7 +63,7 @@ namespace Supernova {
         bool useDepth;
         bool useLight;
 
-        bool ownedPhysics;
+        bool ownedPhysicsWorld;
 
         // S_OPTION
         int userDefinedTransparency;
@@ -100,8 +100,10 @@ namespace Supernova {
         void setAmbientLight(Vector3 ambientLight);
         void setAmbientLight(const float ambientFactor);
 
-        void createPhysicsWorld2D();
-        void createPhysicsWorld3D();
+        void setOwnedPhysicsWorld(bool ownedPhysicsWorld);
+
+        PhysicsWorld2D* createPhysicsWorld2D();
+        //void createPhysicsWorld3D();
 
         void setPhysicsWorld(PhysicsWorld* physicsWorld);
         PhysicsWorld* getPhysicsWorld();
@@ -137,9 +139,6 @@ namespace Supernova {
         bool updateCameraSize();
 
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
-
-        bool isOwnedPhysics();
-        void setOwnedPhysics(bool ownedPhysics);
 
         void updatePhysics(float time);
 

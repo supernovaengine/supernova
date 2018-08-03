@@ -60,7 +60,8 @@ PhysicsWorld2D::PhysicsWorld2D(float pointsToMeterScale): PhysicsWorld2D(){
 
 PhysicsWorld2D::~PhysicsWorld2D(){
     for (int i = 0; i < bodies.size(); i++){
-        ((Body2D*)bodies[i])->destroyBody();
+        ((Body2D*)bodies[i])->destroy();
+        delete bodies[i];
     }
     delete contactListener;
     delete world;
@@ -72,7 +73,7 @@ b2World* PhysicsWorld2D::getBox2DWorld(){
 
 bool PhysicsWorld2D::addBody(Body* body){
     if (PhysicsWorld::addBody(body)){
-        ((Body2D*)body)->createBody((PhysicsWorld2D*)this);
+        ((Body2D*)body)->create((PhysicsWorld2D*)this);
 
         return true;
     }
@@ -83,7 +84,7 @@ bool PhysicsWorld2D::addBody(Body* body){
 void PhysicsWorld2D::removeBody(Body* body){
     PhysicsWorld::removeBody(body);
 
-    ((Body2D*)body)->destroyBody();
+    ((Body2D*)body)->destroy();
 }
 
 void PhysicsWorld2D::setGravity(Vector3 gravity){

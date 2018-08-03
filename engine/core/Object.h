@@ -24,7 +24,7 @@ namespace Supernova {
         
         bool firstLoaded;
 
-        bool ownedBodies;
+        bool ownedBody;
         
         void setSceneAndConfigure(Scene* scene);
         void removeScene();
@@ -114,11 +114,14 @@ namespace Supernova {
         void moveUp();
         void moveDown();
 
-        bool isOwnedBodies();
-        void setOwnedBodies(bool ownedBodies);
+        void setOwnedBody(bool ownedBody);
 
-        void attachBody(Body* body);
-        void detachBody();
+        Body2D* createBody2D();
+        //Body3D* createBody3D();
+
+        void setBody(Body* body);
+        Body* getBody();
+
         void updateFromBody();
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);

@@ -17,7 +17,7 @@ Body::Body(){
 
 Body::~Body(){
     if (attachedObject)
-        attachedObject->detachBody();
+        attachedObject->setBody(NULL);
 
     if (ownedShapes){
         for (int i = 0; i < shapes.size(); i++)

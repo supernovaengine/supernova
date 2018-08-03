@@ -22,7 +22,6 @@ CollisionShape2D::CollisionShape2D(): CollisionShape(){
 
     boxWidth = 0.0f;
     boxHeight = 0.0f;
-    circleCenter = Vector2();
     circleRadius = 0.0f;
 
     center = Vector2(0.0f, 0.0f);
@@ -46,13 +45,13 @@ CollisionShape2D::CollisionShape2D(Vector2 circleCenter, float circleRadius): Co
 }
 
 CollisionShape2D::~CollisionShape2D(){
-    destroyFixture();
+    destroy();
 
     delete fixtureDef;
     delete shape;
 }
 
-void CollisionShape2D::createFixture(Body2D* body){
+void CollisionShape2D::create(Body2D* body){
     computeShape(body->getWorld()->getPointsToMeterScale());
 
     fixture = body->getBox2DBody()->CreateFixture(fixtureDef);
@@ -60,7 +59,7 @@ void CollisionShape2D::createFixture(Body2D* body){
     this->body = body;
 }
 
-void CollisionShape2D::destroyFixture(){
+void CollisionShape2D::destroy(){
     if (fixture && body) {
         body->getBox2DBody()->DestroyFixture(fixture);
         fixture = NULL;
@@ -123,7 +122,7 @@ void CollisionShape2D::setShapeVertices(std::vector<Vector3> vertices){
 }
 
 void CollisionShape2D::setShapeCircle(Vector2 center, float radius){
-    this->circleCenter = center;
+    this->center = center;
     this->circleRadius = radius;
     
     if (shape)
@@ -144,7 +143,7 @@ void CollisionShape2D::computeShape(float scale){
         if (boxWidth > 0 && boxHeight > 0) {
             ((b2PolygonShape *) shape)->SetAsBox(boxWidth / scale,
                                                  boxHeight / scale,
-                                                 b2Vec2((boxWidth - center.x) / scale, (boxHeight - center.y) / scale),
+                                                 b2Vec2((boxWidth - center.x + position.x) / scale, (boxHeight - center.y + position.y) / scale),
                                                  0);
         }else{
             Log::Error("Can not create shape box with size 0");
@@ -157,7 +156,7 @@ void CollisionShape2D::computeShape(float scale){
             b2Vec2 b2Vertices[b2_maxPolygonVertices];
 
             b2Transform xf;
-            xf.p = b2Vec2(-center.x / scale, -center.y / scale);
+            xf.p = b2Vec2((-center.x + position.x) / scale, (-center.y + position.y) / scale);
             xf.q.Set(0);
 
             for (int i = 0; i < vertices.size(); i++){
@@ -176,7 +175,7 @@ void CollisionShape2D::computeShape(float scale){
     }else if (shapeType == S_COLLISIONSHAPE2D_CIRCLE) {
 
         if (circleRadius > 0){
-            ((b2CircleShape *) shape)->m_p.Set(circleCenter.x / scale, circleCenter.y / scale);
+            ((b2CircleShape *) shape)->m_p.Set((center.x + position.x) / scale, (center.y + position.y) / scale);
             ((b2CircleShape *) shape)->m_radius = circleRadius / scale;
         }else{
             Log::Error("Can not create shape circle with radius 0");
