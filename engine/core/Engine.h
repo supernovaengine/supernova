@@ -9,12 +9,6 @@
 
 #define S_GLES2 1
 
-#define S_SCALING_FITWIDTH 1
-#define S_SCALING_FITHEIGHT 2
-#define S_SCALING_LETTERBOX 3
-#define S_SCALING_CROP 4
-#define S_SCALING_STRETCH 5
-
 #define S_PLATFORM_ANDROID 1
 #define S_PLATFORM_IOS 2
 #define S_PLATFORM_WEB 3
@@ -23,6 +17,14 @@ namespace Supernova {
 
     class Scene;
     class Rect;
+
+    enum Scaling{
+        FITWIDTH,
+        FITHEIGHT,
+        LETTERBOX,
+        CROP,
+        STRETCH
+    };
 
     class Engine {
         
@@ -44,7 +46,7 @@ namespace Supernova {
         static int renderAPI;
         static bool mouseAsTouch;
         static bool useDegrees;
-        static int scalingMode;
+        static Scaling scalingMode;
         static bool defaultNearestScaleTexture;
         static bool defaultResampleToPOTTexture;
         static bool fixedTimePhysics;
@@ -85,7 +87,7 @@ namespace Supernova {
         static void setRenderAPI(int renderAPI);
         static int getRenderAPI();
         
-        static void setScalingMode(int scalingMode);
+        static void setScalingMode(Scaling scalingMode);
         static int getScalingMode();
         
         static void setMouseAsTouch(bool mouseAsTouch);

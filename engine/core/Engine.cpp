@@ -48,7 +48,7 @@ Rect Engine::viewRect;
 int Engine::renderAPI;
 bool Engine::mouseAsTouch;
 bool Engine::useDegrees;
-int Engine::scalingMode;
+Scaling Engine::scalingMode;
 bool Engine::defaultNearestScaleTexture;
 bool Engine::defaultResampleToPOTTexture;
 bool Engine::fixedTimePhysics;
@@ -131,11 +131,11 @@ void Engine::setCanvasSize(int canvasWidth, int canvasHeight){
     }
     
     //When canvas size is changed
-    if (scalingMode == S_SCALING_FITWIDTH){
+    if (scalingMode == Scaling::FITWIDTH){
         Engine::canvasWidth = canvasWidth;
         Engine::canvasHeight = screenHeight * canvasWidth / screenWidth;
     }
-    if (scalingMode == S_SCALING_FITHEIGHT){
+    if (scalingMode == Scaling::FITHEIGHT){
         Engine::canvasHeight = canvasHeight;
         Engine::canvasWidth = screenWidth * canvasHeight / screenHeight;
     }
@@ -173,7 +173,7 @@ int Engine::getRenderAPI(){
     return renderAPI;
 }
 
-void Engine::setScalingMode(int scalingMode){
+void Engine::setScalingMode(Scaling scalingMode){
     Engine::scalingMode = scalingMode;
 }
 
@@ -267,7 +267,7 @@ void Engine::systemStart(int width, int height){
     Engine::setMouseAsTouch(true);
     Engine::setUseDegrees(true);
     Engine::setRenderAPI(S_GLES2);
-    Engine::setScalingMode(S_SCALING_FITWIDTH);
+    Engine::setScalingMode(Scaling::FITWIDTH);
     Engine::setDefaultNearestScaleTexture(false);
     Engine::setDefaultResampleToPOTTexture(true);
     Engine::setFixedTimePhysics(false);
@@ -304,7 +304,7 @@ void Engine::systemSurfaceChanged(int width, int height) {
     float canvasAspect = (float)Engine::getPreferedCanvasWidth() / (float)Engine::getPreferedCanvasHeight();
     
     //When canvas size is not changed
-    if (Engine::getScalingMode() == S_SCALING_LETTERBOX){
+    if (Engine::getScalingMode() == Scaling::LETTERBOX){
         if (screenAspect < canvasAspect){
             float aspect = (float)Engine::getScreenWidth() / (float)Engine::getPreferedCanvasWidth();
             int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
@@ -320,7 +320,7 @@ void Engine::systemSurfaceChanged(int width, int height) {
         }
     }
     
-    if (Engine::getScalingMode() == S_SCALING_CROP){
+    if (Engine::getScalingMode() == Scaling::CROP){
         if (screenAspect > canvasAspect){
             float aspect = (float)Engine::getScreenWidth() / (float)Engine::getPreferedCanvasWidth();
             int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
