@@ -28,6 +28,7 @@ Scene::Scene() {
     fogRender = NULL;
     textureRender = NULL;
 
+    physicsWorld = NULL;
     ownedPhysicsWorld = true;
 
     drawShadowLightPos = Vector3();
@@ -406,8 +407,10 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
 }
 
 void Scene::updatePhysics(float time){
-    physicsWorld->step(time);
-    physicsWorld->updateBodyObjects();
+    if (physicsWorld) {
+        physicsWorld->step(time);
+        physicsWorld->updateBodyObjects();
+    }
 }
 
 bool Scene::draw() {
