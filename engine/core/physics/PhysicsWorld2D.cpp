@@ -75,6 +75,11 @@ bool PhysicsWorld2D::addBody(Body* body){
     if (PhysicsWorld::addBody(body)){
         ((Body2D*)body)->create((PhysicsWorld2D*)this);
 
+        //Try to initialize joints
+        for (int j = 0; j < joints.size(); j++){
+            joints[j]->create(this);
+        }
+
         return true;
     }
 
@@ -85,6 +90,31 @@ void PhysicsWorld2D::removeBody(Body* body){
     PhysicsWorld::removeBody(body);
 
     ((Body2D*)body)->destroy();
+}
+
+bool PhysicsWorld2D::addJoint(Joint2D* joint){
+    bool founded = false;
+
+    std::vector<Joint2D*>::iterator it;
+    for (it = joints.begin(); it != joints.end(); ++it) {
+        if (joint == (*it))
+            founded = true;
+    }
+
+    if (!founded){
+        joints.push_back(joint);
+
+        joint->create(this);
+
+        return true;
+    }
+
+    return false;
+}
+
+void PhysicsWorld2D::removeJoint(Joint2D* joint){
+    std::vector<Joint2D*>::iterator i = std::remove(joints.begin(), joints.end(), joint);
+    joints.erase(i, joints.end());
 }
 
 void PhysicsWorld2D::setGravity(Vector3 gravity){

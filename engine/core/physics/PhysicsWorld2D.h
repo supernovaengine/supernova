@@ -8,6 +8,7 @@
 #include "PhysicsWorld.h"
 #include "Body2D.h"
 #include "Contact2D.h"
+#include "Joint2D.h"
 
 class b2World;
 class b2ContactListener;
@@ -25,6 +26,8 @@ namespace Supernova {
         //Cannot be changed after creation
         float pointsToMeterScale;
 
+        std::vector<Joint2D*> joints;
+
     public:
         PhysicsWorld2D();
         PhysicsWorld2D(float pointsToMeterScale);
@@ -39,6 +42,9 @@ namespace Supernova {
 
         virtual bool addBody(Body* body);
         virtual void removeBody(Body* body);
+
+        bool addJoint(Joint2D* joint);
+        void removeJoint(Joint2D* joint);
 
         virtual void setGravity(Vector3 gravity);
         virtual void setGravity(Vector2 gravity);

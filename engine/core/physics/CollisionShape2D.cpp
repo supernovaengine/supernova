@@ -52,11 +52,13 @@ CollisionShape2D::~CollisionShape2D(){
 }
 
 void CollisionShape2D::create(Body2D* body){
-    computeShape(body->getWorld()->getPointsToMeterScale());
+    if (!fixture) {
+        computeShape(body->getWorld()->getPointsToMeterScale());
 
-    fixture = body->getBox2DBody()->CreateFixture(fixtureDef);
-    fixture->SetUserData(this);
-    this->body = body;
+        fixture = body->getBox2DBody()->CreateFixture(fixtureDef);
+        fixture->SetUserData(this);
+        this->body = body;
+    }
 }
 
 void CollisionShape2D::destroy(){

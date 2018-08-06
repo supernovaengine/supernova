@@ -30,6 +30,10 @@ namespace Supernova {
 
         PhysicsWorld2D* world;
 
+        float density;
+        float friction;
+        int restituition;
+
     public:
         Body2D();
         virtual ~Body2D();

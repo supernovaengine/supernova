@@ -460,9 +460,12 @@ Body2D* Object::createBody2D(){
 
 void Object::setBody(Body* body){
     if (!body && this->body){
+
         this->body->attachedObject = NULL;
-    }
-    if (!body->attachedObject){
+        this->body = NULL;
+
+    }else if (!body->attachedObject){
+
         if (this->body != body) {
             if (ownedBody)
                 delete this->body;
@@ -473,6 +476,7 @@ void Object::setBody(Body* body){
             body->setPosition(position);
             body->setRotation(rotation);
         }
+
     }else{
         Log::Error("Body is attached with other object already");
     }

@@ -17,6 +17,10 @@ Body2D::Body2D(): Body() {
 
     body = NULL;
     bodyDef = new b2BodyDef();
+
+    density = 0;
+    friction = 0;
+    restituition = 0;
 }
 
 Body2D::~Body2D(){
@@ -26,14 +30,23 @@ Body2D::~Body2D(){
 }
 
 void Body2D::create(PhysicsWorld2D* world){
-    float scale = world->getPointsToMeterScale();
-    bodyDef->position = b2Vec2(bodyDef->position.x / scale, bodyDef->position.y / scale);
+    if (!body) {
+        float scale = world->getPointsToMeterScale();
+        bodyDef->position = b2Vec2(bodyDef->position.x / scale, bodyDef->position.y / scale);
 
-    body = world->getBox2DWorld()->CreateBody(bodyDef);
-    body->SetUserData(this);
-    this->world = world;
+        body = world->getBox2DWorld()->CreateBody(bodyDef);
+        body->SetUserData(this);
+        this->world = world;
+    }
 
     for (int i = 0; i < shapes.size(); i++){
+        if (density != 0)
+            ((CollisionShape2D*)shapes[i])->setDensity(density);
+        if (friction != 0)
+            ((CollisionShape2D*)shapes[i])->setFriction(friction);
+        if (restituition != 0)
+            ((CollisionShape2D*)shapes[i])->setRestituition(restituition);
+
         ((CollisionShape2D*)shapes[i])->create(this);
     }
 }
@@ -78,18 +91,21 @@ void Body2D::createCircle(Vector2 center, float radius){
 }
 
 void Body2D::setDensity(float density){
+    this->density = density;
     for (int i = 0; i < shapes.size(); i++){
         ((CollisionShape2D*)shapes[i])->setDensity(density);
     }
 }
 
 void Body2D::setFriction(float friction){
+    this->friction = friction;
     for (int i = 0; i < shapes.size(); i++){
         ((CollisionShape2D*)shapes[i])->setFriction(friction);
     }
 }
 
 void Body2D::setRestituition(int restituition){
+    this->restituition = restituition;
     for (int i = 0; i < shapes.size(); i++){
         ((CollisionShape2D*)shapes[i])->setRestituition(restituition);
     }

@@ -126,11 +126,18 @@ PhysicsWorld2D* Scene::createPhysicsWorld2D(){
 //}
 
 void Scene::setPhysicsWorld (PhysicsWorld* physicsWorld){
-    if (this->physicsWorld != physicsWorld) {
+    if (!physicsWorld && this->physicsWorld) {
+
+        this->physicsWorld->attachedScene = NULL;
+        this->physicsWorld = NULL;
+
+    }else if (this->physicsWorld != physicsWorld) {
+
         if (ownedPhysicsWorld)
             delete this->physicsWorld;
 
         this->physicsWorld = physicsWorld;
+
     }
 }
 PhysicsWorld* Scene::getPhysicsWorld(){
