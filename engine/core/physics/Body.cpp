@@ -1,6 +1,7 @@
 #include "Body.h"
 
 #include "Object.h"
+#include "PhysicsWorld2D.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -33,12 +34,23 @@ std::string Body::getName(){
     return name;
 }
 
+PhysicsWorld* Body::getWorld(){
+    return world;
+}
+
 void Body::setOwnedShapes(bool ownedShapes){
     this->ownedShapes = ownedShapes;
 }
 
 bool Body::isOwnedShapes(){
     return ownedShapes;
+}
+
+bool Body::isWorldSpace(){
+    if (world)
+        return world->isWorldSpace();
+
+    return false;
 }
 
 void Body::updateObject(){

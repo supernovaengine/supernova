@@ -28,8 +28,6 @@ namespace Supernova {
         b2Body* body;
         b2BodyDef* bodyDef;
 
-        PhysicsWorld2D* world;
-
         float density;
         float friction;
         int restituition;

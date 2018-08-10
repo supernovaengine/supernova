@@ -12,6 +12,8 @@ using namespace Supernova;
 PhysicsWorld::PhysicsWorld(){
     ownedBodies = true;
     attachedScene = NULL;
+
+    worldSpace = false;
 }
 
 PhysicsWorld::~PhysicsWorld(){
@@ -59,4 +61,12 @@ void PhysicsWorld::updateBodyObjects(){
     for (int i =0; i < bodies.size(); i++){
         bodies[i]->updateObject();
     }
+}
+
+bool PhysicsWorld::isWorldSpace() const {
+    return worldSpace;
+}
+
+void PhysicsWorld::setWorldSpace(bool worldSpace) {
+    PhysicsWorld::worldSpace = worldSpace;
 }

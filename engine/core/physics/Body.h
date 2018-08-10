@@ -13,6 +13,7 @@
 
 namespace Supernova {
     class Object;
+    class PhysicsWorld;
 
     class Body {
 
@@ -22,10 +23,11 @@ namespace Supernova {
         std::string name;
 
     protected:
-        bool is3D;
         Vector3 center;
         Object* attachedObject;
         std::vector<CollisionShape*> shapes;
+        PhysicsWorld* world;
+
         bool ownedShapes;
 
         Body();
@@ -38,6 +40,10 @@ namespace Supernova {
 
         virtual void setRotation(Quaternion rotation) = 0;
         virtual Quaternion getRotation() = 0;
+
+        bool isWorldSpace();
+
+        PhysicsWorld* getWorld();
 
         void updateObject();
 

@@ -39,11 +39,11 @@ namespace Supernova {
 
         void identity();
 
-        bool inverse(Matrix3& rkInverse, float fTolerance) const;
+        bool calcInverse(Matrix3& rkInverse, float fTolerance) const;
 
-        Matrix3 getInverse(float fTolerance);
-        Matrix3 getTranspose();
-        float getDeterminant();
+        Matrix3 inverse(float fTolerance);
+        Matrix3 transpose();
+        float determinant();
 
         static Matrix3 rotateMatrix(const float angle, const Vector3 &axis);
         static Matrix3 rotateMatrix(const float azimuth, const float elevation);

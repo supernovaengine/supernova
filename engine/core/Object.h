@@ -122,10 +122,11 @@ namespace Supernova {
         void setBody(Body* body);
         Body* getBody();
 
+        void updateBodyFromObject();
         void updateFromBody();
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
-        virtual void updateMatrix();
+        virtual void updateMatrix(bool updateBody = true);
 
         virtual bool load();
         virtual bool draw();

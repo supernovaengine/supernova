@@ -275,7 +275,7 @@ void Points::updateMatrix(){
     ConcreteObject::updateMatrix();
 
     if (this->viewMatrix){
-       this->normalMatrix = viewMatrix->getTranspose();
+       this->normalMatrix = viewMatrix->transpose();
     }
 
     updatePointScale();

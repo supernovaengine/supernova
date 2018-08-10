@@ -134,7 +134,7 @@ void Matrix3::identity() {
             set(i,j,(i==j ? 1.f : 0.f));
 }
 
-Matrix3 Matrix3::getTranspose() {
+Matrix3 Matrix3::transpose() {
     Matrix3 tmp;
 
     for (int i=0;i<3;i++)
@@ -144,7 +144,7 @@ Matrix3 Matrix3::getTranspose() {
     return tmp;
 }
 
-bool Matrix3::inverse(Matrix3& rkInverse, float fTolerance) const {
+bool Matrix3::calcInverse(Matrix3& rkInverse, float fTolerance) const {
     rkInverse[0][0] = matrix[1][1]*matrix[2][2] - matrix[2][1]*matrix[1][2];
     rkInverse[1][0] = matrix[2][0]*matrix[1][2] - matrix[1][0]*matrix[2][2];
     rkInverse[2][0] = matrix[1][0]*matrix[2][1] - matrix[2][0]*matrix[1][1];
@@ -173,13 +173,13 @@ bool Matrix3::inverse(Matrix3& rkInverse, float fTolerance) const {
     return true;
 }
 
-Matrix3 Matrix3::getInverse(float fTolerance) {
+Matrix3 Matrix3::inverse(float fTolerance) {
     Matrix3 kInverse(0,0,0,0,0,0,0,0,0);
-    inverse(kInverse,fTolerance);
+    calcInverse(kInverse,fTolerance);
     return kInverse;
 }
 
-float Matrix3::getDeterminant() {
+float Matrix3::determinant() {
     float fCofactor00 = matrix[1][1]*matrix[2][2] - matrix[2][1]*matrix[1][2];
     float fCofactor01 = matrix[2][1]*matrix[0][2] - matrix[0][1]*matrix[2][2];
     float fCofactor02 = matrix[0][1]*matrix[1][2] - matrix[1][1]*matrix[0][2];

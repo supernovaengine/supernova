@@ -182,9 +182,6 @@ void Object::setPosition(Vector2 position){
 }
 
 void Object::setPosition(Vector3 position){
-    if (body)
-        body->setPosition(position);
-
     if (this->position != position){
         this->position = position;
         updateMatrix();
@@ -210,9 +207,6 @@ void Object::setRotation(const float xAngle, const float yAngle, const float zAn
 }
 
 void Object::setRotation(Quaternion rotation){
-    if (body)
-        body->setRotation(rotation);
-
     if (this->rotation != rotation){
         this->rotation = rotation;
         updateMatrix();
@@ -402,7 +396,7 @@ void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     
 }
 
-void Object::updateMatrix(){
+void Object::updateMatrix(bool updateBody){
 
     Matrix4 centerMatrix = Matrix4::translateMatrix(-center);
     Matrix4 scaleMatrix = Matrix4::scaleMatrix(scale);
@@ -424,6 +418,10 @@ void Object::updateMatrix(){
     }
 
     updateMVPMatrix();
+
+    if (updateBody) {
+        updateBodyFromObject();
+    }
 
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
@@ -473,8 +471,7 @@ void Object::setBody(Body* body){
             this->body = body;
             body->attachedObject = this;
 
-            body->setPosition(position);
-            body->setRotation(rotation);
+            updateBodyFromObject();
         }
 
     }else{
@@ -486,6 +483,18 @@ Body* Object::getBody(){
     return body;
 }
 
+void Object::updateBodyFromObject(){
+    if (body) {
+        if (body->isWorldSpace()) {
+            body->setPosition(worldPosition);
+            body->setRotation(worldRotation);
+        }else{
+            body->setPosition(position);
+            body->setRotation(rotation);
+        }
+    }
+}
+
 
 void Object::updateFromBody(){
     if (body){
@@ -493,18 +502,34 @@ void Object::updateFromBody(){
         Vector3 bodyPosition = body->getPosition();
         Quaternion bodyRotation = body->getRotation();
 
-        if (getPosition() != bodyPosition){
-            position = bodyPosition;
-            needUpdate = true;
-        }
+        if (body->isWorldSpace()) {
 
-        if (getRotation() != bodyRotation){
-            rotation = bodyRotation;
-            needUpdate = true;
+            if (getWorldPosition() != bodyPosition) {
+                position = parent->getModelMatrix().inverse() * bodyPosition;
+                needUpdate = true;
+            }
+
+            if (getWorldRotation() != bodyRotation) {
+                rotation = parent->rotation.inverse() * bodyRotation;
+                needUpdate = true;
+            }
+
+        }else{
+
+            if (getPosition() != bodyPosition) {
+                position = bodyPosition;
+                needUpdate = true;
+            }
+
+            if (getRotation() != bodyRotation) {
+                rotation = bodyRotation;
+                needUpdate = true;
+            }
+            
         }
 
         if (needUpdate)
-            updateMatrix();
+            updateMatrix(false);
     }
 }
 

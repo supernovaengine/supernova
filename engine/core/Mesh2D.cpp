@@ -27,7 +27,7 @@ void Mesh2D::updateMatrix(){
     if (billboard) {
         if (viewMatrix) {
 
-            rotation.fromRotationMatrix(viewMatrix->getTranspose());
+            rotation.fromRotationMatrix(viewMatrix->transpose());
             if (parent)
                 rotation = parent->getWorldRotation().inverse() * rotation;
 

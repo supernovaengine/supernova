@@ -195,7 +195,7 @@ void Matrix4::translateInPlace(float x, float y, float z){
     }
 }
 
-Matrix4 Matrix4::getTranspose(){
+Matrix4 Matrix4::transpose(){
     Matrix4 tmp;
 
     for (int i=0;i<4;i++)
@@ -205,7 +205,7 @@ Matrix4 Matrix4::getTranspose(){
     return tmp;
 }
 
-Matrix4 Matrix4::getInverse(){
+Matrix4 Matrix4::inverse(){
     float s[6];
     float c[6];
     s[0] = get(0,0)*get(1,1) - get(1,0)*get(0,1);

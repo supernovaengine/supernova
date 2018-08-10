@@ -98,7 +98,6 @@ namespace Supernova {
 
         void divideByW();
 
-
         float dotProduct(const Vector4& vec) const;
 
         bool isNaN() const;

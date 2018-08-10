@@ -79,7 +79,7 @@ void DirectionalLight::updateLightCamera(){
             if (scene->getCamera()->getType() == S_CAMERA_PERSPECTIVE) {
 
                 Matrix4 projection = *scene->getCamera()->getProjectionMatrix();
-                Matrix4 invProjection = projection.getInverse();
+                Matrix4 invProjection = projection.inverse();
                 std::vector<Vector4> v1 = {
                     invProjection * Vector4(-1.f, 1.f, -1.f, 1.f),
                     invProjection * Vector4(1.f, 1.f, -1.f, 1.f),
@@ -129,13 +129,13 @@ void DirectionalLight::updateLightCamera(){
                 if (scene->getCamera()->getType() == S_CAMERA_PERSPECTIVE) {
 
                     Matrix4 cameraProjection = Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca], splitFar[ca]);
-                    sceneCameraInv = (cameraProjection * *scene->getCamera()->getViewMatrix()).getInverse();
+                    sceneCameraInv = (cameraProjection * *scene->getCamera()->getViewMatrix()).inverse();
 
                     cascadeCameraNearFar[ca] = Vector2(splitNear[ca], splitFar[ca]);
 
                 }else{
 
-                    sceneCameraInv = scene->getCamera()->getViewProjectionMatrix()->getInverse();
+                    sceneCameraInv = scene->getCamera()->getViewProjectionMatrix()->inverse();
 
                     cascadeCameraNearFar[ca] = scene->getCamera()->getNearFarPlane();
 

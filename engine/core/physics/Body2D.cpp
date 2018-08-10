@@ -57,10 +57,10 @@ void Body2D::destroy(){
             ((CollisionShape2D*)shapes[i])->destroy();
             delete shapes[i];
         }
-        float scale = world->getPointsToMeterScale();
+        float scale = ((PhysicsWorld2D*)world)->getPointsToMeterScale();
         bodyDef->position = b2Vec2(bodyDef->position.x * scale, bodyDef->position.y * scale);
 
-        world->getBox2DWorld()->DestroyBody(body);
+        ((PhysicsWorld2D*)world)->getBox2DWorld()->DestroyBody(body);
         body = NULL;
         world = NULL;
     }
@@ -71,7 +71,7 @@ b2Body* Body2D::getBox2DBody(){
 }
 
 PhysicsWorld2D* Body2D::getWorld(){
-    return world;
+    return (PhysicsWorld2D*)world;
 }
 
 void Body2D::createBox(float boxWidth, float boxHeight, Vector2 center){
@@ -258,7 +258,7 @@ void Body2D::applyTorque(const float torque){
 void Body2D::setPosition(Vector2 position){
     float scale = 1;
     if (world)
-        scale = world->getPointsToMeterScale();
+        scale = ((PhysicsWorld2D*)world)->getPointsToMeterScale();
 
     b2Vec2 nPosition(position.x / scale, position.y / scale);
 
@@ -286,7 +286,7 @@ void Body2D::setRotation(Quaternion rotation){
 Vector3 Body2D::getPosition(){
     float scale = 1;
     if (world)
-        scale = world->getPointsToMeterScale();
+        scale = ((PhysicsWorld2D*)world)->getPointsToMeterScale();
 
     b2Vec2 position = bodyDef->position;
     if (body) {

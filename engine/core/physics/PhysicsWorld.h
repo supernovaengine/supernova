@@ -22,8 +22,10 @@ namespace Supernova {
 
     protected:
         std::vector<Body*> bodies;
-        bool ownedBodies;
         Scene* attachedScene;
+        bool worldSpace;
+
+        bool ownedBodies;
 
         PhysicsWorld();
 
@@ -40,6 +42,9 @@ namespace Supernova {
         virtual void setGravity(Vector2 gravity) = 0;
         virtual void setGravity(float gravityX, float gravityY) = 0;
         virtual void setGravity(float gravityX, float gravityY, float gravityZ) = 0;
+
+        bool isWorldSpace() const;
+        void setWorldSpace(bool worldSpace);
 
         void updateBodyObjects();
 

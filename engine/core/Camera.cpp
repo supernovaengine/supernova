@@ -375,7 +375,7 @@ Ray Camera::pointsToRay(float x, float y) {
     Vector4 far_point_ndc = {normalized_x, normalized_y,  1, 1};
 
     Vector4 near_point_world, far_point_world;
-    Matrix4 inverseViewProjection = getViewProjectionMatrix()->getInverse();
+    Matrix4 inverseViewProjection = getViewProjectionMatrix()->inverse();
 
     near_point_world = inverseViewProjection * near_point_ndc;
     far_point_world = inverseViewProjection * far_point_ndc;

@@ -45,8 +45,8 @@ namespace Supernova {
         void identity();
         void translateInPlace(float x, float y, float z);
 
-        Matrix4 getInverse();
-        Matrix4 getTranspose();
+        Matrix4 inverse();
+        Matrix4 transpose();
 
         static Matrix4 translateMatrix(float x, float y, float z);
         static Matrix4 translateMatrix(const Vector3& position);

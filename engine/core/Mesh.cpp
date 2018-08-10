@@ -152,7 +152,7 @@ void Mesh::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix
 void Mesh::updateMatrix(){
     ConcreteObject::updateMatrix();
     
-    this->normalMatrix = modelMatrix.getInverse().getTranspose();
+    this->normalMatrix = modelMatrix.inverse().transpose();
 
     sortTransparentMeshNodes();
 }
