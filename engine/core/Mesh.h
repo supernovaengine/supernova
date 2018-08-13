@@ -11,14 +11,14 @@
 #include "math/Vector3.h"
 #include "math/Vector2.h"
 #include "render/ObjectRender.h"
-#include "MeshNode.h"
+#include "SubMesh.h"
 
 namespace Supernova {
 
     class Mesh: public ConcreteObject {
         
     private:
-        void removeAllMeshNodes();
+        void removeAllSubMeshes();
         
     protected:
         ObjectRender* render;
@@ -27,7 +27,7 @@ namespace Supernova {
         std::vector<Vector3> vertices;
         std::vector<Vector3> normals;
         std::vector<Vector2> texcoords;
-        std::vector<MeshNode*> meshnodes;
+        std::vector<SubMesh*> submeshes;
         
         bool skymesh;
         bool textmesh;
@@ -35,9 +35,9 @@ namespace Supernova {
 
         int primitiveType;
         
-        void addMeshNode(MeshNode* meshnode);
+        void addSubMesh(SubMesh* submesh);
         
-        void sortTransparentMeshNodes();
+        void sortTransparentSubMeshes();
         
         void updateVertices();
         void updateNormals();
@@ -52,7 +52,7 @@ namespace Supernova {
         std::vector<Vector3> getVertices();
         std::vector<Vector3> getNormals();
         std::vector<Vector2> getTexcoords();
-        std::vector<MeshNode*> getMeshNodes();
+        std::vector<SubMesh*> getSubMeshes();
         bool isSky();
         bool isText();
         bool isDynamic();

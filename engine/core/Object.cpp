@@ -525,7 +525,7 @@ void Object::updateFromBody(){
                 rotation = bodyRotation;
                 needUpdate = true;
             }
-            
+
         }
 
         if (needUpdate)

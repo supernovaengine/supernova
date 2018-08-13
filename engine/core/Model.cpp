@@ -69,7 +69,7 @@ void Model::readMeshMaterialsVector(FileData& file, std::vector<MeshMaterialData
     }
 }
 
-void Model::readMeshNodesVector(FileData& file, std::vector<MeshNodeData> &vec){
+void Model::readSubMeshesVector(FileData& file, std::vector<SubMeshData> &vec){
     size_t size = 0;
     file.read((unsigned char*)&size, sizeof(size));
     vec.resize(size);
@@ -95,32 +95,32 @@ bool Model::loadSMODEL(const char* path) {
     if (std::string(sig)!="SMODEL")
         return false;
 
-    readMeshNodesVector(file, meshData.meshNodesData);
+    readSubMeshesVector(file, meshData.subMeshesData);
 
     int indexOffset = 0;
 
-    for (size_t i = 0; i < meshData.meshNodesData.size(); i++){
-        if (i > (this->meshnodes.size() - 1)) {
-            this->meshnodes.push_back(new MeshNode());
-            this->meshnodes.back()->createNewMaterial();
+    for (size_t i = 0; i < meshData.subMeshesData.size(); i++){
+        if (i > (this->submeshes.size() - 1)) {
+            this->submeshes.push_back(new SubMesh());
+            this->submeshes.back()->createNewMaterial();
         }
 
-        for (size_t v = 0; v < meshData.meshNodesData[i].meshVertices.size(); v++) {
-            vertices.push_back(meshData.meshNodesData[i].meshVertices[v].vertex);
-            texcoords.push_back(meshData.meshNodesData[i].meshVertices[v].texcoord);
-            normals.push_back(meshData.meshNodesData[i].meshVertices[v].normal);
+        for (size_t v = 0; v < meshData.subMeshesData[i].meshVertices.size(); v++) {
+            vertices.push_back(meshData.subMeshesData[i].meshVertices[v].vertex);
+            texcoords.push_back(meshData.subMeshesData[i].meshVertices[v].texcoord);
+            normals.push_back(meshData.subMeshesData[i].meshVertices[v].normal);
         }
 
-        this->meshnodes.back()->getIndices()->clear();
+        this->submeshes.back()->getIndices()->clear();
 
-        for (size_t j = 0; j < meshData.meshNodesData[i].indices.size(); j++) {
-            this->meshnodes.back()->addIndex(meshData.meshNodesData[i].indices[j] + indexOffset);
+        for (size_t j = 0; j < meshData.subMeshesData[i].indices.size(); j++) {
+            this->submeshes.back()->addIndex(meshData.subMeshesData[i].indices[j] + indexOffset);
         }
 
-        indexOffset += meshData.meshNodesData[i].meshVertices.size();
+        indexOffset += meshData.subMeshesData[i].meshVertices.size();
 
-        if (meshData.meshNodesData[i].materials.size() > 0)
-            this->meshnodes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir + meshData.meshNodesData[i].materials[0].texture));
+        if (meshData.subMeshesData[i].materials.size() > 0)
+            this->submeshes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir + meshData.subMeshesData[i].materials[0].texture));
     }
 
     return true;
@@ -145,12 +145,12 @@ bool Model::loadOBJ(const char* path){
     if (ret) {
 
         for (size_t i = 0; i < materials.size(); i++) {
-            if (i > (this->meshnodes.size()-1)){
-                this->meshnodes.push_back(new MeshNode());
-                this->meshnodes.back()->createNewMaterial();
+            if (i > (this->submeshes.size()-1)){
+                this->submeshes.push_back(new SubMesh());
+                this->submeshes.back()->createNewMaterial();
             }
 
-            this->meshnodes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir+materials[i].diffuse_texname));
+            this->submeshes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir+materials[i].diffuse_texname));
             if (materials[i].dissolve < 1){
                 // TODO: Add this check on isTransparent Material method
                 transparent = true;
@@ -171,7 +171,7 @@ bool Model::loadOBJ(const char* path){
                 for (size_t v = 0; v < fnum; v++) {
                     tinyobj::index_t idx = shapes[i].mesh.indices[index_offset + v];
 
-                    this->meshnodes[material_id]->addIndex((unsigned int)vertices.size());
+                    this->submeshes[material_id]->addIndex((unsigned int)vertices.size());
 
                     vertices.push_back(Vector3(attrib.vertices[3*idx.vertex_index+0], attrib.vertices[3*idx.vertex_index+1], attrib.vertices[3*idx.vertex_index+2]));
                     

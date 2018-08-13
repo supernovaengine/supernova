@@ -121,7 +121,7 @@ void Cube::createIndices(){
 
     std::vector<unsigned int> indices;
     indices.assign(indices_array, std::end(indices_array));
-    meshnodes[0]->setIndices(indices);
+    submeshes[0]->setIndices(indices);
 
 }
 

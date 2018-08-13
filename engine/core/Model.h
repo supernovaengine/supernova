@@ -24,7 +24,7 @@ namespace Supernova {
             std::string texture;
         };
 
-        struct MeshNodeData {
+        struct SubMeshData {
             std::string name;
             std::vector<MeshVertexData> meshVertices;
             std::vector<unsigned int> indices;
@@ -32,7 +32,7 @@ namespace Supernova {
         };
 
         struct MeshData {
-            std::vector<MeshNodeData> meshNodesData;
+            std::vector<SubMeshData> subMeshesData;
         };
 
         const char* filename;
@@ -42,7 +42,7 @@ namespace Supernova {
         void readIndicesVector(FileData& file, std::vector<unsigned int> &vec);
         void readString(FileData& file, std::string &str);
         void readMeshMaterialsVector(FileData& file, std::vector<MeshMaterialData> &vec);
-        void readMeshNodesVector(FileData& file, std::vector<MeshNodeData> &vec);
+        void readSubMeshesVector(FileData& file, std::vector<SubMeshData> &vec);
 
         bool loadOBJ(const char * path);
         bool loadSMODEL(const char* path);
