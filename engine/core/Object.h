@@ -25,6 +25,7 @@ namespace Supernova {
         bool firstLoaded;
 
         bool ownedBody;
+        bool allowBodyUpdate;
         
         void setSceneAndConfigure(Scene* scene);
         void removeScene();
@@ -126,7 +127,7 @@ namespace Supernova {
         void updateFromBody();
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
-        virtual void updateMatrix(bool updateBody = true);
+        virtual void updateMatrix();
 
         virtual bool load();
         virtual bool draw();

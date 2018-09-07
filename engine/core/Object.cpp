@@ -20,6 +20,7 @@ Object::Object(){
     body = NULL;
 
     ownedBody = true;
+    allowBodyUpdate = true;
 
     viewMatrix = NULL;
     projectionMatrix = NULL;
@@ -396,7 +397,7 @@ void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     
 }
 
-void Object::updateMatrix(bool updateBody){
+void Object::updateMatrix(){
 
     Matrix4 centerMatrix = Matrix4::translateMatrix(-center);
     Matrix4 scaleMatrix = Matrix4::scaleMatrix(scale);
@@ -419,7 +420,7 @@ void Object::updateMatrix(bool updateBody){
 
     updateMVPMatrix();
 
-    if (updateBody) {
+    if (allowBodyUpdate) {
         updateBodyFromObject();
     }
 
@@ -528,8 +529,11 @@ void Object::updateFromBody(){
 
         }
 
-        if (needUpdate)
-            updateMatrix(false);
+        if (needUpdate) {
+            allowBodyUpdate = false;
+            updateMatrix();
+            allowBodyUpdate = true;
+        }
     }
 }
 
