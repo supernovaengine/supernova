@@ -1,5 +1,7 @@
 #include "Model.h"
 
+#include <istream>
+#include <sstream>
 #include "Log.h"
 #include "render/ObjectRender.h"
 #include <algorithm>
@@ -37,90 +39,181 @@ std::string Model::readFileToString(const char* filename){
     return filedata.readString();
 }
 
-void Model::readMeshVerticesVector(FileData& file, std::vector<MeshVertexData> &vec){
-    size_t size = 0;
-    file.read((unsigned char*)&size, sizeof(size));
-    vec.resize(size);
-    file.read((unsigned char*)&vec[0], vec.size() * sizeof(MeshVertexData));
+bool Model::readModel(std::istream& is, ModelData &modelData){
+    char* sig= new char[6];
+    int version;
+
+    is.read(sig, sizeof(char) * 6);
+    is.read((char*)&version, sizeof(int));
+
+    if (std::string(sig)=="SMODEL" && version==1){
+        readString(is, modelData.name);
+        readVector3Vector(is, modelData.vertices);
+        readVector2VectorVector(is, modelData.texcoords);
+        readVector3Vector(is, modelData.normals);
+        readVector3Vector(is, modelData.tangents);
+        readVector3Vector(is, modelData.bitangents);
+        readMeshDataVector(is, modelData.meshes);
+        readBoneWeightDataVector(is, modelData.bonesWeights);
+        readSkeleton(is, modelData.skeleton);
+
+        return true;
+    }
+
+    return false;
 }
 
-void Model::readIndicesVector(FileData& file, std::vector<unsigned int> &vec){
+void Model::readString(std::istream& is, std::string &str){
     size_t size = 0;
-    file.read((unsigned char*)&size, sizeof(size));
-    vec.resize(size);
-    file.read((unsigned char*)&vec[0], vec.size() * sizeof(unsigned int));
-}
-
-void Model::readString(FileData& file, std::string &str){
-    size_t size = 0;
-    file.read((unsigned char*)&size, sizeof(size));
+    is.read((char*)&size, sizeof(size));
     str.resize(size);
-    file.read((unsigned char*)&str[0], size);
+    is.read((char*)&str[0], size);
 }
 
-void Model::readMeshMaterialsVector(FileData& file, std::vector<MeshMaterialData> &vec){
+void Model::readUintVector(std::istream& is, std::vector<unsigned int> &vec){
     size_t size = 0;
-    file.read((unsigned char*)&size, sizeof(size));
+    is.read((char*)&size, sizeof(size));
+    vec.resize(size);
+    is.read((char*)&vec[0], vec.size() * sizeof(unsigned int));
+}
+
+void Model::readVector3Vector(std::istream& is, std::vector<Vector3> &vec){
+    size_t size = 0;
+    is.read((char*)&size, sizeof(size));
+    vec.resize(size);
+    is.read((char*)&vec[0], vec.size() * 3 * sizeof(float));
+}
+
+void Model::readVector2Vector(std::istream& is, std::vector<Vector2> &vec){
+    size_t size = 0;
+    is.read((char*)&size, sizeof(size));
+    vec.resize(size);
+    is.read((char*)&vec[0], vec.size() * 2 * sizeof(float));
+}
+
+void Model::readVector2VectorVector(std::istream& is, std::vector<std::vector<Vector2>> &vec){
+    size_t size = 0;
+    is.read((char*)&size, sizeof(size));
     vec.resize(size);
 
     for (size_t i = 0; i < size; ++i){
-        file.read((unsigned char*)&vec[i].type, sizeof(int));
-        readString(file, vec[i].texture);
+        readVector2Vector(is, vec[i]);
     }
 }
 
-void Model::readSubMeshesVector(FileData& file, std::vector<SubMeshData> &vec){
+void Model::readMeshDataVector(std::istream& is, std::vector<MeshData> &vec){
     size_t size = 0;
-    file.read((unsigned char*)&size, sizeof(size));
+    is.read((char*)&size, sizeof(size));
     vec.resize(size);
 
     for (size_t i = 0; i < size; ++i){
-        readString(file, vec[i].name);
-        readMeshVerticesVector(file, vec[i].meshVertices);
-        readIndicesVector(file, vec[i].indices);
-        readMeshMaterialsVector(file, vec[i].materials);
+        readString(is, vec[i].name);
+        readUintVector(is, vec[i].indices);
+        readMaterialDataVector(is, vec[i].materials);
+    }
+}
+
+void Model::readMaterialDataVector(std::istream& is, std::vector<MaterialData> &vec){
+    size_t size = 0;
+    is.read((char*)&size, sizeof(size));
+    vec.resize(size);
+
+    for (size_t i = 0; i < size; ++i){
+        is.read((char*)&vec[i].type, sizeof(int));
+        readString(is, vec[i].texture);
+    }
+}
+
+void Model::readBoneWeightDataVector(std::istream& is, std::vector<BoneWeightData> &vec){
+    size_t size = 0;
+    is.read((char*)&size, sizeof(size));
+    vec.resize(size);
+
+    for (size_t i = 0; i < size; ++i){
+        readString(is, vec[i].name);
+        readBoneVertexWeightDataVector(is, vec[i].vertexWeights);
+    }
+}
+
+void Model::readBoneVertexWeightDataVector(std::istream& is, std::vector<BoneVertexWeightData> &vec){
+    size_t size = 0;
+    is.read((char*)&size, sizeof(size));
+    vec.resize(size);
+
+    for (size_t i = 0; i < size; ++i){
+        is.read((char*)&vec[i].vertexId, sizeof(unsigned int));
+        is.read((char*)&vec[i].weight, sizeof(float));
+    }
+}
+
+void Model::readSkeleton(std::istream& is, BoneData* &skeleton){
+    size_t size = 0;
+    is.read((char*)&size, sizeof(size));
+
+    skeleton = NULL;
+
+    if (size == 1){
+        skeleton = new BoneData();
+        readBoneData(is, *skeleton);
+    }
+}
+
+void Model::readBoneData(std::istream& is, BoneData &boneData){
+    readString(is, boneData.name);
+    is.read((char*)&boneData.bindPosition, 3 * sizeof(float));
+    is.read((char*)&boneData.bindRotation, 4 * sizeof(float));
+    is.read((char*)&boneData.bindScale, 3 * sizeof(float));
+    is.read((char*)&boneData.offsetMatrix, 16 * sizeof(float));
+
+    size_t size = 0;
+    is.read((char*)&size, sizeof(size));
+    boneData.children.resize(size);
+
+    for (size_t i = 0; i < size; ++i){
+        readBoneData(is, boneData.children[i]);
     }
 }
 
 bool Model::loadSMODEL(const char* path) {
-    char* sig= new char[6];
-    int readversion;
-    MeshData meshData;
 
-    FileData file(path);
+    std::istringstream matIStream(readFileToString(path));
 
-    file.read((unsigned char*)sig, sizeof(char) * 6);
-    file.read((unsigned char*)&readversion, sizeof(int));
+    ModelData modelData;
 
-    if (std::string(sig)!="SMODEL")
+    if (!readModel(matIStream, modelData))
         return false;
 
-    readSubMeshesVector(file, meshData.subMeshesData);
+    vertices.clear();
+    for (size_t i = 0; i < modelData.vertices.size(); i++){
+        vertices.push_back(modelData.vertices[i]);
+    }
 
-    int indexOffset = 0;
+    texcoords.clear();
+    if (modelData.texcoords.size() > 0) {
+        for (size_t i = 0; i < modelData.texcoords[0].size(); i++) {
+            texcoords.push_back(modelData.texcoords[0][i]);
+        }
+    }
 
-    for (size_t i = 0; i < meshData.subMeshesData.size(); i++){
+    normals.clear();
+    for (size_t i = 0; i < modelData.normals.size(); i++){
+        normals.push_back(modelData.normals[i]);
+    }
+
+    for (size_t i = 0; i < modelData.meshes.size(); i++){
         if (i > (this->submeshes.size() - 1)) {
             this->submeshes.push_back(new SubMesh());
             this->submeshes.back()->createNewMaterial();
         }
 
-        for (size_t v = 0; v < meshData.subMeshesData[i].meshVertices.size(); v++) {
-            vertices.push_back(meshData.subMeshesData[i].meshVertices[v].vertex);
-            texcoords.push_back(meshData.subMeshesData[i].meshVertices[v].texcoord);
-            normals.push_back(meshData.subMeshesData[i].meshVertices[v].normal);
-        }
-
         this->submeshes.back()->getIndices()->clear();
 
-        for (size_t j = 0; j < meshData.subMeshesData[i].indices.size(); j++) {
-            this->submeshes.back()->addIndex(meshData.subMeshesData[i].indices[j] + indexOffset);
+        for (size_t j = 0; j < modelData.meshes[i].indices.size(); j++) {
+            this->submeshes.back()->addIndex(modelData.meshes[i].indices[j]);
         }
 
-        indexOffset += meshData.subMeshesData[i].meshVertices.size();
-
-        if (meshData.subMeshesData[i].materials.size() > 0)
-            this->submeshes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir + meshData.subMeshesData[i].materials[0].texture));
+        if (modelData.meshes[i].materials.size() > 0)
+            this->submeshes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir + modelData.meshes[i].materials[0].texture));
     }
 
     return true;
