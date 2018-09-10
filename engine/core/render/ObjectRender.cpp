@@ -25,6 +25,7 @@ ObjectRender::ObjectRender(){
     hasTextureCoords = false;
     hasTextureRect = false;
     hasTextureCube = false;
+    hasSkinning = false;
     isSky = false;
     isText = false;
     
@@ -169,6 +170,10 @@ void ObjectRender::setHasTextureCube(bool hasTextureCube){
     this->hasTextureCube = hasTextureCube;
 }
 
+void ObjectRender::setHasSkinning(bool hasSkinning){
+    this->hasSkinning = hasSkinning;
+}
+
 void ObjectRender::setIsSky(bool isSky){
     this->isSky = isSky;
 }
@@ -236,7 +241,7 @@ void ObjectRender::loadProgram(){
         if (programShader != -1)
             program->setShader(programShader);
     
-        program->setDefinitions(numLights, numShadows2D, numShadowsCube, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
+        program->setDefinitions(numLights, numShadows2D, numShadowsCube, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, hasSkinning, isSky, isText);
         program->load();
     }
 }

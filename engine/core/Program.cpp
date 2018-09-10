@@ -13,6 +13,7 @@ Program::Program(){
     this->hasTextureCoords = false;
     this->hasTextureRect = false;
     this->hasTextureCube = false;
+    this->hasSkinning = false;
     this->isSky = false;
     this->isText = false;
     this->numShadows2D = 0;
@@ -23,12 +24,13 @@ void Program::setShader(int shaderType){
     this->shaderType = shaderType;
 }
 
-void Program::setDefinitions(int numLights, int numShadows2D, int numShadowsCube, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool isSky, bool isText){
+void Program::setDefinitions(int numLights, int numShadows2D, int numShadowsCube, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool hasSkinning, bool isSky, bool isText){
     this->numLights = numLights;
     this->hasFog = hasFog;
     this->hasTextureCoords = hasTextureCoords;
     this->hasTextureRect = hasTextureRect;
     this->hasTextureCube = hasTextureCube;
+    this->hasSkinning = hasSkinning;
     this->isSky = isSky;
     this->isText = isText;
     this->numShadows2D = numShadows2D;
@@ -48,6 +50,7 @@ Program::Program(const Program& p){
     hasTextureCoords = p.hasTextureCoords;
     hasTextureRect = p.hasTextureRect;
     hasTextureCube = p.hasTextureCube;
+    hasSkinning = p.hasSkinning;
     isSky = p.isSky;
     isText = p.isText;
     numShadows2D = p.numShadows2D;
@@ -63,6 +66,7 @@ Program& Program::operator = (const Program& p){
     hasTextureCoords = p.hasTextureCoords;
     hasTextureRect = p.hasTextureRect;
     hasTextureCube = p.hasTextureCube;
+    hasSkinning = p.hasSkinning;
     isSky = p.isSky;
     isText = p.isText;
     numShadows2D = p.numShadows2D;
@@ -103,6 +107,10 @@ bool Program::load(){
         shaderStr += "|hasTextureCoords";
     if (hasTextureRect)
         shaderStr += "|hasTextureRect";
+    if (hasTextureCube)
+        shaderStr += "|hasTextureCube";
+    if (hasSkinning)
+        shaderStr += "|hasSkinning";
     if (isSky)
         shaderStr += "|isSky";
     if (isText)
@@ -116,7 +124,7 @@ bool Program::load(){
 
     if (!programRender.get()->isLoaded()){
 
-        programRender.get()->createProgram(shaderType, numLights, numShadows2D, numShadowsCube, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, isSky, isText);
+        programRender.get()->createProgram(shaderType, numLights, numShadows2D, numShadowsCube, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, hasSkinning, isSky, isText);
 
     }
 
@@ -141,6 +149,10 @@ bool Program::load(){
         if (shaderType == S_SHADER_MESH) {
             if (hasTextureCoords) {
                 shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+            }
+            if (hasSkinning) {
+                shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_BONEWEIGHTS);
+                shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_BONEIDS);
             }
         }
 

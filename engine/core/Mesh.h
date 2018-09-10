@@ -12,6 +12,7 @@
 #include "math/Vector2.h"
 #include "render/ObjectRender.h"
 #include "SubMesh.h"
+#include <array>
 
 namespace Supernova {
 
@@ -28,9 +29,15 @@ namespace Supernova {
         std::vector<Vector3> normals;
         std::vector<Vector2> texcoords;
         std::vector<SubMesh*> submeshes;
+
+        std::vector<std::array<float, 4>> boneWeights;
+        std::vector<std::array<float, 4>> boneIds; //TODO: Change to int when supported
+
+        std::vector<Matrix4> bonesMatrix;
         
         bool skymesh;
         bool textmesh;
+        bool skinning;
         bool dynamic;
 
         int primitiveType;

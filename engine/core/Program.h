@@ -8,10 +8,12 @@
 #define S_VERTEXATTRIBUTE_VERTICES 1
 #define S_VERTEXATTRIBUTE_TEXTURECOORDS 2
 #define S_VERTEXATTRIBUTE_NORMALS 3
-#define S_VERTEXATTRIBUTE_POINTSIZES 4
-#define S_VERTEXATTRIBUTE_POINTCOLORS 5
-#define S_VERTEXATTRIBUTE_POINTROTATIONS 6
-#define S_VERTEXATTRIBUTE_TEXTURERECTS 7
+#define S_VERTEXATTRIBUTE_BONEWEIGHTS 4
+#define S_VERTEXATTRIBUTE_BONEIDS 5
+#define S_VERTEXATTRIBUTE_POINTSIZES 6
+#define S_VERTEXATTRIBUTE_POINTCOLORS 7
+#define S_VERTEXATTRIBUTE_POINTROTATIONS 8
+#define S_VERTEXATTRIBUTE_TEXTURERECTS 9
 
 #define S_PROPERTY_MVPMATRIX 1
 #define S_PROPERTY_MODELMATRIX 2
@@ -87,6 +89,7 @@ namespace Supernova{
         bool hasTextureCoords;
         bool hasTextureRect;
         bool hasTextureCube;
+        bool hasSkinning;
         bool isSky;
         bool isText;
         
@@ -99,7 +102,7 @@ namespace Supernova{
         void setShader(int shaderType);
         void setDefinitions(int numLights = 0, int numShadows2D = 0, int numShadowsCube = 0, bool hasFog = false,
                             bool hasTexture = false, bool hasTextureRect = false, bool hasTextureCube = false,
-                            bool isSky = false, bool isText = false);
+                            bool hasSkinning = false, bool isSky = false, bool isText = false);
         
         bool existVertexAttribute(int vertexAttribute);
         bool existProperty(int property);

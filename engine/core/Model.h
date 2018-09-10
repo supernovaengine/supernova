@@ -2,7 +2,9 @@
 #define model_h
 
 #include <vector>
+#include <map>
 #include "Mesh.h"
+#include "Bone.h"
 #include "math/Vector3.h"
 #include "file/FileData.h"
 
@@ -49,12 +51,19 @@ namespace Supernova {
             std::vector<Vector3> tangents;
             std::vector<Vector3> bitangents;
             std::vector<MeshData> meshes;
-            std::vector<BoneWeightData> bonesWeights;
+            std::vector<BoneWeightData> boneWeights;
             BoneData* skeleton;
         };
 
         const char* filename;
         std::string baseDir;
+
+        struct BoneInfo{
+            Bone* object;
+            int id;
+        };
+
+        std::map<std::string, BoneInfo> bonesMapping;
 
         bool readModel(std::istream& is, ModelData &modelData);
         void readString(std::istream& is, std::string &str);
@@ -69,15 +78,24 @@ namespace Supernova {
         void readSkeleton(std::istream& is, BoneData* &skeleton);
         void readBoneData(std::istream& is, BoneData &boneData);
 
+        Bone* generateSketetalStructure(BoneData boneData);
+        Bone* findBone(Bone* bone, std::string name);
+
         bool loadOBJ(const char * path);
         bool loadSMODEL(const char* path);
         
         static std::string readFileToString(const char* filename);
 
+    protected:
+        Bone* skeleton;
+
     public:
         Model();
         Model(const char * path);
         virtual ~Model();
+
+        Bone* getBone(std::string name);
+        void updateBone(std::string name, Matrix4 skinning);
 
         virtual bool load();
 

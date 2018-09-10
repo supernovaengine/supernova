@@ -364,6 +364,11 @@ std::string gVertexMeshPerPixelLightShader =
 
 "attribute vec3 a_Position;\n"
 
+"#ifdef HAS_SKINNING\n"
+"  attribute vec4 a_BoneWeights;\n"
+"  attribute vec4 a_BoneIds;\n"
+"#endif\n"
+
 "#ifdef USE_TEXTURECOORDS\n"
 "  attribute vec2 a_TextureCoordinates;\n"
 "  varying vec3 v_TextureCoordinates;\n"

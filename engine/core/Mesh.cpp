@@ -15,6 +15,7 @@ Mesh::Mesh(): ConcreteObject(){
     submeshes.push_back(new SubMesh(&material));
     skymesh = false;
     textmesh = false;
+    skinning = false;
     dynamic = false;
 }
 
@@ -246,17 +247,25 @@ bool Mesh::load(){
     render->setHasTextureCoords(hasTextureCoords);
     render->setHasTextureRect(hasTextureRect);
     render->setHasTextureCube(hasTextureCube);
+    render->setHasSkinning(skinning);
     render->setIsSky(isSky());
     render->setIsText(isText());
 
     render->setVertexSize(vertices.size());
 
     render->addVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front(), dynamic);
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES,"vertices", 3);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, "vertices", 3);
     render->addVertexBuffer("normals", normals.size() * 3 * sizeof(float), &normals.front(), dynamic);
     render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, "normals", 3);
     render->addVertexBuffer("texcoords", texcoords.size() * 2 * sizeof(float), &texcoords.front(), dynamic);
     render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, "texcoords", 2);
+
+    if (skinning){
+        render->addVertexBuffer("boneWeights", vertices.size() * 4 * sizeof(float), &boneWeights.front(), dynamic);
+        render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, "boneWeights", 4);
+        render->addVertexBuffer("boneIds", vertices.size() * 4 * sizeof(float), &boneIds.front(), dynamic);
+        render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEIDS, "boneIds", 4);
+    }
     
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);

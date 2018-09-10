@@ -69,6 +69,9 @@ namespace Supernova {
         Object();
         virtual ~Object();
 
+        Object* getObject(unsigned int index) const;
+        const std::vector<Object *> &getObjects() const;
+
         void addObject(Object* obj);
         void removeObject(Object* obj);
 

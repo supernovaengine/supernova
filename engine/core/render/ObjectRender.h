@@ -76,6 +76,7 @@ namespace Supernova {
         bool hasTextureCoords;
         bool hasTextureRect;
         bool hasTextureCube;
+        bool hasSkinning;
         bool isSky;
         bool isText;
         
@@ -115,6 +116,7 @@ namespace Supernova {
         void setHasTextureCoords(bool hasTextureCoords);
         void setHasTextureRect(bool hasTextureRect);
         void setHasTextureCube(bool hasTextureCube);
+        void setHasSkinning(bool hasSkinning);
         void setIsSky(bool isSky);
         void setIsText(bool isText);
 

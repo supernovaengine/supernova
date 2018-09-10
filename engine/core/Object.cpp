@@ -602,3 +602,14 @@ void Object::destroy(){
     loaded = false;
 
 }
+
+Object* Object::getObject(unsigned int index) const{
+    if (index >= 0 && index < objects.size())
+        return objects[index];
+
+    return NULL;
+}
+
+const std::vector<Object *> &Object::getObjects() const {
+    return objects;
+}

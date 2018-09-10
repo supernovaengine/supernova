@@ -113,6 +113,10 @@ bool GLES2Object::load(){
             attribName = "a_TextureCoordinates";
         }else if (type == S_VERTEXATTRIBUTE_NORMALS){
             attribName = "a_Normal";
+        }else if (type == S_VERTEXATTRIBUTE_BONEWEIGHTS){
+            attribName = "a_BoneWeights";
+        }else if (type == S_VERTEXATTRIBUTE_BONEIDS){
+            attribName = "a_BoneIds";
         }else if (type == S_VERTEXATTRIBUTE_POINTSIZES){
             attribName = "a_pointSize";
         }else if (type == S_VERTEXATTRIBUTE_POINTCOLORS){
