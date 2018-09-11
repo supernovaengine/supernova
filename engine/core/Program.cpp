@@ -162,6 +162,9 @@ bool Program::load(){
             if (hasTextureRect) {
                 shaderProperties.push_back(S_PROPERTY_TEXTURERECT);
             }
+            if (hasSkinning) {
+                shaderProperties.push_back(S_PROPERTY_BONESMATRIX);
+            }
         }
         shaderProperties.push_back(S_PROPERTY_MVPMATRIX);
         if (numLights > 0) {
@@ -219,6 +222,9 @@ bool Program::load(){
 
         shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_VERTICES);
 
+        shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_BONEWEIGHTS);
+        shaderVertexAttributes.push_back(S_VERTEXATTRIBUTE_BONEIDS);
+
         shaderProperties.push_back(S_PROPERTY_MVPMATRIX);
         shaderProperties.push_back(S_PROPERTY_MODELMATRIX);
 
@@ -226,6 +232,8 @@ bool Program::load(){
         shaderProperties.push_back(S_PROPERTY_SHADOWCAMERA_NEARFAR);
 
         shaderProperties.push_back(S_PROPERTY_ISPOINTSHADOW);
+
+        shaderProperties.push_back(S_PROPERTY_BONESMATRIX);
 
     }
     return true;

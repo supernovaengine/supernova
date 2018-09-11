@@ -244,6 +244,8 @@ bool GLES2Object::load(){
             propertyName = "u_shadowCameraNearFarCube";
         }else if (type == S_PROPERTY_NUMCASCADES2D){
             propertyName = "u_shadowNumCascades2D";
+        }else if (type == S_PROPERTY_BONESMATRIX){
+            propertyName = "u_bonesMatrix";
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());

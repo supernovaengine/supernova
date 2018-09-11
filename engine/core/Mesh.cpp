@@ -184,11 +184,19 @@ bool Mesh::shadowLoad(){
     if (shadowRender == NULL)
         shadowRender = ObjectRender::newInstance();
     shadowRender->setProgramShader(S_SHADER_DEPTH_RTT);
+    shadowRender->setHasSkinning(skinning);
     shadowRender->setVertexSize(vertices.size());
     shadowRender->addVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front(), dynamic);
     shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, "vertices", 3);
     shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
     shadowRender->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
+    if (skinning){
+        render->addVertexBuffer("boneWeights", vertices.size() * 4 * sizeof(float), &boneWeights.front(), dynamic);
+        render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, "boneWeights", 4);
+        render->addVertexBuffer("boneIds", vertices.size() * 4 * sizeof(float), &boneIds.front(), dynamic);
+        render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEIDS, "boneIds", 4);
+        render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
+    }
     if (scene){
         shadowRender->addProperty(S_PROPERTY_SHADOWLIGHT_POS, S_PROPERTYDATA_FLOAT3, 1, &scene->drawShadowLightPos);
         shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR, S_PROPERTYDATA_FLOAT2, 1, &scene->drawShadowCameraNearFar);
@@ -265,6 +273,8 @@ bool Mesh::load(){
         render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, "boneWeights", 4);
         render->addVertexBuffer("boneIds", vertices.size() * 4 * sizeof(float), &boneIds.front(), dynamic);
         render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEIDS, "boneIds", 4);
+
+        render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
     }
     
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);

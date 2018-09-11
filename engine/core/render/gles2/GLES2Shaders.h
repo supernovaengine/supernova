@@ -25,7 +25,14 @@ std::string lightingVertexImp =
 "#ifdef USE_LIGHTING\n"
 
 "  v_Position = vec3(u_mMatrix * vec4(a_Position, 1.0));\n"
-"  v_Normal = normalize(mat3(u_nMatrix) * a_Normal);\n"
+
+"  vec3 norL = a_Normal;\n"
+
+"  #ifdef HAS_SKINNING\n"
+"    norL = mat3(BoneTransform) * a_Normal;\n"
+"  #endif\n"
+
+"  v_Normal = normalize(mat3(u_nMatrix) * norL);\n"
 
 "  #ifdef HAS_SHADOWS2D\n"
 "    for(int i=0; i<MAXSHADOWS2D; ++i){\n"
@@ -367,6 +374,8 @@ std::string gVertexMeshPerPixelLightShader =
 "#ifdef HAS_SKINNING\n"
 "  attribute vec4 a_BoneWeights;\n"
 "  attribute vec4 a_BoneIds;\n"
+
+"  uniform mat4 u_bonesMatrix[68];\n"
 "#endif\n"
 
 "#ifdef USE_TEXTURECOORDS\n"
@@ -382,7 +391,18 @@ std::string gVertexMeshPerPixelLightShader =
 
 "void main(){\n"
 
-"    vec4 position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
+"    vec4 PosL = vec4(a_Position, 1.0);\n"
+
+"    #ifdef HAS_SKINNING\n"
+"      mat4 BoneTransform = u_bonesMatrix[int(a_BoneIds[0])] * a_BoneWeights[0];\n"
+"      BoneTransform += u_bonesMatrix[int(a_BoneIds[1])] * a_BoneWeights[1];\n"
+"      BoneTransform += u_bonesMatrix[int(a_BoneIds[2])] * a_BoneWeights[2];\n"
+"      BoneTransform += u_bonesMatrix[int(a_BoneIds[3])] * a_BoneWeights[3];\n"
+
+"      PosL = BoneTransform * vec4(a_Position, 1.0);\n"
+"    #endif\n"
+
+"    vec4 position = u_mvpMatrix * PosL;\n"
 
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifdef USE_TEXTURECUBE\n"
@@ -457,9 +477,24 @@ std::string gVertexDepthRTTShader =
 "uniform mat4 u_mMatrix;\n"
 "attribute vec3 a_Position;\n"
 "varying vec3 v_position;\n"
+"#ifdef HAS_SKINNING\n"
+"  attribute vec4 a_BoneWeights;\n"
+"  attribute vec4 a_BoneIds;\n"
+"  uniform mat4 u_bonesMatrix[68];\n"
+"#endif\n"
 "void main(){\n"
-"    v_position = vec3(u_mMatrix * vec4(a_Position, 1.0));\n"
-"    gl_Position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
+"    vec4 PosL = vec4(a_Position, 1.0);\n"
+        /*
+"    #ifdef HAS_SKINNING\n"
+"      mat4 BoneTransform = u_bonesMatrix[int(a_BoneIds[0])] * a_BoneWeights[0];\n"
+"      BoneTransform += u_bonesMatrix[int(a_BoneIds[1])] * a_BoneWeights[1];\n"
+"      BoneTransform += u_bonesMatrix[int(a_BoneIds[2])] * a_BoneWeights[2];\n"
+"      BoneTransform += u_bonesMatrix[int(a_BoneIds[3])] * a_BoneWeights[3];\n"
+"      PosL = BoneTransform * vec4(a_Position, 1.0);\n"
+"    #endif\n"
+         */
+"    v_position = vec3(u_mMatrix * PosL);\n"
+"    gl_Position = u_mvpMatrix * PosL;\n"
 "}\n";
 
 std::string gFragmentDepthRTTShader =

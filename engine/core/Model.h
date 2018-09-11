@@ -88,6 +88,7 @@ namespace Supernova {
 
     protected:
         Bone* skeleton;
+        Matrix4 inverseDerivedTransform;
 
     public:
         Model();
@@ -96,6 +97,10 @@ namespace Supernova {
 
         Bone* getBone(std::string name);
         void updateBone(std::string name, Matrix4 skinning);
+
+        Matrix4 getInverseDerivedTransform();
+
+        virtual void updateMatrix();
 
         virtual bool load();
 

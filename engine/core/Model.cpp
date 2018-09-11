@@ -21,23 +21,6 @@ Model::Model(const char * path): Model() {
 Model::~Model() {
 }
 
-bool Model::load(){
-
-    vertices.clear();
-    texcoords.clear();
-    normals.clear();
-
-    baseDir = File::getBaseDir(filename);
-
-    if (!loadSMODEL(filename))
-        loadOBJ(filename);
-
-    if (skeleton)
-        skinning = true;
-
-    return Mesh::load();
-}
-
 std::string Model::readFileToString(const char* filename){
     FileData filedata(filename);
     return filedata.readString();
@@ -253,6 +236,11 @@ bool Model::loadSMODEL(const char* path) {
     boneWeights.resize(vertices.size());
     boneIds.resize(vertices.size());
 
+    skinning = false;
+    if (modelData.skeleton){
+        skinning = true;
+    }
+
     for (size_t i = 0; i < modelData.boneWeights.size(); i++){
 
         BoneInfo boneInfo;
@@ -378,4 +366,31 @@ Bone* Model::getBone(std::string name){
 void Model::updateBone(std::string name, Matrix4 skinning){
     if (bonesMapping.count(name))
         bonesMatrix[bonesMapping[name].id] = skinning;
+}
+
+void Model::updateMatrix(){
+    Mesh::updateMatrix();
+
+    inverseDerivedTransform = (modelMatrix * Matrix4::translateMatrix(center)).inverse();
+}
+
+bool Model::load(){
+
+    vertices.clear();
+    texcoords.clear();
+    normals.clear();
+
+    baseDir = File::getBaseDir(filename);
+
+    if (!loadSMODEL(filename))
+        loadOBJ(filename);
+
+    if (skeleton)
+        skinning = true;
+
+    return Mesh::load();
+}
+
+Matrix4 Model::getInverseDerivedTransform(){
+    return inverseDerivedTransform;
 }

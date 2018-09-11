@@ -264,6 +264,10 @@ Vector3 Object::getCenter(){
     return center;
 }
 
+Matrix4 Object::getTransformMatrix(){
+    return transformMatrix;
+}
+
 Matrix4 Object::getModelMatrix(){
     return modelMatrix;
 }
@@ -404,7 +408,8 @@ void Object::updateMatrix(){
     Matrix4 translateMatrix = Matrix4::translateMatrix(position);
     Matrix4 rotationMatrix = rotation.getRotationMatrix();
 
-    this->modelMatrix = translateMatrix * rotationMatrix * scaleMatrix * centerMatrix;
+    this->transformMatrix = translateMatrix * rotationMatrix * scaleMatrix;
+    this->modelMatrix = this->transformMatrix * centerMatrix;
 
     if (parent != NULL){
         Matrix4 parentCenterMatrix = Matrix4::translateMatrix(parent->center);

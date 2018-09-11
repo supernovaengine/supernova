@@ -70,22 +70,17 @@ Model* Bone::getModel() const {
 }
 
 void Bone::updateMatrix(){
-    /*
+/*
+    //if (name == "RootMotion"){
     if (name == "T_Rex_ROOTSHJnt"){
+    //if (name == "T_Rex_Spine_01SHJnt"){
         printf("oiii\n");
-        Matrix4 translateMatrix = Matrix4::translateMatrix(position);
-        for (unsigned int i = 0; i < 4; i++)
-            Log::Verbose("%s   %f %f %f %f\n", name.c_str(), translateMatrix[i][0], translateMatrix[i][1], translateMatrix[i][2], translateMatrix[i][3]);
-        for (unsigned int i = 0; i < 4; i++)
-            Log::Verbose("%s   %f %f %f %f\n", name.c_str(), offsetMatrix[i][0], offsetMatrix[i][1], offsetMatrix[i][2], offsetMatrix[i][3]);
     }
-     */
+*/
     Object::updateMatrix();
 
     if (model) {
-
-        Matrix4 skinning = modelMatrix * offsetMatrix;
-        Matrix4 translateMatrix = Matrix4::translateMatrix(position);
+        Matrix4 skinning = model->getInverseDerivedTransform() * modelMatrix * offsetMatrix;
 
         model->updateBone(name, skinning);
     }

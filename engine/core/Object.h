@@ -46,7 +46,8 @@ namespace Supernova {
         Matrix4* projectionMatrix;
         Matrix4* viewProjectionMatrix;
         Vector3 cameraPosition;
-        
+
+        Matrix4 transformMatrix;
         Matrix4 modelMatrix;
         Matrix4 modelViewProjectionMatrix;
 
@@ -78,6 +79,7 @@ namespace Supernova {
         void addAction(Action* action);
         void removeAction(Action* action);
 
+        Matrix4 getTransformMatrix();
         Matrix4 getModelMatrix();
         Matrix4 getModelViewProjectMatrix();
         Vector3 getCameraPosition();
