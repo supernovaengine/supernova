@@ -375,7 +375,7 @@ std::string gVertexMeshPerPixelLightShader =
 "  attribute vec4 a_BoneWeights;\n"
 "  attribute vec4 a_BoneIds;\n"
 
-"  uniform mat4 u_bonesMatrix[68];\n"
+"  uniform mat4 u_bonesMatrix[MAXBONES];\n"
 "#endif\n"
 
 "#ifdef USE_TEXTURECOORDS\n"
@@ -480,11 +480,10 @@ std::string gVertexDepthRTTShader =
 "#ifdef HAS_SKINNING\n"
 "  attribute vec4 a_BoneWeights;\n"
 "  attribute vec4 a_BoneIds;\n"
-"  uniform mat4 u_bonesMatrix[68];\n"
+"  uniform mat4 u_bonesMatrix[MAXBONES];\n"
 "#endif\n"
 "void main(){\n"
 "    vec4 PosL = vec4(a_Position, 1.0);\n"
-        /*
 "    #ifdef HAS_SKINNING\n"
 "      mat4 BoneTransform = u_bonesMatrix[int(a_BoneIds[0])] * a_BoneWeights[0];\n"
 "      BoneTransform += u_bonesMatrix[int(a_BoneIds[1])] * a_BoneWeights[1];\n"
@@ -492,7 +491,6 @@ std::string gVertexDepthRTTShader =
 "      BoneTransform += u_bonesMatrix[int(a_BoneIds[3])] * a_BoneWeights[3];\n"
 "      PosL = BoneTransform * vec4(a_Position, 1.0);\n"
 "    #endif\n"
-         */
 "    v_position = vec3(u_mMatrix * PosL);\n"
 "    gl_Position = u_mvpMatrix * PosL;\n"
 "}\n";

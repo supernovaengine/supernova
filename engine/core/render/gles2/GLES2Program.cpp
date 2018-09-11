@@ -122,6 +122,10 @@ void GLES2Program::createProgram(int shaderType, int numLights, int numShadows2D
         pVertexSource = replaceAll(pVertexSource, "MAXCASCADES", std::to_string(MAXCASCADES_GLES2));
         pFragmentSource = replaceAll(pFragmentSource, "MAXCASCADES", std::to_string(MAXCASCADES_GLES2));
     }
+    if (hasSkinning){
+        pVertexSource = replaceAll(pVertexSource, "MAXBONES", "68");
+        pFragmentSource = replaceAll(pFragmentSource, "MAXBONES", "68");
+    }
 
     pFragmentSource = unrollLoops(pFragmentSource);
 

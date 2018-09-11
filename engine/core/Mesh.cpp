@@ -191,11 +191,11 @@ bool Mesh::shadowLoad(){
     shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
     shadowRender->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     if (skinning){
-        render->addVertexBuffer("boneWeights", vertices.size() * 4 * sizeof(float), &boneWeights.front(), dynamic);
-        render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, "boneWeights", 4);
-        render->addVertexBuffer("boneIds", vertices.size() * 4 * sizeof(float), &boneIds.front(), dynamic);
-        render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEIDS, "boneIds", 4);
-        render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
+        shadowRender->addVertexBuffer("boneWeights", vertices.size() * 4 * sizeof(float), &boneWeights.front(), dynamic);
+        shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, "boneWeights", 4);
+        shadowRender->addVertexBuffer("boneIds", vertices.size() * 4 * sizeof(float), &boneIds.front(), dynamic);
+        shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_BONEIDS, "boneIds", 4);
+        shadowRender->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
     }
     if (scene){
         shadowRender->addProperty(S_PROPERTY_SHADOWLIGHT_POS, S_PROPERTYDATA_FLOAT3, 1, &scene->drawShadowLightPos);
