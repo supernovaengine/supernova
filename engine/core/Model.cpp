@@ -6,6 +6,7 @@
 #include "render/ObjectRender.h"
 #include <algorithm>
 #include "tiny_obj_loader.h"
+#include "util/ReadSModel.h"
 
 using namespace Supernova;
 
@@ -24,141 +25,6 @@ Model::~Model() {
 std::string Model::readFileToString(const char* filename){
     FileData filedata(filename);
     return filedata.readString();
-}
-
-bool Model::readModel(std::istream& is, ModelData &modelData){
-    char* sig= new char[6];
-    int version;
-
-    is.read(sig, sizeof(char) * 6);
-    is.read((char*)&version, sizeof(int));
-
-    if (std::string(sig)=="SMODEL" && version==1){
-        readString(is, modelData.name);
-        readVector3Vector(is, modelData.vertices);
-        readVector2VectorVector(is, modelData.texcoords);
-        readVector3Vector(is, modelData.normals);
-        readVector3Vector(is, modelData.tangents);
-        readVector3Vector(is, modelData.bitangents);
-        readMeshDataVector(is, modelData.meshes);
-        readBoneWeightDataVector(is, modelData.boneWeights);
-        readSkeleton(is, modelData.skeleton);
-
-        return true;
-    }
-
-    return false;
-}
-
-void Model::readString(std::istream& is, std::string &str){
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-    str.resize(size);
-    is.read((char*)&str[0], size);
-}
-
-void Model::readUintVector(std::istream& is, std::vector<unsigned int> &vec){
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-    vec.resize(size);
-    is.read((char*)&vec[0], vec.size() * sizeof(unsigned int));
-}
-
-void Model::readVector3Vector(std::istream& is, std::vector<Vector3> &vec){
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-    vec.resize(size);
-    is.read((char*)&vec[0], vec.size() * 3 * sizeof(float));
-}
-
-void Model::readVector2Vector(std::istream& is, std::vector<Vector2> &vec){
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-    vec.resize(size);
-    is.read((char*)&vec[0], vec.size() * 2 * sizeof(float));
-}
-
-void Model::readVector2VectorVector(std::istream& is, std::vector<std::vector<Vector2>> &vec){
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-    vec.resize(size);
-
-    for (size_t i = 0; i < size; ++i){
-        readVector2Vector(is, vec[i]);
-    }
-}
-
-void Model::readMeshDataVector(std::istream& is, std::vector<MeshData> &vec){
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-    vec.resize(size);
-
-    for (size_t i = 0; i < size; ++i){
-        readString(is, vec[i].name);
-        readUintVector(is, vec[i].indices);
-        readMaterialDataVector(is, vec[i].materials);
-    }
-}
-
-void Model::readMaterialDataVector(std::istream& is, std::vector<MaterialData> &vec){
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-    vec.resize(size);
-
-    for (size_t i = 0; i < size; ++i){
-        is.read((char*)&vec[i].type, sizeof(int));
-        readString(is, vec[i].texture);
-    }
-}
-
-void Model::readBoneWeightDataVector(std::istream& is, std::vector<BoneWeightData> &vec){
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-    vec.resize(size);
-
-    for (size_t i = 0; i < size; ++i){
-        readString(is, vec[i].name);
-        readBoneVertexWeightDataVector(is, vec[i].vertexWeights);
-    }
-}
-
-void Model::readBoneVertexWeightDataVector(std::istream& is, std::vector<BoneVertexWeightData> &vec){
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-    vec.resize(size);
-
-    for (size_t i = 0; i < size; ++i){
-        is.read((char*)&vec[i].vertexId, sizeof(unsigned int));
-        is.read((char*)&vec[i].weight, sizeof(float));
-    }
-}
-
-void Model::readSkeleton(std::istream& is, BoneData* &skeleton){
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-
-    skeleton = NULL;
-
-    if (size == 1){
-        skeleton = new BoneData();
-        readBoneData(is, *skeleton);
-    }
-}
-
-void Model::readBoneData(std::istream& is, BoneData &boneData){
-    readString(is, boneData.name);
-    is.read((char*)&boneData.bindPosition, 3 * sizeof(float));
-    is.read((char*)&boneData.bindRotation, 4 * sizeof(float));
-    is.read((char*)&boneData.bindScale, 3 * sizeof(float));
-    is.read((char*)&boneData.offsetMatrix, 16 * sizeof(float));
-
-    size_t size = 0;
-    is.read((char*)&size, sizeof(size));
-    boneData.children.resize(size);
-
-    for (size_t i = 0; i < size; ++i){
-        readBoneData(is, boneData.children[i]);
-    }
 }
 
 Bone* Model::generateSketetalStructure(BoneData boneData){
@@ -191,9 +57,11 @@ bool Model::loadSMODEL(const char* path) {
 
     std::istringstream matIStream(readFileToString(path));
 
-    ModelData modelData;
+    SModelData modelData;
 
-    if (!readModel(matIStream, modelData))
+    ReadSModel readSModel(&matIStream);
+
+    if (!readSModel.readModel(modelData))
         return false;
 
     vertices.clear();
