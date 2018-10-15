@@ -90,7 +90,8 @@ std::string ProgramRender::replaceAll(std::string source, const std::string from
 }
 
 std::string ProgramRender::unrollLoops(std::string source){
-    return regexReplace(source, std::regex{"[^ ]*#pragma unroll_loop[\\s]+?for\\s*\\(\\s*[a-z]*\\s*([a-z])\\s*\\=\\s*(\\d+)s*;\\s*([a-z])\\s*\\<\\s*(\\d+)s*;\\s*([a-z])\\s*\\+\\+\\s*\\)s*\\{([\\s\\S]+?)(?=\\})\\}"},
+    // "[^\x00]+" is to get anything that is not the null character
+    return regexReplace(source, std::regex{"[^ ]*#pragma unroll_loop[\\s]+?for\\s*\\(\\s*[a-z]*\\s*([a-z])\\s*\\=\\s*(\\d+)s*;\\s*([a-z])\\s*\\<\\s*(\\d+)s*;\\s*([a-z])\\s*\\+\\+\\s*\\)s*\\{([^\\x00]+?)(?=\\})\\}"},
                                    [](std::cmatch m)->std::string {
 
                                        int from = std::stoi(m.str(2));
