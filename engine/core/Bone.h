@@ -17,6 +17,7 @@ namespace Supernova {
     protected:
         Model* model;
 
+        unsigned int id;
         std::string name;
 
         Vector3 bindPosition;
@@ -33,6 +34,9 @@ namespace Supernova {
         void moveToBind();
 
         Model* getModel() const;
+
+        unsigned int getId() const;
+        void setId(unsigned int id);
 
         const std::string &getName() const;
         void setName(const std::string &name);

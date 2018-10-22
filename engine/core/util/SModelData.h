@@ -24,7 +24,7 @@ struct BoneVertexWeightData{
 };
 
 struct BoneWeightData {
-    std::string name;
+    unsigned int boneId;
     std::vector<BoneVertexWeightData> vertexWeights;
 };
 
@@ -36,6 +36,7 @@ struct MeshData {
 
 struct BoneData {
     std::string name;
+    unsigned int boneId;
     Vector3 bindPosition;
     Quaternion bindRotation;
     Vector3 bindScale;

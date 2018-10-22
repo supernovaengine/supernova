@@ -30,6 +30,7 @@ std::string Model::readFileToString(const char* filename){
 Bone* Model::generateSketetalStructure(BoneData boneData){
     Bone* bone = new Bone();
 
+    bone->setId(boneData.boneId);
     bone->setName(boneData.name);
     bone->setBindPosition(boneData.bindPosition);
     bone->setBindRotation(boneData.bindRotation);
@@ -112,10 +113,10 @@ bool Model::loadSMODEL(const char* path) {
     for (size_t i = 0; i < modelData.boneWeights.size(); i++){
 
         BoneInfo boneInfo;
-        boneInfo.id = i;
-        boneInfo.object = findBone(skeleton, modelData.boneWeights[i].name);
+        boneInfo.index = i;
+        boneInfo.object = findBone(skeleton, modelData.boneWeights[i].boneId);
 
-        bonesMapping[modelData.boneWeights[i].name] = boneInfo;
+        bonesMapping[modelData.boneWeights[i].boneId] = boneInfo;
 
         for (size_t j = 0; j < modelData.boneWeights[i].vertexWeights.size(); j++){
             unsigned int vertexId = modelData.boneWeights[i].vertexWeights[j].vertexId;
@@ -210,12 +211,12 @@ bool Model::loadOBJ(const char* path){
     return true;
 }
 
-Bone* Model::findBone(Bone* bone, std::string name){
-    if (bone->getName() == name){
+Bone* Model::findBone(Bone* bone, unsigned int boneId){
+    if (bone->getId() == boneId){
         return bone;
     }else{
         for (size_t i = 0; i < bone->getObjects().size(); i++){
-            Bone* childreturn = findBone((Bone*)bone->getObject(i), name);
+            Bone* childreturn = findBone((Bone*)bone->getObject(i), boneId);
             if (childreturn)
                 return childreturn;
         }
@@ -224,16 +225,16 @@ Bone* Model::findBone(Bone* bone, std::string name){
     return NULL;
 }
 
-Bone* Model::getBone(std::string name){
-    if (bonesMapping.count(name))
-        return bonesMapping[name].object;
+Bone* Model::getBone(unsigned int boneId){
+    if (bonesMapping.count(boneId))
+        return bonesMapping[boneId].object;
 
     return NULL;
 }
 
-void Model::updateBone(std::string name, Matrix4 skinning){
-    if (bonesMapping.count(name))
-        bonesMatrix[bonesMapping[name].id] = skinning;
+void Model::updateBone(unsigned int boneId, Matrix4 skinning){
+    if (bonesMapping.count(boneId))
+        bonesMatrix[bonesMapping[boneId].index] = skinning;
 }
 
 void Model::updateMatrix(){

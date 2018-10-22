@@ -19,13 +19,13 @@ namespace Supernova {
 
         struct BoneInfo{
             Bone* object;
-            int id;
+            int index;
         };
 
-        std::map<std::string, BoneInfo> bonesMapping;
+        std::map<unsigned int, BoneInfo> bonesMapping;
 
         Bone* generateSketetalStructure(BoneData boneData);
-        Bone* findBone(Bone* bone, std::string name);
+        Bone* findBone(Bone* bone, unsigned int boneId);
 
         bool loadOBJ(const char * path);
         bool loadSMODEL(const char* path);
@@ -41,8 +41,8 @@ namespace Supernova {
         Model(const char * path);
         virtual ~Model();
 
-        Bone* getBone(std::string name);
-        void updateBone(std::string name, Matrix4 skinning);
+        Bone* getBone(unsigned int boneId);
+        void updateBone(unsigned int boneId, Matrix4 skinning);
 
         Matrix4 getInverseDerivedTransform();
 
