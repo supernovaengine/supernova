@@ -19,11 +19,8 @@ bool ReadSModel::readModel(SModelData &modelData){
 
     if (std::string(sig)=="SMODEL" && version==1){
         readString(modelData.name);
-        readVector3Vector(modelData.vertices);
-        readVector2VectorVector(modelData.texcoords);
-        readVector3Vector(modelData.normals);
-        readVector3Vector(modelData.tangents);
-        readVector3Vector(modelData.bitangents);
+        is->read((char*)&modelData.vertexMask, sizeof(int));
+        readVerticesVector(modelData.vertices, modelData.vertexMask);
         readMeshDataVector(modelData.meshes);
         readBoneWeightDataVector(modelData.boneWeights);
         readSkeleton(modelData.skeleton);
@@ -48,28 +45,12 @@ void ReadSModel::readUintVector(std::vector<unsigned int> &vec){
     is->read((char*)&vec[0], vec.size() * sizeof(unsigned int));
 }
 
-void ReadSModel::readVector3Vector(std::vector<Vector3> &vec){
-    size_t size = 0;
-    is->read((char*)&size, sizeof(size));
-    vec.resize(size);
-    is->read((char*)&vec[0], vec.size() * 3 * sizeof(float));
+void ReadSModel::readVector3(Vector3 &vec){
+    is->read((char*)&vec, 3 * sizeof(float));
 }
 
-void ReadSModel::readVector2Vector(std::vector<Vector2> &vec){
-    size_t size = 0;
-    is->read((char*)&size, sizeof(size));
-    vec.resize(size);
-    is->read((char*)&vec[0], vec.size() * 2 * sizeof(float));
-}
-
-void ReadSModel::readVector2VectorVector(std::vector<std::vector<Vector2>> &vec){
-    size_t size = 0;
-    is->read((char*)&size, sizeof(size));
-    vec.resize(size);
-
-    for (size_t i = 0; i < size; ++i){
-        readVector2Vector(vec[i]);
-    }
+void ReadSModel::readVector2(Vector2 &vec){
+    is->read((char*)&vec, 2 * sizeof(float));
 }
 
 void ReadSModel::readMeshDataVector(std::vector<MeshData> &vec){
@@ -144,4 +125,29 @@ void ReadSModel::readBoneData(BoneData &boneData){
     for (size_t i = 0; i < size; ++i){
         readBoneData(boneData.children[i]);
     }
+}
+
+void ReadSModel::readVerticesVector(std::vector<VertexData> &vec, int vertexMask){
+    size_t size = 0;
+    is->read((char*)&size, sizeof(size));
+    vec.resize(size);
+
+    for (size_t i = 0; i < size; ++i){
+        readVertexData(vec[i], vertexMask);
+    }
+}
+
+void ReadSModel::readVertexData(VertexData &vertexData, int vertexMask){
+    if (vertexMask & VERTEX_ELEMENT_POSITION)
+        readVector3(vertexData.position);
+    if (vertexMask & VERTEX_ELEMENT_UV0)
+        readVector2(vertexData.texcoord0);
+    if (vertexMask & VERTEX_ELEMENT_UV1)
+        readVector2(vertexData.texcoord1);
+    if (vertexMask & VERTEX_ELEMENT_NORMAL)
+        readVector3(vertexData.normal);
+    if (vertexMask & VERTEX_ELEMENT_TANGENT)
+        readVector3(vertexData.tangent);
+    if (vertexMask & VERTEX_ELEMENT_BITANGENT)
+        readVector3(vertexData.bitangent);
 }

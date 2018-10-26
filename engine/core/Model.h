@@ -23,6 +23,7 @@ namespace Supernova {
         };
 
         std::map<unsigned int, BoneInfo> bonesMapping;
+        std::map<std::string, Bone*> bonesNameMapping;
 
         Bone* generateSketetalStructure(BoneData boneData);
         Bone* findBone(Bone* bone, unsigned int boneId);
@@ -41,6 +42,7 @@ namespace Supernova {
         Model(const char * path);
         virtual ~Model();
 
+        Bone* getBone(std::string name);
         Bone* getBone(unsigned int boneId);
         void updateBone(unsigned int boneId, Matrix4 skinning);
 

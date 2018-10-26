@@ -66,20 +66,20 @@ bool Model::loadSMODEL(const char* path) {
         return false;
 
     vertices.clear();
-    for (size_t i = 0; i < modelData.vertices.size(); i++){
-        vertices.push_back(modelData.vertices[i]);
-    }
-
     texcoords.clear();
-    if (modelData.texcoords.size() > 0) {
-        for (size_t i = 0; i < modelData.texcoords[0].size(); i++) {
-            texcoords.push_back(modelData.texcoords[0][i]);
-        }
-    }
-
     normals.clear();
-    for (size_t i = 0; i < modelData.normals.size(); i++){
-        normals.push_back(modelData.normals[i]);
+    for (size_t i = 0; i < modelData.vertices.size(); i++){
+
+        if (modelData.vertexMask & VERTEX_ELEMENT_POSITION){
+            vertices.push_back(modelData.vertices[i].position);
+        }
+        if (modelData.vertexMask & VERTEX_ELEMENT_UV0){
+            texcoords.push_back(modelData.vertices[i].texcoord0);
+        }
+        if (modelData.vertexMask & VERTEX_ELEMENT_NORMAL){
+            normals.push_back(modelData.vertices[i].normal);
+        }
+
     }
 
     for (size_t i = 0; i < modelData.meshes.size(); i++){
@@ -117,6 +117,7 @@ bool Model::loadSMODEL(const char* path) {
         boneInfo.object = findBone(skeleton, modelData.boneWeights[i].boneId);
 
         bonesMapping[modelData.boneWeights[i].boneId] = boneInfo;
+        bonesNameMapping[boneInfo.object->getName()] = boneInfo.object;
 
         for (size_t j = 0; j < modelData.boneWeights[i].vertexWeights.size(); j++){
             unsigned int vertexId = modelData.boneWeights[i].vertexWeights[j].vertexId;
@@ -221,6 +222,13 @@ Bone* Model::findBone(Bone* bone, unsigned int boneId){
                 return childreturn;
         }
     }
+
+    return NULL;
+}
+
+Bone* Model::getBone(std::string name){
+    if (bonesNameMapping.count(name))
+        return bonesNameMapping[name];
 
     return NULL;
 }
