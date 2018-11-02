@@ -259,6 +259,14 @@ bool Mesh::load(){
     render->setIsSky(isSky());
     render->setIsText(isText());
 
+    render->setVertexSize(vertexBuffer.getVertexSize());
+
+    render->addVertexBuffer("vertices", vertexBuffer.getSize() * sizeof(float), vertexBuffer.getBuffer(), dynamic);
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, "vertices", 3, vertexBuffer.getBlockSize() * sizeof(float), 0 * sizeof(float));
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, "vertices", 2, vertexBuffer.getBlockSize() * sizeof(float), 3 * sizeof(float));
+    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, "vertices", 3, vertexBuffer.getBlockSize() * sizeof(float), 5 * sizeof(float));
+
+/*
     render->setVertexSize(vertices.size());
 
     render->addVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front(), dynamic);
@@ -276,7 +284,7 @@ bool Mesh::load(){
 
         render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
     }
-    
+  */
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
     render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);

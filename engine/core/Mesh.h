@@ -11,6 +11,7 @@
 #include "math/Vector3.h"
 #include "math/Vector2.h"
 #include "render/ObjectRender.h"
+#include "render/VertexBuffer.h"
 #include "SubMesh.h"
 #include <array>
 
@@ -24,6 +25,8 @@ namespace Supernova {
     protected:
         ObjectRender* render;
         ObjectRender* shadowRender;
+
+        VertexBuffer vertexBuffer;
 
         std::vector<Vector3> vertices;
         std::vector<Vector3> normals;

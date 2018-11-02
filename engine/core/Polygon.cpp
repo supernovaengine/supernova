@@ -7,6 +7,10 @@ using namespace Supernova;
 
 Polygon::Polygon(): Mesh2D() {
 	primitiveType = S_PRIMITIVE_TRIANGLES;
+
+	vertexBuffer.addAttribute("position", 3, 0);
+    vertexBuffer.addAttribute("texcoord", 2, 3);
+    vertexBuffer.addAttribute("normal", 3, 5);
 }
 
 Polygon::~Polygon() {
@@ -20,24 +24,29 @@ void Polygon::setInvertTexture(bool invertTexture){
     Mesh2D::setInvertTexture(invertTexture);
     if (loaded) {
         generateTexcoords();
-        updateVertices();
+        updateTexcoords();
     }
 }
 
 void Polygon::clear(){
+    /*
     vertices.clear();
     normals.clear();
     texcoords.clear();
+     */
+    vertexBuffer.clearBuffer();
 }
 
 void Polygon::addVertex(Vector3 vertex){
-	vertices.push_back(vertex);
+	//vertices.push_back(vertex);
+    //normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
 
-    if (vertices.size() > 3){
+    vertexBuffer.addValue("position", vertex);
+    vertexBuffer.addValue("normal", Vector3(0.0f, 0.0f, 1.0f));
+
+    //if (vertices.size() > 3){
         primitiveType = S_PRIMITIVE_TRIANGLES_STRIP;
-    }
-
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+    //}
 }
 
 void Polygon::addVertex(float x, float y){
@@ -51,26 +60,38 @@ void Polygon::generateTexcoords(){
     float min_Y = std::numeric_limits<float>::max();
     float max_Y = std::numeric_limits<float>::min();
 
+    AttributeData* attVertex = vertexBuffer.getAttribute("position");
+
+    for ( unsigned int i = 0; i < vertexBuffer.getVertexSize(); i++){
+        min_X = fmin(min_X, vertexBuffer.getValue(attVertex, i, 0));
+        min_Y = fmin(min_Y, vertexBuffer.getValue(attVertex, i, 1));
+        max_X = fmax(max_X, vertexBuffer.getValue(attVertex, i, 0));
+        max_Y = fmax(max_Y, vertexBuffer.getValue(attVertex, i, 1));
+    }
+
+    /*
     for ( unsigned int i = 0; i < vertices.size(); i++){
         min_X = fmin(min_X, vertices[i].x);
         min_Y = fmin(min_Y, vertices[i].y);
         max_X = fmax(max_X, vertices[i].x);
         max_Y = fmax(max_Y, vertices[i].y);
     }
-
+    */
     double k_X = 1/(max_X - min_X);
     double k_Y = 1/(max_Y - min_Y);
 
     float u = 0;
     float v = 0;
-    texcoords.clear();
-    for ( unsigned int i = 0; i < vertices.size(); i++){
-        u = (vertices[i].x - min_X) * k_X;
-        v = (vertices[i].y - min_Y) * k_Y;
+    //texcoords.clear();
+    for ( unsigned int i = 0; i < vertexBuffer.getVertexSize(); i++){
+        u = (vertexBuffer.getValue(attVertex, i, 0) - min_X) * k_X;
+        v = (vertexBuffer.getValue(attVertex, i, 1) - min_Y) * k_Y;
         if (invertTexture) {
-            texcoords.push_back(Vector2(u, 1.0 - v));
+            //texcoords.push_back(Vector2(u, 1.0 - v));
+            vertexBuffer.addValue("texcoord", Vector2(u, 1.0 - v));
         }else{
-            texcoords.push_back(Vector2(u, v));
+            //texcoords.push_back(Vector2(u, v));
+            vertexBuffer.addValue("texcoord", Vector2(u, v));
         }
     }
 

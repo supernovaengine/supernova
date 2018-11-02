@@ -2,8 +2,8 @@
 // (c) 2018 Eduardo Doria.
 //
 
-#ifndef ATTRIBUTEBUFFER_H
-#define ATTRIBUTEBUFFER_H
+#ifndef VERTEXBUFFER_H
+#define VERTEXBUFFER_H
 
 #include <string>
 #include <vector>
@@ -20,30 +20,44 @@ namespace Supernova {
         int elements;
     };
 
-    class AttributeBuffer {
+    class VertexBuffer {
 
     private:
         std::vector<float> buffer;
         unsigned int blockSize;
+        unsigned int vertexSize;
         std::map<std::string, AttributeData> attributes;
 
     public:
-        AttributeBuffer();
-        virtual ~AttributeBuffer();
+        VertexBuffer();
+        virtual ~VertexBuffer();
 
-        void addAttribute(std::string name, int offset, int elements);
+        void addAttribute(std::string name, int elements, int offset);
         AttributeData* getAttribute(std::string name);
+
+        void clearAll();
         void clearBuffer();
 
         void addValue(AttributeData* attribute, Vector2 vector);
+        void addValue(std::string attributeName, Vector2 vector);
         void addValue(AttributeData* attribute, Vector3 vector);
+        void addValue(std::string attributeName, Vector3 vector);
 
         void setValue(unsigned int index, AttributeData* attribute, Vector2 vector);
         void setValue(unsigned int index, AttributeData* attribute, Vector3 vector);
+        void setValue(unsigned int index, AttributeData* attribute, unsigned int numValues, float* vector);
+
+        float getValue(AttributeData* attribute, unsigned int index, int elementIndex);
+
+        float* getBuffer();
+        unsigned int getSize();
+
+        unsigned int getBlockSize();
+        unsigned int getVertexSize();
 
     };
 
 }
 
 
-#endif //ATTRIBUTEBUFFER_H
+#endif //VERTEXBUFFER_H
