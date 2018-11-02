@@ -8,9 +8,10 @@ using namespace Supernova;
 Polygon::Polygon(): Mesh2D() {
 	primitiveType = S_PRIMITIVE_TRIANGLES;
 
-	vertexBuffer.addAttribute("position", 3, 0);
-    vertexBuffer.addAttribute("texcoord", 2, 3);
-    vertexBuffer.addAttribute("normal", 3, 5);
+	vertexBuffer.setName("vertices");
+	vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
 Polygon::~Polygon() {
@@ -41,8 +42,8 @@ void Polygon::addVertex(Vector3 vertex){
 	//vertices.push_back(vertex);
     //normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
 
-    vertexBuffer.addValue("position", vertex);
-    vertexBuffer.addValue("normal", Vector3(0.0f, 0.0f, 1.0f));
+    vertexBuffer.addValue(S_VERTEXATTRIBUTE_VERTICES, vertex);
+    vertexBuffer.addValue(S_VERTEXATTRIBUTE_NORMALS, Vector3(0.0f, 0.0f, 1.0f));
 
     //if (vertices.size() > 3){
         primitiveType = S_PRIMITIVE_TRIANGLES_STRIP;
@@ -60,7 +61,7 @@ void Polygon::generateTexcoords(){
     float min_Y = std::numeric_limits<float>::max();
     float max_Y = std::numeric_limits<float>::min();
 
-    AttributeData* attVertex = vertexBuffer.getAttribute("position");
+    AttributeData* attVertex = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
 
     for ( unsigned int i = 0; i < vertexBuffer.getVertexSize(); i++){
         min_X = fmin(min_X, vertexBuffer.getValue(attVertex, i, 0));
@@ -88,10 +89,10 @@ void Polygon::generateTexcoords(){
         v = (vertexBuffer.getValue(attVertex, i, 1) - min_Y) * k_Y;
         if (invertTexture) {
             //texcoords.push_back(Vector2(u, 1.0 - v));
-            vertexBuffer.addValue("texcoord", Vector2(u, 1.0 - v));
+            vertexBuffer.addValue(S_VERTEXATTRIBUTE_TEXTURECOORDS, Vector2(u, 1.0 - v));
         }else{
             //texcoords.push_back(Vector2(u, v));
-            vertexBuffer.addValue("texcoord", Vector2(u, v));
+            vertexBuffer.addValue(S_VERTEXATTRIBUTE_TEXTURECOORDS, Vector2(u, v));
         }
     }
 

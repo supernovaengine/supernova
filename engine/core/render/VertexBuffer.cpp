@@ -8,6 +8,20 @@
 using namespace Supernova;
 
 VertexBuffer::VertexBuffer(){
+    const int len = 3;
+    char *s;
+    static const char alphanum[] =
+            "0123456789"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
+
+    for (int i = 0; i < len; ++i) {
+        s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+
+    s[len] = 0;
+
+    name = "vertices-"+std::string(s);
     blockSize = 0;
 }
 
@@ -15,28 +29,28 @@ VertexBuffer::~VertexBuffer(){
 
 }
 
-void VertexBuffer::addAttribute(std::string name, int elements, int offset){
+void VertexBuffer::addAttribute(int attribute, int elements){
     if (buffer.size() == 0) {
-        if (attributes.count(name) == 0) {
+        if (attributes.count(attribute) == 0) {
             AttributeData attData;
             attData.count = 0;
             attData.elements = elements;
-            attData.offset = offset;
+            attData.offset = blockSize;
 
-            attributes[name] = attData;
+            attributes[attribute] = attData;
 
             blockSize += elements;
         } else{
-            Log::Error("Attribute %s already exists", name.c_str());
+            Log::Error("Attribute (%i) already exists", attribute);
         }
     }else{
         Log::Error("Cannot add attribute with not cleared buffer");
     }
 }
 
-AttributeData* VertexBuffer::getAttribute(std::string name){
-    if (attributes.count(name) > 0){
-        return &attributes[name];
+AttributeData* VertexBuffer::getAttribute(int attribute){
+    if (attributes.count(attribute) > 0){
+        return &attributes[attribute];
     }
 
     return NULL;
@@ -59,8 +73,8 @@ void VertexBuffer::addValue(AttributeData* attribute, Vector2 vector){
     }
 }
 
-void VertexBuffer::addValue(std::string attributeName, Vector2 vector){
-    addValue(getAttribute(attributeName), vector);
+void VertexBuffer::addValue(int attribute, Vector2 vector){
+    addValue(getAttribute(attribute), vector);
 }
 
 void VertexBuffer::addValue(AttributeData* attribute, Vector3 vector){
@@ -69,8 +83,8 @@ void VertexBuffer::addValue(AttributeData* attribute, Vector3 vector){
     }
 }
 
-void VertexBuffer::addValue(std::string attributeName, Vector3 vector){
-    addValue(getAttribute(attributeName), vector);
+void VertexBuffer::addValue(int attribute, Vector3 vector){
+    addValue(getAttribute(attribute), vector);
 }
 
 void VertexBuffer::setValue(unsigned int index, AttributeData* attribute, Vector2 vector){
@@ -122,6 +136,10 @@ float VertexBuffer::getValue(AttributeData* attribute, unsigned int index, int e
     return 0;
 }
 
+std::map<int, AttributeData> VertexBuffer::getAttributes(){
+    return attributes;
+};
+
 float* VertexBuffer::getBuffer(){
     return &buffer[0];
 }
@@ -136,4 +154,12 @@ unsigned int VertexBuffer::getBlockSize(){
 
 unsigned int VertexBuffer::getVertexSize(){
     return vertexSize;
+}
+
+const std::string &VertexBuffer::getName() const {
+    return name;
+}
+
+void VertexBuffer::setName(const std::string &name) {
+    VertexBuffer::name = name;
 }

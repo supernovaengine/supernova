@@ -260,11 +260,10 @@ bool Mesh::load(){
     render->setIsText(isText());
 
     render->setVertexSize(vertexBuffer.getVertexSize());
-
-    render->addVertexBuffer("vertices", vertexBuffer.getSize() * sizeof(float), vertexBuffer.getBuffer(), dynamic);
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, "vertices", 3, vertexBuffer.getBlockSize() * sizeof(float), 0 * sizeof(float));
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, "vertices", 2, vertexBuffer.getBlockSize() * sizeof(float), 3 * sizeof(float));
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, "vertices", 3, vertexBuffer.getBlockSize() * sizeof(float), 5 * sizeof(float));
+    render->addVertexBuffer(vertexBuffer.getName(), vertexBuffer.getSize() * sizeof(float), vertexBuffer.getBuffer(), dynamic);
+    for (auto const& x : vertexBuffer.getAttributes()) {
+        render->addVertexAttribute(x.first, vertexBuffer.getName(), x.second.elements, vertexBuffer.getBlockSize() * sizeof(float), x.second.offset * sizeof(float));
+    }
 
 /*
     render->setVertexSize(vertices.size());
