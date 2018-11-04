@@ -30,24 +30,17 @@ void Polygon::setInvertTexture(bool invertTexture){
 }
 
 void Polygon::clear(){
-    /*
-    vertices.clear();
-    normals.clear();
-    texcoords.clear();
-     */
     vertexBuffer.clearBuffer();
 }
 
 void Polygon::addVertex(Vector3 vertex){
-	//vertices.push_back(vertex);
-    //normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
 
     vertexBuffer.addValue(S_VERTEXATTRIBUTE_VERTICES, vertex);
     vertexBuffer.addValue(S_VERTEXATTRIBUTE_NORMALS, Vector3(0.0f, 0.0f, 1.0f));
 
-    //if (vertices.size() > 3){
+    if (vertexBuffer.getVertexSize() > 3){
         primitiveType = S_PRIMITIVE_TRIANGLES_STRIP;
-    //}
+    }
 }
 
 void Polygon::addVertex(float x, float y){
@@ -70,28 +63,18 @@ void Polygon::generateTexcoords(){
         max_Y = fmax(max_Y, vertexBuffer.getValue(attVertex, i, 1));
     }
 
-    /*
-    for ( unsigned int i = 0; i < vertices.size(); i++){
-        min_X = fmin(min_X, vertices[i].x);
-        min_Y = fmin(min_Y, vertices[i].y);
-        max_X = fmax(max_X, vertices[i].x);
-        max_Y = fmax(max_Y, vertices[i].y);
-    }
-    */
     double k_X = 1/(max_X - min_X);
     double k_Y = 1/(max_Y - min_Y);
 
     float u = 0;
     float v = 0;
-    //texcoords.clear();
+
     for ( unsigned int i = 0; i < vertexBuffer.getVertexSize(); i++){
         u = (vertexBuffer.getValue(attVertex, i, 0) - min_X) * k_X;
         v = (vertexBuffer.getValue(attVertex, i, 1) - min_Y) * k_Y;
         if (invertTexture) {
-            //texcoords.push_back(Vector2(u, 1.0 - v));
             vertexBuffer.addValue(S_VERTEXATTRIBUTE_TEXTURECOORDS, Vector2(u, 1.0 - v));
         }else{
-            //texcoords.push_back(Vector2(u, v));
             vertexBuffer.addValue(S_VERTEXATTRIBUTE_TEXTURECOORDS, Vector2(u, v));
         }
     }

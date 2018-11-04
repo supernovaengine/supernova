@@ -118,7 +118,8 @@ void Mesh::sortTransparentSubMeshes(){
         bool needSort = false;
         for (size_t i = 0; i < submeshes.size(); i++) {
             if (this->submeshes[i]->getIndices()->size() > 0){
-                Vector3 submeshFirstVertice = vertices[this->submeshes[i]->getIndex(0)];
+                //Vector3 submeshFirstVertice = vertices[this->submeshes[i]->getIndex(0)];
+                Vector3 submeshFirstVertice = vertexBuffer.getValueVector3(S_VERTEXATTRIBUTE_VERTICES, this->submeshes[i]->getIndex(0));
                 submeshFirstVertice = modelMatrix * submeshFirstVertice;
 
                 if (this->submeshes[i]->getMaterial()->isTransparent()){
@@ -274,16 +275,17 @@ bool Mesh::load(){
     render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, "normals", 3);
     render->addVertexBuffer("texcoords", texcoords.size() * 2 * sizeof(float), &texcoords.front(), dynamic);
     render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, "texcoords", 2);
-
+  */
     if (skinning){
+        /*
         render->addVertexBuffer("boneWeights", vertices.size() * 4 * sizeof(float), &boneWeights.front(), dynamic);
         render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, "boneWeights", 4);
         render->addVertexBuffer("boneIds", vertices.size() * 4 * sizeof(float), &boneIds.front(), dynamic);
         render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEIDS, "boneIds", 4);
-
+        */
         render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
     }
-  */
+
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
     render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);

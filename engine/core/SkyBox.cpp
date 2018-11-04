@@ -10,50 +10,57 @@ using namespace Supernova;
 SkyBox::SkyBox(): Mesh() {
     
     primitiveType = S_PRIMITIVE_TRIANGLES;
+
+    vertexBuffer.setName("vertices");
+    vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    //vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    //vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
     
     skymesh = true;
+
+    AttributeData* attVertex = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     
-    vertices.push_back(Vector3(-1.0f,  1.0f, -1.0f));
-    vertices.push_back(Vector3(-1.0f, -1.0f, -1.0f));
-    vertices.push_back(Vector3(1.0f, -1.0f, -1.0f));
-    vertices.push_back(Vector3(1.0f, -1.0f, -1.0f));
-    vertices.push_back(Vector3(1.0f,  1.0f, -1.0f));
-    vertices.push_back(Vector3(-1.0f,  1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
     
-    vertices.push_back(Vector3(-1.0f, -1.0f,  1.0f));
-    vertices.push_back(Vector3(-1.0f, -1.0f, -1.0f));
-    vertices.push_back(Vector3(-1.0f,  1.0f, -1.0f));
-    vertices.push_back(Vector3(-1.0f,  1.0f, -1.0f));
-    vertices.push_back(Vector3(-1.0f,  1.0f,  1.0f));
-    vertices.push_back(Vector3(-1.0f, -1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
     
-    vertices.push_back(Vector3(1.0f, -1.0f, -1.0f));
-    vertices.push_back(Vector3(1.0f, -1.0f,  1.0f));
-    vertices.push_back(Vector3(1.0f,  1.0f,  1.0f));
-    vertices.push_back(Vector3(1.0f,  1.0f,  1.0f));
-    vertices.push_back(Vector3(1.0f,  1.0f, -1.0f));
-    vertices.push_back(Vector3(1.0f, -1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
     
-    vertices.push_back(Vector3(-1.0f, -1.0f,  1.0f));
-    vertices.push_back(Vector3(-1.0f,  1.0f,  1.0f));
-    vertices.push_back(Vector3(1.0f,  1.0f,  1.0f));
-    vertices.push_back(Vector3(1.0f,  1.0f,  1.0f));
-    vertices.push_back(Vector3(1.0f, -1.0f,  1.0f));
-    vertices.push_back(Vector3(-1.0f, -1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
     
-    vertices.push_back(Vector3(-1.0f,  1.0f, -1.0f));
-    vertices.push_back(Vector3(1.0f,  1.0f, -1.0f));
-    vertices.push_back(Vector3(1.0f,  1.0f,  1.0f));
-    vertices.push_back(Vector3(1.0f,  1.0f,  1.0f));
-    vertices.push_back(Vector3(-1.0f,  1.0f,  1.0f));
-    vertices.push_back(Vector3(-1.0f,  1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
     
-    vertices.push_back(Vector3(-1.0f, -1.0f, -1.0f));
-    vertices.push_back(Vector3(-1.0f, -1.0f,  1.0f));
-    vertices.push_back(Vector3(1.0f, -1.0f, -1.0f));
-    vertices.push_back(Vector3(1.0f, -1.0f, -1.0f));
-    vertices.push_back(Vector3(-1.0f, -1.0f,  1.0f));
-    vertices.push_back(Vector3(1.0f, -1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    vertexBuffer.addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
 }
 
 SkyBox::~SkyBox() {
