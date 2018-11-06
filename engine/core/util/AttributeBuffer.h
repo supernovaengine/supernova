@@ -2,8 +2,8 @@
 // (c) 2018 Eduardo Doria.
 //
 
-#ifndef VERTEXBUFFER_H
-#define VERTEXBUFFER_H
+#ifndef ATTRIBUTEBUFFER_H
+#define ATTRIBUTEBUFFER_H
 
 #include <string>
 #include <vector>
@@ -22,18 +22,18 @@ namespace Supernova {
         int elements;
     };
 
-    class VertexBuffer {
+    class AttributeBuffer {
 
     private:
         std::string name;
         std::vector<float> buffer;
-        unsigned int blockSize;
-        unsigned int vertexSize;
+        unsigned int itemSize;
+        unsigned int count;
         std::map<int, AttributeData> attributes;
 
     public:
-        VertexBuffer();
-        virtual ~VertexBuffer();
+        AttributeBuffer();
+        virtual ~AttributeBuffer();
 
         void addAttribute(int attribute, int elements);
         AttributeData* getAttribute(int attribute);
@@ -73,8 +73,8 @@ namespace Supernova {
         float* getBuffer();
         unsigned int getSize();
 
-        unsigned int getBlockSize();
-        unsigned int getVertexSize();
+        unsigned int getItemSize();
+        unsigned int getCount();
 
         const std::string &getName() const;
         void setName(const std::string &name);
@@ -84,4 +84,4 @@ namespace Supernova {
 }
 
 
-#endif //VERTEXBUFFER_H
+#endif //ATTRIBUTEBUFFER_H

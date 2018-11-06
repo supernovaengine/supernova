@@ -8,10 +8,10 @@ using namespace Supernova;
 Polygon::Polygon(): Mesh2D() {
 	primitiveType = S_PRIMITIVE_TRIANGLES;
 
-	vertexBuffer.setName("vertices");
-	vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+	buffer.setName("vertices");
+	buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+	buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+	buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
 Polygon::~Polygon() {
@@ -30,15 +30,15 @@ void Polygon::setInvertTexture(bool invertTexture){
 }
 
 void Polygon::clear(){
-    vertexBuffer.clearBuffer();
+    buffer.clearBuffer();
 }
 
 void Polygon::addVertex(Vector3 vertex){
 
-    vertexBuffer.addValue(S_VERTEXATTRIBUTE_VERTICES, vertex);
-    vertexBuffer.addValue(S_VERTEXATTRIBUTE_NORMALS, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addValue(S_VERTEXATTRIBUTE_VERTICES, vertex);
+    buffer.addValue(S_VERTEXATTRIBUTE_NORMALS, Vector3(0.0f, 0.0f, 1.0f));
 
-    if (vertexBuffer.getVertexSize() > 3){
+    if (buffer.getCount() > 3){
         primitiveType = S_PRIMITIVE_TRIANGLES_STRIP;
     }
 }
@@ -54,13 +54,13 @@ void Polygon::generateTexcoords(){
     float min_Y = std::numeric_limits<float>::max();
     float max_Y = std::numeric_limits<float>::min();
 
-    AttributeData* attVertex = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
 
-    for ( unsigned int i = 0; i < vertexBuffer.getVertexSize(); i++){
-        min_X = fmin(min_X, vertexBuffer.getValue(attVertex, i, 0));
-        min_Y = fmin(min_Y, vertexBuffer.getValue(attVertex, i, 1));
-        max_X = fmax(max_X, vertexBuffer.getValue(attVertex, i, 0));
-        max_Y = fmax(max_Y, vertexBuffer.getValue(attVertex, i, 1));
+    for ( unsigned int i = 0; i < buffer.getCount(); i++){
+        min_X = fmin(min_X, buffer.getValue(attVertex, i, 0));
+        min_Y = fmin(min_Y, buffer.getValue(attVertex, i, 1));
+        max_X = fmax(max_X, buffer.getValue(attVertex, i, 0));
+        max_Y = fmax(max_Y, buffer.getValue(attVertex, i, 1));
     }
 
     double k_X = 1/(max_X - min_X);
@@ -69,13 +69,13 @@ void Polygon::generateTexcoords(){
     float u = 0;
     float v = 0;
 
-    for ( unsigned int i = 0; i < vertexBuffer.getVertexSize(); i++){
-        u = (vertexBuffer.getValue(attVertex, i, 0) - min_X) * k_X;
-        v = (vertexBuffer.getValue(attVertex, i, 1) - min_Y) * k_Y;
+    for ( unsigned int i = 0; i < buffer.getCount(); i++){
+        u = (buffer.getValue(attVertex, i, 0) - min_X) * k_X;
+        v = (buffer.getValue(attVertex, i, 1) - min_Y) * k_Y;
         if (invertTexture) {
-            vertexBuffer.addValue(S_VERTEXATTRIBUTE_TEXTURECOORDS, Vector2(u, 1.0 - v));
+            buffer.addValue(S_VERTEXATTRIBUTE_TEXTURECOORDS, Vector2(u, 1.0 - v));
         }else{
-            vertexBuffer.addValue(S_VERTEXATTRIBUTE_TEXTURECOORDS, Vector2(u, v));
+            buffer.addValue(S_VERTEXATTRIBUTE_TEXTURECOORDS, Vector2(u, v));
         }
     }
 

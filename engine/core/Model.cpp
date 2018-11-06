@@ -68,26 +68,26 @@ bool Model::loadSMODEL(const char* path) {
     skinning = false;
     if (modelData.skeleton){
         skinning = true;
-        vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_BONEIDS, 4);
-        vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, 4);
+        buffer.addAttribute(S_VERTEXATTRIBUTE_BONEIDS, 4);
+        buffer.addAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, 4);
     }
 
-    AttributeData* attVertex = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-    AttributeData* attTexcoord = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-    AttributeData* attNormal = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
-    AttributeData* attBoneId = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_BONEIDS);
-    AttributeData* attBoneWeight = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS);
+    AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    AttributeData* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    AttributeData* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    AttributeData* attBoneId = buffer.getAttribute(S_VERTEXATTRIBUTE_BONEIDS);
+    AttributeData* attBoneWeight = buffer.getAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS);
 
     for (size_t i = 0; i < modelData.vertices.size(); i++){
 
         if (modelData.vertexMask & VERTEX_ELEMENT_POSITION){
-            vertexBuffer.addValue(attVertex, modelData.vertices[i].position);
+            buffer.addValue(attVertex, modelData.vertices[i].position);
         }
         if (modelData.vertexMask & VERTEX_ELEMENT_UV0){
-            vertexBuffer.addValue(attTexcoord, modelData.vertices[i].texcoord0);
+            buffer.addValue(attTexcoord, modelData.vertices[i].texcoord0);
         }
         if (modelData.vertexMask & VERTEX_ELEMENT_NORMAL){
-            vertexBuffer.addValue(attNormal, modelData.vertices[i].normal);
+            buffer.addValue(attNormal, modelData.vertices[i].normal);
         }
 
     }
@@ -128,8 +128,8 @@ bool Model::loadSMODEL(const char* path) {
             unsigned int vertexId = modelData.boneWeights[i].vertexWeights[j].vertexId;
             float weight = modelData.boneWeights[i].vertexWeights[j].weight;
 
-            Vector4 vertexBoneWeights = vertexBuffer.getValueVector4(attBoneWeight, vertexId);
-            Vector4 vertexBoneIds = vertexBuffer.getValueVector4(attBoneId, vertexId);
+            Vector4 vertexBoneWeights = buffer.getValueVector4(attBoneWeight, vertexId);
+            Vector4 vertexBoneIds = buffer.getValueVector4(attBoneId, vertexId);
 
             if (vertexBoneWeights[0] == 0) {
                 vertexBoneWeights[0] = weight;
@@ -145,8 +145,8 @@ bool Model::loadSMODEL(const char* path) {
                 vertexBoneIds[3] = i;
             }
 
-            vertexBuffer.setValue(vertexId, attBoneWeight, vertexBoneWeights);
-            vertexBuffer.setValue(vertexId, attBoneId, vertexBoneIds);
+            buffer.setValue(vertexId, attBoneWeight, vertexBoneWeights);
+            buffer.setValue(vertexId, attBoneId, vertexBoneIds);
         }
     }
 
@@ -190,9 +190,9 @@ bool Model::loadOBJ(const char* path){
             }
         }
 
-        AttributeData* attVertex = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-        AttributeData* attTexcoord = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-        AttributeData* attNormal = vertexBuffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+        AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+        AttributeData* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+        AttributeData* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
         for (size_t i = 0; i < shapes.size(); i++) {
 
@@ -208,20 +208,20 @@ bool Model::loadOBJ(const char* path){
                 for (size_t v = 0; v < fnum; v++) {
                     tinyobj::index_t idx = shapes[i].mesh.indices[index_offset + v];
 
-                    this->submeshes[material_id]->addIndex(vertexBuffer.getVertexSize());
+                    this->submeshes[material_id]->addIndex(buffer.getCount());
 
-                    vertexBuffer.addValue(attVertex,
+                    buffer.addValue(attVertex,
                                           Vector3(attrib.vertices[3*idx.vertex_index+0],
                                                   attrib.vertices[3*idx.vertex_index+1],
                                                   attrib.vertices[3*idx.vertex_index+2]));
 
                     if (attrib.texcoords.size() > 0) {
-                        vertexBuffer.addValue(attTexcoord,
+                        buffer.addValue(attTexcoord,
                                               Vector2(attrib.texcoords[2 * idx.texcoord_index + 0],
                                                       1.0f - attrib.texcoords[2 * idx.texcoord_index + 1]));
                     }
                     if (attrib.normals.size() > 0) {
-                        vertexBuffer.addValue(attNormal,
+                        buffer.addValue(attNormal,
                                               Vector3(attrib.normals[3 * idx.normal_index + 0],
                                                       attrib.normals[3 * idx.normal_index + 1],
                                                       attrib.normals[3 * idx.normal_index + 2]));
@@ -277,11 +277,11 @@ void Model::updateMatrix(){
 
 bool Model::load(){
 
-    vertexBuffer.clearAll();
-    vertexBuffer.setName("vertices");
-    vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    vertexBuffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    buffer.clearAll();
+    buffer.setName("vertices");
+    buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 
     baseDir = File::getBaseDir(filename);
 
