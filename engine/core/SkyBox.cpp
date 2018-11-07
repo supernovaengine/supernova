@@ -11,56 +11,58 @@ SkyBox::SkyBox(): Mesh() {
     
     primitiveType = S_PRIMITIVE_TRIANGLES;
 
-    buffer.setName("vertices");
-    buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    //buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    //buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    buffers.resize(1);
+    buffers[0].clearAll();
+    buffers[0].setName("vertices");
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    //buffers[0].addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    //buffers[0].addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
     
     skymesh = true;
 
-    AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    AttributeData* attVertex = buffers[0].getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     
-    buffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
     
-    buffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
     
-    buffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
     
-    buffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
     
-    buffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
     
-    buffer.addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffer.addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffer.addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0].addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0].addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
 }
 
 SkyBox::~SkyBox() {

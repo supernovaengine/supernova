@@ -118,7 +118,8 @@ void Mesh::sortTransparentSubMeshes(){
         bool needSort = false;
         for (size_t i = 0; i < submeshes.size(); i++) {
             if (this->submeshes[i]->getIndices()->size() > 0){
-                Vector3 submeshFirstVertice = buffer.getValueVector3(S_VERTEXATTRIBUTE_VERTICES, this->submeshes[i]->getIndex(0));
+                //TODO: Check if buffer has vertices attributes
+                Vector3 submeshFirstVertice = buffers[0].getValueVector3(S_VERTEXATTRIBUTE_VERTICES, this->submeshes[i]->getIndex(0));
                 submeshFirstVertice = modelMatrix * submeshFirstVertice;
 
                 if (this->submeshes[i]->getMaterial()->isTransparent()){
@@ -259,10 +260,14 @@ bool Mesh::load(){
     render->setIsSky(isSky());
     render->setIsText(isText());
 
-    render->setVertexSize(buffer.getCount());
-    render->addVertexBuffer(buffer.getName(), buffer.getSize() * sizeof(float), buffer.getBuffer(), dynamic);
-    for (auto const& x : buffer.getAttributes()) {
-        render->addVertexAttribute(x.first, buffer.getName(), x.second.elements, buffer.getItemSize() * sizeof(float), x.second.offset * sizeof(float));
+    for (int b = 0; b < buffers.size(); b++) {
+        render->setVertexSize(buffers[b].getCount());
+        render->addVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer(), dynamic);
+        for (auto const &x : buffers[b].getAttributes()) {
+            render->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements,
+                                       buffers[b].getItemSize() * sizeof(float),
+                                       x.second.offset * sizeof(float));
+        }
     }
 
 /*

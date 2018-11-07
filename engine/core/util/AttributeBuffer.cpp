@@ -24,7 +24,6 @@ AttributeBuffer::AttributeBuffer(){
     }
 
     name = "buffer|" + randName;
-
     itemSize = 0;
 }
 

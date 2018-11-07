@@ -19,31 +19,30 @@ PlaneTerrain::~PlaneTerrain() {
 
 bool PlaneTerrain::load(){
 
-    buffer.clearAll();
-    buffer.setName("vertices");
-    buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    buffers.resize(1);
+    buffers[0].clearAll();
+    buffers[0].setName("vertices");
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 
-    buffer.clearBuffer();
+    AttributeData* attVertex = buffers[0].getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    buffers[0].addValue(attVertex, Vector3(0, 0, 0));
+    buffers[0].addValue(attVertex, Vector3(0, 0, depth));
+    buffers[0].addValue(attVertex, Vector3(width, 0, 0));
+    buffers[0].addValue(attVertex, Vector3(width, 0, depth));
 
-    AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-    buffer.addValue(attVertex, Vector3(0, 0, 0));
-    buffer.addValue(attVertex, Vector3(0, 0, depth));
-    buffer.addValue(attVertex, Vector3(width, 0, 0));
-    buffer.addValue(attVertex, Vector3(width, 0, depth));
+    AttributeData* attTexcoord = buffers[0].getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    buffers[0].addValue(attTexcoord, Vector2(0.0f, 0.0f));
+    buffers[0].addValue(attTexcoord, Vector2(0.0f, 1.0f));
+    buffers[0].addValue(attTexcoord, Vector2(1.0f, 0.0f));
+    buffers[0].addValue(attTexcoord, Vector2(1.0f, 1.0f));
 
-    AttributeData* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-    buffer.addValue(attTexcoord, Vector2(0.0f, 0.0f));
-    buffer.addValue(attTexcoord, Vector2(0.0f, 1.0f));
-    buffer.addValue(attTexcoord, Vector2(1.0f, 0.0f));
-    buffer.addValue(attTexcoord, Vector2(1.0f, 1.0f));
-
-    AttributeData* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
-    buffer.addValue(attNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffer.addValue(attNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffer.addValue(attNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffer.addValue(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    AttributeData* attNormal = buffers[0].getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    buffers[0].addValue(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    buffers[0].addValue(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    buffers[0].addValue(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    buffers[0].addValue(attNormal, Vector3(0.0f, 1.0f, 0.0f));
 
     return Mesh::load();
 }

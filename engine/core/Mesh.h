@@ -26,7 +26,7 @@ namespace Supernova {
         ObjectRender* render;
         ObjectRender* shadowRender;
 
-        AttributeBuffer buffer;
+        std::vector<AttributeBuffer> buffers;
 
         std::vector<Vector3> vertices;
         std::vector<Vector3> normals;
