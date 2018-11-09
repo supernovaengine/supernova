@@ -61,7 +61,7 @@ void AttributeBuffer::clearAll(){
 }
 
 void AttributeBuffer::clearBuffer(){
-    for (auto x : attributes) {
+    for (auto &x : attributes) {
         x.second.count = 0;
     }
     count = 0;
