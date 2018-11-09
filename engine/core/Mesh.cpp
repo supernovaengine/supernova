@@ -90,11 +90,16 @@ void Mesh::addSubMesh(SubMesh* submesh){
 
 void Mesh::updateBuffers(){
     for (int b = 0; b < buffers.size(); b++) {
-        if (b == 0) {
-            render->setVertexSize(buffers[b].getCount());
-        }
-        render->updateVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer());
+        updateBuffer(b);
     }
+    updateIndices();
+}
+
+void Mesh::updateBuffer(int index){
+    if (index == 0) {
+        render->setVertexSize(buffers[index].getCount());
+    }
+    render->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
 }
 
 void Mesh::updateVertices(){

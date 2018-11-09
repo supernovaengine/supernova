@@ -50,6 +50,7 @@ namespace Supernova {
         void sortTransparentSubMeshes();
 
         void updateBuffers();
+        void updateBuffer(int index);
         void updateVertices();
         void updateNormals();
         void updateTexcoords();
