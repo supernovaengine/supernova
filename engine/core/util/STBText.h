@@ -5,6 +5,7 @@
 #include <vector>
 #include "math/Vector2.h"
 #include "math/Vector3.h"
+#include "util/AttributeBuffer.h"
 #include "stb_rect_pack.h"
 #include "stb_truetype.h"
 #include "Texture.h"
@@ -42,8 +43,8 @@ namespace Supernova {
         int getLineHeight();
 
         bool load(const char* font, unsigned int fontSize, Texture* texture);
-        void createText(std::string text, std::vector<Vector3>* vertices, std::vector<Vector3>* normals, std::vector<Vector2>* texcoords,
-                        std::vector<unsigned int>* indices, int* width, int* height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert);
+        void createText(std::string text, AttributeBuffer& buffer, std::vector<unsigned int>* indices,
+                        int* width, int* height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert);
         
     };
     

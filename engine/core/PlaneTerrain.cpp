@@ -19,7 +19,6 @@ PlaneTerrain::~PlaneTerrain() {
 
 bool PlaneTerrain::load(){
 
-    buffers.resize(1);
     buffers[0].clearAll();
     buffers[0].setName("vertices");
     buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);

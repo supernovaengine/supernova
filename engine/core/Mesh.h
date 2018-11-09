@@ -48,7 +48,8 @@ namespace Supernova {
         void addSubMesh(SubMesh* submesh);
         
         void sortTransparentSubMeshes();
-        
+
+        void updateBuffers();
         void updateVertices();
         void updateNormals();
         void updateTexcoords();

@@ -19,6 +19,12 @@ Text::Text(): Mesh2D() {
     userDefinedWidth = false;
     userDefinedHeight = false;
 
+    buffers[0].clearAll();
+    buffers[0].setName("vertices-text");
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+
     setMinBufferSize(50);
 }
 
@@ -65,12 +71,9 @@ void Text::setText(std::string text){
     if (this->text != text){
         this->text = text;
         if (loaded){
-            if (vertices.size() > 0) {
+            if (buffers[0].getCount() > 0) {
                 createText();
-                updateVertices();
-                updateNormals();
-                updateTexcoords();
-                updateIndices();
+                updateBuffers();
             }else{
                 load();
             }
@@ -84,8 +87,7 @@ void Text::setSize(int width, int height){
     userDefinedHeight = true;
     if (loaded) {
         createText();
-        updateVertices();
-        updateTexcoords();
+        updateBuffers();
     }
 }
 
@@ -94,8 +96,7 @@ void Text::setWidth(int width){
     userDefinedWidth = true;
     if (loaded) {
         createText();
-        updateVertices();
-        updateTexcoords();
+        updateBuffers();
     }
 }
 
@@ -104,8 +105,7 @@ void Text::setHeight(int height){
     userDefinedHeight = true;
     if (loaded) {
         createText();
-        updateVertices();
-        updateTexcoords();
+        updateBuffers();
     }
 }
 
@@ -113,8 +113,7 @@ void Text::setInvertTexture(bool invertTexture){
     Mesh2D::setInvertTexture(invertTexture);
     if (loaded) {
         createText();
-        updateVertices();
-        updateTexcoords();
+        updateBuffers();
     }
 }
 
@@ -159,18 +158,16 @@ void Text::setMultiline(bool multiline){
 }
 
 void Text::createText(){
-    vertices.clear();
-    texcoords.clear();
-    normals.clear();
+    buffers[0].clearBuffer();
+
     std::vector<unsigned int> indices;
     
-    stbtext->createText(text, &vertices, &normals, &texcoords, &indices, &width, &height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
+    stbtext->createText(text, buffers[0], &indices, &width, &height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
 
     submeshes[0]->setIndices(indices);
 }
 
 bool Text::load(){
-
     if (stbtext->load(font.c_str(), fontSize, submeshes[0]->getMaterial()->getTexture())) {
         if (!loaded)
             setInvertTexture(isIn3DScene());

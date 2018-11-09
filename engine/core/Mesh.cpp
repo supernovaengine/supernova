@@ -12,6 +12,7 @@ Mesh::Mesh(): ConcreteObject(){
     render = NULL;
     shadowRender = NULL;
 
+    buffers.resize(1);
     submeshes.push_back(new SubMesh(&material));
     skymesh = false;
     textmesh = false;
@@ -85,6 +86,15 @@ void Mesh::addTexcoord(Vector2 texcoord){
 
 void Mesh::addSubMesh(SubMesh* submesh){
     submeshes.push_back(submesh);
+}
+
+void Mesh::updateBuffers(){
+    for (int b = 0; b < buffers.size(); b++) {
+        if (b == 0) {
+            render->setVertexSize(buffers[b].getCount());
+        }
+        render->updateVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer());
+    }
 }
 
 void Mesh::updateVertices(){
@@ -261,12 +271,12 @@ bool Mesh::load(){
     render->setIsText(isText());
 
     for (int b = 0; b < buffers.size(); b++) {
-        render->setVertexSize(buffers[b].getCount());
+        if (b == 0) {
+            render->setVertexSize(buffers[b].getCount());
+        }
         render->addVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer(), dynamic);
         for (auto const &x : buffers[b].getAttributes()) {
-            render->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements,
-                                       buffers[b].getItemSize() * sizeof(float),
-                                       x.second.offset * sizeof(float));
+            render->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, buffers[b].getItemSize() * sizeof(float), x.second.offset * sizeof(float));
         }
     }
 
