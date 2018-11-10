@@ -112,9 +112,6 @@ bool Model::loadSMODEL(const char* path) {
         skeleton = generateSketetalStructure(*modelData.skeleton);
     }
 
-    boneWeights.resize(vertices.size());
-    boneIds.resize(vertices.size());
-
     for (size_t i = 0; i < modelData.boneWeights.size(); i++){
 
         BoneInfo boneInfo;

@@ -31,18 +31,6 @@ Mesh::~Mesh(){
         delete shadowRender;
 }
 
-std::vector<Vector3> Mesh::getVertices(){
-    return vertices;
-}
-
-std::vector<Vector3> Mesh::getNormals(){
-    return normals;
-}
-
-std::vector<Vector2> Mesh::getTexcoords(){
-    return texcoords;
-}
-
 std::vector<SubMesh*> Mesh::getSubMeshes(){
     return submeshes;
 }
@@ -63,25 +51,8 @@ int Mesh::getPrimitiveType(){
     return primitiveType;
 }
 
-void Mesh::setTexcoords(std::vector<Vector2> texcoords){
-    this->texcoords.clear();
-    this->texcoords = texcoords;
-}
-
 void Mesh::setPrimitiveType(int primitiveType){
     this->primitiveType = primitiveType;
-}
-
-void Mesh::addVertex(Vector3 vertex){
-    vertices.push_back(vertex);
-}
-
-void Mesh::addNormal(Vector3 normal){
-    normals.push_back(normal);
-}
-
-void Mesh::addTexcoord(Vector2 texcoord){
-    texcoords.push_back(texcoord);
 }
 
 void Mesh::addSubMesh(SubMesh* submesh){
@@ -98,25 +69,12 @@ void Mesh::updateBuffers(){
 void Mesh::updateBuffer(int index){
     if (index == 0) {
         render->setVertexSize(buffers[index].getCount());
+        if (shadowRender)
+            shadowRender->setVertexSize(buffers[index].getCount());
     }
     render->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
-}
-
-void Mesh::updateVertices(){
-    render->setVertexSize(vertices.size());
-    render->updateVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front());
-    if (shadowRender) {
-        shadowRender->setVertexSize(vertices.size());
-        shadowRender->updateVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front());
-    }
-}
-
-void Mesh::updateNormals(){
-    render->updateVertexBuffer("normals", normals.size() * 3 * sizeof(float), &normals.front());
-}
-
-void Mesh::updateTexcoords(){
-    render->updateVertexBuffer("texcoords", texcoords.size() * 2 * sizeof(float), &texcoords.front());
+    if (shadowRender)
+        shadowRender->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
 }
 
 void Mesh::updateIndices(){
@@ -201,16 +159,20 @@ bool Mesh::shadowLoad(){
         shadowRender = ObjectRender::newInstance();
     shadowRender->setProgramShader(S_SHADER_DEPTH_RTT);
     shadowRender->setHasSkinning(skinning);
-    shadowRender->setVertexSize(vertices.size());
-    shadowRender->addVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front(), dynamic);
-    shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, "vertices", 3);
+
+    for (int b = 0; b < buffers.size(); b++) {
+        if (b == 0) {
+            shadowRender->setVertexSize(buffers[b].getCount());
+        }
+        shadowRender->addVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer(), dynamic);
+        for (auto const &x : buffers[b].getAttributes()) {
+            shadowRender->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, buffers[b].getItemSize() * sizeof(float), x.second.offset * sizeof(float));
+        }
+    }
+
     shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
     shadowRender->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     if (skinning){
-        shadowRender->addVertexBuffer("boneWeights", vertices.size() * 4 * sizeof(float), &boneWeights.front(), dynamic);
-        shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, "boneWeights", 4);
-        shadowRender->addVertexBuffer("boneIds", vertices.size() * 4 * sizeof(float), &boneIds.front(), dynamic);
-        shadowRender->addVertexAttribute(S_VERTEXATTRIBUTE_BONEIDS, "boneIds", 4);
         shadowRender->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
     }
     if (scene){
@@ -218,7 +180,7 @@ bool Mesh::shadowLoad(){
         shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR, S_PROPERTYDATA_FLOAT2, 1, &scene->drawShadowCameraNearFar);
         shadowRender->addProperty(S_PROPERTY_ISPOINTSHADOW, S_PROPERTYDATA_INT1, 1, &scene->drawIsPointShadow);
     }
-    
+
     Program* shadowProgram = shadowRender->getProgram();
     
     for (size_t i = 0; i < submeshes.size(); i++) {
@@ -237,15 +199,6 @@ bool Mesh::shadowLoad(){
 }
 
 bool Mesh::load(){
-    
-    while (vertices.size() > texcoords.size()){
-        texcoords.push_back(Vector2(0,0));
-    }
-    
-    while (vertices.size() > normals.size()){
-        normals.push_back(Vector3(0,0,0));
-    }
-    
     bool hasTextureRect = false;
     bool hasTextureCoords = false;
     bool hasTextureCube = false;
@@ -285,23 +238,7 @@ bool Mesh::load(){
         }
     }
 
-/*
-    render->setVertexSize(vertices.size());
-
-    render->addVertexBuffer("vertices", vertices.size() * 3 * sizeof(float), &vertices.front(), dynamic);
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, "vertices", 3);
-    render->addVertexBuffer("normals", normals.size() * 3 * sizeof(float), &normals.front(), dynamic);
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, "normals", 3);
-    render->addVertexBuffer("texcoords", texcoords.size() * 2 * sizeof(float), &texcoords.front(), dynamic);
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, "texcoords", 2);
-  */
     if (skinning){
-        /*
-        render->addVertexBuffer("boneWeights", vertices.size() * 4 * sizeof(float), &boneWeights.front(), dynamic);
-        render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, "boneWeights", 4);
-        render->addVertexBuffer("boneIds", vertices.size() * 4 * sizeof(float), &boneIds.front(), dynamic);
-        render->addVertexAttribute(S_VERTEXATTRIBUTE_BONEIDS, "boneIds", 4);
-        */
         render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
     }
 

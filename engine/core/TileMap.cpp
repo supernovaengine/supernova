@@ -7,7 +7,11 @@
 using namespace Supernova;
 
 TileMap::TileMap(): Mesh2D(){
-    
+    buffers[0].clearAll();
+    buffers[0].setName("vertices");
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
 TileMap::~TileMap(){
@@ -100,10 +104,7 @@ void TileMap::addTile(int id, std::string name, int rectId, Vector2 position, fl
 
     if (loaded){
         createTiles();
-        updateVertices();
-        updateNormals();
-        updateTexcoords();
-        updateIndices();
+        updateBuffers();
     }
 }
 
@@ -172,23 +173,31 @@ std::vector<Vector2> TileMap::getTileVertices(int index){
 }
 
 void TileMap::createTiles(){
-    vertices.clear();
-    texcoords.clear();
-    normals.clear();
+    buffers[0].clearBuffer();
+
+    AttributeData* atrVertex = buffers[0].getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    AttributeData* atrTexcoord = buffers[0].getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    AttributeData* atrNormal = buffers[0].getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+
     for (int s = 0; s < submeshes.size(); s++){
         submeshes[s]->getIndices()->clear();
     }
     width = 0;
     height = 0;
+
+    float invTex = 0.0;
+    if (invertTexture){
+        invTex = 1.0;
+    }
     
     for (int i = 0; i < tiles.size(); i++){
         
         std::vector<Vector2> tileVertices = getTileVertices(i);
 
-        vertices.push_back(Vector3(tileVertices[0].x, tileVertices[0].y, 0));
-        vertices.push_back(Vector3(tileVertices[1].x, tileVertices[1].y, 0));
-        vertices.push_back(Vector3(tileVertices[2].x, tileVertices[2].y, 0));
-        vertices.push_back(Vector3(tileVertices[3].x, tileVertices[3].y, 0));
+        buffers[0].addValue(atrVertex, Vector3(tileVertices[0].x, tileVertices[0].y, 0));
+        buffers[0].addValue(atrVertex, Vector3(tileVertices[1].x, tileVertices[1].y, 0));
+        buffers[0].addValue(atrVertex, Vector3(tileVertices[2].x, tileVertices[2].y, 0));
+        buffers[0].addValue(atrVertex, Vector3(tileVertices[3].x, tileVertices[3].y, 0));
 
         if (width < tiles[i].position.x + tiles[i].width)
             width = tiles[i].position.x + tiles[i].width;
@@ -196,21 +205,15 @@ void TileMap::createTiles(){
             height = tiles[i].position.y + tiles[i].height;
 
         Rect tileRect = normalizeTileRect(tilesRect[tiles[i].rectId].rect, tilesRect[tiles[i].rectId].submeshId);
-        texcoords.push_back(Vector2(tileRect.getX(), tileRect.getY()));
-        texcoords.push_back(Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()));
-        texcoords.push_back(Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()+tileRect.getHeight()));
-        texcoords.push_back(Vector2(tileRect.getX(), tileRect.getY()+tileRect.getHeight()));
-        
-        normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-        normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-        normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-        normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-        
-        if (invertTexture){
-            for (int i = 0; i < texcoords.size(); i++){
-                texcoords[i].y = 1 - texcoords[i].y;
-            }
-        }
+        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX(), invTex - tileRect.getY()));
+        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), invTex - tileRect.getY()));
+        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), invTex - tileRect.getY()+tileRect.getHeight()));
+        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX(), invTex - tileRect.getY()+tileRect.getHeight()));
+
+        buffers[0].addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffers[0].addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffers[0].addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffers[0].addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
 
         std::vector<unsigned int>* indices = submeshes[tilesRect[tiles[i].rectId].submeshId]->getIndices();
 

@@ -28,13 +28,7 @@ namespace Supernova {
 
         std::vector<AttributeBuffer> buffers;
 
-        std::vector<Vector3> vertices;
-        std::vector<Vector3> normals;
-        std::vector<Vector2> texcoords;
         std::vector<SubMesh*> submeshes;
-
-        std::vector<std::array<float, 4>> boneWeights;
-        std::vector<std::array<float, 4>> boneIds; //TODO: Change to int when supported
 
         std::vector<Matrix4> bonesMatrix;
         
@@ -51,9 +45,6 @@ namespace Supernova {
 
         void updateBuffers();
         void updateBuffer(int index);
-        void updateVertices();
-        void updateNormals();
-        void updateTexcoords();
         void updateIndices();
         
     public:
@@ -61,20 +52,12 @@ namespace Supernova {
         virtual ~Mesh();
 
         int getPrimitiveType();
-        std::vector<Vector3> getVertices();
-        std::vector<Vector3> getNormals();
-        std::vector<Vector2> getTexcoords();
         std::vector<SubMesh*> getSubMeshes();
         bool isSky();
         bool isText();
         bool isDynamic();
-        
-        void setTexcoords(std::vector<Vector2> texcoords);
 
         void setPrimitiveType(int primitiveType);
-        void addVertex(Vector3 vertex);
-        void addNormal(Vector3 normal);
-        void addTexcoord(Vector2 texcoord);
 
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();

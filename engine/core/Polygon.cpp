@@ -26,7 +26,7 @@ void Polygon::setInvertTexture(bool invertTexture){
     Mesh2D::setInvertTexture(invertTexture);
     if (loaded) {
         generateTexcoords();
-        updateTexcoords();
+        updateBuffers();
     }
 }
 

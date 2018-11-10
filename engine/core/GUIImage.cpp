@@ -20,6 +20,12 @@ GUIImage::GUIImage(): GUIObject(){
     border_right = 0;
     border_top = 0;
     border_bottom = 0;
+
+    buffers[0].clearAll();
+    buffers[0].setName("vertices");
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
 GUIImage::~GUIImage(){
@@ -30,7 +36,7 @@ void GUIImage::setSize(int width, int height){
     Mesh2D::setSize(width, height);
     if (loaded) {
         createVertices();
-        updateVertices();
+        updateBuffers();
     }
 }
 
@@ -42,61 +48,62 @@ void GUIImage::setBorder(int border){
 }
 
 void GUIImage::createVertices(){
-    
-    vertices.clear();
-    
-    vertices.push_back(Vector3(0, 0, 0)); //0
-    vertices.push_back(Vector3(width, 0, 0)); //1
-    vertices.push_back(Vector3(width,  height, 0)); //2
-    vertices.push_back(Vector3(0,  height, 0)); //3
-    
-    vertices.push_back(Vector3(border_left, border_top, 0)); //4
-    vertices.push_back(Vector3(width-border_right, border_top, 0)); //5
-    vertices.push_back(Vector3(width-border_right,  height-border_bottom, 0)); //6
-    vertices.push_back(Vector3(border_left,  height-border_bottom, 0)); //7
-    
-    vertices.push_back(Vector3(border_left, 0, 0)); //8
-    vertices.push_back(Vector3(0, border_top, 0)); //9
-    
-    vertices.push_back(Vector3(width-border_right, 0, 0)); //10
-    vertices.push_back(Vector3(width, border_top, 0)); //11
-    
-    vertices.push_back(Vector3(width-border_right, height, 0)); //12
-    vertices.push_back(Vector3(width, height-border_bottom, 0)); //13
-    
-    vertices.push_back(Vector3(border_left, height, 0)); //14
-    vertices.push_back(Vector3(0, height-border_bottom, 0)); //15
-    
-    texcoords.clear();
-    
-    texcoords.push_back(Vector2(0.0f, 0.0f));
-    texcoords.push_back(Vector2(1.0f, 0.0f));
-    texcoords.push_back(Vector2(1.0f, 1.0f));
-    texcoords.push_back(Vector2(0.0f, 1.0f));
-    
-    texcoords.push_back(Vector2(border_left/(float)texWidth, border_top/(float)texHeight));
-    texcoords.push_back(Vector2(1.0f-(border_right/(float)texWidth), border_top/(float)texHeight));
-    texcoords.push_back(Vector2(1.0f-(border_right/(float)texWidth), 1.0f-(border_bottom/(float)texHeight)));
-    texcoords.push_back(Vector2(border_left/(float)texWidth, 1.0f-(border_bottom/(float)texHeight)));
-    
-    texcoords.push_back(Vector2(border_left/(float)texWidth, 0));
-    texcoords.push_back(Vector2(0, border_top/(float)texHeight));
-    
-    texcoords.push_back(Vector2(1.0f-(border_right/(float)texWidth), 0));
-    texcoords.push_back(Vector2(1.0f, border_top/(float)texHeight));
-    
-    texcoords.push_back(Vector2(1.0f-(border_right/(float)texWidth), 1.0f));
-    texcoords.push_back(Vector2(1.0f, 1.0f-(border_bottom/(float)texHeight)));
-    
-    texcoords.push_back(Vector2((border_left/(float)texWidth), 1.0f));
-    texcoords.push_back(Vector2(0, 1.0f-(border_bottom/(float)texHeight)));
 
+    buffers[0].clearBuffer();
+
+    AttributeData* atrVertex = buffers[0].getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     
+    buffers[0].addValue(atrVertex, Vector3(0, 0, 0)); //0
+    buffers[0].addValue(atrVertex, Vector3(width, 0, 0)); //1
+    buffers[0].addValue(atrVertex, Vector3(width,  height, 0)); //2
+    buffers[0].addValue(atrVertex, Vector3(0,  height, 0)); //3
+    
+    buffers[0].addValue(atrVertex, Vector3(border_left, border_top, 0)); //4
+    buffers[0].addValue(atrVertex, Vector3(width-border_right, border_top, 0)); //5
+    buffers[0].addValue(atrVertex, Vector3(width-border_right,  height-border_bottom, 0)); //6
+    buffers[0].addValue(atrVertex, Vector3(border_left,  height-border_bottom, 0)); //7
+    
+    buffers[0].addValue(atrVertex, Vector3(border_left, 0, 0)); //8
+    buffers[0].addValue(atrVertex, Vector3(0, border_top, 0)); //9
+    
+    buffers[0].addValue(atrVertex, Vector3(width-border_right, 0, 0)); //10
+    buffers[0].addValue(atrVertex, Vector3(width, border_top, 0)); //11
+    
+    buffers[0].addValue(atrVertex, Vector3(width-border_right, height, 0)); //12
+    buffers[0].addValue(atrVertex, Vector3(width, height-border_bottom, 0)); //13
+    
+    buffers[0].addValue(atrVertex, Vector3(border_left, height, 0)); //14
+    buffers[0].addValue(atrVertex, Vector3(0, height-border_bottom, 0)); //15
+
+    float invTex = 0.0;
     if (invertTexture){
-        for (int i = 0; i < texcoords.size(); i++){
-            texcoords[i].y = 1 - texcoords[i].y;
-        }
+        invTex = 1.0;
     }
+
+    AttributeData* atrTexcoord = buffers[0].getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    
+    buffers[0].addValue(atrTexcoord, Vector2(0.0f, invTex - 0.0f));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f, invTex - 0.0f));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f, invTex - 1.0f));
+    buffers[0].addValue(atrTexcoord, Vector2(0.0f, invTex - 1.0f));
+    
+    buffers[0].addValue(atrTexcoord, Vector2(border_left/(float)texWidth, invTex - border_top/(float)texHeight));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), invTex - border_top/(float)texHeight));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), invTex - 1.0f-(border_bottom/(float)texHeight)));
+    buffers[0].addValue(atrTexcoord, Vector2(border_left/(float)texWidth, invTex - 1.0f-(border_bottom/(float)texHeight)));
+    
+    buffers[0].addValue(atrTexcoord, Vector2(border_left/(float)texWidth, invTex - 0));
+    buffers[0].addValue(atrTexcoord, Vector2(0, invTex - border_top/(float)texHeight));
+    
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), invTex - 0));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f, invTex - border_top/(float)texHeight));
+    
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), invTex - 1.0f));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f, invTex - 1.0f-(border_bottom/(float)texHeight)));
+    
+    buffers[0].addValue(atrTexcoord, Vector2((border_left/(float)texWidth), invTex - 1.0f));
+    buffers[0].addValue(atrTexcoord, Vector2(0, invTex - 1.0f-(border_bottom/(float)texHeight)));
+
     
     static const unsigned int indices_array[] = {
         0,  8,  4,
@@ -131,10 +138,11 @@ void GUIImage::createVertices(){
     std::vector<unsigned int> indices;
     indices.assign(indices_array, std::end(indices_array));
     submeshes[0]->setIndices(indices);
-    
-    normals.clear();
-    for (int i = 0; i < texcoords.size(); i++){
-        normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
+
+    AttributeData* atrNormal = buffers[0].getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+
+    for (int i = 0; i < buffers[0].getCount(); i++){
+        buffers[0].addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
     }
 }
 

@@ -20,7 +20,7 @@ Text::Text(): Mesh2D() {
     userDefinedHeight = false;
 
     buffers[0].clearAll();
-    buffers[0].setName("vertices-text");
+    buffers[0].setName("vertices");
     buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffers[0].addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
     buffers[0].addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
