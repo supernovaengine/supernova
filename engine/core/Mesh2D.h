@@ -20,6 +20,8 @@ namespace Supernova {
         bool clipping;
         bool invertTexture;
 
+        float convTex(float value);
+
     public:
         Mesh2D();
         virtual ~Mesh2D();

@@ -22,6 +22,13 @@ Mesh2D::~Mesh2D(){
 
 }
 
+float Mesh2D::convTex(float value){
+    if (invertTexture)
+        return 1.0 - value;
+
+    return value;
+}
+
 void Mesh2D::updateMatrix(){
 
     if (billboard) {

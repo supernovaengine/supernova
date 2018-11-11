@@ -75,34 +75,29 @@ void GUIImage::createVertices(){
     buffers[0].addValue(atrVertex, Vector3(border_left, height, 0)); //14
     buffers[0].addValue(atrVertex, Vector3(0, height-border_bottom, 0)); //15
 
-    float invTex = 0.0;
-    if (invertTexture){
-        invTex = 1.0;
-    }
-
     AttributeData* atrTexcoord = buffers[0].getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
     
-    buffers[0].addValue(atrTexcoord, Vector2(0.0f, invTex - 0.0f));
-    buffers[0].addValue(atrTexcoord, Vector2(1.0f, invTex - 0.0f));
-    buffers[0].addValue(atrTexcoord, Vector2(1.0f, invTex - 1.0f));
-    buffers[0].addValue(atrTexcoord, Vector2(0.0f, invTex - 1.0f));
+    buffers[0].addValue(atrTexcoord, Vector2(0.0f, convTex(0.0f)));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f, convTex(0.0f)));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f, convTex(1.0f)));
+    buffers[0].addValue(atrTexcoord, Vector2(0.0f, convTex(1.0f)));
     
-    buffers[0].addValue(atrTexcoord, Vector2(border_left/(float)texWidth, invTex - border_top/(float)texHeight));
-    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), invTex - border_top/(float)texHeight));
-    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), invTex - 1.0f-(border_bottom/(float)texHeight)));
-    buffers[0].addValue(atrTexcoord, Vector2(border_left/(float)texWidth, invTex - 1.0f-(border_bottom/(float)texHeight)));
+    buffers[0].addValue(atrTexcoord, Vector2(border_left/(float)texWidth, convTex(border_top/(float)texHeight)));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(border_top/(float)texHeight)));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(1.0f-(border_bottom/(float)texHeight))));
+    buffers[0].addValue(atrTexcoord, Vector2(border_left/(float)texWidth, convTex(1.0f-(border_bottom/(float)texHeight))));
     
-    buffers[0].addValue(atrTexcoord, Vector2(border_left/(float)texWidth, invTex - 0));
-    buffers[0].addValue(atrTexcoord, Vector2(0, invTex - border_top/(float)texHeight));
+    buffers[0].addValue(atrTexcoord, Vector2(border_left/(float)texWidth, convTex(0)));
+    buffers[0].addValue(atrTexcoord, Vector2(0, convTex(border_top/(float)texHeight)));
     
-    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), invTex - 0));
-    buffers[0].addValue(atrTexcoord, Vector2(1.0f, invTex - border_top/(float)texHeight));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(0)));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f, convTex(border_top/(float)texHeight)));
     
-    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), invTex - 1.0f));
-    buffers[0].addValue(atrTexcoord, Vector2(1.0f, invTex - 1.0f-(border_bottom/(float)texHeight)));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(1.0f)));
+    buffers[0].addValue(atrTexcoord, Vector2(1.0f, convTex(1.0f-(border_bottom/(float)texHeight))));
     
-    buffers[0].addValue(atrTexcoord, Vector2((border_left/(float)texWidth), invTex - 1.0f));
-    buffers[0].addValue(atrTexcoord, Vector2(0, invTex - 1.0f-(border_bottom/(float)texHeight)));
+    buffers[0].addValue(atrTexcoord, Vector2((border_left/(float)texWidth), convTex(1.0f)));
+    buffers[0].addValue(atrTexcoord, Vector2(0, convTex(1.0f-(border_bottom/(float)texHeight))));
 
     
     static const unsigned int indices_array[] = {

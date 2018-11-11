@@ -185,11 +185,6 @@ void TileMap::createTiles(){
     width = 0;
     height = 0;
 
-    float invTex = 0.0;
-    if (invertTexture){
-        invTex = 1.0;
-    }
-    
     for (int i = 0; i < tiles.size(); i++){
         
         std::vector<Vector2> tileVertices = getTileVertices(i);
@@ -205,10 +200,10 @@ void TileMap::createTiles(){
             height = tiles[i].position.y + tiles[i].height;
 
         Rect tileRect = normalizeTileRect(tilesRect[tiles[i].rectId].rect, tilesRect[tiles[i].rectId].submeshId);
-        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX(), invTex - tileRect.getY()));
-        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), invTex - tileRect.getY()));
-        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), invTex - tileRect.getY()+tileRect.getHeight()));
-        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX(), invTex - tileRect.getY()+tileRect.getHeight()));
+        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX(), convTex(tileRect.getY())));
+        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), convTex(tileRect.getY())));
+        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), convTex(tileRect.getY()+tileRect.getHeight())));
+        buffers[0].addValue(atrTexcoord, Vector2(tileRect.getX(), convTex(tileRect.getY()+tileRect.getHeight())));
 
         buffers[0].addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
         buffers[0].addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
