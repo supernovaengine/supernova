@@ -10,8 +10,6 @@
 #include "math/Vector4.h"
 #include "math/Vector3.h"
 #include "math/Vector2.h"
-#include "render/ObjectRender.h"
-#include "util/AttributeBuffer.h"
 #include "SubMesh.h"
 #include <array>
 
@@ -23,10 +21,6 @@ namespace Supernova {
         void removeAllSubMeshes();
         
     protected:
-        ObjectRender* render;
-        ObjectRender* shadowRender;
-
-        std::vector<AttributeBuffer> buffers;
 
         std::vector<SubMesh*> submeshes;
 
@@ -44,7 +38,6 @@ namespace Supernova {
         void sortTransparentSubMeshes();
 
         void updateBuffers();
-        void updateBuffer(int index);
         void updateIndices();
         
     public:

@@ -24,7 +24,7 @@ namespace Supernova {
         int pointSizeReference;
 
         void updatePointScale();
-        void sortTransparentPoints();
+        bool shouldSort();
         std::vector<int> findFramesByString(std::string id);
 
     protected:
@@ -44,8 +44,6 @@ namespace Supernova {
             bool visible;
         };
 
-        ObjectRender* render;
-
         std::vector<Point> points;
 
         bool sizeAttenuation;
@@ -59,7 +57,8 @@ namespace Supernova {
         bool pertmitSortTransparentPoints;
 
         std::map<int,FramesData> framesRect;
-        
+
+        void copyBuffer();
         void updatePoints();
         void normalizeTextureRects();
 

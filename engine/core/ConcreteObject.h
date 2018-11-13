@@ -8,6 +8,8 @@
 
 #include "Object.h"
 #include "Material.h"
+#include "util/AttributeBuffer.h"
+#include "render/ObjectRender.h"
 
 namespace Supernova {
 
@@ -18,6 +20,11 @@ namespace Supernova {
         void setSceneTransparency(bool transparency);
         
     protected:
+        ObjectRender* render;
+        ObjectRender* shadowRender;
+
+        std::vector<AttributeBuffer> buffers;
+
 
         Material material;
 
@@ -30,6 +37,8 @@ namespace Supernova {
         unsigned int minBufferSize;
 
         void updateDistanceToCamera();
+
+        void updateBuffer(int index);
 
     public:
 

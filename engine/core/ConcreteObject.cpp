@@ -15,11 +15,25 @@ ConcreteObject::ConcreteObject(): Object(){
 
     minBufferSize = 0;
 
+    render = NULL;
+    shadowRender = NULL;
+
     body = NULL;
 }
 
 ConcreteObject::~ConcreteObject(){
 
+}
+
+void ConcreteObject::updateBuffer(int index){
+    if (index == 0) {
+        render->setVertexSize(buffers[index].getCount());
+        if (shadowRender)
+            shadowRender->setVertexSize(buffers[index].getCount());
+    }
+    render->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
+    if (shadowRender)
+        shadowRender->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
 }
 
 Matrix4 ConcreteObject::getNormalMatrix(){

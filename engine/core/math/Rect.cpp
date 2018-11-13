@@ -1,5 +1,8 @@
 #include "Rect.h"
 
+//
+// (c) 2018 Eduardo Doria.
+//
 
 using namespace Supernova;
 
@@ -21,12 +24,28 @@ Rect::Rect(const Rect& t){
     this->height = t.height;
 }
 
+Rect::Rect(const Vector4& v){
+    this->x = v.x;
+    this->y = v.y;
+    this->width = v.z;
+    this->height = v.w;
+}
+
 Rect& Rect::operator = (const Rect& t){
     this->x = t.x;
     this->y = t.y;
     this->width = t.width;
     this->height = t.height;
     
+    return *this;
+}
+
+Rect& Rect::operator = (const Vector4& v){
+    this->x = v.x;
+    this->y = v.y;
+    this->width = v.z;
+    this->height = v.w;
+
     return *this;
 }
 
@@ -52,6 +71,10 @@ float Rect::getWidth(){
 
 float Rect::getHeight(){
     return height;
+}
+
+Vector4 Rect::getVector(){
+    return Vector4(x, y, width, height);
 }
 
 float* Rect::ptr(){

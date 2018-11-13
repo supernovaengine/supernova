@@ -25,7 +25,7 @@ Points::Points(){
     automaticUpdate = true;
     pertmitSortTransparentPoints = true;
 
-    render = NULL;
+    buffers.resize(1);
 }
 
 Points::~Points(){
@@ -35,9 +35,50 @@ Points::~Points(){
         delete render;
 }
 
+bool Points::shouldSort(){
+   return (transparent && scene && scene->isUseDepth() && scene->getUserDefinedTransparency() != S_OPTION_NO && pertmitSortTransparentPoints);
+}
+
+void Points::copyBuffer(){
+    buffers[0].clearAll();
+    buffers[0].setName("points");
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4);
+    buffers[0].addAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, 1);
+    if (useTextureRects)
+        buffers[0].addAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4);
+
+    std::vector<Point> sortedPoints = points;
+
+    if (shouldSort()) {
+        auto comparePoints = [this](const Point a, const Point b) -> bool {
+            float distanceToCameraA = (this->cameraPosition - (modelMatrix * a.position)).length();
+            float distanceToCameraB = (this->cameraPosition - (modelMatrix * b.position)).length();
+            return distanceToCameraA > distanceToCameraB;
+        };
+
+        std::sort(sortedPoints.begin(), sortedPoints.end(), comparePoints);
+    }
+
+    for (int i=0; i < sortedPoints.size(); i++){
+        if (sortedPoints[i].visible) {
+            buffers[0].addValue(S_VERTEXATTRIBUTE_VERTICES, sortedPoints[i].position);
+            buffers[0].addValue(S_VERTEXATTRIBUTE_NORMALS, sortedPoints[i].normal);
+            buffers[0].addValue(S_VERTEXATTRIBUTE_POINTSIZES, sortedPoints[i].size);
+            buffers[0].addValue(S_VERTEXATTRIBUTE_POINTCOLORS, sortedPoints[i].color);
+            buffers[0].addValue(S_VERTEXATTRIBUTE_POINTROTATIONS, sortedPoints[i].rotation);
+            if (useTextureRects)
+                buffers[0].addValue(S_VERTEXATTRIBUTE_TEXTURERECTS, sortedPoints[i].textureRect.getVector());
+        }
+    }
+}
+
 void Points::updatePoints(){
-    render->setVertexSize(points.size());
-    render->updateVertexBuffer("points", points.size() * sizeof(Point), &points.front());
+    copyBuffer();
+
+    updateBuffer(0);
 }
 
 void Points::normalizeTextureRects(){
@@ -246,29 +287,12 @@ void Points::updatePointScale(){
     }
 }
 
-void Points::sortTransparentPoints(){
-    if (transparent && scene && scene->isUseDepth() && scene->getUserDefinedTransparency() != S_OPTION_NO && pertmitSortTransparentPoints){
-
-        auto comparePoints = [this](const Point a, const Point b) -> bool{
-            float distanceToCameraA = (this->cameraPosition - (modelMatrix * a.position)).length();
-            float distanceToCameraB = (this->cameraPosition - (modelMatrix * b.position)).length();
-            return distanceToCameraA > distanceToCameraB;
-        };
-
-        std::sort(points.begin(), points.end(), comparePoints);
-
-        if (loaded){
-            updatePoints();
-        }
-        
-    }
-}
-
 void Points::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
     ConcreteObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     updatePointScale();
-    sortTransparentPoints();
+    if (shouldSort())
+        updatePoints();
 }
 
 void Points::updateMatrix(){
@@ -279,7 +303,8 @@ void Points::updateMatrix(){
     }
 
     updatePointScale();
-    sortTransparentPoints();
+    if (shouldSort())
+        updatePoints();
 }
 
 void Points::setSizeAttenuation(bool sizeAttenuation){
@@ -419,7 +444,7 @@ bool Points::load(){
         texHeight = material.getTexture()->getHeight();
         normalizeTextureRects();
     }
-
+/*
     render->setVertexSize(points.size());
 
     render->addVertexBuffer("points", points.size() * sizeof(Point), &points.front(), true);
@@ -431,6 +456,18 @@ bool Points::load(){
     render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, "points", 1, sizeof(Point), offsetof(Point, rotation));
     if (useTextureRects) {
         render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, "points", 4, sizeof(Point), offsetof(Point, textureRect));
+    }
+*/
+    copyBuffer();
+
+    for (int b = 0; b < buffers.size(); b++) {
+        if (b == 0) {
+            render->setVertexSize(buffers[b].getCount());
+        }
+        render->addVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer(), true);
+        for (auto const &x : buffers[b].getAttributes()) {
+            render->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, buffers[b].getItemSize() * sizeof(float), x.second.offset * sizeof(float));
+        }
     }
 
     render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
