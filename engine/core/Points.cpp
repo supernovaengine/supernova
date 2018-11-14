@@ -8,6 +8,8 @@ using namespace Supernova;
 
 Points::Points(){
 
+    buffers.resize(1);
+
     pointScale = 1.0;
     sizeAttenuation = false;
     pointScaleFactor = 100;
@@ -24,8 +26,6 @@ Points::Points(){
 
     automaticUpdate = true;
     pertmitSortTransparentPoints = true;
-
-    buffers.resize(1);
 }
 
 Points::~Points(){
@@ -50,18 +50,6 @@ void Points::copyBuffer(){
     if (useTextureRects)
         buffers[0].addAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4);
 
-    std::vector<Point> sortedPoints = points;
-
-    if (shouldSort()) {
-        auto comparePoints = [this](const Point a, const Point b) -> bool {
-            float distanceToCameraA = (this->cameraPosition - (modelMatrix * a.position)).length();
-            float distanceToCameraB = (this->cameraPosition - (modelMatrix * b.position)).length();
-            return distanceToCameraA > distanceToCameraB;
-        };
-
-        std::sort(sortedPoints.begin(), sortedPoints.end(), comparePoints);
-    }
-
     for (int i=0; i < sortedPoints.size(); i++){
         if (sortedPoints[i].visible) {
             buffers[0].addValue(S_VERTEXATTRIBUTE_VERTICES, sortedPoints[i].position);
@@ -75,7 +63,33 @@ void Points::copyBuffer(){
     }
 }
 
+bool Points::sortPoints(){
+
+    bool needUpdate = false;
+
+    auto comparePoints = [this, &needUpdate](const Point a, const Point b) -> bool {
+        float distanceToCameraA = (this->cameraPosition - (modelMatrix * a.position)).length();
+        float distanceToCameraB = (this->cameraPosition - (modelMatrix * b.position)).length();
+        if (distanceToCameraA > distanceToCameraB){
+            needUpdate = true;
+            return true;
+        }
+        return false;
+    };
+
+    std::sort(sortedPoints.begin(), sortedPoints.end(), comparePoints);
+
+    return needUpdate;
+
+};
+
 void Points::updatePoints(){
+
+    sortedPoints = points;
+
+    if (shouldSort())
+        sortPoints();
+
     copyBuffer();
 
     if (loaded)
@@ -445,20 +459,7 @@ bool Points::load(){
         texHeight = material.getTexture()->getHeight();
         normalizeTextureRects();
     }
-/*
-    render->setVertexSize(points.size());
 
-    render->addVertexBuffer("points", points.size() * sizeof(Point), &points.front(), true);
-
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_VERTICES, "points", 3, sizeof(Point), offsetof(Point, position));
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_NORMALS, "points", 3, sizeof(Point), offsetof(Point, normal));
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTSIZES, "points", 1, sizeof(Point), offsetof(Point, size));
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, "points", 4, sizeof(Point), offsetof(Point, color));
-    render->addVertexAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, "points", 1, sizeof(Point), offsetof(Point, rotation));
-    if (useTextureRects) {
-        render->addVertexAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, "points", 4, sizeof(Point), offsetof(Point, textureRect));
-    }
-*/
     copyBuffer();
 
     for (int b = 0; b < buffers.size(); b++) {

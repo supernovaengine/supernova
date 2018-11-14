@@ -24,6 +24,7 @@ namespace Supernova {
         int pointSizeReference;
 
         void updatePointScale();
+        bool sortPoints();
         bool shouldSort();
         std::vector<int> findFramesByString(std::string id);
 
@@ -45,6 +46,7 @@ namespace Supernova {
         };
 
         std::vector<Point> points;
+        std::vector<Point> sortedPoints;
 
         bool sizeAttenuation;
         float pointScaleFactor;
