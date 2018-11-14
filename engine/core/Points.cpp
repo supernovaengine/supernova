@@ -78,7 +78,8 @@ void Points::copyBuffer(){
 void Points::updatePoints(){
     copyBuffer();
 
-    updateBuffer(0);
+    if (loaded)
+        updateBuffer(0);
 }
 
 void Points::normalizeTextureRects(){
