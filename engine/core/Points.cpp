@@ -67,17 +67,19 @@ bool Points::sortPoints(){
 
     bool needUpdate = false;
 
-    auto comparePoints = [this, &needUpdate](const Point a, const Point b) -> bool {
-        float distanceToCameraA = (this->cameraPosition - (modelMatrix * a.position)).length();
-        float distanceToCameraB = (this->cameraPosition - (modelMatrix * b.position)).length();
-        if (distanceToCameraA > distanceToCameraB){
-            needUpdate = true;
-            return true;
-        }
-        return false;
-    };
+    if (shouldSort()) {
+        auto comparePoints = [this, &needUpdate](const Point a, const Point b) -> bool {
+            float distanceToCameraA = (this->cameraPosition - (modelMatrix * a.position)).length();
+            float distanceToCameraB = (this->cameraPosition - (modelMatrix * b.position)).length();
+            if (distanceToCameraA > distanceToCameraB) {
+                needUpdate = true;
+                return true;
+            }
+            return false;
+        };
 
-    std::sort(sortedPoints.begin(), sortedPoints.end(), comparePoints);
+        std::sort(sortedPoints.begin(), sortedPoints.end(), comparePoints);
+    }
 
     return needUpdate;
 
@@ -86,10 +88,7 @@ bool Points::sortPoints(){
 void Points::updatePoints(){
 
     sortedPoints = points;
-
-    if (shouldSort())
-        sortPoints();
-
+    sortPoints();
     copyBuffer();
 
     if (loaded)
@@ -306,8 +305,12 @@ void Points::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     ConcreteObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     updatePointScale();
-    if (shouldSort())
-        updatePoints();
+
+    if (sortPoints()) {
+        copyBuffer();
+        if (loaded)
+            updateBuffer(0);
+    }
 }
 
 void Points::updateMatrix(){
@@ -318,8 +321,12 @@ void Points::updateMatrix(){
     }
 
     updatePointScale();
-    if (shouldSort())
-        updatePoints();
+
+    if (sortPoints()) {
+        copyBuffer();
+        if (loaded)
+            updateBuffer(0);
+    }
 }
 
 void Points::setSizeAttenuation(bool sizeAttenuation){
@@ -460,6 +467,8 @@ bool Points::load(){
         normalizeTextureRects();
     }
 
+    sortedPoints = points;
+    sortPoints();
     copyBuffer();
 
     for (int b = 0; b < buffers.size(); b++) {
