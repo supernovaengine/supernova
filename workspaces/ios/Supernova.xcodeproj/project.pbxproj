@@ -135,6 +135,10 @@
 		719301221E50F9CF00BEE527 /* ConcreteObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301201E50F9CF00BEE527 /* ConcreteObject.cpp */; };
 		719301251E51212800BEE527 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301231E51212800BEE527 /* Material.cpp */; };
 		719330B51EDB161B0043E282 /* Rect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89051ED7711A0028DCE0 /* Rect.cpp */; };
+		719ACC3F219DB914008C21F4 /* Bone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719ACC3B219DB913008C21F4 /* Bone.cpp */; };
+		719ACC40219DB914008C21F4 /* SubMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719ACC3D219DB913008C21F4 /* SubMesh.cpp */; };
+		719ACC46219DB934008C21F4 /* ReadSModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719ACC41219DB934008C21F4 /* ReadSModel.cpp */; };
+		719ACC47219DB934008C21F4 /* AttributeBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719ACC44219DB934008C21F4 /* AttributeBuffer.cpp */; };
 		719C089D1F0DCFCB00F0BAF0 /* Program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719C08971F0DCFC300F0BAF0 /* Program.cpp */; };
 		719C089E1F0DCFCB00F0BAF0 /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719C08991F0DCFC300F0BAF0 /* Texture.cpp */; };
 		719C08A01F11128E00F0BAF0 /* ProgramRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719C089F1F11128E00F0BAF0 /* ProgramRender.cpp */; };
@@ -185,7 +189,6 @@
 		71C27739202BCE1F005B3EDC /* ScaleAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C2771F202BC3E2005B3EDC /* ScaleAction.cpp */; };
 		71C2773C202BCE6C005B3EDC /* AlignedBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714E167D2006DF8700548DA2 /* AlignedBox.cpp */; };
 		71C2773D202BCE6C005B3EDC /* Matrix3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714E167E2006DF8700548DA2 /* Matrix3.cpp */; };
-		71C2794D2106BE39004BFA17 /* MeshNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C2794B2106BE39004BFA17 /* MeshNode.cpp */; };
 		71C39E0F2041889B00863AB6 /* Ease.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E0C2041889600863AB6 /* Ease.cpp */; };
 		71C39E48204188B000863AB6 /* ParticleAccelerationInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E22204188A500863AB6 /* ParticleAccelerationInit.cpp */; };
 		71C39E49204188B000863AB6 /* ParticleAlphaInit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C39E24204188A500863AB6 /* ParticleAlphaInit.cpp */; };
@@ -738,6 +741,15 @@
 		719301241E51212800BEE527 /* Material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Material.h; sourceTree = "<group>"; };
 		719301261E53D4B000BEE527 /* Points.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Points.cpp; sourceTree = "<group>"; };
 		719301271E53D4B000BEE527 /* Points.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Points.h; sourceTree = "<group>"; };
+		719ACC3B219DB913008C21F4 /* Bone.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Bone.cpp; sourceTree = "<group>"; };
+		719ACC3C219DB913008C21F4 /* SubMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubMesh.h; sourceTree = "<group>"; };
+		719ACC3D219DB913008C21F4 /* SubMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SubMesh.cpp; sourceTree = "<group>"; };
+		719ACC3E219DB913008C21F4 /* Bone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bone.h; sourceTree = "<group>"; };
+		719ACC41219DB934008C21F4 /* ReadSModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ReadSModel.cpp; sourceTree = "<group>"; };
+		719ACC42219DB934008C21F4 /* ReadSModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadSModel.h; sourceTree = "<group>"; };
+		719ACC43219DB934008C21F4 /* SModelData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SModelData.h; sourceTree = "<group>"; };
+		719ACC44219DB934008C21F4 /* AttributeBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AttributeBuffer.cpp; sourceTree = "<group>"; };
+		719ACC45219DB934008C21F4 /* AttributeBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AttributeBuffer.h; sourceTree = "<group>"; };
 		719C08971F0DCFC300F0BAF0 /* Program.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Program.cpp; sourceTree = "<group>"; };
 		719C08981F0DCFC300F0BAF0 /* Program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Program.h; sourceTree = "<group>"; };
 		719C08991F0DCFC300F0BAF0 /* Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture.cpp; sourceTree = "<group>"; };
@@ -841,8 +853,6 @@
 		71C27726202BC405005B3EDC /* LightData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LightData.h; sourceTree = "<group>"; };
 		71C27729202BC405005B3EDC /* STBText.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STBText.cpp; sourceTree = "<group>"; };
 		71C2772A202BC405005B3EDC /* STBText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STBText.h; sourceTree = "<group>"; };
-		71C2794B2106BE39004BFA17 /* MeshNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MeshNode.cpp; sourceTree = "<group>"; };
-		71C2794C2106BE39004BFA17 /* MeshNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshNode.h; sourceTree = "<group>"; };
 		71C39E0C2041889600863AB6 /* Ease.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Ease.cpp; sourceTree = "<group>"; };
 		71C39E0D2041889700863AB6 /* Ease.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ease.h; sourceTree = "<group>"; };
 		71C39E11204188A500863AB6 /* ParticleAlphaMod.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticleAlphaMod.cpp; sourceTree = "<group>"; };
@@ -1116,6 +1126,8 @@
 			children = (
 				718C7BD61F3E541A001AA8C2 /* action */,
 				7188F1B01DBD416000A2D04F /* audio */,
+				719ACC3B219DB913008C21F4 /* Bone.cpp */,
+				719ACC3E219DB913008C21F4 /* Bone.h */,
 				71369C081E291E22006AE1D1 /* Button.cpp */,
 				71369C091E291E22006AE1D1 /* Button.h */,
 				713D2A071CFB2EAD00A4752F /* Camera.cpp */,
@@ -1153,8 +1165,6 @@
 				713D2A0B1CFB2EAD00A4752F /* Mesh.h */,
 				716F761B1E1C736300FF9888 /* Mesh2D.cpp */,
 				716F761C1E1C736300FF9888 /* Mesh2D.h */,
-				71C2794B2106BE39004BFA17 /* MeshNode.cpp */,
-				71C2794C2106BE39004BFA17 /* MeshNode.h */,
 				71F149B61CFB793200B7552E /* Model.cpp */,
 				71F149B71CFB793200B7552E /* Model.h */,
 				713D2A3C1CFB2EAD00A4752F /* Object.cpp */,
@@ -1185,6 +1195,8 @@
 				713384DD1D2F560400DB73A5 /* SpotLight.h */,
 				71598C3D1E762037000EDAC0 /* Sprite.cpp */,
 				71598C3E1E762037000EDAC0 /* Sprite.h */,
+				719ACC3D219DB913008C21F4 /* SubMesh.cpp */,
+				719ACC3C219DB913008C21F4 /* SubMesh.h */,
 				713D2A6A1CFB2EAD00A4752F /* Supernova.h */,
 				71BCF6C01E476F42008E42A2 /* Text.cpp */,
 				71BCF6C11E476F42008E42A2 /* Text.h */,
@@ -1788,12 +1800,17 @@
 		71C27724202BC405005B3EDC /* util */ = {
 			isa = PBXGroup;
 			children = (
+				719ACC44219DB934008C21F4 /* AttributeBuffer.cpp */,
+				719ACC45219DB934008C21F4 /* AttributeBuffer.h */,
 				71B130C020CD8F4D007A42A9 /* FunctionCallback.h */,
 				71BF18FA20D2034D00804467 /* IntegerSequence.h */,
 				71C27725202BC405005B3EDC /* LightData.cpp */,
 				71C27726202BC405005B3EDC /* LightData.h */,
 				71B130C120CD8F4D007A42A9 /* LuaFunction.cpp */,
 				71B130C220CD8F4D007A42A9 /* LuaFunction.h */,
+				719ACC41219DB934008C21F4 /* ReadSModel.cpp */,
+				719ACC42219DB934008C21F4 /* ReadSModel.h */,
+				719ACC43219DB934008C21F4 /* SModelData.h */,
 				71C27729202BC405005B3EDC /* STBText.cpp */,
 				71C2772A202BC405005B3EDC /* STBText.h */,
 			);
@@ -2387,6 +2404,7 @@
 				71CDC71A1D7B14510060EEFF /* Polygon.cpp in Sources */,
 				71C39E50204188B000863AB6 /* ParticleSpriteInit.cpp in Sources */,
 				71CE94F81EC8A3B2008CCF3C /* FileData.cpp in Sources */,
+				719ACC47219DB934008C21F4 /* AttributeBuffer.cpp in Sources */,
 				71C39E4E204188B000863AB6 /* ParticleRotationInit.cpp in Sources */,
 				71CDC7241D7B146D0060EEFF /* Quaternion.cpp in Sources */,
 				718FFC7A20E9CD7D00EEE535 /* Joint2D.cpp in Sources */,
@@ -2442,6 +2460,7 @@
 				71C39E4F204188B000863AB6 /* ParticleSizeInit.cpp in Sources */,
 				71CDC7171D7B14510060EEFF /* PlaneTerrain.cpp in Sources */,
 				71C39E4B204188B000863AB6 /* ParticleInit.cpp in Sources */,
+				719ACC46219DB934008C21F4 /* ReadSModel.cpp in Sources */,
 				71BF18F020D099F900804467 /* Contact2D.cpp in Sources */,
 				7119E6AB20A6A0B80016AEF2 /* CollisionShape2D.cpp in Sources */,
 				719C089E1F0DCFCB00F0BAF0 /* Texture.cpp in Sources */,
@@ -2467,12 +2486,12 @@
 				71CE95011EC8A3C8008CCF3C /* OGGReader.cpp in Sources */,
 				71C27738202BCE1F005B3EDC /* RotateAction.cpp in Sources */,
 				71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */,
-				71C2794D2106BE39004BFA17 /* MeshNode.cpp in Sources */,
 				71C39E4C204188B000863AB6 /* ParticleLifeInit.cpp in Sources */,
 				71BCF6C21E476F42008E42A2 /* Text.cpp in Sources */,
 				71C39E4A204188B000863AB6 /* ParticleColorInit.cpp in Sources */,
 				71598C431E7CA245000EDAC0 /* Fog.cpp in Sources */,
 				71C27737202BCE1F005B3EDC /* ColorAction.cpp in Sources */,
+				719ACC40219DB914008C21F4 /* SubMesh.cpp in Sources */,
 				71C39E52204188BC00863AB6 /* ParticleAlphaMod.cpp in Sources */,
 				71C39E51204188B000863AB6 /* ParticleVelocityInit.cpp in Sources */,
 				71CDC7231D7B146D0060EEFF /* Matrix4.cpp in Sources */,
@@ -2489,6 +2508,7 @@
 				71BCF6C31E476F49008E42A2 /* SkyBox.cpp in Sources */,
 				71C39E0F2041889B00863AB6 /* Ease.cpp in Sources */,
 				718C7BDA1F3E5422001AA8C2 /* MoveAction.cpp in Sources */,
+				719ACC3F219DB914008C21F4 /* Bone.cpp in Sources */,
 				7188F1B31DBD41A400A2D04F /* AudioFile.cpp in Sources */,
 				71B130C320CD8F4D007A42A9 /* LuaFunction.cpp in Sources */,
 			);
@@ -2966,6 +2986,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/mpg123/src/libmpg123";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				OTHER_CFLAGS = (
 					"-DHAVE_GCC_DESTRUCTOR=1",
@@ -2990,6 +3011,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/mpg123/src/libmpg123";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				OTHER_CFLAGS = (
 					"-DHAVE_GCC_DESTRUCTOR=1",
@@ -3017,7 +3039,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/box2d";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/box2d $(SRCROOT)/../../engine/libs/mpg123/src/libmpg123";
 			};
 			name = Debug;
 		};
@@ -3035,7 +3057,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/box2d";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/box2d $(SRCROOT)/../../engine/libs/mpg123/src/libmpg123";
 			};
 			name = Release;
 		};
