@@ -310,7 +310,7 @@ void Scene::resetSceneProperties(){
 }
 
 void Scene::drawTransparentMeshes(){
-    std::multimap<float, ConcreteObject*>::reverse_iterator it;
+    std::multimap<float, GraphicObject*>::reverse_iterator it;
     for (it = transparentQueue.rbegin(); it != transparentQueue.rend(); ++it) {
         (*it).second->renderDraw();
     }

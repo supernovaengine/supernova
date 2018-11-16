@@ -24,7 +24,7 @@ namespace Supernova {
     class Scene: public Object {
         friend class Engine;
         friend class Object;
-        friend class ConcreteObject;
+        friend class GraphicObject;
         friend class Mesh;
         friend class Points;
     private:
@@ -45,7 +45,7 @@ namespace Supernova {
         Camera* camera;
         bool userCamera;
         
-        std::multimap<float, ConcreteObject*> transparentQueue;
+        std::multimap<float, GraphicObject*> transparentQueue;
 
         std::vector<Light*> lights;
         std::vector<Scene*> subScenes;

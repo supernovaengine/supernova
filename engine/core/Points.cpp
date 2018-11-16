@@ -6,7 +6,7 @@
 
 using namespace Supernova;
 
-Points::Points(){
+Points::Points(): GraphicObject(){
 
     buffers.resize(1);
 
@@ -302,7 +302,7 @@ void Points::updatePointScale(){
 }
 
 void Points::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
-    ConcreteObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+    GraphicObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     updatePointScale();
 
@@ -314,7 +314,7 @@ void Points::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
 }
 
 void Points::updateMatrix(){
-    ConcreteObject::updateMatrix();
+    GraphicObject::updateMatrix();
 
     if (this->viewMatrix){
        this->normalMatrix = viewMatrix->transpose();
@@ -404,7 +404,7 @@ bool Points::isPertmitSortTransparentPoints(){
 }
 
 bool Points::renderDraw(){
-    if (!ConcreteObject::renderDraw())
+    if (!GraphicObject::renderDraw())
         return false;
 
     if (!visible)
@@ -418,7 +418,7 @@ bool Points::renderDraw(){
 }
 
 bool Points::textureLoad(){
-    if (!ConcreteObject::textureLoad())
+    if (!GraphicObject::textureLoad())
         return false;
     
     if (render){
@@ -439,27 +439,6 @@ bool Points::load(){
 
     render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material.getTexture());
 
-    if (scene){
-        render->setNumLights((int)scene->getLights()->size());
-        render->setNumShadows2D((int)scene->getLightData()->shadowsMap2D.size());
-        render->setNumShadowsCube((int)scene->getLightData()->shadowsMapCube.size());
-
-        render->setSceneRender(scene->getSceneRender());
-        render->setLightRender(scene->getLightRender());
-        render->setFogRender(scene->getFogRender());
-
-        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAP2D, scene->getLightData()->shadowsMap2D);
-        render->addProperty(S_PROPERTY_NUMSHADOWS2D, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows2D);
-        render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsVPMatrix.front());
-        render->addProperty(S_PROPERTY_SHADOWBIAS2D, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsBias2D.front());
-        render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR2D, S_PROPERTYDATA_FLOAT2, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsCameraNearFar2D.front());
-        render->addProperty(S_PROPERTY_NUMCASCADES2D, S_PROPERTYDATA_INT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowNumCascades2D.front());
-
-        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAPCUBE, scene->getLightData()->shadowsMapCube);
-        render->addProperty(S_PROPERTY_SHADOWBIASCUBE, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsBiasCube.front());
-        render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFARCUBE, S_PROPERTYDATA_FLOAT2, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsCameraNearFarCube.front());
-    }
-
     if ((material.getTexture()) && (useTextureRects)){
         material.getTexture()->load();
         texWidth = material.getTexture()->getWidth();
@@ -471,24 +450,11 @@ bool Points::load(){
     sortPoints();
     copyBuffer();
 
-    for (int b = 0; b < buffers.size(); b++) {
-        if (b == 0) {
-            render->setVertexSize(buffers[b].getCount());
-        }
-        render->addVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer(), true);
-        for (auto const &x : buffers[b].getAttributes()) {
-            render->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, buffers[b].getItemSize() * sizeof(float), x.second.offset * sizeof(float));
-        }
-    }
-
-    render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
-    render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
-    render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
-    render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition);
+    prepareRender();
     
     bool renderloaded = render->load();
     
-    if (!ConcreteObject::load())
+    if (!GraphicObject::load())
         return false;
 
     return renderloaded;
@@ -496,7 +462,7 @@ bool Points::load(){
 
 void Points::destroy(){
     
-    ConcreteObject::destroy();
+    GraphicObject::destroy();
 
     if (render)
         render->destroy();

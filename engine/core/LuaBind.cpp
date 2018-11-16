@@ -13,7 +13,7 @@
 
 #include "Engine.h"
 #include "Object.h"
-#include "ConcreteObject.h"
+#include "GraphicObject.h"
 #include "Log.h"
 #include "Scene.h"
 #include "Polygon.h"
@@ -554,17 +554,17 @@ void LuaBind::bind(){
     .addProperty("target", &DirectionalLight::getDirection, (void (DirectionalLight::*)(Vector3))&DirectionalLight::setDirection)
     .endClass()
 
-    .beginExtendClass<ConcreteObject, Object>("ConcreteObject")
-    .addFunction("setTexture", (void (ConcreteObject::*)(std::string))&ConcreteObject::setTexture)
-    .addFunction("setColor", (void (ConcreteObject::*)(float, float, float, float))&ConcreteObject::setColor)
-    .addFunction("setColorVector", (void (ConcreteObject::*)(Vector4))&ConcreteObject::setColor)
+    .beginExtendClass<GraphicObject, Object>("GraphicObject")
+    .addFunction("setTexture", (void (GraphicObject::*)(std::string))&GraphicObject::setTexture)
+    .addFunction("setColor", (void (GraphicObject::*)(float, float, float, float))&GraphicObject::setColor)
+    .addFunction("setColorVector", (void (GraphicObject::*)(Vector4))&GraphicObject::setColor)
     .endClass()
 
-    .beginExtendClass<Mesh, ConcreteObject>("Mesh")
+    .beginExtendClass<Mesh, GraphicObject>("Mesh")
     .addConstructor(LUA_ARGS())
     .endClass()
 
-    .beginExtendClass<Points, ConcreteObject>("Points")
+    .beginExtendClass<Points, GraphicObject>("Points")
     .addConstructor(LUA_ARGS())
     .addFunction("setSizeAttenuation", &Points::setSizeAttenuation)
     .addFunction("setPointScaleFactor", &Points::setPointScaleFactor)

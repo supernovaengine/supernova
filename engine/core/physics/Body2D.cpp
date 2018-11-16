@@ -3,7 +3,7 @@
 #include <Box2D/Box2D.h>
 #include "PhysicsWorld2D.h"
 #include "math/Angle.h"
-#include "ConcreteObject.h"
+#include "GraphicObject.h"
 #include "Log.h"
 
 //

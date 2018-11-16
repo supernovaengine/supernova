@@ -6,7 +6,7 @@
 // (c) 2018 Eduardo Doria.
 //
 
-#include "ConcreteObject.h"
+#include "GraphicObject.h"
 #include "math/Vector4.h"
 #include "math/Vector3.h"
 #include "math/Vector2.h"
@@ -15,7 +15,7 @@
 
 namespace Supernova {
 
-    class Mesh: public ConcreteObject {
+    class Mesh: public GraphicObject {
         
     private:
         void removeAllSubMeshes();

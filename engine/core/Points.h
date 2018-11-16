@@ -6,13 +6,13 @@
 #define S_POINTSIZE_WIDTH 1
 #define S_POINTSIZE_HEIGHT 2
 
-#include "ConcreteObject.h"
+#include "GraphicObject.h"
 #include "render/ObjectRender.h"
 #include <map>
 
 namespace Supernova {
 
-    class Points: public ConcreteObject {
+    class Points: public GraphicObject {
 
     private:
         

@@ -1,6 +1,6 @@
 
-#ifndef ConcreteObject_h
-#define ConcreteObject_h
+#ifndef GraphicObject_h
+#define GraphicObject_h
 
 //
 // (c) 2018 Eduardo Doria.
@@ -13,7 +13,7 @@
 
 namespace Supernova {
 
-    class ConcreteObject: public Object {
+    class GraphicObject: public Object {
 
     private:
 
@@ -39,11 +39,12 @@ namespace Supernova {
         void updateDistanceToCamera();
 
         void updateBuffer(int index);
+        void prepareRender();
 
     public:
 
-        ConcreteObject();
-        virtual ~ConcreteObject();
+        GraphicObject();
+        virtual ~GraphicObject();
         
         Matrix4 getNormalMatrix();
 
@@ -78,4 +79,4 @@ namespace Supernova {
     
 }
 
-#endif /* ConcreteObject_h */
+#endif /* GraphicObject_h */

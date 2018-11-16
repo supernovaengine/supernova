@@ -1,7 +1,7 @@
 #include "ColorAction.h"
 
 #include "Object.h"
-#include "ConcreteObject.h"
+#include "GraphicObject.h"
 
 
 using namespace Supernova;
@@ -40,7 +40,7 @@ bool ColorAction::run(){
     if (!TimeAction::run())
         return false;
 
-    ConcreteObject* cObject = dynamic_cast<ConcreteObject*>(object);
+    GraphicObject* cObject = dynamic_cast<GraphicObject*>(object);
 
     if (cObject && objectStartColor){
         startColor = cObject->getColor();
@@ -53,7 +53,7 @@ bool ColorAction::step(){
     if (!TimeAction::step())
         return false;
 
-    ConcreteObject* cObject = dynamic_cast<ConcreteObject*>(object);
+    GraphicObject* cObject = dynamic_cast<GraphicObject*>(object);
 
     if (cObject){
         Vector4 color = (endColor - startColor) * value;
