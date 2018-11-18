@@ -23,8 +23,6 @@ ObjectRender::ObjectRender(){
     numShadowsCube = 0;
     
     sceneRender = NULL;
-    lightRender = NULL;
-    fogRender = NULL;
 
     program = NULL;
     parent = NULL;
@@ -40,12 +38,6 @@ ObjectRender* ObjectRender::newInstance(){
 
 ObjectRender::~ObjectRender(){
     program.reset();
-
-    if (lightRender)
-        delete lightRender;
-
-    if (fogRender)
-        delete fogRender;
 }
 
 void ObjectRender::setProgram(std::shared_ptr<ProgramRender> program){
@@ -59,22 +51,6 @@ void ObjectRender::setParent(ObjectRender* parent){
 
 void ObjectRender::setSceneRender(SceneRender* sceneRender){
     this->sceneRender = sceneRender;
-}
-
-void ObjectRender::setLightRender(ObjectRender* lightRender){
-    if (lightRender){
-        if (!this->lightRender)
-            this->lightRender = ObjectRender::newInstance();
-        this->lightRender->properties = lightRender->properties;
-    }
-}
-
-void ObjectRender::setFogRender(ObjectRender* fogRender) {
-    if (fogRender){
-        if (!this->fogRender)
-            this->fogRender = ObjectRender::newInstance();
-        this->fogRender->properties = fogRender->properties;
-    }
 }
 
 void ObjectRender::setVertexSize(unsigned int vertexSize){
@@ -158,13 +134,13 @@ std::shared_ptr<ProgramRender> ObjectRender::getProgram(){
 }
 
 void ObjectRender::checkLighting(){
-    if (lightRender == NULL || (programDefs & S_PROGRAM_IS_SKY)){
+    if (properties.count(S_PROPERTY_AMBIENTLIGHT)==0 || (programDefs & S_PROGRAM_IS_SKY)){
         numLights = 0;
     }
 }
 
 void ObjectRender::checkFog(){
-    if (fogRender != NULL){
+    if (properties.count(S_PROPERTY_FOG_MODE)){
         programDefs |= S_PROGRAM_USE_FOG;
     }
 }
@@ -226,30 +202,11 @@ bool ObjectRender::load(){
             p.second[i]->load();
         }
     }
-
-    if (numLights > 0){
-        lightRender->setProgram(program);
-        lightRender->load();
-    }
-
-    if (programDefs & S_PROGRAM_USE_FOG){
-        fogRender->setProgram(program);
-        fogRender->load();
-    }
     
     return true;
 }
 
 bool ObjectRender::prepareDraw(){
-    
-    //lightRender and fogRender need to be called after main rander use program
-    if (numLights > 0){
-        lightRender->prepareDraw();
-    }
-    
-    if (programDefs & S_PROGRAM_USE_FOG){
-        fogRender->prepareDraw();
-    }
 
     return true;
 }
@@ -260,6 +217,7 @@ bool ObjectRender::draw(){
 }
 
 bool ObjectRender::finishDraw(){
+
     return true;
 }
 

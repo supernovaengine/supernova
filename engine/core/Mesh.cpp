@@ -145,38 +145,20 @@ bool Mesh::shadowLoad(){
     
     if (shadowRender == NULL)
         shadowRender = ObjectRender::newInstance();
+
     shadowRender->setProgramShader(S_SHADER_DEPTH_RTT);
 
     int progamDefs = 0;
     if (skinning)
         progamDefs |= S_PROGRAM_USE_SKINNING;
-    if (isSky())
-        progamDefs |= S_PROGRAM_IS_SKY;
-    if (isText())
-        progamDefs |= S_PROGRAM_IS_TEXT;
 
     shadowRender->setProgramDefs(progamDefs);
 
-    for (int b = 0; b < buffers.size(); b++) {
-        if (b == 0) {
-            shadowRender->setVertexSize(buffers[b].getCount());
-        }
-        shadowRender->addVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer(), dynamic);
-        for (auto const &x : buffers[b].getAttributes()) {
-            shadowRender->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, buffers[b].getItemSize() * sizeof(float), x.second.offset * sizeof(float));
-        }
-    }
-
-    shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
-    shadowRender->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
     if (skinning){
         shadowRender->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
     }
-    if (scene){
-        shadowRender->addProperty(S_PROPERTY_SHADOWLIGHT_POS, S_PROPERTYDATA_FLOAT3, 1, &scene->drawShadowLightPos);
-        shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR, S_PROPERTYDATA_FLOAT2, 1, &scene->drawShadowCameraNearFar);
-        shadowRender->addProperty(S_PROPERTY_ISPOINTSHADOW, S_PROPERTYDATA_INT1, 1, &scene->drawIsPointShadow);
-    }
+
+    prepareShadowRender();
     
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
@@ -236,6 +218,8 @@ bool Mesh::load(){
     if (skinning){
         render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
     }
+
+    prepareRender();
     
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
@@ -249,8 +233,6 @@ bool Mesh::load(){
         submeshes[i]->load();
     }
 
-    prepareRender();
-    
     bool renderloaded = render->load();
 
     if (renderloaded)

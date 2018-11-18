@@ -25,8 +25,6 @@ Scene::Scene() {
     fog = NULL;
 
     render = NULL;
-    lightRender = NULL;
-    fogRender = NULL;
     textureRender = NULL;
 
     physicsWorld = NULL;
@@ -43,12 +41,6 @@ Scene::Scene() {
 Scene::~Scene() {
     if (render)
         delete render;
-    
-    if (lightRender)
-        delete lightRender;
-    
-    if (fogRender)
-        delete fogRender;
 
     if (ownedPhysicsWorld)
         delete physicsWorld;
@@ -152,16 +144,8 @@ SceneRender* Scene::getSceneRender(){
     return render;
 }
 
-ObjectRender* Scene::getLightRender(){
-    return lightRender;
-}
-
 LightData* Scene::getLightData(){
     return &lightData;
-}
-
-ObjectRender* Scene::getFogRender(){
-    return fogRender;
 }
 
 Vector3 Scene::getDrawShadowLightPos(){
@@ -487,6 +471,51 @@ bool Scene::draw() {
 
 }
 
+bool Scene::addLightProperties(ObjectRender* render){
+    if (useLight){
+
+        render->addProperty(S_PROPERTY_AMBIENTLIGHT, S_PROPERTYDATA_FLOAT3, 1, &ambientLight);
+
+        render->addProperty(S_PROPERTY_NUMPOINTLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numPointLight);
+        render->addProperty(S_PROPERTY_POINTLIGHT_POS, S_PROPERTYDATA_FLOAT3, lightData.numPointLight, &lightData.pointLightPos.front());
+        render->addProperty(S_PROPERTY_POINTLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numPointLight, &lightData.pointLightPower.front());
+        render->addProperty(S_PROPERTY_POINTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numPointLight, &lightData.pointLightColor.front());
+        render->addProperty(S_PROPERTY_POINTLIGHT_SHADOWIDX, S_PROPERTYDATA_INT1, lightData.numPointLight, &lightData.pointLightShadowIdx.front());
+
+        render->addProperty(S_PROPERTY_NUMSPOTLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numSpotLight);
+        render->addProperty(S_PROPERTY_SPOTLIGHT_POS, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightPos.front());
+        render->addProperty(S_PROPERTY_SPOTLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightPower.front());
+        render->addProperty(S_PROPERTY_SPOTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightColor.front());
+        render->addProperty(S_PROPERTY_SPOTLIGHT_TARGET, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightTarget.front());
+        render->addProperty(S_PROPERTY_SPOTLIGHT_CUTOFF, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightCutOff.front());
+        render->addProperty(S_PROPERTY_SPOTLIGHT_OUTERCUTOFF, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightOuterCutOff.front());
+        render->addProperty(S_PROPERTY_SPOTLIGHT_SHADOWIDX, S_PROPERTYDATA_INT1, lightData.numSpotLight, &lightData.spotLightShadowIdx.front());
+
+        render->addProperty(S_PROPERTY_NUMDIRLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numDirectionalLight);
+        render->addProperty(S_PROPERTY_DIRLIGHT_DIR, S_PROPERTYDATA_FLOAT3, lightData.numDirectionalLight, &lightData.directionalLightDir.front());
+        render->addProperty(S_PROPERTY_DIRLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numDirectionalLight, &lightData.directionalLightPower.front());
+        render->addProperty(S_PROPERTY_DIRLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numDirectionalLight, &lightData.directionalLightColor.front());
+        render->addProperty(S_PROPERTY_DIRLIGHT_SHADOWIDX, S_PROPERTYDATA_INT1, lightData.numDirectionalLight, &lightData.directionalLightShadowIdx.front());
+
+        return true;
+    }
+    return false;
+}
+
+bool Scene::addFogProperties(ObjectRender* render){
+    if (fog){
+        render->addProperty(S_PROPERTY_FOG_MODE, S_PROPERTYDATA_INT1, 1, &(fog->mode));
+        render->addProperty(S_PROPERTY_FOG_COLOR, S_PROPERTYDATA_FLOAT3, 1, &(fog->color));
+        render->addProperty(S_PROPERTY_FOG_VISIBILITY, S_PROPERTYDATA_FLOAT1, 1, &(fog->visibility));
+        render->addProperty(S_PROPERTY_FOG_DENSITY, S_PROPERTYDATA_FLOAT1, 1, &(fog->density));
+        render->addProperty(S_PROPERTY_FOG_START, S_PROPERTYDATA_FLOAT1, 1, &(fog->linearStart));
+        render->addProperty(S_PROPERTY_FOG_END, S_PROPERTYDATA_FLOAT1, 1, &(fog->linearEnd));
+
+        return true;
+    }
+    return false;
+}
+
 bool Scene::load(){
 
     if (!render)
@@ -509,46 +538,6 @@ bool Scene::load(){
 
     render->load();
     resetSceneProperties();
-
-    if (useLight){
-        if (!lightRender)
-            lightRender = ObjectRender::newInstance();
-
-        lightRender->addProperty(S_PROPERTY_AMBIENTLIGHT, S_PROPERTYDATA_FLOAT3, 1, &ambientLight);
-
-        lightRender->addProperty(S_PROPERTY_NUMPOINTLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numPointLight);
-        lightRender->addProperty(S_PROPERTY_POINTLIGHT_POS, S_PROPERTYDATA_FLOAT3, lightData.numPointLight, &lightData.pointLightPos.front());
-        lightRender->addProperty(S_PROPERTY_POINTLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numPointLight, &lightData.pointLightPower.front());
-        lightRender->addProperty(S_PROPERTY_POINTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numPointLight, &lightData.pointLightColor.front());
-        lightRender->addProperty(S_PROPERTY_POINTLIGHT_SHADOWIDX, S_PROPERTYDATA_INT1, lightData.numPointLight, &lightData.pointLightShadowIdx.front());
-
-        lightRender->addProperty(S_PROPERTY_NUMSPOTLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numSpotLight);
-        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_POS, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightPos.front());
-        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightPower.front());
-        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightColor.front());
-        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_TARGET, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightTarget.front());
-        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_CUTOFF, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightCutOff.front());
-        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_OUTERCUTOFF, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightOuterCutOff.front());
-        lightRender->addProperty(S_PROPERTY_SPOTLIGHT_SHADOWIDX, S_PROPERTYDATA_INT1, lightData.numSpotLight, &lightData.spotLightShadowIdx.front());
-
-        lightRender->addProperty(S_PROPERTY_NUMDIRLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numDirectionalLight);
-        lightRender->addProperty(S_PROPERTY_DIRLIGHT_DIR, S_PROPERTYDATA_FLOAT3, lightData.numDirectionalLight, &lightData.directionalLightDir.front());
-        lightRender->addProperty(S_PROPERTY_DIRLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numDirectionalLight, &lightData.directionalLightPower.front());
-        lightRender->addProperty(S_PROPERTY_DIRLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numDirectionalLight, &lightData.directionalLightColor.front());
-        lightRender->addProperty(S_PROPERTY_DIRLIGHT_SHADOWIDX, S_PROPERTYDATA_INT1, lightData.numDirectionalLight, &lightData.directionalLightShadowIdx.front());
-    }
-
-    if (fog){
-        if (!fogRender)
-            fogRender = ObjectRender::newInstance();
-
-        fogRender->addProperty(S_PROPERTY_FOG_MODE, S_PROPERTYDATA_INT1, 1, &(fog->mode));
-        fogRender->addProperty(S_PROPERTY_FOG_COLOR, S_PROPERTYDATA_FLOAT3, 1, &(fog->color));
-        fogRender->addProperty(S_PROPERTY_FOG_VISIBILITY, S_PROPERTYDATA_FLOAT1, 1, &(fog->visibility));
-        fogRender->addProperty(S_PROPERTY_FOG_DENSITY, S_PROPERTYDATA_FLOAT1, 1, &(fog->density));
-        fogRender->addProperty(S_PROPERTY_FOG_START, S_PROPERTYDATA_FLOAT1, 1, &(fog->linearStart));
-        fogRender->addProperty(S_PROPERTY_FOG_END, S_PROPERTYDATA_FLOAT1, 1, &(fog->linearEnd));
-    }
 
     bool loadreturn = Object::load();
 

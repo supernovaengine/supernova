@@ -39,6 +39,7 @@ namespace Supernova {
         void updateDistanceToCamera();
 
         void updateBuffer(int index);
+        void prepareShadowRender();
         void prepareRender();
 
     public:

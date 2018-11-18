@@ -74,8 +74,6 @@ namespace Supernova {
         int numShadowsCube;
         
         SceneRender* sceneRender;
-        ObjectRender* lightRender;
-        ObjectRender* fogRender;
 
         std::shared_ptr<ProgramRender> program;
         ObjectRender* parent;
@@ -95,8 +93,6 @@ namespace Supernova {
         void setProgram(std::shared_ptr<ProgramRender> program);
         void setParent(ObjectRender* parent);
         void setSceneRender(SceneRender* sceneRender);
-        void setLightRender(ObjectRender* lightRender);
-        void setFogRender(ObjectRender* fogRender);
 
         void setVertexSize(unsigned int vertexSize);
         void setMinBufferSize(unsigned int minBufferSize);

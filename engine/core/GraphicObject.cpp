@@ -36,6 +36,27 @@ void GraphicObject::updateBuffer(int index){
         shadowRender->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
 }
 
+void GraphicObject::prepareShadowRender(){
+    for (int b = 0; b < buffers.size(); b++) {
+        if (b == 0) {
+            shadowRender->setVertexSize(buffers[b].getCount());
+        }
+        shadowRender->addVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer(), true);
+        for (auto const &x : buffers[b].getAttributes()) {
+            shadowRender->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, buffers[b].getItemSize() * sizeof(float), x.second.offset * sizeof(float));
+        }
+    }
+
+    shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    shadowRender->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
+
+    if (scene){
+        shadowRender->addProperty(S_PROPERTY_SHADOWLIGHT_POS, S_PROPERTYDATA_FLOAT3, 1, &scene->drawShadowLightPos);
+        shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR, S_PROPERTYDATA_FLOAT2, 1, &scene->drawShadowCameraNearFar);
+        shadowRender->addProperty(S_PROPERTY_ISPOINTSHADOW, S_PROPERTYDATA_INT1, 1, &scene->drawIsPointShadow);
+    }
+}
+
 void GraphicObject::prepareRender(){
 
     for (int b = 0; b < buffers.size(); b++) {
@@ -60,8 +81,9 @@ void GraphicObject::prepareRender(){
         render->setNumShadowsCube(scene->getLightData()->numShadowsCube);
 
         render->setSceneRender(scene->getSceneRender());
-        render->setLightRender(scene->getLightRender());
-        render->setFogRender(scene->getFogRender());
+
+        scene->addLightProperties(render);
+        scene->addFogProperties(render);
 
         render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAP2D, scene->getLightData()->shadowsMap2D);
         render->addProperty(S_PROPERTY_NUMSHADOWS2D, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows2D);

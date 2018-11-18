@@ -30,8 +30,6 @@ namespace Supernova {
     private:
 
         SceneRender* render;
-        ObjectRender* lightRender;
-        ObjectRender* fogRender;
         Texture* textureRender;
 
         Vector3 drawShadowLightPos;
@@ -81,6 +79,9 @@ namespace Supernova {
 
         void setSky(SkyBox* sky);
 
+        bool addLightProperties(ObjectRender* render);
+        bool addFogProperties(ObjectRender* render);
+
         void resetSceneProperties();
         void drawTransparentMeshes();
         void drawSky();
@@ -94,8 +95,6 @@ namespace Supernova {
         virtual ~Scene();
         
         SceneRender* getSceneRender();
-        ObjectRender* getLightRender();
-        ObjectRender* getFogRender();
         Vector3 getDrawShadowLightPos();
 
         void setAmbientLight(Vector3 ambientLight);
