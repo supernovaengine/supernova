@@ -88,7 +88,7 @@ bool GLES2Object::load(){
 
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
 
-    GLES2Program* programRender = (GLES2Program*)program->getProgramRender().get();
+    GLES2Program* programRender = (GLES2Program*)program.get();
     GLuint glesProgram = programRender->getProgram();
     
     useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
@@ -259,9 +259,9 @@ bool GLES2Object::load(){
 
 bool GLES2Object::prepareDraw(){
 
-    GLES2Program* programRender = (GLES2Program*)program->getProgramRender().get();
+    GLES2Program* programRender = (GLES2Program*)program.get();
     GLuint glesProgram = programRender->getProgram();
-    if (programOwned){
+    if (parent==NULL){
         glUseProgram(glesProgram);
         GLES2Util::checkGlError("glUseProgram");
     }

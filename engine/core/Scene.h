@@ -57,6 +57,7 @@ namespace Supernova {
         
         Vector3 ambientLight;
 
+        bool loadedShadow;
         bool drawingShadow;
         bool childScene;
         bool useTransparency;
@@ -112,6 +113,7 @@ namespace Supernova {
         std::vector<Light*>* getLights();
         LightData* getLightData();
 
+        bool isLoadedShadow();
         bool isDrawingShadow();
         bool isChildScene();
         bool isUseDepth();

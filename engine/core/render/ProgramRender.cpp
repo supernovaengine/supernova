@@ -124,7 +124,7 @@ int ProgramRender::getMaxShadowsCube(){
     return maxShadowsCube;
 }
 
-void ProgramRender::createProgram(int shaderType, int numLights, int numShadows2D, int numShadowsCube, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool hasSkinning, bool isSky, bool isText){
+void ProgramRender::createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube){
     loaded = true;
 }
 

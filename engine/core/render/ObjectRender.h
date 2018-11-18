@@ -18,7 +18,7 @@
 #define S_PRIMITIVE_POINTS  3
 
 #include <unordered_map>
-#include "Program.h"
+#include "ProgramRender.h"
 #include "SceneRender.h"
 #include "Texture.h"
 
@@ -72,25 +72,18 @@ namespace Supernova {
         int numLights;
         int numShadows2D;
         int numShadowsCube;
-        bool hasFog;
-        bool hasTextureCoords;
-        bool hasTextureRect;
-        bool hasTextureCube;
-        bool hasSkinning;
-        bool isSky;
-        bool isText;
         
         SceneRender* sceneRender;
         ObjectRender* lightRender;
         ObjectRender* fogRender;
 
-        Program* program;
+        std::shared_ptr<ProgramRender> program;
         ObjectRender* parent;
 
         unsigned int minBufferSize;
         int primitiveType;
-        bool programOwned;
         int programShader;
+        int programDefs;
         
         ObjectRender();
 
@@ -99,7 +92,7 @@ namespace Supernova {
         
         virtual ~ObjectRender();
 
-        void setProgram(Program* program);
+        void setProgram(std::shared_ptr<ProgramRender> program);
         void setParent(ObjectRender* parent);
         void setSceneRender(SceneRender* sceneRender);
         void setLightRender(ObjectRender* lightRender);
@@ -109,16 +102,11 @@ namespace Supernova {
         void setMinBufferSize(unsigned int minBufferSize);
         void setPrimitiveType(int primitiveType);
         void setProgramShader(int programShader);
+        void setProgramDefs(int programDefs);
         void setDynamicBuffer(bool dynamicBuffer);
         void setNumLights(int numLights);
         void setNumShadows2D(int numShadows2D);
         void setNumShadowsCube(int numShadowsCube);
-        void setHasTextureCoords(bool hasTextureCoords);
-        void setHasTextureRect(bool hasTextureRect);
-        void setHasTextureCube(bool hasTextureCube);
-        void setHasSkinning(bool hasSkinning);
-        void setIsSky(bool isSky);
-        void setIsText(bool isText);
 
         void addVertexBuffer(std::string name, unsigned int size, void* data, bool dynamic = false);
         void addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride = 0, size_t offset = 0);
@@ -126,8 +114,8 @@ namespace Supernova {
         void addProperty(int type, int datatype, unsigned int size, void* data);
         void addTexture(int type, Texture* texture);
         void addTextureVector(int type, std::vector<Texture*> texturesVec);
-        
-        Program* getProgram();
+
+        std::shared_ptr<ProgramRender> getProgram();
 
         virtual void updateVertexBuffer(std::string name, unsigned int size, void* data);
         virtual void updateIndex(unsigned int size, void* data);

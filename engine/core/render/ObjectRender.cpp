@@ -14,20 +14,13 @@ ObjectRender::ObjectRender(){
     textures.clear();
     indexAttribute.data = NULL;
     properties.clear();
-    programOwned = false;
     programShader = -1;
+    programDefs = 0;
 
     vertexSize = 0;
     numLights = 0;
     numShadows2D = 0;
     numShadowsCube = 0;
-    hasFog = false;
-    hasTextureCoords = false;
-    hasTextureRect = false;
-    hasTextureCube = false;
-    hasSkinning = false;
-    isSky = false;
-    isText = false;
     
     sceneRender = NULL;
     lightRender = NULL;
@@ -46,8 +39,7 @@ ObjectRender* ObjectRender::newInstance(){
 }
 
 ObjectRender::~ObjectRender(){
-    if (program && programOwned)
-        delete program;
+    program.reset();
 
     if (lightRender)
         delete lightRender;
@@ -56,12 +48,8 @@ ObjectRender::~ObjectRender(){
         delete fogRender;
 }
 
-void ObjectRender::setProgram(Program* program){
-    if (this->program && programOwned)
-        delete this->program;
-    
+void ObjectRender::setProgram(std::shared_ptr<ProgramRender> program){
     this->program = program;
-    programOwned = false;
 }
 
 void ObjectRender::setParent(ObjectRender* parent){
@@ -103,6 +91,10 @@ void ObjectRender::setPrimitiveType(int primitiveType){
 
 void ObjectRender::setProgramShader(int programShader){
     this->programShader = programShader;
+}
+
+void ObjectRender::setProgramDefs(int programDefs){
+    this->programDefs = programDefs;
 }
 
 void ObjectRender::addVertexBuffer(std::string name, unsigned int size, void* data, bool dynamic){
@@ -158,31 +150,7 @@ void ObjectRender::setNumShadowsCube(int numShadowsCube){
     this->numShadowsCube = numShadowsCube;
 }
 
-void ObjectRender::setHasTextureCoords(bool hasTextureCoords){
-    this->hasTextureCoords = hasTextureCoords;
-}
-
-void ObjectRender::setHasTextureRect(bool hasTextureRect){
-    this->hasTextureRect = hasTextureRect;
-}
-
-void ObjectRender::setHasTextureCube(bool hasTextureCube){
-    this->hasTextureCube = hasTextureCube;
-}
-
-void ObjectRender::setHasSkinning(bool hasSkinning){
-    this->hasSkinning = hasSkinning;
-}
-
-void ObjectRender::setIsSky(bool isSky){
-    this->isSky = isSky;
-}
-
-void ObjectRender::setIsText(bool isText){
-    this->isText = isText;
-}
-
-Program* ObjectRender::getProgram(){
+std::shared_ptr<ProgramRender> ObjectRender::getProgram(){
     
     loadProgram();
     
@@ -190,29 +158,29 @@ Program* ObjectRender::getProgram(){
 }
 
 void ObjectRender::checkLighting(){
-    if (lightRender == NULL || isSky){
+    if (lightRender == NULL || (programDefs & S_PROGRAM_IS_SKY)){
         numLights = 0;
     }
 }
 
 void ObjectRender::checkFog(){
     if (fogRender != NULL){
-        hasFog = true;
+        programDefs |= S_PROGRAM_USE_FOG;
     }
 }
 
 void ObjectRender::checkTextureCoords(){
     if (textures.count(S_TEXTURESAMPLER_DIFFUSE))
         if (textures[S_TEXTURESAMPLER_DIFFUSE].size() > 0)
-            hasTextureCoords = true;
+            programDefs |= S_PROGRAM_USE_TEXCOORD;
 }
 
 void ObjectRender::checkTextureRect(){
     if (vertexAttributes.count(S_VERTEXATTRIBUTE_TEXTURERECTS)){
-        hasTextureRect = true;
+        programDefs |= S_PROGRAM_USE_TEXRECT;
     }
     if (properties.count(S_PROPERTY_TEXTURERECT)){
-        hasTextureRect = true;
+        programDefs |= S_PROGRAM_USE_TEXRECT;
     }
 }
 
@@ -220,7 +188,7 @@ void ObjectRender::checkTextureCube(){
     if (textures.count(S_TEXTURESAMPLER_DIFFUSE)) {
         for (size_t i = 0; i < textures[S_TEXTURESAMPLER_DIFFUSE].size(); i++) {
             if (textures[S_TEXTURESAMPLER_DIFFUSE][i]->getType() == S_TEXTURE_CUBE)
-                hasTextureCube = true;
+                programDefs |= S_PROGRAM_USE_TEXCUBE;
         }
     }
 }
@@ -231,19 +199,23 @@ void ObjectRender::loadProgram(){
     checkTextureCoords();
     checkTextureRect();
     checkTextureCube();
-    
+
+    std::string shaderStr = std::to_string(programShader);
+    shaderStr += "|" + std::to_string(programDefs);
+    shaderStr += "|" + std::to_string(numLights);
+    shaderStr += "|" + std::to_string(numShadows2D);
+    shaderStr += "|" + std::to_string(numShadowsCube);
+
     if (!program){
-        program = new Program();
-        programOwned = true;
+        program = ProgramRender::sharedInstance(shaderStr);
+
+        if (!program.get()->isLoaded()){
+
+            program.get()->createProgram(programShader, programDefs, numLights, numShadows2D, numShadowsCube);
+
+        }
     }
-    
-    if (programOwned){
-        if (programShader != -1)
-            program->setShader(programShader);
-    
-        program->setDefinitions(numLights, numShadows2D, numShadowsCube, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, hasSkinning, isSky, isText);
-        program->load();
-    }
+
 }
 
 bool ObjectRender::load(){
@@ -255,30 +227,12 @@ bool ObjectRender::load(){
         }
     }
 
-    for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end();)
-    {
-        if (!program->existVertexAttribute(it->first)){
-            it = vertexAttributes.erase(it);
-        }else{
-            it++;
-        }
-    }
-    
-    for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end();)
-    {
-        if (!program->existProperty(it->first)){
-            it = properties.erase(it);
-        }else{
-            it++;
-        }
-    }
-
     if (numLights > 0){
         lightRender->setProgram(program);
         lightRender->load();
     }
 
-    if (hasFog){
+    if (programDefs & S_PROGRAM_USE_FOG){
         fogRender->setProgram(program);
         fogRender->load();
     }
@@ -293,7 +247,7 @@ bool ObjectRender::prepareDraw(){
         lightRender->prepareDraw();
     }
     
-    if (hasFog){
+    if (programDefs & S_PROGRAM_USE_FOG){
         fogRender->prepareDraw();
     }
 
@@ -314,7 +268,7 @@ void ObjectRender::destroy(){
     for (size_t i = 0; i < textures[S_TEXTURESAMPLER_DIFFUSE].size(); i++) {
         textures[S_TEXTURESAMPLER_DIFFUSE][i]->destroy();
     }
-    
-    if (program)
-        program->destroy();
+
+    program.reset();
+    ProgramRender::deleteUnused();
 }

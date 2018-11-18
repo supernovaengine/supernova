@@ -12,6 +12,7 @@ using namespace Supernova;
 
 Scene::Scene() {
     camera = NULL;
+    loadedShadow = false;
     drawingShadow = false;
     childScene = false;
     useTransparency = false;
@@ -190,6 +191,11 @@ Vector3* Scene::getAmbientLight(){
 std::vector<Light*>* Scene::getLights(){
     return &lights;
 }
+
+bool Scene::isLoadedShadow(){
+    return loadedShadow;
+}
+
 
 bool Scene::isDrawingShadow(){
     return drawingShadow;
@@ -491,9 +497,11 @@ bool Scene::load(){
     render->setChildScene(isChildScene());
     render->setUseDepth(isUseDepth());
 
+    loadedShadow = false;
     for (int i=0; i<lights.size(); i++) {
         if (lights[i]->isUseShadow()) {
             lights[i]->loadShadow();
+            loadedShadow = true;
         }
     }
 

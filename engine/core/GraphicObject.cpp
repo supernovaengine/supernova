@@ -196,8 +196,10 @@ bool GraphicObject::load(){
         transparent = true;
         setSceneTransparency(true);
     }
-    
-    shadowLoad();
+
+    if (scene && scene->isLoadedShadow()) {
+        shadowLoad();
+    }
 
     return true;
 }

@@ -146,7 +146,16 @@ bool Mesh::shadowLoad(){
     if (shadowRender == NULL)
         shadowRender = ObjectRender::newInstance();
     shadowRender->setProgramShader(S_SHADER_DEPTH_RTT);
-    shadowRender->setHasSkinning(skinning);
+
+    int progamDefs = 0;
+    if (skinning)
+        progamDefs |= S_PROGRAM_USE_SKINNING;
+    if (isSky())
+        progamDefs |= S_PROGRAM_IS_SKY;
+    if (isText())
+        progamDefs |= S_PROGRAM_IS_TEXT;
+
+    shadowRender->setProgramDefs(progamDefs);
 
     for (int b = 0; b < buffers.size(); b++) {
         if (b == 0) {
@@ -168,8 +177,6 @@ bool Mesh::shadowLoad(){
         shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR, S_PROPERTYDATA_FLOAT2, 1, &scene->drawShadowCameraNearFar);
         shadowRender->addProperty(S_PROPERTY_ISPOINTSHADOW, S_PROPERTYDATA_INT1, 1, &scene->drawIsPointShadow);
     }
-
-    Program* shadowProgram = shadowRender->getProgram();
     
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
@@ -177,7 +184,7 @@ bool Mesh::shadowLoad(){
             //Use the same render for submesh
             submeshes[i]->setSubMeshShadowRender(shadowRender);
         }else{
-            submeshes[i]->getSubMeshShadowRender()->setProgram(shadowProgram);
+            submeshes[i]->getSubMeshShadowRender()->setParent(shadowRender);
         }
         submeshes[i]->getSubMeshShadowRender()->setPrimitiveType(primitiveType);
         submeshes[i]->shadowLoad();
@@ -209,12 +216,22 @@ bool Mesh::load(){
         render = ObjectRender::newInstance();
 
     render->setProgramShader(S_SHADER_MESH);
-    render->setHasTextureCoords(hasTextureCoords);
-    render->setHasTextureRect(hasTextureRect);
-    render->setHasTextureCube(hasTextureCube);
-    render->setHasSkinning(skinning);
-    render->setIsSky(isSky());
-    render->setIsText(isText());
+
+    int progamDefs = 0;
+    if (hasTextureCoords)
+        progamDefs |= S_PROGRAM_USE_TEXCOORD;
+    if (hasTextureRect)
+        progamDefs |= S_PROGRAM_USE_TEXRECT;
+    if (hasTextureCube)
+        progamDefs |= S_PROGRAM_USE_TEXCUBE;
+    if (skinning)
+        progamDefs |= S_PROGRAM_USE_SKINNING;
+    if (isSky())
+        progamDefs |= S_PROGRAM_IS_SKY;
+    if (isText())
+        progamDefs |= S_PROGRAM_IS_TEXT;
+
+    render->setProgramDefs(progamDefs);
 
     if (skinning){
         render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());

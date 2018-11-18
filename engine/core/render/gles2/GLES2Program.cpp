@@ -6,7 +6,6 @@
 #include "GLES2Shaders.h"
 #include "GLES2Util.h"
 #include "Log.h"
-#include "Program.h"
 
 using namespace Supernova;
 
@@ -59,8 +58,8 @@ GLuint GLES2Program::loadShader(GLenum shaderType, const char* pSource) {
     return shader;
 }
 
-void GLES2Program::createProgram(int shaderType, int numLights, int numShadows2D, int numShadowsCube, bool hasFog, bool hasTextureCoords, bool hasTextureRect, bool hasTextureCube, bool hasSkinning, bool isSky, bool isText){
-    ProgramRender::createProgram(shaderType, numLights, numShadows2D, numShadowsCube, hasFog, hasTextureCoords, hasTextureRect, hasTextureCube, hasSkinning, isSky, isText);
+void GLES2Program::createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube){
+    ProgramRender::createProgram(shaderType, programDefs, numLights, numShadows2D, numShadowsCube);
     
     std::string shaderName = "";
     if (shaderType == S_SHADER_MESH){
@@ -75,29 +74,29 @@ void GLES2Program::createProgram(int shaderType, int numLights, int numShadows2D
     maxShadows2D = std::min(MAXSHADOWS_GLES2, numShadows2D);
     maxShadowsCube = std::min(MAXSHADOWS_GLES2 - numShadows2D, numShadowsCube);
 
-    if (numLights > 0){
-        definitions += "#define USE_LIGHTING\n";
-    }
-    if (hasFog){
+    if (programDefs & S_PROGRAM_USE_FOG){
         definitions += "#define HAS_FOG\n";
     }
-    if (hasTextureCoords){
+    if (programDefs & S_PROGRAM_USE_TEXCOORD){
         definitions += "#define USE_TEXTURECOORDS\n";
     }
-    if (hasTextureRect){
+    if (programDefs & S_PROGRAM_USE_TEXRECT){
         definitions += "#define HAS_TEXTURERECT\n";
     }
-    if (hasTextureCube){
+    if (programDefs & S_PROGRAM_USE_TEXCUBE){
         definitions += "#define USE_TEXTURECUBE\n";
     }
-    if (hasSkinning){
+    if (programDefs & S_PROGRAM_USE_SKINNING){
         definitions += "#define HAS_SKINNING\n";
     }
-    if (isSky){
+    if (programDefs & S_PROGRAM_IS_SKY){
         definitions += "#define IS_SKY\n";
     }
-    if (isText){
+    if (programDefs & S_PROGRAM_IS_TEXT){
         definitions += "#define IS_TEXT\n";
+    }
+    if (numLights > 0){
+        definitions += "#define USE_LIGHTING\n";
     }
     if (maxShadows2D > 0){
         definitions += "#define HAS_SHADOWS2D\n";
@@ -122,7 +121,7 @@ void GLES2Program::createProgram(int shaderType, int numLights, int numShadows2D
         pVertexSource = replaceAll(pVertexSource, "MAXCASCADES", std::to_string(MAXCASCADES_GLES2));
         pFragmentSource = replaceAll(pFragmentSource, "MAXCASCADES", std::to_string(MAXCASCADES_GLES2));
     }
-    if (hasSkinning){
+    if (programDefs & S_PROGRAM_USE_SKINNING){
         pVertexSource = replaceAll(pVertexSource, "MAXBONES", "68");
         pFragmentSource = replaceAll(pFragmentSource, "MAXBONES", "68");
     }
