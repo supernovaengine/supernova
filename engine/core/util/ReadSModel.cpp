@@ -22,7 +22,6 @@ bool ReadSModel::readModel(SModelData &modelData){
         is->read((char*)&modelData.vertexMask, sizeof(int));
         readVerticesVector(modelData.vertices, modelData.vertexMask);
         readMeshDataVector(modelData.meshes);
-        readBoneWeightDataVector(modelData.boneWeights);
         readSkeleton(modelData.skeleton);
 
         return true;
@@ -43,6 +42,10 @@ void ReadSModel::readUintVector(std::vector<unsigned int> &vec){
     is->read((char*)&size, sizeof(size));
     vec.resize(size);
     is->read((char*)&vec[0], vec.size() * sizeof(unsigned int));
+}
+
+void ReadSModel::readVector4(Vector4 &vec){
+    is->read((char*)&vec, 4 * sizeof(float));
 }
 
 void ReadSModel::readVector3(Vector3 &vec){
@@ -76,28 +79,6 @@ void ReadSModel::readMaterialDataVector(std::vector<MaterialData> &vec){
     }
 }
 
-void ReadSModel::readBoneWeightDataVector(std::vector<BoneWeightData> &vec){
-    size_t size = 0;
-    is->read((char*)&size, sizeof(size));
-    vec.resize(size);
-
-    for (size_t i = 0; i < size; ++i){
-        is->read((char*)&vec[i].boneId, sizeof(unsigned int));
-        readBoneVertexWeightDataVector(vec[i].vertexWeights);
-    }
-}
-
-void ReadSModel::readBoneVertexWeightDataVector(std::vector<BoneVertexWeightData> &vec){
-    size_t size = 0;
-    is->read((char*)&size, sizeof(size));
-    vec.resize(size);
-
-    for (size_t i = 0; i < size; ++i){
-        is->read((char*)&vec[i].vertexId, sizeof(unsigned int));
-        is->read((char*)&vec[i].weight, sizeof(float));
-    }
-}
-
 void ReadSModel::readSkeleton(BoneData* &skeleton){
     size_t size = 0;
     is->read((char*)&size, sizeof(size));
@@ -112,7 +93,7 @@ void ReadSModel::readSkeleton(BoneData* &skeleton){
 
 void ReadSModel::readBoneData(BoneData &boneData){
     readString(boneData.name);
-    is->read((char*)&boneData.boneId, sizeof(unsigned int));
+    is->read((char*)&boneData.boneIndex, sizeof(int));
     is->read((char*)&boneData.bindPosition, 3 * sizeof(float));
     is->read((char*)&boneData.bindRotation, 4 * sizeof(float));
     is->read((char*)&boneData.bindScale, 3 * sizeof(float));
@@ -150,4 +131,8 @@ void ReadSModel::readVertexData(VertexData &vertexData, int vertexMask){
         readVector3(vertexData.tangent);
     if (vertexMask & VERTEX_ELEMENT_BITANGENT)
         readVector3(vertexData.bitangent);
+    if (vertexMask & VERTEX_ELEMENT_BONE_INDICES)
+        readVector4(vertexData.boneIndices);
+    if (vertexMask & VERTEX_ELEMENT_BONE_WEIGHTS)
+        readVector4(vertexData.boneWeights);
 }

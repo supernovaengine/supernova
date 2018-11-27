@@ -27,10 +27,10 @@ std::string Model::readFileToString(const char* filename){
     return filedata.readString();
 }
 
-Bone* Model::generateSketetalStructure(BoneData boneData){
+Bone* Model::generateSketetalStructure(BoneData boneData, int& numBones){
     Bone* bone = new Bone();
 
-    bone->setId(boneData.boneId);
+    bone->setIndex(boneData.boneIndex);
     bone->setName(boneData.name);
     bone->setBindPosition(boneData.bindPosition);
     bone->setBindRotation(boneData.bindRotation);
@@ -45,8 +45,14 @@ Bone* Model::generateSketetalStructure(BoneData boneData){
 
     bone->setOffsetMatrix(offsetMatrix);
 
+    bonesNameMapping[bone->getName()] = bone;
+
+    if (bone->getIndex() >= 0){
+        numBones++;
+    }
+
     for (size_t i = 0; i < boneData.children.size(); i++){
-        bone->addObject(generateSketetalStructure(boneData.children[i]));
+        bone->addObject(generateSketetalStructure(boneData.children[i], numBones));
     }
 
     bone->model = this;
@@ -89,6 +95,12 @@ bool Model::loadSMODEL(const char* path) {
         if (modelData.vertexMask & VERTEX_ELEMENT_NORMAL){
             buffers[0].addValue(attNormal, modelData.vertices[i].normal);
         }
+        if (modelData.vertexMask & VERTEX_ELEMENT_BONE_INDICES){
+            buffers[0].addValue(attBoneId, modelData.vertices[i].boneIndices);
+        }
+        if (modelData.vertexMask & VERTEX_ELEMENT_BONE_WEIGHTS){
+            buffers[0].addValue(attBoneWeight, modelData.vertices[i].boneWeights);
+        }
 
     }
 
@@ -108,46 +120,13 @@ bool Model::loadSMODEL(const char* path) {
             this->submeshes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir + modelData.meshes[i].materials[0].texture));
     }
 
+    int numBones = 0;
+
     if (modelData.skeleton){
-        skeleton = generateSketetalStructure(*modelData.skeleton);
+        skeleton = generateSketetalStructure(*modelData.skeleton, numBones);
     }
 
-    for (size_t i = 0; i < modelData.boneWeights.size(); i++){
-
-        BoneInfo boneInfo;
-        boneInfo.index = i;
-        boneInfo.object = findBone(skeleton, modelData.boneWeights[i].boneId);
-
-        bonesMapping[modelData.boneWeights[i].boneId] = boneInfo;
-        bonesNameMapping[boneInfo.object->getName()] = boneInfo.object;
-
-        for (size_t j = 0; j < modelData.boneWeights[i].vertexWeights.size(); j++){
-            unsigned int vertexId = modelData.boneWeights[i].vertexWeights[j].vertexId;
-            float weight = modelData.boneWeights[i].vertexWeights[j].weight;
-
-            Vector4 vertexBoneWeights = buffers[0].getValueVector4(attBoneWeight, vertexId);
-            Vector4 vertexBoneIds = buffers[0].getValueVector4(attBoneId, vertexId);
-
-            if (vertexBoneWeights[0] == 0) {
-                vertexBoneWeights[0] = weight;
-                vertexBoneIds[0] = i;
-            }else if (vertexBoneWeights[1] == 0) {
-                vertexBoneWeights[1] = weight;
-                vertexBoneIds[1] = i;
-            }else if (vertexBoneWeights[2] == 0) {
-                vertexBoneWeights[2] = weight;
-                vertexBoneIds[2] = i;
-            }else if (vertexBoneWeights[3] == 0) {
-                vertexBoneWeights[3] = weight;
-                vertexBoneIds[3] = i;
-            }
-
-            buffers[0].setValue(vertexId, attBoneWeight, vertexBoneWeights);
-            buffers[0].setValue(vertexId, attBoneId, vertexBoneIds);
-        }
-    }
-
-    bonesMatrix.resize(modelData.boneWeights.size());
+    bonesMatrix.resize(numBones);
 
     if (modelData.skeleton){
         addObject(skeleton);
@@ -233,12 +212,12 @@ bool Model::loadOBJ(const char* path){
     return true;
 }
 
-Bone* Model::findBone(Bone* bone, unsigned int boneId){
-    if (bone->getId() == boneId){
+Bone* Model::findBone(Bone* bone, int boneIndex){
+    if (bone->getIndex() == boneIndex){
         return bone;
     }else{
         for (size_t i = 0; i < bone->getObjects().size(); i++){
-            Bone* childreturn = findBone((Bone*)bone->getObject(i), boneId);
+            Bone* childreturn = findBone((Bone*)bone->getObject(i), boneIndex);
             if (childreturn)
                 return childreturn;
         }
@@ -254,16 +233,9 @@ Bone* Model::getBone(std::string name){
     return NULL;
 }
 
-Bone* Model::getBone(unsigned int boneId){
-    if (bonesMapping.count(boneId))
-        return bonesMapping[boneId].object;
-
-    return NULL;
-}
-
-void Model::updateBone(unsigned int boneId, Matrix4 skinning){
-    if (bonesMapping.count(boneId))
-        bonesMatrix[bonesMapping[boneId].index] = skinning;
+void Model::updateBone(int boneIndex, Matrix4 skinning){
+    if (boneIndex >= 0 && boneIndex <= bonesMatrix.size())
+        bonesMatrix[boneIndex] = skinning;
 }
 
 void Model::updateMatrix(){

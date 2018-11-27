@@ -25,12 +25,12 @@ void Bone::moveToBind(){
     updateMatrix();
 }
 
-unsigned int Bone::getId() const {
-    return id;
+int Bone::getIndex() const {
+    return index;
 }
 
-void Bone::setId(unsigned int id) {
-    Bone::id = id;
+void Bone::setIndex(int index) {
+    Bone::index = index;
 }
 
 const std::string &Bone::getName() const {
@@ -83,6 +83,6 @@ void Bone::updateMatrix(){
     if (model) {
         Matrix4 skinning = model->getInverseDerivedTransform() * modelMatrix * offsetMatrix;
 
-        model->updateBone(id, skinning);
+        model->updateBone(index, skinning);
     }
 }
