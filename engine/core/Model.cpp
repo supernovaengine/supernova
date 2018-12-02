@@ -234,7 +234,7 @@ Bone* Model::getBone(std::string name){
 }
 
 void Model::updateBone(int boneIndex, Matrix4 skinning){
-    if (boneIndex >= 0 && boneIndex <= bonesMatrix.size())
+    if (boneIndex >= 0 && boneIndex < bonesMatrix.size())
         bonesMatrix[boneIndex] = skinning;
 }
 
