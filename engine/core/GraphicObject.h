@@ -57,8 +57,8 @@ namespace Supernova {
         void setTexture(std::string texturepath);
         std::string getTexture();
 
-        void setVisible(bool visible);
-        bool isVisible();
+        void setVisibility(bool visible);
+        bool isVisibility();
         
         Material* getMaterial();
 
@@ -75,6 +75,8 @@ namespace Supernova {
         
         virtual bool draw();
         virtual bool load();
+
+        virtual void destroy();
 
     };
     

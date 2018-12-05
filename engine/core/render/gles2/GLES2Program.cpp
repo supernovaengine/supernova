@@ -14,6 +14,8 @@ std::string GLES2Program::getVertexShader(int shaderType){
         return gVertexMeshPerPixelLightShader;
     }else if (shaderType == S_SHADER_POINTS){
         return gVertexPointsPerPixelLightShader;
+    }else if (shaderType == S_SHADER_LINES){
+        return gVertexLinesShader;
     }else if (shaderType == S_SHADER_DEPTH_RTT){
         return gVertexDepthRTTShader;
     }
@@ -26,6 +28,8 @@ std::string GLES2Program::getFragmentShader(int shaderType){
         return gFragmentMeshPerPixelLightShader;
     }else if (shaderType == S_SHADER_POINTS){
         return gFragmentPointsPerPixelLightShader;
+    }else if (shaderType == S_SHADER_LINES){
+        return gFragmentLinesShader;
     }else if (shaderType == S_SHADER_DEPTH_RTT){
         return gFragmentDepthRTTShader;
     }

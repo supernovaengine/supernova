@@ -6,7 +6,7 @@
 using namespace Supernova;
 
 PlaneTerrain::PlaneTerrain(): Mesh() {
-    primitiveType = S_PRIMITIVE_TRIANGLES_STRIP;
+    primitiveType = S_PRIMITIVE_TRIANGLE_STRIP;
 }
 
 PlaneTerrain::PlaneTerrain(float width, float depth): PlaneTerrain() {

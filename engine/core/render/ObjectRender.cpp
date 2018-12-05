@@ -16,6 +16,7 @@ ObjectRender::ObjectRender(){
     properties.clear();
     programShader = -1;
     programDefs = 0;
+    lineWidth = 1.0;
 
     vertexSize = 0;
     numLights = 0;
@@ -71,6 +72,10 @@ void ObjectRender::setProgramShader(int programShader){
 
 void ObjectRender::setProgramDefs(int programDefs){
     this->programDefs = programDefs;
+}
+
+void ObjectRender::setLineWidth(float lineWidth){
+    this->lineWidth = lineWidth;
 }
 
 void ObjectRender::addVertexBuffer(std::string name, unsigned int size, void* data, bool dynamic){

@@ -40,7 +40,7 @@ void Polygon::addVertex(Vector3 vertex){
     buffers[0].addValue(S_VERTEXATTRIBUTE_NORMALS, Vector3(0.0f, 0.0f, 1.0f));
 
     if (buffers[0].getCount() > 3){
-        primitiveType = S_PRIMITIVE_TRIANGLES_STRIP;
+        primitiveType = S_PRIMITIVE_TRIANGLE_STRIP;
     }
 }
 

@@ -406,9 +406,6 @@ bool Points::isPertmitSortTransparentPoints(){
 bool Points::renderDraw(){
     if (!GraphicObject::renderDraw())
         return false;
-
-    if (!visible)
-        return false;
     
     render->prepareDraw();
     render->draw();
@@ -458,13 +455,4 @@ bool Points::load(){
         return false;
 
     return renderloaded;
-}
-
-void Points::destroy(){
-    
-    GraphicObject::destroy();
-
-    if (render)
-        render->destroy();
-    
 }

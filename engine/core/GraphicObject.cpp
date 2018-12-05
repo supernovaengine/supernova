@@ -121,11 +121,11 @@ Vector4 GraphicObject::getColor(){
     return *material.getColor();
 }
 
-void GraphicObject::setVisible(bool visible){
+void GraphicObject::setVisibility(bool visible){
     this->visible = visible;
 }
 
-bool GraphicObject::isVisible(){
+bool GraphicObject::isVisibility(){
     return visible;
 }
 
@@ -200,7 +200,8 @@ bool GraphicObject::draw(){
         if (transparent && scene && scene->useDepth && distanceToCamera >= 0){
             scene->transparentQueue.insert(std::make_pair(distanceToCamera, this));
         }else{
-            renderDraw();
+            if (visible)
+                renderDraw();
         }
 
         if (transparent){
@@ -244,4 +245,11 @@ bool GraphicObject::shadowDraw(){
 bool GraphicObject::renderDraw(){
 
     return true;
+}
+
+void GraphicObject::destroy(){
+    if (render)
+        render->destroy();
+
+    Object::destroy();
 }

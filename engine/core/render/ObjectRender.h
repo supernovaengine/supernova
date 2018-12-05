@@ -14,8 +14,9 @@
 #define S_PROPERTYDATA_MATRIX4 11
 
 #define S_PRIMITIVE_TRIANGLES  1
-#define S_PRIMITIVE_TRIANGLES_STRIP  2
+#define S_PRIMITIVE_TRIANGLE_STRIP  2
 #define S_PRIMITIVE_POINTS  3
+#define S_PRIMITIVE_LINES  4
 
 #include <unordered_map>
 #include "ProgramRender.h"
@@ -82,6 +83,8 @@ namespace Supernova {
         int primitiveType;
         int programShader;
         int programDefs;
+
+        float lineWidth;
         
         ObjectRender();
 
@@ -103,6 +106,7 @@ namespace Supernova {
         void setNumLights(int numLights);
         void setNumShadows2D(int numShadows2D);
         void setNumShadowsCube(int numShadowsCube);
+        void setLineWidth(float lineWidth);
 
         void addVertexBuffer(std::string name, unsigned int size, void* data, bool dynamic = false);
         void addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride = 0, size_t offset = 0);

@@ -389,12 +389,17 @@ bool GLES2Object::draw(){
     glUniform1i(useTexture, (textures.count(S_TEXTURESAMPLER_DIFFUSE)?true:false));
         
     GLenum modeGles = GL_TRIANGLES;
-    if (primitiveType == S_PRIMITIVE_TRIANGLES_STRIP){
-        modeGles = GL_TRIANGLE_STRIP;
-    }
     if (primitiveType == S_PRIMITIVE_POINTS){
         modeGles = GL_POINTS;
     }
+    if (primitiveType == S_PRIMITIVE_LINES){
+        modeGles = GL_LINES;
+    }
+    if (primitiveType == S_PRIMITIVE_TRIANGLE_STRIP){
+        modeGles = GL_TRIANGLE_STRIP;
+    }
+
+    glLineWidth(lineWidth);
     
     if (indexAttribute.data){
         glDrawElements(modeGles, (GLsizei)indexAttribute.size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));

@@ -2,8 +2,9 @@
 #define ProgramRender_h
 
 #define S_SHADER_POINTS 1
-#define S_SHADER_MESH 2
-#define S_SHADER_DEPTH_RTT 3
+#define S_SHADER_LINES 2
+#define S_SHADER_MESH 3
+#define S_SHADER_DEPTH_RTT 4
 
 #define S_VERTEXATTRIBUTE_VERTICES 1
 #define S_VERTEXATTRIBUTE_TEXTURECOORDS 2

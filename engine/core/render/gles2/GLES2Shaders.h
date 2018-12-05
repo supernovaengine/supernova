@@ -287,6 +287,26 @@ std::string fogFragmentImp =
 "#endif\n";
 
 
+std::string gVertexLinesShader =
+        "uniform mat4 u_mvpMatrix;\n"
+
+        "attribute vec3 a_Position;\n"
+
+        "void main(){\n"
+        "    vec4 position = u_mvpMatrix * vec4(a_Position, 1.0);\n"
+        "    gl_Position = position;\n"
+        "}\n";
+
+std::string gFragmentLinesShader =
+        "precision highp float;\n"
+
+        "uniform vec4 u_Color;\n"
+
+        "void main(){\n"
+        "   gl_FragColor = u_Color;\n"
+        "}\n";
+
+
 std::string gVertexPointsPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 
