@@ -92,8 +92,29 @@ void Rect::setRect(Rect rect){
     setRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
 }
 
+void Rect::fitOnRect(Rect& rect){
+    if (x < rect.getX())
+        x = rect.getX();
+
+    if (y < rect.getY())
+        y = rect.getY();
+
+    if (x + width >= rect.getX() + rect.getWidth())
+        width = rect.getX() + rect.getWidth() - x;
+
+    if (y + height >= rect.getY() + rect.getHeight())
+        height = rect.getY() + rect.getHeight() - y;
+}
+
 bool Rect::isNormalized(){
     if ((x >= 0 && x <= 1) && (y >= 0 && y <= 1) && (width >= 0 && width <= 1) && (height >= 0 && height <= 1)){
+        return true;
+    }
+    return false;
+}
+
+bool Rect::isZero(){
+    if ((x == 0) && (y == 0) && (width == 0) && (height == 0)) {
         return true;
     }
     return false;

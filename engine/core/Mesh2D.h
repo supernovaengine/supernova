@@ -18,6 +18,7 @@ namespace Supernova {
         float billboardScaleFactor;
 
         bool clipping;
+        float clipBorder[4]; //0-left, 1-top, 2-right, 3-bottom
         bool invertTexture;
 
         float convTex(float value);
@@ -31,6 +32,7 @@ namespace Supernova {
         void setBillboardScaleFactor(float billboardScaleFactor);
 
         void setClipping(bool clipping);
+        void setClipBorder(float left, float top, float right, float bottom);
 
         void setWidth(int width);
         int getWidth();

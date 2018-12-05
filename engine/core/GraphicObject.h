@@ -25,6 +25,7 @@ namespace Supernova {
 
         std::vector<AttributeBuffer> buffers;
 
+        Rect scissor;
 
         Material material;
 

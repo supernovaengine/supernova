@@ -13,6 +13,16 @@ using namespace Supernova;
 TextEdit::TextEdit(): GUIImage(){
     text.setMultiline(false);
     addObject(&text);
+
+    cursor.addVertex(Vector3(0, 0, 0));
+    cursor.addVertex(Vector3(0, 100, 0));
+    cursor.addVertex(Vector3(5, 0, 0));
+    cursor.addVertex(Vector3(5, 100, 0));
+
+    cursor.setPosition(Vector3(80,0,0));
+    cursor.setColor(0.6, 0.2, 0.6, 1);
+
+    addObject(&cursor);
 }
 
 TextEdit::~TextEdit(){

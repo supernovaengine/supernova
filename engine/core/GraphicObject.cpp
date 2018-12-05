@@ -18,6 +18,8 @@ GraphicObject::GraphicObject(): Object(){
     render = NULL;
     shadowRender = NULL;
 
+    scissor = Rect(0, 0, 0, 0);
+
     body = NULL;
 }
 
@@ -209,7 +211,28 @@ bool GraphicObject::draw(){
         }
     }
 
-    return Object::draw();
+    if (!scissor.isZero() && scene){
+
+        SceneRender* sceneRender = scene->getSceneRender();
+        bool on = sceneRender->isEnabledScissor();
+        Rect rect = sceneRender->getActiveScissor();
+
+        if (on)
+            scissor.fitOnRect(rect);
+
+        sceneRender->enableScissor(scissor);
+
+        bool drawReturn = Object::draw();
+
+        if (!on)
+            sceneRender->disableScissor();
+
+        return drawReturn;
+
+    }else{
+
+        return Object::draw();
+    }
 }
 
 bool GraphicObject::load(){

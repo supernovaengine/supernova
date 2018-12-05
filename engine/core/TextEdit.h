@@ -7,12 +7,14 @@
 
 #include "GUIImage.h"
 #include "Text.h"
+#include "Polygon.h"
 
 namespace Supernova {
 
     class TextEdit: public GUIImage {
     private:
         Text text;
+        Polygon cursor;
 
     protected:
         void adjustText();

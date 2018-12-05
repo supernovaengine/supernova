@@ -45,6 +45,8 @@ void GUIImage::setBorder(int border){
     border_right = border;
     border_top = border;
     border_bottom = border;
+
+    setClipBorder(border_left, border_top, border_right, border_bottom);
 }
 
 void GUIImage::createVertices(){

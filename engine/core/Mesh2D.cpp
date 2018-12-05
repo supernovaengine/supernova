@@ -15,6 +15,10 @@ Mesh2D::Mesh2D(): Mesh(){
     this->billboardScaleFactor=100;
 
     this->clipping = false;
+    this->clipBorder[0] = 0;
+    this->clipBorder[1] = 0;
+    this->clipBorder[2] = 0;
+    this->clipBorder[3] = 0;
     this->invertTexture = false;
 }
 
@@ -82,6 +86,13 @@ void Mesh2D::setClipping(bool clipping){
     this->clipping = clipping;
 }
 
+void Mesh2D::setClipBorder(float left, float top, float right, float bottom){
+    this->clipBorder[0] = left;
+    this->clipBorder[1] = top;
+    this->clipBorder[2] = right;
+    this->clipBorder[3] = bottom;
+}
+
 void Mesh2D::setWidth(int width){
     setSize(width, this->height);
 }
@@ -102,60 +113,43 @@ bool Mesh2D::draw() {
 
     if (clipping && scene && scene->getCamera()->getType() == S_CAMERA_2D && scene->getTextureRender() == NULL) {
 
-        float scaleX = scale.x;
-        float scaleY = scale.y;
-        Object *parent = this->parent;
-        while (parent) {
-            scaleX *= parent->getScale().x;
-            scaleY *= parent->getScale().y;
-            parent = parent->getParent();
-        }
+        float scaleX = getWorldScale().x;
+        float scaleY = getWorldScale().y;
 
         float tempX = (2 * getWorldPosition().x / (float) Engine::getCanvasWidth()) - 1;
         float tempY = (2 * getWorldPosition().y / (float) Engine::getCanvasHeight()) - 1;
 
+        float widthRatio = scaleX * (Engine::getViewRect()->getWidth() / (float) Engine::getCanvasWidth());
+        float heightRatio = scaleY * (Engine::getViewRect()->getHeight() / (float) Engine::getCanvasHeight());
+
         int objScreenPosX = (tempX * Engine::getViewRect()->getWidth() + (float) Engine::getScreenWidth()) / 2;
         int objScreenPosY = (tempY * Engine::getViewRect()->getHeight() + (float) Engine::getScreenHeight()) / 2;
-        int objScreenWidth = width * scaleX * (Engine::getViewRect()->getWidth() / (float) Engine::getCanvasWidth());
-        int objScreenHeight = height * scaleY * (Engine::getViewRect()->getHeight() / (float) Engine::getCanvasHeight());
+        int objScreenWidth = width * widthRatio;
+        int objScreenHeight = height * heightRatio;
 
         if (scene && scene->getScene()->is3D())
             objScreenPosY = (float) Engine::getScreenHeight() - objScreenHeight - objScreenPosY;
 
-        SceneRender* sceneRender = scene->getSceneRender();
 
-        bool on = sceneRender->isEnabledScissor();
+        if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 && clipBorder[3] == 0)){
+            float borderScreenLeft = clipBorder[0] * widthRatio;
+            float borderScreenTop = clipBorder[1] * heightRatio;
+            float borderScreenRight = clipBorder[2] * widthRatio;
+            float borderScreenBottom = clipBorder[3] * heightRatio;
 
-        Rect rect = sceneRender->getActiveScissor();
-
-        if (on) {
-            if (objScreenPosX < rect.getX())
-                objScreenPosX = rect.getX();
-
-            if (objScreenPosY < rect.getY())
-                objScreenPosY = rect.getY();
-
-            if (objScreenPosX + objScreenWidth >= rect.getX() + rect.getWidth())
-                objScreenWidth = rect.getX() + rect.getWidth() - objScreenPosX;
-
-            if (objScreenPosY + objScreenHeight >= rect.getY() + rect.getHeight())
-                objScreenHeight = rect.getY() + rect.getHeight() - objScreenPosY;
+            objScreenPosX += borderScreenLeft;
+            objScreenPosY += borderScreenTop;
+            objScreenWidth -= (borderScreenLeft + borderScreenRight);
+            objScreenHeight -= (borderScreenTop + borderScreenBottom);
         }
 
-        sceneRender->enableScissor(Rect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight));
-
-        bool drawReturn = Mesh::draw();
-
-        if (!on)
-            sceneRender->disableScissor();
-
-        return drawReturn;
+        scissor.setRect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight);
 
     }else if (clipping){
         clipping = false;
+        scissor.setRect(0, 0, 0, 0);
         Log::Error("Can not clipping object with 2D camera or textureRender scene");
-        return Mesh::draw();
-    }else{
-        return Mesh::draw();
     }
+
+    return Mesh::draw();
 }
