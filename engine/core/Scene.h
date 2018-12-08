@@ -14,7 +14,7 @@
 #include "SkyBox.h"
 #include <vector>
 #include <map>
-#include "GUIObject.h"
+#include "ui/UIObject.h"
 #include "util/LightData.h"
 #include "math/Matrix4.h"
 #include "physics/PhysicsWorld.h"
@@ -47,7 +47,7 @@ namespace Supernova {
 
         std::vector<Light*> lights;
         std::vector<Scene*> subScenes;
-        std::vector<GUIObject*> guiObjects;
+        std::vector<UIObject*> guiObjects;
 
         PhysicsWorld* physicsWorld;
         SkyBox* sky;
@@ -74,8 +74,8 @@ namespace Supernova {
         void addSubScene (Scene* scene);
         void removeSubScene (Scene* scene);
         
-        void addGUIObject (GUIObject* guiobject);
-        void removeGUIObject (GUIObject* guiobject);
+        void addGUIObject (UIObject* guiobject);
+        void removeGUIObject (UIObject* guiobject);
 
         void setSky(SkyBox* sky);
 

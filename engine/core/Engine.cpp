@@ -13,7 +13,7 @@
 
 #include "math/Rect.h"
 #include "Log.h"
-#include "Button.h"
+#include "ui/Button.h"
 #include "LuaBind.h"
 
 #include <assert.h>
@@ -407,7 +407,7 @@ void Engine::systemTouchStart(int pointer, float x, float y){
         //-----------------
 
         if (mainScene) {
-            std::vector<GUIObject *>::iterator it;
+            std::vector<UIObject *>::iterator it;
             for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
                 (*it)->engineOnDown(pointer, x, y);
             }
@@ -424,7 +424,7 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
         //-----------------
 
         if (mainScene) {
-            std::vector<GUIObject *>::iterator it;
+            std::vector<UIObject *>::iterator it;
             for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
                 (*it)->engineOnUp(pointer, x, y);
             }
@@ -457,7 +457,7 @@ void Engine::systemMouseDown(int button, float x, float y){
         }
 
         if (mainScene) {
-            std::vector<GUIObject *>::iterator it;
+            std::vector<UIObject *>::iterator it;
             for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
                 (*it)->engineOnDown(button, x, y);
             }
@@ -480,7 +480,7 @@ void Engine::systemMouseUp(int button, float x, float y){
         }
 
         if (mainScene) {
-            std::vector<GUIObject *>::iterator it;
+            std::vector<UIObject *>::iterator it;
             for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
                 (*it)->engineOnUp(button, x, y);
             }
@@ -530,7 +530,7 @@ void Engine::systemTextInput(const char* text){
     onTextInput.call(text);
 
     if (mainScene) {
-        std::vector<GUIObject*>::iterator it;
+        std::vector<UIObject*>::iterator it;
         for (it = mainScene->guiObjects.begin(); it != mainScene->guiObjects.end(); ++it) {
             (*it)->engineOnTextInput(text);
         }

@@ -5,13 +5,13 @@
 // (c) 2018 Eduardo Doria.
 //
 
-#include "GUIImage.h"
+#include "UIImage.h"
 #include "Text.h"
 #include "Polygon.h"
 
 namespace Supernova {
 
-    class TextEdit: public GUIImage {
+    class TextEdit: public UIImage {
     private:
         Text text;
         Polygon cursor;

@@ -1,17 +1,17 @@
 
-#ifndef GUIImage_h
-#define GUIImage_h
+#ifndef UIImage_h
+#define UIImage_h
 
 //
 // (c) 2018 Eduardo Doria.
 //
 
-#include "GUIObject.h"
+#include "UIObject.h"
 #include "Image.h"
 
 namespace Supernova {
 
-    class GUIImage: public GUIObject {
+    class UIImage: public UIObject {
 
     private:
         std::vector<Image*> partImage;
@@ -27,8 +27,8 @@ namespace Supernova {
         int border_bottom;
 
     public:
-        GUIImage();
-        virtual ~GUIImage();
+        UIImage();
+        virtual ~UIImage();
         
         virtual void setSize(int width, int height);
         void setBorder(int border);
@@ -40,4 +40,4 @@ namespace Supernova {
     
 }
 
-#endif /* GUIImage_h */
+#endif /* UIImage_h */

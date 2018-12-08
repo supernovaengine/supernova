@@ -26,8 +26,8 @@
 #include "Mesh.h"
 #include "Mesh2D.h"
 #include "Image.h"
-#include "GUIObject.h"
-#include "GUIImage.h"
+#include "ui/UIObject.h"
+#include "ui/UIImage.h"
 #include "Light.h"
 #include "PointLight.h"
 #include "SpotLight.h"
@@ -36,7 +36,7 @@
 #include "SkyBox.h"
 #include "Points.h"
 #include "Particles.h"
-#include "Text.h"
+#include "ui/Text.h"
 #include "Input.h"
 #include "Sprite.h"
 #include "util/FunctionCallback.h"
@@ -610,7 +610,7 @@ void LuaBind::bind(){
     .addFunction("setMultiline", &Text::setMultiline)
     .endClass()
 
-    .beginExtendClass<GUIImage, Mesh2D>("GUIImage")
+    .beginExtendClass<UIImage, Mesh2D>("UIImage")
     .addConstructor(LUA_ARGS())
     .endClass()
     

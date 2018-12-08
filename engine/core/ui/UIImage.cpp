@@ -1,5 +1,5 @@
 
-#include "GUIImage.h"
+#include "UIImage.h"
 #include "render/ObjectRender.h"
 #include <string>
 #include "image/TextureLoader.h"
@@ -10,7 +10,7 @@
 
 using namespace Supernova;
 
-GUIImage::GUIImage(): GUIObject(){
+UIImage::UIImage(): UIObject(){
     primitiveType = S_PRIMITIVE_TRIANGLES;
     
     texWidth = 0;
@@ -28,11 +28,11 @@ GUIImage::GUIImage(): GUIObject(){
     buffers[0].addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
-GUIImage::~GUIImage(){
+UIImage::~UIImage(){
 
 }
 
-void GUIImage::setSize(int width, int height){
+void UIImage::setSize(int width, int height){
     Mesh2D::setSize(width, height);
     if (loaded) {
         createVertices();
@@ -40,7 +40,7 @@ void GUIImage::setSize(int width, int height){
     }
 }
 
-void GUIImage::setBorder(int border){
+void UIImage::setBorder(int border){
     border_left = border;
     border_right = border;
     border_top = border;
@@ -49,7 +49,7 @@ void GUIImage::setBorder(int border){
     setClipBorder(border_left, border_top, border_right, border_bottom);
 }
 
-void GUIImage::createVertices(){
+void UIImage::createVertices(){
 
     buffers[0].clearBuffer();
 
@@ -143,7 +143,7 @@ void GUIImage::createVertices(){
     }
 }
 
-bool GUIImage::load(){
+bool UIImage::load(){
     
     if (submeshes[0]->getMaterial()->getTexture()){
         submeshes[0]->getMaterial()->getTexture()->load();
@@ -158,5 +158,5 @@ bool GUIImage::load(){
     setInvertTexture(isIn3DScene());
     createVertices();
 
-    return GUIObject::load();
+    return UIObject::load();
 }

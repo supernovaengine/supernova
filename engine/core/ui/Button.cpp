@@ -7,7 +7,7 @@
 
 using namespace Supernova;
 
-Button::Button(): GUIImage(){
+Button::Button(): UIImage(){
     ownedTextureNormal = true;
     ownedTexturePressed = true;
     ownedTextureDisabled = true;
@@ -137,7 +137,7 @@ void Button::engineOnDown(int pointer, float x, float y){
         down = true;
         pointerDown = pointer;
     }
-    GUIObject::engineOnDown(pointer, x, y);
+    UIObject::engineOnDown(pointer, x, y);
 }
 
 void Button::engineOnUp(int pointer, float x, float y){
@@ -152,7 +152,7 @@ void Button::engineOnUp(int pointer, float x, float y){
         down = false;
         pointerDown = -1;
     }
-    GUIObject::engineOnUp(pointer, x, y);
+    UIObject::engineOnUp(pointer, x, y);
 }
 
 bool Button::isDown(){
@@ -188,5 +188,5 @@ bool Button::load(){
         label.setPosition(labelX, labelY, 0);
     }
 
-    return GUIImage::load();
+    return UIImage::load();
 }

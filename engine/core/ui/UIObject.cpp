@@ -1,4 +1,4 @@
-#include "GUIObject.h"
+#include "UIObject.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -10,19 +10,19 @@
 
 using namespace Supernova;
 
-GUIObject::GUIObject(): Mesh2D(){
+UIObject::UIObject(): Mesh2D(){
     state = 0;
 }
 
-GUIObject::~GUIObject(){
+UIObject::~UIObject(){
 
 }
 
-int GUIObject::getState(){
+int UIObject::getState(){
     return state;
 }
 
-bool GUIObject::isCoordInside(float x, float y){
+bool UIObject::isCoordInside(float x, float y){
     Vector3 point = worldRotation.getRotationMatrix() * Vector3(x, y, 0);
 
     if (point.x >= (getWorldPosition().x - getCenter().x) and
@@ -34,11 +34,11 @@ bool GUIObject::isCoordInside(float x, float y){
     return false;
 }
 
-void GUIObject::engineOnDown(int pointer, float x, float y){
+void UIObject::engineOnDown(int pointer, float x, float y){
 }
 
-void GUIObject::engineOnUp(int pointer, float x, float y){
+void UIObject::engineOnUp(int pointer, float x, float y){
 }
 
-void GUIObject::engineOnTextInput(std::string text){
+void UIObject::engineOnTextInput(std::string text){
 }

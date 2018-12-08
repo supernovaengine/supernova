@@ -9,12 +9,12 @@
 // (c) 2018 Eduardo Doria.
 //
 
-#include "GUIImage.h"
+#include "UIImage.h"
 #include "Text.h"
 
 namespace Supernova {
 
-    class Button: public GUIImage {
+    class Button: public UIImage {
     private:
         bool ownedTextureNormal;
         bool ownedTexturePressed;

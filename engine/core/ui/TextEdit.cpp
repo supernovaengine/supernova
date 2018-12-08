@@ -12,7 +12,7 @@
 
 using namespace Supernova;
 
-TextEdit::TextEdit(): GUIImage(){
+TextEdit::TextEdit(): UIImage(){
     text.setMultiline(false);
 
     addObject(&text);
@@ -79,11 +79,11 @@ Text* TextEdit::getTextObject(){
 
 void TextEdit::engineOnDown(int pointer, float x, float y){
     SystemPlatform::instance().showVirtualKeyboard();
-    GUIObject::engineOnDown(pointer, x, y);
+    UIObject::engineOnDown(pointer, x, y);
 }
 
 void TextEdit::engineOnUp(int pointer, float x, float y){
-    GUIObject::engineOnUp(pointer, x, y);
+    UIObject::engineOnUp(pointer, x, y);
 }
 
 void TextEdit::engineOnTextInput(std::string text){
@@ -106,7 +106,7 @@ void TextEdit::engineOnTextInput(std::string text){
         }
     }
 
-    GUIObject::engineOnTextInput(text);
+    UIObject::engineOnTextInput(text);
 }
 
 bool TextEdit::load(){
@@ -117,7 +117,7 @@ bool TextEdit::load(){
 
     adjustText();
 
-    return GUIImage::load();
+    return UIImage::load();
 }
 
 bool TextEdit::draw(){
@@ -133,5 +133,5 @@ bool TextEdit::draw(){
         cursorBlinkTimer = 0;
     }
 
-    return GUIImage::draw();
+    return UIImage::draw();
 }

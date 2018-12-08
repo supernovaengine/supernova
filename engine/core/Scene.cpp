@@ -5,7 +5,7 @@
 #include "physics/PhysicsWorld2D.h"
 
 #include "Log.h"
-#include "GUIObject.h"
+#include "ui/UIObject.h"
 #include <stdlib.h>
 
 using namespace Supernova;
@@ -86,10 +86,10 @@ void Scene::removeSubScene (Scene* scene){
     subScenes.erase(i, subScenes.end());
 }
 
-void Scene::addGUIObject (GUIObject* guiobject){
+void Scene::addGUIObject (UIObject* guiobject){
     bool founded = false;
     
-    std::vector<GUIObject*>::iterator it;
+    std::vector<UIObject*>::iterator it;
     for (it = guiObjects.begin(); it != guiObjects.end(); ++it) {
         if (guiobject == (*it))
             founded = true;
@@ -100,8 +100,8 @@ void Scene::addGUIObject (GUIObject* guiobject){
     }
 }
 
-void Scene::removeGUIObject (GUIObject* guiobject){
-    std::vector<GUIObject*>::iterator i = std::remove(guiObjects.begin(), guiObjects.end(), guiobject);
+void Scene::removeGUIObject (UIObject* guiobject){
+    std::vector<UIObject*>::iterator i = std::remove(guiObjects.begin(), guiObjects.end(), guiobject);
     guiObjects.erase(i, guiObjects.end());
 }
 

@@ -1,6 +1,6 @@
 #include "Object.h"
 #include "Log.h"
-#include "GUIObject.h"
+#include "ui/UIObject.h"
 #include "Light.h"
 #include "Scene.h"
 #include "physics/PhysicsWorld2D.h"
@@ -66,7 +66,7 @@ void Object::setSceneAndConfigure(Scene* scene){
             scene->addLight(light_ptr);
         }
 
-        if (GUIObject *guiobject_ptr = dynamic_cast<GUIObject *>(this)) {
+        if (UIObject *guiobject_ptr = dynamic_cast<UIObject *>(this)) {
             scene->addGUIObject(guiobject_ptr);
         }
 
@@ -138,7 +138,7 @@ void Object::removeObject(Object* obj){
             ((Scene*)scene)->removeSubScene(scene_ptr);
         }
         
-        if (GUIObject* guiobject_ptr = dynamic_cast<GUIObject*>(this)){
+        if (UIObject* guiobject_ptr = dynamic_cast<UIObject*>(this)){
             ((Scene*)scene)->removeGUIObject(guiobject_ptr);
         }
 

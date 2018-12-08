@@ -1,6 +1,6 @@
 
-#ifndef GUIObject_h
-#define GUIObject_h
+#ifndef UIObject_h
+#define UIObject_h
 
 //
 // (c) 2018 Eduardo Doria.
@@ -11,13 +11,13 @@
 
 namespace Supernova {
 
-    class GUIObject: public Mesh2D {
+    class UIObject: public Mesh2D {
     protected:
         int state;
         
     public:
-        GUIObject();
-        virtual ~GUIObject();
+        UIObject();
+        virtual ~UIObject();
         
         int getState();
 
@@ -33,4 +33,4 @@ namespace Supernova {
     
 }
 
-#endif /* GUIObject_h */
+#endif /* UIObject_h */
