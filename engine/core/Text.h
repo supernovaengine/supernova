@@ -18,6 +18,8 @@ namespace Supernova {
         std::string text;
         unsigned int fontSize;
         bool multiline;
+
+        std::vector<Vector2> charPositions;
         
         bool userDefinedWidth;
         bool userDefinedHeight;
@@ -48,6 +50,8 @@ namespace Supernova {
         int getLineHeight();
         std::string getFont();
         std::string getText();
+        unsigned int getNumChars();
+        Vector2 getCharPosition(unsigned int index);
         
         void setFont(std::string font);
         void setText(std::string text);

@@ -29,11 +29,13 @@ GraphicObject::~GraphicObject(){
 
 void GraphicObject::updateBuffer(int index){
     if (index == 0) {
-        render->setVertexSize(buffers[index].getCount());
+        if (render)
+            render->setVertexSize(buffers[index].getCount());
         if (shadowRender)
             shadowRender->setVertexSize(buffers[index].getCount());
     }
-    render->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
+    if (render)
+        render->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
     if (shadowRender)
         shadowRender->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
 }
@@ -123,11 +125,11 @@ Vector4 GraphicObject::getColor(){
     return *material.getColor();
 }
 
-void GraphicObject::setVisibility(bool visible){
+void GraphicObject::setVisible(bool visible){
     this->visible = visible;
 }
 
-bool GraphicObject::isVisibility(){
+bool GraphicObject::isVisible(){
     return visible;
 }
 

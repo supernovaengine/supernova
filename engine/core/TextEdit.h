@@ -16,6 +16,9 @@ namespace Supernova {
         Text text;
         Polygon cursor;
 
+        float cursorBlinkTimer;
+        Vector2 cursorSize;
+
     protected:
         void adjustText();
 
@@ -35,6 +38,7 @@ namespace Supernova {
         virtual void engineOnTextInput(std::string text);
 
         virtual bool load();
+        virtual bool draw();
     };
 
 }

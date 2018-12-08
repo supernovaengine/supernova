@@ -3,6 +3,8 @@
 #include <locale>
 #include <codecvt>
 #include "platform/SystemPlatform.h"
+#include "Engine.h"
+#include "Log.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -12,29 +14,41 @@ using namespace Supernova;
 
 TextEdit::TextEdit(): GUIImage(){
     text.setMultiline(false);
+
     addObject(&text);
-
-    cursor.addVertex(Vector3(0, 0, 0));
-    cursor.addVertex(Vector3(0, 100, 0));
-    cursor.addVertex(Vector3(5, 0, 0));
-    cursor.addVertex(Vector3(5, 100, 0));
-
-    cursor.setPosition(Vector3(80,0,0));
-    cursor.setColor(0.6, 0.2, 0.6, 1);
-
     addObject(&cursor);
+
+    cursorBlinkTimer = 0;
+    cursorSize = Vector2(6, 0);
 }
 
 TextEdit::~TextEdit(){
 }
 
 void TextEdit::adjustText(){
+    Vector2 lastCharPos = text.getCharPosition(text.getNumChars() - 1);
+
     float posX = border_left;
     float posY = (height / 2) + (this->text.getHeight() / 2) - border_bottom;
     if (this->text.getWidth() > getWidth()){
-        posX = getWidth() - this->text.getWidth();
+        posX = getWidth() - lastCharPos.x - border_right - cursorSize.x - 1;
     }
     this->text.setPosition(posX, posY);
+
+    if (cursorSize.y != text.getLineHeight()){
+        cursorSize.y = text.getLineHeight();
+
+        cursor.clear();
+        cursor.addVertex(Vector3(0, 0, 0));
+        cursor.addVertex(Vector3(0, cursorSize.y, 0));
+        cursor.addVertex(Vector3(cursorSize.x, 0, 0));
+        cursor.addVertex(Vector3(cursorSize.x, cursorSize.y, 0));
+
+        cursor.updateBuffers();
+    }
+
+    cursor.setPosition(text.getPosition().x + lastCharPos.x, text.getPosition().y - text.getHeight() + text.getLineGap());
+    cursor.setColor(text.getColor());
 }
 
 void TextEdit::setText(std::string text){
@@ -104,4 +118,20 @@ bool TextEdit::load(){
     adjustText();
 
     return GUIImage::load();
+}
+
+bool TextEdit::draw(){
+
+    cursorBlinkTimer += Engine::getDeltatime();
+
+    if (cursorBlinkTimer > 600){
+        if (cursor.isVisible()){
+            cursor.setVisible(false);
+        }else{
+            cursor.setVisible(true);
+        }
+        cursorBlinkTimer = 0;
+    }
+
+    return GUIImage::draw();
 }

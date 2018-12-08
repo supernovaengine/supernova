@@ -36,9 +36,6 @@ namespace Supernova {
         void addSubMesh(SubMesh* submesh);
         
         void sortTransparentSubMeshes();
-
-        void updateBuffers();
-        void updateIndices();
         
     public:
         Mesh();
@@ -51,6 +48,9 @@ namespace Supernova {
         bool isDynamic();
 
         void setPrimitiveType(int primitiveType);
+
+        void updateBuffers();
+        void updateIndices();
 
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();

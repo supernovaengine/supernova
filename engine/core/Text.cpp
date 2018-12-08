@@ -153,6 +153,18 @@ std::string Text::getText(){
     return text;
 }
 
+unsigned int Text::getNumChars(){
+    return charPositions.size();
+}
+
+Vector2 Text::getCharPosition(unsigned int index){
+    if (index < charPositions.size()){
+        return charPositions[index];
+    }
+
+    return Vector2(-1, -1);
+}
+
 void Text::setMultiline(bool multiline){
     this->multiline = multiline;
 }
@@ -162,7 +174,7 @@ void Text::createText(){
 
     std::vector<unsigned int> indices;
     
-    stbtext->createText(text, buffers[0], &indices, &width, &height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
+    stbtext->createText(text, buffers[0], indices, charPositions, width, height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
 
     submeshes[0]->setIndices(indices);
 }

@@ -140,8 +140,8 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
     return true;
 }
 
-void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<unsigned int>* indices,
-                         int* width, int* height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert){
+void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<unsigned int>& indices, std::vector<Vector2>& charPositions,
+                         int& width, int& height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert){
     
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
     std::wstring utf16String = convert.from_bytes( text );
@@ -168,7 +168,7 @@ void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<
                 stbtt_aligned_quad quad;
                 stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, intchar - firstChar, &offsetX, &offsetY, &quad, 1);
                 
-                if (offsetX > (*width)){
+                if (offsetX > width){
                     if (lastSpace > 0){
                         utf16String[lastSpace] = '\n';
                         i = lastSpace;
@@ -188,6 +188,7 @@ void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<
     int minX0 = 0, maxX1 = 0, minY0 = 0, maxY1 = 0;
     int ind = 0;
     int lineCount = 1;
+    charPositions.clear();
 
     for (int i = 0; i < utf16String.size(); i++){
 
@@ -209,6 +210,8 @@ void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<
 
         stbtt_aligned_quad quad;
         stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, intchar - firstChar, &offsetX, &offsetY, &quad, 1);
+
+        charPositions.push_back(Vector2(offsetX, offsetY));
             
         if (invert) {
             float auxt0 = quad.t0;
@@ -228,8 +231,10 @@ void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<
             maxX1 = quad.x1;
         if (quad.y1 > maxY1)
             maxY1 = quad.y1;
+        if (offsetX > maxX1)
+            maxX1 = offsetX;
             
-        if ((!userDefinedWidth || offsetX <= *width) && (!userDefinedHeight || offsetY <= *height)){
+        if ((!userDefinedWidth || offsetX <= width) && (!userDefinedHeight || offsetY <= height)){
             buffer.addValue(atrVertice, Vector3(quad.x0, quad.y0, 0));
             buffer.addValue(atrVertice, Vector3(quad.x1, quad.y0, 0));
             buffer.addValue(atrVertice, Vector3(quad.x1, quad.y1, 0));
@@ -245,12 +250,12 @@ void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<
             buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
             buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
                 
-            indices->push_back(ind);
-            indices->push_back(ind+1);
-            indices->push_back(ind+2);
-            indices->push_back(ind);
-            indices->push_back(ind+2);
-            indices->push_back(ind+3);
+            indices.push_back(ind);
+            indices.push_back(ind+1);
+            indices.push_back(ind+2);
+            indices.push_back(ind);
+            indices.push_back(ind+2);
+            indices.push_back(ind+3);
             ind = ind + 4;
         }
 
@@ -269,13 +274,13 @@ void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<
         buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
         buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
         
-        indices->push_back(0);
-        indices->push_back(1);
-        indices->push_back(2);
+        indices.push_back(0);
+        indices.push_back(1);
+        indices.push_back(2);
     }
     if (!userDefinedWidth)
-        (*width) = maxX1 - minX0;
+        width = maxX1 - minX0;
     if (!userDefinedHeight)
-        (*height) = lineCount * lineHeight;
+        height = lineCount * lineHeight;
 
 }
