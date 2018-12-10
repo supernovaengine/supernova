@@ -86,7 +86,6 @@ void Polygon::generateTexcoords(){
 
 bool Polygon::load(){
 
-    setInvertTexture(isIn3DScene());
     generateTexcoords();
 
     return Mesh::load();

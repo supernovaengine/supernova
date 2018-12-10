@@ -22,7 +22,7 @@ namespace Supernova {
         virtual bool load();
         virtual bool draw();
         virtual bool clear(float value = 0);
-        virtual bool viewSize(Rect rect, bool adjustY=true);
+        virtual bool viewSize(Rect rect);
         virtual bool enableScissor(Rect rect);
         virtual bool disableScissor();
 

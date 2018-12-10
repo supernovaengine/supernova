@@ -15,8 +15,13 @@ using namespace Supernova;
 TextEdit::TextEdit(): UIImage(){
     text.setMultiline(false);
 
+    imagem.setTexture("pista.png");
+
     addObject(&text);
     addObject(&cursor);
+    addObject(&imagem);
+
+    setClipping(true);
 
     cursorBlinkTimer = 0;
     cursorSize = Vector2(6, 0);
@@ -110,8 +115,6 @@ void TextEdit::engineOnTextInput(std::string text){
 }
 
 bool TextEdit::load(){
-    
-    setClipping(true);
 
     text.load();
 

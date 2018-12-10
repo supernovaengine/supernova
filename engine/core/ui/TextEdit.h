@@ -15,6 +15,7 @@ namespace Supernova {
     private:
         Text text;
         Polygon cursor;
+        Image imagem;
 
         float cursorBlinkTimer;
         Vector2 cursorSize;

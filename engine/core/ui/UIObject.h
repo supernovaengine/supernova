@@ -14,7 +14,11 @@ namespace Supernova {
     class UIObject: public Mesh2D {
     protected:
         int state;
-        
+        int pointerDown;
+        bool focused;
+
+        bool isCoordInside(float x, float y);
+
     public:
         UIObject();
         virtual ~UIObject();
@@ -24,7 +28,8 @@ namespace Supernova {
         FunctionCallback<void()> onDown;
         FunctionCallback<void()> onUp;
 
-        bool isCoordInside(float x, float y);
+        virtual void inputDown();
+        virtual void inputUp();
 
         virtual void engineOnDown(int pointer, float x, float y);
         virtual void engineOnUp(int pointer, float x, float y);

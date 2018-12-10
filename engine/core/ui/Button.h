@@ -25,7 +25,6 @@ namespace Supernova {
         Texture* textureDisabled;
 
         bool down;
-        int pointerDown;
 
         Text label;
         
@@ -51,8 +50,8 @@ namespace Supernova {
         void setTextureDisabled(std::string texturepath);
         std::string getTextureDisabled();
 
-        virtual void engineOnDown(int pointer, float x, float y);
-        virtual void engineOnUp(int pointer, float x, float y);
+        virtual void inputDown();
+        virtual void inputUp();
 
         bool isDown();
         

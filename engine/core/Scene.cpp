@@ -363,7 +363,7 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
             textureRender->getTextureRender()->initTextureFrame();
         }
 
-        render->viewSize(Rect(0, 0, textureRender->getTextureFrameWidth(), textureRender->getTextureFrameHeight()), false);
+        render->viewSize(Rect(0, 0, textureRender->getTextureFrameWidth(), textureRender->getTextureFrameHeight()));
         if (shadowMap)
             render->clear(1.0);
         else

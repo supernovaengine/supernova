@@ -84,22 +84,21 @@ bool GLES2Scene::draw() {
     return true;
 }
 
-bool GLES2Scene::viewSize(Rect rect, bool adjustY){
+bool GLES2Scene::viewSize(Rect rect){
     //Convert top-left orientation to botton-left (OpenGL default)
-    if (adjustY) {
-        glViewport(rect.getX(), Engine::getScreenHeight() - rect.getY() - rect.getHeight(),
-                   rect.getWidth(), rect.getHeight());
-    } else{
-        glViewport(rect.getX(), rect.getY(),
-                   rect.getWidth(), rect.getHeight());
-    }
+    //if (adjustY) {
+    //    glViewport(rect.getX(), Engine::getScreenHeight() - rect.getY() - rect.getHeight(),
+    //               rect.getWidth(), rect.getHeight());
+    //} else{
+        glViewport(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+    //}
     GLES2Util::checkGlError("glViewport");
     
     return true;
 }
 
 bool GLES2Scene::enableScissor(Rect rect){
-    //Convert top-left orientation to botton-left (OpenGL default)
+    //Convert bottom-left orientation to top-left (OpenGL default)
     glScissor(rect.getX(), Engine::getScreenHeight() - rect.getY() - rect.getHeight(), rect.getWidth(), rect.getHeight());
     GLES2Util::checkGlError("glScissor");
     glEnable(GL_SCISSOR_TEST);

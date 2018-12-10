@@ -181,8 +181,6 @@ void Text::createText(){
 
 bool Text::load(){
     if (stbtext->load(font.c_str(), fontSize, submeshes[0]->getMaterial()->getTexture())) {
-        if (!loaded)
-            setInvertTexture(isIn3DScene());
         createText();
     }else{
         Log::Error("Can`t load font");

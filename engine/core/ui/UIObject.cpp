@@ -12,6 +12,8 @@ using namespace Supernova;
 
 UIObject::UIObject(): Mesh2D(){
     state = 0;
+    pointerDown = -1;
+    focused = false;
 }
 
 UIObject::~UIObject(){
@@ -34,10 +36,32 @@ bool UIObject::isCoordInside(float x, float y){
     return false;
 }
 
+void UIObject::inputDown(){
+
+}
+
+void UIObject::inputUp(){
+
+}
+
 void UIObject::engineOnDown(int pointer, float x, float y){
+    if (isCoordInside(x, y)) {
+
+        pointerDown = pointer;
+        focused = true;
+
+        inputDown();
+    }
 }
 
 void UIObject::engineOnUp(int pointer, float x, float y){
+    if (pointerDown == pointer) {
+
+        pointerDown = -1;
+        focused = false;
+
+        inputUp();
+    }
 }
 
 void UIObject::engineOnTextInput(std::string text){

@@ -111,7 +111,7 @@ int Mesh2D::getHeight(){
 
 bool Mesh2D::draw() {
 
-    if (clipping && scene && scene->getCamera()->getType() == S_CAMERA_2D && scene->getTextureRender() == NULL) {
+    if (clipping && scene && scene->getCamera()->getType() == S_CAMERA_2D) {
 
         float scaleX = getWorldScale().x;
         float scaleY = getWorldScale().y;
@@ -143,7 +143,11 @@ bool Mesh2D::draw() {
             objScreenHeight -= (borderScreenTop + borderScreenBottom);
         }
 
-        scissor.setRect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight);
+        //scissor.setRect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight);
+        scissor.setRect(6, Engine::getScreenHeight()-10, width - 12, height - 12);
+        //float teste = (float) Engine::getScreenHeight();
+        //float teste2 = (float) Engine::getCanvasHeight();
+        //scissor.setRect(0, 0, 400, 1794);
 
     }else if (clipping){
         clipping = false;
