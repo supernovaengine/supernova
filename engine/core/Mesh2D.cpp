@@ -113,41 +113,72 @@ bool Mesh2D::draw() {
 
     if (clipping && scene && scene->getCamera()->getType() == S_CAMERA_2D) {
 
-        float scaleX = getWorldScale().x;
-        float scaleY = getWorldScale().y;
+        int objScreenPosX = 0;
+        int objScreenPosY = 0;
+        int objScreenWidth = 0;
+        int objScreenHeight = 0;
 
-        float tempX = (2 * getWorldPosition().x / (float) Engine::getCanvasWidth()) - 1;
-        float tempY = (2 * getWorldPosition().y / (float) Engine::getCanvasHeight()) - 1;
+        if (!scene->getTextureRender()) {
 
-        float widthRatio = scaleX * (Engine::getViewRect()->getWidth() / (float) Engine::getCanvasWidth());
-        float heightRatio = scaleY * (Engine::getViewRect()->getHeight() / (float) Engine::getCanvasHeight());
+            float scaleX = getWorldScale().x;
+            float scaleY = getWorldScale().y;
 
-        int objScreenPosX = (tempX * Engine::getViewRect()->getWidth() + (float) Engine::getScreenWidth()) / 2;
-        int objScreenPosY = (tempY * Engine::getViewRect()->getHeight() + (float) Engine::getScreenHeight()) / 2;
-        int objScreenWidth = width * widthRatio;
-        int objScreenHeight = height * heightRatio;
+            float tempX = (2 * getWorldPosition().x / (float) Engine::getCanvasWidth()) - 1;
+            float tempY = (2 * getWorldPosition().y / (float) Engine::getCanvasHeight()) - 1;
 
-        if (scene && scene->getScene()->is3D())
-            objScreenPosY = (float) Engine::getScreenHeight() - objScreenHeight - objScreenPosY;
+            float widthRatio =
+                    scaleX * (Engine::getViewRect()->getWidth() / (float) Engine::getCanvasWidth());
+            float heightRatio = scaleY * (Engine::getViewRect()->getHeight() /
+                                          (float) Engine::getCanvasHeight());
+
+            objScreenPosX = (tempX * Engine::getViewRect()->getWidth() + (float) Engine::getScreenWidth()) / 2;
+            objScreenPosY = (tempY * Engine::getViewRect()->getHeight() + (float) Engine::getScreenHeight()) / 2;
+            objScreenWidth = width * widthRatio;
+            objScreenHeight = height * heightRatio;
+
+            if (!scene->getScene()->is3D())
+                objScreenPosY = (float) Engine::getScreenHeight() - objScreenHeight - objScreenPosY;
 
 
-        if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 && clipBorder[3] == 0)){
-            float borderScreenLeft = clipBorder[0] * widthRatio;
-            float borderScreenTop = clipBorder[1] * heightRatio;
-            float borderScreenRight = clipBorder[2] * widthRatio;
-            float borderScreenBottom = clipBorder[3] * heightRatio;
+            if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 &&
+                  clipBorder[3] == 0)) {
+                float borderScreenLeft = clipBorder[0] * widthRatio;
+                float borderScreenTop = clipBorder[1] * heightRatio;
+                float borderScreenRight = clipBorder[2] * widthRatio;
+                float borderScreenBottom = clipBorder[3] * heightRatio;
 
-            objScreenPosX += borderScreenLeft;
-            objScreenPosY += borderScreenTop;
-            objScreenWidth -= (borderScreenLeft + borderScreenRight);
-            objScreenHeight -= (borderScreenTop + borderScreenBottom);
+                objScreenPosX += borderScreenLeft;
+                objScreenPosY += borderScreenTop;
+                objScreenWidth -= (borderScreenLeft + borderScreenRight);
+                objScreenHeight -= (borderScreenTop + borderScreenBottom);
+            }
+
+        }else {
+
+            objScreenPosX = getWorldPosition().x;
+            objScreenPosY = getWorldPosition().y;
+            objScreenWidth = width;
+            objScreenHeight = height;
+
+            if (!scene->getScene()->is3D())
+                objScreenPosY = (float) scene->getTextureRender()->getHeight() - objScreenHeight - objScreenPosY;
+
+            if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 &&
+                  clipBorder[3] == 0)) {
+                float borderScreenLeft = clipBorder[0];
+                float borderScreenTop = clipBorder[1];
+                float borderScreenRight = clipBorder[2];
+                float borderScreenBottom = clipBorder[3];
+
+                objScreenPosX += borderScreenLeft;
+                objScreenPosY += borderScreenTop;
+                objScreenWidth -= (borderScreenLeft + borderScreenRight);
+                objScreenHeight -= (borderScreenTop + borderScreenBottom);
+            }
+
         }
 
-        //scissor.setRect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight);
-        scissor.setRect(6, Engine::getScreenHeight()-10, width - 12, height - 12);
-        //float teste = (float) Engine::getScreenHeight();
-        //float teste2 = (float) Engine::getCanvasHeight();
-        //scissor.setRect(0, 0, 400, 1794);
+        scissor.setRect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight);
 
     }else if (clipping){
         clipping = false;
