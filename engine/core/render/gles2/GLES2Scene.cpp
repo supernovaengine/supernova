@@ -98,7 +98,7 @@ bool GLES2Scene::enableScissor(Rect rect){
     glScissor(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
 
     GLES2Util::checkGlError("glScissor");
-    
+
     glEnable(GL_SCISSOR_TEST);
 
     return true;

@@ -25,7 +25,7 @@ Scene::Scene() {
     fog = NULL;
 
     render = NULL;
-    textureRender = NULL;
+    textureFrame = NULL;
 
     physicsWorld = NULL;
     ownedPhysicsWorld = true;
@@ -258,10 +258,10 @@ bool Scene::updateCameraSize(){
         render = SceneRender::newInstance();
 
     Rect cameraRect;
-    if (textureRender == NULL) {
+    if (textureFrame == NULL) {
         cameraRect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
     }else{
-        cameraRect = Rect(0, 0, textureRender->getTextureFrameWidth(), textureRender->getTextureFrameHeight());
+        cameraRect = Rect(0, 0, textureFrame->getTextureFrameWidth(), textureFrame->getTextureFrameHeight());
     }
 
     if (this->camera != NULL){
@@ -318,13 +318,13 @@ void Scene::drawSky(){
         sky->renderDraw();
 }
 
-Texture* Scene::getTextureRender(){
-    return textureRender;
+Texture* Scene::getTextureFrame(){
+    return textureFrame;
 }
 
-void Scene::setTextureRender(Texture* textureRender){
+void Scene::setTextureFrame(Texture* textureFrame){
 
-    if (textureRender != NULL){
+    if (textureFrame != NULL){
 
         char rand_id[10];
         static const char alphanum[] =
@@ -335,35 +335,35 @@ void Scene::setTextureRender(Texture* textureRender){
             rand_id[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
         }
 
-        if (textureRender->getId() == "")
-            textureRender->setId("scene|"+std::string(rand_id));
+        if (textureFrame->getId() == "")
+            textureFrame->setId("scene|"+std::string(rand_id));
 
-        if (textureRender->getType() == S_TEXTURE_2D)
-            textureRender->setType(S_TEXTURE_FRAME);
+        if (textureFrame->getType() == S_TEXTURE_2D)
+            textureFrame->setType(S_TEXTURE_FRAME);
 
-        if (textureRender->getTextureFrameWidth() == 0 || textureRender->getTextureFrameHeight() == 0){
-            textureRender->setTextureFrameSize(512,512);
+        if (textureFrame->getTextureFrameWidth() == 0 || textureFrame->getTextureFrameHeight() == 0){
+            textureFrame->setTextureFrameSize(512,512);
         }
 
-        this->textureRender = textureRender;
+        this->textureFrame = textureFrame;
     }else{
-        this->textureRender = NULL;
+        this->textureFrame = NULL;
     }
 }
 
 bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
-    if (textureRender == NULL) {
+    if (textureFrame == NULL) {
         render->viewSize(*Engine::getViewRect());
         if (!childScene)
             render->clear();
     }else{
         if (cubeMap) {
-            textureRender->getTextureRender()->initTextureFrame(cubeFace);
+            textureFrame->getTextureRender()->initTextureFrame(cubeFace);
         }else{
-            textureRender->getTextureRender()->initTextureFrame();
+            textureFrame->getTextureRender()->initTextureFrame();
         }
 
-        render->viewSize(Rect(0, 0, textureRender->getTextureFrameWidth(), textureRender->getTextureFrameHeight()));
+        render->viewSize(Rect(0, 0, textureFrame->getTextureFrameWidth(), textureFrame->getTextureFrameHeight()));
         if (shadowMap)
             render->clear(1.0);
         else
@@ -396,8 +396,8 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
         drawChildScenes();
     }
 
-    if (textureRender != NULL) {
-        textureRender->getTextureRender()->endTextureFrame();
+    if (textureFrame != NULL) {
+        textureFrame->getTextureRender()->endTextureFrame();
     }
 
     return drawreturn;
@@ -414,7 +414,7 @@ bool Scene::draw() {
     //TODO: alert if not loaded
 
     Camera* originalCamera = this->camera;
-    Texture* originalTextureRender = this->textureRender;
+    Texture* originalTextureRender = this->textureFrame;
 
     for (int i=0; i<lights.size(); i++) {
         if (lights[i]->isUseShadow()) {
@@ -426,7 +426,7 @@ bool Scene::draw() {
 
                 this->drawIsPointShadow = true;
 
-                this->setTextureRender(lights[i]->getShadowMap());
+                this->setTextureFrame(lights[i]->getShadowMap());
                 for (int cam = 0; cam < 6; cam++){
                     this->setCamera(lights[i]->getLightCamera(cam));
                     this->drawShadowCameraNearFar = lights[i]->getLightCamera(cam)->getNearFarPlane();
@@ -438,7 +438,7 @@ bool Scene::draw() {
 
                 this->drawIsPointShadow = false;
 
-                this->setTextureRender(lights[i]->getShadowMap());
+                this->setTextureFrame(lights[i]->getShadowMap());
                 this->setCamera(lights[i]->getLightCamera());
                 this->drawShadowCameraNearFar = lights[i]->getLightCamera()->getNearFarPlane();
 
@@ -449,7 +449,7 @@ bool Scene::draw() {
                 this->drawIsPointShadow = false;
 
                 for (int ca = 0; ca < ((DirectionalLight*)lights[i])->getNumShadowCasdades(); ca++) {
-                    this->setTextureRender(lights[i]->getShadowMap(ca));
+                    this->setTextureFrame(lights[i]->getShadowMap(ca));
                     this->setCamera(lights[i]->getLightCamera(ca));
                     this->drawShadowCameraNearFar = lights[i]->getLightCamera(ca)->getNearFarPlane();
 
@@ -464,7 +464,7 @@ bool Scene::draw() {
     if (drawingShadow) {
         drawingShadow = false;
         this->setCamera(originalCamera);
-        this->setTextureRender(originalTextureRender);
+        this->setTextureFrame(originalTextureRender);
     }
 
     return renderDraw();
@@ -544,8 +544,8 @@ bool Scene::load(){
     camera->updateMatrix();
     Object::updateMatrix();
 
-    if (textureRender != NULL) {
-        textureRender->load();
+    if (textureFrame != NULL) {
+        textureFrame->load();
         updateCameraSize();
     }
 

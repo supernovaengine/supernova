@@ -118,7 +118,7 @@ bool Mesh2D::draw() {
         int objScreenWidth = 0;
         int objScreenHeight = 0;
 
-        if (!scene->getTextureRender()) {
+        if (!scene->getTextureFrame()) {
 
             float scaleX = getWorldScale().x;
             float scaleY = getWorldScale().y;
@@ -161,7 +161,7 @@ bool Mesh2D::draw() {
             objScreenHeight = height;
 
             if (!scene->getScene()->is3D())
-                objScreenPosY = (float) scene->getTextureRender()->getHeight() - objScreenHeight - objScreenPosY;
+                objScreenPosY = (float) scene->getTextureFrame()->getTextureFrameHeight() - objScreenHeight - objScreenPosY;
 
             if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 &&
                   clipBorder[3] == 0)) {

@@ -30,7 +30,7 @@ namespace Supernova {
     private:
 
         SceneRender* render;
-        Texture* textureRender;
+        Texture* textureFrame;
 
         Vector3 drawShadowLightPos;
         Vector2 drawShadowCameraNearFar;
@@ -134,8 +134,8 @@ namespace Supernova {
 
         void doCamera();
 
-        void setTextureRender(Texture* textureRender);
-        Texture* getTextureRender();
+        void setTextureFrame(Texture* textureFrame);
+        Texture* getTextureFrame();
 
         bool updateCameraSize();
 
