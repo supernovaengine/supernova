@@ -126,10 +126,8 @@ bool Mesh2D::draw() {
             float tempX = (2 * getWorldPosition().x / (float) Engine::getCanvasWidth()) - 1;
             float tempY = (2 * getWorldPosition().y / (float) Engine::getCanvasHeight()) - 1;
 
-            float widthRatio =
-                    scaleX * (Engine::getViewRect()->getWidth() / (float) Engine::getCanvasWidth());
-            float heightRatio = scaleY * (Engine::getViewRect()->getHeight() /
-                                          (float) Engine::getCanvasHeight());
+            float widthRatio = scaleX * (Engine::getViewRect()->getWidth() / (float) Engine::getCanvasWidth());
+            float heightRatio = scaleY * (Engine::getViewRect()->getHeight() / (float) Engine::getCanvasHeight());
 
             objScreenPosX = (tempX * Engine::getViewRect()->getWidth() + (float) Engine::getScreenWidth()) / 2;
             objScreenPosY = (tempY * Engine::getViewRect()->getHeight() + (float) Engine::getScreenHeight()) / 2;
@@ -140,8 +138,7 @@ bool Mesh2D::draw() {
                 objScreenPosY = (float) Engine::getScreenHeight() - objScreenHeight - objScreenPosY;
 
 
-            if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 &&
-                  clipBorder[3] == 0)) {
+            if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 && clipBorder[3] == 0)) {
                 float borderScreenLeft = clipBorder[0] * widthRatio;
                 float borderScreenTop = clipBorder[1] * heightRatio;
                 float borderScreenRight = clipBorder[2] * widthRatio;
@@ -163,8 +160,7 @@ bool Mesh2D::draw() {
             if (!scene->getScene()->is3D())
                 objScreenPosY = (float) scene->getTextureFrame()->getTextureFrameHeight() - objScreenHeight - objScreenPosY;
 
-            if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 &&
-                  clipBorder[3] == 0)) {
+            if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 && clipBorder[3] == 0)) {
                 float borderScreenLeft = clipBorder[0];
                 float borderScreenTop = clipBorder[1];
                 float borderScreenRight = clipBorder[2];

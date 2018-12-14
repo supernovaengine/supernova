@@ -44,22 +44,29 @@ void UIObject::inputUp(){
 
 }
 
+void UIObject::getFocus(){
+
+}
+
+void UIObject::lostFocus(){
+
+}
+
 void UIObject::engineOnDown(int pointer, float x, float y){
     if (isCoordInside(x, y)) {
-
         pointerDown = pointer;
         focused = true;
-
         inputDown();
+        getFocus();
+    }else{
+        focused = false;
+        lostFocus();
     }
 }
 
 void UIObject::engineOnUp(int pointer, float x, float y){
     if (pointerDown == pointer) {
-
         pointerDown = -1;
-        focused = false;
-
         inputUp();
     }
 }

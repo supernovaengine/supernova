@@ -15,11 +15,8 @@ using namespace Supernova;
 TextEdit::TextEdit(): UIImage(){
     text.setMultiline(false);
 
-    imagem.setTexture("pista.png");
-
     addObject(&text);
     addObject(&cursor);
-    addObject(&imagem);
 
     setClipping(true);
 
@@ -82,33 +79,38 @@ Text* TextEdit::getTextObject(){
     return &text;
 }
 
-void TextEdit::engineOnDown(int pointer, float x, float y){
+void TextEdit::getFocus(){
     SystemPlatform::instance().showVirtualKeyboard();
-    UIObject::engineOnDown(pointer, x, y);
+    UIObject::getFocus();
 }
 
-void TextEdit::engineOnUp(int pointer, float x, float y){
-    UIObject::engineOnUp(pointer, x, y);
+void TextEdit::lostFocus(){
+    SystemPlatform::instance().hideVirtualKeyboard();
+    UIObject::lostFocus();
 }
 
 void TextEdit::engineOnTextInput(std::string text){
 
-    std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
+    if (focused) {
 
-    std::wstring utf16Text = convert.from_bytes( text );
-    std::wstring utf16OldText = convert.from_bytes( getText() );
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > convert;
 
-    for (int i = 0; i < utf16Text.size(); i++){
-        std::string newText = "";
-        if (utf16Text[i] == '\b') {
-            newText = convert.to_bytes(utf16OldText.substr(0, utf16OldText.size()-1));
-            setText(newText);
-        }else if (utf16Text[i] == '\n') {
-            SystemPlatform::instance().hideVirtualKeyboard();
-        }else{
-            newText = getText() + convert.to_bytes(utf16Text[i]);
-            setText(newText);
+        std::wstring utf16Text = convert.from_bytes(text);
+        std::wstring utf16OldText = convert.from_bytes(getText());
+
+        for (int i = 0; i < utf16Text.size(); i++) {
+            std::string newText = "";
+            if (utf16Text[i] == '\b') {
+                newText = convert.to_bytes(utf16OldText.substr(0, utf16OldText.size() - 1));
+                setText(newText);
+            } else if (utf16Text[i] == '\n') {
+                SystemPlatform::instance().hideVirtualKeyboard();
+            } else {
+                newText = getText() + convert.to_bytes(utf16Text[i]);
+                setText(newText);
+            }
         }
+
     }
 
     UIObject::engineOnTextInput(text);
@@ -125,15 +127,19 @@ bool TextEdit::load(){
 
 bool TextEdit::draw(){
 
-    cursorBlinkTimer += Engine::getDeltatime();
+    if (focused) {
+        cursorBlinkTimer += Engine::getDeltatime();
 
-    if (cursorBlinkTimer > 600){
-        if (cursor.isVisible()){
-            cursor.setVisible(false);
-        }else{
-            cursor.setVisible(true);
+        if (cursorBlinkTimer > 600) {
+            if (cursor.isVisible()) {
+                cursor.setVisible(false);
+            } else {
+                cursor.setVisible(true);
+            }
+            cursorBlinkTimer = 0;
         }
-        cursorBlinkTimer = 0;
+    }else{
+        cursor.setVisible(false);
     }
 
     return UIImage::draw();

@@ -31,6 +31,9 @@ namespace Supernova {
         virtual void inputDown();
         virtual void inputUp();
 
+        virtual void getFocus();
+        virtual void lostFocus();
+
         virtual void engineOnDown(int pointer, float x, float y);
         virtual void engineOnUp(int pointer, float x, float y);
         virtual void engineOnTextInput(std::string text);

@@ -15,7 +15,6 @@ namespace Supernova {
     private:
         Text text;
         Polygon cursor;
-        Image imagem;
 
         float cursorBlinkTimer;
         Vector2 cursorSize;
@@ -34,8 +33,8 @@ namespace Supernova {
         std::string getText();
         Text* getTextObject();
 
-        virtual void engineOnDown(int pointer, float x, float y);
-        virtual void engineOnUp(int pointer, float x, float y);
+        virtual void getFocus();
+        virtual void lostFocus();
         virtual void engineOnTextInput(std::string text);
 
         virtual bool load();
