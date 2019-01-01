@@ -24,7 +24,7 @@ AttributeBuffer::AttributeBuffer(){
     }
 
     name = "buffer|" + randName;
-    itemSize = 0;
+    vertexSize = 0;
 }
 
 AttributeBuffer::~AttributeBuffer(){
@@ -36,11 +36,15 @@ void AttributeBuffer::addAttribute(int attribute, int elements){
         AttributeData attData;
         attData.count = 0;
         attData.elements = elements;
-        attData.offset = itemSize;
+        attData.offset = vertexSize;
+
+        vertexSize += elements * sizeof(float);
 
         attributes[attribute] = attData;
 
-        itemSize += elements;
+        for (auto &x : attributes) {
+            x.second.stride = vertexSize;
+        }
     }else{
         Log::Error("Cannot add attribute with not cleared buffer");
     }
@@ -55,7 +59,7 @@ AttributeData* AttributeBuffer::getAttribute(int attribute){
 }
 
 void AttributeBuffer::clearAll(){
-    itemSize = 0;
+    vertexSize = 0;
     attributes.clear();
     clearBuffer();
 }
@@ -131,13 +135,14 @@ void AttributeBuffer::setValue(unsigned int index, AttributeData* attribute, uns
             if (index > attribute->count)
                 attribute->count = index;
 
-            unsigned pos = (index * itemSize) + attribute->offset;
+            unsigned pos = (index * attribute->stride) + attribute->offset;
 
-            if ((attribute->count * itemSize) > buffer.size())
-                buffer.resize(attribute->count*itemSize);
+            if (pos >= buffer.size())
+                buffer.resize(pos+(numValues*sizeof(float)));
 
             for (int i = 0; i < numValues; i++) {
-                buffer[pos++] = vector[i];
+                memcpy(&buffer[pos],&vector[i],sizeof(float));
+                pos += sizeof(float);
             }
 
             if (attribute->count > count)
@@ -164,9 +169,9 @@ Vector4 AttributeBuffer::getValueVector4(int attribute, unsigned int index){
 }
 
 Vector2 AttributeBuffer::getValueVector2(AttributeData* attribute, unsigned int index){
-    unsigned pos = (index * itemSize) + attribute->offset;
+    unsigned pos = (index * attribute->stride) + attribute->offset;
     if ((pos+2) <= buffer.size()){
-        return Vector2(buffer[pos], buffer[pos+1]);
+        return Vector2(buffer[pos], buffer[pos+sizeof(float)]);
     }else{
         Log::Error("Attribute index is bigger than buffer");
     }
@@ -175,9 +180,9 @@ Vector2 AttributeBuffer::getValueVector2(AttributeData* attribute, unsigned int 
 }
 
 Vector3 AttributeBuffer::getValueVector3(AttributeData* attribute, unsigned int index){
-    unsigned pos = (index * itemSize) + attribute->offset;
+    unsigned pos = (index * attribute->stride) + attribute->offset;
     if ((pos+3) <= buffer.size()){
-        return Vector3(buffer[pos], buffer[pos+1], buffer[pos+2]);
+        return Vector3(buffer[pos], buffer[pos+sizeof(float)], buffer[pos+(2*sizeof(float))]);
     }else{
         Log::Error("Attribute index is bigger than buffer");
     }
@@ -186,9 +191,9 @@ Vector3 AttributeBuffer::getValueVector3(AttributeData* attribute, unsigned int 
 }
 
 Vector4 AttributeBuffer::getValueVector4(AttributeData* attribute, unsigned int index){
-    unsigned pos = (index * itemSize) + attribute->offset;
+    unsigned pos = (index * attribute->stride) + attribute->offset;
     if ((pos+4) <= buffer.size()){
-        return Vector4(buffer[pos], buffer[pos+1], buffer[pos+2], buffer[pos+3]);
+        return Vector4(buffer[pos], buffer[pos+sizeof(float)], buffer[pos+(2*sizeof(float))], buffer[pos+(3*sizeof(float))]);
     }else{
         Log::Error("Attribute index is bigger than buffer");
     }
@@ -202,7 +207,7 @@ float AttributeBuffer::getValue(int attribute, unsigned int index){
 
 float AttributeBuffer::getValue(AttributeData* attribute, unsigned int index, int elementIndex){
     if (elementIndex >= 0 && elementIndex < attribute->elements) {
-        unsigned pos = (index * itemSize) + attribute->offset + elementIndex;
+        unsigned pos = (index * attribute->stride) + attribute->offset + elementIndex;
         if ((pos+1) <= buffer.size()){
             return buffer[pos];
         }else{
@@ -219,16 +224,12 @@ std::map<int, AttributeData> AttributeBuffer::getAttributes(){
     return attributes;
 };
 
-float* AttributeBuffer::getBuffer(){
+char* AttributeBuffer::getBuffer(){
     return &buffer[0];
 }
 
 unsigned int AttributeBuffer::getSize(){
     return buffer.size();
-}
-
-unsigned int AttributeBuffer::getItemSize(){
-    return itemSize;
 }
 
 unsigned int AttributeBuffer::getCount(){

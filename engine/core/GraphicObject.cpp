@@ -35,9 +35,9 @@ void GraphicObject::updateBuffer(int index){
             shadowRender->setVertexSize(buffers[index].getCount());
     }
     if (render)
-        render->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
+        render->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize(), buffers[index].getBuffer());
     if (shadowRender)
-        shadowRender->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize() * sizeof(float), buffers[index].getBuffer());
+        shadowRender->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize(), buffers[index].getBuffer());
 }
 
 void GraphicObject::prepareShadowRender(){
@@ -45,9 +45,9 @@ void GraphicObject::prepareShadowRender(){
         if (b == 0) {
             shadowRender->setVertexSize(buffers[b].getCount());
         }
-        shadowRender->addVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer(), true);
+        shadowRender->addVertexBuffer(buffers[b].getName(), buffers[b].getSize(), buffers[b].getBuffer(), true);
         for (auto const &x : buffers[b].getAttributes()) {
-            shadowRender->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, buffers[b].getItemSize() * sizeof(float), x.second.offset * sizeof(float));
+            shadowRender->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, x.second.stride, x.second.offset);
         }
     }
 
@@ -67,9 +67,9 @@ void GraphicObject::prepareRender(){
         if (b == 0) {
             render->setVertexSize(buffers[b].getCount());
         }
-        render->addVertexBuffer(buffers[b].getName(), buffers[b].getSize() * sizeof(float), buffers[b].getBuffer(), true);
+        render->addVertexBuffer(buffers[b].getName(), buffers[b].getSize(), buffers[b].getBuffer(), true);
         for (auto const &x : buffers[b].getAttributes()) {
-            render->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, buffers[b].getItemSize() * sizeof(float), x.second.offset * sizeof(float));
+            render->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, x.second.stride, x.second.offset);
         }
     }
 

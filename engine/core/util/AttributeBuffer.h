@@ -17,17 +17,18 @@
 namespace Supernova {
 
     struct AttributeData{
-        int count;
-        int offset;
-        int elements;
+        unsigned int count;
+        unsigned int elements;
+        unsigned int stride;
+        size_t offset;
     };
 
     class AttributeBuffer {
 
     private:
         std::string name;
-        std::vector<float> buffer;
-        unsigned int itemSize;
+        std::vector<char> buffer;
+        unsigned int vertexSize;
         unsigned int count;
         std::map<int, AttributeData> attributes;
 
@@ -70,10 +71,9 @@ namespace Supernova {
         float getValue(AttributeData* attribute, unsigned int index, int elementIndex = 0);
 
         std::map<int, AttributeData> getAttributes();
-        float* getBuffer();
+        char* getBuffer();
         unsigned int getSize();
 
-        unsigned int getItemSize();
         unsigned int getCount();
 
         const std::string &getName() const;
