@@ -28,8 +28,6 @@ Buffer::Buffer(){
 }
 
 Buffer::~Buffer(){
-    if (data)
-        delete data;
 }
 
 bool Buffer::resize(size_t pos){

@@ -11,11 +11,13 @@ SkyBox::SkyBox(): Mesh() {
     
     primitiveType = S_PRIMITIVE_TRIANGLES;
 
+    buffers.push_back(new InterleavedBuffer());
+
     buffers[0]->clearAll();
     buffers[0]->setName("vertices");
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    //((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    //((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    //((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    //((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
     
     skymesh = true;
 

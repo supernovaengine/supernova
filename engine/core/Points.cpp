@@ -8,7 +8,7 @@ using namespace Supernova;
 
 Points::Points(): GraphicObject(){
 
-    buffers.push_back(new AttributeBuffer());
+    buffers.push_back(new InterleavedBuffer());
 
     pointScale = 1.0;
     sizeAttenuation = false;
@@ -42,13 +42,13 @@ bool Points::shouldSort(){
 void Points::copyBuffer(){
     buffers[0]->clearAll();
     buffers[0]->setName("points");
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1);
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4);
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, 1);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, 1);
     if (useTextureRects)
-        ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4);
+        ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4);
 
     for (int i=0; i < sortedPoints.size(); i++){
         if (sortedPoints[i].visible) {

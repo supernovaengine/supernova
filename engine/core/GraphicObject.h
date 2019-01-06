@@ -9,7 +9,7 @@
 #include "Object.h"
 #include "Material.h"
 #include "buffer/Buffer.h"
-#include "buffer/AttributeBuffer.h"
+#include "buffer/InterleavedBuffer.h"
 #include "render/ObjectRender.h"
 
 namespace Supernova {
@@ -40,6 +40,7 @@ namespace Supernova {
 
         void updateDistanceToCamera();
 
+        void deleteBuffers();
         void updateBuffer(int index);
         void prepareShadowRender();
         void prepareRender();

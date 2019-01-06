@@ -7,6 +7,14 @@ using namespace Supernova;
 
 PlaneTerrain::PlaneTerrain(): Mesh() {
     primitiveType = S_PRIMITIVE_TRIANGLE_STRIP;
+
+    buffers.push_back(new InterleavedBuffer());
+
+    buffers[0]->clearAll();
+    buffers[0]->setName("vertices");
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
 PlaneTerrain::PlaneTerrain(float width, float depth): PlaneTerrain() {
@@ -18,12 +26,6 @@ PlaneTerrain::~PlaneTerrain() {
 }
 
 bool PlaneTerrain::load(){
-
-    buffers[0]->clearAll();
-    buffers[0]->setName("vertices");
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 
     AttributeData* attVertex = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     buffers[0]->addValue(attVertex, Vector3(0, 0, 0));

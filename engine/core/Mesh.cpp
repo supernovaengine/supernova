@@ -9,9 +9,6 @@
 using namespace Supernova;
 
 Mesh::Mesh(): GraphicObject(){
-
-    buffers.push_back(new AttributeBuffer());
-
     submeshes.push_back(new SubMesh(&material));
     skymesh = false;
     textmesh = false;

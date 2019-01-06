@@ -2,8 +2,8 @@
 // (c) 2018 Eduardo Doria.
 //
 
-#ifndef ATTRIBUTEBUFFER_H
-#define ATTRIBUTEBUFFER_H
+#ifndef INTERLEAVEDBUFFER_H
+#define INTERLEAVEDBUFFER_H
 
 #include <string>
 #include <vector>
@@ -17,7 +17,7 @@
 
 namespace Supernova{
 
-    class AttributeBuffer: public Buffer{
+    class InterleavedBuffer: public Buffer{
 
     private:
 
@@ -25,8 +25,8 @@ namespace Supernova{
         unsigned int vertexSize;
 
     public:
-        AttributeBuffer();
-        virtual ~AttributeBuffer();
+        InterleavedBuffer();
+        virtual ~InterleavedBuffer();
 
         virtual bool resize(size_t pos);
         virtual void clearAll();
@@ -39,4 +39,4 @@ namespace Supernova{
 }
 
 
-#endif //ATTRIBUTEBUFFER_H
+#endif //INTERLEAVEDBUFFER_H

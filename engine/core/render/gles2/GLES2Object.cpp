@@ -453,5 +453,12 @@ void GLES2Object::destroy(){
         indexGL.size = 0;
     }
 
+    vertexBuffersGL.clear();
+    attributesGL.clear();
+    indexGL.size = 0;
+    indexGL.buffer = 0;
+    propertyGL.clear();
+    texturesGL.clear();
+
     ObjectRender::destroy();
 }

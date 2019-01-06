@@ -2,22 +2,22 @@
 // (c) 2018 Eduardo Doria.
 //
 
-#include "AttributeBuffer.h"
+#include "InterleavedBuffer.h"
 #include "Log.h"
 #include <cstdlib>
 
 using namespace Supernova;
 
-AttributeBuffer::AttributeBuffer(){
+InterleavedBuffer::InterleavedBuffer(){
 
     vertexSize = 0;
 }
 
-AttributeBuffer::~AttributeBuffer(){
+InterleavedBuffer::~InterleavedBuffer(){
 
 }
 
-bool AttributeBuffer::resize(size_t pos) {
+bool InterleavedBuffer::resize(size_t pos) {
     Buffer::resize(pos);
 
     if (pos >= buffer.size()) {
@@ -30,20 +30,19 @@ bool AttributeBuffer::resize(size_t pos) {
     return true;
 }
 
-void AttributeBuffer::clearAll(){
+void InterleavedBuffer::clearAll(){
     Buffer::clearAll();
 
     vertexSize = 0;
 }
 
-void AttributeBuffer::clear(){
+void InterleavedBuffer::clear(){
     Buffer::clear();
 
     buffer.clear();
 }
 
-//Interleaved
-void AttributeBuffer::addAttribute(int attribute, int elements){
+void InterleavedBuffer::addAttribute(int attribute, int elements){
     if (buffer.size() == 0) {
         AttributeData attData;
         attData.count = 0;

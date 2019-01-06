@@ -5,7 +5,7 @@
 #include <vector>
 #include "math/Vector2.h"
 #include "math/Vector3.h"
-#include "buffer/AttributeBuffer.h"
+#include "buffer/InterleavedBuffer.h"
 #include "stb_rect_pack.h"
 #include "stb_truetype.h"
 #include "Texture.h"

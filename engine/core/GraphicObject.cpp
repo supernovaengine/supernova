@@ -24,12 +24,15 @@ GraphicObject::GraphicObject(): Object(){
 }
 
 GraphicObject::~GraphicObject(){
+    deleteBuffers();
+}
 
+void GraphicObject::deleteBuffers(){
     for (int b = 0; b < buffers.size(); b++){
         delete buffers[b];
     }
-
 }
+
 
 void GraphicObject::updateBuffer(int index){
     if (index == 0) {

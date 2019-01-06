@@ -234,4 +234,10 @@ void ObjectRender::destroy(){
 
     program.reset();
     ProgramRender::deleteUnused();
+
+    vertexBuffers.clear();
+    vertexAttributes.clear();
+    indexAttribute.data = NULL;
+    properties.clear();
+    textures.clear();
 }

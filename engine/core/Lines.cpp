@@ -9,11 +9,11 @@ using namespace Supernova;
 Lines::Lines(): GraphicObject(){
     lineWidth = 1.0;
 
-    buffers.push_back(new AttributeBuffer());
+    buffers.push_back(new InterleavedBuffer());
 
     buffers[0]->clearAll();
     buffers[0]->setName("lines");
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
 }
 
 Lines:: ~Lines(){

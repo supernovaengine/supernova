@@ -13,6 +13,14 @@ using namespace Supernova;
 Model::Model(): Mesh() {
     primitiveType = S_PRIMITIVE_TRIANGLES;
     skeleton = NULL;
+
+    buffers.push_back(new InterleavedBuffer());
+
+    buffers[0]->clearAll();
+    buffers[0]->setName("vertices");
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
 Model::Model(const char * path): Model() {
@@ -74,8 +82,8 @@ bool Model::loadSMODEL(const char* path) {
     skinning = false;
     if (modelData.skeleton){
         skinning = true;
-        ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_BONEIDS, 4);
-        ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, 4);
+        ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_BONEIDS, 4);
+        ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, 4);
     }
 
     AttributeData* attVertex = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
@@ -245,12 +253,6 @@ void Model::updateMatrix(){
 }
 
 bool Model::load(){
-
-    buffers[0]->clearAll();
-    buffers[0]->setName("vertices");
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 
     baseDir = File::getBaseDir(filename);
 
