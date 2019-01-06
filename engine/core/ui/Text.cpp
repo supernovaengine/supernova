@@ -19,11 +19,11 @@ Text::Text(): Mesh2D() {
     userDefinedWidth = false;
     userDefinedHeight = false;
 
-    buffers[0].clearAll();
-    buffers[0].setName("vertices");
-    buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    buffers[0].addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    buffers[0].addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    buffers[0]->clearAll();
+    buffers[0]->setName("vertices");
+    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 
     setMinBufferSize(50);
 }
@@ -71,7 +71,7 @@ void Text::setText(std::string text){
     if (this->text != text){
         this->text = text;
         if (loaded){
-            if (buffers[0].getCount() > 0) {
+            if (buffers[0]->getCount() > 0) {
                 createText();
                 updateBuffers();
             }else{
@@ -170,7 +170,7 @@ void Text::setMultiline(bool multiline){
 }
 
 void Text::createText(){
-    buffers[0].clear();
+    buffers[0]->clear();
 
     std::vector<unsigned int> indices;
     

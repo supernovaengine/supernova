@@ -9,11 +9,11 @@ using namespace Supernova;
 Lines::Lines(): GraphicObject(){
     lineWidth = 1.0;
 
-    buffers.resize(1);
+    buffers.push_back(new AttributeBuffer());
 
-    buffers[0].clearAll();
-    buffers[0].setName("lines");
-    buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffers[0]->clearAll();
+    buffers[0]->setName("lines");
+    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
 }
 
 Lines:: ~Lines(){
@@ -21,12 +21,12 @@ Lines:: ~Lines(){
 }
 
 void Lines::addLine(Vector3 pointA, Vector3 pointB){
-    buffers[0].addValue(S_VERTEXATTRIBUTE_VERTICES, pointA);
-    buffers[0].addValue(S_VERTEXATTRIBUTE_VERTICES, pointB);
+    buffers[0]->addValue(S_VERTEXATTRIBUTE_VERTICES, pointA);
+    buffers[0]->addValue(S_VERTEXATTRIBUTE_VERTICES, pointB);
 }
 
 void Lines::clearLines(){
-    buffers[0].clear();
+    buffers[0]->clear();
 }
 
 float Lines::getLineWidth() const {

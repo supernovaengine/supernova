@@ -8,7 +8,7 @@ using namespace Supernova;
 
 Points::Points(): GraphicObject(){
 
-    buffers.resize(1);
+    buffers.push_back(new AttributeBuffer());
 
     pointScale = 1.0;
     sizeAttenuation = false;
@@ -40,25 +40,25 @@ bool Points::shouldSort(){
 }
 
 void Points::copyBuffer(){
-    buffers[0].clearAll();
-    buffers[0].setName("points");
-    buffers[0].addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    buffers[0].addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
-    buffers[0].addAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1);
-    buffers[0].addAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4);
-    buffers[0].addAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, 1);
+    buffers[0]->clearAll();
+    buffers[0]->setName("points");
+    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_POINTSIZES, 1);
+    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_POINTCOLORS, 4);
+    ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_POINTROTATIONS, 1);
     if (useTextureRects)
-        buffers[0].addAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4);
+        ((AttributeBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURERECTS, 4);
 
     for (int i=0; i < sortedPoints.size(); i++){
         if (sortedPoints[i].visible) {
-            buffers[0].addValue(S_VERTEXATTRIBUTE_VERTICES, sortedPoints[i].position);
-            buffers[0].addValue(S_VERTEXATTRIBUTE_NORMALS, sortedPoints[i].normal);
-            buffers[0].addValue(S_VERTEXATTRIBUTE_POINTSIZES, sortedPoints[i].size);
-            buffers[0].addValue(S_VERTEXATTRIBUTE_POINTCOLORS, sortedPoints[i].color);
-            buffers[0].addValue(S_VERTEXATTRIBUTE_POINTROTATIONS, sortedPoints[i].rotation);
+            buffers[0]->addValue(S_VERTEXATTRIBUTE_VERTICES, sortedPoints[i].position);
+            buffers[0]->addValue(S_VERTEXATTRIBUTE_NORMALS, sortedPoints[i].normal);
+            buffers[0]->addValue(S_VERTEXATTRIBUTE_POINTSIZES, sortedPoints[i].size);
+            buffers[0]->addValue(S_VERTEXATTRIBUTE_POINTCOLORS, sortedPoints[i].color);
+            buffers[0]->addValue(S_VERTEXATTRIBUTE_POINTROTATIONS, sortedPoints[i].rotation);
             if (useTextureRects)
-                buffers[0].addValue(S_VERTEXATTRIBUTE_TEXTURERECTS, sortedPoints[i].textureRect.getVector());
+                buffers[0]->addValue(S_VERTEXATTRIBUTE_TEXTURERECTS, sortedPoints[i].textureRect.getVector());
         }
     }
 }

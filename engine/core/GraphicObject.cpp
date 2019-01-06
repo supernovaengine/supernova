@@ -25,29 +25,33 @@ GraphicObject::GraphicObject(): Object(){
 
 GraphicObject::~GraphicObject(){
 
+    for (int b = 0; b < buffers.size(); b++){
+        delete buffers[b];
+    }
+
 }
 
 void GraphicObject::updateBuffer(int index){
     if (index == 0) {
         if (render)
-            render->setVertexSize(buffers[index].getCount());
+            render->setVertexSize(buffers[index]->getCount());
         if (shadowRender)
-            shadowRender->setVertexSize(buffers[index].getCount());
+            shadowRender->setVertexSize(buffers[index]->getCount());
     }
     if (render)
-        render->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize(), buffers[index].getData());
+        render->updateVertexBuffer(buffers[index]->getName(), buffers[index]->getSize(), buffers[index]->getData());
     if (shadowRender)
-        shadowRender->updateVertexBuffer(buffers[index].getName(), buffers[index].getSize(), buffers[index].getData());
+        shadowRender->updateVertexBuffer(buffers[index]->getName(), buffers[index]->getSize(), buffers[index]->getData());
 }
 
 void GraphicObject::prepareShadowRender(){
     for (int b = 0; b < buffers.size(); b++) {
         if (b == 0) {
-            shadowRender->setVertexSize(buffers[b].getCount());
+            shadowRender->setVertexSize(buffers[b]->getCount());
         }
-        shadowRender->addVertexBuffer(buffers[b].getName(), buffers[b].getSize(), buffers[b].getData(), true);
-        for (auto const &x : buffers[b].getAttributes()) {
-            shadowRender->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, x.second.stride, x.second.offset);
+        shadowRender->addVertexBuffer(buffers[b]->getName(), buffers[b]->getSize(), buffers[b]->getData(), true);
+        for (auto const &x : buffers[b]->getAttributes()) {
+            shadowRender->addVertexAttribute(x.first, buffers[b]->getName(), x.second.elements, x.second.stride, x.second.offset);
         }
     }
 
@@ -65,11 +69,11 @@ void GraphicObject::prepareRender(){
 
     for (int b = 0; b < buffers.size(); b++) {
         if (b == 0) {
-            render->setVertexSize(buffers[b].getCount());
+            render->setVertexSize(buffers[b]->getCount());
         }
-        render->addVertexBuffer(buffers[b].getName(), buffers[b].getSize(), buffers[b].getData(), true);
-        for (auto const &x : buffers[b].getAttributes()) {
-            render->addVertexAttribute(x.first, buffers[b].getName(), x.second.elements, x.second.stride, x.second.offset);
+        render->addVertexBuffer(buffers[b]->getName(), buffers[b]->getSize(), buffers[b]->getData(), true);
+        for (auto const &x : buffers[b]->getAttributes()) {
+            render->addVertexAttribute(x.first, buffers[b]->getName(), x.second.elements, x.second.stride, x.second.offset);
         }
     }
 

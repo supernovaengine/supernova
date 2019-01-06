@@ -139,7 +139,7 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
     return true;
 }
 
-void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<unsigned int>& indices, std::vector<Vector2>& charPositions,
+void STBText::createText(std::string text, Buffer* buffer, std::vector<unsigned int>& indices, std::vector<Vector2>& charPositions,
                          int& width, int& height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert){
     
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
@@ -148,9 +148,9 @@ void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<
     float offsetX = 0;
     float offsetY = 0;
 
-    AttributeData* atrVertice = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-    AttributeData* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-    AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    AttributeData* atrVertice = buffer->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    AttributeData* atrTexcoord = buffer->getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    AttributeData* atrNormal = buffer->getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
     if (multiline && userDefinedWidth){
 
@@ -234,20 +234,20 @@ void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<
             maxX1 = offsetX;
             
         if ((!userDefinedWidth || offsetX <= width) && (!userDefinedHeight || offsetY <= height)){
-            buffer.addValue(atrVertice, Vector3(quad.x0, quad.y0, 0));
-            buffer.addValue(atrVertice, Vector3(quad.x1, quad.y0, 0));
-            buffer.addValue(atrVertice, Vector3(quad.x1, quad.y1, 0));
-            buffer.addValue(atrVertice, Vector3(quad.x0, quad.y1, 0));
+            buffer->addValue(atrVertice, Vector3(quad.x0, quad.y0, 0));
+            buffer->addValue(atrVertice, Vector3(quad.x1, quad.y0, 0));
+            buffer->addValue(atrVertice, Vector3(quad.x1, quad.y1, 0));
+            buffer->addValue(atrVertice, Vector3(quad.x0, quad.y1, 0));
 
-            buffer.addValue(atrTexcoord, Vector2(quad.s0, quad.t0));
-            buffer.addValue(atrTexcoord, Vector2(quad.s1, quad.t0));
-            buffer.addValue(atrTexcoord, Vector2(quad.s1, quad.t1));
-            buffer.addValue(atrTexcoord, Vector2(quad.s0, quad.t1));
+            buffer->addValue(atrTexcoord, Vector2(quad.s0, quad.t0));
+            buffer->addValue(atrTexcoord, Vector2(quad.s1, quad.t0));
+            buffer->addValue(atrTexcoord, Vector2(quad.s1, quad.t1));
+            buffer->addValue(atrTexcoord, Vector2(quad.s0, quad.t1));
 
-            buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-            buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-            buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-            buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+            buffer->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+            buffer->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+            buffer->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+            buffer->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
                 
             indices.push_back(ind);
             indices.push_back(ind+1);
@@ -261,17 +261,17 @@ void STBText::createText(std::string text, AttributeBuffer& buffer, std::vector<
     }
     //Empty text
     if (utf16String.size() == 0){
-        buffer.addValue(atrVertice, Vector3(0.0f, 0.0f, 0.0f));
-        buffer.addValue(atrVertice, Vector3(0.0f, 0.0f, 0.0f));
-        buffer.addValue(atrVertice, Vector3(0.0f, 0.0f, 0.0f));
+        buffer->addValue(atrVertice, Vector3(0.0f, 0.0f, 0.0f));
+        buffer->addValue(atrVertice, Vector3(0.0f, 0.0f, 0.0f));
+        buffer->addValue(atrVertice, Vector3(0.0f, 0.0f, 0.0f));
 
-        buffer.addValue(atrTexcoord, Vector2(0.0f, 0.0f));
-        buffer.addValue(atrTexcoord, Vector2(0.0f, 0.0f));
-        buffer.addValue(atrTexcoord, Vector2(0.0f, 0.0f));
+        buffer->addValue(atrTexcoord, Vector2(0.0f, 0.0f));
+        buffer->addValue(atrTexcoord, Vector2(0.0f, 0.0f));
+        buffer->addValue(atrTexcoord, Vector2(0.0f, 0.0f));
 
-        buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-        buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-        buffer.addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffer->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffer->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffer->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
         
         indices.push_back(0);
         indices.push_back(1);
