@@ -8,7 +8,7 @@
 
 #include "Object.h"
 #include "Material.h"
-#include "util/AttributeBuffer.h"
+#include "buffer/AttributeBuffer.h"
 #include "render/ObjectRender.h"
 
 namespace Supernova {

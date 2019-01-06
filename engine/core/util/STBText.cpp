@@ -4,7 +4,6 @@
 #include "image/TextureLoader.h"
 #include "Log.h"
 #include "file/FileData.h"
-#include "AttributeBuffer.h"
 #include <codecvt>
 
 using namespace Supernova;

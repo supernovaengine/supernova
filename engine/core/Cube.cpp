@@ -169,7 +169,7 @@ void Cube::createNormals(){
 
 
 bool Cube::load(){
-    buffers[0].clearBuffer();
+    buffers[0].clear();
 
     createVertices();
     createTexcoords();

@@ -170,7 +170,7 @@ void Text::setMultiline(bool multiline){
 }
 
 void Text::createText(){
-    buffers[0].clearBuffer();
+    buffers[0].clear();
 
     std::vector<unsigned int> indices;
     

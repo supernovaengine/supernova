@@ -173,7 +173,7 @@ std::vector<Vector2> TileMap::getTileVertices(int index){
 }
 
 void TileMap::createTiles(){
-    buffers[0].clearBuffer();
+    buffers[0].clear();
 
     AttributeData* atrVertex = buffers[0].getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     AttributeData* atrTexcoord = buffers[0].getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);

@@ -51,7 +51,7 @@ void UIImage::setBorder(int border){
 
 void UIImage::createVertices(){
 
-    buffers[0].clearBuffer();
+    buffers[0].clear();
 
     AttributeData* atrVertex = buffers[0].getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     

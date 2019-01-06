@@ -31,7 +31,7 @@ void Polygon::setInvertTexture(bool invertTexture){
 }
 
 void Polygon::clear(){
-    buffers[0].clearBuffer();
+    buffers[0].clear();
 }
 
 void Polygon::addVertex(Vector3 vertex){

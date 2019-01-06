@@ -1,18 +1,17 @@
+#ifndef BUFFER_H
+#define BUFFER_H
+
 //
 // (c) 2018 Eduardo Doria.
 //
 
-#ifndef ATTRIBUTEBUFFER_H
-#define ATTRIBUTEBUFFER_H
-
 #include <string>
-#include <vector>
 #include <map>
 
-#include "render/ProgramRender.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
+
 
 namespace Supernova {
 
@@ -23,25 +22,26 @@ namespace Supernova {
         size_t offset;
     };
 
-    class AttributeBuffer {
+    class Buffer {
 
     private:
         std::string name;
-        std::vector<char> buffer;
-        unsigned int vertexSize;
-        unsigned int count;
+
+    protected:
         std::map<int, AttributeData> attributes;
+        unsigned int count;
+
+        unsigned char* data;
+        size_t size;
 
     public:
-        AttributeBuffer();
-        virtual ~AttributeBuffer();
+        Buffer();
+        virtual ~Buffer();
 
-        void addAttribute(int attribute, int elements);
-        AttributeData* getAttribute(int attribute);
+        virtual bool resize(size_t pos);
+        virtual void clear();
 
         void clearAll();
-        void clearBuffer();
-
 
         void addValue(int attribute, float value);
         void addValue(int attribute, Vector2 vector);
@@ -70,18 +70,19 @@ namespace Supernova {
         float getValue(int attribute, unsigned int index);
         float getValue(AttributeData* attribute, unsigned int index, int elementIndex = 0);
 
+        AttributeData* getAttribute(int attribute);
         std::map<int, AttributeData> getAttributes();
-        char* getBuffer();
-        unsigned int getSize();
-
-        unsigned int getCount();
 
         const std::string &getName() const;
         void setName(const std::string &name);
+
+        unsigned char* getData();
+        size_t getSize();
+
+        unsigned int getCount();
 
     };
 
 }
 
-
-#endif //ATTRIBUTEBUFFER_H
+#endif //BUFFER_H

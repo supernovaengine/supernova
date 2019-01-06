@@ -26,7 +26,7 @@ void Lines::addLine(Vector3 pointA, Vector3 pointB){
 }
 
 void Lines::clearLines(){
-    buffers[0].clearBuffer();
+    buffers[0].clear();
 }
 
 float Lines::getLineWidth() const {
