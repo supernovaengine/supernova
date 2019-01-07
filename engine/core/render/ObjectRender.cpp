@@ -196,7 +196,6 @@ void ObjectRender::loadProgram(){
 
         }
     }
-
 }
 
 bool ObjectRender::load(){

@@ -46,6 +46,10 @@ void Buffer::clear(){
     count = 0;
 }
 
+void Buffer::addValue(int attribute, unsigned int value){
+    addValue(getAttribute(attribute), value);
+}
+
 void Buffer::addValue(int attribute, float value){
     addValue(getAttribute(attribute), value);
 }
@@ -60,6 +64,12 @@ void Buffer::addValue(int attribute, Vector3 vector){
 
 void Buffer::addValue(int attribute, Vector4 vector){
     addValue(getAttribute(attribute), vector);
+}
+
+void Buffer::addValue(AttributeData* attribute, unsigned int value){
+    if (attribute){
+        setValue(attribute->count++, attribute, value);
+    }
 }
 
 void Buffer::addValue(AttributeData* attribute, float value){
@@ -86,23 +96,27 @@ void Buffer::addValue(AttributeData* attribute, Vector4 vector){
     }
 }
 
+void Buffer::setValue(unsigned int index, AttributeData* attribute, unsigned int value){
+    setValue(index, attribute, 1, (char*)&value, sizeof(unsigned int));
+}
+
 void Buffer::setValue(unsigned int index, AttributeData* attribute, float value){
-    setValue(index, attribute, 1, &value);
+    setValue(index, attribute, 1, (char*)&value, sizeof(float));
 }
 
 void Buffer::setValue(unsigned int index, AttributeData* attribute, Vector2 vector){
-    setValue(index, attribute, 2, &vector[0]);
+    setValue(index, attribute, 2, (char*)&vector[0], sizeof(float));
 }
 
 void Buffer::setValue(unsigned int index, AttributeData* attribute, Vector3 vector){
-    setValue(index, attribute, 3, &vector[0]);
+    setValue(index, attribute, 3, (char*)&vector[0], sizeof(float));
 }
 
 void Buffer::setValue(unsigned int index, AttributeData* attribute, Vector4 vector){
-    setValue(index, attribute, 4, &vector[0]);
+    setValue(index, attribute, 4, (char*)&vector[0], sizeof(float));
 }
 
-void Buffer::setValue(unsigned int index, AttributeData* attribute, unsigned int numValues, float* vector){
+void Buffer::setValue(unsigned int index, AttributeData* attribute, unsigned int numValues, char* vector, size_t typesize){
     if (attribute){
         if (attribute->elements == numValues) {
 
@@ -111,11 +125,11 @@ void Buffer::setValue(unsigned int index, AttributeData* attribute, unsigned int
 
             unsigned pos = (index * attribute->stride) + attribute->offset;
 
-            if (resize(pos + (numValues * sizeof(float)))) {
+            if (resize(pos + (numValues * typesize))) {
 
                 for (int i = 0; i < numValues; i++) {
-                    memcpy(&data[pos], &vector[i], sizeof(float));
-                    pos += sizeof(float);
+                    memcpy(&data[pos], &vector[i*typesize], typesize);
+                    pos += typesize;
                 }
 
                 if (attribute->count > count)

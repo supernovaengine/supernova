@@ -43,21 +43,25 @@ namespace Supernova {
 
         void clearAll();
 
+        void addValue(int attribute, unsigned int value);
         void addValue(int attribute, float value);
         void addValue(int attribute, Vector2 vector);
         void addValue(int attribute, Vector3 vector);
         void addValue(int attribute, Vector4 vector);
 
+        void addValue(AttributeData* attribute, unsigned int value);
         void addValue(AttributeData* attribute, float value);
         void addValue(AttributeData* attribute, Vector2 vector);
         void addValue(AttributeData* attribute, Vector3 vector);
         void addValue(AttributeData* attribute, Vector4 vector);
 
+        void setValue(unsigned int index, AttributeData* attribute, unsigned int value);
         void setValue(unsigned int index, AttributeData* attribute, float value);
         void setValue(unsigned int index, AttributeData* attribute, Vector2 vector);
         void setValue(unsigned int index, AttributeData* attribute, Vector3 vector);
         void setValue(unsigned int index, AttributeData* attribute, Vector4 vector);
-        void setValue(unsigned int index, AttributeData* attribute, unsigned int numValues, float* vector);
+
+        void setValue(unsigned int index, AttributeData* attribute, unsigned int numValues, char* vector, size_t typesize);
 
         Vector2 getValueVector2(int attribute, unsigned int index);
         Vector3 getValueVector3(int attribute, unsigned int index);
