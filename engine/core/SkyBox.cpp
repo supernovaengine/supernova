@@ -23,47 +23,47 @@ SkyBox::SkyBox(): Mesh() {
 
     AttributeData* attVertex = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     
-    buffers[0]->addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
     
-    buffers[0]->addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
     
-    buffers[0]->addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
     
-    buffers[0]->addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
     
-    buffers[0]->addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
     
-    buffers[0]->addValue(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffers[0]->addValue(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffers[0]->addValue(attVertex, Vector3(1.0f, -1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+    buffers[0]->addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
 }
 
 SkyBox::~SkyBox() {

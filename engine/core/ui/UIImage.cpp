@@ -57,51 +57,51 @@ void UIImage::createVertices(){
 
     AttributeData* atrVertex = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     
-    buffers[0]->addValue(atrVertex, Vector3(0, 0, 0)); //0
-    buffers[0]->addValue(atrVertex, Vector3(width, 0, 0)); //1
-    buffers[0]->addValue(atrVertex, Vector3(width,  height, 0)); //2
-    buffers[0]->addValue(atrVertex, Vector3(0,  height, 0)); //3
+    buffers[0]->addVector3(atrVertex, Vector3(0, 0, 0)); //0
+    buffers[0]->addVector3(atrVertex, Vector3(width, 0, 0)); //1
+    buffers[0]->addVector3(atrVertex, Vector3(width,  height, 0)); //2
+    buffers[0]->addVector3(atrVertex, Vector3(0,  height, 0)); //3
     
-    buffers[0]->addValue(atrVertex, Vector3(border_left, border_top, 0)); //4
-    buffers[0]->addValue(atrVertex, Vector3(width-border_right, border_top, 0)); //5
-    buffers[0]->addValue(atrVertex, Vector3(width-border_right,  height-border_bottom, 0)); //6
-    buffers[0]->addValue(atrVertex, Vector3(border_left,  height-border_bottom, 0)); //7
+    buffers[0]->addVector3(atrVertex, Vector3(border_left, border_top, 0)); //4
+    buffers[0]->addVector3(atrVertex, Vector3(width-border_right, border_top, 0)); //5
+    buffers[0]->addVector3(atrVertex, Vector3(width-border_right,  height-border_bottom, 0)); //6
+    buffers[0]->addVector3(atrVertex, Vector3(border_left,  height-border_bottom, 0)); //7
     
-    buffers[0]->addValue(atrVertex, Vector3(border_left, 0, 0)); //8
-    buffers[0]->addValue(atrVertex, Vector3(0, border_top, 0)); //9
+    buffers[0]->addVector3(atrVertex, Vector3(border_left, 0, 0)); //8
+    buffers[0]->addVector3(atrVertex, Vector3(0, border_top, 0)); //9
     
-    buffers[0]->addValue(atrVertex, Vector3(width-border_right, 0, 0)); //10
-    buffers[0]->addValue(atrVertex, Vector3(width, border_top, 0)); //11
+    buffers[0]->addVector3(atrVertex, Vector3(width-border_right, 0, 0)); //10
+    buffers[0]->addVector3(atrVertex, Vector3(width, border_top, 0)); //11
     
-    buffers[0]->addValue(atrVertex, Vector3(width-border_right, height, 0)); //12
-    buffers[0]->addValue(atrVertex, Vector3(width, height-border_bottom, 0)); //13
+    buffers[0]->addVector3(atrVertex, Vector3(width-border_right, height, 0)); //12
+    buffers[0]->addVector3(atrVertex, Vector3(width, height-border_bottom, 0)); //13
     
-    buffers[0]->addValue(atrVertex, Vector3(border_left, height, 0)); //14
-    buffers[0]->addValue(atrVertex, Vector3(0, height-border_bottom, 0)); //15
+    buffers[0]->addVector3(atrVertex, Vector3(border_left, height, 0)); //14
+    buffers[0]->addVector3(atrVertex, Vector3(0, height-border_bottom, 0)); //15
 
     AttributeData* atrTexcoord = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
     
-    buffers[0]->addValue(atrTexcoord, Vector2(0.0f, convTex(0.0f)));
-    buffers[0]->addValue(atrTexcoord, Vector2(1.0f, convTex(0.0f)));
-    buffers[0]->addValue(atrTexcoord, Vector2(1.0f, convTex(1.0f)));
-    buffers[0]->addValue(atrTexcoord, Vector2(0.0f, convTex(1.0f)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, convTex(0.0f)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, convTex(0.0f)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, convTex(1.0f)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, convTex(1.0f)));
     
-    buffers[0]->addValue(atrTexcoord, Vector2(border_left/(float)texWidth, convTex(border_top/(float)texHeight)));
-    buffers[0]->addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(border_top/(float)texHeight)));
-    buffers[0]->addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(1.0f-(border_bottom/(float)texHeight))));
-    buffers[0]->addValue(atrTexcoord, Vector2(border_left/(float)texWidth, convTex(1.0f-(border_bottom/(float)texHeight))));
+    buffers[0]->addVector2(atrTexcoord, Vector2(border_left/(float)texWidth, convTex(border_top/(float)texHeight)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(border_top/(float)texHeight)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(1.0f-(border_bottom/(float)texHeight))));
+    buffers[0]->addVector2(atrTexcoord, Vector2(border_left/(float)texWidth, convTex(1.0f-(border_bottom/(float)texHeight))));
     
-    buffers[0]->addValue(atrTexcoord, Vector2(border_left/(float)texWidth, convTex(0)));
-    buffers[0]->addValue(atrTexcoord, Vector2(0, convTex(border_top/(float)texHeight)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(border_left/(float)texWidth, convTex(0)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(0, convTex(border_top/(float)texHeight)));
     
-    buffers[0]->addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(0)));
-    buffers[0]->addValue(atrTexcoord, Vector2(1.0f, convTex(border_top/(float)texHeight)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(0)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, convTex(border_top/(float)texHeight)));
     
-    buffers[0]->addValue(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(1.0f)));
-    buffers[0]->addValue(atrTexcoord, Vector2(1.0f, convTex(1.0f-(border_bottom/(float)texHeight))));
+    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f-(border_right/(float)texWidth), convTex(1.0f)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, convTex(1.0f-(border_bottom/(float)texHeight))));
     
-    buffers[0]->addValue(atrTexcoord, Vector2((border_left/(float)texWidth), convTex(1.0f)));
-    buffers[0]->addValue(atrTexcoord, Vector2(0, convTex(1.0f-(border_bottom/(float)texHeight))));
+    buffers[0]->addVector2(atrTexcoord, Vector2((border_left/(float)texWidth), convTex(1.0f)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(0, convTex(1.0f-(border_bottom/(float)texHeight))));
 
     
     static const unsigned int indices_array[] = {
@@ -141,7 +141,7 @@ void UIImage::createVertices(){
     AttributeData* atrNormal = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
     for (int i = 0; i < buffers[0]->getCount(); i++){
-        buffers[0]->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
     }
 }
 

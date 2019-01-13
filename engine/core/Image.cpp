@@ -101,17 +101,17 @@ void Image::createVertices(){
 
     AttributeData* atrVertex = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
 
-    buffers[0]->addValue(atrVertex, Vector3(0, 0, 0));
-    buffers[0]->addValue(atrVertex, Vector3(width, 0, 0));
-    buffers[0]->addValue(atrVertex, Vector3(width,  height, 0));
-    buffers[0]->addValue(atrVertex, Vector3(0,  height, 0));
+    buffers[0]->addVector3(atrVertex, Vector3(0, 0, 0));
+    buffers[0]->addVector3(atrVertex, Vector3(width, 0, 0));
+    buffers[0]->addVector3(atrVertex, Vector3(width,  height, 0));
+    buffers[0]->addVector3(atrVertex, Vector3(0,  height, 0));
 
     AttributeData* atrTexcoord = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
 
-    buffers[0]->addValue(atrTexcoord, Vector2(0.01f, convTex(0.01f)));
-    buffers[0]->addValue(atrTexcoord, Vector2(0.99f, convTex(0.01f)));
-    buffers[0]->addValue(atrTexcoord, Vector2(0.99f, convTex(0.99f)));
-    buffers[0]->addValue(atrTexcoord, Vector2(0.01f, convTex(0.99f)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(0.01f, convTex(0.01f)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(0.99f, convTex(0.01f)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(0.99f, convTex(0.99f)));
+    buffers[0]->addVector2(atrTexcoord, Vector2(0.01f, convTex(0.99f)));
 
     static const unsigned int indices_array[] = {
         0,  1,  2,
@@ -124,10 +124,10 @@ void Image::createVertices(){
 
     AttributeData* atrNormal = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
-    buffers[0]->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffers[0]->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffers[0]->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffers[0]->addValue(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
 }
 
 bool Image::load(){

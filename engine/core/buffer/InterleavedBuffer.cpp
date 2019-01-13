@@ -1,5 +1,5 @@
 //
-// (c) 2018 Eduardo Doria.
+// (c) 2019 Eduardo Doria.
 //
 
 #include "InterleavedBuffer.h"
@@ -20,11 +20,11 @@ InterleavedBuffer::~InterleavedBuffer(){
 bool InterleavedBuffer::resize(size_t pos) {
     Buffer::resize(pos);
 
-    if (pos >= buffer.size()) {
-        buffer.resize(pos);
+    if (pos >= vectorBuffer.size()) {
+        vectorBuffer.resize(pos);
 
-        data = &buffer[0];
-        size = buffer.size();
+        data = &vectorBuffer[0];
+        size = vectorBuffer.size();
     }
 
     return true;
@@ -39,11 +39,11 @@ void InterleavedBuffer::clearAll(){
 void InterleavedBuffer::clear(){
     Buffer::clear();
 
-    buffer.clear();
+    vectorBuffer.clear();
 }
 
 void InterleavedBuffer::addAttribute(int attribute, int elements){
-    if (buffer.size() == 0) {
+    if (vectorBuffer.size() == 0) {
         AttributeData attData;
         attData.count = 0;
         attData.elements = elements;
@@ -51,13 +51,11 @@ void InterleavedBuffer::addAttribute(int attribute, int elements){
 
         vertexSize += elements * sizeof(float);
 
-        attributes[attribute] = attData;
+        Buffer::addAttribute(attribute, attData);
 
         for (auto &x : attributes) {
             x.second.stride = vertexSize;
         }
-    }else{
-        Log::Error("Cannot add attribute with not cleared buffer");
     }
 }
 

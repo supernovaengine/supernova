@@ -1,5 +1,5 @@
 //
-// (c) 2018 Eduardo Doria.
+// (c) 2019 Eduardo Doria.
 //
 
 #ifndef INTERLEAVEDBUFFER_H
@@ -20,8 +20,7 @@ namespace Supernova{
     class InterleavedBuffer: public Buffer{
 
     private:
-
-        std::vector<unsigned char> buffer;
+        std::vector<unsigned char> vectorBuffer;
         unsigned int vertexSize;
 
     public:

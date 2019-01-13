@@ -2,8 +2,10 @@
 #define BUFFER_H
 
 //
-// (c) 2018 Eduardo Doria.
+// (c) 2019 Eduardo Doria.
 //
+
+#define INDEX_
 
 #include <string>
 #include <map>
@@ -43,39 +45,43 @@ namespace Supernova {
 
         void clearAll();
 
-        void addValue(int attribute, unsigned int value);
-        void addValue(int attribute, float value);
-        void addValue(int attribute, Vector2 vector);
-        void addValue(int attribute, Vector3 vector);
-        void addValue(int attribute, Vector4 vector);
-
-        void addValue(AttributeData* attribute, unsigned int value);
-        void addValue(AttributeData* attribute, float value);
-        void addValue(AttributeData* attribute, Vector2 vector);
-        void addValue(AttributeData* attribute, Vector3 vector);
-        void addValue(AttributeData* attribute, Vector4 vector);
-
-        void setValue(unsigned int index, AttributeData* attribute, unsigned int value);
-        void setValue(unsigned int index, AttributeData* attribute, float value);
-        void setValue(unsigned int index, AttributeData* attribute, Vector2 vector);
-        void setValue(unsigned int index, AttributeData* attribute, Vector3 vector);
-        void setValue(unsigned int index, AttributeData* attribute, Vector4 vector);
-
-        void setValue(unsigned int index, AttributeData* attribute, unsigned int numValues, char* vector, size_t typesize);
-
-        Vector2 getValueVector2(int attribute, unsigned int index);
-        Vector3 getValueVector3(int attribute, unsigned int index);
-        Vector4 getValueVector4(int attribute, unsigned int index);
-
-        Vector2 getValueVector2(AttributeData* attribute, unsigned int index);
-        Vector3 getValueVector3(AttributeData* attribute, unsigned int index);
-        Vector4 getValueVector4(AttributeData* attribute, unsigned int index);
-
-        float getValue(int attribute, unsigned int index);
-        float getValue(AttributeData* attribute, unsigned int index, int elementIndex = 0);
+        void addAttribute(int attribute, unsigned int elements, unsigned int stride, size_t offset);
+        void addAttribute(int attribute, AttributeData attributeData);
 
         AttributeData* getAttribute(int attribute);
         std::map<int, AttributeData> getAttributes();
+
+        void addUInt(int attribute, unsigned int value);
+        void addFloat(int attribute, float value);
+        void addVector2(int attribute, Vector2 vector);
+        void addVector3(int attribute, Vector3 vector);
+        void addVector4(int attribute, Vector4 vector);
+
+        void addUInt(AttributeData* attribute, unsigned int value);
+        void addFloat(AttributeData* attribute, float value);
+        void addVector2(AttributeData* attribute, Vector2 vector);
+        void addVector3(AttributeData* attribute, Vector3 vector);
+        void addVector4(AttributeData* attribute, Vector4 vector);
+
+        void setUInt(unsigned int index, AttributeData* attribute, unsigned int value);
+        void setFloat(unsigned int index, AttributeData* attribute, float value);
+        void setVector2(unsigned int index, AttributeData* attribute, Vector2 vector);
+        void setVector3(unsigned int index, AttributeData* attribute, Vector3 vector);
+        void setVector4(unsigned int index, AttributeData* attribute, Vector4 vector);
+
+        void setValue(unsigned int index, AttributeData* attribute, unsigned int numValues, char* vector, size_t typesize);
+
+        unsigned int getUInt(int attribute, unsigned int index);
+        float getFloat(int attribute, unsigned int index);
+        Vector2 getVector2(int attribute, unsigned int index);
+        Vector3 getVector3(int attribute, unsigned int index);
+        Vector4 getVector4(int attribute, unsigned int index);
+
+        unsigned int getUInt(AttributeData* attribute, unsigned int index, int elementIndex = 0);
+        float getFloat(AttributeData* attribute, unsigned int index, int elementIndex = 0);
+        Vector2 getVector2(AttributeData* attribute, unsigned int index);
+        Vector3 getVector3(AttributeData* attribute, unsigned int index);
+        Vector4 getVector4(AttributeData* attribute, unsigned int index);
 
         const std::string &getName() const;
         void setName(const std::string &name);

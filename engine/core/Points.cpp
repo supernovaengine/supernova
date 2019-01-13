@@ -52,13 +52,13 @@ void Points::copyBuffer(){
 
     for (int i=0; i < sortedPoints.size(); i++){
         if (sortedPoints[i].visible) {
-            buffers[0]->addValue(S_VERTEXATTRIBUTE_VERTICES, sortedPoints[i].position);
-            buffers[0]->addValue(S_VERTEXATTRIBUTE_NORMALS, sortedPoints[i].normal);
-            buffers[0]->addValue(S_VERTEXATTRIBUTE_POINTSIZES, sortedPoints[i].size);
-            buffers[0]->addValue(S_VERTEXATTRIBUTE_POINTCOLORS, sortedPoints[i].color);
-            buffers[0]->addValue(S_VERTEXATTRIBUTE_POINTROTATIONS, sortedPoints[i].rotation);
+            buffers[0]->addVector3(S_VERTEXATTRIBUTE_VERTICES, sortedPoints[i].position);
+            buffers[0]->addVector3(S_VERTEXATTRIBUTE_NORMALS, sortedPoints[i].normal);
+            buffers[0]->addFloat(S_VERTEXATTRIBUTE_POINTSIZES, sortedPoints[i].size);
+            buffers[0]->addVector4(S_VERTEXATTRIBUTE_POINTCOLORS, sortedPoints[i].color);
+            buffers[0]->addFloat(S_VERTEXATTRIBUTE_POINTROTATIONS, sortedPoints[i].rotation);
             if (useTextureRects)
-                buffers[0]->addValue(S_VERTEXATTRIBUTE_TEXTURERECTS, sortedPoints[i].textureRect.getVector());
+                buffers[0]->addVector4(S_VERTEXATTRIBUTE_TEXTURERECTS, sortedPoints[i].textureRect.getVector());
         }
     }
 }

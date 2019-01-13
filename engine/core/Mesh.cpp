@@ -77,7 +77,7 @@ void Mesh::sortTransparentSubMeshes(){
         for (size_t i = 0; i < submeshes.size(); i++) {
             if (this->submeshes[i]->getIndices()->size() > 0){
                 //TODO: Check if buffer has vertices attributes
-                Vector3 submeshFirstVertice = buffers[0]->getValueVector3(S_VERTEXATTRIBUTE_VERTICES, this->submeshes[i]->getIndex(0));
+                Vector3 submeshFirstVertice = buffers[0]->getVector3(S_VERTEXATTRIBUTE_VERTICES, this->submeshes[i]->getIndex(0));
                 submeshFirstVertice = modelMatrix * submeshFirstVertice;
 
                 if (this->submeshes[i]->getMaterial()->isTransparent()){

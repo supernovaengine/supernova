@@ -21,8 +21,8 @@ Lines:: ~Lines(){
 }
 
 void Lines::addLine(Vector3 pointA, Vector3 pointB){
-    buffers[0]->addValue(S_VERTEXATTRIBUTE_VERTICES, pointA);
-    buffers[0]->addValue(S_VERTEXATTRIBUTE_VERTICES, pointB);
+    buffers[0]->addVector3(S_VERTEXATTRIBUTE_VERTICES, pointA);
+    buffers[0]->addVector3(S_VERTEXATTRIBUTE_VERTICES, pointB);
 }
 
 void Lines::clearLines(){
