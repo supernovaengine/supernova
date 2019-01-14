@@ -12,6 +12,8 @@ namespace Supernova {
 
     class SkyBox: public Mesh {
     private:
+        InterleavedBuffer buffer;
+
         //To use texture cube
         std::string textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown;
         Matrix4 skyViewProjectionMatrix;

@@ -10,6 +10,9 @@ namespace Supernova {
     class Cube: public Mesh {
 
     private:
+        InterleavedBuffer buffer;
+        IndexBuffer indices;
+
         void createVertices();
         void createTexcoords();
         void createIndices();

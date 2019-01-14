@@ -9,6 +9,9 @@ namespace Supernova {
 
     class Polygon: public Mesh2D {
 
+    private:
+        InterleavedBuffer buffer;
+
     public:
         Polygon();
         virtual ~Polygon();

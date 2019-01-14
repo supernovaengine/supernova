@@ -26,9 +26,6 @@ namespace Supernova {
 
     class Buffer {
 
-    private:
-        std::string name;
-
     protected:
         std::map<int, AttributeData> attributes;
         unsigned int count;

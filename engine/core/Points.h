@@ -15,7 +15,8 @@ namespace Supernova {
     class Points: public GraphicObject {
 
     private:
-        
+        InterleavedBuffer buffer;
+
         int texWidth;
         int texHeight;
 

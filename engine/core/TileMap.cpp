@@ -7,12 +7,13 @@
 using namespace Supernova;
 
 TileMap::TileMap(): Mesh2D(){
-    buffers.push_back(new InterleavedBuffer());
-    buffers[0]->clearAll();
-    buffers[0]->setName("vertices");
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    buffers["vertices"] = &buffer;
+
+    buffer.clearAll();
+    buffer.setName("vertices");
+    buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
 TileMap::~TileMap(){
@@ -174,11 +175,11 @@ std::vector<Vector2> TileMap::getTileVertices(int index){
 }
 
 void TileMap::createTiles(){
-    buffers[0]->clear();
+    buffer.clear();
 
-    AttributeData* atrVertex = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-    AttributeData* atrTexcoord = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-    AttributeData* atrNormal = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    AttributeData* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    AttributeData* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
     for (int s = 0; s < submeshes.size(); s++){
         submeshes[s]->getIndices()->clear();
@@ -190,10 +191,10 @@ void TileMap::createTiles(){
         
         std::vector<Vector2> tileVertices = getTileVertices(i);
 
-        buffers[0]->addVector3(atrVertex, Vector3(tileVertices[0].x, tileVertices[0].y, 0));
-        buffers[0]->addVector3(atrVertex, Vector3(tileVertices[1].x, tileVertices[1].y, 0));
-        buffers[0]->addVector3(atrVertex, Vector3(tileVertices[2].x, tileVertices[2].y, 0));
-        buffers[0]->addVector3(atrVertex, Vector3(tileVertices[3].x, tileVertices[3].y, 0));
+        buffer.addVector3(atrVertex, Vector3(tileVertices[0].x, tileVertices[0].y, 0));
+        buffer.addVector3(atrVertex, Vector3(tileVertices[1].x, tileVertices[1].y, 0));
+        buffer.addVector3(atrVertex, Vector3(tileVertices[2].x, tileVertices[2].y, 0));
+        buffer.addVector3(atrVertex, Vector3(tileVertices[3].x, tileVertices[3].y, 0));
 
         if (width < tiles[i].position.x + tiles[i].width)
             width = tiles[i].position.x + tiles[i].width;
@@ -201,15 +202,15 @@ void TileMap::createTiles(){
             height = tiles[i].position.y + tiles[i].height;
 
         Rect tileRect = normalizeTileRect(tilesRect[tiles[i].rectId].rect, tilesRect[tiles[i].rectId].submeshId);
-        buffers[0]->addVector2(atrTexcoord, Vector2(tileRect.getX(), convTex(tileRect.getY())));
-        buffers[0]->addVector2(atrTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), convTex(tileRect.getY())));
-        buffers[0]->addVector2(atrTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), convTex(tileRect.getY()+tileRect.getHeight())));
-        buffers[0]->addVector2(atrTexcoord, Vector2(tileRect.getX(), convTex(tileRect.getY()+tileRect.getHeight())));
+        buffer.addVector2(atrTexcoord, Vector2(tileRect.getX(), convTex(tileRect.getY())));
+        buffer.addVector2(atrTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), convTex(tileRect.getY())));
+        buffer.addVector2(atrTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), convTex(tileRect.getY()+tileRect.getHeight())));
+        buffer.addVector2(atrTexcoord, Vector2(tileRect.getX(), convTex(tileRect.getY()+tileRect.getHeight())));
 
-        buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-        buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-        buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-        buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+        buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
 
         std::vector<unsigned int>* indices = submeshes[tilesRect[tiles[i].rectId].submeshId]->getIndices();
 

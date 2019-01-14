@@ -14,13 +14,12 @@ Image::Image(): Mesh2D() {
     texHeight = 0;
     useTextureRect = false;
 
-    buffers.push_back(new InterleavedBuffer());
+    buffers["vertices"] = &buffer;
 
-    buffers[0]->clearAll();
-    buffers[0]->setName("vertices");
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    buffer.clearAll();
+    buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
 Image::Image(int width, int height): Image() {
@@ -97,21 +96,21 @@ void Image::setInvertTexture(bool invertTexture){
 
 void Image::createVertices(){
 
-    buffers[0]->clear();
+    buffer.clear();
 
-    AttributeData* atrVertex = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    AttributeData* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
 
-    buffers[0]->addVector3(atrVertex, Vector3(0, 0, 0));
-    buffers[0]->addVector3(atrVertex, Vector3(width, 0, 0));
-    buffers[0]->addVector3(atrVertex, Vector3(width,  height, 0));
-    buffers[0]->addVector3(atrVertex, Vector3(0,  height, 0));
+    buffer.addVector3(atrVertex, Vector3(0, 0, 0));
+    buffer.addVector3(atrVertex, Vector3(width, 0, 0));
+    buffer.addVector3(atrVertex, Vector3(width,  height, 0));
+    buffer.addVector3(atrVertex, Vector3(0,  height, 0));
 
-    AttributeData* atrTexcoord = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    AttributeData* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
 
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.01f, convTex(0.01f)));
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.99f, convTex(0.01f)));
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.99f, convTex(0.99f)));
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.01f, convTex(0.99f)));
+    buffer.addVector2(atrTexcoord, Vector2(0.01f, convTex(0.01f)));
+    buffer.addVector2(atrTexcoord, Vector2(0.99f, convTex(0.01f)));
+    buffer.addVector2(atrTexcoord, Vector2(0.99f, convTex(0.99f)));
+    buffer.addVector2(atrTexcoord, Vector2(0.01f, convTex(0.99f)));
 
     static const unsigned int indices_array[] = {
         0,  1,  2,
@@ -122,12 +121,12 @@ void Image::createVertices(){
     indices.assign(indices_array, std::end(indices_array));
     submeshes[0]->setIndices(indices);
 
-    AttributeData* atrNormal = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
 }
 
 bool Image::load(){

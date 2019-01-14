@@ -14,6 +14,9 @@ namespace Supernova {
     class UIImage: public UIObject {
 
     private:
+        InterleavedBuffer buffer;
+        IndexBuffer indices;
+
         std::vector<Image*> partImage;
         int rawImageWidth, rawImageHeight;
 

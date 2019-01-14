@@ -10,6 +10,7 @@
 #include "Material.h"
 #include "buffer/Buffer.h"
 #include "buffer/InterleavedBuffer.h"
+#include "buffer/IndexBuffer.h"
 #include "render/ObjectRender.h"
 
 namespace Supernova {
@@ -24,7 +25,8 @@ namespace Supernova {
         ObjectRender* render;
         ObjectRender* shadowRender;
 
-        std::vector<Buffer*> buffers;
+        std::map<std::string, Buffer*> buffers;
+        std::string defaultBuffer;
 
         Rect scissor;
 
@@ -41,7 +43,7 @@ namespace Supernova {
         void updateDistanceToCamera();
 
         void deleteBuffers();
-        void updateBuffer(int index);
+        void updateBuffer(std::string name);
         void prepareShadowRender();
         void prepareRender();
 

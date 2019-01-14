@@ -28,33 +28,31 @@ GraphicObject::~GraphicObject(){
 }
 
 void GraphicObject::deleteBuffers(){
-    for (int b = 0; b < buffers.size(); b++){
-        delete buffers[b];
-    }
+
 }
 
 
-void GraphicObject::updateBuffer(int index){
-    if (index == 0) {
+void GraphicObject::updateBuffer(std::string name){
+    if (name == defaultBuffer) {
         if (render)
-            render->setVertexSize(buffers[index]->getCount());
+            render->setVertexSize(buffers[name]->getCount());
         if (shadowRender)
-            shadowRender->setVertexSize(buffers[index]->getCount());
+            shadowRender->setVertexSize(buffers[name]->getCount());
     }
     if (render)
-        render->updateVertexBuffer(buffers[index]->getName(), buffers[index]->getSize(), buffers[index]->getData());
+        render->updateVertexBuffer(name, buffers[name]->getSize(), buffers[name]->getData());
     if (shadowRender)
-        shadowRender->updateVertexBuffer(buffers[index]->getName(), buffers[index]->getSize(), buffers[index]->getData());
+        shadowRender->updateVertexBuffer(name, buffers[name]->getSize(), buffers[name]->getData());
 }
 
 void GraphicObject::prepareShadowRender(){
-    for (int b = 0; b < buffers.size(); b++) {
-        if (b == 0) {
-            shadowRender->setVertexSize(buffers[b]->getCount());
+    for (auto const& buf : buffers) {
+        if (buf.first == defaultBuffer) {
+            shadowRender->setVertexSize(buf.second->getCount());
         }
-        shadowRender->addVertexBuffer(buffers[b]->getName(), buffers[b]->getSize(), buffers[b]->getData(), true);
-        for (auto const &x : buffers[b]->getAttributes()) {
-            shadowRender->addVertexAttribute(x.first, buffers[b]->getName(), x.second.elements, x.second.stride, x.second.offset);
+        shadowRender->addVertexBuffer(buf.first, buf.second->getSize(), buf.second->getData(), true);
+        for (auto const &x : buf.second->getAttributes()) {
+            shadowRender->addVertexAttribute(x.first, buf.first, x.second.elements, x.second.stride, x.second.offset);
         }
     }
 
@@ -70,13 +68,13 @@ void GraphicObject::prepareShadowRender(){
 
 void GraphicObject::prepareRender(){
 
-    for (int b = 0; b < buffers.size(); b++) {
-        if (b == 0) {
-            render->setVertexSize(buffers[b]->getCount());
+    for (auto const& buf : buffers){
+        if (buf.first == defaultBuffer) {
+            render->setVertexSize(buf.second->getCount());
         }
-        render->addVertexBuffer(buffers[b]->getName(), buffers[b]->getSize(), buffers[b]->getData(), true);
-        for (auto const &x : buffers[b]->getAttributes()) {
-            render->addVertexAttribute(x.first, buffers[b]->getName(), x.second.elements, x.second.stride, x.second.offset);
+        render->addVertexBuffer(buf.first, buf.second->getSize(), buf.second->getData(), true);
+        for (auto const &x : buf.second->getAttributes()) {
+            render->addVertexAttribute(x.first, buf.first, x.second.elements, x.second.stride, x.second.offset);
         }
     }
 

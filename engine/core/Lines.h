@@ -12,6 +12,8 @@ namespace Supernova {
     class Lines : public GraphicObject {
 
     private:
+        InterleavedBuffer buffer;
+
         float lineWidth;
 
     public:

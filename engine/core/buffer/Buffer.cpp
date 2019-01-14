@@ -13,6 +13,9 @@ Buffer::Buffer(){
     std::string randName;
     randName.resize(len);
 
+    data = NULL;
+    size = 0;
+/*
     static const char alphanum[] =
             "0123456789"
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -23,8 +26,7 @@ Buffer::Buffer(){
     }
 
     name = "buffer|" + randName;
-    data = NULL;
-    size = 0;
+*/
 }
 
 Buffer::~Buffer(){
@@ -257,14 +259,6 @@ Vector4 Buffer::getVector4(AttributeData* attribute, unsigned int index){
     }
 
     return Vector4();
-}
-
-const std::string &Buffer::getName() const {
-    return name;
-}
-
-void Buffer::setName(const std::string &name) {
-    Buffer::name = name;
 }
 
 unsigned char* Buffer::getData(){

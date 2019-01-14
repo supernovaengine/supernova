@@ -10,8 +10,11 @@
 
 namespace Supernova{
     class TileMap: public Mesh2D {
+    private:
+        InterleavedBuffer buffer;
+        IndexBuffer indices;
+
     protected:
-        
         struct tileRectData{
             std::string name;
             int submeshId;

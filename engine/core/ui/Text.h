@@ -11,6 +11,7 @@ namespace Supernova {
     class Text: public Mesh2D {
 
     private:
+        InterleavedBuffer buffer;
         
         STBText* stbtext;
 

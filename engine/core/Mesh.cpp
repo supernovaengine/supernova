@@ -14,6 +14,8 @@ Mesh::Mesh(): GraphicObject(){
     textmesh = false;
     skinning = false;
     dynamic = false;
+
+    defaultBuffer = "vertices";
 }
 
 Mesh::~Mesh(){
@@ -56,8 +58,8 @@ void Mesh::addSubMesh(SubMesh* submesh){
 }
 
 void Mesh::updateBuffers(){
-    for (int b = 0; b < buffers.size(); b++) {
-        updateBuffer(b);
+    for (auto const& buf : buffers) {
+        updateBuffer(buf.first);
     }
     updateIndices();
 }
@@ -77,7 +79,7 @@ void Mesh::sortTransparentSubMeshes(){
         for (size_t i = 0; i < submeshes.size(); i++) {
             if (this->submeshes[i]->getIndices()->size() > 0){
                 //TODO: Check if buffer has vertices attributes
-                Vector3 submeshFirstVertice = buffers[0]->getVector3(S_VERTEXATTRIBUTE_VERTICES, this->submeshes[i]->getIndex(0));
+                Vector3 submeshFirstVertice = buffers[defaultBuffer]->getVector3(S_VERTEXATTRIBUTE_VERTICES, this->submeshes[i]->getIndex(0));
                 submeshFirstVertice = modelMatrix * submeshFirstVertice;
 
                 if (this->submeshes[i]->getMaterial()->isTransparent()){

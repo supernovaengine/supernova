@@ -12,7 +12,10 @@
 namespace Supernova {
 
     class Model: public Mesh {
+
     private:
+        InterleavedBuffer buffer;
+        IndexBuffer indices;
 
         const char* filename;
         std::string baseDir;

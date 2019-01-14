@@ -12,13 +12,12 @@ Cube::Cube(): Mesh() {
     height = 0;
     depth = 0;
 
-    buffers.push_back(new InterleavedBuffer());
+    buffers["vertices"] = &buffer;
 
-    buffers[0]->clearAll();
-    buffers[0]->setName("vertices");
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    buffer.clearAll();
+    buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
 Cube::Cube(float width, float height, float depth): Cube() {
@@ -34,73 +33,73 @@ Cube::~Cube() {
 
 void Cube::createVertices(){
 
-    AttributeData* atrVertex = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    AttributeData* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
 
-    buffers[0]->addVector3(atrVertex, Vector3(0, 0,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(width, 0,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(width,  height,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(0, height,  depth));
+    buffer.addVector3(atrVertex, Vector3(0, 0,  depth));
+    buffer.addVector3(atrVertex, Vector3(width, 0,  depth));
+    buffer.addVector3(atrVertex, Vector3(width,  height,  depth));
+    buffer.addVector3(atrVertex, Vector3(0, height,  depth));
 
-    buffers[0]->addVector3(atrVertex, Vector3(0, 0, 0));
-    buffers[0]->addVector3(atrVertex, Vector3(width, 0, 0));
-    buffers[0]->addVector3(atrVertex, Vector3(width,  height, 0));
-    buffers[0]->addVector3(atrVertex, Vector3(0,  height, 0));
+    buffer.addVector3(atrVertex, Vector3(0, 0, 0));
+    buffer.addVector3(atrVertex, Vector3(width, 0, 0));
+    buffer.addVector3(atrVertex, Vector3(width,  height, 0));
+    buffer.addVector3(atrVertex, Vector3(0,  height, 0));
 
-    buffers[0]->addVector3(atrVertex, Vector3(0, 0,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(0,  height,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(0,  height, 0));
-    buffers[0]->addVector3(atrVertex, Vector3(0, 0, 0));
+    buffer.addVector3(atrVertex, Vector3(0, 0,  depth));
+    buffer.addVector3(atrVertex, Vector3(0,  height,  depth));
+    buffer.addVector3(atrVertex, Vector3(0,  height, 0));
+    buffer.addVector3(atrVertex, Vector3(0, 0, 0));
 
-    buffers[0]->addVector3(atrVertex, Vector3(width, 0,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(width,  height,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(width,  height, 0));
-    buffers[0]->addVector3(atrVertex, Vector3(width, 0, 0));
+    buffer.addVector3(atrVertex, Vector3(width, 0,  depth));
+    buffer.addVector3(atrVertex, Vector3(width,  height,  depth));
+    buffer.addVector3(atrVertex, Vector3(width,  height, 0));
+    buffer.addVector3(atrVertex, Vector3(width, 0, 0));
 
-    buffers[0]->addVector3(atrVertex, Vector3(0,  height,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(width,  height,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(width,  height, 0));
-    buffers[0]->addVector3(atrVertex, Vector3(0,  height, 0));
+    buffer.addVector3(atrVertex, Vector3(0,  height,  depth));
+    buffer.addVector3(atrVertex, Vector3(width,  height,  depth));
+    buffer.addVector3(atrVertex, Vector3(width,  height, 0));
+    buffer.addVector3(atrVertex, Vector3(0,  height, 0));
 
-    buffers[0]->addVector3(atrVertex, Vector3(0, 0,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(width, 0,  depth));
-    buffers[0]->addVector3(atrVertex, Vector3(width, 0, 0));
-    buffers[0]->addVector3(atrVertex, Vector3(0, 0, 0));
+    buffer.addVector3(atrVertex, Vector3(0, 0,  depth));
+    buffer.addVector3(atrVertex, Vector3(width, 0,  depth));
+    buffer.addVector3(atrVertex, Vector3(width, 0, 0));
+    buffer.addVector3(atrVertex, Vector3(0, 0, 0));
 
 }
 
 void Cube::createTexcoords(){
 
-    AttributeData* atrTexcoord = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    AttributeData* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
 
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
 
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
 
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
 
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
 
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
 
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
-    buffers[0]->addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
+    buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
+    buffer.addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
 
 }
 
@@ -135,43 +134,43 @@ void Cube::createIndices(){
 
 void Cube::createNormals(){
 
-    AttributeData* atrNormal = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
     
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, -1.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, -1.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, -1.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 0.0f, -1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, -1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, -1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, -1.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, -1.0f));
     
-    buffers[0]->addVector3(atrNormal, Vector3(-1.0f, 0.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(-1.0f, 0.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(-1.0f, 0.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(-1.0f, 0.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(-1.0f, 0.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(-1.0f, 0.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(-1.0f, 0.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(-1.0f, 0.0f, 0.0f));
     
-    buffers[0]->addVector3(atrNormal, Vector3(1.0f, 0.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(1.0f, 0.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(1.0f, 0.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(1.0f, 0.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(1.0f, 0.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(1.0f, 0.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(1.0f, 0.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(1.0f, 0.0f, 0.0f));
     
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, 1.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 1.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 1.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 1.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, 1.0f, 0.0f));
     
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, -1.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, -1.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, -1.0f, 0.0f));
-    buffers[0]->addVector3(atrNormal, Vector3(0.0f, -1.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, -1.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, -1.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, -1.0f, 0.0f));
+    buffer.addVector3(atrNormal, Vector3(0.0f, -1.0f, 0.0f));
 
 }
 
 
 bool Cube::load(){
-    buffers[0]->clear();
+    buffer.clear();
 
     createVertices();
     createTexcoords();

@@ -19,13 +19,12 @@ Text::Text(): Mesh2D() {
     userDefinedWidth = false;
     userDefinedHeight = false;
 
-    buffers.push_back(new InterleavedBuffer());
+    buffers["vertices"] = &buffer;
 
-    buffers[0]->clearAll();
-    buffers[0]->setName("vertices");
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    buffer.clearAll();
+    buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 
     setMinBufferSize(50);
 }
@@ -73,7 +72,7 @@ void Text::setText(std::string text){
     if (this->text != text){
         this->text = text;
         if (loaded){
-            if (buffers[0]->getCount() > 0) {
+            if (buffer.getCount() > 0) {
                 createText();
                 updateBuffers();
             }else{
@@ -172,11 +171,11 @@ void Text::setMultiline(bool multiline){
 }
 
 void Text::createText(){
-    buffers[0]->clear();
+    buffer.clear();
 
     std::vector<unsigned int> indices;
     
-    stbtext->createText(text, buffers[0], indices, charPositions, width, height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
+    stbtext->createText(text, &buffer, indices, charPositions, width, height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
 
     submeshes[0]->setIndices(indices);
 }

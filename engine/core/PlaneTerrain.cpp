@@ -8,13 +8,12 @@ using namespace Supernova;
 PlaneTerrain::PlaneTerrain(): Mesh() {
     primitiveType = S_PRIMITIVE_TRIANGLE_STRIP;
 
-    buffers.push_back(new InterleavedBuffer());
+    buffers["vertices"] = &buffer;
 
-    buffers[0]->clearAll();
-    buffers[0]->setName("vertices");
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
-    ((InterleavedBuffer*)buffers[0])->addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+    buffer.clearAll();
+    buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
+    buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
 PlaneTerrain::PlaneTerrain(float width, float depth): PlaneTerrain() {
@@ -27,23 +26,23 @@ PlaneTerrain::~PlaneTerrain() {
 
 bool PlaneTerrain::load(){
 
-    AttributeData* attVertex = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-    buffers[0]->addVector3(attVertex, Vector3(0, 0, 0));
-    buffers[0]->addVector3(attVertex, Vector3(0, 0, depth));
-    buffers[0]->addVector3(attVertex, Vector3(width, 0, 0));
-    buffers[0]->addVector3(attVertex, Vector3(width, 0, depth));
+    AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    buffer.addVector3(attVertex, Vector3(0, 0, 0));
+    buffer.addVector3(attVertex, Vector3(0, 0, depth));
+    buffer.addVector3(attVertex, Vector3(width, 0, 0));
+    buffer.addVector3(attVertex, Vector3(width, 0, depth));
 
-    AttributeData* attTexcoord = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-    buffers[0]->addVector2(attTexcoord, Vector2(0.0f, 0.0f));
-    buffers[0]->addVector2(attTexcoord, Vector2(0.0f, 1.0f));
-    buffers[0]->addVector2(attTexcoord, Vector2(1.0f, 0.0f));
-    buffers[0]->addVector2(attTexcoord, Vector2(1.0f, 1.0f));
+    AttributeData* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
+    buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f));
+    buffer.addVector2(attTexcoord, Vector2(1.0f, 0.0f));
+    buffer.addVector2(attTexcoord, Vector2(1.0f, 1.0f));
 
-    AttributeData* attNormal = buffers[0]->getAttribute(S_VERTEXATTRIBUTE_NORMALS);
-    buffers[0]->addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffers[0]->addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffers[0]->addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffers[0]->addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    AttributeData* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
 
     return Mesh::load();
 }

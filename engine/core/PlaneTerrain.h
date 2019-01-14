@@ -9,6 +9,8 @@ namespace Supernova {
 
     class PlaneTerrain: public Mesh {
     private:
+        InterleavedBuffer buffer;
+
         float depth;
         float width;
     public:

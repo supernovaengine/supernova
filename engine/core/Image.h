@@ -9,6 +9,9 @@ namespace Supernova {
     class Image: public Mesh2D {
         
     private:
+        InterleavedBuffer buffer;
+        IndexBuffer indices;
+
         bool useTextureRect;
         Rect textureRect;
 
