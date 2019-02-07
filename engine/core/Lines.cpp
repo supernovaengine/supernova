@@ -12,8 +12,6 @@ Lines::Lines(): GraphicObject(){
     buffers["lines"] = &buffer;
     defaultBuffer = "lines";
 
-    buffer.clearAll();
-    buffer.setName("lines");
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
 }
 

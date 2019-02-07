@@ -5,7 +5,8 @@
 // (c) 2019 Eduardo Doria.
 //
 
-#define INDEX_
+#define S_BUFFERTYPE_VERTEX 0
+#define S_BUFFERTYPE_INDEX 1
 
 #include <string>
 #include <map>
@@ -29,6 +30,7 @@ namespace Supernova {
     protected:
         std::map<int, AttributeData> attributes;
         unsigned int count;
+        int type;
 
         unsigned char* data;
         size_t size;
@@ -66,7 +68,7 @@ namespace Supernova {
         void setVector3(unsigned int index, AttributeData* attribute, Vector3 vector);
         void setVector4(unsigned int index, AttributeData* attribute, Vector4 vector);
 
-        void setValue(unsigned int index, AttributeData* attribute, unsigned int numValues, char* vector, size_t typesize);
+        void setValues(unsigned int index, AttributeData* attribute, unsigned int numValues, char* vector, size_t typesize);
 
         unsigned int getUInt(int attribute, unsigned int index);
         float getFloat(int attribute, unsigned int index);
@@ -80,14 +82,13 @@ namespace Supernova {
         Vector3 getVector3(AttributeData* attribute, unsigned int index);
         Vector4 getVector4(AttributeData* attribute, unsigned int index);
 
-        const std::string &getName() const;
-        void setName(const std::string &name);
-
         unsigned char* getData();
         size_t getSize();
 
         unsigned int getCount();
 
+        void setBufferType(int type);
+        int getBufferType();
     };
 
 }

@@ -61,15 +61,6 @@ void Mesh::updateBuffers(){
     for (auto const& buf : buffers) {
         updateBuffer(buf.first);
     }
-    updateIndices();
-}
-
-void Mesh::updateIndices(){
-    for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->getSubMeshRender()->updateIndex(submeshes[i]->getIndices()->size(), &(submeshes[i]->getIndices()->front()));
-        if (shadowRender)
-            submeshes[i]->getSubMeshShadowRender()->updateIndex(submeshes[i]->getIndices()->size(), &(submeshes[i]->getIndices()->front()));
-    }
 }
 
 void Mesh::sortTransparentSubMeshes(){
@@ -77,9 +68,11 @@ void Mesh::sortTransparentSubMeshes(){
 
         bool needSort = false;
         for (size_t i = 0; i < submeshes.size(); i++) {
-            if (this->submeshes[i]->getIndices()->size() > 0){
+            if (buffers.count("indices") > 0 && buffers["indices"]->getSize() > 0){
                 //TODO: Check if buffer has vertices attributes
-                Vector3 submeshFirstVertice = buffers[defaultBuffer]->getVector3(S_VERTEXATTRIBUTE_VERTICES, this->submeshes[i]->getIndex(0));
+                Vector3 submeshFirstVertice = buffers[defaultBuffer]->getVector3(
+                        S_VERTEXATTRIBUTE_VERTICES,
+                        buffers["indices"]->getUInt(S_INDEXATTRIBUTE, this->submeshes[i]->indicesOffset));
                 submeshFirstVertice = modelMatrix * submeshFirstVertice;
 
                 if (this->submeshes[i]->getMaterial()->isTransparent()){

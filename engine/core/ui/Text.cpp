@@ -20,8 +20,8 @@ Text::Text(): Mesh2D() {
     userDefinedHeight = false;
 
     buffers["vertices"] = &buffer;
+    buffers["indices"] = &indices;
 
-    buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
     buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
@@ -173,11 +173,15 @@ void Text::setMultiline(bool multiline){
 void Text::createText(){
     buffer.clear();
 
-    std::vector<unsigned int> indices;
+    std::vector<unsigned int> indices_array;
     
-    stbtext->createText(text, &buffer, indices, charPositions, width, height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
+    stbtext->createText(text, &buffer, indices_array, charPositions, width, height, userDefinedWidth, userDefinedHeight, multiline, invertTexture);
 
-    submeshes[0]->setIndices(indices);
+    indices.setValues(
+            0, indices.getAttribute(S_INDEXATTRIBUTE),
+            indices_array.size(), (char*)&indices_array[0], sizeof(unsigned int));
+
+    submeshes[0]->setIndices("indices", indices_array.size());
 }
 
 bool Text::load(){

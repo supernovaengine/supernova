@@ -9,10 +9,10 @@ using namespace Supernova;
 ObjectRender::ObjectRender(){
     minBufferSize = 0;
     primitiveType = 0;
-    vertexBuffers.clear();
+    buffers.clear();
     vertexAttributes.clear();
     textures.clear();
-    indexAttribute.data = NULL;
+    indexAttribute.reset();
     properties.clear();
     programShader = -1;
     programDefs = 0;
@@ -78,9 +78,9 @@ void ObjectRender::setLineWidth(float lineWidth){
     this->lineWidth = lineWidth;
 }
 
-void ObjectRender::addVertexBuffer(std::string name, unsigned int size, void* data, bool dynamic){
+void ObjectRender::addBuffer(std::string name, unsigned int size, void* data, int type, bool dynamic){
     if (data && (size > 0))
-        vertexBuffers[name] = { size, data, dynamic };
+        buffers[name] = { size, data, type, dynamic };
 }
 
 void ObjectRender::addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride, size_t offset){
@@ -88,9 +88,10 @@ void ObjectRender::addVertexAttribute(int type, std::string buffer, unsigned int
         vertexAttributes[type] = { buffer, elements, stride, offset};
 }
 
-void ObjectRender::addIndex(unsigned int size, void* data, bool dynamic){
-    if (data && (size > 0))
-        indexAttribute = { size, data, dynamic };
+void ObjectRender::setIndices(std::string buffer, size_t size, size_t offset){
+    if (!buffer.empty()) {
+        indexAttribute = std::make_shared<IndexData>(IndexData{buffer, offset, size});
+    }
 }
 
 void ObjectRender::addProperty(int type, int datatype, unsigned int size, void* data){
@@ -106,17 +107,16 @@ void ObjectRender::addTexture(int type, Texture* texture){
 }
 
 void ObjectRender::addTextureVector(int type, std::vector<Texture*> texturesVec){
-    textures[type] = texturesVec;
+    if (texturesVec.size() > 0) {
+        textures[type] = texturesVec;
+    }
 }
 
-void ObjectRender::updateVertexBuffer(std::string name, unsigned int size, void* data){
-    if (vertexBuffers.count(name))
-        addVertexBuffer(name, size, data);
-}
-
-void ObjectRender::updateIndex(unsigned int size, void* data){
-    if (indexAttribute.data)
-        addIndex(size, data);
+void ObjectRender::updateBuffer(std::string name, unsigned int size, void* data){
+    if (buffers.count(name)){
+        buffers[name].size = size;
+        buffers[name].data = data;
+    }
 }
 
 void ObjectRender::setNumLights(int numLights){
@@ -234,9 +234,9 @@ void ObjectRender::destroy(){
     program.reset();
     ProgramRender::deleteUnused();
 
-    vertexBuffers.clear();
+    buffers.clear();
     vertexAttributes.clear();
-    indexAttribute.data = NULL;
+    indexAttribute.reset();
     properties.clear();
     textures.clear();
 }

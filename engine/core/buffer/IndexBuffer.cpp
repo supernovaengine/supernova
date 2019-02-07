@@ -7,12 +7,18 @@
 
 using namespace Supernova;
 
-IndexBuffer::IndexBuffer(){
-    Buffer::addAttribute(S_INDEXATTRIBUTE, 1, sizeof(unsigned int), 0);
+IndexBuffer::IndexBuffer(): Buffer(){
+    createIndexAttribute();
+
+    type = S_BUFFERTYPE_INDEX;
 }
 
 IndexBuffer::~IndexBuffer(){
 
+}
+
+void IndexBuffer::createIndexAttribute(){
+    Buffer::addAttribute(S_INDEXATTRIBUTE, 1, sizeof(unsigned int), 0);
 }
 
 bool IndexBuffer::resize(size_t pos) {

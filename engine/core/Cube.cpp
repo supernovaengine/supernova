@@ -13,8 +13,8 @@ Cube::Cube(): Mesh() {
     depth = 0;
 
     buffers["vertices"] = &buffer;
+    buffers["indices"] = &indices;
 
-    buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
     buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
@@ -126,9 +126,11 @@ void Cube::createIndices(){
             20, 22, 23,
     };
 
-    std::vector<unsigned int> indices;
-    indices.assign(indices_array, std::end(indices_array));
-    submeshes[0]->setIndices(indices);
+    indices.setValues(
+            0, indices.getAttribute(S_INDEXATTRIBUTE),
+            36, (char*)&indices_array[0], sizeof(unsigned int));
+
+    submeshes[0]->setIndices("indices", 36);
 
 }
 

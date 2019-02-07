@@ -15,6 +15,8 @@ Buffer::Buffer(){
 
     data = NULL;
     size = 0;
+
+    type = S_BUFFERTYPE_VERTEX;
 /*
     static const char alphanum[] =
             "0123456789"
@@ -37,6 +39,7 @@ bool Buffer::resize(size_t pos){
 }
 
 void Buffer::clearAll(){
+    size = 0;
     attributes.clear();
     clear();
 }
@@ -60,9 +63,7 @@ void Buffer::addAttribute(int attribute, unsigned int elements, unsigned int str
 
 void Buffer::addAttribute(int attribute, AttributeData attributeData){
     if (size == 0) {
-
         attributes[attribute] = attributeData;
-
     }else{
         Log::Error("Cannot add attribute with not cleared buffer");
     }
@@ -131,47 +132,41 @@ void Buffer::addVector4(AttributeData* attribute, Vector4 vector){
 }
 
 void Buffer::setUInt(unsigned int index, AttributeData* attribute, unsigned int value){
-    setValue(index, attribute, 1, (char*)&value, sizeof(unsigned int));
+    setValues(index, attribute, 1, (char*)&value, sizeof(unsigned int));
 }
 
 void Buffer::setFloat(unsigned int index, AttributeData* attribute, float value){
-    setValue(index, attribute, 1, (char*)&value, sizeof(float));
+    setValues(index, attribute, 1, (char*)&value, sizeof(float));
 }
 
 void Buffer::setVector2(unsigned int index, AttributeData* attribute, Vector2 vector){
-    setValue(index, attribute, 2, (char*)&vector[0], sizeof(float));
+    setValues(index, attribute, 2, (char*)&vector[0], sizeof(float));
 }
 
 void Buffer::setVector3(unsigned int index, AttributeData* attribute, Vector3 vector){
-    setValue(index, attribute, 3, (char*)&vector[0], sizeof(float));
+    setValues(index, attribute, 3, (char*)&vector[0], sizeof(float));
 }
 
 void Buffer::setVector4(unsigned int index, AttributeData* attribute, Vector4 vector){
-    setValue(index, attribute, 4, (char*)&vector[0], sizeof(float));
+    setValues(index, attribute, 4, (char*)&vector[0], sizeof(float));
 }
 
-void Buffer::setValue(unsigned int index, AttributeData* attribute, unsigned int numValues, char* vector, size_t typesize){
+void Buffer::setValues(unsigned int index, AttributeData* attribute, unsigned int numValues, char* vector, size_t typesize){
     if (attribute){
-        if (attribute->elements == numValues) {
+        unsigned int newCount = index + (numValues / attribute->elements);
+        if (newCount > attribute->count)
+            attribute->count = newCount;
 
-            if (index > attribute->count)
-                attribute->count = index;
+        unsigned pos = (index * attribute->stride) + attribute->offset;
 
-            unsigned pos = (index * attribute->stride) + attribute->offset;
-
-            if (resize(pos + (numValues * typesize))) {
-
-                for (int i = 0; i < numValues; i++) {
-                    memcpy(&data[pos], &vector[i*typesize], typesize);
-                    pos += typesize;
-                }
-
-                if (attribute->count > count)
-                    count = attribute->count;
+        if (resize(pos + (numValues * typesize))) {
+            for (int i = 0; i < numValues; i++) {
+                memcpy(&data[pos], &vector[i*typesize], typesize);
+                pos += typesize;
             }
 
-        }else{
-            Log::Error("Error add value to attribute, elements number is incorrect");
+            if (attribute->count > count)
+                count = attribute->count;
         }
     }else{
         Log::Error("Error add value, attribute not exist");
@@ -271,4 +266,12 @@ size_t Buffer::getSize(){
 
 unsigned int Buffer::getCount(){
     return count;
+}
+
+void Buffer::setBufferType(int type){
+    this->type = type;
+}
+
+int Buffer::getBufferType(){
+    return type;
 }

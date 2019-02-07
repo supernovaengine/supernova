@@ -11,6 +11,10 @@ SubMesh::SubMesh(){
     this->materialOwned = false;
     this->dynamic = false;
 
+    this->indicesBuffer = "";
+    this->indicesOffset = 0;
+    this->indicesSize = 0;
+
     this->visible = true;
     this->loaded = false;
     this->renderOwned = true;
@@ -38,11 +42,13 @@ SubMesh::~SubMesh(){
 }
 
 SubMesh::SubMesh(const SubMesh& s){
-    this->indices = s.indices;
     this->distanceToCamera = s.distanceToCamera;
     this->materialOwned = s.materialOwned;
     this->material = s.material;
     this->dynamic = s.dynamic;
+    this->indicesBuffer = s.indicesBuffer;
+    this->indicesOffset = s.indicesOffset;
+    this->indicesSize = s.indicesSize;
     this->visible = s.visible;
     this->loaded = s.loaded;
     this->renderOwned = s.renderOwned;
@@ -53,11 +59,13 @@ SubMesh::SubMesh(const SubMesh& s){
 }
 
 SubMesh& SubMesh::operator = (const SubMesh& s){
-    this->indices = s.indices;
     this->distanceToCamera = s.distanceToCamera;
     this->materialOwned = s.materialOwned;
     this->material = s.material;
     this->dynamic = s.dynamic;
+    this->indicesBuffer = s.indicesBuffer;
+    this->indicesOffset = s.indicesOffset;
+    this->indicesSize = s.indicesSize;
     this->visible = s.visible;
     this->loaded = s.loaded;
     this->renderOwned = s.renderOwned;
@@ -77,20 +85,16 @@ unsigned int SubMesh::getMinBufferSize(){
     return minBufferSize;
 }
 
-void SubMesh::setIndices(std::vector<unsigned int> indices){
-    this->indices = indices;
-}
+void SubMesh::setIndices(std::string bufferName, size_t size, size_t offset){
+    this->indicesBuffer = bufferName;
+    this->indicesOffset = offset;
+    this->indicesSize = size;
 
-void SubMesh::addIndex(unsigned int index){
-    this->indices.push_back(index);
-}
+    if (render)
+        render->setIndices(indicesBuffer, indicesSize, indicesOffset);
 
-std::vector<unsigned int>* SubMesh::getIndices(){
-    return &indices;
-}
-
-unsigned int SubMesh::getIndex(int offset){
-    return indices[offset];
+    if (shadowRender)
+        shadowRender->setIndices(indicesBuffer, indicesSize, indicesOffset);
 }
 
 void SubMesh::createNewMaterial(){
@@ -157,7 +161,7 @@ bool SubMesh::shadowLoad(){
     
     shadowRender = getSubMeshShadowRender();
 
-    shadowRender->addIndex(indices.size(), &indices.front(), dynamic);
+    shadowRender->setIndices(indicesBuffer, indicesSize, indicesOffset);
     
     bool shadowloaded = true;
     
@@ -171,7 +175,7 @@ bool SubMesh::load(){
 
     render = getSubMeshRender();
 
-    render->addIndex(indices.size(), &indices.front(), dynamic);
+    render->setIndices(indicesBuffer, indicesSize, indicesOffset);
 
     render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
     render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor());
@@ -195,7 +199,7 @@ bool SubMesh::draw(){
 
     if (renderOwned)
         render->prepareDraw();
-    
+
     render->draw();
     
     if (renderOwned)

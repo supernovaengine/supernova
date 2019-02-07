@@ -19,6 +19,8 @@ namespace Supernova {
         IndexBuffer();
         virtual ~IndexBuffer();
 
+        void createIndexAttribute();
+
         virtual bool resize(size_t pos);
         virtual void clear();
 

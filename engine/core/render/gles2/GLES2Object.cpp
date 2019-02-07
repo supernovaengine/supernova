@@ -4,6 +4,7 @@
 #include "GLES2Texture.h"
 #include "Engine.h"
 #include "Log.h"
+#include "buffer/Buffer.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define BUFFER_OFFSET(i) ((void*)(i))
@@ -19,7 +20,7 @@ GLES2Object::~GLES2Object(){
 
 }
 
-void GLES2Object::loadVertexBuffer(std::string name, bufferData buff){
+void GLES2Object::loadBuffer(std::string name, bufferData buff){
 
     bufferGlData vb = vertexBuffersGL[name];
 
@@ -30,47 +31,26 @@ void GLES2Object::loadVertexBuffer(std::string name, bufferData buff){
     if (vb.size == 0){
         vb.buffer = GLES2Util::createVBO();
     }
+
+    GLenum target = GL_ARRAY_BUFFER;
+    if (buff.type == S_BUFFERTYPE_INDEX){
+        target = GL_ELEMENT_ARRAY_BUFFER;
+    }
+
     if (vb.size >= buff.size){
-        GLES2Util::updateVBO(vb.buffer, GL_ARRAY_BUFFER, buff.size, buff.data);
+        GLES2Util::updateVBO(vb.buffer, target, buff.size, buff.data);
     }else{
         vb.size = std::max((unsigned int)buff.size, minBufferSize);
-        GLES2Util::dataVBO(vb.buffer, GL_ARRAY_BUFFER, vb.size, buff.data, usageBuffer);
+        GLES2Util::dataVBO(vb.buffer, target, vb.size, buff.data, usageBuffer);
     }
 
     vertexBuffersGL[name] = vb;
 }
 
-void GLES2Object::loadIndex(indexData ibuff){
-    
-    indexGlData ib = indexGL;
-
-    GLenum usageBuffer = GL_STATIC_DRAW;
-    if (ibuff.dynamic)
-        usageBuffer = GL_DYNAMIC_DRAW;
-    
-    if (ib.size == 0){
-        ib.buffer = GLES2Util::createVBO();
-    }
-    if (ib.size >= ibuff.size){
-        GLES2Util::updateVBO(ib.buffer,GL_ELEMENT_ARRAY_BUFFER, ibuff.size * sizeof(unsigned int), ibuff.data);
-    }else{
-        ib.size = std::max((unsigned int)ibuff.size, minBufferSize);
-        GLES2Util::dataVBO(ib.buffer, GL_ELEMENT_ARRAY_BUFFER, ib.size * sizeof(unsigned int), ibuff.data, usageBuffer);
-    }
-
-    indexGL = ib;
-}
-
-void GLES2Object::updateVertexBuffer(std::string name, unsigned int size, void* data){
-    ObjectRender::updateVertexBuffer(name, size, data);
-    if (vertexBuffers.count(name))
-        loadVertexBuffer(name, vertexBuffers[name]);
-}
-
-void GLES2Object::updateIndex(unsigned int size, void* data){
-    ObjectRender::updateIndex(size, data);
-    if (indexAttribute.data)
-        loadIndex(indexAttribute);
+void GLES2Object::updateBuffer(std::string name, unsigned int size, void* data){
+    ObjectRender::updateBuffer(name, size, data);
+    if (buffers.count(name))
+        loadBuffer(name, buffers[name]);
 }
 
 bool GLES2Object::load(){
@@ -83,8 +63,6 @@ bool GLES2Object::load(){
     attributesGL.clear();
     propertyGL.clear();
     texturesGL.clear();
-    indexGL.buffer = 0;
-    indexGL.size = 0;
 
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
 
@@ -93,11 +71,11 @@ bool GLES2Object::load(){
     
     useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
 
-    for (std::unordered_map<std::string, bufferData>::iterator it = vertexBuffers.begin(); it != vertexBuffers.end(); ++it)
+    for (std::unordered_map<std::string, bufferData>::iterator it = buffers.begin(); it != buffers.end(); ++it)
     {
         std::string name = it->first;
 
-        loadVertexBuffer(name, it->second);
+        loadBuffer(name, it->second);
         //Log::Debug("Load vertex buffer: %s, size: %lu", name.c_str(), it->second.size);
     }
     
@@ -130,12 +108,12 @@ bool GLES2Object::load(){
         attributesGL[type].handle = glGetAttribLocation(glesProgram, attribName.c_str());
         //Log::Debug("Load attribute: %s,handle %i", attribName.c_str(), attributesGL[type].handle);
     }
-    
+    /*
     if (indexAttribute.data){
         loadIndex(indexAttribute);
         //Log::Debug("Load index, size: %lu", indexAttribute.size);
     }
-
+    */
     for ( const auto &p : textures ) {
         int type = p.first;
 
@@ -321,10 +299,17 @@ bool GLES2Object::prepareDraw(){
         //Log::Debug("Use attribute handle: %i", att.handle);
     }
     GLES2Util::checkGlError("Error on bind attribute vertex buffer");
-    
-    if (indexAttribute.data){
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexGL.buffer);
+
+    if (indexAttribute) {
+        if (parent && ((GLES2Object*)parent)->vertexBuffersGL.count(indexAttribute->bufferName)) {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                         ((GLES2Object*)parent)->vertexBuffersGL[indexAttribute->bufferName].buffer);
+        }else{
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
+                         vertexBuffersGL[indexAttribute->bufferName].buffer);
+        }
     }
+
     GLES2Util::checkGlError("Error on bind index buffer");
 
     if (parent){
@@ -332,6 +317,39 @@ bool GLES2Object::prepareDraw(){
     }else{
         textureIndex = 0;
     }
+
+
+    GLES2Util::checkGlError("Error on bind texture");
+    
+    return true;
+}
+
+bool GLES2Object::draw(){
+    if (!ObjectRender::draw()){
+        return false;
+    }
+
+    //Log::Debug("Start draw");
+    
+    if (!vertexAttributes.count(S_VERTEXATTRIBUTE_VERTICES) and !indexAttribute){
+        Log::Error("Cannot draw object: no vertices");
+        return false;
+    }
+        
+    glUniform1i(useTexture, (textures.count(S_TEXTURESAMPLER_DIFFUSE)?true:false));
+        
+    GLenum modeGles = GL_TRIANGLES;
+    if (primitiveType == S_PRIMITIVE_POINTS){
+        modeGles = GL_POINTS;
+    }
+    if (primitiveType == S_PRIMITIVE_LINES){
+        modeGles = GL_LINES;
+    }
+    if (primitiveType == S_PRIMITIVE_TRIANGLE_STRIP){
+        modeGles = GL_TRIANGLE_STRIP;
+    }
+
+    glLineWidth(lineWidth);
 
     for ( const auto &p : textures ) {
         std::vector<int> texturesLoc;
@@ -369,47 +387,18 @@ bool GLES2Object::prepareDraw(){
         }
     }
 
-    GLES2Util::checkGlError("Error on bind texture");
-    
-    return true;
-}
 
-bool GLES2Object::draw(){
-    if (!ObjectRender::draw()){
-        return false;
-    }
-
-    //Log::Debug("Start draw");
-    
-    if ((!vertexAttributes.count(S_VERTEXATTRIBUTE_VERTICES)) and (indexAttribute.size == 0)){
-        Log::Error("Cannot draw object: no vertices or indices");
-        return false;
-    }
-        
-    glUniform1i(useTexture, (textures.count(S_TEXTURESAMPLER_DIFFUSE)?true:false));
-        
-    GLenum modeGles = GL_TRIANGLES;
-    if (primitiveType == S_PRIMITIVE_POINTS){
-        modeGles = GL_POINTS;
-    }
-    if (primitiveType == S_PRIMITIVE_LINES){
-        modeGles = GL_LINES;
-    }
-    if (primitiveType == S_PRIMITIVE_TRIANGLE_STRIP){
-        modeGles = GL_TRIANGLE_STRIP;
-    }
-
-    glLineWidth(lineWidth);
-    
-    if (indexAttribute.data){
-        glDrawElements(modeGles, (GLsizei)indexAttribute.size, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
-    }else{
+    if (indexAttribute) {
+        glDrawElements(modeGles, (GLsizei) indexAttribute->size, GL_UNSIGNED_INT,
+                BUFFER_OFFSET(indexAttribute->offset * sizeof(unsigned int)));
+    } else {
         if (vertexSize > 0) {
             glDrawArrays(modeGles, 0, (GLsizei) vertexSize);
-        }else{
+        } else {
             Log::Error("Cannot draw object, vertex size is 0");
         }
     }
+
     
     GLES2Util::checkGlError("Error on draw GLES2");
 
@@ -434,7 +423,7 @@ bool GLES2Object::finishDraw(){
 void GLES2Object::destroy(){
 
     for (std::unordered_map<std::string, bufferGlData>::iterator it = vertexBuffersGL.begin(); it != vertexBuffersGL.end(); ++it) {
-        if (vertexBuffers[it->first].data) {
+        if (buffers[it->first].data) {
             glDeleteBuffers(1, &it->second.buffer);
             it->second.buffer = -1;
             it->second.size = 0;
@@ -446,17 +435,9 @@ void GLES2Object::destroy(){
             it->second.handle = -1;
         }
     }
-    
-    if (indexAttribute.data){
-        glDeleteBuffers(1, &indexGL.buffer);
-        indexGL.buffer = -1;
-        indexGL.size = 0;
-    }
 
     vertexBuffersGL.clear();
     attributesGL.clear();
-    indexGL.size = 0;
-    indexGL.buffer = 0;
     propertyGL.clear();
     texturesGL.clear();
 

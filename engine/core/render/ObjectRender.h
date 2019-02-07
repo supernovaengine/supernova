@@ -41,6 +41,7 @@ namespace Supernova {
         struct bufferData{
             unsigned int size;
             void* data;
+            int type;
             bool dynamic;
         };
         
@@ -50,11 +51,11 @@ namespace Supernova {
             unsigned int stride;
             size_t offset;
         };
-        
-        struct indexData{
-            unsigned int size;
-            void* data;
-            bool dynamic;
+
+        struct IndexData{
+            std::string bufferName;
+            size_t offset;
+            size_t size;
         };
         
         struct propertyData{
@@ -63,9 +64,9 @@ namespace Supernova {
             void* data;
         };
 
-        std::unordered_map<std::string, bufferData> vertexBuffers;
+        std::unordered_map<std::string, bufferData> buffers;
         std::unordered_map<int, attributeData> vertexAttributes;
-        indexData indexAttribute;
+        std::shared_ptr<IndexData> indexAttribute;
         std::unordered_map<int, propertyData> properties;
         std::unordered_map<int, std::vector<Texture*>> textures;
 
@@ -108,17 +109,16 @@ namespace Supernova {
         void setNumShadowsCube(int numShadowsCube);
         void setLineWidth(float lineWidth);
 
-        void addVertexBuffer(std::string name, unsigned int size, void* data, bool dynamic = false);
+        void addBuffer(std::string name, unsigned int size, void* data, int type, bool dynamic = false);
         void addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride = 0, size_t offset = 0);
-        void addIndex(unsigned int size, void* data, bool dynamic = false);
+        void setIndices(std::string buffer, size_t size, size_t offset);
         void addProperty(int type, int datatype, unsigned int size, void* data);
         void addTexture(int type, Texture* texture);
         void addTextureVector(int type, std::vector<Texture*> texturesVec);
 
         std::shared_ptr<ProgramRender> getProgram();
 
-        virtual void updateVertexBuffer(std::string name, unsigned int size, void* data);
-        virtual void updateIndex(unsigned int size, void* data);
+        virtual void updateBuffer(std::string name, unsigned int size, void* data);
 
         virtual bool load();
         virtual bool prepareDraw();

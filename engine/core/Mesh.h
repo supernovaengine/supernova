@@ -50,7 +50,6 @@ namespace Supernova {
         void setPrimitiveType(int primitiveType);
 
         void updateBuffers();
-        void updateIndices();
 
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateMatrix();

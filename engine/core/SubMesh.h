@@ -20,13 +20,15 @@ namespace Supernova {
 
         ObjectRender* render;
         ObjectRender* shadowRender;
-
-        std::vector<unsigned int> indices;
         
         Material* material;
         bool materialOwned;
         float distanceToCamera;
         bool dynamic;
+
+        std::string indicesBuffer;
+        size_t indicesOffset;
+        size_t indicesSize;
 
         unsigned int minBufferSize;
 
@@ -43,11 +45,7 @@ namespace Supernova {
 
         SubMesh& operator = (const SubMesh& s);
 
-        void setIndices(std::vector<unsigned int> indices);
-        void addIndex(unsigned int index);
-
-        std::vector<unsigned int>* getIndices();
-        unsigned int getIndex(int offset);
+        void setIndices(std::string bufferName, size_t size, size_t offset = 0);
 
         void createNewMaterial();
         void setMaterial(Material* material);

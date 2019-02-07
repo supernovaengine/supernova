@@ -22,8 +22,8 @@ UIImage::UIImage(): UIObject(){
     border_bottom = 0;
 
     buffers["vertices"] = &buffer;
-
-    buffer.clearAll();
+    buffers["indices"] = &indices;
+    
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
     buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
@@ -132,10 +132,12 @@ void UIImage::createVertices(){
         4,  6,  7
         
     };
-    
-    std::vector<unsigned int> indices;
-    indices.assign(indices_array, std::end(indices_array));
-    submeshes[0]->setIndices(indices);
+
+    indices.setValues(
+            0, indices.getAttribute(S_INDEXATTRIBUTE),
+            54, (char*)&indices_array[0], sizeof(unsigned int));
+
+    submeshes[0]->setIndices("indices", 54);
 
     AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 

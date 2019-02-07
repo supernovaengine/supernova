@@ -17,12 +17,7 @@ namespace Supernova {
         struct attributeGlData{
             GLint handle = -1;
         };
-        
-        struct indexGlData{
-            GLuint buffer = 0;
-            GLuint size = 0;
-        };
-        
+
         struct propertyGlData{
             GLint handle = -1;
         };
@@ -39,7 +34,6 @@ namespace Supernova {
 
         std::unordered_map<std::string, bufferGlData> vertexBuffersGL;
         std::unordered_map<int, attributeGlData> attributesGL;
-        indexGlData indexGL;
         std::unordered_map<int, propertyGlData> propertyGL;
         std::unordered_map<int, textureGlData> texturesGL;
         
@@ -47,15 +41,13 @@ namespace Supernova {
 
         int textureIndex;
 
-        void loadVertexBuffer(std::string name, bufferData buff);
-        void loadIndex(indexData ibuff);
+        void loadBuffer(std::string name, bufferData buff);
 
     public:
         GLES2Object();
         virtual ~GLES2Object();
 
-        virtual void updateVertexBuffer(std::string name, unsigned int size, void* data);
-        virtual void updateIndex(unsigned int size, void* data);
+        virtual void updateBuffer(std::string name, unsigned int size, void* data);
 
         virtual bool load();
         virtual bool prepareDraw();

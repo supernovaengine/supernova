@@ -8,9 +8,8 @@ using namespace Supernova;
 
 TileMap::TileMap(): Mesh2D(){
     buffers["vertices"] = &buffer;
+    buffers["indices"] = &indices;
 
-    buffer.clearAll();
-    buffer.setName("vertices");
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
     buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
@@ -175,17 +174,20 @@ std::vector<Vector2> TileMap::getTileVertices(int index){
 }
 
 void TileMap::createTiles(){
+
     buffer.clear();
 
     AttributeData* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     AttributeData* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
     AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
-    for (int s = 0; s < submeshes.size(); s++){
-        submeshes[s]->getIndices()->clear();
-    }
+    indices.clear();
+
     width = 0;
     height = 0;
+
+    std::vector<std::vector<unsigned int>> indexMap;
+    indexMap.resize(submeshes.size());
 
     for (int i = 0; i < tiles.size(); i++){
         
@@ -212,24 +214,29 @@ void TileMap::createTiles(){
         buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
         buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
 
-        std::vector<unsigned int>* indices = submeshes[tilesRect[tiles[i].rectId].submeshId]->getIndices();
+        int indexSubmesh = tilesRect[tiles[i].rectId].submeshId;
 
-        indices->push_back(0 + (i*4));
-        indices->push_back(1 + (i*4));
-        indices->push_back(2 + (i*4));
-        indices->push_back(0 + (i*4));
-        indices->push_back(2 + (i*4));
-        indices->push_back(3 + (i*4));
+        indexMap[indexSubmesh].push_back(0 + (i*4));
+        indexMap[indexSubmesh].push_back(1 + (i*4));
+        indexMap[indexSubmesh].push_back(2 + (i*4));
+        indexMap[indexSubmesh].push_back(0 + (i*4));
+        indexMap[indexSubmesh].push_back(2 + (i*4));
+        indexMap[indexSubmesh].push_back(3 + (i*4));
 
     }
 
-    for (int s = submeshes.size()-1; s >= 0; s--){
-        if (submeshes[s]->getIndices()->size() == 0) {
-            submeshes[s]->setVisible(false);
+    for (size_t i = 0; i < submeshes.size(); i++) {
+        submeshes[i]->setIndices("indices", indexMap[i].size(), indices.getCount());
+
+        indices.setValues(indices.getCount(), indices.getAttribute(S_INDEXATTRIBUTE), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(unsigned int));
+
+        if (indexMap[i].size() == 0) {
+            submeshes[i]->setVisible(false);
         } else {
-            submeshes[s]->setVisible(true);
+            submeshes[i]->setVisible(true);
         }
     }
+
 }
 
 void TileMap::loadTextures(){

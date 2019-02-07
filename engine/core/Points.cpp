@@ -92,7 +92,7 @@ void Points::updatePoints(){
     copyBuffer();
 
     if (loaded)
-        updateBuffer(0);
+        updateBuffer(defaultBuffer);
 }
 
 void Points::normalizeTextureRects(){
@@ -309,7 +309,7 @@ void Points::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     if (sortPoints()) {
         copyBuffer();
         if (loaded)
-            updateBuffer(0);
+            updateBuffer(defaultBuffer);
     }
 }
 
@@ -325,7 +325,7 @@ void Points::updateMatrix(){
     if (sortPoints()) {
         copyBuffer();
         if (loaded)
-            updateBuffer(0);
+            updateBuffer(defaultBuffer);
     }
 }
 

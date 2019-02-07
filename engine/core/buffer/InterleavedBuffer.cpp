@@ -8,7 +8,7 @@
 
 using namespace Supernova;
 
-InterleavedBuffer::InterleavedBuffer(){
+InterleavedBuffer::InterleavedBuffer(): Buffer(){
 
     vertexSize = 0;
 }

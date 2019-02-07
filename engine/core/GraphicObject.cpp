@@ -40,9 +40,9 @@ void GraphicObject::updateBuffer(std::string name){
             shadowRender->setVertexSize(buffers[name]->getCount());
     }
     if (render)
-        render->updateVertexBuffer(name, buffers[name]->getSize(), buffers[name]->getData());
+        render->updateBuffer(name, buffers[name]->getSize(), buffers[name]->getData());
     if (shadowRender)
-        shadowRender->updateVertexBuffer(name, buffers[name]->getSize(), buffers[name]->getData());
+        shadowRender->updateBuffer(name, buffers[name]->getSize(), buffers[name]->getData());
 }
 
 void GraphicObject::prepareShadowRender(){
@@ -50,9 +50,11 @@ void GraphicObject::prepareShadowRender(){
         if (buf.first == defaultBuffer) {
             shadowRender->setVertexSize(buf.second->getCount());
         }
-        shadowRender->addVertexBuffer(buf.first, buf.second->getSize(), buf.second->getData(), true);
-        for (auto const &x : buf.second->getAttributes()) {
-            shadowRender->addVertexAttribute(x.first, buf.first, x.second.elements, x.second.stride, x.second.offset);
+        shadowRender->addBuffer(buf.first, buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), true);
+        if (buf.second->getBufferType() == S_BUFFERTYPE_VERTEX) {
+            for (auto const &x : buf.second->getAttributes()) {
+                shadowRender->addVertexAttribute(x.first, buf.first, x.second.elements, x.second.stride, x.second.offset);
+            }
         }
     }
 
@@ -72,9 +74,11 @@ void GraphicObject::prepareRender(){
         if (buf.first == defaultBuffer) {
             render->setVertexSize(buf.second->getCount());
         }
-        render->addVertexBuffer(buf.first, buf.second->getSize(), buf.second->getData(), true);
-        for (auto const &x : buf.second->getAttributes()) {
-            render->addVertexAttribute(x.first, buf.first, x.second.elements, x.second.stride, x.second.offset);
+        render->addBuffer(buf.first, buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), true);
+        if (buf.second->getBufferType() == S_BUFFERTYPE_VERTEX) {
+            for (auto const &x : buf.second->getAttributes()) {
+                render->addVertexAttribute(x.first, buf.first, x.second.elements, x.second.stride, x.second.offset);
+            }
         }
     }
 

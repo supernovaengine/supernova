@@ -15,8 +15,8 @@ Image::Image(): Mesh2D() {
     useTextureRect = false;
 
     buffers["vertices"] = &buffer;
+    buffers["indices"] = &indices;
 
-    buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
     buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
@@ -117,9 +117,11 @@ void Image::createVertices(){
         0,  2,  3
     };
 
-    std::vector<unsigned int> indices;
-    indices.assign(indices_array, std::end(indices_array));
-    submeshes[0]->setIndices(indices);
+    indices.setValues(
+            0, indices.getAttribute(S_INDEXATTRIBUTE),
+            6, (char*)&indices_array[0], sizeof(unsigned int));
+
+    submeshes[0]->setIndices("indices", 6);
 
     AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 

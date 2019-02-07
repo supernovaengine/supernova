@@ -15,8 +15,8 @@ Model::Model(): Mesh() {
     skeleton = NULL;
 
     buffers["vertices"] = &buffer;
+    buffers["indices"] = &indices;
 
-    buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
     buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
@@ -78,6 +78,9 @@ bool Model::loadSMODEL(const char* path) {
     if (!readSModel.readModel(modelData))
         return false;
 
+    buffer.clear();
+    indices.clear();
+
     skinning = false;
     if (modelData.skeleton){
         skinning = true;
@@ -117,10 +120,11 @@ bool Model::loadSMODEL(const char* path) {
             this->submeshes.back()->createNewMaterial();
         }
 
-        this->submeshes.back()->getIndices()->clear();
+        //this->submeshes.back()->getIndices()->clear();
 
         for (size_t j = 0; j < modelData.meshes[i].indices.size(); j++) {
-            this->submeshes.back()->addIndex(modelData.meshes[i].indices[j]);
+            indices.addUInt(S_INDEXATTRIBUTE, modelData.meshes[i].indices[j]);
+            //this->submeshes.back()->addIndex(modelData.meshes[i].indices[j]);
         }
 
         if (modelData.meshes[i].materials.size() > 0)
@@ -160,6 +164,9 @@ bool Model::loadOBJ(const char* path){
 
     if (ret) {
 
+        buffer.clear();
+        indices.clear();
+
         for (size_t i = 0; i < materials.size(); i++) {
             if (i > (this->submeshes.size()-1)){
                 this->submeshes.push_back(new SubMesh());
@@ -177,6 +184,9 @@ bool Model::loadOBJ(const char* path){
         AttributeData* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
         AttributeData* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
+        std::vector<std::vector<unsigned int>> indexMap;
+        indexMap.resize(materials.size());
+
         for (size_t i = 0; i < shapes.size(); i++) {
 
             size_t index_offset = 0;
@@ -191,7 +201,7 @@ bool Model::loadOBJ(const char* path){
                 for (size_t v = 0; v < fnum; v++) {
                     tinyobj::index_t idx = shapes[i].mesh.indices[index_offset + v];
 
-                    this->submeshes[material_id]->addIndex(buffer.getCount());
+                    indexMap[material_id].push_back(buffer.getCount());
 
                     buffer.addVector3(attVertex,
                                           Vector3(attrib.vertices[3*idx.vertex_index+0],
@@ -213,6 +223,12 @@ bool Model::loadOBJ(const char* path){
 
                 index_offset += fnum;
             }
+        }
+
+        for (size_t i = 0; i < submeshes.size(); i++) {
+            submeshes[i]->setIndices("indices", indexMap[i].size(), indices.getCount());
+
+            indices.setValues(indices.getCount(), indices.getAttribute(S_INDEXATTRIBUTE), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(unsigned int));
         }
     }
 

@@ -12,6 +12,7 @@ namespace Supernova {
 
     private:
         InterleavedBuffer buffer;
+        IndexBuffer indices;
         
         STBText* stbtext;
 
