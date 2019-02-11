@@ -22,6 +22,11 @@ add_subdirectory (libs/soloud)
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/stb")
 add_subdirectory (libs/stb)
 
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/json")
+
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/tinygltf")
+add_subdirectory (libs/tinygltf)
+
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/box2d")
 add_subdirectory (libs/box2d)
 

@@ -8,5 +8,6 @@ add_library(
     stb_rect_pack.c
     stb_truetype.c
     stb_image.c
+    stb_image_write.c
 
 )

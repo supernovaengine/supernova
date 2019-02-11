@@ -9,6 +9,8 @@
 #include "file/FileData.h"
 #include "util/SModelData.h"
 
+namespace tinygltf {class Model;}
+
 namespace Supernova {
 
     class Model: public Mesh {
@@ -25,14 +27,18 @@ namespace Supernova {
             int index;
         };
 
+        tinygltf::Model* gltfModel;
+
         std::map<std::string, Bone*> bonesNameMapping;
 
         Bone* generateSketetalStructure(BoneData boneData, int& numBones);
         Bone* findBone(Bone* bone, int boneIndex);
 
-        bool loadOBJ(const char * path);
-        bool loadSMODEL(const char* path);
-        
+        bool loadOBJ(const char * filename);
+        bool loadGLTF(const char * filename);
+
+        static bool fileExists(const std::string &abs_filename, void *);
+        static bool readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *);
         static std::string readFileToString(const char* filename);
 
     protected:

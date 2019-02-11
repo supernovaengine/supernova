@@ -121,3 +121,9 @@ std::string File::readString(){
 
     return s;
 }
+
+std::string File::getFilePathExtension(const std::string &filepath) {
+    if (filepath.find_last_of(".") != std::string::npos)
+        return filepath.substr(filepath.find_last_of(".") + 1);
+    return "";
+}

@@ -12,5 +12,5 @@ add_library(
 
 target_link_libraries(
     supernova
-    lua tinyobjloader mpg123 soloud stb box2d
+    lua tinyobjloader mpg123 soloud stb box2d tinygltf
 )

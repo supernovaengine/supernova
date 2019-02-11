@@ -6,6 +6,7 @@
 #include "render/ObjectRender.h"
 #include <algorithm>
 #include "tiny_obj_loader.h"
+#include "tiny_gltf.h"
 #include "util/ReadSModel.h"
 
 using namespace Supernova;
@@ -13,6 +14,7 @@ using namespace Supernova;
 Model::Model(): Mesh() {
     primitiveType = S_PRIMITIVE_TRIANGLES;
     skeleton = NULL;
+    gltfModel = NULL;
 
     buffers["vertices"] = &buffer;
     buffers["indices"] = &indices;
@@ -24,9 +26,62 @@ Model::Model(): Mesh() {
 
 Model::Model(const char * path): Model() {
     filename = path;
+
 }
 
 Model::~Model() {
+    if (gltfModel)
+        delete gltfModel;
+}
+
+bool Model::fileExists(const std::string &abs_filename, void *) {
+
+
+    FileHandle df;
+    int res = df.open(abs_filename.c_str());
+
+    if (!res) {
+        return true;
+    }
+
+    return false;
+}
+
+bool Model::readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *) {
+
+    FileData filedata(filepath.c_str());
+    std::istringstream f(filedata.readString());
+
+    if (!f) {
+        if (err) {
+            (*err) += "File open error : " + filepath + "\n";
+        }
+        return false;
+    }
+
+    f.seekg(0, f.end);
+    size_t sz = static_cast<size_t>(f.tellg());
+    f.seekg(0, f.beg);
+
+    if (int(sz) < 0) {
+        if (err) {
+            (*err) += "Invalid file size : " + filepath +
+                      " (does the path point to a directory?)";
+        }
+        return false;
+    } else if (sz == 0) {
+        if (err) {
+            (*err) += "File is empty : " + filepath + "\n";
+        }
+        return false;
+    }
+
+    out->resize(sz);
+    f.read(reinterpret_cast<char *>(&out->at(0)),
+           static_cast<std::streamsize>(sz));
+    //f.close();
+
+    return true;
 }
 
 std::string Model::readFileToString(const char* filename){
@@ -67,86 +122,77 @@ Bone* Model::generateSketetalStructure(BoneData boneData, int& numBones){
     return bone;
 }
 
-bool Model::loadSMODEL(const char* path) {
+bool Model::loadGLTF(const char* filename) {
 
-    std::istringstream matIStream(readFileToString(path));
+    if (!gltfModel)
+        gltfModel = new tinygltf::Model();
 
-    SModelData modelData;
+    tinygltf::TinyGLTF loader;
+    std::string err;
+    std::string warn;
 
-    ReadSModel readSModel(&matIStream);
+    loader.SetFsCallbacks({&fileExists, &tinygltf::ExpandFilePath, &readWholeFile, nullptr, nullptr});
+    //loader.SetFsCallbacks({nullptr, nullptr, nullptr, nullptr, nullptr});
 
-    if (!readSModel.readModel(modelData))
-        return false;
+    std::string ext = File::getFilePathExtension(filename);
 
-    buffer.clear();
-    indices.clear();
+    bool res = false;
 
-    skinning = false;
-    if (modelData.skeleton){
-        skinning = true;
-        buffer.addAttribute(S_VERTEXATTRIBUTE_BONEIDS, 4);
-        buffer.addAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS, 4);
+    if (ext.compare("glb") == 0) {
+        res = loader.LoadBinaryFromFile(gltfModel, &err, &warn, filename); // for binary glTF(.glb)
+    }else{
+        res = loader.LoadASCIIFromFile(gltfModel, &err, &warn, filename);
     }
 
-    AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-    AttributeData* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-    AttributeData* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
-    AttributeData* attBoneId = buffer.getAttribute(S_VERTEXATTRIBUTE_BONEIDS);
-    AttributeData* attBoneWeight = buffer.getAttribute(S_VERTEXATTRIBUTE_BONEWEIGHTS);
-
-    for (size_t i = 0; i < modelData.vertices.size(); i++){
-
-        if (modelData.vertexMask & VERTEX_ELEMENT_POSITION){
-            buffer.addVector3(attVertex, modelData.vertices[i].position);
-        }
-        if (modelData.vertexMask & VERTEX_ELEMENT_UV0){
-            buffer.addVector2(attTexcoord, modelData.vertices[i].texcoord0);
-        }
-        if (modelData.vertexMask & VERTEX_ELEMENT_NORMAL){
-            buffer.addVector3(attNormal, modelData.vertices[i].normal);
-        }
-        if (modelData.vertexMask & VERTEX_ELEMENT_BONE_INDICES){
-            buffer.addVector4(attBoneId, modelData.vertices[i].boneIndices);
-        }
-        if (modelData.vertexMask & VERTEX_ELEMENT_BONE_WEIGHTS){
-            buffer.addVector4(attBoneWeight, modelData.vertices[i].boneWeights);
-        }
-
+    if (!warn.empty()) {
+        Log::Warn("WARN: %s", warn.c_str());
     }
 
-    for (size_t i = 0; i < modelData.meshes.size(); i++){
-        if (i > (this->submeshes.size() - 1)) {
-            this->submeshes.push_back(new SubMesh());
-            this->submeshes.back()->createNewMaterial();
+    if (!err.empty()) {
+        Log::Error("ERR: %s", err.c_str());
+    }
+
+    if (!res)
+        Log::Verbose("Failed to load glTF: %s", filename);
+    else
+        Log::Verbose("Loaded glTF: %s", filename);
+
+    //BEGIN DEBUG
+    if (res) {
+        for (auto &mesh : gltfModel->meshes) {
+            Log::Verbose("mesh : %s", mesh.name.c_str());
+            for (auto &primitive : mesh.primitives) {
+                const tinygltf::Accessor &indexAccessor = gltfModel->accessors[primitive.indices];
+
+                Log::Verbose("indexaccessor: count %i, type %i", indexAccessor.count,
+                             indexAccessor.componentType);
+
+                tinygltf::Material &mat = gltfModel->materials[primitive.material];
+                for (auto &mats : mat.values) {
+                    Log::Verbose("mat : %s", mats.first.c_str());
+                }
+
+                for (auto &image : gltfModel->images) {
+                    Log::Verbose("image name : %s", image.uri.c_str());
+                    Log::Verbose("  size : %i", image.image.size());
+                    Log::Verbose("  w/h : %i/%i", image.width, image.height);
+                }
+
+                Log::Verbose("indices : %i", primitive.indices);
+                Log::Verbose("mode     : %i", primitive.mode);
+
+                for (auto &attrib : primitive.attributes) {
+                    Log::Verbose("attribute : %s", attrib.first.c_str());
+                }
+            }
         }
-
-        //this->submeshes.back()->getIndices()->clear();
-
-        for (size_t j = 0; j < modelData.meshes[i].indices.size(); j++) {
-            indices.addUInt(S_INDEXATTRIBUTE, modelData.meshes[i].indices[j]);
-            //this->submeshes.back()->addIndex(modelData.meshes[i].indices[j]);
-        }
-
-        if (modelData.meshes[i].materials.size() > 0)
-            this->submeshes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir + modelData.meshes[i].materials[0].texture));
     }
+    //END DEBUG
 
-    int numBones = 0;
-
-    if (modelData.skeleton){
-        skeleton = generateSketetalStructure(*modelData.skeleton, numBones);
-    }
-
-    bonesMatrix.resize(numBones);
-
-    if (modelData.skeleton){
-        addObject(skeleton);
-    }
-
-    return true;
+    return res;
 }
 
-bool Model::loadOBJ(const char* path){
+bool Model::loadOBJ(const char* filename){
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -156,10 +202,10 @@ bool Model::loadOBJ(const char* path){
     
     tinyobj::FileReader::externalFunc = readFileToString;
 
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path, baseDir.c_str());
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filename, baseDir.c_str());
 
     if (!err.empty()) {
-        Log::Error("%s (%s)", err.c_str(), path);
+        Log::Error("%s (%s)", err.c_str(), filename);
     }
 
     if (ret) {
@@ -271,8 +317,13 @@ bool Model::load(){
 
     baseDir = File::getBaseDir(filename);
 
-    if (!loadSMODEL(filename))
+    std::string ext = File::getFilePathExtension(filename);
+
+    if (ext.compare("obj") == 0) {
         loadOBJ(filename);
+    }else{
+        loadGLTF(filename);
+    }
 
     if (skeleton)
         skinning = true;

@@ -23,7 +23,7 @@ UIImage::UIImage(): UIObject(){
 
     buffers["vertices"] = &buffer;
     buffers["indices"] = &indices;
-    
+
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
     buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
