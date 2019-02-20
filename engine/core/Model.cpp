@@ -8,6 +8,7 @@
 #include "tiny_obj_loader.h"
 #include "tiny_gltf.h"
 #include "util/ReadSModel.h"
+#include "buffer/ExternalBuffer.h"
 
 using namespace Supernova;
 
@@ -122,6 +123,28 @@ Bone* Model::generateSketetalStructure(BoneData boneData, int& numBones){
     return bone;
 }
 
+bool Model::loadGLTFBuffer(int bufferViewIndex){
+    const tinygltf::BufferView &bufferView = gltfModel->bufferViews[bufferViewIndex];
+
+    if (buffers.count(bufferView.name) == 0 && bufferView.target != 0) {
+        ExternalBuffer *ebuffer = new ExternalBuffer();
+
+        buffers[bufferView.name] = ebuffer;
+
+        if (bufferView.target == 34962) { //GL_ARRAY_BUFFER
+            ebuffer->setBufferType(S_BUFFERTYPE_VERTEX);
+        } else if (bufferView.target == 34963) { //GL_ELEMENT_ARRAY_BUFFER
+            ebuffer->setBufferType(S_BUFFERTYPE_INDEX);
+        }
+
+        ebuffer->setData(&gltfModel->buffers[bufferView.buffer].data.at(0) + bufferView.byteOffset, bufferView.byteLength);
+
+        return true;
+    }
+
+    return false;
+}
+
 bool Model::loadGLTF(const char* filename) {
 
     if (!gltfModel)
@@ -130,6 +153,8 @@ bool Model::loadGLTF(const char* filename) {
     tinygltf::TinyGLTF loader;
     std::string err;
     std::string warn;
+
+    buffers.clear();
 
     loader.SetFsCallbacks({&fileExists, &tinygltf::ExpandFilePath, &readWholeFile, nullptr, nullptr});
     //loader.SetFsCallbacks({nullptr, nullptr, nullptr, nullptr, nullptr});
@@ -157,39 +182,140 @@ bool Model::loadGLTF(const char* filename) {
     else
         Log::Verbose("Loaded glTF: %s", filename);
 
+    if (!res)
+        return false;
+
+    for (size_t i = 0; i < gltfModel->meshes[0].primitives.size(); i++) {
+
+        tinygltf::Mesh mesh = gltfModel->meshes[0];
+        tinygltf::Primitive primitive = mesh.primitives[i];
+        tinygltf::Accessor indexAccessor = gltfModel->accessors[primitive.indices];
+        tinygltf::Material &mat = gltfModel->materials[primitive.material];
+
+        IndexType indexType;
+
+        if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE){
+            indexType = IndexType::UNSIGNED_BYTE;
+        }else if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT){
+            indexType = IndexType::UNSIGNED_SHORT;
+        }else if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT){
+            indexType = IndexType::UNSIGNED_INT;
+        }else{
+            Log::Error("Unknown index type %i", indexAccessor.componentType);
+            continue;
+        }
+
+        if (i > (submeshes.size()-1)){
+            submeshes.push_back(new SubMesh());
+            submeshes.back()->createNewMaterial();
+        }
+
+        for (auto &mats : mat.values) {
+            //Log::Debug("mat: %s - %i - %f ", mats.first.c_str(), mats.second.TextureIndex(), mats.second.Factor());
+            if (mats.first.compare("baseColor")){
+                if (mats.second.TextureIndex() >= 0){
+                    tinygltf::Texture &tex = gltfModel->textures[mats.second.TextureIndex()];
+                    tinygltf::Image &image = gltfModel->images[tex.source];
+
+                    Material *material = submeshes.back()->getMaterial();
+
+                    unsigned int pixelSize = image.component * 4;
+                    size_t imageSize = pixelSize * image.width * image.height;
+
+                    int textureType = S_COLOR_RGB_ALPHA;
+                    if (image.component == 3){
+                        textureType = S_COLOR_RGB;
+                    }else if (image.component == 2){
+                        textureType = S_COLOR_GRAY_ALPHA;
+                    }else if (image.component == 1){
+                        textureType = S_COLOR_GRAY;
+                    }
+
+                    TextureData *textureData = new TextureData(image.width, image.height, imageSize, textureType, pixelSize, &image.image.at(0));
+
+                    Texture *texture = new Texture(textureData, std::string(filename) + "|" + image.name);
+                    texture->setDataOwned(true);
+
+                    material->setTexture(texture);
+                    material->setTextureOwned(true);
+                }
+            }
+        }
+
+        loadGLTFBuffer(indexAccessor.bufferView);
+
+        submeshes.back()->getMaterial()->setColor(Vector4(0.5, 0.5, 0.5, 1.0));
+
+        submeshes.back()->setIndices(
+                gltfModel->bufferViews[indexAccessor.bufferView].name,
+                indexAccessor.count,
+                indexAccessor.byteOffset,
+                indexType);
+
+        for (auto &attrib : primitive.attributes) {
+            tinygltf::Accessor accessor = gltfModel->accessors[attrib.second];
+            int byteStride = accessor.ByteStride(gltfModel->bufferViews[accessor.bufferView]);
+            std::string bufferName = gltfModel->bufferViews[accessor.bufferView].name;
+
+            loadGLTFBuffer(accessor.bufferView);
+
+            int elements = 1;
+            if (accessor.type != TINYGLTF_TYPE_SCALAR) {
+                elements = accessor.type;
+            }
+
+            int attType = -1;
+            if (attrib.first.compare("POSITION") == 0){
+                defaultBuffer = bufferName;
+                attType = S_VERTEXATTRIBUTE_VERTICES;
+            }
+            if (attrib.first.compare("NORMAL") == 0){
+                attType = S_VERTEXATTRIBUTE_NORMALS;
+            }
+            if (attrib.first.compare("TEXCOORD_0") == 0){
+                attType = S_VERTEXATTRIBUTE_TEXTURECOORDS;
+            }
+            if (attType > -1) {
+                buffers[bufferName]->addAttribute(attType, elements, byteStride, accessor.byteOffset);
+            } else
+                Log::Warn("Model attribute missing: %s", attrib.first.c_str());
+        }
+    }
+
+/*
     //BEGIN DEBUG
-    if (res) {
-        for (auto &mesh : gltfModel->meshes) {
-            Log::Verbose("mesh : %s", mesh.name.c_str());
-            for (auto &primitive : mesh.primitives) {
-                const tinygltf::Accessor &indexAccessor = gltfModel->accessors[primitive.indices];
+    for (auto &mesh : gltfModel->meshes) {
+        Log::Verbose("mesh : %s", mesh.name.c_str());
+        for (auto &primitive : mesh.primitives) {
+            const tinygltf::Accessor &indexAccessor = gltfModel->accessors[primitive.indices];
 
-                Log::Verbose("indexaccessor: count %i, type %i", indexAccessor.count,
-                             indexAccessor.componentType);
+            Log::Verbose("indexaccessor: count %i, type %i", indexAccessor.count,
+                    indexAccessor.componentType);
 
-                tinygltf::Material &mat = gltfModel->materials[primitive.material];
-                for (auto &mats : mat.values) {
-                    Log::Verbose("mat : %s", mats.first.c_str());
-                }
+            tinygltf::Material &mat = gltfModel->materials[primitive.material];
+            for (auto &mats : mat.values) {
+                Log::Verbose("mat : %s", mats.first.c_str());
+            }
 
-                for (auto &image : gltfModel->images) {
-                    Log::Verbose("image name : %s", image.uri.c_str());
-                    Log::Verbose("  size : %i", image.image.size());
-                    Log::Verbose("  w/h : %i/%i", image.width, image.height);
-                }
+            for (auto &image : gltfModel->images) {
+                Log::Verbose("image name : %s", image.uri.c_str());
+                Log::Verbose("  size : %i", image.image.size());
+                Log::Verbose("  w/h : %i/%i", image.width, image.height);
+            }
 
-                Log::Verbose("indices : %i", primitive.indices);
-                Log::Verbose("mode     : %i", primitive.mode);
+            Log::Verbose("indices : %i", primitive.indices);
+            Log::Verbose("mode     : %i", primitive.mode);
 
-                for (auto &attrib : primitive.attributes) {
-                    Log::Verbose("attribute : %s", attrib.first.c_str());
-                }
+            for (auto &attrib : primitive.attributes) {
+                Log::Verbose("attribute : %s", attrib.first.c_str());
             }
         }
     }
     //END DEBUG
+*/
+    std::reverse(std::begin(submeshes), std::end(submeshes));
 
-    return res;
+    return true;
 }
 
 bool Model::loadOBJ(const char* filename){
@@ -272,10 +398,12 @@ bool Model::loadOBJ(const char* filename){
         }
 
         for (size_t i = 0; i < submeshes.size(); i++) {
-            submeshes[i]->setIndices("indices", indexMap[i].size(), indices.getCount());
+            submeshes[i]->setIndices("indices", indexMap[i].size(), indices.getCount() * sizeof(unsigned int));
 
             indices.setValues(indices.getCount(), indices.getAttribute(S_INDEXATTRIBUTE), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(unsigned int));
         }
+
+        std::reverse(std::begin(submeshes), std::end(submeshes));
     }
 
     return true;

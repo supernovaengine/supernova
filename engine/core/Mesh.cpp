@@ -62,8 +62,9 @@ void Mesh::updateBuffers(){
         updateBuffer(buf.first);
     }
 }
-
+/*
 void Mesh::sortTransparentSubMeshes(){
+
     if (transparent && scene && scene->isUseDepth() && scene->getUserDefinedTransparency() != S_OPTION_NO){
 
         bool needSort = false;
@@ -72,7 +73,8 @@ void Mesh::sortTransparentSubMeshes(){
                 //TODO: Check if buffer has vertices attributes
                 Vector3 submeshFirstVertice = buffers[defaultBuffer]->getVector3(
                         S_VERTEXATTRIBUTE_VERTICES,
-                        buffers["indices"]->getUInt(S_INDEXATTRIBUTE, this->submeshes[i]->indicesOffset));
+                        //TODO: Check when buffer is not unsigned int
+                        buffers["indices"]->getUInt(S_INDEXATTRIBUTE, this->submeshes[i]->indices.offset / sizeof(unsigned int)));
                 submeshFirstVertice = modelMatrix * submeshFirstVertice;
 
                 if (this->submeshes[i]->getMaterial()->isTransparent()){
@@ -81,27 +83,27 @@ void Mesh::sortTransparentSubMeshes(){
                 }
             }
         }
-        
+
         if (needSort){
             std::sort(submeshes.begin(), submeshes.end(),
-                      [](const SubMesh* a, const SubMesh* b) -> bool
-                      {
-                          if (a->distanceToCamera == -1)
-                              return true;
-                          if (b->distanceToCamera == -1)
-                              return false;
-                          return a->distanceToCamera > b->distanceToCamera;
-                      });
-            
+                    [](const SubMesh* a, const SubMesh* b) -> bool
+                    {
+                        if (a->distanceToCamera == -1)
+                            return true;
+                        if (b->distanceToCamera == -1)
+                            return false;
+                        return a->distanceToCamera > b->distanceToCamera;
+                    });
+
         }
     }
 
 }
-
+*/
 void Mesh::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
     GraphicObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
-    sortTransparentSubMeshes();
+    //sortTransparentSubMeshes();
 }
 
 void Mesh::updateMatrix(){
@@ -109,7 +111,7 @@ void Mesh::updateMatrix(){
     
     this->normalMatrix = modelMatrix.inverse().transpose();
 
-    sortTransparentSubMeshes();
+    //sortTransparentSubMeshes();
 }
 
 void Mesh::removeAllSubMeshes(){

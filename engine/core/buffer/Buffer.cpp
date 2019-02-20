@@ -35,7 +35,11 @@ Buffer::~Buffer(){
 }
 
 bool Buffer::resize(size_t pos){
-    return false;
+    if (pos >= size) {
+        return false;
+    }
+
+    return true;
 }
 
 void Buffer::clearAll(){
@@ -62,11 +66,11 @@ void Buffer::addAttribute(int attribute, unsigned int elements, unsigned int str
 }
 
 void Buffer::addAttribute(int attribute, AttributeData attributeData){
-    if (size == 0) {
-        attributes[attribute] = attributeData;
-    }else{
-        Log::Error("Cannot add attribute with not cleared buffer");
-    }
+    //if (size == 0) {
+    attributes[attribute] = attributeData;
+    //}else{
+    //    Log::Error("Cannot add attribute with not cleared buffer");
+    //}
 }
 
 AttributeData* Buffer::getAttribute(int attribute){

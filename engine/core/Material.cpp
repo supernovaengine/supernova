@@ -118,3 +118,11 @@ bool Material::isTransparent(){
     }
     return false;
 }
+
+bool Material::isTextureOwned() const {
+    return textureOwned;
+}
+
+void Material::setTextureOwned(bool textureOwned) {
+    Material::textureOwned = textureOwned;
+}

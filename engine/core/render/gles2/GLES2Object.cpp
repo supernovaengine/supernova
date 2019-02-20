@@ -108,12 +108,7 @@ bool GLES2Object::load(){
         attributesGL[type].handle = glGetAttribLocation(glesProgram, attribName.c_str());
         //Log::Debug("Load attribute: %s,handle %i", attribName.c_str(), attributesGL[type].handle);
     }
-    /*
-    if (indexAttribute.data){
-        loadIndex(indexAttribute);
-        //Log::Debug("Load index, size: %lu", indexAttribute.size);
-    }
-    */
+
     for ( const auto &p : textures ) {
         int type = p.first;
 
@@ -296,7 +291,8 @@ bool GLES2Object::prepareDraw(){
 
             glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, it->second.stride, BUFFER_OFFSET(it->second.offset));
         }
-        //Log::Debug("Use attribute handle: %i", att.handle);
+        //Log::Debug("Use attribute handle: %i, elements: %i, stride: %i, offset: %i, from buffer: %s",
+        //        att.handle, it->second.elements, it->second.stride, it->second.offset, it->second.bufferName.c_str());
     }
     GLES2Util::checkGlError("Error on bind attribute vertex buffer");
 
@@ -304,6 +300,7 @@ bool GLES2Object::prepareDraw(){
         if (parent && ((GLES2Object*)parent)->vertexBuffersGL.count(indexAttribute->bufferName)) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
                          ((GLES2Object*)parent)->vertexBuffersGL[indexAttribute->bufferName].buffer);
+            //Log::Debug("Bind index buffer: %s", indexAttribute->bufferName.c_str());
         }else{
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
                          vertexBuffersGL[indexAttribute->bufferName].buffer);
@@ -389,8 +386,18 @@ bool GLES2Object::draw(){
 
 
     if (indexAttribute) {
-        glDrawElements(modeGles, (GLsizei) indexAttribute->size, GL_UNSIGNED_INT,
-                BUFFER_OFFSET(indexAttribute->offset * sizeof(unsigned int)));
+
+        GLenum type = 0;
+        if (indexAttribute->type == IndexType::UNSIGNED_BYTE){
+            type = GL_UNSIGNED_BYTE;
+        }else if (indexAttribute->type == IndexType::UNSIGNED_SHORT){
+            type = GL_UNSIGNED_SHORT;
+        }else if (indexAttribute->type == IndexType::UNSIGNED_INT){
+            type = GL_UNSIGNED_INT;
+        }
+
+        glDrawElements(modeGles, (GLsizei) indexAttribute->size, type,
+                BUFFER_OFFSET(indexAttribute->offset));
     } else {
         if (vertexSize > 0) {
             glDrawArrays(modeGles, 0, (GLsizei) vertexSize);

@@ -38,7 +38,10 @@ namespace Supernova {
         Rect* getTextureRect();
 
         bool isTransparent();
-        
+
+        bool isTextureOwned() const;
+        void setTextureOwned(bool textureOwned);
+
     };
         
 }

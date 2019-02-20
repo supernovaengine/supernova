@@ -30,7 +30,7 @@ Texture::Texture(std::string path_id): Texture(){
 }
 
 Texture::Texture(TextureData* textureData, std::string id): Texture(){
-    this->texturesData.push_back(textureData);
+    this->texturesData[0] = textureData;
     this->id = id;
 }
 

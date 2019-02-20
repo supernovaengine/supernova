@@ -79,7 +79,7 @@ void ObjectRender::setLineWidth(float lineWidth){
 }
 
 void ObjectRender::addBuffer(std::string name, unsigned int size, void* data, int type, bool dynamic){
-    if (data && (size > 0))
+    if (!name.empty() && data && (size > 0))
         buffers[name] = { size, data, type, dynamic };
 }
 
@@ -88,9 +88,9 @@ void ObjectRender::addVertexAttribute(int type, std::string buffer, unsigned int
         vertexAttributes[type] = { buffer, elements, stride, offset};
 }
 
-void ObjectRender::setIndices(std::string buffer, size_t size, size_t offset){
+void ObjectRender::setIndices(std::string buffer, size_t size, size_t offset, IndexType type){
     if (!buffer.empty()) {
-        indexAttribute = std::make_shared<IndexData>(IndexData{buffer, offset, size});
+        indexAttribute = std::make_shared<IndexData>(IndexData{buffer, offset, size, type});
     }
 }
 

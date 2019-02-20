@@ -226,7 +226,7 @@ void TileMap::createTiles(){
     }
 
     for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->setIndices("indices", indexMap[i].size(), indices.getCount());
+        submeshes[i]->setIndices("indices", indexMap[i].size(), indices.getCount() * sizeof(unsigned int));
 
         indices.setValues(indices.getCount(), indices.getAttribute(S_INDEXATTRIBUTE), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(unsigned int));
 

@@ -10,6 +10,13 @@
 
 namespace Supernova {
 
+    struct IndicesData{
+        std::string buffer;
+        size_t offset;
+        size_t size;
+        IndexType type;
+    };
+
     class SubMesh: public Render {
 
         friend class Mesh;
@@ -26,9 +33,7 @@ namespace Supernova {
         float distanceToCamera;
         bool dynamic;
 
-        std::string indicesBuffer;
-        size_t indicesOffset;
-        size_t indicesSize;
+        IndicesData indices;
 
         unsigned int minBufferSize;
 
@@ -45,7 +50,7 @@ namespace Supernova {
 
         SubMesh& operator = (const SubMesh& s);
 
-        void setIndices(std::string bufferName, size_t size, size_t offset = 0);
+        void setIndices(std::string bufferName, size_t size, size_t offset = 0, IndexType type = UNSIGNED_INT);
 
         void createNewMaterial();
         void setMaterial(Material* material);

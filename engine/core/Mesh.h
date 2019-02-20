@@ -35,7 +35,7 @@ namespace Supernova {
         
         void addSubMesh(SubMesh* submesh);
         
-        void sortTransparentSubMeshes();
+        //void sortTransparentSubMeshes();
         
     public:
         Mesh();
