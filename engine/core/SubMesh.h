@@ -4,20 +4,28 @@
 #include "math/Vector4.h"
 #include <string>
 #include <vector>
+#include <map>
 #include "Material.h"
 #include "render/ObjectRender.h"
 #include "Render.h"
 
 namespace Supernova {
 
-    struct IndicesData{
-        std::string buffer;
-        size_t offset;
-        size_t size;
-        IndexType type;
-    };
-
     class SubMesh: public Render {
+
+        struct IndicesData{
+            std::string buffer;
+            size_t offset;
+            size_t size;
+            IndexType type;
+        };
+
+        struct AttributeData{
+            std::string buffer;
+            unsigned int elements;
+            unsigned int stride;
+            size_t offset;
+        };
 
         friend class Mesh;
         friend class Model;
@@ -34,6 +42,7 @@ namespace Supernova {
         bool dynamic;
 
         IndicesData indices;
+        std::map<int, AttributeData> attributes;
 
         unsigned int minBufferSize;
 
@@ -51,6 +60,7 @@ namespace Supernova {
         SubMesh& operator = (const SubMesh& s);
 
         void setIndices(std::string bufferName, size_t size, size_t offset = 0, IndexType type = UNSIGNED_INT);
+        void addAttribute(std::string bufferName, int attribute, unsigned int elements, unsigned int stride, size_t offset);
 
         void createNewMaterial();
         void setMaterial(Material* material);

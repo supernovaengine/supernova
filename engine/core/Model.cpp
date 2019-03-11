@@ -276,7 +276,8 @@ bool Model::loadGLTF(const char* filename) {
                 attType = S_VERTEXATTRIBUTE_TEXTURECOORDS;
             }
             if (attType > -1) {
-                buffers[bufferName]->addAttribute(attType, elements, byteStride, accessor.byteOffset);
+                //buffers[bufferName]->addAttribute(attType, elements, byteStride, accessor.byteOffset);
+                submeshes.back()->addAttribute(bufferName, attType, elements, byteStride, accessor.byteOffset);
             } else
                 Log::Warn("Model attribute missing: %s", attrib.first.c_str());
         }

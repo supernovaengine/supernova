@@ -42,6 +42,7 @@ namespace Supernova {
         int textureIndex;
 
         void loadBuffer(std::string name, bufferData buff);
+        bufferGlData getVertexBufferGL(std::string name);
 
     public:
         GLES2Object();

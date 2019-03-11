@@ -95,6 +95,17 @@ void SubMesh::setIndices(std::string bufferName, size_t size, size_t offset, Ind
         shadowRender->setIndices(indices.buffer, indices.size, indices.offset, indices.type);
 }
 
+void SubMesh::addAttribute(std::string bufferName, int attribute, unsigned int elements, unsigned int stride, size_t offset){
+    AttributeData attData;
+
+    attData.buffer = bufferName;
+    attData.elements = elements;
+    attData.stride = stride;
+    attData.offset = offset;
+
+    attributes[attribute] = attData;
+}
+
 void SubMesh::createNewMaterial(){
     this->material = new Material();
     this->materialOwned = true;
@@ -160,6 +171,9 @@ bool SubMesh::shadowLoad(){
     shadowRender = getSubMeshShadowRender();
 
     shadowRender->setIndices(indices.buffer, indices.size, indices.offset, indices.type);
+    for (auto const &x : attributes) {
+        shadowRender->addVertexAttribute(x.first, x.second.buffer, x.second.elements, x.second.stride, x.second.offset);
+    }
     
     bool shadowloaded = true;
     
@@ -174,6 +188,9 @@ bool SubMesh::load(){
     render = getSubMeshRender();
 
     render->setIndices(indices.buffer, indices.size, indices.offset, indices.type);
+    for (auto const &x : attributes) {
+        render->addVertexAttribute(x.first, x.second.buffer, x.second.elements, x.second.stride, x.second.offset);
+    }
 
     render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
     render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor());

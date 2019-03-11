@@ -47,6 +47,14 @@ void GLES2Object::loadBuffer(std::string name, bufferData buff){
     vertexBuffersGL[name] = vb;
 }
 
+GLES2Object::bufferGlData GLES2Object::getVertexBufferGL(std::string name){
+    if (parent && ((GLES2Object*)parent)->vertexBuffersGL.count(indexAttribute->bufferName)) {
+        return ((GLES2Object*)parent)->vertexBuffersGL[name];
+    }else{
+        return vertexBuffersGL[name];
+    }
+}
+
 void GLES2Object::updateBuffer(std::string name, unsigned int size, void* data){
     ObjectRender::updateBuffer(name, size, data);
     if (buffers.count(name))
@@ -284,7 +292,7 @@ bool GLES2Object::prepareDraw(){
         if (att.handle != -1){
             glEnableVertexAttribArray(att.handle);
 
-            actualBuffer = vertexBuffersGL[it->second.bufferName].buffer;
+            actualBuffer = getVertexBufferGL(it->second.bufferName).buffer;
             if (actualBuffer != lastBuffer)
                 glBindBuffer(GL_ARRAY_BUFFER, actualBuffer);
             lastBuffer = actualBuffer;
@@ -297,14 +305,7 @@ bool GLES2Object::prepareDraw(){
     GLES2Util::checkGlError("Error on bind attribute vertex buffer");
 
     if (indexAttribute) {
-        if (parent && ((GLES2Object*)parent)->vertexBuffersGL.count(indexAttribute->bufferName)) {
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                         ((GLES2Object*)parent)->vertexBuffersGL[indexAttribute->bufferName].buffer);
-            //Log::Debug("Bind index buffer: %s", indexAttribute->bufferName.c_str());
-        }else{
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                         vertexBuffersGL[indexAttribute->bufferName].buffer);
-        }
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, getVertexBufferGL(indexAttribute->bufferName).buffer);
     }
 
     GLES2Util::checkGlError("Error on bind index buffer");
