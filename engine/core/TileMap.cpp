@@ -177,9 +177,9 @@ void TileMap::createTiles(){
 
     buffer.clear();
 
-    AttributeData* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-    AttributeData* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-    AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    Attribute* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    Attribute* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    Attribute* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
     indices.clear();
 

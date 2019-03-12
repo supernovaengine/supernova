@@ -54,7 +54,7 @@ void UIImage::createVertices(){
 
     buffer.clear();
 
-    AttributeData* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    Attribute* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     
     buffer.addVector3(atrVertex, Vector3(0, 0, 0)); //0
     buffer.addVector3(atrVertex, Vector3(width, 0, 0)); //1
@@ -78,7 +78,7 @@ void UIImage::createVertices(){
     buffer.addVector3(atrVertex, Vector3(border_left, height, 0)); //14
     buffer.addVector3(atrVertex, Vector3(0, height-border_bottom, 0)); //15
 
-    AttributeData* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    Attribute* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
     
     buffer.addVector2(atrTexcoord, Vector2(0.0f, convTex(0.0f)));
     buffer.addVector2(atrTexcoord, Vector2(1.0f, convTex(0.0f)));
@@ -139,7 +139,7 @@ void UIImage::createVertices(){
 
     submeshes[0]->setIndices("indices", 54);
 
-    AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    Attribute* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
     for (int i = 0; i < buffer.getCount(); i++){
         buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));

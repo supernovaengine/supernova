@@ -9,20 +9,20 @@
 namespace Supernova {
     class GLES2Object: public ObjectRender{
 
-        struct bufferGlData{
+        struct BufferGlData{
             GLuint buffer = 0;
             GLuint size = 0;
         };
         
-        struct attributeGlData{
+        struct AttributeGlData{
             GLint handle = -1;
         };
 
-        struct propertyGlData{
+        struct PropertyGlData{
             GLint handle = -1;
         };
 
-        struct textureGlData{
+        struct TextureGlData{
             GLint location = -1;
             unsigned int arraySize = 1;
         };
@@ -32,17 +32,17 @@ namespace Supernova {
         GLuint useTexture;
         GLint maxTextureUnits;
 
-        std::unordered_map<std::string, bufferGlData> vertexBuffersGL;
-        std::unordered_map<int, attributeGlData> attributesGL;
-        std::unordered_map<int, propertyGlData> propertyGL;
-        std::unordered_map<int, textureGlData> texturesGL;
+        std::unordered_map<std::string, BufferGlData> vertexBuffersGL;
+        std::unordered_map<int, AttributeGlData> attributesGL;
+        std::unordered_map<int, PropertyGlData> propertyGL;
+        std::unordered_map<int, TextureGlData> texturesGL;
         
     protected:
 
         int textureIndex;
 
-        void loadBuffer(std::string name, bufferData buff);
-        bufferGlData getVertexBufferGL(std::string name);
+        void loadBuffer(std::string name, BufferData buff);
+        BufferGlData getVertexBufferGL(std::string name);
 
     public:
         GLES2Object();

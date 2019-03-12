@@ -85,12 +85,12 @@ void ObjectRender::addBuffer(std::string name, unsigned int size, void* data, in
 
 void ObjectRender::addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride, size_t offset){
     if ((!buffer.empty()) && (elements > 0))
-        vertexAttributes[type] = { buffer, elements, stride, offset};
+        vertexAttributes[type] = { buffer, elements, stride, offset, 0, DataType::FLOAT};
 }
 
-void ObjectRender::setIndices(std::string buffer, size_t size, size_t offset, IndexType type){
+void ObjectRender::setIndices(std::string buffer, size_t size, size_t offset, DataType type){
     if (!buffer.empty()) {
-        indexAttribute = std::make_shared<IndexData>(IndexData{buffer, offset, size, type});
+        indexAttribute = std::make_shared<AttributeData>(AttributeData{buffer, 1, 0, offset, size, type});
     }
 }
 

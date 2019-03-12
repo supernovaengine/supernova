@@ -7,26 +7,33 @@
 
 #include <array>
 #include <string>
+#include "render/ObjectRender.h"
 
 namespace Supernova {
 
     class Attribute {
 
+        friend class Buffer;
+
     private:
-        int type;
+        DataType dataType;
         std::string buffer;
         unsigned int elements;
         unsigned int stride;
         size_t offset;
+        unsigned int count;
 
     public:
 
         Attribute();
-        Attribute(int type, std::string bufferName, unsigned int elements, unsigned int stride, size_t offset);
+        Attribute(DataType dataType, std::string bufferName, unsigned int elements, unsigned int stride, size_t offset);
+        Attribute(const Attribute& a);
         virtual ~Attribute();
 
-        int getType() const;
-        void setType(int type);
+        Attribute& operator = (const Attribute& s);
+
+        DataType getDataType() const;
+        void setDataType(DataType dataType);
 
         const std::string &getBuffer() const;
         void setBuffer(const std::string &buffer);
@@ -39,6 +46,9 @@ namespace Supernova {
 
         const size_t &getOffset() const;
         void setOffset(const size_t &offset);
+
+        unsigned int getCount() const;
+        void setCount(unsigned int count);
 
     };
 

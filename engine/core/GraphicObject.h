@@ -42,7 +42,6 @@ namespace Supernova {
 
         void updateDistanceToCamera();
 
-        void deleteBuffers();
         void updateBuffer(std::string name);
         void prepareShadowRender();
         void prepareRender();

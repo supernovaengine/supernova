@@ -56,7 +56,7 @@ void Polygon::generateTexcoords(){
     float min_Y = std::numeric_limits<float>::max();
     float max_Y = std::numeric_limits<float>::min();
 
-    AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    Attribute* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
 
     for ( unsigned int i = 0; i < buffer.getCount(); i++){
         min_X = fmin(min_X, buffer.getFloat(attVertex, i, 0));

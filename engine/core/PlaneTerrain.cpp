@@ -26,19 +26,19 @@ PlaneTerrain::~PlaneTerrain() {
 
 bool PlaneTerrain::load(){
 
-    AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    Attribute* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     buffer.addVector3(attVertex, Vector3(0, 0, 0));
     buffer.addVector3(attVertex, Vector3(0, 0, depth));
     buffer.addVector3(attVertex, Vector3(width, 0, 0));
     buffer.addVector3(attVertex, Vector3(width, 0, depth));
 
-    AttributeData* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    Attribute* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
     buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
     buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f));
     buffer.addVector2(attTexcoord, Vector2(1.0f, 0.0f));
     buffer.addVector2(attTexcoord, Vector2(1.0f, 1.0f));
 
-    AttributeData* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    Attribute* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
     buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
     buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
     buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));

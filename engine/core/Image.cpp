@@ -98,14 +98,14 @@ void Image::createVertices(){
 
     buffer.clear();
 
-    AttributeData* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    Attribute* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
 
     buffer.addVector3(atrVertex, Vector3(0, 0, 0));
     buffer.addVector3(atrVertex, Vector3(width, 0, 0));
     buffer.addVector3(atrVertex, Vector3(width,  height, 0));
     buffer.addVector3(atrVertex, Vector3(0,  height, 0));
 
-    AttributeData* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    Attribute* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
 
     buffer.addVector2(atrTexcoord, Vector2(0.01f, convTex(0.01f)));
     buffer.addVector2(atrTexcoord, Vector2(0.99f, convTex(0.01f)));
@@ -123,7 +123,7 @@ void Image::createVertices(){
 
     submeshes[0]->setIndices("indices", 6);
 
-    AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    Attribute* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
     buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
     buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));

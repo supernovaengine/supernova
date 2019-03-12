@@ -192,14 +192,14 @@ bool Model::loadGLTF(const char* filename) {
         tinygltf::Accessor indexAccessor = gltfModel->accessors[primitive.indices];
         tinygltf::Material &mat = gltfModel->materials[primitive.material];
 
-        IndexType indexType;
+        DataType indexType;
 
         if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE){
-            indexType = IndexType::UNSIGNED_BYTE;
+            indexType = DataType::UNSIGNED_BYTE;
         }else if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT){
-            indexType = IndexType::UNSIGNED_SHORT;
+            indexType = DataType::UNSIGNED_SHORT;
         }else if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT){
-            indexType = IndexType::UNSIGNED_INT;
+            indexType = DataType::UNSIGNED_INT;
         }else{
             Log::Error("Unknown index type %i", indexAccessor.componentType);
             continue;
@@ -276,7 +276,7 @@ bool Model::loadGLTF(const char* filename) {
                 attType = S_VERTEXATTRIBUTE_TEXTURECOORDS;
             }
             if (attType > -1) {
-                //buffers[bufferName]->addAttribute(attType, elements, byteStride, accessor.byteOffset);
+                buffers[bufferName]->setRenderAttributes(false);
                 submeshes.back()->addAttribute(bufferName, attType, elements, byteStride, accessor.byteOffset);
             } else
                 Log::Warn("Model attribute missing: %s", attrib.first.c_str());
@@ -353,9 +353,9 @@ bool Model::loadOBJ(const char* filename){
             }
         }
 
-        AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-        AttributeData* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-        AttributeData* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+        Attribute* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+        Attribute* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+        Attribute* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
         std::vector<std::vector<unsigned int>> indexMap;
         indexMap.resize(materials.size());

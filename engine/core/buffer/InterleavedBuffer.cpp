@@ -10,6 +10,8 @@ using namespace Supernova;
 
 InterleavedBuffer::InterleavedBuffer(): Buffer(){
 
+    renderAttributes = true;
+
     vertexSize = 0;
 }
 
@@ -44,17 +46,17 @@ void InterleavedBuffer::clear(){
 
 void InterleavedBuffer::addAttribute(int attribute, int elements){
     if (vectorBuffer.size() == 0) {
-        AttributeData attData;
-        attData.count = 0;
-        attData.elements = elements;
-        attData.offset = vertexSize;
+        Attribute attData;
+        attData.setCount(0);
+        attData.setElements(elements);
+        attData.setOffset(vertexSize);
 
         vertexSize += elements * sizeof(float);
 
         Buffer::addAttribute(attribute, attData);
 
         for (auto &x : attributes) {
-            x.second.stride = vertexSize;
+            x.second.setStride(vertexSize);
         }
     }
 }

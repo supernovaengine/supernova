@@ -20,9 +20,9 @@ GLES2Object::~GLES2Object(){
 
 }
 
-void GLES2Object::loadBuffer(std::string name, bufferData buff){
+void GLES2Object::loadBuffer(std::string name, BufferData buff){
 
-    bufferGlData vb = vertexBuffersGL[name];
+    BufferGlData vb = vertexBuffersGL[name];
 
     GLenum usageBuffer = GL_STATIC_DRAW;
     if (buff.dynamic)
@@ -47,7 +47,7 @@ void GLES2Object::loadBuffer(std::string name, bufferData buff){
     vertexBuffersGL[name] = vb;
 }
 
-GLES2Object::bufferGlData GLES2Object::getVertexBufferGL(std::string name){
+GLES2Object::BufferGlData GLES2Object::getVertexBufferGL(std::string name){
     if (parent && ((GLES2Object*)parent)->vertexBuffersGL.count(indexAttribute->bufferName)) {
         return ((GLES2Object*)parent)->vertexBuffersGL[name];
     }else{
@@ -79,7 +79,7 @@ bool GLES2Object::load(){
     
     useTexture = glGetUniformLocation(glesProgram, "uUseTexture");
 
-    for (std::unordered_map<std::string, bufferData>::iterator it = buffers.begin(); it != buffers.end(); ++it)
+    for (std::unordered_map<std::string, BufferData>::iterator it = buffers.begin(); it != buffers.end(); ++it)
     {
         std::string name = it->first;
 
@@ -87,7 +87,7 @@ bool GLES2Object::load(){
         //Log::Debug("Load vertex buffer: %s, size: %lu", name.c_str(), it->second.size);
     }
     
-    for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
+    for (std::unordered_map<int, AttributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
     {
         int type = it->first;
         
@@ -137,7 +137,7 @@ bool GLES2Object::load(){
         texturesGL[type].arraySize = arraySize;
     }
 
-    for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
+    for (std::unordered_map<int, PropertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
     {
         int type = it->first;
         
@@ -252,9 +252,9 @@ bool GLES2Object::prepareDraw(){
     }
     //Log::Debug("Start prepare");
     
-    for (std::unordered_map<int, propertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
+    for (std::unordered_map<int, PropertyData>::iterator it = properties.begin(); it != properties.end(); ++it)
     {
-        propertyGlData pb = propertyGL[it->first];
+        PropertyGlData pb = propertyGL[it->first];
         if (pb.handle != -1){
             if (it->second.datatype == S_PROPERTYDATA_FLOAT1){
                 glUniform1fv(pb.handle, (GLsizei)it->second.size, (GLfloat*)it->second.data);
@@ -286,9 +286,9 @@ bool GLES2Object::prepareDraw(){
 
     GLuint lastBuffer = 0;
     GLuint actualBuffer = 0;
-    for (std::unordered_map<int, attributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
+    for (std::unordered_map<int, AttributeData>::iterator it = vertexAttributes.begin(); it != vertexAttributes.end(); ++it)
     {
-        attributeGlData att = attributesGL[it->first];
+        AttributeGlData att = attributesGL[it->first];
         if (att.handle != -1){
             glEnableVertexAttribArray(att.handle);
 
@@ -351,7 +351,7 @@ bool GLES2Object::draw(){
 
     for ( const auto &p : textures ) {
         std::vector<int> texturesLoc;
-        textureGlData textureData = texturesGL[p.first];
+        TextureGlData textureData = texturesGL[p.first];
 
         if (textureData.location >= 0) {
             for (size_t i = 0; i < p.second.size(); i++) {
@@ -389,11 +389,11 @@ bool GLES2Object::draw(){
     if (indexAttribute) {
 
         GLenum type = 0;
-        if (indexAttribute->type == IndexType::UNSIGNED_BYTE){
+        if (indexAttribute->type == DataType::UNSIGNED_BYTE){
             type = GL_UNSIGNED_BYTE;
-        }else if (indexAttribute->type == IndexType::UNSIGNED_SHORT){
+        }else if (indexAttribute->type == DataType::UNSIGNED_SHORT){
             type = GL_UNSIGNED_SHORT;
-        }else if (indexAttribute->type == IndexType::UNSIGNED_INT){
+        }else if (indexAttribute->type == DataType::UNSIGNED_INT){
             type = GL_UNSIGNED_INT;
         }
 
@@ -418,7 +418,7 @@ bool GLES2Object::finishDraw(){
         return false;
     }
     
-    for (std::unordered_map<int, attributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it)
+    for (std::unordered_map<int, AttributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it)
         if (it->second.handle != -1)
             glDisableVertexAttribArray(it->second.handle);
     
@@ -430,7 +430,7 @@ bool GLES2Object::finishDraw(){
 
 void GLES2Object::destroy(){
 
-    for (std::unordered_map<std::string, bufferGlData>::iterator it = vertexBuffersGL.begin(); it != vertexBuffersGL.end(); ++it) {
+    for (std::unordered_map<std::string, BufferGlData>::iterator it = vertexBuffersGL.begin(); it != vertexBuffersGL.end(); ++it) {
         if (buffers[it->first].data) {
             glDeleteBuffers(1, &it->second.buffer);
             it->second.buffer = -1;
@@ -438,7 +438,7 @@ void GLES2Object::destroy(){
         }
     }
     
-    for (std::unordered_map<int, attributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it) {
+    for (std::unordered_map<int, AttributeGlData>::iterator it = attributesGL.begin(); it != attributesGL.end(); ++it) {
         if (it->second.handle != -1) {
             it->second.handle = -1;
         }

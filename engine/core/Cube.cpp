@@ -33,7 +33,7 @@ Cube::~Cube() {
 
 void Cube::createVertices(){
 
-    AttributeData* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    Attribute* atrVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
 
     buffer.addVector3(atrVertex, Vector3(0, 0,  depth));
     buffer.addVector3(atrVertex, Vector3(width, 0,  depth));
@@ -69,7 +69,7 @@ void Cube::createVertices(){
 
 void Cube::createTexcoords(){
 
-    AttributeData* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    Attribute* atrTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
 
     buffer.addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
     buffer.addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
@@ -136,7 +136,7 @@ void Cube::createIndices(){
 
 void Cube::createNormals(){
 
-    AttributeData* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    Attribute* atrNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
     buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
     buffer.addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));

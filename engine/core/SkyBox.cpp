@@ -20,7 +20,7 @@ SkyBox::SkyBox(): Mesh() {
     
     skymesh = true;
 
-    AttributeData* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    Attribute* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     
     buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
     buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));

@@ -148,9 +148,9 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<unsigned 
     float offsetX = 0;
     float offsetY = 0;
 
-    AttributeData* atrVertice = buffer->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-    AttributeData* atrTexcoord = buffer->getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-    AttributeData* atrNormal = buffer->getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    Attribute* atrVertice = buffer->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
+    Attribute* atrTexcoord = buffer->getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
+    Attribute* atrNormal = buffer->getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
     if (multiline && userDefinedWidth){
 

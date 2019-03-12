@@ -14,26 +14,22 @@
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
+#include "Attribute.h"
 
 
 namespace Supernova {
 
-    struct AttributeData{
-        unsigned int count;
-        unsigned int elements;
-        unsigned int stride;
-        size_t offset;
-    };
-
     class Buffer {
 
     protected:
-        std::map<int, AttributeData> attributes;
+        std::map<int, Attribute> attributes;
         unsigned int count;
         int type;
 
         unsigned char* data;
         size_t size;
+
+        bool renderAttributes;
 
     public:
         Buffer();
@@ -45,10 +41,10 @@ namespace Supernova {
         void clearAll();
 
         void addAttribute(int attribute, unsigned int elements, unsigned int stride, size_t offset);
-        void addAttribute(int attribute, AttributeData attributeData);
+        void addAttribute(int attribute, Attribute Attribute);
 
-        AttributeData* getAttribute(int attribute);
-        std::map<int, AttributeData> getAttributes();
+        Attribute* getAttribute(int attribute);
+        std::map<int, Attribute> getAttributes();
 
         void addUInt(int attribute, unsigned int value);
         void addFloat(int attribute, float value);
@@ -56,19 +52,19 @@ namespace Supernova {
         void addVector3(int attribute, Vector3 vector);
         void addVector4(int attribute, Vector4 vector);
 
-        void addUInt(AttributeData* attribute, unsigned int value);
-        void addFloat(AttributeData* attribute, float value);
-        void addVector2(AttributeData* attribute, Vector2 vector);
-        void addVector3(AttributeData* attribute, Vector3 vector);
-        void addVector4(AttributeData* attribute, Vector4 vector);
+        void addUInt(Attribute* attribute, unsigned int value);
+        void addFloat(Attribute* attribute, float value);
+        void addVector2(Attribute* attribute, Vector2 vector);
+        void addVector3(Attribute* attribute, Vector3 vector);
+        void addVector4(Attribute* attribute, Vector4 vector);
 
-        void setUInt(unsigned int index, AttributeData* attribute, unsigned int value);
-        void setFloat(unsigned int index, AttributeData* attribute, float value);
-        void setVector2(unsigned int index, AttributeData* attribute, Vector2 vector);
-        void setVector3(unsigned int index, AttributeData* attribute, Vector3 vector);
-        void setVector4(unsigned int index, AttributeData* attribute, Vector4 vector);
+        void setUInt(unsigned int index, Attribute* attribute, unsigned int value);
+        void setFloat(unsigned int index, Attribute* attribute, float value);
+        void setVector2(unsigned int index, Attribute* attribute, Vector2 vector);
+        void setVector3(unsigned int index, Attribute* attribute, Vector3 vector);
+        void setVector4(unsigned int index, Attribute* attribute, Vector4 vector);
 
-        void setValues(unsigned int index, AttributeData* attribute, unsigned int numValues, char* vector, size_t typesize);
+        void setValues(unsigned int index, Attribute* attribute, unsigned int numValues, char* vector, size_t typesize);
 
         unsigned int getUInt(int attribute, unsigned int index);
         float getFloat(int attribute, unsigned int index);
@@ -76,11 +72,11 @@ namespace Supernova {
         Vector3 getVector3(int attribute, unsigned int index);
         Vector4 getVector4(int attribute, unsigned int index);
 
-        unsigned int getUInt(AttributeData* attribute, unsigned int index, int elementIndex = 0);
-        float getFloat(AttributeData* attribute, unsigned int index, int elementIndex = 0);
-        Vector2 getVector2(AttributeData* attribute, unsigned int index);
-        Vector3 getVector3(AttributeData* attribute, unsigned int index);
-        Vector4 getVector4(AttributeData* attribute, unsigned int index);
+        unsigned int getUInt(Attribute* attribute, unsigned int index, int elementIndex = 0);
+        float getFloat(Attribute* attribute, unsigned int index, int elementIndex = 0);
+        Vector2 getVector2(Attribute* attribute, unsigned int index);
+        Vector3 getVector3(Attribute* attribute, unsigned int index);
+        Vector4 getVector4(Attribute* attribute, unsigned int index);
 
         unsigned char* getData();
         size_t getSize();
@@ -89,6 +85,9 @@ namespace Supernova {
 
         void setBufferType(int type);
         int getBufferType();
+
+        bool isRenderAttributes() const;
+        void setRenderAttributes(bool renderAttributes);
     };
 
 }

@@ -25,10 +25,11 @@
 
 namespace Supernova {
 
-    enum IndexType{
+    enum DataType{
         UNSIGNED_BYTE,
         UNSIGNED_SHORT,
-        UNSIGNED_INT
+        UNSIGNED_INT,
+        FLOAT
     };
 
     class ObjectRender {
@@ -45,37 +46,32 @@ namespace Supernova {
     
     protected:
 
-        struct bufferData{
+        struct BufferData{
             unsigned int size;
             void* data;
             int type;
             bool dynamic;
         };
         
-        struct attributeData{
+        struct AttributeData{
             std::string bufferName;
             unsigned int elements;
             unsigned int stride;
             size_t offset;
-        };
-
-        struct IndexData{
-            std::string bufferName;
-            size_t offset;
             size_t size;
-            IndexType type;
+            DataType type;
         };
         
-        struct propertyData{
+        struct PropertyData{
             int datatype;
             unsigned int size;
             void* data;
         };
 
-        std::unordered_map<std::string, bufferData> buffers;
-        std::unordered_map<int, attributeData> vertexAttributes;
-        std::shared_ptr<IndexData> indexAttribute;
-        std::unordered_map<int, propertyData> properties;
+        std::unordered_map<std::string, BufferData> buffers;
+        std::unordered_map<int, AttributeData> vertexAttributes;
+        std::shared_ptr<AttributeData> indexAttribute;
+        std::unordered_map<int, PropertyData> properties;
         std::unordered_map<int, std::vector<Texture*>> textures;
 
         unsigned int vertexSize;
@@ -119,7 +115,7 @@ namespace Supernova {
 
         void addBuffer(std::string name, unsigned int size, void* data, int type, bool dynamic = false);
         void addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride = 0, size_t offset = 0);
-        void setIndices(std::string buffer, size_t size, size_t offset, IndexType type);
+        void setIndices(std::string buffer, size_t size, size_t offset, DataType type);
         void addProperty(int type, int datatype, unsigned int size, void* data);
         void addTexture(int type, Texture* texture);
         void addTextureVector(int type, std::vector<Texture*> texturesVec);

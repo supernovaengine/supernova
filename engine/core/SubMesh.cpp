@@ -11,10 +11,7 @@ SubMesh::SubMesh(){
     this->materialOwned = false;
     this->dynamic = false;
 
-    this->indices.buffer = "";
-    this->indices.offset = 0;
-    this->indices.size = 0;
-    this->indices.type = IndexType::UNSIGNED_INT;
+    this->indices.setDataType(DataType::UNSIGNED_INT);
 
     this->visible = true;
     this->loaded = false;
@@ -82,28 +79,34 @@ unsigned int SubMesh::getMinBufferSize(){
     return minBufferSize;
 }
 
-void SubMesh::setIndices(std::string bufferName, size_t size, size_t offset, IndexType type){
-    this->indices.buffer = bufferName;
-    this->indices.size = size;
-    this->indices.offset = offset;
-    this->indices.type = type;
+void SubMesh::setIndices(std::string bufferName, size_t size, size_t offset, DataType type){
+    this->indices.setBuffer(bufferName);
+    this->indices.setCount(size);
+    this->indices.setOffset(offset);
+    this->indices.setDataType(type);
 
     if (render)
-        render->setIndices(indices.buffer, indices.size, indices.offset, indices.type);
+        render->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
 
     if (shadowRender)
-        shadowRender->setIndices(indices.buffer, indices.size, indices.offset, indices.type);
+        shadowRender->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
 }
 
 void SubMesh::addAttribute(std::string bufferName, int attribute, unsigned int elements, unsigned int stride, size_t offset){
-    AttributeData attData;
+    Attribute attData;
 
-    attData.buffer = bufferName;
-    attData.elements = elements;
-    attData.stride = stride;
-    attData.offset = offset;
+    attData.setBuffer(bufferName);
+    attData.setElements(elements);
+    attData.setStride(stride);
+    attData.setOffset(offset);
 
     attributes[attribute] = attData;
+
+    if (render)
+        render->addVertexAttribute(attribute, attData.getBuffer(), attData.getElements(), attData.getStride(), attData.getOffset());
+
+    if (shadowRender)
+        shadowRender->addVertexAttribute(attribute, attData.getBuffer(), attData.getElements(), attData.getStride(), attData.getOffset());
 }
 
 void SubMesh::createNewMaterial(){
@@ -170,9 +173,9 @@ bool SubMesh::shadowLoad(){
     
     shadowRender = getSubMeshShadowRender();
 
-    shadowRender->setIndices(indices.buffer, indices.size, indices.offset, indices.type);
+    shadowRender->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
     for (auto const &x : attributes) {
-        shadowRender->addVertexAttribute(x.first, x.second.buffer, x.second.elements, x.second.stride, x.second.offset);
+        shadowRender->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getStride(), x.second.getOffset());
     }
     
     bool shadowloaded = true;
@@ -187,9 +190,9 @@ bool SubMesh::load(){
 
     render = getSubMeshRender();
 
-    render->setIndices(indices.buffer, indices.size, indices.offset, indices.type);
+    render->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
     for (auto const &x : attributes) {
-        render->addVertexAttribute(x.first, x.second.buffer, x.second.elements, x.second.stride, x.second.offset);
+        render->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getStride(), x.second.getOffset());
     }
 
     render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());

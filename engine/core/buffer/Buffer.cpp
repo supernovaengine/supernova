@@ -16,6 +16,8 @@ Buffer::Buffer(){
     data = NULL;
     size = 0;
 
+    renderAttributes = false;
+
     type = S_BUFFERTYPE_VERTEX;
 /*
     static const char alphanum[] =
@@ -50,22 +52,22 @@ void Buffer::clearAll(){
 
 void Buffer::clear(){
     for (auto &x : attributes) {
-        x.second.count = 0;
+        x.second.setCount(0);
     }
     count = 0;
 }
 
 void Buffer::addAttribute(int attribute, unsigned int elements, unsigned int stride, size_t offset){
-    AttributeData attData;
-    attData.count = 0;
-    attData.elements = elements;
-    attData.offset = offset;
-    attData.stride = stride;
+    Attribute attData;
+    attData.setCount(0);
+    attData.setElements(elements);
+    attData.setOffset(offset);
+    attData.setStride(stride);
 
     addAttribute(attribute, attData);
 }
 
-void Buffer::addAttribute(int attribute, AttributeData attributeData){
+void Buffer::addAttribute(int attribute, Attribute attributeData){
     //if (size == 0) {
     attributes[attribute] = attributeData;
     //}else{
@@ -73,7 +75,7 @@ void Buffer::addAttribute(int attribute, AttributeData attributeData){
     //}
 }
 
-AttributeData* Buffer::getAttribute(int attribute){
+Attribute* Buffer::getAttribute(int attribute){
     if (attributes.count(attribute) > 0){
         return &attributes[attribute];
     }
@@ -81,7 +83,7 @@ AttributeData* Buffer::getAttribute(int attribute){
     return NULL;
 }
 
-std::map<int, AttributeData> Buffer::getAttributes(){
+std::map<int, Attribute> Buffer::getAttributes(){
     return attributes;
 }
 
@@ -105,57 +107,57 @@ void Buffer::addVector4(int attribute, Vector4 vector){
     addVector4(getAttribute(attribute), vector);
 }
 
-void Buffer::addUInt(AttributeData* attribute, unsigned int value){
+void Buffer::addUInt(Attribute* attribute, unsigned int value){
     if (attribute){
         setUInt(attribute->count++, attribute, value);
     }
 }
 
-void Buffer::addFloat(AttributeData* attribute, float value){
+void Buffer::addFloat(Attribute* attribute, float value){
     if (attribute){
         setFloat(attribute->count++, attribute, value);
     }
 }
 
-void Buffer::addVector2(AttributeData* attribute, Vector2 vector){
+void Buffer::addVector2(Attribute* attribute, Vector2 vector){
     if (attribute){
         setVector2(attribute->count++, attribute, vector);
     }
 }
 
-void Buffer::addVector3(AttributeData* attribute, Vector3 vector){
+void Buffer::addVector3(Attribute* attribute, Vector3 vector){
     if (attribute){
         setVector3(attribute->count++, attribute, vector);
     }
 }
 
-void Buffer::addVector4(AttributeData* attribute, Vector4 vector){
+void Buffer::addVector4(Attribute* attribute, Vector4 vector){
     if (attribute){
         setVector4(attribute->count++, attribute, vector);
     }
 }
 
-void Buffer::setUInt(unsigned int index, AttributeData* attribute, unsigned int value){
+void Buffer::setUInt(unsigned int index, Attribute* attribute, unsigned int value){
     setValues(index, attribute, 1, (char*)&value, sizeof(unsigned int));
 }
 
-void Buffer::setFloat(unsigned int index, AttributeData* attribute, float value){
+void Buffer::setFloat(unsigned int index, Attribute* attribute, float value){
     setValues(index, attribute, 1, (char*)&value, sizeof(float));
 }
 
-void Buffer::setVector2(unsigned int index, AttributeData* attribute, Vector2 vector){
+void Buffer::setVector2(unsigned int index, Attribute* attribute, Vector2 vector){
     setValues(index, attribute, 2, (char*)&vector[0], sizeof(float));
 }
 
-void Buffer::setVector3(unsigned int index, AttributeData* attribute, Vector3 vector){
+void Buffer::setVector3(unsigned int index, Attribute* attribute, Vector3 vector){
     setValues(index, attribute, 3, (char*)&vector[0], sizeof(float));
 }
 
-void Buffer::setVector4(unsigned int index, AttributeData* attribute, Vector4 vector){
+void Buffer::setVector4(unsigned int index, Attribute* attribute, Vector4 vector){
     setValues(index, attribute, 4, (char*)&vector[0], sizeof(float));
 }
 
-void Buffer::setValues(unsigned int index, AttributeData* attribute, unsigned int numValues, char* vector, size_t typesize){
+void Buffer::setValues(unsigned int index, Attribute* attribute, unsigned int numValues, char* vector, size_t typesize){
     if (attribute){
         unsigned int newCount = index + (numValues / attribute->elements);
         if (newCount > attribute->count)
@@ -197,7 +199,7 @@ Vector4 Buffer::getVector4(int attribute, unsigned int index){
     return getVector4(getAttribute(attribute), index);
 }
 
-unsigned int Buffer::getUInt(AttributeData* attribute, unsigned int index, int elementIndex){
+unsigned int Buffer::getUInt(Attribute* attribute, unsigned int index, int elementIndex){
     if (elementIndex >= 0 && elementIndex < attribute->elements) {
         unsigned pos = (index * attribute->stride) + attribute->offset + (elementIndex * sizeof(unsigned int));
         if ((pos+sizeof(unsigned int)) <= size){
@@ -212,7 +214,7 @@ unsigned int Buffer::getUInt(AttributeData* attribute, unsigned int index, int e
     return 0;
 }
 
-float Buffer::getFloat(AttributeData* attribute, unsigned int index, int elementIndex){
+float Buffer::getFloat(Attribute* attribute, unsigned int index, int elementIndex){
     if (elementIndex >= 0 && elementIndex < attribute->elements) {
         unsigned pos = (index * attribute->stride) + attribute->offset + (elementIndex * sizeof(float));
         if ((pos+sizeof(float)) <= size){
@@ -227,7 +229,7 @@ float Buffer::getFloat(AttributeData* attribute, unsigned int index, int element
     return 0;
 }
 
-Vector2 Buffer::getVector2(AttributeData* attribute, unsigned int index){
+Vector2 Buffer::getVector2(Attribute* attribute, unsigned int index){
     unsigned pos = (index * attribute->stride) + attribute->offset;
     if ((pos + 2*sizeof(float)) <= size){
         return Vector2(data[pos], data[pos+sizeof(float)]);
@@ -238,7 +240,7 @@ Vector2 Buffer::getVector2(AttributeData* attribute, unsigned int index){
     return Vector2();
 }
 
-Vector3 Buffer::getVector3(AttributeData* attribute, unsigned int index){
+Vector3 Buffer::getVector3(Attribute* attribute, unsigned int index){
     unsigned pos = (index * attribute->stride) + attribute->offset;
     if ((pos + 3*sizeof(float)) <= size){
         return Vector3(data[pos], data[pos+sizeof(float)], data[pos+(2*sizeof(float))]);
@@ -249,7 +251,7 @@ Vector3 Buffer::getVector3(AttributeData* attribute, unsigned int index){
     return Vector3();
 }
 
-Vector4 Buffer::getVector4(AttributeData* attribute, unsigned int index){
+Vector4 Buffer::getVector4(Attribute* attribute, unsigned int index){
     unsigned pos = (index * attribute->stride) + attribute->offset;
     if ((pos + 4*sizeof(float)) <= size){
         return Vector4(data[pos], data[pos+sizeof(float)], data[pos+(2*sizeof(float))], data[pos+(3*sizeof(float))]);
@@ -278,4 +280,12 @@ void Buffer::setBufferType(int type){
 
 int Buffer::getBufferType(){
     return type;
+}
+
+bool Buffer::isRenderAttributes() const {
+    return renderAttributes;
+}
+
+void Buffer::setRenderAttributes(bool renderAttributes) {
+    Buffer::renderAttributes = renderAttributes;
 }

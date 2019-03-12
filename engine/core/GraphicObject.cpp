@@ -24,13 +24,7 @@ GraphicObject::GraphicObject(): Object(){
 }
 
 GraphicObject::~GraphicObject(){
-    deleteBuffers();
 }
-
-void GraphicObject::deleteBuffers(){
-
-}
-
 
 void GraphicObject::updateBuffer(std::string name){
     if (name == defaultBuffer) {
@@ -51,9 +45,9 @@ void GraphicObject::prepareShadowRender(){
             shadowRender->setVertexSize(buf.second->getCount());
         }
         shadowRender->addBuffer(buf.first, buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), true);
-        if (buf.second->getBufferType() == S_BUFFERTYPE_VERTEX) {
+        if (buf.second->isRenderAttributes()) {
             for (auto const &x : buf.second->getAttributes()) {
-                shadowRender->addVertexAttribute(x.first, buf.first, x.second.elements, x.second.stride, x.second.offset);
+                shadowRender->addVertexAttribute(x.first, buf.first, x.second.getElements(), x.second.getStride(), x.second.getOffset());
             }
         }
     }
@@ -75,9 +69,9 @@ void GraphicObject::prepareRender(){
             render->setVertexSize(buf.second->getCount());
         }
         render->addBuffer(buf.first, buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), true);
-        if (buf.second->getBufferType() == S_BUFFERTYPE_VERTEX) {
+        if (buf.second->isRenderAttributes()) {
             for (auto const &x : buf.second->getAttributes()) {
-                render->addVertexAttribute(x.first, buf.first, x.second.elements, x.second.stride, x.second.offset);
+                render->addVertexAttribute(x.first, buf.first, x.second.getElements(), x.second.getStride(), x.second.getOffset());
             }
         }
     }
