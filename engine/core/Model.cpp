@@ -244,8 +244,6 @@ bool Model::loadGLTF(const char* filename) {
 
         loadGLTFBuffer(indexAccessor.bufferView);
 
-        submeshes.back()->getMaterial()->setColor(Vector4(0.5, 0.5, 0.5, 1.0));
-
         submeshes.back()->setIndices(
                 gltfModel->bufferViews[indexAccessor.bufferView].name,
                 indexAccessor.count,
