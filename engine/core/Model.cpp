@@ -125,11 +125,12 @@ Bone* Model::generateSketetalStructure(BoneData boneData, int& numBones){
 
 bool Model::loadGLTFBuffer(int bufferViewIndex){
     const tinygltf::BufferView &bufferView = gltfModel->bufferViews[bufferViewIndex];
+    const std::string name = getBufferName(bufferViewIndex);
 
-    if (buffers.count(bufferView.name) == 0 && bufferView.target != 0) {
+    if (buffers.count(name) == 0 && bufferView.target != 0) {
         ExternalBuffer *ebuffer = new ExternalBuffer();
 
-        buffers[bufferView.name] = ebuffer;
+        buffers[name] = ebuffer;
 
         if (bufferView.target == 34962) { //GL_ARRAY_BUFFER
             ebuffer->setBufferType(S_BUFFERTYPE_VERTEX);
@@ -143,6 +144,16 @@ bool Model::loadGLTFBuffer(int bufferViewIndex){
     }
 
     return false;
+}
+
+std::string Model::getBufferName(int bufferViewIndex){
+    const tinygltf::BufferView &bufferView = gltfModel->bufferViews[bufferViewIndex];
+
+    if (!bufferView.name.empty())
+        return bufferView.name;
+    else
+        return "buffer"+std::to_string(bufferViewIndex);
+
 }
 
 bool Model::loadGLTF(const char* filename) {
@@ -191,6 +202,7 @@ bool Model::loadGLTF(const char* filename) {
         tinygltf::Primitive primitive = mesh.primitives[i];
         tinygltf::Accessor indexAccessor = gltfModel->accessors[primitive.indices];
         tinygltf::Material &mat = gltfModel->materials[primitive.material];
+        tinygltf::Node &meshNode = gltfModel->nodes[primitive.mode];
 
         DataType indexType;
 
@@ -245,7 +257,7 @@ bool Model::loadGLTF(const char* filename) {
         loadGLTFBuffer(indexAccessor.bufferView);
 
         submeshes.back()->setIndices(
-                gltfModel->bufferViews[indexAccessor.bufferView].name,
+                getBufferName(indexAccessor.bufferView),
                 indexAccessor.count,
                 indexAccessor.byteOffset,
                 indexType);
@@ -253,7 +265,7 @@ bool Model::loadGLTF(const char* filename) {
         for (auto &attrib : primitive.attributes) {
             tinygltf::Accessor accessor = gltfModel->accessors[attrib.second];
             int byteStride = accessor.ByteStride(gltfModel->bufferViews[accessor.bufferView]);
-            std::string bufferName = gltfModel->bufferViews[accessor.bufferView].name;
+            std::string bufferName = getBufferName(accessor.bufferView);
 
             loadGLTFBuffer(accessor.bufferView);
 

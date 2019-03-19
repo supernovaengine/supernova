@@ -38,6 +38,7 @@ namespace Supernova {
         bool loadGLTF(const char * filename);
 
         bool loadGLTFBuffer(int bufferViewIndex);
+        std::string getBufferName(int bufferViewIndex);
 
         static bool fileExists(const std::string &abs_filename, void *);
         static bool readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *);
