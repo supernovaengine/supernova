@@ -165,6 +165,8 @@ bool Model::loadGLTF(const char* filename) {
     std::string err;
     std::string warn;
 
+    int meshIndex = 0;
+
     buffers.clear();
 
     loader.SetFsCallbacks({&fileExists, &tinygltf::ExpandFilePath, &readWholeFile, nullptr, nullptr});
@@ -196,13 +198,12 @@ bool Model::loadGLTF(const char* filename) {
     if (!res)
         return false;
 
-    for (size_t i = 0; i < gltfModel->meshes[0].primitives.size(); i++) {
+    for (size_t i = 0; i < gltfModel->meshes[meshIndex].primitives.size(); i++) {
 
-        tinygltf::Mesh mesh = gltfModel->meshes[0];
+        tinygltf::Mesh mesh = gltfModel->meshes[meshIndex];
         tinygltf::Primitive primitive = mesh.primitives[i];
         tinygltf::Accessor indexAccessor = gltfModel->accessors[primitive.indices];
         tinygltf::Material &mat = gltfModel->materials[primitive.material];
-        tinygltf::Node &meshNode = gltfModel->nodes[primitive.mode];
 
         DataType indexType;
 
@@ -291,6 +292,44 @@ bool Model::loadGLTF(const char* filename) {
             } else
                 Log::Warn("Model attribute missing: %s", attrib.first.c_str());
         }
+    }
+
+    int skinIndex = -1;
+    int skeletonRoot = -1;
+    std::map<int, int> nodesParent;
+
+    for (size_t i = 0; i < gltfModel->nodes.size(); i++) {
+        nodesParent[i] = -1;
+    }
+
+    for (size_t i = 0; i < gltfModel->nodes.size(); i++) {
+        tinygltf::Node node = gltfModel->nodes[i];
+
+        if (node.mesh == meshIndex && node.skin >= 0){
+            skinIndex = node.skin;
+        }
+
+        for (int c = 0; c < node.children.size(); c++){
+            nodesParent[node.children[c]] = i;
+        }
+    }
+
+    if (skinIndex >= 0){
+        tinygltf::Skin skin = gltfModel->skins[skinIndex];
+
+        if (skin.skeleton >= 0) {
+            skeletonRoot = skin.skeleton;
+        }else {
+            //Find skeleton root
+            for (int j = 0; j < skin.joints.size(); j++) {
+                int nodeIndex = skin.joints[j];
+
+                if (std::find(skin.joints.begin(), skin.joints.end(), nodesParent[nodeIndex]) == skin.joints.end())
+                    skeletonRoot = nodeIndex;
+            }
+        }
+
+        Log::Debug("Root: %s, skeleton %i", gltfModel->nodes[skeletonRoot].name.c_str(), skin.joints.size());
     }
 
 /*
