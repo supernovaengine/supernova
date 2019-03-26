@@ -31,7 +31,7 @@ namespace Supernova {
 
         std::map<std::string, Bone*> bonesNameMapping;
 
-        Bone* generateSketetalStructure(BoneData boneData, int& numBones);
+        Bone* generateSketetalStructure(int nodeIndex, int skinIndex);
         Bone* findBone(Bone* bone, int boneIndex);
 
         bool loadOBJ(const char * filename);

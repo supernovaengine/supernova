@@ -297,7 +297,18 @@ bool GLES2Object::prepareDraw(){
                 glBindBuffer(GL_ARRAY_BUFFER, actualBuffer);
             lastBuffer = actualBuffer;
 
-            glVertexAttribPointer(att.handle, it->second.elements, GL_FLOAT, GL_FALSE, it->second.stride, BUFFER_OFFSET(it->second.offset));
+            GLenum type = 0;
+            if (it->second.type == DataType::UNSIGNED_BYTE){
+                type = GL_UNSIGNED_BYTE;
+            }else if (it->second.type == DataType::UNSIGNED_SHORT){
+                type = GL_UNSIGNED_SHORT;
+            }else if (it->second.type == DataType::UNSIGNED_INT){
+                type = GL_UNSIGNED_INT;
+            }else if (it->second.type == DataType::FLOAT){
+                type = GL_FLOAT;
+            }
+
+            glVertexAttribPointer(att.handle, it->second.elements, type, GL_FALSE, it->second.stride, BUFFER_OFFSET(it->second.offset));
         }
         //Log::Debug("Use attribute handle: %i, elements: %i, stride: %i, offset: %i, from buffer: %s",
         //        att.handle, it->second.elements, it->second.stride, it->second.offset, it->second.bufferName.c_str());

@@ -92,10 +92,11 @@ void SubMesh::setIndices(std::string bufferName, size_t size, size_t offset, Dat
         shadowRender->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
 }
 
-void SubMesh::addAttribute(std::string bufferName, int attribute, unsigned int elements, unsigned int stride, size_t offset){
+void SubMesh::addAttribute(std::string bufferName, int attribute, unsigned int elements, DataType dataType, unsigned int stride, size_t offset){
     Attribute attData;
 
     attData.setBuffer(bufferName);
+    attData.setDataType(dataType);
     attData.setElements(elements);
     attData.setStride(stride);
     attData.setOffset(offset);
@@ -103,10 +104,10 @@ void SubMesh::addAttribute(std::string bufferName, int attribute, unsigned int e
     attributes[attribute] = attData;
 
     if (render)
-        render->addVertexAttribute(attribute, attData.getBuffer(), attData.getElements(), attData.getStride(), attData.getOffset());
+        render->addVertexAttribute(attribute, attData.getBuffer(), attData.getElements(), attData.getDataType(), attData.getStride(), attData.getOffset());
 
     if (shadowRender)
-        shadowRender->addVertexAttribute(attribute, attData.getBuffer(), attData.getElements(), attData.getStride(), attData.getOffset());
+        shadowRender->addVertexAttribute(attribute, attData.getBuffer(), attData.getElements(), attData.getDataType(), attData.getStride(), attData.getOffset());
 }
 
 void SubMesh::createNewMaterial(){
@@ -175,7 +176,7 @@ bool SubMesh::shadowLoad(){
 
     shadowRender->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
     for (auto const &x : attributes) {
-        shadowRender->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getStride(), x.second.getOffset());
+        shadowRender->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
     }
     
     bool shadowloaded = true;
@@ -192,7 +193,7 @@ bool SubMesh::load(){
 
     render->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
     for (auto const &x : attributes) {
-        render->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getStride(), x.second.getOffset());
+        render->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
     }
 
     render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());

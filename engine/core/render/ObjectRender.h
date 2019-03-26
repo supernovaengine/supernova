@@ -114,7 +114,7 @@ namespace Supernova {
         void setLineWidth(float lineWidth);
 
         void addBuffer(std::string name, unsigned int size, void* data, int type, bool dynamic = false);
-        void addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride = 0, size_t offset = 0);
+        void addVertexAttribute(int type, std::string buffer, unsigned int elements, DataType dataType = DataType::FLOAT, unsigned int stride = 0, size_t offset = 0);
         void setIndices(std::string buffer, size_t size, size_t offset, DataType type);
         void addProperty(int type, int datatype, unsigned int size, void* data);
         void addTexture(int type, Texture* texture);

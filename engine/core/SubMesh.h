@@ -47,7 +47,7 @@ namespace Supernova {
         SubMesh& operator = (const SubMesh& s);
 
         void setIndices(std::string bufferName, size_t size, size_t offset = 0, DataType type = UNSIGNED_INT);
-        void addAttribute(std::string bufferName, int attribute, unsigned int elements, unsigned int stride, size_t offset);
+        void addAttribute(std::string bufferName, int attribute, unsigned int elements, DataType dataType, unsigned int stride, size_t offset);
 
         void createNewMaterial();
         void setMaterial(Material* material);

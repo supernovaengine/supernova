@@ -61,6 +61,7 @@ void Buffer::addAttribute(int attribute, unsigned int elements, unsigned int str
     Attribute attData;
     attData.setCount(0);
     attData.setElements(elements);
+    attData.setDataType(DataType::FLOAT);
     attData.setOffset(offset);
     attData.setStride(stride);
 

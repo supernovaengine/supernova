@@ -90,39 +90,6 @@ std::string Model::readFileToString(const char* filename){
     return filedata.readString();
 }
 
-Bone* Model::generateSketetalStructure(BoneData boneData, int& numBones){
-    Bone* bone = new Bone();
-
-    bone->setIndex(boneData.boneIndex);
-    bone->setName(boneData.name);
-    bone->setBindPosition(boneData.bindPosition);
-    bone->setBindRotation(boneData.bindRotation);
-    bone->setBindScale(boneData.bindScale);
-    bone->moveToBind();
-
-    Matrix4 offsetMatrix(boneData.offsetMatrix[0][0], boneData.offsetMatrix[1][0], boneData.offsetMatrix[2][0], boneData.offsetMatrix[3][0],
-                         boneData.offsetMatrix[0][1], boneData.offsetMatrix[1][1], boneData.offsetMatrix[2][1], boneData.offsetMatrix[3][1],
-                         boneData.offsetMatrix[0][2], boneData.offsetMatrix[1][2], boneData.offsetMatrix[2][2], boneData.offsetMatrix[3][2],
-                         boneData.offsetMatrix[0][3], boneData.offsetMatrix[1][3], boneData.offsetMatrix[2][3], boneData.offsetMatrix[3][3]);
-
-
-    bone->setOffsetMatrix(offsetMatrix);
-
-    bonesNameMapping[bone->getName()] = bone;
-
-    if (bone->getIndex() >= 0){
-        numBones++;
-    }
-
-    for (size_t i = 0; i < boneData.children.size(); i++){
-        bone->addObject(generateSketetalStructure(boneData.children[i], numBones));
-    }
-
-    bone->model = this;
-
-    return bone;
-}
-
 bool Model::loadGLTFBuffer(int bufferViewIndex){
     const tinygltf::BufferView &bufferView = gltfModel->bufferViews[bufferViewIndex];
     const std::string name = getBufferName(bufferViewIndex);
@@ -154,6 +121,49 @@ std::string Model::getBufferName(int bufferViewIndex){
     else
         return "buffer"+std::to_string(bufferViewIndex);
 
+}
+
+Bone* Model::generateSketetalStructure(int nodeIndex, int skinIndex){
+    tinygltf::Node node = gltfModel->nodes[nodeIndex];
+    tinygltf::Skin skin = gltfModel->skins[skinIndex];
+
+    int index = -1;
+
+    for (int j = 0; j < skin.joints.size(); j++){
+        if (nodeIndex == skin.joints[j])
+            index = j;
+    }
+
+    Bone* bone = new Bone();
+
+    bone->setIndex(index);
+    bone->setName(node.name);
+    bone->setBindPosition(Vector3(node.translation[0], node.translation[1], node.translation[2]));
+    bone->setBindRotation(Quaternion(node.rotation[3], node.rotation[0], node.rotation[1], node.rotation[2]));
+    bone->setBindScale(Vector3(node.scale[0], node.scale[1], node.scale[2]));
+    bone->moveToBind();
+
+    tinygltf::Accessor accessor = gltfModel->accessors[skin.inverseBindMatrices];
+    tinygltf::BufferView bufferView = gltfModel->bufferViews[accessor.bufferView];
+
+    float* matrices = (float*)(&gltfModel->buffers[bufferView.buffer].data.at(0) + bufferView.byteOffset + 16*sizeof(float)*index);
+
+    Matrix4 offsetMatrix(matrices[0], matrices[4], matrices[8], matrices[12],
+                         matrices[1], matrices[5], matrices[9], matrices[13],
+                         matrices[2], matrices[6], matrices[10], matrices[14],
+                         matrices[3], matrices[7], matrices[11], matrices[15]);
+
+    bone->setOffsetMatrix(offsetMatrix);
+
+    bonesNameMapping[bone->getName()] = bone;
+
+    for (size_t i = 0; i < node.children.size(); i++){
+        bone->addObject(generateSketetalStructure(node.children[i], skinIndex));
+    }
+
+    bone->model = this;
+
+    return bone;
 }
 
 bool Model::loadGLTF(const char* filename) {
@@ -275,6 +285,21 @@ bool Model::loadGLTF(const char* filename) {
                 elements = accessor.type;
             }
 
+            DataType dataType;
+
+            if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE){
+                dataType = DataType::UNSIGNED_BYTE;
+            }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT){
+                dataType = DataType::UNSIGNED_SHORT;
+            }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT){
+                dataType = DataType::UNSIGNED_INT;
+            }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT){
+                dataType = DataType::FLOAT;
+            }else{
+                Log::Error("Unknown data type %i of %s", accessor.componentType, attrib.first.c_str());
+                continue;
+            }
+
             int attType = -1;
             if (attrib.first.compare("POSITION") == 0){
                 defaultBuffer = bufferName;
@@ -286,9 +311,15 @@ bool Model::loadGLTF(const char* filename) {
             if (attrib.first.compare("TEXCOORD_0") == 0){
                 attType = S_VERTEXATTRIBUTE_TEXTURECOORDS;
             }
+            if (attrib.first.compare("JOINTS_0") == 0){
+                attType = S_VERTEXATTRIBUTE_BONEIDS;
+            }
+            if (attrib.first.compare("WEIGHTS_0") == 0){
+                attType = S_VERTEXATTRIBUTE_BONEWEIGHTS;
+            }
             if (attType > -1) {
                 buffers[bufferName]->setRenderAttributes(false);
-                submeshes.back()->addAttribute(bufferName, attType, elements, byteStride, accessor.byteOffset);
+                submeshes.back()->addAttribute(bufferName, attType, elements, dataType, byteStride, accessor.byteOffset);
             } else
                 Log::Warn("Model attribute missing: %s", attrib.first.c_str());
         }
@@ -329,6 +360,9 @@ bool Model::loadGLTF(const char* filename) {
             }
         }
 
+        skeleton = generateSketetalStructure(skeletonRoot, skinIndex);
+        bonesMatrix.resize(skin.joints.size());
+        addObject(skeleton);
         Log::Debug("Root: %s, skeleton %i", gltfModel->nodes[skeletonRoot].name.c_str(), skin.joints.size());
     }
 

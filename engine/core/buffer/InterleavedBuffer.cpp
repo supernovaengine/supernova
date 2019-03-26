@@ -49,6 +49,7 @@ void InterleavedBuffer::addAttribute(int attribute, int elements){
         Attribute attData;
         attData.setCount(0);
         attData.setElements(elements);
+        attData.setDataType(DataType::FLOAT);
         attData.setOffset(vertexSize);
 
         vertexSize += elements * sizeof(float);

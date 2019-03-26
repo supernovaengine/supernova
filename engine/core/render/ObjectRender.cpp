@@ -83,9 +83,9 @@ void ObjectRender::addBuffer(std::string name, unsigned int size, void* data, in
         buffers[name] = { size, data, type, dynamic };
 }
 
-void ObjectRender::addVertexAttribute(int type, std::string buffer, unsigned int elements, unsigned int stride, size_t offset){
+void ObjectRender::addVertexAttribute(int type, std::string buffer, unsigned int elements, DataType dataType, unsigned int stride, size_t offset){
     if ((!buffer.empty()) && (elements > 0))
-        vertexAttributes[type] = { buffer, elements, stride, offset, 0, DataType::FLOAT};
+        vertexAttributes[type] = { buffer, elements, stride, offset, 0, dataType};
 }
 
 void ObjectRender::setIndices(std::string buffer, size_t size, size_t offset, DataType type){

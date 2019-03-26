@@ -47,7 +47,7 @@ void GraphicObject::prepareShadowRender(){
         shadowRender->addBuffer(buf.first, buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), true);
         if (buf.second->isRenderAttributes()) {
             for (auto const &x : buf.second->getAttributes()) {
-                shadowRender->addVertexAttribute(x.first, buf.first, x.second.getElements(), x.second.getStride(), x.second.getOffset());
+                shadowRender->addVertexAttribute(x.first, buf.first, x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
             }
         }
     }
@@ -71,7 +71,7 @@ void GraphicObject::prepareRender(){
         render->addBuffer(buf.first, buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), true);
         if (buf.second->isRenderAttributes()) {
             for (auto const &x : buf.second->getAttributes()) {
-                render->addVertexAttribute(x.first, buf.first, x.second.getElements(), x.second.getStride(), x.second.getOffset());
+                render->addVertexAttribute(x.first, buf.first, x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
             }
         }
     }
