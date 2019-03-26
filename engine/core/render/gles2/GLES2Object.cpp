@@ -298,8 +298,12 @@ bool GLES2Object::prepareDraw(){
             lastBuffer = actualBuffer;
 
             GLenum type = 0;
-            if (it->second.type == DataType::UNSIGNED_BYTE){
+            if (it->second.type == DataType::BYTE){
+                type = GL_BYTE;
+            }else if (it->second.type == DataType::UNSIGNED_BYTE){
                 type = GL_UNSIGNED_BYTE;
+            }else if (it->second.type == DataType::SHORT){
+                type = GL_SHORT;
             }else if (it->second.type == DataType::UNSIGNED_SHORT){
                 type = GL_UNSIGNED_SHORT;
             }else if (it->second.type == DataType::UNSIGNED_INT){

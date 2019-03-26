@@ -129,9 +129,33 @@ Bone* Model::generateSketetalStructure(int nodeIndex, int skinIndex){
 
     int index = -1;
 
-    for (int j = 0; j < skin.joints.size(); j++){
+    for (int j = 0; j < skin.joints.size(); j++) {
         if (nodeIndex == skin.joints[j])
             index = j;
+    }
+
+    Matrix4 offsetMatrix;
+
+    if (skin.inverseBindMatrices >= 0) {
+
+        tinygltf::Accessor accessor = gltfModel->accessors[skin.inverseBindMatrices];
+        tinygltf::BufferView bufferView = gltfModel->bufferViews[accessor.bufferView];
+
+        float *matrices = (float *) (&gltfModel->buffers[bufferView.buffer].data.at(0) +
+                                     bufferView.byteOffset + 16 * sizeof(float) * index);
+
+        if (accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT || accessor.type != TINYGLTF_TYPE_MAT4) {
+            Log::Error("Skeleton error: Unknown inverse bind matrix data type");
+
+            return NULL;
+        }
+
+        offsetMatrix = Matrix4(
+                matrices[0], matrices[4], matrices[8], matrices[12],
+                matrices[1], matrices[5], matrices[9], matrices[13],
+                matrices[2], matrices[6], matrices[10], matrices[14],
+                matrices[3], matrices[7], matrices[11], matrices[15]);
+
     }
 
     Bone* bone = new Bone();
@@ -142,16 +166,6 @@ Bone* Model::generateSketetalStructure(int nodeIndex, int skinIndex){
     bone->setBindRotation(Quaternion(node.rotation[3], node.rotation[0], node.rotation[1], node.rotation[2]));
     bone->setBindScale(Vector3(node.scale[0], node.scale[1], node.scale[2]));
     bone->moveToBind();
-
-    tinygltf::Accessor accessor = gltfModel->accessors[skin.inverseBindMatrices];
-    tinygltf::BufferView bufferView = gltfModel->bufferViews[accessor.bufferView];
-
-    float* matrices = (float*)(&gltfModel->buffers[bufferView.buffer].data.at(0) + bufferView.byteOffset + 16*sizeof(float)*index);
-
-    Matrix4 offsetMatrix(matrices[0], matrices[4], matrices[8], matrices[12],
-                         matrices[1], matrices[5], matrices[9], matrices[13],
-                         matrices[2], matrices[6], matrices[10], matrices[14],
-                         matrices[3], matrices[7], matrices[11], matrices[15]);
 
     bone->setOffsetMatrix(offsetMatrix);
 
@@ -200,13 +214,10 @@ bool Model::loadGLTF(const char* filename) {
         Log::Error("ERR: %s", err.c_str());
     }
 
-    if (!res)
+    if (!res) {
         Log::Verbose("Failed to load glTF: %s", filename);
-    else
-        Log::Verbose("Loaded glTF: %s", filename);
-
-    if (!res)
         return false;
+    }
 
     for (size_t i = 0; i < gltfModel->meshes[meshIndex].primitives.size(); i++) {
 
@@ -287,8 +298,12 @@ bool Model::loadGLTF(const char* filename) {
 
             DataType dataType;
 
-            if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE){
+            if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_BYTE){
+                dataType = DataType::BYTE;
+            }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE){
                 dataType = DataType::UNSIGNED_BYTE;
+            }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_SHORT){
+                dataType = DataType::SHORT;
             }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT){
                 dataType = DataType::UNSIGNED_SHORT;
             }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT){
@@ -361,9 +376,11 @@ bool Model::loadGLTF(const char* filename) {
         }
 
         skeleton = generateSketetalStructure(skeletonRoot, skinIndex);
-        bonesMatrix.resize(skin.joints.size());
-        addObject(skeleton);
-        Log::Debug("Root: %s, skeleton %i", gltfModel->nodes[skeletonRoot].name.c_str(), skin.joints.size());
+
+        if (skeleton) {
+            bonesMatrix.resize(skin.joints.size());
+            addObject(skeleton);
+        }
     }
 
 /*

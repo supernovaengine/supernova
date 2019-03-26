@@ -26,7 +26,9 @@
 namespace Supernova {
 
     enum DataType{
+        BYTE,
         UNSIGNED_BYTE,
+        SHORT,
         UNSIGNED_SHORT,
         UNSIGNED_INT,
         FLOAT
