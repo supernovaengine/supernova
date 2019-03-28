@@ -244,14 +244,14 @@ bool Model::loadGLTF(const char* filename) {
             submeshes.back()->createNewMaterial();
         }
 
+        Material *material = submeshes.back()->getMaterial();
+
         for (auto &mats : mat.values) {
             //Log::Debug("mat: %s - %i - %f ", mats.first.c_str(), mats.second.TextureIndex(), mats.second.Factor());
-            if (mats.first.compare("baseColor")){
+            if (mats.first.compare("baseColorTexture") == 0){
                 if (mats.second.TextureIndex() >= 0){
                     tinygltf::Texture &tex = gltfModel->textures[mats.second.TextureIndex()];
                     tinygltf::Image &image = gltfModel->images[tex.source];
-
-                    Material *material = submeshes.back()->getMaterial();
 
                     unsigned int pixelSize = image.component * 4;
                     size_t imageSize = pixelSize * image.width * image.height;
@@ -272,6 +272,16 @@ bool Model::loadGLTF(const char* filename) {
 
                     material->setTexture(texture);
                     material->setTextureOwned(true);
+                }
+            }
+
+            if (mats.first.compare("baseColorFactor") == 0){
+                if (mats.second.ColorFactor().size()){
+                    material->setColor(Vector4(
+                            mats.second.ColorFactor()[0],
+                            mats.second.ColorFactor()[1],
+                            mats.second.ColorFactor()[2],
+                            mats.second.ColorFactor()[3]));
                 }
             }
         }
