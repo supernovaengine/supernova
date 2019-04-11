@@ -438,37 +438,35 @@ bool Quaternion::equals(const Quaternion& rhs) const
     return ( fabs(matching-1.0) < 0.001 );
 }
 
-Quaternion Quaternion::slerp (float fT, const Quaternion& rkP, const Quaternion& rkQ, bool shortestPath)
+Quaternion Quaternion::slerp(float t, Quaternion q1, Quaternion q2)
 {
-    float fCos = rkP.dot(rkQ);
-    Quaternion rkT;
+    float w1, x1, y1, z1, w2, x2, y2, z2, w3, x3, y3, z3;
 
-    if (fCos < 0.0f && shortestPath)
-    {
-        fCos = -fCos;
-        rkT = -rkQ;
-    }
-    else
-    {
-        rkT = rkQ;
+    float theta, mult1, mult2;
+
+    w1 = q1.w; x1 = q1.x; y1 = q1.y; z1 = q1.z;
+    w2 = q2.w; x2 = q2.x; y2 = q2.y; z2 = q2.z;
+
+    if (w1*w2 + x1*x2 + y1*y2 + z1*z2 < 0) {
+        w2 = -w2; x2 = -x2; y2 = -y2; z2 = -z2;
     }
 
-    if (fabs(fCos) < 1 - FLT_EPSILON)
-    {
-        float fSin = sqrt(1 - (fCos*fCos));
-        float fAngle = atan2(fSin, fCos);
-        float fInvSin = 1.0f / fSin;
-        float fCoeff0 = sin((1.0f - fT) * fAngle) * fInvSin;
-        float fCoeff1 =sin(fT * fAngle) * fInvSin;
-        return fCoeff0 * rkP + fCoeff1 * rkT;
-    }
-    else
-    {
-        Quaternion t = (1.0f - fT) * rkP + fT * rkT;
+    theta = acos(w1*w2 + x1*x2 + y1*y2 + z1*z2);
 
-        t.normalise();
-        return t;
+    if (theta > FLT_EPSILON) {
+        mult1 = sin( (1-t)*theta ) / sin( theta );
+        mult2 = sin( t*theta ) / sin( theta );
+    } else {
+        mult1 = 1 - t;
+        mult2 = t;
     }
+
+    w3 =  mult1*w1 + mult2*w2;
+    x3 =  mult1*x1 + mult2*x2;
+    y3 =  mult1*y1 + mult2*y2;
+    z3 =  mult1*z1 + mult2*z2;
+
+    return Quaternion(w3, x3, y3, z3);
 }
 
 Quaternion Quaternion::slerpExtraSpins (float fT, const Quaternion& rkP, const Quaternion& rkQ, int iExtraSpins)
@@ -487,12 +485,12 @@ Quaternion Quaternion::slerpExtraSpins (float fT, const Quaternion& rkP, const Q
     return fCoeff0*rkP + fCoeff1*rkQ;
 }
 
-Quaternion Quaternion::squad (float fT, const Quaternion& rkP, const Quaternion& rkA, const Quaternion& rkB, const Quaternion& rkQ, bool shortestPath)
+Quaternion Quaternion::squad (float fT, const Quaternion& rkP, const Quaternion& rkA, const Quaternion& rkB, const Quaternion& rkQ)
 {
     float fSlerpT = 2.0f*fT*(1.0f-fT);
-    Quaternion kSlerpP = slerp(fT, rkP, rkQ, shortestPath);
-    Quaternion kSlerpQ = slerp(fT, rkA, rkB, false);
-    return slerp(fSlerpT, kSlerpP ,kSlerpQ, false);
+    Quaternion kSlerpP = slerp(fT, rkP, rkQ);
+    Quaternion kSlerpQ = slerp(fT, rkA, rkB);
+    return slerp(fSlerpT, kSlerpP ,kSlerpQ);
 }
 
 float Quaternion::normalise(void)

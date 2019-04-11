@@ -26,6 +26,10 @@ Object* Action::getObject(){
     return object;
 }
 
+void Action::setTimecount(unsigned long timecount){
+    this->timecount = timecount;
+}
+
 bool Action::isRunning(){
     return running;
 }

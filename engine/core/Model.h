@@ -8,12 +8,16 @@
 #include "math/Vector3.h"
 #include "file/FileData.h"
 #include "util/SModelData.h"
+#include "action/Animation.h"
 
 namespace tinygltf {class Model;}
 
 namespace Supernova {
 
     class Model: public Mesh {
+
+    public:
+        Animation anim;
 
     private:
         InterleavedBuffer buffer;
@@ -30,6 +34,7 @@ namespace Supernova {
         tinygltf::Model* gltfModel;
 
         std::map<std::string, Bone*> bonesNameMapping;
+        std::map<int, Bone*> bonesIdMapping;
 
         Bone* generateSketetalStructure(int nodeIndex, int skinIndex);
         Bone* findBone(Bone* bone, int boneIndex);

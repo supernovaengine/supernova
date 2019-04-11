@@ -1,21 +1,18 @@
 #include "RotateAction.h"
 
 #include "Object.h"
-#include "Log.h"
 
 using namespace Supernova;
 
 RotateAction::RotateAction(Quaternion endRotation, float duration, bool loop): TimeAction(duration, loop){
     this->endRotation = endRotation;
     this->objectStartRotation = true;
-    this->shortestPath = false;
 }
 
 RotateAction::RotateAction(Quaternion startRotation, Quaternion endRotation, float duration, bool loop): TimeAction(duration, loop){
     this->startRotation = startRotation;
     this->endRotation = endRotation;
     this->objectStartRotation = false;
-    this->shortestPath = false;
 }
 
 RotateAction::RotateAction(float endAngle2D, float duration, bool loop): TimeAction(duration, loop){
@@ -24,7 +21,6 @@ RotateAction::RotateAction(float endAngle2D, float duration, bool loop): TimeAct
 
     this->endRotation = endRotation;
     this->objectStartRotation = true;
-    this->shortestPath = false;
 }
 
 RotateAction::RotateAction(float startAngle2D, float endAngle2D, float duration, bool loop): TimeAction(duration, loop){
@@ -37,19 +33,10 @@ RotateAction::RotateAction(float startAngle2D, float endAngle2D, float duration,
     this->startRotation = startRotation;
     this->endRotation = endRotation;
     this->objectStartRotation = false;
-    this->shortestPath = false;
 }
 
 RotateAction::~RotateAction(){
 
-}
-
-bool RotateAction::isShortestPath(){
-    return shortestPath;
-}
-
-void RotateAction::setShortestPath(bool shortestPath){
-    this->shortestPath = shortestPath;
 }
 
 bool RotateAction::run(){
@@ -68,7 +55,7 @@ bool RotateAction::step(){
         return false;
 
     if (object) {
-        object->setRotation(object->getRotation().slerp(value, startRotation, endRotation, shortestPath));
+        object->setRotation(object->getRotation().slerp(value, startRotation, endRotation));
     }
 
     return true;

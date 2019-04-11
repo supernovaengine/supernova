@@ -765,8 +765,6 @@ void LuaBind::bind(){
 
     .beginExtendClass<RotateAction, TimeAction>("RotateAction")
     .addConstructor(LUA_ARGS(LuaIntf::_opt<Quaternion>, LuaIntf::_opt<Quaternion>, LuaIntf::_opt<float>, LuaIntf::_opt<bool>))
-    .addFunction("isShortestPath", &RotateAction::isShortestPath)
-    .addFunction("setShortestPath", &RotateAction::setShortestPath)
     .endClass()
 
     .beginExtendClass<ScaleAction, TimeAction>("ScaleAction")

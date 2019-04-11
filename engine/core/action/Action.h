@@ -14,6 +14,7 @@ namespace Supernova{
     class Action{
 
         friend class Object;
+        friend class Animation;
         
     protected:
         
@@ -35,6 +36,8 @@ namespace Supernova{
         FunctionCallback<void(Object*)> onStep;
 
         Object* getObject();
+
+        void setTimecount(unsigned long timecount);
 
         bool isRunning();
 

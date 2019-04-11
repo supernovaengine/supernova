@@ -9,6 +9,9 @@
 #include "tiny_gltf.h"
 #include "util/ReadSModel.h"
 #include "buffer/ExternalBuffer.h"
+#include "action/MoveAction.h"
+#include "action/RotateAction.h"
+#include "action/ScaleAction.h"
 
 using namespace Supernova;
 
@@ -142,7 +145,8 @@ Bone* Model::generateSketetalStructure(int nodeIndex, int skinIndex){
         tinygltf::BufferView bufferView = gltfModel->bufferViews[accessor.bufferView];
 
         float *matrices = (float *) (&gltfModel->buffers[bufferView.buffer].data.at(0) +
-                                     bufferView.byteOffset + 16 * sizeof(float) * index);
+                                     bufferView.byteOffset + accessor.byteOffset +
+                                     (16 * sizeof(float) * index));
 
         if (accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT || accessor.type != TINYGLTF_TYPE_MAT4) {
             Log::Error("Skeleton error: Unknown inverse bind matrix data type");
@@ -170,6 +174,7 @@ Bone* Model::generateSketetalStructure(int nodeIndex, int skinIndex){
     bone->setOffsetMatrix(offsetMatrix);
 
     bonesNameMapping[bone->getName()] = bone;
+    bonesIdMapping[nodeIndex] = bone;
 
     for (size_t i = 0; i < node.children.size(); i++){
         bone->addObject(generateSketetalStructure(node.children[i], skinIndex));
@@ -385,12 +390,77 @@ bool Model::loadGLTF(const char* filename) {
             }
         }
 
+        bonesNameMapping.clear();
+        bonesIdMapping.clear();
+
         skeleton = generateSketetalStructure(skeletonRoot, skinIndex);
 
         if (skeleton) {
             bonesMatrix.resize(skin.joints.size());
             addObject(skeleton);
         }
+    }
+
+    for (size_t i = 0; i < gltfModel->animations.size(); i++) {
+        const tinygltf::Animation &animation = gltfModel->animations[i];
+
+        Log::Debug("Animation %s", animation.name.c_str());
+
+        for (size_t j = 0; j < animation.channels.size(); j++) {
+            const tinygltf::AnimationChannel &channel = animation.channels[j];
+            const tinygltf::AnimationSampler &sampler = animation.samplers[channel.sampler];
+
+            tinygltf::Accessor accessorIn = gltfModel->accessors[sampler.input];
+            tinygltf::BufferView bufferViewIn = gltfModel->bufferViews[accessorIn.bufferView];
+
+            tinygltf::Accessor accessorOut = gltfModel->accessors[sampler.output];
+            tinygltf::BufferView bufferViewOut = gltfModel->bufferViews[accessorOut.bufferView];
+
+            if (accessorIn.count != accessorOut.count){
+                Log::Error("Incorret frame size in animation: %s, sampler: %i", animation.name.c_str(), channel.sampler);
+            }
+
+            for (int c = 1; c < accessorIn.count; c++){
+                float *timeValues = (float *) (&gltfModel->buffers[bufferViewIn.buffer].data.at(0) + bufferViewIn.byteOffset + accessorIn.byteOffset);
+                float *values = (float *) (&gltfModel->buffers[bufferViewOut.buffer].data.at(0) + bufferViewOut.byteOffset + accessorOut.byteOffset);
+
+                float duration = timeValues[c] - timeValues[c - 1];
+
+                TimeAction* action = NULL;
+
+                if (channel.target_path.compare("translation") == 0) {
+                    Vector3 positionPre(values[3 * (c - 1)], values[(3 * (c - 1)) + 1], values[(3 * (c - 1)) + 2]);
+                    Vector3 positionAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
+
+                    action = new MoveAction(positionPre, positionAc, duration);
+                    //Log::Debug("MoveAction - Start: %f - Id: %i - Duration: %f - Vector: %f %f %f", timeValues[c-1], channel.target_node, duration, positionAc[0], positionAc[1], positionAc[2]);
+                }
+
+                if (channel.target_path.compare("rotation") == 0) {
+                    Quaternion rotationPre(values[(4 * (c - 1)) + 3], values[4 * (c - 1)], values[(4 * (c - 1)) + 1], values[(4 * (c - 1)) + 2]);
+                    Quaternion rotationAc(values[(4 * c) + 3], values[4 * c], values[(4 * c) + 1], values[(4 * c) + 2]);
+
+                    action = new RotateAction(rotationPre, rotationAc, duration);
+                    //Log::Debug("RotateAction - Start: %f - Id: %i - Duration: %f - Vector: %f %f %f %f", timeValues[c-1], channel.target_node, duration, rotationAc[0], rotationAc[1], rotationAc[2], rotationAc[3]);
+                }
+
+                if (channel.target_path.compare("scale") == 0) {
+                    Vector3 scalePre(values[3 * (c - 1)], values[(3 * (c - 1)) + 1], values[(3 * (c - 1)) + 2]);
+                    Vector3 scaleAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
+
+                    action = new ScaleAction(scalePre, scaleAc, duration);
+                    //Log::Debug("ScaleAction - Start: %f - Id: %i - Duration: %f - Vector: %f %f %f", timeValues[c-1], channel.target_node, duration, scaleAc[0], scaleAc[1], scaleAc[2]);
+                }
+
+                if (action && bonesIdMapping.count(channel.target_node))
+                    anim.addActionFrame(timeValues[c-1], action, bonesIdMapping[channel.target_node]);
+            }
+
+            //Log::Debug("Time %s %i %f %f %f", animation.channels[j].target_path.c_str(), accessorIn.count, matrices[0], matrices[1], matrices[2]);
+        }
+
+        addAction(&anim);
+
     }
 
 /*
