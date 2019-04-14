@@ -580,9 +580,12 @@ bool Object::draw(){
         setSceneDepth(true);
     }
 
-    for (int i = 0; i < actions.size(); i++){
-        if (actions[i]->isRunning()) {
-            actions[i]->step();
+    if (!scene || !scene->drawingShadow) {
+        //Do not update animations when shadow draw
+        for (int i = 0; i < actions.size(); i++) {
+            if (actions[i]->isRunning()) {
+                actions[i]->step();
+            }
         }
     }
     

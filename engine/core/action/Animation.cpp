@@ -87,6 +87,8 @@ bool Animation::run(){
     if (!Action::run())
         return false;
 
+    if (timecount == (long)(startTime * 1000))
+        onStart.call(object);
 
     return true;
 }
