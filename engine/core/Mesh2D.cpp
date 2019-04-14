@@ -33,7 +33,8 @@ float Mesh2D::convTex(float value){
     return value;
 }
 
-void Mesh2D::updateMatrix(){
+void Mesh2D::updateModelMatrix(){
+    Mesh::updateModelMatrix();
 
     if (billboard) {
         if (viewMatrix) {
@@ -48,8 +49,6 @@ void Mesh2D::updateMatrix(){
             }
         }
     }
-
-    Mesh::updateMatrix();
 }
 
 void Mesh2D::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){

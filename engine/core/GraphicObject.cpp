@@ -191,8 +191,8 @@ void GraphicObject::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatri
     updateDistanceToCamera();
 }
 
-void GraphicObject::updateMatrix(){
-    Object::updateMatrix();
+void GraphicObject::updateModelMatrix(){
+    Object::updateModelMatrix();
     
     this->normalMatrix.identity();
 

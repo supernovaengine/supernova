@@ -106,8 +106,8 @@ void Mesh::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix
     //sortTransparentSubMeshes();
 }
 
-void Mesh::updateMatrix(){
-    GraphicObject::updateMatrix();
+void Mesh::updateModelMatrix(){
+    GraphicObject::updateModelMatrix();
     
     this->normalMatrix = modelMatrix.inverse().transpose();
 

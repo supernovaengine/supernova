@@ -361,7 +361,7 @@ void Engine::systemDraw() {
     
     int updateLoops = 0;
     updateTimeCount += deltatime;
-    while (updateTimeCount >= updateTime && updateLoops <= 5){
+    while (updateTimeCount >= updateTime && updateLoops <= 100){
         updateLoops++;
         updateTimeCount -= updateTime;
 
@@ -369,6 +369,9 @@ void Engine::systemDraw() {
             (Engine::getScene())->updatePhysics(updateTime / 1000.0f);
 
         Engine::onUpdate.call();
+    }
+    if (updateLoops > 100){
+        Log::Warn("More than 100 updates in a frame");
     }
 
     Engine::onDraw.call();

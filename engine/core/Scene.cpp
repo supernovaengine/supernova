@@ -541,7 +541,7 @@ bool Scene::load(){
 
     bool loadreturn = Object::load();
 
-    camera->updateMatrix();
+    camera->updateModelMatrix();
     Object::updateMatrix();
 
     if (textureFrame != NULL) {

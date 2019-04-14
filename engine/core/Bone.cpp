@@ -77,12 +77,13 @@ Model* Bone::getModel() const {
     return model;
 }
 
-void Bone::updateMatrix(){
-    Object::updateMatrix();
+void Bone::updateModelMatrix(){
+    Object::updateModelMatrix();
 
     if (model) {
         Matrix4 skinning = model->getInverseDerivedTransform() * modelMatrix * offsetMatrix;
 
         model->updateBone(index, skinning);
     }
+
 }

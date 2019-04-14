@@ -401,8 +401,7 @@ void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     
 }
 
-void Object::updateMatrix(){
-
+void Object::updateModelMatrix(){
     Matrix4 centerMatrix = Matrix4::translateMatrix(-center);
     Matrix4 scaleMatrix = Matrix4::scaleMatrix(scale);
     Matrix4 translateMatrix = Matrix4::translateMatrix(position);
@@ -428,12 +427,15 @@ void Object::updateMatrix(){
     if (allowBodyUpdate) {
         updateBodyFromObject();
     }
+}
+
+void Object::updateMatrix(){
+    updateModelMatrix();
 
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
         (*it)->updateMatrix();
     }
-
 }
 
 void Object::updateMVPMatrix(){

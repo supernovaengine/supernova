@@ -395,8 +395,8 @@ void Camera::setLinkedScene(Scene* linkedScene){
     this->linkedScene = linkedScene;
 }
 
-void Camera::updateMatrix(){
-    Object::updateMatrix();
+void Camera::updateModelMatrix(){
+    Object::updateModelMatrix();
 
     if (type == S_CAMERA_2D){ //use top-left orientation
         projectionMatrix = Matrix4::orthoMatrix(left, right, top, bottom, orthoNear, orthoFar);

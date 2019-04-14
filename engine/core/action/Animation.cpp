@@ -39,8 +39,21 @@ void Animation::setStartTime(float startTime){
         timecount = (long)(startTime * 1000);
 }
 
+float Animation::getStartTime(){
+    return startTime;
+}
+
 void Animation::setEndTime(float endTime){
     this->endTime = endTime;
+}
+
+float Animation::getEndTime(){
+    return endTime;
+}
+
+void Animation::setLimits(float startTime, float endTime){
+    setStartTime(startTime);
+    setEndTime(endTime);
 }
 
 void Animation::addActionFrame(float startTime, TimeAction* action, Object* object){
@@ -74,7 +87,15 @@ bool Animation::run(){
     if (!Action::run())
         return false;
 
-    //timecount = (0.041656*1483*1000);
+
+    return true;
+}
+
+bool Animation::stop(){
+    if (!Action::stop())
+        return false;
+
+    timecount = (long)(startTime * 1000);
 
     return true;
 }
@@ -87,7 +108,6 @@ bool Animation::step(){
     int totalActionsPassed = 0;
 
     for (int i = 0; i < actions.size(); i++){
-        actions[i].action->step();
 
         float timeDiff = timesec - actions[i].startTime;
 
@@ -101,6 +121,8 @@ bool Animation::step(){
                 totalActionsPassed++;
             }
         }
+
+        actions[i].action->step();
 
     }
 

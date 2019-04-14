@@ -313,8 +313,8 @@ void Points::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     }
 }
 
-void Points::updateMatrix(){
-    GraphicObject::updateMatrix();
+void Points::updateModelMatrix(){
+    GraphicObject::updateModelMatrix();
 
     if (this->viewMatrix){
        this->normalMatrix = viewMatrix->transpose();

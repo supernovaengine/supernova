@@ -101,7 +101,7 @@ namespace Supernova {
 
         void setLinkedScene(Scene* linkedScene);
 
-        virtual void updateMatrix();
+        virtual void updateModelMatrix();
 
         Matrix4* getViewMatrix();
         Matrix4* getProjectionMatrix();

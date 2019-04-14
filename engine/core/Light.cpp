@@ -138,8 +138,8 @@ void Light::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matri
         Object::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 }
 
-void Light::updateMatrix(){
-    Object::updateMatrix();
+void Light::updateModelMatrix(){
+    Object::updateModelMatrix();
 
     worldTarget = modelMatrix * (target - position);
 

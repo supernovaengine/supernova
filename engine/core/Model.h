@@ -63,7 +63,7 @@ namespace Supernova {
 
         Matrix4 getInverseDerivedTransform();
 
-        virtual void updateMatrix();
+        virtual void updateModelMatrix();
 
         virtual bool load();
 

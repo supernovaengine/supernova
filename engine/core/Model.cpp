@@ -404,9 +404,13 @@ bool Model::loadGLTF(const char* filename) {
     for (size_t i = 0; i < gltfModel->animations.size(); i++) {
         const tinygltf::Animation &animation = gltfModel->animations[i];
 
-        Log::Debug("Animation %s", animation.name.c_str());
+        //Log::Debug("Animation %s", animation.name.c_str());
+
+        float startTime = FLT_MAX;
+        float endTime = 0;
 
         for (size_t j = 0; j < animation.channels.size(); j++) {
+
             const tinygltf::AnimationChannel &channel = animation.channels[j];
             const tinygltf::AnimationSampler &sampler = animation.samplers[channel.sampler];
 
@@ -423,6 +427,12 @@ bool Model::loadGLTF(const char* filename) {
             for (int c = 1; c < accessorIn.count; c++){
                 float *timeValues = (float *) (&gltfModel->buffers[bufferViewIn.buffer].data.at(0) + bufferViewIn.byteOffset + accessorIn.byteOffset);
                 float *values = (float *) (&gltfModel->buffers[bufferViewOut.buffer].data.at(0) + bufferViewOut.byteOffset + accessorOut.byteOffset);
+
+                if (timeValues[c - 1] < startTime)
+                    startTime = timeValues[c - 1];
+
+                if (timeValues[c] > endTime)
+                    endTime = timeValues[c];
 
                 float duration = timeValues[c] - timeValues[c - 1];
 
@@ -458,6 +468,12 @@ bool Model::loadGLTF(const char* filename) {
 
             //Log::Debug("Time %s %i %f %f %f", animation.channels[j].target_path.c_str(), accessorIn.count, matrices[0], matrices[1], matrices[2]);
         }
+
+        if (anim.getStartTime() < startTime)
+            anim.setStartTime(startTime);
+
+        if (anim.getEndTime() > endTime)
+            anim.setEndTime(endTime);
 
         addAction(&anim);
 
@@ -616,8 +632,8 @@ void Model::updateBone(int boneIndex, Matrix4 skinning){
         bonesMatrix[boneIndex] = skinning;
 }
 
-void Model::updateMatrix(){
-    Mesh::updateMatrix();
+void Model::updateModelMatrix(){
+    Mesh::updateModelMatrix();
 
     inverseDerivedTransform = (modelMatrix * Matrix4::translateMatrix(center)).inverse();
 }

@@ -53,7 +53,7 @@ namespace Supernova {
         const Matrix4 &getOffsetMatrix() const;
         void setOffsetMatrix(const Matrix4 &offsetMatrix);
 
-        virtual void updateMatrix();
+        virtual void updateModelMatrix();
     };
 }
 

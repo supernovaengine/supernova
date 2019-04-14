@@ -36,7 +36,12 @@ namespace Supernova {
         void setLoop(bool loop);
 
         void setStartTime(float startTime);
+        float getStartTime();
+
         void setEndTime(float endTime);
+        float getEndTime();
+
+        void setLimits(float startTime, float endTime);
 
         bool isOwnedActions() const;
         void setOwnedActions(bool ownedActions);
@@ -45,6 +50,7 @@ namespace Supernova {
         void clearActionFrames();
 
         virtual bool run();
+        virtual bool stop();
         virtual bool step();
 
     };

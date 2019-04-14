@@ -65,6 +65,7 @@ namespace Supernova {
         bool reload();
 
         virtual void updateMVPMatrix();
+        virtual void updateModelMatrix();
 
     public:
         Object();
