@@ -40,7 +40,7 @@ void SpotLight::updateLightCamera(){
 void SpotLight::setTarget(Vector3 target){
     if (this->target != target){
         this->target = target;
-        updateMatrix();
+        needUpdate();
     }
 }
 

@@ -22,7 +22,7 @@ void Bone::moveToBind(){
     rotation = bindRotation;
     scale = bindScale;
 
-    updateMatrix();
+    needUpdate();
 }
 
 int Bone::getIndex() const {

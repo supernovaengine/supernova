@@ -15,7 +15,7 @@ using namespace Supernova;
 Object::Object(){
     loaded = false;
     firstLoaded = false;
-    markToUpdate = false;
+    markToUpdate = true;
     
     parent = NULL;
     scene = NULL;
@@ -119,7 +119,7 @@ void Object::addObject(Object* obj){
                 }
             }
 
-            obj->updateMatrix();
+            obj->needUpdate();
         } else {
             Log::Error("Object has a parent already");
         }
@@ -162,7 +162,7 @@ void Object::removeObject(Object* obj){
     obj->viewMatrix = NULL;
     obj->viewProjectionMatrix = NULL;
     
-    obj->updateMatrix();
+    obj->needUpdate();
 }
 
 void Object::setSceneDepth(bool depth){
@@ -187,7 +187,7 @@ void Object::setPosition(Vector2 position){
 void Object::setPosition(Vector3 position){
     if (this->position != position){
         this->position = position;
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -212,7 +212,7 @@ void Object::setRotation(const float xAngle, const float yAngle, const float zAn
 void Object::setRotation(Quaternion rotation){
     if (this->rotation != rotation){
         this->rotation = rotation;
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -231,7 +231,7 @@ void Object::setScale(const float factor){
 void Object::setScale(Vector3 scale){
     if (this->scale != scale){
         this->scale = scale;
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -250,7 +250,7 @@ void Object::setCenter(const float x, const float y, const float z){
 void Object::setCenter(Vector3 center){
     if (this->center != center){
         this->center = center;
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -433,13 +433,14 @@ void Object::updateModelMatrix(){
     }
 }
 
-void Object::updateMatrix(){
-    //updateModelMatrix();
-    markToUpdate = true;
+void Object::needUpdate(){
+    if (!markToUpdate) {
+        markToUpdate = true;
 
-    std::vector<Object*>::iterator it;
-    for (it = objects.begin(); it != objects.end(); ++it) {
-        (*it)->updateMatrix();
+        std::vector<Object *>::iterator it;
+        for (it = objects.begin(); it != objects.end(); ++it) {
+            (*it)->needUpdate();
+        }
     }
 }
 
@@ -511,7 +512,7 @@ void Object::updateBodyFromObject(){
 
 void Object::updateFromBody(){
     if (body){
-        bool needUpdate = false;
+        bool needUpdateBody = false;
         Vector3 bodyPosition = body->getPosition();
         Quaternion bodyRotation = body->getRotation();
 
@@ -519,31 +520,31 @@ void Object::updateFromBody(){
 
             if (getWorldPosition() != bodyPosition) {
                 position = parent->getModelMatrix().inverse() * bodyPosition;
-                needUpdate = true;
+                needUpdateBody = true;
             }
 
             if (getWorldRotation() != bodyRotation) {
                 rotation = parent->rotation.inverse() * bodyRotation;
-                needUpdate = true;
+                needUpdateBody = true;
             }
 
         }else{
 
             if (getPosition() != bodyPosition) {
                 position = bodyPosition;
-                needUpdate = true;
+                needUpdateBody = true;
             }
 
             if (getRotation() != bodyRotation) {
                 rotation = bodyRotation;
-                needUpdate = true;
+                needUpdateBody = true;
             }
 
         }
 
-        if (needUpdate) {
+        if (needUpdateBody) {
             allowBodyUpdate = false;
-            updateMatrix();
+            needUpdate();
             allowBodyUpdate = true;
         }
     }

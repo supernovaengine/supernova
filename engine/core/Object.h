@@ -67,6 +67,7 @@ namespace Supernova {
 
         virtual void updateMVPMatrix();
         virtual void updateModelMatrix();
+        virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
     public:
         Object();
@@ -132,9 +133,8 @@ namespace Supernova {
 
         void updateBodyFromObject();
         void updateFromBody();
-        
-        virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
-        virtual void updateMatrix();
+
+        virtual void needUpdate();
 
         virtual void update();
         virtual bool load();

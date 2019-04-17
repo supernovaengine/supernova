@@ -236,7 +236,7 @@ void Scene::setCamera(Camera* camera){
         this->camera->setLinkedScene(this);
         userCamera = true;
         if (loaded)
-            this->camera->updateMatrix();
+            this->camera->needUpdate();
     }
 }
 
@@ -563,7 +563,7 @@ bool Scene::load(){
     bool loadreturn = Object::load();
 
     camera->updateModelMatrix();
-    Object::updateMatrix();
+    Object::needUpdate();
 
     if (textureFrame != NULL) {
         textureFrame->load();

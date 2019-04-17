@@ -90,7 +90,7 @@ void Camera::setView(const float x, const float y, const float z){
 void Camera::setView(Vector3 view){
     if (this->view != view){
         this->view = view;
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -105,7 +105,7 @@ void Camera::setUp(const float x, const float y, const float z){
 void Camera::setUp(Vector3 up){
     if (this->up != up){
         this->up = up;
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -116,7 +116,7 @@ Vector3 Camera::getUp(){
 void Camera::setType(int type){
     if (this->type != type){
         this->type = type;
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -152,12 +152,12 @@ void Camera::setNear(float near){
     if (type == S_CAMERA_PERSPECTIVE) {
         if (this->perspectiveNear != near) {
             this->perspectiveNear = near;
-            updateMatrix();
+            needUpdate();
         }
     } else {
         if (this->orthoNear != near) {
             this->orthoNear = near;
-            updateMatrix();
+            needUpdate();
         }
     }
 }
@@ -173,12 +173,12 @@ void Camera::setFar(float far){
     if (type == S_CAMERA_PERSPECTIVE) {
         if (this->perspectiveFar != far) {
             this->perspectiveFar = far;
-            updateMatrix();
+            needUpdate();
         }
     } else {
         if (this->orthoFar != far) {
             this->orthoFar = far;
-            updateMatrix();
+            needUpdate();
         }
     }
 }
@@ -211,7 +211,7 @@ void Camera::updateAutomaticSizes(Rect rect){
             right = newRight;
             top = newTop;
             aspect = newAspect;
-            updateMatrix();
+            needUpdate();
         }
     }
 }
@@ -229,7 +229,7 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
     
     automatic = false;
 
-    updateMatrix();
+    needUpdate();
 }
 
 void Camera::setPerspective(float y_fov, float aspect, float near, float far){
@@ -243,7 +243,7 @@ void Camera::setPerspective(float y_fov, float aspect, float near, float far){
     
     automatic = false;
 
-    updateMatrix();
+    needUpdate();
 }
 
 void Camera::rotateView(float angle){
@@ -256,7 +256,7 @@ void Camera::rotateView(float angle){
 
         view = Vector3(viewCenter.x + position.x, viewCenter.y + position.y, viewCenter.z + position.z);
 
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -270,7 +270,7 @@ void Camera::rotatePosition(float angle){
 
         position = Vector3(positionCenter.x + view.x, positionCenter.y + view.y, positionCenter.z + view.z);
 
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -284,7 +284,7 @@ void Camera::elevateView(float angle){
 
         view = Vector3(viewCenter.x + position.x, viewCenter.y + position.y, viewCenter.z + position.z);
 
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -298,7 +298,7 @@ void Camera::elevatePosition(float angle){
 
         position = Vector3(positionCenter.x + view.x, positionCenter.y + view.y, positionCenter.z + view.z);
 
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -311,7 +311,7 @@ void Camera::moveForward(float distance){
         view = view + (viewCenter.normalize() * distance);
         position = position + (viewCenter.normalize() * distance);
 
-        updateMatrix();
+        needUpdate();
     }
 }
 
@@ -327,7 +327,7 @@ void Camera::walkForward(float distance){
         view = view + (walkVector.normalize() * distance);
         position = position + (walkVector.normalize() * distance);
 
-        updateMatrix();
+        needUpdate();
 
     }
 }
@@ -341,7 +341,7 @@ void Camera::slide(float distance){
         view = view + (slideVector.normalize() * distance);
         position = position + (slideVector.normalize() * distance);
 
-        updateMatrix();
+        needUpdate();
     }
 }
 
