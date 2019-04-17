@@ -23,13 +23,15 @@ namespace Supernova {
         bool ownedActions;
         bool loop;
 
+        std::string name;
+
         float startTime;
         float endTime;
 
     public:
 
         Animation();
-        Animation(bool loop);
+        Animation(std::string name, bool loop = false);
         virtual ~Animation();
 
         bool isLoop();
@@ -46,12 +48,17 @@ namespace Supernova {
         bool isOwnedActions() const;
         void setOwnedActions(bool ownedActions);
 
+        const std::string &getName() const;
+        void setName(const std::string &name);
+
         void addActionFrame(float startTime, TimeAction* action, Object* object);
+        ActionFrame getActionFrame(unsigned int index);
         void clearActionFrames();
 
         virtual bool run();
         virtual bool stop();
-        virtual bool step();
+
+        virtual bool update(float time);
 
     };
 

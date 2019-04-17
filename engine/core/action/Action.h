@@ -46,6 +46,7 @@ namespace Supernova{
         virtual bool stop();
         
         virtual bool step();
+        virtual bool update(float time);
     };
 }
 

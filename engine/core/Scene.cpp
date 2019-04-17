@@ -111,6 +111,7 @@ void Scene::setOwnedPhysicsWorld(bool ownedPhysicsWorld){
 
 PhysicsWorld2D* Scene::createPhysicsWorld2D(){
     physicsWorld = new PhysicsWorld2D();
+    setOwnedPhysicsWorld(true);
     return (PhysicsWorld2D*)getPhysicsWorld();
 }
 
@@ -389,7 +390,12 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
 
     bool drawreturn = render->draw();
 
+    if (camera && !camera->getParent()){
+        camera->draw();
+    }
+
     Object::draw();
+
     if (!drawingShadow) {
         drawSky();
         drawTransparentMeshes();
@@ -410,8 +416,23 @@ void Scene::updatePhysics(float time){
     }
 }
 
+void Scene::update(){
+
+    if (Engine::isFixedTimePhysics())
+        updatePhysics(Engine::getUpdateTime());
+
+    if (camera && !camera->getParent()){
+        camera->update();
+    }
+
+    Object::update();
+}
+
 bool Scene::draw() {
     //TODO: alert if not loaded
+
+    if (!Engine::isFixedTimePhysics())
+        updatePhysics(Engine::getDeltatime());
 
     Camera* originalCamera = this->camera;
     Texture* originalTextureRender = this->textureFrame;

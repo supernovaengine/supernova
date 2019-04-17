@@ -49,15 +49,17 @@ namespace Supernova {
         static Scaling scalingMode;
         static bool defaultNearestScaleTexture;
         static bool defaultResampleToPOTTexture;
+        static bool fixedTimeObjectUpdate;
         static bool fixedTimePhysics;
+        static bool fixedTimeAnimations;
 
         static unsigned long lastTime;
-        static unsigned int updateTimeCount;
+        static float updateTimeCount;
         
-        static unsigned int deltatime;
+        static float deltatime;
         static float framerate;
         
-        static unsigned int updateTime;
+        static float updateTime;
         
         static bool transformCoordPos(float& x, float& y);
 
@@ -102,11 +104,17 @@ namespace Supernova {
         static void setDefaultResampleToPOTTexture(bool defaultResampleToPOTTexture);
         static bool isDefaultResampleToPOTTexture();
 
+        static void setFixedTimeObjectUpdate(bool fixedTimeObjectUpdate);
+        static bool isFixedTimeObjectUpdate();
+
         static void setFixedTimePhysics(bool fixedTimePhysics);
         static bool isFixedTimePhysics();
-        
-        static void setUpdateTime(unsigned int updateTime);
-        static unsigned int getUpdateTime();
+
+        static void setFixedTimeAnimations(bool fixedTimeAnimations);
+        static bool isFixedTimeAnimations();
+
+        static void setUpdateTime(unsigned int updateTimeMS);
+        static float getUpdateTime();
         
         static int getPlatform();
         static float getFramerate();

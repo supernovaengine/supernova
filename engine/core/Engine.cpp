@@ -51,15 +51,17 @@ bool Engine::useDegrees;
 Scaling Engine::scalingMode;
 bool Engine::defaultNearestScaleTexture;
 bool Engine::defaultResampleToPOTTexture;
+bool Engine::fixedTimeObjectUpdate;
 bool Engine::fixedTimePhysics;
+bool Engine::fixedTimeAnimations;
 
 unsigned long Engine::lastTime = 0;
-unsigned int Engine::updateTimeCount = 0;
+float Engine::updateTimeCount = 0;
 
-unsigned int Engine::deltatime = 0;
+float Engine::deltatime = 0;
 float Engine::framerate = 0;
 
-unsigned int Engine::updateTime = 30;
+float Engine::updateTime = 0.03;
 
 //-----Supernova user events-----
 FunctionCallback<void()> Engine::onCanvasLoaded;
@@ -213,6 +215,14 @@ bool Engine::isDefaultResampleToPOTTexture(){
     return defaultResampleToPOTTexture;
 }
 
+void Engine::setFixedTimeObjectUpdate(bool fixedTimeObjectUpdate) {
+    Engine::fixedTimeObjectUpdate = fixedTimeObjectUpdate;
+}
+
+bool Engine::isFixedTimeObjectUpdate() {
+    return fixedTimeObjectUpdate;
+}
+
 void Engine::setFixedTimePhysics(bool fixedTimePhysics){
     Engine::fixedTimePhysics = fixedTimePhysics;
 }
@@ -221,11 +231,19 @@ bool Engine::isFixedTimePhysics(){
     return fixedTimePhysics;
 }
 
-void Engine::setUpdateTime(unsigned int updateTime){
-    Engine::updateTime = updateTime;
+void Engine::setFixedTimeAnimations(bool fixedTimeAnimations) {
+    Engine::fixedTimeAnimations = fixedTimeAnimations;
 }
 
-unsigned int Engine::getUpdateTime(){
+bool Engine::isFixedTimeAnimations() {
+    return fixedTimeAnimations;
+}
+
+void Engine::setUpdateTime(unsigned int updateTimeMS){
+    Engine::updateTime = updateTimeMS / 1000.0f;
+}
+
+float Engine::getUpdateTime(){
     return Engine::updateTime;
 }
 
@@ -270,7 +288,9 @@ void Engine::systemStart(int width, int height){
     Engine::setScalingMode(Scaling::FITWIDTH);
     Engine::setDefaultNearestScaleTexture(false);
     Engine::setDefaultResampleToPOTTexture(true);
+    Engine::setFixedTimeObjectUpdate(false);
     Engine::setFixedTimePhysics(false);
+    Engine::setFixedTimeAnimations(false);
     
     auto now = std::chrono::steady_clock::now();
     lastTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
@@ -348,16 +368,13 @@ void Engine::systemSurfaceChanged(int width, int height) {
 }
 
 void Engine::systemDraw() {
-
-    if (!fixedTimePhysics && Engine::getScene())
-        (Engine::getScene())->updatePhysics(Engine::getDeltatime() / 1000.0f);
     
     auto now = std::chrono::steady_clock::now();
     unsigned long newTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     
-    deltatime = (unsigned int)(newTime - lastTime);
+    deltatime = (newTime - lastTime) / 1000.0f;
     lastTime = newTime;
-    framerate = 1 / (float)deltatime * 1000;
+    framerate = 1 / (float)deltatime;
     
     int updateLoops = 0;
     updateTimeCount += deltatime;
@@ -365,8 +382,8 @@ void Engine::systemDraw() {
         updateLoops++;
         updateTimeCount -= updateTime;
 
-        if (fixedTimePhysics && Engine::getScene())
-            (Engine::getScene())->updatePhysics(updateTime / 1000.0f);
+        if (Engine::getScene())
+            (Engine::getScene())->update();
 
         Engine::onUpdate.call();
     }

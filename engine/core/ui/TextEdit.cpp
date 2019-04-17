@@ -130,7 +130,7 @@ bool TextEdit::draw(){
     if (focused) {
         cursorBlinkTimer += Engine::getDeltatime();
 
-        if (cursorBlinkTimer > 600) {
+        if (cursorBlinkTimer > 0.6) {
             if (cursor.isVisible()) {
                 cursor.setVisible(false);
             } else {

@@ -10,13 +10,15 @@ using namespace Supernova;
 Animation::Animation(): Action(){
     this->ownedActions = true;
     this->loop = true;
+    this->name = "";
     this->startTime = 0;
     this->endTime = FLT_MAX;
 }
 
-Animation::Animation(bool loop): Action(){
+Animation::Animation(std::string name, bool loop): Action(){
     this->ownedActions = true;
     this->loop = loop;
+    this->name = name;
     this->startTime = 0;
     this->endTime = FLT_MAX;
 }
@@ -66,6 +68,14 @@ void Animation::addActionFrame(float startTime, TimeAction* action, Object* obje
     actions.push_back(actionFrame);
 }
 
+Animation::ActionFrame Animation::getActionFrame(unsigned int index){
+    if (index >= actions.size()){
+        Log::Error("ActionFrame index %i is not created", index);
+    }else{
+        return actions[index];
+    }
+}
+
 void Animation::clearActionFrames(){
     if (ownedActions){
         for (int i = 0; i < actions.size(); i++){
@@ -81,6 +91,14 @@ bool Animation::isOwnedActions() const {
 
 void Animation::setOwnedActions(bool ownedActions) {
     Animation::ownedActions = ownedActions;
+}
+
+const std::string &Animation::getName() const {
+    return name;
+}
+
+void Animation::setName(const std::string &name) {
+    Animation::name = name;
 }
 
 bool Animation::run(){
@@ -102,8 +120,8 @@ bool Animation::stop(){
     return true;
 }
 
-bool Animation::step(){
-    if (!Action::step())
+bool Animation::update(float time){
+    if (!Action::update(time))
         return false;
 
     float timesec = timecount / (float)1000;
@@ -124,7 +142,7 @@ bool Animation::step(){
             }
         }
 
-        actions[i].action->step();
+        actions[i].action->update(time);
 
     }
 

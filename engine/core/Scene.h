@@ -143,6 +143,7 @@ namespace Supernova {
 
         void updatePhysics(float time);
 
+        virtual void update();
         virtual bool load();
         virtual bool draw();
         virtual void destroy();

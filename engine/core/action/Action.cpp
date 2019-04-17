@@ -59,13 +59,19 @@ bool Action::stop(){
 }
 
 bool Action::step(){
+    onStep.call(object);
+    
+    return true;
+}
+
+bool Action::update(float time){
     if (running){
-        steptime = Engine::getDeltatime();
+        steptime = time * 1000;
         timecount += steptime;
-        onStep.call(object);
+        step();
     }else{
         return false;
     }
-    
+
     return true;
 }

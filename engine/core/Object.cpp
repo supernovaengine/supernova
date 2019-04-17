@@ -3,6 +3,7 @@
 #include "ui/UIObject.h"
 #include "Light.h"
 #include "Scene.h"
+#include "Engine.h"
 #include "physics/PhysicsWorld2D.h"
 
 //
@@ -14,6 +15,7 @@ using namespace Supernova;
 Object::Object(){
     loaded = false;
     firstLoaded = false;
+    markToUpdate = false;
     
     parent = NULL;
     scene = NULL;
@@ -402,6 +404,8 @@ void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
 }
 
 void Object::updateModelMatrix(){
+    markToUpdate = false;
+
     Matrix4 centerMatrix = Matrix4::translateMatrix(-center);
     Matrix4 scaleMatrix = Matrix4::scaleMatrix(scale);
     Matrix4 translateMatrix = Matrix4::translateMatrix(position);
@@ -430,7 +434,8 @@ void Object::updateModelMatrix(){
 }
 
 void Object::updateMatrix(){
-    updateModelMatrix();
+    //updateModelMatrix();
+    markToUpdate = true;
 
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
@@ -554,6 +559,26 @@ bool Object::reload(){
     return load();
 }
 
+void Object::update(){
+
+    if (Engine::isFixedTimeAnimations()) {
+        for (int i = 0; i < actions.size(); i++) {
+            if (actions[i]->isRunning()) {
+                actions[i]->update(Engine::getUpdateTime());
+            }
+        }
+    }
+
+    if (Engine::isFixedTimeObjectUpdate() && markToUpdate) {
+        updateModelMatrix();
+    }
+
+    std::vector<Object*>::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it) {
+        (*it)->update();
+    }
+}
+
 bool Object::load(){
 
     if ((position.z != 0) && isIn3DScene()){
@@ -582,11 +607,17 @@ bool Object::draw(){
 
     if (!scene || !scene->drawingShadow) {
         //Do not update animations when shadow draw
-        for (int i = 0; i < actions.size(); i++) {
-            if (actions[i]->isRunning()) {
-                actions[i]->step();
+        if (!Engine::isFixedTimeAnimations()) {
+            for (int i = 0; i < actions.size(); i++) {
+                if (actions[i]->isRunning()) {
+                    actions[i]->update(Engine::getDeltatime());
+                }
             }
         }
+    }
+
+    if (!Engine::isFixedTimeObjectUpdate() && markToUpdate) {
+        updateModelMatrix();
     }
     
     std::vector<Object*>::iterator it;
