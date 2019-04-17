@@ -143,6 +143,8 @@ void DirectionalLight::updateLightCamera(){
 
                 configLightOrthoCamera(lightCameras[ca], sceneCameraInv);
 
+                lightCameras[ca]->updateModelMatrix();
+
                 depthVPMatrix[ca] = (*lightCameras[ca]->getViewProjectionMatrix());
 
             }

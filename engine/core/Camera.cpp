@@ -354,9 +354,7 @@ Matrix4* Camera::getViewMatrix(){
 }
 
 Matrix4* Camera::getViewProjectionMatrix(){
-
     return &viewProjectionMatrix;
-
 }
 
 Ray Camera::pointsToRay(float x, float y) {

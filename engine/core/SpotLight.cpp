@@ -32,6 +32,8 @@ void SpotLight::updateLightCamera(){
         lightCameras[0]->setUp(0, 1, 0);
     }
 
+    lightCameras[0]->updateModelMatrix();
+
     depthVPMatrix[0] = (*lightCameras[0]->getViewProjectionMatrix());
 
     Light::updateLightCamera();
