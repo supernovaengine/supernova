@@ -136,9 +136,9 @@ namespace Supernova {
 
         virtual void needUpdate();
 
-        virtual void update();
         virtual bool load();
         virtual bool draw();
+        virtual void update();
         virtual void destroy();
 
     };

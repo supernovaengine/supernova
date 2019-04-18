@@ -116,8 +116,8 @@ bool ParticlesAnimation::isEmitting(){
     return emitter;
 }
 
-bool ParticlesAnimation::step(){
-    if (!Action::step())
+bool ParticlesAnimation::update(float interval){
+    if (!Action::update(interval))
         return false;
 
     if (Particles* particles = dynamic_cast<Particles*>(object)){

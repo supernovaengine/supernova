@@ -31,8 +31,8 @@ bool ScaleAction::run(){
     return true;
 }
 
-bool ScaleAction::step(){
-    if (!TimeAction::step())
+bool ScaleAction::update(float interval){
+    if (!TimeAction::update(interval))
         return false;
 
     if (object){

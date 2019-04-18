@@ -24,7 +24,7 @@ namespace Supernova{
 
         virtual bool run();
 
-        virtual bool step();
+        virtual bool update(float interval);
     };
 }
 

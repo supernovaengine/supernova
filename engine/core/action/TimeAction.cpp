@@ -80,9 +80,8 @@ bool TimeAction::stop(){
     return true;
 }
 
-bool TimeAction::step(){
-    
-    if (!Action::step())
+bool TimeAction::update(float interval){
+    if (!Action::update(interval))
         return false;
     
     if ((time == 1) && !loop){

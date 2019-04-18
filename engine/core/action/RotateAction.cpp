@@ -50,8 +50,8 @@ bool RotateAction::run(){
     return true;
 }
 
-bool RotateAction::step(){
-    if (!TimeAction::step())
+bool RotateAction::update(float interval){
+    if (!TimeAction::update(interval))
         return false;
 
     if (object) {

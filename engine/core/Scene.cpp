@@ -416,18 +416,6 @@ void Scene::updatePhysics(float time){
     }
 }
 
-void Scene::update(){
-
-    if (Engine::isFixedTimePhysics())
-        updatePhysics(Engine::getUpdateTime());
-
-    if (camera && !camera->getParent()){
-        camera->update();
-    }
-
-    Object::update();
-}
-
 bool Scene::draw() {
     //TODO: alert if not loaded
 
@@ -489,7 +477,18 @@ bool Scene::draw() {
     }
 
     return renderDraw();
+}
 
+void Scene::update(){
+
+    if (Engine::isFixedTimePhysics())
+        updatePhysics(Engine::getUpdateTime());
+
+    if (camera && !camera->getParent()){
+        camera->update();
+    }
+
+    Object::update();
 }
 
 bool Scene::addLightProperties(ObjectRender* render){

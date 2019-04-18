@@ -44,8 +44,8 @@ bool MoveAction::run(){
     return true;
 }
 
-bool MoveAction::step(){
-    if (!TimeAction::step())
+bool MoveAction::update(float interval){
+    if (!TimeAction::update(interval))
         return false;
     
     if (object){

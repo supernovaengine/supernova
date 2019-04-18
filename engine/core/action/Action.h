@@ -33,7 +33,7 @@ namespace Supernova{
         FunctionCallback<void(Object*)> onPause;
         FunctionCallback<void(Object*)> onStop;
         FunctionCallback<void(Object*)> onFinish;
-        FunctionCallback<void(Object*)> onStep;
+        FunctionCallback<void(Object*,float)> onUpdate;
 
         Object* getObject();
 
@@ -44,9 +44,8 @@ namespace Supernova{
         virtual bool run();
         virtual bool pause();
         virtual bool stop();
-        
-        virtual bool step();
-        virtual bool update(float time);
+
+        virtual bool update(float interval);
     };
 }
 

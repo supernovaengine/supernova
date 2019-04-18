@@ -713,7 +713,7 @@ void LuaBind::bind(){
     .addProperty("onPause", [] (Action* action) { return &action->onPause; }, [] (Action* action, lua_State* L) { action->onPause.set(L); })
     .addProperty("onStop", [] (Action* action) { return &action->onStop; }, [] (Action* action, lua_State* L) { action->onStop.set(L); })
     .addProperty("onFinish", [] (Action* action) { return &action->onFinish; }, [] (Action* action, lua_State* L) { action->onFinish.set(L); })
-    .addProperty("onStep", [] (Action* action) { return &action->onStep; }, [] (Action* action, lua_State* L) { action->onStep.set(L); })
+    .addProperty("onUpdate", [] (Action* action) { return &action->onUpdate; }, [] (Action* action, lua_State* L) { action->onUpdate.set(L); })
     .addConstant("LINEAR", S_LINEAR)
     .addConstant("EASE_QUAD_IN", S_EASE_QUAD_IN)
     .addConstant("EASE_QUAD_OUT", S_EASE_QUAD_OUT)

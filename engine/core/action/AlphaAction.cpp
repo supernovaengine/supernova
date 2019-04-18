@@ -33,8 +33,8 @@ bool AlphaAction::run(){
     return true;
 }
 
-bool AlphaAction::step(){
-    if (!TimeAction::step())
+bool AlphaAction::update(float interval){
+    if (!TimeAction::update(interval))
         return false;
 
     GraphicObject* cObject = dynamic_cast<GraphicObject*>(object);

@@ -49,8 +49,8 @@ bool ColorAction::run(){
     return true;
 }
 
-bool ColorAction::step(){
-    if (!TimeAction::step())
+bool ColorAction::update(float interval){
+    if (!TimeAction::update(interval))
         return false;
 
     GraphicObject* cObject = dynamic_cast<GraphicObject*>(object);

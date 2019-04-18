@@ -43,7 +43,7 @@ namespace Supernova{
 
         bool isEmitting();
         
-        virtual bool step();
+        virtual bool update(float interval);
     };
     
 }

@@ -58,17 +58,11 @@ bool Action::stop(){
     return true;
 }
 
-bool Action::step(){
-    onStep.call(object);
-    
-    return true;
-}
-
-bool Action::update(float time){
+bool Action::update(float interval){
     if (running){
-        steptime = time * 1000;
+        steptime = interval * 1000;
         timecount += steptime;
-        step();
+        onUpdate.call(object, interval);
     }else{
         return false;
     }

@@ -137,8 +137,8 @@ bool SpriteAnimation::stop(){
     return true;
 }
 
-bool SpriteAnimation::step(){
-    if (!Action::step())
+bool SpriteAnimation::update(float interval){
+    if (!Action::update(interval))
         return false;
     
     if (Sprite* sprite = dynamic_cast<Sprite*>(object)){

@@ -120,8 +120,8 @@ bool Animation::stop(){
     return true;
 }
 
-bool Animation::update(float time){
-    if (!Action::update(time))
+bool Animation::update(float interval){
+    if (!Action::update(interval))
         return false;
 
     float timesec = timecount / (float)1000;
@@ -142,7 +142,7 @@ bool Animation::update(float time){
             }
         }
 
-        actions[i].action->update(time);
+        actions[i].action->update(interval);
 
     }
 

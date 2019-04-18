@@ -30,7 +30,7 @@ namespace Supernova{
         virtual bool pause();
         virtual bool stop();
         
-        virtual bool step();
+        virtual bool update(float interval);
     };
 }
 

@@ -560,26 +560,6 @@ bool Object::reload(){
     return load();
 }
 
-void Object::update(){
-
-    if (Engine::isFixedTimeAnimations()) {
-        for (int i = 0; i < actions.size(); i++) {
-            if (actions[i]->isRunning()) {
-                actions[i]->update(Engine::getUpdateTime());
-            }
-        }
-    }
-
-    if (Engine::isFixedTimeObjectUpdate() && markToUpdate) {
-        updateModelMatrix();
-    }
-
-    std::vector<Object*>::iterator it;
-    for (it = objects.begin(); it != objects.end(); ++it) {
-        (*it)->update();
-    }
-}
-
 bool Object::load(){
 
     if ((position.z != 0) && isIn3DScene()){
@@ -632,6 +612,26 @@ bool Object::draw(){
     }
     
     return loaded;
+}
+
+void Object::update(){
+
+    if (Engine::isFixedTimeAnimations()) {
+        for (int i = 0; i < actions.size(); i++) {
+            if (actions[i]->isRunning()) {
+                actions[i]->update(Engine::getUpdateTime());
+            }
+        }
+    }
+
+    if (Engine::isFixedTimeObjectUpdate() && markToUpdate) {
+        updateModelMatrix();
+    }
+
+    std::vector<Object*>::iterator it;
+    for (it = objects.begin(); it != objects.end(); ++it) {
+        (*it)->update();
+    }
 }
 
 void Object::destroy(){
