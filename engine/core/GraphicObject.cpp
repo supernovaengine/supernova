@@ -201,6 +201,29 @@ void GraphicObject::updateModelMatrix(){
 
 bool GraphicObject::draw(){
 
+    bool drawReturn = false;
+
+    if (!scissor.isZero() && scene){
+
+        SceneRender* sceneRender = scene->getSceneRender();
+        bool on = sceneRender->isEnabledScissor();
+        Rect rect = sceneRender->getActiveScissor();
+
+        if (on)
+            scissor.fitOnRect(rect);
+
+        sceneRender->enableScissor(scissor);
+
+        drawReturn = Object::draw();
+
+        if (!on)
+            sceneRender->disableScissor();
+
+    }else{
+
+        drawReturn = Object::draw();
+    }
+
     if (scene && scene->isDrawingShadow()){
         shadowDraw();
     }else{
@@ -216,28 +239,7 @@ bool GraphicObject::draw(){
         }
     }
 
-    if (!scissor.isZero() && scene){
-
-        SceneRender* sceneRender = scene->getSceneRender();
-        bool on = sceneRender->isEnabledScissor();
-        Rect rect = sceneRender->getActiveScissor();
-
-        if (on)
-            scissor.fitOnRect(rect);
-
-        sceneRender->enableScissor(scissor);
-
-        bool drawReturn = Object::draw();
-
-        if (!on)
-            sceneRender->disableScissor();
-
-        return drawReturn;
-
-    }else{
-
-        return Object::draw();
-    }
+    return drawReturn;
 }
 
 bool GraphicObject::load(){
