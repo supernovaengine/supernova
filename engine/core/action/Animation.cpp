@@ -137,12 +137,11 @@ bool Animation::update(float interval){
                     actions[i].action->setTimecount((int) (timeDiff * 1000));
                     actions[i].action->run();
                 }
+                actions[i].action->update(interval);
             }else{
                 totalActionsPassed++;
             }
         }
-
-        actions[i].action->update(interval);
 
     }
 
