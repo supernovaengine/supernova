@@ -28,6 +28,8 @@ namespace Supernova {
         float startTime;
         float endTime;
 
+        bool checkAllKeyframe();
+
     public:
 
         Animation();
@@ -37,9 +39,11 @@ namespace Supernova {
         bool isLoop();
         void setLoop(bool loop);
 
+        void setStartFrame(int frameIndex);
         void setStartTime(float startTime);
         float getStartTime();
 
+        void setEndFrame(int frameIndex);
         void setEndTime(float endTime);
         float getEndTime();
 

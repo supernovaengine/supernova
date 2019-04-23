@@ -21,6 +21,7 @@ namespace Supernova {
         KeyframeTrack(std::vector<float> times);
 
         void setTimes(std::vector<float> times);
+        std::vector<float> getTimes();
 
         virtual bool stop();
 

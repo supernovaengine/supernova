@@ -22,6 +22,10 @@ void KeyframeTrack::setTimes(std::vector<float> times){
     this->times = times;
 }
 
+std::vector<float> KeyframeTrack::getTimes(){
+    return times;
+}
+
 bool KeyframeTrack::stop(){
     if (!Action::stop())
         return false;

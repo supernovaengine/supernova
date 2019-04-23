@@ -4,6 +4,7 @@
 
 #include "Animation.h"
 #include "Log.h"
+#include "keyframe/KeyframeTrack.h"
 
 using namespace Supernova;
 
@@ -35,6 +36,42 @@ void Animation::setLoop(bool loop){
     this->loop = loop;
 }
 
+bool Animation::checkAllKeyframe(){
+    int previousFramesSize = -1;
+
+    for (int i = 0; i < actions.size(); i++){
+        KeyframeTrack* keyframeAction = dynamic_cast<KeyframeTrack*>(actions[i].action);
+
+        if (keyframeAction){
+            int framesSize = keyframeAction->getTimes().size();
+
+            if (previousFramesSize != -1 && previousFramesSize != framesSize){
+                Log::Error("The animation (%s) has different sizes of keyframes tracks", name.c_str());
+                return false;
+            }else{
+                previousFramesSize = framesSize;
+            }
+        }else{
+            Log::Error("The animation (%s) is not composed by only keyframe tracks", name.c_str());
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void Animation::setStartFrame(int frameIndex){
+    if (checkAllKeyframe()){
+        std::vector<float> times = ((KeyframeTrack*)actions[0].action)->getTimes();
+
+        if (frameIndex <= 0 || frameIndex > (times.size()-1)){
+            Log::Error("Frameindex is out of bound");
+        }else{
+            setStartTime(times[frameIndex]);
+        }
+    }
+}
+
 void Animation::setStartTime(float startTime){
     this->startTime = startTime;
     if (!isRunning())
@@ -45,6 +82,18 @@ float Animation::getStartTime(){
     return startTime;
 }
 
+
+void Animation::setEndFrame(int frameIndex){
+    if (checkAllKeyframe()){
+        std::vector<float> times = ((KeyframeTrack*)actions[0].action)->getTimes();
+
+        if (frameIndex <= 0 || frameIndex > (times.size()-1)){
+            Log::Error("Frameindex is out of bound");
+        }else{
+            setEndTime(times[frameIndex]);
+        }
+    }
+}
 void Animation::setEndTime(float endTime){
     this->endTime = endTime;
 }
