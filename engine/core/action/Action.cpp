@@ -26,7 +26,7 @@ Object* Action::getObject(){
     return object;
 }
 
-void Action::setTimecount(unsigned long timecount){
+void Action::setTimecount(float timecount){
     this->timecount = timecount;
 }
 
@@ -60,7 +60,7 @@ bool Action::stop(){
 
 bool Action::update(float interval){
     if (running){
-        steptime = interval * 1000;
+        steptime = interval;
         timecount += steptime;
         onUpdate.call(object, interval);
     }else{

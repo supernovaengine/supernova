@@ -18,8 +18,8 @@ namespace Supernova{
         
     protected:
         
-        unsigned long timecount;
-        unsigned int steptime;
+        float timecount;
+        float steptime;
         
         bool running;
         Object* object;
@@ -37,7 +37,7 @@ namespace Supernova{
 
         Object* getObject();
 
-        void setTimecount(unsigned long timecount);
+        void setTimecount(float timecount);
 
         bool isRunning();
 

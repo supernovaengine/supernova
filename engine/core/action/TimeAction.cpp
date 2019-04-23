@@ -92,17 +92,15 @@ bool TimeAction::update(float interval){
     
     if (duration >= 0) {
         
-        int durationms = (int)(duration * 1000);
-        
-        if (timecount >= durationms){
+        if (timecount >= duration){
             if (!loop){
-                timecount = durationms;
+                timecount = duration;
             }else{
-                timecount -= durationms;
+                timecount -= duration;
             }
         }
         
-        time = (float) timecount / durationms;
+        time = timecount / duration;
     }
 
     value = function.call(time);

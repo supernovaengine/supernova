@@ -122,7 +122,7 @@ bool ParticlesAnimation::update(float interval){
 
     if (Particles* particles = dynamic_cast<Particles*>(object)){
         
-        float delta = (float)steptime / 1000;
+        float delta = steptime;
 
         if (emitter){
             newParticlesCount += delta * particles->getMinRate();

@@ -12,6 +12,10 @@
 #include "action/MoveAction.h"
 #include "action/RotateAction.h"
 #include "action/ScaleAction.h"
+#include "action/keyframe/KeyframeTrack.h"
+#include "action/keyframe/TranslateTracks.h"
+#include "action/keyframe/RotateTracks.h"
+#include "action/keyframe/ScaleTracks.h"
 
 using namespace Supernova;
 
@@ -424,49 +428,46 @@ bool Model::loadGLTF(const char* filename) {
                 Log::Error("Incorret frame size in animation: %s, sampler: %i", animation.name.c_str(), channel.sampler);
             }
 
-            for (int c = 1; c < accessorIn.count; c++){
-                float *timeValues = (float *) (&gltfModel->buffers[bufferViewIn.buffer].data.at(0) + bufferViewIn.byteOffset + accessorIn.byteOffset);
-                float *values = (float *) (&gltfModel->buffers[bufferViewOut.buffer].data.at(0) + bufferViewOut.byteOffset + accessorOut.byteOffset);
+            float *timeValues = (float *) (&gltfModel->buffers[bufferViewIn.buffer].data.at(0) + bufferViewIn.byteOffset + accessorIn.byteOffset);
+            float *values = (float *) (&gltfModel->buffers[bufferViewOut.buffer].data.at(0) + bufferViewOut.byteOffset + accessorOut.byteOffset);
 
-                if (timeValues[c - 1] < startTime)
-                    startTime = timeValues[c - 1];
+            float trackStartTime = timeValues[0];
+            float trackEndTIme = timeValues[accessorIn.count-1];
 
-                if (timeValues[c] > endTime)
-                    endTime = timeValues[c];
+            if (trackStartTime < startTime)
+                startTime = trackStartTime;
 
-                float duration = timeValues[c] - timeValues[c - 1];
+            if (trackEndTIme > endTime)
+                endTime = trackEndTIme;
 
-                TimeAction* action = NULL;
+            KeyframeTrack* track = NULL;
 
-                if (channel.target_path.compare("translation") == 0) {
-                    Vector3 positionPre(values[3 * (c - 1)], values[(3 * (c - 1)) + 1], values[(3 * (c - 1)) + 2]);
+            if (channel.target_path.compare("translation") == 0) {
+                track = new TranslateTracks();
+                for (int c = 0; c < accessorIn.count; c++){
                     Vector3 positionAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
-
-                    action = new MoveAction(positionPre, positionAc, duration);
-                    //Log::Debug("MoveAction - Start: %f - Id: %i - Duration: %f - Vector: %f %f %f", timeValues[c-1], channel.target_node, duration, positionAc[0], positionAc[1], positionAc[2]);
+                    ((TranslateTracks*)track)->addKeyframe(timeValues[c], positionAc);
                 }
-
-                if (channel.target_path.compare("rotation") == 0) {
-                    Quaternion rotationPre(values[(4 * (c - 1)) + 3], values[4 * (c - 1)], values[(4 * (c - 1)) + 1], values[(4 * (c - 1)) + 2]);
+            }
+            if (channel.target_path.compare("rotation") == 0) {
+                track = new RotateTracks();
+                for (int c = 0; c < accessorIn.count; c++){
                     Quaternion rotationAc(values[(4 * c) + 3], values[4 * c], values[(4 * c) + 1], values[(4 * c) + 2]);
-
-                    action = new RotateAction(rotationPre, rotationAc, duration);
-                    //Log::Debug("RotateAction - Start: %f - Id: %i - Duration: %f - Vector: %f %f %f %f", timeValues[c-1], channel.target_node, duration, rotationAc[0], rotationAc[1], rotationAc[2], rotationAc[3]);
+                    ((RotateTracks*)track)->addKeyframe(timeValues[c], rotationAc);
                 }
-
-                if (channel.target_path.compare("scale") == 0) {
-                    Vector3 scalePre(values[3 * (c - 1)], values[(3 * (c - 1)) + 1], values[(3 * (c - 1)) + 2]);
+            }
+            if (channel.target_path.compare("scale") == 0) {
+                track = new ScaleTracks();
+                for (int c = 0; c < accessorIn.count; c++){
                     Vector3 scaleAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
-
-                    action = new ScaleAction(scalePre, scaleAc, duration);
-                    //Log::Debug("ScaleAction - Start: %f - Id: %i - Duration: %f - Vector: %f %f %f", timeValues[c-1], channel.target_node, duration, scaleAc[0], scaleAc[1], scaleAc[2]);
+                    ((ScaleTracks*)track)->addKeyframe(timeValues[c], scaleAc);
                 }
-
-                if (action && bonesIdMapping.count(channel.target_node))
-                    anim.addActionFrame(timeValues[c-1], action, bonesIdMapping[channel.target_node]);
             }
 
-            //Log::Debug("Time %s %i %f %f %f", animation.channels[j].target_path.c_str(), accessorIn.count, matrices[0], matrices[1], matrices[2]);
+            if (track && bonesIdMapping.count(channel.target_node)) {
+                track->setDuration(trackEndTIme - trackStartTime);
+                anim.addActionFrame(trackStartTime, track, bonesIdMapping[channel.target_node]);
+            }
         }
 
         if (anim.getStartTime() < startTime)

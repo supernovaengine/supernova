@@ -38,7 +38,7 @@ void Animation::setLoop(bool loop){
 void Animation::setStartTime(float startTime){
     this->startTime = startTime;
     if (!isRunning())
-        timecount = (long)(startTime * 1000);
+        timecount = startTime;
 }
 
 float Animation::getStartTime(){
@@ -105,7 +105,7 @@ bool Animation::run(){
     if (!Action::run())
         return false;
 
-    if (timecount == (long)(startTime * 1000))
+    if (timecount == startTime)
         onStart.call(object);
 
     return true;
@@ -115,7 +115,11 @@ bool Animation::stop(){
     if (!Action::stop())
         return false;
 
-    timecount = (long)(startTime * 1000);
+    for (int i = 0; i < actions.size(); i++){
+        actions[i].action->stop();
+    }
+
+    timecount = startTime;
 
     return true;
 }
@@ -124,19 +128,19 @@ bool Animation::update(float interval){
     if (!Action::update(interval))
         return false;
 
-    float timesec = timecount / (float)1000;
     int totalActionsPassed = 0;
 
     for (int i = 0; i < actions.size(); i++){
 
-        float timeDiff = timesec - actions[i].startTime;
+        float timeDiff = timecount - actions[i].startTime;
 
         if (timeDiff >= 0) {
+            //TODO: Support loop actions
             if (timeDiff <= actions[i].action->getDuration()) {
                 if (!actions[i].action->isRunning()) {
-                    actions[i].action->setTimecount((int) (timeDiff * 1000));
                     actions[i].action->run();
                 }
+                actions[i].action->setTimecount(timeDiff);
                 actions[i].action->update(interval);
             }else{
                 totalActionsPassed++;
@@ -145,13 +149,13 @@ bool Animation::update(float interval){
 
     }
 
-    if (totalActionsPassed == actions.size() || timesec >= endTime) {
+    if (totalActionsPassed == actions.size() || timecount >= endTime) {
         if (!loop) {
             stop();
             onFinish.call(object);
             return false;
         }else{
-            timecount = (long)(startTime * 1000);
+            timecount = startTime;
         }
     }
 
