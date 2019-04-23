@@ -143,7 +143,7 @@ bool SpriteAnimation::update(float interval){
     
     if (Sprite* sprite = dynamic_cast<Sprite*>(object)){
 
-        spriteFrameCount += steptime * 1000;
+        spriteFrameCount += interval * 1000;
         while ((spriteFrameCount >= framesTime[framesTimeIndex]) && (isRunning())) {
 
             spriteFrameCount -= framesTime[framesTimeIndex];

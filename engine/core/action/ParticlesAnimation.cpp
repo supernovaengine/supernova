@@ -121,11 +121,9 @@ bool ParticlesAnimation::update(float interval){
         return false;
 
     if (Particles* particles = dynamic_cast<Particles*>(object)){
-        
-        float delta = steptime;
 
         if (emitter){
-            newParticlesCount += delta * particles->getMinRate();
+            newParticlesCount += interval * particles->getMinRate();
 
             int newparticles = (int)newParticlesCount;
             newParticlesCount -= newparticles;
@@ -169,9 +167,9 @@ bool ParticlesAnimation::update(float interval){
                 Vector3 position = particles->getParticlePosition(i);
                 Vector3 acceleration = particles->getParticleAcceleration(i);
                 
-                velocity += acceleration * (float)delta * 0.5f;
-                position += velocity * (float)delta;
-                life -= delta;
+                velocity += acceleration * interval * 0.5f;
+                position += velocity * interval;
+                life -= interval;
 
                 particles->setParticleLife(i, life);
                 particles->setParticleVelocity(i, velocity);

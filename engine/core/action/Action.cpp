@@ -14,7 +14,6 @@ Action::Action(){
     this->object = NULL;
     this->running = false;
     this->timecount = 0;
-    this->steptime = 0;
 }
 
 Action::~Action(){
@@ -60,8 +59,7 @@ bool Action::stop(){
 
 bool Action::update(float interval){
     if (running){
-        steptime = interval;
-        timecount += steptime;
+        timecount += interval;
         onUpdate.call(object, interval);
     }else{
         return false;

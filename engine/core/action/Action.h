@@ -19,7 +19,6 @@ namespace Supernova{
     protected:
         
         float timecount;
-        float steptime;
         
         bool running;
         Object* object;
