@@ -107,14 +107,19 @@ void Animation::setLimits(float startTime, float endTime){
     setEndTime(endTime);
 }
 
-void Animation::addActionFrame(float startTime, TimeAction* action, Object* object){
+void Animation::addActionFrame(float startTime, float endTime, Action* action, Object* object){
     ActionFrame actionFrame;
 
     actionFrame.startTime = startTime;
+    actionFrame.endTime = endTime;
     actionFrame.action = action;
     action->object = object;
 
     actions.push_back(actionFrame);
+}
+
+void Animation::addActionFrame(float startTime, TimeAction* action, Object* object){
+    addActionFrame(startTime, startTime + action->getDuration(), action, object);
 }
 
 Animation::ActionFrame Animation::getActionFrame(unsigned int index){
@@ -182,10 +187,11 @@ bool Animation::update(float interval){
     for (int i = 0; i < actions.size(); i++){
 
         float timeDiff = timecount - actions[i].startTime;
+        float duration = actions[i].endTime - actions[i].startTime;
 
         if (timeDiff >= 0) {
             //TODO: Support loop actions
-            if (timeDiff <= actions[i].action->getDuration()) {
+            if (timeDiff <= duration) {
                 if (!actions[i].action->isRunning()) {
                     actions[i].action->run();
                 }

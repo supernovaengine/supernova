@@ -14,7 +14,8 @@ namespace Supernova {
 
         struct ActionFrame{
             float startTime;
-            TimeAction* action;
+            float endTime;
+            Action* action;
         };
 
     private:
@@ -55,6 +56,7 @@ namespace Supernova {
         const std::string &getName() const;
         void setName(const std::string &name);
 
+        void addActionFrame(float startTime, float endTime, Action* action, Object* object);
         void addActionFrame(float startTime, TimeAction* action, Object* object);
         ActionFrame getActionFrame(unsigned int index);
         void clearActionFrames();
