@@ -15,6 +15,7 @@
 void renderLoop();
 EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData);
 EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChangeEvent *e, void *userData);
+EM_BOOL canvasresize_callback(int eventType, const EmscriptenUiEvent *event, void *userData);
 EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData);
 EM_BOOL wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData);
 
@@ -50,7 +51,7 @@ int main(int argc, char **argv) {
     int height = Supernova::Engine::getScreenHeight();
 
     //Need SDL because Soloud uses SDL and can cause fullscreen error
-    SDL_Surface *screen = SDL_SetVideoMode( width, height, 16, SDL_OPENGL );
+    SDL_Surface *screen = SDL_SetVideoMode(width, height, 16, SDL_OPENGL );
     if ( !screen ) {
         printf("Unable to set video mode: %s\n", SDL_GetError());
         return 1;
@@ -59,13 +60,16 @@ int main(int argc, char **argv) {
     EMSCRIPTEN_RESULT ret = emscripten_set_keypress_callback(0, 0, 1, key_callback);
     ret = emscripten_set_keydown_callback(0, 0, 1, key_callback);
     ret = emscripten_set_keyup_callback(0, 0, 1, key_callback);
-    ret = emscripten_set_fullscreenchange_callback(0, 0, 1, fullscreenchange_callback);
     ret = emscripten_set_click_callback(0, 0, 1, mouse_callback);
     ret = emscripten_set_mousedown_callback(0, 0, 1, mouse_callback);
     ret = emscripten_set_mouseup_callback(0, 0, 1, mouse_callback);
     ret = emscripten_set_dblclick_callback(0, 0, 1, mouse_callback);
     ret = emscripten_set_mousemove_callback(0, 0, 1, mouse_callback);
     ret = emscripten_set_wheel_callback(0, 0, 1, wheel_callback);
+
+    //Removed because emscripten_set_canvas_element_size is not working on this callback
+    //ret = emscripten_set_fullscreenchange_callback(0, 0, 1, fullscreenchange_callback);
+    ret = emscripten_set_resize_callback(0, 0, 1, canvasresize_callback);
 
     Supernova::Engine::systemSurfaceCreated();
     Supernova::Engine::systemSurfaceChanged(width, height);
@@ -83,21 +87,37 @@ void renderLoop(){
     SDL_GL_SwapBuffers();
 }
 
+EM_BOOL canvasresize_callback(int eventType, const EmscriptenUiEvent *event, void *userData){
+    int width, height;
+    emscripten_get_canvas_element_size("#canvas", &width, &height);
+
+    updateScreenSize(width, height);
+
+    return EMSCRIPTEN_RESULT_SUCCESS;
+}
+
 EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChangeEvent *e, void *userData) {
     if (e->isFullscreen){
-        int w, h, fs;
-        emscripten_get_canvas_size(&w, &h, &fs);
+        int w, h;
+        emscripten_get_canvas_element_size("#canvas", &w, &h);
         originalWidth = w;
         originalHeight = h;
 
-        emscripten_set_canvas_size(e->screenWidth, e->screenHeight);
-        updateScreenSize(e->screenWidth, e->screenHeight);
+        EMSCRIPTEN_RESULT r = emscripten_set_canvas_element_size("#canvas", e->screenWidth, e->screenHeight);
+        if (r != EMSCRIPTEN_RESULT_SUCCESS) {
+            printf("Can't resize canvas element");
+        }
+        //updateScreenSize(e->screenWidth, e->screenHeight);
     }else{
-        emscripten_set_canvas_size(originalWidth, originalHeight);
-        updateScreenSize(originalWidth, originalHeight);
+
+        EMSCRIPTEN_RESULT r = emscripten_set_canvas_element_size("#canvas", originalWidth, originalHeight);
+        if (r != EMSCRIPTEN_RESULT_SUCCESS) {
+            printf("Can't resize canvas element");
+        }
+        //updateScreenSize(originalWidth, originalHeight);
     }
 
-    return 0;
+    return EMSCRIPTEN_RESULT_SUCCESS;
 }
 
 int supernova_mouse_button(int button){

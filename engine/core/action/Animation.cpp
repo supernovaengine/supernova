@@ -3,6 +3,7 @@
 //
 
 #include "Animation.h"
+#include <float.h>
 #include "Log.h"
 #include "keyframe/KeyframeTrack.h"
 
@@ -125,6 +126,7 @@ void Animation::addActionFrame(float startTime, TimeAction* action, Object* obje
 Animation::ActionFrame Animation::getActionFrame(unsigned int index){
     if (index >= actions.size()){
         Log::Error("ActionFrame index %i is not created", index);
+        return actions[0];
     }else{
         return actions[index];
     }

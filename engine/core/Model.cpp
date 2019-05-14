@@ -5,6 +5,7 @@
 #include "Log.h"
 #include "render/ObjectRender.h"
 #include <algorithm>
+#include <float.h>
 #include "tiny_obj_loader.h"
 #include "tiny_gltf.h"
 #include "util/ReadSModel.h"
