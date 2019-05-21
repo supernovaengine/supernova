@@ -1,6 +1,10 @@
 #ifndef model_h
 #define model_h
 
+//
+// (c) 2019 Eduardo Doria.
+//
+
 #include <vector>
 #include <map>
 #include "Mesh.h"
@@ -16,12 +20,10 @@ namespace Supernova {
 
     class Model: public Mesh {
 
-    public:
-        Animation anim;
-
     private:
         InterleavedBuffer buffer;
         IndexBuffer indices;
+        std::vector<Animation*> animations;
 
         const char* filename;
         std::string baseDir;
@@ -60,6 +62,11 @@ namespace Supernova {
 
         Bone* getBone(std::string name);
         void updateBone(int boneIndex, Matrix4 skinning);
+
+        Animation* getAnimation(int index);
+        Animation* findAnimation(std::string name);
+
+        void clearAnimations();
 
         Matrix4 getInverseDerivedTransform();
 

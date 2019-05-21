@@ -1,5 +1,9 @@
 #include "Model.h"
 
+//
+// (c) 2019 Eduardo Doria.
+//
+
 #include <istream>
 #include <sstream>
 #include "Log.h"
@@ -41,6 +45,8 @@ Model::Model(const char * path): Model() {
 Model::~Model() {
     if (gltfModel)
         delete gltfModel;
+
+    clearAnimations();
 }
 
 bool Model::fileExists(const std::string &abs_filename, void *) {
@@ -406,10 +412,15 @@ bool Model::loadGLTF(const char* filename) {
         }
     }
 
+    clearAnimations();
+
     for (size_t i = 0; i < gltfModel->animations.size(); i++) {
         const tinygltf::Animation &animation = gltfModel->animations[i];
 
-        //Log::Debug("Animation %s", animation.name.c_str());
+        Animation* anim = new Animation();
+        anim->setName(animation.name);
+
+        animations.push_back(anim);
 
         float startTime = FLT_MAX;
         float endTime = 0;
@@ -467,17 +478,17 @@ bool Model::loadGLTF(const char* filename) {
 
             if (track && bonesIdMapping.count(channel.target_node)) {
                 track->setDuration(trackEndTIme - trackStartTime);
-                anim.addActionFrame(trackStartTime, track, bonesIdMapping[channel.target_node]);
+                anim->addActionFrame(trackStartTime, track, bonesIdMapping[channel.target_node]);
             }
         }
 
-        if (anim.getStartTime() < startTime)
-            anim.setStartTime(startTime);
+        if (anim->getStartTime() < startTime)
+            anim->setStartTime(startTime);
 
-        if (anim.getEndTime() > endTime)
-            anim.setEndTime(endTime);
+        if (anim->getEndTime() > endTime)
+            anim->setEndTime(endTime);
 
-        addAction(&anim);
+        addAction(anim);
 
     }
 
@@ -627,6 +638,32 @@ Bone* Model::getBone(std::string name){
         return bonesNameMapping[name];
 
     return NULL;
+}
+
+Animation* Model::getAnimation(int index){
+    if (index >= 0 && index < animations.size()){
+        return animations[index];
+    }
+
+    Log::Error("Animation out of ranger");
+    return NULL;
+}
+
+Animation* Model::findAnimation(std::string name){
+    for (int i = 0; i < animations.size(); i++){
+        if (animations[i]->getName() == name){
+            return animations[i];
+        }
+    }
+
+    return NULL;
+}
+
+void Model::clearAnimations(){
+    for (int i = 0; i < animations.size(); i++){
+        delete animations[i];
+    }
+    animations.clear();
 }
 
 void Model::updateBone(int boneIndex, Matrix4 skinning){
