@@ -110,7 +110,15 @@ bool GLES2Object::load(){
         }else if (type == S_VERTEXATTRIBUTE_POINTROTATIONS){
             attribName = "a_pointRotation";
         }else if (type == S_VERTEXATTRIBUTE_TEXTURERECTS){
-            attribName = "a_textureRect";            
+            attribName = "a_textureRect";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHTARGET0){
+            attribName = "a_morphTarget0";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHTARGET1){
+            attribName = "a_morphTarget1";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHTARGET2){
+            attribName = "a_morphTarget2";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHTARGET3){
+            attribName = "a_morphTarget3";
         }
 
         attributesGL[type].handle = glGetAttribLocation(glesProgram, attribName.c_str());

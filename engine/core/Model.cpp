@@ -349,6 +349,8 @@ bool Model::loadGLTF(const char* filename) {
             if (attrib.first.compare("NORMAL") == 0){
                 attType = S_VERTEXATTRIBUTE_NORMALS;
             }
+            if (attrib.first.compare("TANGENT") == 0){
+            }
             if (attrib.first.compare("TEXCOORD_0") == 0){
                 attType = S_VERTEXATTRIBUTE_TEXTURECOORDS;
             }
@@ -358,11 +360,71 @@ bool Model::loadGLTF(const char* filename) {
             if (attrib.first.compare("WEIGHTS_0") == 0){
                 attType = S_VERTEXATTRIBUTE_BONEWEIGHTS;
             }
+
             if (attType > -1) {
                 buffers[bufferName]->setRenderAttributes(false);
                 submeshes.back()->addAttribute(bufferName, attType, elements, dataType, byteStride, accessor.byteOffset);
             } else
                 Log::Warn("Model attribute missing: %s", attrib.first.c_str());
+        }
+
+        int morphIndex = 0;
+        for (auto &morphs : primitive.targets) {
+            for (auto &attribMorph : morphs) {
+
+                tinygltf::Accessor accessor = gltfModel->accessors[attribMorph.second];
+                int byteStride = accessor.ByteStride(gltfModel->bufferViews[accessor.bufferView]);
+                std::string bufferName = getBufferName(accessor.bufferView);
+
+                loadGLTFBuffer(accessor.bufferView);
+
+                int elements = 1;
+                if (accessor.type != TINYGLTF_TYPE_SCALAR) {
+                    elements = accessor.type;
+                }
+
+                DataType dataType;
+
+                if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_BYTE){
+                    dataType = DataType::BYTE;
+                }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE){
+                    dataType = DataType::UNSIGNED_BYTE;
+                }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_SHORT){
+                    dataType = DataType::SHORT;
+                }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT){
+                    dataType = DataType::UNSIGNED_SHORT;
+                }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT){
+                    dataType = DataType::UNSIGNED_INT;
+                }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT){
+                    dataType = DataType::FLOAT;
+                }else{
+                    Log::Error("Unknown data type %i of morph target %s", accessor.componentType, attribMorph.first.c_str());
+                    continue;
+                }
+
+                int attType = -1;
+                if (attribMorph.first.compare("POSITION") == 0){
+                    if (morphIndex == 0){
+                        attType = S_VERTEXATTRIBUTE_MORPHTARGET0;
+                    } else if (morphIndex == 1){
+                        attType = S_VERTEXATTRIBUTE_MORPHTARGET1;
+                    } else if (morphIndex == 2){
+                        attType = S_VERTEXATTRIBUTE_MORPHTARGET2;
+                    } else if (morphIndex == 3){
+                        attType = S_VERTEXATTRIBUTE_MORPHTARGET3;
+                    }
+                }
+                if (attribMorph.first.compare("NORMAL") == 0){
+                }
+                if (attribMorph.first.compare("TANGENT") == 0){
+                }
+
+                if (attType > -1) {
+                    buffers[bufferName]->setRenderAttributes(false);
+                    submeshes.back()->addAttribute(bufferName, attType, elements, dataType, byteStride, accessor.byteOffset);
+                }
+            }
+            morphIndex++;
         }
     }
 
