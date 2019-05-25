@@ -25,10 +25,12 @@ namespace Supernova {
         std::vector<SubMesh*> submeshes;
 
         std::vector<Matrix4> bonesMatrix;
+        std::vector<float> morphWeights;
         
         bool skymesh;
         bool textmesh;
         bool skinning;
+        bool morphTargets;
         bool dynamic;
 
         int primitiveType;

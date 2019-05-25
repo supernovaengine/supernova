@@ -391,6 +391,15 @@ std::string gVertexMeshPerPixelLightShader =
 
 "attribute vec3 a_Position;\n"
 
+"#ifdef USE_MORPHTARGET\n"
+"  attribute vec3 a_morphTarget0;\n"
+"  attribute vec3 a_morphTarget1;\n"
+"  attribute vec3 a_morphTarget2;\n"
+"  attribute vec3 a_morphTarget3;\n"
+
+"  uniform float u_morphWeights[4];\n"
+"#endif\n"
+
 "#ifdef HAS_SKINNING\n"
 "  attribute vec4 a_BoneWeights;\n"
 "  attribute vec4 a_BoneIds;\n"
@@ -411,7 +420,16 @@ std::string gVertexMeshPerPixelLightShader =
 
 "void main(){\n"
 
-"    vec4 PosL = vec4(a_Position, 1.0);\n"
+"    vec3 morphPosition = a_Position;\n"
+
+"    #ifdef USE_MORPHTARGET\n"
+"      morphPosition += (u_morphWeights[0] * a_morphTarget0);\n"
+"      morphPosition += (u_morphWeights[1] * a_morphTarget1);\n"
+"      morphPosition += (u_morphWeights[2] * a_morphTarget2);\n"
+"      morphPosition += (u_morphWeights[3] * a_morphTarget3);\n"
+"    #endif\n"
+
+"    vec4 PosL = vec4(morphPosition, 1.0);\n"
 
 "    #ifdef HAS_SKINNING\n"
 "      mat4 BoneTransform = u_bonesMatrix[int(a_BoneIds[0])] * a_BoneWeights[0];\n"
@@ -497,13 +515,27 @@ std::string gVertexDepthRTTShader =
 "uniform mat4 u_mMatrix;\n"
 "attribute vec3 a_Position;\n"
 "varying vec3 v_position;\n"
+"#ifdef USE_MORPHTARGET\n"
+"  attribute vec3 a_morphTarget0;\n"
+"  attribute vec3 a_morphTarget1;\n"
+"  attribute vec3 a_morphTarget2;\n"
+"  attribute vec3 a_morphTarget3;\n"
+"  uniform float u_morphWeights[4];\n"
+"#endif\n"
 "#ifdef HAS_SKINNING\n"
 "  attribute vec4 a_BoneWeights;\n"
 "  attribute vec4 a_BoneIds;\n"
 "  uniform mat4 u_bonesMatrix[MAXBONES];\n"
 "#endif\n"
 "void main(){\n"
-"    vec4 PosL = vec4(a_Position, 1.0);\n"
+"    vec3 morphPosition = a_Position;\n"
+"    #ifdef USE_MORPHTARGET\n"
+"      morphPosition += (u_morphWeights[0] * a_morphTarget0);\n"
+"      morphPosition += (u_morphWeights[1] * a_morphTarget1);\n"
+"      morphPosition += (u_morphWeights[2] * a_morphTarget2);\n"
+"      morphPosition += (u_morphWeights[3] * a_morphTarget3);\n"
+"    #endif\n"
+"    vec4 PosL = vec4(morphPosition, 1.0);\n"
 "    #ifdef HAS_SKINNING\n"
 "      mat4 BoneTransform = u_bonesMatrix[int(a_BoneIds[0])] * a_BoneWeights[0];\n"
 "      BoneTransform += u_bonesMatrix[int(a_BoneIds[1])] * a_BoneWeights[1];\n"

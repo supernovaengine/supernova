@@ -368,9 +368,13 @@ bool Model::loadGLTF(const char* filename) {
                 Log::Warn("Model attribute missing: %s", attrib.first.c_str());
         }
 
+        morphTargets = false;
+
         int morphIndex = 0;
         for (auto &morphs : primitive.targets) {
             for (auto &attribMorph : morphs) {
+
+                morphTargets = true;
 
                 tinygltf::Accessor accessor = gltfModel->accessors[attribMorph.second];
                 int byteStride = accessor.ByteStride(gltfModel->bufferViews[accessor.bufferView]);
@@ -425,6 +429,15 @@ bool Model::loadGLTF(const char* filename) {
                 }
             }
             morphIndex++;
+        }
+
+        if (morphTargets){
+            morphWeights.resize(4);
+            for (int w = 0; w < mesh.weights.size(); w++) {
+                if (w < 4){
+                    morphWeights[w] = mesh.weights[w];
+                }
+            }
         }
     }
 
@@ -726,6 +739,23 @@ void Model::clearAnimations(){
         delete animations[i];
     }
     animations.clear();
+}
+
+float Model::getMorphWeight(int index){
+    if (index >= 0 && index < morphWeights.size()){
+        return morphWeights[index];
+    }
+
+    Log::Error("Morph target %i out of index", index);
+    return 0;
+}
+
+void Model::setMorphWeight(int index, float value){
+    if (index >= 0 && index < morphWeights.size()){
+        morphWeights[index] = value;
+    }
+
+    Log::Error("Morph target %i out of index", index);
 }
 
 void Model::updateBone(int boneIndex, Matrix4 skinning){

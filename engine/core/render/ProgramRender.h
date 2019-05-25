@@ -75,6 +75,8 @@
 
 #define S_PROPERTY_BONESMATRIX 42
 
+#define S_PROPERTY_MORPHWEIGHTS 43
+
 #define S_TEXTURESAMPLER_DIFFUSE 1
 #define S_TEXTURESAMPLER_SHADOWMAP2D 2
 #define S_TEXTURESAMPLER_SHADOWMAPCUBE 3
@@ -84,8 +86,9 @@
 #define S_PROGRAM_USE_TEXRECT  1 << 2
 #define S_PROGRAM_USE_TEXCUBE  1 << 3
 #define S_PROGRAM_USE_SKINNING  1 << 4
-#define S_PROGRAM_IS_SKY  1 << 5
-#define S_PROGRAM_IS_TEXT  1 << 6
+#define S_PROGRAM_USE_MORPHTARGET  1 << 5
+#define S_PROGRAM_IS_SKY  1 << 6
+#define S_PROGRAM_IS_TEXT  1 << 7
 
 #include <string>
 #include <unordered_map>

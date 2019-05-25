@@ -174,12 +174,26 @@ void ObjectRender::checkTextureCube(){
     }
 }
 
+void ObjectRender::checkSkinning(){
+    if (properties.count(S_PROPERTY_BONESMATRIX)) {
+        programDefs |= S_PROGRAM_USE_SKINNING;
+    }
+}
+
+void ObjectRender::checkMorphTarget(){
+    if (vertexAttributes.count(S_VERTEXATTRIBUTE_MORPHTARGET0)) {
+        programDefs |= S_PROGRAM_USE_MORPHTARGET;
+    }
+}
+
 void ObjectRender::loadProgram(){
     checkLighting();
     checkFog();
     checkTextureCoords();
     checkTextureRect();
     checkTextureCube();
+    checkSkinning();
+    checkMorphTarget();
 
     std::string shaderStr = std::to_string(programShader);
     shaderStr += "|" + std::to_string(programDefs);

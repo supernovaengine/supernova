@@ -93,6 +93,9 @@ void GLES2Program::createProgram(int shaderType, int programDefs, int numLights,
     if (programDefs & S_PROGRAM_USE_SKINNING){
         definitions += "#define HAS_SKINNING\n";
     }
+    if (programDefs & S_PROGRAM_USE_MORPHTARGET){
+        definitions += "#define USE_MORPHTARGET\n";
+    }
     if (programDefs & S_PROGRAM_IS_SKY){
         definitions += "#define IS_SKY\n";
     }

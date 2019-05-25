@@ -13,6 +13,7 @@ Mesh::Mesh(): GraphicObject(){
     skymesh = false;
     textmesh = false;
     skinning = false;
+    morphTargets = false;
     dynamic = false;
 
     defaultBuffer = "vertices";
@@ -143,13 +144,14 @@ bool Mesh::shadowLoad(){
     shadowRender->setProgramShader(S_SHADER_DEPTH_RTT);
 
     int progamDefs = 0;
-    if (skinning)
-        progamDefs |= S_PROGRAM_USE_SKINNING;
-
     shadowRender->setProgramDefs(progamDefs);
 
     if (skinning){
         shadowRender->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
+    }
+
+    if (morphTargets){
+        shadowRender->addProperty(S_PROPERTY_MORPHWEIGHTS, S_PROPERTYDATA_FLOAT1, morphWeights.size(), &morphWeights.front());
     }
 
     prepareShadowRender();
@@ -193,6 +195,7 @@ bool Mesh::load(){
 
     render->setProgramShader(S_SHADER_MESH);
 
+    //TODO: Remove here and add in ObjectRender
     int progamDefs = 0;
     if (hasTextureCoords)
         progamDefs |= S_PROGRAM_USE_TEXCOORD;
@@ -200,8 +203,6 @@ bool Mesh::load(){
         progamDefs |= S_PROGRAM_USE_TEXRECT;
     if (hasTextureCube)
         progamDefs |= S_PROGRAM_USE_TEXCUBE;
-    if (skinning)
-        progamDefs |= S_PROGRAM_USE_SKINNING;
     if (isSky())
         progamDefs |= S_PROGRAM_IS_SKY;
     if (isText())
@@ -211,6 +212,10 @@ bool Mesh::load(){
 
     if (skinning){
         render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
+    }
+
+    if (morphTargets){
+        render->addProperty(S_PROPERTY_MORPHWEIGHTS, S_PROPERTYDATA_FLOAT1, morphWeights.size(), &morphWeights.front());
     }
 
     prepareRender();

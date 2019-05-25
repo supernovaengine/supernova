@@ -66,6 +66,9 @@ namespace Supernova {
         Animation* getAnimation(int index);
         Animation* findAnimation(std::string name);
 
+        float getMorphWeight(int index);
+        void setMorphWeight(int index, float value);
+
         void clearAnimations();
 
         Matrix4 getInverseDerivedTransform();

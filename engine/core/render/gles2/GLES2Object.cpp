@@ -235,6 +235,8 @@ bool GLES2Object::load(){
             propertyName = "u_shadowNumCascades2D";
         }else if (type == S_PROPERTY_BONESMATRIX){
             propertyName = "u_bonesMatrix";
+        }else if (type == S_PROPERTY_MORPHWEIGHTS){
+            propertyName = "u_morphWeights";
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());
