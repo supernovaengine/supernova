@@ -119,6 +119,22 @@ bool GLES2Object::load(){
             attribName = "a_morphTarget2";
         }else if (type == S_VERTEXATTRIBUTE_MORPHTARGET3){
             attribName = "a_morphTarget3";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHTARGET4){
+            attribName = "a_morphTarget4";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHTARGET5){
+            attribName = "a_morphTarget5";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHTARGET6){
+            attribName = "a_morphTarget6";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHTARGET7){
+            attribName = "a_morphTarget7";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHNORMAL0){
+            attribName = "a_morphNormal0";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHNORMAL1){
+            attribName = "a_morphNormal1";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHNORMAL2){
+            attribName = "a_morphNormal2";
+        }else if (type == S_VERTEXATTRIBUTE_MORPHNORMAL3){
+            attribName = "a_morphNormal3";
         }
 
         attributesGL[type].handle = glGetAttribLocation(glesProgram, attribName.c_str());

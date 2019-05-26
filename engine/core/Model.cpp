@@ -369,6 +369,7 @@ bool Model::loadGLTF(const char* filename) {
         }
 
         morphTargets = false;
+        bool morphNormals = false;
 
         int morphIndex = 0;
         for (auto &morphs : primitive.targets) {
@@ -417,8 +418,29 @@ bool Model::loadGLTF(const char* filename) {
                     } else if (morphIndex == 3){
                         attType = S_VERTEXATTRIBUTE_MORPHTARGET3;
                     }
+                    if (!morphNormals){
+                        if (morphIndex == 4){
+                            attType = S_VERTEXATTRIBUTE_MORPHTARGET4;
+                        } else if (morphIndex == 5){
+                            attType = S_VERTEXATTRIBUTE_MORPHTARGET5;
+                        } else if (morphIndex == 6){
+                            attType = S_VERTEXATTRIBUTE_MORPHTARGET6;
+                        } else if (morphIndex == 7){
+                            attType = S_VERTEXATTRIBUTE_MORPHTARGET7;
+                        }
+                    }
                 }
                 if (attribMorph.first.compare("NORMAL") == 0){
+                    morphNormals = true;
+                    if (morphIndex == 0){
+                        attType = S_VERTEXATTRIBUTE_MORPHNORMAL0;
+                    } else if (morphIndex == 1){
+                        attType = S_VERTEXATTRIBUTE_MORPHNORMAL1;
+                    } else if (morphIndex == 2){
+                        attType = S_VERTEXATTRIBUTE_MORPHNORMAL2;
+                    } else if (morphIndex == 3){
+                        attType = S_VERTEXATTRIBUTE_MORPHNORMAL3;
+                    }
                 }
                 if (attribMorph.first.compare("TANGENT") == 0){
                 }
@@ -431,10 +453,15 @@ bool Model::loadGLTF(const char* filename) {
             morphIndex++;
         }
 
+        int morphWeightSize = 8;
+        if (morphNormals){
+            morphWeightSize = 4;
+        }
+
         if (morphTargets){
-            morphWeights.resize(4);
+            morphWeights.resize(morphWeightSize);
             for (int w = 0; w < mesh.weights.size(); w++) {
-                if (w < 4){
+                if (w < morphWeightSize){
                     morphWeights[w] = mesh.weights[w];
                 }
             }
@@ -753,9 +780,9 @@ float Model::getMorphWeight(int index){
 void Model::setMorphWeight(int index, float value){
     if (index >= 0 && index < morphWeights.size()){
         morphWeights[index] = value;
+    }else {
+        Log::Error("Morph target %i out of index", index);
     }
-
-    Log::Error("Morph target %i out of index", index);
 }
 
 void Model::updateBone(int boneIndex, Matrix4 skinning){

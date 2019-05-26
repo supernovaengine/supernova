@@ -96,6 +96,9 @@ void GLES2Program::createProgram(int shaderType, int programDefs, int numLights,
     if (programDefs & S_PROGRAM_USE_MORPHTARGET){
         definitions += "#define USE_MORPHTARGET\n";
     }
+    if (programDefs & S_PROGRAM_USE_MORPHNORMAL){
+        definitions += "#define USE_MORPHNORMAL\n";
+    }
     if (programDefs & S_PROGRAM_IS_SKY){
         definitions += "#define IS_SKY\n";
     }

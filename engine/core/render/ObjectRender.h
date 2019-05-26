@@ -45,6 +45,7 @@ namespace Supernova {
         void checkTextureCube();
         void checkSkinning();
         void checkMorphTarget();
+        void checkMorphNormal();
         void loadProgram();
         
     

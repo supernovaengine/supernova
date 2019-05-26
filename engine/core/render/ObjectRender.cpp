@@ -186,6 +186,12 @@ void ObjectRender::checkMorphTarget(){
     }
 }
 
+void ObjectRender::checkMorphNormal(){
+    if (vertexAttributes.count(S_VERTEXATTRIBUTE_MORPHNORMAL0)) {
+        programDefs |= S_PROGRAM_USE_MORPHNORMAL;
+    }
+}
+
 void ObjectRender::loadProgram(){
     checkLighting();
     checkFog();
@@ -194,6 +200,7 @@ void ObjectRender::loadProgram(){
     checkTextureCube();
     checkSkinning();
     checkMorphTarget();
+    checkMorphNormal();
 
     std::string shaderStr = std::to_string(programShader);
     shaderStr += "|" + std::to_string(programDefs);
