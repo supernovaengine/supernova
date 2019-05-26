@@ -10,7 +10,7 @@
 
 namespace Supernova {
 
-    class RotateTracks: public KeyframeTrack  {
+    class RotateTracks: public KeyframeTrack {
 
     protected:
         std::vector<Quaternion> values;
