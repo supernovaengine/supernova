@@ -11,17 +11,15 @@ namespace Supernova {
     class MorphTracks: public KeyframeTrack {
 
     protected:
-        std::vector<float> values;
-        int morphIndex;
+        std::vector<std::vector<float>> values;
 
     public:
         MorphTracks();
-        MorphTracks(int morphIndex, std::vector<float> times, std::vector<float> values);
+        MorphTracks(std::vector<float> times, std::vector<std::vector<float>> values);
 
-        void setMorphIndex(int morphIndex);
-        void setValues(std::vector<float> values);
+        void setValues(std::vector<std::vector<float>> values);
 
-        void addKeyframe(float time, float value);
+        void addKeyframe(float time, std::vector<float>);
 
         virtual bool update(float interval);
     };

@@ -21,6 +21,7 @@
 #include "action/keyframe/TranslateTracks.h"
 #include "action/keyframe/RotateTracks.h"
 #include "action/keyframe/ScaleTracks.h"
+#include "action/keyframe/MorphTracks.h"
 
 using namespace Supernova;
 
@@ -577,10 +578,25 @@ bool Model::loadGLTF(const char* filename) {
                     ((ScaleTracks*)track)->addKeyframe(timeValues[c], scaleAc);
                 }
             }
+            if (channel.target_path.compare("weights") == 0) {
+                track = new MorphTracks();
+                int morphNum = accessorOut.count / accessorIn.count;
+                for (int c = 0; c < accessorIn.count; c++){
+                    std::vector<float> weightsAc;
+                    for (int m = 0; m < morphNum; m++){
+                        weightsAc.push_back(values[morphNum * c] + m);
+                    }
+                    ((MorphTracks*)track)->addKeyframe(timeValues[c], weightsAc);
+                }
+            }
 
-            if (track && bonesIdMapping.count(channel.target_node)) {
+            if (track){
                 track->setDuration(trackEndTIme - trackStartTime);
-                anim->addActionFrame(trackStartTime, track, bonesIdMapping[channel.target_node]);
+                if (bonesIdMapping.count(channel.target_node)) {
+                    anim->addActionFrame(trackStartTime, track, bonesIdMapping[channel.target_node]);
+                }else{
+                    anim->addActionFrame(trackStartTime, track, this);
+                }
             }
         }
 
