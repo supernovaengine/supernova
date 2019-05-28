@@ -27,7 +27,7 @@ std::vector<float> KeyframeTrack::getTimes(){
 }
 
 bool KeyframeTrack::stop(){
-    if (!Action::stop())
+    if (!TimeAction::stop())
         return false;
 
     index = 0;
