@@ -12,6 +12,8 @@ project/assets/*
 # Icon must end with two \r
 Icon
 
+# Visual Studio Code
+.vscode
 
 # Thumbnails
 ._*
