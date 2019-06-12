@@ -203,6 +203,21 @@ bool GraphicObject::draw(){
 
     bool drawReturn = false;
 
+    if (scene && scene->isDrawingShadow()){
+        shadowDraw();
+    }else{
+        if (transparent && scene && scene->useDepth && distanceToCamera >= 0){
+            scene->transparentQueue.insert(std::make_pair(distanceToCamera, this));
+        }else{
+            if (visible)
+                renderDraw();
+        }
+
+        if (transparent){
+            setSceneTransparency(true);
+        }
+    }
+
     if (!scissor.isZero() && scene){
 
         SceneRender* sceneRender = scene->getSceneRender();
@@ -222,21 +237,6 @@ bool GraphicObject::draw(){
     }else{
 
         drawReturn = Object::draw();
-    }
-
-    if (scene && scene->isDrawingShadow()){
-        shadowDraw();
-    }else{
-        if (transparent && scene && scene->useDepth && distanceToCamera >= 0){
-            scene->transparentQueue.insert(std::make_pair(distanceToCamera, this));
-        }else{
-            if (visible)
-                renderDraw();
-        }
-
-        if (transparent){
-            setSceneTransparency(true);
-        }
     }
 
     return drawReturn;
