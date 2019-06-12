@@ -38,6 +38,8 @@ namespace Supernova {
         std::map<std::string, Bone*> bonesNameMapping;
         std::map<int, Bone*> bonesIdMapping;
 
+        std::map<std::string, int> morphNameMapping;
+
         Bone* generateSketetalStructure(int nodeIndex, int skinIndex);
         Bone* findBone(Bone* bone, int boneIndex);
 
@@ -67,7 +69,10 @@ namespace Supernova {
         Animation* findAnimation(std::string name);
 
         float getMorphWeight(int index);
+        float getMorphWeight(std::string name);
+
         void setMorphWeight(int index, float value);
+        void setMorphWeight(std::string name, float value);
 
         void clearAnimations();
 

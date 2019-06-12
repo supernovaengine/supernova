@@ -236,9 +236,10 @@ bool Model::loadGLTF(const char* filename) {
         return false;
     }
 
-    for (size_t i = 0; i < gltfModel->meshes[meshIndex].primitives.size(); i++) {
+    tinygltf::Mesh mesh = gltfModel->meshes[meshIndex];
 
-        tinygltf::Mesh mesh = gltfModel->meshes[meshIndex];
+    for (size_t i = 0; i < mesh.primitives.size(); i++) {
+
         tinygltf::Primitive primitive = mesh.primitives[i];
         tinygltf::Accessor indexAccessor = gltfModel->accessors[primitive.indices];
         tinygltf::Material &mat = gltfModel->materials[primitive.material];
@@ -466,6 +467,14 @@ bool Model::loadGLTF(const char* filename) {
                     morphWeights[w] = mesh.weights[w];
                 }
             }
+
+            //Getting morph target names from mesh extra property
+            morphNameMapping.clear();
+            if (mesh.extras.Has("targetNames") && mesh.extras.Get("targetNames").IsArray()){
+                for (int t = 0; t < mesh.extras.Get("targetNames").Size(); t++){
+                    morphNameMapping[mesh.extras.Get("targetNames").Get(t).Get<std::string>()] = t;
+                }
+            }
         }
     }
 
@@ -539,64 +548,75 @@ bool Model::loadGLTF(const char* filename) {
             tinygltf::Accessor accessorOut = gltfModel->accessors[sampler.output];
             tinygltf::BufferView bufferViewOut = gltfModel->bufferViews[accessorOut.bufferView];
 
-            if (accessorIn.count != accessorOut.count){
-                Log::Error("Incorret frame size in animation: %s, sampler: %i", animation.name.c_str(), channel.sampler);
-            }
+            //TODO: Implement rotation and weights non float
+            if (accessorOut.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT) {
 
-            float *timeValues = (float *) (&gltfModel->buffers[bufferViewIn.buffer].data.at(0) + bufferViewIn.byteOffset + accessorIn.byteOffset);
-            float *values = (float *) (&gltfModel->buffers[bufferViewOut.buffer].data.at(0) + bufferViewOut.byteOffset + accessorOut.byteOffset);
-
-            float trackStartTime = timeValues[0];
-            float trackEndTIme = timeValues[accessorIn.count-1];
-
-            if (trackStartTime < startTime)
-                startTime = trackStartTime;
-
-            if (trackEndTIme > endTime)
-                endTime = trackEndTIme;
-
-            KeyframeTrack* track = NULL;
-
-            if (channel.target_path.compare("translation") == 0) {
-                track = new TranslateTracks();
-                for (int c = 0; c < accessorIn.count; c++){
-                    Vector3 positionAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
-                    ((TranslateTracks*)track)->addKeyframe(timeValues[c], positionAc);
+                if (accessorIn.count != accessorOut.count) {
+                    Log::Error("Incorrect frame size in animation: %s, sampler: %i",
+                               animation.name.c_str(), channel.sampler);
                 }
-            }
-            if (channel.target_path.compare("rotation") == 0) {
-                track = new RotateTracks();
-                for (int c = 0; c < accessorIn.count; c++){
-                    Quaternion rotationAc(values[(4 * c) + 3], values[4 * c], values[(4 * c) + 1], values[(4 * c) + 2]);
-                    ((RotateTracks*)track)->addKeyframe(timeValues[c], rotationAc);
-                }
-            }
-            if (channel.target_path.compare("scale") == 0) {
-                track = new ScaleTracks();
-                for (int c = 0; c < accessorIn.count; c++){
-                    Vector3 scaleAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
-                    ((ScaleTracks*)track)->addKeyframe(timeValues[c], scaleAc);
-                }
-            }
-            if (channel.target_path.compare("weights") == 0) {
-                track = new MorphTracks();
-                int morphNum = accessorOut.count / accessorIn.count;
-                for (int c = 0; c < accessorIn.count; c++){
-                    std::vector<float> weightsAc;
-                    for (int m = 0; m < morphNum; m++){
-                        weightsAc.push_back(values[morphNum * c] + m);
+
+                float *timeValues = (float *) (&gltfModel->buffers[bufferViewIn.buffer].data.at(0) +
+                                               bufferViewIn.byteOffset + accessorIn.byteOffset);
+                float *values = (float *) (&gltfModel->buffers[bufferViewOut.buffer].data.at(0) +
+                                           bufferViewOut.byteOffset + accessorOut.byteOffset);
+
+                float trackStartTime = timeValues[0];
+                float trackEndTIme = timeValues[accessorIn.count - 1];
+
+                if (trackStartTime < startTime)
+                    startTime = trackStartTime;
+
+                if (trackEndTIme > endTime)
+                    endTime = trackEndTIme;
+
+                KeyframeTrack *track = NULL;
+
+                if (channel.target_path.compare("translation") == 0) {
+                    track = new TranslateTracks();
+                    for (int c = 0; c < accessorIn.count; c++) {
+                        Vector3 positionAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
+                        ((TranslateTracks *) track)->addKeyframe(timeValues[c], positionAc);
                     }
-                    ((MorphTracks*)track)->addKeyframe(timeValues[c], weightsAc);
                 }
-            }
+                if (channel.target_path.compare("rotation") == 0) {
+                    track = new RotateTracks();
+                    for (int c = 0; c < accessorIn.count; c++) {
+                        Quaternion rotationAc(values[(4 * c) + 3], values[4 * c],
+                                              values[(4 * c) + 1], values[(4 * c) + 2]);
+                        ((RotateTracks *) track)->addKeyframe(timeValues[c], rotationAc);
+                    }
+                }
+                if (channel.target_path.compare("scale") == 0) {
+                    track = new ScaleTracks();
+                    for (int c = 0; c < accessorIn.count; c++) {
+                        Vector3 scaleAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
+                        ((ScaleTracks *) track)->addKeyframe(timeValues[c], scaleAc);
+                    }
+                }
+                if (channel.target_path.compare("weights") == 0) {
+                    track = new MorphTracks();
+                    int morphNum = accessorOut.count / accessorIn.count;
+                    for (int c = 0; c < accessorIn.count; c++) {
+                        std::vector<float> weightsAc;
+                        for (int m = 0; m < morphNum; m++) {
+                            weightsAc.push_back(values[morphNum * c] + m);
+                        }
+                        ((MorphTracks *) track)->addKeyframe(timeValues[c], weightsAc);
+                    }
+                }
 
-            if (track){
-                track->setDuration(trackEndTIme - trackStartTime);
-                if (bonesIdMapping.count(channel.target_node)) {
-                    anim->addActionFrame(trackStartTime, track, bonesIdMapping[channel.target_node]);
-                }else{
-                    anim->addActionFrame(trackStartTime, track, this);
+                if (track) {
+                    track->setDuration(trackEndTIme - trackStartTime);
+                    if (bonesIdMapping.count(channel.target_node)) {
+                        anim->addActionFrame(trackStartTime, track, bonesIdMapping[channel.target_node]);
+                    } else {
+                        anim->addActionFrame(trackStartTime, track, this);
+                    }
                 }
+
+            }else{
+                Log::Error("Cannot load animation: %s, channel %i: no float elements", animation.name.c_str(), j);
             }
         }
 
@@ -793,11 +813,28 @@ float Model::getMorphWeight(int index){
     return 0;
 }
 
+float Model::getMorphWeight(std::string name){
+    if (morphNameMapping.count(name)){
+        return getMorphWeight(morphNameMapping[name]);
+    }
+
+    Log::Error("Morph target %s not exist", name.c_str());
+    return 0;
+}
+
 void Model::setMorphWeight(int index, float value){
     if (index >= 0 && index < morphWeights.size()){
         morphWeights[index] = value;
-    }else {
+    }else{
         Log::Error("Morph target %i out of index", index);
+    }
+}
+
+void Model::setMorphWeight(std::string name, float value){
+    if (morphNameMapping.count(name)) {
+        setMorphWeight(morphNameMapping[name], value);
+    }else{
+        Log::Error("Morph target %s not exist", name.c_str());
     }
 }
 
