@@ -705,7 +705,11 @@ bool Model::loadOBJ(const char* filename){
         Attribute* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
 
         std::vector<std::vector<unsigned int>> indexMap;
-        indexMap.resize(materials.size());
+        if (materials.size() > 0) {
+            indexMap.resize(materials.size());
+        }else{
+            indexMap.resize(1);
+        }
 
         for (size_t i = 0; i < shapes.size(); i++) {
 
