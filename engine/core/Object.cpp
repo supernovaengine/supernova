@@ -393,7 +393,7 @@ void Object::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     this->projectionMatrix = projectionMatrix;
     this->viewProjectionMatrix = viewProjectionMatrix;
     this->cameraPosition = *cameraPosition;
-    
+
     updateMVPMatrix();
     
     std::vector<Object*>::iterator it;
@@ -552,6 +552,10 @@ void Object::updateFromBody(){
 
 bool Object::isLoaded(){
     return loaded;
+}
+
+bool Object::isMarkToUpdate(){
+    return markToUpdate;
 }
 
 bool Object::reload(){

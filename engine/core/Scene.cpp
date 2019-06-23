@@ -230,11 +230,10 @@ void Scene::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matri
 
 void Scene::setCamera(Camera* camera){
     if (camera && (camera != this->camera)) {
-        if (this->camera)
-            this->camera->setLinkedScene(NULL);
         this->camera = camera;
-        this->camera->setLinkedScene(this);
+
         userCamera = true;
+
         if (loaded)
             this->camera->needUpdate();
     }
@@ -280,7 +279,6 @@ bool Scene::updateCameraSize(){
 void Scene::doCamera(){
     if (this->camera == NULL){
         this->camera = new Camera(S_CAMERA_2D);
-        this->camera->setLinkedScene(this);
     }
 }
 
@@ -352,15 +350,15 @@ void Scene::setTextureFrame(Texture* textureFrame){
     }
 }
 
-bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
+bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace) {
     if (textureFrame == NULL) {
         render->viewSize(*Engine::getViewRect());
         if (!childScene)
             render->clear();
-    }else{
+    } else {
         if (cubeMap) {
             textureFrame->getTextureRender()->initTextureFrame(cubeFace);
-        }else{
+        } else {
             textureFrame->getTextureRender()->initTextureFrame();
         }
 
@@ -372,7 +370,7 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
     }
 
     transparentQueue.clear();
-    
+
     if (!drawingShadow) {
         render->setUseTransparency(isUseTransparency());
         render->setUseLight(isUseLight());
@@ -380,7 +378,7 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
         render->setUseDepth(isUseDepth());
 
         resetSceneProperties();
-    }else{
+    } else {
         render->setUseTransparency(false);
         render->setUseLight(false);
         render->setChildScene(false);
@@ -390,8 +388,15 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace){
 
     bool drawreturn = render->draw();
 
-    if (camera && !camera->getParent()){
-        camera->draw();
+    if (camera){
+        bool cameraNeedUpdate = camera->isMarkToUpdate();
+
+        if (!camera->getParent())
+            camera->draw();
+
+        if (cameraNeedUpdate)
+            updateVPMatrix(camera->getViewMatrix(), camera->getProjectionMatrix(),
+                    camera->getViewProjectionMatrix(), camera->getWorldPositionPtr());
     }
 
     Object::draw();

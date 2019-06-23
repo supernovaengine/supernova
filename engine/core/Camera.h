@@ -45,10 +45,8 @@ namespace Supernova {
         float perspectiveFar;
 
         int type;
-        
-        bool automatic;
 
-        Scene* linkedScene;
+        bool automatic;
 
     public:
 
@@ -99,13 +97,12 @@ namespace Supernova {
         void walkForward(float distance);
         void slide(float distance);
 
-        void setLinkedScene(Scene* linkedScene);
-
         virtual void updateModelMatrix();
 
         Matrix4* getViewMatrix();
         Matrix4* getProjectionMatrix();
         Matrix4* getViewProjectionMatrix();
+        Vector3* getWorldPositionPtr();
 
         Ray pointsToRay(float normalized_x, float normalized_y);
 

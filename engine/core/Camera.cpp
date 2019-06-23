@@ -34,9 +34,6 @@ Camera::Camera() : Object(){
     type = S_CAMERA_PERSPECTIVE;
     
     automatic = true;
-
-    linkedScene = NULL;
-
 }
 
 Camera::Camera(const Camera &camera){
@@ -357,6 +354,10 @@ Matrix4* Camera::getViewProjectionMatrix(){
     return &viewProjectionMatrix;
 }
 
+Vector3* Camera::getWorldPositionPtr(){
+    return &worldPosition;
+}
+
 Ray Camera::pointsToRay(float x, float y) {
 
     float normalized_x, normalized_y;
@@ -389,10 +390,6 @@ Ray Camera::pointsToRay(float x, float y) {
     return Ray(near_point_ray, vector_between);
 }
 
-void Camera::setLinkedScene(Scene* linkedScene){
-    this->linkedScene = linkedScene;
-}
-
 void Camera::updateModelMatrix(){
     Object::updateModelMatrix();
 
@@ -419,8 +416,4 @@ void Camera::updateModelMatrix(){
     }
 
     viewProjectionMatrix = projectionMatrix * viewMatrix;
-
-    if (linkedScene && (linkedScene->getCamera() == this)){
-        linkedScene->updateVPMatrix(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);
-    }
 }

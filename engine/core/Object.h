@@ -115,6 +115,7 @@ namespace Supernova {
         
         bool isIn3DScene();
         bool isLoaded();
+        bool isMarkToUpdate();
 
         int find(Object* object);
         void moveTo(int index);
