@@ -8,7 +8,7 @@ namespace Supernova {
 
         int width;
         int height;
-        int size;
+        unsigned int size; //in bytes
         int color_format;
         int bitsPerPixel;
         void* data;
@@ -18,7 +18,7 @@ namespace Supernova {
     public:
 
         TextureData();
-        TextureData(int width, int height, int size, int color_format, int bitsPerPixel, void* data);
+        TextureData(int width, int height, unsigned int size, int color_format, int bitsPerPixel, void* data);
         TextureData(const TextureData& v);
         TextureData& operator = ( const TextureData& v );
         virtual ~TextureData();
@@ -35,7 +35,7 @@ namespace Supernova {
 
         int getWidth();
         int getHeight();
-        int getSize();
+        unsigned int getSize();
         int getColorFormat();
         int getBitsPerPixel();
         void* getData();

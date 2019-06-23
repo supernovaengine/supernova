@@ -14,7 +14,7 @@ TextureData::TextureData() {
     this->data = NULL;
 }
 
-TextureData::TextureData(int width, int height, int size, int color_format, int bitsPerPixel, void* data){
+TextureData::TextureData(int width, int height, unsigned int size, int color_format, int bitsPerPixel, void* data){
     this->width = width;
     this->height = height;
     this->size = size;
@@ -197,7 +197,7 @@ int TextureData::getHeight(){
     return height;
 }
 
-int TextureData::getSize(){
+unsigned int TextureData::getSize(){
     return size;
 }
 
