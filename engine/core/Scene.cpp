@@ -388,15 +388,12 @@ bool Scene::renderDraw(bool shadowMap, bool cubeMap, int cubeFace) {
 
     bool drawreturn = render->draw();
 
-    if (camera){
-        bool cameraNeedUpdate = camera->isMarkToUpdate();
+    if (camera && camera->isMarkToUpdate()){
+        if (!camera->getParent()) //Camera will not call draw()
+            camera->updateModelMatrix();
 
-        if (!camera->getParent())
-            camera->draw();
-
-        if (cameraNeedUpdate)
-            updateVPMatrix(camera->getViewMatrix(), camera->getProjectionMatrix(),
-                    camera->getViewProjectionMatrix(), camera->getWorldPositionPtr());
+        updateVPMatrix(camera->getViewMatrix(), camera->getProjectionMatrix(),
+                camera->getViewProjectionMatrix(), camera->getWorldPositionPtr());
     }
 
     Object::draw();
