@@ -390,9 +390,15 @@ Ray Camera::pointsToRay(float x, float y) {
     return Ray(near_point_ray, vector_between);
 }
 
-void Camera::updateModelMatrix(){
-    Object::updateModelMatrix();
+void Camera::updateViewMatrix(){
+    if (type == S_CAMERA_2D){
+        viewMatrix.identity();
+    }else{
+        viewMatrix = Matrix4::lookAtMatrix(worldPosition, worldView, worldUp);
+    }
+}
 
+void Camera::updateProjectionMatrix(){
     if (type == S_CAMERA_2D){ //use top-left orientation
         projectionMatrix = Matrix4::orthoMatrix(left, right, top, bottom, orthoNear, orthoFar);
     }else if (type == S_CAMERA_ORTHO){
@@ -400,6 +406,16 @@ void Camera::updateModelMatrix(){
     }else if (type == S_CAMERA_PERSPECTIVE){
         projectionMatrix = Matrix4::perspectiveMatrix(y_fov, aspect, perspectiveNear, perspectiveFar);
     }
+}
+
+void Camera::updateViewProjectionMatrix(){
+    viewProjectionMatrix = projectionMatrix * viewMatrix;
+}
+
+void Camera::updateModelMatrix(){
+    Object::updateModelMatrix();
+
+    updateProjectionMatrix();
 
     if (parent != NULL){
         worldView = modelMatrix * (view - position);
@@ -408,12 +424,8 @@ void Camera::updateModelMatrix(){
         worldView = view;
         worldUp = up;
     }
-    
-    if (type == S_CAMERA_2D){
-        viewMatrix.identity();
-    }else{
-        viewMatrix = Matrix4::lookAtMatrix(worldPosition, worldView, worldUp);
-    }
 
-    viewProjectionMatrix = projectionMatrix * viewMatrix;
+    updateViewMatrix();
+
+    updateViewProjectionMatrix();
 }

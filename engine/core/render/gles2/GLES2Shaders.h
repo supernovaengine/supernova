@@ -58,7 +58,7 @@ std::string lightingVertexImp =
 "            v_ShadowCoordinates[i] = vec4(0.0);\n"
 "        }\n"
 "    }\n"
-"    v_ClipSpacePosZ = position.z;\n"
+"    v_ClipSpacePosZ = position.z;\n" //The same of (gl_FragCoord.z / gl_FragCoord.w)
 "  #endif\n"
 
 "#endif\n";

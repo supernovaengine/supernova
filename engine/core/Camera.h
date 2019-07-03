@@ -97,6 +97,9 @@ namespace Supernova {
         void walkForward(float distance);
         void slide(float distance);
 
+        void updateViewMatrix();
+        void updateProjectionMatrix();
+        void updateViewProjectionMatrix();
         virtual void updateModelMatrix();
 
         Matrix4* getViewMatrix();

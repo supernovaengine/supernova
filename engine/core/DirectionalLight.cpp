@@ -113,8 +113,8 @@ void DirectionalLight::updateLightCamera(){
 
             for (int ca = 0; ca < numShadowCascades; ca++) {
 
-                lightCameras[ca]->setPosition(Vector3(0, 0, 0));
-                lightCameras[ca]->setView(getDirection());
+                lightCameras[ca]->setPosition(scene->getCamera()->getWorldPosition());
+                lightCameras[ca]->setView(getDirection() + scene->getCamera()->getWorldPosition());
 
                 //TODO: Check this
                 Vector3 cameraDirection = (lightCameras[ca]->getPosition() - lightCameras[ca]->getView()).normalize();
@@ -141,9 +141,12 @@ void DirectionalLight::updateLightCamera(){
 
                 }
 
+                lightCameras[ca]->updateModelMatrix();
+
                 configLightOrthoCamera(lightCameras[ca], sceneCameraInv);
 
-                lightCameras[ca]->updateModelMatrix();
+                lightCameras[ca]->updateProjectionMatrix();
+                lightCameras[ca]->updateViewProjectionMatrix();
 
                 depthVPMatrix[ca] = (*lightCameras[ca]->getViewProjectionMatrix());
 
@@ -158,9 +161,7 @@ void DirectionalLight::updateLightCamera(){
 void DirectionalLight::setDirection(Vector3 direction){
     if (this->direction != direction) {
         this->direction = direction;
-
-        updateLightCamera();
-
+        needUpdate();
     }
 }
 
