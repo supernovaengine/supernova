@@ -55,8 +55,7 @@ void TileMap::addRect(int id, std::string name, std::string texture, Rect rect){
         }
 
         if (!textureFound) {
-            this->submeshes.push_back(new SubMesh());
-            this->submeshes.back()->createNewMaterial();
+            this->submeshes.push_back(new Submesh());
             this->submeshes.back()->getMaterial()->setTexturePath(texture);
 
             submeshId = submeshes.size() - 1;

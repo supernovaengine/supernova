@@ -1,13 +1,32 @@
-#include "SubMesh.h"
+#include "Submesh.h"
 
 using namespace Supernova;
 
-SubMesh::SubMesh(){
+Submesh::Submesh(){
     this->render = NULL;
     this->shadowRender = NULL;
 
     this->distanceToCamera = -1;
-    this->material = NULL;
+    this->material = new Material();
+    this->materialOwned = true;
+    this->dynamic = false;
+
+    this->indices.setDataType(DataType::UNSIGNED_INT);
+
+    this->visible = true;
+    this->loaded = false;
+    this->renderOwned = true;
+    this->shadowRenderOwned = true;
+
+    this->minBufferSize = 0;
+}
+
+Submesh::Submesh(Material* material){
+    this->render = NULL;
+    this->shadowRender = NULL;
+
+    this->distanceToCamera = -1;
+    this->material = material;
     this->materialOwned = false;
     this->dynamic = false;
 
@@ -21,11 +40,7 @@ SubMesh::SubMesh(){
     this->minBufferSize = 0;
 }
 
-SubMesh::SubMesh(Material* material): SubMesh() {
-    this->material = material;
-}
-
-SubMesh::~SubMesh(){
+Submesh::~Submesh(){
     if (materialOwned)
         delete this->material;
     
@@ -39,7 +54,7 @@ SubMesh::~SubMesh(){
         destroy();
 }
 
-SubMesh::SubMesh(const SubMesh& s){
+Submesh::Submesh(const Submesh& s){
     this->distanceToCamera = s.distanceToCamera;
     this->materialOwned = s.materialOwned;
     this->material = s.material;
@@ -54,7 +69,7 @@ SubMesh::SubMesh(const SubMesh& s){
     this->minBufferSize = s.minBufferSize;
 }
 
-SubMesh& SubMesh::operator = (const SubMesh& s){
+Submesh& Submesh::operator = (const Submesh& s){
     this->distanceToCamera = s.distanceToCamera;
     this->materialOwned = s.materialOwned;
     this->material = s.material;
@@ -71,15 +86,15 @@ SubMesh& SubMesh::operator = (const SubMesh& s){
     return *this;
 }
 
-bool SubMesh::isDynamic(){
+bool Submesh::isDynamic(){
     return dynamic;
 }
 
-unsigned int SubMesh::getMinBufferSize(){
+unsigned int Submesh::getMinBufferSize(){
     return minBufferSize;
 }
 
-void SubMesh::setIndices(std::string bufferName, size_t size, size_t offset, DataType type){
+void Submesh::setIndices(std::string bufferName, size_t size, size_t offset, DataType type){
     this->indices.setBuffer(bufferName);
     this->indices.setCount(size);
     this->indices.setOffset(offset);
@@ -92,7 +107,7 @@ void SubMesh::setIndices(std::string bufferName, size_t size, size_t offset, Dat
         shadowRender->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
 }
 
-void SubMesh::addAttribute(std::string bufferName, int attribute, unsigned int elements, DataType dataType, unsigned int stride, size_t offset){
+void Submesh::addAttribute(std::string bufferName, int attribute, unsigned int elements, DataType dataType, unsigned int stride, size_t offset){
     Attribute attData;
 
     attData.setBuffer(bufferName);
@@ -110,20 +125,11 @@ void SubMesh::addAttribute(std::string bufferName, int attribute, unsigned int e
         shadowRender->addVertexAttribute(attribute, attData.getBuffer(), attData.getElements(), attData.getDataType(), attData.getStride(), attData.getOffset());
 }
 
-void SubMesh::createNewMaterial(){
-    this->material = new Material();
-    this->materialOwned = true;
-}
-
-void SubMesh::setMaterial(Material* material){
-    this->material = material;
-}
-
-Material* SubMesh::getMaterial(){
+Material* Submesh::getMaterial(){
     return this->material;
 }
 
-void SubMesh::setSubMeshRender(ObjectRender* render){
+void Submesh::setSubmeshRender(ObjectRender* render){
     if (this->render && this->renderOwned)
         delete this->render;
     
@@ -131,14 +137,14 @@ void SubMesh::setSubMeshRender(ObjectRender* render){
     renderOwned = false;
 }
 
-ObjectRender* SubMesh::getSubMeshRender(){
+ObjectRender* Submesh::getSubmeshRender(){
     if (render == NULL)
         render = ObjectRender::newInstance();
     
     return render;
 }
 
-void SubMesh::setSubMeshShadowRender(ObjectRender* shadowRender){
+void Submesh::setSubmeshShadowRender(ObjectRender* shadowRender){
     if (this->shadowRender && this->shadowRenderOwned)
         delete this->shadowRender;
 
@@ -146,22 +152,22 @@ void SubMesh::setSubMeshShadowRender(ObjectRender* shadowRender){
     shadowRenderOwned = false;
 }
 
-ObjectRender* SubMesh::getSubMeshShadowRender(){
+ObjectRender* Submesh::getSubmeshShadowRender(){
     if (shadowRender == NULL)
         shadowRender = ObjectRender::newInstance();
 
     return shadowRender;
 }
 
-void SubMesh::setVisible(bool visible){
+void Submesh::setVisible(bool visible){
     this->visible = visible;
 }
 
-bool SubMesh::isVisible(){
+bool Submesh::isVisible(){
     return visible;
 }
 
-bool SubMesh::textureLoad(){
+bool Submesh::textureLoad(){
     if (material && render){
         material->getTexture()->load();
         render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
@@ -170,9 +176,9 @@ bool SubMesh::textureLoad(){
     return true;
 }
 
-bool SubMesh::shadowLoad(){
+bool Submesh::shadowLoad(){
     
-    shadowRender = getSubMeshShadowRender();
+    shadowRender = getSubmeshShadowRender();
 
     shadowRender->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
     for (auto const &x : attributes) {
@@ -187,9 +193,9 @@ bool SubMesh::shadowLoad(){
     return shadowloaded;
 }
 
-bool SubMesh::load(){
+bool Submesh::load(){
 
-    render = getSubMeshRender();
+    render = getSubmeshRender();
 
     render->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
     for (auto const &x : attributes) {
@@ -212,7 +218,7 @@ bool SubMesh::load(){
     return renderloaded;
 }
 
-bool SubMesh::draw(){
+bool Submesh::draw(){
     if (!visible)
         return false;
 
@@ -227,7 +233,7 @@ bool SubMesh::draw(){
     return true;
 }
 
-bool SubMesh::shadowDraw(){
+bool Submesh::shadowDraw(){
     if (!visible)
         return false;
 
@@ -242,7 +248,7 @@ bool SubMesh::shadowDraw(){
     return true;
 }
 
-void SubMesh::destroy(){
+void Submesh::destroy(){
     if (render)
         render->destroy();
 

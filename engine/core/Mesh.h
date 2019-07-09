@@ -10,7 +10,7 @@
 #include "math/Vector4.h"
 #include "math/Vector3.h"
 #include "math/Vector2.h"
-#include "SubMesh.h"
+#include "Submesh.h"
 #include <array>
 
 namespace Supernova {
@@ -18,11 +18,11 @@ namespace Supernova {
     class Mesh: public GraphicObject {
         
     private:
-        void removeAllSubMeshes();
+        void removeAllSubmeshes();
         
     protected:
 
-        std::vector<SubMesh*> submeshes;
+        std::vector<Submesh*> submeshes;
 
         std::vector<Matrix4> bonesMatrix;
         std::vector<float> morphWeights;
@@ -34,17 +34,17 @@ namespace Supernova {
         bool dynamic;
 
         int primitiveType;
+
+        int createSubmesh();
         
-        void addSubMesh(SubMesh* submesh);
-        
-        //void sortTransparentSubMeshes();
+        //void sortTransparentSubmeshes();
         
     public:
         Mesh();
         virtual ~Mesh();
 
         int getPrimitiveType();
-        std::vector<SubMesh*> getSubMeshes();
+        std::vector<Submesh*> getSubmeshes();
         bool isSky();
         bool isText();
         bool isDynamic();

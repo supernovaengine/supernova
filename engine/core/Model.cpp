@@ -258,8 +258,7 @@ bool Model::loadGLTF(const char* filename) {
         }
 
         if (i > (submeshes.size()-1)){
-            submeshes.push_back(new SubMesh());
-            submeshes.back()->createNewMaterial();
+            submeshes.push_back(new Submesh());
         }
 
         Material *material = submeshes.back()->getMaterial();
@@ -689,8 +688,7 @@ bool Model::loadOBJ(const char* filename){
 
         for (size_t i = 0; i < materials.size(); i++) {
             if (i > (this->submeshes.size()-1)){
-                this->submeshes.push_back(new SubMesh());
-                this->submeshes.back()->createNewMaterial();
+                this->submeshes.push_back(new Submesh());
             }
 
             this->submeshes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir+materials[i].diffuse_texname));

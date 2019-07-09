@@ -9,7 +9,7 @@
 using namespace Supernova;
 
 Mesh::Mesh(): GraphicObject(){
-    submeshes.push_back(new SubMesh(&material));
+    submeshes.push_back(new Submesh(&material));
     skymesh = false;
     textmesh = false;
     skinning = false;
@@ -21,7 +21,7 @@ Mesh::Mesh(): GraphicObject(){
 
 Mesh::~Mesh(){
     destroy();
-    removeAllSubMeshes();
+    removeAllSubmeshes();
 
     if (render)
         delete render;
@@ -30,7 +30,7 @@ Mesh::~Mesh(){
         delete shadowRender;
 }
 
-std::vector<SubMesh*> Mesh::getSubMeshes(){
+std::vector<Submesh*> Mesh::getSubmeshes(){
     return submeshes;
 }
 
@@ -54,8 +54,9 @@ void Mesh::setPrimitiveType(int primitiveType){
     this->primitiveType = primitiveType;
 }
 
-void Mesh::addSubMesh(SubMesh* submesh){
-    submeshes.push_back(submesh);
+int Mesh::createSubmesh(){
+    submeshes.push_back(new Submesh());
+    return (submeshes.size()-1);
 }
 
 void Mesh::updateBuffers(){
@@ -64,7 +65,7 @@ void Mesh::updateBuffers(){
     }
 }
 /*
-void Mesh::sortTransparentSubMeshes(){
+void Mesh::sortTransparentSubmeshes(){
 
     if (transparent && scene && scene->isUseDepth() && scene->getUserDefinedTransparency() != S_OPTION_NO){
 
@@ -87,7 +88,7 @@ void Mesh::sortTransparentSubMeshes(){
 
         if (needSort){
             std::sort(submeshes.begin(), submeshes.end(),
-                    [](const SubMesh* a, const SubMesh* b) -> bool
+                    [](const Submesh* a, const Submesh* b) -> bool
                     {
                         if (a->distanceToCamera == -1)
                             return true;
@@ -104,7 +105,7 @@ void Mesh::sortTransparentSubMeshes(){
 void Mesh::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
     GraphicObject::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
-    //sortTransparentSubMeshes();
+    //sortTransparentSubmeshes();
 }
 
 void Mesh::updateModelMatrix(){
@@ -112,11 +113,11 @@ void Mesh::updateModelMatrix(){
     
     this->normalMatrix = modelMatrix.inverse().transpose();
 
-    //sortTransparentSubMeshes();
+    //sortTransparentSubmeshes();
 }
 
-void Mesh::removeAllSubMeshes(){
-    for (std::vector<SubMesh*>::iterator it = submeshes.begin() ; it != submeshes.end(); ++it)
+void Mesh::removeAllSubmeshes(){
+    for (std::vector<Submesh*>::iterator it = submeshes.begin() ; it != submeshes.end(); ++it)
     {
         delete (*it);
     }
@@ -160,11 +161,11 @@ bool Mesh::shadowLoad(){
         submeshes[i]->dynamic = dynamic;
         if (submeshes.size() == 1){
             //Use the same render for submesh
-            submeshes[i]->setSubMeshShadowRender(shadowRender);
+            submeshes[i]->setSubmeshShadowRender(shadowRender);
         }else{
-            submeshes[i]->getSubMeshShadowRender()->setParent(shadowRender);
+            submeshes[i]->getSubmeshShadowRender()->setParent(shadowRender);
         }
-        submeshes[i]->getSubMeshShadowRender()->setPrimitiveType(primitiveType);
+        submeshes[i]->getSubmeshShadowRender()->setPrimitiveType(primitiveType);
         submeshes[i]->shadowLoad();
     }
     
@@ -224,11 +225,11 @@ bool Mesh::load(){
         submeshes[i]->dynamic = dynamic;
         if (submeshes.size() == 1){
             //Use the same render for submesh
-            submeshes[i]->setSubMeshRender(render);
+            submeshes[i]->setSubmeshRender(render);
         }else{
-            submeshes[i]->getSubMeshRender()->setParent(render);
+            submeshes[i]->getSubmeshRender()->setParent(render);
         }
-        submeshes[i]->getSubMeshRender()->setPrimitiveType(primitiveType);
+        submeshes[i]->getSubmeshRender()->setPrimitiveType(primitiveType);
         submeshes[i]->load();
     }
 
