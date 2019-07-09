@@ -35,7 +35,7 @@ namespace Supernova {
 
         int primitiveType;
 
-        int createSubmesh();
+        bool resizeSubmeshes(unsigned int count, Material* material = NULL);
         
         //void sortTransparentSubmeshes();
         

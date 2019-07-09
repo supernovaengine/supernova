@@ -238,6 +238,8 @@ bool Model::loadGLTF(const char* filename) {
 
     tinygltf::Mesh mesh = gltfModel->meshes[meshIndex];
 
+    resizeSubmeshes(mesh.primitives.size());
+
     for (size_t i = 0; i < mesh.primitives.size(); i++) {
 
         tinygltf::Primitive primitive = mesh.primitives[i];
@@ -257,11 +259,7 @@ bool Model::loadGLTF(const char* filename) {
             continue;
         }
 
-        if (i > (submeshes.size()-1)){
-            submeshes.push_back(new Submesh());
-        }
-
-        Material *material = submeshes.back()->getMaterial();
+        Material *material = submeshes[i]->getMaterial();
 
         for (auto &mats : mat.values) {
             //Log::Debug("mat: %s - %i - %f ", mats.first.c_str(), mats.second.TextureIndex(), mats.second.Factor());
@@ -305,7 +303,7 @@ bool Model::loadGLTF(const char* filename) {
 
         loadGLTFBuffer(indexAccessor.bufferView);
 
-        submeshes.back()->setIndices(
+        submeshes[i]->setIndices(
                 getBufferName(indexAccessor.bufferView),
                 indexAccessor.count,
                 indexAccessor.byteOffset,
@@ -364,7 +362,7 @@ bool Model::loadGLTF(const char* filename) {
 
             if (attType > -1) {
                 buffers[bufferName]->setRenderAttributes(false);
-                submeshes.back()->addAttribute(bufferName, attType, elements, dataType, byteStride, accessor.byteOffset);
+                submeshes[i]->addAttribute(bufferName, attType, elements, dataType, byteStride, accessor.byteOffset);
             } else
                 Log::Warn("Model attribute missing: %s", attrib.first.c_str());
         }
@@ -448,7 +446,7 @@ bool Model::loadGLTF(const char* filename) {
 
                 if (attType > -1) {
                     buffers[bufferName]->setRenderAttributes(false);
-                    submeshes.back()->addAttribute(bufferName, attType, elements, dataType, byteStride, accessor.byteOffset);
+                    submeshes[i]->addAttribute(bufferName, attType, elements, dataType, byteStride, accessor.byteOffset);
                 }
             }
             morphIndex++;
@@ -686,12 +684,10 @@ bool Model::loadOBJ(const char* filename){
         buffer.clear();
         indices.clear();
 
-        for (size_t i = 0; i < materials.size(); i++) {
-            if (i > (this->submeshes.size()-1)){
-                this->submeshes.push_back(new Submesh());
-            }
+        resizeSubmeshes(materials.size());
 
-            this->submeshes.back()->getMaterial()->setTexturePath(File::simplifyPath(baseDir+materials[i].diffuse_texname));
+        for (size_t i = 0; i < materials.size(); i++) {
+            this->submeshes[i]->getMaterial()->setTexturePath(File::simplifyPath(baseDir+materials[i].diffuse_texname));
             if (materials[i].dissolve < 1){
                 // TODO: Add this check on isTransparent Material method
                 transparent = true;

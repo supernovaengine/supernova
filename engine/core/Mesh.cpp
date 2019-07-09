@@ -54,9 +54,21 @@ void Mesh::setPrimitiveType(int primitiveType){
     this->primitiveType = primitiveType;
 }
 
-int Mesh::createSubmesh(){
-    submeshes.push_back(new Submesh());
-    return (submeshes.size()-1);
+bool Mesh::resizeSubmeshes(unsigned int count, Material* material){
+    bool resized = false;
+
+    for (int i = 0; i < count; i++){
+        if (i > (this->submeshes.size()-1)){
+            if (material){
+                this->submeshes.push_back(new Submesh(material));
+            } else {
+                this->submeshes.push_back(new Submesh());
+            }
+            resized = true;
+        }
+    }
+
+    return resized;
 }
 
 void Mesh::updateBuffers(){
