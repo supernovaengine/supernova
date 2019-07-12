@@ -30,6 +30,9 @@ Model::Model(): Mesh() {
     skeleton = NULL;
     gltfModel = NULL;
 
+    skinning = false;
+    morphTargets = false;
+
     buffers["vertices"] = &buffer;
     buffers["indices"] = &indices;
 
@@ -847,6 +850,21 @@ void Model::updateModelMatrix(){
     inverseDerivedTransform = (modelMatrix * Matrix4::translateMatrix(center)).inverse();
 }
 
+bool Model::shadowLoad() {
+
+    instanciateShadowRender();
+
+    if (skinning){
+        shadowRender->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
+    }
+
+    if (morphTargets){
+        shadowRender->addProperty(S_PROPERTY_MORPHWEIGHTS, S_PROPERTYDATA_FLOAT1, morphWeights.size(), &morphWeights.front());
+    }
+
+    return Mesh::shadowLoad();
+}
+
 bool Model::load(){
 
     baseDir = File::getBaseDir(filename);
@@ -861,6 +879,16 @@ bool Model::load(){
 
     if (skeleton)
         skinning = true;
+
+    instanciateRender();
+
+    if (skinning){
+        render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
+    }
+
+    if (morphTargets){
+        render->addProperty(S_PROPERTY_MORPHWEIGHTS, S_PROPERTYDATA_FLOAT1, morphWeights.size(), &morphWeights.front());
+    }
 
     return Mesh::load();
 }

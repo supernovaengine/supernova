@@ -57,6 +57,12 @@ namespace Supernova {
         Bone* skeleton;
         Matrix4 inverseDerivedTransform;
 
+        std::vector<Matrix4> bonesMatrix;
+        std::vector<float> morphWeights;
+
+        bool skinning;
+        bool morphTargets;
+
     public:
         Model();
         Model(const char * path);
@@ -79,6 +85,8 @@ namespace Supernova {
         Matrix4 getInverseDerivedTransform();
 
         virtual void updateModelMatrix();
+
+        virtual bool shadowLoad();
 
         virtual bool load();
 
