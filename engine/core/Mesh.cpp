@@ -157,19 +157,7 @@ bool Mesh::shadowLoad(){
 }
 
 bool Mesh::load(){
-    bool hasTextureRect = false;
-    bool hasTextureCoords = false;
-    bool hasTextureCube = false;
     for (unsigned int i = 0; i < submeshes.size(); i++){
-        if (submeshes.at(i)->getMaterial()->getTextureRect()){
-            hasTextureRect = true;
-        }
-        if (submeshes.at(i)->getMaterial()->getTexture()){
-            hasTextureCoords = true;
-            if (submeshes.at(i)->getMaterial()->getTexture()->getType() == S_TEXTURE_CUBE){
-                hasTextureCube = true;
-            }
-        }
         if (submeshes.at(i)->getMaterial()->isTransparent()) {
             transparent = true;
         }
@@ -179,14 +167,6 @@ bool Mesh::load(){
 
     render->setProgramShader(S_SHADER_MESH);
 
-    //TODO: Remove here and add in ObjectRender
-    if (hasTextureCoords)
-        render->addProgramDef(S_PROGRAM_USE_TEXCOORD);
-    if (hasTextureRect)
-        render->addProgramDef(S_PROGRAM_USE_TEXRECT);
-    if (hasTextureCube)
-        render->addProgramDef(S_PROGRAM_USE_TEXCUBE);
-    
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
         if (submeshes.size() == 1){
