@@ -26,6 +26,26 @@ GraphicObject::GraphicObject(): Object(){
 GraphicObject::~GraphicObject(){
 }
 
+bool GraphicObject::instanciateRender(){
+    if (render == NULL) {
+        render = ObjectRender::newInstance();
+        if (render == NULL)
+            return false;
+    }
+
+    return true;
+}
+
+bool GraphicObject::instanciateShadowRender(){
+    if (shadowRender == NULL) {
+        shadowRender = ObjectRender::newInstance();
+        if (shadowRender == NULL)
+            return false;
+    }
+
+    return true;
+}
+
 void GraphicObject::updateBuffer(std::string name){
     if (name == defaultBuffer) {
         if (render)
@@ -37,72 +57,6 @@ void GraphicObject::updateBuffer(std::string name){
         render->updateBuffer(name, buffers[name]->getSize(), buffers[name]->getData());
     if (shadowRender)
         shadowRender->updateBuffer(name, buffers[name]->getSize(), buffers[name]->getData());
-}
-
-void GraphicObject::prepareShadowRender(){
-    for (auto const& buf : buffers) {
-        if (buf.first == defaultBuffer) {
-            shadowRender->setVertexSize(buf.second->getCount());
-        }
-        shadowRender->addBuffer(buf.first, buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), true);
-        if (buf.second->isRenderAttributes()) {
-            for (auto const &x : buf.second->getAttributes()) {
-                shadowRender->addVertexAttribute(x.first, buf.first, x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
-            }
-        }
-    }
-
-    shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
-    shadowRender->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
-
-    if (scene){
-        shadowRender->addProperty(S_PROPERTY_SHADOWLIGHT_POS, S_PROPERTYDATA_FLOAT3, 1, &scene->drawShadowLightPos);
-        shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR, S_PROPERTYDATA_FLOAT2, 1, &scene->drawShadowCameraNearFar);
-        shadowRender->addProperty(S_PROPERTY_ISPOINTSHADOW, S_PROPERTYDATA_INT1, 1, &scene->drawIsPointShadow);
-    }
-}
-
-void GraphicObject::prepareRender(){
-
-    for (auto const& buf : buffers){
-        if (buf.first == defaultBuffer) {
-            render->setVertexSize(buf.second->getCount());
-        }
-        render->addBuffer(buf.first, buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), true);
-        if (buf.second->isRenderAttributes()) {
-            for (auto const &x : buf.second->getAttributes()) {
-                render->addVertexAttribute(x.first, buf.first, x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
-            }
-        }
-    }
-
-    render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
-    render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
-    render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
-    render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition); //TODO: put cameraPosition on Scene
-
-    if (scene){
-
-        render->setNumLights((int)scene->getLights()->size());
-        render->setNumShadows2D(scene->getLightData()->numShadows2D);
-        render->setNumShadowsCube(scene->getLightData()->numShadowsCube);
-
-        render->setSceneRender(scene->getSceneRender());
-
-        scene->addLightProperties(render);
-        scene->addFogProperties(render);
-
-        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAP2D, scene->getLightData()->shadowsMap2D);
-        render->addProperty(S_PROPERTY_NUMSHADOWS2D, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows2D);
-        render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsVPMatrix.front());
-        render->addProperty(S_PROPERTY_SHADOWBIAS2D, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsBias2D.front());
-        render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR2D, S_PROPERTYDATA_FLOAT2, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsCameraNearFar2D.front());
-        render->addProperty(S_PROPERTY_NUMCASCADES2D, S_PROPERTYDATA_INT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowNumCascades2D.front());
-
-        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAPCUBE, scene->getLightData()->shadowsMapCube);
-        render->addProperty(S_PROPERTY_SHADOWBIASCUBE, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsBiasCube.front());
-        render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFARCUBE, S_PROPERTYDATA_FLOAT2, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsCameraNearFarCube.front());
-    }
 }
 
 Matrix4 GraphicObject::getNormalMatrix(){
@@ -254,7 +208,49 @@ bool GraphicObject::load(){
         shadowLoad();
     }
 
-    return true;
+    instanciateRender();
+
+    for (auto const& buf : buffers){
+        if (buf.first == defaultBuffer) {
+            render->setVertexSize(buf.second->getCount());
+        }
+        render->addBuffer(buf.first, buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), true);
+        if (buf.second->isRenderAttributes()) {
+            for (auto const &x : buf.second->getAttributes()) {
+                render->addVertexAttribute(x.first, buf.first, x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
+            }
+        }
+    }
+
+    render->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
+    render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
+    render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition); //TODO: put cameraPosition on Scene
+
+    if (scene){
+
+        render->setNumLights((int)scene->getLights()->size());
+        render->setNumShadows2D(scene->getLightData()->numShadows2D);
+        render->setNumShadowsCube(scene->getLightData()->numShadowsCube);
+
+        render->setSceneRender(scene->getSceneRender());
+
+        scene->addLightProperties(render);
+        scene->addFogProperties(render);
+
+        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAP2D, scene->getLightData()->shadowsMap2D);
+        render->addProperty(S_PROPERTY_NUMSHADOWS2D, S_PROPERTYDATA_INT1, 1, &scene->getLightData()->numShadows2D);
+        render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsVPMatrix.front());
+        render->addProperty(S_PROPERTY_SHADOWBIAS2D, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsBias2D.front());
+        render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR2D, S_PROPERTYDATA_FLOAT2, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowsCameraNearFar2D.front());
+        render->addProperty(S_PROPERTY_NUMCASCADES2D, S_PROPERTYDATA_INT1, scene->getLightData()->numShadows2D, &scene->getLightData()->shadowNumCascades2D.front());
+
+        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAPCUBE, scene->getLightData()->shadowsMapCube);
+        render->addProperty(S_PROPERTY_SHADOWBIASCUBE, S_PROPERTYDATA_FLOAT1, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsBiasCube.front());
+        render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFARCUBE, S_PROPERTYDATA_FLOAT2, scene->getLightData()->numShadowsCube, &scene->getLightData()->shadowsCameraNearFarCube.front());
+    }
+
+    return render->load();
 }
 
 bool GraphicObject::textureLoad(){
@@ -263,8 +259,31 @@ bool GraphicObject::textureLoad(){
 }
 
 bool GraphicObject::shadowLoad(){
+
+    instanciateShadowRender();
+
+    for (auto const& buf : buffers) {
+        if (buf.first == defaultBuffer) {
+            shadowRender->setVertexSize(buf.second->getCount());
+        }
+        shadowRender->addBuffer(buf.first, buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), true);
+        if (buf.second->isRenderAttributes()) {
+            for (auto const &x : buf.second->getAttributes()) {
+                shadowRender->addVertexAttribute(x.first, buf.first, x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
+            }
+        }
+    }
+
+    shadowRender->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
+    shadowRender->addProperty(S_PROPERTY_MODELMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelMatrix);
+
+    if (scene){
+        shadowRender->addProperty(S_PROPERTY_SHADOWLIGHT_POS, S_PROPERTYDATA_FLOAT3, 1, &scene->drawShadowLightPos);
+        shadowRender->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR, S_PROPERTYDATA_FLOAT2, 1, &scene->drawShadowCameraNearFar);
+        shadowRender->addProperty(S_PROPERTY_ISPOINTSHADOW, S_PROPERTYDATA_INT1, 1, &scene->drawIsPointShadow);
+    }
     
-    return true;
+    return shadowRender->load();
 }
 
 bool GraphicObject::shadowDraw(){

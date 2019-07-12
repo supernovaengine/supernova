@@ -51,8 +51,7 @@ bool Lines::renderDraw(){
 
 bool Lines::load(){
 
-    if (render == NULL)
-        render = ObjectRender::newInstance();
+    instanciateRender();
 
     render->setPrimitiveType(S_PRIMITIVE_LINES);
     render->setProgramShader(S_SHADER_LINES);
@@ -61,12 +60,5 @@ bool Lines::load(){
 
     render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material.getColor());
 
-    prepareRender();
-
-    bool renderloaded = render->load();
-
-    if (!GraphicObject::load())
-        return false;
-
-    return renderloaded;
+    return GraphicObject::load();
 }

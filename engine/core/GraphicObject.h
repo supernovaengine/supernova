@@ -40,11 +40,12 @@ namespace Supernova {
 
         unsigned int minBufferSize;
 
+        bool instanciateRender();
+        bool instanciateShadowRender();
+
         void updateDistanceToCamera();
 
         void updateBuffer(std::string name);
-        void prepareShadowRender();
-        void prepareRender();
 
     public:
 

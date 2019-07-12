@@ -428,8 +428,7 @@ bool Points::textureLoad(){
 
 bool Points::load(){
 
-    if (render == NULL)
-        render = ObjectRender::newInstance();
+    instanciateRender();
     
     render->setPrimitiveType(S_PRIMITIVE_POINTS);
     render->setProgramShader(S_SHADER_POINTS);
@@ -447,12 +446,5 @@ bool Points::load(){
     sortPoints();
     copyBuffer();
 
-    prepareRender();
-    
-    bool renderloaded = render->load();
-    
-    if (!GraphicObject::load())
-        return false;
-
-    return renderloaded;
+    return GraphicObject::load();
 }

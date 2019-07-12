@@ -148,11 +148,8 @@ bool Mesh::textureLoad(){
 }
 
 bool Mesh::shadowLoad(){
-    if (!GraphicObject::shadowLoad())
-        return false;
-    
-    if (shadowRender == NULL)
-        shadowRender = ObjectRender::newInstance();
+
+    instanciateShadowRender();
 
     shadowRender->setProgramShader(S_SHADER_DEPTH_RTT);
 
@@ -166,8 +163,6 @@ bool Mesh::shadowLoad(){
     if (morphTargets){
         shadowRender->addProperty(S_PROPERTY_MORPHWEIGHTS, S_PROPERTYDATA_FLOAT1, morphWeights.size(), &morphWeights.front());
     }
-
-    prepareShadowRender();
     
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
@@ -181,7 +176,7 @@ bool Mesh::shadowLoad(){
         submeshes[i]->shadowLoad();
     }
     
-    return shadowRender->load();
+    return GraphicObject::shadowLoad();
 }
 
 bool Mesh::load(){
@@ -202,9 +197,8 @@ bool Mesh::load(){
             transparent = true;
         }
     }
-    
-    if (render == NULL)
-        render = ObjectRender::newInstance();
+
+    instanciateRender();
 
     render->setProgramShader(S_SHADER_MESH);
 
@@ -230,8 +224,6 @@ bool Mesh::load(){
     if (morphTargets){
         render->addProperty(S_PROPERTY_MORPHWEIGHTS, S_PROPERTYDATA_FLOAT1, morphWeights.size(), &morphWeights.front());
     }
-
-    prepareRender();
     
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
@@ -245,12 +237,7 @@ bool Mesh::load(){
         submeshes[i]->load();
     }
 
-    bool renderloaded = render->load();
-
-    if (renderloaded)
-        return GraphicObject::load();
-    else
-        return false;
+    return GraphicObject::load();
 }
 
 bool Mesh::shadowDraw(){
