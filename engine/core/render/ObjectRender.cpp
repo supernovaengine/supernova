@@ -70,12 +70,12 @@ void ObjectRender::setProgramShader(int programShader){
     this->programShader = programShader;
 }
 
-void ObjectRender::setProgramDefs(int programDefs){
-    this->programDefs = programDefs;
-}
-
 void ObjectRender::setLineWidth(float lineWidth){
     this->lineWidth = lineWidth;
+}
+
+void ObjectRender::addProgramDef(int programDef){
+    this->programDefs |= programDef;
 }
 
 void ObjectRender::addBuffer(std::string name, unsigned int size, void* data, int type, bool dynamic){

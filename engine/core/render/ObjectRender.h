@@ -111,13 +111,13 @@ namespace Supernova {
         void setMinBufferSize(unsigned int minBufferSize);
         void setPrimitiveType(int primitiveType);
         void setProgramShader(int programShader);
-        void setProgramDefs(int programDefs);
         void setDynamicBuffer(bool dynamicBuffer);
         void setNumLights(int numLights);
         void setNumShadows2D(int numShadows2D);
         void setNumShadowsCube(int numShadowsCube);
         void setLineWidth(float lineWidth);
 
+        void addProgramDef(int programDef);
         void addBuffer(std::string name, unsigned int size, void* data, int type, bool dynamic = false);
         void addVertexAttribute(int type, std::string buffer, unsigned int elements, DataType dataType = DataType::FLOAT, unsigned int stride = 0, size_t offset = 0);
         void setIndices(std::string buffer, size_t size, size_t offset, DataType type);

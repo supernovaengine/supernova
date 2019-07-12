@@ -10,8 +10,6 @@ using namespace Supernova;
 
 Mesh::Mesh(): GraphicObject(){
     submeshes.push_back(new Submesh(&material));
-    skymesh = false;
-    textmesh = false;
     dynamic = false;
 
     defaultBuffer = "vertices";
@@ -30,14 +28,6 @@ Mesh::~Mesh(){
 
 std::vector<Submesh*> Mesh::getSubmeshes(){
     return submeshes;
-}
-
-bool Mesh::isSky(){
-    return skymesh;
-}
-
-bool Mesh::isText(){
-    return textmesh;
 }
 
 bool Mesh::isDynamic(){
@@ -151,9 +141,6 @@ bool Mesh::shadowLoad(){
 
     shadowRender->setProgramShader(S_SHADER_DEPTH_RTT);
 
-    int progamDefs = 0;
-    shadowRender->setProgramDefs(progamDefs);
-
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;
         if (submeshes.size() == 1){
@@ -193,19 +180,12 @@ bool Mesh::load(){
     render->setProgramShader(S_SHADER_MESH);
 
     //TODO: Remove here and add in ObjectRender
-    int progamDefs = 0;
     if (hasTextureCoords)
-        progamDefs |= S_PROGRAM_USE_TEXCOORD;
+        render->addProgramDef(S_PROGRAM_USE_TEXCOORD);
     if (hasTextureRect)
-        progamDefs |= S_PROGRAM_USE_TEXRECT;
+        render->addProgramDef(S_PROGRAM_USE_TEXRECT);
     if (hasTextureCube)
-        progamDefs |= S_PROGRAM_USE_TEXCUBE;
-    if (isSky())
-        progamDefs |= S_PROGRAM_IS_SKY;
-    if (isText())
-        progamDefs |= S_PROGRAM_IS_TEXT;
-
-    render->setProgramDefs(progamDefs);
+        render->addProgramDef(S_PROGRAM_USE_TEXCUBE);
     
     for (size_t i = 0; i < submeshes.size(); i++) {
         submeshes[i]->dynamic = dynamic;

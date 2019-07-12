@@ -17,8 +17,6 @@ SkyBox::SkyBox(): Mesh() {
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     //buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
     //buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
-    
-    skymesh = true;
 
     Attribute* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
     
@@ -107,6 +105,10 @@ bool SkyBox::draw(){
 bool SkyBox::load(){
     if (this->submeshes[0]->getMaterial()->getTexture() == NULL)
         this->submeshes[0]->getMaterial()->setTextureCube(textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
+
+    instanciateRender();
+
+    render->addProgramDef(S_PROGRAM_IS_SKY);
 
     return Mesh::load();
 }

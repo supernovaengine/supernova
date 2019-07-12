@@ -23,9 +23,7 @@ namespace Supernova {
     protected:
 
         std::vector<Submesh*> submeshes;
-        
-        bool skymesh;
-        bool textmesh;
+
         bool dynamic;
 
         int primitiveType;
@@ -40,8 +38,7 @@ namespace Supernova {
 
         int getPrimitiveType();
         std::vector<Submesh*> getSubmeshes();
-        bool isSky();
-        bool isText();
+
         bool isDynamic();
 
         void setPrimitiveType(int primitiveType);

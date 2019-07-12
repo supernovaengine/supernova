@@ -10,7 +10,6 @@ using namespace Supernova;
 Text::Text(): Mesh2D() {
     primitiveType = S_PRIMITIVE_TRIANGLES;
     dynamic = true;
-    textmesh = true;
     stbtext = new STBText();
     text = "";
     fontSize = 40;
@@ -190,6 +189,10 @@ bool Text::load(){
     }else{
         Log::Error("Can`t load font");
     }
+
+    instanciateRender();
+
+    render->addProgramDef(S_PROGRAM_IS_TEXT);
     
     return Mesh2D::load();
 }
