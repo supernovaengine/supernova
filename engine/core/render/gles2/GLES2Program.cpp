@@ -3,7 +3,7 @@
 
 #include <algorithm>
 #include <stdlib.h>
-#include "GLES2Shaders.h"
+#include "shaders/GLES2Shaders.h"
 #include "GLES2Util.h"
 #include "Log.h"
 
@@ -17,7 +17,7 @@ std::string GLES2Program::getVertexShader(int shaderType){
     }else if (shaderType == S_SHADER_LINES){
         return gVertexLinesShader;
     }else if (shaderType == S_SHADER_DEPTH_RTT){
-        return gVertexDepthRTTShader;
+        return gVertexDepthShader;
     }
     return "";
 }
@@ -31,7 +31,7 @@ std::string GLES2Program::getFragmentShader(int shaderType){
     }else if (shaderType == S_SHADER_LINES){
         return gFragmentLinesShader;
     }else if (shaderType == S_SHADER_DEPTH_RTT){
-        return gFragmentDepthRTTShader;
+        return gFragmentDepthShader;
     }
     return "";
 }
@@ -104,6 +104,9 @@ void GLES2Program::createProgram(int shaderType, int programDefs, int numLights,
     }
     if (programDefs & S_PROGRAM_IS_TEXT){
         definitions += "#define IS_TEXT\n";
+    }
+    if (programDefs & S_PROGRAM_IS_TERRAIN){
+        definitions += "#define IS_TERRAIN\n";
     }
     if (numLights > 0){
         definitions += "#define USE_LIGHTING\n";

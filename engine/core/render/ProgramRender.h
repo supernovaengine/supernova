@@ -85,6 +85,8 @@
 
 #define S_PROPERTY_MORPHWEIGHTS 43
 
+#define S_PROPERTY_TERRAINTILEOFFSET 44
+
 #define S_TEXTURESAMPLER_DIFFUSE 1
 #define S_TEXTURESAMPLER_SHADOWMAP2D 2
 #define S_TEXTURESAMPLER_SHADOWMAPCUBE 3
@@ -98,6 +100,7 @@
 #define S_PROGRAM_USE_MORPHNORMAL  1 << 6
 #define S_PROGRAM_IS_SKY  1 << 7
 #define S_PROGRAM_IS_TEXT  1 << 8
+#define S_PROGRAM_IS_TERRAIN  1 << 9
 
 #include <string>
 #include <unordered_map>
