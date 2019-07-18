@@ -564,6 +564,9 @@ bool Scene::load(){
     bool loadreturn = Object::load();
 
     camera->updateModelMatrix();
+    updateVPMatrix(camera->getViewMatrix(), camera->getProjectionMatrix(),
+                   camera->getViewProjectionMatrix(), camera->getWorldPositionPtr());
+
     Object::needUpdate();
 
     if (textureFrame != NULL) {
