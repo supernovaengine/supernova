@@ -10,24 +10,21 @@
 namespace Supernova{
 
     class Terrain: public Mesh {
+        struct Tile{
+
+        };
+
     private:
 
         InterleavedBuffer buffer;
-        TextureData* heightmap_data;
+        IndexBuffer indices;
         std::string heightmap_path;
 
-        bool loadTerrainFromImage(std::string path);
-        void computeNormals();
-        Vector3 terrainCrossProduct(int x1,int z1,int x2,int z2,int x3,int z3);
-        bool terrainScale(float min, float max);
-        bool terrainCreate(float xOffset, float yOffset, float zOffset);
+        Vector2 offset;
+
+        void createPlaneTile(int index, int widthSegments, int heightSegments);
 
     protected:
-
-        int terrainGridWidth;
-        int terrainGridLength;
-        std::vector<float> terrainHeights;
-        std::vector<Vector3> terrainNormals;
 
     public:
 
@@ -38,7 +35,8 @@ namespace Supernova{
         const std::string &getHeightmap() const;
         void setHeightmap(const std::string &heightmap);
 
-        bool load();
+        virtual bool shadowLoad();
+        virtual bool load();
     };
 
 }
