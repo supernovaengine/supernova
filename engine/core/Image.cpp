@@ -10,6 +10,7 @@ using namespace Supernova;
 
 Image::Image(): Mesh2D() {
     primitiveType = S_PRIMITIVE_TRIANGLES;
+    submeshes.push_back(new Submesh());
     texWidth = 0;
     texHeight = 0;
     useTextureRect = false;

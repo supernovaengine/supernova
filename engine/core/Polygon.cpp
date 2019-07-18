@@ -6,7 +6,8 @@
 using namespace Supernova;
 
 Polygon::Polygon(): Mesh2D() {
-	primitiveType = S_PRIMITIVE_TRIANGLES;
+    primitiveType = S_PRIMITIVE_TRIANGLES;
+    submeshes.push_back(new Submesh());
 
     buffers["vertices"] = &buffer;
 

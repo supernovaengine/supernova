@@ -30,8 +30,6 @@ namespace Supernova {
 
         Rect scissor;
 
-        Material material;
-
         Matrix4 normalMatrix;
 
         bool visible;
@@ -54,20 +52,14 @@ namespace Supernova {
         
         Matrix4 getNormalMatrix();
 
-        void setColor(Vector4 color);
-        void setColor(float red, float green, float blue, float alpha);
-        Vector4 getColor();
-        
-        void setTexture(Texture* texture);
-        void setTexture(std::string texturepath);
-        std::string getTexture();
-
         void setVisible(bool visible);
         bool isVisible();
-        
-        Material* getMaterial();
 
         unsigned int getMinBufferSize();
+
+        virtual void setColor(Vector4 color) = 0;
+        virtual void setColor(float red, float green, float blue, float alpha) = 0;
+        virtual Vector4 getColor() = 0;
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateModelMatrix();

@@ -27,6 +27,8 @@ using namespace Supernova;
 
 Model::Model(): Mesh() {
     primitiveType = S_PRIMITIVE_TRIANGLES;
+    submeshes.push_back(new Submesh());
+
     skeleton = NULL;
     gltfModel = NULL;
 

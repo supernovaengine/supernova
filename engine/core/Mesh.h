@@ -36,6 +36,20 @@ namespace Supernova {
         Mesh();
         virtual ~Mesh();
 
+        virtual void setColor(Vector4 color);
+        virtual void setColor(float red, float green, float blue, float alpha);
+        virtual Vector4 getColor();
+
+        void setColor(Vector4 color, int submesh);
+        void setColor(float red, float green, float blue, float alpha, int submesh);
+        Vector4 getColor(int submesh);
+
+        void setTexture(Texture* texture, int submesh = 0);
+        void setTexture(std::string texturepath, int submesh = 0);
+        std::string getTexture(int submesh = 0);
+
+        Material* getMaterial(int submesh = 0);
+
         int getPrimitiveType();
         std::vector<Submesh*> getSubmeshes();
 

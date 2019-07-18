@@ -9,7 +9,6 @@
 using namespace Supernova;
 
 Mesh::Mesh(): GraphicObject(){
-    submeshes.push_back(new Submesh(&material));
     dynamic = false;
 
     defaultBuffer = "vertices";
@@ -24,6 +23,81 @@ Mesh::~Mesh(){
 
     if (shadowRender)
         delete shadowRender;
+}
+
+void Mesh::setColor(Vector4 color){
+    setColor(color, 0);
+}
+
+void Mesh::setColor(float red, float green, float blue, float alpha){
+    setColor(Vector4(red, green, blue, alpha), 0);
+}
+
+Vector4 Mesh::getColor(){
+    return getColor(0);
+}
+
+void Mesh::setColor(Vector4 color, int submesh){
+    if (submesh >= 0 && submesh < submeshes.size()) {
+        if (color.w != 1) {
+            transparent = true;
+        }
+        submeshes[submesh]->getMaterial()->setColor(color);
+    }
+}
+
+void Mesh::setColor(float red, float green, float blue, float alpha, int submesh){
+    setColor(Vector4(red, green, blue, alpha), submesh);
+}
+
+Vector4 Mesh::getColor(int submesh){
+    if (submesh >= 0 && submesh < submeshes.size()) {
+        return *submeshes[submesh]->getMaterial()->getColor();
+    }
+
+    return Vector4(0, 0, 0, 0);
+}
+
+void Mesh::setTexture(Texture* texture, int submesh){
+    if (submesh >= 0 && submesh < submeshes.size()) {
+        Texture *oldTexture = submeshes[submesh]->getMaterial()->getTexture();
+
+        if (texture != oldTexture) {
+            submeshes[submesh]->getMaterial()->setTexture(texture);
+            if (loaded) {
+                textureLoad();
+            }
+        }
+    }
+}
+
+void Mesh::setTexture(std::string texturepath, int submesh){
+    if (submesh >= 0 && submesh < submeshes.size()) {
+        std::string oldTexture = submeshes[submesh]->getMaterial()->getTexturePath();
+
+        if (texturepath != oldTexture) {
+            submeshes[submesh]->getMaterial()->setTexturePath(texturepath);
+            if (loaded) {
+                textureLoad();
+            }
+        }
+    }
+}
+
+std::string Mesh::getTexture(int submesh){
+    if (submesh >= 0 && submesh < submeshes.size()) {
+        return submeshes[submesh]->getMaterial()->getTexturePath();
+    }
+
+    return "";
+}
+
+Material* Mesh::getMaterial(int submesh){
+    if (submesh >= 0 && submesh < submeshes.size()) {
+        return submeshes[submesh]->getMaterial();
+    }
+
+    return NULL;
 }
 
 std::vector<Submesh*> Mesh::getSubmeshes(){

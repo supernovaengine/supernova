@@ -36,6 +36,59 @@ Points::~Points(){
         delete render;
 }
 
+void Points::setColor(Vector4 color){
+    if (color.w != 1){
+        transparent = true;
+    }
+    material.setColor(color);
+}
+
+void Points::setColor(float red, float green, float blue, float alpha){
+    setColor(Vector4(red, green, blue, alpha));
+}
+
+Vector4 Points::getColor(){
+    return *material.getColor();
+}
+
+void Points::setTexture(Texture* texture){
+
+    Texture* oldTexture = material.getTexture();
+
+    if (texture != oldTexture){
+
+        material.setTexture(texture);
+
+        if (loaded){
+            textureLoad();
+        }
+
+    }
+}
+
+void Points::setTexture(std::string texturepath){
+
+    std::string oldTexture = material.getTexturePath();
+
+    if (texturepath != oldTexture){
+
+        material.setTexturePath(texturepath);
+
+        if (loaded){
+            textureLoad();
+        }
+
+    }
+}
+
+std::string Points::getTexture(){
+    return material.getTexturePath();
+}
+
+Material* Points::getMaterial(){
+    return &this->material;
+}
+
 bool Points::shouldSort(){
    return (transparent && scene && scene->isUseDepth() && scene->getUserDefinedTransparency() != S_OPTION_NO && pertmitSortTransparentPoints);
 }
@@ -427,6 +480,10 @@ bool Points::textureLoad(){
 }
 
 bool Points::load(){
+
+    if (material.isTransparent()){
+        transparent = true;
+    }
 
     instanciateRender();
     

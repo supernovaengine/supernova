@@ -9,6 +9,7 @@ using namespace Supernova;
 
 Text::Text(): Mesh2D() {
     primitiveType = S_PRIMITIVE_TRIANGLES;
+    submeshes.push_back(new Submesh());
     dynamic = true;
     stbtext = new STBText();
     text = "";

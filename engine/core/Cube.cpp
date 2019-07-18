@@ -7,6 +7,7 @@ using namespace Supernova;
 
 Cube::Cube(): Mesh() {
     primitiveType = S_PRIMITIVE_TRIANGLES;
+    submeshes.push_back(new Submesh());
 
     width = 0;
     height = 0;

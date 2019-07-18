@@ -555,17 +555,18 @@ void LuaBind::bind(){
     .endClass()
 
     .beginExtendClass<GraphicObject, Object>("GraphicObject")
-    .addFunction("setTexture", (void (GraphicObject::*)(std::string))&GraphicObject::setTexture)
     .addFunction("setColor", (void (GraphicObject::*)(float, float, float, float))&GraphicObject::setColor)
     .addFunction("setColorVector", (void (GraphicObject::*)(Vector4))&GraphicObject::setColor)
     .endClass()
 
     .beginExtendClass<Mesh, GraphicObject>("Mesh")
     .addConstructor(LUA_ARGS())
+    .addFunction("setTexture", (void (Mesh::*)(std::string, int))&Mesh::setTexture)
     .endClass()
 
     .beginExtendClass<Points, GraphicObject>("Points")
     .addConstructor(LUA_ARGS())
+    .addFunction("setTexture", (void (Points::*)(std::string))&Points::setTexture)
     .addFunction("setSizeAttenuation", &Points::setSizeAttenuation)
     .addFunction("setPointScaleFactor", &Points::setPointScaleFactor)
     .addFunction("setMinPointSize", &Points::setMinPointSize)

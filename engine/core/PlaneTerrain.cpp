@@ -7,6 +7,7 @@ using namespace Supernova;
 
 PlaneTerrain::PlaneTerrain(): Mesh() {
     primitiveType = S_PRIMITIVE_TRIANGLE_STRIP;
+    submeshes.push_back(new Submesh());
 
     buffers["vertices"] = &buffer;
 

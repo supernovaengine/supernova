@@ -14,11 +14,17 @@ namespace Supernova {
     private:
         InterleavedBuffer buffer;
 
+        Vector4 color;
+
         float lineWidth;
 
     public:
         Lines();
         virtual ~Lines();
+
+        virtual void setColor(Vector4 color);
+        virtual void setColor(float red, float green, float blue, float alpha);
+        virtual Vector4 getColor();
 
         void addLine(Vector3 pointA, Vector3 pointB);
         void clearLines();

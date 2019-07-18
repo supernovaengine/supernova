@@ -10,6 +10,7 @@ using namespace Supernova;
 SkyBox::SkyBox(): Mesh() {
     
     primitiveType = S_PRIMITIVE_TRIANGLES;
+    submeshes.push_back(new Submesh());
 
     buffers["vertices"] = &buffer;
 

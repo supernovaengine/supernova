@@ -77,6 +77,9 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
     if (*font == 0)
         return false;
 
+    if (!texture)
+        return false;
+
     FileData* fontData = new FileData();
     fontData->open(font);
 
@@ -128,7 +131,7 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
 
     unsigned int textureSize = atlasWidth * atlasHeight * sizeof(unsigned char);
     TextureData* textureData  = new TextureData(atlasWidth, atlasHeight, textureSize, S_COLOR_ALPHA, 8, (void*)atlasData);
-    
+
     texture->setId(font + std::to_string('-') + std::to_string(fontSize));
     texture->setTextureData(textureData);
     texture->setDataOwned(true);

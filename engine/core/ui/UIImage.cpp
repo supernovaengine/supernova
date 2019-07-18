@@ -12,6 +12,7 @@ using namespace Supernova;
 
 UIImage::UIImage(): UIObject(){
     primitiveType = S_PRIMITIVE_TRIANGLES;
+    submeshes.push_back(new Submesh());
     
     texWidth = 0;
     texHeight = 0;

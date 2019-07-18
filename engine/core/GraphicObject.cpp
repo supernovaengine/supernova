@@ -67,65 +67,12 @@ unsigned int GraphicObject::getMinBufferSize(){
     return minBufferSize;
 }
 
-void GraphicObject::setColor(Vector4 color){
-    if (color.w != 1){
-        transparent = true;
-    }
-    material.setColor(color);
-}
-
-void GraphicObject::setColor(float red, float green, float blue, float alpha){
-    setColor(Vector4(red, green, blue, alpha));
-}
-
-Vector4 GraphicObject::getColor(){
-    return *material.getColor();
-}
-
 void GraphicObject::setVisible(bool visible){
     this->visible = visible;
 }
 
 bool GraphicObject::isVisible(){
     return visible;
-}
-
-void GraphicObject::setTexture(Texture* texture){
-    
-    Texture* oldTexture = material.getTexture();
-    
-    if (texture != oldTexture){
-        
-        material.setTexture(texture);
-        
-        if (loaded){
-            textureLoad();
-        }
-        
-    }
-}
-
-void GraphicObject::setTexture(std::string texturepath){
-    
-    std::string oldTexture = material.getTexturePath();
-    
-    if (texturepath != oldTexture){
-        
-        material.setTexturePath(texturepath);
-        
-        if (loaded){
-            textureLoad();
-        }
-        
-    }
-}
-
-Material* GraphicObject::getMaterial(){
-    return &this->material;
-}
-
-std::string GraphicObject::getTexture(){
-    return material.getTexturePath();
 }
 
 void GraphicObject::updateDistanceToCamera(){
@@ -199,10 +146,7 @@ bool GraphicObject::draw(){
 bool GraphicObject::load(){
     Object::load();
 
-    if (material.isTransparent()){
-        transparent = true;
-        setSceneTransparency(true);
-    }
+    setSceneTransparency(transparent);
 
     if (scene && scene->isLoadedShadow()) {
         shadowLoad();

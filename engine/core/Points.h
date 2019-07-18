@@ -17,6 +17,8 @@ namespace Supernova {
     private:
         InterleavedBuffer buffer;
 
+        Material material;
+
         int texWidth;
         int texHeight;
 
@@ -68,6 +70,16 @@ namespace Supernova {
     public:
         Points();
         virtual ~Points();
+
+        virtual void setColor(Vector4 color);
+        virtual void setColor(float red, float green, float blue, float alpha);
+        virtual Vector4 getColor();
+
+        void setTexture(Texture* texture);
+        void setTexture(std::string texturepath);
+        std::string getTexture();
+
+        Material* getMaterial();
 
         void setSizeAttenuation(bool sizeAttenuation);
         void setPointScaleFactor(float pointScaleFactor);
