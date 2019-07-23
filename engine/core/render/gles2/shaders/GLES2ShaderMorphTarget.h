@@ -15,6 +15,14 @@ std::string morphTargetVertexDec =
         "  attribute vec3 a_morphTarget5;\n"
         "  attribute vec3 a_morphTarget6;\n"
         "  attribute vec3 a_morphTarget7;\n"
+
+        "  #ifdef USE_MORPHNORMAL\n"
+        "    attribute vec3 a_morphNormal0;\n"
+        "    attribute vec3 a_morphNormal1;\n"
+        "    attribute vec3 a_morphNormal2;\n"
+        "    attribute vec3 a_morphNormal3;\n"
+        "  #endif\n"
+
         "  #ifndef USE_MORPHNORMAL\n"
         "    uniform float u_morphWeights[4];\n"
         "  #else\n"
@@ -24,18 +32,25 @@ std::string morphTargetVertexDec =
 
 std::string morphTargetVertexImp =
         "    #ifdef USE_MORPHTARGET\n"
-        "      vec3 morphPosition = vec3(localPos);\n"
-        "      morphPosition += (u_morphWeights[0] * a_morphTarget0);\n"
-        "      morphPosition += (u_morphWeights[1] * a_morphTarget1);\n"
-        "      morphPosition += (u_morphWeights[2] * a_morphTarget2);\n"
-        "      morphPosition += (u_morphWeights[3] * a_morphTarget3);\n"
+        "      localPos += (u_morphWeights[0] * a_morphTarget0);\n"
+        "      localPos += (u_morphWeights[1] * a_morphTarget1);\n"
+        "      localPos += (u_morphWeights[2] * a_morphTarget2);\n"
+        "      localPos += (u_morphWeights[3] * a_morphTarget3);\n"
         "      #ifndef USE_MORPHNORMAL\n"
-        "        morphPosition += (u_morphWeights[4] * a_morphTarget4);\n"
-        "        morphPosition += (u_morphWeights[5] * a_morphTarget5);\n"
-        "        morphPosition += (u_morphWeights[6] * a_morphTarget6);\n"
-        "        morphPosition += (u_morphWeights[7] * a_morphTarget7);\n"
+        "        localPos += (u_morphWeights[4] * a_morphTarget4);\n"
+        "        localPos += (u_morphWeights[5] * a_morphTarget5);\n"
+        "        localPos += (u_morphWeights[6] * a_morphTarget6);\n"
+        "        localPos += (u_morphWeights[7] * a_morphTarget7);\n"
         "      #endif\n"
-        "      localPos = vec4(morphPosition, localPos.w);\n"
+        "    #endif\n"
+
+        "    #ifdef USE_LIGHTING\n"
+        "      #ifdef USE_MORPHNORMAL\n"
+        "        localNormal += (u_morphWeights[0] * a_morphNormal0);\n"
+        "        localNormal += (u_morphWeights[1] * a_morphNormal1);\n"
+        "        localNormal += (u_morphWeights[2] * a_morphNormal2);\n"
+        "        localNormal += (u_morphWeights[3] * a_morphNormal3);\n"
+        "      #endif\n"
         "    #endif\n";
 
 #endif //GLES2SHADERMORPHTARGET_H

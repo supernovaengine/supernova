@@ -12,7 +12,7 @@ std::string terrainVertexDec =
 
 std::string terrainVertexImp =
         "    #ifdef IS_TERRAIN\n"
-        "      localPos += vec4(u_terrainTileOffset.x, 0.0, u_terrainTileOffset.y, 0.0);\n"
+        "      localPos += vec3(u_terrainTileOffset[0], 0.0, u_terrainTileOffset[1]);\n"
         "    #endif\n";
 
 #endif //GLES2SHADERTERRAIN_H

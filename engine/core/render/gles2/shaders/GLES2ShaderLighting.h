@@ -11,17 +11,8 @@ std::string lightingVertexDec =
         "  uniform mat4 u_mMatrix;\n"
         "  uniform mat4 u_nMatrix;\n"
 
-        "  attribute vec3 a_Normal;\n"
-
-        "  #ifdef USE_MORPHNORMAL\n"
-        "    attribute vec3 a_morphNormal0;\n"
-        "    attribute vec3 a_morphNormal1;\n"
-        "    attribute vec3 a_morphNormal2;\n"
-        "    attribute vec3 a_morphNormal3;\n"
-        "  #endif\n"
-
-        "  varying vec3 v_Position;\n"
-        "  varying vec3 v_Normal;\n"
+        "  varying vec3 v_worldPos;\n"
+        "  varying vec3 v_worldNormal;\n"
 
         "  #ifdef HAS_SHADOWS2D\n"
         "    uniform int u_NumShadows2D;\n"
@@ -35,34 +26,19 @@ std::string lightingVertexDec =
 std::string lightingVertexImp =
         "#ifdef USE_LIGHTING\n"
 
-        "  v_Position = vec3(u_mMatrix * localPos);\n"
+        "  v_worldPos = vec3(u_mMatrix * vec4(localPos, 1.0));\n"
 
-        "  vec3 morphNormal = a_Normal;\n"
-
-        "  #ifdef USE_MORPHNORMAL\n"
-        "    morphNormal += (u_morphWeights[0] * a_morphNormal0);\n"
-        "    morphNormal += (u_morphWeights[1] * a_morphNormal1);\n"
-        "    morphNormal += (u_morphWeights[2] * a_morphNormal2);\n"
-        "    morphNormal += (u_morphWeights[3] * a_morphNormal3);\n"
-        "  #endif\n"
-
-        "  vec3 norL = morphNormal;\n"
-
-        "  #ifdef HAS_SKINNING\n"
-        "    norL = mat3(BoneTransform) * morphNormal;\n"
-        "  #endif\n"
-
-        "  v_Normal = normalize(mat3(u_nMatrix) * norL);\n"
+        "  v_worldNormal = normalize(vec3(u_nMatrix * vec4(localNormal, 1.0)));\n"
 
         "  #ifdef HAS_SHADOWS2D\n"
         "    for(int i=0; i<MAXSHADOWS2D; ++i){\n"
         "        if (i < u_NumShadows2D){\n"
-        "            v_ShadowCoordinates[i] = u_ShadowVP[i] * vec4(v_Position, 1.0);\n"
+        "            v_ShadowCoordinates[i] = u_ShadowVP[i] * vec4(v_worldPos, 1.0);\n"
         "        }else{\n"
         "            v_ShadowCoordinates[i] = vec4(0.0);\n"
         "        }\n"
         "    }\n"
-        "    v_ClipSpacePosZ = worldPos.z;\n" //The same of (gl_FragCoord.z / gl_FragCoord.w)
+        "    v_ClipSpacePosZ = mvpPos.z;\n" //The same of (gl_FragCoord.z / gl_FragCoord.w)
         "  #endif\n"
 
         "#endif\n";
@@ -95,8 +71,8 @@ std::string lightingFragmentDec =
         "  uniform vec3 u_DirectionalLightColor[MAXLIGHTS];\n"
         "  uniform int u_DirectionalLightShadowIdx[MAXLIGHTS];\n"
 
-        "  varying vec3 v_Position;\n"
-        "  varying vec3 v_Normal;\n"
+        "  varying vec3 v_worldPos;\n"
+        "  varying vec3 v_worldNormal;\n"
 
         "  #ifdef HAS_SHADOWS2D\n"
         "    uniform sampler2D u_shadowsMap2D[MAXSHADOWS2D];\n"
@@ -137,7 +113,7 @@ std::string lightingFragmentDec =
         "  #ifdef HAS_SHADOWSCUBE\n"
         "    bool checkShadowCube(vec3 lightPos, samplerCube shadowMap, float shadowBias, vec2 shadowCameraNearFar) {\n"
         "        lightPos = vec3(lightPos.x, lightPos.y, lightPos.z);\n"
-        "        vec3 fragToLight = v_Position - lightPos;\n"
+        "        vec3 fragToLight = v_worldPos - lightPos;\n"
         "        float lenDepthMap = unpackDepth(textureCube(shadowMap, fragToLight));\n"
         "        float lenToLight = (length(fragToLight) - shadowCameraNearFar.x) / (shadowCameraNearFar.y - shadowCameraNearFar.x);\n"
         "        float bias = shadowBias;\n"
@@ -165,7 +141,7 @@ std::string lightingFragmentImp =
 
         "     FragColor = MaterialAmbientColor;\n"
 
-        "     vec3 EyeDirection = normalize( u_EyePos - v_Position );\n"
+        "     vec3 EyeDirection = normalize( u_EyePos - v_worldPos );\n"
 
         "     int numLights = u_NumPointLight + u_NumSpotLight + u_NumDirectionalLight;\n"
 
@@ -183,14 +159,14 @@ std::string lightingFragmentImp =
         "             #endif\n"
 
         "             if (!inShadow) {\n"
-        "                 float PointLightDistance = length(u_PointLightPos[i] - v_Position);\n"
+        "                 float PointLightDistance = length(u_PointLightPos[i] - v_worldPos);\n"
 
-        "                 vec3 PointLightDirection = normalize( u_PointLightPos[i] - v_Position );\n"
-        "                 float PointLightcosTheta = clamp( dot( v_Normal,PointLightDirection ), 0.0,1.0 );\n"
+        "                 vec3 PointLightDirection = normalize( u_PointLightPos[i] - v_worldPos );\n"
+        "                 float PointLightcosTheta = clamp( dot( v_worldNormal,PointLightDirection ), 0.0,1.0 );\n"
 
         "                 float PointLightcosAlpha = 0.0;\n"
         "                 if (PointLightcosTheta > 0.0){\n"
-        "                    float PointLightcosAlpha = clamp( dot( EyeDirection, reflect(-PointLightDirection,v_Normal) ), 0.0,1.0 );\n"
+        "                    float PointLightcosAlpha = clamp( dot( EyeDirection, reflect(-PointLightDirection,v_worldNormal) ), 0.0,1.0 );\n"
         "                 }\n"
 
         "                 float Attenuation = PointLightFalloff.x + (PointLightFalloff.y*PointLightDistance) + (PointLightFalloff.z*PointLightDistance*PointLightDistance);\n"
@@ -206,8 +182,8 @@ std::string lightingFragmentImp =
         //SpotLight
         "         if (i < u_NumSpotLight){\n"
 
-        "             vec3 SpotLightDirection = normalize( u_SpotLightPos[i] - v_Position );\n"
-        "             float SpotLightcosTheta = clamp( dot( v_Normal,SpotLightDirection ), 0.0,1.0 );\n"
+        "             vec3 SpotLightDirection = normalize( u_SpotLightPos[i] - v_worldPos );\n"
+        "             float SpotLightcosTheta = clamp( dot( v_worldNormal,SpotLightDirection ), 0.0,1.0 );\n"
 
         "             bool inShadow = false;\n"
         "             #ifdef HAS_SHADOWS2D\n"
@@ -219,11 +195,11 @@ std::string lightingFragmentImp =
         "             #endif\n"
 
         "             if (!inShadow) {\n"
-        "                 float SpotLightDistance = length(u_SpotLightPos[i] - v_Position);\n"
+        "                 float SpotLightDistance = length(u_SpotLightPos[i] - v_worldPos);\n"
 
         "                 float SpotLightcosAlpha = 0.0;\n"
         "                 if (SpotLightcosTheta > 0.0){\n"
-        "                     SpotLightcosAlpha = clamp( dot( EyeDirection, reflect(-SpotLightDirection,v_Normal) ), 0.0,1.0 );\n"
+        "                     SpotLightcosAlpha = clamp( dot( EyeDirection, reflect(-SpotLightDirection,v_worldNormal) ), 0.0,1.0 );\n"
         "                 }\n"
 
         "                 vec3 SpotLightTargetNorm = normalize( u_SpotLightTarget[i] - u_SpotLightPos[i] );\n"
@@ -245,7 +221,7 @@ std::string lightingFragmentImp =
         "         if (i < u_NumDirectionalLight){\n"
 
         "             vec3 DirectionalLightDirection = normalize( -u_DirectionalLightDir[i] );\n"
-        "             float DirectionalLightcosTheta = clamp( dot( v_Normal,DirectionalLightDirection ), 0.0,1.0 );\n"
+        "             float DirectionalLightcosTheta = clamp( dot( v_worldNormal,DirectionalLightDirection ), 0.0,1.0 );\n"
 
         "             int nShadows = 0;\n"
         "             #ifdef HAS_SHADOWS2D\n"
@@ -260,7 +236,7 @@ std::string lightingFragmentImp =
         "             if (nShadows == 0) {\n"
         "                 float DirectionalLightcosAlpha = 0.0;\n"
         "                 if (DirectionalLightcosTheta > 0.0){\n"
-        "                     DirectionalLightcosAlpha = clamp( dot( EyeDirection, reflect(-DirectionalLightDirection,v_Normal) ), 0.0,1.0 );\n"
+        "                     DirectionalLightcosAlpha = clamp( dot( EyeDirection, reflect(-DirectionalLightDirection,v_worldNormal) ), 0.0,1.0 );\n"
         "                 }\n"
 
         "                 FragColor = FragColor +\n"

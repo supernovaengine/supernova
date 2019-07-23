@@ -18,8 +18,8 @@ std::string gVertexLinesShader =
         "attribute vec3 a_Position;\n"
 
         "void main(){\n"
-        "    vec4 worldPos = u_mvpMatrix * vec4(a_Position, 1.0);\n"
-        "    gl_Position = worldPos;\n"
+        "    vec4 mvpPos = u_mvpMatrix * vec4(a_Position, 1.0);\n"
+        "    gl_Position = mvpPos;\n"
         "}\n";
 
 std::string gFragmentLinesShader =
@@ -36,6 +36,9 @@ std::string gVertexPointsPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 
 "attribute vec3 a_Position;\n"
+"#ifdef USE_LIGHTING\n"
+"  attribute vec3 a_Normal;\n"
+"#endif\n"
 
 + lightingVertexDec +
 
@@ -53,9 +56,12 @@ std::string gVertexPointsPerPixelLightShader =
 
 "void main(){\n"
 
-"    vec4 localPos = vec4(a_Position, 1.0);\n"
+"    vec3 localPos = a_Position;\n"
+"    #ifdef USE_LIGHTING\n"
+"      vec3 localNormal = a_Normal;\n"
+"    #endif\n"
 
-"    vec4 worldPos = u_mvpMatrix * vec4(a_Position, 1.0);\n"
+"    vec4 mvpPos = u_mvpMatrix * vec4(localPos, 1.0);\n"
 
 "    v_pointColor = a_pointColor;\n"
 "    v_pointRotation = a_pointRotation;\n"
@@ -67,7 +73,7 @@ std::string gVertexPointsPerPixelLightShader =
 
 +    lightingVertexImp +
 
-"    gl_Position = worldPos;\n"
+"    gl_Position = mvpPos;\n"
 "}\n";
 
 
@@ -119,6 +125,9 @@ std::string gVertexMeshPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 
 "attribute vec3 a_Position;\n"
+"#ifdef USE_LIGHTING\n"
+"  attribute vec3 a_Normal;\n"
+"#endif\n"
 
 + terrainVertexDec
 + morphTargetVertexDec
@@ -137,13 +146,16 @@ std::string gVertexMeshPerPixelLightShader =
 
 "void main(){\n"
 
-"    vec4 localPos = vec4(a_Position, 1.0);\n"
+"    vec3 localPos = a_Position;\n"
+"    #ifdef USE_LIGHTING\n"
+"      vec3 localNormal = a_Normal;\n"
+"    #endif\n"
 
 + terrainVertexImp
 + morphTargetVertexImp
 + skinningVertexImp +
 
-"    vec4 worldPos = u_mvpMatrix * localPos;\n"
+"    vec4 mvpPos = u_mvpMatrix * vec4(localPos, 1.0);\n"
 
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifdef USE_TEXTURECUBE\n"
@@ -159,12 +171,12 @@ std::string gVertexMeshPerPixelLightShader =
 "    #endif\n"
 
 "    #ifdef IS_SKY\n"
-"      worldPos.z = worldPos.w;\n"
+"      mvpPos.z = mvpPos.w;\n"
 "    #endif\n"
 
 + lightingVertexImp +
 
-"    gl_Position = worldPos;\n"
+"    gl_Position = mvpPos;\n"
 
 "}\n";
 
@@ -219,23 +231,23 @@ std::string gVertexDepthShader =
 "uniform mat4 u_mvpMatrix;\n"
 "uniform mat4 u_mMatrix;\n"
 "attribute vec3 a_Position;\n"
-"varying vec3 v_position;\n"
+"varying vec3 v_worldPos;\n"
 + terrainVertexDec
 + morphTargetVertexDec
 + skinningVertexDec +
 "void main(){\n"
-"    vec4 localPos = vec4(a_Position, 1.0);\n"
+"    vec3 localPos = a_Position;\n"
 + terrainVertexImp
 + morphTargetVertexImp
 + skinningVertexImp +
-"    v_position = vec3(u_mMatrix * localPos);\n"
-"    gl_Position = u_mvpMatrix * localPos;\n"
+"    v_worldPos = vec3(u_mMatrix * vec4(localPos, 1.0));\n"
+"    gl_Position = u_mvpMatrix * vec4(localPos, 1.0);\n"
 "}\n";
 
 std::string gFragmentDepthShader =
 "precision highp float;\n"
 
-"varying vec3 v_position;\n"
+"varying vec3 v_worldPos;\n"
 "uniform vec3 u_shadowLightPos;\n"
 "uniform vec2 u_shadowCameraNearFar;\n"
 "uniform bool u_isPointShadow;\n"
@@ -250,7 +262,7 @@ std::string gFragmentDepthShader =
 
 "void main(){\n"
 "    if (u_isPointShadow){\n"
-"        float lightDistance = length(v_position - u_shadowLightPos);\n"
+"        float lightDistance = length(v_worldPos - u_shadowLightPos);\n"
 "        lightDistance = (lightDistance - u_shadowCameraNearFar.x) / (u_shadowCameraNearFar.y - u_shadowCameraNearFar.x);\n"
 "        gl_FragColor = packDepth(lightDistance);\n"
 "    }else{\n"

@@ -15,12 +15,23 @@ std::string skinningVertexDec =
 
 std::string skinningVertexImp =
         "    #ifdef HAS_SKINNING\n"
-        "      mat4 BoneTransform = u_bonesMatrix[int(a_BoneIds[0])] * a_BoneWeights[0];\n"
-        "      BoneTransform += u_bonesMatrix[int(a_BoneIds[1])] * a_BoneWeights[1];\n"
-        "      BoneTransform += u_bonesMatrix[int(a_BoneIds[2])] * a_BoneWeights[2];\n"
-        "      BoneTransform += u_bonesMatrix[int(a_BoneIds[3])] * a_BoneWeights[3];\n"
+        "      vec4 skinVertex = vec4(localPos, 1.0);\n"
+        "      mat4 boneTransform = mat4(0.0);\n"
 
-        "      localPos = BoneTransform * localPos;\n"
+        "      boneTransform += u_bonesMatrix[int(a_BoneIds[0])] * a_BoneWeights[0];\n"
+        "      boneTransform += u_bonesMatrix[int(a_BoneIds[1])] * a_BoneWeights[1];\n"
+        "      boneTransform += u_bonesMatrix[int(a_BoneIds[2])] * a_BoneWeights[2];\n"
+        "      boneTransform += u_bonesMatrix[int(a_BoneIds[3])] * a_BoneWeights[3];\n"
+
+        "      skinVertex = boneTransform * skinVertex;\n"
+        "      localPos = vec3(skinVertex) / skinVertex.w;\n"
+
+        "      #ifdef USE_LIGHTING\n"
+        "        vec4 skinNormal = vec4(localNormal, 1.0);\n"
+
+        "        skinNormal = boneTransform * skinNormal;\n"
+        "        localNormal = vec3(skinNormal) / skinNormal.w;\n"
+        "      #endif\n"
         "    #endif\n";
 
 #endif //GLES2SHADERSKINNING_H
