@@ -97,6 +97,7 @@ void GLES2Program::createProgram(int shaderType, int programDefs, int numLights,
         definitions += "#define USE_MORPHTARGET\n";
     }
     if (programDefs & S_PROGRAM_USE_MORPHNORMAL){
+        definitions += "#define USE_NORMAL\n";
         definitions += "#define USE_MORPHNORMAL\n";
     }
     if (programDefs & S_PROGRAM_IS_SKY){
@@ -109,6 +110,7 @@ void GLES2Program::createProgram(int shaderType, int programDefs, int numLights,
         definitions += "#define IS_TERRAIN\n";
     }
     if (numLights > 0){
+        definitions += "#define USE_NORMAL\n";
         definitions += "#define USE_LIGHTING\n";
     }
     if (maxShadows2D > 0){

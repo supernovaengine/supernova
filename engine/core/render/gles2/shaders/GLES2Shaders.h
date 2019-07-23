@@ -36,7 +36,7 @@ std::string gVertexPointsPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 
 "attribute vec3 a_Position;\n"
-"#ifdef USE_LIGHTING\n"
+"#ifdef USE_NORMAL\n"
 "  attribute vec3 a_Normal;\n"
 "#endif\n"
 
@@ -57,7 +57,7 @@ std::string gVertexPointsPerPixelLightShader =
 "void main(){\n"
 
 "    vec3 localPos = a_Position;\n"
-"    #ifdef USE_LIGHTING\n"
+"    #ifdef USE_NORMAL\n"
 "      vec3 localNormal = a_Normal;\n"
 "    #endif\n"
 
@@ -125,7 +125,7 @@ std::string gVertexMeshPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 
 "attribute vec3 a_Position;\n"
-"#ifdef USE_LIGHTING\n"
+"#ifdef USE_NORMAL\n"
 "  attribute vec3 a_Normal;\n"
 "#endif\n"
 
@@ -147,7 +147,7 @@ std::string gVertexMeshPerPixelLightShader =
 "void main(){\n"
 
 "    vec3 localPos = a_Position;\n"
-"    #ifdef USE_LIGHTING\n"
+"    #ifdef USE_NORMAL\n"
 "      vec3 localNormal = a_Normal;\n"
 "    #endif\n"
 

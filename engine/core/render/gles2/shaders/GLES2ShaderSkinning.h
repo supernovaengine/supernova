@@ -26,7 +26,7 @@ std::string skinningVertexImp =
         "      skinVertex = boneTransform * skinVertex;\n"
         "      localPos = vec3(skinVertex) / skinVertex.w;\n"
 
-        "      #ifdef USE_LIGHTING\n"
+        "      #ifdef USE_NORMAL\n"
         "        vec4 skinNormal = vec4(localNormal, 1.0);\n"
 
         "        skinNormal = boneTransform * skinNormal;\n"

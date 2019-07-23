@@ -44,13 +44,11 @@ std::string morphTargetVertexImp =
         "      #endif\n"
         "    #endif\n"
 
-        "    #ifdef USE_LIGHTING\n"
-        "      #ifdef USE_MORPHNORMAL\n"
-        "        localNormal += (u_morphWeights[0] * a_morphNormal0);\n"
-        "        localNormal += (u_morphWeights[1] * a_morphNormal1);\n"
-        "        localNormal += (u_morphWeights[2] * a_morphNormal2);\n"
-        "        localNormal += (u_morphWeights[3] * a_morphNormal3);\n"
-        "      #endif\n"
+        "    #ifdef USE_MORPHNORMAL\n"
+        "      localNormal += (u_morphWeights[0] * a_morphNormal0);\n"
+        "      localNormal += (u_morphWeights[1] * a_morphNormal1);\n"
+        "      localNormal += (u_morphWeights[2] * a_morphNormal2);\n"
+        "      localNormal += (u_morphWeights[3] * a_morphNormal3);\n"
         "    #endif\n";
 
 #endif //GLES2SHADERMORPHTARGET_H

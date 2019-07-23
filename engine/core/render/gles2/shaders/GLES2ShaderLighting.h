@@ -27,7 +27,6 @@ std::string lightingVertexImp =
         "#ifdef USE_LIGHTING\n"
 
         "  v_worldPos = vec3(u_mMatrix * vec4(localPos, 1.0));\n"
-
         "  v_worldNormal = normalize(vec3(u_nMatrix * vec4(localNormal, 1.0)));\n"
 
         "  #ifdef HAS_SHADOWS2D\n"
