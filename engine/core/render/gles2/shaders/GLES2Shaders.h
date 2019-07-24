@@ -10,6 +10,8 @@
 #include "GLES2ShaderFog.h"
 #include "GLES2ShaderTerrain.h"
 #include "GLES2ShaderSkinning.h"
+#include "GLES2ShaderMeshTexture.h"
+#include "GLES2ShaderPointTexture.h"
 
 
 std::string gVertexLinesShader =
@@ -31,7 +33,6 @@ std::string gFragmentLinesShader =
         "   gl_FragColor = u_Color;\n"
         "}\n";
 
-
 std::string gVertexPointsPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 
@@ -40,12 +41,8 @@ std::string gVertexPointsPerPixelLightShader =
 "  attribute vec3 a_Normal;\n"
 "#endif\n"
 
-+ lightingVertexDec +
-
-"#ifdef HAS_TEXTURERECT\n"
-"  attribute vec4 a_textureRect;\n"
-"  varying vec4 v_textureRect;\n"
-"#endif\n"
++ lightingVertexDec
++ texturePointVertexDec +
 
 "attribute float a_pointSize;\n"
 "attribute vec4 a_pointColor;\n"
@@ -67,59 +64,26 @@ std::string gVertexPointsPerPixelLightShader =
 "    v_pointRotation = a_pointRotation;\n"
 "    gl_PointSize = a_pointSize;\n"
 
-"    #ifdef HAS_TEXTURERECT\n"
-"      v_textureRect = a_textureRect;\n"
-"    #endif\n"
-
-+    lightingVertexImp +
++ texturePointVertexImp
++ lightingVertexImp +
 
 "    gl_Position = mvpPos;\n"
 "}\n";
 
-
 std::string gFragmentPointsPerPixelLightShader =
 "precision highp float;\n"
-
-"uniform sampler2D u_TextureUnit;\n"
-"uniform bool uUseTexture;\n"
-
 "varying vec4 v_pointColor;\n"
 "varying float v_pointRotation;\n"
-
++ texturePointFragmentDec
 + lightingFragmentDec
 + fogFragmentDec +
-
-"#ifdef HAS_TEXTURERECT\n"
-"  varying vec4 v_textureRect;\n"
-"#endif\n"
-
 "void main(){\n"
-"   vec4 fragmentColor = v_pointColor;\n"
-
-"   if (uUseTexture){\n"
-"     vec2 resultCoord = gl_PointCoord;\n"
-
-"     if (v_pointRotation != 0.0){\n"
-"         resultCoord = vec2(cos(v_pointRotation) * (resultCoord.x - 0.5) + sin(v_pointRotation) * (resultCoord.y - 0.5) + 0.5,\n"
-"                            cos(v_pointRotation) * (resultCoord.y - 0.5) - sin(v_pointRotation) * (resultCoord.x - 0.5) + 0.5);\n"
-"     }\n"
-
-"     #ifdef HAS_TEXTURERECT\n"
-"       resultCoord = resultCoord * v_textureRect.zw + v_textureRect.xy;\n"
-"     #endif\n"
-
-"     fragmentColor *= texture2D(u_TextureUnit, resultCoord);\n"
-"   }\n"
-
-"   vec3 FragColor = vec3(fragmentColor);\n"
-
+"   vec4 fragColor = v_pointColor;\n"
++ texturePointFragmentImp
 + lightingFragmentImp
 + fogFragmentImp +
-
-"   gl_FragColor = vec4(FragColor ,fragmentColor.a);\n"
+"   gl_FragColor = fragColor;\n"
 "}\n";
-
-
 
 std::string gVertexMeshPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
@@ -131,21 +95,11 @@ std::string gVertexMeshPerPixelLightShader =
 
 + terrainVertexDec
 + morphTargetVertexDec
-+ skinningVertexDec +
-
-"#ifdef USE_TEXTURECOORDS\n"
-"  attribute vec2 a_TextureCoordinates;\n"
-"  varying vec3 v_TextureCoordinates;\n"
-"#endif\n"
-
-"#ifdef HAS_TEXTURERECT\n"
-"  uniform vec4 u_textureRect;\n"
-"#endif\n"
-
++ skinningVertexDec
++ textureMeshVertexDec
 + lightingVertexDec +
 
 "void main(){\n"
-
 "    vec3 localPos = a_Position;\n"
 "    #ifdef USE_NORMAL\n"
 "      vec3 localNormal = a_Normal;\n"
@@ -153,28 +107,15 @@ std::string gVertexMeshPerPixelLightShader =
 
 + terrainVertexImp
 + morphTargetVertexImp
-+ skinningVertexImp +
++ skinningVertexImp
++ textureMeshVertexImp
++ lightingVertexImp +
 
 "    vec4 mvpPos = u_mvpMatrix * vec4(localPos, 1.0);\n"
-
-"    #ifdef USE_TEXTURECOORDS\n"
-"      #ifdef USE_TEXTURECUBE\n"
-"        v_TextureCoordinates = a_Position;\n"
-"      #else\n"
-"        #ifdef HAS_TEXTURERECT\n"
-"          vec2 resultCoords = a_TextureCoordinates * u_textureRect.zw + u_textureRect.xy;\n"
-"        #else\n"
-"          vec2 resultCoords = a_TextureCoordinates;\n"
-"        #endif\n"
-"        v_TextureCoordinates = vec3(resultCoords,0.0);\n"
-"      #endif\n"
-"    #endif\n"
 
 "    #ifdef IS_SKY\n"
 "      mvpPos.z = mvpPos.w;\n"
 "    #endif\n"
-
-+ lightingVertexImp +
 
 "    gl_Position = mvpPos;\n"
 
@@ -182,49 +123,16 @@ std::string gVertexMeshPerPixelLightShader =
 
 std::string gFragmentMeshPerPixelLightShader =
 "precision highp float;\n"
-
-"#ifdef USE_TEXTURECUBE\n"
-"  uniform samplerCube u_TextureUnit;\n"
-"#else\n"
-"  uniform sampler2D u_TextureUnit;\n"
-"#endif\n"
-
 "uniform vec4 u_Color;\n"
-
-"uniform bool uUseTexture;\n"
-
 + lightingFragmentDec
-+ fogFragmentDec +
-
-"#ifdef USE_TEXTURECOORDS\n"
-"  varying vec3 v_TextureCoordinates;\n"
-"#endif\n"
-
++ fogFragmentDec
++ textureMeshFragmentDec +
 "void main(){\n"
-
-    //Texture or color
-"   vec4 fragmentColor = u_Color;\n"
-
-"   if (uUseTexture){\n"
-"     #ifdef USE_TEXTURECOORDS\n"
-"       #ifdef USE_TEXTURECUBE\n"
-"         fragmentColor *= textureCube(u_TextureUnit, v_TextureCoordinates);\n"
-"       #else\n"
-"         #ifdef IS_TEXT\n"
-"           fragmentColor *= vec4(1.0, 1.0, 1.0, texture2D(u_TextureUnit, v_TextureCoordinates.xy).a);\n"
-"         #else\n"
-"           fragmentColor *= texture2D(u_TextureUnit, v_TextureCoordinates.xy);\n"
-"         #endif\n"
-"       #endif\n"
-"     #endif\n"
-"   }\n"
-
-"   vec3 FragColor = vec3(fragmentColor);\n"
-
+"   vec4 fragColor = u_Color;\n"
++ textureMeshFragmentImp
 + lightingFragmentImp
 + fogFragmentImp +
-
-"   gl_FragColor = vec4(FragColor ,fragmentColor.a);\n"
+"   gl_FragColor = fragColor;\n"
 "}\n";
 
 std::string gVertexDepthShader =

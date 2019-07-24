@@ -148,10 +148,6 @@ bool GraphicObject::load(){
 
     setSceneTransparency(transparent);
 
-    if (scene && scene->isLoadedShadow()) {
-        shadowLoad();
-    }
-
     instanciateRender();
 
     for (auto const& buf : buffers){

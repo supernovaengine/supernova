@@ -18,7 +18,6 @@ std::string lightingVertexDec =
         "    uniform int u_NumShadows2D;\n"
         "    uniform mat4 u_ShadowVP[MAXSHADOWS2D];\n"
         "    varying vec4 v_ShadowCoordinates[MAXSHADOWS2D];\n"
-        "    varying float v_ClipSpacePosZ;\n"
         "  #endif\n"
 
         "#endif\n";
@@ -37,7 +36,6 @@ std::string lightingVertexImp =
         "            v_ShadowCoordinates[i] = vec4(0.0);\n"
         "        }\n"
         "    }\n"
-        "    v_ClipSpacePosZ = mvpPos.z;\n" //The same of (gl_FragCoord.z / gl_FragCoord.w)
         "  #endif\n"
 
         "#endif\n";
@@ -79,7 +77,6 @@ std::string lightingFragmentDec =
         "    uniform vec2 u_shadowCameraNearFar2D[MAXSHADOWS2D];\n"
         "    uniform int u_shadowNumCascades2D[MAXSHADOWS2D];\n"
         "    varying vec4 v_ShadowCoordinates[MAXSHADOWS2D];\n"
-        "    varying float v_ClipSpacePosZ;\n"
         "  #endif\n"
         "  #ifdef HAS_SHADOWSCUBE\n"
         "    uniform samplerCube u_shadowsMapCube[MAXSHADOWSCUBE];\n"
@@ -93,8 +90,8 @@ std::string lightingFragmentDec =
         "  }\n"
 
         "  #ifdef HAS_SHADOWS2D\n"
-        "    bool checkShadow(vec4 shadowCoordinates, sampler2D shadowMap, float shadowBias, vec2 shadowCameraNearFar, float cosTheta) {\n"
-        "        if ((v_ClipSpacePosZ >= shadowCameraNearFar.x) && (v_ClipSpacePosZ <= shadowCameraNearFar.y)){\n"
+        "    bool checkShadow(vec4 shadowCoordinates, sampler2D shadowMap, float shadowBias, vec2 shadowCameraNearFar, float cosTheta, float clipSpacePosZ) {\n"
+        "        if ((clipSpacePosZ >= shadowCameraNearFar.x) && (clipSpacePosZ <= shadowCameraNearFar.y)){\n"
         "            vec3 shadowCoord = (shadowCoordinates.xyz/shadowCoordinates.w)/2.0 + 0.5;\n"
         "            vec4 rgbaDepth = texture2D(shadowMap, shadowCoord.xy);\n"
         //"          float depth = unpackDepth(rgbaDepth);\n"
@@ -135,14 +132,16 @@ std::string lightingFragmentImp =
         "     vec3 MaterialSpecularColor = vec3(0.3,0.3,0.3);\n"
         "     float MaterialShininess = 80.0;\n"
 
-        "     vec3 MaterialDiffuseColor = vec3(fragmentColor);\n"
+        "     vec3 MaterialDiffuseColor = vec3(fragColor);\n"
         "     vec3 MaterialAmbientColor = u_AmbientLight * MaterialDiffuseColor;\n"
 
-        "     FragColor = MaterialAmbientColor;\n"
+        "     vec3 lightFragColor = MaterialAmbientColor;\n"
 
         "     vec3 EyeDirection = normalize( u_EyePos - v_worldPos );\n"
 
         "     int numLights = u_NumPointLight + u_NumSpotLight + u_NumDirectionalLight;\n"
+
+        "     float clipSpacePosZ = (gl_FragCoord.z / gl_FragCoord.w);\n" //The same of mvpPos.z
 
         "     for(int i = 0; i < MAXLIGHTS; ++i){\n"
         //PointLight
@@ -170,7 +169,7 @@ std::string lightingFragmentImp =
 
         "                 float Attenuation = PointLightFalloff.x + (PointLightFalloff.y*PointLightDistance) + (PointLightFalloff.z*PointLightDistance*PointLightDistance);\n"
 
-        "                 FragColor = FragColor +\n"
+        "                 lightFragColor = lightFragColor +\n"
         "                   ( MaterialDiffuseColor * PointLightcosTheta \n"
         "                   + MaterialSpecularColor * pow(PointLightcosAlpha, MaterialShininess) ) \n"
         "                   * u_PointLightColor[i] * u_PointLightPower[i] / Attenuation;\n"
@@ -189,7 +188,7 @@ std::string lightingFragmentImp =
         "               #pragma unroll_loop\n"
         "               for(int j = 0; j < MAXSHADOWS2D; j++){\n"
         "                   if (u_SpotLightShadowIdx[i] == (j))\n"
-        "                       inShadow = checkShadow(v_ShadowCoordinates[j], u_shadowsMap2D[j], u_shadowBias2D[j], u_shadowCameraNearFar2D[j], SpotLightcosTheta);\n"
+        "                       inShadow = checkShadow(v_ShadowCoordinates[j], u_shadowsMap2D[j], u_shadowBias2D[j], u_shadowCameraNearFar2D[j], SpotLightcosTheta, clipSpacePosZ);\n"
         "               }\n"
         "             #endif\n"
 
@@ -208,7 +207,7 @@ std::string lightingFragmentImp =
         //"               if ( dot( SpotLightTargetNorm, -SpotLightDirection ) > u_SpotLightCutOff[i] ) {\n"
         "                 float Attenuation = SpotLightFalloff.x + (SpotLightFalloff.y*SpotLightDistance) + (SpotLightFalloff.z*SpotLightDistance*SpotLightDistance);\n"
 
-        "                 FragColor = FragColor +\n"
+        "                 lightFragColor = lightFragColor +\n"
         "                   ( MaterialDiffuseColor * SpotLightcosTheta \n"
         "                   + MaterialSpecularColor * pow(SpotLightcosAlpha, MaterialShininess) ) \n"
         "                   * u_SpotLightColor[i] * SpotLightintensity * u_SpotLightPower[i] / Attenuation;\n"
@@ -227,7 +226,7 @@ std::string lightingFragmentImp =
         "               #pragma unroll_loop\n"
         "               for(int j = 0; j < MAXSHADOWS2D; j++){\n"
         "                   if ((u_DirectionalLightShadowIdx[i] <= (j)) && ((u_DirectionalLightShadowIdx[i] + u_shadowNumCascades2D[j]) > (j)))\n"
-        "                       if (checkShadow(v_ShadowCoordinates[j], u_shadowsMap2D[j], u_shadowBias2D[j], u_shadowCameraNearFar2D[j], DirectionalLightcosTheta))\n"
+        "                       if (checkShadow(v_ShadowCoordinates[j], u_shadowsMap2D[j], u_shadowBias2D[j], u_shadowCameraNearFar2D[j], DirectionalLightcosTheta, clipSpacePosZ))\n"
         "                           nShadows += 1;\n"
         "               }\n"
         "             #endif\n"
@@ -238,7 +237,7 @@ std::string lightingFragmentImp =
         "                     DirectionalLightcosAlpha = clamp( dot( EyeDirection, reflect(-DirectionalLightDirection,v_worldNormal) ), 0.0,1.0 );\n"
         "                 }\n"
 
-        "                 FragColor = FragColor +\n"
+        "                 lightFragColor = lightFragColor +\n"
         "                   ( MaterialDiffuseColor * DirectionalLightcosTheta \n"
         "                   + MaterialSpecularColor * pow(DirectionalLightcosAlpha, MaterialShininess) ) \n"
         "                   * u_DirectionalLightColor[i] * u_DirectionalLightPower[i];\n"
@@ -247,6 +246,8 @@ std::string lightingFragmentImp =
         "         }\n"
 
         "     }\n"
+
+        "     fragColor = vec4(lightFragColor, fragColor.a);\n"
 
         "   #endif\n";
 

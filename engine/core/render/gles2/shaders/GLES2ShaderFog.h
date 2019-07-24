@@ -32,7 +32,7 @@ std::string fogFragmentImp =
         "      fogFactor = clamp( fogFactor, u_fogVisibility, 1.0);\n"
         "    #endif\n"
 
-        "   FragColor = mix(u_fogColor, FragColor, fogFactor);\n"
+        "   fragColor = mix(vec4(u_fogColor, 0.0), fragColor, fogFactor);\n"
         "#endif\n";
 
 #endif //GLES2SHADERFOG_H

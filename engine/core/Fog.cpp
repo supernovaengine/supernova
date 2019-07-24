@@ -3,7 +3,7 @@
 using namespace Supernova;
 
 Fog::Fog(){
-    mode = 2;
+    mode = S_FOG_LINEAR;
     linearStart = 200;
     linearEnd = 800;
     density = 1;

@@ -237,6 +237,10 @@ bool Mesh::load(){
         }
     }
 
+    if (scene && scene->isLoadedShadow()) {
+        shadowLoad();
+    }
+
     instanciateRender();
 
     render->setProgramShader(S_SHADER_MESH);
