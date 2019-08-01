@@ -6,6 +6,7 @@
 #include <math.h>
 #include <cstdlib>
 #include <float.h>
+#include "Log.h"
 
 using namespace Supernova;
 
@@ -175,17 +176,17 @@ void Quaternion::fromAxes (const Vector3& xaxis, const Vector3& yaxis, const Vec
     Matrix4 kRot;
 
     kRot.set(0,0, xaxis.x);
-    kRot.set(0,1, xaxis.y);
-    kRot.set(0,2, xaxis.z);
+    kRot.set(0,1, yaxis.x);
+    kRot.set(0,2, zaxis.x);
     kRot.set(0,3, 0.0f);
 
-    kRot.set(1,0, yaxis.x);
+    kRot.set(1,0, xaxis.y);
     kRot.set(1,1, yaxis.y);
-    kRot.set(1,2, yaxis.z);
+    kRot.set(1,2, zaxis.y);
     kRot.set(1,3, 0.0f);
 
-    kRot.set(2,0, zaxis.x);
-    kRot.set(2,1, zaxis.y);
+    kRot.set(2,0, xaxis.z);
+    kRot.set(2,1, yaxis.z);
     kRot.set(2,2, zaxis.z);
     kRot.set(2,3, 0.0f);
 
@@ -200,54 +201,34 @@ void Quaternion::fromAxes (const Vector3& xaxis, const Vector3& yaxis, const Vec
 
 void Quaternion::fromRotationMatrix (const Matrix4& kRot){
 
-    float S;
+    float trace = kRot[0][0]+kRot[1][1]+kRot[2][2];
+    float root;
 
-    float trace = kRot[0][0] + kRot[1][1] + kRot[2][2] + 1.0f;
-
-    if (trace > 0.0f){
-
-        S = 0.5 / sqrt(trace);
-
-        w = 0.25 / S;
-        x = ( kRot[1][2] - kRot[2][1] ) * S;
-        y = ( kRot[2][0] - kRot[0][2] ) * S;
-        z = ( kRot[0][1] - kRot[1][0] ) * S;
-
-    }else{
-
-        int i = 0;
+    if ( trace > 0.0 ) {
+        root = sqrt(trace + 1.0f);
+        w = 0.5f*root;
+        root = 0.5f/root;
+        x = (kRot[2][1]-kRot[1][2])*root;
+        y = (kRot[0][2]-kRot[2][0])*root;
+        z = (kRot[1][0]-kRot[0][1])*root;
+    } else {
+        static size_t s_iNext[3] = { 1, 2, 0 };
+        size_t i = 0;
         if ( kRot[1][1] > kRot[0][0] )
             i = 1;
         if ( kRot[2][2] > kRot[i][i] )
             i = 2;
+        size_t j = s_iNext[i];
+        size_t k = s_iNext[j];
 
-        if (i==0){
-            S  = sqrt( 1.0 + kRot[0][0] - kRot[1][1] - kRot[2][2] ) * 2;
-
-            x = 0.5 / S;
-            y = (kRot[1][0] + kRot[0][1] ) / S;
-            z = (kRot[2][0] + kRot[0][2] ) / S;
-            w = (kRot[2][1] + kRot[1][2] ) / S;
-
-        }else if(i==1){
-            S  = sqrt( 1.0 + kRot[1][1] - kRot[0][0] - kRot[2][2] ) * 2;
-
-            x = (kRot[1][0] + kRot[0][1] ) / S;
-            y = 0.5 / S;
-            z = (kRot[2][1] + kRot[1][2] ) / S;
-            w = (kRot[2][0] + kRot[0][2] ) / S;
-
-        }else if(i==2){
-            S  = sqrt( 1.0 + kRot[2][2] - kRot[0][0] - kRot[1][1] ) * 2;
-
-            x = (kRot[2][0] + kRot[0][2] ) / S;
-            y = (kRot[2][1] + kRot[1][2] ) / S;
-            z = 0.5 / S;
-            w = (kRot[1][0] + kRot[0][1] ) / S;
-        }
-
+        root = sqrt(kRot[i][i]-kRot[j][j]-kRot[k][k] + 1.0f);
+        float* apkQuat[3] = { &x, &y, &z };
+        *apkQuat[i] = 0.5f*root;
+        root = 0.5f/root;
+        w = (kRot[k][j]-kRot[j][k])*root;
+        *apkQuat[j] = (kRot[j][i]+kRot[i][j])*root;
+        *apkQuat[k] = (kRot[k][i]+kRot[i][k])*root;
     }
-
 }
 
 Matrix4 Quaternion::getRotationMatrix(){

@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "Scene.h"
 #include "Log.h"
+#include "math/Angle.h"
 
 using namespace Supernova;
 
@@ -11,8 +12,10 @@ Mesh2D::Mesh2D(): Mesh(){
     this->height = 0;
 
     this->billboard = false;
+    this->fakeBillboard = true;
     this->fixedSizeBillboard=false;
-    this->billboardScaleFactor=100;
+    this->cylindricalBillboard=false;
+    this->billboardScaleFactor=1000;
 
     this->clipping = false;
     this->clipBorder[0] = 0;
@@ -33,21 +36,69 @@ float Mesh2D::convTex(float value){
     return value;
 }
 
+void Mesh2D::updateMVPMatrix(){
+
+    if (billboard && fakeBillboard) {
+
+        Matrix4 modelViewMatrix = *viewMatrix * modelMatrix;
+
+        Vector3 newScale = getWorldScale();
+
+        if (fixedSizeBillboard) {
+            float scalebillboard =
+                    (((*this->viewProjectionMatrix)) * Vector4(worldPosition, 1.0)).w / billboardScaleFactor;
+            newScale = newScale * scalebillboard;
+        }
+
+        modelViewMatrix.set(0,0, newScale.x);
+        modelViewMatrix.set(0,1, 0.0);
+        modelViewMatrix.set(0,2, 0.0);
+
+        if (!cylindricalBillboard) {
+            modelViewMatrix.set(1, 0, 0.0);
+            modelViewMatrix.set(1, 1, newScale.y);
+            modelViewMatrix.set(1, 2, 0.0);
+        }
+
+        modelViewMatrix.set(2,0, 0.0);
+        modelViewMatrix.set(2,1, 0.0);
+        modelViewMatrix.set(2,2, newScale.z);
+
+
+        if (this->viewProjectionMatrix != NULL){
+            this->modelViewProjectionMatrix = *projectionMatrix * modelViewMatrix;
+        }
+
+    }else{
+        Mesh::updateMVPMatrix();
+    }
+}
+
 void Mesh2D::updateModelMatrix(){
+
     Mesh::updateModelMatrix();
 
-    if (billboard) {
-        if (viewMatrix) {
+    if (billboard && !fakeBillboard) {
 
-            rotation.fromRotationMatrix(viewMatrix->transpose());
-            if (parent)
-                rotation = parent->getWorldRotation().inverse() * rotation;
+        if (scene && scene->getCamera()) {
+            Vector3 camPos = scene->getCamera()->getWorldPosition();
 
-            if (fixedSizeBillboard){
-                float scalebillboard = (modelViewProjectionMatrix * Vector4(0, 0, 0, 1.0)).w / billboardScaleFactor;
-                scale = Vector3(scalebillboard, scalebillboard, scalebillboard);
+            if (cylindricalBillboard)
+                camPos.y = worldPosition.y;
+
+            lookAt(camPos, *scene->getCamera()->getWorldUpPtr());
+
+            if (fixedSizeBillboard) {
+                float scalebillboard =
+                        (((*this->viewProjectionMatrix)) * Vector4(worldPosition, 1.0)).w / billboardScaleFactor;
+
+                if (billboardOldScale == Vector3::ZERO)
+                    billboardOldScale = scale;
+
+                setScale(billboardOldScale * scalebillboard);
             }
         }
+
     }
 }
 
@@ -55,7 +106,7 @@ void Mesh2D::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
 
     Mesh::updateVPMatrix( viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
-    if (billboard) {
+    if (billboard && !fakeBillboard) {
         needUpdate();
     }
 }
@@ -73,6 +124,10 @@ void Mesh2D::setBillboard(bool billboard){
     this->billboard = billboard;
 }
 
+void Mesh2D::setFakeBillboard(bool fakeBillboard){
+    this->fakeBillboard = fakeBillboard;
+}
+
 void Mesh2D::setFixedSizeBillboard(bool fixedSizeBillboard){
     this->fixedSizeBillboard = fixedSizeBillboard;
 }
@@ -80,6 +135,11 @@ void Mesh2D::setFixedSizeBillboard(bool fixedSizeBillboard){
 void Mesh2D::setBillboardScaleFactor(float billboardScaleFactor){
     this->billboardScaleFactor = billboardScaleFactor;
 }
+
+void Mesh2D::setCylindricalBillboard(bool cylindricalBillboard) {
+    this->cylindricalBillboard = cylindricalBillboard;
+}
+
 
 void Mesh2D::setClipping(bool clipping){
     this->clipping = clipping;

@@ -31,6 +31,7 @@ namespace Supernova {
 
         Vector3 worldView;
         Vector3 worldUp;
+        Vector3 worldRight;
 
         float left;
         float right;
@@ -106,6 +107,9 @@ namespace Supernova {
         Matrix4* getProjectionMatrix();
         Matrix4* getViewProjectionMatrix();
         Vector3* getWorldPositionPtr();
+        Vector3* getWorldUpPtr();
+        Vector3* getWorldViewPtr();
+        Vector3* getWorldRightPtr();
 
         Ray pointsToRay(float normalized_x, float normalized_y);
 

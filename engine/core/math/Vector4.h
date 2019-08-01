@@ -37,7 +37,9 @@ namespace Supernova {
 
         explicit Vector4( const float scaler );
 
-        explicit Vector4(const Vector3& rhs);
+        explicit Vector4( const Vector3& rhs );
+
+        explicit Vector4( const Vector3& rhs, const float fW );
 
 
         void swap(Vector4& other);

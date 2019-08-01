@@ -9,12 +9,17 @@ namespace Supernova {
 
     class Mesh2D: public Mesh {
 
+    private:
+        Vector3 billboardOldScale;
+
     protected:
         int width;
         int height;
 
         bool billboard;
+        bool fakeBillboard;
         bool fixedSizeBillboard;
+        bool cylindricalBillboard;
         float billboardScaleFactor;
 
         bool clipping;
@@ -23,13 +28,17 @@ namespace Supernova {
 
         float convTex(float value);
 
+        virtual void updateMVPMatrix();
+
     public:
         Mesh2D();
         virtual ~Mesh2D();
 
         void setBillboard(bool billboard);
+        void setFakeBillboard(bool fakeBillboard);
         void setFixedSizeBillboard(bool fixedSizeBillboard);
         void setBillboardScaleFactor(float billboardScaleFactor);
+        void setCylindricalBillboard(bool cylindricalBillboard);
 
         void setClipping(bool clipping);
         void setClipBorder(float left, float top, float right, float bottom);

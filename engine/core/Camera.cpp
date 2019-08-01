@@ -358,6 +358,18 @@ Vector3* Camera::getWorldPositionPtr(){
     return &worldPosition;
 }
 
+Vector3* Camera::getWorldUpPtr(){
+    return &worldUp;
+}
+
+Vector3* Camera::getWorldViewPtr(){
+    return &worldView;
+}
+
+Vector3* Camera::getWorldRightPtr(){
+    return &worldRight;
+}
+
 Ray Camera::pointsToRay(float x, float y) {
 
     float normalized_x, normalized_y;
@@ -426,6 +438,8 @@ void Camera::updateModelMatrix(){
     }
 
     updateViewMatrix();
+
+    worldRight = Vector3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
 
     updateViewProjectionMatrix();
 }

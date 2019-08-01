@@ -124,6 +124,8 @@ namespace Supernova {
         void moveUp();
         void moveDown();
 
+        void lookAt(Vector3 target, Vector3 up = Vector3(0, 1, 0));
+
         void setOwnedBody(bool ownedBody);
 
         Body2D* createBody2D();

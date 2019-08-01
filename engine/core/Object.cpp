@@ -358,6 +358,19 @@ void Object::moveUp(){
     }
 }
 
+void Object::lookAt(Vector3 target, Vector3 up){
+    Matrix4 m1 = Matrix4::lookAtMatrix(target, worldPosition, up);
+
+    Quaternion oldRotation = rotation;
+
+    rotation.fromRotationMatrix(m1);
+    if (parent)
+        rotation = parent->getWorldRotation().inverse() * rotation;
+
+    if (rotation != oldRotation)
+        needUpdate();
+}
+
 void Object::addAction(Action* action){
     bool founded = false;
 

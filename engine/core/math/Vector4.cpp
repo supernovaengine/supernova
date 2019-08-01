@@ -28,7 +28,10 @@ Vector4::Vector4( float* const r ): x( r[0] ), y( r[1] ), z( r[2] ), w( r[3] ){
 Vector4::Vector4( const float scaler ): x( scaler ), y( scaler ), z( scaler ), w( scaler ){
 }
 
-Vector4::Vector4(const Vector3& rhs): x(rhs.x), y(rhs.y), z(rhs.z), w(1.0f){
+Vector4::Vector4( const Vector3& rhs ): x(rhs.x), y(rhs.y), z(rhs.z), w(0.0f){
+}
+
+Vector4::Vector4( const Vector3& rhs, const float fW ): x(rhs.x), y(rhs.y), z(rhs.z), w(fW){
 }
 
 
