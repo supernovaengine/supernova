@@ -141,6 +141,7 @@ namespace Supernova {
 
         virtual bool load();
         virtual bool draw();
+        virtual void interDraw();
         virtual void update();
         virtual void destroy();
 

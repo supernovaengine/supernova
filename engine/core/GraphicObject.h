@@ -69,6 +69,8 @@ namespace Supernova {
         virtual bool shadowDraw();
         
         virtual bool renderDraw();
+
+        virtual void interDraw();
         
         virtual bool draw();
         virtual bool load();

@@ -100,7 +100,7 @@ void GraphicObject::updateModelMatrix(){
     updateDistanceToCamera();
 }
 
-bool GraphicObject::draw(){
+void GraphicObject::interDraw(){
 
     bool drawReturn = false;
 
@@ -118,6 +118,12 @@ bool GraphicObject::draw(){
             setSceneTransparency(true);
         }
     }
+
+}
+
+bool GraphicObject::draw(){
+
+    bool drawReturn = false;
 
     if (!scissor.isZero() && scene){
 

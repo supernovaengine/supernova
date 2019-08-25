@@ -78,7 +78,7 @@ void Mesh2D::updateModelMatrix(){
 
     Mesh::updateModelMatrix();
 
-    if (billboard && !fakeBillboard) {
+    if (billboard && !fakeBillboard && viewProjectionMatrix) {
 
         if (scene && scene->getCamera()) {
             Vector3 camPos = scene->getCamera()->getWorldPosition();
@@ -107,7 +107,7 @@ void Mesh2D::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     Mesh::updateVPMatrix( viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     if (billboard && !fakeBillboard) {
-        needUpdate();
+        updateModelMatrix();
     }
 }
 
