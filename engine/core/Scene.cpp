@@ -301,7 +301,7 @@ void Scene::resetSceneProperties(){
 void Scene::drawTransparentMeshes(){
     std::multimap<float, GraphicObject*>::reverse_iterator it;
     for (it = transparentQueue.rbegin(); it != transparentQueue.rend(); ++it) {
-        (*it).second->renderDraw();
+        (*it).second->renderDraw(false);
     }
 }
 
@@ -314,7 +314,7 @@ void Scene::drawChildScenes(){
 
 void Scene::drawSky(){
     if (sky != NULL)
-        sky->renderDraw();
+        sky->renderDraw(false);
 }
 
 Texture* Scene::getTextureFrame(){

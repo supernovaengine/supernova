@@ -63,10 +63,9 @@ namespace Supernova {
         virtual void updateModelMatrix();
         
         virtual bool textureLoad();
-        virtual bool shadowLoad();
-        virtual bool shadowDraw();
-        
-        virtual bool renderDraw();
+
+        virtual bool renderLoad(bool shadow);
+        virtual bool renderDraw(bool shadow);
         
         virtual bool load();
         virtual void destroy();

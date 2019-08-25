@@ -852,19 +852,35 @@ void Model::updateModelMatrix(){
     inverseDerivedTransform = (modelMatrix * Matrix4::translateMatrix(center)).inverse();
 }
 
-bool Model::shadowLoad() {
+bool Model::renderLoad(bool shadow) {
 
-    instanciateShadowRender();
+    if (!shadow){
 
-    if (skinning){
-        shadowRender->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
+        instanciateRender();
+
+        if (skinning){
+            render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
+        }
+
+        if (morphTargets){
+            render->addProperty(S_PROPERTY_MORPHWEIGHTS, S_PROPERTYDATA_FLOAT1, morphWeights.size(), &morphWeights.front());
+        }
+
+    } else {
+
+        instanciateShadowRender();
+
+        if (skinning){
+            shadowRender->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
+        }
+
+        if (morphTargets){
+            shadowRender->addProperty(S_PROPERTY_MORPHWEIGHTS, S_PROPERTYDATA_FLOAT1, morphWeights.size(), &morphWeights.front());
+        }
+
     }
 
-    if (morphTargets){
-        shadowRender->addProperty(S_PROPERTY_MORPHWEIGHTS, S_PROPERTYDATA_FLOAT1, morphWeights.size(), &morphWeights.front());
-    }
-
-    return Mesh::shadowLoad();
+    return Mesh::renderLoad(shadow);
 }
 
 bool Model::load(){
@@ -881,16 +897,6 @@ bool Model::load(){
 
     if (skeleton)
         skinning = true;
-
-    instanciateRender();
-
-    if (skinning){
-        render->addProperty(S_PROPERTY_BONESMATRIX, S_PROPERTYDATA_MATRIX4, bonesMatrix.size(), &bonesMatrix.front());
-    }
-
-    if (morphTargets){
-        render->addProperty(S_PROPERTY_MORPHWEIGHTS, S_PROPERTYDATA_FLOAT1, morphWeights.size(), &morphWeights.front());
-    }
 
     return Mesh::load();
 }

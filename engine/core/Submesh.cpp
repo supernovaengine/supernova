@@ -176,76 +176,82 @@ bool Submesh::textureLoad(){
     return true;
 }
 
-bool Submesh::shadowLoad(){
-    
-    shadowRender = getSubmeshShadowRender();
+bool Submesh::renderLoad(bool shadow){
 
-    shadowRender->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
-    for (auto const &x : attributes) {
-        shadowRender->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
+    if (!shadow) {
+
+        render = getSubmeshRender();
+
+        render->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
+        for (auto const &x : attributes) {
+            render->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
+        }
+
+        render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
+        render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor());
+        if (material->getTextureRect())
+            render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect());
+
+        bool renderloaded = true;
+
+        if (renderOwned)
+            renderloaded = render->load();
+
+        if (renderloaded)
+            loaded = true;
+
+        return renderloaded;
+
+    } else {
+
+        shadowRender = getSubmeshShadowRender();
+
+        shadowRender->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
+        for (auto const &x : attributes) {
+            shadowRender->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
+        }
+
+        bool shadowloaded = true;
+
+        if (shadowRenderOwned)
+            shadowloaded = shadowRender->load();
+
+        return shadowloaded;
+
     }
-    
-    bool shadowloaded = true;
-    
-    if (shadowRenderOwned)
-        shadowloaded = shadowRender->load();
-    
-    return shadowloaded;
 }
 
-bool Submesh::load(){
+bool Submesh::renderDraw(bool shadow){
+    if (!shadow){
 
-    render = getSubmeshRender();
+        if (!visible)
+            return false;
 
-    render->setIndices(indices.getBuffer(), indices.getCount(), indices.getOffset(), indices.getDataType());
-    for (auto const &x : attributes) {
-        render->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
+        if (renderOwned)
+            render->prepareDraw();
+
+        render->draw();
+
+        if (renderOwned)
+            render->finishDraw();
+
+        return true;
+
+    } else {
+
+        if (!visible)
+            return false;
+
+        if (shadowRenderOwned)
+            shadowRender->prepareDraw();
+
+        shadowRender->draw();
+
+        if (shadowRenderOwned)
+            shadowRender->finishDraw();
+
+        return true;
     }
-
-    render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
-    render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor());
-    if (material->getTextureRect())
-        render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect());
-
-    bool renderloaded = true;
-
-    if (renderOwned)
-        renderloaded = render->load();
-    
-    if (renderloaded)
-        loaded = true;
-    
-    return renderloaded;
-}
-
-bool Submesh::draw(){
-    if (!visible)
-        return false;
-
-    if (renderOwned)
-        render->prepareDraw();
-
-    render->draw();
-    
-    if (renderOwned)
-        render->finishDraw();
-    
-    return true;
-}
-
-bool Submesh::shadowDraw(){
-    if (!visible)
-        return false;
-
-    if (shadowRenderOwned)
-        shadowRender->prepareDraw();
-
-    shadowRender->draw();
-
-    if (shadowRenderOwned)
-        shadowRender->finishDraw();
-
-    return true;
 }
 
 void Submesh::destroy(){

@@ -7,7 +7,6 @@
 
 #include "Object.h"
 #include "Camera.h"
-#include "Render.h"
 #include "render/SceneRender.h"
 #include "Light.h"
 #include "Fog.h"

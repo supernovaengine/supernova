@@ -8,11 +8,10 @@
 #include "Material.h"
 #include "render/ObjectRender.h"
 #include "buffer/Attribute.h"
-#include "Render.h"
 
 namespace Supernova {
 
-    class Submesh: public Render {
+    class Submesh{
 
         friend class Mesh;
         friend class Model;
@@ -64,11 +63,9 @@ namespace Supernova {
         bool isVisible();
 
         bool textureLoad();
-        bool shadowLoad();
-        bool shadowDraw();
+        bool renderLoad(bool shadow);
+        bool renderDraw(bool shadow);
         
-        virtual bool load();
-        virtual bool draw();
         virtual void destroy();
     };
     

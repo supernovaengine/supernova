@@ -456,8 +456,8 @@ bool Points::isPertmitSortTransparentPoints(){
     return pertmitSortTransparentPoints;
 }
 
-bool Points::renderDraw(){
-    if (!GraphicObject::renderDraw())
+bool Points::renderDraw(bool shadow){
+    if (!GraphicObject::renderDraw(shadow))
         return false;
     
     render->prepareDraw();

@@ -93,15 +93,27 @@ void Terrain::createPlaneTile(int index, int widthSegments, int heightSegments){
 
 }
 
-bool Terrain::shadowLoad(){
+bool Terrain::renderLoad(bool shadow){
 
-    instanciateShadowRender();
+    if (!shadow){
 
-    //shadowRender->addProgramDef(S_PROGRAM_IS_TERRAIN);
+        instanciateRender();
 
-    shadowRender->addProperty(S_PROPERTY_TERRAINTILEOFFSET, S_PROPERTYDATA_FLOAT2, 1, &offset);
+        render->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
-    return Mesh::shadowLoad();
+        render->addProperty(S_PROPERTY_TERRAINTILEOFFSET, S_PROPERTYDATA_FLOAT2, 1, &offset);
+
+    } else {
+
+        instanciateShadowRender();
+
+        //shadowRender->addProgramDef(S_PROGRAM_IS_TERRAIN);
+
+        shadowRender->addProperty(S_PROPERTY_TERRAINTILEOFFSET, S_PROPERTYDATA_FLOAT2, 1, &offset);
+
+    }
+
+    return Mesh::renderLoad(shadow);
 };
 
 bool Terrain::load(){
@@ -134,13 +146,6 @@ bool Terrain::load(){
     buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
     buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
 */
-
-
-    instanciateRender();
-
-    render->addProgramDef(S_PROGRAM_IS_TERRAIN);
-
-    render->addProperty(S_PROPERTY_TERRAINTILEOFFSET, S_PROPERTYDATA_FLOAT2, 1, &offset);
 
     return Mesh::load();
 }

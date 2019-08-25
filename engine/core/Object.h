@@ -6,7 +6,6 @@
 //
 
 #include <vector>
-#include "Render.h"
 #include "math/Matrix4.h"
 #include "math/Vector3.h"
 #include "math/Vector2.h"
@@ -18,7 +17,7 @@ namespace Supernova {
 
     class Scene;
 
-    class Object: public Render {
+    class Object {
 
     private:
         

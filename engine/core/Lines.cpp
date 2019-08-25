@@ -53,8 +53,8 @@ void Lines::setLineWidth(float lineWidth) {
         render->setLineWidth(lineWidth);
 }
 
-bool Lines::renderDraw(){
-    if (!GraphicObject::renderDraw())
+bool Lines::renderDraw(bool shadow){
+    if (!GraphicObject::renderDraw(shadow))
         return false;
 
     render->prepareDraw();

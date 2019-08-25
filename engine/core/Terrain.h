@@ -35,7 +35,7 @@ namespace Supernova{
         const std::string &getHeightmap() const;
         void setHeightmap(const std::string &heightmap);
 
-        virtual bool shadowLoad();
+        virtual bool renderLoad(bool shadow);
         virtual bool load();
     };
 
