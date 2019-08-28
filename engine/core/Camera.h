@@ -49,6 +49,8 @@ namespace Supernova {
 
         bool automatic;
 
+        Scene* linkedScene;
+
     public:
 
         Camera();
@@ -97,6 +99,8 @@ namespace Supernova {
         void moveForward(float distance);
         void walkForward(float distance);
         void slide(float distance);
+
+        void setLinkedScene(Scene* linkedScene);
 
         void updateViewMatrix();
         void updateProjectionMatrix();

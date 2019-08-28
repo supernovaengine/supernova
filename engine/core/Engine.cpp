@@ -288,7 +288,7 @@ void Engine::systemStart(int width, int height){
     Engine::setScalingMode(Scaling::FITWIDTH);
     Engine::setDefaultNearestScaleTexture(false);
     Engine::setDefaultResampleToPOTTexture(true);
-    Engine::setFixedTimeObjectUpdate(false);
+    Engine::setFixedTimeObjectUpdate(true);
     Engine::setFixedTimePhysics(false);
     Engine::setFixedTimeAnimations(false);
     
