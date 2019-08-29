@@ -15,6 +15,9 @@ Icon
 # Visual Studio Code
 .vscode
 
+# Android Stuido ndk
+.cxx
+
 # Thumbnails
 ._*
 
