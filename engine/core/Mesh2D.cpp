@@ -107,7 +107,7 @@ void Mesh2D::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matr
     Mesh::updateVPMatrix( viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
 
     if (billboard && !fakeBillboard) {
-        updateModelMatrix();
+        needUpdate();
     }
 }
 
