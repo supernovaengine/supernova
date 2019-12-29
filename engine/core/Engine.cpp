@@ -382,10 +382,10 @@ void Engine::systemDraw() {
         updateLoops++;
         updateTimeCount -= updateTime;
 
+        Engine::onUpdate.call();
+
         if (Engine::getScene())
             (Engine::getScene())->update();
-
-        Engine::onUpdate.call();
     }
     if (updateLoops > 100){
         Log::Warn("More than 100 updates in a frame");

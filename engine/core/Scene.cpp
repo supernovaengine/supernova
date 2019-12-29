@@ -238,7 +238,7 @@ void Scene::setCamera(Camera* camera){
         userCamera = true;
 
         if (loaded)
-            this->camera->updateModelMatrix();
+            updateVPMatrix(camera->getViewMatrix(), camera->getProjectionMatrix(), camera->getViewProjectionMatrix(), camera->getWorldPositionPtr());
     }
 }
 
