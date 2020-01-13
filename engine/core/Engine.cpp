@@ -51,7 +51,7 @@ bool Engine::useDegrees;
 Scaling Engine::scalingMode;
 bool Engine::defaultNearestScaleTexture;
 bool Engine::defaultResampleToPOTTexture;
-bool Engine::fixedTimeObjectUpdate;
+bool Engine::fixedTimeSceneUpdate;
 bool Engine::fixedTimePhysics;
 bool Engine::fixedTimeAnimations;
 
@@ -215,28 +215,12 @@ bool Engine::isDefaultResampleToPOTTexture(){
     return defaultResampleToPOTTexture;
 }
 
-void Engine::setFixedTimeObjectUpdate(bool fixedTimeObjectUpdate) {
-    Engine::fixedTimeObjectUpdate = fixedTimeObjectUpdate;
+void Engine::setFixedTimeSceneUpdate(bool fixedTimeSceneUpdate) {
+    Engine::fixedTimeSceneUpdate = fixedTimeSceneUpdate;
 }
 
-bool Engine::isFixedTimeObjectUpdate() {
-    return fixedTimeObjectUpdate;
-}
-
-void Engine::setFixedTimePhysics(bool fixedTimePhysics){
-    Engine::fixedTimePhysics = fixedTimePhysics;
-}
-
-bool Engine::isFixedTimePhysics(){
-    return fixedTimePhysics;
-}
-
-void Engine::setFixedTimeAnimations(bool fixedTimeAnimations) {
-    Engine::fixedTimeAnimations = fixedTimeAnimations;
-}
-
-bool Engine::isFixedTimeAnimations() {
-    return fixedTimeAnimations;
+bool Engine::isFixedTimeSceneUpdate() {
+    return fixedTimeSceneUpdate;
 }
 
 void Engine::setUpdateTime(unsigned int updateTimeMS){
@@ -246,6 +230,15 @@ void Engine::setUpdateTime(unsigned int updateTimeMS){
 float Engine::getUpdateTime(){
     return Engine::updateTime;
 }
+
+float Engine::getSceneUpdateTime(){
+    if (isFixedTimeSceneUpdate()){
+        return getUpdateTime();
+    }else{
+        return getDeltatime();
+    }
+}
+
 
 int Engine::getPlatform(){
     
@@ -288,9 +281,7 @@ void Engine::systemStart(int width, int height){
     Engine::setScalingMode(Scaling::FITWIDTH);
     Engine::setDefaultNearestScaleTexture(false);
     Engine::setDefaultResampleToPOTTexture(true);
-    Engine::setFixedTimeObjectUpdate(true);
-    Engine::setFixedTimePhysics(false);
-    Engine::setFixedTimeAnimations(false);
+    Engine::setFixedTimeSceneUpdate(false);
     
     auto now = std::chrono::steady_clock::now();
     lastTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
@@ -384,12 +375,15 @@ void Engine::systemDraw() {
 
         Engine::onUpdate.call();
 
-        if (Engine::getScene())
+        if (isFixedTimeSceneUpdate() && Engine::getScene())
             (Engine::getScene())->update();
     }
     if (updateLoops > 100){
         Log::Warn("More than 100 updates in a frame");
     }
+
+    if (!isFixedTimeSceneUpdate() && Engine::getScene())
+        (Engine::getScene())->update();
 
     Engine::onDraw.call();
 

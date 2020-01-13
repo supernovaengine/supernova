@@ -238,7 +238,7 @@ void Scene::setCamera(Camera* camera){
         userCamera = true;
 
         if (loaded)
-            updateVPMatrix(camera->getViewMatrix(), camera->getProjectionMatrix(), camera->getViewProjectionMatrix(), camera->getWorldPositionPtr());
+            this->camera->updateModelMatrix();
     }
 }
 
@@ -420,9 +420,6 @@ void Scene::updatePhysics(float time){
 bool Scene::draw() {
     //TODO: alert if not loaded
 
-    if (!Engine::isFixedTimePhysics())
-        updatePhysics(Engine::getDeltatime());
-
     Camera* originalCamera = this->camera;
     Texture* originalTextureRender = this->textureFrame;
 
@@ -482,8 +479,7 @@ bool Scene::draw() {
 
 void Scene::update(){
 
-    if (Engine::isFixedTimePhysics())
-        updatePhysics(Engine::getUpdateTime());
+    updatePhysics(Engine::getSceneUpdateTime());
 
     if (camera && !camera->getParent()){
         camera->update();

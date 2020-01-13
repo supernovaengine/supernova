@@ -607,21 +607,6 @@ bool Object::draw(){
         setSceneDepth(true);
     }
 
-    if (!scene || !scene->drawingShadow) {
-        //Do not update animations when shadow draw
-        if (!Engine::isFixedTimeAnimations()) {
-            for (int i = 0; i < actions.size(); i++) {
-                if (actions[i]->isRunning()) {
-                    actions[i]->update(Engine::getDeltatime());
-                }
-            }
-        }
-    }
-
-    if (!Engine::isFixedTimeObjectUpdate() && markToUpdate) {
-        updateModelMatrix();
-    }
-
     interDraw();
     
     std::vector<Object*>::iterator it;
@@ -639,15 +624,13 @@ bool Object::draw(){
 
 void Object::update(){
 
-    if (Engine::isFixedTimeAnimations()) {
-        for (int i = 0; i < actions.size(); i++) {
-            if (actions[i]->isRunning()) {
-                actions[i]->update(Engine::getUpdateTime());
-            }
+    for (int i = 0; i < actions.size(); i++) {
+        if (actions[i]->isRunning()) {
+            actions[i]->update(Engine::getSceneUpdateTime());
         }
     }
 
-    if (Engine::isFixedTimeObjectUpdate() && markToUpdate) {
+    if (markToUpdate) {
         updateModelMatrix();
     }
 
