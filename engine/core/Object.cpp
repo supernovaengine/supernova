@@ -598,16 +598,10 @@ bool Object::load(){
 
 }
 
-void Object::interDraw(){
-
-};
-
 bool Object::draw(){
     if (position.z != 0){
         setSceneDepth(true);
     }
-
-    interDraw();
     
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
