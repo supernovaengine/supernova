@@ -281,7 +281,8 @@ bool Scene::updateCameraSize(){
 
 void Scene::doCamera(){
     if (this->camera == NULL){
-        this->camera = new Camera(S_CAMERA_2D);
+        setCamera(new Camera(S_CAMERA_2D));
+        userCamera = false;
     }
 }
 
@@ -558,7 +559,6 @@ bool Scene::load(){
 
     bool loadreturn = Object::load();
 
-    camera->updateModelMatrix();
     Object::needUpdate();
 
     if (textureFrame != NULL) {
