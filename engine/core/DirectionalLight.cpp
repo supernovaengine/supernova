@@ -11,7 +11,7 @@ DirectionalLight::DirectionalLight(): Light(){
     this->power = 1;
 
     this->numShadowCascades = 3;
-    this->shadowSplitLogFactor = .8f;
+    this->shadowSplitLogFactor = .7f;
     this->cascadeCameraNearFar.clear();
 
 }
@@ -68,7 +68,7 @@ void DirectionalLight::updateLightCamera(){
 
         if (scene && !scene->isDrawingShadow()) {
 
-            float zFar = 1000;
+            float zFar = 5000;
             float zNear = 1;
             float fov = 0;
             float ratio = 1;
