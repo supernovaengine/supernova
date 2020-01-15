@@ -253,19 +253,22 @@ bool Mesh::renderLoad(bool shadow){
 }
 
 bool Mesh::load(){
-    for (unsigned int i = 0; i < submeshes.size(); i++){
-        if (submeshes.at(i)->getMaterial()->isTransparent()) {
-            transparent = true;
-        }
-    }
-
     if (scene && scene->isLoadedShadow()) {
         renderLoad(true);
     }
 
     renderLoad(false);
 
-    return GraphicObject::load();
+    bool loadReturn = GraphicObject::load();
+
+    //Check after texture is loaded
+    for (unsigned int i = 0; i < submeshes.size(); i++){
+        if (submeshes.at(i)->getMaterial()->isTransparent()) {
+            transparent = true;
+        }
+    }
+
+    return loadReturn;
 }
 
 bool Mesh::renderDraw(bool shadow){

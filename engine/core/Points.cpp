@@ -481,10 +481,6 @@ bool Points::textureLoad(){
 
 bool Points::load(){
 
-    if (material.isTransparent()){
-        transparent = true;
-    }
-
     instanciateRender();
     
     render->setPrimitiveType(S_PRIMITIVE_POINTS);
@@ -503,5 +499,12 @@ bool Points::load(){
     sortPoints();
     copyBuffer();
 
-    return GraphicObject::load();
+    bool loadReturn = GraphicObject::load();
+
+    //Check after texture is loaded
+    if (material.isTransparent()){
+        transparent = true;
+    }
+
+    return loadReturn;
 }
