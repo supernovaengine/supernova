@@ -561,7 +561,8 @@ void LuaBind::bind(){
 
     .beginExtendClass<Mesh, GraphicObject>("Mesh")
     .addConstructor(LUA_ARGS())
-    .addFunction("setTexture", (void (Mesh::*)(std::string, int))&Mesh::setTexture)
+    .addFunction("setTexture", (void (Mesh::*)(std::string))&Mesh::setTexture)
+    .addFunction("setTextureInt", (void (Mesh::*)(std::string, int))&Mesh::setTexture)
     .endClass()
 
     .beginExtendClass<Points, GraphicObject>("Points")

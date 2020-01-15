@@ -58,6 +58,14 @@ Vector4 Mesh::getColor(int submesh){
     return Vector4(0, 0, 0, 0);
 }
 
+void Mesh::setTexture(Texture* texture){
+    setTexture(texture, 0);
+}
+
+void Mesh::setTexture(std::string texturepath){
+    setTexture(texturepath, 0);
+}
+
 void Mesh::setTexture(Texture* texture, int submesh){
     if (submesh >= 0 && submesh < submeshes.size()) {
         Texture *oldTexture = submeshes[submesh]->getMaterial()->getTexture();
