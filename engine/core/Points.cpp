@@ -456,17 +456,6 @@ bool Points::isPertmitSortTransparentPoints(){
     return pertmitSortTransparentPoints;
 }
 
-bool Points::renderDraw(bool shadow){
-    if (!GraphicObject::renderDraw(shadow))
-        return false;
-    
-    render->prepareDraw();
-    render->draw();
-    render->finishDraw();
-    
-    return true;
-}
-
 bool Points::textureLoad(){
     if (!GraphicObject::textureLoad())
         return false;

@@ -235,6 +235,23 @@ bool GraphicObject::renderLoad(bool shadow){
 
 bool GraphicObject::renderDraw(bool shadow){
 
+    if (!visible)
+        return false;
+
+    if (!shadow) {
+
+        render->prepareDraw();
+        render->draw();
+        render->finishDraw();
+
+    }else{
+
+        shadowRender->prepareDraw();
+        shadowRender->draw();
+        shadowRender->finishDraw();
+
+    }
+
     return true;
 }
 

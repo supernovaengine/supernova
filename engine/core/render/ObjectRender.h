@@ -40,9 +40,9 @@ namespace Supernova {
         
         void checkLighting();
         void checkFog();
-        void checkTextureCoords();
-        void checkTextureRect();
-        void checkTextureCube();
+        void checkTextureCoords(ObjectRender* render);
+        void checkTextureRect(ObjectRender* render);
+        void checkTextureCube(ObjectRender* render);
         void checkSkinning();
         void checkMorphTarget();
         void checkMorphNormal();
@@ -88,6 +88,7 @@ namespace Supernova {
 
         std::shared_ptr<ProgramRender> program;
         ObjectRender* parent;
+        std::vector<ObjectRender*> childs;
 
         unsigned int minBufferSize;
         int primitiveType;
@@ -104,8 +105,10 @@ namespace Supernova {
         virtual ~ObjectRender();
 
         void setProgram(std::shared_ptr<ProgramRender> program);
-        void setParent(ObjectRender* parent);
         void setSceneRender(SceneRender* sceneRender);
+
+        void addChild(ObjectRender* child);
+        void clearChilds();
 
         void setVertexSize(unsigned int vertexSize);
         void setMinBufferSize(unsigned int minBufferSize);

@@ -192,15 +192,9 @@ bool Submesh::renderLoad(bool shadow){
         if (material->getTextureRect())
             render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect());
 
-        bool renderloaded = true;
+        loaded = true;
 
-        if (renderOwned)
-            renderloaded = render->load();
-
-        if (renderloaded)
-            loaded = true;
-
-        return renderloaded;
+        return true;
 
     } else {
 
@@ -211,46 +205,8 @@ bool Submesh::renderLoad(bool shadow){
             shadowRender->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
         }
 
-        bool shadowloaded = true;
-
-        if (shadowRenderOwned)
-            shadowloaded = shadowRender->load();
-
-        return shadowloaded;
-
-    }
-}
-
-bool Submesh::renderDraw(bool shadow){
-    if (!shadow){
-
-        if (!visible)
-            return false;
-
-        if (renderOwned)
-            render->prepareDraw();
-
-        render->draw();
-
-        if (renderOwned)
-            render->finishDraw();
-
         return true;
 
-    } else {
-
-        if (!visible)
-            return false;
-
-        if (shadowRenderOwned)
-            shadowRender->prepareDraw();
-
-        shadowRender->draw();
-
-        if (shadowRenderOwned)
-            shadowRender->finishDraw();
-
-        return true;
     }
 }
 

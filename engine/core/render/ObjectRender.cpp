@@ -45,13 +45,20 @@ void ObjectRender::setProgram(std::shared_ptr<ProgramRender> program){
     this->program = program;
 }
 
-void ObjectRender::setParent(ObjectRender* parent){
-    this->parent = parent;
-    this->program = parent->getProgram();
-}
-
 void ObjectRender::setSceneRender(SceneRender* sceneRender){
     this->sceneRender = sceneRender;
+}
+
+void ObjectRender::addChild(ObjectRender* child){
+    childs.push_back(child);
+    child->parent = this;
+}
+
+void ObjectRender::clearChilds(){
+    for (int i=0; i<childs.size(); i++){
+        childs[i]->parent = NULL;
+    }
+    childs.clear();
 }
 
 void ObjectRender::setVertexSize(unsigned int vertexSize){
@@ -150,25 +157,25 @@ void ObjectRender::checkFog(){
     }
 }
 
-void ObjectRender::checkTextureCoords(){
-    if (textures.count(S_TEXTURESAMPLER_DIFFUSE))
-        if (textures[S_TEXTURESAMPLER_DIFFUSE].size() > 0)
+void ObjectRender::checkTextureCoords(ObjectRender* render){
+    if (render->textures.count(S_TEXTURESAMPLER_DIFFUSE))
+        if (render->textures[S_TEXTURESAMPLER_DIFFUSE].size() > 0)
             programDefs |= S_PROGRAM_USE_TEXCOORD;
 }
 
-void ObjectRender::checkTextureRect(){
-    if (vertexAttributes.count(S_VERTEXATTRIBUTE_TEXTURERECTS)){
+void ObjectRender::checkTextureRect(ObjectRender* render){
+    if (render->vertexAttributes.count(S_VERTEXATTRIBUTE_TEXTURERECTS)){
         programDefs |= S_PROGRAM_USE_TEXRECT;
     }
-    if (properties.count(S_PROPERTY_TEXTURERECT)){
+    if (render->properties.count(S_PROPERTY_TEXTURERECT)){
         programDefs |= S_PROGRAM_USE_TEXRECT;
     }
 }
 
-void ObjectRender::checkTextureCube(){
-    if (textures.count(S_TEXTURESAMPLER_DIFFUSE)) {
-        for (size_t i = 0; i < textures[S_TEXTURESAMPLER_DIFFUSE].size(); i++) {
-            if (textures[S_TEXTURESAMPLER_DIFFUSE][i]->getType() == S_TEXTURE_CUBE)
+void ObjectRender::checkTextureCube(ObjectRender* render){
+    if (render->textures.count(S_TEXTURESAMPLER_DIFFUSE)) {
+        for (size_t i = 0; i < render->textures[S_TEXTURESAMPLER_DIFFUSE].size(); i++) {
+            if (render->textures[S_TEXTURESAMPLER_DIFFUSE][i]->getType() == S_TEXTURE_CUBE)
                 programDefs |= S_PROGRAM_USE_TEXCUBE;
         }
     }
@@ -195,12 +202,17 @@ void ObjectRender::checkMorphNormal(){
 void ObjectRender::loadProgram(){
     checkLighting();
     checkFog();
-    checkTextureCoords();
-    checkTextureRect();
-    checkTextureCube();
     checkSkinning();
     checkMorphTarget();
     checkMorphNormal();
+    checkTextureCoords(this);
+    checkTextureRect(this);
+    checkTextureCube(this);
+    for (int i=0; i<childs.size(); i++){
+        checkTextureCoords(childs[i]);
+        checkTextureRect(childs[i]);
+        checkTextureCube(childs[i]);
+    }
 
     std::string shaderStr = std::to_string(programShader);
     shaderStr += "|" + std::to_string(programDefs);
@@ -227,6 +239,11 @@ bool ObjectRender::load(){
             p.second[i]->load();
         }
     }
+
+    for (int i=0; i<childs.size(); i++){
+        childs[i]->program = getProgram();
+        childs[i]->load();
+    }
     
     return true;
 }
@@ -237,6 +254,15 @@ bool ObjectRender::prepareDraw(){
 }
 
 bool ObjectRender::draw(){
+
+    for (int i=0; i<childs.size(); i++){
+        childs[i]->prepareDraw();
+        childs[i]->draw();
+        childs[i]->finishDraw();
+    }
+
+    if (childs.size() > 0)
+        return false;
 
     return true;
 }

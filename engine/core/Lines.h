@@ -32,7 +32,6 @@ namespace Supernova {
         float getLineWidth() const;
         void setLineWidth(float lineWidth);
 
-        virtual bool renderDraw(bool shadow);
         virtual bool load();
 
     };
