@@ -5,7 +5,7 @@
 // (c) 2018 Eduardo Doria.
 //
 
-#include "util/FunctionCallback.h"
+#include "util/FunctionSubscribe.h"
 
 namespace Supernova{
 
@@ -27,12 +27,12 @@ namespace Supernova{
         Action();
         virtual ~Action();
 
-        FunctionCallback<void(Object*)> onStart;
-        FunctionCallback<void(Object*)> onRun;
-        FunctionCallback<void(Object*)> onPause;
-        FunctionCallback<void(Object*)> onStop;
-        FunctionCallback<void(Object*)> onFinish;
-        FunctionCallback<void(Object*,float)> onUpdate;
+        FunctionSubscribe<void(Object*)> onStart;
+        FunctionSubscribe<void(Object*)> onRun;
+        FunctionSubscribe<void(Object*)> onPause;
+        FunctionSubscribe<void(Object*)> onStop;
+        FunctionSubscribe<void(Object*)> onFinish;
+        FunctionSubscribe<void(Object*,float)> onUpdate;
 
         Object* getObject();
 

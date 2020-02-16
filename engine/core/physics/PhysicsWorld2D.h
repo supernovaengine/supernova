@@ -33,10 +33,10 @@ namespace Supernova {
         PhysicsWorld2D(float pointsToMeterScale);
         virtual ~PhysicsWorld2D();
         
-        FunctionCallback<void(Contact2D*)> onBeginContact;
-        FunctionCallback<void(Contact2D*)> onPreSolve;
-        FunctionCallback<void(Contact2D*)> onPostSolve;
-        FunctionCallback<void(Contact2D*)> onEndContact;
+        FunctionSubscribe<void(Contact2D*)> onBeginContact;
+        FunctionSubscribe<void(Contact2D*)> onPreSolve;
+        FunctionSubscribe<void(Contact2D*)> onPostSolve;
+        FunctionSubscribe<void(Contact2D*)> onEndContact;
 
         b2World* getBox2DWorld();
 

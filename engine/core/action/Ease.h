@@ -1,7 +1,7 @@
 #ifndef EASE_H
 #define EASE_H
 
-#include "util/FunctionCallback.h"
+#include "util/Function.h"
 
 #define S_LINEAR 0
 #define S_EASE_QUAD_IN 1
@@ -41,7 +41,7 @@ namespace Supernova {
 
     protected:
 
-        FunctionCallback<float(float)> function;
+        Function<float(float)> function;
 
     public:
 

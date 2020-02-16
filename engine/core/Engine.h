@@ -1,7 +1,7 @@
 #ifndef engine_h
 #define engine_h
 
-#include "util/FunctionCallback.h"
+#include "util/FunctionSubscribe.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -141,20 +141,20 @@ namespace Supernova {
         static void systemTextInput(const char* text);
 
         //-----Supernova user events-----
-        static FunctionCallback<void()> onCanvasLoaded;
-        static FunctionCallback<void()> onCanvasChanged;
-        static FunctionCallback<void()> onDraw;
-        static FunctionCallback<void()> onUpdate;
-        static FunctionCallback<void(int,float,float)> onTouchStart;
-        static FunctionCallback<void(int,float,float)> onTouchEnd;
-        static FunctionCallback<void(int,float,float)> onTouchDrag;
-        static FunctionCallback<void(int,float,float)> onMouseDown;
-        static FunctionCallback<void(int,float,float)> onMouseUp;
-        static FunctionCallback<void(int,float,float)> onMouseDrag;
-        static FunctionCallback<void(float,float)> onMouseMove;
-        static FunctionCallback<void(int)> onKeyDown;
-        static FunctionCallback<void(int)> onKeyUp;
-        static FunctionCallback<void(std::string)> onTextInput;
+        static FunctionSubscribe<void()> onCanvasLoaded;
+        static FunctionSubscribe<void()> onCanvasChanged;
+        static FunctionSubscribe<void()> onDraw;
+        static FunctionSubscribe<void()> onUpdate;
+        static FunctionSubscribe<void(int,float,float)> onTouchStart;
+        static FunctionSubscribe<void(int,float,float)> onTouchEnd;
+        static FunctionSubscribe<void(int,float,float)> onTouchDrag;
+        static FunctionSubscribe<void(int,float,float)> onMouseDown;
+        static FunctionSubscribe<void(int,float,float)> onMouseUp;
+        static FunctionSubscribe<void(int,float,float)> onMouseDrag;
+        static FunctionSubscribe<void(float,float)> onMouseMove;
+        static FunctionSubscribe<void(int)> onKeyDown;
+        static FunctionSubscribe<void(int)> onKeyUp;
+        static FunctionSubscribe<void(std::string)> onTextInput;
 
     };
     

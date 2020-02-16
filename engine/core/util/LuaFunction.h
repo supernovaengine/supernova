@@ -26,6 +26,9 @@ namespace Supernova {
 
         LuaFunction& operator = (const LuaFunction& t);
 
+        bool operator == ( const LuaFunction& t ) const;
+        operator bool() const;
+
         int set(lua_State *L);
         void remove();
 

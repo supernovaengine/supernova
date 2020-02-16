@@ -64,20 +64,20 @@ float Engine::framerate = 0;
 float Engine::updateTime = 0.03;
 
 //-----Supernova user events-----
-FunctionCallback<void()> Engine::onCanvasLoaded;
-FunctionCallback<void()> Engine::onCanvasChanged;
-FunctionCallback<void()> Engine::onDraw;
-FunctionCallback<void()> Engine::onUpdate;
-FunctionCallback<void(int,float,float)> Engine::onTouchStart;
-FunctionCallback<void(int,float,float)> Engine::onTouchEnd;
-FunctionCallback<void(int,float,float)> Engine::onTouchDrag;
-FunctionCallback<void(int,float,float)> Engine::onMouseDown;
-FunctionCallback<void(int,float,float)> Engine::onMouseUp;
-FunctionCallback<void(int,float,float)> Engine::onMouseDrag;
-FunctionCallback<void(float,float)> Engine::onMouseMove;
-FunctionCallback<void(int)> Engine::onKeyDown;
-FunctionCallback<void(int)> Engine::onKeyUp;
-FunctionCallback<void(std::string)> Engine::onTextInput;
+FunctionSubscribe<void()> Engine::onCanvasLoaded;
+FunctionSubscribe<void()> Engine::onCanvasChanged;
+FunctionSubscribe<void()> Engine::onDraw;
+FunctionSubscribe<void()> Engine::onUpdate;
+FunctionSubscribe<void(int,float,float)> Engine::onTouchStart;
+FunctionSubscribe<void(int,float,float)> Engine::onTouchEnd;
+FunctionSubscribe<void(int,float,float)> Engine::onTouchDrag;
+FunctionSubscribe<void(int,float,float)> Engine::onMouseDown;
+FunctionSubscribe<void(int,float,float)> Engine::onMouseUp;
+FunctionSubscribe<void(int,float,float)> Engine::onMouseDrag;
+FunctionSubscribe<void(float,float)> Engine::onMouseMove;
+FunctionSubscribe<void(int)> Engine::onKeyDown;
+FunctionSubscribe<void(int)> Engine::onKeyUp;
+FunctionSubscribe<void(std::string)> Engine::onTextInput;
 
 
 Engine::Engine() {

@@ -7,7 +7,7 @@
 //
 
 #include "Mesh2D.h"
-#include "util/FunctionCallback.h"
+#include "util/FunctionSubscribe.h"
 
 namespace Supernova {
 
@@ -25,8 +25,8 @@ namespace Supernova {
         
         int getState();
 
-        FunctionCallback<void()> onDown;
-        FunctionCallback<void()> onUp;
+        FunctionSubscribe<void()> onDown;
+        FunctionSubscribe<void()> onUp;
 
         virtual void inputDown();
         virtual void inputUp();

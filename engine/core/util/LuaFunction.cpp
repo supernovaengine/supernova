@@ -31,6 +31,18 @@ LuaFunction& LuaFunction::operator = (const LuaFunction& t){
     return *this;
 }
 
+bool LuaFunction::operator == ( const LuaFunction& t ) const{
+    return ( function == t.function );
+}
+
+LuaFunction::operator bool() const
+{
+    if (function > 0)
+        return true;
+
+    return false;
+}
+
 int LuaFunction::set(lua_State *L){
     if (lua_type(L, lua_gettop(L)) == LUA_TFUNCTION){
         // The function to store is on the top of stack L
