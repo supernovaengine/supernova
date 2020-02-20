@@ -1,6 +1,7 @@
 #include "DirectionalLight.h"
 #include "math/Angle.h"
 #include "Scene.h"
+#include "util/UniqueToken.h"
 #include <algorithm>
 
 using namespace Supernova;
@@ -213,16 +214,7 @@ bool DirectionalLight::loadShadow(){
             if (shadowMap.size() < (ca+1)) {
                 shadowMap.push_back(new Texture(shadowMapWidth, shadowMapHeight));
 
-                char rand_id[10];
-                static const char alphanum[] =
-                        "0123456789"
-                                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                "abcdefghijklmnopqrstuvwxyz";
-                for (int i = 0; i < 10; ++i) {
-                    rand_id[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
-                }
-
-                shadowMap[ca]->setId("shadowMap|" + std::string(rand_id));
+                shadowMap[ca]->setId("shadowMap|" + UniqueToken::get());
                 shadowMap[ca]->setType(S_TEXTURE_DEPTH_FRAME);
             }
 

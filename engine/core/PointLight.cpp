@@ -1,5 +1,6 @@
 #include "PointLight.h"
 #include "math/Angle.h"
+#include "util/UniqueToken.h"
 #include "Scene.h"
 
 using namespace Supernova;
@@ -63,16 +64,7 @@ bool PointLight::loadShadow(){
         if (shadowMap.size()==0) {
             shadowMap.push_back(new Texture(shadowMapWidth, shadowMapHeight));
 
-            char rand_id[10];
-            static const char alphanum[] =
-                    "0123456789"
-                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                            "abcdefghijklmnopqrstuvwxyz";
-            for (int i = 0; i < 10; ++i) {
-                rand_id[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
-            }
-
-            shadowMap[0]->setId("shadowCubeMap|" + std::string(rand_id));
+            shadowMap[0]->setId("shadowCubeMap|" + UniqueToken::get());
             shadowMap[0]->setType(S_TEXTURE_FRAME_CUBE);
         }
 

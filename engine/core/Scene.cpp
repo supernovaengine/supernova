@@ -6,6 +6,7 @@
 
 #include "Log.h"
 #include "ui/UIObject.h"
+#include "util/UniqueToken.h"
 #include <stdlib.h>
 
 using namespace Supernova;
@@ -329,17 +330,8 @@ void Scene::setTextureFrame(Texture* textureFrame){
 
     if (textureFrame != NULL){
 
-        char rand_id[10];
-        static const char alphanum[] =
-                "0123456789"
-                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                        "abcdefghijklmnopqrstuvwxyz";
-        for (int i = 0; i < 10; ++i) {
-            rand_id[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
-        }
-
         if (textureFrame->getId() == "")
-            textureFrame->setId("scene|"+std::string(rand_id));
+            textureFrame->setId("scene|" + UniqueToken::get());
 
         if (textureFrame->getType() == S_TEXTURE_2D)
             textureFrame->setType(S_TEXTURE_FRAME);
