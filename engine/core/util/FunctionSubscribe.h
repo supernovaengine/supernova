@@ -109,6 +109,13 @@ namespace Supernova {
             return true;
         }
 
+        template<typename T, Ret(T::*funcPtr)(Args...)>
+        bool add(const std::string& tag, T* obj)
+        {
+            addImpl(tag, bindImpl(obj, funcPtr, index_sequence_for<Args...>{}));
+            return true;
+        }
+
         template<typename T>
         bool add(const std::string& tag, std::shared_ptr<T> t)
         {

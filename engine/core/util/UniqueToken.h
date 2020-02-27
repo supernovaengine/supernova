@@ -13,6 +13,8 @@ namespace Supernova {
     private:
         static int id;
 
+        static std::string randString(const int len);
+
     public:
         static std::string get();
 

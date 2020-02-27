@@ -7,6 +7,8 @@
 #include "Log.h"
 
 #include <cmath>
+#include "Engine.h"
+#include "util/UniqueToken.h"
 
 using namespace Supernova;
 
@@ -14,10 +16,22 @@ UIObject::UIObject(): Mesh2D(){
     state = 0;
     pointerDown = -1;
     focused = false;
+
+    eventId = UniqueToken::get();
+
+    Engine::onTextInput.add<UIObject, &UIObject::engineOnTextInput>(eventId, this);
+    Engine::onTouchStart.add<UIObject, &UIObject::engineOnDown>(eventId, this);
+    Engine::onMouseDown.add<UIObject, &UIObject::engineOnDown>(eventId, this);
+    Engine::onTouchEnd.add<UIObject, &UIObject::engineOnUp>(eventId, this);
+    Engine::onMouseUp.add<UIObject, &UIObject::engineOnUp>(eventId, this);
 }
 
 UIObject::~UIObject(){
-
+    Engine::onTextInput.remove(eventId);
+    Engine::onTouchStart.remove(eventId);
+    Engine::onMouseDown.remove(eventId);
+    Engine::onTouchEnd.remove(eventId);
+    Engine::onMouseUp.remove(eventId);
 }
 
 int UIObject::getState(){

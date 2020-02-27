@@ -17,6 +17,8 @@ namespace Supernova {
         int pointerDown;
         bool focused;
 
+        std::string eventId;
+
         bool isCoordInside(float x, float y);
 
     public:
