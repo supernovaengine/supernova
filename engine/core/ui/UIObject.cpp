@@ -17,7 +17,7 @@ UIObject::UIObject(): Mesh2D(){
     pointerDown = -1;
     focused = false;
 
-    eventId = UniqueToken::get();
+    eventId = "UIObject|" + UniqueToken::get();
 
     Engine::onTextInput.add<UIObject, &UIObject::engineOnTextInput>(eventId, this);
     Engine::onTouchStart.add<UIObject, &UIObject::engineOnDown>(eventId, this);
