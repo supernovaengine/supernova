@@ -359,38 +359,7 @@ bool GLES2Object::prepareDraw(){
         textureIndex = 0;
     }
 
-
-    GLES2Util::checkGlError("Error on bind texture");
-    
-    return true;
-}
-
-bool GLES2Object::draw(){
-    if (!ObjectRender::draw()){
-        return false;
-    }
-
-    //Log::Debug("Start draw");
-    
-    if (!vertexAttributes.count(S_VERTEXATTRIBUTE_VERTICES) and !indexAttribute){
-        Log::Error("Cannot draw object: no vertices");
-        return false;
-    }
-        
-    glUniform1i(useTexture, (textures.count(S_TEXTURESAMPLER_DIFFUSE)?true:false));
-        
-    GLenum modeGles = GL_TRIANGLES;
-    if (primitiveType == S_PRIMITIVE_POINTS){
-        modeGles = GL_POINTS;
-    }
-    if (primitiveType == S_PRIMITIVE_LINES){
-        modeGles = GL_LINES;
-    }
-    if (primitiveType == S_PRIMITIVE_TRIANGLE_STRIP){
-        modeGles = GL_TRIANGLE_STRIP;
-    }
-
-    glLineWidth(lineWidth);
+    glUniform1i(useTexture, isUseTexture());
 
     for ( const auto &p : textures ) {
         std::vector<int> texturesLoc;
@@ -428,6 +397,35 @@ bool GLES2Object::draw(){
         }
     }
 
+    GLES2Util::checkGlError("Error on bind texture");
+    
+    return true;
+}
+
+bool GLES2Object::draw(){
+    if (!ObjectRender::draw()){
+        return false;
+    }
+
+    //Log::Debug("Start draw");
+    
+    if (!vertexAttributes.count(S_VERTEXATTRIBUTE_VERTICES) and !indexAttribute){
+        Log::Error("Cannot draw object: no vertices");
+        return false;
+    }
+        
+    GLenum modeGles = GL_TRIANGLES;
+    if (primitiveType == S_PRIMITIVE_POINTS){
+        modeGles = GL_POINTS;
+    }
+    if (primitiveType == S_PRIMITIVE_LINES){
+        modeGles = GL_LINES;
+    }
+    if (primitiveType == S_PRIMITIVE_TRIANGLE_STRIP){
+        modeGles = GL_TRIANGLE_STRIP;
+    }
+
+    glLineWidth(lineWidth);
 
     if (indexAttribute) {
 

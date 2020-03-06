@@ -231,6 +231,19 @@ void ObjectRender::loadProgram(){
     }
 }
 
+bool ObjectRender::isUseTexture(){
+    if (textures.count(S_TEXTURESAMPLER_DIFFUSE)){
+        return true;
+    }
+    if (parent){
+        if (parent->textures.count(S_TEXTURESAMPLER_DIFFUSE)){
+            return true;
+        }
+    }
+
+    return false;
+};
+
 bool ObjectRender::load(){
     
     loadProgram();

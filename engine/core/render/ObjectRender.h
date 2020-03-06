@@ -47,7 +47,6 @@ namespace Supernova {
         void checkMorphTarget();
         void checkMorphNormal();
         void loadProgram();
-        
     
     protected:
 
@@ -106,6 +105,8 @@ namespace Supernova {
 
         void setProgram(std::shared_ptr<ProgramRender> program);
         void setSceneRender(SceneRender* sceneRender);
+
+        bool isUseTexture();
 
         void addChild(ObjectRender* child);
         void clearChilds();
