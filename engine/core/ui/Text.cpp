@@ -185,7 +185,7 @@ void Text::createText(){
 }
 
 bool Text::load(){
-    if (stbtext->load(font.c_str(), fontSize, submeshes[0]->getMaterial()->getTexture())) {
+    if (stbtext->load(font.c_str(), fontSize, getMaterial()->getTexture())) {
         createText();
     }else{
         Log::Error("Can`t load font");

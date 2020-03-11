@@ -152,6 +152,7 @@ bool Button::isDown(){
 }
 
 bool Button::load(){
+
     if (textureNormal) {
         textureNormal->load();
     }else{

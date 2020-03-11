@@ -18,12 +18,21 @@ GraphicObject::GraphicObject(): Object(){
     render = NULL;
     shadowRender = NULL;
 
+    material = NULL;
+
     scissor = Rect(0, 0, 0, 0);
 
     body = NULL;
 }
 
 GraphicObject::~GraphicObject(){
+    if (material)
+        delete material;
+}
+
+void GraphicObject::instanciateMaterial(){
+    if (!material)
+        material = new Material();
 }
 
 bool GraphicObject::instanciateRender(){
@@ -44,6 +53,63 @@ bool GraphicObject::instanciateShadowRender(){
     }
 
     return true;
+}
+
+void GraphicObject::setColor(Vector4 color){
+    instanciateMaterial();
+
+    if (color.w != 1){
+        transparent = true;
+    }
+    material->setColor(color);
+}
+
+void GraphicObject::setColor(float red, float green, float blue, float alpha){
+    setColor(Vector4(red, green, blue, alpha));
+}
+
+Vector4 GraphicObject::getColor(){
+    instanciateMaterial();
+
+    return *material->getColor();
+}
+
+void GraphicObject::setTexture(Texture* texture){
+    instanciateMaterial();
+
+    Texture* oldTexture = material->getTexture();
+
+    if (texture != oldTexture){
+
+        material->setTexture(texture);
+
+        textureLoad();
+    }
+}
+
+void GraphicObject::setTexture(std::string texturepath){
+    instanciateMaterial();
+
+    std::string oldTexture = material->getTexturePath();
+
+    if (texturepath != oldTexture){
+
+        material->setTexturePath(texturepath);
+
+        textureLoad();
+    }
+}
+
+std::string GraphicObject::getTexture(){
+    instanciateMaterial();
+
+    return material->getTexturePath();
+}
+
+Material* GraphicObject::getMaterial(){
+    instanciateMaterial();
+
+    return this->material;
 }
 
 void GraphicObject::updateBuffer(std::string name){
@@ -146,13 +212,24 @@ bool GraphicObject::draw(){
 bool GraphicObject::load(){
     Object::load();
 
+    bool renderReturn = renderLoad(false);
+
+    //Check after texture is loaded
+    if (material && material->isTransparent()){
+        transparent = true;
+    }
+
     setSceneTransparency(transparent);
 
-    return renderLoad(false);
+    return renderReturn;
 }
 
 bool GraphicObject::textureLoad(){
-    
+    if (material && render){
+        material->getTexture()->load();
+        render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
+    }
+
     return true;
 }
 
@@ -176,6 +253,13 @@ bool GraphicObject::renderLoad(bool shadow){
         render->addProperty(S_PROPERTY_NORMALMATRIX, S_PROPERTYDATA_MATRIX4, 1, &normalMatrix);
         render->addProperty(S_PROPERTY_MVPMATRIX, S_PROPERTYDATA_MATRIX4, 1, &modelViewProjectionMatrix);
         render->addProperty(S_PROPERTY_CAMERAPOS, S_PROPERTYDATA_FLOAT3, 1, &cameraPosition); //TODO: put cameraPosition on Scene
+
+        if (material) {
+            render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
+            render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor());
+            if (material->getTextureRect())
+                render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect());
+        }
 
         if (scene){
 

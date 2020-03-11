@@ -7,7 +7,7 @@ Submesh::Submesh(){
     this->shadowRender = NULL;
 
     this->distanceToCamera = -1;
-    this->material = new Material();
+    this->material = NULL;
     this->materialOwned = true;
     this->dynamic = false;
 
@@ -41,7 +41,7 @@ Submesh::Submesh(Material* material){
 }
 
 Submesh::~Submesh(){
-    if (materialOwned)
+    if (materialOwned && material)
         delete this->material;
     
     if (this->render && this->renderOwned)
@@ -126,6 +126,10 @@ void Submesh::addAttribute(std::string bufferName, int attribute, unsigned int e
 }
 
 Material* Submesh::getMaterial(){
+    if (!material){
+        material = new Material();
+        materialOwned = true;
+    }
     return this->material;
 }
 
@@ -168,7 +172,7 @@ bool Submesh::isVisible(){
 }
 
 bool Submesh::textureLoad(){
-    if (material && render){
+    if (material && material->getTexture() && render){
         material->getTexture()->load();
         render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
     }
@@ -187,10 +191,12 @@ bool Submesh::renderLoad(bool shadow){
             render->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
         }
 
-        render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
-        render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor());
-        if (material->getTextureRect())
-            render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect());
+        if (material) {
+            render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
+            render->addProperty(S_PROPERTY_COLOR, S_PROPERTYDATA_FLOAT4, 1, material->getColor());
+            if (material->getTextureRect())
+                render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect());
+        }
 
         loaded = true;
 

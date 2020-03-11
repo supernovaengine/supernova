@@ -36,59 +36,6 @@ Points::~Points(){
         delete render;
 }
 
-void Points::setColor(Vector4 color){
-    if (color.w != 1){
-        transparent = true;
-    }
-    material.setColor(color);
-}
-
-void Points::setColor(float red, float green, float blue, float alpha){
-    setColor(Vector4(red, green, blue, alpha));
-}
-
-Vector4 Points::getColor(){
-    return *material.getColor();
-}
-
-void Points::setTexture(Texture* texture){
-
-    Texture* oldTexture = material.getTexture();
-
-    if (texture != oldTexture){
-
-        material.setTexture(texture);
-
-        if (loaded){
-            textureLoad();
-        }
-
-    }
-}
-
-void Points::setTexture(std::string texturepath){
-
-    std::string oldTexture = material.getTexturePath();
-
-    if (texturepath != oldTexture){
-
-        material.setTexturePath(texturepath);
-
-        if (loaded){
-            textureLoad();
-        }
-
-    }
-}
-
-std::string Points::getTexture(){
-    return material.getTexturePath();
-}
-
-Material* Points::getMaterial(){
-    return &this->material;
-}
-
 bool Points::shouldSort(){
    return (transparent && scene && scene->isUseDepth() && scene->getUserDefinedTransparency() != S_OPTION_NO && pertmitSortTransparentPoints);
 }
@@ -163,7 +110,7 @@ void Points::normalizeTextureRects(){
 }
 
 void Points::addPoint(){
-    points.push_back({Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0), Rect(0.0, 0.0, 1.0, 1.0), 1, *material.getColor(), 0.0, true});
+    points.push_back({Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 1.0), Rect(0.0, 0.0, 1.0, 1.0), 1, *getMaterial()->getColor(), 0.0, true});
 }
 
 void Points::addPoint(Vector3 position){
@@ -456,18 +403,6 @@ bool Points::isPertmitSortTransparentPoints(){
     return pertmitSortTransparentPoints;
 }
 
-bool Points::textureLoad(){
-    if (!GraphicObject::textureLoad())
-        return false;
-    
-    if (render){
-        material.getTexture()->load();
-        render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material.getTexture());
-    }
-    
-    return true;
-}
-
 bool Points::load(){
 
     instanciateRender();
@@ -475,12 +410,10 @@ bool Points::load(){
     render->setPrimitiveType(S_PRIMITIVE_POINTS);
     render->setProgramShader(S_SHADER_POINTS);
 
-    render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material.getTexture());
-
-    if ((material.getTexture()) && (useTextureRects)){
-        material.getTexture()->load();
-        texWidth = material.getTexture()->getWidth();
-        texHeight = material.getTexture()->getHeight();
+    if (material && material->getTexture() && useTextureRects){
+        material->getTexture()->load();
+        texWidth = material->getTexture()->getWidth();
+        texHeight = material->getTexture()->getHeight();
         normalizeTextureRects();
     }
 
@@ -488,12 +421,5 @@ bool Points::load(){
     sortPoints();
     copyBuffer();
 
-    bool loadReturn = GraphicObject::load();
-
-    //Check after texture is loaded
-    if (material.isTransparent()){
-        transparent = true;
-    }
-
-    return loadReturn;
+    return GraphicObject::load();
 }

@@ -29,42 +29,25 @@ namespace Supernova {
         int primitiveType;
 
         bool resizeSubmeshes(unsigned int count, Material* material = NULL);
-        
+
+        virtual bool textureLoad();
         //void sortTransparentSubmeshes();
         
     public:
         Mesh();
         virtual ~Mesh();
 
-        virtual void setColor(Vector4 color);
-        virtual void setColor(float red, float green, float blue, float alpha);
-        virtual Vector4 getColor();
-
-        void setColor(Vector4 color, int submesh);
-        void setColor(float red, float green, float blue, float alpha, int submesh);
-        Vector4 getColor(int submesh);
-
-        void setTexture(Texture* texture);
-        void setTexture(std::string texturepath);
-        void setTexture(Texture* texture, int submesh);
-        void setTexture(std::string texturepath, int submesh);
-        std::string getTexture(int submesh = 0);
-
-        Material* getMaterial(int submesh = 0);
-
         int getPrimitiveType();
-        std::vector<Submesh*> getSubmeshes();
+        void setPrimitiveType(int primitiveType);
 
         bool isDynamic();
 
-        void setPrimitiveType(int primitiveType);
+        std::vector<Submesh*> getSubmeshes();
 
         void updateBuffers();
 
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateModelMatrix();
-        
-        virtual bool textureLoad();
 
         virtual bool renderLoad(bool shadow);
         

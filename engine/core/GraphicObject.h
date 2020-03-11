@@ -19,11 +19,13 @@ namespace Supernova {
 
     private:
 
-        void setSceneTransparency(bool transparency);
+        void instanciateMaterial();
         
     protected:
         ObjectRender* render;
         ObjectRender* shadowRender;
+
+        Material* material;
 
         std::map<std::string, Buffer*> buffers;
         std::string defaultBuffer;
@@ -41,9 +43,13 @@ namespace Supernova {
         bool instanciateRender();
         bool instanciateShadowRender();
 
+        void setSceneTransparency(bool transparency);
+
         void updateDistanceToCamera();
 
         void updateBuffer(std::string name);
+
+        virtual bool textureLoad();
 
     public:
 
@@ -57,14 +63,18 @@ namespace Supernova {
 
         unsigned int getMinBufferSize();
 
-        virtual void setColor(Vector4 color) = 0;
-        virtual void setColor(float red, float green, float blue, float alpha) = 0;
-        virtual Vector4 getColor() = 0;
+        void setColor(Vector4 color);
+        void setColor(float red, float green, float blue, float alpha);
+        Vector4 getColor();
+
+        void setTexture(Texture* texture);
+        void setTexture(std::string texturepath);
+        std::string getTexture();
+
+        Material* getMaterial();
         
         virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
         virtual void updateModelMatrix();
-        
-        virtual bool textureLoad();
 
         virtual bool renderLoad(bool shadow);
         virtual bool renderDraw(bool shadow);

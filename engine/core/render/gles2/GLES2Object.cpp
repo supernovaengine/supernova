@@ -384,6 +384,7 @@ bool GLES2Object::prepareDraw(){
             if (texturesLoc.size() > 0) {
                 if (texturesLoc.size() <= textureData.arraySize) {
 
+                    //Need to fill the array size to avoid errors
                     while (texturesLoc.size() < textureData.arraySize) {
                         texturesLoc.push_back(texturesLoc[0]);
                     }

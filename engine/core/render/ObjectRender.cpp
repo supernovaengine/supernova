@@ -254,6 +254,7 @@ bool ObjectRender::load(){
     }
 
     for (int i=0; i<childs.size(); i++){
+        childs[i]->primitiveType = primitiveType;
         childs[i]->program = getProgram();
         childs[i]->load();
     }

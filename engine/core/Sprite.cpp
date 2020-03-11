@@ -133,8 +133,8 @@ void Sprite::stopAnimation(){
 
 bool Sprite::load(){
 
-    if (submeshes[0]->getMaterial()->getTexture()) {
-        submeshes[0]->getMaterial()->getTexture()->setResampleToPowerOfTwo(false);
+    if (getMaterial()->getTexture()) {
+        getMaterial()->getTexture()->setResampleToPowerOfTwo(false);
     }
 
     return Image::load();

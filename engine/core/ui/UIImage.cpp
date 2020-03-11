@@ -149,10 +149,10 @@ void UIImage::createVertices(){
 
 bool UIImage::load(){
     
-    if (submeshes[0]->getMaterial()->getTexture()){
-        submeshes[0]->getMaterial()->getTexture()->load();
-        texWidth = submeshes[0]->getMaterial()->getTexture()->getWidth();
-        texHeight = submeshes[0]->getMaterial()->getTexture()->getHeight();
+    if (getMaterial()->getTexture()){
+        getMaterial()->getTexture()->load();
+        texWidth = getMaterial()->getTexture()->getWidth();
+        texHeight = getMaterial()->getTexture()->getHeight();
     }
     if (this->width == 0 && this->height == 0){
         this->width = texWidth;

@@ -104,8 +104,8 @@ bool SkyBox::draw(){
 }
 
 bool SkyBox::load(){
-    if (this->submeshes[0]->getMaterial()->getTexture() == NULL)
-        this->submeshes[0]->getMaterial()->setTextureCube(textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
+    if (getMaterial()->getTexture() == NULL)
+        getMaterial()->setTextureCube(textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
 
     instanciateRender();
 
