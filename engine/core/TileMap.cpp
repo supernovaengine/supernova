@@ -7,6 +7,9 @@
 using namespace Supernova;
 
 TileMap::TileMap(): Mesh2D(){
+    primitiveType = S_PRIMITIVE_TRIANGLES;
+    submeshes.push_back(new Submesh());
+
     buffers["vertices"] = &buffer;
     buffers["indices"] = &indices;
 
@@ -44,7 +47,8 @@ int TileMap::findTileByString(std::string name){
 }
 
 void TileMap::addRect(int id, std::string name, std::string texture, Rect rect){
-    int submeshId = 0;
+    int submeshId = 0;    //Submesh 0 will be always without texture
+
     if (!texture.empty()) {
         bool textureFound = false;
         for (int s = 0; s < submeshes.size(); s++){
@@ -146,6 +150,9 @@ Rect TileMap::normalizeTileRect(Rect tileRect, int submeshId){
     if (submeshes[submeshId]->getMaterial()->getTexture()) {
         texWidth = submeshes[submeshId]->getMaterial()->getTexture()->getWidth();
         texHeight = submeshes[submeshId]->getMaterial()->getTexture()->getHeight();
+    }else if (getMaterial()->getTexture()){
+        texWidth = getMaterial()->getTexture()->getWidth();
+        texHeight = getMaterial()->getTexture()->getHeight();
     }
 
     if (!tileRect.isNormalized()){
@@ -239,6 +246,10 @@ void TileMap::createTiles(){
 }
 
 void TileMap::loadTextures(){
+    if (getMaterial()->getTexture()) {
+        getMaterial()->getTexture()->setResampleToPowerOfTwo(false);
+        getMaterial()->getTexture()->load();
+    }
     for (int s = 0; s < submeshes.size(); s++) {
         if (submeshes[s]->getMaterial()->getTexture()) {
             submeshes[s]->getMaterial()->getTexture()->setResampleToPowerOfTwo(false);
