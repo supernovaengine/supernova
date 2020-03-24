@@ -40,9 +40,9 @@ namespace Supernova {
         
         void checkLighting();
         void checkFog();
-        void checkTextureCoords(ObjectRender* render);
-        void checkTextureRect(ObjectRender* render);
-        void checkTextureCube(ObjectRender* render);
+        void checkTextureCoords();
+        void checkTextureRect();
+        void checkTextureCube();
         void checkSkinning();
         void checkMorphTarget();
         void checkMorphNormal();
@@ -78,6 +78,8 @@ namespace Supernova {
         std::unordered_map<int, PropertyData> properties;
         std::unordered_map<int, std::vector<Texture*>> textures;
 
+    protected:
+
         unsigned int vertexSize;
         int numLights;
         int numShadows2D;
@@ -87,7 +89,6 @@ namespace Supernova {
 
         std::shared_ptr<ProgramRender> program;
         ObjectRender* parent;
-        std::vector<ObjectRender*> childs;
 
         unsigned int minBufferSize;
         int primitiveType;
@@ -106,10 +107,9 @@ namespace Supernova {
         void setProgram(std::shared_ptr<ProgramRender> program);
         void setSceneRender(SceneRender* sceneRender);
 
-        bool isUseTexture();
+        void setParent(ObjectRender* parent);
 
-        void addChild(ObjectRender* child);
-        void clearChilds();
+        bool isUseTexture();
 
         void setVertexSize(unsigned int vertexSize);
         void setMinBufferSize(unsigned int minBufferSize);

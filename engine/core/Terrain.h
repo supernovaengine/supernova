@@ -6,6 +6,7 @@
 #define TERRAIN_H
 
 #include "Mesh.h"
+#include "TerrainTile.h"
 
 namespace Supernova{
 
@@ -18,22 +19,34 @@ namespace Supernova{
 
         InterleavedBuffer buffer;
         IndexBuffer indices;
-        std::string heightmap_path;
+
+        Texture* heightData;
+
+        unsigned int bufferIndexCount;
 
         Vector2 offset;
 
-        void createPlaneTile(int index, int widthSegments, int heightSegments);
+    private:
+
+        float worldWidth;
+        int levels;
+        int resolution;
+
+        void createPlaneTileBuffer(int width, int height, int widthSegments, int heightSegments);
+        TerrainTile* createTile(float x, float y, float scale, int lodDepth);
 
     protected:
+
+        //virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
     public:
 
         Terrain();
-        Terrain(std::string heightmap);
+        Terrain(std::string heightMapPath);
         virtual ~Terrain();
 
-        const std::string &getHeightmap() const;
-        void setHeightmap(const std::string &heightmap);
+        Texture* getHeightmap();
+        void setHeightmap(std::string heightMapPath);
 
         virtual bool renderLoad(bool shadow);
         virtual bool load();

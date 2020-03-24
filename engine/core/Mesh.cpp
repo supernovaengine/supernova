@@ -140,6 +140,19 @@ bool Mesh::renderLoad(bool shadow){
 
         instanciateRender();
 
+        //Activating texture if any submesh has texture
+        for (unsigned int i = 0; i < submeshes.size(); i++){
+            if (submeshes.at(i)->getMaterial()->getTexture()){
+                render->addProgramDef(S_PROGRAM_USE_TEXCOORD);
+                if (submeshes.at(i)->getMaterial()->getTexture()->getType() == S_TEXTURE_CUBE){
+                    render->addProgramDef(S_PROGRAM_USE_TEXCUBE);
+                }
+            }
+            if (submeshes.at(i)->getMaterial()->getTextureRect()){
+                render->addProgramDef(S_PROGRAM_USE_TEXRECT);
+            }
+        }
+
         render->setPrimitiveType(primitiveType);
         render->setProgramShader(S_SHADER_MESH);
 
@@ -149,7 +162,7 @@ bool Mesh::renderLoad(bool shadow){
                 //Use the same render for submesh
                 submeshes[i]->setSubmeshRender(render);
             }else{
-                render->addChild(submeshes[i]->getSubmeshRender());
+                submeshes[i]->getSubmeshRender()->setParent(render);
             }
             submeshes[i]->renderLoad(shadow);
         }
@@ -167,14 +180,75 @@ bool Mesh::renderLoad(bool shadow){
                 //Use the same render for submesh
                 submeshes[i]->setSubmeshShadowRender(shadowRender);
             } else {
-                shadowRender->addChild(submeshes[i]->getSubmeshShadowRender());
+                submeshes[i]->getSubmeshShadowRender()->setParent(shadowRender);
             }
             submeshes[i]->renderLoad(shadow);
         }
 
     }
 
-    return GraphicObject::renderLoad(shadow);
+    GraphicObject::renderLoad(shadow);
+
+    //Load submeshes if use a different render
+    if (submeshes.size() > 1) {
+        if (!shadow) {
+            for (size_t i = 0; i < submeshes.size(); i++) {
+                submeshes[i]->getSubmeshRender()->load();
+            }
+        } else {
+            for (size_t i = 0; i < submeshes.size(); i++) {
+                submeshes[i]->getSubmeshShadowRender()->load();
+            }
+        }
+    }
+
+    return true;
+}
+
+bool Mesh::renderDraw(bool shadow){
+
+    if (!visible)
+        return false;
+
+    if (!shadow) {
+
+        render->prepareDraw();
+
+        if (submeshes.size() == 1){
+            submeshes[0]->getSubmeshRender()->draw();
+        }else{
+            for (size_t i = 0; i < submeshes.size(); i++) {
+                if (submeshes[i]->isVisible()) {
+                    submeshes[i]->getSubmeshRender()->prepareDraw();
+                    submeshes[i]->getSubmeshRender()->draw();
+                    submeshes[i]->getSubmeshRender()->finishDraw();
+                }
+            }
+        }
+
+        render->finishDraw();
+
+    }else{
+
+        shadowRender->prepareDraw();
+
+        if (submeshes.size() == 1){
+            submeshes[0]->getSubmeshShadowRender()->draw();
+        }else{
+            for (size_t i = 0; i < submeshes.size(); i++) {
+                if (submeshes[i]->isVisible()) {
+                    submeshes[i]->getSubmeshShadowRender()->prepareDraw();
+                    submeshes[i]->getSubmeshShadowRender()->draw();
+                    submeshes[i]->getSubmeshShadowRender()->finishDraw();
+                }
+            }
+        }
+
+        shadowRender->finishDraw();
+
+    }
+
+    return true;
 }
 
 bool Mesh::load(){

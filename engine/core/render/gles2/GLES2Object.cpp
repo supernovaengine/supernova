@@ -155,6 +155,8 @@ bool GLES2Object::load(){
         }else if (type == S_TEXTURESAMPLER_SHADOWMAPCUBE){
             samplerName = "u_shadowsMapCube";
             arraySize = programRender->getMaxShadowsCube();
+        }else if (type == S_TEXTURESAMPLER_HEIGHTDATA){
+            samplerName = "u_heightData";
         }
 
         texturesGL[type].location = glGetUniformLocation(glesProgram, samplerName.c_str());
@@ -255,6 +257,10 @@ bool GLES2Object::load(){
             propertyName = "u_morphWeights";
         }else if (type == S_PROPERTY_TERRAINTILEOFFSET){
             propertyName = "u_terrainTileOffset";
+        }else if (type == S_PROPERTY_TERRAINGLOBALOFFSET){
+            propertyName = "u_terrainGlobalOffset";
+        }else if (type == S_PROPERTY_TERRAINTILESCALE){
+            propertyName = "u_terrainTileScale";
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());

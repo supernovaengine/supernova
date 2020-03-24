@@ -18,9 +18,6 @@ namespace Supernova {
         friend class Text;
 
     private:
-
-        ObjectRender* render;
-        ObjectRender* shadowRender;
         
         Material* material;
         bool materialOwned;
@@ -34,8 +31,14 @@ namespace Supernova {
 
         bool visible;
         bool renderOwned;
+
+    private:
         bool shadowRenderOwned;
         bool loaded;
+
+    protected:
+        ObjectRender* render;
+        ObjectRender* shadowRender;
 
     public:
         Submesh();
@@ -45,8 +48,8 @@ namespace Supernova {
 
         Submesh& operator = (const Submesh& s);
 
-        void setIndices(std::string bufferName, size_t size, size_t offset = 0, DataType type = UNSIGNED_INT);
-        void addAttribute(std::string bufferName, int attribute, unsigned int elements, DataType dataType, unsigned int stride, size_t offset);
+        virtual void setIndices(std::string bufferName, size_t size, size_t offset = 0, DataType type = UNSIGNED_INT);
+        virtual void addAttribute(std::string bufferName, int attribute, unsigned int elements, DataType dataType, unsigned int stride, size_t offset);
 
         Material* getMaterial();
 
@@ -62,8 +65,12 @@ namespace Supernova {
         void setVisible(bool visible);
         bool isVisible();
 
+        bool isRenderOwned() const;
+        bool isShadowRenderOwned() const;
+
         bool textureLoad();
-        bool renderLoad(bool shadow);
+
+        virtual bool renderLoad(bool shadow);
 
         virtual void destroy();
     };

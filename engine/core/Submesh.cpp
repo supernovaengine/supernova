@@ -171,6 +171,15 @@ bool Submesh::isVisible(){
     return visible;
 }
 
+bool Submesh::isRenderOwned() const {
+    return renderOwned;
+}
+
+bool Submesh::isShadowRenderOwned() const {
+    return shadowRenderOwned;
+}
+
+
 bool Submesh::textureLoad(){
     if (material && material->getTexture() && render){
         material->getTexture()->load();

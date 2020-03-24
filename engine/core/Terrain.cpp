@@ -5,18 +5,24 @@
 #include "image/TextureLoader.h"
 #include "Terrain.h"
 #include "Log.h"
+#include <math.h>
 
 using namespace Supernova;
 
 Terrain::Terrain(): Mesh(){
 
     primitiveType = S_PRIMITIVE_TRIANGLES;
-    submeshes.push_back(new Submesh());
 
     buffers["vertices"] = &buffer;
     buffers["indices"] = &indices;
 
-    offset = Vector2(10,10);
+    heightData = NULL;
+
+    bufferIndexCount = 0;
+
+    worldWidth = 1024;
+    levels = 6;
+    resolution = 32;
 
     buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
@@ -24,18 +30,24 @@ Terrain::Terrain(): Mesh(){
     buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
 }
 
-Terrain::Terrain(std::string heightmap): Terrain(){
-    this->heightmap_path = heightmap;
+Terrain::Terrain(std::string heightMapPath): Terrain(){
+    setHeightmap(heightMapPath);
 }
 
 Terrain::~Terrain(){
-
+    if (heightData)
+        delete heightData;
 }
 
-void Terrain::createPlaneTile(int index, int widthSegments, int heightSegments){
-    int width = 5000;
-    int height = 5000;
+Texture* Terrain::getHeightmap(){
+    return heightData;
+}
 
+void Terrain::setHeightmap(std::string heightMapPath){
+    heightData = new Texture(heightMapPath);
+}
+
+void Terrain::createPlaneTileBuffer(int width, int height, int widthSegments, int heightSegments){
     float width_half = (float)width / 2;
     float height_half = (float)height / 2;
 
@@ -53,6 +65,8 @@ void Terrain::createPlaneTile(int index, int widthSegments, int heightSegments){
     Attribute* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
     Attribute* attIndice = indices.getAttribute(S_INDEXATTRIBUTE);
 
+    int bufferCount = buffer.getCount();
+
     for (int iy = 0; iy < gridY1; iy++) {
         float y = iy * segment_height - height_half;
         for (int ix = 0; ix < gridX1; ix ++) {
@@ -66,7 +80,7 @@ void Terrain::createPlaneTile(int index, int widthSegments, int heightSegments){
         }
     }
 
-    unsigned int indexCount = 0;
+    bufferIndexCount = 0;
 
     for (int iy = 0; iy < gridY; iy++) {
         for (int ix = 0; ix < gridX; ix++) {
@@ -76,23 +90,39 @@ void Terrain::createPlaneTile(int index, int widthSegments, int heightSegments){
             int c = ( ix + 1 ) + gridX1 * ( iy + 1 );
             int d = ( ix + 1 ) + gridX1 * iy;
 
-            indices.addUInt(attIndice, a);
-            indices.addUInt(attIndice, b);
-            indices.addUInt(attIndice, d);
+            indices.addUInt(attIndice, a + bufferCount);
+            indices.addUInt(attIndice, b + bufferCount);
+            indices.addUInt(attIndice, d + bufferCount);
 
-            indices.addUInt(attIndice, b);
-            indices.addUInt(attIndice, c);
-            indices.addUInt(attIndice, d);
+            indices.addUInt(attIndice, b + bufferCount);
+            indices.addUInt(attIndice, c + bufferCount);
+            indices.addUInt(attIndice, d + bufferCount);
 
-            indexCount += 6;
+            bufferIndexCount += 6;
 
         }
     }
-
-    submeshes[0]->setIndices("indices", indexCount, index * gridX * gridY);
-
 }
 
+TerrainTile* Terrain::createTile(float x, float y, float scale, int lodDepth){
+    TerrainTile* terrainTile = new TerrainTile(x, y, scale, lodDepth, &submeshes);
+
+    this->submeshes.push_back(terrainTile);
+    terrainTile->setIndices("indices", bufferIndexCount, 0 * sizeof(unsigned int));
+
+    return terrainTile;
+}
+/*
+void Terrain::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+
+    Mesh::updateVPMatrix( viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+
+    if (cameraPosition) {
+        offset.x = cameraPosition->x;
+        offset.y = cameraPosition->z;
+    }
+}
+*/
 bool Terrain::renderLoad(bool shadow){
 
     if (!shadow){
@@ -101,16 +131,23 @@ bool Terrain::renderLoad(bool shadow){
 
         render->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
-        render->addProperty(S_PROPERTY_TERRAINTILEOFFSET, S_PROPERTYDATA_FLOAT2, 1, &offset);
+        //render->addProperty(S_PROPERTY_TERRAINGLOBALOFFSET, S_PROPERTYDATA_FLOAT2, 1, &offset);
+
+        if (heightData){
+            render->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightData);
+        }
 
     } else {
 
         instanciateShadowRender();
 
-        //shadowRender->addProgramDef(S_PROGRAM_IS_TERRAIN);
+        shadowRender->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
-        shadowRender->addProperty(S_PROPERTY_TERRAINTILEOFFSET, S_PROPERTYDATA_FLOAT2, 1, &offset);
+        //shadowRender->addProperty(S_PROPERTY_TERRAINGLOBALOFFSET, S_PROPERTYDATA_FLOAT2, 1, &offset);
 
+        if (heightData){
+            shadowRender->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightData);
+        }
     }
 
     return Mesh::renderLoad(shadow);
@@ -118,33 +155,35 @@ bool Terrain::renderLoad(bool shadow){
 
 bool Terrain::load(){
 
-    createPlaneTile(0, 16, 16);
-    int oi = 3;
+    createPlaneTileBuffer(1, 1, resolution, resolution);
+
+    float initialScale = worldWidth / pow( 2, levels );
+    createTile(0, 0, 500, 2);
+
 /*
-    loadTerrainFromImage(heightmap_path);
-    //terrainScale(0, 40);
-    terrainCreate(0, 0, 0);
+    createTile( -initialScale, -initialScale, initialScale );
+    createTile( -initialScale, 0, initialScale );
+    createTile( 0, 0, initialScale);
+    createTile( 0, -initialScale, initialScale );
 
-    int width = 2000;
-    int depth = 2000;
 
-    Attribute* attVertex = buffer.getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-    buffer.addVector3(attVertex, Vector3(0, 0, 0));
-    buffer.addVector3(attVertex, Vector3(0, 0, depth));
-    buffer.addVector3(attVertex, Vector3(width, 0, 0));
-    buffer.addVector3(attVertex, Vector3(width, 0, depth));
+    for ( float scale = initialScale; scale < worldWidth; scale *= 2 ) {
+        createTile( -2 * scale, -2 * scale, scale );
+        createTile( -2 * scale, -scale, scale);
+        createTile( -2 * scale, 0, scale);
+        createTile( -2 * scale, scale, scale);
 
-    Attribute* attTexcoord = buffer.getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-    buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
-    buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f));
-    buffer.addVector2(attTexcoord, Vector2(1.0f, 0.0f));
-    buffer.addVector2(attTexcoord, Vector2(1.0f, 1.0f));
+        createTile( -scale, -2 * scale, scale);
+        createTile( -scale, scale, scale);
 
-    Attribute* attNormal = buffer.getAttribute(S_VERTEXATTRIBUTE_NORMALS);
-    buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
-    buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+        createTile( 0, -2 * scale, scale);
+        createTile( 0, scale, scale);
+
+        createTile( scale, -2 * scale, scale);
+        createTile( scale, -scale, scale);
+        createTile( scale, 0, scale);
+        createTile( scale, scale, scale);
+    }
 */
 
     return Mesh::load();
