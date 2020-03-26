@@ -11,20 +11,20 @@ namespace Supernova{
 
     class TerrainNode: public Submesh {
     private:
-        Vector2 offset;
-        float scale;
+        Vector2 position;
+        float size;
 
         TerrainNode* childs[4];
 
     public:
-        TerrainNode(float x, float y, float scale, int lodDepth, std::vector<Submesh*>* submeshes);
+        TerrainNode(float x, float y, float size, int lodDepth, std::vector<Submesh*> &submeshes);
         virtual ~TerrainNode();
 
-        const Vector2 &getOffset() const;
-        void setOffset(const Vector2 &offset);
+        const Vector2 &getPosition() const;
+        void setPosition(const Vector2 &position);
 
-        float getScale() const;
-        void setScale(float scale);
+        float getSize() const;
+        void setSize(float size);
 
         virtual void setIndices(std::string bufferName, size_t size, size_t offset = 0, DataType type = UNSIGNED_INT);
 

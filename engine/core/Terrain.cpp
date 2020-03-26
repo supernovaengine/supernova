@@ -24,6 +24,11 @@ Terrain::Terrain(): Mesh(){
     levels = 6;
     resolution = 32;
 
+    ranges.push_back(1);
+    for (int i = 1; i < levels; i++) {
+        ranges.push_back(ranges[i-1] + pow(2,i));
+    }
+
     buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
@@ -105,7 +110,7 @@ void Terrain::createPlaneNodeBuffer(int width, int height, int widthSegments, in
 }
 
 TerrainNode* Terrain::createNode(float x, float y, float scale, int lodDepth){
-    TerrainNode* terrainNode = new TerrainNode(x, y, scale, lodDepth, &submeshes);
+    TerrainNode* terrainNode = new TerrainNode(x, y, scale, lodDepth, submeshes);
 
     this->submeshes.push_back(terrainNode);
     terrainNode->setIndices("indices", bufferIndexCount, 0 * sizeof(unsigned int));
