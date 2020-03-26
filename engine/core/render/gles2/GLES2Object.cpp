@@ -255,12 +255,12 @@ bool GLES2Object::load(){
             propertyName = "u_bonesMatrix";
         }else if (type == S_PROPERTY_MORPHWEIGHTS){
             propertyName = "u_morphWeights";
-        }else if (type == S_PROPERTY_TERRAINTILEOFFSET){
-            propertyName = "u_terrainTileOffset";
+        }else if (type == S_PROPERTY_TERRAINNODEOFFSET){
+            propertyName = "u_terrainNodeOffset";
         }else if (type == S_PROPERTY_TERRAINGLOBALOFFSET){
             propertyName = "u_terrainGlobalOffset";
-        }else if (type == S_PROPERTY_TERRAINTILESCALE){
-            propertyName = "u_terrainTileScale";
+        }else if (type == S_PROPERTY_TERRAINNODESCALE){
+            propertyName = "u_terrainNodeScale";
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());

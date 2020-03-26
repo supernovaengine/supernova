@@ -2,23 +2,23 @@
 // (c) 2020 Eduardo Doria.
 //
 
-#ifndef TERRAINTILE_H
-#define TERRAINTILE_H
+#ifndef TERRAINNODE_H
+#define TERRAINNODE_H
 
 #include "Submesh.h"
 
 namespace Supernova{
 
-    class TerrainTile: public Submesh {
+    class TerrainNode: public Submesh {
     private:
         Vector2 offset;
         float scale;
 
-        TerrainTile* childs[4];
+        TerrainNode* childs[4];
 
     public:
-        TerrainTile(float x, float y, float scale, int lodDepth, std::vector<Submesh*>* submeshes);
-        virtual ~TerrainTile();
+        TerrainNode(float x, float y, float scale, int lodDepth, std::vector<Submesh*>* submeshes);
+        virtual ~TerrainNode();
 
         const Vector2 &getOffset() const;
         void setOffset(const Vector2 &offset);
@@ -34,4 +34,4 @@ namespace Supernova{
 }
 
 
-#endif //TERRAINTILE_H
+#endif //TERRAINNODE_H

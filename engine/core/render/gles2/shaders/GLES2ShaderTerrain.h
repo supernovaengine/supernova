@@ -10,8 +10,8 @@ std::string terrainVertexDec =
         "  uniform sampler2D u_heightData;\n"
 
         "  uniform vec2 u_terrainGlobalOffset;\n"
-        "  uniform vec2 u_terrainTileOffset;\n"
-        "  uniform float u_terrainTileScale;\n"
+        "  uniform vec2 u_terrainNodeOffset;\n"
+        "  uniform float u_terrainNodeScale;\n"
 
         "  float getHeight(vec3 p) {\n"
               // Assume a 1024x1024 world
@@ -32,8 +32,8 @@ std::string terrainVertexDec =
 
 std::string terrainVertexImp =
         "    #ifdef IS_TERRAIN\n"
-        "      localPos = u_terrainTileScale * localPos;\n"
-        "      localPos = localPos + vec3(u_terrainTileOffset[0], 0.0, u_terrainTileOffset[1]);\n"
+        "      localPos = u_terrainNodeScale * localPos;\n"
+        "      localPos = localPos + vec3(u_terrainNodeOffset[0], 0.0, u_terrainNodeOffset[1]);\n"
         //"      localPos = localPos + vec3(u_terrainGlobalOffset[0], 0.0, u_terrainGlobalOffset[1]);\n"
         "      localPos = vec3(localPos.x, getHeight(localPos), localPos.z);\n"
         "    #endif\n";

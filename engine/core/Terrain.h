@@ -6,7 +6,7 @@
 #define TERRAIN_H
 
 #include "Mesh.h"
-#include "TerrainTile.h"
+#include "TerrainNode.h"
 
 namespace Supernova{
 
@@ -32,8 +32,8 @@ namespace Supernova{
         int levels;
         int resolution;
 
-        void createPlaneTileBuffer(int width, int height, int widthSegments, int heightSegments);
-        TerrainTile* createTile(float x, float y, float scale, int lodDepth);
+        void createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments);
+        TerrainNode* createNode(float x, float y, float scale, int lodDepth);
 
     protected:
 

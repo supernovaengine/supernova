@@ -47,7 +47,7 @@ void Terrain::setHeightmap(std::string heightMapPath){
     heightData = new Texture(heightMapPath);
 }
 
-void Terrain::createPlaneTileBuffer(int width, int height, int widthSegments, int heightSegments){
+void Terrain::createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments){
     float width_half = (float)width / 2;
     float height_half = (float)height / 2;
 
@@ -104,13 +104,13 @@ void Terrain::createPlaneTileBuffer(int width, int height, int widthSegments, in
     }
 }
 
-TerrainTile* Terrain::createTile(float x, float y, float scale, int lodDepth){
-    TerrainTile* terrainTile = new TerrainTile(x, y, scale, lodDepth, &submeshes);
+TerrainNode* Terrain::createNode(float x, float y, float scale, int lodDepth){
+    TerrainNode* terrainNode = new TerrainNode(x, y, scale, lodDepth, &submeshes);
 
-    this->submeshes.push_back(terrainTile);
-    terrainTile->setIndices("indices", bufferIndexCount, 0 * sizeof(unsigned int));
+    this->submeshes.push_back(terrainNode);
+    terrainNode->setIndices("indices", bufferIndexCount, 0 * sizeof(unsigned int));
 
-    return terrainTile;
+    return terrainNode;
 }
 /*
 void Terrain::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
@@ -155,10 +155,10 @@ bool Terrain::renderLoad(bool shadow){
 
 bool Terrain::load(){
 
-    createPlaneTileBuffer(1, 1, resolution, resolution);
+    createPlaneNodeBuffer(1, 1, resolution, resolution);
 
     float initialScale = worldWidth / pow( 2, levels );
-    createTile(0, 0, 500, 2);
+    createNode(0, 0, 500, 2);
 
 /*
     createTile( -initialScale, -initialScale, initialScale );
