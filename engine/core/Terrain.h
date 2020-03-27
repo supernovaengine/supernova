@@ -11,9 +11,7 @@
 namespace Supernova{
 
     class Terrain: public Mesh {
-        struct Tile{
-
-        };
+        friend class TerrainNode;
 
     private:
 
@@ -26,6 +24,7 @@ namespace Supernova{
 
         Vector2 offset;
         std::vector<int> ranges;
+        std::vector<TerrainNode*> grid;
 
     private:
 
@@ -38,7 +37,10 @@ namespace Supernova{
 
     protected:
 
-        //virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
+        void updateNodes();
+
+        virtual void updateModelMatrix();
+        virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
 
     public:
 

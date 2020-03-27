@@ -5,6 +5,7 @@
 #include "image/TextureLoader.h"
 #include "Terrain.h"
 #include "Log.h"
+#include "Scene.h"
 #include <math.h>
 
 using namespace Supernova;
@@ -24,10 +25,14 @@ Terrain::Terrain(): Mesh(){
     levels = 6;
     resolution = 32;
 
-    ranges.push_back(1);
+
+    ranges.push_back(1*5);
     for (int i = 1; i < levels; i++) {
-        ranges.push_back(ranges[i-1] + pow(2,i));
+        ranges.push_back((ranges[i-1] + pow(2,i))*2);
     }
+
+    //float leafNodeSize = 1.0f;
+    //float rootNodeSize = leafNodeSize*pow(2, levels-1);
 
     buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
@@ -110,7 +115,7 @@ void Terrain::createPlaneNodeBuffer(int width, int height, int widthSegments, in
 }
 
 TerrainNode* Terrain::createNode(float x, float y, float scale, int lodDepth){
-    TerrainNode* terrainNode = new TerrainNode(x, y, scale, lodDepth, submeshes);
+    TerrainNode* terrainNode = new TerrainNode(x, y, scale, lodDepth, this);
 
     this->submeshes.push_back(terrainNode);
     terrainNode->setIndices("indices", bufferIndexCount, 0 * sizeof(unsigned int));
@@ -158,12 +163,36 @@ bool Terrain::renderLoad(bool shadow){
     return Mesh::renderLoad(shadow);
 };
 
+void Terrain::updateNodes(){
+    if (scene && scene->getCamera()) {
+        for (int i = 0; i < submeshes.size(); i++) {
+            submeshes[i]->setVisible(false);
+        }
+        for (int i = 0; i < grid.size(); i++) {
+            grid[i]->LODSelect(ranges, levels - 1);
+        }
+    }
+}
+
+void Terrain::updateModelMatrix(){
+    Mesh::updateModelMatrix();
+
+    updateNodes();
+}
+
+void Terrain::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
+    Mesh::updateVPMatrix(viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
+
+    updateNodes();
+}
+
+
 bool Terrain::load(){
 
     createPlaneNodeBuffer(1, 1, resolution, resolution);
 
     float initialScale = worldWidth / pow( 2, levels );
-    createNode(0, 0, 500, 2);
+    grid.push_back(createNode(0, 0, 500, levels));
 
 /*
     createTile( -initialScale, -initialScale, initialScale );

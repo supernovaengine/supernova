@@ -27,6 +27,10 @@ public class KeyListener implements OnKeyListener {
 			return 263;
 		if (key == KeyEvent.KEYCODE_D)
 			return 68;
+		if (key == KeyEvent.KEYCODE_Z)
+			return 90;
+		if (key == KeyEvent.KEYCODE_X)
+			return 88;
 		return 0;
 	}
 
