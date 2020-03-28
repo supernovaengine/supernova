@@ -34,7 +34,7 @@ namespace Supernova{
         float getSize() const;
         void setSize(float size);
 
-        bool LODSelect(std::vector<int> &ranges, int lodLevel);
+        bool LODSelect(std::vector<float> &ranges, int lodLevel);
 
         virtual void setIndices(std::string bufferName, size_t size, size_t offset = 0, DataType type = UNSIGNED_INT);
 

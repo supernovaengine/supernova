@@ -24,12 +24,7 @@ Terrain::Terrain(): Mesh(){
     worldWidth = 1024;
     levels = 6;
     resolution = 32;
-
-
-    ranges.push_back(1*5);
-    for (int i = 1; i < levels; i++) {
-        ranges.push_back((ranges[i-1] + pow(2,i))*2);
-    }
+    rootNodeSize = 500;
 
     //float leafNodeSize = 1.0f;
     //float rootNodeSize = leafNodeSize*pow(2, levels-1);
@@ -191,10 +186,21 @@ bool Terrain::load(){
 
     createPlaneNodeBuffer(1, 1, resolution, resolution);
 
-    float initialScale = worldWidth / pow( 2, levels );
-    grid.push_back(createNode(0, 0, 500, levels));
+    grid.push_back(createNode(0, 0, rootNodeSize, levels));
+
+    float maxDistance = 1000;
+    if (scene && scene->getCamera())
+        maxDistance = scene->getCamera()->getFar();
+
+    ranges.resize(levels);
+    ranges[levels-1] = maxDistance;
+    for (int i = levels-2; i >=0; i--) {
+        ranges[i] = ranges[i+1] / 2;
+    }
 
 /*
+    float initialScale = worldWidth / pow( 2, levels );
+
     createTile( -initialScale, -initialScale, initialScale );
     createTile( -initialScale, 0, initialScale );
     createTile( 0, 0, initialScale);

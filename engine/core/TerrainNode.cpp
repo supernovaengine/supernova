@@ -56,7 +56,7 @@ void TerrainNode::setSize(float size) {
     TerrainNode::size = size;
 }
 
-bool TerrainNode::LODSelect(std::vector<int> &ranges, int lodLevel){
+bool TerrainNode::LODSelect(std::vector<float> &ranges, int lodLevel){
     currentRange = ranges[lodLevel];
     if ( !inSphere(ranges[lodLevel]) ) {
         return false;

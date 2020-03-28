@@ -23,8 +23,9 @@ namespace Supernova{
         unsigned int bufferIndexCount;
 
         Vector2 offset;
-        std::vector<int> ranges;
+        std::vector<float> ranges;
         std::vector<TerrainNode*> grid;
+        float rootNodeSize;
 
     private:
 
