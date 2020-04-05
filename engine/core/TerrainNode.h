@@ -21,6 +21,9 @@ namespace Supernova{
         TerrainNode* childs[4];
 
         float currentRange;
+        int resolution;
+
+    private:
 
         bool inSphere(float radius);
 

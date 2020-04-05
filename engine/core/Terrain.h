@@ -20,20 +20,24 @@ namespace Supernova{
 
         Texture* heightData;
 
-        unsigned int bufferIndexCount;
+        struct NodeIndex{
+            unsigned int indexCount;
+            unsigned int indexOffset;
+        };
+
+        NodeIndex fullResNode;
+        NodeIndex halfResNode;
 
         Vector2 offset;
         std::vector<float> ranges;
         std::vector<TerrainNode*> grid;
         float rootNodeSize;
 
-    private:
-
         float worldWidth;
         int levels;
         int resolution;
 
-        void createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments);
+        NodeIndex createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments);
         TerrainNode* createNode(float x, float y, float scale, int lodDepth);
 
     protected:

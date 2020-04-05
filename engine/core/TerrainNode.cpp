@@ -13,6 +13,9 @@ TerrainNode::TerrainNode(float x, float y, float size, int lodDepth, Terrain* te
     this->size = size;
     this->terrain = terrain;
 
+    this->currentRange = 0;
+    this->resolution = terrain->resolution;
+
     if (lodDepth == 1){
         childs[0] = NULL;
         childs[1] = NULL;
@@ -58,6 +61,7 @@ void TerrainNode::setSize(float size) {
 
 bool TerrainNode::LODSelect(std::vector<float> &ranges, int lodLevel){
     currentRange = ranges[lodLevel];
+
     if ( !inSphere(ranges[lodLevel]) ) {
         return false;
     }
@@ -67,21 +71,27 @@ bool TerrainNode::LODSelect(std::vector<float> &ranges, int lodLevel){
     //}
 
     if( lodLevel == 0 ) {
-        //fullResolution = true;
+        //Full resolution
+        this->resolution = terrain->resolution;
+        this->setIndices("indices", terrain->fullResNode.indexCount, terrain->fullResNode.indexOffset * sizeof(unsigned int));
         this->setVisible(true);
 
         return true;
     } else {
 
         if( !inSphere(ranges[lodLevel-1]) ) {
-            //fullResolution = true;
+            //Full resolution
+            this->resolution = terrain->resolution;
+            this->setIndices("indices", terrain->fullResNode.indexCount, terrain->fullResNode.indexOffset * sizeof(unsigned int));
             this->setVisible(true);
         } else {
             TerrainNode *child;
             for (int i = 0; i < 4; i++) {
                 child = childs[i];
                 if (!child->LODSelect(ranges, lodLevel - 1)) {
-                    //child->fullResolution = false;
+                    //Half resolution
+                    child->resolution = terrain->resolution / 2;
+                    child->setIndices("indices", terrain->halfResNode.indexCount, terrain->halfResNode.indexOffset * sizeof(unsigned int));
                     child->currentRange = currentRange;
                     child->setVisible(true);
                 }
@@ -93,16 +103,16 @@ bool TerrainNode::LODSelect(std::vector<float> &ranges, int lodLevel){
 
 bool TerrainNode::inSphere(float radius) {
     float halfSize = size/2;
-    Vector2 worldHalfScale(halfSize * terrain->getWorldScale().x, halfSize * terrain->getWorldScale().z);
-    Vector3 worldPosition = terrain->getModelMatrix() * Vector3(position.x, position.y, 0);
+    Vector3 worldHalfScale(halfSize * terrain->getWorldScale().x, 1, halfSize * terrain->getWorldScale().z);
+    Vector3 worldPosition = terrain->getModelMatrix() * Vector3(position.x, 0, position.y);
 
     if (terrain->getScene()) {
         float r2 = radius*radius;
         Vector3 cameraPosition = terrain->getScene()->getCameraPosition();
 
         //TODO: minHeight and maxHeight
-        Vector3 c1 = Vector3(worldPosition.x - worldHalfScale.x, 0, worldPosition.y - worldHalfScale.y);
-        Vector3 c2 = Vector3(worldPosition.x + worldHalfScale.x, 0, worldPosition.y + worldHalfScale.y);
+        Vector3 c1 = Vector3(worldPosition.x - worldHalfScale.x, 0, worldPosition.z - worldHalfScale.z);
+        Vector3 c2 = Vector3(worldPosition.x + worldHalfScale.x, 0, worldPosition.z + worldHalfScale.z);
         Vector3 distV;
 
         if (cameraPosition.x < c1.x) distV.x = (cameraPosition.x - c1.x);
@@ -112,7 +122,7 @@ bool TerrainNode::inSphere(float radius) {
         if (cameraPosition.z < c1.z) distV.z = (cameraPosition.z - c1.z);
         else if (cameraPosition.z > c2.z) distV.z = (cameraPosition.z - c2.z);
 
-        float dist2 = distV.absDotProduct(distV);
+        float dist2 = distV.dotProduct(distV);
 
         return dist2 <= r2;
     }
@@ -137,6 +147,8 @@ bool TerrainNode::renderLoad(bool shadow){
 
         render->addProperty(S_PROPERTY_TERRAINNODEPOS, S_PROPERTYDATA_FLOAT2, 1, &position);
         render->addProperty(S_PROPERTY_TERRAINNODESIZE, S_PROPERTYDATA_FLOAT1, 1, &size);
+        render->addProperty(S_PROPERTY_TERRAINNODERANGE, S_PROPERTYDATA_FLOAT1, 1, &currentRange);
+        render->addProperty(S_PROPERTY_TERRAINNODERESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
     } else {
 
@@ -144,6 +156,8 @@ bool TerrainNode::renderLoad(bool shadow){
 
         shadowRender->addProperty(S_PROPERTY_TERRAINNODEPOS, S_PROPERTYDATA_FLOAT2, 1, &position);
         shadowRender->addProperty(S_PROPERTY_TERRAINNODESIZE, S_PROPERTYDATA_FLOAT1, 1, &size);
+        shadowRender->addProperty(S_PROPERTY_TERRAINNODERANGE, S_PROPERTYDATA_FLOAT1, 1, &currentRange);
+        shadowRender->addProperty(S_PROPERTY_TERRAINNODERESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
     }
 

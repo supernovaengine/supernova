@@ -19,12 +19,13 @@ Terrain::Terrain(): Mesh(){
 
     heightData = NULL;
 
-    bufferIndexCount = 0;
+    fullResNode = {0,0};
+    halfResNode = {0,0};
 
     worldWidth = 1024;
     levels = 6;
     resolution = 32;
-    rootNodeSize = 500;
+    rootNodeSize = 2000;
 
     //float leafNodeSize = 1.0f;
     //float rootNodeSize = leafNodeSize*pow(2, levels-1);
@@ -52,7 +53,7 @@ void Terrain::setHeightmap(std::string heightMapPath){
     heightData = new Texture(heightMapPath);
 }
 
-void Terrain::createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments){
+Terrain::NodeIndex Terrain::createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments){
     float width_half = (float)width / 2;
     float height_half = (float)height / 2;
 
@@ -85,7 +86,8 @@ void Terrain::createPlaneNodeBuffer(int width, int height, int widthSegments, in
         }
     }
 
-    bufferIndexCount = 0;
+    unsigned int bufferIndexCount = 0;
+    unsigned int bufferIndexOffset = indices.getCount();
 
     for (int iy = 0; iy < gridY; iy++) {
         for (int ix = 0; ix < gridX; ix++) {
@@ -107,27 +109,18 @@ void Terrain::createPlaneNodeBuffer(int width, int height, int widthSegments, in
 
         }
     }
+
+    return {bufferIndexCount, bufferIndexOffset};
 }
 
 TerrainNode* Terrain::createNode(float x, float y, float scale, int lodDepth){
     TerrainNode* terrainNode = new TerrainNode(x, y, scale, lodDepth, this);
 
     this->submeshes.push_back(terrainNode);
-    terrainNode->setIndices("indices", bufferIndexCount, 0 * sizeof(unsigned int));
 
     return terrainNode;
 }
-/*
-void Terrain::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){
 
-    Mesh::updateVPMatrix( viewMatrix, projectionMatrix, viewProjectionMatrix, cameraPosition);
-
-    if (cameraPosition) {
-        offset.x = cameraPosition->x;
-        offset.y = cameraPosition->z;
-    }
-}
-*/
 bool Terrain::renderLoad(bool shadow){
 
     if (!shadow){
@@ -136,7 +129,8 @@ bool Terrain::renderLoad(bool shadow){
 
         render->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
-        //render->addProperty(S_PROPERTY_TERRAINGLOBALOFFSET, S_PROPERTYDATA_FLOAT2, 1, &offset);
+        render->addProperty(S_PROPERTY_TERRAINSIZE, S_PROPERTYDATA_FLOAT1, 1, &rootNodeSize);
+        render->addProperty(S_PROPERTY_TERRAINRESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
         if (heightData){
             render->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightData);
@@ -148,7 +142,8 @@ bool Terrain::renderLoad(bool shadow){
 
         shadowRender->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
-        //shadowRender->addProperty(S_PROPERTY_TERRAINGLOBALOFFSET, S_PROPERTYDATA_FLOAT2, 1, &offset);
+        shadowRender->addProperty(S_PROPERTY_TERRAINSIZE, S_PROPERTYDATA_FLOAT1, 1, &rootNodeSize);
+        shadowRender->addProperty(S_PROPERTY_TERRAINRESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
         if (heightData){
             shadowRender->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightData);
@@ -184,7 +179,8 @@ void Terrain::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Mat
 
 bool Terrain::load(){
 
-    createPlaneNodeBuffer(1, 1, resolution, resolution);
+    fullResNode = createPlaneNodeBuffer(1, 1, resolution, resolution);
+    halfResNode = createPlaneNodeBuffer(1, 1, resolution/2, resolution/2);
 
     grid.push_back(createNode(0, 0, rootNodeSize, levels));
 
@@ -197,34 +193,6 @@ bool Terrain::load(){
     for (int i = levels-2; i >=0; i--) {
         ranges[i] = ranges[i+1] / 2;
     }
-
-/*
-    float initialScale = worldWidth / pow( 2, levels );
-
-    createTile( -initialScale, -initialScale, initialScale );
-    createTile( -initialScale, 0, initialScale );
-    createTile( 0, 0, initialScale);
-    createTile( 0, -initialScale, initialScale );
-
-
-    for ( float scale = initialScale; scale < worldWidth; scale *= 2 ) {
-        createTile( -2 * scale, -2 * scale, scale );
-        createTile( -2 * scale, -scale, scale);
-        createTile( -2 * scale, 0, scale);
-        createTile( -2 * scale, scale, scale);
-
-        createTile( -scale, -2 * scale, scale);
-        createTile( -scale, scale, scale);
-
-        createTile( 0, -2 * scale, scale);
-        createTile( 0, scale, scale);
-
-        createTile( scale, -2 * scale, scale);
-        createTile( scale, -scale, scale);
-        createTile( scale, 0, scale);
-        createTile( scale, scale, scale);
-    }
-*/
 
     return Mesh::load();
 }
