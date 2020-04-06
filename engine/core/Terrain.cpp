@@ -193,7 +193,10 @@ bool Terrain::load(){
     }
 
     rootNodeSize = maxDistance / 2;
-    //TODO: Check if rootNodeSize is bigger than terrainSize
+    if (rootNodeSize > terrainSize)
+        rootNodeSize = terrainSize;
+    if (rootNodeSize < terrainSize)
+        rootNodeSize = terrainSize / 2;
 
     //TODO: Clear grid
     int gridWidth = floor(terrainSize/rootNodeSize);

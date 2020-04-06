@@ -35,6 +35,7 @@ std::string gFragmentLinesShader =
 
 std::string gVertexPointsPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
+"uniform mat4 u_mMatrix;\n"
 
 "attribute vec3 a_Position;\n"
 "#ifdef USE_NORMAL\n"
@@ -87,6 +88,7 @@ std::string gFragmentPointsPerPixelLightShader =
 
 std::string gVertexMeshPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
+"uniform mat4 u_mMatrix;\n"
 
 "attribute vec3 a_Position;\n"
 "#ifdef USE_NORMAL\n"

@@ -8,7 +8,6 @@
 std::string lightingVertexDec =
         "#ifdef USE_LIGHTING\n"
 
-        "  uniform mat4 u_mMatrix;\n"
         "  uniform mat4 u_nMatrix;\n"
 
         "  varying vec3 v_worldPos;\n"
