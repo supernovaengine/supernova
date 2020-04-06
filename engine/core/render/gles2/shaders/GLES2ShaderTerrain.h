@@ -22,6 +22,7 @@ std::string terrainVertexDec =
         "  uniform int u_terrainNodeResolution;\n"
 
         "  vec2 gridDim;\n"
+        "  vec2 terrainTextureCoords;\n"
 
         "  vec2 morphVertex(vec2 gridPos, vec2 worldPos, float morph) {\n"
         "      vec2 fracPart = fract(gridPos * gridDim.xy * 0.5) * 2.0 / gridDim.xy;\n"
@@ -29,7 +30,7 @@ std::string terrainVertexDec =
         "  }\n"
 
         "  float getHeight(vec2 p) {\n"
-        "      return texture2DLod(u_heightData, p/u_terrainSize, 0.0).r * 50.0;\n"
+        "      return texture2DLod(u_heightData, p/u_terrainSize, 0.0).r * 100.0;\n"
         "  }\n"
 
         "#endif\n";
@@ -42,16 +43,20 @@ std::string terrainVertexImp =
         "      localPos = vec3(localPos.x, getHeight(localPos.xz + (u_terrainSize/2.0)), localPos.z);\n"
 
         "      gridDim = vec2(u_terrainNodeResolution, u_terrainNodeResolution);\n"
-        "      float morphStart = -0.35;\n"
-        "      float morphEnd = 0.35;\n"
+        "      float morphStart = 0.0;\n"
+        "      float morphEnd = 0.25;\n"
 
+        //"      float dist = distance(vec3(629.0, 0.0, -158.0), vec3(u_mMatrix * vec4(localPos, 1.0)));\n"
         "      float dist = distance(u_EyePos, vec3(u_mMatrix * vec4(localPos, 1.0)));\n"
 
         "      float nextlevel_thresh = ((u_terrainNodeRange-dist)/u_terrainNodeSize*gridDim.x/float(u_terrainResolution));\n"
         "      float rangeDist = 1.0 - smoothstep(morphStart, morphEnd, nextlevel_thresh);\n"
 
         "      localPos.xz = morphVertex(a_Position.xz, localPos.xz, rangeDist);\n"
+
         "      localPos = vec3(localPos.x, getHeight(localPos.xz + (u_terrainSize/2.0)), localPos.z);\n"
+
+        "      terrainTextureCoords = (localPos.xz + (u_terrainSize/2.0)) / u_terrainSize;\n"
         "    #endif\n";
 
 #endif //GLES2SHADERTERRAIN_H

@@ -22,10 +22,10 @@ Terrain::Terrain(): Mesh(){
     fullResNode = {0,0};
     halfResNode = {0,0};
 
-    worldWidth = 1024;
-    levels = 6;
+    terrainSize = 2000;
+    levels = 4;
     resolution = 32;
-    rootNodeSize = 2000;
+    rootNodeSize = 1000;
 
     //float leafNodeSize = 1.0f;
     //float rootNodeSize = leafNodeSize*pow(2, levels-1);
@@ -129,7 +129,7 @@ bool Terrain::renderLoad(bool shadow){
 
         render->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
-        render->addProperty(S_PROPERTY_TERRAINSIZE, S_PROPERTYDATA_FLOAT1, 1, &rootNodeSize);
+        render->addProperty(S_PROPERTY_TERRAINSIZE, S_PROPERTYDATA_FLOAT1, 1, &terrainSize);
         render->addProperty(S_PROPERTY_TERRAINRESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
         if (heightData){
@@ -142,7 +142,7 @@ bool Terrain::renderLoad(bool shadow){
 
         shadowRender->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
-        shadowRender->addProperty(S_PROPERTY_TERRAINSIZE, S_PROPERTYDATA_FLOAT1, 1, &rootNodeSize);
+        shadowRender->addProperty(S_PROPERTY_TERRAINSIZE, S_PROPERTYDATA_FLOAT1, 1, &terrainSize);
         shadowRender->addProperty(S_PROPERTY_TERRAINRESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
         if (heightData){
@@ -182,8 +182,6 @@ bool Terrain::load(){
     fullResNode = createPlaneNodeBuffer(1, 1, resolution, resolution);
     halfResNode = createPlaneNodeBuffer(1, 1, resolution/2, resolution/2);
 
-    grid.push_back(createNode(0, 0, rootNodeSize, levels));
-
     float maxDistance = 1000;
     if (scene && scene->getCamera())
         maxDistance = scene->getCamera()->getFar();
@@ -193,6 +191,22 @@ bool Terrain::load(){
     for (int i = levels-2; i >=0; i--) {
         ranges[i] = ranges[i+1] / 2;
     }
+
+    rootNodeSize = maxDistance / 2;
+    //TODO: Check if rootNodeSize is bigger than terrainSize
+
+    //TODO: Clear grid
+    int gridWidth = floor(terrainSize/rootNodeSize);
+    int gridHeight = floor(terrainSize/rootNodeSize);
+
+    for (int i = 0; i < gridWidth; i++) {
+        for (int j = 0; j < gridHeight; j++) {
+            float xPos = i*rootNodeSize;
+            float zPos = j*rootNodeSize;
+            grid.push_back(createNode(xPos-(terrainSize/4), zPos-(terrainSize/4), rootNodeSize, levels));
+        }
+    }
+
 
     return Mesh::load();
 }

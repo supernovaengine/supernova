@@ -109,6 +109,7 @@ bool TerrainNode::inSphere(float radius) {
     if (terrain->getScene()) {
         float r2 = radius*radius;
         Vector3 cameraPosition = terrain->getScene()->getCameraPosition();
+        //Vector3 cameraPosition(629, 0, -158);
 
         //TODO: minHeight and maxHeight
         Vector3 c1 = Vector3(worldPosition.x - worldHalfScale.x, 0, worldPosition.z - worldHalfScale.z);

@@ -33,7 +33,7 @@ namespace Supernova{
         std::vector<TerrainNode*> grid;
         float rootNodeSize;
 
-        float worldWidth;
+        float terrainSize;
         int levels;
         int resolution;
 
