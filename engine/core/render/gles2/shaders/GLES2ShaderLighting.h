@@ -42,8 +42,6 @@ std::string lightingVertexImp =
 std::string lightingFragmentDec =
         "#ifdef USE_LIGHTING\n"
 
-        "  uniform vec3 u_EyePos;\n"
-
         "  uniform vec3 u_AmbientLight;\n"
 
         "  uniform int u_NumPointLight;\n"

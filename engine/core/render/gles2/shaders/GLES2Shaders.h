@@ -36,6 +36,7 @@ std::string gFragmentLinesShader =
 std::string gVertexPointsPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 "uniform mat4 u_mMatrix;\n"
+"uniform vec3 u_EyePos;\n"
 
 "attribute vec3 a_Position;\n"
 "#ifdef USE_NORMAL\n"
@@ -73,6 +74,7 @@ std::string gVertexPointsPerPixelLightShader =
 
 std::string gFragmentPointsPerPixelLightShader =
 "precision highp float;\n"
+"uniform vec3 u_EyePos;\n"
 "varying vec4 v_pointColor;\n"
 "varying float v_pointRotation;\n"
 + texturePointFragmentDec
@@ -89,6 +91,7 @@ std::string gFragmentPointsPerPixelLightShader =
 std::string gVertexMeshPerPixelLightShader =
 "uniform mat4 u_mvpMatrix;\n"
 "uniform mat4 u_mMatrix;\n"
+"uniform vec3 u_EyePos;\n"
 
 "attribute vec3 a_Position;\n"
 "#ifdef USE_NORMAL\n"
@@ -126,6 +129,7 @@ std::string gVertexMeshPerPixelLightShader =
 std::string gFragmentMeshPerPixelLightShader =
 "precision highp float;\n"
 "uniform vec4 u_Color;\n"
+"uniform vec3 u_EyePos;\n"
 + lightingFragmentDec
 + fogFragmentDec
 + textureMeshFragmentDec +
@@ -140,6 +144,7 @@ std::string gFragmentMeshPerPixelLightShader =
 std::string gVertexDepthShader =
 "uniform mat4 u_mvpMatrix;\n"
 "uniform mat4 u_mMatrix;\n"
+"uniform vec3 u_EyePos;\n"
 "attribute vec3 a_Position;\n"
 "varying vec3 v_worldPos;\n"
 + terrainVertexDec

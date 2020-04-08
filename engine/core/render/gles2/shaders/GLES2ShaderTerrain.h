@@ -9,8 +9,6 @@ std::string terrainVertexDec =
         "#ifdef IS_TERRAIN\n"
         "  uniform sampler2D u_heightData;\n"
 
-        "  uniform vec3 u_EyePos;\n"
-
         "  uniform float u_terrainSize;\n"
         "  uniform int u_terrainResolution;\n"
 
