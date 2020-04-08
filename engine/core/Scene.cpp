@@ -50,15 +50,15 @@ Scene::~Scene() {
 }
 
 void Scene::addLight (Light* light){    
-    bool founded = false;
+    bool found = false;
     
     std::vector<Light*>::iterator it;
     for (it = lights.begin(); it != lights.end(); ++it) {
         if (light == (*it))
-            founded = true;
+            found = true;
     }
     
-    if (!founded){
+    if (!found){
         lights.push_back(light);
     }
 }
@@ -69,15 +69,15 @@ void Scene::removeLight (Light* light){
 }
 
 void Scene::addSubScene (Scene* scene){
-    bool founded = false;
+    bool found = false;
     
     std::vector<Scene*>::iterator it;
     for (it = subScenes.begin(); it != subScenes.end(); ++it) {
         if (scene == (*it))
-            founded = true;
+            found = true;
     }
     
-    if (!founded){
+    if (!found){
         subScenes.push_back(scene);
     }
 }
@@ -88,15 +88,15 @@ void Scene::removeSubScene (Scene* scene){
 }
 
 void Scene::addGUIObject (UIObject* guiobject){
-    bool founded = false;
+    bool found = false;
     
     std::vector<UIObject*>::iterator it;
     for (it = guiObjects.begin(); it != guiObjects.end(); ++it) {
         if (guiobject == (*it))
-            founded = true;
+            found = true;
     }
     
-    if (!founded){
+    if (!found){
         guiObjects.push_back(guiobject);
     }
 }

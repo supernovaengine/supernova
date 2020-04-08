@@ -112,15 +112,15 @@ void Body2D::setRestituition(int restituition){
 }
 
 void Body2D::addCollisionShape(CollisionShape2D* shape){
-    bool founded = false;
+    bool found = false;
 
     std::vector<CollisionShape*>::iterator it;
     for (it = shapes.begin(); it != shapes.end(); ++it) {
         if (shape == (*it))
-            founded = true;
+            found = true;
     }
 
-    if (!founded){
+    if (!found){
         shapes.push_back(shape);
 
         if (body){

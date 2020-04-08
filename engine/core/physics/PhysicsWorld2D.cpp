@@ -93,15 +93,15 @@ void PhysicsWorld2D::removeBody(Body* body){
 }
 
 bool PhysicsWorld2D::addJoint(Joint2D* joint){
-    bool founded = false;
+    bool found = false;
 
     std::vector<Joint2D*>::iterator it;
     for (it = joints.begin(); it != joints.end(); ++it) {
         if (joint == (*it))
-            founded = true;
+            found = true;
     }
 
-    if (!founded){
+    if (!found){
         joints.push_back(joint);
 
         joint->create(this);

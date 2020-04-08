@@ -372,15 +372,15 @@ void Object::lookAt(Vector3 target, Vector3 up){
 }
 
 void Object::addAction(Action* action){
-    bool founded = false;
+    bool found = false;
 
     std::vector<Action*>::iterator it;
     for (it = actions.begin(); it != actions.end(); ++it) {
         if (action == (*it))
-            founded = true;
+            found = true;
     }
 
-    if (!founded){
+    if (!found){
         if (!action->object) {
             actions.push_back(action);
             action->object = this;

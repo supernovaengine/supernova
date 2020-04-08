@@ -35,15 +35,15 @@ bool PhysicsWorld::isOwnedBodies(){
 }
 
 bool PhysicsWorld::addBody(Body* body){
-    bool founded = false;
+    bool found = false;
 
     std::vector<Body*>::iterator it;
     for (it = bodies.begin(); it != bodies.end(); ++it) {
         if (body == (*it))
-            founded = true;
+            found = true;
     }
 
-    if (!founded){
+    if (!found){
         bodies.push_back(body);
 
         return true;
