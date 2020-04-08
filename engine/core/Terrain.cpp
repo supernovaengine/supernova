@@ -23,7 +23,7 @@ Terrain::Terrain(): Mesh(){
     halfResNode = {0,0};
 
     terrainSize = 2000;
-    levels = 4;
+    levels = 6;
     resolution = 32;
     rootNodeSize = 1000;
 
@@ -188,10 +188,11 @@ bool Terrain::load(){
     }
 
     rootNodeSize = maxDistance / 2;
+
     if (rootNodeSize > terrainSize)
         rootNodeSize = terrainSize;
     if (rootNodeSize < terrainSize)
-        rootNodeSize = terrainSize / 2;
+        rootNodeSize = terrainSize / floor(terrainSize/rootNodeSize);
 
     for (int i = 0; i < grid.size(); i++) {
         delete grid[i];
@@ -201,11 +202,14 @@ bool Terrain::load(){
     int gridWidth = floor(terrainSize/rootNodeSize);
     int gridHeight = floor(terrainSize/rootNodeSize);
 
+    //To center terrain
+    float offset = (terrainSize / 2) - (rootNodeSize / 2);
+
     for (int i = 0; i < gridWidth; i++) {
         for (int j = 0; j < gridHeight; j++) {
             float xPos = i*rootNodeSize;
             float zPos = j*rootNodeSize;
-            grid.push_back(createNode(xPos-(terrainSize/4), zPos-(terrainSize/4), rootNodeSize, levels));
+            grid.push_back(createNode(xPos-offset, zPos-offset, rootNodeSize, levels));
         }
     }
 

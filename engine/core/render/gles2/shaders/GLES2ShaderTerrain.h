@@ -63,7 +63,7 @@ std::string terrainVertexImp =
 
         "      gridDim = vec2(u_terrainNodeResolution, u_terrainNodeResolution);\n"
         "      float morphStart = 0.0;\n"
-        "      float morphEnd = 0.25;\n"
+        "      float morphEnd = 0.40;\n"
 
         "      float dist = distance(u_EyePos, vec3(u_mMatrix * vec4(localPos, 1.0)));\n"
 
