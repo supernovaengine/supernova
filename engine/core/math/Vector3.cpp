@@ -136,18 +136,29 @@ float Vector3::squaredDistance(const Vector3& rhs) const{
 }
 
 Vector3& Vector3::normalize(){
-    float f = (float)sqrt( x * x + y * y + z * z );
-    
-    // Will also work for zero-sized vectors, but will change nothing
-    if ( f > 1e-06f )
-    {
-        f = 1.0f / f;
-        x *= f;
-        y *= f;
-        z *= f;
+    float length = (float)sqrt( x * x + y * y + z * z );
+
+    if (length > 0.0){
+        float invLength = 1.0f / length;
+        x *= invLength;
+        y *= invLength;
+        z *= invLength;
     }
     
     return *this;
+}
+
+float Vector3::normalizeL(){
+    float length = (float)sqrt( x * x + y * y + z * z );
+
+    if (length > 0.0){
+        float invLength = 1.0f / length;
+        x *= invLength;
+        y *= invLength;
+        z *= invLength;
+    }
+
+    return length;
 }
 
 Vector3 Vector3::crossProduct( const Vector3& v ) const{

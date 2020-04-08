@@ -6,6 +6,7 @@
 #define TERRAINNODE_H
 
 #include "Submesh.h"
+#include "math/AlignedBox.h"
 
 
 namespace Supernova{
@@ -25,7 +26,8 @@ namespace Supernova{
 
     private:
 
-        bool inSphere(float radius);
+        bool inSphere(float radius, const AlignedBox& box);
+        bool inFrustum(const AlignedBox& box);
 
     public:
         TerrainNode(float x, float y, float size, int lodDepth, Terrain* submeshes);
@@ -36,6 +38,8 @@ namespace Supernova{
 
         float getSize() const;
         void setSize(float size);
+
+        AlignedBox getAlignedBox();
 
         bool LODSelect(std::vector<float> &ranges, int lodLevel);
 

@@ -62,13 +62,15 @@ void TerrainNode::setSize(float size) {
 bool TerrainNode::LODSelect(std::vector<float> &ranges, int lodLevel){
     currentRange = ranges[lodLevel];
 
-    if ( !inSphere(ranges[lodLevel]) ) {
+    AlignedBox box = getAlignedBox();
+
+    if (!inSphere(ranges[lodLevel], box)) {
         return false;
     }
 
-    //if ( !inFrustum( camera ) ) {
-    //    return true;
-    //}
+    if (!inFrustum(box)) {
+        return true;
+    }
 
     if( lodLevel == 0 ) {
         //Full resolution
@@ -79,7 +81,7 @@ bool TerrainNode::LODSelect(std::vector<float> &ranges, int lodLevel){
         return true;
     } else {
 
-        if( !inSphere(ranges[lodLevel-1]) ) {
+        if( !inSphere(ranges[lodLevel-1], box) ) {
             //Full resolution
             this->resolution = terrain->resolution;
             this->setIndices("indices", terrain->fullResNode.indexCount, terrain->fullResNode.indexOffset * sizeof(unsigned int));
@@ -101,18 +103,36 @@ bool TerrainNode::LODSelect(std::vector<float> &ranges, int lodLevel){
     }
 }
 
-bool TerrainNode::inSphere(float radius) {
+AlignedBox TerrainNode::getAlignedBox(){
     float halfSize = size/2;
     Vector3 worldHalfScale(halfSize * terrain->getWorldScale().x, 1, halfSize * terrain->getWorldScale().z);
     Vector3 worldPosition = terrain->getModelMatrix() * Vector3(position.x, 0, position.y);
 
+    //TODO: minHeight and maxHeight
+    Vector3 c1 = Vector3(worldPosition.x - worldHalfScale.x, 0, worldPosition.z - worldHalfScale.z);
+    Vector3 c2 = Vector3(worldPosition.x + worldHalfScale.x, 100, worldPosition.z + worldHalfScale.z);
+
+    return AlignedBox(c1, c2);
+};
+
+bool TerrainNode::inFrustum(const AlignedBox& box){
+    if (terrain->getScene() && terrain->getScene()->getCamera()) {
+        Camera* camera = terrain->getScene()->getCamera();
+
+        return camera->isInside(box);
+    }
+
+    return false;
+}
+
+bool TerrainNode::inSphere(float radius, const AlignedBox& box) {
     if (terrain->getScene()) {
         float r2 = radius*radius;
         Vector3 cameraPosition = terrain->getScene()->getCameraPosition();
 
         //TODO: minHeight and maxHeight
-        Vector3 c1 = Vector3(worldPosition.x - worldHalfScale.x, 0, worldPosition.z - worldHalfScale.z);
-        Vector3 c2 = Vector3(worldPosition.x + worldHalfScale.x, 0, worldPosition.z + worldHalfScale.z);
+        Vector3 c1 = box.getMinimum();
+        Vector3 c2 = box.getMaximum();
         Vector3 distV;
 
         if (cameraPosition.x < c1.x) distV.x = (cameraPosition.x - c1.x);

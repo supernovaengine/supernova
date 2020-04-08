@@ -30,12 +30,14 @@ Camera::Camera() : Object(){
 
     perspectiveNear = 1;
     perspectiveFar = 2000;
-
-    type = S_CAMERA_PERSPECTIVE;
     
     automatic = true;
 
+    type = S_CAMERA_PERSPECTIVE;
+
     linkedScene = NULL;
+
+    needUpdateFrustumPlanes = false;
 }
 
 Camera::Camera(const Camera &camera){
@@ -78,6 +80,10 @@ Camera& Camera::operator=(const Camera &c){
     this->automatic = c.automatic;
 
     this->type = c.type;
+
+    this->linkedScene = c.linkedScene;
+
+    this->needUpdateFrustumPlanes = c.needUpdateFrustumPlanes;
 
     return *this;
 }
@@ -408,6 +414,104 @@ Ray Camera::pointsToRay(float x, float y) {
     return Ray(near_point_ray, vector_between);
 }
 
+bool Camera::isInside(const AlignedBox& box){
+
+    if (box.isNull() || box.isInfinite())
+        return false;
+
+    updateFrustumPlanes();
+
+    Vector3 centre = box.getCenter();
+    Vector3 halfSize = box.getHalfSize();
+
+    for (int plane = 0; plane < 6; ++plane){
+        if (plane == FRUSTUM_PLANE_FAR && getFar() == 0)
+            continue;
+
+        Plane::Side side = frustumPlanes[plane].getSide(centre, halfSize);
+        if (side == Plane::NEGATIVE_SIDE){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Camera::isInside(const Vector3& point){
+    updateFrustumPlanes();
+
+    for (int plane = 0; plane < 6; ++plane){
+        if (plane == FRUSTUM_PLANE_FAR && getFar() == 0)
+            continue;
+
+        if (frustumPlanes[plane].getSide(point) == Plane::NEGATIVE_SIDE){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Camera::isInside(const Vector3& center, const float& radius){
+    updateFrustumPlanes();
+
+    for (int plane = 0; plane < 6; ++plane){
+        if (plane == FRUSTUM_PLANE_FAR && getFar() == 0)
+            continue;
+
+        if (frustumPlanes[plane].getDistance(center) < -radius){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Camera::updateFrustumPlanes(){
+    if (!needUpdateFrustumPlanes)
+        return false;
+
+    needUpdateFrustumPlanes = false;
+
+    frustumPlanes[FRUSTUM_PLANE_LEFT].normal.x = viewProjectionMatrix[0][3] + viewProjectionMatrix[0][0];
+    frustumPlanes[FRUSTUM_PLANE_LEFT].normal.y = viewProjectionMatrix[1][3] + viewProjectionMatrix[1][0];
+    frustumPlanes[FRUSTUM_PLANE_LEFT].normal.z = viewProjectionMatrix[2][3] + viewProjectionMatrix[2][0];
+    frustumPlanes[FRUSTUM_PLANE_LEFT].d = viewProjectionMatrix[3][3] + viewProjectionMatrix[3][0];
+
+    frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.x = viewProjectionMatrix[0][3] - viewProjectionMatrix[0][0];
+    frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.y = viewProjectionMatrix[1][3] - viewProjectionMatrix[1][0];
+    frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.z = viewProjectionMatrix[2][3] - viewProjectionMatrix[2][0];
+    frustumPlanes[FRUSTUM_PLANE_RIGHT].d = viewProjectionMatrix[3][3] - viewProjectionMatrix[3][0];
+
+    frustumPlanes[FRUSTUM_PLANE_TOP].normal.x = viewProjectionMatrix[0][3] - viewProjectionMatrix[0][1];
+    frustumPlanes[FRUSTUM_PLANE_TOP].normal.y = viewProjectionMatrix[1][3] - viewProjectionMatrix[1][1];
+    frustumPlanes[FRUSTUM_PLANE_TOP].normal.z = viewProjectionMatrix[2][3] - viewProjectionMatrix[2][1];
+    frustumPlanes[FRUSTUM_PLANE_TOP].d = viewProjectionMatrix[3][3] - viewProjectionMatrix[3][1];
+
+    frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.x = viewProjectionMatrix[0][3] + viewProjectionMatrix[0][1];
+    frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.y = viewProjectionMatrix[1][3] + viewProjectionMatrix[1][1];
+    frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.z = viewProjectionMatrix[2][3] + viewProjectionMatrix[2][1];
+    frustumPlanes[FRUSTUM_PLANE_BOTTOM].d = viewProjectionMatrix[3][3] + viewProjectionMatrix[3][1];
+
+    frustumPlanes[FRUSTUM_PLANE_NEAR].normal.x = viewProjectionMatrix[0][3] + viewProjectionMatrix[0][2];
+    frustumPlanes[FRUSTUM_PLANE_NEAR].normal.y = viewProjectionMatrix[1][3] + viewProjectionMatrix[1][2];
+    frustumPlanes[FRUSTUM_PLANE_NEAR].normal.z = viewProjectionMatrix[2][3] + viewProjectionMatrix[2][2];
+    frustumPlanes[FRUSTUM_PLANE_NEAR].d = viewProjectionMatrix[3][3] + viewProjectionMatrix[3][2];
+
+    frustumPlanes[FRUSTUM_PLANE_FAR].normal.x = viewProjectionMatrix[0][3] - viewProjectionMatrix[0][2];
+    frustumPlanes[FRUSTUM_PLANE_FAR].normal.y = viewProjectionMatrix[1][3] - viewProjectionMatrix[1][2];
+    frustumPlanes[FRUSTUM_PLANE_FAR].normal.z = viewProjectionMatrix[2][3] - viewProjectionMatrix[2][2];
+    frustumPlanes[FRUSTUM_PLANE_FAR].d = viewProjectionMatrix[3][3] - viewProjectionMatrix[3][2];
+
+    for(int i=0; i<6; i++ )
+    {
+        float length = frustumPlanes[i].normal.normalizeL();
+        frustumPlanes[i].d /= length;
+    }
+
+    return true;
+}
+
 void Camera::updateViewMatrix(){
     if (type == S_CAMERA_2D){
         viewMatrix.identity();
@@ -448,6 +552,8 @@ void Camera::updateModelMatrix(){
     worldRight = Vector3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
 
     updateViewProjectionMatrix();
+
+    needUpdateFrustumPlanes = true;
 
     if (linkedScene && (linkedScene->getCamera() == this)){
         linkedScene->updateVPMatrix(getViewMatrix(), getProjectionMatrix(), getViewProjectionMatrix(), &worldPosition);

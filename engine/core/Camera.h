@@ -11,6 +11,7 @@
 #include "math/Vector2.h"
 #include "math/Ray.h"
 #include "math/Rect.h"
+#include "math/AlignedBox.h"
 #include "Object.h"
 
 namespace Supernova {
@@ -19,10 +20,22 @@ namespace Supernova {
 
     class Camera: public Object {
 
+        enum FrustumPlane
+        {
+            FRUSTUM_PLANE_NEAR   = 0,
+            FRUSTUM_PLANE_FAR    = 1,
+            FRUSTUM_PLANE_LEFT   = 2,
+            FRUSTUM_PLANE_RIGHT  = 3,
+            FRUSTUM_PLANE_TOP    = 4,
+            FRUSTUM_PLANE_BOTTOM = 5
+        };
+
     private:
         Matrix4 projectionMatrix;
         Matrix4 viewMatrix;
         Matrix4 viewProjectionMatrix;
+
+        bool needUpdateFrustumPlanes;
 
     protected:
 
@@ -50,6 +63,8 @@ namespace Supernova {
         bool automatic;
 
         Scene* linkedScene;
+
+        Plane frustumPlanes[6];
 
     public:
 
@@ -102,11 +117,6 @@ namespace Supernova {
 
         void setLinkedScene(Scene* linkedScene);
 
-        void updateViewMatrix();
-        void updateProjectionMatrix();
-        void updateViewProjectionMatrix();
-        virtual void updateModelMatrix();
-
         Matrix4* getViewMatrix();
         Matrix4* getProjectionMatrix();
         Matrix4* getViewProjectionMatrix();
@@ -116,6 +126,16 @@ namespace Supernova {
         Vector3* getWorldRightPtr();
 
         Ray pointsToRay(float normalized_x, float normalized_y);
+
+        bool isInside(const AlignedBox& box);
+        bool isInside(const Vector3& point);
+        bool isInside(const Vector3& center, const float& radius);
+
+        bool updateFrustumPlanes();
+        void updateViewMatrix();
+        void updateProjectionMatrix();
+        void updateViewProjectionMatrix();
+        virtual void updateModelMatrix();
 
     };
     
