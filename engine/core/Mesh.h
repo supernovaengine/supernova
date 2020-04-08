@@ -42,6 +42,9 @@ namespace Supernova {
 
         bool isDynamic();
 
+        void addSubmesh(Submesh* submesh);
+        void removeSubmesh(Submesh* submesh);
+
         std::vector<Submesh*> getSubmeshes();
 
         void updateBuffers();

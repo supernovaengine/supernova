@@ -16,6 +16,8 @@ TerrainNode::TerrainNode(float x, float y, float size, int lodDepth, Terrain* te
     this->currentRange = 0;
     this->resolution = terrain->resolution;
 
+    terrain->addSubmesh(this);
+
     if (lodDepth == 1){
         childs[0] = NULL;
         childs[1] = NULL;
@@ -32,15 +34,16 @@ TerrainNode::TerrainNode(float x, float y, float size, int lodDepth, Terrain* te
         childs[2]->setVisible(false);
         childs[3] = new TerrainNode(x + quarterSize, y + quarterSize, halfSize, lodDepth - 1, terrain);
         childs[3]->setVisible(false);
-
-        for (int i = 0; i < 4; i++){
-            terrain->submeshes.push_back(childs[i]);
-        }
     }
 }
 
 TerrainNode::~TerrainNode(){
+    terrain->removeSubmesh(this);
 
+    for (int i = 0; i < 4; i++){
+        if (childs[i])
+            delete childs[i];
+    }
 }
 
 const Vector2 &TerrainNode::getPosition() const {

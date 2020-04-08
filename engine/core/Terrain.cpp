@@ -27,9 +27,6 @@ Terrain::Terrain(): Mesh(){
     resolution = 32;
     rootNodeSize = 1000;
 
-    //float leafNodeSize = 1.0f;
-    //float rootNodeSize = leafNodeSize*pow(2, levels-1);
-
     buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
@@ -116,8 +113,6 @@ Terrain::NodeIndex Terrain::createPlaneNodeBuffer(int width, int height, int wid
 TerrainNode* Terrain::createNode(float x, float y, float scale, int lodDepth){
     TerrainNode* terrainNode = new TerrainNode(x, y, scale, lodDepth, this);
 
-    this->submeshes.push_back(terrainNode);
-
     return terrainNode;
 }
 
@@ -198,7 +193,11 @@ bool Terrain::load(){
     if (rootNodeSize < terrainSize)
         rootNodeSize = terrainSize / 2;
 
-    //TODO: Clear grid
+    for (int i = 0; i < grid.size(); i++) {
+        delete grid[i];
+    }
+    grid.clear();
+
     int gridWidth = floor(terrainSize/rootNodeSize);
     int gridHeight = floor(terrainSize/rootNodeSize);
 

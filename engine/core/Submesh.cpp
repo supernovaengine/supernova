@@ -41,6 +41,9 @@ Submesh::Submesh(Material* material){
 }
 
 Submesh::~Submesh(){
+    if (this->loaded)
+        destroy();
+
     if (materialOwned && material)
         delete this->material;
     
@@ -49,9 +52,6 @@ Submesh::~Submesh(){
 
     if (this->shadowRender && this->shadowRenderOwned)
         delete this->shadowRender;
-
-    if (this->loaded)
-        destroy();
 }
 
 Submesh::Submesh(const Submesh& s){

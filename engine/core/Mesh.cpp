@@ -25,6 +25,25 @@ Mesh::~Mesh(){
         delete shadowRender;
 }
 
+void Mesh::addSubmesh(Submesh* submesh){
+    bool found = false;
+
+    std::vector<Submesh*>::iterator it;
+    for (it = submeshes.begin(); it != submeshes.end(); ++it) {
+        if (submesh == (*it))
+            found = true;
+    }
+
+    if (!found){
+        submeshes.push_back(submesh);
+    }
+}
+
+void Mesh::removeSubmesh(Submesh* submesh){
+    std::vector<Submesh*>::iterator i = std::remove(submeshes.begin(), submeshes.end(), submesh);
+    submeshes.erase(i, submeshes.end());
+}
+
 std::vector<Submesh*> Mesh::getSubmeshes(){
     return submeshes;
 }
