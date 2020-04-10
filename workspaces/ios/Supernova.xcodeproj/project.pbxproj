@@ -74,6 +74,14 @@
 		715F910121EAF6FE0025464D /* TextEdit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715F90FB21EAF6FE0025464D /* TextEdit.cpp */; };
 		715F910721EAF7360025464D /* InterleavedBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715F910321EAF7360025464D /* InterleavedBuffer.cpp */; };
 		715F910821EAF7360025464D /* Buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715F910421EAF7360025464D /* Buffer.cpp */; };
+		716302612440C3A5008C7116 /* GLES2Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7163024C2440C3A5008C7116 /* GLES2Object.cpp */; };
+		716302622440C3A5008C7116 /* GLES2Util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7163024D2440C3A5008C7116 /* GLES2Util.cpp */; };
+		716302632440C3A5008C7116 /* GLES2Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716302522440C3A5008C7116 /* GLES2Texture.cpp */; };
+		716302642440C3A5008C7116 /* GLES2Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716302532440C3A5008C7116 /* GLES2Scene.cpp */; };
+		716302652440C3A6008C7116 /* GLES2Program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7163025E2440C3A5008C7116 /* GLES2Program.cpp */; };
+		716302662440C4FB008C7116 /* libsupernova-renders.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 716302412440C327008C7116 /* libsupernova-renders.a */; };
+		7163026F2440C98E008C7116 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7163026E2440C98E008C7116 /* main.cpp */; };
+		716302702440C9B7008C7116 /* TerrainNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716302692440C80A008C7116 /* TerrainNode.cpp */; };
 		716AB5A71BEF9F3C001B672D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 716AB5A61BEF9F3C001B672D /* main.m */; };
 		716AB5AA1BEF9F3C001B672D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 716AB5A91BEF9F3C001B672D /* AppDelegate.m */; };
 		716AB5B11BEF9F3D001B672D /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 716AB5B01BEF9F3D001B672D /* GameViewController.mm */; };
@@ -144,7 +152,6 @@
 		717E66F020A10F1400ABC488 /* b2Rope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717E66BF20A10F1400ABC488 /* b2Rope.cpp */; };
 		717E66F120A10F5000ABC488 /* libbox2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 717E665220A10EF100ABC488 /* libbox2d.a */; };
 		717FA2091CA1843C009071DC /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 717FA2081CA1843C009071DC /* EAGLView.mm */; };
-		7188F1A11D9B282300A2D04F /* GLES2Program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F19F1D9B282300A2D04F /* GLES2Program.cpp */; };
 		7188F1AC1DBBAB0B00A2D04F /* Sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */; };
 		7188F1AF1DBC5A4100A2D04F /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7188F1AE1DBC5A4100A2D04F /* OpenAL.framework */; };
 		7188F1B31DBD41A400A2D04F /* AudioFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1B11DBD41A400A2D04F /* AudioFile.cpp */; };
@@ -161,13 +168,11 @@
 		719C089E1F0DCFCB00F0BAF0 /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719C08991F0DCFC300F0BAF0 /* Texture.cpp */; };
 		719C08A01F11128E00F0BAF0 /* ProgramRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719C089F1F11128E00F0BAF0 /* ProgramRender.cpp */; };
 		719C08A41F16C7D000F0BAF0 /* ObjectRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719C08A11F16C7CA00F0BAF0 /* ObjectRender.cpp */; };
-		719C08A81F16C82C00F0BAF0 /* GLES2Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719C08A51F16C80200F0BAF0 /* GLES2Object.cpp */; };
 		71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */; };
 		71A6FABD1DEA3F1E003850A2 /* MP3Reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28351DE8E96800C12A1D /* MP3Reader.cpp */; };
 		71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FAC11DEB1924003850A2 /* SoundManager.cpp */; };
 		71AC8B611E6B42C000DB33C3 /* Points.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301261E53D4B000BEE527 /* Points.cpp */; };
 		71B130C320CD8F4D007A42A9 /* LuaFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71B130C120CD8F4D007A42A9 /* LuaFunction.cpp */; };
-		71B818C320B095A10069E8FA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71192EFB1CE1334000BD76EE /* main.cpp */; };
 		71B818C420B095BD0069E8FA /* libsupernova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC7041D7B142D0060EEFF /* libsupernova.a */; };
 		71B818C520B095CC0069E8FA /* libsupernova-project.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71B818B720B094930069E8FA /* libsupernova-project.a */; };
 		71BCF6C31E476F49008E42A2 /* SkyBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7193011B1E42943800BEE527 /* SkyBox.cpp */; };
@@ -250,9 +255,6 @@
 		71CDC7261D7B146D0060EEFF /* Vector2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A331CFB2EAD00A4752F /* Vector2.cpp */; };
 		71CDC7271D7B146D0060EEFF /* Vector3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A361CFB2EAD00A4752F /* Vector3.cpp */; };
 		71CDC7281D7B146D0060EEFF /* Vector4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A391CFB2EAD00A4752F /* Vector4.cpp */; };
-		71CDC72D1D7B14860060EEFF /* GLES2Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */; };
-		71CDC72F1D7B14860060EEFF /* GLES2Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A571CFB2EAD00A4752F /* GLES2Texture.cpp */; };
-		71CDC7301D7B14860060EEFF /* GLES2Util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A5A1CFB2EAD00A4752F /* GLES2Util.cpp */; };
 		71CDC7381D7B14BA0060EEFF /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 715AC0CA1D7B09F4003D7C8C /* liblua.a */; };
 		71CDC73C1D7B14D20060EEFF /* libsupernova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC7041D7B142D0060EEFF /* libsupernova.a */; };
 		71CDC74A1D7B16840060EEFF /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7137AEB71CFCF58900B271D5 /* tiny_obj_loader.cc */; };
@@ -305,6 +307,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 712379101EC13C6000BFD1F7;
 			remoteInfo = stb;
+		};
+		716302672440C778008C7116 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 716AB59A1BEF9F3C001B672D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 716302402440C327008C7116;
+			remoteInfo = "supernova-renders";
 		};
 		716E1D9422AF3C6C00A4386B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -397,6 +406,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7163023F2440C327008C7116 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		716E1D8E22AF3A8400A4386B /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -467,7 +485,6 @@
 		7105A9E420A258120028DCC7 /* PhysicsWorld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhysicsWorld.h; sourceTree = "<group>"; };
 		7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PhysicsWorld2D.cpp; sourceTree = "<group>"; };
 		7105A9E620A258120028DCC7 /* PhysicsWorld2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhysicsWorld2D.h; sourceTree = "<group>"; };
-		71192EFB1CE1334000BD76EE /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		7119E6A920A6A0B80016AEF2 /* CollisionShape2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollisionShape2D.h; sourceTree = "<group>"; };
 		7119E6AA20A6A0B80016AEF2 /* CollisionShape2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CollisionShape2D.cpp; sourceTree = "<group>"; };
 		7119E6AC20AA2A440016AEF2 /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CollisionShape.cpp; sourceTree = "<group>"; };
@@ -518,14 +535,6 @@
 		713D2A3D1CFB2EAD00A4752F /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
 		713D2A3F1CFB2EAD00A4752F /* PlaneTerrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaneTerrain.cpp; sourceTree = "<group>"; };
 		713D2A401CFB2EAD00A4752F /* PlaneTerrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaneTerrain.h; sourceTree = "<group>"; };
-		713D2A4C1CFB2EAD00A4752F /* GLES2Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Header.h; sourceTree = "<group>"; };
-		713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Scene.cpp; sourceTree = "<group>"; };
-		713D2A511CFB2EAD00A4752F /* GLES2Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Scene.h; sourceTree = "<group>"; };
-		713D2A561CFB2EAD00A4752F /* GLES2Shaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Shaders.h; sourceTree = "<group>"; };
-		713D2A571CFB2EAD00A4752F /* GLES2Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Texture.cpp; sourceTree = "<group>"; };
-		713D2A581CFB2EAD00A4752F /* GLES2Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Texture.h; sourceTree = "<group>"; };
-		713D2A5A1CFB2EAD00A4752F /* GLES2Util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Util.cpp; sourceTree = "<group>"; };
-		713D2A5B1CFB2EAD00A4752F /* GLES2Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Util.h; sourceTree = "<group>"; };
 		713D2A631CFB2EAD00A4752F /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = "<group>"; };
 		713D2A641CFB2EAD00A4752F /* Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scene.h; sourceTree = "<group>"; };
 		713D2A661CFB2EAD00A4752F /* Polygon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Polygon.cpp; sourceTree = "<group>"; };
@@ -658,6 +667,29 @@
 		715F910421EAF7360025464D /* Buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Buffer.cpp; sourceTree = "<group>"; };
 		715F910521EAF7360025464D /* Buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Buffer.h; sourceTree = "<group>"; };
 		715F910621EAF7360025464D /* InterleavedBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterleavedBuffer.h; sourceTree = "<group>"; };
+		716302412440C327008C7116 /* libsupernova-renders.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libsupernova-renders.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7163024C2440C3A5008C7116 /* GLES2Object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Object.cpp; sourceTree = "<group>"; };
+		7163024D2440C3A5008C7116 /* GLES2Util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Util.cpp; sourceTree = "<group>"; };
+		7163024E2440C3A5008C7116 /* GLES2Texture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Texture.h; sourceTree = "<group>"; };
+		7163024F2440C3A5008C7116 /* GLES2Program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Program.h; sourceTree = "<group>"; };
+		716302502440C3A5008C7116 /* GLES2Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Util.h; sourceTree = "<group>"; };
+		716302512440C3A5008C7116 /* GLES2Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Header.h; sourceTree = "<group>"; };
+		716302522440C3A5008C7116 /* GLES2Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Texture.cpp; sourceTree = "<group>"; };
+		716302532440C3A5008C7116 /* GLES2Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Scene.cpp; sourceTree = "<group>"; };
+		716302552440C3A5008C7116 /* GLES2ShaderMorphTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2ShaderMorphTarget.h; sourceTree = "<group>"; };
+		716302562440C3A5008C7116 /* GLES2ShaderPointTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2ShaderPointTexture.h; sourceTree = "<group>"; };
+		716302572440C3A5008C7116 /* GLES2ShaderSkinning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2ShaderSkinning.h; sourceTree = "<group>"; };
+		716302582440C3A5008C7116 /* GLES2ShaderMeshTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2ShaderMeshTexture.h; sourceTree = "<group>"; };
+		716302592440C3A5008C7116 /* GLES2ShaderLighting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2ShaderLighting.h; sourceTree = "<group>"; };
+		7163025A2440C3A5008C7116 /* GLES2Shaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Shaders.h; sourceTree = "<group>"; };
+		7163025B2440C3A5008C7116 /* GLES2ShaderTerrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2ShaderTerrain.h; sourceTree = "<group>"; };
+		7163025C2440C3A5008C7116 /* GLES2ShaderFog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2ShaderFog.h; sourceTree = "<group>"; };
+		7163025D2440C3A5008C7116 /* GLES2Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Scene.h; sourceTree = "<group>"; };
+		7163025E2440C3A5008C7116 /* GLES2Program.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Program.cpp; sourceTree = "<group>"; };
+		7163025F2440C3A5008C7116 /* GLES2Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Object.h; sourceTree = "<group>"; };
+		716302692440C80A008C7116 /* TerrainNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TerrainNode.cpp; sourceTree = "<group>"; };
+		7163026A2440C80A008C7116 /* TerrainNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TerrainNode.h; sourceTree = "<group>"; };
+		7163026E2440C98E008C7116 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		716AB5A21BEF9F3C001B672D /* supernova-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "supernova-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		716AB5A61BEF9F3C001B672D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		716AB5A81BEF9F3C001B672D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -796,8 +828,6 @@
 		717E66F520A1157800ABC488 /* Box2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box2D.h; sourceTree = "<group>"; };
 		717FA2081CA1843C009071DC /* EAGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EAGLView.mm; sourceTree = "<group>"; };
 		717FA20A1CA184B9009071DC /* EAGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
-		7188F19F1D9B282300A2D04F /* GLES2Program.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Program.cpp; sourceTree = "<group>"; };
-		7188F1A01D9B282300A2D04F /* GLES2Program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Program.h; sourceTree = "<group>"; };
 		7188F1A31D9B436200A2D04F /* SceneRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneRender.h; sourceTree = "<group>"; };
 		7188F1A41D9B444600A2D04F /* TextureRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextureRender.h; sourceTree = "<group>"; };
 		7188F1A61D9B464900A2D04F /* ProgramRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgramRender.h; sourceTree = "<group>"; };
@@ -834,8 +864,6 @@
 		719C089F1F11128E00F0BAF0 /* ProgramRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProgramRender.cpp; sourceTree = "<group>"; };
 		719C08A11F16C7CA00F0BAF0 /* ObjectRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectRender.cpp; sourceTree = "<group>"; };
 		719C08A21F16C7CA00F0BAF0 /* ObjectRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectRender.h; sourceTree = "<group>"; };
-		719C08A51F16C80200F0BAF0 /* GLES2Object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLES2Object.cpp; sourceTree = "<group>"; };
-		719C08A61F16C80200F0BAF0 /* GLES2Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLES2Object.h; sourceTree = "<group>"; };
 		71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPlayer.cpp; sourceTree = "<group>"; };
 		71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 		71A6FAC11DEB1924003850A2 /* SoundManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundManager.cpp; sourceTree = "<group>"; };
@@ -1074,6 +1102,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7163023E2440C327008C7116 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		716AB59F1BEF9F3C001B672D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1121,6 +1156,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				716302662440C4FB008C7116 /* libsupernova-renders.a in Frameworks */,
 				716E1D9622AF3C7500A4386B /* libtinygltf.a in Frameworks */,
 				717E66F120A10F5000ABC488 /* libbox2d.a in Frameworks */,
 				712379231EC13CDA00BFD1F7 /* libstb.a in Frameworks */,
@@ -1174,7 +1210,7 @@
 		71192EFA1CE1334000BD76EE /* project */ = {
 			isa = PBXGroup;
 			children = (
-				71192EFB1CE1334000BD76EE /* main.cpp */,
+				7163026E2440C98E008C7116 /* main.cpp */,
 			);
 			name = project;
 			path = ../../project;
@@ -1279,6 +1315,8 @@
 				713D2A6A1CFB2EAD00A4752F /* Supernova.h */,
 				714F366B240BDB4B00E48E76 /* Terrain.cpp */,
 				714F366C240BDB4B00E48E76 /* Terrain.h */,
+				716302692440C80A008C7116 /* TerrainNode.cpp */,
+				7163026A2440C80A008C7116 /* TerrainNode.h */,
 				719C08991F0DCFC300F0BAF0 /* Texture.cpp */,
 				719C089A1F0DCFC400F0BAF0 /* Texture.h */,
 				714C6CFB209FCC1A0002F031 /* TileMap.cpp */,
@@ -1346,7 +1384,6 @@
 		713D2A4A1CFB2EAD00A4752F /* render */ = {
 			isa = PBXGroup;
 			children = (
-				713D2A4B1CFB2EAD00A4752F /* gles2 */,
 				719C08A11F16C7CA00F0BAF0 /* ObjectRender.cpp */,
 				719C08A21F16C7CA00F0BAF0 /* ObjectRender.h */,
 				719C089F1F11128E00F0BAF0 /* ProgramRender.cpp */,
@@ -1357,25 +1394,6 @@
 				7188F1A41D9B444600A2D04F /* TextureRender.h */,
 			);
 			path = render;
-			sourceTree = "<group>";
-		};
-		713D2A4B1CFB2EAD00A4752F /* gles2 */ = {
-			isa = PBXGroup;
-			children = (
-				713D2A4C1CFB2EAD00A4752F /* GLES2Header.h */,
-				719C08A51F16C80200F0BAF0 /* GLES2Object.cpp */,
-				719C08A61F16C80200F0BAF0 /* GLES2Object.h */,
-				7188F19F1D9B282300A2D04F /* GLES2Program.cpp */,
-				7188F1A01D9B282300A2D04F /* GLES2Program.h */,
-				713D2A501CFB2EAD00A4752F /* GLES2Scene.cpp */,
-				713D2A511CFB2EAD00A4752F /* GLES2Scene.h */,
-				713D2A561CFB2EAD00A4752F /* GLES2Shaders.h */,
-				713D2A571CFB2EAD00A4752F /* GLES2Texture.cpp */,
-				713D2A581CFB2EAD00A4752F /* GLES2Texture.h */,
-				713D2A5A1CFB2EAD00A4752F /* GLES2Util.cpp */,
-				713D2A5B1CFB2EAD00A4752F /* GLES2Util.h */,
-			);
-			path = gles2;
 			sourceTree = "<group>";
 		};
 		713D2AAE1CFB2EF900A4752F /* libs */ = {
@@ -1524,20 +1542,64 @@
 			path = buffer;
 			sourceTree = "<group>";
 		};
+		7163024A2440C3A5008C7116 /* renders */ = {
+			isa = PBXGroup;
+			children = (
+				7163024B2440C3A5008C7116 /* gles2 */,
+			);
+			name = renders;
+			path = ../../engine/renders;
+			sourceTree = "<group>";
+		};
+		7163024B2440C3A5008C7116 /* gles2 */ = {
+			isa = PBXGroup;
+			children = (
+				716302512440C3A5008C7116 /* GLES2Header.h */,
+				7163024C2440C3A5008C7116 /* GLES2Object.cpp */,
+				7163025F2440C3A5008C7116 /* GLES2Object.h */,
+				7163025E2440C3A5008C7116 /* GLES2Program.cpp */,
+				7163024F2440C3A5008C7116 /* GLES2Program.h */,
+				716302532440C3A5008C7116 /* GLES2Scene.cpp */,
+				7163025D2440C3A5008C7116 /* GLES2Scene.h */,
+				716302522440C3A5008C7116 /* GLES2Texture.cpp */,
+				7163024E2440C3A5008C7116 /* GLES2Texture.h */,
+				7163024D2440C3A5008C7116 /* GLES2Util.cpp */,
+				716302502440C3A5008C7116 /* GLES2Util.h */,
+				716302542440C3A5008C7116 /* shaders */,
+			);
+			path = gles2;
+			sourceTree = "<group>";
+		};
+		716302542440C3A5008C7116 /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				716302552440C3A5008C7116 /* GLES2ShaderMorphTarget.h */,
+				716302562440C3A5008C7116 /* GLES2ShaderPointTexture.h */,
+				716302572440C3A5008C7116 /* GLES2ShaderSkinning.h */,
+				716302582440C3A5008C7116 /* GLES2ShaderMeshTexture.h */,
+				716302592440C3A5008C7116 /* GLES2ShaderLighting.h */,
+				7163025A2440C3A5008C7116 /* GLES2Shaders.h */,
+				7163025B2440C3A5008C7116 /* GLES2ShaderTerrain.h */,
+				7163025C2440C3A5008C7116 /* GLES2ShaderFog.h */,
+			);
+			path = shaders;
+			sourceTree = "<group>";
+		};
 		716AB5991BEF9F3C001B672D = {
 			isa = PBXGroup;
 			children = (
-				71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */,
-				71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */,
-				71CDC6FA1D7B13240060EEFF /* libz.tbd */,
 				713D30C41CFB306D00A4752F /* assets */,
-				71192EFA1CE1334000BD76EE /* project */,
-				713D2AAE1CFB2EF900A4752F /* libs */,
 				713D2A051CFB2EAD00A4752F /* core */,
+				7188F1AD1DBC5A4100A2D04F /* Frameworks */,
+				713D2AAE1CFB2EF900A4752F /* libs */,
+				71CDC6FA1D7B13240060EEFF /* libz.tbd */,
+				71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */,
+				716AB5A31BEF9F3C001B672D /* Products */,
+				71192EFA1CE1334000BD76EE /* project */,
+				71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */,
+				7163024A2440C3A5008C7116 /* renders */,
 				716AB5A41BEF9F3C001B672D /* Supernova */,
 				716E1D4B22AF33F200A4386B /* tinygltf */,
-				716AB5A31BEF9F3C001B672D /* Products */,
-				7188F1AD1DBC5A4100A2D04F /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1554,6 +1616,7 @@
 				717E665220A10EF100ABC488 /* libbox2d.a */,
 				71B818B720B094930069E8FA /* libsupernova-project.a */,
 				716E1D9222AF3A8400A4386B /* libtinygltf.a */,
+				716302412440C327008C7116 /* libsupernova-renders.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2188,6 +2251,23 @@
 			productReference = 715AC0CA1D7B09F4003D7C8C /* liblua.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		716302402440C327008C7116 /* supernova-renders */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 716302472440C327008C7116 /* Build configuration list for PBXNativeTarget "supernova-renders" */;
+			buildPhases = (
+				7163023D2440C327008C7116 /* Sources */,
+				7163023E2440C327008C7116 /* Frameworks */,
+				7163023F2440C327008C7116 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "supernova-renders";
+			productName = "supernova-renders";
+			productReference = 716302412440C327008C7116 /* libsupernova-renders.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		716AB5A11BEF9F3C001B672D /* supernova-ios */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 716AB5BD1BEF9F3D001B672D /* Build configuration list for PBXNativeTarget "supernova-ios" */;
@@ -2288,6 +2368,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				716302682440C778008C7116 /* PBXTargetDependency */,
 				716E1D9522AF3C6C00A4386B /* PBXTargetDependency */,
 				717E66F320A10F5A00ABC488 /* PBXTargetDependency */,
 				712379221EC13CD400BFD1F7 /* PBXTargetDependency */,
@@ -2352,6 +2433,10 @@
 					715AC0C91D7B09F4003D7C8C = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
+					716302402440C327008C7116 = {
+						CreatedOnToolsVersion = 11.4;
+						ProvisioningStyle = Automatic;
+					};
 					716AB5A11BEF9F3C001B672D = {
 						CreatedOnToolsVersion = 7.1;
 					};
@@ -2398,6 +2483,7 @@
 			targets = (
 				716AB5A11BEF9F3C001B672D /* supernova-ios */,
 				71CDC7031D7B142D0060EEFF /* supernova */,
+				716302402440C327008C7116 /* supernova-renders */,
 				71B818B620B094930069E8FA /* supernova-project */,
 				715AC0C91D7B09F4003D7C8C /* lua */,
 				71CDC7401D7B167C0060EEFF /* tinyobjloader */,
@@ -2474,6 +2560,18 @@
 				715AC0F31D7B0A29003D7C8C /* lzio.c in Sources */,
 				715AC0D41D7B0A29003D7C8C /* lauxlib.c in Sources */,
 				715AC0E41D7B0A29003D7C8C /* lmem.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7163023D2440C327008C7116 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				716302612440C3A5008C7116 /* GLES2Object.cpp in Sources */,
+				716302632440C3A5008C7116 /* GLES2Texture.cpp in Sources */,
+				716302652440C3A6008C7116 /* GLES2Program.cpp in Sources */,
+				716302642440C3A5008C7116 /* GLES2Scene.cpp in Sources */,
+				716302622440C3A5008C7116 /* GLES2Util.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2556,7 +2654,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71B818C320B095A10069E8FA /* main.cpp in Sources */,
+				7163026F2440C98E008C7116 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2596,6 +2694,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				716302702440C9B7008C7116 /* TerrainNode.cpp in Sources */,
 				716E1DC122AF459C00A4386B /* Animation.cpp in Sources */,
 				716E1DC222AF459C00A4386B /* MorphAction.cpp in Sources */,
 				716E1DBE22AF455800A4386B /* Attribute.cpp in Sources */,
@@ -2623,7 +2722,6 @@
 				71FA3F651F5E2FEE0015BEFE /* Plane.cpp in Sources */,
 				71D6EFE81F53551F00241F0C /* TimeAction.cpp in Sources */,
 				71CE94F71EC8A3B2008CCF3C /* File.cpp in Sources */,
-				71CDC72F1D7B14860060EEFF /* GLES2Texture.cpp in Sources */,
 				71C39E56204188BC00863AB6 /* ParticleRotationMod.cpp in Sources */,
 				71C39E55204188BC00863AB6 /* ParticlePositionMod.cpp in Sources */,
 				715F90F021EAF6BF0025464D /* Lines.cpp in Sources */,
@@ -2636,7 +2734,6 @@
 				71C27736202BCE1F005B3EDC /* AlphaAction.cpp in Sources */,
 				7188F1B91DBD4BAC00A2D04F /* AudioLoader.cpp in Sources */,
 				715F90FE21EAF6FE0025464D /* Text.cpp in Sources */,
-				71CDC72D1D7B14860060EEFF /* GLES2Scene.cpp in Sources */,
 				71C39E48204188B000863AB6 /* ParticleAccelerationInit.cpp in Sources */,
 				714C6CF7209BEC0B0002F031 /* SystemPlatform.cpp in Sources */,
 				71CDC7161D7B14510060EEFF /* Object.cpp in Sources */,
@@ -2646,7 +2743,6 @@
 				7188F1BC1DBD960000A2D04F /* WAVReader.cpp in Sources */,
 				71C2773C202BCE6C005B3EDC /* AlignedBox.cpp in Sources */,
 				71CDC70E1D7B14510060EEFF /* Cube.cpp in Sources */,
-				71CDC7301D7B14860060EEFF /* GLES2Util.cpp in Sources */,
 				71CDC70D1D7B14510060EEFF /* Camera.cpp in Sources */,
 				7188F1B61DBD4A3400A2D04F /* AudioReader.cpp in Sources */,
 				714C89171F0EDF370028DCE0 /* TextureRender.cpp in Sources */,
@@ -2668,7 +2764,6 @@
 				71CE94F91EC8A3B2008CCF3C /* FileHandle.cpp in Sources */,
 				715F910121EAF6FE0025464D /* TextEdit.cpp in Sources */,
 				71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */,
-				719C08A81F16C82C00F0BAF0 /* GLES2Object.cpp in Sources */,
 				714C6CFD209FCC1A0002F031 /* TileMap.cpp in Sources */,
 				71C39E4F204188B000863AB6 /* ParticleSizeInit.cpp in Sources */,
 				71CDC7171D7B14510060EEFF /* PlaneTerrain.cpp in Sources */,
@@ -2686,7 +2781,6 @@
 				71EC38B41EB82871008654E8 /* Particles.cpp in Sources */,
 				71CDC7281D7B146D0060EEFF /* Vector4.cpp in Sources */,
 				715F910721EAF7360025464D /* InterleavedBuffer.cpp in Sources */,
-				7188F1A11D9B282300A2D04F /* GLES2Program.cpp in Sources */,
 				71CDC71B1D7B14510060EEFF /* SpotLight.cpp in Sources */,
 				71CDC7151D7B14510060EEFF /* Model.cpp in Sources */,
 				71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */,
@@ -2772,6 +2866,11 @@
 			isa = PBXTargetDependency;
 			target = 712379101EC13C6000BFD1F7 /* stb */;
 			targetProxy = 712379211EC13CD400BFD1F7 /* PBXContainerItemProxy */;
+		};
+		716302682440C778008C7116 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 716302402440C327008C7116 /* supernova-renders */;
+			targetProxy = 716302672440C778008C7116 /* PBXContainerItemProxy */;
 		};
 		716E1D9522AF3C6C00A4386B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2903,6 +3002,55 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		716302482440C327008C7116 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/core";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		716302492440C327008C7116 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/core";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -3336,7 +3484,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/box2d $(SRCROOT)/../../engine/libs/mpg123/src/libmpg123 $(SRCROOT)/../../engine/libs/json";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/box2d $(SRCROOT)/../../engine/libs/mpg123/src/libmpg123 $(SRCROOT)/../../engine/libs/json $(SRCROOT)/../../engine/renders";
 			};
 			name = Debug;
 		};
@@ -3354,7 +3502,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/box2d $(SRCROOT)/../../engine/libs/mpg123/src/libmpg123 $(SRCROOT)/../../engine/libs/json";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/box2d $(SRCROOT)/../../engine/libs/mpg123/src/libmpg123 $(SRCROOT)/../../engine/libs/json $(SRCROOT)/../../engine/renders";
 			};
 			name = Release;
 		};
@@ -3441,6 +3589,15 @@
 			buildConfigurations = (
 				715AC0D01D7B09F4003D7C8C /* Debug */,
 				715AC0D11D7B09F4003D7C8C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		716302472440C327008C7116 /* Build configuration list for PBXNativeTarget "supernova-renders" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				716302482440C327008C7116 /* Debug */,
+				716302492440C327008C7116 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
