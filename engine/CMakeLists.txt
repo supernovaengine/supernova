@@ -30,6 +30,9 @@ add_subdirectory (libs/tinygltf)
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/box2d")
 add_subdirectory (libs/box2d)
 
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/renders")
+add_subdirectory (renders)
+
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/core")
 add_subdirectory (core)
 
