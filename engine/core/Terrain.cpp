@@ -22,10 +22,12 @@ Terrain::Terrain(): Mesh(){
     fullResNode = {0,0};
     halfResNode = {0,0};
 
+    autoSetRanges = true;
+
     terrainSize = 2000;
+    rootGridSize = 2;
     levels = 6;
     resolution = 32;
-    rootNodeSize = 1000;
 
     buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
@@ -48,6 +50,15 @@ Texture* Terrain::getHeightmap(){
 
 void Terrain::setHeightmap(std::string heightMapPath){
     heightData = new Texture(heightMapPath);
+}
+
+const std::vector<float> &Terrain::getRanges() const {
+    return ranges;
+}
+
+void Terrain::setRanges(const std::vector<float> &ranges) {
+    autoSetRanges = false;
+    Terrain::ranges = ranges;
 }
 
 Terrain::NodeIndex Terrain::createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments){
@@ -177,42 +188,42 @@ bool Terrain::load(){
     fullResNode = createPlaneNodeBuffer(1, 1, resolution, resolution);
     halfResNode = createPlaneNodeBuffer(1, 1, resolution/2, resolution/2);
 
-    float maxDistance = 1000;
-    if (scene && scene->getCamera())
-        maxDistance = scene->getCamera()->getFar();
+    float rootNodeSize = terrainSize / rootGridSize;
 
-    ranges.resize(levels);
-    ranges[levels-1] = maxDistance;
-    for (int i = levels-2; i >=0; i--) {
-        ranges[i] = ranges[i+1] / 2;
+    if (autoSetRanges) {
+        float maxDistance = 1000;
+        if (scene && scene->getCamera())
+            maxDistance = scene->getCamera()->getFar();
+
+        float lastLevel = maxDistance;
+        if (maxDistance < (rootNodeSize * 2)){
+            lastLevel = rootNodeSize * 2;
+            Log::Warn("Terrain quadtree root is not in camera field of view. Increase terrain root grid.");
+        }
+
+        ranges.clear();
+        ranges.resize(levels);
+        ranges[levels - 1] = lastLevel;
+        for (int i = levels - 2; i >= 0; i--) {
+            ranges[i] = ranges[i + 1] / 2;
+        }
     }
-
-    rootNodeSize = maxDistance / 2;
-
-    if (rootNodeSize > terrainSize)
-        rootNodeSize = terrainSize;
-    if (rootNodeSize < terrainSize)
-        rootNodeSize = terrainSize / floor(terrainSize/rootNodeSize);
 
     for (int i = 0; i < grid.size(); i++) {
         delete grid[i];
     }
     grid.clear();
 
-    int gridWidth = floor(terrainSize/rootNodeSize);
-    int gridHeight = floor(terrainSize/rootNodeSize);
-
     //To center terrain
     float offset = (terrainSize / 2) - (rootNodeSize / 2);
 
-    for (int i = 0; i < gridWidth; i++) {
-        for (int j = 0; j < gridHeight; j++) {
+    for (int i = 0; i < rootGridSize; i++) {
+        for (int j = 0; j < rootGridSize; j++) {
             float xPos = i*rootNodeSize;
             float zPos = j*rootNodeSize;
             grid.push_back(createNode(xPos-offset, zPos-offset, rootNodeSize, levels));
         }
     }
-
 
     return Mesh::load();
 }

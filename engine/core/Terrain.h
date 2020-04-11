@@ -28,12 +28,16 @@ namespace Supernova{
         NodeIndex fullResNode;
         NodeIndex halfResNode;
 
+        bool autoSetRanges;
+
         Vector2 offset;
         std::vector<float> ranges;
+
+    private:
         std::vector<TerrainNode*> grid;
-        float rootNodeSize;
 
         float terrainSize;
+        int rootGridSize;
         int levels;
         int resolution;
 
@@ -55,6 +59,9 @@ namespace Supernova{
 
         Texture* getHeightmap();
         void setHeightmap(std::string heightMapPath);
+
+        const std::vector<float> &getRanges() const;
+        void setRanges(const std::vector<float> &ranges);
 
         virtual bool renderLoad(bool shadow);
         virtual bool load();
