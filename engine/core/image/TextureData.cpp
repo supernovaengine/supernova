@@ -10,16 +10,16 @@ TextureData::TextureData() {
     this->height = 0;
     this->size = 0;
     this->color_format = 0;
-    this->bitsPerPixel = 0;
+    this->channels = 0;
     this->data = NULL;
 }
 
-TextureData::TextureData(int width, int height, unsigned int size, int color_format, int bitsPerPixel, void* data){
+TextureData::TextureData(int width, int height, unsigned int size, int color_format, int channels, void* data){
     this->width = width;
     this->height = height;
     this->size = size;
     this->color_format = color_format;
-    this->bitsPerPixel = bitsPerPixel;
+    this->channels = channels;
     this->data = data;
 }
 
@@ -38,7 +38,7 @@ void TextureData::copy ( const TextureData& v ){
     this->height = v.height;
     this->size = v.size;
     this->color_format = v.color_format;
-    this->bitsPerPixel = v.bitsPerPixel;
+    this->channels = v.channels;
 
     this->data = (void *)malloc(this->size);
     memcpy((void*)this->data, (void*)v.data, this->size);
@@ -62,16 +62,16 @@ int TextureData::getNearestPowerOfTwo(int size){
 
 void TextureData::crop(int offsetX, int offsetY, int newWidth, int newHeight){
     
-    int rowsize = width * (bitsPerPixel / 8);
-    int newRowsize = newWidth * (bitsPerPixel / 8);
-    int bufsize = newWidth * newHeight * (bitsPerPixel / 8);
+    int rowsize = width * channels;
+    int newRowsize = newWidth * channels;
+    int bufsize = newWidth * newHeight * channels;
     
     unsigned char* newData = new unsigned char[bufsize];
     
     int row_cnt;
-    long off1=0;
-    long off2=0;
-    long off3=offsetX*(bitsPerPixel / 8);
+    long off1 = 0;
+    long off2 = 0;
+    long off3 = offsetX*channels;
     
     for (row_cnt=offsetY;row_cnt<offsetY+(newHeight);row_cnt++) {
         off1=row_cnt*rowsize;
@@ -95,8 +95,7 @@ void TextureData::resamplePowerOfTwo(){
 void TextureData::resample(int newWidth, int newHeight){
 
     if ((newWidth != width) || (newHeight != height)){
-    
-        int channels = (bitsPerPixel / 8);
+
         int bufsize = newWidth * newHeight * channels;
         unsigned char* newData = new unsigned char [bufsize];
     
@@ -134,8 +133,7 @@ void TextureData::fitPowerOfTwo(){
 void TextureData::fitSize(int newWidth, int newHeight){
     
     if ((newWidth != width) || (newHeight != height)){
-        
-        int channels = (bitsPerPixel / 8);
+
         int bufsize = newWidth * newHeight * channels;
         unsigned char* newData = new unsigned char [bufsize];
         
@@ -165,14 +163,14 @@ void TextureData::fitSize(int newWidth, int newHeight){
 
 void TextureData::flipVertical(){
     
-    int bufsize=width * (bitsPerPixel / 8);
+    int bufsize = width * channels;
     
     unsigned char* tb1 = new unsigned char[bufsize];
     unsigned char* tb2 = new unsigned char[bufsize];
     
     int row_cnt;
-    long off1=0;
-    long off2=0;
+    long off1 = 0;
+    long off2 = 0;
     
     for (row_cnt=0;row_cnt<(height+1)/2;row_cnt++) {
         off1=row_cnt*bufsize;
@@ -187,6 +185,10 @@ void TextureData::flipVertical(){
     delete [] tb1;
     delete [] tb2;
     
+}
+
+unsigned char TextureData::getColorComponent(int x, int y, int color){
+    return ((unsigned char*)data)[((x + y*width)*channels)+color];
 }
 
 int TextureData::getWidth(){
@@ -205,8 +207,8 @@ int TextureData::getColorFormat(){
     return color_format;
 }
 
-int TextureData::getBitsPerPixel(){
-    return bitsPerPixel;
+int TextureData::getChannels(){
+    return channels;
 }
 
 void* TextureData::getData(){

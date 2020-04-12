@@ -17,10 +17,11 @@ TextureData* STBImageReader::getRawImage(FileData* filedata){
     if(channels == 2) type = S_COLOR_GRAY_ALPHA;
     if(channels == 3) type = S_COLOR_RGB;
     if(channels == 4) type = S_COLOR_RGB_ALPHA;
-    
+
+    //Considering one byte per channel
     int size = x * y * channels; //in bytes
-    
-    TextureData* textureData  = new TextureData((int)x, (int)y, (int)size, type, channels * 8, (void*)data);
+
+    TextureData* textureData  = new TextureData((int)x, (int)y, (int)size, type, channels, (void*)data);
     //textureFile->flipVertical();
     //stbi_image_free(data);
     

@@ -130,9 +130,9 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
     stbtt_PackEnd(&context);
 
     unsigned int textureSize = atlasWidth * atlasHeight * sizeof(unsigned char);
-    TextureData* textureData  = new TextureData(atlasWidth, atlasHeight, textureSize, S_COLOR_ALPHA, 8, (void*)atlasData);
+    TextureData* textureData  = new TextureData(atlasWidth, atlasHeight, textureSize, S_COLOR_ALPHA, 1, (void*)atlasData);
 
-    texture->setId(font + std::to_string('-') + std::to_string(fontSize));
+    texture->setId(font + std::string("|") + std::to_string(fontSize));
     texture->setTextureData(textureData);
     texture->setDataOwned(true);
     texture->load();
