@@ -18,7 +18,7 @@ namespace Supernova{
         InterleavedBuffer buffer;
         IndexBuffer indices;
 
-        Texture* heightData;
+        Texture* heightMap;
 
         struct NodeIndex{
             unsigned int indexCount;
@@ -33,10 +33,10 @@ namespace Supernova{
         Vector2 offset;
         std::vector<float> ranges;
 
-    private:
         std::vector<TerrainNode*> grid;
 
         float terrainSize;
+        float maxHeight;
         int rootGridSize;
         int levels;
         int resolution;
@@ -62,6 +62,8 @@ namespace Supernova{
 
         const std::vector<float> &getRanges() const;
         void setRanges(const std::vector<float> &ranges);
+
+        float getHeight(float x, float y);
 
         virtual bool renderLoad(bool shadow);
         virtual bool load();

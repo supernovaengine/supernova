@@ -10,6 +10,7 @@ std::string terrainVertexDec =
         "  uniform sampler2D u_heightData;\n"
 
         "  uniform float u_terrainSize;\n"
+        "  uniform float u_terrainMaxHeight;\n"
         "  uniform int u_terrainResolution;\n"
 
         "  uniform vec2 u_terrainNodePos;\n"
@@ -26,7 +27,7 @@ std::string terrainVertexDec =
         "  }\n"
 
         "  float getHeight(vec3 position) {\n"
-        "      return texture2DLod(u_heightData, (position.xz + (u_terrainSize/2.0)) / u_terrainSize, 0.0).r * 100.0;\n"
+        "      return texture2DLod(u_heightData, (position.xz + (u_terrainSize/2.0)) / u_terrainSize, 0.0).r * u_terrainMaxHeight;\n"
         "  }\n"
 
         "  #ifdef USE_NORMAL\n"

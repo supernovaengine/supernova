@@ -17,7 +17,7 @@ Terrain::Terrain(): Mesh(){
     buffers["vertices"] = &buffer;
     buffers["indices"] = &indices;
 
-    heightData = NULL;
+    heightMap = NULL;
 
     fullResNode = {0,0};
     halfResNode = {0,0};
@@ -25,6 +25,7 @@ Terrain::Terrain(): Mesh(){
     autoSetRanges = true;
 
     terrainSize = 2000;
+    maxHeight = 100;
     rootGridSize = 2;
     levels = 6;
     resolution = 32;
@@ -40,16 +41,20 @@ Terrain::Terrain(std::string heightMapPath): Terrain(){
 }
 
 Terrain::~Terrain(){
-    if (heightData)
-        delete heightData;
+    if (heightMap)
+        delete heightMap;
 }
 
 Texture* Terrain::getHeightmap(){
-    return heightData;
+    return heightMap;
 }
 
 void Terrain::setHeightmap(std::string heightMapPath){
-    heightData = new Texture(heightMapPath);
+    if (heightMap)
+        delete heightMap;
+
+    heightMap = new Texture(heightMapPath);
+    heightMap->setPreserveData(true);
 }
 
 const std::vector<float> &Terrain::getRanges() const {
@@ -121,6 +126,23 @@ Terrain::NodeIndex Terrain::createPlaneNodeBuffer(int width, int height, int wid
     return {bufferIndexCount, bufferIndexOffset};
 }
 
+float Terrain::getHeight(float x, float y){
+
+    if (x < 0 || y < 0 || x >= terrainSize || y >= terrainSize)
+        return 0;
+
+    //TODO: Check if loaded
+    heightMap->load();
+
+    TextureData* textureData = heightMap->getTextureData();
+
+    int posX = round(textureData->getWidth() * x / terrainSize);
+    int posY = round(textureData->getHeight() * y / terrainSize);
+
+    float val = maxHeight*(textureData->getColorComponent(posX,posY,0)/255.0f);
+    return val;
+}
+
 TerrainNode* Terrain::createNode(float x, float y, float scale, int lodDepth){
     TerrainNode* terrainNode = new TerrainNode(x, y, scale, lodDepth, this);
 
@@ -136,10 +158,11 @@ bool Terrain::renderLoad(bool shadow){
         render->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
         render->addProperty(S_PROPERTY_TERRAINSIZE, S_PROPERTYDATA_FLOAT1, 1, &terrainSize);
+        render->addProperty(S_PROPERTY_TERRAINMAXHEIGHT, S_PROPERTYDATA_FLOAT1, 1, &maxHeight);
         render->addProperty(S_PROPERTY_TERRAINRESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
-        if (heightData){
-            render->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightData);
+        if (heightMap){
+            render->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightMap);
         }
 
     } else {
@@ -149,10 +172,11 @@ bool Terrain::renderLoad(bool shadow){
         shadowRender->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
         shadowRender->addProperty(S_PROPERTY_TERRAINSIZE, S_PROPERTYDATA_FLOAT1, 1, &terrainSize);
+        shadowRender->addProperty(S_PROPERTY_TERRAINMAXHEIGHT, S_PROPERTYDATA_FLOAT1, 1, &maxHeight);
         shadowRender->addProperty(S_PROPERTY_TERRAINRESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
-        if (heightData){
-            shadowRender->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightData);
+        if (heightMap){
+            shadowRender->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightMap);
         }
     }
 

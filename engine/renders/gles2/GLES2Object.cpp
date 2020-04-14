@@ -257,6 +257,8 @@ bool GLES2Object::load(){
             propertyName = "u_morphWeights";
         }else if (type == S_PROPERTY_TERRAINSIZE){
             propertyName = "u_terrainSize";
+        }else if (type == S_PROPERTY_TERRAINMAXHEIGHT){
+            propertyName = "u_terrainMaxHeight";
         }else if (type == S_PROPERTY_TERRAINRESOLUTION){
             propertyName = "u_terrainResolution";
         }else if (type == S_PROPERTY_TERRAINNODEPOS){

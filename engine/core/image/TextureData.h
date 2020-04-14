@@ -33,7 +33,7 @@ namespace Supernova {
         void fitSize(int newWidth, int newHeight);
         void flipVertical();
 
-        unsigned char getColorComponent(int newWidth, int newHeight, int color);
+        unsigned char getColorComponent(int x, int y, int color);
 
         int getWidth();
         int getHeight();
