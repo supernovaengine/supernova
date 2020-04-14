@@ -23,6 +23,7 @@ Terrain::Terrain(): Mesh(){
     halfResNode = {0,0};
 
     autoSetRanges = true;
+    heightMapLoaded = false;
 
     terrainSize = 2000;
     maxHeight = 100;
@@ -55,6 +56,7 @@ void Terrain::setHeightmap(std::string heightMapPath){
 
     heightMap = new Texture(heightMapPath);
     heightMap->setPreserveData(true);
+    heightMapLoaded = false;
 }
 
 const std::vector<float> &Terrain::getRanges() const {
@@ -131,8 +133,10 @@ float Terrain::getHeight(float x, float y){
     if (x < 0 || y < 0 || x >= terrainSize || y >= terrainSize)
         return 0;
 
-    //TODO: Check if loaded
-    heightMap->load();
+    if (!heightMapLoaded) {
+        heightMap->load();
+        heightMapLoaded = true;
+    }
 
     TextureData* textureData = heightMap->getTextureData();
 
@@ -248,6 +252,9 @@ bool Terrain::load(){
             grid.push_back(createNode(xPos-offset, zPos-offset, rootNodeSize, levels));
         }
     }
+
+    if (heightMap)
+        heightMapLoaded = true;
 
     return Mesh::load();
 }

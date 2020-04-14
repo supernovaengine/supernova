@@ -29,6 +29,7 @@ namespace Supernova{
         NodeIndex halfResNode;
 
         bool autoSetRanges;
+        bool heightMapLoaded;
 
         Vector2 offset;
         std::vector<float> ranges;
