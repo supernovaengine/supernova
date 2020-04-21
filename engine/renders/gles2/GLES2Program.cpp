@@ -62,8 +62,8 @@ GLuint GLES2Program::loadShader(GLenum shaderType, const char* pSource) {
     return shader;
 }
 
-void GLES2Program::createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube){
-    ProgramRender::createProgram(shaderType, programDefs, numLights, numShadows2D, numShadowsCube);
+void GLES2Program::createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube, int numBlendMapColors){
+    ProgramRender::createProgram(shaderType, programDefs, numLights, numShadows2D, numShadowsCube, numBlendMapColors);
     
     std::string shaderName = "";
     if (shaderType == S_SHADER_MESH){
@@ -77,6 +77,7 @@ void GLES2Program::createProgram(int shaderType, int programDefs, int numLights,
     maxLights = std::min(MAXLIGHTS_GLES2, numLights);
     maxShadows2D = std::min(MAXSHADOWS_GLES2, numShadows2D);
     maxShadowsCube = std::min(MAXSHADOWS_GLES2 - numShadows2D, numShadowsCube);
+    maxBlendMapColors = numBlendMapColors;
 
     if (programDefs & S_PROGRAM_USE_FOG){
         definitions += "#define HAS_FOG\n";
@@ -135,6 +136,10 @@ void GLES2Program::createProgram(int shaderType, int programDefs, int numLights,
 
         pVertexSource = replaceAll(pVertexSource, "MAXCASCADES", std::to_string(MAXCASCADES_GLES2));
         pFragmentSource = replaceAll(pFragmentSource, "MAXCASCADES", std::to_string(MAXCASCADES_GLES2));
+    }
+    if (programDefs & S_PROGRAM_IS_TERRAIN){
+        pVertexSource = replaceAll(pVertexSource, "MAXBLENDMAPCOLORS", std::to_string(maxBlendMapColors));
+        pFragmentSource = replaceAll(pFragmentSource, "MAXBLENDMAPCOLORS", std::to_string(maxBlendMapColors));
     }
     if (programDefs & S_PROGRAM_USE_SKINNING){
         pVertexSource = replaceAll(pVertexSource, "MAXBONES", "70");

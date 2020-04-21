@@ -46,6 +46,7 @@ namespace Supernova {
         void checkSkinning();
         void checkMorphTarget();
         void checkMorphNormal();
+        int getNumBlendMapColors();
         void loadProgram();
     
     protected:

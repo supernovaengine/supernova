@@ -192,6 +192,14 @@ void ObjectRender::checkMorphNormal(){
     }
 }
 
+int ObjectRender::getNumBlendMapColors(){
+    if (properties.count(S_PROPERTY_BLENDMAPCOLORINDEX)) {
+        return properties[S_PROPERTY_BLENDMAPCOLORINDEX].size;
+    }
+
+    return 0;
+}
+
 void ObjectRender::loadProgram(){
     if (!parent) {
         checkLighting();
@@ -203,15 +211,18 @@ void ObjectRender::loadProgram(){
         checkTextureRect();
         checkTextureCube();
 
+        int numBlendMapColors = getNumBlendMapColors();
+
         std::string shaderStr = std::to_string(programShader);
         shaderStr += "|" + std::to_string(programDefs);
         shaderStr += "|" + std::to_string(numLights);
         shaderStr += "|" + std::to_string(numShadows2D);
         shaderStr += "|" + std::to_string(numShadowsCube);
+        shaderStr += "|" + std::to_string(numBlendMapColors);
 
         program = ProgramRender::sharedInstance(shaderStr);
         if (program && !program.get()->isLoaded()) {
-            program.get()->createProgram(programShader, programDefs, numLights, numShadows2D, numShadowsCube);
+            program.get()->createProgram(programShader, programDefs, numLights, numShadows2D, numShadowsCube, numBlendMapColors);
         }
     }else{
         program = parent->program;

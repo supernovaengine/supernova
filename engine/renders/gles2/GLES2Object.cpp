@@ -157,6 +157,11 @@ bool GLES2Object::load(){
             arraySize = programRender->getMaxShadowsCube();
         }else if (type == S_TEXTURESAMPLER_HEIGHTDATA){
             samplerName = "u_heightData";
+        }else if (type == S_TEXTURESAMPLER_BLENDMAP){
+            samplerName = "u_blendMap";
+        }else if (type == S_TEXTURESAMPLER_TERRAINDETAIL){
+            samplerName = "u_terrainDetail";
+            arraySize = programRender->getMaxBlendMapColors();
         }
 
         texturesGL[type].location = glGetUniformLocation(glesProgram, samplerName.c_str());
@@ -269,6 +274,8 @@ bool GLES2Object::load(){
             propertyName = "u_terrainNodeRange";
         }else if (type == S_PROPERTY_TERRAINNODERESOLUTION){
             propertyName = "u_terrainNodeResolution";
+        }else if (type == S_PROPERTY_BLENDMAPCOLORINDEX){
+            propertyName = "u_blendMapColorIdx";
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());

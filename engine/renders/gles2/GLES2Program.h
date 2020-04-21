@@ -26,7 +26,7 @@ namespace Supernova {
         
     public:
 
-        virtual void createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube);
+        virtual void createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube, int numBlendMapColors);
         virtual void deleteProgram();
         
         GLuint getProgram();

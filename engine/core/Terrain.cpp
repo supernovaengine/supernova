@@ -18,6 +18,7 @@ Terrain::Terrain(): Mesh(){
     buffers["indices"] = &indices;
 
     heightMap = NULL;
+    blendMap = NULL;
 
     fullResNode = {0,0};
     halfResNode = {0,0};
@@ -38,7 +39,7 @@ Terrain::Terrain(): Mesh(){
 }
 
 Terrain::Terrain(std::string heightMapPath): Terrain(){
-    setHeightmap(heightMapPath);
+    setHeightMap(heightMapPath);
 }
 
 Terrain::~Terrain(){
@@ -46,17 +47,33 @@ Terrain::~Terrain(){
         delete heightMap;
 }
 
-Texture* Terrain::getHeightmap(){
+Texture* Terrain::getHeightMap(){
     return heightMap;
 }
 
-void Terrain::setHeightmap(std::string heightMapPath){
+void Terrain::setHeightMap(std::string heightMapPath){
     if (heightMap)
         delete heightMap;
 
     heightMap = new Texture(heightMapPath);
     heightMap->setPreserveData(true);
     heightMapLoaded = false;
+}
+
+Texture* Terrain::getBlendMap(){
+    return blendMap;
+}
+
+void Terrain::setBlendMap(std::string blendMapPath){
+    if (blendMap)
+        delete blendMap;
+
+    blendMap = new Texture(blendMapPath);
+}
+
+void Terrain::setTextureDetail(int index, std::string heightMapPath){
+    textureDetails.push_back(new Texture(heightMapPath));
+    blendMapColorIndex.push_back(2);
 }
 
 const std::vector<float> &Terrain::getRanges() const {
@@ -165,9 +182,12 @@ bool Terrain::renderLoad(bool shadow){
         render->addProperty(S_PROPERTY_TERRAINMAXHEIGHT, S_PROPERTYDATA_FLOAT1, 1, &maxHeight);
         render->addProperty(S_PROPERTY_TERRAINRESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
-        if (heightMap){
-            render->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightMap);
-        }
+        render->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightMap);
+
+        //BlendMaps
+        render->addTexture(S_TEXTURESAMPLER_BLENDMAP, blendMap);
+        render->addTextureVector(S_TEXTURESAMPLER_TERRAINDETAIL, textureDetails);
+        render->addProperty(S_PROPERTY_BLENDMAPCOLORINDEX, S_PROPERTYDATA_INT1, blendMapColorIndex.size(), &blendMapColorIndex.front());
 
     } else {
 
@@ -179,9 +199,7 @@ bool Terrain::renderLoad(bool shadow){
         shadowRender->addProperty(S_PROPERTY_TERRAINMAXHEIGHT, S_PROPERTYDATA_FLOAT1, 1, &maxHeight);
         shadowRender->addProperty(S_PROPERTY_TERRAINRESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
-        if (heightMap){
-            shadowRender->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightMap);
-        }
+        shadowRender->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightMap);
     }
 
     return Mesh::renderLoad(shadow);

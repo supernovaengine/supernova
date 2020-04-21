@@ -92,11 +92,14 @@
 #define S_PROPERTY_TERRAINNODESIZE 48
 #define S_PROPERTY_TERRAINNODERANGE 49
 #define S_PROPERTY_TERRAINNODERESOLUTION 50
+#define S_PROPERTY_BLENDMAPCOLORINDEX 51
 
 #define S_TEXTURESAMPLER_DIFFUSE 1
 #define S_TEXTURESAMPLER_SHADOWMAP2D 2
 #define S_TEXTURESAMPLER_SHADOWMAPCUBE 3
 #define S_TEXTURESAMPLER_HEIGHTDATA 4
+#define S_TEXTURESAMPLER_BLENDMAP 5
+#define S_TEXTURESAMPLER_TERRAINDETAIL 6
 
 #define S_PROGRAM_USE_FOG  1 << 0
 #define S_PROGRAM_USE_TEXCOORD  1 << 1
@@ -132,7 +135,7 @@ namespace Supernova {
         int maxLights;
         int maxShadows2D;
         int maxShadowsCube;
-
+        int maxBlendMapColors;
 
         std::string regexReplace(std::string_view haystack, const std::regex& rx, std::function<std::string(const std::cmatch&)> f);
         std::string replaceAll(std::string source, const std::string from, const std::string to);
@@ -152,8 +155,9 @@ namespace Supernova {
         int getMaxLights();
         int getMaxShadows2D();
         int getMaxShadowsCube();
+        int getMaxBlendMapColors();
 
-        virtual void createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube);
+        virtual void createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube, int numBlendMapColors);
         virtual void deleteProgram();
         
     };

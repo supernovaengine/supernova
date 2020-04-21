@@ -82,4 +82,25 @@ std::string terrainVertexImp =
         "      terrainTextureCoords = (localPos.xz + (u_terrainSize/2.0)) / u_terrainSize;\n"
         "    #endif\n";
 
+
+std::string terrainFragmentDec =
+        "#ifdef IS_TERRAIN\n"
+        "  uniform sampler2D u_blendMap;\n"
+        "  uniform sampler2D u_terrainDetail[3];\n"
+        "  uniform int u_blendMapColorIdx[3];\n"
+        "#endif\n";
+
+std::string terrainFragmentImp =
+        "    #ifdef IS_TERRAIN\n"
+        "        vec4 blendMapColor = texture2D(u_blendMap, v_TextureCoordinates.xy);\n"
+        "        float backTextureAmount = 1.0 - (blendMapColor.r + blendMapColor.g + blendMapColor.b);\n"
+        "        vec2 tiledCoords = v_TextureCoordinates.xy * 40.0;\n"
+        "        fragColor = fragColor * backTextureAmount;\n"
+
+        "        #pragma unroll_loop\n"
+        "        for(int i = 0; i < MAXBLENDMAPCOLORS; i++){\n"
+        "            fragColor = fragColor + texture2D(u_terrainDetail[i], tiledCoords) * blendMapColor[u_blendMapColorIdx[i]];\n"
+        "        }\n"
+        "    #endif\n";
+
 #endif //GLES2SHADERTERRAIN_H

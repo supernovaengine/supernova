@@ -97,8 +97,8 @@ std::string ProgramRender::unrollLoops(std::string source){
                                        int from = std::stoi(m.str(2));
                                        int to = std::stoi(m.str(4));
 
-                                       std::regex reg1 ("\\[\\s*j\\s*\\]");
-                                       std::regex reg2 ("\\(\\s*j\\s*\\)");
+                                       std::regex reg1 ("\\[\\s*"+m.str(3)+"\\s*\\]");
+                                       std::regex reg2 ("\\(\\s*"+m.str(3)+"\\s*\\)");
                                        std::string result;
 
                                        for (int i = from; i < to; i++){
@@ -124,7 +124,11 @@ int ProgramRender::getMaxShadowsCube(){
     return maxShadowsCube;
 }
 
-void ProgramRender::createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube){
+int ProgramRender::getMaxBlendMapColors(){
+    return maxBlendMapColors;
+}
+
+void ProgramRender::createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube, int numBlendMapColors){
     loaded = true;
 }
 

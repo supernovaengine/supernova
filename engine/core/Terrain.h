@@ -20,6 +20,10 @@ namespace Supernova{
 
         Texture* heightMap;
 
+        Texture* blendMap;
+        std::vector<Texture*> textureDetails;
+        std::vector<int> blendMapColorIndex;
+
         struct NodeIndex{
             unsigned int indexCount;
             unsigned int indexOffset;
@@ -58,8 +62,13 @@ namespace Supernova{
         Terrain(std::string heightMapPath);
         virtual ~Terrain();
 
-        Texture* getHeightmap();
-        void setHeightmap(std::string heightMapPath);
+        Texture* getHeightMap();
+        void setHeightMap(std::string heightMapPath);
+
+        Texture* getBlendMap();
+        void setBlendMap(std::string blendMapPath);
+
+        void setTextureDetail(int index, std::string heightMapPath);
 
         const std::vector<float> &getRanges() const;
         void setRanges(const std::vector<float> &ranges);
