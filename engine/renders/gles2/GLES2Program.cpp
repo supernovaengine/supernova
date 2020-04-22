@@ -62,8 +62,8 @@ GLuint GLES2Program::loadShader(GLenum shaderType, const char* pSource) {
     return shader;
 }
 
-void GLES2Program::createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube, int numBlendMapColors){
-    ProgramRender::createProgram(shaderType, programDefs, numLights, numShadows2D, numShadowsCube, numBlendMapColors);
+void GLES2Program::createProgram(int shaderType, int programDefs, int numPointLights, int numSpotLights, int numDirLights, int numShadows2D, int numShadowsCube, int numBlendMapColors){
+    ProgramRender::createProgram(shaderType, programDefs, numPointLights, numSpotLights, numDirLights, numShadows2D, numShadowsCube, numBlendMapColors);
     
     std::string shaderName = "";
     if (shaderType == S_SHADER_MESH){
@@ -74,10 +74,12 @@ void GLES2Program::createProgram(int shaderType, int programDefs, int numLights,
 
     std::string definitions = "";
 
-    maxLights = std::min(MAXLIGHTS_GLES2, numLights);
-    maxShadows2D = std::min(MAXSHADOWS_GLES2, numShadows2D);
-    maxShadowsCube = std::min(MAXSHADOWS_GLES2 - numShadows2D, numShadowsCube);
-    maxBlendMapColors = numBlendMapColors;
+    this->numPointLights = std::min(MAXLIGHTS_GLES2, numPointLights);
+    this->numSpotLights = std::min(MAXLIGHTS_GLES2 - numPointLights, numSpotLights);
+    this->numDirLights = std::min(MAXLIGHTS_GLES2 - numPointLights - numSpotLights, numDirLights);
+    this->numShadows2D = std::min(MAXSHADOWS_GLES2, numShadows2D);
+    this->numShadowsCube = std::min(MAXSHADOWS_GLES2 - numShadows2D, numShadowsCube);
+    this->numBlendMapColors = numBlendMapColors;
 
     if (programDefs & S_PROGRAM_USE_FOG){
         definitions += "#define HAS_FOG\n";
@@ -110,36 +112,39 @@ void GLES2Program::createProgram(int shaderType, int programDefs, int numLights,
     if (programDefs & S_PROGRAM_IS_TERRAIN){
         definitions += "#define IS_TERRAIN\n";
     }
-    if (numLights > 0){
+    if (this->numPointLights > 0 || this->numSpotLights > 0 || this->numDirLights > 0){
         definitions += "#define USE_NORMAL\n";
         definitions += "#define USE_LIGHTING\n";
     }
-    if (maxShadows2D > 0){
+    if (this->numShadows2D > 0){
         definitions += "#define HAS_SHADOWS2D\n";
     }
-    if (maxShadowsCube > 0){
+    if (this->numShadowsCube > 0){
         definitions += "#define HAS_SHADOWSCUBE\n";
     }
     
     std::string pVertexSource = definitions + getVertexShader(shaderType);
     std::string pFragmentSource = definitions + getFragmentShader(shaderType);
 
-    if (numLights > 0){
-        pVertexSource = replaceAll(pVertexSource, "MAXLIGHTS", std::to_string(maxLights));
-        pFragmentSource = replaceAll(pFragmentSource, "MAXLIGHTS", std::to_string(maxLights));
+    if (this->numPointLights > 0 || this->numSpotLights > 0 || this->numDirLights > 0){
+        pVertexSource = replaceAll(pVertexSource, "NUMPOINTLIGHTS", std::to_string(this->numPointLights));
+        pFragmentSource = replaceAll(pFragmentSource, "NUMPOINTLIGHTS", std::to_string(this->numPointLights));
 
-        pVertexSource = replaceAll(pVertexSource, "MAXSHADOWS2D", std::to_string(maxShadows2D));
-        pFragmentSource = replaceAll(pFragmentSource, "MAXSHADOWS2D", std::to_string(maxShadows2D));
+        pVertexSource = replaceAll(pVertexSource, "NUMSPOTLIGHTS", std::to_string(this->numSpotLights));
+        pFragmentSource = replaceAll(pFragmentSource, "NUMSPOTLIGHTS", std::to_string(this->numSpotLights));
 
-        pVertexSource = replaceAll(pVertexSource, "MAXSHADOWSCUBE", std::to_string(maxShadowsCube));
-        pFragmentSource = replaceAll(pFragmentSource, "MAXSHADOWSCUBE", std::to_string(maxShadowsCube));
+        pVertexSource = replaceAll(pVertexSource, "NUMDIRLIGHTS", std::to_string(this->numDirLights));
+        pFragmentSource = replaceAll(pFragmentSource, "NUMDIRLIGHTS", std::to_string(this->numDirLights));
 
-        pVertexSource = replaceAll(pVertexSource, "MAXCASCADES", std::to_string(MAXCASCADES_GLES2));
-        pFragmentSource = replaceAll(pFragmentSource, "MAXCASCADES", std::to_string(MAXCASCADES_GLES2));
+        pVertexSource = replaceAll(pVertexSource, "NUMSHADOWS2D", std::to_string(this->numShadows2D));
+        pFragmentSource = replaceAll(pFragmentSource, "NUMSHADOWS2D", std::to_string(this->numShadows2D));
+
+        pVertexSource = replaceAll(pVertexSource, "NUMSHADOWSCUBE", std::to_string(this->numShadowsCube));
+        pFragmentSource = replaceAll(pFragmentSource, "NUMSHADOWSCUBE", std::to_string(this->numShadowsCube));
     }
     if (programDefs & S_PROGRAM_IS_TERRAIN){
-        pVertexSource = replaceAll(pVertexSource, "MAXBLENDMAPCOLORS", std::to_string(maxBlendMapColors));
-        pFragmentSource = replaceAll(pFragmentSource, "MAXBLENDMAPCOLORS", std::to_string(maxBlendMapColors));
+        pVertexSource = replaceAll(pVertexSource, "NUMBLENDMAPCOLORS", std::to_string(this->numBlendMapColors));
+        pFragmentSource = replaceAll(pFragmentSource, "NUMBLENDMAPCOLORS", std::to_string(this->numBlendMapColors));
     }
     if (programDefs & S_PROGRAM_USE_SKINNING){
         pVertexSource = replaceAll(pVertexSource, "MAXBONES", "70");

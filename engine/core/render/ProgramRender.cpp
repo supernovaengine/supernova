@@ -11,6 +11,13 @@ std::unordered_map< std::string, std::shared_ptr<ProgramRender> > ProgramRender:
 
 ProgramRender::ProgramRender(){
     this->loaded = false;
+
+    this->numPointLights = 0;
+    this->numSpotLights = 0;
+    this->numDirLights = 0;
+    this->numShadows2D = 0;
+    this->numShadowsCube = 0;
+    this->numBlendMapColors = 0;
 }
 
 ProgramRender::~ProgramRender(){
@@ -112,23 +119,31 @@ std::string ProgramRender::unrollLoops(std::string source){
                                    });
 }
 
-int ProgramRender::getMaxLights(){
-    return maxLights;
+int ProgramRender::getNumPointLights(){
+    return numPointLights;
 }
 
-int ProgramRender::getMaxShadows2D(){
-    return maxShadows2D;
+int ProgramRender::getNumSpotLights(){
+    return numSpotLights;
 }
 
-int ProgramRender::getMaxShadowsCube(){
-    return maxShadowsCube;
+int ProgramRender::getNumDirLights(){
+    return numDirLights;
 }
 
-int ProgramRender::getMaxBlendMapColors(){
-    return maxBlendMapColors;
+int ProgramRender::getNumShadows2D(){
+    return numShadows2D;
 }
 
-void ProgramRender::createProgram(int shaderType, int programDefs, int numLights, int numShadows2D, int numShadowsCube, int numBlendMapColors){
+int ProgramRender::getNumShadowsCube(){
+    return numShadowsCube;
+}
+
+int ProgramRender::getNumBlendMapColors(){
+    return numBlendMapColors;
+}
+
+void ProgramRender::createProgram(int shaderType, int programDefs, int numPointLights, int numSpotLights, int numDirLights, int numShadows2D, int numShadowsCube, int numBlendMapColors){
     loaded = true;
 }
 

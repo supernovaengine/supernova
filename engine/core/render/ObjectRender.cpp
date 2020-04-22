@@ -19,9 +19,6 @@ ObjectRender::ObjectRender(){
     lineWidth = 1.0;
 
     vertexSize = 0;
-    numLights = 0;
-    numShadows2D = 0;
-    numShadowsCube = 0;
     
     sceneRender = NULL;
 
@@ -119,29 +116,11 @@ void ObjectRender::updateBuffer(std::string name, unsigned int size, void* data)
     }
 }
 
-void ObjectRender::setNumLights(int numLights){
-    this->numLights = numLights;
-}
-
-void ObjectRender::setNumShadows2D(int numShadows2D){
-    this->numShadows2D = numShadows2D;
-}
-
-void ObjectRender::setNumShadowsCube(int numShadowsCube){
-    this->numShadowsCube = numShadowsCube;
-}
-
 std::shared_ptr<ProgramRender> ObjectRender::getProgram(){
     
     loadProgram();
     
     return program;
-}
-
-void ObjectRender::checkLighting(){
-    if (properties.count(S_PROPERTY_AMBIENTLIGHT)==0 || (programDefs & S_PROGRAM_IS_SKY)){
-        numLights = 0;
-    }
 }
 
 void ObjectRender::checkFog(){
@@ -192,9 +171,9 @@ void ObjectRender::checkMorphNormal(){
     }
 }
 
-int ObjectRender::getNumBlendMapColors(){
-    if (properties.count(S_PROPERTY_BLENDMAPCOLORINDEX)) {
-        return properties[S_PROPERTY_BLENDMAPCOLORINDEX].size;
+int ObjectRender::getSizeProperty(int property){
+    if (properties.count(property)) {
+        return properties[property].size;
     }
 
     return 0;
@@ -202,7 +181,6 @@ int ObjectRender::getNumBlendMapColors(){
 
 void ObjectRender::loadProgram(){
     if (!parent) {
-        checkLighting();
         checkFog();
         checkSkinning();
         checkMorphTarget();
@@ -211,18 +189,32 @@ void ObjectRender::loadProgram(){
         checkTextureRect();
         checkTextureCube();
 
-        int numBlendMapColors = getNumBlendMapColors();
+        int numPointLights = 0;
+        int numSpotLights = 0;
+        int numDirLights = 0;
+        int numShadows2D = 0;
+        int numShadowsCube = 0;
+        if (properties.count(S_PROPERTY_AMBIENTLIGHT) && !(programDefs & S_PROGRAM_IS_SKY)) {
+            numPointLights = getSizeProperty(S_PROPERTY_POINTLIGHT_POWER);
+            numSpotLights = getSizeProperty(S_PROPERTY_SPOTLIGHT_POWER);
+            numDirLights = getSizeProperty(S_PROPERTY_DIRLIGHT_POWER);
+            numShadows2D = getSizeProperty(S_PROPERTY_SHADOWBIAS2D);
+            numShadowsCube = getSizeProperty(S_PROPERTY_SHADOWBIASCUBE);
+        }
+        int numBlendMapColors = getSizeProperty(S_PROPERTY_BLENDMAPCOLORINDEX);
 
         std::string shaderStr = std::to_string(programShader);
         shaderStr += "|" + std::to_string(programDefs);
-        shaderStr += "|" + std::to_string(numLights);
+        shaderStr += "|" + std::to_string(numPointLights);
+        shaderStr += "|" + std::to_string(numSpotLights);
+        shaderStr += "|" + std::to_string(numDirLights);
         shaderStr += "|" + std::to_string(numShadows2D);
         shaderStr += "|" + std::to_string(numShadowsCube);
         shaderStr += "|" + std::to_string(numBlendMapColors);
 
         program = ProgramRender::sharedInstance(shaderStr);
         if (program && !program.get()->isLoaded()) {
-            program.get()->createProgram(programShader, programDefs, numLights, numShadows2D, numShadowsCube, numBlendMapColors);
+            program.get()->createProgram(programShader, programDefs, numPointLights, numSpotLights, numDirLights, numShadows2D, numShadowsCube, numBlendMapColors);
         }
     }else{
         program = parent->program;

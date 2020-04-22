@@ -151,17 +151,17 @@ bool GLES2Object::load(){
             samplerName = "u_TextureUnit";
         }else if (type == S_TEXTURESAMPLER_SHADOWMAP2D){
             samplerName = "u_shadowsMap2D";
-            arraySize = programRender->getMaxShadows2D();
+            arraySize = programRender->getNumShadows2D();
         }else if (type == S_TEXTURESAMPLER_SHADOWMAPCUBE){
             samplerName = "u_shadowsMapCube";
-            arraySize = programRender->getMaxShadowsCube();
+            arraySize = programRender->getNumShadowsCube();
         }else if (type == S_TEXTURESAMPLER_HEIGHTDATA){
             samplerName = "u_heightData";
         }else if (type == S_TEXTURESAMPLER_BLENDMAP){
             samplerName = "u_blendMap";
         }else if (type == S_TEXTURESAMPLER_TERRAINDETAIL){
             samplerName = "u_terrainDetail";
-            arraySize = programRender->getMaxBlendMapColors();
+            arraySize = programRender->getNumBlendMapColors();
         }
 
         texturesGL[type].location = glGetUniformLocation(glesProgram, samplerName.c_str());
@@ -188,12 +188,8 @@ bool GLES2Object::load(){
             propertyName = "u_textureRect";
         }else if (type == S_PROPERTY_COLOR){
             propertyName = "u_Color";
-        }else if (type == S_PROPERTY_NUMSHADOWS2D){
-            propertyName = "u_NumShadows2D";
         }else if (type == S_PROPERTY_AMBIENTLIGHT){
             propertyName = "u_AmbientLight";
-        }else if (type == S_PROPERTY_NUMPOINTLIGHT){
-            propertyName = "u_NumPointLight";
         }else if (type == S_PROPERTY_POINTLIGHT_POS){
             propertyName = "u_PointLightPos";
         }else if (type == S_PROPERTY_POINTLIGHT_POWER){
@@ -202,8 +198,6 @@ bool GLES2Object::load(){
             propertyName = "u_PointLightColor";
         }else if (type == S_PROPERTY_POINTLIGHT_SHADOWIDX){
             propertyName = "u_PointLightShadowIdx";
-        }else if (type == S_PROPERTY_NUMSPOTLIGHT){
-            propertyName = "u_NumSpotLight";
         }else if (type == S_PROPERTY_SPOTLIGHT_POS){
             propertyName = "u_SpotLightPos";
         }else if (type == S_PROPERTY_SPOTLIGHT_POWER){
@@ -218,8 +212,6 @@ bool GLES2Object::load(){
             propertyName = "u_SpotLightOuterCutOff";
         }else if (type == S_PROPERTY_SPOTLIGHT_SHADOWIDX){
             propertyName = "u_SpotLightShadowIdx";
-        }else if (type == S_PROPERTY_NUMDIRLIGHT){
-            propertyName = "u_NumDirectionalLight";
         }else if (type == S_PROPERTY_DIRLIGHT_DIR){
             propertyName = "u_DirectionalLightDir";
         }else if (type == S_PROPERTY_DIRLIGHT_POWER){

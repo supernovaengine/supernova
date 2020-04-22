@@ -98,7 +98,7 @@ std::string terrainFragmentImp =
         "        fragColor = fragColor * backTextureAmount;\n"
 
         "        #pragma unroll_loop\n"
-        "        for(int i = 0; i < MAXBLENDMAPCOLORS; i++){\n"
+        "        for(int i = 0; i < NUMBLENDMAPCOLORS; i++){\n"
         "            fragColor = fragColor + texture2D(u_terrainDetail[i], tiledCoords) * blendMapColor[u_blendMapColorIdx[i]];\n"
         "        }\n"
         "    #endif\n";

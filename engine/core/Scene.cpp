@@ -484,15 +484,14 @@ void Scene::update(){
 bool Scene::addLightProperties(ObjectRender* render){
     if (useLight){
 
+        //Lights
         render->addProperty(S_PROPERTY_AMBIENTLIGHT, S_PROPERTYDATA_FLOAT3, 1, &ambientLight);
 
-        render->addProperty(S_PROPERTY_NUMPOINTLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numPointLight);
         render->addProperty(S_PROPERTY_POINTLIGHT_POS, S_PROPERTYDATA_FLOAT3, lightData.numPointLight, &lightData.pointLightPos.front());
         render->addProperty(S_PROPERTY_POINTLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numPointLight, &lightData.pointLightPower.front());
         render->addProperty(S_PROPERTY_POINTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numPointLight, &lightData.pointLightColor.front());
         render->addProperty(S_PROPERTY_POINTLIGHT_SHADOWIDX, S_PROPERTYDATA_INT1, lightData.numPointLight, &lightData.pointLightShadowIdx.front());
 
-        render->addProperty(S_PROPERTY_NUMSPOTLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numSpotLight);
         render->addProperty(S_PROPERTY_SPOTLIGHT_POS, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightPos.front());
         render->addProperty(S_PROPERTY_SPOTLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightPower.front());
         render->addProperty(S_PROPERTY_SPOTLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numSpotLight, &lightData.spotLightColor.front());
@@ -501,11 +500,21 @@ bool Scene::addLightProperties(ObjectRender* render){
         render->addProperty(S_PROPERTY_SPOTLIGHT_OUTERCUTOFF, S_PROPERTYDATA_FLOAT1, lightData.numSpotLight, &lightData.spotLightOuterCutOff.front());
         render->addProperty(S_PROPERTY_SPOTLIGHT_SHADOWIDX, S_PROPERTYDATA_INT1, lightData.numSpotLight, &lightData.spotLightShadowIdx.front());
 
-        render->addProperty(S_PROPERTY_NUMDIRLIGHT, S_PROPERTYDATA_INT1, 1, &lightData.numDirectionalLight);
         render->addProperty(S_PROPERTY_DIRLIGHT_DIR, S_PROPERTYDATA_FLOAT3, lightData.numDirectionalLight, &lightData.directionalLightDir.front());
         render->addProperty(S_PROPERTY_DIRLIGHT_POWER, S_PROPERTYDATA_FLOAT1, lightData.numDirectionalLight, &lightData.directionalLightPower.front());
         render->addProperty(S_PROPERTY_DIRLIGHT_COLOR, S_PROPERTYDATA_FLOAT3, lightData.numDirectionalLight, &lightData.directionalLightColor.front());
         render->addProperty(S_PROPERTY_DIRLIGHT_SHADOWIDX, S_PROPERTYDATA_INT1, lightData.numDirectionalLight, &lightData.directionalLightShadowIdx.front());
+
+        //Shadows
+        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAP2D, lightData.shadowsMap2D);
+        render->addProperty(S_PROPERTY_DEPTHVPMATRIX, S_PROPERTYDATA_MATRIX4, lightData.numShadows2D, &lightData.shadowsVPMatrix.front());
+        render->addProperty(S_PROPERTY_SHADOWBIAS2D, S_PROPERTYDATA_FLOAT1, lightData.numShadows2D, &lightData.shadowsBias2D.front());
+        render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFAR2D, S_PROPERTYDATA_FLOAT2, lightData.numShadows2D, &lightData.shadowsCameraNearFar2D.front());
+        render->addProperty(S_PROPERTY_NUMCASCADES2D, S_PROPERTYDATA_INT1, lightData.numShadows2D, &lightData.shadowNumCascades2D.front());
+
+        render->addTextureVector(S_TEXTURESAMPLER_SHADOWMAPCUBE, lightData.shadowsMapCube);
+        render->addProperty(S_PROPERTY_SHADOWBIASCUBE, S_PROPERTYDATA_FLOAT1, lightData.numShadowsCube, &lightData.shadowsBiasCube.front());
+        render->addProperty(S_PROPERTY_SHADOWCAMERA_NEARFARCUBE, S_PROPERTYDATA_FLOAT2, lightData.numShadowsCube, &lightData.shadowsCameraNearFarCube.front());
 
         return true;
     }

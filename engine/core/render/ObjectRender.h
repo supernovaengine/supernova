@@ -37,8 +37,7 @@ namespace Supernova {
     class ObjectRender {
         
     private:
-        
-        void checkLighting();
+
         void checkFog();
         void checkTextureCoords();
         void checkTextureRect();
@@ -46,7 +45,9 @@ namespace Supernova {
         void checkSkinning();
         void checkMorphTarget();
         void checkMorphNormal();
-        int getNumBlendMapColors();
+
+        int getSizeProperty(int property);
+
         void loadProgram();
     
     protected:
@@ -82,9 +83,6 @@ namespace Supernova {
     protected:
 
         unsigned int vertexSize;
-        int numLights;
-        int numShadows2D;
-        int numShadowsCube;
         
         SceneRender* sceneRender;
 
@@ -117,9 +115,6 @@ namespace Supernova {
         void setPrimitiveType(int primitiveType);
         void setProgramShader(int programShader);
         void setDynamicBuffer(bool dynamicBuffer);
-        void setNumLights(int numLights);
-        void setNumShadows2D(int numShadows2D);
-        void setNumShadowsCube(int numShadowsCube);
         void setLineWidth(float lineWidth);
 
         void addProgramDef(int programDef);
