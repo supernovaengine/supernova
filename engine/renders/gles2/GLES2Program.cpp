@@ -116,11 +116,20 @@ void GLES2Program::createProgram(int shaderType, int programDefs, int numPointLi
         definitions += "#define USE_NORMAL\n";
         definitions += "#define USE_LIGHTING\n";
     }
+    if (this->numPointLights > 0){
+        definitions += "#define USE_POINTLIGHT\n";
+    }
+    if (this->numSpotLights > 0){
+        definitions += "#define USE_SPOTLIGHT\n";
+    }
+    if (this->numDirLights > 0){
+        definitions += "#define USE_DIRLIGHT\n";
+    }
     if (this->numShadows2D > 0){
-        definitions += "#define HAS_SHADOWS2D\n";
+        definitions += "#define USE_SHADOWS2D\n";
     }
     if (this->numShadowsCube > 0){
-        definitions += "#define HAS_SHADOWSCUBE\n";
+        definitions += "#define USE_SHADOWSCUBE\n";
     }
     
     std::string pVertexSource = definitions + getVertexShader(shaderType);
