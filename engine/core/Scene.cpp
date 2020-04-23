@@ -448,7 +448,7 @@ bool Scene::draw() {
 
                 this->drawIsPointShadow = false;
 
-                for (int ca = 0; ca < ((DirectionalLight*)lights[i])->getNumShadowCasdades(); ca++) {
+                for (int ca = 0; ca < ((DirectionalLight*)lights[i])->getNumShadowCascades(); ca++) {
                     this->setTextureFrame(lights[i]->getShadowMap(ca));
                     this->setCamera(lights[i]->getLightCamera(ca));
                     this->drawShadowCameraNearFar = lights[i]->getLightCamera(ca)->getNearFarPlane();

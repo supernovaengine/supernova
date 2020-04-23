@@ -126,13 +126,13 @@ bool LightData::updateLights(std::vector<Light*>* lights, Vector3* ambientLight)
                 this->shadowNumCascades2D.push_back(0);
 
             }else if (lights->at(i)->getType() == S_DIRECTIONAL_LIGHT) {
-                for (int ca = 0; ca < ((DirectionalLight*)lights->at(i))->getNumShadowCasdades(); ca++) {
+                for (int ca = 0; ca < ((DirectionalLight*)lights->at(i))->getNumShadowCascades(); ca++) {
                     this->numShadows2D++;
                     this->shadowsMap2D.push_back(lights->at(i)->getShadowMap(ca));
                     this->shadowsVPMatrix.push_back(lights->at(i)->getDepthVPMatrix(ca));
                     this->shadowsBias2D.push_back(lights->at(i)->getShadowBias());
                     this->shadowsCameraNearFar2D.push_back(((DirectionalLight *) lights->at(i))->getCascadeCameraNearFar(ca));
-                    this->shadowNumCascades2D.push_back(((DirectionalLight *) lights->at(i))->getNumShadowCasdades());
+                    this->shadowNumCascades2D.push_back(((DirectionalLight *) lights->at(i))->getNumShadowCascades());
                 }
             }else if (lights->at(i)->getType() == S_POINT_LIGHT) {
                 this->numShadowsCube++;
