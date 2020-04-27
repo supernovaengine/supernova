@@ -1,5 +1,5 @@
-#ifndef JNI_SUPERNOVA_ANDROID_JNI_H_
-#define JNI_SUPERNOVA_ANDROID_JNI_H_
+#ifndef ANDROID_JNI_H_
+#define ANDROID_JNI_H_
 
 #include <jni.h>
 
@@ -23,4 +23,4 @@ extern "C" {
 //void showSoftKeyboard();
 
 
-#endif /* JNI_SUPERNOVA_ANDROID_JNI_H_ */
+#endif /* ANDROID_JNI_H_ */

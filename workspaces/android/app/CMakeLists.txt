@@ -5,8 +5,10 @@
  add_definitions("-DLUA_USE_C89")
  add_definitions("-DWITH_OPENSLES") # For SoLoud
 
+ set(PLATFORM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/platform/android")
+
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
- set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PROJECT_SOURCE_DIR}/src/main/cpp/android_macros.h")
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PLATFORM_DIR}/AndroidMacros.h")
  set(COMPILE_ZLIB OFF)
  set(IS_ARM OFF)
  set(SUPERNOVA_GLES2 ON)
@@ -17,7 +19,7 @@
  endif()
 
  include_directories ("${ANDROID_NDK}/sources/android/cpufeatures")
- include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp")
+ include_directories ("${PLATFORM_DIR}")
  include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core")
 
  add_subdirectory (../../../engine ${PROJECT_BINARY_DIR}/engine)
@@ -28,8 +30,8 @@
 
      SHARED
 
-     src/main/cpp/supernova_android_jni.cpp
-     src/main/cpp/SupernovaAndroid.cpp
+     ${PLATFORM_DIR}/AndroidJNI.cpp
+     ${PLATFORM_DIR}/SupernovaAndroid.cpp
  )
 
   target_link_libraries(

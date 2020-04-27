@@ -1,4 +1,4 @@
-#include "supernova_android_jni.h"
+#include "AndroidJNI.h"
 
 #include <android/asset_manager_jni.h>
 
