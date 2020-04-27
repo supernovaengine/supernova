@@ -13,6 +13,7 @@ DirectionalLight::DirectionalLight(): Light(){
 
     this->numShadowCascades = 3;
     this->shadowSplitLogFactor = .7f;
+    this->shadowNearPlaneOffset = 10;
     this->cascadeCameraNearFar.clear();
 
 }
@@ -55,7 +56,7 @@ void DirectionalLight::configLightOrthoCamera(Camera* lightCamera, Matrix4 scene
         if (p.z > maxZ) maxZ = p.z;
     }
 
-    lightCamera->setOrtho(minX, maxX, minY, maxY, -maxZ, -minZ);
+    lightCamera->setOrtho(minX, maxX, minY, maxY, -maxZ-shadowNearPlaneOffset, -minZ);
 
 }
 
@@ -174,12 +175,20 @@ Vector2 DirectionalLight::getCascadeCameraNearFar(int index){
     return cascadeCameraNearFar[index];
 }
 
-int DirectionalLight::getNumShadowCasdades(){
+int DirectionalLight::getNumShadowCascades(){
     return numShadowCascades;
 }
 
 float DirectionalLight::getShadowSplitLogFactor(){
     return shadowSplitLogFactor;
+}
+
+float DirectionalLight::getShadowNearPlaneOffset() const {
+    return shadowNearPlaneOffset;
+}
+
+void DirectionalLight::setShadowNearPlaneOffset(float shadowNearPlaneOffset) {
+    DirectionalLight::shadowNearPlaneOffset = shadowNearPlaneOffset;
 }
 
 void DirectionalLight::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition){

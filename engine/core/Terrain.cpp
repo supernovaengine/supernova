@@ -17,15 +17,23 @@ Terrain::Terrain(): Mesh(){
     buffers["vertices"] = &buffer;
     buffers["indices"] = &indices;
 
-    heightData = NULL;
+    heightMap = NULL;
+    blendMap = NULL;
 
     fullResNode = {0,0};
     halfResNode = {0,0};
 
+    autoSetRanges = true;
+    heightMapLoaded = false;
+
     terrainSize = 2000;
+    maxHeight = 100;
+    rootGridSize = 2;
     levels = 6;
     resolution = 32;
-    rootNodeSize = 1000;
+
+    textureBaseTiles = 1;
+    textureDetailTiles = 20;
 
     buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
@@ -34,20 +42,66 @@ Terrain::Terrain(): Mesh(){
 }
 
 Terrain::Terrain(std::string heightMapPath): Terrain(){
-    setHeightmap(heightMapPath);
+    setHeightMap(heightMapPath);
 }
 
 Terrain::~Terrain(){
-    if (heightData)
-        delete heightData;
+    if (heightMap)
+        delete heightMap;
 }
 
-Texture* Terrain::getHeightmap(){
-    return heightData;
+Texture* Terrain::getHeightMap(){
+    return heightMap;
 }
 
-void Terrain::setHeightmap(std::string heightMapPath){
-    heightData = new Texture(heightMapPath);
+void Terrain::setHeightMap(std::string heightMapPath){
+    if (heightMap)
+        delete heightMap;
+
+    heightMap = new Texture(heightMapPath);
+    heightMap->setPreserveData(true);
+    heightMapLoaded = false;
+}
+
+Texture* Terrain::getBlendMap(){
+    return blendMap;
+}
+
+void Terrain::setBlendMap(std::string blendMapPath){
+    if (blendMap)
+        delete blendMap;
+
+    blendMap = new Texture(blendMapPath);
+}
+
+void Terrain::setTextureDetail(int index, std::string heightMapPath){
+    textureDetails.push_back(new Texture(heightMapPath));
+    blendMapColorIndex.push_back(2);
+}
+
+const std::vector<float> &Terrain::getRanges() const {
+    return ranges;
+}
+
+void Terrain::setRanges(const std::vector<float> &ranges) {
+    autoSetRanges = false;
+    Terrain::ranges = ranges;
+}
+
+int Terrain::getTextureBaseTiles() const {
+    return textureBaseTiles;
+}
+
+void Terrain::setTextureBaseTiles(int textureBaseTiles) {
+    Terrain::textureBaseTiles = textureBaseTiles;
+}
+
+int Terrain::getTextureDetailTiles() const {
+    return textureDetailTiles;
+}
+
+void Terrain::setTextureDetailTiles(int textureDetailTiles) {
+    Terrain::textureDetailTiles = textureDetailTiles;
 }
 
 Terrain::NodeIndex Terrain::createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments){
@@ -110,6 +164,25 @@ Terrain::NodeIndex Terrain::createPlaneNodeBuffer(int width, int height, int wid
     return {bufferIndexCount, bufferIndexOffset};
 }
 
+float Terrain::getHeight(float x, float y){
+
+    if (x < 0 || y < 0 || x >= terrainSize || y >= terrainSize)
+        return 0;
+
+    if (!heightMapLoaded) {
+        heightMap->load();
+        heightMapLoaded = true;
+    }
+
+    TextureData* textureData = heightMap->getTextureData();
+
+    int posX = round(textureData->getWidth() * x / terrainSize);
+    int posY = round(textureData->getHeight() * y / terrainSize);
+
+    float val = maxHeight*(textureData->getColorComponent(posX,posY,0)/255.0f);
+    return val;
+}
+
 TerrainNode* Terrain::createNode(float x, float y, float scale, int lodDepth){
     TerrainNode* terrainNode = new TerrainNode(x, y, scale, lodDepth, this);
 
@@ -125,11 +198,18 @@ bool Terrain::renderLoad(bool shadow){
         render->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
         render->addProperty(S_PROPERTY_TERRAINSIZE, S_PROPERTYDATA_FLOAT1, 1, &terrainSize);
+        render->addProperty(S_PROPERTY_TERRAINMAXHEIGHT, S_PROPERTYDATA_FLOAT1, 1, &maxHeight);
         render->addProperty(S_PROPERTY_TERRAINRESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
-        if (heightData){
-            render->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightData);
-        }
+        render->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightMap);
+
+        //BlendMaps
+        render->addTexture(S_TEXTURESAMPLER_BLENDMAP, blendMap);
+        render->addTextureVector(S_TEXTURESAMPLER_TERRAINDETAIL, textureDetails);
+        render->addProperty(S_PROPERTY_BLENDMAPCOLORINDEX, S_PROPERTYDATA_INT1, blendMapColorIndex.size(), &blendMapColorIndex.front());
+
+        render->addProperty(S_PROPERTY_TERRAINTEXTUREBASETILES, S_PROPERTYDATA_INT1, 1, &textureBaseTiles);
+        render->addProperty(S_PROPERTY_TERRAINTEXTUREDETAILTILES, S_PROPERTYDATA_INT1, 1, &textureDetailTiles);
 
     } else {
 
@@ -138,11 +218,10 @@ bool Terrain::renderLoad(bool shadow){
         shadowRender->addProgramDef(S_PROGRAM_IS_TERRAIN);
 
         shadowRender->addProperty(S_PROPERTY_TERRAINSIZE, S_PROPERTYDATA_FLOAT1, 1, &terrainSize);
+        shadowRender->addProperty(S_PROPERTY_TERRAINMAXHEIGHT, S_PROPERTYDATA_FLOAT1, 1, &maxHeight);
         shadowRender->addProperty(S_PROPERTY_TERRAINRESOLUTION, S_PROPERTYDATA_INT1, 1, &resolution);
 
-        if (heightData){
-            shadowRender->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightData);
-        }
+        shadowRender->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightMap);
     }
 
     return Mesh::renderLoad(shadow);
@@ -177,42 +256,45 @@ bool Terrain::load(){
     fullResNode = createPlaneNodeBuffer(1, 1, resolution, resolution);
     halfResNode = createPlaneNodeBuffer(1, 1, resolution/2, resolution/2);
 
-    float maxDistance = 1000;
-    if (scene && scene->getCamera())
-        maxDistance = scene->getCamera()->getFar();
+    float rootNodeSize = terrainSize / rootGridSize;
 
-    ranges.resize(levels);
-    ranges[levels-1] = maxDistance;
-    for (int i = levels-2; i >=0; i--) {
-        ranges[i] = ranges[i+1] / 2;
+    if (autoSetRanges) {
+        float maxDistance = 1000;
+        if (scene && scene->getCamera())
+            maxDistance = scene->getCamera()->getFar();
+
+        float lastLevel = maxDistance;
+        if (maxDistance < (rootNodeSize * 2)){
+            lastLevel = rootNodeSize * 2;
+            Log::Warn("Terrain quadtree root is not in camera field of view. Increase terrain root grid.");
+        }
+
+        ranges.clear();
+        ranges.resize(levels);
+        ranges[levels - 1] = lastLevel;
+        for (int i = levels - 2; i >= 0; i--) {
+            ranges[i] = ranges[i + 1] / 2;
+        }
     }
-
-    rootNodeSize = maxDistance / 2;
-
-    if (rootNodeSize > terrainSize)
-        rootNodeSize = terrainSize;
-    if (rootNodeSize < terrainSize)
-        rootNodeSize = terrainSize / floor(terrainSize/rootNodeSize);
 
     for (int i = 0; i < grid.size(); i++) {
         delete grid[i];
     }
     grid.clear();
 
-    int gridWidth = floor(terrainSize/rootNodeSize);
-    int gridHeight = floor(terrainSize/rootNodeSize);
-
     //To center terrain
     float offset = (terrainSize / 2) - (rootNodeSize / 2);
 
-    for (int i = 0; i < gridWidth; i++) {
-        for (int j = 0; j < gridHeight; j++) {
+    for (int i = 0; i < rootGridSize; i++) {
+        for (int j = 0; j < rootGridSize; j++) {
             float xPos = i*rootNodeSize;
             float zPos = j*rootNodeSize;
             grid.push_back(createNode(xPos-offset, zPos-offset, rootNodeSize, levels));
         }
     }
 
+    if (heightMap)
+        heightMapLoaded = true;
 
     return Mesh::load();
 }

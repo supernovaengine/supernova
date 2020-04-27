@@ -18,7 +18,11 @@ namespace Supernova{
         InterleavedBuffer buffer;
         IndexBuffer indices;
 
-        Texture* heightData;
+        Texture* heightMap;
+
+        Texture* blendMap;
+        std::vector<Texture*> textureDetails;
+        std::vector<int> blendMapColorIndex;
 
         struct NodeIndex{
             unsigned int indexCount;
@@ -28,14 +32,22 @@ namespace Supernova{
         NodeIndex fullResNode;
         NodeIndex halfResNode;
 
+        bool autoSetRanges;
+        bool heightMapLoaded;
+
         Vector2 offset;
         std::vector<float> ranges;
+
         std::vector<TerrainNode*> grid;
-        float rootNodeSize;
 
         float terrainSize;
+        float maxHeight;
+        int rootGridSize;
         int levels;
         int resolution;
+
+        int textureBaseTiles;
+        int textureDetailTiles;
 
         NodeIndex createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments);
         TerrainNode* createNode(float x, float y, float scale, int lodDepth);
@@ -53,8 +65,24 @@ namespace Supernova{
         Terrain(std::string heightMapPath);
         virtual ~Terrain();
 
-        Texture* getHeightmap();
-        void setHeightmap(std::string heightMapPath);
+        Texture* getHeightMap();
+        void setHeightMap(std::string heightMapPath);
+
+        Texture* getBlendMap();
+        void setBlendMap(std::string blendMapPath);
+
+        void setTextureDetail(int index, std::string heightMapPath);
+
+        const std::vector<float> &getRanges() const;
+        void setRanges(const std::vector<float> &ranges);
+
+        int getTextureBaseTiles() const;
+        void setTextureBaseTiles(int textureBaseTiles);
+
+        int getTextureDetailTiles() const;
+        void setTextureDetailTiles(int textureDetailTiles);
+
+        float getHeight(float x, float y);
 
         virtual bool renderLoad(bool shadow);
         virtual bool load();

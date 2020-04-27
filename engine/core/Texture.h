@@ -32,6 +32,7 @@ namespace Supernova{
         std::vector<TextureData*> texturesData;
         
         bool dataOwned;
+        bool preserveData;
 
         bool resampleToPowerOfTwo;
         bool nearestScale;
@@ -40,6 +41,7 @@ namespace Supernova{
         bool userNearestScale;
 
         void setDefaults();
+        void releaseData();
         
     public:
         Texture();
@@ -61,6 +63,9 @@ namespace Supernova{
         void setResampleToPowerOfTwo(bool resampleToPowerOfTwo);
         void setNearestScale(bool nearestScale);
 
+        void setPreserveData(bool preserveData);
+        bool isPreserveData() const;
+
         std::string getId();
         int getType();
         std::shared_ptr<TextureRender> getTextureRender();
@@ -69,6 +74,7 @@ namespace Supernova{
         int getTextureFrameHeight();
         bool getResampleToPowerOfTwo();
         bool getNearestScale();
+        TextureData* getTextureData(int index = 0);
         
         int getColorFormat();
         bool hasAlphaChannel();

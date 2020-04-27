@@ -17,6 +17,7 @@ Texture::Texture(){
     this->id = "";
     
     this->dataOwned = false;
+    this->preserveData = false;
 
     this->resampleToPowerOfTwo = false;
     this->nearestScale = false;
@@ -44,6 +45,31 @@ Texture::Texture(int textureFrameWidth, int textureFrameHeight, std::string id):
     this->textureFrameWidth = textureFrameWidth;
     this->textureFrameHeight = textureFrameHeight;
     this->id = id;
+}
+
+Texture::Texture(const Texture& t){
+    this->textureRender = t.textureRender;
+    this->texturesData = t.texturesData;
+    this->type = t.type;
+    this->id = t.id;
+    this->dataOwned = t.dataOwned;
+}
+
+Texture& Texture::operator = (const Texture& t){
+    this->textureRender = t.textureRender;
+    this->texturesData = t.texturesData;
+    this->type = t.type;
+    this->id = t.id;
+    this->dataOwned = t.dataOwned;
+
+    return *this;
+}
+
+Texture::~Texture(){
+    textureRender.reset();
+    if (dataOwned){
+        releaseData();
+    }
 }
 
 void Texture::setId(std::string id){
@@ -150,12 +176,8 @@ bool Texture::load(){
             return false;
         }
         
-        if (dataOwned){
-            for (int i = 0; i < texturesData.size(); i++){
-                delete texturesData[i];
-            }
-            this->texturesData.clear();
-            this->texturesData.push_back(NULL);
+        if (dataOwned && !preserveData){
+            releaseData();
         }
         
         return true;
@@ -166,26 +188,12 @@ bool Texture::load(){
 
 }
 
-Texture::~Texture(){
-    textureRender.reset();
-}
-
-Texture::Texture(const Texture& t){
-    this->textureRender = t.textureRender;
-    this->texturesData = t.texturesData;
-    this->type = t.type;
-    this->id = t.id;
-    this->dataOwned = t.dataOwned;
-}
-
-Texture& Texture::operator = (const Texture& t){
-    this->textureRender = t.textureRender;
-    this->texturesData = t.texturesData;
-    this->type = t.type;
-    this->id = t.id;
-    this->dataOwned = t.dataOwned;
-
-    return *this;
+void Texture::releaseData(){
+    for (int i = 0; i < texturesData.size(); i++){
+        delete texturesData[i];
+    }
+    this->texturesData.clear();
+    this->texturesData.push_back(NULL);
 }
 
 std::string Texture::getId(){
@@ -214,6 +222,18 @@ bool Texture::getResampleToPowerOfTwo(){
 
 bool Texture::getNearestScale(){
     return this->nearestScale;
+}
+
+TextureData* Texture::getTextureData(int index){
+    return texturesData[index];
+}
+
+bool Texture::isPreserveData() const {
+    return preserveData;
+}
+
+void Texture::setPreserveData(bool preserveData) {
+    Texture::preserveData = preserveData;
 }
 
 std::shared_ptr<TextureRender> Texture::getTextureRender(){

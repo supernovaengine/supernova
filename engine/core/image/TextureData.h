@@ -10,7 +10,7 @@ namespace Supernova {
         int height;
         unsigned int size; //in bytes
         int color_format;
-        int bitsPerPixel;
+        int channels;
         void* data;
         
         int getNearestPowerOfTwo(int size);
@@ -18,7 +18,7 @@ namespace Supernova {
     public:
 
         TextureData();
-        TextureData(int width, int height, unsigned int size, int color_format, int bitsPerPixel, void* data);
+        TextureData(int width, int height, unsigned int size, int color_format, int channels, void* data);
         TextureData(const TextureData& v);
         TextureData& operator = ( const TextureData& v );
         virtual ~TextureData();
@@ -33,11 +33,13 @@ namespace Supernova {
         void fitSize(int newWidth, int newHeight);
         void flipVertical();
 
+        unsigned char getColorComponent(int x, int y, int color);
+
         int getWidth();
         int getHeight();
         unsigned int getSize();
         int getColorFormat();
-        int getBitsPerPixel();
+        int getChannels();
         void* getData();
 
     };

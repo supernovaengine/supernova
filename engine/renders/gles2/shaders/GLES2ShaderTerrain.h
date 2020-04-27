@@ -10,6 +10,7 @@ std::string terrainVertexDec =
         "  uniform sampler2D u_heightData;\n"
 
         "  uniform float u_terrainSize;\n"
+        "  uniform float u_terrainMaxHeight;\n"
         "  uniform int u_terrainResolution;\n"
 
         "  uniform vec2 u_terrainNodePos;\n"
@@ -17,8 +18,14 @@ std::string terrainVertexDec =
         "  uniform float u_terrainNodeRange;\n"
         "  uniform int u_terrainNodeResolution;\n"
 
+        "  uniform int u_terrainTextureBaseTiles;\n"
+        "  uniform int u_terrainTextureDetailTiles;\n"
+
+        "  varying vec2 v_TerrainTextureCoords;\n"
+        "  varying vec2 v_TerrainTextureDetailTiled;\n"
+
+        "  vec2 terrainTextureBaseTiled;\n"
         "  vec2 gridDim;\n"
-        "  vec2 terrainTextureCoords;\n"
 
         "  vec2 morphVertex(vec2 gridPos, vec2 worldPos, float morph) {\n"
         "      vec2 fracPart = fract(gridPos * gridDim.xy * 0.5) * 2.0 / gridDim.xy;\n"
@@ -26,7 +33,7 @@ std::string terrainVertexDec =
         "  }\n"
 
         "  float getHeight(vec3 position) {\n"
-        "      return texture2DLod(u_heightData, (position.xz + (u_terrainSize/2.0)) / u_terrainSize, 0.0).r * 100.0;\n"
+        "      return texture2DLod(u_heightData, (position.xz + (u_terrainSize/2.0)) / u_terrainSize, 0.0).r * u_terrainMaxHeight;\n"
         "  }\n"
 
         "  #ifdef USE_NORMAL\n"
@@ -78,7 +85,32 @@ std::string terrainVertexImp =
         "        localNormal = getNormal(vec3(0.0,1.0,0.0), localPos, morph);\n"
         "      #endif\n"
 
-        "      terrainTextureCoords = (localPos.xz + (u_terrainSize/2.0)) / u_terrainSize;\n"
+        "      v_TerrainTextureCoords = (localPos.xz + (u_terrainSize/2.0)) / u_terrainSize;\n"
+        "      v_TerrainTextureDetailTiled = v_TerrainTextureCoords * float(u_terrainTextureDetailTiles);\n"
+        "      terrainTextureBaseTiled = v_TerrainTextureCoords * float(u_terrainTextureBaseTiles);\n"
+        "    #endif\n";
+
+
+std::string terrainFragmentDec =
+        "#ifdef IS_TERRAIN\n"
+        "  uniform sampler2D u_blendMap;\n"
+        "  uniform sampler2D u_terrainDetail[3];\n"
+        "  uniform int u_blendMapColorIdx[3];\n"
+
+        "  varying vec2 v_TerrainTextureCoords;\n"
+        "  varying vec2 v_TerrainTextureDetailTiled;\n"
+        "#endif\n";
+
+std::string terrainFragmentImp =
+        "    #ifdef IS_TERRAIN\n"
+        "        vec4 blendMapColor = texture2D(u_blendMap, v_TerrainTextureCoords);\n"
+        "        float backTextureAmount = 1.0 - (blendMapColor.r + blendMapColor.g + blendMapColor.b);\n"
+        "        fragColor = fragColor * backTextureAmount;\n"
+
+        "        #pragma unroll_loop\n"
+        "        for(int i = 0; i < NUMBLENDMAPCOLORS; i++){\n"
+        "            fragColor = fragColor + texture2D(u_terrainDetail[i], v_TerrainTextureDetailTiled) * blendMapColor[u_blendMapColorIdx[i]];\n"
+        "        }\n"
         "    #endif\n";
 
 #endif //GLES2SHADERTERRAIN_H

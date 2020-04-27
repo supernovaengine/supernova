@@ -273,8 +273,7 @@ bool Model::loadGLTF(const char* filename) {
                     tinygltf::Texture &tex = gltfModel->textures[mats.second.TextureIndex()];
                     tinygltf::Image &image = gltfModel->images[tex.source];
 
-                    unsigned int pixelSize = image.component * 4;
-                    size_t imageSize = pixelSize * image.width * image.height;
+                    size_t imageSize = image.component * image.width * image.height; //in bytes
 
                     int textureType = S_COLOR_RGB_ALPHA;
                     if (image.component == 3){
@@ -285,7 +284,7 @@ bool Model::loadGLTF(const char* filename) {
                         textureType = S_COLOR_GRAY;
                     }
 
-                    TextureData *textureData = new TextureData(image.width, image.height, imageSize, textureType, pixelSize, &image.image.at(0));
+                    TextureData *textureData = new TextureData(image.width, image.height, imageSize, textureType, image.component, &image.image.at(0));
 
                     Texture *texture = new Texture(textureData, std::string(filename) + "|" + image.name);
                     texture->setDataOwned(true);

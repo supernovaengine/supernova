@@ -130,12 +130,14 @@ std::string gFragmentMeshPerPixelLightShader =
 "precision highp float;\n"
 "uniform vec4 u_Color;\n"
 "uniform vec3 u_EyePos;\n"
++ textureMeshFragmentDec
++ terrainFragmentDec
 + lightingFragmentDec
-+ fogFragmentDec
-+ textureMeshFragmentDec +
++ fogFragmentDec +
 "void main(){\n"
 "   vec4 fragColor = u_Color;\n"
 + textureMeshFragmentImp
++ terrainFragmentImp
 + lightingFragmentImp
 + fogFragmentImp +
 "   gl_FragColor = fragColor;\n"
