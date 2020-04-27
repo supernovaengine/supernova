@@ -32,18 +32,23 @@ std::string textureMeshFragmentDec =
 std::string textureMeshVertexImp =
 "    #ifdef USE_TEXTURECOORDS\n"
 "      #ifdef USE_TEXTURECUBE\n"
+
 "        v_TextureCoordinates = a_Position;\n"
+
 "      #else\n"
+
+"        vec2 textureCoordinates = a_TextureCoordinates;\n"
+
 "        #ifdef IS_TERRAIN\n"
-"          v_TextureCoordinates = vec3(terrainTextureCoords, 0.0);\n"
-"        #else\n"
-"          #ifdef HAS_TEXTURERECT\n"
-"            vec2 resultCoords = a_TextureCoordinates * u_textureRect.zw + u_textureRect.xy;\n"
-"          #else\n"
-"            vec2 resultCoords = a_TextureCoordinates;\n"
-"          #endif\n"
-"          v_TextureCoordinates = vec3(resultCoords,0.0);\n"
+"          textureCoordinates = terrainTextureBaseTiled;\n"
 "        #endif\n"
+
+"        #ifdef HAS_TEXTURERECT\n"
+"          textureCoordinates = textureCoordinates * u_textureRect.zw + u_textureRect.xy;\n"
+"        #endif\n"
+
+"        v_TextureCoordinates = vec3(textureCoordinates, 0.0);\n"
+
 "      #endif\n"
 "    #endif\n";
 

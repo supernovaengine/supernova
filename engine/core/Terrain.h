@@ -46,6 +46,9 @@ namespace Supernova{
         int levels;
         int resolution;
 
+        int textureBaseTiles;
+        int textureDetailTiles;
+
         NodeIndex createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments);
         TerrainNode* createNode(float x, float y, float scale, int lodDepth);
 
@@ -72,6 +75,12 @@ namespace Supernova{
 
         const std::vector<float> &getRanges() const;
         void setRanges(const std::vector<float> &ranges);
+
+        int getTextureBaseTiles() const;
+        void setTextureBaseTiles(int textureBaseTiles);
+
+        int getTextureDetailTiles() const;
+        void setTextureDetailTiles(int textureDetailTiles);
 
         float getHeight(float x, float y);
 

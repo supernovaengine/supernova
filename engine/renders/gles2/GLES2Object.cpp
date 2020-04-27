@@ -268,6 +268,10 @@ bool GLES2Object::load(){
             propertyName = "u_terrainNodeResolution";
         }else if (type == S_PROPERTY_BLENDMAPCOLORINDEX){
             propertyName = "u_blendMapColorIdx";
+        }else if (type == S_PROPERTY_TERRAINTEXTUREBASETILES){
+            propertyName = "u_terrainTextureBaseTiles";
+        }else if (type == S_PROPERTY_TERRAINTEXTUREDETAILTILES){
+            propertyName = "u_terrainTextureDetailTiles";
         }
         
         propertyGL[type].handle = glGetUniformLocation(glesProgram, propertyName.c_str());

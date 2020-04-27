@@ -32,6 +32,9 @@ Terrain::Terrain(): Mesh(){
     levels = 6;
     resolution = 32;
 
+    textureBaseTiles = 1;
+    textureDetailTiles = 20;
+
     buffer.clearAll();
     buffer.addAttribute(S_VERTEXATTRIBUTE_VERTICES, 3);
     buffer.addAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS, 2);
@@ -83,6 +86,22 @@ const std::vector<float> &Terrain::getRanges() const {
 void Terrain::setRanges(const std::vector<float> &ranges) {
     autoSetRanges = false;
     Terrain::ranges = ranges;
+}
+
+int Terrain::getTextureBaseTiles() const {
+    return textureBaseTiles;
+}
+
+void Terrain::setTextureBaseTiles(int textureBaseTiles) {
+    Terrain::textureBaseTiles = textureBaseTiles;
+}
+
+int Terrain::getTextureDetailTiles() const {
+    return textureDetailTiles;
+}
+
+void Terrain::setTextureDetailTiles(int textureDetailTiles) {
+    Terrain::textureDetailTiles = textureDetailTiles;
 }
 
 Terrain::NodeIndex Terrain::createPlaneNodeBuffer(int width, int height, int widthSegments, int heightSegments){
@@ -188,6 +207,9 @@ bool Terrain::renderLoad(bool shadow){
         render->addTexture(S_TEXTURESAMPLER_BLENDMAP, blendMap);
         render->addTextureVector(S_TEXTURESAMPLER_TERRAINDETAIL, textureDetails);
         render->addProperty(S_PROPERTY_BLENDMAPCOLORINDEX, S_PROPERTYDATA_INT1, blendMapColorIndex.size(), &blendMapColorIndex.front());
+
+        render->addProperty(S_PROPERTY_TERRAINTEXTUREBASETILES, S_PROPERTYDATA_INT1, 1, &textureBaseTiles);
+        render->addProperty(S_PROPERTY_TERRAINTEXTUREDETAILTILES, S_PROPERTYDATA_INT1, 1, &textureDetailTiles);
 
     } else {
 
