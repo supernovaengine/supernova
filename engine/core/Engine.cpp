@@ -22,6 +22,7 @@
 //#include "Mesh.h"
 
 #include "audio/SoundManager.h"
+#include "system/System.h"
 #include "Input.h"
 
 //
@@ -32,9 +33,6 @@ using namespace Supernova;
 
 //-----Supernova user config-----
 Scene *Engine::mainScene;
-
-int Engine::screenWidth;
-int Engine::screenHeight;
 
 int Engine::canvasWidth;
 int Engine::canvasHeight;
@@ -95,25 +93,6 @@ Scene* Engine::getScene(){
     return mainScene;
 }
 
-int Engine::getScreenWidth(){
-    return Engine::screenWidth;
-}
-
-int Engine::getScreenHeight(){
-    return Engine::screenHeight;
-}
-
-void Engine::setScreenSize(int screenWidth, int screenHeight){
-    
-    Engine::screenWidth = screenWidth;
-    Engine::screenHeight = screenHeight;
-    
-    if ((Engine::preferedCanvasWidth != 0) && (Engine::preferedCanvasHeight != 0)){
-        setCanvasSize(preferedCanvasWidth, preferedCanvasHeight);
-    }
-    
-}
-
 int Engine::getCanvasWidth(){
     return Engine::canvasWidth;
 }
@@ -123,28 +102,28 @@ int Engine::getCanvasHeight(){
 }
 
 void Engine::setCanvasSize(int canvasWidth, int canvasHeight){
-    
-    Engine::canvasWidth = canvasWidth;
-    Engine::canvasHeight = canvasHeight;
-    
-    if ((Engine::screenWidth == 0) || (Engine::screenHeight == 0)){
-        setScreenSize(canvasWidth, canvasHeight);
-    }
-    
+    Engine::preferedCanvasWidth = canvasWidth;
+    Engine::preferedCanvasHeight = canvasHeight;
+
+    calculateCanvas();
+}
+
+void Engine::calculateCanvas(){
+    Engine::canvasWidth = preferedCanvasWidth;
+    Engine::canvasHeight = preferedCanvasHeight;
+
+    int screenWidth = System::instance().getScreenWidth();
+    int screenHeight = System::instance().getScreenHeight();
+
     //When canvas size is changed
     if (scalingMode == Scaling::FITWIDTH){
-        Engine::canvasWidth = canvasWidth;
-        Engine::canvasHeight = screenHeight * canvasWidth / screenWidth;
+        Engine::canvasWidth = preferedCanvasWidth;
+        Engine::canvasHeight = screenHeight * preferedCanvasWidth / screenWidth;
     }
     if (scalingMode == Scaling::FITHEIGHT){
-        Engine::canvasHeight = canvasHeight;
-        Engine::canvasWidth = screenWidth * canvasHeight / screenHeight;
+        Engine::canvasHeight = preferedCanvasHeight;
+        Engine::canvasWidth = screenWidth * preferedCanvasHeight / screenHeight;
     }
-    
-    if ((Engine::preferedCanvasWidth == 0) && (Engine::preferedCanvasHeight == 0)){
-        setPreferedCanvasSize(canvasWidth, canvasHeight);
-    }
-    
 }
 
 int Engine::getPreferedCanvasWidth(){
@@ -153,13 +132,6 @@ int Engine::getPreferedCanvasWidth(){
 
 int Engine::getPreferedCanvasHeight(){
     return Engine::preferedCanvasHeight;
-}
-
-void Engine::setPreferedCanvasSize(int preferedCanvasWidth, int preferedCanvasHeight){
-    if ((Engine::preferedCanvasWidth == 0) && (Engine::preferedCanvasHeight == 0)){
-        Engine::preferedCanvasWidth = preferedCanvasWidth;
-        Engine::preferedCanvasHeight = preferedCanvasHeight;
-    }
 }
 
 Rect* Engine::getViewRect(){
@@ -266,18 +238,11 @@ float Engine::getDeltatime(){
 
 void Engine::systemStart(){
 
-    systemStart(0, 0);
-
-}
-
-void Engine::systemStart(int width, int height){
-
-    Engine::setScreenSize(width, height);
-
+    Engine::setCanvasSize(1000,480);
+    Engine::setScalingMode(Scaling::FITWIDTH);
     Engine::setMouseAsTouch(true);
     Engine::setUseDegrees(true);
     Engine::setRenderAPI(S_GLES2);
-    Engine::setScalingMode(Scaling::FITWIDTH);
     Engine::setDefaultNearestScaleTexture(false);
     Engine::setDefaultResampleToPOTTexture(true);
     Engine::setFixedTimeSceneUpdate(false);
@@ -301,48 +266,51 @@ void Engine::systemSurfaceCreated(){
     onCanvasLoaded.call();
 }
 
-void Engine::systemSurfaceChanged(int width, int height) {
+void Engine::systemSurfaceChanged() {
 
-    Engine::setScreenSize(width, height);
+    calculateCanvas();
+
+    int screenWidth = System::instance().getScreenWidth();
+    int screenHeight = System::instance().getScreenHeight();
     
     int viewX = 0;
     int viewY = 0;
-    int viewWidth = Engine::getScreenWidth();
-    int viewHeight = Engine::getScreenHeight();
+    int viewWidth = screenWidth;
+    int viewHeight = screenHeight;
     
-    float screenAspect = (float)Engine::getScreenWidth() / (float)Engine::getScreenHeight();
+    float screenAspect = (float)screenWidth / (float)screenHeight;
     float canvasAspect = (float)Engine::getPreferedCanvasWidth() / (float)Engine::getPreferedCanvasHeight();
     
     //When canvas size is not changed
     if (Engine::getScalingMode() == Scaling::LETTERBOX){
         if (screenAspect < canvasAspect){
-            float aspect = (float)Engine::getScreenWidth() / (float)Engine::getPreferedCanvasWidth();
+            float aspect = (float)screenWidth / (float)Engine::getPreferedCanvasWidth();
             int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
-            int dif = Engine::getScreenHeight() - newHeight;
+            int dif = screenHeight - newHeight;
             viewY = (dif/2);
-            viewHeight = Engine::getScreenHeight()-(viewY*2); //diff could be odd, for this use view*2
+            viewHeight = screenHeight-(viewY*2); //diff could be odd, for this use view*2
         }else{
-            float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
+            float aspect = (float)screenHeight / (float)Engine::getPreferedCanvasHeight();
             int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
-            int dif = Engine::getScreenWidth() - newWidth;
+            int dif = screenWidth - newWidth;
             viewX = (dif/2);
-            viewWidth = Engine::getScreenWidth()-(viewX*2);
+            viewWidth = screenWidth-(viewX*2);
         }
     }
     
     if (Engine::getScalingMode() == Scaling::CROP){
         if (screenAspect > canvasAspect){
-            float aspect = (float)Engine::getScreenWidth() / (float)Engine::getPreferedCanvasWidth();
+            float aspect = (float)screenWidth / (float)Engine::getPreferedCanvasWidth();
             int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
-            int dif = Engine::getScreenHeight() - newHeight;
+            int dif = screenHeight - newHeight;
             viewY = (dif/2);
-            viewHeight = Engine::getScreenHeight()-(viewY*2);
+            viewHeight = screenHeight-(viewY*2);
         }else{
-            float aspect = (float)Engine::getScreenHeight() / (float)Engine::getPreferedCanvasHeight();
+            float aspect = (float)screenHeight / (float)Engine::getPreferedCanvasHeight();
             int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
-            int dif = Engine::getScreenWidth() - newWidth;
+            int dif = screenWidth - newWidth;
             viewX = (dif/2);
-            viewWidth = Engine::getScreenWidth()-(viewX*2);
+            viewWidth = screenWidth-(viewX*2);
         }
     }
     
@@ -402,8 +370,8 @@ void Engine::systemResume(){
 }
 
 bool Engine::transformCoordPos(float& x, float& y){
-    x = (x * (float)screenWidth / viewRect.getWidth());
-    y = (y * (float)screenHeight / viewRect.getHeight());
+    x = (x * (float)System::instance().getScreenWidth() / viewRect.getWidth());
+    y = (y * (float)System::instance().getScreenHeight() / viewRect.getHeight());
     
     x = ((float)Engine::getCanvasWidth() * (x+1)) / 2;
     y = ((float)Engine::getCanvasHeight() * (y+1)) / 2;

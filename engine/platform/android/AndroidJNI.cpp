@@ -13,17 +13,19 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_init_1native(JNIEnv 
     SupernovaAndroid::envRef = env;
     SupernovaAndroid::mainActivityClsRef = env->FindClass("com/deslon/supernova/MainActivity");
     //SupernovaAndroid::showInputTextRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "showInputText", "(Ljava/lang/String;)V");
-    SupernovaAndroid::showSoftKeyboardRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "showSoftKeyboard", "()V");
-    SupernovaAndroid::hideSoftKeyboardRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "hideSoftKeyboard", "()V");
+    SupernovaAndroid::getScreenWidthRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "getScreenWidth", "()I");
+    SupernovaAndroid::getScreenHeightRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "getScreenHeight", "()I");
+	SupernovaAndroid::showSoftKeyboardRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "showSoftKeyboard", "()V");
+	SupernovaAndroid::hideSoftKeyboardRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "hideSoftKeyboard", "()V");
     SupernovaAndroid::mainActivityObjRef = env->NewGlobalRef(main_activity);
 
     SupernovaAndroid::android_asset_manager = AAssetManager_fromJava(env, java_asset_manager);
 }
 
-JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1start(JNIEnv * env, jclass cls, jint width, jint height) {
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1start(JNIEnv * env, jclass cls) {
 	UNUSED(env);
 	UNUSED(cls);
-	Supernova::Engine::systemStart(width, height);
+	Supernova::Engine::systemStart();
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1surface_1created(JNIEnv * env, jclass cls) {
@@ -32,10 +34,10 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1surface_1cre
 	Supernova::Engine::systemSurfaceCreated();
 }
 
-JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1surface_1changed(JNIEnv * env, jclass cls, jint width, jint height) {
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1surface_1changed(JNIEnv * env, jclass cls) {
 	UNUSED(env);
 	UNUSED(cls);
-	Supernova::Engine::systemSurfaceChanged(width, height);
+	Supernova::Engine::systemSurfaceChanged();
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1draw(JNIEnv * env, jclass cls) {

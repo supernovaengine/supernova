@@ -1,8 +1,9 @@
 #include "Points.h"
 
 #include "Scene.h"
-#include "Engine.h"
 #include "math/Angle.h"
+#include "Engine.h"
+#include "system/System.h"
 
 using namespace Supernova;
 
@@ -287,9 +288,9 @@ void Points::updatePointScale(){
     }
     
     if (pointSizeReference == S_POINTSIZE_HEIGHT)
-        newPointScale *= (float)Engine::getScreenHeight() / (float)Engine::getCanvasHeight();
+        newPointScale *= (float)System::instance().getScreenHeight() / (float)Engine::getCanvasHeight();
     if (pointSizeReference == S_POINTSIZE_WIDTH)
-        newPointScale *= (float)Engine::getScreenWidth() / (float)Engine::getCanvasWidth();
+        newPointScale *= (float)System::instance().getScreenWidth() / (float)Engine::getCanvasWidth();
 
     if (newPointScale != pointScale){
     

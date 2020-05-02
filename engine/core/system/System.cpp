@@ -1,4 +1,4 @@
-#include "SystemPlatform.h"
+#include "System.h"
 
 
 using namespace Supernova;
@@ -13,9 +13,9 @@ using namespace Supernova;
 #include "SupernovaWeb.h"
 #endif
 
-SystemPlatform& SystemPlatform::instance(){
+System& System::instance(){
 #ifdef SUPERNOVA_ANDROID
-    static SystemPlatform *instance = new SupernovaAndroid();
+    static System *instance = new SupernovaAndroid();
 #endif
 #ifdef  SUPERNOVA_IOS
     static SystemPlatform *instance = new SupernovaIOS();
@@ -27,19 +27,19 @@ SystemPlatform& SystemPlatform::instance(){
     return *instance;
 }
 
-void SystemPlatform::showVirtualKeyboard(){
+void System::showVirtualKeyboard(){
 
 }
 
-void SystemPlatform::hideVirtualKeyboard(){
+void System::hideVirtualKeyboard(){
 
 }
 
-FILE* SystemPlatform::platformFopen(const char* fname, const char* mode){
+FILE* System::platformFopen(const char* fname, const char* mode){
     return fopen(fname, mode);
 }
 
-void SystemPlatform::platformLog(const int type, const char *fmt, va_list args){
+void System::platformLog(const int type, const char *fmt, va_list args){
     const char* priority;
 
     if (type == S_LOG_VERBOSE){

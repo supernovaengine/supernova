@@ -11,11 +11,11 @@ public class JNIWrapper {
 
 	public static native void init_native(Activity mainActivity, AssetManager assetManager);
     
-    public static native void system_start(int width, int height);
+    public static native void system_start();
     
 	public static native void system_surface_created();
 
-	public static native void system_surface_changed(int width, int height);
+	public static native void system_surface_changed();
 
 	public static native void system_draw();
 	

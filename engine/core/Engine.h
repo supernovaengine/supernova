@@ -32,9 +32,6 @@ namespace Supernova {
         //-----Supernova config-----
         static Scene *mainScene;
         
-        static int screenWidth;
-        static int screenHeight;
-        
         static int canvasWidth;
         static int canvasHeight;
         
@@ -72,17 +69,14 @@ namespace Supernova {
         static void setScene(Scene *mainScene);
         static Scene* getScene();
         
-        static int getScreenWidth();
-        static int getScreenHeight();
-        static void setScreenSize(int screenWidth, int screenHeight);
-        
         static int getCanvasWidth();
         static int getCanvasHeight();
         static void setCanvasSize(int canvasWidth, int canvasHeight);
         
         static int getPreferedCanvasWidth();
         static int getPreferedCanvasHeight();
-        static void setPreferedCanvasSize(int preferedCanvasWidth, int preferedCanvasHeight);
+
+        static void calculateCanvas();
         
         static Rect* getViewRect();
         
@@ -118,9 +112,8 @@ namespace Supernova {
         
         //-----Supernova API functions-----
         static void systemStart();
-        static void systemStart(int width, int height);
         static void systemSurfaceCreated();
-        static void systemSurfaceChanged(int width, int height);
+        static void systemSurfaceChanged();
         static void systemDraw();
 
         static void systemPause();

@@ -45,6 +45,9 @@ public class MainActivity extends Activity {
 
 	private FrameLayout layout;
 	private TextInput edittext;
+
+	public int screenWidth;
+	public int screenHeight;
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,11 @@ public class MainActivity extends Activity {
 
 			DisplayMetrics dm = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(dm);
-			final RendererWrapper rendererWrapper = new RendererWrapper(MainActivity.this, this.getAssets(), dm.widthPixels, dm.heightPixels);
+
+			screenWidth = dm.widthPixels;
+			screenWidth = dm.heightPixels;
+
+			final RendererWrapper rendererWrapper = new RendererWrapper(MainActivity.this, this.getAssets());
 			
 			glSurfaceView.setEGLContextClientVersion(2);
 			glSurfaceView.setPreserveEGLContextOnPause(true);
@@ -218,4 +225,8 @@ public class MainActivity extends Activity {
 	public void hideSoftKeyboard(){
 		edittext.hideKeyboard();
 	}
+
+	public int getScreenWidth(){ return screenWidth; }
+
+	public int getScreenHeight(){ return screenHeight; }
 }

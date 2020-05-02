@@ -1,5 +1,5 @@
-#ifndef SYSTEMPLATFORM_H
-#define SYSTEMPLATFORM_H
+#ifndef SYSTEM_H
+#define SYSTEM_H
 
 #define S_LOG_VERBOSE 1
 #define S_LOG_DEBUG 2
@@ -10,16 +10,19 @@
 
 namespace Supernova {
 
-    class SystemPlatform {
+    class System {
     protected:
 
-        SystemPlatform() {}
+        System() {}
 
     public:
 
-        static SystemPlatform& instance();
+        static System& instance();
 
-        virtual ~SystemPlatform() {}
+        virtual ~System() {}
+
+        virtual int getScreenWidth() = 0;
+        virtual int getScreenHeight() = 0;
 
         virtual void showVirtualKeyboard();
         virtual void hideVirtualKeyboard();
@@ -30,4 +33,4 @@ namespace Supernova {
 }
 
 
-#endif //SYSTEMPLATFORM_H
+#endif //SYSTEM_H

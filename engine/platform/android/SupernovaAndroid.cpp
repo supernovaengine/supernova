@@ -22,6 +22,8 @@ static int android_close(void* cookie) {
 }
 
 jclass SupernovaAndroid::mainActivityClsRef;
+jmethodID SupernovaAndroid::getScreenWidthRef;
+jmethodID SupernovaAndroid::getScreenHeightRef;
 jmethodID SupernovaAndroid::showSoftKeyboardRef;
 jmethodID SupernovaAndroid::hideSoftKeyboardRef;
 jobject SupernovaAndroid::mainActivityObjRef;
@@ -32,6 +34,14 @@ AAssetManager* SupernovaAndroid::android_asset_manager;
 
 SupernovaAndroid::SupernovaAndroid(){
     logtag = "Supernova";
+}
+
+int SupernovaAndroid::getScreenWidth(){
+    return envRef->CallIntMethod(mainActivityObjRef, getScreenWidthRef);
+}
+
+int SupernovaAndroid::getScreenHeight(){
+    return envRef->CallIntMethod(mainActivityObjRef, getScreenHeightRef);
 }
 
 void SupernovaAndroid::showVirtualKeyboard(){

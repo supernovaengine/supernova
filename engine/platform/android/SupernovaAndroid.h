@@ -4,9 +4,9 @@
 #include <jni.h>
 #include <android/asset_manager.h>
 #include <stdio.h>
-#include "platform/SystemPlatform.h"
+#include "system/System.h"
 
-class SupernovaAndroid: public Supernova::SystemPlatform {
+class SupernovaAndroid: public Supernova::System {
 
 private:
 
@@ -15,6 +15,8 @@ private:
 public:
 
 	static jclass mainActivityClsRef;
+	static jmethodID getScreenWidthRef;
+	static jmethodID getScreenHeightRef;
 	static jmethodID showSoftKeyboardRef;
 	static jmethodID hideSoftKeyboardRef;
 	static jobject mainActivityObjRef;
@@ -23,6 +25,9 @@ public:
 	static AAssetManager* android_asset_manager;
 
     SupernovaAndroid();
+
+    virtual int getScreenWidth();
+    virtual int getScreenHeight();
 
 	virtual void showVirtualKeyboard();
 	virtual void hideVirtualKeyboard();
