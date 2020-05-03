@@ -1,11 +1,13 @@
- cmake_minimum_required(VERSION 3.0)
+ cmake_minimum_required(VERSION 3.6)
+
+ project (Supernova)
 
  add_definitions("-D\"lua_getlocaledecpoint()='.'\"")
  add_definitions("-DLUA_ANSI")
  add_definitions("-DLUA_USE_C89")
  add_definitions("-DWITH_OPENSLES") # For SoLoud
 
- set(PLATFORM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/platform/android")
+ set(PLATFORM_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${PLATFORM_DIR}/AndroidMacros.h")
@@ -20,18 +22,18 @@
 
  include_directories ("${ANDROID_NDK}/sources/android/cpufeatures")
  include_directories ("${PLATFORM_DIR}")
- include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../../engine/core")
+ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core")
 
- add_subdirectory (../../../engine ${PROJECT_BINARY_DIR}/engine)
- add_subdirectory (../../../project ${PROJECT_BINARY_DIR}/project)
+ add_subdirectory (../../engine ${PROJECT_BINARY_DIR}/engine)
+ add_subdirectory (../../project ${PROJECT_BINARY_DIR}/project)
 
  add_library(
      supernova-android
 
      SHARED
 
-     ${PLATFORM_DIR}/AndroidJNI.cpp
-     ${PLATFORM_DIR}/SupernovaAndroid.cpp
+     AndroidJNI.cpp
+     SupernovaAndroid.cpp
  )
 
   target_link_libraries(

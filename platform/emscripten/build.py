@@ -33,7 +33,7 @@ def makedirs_silent(root):
 if __name__ == "__main__":
 
     if not "EMSCRIPTEN" in os.environ:
-        print "You need to include EMSCRIPTEN environment variable or edit 'emscripten =' line in this file"
+        print ("You need to include EMSCRIPTEN environment variable or edit 'emscripten =' line in this file")
     else:
 
         build_dir = resolve_path("./build")

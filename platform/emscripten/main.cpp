@@ -7,6 +7,7 @@
 #include <emscripten/html5.h>
 #include <string.h>
 
+#include "SupernovaWeb.h"
 #include "Engine.h"
 #include "Supernova.h"
 #include "Input.h"
@@ -14,22 +15,21 @@
 
 void renderLoop();
 EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData);
-EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChangeEvent *e, void *userData);
-EM_BOOL canvasresize_callback(int eventType, const EmscriptenUiEvent *event, void *userData);
 EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData);
 EM_BOOL wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData);
 
-int originalWidth = 800, originalHeight = 600;
 
 extern "C" {
     int getScreenWidth() {
-        return Supernova::Engine::getScreenWidth();
+        return SupernovaWeb::screenWidth;
     }
     int getScreenHeight() {
-        return Supernova::Engine::getScreenHeight();
+        return SupernovaWeb::screenHeight;
     }
     void updateScreenSize(int nWidth, int nHeight){
-        Supernova::Engine::systemSurfaceChanged(nWidth, nHeight);
+        SupernovaWeb::screenWidth = nWidth;
+        SupernovaWeb::screenHeight = nHeight;
+        Supernova::Engine::systemSurfaceChanged();
     }
 }
 
@@ -41,38 +41,41 @@ int main(int argc, char **argv) {
     //    return 1;
     //}
 
+    SupernovaWeb::screenWidth = 1000;
+    SupernovaWeb::screenHeight = 480;
     if ((argv[1] != NULL && argv[1] != 0) && (argv[2] != NULL && argv[2] != 0)){
-        Supernova::Engine::systemStart(atoi(argv[1]), atoi(argv[2]));
-    }else{
-        Supernova::Engine::systemStart();
+        SupernovaWeb::screenWidth = atoi(argv[1]);
+        SupernovaWeb::screenHeight = atoi(argv[2]);
     }
 
-    int width = Supernova::Engine::getScreenWidth();
-    int height = Supernova::Engine::getScreenHeight();
+    Supernova::Engine::systemStart();
+
+    int width = SupernovaWeb::screenWidth;
+    int height = SupernovaWeb::screenHeight;
 
     //Need SDL because Soloud uses SDL and can cause fullscreen error
-    SDL_Surface *screen = SDL_SetVideoMode(width, height, 16, SDL_OPENGL );
+    SDL_Surface *screen = SDL_SetVideoMode(width, height, 16, SDL_OPENGL);
     if ( !screen ) {
         printf("Unable to set video mode: %s\n", SDL_GetError());
         return 1;
     }
 
-    EMSCRIPTEN_RESULT ret = emscripten_set_keypress_callback(0, 0, 1, key_callback);
-    ret = emscripten_set_keydown_callback(0, 0, 1, key_callback);
-    ret = emscripten_set_keyup_callback(0, 0, 1, key_callback);
-    ret = emscripten_set_click_callback(0, 0, 1, mouse_callback);
-    ret = emscripten_set_mousedown_callback(0, 0, 1, mouse_callback);
-    ret = emscripten_set_mouseup_callback(0, 0, 1, mouse_callback);
-    ret = emscripten_set_dblclick_callback(0, 0, 1, mouse_callback);
-    ret = emscripten_set_mousemove_callback(0, 0, 1, mouse_callback);
-    ret = emscripten_set_wheel_callback(0, 0, 1, wheel_callback);
+    EMSCRIPTEN_RESULT ret = emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
+    ret = emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
+    ret = emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
+    ret = emscripten_set_click_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, mouse_callback);
+    ret = emscripten_set_mousedown_callback("#canvas", 0, 1, mouse_callback);
+    ret = emscripten_set_mouseup_callback("#canvas", 0, 1, mouse_callback);
+    ret = emscripten_set_dblclick_callback("#canvas", 0, 1, mouse_callback);
+    ret = emscripten_set_mousemove_callback("#canvas", 0, 1, mouse_callback);
+    ret = emscripten_set_wheel_callback("#canvas", 0, 1, wheel_callback);
 
     //Removed because emscripten_set_canvas_element_size is not working on this callback
-    //ret = emscripten_set_fullscreenchange_callback(0, 0, 1, fullscreenchange_callback);
-    ret = emscripten_set_resize_callback(0, 0, 1, canvasresize_callback);
+    //ret = emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, 0, 1, fullscreenchange_callback);
+    //ret = emscripten_set_resize_callback("#canvas", 0, 1, canvasresize_callback);
 
     Supernova::Engine::systemSurfaceCreated();
-    Supernova::Engine::systemSurfaceChanged(width, height);
+    Supernova::Engine::systemSurfaceChanged();
 
     emscripten_set_main_loop(renderLoop, 0, 1);
 
@@ -85,39 +88,6 @@ void renderLoop(){
     Supernova::Engine::systemDraw();
 
     SDL_GL_SwapBuffers();
-}
-
-EM_BOOL canvasresize_callback(int eventType, const EmscriptenUiEvent *event, void *userData){
-    int width, height;
-    emscripten_get_canvas_element_size("#canvas", &width, &height);
-
-    updateScreenSize(width, height);
-
-    return EMSCRIPTEN_RESULT_SUCCESS;
-}
-
-EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChangeEvent *e, void *userData) {
-    if (e->isFullscreen){
-        int w, h;
-        emscripten_get_canvas_element_size("#canvas", &w, &h);
-        originalWidth = w;
-        originalHeight = h;
-
-        EMSCRIPTEN_RESULT r = emscripten_set_canvas_element_size("#canvas", e->screenWidth, e->screenHeight);
-        if (r != EMSCRIPTEN_RESULT_SUCCESS) {
-            printf("Can't resize canvas element");
-        }
-        //updateScreenSize(e->screenWidth, e->screenHeight);
-    }else{
-
-        EMSCRIPTEN_RESULT r = emscripten_set_canvas_element_size("#canvas", originalWidth, originalHeight);
-        if (r != EMSCRIPTEN_RESULT_SUCCESS) {
-            printf("Can't resize canvas element");
-        }
-        //updateScreenSize(originalWidth, originalHeight);
-    }
-
-    return EMSCRIPTEN_RESULT_SUCCESS;
 }
 
 int supernova_mouse_button(int button){
@@ -135,16 +105,16 @@ int supernova_mouse_button(int button){
 
 EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData) {
 
-    int width = Supernova::Engine::getScreenWidth();
-    int height = Supernova::Engine::getScreenHeight();
+    int width = SupernovaWeb::screenWidth;
+    int height = SupernovaWeb::screenHeight;
 
     if (e->canvasX < 0) return 0;
     if (e->canvasY < 0) return 0;
     if (e->canvasX > width) return 0;
     if (e->canvasY > height) return 0;
 
-    const float normalized_x = (e->canvasX / (float) width) * 2.f - 1.f;
-    const float normalized_y = (e->canvasY / (float) height) * 2.f - 1.f;
+    const float normalized_x = (e->targetX / (float) width) * 2.f - 1.f;
+    const float normalized_y = (e->targetY / (float) height) * 2.f - 1.f;
 
     Supernova::Engine::systemMouseMove(normalized_x, normalized_y);
     if ((e->movementX != 0 || e->movementY != 0) && e->buttons != 0) {
@@ -408,8 +378,47 @@ int supernova_legacy_input(int code){
     return 0;
 }
 
-EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData){
+EM_BOOL canvas_resize(int eventType, const void *reserved, void *userData){
+    int w, h;
+    emscripten_get_canvas_element_size("#canvas", &w, &h);
 
+    updateScreenSize(w, h);
+
+    return 0;
+}
+
+bool isFullscreen(){
+    EmscriptenFullscreenChangeEvent fsce;
+    EMSCRIPTEN_RESULT ret = emscripten_get_fullscreen_status(&fsce);
+
+    return fsce.isFullscreen;
+}
+
+void requestFullscreen(){
+    EmscriptenFullscreenStrategy strategy;
+    strategy.scaleMode = EMSCRIPTEN_FULLSCREEN_SCALE_STRETCH;
+    strategy.canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF;
+    strategy.filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT;
+    strategy.canvasResizedCallback = canvas_resize;
+    strategy.canvasResizedCallbackUserData = NULL;
+
+    EMSCRIPTEN_RESULT ret = emscripten_request_fullscreen_strategy("#canvas", 1, &strategy);
+}
+
+void exitFullscreen(){
+    EMSCRIPTEN_RESULT ret = emscripten_exit_fullscreen();
+}
+
+EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData){
+/*
+    if (eventType == EMSCRIPTEN_EVENT_KEYPRESS && (!strcmp(e->key, "f") || e->which == 102)) {
+        if (!isFullscreen()){
+            requestFullscreen();
+        }else{
+            exitFullscreen();
+        }
+    }
+*/
   const char *key=e->key;
   char keybuff[5] = {0};
   if ( (!key)||(!(*key)) ){

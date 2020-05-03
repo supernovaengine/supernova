@@ -18,10 +18,10 @@ System& System::instance(){
     static System *instance = new SupernovaAndroid();
 #endif
 #ifdef  SUPERNOVA_IOS
-    static SystemPlatform *instance = new SupernovaIOS();
+    static System *instance = new SupernovaIOS();
 #endif
 #ifdef  SUPERNOVA_WEB
-    static SystemPlatform *instance = new SupernovaWeb();
+    static System *instance = new SupernovaWeb();
 #endif
 
     return *instance;
