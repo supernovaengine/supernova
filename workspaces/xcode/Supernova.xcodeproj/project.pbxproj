@@ -10,13 +10,19 @@
 		7105A9E720A258130028DCC7 /* PhysicsWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A9E320A258120028DCC7 /* PhysicsWorld.cpp */; };
 		7105A9E820A258130028DCC7 /* PhysicsWorld2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */; };
 		7108B9211F00A0DE005B7783 /* synth_8bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BD28381DE8EA1500C12A1D /* synth_8bit.c */; };
+		710F071F245F453700EE69E8 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 710F071D245F453700EE69E8 /* System.cpp */; };
+		710F072024603E6200EE69E8 /* UniqueToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714F3668240BDB3900E48E76 /* UniqueToken.cpp */; };
+		710F072124603E8F00EE69E8 /* Terrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714F366B240BDB4B00E48E76 /* Terrain.cpp */; };
+		710F072A24603EFF00EE69E8 /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710F072224603EFE00EE69E8 /* GameViewController.mm */; };
+		710F072B24603EFF00EE69E8 /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710F072324603EFE00EE69E8 /* EAGLView.mm */; };
+		710F072C24603EFF00EE69E8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 710F072724603EFF00EE69E8 /* AppDelegate.m */; };
+		710F072D24603EFF00EE69E8 /* SupernovaIOS.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710F072924603EFF00EE69E8 /* SupernovaIOS.mm */; };
 		7119E6AB20A6A0B80016AEF2 /* CollisionShape2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119E6AA20A6A0B80016AEF2 /* CollisionShape2D.cpp */; };
 		7119E6AE20AA2A440016AEF2 /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119E6AC20AA2A440016AEF2 /* CollisionShape.cpp */; };
 		712379201EC13C7E00BFD1F7 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */; };
 		712379231EC13CDA00BFD1F7 /* libstb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 712379111EC13C6000BFD1F7 /* libstb.a */; };
 		712D3DA821A44E23007EFCF9 /* GraphicObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 712D3DA721A44E23007EFCF9 /* GraphicObject.cpp */; };
 		713D30C51CFB306D00A4752F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 713D30C41CFB306D00A4752F /* assets */; };
-		714C6CF7209BEC0B0002F031 /* SystemPlatform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */; };
 		714C6CFA209DF09E0002F031 /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CF8209DF09D0002F031 /* Log.cpp */; };
 		714C6CFD209FCC1A0002F031 /* TileMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CFB209FCC1A0002F031 /* TileMap.cpp */; };
 		714C6D0220A525F20002F031 /* Body2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6CFF20A525F10002F031 /* Body2D.cpp */; };
@@ -27,9 +33,6 @@
 		714C89151F01BCB30028DCE0 /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89131F01BCB30028DCE0 /* Input.cpp */; };
 		714C89171F0EDF370028DCE0 /* TextureRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89161F0EDF370028DCE0 /* TextureRender.cpp */; };
 		714D81E91E70C2E40038BE50 /* SceneRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714D81E11E70BF4B0038BE50 /* SceneRender.cpp */; };
-		714F366A240BDB3A00E48E76 /* UniqueToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714F3668240BDB3900E48E76 /* UniqueToken.cpp */; };
-		714F366D240BDB4B00E48E76 /* Terrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714F366B240BDB4B00E48E76 /* Terrain.cpp */; };
-		7151F2801CD4FA86001A3AC3 /* SupernovaIOS.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7151F27F1CD4FA86001A3AC3 /* SupernovaIOS.mm */; };
 		715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7125E32B1D7CC7470090B05E /* ImageReader.cpp */; };
 		71598C401E76203A000EDAC0 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71598C3D1E762037000EDAC0 /* Sprite.cpp */; };
 		71598C431E7CA245000EDAC0 /* Fog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71598C411E7CA245000EDAC0 /* Fog.cpp */; };
@@ -83,8 +86,6 @@
 		7163026F2440C98E008C7116 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7163026E2440C98E008C7116 /* main.cpp */; };
 		716302702440C9B7008C7116 /* TerrainNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716302692440C80A008C7116 /* TerrainNode.cpp */; };
 		716AB5A71BEF9F3C001B672D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 716AB5A61BEF9F3C001B672D /* main.m */; };
-		716AB5AA1BEF9F3C001B672D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 716AB5A91BEF9F3C001B672D /* AppDelegate.m */; };
-		716AB5B11BEF9F3D001B672D /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 716AB5B01BEF9F3D001B672D /* GameViewController.mm */; };
 		716AB5B41BEF9F3D001B672D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B21BEF9F3D001B672D /* Main.storyboard */; };
 		716AB5B61BEF9F3D001B672D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B51BEF9F3D001B672D /* Assets.xcassets */; };
 		716AB5B91BEF9F3D001B672D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B71BEF9F3D001B672D /* LaunchScreen.storyboard */; };
@@ -151,7 +152,6 @@
 		717E66EF20A10F1400ABC488 /* b2WheelJoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717E66BC20A10F1400ABC488 /* b2WheelJoint.cpp */; };
 		717E66F020A10F1400ABC488 /* b2Rope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717E66BF20A10F1400ABC488 /* b2Rope.cpp */; };
 		717E66F120A10F5000ABC488 /* libbox2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 717E665220A10EF100ABC488 /* libbox2d.a */; };
-		717FA2091CA1843C009071DC /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 717FA2081CA1843C009071DC /* EAGLView.mm */; };
 		7188F1AC1DBBAB0B00A2D04F /* Sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */; };
 		7188F1AF1DBC5A4100A2D04F /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7188F1AE1DBC5A4100A2D04F /* OpenAL.framework */; };
 		7188F1B31DBD41A400A2D04F /* AudioFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7188F1B11DBD41A400A2D04F /* AudioFile.cpp */; };
@@ -485,6 +485,16 @@
 		7105A9E420A258120028DCC7 /* PhysicsWorld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhysicsWorld.h; sourceTree = "<group>"; };
 		7105A9E520A258120028DCC7 /* PhysicsWorld2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PhysicsWorld2D.cpp; sourceTree = "<group>"; };
 		7105A9E620A258120028DCC7 /* PhysicsWorld2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhysicsWorld2D.h; sourceTree = "<group>"; };
+		710F071D245F453700EE69E8 /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = System.cpp; sourceTree = "<group>"; };
+		710F071E245F453700EE69E8 /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = System.h; sourceTree = "<group>"; };
+		710F072224603EFE00EE69E8 /* GameViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GameViewController.mm; path = ../../platform/ios/GameViewController.mm; sourceTree = "<group>"; };
+		710F072324603EFE00EE69E8 /* EAGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = EAGLView.mm; path = ../../platform/ios/EAGLView.mm; sourceTree = "<group>"; };
+		710F072424603EFE00EE69E8 /* GameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameViewController.h; path = ../../platform/ios/GameViewController.h; sourceTree = "<group>"; };
+		710F072524603EFE00EE69E8 /* SupernovaIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SupernovaIOS.h; path = ../../platform/ios/SupernovaIOS.h; sourceTree = "<group>"; };
+		710F072624603EFF00EE69E8 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ../../platform/ios/AppDelegate.h; sourceTree = "<group>"; };
+		710F072724603EFF00EE69E8 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = ../../platform/ios/AppDelegate.m; sourceTree = "<group>"; };
+		710F072824603EFF00EE69E8 /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EAGLView.h; path = ../../platform/ios/EAGLView.h; sourceTree = "<group>"; };
+		710F072924603EFF00EE69E8 /* SupernovaIOS.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SupernovaIOS.mm; path = ../../platform/ios/SupernovaIOS.mm; sourceTree = "<group>"; };
 		7119E6A920A6A0B80016AEF2 /* CollisionShape2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollisionShape2D.h; sourceTree = "<group>"; };
 		7119E6AA20A6A0B80016AEF2 /* CollisionShape2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CollisionShape2D.cpp; sourceTree = "<group>"; };
 		7119E6AC20AA2A440016AEF2 /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CollisionShape.cpp; sourceTree = "<group>"; };
@@ -614,8 +624,6 @@
 		713D2D6E1CFB2EFA00A4752F /* LuaState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaState.h; sourceTree = "<group>"; };
 		713D2D6F1CFB2EFA00A4752F /* QtLuaIntf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QtLuaIntf.h; sourceTree = "<group>"; };
 		713D30C41CFB306D00A4752F /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../project/assets; sourceTree = "<group>"; };
-		714C6CF5209BEC0A0002F031 /* SystemPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemPlatform.h; sourceTree = "<group>"; };
-		714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SystemPlatform.cpp; sourceTree = "<group>"; };
 		714C6CF8209DF09D0002F031 /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Log.cpp; sourceTree = "<group>"; };
 		714C6CF9209DF09E0002F031 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		714C6CFB209FCC1A0002F031 /* TileMap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TileMap.cpp; sourceTree = "<group>"; };
@@ -644,8 +652,6 @@
 		714F3669240BDB3900E48E76 /* UniqueToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UniqueToken.h; sourceTree = "<group>"; };
 		714F366B240BDB4B00E48E76 /* Terrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Terrain.cpp; sourceTree = "<group>"; };
 		714F366C240BDB4B00E48E76 /* Terrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
-		7151F27F1CD4FA86001A3AC3 /* SupernovaIOS.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SupernovaIOS.mm; sourceTree = "<group>"; };
-		7151F2811CD4FAAC001A3AC3 /* SupernovaIOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SupernovaIOS.h; sourceTree = "<group>"; };
 		71598C3D1E762037000EDAC0 /* Sprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sprite.cpp; sourceTree = "<group>"; };
 		71598C3E1E762037000EDAC0 /* Sprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sprite.h; sourceTree = "<group>"; };
 		71598C411E7CA245000EDAC0 /* Fog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Fog.cpp; sourceTree = "<group>"; };
@@ -692,10 +698,6 @@
 		7163026E2440C98E008C7116 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		716AB5A21BEF9F3C001B672D /* supernova-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "supernova-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		716AB5A61BEF9F3C001B672D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		716AB5A81BEF9F3C001B672D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		716AB5A91BEF9F3C001B672D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		716AB5AF1BEF9F3D001B672D /* GameViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
-		716AB5B01BEF9F3D001B672D /* GameViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GameViewController.mm; sourceTree = "<group>"; };
 		716AB5B31BEF9F3D001B672D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		716AB5B51BEF9F3D001B672D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		716AB5B81BEF9F3D001B672D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -824,8 +826,6 @@
 		717E66BF20A10F1400ABC488 /* b2Rope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = b2Rope.cpp; sourceTree = "<group>"; };
 		717E66C020A10F1400ABC488 /* b2Rope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = b2Rope.h; sourceTree = "<group>"; };
 		717E66F520A1157800ABC488 /* Box2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box2D.h; sourceTree = "<group>"; };
-		717FA2081CA1843C009071DC /* EAGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EAGLView.mm; sourceTree = "<group>"; };
-		717FA20A1CA184B9009071DC /* EAGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
 		7188F1A31D9B436200A2D04F /* SceneRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneRender.h; sourceTree = "<group>"; };
 		7188F1A41D9B444600A2D04F /* TextureRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextureRender.h; sourceTree = "<group>"; };
 		7188F1A61D9B464900A2D04F /* ProgramRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgramRender.h; sourceTree = "<group>"; };
@@ -1205,6 +1205,15 @@
 			path = physics;
 			sourceTree = "<group>";
 		};
+		710F071C245F453700EE69E8 /* system */ = {
+			isa = PBXGroup;
+			children = (
+				710F071D245F453700EE69E8 /* System.cpp */,
+				710F071E245F453700EE69E8 /* System.h */,
+			);
+			path = system;
+			sourceTree = "<group>";
+		};
 		71192EFA1CE1334000BD76EE /* project */ = {
 			isa = PBXGroup;
 			children = (
@@ -1290,7 +1299,6 @@
 				7105A9E220A258120028DCC7 /* physics */,
 				713D2A3F1CFB2EAD00A4752F /* PlaneTerrain.cpp */,
 				713D2A401CFB2EAD00A4752F /* PlaneTerrain.h */,
-				713D2A421CFB2EAD00A4752F /* platform */,
 				71E1D22C1D2957AA001209C8 /* PointLight.cpp */,
 				71E1D22D1D2957AA001209C8 /* PointLight.h */,
 				719301261E53D4B000BEE527 /* Points.cpp */,
@@ -1311,6 +1319,7 @@
 				719ACC3D219DB913008C21F4 /* SubMesh.cpp */,
 				719ACC3C219DB913008C21F4 /* SubMesh.h */,
 				713D2A6A1CFB2EAD00A4752F /* Supernova.h */,
+				710F071C245F453700EE69E8 /* system */,
 				714F366B240BDB4B00E48E76 /* Terrain.cpp */,
 				714F366C240BDB4B00E48E76 /* Terrain.h */,
 				716302692440C80A008C7116 /* TerrainNode.cpp */,
@@ -1368,15 +1377,6 @@
 				713D2A3A1CFB2EAD00A4752F /* Vector4.h */,
 			);
 			path = math;
-			sourceTree = "<group>";
-		};
-		713D2A421CFB2EAD00A4752F /* platform */ = {
-			isa = PBXGroup;
-			children = (
-				714C6CF6209BEC0B0002F031 /* SystemPlatform.cpp */,
-				714C6CF5209BEC0A0002F031 /* SystemPlatform.h */,
-			);
-			path = platform;
 			sourceTree = "<group>";
 		};
 		713D2A4A1CFB2EAD00A4752F /* render */ = {
@@ -1586,6 +1586,14 @@
 		716AB5991BEF9F3C001B672D = {
 			isa = PBXGroup;
 			children = (
+				710F072624603EFF00EE69E8 /* AppDelegate.h */,
+				710F072724603EFF00EE69E8 /* AppDelegate.m */,
+				710F072824603EFF00EE69E8 /* EAGLView.h */,
+				710F072324603EFE00EE69E8 /* EAGLView.mm */,
+				710F072424603EFE00EE69E8 /* GameViewController.h */,
+				710F072224603EFE00EE69E8 /* GameViewController.mm */,
+				710F072524603EFE00EE69E8 /* SupernovaIOS.h */,
+				710F072924603EFF00EE69E8 /* SupernovaIOS.mm */,
 				713D30C41CFB306D00A4752F /* assets */,
 				713D2A051CFB2EAD00A4752F /* core */,
 				7188F1AD1DBC5A4100A2D04F /* Frameworks */,
@@ -1621,14 +1629,6 @@
 		716AB5A41BEF9F3C001B672D /* Supernova */ = {
 			isa = PBXGroup;
 			children = (
-				716AB5A81BEF9F3C001B672D /* AppDelegate.h */,
-				716AB5A91BEF9F3C001B672D /* AppDelegate.m */,
-				716AB5AF1BEF9F3D001B672D /* GameViewController.h */,
-				716AB5B01BEF9F3D001B672D /* GameViewController.mm */,
-				717FA20A1CA184B9009071DC /* EAGLView.h */,
-				717FA2081CA1843C009071DC /* EAGLView.mm */,
-				7151F2811CD4FAAC001A3AC3 /* SupernovaIOS.h */,
-				7151F27F1CD4FA86001A3AC3 /* SupernovaIOS.mm */,
 				716AB5B21BEF9F3D001B672D /* Main.storyboard */,
 				716AB5B51BEF9F3D001B672D /* Assets.xcassets */,
 				716AB5B71BEF9F3D001B672D /* LaunchScreen.storyboard */,
@@ -2567,13 +2567,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				714F366D240BDB4B00E48E76 /* Terrain.cpp in Sources */,
-				714F366A240BDB3A00E48E76 /* UniqueToken.cpp in Sources */,
-				716AB5AA1BEF9F3C001B672D /* AppDelegate.m in Sources */,
-				716AB5B11BEF9F3D001B672D /* GameViewController.mm in Sources */,
+				710F072A24603EFF00EE69E8 /* GameViewController.mm in Sources */,
 				716AB5A71BEF9F3C001B672D /* main.m in Sources */,
-				717FA2091CA1843C009071DC /* EAGLView.mm in Sources */,
-				7151F2801CD4FA86001A3AC3 /* SupernovaIOS.mm in Sources */,
+				710F072C24603EFF00EE69E8 /* AppDelegate.m in Sources */,
+				710F072D24603EFF00EE69E8 /* SupernovaIOS.mm in Sources */,
+				710F072B24603EFF00EE69E8 /* EAGLView.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2682,6 +2680,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				710F072124603E8F00EE69E8 /* Terrain.cpp in Sources */,
+				710F072024603E6200EE69E8 /* UniqueToken.cpp in Sources */,
 				716302702440C9B7008C7116 /* TerrainNode.cpp in Sources */,
 				716E1DC122AF459C00A4386B /* Animation.cpp in Sources */,
 				716E1DC222AF459C00A4386B /* MorphAction.cpp in Sources */,
@@ -2692,6 +2692,7 @@
 				716E1DBA22AF44FD00A4386B /* MorphTracks.cpp in Sources */,
 				716E1DBB22AF44FD00A4386B /* RotateTracks.cpp in Sources */,
 				716E1DBC22AF44FD00A4386B /* ScaleTracks.cpp in Sources */,
+				710F071F245F453700EE69E8 /* System.cpp in Sources */,
 				716E1DBD22AF44FD00A4386B /* TranslateTracks.cpp in Sources */,
 				71C2772E202BCE0F005B3EDC /* LightData.cpp in Sources */,
 				712D3DA821A44E23007EFCF9 /* GraphicObject.cpp in Sources */,
@@ -2723,7 +2724,6 @@
 				7188F1B91DBD4BAC00A2D04F /* AudioLoader.cpp in Sources */,
 				715F90FE21EAF6FE0025464D /* Text.cpp in Sources */,
 				71C39E48204188B000863AB6 /* ParticleAccelerationInit.cpp in Sources */,
-				714C6CF7209BEC0B0002F031 /* SystemPlatform.cpp in Sources */,
 				71CDC7161D7B14510060EEFF /* Object.cpp in Sources */,
 				71C39E49204188B000863AB6 /* ParticleAlphaInit.cpp in Sources */,
 				71C39E53204188BC00863AB6 /* ParticleColorMod.cpp in Sources */,

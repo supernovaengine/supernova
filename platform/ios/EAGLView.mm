@@ -1,5 +1,6 @@
 #import "EAGLView.h"
 #include "Engine.h"
+#include "SupernovaIOS.h"
 
 @implementation EAGLView{
     CAEAGLLayer* _eaglLayer;
@@ -107,7 +108,10 @@
     [self setupRenderBuffer];
     [self setupFrameBuffer];
     
-    Supernova::Engine::systemSurfaceChanged(backingWidth, backingHeight);
+    SupernovaIOS::screenWidth = backingWidth;
+    SupernovaIOS::screenHeight = backingHeight;
+    
+    Supernova::Engine::systemSurfaceChanged();
     
     [self render:nil];
 }
@@ -115,6 +119,13 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
+    CGFloat screenScale = [UIScreen mainScreen].scale;
+    
+    SupernovaIOS::screenWidth = frame.size.width * screenScale;
+    SupernovaIOS::screenHeight = frame.size.height * screenScale;
+    
+    Supernova::Engine::systemStart();
+    
     self = [super initWithFrame:frame];
     if (self) {
 

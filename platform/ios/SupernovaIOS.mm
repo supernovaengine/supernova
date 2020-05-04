@@ -1,5 +1,18 @@
 #import "SupernovaIOS.h"
 #import "GameViewController.h"
+#import "EAGLView.h"
+
+
+int SupernovaIOS::screenWidth;
+int SupernovaIOS::screenHeight;
+
+int SupernovaIOS::getScreenWidth(){
+    return screenWidth;
+}
+
+int SupernovaIOS::getScreenHeight(){
+    return screenHeight;
+}
 
 void SupernovaIOS::showVirtualKeyboard(){
     UIWindow *window = [UIApplication sharedApplication].keyWindow;

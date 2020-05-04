@@ -23,10 +23,6 @@ static UITouch* touches[MAX_TOUCHES];
     int width=rect.size.width;
     int height=rect.size.height;
     
-    CGFloat screenScale = [UIScreen mainScreen].scale;
-    
-    Supernova::Engine::systemStart(width*screenScale, height*screenScale);
-    
     self.glView = [[EAGLView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
     if([[UIScreen mainScreen] respondsToSelector:@selector(scale)]) {
         self.glView.contentScaleFactor = [[UIScreen mainScreen] scale];
