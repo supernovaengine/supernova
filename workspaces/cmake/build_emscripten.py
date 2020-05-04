@@ -57,7 +57,7 @@ if __name__ == "__main__":
         "-DCMAKE_TOOLCHAIN_FILE="+emscripten+"/cmake/Modules/Platform/Emscripten.cmake",
         "-DCMAKE_BUILD_TYPE=Debug",
         "-G", system_output,
-        ".."
+        "../../../platform/emscripten"
         ])
 
         check_call([system_make])
