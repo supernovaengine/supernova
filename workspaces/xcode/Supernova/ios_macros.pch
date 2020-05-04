@@ -1,6 +1,0 @@
-#ifndef Supernova_pch
-#define Supernova_pch
-
-#define SUPERNOVA_IOS
-
-#endif /* Supernova_pch */

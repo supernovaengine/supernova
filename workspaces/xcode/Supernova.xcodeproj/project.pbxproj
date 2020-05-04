@@ -13,10 +13,10 @@
 		710F071F245F453700EE69E8 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 710F071D245F453700EE69E8 /* System.cpp */; };
 		710F072024603E6200EE69E8 /* UniqueToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714F3668240BDB3900E48E76 /* UniqueToken.cpp */; };
 		710F072124603E8F00EE69E8 /* Terrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714F366B240BDB4B00E48E76 /* Terrain.cpp */; };
-		710F072A24603EFF00EE69E8 /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710F072224603EFE00EE69E8 /* GameViewController.mm */; };
-		710F072B24603EFF00EE69E8 /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710F072324603EFE00EE69E8 /* EAGLView.mm */; };
-		710F072C24603EFF00EE69E8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 710F072724603EFF00EE69E8 /* AppDelegate.m */; };
-		710F072D24603EFF00EE69E8 /* SupernovaIOS.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710F072924603EFF00EE69E8 /* SupernovaIOS.mm */; };
+		710F073C2460681C00EE69E8 /* GameViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710F07332460681C00EE69E8 /* GameViewController.mm */; };
+		710F073D2460681C00EE69E8 /* SupernovaIOS.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710F07352460681C00EE69E8 /* SupernovaIOS.mm */; };
+		710F073E2460681C00EE69E8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 710F07382460681C00EE69E8 /* AppDelegate.m */; };
+		710F073F2460681C00EE69E8 /* EAGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710F073B2460681C00EE69E8 /* EAGLView.mm */; };
 		7119E6AB20A6A0B80016AEF2 /* CollisionShape2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119E6AA20A6A0B80016AEF2 /* CollisionShape2D.cpp */; };
 		7119E6AE20AA2A440016AEF2 /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7119E6AC20AA2A440016AEF2 /* CollisionShape.cpp */; };
 		712379201EC13C7E00BFD1F7 /* stb_vorbis.c in Sources */ = {isa = PBXBuildFile; fileRef = 7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */; };
@@ -487,14 +487,15 @@
 		7105A9E620A258120028DCC7 /* PhysicsWorld2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhysicsWorld2D.h; sourceTree = "<group>"; };
 		710F071D245F453700EE69E8 /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = System.cpp; sourceTree = "<group>"; };
 		710F071E245F453700EE69E8 /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = System.h; sourceTree = "<group>"; };
-		710F072224603EFE00EE69E8 /* GameViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GameViewController.mm; path = ../../platform/ios/GameViewController.mm; sourceTree = "<group>"; };
-		710F072324603EFE00EE69E8 /* EAGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = EAGLView.mm; path = ../../platform/ios/EAGLView.mm; sourceTree = "<group>"; };
-		710F072424603EFE00EE69E8 /* GameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameViewController.h; path = ../../platform/ios/GameViewController.h; sourceTree = "<group>"; };
-		710F072524603EFE00EE69E8 /* SupernovaIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SupernovaIOS.h; path = ../../platform/ios/SupernovaIOS.h; sourceTree = "<group>"; };
-		710F072624603EFF00EE69E8 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ../../platform/ios/AppDelegate.h; sourceTree = "<group>"; };
-		710F072724603EFF00EE69E8 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = ../../platform/ios/AppDelegate.m; sourceTree = "<group>"; };
-		710F072824603EFF00EE69E8 /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EAGLView.h; path = ../../platform/ios/EAGLView.h; sourceTree = "<group>"; };
-		710F072924603EFF00EE69E8 /* SupernovaIOS.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SupernovaIOS.mm; path = ../../platform/ios/SupernovaIOS.mm; sourceTree = "<group>"; };
+		710F07332460681C00EE69E8 /* GameViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GameViewController.mm; sourceTree = "<group>"; };
+		710F07342460681C00EE69E8 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		710F07352460681C00EE69E8 /* SupernovaIOS.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SupernovaIOS.mm; sourceTree = "<group>"; };
+		710F07362460681C00EE69E8 /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
+		710F07372460681C00EE69E8 /* SupernovaIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupernovaIOS.h; sourceTree = "<group>"; };
+		710F07382460681C00EE69E8 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		710F07392460681C00EE69E8 /* IOSMacros.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOSMacros.pch; sourceTree = "<group>"; };
+		710F073A2460681C00EE69E8 /* GameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
+		710F073B2460681C00EE69E8 /* EAGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EAGLView.mm; sourceTree = "<group>"; };
 		7119E6A920A6A0B80016AEF2 /* CollisionShape2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollisionShape2D.h; sourceTree = "<group>"; };
 		7119E6AA20A6A0B80016AEF2 /* CollisionShape2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CollisionShape2D.cpp; sourceTree = "<group>"; };
 		7119E6AC20AA2A440016AEF2 /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CollisionShape.cpp; sourceTree = "<group>"; };
@@ -512,7 +513,6 @@
 		713384E01D3051FF00DB73A5 /* DirectionalLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DirectionalLight.h; sourceTree = "<group>"; };
 		7137AEB71CFCF58900B271D5 /* tiny_obj_loader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_obj_loader.cc; sourceTree = "<group>"; };
 		7137AEB81CFCF58900B271D5 /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
-		713B79A01C0FB5FD00892EAC /* ios_macros.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ios_macros.pch; sourceTree = "<group>"; };
 		713D2A071CFB2EAD00A4752F /* Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
 		713D2A081CFB2EAD00A4752F /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		713D2A0A1CFB2EAD00A4752F /* Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mesh.cpp; sourceTree = "<group>"; };
@@ -1214,6 +1214,23 @@
 			path = system;
 			sourceTree = "<group>";
 		};
+		710F07322460681C00EE69E8 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				710F07342460681C00EE69E8 /* AppDelegate.h */,
+				710F07382460681C00EE69E8 /* AppDelegate.m */,
+				710F07362460681C00EE69E8 /* EAGLView.h */,
+				710F073B2460681C00EE69E8 /* EAGLView.mm */,
+				710F073A2460681C00EE69E8 /* GameViewController.h */,
+				710F07332460681C00EE69E8 /* GameViewController.mm */,
+				710F07392460681C00EE69E8 /* IOSMacros.pch */,
+				710F07372460681C00EE69E8 /* SupernovaIOS.h */,
+				710F07352460681C00EE69E8 /* SupernovaIOS.mm */,
+			);
+			name = ios;
+			path = ../../platform/ios;
+			sourceTree = "<group>";
+		};
 		71192EFA1CE1334000BD76EE /* project */ = {
 			isa = PBXGroup;
 			children = (
@@ -1586,23 +1603,16 @@
 		716AB5991BEF9F3C001B672D = {
 			isa = PBXGroup;
 			children = (
-				710F072624603EFF00EE69E8 /* AppDelegate.h */,
-				710F072724603EFF00EE69E8 /* AppDelegate.m */,
-				710F072824603EFF00EE69E8 /* EAGLView.h */,
-				710F072324603EFE00EE69E8 /* EAGLView.mm */,
-				710F072424603EFE00EE69E8 /* GameViewController.h */,
-				710F072224603EFE00EE69E8 /* GameViewController.mm */,
-				710F072524603EFE00EE69E8 /* SupernovaIOS.h */,
-				710F072924603EFF00EE69E8 /* SupernovaIOS.mm */,
+				710F07322460681C00EE69E8 /* ios */,
 				713D30C41CFB306D00A4752F /* assets */,
+				71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */,
+				71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */,
+				71CDC6FA1D7B13240060EEFF /* libz.tbd */,
 				713D2A051CFB2EAD00A4752F /* core */,
 				7188F1AD1DBC5A4100A2D04F /* Frameworks */,
 				713D2AAE1CFB2EF900A4752F /* libs */,
-				71CDC6FA1D7B13240060EEFF /* libz.tbd */,
-				71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */,
 				716AB5A31BEF9F3C001B672D /* Products */,
 				71192EFA1CE1334000BD76EE /* project */,
-				71CDC6FC1D7B132B0060EEFF /* QuartzCore.framework */,
 				7163024A2440C3A5008C7116 /* renders */,
 				716AB5A41BEF9F3C001B672D /* Supernova */,
 			);
@@ -1642,7 +1652,6 @@
 			isa = PBXGroup;
 			children = (
 				716AB5A61BEF9F3C001B672D /* main.m */,
-				713B79A01C0FB5FD00892EAC /* ios_macros.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -2567,11 +2576,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				710F072A24603EFF00EE69E8 /* GameViewController.mm in Sources */,
+				710F073E2460681C00EE69E8 /* AppDelegate.m in Sources */,
+				710F073D2460681C00EE69E8 /* SupernovaIOS.mm in Sources */,
+				710F073F2460681C00EE69E8 /* EAGLView.mm in Sources */,
+				710F073C2460681C00EE69E8 /* GameViewController.mm in Sources */,
 				716AB5A71BEF9F3C001B672D /* main.m in Sources */,
-				710F072C24603EFF00EE69E8 /* AppDelegate.m in Sources */,
-				710F072D24603EFF00EE69E8 /* SupernovaIOS.mm in Sources */,
-				710F072B24603EFF00EE69E8 /* EAGLView.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3078,7 +3087,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = Supernova/ios_macros.pch;
+				GCC_PREFIX_HEADER = ../../platform/ios/IOSMacros.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -3133,7 +3142,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = Supernova/ios_macros.pch;
+				GCC_PREFIX_HEADER = ../../platform/ios/IOSMacros.pch;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
