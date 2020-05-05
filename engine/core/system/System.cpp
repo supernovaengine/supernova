@@ -35,6 +35,18 @@ void System::hideVirtualKeyboard(){
 
 }
 
+bool System::isFullscreen(){
+    return false;
+}
+
+void System::requestFullscreen(){
+
+}
+
+void System::exitFullscreen(){
+
+}
+
 FILE* System::platformFopen(const char* fname, const char* mode){
     return fopen(fname, mode);
 }

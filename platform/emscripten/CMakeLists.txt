@@ -21,14 +21,13 @@ add_subdirectory (../../project ${PROJECT_BINARY_DIR}/project)
 add_executable(
     supernova-emscripten
 
-    main.cpp
     SupernovaWeb.cpp
 )
 
 set_target_properties(
     supernova-emscripten
     PROPERTIES LINK_FLAGS
-    "-g4 -s ALLOW_MEMORY_GROWTH=1 --embed-file ../../../project/assets@/ -o supernova.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_updateScreenSize','_main']\""
+    "-g4 -s ALLOW_MEMORY_GROWTH=1 --embed-file ../../../project/assets@/ -o supernova.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\""
 )
 
 target_link_libraries(

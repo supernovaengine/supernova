@@ -26,6 +26,11 @@ namespace Supernova {
 
         virtual void showVirtualKeyboard();
         virtual void hideVirtualKeyboard();
+
+        virtual bool isFullscreen();
+        virtual void requestFullscreen();
+        virtual void exitFullscreen();
+
         virtual FILE* platformFopen(const char* fname, const char* mode);
         virtual void platformLog(const int type, const char *fmt, va_list args);
     };
