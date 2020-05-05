@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
 #include <emscripten/emscripten.h>
 
 #include "Engine.h"
@@ -62,18 +61,16 @@ int SupernovaWeb::init(int width, int height){
 
     Supernova::Engine::systemStart();
 
-    //If it is called SDL overrides HTML input events and keypress dont work
-    //if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
-    //    printf("Unable to initialize SDL: %s\n", SDL_GetError());
-    //    return 1;
-    //}
-
-    //Need SDL because Soloud uses SDL and can cause fullscreen error
-    SDL_Surface *screen = SDL_SetVideoMode(width, height, 16, SDL_OPENGL);
-    if ( !screen ) {
-        printf("Unable to set video mode: %s\n", SDL_GetError());
-        return 1;
-    }
+    EmscriptenWebGLContextAttributes attr;
+    emscripten_webgl_init_context_attributes(&attr);
+    attr.alpha = attr.depth = attr.stencil = attr.antialias = attr.preserveDrawingBuffer = attr.failIfMajorPerformanceCaveat = 0;
+    attr.enableExtensionsByDefault = 1;
+    attr.premultipliedAlpha = 0;
+    attr.majorVersion = 1;
+    attr.minorVersion = 0;
+    EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_create_context("#canvas", &attr);
+    
+    emscripten_webgl_make_context_current(ctx);
 
     EMSCRIPTEN_RESULT ret = emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
     ret = emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
@@ -90,11 +87,9 @@ int SupernovaWeb::init(int width, int height){
     //ret = emscripten_set_resize_callback("#canvas", 0, 1, canvasresize_callback);
 
     Supernova::Engine::systemSurfaceCreated();
-    Supernova::Engine::systemSurfaceChanged();
+    changeCanvasSize(width, height);
 
     emscripten_set_main_loop(renderLoop, 0, 1);
-
-    SDL_Quit();
 
     return 0;
 }
@@ -129,10 +124,8 @@ void SupernovaWeb::exitFullscreen(){
     EMSCRIPTEN_RESULT ret = emscripten_exit_fullscreen();
 }
 
-void SupernovaWeb::renderLoop(){
+void SupernovaWeb::renderLoop(){    
     Supernova::Engine::systemDraw();
-
-    SDL_GL_SwapBuffers();
 }
 
 EM_BOOL SupernovaWeb::canvas_resize(int eventType, const void *reserved, void *userData){
