@@ -13,9 +13,6 @@ if (COMPILE_ZLIB)
     add_subdirectory (libs/zlib)
 endif (COMPILE_ZLIB)
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/mpg123/src/libmpg123")
-add_subdirectory (libs/mpg123)
-
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/soloud/include")
 add_subdirectory (libs/soloud)
 
