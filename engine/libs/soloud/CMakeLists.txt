@@ -47,8 +47,9 @@ add_library(
     src/filter/soloud_lofifilter.cpp
     src/filter/soloud_robotizefilter.cpp
     src/filter/soloud_waveshaperfilter.cpp
+)
 
-
-
-
+target_link_libraries(
+        soloud
+        stb
 )

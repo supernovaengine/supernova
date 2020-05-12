@@ -1,3 +1,5 @@
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../stb")
+
 add_library(
 
     tinygltf
