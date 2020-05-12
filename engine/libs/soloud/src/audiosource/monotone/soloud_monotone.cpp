@@ -1,6 +1,6 @@
 /*
 MONOTONE module for SoLoud audio engine
-Copyright (c) 2013-2015 Jari Komppa
+Copyright (c) 2013-2020 Jari Komppa
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -60,7 +60,7 @@ namespace SoLoud
 		}
 	}
 
-	void MonotoneInstance::getAudio(float *aBuffer, unsigned int aSamples)
+	unsigned int MonotoneInstance::getAudio(float *aBuffer, unsigned int aSamplesToRead, unsigned int /*aBufferSize*/)
 	{
 		int samplesPerTick = (int)floor(mSamplerate / 60);
 		unsigned int i;
@@ -68,7 +68,7 @@ namespace SoLoud
 		{
 			mOutput[i].mEnabled = i < (unsigned int)mParent->mHardwareChannels && i < (unsigned int)mParent->mSong.mTotalTracks;
 		}
-		for (i = 0; i < aSamples; i++)
+		for (i = 0; i < aSamplesToRead; i++)
 		{
 			if ((mSampleCount % samplesPerTick) == 0)
 			{
@@ -259,63 +259,19 @@ namespace SoLoud
 			
 			aBuffer[i] = 0;
 			int j;
-			switch (mParent->mWaveform)
+			for (j = 0; j < 12; j++)
 			{
-			case Monotone::SAW:
-				for (j = 0; j < 12; j++)
+				if (mOutput[j].mEnabled)
 				{
-					if (mOutput[j].mEnabled)
-					{
-						float bleh = mOutput[j].mSamplePos + mOutput[j].mSamplePosInc;
-						mOutput[j].mSamplePos = bleh - (long)bleh;
-						// saw:
-						aBuffer[i] += ((mOutput[j].mSamplePos) - 0.5f) * 0.5f;
-					}
+					float bleh = mOutput[j].mSamplePos + mOutput[j].mSamplePosInc;
+					mOutput[j].mSamplePos = bleh - (long)bleh;					
+					aBuffer[i] += SoLoud::Misc::generateWaveform(mParent->mWaveform, mOutput[j].mSamplePos) * 0.5f;
 				}
-				break;
-			case Monotone::SIN:
-				for (j = 0; j < 12; j++)
-				{
-					if (mOutput[j].mEnabled)
-					{
-						float bleh = mOutput[j].mSamplePos + mOutput[j].mSamplePosInc;
-						mOutput[j].mSamplePos = bleh - (long)bleh;
-						// sin: 
-						aBuffer[i] += (float)sin(mOutput[j].mSamplePos * M_PI * 2) * 0.5f;
-					}
-				}
-				break;
-			case Monotone::SAWSIN:
-				for (j = 0; j < 12; j++)
-				{
-					if (mOutput[j].mEnabled)
-					{
-						float bleh = mOutput[j].mSamplePos + mOutput[j].mSamplePosInc;
-						mOutput[j].mSamplePos = bleh - (long)bleh;
-						// sawsin:
-						bleh = ((mOutput[j].mSamplePos) - 0.5f);
-						bleh *= (float)sin(mOutput[j].mSamplePos * M_PI * 2);
-						aBuffer[i] += bleh;
-					}
-				}
-				break;
-			case Monotone::SQUARE:
-			default:
-				for (j = 0; j < 12; j++)
-				{
-					if (mOutput[j].mEnabled)
-					{
-						float bleh = mOutput[j].mSamplePos + mOutput[j].mSamplePosInc;
-						mOutput[j].mSamplePos = bleh - (long)bleh;
-						// square:
-						aBuffer[i] += (mOutput[j].mSamplePos > 0.5f) ? 0.25f : -0.25f;
-					}
-				}
-				break;
 			}
 
 			mSampleCount++;
 		}
+		return aSamplesToRead;
 	}
 
 	bool MonotoneInstance::hasEnded()
@@ -329,6 +285,8 @@ namespace SoLoud
 		float temphz = 27.5f;
 		int IBO = 12; // Intervals Between Octaves
 		int IBN = 8; // Intervals Between Notes
+		// Fun fact: the resulting constant is pretty 
+		// close to Proton Mass consntant 1.00727646688
 		float interval = 1.00724641222f;//exp(ln(2)/(IBO*IBN));
 		int maxnote = 3 + (8 * IBO) + 1;
 
@@ -359,7 +317,7 @@ namespace SoLoud
 		mChannels = 1;
 
 		mHardwareChannels = 1;
-		mWaveform = SQUARE;
+		mWaveform = SoLoud::Misc::WAVE_SQUARE;
 	}
 
 	void Monotone::clear()
@@ -399,7 +357,7 @@ namespace SoLoud
 		return SO_NO_ERROR;
 	}
 	
-	result Monotone::loadMem(unsigned char *aMem, unsigned int aLength, bool aCopy, bool aTakeOwnership)
+	result Monotone::loadMem(const unsigned char *aMem, unsigned int aLength, bool aCopy, bool aTakeOwnership)
 	{
 		MemoryFile mf;
 		int res = mf.openMem(aMem, aLength, aCopy, aTakeOwnership);

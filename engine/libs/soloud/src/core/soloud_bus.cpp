@@ -1,6 +1,6 @@
 /*
 SoLoud audio engine
-Copyright (c) 2013-2014 Jari Komppa
+Copyright (c) 2013-2020 Jari Komppa
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -24,6 +24,7 @@ freely, subject to the following restrictions:
 
 #include "soloud.h"
 #include "soloud_fft.h"
+#include "soloud_internal.h"
 
 namespace SoLoud
 {
@@ -31,19 +32,23 @@ namespace SoLoud
 	{
 		mParent = aParent;
 		mScratchSize = 0;
-		mFlags |= PROTECTED | INAUDIBLE_TICK;
+		mFlags |= PROTECTED | INAUDIBLE_TICK;		
+		for (int i = 0; i < MAX_CHANNELS; i++)
+			mVisualizationChannelVolume[i] = 0;
+		for (int i = 0; i < 256; i++)
+			mVisualizationWaveData[i] = 0;
 	}
 	
-	void BusInstance::getAudio(float *aBuffer, unsigned int aSamples)
+	unsigned int BusInstance::getAudio(float *aBuffer, unsigned int aSamplesToRead, unsigned int aBufferSize)
 	{
 		int handle = mParent->mChannelHandle;
 		if (handle == 0) 
 		{
 			// Avoid reuse of scratch data if this bus hasn't played anything yet
 			unsigned int i;
-			for (i = 0; i < aSamples * mChannels; i++)
+			for (i = 0; i < aBufferSize * mChannels; i++)
 				aBuffer[i] = 0;
-			return;
+			return aSamplesToRead;
 		}
 		
 		Soloud *s = mParent->mSoloud;
@@ -53,19 +58,28 @@ namespace SoLoud
 			mScratch.init(mScratchSize * MAX_CHANNELS);
 		}
 		
-		s->mixBus(aBuffer, aSamples, mScratch.mData, handle, mSamplerate, mChannels);
+		s->mixBus_internal(aBuffer, aSamplesToRead, aBufferSize, mScratch.mData, handle, mSamplerate, mChannels);
 
 		int i;
 		if (mParent->mFlags & AudioSource::VISUALIZATION_DATA)
 		{
-			if (aSamples > 255)
+			for (i = 0; i < MAX_CHANNELS; i++)
+				mVisualizationChannelVolume[i] = 0;
+
+			if (aSamplesToRead > 255)
 			{
 				for (i = 0; i < 256; i++)
 				{
 					int j;
 					mVisualizationWaveData[i] = 0;
 					for (j = 0; j < (signed)mChannels; j++)
-						mVisualizationWaveData[i] += aBuffer[i + aSamples * j];
+					{
+						float sample = aBuffer[i + aBufferSize * j];
+						float absvol = (float)fabs(sample);
+						if (absvol > mVisualizationChannelVolume[j])
+							mVisualizationChannelVolume[j] = absvol;
+						mVisualizationWaveData[i] += sample;
+					}
 				}
 			}
 			else
@@ -76,10 +90,17 @@ namespace SoLoud
 					int j;
 					mVisualizationWaveData[i] = 0;
 					for (j = 0; j < (signed)mChannels; j++)
-						mVisualizationWaveData[i] += aBuffer[(i % aSamples) + aSamples * j];
+					{
+						float sample = aBuffer[(i % aSamplesToRead) + aBufferSize * j];
+						float absvol = (float)fabs(sample);
+						if (absvol > mVisualizationChannelVolume[j])
+							mVisualizationChannelVolume[j] = absvol;
+						mVisualizationWaveData[i] += sample;
+					}
 				}
 			}
 		}
+		return aSamplesToRead;
 	}
 
 	bool BusInstance::hasEnded()
@@ -96,7 +117,7 @@ namespace SoLoud
 		{
 			if (s->mVoice[i] && s->mVoice[i]->mBusHandle == mParent->mChannelHandle)
 			{
-				s->stopVoice(i);
+				s->stopVoice_internal(i);
 			}
 		}
 	}
@@ -106,14 +127,18 @@ namespace SoLoud
 		mChannelHandle = 0;
 		mInstance = 0;
 		mChannels = 2;
+		for (int i = 0; i < 256; i++)
+		{
+			mFFTData[i] = 0;
+			mWaveData[i] = 0;
+		}
 	}
 	
 	BusInstance * Bus::createInstance()
 	{
 		if (mChannelHandle)
 		{
-			// We should be inside the mutex at the moment, so stop using the "internal" functions
-			mSoloud->stopVoice(mSoloud->getVoiceFromHandle(mChannelHandle));
+			stop();
 			mChannelHandle = 0;
 			mInstance = 0;
 		}
@@ -131,7 +156,7 @@ namespace SoLoud
 			{
 				if (mSoloud->mVoice[i] == mInstance)
 				{
-					mChannelHandle = mSoloud->getHandleFromVoice(i);
+					mChannelHandle = mSoloud->getHandleFromVoice_internal(i);
 				}
 			}
 		}
@@ -203,6 +228,13 @@ namespace SoLoud
 		return mSoloud->play3dClocked(aSoundTime, aSound, aPosX, aPosY, aPosZ, aVelX, aVelY, aVelZ, aVolume, mChannelHandle);
 	}
 
+	void Bus::annexSound(handle aVoiceHandle)
+	{
+		findBusHandle();
+		FOR_ALL_VOICES_PRE_EXT
+			mSoloud->mVoice[ch]->mBusHandle = mChannelHandle;
+		FOR_ALL_VOICES_POST_EXT
+	}
 
 	void Bus::setFilter(unsigned int aFilterId, Filter *aFilter)
 	{
@@ -213,7 +245,7 @@ namespace SoLoud
 
 		if (mInstance)
 		{
-			mSoloud->lockAudioMutex();
+			mSoloud->lockAudioMutex_internal();
 			delete mInstance->mFilter[aFilterId];
 			mInstance->mFilter[aFilterId] = 0;
 		
@@ -221,13 +253,13 @@ namespace SoLoud
 			{
 				mInstance->mFilter[aFilterId] = mFilter[aFilterId]->createInstance();
 			}
-			mSoloud->unlockAudioMutex();
+			mSoloud->unlockAudioMutex_internal();
 		}
 	}
 
 	result Bus::setChannels(unsigned int aChannels)
 	{
-		if (aChannels == 0 || aChannels == 3 || aChannels == 5 || aChannels > 6)
+		if (aChannels == 0 || aChannels == 3 || aChannels == 5 || aChannels == 7 || aChannels > MAX_CHANNELS)
 			return INVALID_PARAMETER;
 		mChannels = aChannels;
 		return SO_NO_ERROR;
@@ -249,7 +281,7 @@ namespace SoLoud
 	{
 		if (mInstance && mSoloud)
 		{
-			mSoloud->lockAudioMutex();
+			mSoloud->lockAudioMutex_internal();
 			float temp[1024];
 			int i;
 			for (i = 0; i < 256; i++)
@@ -259,14 +291,14 @@ namespace SoLoud
 				temp[i+512] = 0;
 				temp[i+768] = 0;
 			}
-			mSoloud->unlockAudioMutex();
+			mSoloud->unlockAudioMutex_internal();
 
 			SoLoud::FFT::fft1024(temp);
 
 			for (i = 0; i < 256; i++)
 			{
-				float real = temp[i];
-				float imag = temp[i+512];
+				float real = temp[i * 2];
+				float imag = temp[i * 2 + 1];
 				mFFTData[i] = (float)sqrt(real*real+imag*imag);
 			}
 		}
@@ -279,12 +311,38 @@ namespace SoLoud
 		if (mInstance && mSoloud)
 		{
 			int i;
-			mSoloud->lockAudioMutex();
+			mSoloud->lockAudioMutex_internal();
 			for (i = 0; i < 256; i++)
 				mWaveData[i] = mInstance->mVisualizationWaveData[i];
-			mSoloud->unlockAudioMutex();
+			mSoloud->unlockAudioMutex_internal();
 		}
 		return mWaveData;
 	}
 
+	float Bus::getApproximateVolume(unsigned int aChannel)
+	{
+		if (aChannel > mChannels)
+			return 0;
+		float vol = 0;
+		if (mInstance && mSoloud)
+		{
+			mSoloud->lockAudioMutex_internal();
+			vol = mInstance->mVisualizationChannelVolume[aChannel];
+			mSoloud->unlockAudioMutex_internal();
+		}
+		return vol;
+	}
+
+	unsigned int Bus::getActiveVoiceCount()
+	{
+		int i;
+		unsigned int count = 0;
+		findBusHandle();
+		mSoloud->lockAudioMutex_internal();
+		for (i = 0; i < VOICE_COUNT; i++)
+			if (mSoloud->mVoice[i] && mSoloud->mVoice[i]->mBusHandle == mChannelHandle)
+				count++;
+		mSoloud->unlockAudioMutex_internal();
+		return count;
+	}
 };

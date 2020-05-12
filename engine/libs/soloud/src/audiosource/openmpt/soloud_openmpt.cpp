@@ -43,37 +43,28 @@ namespace SoLoud
 		mPlaying = mModfile != NULL;		
 	}
 
-	void OpenmptInstance::getAudio(float *aBuffer, unsigned int aSamples)
+	unsigned int OpenmptInstance::getAudio(float *aBuffer, unsigned int aSamplesToRead, unsigned int aBufferSize)
 	{
 		if (mModfile == NULL)
-			return;
-		int s = aSamples;
+			return 0;
+		int s = aSamplesToRead;
 		unsigned int outofs = 0;
 		
 		while (s && mPlaying)
 		{
 			int samples = 512;
 			if (s < samples) samples = s;
-			int res = openmpt_module_read_float_stereo(mModfile, (int)floor(mSamplerate), samples, aBuffer + outofs, aBuffer + outofs + aSamples);
-			if (res == 0) mPlaying = 0;
-
-			int i;
-			for (i = res; i < samples; i++)
+			int res = openmpt_module_read_float_stereo(mModfile, (int)floor(mSamplerate), samples, aBuffer + outofs, aBuffer + outofs + aBufferSize);
+			if (res == 0)
 			{
-				aBuffer[outofs + i] = 0;
-				aBuffer[outofs + i + aSamples] = 0;
+				mPlaying = 0;
+				return outofs;
 			}
 			outofs += samples;
 			s -= samples;
 		}
 
-		if (outofs < aSamples)
-		{
-			// TODO: handle looping
-			unsigned int i;
-			for (i = outofs; i < aSamples; i++)
-				aBuffer[i] = aBuffer[i + aSamples] = 0;
-		}
+		return outofs;
 	}
 
 	bool OpenmptInstance::hasEnded()
@@ -90,7 +81,7 @@ namespace SoLoud
 		mModfile = 0;
 	}
 
-	result Openmpt::loadMem(unsigned char *aMem, unsigned int aLength, bool aCopy, bool aTakeOwnership)
+	result Openmpt::loadMem(const unsigned char *aMem, unsigned int aLength, bool aCopy, bool aTakeOwnership)
 	{
 		MemoryFile mf;
 		int res = mf.openMem(aMem, aLength, aCopy, aTakeOwnership);
@@ -129,6 +120,7 @@ namespace SoLoud
 		if (!mpf)
 		{
 			delete[] mData;
+			mData = 0;
 			mDataLen = 0;
 			return FILE_LOAD_FAILED;
 		}
@@ -147,8 +139,11 @@ namespace SoLoud
 	Openmpt::~Openmpt()
 	{
 		stop();
-		delete[] mData;
-		mData = 0;
+		if (mData)
+		{
+			delete[] mData;
+			mData = 0;
+		}
 		mDataLen = 0;
 	}
 

@@ -29,11 +29,14 @@ freely, subject to the following restrictions:
 
 namespace SoLoud
 {
-	// SDL back-end initialization call
-	result sdl_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
+	// SDL1 back-end initialization call
+	result sdl1_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
 
-	// SDL "non-dynamic" back-end initialization call
-	result sdlstatic_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
+	// SDL2 back-end initialization call
+	result sdl2_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
+
+	// SDL1 "non-dynamic" back-end initialization call
+	result sdl1static_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
 
 	// SDL2 "non-dynamic" back-end initialization call
 	result sdl2static_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
@@ -62,8 +65,20 @@ namespace SoLoud
 	// OSS back-end initialization call
 	result oss_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
 
+	// PS Vita homebrew back-end initialization call	
+	result vita_homebrew_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
+
 	// ALSA back-end initialization call
 	result alsa_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
+
+	// JACK back-end initialization call
+	result jack_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
+
+	// MiniAudio back-end initialization call
+	result miniaudio_init(SoLoud::Soloud* aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
+
+	// nosound back-end initialization call
+	result nosound_init(SoLoud::Soloud* aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
 
 	// null driver back-end initialization call
 	result null_init(SoLoud::Soloud *aSoloud, unsigned int aFlags = Soloud::CLIP_ROUNDOFF, unsigned int aSamplerate = 44100, unsigned int aBuffer = 2048, unsigned int aChannels = 2);
@@ -81,12 +96,12 @@ namespace SoLoud
 #define FOR_ALL_VOICES_PRE \
 		handle *h_ = NULL; \
 		handle th_[2] = { aVoiceHandle, 0 }; \
-		lockAudioMutex(); \
-		h_ = voiceGroupHandleToArray(aVoiceHandle); \
+		lockAudioMutex_internal(); \
+		h_ = voiceGroupHandleToArray_internal(aVoiceHandle); \
 		if (h_ == NULL) h_ = th_; \
 		while (*h_) \
 		{ \
-			int ch = getVoiceFromHandle(*h_); \
+			int ch = getVoiceFromHandle_internal(*h_); \
 			if (ch != -1)  \
 			{
 
@@ -94,12 +109,12 @@ namespace SoLoud
 			} \
 			h_++; \
 		} \
-		unlockAudioMutex();
+		unlockAudioMutex_internal();
 
 #define FOR_ALL_VOICES_PRE_3D \
 		handle *h_ = NULL; \
 		handle th_[2] = { aVoiceHandle, 0 }; \
-		h_ = voiceGroupHandleToArray(aVoiceHandle); \
+		h_ = voiceGroupHandleToArray_internal(aVoiceHandle); \
 		if (h_ == NULL) h_ = th_; \
 				while (*h_) \
 						{ \
@@ -108,6 +123,40 @@ namespace SoLoud
 						{
 
 #define FOR_ALL_VOICES_POST_3D \
+						} \
+			h_++; \
+						} 
+
+#define FOR_ALL_VOICES_PRE_EXT \
+		handle *h_ = NULL; \
+		handle th_[2] = { aVoiceHandle, 0 }; \
+		mSoloud->lockAudioMutex_internal(); \
+		h_ = mSoloud->voiceGroupHandleToArray_internal(aVoiceHandle); \
+		if (h_ == NULL) h_ = th_; \
+		while (*h_) \
+		{ \
+			int ch = mSoloud->getVoiceFromHandle_internal(*h_); \
+			if (ch != -1)  \
+			{
+
+#define FOR_ALL_VOICES_POST_EXT \
+			} \
+			h_++; \
+		} \
+		mSoloud->unlockAudioMutex_internal();
+
+#define FOR_ALL_VOICES_PRE_3D_EXT \
+		handle *h_ = NULL; \
+		handle th_[2] = { aVoiceHandle, 0 }; \
+		h_ = mSoloud->voiceGroupHandleToArray(aVoiceHandle); \
+		if (h_ == NULL) h_ = th_; \
+				while (*h_) \
+						{ \
+			int ch = (*h_ & 0xfff) - 1; \
+			if (ch != -1 && mSoloud->m3dData[ch].mHandle == *h_)  \
+						{
+
+#define FOR_ALL_VOICES_POST_3D_EXT \
 						} \
 			h_++; \
 						} 

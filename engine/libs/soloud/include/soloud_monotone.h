@@ -1,6 +1,6 @@
 /*
 MONOTONE module for SoLoud audio engine
-Copyright (c) 2013-2015 Jari Komppa
+Copyright (c) 2013-2020 Jari Komppa
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -26,6 +26,7 @@ freely, subject to the following restrictions:
 #define MONOTONE_H
 
 #include "soloud.h"
+#include "soloud_misc.h"
 
 namespace SoLoud
 {
@@ -81,20 +82,13 @@ namespace SoLoud
 		int mRowTick;
 
 		MonotoneInstance(Monotone *aParent);
-		virtual void getAudio(float *aBuffer, unsigned int aSamples);
+		virtual unsigned int getAudio(float *aBuffer, unsigned int aSamples, unsigned int aBufferSize);
 		virtual bool hasEnded();
 	};
 
 	class Monotone : public AudioSource
 	{
 	public:
-		enum MONOTONE_WAVEFORMS
-		{
-			SQUARE = 0,
-			SAW    = 1,
-			SIN    = 2,
-			SAWSIN = 3
-		};
 		
 		int mNotesHz[800];
 		int mVibTable[32];
@@ -103,9 +97,9 @@ namespace SoLoud
 		MonotoneSong mSong;
 		Monotone();
 		~Monotone();
-		result setParams(int aHardwareChannels, int aWaveform = SQUARE);
+		result setParams(int aHardwareChannels, int aWaveform = SoLoud::Misc::WAVE_SQUARE);
 		result load(const char *aFilename);
-		result loadMem(unsigned char *aMem, unsigned int aLength, bool aCopy = false, bool aTakeOwnership = true);
+		result loadMem(const unsigned char *aMem, unsigned int aLength, bool aCopy = false, bool aTakeOwnership = true);
 		result loadFile(File *aFile);
 		virtual AudioSourceInstance *createInstance();
 	public:

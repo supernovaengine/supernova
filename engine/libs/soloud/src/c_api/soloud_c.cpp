@@ -5,7 +5,7 @@
 
 /*
 SoLoud audio engine
-Copyright (c) 2013-2016 Jari Komppa
+Copyright (c) 2013-2020 Jari Komppa
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,27 +27,35 @@ freely, subject to the following restrictions:
    distribution.
 */
 
-/* SoLoud C-Api Code Generator (c)2013-2016 Jari Komppa http://iki.fi/sol/ */
+/* SoLoud C-Api Code Generator (c)2013-2020 Jari Komppa http://iki.fi/sol/ */
 
 #include "../include/soloud.h"
 #include "../include/soloud_audiosource.h"
+#include "../include/soloud_bassboostfilter.h"
 #include "../include/soloud_biquadresonantfilter.h"
-#include "../include/soloud_lofifilter.h"
 #include "../include/soloud_bus.h"
+#include "../include/soloud_dcremovalfilter.h"
 #include "../include/soloud_echofilter.h"
 #include "../include/soloud_fader.h"
+#include "../include/soloud_fft.h"
 #include "../include/soloud_fftfilter.h"
-#include "../include/soloud_bassboostfilter.h"
 #include "../include/soloud_filter.h"
-#include "../include/soloud_speech.h"
-#include "../include/soloud_wav.h"
-#include "../include/soloud_wavstream.h"
-#include "../include/soloud_sfxr.h"
 #include "../include/soloud_flangerfilter.h"
-#include "../include/soloud_dcremovalfilter.h"
-#include "../include/soloud_openmpt.h"
+#include "../include/soloud_freeverbfilter.h"
+#include "../include/soloud_lofifilter.h"
 #include "../include/soloud_monotone.h"
+#include "../include/soloud_noise.h"
+#include "../include/soloud_openmpt.h"
+#include "../include/soloud_queue.h"
+#include "../include/soloud_robotizefilter.h"
+#include "../include/soloud_sfxr.h"
+#include "../include/soloud_speech.h"
 #include "../include/soloud_tedsid.h"
+#include "../include/soloud_vic.h"
+#include "../include/soloud_vizsn.h"
+#include "../include/soloud_wav.h"
+#include "../include/soloud_waveshaperfilter.h"
+#include "../include/soloud_wavstream.h"
 
 using namespace SoLoud;
 
@@ -130,6 +138,12 @@ int Soloud_setSpeakerPosition(void * aClassPtr, unsigned int aChannel, float aX,
 	return cl->setSpeakerPosition(aChannel, aX, aY, aZ);
 }
 
+int Soloud_getSpeakerPosition(void * aClassPtr, unsigned int aChannel, float * aX, float * aY, float * aZ)
+{
+	Soloud * cl = (Soloud *)aClassPtr;
+	return cl->getSpeakerPosition(aChannel, *aX, *aY, *aZ);
+}
+
 unsigned int Soloud_play(void * aClassPtr, AudioSource * aSound)
 {
 	Soloud * cl = (Soloud *)aClassPtr;
@@ -178,10 +192,22 @@ unsigned int Soloud_play3dClockedEx(void * aClassPtr, double aSoundTime, AudioSo
 	return cl->play3dClocked(aSoundTime, *aSound, aPosX, aPosY, aPosZ, aVelX, aVelY, aVelZ, aVolume, aBus);
 }
 
-void Soloud_seek(void * aClassPtr, unsigned int aVoiceHandle, double aSeconds)
+unsigned int Soloud_playBackground(void * aClassPtr, AudioSource * aSound)
 {
 	Soloud * cl = (Soloud *)aClassPtr;
-	cl->seek(aVoiceHandle, aSeconds);
+	return cl->playBackground(*aSound);
+}
+
+unsigned int Soloud_playBackgroundEx(void * aClassPtr, AudioSource * aSound, float aVolume, int aPaused, unsigned int aBus)
+{
+	Soloud * cl = (Soloud *)aClassPtr;
+	return cl->playBackground(*aSound, aVolume, !!aPaused, aBus);
+}
+
+int Soloud_seek(void * aClassPtr, unsigned int aVoiceHandle, double aSeconds)
+{
+	Soloud * cl = (Soloud *)aClassPtr;
+	return cl->seek(aVoiceHandle, aSeconds);
 }
 
 void Soloud_stop(void * aClassPtr, unsigned int aVoiceHandle)
@@ -200,6 +226,12 @@ void Soloud_stopAudioSource(void * aClassPtr, AudioSource * aSound)
 {
 	Soloud * cl = (Soloud *)aClassPtr;
 	cl->stopAudioSource(*aSound);
+}
+
+int Soloud_countAudioSource(void * aClassPtr, AudioSource * aSound)
+{
+	Soloud * cl = (Soloud *)aClassPtr;
+	return cl->countAudioSource(*aSound);
 }
 
 void Soloud_setFilterParameter(void * aClassPtr, unsigned int aVoiceHandle, unsigned int aFilterId, unsigned int aAttributeId, float aValue)
@@ -230,6 +262,12 @@ double Soloud_getStreamTime(void * aClassPtr, unsigned int aVoiceHandle)
 {
 	Soloud * cl = (Soloud *)aClassPtr;
 	return cl->getStreamTime(aVoiceHandle);
+}
+
+double Soloud_getStreamPosition(void * aClassPtr, unsigned int aVoiceHandle)
+{
+	Soloud * cl = (Soloud *)aClassPtr;
+	return cl->getStreamPosition(aVoiceHandle);
 }
 
 int Soloud_getPause(void * aClassPtr, unsigned int aVoiceHandle)
@@ -314,6 +352,18 @@ int Soloud_getLooping(void * aClassPtr, unsigned int aVoiceHandle)
 {
 	Soloud * cl = (Soloud *)aClassPtr;
 	return cl->getLooping(aVoiceHandle);
+}
+
+double Soloud_getLoopPoint(void * aClassPtr, unsigned int aVoiceHandle)
+{
+	Soloud * cl = (Soloud *)aClassPtr;
+	return cl->getLoopPoint(aVoiceHandle);
+}
+
+void Soloud_setLoopPoint(void * aClassPtr, unsigned int aVoiceHandle, double aLoopPoint)
+{
+	Soloud * cl = (Soloud *)aClassPtr;
+	cl->setLoopPoint(aVoiceHandle, aLoopPoint);
 }
 
 void Soloud_setLooping(void * aClassPtr, unsigned int aVoiceHandle, int aLooping)
@@ -490,6 +540,12 @@ float * Soloud_getWave(void * aClassPtr)
 	return cl->getWave();
 }
 
+float Soloud_getApproximateVolume(void * aClassPtr, unsigned int aChannel)
+{
+	Soloud * cl = (Soloud *)aClassPtr;
+	return cl->getApproximateVolume(aChannel);
+}
+
 unsigned int Soloud_getLoopCount(void * aClassPtr, unsigned int aVoiceHandle)
 {
 	Soloud * cl = (Soloud *)aClassPtr;
@@ -640,15 +696,50 @@ void Soloud_mixSigned16(void * aClassPtr, short * aBuffer, unsigned int aSamples
 	cl->mixSigned16(aBuffer, aSamples);
 }
 
-void AudioAttenuator_destroy(void * aClassPtr)
+void BassboostFilter_destroy(void * aClassPtr)
 {
-  delete (AudioAttenuator *)aClassPtr;
+  delete (BassboostFilter *)aClassPtr;
 }
 
-float AudioAttenuator_attenuate(void * aClassPtr, float aDistance, float aMinDistance, float aMaxDistance, float aRolloffFactor)
+int BassboostFilter_getParamCount(void * aClassPtr)
 {
-	AudioAttenuator * cl = (AudioAttenuator *)aClassPtr;
-	return cl->attenuate(aDistance, aMinDistance, aMaxDistance, aRolloffFactor);
+	BassboostFilter * cl = (BassboostFilter *)aClassPtr;
+	return cl->getParamCount();
+}
+
+const char * BassboostFilter_getParamName(void * aClassPtr, unsigned int aParamIndex)
+{
+	BassboostFilter * cl = (BassboostFilter *)aClassPtr;
+	return cl->getParamName(aParamIndex);
+}
+
+unsigned int BassboostFilter_getParamType(void * aClassPtr, unsigned int aParamIndex)
+{
+	BassboostFilter * cl = (BassboostFilter *)aClassPtr;
+	return cl->getParamType(aParamIndex);
+}
+
+float BassboostFilter_getParamMax(void * aClassPtr, unsigned int aParamIndex)
+{
+	BassboostFilter * cl = (BassboostFilter *)aClassPtr;
+	return cl->getParamMax(aParamIndex);
+}
+
+float BassboostFilter_getParamMin(void * aClassPtr, unsigned int aParamIndex)
+{
+	BassboostFilter * cl = (BassboostFilter *)aClassPtr;
+	return cl->getParamMin(aParamIndex);
+}
+
+int BassboostFilter_setParams(void * aClassPtr, float aBoost)
+{
+	BassboostFilter * cl = (BassboostFilter *)aClassPtr;
+	return cl->setParams(aBoost);
+}
+
+void * BassboostFilter_create()
+{
+  return (void *)new BassboostFilter;
 }
 
 void BiquadResonantFilter_destroy(void * aClassPtr)
@@ -656,31 +747,45 @@ void BiquadResonantFilter_destroy(void * aClassPtr)
   delete (BiquadResonantFilter *)aClassPtr;
 }
 
+int BiquadResonantFilter_getParamCount(void * aClassPtr)
+{
+	BiquadResonantFilter * cl = (BiquadResonantFilter *)aClassPtr;
+	return cl->getParamCount();
+}
+
+const char * BiquadResonantFilter_getParamName(void * aClassPtr, unsigned int aParamIndex)
+{
+	BiquadResonantFilter * cl = (BiquadResonantFilter *)aClassPtr;
+	return cl->getParamName(aParamIndex);
+}
+
+unsigned int BiquadResonantFilter_getParamType(void * aClassPtr, unsigned int aParamIndex)
+{
+	BiquadResonantFilter * cl = (BiquadResonantFilter *)aClassPtr;
+	return cl->getParamType(aParamIndex);
+}
+
+float BiquadResonantFilter_getParamMax(void * aClassPtr, unsigned int aParamIndex)
+{
+	BiquadResonantFilter * cl = (BiquadResonantFilter *)aClassPtr;
+	return cl->getParamMax(aParamIndex);
+}
+
+float BiquadResonantFilter_getParamMin(void * aClassPtr, unsigned int aParamIndex)
+{
+	BiquadResonantFilter * cl = (BiquadResonantFilter *)aClassPtr;
+	return cl->getParamMin(aParamIndex);
+}
+
 void * BiquadResonantFilter_create()
 {
   return (void *)new BiquadResonantFilter;
 }
 
-int BiquadResonantFilter_setParams(void * aClassPtr, int aType, float aSampleRate, float aFrequency, float aResonance)
+int BiquadResonantFilter_setParams(void * aClassPtr, int aType, float aFrequency, float aResonance)
 {
 	BiquadResonantFilter * cl = (BiquadResonantFilter *)aClassPtr;
-	return cl->setParams(aType, aSampleRate, aFrequency, aResonance);
-}
-
-void LofiFilter_destroy(void * aClassPtr)
-{
-  delete (LofiFilter *)aClassPtr;
-}
-
-void * LofiFilter_create()
-{
-  return (void *)new LofiFilter;
-}
-
-int LofiFilter_setParams(void * aClassPtr, float aSampleRate, float aBitdepth)
-{
-	LofiFilter * cl = (LofiFilter *)aClassPtr;
-	return cl->setParams(aSampleRate, aBitdepth);
+	return cl->setParams(aType, aFrequency, aResonance);
 }
 
 void Bus_destroy(void * aClassPtr)
@@ -759,6 +864,12 @@ void Bus_setVisualizationEnable(void * aClassPtr, int aEnable)
 	cl->setVisualizationEnable(!!aEnable);
 }
 
+void Bus_annexSound(void * aClassPtr, unsigned int aVoiceHandle)
+{
+	Bus * cl = (Bus *)aClassPtr;
+	cl->annexSound(aVoiceHandle);
+}
+
 float * Bus_calcFFT(void * aClassPtr)
 {
 	Bus * cl = (Bus *)aClassPtr;
@@ -769,6 +880,18 @@ float * Bus_getWave(void * aClassPtr)
 {
 	Bus * cl = (Bus *)aClassPtr;
 	return cl->getWave();
+}
+
+float Bus_getApproximateVolume(void * aClassPtr, unsigned int aChannel)
+{
+	Bus * cl = (Bus *)aClassPtr;
+	return cl->getApproximateVolume(aChannel);
+}
+
+unsigned int Bus_getActiveVoiceCount(void * aClassPtr)
+{
+	Bus * cl = (Bus *)aClassPtr;
+	return cl->getActiveVoiceCount();
 }
 
 void Bus_setVolume(void * aClassPtr, float aVolume)
@@ -799,12 +922,6 @@ void Bus_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
 {
 	Bus * cl = (Bus *)aClassPtr;
 	cl->set3dDopplerFactor(aDopplerFactor);
-}
-
-void Bus_set3dProcessing(void * aClassPtr, int aDo3dProcessing)
-{
-	Bus * cl = (Bus *)aClassPtr;
-	cl->set3dProcessing(!!aDo3dProcessing);
 }
 
 void Bus_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
@@ -843,15 +960,109 @@ void Bus_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
 	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
 }
 
+void Bus_setLoopPoint(void * aClassPtr, double aLoopPoint)
+{
+	Bus * cl = (Bus *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double Bus_getLoopPoint(void * aClassPtr)
+{
+	Bus * cl = (Bus *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
 void Bus_stop(void * aClassPtr)
 {
 	Bus * cl = (Bus *)aClassPtr;
 	cl->stop();
 }
 
+void DCRemovalFilter_destroy(void * aClassPtr)
+{
+  delete (DCRemovalFilter *)aClassPtr;
+}
+
+void * DCRemovalFilter_create()
+{
+  return (void *)new DCRemovalFilter;
+}
+
+int DCRemovalFilter_setParams(void * aClassPtr)
+{
+	DCRemovalFilter * cl = (DCRemovalFilter *)aClassPtr;
+	return cl->setParams();
+}
+
+int DCRemovalFilter_setParamsEx(void * aClassPtr, float aLength)
+{
+	DCRemovalFilter * cl = (DCRemovalFilter *)aClassPtr;
+	return cl->setParams(aLength);
+}
+
+int DCRemovalFilter_getParamCount(void * aClassPtr)
+{
+	DCRemovalFilter * cl = (DCRemovalFilter *)aClassPtr;
+	return cl->getParamCount();
+}
+
+const char * DCRemovalFilter_getParamName(void * aClassPtr, unsigned int aParamIndex)
+{
+	DCRemovalFilter * cl = (DCRemovalFilter *)aClassPtr;
+	return cl->getParamName(aParamIndex);
+}
+
+unsigned int DCRemovalFilter_getParamType(void * aClassPtr, unsigned int aParamIndex)
+{
+	DCRemovalFilter * cl = (DCRemovalFilter *)aClassPtr;
+	return cl->getParamType(aParamIndex);
+}
+
+float DCRemovalFilter_getParamMax(void * aClassPtr, unsigned int aParamIndex)
+{
+	DCRemovalFilter * cl = (DCRemovalFilter *)aClassPtr;
+	return cl->getParamMax(aParamIndex);
+}
+
+float DCRemovalFilter_getParamMin(void * aClassPtr, unsigned int aParamIndex)
+{
+	DCRemovalFilter * cl = (DCRemovalFilter *)aClassPtr;
+	return cl->getParamMin(aParamIndex);
+}
+
 void EchoFilter_destroy(void * aClassPtr)
 {
   delete (EchoFilter *)aClassPtr;
+}
+
+int EchoFilter_getParamCount(void * aClassPtr)
+{
+	EchoFilter * cl = (EchoFilter *)aClassPtr;
+	return cl->getParamCount();
+}
+
+const char * EchoFilter_getParamName(void * aClassPtr, unsigned int aParamIndex)
+{
+	EchoFilter * cl = (EchoFilter *)aClassPtr;
+	return cl->getParamName(aParamIndex);
+}
+
+unsigned int EchoFilter_getParamType(void * aClassPtr, unsigned int aParamIndex)
+{
+	EchoFilter * cl = (EchoFilter *)aClassPtr;
+	return cl->getParamType(aParamIndex);
+}
+
+float EchoFilter_getParamMax(void * aClassPtr, unsigned int aParamIndex)
+{
+	EchoFilter * cl = (EchoFilter *)aClassPtr;
+	return cl->getParamMax(aParamIndex);
+}
+
+float EchoFilter_getParamMin(void * aClassPtr, unsigned int aParamIndex)
+{
+	EchoFilter * cl = (EchoFilter *)aClassPtr;
+	return cl->getParamMin(aParamIndex);
 }
 
 void * EchoFilter_create()
@@ -881,402 +1092,726 @@ void * FFTFilter_create()
   return (void *)new FFTFilter;
 }
 
-void BassboostFilter_destroy(void * aClassPtr)
+int FFTFilter_getParamCount(void * aClassPtr)
 {
-  delete (BassboostFilter *)aClassPtr;
+	FFTFilter * cl = (FFTFilter *)aClassPtr;
+	return cl->getParamCount();
 }
 
-int BassboostFilter_setParams(void * aClassPtr, float aBoost)
+const char * FFTFilter_getParamName(void * aClassPtr, unsigned int aParamIndex)
 {
-	BassboostFilter * cl = (BassboostFilter *)aClassPtr;
-	return cl->setParams(aBoost);
+	FFTFilter * cl = (FFTFilter *)aClassPtr;
+	return cl->getParamName(aParamIndex);
 }
 
-void * BassboostFilter_create()
+unsigned int FFTFilter_getParamType(void * aClassPtr, unsigned int aParamIndex)
 {
-  return (void *)new BassboostFilter;
+	FFTFilter * cl = (FFTFilter *)aClassPtr;
+	return cl->getParamType(aParamIndex);
 }
 
-void Speech_destroy(void * aClassPtr)
+float FFTFilter_getParamMax(void * aClassPtr, unsigned int aParamIndex)
 {
-  delete (Speech *)aClassPtr;
+	FFTFilter * cl = (FFTFilter *)aClassPtr;
+	return cl->getParamMax(aParamIndex);
 }
 
-void * Speech_create()
+float FFTFilter_getParamMin(void * aClassPtr, unsigned int aParamIndex)
 {
-  return (void *)new Speech;
+	FFTFilter * cl = (FFTFilter *)aClassPtr;
+	return cl->getParamMin(aParamIndex);
 }
 
-int Speech_setText(void * aClassPtr, const char * aText)
+void FlangerFilter_destroy(void * aClassPtr)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	return cl->setText(aText);
+  delete (FlangerFilter *)aClassPtr;
 }
 
-void Speech_setVolume(void * aClassPtr, float aVolume)
+int FlangerFilter_getParamCount(void * aClassPtr)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->setVolume(aVolume);
+	FlangerFilter * cl = (FlangerFilter *)aClassPtr;
+	return cl->getParamCount();
 }
 
-void Speech_setLooping(void * aClassPtr, int aLoop)
+const char * FlangerFilter_getParamName(void * aClassPtr, unsigned int aParamIndex)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->setLooping(!!aLoop);
+	FlangerFilter * cl = (FlangerFilter *)aClassPtr;
+	return cl->getParamName(aParamIndex);
 }
 
-void Speech_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
+unsigned int FlangerFilter_getParamType(void * aClassPtr, unsigned int aParamIndex)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
+	FlangerFilter * cl = (FlangerFilter *)aClassPtr;
+	return cl->getParamType(aParamIndex);
 }
 
-void Speech_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
+float FlangerFilter_getParamMax(void * aClassPtr, unsigned int aParamIndex)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
+	FlangerFilter * cl = (FlangerFilter *)aClassPtr;
+	return cl->getParamMax(aParamIndex);
 }
 
-void Speech_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
+float FlangerFilter_getParamMin(void * aClassPtr, unsigned int aParamIndex)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->set3dDopplerFactor(aDopplerFactor);
+	FlangerFilter * cl = (FlangerFilter *)aClassPtr;
+	return cl->getParamMin(aParamIndex);
 }
 
-void Speech_set3dProcessing(void * aClassPtr, int aDo3dProcessing)
+void * FlangerFilter_create()
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->set3dProcessing(!!aDo3dProcessing);
+  return (void *)new FlangerFilter;
 }
 
-void Speech_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
+int FlangerFilter_setParams(void * aClassPtr, float aDelay, float aFreq)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->set3dListenerRelative(!!aListenerRelative);
+	FlangerFilter * cl = (FlangerFilter *)aClassPtr;
+	return cl->setParams(aDelay, aFreq);
 }
 
-void Speech_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
+void FreeverbFilter_destroy(void * aClassPtr)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->set3dDistanceDelay(!!aDistanceDelay);
+  delete (FreeverbFilter *)aClassPtr;
 }
 
-void Speech_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
+int FreeverbFilter_getParamCount(void * aClassPtr)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->set3dCollider(aCollider);
+	FreeverbFilter * cl = (FreeverbFilter *)aClassPtr;
+	return cl->getParamCount();
 }
 
-void Speech_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
+const char * FreeverbFilter_getParamName(void * aClassPtr, unsigned int aParamIndex)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->set3dCollider(aCollider, aUserData);
+	FreeverbFilter * cl = (FreeverbFilter *)aClassPtr;
+	return cl->getParamName(aParamIndex);
 }
 
-void Speech_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
+unsigned int FreeverbFilter_getParamType(void * aClassPtr, unsigned int aParamIndex)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->set3dAttenuator(aAttenuator);
+	FreeverbFilter * cl = (FreeverbFilter *)aClassPtr;
+	return cl->getParamType(aParamIndex);
 }
 
-void Speech_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
+float FreeverbFilter_getParamMax(void * aClassPtr, unsigned int aParamIndex)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
+	FreeverbFilter * cl = (FreeverbFilter *)aClassPtr;
+	return cl->getParamMax(aParamIndex);
 }
 
-void Speech_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+float FreeverbFilter_getParamMin(void * aClassPtr, unsigned int aParamIndex)
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->setFilter(aFilterId, aFilter);
+	FreeverbFilter * cl = (FreeverbFilter *)aClassPtr;
+	return cl->getParamMin(aParamIndex);
 }
 
-void Speech_stop(void * aClassPtr)
+void * FreeverbFilter_create()
 {
-	Speech * cl = (Speech *)aClassPtr;
-	cl->stop();
+  return (void *)new FreeverbFilter;
 }
 
-void Wav_destroy(void * aClassPtr)
+int FreeverbFilter_setParams(void * aClassPtr, float aMode, float aRoomSize, float aDamp, float aWidth)
 {
-  delete (Wav *)aClassPtr;
+	FreeverbFilter * cl = (FreeverbFilter *)aClassPtr;
+	return cl->setParams(aMode, aRoomSize, aDamp, aWidth);
 }
 
-void * Wav_create()
+void LofiFilter_destroy(void * aClassPtr)
 {
-  return (void *)new Wav;
+  delete (LofiFilter *)aClassPtr;
 }
 
-int Wav_load(void * aClassPtr, const char * aFilename)
+int LofiFilter_getParamCount(void * aClassPtr)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	LofiFilter * cl = (LofiFilter *)aClassPtr;
+	return cl->getParamCount();
+}
+
+const char * LofiFilter_getParamName(void * aClassPtr, unsigned int aParamIndex)
+{
+	LofiFilter * cl = (LofiFilter *)aClassPtr;
+	return cl->getParamName(aParamIndex);
+}
+
+unsigned int LofiFilter_getParamType(void * aClassPtr, unsigned int aParamIndex)
+{
+	LofiFilter * cl = (LofiFilter *)aClassPtr;
+	return cl->getParamType(aParamIndex);
+}
+
+float LofiFilter_getParamMax(void * aClassPtr, unsigned int aParamIndex)
+{
+	LofiFilter * cl = (LofiFilter *)aClassPtr;
+	return cl->getParamMax(aParamIndex);
+}
+
+float LofiFilter_getParamMin(void * aClassPtr, unsigned int aParamIndex)
+{
+	LofiFilter * cl = (LofiFilter *)aClassPtr;
+	return cl->getParamMin(aParamIndex);
+}
+
+void * LofiFilter_create()
+{
+  return (void *)new LofiFilter;
+}
+
+int LofiFilter_setParams(void * aClassPtr, float aSampleRate, float aBitdepth)
+{
+	LofiFilter * cl = (LofiFilter *)aClassPtr;
+	return cl->setParams(aSampleRate, aBitdepth);
+}
+
+void Monotone_destroy(void * aClassPtr)
+{
+  delete (Monotone *)aClassPtr;
+}
+
+void * Monotone_create()
+{
+  return (void *)new Monotone;
+}
+
+int Monotone_setParams(void * aClassPtr, int aHardwareChannels)
+{
+	Monotone * cl = (Monotone *)aClassPtr;
+	return cl->setParams(aHardwareChannels);
+}
+
+int Monotone_setParamsEx(void * aClassPtr, int aHardwareChannels, int aWaveform)
+{
+	Monotone * cl = (Monotone *)aClassPtr;
+	return cl->setParams(aHardwareChannels, aWaveform);
+}
+
+int Monotone_load(void * aClassPtr, const char * aFilename)
+{
+	Monotone * cl = (Monotone *)aClassPtr;
 	return cl->load(aFilename);
 }
 
-int Wav_loadMem(void * aClassPtr, unsigned char * aMem, unsigned int aLength)
+int Monotone_loadMem(void * aClassPtr, const unsigned char * aMem, unsigned int aLength)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	return cl->loadMem(aMem, aLength);
 }
 
-int Wav_loadMemEx(void * aClassPtr, unsigned char * aMem, unsigned int aLength, int aCopy, int aTakeOwnership)
+int Monotone_loadMemEx(void * aClassPtr, const unsigned char * aMem, unsigned int aLength, int aCopy, int aTakeOwnership)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	return cl->loadMem(aMem, aLength, !!aCopy, !!aTakeOwnership);
 }
 
-int Wav_loadFile(void * aClassPtr, File * aFile)
+int Monotone_loadFile(void * aClassPtr, File * aFile)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	return cl->loadFile(aFile);
 }
 
-double Wav_getLength(void * aClassPtr)
+void Monotone_setVolume(void * aClassPtr, float aVolume)
 {
-	Wav * cl = (Wav *)aClassPtr;
-	return cl->getLength();
-}
-
-void Wav_setVolume(void * aClassPtr, float aVolume)
-{
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->setVolume(aVolume);
 }
 
-void Wav_setLooping(void * aClassPtr, int aLoop)
+void Monotone_setLooping(void * aClassPtr, int aLoop)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->setLooping(!!aLoop);
 }
 
-void Wav_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
+void Monotone_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
 }
 
-void Wav_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
+void Monotone_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
 }
 
-void Wav_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
+void Monotone_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->set3dDopplerFactor(aDopplerFactor);
 }
 
-void Wav_set3dProcessing(void * aClassPtr, int aDo3dProcessing)
+void Monotone_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
 {
-	Wav * cl = (Wav *)aClassPtr;
-	cl->set3dProcessing(!!aDo3dProcessing);
-}
-
-void Wav_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
-{
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->set3dListenerRelative(!!aListenerRelative);
 }
 
-void Wav_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
+void Monotone_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->set3dDistanceDelay(!!aDistanceDelay);
 }
 
-void Wav_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
+void Monotone_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->set3dCollider(aCollider);
 }
 
-void Wav_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
+void Monotone_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->set3dCollider(aCollider, aUserData);
 }
 
-void Wav_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
+void Monotone_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->set3dAttenuator(aAttenuator);
 }
 
-void Wav_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
+void Monotone_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
 }
 
-void Wav_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+void Monotone_setLoopPoint(void * aClassPtr, double aLoopPoint)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double Monotone_getLoopPoint(void * aClassPtr)
+{
+	Monotone * cl = (Monotone *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
+void Monotone_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+{
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->setFilter(aFilterId, aFilter);
 }
 
-void Wav_stop(void * aClassPtr)
+void Monotone_stop(void * aClassPtr)
 {
-	Wav * cl = (Wav *)aClassPtr;
+	Monotone * cl = (Monotone *)aClassPtr;
 	cl->stop();
 }
 
-void WavStream_destroy(void * aClassPtr)
+void Noise_destroy(void * aClassPtr)
 {
-  delete (WavStream *)aClassPtr;
+  delete (Noise *)aClassPtr;
 }
 
-void * WavStream_create()
+void * Noise_create()
 {
-  return (void *)new WavStream;
+  return (void *)new Noise;
 }
 
-int WavStream_load(void * aClassPtr, const char * aFilename)
+void Noise_setOctaveScale(void * aClassPtr, float aOct0, float aOct1, float aOct2, float aOct3, float aOct4, float aOct5, float aOct6, float aOct7, float aOct8, float aOct9)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Noise * cl = (Noise *)aClassPtr;
+	cl->setOctaveScale(aOct0, aOct1, aOct2, aOct3, aOct4, aOct5, aOct6, aOct7, aOct8, aOct9);
+}
+
+void Noise_setType(void * aClassPtr, int aType)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->setType(aType);
+}
+
+void Noise_setVolume(void * aClassPtr, float aVolume)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->setVolume(aVolume);
+}
+
+void Noise_setLooping(void * aClassPtr, int aLoop)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->setLooping(!!aLoop);
+}
+
+void Noise_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
+}
+
+void Noise_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
+}
+
+void Noise_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->set3dDopplerFactor(aDopplerFactor);
+}
+
+void Noise_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->set3dListenerRelative(!!aListenerRelative);
+}
+
+void Noise_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->set3dDistanceDelay(!!aDistanceDelay);
+}
+
+void Noise_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->set3dCollider(aCollider);
+}
+
+void Noise_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->set3dCollider(aCollider, aUserData);
+}
+
+void Noise_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->set3dAttenuator(aAttenuator);
+}
+
+void Noise_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
+}
+
+void Noise_setLoopPoint(void * aClassPtr, double aLoopPoint)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double Noise_getLoopPoint(void * aClassPtr)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
+void Noise_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->setFilter(aFilterId, aFilter);
+}
+
+void Noise_stop(void * aClassPtr)
+{
+	Noise * cl = (Noise *)aClassPtr;
+	cl->stop();
+}
+
+void Openmpt_destroy(void * aClassPtr)
+{
+  delete (Openmpt *)aClassPtr;
+}
+
+void * Openmpt_create()
+{
+  return (void *)new Openmpt;
+}
+
+int Openmpt_load(void * aClassPtr, const char * aFilename)
+{
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	return cl->load(aFilename);
 }
 
-int WavStream_loadMem(void * aClassPtr, unsigned char * aData, unsigned int aDataLen)
+int Openmpt_loadMem(void * aClassPtr, const unsigned char * aMem, unsigned int aLength)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
-	return cl->loadMem(aData, aDataLen);
+	Openmpt * cl = (Openmpt *)aClassPtr;
+	return cl->loadMem(aMem, aLength);
 }
 
-int WavStream_loadMemEx(void * aClassPtr, unsigned char * aData, unsigned int aDataLen, int aCopy, int aTakeOwnership)
+int Openmpt_loadMemEx(void * aClassPtr, const unsigned char * aMem, unsigned int aLength, int aCopy, int aTakeOwnership)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
-	return cl->loadMem(aData, aDataLen, !!aCopy, !!aTakeOwnership);
+	Openmpt * cl = (Openmpt *)aClassPtr;
+	return cl->loadMem(aMem, aLength, !!aCopy, !!aTakeOwnership);
 }
 
-int WavStream_loadToMem(void * aClassPtr, const char * aFilename)
+int Openmpt_loadFile(void * aClassPtr, File * aFile)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
-	return cl->loadToMem(aFilename);
-}
-
-int WavStream_loadFile(void * aClassPtr, File * aFile)
-{
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	return cl->loadFile(aFile);
 }
 
-int WavStream_loadFileToMem(void * aClassPtr, File * aFile)
+void Openmpt_setVolume(void * aClassPtr, float aVolume)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
-	return cl->loadFileToMem(aFile);
-}
-
-double WavStream_getLength(void * aClassPtr)
-{
-	WavStream * cl = (WavStream *)aClassPtr;
-	return cl->getLength();
-}
-
-void WavStream_setVolume(void * aClassPtr, float aVolume)
-{
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->setVolume(aVolume);
 }
 
-void WavStream_setLooping(void * aClassPtr, int aLoop)
+void Openmpt_setLooping(void * aClassPtr, int aLoop)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->setLooping(!!aLoop);
 }
 
-void WavStream_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
+void Openmpt_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
 }
 
-void WavStream_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
+void Openmpt_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
 }
 
-void WavStream_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
+void Openmpt_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->set3dDopplerFactor(aDopplerFactor);
 }
 
-void WavStream_set3dProcessing(void * aClassPtr, int aDo3dProcessing)
+void Openmpt_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
-	cl->set3dProcessing(!!aDo3dProcessing);
-}
-
-void WavStream_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
-{
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->set3dListenerRelative(!!aListenerRelative);
 }
 
-void WavStream_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
+void Openmpt_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->set3dDistanceDelay(!!aDistanceDelay);
 }
 
-void WavStream_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
+void Openmpt_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->set3dCollider(aCollider);
 }
 
-void WavStream_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
+void Openmpt_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->set3dCollider(aCollider, aUserData);
 }
 
-void WavStream_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
+void Openmpt_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->set3dAttenuator(aAttenuator);
 }
 
-void WavStream_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
+void Openmpt_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
 }
 
-void WavStream_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+void Openmpt_setLoopPoint(void * aClassPtr, double aLoopPoint)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double Openmpt_getLoopPoint(void * aClassPtr)
+{
+	Openmpt * cl = (Openmpt *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
+void Openmpt_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+{
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->setFilter(aFilterId, aFilter);
 }
 
-void WavStream_stop(void * aClassPtr)
+void Openmpt_stop(void * aClassPtr)
 {
-	WavStream * cl = (WavStream *)aClassPtr;
+	Openmpt * cl = (Openmpt *)aClassPtr;
 	cl->stop();
 }
 
-void Prg_destroy(void * aClassPtr)
+void Queue_destroy(void * aClassPtr)
 {
-  delete (Prg *)aClassPtr;
+  delete (Queue *)aClassPtr;
 }
 
-void * Prg_create()
+void * Queue_create()
 {
-  return (void *)new Prg;
+  return (void *)new Queue;
 }
 
-unsigned int Prg_rand(void * aClassPtr)
+int Queue_play(void * aClassPtr, AudioSource * aSound)
 {
-	Prg * cl = (Prg *)aClassPtr;
-	return cl->rand();
+	Queue * cl = (Queue *)aClassPtr;
+	return cl->play(*aSound);
 }
 
-void Prg_srand(void * aClassPtr, int aSeed)
+unsigned int Queue_getQueueCount(void * aClassPtr)
 {
-	Prg * cl = (Prg *)aClassPtr;
-	cl->srand(aSeed);
+	Queue * cl = (Queue *)aClassPtr;
+	return cl->getQueueCount();
+}
+
+int Queue_isCurrentlyPlaying(void * aClassPtr, AudioSource * aSound)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	return cl->isCurrentlyPlaying(*aSound);
+}
+
+int Queue_setParamsFromAudioSource(void * aClassPtr, AudioSource * aSound)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	return cl->setParamsFromAudioSource(*aSound);
+}
+
+int Queue_setParams(void * aClassPtr, float aSamplerate)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	return cl->setParams(aSamplerate);
+}
+
+int Queue_setParamsEx(void * aClassPtr, float aSamplerate, unsigned int aChannels)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	return cl->setParams(aSamplerate, aChannels);
+}
+
+void Queue_setVolume(void * aClassPtr, float aVolume)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->setVolume(aVolume);
+}
+
+void Queue_setLooping(void * aClassPtr, int aLoop)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->setLooping(!!aLoop);
+}
+
+void Queue_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
+}
+
+void Queue_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
+}
+
+void Queue_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->set3dDopplerFactor(aDopplerFactor);
+}
+
+void Queue_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->set3dListenerRelative(!!aListenerRelative);
+}
+
+void Queue_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->set3dDistanceDelay(!!aDistanceDelay);
+}
+
+void Queue_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->set3dCollider(aCollider);
+}
+
+void Queue_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->set3dCollider(aCollider, aUserData);
+}
+
+void Queue_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->set3dAttenuator(aAttenuator);
+}
+
+void Queue_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
+}
+
+void Queue_setLoopPoint(void * aClassPtr, double aLoopPoint)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double Queue_getLoopPoint(void * aClassPtr)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
+void Queue_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->setFilter(aFilterId, aFilter);
+}
+
+void Queue_stop(void * aClassPtr)
+{
+	Queue * cl = (Queue *)aClassPtr;
+	cl->stop();
+}
+
+void RobotizeFilter_destroy(void * aClassPtr)
+{
+  delete (RobotizeFilter *)aClassPtr;
+}
+
+int RobotizeFilter_getParamCount(void * aClassPtr)
+{
+	RobotizeFilter * cl = (RobotizeFilter *)aClassPtr;
+	return cl->getParamCount();
+}
+
+const char * RobotizeFilter_getParamName(void * aClassPtr, unsigned int aParamIndex)
+{
+	RobotizeFilter * cl = (RobotizeFilter *)aClassPtr;
+	return cl->getParamName(aParamIndex);
+}
+
+unsigned int RobotizeFilter_getParamType(void * aClassPtr, unsigned int aParamIndex)
+{
+	RobotizeFilter * cl = (RobotizeFilter *)aClassPtr;
+	return cl->getParamType(aParamIndex);
+}
+
+float RobotizeFilter_getParamMax(void * aClassPtr, unsigned int aParamIndex)
+{
+	RobotizeFilter * cl = (RobotizeFilter *)aClassPtr;
+	return cl->getParamMax(aParamIndex);
+}
+
+float RobotizeFilter_getParamMin(void * aClassPtr, unsigned int aParamIndex)
+{
+	RobotizeFilter * cl = (RobotizeFilter *)aClassPtr;
+	return cl->getParamMin(aParamIndex);
+}
+
+void RobotizeFilter_setParams(void * aClassPtr, float aFreq, int aWaveform)
+{
+	RobotizeFilter * cl = (RobotizeFilter *)aClassPtr;
+	cl->setParams(aFreq, aWaveform);
+}
+
+void * RobotizeFilter_create()
+{
+  return (void *)new RobotizeFilter;
 }
 
 void Sfxr_destroy(void * aClassPtr)
@@ -1355,12 +1890,6 @@ void Sfxr_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
 	cl->set3dDopplerFactor(aDopplerFactor);
 }
 
-void Sfxr_set3dProcessing(void * aClassPtr, int aDo3dProcessing)
-{
-	Sfxr * cl = (Sfxr *)aClassPtr;
-	cl->set3dProcessing(!!aDo3dProcessing);
-}
-
 void Sfxr_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
 {
 	Sfxr * cl = (Sfxr *)aClassPtr;
@@ -1397,6 +1926,18 @@ void Sfxr_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
 	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
 }
 
+void Sfxr_setLoopPoint(void * aClassPtr, double aLoopPoint)
+{
+	Sfxr * cl = (Sfxr *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double Sfxr_getLoopPoint(void * aClassPtr)
+{
+	Sfxr * cl = (Sfxr *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
 void Sfxr_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
 {
 	Sfxr * cl = (Sfxr *)aClassPtr;
@@ -1409,289 +1950,121 @@ void Sfxr_stop(void * aClassPtr)
 	cl->stop();
 }
 
-void FlangerFilter_destroy(void * aClassPtr)
+void Speech_destroy(void * aClassPtr)
 {
-  delete (FlangerFilter *)aClassPtr;
+  delete (Speech *)aClassPtr;
 }
 
-void * FlangerFilter_create()
+void * Speech_create()
 {
-  return (void *)new FlangerFilter;
+  return (void *)new Speech;
 }
 
-int FlangerFilter_setParams(void * aClassPtr, float aDelay, float aFreq)
+int Speech_setText(void * aClassPtr, const char * aText)
 {
-	FlangerFilter * cl = (FlangerFilter *)aClassPtr;
-	return cl->setParams(aDelay, aFreq);
+	Speech * cl = (Speech *)aClassPtr;
+	return cl->setText(aText);
 }
 
-void DCRemovalFilter_destroy(void * aClassPtr)
+int Speech_setParams(void * aClassPtr)
 {
-  delete (DCRemovalFilter *)aClassPtr;
-}
-
-void * DCRemovalFilter_create()
-{
-  return (void *)new DCRemovalFilter;
-}
-
-int DCRemovalFilter_setParams(void * aClassPtr)
-{
-	DCRemovalFilter * cl = (DCRemovalFilter *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	return cl->setParams();
 }
 
-int DCRemovalFilter_setParamsEx(void * aClassPtr, float aLength)
+int Speech_setParamsEx(void * aClassPtr, unsigned int aBaseFrequency, float aBaseSpeed, float aBaseDeclination, int aBaseWaveform)
 {
-	DCRemovalFilter * cl = (DCRemovalFilter *)aClassPtr;
-	return cl->setParams(aLength);
+	Speech * cl = (Speech *)aClassPtr;
+	return cl->setParams(aBaseFrequency, aBaseSpeed, aBaseDeclination, aBaseWaveform);
 }
 
-void Openmpt_destroy(void * aClassPtr)
+void Speech_setVolume(void * aClassPtr, float aVolume)
 {
-  delete (Openmpt *)aClassPtr;
-}
-
-void * Openmpt_create()
-{
-  return (void *)new Openmpt;
-}
-
-int Openmpt_load(void * aClassPtr, const char * aFilename)
-{
-	Openmpt * cl = (Openmpt *)aClassPtr;
-	return cl->load(aFilename);
-}
-
-int Openmpt_loadMem(void * aClassPtr, unsigned char * aMem, unsigned int aLength)
-{
-	Openmpt * cl = (Openmpt *)aClassPtr;
-	return cl->loadMem(aMem, aLength);
-}
-
-int Openmpt_loadMemEx(void * aClassPtr, unsigned char * aMem, unsigned int aLength, int aCopy, int aTakeOwnership)
-{
-	Openmpt * cl = (Openmpt *)aClassPtr;
-	return cl->loadMem(aMem, aLength, !!aCopy, !!aTakeOwnership);
-}
-
-int Openmpt_loadFile(void * aClassPtr, File * aFile)
-{
-	Openmpt * cl = (Openmpt *)aClassPtr;
-	return cl->loadFile(aFile);
-}
-
-void Openmpt_setVolume(void * aClassPtr, float aVolume)
-{
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->setVolume(aVolume);
 }
 
-void Openmpt_setLooping(void * aClassPtr, int aLoop)
+void Speech_setLooping(void * aClassPtr, int aLoop)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->setLooping(!!aLoop);
 }
 
-void Openmpt_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
+void Speech_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
 }
 
-void Openmpt_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
+void Speech_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
 }
 
-void Openmpt_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
+void Speech_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->set3dDopplerFactor(aDopplerFactor);
 }
 
-void Openmpt_set3dProcessing(void * aClassPtr, int aDo3dProcessing)
+void Speech_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
-	cl->set3dProcessing(!!aDo3dProcessing);
-}
-
-void Openmpt_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
-{
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->set3dListenerRelative(!!aListenerRelative);
 }
 
-void Openmpt_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
+void Speech_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->set3dDistanceDelay(!!aDistanceDelay);
 }
 
-void Openmpt_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
+void Speech_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->set3dCollider(aCollider);
 }
 
-void Openmpt_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
+void Speech_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->set3dCollider(aCollider, aUserData);
 }
 
-void Openmpt_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
+void Speech_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->set3dAttenuator(aAttenuator);
 }
 
-void Openmpt_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
+void Speech_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
 }
 
-void Openmpt_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+void Speech_setLoopPoint(void * aClassPtr, double aLoopPoint)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double Speech_getLoopPoint(void * aClassPtr)
+{
+	Speech * cl = (Speech *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
+void Speech_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+{
+	Speech * cl = (Speech *)aClassPtr;
 	cl->setFilter(aFilterId, aFilter);
 }
 
-void Openmpt_stop(void * aClassPtr)
+void Speech_stop(void * aClassPtr)
 {
-	Openmpt * cl = (Openmpt *)aClassPtr;
-	cl->stop();
-}
-
-void Monotone_destroy(void * aClassPtr)
-{
-  delete (Monotone *)aClassPtr;
-}
-
-void * Monotone_create()
-{
-  return (void *)new Monotone;
-}
-
-int Monotone_setParams(void * aClassPtr, int aHardwareChannels)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	return cl->setParams(aHardwareChannels);
-}
-
-int Monotone_setParamsEx(void * aClassPtr, int aHardwareChannels, int aWaveform)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	return cl->setParams(aHardwareChannels, aWaveform);
-}
-
-int Monotone_load(void * aClassPtr, const char * aFilename)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	return cl->load(aFilename);
-}
-
-int Monotone_loadMem(void * aClassPtr, unsigned char * aMem, unsigned int aLength)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	return cl->loadMem(aMem, aLength);
-}
-
-int Monotone_loadMemEx(void * aClassPtr, unsigned char * aMem, unsigned int aLength, int aCopy, int aTakeOwnership)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	return cl->loadMem(aMem, aLength, !!aCopy, !!aTakeOwnership);
-}
-
-int Monotone_loadFile(void * aClassPtr, File * aFile)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	return cl->loadFile(aFile);
-}
-
-void Monotone_setVolume(void * aClassPtr, float aVolume)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->setVolume(aVolume);
-}
-
-void Monotone_setLooping(void * aClassPtr, int aLoop)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->setLooping(!!aLoop);
-}
-
-void Monotone_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
-}
-
-void Monotone_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
-}
-
-void Monotone_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->set3dDopplerFactor(aDopplerFactor);
-}
-
-void Monotone_set3dProcessing(void * aClassPtr, int aDo3dProcessing)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->set3dProcessing(!!aDo3dProcessing);
-}
-
-void Monotone_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->set3dListenerRelative(!!aListenerRelative);
-}
-
-void Monotone_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->set3dDistanceDelay(!!aDistanceDelay);
-}
-
-void Monotone_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->set3dCollider(aCollider);
-}
-
-void Monotone_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->set3dCollider(aCollider, aUserData);
-}
-
-void Monotone_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->set3dAttenuator(aAttenuator);
-}
-
-void Monotone_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
-}
-
-void Monotone_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
-	cl->setFilter(aFilterId, aFilter);
-}
-
-void Monotone_stop(void * aClassPtr)
-{
-	Monotone * cl = (Monotone *)aClassPtr;
+	Speech * cl = (Speech *)aClassPtr;
 	cl->stop();
 }
 
@@ -1717,13 +2090,13 @@ int TedSid_loadToMem(void * aClassPtr, const char * aFilename)
 	return cl->loadToMem(aFilename);
 }
 
-int TedSid_loadMem(void * aClassPtr, unsigned char * aMem, unsigned int aLength)
+int TedSid_loadMem(void * aClassPtr, const unsigned char * aMem, unsigned int aLength)
 {
 	TedSid * cl = (TedSid *)aClassPtr;
 	return cl->loadMem(aMem, aLength);
 }
 
-int TedSid_loadMemEx(void * aClassPtr, unsigned char * aMem, unsigned int aLength, int aCopy, int aTakeOwnership)
+int TedSid_loadMemEx(void * aClassPtr, const unsigned char * aMem, unsigned int aLength, int aCopy, int aTakeOwnership)
 {
 	TedSid * cl = (TedSid *)aClassPtr;
 	return cl->loadMem(aMem, aLength, !!aCopy, !!aTakeOwnership);
@@ -1771,12 +2144,6 @@ void TedSid_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
 	cl->set3dDopplerFactor(aDopplerFactor);
 }
 
-void TedSid_set3dProcessing(void * aClassPtr, int aDo3dProcessing)
-{
-	TedSid * cl = (TedSid *)aClassPtr;
-	cl->set3dProcessing(!!aDo3dProcessing);
-}
-
 void TedSid_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
 {
 	TedSid * cl = (TedSid *)aClassPtr;
@@ -1813,6 +2180,18 @@ void TedSid_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
 	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
 }
 
+void TedSid_setLoopPoint(void * aClassPtr, double aLoopPoint)
+{
+	TedSid * cl = (TedSid *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double TedSid_getLoopPoint(void * aClassPtr)
+{
+	TedSid * cl = (TedSid *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
 void TedSid_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
 {
 	TedSid * cl = (TedSid *)aClassPtr;
@@ -1822,6 +2201,590 @@ void TedSid_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter
 void TedSid_stop(void * aClassPtr)
 {
 	TedSid * cl = (TedSid *)aClassPtr;
+	cl->stop();
+}
+
+void Vic_destroy(void * aClassPtr)
+{
+  delete (Vic *)aClassPtr;
+}
+
+void * Vic_create()
+{
+  return (void *)new Vic;
+}
+
+void Vic_setModel(void * aClassPtr, int model)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->setModel(model);
+}
+
+int Vic_getModel(void * aClassPtr)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	return cl->getModel();
+}
+
+void Vic_setRegister(void * aClassPtr, int reg, unsigned char value)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->setRegister(reg, value);
+}
+
+unsigned char Vic_getRegister(void * aClassPtr, int reg)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	return cl->getRegister(reg);
+}
+
+void Vic_setVolume(void * aClassPtr, float aVolume)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->setVolume(aVolume);
+}
+
+void Vic_setLooping(void * aClassPtr, int aLoop)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->setLooping(!!aLoop);
+}
+
+void Vic_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
+}
+
+void Vic_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
+}
+
+void Vic_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->set3dDopplerFactor(aDopplerFactor);
+}
+
+void Vic_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->set3dListenerRelative(!!aListenerRelative);
+}
+
+void Vic_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->set3dDistanceDelay(!!aDistanceDelay);
+}
+
+void Vic_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->set3dCollider(aCollider);
+}
+
+void Vic_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->set3dCollider(aCollider, aUserData);
+}
+
+void Vic_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->set3dAttenuator(aAttenuator);
+}
+
+void Vic_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
+}
+
+void Vic_setLoopPoint(void * aClassPtr, double aLoopPoint)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double Vic_getLoopPoint(void * aClassPtr)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
+void Vic_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->setFilter(aFilterId, aFilter);
+}
+
+void Vic_stop(void * aClassPtr)
+{
+	Vic * cl = (Vic *)aClassPtr;
+	cl->stop();
+}
+
+void Vizsn_destroy(void * aClassPtr)
+{
+  delete (Vizsn *)aClassPtr;
+}
+
+void * Vizsn_create()
+{
+  return (void *)new Vizsn;
+}
+
+void Vizsn_setText(void * aClassPtr, char * aText)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->setText(aText);
+}
+
+void Vizsn_setVolume(void * aClassPtr, float aVolume)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->setVolume(aVolume);
+}
+
+void Vizsn_setLooping(void * aClassPtr, int aLoop)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->setLooping(!!aLoop);
+}
+
+void Vizsn_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
+}
+
+void Vizsn_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
+}
+
+void Vizsn_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->set3dDopplerFactor(aDopplerFactor);
+}
+
+void Vizsn_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->set3dListenerRelative(!!aListenerRelative);
+}
+
+void Vizsn_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->set3dDistanceDelay(!!aDistanceDelay);
+}
+
+void Vizsn_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->set3dCollider(aCollider);
+}
+
+void Vizsn_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->set3dCollider(aCollider, aUserData);
+}
+
+void Vizsn_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->set3dAttenuator(aAttenuator);
+}
+
+void Vizsn_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
+}
+
+void Vizsn_setLoopPoint(void * aClassPtr, double aLoopPoint)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double Vizsn_getLoopPoint(void * aClassPtr)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
+void Vizsn_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->setFilter(aFilterId, aFilter);
+}
+
+void Vizsn_stop(void * aClassPtr)
+{
+	Vizsn * cl = (Vizsn *)aClassPtr;
+	cl->stop();
+}
+
+void Wav_destroy(void * aClassPtr)
+{
+  delete (Wav *)aClassPtr;
+}
+
+void * Wav_create()
+{
+  return (void *)new Wav;
+}
+
+int Wav_load(void * aClassPtr, const char * aFilename)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->load(aFilename);
+}
+
+int Wav_loadMem(void * aClassPtr, const unsigned char * aMem, unsigned int aLength)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->loadMem(aMem, aLength);
+}
+
+int Wav_loadMemEx(void * aClassPtr, const unsigned char * aMem, unsigned int aLength, int aCopy, int aTakeOwnership)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->loadMem(aMem, aLength, !!aCopy, !!aTakeOwnership);
+}
+
+int Wav_loadFile(void * aClassPtr, File * aFile)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->loadFile(aFile);
+}
+
+int Wav_loadRawWave8(void * aClassPtr, unsigned char * aMem, unsigned int aLength)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->loadRawWave8(aMem, aLength);
+}
+
+int Wav_loadRawWave8Ex(void * aClassPtr, unsigned char * aMem, unsigned int aLength, float aSamplerate, unsigned int aChannels)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->loadRawWave8(aMem, aLength, aSamplerate, aChannels);
+}
+
+int Wav_loadRawWave16(void * aClassPtr, short * aMem, unsigned int aLength)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->loadRawWave16(aMem, aLength);
+}
+
+int Wav_loadRawWave16Ex(void * aClassPtr, short * aMem, unsigned int aLength, float aSamplerate, unsigned int aChannels)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->loadRawWave16(aMem, aLength, aSamplerate, aChannels);
+}
+
+int Wav_loadRawWave(void * aClassPtr, float * aMem, unsigned int aLength)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->loadRawWave(aMem, aLength);
+}
+
+int Wav_loadRawWaveEx(void * aClassPtr, float * aMem, unsigned int aLength, float aSamplerate, unsigned int aChannels, int aCopy, int aTakeOwnership)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->loadRawWave(aMem, aLength, aSamplerate, aChannels, !!aCopy, !!aTakeOwnership);
+}
+
+double Wav_getLength(void * aClassPtr)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->getLength();
+}
+
+void Wav_setVolume(void * aClassPtr, float aVolume)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->setVolume(aVolume);
+}
+
+void Wav_setLooping(void * aClassPtr, int aLoop)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->setLooping(!!aLoop);
+}
+
+void Wav_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
+}
+
+void Wav_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
+}
+
+void Wav_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->set3dDopplerFactor(aDopplerFactor);
+}
+
+void Wav_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->set3dListenerRelative(!!aListenerRelative);
+}
+
+void Wav_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->set3dDistanceDelay(!!aDistanceDelay);
+}
+
+void Wav_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->set3dCollider(aCollider);
+}
+
+void Wav_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->set3dCollider(aCollider, aUserData);
+}
+
+void Wav_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->set3dAttenuator(aAttenuator);
+}
+
+void Wav_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
+}
+
+void Wav_setLoopPoint(void * aClassPtr, double aLoopPoint)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double Wav_getLoopPoint(void * aClassPtr)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
+void Wav_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->setFilter(aFilterId, aFilter);
+}
+
+void Wav_stop(void * aClassPtr)
+{
+	Wav * cl = (Wav *)aClassPtr;
+	cl->stop();
+}
+
+void WaveShaperFilter_destroy(void * aClassPtr)
+{
+  delete (WaveShaperFilter *)aClassPtr;
+}
+
+int WaveShaperFilter_setParams(void * aClassPtr, float aAmount)
+{
+	WaveShaperFilter * cl = (WaveShaperFilter *)aClassPtr;
+	return cl->setParams(aAmount);
+}
+
+void * WaveShaperFilter_create()
+{
+  return (void *)new WaveShaperFilter;
+}
+
+int WaveShaperFilter_getParamCount(void * aClassPtr)
+{
+	WaveShaperFilter * cl = (WaveShaperFilter *)aClassPtr;
+	return cl->getParamCount();
+}
+
+const char * WaveShaperFilter_getParamName(void * aClassPtr, unsigned int aParamIndex)
+{
+	WaveShaperFilter * cl = (WaveShaperFilter *)aClassPtr;
+	return cl->getParamName(aParamIndex);
+}
+
+unsigned int WaveShaperFilter_getParamType(void * aClassPtr, unsigned int aParamIndex)
+{
+	WaveShaperFilter * cl = (WaveShaperFilter *)aClassPtr;
+	return cl->getParamType(aParamIndex);
+}
+
+float WaveShaperFilter_getParamMax(void * aClassPtr, unsigned int aParamIndex)
+{
+	WaveShaperFilter * cl = (WaveShaperFilter *)aClassPtr;
+	return cl->getParamMax(aParamIndex);
+}
+
+float WaveShaperFilter_getParamMin(void * aClassPtr, unsigned int aParamIndex)
+{
+	WaveShaperFilter * cl = (WaveShaperFilter *)aClassPtr;
+	return cl->getParamMin(aParamIndex);
+}
+
+void WavStream_destroy(void * aClassPtr)
+{
+  delete (WavStream *)aClassPtr;
+}
+
+void * WavStream_create()
+{
+  return (void *)new WavStream;
+}
+
+int WavStream_load(void * aClassPtr, const char * aFilename)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	return cl->load(aFilename);
+}
+
+int WavStream_loadMem(void * aClassPtr, const unsigned char * aData, unsigned int aDataLen)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	return cl->loadMem(aData, aDataLen);
+}
+
+int WavStream_loadMemEx(void * aClassPtr, const unsigned char * aData, unsigned int aDataLen, int aCopy, int aTakeOwnership)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	return cl->loadMem(aData, aDataLen, !!aCopy, !!aTakeOwnership);
+}
+
+int WavStream_loadToMem(void * aClassPtr, const char * aFilename)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	return cl->loadToMem(aFilename);
+}
+
+int WavStream_loadFile(void * aClassPtr, File * aFile)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	return cl->loadFile(aFile);
+}
+
+int WavStream_loadFileToMem(void * aClassPtr, File * aFile)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	return cl->loadFileToMem(aFile);
+}
+
+double WavStream_getLength(void * aClassPtr)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	return cl->getLength();
+}
+
+void WavStream_setVolume(void * aClassPtr, float aVolume)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->setVolume(aVolume);
+}
+
+void WavStream_setLooping(void * aClassPtr, int aLoop)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->setLooping(!!aLoop);
+}
+
+void WavStream_set3dMinMaxDistance(void * aClassPtr, float aMinDistance, float aMaxDistance)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->set3dMinMaxDistance(aMinDistance, aMaxDistance);
+}
+
+void WavStream_set3dAttenuation(void * aClassPtr, unsigned int aAttenuationModel, float aAttenuationRolloffFactor)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->set3dAttenuation(aAttenuationModel, aAttenuationRolloffFactor);
+}
+
+void WavStream_set3dDopplerFactor(void * aClassPtr, float aDopplerFactor)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->set3dDopplerFactor(aDopplerFactor);
+}
+
+void WavStream_set3dListenerRelative(void * aClassPtr, int aListenerRelative)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->set3dListenerRelative(!!aListenerRelative);
+}
+
+void WavStream_set3dDistanceDelay(void * aClassPtr, int aDistanceDelay)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->set3dDistanceDelay(!!aDistanceDelay);
+}
+
+void WavStream_set3dCollider(void * aClassPtr, AudioCollider * aCollider)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->set3dCollider(aCollider);
+}
+
+void WavStream_set3dColliderEx(void * aClassPtr, AudioCollider * aCollider, int aUserData)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->set3dCollider(aCollider, aUserData);
+}
+
+void WavStream_set3dAttenuator(void * aClassPtr, AudioAttenuator * aAttenuator)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->set3dAttenuator(aAttenuator);
+}
+
+void WavStream_setInaudibleBehavior(void * aClassPtr, int aMustTick, int aKill)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->setInaudibleBehavior(!!aMustTick, !!aKill);
+}
+
+void WavStream_setLoopPoint(void * aClassPtr, double aLoopPoint)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->setLoopPoint(aLoopPoint);
+}
+
+double WavStream_getLoopPoint(void * aClassPtr)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	return cl->getLoopPoint();
+}
+
+void WavStream_setFilter(void * aClassPtr, unsigned int aFilterId, Filter * aFilter)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
+	cl->setFilter(aFilterId, aFilter);
+}
+
+void WavStream_stop(void * aClassPtr)
+{
+	WavStream * cl = (WavStream *)aClassPtr;
 	cl->stop();
 }
 

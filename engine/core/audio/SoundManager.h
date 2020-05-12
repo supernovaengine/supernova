@@ -2,7 +2,6 @@
 #ifndef SoundManager_h
 #define SoundManager_h
 
-#include "AudioFile.h"
 #include "soloud.h"
 
 namespace Supernova {

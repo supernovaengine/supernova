@@ -88,7 +88,8 @@ void TED::writeSoundReg(unsigned int reg, unsigned char value)
 			setFreq(1, Freq2);
 			break;
 		case 3:
-			if ((DAStatus = value & 0x80)) {
+			DAStatus = value & 0x80;
+			if (DAStatus) {
 				FlipFlop[0] = 1;
 				FlipFlop[1] = 1;
 				oscCount[0] = OscReload[0];
@@ -109,7 +110,7 @@ void TED::writeSoundReg(unsigned int reg, unsigned char value)
 	}
 }
 
-inline unsigned int TED::waveSquare(unsigned int channel)
+inline unsigned int TED::waveSquare(unsigned int /*channel*/)
 {
 	return Volume;
 }
@@ -139,7 +140,7 @@ inline unsigned int TED::waveTriangle(unsigned int channel)
 
 #if 0
 	msb = OSCRELOADVAL + 1 - OscReload[channel];
-	int diff = FlipFlop[channel] ? int(oscCount[channel]) - int(OscReload[channel]) 
+	int diff = FlipFlop[channel] ? int(oscCount[channel]) - int(OscReload[channel])
 		: int(OSCRELOADVAL) - int(oscCount[channel]);
 	//if (diff < 0) diff = 0;
 	//if (oscCount[channel] >= 0x3fa) diff = 0;
@@ -174,7 +175,7 @@ inline unsigned int TED::getWaveSample(unsigned int channel, unsigned int wave)
 			return waveTriangle(channel);
 			break;
 
-		// combined waveforms แ la SID
+		// combined waveforms รก la SID
 		case 3: // square + sawtooth
 			sm = waveSawTooth(channel) + waveSquare(channel);
 			return sm /= 2;
@@ -199,8 +200,8 @@ void TED::renderSound(unsigned int nrsamples, short *buffer)
 	// Calculate the buffer...
 	if (DAStatus) {// digi?
 		short sample = 0;//audiohwspec->silence;
-		if (Snd1Status) sample = Volume;
-		if (Snd2Status) sample += Volume;
+		if (Snd1Status) sample = (short)Volume;
+		if (Snd2Status) sample += (short)Volume;
 		for (;nrsamples--;) {
 			*buffer++ = sample & channelMask[2];
 		}
@@ -228,7 +229,7 @@ void TED::renderSound(unsigned int nrsamples, short *buffer)
 			} else if (SndNoiseStatus && noise[NoiseCounter] & channelMask[2]) {
 				result += Volume;
 			}
-			*buffer++ = result;
+			*buffer++ = (short)result;
 		}   // for
 	}
 }

@@ -65,12 +65,12 @@ namespace SoLoud
 			mZ /= m;
 		}
 		
-		float dot(vec3 a)
+		float dot(const vec3 &a)
 		{
 			return mX * a.mX + mY * a.mY + mZ * a.mZ;
 		}
 		
-		vec3 sub(vec3 a)
+		vec3 sub(const vec3 &a)
 		{
 			vec3 r;
 			r.mX = mX - a.mX;
@@ -79,7 +79,7 @@ namespace SoLoud
 			return r;
 		}
 
-		vec3 cross(vec3 a)
+		vec3 cross(const vec3 &a)
 		{
 			vec3 r;
 
@@ -95,7 +95,7 @@ namespace SoLoud
 	{
 		vec3 m[3];
 
-		vec3 mul(vec3 a)
+		vec3 mul(const vec3 &a)
 		{
 			vec3 r;
 
@@ -106,7 +106,7 @@ namespace SoLoud
 			return r;
 		}
 
-		void lookatRH(vec3 at, vec3 up)
+		void lookatRH(const vec3 &at, vec3 up)
 		{
 			vec3 z = at;
 			z.normalize();
@@ -118,7 +118,7 @@ namespace SoLoud
 			m[2] = z;
 		}
 
-		void lookatLH(vec3 at, vec3 up)
+		void lookatLH(const vec3 &at, vec3 up)
 		{
 			vec3 z = at;
 			z.normalize();
@@ -140,7 +140,7 @@ namespace SoLoud
 #define MAX(a,b) ((a) > (b)) ? (a) : (b)
 #endif
 
-	float doppler(vec3 aDeltaPos, vec3 aSrcVel, vec3 aDstVel, float aFactor, float aSoundSpeed)
+	float doppler(vec3 aDeltaPos, const vec3 &aSrcVel, const vec3 &aDstVel, float aFactor, float aSoundSpeed)
 	{
 		float deltamag = aDeltaPos.mag();
 		if (deltamag == 0)
@@ -174,7 +174,7 @@ namespace SoLoud
 		return (float)pow(distance / aMinDistance, -aRolloffFactor);
 	}
 
-	void Soloud::update3dVoices(unsigned int *aVoiceArray, unsigned int aVoiceCount)
+	void Soloud::update3dVoices_internal(unsigned int *aVoiceArray, unsigned int aVoiceCount)
 	{
 		vec3 speaker[MAX_CHANNELS];
 
@@ -185,6 +185,12 @@ namespace SoLoud
 			speaker[i].mY = m3dSpeakerPosition[3 * i + 1];
 			speaker[i].mZ = m3dSpeakerPosition[3 * i + 2];
 			speaker[i].normalize();
+		}
+		for (; i < MAX_CHANNELS; i++)
+		{
+			speaker[i].mX = 0;
+			speaker[i].mY = 0;
+			speaker[i].mZ = 0;
 		}
 
 		vec3 lpos, lvel, at, up;
@@ -276,7 +282,7 @@ namespace SoLoud
 
 			// Apply volume to channels based on speaker vectors
 			int j;
-			for (j = 0; j < MAX_CHANNELS; j++)
+			for (j = 0; j < (signed)mChannels; j++)
 			{
 				float speakervol = (speaker[j].dot(pos) + 1) / 2;
 				if (speaker[j].null())
@@ -285,6 +291,10 @@ namespace SoLoud
 				//speakervol = (speakervol * speakervol + speakervol) / 2;
 				//speakervol = speakervol * speakervol;
 				v->mChannelVolume[j] = vol * speakervol;
+			}
+			for (; j < MAX_CHANNELS; j++)
+			{
+				v->mChannelVolume[j] = 0;
 			}
 
 			v->m3dVolume = vol;
@@ -297,7 +307,7 @@ namespace SoLoud
 		unsigned int voices[VOICE_COUNT];
 
 		// Step 1 - find voices that need 3d processing
-		lockAudioMutex();
+		lockAudioMutex_internal();
 		int i;
 		for (i = 0; i < (signed)mHighestVoice; i++)
 		{
@@ -308,37 +318,37 @@ namespace SoLoud
 				m3dData[i].mFlags = mVoice[i]->mFlags;
 			}
 		}
-		unlockAudioMutex();
+		unlockAudioMutex_internal();
 
 		// Step 2 - do 3d processing
 
-		update3dVoices(voices, voicecount);
+		update3dVoices_internal(voices, voicecount);
 
 		// Step 3 - update SoLoud voices
 
-		lockAudioMutex();
+		lockAudioMutex_internal();
 		for (i = 0; i < (int)voicecount; i++)
 		{
 			AudioSourceInstance3dData * v = &m3dData[voices[i]];
 			AudioSourceInstance * vi = mVoice[voices[i]];
 			if (vi)
 			{
-				updateVoiceRelativePlaySpeed(voices[i]);
-				updateVoiceVolume(voices[i]);
+				updateVoiceRelativePlaySpeed_internal(voices[i]);
+				updateVoiceVolume_internal(voices[i]);
 				int j;
 				for (j = 0; j < MAX_CHANNELS; j++)
 				{
 					vi->mChannelVolume[j] = v->mChannelVolume[j];
 				}
 
-				if (vi->mOverallVolume < 0.01f)
+				if (vi->mOverallVolume < 0.001f)
 				{
 					// Inaudible.
 					vi->mFlags |= AudioSourceInstance::INAUDIBLE;
 
 					if (vi->mFlags & AudioSourceInstance::INAUDIBLE_KILL)
 					{
-						stopVoice(voices[i]);
+						stopVoice_internal(voices[i]);
 					}
 				}
 				else
@@ -349,25 +359,23 @@ namespace SoLoud
 		}
 
 		mActiveVoiceDirty = true;
-		unlockAudioMutex();
+		unlockAudioMutex_internal();
 	}
 
 
 	handle Soloud::play3d(AudioSource &aSound, float aPosX, float aPosY, float aPosZ, float aVelX, float aVelY, float aVelZ, float aVolume, bool aPaused, unsigned int aBus)
 	{
 		handle h = play(aSound, aVolume, 0, 1, aBus);
-		lockAudioMutex();
-		int v = getVoiceFromHandle(h);
+		lockAudioMutex_internal();
+		int v = getVoiceFromHandle_internal(h);
 		if (v < 0) 
 		{
-			unlockAudioMutex();
+			unlockAudioMutex_internal();
 			return h;
 		}
 		m3dData[v].mHandle = h;
 		mVoice[v]->mFlags |= AudioSourceInstance::PROCESS_3D;
 		set3dSourceParameters(h, aPosX, aPosY, aPosZ, aVelX, aVelY, aVelZ);
-
-		unlockAudioMutex();
 
 		int samples = 0;
 		if (aSound.mFlags & AudioSource::DISTANCE_DELAY)
@@ -386,15 +394,23 @@ namespace SoLoud
 			samples += (int)floor((dist / m3dSoundSpeed) * mSamplerate);
 		}
 
-		update3dVoices((unsigned int *)&v, 1);
-		updateVoiceRelativePlaySpeed(v);
+		update3dVoices_internal((unsigned int *)&v, 1);
+		updateVoiceRelativePlaySpeed_internal(v);
 		int j;
 		for (j = 0; j < MAX_CHANNELS; j++)
 		{
 			mVoice[v]->mChannelVolume[j] = m3dData[v].mChannelVolume[j];
 		}
 
-		updateVoiceVolume(v);
+		updateVoiceVolume_internal(v);
+		
+		// Fix initial voice volume ramp up
+		int i;
+		for (i = 0; i < MAX_CHANNELS; i++)
+		{
+			mVoice[v]->mCurrentChannelVolume[i] = mVoice[v]->mChannelVolume[i] * mVoice[v]->mOverallVolume;
+		}
+
 		if (mVoice[v]->mOverallVolume < 0.01f)
 		{
 			// Inaudible.
@@ -402,7 +418,7 @@ namespace SoLoud
 
 			if (mVoice[v]->mFlags & AudioSourceInstance::INAUDIBLE_KILL)
 			{
-				stopVoice(v);
+				stopVoice_internal(v);
 			}
 		}
 		else
@@ -411,52 +427,65 @@ namespace SoLoud
 		}
 		mActiveVoiceDirty = true;
 
+		unlockAudioMutex_internal();
 		setDelaySamples(h, samples);
 		setPause(h, aPaused);
-		return h;		
+		return h;
 	}
 
 	handle Soloud::play3dClocked(time aSoundTime, AudioSource &aSound, float aPosX, float aPosY, float aPosZ, float aVelX, float aVelY, float aVelZ, float aVolume, unsigned int aBus)
 	{
 		handle h = play(aSound, aVolume, 0, 1, aBus);
-		lockAudioMutex();
-		int v = getVoiceFromHandle(h);
+		lockAudioMutex_internal();
+		int v = getVoiceFromHandle_internal(h);
 		if (v < 0) 
 		{
-			unlockAudioMutex();
+			unlockAudioMutex_internal();
 			return h;
 		}
 		m3dData[v].mHandle = h;
 		mVoice[v]->mFlags |= AudioSourceInstance::PROCESS_3D;
 		set3dSourceParameters(h, aPosX, aPosY, aPosZ, aVelX, aVelY, aVelZ);
 		time lasttime = mLastClockedTime;
-		if (lasttime == 0) 
+		if (lasttime == 0)
+		{
+			lasttime = aSoundTime;
 			mLastClockedTime = aSoundTime;
+		}
 		vec3 pos;
 		pos.mX = aPosX;
 		pos.mY = aPosY;
 		pos.mZ = aPosZ;
-		unlockAudioMutex();
-		int samples = 0;
-		if (lasttime != 0)
-		{
-			samples = (int)floor((aSoundTime - lasttime) * mSamplerate);
-		}
+		unlockAudioMutex_internal();
+		
+		int samples = (int)floor((aSoundTime - lasttime) * mSamplerate);		
+		// Make sure we don't delay too much (or overflow)
+		if (samples < 0 || samples > 2048) samples = 0;
+
 		if (aSound.mFlags & AudioSource::DISTANCE_DELAY)
 		{
 			float dist = pos.mag();
 			samples += (int)floor((dist / m3dSoundSpeed) * mSamplerate);
 		}
 
-		update3dVoices((unsigned int *)&v, 1);
-		updateVoiceRelativePlaySpeed(v);
+		update3dVoices_internal((unsigned int *)&v, 1);
+		lockAudioMutex_internal();
+		updateVoiceRelativePlaySpeed_internal(v);
 		int j;
 		for (j = 0; j < MAX_CHANNELS; j++)
 		{
 			mVoice[v]->mChannelVolume[j] = m3dData[v].mChannelVolume[j];
 		}
 
-		updateVoiceVolume(v);
+		updateVoiceVolume_internal(v);
+
+		// Fix initial voice volume ramp up
+		int i;
+		for (i = 0; i < MAX_CHANNELS; i++)
+		{
+			mVoice[v]->mCurrentChannelVolume[i] = mVoice[v]->mChannelVolume[i] * mVoice[v]->mOverallVolume;
+		}
+
 		if (mVoice[v]->mOverallVolume < 0.01f)
 		{
 			// Inaudible.
@@ -464,7 +493,7 @@ namespace SoLoud
 
 			if (mVoice[v]->mFlags & AudioSourceInstance::INAUDIBLE_KILL)
 			{
-				stopVoice(v);
+				stopVoice_internal(v);
 			}
 		}
 		else
@@ -472,6 +501,7 @@ namespace SoLoud
 			mVoice[v]->mFlags &= ~AudioSourceInstance::INAUDIBLE;
 		}
 		mActiveVoiceDirty = true;
+		unlockAudioMutex_internal();
 
 		setDelaySamples(h, samples);
 		setPause(h, 0);

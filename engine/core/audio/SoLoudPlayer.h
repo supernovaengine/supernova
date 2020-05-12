@@ -3,15 +3,15 @@
 #define SOLOUDPLAYER_H
 
 #include "AudioPlayer.h"
-#include "SoLoudSource.h"
 #include "soloud.h"
+#include "soloud_wav.h"
 
 namespace Supernova {
 
     class SoLoudPlayer: public AudioPlayer {
     private:
         SoLoud::Soloud* soloud;
-        SoLoudSource sample;
+        SoLoud::Wav sample;
         SoLoud::handle soundHandle;
     public:
         SoLoudPlayer();

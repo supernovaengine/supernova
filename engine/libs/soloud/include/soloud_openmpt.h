@@ -41,7 +41,7 @@ namespace SoLoud
 	public:
 		OpenmptInstance(Openmpt *aParent);
 		virtual ~OpenmptInstance();
-		virtual void getAudio(float *aBuffer, unsigned int aSamples);
+		virtual unsigned int getAudio(float *aBuffer, unsigned int aSamplesToRead, unsigned int aBufferSize);
 		virtual bool hasEnded();
 	};
 
@@ -53,7 +53,7 @@ namespace SoLoud
 		Openmpt();
 		virtual ~Openmpt();
 		result load(const char* aFilename);
-		result loadMem(unsigned char *aMem, unsigned int aLength, bool aCopy = false, bool aTakeOwnership = true);
+		result loadMem(const unsigned char *aMem, unsigned int aLength, bool aCopy = false, bool aTakeOwnership = true);
 		result loadFile(File *aFile);
 		virtual AudioSourceInstance *createInstance();
 	};

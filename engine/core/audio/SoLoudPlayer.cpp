@@ -1,6 +1,6 @@
 
 #include "SoLoudPlayer.h"
-#include "AudioLoader.h"
+#include "file/FileData.h"
 #include "soloud_thread.h"
 #include "SoundManager.h"
 #include "Log.h"
@@ -15,27 +15,41 @@ SoLoudPlayer::~SoLoudPlayer(){
 }
 
 int SoLoudPlayer::load(){
-    AudioLoader audioLoader;
-    audioFile = audioLoader.loadAudio(filename.c_str());
+    FileData file(filename.c_str());
 
-    sample.load(audioFile);
+    SoLoud::result res = sample.loadMem(file.getMemPtr(), file.length(), false, false);
+
+    if (res == SoLoud::SOLOUD_ERRORS::FILE_LOAD_FAILED){
+        Log::Error("Audio file type of '%s' could not be loaded", filename.c_str());
+        return res;
+    }else if (res == SoLoud::SOLOUD_ERRORS::OUT_OF_MEMORY){
+        Log::Error("Out of memory when loading '%s'", filename.c_str());
+        return res;
+    }else if (res == SoLoud::SOLOUD_ERRORS::UNKNOWN_ERROR){
+        Log::Error("Unknown error when loading '%s'", filename.c_str());
+        return res;
+    }
+
     sample.setSingleInstance(true);
     sample.setVolume(1.0);
 
     loaded = true;
 
-    return 0;
+    return res;
 
 }
 
 void SoLoudPlayer::destroy(){
     loaded = false;
-    delete audioFile;
 }
 
 int SoLoudPlayer::play(){
-    if (!loaded)
-        load();
+    if (!loaded) {
+        SoLoud::result res = load();
+
+        if (res != SoLoud::SOLOUD_ERRORS::SO_NO_ERROR)
+            return res;
+    }
 
     if (state != S_AUDIO_PAUSED) {
         soloud = SoundManager::init();

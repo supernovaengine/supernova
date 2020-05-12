@@ -1,6 +1,6 @@
 /*
 SoLoud audio engine
-Copyright (c) 2013-2014 Jari Komppa
+Copyright (c) 2013-2020 Jari Komppa
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -38,19 +38,15 @@ namespace SoLoud
 	{
 		mDirty = 0;
 
-		float omega = (float)((2.0f * M_PI * mParam[FREQUENCY]) / mParam[SAMPLERATE]);
+		float omega = (float)((2.0f * M_PI * mParam[FREQUENCY]) / mSamplerate);
 		float sin_omega = (float)sin(omega);
 		float cos_omega = (float)cos(omega);
 		float alpha = sin_omega / (2.0f * mParam[RESONANCE]);
 		float scalar = 1.0f / (1.0f + alpha);
 
-		mActive = 1;
-
-		switch (mFilterType)
+		switch ((int)(mParam[TYPE]))
 		{
-		case BiquadResonantFilter::NONE:
-			mActive = 0;
-			break;
+		default:
 		case BiquadResonantFilter::LOWPASS:
 			mA0 = 0.5f * (1.0f - cos_omega) * scalar;
 			mA1 = (1.0f - cos_omega) * scalar;
@@ -79,7 +75,7 @@ namespace SoLoud
 	BiquadResonantFilterInstance::BiquadResonantFilterInstance(BiquadResonantFilter *aParent)
 	{
 		int i;
-		for (i = 0; i < 2; i++)
+		for (i = 0; i < 8; i++)
 		{
 			mState[i].mX1 = 0;
 			mState[i].mY1 = 0;
@@ -88,39 +84,40 @@ namespace SoLoud
 		}
 
 		mParent = aParent;
-		mFilterType = aParent->mFilterType;
 
 		initParams(4);
 		
-		mParam[SAMPLERATE] = aParent->mSampleRate;
 		mParam[RESONANCE] = aParent->mResonance;
 		mParam[FREQUENCY] = aParent->mFrequency;
-		mParam[WET] = 1;
+		mParam[TYPE] = (float)aParent->mFilterType;
+		
+		mSamplerate = 44100;
 
 		calcBQRParams();
 	}
 
-	void BiquadResonantFilterInstance::filterChannel(float *aBuffer, unsigned int aSamples, float aSamplerate, double aTime, unsigned int aChannel, unsigned int aChannels)
+	void BiquadResonantFilterInstance::filterChannel(float *aBuffer, unsigned int aSamples, float aSamplerate, double aTime, unsigned int aChannel, unsigned int /*aChannels*/)
 	{
-		if (!mActive)
-			return;
-
+		unsigned int osamples = aSamples;
 		if (aChannel == 0)
 		{
 			updateParams(aTime);
 
-			if (mParamChanged & ((1 << FREQUENCY) | (1 << RESONANCE) | (1 << SAMPLERATE)))
+			if (mParamChanged & ((1 << FREQUENCY) | (1 << RESONANCE) | (1 << TYPE)) || aSamplerate != mSamplerate)
 			{
+				mSamplerate = aSamplerate;
 				calcBQRParams();
 			}
-			mParamChanged = 0;
-		}
-
+			mParamChanged = 0;			
+		}		
 		float x;
 		unsigned int i;
 		int c = 0;
 
 		BQRStateData &s = mState[aChannel];
+
+		// make sure we access pairs of samples (one sample may be skipped)
+		aSamples = aSamples & ~1; 
 
 		for (i = 0; i < aSamples; i +=2, c++)
 		{
@@ -141,10 +138,9 @@ namespace SoLoud
 			s.mX1 = s.mX2;
 			s.mX2 = x;
 		}
-
-		// Apply a small impulse to filter to prevent arithmetic underflow,
-		// which can cause the FPU to interrupt the CPU.
-		s.mY1 += (float) 1.0E-26;		
+		// If we skipped a sample earlier, patch it by just copying the previous.
+		if (osamples != aSamples)
+			aBuffer[c] = aBuffer[c - 1];
 	}
 
 
@@ -154,21 +150,69 @@ namespace SoLoud
 
 	BiquadResonantFilter::BiquadResonantFilter()
 	{
-		setParams(LOWPASS, 44100, 1000, 2);
+		setParams(LOWPASS, 1000, 2);
 	}
 
-	result BiquadResonantFilter::setParams(int aType, float aSampleRate, float aFrequency, float aResonance)
+	result BiquadResonantFilter::setParams(int aType, float aFrequency, float aResonance)
 	{
-		if (aType < 0 || aType > 3 || aSampleRate <= 0 || aFrequency <= 0 || aResonance <= 0)
+		if (aType < 0 || aType > 3 || aFrequency <= 0 || aResonance <= 0)
 			return INVALID_PARAMETER;
 
 		mFilterType = aType;
-		mSampleRate = aSampleRate;
 		mFrequency = aFrequency;
 		mResonance = aResonance;
 
 		return 0;
 	}
+
+	int BiquadResonantFilter::getParamCount()
+	{
+		return 4;
+	}
+
+	const char* BiquadResonantFilter::getParamName(unsigned int aParamIndex)
+	{
+		if (aParamIndex > 3)
+			return 0;
+
+		const char* name[4] = {
+			"Wet",
+			"Type",
+			"Frequency",
+			"Resonance"
+		};
+		return name[aParamIndex];
+	}
+	
+	unsigned int BiquadResonantFilter::getParamType(unsigned int aParamIndex)
+	{
+		if (aParamIndex == TYPE)
+			return INT_PARAM;
+		return FLOAT_PARAM;
+	}
+
+	float BiquadResonantFilter::getParamMax(unsigned int aParamIndex)
+	{
+		switch (aParamIndex)
+		{
+		case WET: return 1;
+		case TYPE: return 2;
+		case FREQUENCY: return 8000;
+		case RESONANCE: return 20;
+		}
+		return 1;
+	}
+	
+	float BiquadResonantFilter::getParamMin(unsigned int aParamIndex)
+	{
+		switch (aParamIndex)
+		{
+		case FREQUENCY: return 10;
+		case RESONANCE: return 0.1f;
+		}
+		return 0;
+	}
+
 
 	BiquadResonantFilter::~BiquadResonantFilter()
 	{

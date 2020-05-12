@@ -1,7 +1,6 @@
 #ifndef AudioPlayer_h
 #define AudioPlayer_h
 
-#include "AudioFile.h"
 #include <string>
 
 #define S_AUDIO_PLAYING 1
@@ -16,7 +15,6 @@ namespace Supernova {
         std::string filename;
         bool loaded;
         int state;
-        AudioFile* audioFile;
     public:
         AudioPlayer();
         virtual ~AudioPlayer();

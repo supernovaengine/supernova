@@ -40,9 +40,15 @@ namespace SoLoud
 		m3dVelocity[0] = 0;
 		m3dVelocity[1] = 0;
 		m3dVelocity[2] = 0;
+		m3dVolume = 0;
 		mCollider = 0;
 		mColliderData = 0;
 		mAttenuator = 0;
+		mDopplerValue = 0;
+		mFlags = 0;
+		mHandle = 0;
+		for (int i = 0; i < MAX_CHANNELS; i++)
+			mChannelVolume[i] = 0;
 	}
 
 	void AudioSourceInstance3dData::init(AudioSource &aSource)
@@ -59,16 +65,6 @@ namespace SoLoud
 		mDopplerValue = 1.0f;
 	}
 
-	AudioSourceResampleData::AudioSourceResampleData()
-	{
-		mBuffer = 0;
-	}
-	
-	AudioSourceResampleData::~AudioSourceResampleData()
-	{
-		delete[] mBuffer;
-	}
-
 	AudioSourceInstance::AudioSourceInstance()
 	{
 		mPlayIndex = 0;
@@ -83,11 +79,13 @@ namespace SoLoud
 		mSamplerate = 44100.0f;
 		mSetRelativePlaySpeed = 1.0f;
 		mStreamTime = 0.0f;
+		mStreamPosition = 0.0f;
 		mAudioSourceID = 0;
 		mActiveFader = 0;
 		mChannels = 1;
 		mBusHandle = ~0u;
 		mLoopCount = 0;
+		mLoopPoint = 0;
 		for (i = 0; i < FILTERS_PER_STREAM; i++)
 		{
 			mFilter[i] = NULL;
@@ -97,12 +95,13 @@ namespace SoLoud
 			mCurrentChannelVolume[i] = 0;
 		}
 		// behind pointers because we swap between the two buffers
-		mResampleData[0] = new AudioSourceResampleData;
-		mResampleData[1] = new AudioSourceResampleData;
+		mResampleData[0] = 0;
+		mResampleData[1] = 0;
 		mSrcOffset = 0;
 		mLeftoverSamples = 0;
 		mDelaySamples = 0;
-
+		mOverallVolume = 0;
+		mOverallRelativePlaySpeed = 1;
 	}
 
 	AudioSourceInstance::~AudioSourceInstance()
@@ -111,9 +110,7 @@ namespace SoLoud
 		for (i = 0; i < FILTERS_PER_STREAM; i++)
 		{
 			delete mFilter[i];
-		}
-		delete mResampleData[0];
-		delete mResampleData[1];
+		}		
 	}
 
 	void AudioSourceInstance::init(AudioSource &aSource, int aPlayIndex)
@@ -123,6 +120,8 @@ namespace SoLoud
 		mSamplerate = mBaseSamplerate;
 		mChannels = aSource.mChannels;
 		mStreamTime = 0.0f;
+		mStreamPosition = 0.0f;
+		mLoopPoint = aSource.mLoopPoint;
 
 		if (aSource.mFlags & AudioSource::SHOULD_LOOP)
 		{
@@ -151,15 +150,15 @@ namespace SoLoud
 		return NOT_IMPLEMENTED;
 	}
 
-	void AudioSourceInstance::seek(double aSeconds, float *mScratch, unsigned int mScratchSize)
+	result AudioSourceInstance::seek(double aSeconds, float *mScratch, unsigned int mScratchSize)
 	{
-		double offset = aSeconds - mStreamTime;
-		if (offset < 0)
+		double offset = aSeconds - mStreamPosition;
+		if (offset <= 0)
 		{
 			if (rewind() != SO_NO_ERROR)
 			{
 				// can't do generic seek backwards unless we can rewind.
-				return;
+				return NOT_IMPLEMENTED;
 			}
 			offset = aSeconds;
 		}
@@ -167,14 +166,14 @@ namespace SoLoud
 
 		while (samples_to_discard)
 		{
-			int samples = mScratchSize / 2;
+			int samples = mScratchSize / mChannels;
 			if (samples > samples_to_discard)
 				samples = samples_to_discard;
-			getAudio(mScratch, samples);
+			getAudio(mScratch, samples, samples);
 			samples_to_discard -= samples;
 		}
-
-		mStreamTime = aSeconds;
+		mStreamPosition = offset;
+		return SO_NO_ERROR;
 	}
 
 
@@ -199,6 +198,7 @@ namespace SoLoud
 		mAttenuator = 0;
 		mColliderData = 0;
 		mVolume = 1;
+		mLoopPoint = 0;
 	}
 
 	AudioSource::~AudioSource() 
@@ -209,6 +209,16 @@ namespace SoLoud
 	void AudioSource::setVolume(float aVolume)
 	{
 		mVolume = aVolume;
+	}
+
+	void AudioSource::setLoopPoint(time aLoopPoint)
+	{
+		mLoopPoint = aLoopPoint;
+	}
+
+	time AudioSource::getLoopPoint()
+	{
+		return mLoopPoint;
 	}
 
 	void AudioSource::setLooping(bool aLoop)
@@ -267,18 +277,6 @@ namespace SoLoud
 		m3dDopplerFactor = aDopplerFactor;
 	}
 
-	void AudioSource::set3dProcessing(bool aDo3dProcessing)
-	{
-		if (aDo3dProcessing)
-		{
-			mFlags |= PROCESS_3D;
-		}
-		else
-		{
-			mFlags &= ~PROCESS_3D;
-		}
-	}
-
 	void AudioSource::set3dListenerRelative(bool aListenerRelative)
 	{
 		if (aListenerRelative)
@@ -329,7 +327,7 @@ namespace SoLoud
 	}
 
 
-	float AudioSourceInstance::getInfo(unsigned int aInfoKey)
+	float AudioSourceInstance::getInfo(unsigned int /*aInfoKey*/)
 	{
 	    return 0;
 	}

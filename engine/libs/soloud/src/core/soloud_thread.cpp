@@ -22,15 +22,17 @@ freely, subject to the following restrictions:
    distribution.
 */
 
-#include "soloud.h"
-#include "soloud_thread.h"
-
-#ifdef WINDOWS_VERSION
-#include <Windows.h>
+#if defined(_WIN32)||defined(_WIN64)
+#include <windows.h>
 #else
+#include <inttypes.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <time.h>
 #endif
+
+#include "soloud.h"
+#include "soloud_thread.h"
 
 namespace SoLoud
 {
@@ -119,6 +121,11 @@ namespace SoLoud
             delete aThreadHandle;
         }
 
+		int getTimeMillis()
+		{
+			return GetTickCount();
+		}
+
 #else // pthreads
         struct ThreadHandleData
         {
@@ -194,7 +201,11 @@ namespace SoLoud
 
 		void sleep(int aMSec)
 		{
-			usleep(aMSec * 1000);
+			//usleep(aMSec * 1000);
+			struct timespec req = {0};
+			req.tv_sec = 0;
+			req.tv_nsec = aMSec * 1000000L;
+			nanosleep(&req, (struct timespec *)NULL);
 		}
 
         void wait(ThreadHandle aThreadHandle)
@@ -206,6 +217,13 @@ namespace SoLoud
         {
             delete aThreadHandle;
         }
+
+		int getTimeMillis()
+		{
+			struct timespec spec;
+			clock_gettime(CLOCK_REALTIME, &spec);
+			return spec.tv_sec * 1000 + (int)(spec.tv_nsec / 1.0e6);
+		}
 #endif
 
 		static void poolWorker(void *aParam)
@@ -233,6 +251,8 @@ namespace SoLoud
 			mWorkMutex = 0;
 			mRobin = 0;
 			mMaxTask = 0;
+			for (int i = 0; i < MAX_THREADPOOL_TASKS; i++)
+				mTaskArray[i] = 0;
 		}
 
 		Pool::~Pool()

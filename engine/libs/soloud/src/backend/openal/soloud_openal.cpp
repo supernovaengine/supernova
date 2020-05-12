@@ -81,7 +81,7 @@ extern "C"
 
 namespace SoLoud
 {
-	void soloud_openal_deinit(SoLoud::Soloud *aSoloud)
+	void soloud_openal_deinit(SoLoud::Soloud * /*aSoloud*/)
 	{
 		threadrun++;
 		while (threadrun == 1)
@@ -108,7 +108,7 @@ namespace SoLoud
 		buffersize = 0;
 		bufferdata = 0;
 	}
-	
+#if 0	
 	static void openal_mutex_lock(void * mutex)
 	{
 		Thread::lockMutex(mutex);
@@ -118,7 +118,7 @@ namespace SoLoud
 	{
 		Thread::unlockMutex(mutex);
 	}
-
+#endif
 	static void openal_iterate(SoLoud::Soloud *aSoloud)
 	{
 		ALuint buffer = 0;
@@ -153,12 +153,12 @@ namespace SoLoud
 		threadrun++;
 	}
 
-	result openal_init(SoLoud::Soloud *aSoloud, unsigned int aFlags, unsigned int aSamplerate, unsigned int aBuffer, unsigned int aChannels)
+	result openal_init(SoLoud::Soloud *aSoloud, unsigned int aFlags, unsigned int aSamplerate, unsigned int aBuffer, unsigned int /*aChannels*/)
 	{
 		if (!dll_al_found())
 			return DLL_NOT_FOUND;
 
-		aSoloud->postinit(aSamplerate,aBuffer,aFlags,2);
+		aSoloud->postinit_internal(aSamplerate,aBuffer,aFlags,2);
 		aSoloud->mBackendCleanupFunc = soloud_openal_deinit;
 
 		device = dll_alc_OpenDevice(NULL);
@@ -169,6 +169,9 @@ namespace SoLoud
 		dll_al_GenSources(1, &source);
 		buffersize = aBuffer;
 		bufferdata = (short*)malloc(buffersize*2*2);
+
+		if (!bufferdata)
+			return OUT_OF_MEMORY;
 
 		frequency = aSamplerate;
 

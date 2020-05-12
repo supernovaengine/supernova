@@ -5,7 +5,7 @@
  add_definitions("-D\"lua_getlocaledecpoint()='.'\"")
  add_definitions("-DLUA_ANSI")
  add_definitions("-DLUA_USE_C89")
- add_definitions("-DWITH_OPENSLES") # For SoLoud
+ add_definitions("-DWITH_MINIAUDIO") # For SoLoud
 
  set(PLATFORM_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 

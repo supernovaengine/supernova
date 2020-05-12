@@ -6,7 +6,9 @@
 //  - probably many more
 
 #include <math.h>
+#ifndef __vita__
 #include <memory.h>
+#endif
 #include "sid.h"
 //#include "Tedmem.h"
 
@@ -168,7 +170,7 @@ void SIDsound::setSampleRate(unsigned int sampleRate_)
 	calcEnvelopeTable();
 }
 
-SIDsound::SIDsound(unsigned int model, unsigned int chnlDisableMask) : enableDigiBlaster(false)
+SIDsound::SIDsound(unsigned int model, unsigned int chnlDisableMask) : enableDigiBlaster(false), sampleRate(0)
 {
 	unsigned int i;
 	masterVolume = 0;
@@ -199,7 +201,7 @@ void SIDsound::reset(void)
 		voice[v].freq = voice[v].pw = 0;
 		voice[v].envCurrLevel = voice[v].envSustainLevel = 0;
 		voice[v].gate = voice[v].ring = voice[v].test = 0;
-		voice[v].filter = voice[v].sync = false;
+		voice[v].filter = voice[v].sync = 0;
 		voice[v].muted = 0;
 		// Initial value of internal shift register
 		voice[v].shiftReg = 0x7FFFFC;
@@ -515,7 +517,8 @@ inline int SIDsound::doEnvelopeGenerator(unsigned int cycles, SIDVoice &v)
 
 				case EG_DECAY:
 					if (v.envCurrLevel != v.envSustainLevel) {
-						--v.envCurrLevel &= 0xFF;
+						v.envCurrLevel--;
+						v.envCurrLevel &= 0xFF;
 						if (!v.envCurrLevel)
 							v.egState = EG_FROZEN;
 					}
@@ -598,16 +601,16 @@ void SIDsound::calcSamples(short *buf, long accu)
 			}
 		} while (j--);
 
-		int accu = (sumOutput + filterOutput(cyclesToDo, sumFilteredOutput) 
+		int accu2 = (sumOutput + filterOutput(cyclesToDo, sumFilteredOutput) 
 			+ dcMixer + dcDigiBlaster) * volume;
 
 #if 1
-		sample = accu >> 12;
+		sample = accu2 >> 12;
 #else
 		unsigned int interPolationFac = (clockDeltaRemainder - sidCyclesPerSampleInt) & 0xFF;
-		accu >>= 7;
-		sample = (prevAccu * (0xFF ^ interPolationFac) + accu * (interPolationFac)) >> 12;
-		prevAccu = accu;
+		accu2 >>= 7;
+		sample = (prevAccu * (0xFF ^ interPolationFac) + accu2 * (interPolationFac)) >> 12;
+		prevAccu = accu2;
 #endif
 
 		*buf++ = (short) sample;

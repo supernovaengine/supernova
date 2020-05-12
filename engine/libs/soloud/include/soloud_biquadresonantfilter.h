@@ -41,16 +41,15 @@ namespace SoLoud
 		enum FILTERATTRIBUTE
 		{
 			WET = 0,
-			SAMPLERATE = 1,
-			FREQUENCY = 2,
-			RESONANCE = 3
+			TYPE,
+			FREQUENCY,
+			RESONANCE
 		};
 
-		int mActive;
-		BQRStateData mState[2];
+		BQRStateData mState[8];
 		float mA0, mA1, mA2, mB1, mB2;
 		int mDirty;
-		int mFilterType;
+		float mSamplerate;
 
 		BiquadResonantFilter *mParent;
 		void calcBQRParams();
@@ -65,25 +64,29 @@ namespace SoLoud
 	public:
 		enum FILTERTYPE
 		{
-			NONE = 0,
-			LOWPASS = 1,
-			HIGHPASS = 2,
-			BANDPASS = 3
+			LOWPASS = 0,
+			HIGHPASS = 1,
+			BANDPASS = 2
 		};
 		enum FILTERATTRIBUTE
 		{
 			WET = 0,
-			SAMPLERATE = 1,
-			FREQUENCY = 2,
-			RESONANCE = 3
+			TYPE,
+			FREQUENCY,
+			RESONANCE
 		};
 		int mFilterType;
-		float mSampleRate;
 		float mFrequency;
 		float mResonance;
+		virtual int getParamCount();
+		virtual const char* getParamName(unsigned int aParamIndex);
+		virtual unsigned int getParamType(unsigned int aParamIndex);
+		virtual float getParamMax(unsigned int aParamIndex);
+		virtual float getParamMin(unsigned int aParamIndex);
+
 		virtual BiquadResonantFilterInstance *createInstance();
 		BiquadResonantFilter();
-		result setParams(int aType, float aSampleRate, float aFrequency, float aResonance);
+		result setParams(int aType, float aFrequency, float aResonance);
 		virtual ~BiquadResonantFilter();
 	};
 }

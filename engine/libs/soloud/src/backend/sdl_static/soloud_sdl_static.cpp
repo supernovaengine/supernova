@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 
 namespace SoLoud
 {
-	result sdlstatic_init(SoLoud::Soloud *aSoloud, unsigned int aFlags, unsigned int aSamplerate, unsigned int aBuffer)
+	result sdl1static_init(SoLoud::Soloud *aSoloud, unsigned int aFlags, unsigned int aSamplerate, unsigned int aBuffer)
 	{
 		return NOT_IMPLEMENTED;
 	}
@@ -37,11 +37,7 @@ namespace SoLoud
 
 #else
 
-#if defined(_MSC_VER)
 #include "SDL.h"
-#else
-#include "SDL/SDL.h"
-#endif
 #include <math.h>
 
 
@@ -52,16 +48,8 @@ namespace SoLoud
 	{
 		short *buf = (short*)stream;
 		SoLoud::Soloud *soloud = (SoLoud::Soloud *)userdata;
-		if (gActiveAudioSpec.format == AUDIO_F32)
-		{
-			int samples = len / (gActiveAudioSpec.channels * sizeof(float));
-			soloud->mix((float *)buf, samples);
-		}
-		else // assume s16 if not float
-		{
-			int samples = len / (gActiveAudioSpec.channels * sizeof(short));
-			soloud->mixSigned16(buf, samples);
-		}
+		int samples = len / (gActiveAudioSpec.channels * sizeof(short));
+		soloud->mixSigned16(buf, samples);
 	}
 
 	static void soloud_sdlstatic_deinit(SoLoud::Soloud *aSoloud)
@@ -69,35 +57,27 @@ namespace SoLoud
 		SDL_CloseAudio();
 	}
 
-	result sdlstatic_init(SoLoud::Soloud *aSoloud, unsigned int aFlags, unsigned int aSamplerate, unsigned int aBuffer, unsigned int aChannels)
+	result sdl1static_init(SoLoud::Soloud *aSoloud, unsigned int aFlags, unsigned int aSamplerate, unsigned int aBuffer, unsigned int aChannels)
 	{
 		SDL_AudioSpec as;
 		as.freq = aSamplerate;
+		as.format = AUDIO_S16;
 		as.channels = aChannels;
 		as.samples = aBuffer;
 		as.callback = soloud_sdlstatic_audiomixer;
 		as.userdata = (void*)aSoloud;
 
-#ifndef __EMSCRIPTEN__
-		as.format = AUDIO_F32;
 		if (SDL_OpenAudio(&as, &gActiveAudioSpec) < 0)
 		{
-#endif
-			as.format = AUDIO_S16;
-			if (SDL_OpenAudio(&as, &gActiveAudioSpec) < 0 || gActiveAudioSpec.format != AUDIO_S16)
-			{
-				return UNKNOWN_ERROR;
-			}
-#ifndef __EMSCRIPTEN__
+			return UNKNOWN_ERROR;
 		}
-#endif
 
-		aSoloud->postinit(gActiveAudioSpec.freq, gActiveAudioSpec.samples, aFlags, gActiveAudioSpec.channels);
+		aSoloud->postinit_internal(gActiveAudioSpec.freq, gActiveAudioSpec.samples, aFlags, gActiveAudioSpec.channels);
 
 		aSoloud->mBackendCleanupFunc = soloud_sdlstatic_deinit;
 
 		SDL_PauseAudio(0);
-        aSoloud->mBackendString = "SDL (static)";
+        aSoloud->mBackendString = "SDL1 (static)";
 		return 0;
 	}
 	

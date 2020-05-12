@@ -35,11 +35,27 @@ namespace SoLoud
 
 	class Speech : public AudioSource
 	{
+		// copy of the enum in klatt.h for codegen purposes
+		enum KLATT_WAVEFORM
+		{
+			KW_SAW,
+			KW_TRIANGLE,
+			KW_SIN,
+			KW_SQUARE,
+			KW_PULSE,
+			KW_NOISE,
+			KW_WARBLE
+		};
 	public:
+		int mBaseFrequency;
+		float mBaseSpeed;
+		float mBaseDeclination;
+		int mBaseWaveform;
 		int mFrames;
 		darray mElement;
 		Speech();
 		result setText(const char *aText);
+		result setParams(unsigned int aBaseFrequency = 1330, float aBaseSpeed = 10.0f, float aBaseDeclination = 0.5f, int aBaseWaveform = KW_TRIANGLE);
 		virtual ~Speech();
 		virtual AudioSourceInstance *createInstance();
 	};
@@ -54,7 +70,7 @@ namespace SoLoud
 	public:
 		SpeechInstance(Speech *aParent);
         virtual ~SpeechInstance();
-		virtual void getAudio(float *aBuffer, unsigned int aSamples);
+		virtual unsigned int getAudio(float *aBuffer, unsigned int aSamplesToRead, unsigned int aBufferSize);
 		virtual result rewind();
 		virtual bool hasEnded();
 	};

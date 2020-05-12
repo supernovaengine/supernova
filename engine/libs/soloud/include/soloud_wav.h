@@ -1,6 +1,6 @@
 /*
 SoLoud audio engine
-Copyright (c) 2013-2015 Jari Komppa
+Copyright (c) 2013-2018 Jari Komppa
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -33,6 +33,7 @@ namespace SoLoud
 {
 	class Wav;
 	class File;
+	class MemoryFile;
 
 	class WavInstance : public AudioSourceInstance
 	{
@@ -40,16 +41,18 @@ namespace SoLoud
 		unsigned int mOffset;
 	public:
 		WavInstance(Wav *aParent);
-		virtual void getAudio(float *aBuffer, unsigned int aSamples);
+		virtual unsigned int getAudio(float *aBuffer, unsigned int aSamplesToRead, unsigned int aBufferSize);
 		virtual result rewind();
 		virtual bool hasEnded();
 	};
 
 	class Wav : public AudioSource
 	{
-		result loadwav(File *aReader);
-		result loadogg(File *aReader);
-		result testAndLoadFile(File *aReader);
+		result loadwav(MemoryFile *aReader);
+		result loadogg(MemoryFile *aReader);
+		result loadmp3(MemoryFile *aReader);
+		result loadflac(MemoryFile *aReader);
+		result testAndLoadFile(MemoryFile *aReader);
 	public:
 		float *mData;
 		unsigned int mSampleCount;
@@ -57,9 +60,12 @@ namespace SoLoud
 		Wav();
 		virtual ~Wav();
 		result load(const char *aFilename);
-		result loadMem(unsigned char *aMem, unsigned int aLength, bool aCopy = false, bool aTakeOwnership = true);
+		result loadMem(const unsigned char *aMem, unsigned int aLength, bool aCopy = false, bool aTakeOwnership = true);
 		result loadFile(File *aFile);
-		
+		result loadRawWave8(unsigned char *aMem, unsigned int aLength, float aSamplerate = 44100.0f, unsigned int aChannels = 1);
+		result loadRawWave16(short *aMem, unsigned int aLength, float aSamplerate = 44100.0f, unsigned int aChannels = 1);
+		result loadRawWave(float *aMem, unsigned int aLength, float aSamplerate = 44100.0f, unsigned int aChannels = 1, bool aCopy = false, bool aTakeOwnership = true);
+
 		virtual AudioSourceInstance *createInstance();
 		time getLength();
 	};
