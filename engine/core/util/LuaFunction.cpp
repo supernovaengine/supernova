@@ -4,7 +4,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-#include "LuaIntf.h"
+#include "LuaIntf/LuaIntf.h"
 
 #include "LuaBind.h"
 #include "Log.h"

@@ -55,7 +55,7 @@
 /**
  * Set LUAINTF_UNSAFE_INT64 to 1 if you want to include partial int64_t support.
  *
- * This option applys to lua 5.2 or eailier version only, or with 32-bit configuration.
+ * This option applies to lua 5.2 or earlier version only, or with 32-bit configuration.
  * This option has no effect to lua 5.3 or later version, which has native 64 bit int support.
  */
 #ifndef LUAINTF_UNSAFE_INT64

@@ -1,9 +1,11 @@
 add_definitions("-frtti -fexceptions")
 # add_definitions("-Wall -Wextra")
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/lua/src")
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/luaintf")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/lua")
 add_subdirectory (libs/lua)
+
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/luaintf")
+add_subdirectory (libs/luaintf)
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/tinyobjloader")
 add_subdirectory (libs/tinyobjloader)

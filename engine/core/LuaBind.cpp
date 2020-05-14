@@ -9,7 +9,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-#include "LuaIntf.h"
+#include "LuaIntf/LuaIntf.h"
 
 #include "Engine.h"
 #include "Object.h"

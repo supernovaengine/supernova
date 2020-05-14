@@ -94,7 +94,9 @@ enum CppBindMethodCheck
 {
     CHK_NORMAL,
     CHK_GETTER,
-    CHK_SETTER
+    CHK_SETTER,
+    CHK_GETTER_INDEXED,
+    CHK_SETTER_INDEXED
 };
 
 template <int CHK, typename FN, int IARG, typename R, typename... P>

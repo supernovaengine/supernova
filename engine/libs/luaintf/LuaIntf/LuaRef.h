@@ -444,7 +444,7 @@ public:
      * Create reference to Lua global.
      *
      * @param L Lua state
-     * @param name the global name, may contains '.' to access sub obejct
+     * @param name the global name, may contain '.' to access sub object
      */
     LuaRef(lua_State* state, const char* name)
         : L(state)
@@ -731,7 +731,7 @@ public:
      * @param args arguments to pass to function
      */
     template <typename... P>
-    void operator () (P&&... args)
+    void operator () (P&&... args) const
     {
         assert(L);
         Call<void, P...>::invoke(L, *this, std::forward<P>(args)...);
@@ -754,7 +754,7 @@ public:
      * @return values of function
      */
     template <typename R = void, typename... P>
-    R call(P&&... args)
+    R call(P&&... args) const
     {
         assert(L);
         return Call<R, P...>::invoke(L, *this, std::forward<P>(args)...);
@@ -780,7 +780,7 @@ public:
      * @return values of function
      */
     template <typename R = void, typename... P>
-    R dispatch(const char* func, P&&... args)
+    R dispatch(const char* func, P&&... args) const
     {
         assert(L);
         return Call<R, const LuaRef&, P...>::invoke(L, get(func), *this, std::forward<P>(args)...);
@@ -805,7 +805,7 @@ public:
      * @return values of function
      */
     template <typename R = void, typename... P>
-    R dispatchStatic(const char* func, P&&... args)
+    R dispatchStatic(const char* func, P&&... args) const
     {
         assert(L);
         return Call<R, P...>::invoke(L, get(func), std::forward<P>(args)...);
@@ -899,7 +899,7 @@ public:
     /**
      * Look up field in table in raw mode (not via metatable).
      * This may raise Lua error or throw LuaException if V is not convertible.
-     * This is the same as rawgetp, just for convienence.
+     * This is the same as rawgetp, just for convenience.
      *
      * @param p field key
      * @return field value
@@ -931,7 +931,7 @@ public:
     /**
      * Look up field in table in raw mode (not via metatable).
      * This may raise Lua error or throw LuaException if V is not convertible.
-     * This is the same as rawgetp, just for convienence.
+     * This is the same as rawgetp, just for convenience.
      *
      * @param p field key
      * @param def default value if the field is missing
@@ -962,7 +962,7 @@ public:
     /**
      * Set field in table in raw mode (not via metatable).
      * This may raise Lua error or throw LuaException if V is not convertible.
-     * This is the same as rawsetp, just for convienence.
+     * This is the same as rawsetp, just for convenience.
      *
      * @param p field key
      * @param value field value

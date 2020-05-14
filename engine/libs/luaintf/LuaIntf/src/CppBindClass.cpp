@@ -63,8 +63,25 @@ LUA_INLINE int CppBindClassMetaMethod::index(lua_State* L)
             break;
         }
 
+        
         // get metatable.getters -> <mt> <getters>
         lua_pop(L, 1);                  // pop nil
+
+        if (lua_isnumber(L, 2)) {
+            lua_pushliteral(L, "___get_indexed");
+            lua_rawget(L, -2);
+
+            if (!lua_isnil(L, -1)) {
+                assert(lua_iscfunction(L, -1));
+                lua_pushvalue(L, 1);
+                lua_pushvalue(L, 2);
+                lua_call(L, 2, 1);
+                break;
+            } else {
+                lua_pop(L, 1);
+            }
+        }
+
         lua_pushliteral(L, "___getters");
         lua_rawget(L, -2);
         assert(lua_istable(L, -1));
@@ -143,6 +160,22 @@ LUA_INLINE int CppBindClassMetaMethod::newIndex(lua_State* L)
     }
 
     for (;;) {
+        if (lua_isnumber(L, 2)) {
+            lua_pushliteral(L, "___set_indexed");
+            lua_rawget(L, -2);
+
+            if (!lua_isnil(L, -1)) {
+                assert(lua_iscfunction(L, -1));
+                lua_pushvalue(L, 1);
+                lua_pushvalue(L, 2);
+                lua_pushvalue(L, 3);
+                lua_call(L, 3, 0);
+                break;
+            } else {
+                lua_pop(L, 1);
+            }
+        }
+
         // get setters subtable of metatable -> <mt> <setters>
         lua_pushliteral(L, "___setters");
         lua_rawget(L, -2);              // get __setters table

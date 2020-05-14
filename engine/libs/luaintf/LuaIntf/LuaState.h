@@ -172,7 +172,7 @@ namespace Lua
     /**
      * Push the named global onto Lua stack, the name may contains '.' to access field of table.
      * If any sub-table does not exist, this function will return nil.
-     * If any value in the name path is not accessable (not a table or no __index meta-method),
+     * If any value in the name path is not accessible (not a table or no __index meta-method),
      * it may result in Lua error.
      */
     void pushGlobal(lua_State* L, const char* name);
@@ -180,7 +180,7 @@ namespace Lua
     /**
      * Pop value from top of Lua stack, and set it to the named global,
      * the name may contains '.' to access field of table.
-     * If any sub-table does not exist or is not accessable (not a table or no __index meta-method),
+     * If any sub-table does not exist or is not accessible (not a table or no __index meta-method),
      * it may result in Lua error.
      */
     void popToGlobal(lua_State* L, const char* name);
