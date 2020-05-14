@@ -41,7 +41,8 @@ namespace Supernova {
         static Rect viewRect;
         
         static int renderAPI;
-        static bool mouseAsTouch;
+        static bool callMouseInTouchEvent;
+        static bool callTouchInMouseEvent;
         static bool useDegrees;
         static Scaling scalingMode;
         static bool defaultNearestScaleTexture;
@@ -86,8 +87,11 @@ namespace Supernova {
         static void setScalingMode(Scaling scalingMode);
         static int getScalingMode();
         
-        static void setMouseAsTouch(bool mouseAsTouch);
-        static bool isMouseAsTouch();
+        static void setCallMouseInTouchEvent(bool callMouseInTouchEvent);
+        static bool isCallMouseInTouchEvent();
+
+        static void setCallTouchInMouseEvent(bool callTouchInMouseEvent);
+        static bool isCallTouchInMouseEvent();
         
         static void setUseDegrees(bool useDegrees);
         static bool isUseDegrees();

@@ -43,7 +43,8 @@ int Engine::preferedCanvasHeight;
 Rect Engine::viewRect;
 
 int Engine::renderAPI;
-bool Engine::mouseAsTouch;
+bool Engine::callMouseInTouchEvent;
+bool Engine::callTouchInMouseEvent;
 bool Engine::useDegrees;
 Scaling Engine::scalingMode;
 bool Engine::defaultNearestScaleTexture;
@@ -154,12 +155,18 @@ int Engine::getScalingMode(){
     return scalingMode;
 }
 
-void Engine::setMouseAsTouch(bool mouseAsTouch){
-    Engine::mouseAsTouch = mouseAsTouch;
+void Engine::setCallMouseInTouchEvent(bool callMouseInTouchEvent){
+    Engine::callMouseInTouchEvent = callMouseInTouchEvent;
+}
+bool Engine::isCallMouseInTouchEvent(){
+    return Engine::callMouseInTouchEvent;
 }
 
-bool Engine::isMouseAsTouch(){
-    return Engine::mouseAsTouch;
+void Engine::setCallTouchInMouseEvent(bool callTouchInMouseEvent){
+    Engine::callTouchInMouseEvent = callTouchInMouseEvent;
+}
+bool Engine::isCallTouchInMouseEvent(){
+    return Engine::callTouchInMouseEvent;
 }
 
 void Engine::setUseDegrees(bool useDegrees){
@@ -240,7 +247,8 @@ void Engine::systemStart(){
 
     Engine::setCanvasSize(1000,480);
     Engine::setScalingMode(Scaling::FITWIDTH);
-    Engine::setMouseAsTouch(true);
+    Engine::setCallMouseInTouchEvent(false);
+    Engine::setCallTouchInMouseEvent(false);
     Engine::setUseDegrees(true);
     Engine::setRenderAPI(S_GLES2);
     Engine::setDefaultNearestScaleTexture(false);
@@ -386,6 +394,13 @@ void Engine::systemTouchStart(int pointer, float x, float y){
         Input::addTouchStarted();
         Input::setTouchPosition(x, y);
         //-----------------
+        if (Engine::isCallMouseInTouchEvent()){
+            //-----------------
+            Engine::onMouseDown.call(100, x, y);
+            Input::addMousePressed(100);
+            Input::setMousePosition(x, y);
+            //-----------------
+        }
     }
 }
 
@@ -396,6 +411,13 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
         Input::releaseTouchStarted();
         Input::setTouchPosition(x, y);
         //-----------------
+        if (Engine::isCallMouseInTouchEvent()){
+            //-----------------
+            Engine::onMouseUp.call(100, x, y);
+            Input::releaseMousePressed(100);
+            Input::setMousePosition(x, y);
+            //-----------------
+        }
     }
 }
 
@@ -405,6 +427,12 @@ void Engine::systemTouchDrag(int pointer, float x, float y){
         Engine::onTouchDrag.call(pointer, x, y);
         Input::setTouchPosition(x, y);
         //-----------------
+        if (Engine::isCallMouseInTouchEvent()){
+            //-----------------
+            Engine::onMouseDrag.call(100, x, y);
+            Input::setMousePosition(x, y);
+            //-----------------
+        }
     }
 }
 
@@ -415,7 +443,7 @@ void Engine::systemMouseDown(int button, float x, float y){
         Input::addMousePressed(button);
         Input::setMousePosition(x, y);
         //-----------------
-        if (Engine::isMouseAsTouch()){
+        if (Engine::isCallTouchInMouseEvent()){
             //-----------------
             Engine::onTouchStart.call(100, x, y);
             Input::addTouchStarted();
@@ -431,7 +459,7 @@ void Engine::systemMouseUp(int button, float x, float y){
         Input::releaseMousePressed(button);
         Input::setMousePosition(x, y);
         //-----------------
-        if (Engine::isMouseAsTouch()){
+        if (Engine::isCallTouchInMouseEvent()){
             //-----------------
             Engine::onTouchEnd.call(100, x, y);
             Input::releaseTouchStarted();
@@ -447,7 +475,7 @@ void Engine::systemMouseDrag(int button, float x, float y){
         Engine::onMouseDrag.call(button, x, y);
         Input::setMousePosition(x, y);
         //-----------------
-        if (Engine::isMouseAsTouch()){
+        if (Engine::isCallTouchInMouseEvent()){
             //-----------------
             Engine::onTouchDrag.call(100, x, y);
             Input::setTouchPosition(x, y);
