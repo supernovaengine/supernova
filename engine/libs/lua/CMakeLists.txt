@@ -1,42 +1,42 @@
-
+# By default LuaIntf expect the Lua library to build under C++
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x c++")
 
 set (
     lua_src
 
-    lapi.c
-    lauxlib.c
-    lbaselib.c
-    lbitlib.c
-    lcode.c
-    lcorolib.c
-    lctype.c
-    ldblib.c
-    ldebug.c
-    ldo.c
-    ldump.c
-    lfunc.c
-    lgc.c
-    linit.c
-    liolib.c
-    llex.c
-    lmathlib.c
-    lmem.c
-    loadlib.c
-    lobject.c
-    lopcodes.c
-    loslib.c
-    lparser.c
-    lstate.c
-    lstring.c
-    lstrlib.c
-    ltable.c
-    ltablib.c
-    ltm.c
-    lundump.c
-    lutf8lib.c
-    lvm.c
-    lzio.c
+    src/lapi.c
+    src/lauxlib.c
+    src/lbaselib.c
+    src/lbitlib.c
+    src/lcode.c
+    src/lcorolib.c
+    src/lctype.c
+    src/ldblib.c
+    src/ldebug.c
+    src/ldo.c
+    src/ldump.c
+    src/lfunc.c
+    src/lgc.c
+    src/linit.c
+    src/liolib.c
+    src/llex.c
+    src/lmathlib.c
+    src/lmem.c
+    src/loadlib.c
+    src/lobject.c
+    src/lopcodes.c
+    src/loslib.c
+    src/lparser.c
+    src/lstate.c
+    src/lstring.c
+    src/lstrlib.c
+    src/ltable.c
+    src/ltablib.c
+    src/ltm.c
+    src/lundump.c
+    src/lutf8lib.c
+    src/lvm.c
+    src/lzio.c
 )
 
 add_library(

@@ -1,7 +1,7 @@
 add_definitions("-frtti -fexceptions")
 # add_definitions("-Wall -Wextra")
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/lua")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/lua/src")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/luaintf")
 add_subdirectory (libs/lua)
 
