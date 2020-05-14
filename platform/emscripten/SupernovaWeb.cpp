@@ -56,22 +56,6 @@ int SupernovaWeb::getScreenHeight(){
 
 int SupernovaWeb::init(int width, int height){
 
-    SupernovaWeb::screenWidth = width;
-    SupernovaWeb::screenHeight = height;
-
-    Supernova::Engine::systemStart();
-
-    EmscriptenWebGLContextAttributes attr;
-    emscripten_webgl_init_context_attributes(&attr);
-    attr.alpha = attr.depth = attr.stencil = attr.antialias = attr.preserveDrawingBuffer = attr.failIfMajorPerformanceCaveat = 0;
-    attr.enableExtensionsByDefault = 1;
-    attr.premultipliedAlpha = 0;
-    attr.majorVersion = 1;
-    attr.minorVersion = 0;
-    EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_create_context("#canvas", &attr);
-    
-    emscripten_webgl_make_context_current(ctx);
-
     EMSCRIPTEN_RESULT ret = emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
     ret = emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
     ret = emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
@@ -85,6 +69,26 @@ int SupernovaWeb::init(int width, int height){
     //Removed because emscripten_set_canvas_element_size is not working on this callback
     //ret = emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, 0, 1, fullscreenchange_callback);
     //ret = emscripten_set_resize_callback("#canvas", 0, 1, canvasresize_callback);
+
+    SupernovaWeb::screenWidth = width;
+    SupernovaWeb::screenHeight = height;
+    Supernova::Engine::systemStart();
+
+    EmscriptenWebGLContextAttributes attr;
+    emscripten_webgl_init_context_attributes(&attr);
+    attr.alpha = true;
+    attr.depth = true;
+    attr.stencil = true;
+    attr.antialias = false;
+    attr.preserveDrawingBuffer = false;
+    attr.failIfMajorPerformanceCaveat = false;
+    attr.enableExtensionsByDefault = true;
+    attr.premultipliedAlpha = true;
+    attr.majorVersion = true;
+    attr.minorVersion = false;
+    EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_create_context("#canvas", &attr);
+    
+    emscripten_webgl_make_context_current(ctx);
 
     Supernova::Engine::systemSurfaceCreated();
     changeCanvasSize(width, height);
