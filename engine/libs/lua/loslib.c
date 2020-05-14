@@ -136,7 +136,16 @@ static time_t l_checktime (lua_State *L, int arg) {
 /* }================================================================== */
 
 
-
+//------ Supernova mod to compile on iOS platform (http://lua-users.org/lists/lua-l/2017-09/msg00242.html)
+#if defined(__APPLE__)
+     #include "TargetConditionals.h"
+     #if TARGET_OS_IOS || TARGET_OS_WATCH || TARGET_OS_TV
+         #define system(s) ((s)==NULL ? 0 : -1)
+     #endif
+#elif defined(__ANDROID__)
+     #define system(s) ((s)==NULL ? 0 : -1)
+#endif
+//------ Supernova end
 
 static int os_execute (lua_State *L) {
   const char *cmd = luaL_optstring(L, 1, NULL);
