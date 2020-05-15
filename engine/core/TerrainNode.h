@@ -14,6 +14,7 @@ namespace Supernova{
     class Terrain;
 
     class TerrainNode: public Submesh {
+
     private:
         Vector2 position;
         float size;
@@ -24,7 +25,8 @@ namespace Supernova{
         float currentRange;
         int resolution;
 
-    private:
+        float maxHeight;
+        float minHeight;
 
         bool inSphere(float radius, const AlignedBox& box);
         bool inFrustum(const AlignedBox& box);

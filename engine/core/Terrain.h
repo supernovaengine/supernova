@@ -83,6 +83,8 @@ namespace Supernova{
         void setTextureDetailTiles(int textureDetailTiles);
 
         float getHeight(float x, float y);
+        float maxHeightArea(float x, float z, float w, float h);
+        float minHeightArea(float x, float z, float w, float h);
 
         virtual bool renderLoad(bool shadow);
         virtual bool load();

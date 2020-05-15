@@ -183,6 +183,30 @@ float Terrain::getHeight(float x, float y){
     return val;
 }
 
+float Terrain::maxHeightArea(float x, float z, float w, float h) {
+    float maxVal = FLT_MIN;
+    for(float i = x; i < x+w; i++)
+        for(float j = z; j < z+h; j++){
+            float newVal = getHeight(i,j);
+            if(newVal > maxVal) {
+                maxVal = newVal;
+            }
+        }
+    return maxVal;
+}
+
+float Terrain::minHeightArea(float x, float z, float w, float h) {
+    float minVal = FLT_MAX;
+    for(float i = x; i < x+w; i++)
+        for(float j = z; j < z+h; j++){
+            float newVal = getHeight(i,j);
+            if(newVal < minVal) {
+                minVal = newVal;
+            }
+        }
+    return minVal;
+}
+
 TerrainNode* Terrain::createNode(float x, float y, float scale, int lodDepth){
     TerrainNode* terrainNode = new TerrainNode(x, y, scale, lodDepth, this);
 

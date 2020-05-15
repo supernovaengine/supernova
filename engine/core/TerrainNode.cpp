@@ -18,14 +18,23 @@ TerrainNode::TerrainNode(float x, float y, float size, int lodDepth, Terrain* te
 
     terrain->addSubmesh(this);
 
+    float halfSize = size/2;
+
     if (lodDepth == 1){
+        float terrainHalfSize = terrain->terrainSize / 2;
+        float relativeX = x - halfSize + terrainHalfSize;
+        float relativeY = y - halfSize + terrainHalfSize;
+
         childs[0] = NULL;
         childs[1] = NULL;
         childs[2] = NULL;
         childs[3] = NULL;
+
+        maxHeight = terrain->maxHeightArea(relativeX, relativeY, size, size);
+        minHeight = terrain->minHeightArea(relativeX, relativeY, size, size);
     }else{
-        float halfSize = size/2;
         float quarterSize = halfSize/2;
+
         childs[0] = new TerrainNode(x - quarterSize, y - quarterSize, halfSize, lodDepth - 1, terrain);
         childs[0]->setVisible(false);
         childs[1] = new TerrainNode(x - quarterSize, y + quarterSize, halfSize, lodDepth - 1, terrain);
@@ -34,6 +43,9 @@ TerrainNode::TerrainNode(float x, float y, float size, int lodDepth, Terrain* te
         childs[2]->setVisible(false);
         childs[3] = new TerrainNode(x + quarterSize, y + quarterSize, halfSize, lodDepth - 1, terrain);
         childs[3]->setVisible(false);
+
+        maxHeight = std::max(std::max(childs[0]->maxHeight,childs[1]->maxHeight), std::max(childs[2]->maxHeight,childs[3]->maxHeight));
+        minHeight = std::min(std::min(childs[0]->minHeight,childs[1]->minHeight), std::min(childs[2]->minHeight,childs[3]->minHeight));
     }
 }
 
@@ -111,9 +123,8 @@ AlignedBox TerrainNode::getAlignedBox(){
     Vector3 worldHalfScale(halfSize * terrain->getWorldScale().x, 1, halfSize * terrain->getWorldScale().z);
     Vector3 worldPosition = terrain->getModelMatrix() * Vector3(position.x, 0, position.y);
 
-    //TODO: minHeight and maxHeight
-    Vector3 c1 = Vector3(worldPosition.x - worldHalfScale.x, 0, worldPosition.z - worldHalfScale.z);
-    Vector3 c2 = Vector3(worldPosition.x + worldHalfScale.x, 100, worldPosition.z + worldHalfScale.z);
+    Vector3 c1 = Vector3(worldPosition.x - worldHalfScale.x, minHeight, worldPosition.z - worldHalfScale.z);
+    Vector3 c2 = Vector3(worldPosition.x + worldHalfScale.x, maxHeight, worldPosition.z + worldHalfScale.z);
 
     return AlignedBox(c1, c2);
 };
@@ -133,7 +144,6 @@ bool TerrainNode::inSphere(float radius, const AlignedBox& box) {
         float r2 = radius*radius;
         Vector3 cameraPosition = terrain->getScene()->getCameraPosition();
 
-        //TODO: minHeight and maxHeight
         Vector3 c1 = box.getMinimum();
         Vector3 c2 = box.getMaximum();
         Vector3 distV;
