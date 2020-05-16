@@ -10,6 +10,12 @@
 
 namespace Supernova{
 
+    enum BlendMapColor{
+        RED = 0,
+        GREEN = 1,
+        BLUE = 2
+    };
+
     class Terrain: public Mesh {
         friend class TerrainNode;
 
@@ -71,7 +77,8 @@ namespace Supernova{
         Texture* getBlendMap();
         void setBlendMap(std::string blendMapPath);
 
-        void setTextureDetail(int index, std::string heightMapPath);
+        void addTextureDetail(std::string heightMapPath, BlendMapColor blendMapColor);
+        bool removeTextureDetail(BlendMapColor blendMapColor);
 
         const std::vector<float> &getRanges() const;
         void setRanges(const std::vector<float> &ranges);

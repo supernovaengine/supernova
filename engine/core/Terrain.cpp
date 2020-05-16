@@ -48,6 +48,17 @@ Terrain::Terrain(std::string heightMapPath): Terrain(){
 Terrain::~Terrain(){
     if (heightMap)
         delete heightMap;
+
+    if (blendMap)
+        delete blendMap;
+
+    for (int i = 0; i < textureDetails.size(); i++){
+        delete textureDetails[i];
+    }
+
+    for (int i = 0; i < grid.size(); i++){
+        delete grid[i];
+    }
 }
 
 Texture* Terrain::getHeightMap(){
@@ -74,9 +85,23 @@ void Terrain::setBlendMap(std::string blendMapPath){
     blendMap = new Texture(blendMapPath);
 }
 
-void Terrain::setTextureDetail(int index, std::string heightMapPath){
+void Terrain::addTextureDetail(std::string heightMapPath, BlendMapColor blendMapColor){
+    removeTextureDetail(blendMapColor);
+
     textureDetails.push_back(new Texture(heightMapPath));
-    blendMapColorIndex.push_back(2);
+    blendMapColorIndex.push_back(blendMapColor);
+}
+
+bool Terrain::removeTextureDetail(BlendMapColor blendMapColor){
+    for (int i = 0; i < blendMapColorIndex.size(); i++){
+        if (blendMapColorIndex[i] == blendMapColor){
+            delete textureDetails[i];
+            textureDetails.erase(textureDetails.begin() + i);
+            blendMapColorIndex.erase(blendMapColorIndex.begin() + i);
+            return true;
+        }
+    }
+    return false;
 }
 
 const std::vector<float> &Terrain::getRanges() const {

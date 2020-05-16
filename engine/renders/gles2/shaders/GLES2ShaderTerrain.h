@@ -109,10 +109,9 @@ std::string terrainFragmentImp =
 
         "        #pragma unroll_loop\n"
         "        for(int i = 0; i < NUMBLENDMAPCOLORS; i++){\n"
-        "            for (int j = 0; j < 3; j++){\n" //Max of blend colors
+        "            for (int j = 0; j < 3; j++)\n" //Max of blend colors
         "                if (u_blendMapColorIdx[i] == j)\n"
         "                    fragColor = fragColor + texture2D(u_terrainDetail[i], v_TerrainTextureDetailTiled) * blendMapColor[j];\n"
-        "            }\n"
         "        }\n"
         "    #endif\n";
 
