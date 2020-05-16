@@ -36,28 +36,27 @@ public class KeyListener implements OnKeyListener {
 
 	@Override
 	public boolean onKey(View v, final int keyCode, KeyEvent event) {
+		final int supernovaKey = convertToSupernova(keyCode);
 
-		if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP){
-			activity.finish();
-		}
-
-        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+        if(event.getAction() == KeyEvent.ACTION_DOWN && supernovaKey > 0) {
             glSurfaceView.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                	JNIWrapper.system_key_down(convertToSupernova(keyCode));
+                	JNIWrapper.system_key_down(supernovaKey);
                 }
             });
-        }else if(event.getAction() == KeyEvent.ACTION_UP) {
+            return true;
+        }else if(event.getAction() == KeyEvent.ACTION_UP && supernovaKey > 0) {
             glSurfaceView.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                	JNIWrapper.system_key_up(convertToSupernova(keyCode));
+                	JNIWrapper.system_key_up(supernovaKey);
                 }
             });
+            return true;
         }
 
-        return true;
+        return false;
 	}
 
 }
