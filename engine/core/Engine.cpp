@@ -113,8 +113,8 @@ void Engine::calculateCanvas(){
     Engine::canvasWidth = preferedCanvasWidth;
     Engine::canvasHeight = preferedCanvasHeight;
 
-    int screenWidth = System::instance().getScreenWidth();
-    int screenHeight = System::instance().getScreenHeight();
+    int screenWidth = System::instance()->getScreenWidth();
+    int screenHeight = System::instance()->getScreenHeight();
 
     //When canvas size is changed
     if (scalingMode == Scaling::FITWIDTH){
@@ -278,8 +278,8 @@ void Engine::systemSurfaceChanged() {
 
     calculateCanvas();
 
-    int screenWidth = System::instance().getScreenWidth();
-    int screenHeight = System::instance().getScreenHeight();
+    int screenWidth = System::instance()->getScreenWidth();
+    int screenHeight = System::instance()->getScreenHeight();
     
     int viewX = 0;
     int viewY = 0;
@@ -378,8 +378,8 @@ void Engine::systemResume(){
 }
 
 bool Engine::transformCoordPos(float& x, float& y){
-    x = (x * (float)System::instance().getScreenWidth() / viewRect.getWidth());
-    y = (y * (float)System::instance().getScreenHeight() / viewRect.getHeight());
+    x = (x * (float)System::instance()->getScreenWidth() / viewRect.getWidth());
+    y = (y * (float)System::instance()->getScreenHeight() / viewRect.getHeight());
     
     x = ((float)Engine::getCanvasWidth() * (x+1)) / 2;
     y = ((float)Engine::getCanvasHeight() * (y+1)) / 2;

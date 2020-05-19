@@ -3,23 +3,35 @@
 #include <android/asset_manager_jni.h>
 
 #include "Engine.h"
-#include "SupernovaAndroid.h"
 
 #define UNUSED(x) (void)(x)
+
+jclass AndroidJNI::mainActivityClsRef;
+jmethodID AndroidJNI::getScreenWidthRef;
+jmethodID AndroidJNI::getScreenHeightRef;
+jmethodID AndroidJNI::getWritablePathRef;
+jmethodID AndroidJNI::showSoftKeyboardRef;
+jmethodID AndroidJNI::hideSoftKeyboardRef;
+jobject AndroidJNI::mainActivityObjRef;
+JNIEnv * AndroidJNI::envRef;
+
+AAssetManager* AndroidJNI::android_asset_manager;
+
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_init_1native(JNIEnv * env, jclass cls, jobject main_activity, jobject java_asset_manager) {
     UNUSED(cls);
 
-    SupernovaAndroid::envRef = env;
-    SupernovaAndroid::mainActivityClsRef = env->FindClass("com/deslon/supernova/MainActivity");
-    //SupernovaAndroid::showInputTextRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "showInputText", "(Ljava/lang/String;)V");
-    SupernovaAndroid::getScreenWidthRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "getScreenWidth", "()I");
-    SupernovaAndroid::getScreenHeightRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "getScreenHeight", "()I");
-	SupernovaAndroid::showSoftKeyboardRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "showSoftKeyboard", "()V");
-	SupernovaAndroid::hideSoftKeyboardRef = env->GetMethodID(SupernovaAndroid::mainActivityClsRef, "hideSoftKeyboard", "()V");
-    SupernovaAndroid::mainActivityObjRef = env->NewGlobalRef(main_activity);
+    AndroidJNI::envRef = env;
+    AndroidJNI::mainActivityClsRef = env->FindClass("com/deslon/supernova/MainActivity");
+    //AndroidJNI::showInputTextRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "showInputText", "(Ljava/lang/String;)V");
+    AndroidJNI::getScreenWidthRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getScreenWidth", "()I");
+    AndroidJNI::getScreenHeightRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getScreenHeight", "()I");
+	AndroidJNI::getWritablePathRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getWritablePath", "()Ljava/lang/String;");
+	AndroidJNI::showSoftKeyboardRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "showSoftKeyboard", "()V");
+	AndroidJNI::hideSoftKeyboardRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "hideSoftKeyboard", "()V");
+    AndroidJNI::mainActivityObjRef = env->NewGlobalRef(main_activity);
 
-    SupernovaAndroid::android_asset_manager = AAssetManager_fromJava(env, java_asset_manager);
+	AndroidJNI::android_asset_manager = AAssetManager_fromJava(env, java_asset_manager);
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1start(JNIEnv * env, jclass cls) {

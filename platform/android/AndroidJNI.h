@@ -2,6 +2,23 @@
 #define ANDROID_JNI_H_
 
 #include <jni.h>
+#include <android/asset_manager.h>
+
+class AndroidJNI {
+
+public:
+
+	static jclass mainActivityClsRef;
+	static jmethodID getScreenWidthRef;
+	static jmethodID getScreenHeightRef;
+	static jmethodID getWritablePathRef;
+	static jmethodID showSoftKeyboardRef;
+	static jmethodID hideSoftKeyboardRef;
+	static jobject mainActivityObjRef;
+	static JNIEnv *envRef;
+
+	static AAssetManager* android_asset_manager;
+};
 
 
 extern "C" {

@@ -1,9 +1,8 @@
 #ifndef SupernovaAndroid_H_
 #define SupernovaAndroid_H_
 
-#include <jni.h>
-#include <android/asset_manager.h>
 #include <stdio.h>
+#include <string>
 #include "system/System.h"
 
 class SupernovaAndroid: public Supernova::System {
@@ -14,16 +13,6 @@ private:
 
 public:
 
-	static jclass mainActivityClsRef;
-	static jmethodID getScreenWidthRef;
-	static jmethodID getScreenHeightRef;
-	static jmethodID showSoftKeyboardRef;
-	static jmethodID hideSoftKeyboardRef;
-	static jobject mainActivityObjRef;
-	static JNIEnv * envRef;
-
-	static AAssetManager* android_asset_manager;
-
     SupernovaAndroid();
 
     virtual int getScreenWidth();
@@ -31,6 +20,9 @@ public:
 
 	virtual void showVirtualKeyboard();
 	virtual void hideVirtualKeyboard();
+
+	std::string getWritablePath();
+
     virtual FILE* platformFopen(const char* fname, const char* mode);
 	virtual void platformLog(const int type, const char *fmt, va_list args);
 };

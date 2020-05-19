@@ -8,6 +8,9 @@ class SupernovaWeb: public Supernova::System{
 
 private:
 
+    static int syncWaitTime;
+    static bool enabledIDB;
+
     static int screenWidth;
     static int screenHeight;
 
@@ -28,6 +31,8 @@ public:
 
     SupernovaWeb();
 
+    static void setEnabledIDB(bool enabledIDB);
+
     static int init(int width, int height);
     static void changeCanvasSize(int width, int height);
 
@@ -37,6 +42,10 @@ public:
     virtual bool isFullscreen();
     virtual void requestFullscreen();
     virtual void exitFullscreen();
+
+    virtual std::string getWritablePath();
+
+    virtual bool syncFileSystem();
     
 };
 

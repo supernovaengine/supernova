@@ -112,14 +112,18 @@ std::string File::simplifyPath(std::string path) {
     return res;
 }
 
-std::string File::readString(){
+std::string File::readString(int aOffset){
     unsigned int stringlen = length();
     std::string s( stringlen, '\0' );
     
-    seek(0);
+    seek(aOffset);
     read((unsigned char*)&s[0], stringlen);
 
     return s;
+}
+
+unsigned int File::writeString(std::string s){
+    return write((unsigned char*)&s[0], s.length());
 }
 
 std::string File::getFilePathExtension(const std::string &filepath) {

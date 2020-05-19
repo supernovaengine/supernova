@@ -35,4 +35,5 @@ target_link_libraries(
 
     supernova
     supernova-project
+    idbfs.js
 )

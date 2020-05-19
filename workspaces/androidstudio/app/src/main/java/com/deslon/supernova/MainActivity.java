@@ -229,4 +229,8 @@ public class MainActivity extends Activity {
 	public int getScreenWidth(){ return screenWidth; }
 
 	public int getScreenHeight(){ return screenHeight; }
+
+	public String getWritablePath() {
+		return getFilesDir().getAbsolutePath();
+	}
 }

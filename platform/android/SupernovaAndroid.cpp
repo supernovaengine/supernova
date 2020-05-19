@@ -3,6 +3,8 @@
 #include <errno.h>
 #include <android/log.h>
 #include <stdarg.h>
+#include <android/asset_manager.h>
+#include "AndroidJNI.h"
 
 int android_read(void* cookie, char* buf, int size) {
     return AAsset_read((AAsset*)cookie, buf, size);
@@ -21,43 +23,40 @@ static int android_close(void* cookie) {
     return 0;
 }
 
-jclass SupernovaAndroid::mainActivityClsRef;
-jmethodID SupernovaAndroid::getScreenWidthRef;
-jmethodID SupernovaAndroid::getScreenHeightRef;
-jmethodID SupernovaAndroid::showSoftKeyboardRef;
-jmethodID SupernovaAndroid::hideSoftKeyboardRef;
-jobject SupernovaAndroid::mainActivityObjRef;
-JNIEnv * SupernovaAndroid::envRef;
-
-AAssetManager* SupernovaAndroid::android_asset_manager;
-
-
 SupernovaAndroid::SupernovaAndroid(){
     logtag = "Supernova";
 }
 
 int SupernovaAndroid::getScreenWidth(){
-    return envRef->CallIntMethod(mainActivityObjRef, getScreenWidthRef);
+    return AndroidJNI::envRef->CallIntMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getScreenWidthRef);
 }
 
 int SupernovaAndroid::getScreenHeight(){
-    return envRef->CallIntMethod(mainActivityObjRef, getScreenHeightRef);
+    return AndroidJNI::envRef->CallIntMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getScreenHeightRef);
 }
 
 void SupernovaAndroid::showVirtualKeyboard(){
-    envRef->CallVoidMethod(mainActivityObjRef, showSoftKeyboardRef);
+    AndroidJNI::envRef->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::showSoftKeyboardRef);
 }
 
 void SupernovaAndroid::hideVirtualKeyboard(){
-    envRef->CallVoidMethod(mainActivityObjRef, hideSoftKeyboardRef);
+    AndroidJNI::envRef->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::hideSoftKeyboardRef);
+}
+
+std::string SupernovaAndroid::getWritablePath() {
+    jstring rv = (jstring)AndroidJNI::envRef->CallObjectMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getWritablePathRef);
+    return AndroidJNI::envRef->GetStringUTFChars(rv, 0);
 }
 
 FILE* SupernovaAndroid::platformFopen(const char* fname, const char* mode) {
+    //Return regular fopen if writable path is in path
+    if (std::string(fname).find(getWritablePath()) != std::string::npos) {
+        return fopen(fname, mode);
+    }
+
     if(mode[0] == 'w') return NULL;
-
-    AAsset* asset = AAssetManager_open(android_asset_manager, fname, 0);
+    AAsset* asset = AAssetManager_open(AndroidJNI::android_asset_manager, fname, 0);
     if(!asset) return NULL;
-
     return funopen(asset, android_read, android_write, android_seek, android_close);
 }
 

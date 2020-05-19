@@ -7,6 +7,7 @@
 #define S_LOG_ERROR 4
 
 #include <stdio.h>
+#include <string>
 
 namespace Supernova {
 
@@ -17,7 +18,7 @@ namespace Supernova {
 
     public:
 
-        static System& instance();
+        static System* instance();
 
         virtual ~System() {}
 
@@ -31,7 +32,11 @@ namespace Supernova {
         virtual void requestFullscreen();
         virtual void exitFullscreen();
 
+        virtual std::string getWritablePath();
+
         virtual FILE* platformFopen(const char* fname, const char* mode);
+        virtual bool syncFileSystem();
+
         virtual void platformLog(const int type, const char *fmt, va_list args);
     };
 

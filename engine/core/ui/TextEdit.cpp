@@ -80,12 +80,12 @@ Text* TextEdit::getTextObject(){
 }
 
 void TextEdit::getFocus(){
-    System::instance().showVirtualKeyboard();
+    System::instance()->showVirtualKeyboard();
     UIObject::getFocus();
 }
 
 void TextEdit::lostFocus(){
-    System::instance().hideVirtualKeyboard();
+    System::instance()->hideVirtualKeyboard();
     UIObject::lostFocus();
 }
 
@@ -104,7 +104,7 @@ void TextEdit::engineOnTextInput(std::string text){
                 newText = convert.to_bytes(utf16OldText.substr(0, utf16OldText.size() - 1));
                 setText(newText);
             } else if (utf16Text[i] == '\n') {
-                System::instance().hideVirtualKeyboard();
+                System::instance()->hideVirtualKeyboard();
             } else {
                 newText = getText() + convert.to_bytes(utf16Text[i]);
                 setText(newText);

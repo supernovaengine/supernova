@@ -34,6 +34,16 @@ unsigned int FileData::read(unsigned char *aDst, unsigned int aBytes) {
     return aBytes;
 }
 
+unsigned int FileData::write(unsigned char *aSrc, unsigned int aBytes) {
+    if (offset + aBytes >= dataLength)
+        aBytes = dataLength - offset;
+
+    memcpy(dataPtr + offset, aSrc, aBytes);
+    offset += aBytes;
+
+    return aBytes;
+}
+
 unsigned int FileData::length() {
     return dataLength;
 }

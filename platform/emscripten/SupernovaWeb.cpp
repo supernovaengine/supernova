@@ -9,20 +9,36 @@
 #include "Engine.h"
 #include "Input.h"
 #include "system/System.h"
+#include "Log.h"
+
+int SupernovaWeb::syncWaitTime;
+bool SupernovaWeb::enabledIDB;
 
 int SupernovaWeb::screenWidth;
 int SupernovaWeb::screenHeight;
 
-
 extern "C" {
     int getScreenWidth() {
-        return Supernova::System::instance().getScreenWidth();
+        return Supernova::System::instance()->getScreenWidth();
     }
     int getScreenHeight() {
-        return Supernova::System::instance().getScreenHeight();
+        return Supernova::System::instance()->getScreenHeight();
     }
     void changeCanvasSize(int nWidth, int nHeight){
         SupernovaWeb::changeCanvasSize(nWidth, nHeight);
+    }
+    EMSCRIPTEN_KEEPALIVE void syncfs_enable_callback(std::string err) {
+	    if (!err.empty()) {
+		    Supernova::Log::Error("Failed to enable IndexedDB: %s", err.c_str());
+            SupernovaWeb::setEnabledIDB(false);
+	    }else{
+            SupernovaWeb::setEnabledIDB(true);
+        }
+    }
+    EMSCRIPTEN_KEEPALIVE void syncfs_callback(std::string err) {
+	    if (!err.empty()) {
+		    Supernova::Log::Error("Failed to save in iDB file system: %s", err.c_str());
+	    }
     }
 }
 
@@ -43,7 +59,11 @@ int main(int argc, char **argv) {
 
 
 SupernovaWeb::SupernovaWeb(){
-    
+
+}
+
+void SupernovaWeb::setEnabledIDB(bool enabledIDB){
+    SupernovaWeb::enabledIDB = enabledIDB;
 }
 
 int SupernovaWeb::getScreenWidth(){
@@ -69,6 +89,16 @@ int SupernovaWeb::init(int width, int height){
     //Removed because emscripten_set_canvas_element_size is not working on this callback
     //ret = emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, 0, 1, fullscreenchange_callback);
     //ret = emscripten_set_resize_callback("#canvas", 0, 1, canvasresize_callback);
+
+    syncWaitTime = 0;
+    enabledIDB = false;
+    EM_ASM(
+		FS.mkdir('/datafs');
+		FS.mount(IDBFS, {}, '/datafs');
+		FS.syncfs(true, function(err) {
+			ccall('syncfs_enable_callback', null, ['string'], [err ? err.message : ""])
+		});
+	);
 
     SupernovaWeb::screenWidth = width;
     SupernovaWeb::screenHeight = height;
@@ -128,8 +158,31 @@ void SupernovaWeb::exitFullscreen(){
     EMSCRIPTEN_RESULT ret = emscripten_exit_fullscreen();
 }
 
+std::string SupernovaWeb::getWritablePath(){
+    return "/datafs";
+}
+
+bool SupernovaWeb::syncFileSystem(){
+    if (enabledIDB)
+        syncWaitTime = 1000;
+
+    return true;
+}
+
 void SupernovaWeb::renderLoop(){    
     Supernova::Engine::systemDraw();
+
+    if (syncWaitTime > 0) {
+		syncWaitTime -= (int)(Supernova::Engine::getDeltatime()*1000);
+
+        if (syncWaitTime <= 0){
+            EM_ASM(
+	            FS.syncfs(function(err) {
+                    ccall('syncfs_callback', null, ['string'], [err ? err.message : ""])
+		        });
+	        );
+        }
+    }
 }
 
 EM_BOOL SupernovaWeb::canvas_resize(int eventType, const void *reserved, void *userData){

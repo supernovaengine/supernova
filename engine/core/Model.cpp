@@ -56,8 +56,6 @@ Model::~Model() {
 }
 
 bool Model::fileExists(const std::string &abs_filename, void *) {
-
-
     FileHandle df;
     int res = df.open(abs_filename.c_str());
 
@@ -69,7 +67,6 @@ bool Model::fileExists(const std::string &abs_filename, void *) {
 }
 
 bool Model::readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *) {
-
     FileData filedata(filepath.c_str());
     std::istringstream f(filedata.readString());
 

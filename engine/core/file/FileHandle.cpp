@@ -12,8 +12,8 @@ FileHandle::FileHandle(FILE *fp) {
     this->fileHandle = fp;
 }
 
-FileHandle::FileHandle(const char *aFilename){
-    open(aFilename);
+FileHandle::FileHandle(const char *aFilename, bool write){
+    open(aFilename, write);
 }
 
 FileHandle::~FileHandle() {
@@ -23,6 +23,12 @@ FileHandle::~FileHandle() {
 
 unsigned int FileHandle::read(unsigned char *aDst, unsigned int aBytes) {
     return (unsigned int)fread(aDst, 1, aBytes, fileHandle);
+}
+
+unsigned int FileHandle::write(unsigned char *aSrc, unsigned int aBytes){
+    unsigned int r = (unsigned int)fwrite(aSrc, 1, aBytes, fileHandle);
+    System::instance()->syncFileSystem();
+    return r;
 }
 
 unsigned int FileHandle::length() {
@@ -45,10 +51,14 @@ FILE *FileHandle::getFilePtr() {
     return fileHandle;
 }
 
-unsigned int FileHandle::open(const char *aFilename){
+unsigned int FileHandle::open(const char *aFilename, bool write){
     if (!aFilename)
         return 1;
-    fileHandle = System::instance().platformFopen(aFilename, "rb");
+    if (!write)
+        fileHandle = System::instance()->platformFopen(aFilename, "rb");
+    else{
+        fileHandle = System::instance()->platformFopen(aFilename, "w+b");
+    }
     if (!fileHandle)
         return 2;
     return 0;

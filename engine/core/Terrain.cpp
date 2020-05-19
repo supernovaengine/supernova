@@ -209,7 +209,7 @@ float Terrain::getHeight(float x, float y){
 }
 
 float Terrain::maxHeightArea(float x, float z, float w, float h) {
-    float maxVal = FLT_MIN;
+    float maxVal = std::numeric_limits<float>::min();
     for(float i = x; i < x+w; i++)
         for(float j = z; j < z+h; j++){
             float newVal = getHeight(i,j);
@@ -221,7 +221,7 @@ float Terrain::maxHeightArea(float x, float z, float w, float h) {
 }
 
 float Terrain::minHeightArea(float x, float z, float w, float h) {
-    float minVal = FLT_MAX;
+    float minVal = std::numeric_limits<float>::max();
     for(float i = x; i < x+w; i++)
         for(float j = z; j < z+h; j++){
             float newVal = getHeight(i,j);

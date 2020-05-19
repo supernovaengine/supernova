@@ -13,7 +13,7 @@ using namespace Supernova;
 #include "SupernovaWeb.h"
 #endif
 
-System& System::instance(){
+System* System::instance(){
 #ifdef SUPERNOVA_ANDROID
     static System *instance = new SupernovaAndroid();
 #endif
@@ -24,7 +24,7 @@ System& System::instance(){
     static System *instance = new SupernovaWeb();
 #endif
 
-    return *instance;
+    return instance;
 }
 
 void System::showVirtualKeyboard(){
@@ -47,8 +47,16 @@ void System::exitFullscreen(){
 
 }
 
+std::string System::getWritablePath(){
+    return ".";
+}
+
 FILE* System::platformFopen(const char* fname, const char* mode){
     return fopen(fname, mode);
+}
+
+bool System::syncFileSystem(){
+    return true;
 }
 
 void System::platformLog(const int type, const char *fmt, va_list args){
