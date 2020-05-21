@@ -43,7 +43,7 @@ public:
     virtual void requestFullscreen();
     virtual void exitFullscreen();
 
-    virtual std::string getWritablePath();
+    virtual std::string getUserDataPath();
 
     virtual bool syncFileSystem();
     

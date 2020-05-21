@@ -47,7 +47,11 @@ void System::exitFullscreen(){
 
 }
 
-std::string System::getWritablePath(){
+std::string System::getAssetPath(){
+    return ".";
+}
+
+std::string System::getUserDataPath(){
     return ".";
 }
 

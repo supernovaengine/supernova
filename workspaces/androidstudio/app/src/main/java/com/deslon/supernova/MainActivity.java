@@ -230,7 +230,7 @@ public class MainActivity extends Activity {
 
 	public int getScreenHeight(){ return screenHeight; }
 
-	public String getWritablePath() {
+	public String getUserDataPath() {
 		return getFilesDir().getAbsolutePath();
 	}
 }

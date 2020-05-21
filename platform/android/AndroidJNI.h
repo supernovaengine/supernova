@@ -11,7 +11,7 @@ public:
 	static jclass mainActivityClsRef;
 	static jmethodID getScreenWidthRef;
 	static jmethodID getScreenHeightRef;
-	static jmethodID getWritablePathRef;
+	static jmethodID getUserDataPathRef;
 	static jmethodID showSoftKeyboardRef;
 	static jmethodID hideSoftKeyboardRef;
 	static jobject mainActivityObjRef;

@@ -112,6 +112,16 @@ std::string File::simplifyPath(std::string path) {
     return res;
 }
 
+std::string File::getFilePathExtension(const std::string &filepath) {
+    if (filepath.find_last_of(".") != std::string::npos)
+        return filepath.substr(filepath.find_last_of(".") + 1);
+    return "";
+}
+
+std::string File::getSystemPath(std::string path){
+
+}
+
 std::string File::readString(int aOffset){
     unsigned int stringlen = length();
     std::string s( stringlen, '\0' );
@@ -124,10 +134,4 @@ std::string File::readString(int aOffset){
 
 unsigned int File::writeString(std::string s){
     return write((unsigned char*)&s[0], s.length());
-}
-
-std::string File::getFilePathExtension(const std::string &filepath) {
-    if (filepath.find_last_of(".") != std::string::npos)
-        return filepath.substr(filepath.find_last_of(".") + 1);
-    return "";
 }

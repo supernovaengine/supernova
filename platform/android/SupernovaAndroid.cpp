@@ -43,14 +43,14 @@ void SupernovaAndroid::hideVirtualKeyboard(){
     AndroidJNI::envRef->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::hideSoftKeyboardRef);
 }
 
-std::string SupernovaAndroid::getWritablePath() {
-    jstring rv = (jstring)AndroidJNI::envRef->CallObjectMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getWritablePathRef);
+std::string SupernovaAndroid::getUserDataPath() {
+    jstring rv = (jstring)AndroidJNI::envRef->CallObjectMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getUserDataPathRef);
     return AndroidJNI::envRef->GetStringUTFChars(rv, 0);
 }
 
 FILE* SupernovaAndroid::platformFopen(const char* fname, const char* mode) {
     //Return regular fopen if writable path is in path
-    if (std::string(fname).find(getWritablePath()) != std::string::npos) {
+    if (std::string(fname).find(getUserDataPath()) != std::string::npos) {
         return fopen(fname, mode);
     }
 

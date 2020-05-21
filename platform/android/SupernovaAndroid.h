@@ -21,7 +21,7 @@ public:
 	virtual void showVirtualKeyboard();
 	virtual void hideVirtualKeyboard();
 
-	std::string getWritablePath();
+	std::string getUserDataPath();
 
     virtual FILE* platformFopen(const char* fname, const char* mode);
 	virtual void platformLog(const int type, const char *fmt, va_list args);

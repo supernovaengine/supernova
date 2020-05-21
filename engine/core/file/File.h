@@ -18,6 +18,7 @@ namespace Supernova {
         static std::string getBaseDir(std::string filepath);
         static std::string simplifyPath(std::string path);
         static std::string getFilePathExtension(const std::string &filepath);
+        static std::string getSystemPath(std::string path);
 
         unsigned int read8();
         unsigned int read16();

@@ -158,7 +158,7 @@ void SupernovaWeb::exitFullscreen(){
     EMSCRIPTEN_RESULT ret = emscripten_exit_fullscreen();
 }
 
-std::string SupernovaWeb::getWritablePath(){
+std::string SupernovaWeb::getUserDataPath(){
     return "/datafs";
 }
 

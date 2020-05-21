@@ -32,7 +32,8 @@ namespace Supernova {
         virtual void requestFullscreen();
         virtual void exitFullscreen();
 
-        virtual std::string getWritablePath();
+        virtual std::string getAssetPath();
+        virtual std::string getUserDataPath();
 
         virtual FILE* platformFopen(const char* fname, const char* mode);
         virtual bool syncFileSystem();
