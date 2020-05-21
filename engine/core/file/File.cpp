@@ -1,5 +1,6 @@
 #include "File.h"
 #include "FileData.h"
+#include "system/System.h"
 #include <stack>
 
 using namespace Supernova;
@@ -46,6 +47,25 @@ char File::getDirSeparator(){
 #else
     return '/';
 #endif
+}
+
+bool File::beginWith(std::string path, std::string prefix){
+    if (prefix.length() > path.length()) {
+        return false;
+    }
+
+    if (prefix.length() == 0) {
+        return true;
+    }
+
+    int i;
+    for (i = 0; i < prefix.length(); i++) {
+        if (path[i] != prefix[i]) {
+            return false;
+        }
+    }
+
+    return i == prefix.length();
 }
 
 std::string File::getBaseDir(std::string filepath){
@@ -119,7 +139,19 @@ std::string File::getFilePathExtension(const std::string &filepath) {
 }
 
 std::string File::getSystemPath(std::string path){
-
+    if (beginWith(path, "data://")){
+        path = path.substr(7, path.length());
+        return System::instance()->getUserDataPath() + "/" + File::simplifyPath(path);
+    }
+    if (beginWith(path, "asset://")){
+        path = path.substr(8, path.length());
+        return System::instance()->getAssetPath() + "/" + File::simplifyPath(path);
+    }
+    if (beginWith(path, "/")){
+        path = path.substr(1, path.length());
+        return System::instance()->getAssetPath() + "/" + File::simplifyPath(path);
+    }
+    return System::instance()->getAssetPath() + "/" + File::simplifyPath(path);
 }
 
 std::string File::readString(int aOffset){

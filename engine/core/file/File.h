@@ -8,6 +8,11 @@
 namespace Supernova {
 
     class File {
+
+    protected:
+        static bool beginWith(std::string path, std::string prefix);
+        static std::string simplifyPath(std::string path);
+
     public:
         virtual ~File();
 
@@ -16,7 +21,6 @@ namespace Supernova {
 
         static char getDirSeparator();
         static std::string getBaseDir(std::string filepath);
-        static std::string simplifyPath(std::string path);
         static std::string getFilePathExtension(const std::string &filepath);
         static std::string getSystemPath(std::string path);
 

@@ -49,13 +49,19 @@ std::string SupernovaAndroid::getUserDataPath() {
 }
 
 FILE* SupernovaAndroid::platformFopen(const char* fname, const char* mode) {
+    std::string path = fname;
+
     //Return regular fopen if writable path is in path
-    if (std::string(fname).find(getUserDataPath()) != std::string::npos) {
-        return fopen(fname, mode);
+    if (path.find(getUserDataPath()) != std::string::npos) {
+        return fopen(path.c_str(), mode);
+    }
+
+    if (path[0] == '/'){
+        path = path.substr(1, path.length());
     }
 
     if(mode[0] == 'w') return NULL;
-    AAsset* asset = AAssetManager_open(AndroidJNI::android_asset_manager, fname, 0);
+    AAsset* asset = AAssetManager_open(AndroidJNI::android_asset_manager, path.c_str(), 0);
     if(!asset) return NULL;
     return funopen(asset, android_read, android_write, android_seek, android_close);
 }

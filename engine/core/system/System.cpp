@@ -48,11 +48,11 @@ void System::exitFullscreen(){
 }
 
 std::string System::getAssetPath(){
-    return ".";
+    return "";
 }
 
 std::string System::getUserDataPath(){
-    return ".";
+    return "";
 }
 
 FILE* System::platformFopen(const char* fname, const char* mode){

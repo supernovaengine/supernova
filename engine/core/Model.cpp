@@ -688,7 +688,7 @@ bool Model::loadOBJ(const char* filename){
         resizeSubmeshes(materials.size());
 
         for (size_t i = 0; i < materials.size(); i++) {
-            this->submeshes[i]->getMaterial()->setTexturePath(File::simplifyPath(baseDir+materials[i].diffuse_texname));
+            this->submeshes[i]->getMaterial()->setTexturePath(baseDir+materials[i].diffuse_texname);
             if (materials[i].dissolve < 1){
                 // TODO: Add this check on isTransparent Material method
                 transparent = true;
