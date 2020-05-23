@@ -54,11 +54,11 @@ FILE *FileHandle::getFilePtr() {
 unsigned int FileHandle::open(const char *aFilename, bool write){
     if (!aFilename)
         return 1;
-    const char* systemPath = File::getSystemPath(aFilename).c_str();
+    std::string systemPath = File::getSystemPath(aFilename);
     if (!write)
-        fileHandle = System::instance()->platformFopen(systemPath, "rb");
+        fileHandle = System::instance()->platformFopen(systemPath.c_str(), "rb");
     else{
-        fileHandle = System::instance()->platformFopen(systemPath, "w+b");
+        fileHandle = System::instance()->platformFopen(systemPath.c_str(), "w+b");
     }
     if (!fileHandle)
         return 2;
