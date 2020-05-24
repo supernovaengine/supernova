@@ -27,17 +27,17 @@ extern "C" {
     void changeCanvasSize(int nWidth, int nHeight){
         SupernovaWeb::changeCanvasSize(nWidth, nHeight);
     }
-    EMSCRIPTEN_KEEPALIVE void syncfs_enable_callback(std::string err) {
-	    if (!err.empty()) {
-		    Supernova::Log::Error("Failed to enable IndexedDB: %s", err.c_str());
+    EMSCRIPTEN_KEEPALIVE void syncfs_enable_callback(const char* err) {
+	    if (!err || err[0]) {
+		    Supernova::Log::Error("Failed to enable IndexedDB: %s", err);
             SupernovaWeb::setEnabledIDB(false);
 	    }else{
             SupernovaWeb::setEnabledIDB(true);
         }
     }
-    EMSCRIPTEN_KEEPALIVE void syncfs_callback(std::string err) {
-	    if (!err.empty()) {
-		    Supernova::Log::Error("Failed to save in iDB file system: %s", err.c_str());
+    EMSCRIPTEN_KEEPALIVE void syncfs_callback(const char* err) {
+	    if (!err || err[0]) {
+		    Supernova::Log::Error("Failed to save in iDB file system: %s", err);
 	    }
     }
 }
@@ -96,7 +96,7 @@ int SupernovaWeb::init(int width, int height){
 		FS.mkdir('/datafs');
 		FS.mount(IDBFS, {}, '/datafs');
 		FS.syncfs(true, function(err) {
-			ccall('syncfs_enable_callback', null, ['string'], [err ? err.message : ""])
+			ccall('syncfs_enable_callback', null, ['string'], [err ? err.message : ""]);
 		});
 	);
 
@@ -164,7 +164,7 @@ std::string SupernovaWeb::getUserDataPath(){
 
 bool SupernovaWeb::syncFileSystem(){
     if (enabledIDB)
-        syncWaitTime = 1000;
+        syncWaitTime = 500;
 
     return true;
 }
@@ -178,7 +178,7 @@ void SupernovaWeb::renderLoop(){
         if (syncWaitTime <= 0){
             EM_ASM(
 	            FS.syncfs(function(err) {
-                    ccall('syncfs_callback', null, ['string'], [err ? err.message : ""])
+                    ccall('syncfs_callback', null, ['string'], [err ? err.message : ""]);
 		        });
 	        );
         }
