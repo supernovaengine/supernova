@@ -30,13 +30,19 @@ void SupernovaIOS::hideVirtualKeyboard(){
     [rootViewController hideSoftKeyboard];
 }
 
-const char* SupernovaIOS::getFullPath(const char* filename) {
-    NSMutableString* adjusted_relative_path = [[NSMutableString alloc] initWithString:@"assets/"];
-    [adjusted_relative_path appendString:[[NSString alloc] initWithCString:filename encoding:NSASCIIStringEncoding]];
+std::string SupernovaIOS::getAssetPath(){
+    NSMutableString* adjusted_relative_path = [[NSMutableString alloc] initWithString:@"assets"];
     
     return [[[NSBundle mainBundle] pathForResource:adjusted_relative_path ofType:nil] cStringUsingEncoding:NSASCIIStringEncoding];
 }
 
+std::string SupernovaIOS::getUserDataPath(){
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    return [documentsDirectory UTF8String];
+}
+
 FILE* SupernovaIOS::platformFopen(const char* fname, const char* mode){
-    return fopen(SupernovaIOS::getFullPath(fname), mode);
+    return fopen(fname, mode);
 }

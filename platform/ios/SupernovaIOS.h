@@ -4,9 +4,6 @@
 #include "system/System.h"
 
 class SupernovaIOS: public Supernova::System{
-private:
-    static const char* getFullPath(const char* filename);
-    
 public:
     static int screenWidth;
     static int screenHeight;
@@ -16,6 +13,9 @@ public:
     
     virtual void showVirtualKeyboard();
     virtual void hideVirtualKeyboard();
+    
+    virtual std::string getAssetPath();
+    virtual std::string getUserDataPath();
     
     virtual FILE* platformFopen(const char* fname, const char* mode);
 };
