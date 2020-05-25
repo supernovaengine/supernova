@@ -9,7 +9,7 @@ namespace Supernova {
         
     public:
         
-        TextureData* getRawImage(FileData* filedata);
+        TextureData* getRawImage(Data* filedata);
         
     };
     

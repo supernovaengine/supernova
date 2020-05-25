@@ -1,133 +1,169 @@
 #include "FileData.h"
-
-#include <string.h>
+#include "Data.h"
+#include "system/System.h"
+#include <stack>
 
 using namespace Supernova;
 
-FileData::FileData() {
-    dataPtr = NULL;
-    dataLength = 0;
-    offset = 0;
-    dataOwned = false;
+FileData::~FileData(){
+
 }
 
-FileData::FileData(unsigned char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership): FileData(){
-    open(aData, aDataLength, aCopy, aTakeOwnership);
-}
-
-FileData::FileData(const char *aFilename){
-    open(aFilename);
-}
-
-FileData::~FileData() {
-    if (dataOwned)
-        delete[] dataPtr;
-}
-
-unsigned int FileData::read(unsigned char *aDst, unsigned int aBytes) {
-    if (offset + aBytes >= dataLength)
-        aBytes = dataLength - offset;
-
-    memcpy(aDst, dataPtr + offset, aBytes);
-    offset += aBytes;
-
-    return aBytes;
-}
-
-unsigned int FileData::write(unsigned char *aSrc, unsigned int aBytes) {
-    if (offset + aBytes >= dataLength)
-        aBytes = dataLength - offset;
-
-    memcpy(dataPtr + offset, aSrc, aBytes);
-    offset += aBytes;
-
-    return aBytes;
-}
-
-unsigned int FileData::length() {
-    return dataLength;
-}
-
-void FileData::seek(int aOffset) {
-    if (aOffset >= 0)
-        offset = aOffset;
+FileData* FileData::newFile(bool useHandle){
+    if (!useHandle)
+        return new Data();
     else
-        offset = dataLength + aOffset;
-    if (offset > dataLength-1)
-        offset = dataLength-1;
+        return new File();
 }
 
-unsigned int FileData::pos() {
-    return offset;
+FileData* FileData::newFile(const char *aFilename, bool useHandle){
+    if (!useHandle)
+        return new Data(aFilename);
+    else
+        return new File(aFilename);
 }
 
-unsigned char * FileData::getMemPtr() {
-    return dataPtr;
+unsigned int FileData::read8(){
+    unsigned char d = 0;
+    read((unsigned char*)&d, 1);
+    return d;
 }
 
-unsigned int FileData::open(unsigned char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership) {
-    if (aData == NULL || aDataLength == 0)
-        return 1;
+unsigned int FileData::read16(){
+    unsigned short d = 0;
+    read((unsigned char*)&d, 2);
+    return d;
+}
 
-    if (dataOwned)
-        delete[] dataPtr;
-    dataPtr = 0;
-    offset = 0;
+unsigned int FileData::read32(){
+    unsigned int d = 0;
+    read((unsigned char*)&d, 4);
+    return d;
+}
 
-    dataLength = aDataLength;
+char FileData::getDirSeparator(){
+#if defined(_WIN32)
+    return '\\';
+#else
+    return '/';
+#endif
+}
 
-    if (aCopy)
-    {
-        dataOwned = true;
-        dataPtr = new unsigned char[aDataLength];
-        if (dataPtr == NULL)
-            return 3;
-        memcpy(dataPtr, aData, aDataLength);
-        return 0;
+bool FileData::beginWith(std::string path, std::string prefix){
+    if (prefix.length() > path.length()) {
+        return false;
     }
 
-    dataPtr = aData;
-    dataOwned = aTakeOwnership;
-    return 0;
+    if (prefix.length() == 0) {
+        return true;
+    }
+
+    int i;
+    for (i = 0; i < prefix.length(); i++) {
+        if (path[i] != prefix[i]) {
+            return false;
+        }
+    }
+
+    return i == prefix.length();
 }
 
-unsigned int FileData::open(const char *aFilename) {
-    if (!aFilename)
-        return 1;
-    dataPtr = 0;
-    offset = 0;
+std::string FileData::getBaseDir(std::string filepath){
+    size_t found;
 
-    FileHandle df;
-    int res = df.open(aFilename);
-    if (res != 0)
-        return res;
+    found=filepath.find_last_of(getDirSeparator());
 
-    dataLength = df.length();
-    dataPtr = new unsigned char[dataLength];
-    if (dataPtr == NULL)
-        return 3;
-    df.read(dataPtr, dataLength);
-    dataOwned = true;
-    return 0;
+    std::string result = filepath.substr(0,found);
+
+    if (filepath == result)
+        result= "";
+
+    return result + getDirSeparator();
 }
 
-unsigned int FileData::open(FileHandle *aFile) {
-    if (dataOwned)
-        delete[] dataPtr;
-    dataPtr = 0;
-    offset = 0;
+std::string FileData::simplifyPath(std::string path) {
 
-    dataLength = aFile->length();
-    dataPtr = new unsigned char[dataLength];
-    if (dataPtr == NULL)
-        return 3;
-    aFile->read(dataPtr, dataLength);
-    dataOwned = true;
-    return 0;
+    std::stack<std::string> st;
+
+    std::string dir;
+
+    std::string res;
+
+    int len_path = path.length();
+
+    for (int i = 0; i < len_path; i++) {
+
+        dir.clear();
+
+        while (path[i] == getDirSeparator())
+            i++;
+
+        while (i < len_path && path[i] != getDirSeparator()) {
+            dir.push_back(path[i]);
+            i++;
+        }
+
+        if (dir.compare("..") == 0) {
+            if (!st.empty())
+                st.pop();
+        }
+        else if (dir.compare(".") == 0)
+            continue;
+        else if (dir.length() != 0)
+            st.push(dir);
+    }
+
+    std::stack<std::string> st1;
+    while (!st.empty()) {
+        st1.push(st.top());
+        st.pop();
+    }
+
+    while (!st1.empty()) {
+        std::string temp = st1.top();
+        if (st1.size() != 1)
+            res.append(temp + getDirSeparator());
+        else
+            res.append(temp);
+
+        st1.pop();
+    }
+
+    return res;
 }
 
-int FileData::eof() {
-    if (offset >= dataLength)
-        return 1;
-    return 0;
+std::string FileData::getFilePathExtension(const std::string &filepath) {
+    if (filepath.find_last_of(".") != std::string::npos)
+        return filepath.substr(filepath.find_last_of(".") + 1);
+    return "";
+}
+
+std::string FileData::getSystemPath(std::string path){
+    if (beginWith(path, "data://")){
+        path = path.substr(7, path.length());
+        return System::instance()->getUserDataPath() + "/" + FileData::simplifyPath(path);
+    }
+    if (beginWith(path, "asset://")){
+        path = path.substr(8, path.length());
+        return System::instance()->getAssetPath() + "/" + FileData::simplifyPath(path);
+    }
+    if (beginWith(path, "/")){
+        path = path.substr(1, path.length());
+        return System::instance()->getAssetPath() + "/" + FileData::simplifyPath(path);
+    }
+    return System::instance()->getAssetPath() + "/" + FileData::simplifyPath(path);
+}
+
+std::string FileData::readString(int aOffset){
+    unsigned int stringlen = length();
+    std::string s( stringlen, '\0' );
+    
+    seek(aOffset);
+    read((unsigned char*)&s[0], stringlen);
+
+    return s;
+}
+
+unsigned int FileData::writeString(std::string s){
+    return write((unsigned char*)&s[0], s.length());
 }

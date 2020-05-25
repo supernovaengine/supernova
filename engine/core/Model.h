@@ -10,7 +10,7 @@
 #include "Mesh.h"
 #include "Bone.h"
 #include "math/Vector3.h"
-#include "file/FileData.h"
+#include "file/Data.h"
 #include "util/SModelData.h"
 #include "action/Animation.h"
 

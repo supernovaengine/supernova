@@ -1,0 +1,40 @@
+
+#ifndef DATA_H
+#define DATA_H
+
+#include "FileData.h"
+#include "File.h"
+
+namespace Supernova {
+
+    class Data: public FileData {
+
+    protected:
+        unsigned char *dataPtr;
+        unsigned int dataLength;
+        unsigned int offset;
+        bool dataOwned;
+
+    public:
+        Data();
+        Data(unsigned char *aData, unsigned int aDataLength, bool aCopy=false, bool aTakeOwnership=true);
+        Data(const char *aFilename);
+        virtual ~Data();
+
+        virtual int eof();
+        virtual unsigned int read(unsigned char *aDst, unsigned int aBytes);
+        virtual unsigned int write(unsigned char *aSrc, unsigned int aBytes);
+        virtual unsigned int length();
+        virtual void seek(int aOffset);
+        virtual unsigned int pos();
+        virtual unsigned char * getMemPtr();
+
+        unsigned int open(unsigned char *aData, unsigned int aDataLength, bool aCopy=false, bool aTakeOwnership=true);
+        unsigned int open(const char *aFilename);
+        unsigned int open(File *aFile);
+    };
+    
+}
+
+
+#endif

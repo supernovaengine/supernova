@@ -5,7 +5,7 @@
 
 using namespace Supernova;
 
-TextureData* STBImageReader::getRawImage(FileData* filedata){
+TextureData* STBImageReader::getRawImage(Data* filedata){
     
     int x,y,channels;
 

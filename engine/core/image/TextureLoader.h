@@ -9,7 +9,7 @@ namespace Supernova {
 
     private:
         
-        ImageReader* getImageFormat(FileData* filedata);
+        ImageReader* getImageFormat(Data* filedata);
     public:
         TextureLoader();
         virtual ~TextureLoader();

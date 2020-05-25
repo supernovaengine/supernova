@@ -20,7 +20,7 @@ TextureData* TextureLoader::loadTextureData(std::string relative_path) {
     
     //Texture data orientation is top left (first loaded bytes as lower-valued V coordinates)
     
-    FileData* filedata = new FileData();
+    Data* filedata = new Data();
     filedata->open(relative_path.c_str());
 
     //TODO
@@ -49,7 +49,7 @@ TextureData* TextureLoader::loadTextureData(std::string relative_path) {
 
 }
 
-ImageReader* TextureLoader::getImageFormat(FileData* filedata){
+ImageReader* TextureLoader::getImageFormat(Data* filedata){
     
     std::uint8_t DeCompressed[12] = {0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
     std::uint8_t IsCompressed[12] = {0x0, 0x0, 0xA, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};

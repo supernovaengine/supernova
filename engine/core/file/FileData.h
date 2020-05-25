@@ -2,36 +2,40 @@
 #ifndef FILEDATA_H
 #define FILEDATA_H
 
-#include "File.h"
-#include "FileHandle.h"
+#include <stdio.h>
+#include <string>
 
 namespace Supernova {
 
-    class FileData: public File {
+    class FileData {
 
     protected:
-        unsigned char *dataPtr;
-        unsigned int dataLength;
-        unsigned int offset;
-        bool dataOwned;
+        static bool beginWith(std::string path, std::string prefix);
+        static std::string simplifyPath(std::string path);
 
     public:
-        FileData();
-        FileData(unsigned char *aData, unsigned int aDataLength, bool aCopy=false, bool aTakeOwnership=true);
-        FileData(const char *aFilename);
         virtual ~FileData();
 
-        virtual int eof();
-        virtual unsigned int read(unsigned char *aDst, unsigned int aBytes);
-        virtual unsigned int write(unsigned char *aSrc, unsigned int aBytes);
-        virtual unsigned int length();
-        virtual void seek(int aOffset);
-        virtual unsigned int pos();
-        virtual unsigned char * getMemPtr();
+        static FileData* newFile(bool useHandle = false);
+        static FileData* newFile(const char *aFilename, bool useHandle = false);
 
-        unsigned int open(unsigned char *aData, unsigned int aDataLength, bool aCopy=false, bool aTakeOwnership=true);
-        unsigned int open(const char *aFilename);
-        unsigned int open(FileHandle *aFile);
+        static char getDirSeparator();
+        static std::string getBaseDir(std::string filepath);
+        static std::string getFilePathExtension(const std::string &filepath);
+        static std::string getSystemPath(std::string path);
+
+        unsigned int read8();
+        unsigned int read16();
+        unsigned int read32();
+        std::string readString(int aOffset = 0);
+        unsigned int writeString(std::string s);
+
+        virtual int eof() = 0;
+        virtual unsigned int read(unsigned char *aDst, unsigned int aBytes) = 0;
+        virtual unsigned int write(unsigned char *aSrc, unsigned int aBytes) = 0;
+        virtual unsigned int length() = 0;
+        virtual void seek(int aOffset) = 0;
+        virtual unsigned int pos() = 0;
     };
     
 }

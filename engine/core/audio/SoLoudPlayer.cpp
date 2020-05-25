@@ -1,6 +1,6 @@
 
 #include "SoLoudPlayer.h"
-#include "file/FileData.h"
+#include "file/Data.h"
 #include "soloud_thread.h"
 #include "SoundManager.h"
 #include "Log.h"
@@ -15,7 +15,7 @@ SoLoudPlayer::~SoLoudPlayer(){
 }
 
 int SoLoudPlayer::load(){
-    FileData file(filename.c_str());
+    Data file(filename.c_str());
 
     SoLoud::result res = sample.loadMem(file.getMemPtr(), file.length(), false, false);
 

@@ -3,7 +3,7 @@
 #include <string>
 #include "image/TextureLoader.h"
 #include "Log.h"
-#include "file/FileData.h"
+#include "file/Data.h"
 #include <codecvt>
 
 using namespace Supernova;
@@ -80,7 +80,7 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
     if (!texture)
         return false;
 
-    FileData* fontData = new FileData();
+    Data* fontData = new Data();
     fontData->open(font);
 
     stbtt_fontinfo info;

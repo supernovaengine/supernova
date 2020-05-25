@@ -247,13 +247,13 @@
 		71CDC73C1D7B14D20060EEFF /* libsupernova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC7041D7B142D0060EEFF /* libsupernova.a */; };
 		71CDC74A1D7B16840060EEFF /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 7137AEB71CFCF58900B271D5 /* tiny_obj_loader.cc */; };
 		71CDC74D1D7B16AA0060EEFF /* libtinyobjloader.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC7411D7B167C0060EEFF /* libtinyobjloader.a */; };
-		71CE94F71EC8A3B2008CCF3C /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE94EE1EC8A38E008CCF3C /* File.cpp */; };
-		71CE94F81EC8A3B2008CCF3C /* FileData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE94F01EC8A38E008CCF3C /* FileData.cpp */; };
-		71CE94F91EC8A3B2008CCF3C /* FileHandle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE94F21EC8A38E008CCF3C /* FileHandle.cpp */; };
 		71CE95021EC8A3C8008CCF3C /* SoLoudPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CE94E61EC8A35E008CCF3C /* SoLoudPlayer.cpp */; };
 		71CE95111ECA6048008CCF3C /* stb_truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 71CE950E1ECA6043008CCF3C /* stb_truetype.c */; };
 		71D6EFD21F40A00E00241F0C /* SpriteAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFD01F40A00E00241F0C /* SpriteAnimation.cpp */; };
 		71D6EFE81F53551F00241F0C /* TimeAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D6EFE61F53551F00241F0C /* TimeAction.cpp */; };
+		71E11DCB247BFD5F00515174 /* Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E11DC5247BFD5E00515174 /* Data.cpp */; };
+		71E11DCC247BFD5F00515174 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E11DC6247BFD5E00515174 /* File.cpp */; };
+		71E11DCD247BFD5F00515174 /* FileData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E11DC7247BFD5E00515174 /* FileData.cpp */; };
 		71E170521F4D088C006D207B /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E170501F4D088C006D207B /* ParticlesAnimation.cpp */; };
 		71EC38B41EB82871008654E8 /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71EC38B21EB82871008654E8 /* Particles.cpp */; };
 		71F59C381EBFCB1500F49392 /* soloud_coreaudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F59B971EBFCA5300F49392 /* soloud_coreaudio.cpp */; };
@@ -956,18 +956,18 @@
 		71CDC7411D7B167C0060EEFF /* libtinyobjloader.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtinyobjloader.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		71CE94E61EC8A35E008CCF3C /* SoLoudPlayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoLoudPlayer.cpp; sourceTree = "<group>"; };
 		71CE94E71EC8A35E008CCF3C /* SoLoudPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoLoudPlayer.h; sourceTree = "<group>"; };
-		71CE94EE1EC8A38E008CCF3C /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
-		71CE94EF1EC8A38E008CCF3C /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = File.h; sourceTree = "<group>"; };
-		71CE94F01EC8A38E008CCF3C /* FileData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileData.cpp; sourceTree = "<group>"; };
-		71CE94F11EC8A38E008CCF3C /* FileData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileData.h; sourceTree = "<group>"; };
-		71CE94F21EC8A38E008CCF3C /* FileHandle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileHandle.cpp; sourceTree = "<group>"; };
-		71CE94F31EC8A38E008CCF3C /* FileHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileHandle.h; sourceTree = "<group>"; };
 		71CE950E1ECA6043008CCF3C /* stb_truetype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_truetype.c; sourceTree = "<group>"; };
 		71CE950F1ECA6043008CCF3C /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
 		71D6EFD01F40A00E00241F0C /* SpriteAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteAnimation.cpp; sourceTree = "<group>"; };
 		71D6EFD11F40A00E00241F0C /* SpriteAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteAnimation.h; sourceTree = "<group>"; };
 		71D6EFE61F53551F00241F0C /* TimeAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TimeAction.cpp; sourceTree = "<group>"; };
 		71D6EFE71F53551F00241F0C /* TimeAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeAction.h; sourceTree = "<group>"; };
+		71E11DC5247BFD5E00515174 /* Data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Data.cpp; sourceTree = "<group>"; };
+		71E11DC6247BFD5E00515174 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
+		71E11DC7247BFD5E00515174 /* FileData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileData.cpp; sourceTree = "<group>"; };
+		71E11DC8247BFD5E00515174 /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = File.h; sourceTree = "<group>"; };
+		71E11DC9247BFD5E00515174 /* FileData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileData.h; sourceTree = "<group>"; };
+		71E11DCA247BFD5E00515174 /* Data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
 		71E170501F4D088C006D207B /* ParticlesAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlesAnimation.cpp; sourceTree = "<group>"; };
 		71E170511F4D088C006D207B /* ParticlesAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimation.h; sourceTree = "<group>"; };
 		71E1D2291D27358B001209C8 /* Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Light.cpp; sourceTree = "<group>"; };
@@ -1998,12 +1998,12 @@
 		71CE94ED1EC8A38E008CCF3C /* file */ = {
 			isa = PBXGroup;
 			children = (
-				71CE94EE1EC8A38E008CCF3C /* File.cpp */,
-				71CE94EF1EC8A38E008CCF3C /* File.h */,
-				71CE94F01EC8A38E008CCF3C /* FileData.cpp */,
-				71CE94F11EC8A38E008CCF3C /* FileData.h */,
-				71CE94F21EC8A38E008CCF3C /* FileHandle.cpp */,
-				71CE94F31EC8A38E008CCF3C /* FileHandle.h */,
+				71E11DC5247BFD5E00515174 /* Data.cpp */,
+				71E11DCA247BFD5E00515174 /* Data.h */,
+				71E11DC6247BFD5E00515174 /* File.cpp */,
+				71E11DC8247BFD5E00515174 /* File.h */,
+				71E11DC7247BFD5E00515174 /* FileData.cpp */,
+				71E11DC9247BFD5E00515174 /* FileData.h */,
 			);
 			path = file;
 			sourceTree = "<group>";
@@ -2596,6 +2596,7 @@
 				710F072024603E6200EE69E8 /* UniqueToken.cpp in Sources */,
 				716302702440C9B7008C7116 /* TerrainNode.cpp in Sources */,
 				716E1DC122AF459C00A4386B /* Animation.cpp in Sources */,
+				71E11DCB247BFD5F00515174 /* Data.cpp in Sources */,
 				716E1DC222AF459C00A4386B /* MorphAction.cpp in Sources */,
 				716E1DBE22AF455800A4386B /* Attribute.cpp in Sources */,
 				716E1DBF22AF455800A4386B /* ExternalBuffer.cpp in Sources */,
@@ -2615,14 +2616,12 @@
 				71C2773D202BCE6C005B3EDC /* Matrix3.cpp in Sources */,
 				71CDC71A1D7B14510060EEFF /* Polygon.cpp in Sources */,
 				71C39E50204188B000863AB6 /* ParticleSpriteInit.cpp in Sources */,
-				71CE94F81EC8A3B2008CCF3C /* FileData.cpp in Sources */,
 				71C39E4E204188B000863AB6 /* ParticleRotationInit.cpp in Sources */,
 				71CDC7241D7B146D0060EEFF /* Quaternion.cpp in Sources */,
 				718FFC7A20E9CD7D00EEE535 /* Joint2D.cpp in Sources */,
 				71C39E54204188BC00863AB6 /* ParticleMod.cpp in Sources */,
 				71FA3F651F5E2FEE0015BEFE /* Plane.cpp in Sources */,
 				71D6EFE81F53551F00241F0C /* TimeAction.cpp in Sources */,
-				71CE94F71EC8A3B2008CCF3C /* File.cpp in Sources */,
 				71C39E56204188BC00863AB6 /* ParticleRotationMod.cpp in Sources */,
 				71C39E55204188BC00863AB6 /* ParticlePositionMod.cpp in Sources */,
 				715F90F021EAF6BF0025464D /* Lines.cpp in Sources */,
@@ -2634,6 +2633,7 @@
 				71C39E58204188BC00863AB6 /* ParticleSpriteMod.cpp in Sources */,
 				71C27736202BCE1F005B3EDC /* AlphaAction.cpp in Sources */,
 				715F90FE21EAF6FE0025464D /* Text.cpp in Sources */,
+				71E11DCD247BFD5F00515174 /* FileData.cpp in Sources */,
 				71C39E48204188B000863AB6 /* ParticleAccelerationInit.cpp in Sources */,
 				71CDC7161D7B14510060EEFF /* Object.cpp in Sources */,
 				71C39E49204188B000863AB6 /* ParticleAlphaInit.cpp in Sources */,
@@ -2658,11 +2658,11 @@
 				71E170521F4D088C006D207B /* ParticlesAnimation.cpp in Sources */,
 				71CDC7251D7B146D0060EEFF /* Ray.cpp in Sources */,
 				71CDC7211D7B14680060EEFF /* TextureData.cpp in Sources */,
-				71CE94F91EC8A3B2008CCF3C /* FileHandle.cpp in Sources */,
 				715F910121EAF6FE0025464D /* TextEdit.cpp in Sources */,
 				71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */,
 				714C6CFD209FCC1A0002F031 /* TileMap.cpp in Sources */,
 				71C39E4F204188B000863AB6 /* ParticleSizeInit.cpp in Sources */,
+				71E11DCC247BFD5F00515174 /* File.cpp in Sources */,
 				71CDC7171D7B14510060EEFF /* PlaneTerrain.cpp in Sources */,
 				71C39E4B204188B000863AB6 /* ParticleInit.cpp in Sources */,
 				719ACC46219DB934008C21F4 /* ReadSModel.cpp in Sources */,

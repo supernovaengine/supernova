@@ -3,7 +3,7 @@
 #define ImageReader_h
 
 #include "TextureData.h"
-#include "file/FileData.h"
+#include "file/Data.h"
 #include <fstream>
 
 namespace Supernova {
@@ -12,7 +12,7 @@ namespace Supernova {
 
     public:
 
-        virtual TextureData* getRawImage(FileData* filedata) = 0;
+        virtual TextureData* getRawImage(Data* filedata) = 0;
 
         virtual ~ImageReader();
 

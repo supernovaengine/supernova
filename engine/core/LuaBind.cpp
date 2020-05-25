@@ -212,12 +212,12 @@ int LuaBind::setLuaPath(const char* path)
 int LuaBind::moduleLoader(lua_State *L) {
     
     const char *filename = lua_tostring(L, 1);
-    filename = luaL_gsub(L, filename, ".", std::to_string(File::getDirSeparator()).c_str());
+    filename = luaL_gsub(L, filename, ".", std::to_string(FileData::getDirSeparator()).c_str());
     
     std::string filepath;
-    FileData filedata;
+    Data filedata;
     
-    filepath = std::string("lua") + File::getDirSeparator() + filename + ".lua";
+    filepath = std::string("lua") + FileData::getDirSeparator() + filename + ".lua";
     filedata.open(filepath.c_str());
     if (filedata.getMemPtr() != NULL) {
         
@@ -917,14 +917,14 @@ void LuaBind::bind(){
     .endClass();
     
 
-    std::string luadir = std::string("lua") + File::getDirSeparator();
+    std::string luadir = std::string("lua") + FileData::getDirSeparator();
 
     setLuaPath(std::string(luadir + "?.lua").c_str());
     setLuaSearcher(moduleLoader, true);
 
     std::string luafile = luadir + "main.lua";
 
-    FileData filedata;
+    Data filedata;
     filedata.open(luafile.c_str());
 
     //int luaL_dofile (lua_State *L, const char *filename);

@@ -1,169 +1,70 @@
 #include "File.h"
-#include "FileData.h"
+
 #include "system/System.h"
-#include <stack>
 
 using namespace Supernova;
 
-File::~File(){
-
+File::File(){
+    fileHandle = NULL;
 }
 
-File* File::newFile(bool useHandle){
-    if (!useHandle)
-        return new FileData();
-    else
-        return new FileHandle();
+File::File(FILE *fp) {
+    this->fileHandle = fp;
 }
 
-File* File::newFile(const char *aFilename, bool useHandle){
-    if (!useHandle)
-        return new FileData(aFilename);
-    else
-        return new FileHandle(aFilename);
+File::File(const char *aFilename, bool write){
+    open(aFilename, write);
 }
 
-unsigned int File::read8(){
-    unsigned char d = 0;
-    read((unsigned char*)&d, 1);
-    return d;
+File::~File() {
+    if (fileHandle)
+        fclose(fileHandle);
 }
 
-unsigned int File::read16(){
-    unsigned short d = 0;
-    read((unsigned char*)&d, 2);
-    return d;
+unsigned int File::read(unsigned char *aDst, unsigned int aBytes) {
+    return (unsigned int)fread(aDst, 1, aBytes, fileHandle);
 }
 
-unsigned int File::read32(){
-    unsigned int d = 0;
-    read((unsigned char*)&d, 4);
-    return d;
+unsigned int File::write(unsigned char *aSrc, unsigned int aBytes){
+    unsigned int r = (unsigned int)fwrite(aSrc, 1, aBytes, fileHandle);
+    System::instance()->syncFileSystem();
+    return r;
 }
 
-char File::getDirSeparator(){
-#if defined(_WIN32)
-    return '\\';
-#else
-    return '/';
-#endif
+unsigned int File::length() {
+    int pos = ftell(fileHandle);
+    fseek(fileHandle, 0, SEEK_END);
+    int len = ftell(fileHandle);
+    fseek(fileHandle, pos, SEEK_SET);
+    return len;
 }
 
-bool File::beginWith(std::string path, std::string prefix){
-    if (prefix.length() > path.length()) {
-        return false;
+void File::seek(int aOffset) {
+    fseek(fileHandle, aOffset, SEEK_SET);
+}
+
+unsigned int File::pos() {
+    return ftell(fileHandle);
+}
+
+FILE *File::getFilePtr() {
+    return fileHandle;
+}
+
+unsigned int File::open(const char *aFilename, bool write){
+    if (!aFilename)
+        return 1;
+    std::string systemPath = FileData::getSystemPath(aFilename);
+    if (!write)
+        fileHandle = System::instance()->platformFopen(systemPath.c_str(), "rb");
+    else{
+        fileHandle = System::instance()->platformFopen(systemPath.c_str(), "w+b");
     }
-
-    if (prefix.length() == 0) {
-        return true;
-    }
-
-    int i;
-    for (i = 0; i < prefix.length(); i++) {
-        if (path[i] != prefix[i]) {
-            return false;
-        }
-    }
-
-    return i == prefix.length();
+    if (!fileHandle)
+        return 2;
+    return 0;
 }
 
-std::string File::getBaseDir(std::string filepath){
-    size_t found;
-
-    found=filepath.find_last_of(getDirSeparator());
-
-    std::string result = filepath.substr(0,found);
-
-    if (filepath == result)
-        result= "";
-
-    return result + getDirSeparator();
-}
-
-std::string File::simplifyPath(std::string path) {
-
-    std::stack<std::string> st;
-
-    std::string dir;
-
-    std::string res;
-
-    int len_path = path.length();
-
-    for (int i = 0; i < len_path; i++) {
-
-        dir.clear();
-
-        while (path[i] == getDirSeparator())
-            i++;
-
-        while (i < len_path && path[i] != getDirSeparator()) {
-            dir.push_back(path[i]);
-            i++;
-        }
-
-        if (dir.compare("..") == 0) {
-            if (!st.empty())
-                st.pop();
-        }
-        else if (dir.compare(".") == 0)
-            continue;
-        else if (dir.length() != 0)
-            st.push(dir);
-    }
-
-    std::stack<std::string> st1;
-    while (!st.empty()) {
-        st1.push(st.top());
-        st.pop();
-    }
-
-    while (!st1.empty()) {
-        std::string temp = st1.top();
-        if (st1.size() != 1)
-            res.append(temp + getDirSeparator());
-        else
-            res.append(temp);
-
-        st1.pop();
-    }
-
-    return res;
-}
-
-std::string File::getFilePathExtension(const std::string &filepath) {
-    if (filepath.find_last_of(".") != std::string::npos)
-        return filepath.substr(filepath.find_last_of(".") + 1);
-    return "";
-}
-
-std::string File::getSystemPath(std::string path){
-    if (beginWith(path, "data://")){
-        path = path.substr(7, path.length());
-        return System::instance()->getUserDataPath() + "/" + File::simplifyPath(path);
-    }
-    if (beginWith(path, "asset://")){
-        path = path.substr(8, path.length());
-        return System::instance()->getAssetPath() + "/" + File::simplifyPath(path);
-    }
-    if (beginWith(path, "/")){
-        path = path.substr(1, path.length());
-        return System::instance()->getAssetPath() + "/" + File::simplifyPath(path);
-    }
-    return System::instance()->getAssetPath() + "/" + File::simplifyPath(path);
-}
-
-std::string File::readString(int aOffset){
-    unsigned int stringlen = length();
-    std::string s( stringlen, '\0' );
-    
-    seek(aOffset);
-    read((unsigned char*)&s[0], stringlen);
-
-    return s;
-}
-
-unsigned int File::writeString(std::string s){
-    return write((unsigned char*)&s[0], s.length());
+int File::eof() {
+    return feof(fileHandle);
 }

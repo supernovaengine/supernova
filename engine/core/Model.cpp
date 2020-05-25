@@ -56,7 +56,7 @@ Model::~Model() {
 }
 
 bool Model::fileExists(const std::string &abs_filename, void *) {
-    FileHandle df;
+    File df;
     int res = df.open(abs_filename.c_str());
 
     if (!res) {
@@ -67,7 +67,7 @@ bool Model::fileExists(const std::string &abs_filename, void *) {
 }
 
 bool Model::readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *) {
-    FileData filedata(filepath.c_str());
+    Data filedata(filepath.c_str());
     std::istringstream f(filedata.readString());
 
     if (!f) {
@@ -103,7 +103,7 @@ bool Model::readWholeFile(std::vector<unsigned char> *out, std::string *err, con
 }
 
 std::string Model::readFileToString(const char* filename){
-    FileData filedata(filename);
+    Data filedata(filename);
     return filedata.readString();
 }
 
@@ -215,7 +215,7 @@ bool Model::loadGLTF(const char* filename) {
     loader.SetFsCallbacks({&fileExists, &tinygltf::ExpandFilePath, &readWholeFile, nullptr, nullptr});
     //loader.SetFsCallbacks({nullptr, nullptr, nullptr, nullptr, nullptr});
 
-    std::string ext = File::getFilePathExtension(filename);
+    std::string ext = FileData::getFilePathExtension(filename);
 
     bool res = false;
 
@@ -881,9 +881,9 @@ bool Model::renderLoad(bool shadow) {
 
 bool Model::load(){
 
-    baseDir = File::getBaseDir(filename);
+    baseDir = FileData::getBaseDir(filename);
 
-    std::string ext = File::getFilePathExtension(filename);
+    std::string ext = FileData::getFilePathExtension(filename);
 
     if (ext.compare("obj") == 0) {
         loadOBJ(filename);
