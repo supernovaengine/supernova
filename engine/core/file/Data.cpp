@@ -1,3 +1,9 @@
+//
+// Inspired by work of Jari Komppa in SoLoud audio engine
+// https://sol.gfxile.net/soloud/file.html
+// Modified by (c) 2020 Eduardo Doria.
+//
+
 #include "Data.h"
 
 #include <string.h>
@@ -67,7 +73,7 @@ unsigned char * Data::getMemPtr() {
 
 unsigned int Data::open(unsigned char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership) {
     if (aData == NULL || aDataLength == 0)
-        return 1;
+        return FileErrors::INVALID_PARAMETER;
 
     if (dataOwned)
         delete[] dataPtr;
@@ -81,19 +87,19 @@ unsigned int Data::open(unsigned char *aData, unsigned int aDataLength, bool aCo
         dataOwned = true;
         dataPtr = new unsigned char[aDataLength];
         if (dataPtr == NULL)
-            return 3;
+            return FileErrors::OUT_OF_MEMORY;
         memcpy(dataPtr, aData, aDataLength);
-        return 0;
+        return FileErrors::NO_ERROR;
     }
 
     dataPtr = aData;
     dataOwned = aTakeOwnership;
-    return 0;
+    return FileErrors::NO_ERROR;
 }
 
 unsigned int Data::open(const char *aFilename) {
     if (!aFilename)
-        return 1;
+        return FileErrors::INVALID_PARAMETER;
     dataPtr = 0;
     offset = 0;
 
@@ -105,10 +111,10 @@ unsigned int Data::open(const char *aFilename) {
     dataLength = df.length();
     dataPtr = new unsigned char[dataLength];
     if (dataPtr == NULL)
-        return 3;
+        return FileErrors::OUT_OF_MEMORY;
     df.read(dataPtr, dataLength);
     dataOwned = true;
-    return 0;
+    return FileErrors::NO_ERROR;
 }
 
 unsigned int Data::open(File *aFile) {
@@ -120,10 +126,10 @@ unsigned int Data::open(File *aFile) {
     dataLength = aFile->length();
     dataPtr = new unsigned char[dataLength];
     if (dataPtr == NULL)
-        return 3;
+        return FileErrors::OUT_OF_MEMORY;
     aFile->read(dataPtr, dataLength);
     dataOwned = true;
-    return 0;
+    return FileErrors::NO_ERROR;
 }
 
 int Data::eof() {

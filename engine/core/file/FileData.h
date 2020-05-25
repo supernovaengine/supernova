@@ -1,3 +1,8 @@
+//
+// Inspired by work of Jari Komppa in SoLoud audio engine
+// https://sol.gfxile.net/soloud/file.html
+// Modified by (c) 2020 Eduardo Doria.
+//
 
 #ifndef FILEDATA_H
 #define FILEDATA_H
@@ -6,6 +11,13 @@
 #include <string>
 
 namespace Supernova {
+
+    enum FileErrors{
+        NO_ERROR       = 0,
+        INVALID_PARAMETER = 1,
+        FILE_NOT_FOUND    = 2,
+        OUT_OF_MEMORY    = 2
+    };
 
     class FileData {
 

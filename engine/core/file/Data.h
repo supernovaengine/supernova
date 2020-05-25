@@ -1,3 +1,8 @@
+//
+// Inspired by work of Jari Komppa in SoLoud audio engine
+// https://sol.gfxile.net/soloud/file.html
+// Modified by (c) 2020 Eduardo Doria.
+//
 
 #ifndef DATA_H
 #define DATA_H

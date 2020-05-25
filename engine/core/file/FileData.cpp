@@ -1,3 +1,9 @@
+//
+// Inspired by work of Jari Komppa in SoLoud audio engine
+// https://sol.gfxile.net/soloud/file.html
+// Modified by (c) 2020 Eduardo Doria.
+//
+
 #include "FileData.h"
 #include "Data.h"
 #include "system/System.h"

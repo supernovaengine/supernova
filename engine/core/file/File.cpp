@@ -1,3 +1,9 @@
+//
+// Inspired by work of Jari Komppa in SoLoud audio engine
+// https://sol.gfxile.net/soloud/file.html
+// Modified by (c) 2020 Eduardo Doria.
+//
+
 #include "File.h"
 
 #include "system/System.h"
@@ -53,7 +59,7 @@ FILE *File::getFilePtr() {
 
 unsigned int File::open(const char *aFilename, bool write){
     if (!aFilename)
-        return 1;
+        return FileErrors::INVALID_PARAMETER;
     std::string systemPath = FileData::getSystemPath(aFilename);
     if (!write)
         fileHandle = System::instance()->platformFopen(systemPath.c_str(), "rb");
@@ -61,8 +67,8 @@ unsigned int File::open(const char *aFilename, bool write){
         fileHandle = System::instance()->platformFopen(systemPath.c_str(), "w+b");
     }
     if (!fileHandle)
-        return 2;
-    return 0;
+        return FileErrors::FILE_NOT_FOUND;
+    return FileErrors::NO_ERROR;
 }
 
 int File::eof() {
