@@ -42,7 +42,3 @@ std::string SupernovaIOS::getUserDataPath(){
     
     return [documentsDirectory UTF8String];
 }
-
-FILE* SupernovaIOS::platformFopen(const char* fname, const char* mode){
-    return fopen(fname, mode);
-}

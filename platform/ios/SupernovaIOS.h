@@ -16,8 +16,6 @@ public:
     
     virtual std::string getAssetPath();
     virtual std::string getUserDataPath();
-    
-    virtual FILE* platformFopen(const char* fname, const char* mode);
 };
 
 
