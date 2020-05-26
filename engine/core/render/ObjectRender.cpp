@@ -238,8 +238,10 @@ bool ObjectRender::load() {
 
     loadProgram();
     for ( const auto &p : textures ) {
-        for (size_t i = 0; i < p.second.size(); i++) {
-            p.second[i]->load();
+        for (auto it = textures[p.first].begin(); it != textures[p.first].end(); it++) {
+            //Remove if texture cannot be loaded
+            if (!(*it)->load())
+                textures[p.first].erase(it--);
         }
     }
     

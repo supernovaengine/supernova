@@ -107,6 +107,9 @@ bool SkyBox::load(){
     if (getMaterial()->getTexture() == NULL)
         getMaterial()->setTextureCube(textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
 
+    if (!getMaterial()->getTexture()->load())
+        return false;
+
     instanciateRender();
 
     render->addProgramDef(S_PROGRAM_IS_SKY);

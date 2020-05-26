@@ -2,7 +2,6 @@
 #include "UIImage.h"
 #include "render/ObjectRender.h"
 #include <string>
-#include "image/TextureLoader.h"
 
 //
 // (c) 2018 Eduardo Doria.

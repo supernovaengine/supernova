@@ -226,8 +226,8 @@ bool GraphicObject::load(){
 
 bool GraphicObject::textureLoad(){
     if (material && render){
-        material->getTexture()->load();
-        render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
+        if (material->getTexture()->load())
+            render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
     }
 
     return true;

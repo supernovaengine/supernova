@@ -1,5 +1,4 @@
 #include "Texture.h"
-#include "image/TextureLoader.h"
 #include "Engine.h"
 
 
@@ -123,10 +122,11 @@ bool Texture::load(){
     if (!textureRender.get()->isLoaded()){
 
         if (type == S_TEXTURE_2D){
-            
-            TextureLoader image;
+
             if (texturesData[0] == NULL){
-                texturesData[0] = image.loadTextureData(id.c_str());
+                texturesData[0] = new TextureData(id.c_str());
+                if (!texturesData[0]->getData())
+                    return false;
                 dataOwned = true;
             }
 
@@ -143,6 +143,8 @@ bool Texture::load(){
         }else if (type == S_TEXTURE_CUBE){
 
             for (int i = 0; i < texturesData.size(); i++){
+                if (!texturesData[i]->getData())
+                    return false;
                 texturesData[i]->resamplePowerOfTwo();
             }
             
@@ -180,11 +182,9 @@ bool Texture::load(){
             releaseData();
         }
         
-        return true;
-        
     }
     
-    return false;
+    return true;
 
 }
 

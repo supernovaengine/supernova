@@ -319,7 +319,8 @@ void Scene::drawChildScenes(){
 
 void Scene::drawSky(){
     if (sky != NULL)
-        sky->renderDraw(false);
+        if (sky->isLoaded())
+            sky->renderDraw(false);
 }
 
 Texture* Scene::getTextureFrame(){

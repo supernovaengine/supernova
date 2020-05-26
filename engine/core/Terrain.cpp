@@ -2,7 +2,6 @@
 // (c) 2019 Eduardo Doria.
 //
 
-#include "image/TextureLoader.h"
 #include "Terrain.h"
 #include "Log.h"
 #include "Scene.h"

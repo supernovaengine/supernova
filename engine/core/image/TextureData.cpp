@@ -1,7 +1,10 @@
 #include "TextureData.h"
 #include <assert.h>
-#include <string.h>
 #include <stdlib.h>
+#include "file/Data.h"
+#include "stb_image.h"
+#include "Log.h"
+#include "Texture.h"
 
 using namespace Supernova;
 
@@ -12,6 +15,8 @@ TextureData::TextureData() {
     this->color_format = 0;
     this->channels = 0;
     this->data = NULL;
+    
+    this->dataOwned = true;
 }
 
 TextureData::TextureData(int width, int height, unsigned int size, int color_format, int channels, void* data){
@@ -21,16 +26,73 @@ TextureData::TextureData(int width, int height, unsigned int size, int color_for
     this->color_format = color_format;
     this->channels = channels;
     this->data = data;
+    
+    this->dataOwned = false;
+}
+
+TextureData::TextureData(const char* filename): TextureData(){
+    loadTextureData(filename);
 }
 
 TextureData::TextureData(const TextureData& v){
-    this->copy(v);
+    this->width = v.width;
+    this->height = v.height;
+    this->size = v.size;
+    this->color_format = v.color_format;
+    this->channels = v.channels;
+    this->data = v.data;
+    
+    this->dataOwned = v.dataOwned;
 }
 
 TextureData& TextureData::operator = ( const TextureData& v ){
-    this->copy(v);
+    this->width = v.width;
+    this->height = v.height;
+    this->size = v.size;
+    this->color_format = v.color_format;
+    this->channels = v.channels;
+    this->data = v.data;
+    
+    this->dataOwned = v.dataOwned;
 
     return *this;
+}
+
+bool TextureData::loadTextureData(const char* filename) {
+    
+    Data filedata;
+    
+    int res = filedata.open(filename);
+    
+    if (res==FileErrors::FILE_NOT_FOUND){
+        Log::Error("Texture file not found: %s", filename);
+        return false;
+    }
+    if (res==FileErrors::INVALID_PARAMETER){
+        Log::Error("Texture file path is invalid: %s", filename);
+        return false;
+    }
+    filedata.seek(0);
+    
+    //----- Start std_image read texture
+    data = stbi_load_from_memory((stbi_uc const *)filedata.getMemPtr(), filedata.length(), &width, &height, &channels, 0);
+
+    if (!data){
+        Log::Error("Error loading texture file (%s): %s", filename, stbi_failure_reason());
+        return false;
+    }
+    
+    color_format = S_COLOR_GRAY;
+    if(channels == 2) color_format = S_COLOR_GRAY_ALPHA;
+    if(channels == 3) color_format = S_COLOR_RGB;
+    if(channels == 4) color_format = S_COLOR_RGB_ALPHA;
+
+    //Considering one byte per channel
+    size = width * height * channels; //in bytes
+    //----- End std_image read texture
+    
+    return true;
+
 }
 
 void TextureData::copy ( const TextureData& v ){
@@ -45,7 +107,8 @@ void TextureData::copy ( const TextureData& v ){
 }
 
 TextureData::~TextureData() {
-    releaseImageData();
+    if (dataOwned)
+        releaseImageData();
 }
 
 void TextureData::releaseImageData(){
@@ -189,6 +252,10 @@ void TextureData::flipVertical(){
 
 unsigned char TextureData::getColorComponent(int x, int y, int color){
     return ((unsigned char*)data)[((x + y*width)*channels)+color];
+}
+
+void TextureData::setDataOwned(bool dataOwned){
+    this->dataOwned = dataOwned;
 }
 
 int TextureData::getWidth(){

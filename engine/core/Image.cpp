@@ -2,7 +2,6 @@
 #include "Image.h"
 #include "render/ObjectRender.h"
 #include <string>
-#include "image/TextureLoader.h"
 #include "Log.h"
 #include <math.h>
 

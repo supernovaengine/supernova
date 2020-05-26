@@ -1,10 +1,10 @@
 #include "STBText.h"
 
 #include <string>
-#include "image/TextureLoader.h"
 #include "Log.h"
 #include "file/Data.h"
 #include <codecvt>
+#include <locale>
 
 using namespace Supernova;
 

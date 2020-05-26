@@ -1,7 +1,5 @@
 #include "Material.h"
 
-#include "image/TextureLoader.h"
-
 using namespace Supernova;
 
 Material::Material(){
@@ -64,14 +62,12 @@ void Material::setTextureCube(std::string front, std::string back, std::string l
     textures.push_back(down);
     textures.push_back(back);
     textures.push_back(front);
-    
-    TextureLoader image;
+
     std::vector<TextureData*> texturesData;
     
-    std::string id = "cube|";
+    std::string id = "cube";
     for (int i = 0; i < textures.size(); i++){
-        texturesData.push_back(image.loadTextureData(textures[i].c_str()));
-        texturesData.back()->resamplePowerOfTwo();
+        texturesData.push_back(new TextureData(textures[i].c_str()));
         id = id + "|" + textures[i];
     }
     

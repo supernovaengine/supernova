@@ -47,11 +47,9 @@
 		714C6D0320A525F20002F031 /* Body.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C6D0120A525F20002F031 /* Body.cpp */; };
 		714C890B1EDE129A0028DCE0 /* stb_rect_pack.c in Sources */ = {isa = PBXBuildFile; fileRef = 71E34E251ED217CD0005DEF2 /* stb_rect_pack.c */; };
 		714C890F1EDE12AF0028DCE0 /* stb_image.c in Sources */ = {isa = PBXBuildFile; fileRef = 714C890C1EDE12AA0028DCE0 /* stb_image.c */; };
-		714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89101EDE12F20028DCE0 /* STBImageReader.cpp */; };
 		714C89151F01BCB30028DCE0 /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89131F01BCB30028DCE0 /* Input.cpp */; };
 		714C89171F0EDF370028DCE0 /* TextureRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89161F0EDF370028DCE0 /* TextureRender.cpp */; };
 		714D81E91E70C2E40038BE50 /* SceneRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714D81E11E70BF4B0038BE50 /* SceneRender.cpp */; };
-		715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7125E32B1D7CC7470090B05E /* ImageReader.cpp */; };
 		71598C401E76203A000EDAC0 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71598C3D1E762037000EDAC0 /* Sprite.cpp */; };
 		71598C431E7CA245000EDAC0 /* Fog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71598C411E7CA245000EDAC0 /* Fog.cpp */; };
 		715AC0D31D7B0A29003D7C8C /* lapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 713D2D011CFB2EFA00A4752F /* lapi.c */; };
@@ -234,7 +232,6 @@
 		71CDC7191D7B14510060EEFF /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A631CFB2EAD00A4752F /* Scene.cpp */; };
 		71CDC71A1D7B14510060EEFF /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A661CFB2EAD00A4752F /* Polygon.cpp */; };
 		71CDC71B1D7B14510060EEFF /* SpotLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713384DC1D2F560400DB73A5 /* SpotLight.cpp */; };
-		71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A181CFB2EAD00A4752F /* TextureLoader.cpp */; };
 		71CDC7211D7B14680060EEFF /* TextureData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A1E1CFB2EAD00A4752F /* TextureData.cpp */; };
 		71CDC7221D7B146D0060EEFF /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A271CFB2EAD00A4752F /* Angle.cpp */; };
 		71CDC7231D7B146D0060EEFF /* Matrix4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A2A1CFB2EAD00A4752F /* Matrix4.cpp */; };
@@ -548,8 +545,6 @@
 		712379111EC13C6000BFD1F7 /* libstb.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libstb.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7123791C1EC13C7500BFD1F7 /* stb_vorbis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_vorbis.c; sourceTree = "<group>"; };
 		7123791D1EC13C7500BFD1F7 /* stb_vorbis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_vorbis.h; sourceTree = "<group>"; };
-		7125E3291D7CB2B20090B05E /* ImageReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageReader.h; sourceTree = "<group>"; };
-		7125E32B1D7CC7470090B05E /* ImageReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageReader.cpp; sourceTree = "<group>"; };
 		712D3DA621A44E23007EFCF9 /* GraphicObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphicObject.h; sourceTree = "<group>"; };
 		712D3DA721A44E23007EFCF9 /* GraphicObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GraphicObject.cpp; sourceTree = "<group>"; };
 		713384DC1D2F560400DB73A5 /* SpotLight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpotLight.cpp; sourceTree = "<group>"; };
@@ -566,8 +561,6 @@
 		713D2A0E1CFB2EAD00A4752F /* Cube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cube.h; sourceTree = "<group>"; };
 		713D2A101CFB2EAD00A4752F /* Engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
 		713D2A111CFB2EAD00A4752F /* Engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
-		713D2A181CFB2EAD00A4752F /* TextureLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureLoader.cpp; sourceTree = "<group>"; };
-		713D2A191CFB2EAD00A4752F /* TextureLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureLoader.h; sourceTree = "<group>"; };
 		713D2A1E1CFB2EAD00A4752F /* TextureData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureData.cpp; sourceTree = "<group>"; };
 		713D2A1F1CFB2EAD00A4752F /* TextureData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureData.h; sourceTree = "<group>"; };
 		713D2A231CFB2EAD00A4752F /* LuaBind.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaBind.cpp; sourceTree = "<group>"; };
@@ -667,8 +660,6 @@
 		714C89051ED7711A0028DCE0 /* Rect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rect.cpp; sourceTree = "<group>"; };
 		714C890C1EDE12AA0028DCE0 /* stb_image.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image.c; sourceTree = "<group>"; };
 		714C890D1EDE12AA0028DCE0 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
-		714C89101EDE12F20028DCE0 /* STBImageReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STBImageReader.cpp; sourceTree = "<group>"; };
-		714C89111EDE12F20028DCE0 /* STBImageReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STBImageReader.h; sourceTree = "<group>"; };
 		714C89131F01BCB30028DCE0 /* Input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Input.cpp; sourceTree = "<group>"; };
 		714C89141F01BCB30028DCE0 /* Input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Input.h; sourceTree = "<group>"; };
 		714C89161F0EDF370028DCE0 /* TextureRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureRender.cpp; sourceTree = "<group>"; };
@@ -1385,14 +1376,8 @@
 		713D2A161CFB2EAD00A4752F /* image */ = {
 			isa = PBXGroup;
 			children = (
-				7125E32B1D7CC7470090B05E /* ImageReader.cpp */,
-				7125E3291D7CB2B20090B05E /* ImageReader.h */,
 				713D2A1E1CFB2EAD00A4752F /* TextureData.cpp */,
 				713D2A1F1CFB2EAD00A4752F /* TextureData.h */,
-				713D2A181CFB2EAD00A4752F /* TextureLoader.cpp */,
-				713D2A191CFB2EAD00A4752F /* TextureLoader.h */,
-				714C89101EDE12F20028DCE0 /* STBImageReader.cpp */,
-				714C89111EDE12F20028DCE0 /* STBImageReader.h */,
 			);
 			path = image;
 			sourceTree = "<group>";
@@ -2644,9 +2629,7 @@
 				71CDC70D1D7B14510060EEFF /* Camera.cpp in Sources */,
 				714C89171F0EDF370028DCE0 /* TextureRender.cpp in Sources */,
 				714C6CFA209DF09E0002F031 /* Log.cpp in Sources */,
-				715823FD1D93688F00AB1181 /* ImageReader.cpp in Sources */,
 				715F90FF21EAF6FE0025464D /* UIObject.cpp in Sources */,
-				714C89121EDE12F20028DCE0 /* STBImageReader.cpp in Sources */,
 				71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */,
 				714C6D0320A525F20002F031 /* Body.cpp in Sources */,
 				71AC8B611E6B42C000DB33C3 /* Points.cpp in Sources */,
@@ -2659,7 +2642,6 @@
 				71CDC7251D7B146D0060EEFF /* Ray.cpp in Sources */,
 				71CDC7211D7B14680060EEFF /* TextureData.cpp in Sources */,
 				715F910121EAF6FE0025464D /* TextEdit.cpp in Sources */,
-				71CDC71F1D7B14680060EEFF /* TextureLoader.cpp in Sources */,
 				714C6CFD209FCC1A0002F031 /* TileMap.cpp in Sources */,
 				71C39E4F204188B000863AB6 /* ParticleSizeInit.cpp in Sources */,
 				71E11DCC247BFD5F00515174 /* File.cpp in Sources */,

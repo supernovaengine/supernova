@@ -13,16 +13,21 @@ namespace Supernova {
         int channels;
         void* data;
         
+        bool dataOwned;
+        
         int getNearestPowerOfTwo(int size);
 
     public:
 
         TextureData();
         TextureData(int width, int height, unsigned int size, int color_format, int channels, void* data);
+        TextureData(const char* filename);
         TextureData(const TextureData& v);
         TextureData& operator = ( const TextureData& v );
         virtual ~TextureData();
         void copy(const TextureData& v);
+        
+        bool loadTextureData(const char* relative_path);
 
         void releaseImageData();
         
@@ -34,6 +39,8 @@ namespace Supernova {
         void flipVertical();
 
         unsigned char getColorComponent(int x, int y, int color);
+        
+        void setDataOwned(bool dataOwned);
 
         int getWidth();
         int getHeight();

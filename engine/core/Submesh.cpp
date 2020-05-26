@@ -182,8 +182,9 @@ bool Submesh::isShadowRenderOwned() const {
 
 bool Submesh::textureLoad(){
     if (material && material->getTexture() && render){
-        material->getTexture()->load();
-        render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
+        if (material->getTexture()->load()) {
+            render->addTexture(S_TEXTURESAMPLER_DIFFUSE, material->getTexture());
+        }
     }
     
     return true;
