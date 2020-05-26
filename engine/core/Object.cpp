@@ -14,7 +14,6 @@ using namespace Supernova;
 
 Object::Object(){
     loaded = false;
-    firstLoaded = false;
     markToUpdate = true;
     
     parent = NULL;
@@ -108,8 +107,6 @@ void Object::addObject(Object* obj){
             obj->viewProjectionMatrix = viewProjectionMatrix;
             obj->cameraPosition = cameraPosition;
             obj->modelViewProjectionMatrix = modelViewProjectionMatrix;
-
-            obj->firstLoaded = false;
 
             if (scene != NULL) {
                 obj->setSceneAndConfigure(scene);
@@ -592,7 +589,6 @@ bool Object::load(){
         scene->getPhysicsWorld()->addBody(body);
 
     loaded = true;
-    firstLoaded = true;
 
     return loaded;
 
@@ -606,8 +602,6 @@ bool Object::draw(){
     std::vector<Object*>::iterator it;
     for (it = objects.begin(); it != objects.end(); ++it) {
         if ((*it)->scene != (*it)){ //if not a scene object
-            if (!(*it)->firstLoaded)
-                (*it)->load();
             if ((*it)->loaded)
                 (*it)->draw();
         }

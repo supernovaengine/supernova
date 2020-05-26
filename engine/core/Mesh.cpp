@@ -183,7 +183,7 @@ bool Mesh::renderLoad(bool shadow){
             }else{
                 submeshes[i]->getSubmeshRender()->setParent(render);
             }
-            submeshes[i]->renderLoad(shadow);
+            submeshes[i]->renderSetup(shadow);
         }
 
     } else {
@@ -201,22 +201,25 @@ bool Mesh::renderLoad(bool shadow){
             } else {
                 submeshes[i]->getSubmeshShadowRender()->setParent(shadowRender);
             }
-            submeshes[i]->renderLoad(shadow);
+            submeshes[i]->renderSetup(shadow);
         }
 
     }
 
-    GraphicObject::renderLoad(shadow);
+    if (!GraphicObject::renderLoad(shadow))
+        return false;
 
     //Load submeshes if use a different render
     if (submeshes.size() > 1) {
         if (!shadow) {
             for (size_t i = 0; i < submeshes.size(); i++) {
-                submeshes[i]->getSubmeshRender()->load();
+                if (!submeshes[i]->getSubmeshRender()->load())
+                    return false;
             }
         } else {
             for (size_t i = 0; i < submeshes.size(); i++) {
-                submeshes[i]->getSubmeshShadowRender()->load();
+                if (!submeshes[i]->getSubmeshShadowRender()->load())
+                    return false;
             }
         }
     }
@@ -271,11 +274,16 @@ bool Mesh::renderDraw(bool shadow){
 }
 
 bool Mesh::load(){
-    if (scene && scene->isLoadedShadow()) {
-        renderLoad(true);
+    if (!GraphicObject::load()){
+        return false;
     }
 
-    bool loadReturn = GraphicObject::load();
+    if (scene && scene->isLoadedShadow()) {
+        if (!renderLoad(true)){
+            loaded = false;
+            return false;
+        }
+    }
 
     //Check after texture is loaded
     for (unsigned int i = 0; i < submeshes.size(); i++){
@@ -286,13 +294,16 @@ bool Mesh::load(){
 
     setSceneTransparency(transparent);
 
-    return loadReturn;
+    return true;
 }
 
 void Mesh::destroy(){
 
     for (size_t i = 0; i < submeshes.size(); i++) {
-        submeshes[i]->destroy();
+        if (submeshes[i]->render && submeshes[i]->renderOwned)
+            submeshes[i]->getSubmeshRender()->destroy();
+        if (submeshes[i]->shadowRender && submeshes[i]->shadowRenderOwned)
+            submeshes[i]->getSubmeshShadowRender()->destroy();
     }
 
     GraphicObject::destroy();

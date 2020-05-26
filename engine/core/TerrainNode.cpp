@@ -172,7 +172,7 @@ void TerrainNode::setIndices(std::string bufferName, size_t size, size_t offset,
     }
 }
 
-bool TerrainNode::renderLoad(bool shadow){
+void TerrainNode::renderSetup(bool shadow){
 
     if (!shadow) {
 
@@ -194,5 +194,5 @@ bool TerrainNode::renderLoad(bool shadow){
 
     }
 
-    return Submesh::renderLoad(shadow);
+    Submesh::renderSetup(shadow);
 }

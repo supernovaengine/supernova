@@ -125,8 +125,10 @@ bool Texture::load(){
 
             if (texturesData[0] == NULL){
                 texturesData[0] = new TextureData(id.c_str());
-                if (!texturesData[0]->getData())
+                if (!texturesData[0]->getData()) {
+                    releaseData();
                     return false;
+                }
                 dataOwned = true;
             }
 

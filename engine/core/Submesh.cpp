@@ -14,7 +14,6 @@ Submesh::Submesh(){
     this->indices.setDataType(DataType::UNSIGNED_INT);
 
     this->visible = true;
-    this->loaded = false;
     this->renderOwned = true;
     this->shadowRenderOwned = true;
 
@@ -33,7 +32,6 @@ Submesh::Submesh(Material* material){
     this->indices.setDataType(DataType::UNSIGNED_INT);
 
     this->visible = true;
-    this->loaded = false;
     this->renderOwned = true;
     this->shadowRenderOwned = true;
 
@@ -41,9 +39,6 @@ Submesh::Submesh(Material* material){
 }
 
 Submesh::~Submesh(){
-    if (this->loaded)
-        destroy();
-
     if (materialOwned && material)
         delete this->material;
     
@@ -61,7 +56,6 @@ Submesh::Submesh(const Submesh& s){
     this->dynamic = s.dynamic;
     this->indices = s.indices;
     this->visible = s.visible;
-    this->loaded = s.loaded;
     this->renderOwned = s.renderOwned;
     this->shadowRenderOwned = s.shadowRenderOwned;
     this->render = s.render;
@@ -76,7 +70,6 @@ Submesh& Submesh::operator = (const Submesh& s){
     this->dynamic = s.dynamic;
     this->indices = s.indices;
     this->visible = s.visible;
-    this->loaded = s.loaded;
     this->renderOwned = s.renderOwned;
     this->shadowRenderOwned = s.shadowRenderOwned;
     this->render = s.render;
@@ -190,7 +183,7 @@ bool Submesh::textureLoad(){
     return true;
 }
 
-bool Submesh::renderLoad(bool shadow){
+void Submesh::renderSetup(bool shadow){
 
     if (!shadow) {
 
@@ -208,10 +201,6 @@ bool Submesh::renderLoad(bool shadow){
                 render->addProperty(S_PROPERTY_TEXTURERECT, S_PROPERTYDATA_FLOAT4, 1, material->getTextureRect());
         }
 
-        loaded = true;
-
-        return true;
-
     } else {
 
         shadowRender = getSubmeshShadowRender();
@@ -221,14 +210,5 @@ bool Submesh::renderLoad(bool shadow){
             shadowRender->addVertexAttribute(x.first, x.second.getBuffer(), x.second.getElements(), x.second.getDataType(), x.second.getStride(), x.second.getOffset());
         }
 
-        return true;
-
     }
-}
-
-void Submesh::destroy(){
-    if (render)
-        render->destroy();
-
-    loaded = false;
 }

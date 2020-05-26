@@ -210,9 +210,14 @@ bool GraphicObject::draw(){
 }
 
 bool GraphicObject::load(){
-    Object::load();
+    if (!Object::load()) {
+        return false;
+    }
 
-    bool renderReturn = renderLoad(false);
+    if (!renderLoad(false)) {
+        loaded = false;
+        return false;
+    }
 
     //Check after texture is loaded
     if (material && material->isTransparent()){
@@ -221,7 +226,7 @@ bool GraphicObject::load(){
 
     setSceneTransparency(transparent);
 
-    return renderReturn;
+    return true;
 }
 
 bool GraphicObject::textureLoad(){
@@ -328,6 +333,9 @@ bool GraphicObject::renderDraw(bool shadow){
 void GraphicObject::destroy(){
     if (render)
         render->destroy();
+
+    if (shadowRender)
+        shadowRender->destroy();
 
     Object::destroy();
 }

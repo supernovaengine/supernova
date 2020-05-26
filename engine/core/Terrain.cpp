@@ -70,7 +70,15 @@ void Terrain::setHeightMap(std::string heightMapPath){
 
     heightMap = new Texture(heightMapPath);
     heightMap->setPreserveData(true);
-    heightMapLoaded = false;
+
+    if (loaded){
+        if (heightMap->load()){
+            render->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightMap);
+            shadowRender->addTexture(S_TEXTURESAMPLER_HEIGHTDATA, heightMap);
+        }else{
+            destroy();
+        }
+    }
 }
 
 Texture* Terrain::getBlendMap(){
@@ -193,15 +201,10 @@ float Terrain::getHeight(float x, float y){
     if (x < 0 || y < 0 || x >= terrainSize || y >= terrainSize)
         return 0;
 
-    if (!heightMapLoaded) {
-        heightMap->load();
-        heightMapLoaded = true;
-    }
-
     TextureData* textureData = heightMap->getTextureData();
 
-    int posX = round(textureData->getWidth() * x / terrainSize);
-    int posY = round(textureData->getHeight() * y / terrainSize);
+    int posX = floor(textureData->getWidth() * x / terrainSize);
+    int posY = floor(textureData->getHeight() * y / terrainSize);
 
     float val = maxHeight*(textureData->getColorComponent(posX,posY,0)/255.0f);
     return val;
@@ -300,6 +303,16 @@ void Terrain::updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Mat
 
 
 bool Terrain::load(){
+
+    if (!heightMap){
+        Log::Error("Terrain must have a heightmap");
+        return false;
+    }
+
+    if (!heightMap->load()){
+        delete heightMap;
+        return false;
+    }
 
     fullResNode = createPlaneNodeBuffer(1, 1, resolution, resolution);
     halfResNode = createPlaneNodeBuffer(1, 1, resolution/2, resolution/2);

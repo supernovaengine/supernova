@@ -20,8 +20,7 @@ namespace Supernova {
     class Object {
 
     private:
-        
-        bool firstLoaded;
+
         bool markToUpdate;
 
         bool ownedBody;

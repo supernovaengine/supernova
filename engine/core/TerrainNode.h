@@ -47,7 +47,7 @@ namespace Supernova{
 
         virtual void setIndices(std::string bufferName, size_t size, size_t offset = 0, DataType type = UNSIGNED_INT);
 
-        virtual bool renderLoad(bool shadow);
+        virtual void renderSetup(bool shadow);
     };
 
 }

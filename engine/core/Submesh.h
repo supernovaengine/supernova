@@ -32,9 +32,7 @@ namespace Supernova {
         bool visible;
         bool renderOwned;
 
-    private:
         bool shadowRenderOwned;
-        bool loaded;
 
     protected:
         ObjectRender* render;
@@ -70,9 +68,7 @@ namespace Supernova {
 
         bool textureLoad();
 
-        virtual bool renderLoad(bool shadow);
-
-        virtual void destroy();
+        virtual void renderSetup(bool shadow);
     };
     
 }
