@@ -43,7 +43,7 @@ void TextureRender::deleteUnused(){
     TextureRender::it_type remove = findToRemove();
     while (remove != texturesRender.end()){
         texturesRender.erase(remove);
-        Log::Debug("Deleted texture (texture map size: %lu)", texturesRender.size());
+        Log::Debug("Deleted texture (texture map size: %lu): %s", texturesRender.size(), remove->first.c_str());
         remove = findToRemove();
     }
 

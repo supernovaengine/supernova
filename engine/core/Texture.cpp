@@ -127,6 +127,8 @@ bool Texture::load(){
                 texturesData[0] = new TextureData(id.c_str());
                 if (!texturesData[0]->getData()) {
                     releaseData();
+                    this->textureRender.reset();
+                    TextureRender::deleteUnused();
                     return false;
                 }
                 dataOwned = true;
@@ -145,8 +147,11 @@ bool Texture::load(){
         }else if (type == S_TEXTURE_CUBE){
 
             for (int i = 0; i < texturesData.size(); i++){
-                if (!texturesData[i]->getData())
+                if (!texturesData[i]->getData()) {
+                    this->textureRender.reset();
+                    TextureRender::deleteUnused();
                     return false;
+                }
                 texturesData[i]->resamplePowerOfTwo();
             }
             
@@ -175,7 +180,7 @@ bool Texture::load(){
         }
         
         if (renderNotPrepared){
-            this->textureRender = NULL;
+            this->textureRender.reset();
             TextureRender::deleteUnused();
             return false;
         }
