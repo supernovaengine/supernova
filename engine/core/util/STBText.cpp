@@ -81,11 +81,14 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
         return false;
 
     Data* fontData = new Data();
-    fontData->open(font);
+    if (fontData->open(font) != FileErrors::NO_ERROR){
+        Log::Error("Font file not found: %s", font);
+        return false;
+    }
 
     stbtt_fontinfo info;
     if (!stbtt_InitFont(&info, fontData->getMemPtr(), 0)) {
-        Log::Error("Failed to initialize font");
+        Log::Error("Failed to initialize font: %s", font);
         return false;
     }
     float scale = stbtt_ScaleForPixelHeight(&info, fontSize);

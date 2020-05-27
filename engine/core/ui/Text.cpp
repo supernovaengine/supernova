@@ -185,11 +185,11 @@ void Text::createText(){
 }
 
 bool Text::load(){
-    if (stbtext->load(font.c_str(), fontSize, getMaterial()->getTexture())) {
-        createText();
-    }else{
-        Log::Error("Can`t load font");
+    if (!stbtext->load(font.c_str(), fontSize, getMaterial()->getTexture())) {
+        return false;
     }
+
+    createText();
 
     instanciateRender();
 
