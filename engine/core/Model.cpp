@@ -67,7 +67,13 @@ bool Model::fileExists(const std::string &abs_filename, void *) {
 }
 
 bool Model::readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *) {
-    Data filedata(filepath.c_str());
+    Data filedata;
+
+    if (filedata.open(filepath.c_str()) != FileErrors::NO_ERROR){
+        Log::Error("Model file not found: %s", filepath.c_str());
+        return false;
+    }
+
     std::istringstream f(filedata.readString());
 
     if (!f) {
@@ -103,7 +109,13 @@ bool Model::readWholeFile(std::vector<unsigned char> *out, std::string *err, con
 }
 
 std::string Model::readFileToString(const char* filename){
-    Data filedata(filename);
+    Data filedata;
+
+    if (filedata.open(filename) != FileErrors::NO_ERROR){
+        Log::Error("Model file not found: %s", filename);
+        return "";
+    }
+
     return filedata.readString();
 }
 
@@ -226,11 +238,12 @@ bool Model::loadGLTF(const char* filename) {
     }
 
     if (!warn.empty()) {
-        Log::Warn("WARN: %s", warn.c_str());
+        Log::Warn("Loading GLTF model (%s): %s", filename, warn.c_str());
     }
 
     if (!err.empty()) {
-        Log::Error("ERR: %s", err.c_str());
+        Log::Error("Can't load GLTF model (%s): %s", filename, err.c_str());
+        return false;
     }
 
     if (!res) {
@@ -670,14 +683,20 @@ bool Model::loadOBJ(const char* filename){
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
 
+    std::string warn;
     std::string err;
     
     tinyobj::FileReader::externalFunc = readFileToString;
 
-    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filename, baseDir.c_str());
+    bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename, baseDir.c_str());
+
+    if (!warn.empty()) {
+        Log::Warn("Loading OBJ model (%s): %s", filename, warn.c_str());
+    }
 
     if (!err.empty()) {
-        Log::Error("%s (%s)", err.c_str(), filename);
+        Log::Error("Can't load OBJ model (%s): %s", filename, err.c_str());
+        return false;
     }
 
     if (ret) {
@@ -886,9 +905,11 @@ bool Model::load(){
     std::string ext = FileData::getFilePathExtension(filename);
 
     if (ext.compare("obj") == 0) {
-        loadOBJ(filename);
+        if (!loadOBJ(filename))
+            return false;
     }else{
-        loadGLTF(filename);
+        if (!loadGLTF(filename))
+            return false;
     }
 
     if (skeleton)
