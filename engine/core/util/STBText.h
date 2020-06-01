@@ -42,7 +42,7 @@ namespace Supernova {
         float getLineGap();
         int getLineHeight();
 
-        bool load(const char* font, unsigned int fontSize, Texture* texture);
+        TextureData* load(std::string fontpath, unsigned int fontSize);
         void createText(std::string text, Buffer* buffer, std::vector<unsigned int>& indices, std::vector<Vector2>& charPositions,
                         int& width, int& height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert);
         

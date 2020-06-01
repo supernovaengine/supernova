@@ -9,8 +9,9 @@ Texture::Texture(){
 
     this->textureFrameWidth = 0;
     this->textureFrameHeight = 0;
-    
-    this->texturesData.push_back(NULL);
+
+    this->paths.clear();
+    this->texturesData.clear();
     this->type = S_TEXTURE_2D;
     
     this->id = "";
@@ -25,12 +26,18 @@ Texture::Texture(){
     this->userNearestScale = false;
 }
 
-Texture::Texture(std::string path_id): Texture(){
-    this->id = path_id;
+Texture::Texture(std::string filename): Texture(){
+    this->paths.push_back(filename);
+    this->id = filename;
+}
+
+Texture::Texture(std::vector<std::string> paths, std::string id): Texture(){
+    this->paths = paths;
+    this->id = id;
 }
 
 Texture::Texture(TextureData* textureData, std::string id): Texture(){
-    this->texturesData[0] = textureData;
+    this->texturesData.push_back(textureData);
     this->id = id;
 }
 
@@ -48,6 +55,7 @@ Texture::Texture(int textureFrameWidth, int textureFrameHeight, std::string id):
 
 Texture::Texture(const Texture& t){
     this->textureRender = t.textureRender;
+    this->paths = t.paths;
     this->texturesData = t.texturesData;
     this->type = t.type;
     this->id = t.id;
@@ -56,6 +64,7 @@ Texture::Texture(const Texture& t){
 
 Texture& Texture::operator = (const Texture& t){
     this->textureRender = t.textureRender;
+    this->paths = t.paths;
     this->texturesData = t.texturesData;
     this->type = t.type;
     this->id = t.id;
@@ -69,6 +78,10 @@ Texture::~Texture(){
     if (dataOwned){
         releaseData();
     }
+}
+
+bool Texture::isIdLoaded(std::string id){
+    return TextureRender::sharedInstance(id).get()->isLoaded();
 }
 
 void Texture::setId(std::string id){
@@ -123,9 +136,10 @@ bool Texture::load(){
 
         if (type == S_TEXTURE_2D){
 
-            if (texturesData[0] == NULL){
-                texturesData[0] = new TextureData(id.c_str());
-                if (!texturesData[0]->getData()) {
+            if (paths.size() > 0){
+                texturesData.push_back(new TextureData());
+                texturesData.back()->loadTextureFromFile(paths[0].c_str());
+                if (!texturesData.back()->getData()) {
                     releaseData();
                     this->textureRender.reset();
                     TextureRender::deleteUnused();
@@ -146,15 +160,21 @@ bool Texture::load(){
             
         }else if (type == S_TEXTURE_CUBE){
 
-            for (int i = 0; i < texturesData.size(); i++){
-                if (!texturesData[i]->getData()) {
-                    this->textureRender.reset();
-                    TextureRender::deleteUnused();
-                    return false;
+            if (paths.size() > 0) {
+                for (int i = 0; i < paths.size(); i++) {
+                    texturesData.push_back(new TextureData());
+                    texturesData.back()->loadTextureFromFile(paths[i].c_str());
+                    if (!texturesData.back()->getData()) {
+                        releaseData();
+                        this->textureRender.reset();
+                        TextureRender::deleteUnused();
+                        return false;
+                    }
+                    texturesData.back()->resamplePowerOfTwo();
                 }
-                texturesData[i]->resamplePowerOfTwo();
+                dataOwned = true;
             }
-            
+
             if (!textureRender.get()->loadTextureCube(texturesData)){
                 renderNotPrepared = true;
             }

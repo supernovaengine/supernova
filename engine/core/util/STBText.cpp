@@ -5,6 +5,7 @@
 #include "file/Data.h"
 #include <codecvt>
 #include <locale>
+#include "ui/DefaultFont.h"
 
 using namespace Supernova;
 
@@ -72,24 +73,26 @@ int STBText::getLineHeight(){
     return lineHeight;
 }
 
-bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
+TextureData* STBText::load(std::string fontpath, unsigned int fontSize){
 
-    if (*font == 0)
-        return false;
+    Data fontData;
 
-    if (!texture)
-        return false;
-
-    Data* fontData = new Data();
-    if (fontData->open(font) != FileErrors::NO_ERROR){
-        Log::Error("Font file not found: %s", font);
-        return false;
+    if (!fontpath.empty()) {
+        if (fontData.open(fontpath.c_str()) != FileErrors::NO_ERROR) {
+            Log::Error("Font file not found: %s", fontpath.c_str());
+            return NULL;
+        }
+    }else{
+        if (fontData.open(roboto_v20_latin_regular_ttf, roboto_v20_latin_regular_ttf_len, false, false) != FileErrors::NO_ERROR) {
+            Log::Error("Can't open default font");
+            return NULL;
+        }
     }
 
     stbtt_fontinfo info;
-    if (!stbtt_InitFont(&info, fontData->getMemPtr(), 0)) {
-        Log::Error("Failed to initialize font: %s", font);
-        return false;
+    if (!stbtt_InitFont(&info, fontData.getMemPtr(), 0)) {
+        Log::Error("Failed to initialize font: %s", fontpath.c_str());
+        return NULL;
     }
     float scale = stbtt_ScaleForPixelHeight(&info, fontSize);
 
@@ -115,11 +118,11 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
 
         if (!stbtt_PackBegin(&context, atlasData, atlasWidth, atlasHeight, 0, 1, nullptr)){
             Log::Error("Failed to initialize font");
-            return false;
+            return NULL;
         }
 
         //stbtt_PackSetOversampling(&context, oversampleX, oversampleY);
-        if (!stbtt_PackFontRange(&context, fontData->getMemPtr(), 0, fontSize, firstChar, charCount, charInfo)){
+        if (!stbtt_PackFontRange(&context, fontData.getMemPtr(), 0, fontSize, firstChar, charCount, charInfo)){
             atlasWidth = atlasWidth * 2;
             atlasHeight = atlasHeight * 2;
         }else{
@@ -128,21 +131,12 @@ bool STBText::load(const char* font, unsigned int fontSize, Texture* texture){
     }
     if (atlasWidth > atlasLimit){
         Log::Error("Failed to pack font");
-        return false;
+        return NULL;
     }
     stbtt_PackEnd(&context);
 
     unsigned int textureSize = atlasWidth * atlasHeight * sizeof(unsigned char);
-    TextureData* textureData  = new TextureData(atlasWidth, atlasHeight, textureSize, S_COLOR_ALPHA, 1, (void*)atlasData);
-
-    texture->setId(font + std::string("|") + std::to_string(fontSize));
-    texture->setTextureData(textureData);
-    texture->setDataOwned(true);
-    texture->load();
-
-    delete fontData;
-
-    return true;
+    return new TextureData(atlasWidth, atlasHeight, textureSize, S_COLOR_ALPHA, 1, (void*)atlasData);
 }
 
 void STBText::createText(std::string text, Buffer* buffer, std::vector<unsigned int>& indices, std::vector<Vector2>& charPositions,

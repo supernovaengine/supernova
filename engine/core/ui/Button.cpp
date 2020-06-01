@@ -31,14 +31,14 @@ Button::~Button(){
 }
 
 void Button::setLabelText(std::string text){
-    label.setText(text.c_str());
+    if (!text.empty()) {
+        label.setText(text.c_str());
+        addObject(&label);
+    }
 }
 
 void Button::setLabelFont(std::string font){
-    if (font != "") {
-        label.setFont(font.c_str());
-        addObject(&label);
-    }
+    label.setFont(font.c_str());
 }
 
 void Button::setLabelSize(unsigned int size){
@@ -166,7 +166,7 @@ bool Button::load(){
     if (textureDisabled)
         textureDisabled->load();
 
-    if (!label.getFont().empty()) {
+    if (!label.getText().empty()) {
         label.load();
 
         float labelX = 0;

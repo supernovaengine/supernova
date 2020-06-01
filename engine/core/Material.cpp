@@ -63,20 +63,16 @@ void Material::setTextureCube(std::string front, std::string back, std::string l
     textures.push_back(back);
     textures.push_back(front);
 
-    std::vector<TextureData*> texturesData;
-    
     std::string id = "cube";
     for (int i = 0; i < textures.size(); i++){
-        texturesData.push_back(new TextureData(textures[i].c_str()));
         id = id + "|" + textures[i];
     }
-    
+
     if (this->texture && textureOwned)
         delete this->texture;
-    
-    this->texture = new Texture(texturesData, id);
+
+    this->texture = new Texture(textures, id);
     this->texture->setType(S_TEXTURE_CUBE);
-    this->texture->setDataOwned(true);
 }
 
 void Material::setTextureRect(float x, float y, float width, float height){

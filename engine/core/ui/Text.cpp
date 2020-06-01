@@ -12,6 +12,7 @@ Text::Text(): Mesh2D() {
     submeshes.push_back(new Submesh());
     dynamic = true;
     stbtext = new STBText();
+    font = "";
     text = "";
     fontSize = 40;
     multiline = true;
@@ -185,9 +186,21 @@ void Text::createText(){
 }
 
 bool Text::load(){
-    if (!stbtext->load(font.c_str(), fontSize, getMaterial()->getTexture())) {
+    TextureData* textureData = stbtext->load(font, fontSize);
+    if (!textureData) {
         return false;
     }
+
+    std::string fontId = font;
+    if (font.empty())
+        fontId = "font";
+
+    Texture* fontTexture = new Texture(textureData, fontId + std::string("|") + std::to_string(fontSize));
+    fontTexture->setDataOwned(true);
+    fontTexture->load();
+
+    setTexture(fontTexture);
+    material->setTextureOwned(true);
 
     createText();
 

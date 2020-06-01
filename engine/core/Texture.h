@@ -29,6 +29,7 @@ namespace Supernova{
         int textureFrameHeight;
         
         std::string id;
+        std::vector<std::string> paths;
         std::vector<TextureData*> texturesData;
         
         bool dataOwned;
@@ -45,7 +46,8 @@ namespace Supernova{
         
     public:
         Texture();
-        Texture(std::string path_id);
+        Texture(std::string filename);
+        Texture(std::vector<std::string> paths, std::string id = "");
         Texture(TextureData* textureData, std::string id = "");
         Texture(std::vector<TextureData*> texturesData, std::string id = "");
         Texture(int textureFrameWidth, int textureFrameHeight, std::string id = "");
@@ -54,6 +56,8 @@ namespace Supernova{
         virtual ~Texture();
         
         Texture& operator = (const Texture& t);
+
+        static bool isIdLoaded(std::string id);
         
         void setId(std::string id);
         void setTextureData(TextureData* textureData);

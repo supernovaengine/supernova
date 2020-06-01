@@ -21,13 +21,12 @@ namespace Supernova {
 
         TextureData();
         TextureData(int width, int height, unsigned int size, int color_format, int channels, void* data);
-        TextureData(const char* filename);
         TextureData(const TextureData& v);
         TextureData& operator = ( const TextureData& v );
         virtual ~TextureData();
         void copy(const TextureData& v);
         
-        bool loadTextureData(const char* relative_path);
+        bool loadTextureFromFile(const char* filename);
 
         void releaseImageData();
         

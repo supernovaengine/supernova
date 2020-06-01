@@ -30,10 +30,6 @@ TextureData::TextureData(int width, int height, unsigned int size, int color_for
     this->dataOwned = false;
 }
 
-TextureData::TextureData(const char* filename): TextureData(){
-    loadTextureData(filename);
-}
-
 TextureData::TextureData(const TextureData& v){
     this->width = v.width;
     this->height = v.height;
@@ -58,7 +54,7 @@ TextureData& TextureData::operator = ( const TextureData& v ){
     return *this;
 }
 
-bool TextureData::loadTextureData(const char* filename) {
+bool TextureData::loadTextureFromFile(const char* filename) {
     
     Data filedata;
     
