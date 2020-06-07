@@ -47,14 +47,6 @@ unsigned int FileData::read32(){
     return d;
 }
 
-char FileData::getDirSeparator(){
-#if defined(_WIN32)
-    return '\\';
-#else
-    return '/';
-#endif
-}
-
 bool FileData::beginWith(std::string path, std::string prefix){
     if (prefix.length() > path.length()) {
         return false;
@@ -77,14 +69,14 @@ bool FileData::beginWith(std::string path, std::string prefix){
 std::string FileData::getBaseDir(std::string filepath){
     size_t found;
 
-    found=filepath.find_last_of(getDirSeparator());
+    found=filepath.find_last_of(System::instance().getDirSeparator());
 
     std::string result = filepath.substr(0,found);
 
     if (filepath == result)
         result= "";
 
-    return result + getDirSeparator();
+    return result + System::instance().getDirSeparator();
 }
 
 std::string FileData::simplifyPath(std::string path) {
@@ -101,10 +93,10 @@ std::string FileData::simplifyPath(std::string path) {
 
         dir.clear();
 
-        while (path[i] == getDirSeparator())
+        while (path[i] == System::instance().getDirSeparator())
             i++;
 
-        while (i < len_path && path[i] != getDirSeparator()) {
+        while (i < len_path && path[i] != System::instance().getDirSeparator()) {
             dir.push_back(path[i]);
             i++;
         }
@@ -128,7 +120,7 @@ std::string FileData::simplifyPath(std::string path) {
     while (!st1.empty()) {
         std::string temp = st1.top();
         if (st1.size() != 1)
-            res.append(temp + getDirSeparator());
+            res.append(temp + System::instance().getDirSeparator());
         else
             res.append(temp);
 
@@ -147,17 +139,17 @@ std::string FileData::getFilePathExtension(const std::string &filepath) {
 std::string FileData::getSystemPath(std::string path){
     if (beginWith(path, "data://")){
         path = path.substr(7, path.length());
-        return System::instance()->getUserDataPath() + "/" + FileData::simplifyPath(path);
+        return System::instance().getUserDataPath() + "/" + FileData::simplifyPath(path);
     }
     if (beginWith(path, "asset://")){
         path = path.substr(8, path.length());
-        return System::instance()->getAssetPath() + "/" + FileData::simplifyPath(path);
+        return System::instance().getAssetPath() + "/" + FileData::simplifyPath(path);
     }
     if (beginWith(path, "/")){
         path = path.substr(1, path.length());
-        return System::instance()->getAssetPath() + "/" + FileData::simplifyPath(path);
+        return System::instance().getAssetPath() + "/" + FileData::simplifyPath(path);
     }
-    return System::instance()->getAssetPath() + "/" + FileData::simplifyPath(path);
+    return System::instance().getAssetPath() + "/" + FileData::simplifyPath(path);
 }
 
 std::string FileData::readString(int aOffset){

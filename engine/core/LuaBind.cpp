@@ -12,6 +12,7 @@
 #include "LuaIntf/LuaIntf.h"
 
 #include "Engine.h"
+#include "system/System.h"
 #include "Object.h"
 #include "GraphicObject.h"
 #include "Log.h"
@@ -212,12 +213,12 @@ int LuaBind::setLuaPath(const char* path)
 int LuaBind::moduleLoader(lua_State *L) {
     
     const char *filename = lua_tostring(L, 1);
-    filename = luaL_gsub(L, filename, ".", std::to_string(FileData::getDirSeparator()).c_str());
+    filename = luaL_gsub(L, filename, ".", std::to_string(System::instance().getDirSeparator()).c_str());
     
     std::string filepath;
     Data filedata;
     
-    filepath = std::string("lua") + FileData::getDirSeparator() + filename + ".lua";
+    filepath = std::string("lua") + System::instance().getDirSeparator() + filename + ".lua";
     filedata.open(filepath.c_str());
     if (filedata.getMemPtr() != NULL) {
         
@@ -917,15 +918,21 @@ void LuaBind::bind(){
     .endClass();
     
 
-    std::string luadir = std::string("lua") + FileData::getDirSeparator();
+    std::string luadir = std::string("lua") + System::instance().getDirSeparator();
 
     setLuaPath(std::string(luadir + "?.lua").c_str());
     setLuaSearcher(moduleLoader, true);
 
-    std::string luafile = luadir + "main.lua";
+    std::string luafile = "main.lua";
+    std::string luafile_subdir = luadir + "main.lua";
 
     Data filedata;
-    filedata.open(luafile.c_str());
+
+    //First try open on root assets dir
+    if (filedata.open(luafile.c_str()) != FileErrors::NO_ERROR){
+        //Second try to open on lua dir
+        filedata.open(luafile_subdir.c_str());
+    }
 
     //int luaL_dofile (lua_State *L, const char *filename);
     if (luaL_loadbuffer(L,(const char*)filedata.getMemPtr(),filedata.length(), luafile.c_str()) == 0){

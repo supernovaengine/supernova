@@ -33,7 +33,7 @@ unsigned int File::read(unsigned char *aDst, unsigned int aBytes) {
 
 unsigned int File::write(unsigned char *aSrc, unsigned int aBytes){
     unsigned int r = (unsigned int)fwrite(aSrc, 1, aBytes, fileHandle);
-    System::instance()->syncFileSystem();
+    System::instance().syncFileSystem();
     return r;
 }
 
@@ -62,9 +62,9 @@ unsigned int File::open(const char *aFilename, bool write){
         return FileErrors::INVALID_PARAMETER;
     std::string systemPath = FileData::getSystemPath(aFilename);
     if (!write)
-        fileHandle = System::instance()->platformFopen(systemPath.c_str(), "rb");
+        fileHandle = System::instance().platformFopen(systemPath.c_str(), "rb");
     else{
-        fileHandle = System::instance()->platformFopen(systemPath.c_str(), "w+b");
+        fileHandle = System::instance().platformFopen(systemPath.c_str(), "w+b");
     }
     if (!fileHandle)
         return FileErrors::FILE_NOT_FOUND;

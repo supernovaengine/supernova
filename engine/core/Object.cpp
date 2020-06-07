@@ -117,6 +117,9 @@ void Object::addObject(Object* obj){
             }
 
             obj->needUpdate();
+
+            if (loaded)
+                obj->load();
         } else {
             Log::Error("Object has a parent already");
         }

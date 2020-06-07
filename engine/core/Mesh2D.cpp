@@ -189,13 +189,13 @@ bool Mesh2D::draw() {
             float widthRatio = scaleX * (Engine::getViewRect()->getWidth() / (float) Engine::getCanvasWidth());
             float heightRatio = scaleY * (Engine::getViewRect()->getHeight() / (float) Engine::getCanvasHeight());
 
-            objScreenPosX = (tempX * Engine::getViewRect()->getWidth() + (float) System::instance()->getScreenWidth()) / 2;
-            objScreenPosY = (tempY * Engine::getViewRect()->getHeight() + (float) System::instance()->getScreenHeight()) / 2;
+            objScreenPosX = (tempX * Engine::getViewRect()->getWidth() + (float) System::instance().getScreenWidth()) / 2;
+            objScreenPosY = (tempY * Engine::getViewRect()->getHeight() + (float) System::instance().getScreenHeight()) / 2;
             objScreenWidth = width * widthRatio;
             objScreenHeight = height * heightRatio;
 
             if (!scene->getScene()->is3D())
-                objScreenPosY = (float) System::instance()->getScreenHeight() - objScreenHeight - objScreenPosY;
+                objScreenPosY = (float) System::instance().getScreenHeight() - objScreenHeight - objScreenPosY;
 
 
             if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 && clipBorder[3] == 0)) {

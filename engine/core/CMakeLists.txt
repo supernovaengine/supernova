@@ -14,5 +14,5 @@ target_link_libraries(
     supernova
 
     supernova-renders
-    lua luaintf tinyobjloader soloud stb box2d tinygltf
+    lua luaintf tinyobjloader soloud stb box2d tinygltf tinyxml2
 )

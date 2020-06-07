@@ -19,10 +19,10 @@ int SupernovaWeb::screenHeight;
 
 extern "C" {
     int getScreenWidth() {
-        return Supernova::System::instance()->getScreenWidth();
+        return Supernova::System::instance().getScreenWidth();
     }
     int getScreenHeight() {
-        return Supernova::System::instance()->getScreenHeight();
+        return Supernova::System::instance().getScreenHeight();
     }
     void changeCanvasSize(int nWidth, int nHeight){
         SupernovaWeb::changeCanvasSize(nWidth, nHeight);

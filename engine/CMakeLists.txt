@@ -26,6 +26,9 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/json")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/tinygltf")
 add_subdirectory (libs/tinygltf)
 
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/tinyxml2")
+add_subdirectory (libs/tinyxml2)
+
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/box2d")
 add_subdirectory (libs/box2d)
 

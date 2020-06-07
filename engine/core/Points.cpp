@@ -288,9 +288,9 @@ void Points::updatePointScale(){
     }
     
     if (pointSizeReference == S_POINTSIZE_HEIGHT)
-        newPointScale *= (float)System::instance()->getScreenHeight() / (float)Engine::getCanvasHeight();
+        newPointScale *= (float)System::instance().getScreenHeight() / (float)Engine::getCanvasHeight();
     if (pointSizeReference == S_POINTSIZE_WIDTH)
-        newPointScale *= (float)System::instance()->getScreenWidth() / (float)Engine::getCanvasWidth();
+        newPointScale *= (float)System::instance().getScreenWidth() / (float)Engine::getCanvasWidth();
 
     if (newPointScale != pointScale){
     

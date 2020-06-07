@@ -1,7 +1,15 @@
-#include "System.h"
+//
+// (c) 2020 Eduardo Doria.
+//
 
+#include "System.h"
+#include "tinyxml2.h"
+#include "util/XMLUtils.h"
+#include <stdlib.h>
 
 using namespace Supernova;
+
+#define USERSETTINGS_ROOT "userSettings"
 
 #ifdef SUPERNOVA_ANDROID
 #include "SupernovaAndroid.h"
@@ -13,7 +21,7 @@ using namespace Supernova;
 #include "SupernovaWeb.h"
 #endif
 
-System* System::instance(){
+System& System::instance(){
 #ifdef SUPERNOVA_ANDROID
     static System *instance = new SupernovaAndroid();
 #endif
@@ -24,7 +32,7 @@ System* System::instance(){
     static System *instance = new SupernovaWeb();
 #endif
 
-    return instance;
+    return *instance;
 }
 
 void System::showVirtualKeyboard(){
@@ -45,6 +53,18 @@ void System::requestFullscreen(){
 
 void System::exitFullscreen(){
 
+}
+
+char System::getDirSeparator(){
+#if defined(_WIN32)
+    return '\\';
+#else
+    return '/';
+#endif
+}
+
+std::string System::getXMLStorageFile(){
+    return getUserDataPath() + getDirSeparator() + "UserSettings.xml";
 }
 
 std::string System::getAssetPath(){
@@ -81,4 +101,68 @@ void System::platformLog(const int type, const char *fmt, va_list args){
 
     vprintf(fmt, args);
     printf("\n");
+}
+
+bool System::getBoolForKey(const char *key, bool defaultValue){
+    const char* value = XMLUtils::getValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key);
+
+    if (!value)
+        return defaultValue;
+
+    return (! strcmp(value, "true"));
+}
+
+int System::getIntegerForKey(const char *key, int defaultValue){
+    const char* value = XMLUtils::getValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key);
+
+    if (!value)
+        return defaultValue;
+
+    return atoi(value);
+}
+
+float System::getFloatForKey(const char *key, float defaultValue){
+    return (float)getDoubleForKey(key, defaultValue);
+}
+
+double System::getDoubleForKey(const char *key, double defaultValue){
+    const char* value = XMLUtils::getValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key);
+
+    if (!value)
+        return defaultValue;
+
+    return atof(value);
+}
+
+std::string System::getStringForKey(const char *key, std::string defaultValue){
+    const char* value = XMLUtils::getValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key);
+
+    if (!value)
+        return defaultValue;
+
+    return std::string(value);
+}
+
+void System::setBoolForKey(const char *key, bool value){
+    if (value) {
+        setStringForKey(key, "true");
+    } else {
+        setStringForKey(key, "false");
+    }
+}
+
+void System::setIntegerForKey(const char *key, int value){
+    setStringForKey(key, std::to_string(value).c_str());
+}
+
+void System::setFloatForKey(const char *key, float value){
+    setStringForKey(key, std::to_string(value).c_str());
+}
+
+void System::setDoubleForKey(const char *key, double value){
+    setStringForKey(key, std::to_string(value).c_str());
+}
+
+void System::setStringForKey(const char* key, std::string value){
+    XMLUtils::setValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key, value.c_str());
 }

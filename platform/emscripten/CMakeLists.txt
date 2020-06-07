@@ -27,7 +27,7 @@ add_executable(
 set_target_properties(
     supernova-emscripten
     PROPERTIES LINK_FLAGS
-    "-g4 -s ALLOW_MEMORY_GROWTH=1 --preload-file ../../../project/assets@/ -o supernova.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\""
+    "-g4 -s ALLOW_MEMORY_GROWTH=1 --preload-file ../../../project/assets@/ --preload-file ../../../project/lua@/ -o supernova.html -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\""
 )
 
 target_link_libraries(

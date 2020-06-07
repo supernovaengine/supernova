@@ -1,3 +1,7 @@
+//
+// (c) 2020 Eduardo Doria.
+//
+
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
@@ -18,7 +22,7 @@ namespace Supernova {
 
     public:
 
-        static System* instance();
+        static System& instance();
 
         virtual ~System() {}
 
@@ -32,6 +36,9 @@ namespace Supernova {
         virtual void requestFullscreen();
         virtual void exitFullscreen();
 
+        virtual char getDirSeparator();
+
+        virtual std::string getXMLStorageFile();
         virtual std::string getAssetPath();
         virtual std::string getUserDataPath();
 
@@ -39,6 +46,19 @@ namespace Supernova {
         virtual bool syncFileSystem();
 
         virtual void platformLog(const int type, const char *fmt, va_list args);
+
+        virtual bool getBoolForKey(const char *key, bool defaultValue);
+        virtual int getIntegerForKey(const char *key, int defaultValue);
+        virtual float getFloatForKey(const char *key, float defaultValue);
+        virtual double getDoubleForKey(const char *key, double defaultValue);
+        virtual std::string getStringForKey(const char *key, std::string defaultValue);
+
+        virtual void setBoolForKey(const char *key, bool value);
+        virtual void setIntegerForKey(const char *key, int value);
+        virtual void setFloatForKey(const char *key, float value);
+        virtual void setDoubleForKey(const char *key, double value);
+        virtual void setStringForKey(const char* key, std::string value);
+
     };
 
 }
