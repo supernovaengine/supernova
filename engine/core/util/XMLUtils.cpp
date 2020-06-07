@@ -4,8 +4,8 @@
 
 #include "XMLUtils.h"
 #include "Log.h"
-#include "file/File.h"
-#include "file/FileData.h"
+#include "io/File.h"
+#include "io/FileData.h"
 
 using namespace Supernova;
 
