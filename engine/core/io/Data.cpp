@@ -25,6 +25,26 @@ Data::Data(const char *aFilename){
     open(aFilename);
 }
 
+Data::Data(const Data& d){
+    this->dataLength = d.dataLength;
+    this->offset = d.offset;
+    this->dataOwned = d.dataOwned;
+
+    this->dataPtr = new unsigned char[this->dataLength];
+    memcpy(d.dataPtr, this->dataPtr, this->dataLength);
+}
+
+Data& Data::operator = ( const Data& d ){
+    this->dataLength = d.dataLength;
+    this->offset = d.offset;
+    this->dataOwned = d.dataOwned;
+
+    this->dataPtr = new unsigned char[this->dataLength];
+    memcpy(d.dataPtr, this->dataPtr, this->dataLength);
+
+    return *this;
+}
+
 Data::~Data() {
     if (dataOwned)
         delete[] dataPtr;

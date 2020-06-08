@@ -31,25 +31,11 @@ TextureData::TextureData(int width, int height, unsigned int size, int color_for
 }
 
 TextureData::TextureData(const TextureData& v){
-    this->width = v.width;
-    this->height = v.height;
-    this->size = v.size;
-    this->color_format = v.color_format;
-    this->channels = v.channels;
-    this->data = v.data;
-    
-    this->dataOwned = v.dataOwned;
+    this->copy(v);
 }
 
 TextureData& TextureData::operator = ( const TextureData& v ){
-    this->width = v.width;
-    this->height = v.height;
-    this->size = v.size;
-    this->color_format = v.color_format;
-    this->channels = v.channels;
-    this->data = v.data;
-    
-    this->dataOwned = v.dataOwned;
+    this->copy(v);
 
     return *this;
 }
@@ -97,6 +83,8 @@ void TextureData::copy ( const TextureData& v ){
     this->size = v.size;
     this->color_format = v.color_format;
     this->channels = v.channels;
+
+    this->dataOwned = v.dataOwned;
 
     this->data = (void *)malloc(this->size);
     memcpy((void*)this->data, (void*)v.data, this->size);

@@ -24,6 +24,10 @@ namespace Supernova {
         Data();
         Data(unsigned char *aData, unsigned int aDataLength, bool aCopy=false, bool aTakeOwnership=true);
         Data(const char *aFilename);
+
+        Data(const Data& d);
+        Data& operator = ( const Data& d );
+
         virtual ~Data();
 
         virtual int eof();

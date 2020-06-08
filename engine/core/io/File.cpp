@@ -22,6 +22,16 @@ File::File(const char *aFilename, bool write){
     open(aFilename, write);
 }
 
+File::File(const File& f){
+    this->fileHandle = f.fileHandle;
+}
+
+File& File::operator = ( const File& f ){
+    this->fileHandle = f.fileHandle;
+
+    return *this;
+}
+
 File::~File() {
     if (fileHandle)
         fclose(fileHandle);

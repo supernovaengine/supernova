@@ -20,6 +20,10 @@ namespace Supernova {
         File();
         File(FILE *fp);
         File(const char *aFilename, bool write = false);
+
+        File(const File& f);
+        File& operator = ( const File& f );
+
         virtual ~File();
 
         virtual int eof();
