@@ -14,6 +14,21 @@ public:
 	static jmethodID getUserDataPathRef;
 	static jmethodID showSoftKeyboardRef;
 	static jmethodID hideSoftKeyboardRef;
+
+	static jmethodID getBoolForKeyRef;
+	static jmethodID getIntegerForKeyRef;
+	static jmethodID getFloatForKeyRef;
+	static jmethodID getDoubleForKeyRef;
+	static jmethodID getStringForKeyRef;
+
+	static jmethodID setBoolForKeyRef;
+	static jmethodID setIntegerForKeyRef;
+	static jmethodID setFloatForKeyRef;
+	static jmethodID setDoubleForKeyRef;
+	static jmethodID setStringForKeyRef;
+
+	static jmethodID removeKeyRef;
+
 	static jobject mainActivityObjRef;
 	static JNIEnv *envRef;
 

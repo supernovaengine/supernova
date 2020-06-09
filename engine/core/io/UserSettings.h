@@ -33,6 +33,8 @@ namespace Supernova {
         static void setStringForKey(const char* key, std::string value);
         static void setDataForKey(const char *key, Data& value);
 
+        static void removeKey(const char *key);
+
     };
 }
 

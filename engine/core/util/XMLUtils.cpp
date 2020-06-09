@@ -116,3 +116,31 @@ void XMLUtils::setValueForKey(const char* XMLFilePath, const char* rootName, con
         }
     }
 }
+
+void XMLUtils::removeKey(const char* XMLFilePath, const char* rootName, const char *key){
+    if (!key) {
+        Log::Error("Can't delete value in XML (%s): Key is invalid", XMLFilePath);
+
+    } else {
+
+        tinyxml2::XMLDocument doc;
+
+        //They are deleted when doc is deleted
+        tinyxml2::XMLElement *rootNode;
+        tinyxml2::XMLElement *node;
+
+        node = getNodeForKey(XMLFilePath, rootName, key, &rootNode, &doc);
+
+        if (node){
+            doc.DeleteNode(node);
+
+            File file;
+            if (file.open(XMLFilePath, true) == FileErrors::NO_ERROR) {
+                doc.SaveFile(file.getFilePtr());
+            } else {
+                Log::Error("Can't save XML file: %s", XMLFilePath);
+            }
+        }
+
+    }
+}

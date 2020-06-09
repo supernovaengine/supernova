@@ -5,6 +5,7 @@
 #include "UserSettings.h"
 #include "system/System.h"
 #include "util/Base64.h"
+#include "Log.h"
 
 using namespace Supernova;
 
@@ -29,7 +30,7 @@ std::string UserSettings::getStringForKey(const char *key){
 }
 
 Data UserSettings::getDataForKey(const char *key){
-    return getDataForKey(key, NULL);
+    return getDataForKey(key, Data());
 }
 
 bool UserSettings::getBoolForKey(const char *key, bool defaultValue){
@@ -82,5 +83,13 @@ void UserSettings::setStringForKey(const char* key, std::string value){
 }
 
 void UserSettings::setDataForKey(const char *key, Data& value){
-    System::instance().setStringForKey(key, Base64::encode(value.getMemPtr(), value.length()));
+    if (value.getMemPtr()) {
+        System::instance().setStringForKey(key, Base64::encode(value.getMemPtr(), value.length()));
+    }else{
+        Log::Error("No data to add for key: %s", key);
+    }
+}
+
+void UserSettings::removeKey(const char *key){
+    System::instance().removeKey(key);
 }

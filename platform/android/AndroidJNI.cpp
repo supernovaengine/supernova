@@ -7,11 +7,27 @@
 #define UNUSED(x) (void)(x)
 
 jclass AndroidJNI::mainActivityClsRef;
+
 jmethodID AndroidJNI::getScreenWidthRef;
 jmethodID AndroidJNI::getScreenHeightRef;
 jmethodID AndroidJNI::getUserDataPathRef;
 jmethodID AndroidJNI::showSoftKeyboardRef;
 jmethodID AndroidJNI::hideSoftKeyboardRef;
+
+jmethodID AndroidJNI::getBoolForKeyRef;
+jmethodID AndroidJNI::getIntegerForKeyRef;
+jmethodID AndroidJNI::getFloatForKeyRef;
+jmethodID AndroidJNI::getDoubleForKeyRef;
+jmethodID AndroidJNI::getStringForKeyRef;
+
+jmethodID AndroidJNI::setBoolForKeyRef;
+jmethodID AndroidJNI::setIntegerForKeyRef;
+jmethodID AndroidJNI::setFloatForKeyRef;
+jmethodID AndroidJNI::setDoubleForKeyRef;
+jmethodID AndroidJNI::setStringForKeyRef;
+
+jmethodID AndroidJNI::removeKeyRef;
+
 jobject AndroidJNI::mainActivityObjRef;
 JNIEnv * AndroidJNI::envRef;
 
@@ -23,12 +39,27 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_init_1native(JNIEnv 
 
     AndroidJNI::envRef = env;
     AndroidJNI::mainActivityClsRef = env->FindClass("com/deslon/supernova/MainActivity");
-    //AndroidJNI::showInputTextRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "showInputText", "(Ljava/lang/String;)V");
+
     AndroidJNI::getScreenWidthRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getScreenWidth", "()I");
     AndroidJNI::getScreenHeightRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getScreenHeight", "()I");
 	AndroidJNI::getUserDataPathRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getUserDataPath", "()Ljava/lang/String;");
 	AndroidJNI::showSoftKeyboardRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "showSoftKeyboard", "()V");
 	AndroidJNI::hideSoftKeyboardRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "hideSoftKeyboard", "()V");
+
+	AndroidJNI::getBoolForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getBoolForKey", "(Ljava/lang/String;Z)Z");
+	AndroidJNI::getIntegerForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getIntegerForKey", "(Ljava/lang/String;I)I");
+	AndroidJNI::getFloatForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getFloatForKey", "(Ljava/lang/String;F)F");
+	AndroidJNI::getDoubleForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getDoubleForKey", "(Ljava/lang/String;D)D");
+	AndroidJNI::getStringForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getStringForKey", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+
+	AndroidJNI::setBoolForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setBoolForKey", "(Ljava/lang/String;Z)V");
+	AndroidJNI::setIntegerForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setIntegerForKey", "(Ljava/lang/String;I)V");
+	AndroidJNI::setFloatForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setFloatForKey", "(Ljava/lang/String;F)V");
+	AndroidJNI::setDoubleForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setDoubleForKey", "(Ljava/lang/String;D)V");
+	AndroidJNI::setStringForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setStringForKey", "(Ljava/lang/String;Ljava/lang/String;)V");
+
+	AndroidJNI::removeKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "removeKey", "(Ljava/lang/String;)V");
+
     AndroidJNI::mainActivityObjRef = env->NewGlobalRef(main_activity);
 
 	AndroidJNI::android_asset_manager = AAssetManager_fromJava(env, java_asset_manager);

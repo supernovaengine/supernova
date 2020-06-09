@@ -59,6 +59,8 @@ namespace Supernova {
         virtual void setDoubleForKey(const char *key, double value);
         virtual void setStringForKey(const char* key, std::string value);
 
+        virtual void removeKey(const char *key);
+
     };
 
 }

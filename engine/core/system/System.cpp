@@ -166,3 +166,7 @@ void System::setDoubleForKey(const char *key, double value){
 void System::setStringForKey(const char* key, std::string value){
     XMLUtils::setValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key, value.c_str());
 }
+
+void System::removeKey(const char *key){
+    XMLUtils::removeKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key);
+}
