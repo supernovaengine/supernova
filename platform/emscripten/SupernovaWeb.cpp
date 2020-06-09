@@ -533,3 +533,72 @@ int SupernovaWeb::supernova_legacy_input(int code){
 
     return 0;
 }
+
+bool SupernovaWeb::getBoolForKey(const char *key, bool defaultValue){
+    return getIntegerForKey(key, defaultValue ? 1 : 0) == 1;
+}
+
+int SupernovaWeb::getIntegerForKey(const char *key, int defaultValue){
+    return std::stoi(getStringForKey(key, std::to_string(defaultValue).c_str()));
+}
+
+float SupernovaWeb::getFloatForKey(const char *key, float defaultValue){
+    return std::stod(getStringForKey(key, std::to_string(defaultValue).c_str()));
+}
+
+double SupernovaWeb::getDoubleForKey(const char *key, double defaultValue){
+    return std::stod(getStringForKey(key, std::to_string(defaultValue).c_str()));
+}
+
+std::string SupernovaWeb::getStringForKey(const char *key, std::string defaultValue){
+    char* value = (char*)EM_ASM_INT({
+        var key = UTF8ToString($0);
+        var val = localStorage.getItem(key);
+        if (val) {
+            var len = lengthBytesUTF8(val)+1;
+            var buf = _malloc(len);
+            stringToUTF8(val, buf, len);
+            return buf;
+        }
+        return null;
+    }, key);
+
+    if (value){
+        std::string strValue = value;
+        free(value); //Each call to _malloc() must be paired with free() or heap memory will leak
+        return strValue;
+    }
+
+    return defaultValue;
+}
+
+void SupernovaWeb::setBoolForKey(const char *key, bool value){
+    setIntegerForKey(key, value ? 1 : 0);
+}
+
+void SupernovaWeb::setIntegerForKey(const char *key, int value){
+    setStringForKey(key, std::to_string(value).c_str());
+}
+
+void SupernovaWeb::setFloatForKey(const char *key, float value){
+    setStringForKey(key, std::to_string(value).c_str());
+}
+
+void SupernovaWeb::setDoubleForKey(const char *key, double value){
+    setStringForKey(key, std::to_string(value).c_str());
+}
+
+void SupernovaWeb::setStringForKey(const char* key, std::string value){
+    EM_ASM_ARGS({
+        var key = UTF8ToString($0);
+        var value = UTF8ToString($1);
+        localStorage.setItem(key, value);
+    }, key, value.c_str());
+}
+
+void SupernovaWeb::removeKey(const char *key){
+    EM_ASM_ARGS({
+        var key = UTF8ToString($0);
+        localStorage.removeItem(key);
+    }, key);
+}
