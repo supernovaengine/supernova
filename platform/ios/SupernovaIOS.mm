@@ -33,7 +33,12 @@ void SupernovaIOS::hideVirtualKeyboard(){
 std::string SupernovaIOS::getAssetPath(){
     NSMutableString* adjusted_relative_path = [[NSMutableString alloc] initWithString:@"assets"];
     
-    return [[[NSBundle mainBundle] pathForResource:adjusted_relative_path ofType:nil] cStringUsingEncoding:NSASCIIStringEncoding];
+    NSString* path = [[NSBundle mainBundle] pathForResource:adjusted_relative_path ofType:nil];
+    
+    if (!path)
+        return "";
+    
+    return [path cStringUsingEncoding:NSASCIIStringEncoding];
 }
 
 std::string SupernovaIOS::getUserDataPath(){
@@ -41,4 +46,15 @@ std::string SupernovaIOS::getUserDataPath(){
     NSString *documentsDirectory = [paths objectAtIndex:0];
     
     return [documentsDirectory UTF8String];
+}
+
+std::string SupernovaIOS::getLuaPath(){
+    NSMutableString* adjusted_relative_path = [[NSMutableString alloc] initWithString:@"lua"];
+    
+    NSString* path = [[NSBundle mainBundle] pathForResource:adjusted_relative_path ofType:nil];
+    
+    if (!path)
+        return "";
+    
+    return [path cStringUsingEncoding:NSASCIIStringEncoding];
 }

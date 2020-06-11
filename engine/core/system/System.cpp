@@ -72,6 +72,10 @@ std::string System::getUserDataPath(){
     return "";
 }
 
+std::string System::getLuaPath(){
+    return "";
+}
+
 FILE* System::platformFopen(const char* fname, const char* mode){
     return fopen(fname, mode);
 }

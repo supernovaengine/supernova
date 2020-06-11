@@ -180,6 +180,7 @@
 		719127562491863700D27DD6 /* XMLUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719127542491863700D27DD6 /* XMLUtils.cpp */; };
 		7191276A249186ED00D27DD6 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71912765249186ED00D27DD6 /* tinyxml2.cpp */; };
 		7191276D2491875B00D27DD6 /* libtinyxml2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7191275B249186C000D27DD6 /* libtinyxml2.a */; };
+		7191276F2492853900D27DD6 /* lua in Resources */ = {isa = PBXBuildFile; fileRef = 7191276E249282BF00D27DD6 /* lua */; };
 		719301251E51212800BEE527 /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301231E51212800BEE527 /* Material.cpp */; };
 		719330B51EDB161B0043E282 /* Rect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714C89051ED7711A0028DCE0 /* Rect.cpp */; };
 		719ACC3F219DB914008C21F4 /* Bone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719ACC3B219DB913008C21F4 /* Bone.cpp */; };
@@ -894,6 +895,7 @@
 		7191275B249186C000D27DD6 /* libtinyxml2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtinyxml2.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		71912765249186ED00D27DD6 /* tinyxml2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml2.cpp; sourceTree = "<group>"; };
 		71912768249186ED00D27DD6 /* tinyxml2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml2.h; sourceTree = "<group>"; };
+		7191276E249282BF00D27DD6 /* lua */ = {isa = PBXFileReference; lastKnownFileType = folder; name = lua; path = ../../project/lua; sourceTree = "<group>"; };
 		7193011B1E42943800BEE527 /* SkyBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkyBox.cpp; sourceTree = "<group>"; };
 		7193011C1E42943800BEE527 /* SkyBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyBox.h; sourceTree = "<group>"; };
 		719301231E51212800BEE527 /* Material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Material.cpp; sourceTree = "<group>"; };
@@ -1635,6 +1637,7 @@
 		716AB5991BEF9F3C001B672D = {
 			isa = PBXGroup;
 			children = (
+				7191276E249282BF00D27DD6 /* lua */,
 				710F07322460681C00EE69E8 /* ios */,
 				713D30C41CFB306D00A4752F /* assets */,
 				71CDC6FE1D7B13350060EEFF /* OpenGLES.framework */,
@@ -2485,6 +2488,7 @@
 				716AB5B41BEF9F3D001B672D /* Main.storyboard in Resources */,
 				713D30C51CFB306D00A4752F /* assets in Resources */,
 				716AB5B61BEF9F3D001B672D /* Assets.xcassets in Resources */,
+				7191276F2492853900D27DD6 /* lua in Resources */,
 				716AB5B91BEF9F3D001B672D /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

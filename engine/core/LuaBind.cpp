@@ -218,7 +218,7 @@ int LuaBind::moduleLoader(lua_State *L) {
     std::string filepath;
     Data filedata;
     
-    filepath = std::string("lua") + System::instance().getDirSeparator() + filename + ".lua";
+    filepath = "lua://" + std::string("lua") + System::instance().getDirSeparator() + filename + ".lua";
     filedata.open(filepath.c_str());
     if (filedata.getMemPtr() != NULL) {
         
@@ -228,7 +228,7 @@ int LuaBind::moduleLoader(lua_State *L) {
         return 1;
     }
     
-    filepath = std::string("") + filename + ".lua";
+    filepath = "lua://" + std::string("") + filename + ".lua";
     filedata.open(filepath.c_str());
     if (filedata.getMemPtr() != NULL) {
         
@@ -920,11 +920,11 @@ void LuaBind::bind(){
 
     std::string luadir = std::string("lua") + System::instance().getDirSeparator();
 
-    setLuaPath(std::string(luadir + "?.lua").c_str());
+    setLuaPath(std::string("lua://" + luadir + "?.lua").c_str());
     setLuaSearcher(moduleLoader, true);
 
-    std::string luafile = "main.lua";
-    std::string luafile_subdir = luadir + "main.lua";
+    std::string luafile = std::string("lua://") + "main.lua";
+    std::string luafile_subdir = std::string("lua://") + luadir + "main.lua";
 
     Data filedata;
 
