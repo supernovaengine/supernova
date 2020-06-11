@@ -58,8 +58,10 @@ Data UserSettings::getDataForKey(const char *key, const Data& defaultValue){
 
     if (ret.empty())
         return defaultValue;
+    
+    std::vector<unsigned char> decodedData = Base64::decode(ret);
 
-    return Data(&Base64::decode(ret).front(), (unsigned int)ret.length(), false, true);
+    return Data(&decodedData[0], (unsigned int)decodedData.size(), true, true);
 }
 
 void UserSettings::setBoolForKey(const char *key, bool value){

@@ -37,8 +37,7 @@ namespace Supernova {
         virtual void exitFullscreen();
 
         virtual char getDirSeparator();
-
-        virtual std::string getXMLStorageFile();
+        
         virtual std::string getAssetPath();
         virtual std::string getUserDataPath();
 

@@ -26,7 +26,7 @@ namespace Supernova {
         Data(const char *aFilename);
 
         Data(const Data& d);
-        Data& operator = ( const Data& d );
+        Data& operator = (const Data& d);
 
         virtual ~Data();
 

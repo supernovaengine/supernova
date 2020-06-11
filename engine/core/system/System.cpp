@@ -10,6 +10,7 @@
 using namespace Supernova;
 
 #define USERSETTINGS_ROOT "userSettings"
+#define USERSETTINGS_XML_FILE "data://UserSettings.xml"
 
 #ifdef SUPERNOVA_ANDROID
 #include "SupernovaAndroid.h"
@@ -63,10 +64,6 @@ char System::getDirSeparator(){
 #endif
 }
 
-std::string System::getXMLStorageFile(){
-    return getUserDataPath() + getDirSeparator() + "UserSettings.xml";
-}
-
 std::string System::getAssetPath(){
     return "";
 }
@@ -104,7 +101,7 @@ void System::platformLog(const int type, const char *fmt, va_list args){
 }
 
 bool System::getBoolForKey(const char *key, bool defaultValue){
-    const char* value = XMLUtils::getValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key);
+    const char* value = XMLUtils::getValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
 
     if (!value)
         return defaultValue;
@@ -113,7 +110,7 @@ bool System::getBoolForKey(const char *key, bool defaultValue){
 }
 
 int System::getIntegerForKey(const char *key, int defaultValue){
-    const char* value = XMLUtils::getValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key);
+    const char* value = XMLUtils::getValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
 
     if (!value)
         return defaultValue;
@@ -126,7 +123,7 @@ float System::getFloatForKey(const char *key, float defaultValue){
 }
 
 double System::getDoubleForKey(const char *key, double defaultValue){
-    const char* value = XMLUtils::getValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key);
+    const char* value = XMLUtils::getValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
 
     if (!value)
         return defaultValue;
@@ -135,7 +132,7 @@ double System::getDoubleForKey(const char *key, double defaultValue){
 }
 
 std::string System::getStringForKey(const char *key, std::string defaultValue){
-    const char* value = XMLUtils::getValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key);
+    const char* value = XMLUtils::getValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
 
     if (!value)
         return defaultValue;
@@ -164,9 +161,9 @@ void System::setDoubleForKey(const char *key, double value){
 }
 
 void System::setStringForKey(const char* key, std::string value){
-    XMLUtils::setValueForKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key, value.c_str());
+    XMLUtils::setValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key, value.c_str());
 }
 
 void System::removeKey(const char *key){
-    XMLUtils::removeKey(getXMLStorageFile().c_str(), USERSETTINGS_ROOT, key);
+    XMLUtils::removeKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
 }

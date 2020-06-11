@@ -163,5 +163,5 @@ std::string FileData::readString(int aOffset){
 }
 
 unsigned int FileData::writeString(std::string s){
-    return write((unsigned char*)&s[0], s.length());
+    return write((unsigned char*)&s[0], (unsigned int)s.length());
 }

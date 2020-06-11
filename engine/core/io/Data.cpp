@@ -10,18 +10,15 @@
 
 using namespace Supernova;
 
-Data::Data() {
-    dataPtr = NULL;
-    dataLength = 0;
-    offset = 0;
-    dataOwned = false;
+Data::Data(): dataPtr(NULL), dataLength(0), offset(0), dataOwned(false) {
+
 }
 
 Data::Data(unsigned char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership): Data(){
     open(aData, aDataLength, aCopy, aTakeOwnership);
 }
 
-Data::Data(const char *aFilename){
+Data::Data(const char *aFilename): Data(){
     open(aFilename);
 }
 
@@ -31,16 +28,16 @@ Data::Data(const Data& d){
     this->dataOwned = d.dataOwned;
 
     this->dataPtr = new unsigned char[this->dataLength];
-    memcpy(d.dataPtr, this->dataPtr, this->dataLength);
+    memcpy(this->dataPtr, d.dataPtr, this->dataLength);
 }
 
-Data& Data::operator = ( const Data& d ){
+Data& Data::operator = (const Data& d){
     this->dataLength = d.dataLength;
     this->offset = d.offset;
     this->dataOwned = d.dataOwned;
 
     this->dataPtr = new unsigned char[this->dataLength];
-    memcpy(d.dataPtr, this->dataPtr, this->dataLength);
+    memcpy(this->dataPtr, d.dataPtr, this->dataLength);
 
     return *this;
 }
@@ -61,9 +58,11 @@ unsigned int Data::read(unsigned char *aDst, unsigned int aBytes) {
 }
 
 unsigned int Data::write(unsigned char *aSrc, unsigned int aBytes) {
-    if (offset + aBytes >= dataLength)
-        aBytes = dataLength - offset;
+    if (dataLength > 0 || offset > 0)
+        return 0;
 
+    dataLength = aBytes;
+    dataPtr = (unsigned char*)malloc(aBytes);
     memcpy(dataPtr + offset, aSrc, aBytes);
     offset += aBytes;
 
