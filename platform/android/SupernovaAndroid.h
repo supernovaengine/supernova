@@ -28,12 +28,14 @@ public:
 
 	virtual bool getBoolForKey(const char *key, bool defaultValue);
 	virtual int getIntegerForKey(const char *key, int defaultValue);
+	virtual long getLongForKey(const char *key, long defaultValue);
 	virtual float getFloatForKey(const char *key, float defaultValue);
 	virtual double getDoubleForKey(const char *key, double defaultValue);
 	virtual std::string getStringForKey(const char *key, std::string defaultValue);
 
 	virtual void setBoolForKey(const char *key, bool value);
 	virtual void setIntegerForKey(const char *key, int value);
+	virtual void setLongForKey(const char *key, long value);
 	virtual void setFloatForKey(const char *key, float value);
 	virtual void setDoubleForKey(const char *key, double value);
 	virtual void setStringForKey(const char* key, std::string value);

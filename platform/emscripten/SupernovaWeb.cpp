@@ -534,22 +534,6 @@ int SupernovaWeb::supernova_legacy_input(int code){
     return 0;
 }
 
-bool SupernovaWeb::getBoolForKey(const char *key, bool defaultValue){
-    return getIntegerForKey(key, defaultValue ? 1 : 0) == 1;
-}
-
-int SupernovaWeb::getIntegerForKey(const char *key, int defaultValue){
-    return std::stoi(getStringForKey(key, std::to_string(defaultValue).c_str()));
-}
-
-float SupernovaWeb::getFloatForKey(const char *key, float defaultValue){
-    return std::stod(getStringForKey(key, std::to_string(defaultValue).c_str()));
-}
-
-double SupernovaWeb::getDoubleForKey(const char *key, double defaultValue){
-    return std::stod(getStringForKey(key, std::to_string(defaultValue).c_str()));
-}
-
 std::string SupernovaWeb::getStringForKey(const char *key, std::string defaultValue){
     char* value = (char*)EM_ASM_INT({
         var key = UTF8ToString($0);
@@ -570,22 +554,6 @@ std::string SupernovaWeb::getStringForKey(const char *key, std::string defaultVa
     }
 
     return defaultValue;
-}
-
-void SupernovaWeb::setBoolForKey(const char *key, bool value){
-    setIntegerForKey(key, value ? 1 : 0);
-}
-
-void SupernovaWeb::setIntegerForKey(const char *key, int value){
-    setStringForKey(key, std::to_string(value).c_str());
-}
-
-void SupernovaWeb::setFloatForKey(const char *key, float value){
-    setStringForKey(key, std::to_string(value).c_str());
-}
-
-void SupernovaWeb::setDoubleForKey(const char *key, double value){
-    setStringForKey(key, std::to_string(value).c_str());
 }
 
 void SupernovaWeb::setStringForKey(const char* key, std::string value){

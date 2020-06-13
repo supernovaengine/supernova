@@ -92,6 +92,11 @@ int SupernovaAndroid::getIntegerForKey(const char *key, int defaultValue){
     return AndroidJNI::envRef->CallIntMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getIntegerForKeyRef, jstrKey, defaultValue);
 }
 
+long SupernovaAndroid::getLongForKey(const char *key, long defaultValue){
+    jstring jstrKey = AndroidJNI::envRef->NewStringUTF(key);
+    return AndroidJNI::envRef->CallLongMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getLongForKeyRef, jstrKey, defaultValue);
+}
+
 float SupernovaAndroid::getFloatForKey(const char *key, float defaultValue){
     jstring jstrKey = AndroidJNI::envRef->NewStringUTF(key);
     return AndroidJNI::envRef->CallFloatMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getFloatForKeyRef, jstrKey, defaultValue);
@@ -117,6 +122,11 @@ void SupernovaAndroid::setBoolForKey(const char *key, bool value){
 void SupernovaAndroid::setIntegerForKey(const char *key, int value){
     jstring jstrKey = AndroidJNI::envRef->NewStringUTF(key);
     AndroidJNI::envRef->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setIntegerForKeyRef, jstrKey, value);
+}
+
+void SupernovaAndroid::setLongForKey(const char *key, long value){
+    jstring jstrKey = AndroidJNI::envRef->NewStringUTF(key);
+    AndroidJNI::envRef->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setLongForKeyRef, jstrKey, value);
 }
 
 void SupernovaAndroid::setFloatForKey(const char *key, float value){

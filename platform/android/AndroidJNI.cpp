@@ -16,12 +16,14 @@ jmethodID AndroidJNI::hideSoftKeyboardRef;
 
 jmethodID AndroidJNI::getBoolForKeyRef;
 jmethodID AndroidJNI::getIntegerForKeyRef;
+jmethodID AndroidJNI::getLongForKeyRef;
 jmethodID AndroidJNI::getFloatForKeyRef;
 jmethodID AndroidJNI::getDoubleForKeyRef;
 jmethodID AndroidJNI::getStringForKeyRef;
 
 jmethodID AndroidJNI::setBoolForKeyRef;
 jmethodID AndroidJNI::setIntegerForKeyRef;
+jmethodID AndroidJNI::setLongForKeyRef;
 jmethodID AndroidJNI::setFloatForKeyRef;
 jmethodID AndroidJNI::setDoubleForKeyRef;
 jmethodID AndroidJNI::setStringForKeyRef;
@@ -48,12 +50,14 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_init_1native(JNIEnv 
 
 	AndroidJNI::getBoolForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getBoolForKey", "(Ljava/lang/String;Z)Z");
 	AndroidJNI::getIntegerForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getIntegerForKey", "(Ljava/lang/String;I)I");
+	AndroidJNI::getLongForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getLongForKey", "(Ljava/lang/String;J)J");
 	AndroidJNI::getFloatForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getFloatForKey", "(Ljava/lang/String;F)F");
 	AndroidJNI::getDoubleForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getDoubleForKey", "(Ljava/lang/String;D)D");
 	AndroidJNI::getStringForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getStringForKey", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 
 	AndroidJNI::setBoolForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setBoolForKey", "(Ljava/lang/String;Z)V");
 	AndroidJNI::setIntegerForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setIntegerForKey", "(Ljava/lang/String;I)V");
+	AndroidJNI::setLongForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setLongForKey", "(Ljava/lang/String;J)V");
 	AndroidJNI::setFloatForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setFloatForKey", "(Ljava/lang/String;F)V");
 	AndroidJNI::setDoubleForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setDoubleForKey", "(Ljava/lang/String;D)V");
 	AndroidJNI::setStringForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setStringForKey", "(Ljava/lang/String;Ljava/lang/String;)V");

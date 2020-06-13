@@ -5,6 +5,8 @@
 #include "System.h"
 #include "tinyxml2.h"
 #include "util/XMLUtils.h"
+#include "util/Base64.h"
+#include "Log.h"
 #include <stdlib.h>
 
 using namespace Supernova;
@@ -105,34 +107,34 @@ void System::platformLog(const int type, const char *fmt, va_list args){
 }
 
 bool System::getBoolForKey(const char *key, bool defaultValue){
-    const char* value = XMLUtils::getValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
-
-    if (!value)
-        return defaultValue;
-
-    return (! strcmp(value, "true"));
+    return getStringForKey(key, defaultValue ? "true" : "false") == "true";
 }
 
 int System::getIntegerForKey(const char *key, int defaultValue){
-    const char* value = XMLUtils::getValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
+    return std::stoi(getStringForKey(key, std::to_string(defaultValue).c_str()));
+}
 
-    if (!value)
-        return defaultValue;
-
-    return atoi(value);
+long System::getLongForKey(const char *key, long defaultValue){
+    return std::stol(getStringForKey(key, std::to_string(defaultValue).c_str()));
 }
 
 float System::getFloatForKey(const char *key, float defaultValue){
-    return (float)getDoubleForKey(key, defaultValue);
+    return std::stof(getStringForKey(key, std::to_string(defaultValue).c_str()));
 }
 
 double System::getDoubleForKey(const char *key, double defaultValue){
-    const char* value = XMLUtils::getValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
+    return std::stod(getStringForKey(key, std::to_string(defaultValue).c_str()));
+}
 
-    if (!value)
+Data System::getDataForKey(const char *key, const Data& defaultValue){
+    std::string ret = System::instance().getStringForKey(key, "");
+
+    if (ret.empty())
         return defaultValue;
+    
+    std::vector<unsigned char> decodedData = Base64::decode(ret);
 
-    return atof(value);
+    return Data(&decodedData[0], (unsigned int)decodedData.size(), true, true);
 }
 
 std::string System::getStringForKey(const char *key, std::string defaultValue){
@@ -145,14 +147,14 @@ std::string System::getStringForKey(const char *key, std::string defaultValue){
 }
 
 void System::setBoolForKey(const char *key, bool value){
-    if (value) {
-        setStringForKey(key, "true");
-    } else {
-        setStringForKey(key, "false");
-    }
+    setStringForKey(key, value ? "true" : "false");
 }
 
 void System::setIntegerForKey(const char *key, int value){
+    setStringForKey(key, std::to_string(value).c_str());
+}
+
+void System::setLongForKey(const char *key, long value){
     setStringForKey(key, std::to_string(value).c_str());
 }
 
@@ -162,6 +164,14 @@ void System::setFloatForKey(const char *key, float value){
 
 void System::setDoubleForKey(const char *key, double value){
     setStringForKey(key, std::to_string(value).c_str());
+}
+
+void System::setDataForKey(const char *key, Data& value){
+    if (value.getMemPtr()) {
+        System::instance().setStringForKey(key, Base64::encode(value.getMemPtr(), value.length()));
+    }else{
+        Log::Error("No data to add for key: %s", key);
+    }
 }
 
 void System::setStringForKey(const char* key, std::string value){

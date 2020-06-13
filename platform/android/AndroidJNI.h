@@ -17,12 +17,14 @@ public:
 
 	static jmethodID getBoolForKeyRef;
 	static jmethodID getIntegerForKeyRef;
+	static jmethodID getLongForKeyRef;
 	static jmethodID getFloatForKeyRef;
 	static jmethodID getDoubleForKeyRef;
 	static jmethodID getStringForKeyRef;
 
 	static jmethodID setBoolForKeyRef;
 	static jmethodID setIntegerForKeyRef;
+	static jmethodID setLongForKeyRef;
 	static jmethodID setFloatForKeyRef;
 	static jmethodID setDoubleForKeyRef;
 	static jmethodID setStringForKeyRef;

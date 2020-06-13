@@ -4,8 +4,6 @@
 
 #include "UserSettings.h"
 #include "system/System.h"
-#include "util/Base64.h"
-#include "Log.h"
 
 using namespace Supernova;
 
@@ -15,6 +13,10 @@ bool UserSettings::getBoolForKey(const char *key){
 
 int UserSettings::getIntegerForKey(const char *key){
     return getIntegerForKey(key, 0);
+}
+
+long UserSettings::getLongForKey(const char *key){
+    return getLongForKey(key, 0);
 }
 
 float UserSettings::getFloatForKey(const char *key){
@@ -41,6 +43,10 @@ int UserSettings::getIntegerForKey(const char *key, int defaultValue){
     return System::instance().getIntegerForKey(key, defaultValue);
 }
 
+long UserSettings::getLongForKey(const char *key, long defaultValue){
+    return System::instance().getLongForKey(key, defaultValue);
+}
+
 float UserSettings::getFloatForKey(const char *key, float defaultValue){
     return System::instance().getFloatForKey(key, defaultValue);
 }
@@ -54,14 +60,7 @@ std::string UserSettings::getStringForKey(const char *key, std::string defaultVa
 }
 
 Data UserSettings::getDataForKey(const char *key, const Data& defaultValue){
-    std::string ret = System::instance().getStringForKey(key, "");
-
-    if (ret.empty())
-        return defaultValue;
-    
-    std::vector<unsigned char> decodedData = Base64::decode(ret);
-
-    return Data(&decodedData[0], (unsigned int)decodedData.size(), true, true);
+    return System::instance().getDataForKey(key, defaultValue);
 }
 
 void UserSettings::setBoolForKey(const char *key, bool value){
@@ -70,6 +69,10 @@ void UserSettings::setBoolForKey(const char *key, bool value){
 
 void UserSettings::setIntegerForKey(const char *key, int value){
     System::instance().setIntegerForKey(key, value);
+}
+
+void UserSettings::setLongForKey(const char *key, long value){
+    System::instance().setLongForKey(key, value);
 }
 
 void UserSettings::setFloatForKey(const char *key, float value){
@@ -85,11 +88,7 @@ void UserSettings::setStringForKey(const char* key, std::string value){
 }
 
 void UserSettings::setDataForKey(const char *key, Data& value){
-    if (value.getMemPtr()) {
-        System::instance().setStringForKey(key, Base64::encode(value.getMemPtr(), value.length()));
-    }else{
-        Log::Error("No data to add for key: %s", key);
-    }
+    System::instance().setDataForKey(key, value);
 }
 
 void UserSettings::removeKey(const char *key){

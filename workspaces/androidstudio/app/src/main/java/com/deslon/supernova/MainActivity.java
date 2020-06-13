@@ -261,6 +261,18 @@ public class MainActivity extends Activity {
 		return defaultValue;
 	}
 
+	public long getLongForKey(String key, long defaultValue) {
+		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
+
+		try {
+			return sharedPref.getLong(key, defaultValue);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return defaultValue;
+	}
+
 	public float getFloatForKey(String key, float defaultValue) {
 		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
 
@@ -309,6 +321,13 @@ public class MainActivity extends Activity {
 		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPref.edit();
 		editor.putInt(key, value);
+		editor.apply();
+	}
+
+	public void setLongForKey(String key, long value) {
+		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.putLong(key, value);
 		editor.apply();
 	}
 
