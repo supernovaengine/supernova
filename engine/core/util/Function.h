@@ -7,7 +7,7 @@
 
 #include <functional>
 #include <string>
-#include "LuaFunction.h"
+#include "script/LuaFunction.h"
 
 namespace Supernova {
 

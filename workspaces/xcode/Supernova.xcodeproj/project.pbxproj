@@ -101,6 +101,9 @@
 		716302662440C4FB008C7116 /* libsupernova-renders.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 716302412440C327008C7116 /* libsupernova-renders.a */; };
 		7163026F2440C98E008C7116 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7163026E2440C98E008C7116 /* main.cpp */; };
 		716302702440C9B7008C7116 /* TerrainNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716302692440C80A008C7116 /* TerrainNode.cpp */; };
+		716789E62497D674006EAAEB /* LuaBinding.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716789E02497D674006EAAEB /* LuaBinding.cpp */; };
+		716789E72497D674006EAAEB /* LuaFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716789E12497D674006EAAEB /* LuaFunction.cpp */; };
+		716789E82497D674006EAAEB /* LuaScript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716789E22497D674006EAAEB /* LuaScript.cpp */; };
 		716AB5A71BEF9F3C001B672D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 716AB5A61BEF9F3C001B672D /* main.m */; };
 		716AB5B41BEF9F3D001B672D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B21BEF9F3D001B672D /* Main.storyboard */; };
 		716AB5B61BEF9F3D001B672D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 716AB5B51BEF9F3D001B672D /* Assets.xcassets */; };
@@ -192,7 +195,6 @@
 		71A6FABC1DEA3F15003850A2 /* AudioPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FABA1DEA3F15003850A2 /* AudioPlayer.cpp */; };
 		71A6FAC31DEB1924003850A2 /* SoundManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A6FAC11DEB1924003850A2 /* SoundManager.cpp */; };
 		71AC8B611E6B42C000DB33C3 /* Points.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 719301261E53D4B000BEE527 /* Points.cpp */; };
-		71B130C320CD8F4D007A42A9 /* LuaFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71B130C120CD8F4D007A42A9 /* LuaFunction.cpp */; };
 		71B818C420B095BD0069E8FA /* libsupernova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71CDC7041D7B142D0060EEFF /* libsupernova.a */; };
 		71B818C520B095CC0069E8FA /* libsupernova-project.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71B818B720B094930069E8FA /* libsupernova-project.a */; };
 		71BCF6C31E476F49008E42A2 /* SkyBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7193011B1E42943800BEE527 /* SkyBox.cpp */; };
@@ -232,7 +234,6 @@
 		71CDC70F1D7B14510060EEFF /* DirectionalLight.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713384DF1D3051FF00DB73A5 /* DirectionalLight.cpp */; };
 		71CDC7101D7B14510060EEFF /* Engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A101CFB2EAD00A4752F /* Engine.cpp */; };
 		71CDC7121D7B14510060EEFF /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E1D2291D27358B001209C8 /* Light.cpp */; };
-		71CDC7131D7B14510060EEFF /* LuaBind.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A231CFB2EAD00A4752F /* LuaBind.cpp */; };
 		71CDC7141D7B14510060EEFF /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A0A1CFB2EAD00A4752F /* Mesh.cpp */; };
 		71CDC7151D7B14510060EEFF /* Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F149B61CFB793200B7552E /* Model.cpp */; };
 		71CDC7161D7B14510060EEFF /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713D2A3C1CFB2EAD00A4752F /* Object.cpp */; };
@@ -585,8 +586,6 @@
 		713D2A111CFB2EAD00A4752F /* Engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
 		713D2A1E1CFB2EAD00A4752F /* TextureData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureData.cpp; sourceTree = "<group>"; };
 		713D2A1F1CFB2EAD00A4752F /* TextureData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureData.h; sourceTree = "<group>"; };
-		713D2A231CFB2EAD00A4752F /* LuaBind.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaBind.cpp; sourceTree = "<group>"; };
-		713D2A241CFB2EAD00A4752F /* LuaBind.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaBind.h; sourceTree = "<group>"; };
 		713D2A271CFB2EAD00A4752F /* Angle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Angle.cpp; sourceTree = "<group>"; };
 		713D2A281CFB2EAD00A4752F /* Angle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Angle.h; sourceTree = "<group>"; };
 		713D2A2A1CFB2EAD00A4752F /* Matrix4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Matrix4.cpp; sourceTree = "<group>"; };
@@ -740,6 +739,12 @@
 		716302692440C80A008C7116 /* TerrainNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TerrainNode.cpp; sourceTree = "<group>"; };
 		7163026A2440C80A008C7116 /* TerrainNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TerrainNode.h; sourceTree = "<group>"; };
 		7163026E2440C98E008C7116 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		716789E02497D674006EAAEB /* LuaBinding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaBinding.cpp; sourceTree = "<group>"; };
+		716789E12497D674006EAAEB /* LuaFunction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaFunction.cpp; sourceTree = "<group>"; };
+		716789E22497D674006EAAEB /* LuaScript.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaScript.cpp; sourceTree = "<group>"; };
+		716789E32497D674006EAAEB /* LuaScript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaScript.h; sourceTree = "<group>"; };
+		716789E42497D674006EAAEB /* LuaBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaBinding.h; sourceTree = "<group>"; };
+		716789E52497D674006EAAEB /* LuaFunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunction.h; sourceTree = "<group>"; };
 		716AB5A21BEF9F3C001B672D /* supernova-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "supernova-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		716AB5A61BEF9F3C001B672D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		716AB5B31BEF9F3D001B672D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -918,8 +923,6 @@
 		71A6FABB1DEA3F15003850A2 /* AudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPlayer.h; sourceTree = "<group>"; };
 		71A6FAC11DEB1924003850A2 /* SoundManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoundManager.cpp; sourceTree = "<group>"; };
 		71A6FAC21DEB1924003850A2 /* SoundManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
-		71B130C120CD8F4D007A42A9 /* LuaFunction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaFunction.cpp; sourceTree = "<group>"; };
-		71B130C220CD8F4D007A42A9 /* LuaFunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunction.h; sourceTree = "<group>"; };
 		71B818B720B094930069E8FA /* libsupernova-project.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libsupernova-project.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BCFC181E47DCC8008E42A2 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		71BCFC1A1E47DCF1008E42A2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -1359,8 +1362,6 @@
 				715F90EF21EAF6BF0025464D /* Lines.h */,
 				714C6CF8209DF09D0002F031 /* Log.cpp */,
 				714C6CF9209DF09E0002F031 /* Log.h */,
-				713D2A231CFB2EAD00A4752F /* LuaBind.cpp */,
-				713D2A241CFB2EAD00A4752F /* LuaBind.h */,
 				719301231E51212800BEE527 /* Material.cpp */,
 				719301241E51212800BEE527 /* Material.h */,
 				713D2A261CFB2EAD00A4752F /* math */,
@@ -1386,6 +1387,7 @@
 				713D2A4A1CFB2EAD00A4752F /* render */,
 				713D2A631CFB2EAD00A4752F /* Scene.cpp */,
 				713D2A641CFB2EAD00A4752F /* Scene.h */,
+				716789DF2497D674006EAAEB /* script */,
 				7193011B1E42943800BEE527 /* SkyBox.cpp */,
 				7193011C1E42943800BEE527 /* SkyBox.h */,
 				7188F1AA1DBBAB0B00A2D04F /* Sound.cpp */,
@@ -1632,6 +1634,19 @@
 				7163025C2440C3A5008C7116 /* GLES2ShaderFog.h */,
 			);
 			path = shaders;
+			sourceTree = "<group>";
+		};
+		716789DF2497D674006EAAEB /* script */ = {
+			isa = PBXGroup;
+			children = (
+				716789E02497D674006EAAEB /* LuaBinding.cpp */,
+				716789E42497D674006EAAEB /* LuaBinding.h */,
+				716789E12497D674006EAAEB /* LuaFunction.cpp */,
+				716789E52497D674006EAAEB /* LuaFunction.h */,
+				716789E22497D674006EAAEB /* LuaScript.cpp */,
+				716789E32497D674006EAAEB /* LuaScript.h */,
+			);
+			path = script;
 			sourceTree = "<group>";
 		};
 		716AB5991BEF9F3C001B672D = {
@@ -1986,8 +2001,6 @@
 				71BF18FA20D2034D00804467 /* IntegerSequence.h */,
 				71C27725202BC405005B3EDC /* LightData.cpp */,
 				71C27726202BC405005B3EDC /* LightData.h */,
-				71B130C120CD8F4D007A42A9 /* LuaFunction.cpp */,
-				71B130C220CD8F4D007A42A9 /* LuaFunction.h */,
 				719ACC41219DB934008C21F4 /* ReadSModel.cpp */,
 				719ACC42219DB934008C21F4 /* ReadSModel.h */,
 				719ACC43219DB934008C21F4 /* SModelData.h */,
@@ -2716,6 +2729,7 @@
 				71C2773C202BCE6C005B3EDC /* AlignedBox.cpp in Sources */,
 				71CDC70E1D7B14510060EEFF /* Cube.cpp in Sources */,
 				71CDC70D1D7B14510060EEFF /* Camera.cpp in Sources */,
+				716789E82497D674006EAAEB /* LuaScript.cpp in Sources */,
 				714C89171F0EDF370028DCE0 /* TextureRender.cpp in Sources */,
 				714C6CFA209DF09E0002F031 /* Log.cpp in Sources */,
 				715F90FF21EAF6FE0025464D /* UIObject.cpp in Sources */,
@@ -2729,6 +2743,7 @@
 				716F761D1E1C736300FF9888 /* Mesh2D.cpp in Sources */,
 				719330B51EDB161B0043E282 /* Rect.cpp in Sources */,
 				71E170521F4D088C006D207B /* ParticlesAnimation.cpp in Sources */,
+				716789E72497D674006EAAEB /* LuaFunction.cpp in Sources */,
 				71CDC7251D7B146D0060EEFF /* Ray.cpp in Sources */,
 				71CDC7211D7B14680060EEFF /* TextureData.cpp in Sources */,
 				715F910121EAF6FE0025464D /* TextEdit.cpp in Sources */,
@@ -2743,7 +2758,7 @@
 				71CDC7191D7B14510060EEFF /* Scene.cpp in Sources */,
 				71C27735202BCE1F005B3EDC /* Action.cpp in Sources */,
 				71CDC7271D7B146D0060EEFF /* Vector3.cpp in Sources */,
-				71CDC7131D7B14510060EEFF /* LuaBind.cpp in Sources */,
+				716789E62497D674006EAAEB /* LuaBinding.cpp in Sources */,
 				716F76171E1186CB00FF9888 /* Image.cpp in Sources */,
 				71EC38B41EB82871008654E8 /* Particles.cpp in Sources */,
 				71CDC7281D7B146D0060EEFF /* Vector4.cpp in Sources */,
@@ -2783,7 +2798,6 @@
 				715F910821EAF7360025464D /* Buffer.cpp in Sources */,
 				719ACC3F219DB914008C21F4 /* Bone.cpp in Sources */,
 				715F90FD21EAF6FE0025464D /* Button.cpp in Sources */,
-				71B130C320CD8F4D007A42A9 /* LuaFunction.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

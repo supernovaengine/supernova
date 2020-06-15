@@ -1,20 +1,16 @@
-
-
-#ifndef luabind_h
-#define luabind_h
-
 //
-// (c) 2018 Eduardo Doria.
+// (c) 2020 Eduardo Doria.
 //
 
-#include "Object.h"
+#ifndef luabinding_h
+#define luabinding_h
 
 typedef struct lua_State lua_State;
 typedef int (*lua_CFunction) (lua_State *L);
 
 namespace Supernova {
 
-    class LuaBind {
+    class LuaBinding {
         
         friend class Engine;
         
@@ -28,19 +24,18 @@ namespace Supernova {
         static int moduleLoader(lua_State *L);
         
         static void bind();
+        static void registerClasses(lua_State *L);
+
     public:
-        LuaBind();
-        virtual ~LuaBind();
+        LuaBinding();
+        virtual ~LuaBinding();
         
         static lua_State* getLuaState();
         static void luaCallback(int nargs, int nresults, int msgh);
         static void stackDump (lua_State *L);
         
-        static void setObject(const char* global, Object* object);
-        static Object* getObject(const char* global);
-        
     };
     
 }
 
-#endif /* luabind_h */
+#endif /* luabinding_h */

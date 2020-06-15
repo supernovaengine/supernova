@@ -13,7 +13,7 @@
 
 #include "math/Rect.h"
 #include "Log.h"
-#include "LuaBind.h"
+#include "script/LuaBinding.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -258,8 +258,8 @@ void Engine::systemStart(){
     auto now = std::chrono::steady_clock::now();
     lastTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     
-    LuaBind::createLuaState();
-    LuaBind::bind();
+    LuaBinding::createLuaState();
+    LuaBinding::bind();
     
     init();
     
