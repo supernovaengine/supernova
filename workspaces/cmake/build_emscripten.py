@@ -2,9 +2,12 @@
 
 # /*
 # Based on Filip Stoklas code (http://forums.4fips.com/viewtopic.php?f=3&t=1201)
+# (c) 2020 Eduardo Doria.
 # */
 
 import os
+import sys
+import subprocess
 import stat
 from shutil import rmtree
 from subprocess import check_call
@@ -32,32 +35,37 @@ def makedirs_silent(root):
 
 if __name__ == "__main__":
 
-    if not "EMSCRIPTEN" in os.environ:
-        print ("You need to include EMSCRIPTEN environment variable or edit 'emscripten =' line in this file")
-    else:
-
-        build_dir = resolve_path("./build")
-        if not os.path.isdir(build_dir):
-            rmtree_silent(build_dir)
-        makedirs_silent(build_dir)
-        os.chdir(build_dir)
-
+    emscripten = ""
+    if "EMSCRIPTEN_ROOT" in os.environ:
+        emscripten = os.path.expandvars("$EMSCRIPTEN_ROOT")
+    elif "EMSCRIPTEN" in os.environ:
         emscripten = os.path.expandvars("$EMSCRIPTEN")
+    else:
+        print ("Not found EMSCRIPTEN_ROOT or EMSCRIPTEN environment variable")
+        sys.exit(os.EX_CONFIG)
 
-        from sys import platform
-        if platform == "linux" or platform == "linux2" or platform == "darwin":
-            system_output = "Unix Makefiles"
-            system_make = "make"
-        elif platform == "win32":
-            system_output = "MinGW Makefiles"
-            system_make = "mingw32-make"
+    build_dir = resolve_path("./build")
+    if not os.path.isdir(build_dir):
+        rmtree_silent(build_dir)
+    makedirs_silent(build_dir)
+    os.chdir(build_dir)
 
-        check_call([
-        "cmake",
-        "-DCMAKE_TOOLCHAIN_FILE="+emscripten+"/cmake/Modules/Platform/Emscripten.cmake",
-        "-DCMAKE_BUILD_TYPE=Debug",
-        "-G", system_output,
-        "../../../platform/emscripten"
-        ])
+    emscripten = os.path.expandvars("$EMSCRIPTEN")
 
-        check_call([system_make])
+    from sys import platform
+    if platform == "linux" or platform == "linux2" or platform == "darwin":
+        system_output = "Unix Makefiles"
+        system_make = "make"
+    elif platform == "win32":
+        system_output = "MinGW Makefiles"
+        system_make = "mingw32-make"
+
+    subprocess.run([
+    "cmake",
+    "-DCMAKE_TOOLCHAIN_FILE="+emscripten+"/cmake/Modules/Platform/Emscripten.cmake",
+    "-DCMAKE_BUILD_TYPE=Debug",
+    "-G", system_output,
+    "../../../platform/emscripten"
+    ]).check_returncode()
+
+    subprocess.run([system_make]).check_returncode()
