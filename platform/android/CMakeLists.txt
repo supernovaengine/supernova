@@ -20,12 +20,20 @@
     set(IS_ARM ON)
  endif()
 
+ if(NOT DEFINED SUPERNOVA_ROOT)
+    set(SUPERNOVA_ROOT ../..)
+ endif()
+
+ if(NOT DEFINED PROJECT_SOURCE)
+    set(PROJECT_SOURCE project)
+ endif()
+
  include_directories ("${ANDROID_NDK}/sources/android/cpufeatures")
  include_directories ("${PLATFORM_DIR}")
- include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../../engine/core")
+ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/${SUPERNOVA_ROOT}/engine/core")
 
- add_subdirectory (../../engine ${PROJECT_BINARY_DIR}/engine)
- add_subdirectory (../../project ${PROJECT_BINARY_DIR}/project)
+ add_subdirectory (${SUPERNOVA_ROOT}/engine ${PROJECT_BINARY_DIR}/engine)
+ add_subdirectory (${SUPERNOVA_ROOT}/${PROJECT_SOURCE} ${PROJECT_BINARY_DIR}/project)
 
  add_library(
      supernova-android

@@ -9,6 +9,7 @@ import os
 import sys
 import subprocess
 import stat
+import click
 from shutil import rmtree
 from subprocess import check_call
 
@@ -33,7 +34,13 @@ def makedirs_silent(root):
     except OSError: # mute if exists
         pass
 
-if __name__ == "__main__":
+@click.command()
+@click.option('--project', '-p', default='project', help="Source path of project files")
+@click.option('--root-dir', '-r', default='../../..', help="Source path of Suepernova lib")
+def build_emscripten(project, root_dir):
+
+    projectSource = project
+    supernovaRoot = root_dir
 
     emscripten = ""
     if "EMSCRIPTEN_ROOT" in os.environ:
@@ -63,9 +70,14 @@ if __name__ == "__main__":
     subprocess.run([
     "cmake",
     "-DCMAKE_TOOLCHAIN_FILE="+emscripten+"/cmake/Modules/Platform/Emscripten.cmake",
+    "-DPROJECT_SOURCE="+projectSource,
     "-DCMAKE_BUILD_TYPE=Debug",
     "-G", system_output,
-    "../../../platform/emscripten"
+    supernovaRoot+"/platform/emscripten"
     ]).check_returncode()
 
     subprocess.run([system_make]).check_returncode()
+
+
+if __name__ == '__main__':
+    build_emscripten()

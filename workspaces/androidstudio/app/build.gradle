@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+def projectSource = "project"
+
+def supernovaRoot = "../../.."
+def projectSrcPath = supernovaRoot+"/"+projectSource
+
 android {
     compileSdkVersion 25
     buildToolsVersion '28.0.3'
@@ -17,7 +22,7 @@ android {
                 abiFilters "armeabi-v7a"
                 abiFilters "x86_64"
 
-                arguments '-DANDROID_STL=c++_static'
+                arguments "-DANDROID_STL=c++_static", "-DPROJECT_SOURCE="+projectSource
             }
         }
     }
@@ -27,15 +32,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     externalNativeBuild {
         cmake {
-            path "../../../platform/android/CMakeLists.txt"
+            path supernovaRoot+"/platform/android/CMakeLists.txt"
         }
     }
 
     sourceSets {
         main {
-            assets.srcDirs = ['../../../project/assets','../../../project/lua']
+            assets.srcDirs = [projectSrcPath+'/assets',projectSrcPath+'/lua']
         }
     }
 

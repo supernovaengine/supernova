@@ -23,5 +23,5 @@ jobs:
       - name: Build with Emscripten
         run: |
           export EMSCRIPTEN=$(dirname $(which emcc))
-          cd workspaces/cmake/
-          python3 build_emscripten.py
+          cd workspaces/build-scripts/
+          python3 emscripten.py
