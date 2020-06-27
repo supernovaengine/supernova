@@ -1,10 +1,6 @@
 name: IOS CMake
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -19,8 +15,11 @@ jobs:
              
       - name: Create assets dir
         run: mkdir project/assets
+
+      - name: Install dependencies
+        run: pip3 install click
              
       - name: Build with Xcode (CMake)
         run: |
           cd workspaces/build-scripts/
-          python3 ios.py
+          python3 ios.py --build
