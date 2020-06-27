@@ -1,0 +1,26 @@
+name: IOS CMake
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Xcode version
+        run: /usr/bin/xcodebuild -version
+             
+      - name: Create assets dir
+        run: mkdir project/assets
+             
+      - name: Build with Xcode (CMake)
+        run: |
+          cd workspaces/build-scripts/
+          python3 ios.py

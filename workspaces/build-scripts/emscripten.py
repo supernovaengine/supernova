@@ -11,7 +11,6 @@ import subprocess
 import stat
 import click
 from shutil import rmtree
-from subprocess import check_call
 
 def resolve_path(rel_path):
     return os.path.abspath(os.path.join(os.path.dirname(__file__), rel_path))
@@ -36,7 +35,7 @@ def makedirs_silent(root):
 
 @click.command()
 @click.option('--project', '-p', default='project', help="Source path of project files")
-@click.option('--root-dir', '-r', default='../../..', help="Source path of Suepernova lib")
+@click.option('--root-dir', '-r', default='../..', help="Source path of Suepernova lib")
 def build_emscripten(project, root_dir):
 
     projectSource = project
@@ -51,7 +50,7 @@ def build_emscripten(project, root_dir):
         print ("Not found EMSCRIPTEN_ROOT or EMSCRIPTEN environment variable")
         sys.exit(os.EX_CONFIG)
 
-    build_dir = resolve_path("./build")
+    build_dir = resolve_path("build_emscripten")
     if not os.path.isdir(build_dir):
         rmtree_silent(build_dir)
     makedirs_silent(build_dir)
@@ -73,7 +72,7 @@ def build_emscripten(project, root_dir):
     "-DPROJECT_SOURCE="+projectSource,
     "-DCMAKE_BUILD_TYPE=Debug",
     "-G", system_output,
-    supernovaRoot+"/platform/emscripten"
+    os.path.join("..", supernovaRoot, "platform", "emscripten")
     ]).check_returncode()
 
     subprocess.run([system_make]).check_returncode()

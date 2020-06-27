@@ -49,6 +49,11 @@ add_library(
     src/filter/soloud_waveshaperfilter.cpp
 )
 
+if(APPLE)
+    #set_source_files_properties(src/backend/miniaudio/soloud_miniaudio.cpp PROPERTIES LANGUAGE OBJCXX)
+    set_source_files_properties(src/backend/miniaudio/soloud_miniaudio.cpp PROPERTIES XCODE_EXPLICIT_FILE_TYPE "sourcecode.cpp.objcpp")
+endif()
+
 target_link_libraries(
         soloud
         stb

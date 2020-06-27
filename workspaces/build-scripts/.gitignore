@@ -1,6 +1,6 @@
 # Emscripten LLVM
 
-build/
+build*
 
 *.map
 *.mem
