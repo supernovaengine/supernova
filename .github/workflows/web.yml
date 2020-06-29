@@ -1,4 +1,4 @@
-name: Emscripten
+name: Web
 
 on: [push, pull_request]
 
@@ -20,4 +20,4 @@ jobs:
         run: |
           export EMSCRIPTEN=$(dirname $(which emcc))
           cd workspaces/build-scripts/
-          python3 emscripten.py
+          python3 supernova.py --build --platform web

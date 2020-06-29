@@ -17,14 +17,14 @@ set(SUPERNOVA_GLES2 ON)
  endif()
 
  if(NOT DEFINED PROJECT_SOURCE)
-    set(PROJECT_SOURCE project)
+    set(PROJECT_SOURCE ${SUPERNOVA_ROOT}/project)
  endif()
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/${SUPERNOVA_ROOT}/engine/core")
 
 add_subdirectory (${SUPERNOVA_ROOT}/engine ${PROJECT_BINARY_DIR}/engine)
-add_subdirectory (${SUPERNOVA_ROOT}/${PROJECT_SOURCE} ${PROJECT_BINARY_DIR}/project)
+add_subdirectory (${PROJECT_SOURCE} ${PROJECT_BINARY_DIR}/project)
 
 add_executable(
     supernova-emscripten
@@ -36,8 +36,8 @@ set_target_properties(
     supernova-emscripten
     PROPERTIES LINK_FLAGS
         "-g4 -s ALLOW_MEMORY_GROWTH=1 \
-        --preload-file ../${SUPERNOVA_ROOT}/${PROJECT_SOURCE}/assets@/ \
-        --preload-file ../${SUPERNOVA_ROOT}/${PROJECT_SOURCE}/lua@/ \
+        --preload-file ../${PROJECT_SOURCE}/assets@/ \
+        --preload-file ../${PROJECT_SOURCE}/lua@/ \
         -o supernova.html \
         -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\""
 )

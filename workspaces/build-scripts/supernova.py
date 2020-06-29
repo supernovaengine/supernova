@@ -1,0 +1,209 @@
+#!/usr/bin/env python
+
+# /*
+# Based on Filip Stoklas code (http://forums.4fips.com/viewtopic.php?f=3&t=1201)
+# (c) 2020 Eduardo Doria.
+# */
+
+import os
+import sys
+import subprocess
+import stat
+import click
+import uuid
+from shutil import rmtree
+
+def resolve_path(rel_path):
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), rel_path))
+
+def rmtree_silent(root):
+    def remove_readonly_handler(fn, root, excinfo):
+        if fn is os.rmdir:
+            if os.path.isdir(root): # if exists
+                os.chmod(root, stat.S_IWRITE) # make writable
+                os.rmdir(root)
+        elif fn is os.remove:
+            if os.path.isfile(root): # if exists
+                os.chmod(root, stat.S_IWRITE) # make writable
+                os.remove(root)
+    rmtree(root, onerror=remove_readonly_handler)
+
+def makedirs_silent(root):
+    try:
+        os.makedirs(root)
+    except OSError: # mute if exists
+        pass
+
+##
+# Based on Steve Robinson comment https://gitlab.kitware.com/cmake/cmake/-/issues/19588
+# https://gitlab.com/ssrobins/sdl2-example/blob/cmake_issues_19588/add_xcode_folder_reference.py
+##
+def add_folder_reference(project, folder_path, target):
+    
+    with open(project) as f:
+        project_data = f.read()
+        
+    folder = os.path.basename(folder_path)
+    
+    id1 = str(uuid.uuid4().hex)
+    id2 = str(uuid.uuid4().hex)
+    
+    pbxbuildfile_header = '/* Begin PBXBuildFile section */'
+    project_data = project_data.replace(
+        pbxbuildfile_header,
+        '{0}\n\t\t{1} /* {2} in Resources */ = {{isa = PBXBuildFile; fileRef = {3} /* {2} */; }};'.format(pbxbuildfile_header, id1, folder, id2),
+    )
+
+    if folder.endswith(".xcassets"):
+        last_known_file_type = "folder.assetcatalog"
+    else:
+        last_known_file_type = "folder"
+    
+    pbxfilereference_header = '/* Begin PBXFileReference section */'
+    project_data = project_data.replace(
+        pbxfilereference_header,
+        '{0}\n\t\t{1} /* {2} */ = {{isa = PBXFileReference; lastKnownFileType = {3}; name = {2}; path = {4}; sourceTree = "<group>"; }};'.format(pbxfilereference_header, id2, folder, last_known_file_type, folder_path)
+    )
+    
+    # Get <RESOURCES_PBXGROUP_ID> for 'Resources' in <TARGET>:
+    # <PBXGROUP_ID> /* <TARGET> */ = {
+    #        isa = PBXGroup;
+    #        children = (
+    #            <RESOURCES_PBXGROUP_ID> /* Resources */,
+    index_pbx_group = project_data.find('/* {0} */ = {{\n\t\t\tisa = PBXGroup;'.format(target))
+    index_resources_child = project_data.find('/* Resources */', index_pbx_group)
+    index_start_resources_pbxgroup = project_data.rfind('\t', 0, index_resources_child)
+    resources_pbxgroup_id = project_data[index_start_resources_pbxgroup:index_resources_child].strip()
+    
+    pbxgroup_section = '{0} /* Resources */ = {{\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = ('.format(resources_pbxgroup_id)
+    project_data = project_data.replace(
+        pbxgroup_section,
+        '{0}\n\t\t\t\t{1} /* {2} */,'.format(pbxgroup_section, id2, folder)
+    )
+
+    pbxbuildphase_section = 'isa = PBXResourcesBuildPhase;\n\t\t\tbuildActionMask = 2147483647;\n\t\t\tfiles = ('
+    project_data = project_data.replace(
+        pbxbuildphase_section,
+        '{0}\n\t\t\t\t{1} /* {2} in Resources */,'.format(pbxbuildphase_section, id1, folder)
+    )
+        
+    with open(project, "w") as f:
+        f.write(project_data) 
+
+
+def create_build_dir(name):
+    build_dir = resolve_path(name)
+
+    if not os.path.isdir(build_dir):
+        rmtree_silent(build_dir)
+    makedirs_silent(build_dir)
+    os.chdir(build_dir)
+
+    return build_dir
+
+@click.command()
+@click.option('--platform', '-p', required=True, type=click.Choice(['ios', 'web'], case_sensitive=False), help="Plataform build type")
+@click.option('--project', '-s', default='../../project', help="Source path of project files")
+@click.option('--supernova', '-r', default='../..', help="Supernova root directory")
+@click.option('--build/--no-build', '-b', default=False, help="Build or no build generated Xcode project")
+def build(platform, project, supernova, build):
+
+    projectSource = project
+    supernovaRoot = supernova
+
+    system_output = ""
+    source_path = ""
+    cmake_definitions = []
+
+    build_config = []
+    native_build_config = []
+
+    build_dir = create_build_dir("build_"+platform)
+
+####
+## Preparing web (Emscripten) environment
+####
+    if (platform == "web"):
+
+        emscripten = ""
+        if "EMSCRIPTEN_ROOT" in os.environ:
+            emscripten = os.path.expandvars("$EMSCRIPTEN_ROOT")
+        elif "EMSCRIPTEN" in os.environ:
+            emscripten = os.path.expandvars("$EMSCRIPTEN")
+        else:
+            print ("Not found EMSCRIPTEN_ROOT or EMSCRIPTEN environment variable")
+            sys.exit(os.EX_CONFIG)
+
+        from sys import platform
+        if platform == "linux" or platform == "linux2" or platform == "darwin":
+            system_output = "Unix Makefiles"
+        elif platform == "win32":
+            system_output = "MinGW Makefiles"
+        
+        cmake_definitions = [
+            "-DCMAKE_BUILD_TYPE=Debug",
+            "-DCMAKE_TOOLCHAIN_FILE="+emscripten+"/cmake/Modules/Platform/Emscripten.cmake"
+        ]
+        source_path = os.path.join("..", supernovaRoot, "platform", "emscripten")
+
+
+####
+## Preparing ios (Apple) environment
+####
+    if (platform == "ios"):
+
+        system_output = "Xcode"
+        system_name = "iOS"
+        OSX_SDK="iphoneos"
+        build_config_mode = "Debug"
+        build_sdk = "iphonesimulator"
+
+        build_config = ["--config", build_config_mode]
+        native_build_config = ["-sdk", build_sdk]
+        cmake_definitions = [
+            "-DCMAKE_SYSTEM_NAME="+system_name,
+            "-DCMAKE_OSX_SYSROOT="+OSX_SDK
+        ]
+        source_path = os.path.join("..", supernovaRoot, "platform", "ios")
+
+####
+## Executing CMake command
+####
+    cmake_command = [
+        "cmake",
+        "-DPROJECT_SOURCE="+projectSource,
+        "-G", system_output,
+        source_path,
+        ]
+    cmake_command.extend(cmake_definitions)
+
+    subprocess.run(cmake_command).check_returncode()
+
+####
+## Adding folder reference to iOS project
+####
+    if (platform == "ios"):
+        xcode_project = os.path.join("Supernova.xcodeproj", "project.pbxproj")
+        assets_path = os.path.join(projectSource, "assets")
+        lua_path = os.path.join(projectSource, "lua")
+
+        add_folder_reference(xcode_project, assets_path, "supernova-ios")
+        add_folder_reference(xcode_project, lua_path, "supernova-ios")
+
+####
+## Executing CMake build command
+####
+    if build:
+        cmake_build_command = [
+            "cmake",
+            "--build", build_dir
+            ]
+        cmake_build_command.extend(build_config)
+        cmake_build_command.append("--")
+        cmake_build_command.extend(native_build_config)
+
+        subprocess.run(cmake_build_command).check_returncode()
+
+
+if __name__ == '__main__':
+    build()

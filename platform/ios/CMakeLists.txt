@@ -16,14 +16,14 @@ set(SUPERNOVA_GLES2 ON)
  endif()
 
  if(NOT DEFINED PROJECT_SOURCE)
-    set(PROJECT_SOURCE project)
+    set(PROJECT_SOURCE ${SUPERNOVA_ROOT}/project)
  endif()
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/${SUPERNOVA_ROOT}/engine/core")
 
 add_subdirectory (${SUPERNOVA_ROOT}/engine ${PROJECT_BINARY_DIR}/engine)
-add_subdirectory (${SUPERNOVA_ROOT}/${PROJECT_SOURCE} ${PROJECT_BINARY_DIR}/project)
+add_subdirectory (${PROJECT_SOURCE} ${PROJECT_BINARY_DIR}/project)
 
 set(RESOURCES
     Base.lproj/LaunchScreen.storyboard

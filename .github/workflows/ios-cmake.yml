@@ -22,4 +22,4 @@ jobs:
       - name: Build with Xcode (CMake)
         run: |
           cd workspaces/build-scripts/
-          python3 ios.py --build
+          python3 supernova.py --build --platform ios
