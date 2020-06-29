@@ -16,6 +16,9 @@ jobs:
           version: latest-upstream
           actions-cache-folder: 'emsdk-cache'
 
+      - name: Install dependencies
+        run: pip3 install --upgrade click
+
       - name: Build with Emscripten
         run: |
           export EMSCRIPTEN=$(dirname $(which emcc))
