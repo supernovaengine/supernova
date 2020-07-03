@@ -1,9 +1,10 @@
 apply plugin: 'com.android.application'
 
-def projectSource = "project"
+def projectSourceRoot = "../../../project"
+def supernovaRoot = "../../.."
 
-def supernovaRootRelPath = "../../.."
-def projectSrcRelPath = supernovaRootRelPath+"/"+projectSource
+def projectSourceRootAbs = file(projectSourceRoot).toString()
+def supernovaRootAbs = file(supernovaRoot).toString()
 
 android {
     compileSdkVersion 25
@@ -22,7 +23,7 @@ android {
                 abiFilters "armeabi-v7a"
                 abiFilters "x86_64"
 
-                arguments "-DANDROID_STL=c++_static", "-DPROJECT_ROOT="+projectSource
+                arguments "-DANDROID_STL=c++_static", "-DPROJECT_ROOT="+projectSourceRootAbs
             }
         }
     }
@@ -35,13 +36,13 @@ android {
 
     externalNativeBuild {
         cmake {
-            path supernovaRootRelPath+"/CMakeLists.txt"
+            path supernovaRootAbs+"/CMakeLists.txt"
         }
     }
 
     sourceSets {
         main {
-            assets.srcDirs = [projectSrcRelPath+'/assets',projectSrcRelPath+'/lua']
+            assets.srcDirs = [projectSourceRootAbs+'/assets',projectSourceRootAbs+'/lua']
         }
     }
 
