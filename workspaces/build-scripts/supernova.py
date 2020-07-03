@@ -103,16 +103,17 @@ def create_build_dir(name):
 
 @click.command()
 @click.option('--platform', '-p', required=True, type=click.Choice(['ios', 'web'], case_sensitive=False), help="Plataform build type")
-@click.option('--project', '-s', default='../../project', help="Source path of project files")
+@click.option('--project', '-s', default='../../project', help="Source root path of project files")
 @click.option('--supernova', '-r', default='../..', help="Supernova root directory")
+@click.option('--appname', '-a', default='supernova-project', help="Project target name")
 @click.option('--build/--no-build', '-b', default=False, help="Build or no build generated Xcode project")
-def build(platform, project, supernova, build):
+def build(platform, project, supernova, appname, build):
 
-    projectSource = project
-    supernovaRoot = supernova
+    projectRoot = os.path.abspath(project)
+    supernovaRoot = os.path.abspath(supernova)
 
     system_output = ""
-    source_path = ""
+    source_path = os.path.join("..", supernovaRoot)
     cmake_definitions = []
 
     build_config = []
@@ -142,9 +143,11 @@ def build(platform, project, supernova, build):
         
         cmake_definitions = [
             "-DCMAKE_BUILD_TYPE=Debug",
+            #"-DNO_LUA_INIT=1",
+            #"-DNO_CPP_INIT=1",
             "-DCMAKE_TOOLCHAIN_FILE="+emscripten+"/cmake/Modules/Platform/Emscripten.cmake"
         ]
-        source_path = os.path.join("..", supernovaRoot, "platform", "emscripten")
+        
 
 
 ####
@@ -164,14 +167,15 @@ def build(platform, project, supernova, build):
             "-DCMAKE_SYSTEM_NAME="+system_name,
             "-DCMAKE_OSX_SYSROOT="+OSX_SDK
         ]
-        source_path = os.path.join("..", supernovaRoot, "platform", "ios")
+
 
 ####
 ## Executing CMake command
 ####
     cmake_command = [
         "cmake",
-        "-DPROJECT_SOURCE="+projectSource,
+        "-DPROJECT_ROOT="+projectRoot,
+        "-DAPP_NAME="+appname,
         "-G", system_output,
         source_path,
         ]
@@ -183,12 +187,12 @@ def build(platform, project, supernova, build):
 ## Adding folder reference to iOS project
 ####
     if (platform == "ios"):
-        xcode_project = os.path.join("Supernova.xcodeproj", "project.pbxproj")
-        assets_path = os.path.join(projectSource, "assets")
-        lua_path = os.path.join(projectSource, "lua")
+        xcode_project = os.path.join(appname+".xcodeproj", "project.pbxproj")
+        assets_path = os.path.join(projectRoot, "assets")
+        lua_path = os.path.join(projectRoot, "lua")
 
-        add_folder_reference(xcode_project, assets_path, "supernova-ios")
-        add_folder_reference(xcode_project, lua_path, "supernova-ios")
+        add_folder_reference(xcode_project, assets_path, appname)
+        add_folder_reference(xcode_project, lua_path, appname)
 
 ####
 ## Executing CMake build command

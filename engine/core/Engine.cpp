@@ -261,7 +261,9 @@ void Engine::systemStart(){
     LuaBinding::createLuaState();
     LuaBinding::bind();
     
+    #ifndef NO_CPP_INIT
     init();
+    #endif
     
 }
 

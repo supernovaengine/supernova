@@ -1,6 +1,5 @@
 #ifndef IOSMacros_pch
 #define IOSMacros_pch
 
-#define SUPERNOVA_IOS
 
 #endif /* IOSMacros_pch */

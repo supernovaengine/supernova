@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
 
-def projectSource = "../../project"
+def projectSource = "project"
 
 def supernovaRootRelPath = "../../.."
-def projectSrcRelPath = "../"+projectSource
+def projectSrcRelPath = supernovaRootRelPath+"/"+projectSource
 
 android {
     compileSdkVersion 25
@@ -22,7 +22,7 @@ android {
                 abiFilters "armeabi-v7a"
                 abiFilters "x86_64"
 
-                arguments "-DANDROID_STL=c++_static", "-DPROJECT_SOURCE="+projectSource
+                arguments "-DANDROID_STL=c++_static", "-DPROJECT_ROOT="+projectSource
             }
         }
     }
@@ -35,7 +35,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            path supernovaRootRelPath+"/platform/android/CMakeLists.txt"
+            path supernovaRootRelPath+"/CMakeLists.txt"
         }
     }
 
