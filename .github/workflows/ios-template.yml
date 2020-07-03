@@ -1,4 +1,4 @@
-name: IOS CMake
+name: IOS Xcode Template
 
 on: [push, pull_request]
 
@@ -15,11 +15,8 @@ jobs:
              
       - name: Create assets dir if not exist
         run: mkdir -p project/assets
-
-      - name: Install dependencies
-        run: pip3 install --upgrade click
              
-      - name: Build with Xcode (CMake)
+      - name: Build with Xcode
         run: |
-          cd workspaces/
-          python3 supernova.py --build --platform ios
+          cd workspaces/xcode/
+          xcodebuild build -sdk iphonesimulator -project Supernova.xcodeproj -configuration Debug -scheme supernova-ios

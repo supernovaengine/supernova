@@ -22,5 +22,5 @@ jobs:
       - name: Build with Emscripten
         run: |
           export EMSCRIPTEN=$(dirname $(which emcc))
-          cd workspaces/build-scripts/
+          cd workspaces/
           python3 supernova.py --build --platform web

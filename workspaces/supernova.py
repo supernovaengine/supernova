@@ -103,11 +103,13 @@ def create_build_dir(name):
 
 @click.command()
 @click.option('--platform', '-p', required=True, type=click.Choice(['ios', 'web'], case_sensitive=False), help="Plataform build type")
-@click.option('--project', '-s', default='../../project', help="Source root path of project files")
-@click.option('--supernova', '-r', default='../..', help="Supernova root directory")
+@click.option('--project', '-s', default='../project', help="Source root path of project files")
+@click.option('--supernova', '-r', default='..', help="Supernova root directory")
 @click.option('--appname', '-a', default='supernova-project', help="Project target name")
 @click.option('--build/--no-build', '-b', default=False, help="Build or no build generated Xcode project")
-def build(platform, project, supernova, appname, build):
+@click.option('--no-cpp-init', is_flag=True, help="No call C++ init on project start")
+@click.option('--no-lua-init', is_flag=True, help="No call Lua on project start")
+def build(platform, project, supernova, appname, build, no_lua_init, no_cpp_init):
 
     projectRoot = os.path.abspath(project)
     supernovaRoot = os.path.abspath(supernova)
@@ -119,7 +121,12 @@ def build(platform, project, supernova, appname, build):
     build_config = []
     native_build_config = []
 
-    build_dir = create_build_dir("build_"+platform)
+    build_dir = create_build_dir("project_"+platform)
+
+    if no_cpp_init:
+        cmake_definitions.append("-DNO_CPP_INIT=1")
+    if no_lua_init:
+        cmake_definitions.append("-DNO_LUA_INIT=1")
 
 ####
 ## Preparing web (Emscripten) environment
@@ -141,12 +148,10 @@ def build(platform, project, supernova, appname, build):
         elif platform == "win32":
             system_output = "MinGW Makefiles"
         
-        cmake_definitions = [
+        cmake_definitions.extend([
             "-DCMAKE_BUILD_TYPE=Debug",
-            #"-DNO_LUA_INIT=1",
-            #"-DNO_CPP_INIT=1",
             "-DCMAKE_TOOLCHAIN_FILE="+emscripten+"/cmake/Modules/Platform/Emscripten.cmake"
-        ]
+        ])
         
 
 
@@ -163,10 +168,10 @@ def build(platform, project, supernova, appname, build):
 
         build_config = ["--config", build_config_mode]
         native_build_config = ["-sdk", build_sdk]
-        cmake_definitions = [
+        cmake_definitions.extend([
             "-DCMAKE_SYSTEM_NAME="+system_name,
             "-DCMAKE_OSX_SYSROOT="+OSX_SDK
-        ]
+        ])
 
 
 ####
