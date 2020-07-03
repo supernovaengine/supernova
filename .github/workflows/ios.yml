@@ -1,4 +1,4 @@
-name: IOS CMake
+name: IOS
 
 on: [push, pull_request]
 
