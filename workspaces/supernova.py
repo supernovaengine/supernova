@@ -196,8 +196,15 @@ def build(platform, project, supernova, appname, build, no_lua_init, no_cpp_init
         assets_path = os.path.join(projectRoot, "assets")
         lua_path = os.path.join(projectRoot, "lua")
 
-        add_folder_reference(xcode_project, assets_path, appname)
-        add_folder_reference(xcode_project, lua_path, appname)
+        if os.path.exists(assets_path):
+            add_folder_reference(xcode_project, assets_path, appname)
+        else:
+            print("Warning: %s does not exist, ignoring." % (assets_path), flush=True)
+
+        if os.path.exists(lua_path):
+            add_folder_reference(xcode_project, lua_path, appname)
+        else:
+            print("Warning: %s does not exist, ignoring." % (lua_path), flush=True)
 
 ####
 ## Executing CMake build command
