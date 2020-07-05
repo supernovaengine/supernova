@@ -155,6 +155,15 @@ else()
 endif()
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
+    set(PRELOAD_FILES)
+
+    if (EXISTS "${PROJECT_ROOT}/assets")
+        set(PRELOAD_FILES "${PRELOAD_FILES} --preload-file ${PROJECT_ROOT}/assets@/")
+    endif()
+    if (EXISTS "${PROJECT_ROOT}/lua")
+        set(PRELOAD_FILES "${PRELOAD_FILES} --preload-file ${PROJECT_ROOT}/lua@/")
+    endif()
+
     set_target_properties(
         ${APP_NAME}
 
@@ -162,8 +171,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
         
         LINK_FLAGS
             "-g4 -s ALLOW_MEMORY_GROWTH=1 \
-            --preload-file ${PROJECT_ROOT}/assets@/ \
-            --preload-file ${PROJECT_ROOT}/lua@/ \
+            ${PRELOAD_FILES} \
             -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\""
     )
 endif()

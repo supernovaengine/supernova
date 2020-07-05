@@ -103,25 +103,29 @@ def create_build_dir(name):
 
 @click.command()
 @click.option('--platform', '-p', required=True, type=click.Choice(['ios', 'web'], case_sensitive=False), help="Plataform build type")
-@click.option('--project', '-s', default='../project', help="Source root path of project files")
-@click.option('--supernova', '-r', default='..', help="Supernova root directory")
+@click.option('--project', '-s', default='../project', type=click.Path(), help="Source root path of project files")
+@click.option('--supernova', '-r', default='..', type=click.Path(), help="Supernova root directory")
 @click.option('--appname', '-a', default='supernova-project', help="Project target name")
+@click.option('--output', '-o', type=click.Path(), help="Output directory")
 @click.option('--build/--no-build', '-b', default=False, help="Build or no build generated Xcode project")
 @click.option('--no-cpp-init', is_flag=True, help="No call C++ init on project start")
 @click.option('--no-lua-init', is_flag=True, help="No call Lua on project start")
-def build(platform, project, supernova, appname, build, no_lua_init, no_cpp_init):
+def build(platform, project, supernova, appname, output, build, no_lua_init, no_cpp_init):
 
     projectRoot = os.path.abspath(project)
     supernovaRoot = os.path.abspath(supernova)
 
     system_output = ""
-    source_path = os.path.join("..", supernovaRoot)
+    source_path = supernovaRoot
     cmake_definitions = []
 
     build_config = []
     native_build_config = []
 
-    build_dir = create_build_dir("project_"+platform)
+    if output==None:
+        build_dir = create_build_dir("project_"+platform)
+    else:
+        build_dir = create_build_dir(output)
 
     if no_cpp_init:
         cmake_definitions.append("-DNO_CPP_INIT=1")
