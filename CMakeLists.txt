@@ -29,6 +29,7 @@ set(PLATFORM_ROOT)
 set(PLATFORM_SOURCE)
 set(PLATFORM_LIBS)
 set(PLATFORM_RESOURCES)
+set(PLATFORM_PROPERTIES)
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     add_definitions("-DSUPERNOVA_WEB")
@@ -38,6 +39,15 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 
     set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/emscripten)
 
+    set(EM_PRELOAD_FILES)
+
+    if (EXISTS "${PROJECT_ROOT}/assets")
+        set(EM_PRELOAD_FILES "${EM_PRELOAD_FILES} --preload-file ${PROJECT_ROOT}/assets@/")
+    endif()
+    if (EXISTS "${PROJECT_ROOT}/lua")
+        set(EM_PRELOAD_FILES "${EM_PRELOAD_FILES} --preload-file ${PROJECT_ROOT}/lua@/")
+    endif()
+
     list(APPEND PLATFORM_SOURCE
         ${PLATFORM_ROOT}/SupernovaWeb.cpp
     )
@@ -45,16 +55,24 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     list(APPEND PLATFORM_LIBS
         idbfs.js
     )
+
+    list(APPEND PLATFORM_PROPERTIES
+        LINK_FLAGS
+            "-g4 -s ALLOW_MEMORY_GROWTH=1 \
+            ${EM_PRELOAD_FILES} \
+            ${EM_ADDITIONAL_LINK_FLAGS} \
+            -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\""
+    )
 endif()
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
-    set(APP_NAME supernova-android) # Android uses a fixed library name
-
     add_definitions("-DSUPERNOVA_ANDROID")
     add_definitions("-D\"lua_getlocaledecpoint()='.'\"")
     add_definitions("-DLUA_ANSI")
     add_definitions("-DLUA_USE_C89")
     add_definitions("-DWITH_MINIAUDIO") # For SoLoud
+
+    set(APP_NAME supernova-android) # Android uses a fixed library name
 
     if( ANDROID_ABI MATCHES "^arm(eabi)?(-v7a)?(64-v8a)?$" )
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon")
@@ -78,6 +96,21 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
     add_definitions("-DWITH_MINIAUDIO") # For SoLoud
 
     set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/ios)
+
+    set(APP_BUNDLE_IDENTIFIER "org.supernovaengine.supernova") 
+    
+    set(PRODUCT_NAME ${APP_NAME})
+    set(EXECUTABLE_NAME ${APP_NAME})
+    
+    set(MACOSX_BUNDLE_EXECUTABLE_NAME ${APP_NAME})
+    set(MACOSX_BUNDLE_INFO_STRING ${APP_BUNDLE_IDENTIFIER})
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER ${APP_BUNDLE_IDENTIFIER})
+    set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_BUNDLE_IDENTIFIER})
+    set(MACOSX_BUNDLE_ICON_FILE "")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING "1.0")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
+    set(MACOSX_BUNDLE_COPYRIGHT "(c) 2020 Eduardo Doria")
 
     include_directories (/System/Library/Frameworks)
 
@@ -107,6 +140,11 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
 
     list(APPEND PLATFORM_LIBS
         ${UIKIT_LIBRARY} ${OPENGLES_LIBRARY} ${AV_FOUNDATION_LIBRARY} ${QUARTZCORE_LIBRARY} ${AUDIOTOOLBOX_LIBRARY}
+    )
+
+    list(APPEND PLATFORM_PROPERTIES
+        XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${PLATFORM_ROOT}/IOSMacros.pch"
+        MACOSX_BUNDLE_INFO_PLIST "${PLATFORM_ROOT}/plist.in"
     )
 
 endif()
@@ -154,53 +192,13 @@ else()
     )
 endif()
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
-    set(PRELOAD_FILES)
+set_target_properties(
+    ${APP_NAME}
 
-    if (EXISTS "${PROJECT_ROOT}/assets")
-        set(PRELOAD_FILES "${PRELOAD_FILES} --preload-file ${PROJECT_ROOT}/assets@/")
-    endif()
-    if (EXISTS "${PROJECT_ROOT}/lua")
-        set(PRELOAD_FILES "${PRELOAD_FILES} --preload-file ${PROJECT_ROOT}/lua@/")
-    endif()
-
-    set_target_properties(
-        ${APP_NAME}
-
-        PROPERTIES 
-        
-        LINK_FLAGS
-            "-g4 -s ALLOW_MEMORY_GROWTH=1 \
-            ${PRELOAD_FILES} \
-            -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\""
-    )
-endif()
-
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
-    set(APP_BUNDLE_IDENTIFIER "org.supernovaengine.supernova") 
-    
-    set(PRODUCT_NAME ${APP_NAME})
-    set(EXECUTABLE_NAME ${APP_NAME})
-    set(MACOSX_BUNDLE_EXECUTABLE_NAME ${APP_NAME})
-    set(MACOSX_BUNDLE_INFO_STRING ${APP_BUNDLE_IDENTIFIER})
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER ${APP_BUNDLE_IDENTIFIER})
-    set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_BUNDLE_IDENTIFIER})
-    set(MACOSX_BUNDLE_ICON_FILE "")
-    set(MACOSX_BUNDLE_LONG_VERSION_STRING "1.0")
-    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
-    set(MACOSX_BUNDLE_COPYRIGHT "(c) 2020 Eduardo Doria")
-    
-    set_target_properties(
-        ${APP_NAME}
-        
-        PROPERTIES
-    
-        XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${PLATFORM_ROOT}/IOSMacros.pch"
-        MACOSX_BUNDLE_INFO_PLIST ${PLATFORM_ROOT}/plist.in
-        RESOURCE "${PLATFORM_RESOURCES}"
-    )
-endif()
+    PROPERTIES
+    ${PLATFORM_PROPERTIES}
+    RESOURCE "${PLATFORM_RESOURCES}"
+)
 
 target_link_libraries(
     ${APP_NAME}
