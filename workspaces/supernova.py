@@ -110,7 +110,8 @@ def create_build_dir(name):
 @click.option('--build/--no-build', '-b', default=False, help="Build or no build generated Xcode project")
 @click.option('--no-cpp-init', is_flag=True, help="No call C++ init on project start")
 @click.option('--no-lua-init', is_flag=True, help="No call Lua on project start")
-def build(platform, project, supernova, appname, output, build, no_lua_init, no_cpp_init):
+@click.option('--em-shell-file', type=click.Path(), help="Emscripten shell file")
+def build(platform, project, supernova, appname, output, build, no_lua_init, no_cpp_init, em_shell_file):
 
     projectRoot = os.path.abspath(project)
     supernovaRoot = os.path.abspath(supernova)
@@ -156,6 +157,11 @@ def build(platform, project, supernova, appname, output, build, no_lua_init, no_
             "-DCMAKE_BUILD_TYPE=Debug",
             "-DCMAKE_TOOLCHAIN_FILE="+emscripten+"/cmake/Modules/Platform/Emscripten.cmake"
         ])
+
+        if em_shell_file!=None:
+            cmake_definitions.extend([
+                '-DEM_ADDITIONAL_LINK_FLAGS=--shell-file "' + em_shell_file + '"'
+            ])
         
 
 
