@@ -1,8 +1,10 @@
 if(DEFINED NO_LUA_INIT)
     add_definitions("-DNO_LUA_INIT=${NO_LUA_INIT}")
+    unset(NO_LUA_INIT CACHE)
 endif()
 if(DEFINED NO_CPP_INIT)
     add_definitions("-DNO_CPP_INIT=${NO_CPP_INIT}")
+    unset(NO_CPP_INIT CACHE)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
