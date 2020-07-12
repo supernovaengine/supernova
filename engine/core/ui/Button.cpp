@@ -12,6 +12,10 @@ Button::Button(): UIImage(){
     ownedTexturePressed = true;
     ownedTextureDisabled = true;
 
+    textureNormal = NULL;
+    texturePressed = NULL;
+    textureDisabled = NULL;
+
     down = false;
 
     label.setMultiline(false);

@@ -1,5 +1,5 @@
 /*
- * Inspired by the work of https://nikitablack.github.io/2016/04/26/stdfunction-as-delegate.html
+ * Inspired by the work of http://nikitablack.github.io/post/std_function_as_delegate/
  */
 
 //

@@ -18,20 +18,9 @@ UIObject::UIObject(): Mesh2D(){
     focused = false;
 
     eventId = "UIObject|" + UniqueToken::get();
-
-    Engine::onTextInput.add<UIObject, &UIObject::engineOnTextInput>(eventId, this);
-    Engine::onTouchStart.add<UIObject, &UIObject::engineOnDown>(eventId, this);
-    Engine::onMouseDown.add<UIObject, &UIObject::engineOnDown>(eventId, this);
-    Engine::onTouchEnd.add<UIObject, &UIObject::engineOnUp>(eventId, this);
-    Engine::onMouseUp.add<UIObject, &UIObject::engineOnUp>(eventId, this);
 }
 
 UIObject::~UIObject(){
-    Engine::onTextInput.remove(eventId);
-    Engine::onTouchStart.remove(eventId);
-    Engine::onMouseDown.remove(eventId);
-    Engine::onTouchEnd.remove(eventId);
-    Engine::onMouseUp.remove(eventId);
 }
 
 int UIObject::getState(){
@@ -87,3 +76,27 @@ void UIObject::engineOnUp(int pointer, float x, float y){
 
 void UIObject::engineOnTextInput(std::string text){
 }
+
+bool UIObject::load() {
+    // Removed from constructor to prevent static initialization order fiasco:
+    // http://www.parashift.com/c++-faq-lite/static-init-order.html
+    Engine::onTextInput.add<UIObject, &UIObject::engineOnTextInput>(eventId, this);
+    Engine::onTouchStart.add<UIObject, &UIObject::engineOnDown>(eventId, this);
+    Engine::onMouseDown.add<UIObject, &UIObject::engineOnDown>(eventId, this);
+    Engine::onTouchEnd.add<UIObject, &UIObject::engineOnUp>(eventId, this);
+    Engine::onMouseUp.add<UIObject, &UIObject::engineOnUp>(eventId, this);
+
+    return Mesh2D::load();
+}
+
+void UIObject::destroy() {
+    Engine::onTextInput.remove(eventId);
+    Engine::onTouchStart.remove(eventId);
+    Engine::onMouseDown.remove(eventId);
+    Engine::onTouchEnd.remove(eventId);
+    Engine::onMouseUp.remove(eventId);
+
+    Mesh2D::destroy();
+}
+
+

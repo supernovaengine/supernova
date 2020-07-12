@@ -39,6 +39,9 @@ namespace Supernova {
         virtual void engineOnDown(int pointer, float x, float y);
         virtual void engineOnUp(int pointer, float x, float y);
         virtual void engineOnTextInput(std::string text);
+
+        virtual bool load();
+        virtual void destroy();
     };
     
 }
