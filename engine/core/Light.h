@@ -26,6 +26,7 @@ namespace Supernova {
 
         int type;
 
+        bool loadedShadow;
         bool useShadow;
         std::vector<Texture*> shadowMap;
         std::vector<Camera*> lightCameras;
@@ -70,6 +71,7 @@ namespace Supernova {
         virtual void updateModelMatrix();
 
         virtual bool loadShadow();
+        virtual bool load();
 
     };
     

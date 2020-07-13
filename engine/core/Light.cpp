@@ -14,6 +14,8 @@ Light::Light(){
     this->spotAngle = Angle::degToRad(20);
     this->spotOuterAngle = Angle::degToRad(20);
     this->power = 1;
+
+    this->loadedShadow = false;
     this->useShadow = false;
     this->shadowMapWidth = 1024;
     this->shadowMapHeight = 1024;
@@ -149,11 +151,19 @@ void Light::updateModelMatrix(){
 }
 
 bool Light::loadShadow(){
-    if (useShadow){
+    if (!loadedShadow){
+        loadedShadow = true;
         if (shadowMap.size() > 0)
             for (int i = 0; i < shadowMap.size(); i++)
                 shadowMap[i]->load();
     }
 
     return true;
+}
+
+bool Light::load(){
+    if (useShadow)
+        loadShadow();
+
+    return Object::load();
 }
