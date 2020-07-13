@@ -15,9 +15,14 @@ SoLoudPlayer::~SoLoudPlayer(){
 }
 
 int SoLoudPlayer::load(){
-    Data file(filename.c_str());
+    Data filedata;
 
-    SoLoud::result res = sample.loadMem(file.getMemPtr(), file.length(), false, false);
+    if (filedata.open(filename.c_str()) != FileErrors::NO_ERROR){
+        Log::Error("Audio file not found: %s", filename.c_str());
+        return SoLoud::SOLOUD_ERRORS::FILE_NOT_FOUND;
+    }
+
+    SoLoud::result res = sample.loadMem(filedata.getMemPtr(), filedata.length(), false, false);
 
     if (res == SoLoud::SOLOUD_ERRORS::FILE_LOAD_FAILED){
         Log::Error("Audio file type of '%s' could not be loaded", filename.c_str());
