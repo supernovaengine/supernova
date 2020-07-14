@@ -46,8 +46,8 @@ extern "C" {
 
 int main(int argc, char **argv) {
 
-    int sWidth = 1000;
-    int sHeight = 480;
+    int sWidth = 960;
+    int sHeight = 540;
     if ((argv[1] != NULL && argv[1] != 0) && (argv[2] != NULL && argv[2] != 0)){
         sWidth = atoi(argv[1]);
         sHeight = atoi(argv[2]);

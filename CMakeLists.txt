@@ -61,7 +61,8 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
             "-g4 -s ALLOW_MEMORY_GROWTH=1 \
             ${EM_PRELOAD_FILES} \
             ${EM_ADDITIONAL_LINK_FLAGS} \
-            -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\""
+            -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\" \
+            -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\""
     )
 endif()
 
