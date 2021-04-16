@@ -318,10 +318,10 @@ EM_BOOL SupernovaWeb::wheel_callback(int eventType, const EmscriptenWheelEvent *
     }
 
     int modifiers = 0;
-    if (e->ctrlKey) modifiers |= S_MODIFIER_CONTROL;
-    if (e->shiftKey) modifiers |= S_MODIFIER_SHIFT;
-    if (e->altKey) modifiers |= S_MODIFIER_ALT;
-    if (e->metaKey) modifiers |= S_MODIFIER_SUPER;
+    if (e->mouse.ctrlKey) modifiers |= S_MODIFIER_CONTROL;
+    if (e->mouse.shiftKey) modifiers |= S_MODIFIER_SHIFT;
+    if (e->mouse.altKey) modifiers |= S_MODIFIER_ALT;
+    if (e->mouse.metaKey) modifiers |= S_MODIFIER_SUPER;
 
     Supernova::Engine::systemMouseScroll(scale * (float)e->deltaX, scale * (float)e->deltaY, modifiers);
 

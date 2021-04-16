@@ -19,7 +19,7 @@ IndexBuffer::~IndexBuffer(){
 
 void IndexBuffer::createIndexAttribute(){
     Buffer::addAttribute(AttributeType::INDEX, AttributeDataType::UNSIGNED_SHORT, 1, 0);
-    Buffer::setStride(sizeof(u_int16_t));
+    Buffer::setStride(sizeof(uint16_t));
 }
 
 bool IndexBuffer::resize(size_t pos) {
