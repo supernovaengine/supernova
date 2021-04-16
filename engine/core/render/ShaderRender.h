@@ -1,0 +1,27 @@
+#ifndef ShaderRender_h
+#define ShaderRender_h
+
+#include "Render.h"
+#include "sokol/SokolShader.h"
+
+namespace Supernova{
+    class ShaderRender{
+
+    public:
+        //***Backend***
+        SokolShader backend;
+        //***
+
+        ShaderRender();
+        ShaderRender(const ShaderRender& rhs);
+        ShaderRender& operator=(const ShaderRender& rhs);
+        virtual ~ShaderRender();
+
+        bool createShader(ShaderType shaderType);
+
+        void destroyShader();
+    };
+}
+
+
+#endif /* ShaderRender_h */

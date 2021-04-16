@@ -6,7 +6,7 @@
 
 #include "FileData.h"
 #include "Data.h"
-#include "system/System.h"
+#include "System.h"
 #include <stack>
 
 using namespace Supernova;

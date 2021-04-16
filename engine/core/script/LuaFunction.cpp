@@ -9,7 +9,7 @@
 #include "script/LuaBinding.h"
 #include "Log.h"
 #include "Object.h"
-#include "physics/Contact2D.h"
+//#include "physics/Contact2D.h"
 
 //
 // (c) 2018 Eduardo Doria.
@@ -115,6 +115,17 @@ void LuaFunction::call(int p1, float p2, float p3){
 };
 
 template<>
+void LuaFunction::call(int p1, bool p2, int p3){
+    if (function != 0){
+        lua_rawgeti(LuaBinding::getLuaState(), LUA_REGISTRYINDEX, function);
+        lua_pushnumber(LuaBinding::getLuaState(), p1);
+        lua_pushboolean(LuaBinding::getLuaState(), p2);
+        lua_pushnumber(LuaBinding::getLuaState(), p3);
+        LuaBinding::luaCallback(3, 0, 0);
+    }
+};
+
+template<>
 void LuaFunction::call(Object* p1){
     if (function != 0){
         lua_rawgeti(LuaBinding::getLuaState(), LUA_REGISTRYINDEX, function);
@@ -143,6 +154,16 @@ void LuaFunction::call(std::string p1){
 };
 
 template<>
+void LuaFunction::call(wchar_t p1){
+    if (function != 0){
+        lua_rawgeti(LuaBinding::getLuaState(), LUA_REGISTRYINDEX, function);
+        lua_pushnumber(LuaBinding::getLuaState(), p1);
+        LuaBinding::luaCallback(1, 0, 0);
+    }
+};
+
+/*
+template<>
 void LuaFunction::call(Contact2D* p1){
     if (function != 0){
         lua_rawgeti(LuaBinding::getLuaState(), LUA_REGISTRYINDEX, function);
@@ -150,7 +171,7 @@ void LuaFunction::call(Contact2D* p1){
         LuaBinding::luaCallback(1, 0, 0);
     }
 };
-
+*/
 template<>
 float LuaFunction::call(float p1){
     if (function != 0){

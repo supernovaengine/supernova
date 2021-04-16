@@ -1,29 +1,33 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef engine_h
 #define engine_h
 
 #include "util/FunctionSubscribe.h"
-
-//
-// (c) 2018 Eduardo Doria.
-//
-
-#define S_GLES2 1
-
-#define S_PLATFORM_ANDROID 1
-#define S_PLATFORM_IOS 2
-#define S_PLATFORM_WEB 3
+#include "math/Rect.h"
 
 namespace Supernova {
 
     class Scene;
-    class Rect;
+    //class Rect;
 
-    enum Scaling{
+    enum class Scaling{
         FITWIDTH,
         FITHEIGHT,
         LETTERBOX,
         CROP,
         STRETCH
+    };
+
+    enum class Platform{
+        MACOS,
+        IOS,
+        WEB,
+        ANDROID,
+        LINUX,
+        WINDOWS
     };
 
     class Engine {
@@ -39,28 +43,33 @@ namespace Supernova {
         static int preferedCanvasHeight;
         
         static Rect viewRect;
+
+        static Scaling scalingMode;
         
-        static int renderAPI;
         static bool callMouseInTouchEvent;
         static bool callTouchInMouseEvent;
         static bool useDegrees;
-        static Scaling scalingMode;
         static bool defaultNearestScaleTexture;
         static bool defaultResampleToPOTTexture;
-        static bool fixedTimeSceneUpdate;
+        static bool automaticTransparency;
+
+        static bool allowEventsOutCanvas;
+        
         static bool fixedTimePhysics;
         static bool fixedTimeAnimations;
 
-        static unsigned long lastTime;
+        static bool fixedTimeSceneUpdate;
+
+        static uint64_t lastTime;
         static float updateTimeCount;
         
-        static float deltatime;
+        static double deltatime;
         static float framerate;
         
         static float updateTime;
         
         static bool transformCoordPos(float& x, float& y);
-
+        
     public:
         
         Engine();
@@ -79,13 +88,10 @@ namespace Supernova {
 
         static void calculateCanvas();
         
-        static Rect* getViewRect();
-        
-        static void setRenderAPI(int renderAPI);
-        static int getRenderAPI();
+        static Rect getViewRect();
         
         static void setScalingMode(Scaling scalingMode);
-        static int getScalingMode();
+        static Scaling getScalingMode();
         
         static void setCallMouseInTouchEvent(bool callMouseInTouchEvent);
         static bool isCallMouseInTouchEvent();
@@ -102,6 +108,12 @@ namespace Supernova {
         static void setDefaultResampleToPOTTexture(bool defaultResampleToPOTTexture);
         static bool isDefaultResampleToPOTTexture();
 
+        static void setAutomaticTransparency(bool automaticTransparency);
+        static bool isAutomaticTransparency();
+
+        static void setAllowEventsOutCanvas(bool allowEventsOutCanvas);
+        static bool isAllowEventsOutCanvas();
+        
         static void setFixedTimeSceneUpdate(bool fixedTimeSceneUpdate);
         static bool isFixedTimeSceneUpdate();
 
@@ -110,48 +122,56 @@ namespace Supernova {
 
         static float getSceneUpdateTime();
         
-        static int getPlatform();
+        static Platform getPlatform();
         static float getFramerate();
         static float getDeltatime();
-        
+
         //-----Supernova API functions-----
-        static void systemStart();
-        static void systemSurfaceCreated();
-        static void systemSurfaceChanged();
+        static void systemInit(int argc, char* argv[]);
+        static void systemViewLoaded();
+        static void systemViewChanged();
         static void systemDraw();
+        static void systemShutdown();
 
         static void systemPause();
         static void systemResume();
 
         static void systemTouchStart(int pointer, float x, float y);
         static void systemTouchEnd(int pointer, float x, float y);
-        static void systemTouchDrag(int pointer, float x, float y);
+        static void systemTouchMove(int pointer, float x, float y);
+        static void systemTouchCancel();
 
-        static void systemMouseDown(int button, float x, float y);
-        static void systemMouseUp(int button, float x, float y);
-        static void systemMouseDrag(int button, float x, float y);
-        static void systemMouseMove(float x, float y);
+        static void systemMouseDown(int button, float x, float y, int mods);
+        static void systemMouseUp(int button, float x, float y, int mods);
+        static void systemMouseMove(float x, float y, int mods);
+        static void systemMouseScroll(float xoffset, float yoffset, int mods);
+        static void systemMouseEnter();
+        static void systemMouseLeave();
 
-        static void systemKeyDown(int inputKey);
-        static void systemKeyUp(int inputKey);
+        static void systemKeyDown(int key, bool repeat, int mods);
+        static void systemKeyUp(int key, bool repeat, int mods);
 
-        static void systemTextInput(const char* text);
+        static void systemCharInput(wchar_t codepoint);
 
         //-----Supernova user events-----
-        static FunctionSubscribe<void()> onCanvasLoaded;
-        static FunctionSubscribe<void()> onCanvasChanged;
+        static FunctionSubscribe<void()> onViewLoaded;
+        static FunctionSubscribe<void()> onViewChanged;
         static FunctionSubscribe<void()> onDraw;
         static FunctionSubscribe<void()> onUpdate;
+        static FunctionSubscribe<void()> onShutdown;
         static FunctionSubscribe<void(int,float,float)> onTouchStart;
         static FunctionSubscribe<void(int,float,float)> onTouchEnd;
-        static FunctionSubscribe<void(int,float,float)> onTouchDrag;
-        static FunctionSubscribe<void(int,float,float)> onMouseDown;
-        static FunctionSubscribe<void(int,float,float)> onMouseUp;
-        static FunctionSubscribe<void(int,float,float)> onMouseDrag;
+        static FunctionSubscribe<void(int,float,float)> onTouchMove;
+        static FunctionSubscribe<void()> onTouchCancel;
+        static FunctionSubscribe<void(int,int)> onMouseDown;
+        static FunctionSubscribe<void(int,int)> onMouseUp;
+        static FunctionSubscribe<void(float,float)> onMouseScroll;
         static FunctionSubscribe<void(float,float)> onMouseMove;
-        static FunctionSubscribe<void(int)> onKeyDown;
-        static FunctionSubscribe<void(int)> onKeyUp;
-        static FunctionSubscribe<void(std::string)> onTextInput;
+        static FunctionSubscribe<void()> onMouseEnter;
+        static FunctionSubscribe<void()> onMouseLeave;
+        static FunctionSubscribe<void(int,bool,int)> onKeyDown;
+        static FunctionSubscribe<void(int,bool,int)> onKeyUp;
+        static FunctionSubscribe<void(wchar_t)> onCharInput;
 
     };
     

@@ -44,21 +44,19 @@ void InterleavedBuffer::clear(){
     vectorBuffer.clear();
 }
 
-void InterleavedBuffer::addAttribute(int attribute, int elements){
+void InterleavedBuffer::addAttribute(AttributeType attribute, int elements){
     if (vectorBuffer.size() == 0) {
         Attribute attData;
         attData.setCount(0);
         attData.setElements(elements);
-        attData.setDataType(DataType::FLOAT);
+        attData.setDataType(AttributeDataType::FLOAT);
         attData.setOffset(vertexSize);
 
         vertexSize += elements * sizeof(float);
 
         Buffer::addAttribute(attribute, attData);
 
-        for (auto &x : attributes) {
-            x.second.setStride(vertexSize);
-        }
+        setStride(vertexSize);
     }
 }
 

@@ -1,12 +1,13 @@
 #include "Angle.h"
 
-#include "Engine.h"
 #include <math.h>
 
 using namespace Supernova;
 
+bool Angle::useDegrees = true;
+
 float Angle::radToDefault(float radians){
-    if (Engine::isUseDegrees()){
+    if (useDegrees){
         return radians * (180.0 / M_PI);
     }else{
         return radians;
@@ -14,7 +15,7 @@ float Angle::radToDefault(float radians){
 }
 
 float Angle::degToDefault(float degrees){
-    if (!Engine::isUseDegrees()){
+    if (!useDegrees){
         return degrees * (M_PI / 180.0);
     }else{
         return degrees;
@@ -22,7 +23,7 @@ float Angle::degToDefault(float degrees){
 }
 
 float Angle::defaultToRad(float angle){
-    if (Engine::isUseDegrees()){
+    if (useDegrees){
         return angle * (M_PI / 180.0);
     }else{
         return angle;
@@ -30,7 +31,7 @@ float Angle::defaultToRad(float angle){
 }
 
 float Angle::defaultToDeg(float angle){
-  if (!Engine::isUseDegrees()){
+  if (!useDegrees){
       return angle * (180.0 / M_PI);
   }else{
       return angle;

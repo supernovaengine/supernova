@@ -10,7 +10,6 @@
 #include <map>
 
 #include "buffer/Buffer.h"
-#include "render/ProgramRender.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
@@ -31,7 +30,7 @@ namespace Supernova{
         virtual void clearAll();
         virtual void clear();
 
-        void addAttribute(int attribute, int elements);
+        void addAttribute(AttributeType attribute, int elements);
 
     };
 

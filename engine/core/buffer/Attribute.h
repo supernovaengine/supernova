@@ -7,7 +7,7 @@
 
 #include <array>
 #include <string>
-#include "render/ObjectRender.h"
+#include "render/Render.h"
 
 namespace Supernova {
 
@@ -16,24 +16,24 @@ namespace Supernova {
         friend class Buffer;
 
     private:
-        DataType dataType;
+        AttributeDataType dataType;
         std::string buffer;
         unsigned int elements;
-        unsigned int stride;
         size_t offset;
         unsigned int count;
+        bool normalized;
 
     public:
 
         Attribute();
-        Attribute(DataType dataType, std::string bufferName, unsigned int elements, unsigned int stride, size_t offset);
+        Attribute(AttributeDataType dataType, std::string bufferName, unsigned int elements, size_t offset, bool normalized);
         Attribute(const Attribute& a);
         virtual ~Attribute();
 
         Attribute& operator = (const Attribute& s);
 
-        DataType getDataType() const;
-        void setDataType(DataType dataType);
+        AttributeDataType getDataType() const;
+        void setDataType(AttributeDataType dataType);
 
         const std::string &getBuffer() const;
         void setBuffer(const std::string &buffer);
@@ -41,14 +41,14 @@ namespace Supernova {
         unsigned int getElements() const;
         void setElements(unsigned int elements);
 
-        unsigned int getStride() const;
-        void setStride(unsigned int stride);
-
         const size_t &getOffset() const;
         void setOffset(const size_t &offset);
 
         unsigned int getCount() const;
         void setCount(unsigned int count);
+
+        bool getNormalized() const;
+        void setNormalized(bool normalized);
 
     };
 

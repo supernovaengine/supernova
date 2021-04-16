@@ -1,19 +1,29 @@
+.vscode
+build
 
-project/*
-!project/assets
-project/assets/*
+### Linux ###
+*~
 
-# --OSX--
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
 
-*.DS_Store
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+### OSX ###
+# General
+.DS_Store
 .AppleDouble
 .LSOverride
 
 # Icon must end with two \r
 Icon
-
-# Visual Studio Code
-.vscode
 
 # Thumbnails
 ._*
@@ -34,15 +44,18 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-
-#--Windows--
-
-# Windows image file caches
+### Windows ###
+# Windows thumbnail cache files
 Thumbs.db
+Thumbs.db:encryptable
 ehthumbs.db
+ehthumbs_vista.db
+
+# Dump file
+*.stackdump
 
 # Folder config file
-Desktop.ini
+[Dd]esktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
@@ -50,22 +63,9 @@ $RECYCLE.BIN/
 # Windows Installer files
 *.cab
 *.msi
+*.msix
 *.msm
 *.msp
 
 # Windows shortcuts
 *.lnk
-
-# --LINUNX--
-
-
-*~
-
-# temporary files which can be created if a process still has a handle open of a deleted file
-.fuse_hidden*
-
-# KDE directory preferences
-.directory
-
-# Linux trash folder which might appear on any partition or disk
-.Trash-*

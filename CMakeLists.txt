@@ -20,7 +20,7 @@ if (NOT EXISTS "${PROJECT_ROOT}")
     message(FATAL_ERROR "Can't find project root directory: ${PROJECT_ROOT}")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(COMPILE_ZLIB OFF)
 set(IS_ARM OFF)
 set(SUPERNOVA_GLES2 ON)
@@ -33,6 +33,7 @@ set(PLATFORM_PROPERTIES)
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     add_definitions("-DSUPERNOVA_WEB")
+    add_definitions("-DSOKOL_GLES2")
     add_definitions("-DWITH_SDL_STATIC") # For SoLoud
 
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
@@ -50,6 +51,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 
     list(APPEND PLATFORM_SOURCE
         ${PLATFORM_ROOT}/SupernovaWeb.cpp
+        ${PLATFORM_ROOT}/main.cpp
     )
 
     list(APPEND PLATFORM_LIBS
@@ -66,110 +68,54 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     )
 endif()
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
-    add_definitions("-DSUPERNOVA_ANDROID")
-    add_definitions("-D\"lua_getlocaledecpoint()='.'\"")
-    add_definitions("-DLUA_ANSI")
-    add_definitions("-DLUA_USE_C89")
-    add_definitions("-DWITH_MINIAUDIO") # For SoLoud
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_definitions("-DSUPERNOVA_SOKOL")
+    add_definitions("-DSOKOL_GLCORE33")
 
-    set(APP_NAME supernova-android) # Android uses a fixed library name
+    file(COPY "${PROJECT_ROOT}/assets" DESTINATION ${CMAKE_BINARY_DIR})
 
-    if( ANDROID_ABI MATCHES "^arm(eabi)?(-v7a)?(64-v8a)?$" )
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon")
-        set(IS_ARM ON)
-    endif()
-
-    set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/android)
+    set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
 
     list(APPEND PLATFORM_SOURCE
-        ${PLATFORM_ROOT}/AndroidJNI.cpp
-        ${PLATFORM_ROOT}/SupernovaAndroid.cpp
+        ${PLATFORM_ROOT}/SupernovaSokol.cpp
+        ${PLATFORM_ROOT}/main.cpp
     )
 
     list(APPEND PLATFORM_LIBS
-        log android EGL GLESv2 OpenSLES
+        
     )
 endif()
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
-    add_definitions("-DSUPERNOVA_IOS")
-    add_definitions("-DWITH_MINIAUDIO") # For SoLoud
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    include_directories (/usr/local/include)
+    link_directories(/usr/local/lib)
 
-    set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/ios)
+    add_definitions("-DSUPERNOVA_SOKOL")
+    #add_definitions("-DSOKOL_GLCORE33")
+    add_definitions("-DSOKOL_METAL")
 
-    set(APP_BUNDLE_IDENTIFIER "org.supernovaengine.supernova") 
-    
-    set(PRODUCT_NAME ${APP_NAME})
-    set(EXECUTABLE_NAME ${APP_NAME})
-    
-    set(MACOSX_BUNDLE_EXECUTABLE_NAME ${APP_NAME})
-    set(MACOSX_BUNDLE_INFO_STRING ${APP_BUNDLE_IDENTIFIER})
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER ${APP_BUNDLE_IDENTIFIER})
-    set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_BUNDLE_IDENTIFIER})
-    set(MACOSX_BUNDLE_ICON_FILE "")
-    set(MACOSX_BUNDLE_LONG_VERSION_STRING "1.0")
-    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
-    set(MACOSX_BUNDLE_COPYRIGHT "(c) 2020 Eduardo Doria")
+    file(COPY "${PROJECT_ROOT}/assets" DESTINATION ${CMAKE_BINARY_DIR})
 
-    include_directories (/System/Library/Frameworks)
+    set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
 
     list(APPEND PLATFORM_SOURCE
-        ${PLATFORM_ROOT}/main.m 
-        ${PLATFORM_ROOT}/AppDelegate.h 
-        ${PLATFORM_ROOT}/AppDelegate.m 
-        ${PLATFORM_ROOT}/EAGLView.h
-        ${PLATFORM_ROOT}/EAGLView.mm
-        ${PLATFORM_ROOT}/GameViewController.h
-        ${PLATFORM_ROOT}/GameViewController.mm
-        ${PLATFORM_ROOT}/SupernovaIOS.h
-        ${PLATFORM_ROOT}/SupernovaIOS.mm
-        ${PLATFORM_ROOT}/IOSMacros.pch
+        ${PLATFORM_ROOT}/SupernovaSokol.cpp
+        ${PLATFORM_ROOT}/main.cpp
     )
-
-    list(APPEND PLATFORM_RESOURCES
-        ${PLATFORM_ROOT}/Base.lproj/LaunchScreen.storyboard
-        ${PLATFORM_ROOT}/Base.lproj/Main.storyboard
-    )
-
-    find_library(UIKIT_LIBRARY UIKit)
-    find_library(OPENGLES_LIBRARY OpenGLES)
-    find_library(AV_FOUNDATION_LIBRARY AVFoundation)
-    find_library(QUARTZCORE_LIBRARY QuartzCore)
-    find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
-
+   
     list(APPEND PLATFORM_LIBS
-        ${UIKIT_LIBRARY} ${OPENGLES_LIBRARY} ${AV_FOUNDATION_LIBRARY} ${QUARTZCORE_LIBRARY} ${AUDIOTOOLBOX_LIBRARY}
+        
     )
-
-    list(APPEND PLATFORM_PROPERTIES
-        XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${PLATFORM_ROOT}/IOSMacros.pch"
-        MACOSX_BUNDLE_INFO_PLIST "${PLATFORM_ROOT}/plist.in"
-    )
-
 endif()
 
+include_directories (${PLATFORM_ROOT})
+include_directories (${SUPERNOVA_ROOT}/engine/libs/sokol)
+include_directories (${SUPERNOVA_ROOT}/engine/core)
+include_directories (${SUPERNOVA_ROOT}/engine/core/ecs)
+include_directories (${SUPERNOVA_ROOT}/engine/core/object)
+include_directories (${SUPERNOVA_ROOT}/engine/renders)
 
-include_directories ("${PLATFORM_ROOT}")
-include_directories ("${SUPERNOVA_ROOT}/engine/core")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/action")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/action/keyframe")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/action/particleinit")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/action/particlemod")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/audio")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/buffer")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/image")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/io")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/math")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/physics")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/script")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/system")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/render")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/ui")
-include_directories ("${SUPERNOVA_ROOT}/engine/core/util")
-
-add_subdirectory (${SUPERNOVA_ROOT}/engine)
+add_subdirectory(${SUPERNOVA_ROOT}/engine)
 
 file(GLOB_RECURSE PROJECT_SOURCE ${PROJECT_ROOT}/*.cpp)
 

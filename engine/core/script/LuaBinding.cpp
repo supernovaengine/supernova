@@ -4,14 +4,15 @@
 
 #include "LuaBinding.h"
 
+#include "Log.h"
+#include "System.h"
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
 
 #include "LuaIntf/LuaIntf.h"
-
-#include "Engine.h"
-#include "system/System.h"
+/*
 #include "Object.h"
 #include "GraphicObject.h"
 #include "Log.h"
@@ -70,10 +71,12 @@
 #include "action/particlemod/ParticleSizeMod.h"
 #include "action/particlemod/ParticleSpriteMod.h"
 #include "action/particlemod/ParticleVelocityMod.h"
-
+*/
 #include <map>
 #include <unistd.h>
 #include <locale>
+#include <vector>
+#include <memory>
 
 using namespace Supernova;
 
@@ -264,7 +267,7 @@ void LuaBinding::bind(){
 }
 
 void LuaBinding::registerClasses(lua_State *L){
-
+/*
     LuaIntf::LuaBinding(L).beginClass<Engine>("Engine")
             .addConstructor(LUA_ARGS())
             .addStaticFunction("setScene", &Engine::setScene)
@@ -933,4 +936,5 @@ void LuaBinding::registerClasses(lua_State *L){
             .addFunction("getFromVelocity", &ParticleVelocityMod::getFromVelocity)
             .addFunction("getToVelocity", &ParticleVelocityMod::getToVelocity)
             .endClass();
+*/
 }

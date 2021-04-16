@@ -10,10 +10,12 @@
 #define FUNCTIONSUBSCRIBE_H
 
 #include <functional>
+#include <type_traits>
+#include <memory>
 #include <string>
 #include <vector>
+#include <algorithm> 
 #include "Function.h"
-#include "IntegerSequence.h"
 
 template<size_t>
 struct MyPlaceholder {};
@@ -44,7 +46,7 @@ namespace Supernova {
         }
 
         template<typename T, size_t... Idx>
-        std::function<Ret(Args...)> bindImpl(T *obj, Ret(T::*funcPtr)(Args...), index_sequence<Idx...>) {
+        std::function<Ret(Args...)> bindImpl(T *obj, Ret(T::*funcPtr)(Args...), std::index_sequence<Idx...>) {
             return std::bind(funcPtr, obj, getPlaceholder<Idx>()...);
         }
 
@@ -105,14 +107,14 @@ namespace Supernova {
         template<typename T, Ret(T::*funcPtr)(Args...)>
         bool add(const std::string& tag, std::shared_ptr<T> obj)
         {
-            addImpl(tag, bindImpl(obj.get(), funcPtr, index_sequence_for<Args...>{}));
+            addImpl(tag, bindImpl(obj.get(), funcPtr, std::index_sequence_for<Args...>{}));
             return true;
         }
 
         template<typename T, Ret(T::*funcPtr)(Args...)>
         bool add(const std::string& tag, T* obj)
         {
-            addImpl(tag, bindImpl(obj, funcPtr, index_sequence_for<Args...>{}));
+            addImpl(tag, bindImpl(obj, funcPtr, std::index_sequence_for<Args...>{}));
             return true;
         }
 

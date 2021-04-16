@@ -1,0 +1,28 @@
+#ifndef SokolShader_h
+#define SokolShader_h
+
+#include "render/Render.h"
+
+#include "sokol_gfx.h"
+
+namespace Supernova{
+    class SokolShader{
+
+    private:
+        sg_shader shader;
+
+    public:
+        SokolShader();
+        SokolShader(const SokolShader& rhs);
+        SokolShader& operator=(const SokolShader& rhs);
+
+        bool createShader(ShaderType shaderType);
+
+        void destroyShader();
+
+        sg_shader get();
+    };
+}
+
+
+#endif /* SokolShader_h */

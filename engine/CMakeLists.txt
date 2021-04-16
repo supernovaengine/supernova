@@ -1,40 +1,47 @@
-add_definitions("-frtti -fexceptions")
-# add_definitions("-Wall -Wextra")
+if(DEFINED NO_LUA_INIT)
+    add_definitions("-DNO_LUA_INIT=${NO_LUA_INIT}")
+    unset(NO_LUA_INIT CACHE)
+endif()
+if(DEFINED NO_CPP_INIT)
+    add_definitions("-DNO_CPP_INIT=${NO_CPP_INIT}")
+    unset(NO_CPP_INIT CACHE)
+endif()
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/lua")
-add_subdirectory (libs/lua)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/luaintf")
-add_subdirectory (libs/luaintf)
+include_directories(libs/json)
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/tinyobjloader")
-add_subdirectory (libs/tinyobjloader)
+include_directories(libs/sokol)
+include_directories(libs/lua)
+include_directories(libs/luaintf)
+include_directories(libs/stb)
+include_directories(libs/tinyobjloader)
+include_directories(libs/tinygltf)
 
-if (COMPILE_ZLIB)
-    include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/zlib")
-    add_subdirectory (libs/zlib)
-endif (COMPILE_ZLIB)
+add_subdirectory(libs/sokol)
+add_subdirectory(libs/lua)
+add_subdirectory(libs/luaintf)
+add_subdirectory(libs/stb)
+add_subdirectory(libs/tinyobjloader)
+add_subdirectory(libs/tinygltf)
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/soloud/include")
-add_subdirectory (libs/soloud)
+file(GLOB_RECURSE SUPERNOVA_SRCS core/*.cpp)
+file(GLOB RENDER_SOKOL_SRC renders/sokol/*.cpp)
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/stb")
-add_subdirectory (libs/stb)
+add_library(
+    supernova
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/json")
+    STATIC
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/tinygltf")
-add_subdirectory (libs/tinygltf)
+    ${RENDER_SOKOL_SRC}
+    ${SUPERNOVA_SRCS}
+)
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/tinyxml2")
-add_subdirectory (libs/tinyxml2)
+target_link_libraries(
+    supernova
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/libs/box2d")
-add_subdirectory (libs/box2d)
+    sokol lua luaintf stb tinyobjloader tinygltf
 
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/renders")
-add_subdirectory (renders)
-
-include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/core")
-add_subdirectory (core)
-
+    #supernova-renders
+    #soloud box2d tinyxml2
+)

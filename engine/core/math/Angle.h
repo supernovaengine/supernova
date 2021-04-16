@@ -4,7 +4,9 @@
 
 namespace Supernova {
 
-    class Angle{
+    class Angle {
+    private:
+        static bool useDegrees;
 
     public:
 

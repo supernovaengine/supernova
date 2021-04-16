@@ -2,7 +2,7 @@
 #define SupernovaWeb_h
 
 #include <emscripten/html5.h>
-#include "system/System.h"
+#include "System.h"
 
 class SupernovaWeb: public Supernova::System{
 
@@ -21,8 +21,8 @@ private:
 
     static void renderLoop();
 
-    static void unicode_to_utf8(char *b, unsigned long c);
-    static size_t utf8len(const char *s);
+    static wchar_t toCodepoint(const std::string &u);
+    static std::string toUTF8(wchar_t cp);
     static int supernova_mouse_button(int button);
     static int supernova_legacy_input(int code);
     static int supernova_input(const char code[32]);
@@ -33,7 +33,7 @@ public:
 
     static void setEnabledIDB(bool enabledIDB);
 
-    static int init(int width, int height);
+    static int init(int argc, char **argv);
     static void changeCanvasSize(int width, int height);
 
     virtual int getScreenWidth();

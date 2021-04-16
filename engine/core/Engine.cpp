@@ -1,38 +1,20 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #include "Engine.h"
-
-#include <iostream>
-
-#include "Supernova.h"
-
 #include "Scene.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
-
-#include "math/Rect.h"
-#include "Log.h"
-#include "script/LuaBinding.h"
-
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-//#include "Mesh.h"
-
-#include "audio/SoundManager.h"
-#include "system/System.h"
+#include "Supernova.h"
+#include "System.h"
 #include "Input.h"
+#include "render/SystemRender.h"
 
-//
-// (c) 2018 Eduardo Doria.
-//
+#include "sokol_time.h"
 
 using namespace Supernova;
 
 //-----Supernova user config-----
-Scene *Engine::mainScene;
+Scene *Engine::mainScene = NULL;
 
 int Engine::canvasWidth;
 int Engine::canvasHeight;
@@ -42,49 +24,47 @@ int Engine::preferedCanvasHeight;
 
 Rect Engine::viewRect;
 
-int Engine::renderAPI;
+Scaling Engine::scalingMode;
+
 bool Engine::callMouseInTouchEvent;
 bool Engine::callTouchInMouseEvent;
 bool Engine::useDegrees;
-Scaling Engine::scalingMode;
 bool Engine::defaultNearestScaleTexture;
 bool Engine::defaultResampleToPOTTexture;
+bool Engine::automaticTransparency;
+bool Engine::allowEventsOutCanvas;
 bool Engine::fixedTimeSceneUpdate;
 bool Engine::fixedTimePhysics;
 bool Engine::fixedTimeAnimations;
 
-unsigned long Engine::lastTime = 0;
+uint64_t Engine::lastTime = 0;
 float Engine::updateTimeCount = 0;
 
-float Engine::deltatime = 0;
+double Engine::deltatime = 0;
 float Engine::framerate = 0;
 
 float Engine::updateTime = 0.03;
 
 //-----Supernova user events-----
-FunctionSubscribe<void()> Engine::onCanvasLoaded;
-FunctionSubscribe<void()> Engine::onCanvasChanged;
+FunctionSubscribe<void()> Engine::onViewLoaded;
+FunctionSubscribe<void()> Engine::onViewChanged;
 FunctionSubscribe<void()> Engine::onDraw;
 FunctionSubscribe<void()> Engine::onUpdate;
+FunctionSubscribe<void()> Engine::onShutdown;
 FunctionSubscribe<void(int,float,float)> Engine::onTouchStart;
 FunctionSubscribe<void(int,float,float)> Engine::onTouchEnd;
-FunctionSubscribe<void(int,float,float)> Engine::onTouchDrag;
-FunctionSubscribe<void(int,float,float)> Engine::onMouseDown;
-FunctionSubscribe<void(int,float,float)> Engine::onMouseUp;
-FunctionSubscribe<void(int,float,float)> Engine::onMouseDrag;
+FunctionSubscribe<void(int,float,float)> Engine::onTouchMove;
+FunctionSubscribe<void()> Engine::onTouchCancel;
+FunctionSubscribe<void(int,int)> Engine::onMouseDown;
+FunctionSubscribe<void(int,int)> Engine::onMouseUp;
+FunctionSubscribe<void(float,float)> Engine::onMouseScroll;
 FunctionSubscribe<void(float,float)> Engine::onMouseMove;
-FunctionSubscribe<void(int)> Engine::onKeyDown;
-FunctionSubscribe<void(int)> Engine::onKeyUp;
-FunctionSubscribe<void(std::string)> Engine::onTextInput;
+FunctionSubscribe<void()> Engine::onMouseEnter;
+FunctionSubscribe<void()> Engine::onMouseLeave;
+FunctionSubscribe<void(int,bool,int)> Engine::onKeyDown;
+FunctionSubscribe<void(int,bool,int)> Engine::onKeyUp;
+FunctionSubscribe<void(wchar_t)> Engine::onCharInput;
 
-
-Engine::Engine() {
-    this->mainScene = NULL;
-}
-
-Engine::~Engine() {
-    
-}
 
 void Engine::setScene(Scene *mainScene){
     Engine::mainScene = mainScene;
@@ -109,24 +89,6 @@ void Engine::setCanvasSize(int canvasWidth, int canvasHeight){
     calculateCanvas();
 }
 
-void Engine::calculateCanvas(){
-    Engine::canvasWidth = preferedCanvasWidth;
-    Engine::canvasHeight = preferedCanvasHeight;
-
-    int screenWidth = System::instance().getScreenWidth();
-    int screenHeight = System::instance().getScreenHeight();
-
-    //When canvas size is changed
-    if (scalingMode == Scaling::FITWIDTH){
-        Engine::canvasWidth = preferedCanvasWidth;
-        Engine::canvasHeight = screenHeight * preferedCanvasWidth / screenWidth;
-    }
-    if (scalingMode == Scaling::FITHEIGHT){
-        Engine::canvasHeight = preferedCanvasHeight;
-        Engine::canvasWidth = screenWidth * preferedCanvasHeight / screenHeight;
-    }
-}
-
 int Engine::getPreferedCanvasWidth(){
     return Engine::preferedCanvasWidth;
 }
@@ -135,29 +97,22 @@ int Engine::getPreferedCanvasHeight(){
     return Engine::preferedCanvasHeight;
 }
 
-Rect* Engine::getViewRect(){
-    return &viewRect;
-}
-
-void Engine::setRenderAPI(int renderAPI){
-    Engine::renderAPI = renderAPI;
-}
-
-int Engine::getRenderAPI(){
-    return renderAPI;
+Rect Engine::getViewRect(){
+    return viewRect;
 }
 
 void Engine::setScalingMode(Scaling scalingMode){
     Engine::scalingMode = scalingMode;
 }
 
-int Engine::getScalingMode(){
+Scaling Engine::getScalingMode(){
     return scalingMode;
 }
 
 void Engine::setCallMouseInTouchEvent(bool callMouseInTouchEvent){
     Engine::callMouseInTouchEvent = callMouseInTouchEvent;
 }
+
 bool Engine::isCallMouseInTouchEvent(){
     return Engine::callMouseInTouchEvent;
 }
@@ -165,6 +120,7 @@ bool Engine::isCallMouseInTouchEvent(){
 void Engine::setCallTouchInMouseEvent(bool callTouchInMouseEvent){
     Engine::callTouchInMouseEvent = callTouchInMouseEvent;
 }
+
 bool Engine::isCallTouchInMouseEvent(){
     return Engine::callTouchInMouseEvent;
 }
@@ -193,6 +149,22 @@ bool Engine::isDefaultResampleToPOTTexture(){
     return defaultResampleToPOTTexture;
 }
 
+void Engine::setAutomaticTransparency(bool automaticTransparency){
+    Engine::automaticTransparency = automaticTransparency;
+}
+
+bool Engine::isAutomaticTransparency(){
+    return automaticTransparency;
+}
+
+void Engine::setAllowEventsOutCanvas(bool allowEventsOutCanvas){
+    Engine::allowEventsOutCanvas = allowEventsOutCanvas;
+}
+
+bool Engine::isAllowEventsOutCanvas(){
+    return allowEventsOutCanvas;
+}
+
 void Engine::setFixedTimeSceneUpdate(bool fixedTimeSceneUpdate) {
     Engine::fixedTimeSceneUpdate = fixedTimeSceneUpdate;
 }
@@ -217,22 +189,25 @@ float Engine::getSceneUpdateTime(){
     }
 }
 
-
-int Engine::getPlatform(){
-    
-#ifdef SUPERNOVA_IOS
-    return S_PLATFORM_IOS;
+Platform Engine::getPlatform(){
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+    return Platform::WINDOWS;
+#elif __APPLE__
+    #include <TargetConditionals.h>
+    #if TARGET_IPHONE_SIMULATOR
+    return Platform::IOS;
+    #elif TARGET_OS_IPHONE
+    return Platform::IOS;
+    #elif TARGET_OS_MAC
+    return Platform::MACOS;
+    #endif
+#elif __ANDROID__
+    return Platform::ANDROID;
+#elif __EMSCRIPTEN__
+    return Platform::WEB;
+#elif __linux__
+    return Platform::LINUX;
 #endif
-    
-#ifdef SUPERNOVA_ANDROID
-    return S_PLATFORM_ANDROID;
-#endif
-    
-#ifdef SUPERNOVA_WEB
-    return S_PLATFORM_WEB;
-#endif
-    
-    return 0;
 }
 
 float Engine::getFramerate(){
@@ -243,41 +218,56 @@ float Engine::getDeltatime(){
     return deltatime;
 }
 
-void Engine::systemStart(){
+void Engine::calculateCanvas(){
+    Engine::canvasWidth = preferedCanvasWidth;
+    Engine::canvasHeight = preferedCanvasHeight;
+
+    int screenWidth = System::instance().getScreenWidth();
+    int screenHeight = System::instance().getScreenHeight();
+
+    //When canvas size is changed
+    if (screenWidth != 0 && screenHeight != 0){
+        if (scalingMode == Scaling::FITWIDTH){
+            Engine::canvasWidth = preferedCanvasWidth;
+            Engine::canvasHeight = screenHeight * preferedCanvasWidth / screenWidth;
+        }
+        if (scalingMode == Scaling::FITHEIGHT){
+            Engine::canvasHeight = preferedCanvasHeight;
+            Engine::canvasWidth = screenWidth * preferedCanvasHeight / screenHeight;
+        }
+    }
+}
+
+void Engine::systemInit(int argc, char* argv[]){
 
     Engine::setCanvasSize(1000,480);
     Engine::setScalingMode(Scaling::FITWIDTH);
     Engine::setCallMouseInTouchEvent(false);
     Engine::setCallTouchInMouseEvent(false);
     Engine::setUseDegrees(true);
-    Engine::setRenderAPI(S_GLES2);
     Engine::setDefaultNearestScaleTexture(false);
     Engine::setDefaultResampleToPOTTexture(true);
+    Engine::setAutomaticTransparency(true);
+    Engine::setAllowEventsOutCanvas(false);
     Engine::setFixedTimeSceneUpdate(false);
+
+    stm_setup();
     
-    auto now = std::chrono::steady_clock::now();
-    lastTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-    
-    LuaBinding::createLuaState();
-    LuaBinding::bind();
-    
+    std::vector<std::string> args(argv, argv + argc);
+    System::instance().args = args;
+
     #ifndef NO_CPP_INIT
     init();
     #endif
-    
 }
 
-void Engine::systemSurfaceCreated(){
-
-    if (Engine::getScene() != NULL){
-        (Engine::getScene())->load();
-    }
-
-    onCanvasLoaded.call();
+void Engine::systemViewLoaded(){
+    SystemRender::setup();
+    onViewLoaded.call();
+    mainScene->load();
 }
 
-void Engine::systemSurfaceChanged() {
-
+void Engine::systemViewChanged(){
     calculateCanvas();
 
     int screenWidth = System::instance().getScreenWidth();
@@ -329,21 +319,17 @@ void Engine::systemSurfaceChanged() {
     viewRect.setRect(viewX, viewY, viewWidth, viewHeight);
 
     if (Engine::getScene() != NULL){
-        (Engine::getScene())->updateCameraSize();
+        Engine::getScene()->updateCameraSize();
     }
 
-    onCanvasChanged.call();
+    onViewChanged.call();
 }
 
-void Engine::systemDraw() {
-    
-    auto now = std::chrono::steady_clock::now();
-    unsigned long newTime = (unsigned long)std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-    
-    deltatime = (newTime - lastTime) / 1000.0f;
-    lastTime = newTime;
-    framerate = 1 / (float)deltatime;
-    
+void Engine::systemDraw(){
+    //Deltatime in seconds
+    deltatime = stm_sec(stm_laptime(&lastTime));
+    framerate = 1 / deltatime;
+
     int updateLoops = 0;
     updateTimeCount += deltatime;
     while (updateTimeCount >= updateTime && updateLoops <= 100){
@@ -353,38 +339,47 @@ void Engine::systemDraw() {
         Engine::onUpdate.call();
 
         if (isFixedTimeSceneUpdate() && Engine::getScene())
-            (Engine::getScene())->update();
+            mainScene->update(updateTime);
     }
     if (updateLoops > 100){
         Log::Warn("More than 100 updates in a frame");
     }
 
-    if (!isFixedTimeSceneUpdate() && Engine::getScene())
-        (Engine::getScene())->update();
+    if (!isFixedTimeSceneUpdate() && Engine::getScene()){
+        mainScene->update(deltatime);
+    }
 
     Engine::onDraw.call();
 
     if (Engine::getScene())
-        (Engine::getScene())->draw();
+        mainScene->draw();
     
-    SoundManager::checkActive();
-    
+    //SoundManager::checkActive();
+}
+
+void Engine::systemShutdown(){
+    SystemRender::shutdown();
+    Engine::onShutdown.call();
 }
 
 void Engine::systemPause(){
-    SoundManager::pauseAll();
+    //SoundManager::pauseAll();
 }
 
 void Engine::systemResume(){
-    SoundManager::resumeAll();
+    //SoundManager::resumeAll();
 }
 
 bool Engine::transformCoordPos(float& x, float& y){
-    x = (x * (float)System::instance().getScreenWidth() / viewRect.getWidth());
-    y = (y * (float)System::instance().getScreenHeight() / viewRect.getHeight());
+
+    x = (x - viewRect.getX()) / viewRect.getWidth();
+    y = (y - viewRect.getY()) / viewRect.getHeight();
     
-    x = ((float)Engine::getCanvasWidth() * (x+1)) / 2;
-    y = ((float)Engine::getCanvasHeight() * (y+1)) / 2;
+    x = (float)Engine::getCanvasWidth() * x;
+    y = (float)Engine::getCanvasHeight() * y;
+    
+    if (allowEventsOutCanvas)
+        return true;
     
     return ((x >= 0) && (x <= Engine::getCanvasWidth()) && (y >= 0) && (y <= Engine::getCanvasHeight()));
 }
@@ -393,12 +388,11 @@ void Engine::systemTouchStart(int pointer, float x, float y){
     if (transformCoordPos(x, y)){
         //-----------------
         Engine::onTouchStart.call(pointer, x, y);
-        Input::addTouchStarted();
-        Input::setTouchPosition(x, y);
+        Input::addTouch(pointer, x, y);
         //-----------------
         if (Engine::isCallMouseInTouchEvent()){
             //-----------------
-            Engine::onMouseDown.call(100, x, y);
+            Engine::onMouseDown.call(100, 0);
             Input::addMousePressed(100);
             Input::setMousePosition(x, y);
             //-----------------
@@ -410,12 +404,11 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
     if (transformCoordPos(x, y)){
         //-----------------
         Engine::onTouchEnd.call(pointer, x, y);
-        Input::releaseTouchStarted();
-        Input::setTouchPosition(x, y);
+        Input::removeTouch(pointer);
         //-----------------
         if (Engine::isCallMouseInTouchEvent()){
             //-----------------
-            Engine::onMouseUp.call(100, x, y);
+            Engine::onMouseUp.call(100, 0);
             Input::releaseMousePressed(100);
             Input::setMousePosition(x, y);
             //-----------------
@@ -423,92 +416,115 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
     }
 }
 
-void Engine::systemTouchDrag(int pointer, float x, float y){
+void Engine::systemTouchMove(int pointer, float x, float y){
     if (transformCoordPos(x, y)){
         //-----------------
-        Engine::onTouchDrag.call(pointer, x, y);
-        Input::setTouchPosition(x, y);
+        Engine::onTouchMove.call(pointer, x, y);
+        Input::setTouchPosition(pointer, x, y);
         //-----------------
         if (Engine::isCallMouseInTouchEvent()){
             //-----------------
-            Engine::onMouseDrag.call(100, x, y);
+            Engine::onMouseMove.call(x, y);
             Input::setMousePosition(x, y);
             //-----------------
         }
     }
 }
 
-void Engine::systemMouseDown(int button, float x, float y){
+void Engine::systemTouchCancel(){
+    //-----------------
+    Engine::onTouchCancel.call();
+    Input::clearTouches();
+    //-----------------
+}
+
+void Engine::systemMouseDown(int button, float x, float y, int mods){
     if (transformCoordPos(x, y)){
         //-----------------
-        Engine::onMouseDown.call(button, x, y);
+        Engine::onMouseDown.call(button, mods);
         Input::addMousePressed(button);
         Input::setMousePosition(x, y);
+        Input::setModifiers(mods);
         //-----------------
         if (Engine::isCallTouchInMouseEvent()){
             //-----------------
             Engine::onTouchStart.call(100, x, y);
-            Input::addTouchStarted();
-            Input::setTouchPosition(x, y);
+            Input::addTouch(100, x, y);
             //-----------------
         }
     }
 }
-void Engine::systemMouseUp(int button, float x, float y){
+void Engine::systemMouseUp(int button, float x, float y, int mods){
     if (transformCoordPos(x, y)){
         //-----------------
-        Engine::onMouseUp.call(button, x, y);
+        Engine::onMouseUp.call(button, mods);
         Input::releaseMousePressed(button);
         Input::setMousePosition(x, y);
+        Input::setModifiers(mods);
         //-----------------
         if (Engine::isCallTouchInMouseEvent()){
             //-----------------
             Engine::onTouchEnd.call(100, x, y);
-            Input::releaseTouchStarted();
-            Input::setTouchPosition(x, y);
+            Input::removeTouch(100);
             //-----------------
         }
     }
 }
 
-void Engine::systemMouseDrag(int button, float x, float y){
-    if (transformCoordPos(x, y)){
-        //-----------------
-        Engine::onMouseDrag.call(button, x, y);
-        Input::setMousePosition(x, y);
-        //-----------------
-        if (Engine::isCallTouchInMouseEvent()){
-            //-----------------
-            Engine::onTouchDrag.call(100, x, y);
-            Input::setTouchPosition(x, y);
-            //-----------------
-        }
-    }
-}
-
-void Engine::systemMouseMove(float x, float y){
+void Engine::systemMouseMove(float x, float y, int mods){
     if (transformCoordPos(x, y)){
         //-----------------
         Engine::onMouseMove.call(x, y);
         Input::setMousePosition(x, y);
+        Input::setModifiers(mods);
         //-----------------
+        if (Engine::isCallTouchInMouseEvent()){
+            //-----------------
+            if (Input::isMousePressed(S_MOUSE_BUTTON_LEFT) || Input::isMousePressed(S_MOUSE_BUTTON_RIGHT)){
+                Engine::onTouchMove.call(100, x, y);
+                Input::setTouchPosition(100, x, y);
+            }
+            //-----------------
+        }
     }
 }
 
-void Engine::systemKeyDown(int inputKey){
+void Engine::systemMouseScroll(float xoffset, float yoffset, int mods){
     //-----------------
-    Engine::onKeyDown.call(inputKey);
-    Input::addKeyPressed(inputKey);
-    //-----------------
-}
-
-void Engine::systemKeyUp(int inputKey){
-    //-----------------
-    Engine::onKeyUp.call(inputKey);
-    Input::releaseKeyPressed(inputKey);
+    Engine::onMouseScroll.call(xoffset, yoffset);
+    Input::setMouseScroll(xoffset, yoffset);
+    Input::setModifiers(mods);
     //-----------------
 }
 
-void Engine::systemTextInput(const char* text){
-    onTextInput.call(text);
+void Engine::systemMouseEnter(){
+    //-----------------
+    Engine::onMouseEnter.call();
+    Input::addMouseEntered();
+    //-----------------
+}
+
+void Engine::systemMouseLeave(){
+    //-----------------
+    Engine::onMouseLeave.call();
+    Input::releaseMouseEntered();
+    //-----------------
+}
+
+void Engine::systemKeyDown(int key, bool repeat, int mods){
+    //-----------------
+    Engine::onKeyDown.call(key, repeat, mods);
+    Input::addKeyPressed(key);
+    //-----------------
+}
+
+void Engine::systemKeyUp(int key, bool repeat, int mods){
+    //-----------------
+    Engine::onKeyUp.call(key, repeat, mods);
+    Input::releaseKeyPressed(key);
+    //-----------------
+}
+
+void Engine::systemCharInput(wchar_t codepoint){
+    onCharInput.call(codepoint);
 }
