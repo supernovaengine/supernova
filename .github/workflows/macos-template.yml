@@ -1,0 +1,22 @@
+name: MacOS Xcode Template
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Xcode version
+        run: /usr/bin/xcodebuild -version
+             
+      - name: Create assets dir if not exist
+        run: mkdir -p project/assets
+             
+      - name: Build with Xcode
+        run: |
+          cd workspaces/xcode/
+          xcodebuild build -sdk macosx -project Supernova.xcodeproj -configuration Debug -scheme supernova-macos
