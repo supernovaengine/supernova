@@ -4,6 +4,12 @@
 ![](https://github.com/supernovaengine/supernova/workflows/Android/badge.svg)
 ![](https://github.com/supernovaengine/supernova/workflows/Web/badge.svg)
 
+
+
+**This version is deprecated, working now on [ecs](https://github.com/supernovaengine/supernova/tree/ecs) branch**
+
+
+
 Supernova is a **free** and open source cross-platform game engine for create 2D and 3D projects with Lua or C++. It is lightweight and promote the simplest way to do the best results.
 
 Licensed under MIT license, you can use freely for whatever you want, including commercial projects.
@@ -18,10 +24,6 @@ For future versions:
   - OSX
   - Linux
 
-
-**Supernova is NOT ready for Production!**
-
-Please, don't try. We are under development. :-)
 
 ## Getting started
 
