@@ -22,6 +22,8 @@ bool RenderSystem::emptyTexturesCreated = false;
 RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 	signature.set(scene->getComponentType<Transform>());
 	signature.set(scene->getComponentType<MeshComponent>());
+
+	hasLights = false;
 }
 
 void RenderSystem::load(){
@@ -73,19 +75,13 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 	for (int i = 0; i < mesh.numSubmeshes; i++){
 
+		mesh.submeshes[i].hasNormalMap = false;
+		mesh.submeshes[i].hasTangent = false;
+		mesh.submeshes[i].hasVertexColor = false;
+
 		ObjectRender* render = &mesh.submeshes[i].render;
 
 		render->beginLoad(mesh.submeshes[i].primitiveType);
-
-		mesh.submeshes[i].material.baseColorTexture.load();
-		
-		TextureRender* baseColorTextureRender = mesh.submeshes[i].material.baseColorTexture.getRender();
-		if (baseColorTextureRender){
-			mesh.submeshes[i].shaderType = ShaderType::MESH_PBR;
-			render->loadTexture(baseColorTextureRender, TextureSamplerType::BASECOLOR);
-		}else{
-			mesh.submeshes[i].shaderType = ShaderType::MESH;
-		}
 
 		if (Engine::isAutomaticTransparency()){
 			if (mesh.submeshes[i].material.baseColorTexture.isTransparent() || mesh.submeshes[i].material.baseColorFactor.w != 1.0){
@@ -93,35 +89,76 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			}
 		}
 
-		if (mesh.submeshes[i].shaderType == ShaderType::MESH_PBR){
+		TextureRender* textureRender = NULL;
+		textureRender = mesh.submeshes[i].material.baseColorTexture.getRender();
+		if (textureRender)
+			render->loadTexture(textureRender, TextureSamplerType::BASECOLOR);
+		else
+			render->loadTexture(&emptyWhite, TextureSamplerType::BASECOLOR);
+
+		if (hasLights){
 			TextureRender* textureRender = NULL;
 			textureRender = mesh.submeshes[i].material.metallicRoughnessTexture.getRender();
-			if (!textureRender)
-				render->loadTexture(&emptyWhite, TextureSamplerType::METALLICROUGHNESS);
-			else
+			if (textureRender)	
 				render->loadTexture(textureRender, TextureSamplerType::METALLICROUGHNESS);
+			else
+				render->loadTexture(&emptyWhite, TextureSamplerType::METALLICROUGHNESS);
 
 			textureRender = mesh.submeshes[i].material.normalTexture.getRender();
-			if (!textureRender){
-				mesh.submeshes[i].shaderType = ShaderType::MESH_PBR_NONMAP_NOTAN;
-				//render->loadTexture(&emptyNormal, TextureSamplerType::NORMAL);
-				//mesh.submeshes[i].hasNormalMap = false;
-			}else{
+			if (textureRender){
 				render->loadTexture(textureRender, TextureSamplerType::NORMAL);
 				mesh.submeshes[i].hasNormalMap = true;
+			}else{
+				//render->loadTexture(&emptyNormal, TextureSamplerType::NORMAL);
+				mesh.submeshes[i].hasNormalMap = false;
 			}
 
 			textureRender = mesh.submeshes[i].material.occlusionTexture.getRender();
-			if (!textureRender)	
-				render->loadTexture(&emptyWhite, TextureSamplerType::OCCULSION);
-			else
+			if (textureRender)	
 				render->loadTexture(textureRender, TextureSamplerType::OCCULSION);
+			else
+				render->loadTexture(&emptyWhite, TextureSamplerType::OCCULSION);
 
 			textureRender = mesh.submeshes[i].material.emissiveTexture.getRender();
-			if (!textureRender)
-				render->loadTexture(&emptyBlack, TextureSamplerType::EMISSIVE);
+			if (textureRender)
+				render->loadTexture(textureRender, TextureSamplerType::EMISSIVE);	
 			else
-				render->loadTexture(textureRender, TextureSamplerType::EMISSIVE);
+				render->loadTexture(&emptyBlack, TextureSamplerType::EMISSIVE);
+		}
+
+		for (auto const& buf : mesh.buffers){
+        	if (buf.second->isRenderAttributes()) {
+            	for (auto const &attr : buf.second->getAttributes()) {
+					if (attr.first == AttributeType::TANGENTS){
+						mesh.submeshes[i].hasTangent = true;
+					}
+					if (attr.first == AttributeType::COLORS){
+						mesh.submeshes[i].hasVertexColor = true;
+					}
+            	}
+        	}
+    	}
+		for (auto const& attr : mesh.submeshes[i].attributes){
+			if (attr.first == AttributeType::TANGENTS){
+				mesh.submeshes[i].hasTangent = true;
+			}
+			if (attr.first == AttributeType::COLORS){
+				mesh.submeshes[i].hasVertexColor = true;
+			}
+		}
+
+		if (hasLights){
+			if (mesh.submeshes[i].hasTangent && mesh.submeshes[i].hasNormalMap){
+				mesh.submeshes[i].shaderType = ShaderType::MESH_PBR;
+			}else if (!mesh.submeshes[i].hasTangent && mesh.submeshes[i].hasNormalMap){
+				mesh.submeshes[i].shaderType = ShaderType::MESH_PBR_NOTAN;
+			}else if (mesh.submeshes[i].hasTangent && !mesh.submeshes[i].hasNormalMap){
+				mesh.submeshes[i].shaderType = ShaderType::MESH_PBR_NONMAP;
+			}else{
+				mesh.submeshes[i].shaderType = ShaderType::MESH_PBR_NONMAP_NOTAN;
+			}
+		}else{
+			mesh.submeshes[i].shaderType = ShaderType::MESH_PBR_UNLIT;
 		}
 
 		mesh.submeshes[i].shader = ShaderPool::get(mesh.submeshes[i].shaderType);
@@ -239,8 +276,8 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 				render->applyUniform(UniformType::PBR_FS_PARAMS, UniformDataType::FLOAT, 16, &pbrParams_fs);
 				//render->applyUniform(UniformType::MATERIAL, UniformDataType::FLOAT, 4, &mesh.submeshes[0].material.baseColorFactor);
 
-				//model and mvp matrix
-				render->applyUniform(UniformType::TRANSFORM, UniformDataType::FLOAT, 32, &transform.modelMatrix);
+				//model, normal and mvp matrix
+				render->applyUniform(UniformType::PBR_VS_PARAMS, UniformDataType::FLOAT, 48, &transform.modelMatrix);
 
 				render->draw(mesh.submeshes[i].vertexCount);
 			}
@@ -311,6 +348,9 @@ void RenderSystem::updateTransform(Transform& transform){
     	transform.worldScale = transform.scale;
     	transform.worldPosition = transform.position;
 	}
+
+	//TODO: Check if lights is on
+	transform.normalMatrix = transform.modelMatrix.inverse().transpose();
 }
 
 void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){

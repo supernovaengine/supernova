@@ -523,7 +523,6 @@ bool Model::loadGLTF(const char* filename) {
             if (attrib.first.compare("TANGENT") == 0){
                 attType = AttributeType::TANGENTS;
                 verifyAttrs = true;
-                mesh.submeshes[i].hasTangent = true;
             }
             if (attrib.first.compare("TEXCOORD_0") == 0){
                 attType = AttributeType::TEXTURECOORDS;

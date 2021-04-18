@@ -20,12 +20,14 @@ SokolShader& SokolShader::operator=(const SokolShader& rhs){
 }
 
 bool SokolShader::createShader(ShaderType shaderType){
-    if (shaderType == ShaderType::MESH){
-        shader = sg_make_shader(mesh_shader_desc(sg_query_backend()));
-    }else if (shaderType == ShaderType::MESH_PBR_UNLIT){
+    if (shaderType == ShaderType::MESH_PBR_UNLIT){
         shader = sg_make_shader(meshPBR_unlit_shader_desc(sg_query_backend()));
     }else if (shaderType == ShaderType::MESH_PBR){
         shader = sg_make_shader(meshPBR_shader_desc(sg_query_backend()));
+    }else if (shaderType == ShaderType::MESH_PBR_NOTAN){
+        shader = sg_make_shader(meshPBR_noTan_shader_desc(sg_query_backend()));
+    }else if (shaderType == ShaderType::MESH_PBR_NONMAP){
+        shader = sg_make_shader(meshPBR_noNmap_shader_desc(sg_query_backend()));
     }else if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN){
         shader = sg_make_shader(meshPBR_noNmap_noTan_shader_desc(sg_query_backend()));
     }else if (shaderType == ShaderType::SKYBOX){

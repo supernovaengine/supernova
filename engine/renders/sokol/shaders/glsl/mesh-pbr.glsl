@@ -1,10 +1,11 @@
 // Based on https://github.com/KhronosGroup/glTF-Sample-Viewer shaders
 
 @block pbr_vs_attr
-    uniform transform {
-        mat4 u_modelMatrix;
-        mat4 u_mvpMatrix;
-    };
+    uniform u_vs_pbrParams {
+        mat4 modelMatrix;
+        mat4 normalMatrix;
+        mat4 mvpMatrix;
+    } fs_pbrParams;
 
     in vec3 a_position;
     out vec3 v_position;
@@ -68,21 +69,19 @@
 
 @block pbr_vs_main
     #ifndef MATERIAL_UNLIT
-        vec4 pos = u_modelMatrix * getPosition();
+        vec4 pos = fs_pbrParams.modelMatrix * getPosition();
         v_position = vec3(pos.xyz) / pos.w;
     #endif
-
-    mat4 normalMatrix = transpose(inverse(u_modelMatrix));
 
     #ifdef HAS_NORMALS
     #ifdef HAS_TANGENTS
         vec3 tangent = getTangent();
-        vec3 normalW = normalize(vec3(normalMatrix * vec4(getNormal(), 0.0)));
-        vec3 tangentW = normalize(vec3(u_modelMatrix * vec4(tangent, 0.0)));
+        vec3 normalW = normalize(vec3(fs_pbrParams.normalMatrix * vec4(getNormal(), 0.0)));
+        vec3 tangentW = normalize(vec3(fs_pbrParams.modelMatrix * vec4(tangent, 0.0)));
         vec3 bitangentW = cross(normalW, tangentW) * a_tangent.w;
         v_tbn = mat3(tangentW, bitangentW, normalW);
     #else // !HAS_TANGENTS
-        v_normal = normalize(vec3(normalMatrix * vec4(getNormal(), 0.0)));
+        v_normal = normalize(vec3(fs_pbrParams.normalMatrix * vec4(getNormal(), 0.0)));
     #endif
     #endif
 
@@ -101,7 +100,7 @@
         v_color = a_color;
     #endif
 
-    gl_Position = u_mvpMatrix * getPosition();
+    gl_Position = fs_pbrParams.mvpMatrix * getPosition();
 @end
 
 

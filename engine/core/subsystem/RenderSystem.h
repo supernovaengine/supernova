@@ -36,6 +36,8 @@ namespace Supernova{
 		static TextureRender emptyNormal;
 
 		static bool emptyTexturesCreated;
+		
+		bool hasLights;
 
 		std::map<std::string, BufferRender*> bufferNameToRender;
 		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;

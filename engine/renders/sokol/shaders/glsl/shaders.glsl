@@ -7,7 +7,7 @@
 @include mesh-texture.glsl
 @include mesh-pbr.glsl
 
-
+/*
 @block mesh_vs_attr
     in vec3 a_position;
 
@@ -71,7 +71,7 @@
         @include_block texture_fs_main
     }
 @end
-
+*/
 
 //--------------------------------------
 @block pbr_unlit_defines
@@ -262,11 +262,12 @@
 //--------------------------------------
 
 
-@program mesh mesh_vs mesh_fs
+//@program mesh mesh_vs mesh_fs
 
 @program meshPBR_unlit meshPBR_unlit_vs meshPBR_unlit_fs
 
 @program meshPBR meshPBR_vs meshPBR_fs
+
 @program meshPBR_noTan meshPBR_noTan_vs meshPBR_noTan_fs
 @program meshPBR_noNmap meshPBR_noNmap_vs meshPBR_noNmap_fs
 @program meshPBR_noNmap_noTan meshPBR_noNmap_noTan_vs meshPBR_noNmap_noTan_fs

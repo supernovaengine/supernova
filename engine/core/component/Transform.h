@@ -20,6 +20,7 @@ namespace Supernova{
         Vector3 worldScale;
 
         Matrix4 modelMatrix;
+        Matrix4 normalMatrix;
         Matrix4 modelViewProjectionMatrix;
 
         Entity parent = NULL_ENTITY;

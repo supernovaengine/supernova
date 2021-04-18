@@ -83,7 +83,7 @@ namespace Supernova{
     };
 
     enum class UniformType{
-        TRANSFORM,
+        PBR_VS_PARAMS,
         MATERIAL,
         PBR_FS_PARAMS,
         //PBR_VS_PARAMS,

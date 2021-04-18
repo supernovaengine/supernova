@@ -35,14 +35,16 @@ SokolObject& SokolObject::operator=(const SokolObject& rhs) {
 
 size_t SokolObject::getAttributesIndex(AttributeType type, ShaderType shaderType){
     if (type == AttributeType::POSITIONS){
-        if (shaderType == ShaderType::MESH)
-            return ATTR_mesh_vs_a_position;
         if (shaderType == ShaderType::MESH_PBR_UNLIT)
             return ATTR_meshPBR_unlit_vs_a_position;
         if (shaderType == ShaderType::MESH_PBR)
             return ATTR_meshPBR_vs_a_position;
         if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN)
             return ATTR_meshPBR_noNmap_noTan_vs_a_position;
+        if (shaderType == ShaderType::MESH_PBR_NONMAP)
+            return ATTR_meshPBR_noNmap_vs_a_position;
+        if (shaderType == ShaderType::MESH_PBR_NOTAN)
+            return ATTR_meshPBR_noTan_vs_a_position;
         if (shaderType == ShaderType::SKYBOX)
             return ATTR_skybox_vs_a_position;
     }else if (type == AttributeType::TEXTURECOORDS){
@@ -52,19 +54,33 @@ size_t SokolObject::getAttributesIndex(AttributeType type, ShaderType shaderType
             return ATTR_meshPBR_vs_a_texcoord1;
         if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN)
             return ATTR_meshPBR_noNmap_noTan_vs_a_texcoord1;
+        if (shaderType == ShaderType::MESH_PBR_NONMAP)
+            return ATTR_meshPBR_noNmap_vs_a_texcoord1;
+        if (shaderType == ShaderType::MESH_PBR_NOTAN)
+            return ATTR_meshPBR_noTan_vs_a_texcoord1;
     }else if (type == AttributeType::NORMALS){
         if (shaderType == ShaderType::MESH_PBR)
             return ATTR_meshPBR_vs_a_normal;
         if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN)
             return ATTR_meshPBR_noNmap_noTan_vs_a_normal;
+        if (shaderType == ShaderType::MESH_PBR_NONMAP)
+            return ATTR_meshPBR_noNmap_vs_a_normal;
+        if (shaderType == ShaderType::MESH_PBR_NOTAN)
+            return ATTR_meshPBR_noTan_vs_a_normal;
     }else if (type == AttributeType::COLORS){
         if (shaderType == ShaderType::MESH_PBR)
             return ATTR_meshPBR_vs_a_color;
         if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN)
             return ATTR_meshPBR_noNmap_noTan_vs_a_color;
+        if (shaderType == ShaderType::MESH_PBR_NONMAP)
+            return ATTR_meshPBR_noNmap_noTan_vs_a_color;
+        if (shaderType == ShaderType::MESH_PBR_NOTAN)
+            return ATTR_meshPBR_noNmap_noTan_vs_a_color;
     }else if (type == AttributeType::TANGENTS){
         if (shaderType == ShaderType::MESH_PBR)
             return ATTR_meshPBR_vs_a_tangent;
+        if (shaderType == ShaderType::MESH_PBR_NONMAP)
+            return ATTR_meshPBR_noNmap_vs_a_tangent;
     }
 
     return -1;
@@ -150,18 +166,14 @@ sg_primitive_type SokolObject::getPrimitiveType(PrimitiveType primitiveType){
 UniformStageSlot SokolObject::getUniformStageSlot(UniformType type){
 
     //Vertex uniforms
-    if (type == UniformType::TRANSFORM){
-        return {SG_SHADERSTAGE_VS, SLOT_transform};
+    if (type == UniformType::PBR_VS_PARAMS){
+        return {SG_SHADERSTAGE_VS, SLOT_u_vs_pbrParams};
     }else if (type == UniformType::VIEWPROJECTIONSKY){
         return {SG_SHADERSTAGE_VS, SLOT_viewProjectionSky};
-    //}else if (type == UniformType::PBR_VS_PARAMS){
-    //    return {SG_SHADERSTAGE_VS, SLOT_u_pbr_vs_params};
     }
 
     //Fragment uniforms
-    if (type == UniformType::MATERIAL){
-        return {SG_SHADERSTAGE_FS, SLOT_u_material};
-    }else if (type == UniformType::PBR_FS_PARAMS){
+    if (type == UniformType::PBR_FS_PARAMS){
         return {SG_SHADERSTAGE_FS, SLOT_u_fs_pbrParams};
     }else if (type == UniformType::DIR_LIGHTS){
         return {SG_SHADERSTAGE_FS, SLOT_u_dirLight};
