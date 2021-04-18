@@ -80,6 +80,7 @@ void init(){
 */
 
     plane.create(1000, 1000);
+    //plane.setColor(0.5, 0.3, 0.7, 1.0);
     plane.setTexture("pista.png");
     plane.setPosition(-500,0,-500);
 

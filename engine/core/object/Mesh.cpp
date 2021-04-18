@@ -1,5 +1,6 @@
 #include "Mesh.h"
 #include "render/ObjectRender.h"
+#include "math/Color.h"
 
 using namespace Supernova;
 
@@ -83,11 +84,17 @@ void Mesh::setTexture(std::string path){
 void Mesh::setColor(Vector4 color){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
-    mesh.submeshes[0].material.baseColorFactor = color;
+    mesh.submeshes[0].material.baseColorFactor = Color::sRGBToLinear(color);
 }
 
 void Mesh::setColor(float red, float green, float blue, float alpha){
     setColor(Vector4(red, green, blue, alpha));
+}
+
+Vector4 Mesh::getColor(){
+    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+    return Color::linearTosRGB(mesh.submeshes[0].material.baseColorFactor);
 }
 
 void Mesh::addSubmeshAttribute(Submesh& submesh, std::string bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized){
