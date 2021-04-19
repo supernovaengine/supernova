@@ -346,6 +346,23 @@
 		71E36BD625D59A1400EFEED4 /* tiny_obj_loader.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E36BB425D599C000EFEED4 /* tiny_obj_loader.h */; };
 		71E36BD825D59A1400EFEED4 /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71E36BB325D599C000EFEED4 /* tiny_obj_loader.cc */; };
 		71E36BEE25D59A3800EFEED4 /* libtinyobjloader-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71E36BDD25D59A1400EFEED4 /* libtinyobjloader-ios.a */; };
+		71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */; };
+		71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */; };
+		71F97A8D262D1D5900CD6F2B /* SkyBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97A88262D1D5900CD6F2B /* SkyBox.h */; };
+		71F97A8E262D1D5900CD6F2B /* SkyBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A89262D1D5900CD6F2B /* SkyBox.cpp */; };
+		71F97A8F262D1D5900CD6F2B /* SkyBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A89262D1D5900CD6F2B /* SkyBox.cpp */; };
+		71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */; };
+		71F97AAF262D1D8000CD6F2B /* Color.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97AAD262D1D8000CD6F2B /* Color.h */; };
+		71F97AB0262D1D8000CD6F2B /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97AAE262D1D8000CD6F2B /* Color.cpp */; };
+		71F97AB1262D1D8000CD6F2B /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97AAE262D1D8000CD6F2B /* Color.cpp */; };
+		71F97B21262D1E2B00CD6F2B /* tiny_gltf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */; };
+		71F97B22262D1E2B00CD6F2B /* tiny_gltf.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */; };
+		71F97B43262D1E6500CD6F2B /* libstb-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BE612625B1D088006D6E02 /* libstb-macos.a */; };
+		71F97B69262D1FC300CD6F2B /* libtinygltf-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F97AD2262D1DF200CD6F2B /* libtinygltf-macos.a */; };
+		71F97B7D262D1FFE00CD6F2B /* tiny_gltf.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */; };
+		71F97B7F262D1FFE00CD6F2B /* tiny_gltf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */; };
+		71F97B98262D202300CD6F2B /* libstb-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 710AD6E325B6053400A7B12F /* libstb-ios.a */; };
+		71F97B9B262D203E00CD6F2B /* libtinygltf-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -446,6 +463,34 @@
 			proxyType = 1;
 			remoteGlobalIDString = 71E36BD425D59A1400EFEED4;
 			remoteInfo = "tinyobjloader-ios";
+		};
+		71F97B41262D1E5C00CD6F2B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7162F8C0259547D60075B97D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 71BE612525B1D088006D6E02;
+			remoteInfo = "stb-macos";
+		};
+		71F97B67262D1FBB00CD6F2B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7162F8C0259547D60075B97D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 71F97AD1262D1DF200CD6F2B;
+			remoteInfo = "tinygltf-macos";
+		};
+		71F97B96262D201700CD6F2B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7162F8C0259547D60075B97D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 710AD6D225B6053400A7B12F;
+			remoteInfo = "stb-ios";
+		};
+		71F97B99262D203300CD6F2B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7162F8C0259547D60075B97D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 71F97B79262D1FFE00CD6F2B;
+			remoteInfo = "tinygltf-ios";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -720,6 +765,17 @@
 		71E36BB325D599C000EFEED4 /* tiny_obj_loader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_obj_loader.cc; sourceTree = "<group>"; };
 		71E36BB425D599C000EFEED4 /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
 		71E36BDD25D59A1400EFEED4 /* libtinyobjloader-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinyobjloader-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaneTerrain.cpp; sourceTree = "<group>"; };
+		71F97A88262D1D5900CD6F2B /* SkyBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyBox.h; sourceTree = "<group>"; };
+		71F97A89262D1D5900CD6F2B /* SkyBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkyBox.cpp; sourceTree = "<group>"; };
+		71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaneTerrain.h; sourceTree = "<group>"; };
+		71F97AAD262D1D8000CD6F2B /* Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
+		71F97AAE262D1D8000CD6F2B /* Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Color.cpp; sourceTree = "<group>"; };
+		71F97AD2262D1DF200CD6F2B /* libtinygltf-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinygltf-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_gltf.cc; sourceTree = "<group>"; };
+		71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_gltf.h; sourceTree = "<group>"; };
+		71F97B57262D1EF200CD6F2B /* json.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = json.hpp; sourceTree = "<group>"; };
+		71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinygltf-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -749,6 +805,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71F97B9B262D203E00CD6F2B /* libtinygltf-ios.a in Frameworks */,
 				71E36BEE25D59A3800EFEED4 /* libtinyobjloader-ios.a in Frameworks */,
 				710AD70425B6058100A7B12F /* libstb-ios.a in Frameworks */,
 				710AD70325B6057C00A7B12F /* libluaintf-ios.a in Frameworks */,
@@ -784,6 +841,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71F97B69262D1FC300CD6F2B /* libtinygltf-macos.a in Frameworks */,
 				71E36BC625D599E200EFEED4 /* libtinyobjloader-macos.a in Frameworks */,
 				71BE626825B1DC7D006D6E02 /* liblua-macos.a in Frameworks */,
 				71BE626925B1DC7D006D6E02 /* libluaintf-macos.a in Frameworks */,
@@ -832,6 +890,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71F97AD0262D1DF200CD6F2B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71F97B43262D1E6500CD6F2B /* libstb-macos.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71F97B80262D1FFE00CD6F2B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71F97B98262D202300CD6F2B /* libstb-ios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -900,6 +974,8 @@
 				710AD6E325B6053400A7B12F /* libstb-ios.a */,
 				71E36B8C25D5999C00EFEED4 /* libtinyobjloader-macos.a */,
 				71E36BDD25D59A1400EFEED4 /* libtinyobjloader-ios.a */,
+				71F97AD2262D1DF200CD6F2B /* libtinygltf-macos.a */,
+				71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1010,6 +1086,8 @@
 				7162FC4E25962A0E0075B97D /* AlignedBox.h */,
 				7162FC5E25962A0E0075B97D /* Angle.cpp */,
 				7162FC5325962A0E0075B97D /* Angle.h */,
+				71F97AAE262D1D8000CD6F2B /* Color.cpp */,
+				71F97AAD262D1D8000CD6F2B /* Color.h */,
 				7162FC5125962A0E0075B97D /* Matrix3.cpp */,
 				7162FC5B25962A0E0075B97D /* Matrix3.h */,
 				7162FC4D25962A0E0075B97D /* Matrix4.cpp */,
@@ -1043,6 +1121,10 @@
 				71E36B5225D5994100EFEED4 /* Model.h */,
 				7162FC6625962A0E0075B97D /* Object.cpp */,
 				7162FC6825962A0E0075B97D /* Object.h */,
+				71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */,
+				71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */,
+				71F97A89262D1D5900CD6F2B /* SkyBox.cpp */,
+				71F97A88262D1D5900CD6F2B /* SkyBox.h */,
 			);
 			path = object;
 			sourceTree = "<group>";
@@ -1123,6 +1205,8 @@
 		7162FC9625962A0E0075B97D /* libs */ = {
 			isa = PBXGroup;
 			children = (
+				71F97B56262D1EF200CD6F2B /* json */,
+				71F97B1D262D1E2B00CD6F2B /* tinygltf */,
 				71BE604125B1C55B006D6E02 /* lua */,
 				71BE614425B1D0B2006D6E02 /* luaintf */,
 				7162FC9725962A0E0075B97D /* sokol */,
@@ -1369,6 +1453,23 @@
 			path = tinyobjloader;
 			sourceTree = "<group>";
 		};
+		71F97B1D262D1E2B00CD6F2B /* tinygltf */ = {
+			isa = PBXGroup;
+			children = (
+				71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */,
+				71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */,
+			);
+			path = tinygltf;
+			sourceTree = "<group>";
+		};
+		71F97B56262D1EF200CD6F2B /* json */ = {
+			isa = PBXGroup;
+			children = (
+				71F97B57262D1EF200CD6F2B /* json.hpp */,
+			);
+			path = json;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1452,10 +1553,13 @@
 				71BE624025B1DB9E006D6E02 /* LuaFunction.h in Headers */,
 				71BE61F425B1DAE9006D6E02 /* shaders.h in Headers */,
 				71BE621325B1DB37006D6E02 /* Input.h in Headers */,
+				71F97AAF262D1D8000CD6F2B /* Color.h in Headers */,
 				71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */,
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
 				71BE620025B1DB22006D6E02 /* System.h in Headers */,
+				71F97A8D262D1D5900CD6F2B /* SkyBox.h in Headers */,
 				71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */,
+				71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */,
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
 				71BE622225B1DB83006D6E02 /* TextureData.h in Headers */,
 				71BE621425B1DB37006D6E02 /* Function.h in Headers */,
@@ -1553,6 +1657,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		71F97ACE262D1DF200CD6F2B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71F97B22262D1E2B00CD6F2B /* tiny_gltf.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71F97B7C262D1FFE00CD6F2B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71F97B7D262D1FFE00CD6F2B /* tiny_gltf.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -1619,6 +1739,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				71F97B9A262D203300CD6F2B /* PBXTargetDependency */,
 				71E36BED25D59A3000EFEED4 /* PBXTargetDependency */,
 				710AD70125B6056E00A7B12F /* PBXTargetDependency */,
 				710AD6FF25B6056900A7B12F /* PBXTargetDependency */,
@@ -1694,6 +1815,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				71F97B68262D1FBB00CD6F2B /* PBXTargetDependency */,
 				71E36BC525D599DB00EFEED4 /* PBXTargetDependency */,
 				71BE626325B1DC6E006D6E02 /* PBXTargetDependency */,
 				71BE626525B1DC6E006D6E02 /* PBXTargetDependency */,
@@ -1808,6 +1930,42 @@
 			productReference = 71E36BDD25D59A1400EFEED4 /* libtinyobjloader-ios.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		71F97AD1262D1DF200CD6F2B /* tinygltf-macos */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 71F97ADA262D1DF200CD6F2B /* Build configuration list for PBXNativeTarget "tinygltf-macos" */;
+			buildPhases = (
+				71F97ACE262D1DF200CD6F2B /* Headers */,
+				71F97ACF262D1DF200CD6F2B /* Sources */,
+				71F97AD0262D1DF200CD6F2B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				71F97B42262D1E5C00CD6F2B /* PBXTargetDependency */,
+			);
+			name = "tinygltf-macos";
+			productName = "tinygltf-macos";
+			productReference = 71F97AD2262D1DF200CD6F2B /* libtinygltf-macos.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		71F97B79262D1FFE00CD6F2B /* tinygltf-ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 71F97B82262D1FFE00CD6F2B /* Build configuration list for PBXNativeTarget "tinygltf-ios" */;
+			buildPhases = (
+				71F97B7C262D1FFE00CD6F2B /* Headers */,
+				71F97B7E262D1FFE00CD6F2B /* Sources */,
+				71F97B80262D1FFE00CD6F2B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				71F97B97262D201700CD6F2B /* PBXTargetDependency */,
+			);
+			name = "tinygltf-ios";
+			productName = "tinygltf-macos";
+			productReference = 71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1843,6 +2001,9 @@
 					71E36B8B25D5999C00EFEED4 = {
 						CreatedOnToolsVersion = 12.4;
 					};
+					71F97AD1262D1DF200CD6F2B = {
+						CreatedOnToolsVersion = 12.4;
+					};
 				};
 			};
 			buildConfigurationList = 7162F8C3259547D60075B97D /* Build configuration list for PBXProject "Supernova" */;
@@ -1872,6 +2033,8 @@
 				710AD6D225B6053400A7B12F /* stb-ios */,
 				71E36B8B25D5999C00EFEED4 /* tinyobjloader-macos */,
 				71E36BD425D59A1400EFEED4 /* tinyobjloader-ios */,
+				71F97AD1262D1DF200CD6F2B /* tinygltf-macos */,
+				71F97B79262D1FFE00CD6F2B /* tinygltf-ios */,
 			);
 		};
 /* End PBXProject section */
@@ -1974,6 +2137,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				713D8304259D34F900567F9F /* Ray.cpp in Sources */,
+				71F97AB1262D1D8000CD6F2B /* Color.cpp in Sources */,
 				713D8292259D307E00567F9F /* Log.cpp in Sources */,
 				71BE624225B1DB9E006D6E02 /* TexturePool.cpp in Sources */,
 				713D8293259D307F00567F9F /* Scene.cpp in Sources */,
@@ -1981,6 +2145,7 @@
 				713D8294259D307F00567F9F /* Data.cpp in Sources */,
 				71BE623D25B1DB9E006D6E02 /* LuaScript.cpp in Sources */,
 				713D8295259D307F00567F9F /* UserSettings.cpp in Sources */,
+				71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
 				713D8296259D307F00567F9F /* File.cpp in Sources */,
 				713D8297259D307F00567F9F /* FileData.cpp in Sources */,
 				713D8298259D307F00567F9F /* ShaderRender.cpp in Sources */,
@@ -2001,6 +2166,7 @@
 				7128D0AF25BB18DC00965B51 /* StringUtils.cpp in Sources */,
 				713D82A5259D307F00567F9F /* Plane.cpp in Sources */,
 				713D82A6259D307F00567F9F /* Angle.cpp in Sources */,
+				71F97A8F262D1D5900CD6F2B /* SkyBox.cpp in Sources */,
 				71BE624425B1DB9E006D6E02 /* ShaderPool.cpp in Sources */,
 				71BE622125B1DB83006D6E02 /* TextureData.cpp in Sources */,
 				713D82A8259D307F00567F9F /* Camera.cpp in Sources */,
@@ -2070,6 +2236,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7162FE0C2596A5BE0075B97D /* SokolObject.cpp in Sources */,
+				71F97AB0262D1D8000CD6F2B /* Color.cpp in Sources */,
 				7162FE0D2596A5BE0075B97D /* SokolBuffer.cpp in Sources */,
 				71BE624125B1DB9E006D6E02 /* TexturePool.cpp in Sources */,
 				7162FE0E2596A5BE0075B97D /* SokolShader.cpp in Sources */,
@@ -2077,6 +2244,7 @@
 				7162FE0F2596A5BE0075B97D /* SokolTexture.cpp in Sources */,
 				71BE623C25B1DB9E006D6E02 /* LuaScript.cpp in Sources */,
 				7162FE102596A5BE0075B97D /* SokolScene.cpp in Sources */,
+				71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
 				7162FD1225963AE00075B97D /* Log.cpp in Sources */,
 				7162FD1325963AE00075B97D /* Scene.cpp in Sources */,
 				7162FD1625963AE00075B97D /* Data.cpp in Sources */,
@@ -2097,6 +2265,7 @@
 				7128D0AE25BB18DC00965B51 /* StringUtils.cpp in Sources */,
 				7162FD3225963AE00075B97D /* Matrix3.cpp in Sources */,
 				7162FD3725963AE00075B97D /* Rect.cpp in Sources */,
+				71F97A8E262D1D5900CD6F2B /* SkyBox.cpp in Sources */,
 				71BE624325B1DB9E006D6E02 /* ShaderPool.cpp in Sources */,
 				71BE622025B1DB83006D6E02 /* TextureData.cpp in Sources */,
 				7162FD3925963AE00075B97D /* Quaternion.cpp in Sources */,
@@ -2213,6 +2382,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		71F97ACF262D1DF200CD6F2B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71F97B21262D1E2B00CD6F2B /* tiny_gltf.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71F97B7E262D1FFE00CD6F2B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71F97B7F262D1FFE00CD6F2B /* tiny_gltf.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2285,6 +2470,26 @@
 			isa = PBXTargetDependency;
 			target = 71E36BD425D59A1400EFEED4 /* tinyobjloader-ios */;
 			targetProxy = 71E36BEC25D59A3000EFEED4 /* PBXContainerItemProxy */;
+		};
+		71F97B42262D1E5C00CD6F2B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 71BE612525B1D088006D6E02 /* stb-macos */;
+			targetProxy = 71F97B41262D1E5C00CD6F2B /* PBXContainerItemProxy */;
+		};
+		71F97B68262D1FBB00CD6F2B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 71F97AD1262D1DF200CD6F2B /* tinygltf-macos */;
+			targetProxy = 71F97B67262D1FBB00CD6F2B /* PBXContainerItemProxy */;
+		};
+		71F97B97262D201700CD6F2B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 710AD6D225B6053400A7B12F /* stb-ios */;
+			targetProxy = 71F97B96262D201700CD6F2B /* PBXContainerItemProxy */;
+		};
+		71F97B9A262D203300CD6F2B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 71F97B79262D1FFE00CD6F2B /* tinygltf-ios */;
+			targetProxy = 71F97B99262D203300CD6F2B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2932,6 +3137,66 @@
 			};
 			name = Release;
 		};
+		71F97ADB262D1DF200CD6F2B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/json";
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		71F97ADC262D1DF200CD6F2B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/json";
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		71F97B83262D1FFE00CD6F2B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/json";
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		71F97B84262D1FFE00CD6F2B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/json";
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3066,6 +3331,24 @@
 			buildConfigurations = (
 				71E36BDB25D59A1400EFEED4 /* Debug */,
 				71E36BDC25D59A1400EFEED4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		71F97ADA262D1DF200CD6F2B /* Build configuration list for PBXNativeTarget "tinygltf-macos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				71F97ADB262D1DF200CD6F2B /* Debug */,
+				71F97ADC262D1DF200CD6F2B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		71F97B82262D1FFE00CD6F2B /* Build configuration list for PBXNativeTarget "tinygltf-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				71F97B83262D1FFE00CD6F2B /* Debug */,
+				71F97B84262D1FFE00CD6F2B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

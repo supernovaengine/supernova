@@ -19,4 +19,4 @@ jobs:
       - name: Build with Xcode
         run: |
           cd workspaces/xcode/
-          xcodebuild build -sdk iphonesimulator -project Supernova.xcodeproj -configuration Debug -scheme supernova-ios
+          xcodebuild build -sdk iphonesimulator -project Supernova.xcodeproj -configuration Debug -scheme "Supernova iOS"
