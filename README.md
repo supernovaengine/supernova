@@ -1,4 +1,4 @@
-![Logo](http://www.supernovaengine.org/img/logo_black.png)
+![Logo](http://www.supernovaengine.org/img/logo_blue.png)
 
 ![](https://github.com/supernovaengine/supernova/workflows/IOS/badge.svg)
 ![](https://github.com/supernovaengine/supernova/workflows/Android/badge.svg)
