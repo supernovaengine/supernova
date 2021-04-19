@@ -1,3 +1,8 @@
+![Logo](http://www.supernovaengine.org/img/logo_blue.png)
+
+![](https://github.com/supernovaengine/supernova/actions/workflows/macos-template.yml/badge.svg?branch=ecs)
+![](https://github.com/supernovaengine/supernova/actions/workflows/ios-template.yml/badge.svg?branch=ecs)
+![](https://github.com/supernovaengine/supernova/actions/workflows/web.yml/badge.svg?branch=ecs)
 
 **This branch is a new version, now entity component system (ECS) and data-oriented design.**
 
