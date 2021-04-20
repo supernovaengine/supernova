@@ -3,75 +3,8 @@
 @ctype vec4 Supernova::Vector4
 @ctype mat4 Supernova::Matrix4
 
-
-@include mesh-texture.glsl
 @include mesh-pbr.glsl
 
-/*
-@block mesh_vs_attr
-    in vec3 a_position;
-
-    uniform transform {
-        mat4 u_modelMatrix;
-        mat4 u_mvpMatrix;
-    };
-@end
-
-@block mesh_vs_main
-    gl_Position = u_mvpMatrix * vec4(a_position, 1.0);
-@end
-
-@block mesh_fs_attr
-    out vec4 frag_color;
-
-    uniform u_material {
-        vec4 baseColorFactor;
-    } material;
-@end
-
-@block mesh_fs_main
-    frag_color = material.baseColorFactor;
-@end
-
-
-
-@vs mesh_vs
-    @include_block mesh_vs_attr
-
-    void main() {
-        @include_block mesh_vs_main
-    }
-@end
-
-@fs mesh_fs
-    @include_block mesh_fs_attr
-
-    void main() {
-        @include_block mesh_fs_main
-    }
-@end
-
-
-@vs mesh_texture_vs
-    @include_block mesh_vs_attr
-    @include_block texture_vs_attr
-
-    void main() {
-        @include_block mesh_vs_main
-        @include_block texture_vs_main
-    }
-@end
-
-@fs mesh_texture_fs
-    @include_block mesh_fs_attr
-    @include_block texture_fs_attr
-
-    void main() {
-        @include_block mesh_fs_main
-        @include_block texture_fs_main
-    }
-@end
-*/
 
 //--------------------------------------
 @block pbr_unlit_defines

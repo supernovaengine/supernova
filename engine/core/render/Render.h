@@ -86,9 +86,7 @@ namespace Supernova{
         PBR_VS_PARAMS,
         MATERIAL,
         PBR_FS_PARAMS,
-        //PBR_VS_PARAMS,
-        //LIGHTING,
-        DIR_LIGHTS,
+        LIGHTING,
         VIEWPROJECTIONSKY,
         //CAMERA
         /*

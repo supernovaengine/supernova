@@ -105,7 +105,7 @@
 
 
 @block pbr_fs_attr
-    #define NUM_DIRLIGHTS 1
+    #define NUM_LIGHTS 3
 
     in vec3 v_position;
 
@@ -147,19 +147,12 @@
     } fs_pbrParams;
 
     #ifdef USE_PUNCTUAL
-    uniform u_lighting{
-        vec3 ambient;
-        float materialShininess;
-        float numDirLights;
-        float numSpotLights;
-        float numPointLights;
-    } lighting;
-    
-    uniform u_dirLight{
-        vec3 direction[NUM_DIRLIGHTS];
-        vec3 color[NUM_DIRLIGHTS];
-        float intensity[NUM_DIRLIGHTS];
-    } dirLight;
+        uniform u_lighting {
+            vec4 direction_range[NUM_LIGHTS]; //direction.xyz and range.w
+            vec4 color_intensity[NUM_LIGHTS]; //color.xyz and intensity.w
+            vec4 position_type[NUM_LIGHTS]; //position.xyz and type.w
+            vec4 inner_outer_ConeCos[NUM_LIGHTS]; //innerConeCos.x and outerConeCos.y
+        } lighting;
     #endif
 
     struct MaterialInfo{
@@ -203,6 +196,9 @@
 
     @include funcs-pbr.glsl
     @include funcs-brdf.glsl
+    #ifdef USE_PUNCTUAL
+        @include funcs-punctual.glsl
+    #endif
 @end
 
 @block pbr_fs_main
@@ -266,26 +262,43 @@
 
     // Apply light sources
     #ifdef USE_PUNCTUAL
-        for (int i = 0; i < NUM_DIRLIGHTS; ++i){
-            vec3 pointToLight = vec3(-dirLight.direction[i]);
-            float rangeAttenuation = 1.0;
-            float spotAttenuation = 1.0;
+        for (int i = 0; i < NUM_LIGHTS; ++i){
 
-            vec3 intensity = rangeAttenuation * spotAttenuation * dirLight.intensity[i] * dirLight.color[i];
+            //Cannot be in function to avoid GLES2 index errors
+            Light light = Light(
+                int(lighting.position_type[i].w),
+                lighting.direction_range[i].xyz,
+                lighting.color_intensity[i].xyz,
+                lighting.position_type[i].xyz,
+                lighting.direction_range[i].w,
+                lighting.color_intensity[i].w,
+                lighting.inner_outer_ConeCos[i].x,
+                lighting.inner_outer_ConeCos[i].y
+            ); 
 
-            vec3 l = normalize(pointToLight);   // Direction from surface point to light
-            vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
-            float NdotL = clampedDot(n, l);
-            float NdotV = clampedDot(n, v);
-            float NdotH = clampedDot(n, h);
-            float LdotH = clampedDot(l, h);
-            float VdotH = clampedDot(v, h);
+            if (light.intensity > 0.0){
+                vec3 pointToLight;
+                if(light.type != LightType_Directional) {
+                    pointToLight = light.position - v_position;
+                } else {
+                    pointToLight = -light.direction;
+                }
 
-            if (NdotL > 0.0 || NdotV > 0.0){
-                // Calculation of analytical light
-                // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
-                f_diffuse += intensity * NdotL *  BRDF_lambertian(materialInfo.f0, materialInfo.f90, materialInfo.albedoColor, VdotH);
-                f_specular += intensity * NdotL * BRDF_specularGGX(materialInfo.f0, materialInfo.f90, materialInfo.alphaRoughness, VdotH, NdotL, NdotV, NdotH);
+                vec3 l = normalize(pointToLight);   // Direction from surface point to light
+                vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
+                float NdotL = clampedDot(n, l);
+                float NdotV = clampedDot(n, v);
+                float NdotH = clampedDot(n, h);
+                float LdotH = clampedDot(l, h);
+                float VdotH = clampedDot(v, h);
+
+                if (NdotL > 0.0 || NdotV > 0.0){
+                    // Calculation of analytical light
+                    // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
+                    vec3 intensity = getLighIntensity(light, pointToLight);
+                    f_diffuse += intensity * NdotL *  BRDF_lambertian(materialInfo.f0, materialInfo.f90, materialInfo.albedoColor, VdotH);
+                    f_specular += intensity * NdotL * BRDF_specularGGX(materialInfo.f0, materialInfo.f90, materialInfo.alphaRoughness, VdotH, NdotL, NdotV, NdotH);
+                }
             }
     }
     #endif

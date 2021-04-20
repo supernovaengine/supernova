@@ -107,29 +107,17 @@ size_t SokolObject::getTextureSampler(TextureSamplerType samplerType){
 sg_vertex_format SokolObject::getVertexFormat(unsigned int elements, AttributeDataType dataType, bool normalized){
     if (dataType == AttributeDataType::BYTE){
         if (elements == 4)
-            if (normalized)
-                return SG_VERTEXFORMAT_BYTE4N;
-            else
-                return SG_VERTEXFORMAT_BYTE4;
+            return (normalized)?SG_VERTEXFORMAT_BYTE4N:SG_VERTEXFORMAT_BYTE4;
     }
     if (dataType == AttributeDataType::UNSIGNED_BYTE){
         if (elements == 4)
-            if (normalized)
-                return SG_VERTEXFORMAT_UBYTE4N;
-            else
-                return SG_VERTEXFORMAT_UBYTE4;
+            return (normalized)?SG_VERTEXFORMAT_UBYTE4N:SG_VERTEXFORMAT_UBYTE4;
     }
     if (dataType == AttributeDataType::SHORT){
         if (elements == 2)
-            if (normalized)
-                return SG_VERTEXFORMAT_SHORT2N;
-            else
-                return SG_VERTEXFORMAT_SHORT2;
+            return (normalized)?SG_VERTEXFORMAT_SHORT2N:SG_VERTEXFORMAT_SHORT2;
         if (elements == 4)
-            if (normalized)
-                return SG_VERTEXFORMAT_SHORT4N;
-            else
-                return SG_VERTEXFORMAT_SHORT4;
+            return (normalized)?SG_VERTEXFORMAT_SHORT4N:SG_VERTEXFORMAT_SHORT4;
     }
     if (dataType == AttributeDataType::UNSIGNED_SHORT){
         if (elements == 2)
@@ -175,10 +163,8 @@ UniformStageSlot SokolObject::getUniformStageSlot(UniformType type){
     //Fragment uniforms
     if (type == UniformType::PBR_FS_PARAMS){
         return {SG_SHADERSTAGE_FS, SLOT_u_fs_pbrParams};
-    }else if (type == UniformType::DIR_LIGHTS){
-        return {SG_SHADERSTAGE_FS, SLOT_u_dirLight};
-    //}else if (type == UniformType::LIGHTING){
-    //    return {SG_SHADERSTAGE_FS, SLOT_u_lighting};
+    }else if (type == UniformType::LIGHTING){
+        return {SG_SHADERSTAGE_FS, SLOT_u_lighting};
     }
 
     return {SG_SHADERSTAGE_VS, -1};

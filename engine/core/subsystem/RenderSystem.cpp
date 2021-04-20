@@ -23,7 +23,7 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 	signature.set(scene->getComponentType<Transform>());
 	signature.set(scene->getComponentType<MeshComponent>());
 
-	hasLights = false;
+	hasLights = true;
 }
 
 void RenderSystem::load(){
@@ -206,24 +206,6 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 	return true;
 }
 
-typedef struct u_dirLight_t {
-    Supernova::Vector3 direction;
-    uint8_t _pad_12[4];
-    Supernova::Vector3 color;
-    uint8_t _pad_28[4];
-    float intensity;
-    uint8_t _pad_36[12];
-} u_dirLight_t;
-
-typedef struct u_lighting_t {
-    Supernova::Vector3 ambient;
-    float materialShininess;
-    float numDirLights;
-    float numSpotLights;
-    float numPointLights;
-    uint8_t _pad_28[4];
-} u_lightParams_t;
-
 typedef struct u_fs_pbrParams_t {
     Supernova::Vector4 baseColorFactor;
     float metallicFactor;
@@ -235,23 +217,34 @@ typedef struct u_fs_pbrParams_t {
     uint8_t _pad_60[4];
 } u_fs_pbrParams_t;
 
+typedef struct u_lighting_t {
+    Supernova::Vector4 direction_range[3];
+    Supernova::Vector4 color_intensity[3];
+    Supernova::Vector4 position_type[3];
+    Supernova::Vector4 inner_outer_ConeCos[3];
+} u_lighting_t;
+
 void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform){
 	if (mesh.loaded){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender* render = &mesh.submeshes[i].render;
 			if (render){
 
-				u_dirLight_t dir_lights;
-				dir_lights.direction   = Vector3(0.8f, -0.2f, 0.0f);
-        		dir_lights.color     = Vector3(1.0f, 1.0f, 1.0f);
-        		dir_lights.intensity    = 5.0;
+				u_lighting_t lights;
+				lights.direction_range[0] = Vector4(0.8f, -0.2, 0.0, 0.0);
+				lights.color_intensity[0] = Vector4(1.0f, 1.0f, 1.0f, 0.0);
+				lights.position_type[0] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
+				lights.inner_outer_ConeCos[0] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
 
-				u_lighting_t lightParams;
-				lightParams.ambient = Vector3(0.2f, 0.2f, 0.2f);
-				lightParams.materialShininess = 32.0;
-				lightParams.numDirLights = 2;
-				lightParams.numSpotLights = 0;
-				lightParams.numPointLights = 0;
+				lights.direction_range[1] = Vector4(-0.8f, -0.5, 0.0, 0.0);
+				lights.color_intensity[1] = Vector4(1.0f, 1.0f, 1.0f, 0.0);
+				lights.position_type[1] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
+				lights.inner_outer_ConeCos[1] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
+
+				lights.direction_range[2] = Vector4(0.0, 0.0, 0.0, 0.0);
+				lights.color_intensity[2] = Vector4(1.0f, 1.0f, 1.0f, 10000.0);
+				lights.position_type[2] = Vector4(300.0f, 80.0f, 80.0f, 1.0);
+				lights.inner_outer_ConeCos[2] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
 
 				u_fs_pbrParams_t pbrParams_fs;
 				pbrParams_fs.baseColorFactor = mesh.submeshes[i].material.baseColorFactor;
@@ -267,14 +260,10 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 					mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN ||
 					mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NOTAN ||
 					mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NONMAP){
-					render->applyUniform(UniformType::DIR_LIGHTS, UniformDataType::FLOAT, 12, &dir_lights);
-					//render->applyUniform(UniformType::LIGHTING, UniformDataType::FLOAT, 8, &lightParams);
-					//render->applyUniform(UniformType::PBR_VS_PARAMS, UniformDataType::FLOAT, 4, &pbr_vs_params);
-					//render->applyUniform(UniformType::CAMERA, UniformDataType::FLOAT, 4, &camTransform.worldPosition);
+					render->applyUniform(UniformType::LIGHTING, UniformDataType::FLOAT, 16 * 3, &lights);
 				}
 
 				render->applyUniform(UniformType::PBR_FS_PARAMS, UniformDataType::FLOAT, 16, &pbrParams_fs);
-				//render->applyUniform(UniformType::MATERIAL, UniformDataType::FLOAT, 4, &mesh.submeshes[0].material.baseColorFactor);
 
 				//model, normal and mvp matrix
 				render->applyUniform(UniformType::PBR_VS_PARAMS, UniformDataType::FLOAT, 48, &transform.modelMatrix);
