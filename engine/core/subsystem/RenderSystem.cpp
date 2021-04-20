@@ -129,20 +129,20 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		for (auto const& buf : mesh.buffers){
         	if (buf.second->isRenderAttributes()) {
             	for (auto const &attr : buf.second->getAttributes()) {
-					if (attr.first == AttributeType::TANGENTS){
+					if (attr.first == AttributeType::TANGENT){
 						mesh.submeshes[i].hasTangent = true;
 					}
-					if (attr.first == AttributeType::COLORS){
+					if (attr.first == AttributeType::COLOR){
 						mesh.submeshes[i].hasVertexColor = true;
 					}
             	}
         	}
     	}
 		for (auto const& attr : mesh.submeshes[i].attributes){
-			if (attr.first == AttributeType::TANGENTS){
+			if (attr.first == AttributeType::TANGENT){
 				mesh.submeshes[i].hasTangent = true;
 			}
-			if (attr.first == AttributeType::COLORS){
+			if (attr.first == AttributeType::COLOR){
 				mesh.submeshes[i].hasVertexColor = true;
 			}
 		}

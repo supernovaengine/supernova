@@ -11,10 +11,10 @@ Mesh::Mesh(Scene* scene): Object(scene){
     mesh.buffers["vertices"] = &buffer;
 
 	buffer.clearAll();
-	buffer.addAttribute(AttributeType::POSITIONS, 3);
-	buffer.addAttribute(AttributeType::TEXTURECOORDS, 2);
-	buffer.addAttribute(AttributeType::NORMALS, 3);
-    buffer.addAttribute(AttributeType::COLORS, 4);
+	buffer.addAttribute(AttributeType::POSITION, 3);
+	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+	buffer.addAttribute(AttributeType::NORMAL, 3);
+    buffer.addAttribute(AttributeType::COLOR, 4);
 }
 
 Mesh::~Mesh(){
@@ -23,9 +23,9 @@ Mesh::~Mesh(){
 
 void Mesh::addVertex(Vector3 vertex){
 
-    buffer.addVector3(AttributeType::POSITIONS, vertex);
-    buffer.addVector3(AttributeType::NORMALS, Vector3(0.0f, 0.0f, 1.0f));
-    buffer.addVector4(AttributeType::COLORS, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    buffer.addVector3(AttributeType::POSITION, vertex);
+    buffer.addVector3(AttributeType::NORMAL, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector4(AttributeType::COLOR, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
     //if (buffer.getCount() > 3){
     //    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
@@ -44,7 +44,7 @@ void Mesh::generateTexcoords(){
     float min_Y = std::numeric_limits<float>::max();
     float max_Y = std::numeric_limits<float>::min();
 
-    Attribute* attVertex = buffer.getAttribute(AttributeType::POSITIONS);
+    Attribute* attVertex = buffer.getAttribute(AttributeType::POSITION);
 
     for ( unsigned int i = 0; i < buffer.getCount(); i++){
         min_X = fmin(min_X, buffer.getFloat(attVertex, i, 0));
@@ -65,7 +65,7 @@ void Mesh::generateTexcoords(){
         //if (invertTexture) {
             //buffer.addVector2(AttributeType::TEXTURECOORDS, Vector2(u, 1.0 - v));
        // }else{
-            buffer.addVector2(AttributeType::TEXTURECOORDS, Vector2(u, v));
+            buffer.addVector2(AttributeType::TEXCOORD1, Vector2(u, v));
        // }
     }
 

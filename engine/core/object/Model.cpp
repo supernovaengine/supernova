@@ -17,9 +17,9 @@ Model::Model(Scene* scene): Mesh(scene){
     mesh.buffers["indices"] = &indices;
 
 	buffer.clearAll();
-	buffer.addAttribute(AttributeType::POSITIONS, 3);
-	buffer.addAttribute(AttributeType::TEXTURECOORDS, 2);
-	buffer.addAttribute(AttributeType::NORMALS, 3);
+	buffer.addAttribute(AttributeType::POSITION, 3);
+	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+	buffer.addAttribute(AttributeType::NORMAL, 3);
 
     gltfModel = NULL;
 }
@@ -277,9 +277,9 @@ bool Model::loadOBJ(const char* filename){
             //}
         }
 
-        Attribute* attVertex = buffer.getAttribute(AttributeType::POSITIONS);
-        Attribute* attTexcoord = buffer.getAttribute(AttributeType::TEXTURECOORDS);
-        Attribute* attNormal = buffer.getAttribute(AttributeType::NORMALS);
+        Attribute* attVertex = buffer.getAttribute(AttributeType::POSITION);
+        Attribute* attTexcoord = buffer.getAttribute(AttributeType::TEXCOORD1);
+        Attribute* attNormal = buffer.getAttribute(AttributeType::NORMAL);
 
         std::vector<std::vector<uint16_t>> indexMap;
         if (materials.size() > 0) {
@@ -513,19 +513,19 @@ bool Model::loadGLTF(const char* filename) {
             bool verifyAttrs = false;
             if (attrib.first.compare("POSITION") == 0){
                 mesh.defaultBuffer = bufferName;
-                attType = AttributeType::POSITIONS;
+                attType = AttributeType::POSITION;
                 verifyAttrs = true;
             }
             if (attrib.first.compare("NORMAL") == 0){
-                attType = AttributeType::NORMALS;
+                attType = AttributeType::NORMAL;
                 verifyAttrs = true;
             }
             if (attrib.first.compare("TANGENT") == 0){
-                attType = AttributeType::TANGENTS;
+                attType = AttributeType::TANGENT;
                 verifyAttrs = true;
             }
             if (attrib.first.compare("TEXCOORD_0") == 0){
-                attType = AttributeType::TEXTURECOORDS;
+                attType = AttributeType::TEXCOORD1;
                 verifyAttrs = true;
             }
             if (attrib.first.compare("TEXCOORD_1") == 0){
@@ -534,7 +534,7 @@ bool Model::loadGLTF(const char* filename) {
             }
             if (attrib.first.compare("COLOR_0") == 0){
                 if (elements == 4){
-                    attType = AttributeType::COLORS;
+                    attType = AttributeType::COLOR;
                     verifyAttrs = true;
                     mesh.submeshes[i].hasVertexColor = true;
                 } else {
@@ -571,7 +571,7 @@ bool Model::loadGLTF(const char* filename) {
             eBuffers[eBufferIndex].setBufferType(BufferType::VERTEX_BUFFER);
             eBuffers[eBufferIndex].setData((unsigned char*)(&extraBuffer.at(0)), sizeof(float)*count);
             eBuffers[eBufferIndex].setRenderAttributes(false);
-            addSubmeshAttribute(mesh.submeshes[i], bufferName, AttributeType::COLORS, 4, AttributeDataType::FLOAT, sizeof(float)*4, 0, false);
+            addSubmeshAttribute(mesh.submeshes[i], bufferName, AttributeType::COLOR, 4, AttributeDataType::FLOAT, sizeof(float)*4, 0, false);
             eBufferIndex++;
             if (eBufferIndex > MAX_EXTERNAL_BUFFERS){
                 Log::Error("External buffer limit reached for GLTF model: %s", filename);

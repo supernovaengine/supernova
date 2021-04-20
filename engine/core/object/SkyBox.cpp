@@ -11,11 +11,9 @@ SkyBox::SkyBox(Scene* scene){
     sky.buffer = &buffer;
 
 	buffer.clearAll();
-	buffer.addAttribute(AttributeType::POSITIONS, 3);
-	//buffer.addAttribute(AttributeType::TEXTURECOORDS, 2);
-	//buffer.addAttribute(S_VERTEXATTRIBUTE_NORMALS, 3);
+	buffer.addAttribute(AttributeType::POSITION, 3);
 
-    Attribute* attVertex = buffer.getAttribute(AttributeType::POSITIONS);
+    Attribute* attVertex = buffer.getAttribute(AttributeType::POSITION);
     
     buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
     buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));

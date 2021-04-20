@@ -47,11 +47,11 @@ namespace Supernova{
 
     enum class AttributeType{
         INDEX,
-        POSITIONS,
-        TEXTURECOORDS,
-        NORMALS,
-        TANGENTS,
-        COLORS
+        POSITION,
+        TEXCOORD1,
+        NORMAL,
+        TANGENT,
+        COLOR
         //BONEWEIGHTS,
         //BONEIDS,
         //POINTSIZES,

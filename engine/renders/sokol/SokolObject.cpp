@@ -34,7 +34,7 @@ SokolObject& SokolObject::operator=(const SokolObject& rhs) {
 }
 
 size_t SokolObject::getAttributesIndex(AttributeType type, ShaderType shaderType){
-    if (type == AttributeType::POSITIONS){
+    if (type == AttributeType::POSITION){
         if (shaderType == ShaderType::MESH_PBR_UNLIT)
             return ATTR_meshPBR_unlit_vs_a_position;
         if (shaderType == ShaderType::MESH_PBR)
@@ -47,7 +47,7 @@ size_t SokolObject::getAttributesIndex(AttributeType type, ShaderType shaderType
             return ATTR_meshPBR_noTan_vs_a_position;
         if (shaderType == ShaderType::SKYBOX)
             return ATTR_skybox_vs_a_position;
-    }else if (type == AttributeType::TEXTURECOORDS){
+    }else if (type == AttributeType::TEXCOORD1){
         if (shaderType == ShaderType::MESH_PBR_UNLIT)
             return ATTR_meshPBR_unlit_vs_a_texcoord1;
         if (shaderType == ShaderType::MESH_PBR)
@@ -58,7 +58,7 @@ size_t SokolObject::getAttributesIndex(AttributeType type, ShaderType shaderType
             return ATTR_meshPBR_noNmap_vs_a_texcoord1;
         if (shaderType == ShaderType::MESH_PBR_NOTAN)
             return ATTR_meshPBR_noTan_vs_a_texcoord1;
-    }else if (type == AttributeType::NORMALS){
+    }else if (type == AttributeType::NORMAL){
         if (shaderType == ShaderType::MESH_PBR)
             return ATTR_meshPBR_vs_a_normal;
         if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN)
@@ -67,7 +67,7 @@ size_t SokolObject::getAttributesIndex(AttributeType type, ShaderType shaderType
             return ATTR_meshPBR_noNmap_vs_a_normal;
         if (shaderType == ShaderType::MESH_PBR_NOTAN)
             return ATTR_meshPBR_noTan_vs_a_normal;
-    }else if (type == AttributeType::COLORS){
+    }else if (type == AttributeType::COLOR){
         if (shaderType == ShaderType::MESH_PBR)
             return ATTR_meshPBR_vs_a_color;
         if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN)
@@ -76,7 +76,7 @@ size_t SokolObject::getAttributesIndex(AttributeType type, ShaderType shaderType
             return ATTR_meshPBR_noNmap_noTan_vs_a_color;
         if (shaderType == ShaderType::MESH_PBR_NOTAN)
             return ATTR_meshPBR_noNmap_noTan_vs_a_color;
-    }else if (type == AttributeType::TANGENTS){
+    }else if (type == AttributeType::TANGENT){
         if (shaderType == ShaderType::MESH_PBR)
             return ATTR_meshPBR_vs_a_tangent;
         if (shaderType == ShaderType::MESH_PBR_NONMAP)
