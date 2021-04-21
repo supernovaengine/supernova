@@ -1,3 +1,7 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #include "Camera.h"
 
 #include "math/Angle.h"

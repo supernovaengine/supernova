@@ -1,3 +1,7 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #include "Mesh.h"
 #include "render/ObjectRender.h"
 #include "math/Color.h"

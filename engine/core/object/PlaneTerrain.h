@@ -1,3 +1,7 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef PLANETERRAIN_H
 #define PLANETERRAIN_H
 

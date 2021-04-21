@@ -5,11 +5,7 @@
 namespace Supernova {
 
     class Angle {
-    private:
-        static bool useDegrees;
-
     public:
-
         static float radToDefault(float radians);
         static float degToDefault(float degrees);
         static float defaultToRad(float angle);

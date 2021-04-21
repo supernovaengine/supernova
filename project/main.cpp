@@ -8,6 +8,7 @@
 #include "Model.h"
 #include "PlaneTerrain.h"
 #include "SkyBox.h"
+#include "Light.h"
 #include "math/Angle.h"
 
 using namespace Supernova;
@@ -37,6 +38,7 @@ Model carro(&scene);
 //Mesh* child11;
 PlaneTerrain plane(&scene);
 SkyBox sky(&scene);
+Light light(&scene);
 
 float rotationY = 0;
 float speed = 0;

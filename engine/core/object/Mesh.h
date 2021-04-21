@@ -1,3 +1,7 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef MESH_H
 #define MESH_H
 

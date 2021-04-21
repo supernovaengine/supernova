@@ -1,3 +1,7 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef SKYBOX_H
 #define SKYBOX_H
 

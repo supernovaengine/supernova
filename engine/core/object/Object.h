@@ -1,3 +1,7 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef OBJECT_H
 #define OBJECT_H
 

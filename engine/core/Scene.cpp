@@ -10,6 +10,7 @@ Scene::Scene(){
 	registerComponent<SkyComponent>();
     registerComponent<Transform>();
 	registerComponent<CameraComponent>();
+	registerComponent<LightComponent>();
 
 	registerSystem<RenderSystem>();
 

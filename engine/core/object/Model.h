@@ -1,3 +1,7 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef MODEL_H
 #define MODEL_H
 
