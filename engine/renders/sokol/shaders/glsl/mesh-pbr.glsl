@@ -105,7 +105,6 @@
 
 
 @block pbr_fs_attr
-    #define NUM_LIGHTS 3
 
     in vec3 v_position;
 

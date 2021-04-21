@@ -17,7 +17,10 @@ namespace Supernova{
         void setType(LightType type);
 
         void setDirection(Vector3 direction);
+        void setDirection(const float x, const float y, const float z);
+
         void setColor(Vector3 color);
+        void setColor(const float r, const float g, const float b);
 
         void setRange(float range);
         void setIntensity(float intensity);

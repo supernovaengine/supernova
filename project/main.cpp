@@ -38,7 +38,9 @@ Model carro(&scene);
 //Mesh* child11;
 PlaneTerrain plane(&scene);
 SkyBox sky(&scene);
-Light light(&scene);
+Light lightDir(&scene);
+Light lightPoint(&scene);
+Light lightSpot(&scene);
 
 float rotationY = 0;
 float speed = 0;
@@ -46,6 +48,25 @@ float speed = 0;
 Camera camera(&scene);
 
 void init(){
+
+    lightDir.setType(LightType::DIRECTIONAL);
+    lightDir.setDirection(0.8f, -0.2, 0.0);
+    lightDir.setRange(0.0);
+    lightDir.setPosition(0.0f, 0.0f, 0.0f);
+    lightDir.setIntensity(1.0);
+
+    lightPoint.setType(LightType::POINT);
+    lightPoint.setDirection(0.0, 0.0, 0.0);
+    lightPoint.setRange(0.0);
+    lightPoint.setPosition(300.0f, 30.0f, 80.0f);
+    lightPoint.setIntensity(10000.0);
+
+    lightSpot.setType(LightType::SPOT);
+    lightSpot.setDirection(-0.5f, -0.5, 0.0);
+    lightSpot.setRange(0.0);
+    lightSpot.setPosition(-50.0f, 80.0f, 80.0f);
+    lightSpot.setIntensity(10000.0);
+    lightSpot.setConeAngle(25, 35);
 
     sky.setTextureLeft("ely_hills/hills_lf.tga");
     sky.setTextureRight("ely_hills/hills_rt.tga");

@@ -12,8 +12,6 @@
 #include "math/Angle.h"
 #include <memory>
 
-#define NUM_LIGHTS 3
-
 using namespace Supernova;
 
 TextureRender RenderSystem::emptyWhite;
@@ -62,6 +60,44 @@ void RenderSystem::createEmptyTextures(){
 
 		emptyTexturesCreated = true;
 	}
+}
+
+u_lighting_t RenderSystem::collectLights(){
+	u_lighting_t lights;
+
+	auto lightscomp = scene->getComponentArray<LightComponent>();
+
+	int numLights = lightscomp->size();
+	if (numLights > NUM_LIGHTS)
+		numLights = NUM_LIGHTS;
+	
+	for (int i = 0; i < numLights; i++){
+		LightComponent& light = lightscomp->getComponentFromIndex(i);
+		Entity entity = lightscomp->getEntity(i);
+		Transform* transform = scene->findComponent<Transform>(entity);
+
+		Vector3 position;
+		if (transform)
+			position = Vector3(transform->worldPosition);
+
+		int type = 0;
+		if (light.type == LightType::POINT)
+			type = 1;
+		if (light.type == LightType::SPOT)
+			type = 2;
+
+		lights.direction_range[i] = Vector4(light.direction.x, light.direction.y, light.direction.z, light.range);
+		lights.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
+		lights.position_type[i] = Vector4(position.x, position.y, position.z, (float)type);
+		lights.inner_outer_ConeCos[i] = Vector4(light.innerConeCos, light.outerConeCos, 0.0f, 0.0);	
+	}
+
+	// Setting intensity of other lights to zero
+	for (int i = numLights; i < NUM_LIGHTS; i++){
+		lights.color_intensity[i].w = 0.0;
+	}
+
+	return lights;
 }
 
 bool RenderSystem::loadMesh(MeshComponent& mesh){
@@ -209,45 +245,11 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 	return true;
 }
 
-typedef struct u_fs_pbrParams_t {
-    Supernova::Vector4 baseColorFactor;
-    float metallicFactor;
-    float roughnessFactor;
-    uint8_t _pad_24[8];
-    Supernova::Vector3 emissiveFactor;
-    uint8_t _pad_44[4];
-    Supernova::Vector3 eyePos;
-    uint8_t _pad_60[4];
-} u_fs_pbrParams_t;
-
-typedef struct u_lighting_t {
-    Supernova::Vector4 direction_range[NUM_LIGHTS];
-    Supernova::Vector4 color_intensity[NUM_LIGHTS];
-    Supernova::Vector4 position_type[NUM_LIGHTS];
-    Supernova::Vector4 inner_outer_ConeCos[NUM_LIGHTS];
-} u_lighting_t;
-
-void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform){
+void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, u_lighting_t& lights){
 	if (mesh.loaded){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender* render = &mesh.submeshes[i].render;
 			if (render){
-
-				u_lighting_t lights;
-				lights.direction_range[0] = Vector4(0.8f, -0.2, 0.0, 0.0);
-				lights.color_intensity[0] = Vector4(1.0f, 1.0f, 1.0f, 0.0);
-				lights.position_type[0] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
-				lights.inner_outer_ConeCos[0] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
-
-				lights.direction_range[1] = Vector4(-0.5f, -0.5, 0.0, 0.0);
-				lights.color_intensity[1] = Vector4(1.0f, 1.0f, 1.0f, 10000.0);
-				lights.position_type[1] = Vector4(-50.0f, 80.0f, 80.0f, 2.0);
-				lights.inner_outer_ConeCos[1] = Vector4(cos(Angle::degToRad(25)), cos(Angle::degToRad(35)), 0.0f, 0.0);
-
-				lights.direction_range[2] = Vector4(0.0, 0.0, 0.0, 0.0);
-				lights.color_intensity[2] = Vector4(1.0f, 1.0f, 1.0f, 10000.0);
-				lights.position_type[2] = Vector4(300.0f, 30.0f, 80.0f, 1.0);
-				lights.inner_outer_ConeCos[2] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
 
 				u_fs_pbrParams_t pbrParams_fs;
 				pbrParams_fs.baseColorFactor = mesh.submeshes[i].material.baseColorFactor;
@@ -255,7 +257,6 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 				pbrParams_fs.roughnessFactor = mesh.submeshes[i].material.roughnessFactor;
 				pbrParams_fs.emissiveFactor = mesh.submeshes[i].material.emissiveFactor;
 				pbrParams_fs.eyePos = camTransform.worldPosition;
-
 
 				render->beginDraw();
 
@@ -433,6 +434,8 @@ void RenderSystem::draw(){
 	sceneRender.startFrameBuffer();
 	sceneRender.applyViewport(Engine::getViewRect());
 
+	u_lighting_t lights = collectLights();
+
 	auto meshes = scene->getComponentArray<MeshComponent>();
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
 	
@@ -447,7 +450,7 @@ void RenderSystem::draw(){
 			}
 			if (!mesh.transparency){
 				//Draw opaque meshes
-				drawMesh(mesh, *transform, cameraTransform);
+				drawMesh(mesh, *transform, cameraTransform, lights);
 			}else{
 				transparentMeshes.push({&mesh, transform, transform->distanceToCamera});
 			}
@@ -467,7 +470,7 @@ void RenderSystem::draw(){
 		TransparentMeshesData meshData = transparentMeshes.top();
 
 		//Draw transparent meshes
-		drawMesh(*meshData.mesh, *meshData.transform, cameraTransform);
+		drawMesh(*meshData.mesh, *meshData.transform, cameraTransform, lights);
 
 		transparentMeshes.pop();
 	}

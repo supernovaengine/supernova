@@ -5,6 +5,10 @@
 
 @include mesh-pbr.glsl
 
+@block pbr_common_defines
+    #define NUM_LIGHTS 6
+@end
+
 
 //--------------------------------------
 @block pbr_unlit_defines
@@ -20,6 +24,7 @@
 
 @vs meshPBR_unlit_vs
     @include_block pbr_unlit_defines
+    @include_block pbr_common_defines
     @include_block pbr_vs_attr
 
     void main() {
@@ -29,6 +34,7 @@
 
 @fs meshPBR_unlit_fs
     @include_block pbr_unlit_defines
+    @include_block pbr_common_defines
     @include_block pbr_fs_attr
 
     void main() {
@@ -52,6 +58,7 @@
 
 @vs meshPBR_vs
     @include_block pbr_defines
+    @include_block pbr_common_defines
     @include_block pbr_vs_attr
 
     void main() {
@@ -61,6 +68,7 @@
 
 @fs meshPBR_fs
     @include_block pbr_defines
+    @include_block pbr_common_defines
     @include_block pbr_fs_attr
 
     void main() {
@@ -83,6 +91,7 @@
 
 @vs meshPBR_noTan_vs
     @include_block pbr_noTan_defines
+    @include_block pbr_common_defines
     @include_block pbr_vs_attr
 
     void main() {
@@ -92,6 +101,7 @@
 
 @fs meshPBR_noTan_fs
     @include_block pbr_noTan_defines
+    @include_block pbr_common_defines
     @include_block pbr_fs_attr
 
     void main() {
@@ -114,6 +124,7 @@
 
 @vs meshPBR_noNmap_vs
     @include_block pbr_noNmap_defines
+    @include_block pbr_common_defines
     @include_block pbr_vs_attr
 
     void main() {
@@ -123,6 +134,7 @@
 
 @fs meshPBR_noNmap_fs
     @include_block pbr_noNmap_defines
+    @include_block pbr_common_defines
     @include_block pbr_fs_attr
 
     void main() {
@@ -146,6 +158,7 @@
 
 @vs meshPBR_noNmap_noTan_vs
     @include_block pbr_noNmap_noTan_defines
+    @include_block pbr_common_defines
     @include_block pbr_vs_attr
 
     void main() {
@@ -155,6 +168,7 @@
 
 @fs meshPBR_noNmap_noTan_fs
     @include_block pbr_noNmap_noTan_defines
+    @include_block pbr_common_defines
     @include_block pbr_fs_attr
 
     void main() {

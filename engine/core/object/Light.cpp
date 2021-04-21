@@ -5,6 +5,7 @@
 #include "Light.h"
 
 #include "math/Angle.h"
+#include "math/Color.h"
 #include <math.h>
 
 using namespace Supernova;
@@ -30,10 +31,18 @@ void Light::setDirection(Vector3 direction){
     lightcomp.direction = direction;
 }
 
+void Light::setDirection(const float x, const float y, const float z){
+    setDirection(Vector3(x,y,z));
+}
+
 void Light::setColor(Vector3 color){
     LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
 
-    lightcomp.color = color;
+    lightcomp.color = Color::sRGBToLinear(color);
+}
+
+void Light::setColor(const float r, const float g, const float b){
+    setColor(Vector3(r,g,b));
 }
 
 void Light::setRange(float range){
