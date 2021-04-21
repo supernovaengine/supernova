@@ -5,6 +5,7 @@
 #include "texture/TextureData.h"
 #include "pool/TexturePool.h"
 
+#include <algorithm>
 #include <sstream>
 #include "tiny_obj_loader.h"
 #include "tiny_gltf.h"
@@ -20,6 +21,7 @@ Model::Model(Scene* scene): Mesh(scene){
 	buffer.addAttribute(AttributeType::POSITION, 3);
 	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
 	buffer.addAttribute(AttributeType::NORMAL, 3);
+    buffer.addAttribute(AttributeType::COLOR, 4);
 
     gltfModel = NULL;
 }
@@ -271,15 +273,54 @@ bool Model::loadOBJ(const char* filename){
         mesh.numSubmeshes = materials.size();
 
         for (size_t i = 0; i < materials.size(); i++) {
-            mesh.submeshes[i].material.baseColorTexture.setPath(baseDir+materials[i].diffuse_texname);
-            //if (materials[i].dissolve < 1){
-            //    transparent = true;
-            //}
+            // Convert the blinn-phong model to the pbr metallic-roughness model
+            // Based on https://github.com/CesiumGS/obj2gltf
+            const float specularIntensity = materials[i].specular[0] * 0.2125 + materials[i].specular[1] * 0.7154 + materials[i].specular[2] * 0.0721; //luminance
+            
+            float roughnessFactor = materials[i].shininess;
+            roughnessFactor = roughnessFactor / 1000.0;
+            roughnessFactor = 1.0 - roughnessFactor;
+            roughnessFactor = std::min(std::max(roughnessFactor, 0.0f), 1.0f); //clamp
+
+            if (specularIntensity < 0.1) {
+                roughnessFactor *= (1.0 - specularIntensity);
+            }
+            
+            const float metallicFactor = 0.0;
+
+            materials[i].specular[0] = metallicFactor;
+            materials[i].specular[1] = metallicFactor;
+            materials[i].specular[2] = metallicFactor;
+
+            materials[i].shininess = roughnessFactor;
+            // ------ End convertion
+
+            mesh.submeshes[i].material.baseColorFactor = Vector4(materials[i].diffuse[0], materials[i].diffuse[1], materials[i].diffuse[2], 1.0);
+            mesh.submeshes[i].material.emissiveFactor = Vector3(materials[i].emission[0], materials[i].emission[1], materials[i].emission[2]);
+            mesh.submeshes[i].material.metallicFactor = materials[i].specular[0];
+            mesh.submeshes[i].material.roughnessFactor = materials[i].shininess;
+
+            if (!materials[i].diffuse_texname.empty())
+                mesh.submeshes[i].material.baseColorTexture.setPath(baseDir+materials[i].diffuse_texname);
+            if (!materials[i].normal_texname.empty())
+                mesh.submeshes[i].material.normalTexture.setPath(baseDir+materials[i].normal_texname);
+            if (!materials[i].emissive_texname.empty())
+                mesh.submeshes[i].material.emissiveTexture.setPath(baseDir+materials[i].emissive_texname);
+            if (!materials[i].ambient_texname.empty())
+                mesh.submeshes[i].material.occlusionTexture.setPath(baseDir+materials[i].ambient_texname);
+
+            //TODO: occlusionFactor (Ka)
+            //TODO: metallicroughnessTexture (map_Ks + map_Ns)
+
+            if (materials[i].dissolve < 1){
+                mesh.transparency = true;
+            }
         }
 
         Attribute* attVertex = buffer.getAttribute(AttributeType::POSITION);
         Attribute* attTexcoord = buffer.getAttribute(AttributeType::TEXCOORD1);
         Attribute* attNormal = buffer.getAttribute(AttributeType::NORMAL);
+        Attribute* attColor = buffer.getAttribute(AttributeType::COLOR);
 
         std::vector<std::vector<uint16_t>> indexMap;
         if (materials.size() > 0) {
@@ -320,6 +361,17 @@ bool Model::loadOBJ(const char* filename){
                                                       attrib.normals[3 * idx.normal_index + 1],
                                                       attrib.normals[3 * idx.normal_index + 2]));
                     }
+                    
+                    if (attrib.colors.size() > 0){
+                        buffer.addVector4(attColor,
+                                              Vector4(attrib.colors[3 * idx.vertex_index + 0],
+                                                      attrib.colors[3 * idx.vertex_index + 1],
+                                                      attrib.colors[3 * idx.vertex_index + 2],
+                                                      1.0));
+                    }else{
+                        buffer.addVector4(attColor, Vector4(1.0, 1.0, 1.0, 1.0));
+                    }
+                    
                 }
 
                 index_offset += fnum;

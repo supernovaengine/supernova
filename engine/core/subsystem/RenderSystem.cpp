@@ -9,7 +9,10 @@
 #include "pool/ShaderPool.h"
 #include "pool/TexturePool.h"
 #include "math/Vector3.h"
+#include "math/Angle.h"
 #include <memory>
+
+#define NUM_LIGHTS 3
 
 using namespace Supernova;
 
@@ -83,12 +86,6 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 		render->beginLoad(mesh.submeshes[i].primitiveType);
 
-		if (Engine::isAutomaticTransparency()){
-			if (mesh.submeshes[i].material.baseColorTexture.isTransparent() || mesh.submeshes[i].material.baseColorFactor.w != 1.0){
-				mesh.transparency = true;
-			}
-		}
-
 		TextureRender* textureRender = NULL;
 		textureRender = mesh.submeshes[i].material.baseColorTexture.getRender();
 		if (textureRender)
@@ -124,6 +121,12 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				render->loadTexture(textureRender, TextureSamplerType::EMISSIVE);	
 			else
 				render->loadTexture(&emptyBlack, TextureSamplerType::EMISSIVE);
+		}
+
+		if (Engine::isAutomaticTransparency() && !mesh.transparency){
+			if (mesh.submeshes[i].material.baseColorTexture.isTransparent() || mesh.submeshes[i].material.baseColorFactor.w != 1.0){
+				mesh.transparency = true;
+			}
 		}
 
 		for (auto const& buf : mesh.buffers){
@@ -218,10 +221,10 @@ typedef struct u_fs_pbrParams_t {
 } u_fs_pbrParams_t;
 
 typedef struct u_lighting_t {
-    Supernova::Vector4 direction_range[3];
-    Supernova::Vector4 color_intensity[3];
-    Supernova::Vector4 position_type[3];
-    Supernova::Vector4 inner_outer_ConeCos[3];
+    Supernova::Vector4 direction_range[NUM_LIGHTS];
+    Supernova::Vector4 color_intensity[NUM_LIGHTS];
+    Supernova::Vector4 position_type[NUM_LIGHTS];
+    Supernova::Vector4 inner_outer_ConeCos[NUM_LIGHTS];
 } u_lighting_t;
 
 void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform){
@@ -236,14 +239,14 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 				lights.position_type[0] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
 				lights.inner_outer_ConeCos[0] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
 
-				lights.direction_range[1] = Vector4(-0.8f, -0.5, 0.0, 0.0);
-				lights.color_intensity[1] = Vector4(1.0f, 1.0f, 1.0f, 0.0);
-				lights.position_type[1] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
-				lights.inner_outer_ConeCos[1] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
+				lights.direction_range[1] = Vector4(-0.5f, -0.5, 0.0, 0.0);
+				lights.color_intensity[1] = Vector4(1.0f, 1.0f, 1.0f, 10000.0);
+				lights.position_type[1] = Vector4(-50.0f, 80.0f, 80.0f, 2.0);
+				lights.inner_outer_ConeCos[1] = Vector4(cos(Angle::degToRad(25)), cos(Angle::degToRad(35)), 0.0f, 0.0);
 
 				lights.direction_range[2] = Vector4(0.0, 0.0, 0.0, 0.0);
 				lights.color_intensity[2] = Vector4(1.0f, 1.0f, 1.0f, 10000.0);
-				lights.position_type[2] = Vector4(300.0f, 80.0f, 80.0f, 1.0);
+				lights.position_type[2] = Vector4(300.0f, 30.0f, 80.0f, 1.0);
 				lights.inner_outer_ConeCos[2] = Vector4(0.0f, 0.0f, 0.0f, 0.0);
 
 				u_fs_pbrParams_t pbrParams_fs;
@@ -260,7 +263,7 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 					mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN ||
 					mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NOTAN ||
 					mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NONMAP){
-					render->applyUniform(UniformType::LIGHTING, UniformDataType::FLOAT, 16 * 3, &lights);
+					render->applyUniform(UniformType::LIGHTING, UniformDataType::FLOAT, 16 * NUM_LIGHTS, &lights);
 				}
 
 				render->applyUniform(UniformType::PBR_FS_PARAMS, UniformDataType::FLOAT, 16, &pbrParams_fs);

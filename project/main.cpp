@@ -58,13 +58,13 @@ void init(){
     camera.setPosition(0,30,100);
     //camera.getComponent<CameraComponent>().view = Vector3(0,0,0);
 
-    //carro.loadOBJ("jeep/Jeep.obj");
-    //carro.setPosition(0, 0, 20);
-    //carro.setScale(5);
+    carro.loadOBJ("jeep/Jeep.obj");
+    carro.setPosition(0, 0, 20);
+    carro.setScale(5);
 
-    carro.loadGLTF("WaterBottle.glb");
-    carro.setPosition(0, 30, 20);
-    carro.setScale(200);
+    //carro.loadGLTF("WaterBottle.glb");
+    //carro.setPosition(0, 30, 20);
+    //carro.setScale(200);
 
     carro.setName("carro");
  /*
