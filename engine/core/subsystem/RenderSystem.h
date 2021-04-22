@@ -5,6 +5,7 @@
 #include "component/MeshComponent.h"
 #include "component/SkyComponent.h"
 #include "component/CameraComponent.h"
+#include "component/LightComponent.h"
 #include "component/Transform.h"
 #include "render/ObjectRender.h"
 #include "render/SceneRender.h"
@@ -76,6 +77,7 @@ namespace Supernova{
 		void updateTransform(Transform& transform);
 		void updateCamera(CameraComponent& camera, Transform& transform);
 		void updateSkyViewProjection(CameraComponent& camera);
+		void updateLightFromTransform(LightComponent& light, Transform& transform);
 	
 		virtual void load();
 		virtual void draw();

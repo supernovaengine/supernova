@@ -15,6 +15,8 @@ namespace Supernova{
         LightType type = LightType::DIRECTIONAL;
 
         Vector3 direction;
+        Vector3 worldDirection;
+
         Vector3 color = Vector3(1.0, 1.0, 1.0);
 
         float range = 0.0;

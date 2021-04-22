@@ -62,11 +62,13 @@ void init(){
     lightPoint.setIntensity(10000.0);
 
     lightSpot.setType(LightType::SPOT);
-    lightSpot.setDirection(-0.5f, -0.5, 0.0);
+    lightSpot.setDirection(0.0f, -0.6, 0.4);
     lightSpot.setRange(0.0);
-    lightSpot.setPosition(-50.0f, 80.0f, 80.0f);
+    lightSpot.setPosition(0.0f, 80.0f/5, 30.0f/5);
     lightSpot.setIntensity(10000.0);
     lightSpot.setConeAngle(25, 35);
+
+    carro.addChild(&lightSpot);
 
     sky.setTextureLeft("ely_hills/hills_lf.tga");
     sky.setTextureRight("ely_hills/hills_rt.tga");

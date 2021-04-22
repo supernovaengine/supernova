@@ -27,8 +27,10 @@ void Light::setType(LightType type){
 
 void Light::setDirection(Vector3 direction){
     LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    Transform& transform = scene->getComponent<Transform>(entity);
 
     lightcomp.direction = direction;
+    transform.needUpdate = true; //Does not affect children
 }
 
 void Light::setDirection(const float x, const float y, const float z){

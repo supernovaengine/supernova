@@ -63,22 +63,23 @@ void RenderSystem::createEmptyTextures(){
 }
 
 u_lighting_t RenderSystem::collectLights(){
-	u_lighting_t lights;
+	u_lighting_t lightsBlock;
 
-	auto lightscomp = scene->getComponentArray<LightComponent>();
+	auto lights = scene->getComponentArray<LightComponent>();
 
-	int numLights = lightscomp->size();
+	int numLights = lights->size();
 	if (numLights > NUM_LIGHTS)
 		numLights = NUM_LIGHTS;
 	
 	for (int i = 0; i < numLights; i++){
-		LightComponent& light = lightscomp->getComponentFromIndex(i);
-		Entity entity = lightscomp->getEntity(i);
+		LightComponent& light = lights->getComponentFromIndex(i);
+		Entity entity = lights->getEntity(i);
 		Transform* transform = scene->findComponent<Transform>(entity);
 
-		Vector3 position;
-		if (transform)
-			position = Vector3(transform->worldPosition);
+		Vector3 worldPosition;
+		if (transform){
+			worldPosition = Vector3(transform->worldPosition);
+		}
 
 		int type = 0;
 		if (light.type == LightType::POINT)
@@ -86,18 +87,18 @@ u_lighting_t RenderSystem::collectLights(){
 		if (light.type == LightType::SPOT)
 			type = 2;
 
-		lights.direction_range[i] = Vector4(light.direction.x, light.direction.y, light.direction.z, light.range);
-		lights.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
-		lights.position_type[i] = Vector4(position.x, position.y, position.z, (float)type);
-		lights.inner_outer_ConeCos[i] = Vector4(light.innerConeCos, light.outerConeCos, 0.0f, 0.0);	
+		lightsBlock.direction_range[i] = Vector4(light.worldDirection.x, light.worldDirection.y, light.worldDirection.z, light.range);
+		lightsBlock.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
+		lightsBlock.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
+		lightsBlock.inner_outer_ConeCos[i] = Vector4(light.innerConeCos, light.outerConeCos, 0.0f, 0.0);
 	}
 
 	// Setting intensity of other lights to zero
 	for (int i = numLights; i < NUM_LIGHTS; i++){
-		lights.color_intensity[i].w = 0.0;
+		lightsBlock.color_intensity[i].w = 0.0;
 	}
 
-	return lights;
+	return lightsBlock;
 }
 
 bool RenderSystem::loadMesh(MeshComponent& mesh){
@@ -342,8 +343,9 @@ void RenderSystem::updateTransform(Transform& transform){
     	transform.worldPosition = transform.position;
 	}
 
-	//TODO: Check if lights is on
-	transform.normalMatrix = transform.modelMatrix.inverse().transpose();
+	if (hasLights){
+		transform.normalMatrix = transform.modelMatrix.inverse().transpose();
+	}
 }
 
 void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
@@ -394,6 +396,10 @@ void RenderSystem::updateSkyViewProjection(CameraComponent& camera){
 	}
 }
 
+void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& transform){
+	light.worldDirection = transform.worldRotation * light.direction;
+}
+
 void RenderSystem::update(double dt){
 	CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
@@ -403,12 +409,18 @@ void RenderSystem::update(double dt){
 	}
 
 	auto transforms = scene->getComponentArray<Transform>();
-
 	for (int i = 0; i < transforms->size(); i++){
 		Transform& transform = transforms->getComponentFromIndex(i);
 		
 		if (transform.needUpdate){
 			updateTransform(transform);
+
+			Entity entity = transforms->getEntity(i);
+
+			LightComponent* light = scene->findComponent<LightComponent>(entity);
+			if (light){
+				updateLightFromTransform(*light, transform);
+			}
 		}
 	}
 
