@@ -6,6 +6,7 @@
 #include "System.h"
 #include "render/Render.h"
 #include "render/ObjectRender.h"
+#include "render/SystemRender.h"
 #include "pool/ShaderPool.h"
 #include "pool/TexturePool.h"
 #include "math/Vector3.h"
@@ -443,7 +444,7 @@ void RenderSystem::update(double dt){
 
 void RenderSystem::draw(){
 	
-	sceneRender.startFrameBuffer();
+	sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
 	sceneRender.applyViewport(Engine::getViewRect());
 
 	u_lighting_t lights = collectLights();
@@ -488,6 +489,7 @@ void RenderSystem::draw(){
 	}
 
 	sceneRender.endFrameBuffer();
+	SystemRender::commit();
 }
 
 void RenderSystem::entityDestroyed(Entity entity){

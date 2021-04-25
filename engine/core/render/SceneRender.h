@@ -16,8 +16,13 @@ namespace Supernova{
         SceneRender& operator=(const SceneRender& rhs);
         virtual ~SceneRender();
 
-        void startFrameBuffer();
+        void setClearColor(Vector4 clearColor);
+
+        void startFrameBuffer(FramebufferRender* framebuffer);
+        void startDefaultFrameBuffer(int width, int height);
+
         void applyViewport(Rect rect);
+
         void endFrameBuffer();
     };
 }

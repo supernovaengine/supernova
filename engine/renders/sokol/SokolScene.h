@@ -2,6 +2,8 @@
 #define sokolscene_h
 
 #include "math/Rect.h"
+#include "math/Vector4.h"
+#include "render/FramebufferRender.h"
 
 #include "sokol_gfx.h"
 
@@ -17,8 +19,13 @@ namespace Supernova{
         SokolScene& operator=(const SokolScene& rhs);
         virtual ~SokolScene();
 
-        void startFrameBuffer();
+        void setClearColor(Vector4 clearColor);
+
+        void startFrameBuffer(FramebufferRender* framebuffer);
+        void startDefaultFrameBuffer(int width, int height);
+
         void applyViewport(Rect rect);
+
         void endFrameBuffer();
     };
 }

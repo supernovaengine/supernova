@@ -36,15 +36,14 @@ bool SokolTexture::createTexture(std::string label, int width, int height, Color
         Log::Error("Renders only support 8bpp and 32bpp textures");
     }
 
-    sg_image_desc image_desc = {
-        .type = getTextureType(type),
-        .width = width,
-        .height = height,
-        .pixel_format = pixelFormat,
-        .min_filter = SG_FILTER_LINEAR,
-        .mag_filter = SG_FILTER_LINEAR,
-        .label = label.c_str()
-    };
+    sg_image_desc image_desc = {0};
+    image_desc.type = getTextureType(type);
+    image_desc.width = width;
+    image_desc.height = height;
+    image_desc.pixel_format = pixelFormat;
+    image_desc.min_filter = SG_FILTER_LINEAR;
+    image_desc.mag_filter = SG_FILTER_LINEAR;
+    image_desc.label = label.c_str();
 
     for (int f = 0; f < numFaces; f++){
         image_desc.data.subimage[f][0].ptr = texData[f].data;
@@ -52,6 +51,25 @@ bool SokolTexture::createTexture(std::string label, int width, int height, Color
     }
 
     image = sg_make_image(&image_desc);
+
+    if (image.id != SG_INVALID_ID)
+        return true;
+
+    return false;
+}
+
+bool SokolTexture::createShadowMapColorTexture(int width, int height){
+    sg_image_desc img_desc = {0};
+    img_desc.render_target = true;
+    img_desc.width = width;
+    img_desc.height = height;
+    img_desc.pixel_format = SG_PIXELFORMAT_RGBA8;
+    img_desc.min_filter = SG_FILTER_LINEAR;
+    img_desc.mag_filter = SG_FILTER_LINEAR;
+    img_desc.sample_count = 1;
+    img_desc.label = "shadow-map-color-image";
+
+    image = sg_make_image(&img_desc);
 
     if (image.id != SG_INVALID_ID)
         return true;

@@ -5,6 +5,7 @@ namespace Supernova{
     class SystemRender{        
     public:
         static void setup();
+        static void commit();
         static void shutdown();
     };
 }

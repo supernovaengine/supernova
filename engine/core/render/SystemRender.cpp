@@ -8,6 +8,10 @@ void SystemRender::setup(){
     SokolSystem::setup();
 }
 
+void SystemRender::commit(){
+    SokolSystem::commit();
+}
+
 void SystemRender::shutdown(){
     SokolSystem::shutdown();
 }

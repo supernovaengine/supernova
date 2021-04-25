@@ -24,4 +24,4 @@ namespace Supernova{
 }
 
 
-#endif /* ShaderRender_h */
+#endif /* BufferRender_h */

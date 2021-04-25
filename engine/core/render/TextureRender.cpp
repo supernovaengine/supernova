@@ -20,6 +20,10 @@ bool TextureRender::createTexture(std::string label, int width, int height, Colo
     return backend.createTexture(label, width, height, colorFormat, type, numFaces, texData);
 }
 
+bool TextureRender::createShadowMapColorTexture(int width, int height){
+    return backend.createShadowMapColorTexture(width, height);
+}
+
 void TextureRender::destroyTexture(){
     backend.destroyTexture();
 }

@@ -15,8 +15,16 @@ SceneRender& SceneRender::operator=(const SceneRender& rhs) {
 
 SceneRender::~SceneRender(){ }
 
-void SceneRender::startFrameBuffer(){
-    backend.startFrameBuffer();
+void SceneRender::setClearColor(Vector4 clearColor){
+    backend.setClearColor(clearColor);
+}
+
+void SceneRender::startFrameBuffer(FramebufferRender* framebuffer){
+    backend.startFrameBuffer(framebuffer);
+}
+
+void SceneRender::startDefaultFrameBuffer(int width, int height){
+    backend.startDefaultFrameBuffer(width, height);
 }
 
 void SceneRender::applyViewport(Rect rect){

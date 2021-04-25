@@ -13,6 +13,10 @@ void SokolSystem::setup(){
     sg_setup(&desc);
 }
 
+void SokolSystem::commit(){
+    sg_commit();
+}
+
 void SokolSystem::shutdown(){
     sg_shutdown();
 }
