@@ -30,6 +30,8 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 
 void RenderSystem::load(){
 	createEmptyTextures();
+	depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
+	depthFb.createFramebuffer(2048, 2048);
 }
 
 void RenderSystem::createEmptyTextures(){
@@ -122,7 +124,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 		ObjectRender* render = &mesh.submeshes[i].render;
 
-		render->beginLoad(mesh.submeshes[i].primitiveType);
+		render->beginLoad(mesh.submeshes[i].primitiveType, false);
 
 		TextureRender* textureRender = NULL;
 		textureRender = mesh.submeshes[i].material.baseColorTexture.getRender();
@@ -238,11 +240,48 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		}else{
 			mesh.submeshes[i].vertexCount = vertexBufferCount;
 		}
-	
-		mesh.loaded = true;
 
 		render->endLoad();
+
+		//----------Start depth shader---------------
+		if (hasLights && mesh.castShadows){
+			ObjectRender* depthRender = &mesh.submeshes[i].depthRender;
+
+			depthRender->beginLoad(mesh.submeshes[i].primitiveType, true);
+
+			ShaderType shaderType = ShaderType::DEPTH;
+
+			mesh.submeshes[i].depthShader = ShaderPool::get(shaderType);
+			depthRender->loadShader(mesh.submeshes[i].depthShader.get());
+
+			for (auto const& buf : mesh.buffers){
+        		if (buf.second->isRenderAttributes()) {
+					if (buf.second->getAttributes().count(AttributeType::POSITION)){
+						Attribute posattr = buf.second->getAttributes()[AttributeType::POSITION];
+						depthRender->loadAttribute(AttributeType::POSITION, shaderType, buf.second->getRender(), posattr.getElements(), posattr.getDataType(), buf.second->getStride(), posattr.getOffset(), posattr.getNormalized());
+					}
+        		}
+				if (buf.second->getBufferType() == BufferType::INDEX_BUFFER){
+					indexCount = buf.second->getCount();
+					Attribute indexattr = buf.second->getAttributes()[AttributeType::INDEX];
+					depthRender->loadIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
+				}
+    		}
+
+			for (auto const& attr : mesh.submeshes[i].attributes){
+				if (attr.first == AttributeType::INDEX){
+					depthRender->loadIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
+				}else if (attr.first == AttributeType::POSITION){
+					depthRender->loadAttribute(attr.first, shaderType, bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+				}
+			}
+
+			depthRender->endLoad();
+		}
+		//----------End depth shader---------------
 	}
+
+	mesh.loaded = true;
 
 	return true;
 }
@@ -251,31 +290,44 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 	if (mesh.loaded){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender* render = &mesh.submeshes[i].render;
-			if (render){
+			
+			u_fs_pbrParams_t pbrParams_fs;
+			pbrParams_fs.baseColorFactor = mesh.submeshes[i].material.baseColorFactor;
+			pbrParams_fs.metallicFactor = mesh.submeshes[i].material.metallicFactor;
+			pbrParams_fs.roughnessFactor = mesh.submeshes[i].material.roughnessFactor;
+			pbrParams_fs.emissiveFactor = mesh.submeshes[i].material.emissiveFactor;
+			pbrParams_fs.eyePos = camTransform.worldPosition;
 
-				u_fs_pbrParams_t pbrParams_fs;
-				pbrParams_fs.baseColorFactor = mesh.submeshes[i].material.baseColorFactor;
-				pbrParams_fs.metallicFactor = mesh.submeshes[i].material.metallicFactor;
-				pbrParams_fs.roughnessFactor = mesh.submeshes[i].material.roughnessFactor;
-				pbrParams_fs.emissiveFactor = mesh.submeshes[i].material.emissiveFactor;
-				pbrParams_fs.eyePos = camTransform.worldPosition;
+			render->beginDraw();
 
-				render->beginDraw();
-
-				if (mesh.submeshes[i].shaderType == ShaderType::MESH_PBR || 
-					mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN ||
-					mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NOTAN ||
-					mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NONMAP){
-					render->applyUniform(UniformType::LIGHTING, UniformDataType::FLOAT, 16 * NUM_LIGHTS, &lights);
-				}
-
-				render->applyUniform(UniformType::PBR_FS_PARAMS, UniformDataType::FLOAT, 16, &pbrParams_fs);
-
-				//model, normal and mvp matrix
-				render->applyUniform(UniformType::PBR_VS_PARAMS, UniformDataType::FLOAT, 48, &transform.modelMatrix);
-
-				render->draw(mesh.submeshes[i].vertexCount);
+			if (mesh.submeshes[i].shaderType == ShaderType::MESH_PBR || 
+				mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN ||
+				mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NOTAN ||
+				mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NONMAP){
+				render->applyUniform(UniformType::LIGHTING, UniformDataType::FLOAT, 16 * NUM_LIGHTS, &lights);
 			}
+
+			render->applyUniform(UniformType::PBR_FS_PARAMS, UniformDataType::FLOAT, 16, &pbrParams_fs);
+
+			//model, normal and mvp matrix
+			render->applyUniform(UniformType::PBR_VS_PARAMS, UniformDataType::FLOAT, 48, &transform.modelMatrix);
+
+			render->draw(mesh.submeshes[i].vertexCount);
+		}
+	}
+}
+
+void RenderSystem::drawMeshDepth(MeshComponent& mesh, Transform& transform){
+	if (mesh.loaded && hasLights && mesh.castShadows){
+		for (int i = 0; i < mesh.numSubmeshes; i++){
+			ObjectRender* depthRender = &mesh.submeshes[i].depthRender;
+
+			depthRender->beginDraw();
+			
+			//mvp matrix
+			depthRender->applyUniform(UniformType::DEPTH_VS_PARAMS, UniformDataType::FLOAT, 16, &transform.modelViewProjectionMatrix);
+
+			depthRender->draw(mesh.submeshes[i].vertexCount);
 		}
 	}
 }
@@ -284,7 +336,7 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 
 	ObjectRender* render = &sky.render;
 
-	render->beginLoad(PrimitiveType::TRIANGLES);
+	render->beginLoad(PrimitiveType::TRIANGLES, false);
 
 	ShaderType shaderType = ShaderType::SKYBOX;
 
@@ -443,13 +495,33 @@ void RenderSystem::update(double dt){
 }
 
 void RenderSystem::draw(){
+
+	//---------Draw all meshes----------
+	auto meshes = scene->getComponentArray<MeshComponent>();
+
+	depthRender.startFrameBuffer(&depthFb);
+	
+	for (int i = 0; i < meshes->size(); i++){
+		MeshComponent& mesh = meshes->getComponentFromIndex(i);
+		Entity entity = meshes->getEntity(i);
+		Transform* transform = scene->findComponent<Transform>(entity);
+
+		if (transform){
+			if (!mesh.loaded){
+				loadMesh(mesh);
+			}
+			drawMeshDepth(mesh, *transform);
+		}
+	}
+
+	depthRender.endFrameBuffer();
+	
 	
 	sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
 	sceneRender.applyViewport(Engine::getViewRect());
 
 	u_lighting_t lights = collectLights();
 
-	auto meshes = scene->getComponentArray<MeshComponent>();
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
 	
 	for (int i = 0; i < meshes->size(); i++){
@@ -470,6 +542,7 @@ void RenderSystem::draw(){
 		}
 	}
 
+	//---------Draw sky----------
 	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
 	if (sky){
 		if (!sky->loaded){
@@ -489,6 +562,7 @@ void RenderSystem::draw(){
 	}
 
 	sceneRender.endFrameBuffer();
+	
 	SystemRender::commit();
 }
 
@@ -503,6 +577,7 @@ void RenderSystem::entityDestroyed(Entity entity){
 			//Destroy shader
 			submesh.shader.reset();
 			ShaderPool::remove(submesh.shaderType);
+			ShaderPool::remove(ShaderType::DEPTH);
 
 			//Destroy texture
 			submesh.material.baseColorTexture.destroy();

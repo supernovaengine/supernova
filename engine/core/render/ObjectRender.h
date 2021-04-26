@@ -21,7 +21,7 @@ namespace Supernova {
         ObjectRender& operator=(const ObjectRender& rhs);
         virtual ~ObjectRender();
 
-        void beginLoad(PrimitiveType primitiveType);
+        void beginLoad(PrimitiveType primitiveType, bool depth);
         void loadIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset);
         void loadAttribute(AttributeType type, ShaderType shaderType, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized);
         void loadShader(ShaderRender* shader);

@@ -34,7 +34,7 @@ TextureRender* SokolFramebuffer::createFramebuffer(int width, int height){
     pass_desc.depth_stencil_attachment.image = depth_img;
     pass_desc.label = "shadow-map-pass";
 
-    sg_pass pass = sg_make_pass(&pass_desc);
+    pass = sg_make_pass(&pass_desc);
 
     if (pass.id != SG_INVALID_ID)
         return &colorTexture;

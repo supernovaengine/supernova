@@ -32,6 +32,8 @@ bool SokolShader::createShader(ShaderType shaderType){
         shader = sg_make_shader(meshPBR_noNmap_noTan_shader_desc(sg_query_backend()));
     }else if (shaderType == ShaderType::SKYBOX){
         shader = sg_make_shader(skybox_shader_desc(sg_query_backend()));
+    }else if (shaderType == ShaderType::DEPTH){
+        shader = sg_make_shader(depth_shader_desc(sg_query_backend()));
     }
 
     if (shader.id != SG_INVALID_ID)

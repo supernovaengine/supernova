@@ -10,6 +10,7 @@
 #include "render/ObjectRender.h"
 #include "render/SceneRender.h"
 #include "render/BufferRender.h"
+#include "render/FramebufferRender.h"
 #include "Supernova.h"
 #include <map>
 #include <memory>
@@ -50,6 +51,8 @@ namespace Supernova{
 		};
 
 		SceneRender sceneRender;
+		SceneRender depthRender;
+		FramebufferRender depthFb;
 
 		static TextureRender emptyWhite;
 		static TextureRender emptyBlack;
@@ -70,6 +73,7 @@ namespace Supernova{
 
 		bool loadMesh(MeshComponent& mesh);
 		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, u_lighting_t& lights);
+		void drawMeshDepth(MeshComponent& mesh, Transform& transform);
 
 		bool loadSky(SkyComponent& sky);
 		void drawSky(SkyComponent& sky);

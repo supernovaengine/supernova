@@ -5,7 +5,7 @@
         mat4 modelMatrix;
         mat4 normalMatrix;
         mat4 mvpMatrix;
-    } fs_pbrParams;
+    } pbrParams;
 
     in vec3 a_position;
     out vec3 v_position;
@@ -69,19 +69,19 @@
 
 @block pbr_vs_main
     #ifndef MATERIAL_UNLIT
-        vec4 pos = fs_pbrParams.modelMatrix * getPosition();
+        vec4 pos = pbrParams.modelMatrix * getPosition();
         v_position = vec3(pos.xyz) / pos.w;
     #endif
 
     #ifdef HAS_NORMALS
     #ifdef HAS_TANGENTS
         vec3 tangent = getTangent();
-        vec3 normalW = normalize(vec3(fs_pbrParams.normalMatrix * vec4(getNormal(), 0.0)));
-        vec3 tangentW = normalize(vec3(fs_pbrParams.modelMatrix * vec4(tangent, 0.0)));
+        vec3 normalW = normalize(vec3(pbrParams.normalMatrix * vec4(getNormal(), 0.0)));
+        vec3 tangentW = normalize(vec3(pbrParams.modelMatrix * vec4(tangent, 0.0)));
         vec3 bitangentW = cross(normalW, tangentW) * a_tangent.w;
         v_tbn = mat3(tangentW, bitangentW, normalW);
     #else // !HAS_TANGENTS
-        v_normal = normalize(vec3(fs_pbrParams.normalMatrix * vec4(getNormal(), 0.0)));
+        v_normal = normalize(vec3(pbrParams.normalMatrix * vec4(getNormal(), 0.0)));
     #endif
     #endif
 
@@ -100,7 +100,7 @@
         v_color = a_color;
     #endif
 
-    gl_Position = fs_pbrParams.mvpMatrix * getPosition();
+    gl_Position = pbrParams.mvpMatrix * getPosition();
 @end
 
 
@@ -143,7 +143,7 @@
 
         //Camera Position
         vec3 eyePos;
-    } fs_pbrParams;
+    } pbrParams;
 
     #ifdef USE_PUNCTUAL
         uniform u_lighting {
@@ -208,7 +208,7 @@
         return;
     #endif
 
-    vec3 v = normalize(fs_pbrParams.eyePos- v_position);
+    vec3 v = normalize(pbrParams.eyePos- v_position);
     NormalInfo normalInfo = getNormalInfo(v);
     vec3 n = normalInfo.n;
     vec3 t = normalInfo.t;
@@ -302,7 +302,7 @@
     }
     #endif
 
-    f_emissive = fs_pbrParams.emissiveFactor;
+    f_emissive = pbrParams.emissiveFactor;
     f_emissive *= sRGBToLinear(getEmissiveTexture().rgb);
 
     vec3 color = f_emissive + f_diffuse + f_specular;

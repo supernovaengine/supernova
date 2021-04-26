@@ -42,7 +42,8 @@ namespace Supernova{
         MESH_PBR_NOTAN,
         MESH_PBR_NONMAP,
         MESH_PBR_NONMAP_NOTAN,
-        SKYBOX
+        SKYBOX,
+        DEPTH
     };
 
     enum class AttributeType{
@@ -88,6 +89,7 @@ namespace Supernova{
         PBR_FS_PARAMS,
         LIGHTING,
         VIEWPROJECTIONSKY,
+        DEPTH_VS_PARAMS
         //CAMERA
         /*
         MVPMATRIX,

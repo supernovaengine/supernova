@@ -209,7 +209,36 @@
 //--------------------------------------
 
 
-//@program mesh mesh_vs mesh_fs
+@vs depth_vs
+uniform u_vs_depthParams {
+    mat4 mvpMatrix;
+} depthParams;
+
+in vec3 a_position;
+
+void main() {
+    gl_Position = depthParams.mvpMatrix * vec4(a_position, 1.0);
+}
+@end
+
+@fs depth_fs
+out vec4 frag_color;
+
+vec4 encodeDepth(float v) {
+    vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
+    enc = fract(enc);
+    enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);
+    return enc;
+}
+
+void main() {             
+    // sokol and webgl 1 do not support using the depth map as texture
+    // so instead we write the depth value to the color map
+    frag_color = encodeDepth(gl_FragCoord.z);
+}
+@end
+
+
 
 @program meshPBR_unlit meshPBR_unlit_vs meshPBR_unlit_fs
 
@@ -220,3 +249,5 @@
 @program meshPBR_noNmap_noTan meshPBR_noNmap_noTan_vs meshPBR_noNmap_noTan_fs
 
 @program skybox skybox_vs skybox_fs
+
+@program depth depth_vs depth_fs

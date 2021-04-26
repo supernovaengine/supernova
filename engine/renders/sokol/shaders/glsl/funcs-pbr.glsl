@@ -30,14 +30,14 @@ vec4 getVertexColor(){
 }
 
 vec4 getBaseColor(){
-    vec4 baseColor = fs_pbrParams.baseColorFactor;
+    vec4 baseColor = pbrParams.baseColorFactor;
     baseColor *= sRGBToLinear(texture(u_baseColorTexture, v_uv1));
     return baseColor * getVertexColor();
 }
 
 MaterialInfo getMetallicRoughnessInfo(MaterialInfo info, float f0_ior){
-    info.metallic = fs_pbrParams.metallicFactor;
-    info.perceptualRoughness = fs_pbrParams.roughnessFactor;
+    info.metallic = pbrParams.metallicFactor;
+    info.perceptualRoughness = pbrParams.roughnessFactor;
     // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
     // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
     vec4 mrSample = texture(u_metallicRoughnessTexture, v_uv1);

@@ -1,5 +1,7 @@
 #include "ShaderPool.h"
 
+#include "Log.h"
+
 using namespace Supernova;
 
 shaders_t& ShaderPool::getMap(){
@@ -24,9 +26,13 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType){
 }
 
 void ShaderPool::remove(ShaderType shaderType){
-	auto& shared = getMap()[shaderType];
-	if (shared.use_count() <= 1){
-		shared->destroyShader();
-		getMap().erase(shaderType);
+	if (getMap().count(shaderType)){
+		auto& shared = getMap()[shaderType];
+		if (shared.use_count() <= 1){
+			shared->destroyShader();
+			getMap().erase(shaderType);
+		}
+	}else{
+		Log::Debug("Trying to destroy a not existent shader");
 	}
 }

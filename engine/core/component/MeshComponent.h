@@ -35,9 +35,15 @@ namespace Supernova{
     struct Submesh{
         Material material;
         std::map<AttributeType, Attribute> attributes;
+
         ObjectRender render;
+        ObjectRender depthRender;
+
         std::shared_ptr<ShaderRender> shader;
+        std::shared_ptr<ShaderRender> depthShader;
+
         ShaderType shaderType;
+
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;
         int vertexCount = 0;
         
@@ -55,6 +61,7 @@ namespace Supernova{
         Submesh submeshes[MAX_SUBMESHES];
         unsigned int numSubmeshes = 1;
 
+        bool castShadows = true;
         bool transparency = false;
     };
     

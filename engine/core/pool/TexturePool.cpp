@@ -1,6 +1,7 @@
 #include "TexturePool.h"
 
 #include "Engine.h"
+#include "Log.h"
 
 using namespace Supernova;
 
@@ -47,9 +48,13 @@ std::shared_ptr<TextureRender> TexturePool::get(std::string id, TextureType type
 }
 
 void TexturePool::remove(std::string id){
-	auto& shared = getMap()[id];
-	if (shared.use_count() <= 1){
-		shared->destroyTexture();
-		getMap().erase(id);
+	if (getMap().count(id)){
+		auto& shared = getMap()[id];
+		if (shared.use_count() <= 1){
+			shared->destroyTexture();
+			getMap().erase(id);
+		}
+	}else{
+		Log::Debug("Trying to destroy a not existent texture: %s", id.c_str());
 	}
 }

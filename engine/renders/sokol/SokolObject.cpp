@@ -47,6 +47,8 @@ size_t SokolObject::getAttributesIndex(AttributeType type, ShaderType shaderType
             return ATTR_meshPBR_noTan_vs_a_position;
         if (shaderType == ShaderType::SKYBOX)
             return ATTR_skybox_vs_a_position;
+        if (shaderType == ShaderType::DEPTH)
+            return ATTR_depth_vs_a_position;
     }else if (type == AttributeType::TEXCOORD1){
         if (shaderType == ShaderType::MESH_PBR_UNLIT)
             return ATTR_meshPBR_unlit_vs_a_texcoord1;
@@ -158,6 +160,8 @@ UniformStageSlot SokolObject::getUniformStageSlot(UniformType type){
         return {SG_SHADERSTAGE_VS, SLOT_u_vs_pbrParams};
     }else if (type == UniformType::VIEWPROJECTIONSKY){
         return {SG_SHADERSTAGE_VS, SLOT_viewProjectionSky};
+    }else if (type == UniformType::DEPTH_VS_PARAMS){
+        return {SG_SHADERSTAGE_VS, SLOT_u_vs_depthParams};
     }
 
     //Fragment uniforms
@@ -170,7 +174,7 @@ UniformStageSlot SokolObject::getUniformStageSlot(UniformType type){
     return {SG_SHADERSTAGE_VS, -1};
 }
 
-void SokolObject::beginLoad(PrimitiveType primitiveType){
+void SokolObject::beginLoad(PrimitiveType primitiveType, bool depth){
     bind = {0};
     pip = {0};
     pipeline_desc = {0};
@@ -185,6 +189,12 @@ void SokolObject::beginLoad(PrimitiveType primitiveType){
     pipeline_desc.colors[0].blend.enabled = true;
     pipeline_desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
     pipeline_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+
+    if (depth){
+        pipeline_desc.sample_count = 1;
+        pipeline_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
+        pipeline_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
+    }
 
     pipeline_desc.primitive_type = getPrimitiveType(primitiveType);
 
