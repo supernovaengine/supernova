@@ -49,6 +49,7 @@
     #define HAS_UV_SET1
     //#define HAS_UV_SET2
     #define USE_PUNCTUAL
+    //#define USE_SHADOWS
     #define HAS_NORMALS
     #define HAS_NORMAL_MAP
     #define HAS_TANGENTS
@@ -83,6 +84,7 @@
     #define HAS_UV_SET1
     //#define HAS_UV_SET2
     #define USE_PUNCTUAL
+    //#define USE_SHADOWS
     #define HAS_NORMALS
     #define HAS_NORMAL_MAP
     //#define HAS_TANGENTS
@@ -116,6 +118,7 @@
     #define HAS_UV_SET1
     //#define HAS_UV_SET2
     #define USE_PUNCTUAL
+    //#define USE_SHADOWS
     #define HAS_NORMALS
     //#define HAS_NORMAL_MAP
     #define HAS_TANGENTS
@@ -149,6 +152,7 @@
     #define HAS_UV_SET1
     //#define HAS_UV_SET2
     #define USE_PUNCTUAL
+    //#define USE_SHADOWS
     #define HAS_NORMALS
     //#define HAS_NORMAL_MAP
     //#define HAS_TANGENTS
@@ -215,13 +219,16 @@ uniform u_vs_depthParams {
 } depthParams;
 
 in vec3 a_position;
+out vec2 projZW;
 
 void main() {
     gl_Position = depthParams.mvpMatrix * vec4(a_position, 1.0);
+    projZW = gl_Position.zw;
 }
 @end
 
 @fs depth_fs
+in vec2 projZW;
 out vec4 frag_color;
 
 vec4 encodeDepth(float v) {
@@ -234,7 +241,10 @@ vec4 encodeDepth(float v) {
 void main() {             
     // sokol and webgl 1 do not support using the depth map as texture
     // so instead we write the depth value to the color map
-    frag_color = encodeDepth(gl_FragCoord.z);
+    //frag_color = encodeDepth(gl_FragCoord.z);
+    float depth = projZW.x / projZW.y;
+    frag_color = encodeDepth(depth);
+    //frag_color = vec4(vec3(decodeDepth(encodeDepth(gl_FragCoord.z)))/5.0, 1.0);
 }
 @end
 

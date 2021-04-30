@@ -2,6 +2,9 @@
 #define LIGHT_COMPONENT_H
 
 #include "math/Vector3.h"
+#include "component/CameraComponent.h"
+#include "component/Transform.h"
+#include "render/FramebufferRender.h"
 
 namespace Supernova{
 
@@ -24,6 +27,9 @@ namespace Supernova{
 
         float innerConeCos = 0.0;
         float outerConeCos = 0.0;
+
+        Matrix4 lightViewProjection;
+        FramebufferRender lightFb;
     };
     
 }

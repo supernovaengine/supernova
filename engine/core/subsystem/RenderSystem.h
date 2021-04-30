@@ -52,7 +52,6 @@ namespace Supernova{
 
 		SceneRender sceneRender;
 		SceneRender depthRender;
-		FramebufferRender depthFb;
 
 		static TextureRender emptyWhite;
 		static TextureRender emptyBlack;
@@ -73,7 +72,7 @@ namespace Supernova{
 
 		bool loadMesh(MeshComponent& mesh);
 		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, u_lighting_t& lights);
-		void drawMeshDepth(MeshComponent& mesh, Transform& transform);
+		void drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix);
 
 		bool loadSky(SkyComponent& sky);
 		void drawSky(SkyComponent& sky);

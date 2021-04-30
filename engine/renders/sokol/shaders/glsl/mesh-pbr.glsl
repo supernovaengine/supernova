@@ -47,6 +47,14 @@
         out vec4 v_color;
     #endif
 
+    #ifdef USE_SHADOWS
+        uniform u_vs_lighting {
+            mat4 lightMVP[NUM_LIGHTS];
+        };
+        
+        out vec4 lightProjPos[NUM_LIGHTS];
+    #endif
+
     vec4 getPosition(){
         vec4 pos = vec4(a_position, 1.0);
         return pos;
@@ -100,6 +108,12 @@
         v_color = a_color;
     #endif
 
+    #ifdef USE_SHADOWS
+    for (int i = 0; i < NUM_LIGHTS; ++i){
+        lightProjPos[i] = lightMVP[i] * getPosition();
+    }
+    #endif
+
     gl_Position = pbrParams.mvpMatrix * getPosition();
 @end
 
@@ -146,12 +160,18 @@
     } pbrParams;
 
     #ifdef USE_PUNCTUAL
-        uniform u_lighting {
+        uniform u_fs_lighting {
             vec4 direction_range[NUM_LIGHTS]; //direction.xyz and range.w
             vec4 color_intensity[NUM_LIGHTS]; //color.xyz and intensity.w
             vec4 position_type[NUM_LIGHTS]; //position.xyz and type.w
             vec4 inner_outer_ConeCos[NUM_LIGHTS]; //innerConeCos.x and outerConeCos.y
         } lighting;
+    #endif
+
+    #ifdef USE_SHADOWS
+        uniform sampler2D shadowMap;
+
+        in vec4 lightProjPos[NUM_LIGHTS];
     #endif
 
     struct MaterialInfo{
@@ -263,6 +283,22 @@
     #ifdef USE_PUNCTUAL
         for (int i = 0; i < NUM_LIGHTS; ++i){
 
+            float shadow = 1.0;
+             #ifdef USE_SHADOWS
+                // perform perspective divide
+                vec3 proj_coords = lightProjPos[i].xyz / lightProjPos[i].w;
+                // transform to [0,1] range
+                proj_coords = proj_coords * 0.5 + 0.5;
+                // get closest depth value from light's perspective (using [0,1] range frag_pos_light as coords)
+                float closest_depth = decodeDepth(texture(shadowMap, proj_coords.xy)); 
+                // get depth of current fragment from light's perspective
+                float current_depth = proj_coords.z;
+                // check whether current frag pos is in shadow
+                shadow = current_depth > closest_depth  ? 1.0 : 0.0;
+                shadow = 1.0 - shadow;
+            #endif
+
+
             //Cannot be in function to avoid GLES2 index errors
             Light light = Light(
                 int(lighting.position_type[i].w),
@@ -295,8 +331,8 @@
                     // Calculation of analytical light
                     // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
                     vec3 intensity = getLighIntensity(light, pointToLight);
-                    f_diffuse += intensity * NdotL *  BRDF_lambertian(materialInfo.f0, materialInfo.f90, materialInfo.albedoColor, VdotH);
-                    f_specular += intensity * NdotL * BRDF_specularGGX(materialInfo.f0, materialInfo.f90, materialInfo.alphaRoughness, VdotH, NdotL, NdotV, NdotH);
+                    f_diffuse += shadow * intensity * NdotL *  BRDF_lambertian(materialInfo.f0, materialInfo.f90, materialInfo.albedoColor, VdotH);
+                    f_specular += shadow * intensity * NdotL * BRDF_specularGGX(materialInfo.f0, materialInfo.f90, materialInfo.alphaRoughness, VdotH, NdotL, NdotV, NdotH);
                 }
             }
     }

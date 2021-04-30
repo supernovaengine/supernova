@@ -168,7 +168,7 @@ UniformStageSlot SokolObject::getUniformStageSlot(UniformType type){
     if (type == UniformType::PBR_FS_PARAMS){
         return {SG_SHADERSTAGE_FS, SLOT_u_fs_pbrParams};
     }else if (type == UniformType::LIGHTING){
-        return {SG_SHADERSTAGE_FS, SLOT_u_lighting};
+        return {SG_SHADERSTAGE_FS, SLOT_u_fs_lighting};
     }
 
     return {SG_SHADERSTAGE_VS, -1};

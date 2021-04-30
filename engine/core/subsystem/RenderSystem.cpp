@@ -31,7 +31,13 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 void RenderSystem::load(){
 	createEmptyTextures();
 	depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
-	depthFb.createFramebuffer(2048, 2048);
+
+	//TODO: Remove from here, to can create lights at runtime
+	auto lights = scene->getComponentArray<LightComponent>();	
+	for (int i = 0; i < lights->size(); i++){
+		LightComponent& light = lights->getComponentFromIndex(i);
+		light.lightFb.createFramebuffer(2048, 2048);
+	}
 }
 
 void RenderSystem::createEmptyTextures(){
@@ -94,6 +100,13 @@ u_lighting_t RenderSystem::collectLights(){
 		lightsBlock.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
 		lightsBlock.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
 		lightsBlock.inner_outer_ConeCos[i] = Vector4(light.innerConeCos, light.outerConeCos, 0.0f, 0.0);
+
+		if (light.type == LightType::DIRECTIONAL){
+			Matrix4 projectionMatrix = Matrix4::orthoMatrix(-100, 100, -100, 100, -100, 100);
+			Matrix4 viewMatrix = Matrix4::lookAtMatrix(transform->worldPosition, light.direction, Vector3(0, 1, 0));
+
+			light.lightViewProjection = projectionMatrix * viewMatrix;
+		}
 	}
 
 	// Setting intensity of other lights to zero
@@ -317,7 +330,7 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 	}
 }
 
-void RenderSystem::drawMeshDepth(MeshComponent& mesh, Transform& transform){
+void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix){
 	if (mesh.loaded && hasLights && mesh.castShadows){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender* depthRender = &mesh.submeshes[i].depthRender;
@@ -325,7 +338,7 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, Transform& transform){
 			depthRender->beginDraw();
 			
 			//mvp matrix
-			depthRender->applyUniform(UniformType::DEPTH_VS_PARAMS, UniformDataType::FLOAT, 16, &transform.modelViewProjectionMatrix);
+			depthRender->applyUniform(UniformType::DEPTH_VS_PARAMS, UniformDataType::FLOAT, 16, &modelLightSpaceMatrix);
 
 			depthRender->draw(mesh.submeshes[i].vertexCount);
 		}
@@ -499,7 +512,15 @@ void RenderSystem::draw(){
 	//---------Draw all meshes----------
 	auto meshes = scene->getComponentArray<MeshComponent>();
 
-	depthRender.startFrameBuffer(&depthFb);
+/*
+	//---------Depth shader----------
+	auto lights = scene->getComponentArray<LightComponent>();
+	LightComponent& light = lights->getComponentFromIndex(0);
+	Entity entity = lights->getEntity(0);
+	Transform* transform = scene->findComponent<Transform>(entity);
+
+	depthRender.startFrameBuffer(&light.lightFb);
+	//depthRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
 	
 	for (int i = 0; i < meshes->size(); i++){
 		MeshComponent& mesh = meshes->getComponentFromIndex(i);
@@ -510,17 +531,17 @@ void RenderSystem::draw(){
 			if (!mesh.loaded){
 				loadMesh(mesh);
 			}
-			drawMeshDepth(mesh, *transform);
+			drawMeshDepth(mesh, light.lightViewProjection * transform->modelMatrix);
 		}
 	}
 
 	depthRender.endFrameBuffer();
-	
-	
+*/	
+	//---------Draw transparent meshes----------
 	sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
 	sceneRender.applyViewport(Engine::getViewRect());
 
-	u_lighting_t lights = collectLights();
+	u_lighting_t lightsFormated = collectLights();
 
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
 	
@@ -535,7 +556,7 @@ void RenderSystem::draw(){
 			}
 			if (!mesh.transparency){
 				//Draw opaque meshes
-				drawMesh(mesh, *transform, cameraTransform, lights);
+				drawMesh(mesh, *transform, cameraTransform, lightsFormated);
 			}else{
 				transparentMeshes.push({&mesh, transform, transform->distanceToCamera});
 			}
@@ -552,11 +573,12 @@ void RenderSystem::draw(){
 		drawSky(*sky);
 	}
 
+	//---------Draw opaque meshes----------
 	while (!transparentMeshes.empty()){
 		TransparentMeshesData meshData = transparentMeshes.top();
 
 		//Draw transparent meshes
-		drawMesh(*meshData.mesh, *meshData.transform, cameraTransform, lights);
+		drawMesh(*meshData.mesh, *meshData.transform, cameraTransform, lightsFormated);
 
 		transparentMeshes.pop();
 	}

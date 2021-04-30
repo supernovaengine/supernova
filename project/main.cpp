@@ -39,8 +39,8 @@ Model carro(&scene);
 PlaneTerrain plane(&scene);
 SkyBox sky(&scene);
 Light lightDir(&scene);
-Light lightPoint(&scene);
-Light lightSpot(&scene);
+//Light lightPoint(&scene);
+//Light lightSpot(&scene);
 
 float rotationY = 0;
 float speed = 0;
@@ -54,7 +54,7 @@ void init(){
     lightDir.setRange(0.0);
     lightDir.setPosition(0.0f, 0.0f, 0.0f);
     lightDir.setIntensity(1.0);
-
+/*
     lightPoint.setType(LightType::POINT);
     lightPoint.setDirection(0.0, 0.0, 0.0);
     lightPoint.setRange(0.0);
@@ -69,7 +69,7 @@ void init(){
     lightSpot.setConeAngle(25, 35);
 
     carro.addChild(&lightSpot);
-
+*/
     sky.setTextureLeft("ely_hills/hills_lf.tga");
     sky.setTextureRight("ely_hills/hills_rt.tga");
     sky.setTextureBack("ely_hills/hills_bk.tga");
