@@ -54,7 +54,8 @@ bool Model::readWholeFile(std::vector<unsigned char> *out, std::string *err, con
         return false;
     }
 
-    std::istringstream f(filedata.readString());
+    filedata.seek(0);
+    std::istringstream f(filedata.readString(filedata.length()));
 
     if (!f) {
         if (err) {
@@ -95,8 +96,8 @@ std::string Model::readFileToString(const char* filename){
         Log::Error("Model file not found: %s", filename);
         return "";
     }
-
-    return filedata.readString();
+    filedata.seek(0);
+    return filedata.readString(filedata.length());
 }
 
 bool Model::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, int& eBufferIndex){

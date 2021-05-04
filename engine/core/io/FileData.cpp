@@ -156,13 +156,9 @@ std::string FileData::getSystemPath(std::string path){
     return System::instance().getAssetPath() + "/" + FileData::simplifyPath(path);
 }
 
-std::string FileData::readString(int aOffset){
-    unsigned int stringlen = length();
+std::string FileData::readString(unsigned int stringlen){
     std::string s( stringlen, '\0' );
-    
-    seek(aOffset);
     read((unsigned char*)&s[0], stringlen);
-
     return s;
 }
 

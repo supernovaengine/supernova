@@ -165,7 +165,9 @@ namespace Supernova{
 
     enum class TextureType {
         TEXTURE_2D,
-        TEXTURE_CUBE
+        TEXTURE_3D,
+        TEXTURE_CUBE,
+        TEXTURE_ARRAY
     };
 
     enum class ColorFormat{

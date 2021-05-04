@@ -11,6 +11,8 @@
 #include "Light.h"
 #include "math/Angle.h"
 
+#include "io/SGSReader.h"
+
 using namespace Supernova;
 
 void onUpdate();
@@ -42,12 +44,16 @@ Light lightDir(&scene);
 //Light lightPoint(&scene);
 //Light lightSpot(&scene);
 
+SGSReader sgs;
+
 float rotationY = 0;
 float speed = 0;
 
 Camera camera(&scene);
 
 void init(){
+
+    sgs.read("shaders/teste.sgs");
 
     lightDir.setType(LightType::DIRECTIONAL);
     lightDir.setDirection(0.8f, -0.2, 0.0);
