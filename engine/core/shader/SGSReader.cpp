@@ -5,7 +5,7 @@
 
 #include "SGSReader.h"
 
-#include "File.h"
+#include "io/File.h"
 #include "Log.h"
 
 #define makefourcc(_a, _b, _c, _d) (((uint32_t)(_a) | ((uint32_t)(_b) << 8) | ((uint32_t)(_c) << 16) | ((uint32_t)(_d) << 24)))
@@ -107,16 +107,14 @@ using namespace Supernova;
 
 
 SGSReader::SGSReader(){
-    vertexShader.bytecode.data = NULL;
-    fragmentShader.bytecode.data = NULL;
+
 }
 
 SGSReader::~SGSReader(){
-    if (vertexShader.bytecode.data)
-        delete vertexShader.bytecode.data;
-
-    if (fragmentShader.bytecode.data)
-        delete fragmentShader.bytecode.data;
+    for (int i = 0; i < shaderData.stages.size(); i++){
+        if (shaderData.stages[i].bytecode.data)
+            delete shaderData.stages[i].bytecode.data;
+    }
 }
 
 bool SGSReader::read(std::string filepath){
@@ -138,16 +136,16 @@ bool SGSReader::read(std::string filepath){
     sgs_chunk sinfo;
     file.read((unsigned char*)&sinfo, sizeof(sinfo));
 
-    profileVersion = sinfo.profile_ver;
+    shaderData.profileVersion = sinfo.profile_ver;
 
     if (sinfo.lang == SGS_LANG_GLSL){
-        lang = ShaderLang::GLSL;
+        shaderData.lang = ShaderLang::GLSL;
     }else if (sinfo.lang == SGS_LANG_GLES){
-        lang = ShaderLang::GLES;
+        shaderData.lang = ShaderLang::GLSL;
     }else if (sinfo.lang == SGS_LANG_HLSL){
-        lang = ShaderLang::HLSL;
+        shaderData.lang = ShaderLang::HLSL;
     }else if (sinfo.lang == SGS_LANG_MSL){
-        lang = ShaderLang::MSL;
+        shaderData.lang = ShaderLang::MSL;
     }
 
     uint32_t stag = file.read32();
@@ -160,10 +158,12 @@ bool SGSReader::read(std::string filepath){
 
         uint32_t stageType = file.read32();
 
+        shaderData.stages.push_back({});
+        shaderStage = &shaderData.stages.back();
         if (stageType == SGS_STAGE_VERTEX) {
-            shaderStage = &vertexShader;
+            shaderStage->type = ShaderStageType::VERTEX;
         } else if (stageType == SGS_STAGE_FRAGMENT) {
-            shaderStage = &fragmentShader;
+            shaderStage->type = ShaderStageType::FRAGMENT;
         } else if (stageType == SGS_STAGE_COMPUTE) {
             Log::Error("Stage compute is not supported: %s", filepath.c_str());
         } else {
@@ -277,18 +277,6 @@ bool SGSReader::read(std::string filepath){
     return true;
 }
 
-ShaderLang SGSReader::getLang(){
-    return lang;
-}
-
-unsigned int SGSReader::getProfileVer(){
-    return profileVersion;
-}
-
-ShaderStage& SGSReader::getVertexStage(){
-    return vertexShader;
-}
-
-ShaderStage& SGSReader::getFragmentStage(){
-    return fragmentShader;
+ShaderData& SGSReader::getShaderData(){
+    return shaderData;
 }

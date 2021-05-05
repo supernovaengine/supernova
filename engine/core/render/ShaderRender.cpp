@@ -15,8 +15,8 @@ ShaderRender::~ShaderRender(){
     //Cannot destroy because its a handle
 }
 
-bool ShaderRender::createShader(ShaderType shaderType){
-    return backend.createShader(shaderType);
+bool ShaderRender::createShader(ShaderData& shaderData){
+    return backend.createShader(shaderData);
 }
 
 void ShaderRender::destroyShader(){

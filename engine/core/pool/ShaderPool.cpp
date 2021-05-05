@@ -1,6 +1,8 @@
 #include "ShaderPool.h"
 
 #include "Log.h"
+#include "Engine.h"
+#include "shader/SGSReader.h"
 
 using namespace Supernova;
 
@@ -11,6 +13,22 @@ shaders_t& ShaderPool::getMap(){
     return *map;
 };
 
+std::string ShaderPool::getShaderFile(ShaderType shaderType){
+	std::string filename = "";
+	
+	if (shaderType == ShaderType::SKYBOX){
+		filename += "sky";
+	}
+
+	if (Engine::getPlatform() == Platform::LINUX){
+		filename += "_glsl330";
+	}
+
+	filename += ".sgs";
+
+	return filename;
+}
+
 std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType){
 	auto& shared = getMap()[shaderType];
 
@@ -18,8 +36,11 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType){
 		return shared;
 	}
 
+	SGSReader sgs;
+	sgs.read("shader://"+getShaderFile(shaderType));
+
 	const auto resource =  std::make_shared<ShaderRender>();
-	resource->createShader(shaderType);
+	resource->createShader(sgs.getShaderData());
 	shared = resource;
 	
 	return resource;

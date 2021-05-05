@@ -1,34 +1,15 @@
 //
 // (c) 2021 Eduardo Doria.
-// Based on a work of Sepehr Taghdisian (https://github.com/septag/glslcc)
 //
 
-#ifndef SGSREADER_H
-#define SGSREADER_H
+#ifndef SHADERDATA_H
+#define SHADERDATA_H
 
 #include <string>
 #include <vector>
 #include "render/Render.h"
 
 namespace Supernova {
-
-    enum class ShaderLang{
-        GLSL,
-        GLES,
-        MSL,
-        HLSL
-    };
-
-    enum class ShaderVertexFormat{
-        FLOAT,
-        FLOAT2,
-        FLOAT3,
-        FLOAT4,
-        INT,
-        INT2,
-        INT3,
-        INT4
-    };
 
     struct ShaderAttr{
         std::string name;
@@ -53,11 +34,15 @@ namespace Supernova {
     };
 
     struct ShaderBinSource{
-        unsigned char* data;
+        unsigned char* data = NULL;
         uint32_t size;
     };
 
+    //TODO: Remove flattenUBOs that is used only in GL/GLES. Because Sokol 
+    //      shader needs individual uniform names when using GL/GLES
+    //      and SGS file format is not parsing them, only JSON format
     struct ShaderStage{
+        ShaderStageType type;
         std::string name;
         bool flattenUBOs;
 
@@ -69,26 +54,18 @@ namespace Supernova {
         std::vector<ShaderTexture> textures;
     };
 
-    class SGSReader {
-    private:
+    class ShaderData {
+    public:
+        ShaderData();
+        virtual ~ShaderData();
+
         ShaderLang lang;
         unsigned int profileVersion;
-        ShaderStage vertexShader;
-        ShaderStage fragmentShader;
-        
 
-    public:
-        SGSReader();
-        virtual ~SGSReader();
-
-        bool read(std::string filepath);
-
-        ShaderLang getLang();
-        unsigned int getProfileVer();
-        ShaderStage& getVertexStage();
-        ShaderStage& getFragmentStage();
+        std::vector<ShaderStage> stages;
     };
+
 }
 
 
-#endif //SGSREADER_H
+#endif //SHADERDATA_H

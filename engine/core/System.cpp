@@ -94,6 +94,10 @@ std::string System::getLuaPath(){
     return "";
 }
 
+std::string System::getShaderPath(){
+    return getAssetPath() + "/" + "shaders";
+}
+
 FILE* System::platformFopen(const char* fname, const char* mode){
     return fopen(fname, mode);
 }

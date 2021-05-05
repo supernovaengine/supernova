@@ -47,6 +47,7 @@ namespace Supernova {
         virtual std::string getAssetPath();
         virtual std::string getUserDataPath();
         virtual std::string getLuaPath();
+        virtual std::string getShaderPath();
 
         virtual FILE* platformFopen(const char* fname, const char* mode);
         virtual bool syncFileSystem();

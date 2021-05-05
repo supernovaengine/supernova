@@ -11,8 +11,6 @@
 #include "Light.h"
 #include "math/Angle.h"
 
-#include "io/SGSReader.h"
-
 using namespace Supernova;
 
 void onUpdate();
@@ -35,16 +33,14 @@ Scene scene;
 //Mesh child2(&scene);
 //Object objeto(&scene);
 //Mesh child1(&scene);
-Model carro(&scene);
+//Model carro(&scene);
 //Mesh chefao(&scene);
 //Mesh* child11;
-PlaneTerrain plane(&scene);
+//PlaneTerrain plane(&scene);
 SkyBox sky(&scene);
-Light lightDir(&scene);
+//Light lightDir(&scene);
 //Light lightPoint(&scene);
 //Light lightSpot(&scene);
-
-SGSReader sgs;
 
 float rotationY = 0;
 float speed = 0;
@@ -52,15 +48,13 @@ float speed = 0;
 Camera camera(&scene);
 
 void init(){
-
-    sgs.read("shaders/teste.sgs");
-
+/*
     lightDir.setType(LightType::DIRECTIONAL);
     lightDir.setDirection(0.8f, -0.2, 0.0);
     lightDir.setRange(0.0);
     lightDir.setPosition(0.0f, 0.0f, 0.0f);
     lightDir.setIntensity(1.0);
-/*
+
     lightPoint.setType(LightType::POINT);
     lightPoint.setDirection(0.0, 0.0, 0.0);
     lightPoint.setRange(0.0);
@@ -89,15 +83,15 @@ void init(){
     camera.setPosition(0,30,100);
     //camera.getComponent<CameraComponent>().view = Vector3(0,0,0);
 
-    carro.loadOBJ("jeep/Jeep.obj");
-    carro.setPosition(0, 0, 20);
-    carro.setScale(5);
+    //carro.loadOBJ("jeep/Jeep.obj");
+    ///carro.setPosition(0, 0, 20);
+    //carro.setScale(5);
 
     //carro.loadGLTF("WaterBottle.glb");
     //carro.setPosition(0, 30, 20);
     //carro.setScale(200);
 
-    carro.setName("carro");
+    //carro.setName("carro");
  /*
     child1.addVertex(-50.0f,  -50.0f);
     child1.addVertex(50.0f,  -50.0f);
@@ -110,10 +104,10 @@ void init(){
     child1.setName("child1");
 */
 
-    plane.create(1000, 1000);
+    //plane.create(1000, 1000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);
-    plane.setTexture("pista.png");
-    plane.setPosition(-500,0,-500);
+    //plane.setTexture("pista.png");
+    //plane.setPosition(-500,0,-500);
 
 /*   
     std::vector<std::string> teste = System::instance().args;
@@ -215,11 +209,11 @@ void onUpdate(){
 
     Vector3 vDirection(cos(Angle::degToRad(rotationY-90)), 0, -sin(Angle::degToRad(rotationY-90)));
 
-    carro.setPosition(carro.getPosition() + (vDirection*speed));
-    carro.setRotation(0, rotationY, 0);
+    //carro.setPosition(carro.getPosition() + (vDirection*speed));
+    //carro.setRotation(0, rotationY, 0);
     //camera.walkForward(0.5);
 
-    camera.setView(carro.getPosition());
+    //camera.setView(carro.getPosition());
 }
 
 void onViewLoaded(){

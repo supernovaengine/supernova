@@ -17,6 +17,8 @@ namespace Supernova{
     private:
         static shaders_t& getMap();
 
+        static std::string getShaderFile(ShaderType shaderType);
+
     public:
         static std::shared_ptr<ShaderRender> get(ShaderType shaderType);
         static void remove(ShaderType shaderType);

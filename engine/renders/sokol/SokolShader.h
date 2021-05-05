@@ -2,6 +2,7 @@
 #define SokolShader_h
 
 #include "render/Render.h"
+#include "shader/ShaderData.h"
 
 #include "sokol_gfx.h"
 
@@ -16,7 +17,7 @@ namespace Supernova{
         SokolShader(const SokolShader& rhs);
         SokolShader& operator=(const SokolShader& rhs);
 
-        bool createShader(ShaderType shaderType);
+        bool createShader(ShaderData& shaderData);
 
         void destroyShader();
 

@@ -149,6 +149,10 @@ std::string FileData::getSystemPath(std::string path){
         path = path.substr(6, path.length());
         return System::instance().getLuaPath() + "/" + FileData::simplifyPath(path);
     }
+    if (beginWith(path, "shader://")){
+        path = path.substr(9, path.length());
+        return System::instance().getShaderPath() + "/" + FileData::simplifyPath(path);
+    }
     if (beginWith(path, "/")){
         path = path.substr(1, path.length());
         return System::instance().getAssetPath() + "/" + FileData::simplifyPath(path);

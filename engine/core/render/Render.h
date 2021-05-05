@@ -191,6 +191,30 @@ namespace Supernova{
         int numBlendMapColors;
     } shaderConfig;
 */
+
+    //-------Start shader definition--------
+    enum class ShaderLang{
+        GLSL,
+        MSL,
+        HLSL
+    };
+
+    enum class ShaderVertexFormat{
+        FLOAT,
+        FLOAT2,
+        FLOAT3,
+        FLOAT4,
+        INT,
+        INT2,
+        INT3,
+        INT4
+    };
+
+    enum class ShaderStageType{
+        VERTEX,
+        FRAGMENT
+    };
+    //-------End shader definition--------
 }
 
 #endif //Render_h
