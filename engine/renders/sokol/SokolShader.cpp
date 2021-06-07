@@ -19,6 +19,10 @@ SokolShader& SokolShader::operator=(const SokolShader& rhs){
     return *this;
 }
 
+int SokolShader::roundup(int val, int round_to) {
+    return (val + (round_to - 1)) & ~(round_to - 1);
+}
+
 bool SokolShader::createShader(ShaderData& shaderData){
     /*
     if (shaderType == ShaderType::MESH_PBR_UNLIT){
@@ -72,20 +76,27 @@ bool SokolShader::createShader(ShaderData& shaderData){
         // uniform blocks
         for (int u = 0; u < stage->uniforms.size(); u++) {
             sg_shader_uniform_block_desc* ub = &stage_desc->uniform_blocks[stage->uniforms[u].binding];
-            ub->size = stage->uniforms[u].sizeBytes;
-            // TODO: Remove flattenUBOs, see ShaderData.h
-            //       GL/GLES always flattenUBOs to not declare individual uniforms and use only one glUniform4fv call
-            if (stage->flattenUBOs) {
-                ub->uniforms[0].array_count = stage->uniforms[u].arraySize;
+            ub->size = roundup(stage->uniforms[u].sizeBytes, 16);
+            // GL/GLES always flatten UBs to not declare individual uniforms and use only one glUniform4fv call
+            if (shaderData.lang == ShaderLang::GLSL) {
+                ub->uniforms[0].array_count = ub->size / 16;
                 ub->uniforms[0].name = stage->uniforms[u].name.c_str();
                 ub->uniforms[0].type = SG_UNIFORMTYPE_FLOAT4;
             }
         }
 
+        //textures
         for (int t = 0; t < stage->textures.size(); t++) {
             sg_shader_image_desc* img = &stage_desc->images[stage->textures[t].binding];
             img->name = stage->textures[t].name.c_str();
-            img->sampler_type = SG_SAMPLERTYPE_FLOAT;
+
+            if (stage->textures[t].samplerType == TextureSamplerType::FLOAT){
+                img->sampler_type = SG_SAMPLERTYPE_FLOAT;
+            }else if (stage->textures[t].samplerType == TextureSamplerType::UINT){
+                img->sampler_type = SG_SAMPLERTYPE_UINT;
+            }else if (stage->textures[t].samplerType == TextureSamplerType::SINT){
+                img->sampler_type = SG_SAMPLERTYPE_SINT;
+            }
 
             if (stage->textures[t].type == TextureType::TEXTURE_2D){
                 img->image_type = SG_IMAGETYPE_2D;

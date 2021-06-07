@@ -25,7 +25,7 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 	signature.set(scene->getComponentType<Transform>());
 	signature.set(scene->getComponentType<MeshComponent>());
 
-	hasLights = true;
+	hasLights = false;
 }
 
 void RenderSystem::load(){
@@ -139,49 +139,6 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 		render->beginLoad(mesh.submeshes[i].primitiveType, false);
 
-		TextureRender* textureRender = NULL;
-		textureRender = mesh.submeshes[i].material.baseColorTexture.getRender();
-		if (textureRender)
-			render->loadTexture(textureRender, TextureSamplerType::BASECOLOR);
-		else
-			render->loadTexture(&emptyWhite, TextureSamplerType::BASECOLOR);
-
-		if (hasLights){
-			TextureRender* textureRender = NULL;
-			textureRender = mesh.submeshes[i].material.metallicRoughnessTexture.getRender();
-			if (textureRender)	
-				render->loadTexture(textureRender, TextureSamplerType::METALLICROUGHNESS);
-			else
-				render->loadTexture(&emptyWhite, TextureSamplerType::METALLICROUGHNESS);
-
-			textureRender = mesh.submeshes[i].material.normalTexture.getRender();
-			if (textureRender){
-				render->loadTexture(textureRender, TextureSamplerType::NORMAL);
-				mesh.submeshes[i].hasNormalMap = true;
-			}else{
-				//render->loadTexture(&emptyNormal, TextureSamplerType::NORMAL);
-				mesh.submeshes[i].hasNormalMap = false;
-			}
-
-			textureRender = mesh.submeshes[i].material.occlusionTexture.getRender();
-			if (textureRender)	
-				render->loadTexture(textureRender, TextureSamplerType::OCCULSION);
-			else
-				render->loadTexture(&emptyWhite, TextureSamplerType::OCCULSION);
-
-			textureRender = mesh.submeshes[i].material.emissiveTexture.getRender();
-			if (textureRender)
-				render->loadTexture(textureRender, TextureSamplerType::EMISSIVE);	
-			else
-				render->loadTexture(&emptyBlack, TextureSamplerType::EMISSIVE);
-		}
-
-		if (Engine::isAutomaticTransparency() && !mesh.transparency){
-			if (mesh.submeshes[i].material.baseColorTexture.isTransparent() || mesh.submeshes[i].material.baseColorFactor.w != 1.0){
-				mesh.transparency = true;
-			}
-		}
-
 		for (auto const& buf : mesh.buffers){
         	if (buf.second->isRenderAttributes()) {
             	for (auto const &attr : buf.second->getAttributes()) {
@@ -203,22 +160,92 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			}
 		}
 
+		ShaderType shaderType = ShaderType::MESH;
+
+		bool p_unlit = false;
+		bool p_punctual = false;
+		bool p_hasNormalMap = false;
+		bool p_hasNormal = false;
+		bool p_hasTangent = false;
+		bool p_castShadows = false;
+
 		if (hasLights){
-			if (mesh.submeshes[i].hasTangent && mesh.submeshes[i].hasNormalMap){
-				mesh.submeshes[i].shaderType = ShaderType::MESH_PBR;
-			}else if (!mesh.submeshes[i].hasTangent && mesh.submeshes[i].hasNormalMap){
-				mesh.submeshes[i].shaderType = ShaderType::MESH_PBR_NOTAN;
-			}else if (mesh.submeshes[i].hasTangent && !mesh.submeshes[i].hasNormalMap){
-				mesh.submeshes[i].shaderType = ShaderType::MESH_PBR_NONMAP;
-			}else{
-				mesh.submeshes[i].shaderType = ShaderType::MESH_PBR_NONMAP_NOTAN;
+			p_punctual = true;
+
+			p_hasNormal = true;
+			if (mesh.submeshes[i].hasTangent){
+				p_hasTangent = true;
 			}
+			if (mesh.submeshes[i].hasNormalMap){
+				p_hasNormalMap = true;
+			}
+			p_castShadows = false;
 		}else{
-			mesh.submeshes[i].shaderType = ShaderType::MESH_PBR_UNLIT;
+			p_unlit = true;
 		}
 
-		mesh.submeshes[i].shader = ShaderPool::get(mesh.submeshes[i].shaderType);
+		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(p_unlit, true, false, p_punctual, p_castShadows, p_hasNormal, p_hasNormalMap, p_hasTangent, false, true);
+		mesh.submeshes[i].shader = ShaderPool::get(shaderType, mesh.submeshes[i].shaderProperties);
 		render->loadShader(mesh.submeshes[i].shader.get());
+		ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
+
+		mesh.submeshes[i].slotVSParams = shaderData.getUniformIndex(UniformType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
+		mesh.submeshes[i].slotFSParams = shaderData.getUniformIndex(UniformType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
+		if (hasLights){
+			mesh.submeshes[i].slotFSLighting = shaderData.getUniformIndex(UniformType::LIGHTING, ShaderStageType::FRAGMENT);
+			if (mesh.castShadows){
+				mesh.submeshes[i].slotVSDepthParams = shaderData.getUniformIndex(UniformType::LIGHTING, ShaderStageType::VERTEX);
+			}
+		}
+
+		TextureRender* textureRender = NULL;
+		textureRender = mesh.submeshes[i].material.baseColorTexture.getRender();
+		if (textureRender)
+			render->loadTexture(shaderData.getTextureIndex(TextureShaderType::BASECOLOR, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
+		else
+			render->loadTexture(shaderData.getTextureIndex(TextureShaderType::BASECOLOR, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, &emptyWhite);
+
+		if (hasLights){
+			TextureRender* textureRender = NULL;
+			int slotTex = -1;
+			
+			textureRender = mesh.submeshes[i].material.metallicRoughnessTexture.getRender();
+			slotTex = shaderData.getTextureIndex(TextureShaderType::METALLICROUGHNESS, ShaderStageType::FRAGMENT);
+			if (textureRender)
+				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+			else
+				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+
+			textureRender = mesh.submeshes[i].material.normalTexture.getRender();
+			slotTex = shaderData.getTextureIndex(TextureShaderType::NORMAL, ShaderStageType::FRAGMENT);
+			if (textureRender){
+				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+				//mesh.submeshes[i].hasNormalMap = true;
+			}else{
+				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyNormal);
+				//mesh.submeshes[i].hasNormalMap = false;
+			}
+
+			textureRender = mesh.submeshes[i].material.occlusionTexture.getRender();
+			slotTex = shaderData.getTextureIndex(TextureShaderType::OCCULSION, ShaderStageType::FRAGMENT);
+			if (textureRender)	
+				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+			else
+				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+
+			textureRender = mesh.submeshes[i].material.emissiveTexture.getRender();
+			slotTex = shaderData.getTextureIndex(TextureShaderType::EMISSIVE, ShaderStageType::FRAGMENT);
+			if (textureRender)	
+				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+			else
+				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
+		}
+
+		if (Engine::isAutomaticTransparency() && !mesh.transparency){
+			if (mesh.submeshes[i].material.baseColorTexture.isTransparent() || mesh.submeshes[i].material.baseColorFactor.w != 1.0){
+				mesh.transparency = true;
+			}
+		}
 	
 		unsigned int vertexBufferCount = 0;
 		unsigned int indexCount = 0;
@@ -229,7 +256,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
         	}
         	if (buf.second->isRenderAttributes()) {
             	for (auto const &attr : buf.second->getAttributes()) {
-					render->loadAttribute(attr.first, mesh.submeshes[i].shaderType, buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+					render->loadAttribute(shaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
             	}
         	}
 			if (buf.second->getBufferType() == BufferType::INDEX_BUFFER){
@@ -244,7 +271,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				indexCount = attr.second.getCount();
 				render->loadIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
 			}else{
-				render->loadAttribute(attr.first, mesh.submeshes[i].shaderType, bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+				render->loadAttribute(shaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
 			}
 		}
 
@@ -264,14 +291,14 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 			ShaderType shaderType = ShaderType::DEPTH;
 
-			mesh.submeshes[i].depthShader = ShaderPool::get(shaderType);
+			mesh.submeshes[i].depthShader = ShaderPool::get(shaderType, "");
 			depthRender->loadShader(mesh.submeshes[i].depthShader.get());
 
 			for (auto const& buf : mesh.buffers){
         		if (buf.second->isRenderAttributes()) {
 					if (buf.second->getAttributes().count(AttributeType::POSITION)){
 						Attribute posattr = buf.second->getAttributes()[AttributeType::POSITION];
-						depthRender->loadAttribute(AttributeType::POSITION, shaderType, buf.second->getRender(), posattr.getElements(), posattr.getDataType(), buf.second->getStride(), posattr.getOffset(), posattr.getNormalized());
+						render->loadAttribute(shaderData.getAttrIndex(AttributeType::POSITION), buf.second->getRender(), posattr.getElements(), posattr.getDataType(), buf.second->getStride(), posattr.getOffset(), posattr.getNormalized());
 					}
         		}
 				if (buf.second->getBufferType() == BufferType::INDEX_BUFFER){
@@ -285,7 +312,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				if (attr.first == AttributeType::INDEX){
 					depthRender->loadIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
 				}else if (attr.first == AttributeType::POSITION){
-					depthRender->loadAttribute(attr.first, shaderType, bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+					render->loadAttribute(shaderData.getAttrIndex(AttributeType::POSITION), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
 				}
 			}
 
@@ -313,17 +340,14 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 
 			render->beginDraw();
 
-			if (mesh.submeshes[i].shaderType == ShaderType::MESH_PBR || 
-				mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN ||
-				mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NOTAN ||
-				mesh.submeshes[i].shaderType == ShaderType::MESH_PBR_NONMAP){
-				render->applyUniform(UniformType::LIGHTING, UniformDataType::FLOAT, 16 * NUM_LIGHTS, &lights);
+			if (hasLights){
+				render->applyUniform(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16 * NUM_LIGHTS, &lights);
 			}
 
-			render->applyUniform(UniformType::PBR_FS_PARAMS, UniformDataType::FLOAT, 16, &pbrParams_fs);
+			render->applyUniform(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16, &pbrParams_fs);
 
 			//model, normal and mvp matrix
-			render->applyUniform(UniformType::PBR_VS_PARAMS, UniformDataType::FLOAT, 48, &transform.modelMatrix);
+			render->applyUniform(mesh.submeshes[i].slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 48, &transform.modelMatrix);
 
 			render->draw(mesh.submeshes[i].vertexCount);
 		}
@@ -338,7 +362,7 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMat
 			depthRender->beginDraw();
 			
 			//mvp matrix
-			depthRender->applyUniform(UniformType::DEPTH_VS_PARAMS, UniformDataType::FLOAT, 16, &modelLightSpaceMatrix);
+			depthRender->applyUniform(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &modelLightSpaceMatrix);
 
 			depthRender->draw(mesh.submeshes[i].vertexCount);
 		}
@@ -353,11 +377,14 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 
 	ShaderType shaderType = ShaderType::SKYBOX;
 
-	sky.shader = ShaderPool::get(shaderType);
+	sky.shader = ShaderPool::get(shaderType, "");
 	render->loadShader(sky.shader.get());
+	ShaderData& shaderData = sky.shader.get()->shaderData;
+
+	sky.slotVSParams = shaderData.getUniformIndex(UniformType::VIEWPROJECTIONSKY, ShaderStageType::VERTEX);
 
 	if (sky.texture.load()){
-		render->loadTexture(sky.texture.getRender(), TextureSamplerType::SKYCUBE);
+		render->loadTexture(shaderData.getTextureIndex(TextureShaderType::SKYCUBE, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, sky.texture.getRender());
 	} else {
 		return false;
 	}
@@ -366,7 +393,7 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 
 	if (sky.buffer->isRenderAttributes()) {
         for (auto const &attr : sky.buffer->getAttributes()) {
-			render->loadAttribute(attr.first, shaderType, sky.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), sky.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+			render->loadAttribute(shaderData.getAttrIndex(attr.first), sky.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), sky.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
         }
     }
 
@@ -382,7 +409,7 @@ void RenderSystem::drawSky(SkyComponent& sky){
 		ObjectRender* render = &sky.render;
 		if (render){
 			render->beginDraw();
-			render->applyUniform(UniformType::VIEWPROJECTIONSKY, UniformDataType::FLOAT, 16, &sky.skyViewProjectionMatrix);
+			render->applyUniform(sky.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &sky.skyViewProjectionMatrix);
 			render->draw(36);
 		}
 	}
@@ -598,8 +625,9 @@ void RenderSystem::entityDestroyed(Entity entity){
 
 			//Destroy shader
 			submesh.shader.reset();
-			ShaderPool::remove(submesh.shaderType);
-			ShaderPool::remove(ShaderType::DEPTH);
+			ShaderPool::remove(ShaderType::MESH, mesh->submeshes[i].shaderProperties);
+			if (hasLights && mesh->castShadows)
+				ShaderPool::remove(ShaderType::DEPTH, "");
 
 			//Destroy texture
 			submesh.material.baseColorTexture.destroy();
@@ -618,7 +646,7 @@ void RenderSystem::entityDestroyed(Entity entity){
 	if (sky){
 		//Destroy shader
 		sky->shader.reset();
-		ShaderPool::remove(sky->shaderType);
+		ShaderPool::remove(sky->shaderType, "");
 
 		//Destroy texture
 		sky->texture.destroy();

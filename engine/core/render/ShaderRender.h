@@ -11,6 +11,7 @@ namespace Supernova{
         //***Backend***
         SokolShader backend;
         //***
+        ShaderData shaderData; //For reflection info
 
         ShaderRender();
         ShaderRender(const ShaderRender& rhs);

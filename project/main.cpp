@@ -33,10 +33,10 @@ Scene scene;
 //Mesh child2(&scene);
 //Object objeto(&scene);
 //Mesh child1(&scene);
-//Model carro(&scene);
+Model carro(&scene);
 //Mesh chefao(&scene);
 //Mesh* child11;
-//PlaneTerrain plane(&scene);
+PlaneTerrain plane(&scene);
 SkyBox sky(&scene);
 //Light lightDir(&scene);
 //Light lightPoint(&scene);
@@ -84,14 +84,14 @@ void init(){
     //camera.getComponent<CameraComponent>().view = Vector3(0,0,0);
 
     //carro.loadOBJ("jeep/Jeep.obj");
-    ///carro.setPosition(0, 0, 20);
+    //carro.setPosition(0, 0, 20);
     //carro.setScale(5);
 
-    //carro.loadGLTF("WaterBottle.glb");
-    //carro.setPosition(0, 30, 20);
-    //carro.setScale(200);
+    carro.loadGLTF("WaterBottle.glb");
+    carro.setPosition(0, 30, 20);
+    carro.setScale(200);
 
-    //carro.setName("carro");
+    carro.setName("carro");
  /*
     child1.addVertex(-50.0f,  -50.0f);
     child1.addVertex(50.0f,  -50.0f);
@@ -104,10 +104,10 @@ void init(){
     child1.setName("child1");
 */
 
-    //plane.create(1000, 1000);
+    plane.create(1000, 1000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);
-    //plane.setTexture("pista.png");
-    //plane.setPosition(-500,0,-500);
+    plane.setTexture("pista.png");
+    plane.setPosition(-500,0,-500);
 
 /*   
     std::vector<std::string> teste = System::instance().args;
@@ -209,11 +209,11 @@ void onUpdate(){
 
     Vector3 vDirection(cos(Angle::degToRad(rotationY-90)), 0, -sin(Angle::degToRad(rotationY-90)));
 
-    //carro.setPosition(carro.getPosition() + (vDirection*speed));
-    //carro.setRotation(0, rotationY, 0);
+    carro.setPosition(carro.getPosition() + (vDirection*speed));
+    carro.setRotation(0, rotationY, 0);
     //camera.walkForward(0.5);
 
-    //camera.setView(carro.getPosition());
+    camera.setView(carro.getPosition());
 }
 
 void onViewLoaded(){

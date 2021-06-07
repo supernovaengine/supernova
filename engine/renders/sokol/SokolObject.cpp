@@ -88,18 +88,18 @@ size_t SokolObject::getAttributesIndex(AttributeType type, ShaderType shaderType
     return -1;
 }
 
-size_t SokolObject::getTextureSampler(TextureSamplerType samplerType){
-    if (samplerType == TextureSamplerType::BASECOLOR){
+size_t SokolObject::getTextureSampler(TextureShaderType type){
+    if (type == TextureShaderType::BASECOLOR){
         return SLOT_u_baseColorTexture;
-    }else if (samplerType == TextureSamplerType::METALLICROUGHNESS){
+    }else if (type == TextureShaderType::METALLICROUGHNESS){
         return SLOT_u_metallicRoughnessTexture;
-    }else if (samplerType == TextureSamplerType::EMISSIVE){
+    }else if (type == TextureShaderType::EMISSIVE){
         return SLOT_u_emissiveTexture;
-    }else if (samplerType == TextureSamplerType::NORMAL){
+    }else if (type == TextureShaderType::NORMAL){
         return SLOT_u_normalTexture;
-    }else if (samplerType == TextureSamplerType::OCCULSION){
+    }else if (type == TextureShaderType::OCCULSION){
         return SLOT_u_occlusionTexture;
-    }else if (samplerType == TextureSamplerType::SKYCUBE){
+    }else if (type == TextureShaderType::SKYCUBE){
         return SLOT_u_skyTexture;
     }
 
@@ -215,11 +215,9 @@ void SokolObject::loadIndex(BufferRender* buffer, AttributeDataType dataType, si
         pipeline_desc.index_type = SG_INDEXTYPE_NONE;
     }
 }
- 
-void SokolObject::loadAttribute(AttributeType type, ShaderType shaderType, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
-    size_t indexAttr = getAttributesIndex(type, shaderType);
 
-    if (indexAttr != -1){
+void SokolObject::loadAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
+    if (slotAttribute != -1){
         sg_buffer vbuf = buffer->backend.get();
         
         if (bufferToBindSlot.count(vbuf.id) == 0){
@@ -233,9 +231,9 @@ void SokolObject::loadAttribute(AttributeType type, ShaderType shaderType, Buffe
 
         size_t indexBuf = bufferToBindSlot[vbuf.id];
 
-        pipeline_desc.layout.attrs[indexAttr].buffer_index = indexBuf;
-        pipeline_desc.layout.attrs[indexAttr].offset = offset;
-        pipeline_desc.layout.attrs[indexAttr].format = getVertexFormat(elements, dataType, normalized);
+        pipeline_desc.layout.attrs[slotAttribute].buffer_index = indexBuf;
+        pipeline_desc.layout.attrs[slotAttribute].offset = offset;
+        pipeline_desc.layout.attrs[slotAttribute].format = getVertexFormat(elements, dataType, normalized);
     }
 }
 
@@ -243,11 +241,16 @@ void SokolObject::loadShader(ShaderRender* shader){
     pipeline_desc.shader = shader->backend.get();
 }
 
-void SokolObject::loadTexture(TextureRender* texture, TextureSamplerType samplerType){
-    sg_image image = texture->backend.get();
-    size_t texSampler = getTextureSampler(samplerType);
-    if (texSampler != -1)
-        bind.fs_images[texSampler] = image;
+void SokolObject::loadTexture(int slotTexture, ShaderStageType stage, TextureRender* texture){
+    if (slotTexture != -1){
+        sg_image image = texture->backend.get();
+        if (stage == ShaderStageType::VERTEX){
+            bind.vs_images[slotTexture] = image;
+        }else if (stage == ShaderStageType::FRAGMENT){
+            bind.fs_images[slotTexture] = image;
+        }
+
+    }
 }
 
 void SokolObject::endLoad(){
@@ -259,12 +262,19 @@ void SokolObject::beginDraw(){
     sg_apply_bindings(&bind);
 }
 
-void SokolObject::applyUniform(UniformType type, UniformDataType datatype, unsigned int count, void* data){
-    if (datatype == UniformDataType::FLOAT){
-        UniformStageSlot uniform = getUniformStageSlot(type);
-        sg_apply_uniforms(uniform.stage, uniform.slot, {data, sizeof(float) * count});
-    }else{
-        Log::Error("Sokol backend only supports float uniforms");
+void SokolObject::applyUniform(int slotUniform, ShaderStageType stage, UniformDataType datatype, unsigned int count, void* data){
+    if (slotUniform != -1){
+        if (datatype == UniformDataType::FLOAT){
+            sg_shader_stage sg_stage;
+            if (stage == ShaderStageType::VERTEX){
+                sg_stage = SG_SHADERSTAGE_VS;
+            }else if (stage == ShaderStageType::FRAGMENT){
+                sg_stage = SG_SHADERSTAGE_FS;
+            }
+            sg_apply_uniforms(sg_stage, slotUniform, {data, sizeof(float) * count});
+        }else{
+            Log::Error("Sokol backend only supports float uniforms");
+        }
     }
 }
 

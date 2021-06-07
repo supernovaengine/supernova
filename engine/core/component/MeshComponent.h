@@ -42,7 +42,12 @@ namespace Supernova{
         std::shared_ptr<ShaderRender> shader;
         std::shared_ptr<ShaderRender> depthShader;
 
-        ShaderType shaderType;
+        std::string shaderProperties;
+
+        int slotVSParams = -1;
+        int slotFSParams = -1;
+        int slotFSLighting = -1;
+        int slotVSDepthParams = -1;
 
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;
         int vertexCount = 0;

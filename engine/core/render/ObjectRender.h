@@ -23,13 +23,13 @@ namespace Supernova {
 
         void beginLoad(PrimitiveType primitiveType, bool depth);
         void loadIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset);
-        void loadAttribute(AttributeType type, ShaderType shaderType, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized);
+        void loadAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized);
         void loadShader(ShaderRender* shader);
-        void loadTexture(TextureRender* texture, TextureSamplerType samplerType);
+        void loadTexture(int slotTexture, ShaderStageType stage, TextureRender* texture);
         void endLoad();
 
         void beginDraw();
-        void applyUniform(UniformType type, UniformDataType datatype, unsigned int size, void* data);
+        void applyUniform(int slotUniform, ShaderStageType stage, UniformDataType datatype, unsigned int count, void* data);
         void draw(int vertexCount);
 
         void destroy();

@@ -16,21 +16,22 @@ namespace Supernova {
         std::string semanticName;
         unsigned int semanticIndex;
         int location;
-        ShaderVertexFormat format;
+        ShaderVertexType type;
     };
 
     struct ShaderUniform {
         std::string name;
+        int  set;
         int  binding;
         unsigned int sizeBytes;
-        int arraySize;
     };
 
     struct ShaderTexture {
         std::string name;
+        int set;
         int binding;
         TextureType type;
-        bool multisample;
+        TextureSamplerType samplerType;
     };
 
     struct ShaderBinSource{
@@ -38,13 +39,9 @@ namespace Supernova {
         uint32_t size;
     };
 
-    //TODO: Remove flattenUBOs that is used only in GL/GLES. Because Sokol 
-    //      shader needs individual uniform names when using GL/GLES
-    //      and SGS file format is not parsing them, only JSON format
     struct ShaderStage{
         ShaderStageType type;
         std::string name;
-        bool flattenUBOs;
 
         std::string source;
         ShaderBinSource bytecode;
@@ -56,13 +53,23 @@ namespace Supernova {
 
     class ShaderData {
     public:
+        ShaderLang lang;
+        unsigned int profileVersion;
+        bool es;
+        std::vector<ShaderStage> stages;
+
+
         ShaderData();
         virtual ~ShaderData();
 
-        ShaderLang lang;
-        unsigned int profileVersion;
+        ShaderData(const ShaderData& d);
+        ShaderData& operator = (const ShaderData& d);
 
-        std::vector<ShaderStage> stages;
+        int getAttrIndex(AttributeType type);
+        int getUniformIndex(UniformType type, ShaderStageType stage);
+        int getTextureIndex(TextureShaderType type, ShaderStageType stage);
+
+        void releaseSourceData();
     };
 
 }

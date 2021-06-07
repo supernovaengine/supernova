@@ -4,10 +4,11 @@ using namespace Supernova;
 
 ShaderRender::ShaderRender(){ }
 
-ShaderRender::ShaderRender(const ShaderRender& rhs) : backend(rhs.backend) { }
+ShaderRender::ShaderRender(const ShaderRender& rhs) : backend(rhs.backend), shaderData(rhs.shaderData) { }
 
 ShaderRender& ShaderRender::operator=(const ShaderRender& rhs) { 
-    backend = rhs.backend; 
+    backend = rhs.backend;
+    shaderData = rhs.shaderData;
     return *this; 
 }
 
@@ -16,6 +17,11 @@ ShaderRender::~ShaderRender(){
 }
 
 bool ShaderRender::createShader(ShaderData& shaderData){
+    this->shaderData = shaderData;
+
+    //Keep only reflection info
+    this->shaderData.releaseSourceData();
+    
     return backend.createShader(shaderData);
 }
 

@@ -2,7 +2,7 @@
 
 #include "Log.h"
 #include "Engine.h"
-#include "shader/SGSReader.h"
+#include "shader/SBSReader.h"
 
 using namespace Supernova;
 
@@ -13,47 +13,99 @@ shaders_t& ShaderPool::getMap(){
     return *map;
 };
 
-std::string ShaderPool::getShaderFile(ShaderType shaderType){
-	std::string filename = "";
-	
-	if (shaderType == ShaderType::SKYBOX){
-		filename += "sky";
-	}
+std::string ShaderPool::getShaderFile(std::string shaderStr){
+	std::string filename = shaderStr;
 
 	if (Engine::getPlatform() == Platform::LINUX){
 		filename += "_glsl330";
 	}
 
-	filename += ".sgs";
+	filename += ".sbs";
 
 	return filename;
 }
 
-std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType){
-	auto& shared = getMap()[shaderType];
+std::string ShaderPool::getShaderStr(ShaderType shaderType, std::string properties){
+
+	std::string str;
+
+	if (shaderType == ShaderType::MESH){
+		str = "mesh";
+	}else if (shaderType == ShaderType::SKYBOX){
+		str = "sky";
+	}else if (shaderType == ShaderType::DEPTH){
+		str = "depth";
+	}else if (shaderType == ShaderType::LINES){
+		str = "lines";
+	}else if (shaderType == ShaderType::POINTS){
+		str = "points";
+	}
+
+	if (str.empty())
+		Log::Error("Erro mapping shader type to string");
+
+	if (!properties.empty())
+		str += "_" + properties;
+
+	return str;
+}
+
+std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, std::string properties){
+	std::string shaderStr = getShaderStr(shaderType, properties);
+	auto& shared = getMap()[shaderStr];
 
 	if (shared.use_count() > 0){
 		return shared;
 	}
 
-	SGSReader sgs;
-	sgs.read("shader://"+getShaderFile(shaderType));
+	SBSReader sbs;
+	sbs.read("shader://"+getShaderFile(shaderStr));
 
 	const auto resource =  std::make_shared<ShaderRender>();
-	resource->createShader(sgs.getShaderData());
+	resource->createShader(sbs.getShaderData());
 	shared = resource;
 	
 	return resource;
 }
 
-void ShaderPool::remove(ShaderType shaderType){
-	if (getMap().count(shaderType)){
-		auto& shared = getMap()[shaderType];
+void ShaderPool::remove(ShaderType shaderType, std::string properties){
+	std::string shaderStr = getShaderStr(shaderType, properties);
+	if (getMap().count(shaderStr)){
+		auto& shared = getMap()[shaderStr];
 		if (shared.use_count() <= 1){
 			shared->destroyShader();
-			getMap().erase(shaderType);
+			getMap().erase(shaderStr);
 		}
 	}else{
 		Log::Debug("Trying to destroy a not existent shader");
 	}
+}
+
+std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2, 
+						bool punctual, bool shadows, bool normals, bool normalMap, 
+						bool tangents, bool vertexColorVec3, bool vertexColorVec4){
+	std::string prop;
+
+	if (unlit)
+		prop += "Ult";
+	if (uv1)
+		prop += "Uv1";
+	if (uv2)
+		prop += "Uv2";
+	if (punctual)
+		prop += "Puc";
+	if (shadows)
+		prop += "Shw";
+	if (normals)
+		prop += "Nor";
+	if (normalMap)
+		prop += "Nmp";
+	if (tangents)
+		prop += "Tan";
+	if (vertexColorVec3)
+		prop += "Vc3";
+	if (vertexColorVec4)
+		prop += "Vc4";
+
+	return prop;
 }

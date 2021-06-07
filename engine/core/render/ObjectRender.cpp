@@ -23,16 +23,16 @@ void ObjectRender::loadIndex(BufferRender* buffer, AttributeDataType dataType, s
     backend.loadIndex(buffer, dataType, offset);
 }
 
-void ObjectRender::loadAttribute(AttributeType type, ShaderType shaderType, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
-    backend.loadAttribute(type, shaderType, buffer, elements, dataType, stride, offset, normalized);
+void ObjectRender::loadAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
+    backend.loadAttribute(slotAttribute, buffer, elements, dataType, stride, offset, normalized);
 }
 
 void ObjectRender::loadShader(ShaderRender* shader){
     backend.loadShader(shader);
 }
 
-void ObjectRender::loadTexture(TextureRender* texture, TextureSamplerType samplerType){
-    backend.loadTexture(texture, samplerType);
+void ObjectRender::loadTexture(int slotTexture, ShaderStageType stage, TextureRender* texture){
+    backend.loadTexture(slotTexture, stage, texture);
 }
 
 void ObjectRender::endLoad(){
@@ -43,8 +43,8 @@ void ObjectRender::beginDraw(){
     backend.beginDraw();
 }
 
-void ObjectRender::applyUniform(UniformType type, UniformDataType datatype, unsigned int count, void* data){
-    backend.applyUniform(type, datatype, count, data);
+void ObjectRender::applyUniform(int slotUniform, ShaderStageType stage, UniformDataType datatype, unsigned int count, void* data){
+    backend.applyUniform(slotUniform, stage, datatype, count, data);
 }
 
 void ObjectRender::draw(int vertexCount){

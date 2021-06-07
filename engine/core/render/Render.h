@@ -144,7 +144,7 @@ namespace Supernova{
         */
     };
 
-    enum class TextureSamplerType{
+    enum class TextureShaderType{
         BASECOLOR,
         EMISSIVE,
         METALLICROUGHNESS,
@@ -168,6 +168,12 @@ namespace Supernova{
         TEXTURE_3D,
         TEXTURE_CUBE,
         TEXTURE_ARRAY
+    };
+
+    enum class TextureSamplerType {
+        SINT,
+        UINT,
+        FLOAT
     };
 
     enum class ColorFormat{
@@ -199,7 +205,7 @@ namespace Supernova{
         HLSL
     };
 
-    enum class ShaderVertexFormat{
+    enum class ShaderVertexType{
         FLOAT,
         FLOAT2,
         FLOAT3,

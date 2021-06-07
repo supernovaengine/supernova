@@ -12,6 +12,8 @@ namespace Supernova{
     private:
         sg_shader shader;
 
+        int roundup(int val, int round_to);
+
     public:
         SokolShader();
         SokolShader(const SokolShader& rhs);
