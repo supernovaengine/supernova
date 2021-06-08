@@ -25,7 +25,7 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 	signature.set(scene->getComponentType<Transform>());
 	signature.set(scene->getComponentType<MeshComponent>());
 
-	hasLights = false;
+	hasLights = true;
 }
 
 void RenderSystem::load(){

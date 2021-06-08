@@ -66,7 +66,7 @@ namespace Supernova{
         Submesh submeshes[MAX_SUBMESHES];
         unsigned int numSubmeshes = 1;
 
-        bool castShadows = true;
+        bool castShadows = false;
         bool transparency = false;
     };
     
