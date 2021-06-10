@@ -44,6 +44,7 @@ namespace Supernova{
             TextureRender* getRender();
 
             bool isTransparent();
+            bool empty();
     };
 }
 

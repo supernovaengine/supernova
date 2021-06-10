@@ -19,8 +19,8 @@ namespace Supernova{
         virtual ~ShaderRender();
 
         bool createShader(ShaderData& shaderData);
-
         void destroyShader();
+        bool isCreated();
     };
 }
 

@@ -20,8 +20,8 @@ namespace Supernova{
         SokolShader& operator=(const SokolShader& rhs);
 
         bool createShader(ShaderData& shaderData);
-
         void destroyShader();
+        bool isCreated();
 
         sg_shader get();
     };

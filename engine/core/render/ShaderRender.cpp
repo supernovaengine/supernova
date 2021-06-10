@@ -28,3 +28,7 @@ bool ShaderRender::createShader(ShaderData& shaderData){
 void ShaderRender::destroyShader(){
     backend.destroyShader();
 }
+
+bool ShaderRender::isCreated(){
+    return backend.isCreated();
+}

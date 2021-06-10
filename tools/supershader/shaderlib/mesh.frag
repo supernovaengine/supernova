@@ -41,17 +41,17 @@ uniform u_fs_pbrParams {
 
 #ifdef USE_PUNCTUAL
     uniform u_fs_lighting {
-        vec4 direction_range[NUM_LIGHTS]; //direction.xyz and range.w
-        vec4 color_intensity[NUM_LIGHTS]; //color.xyz and intensity.w
-        vec4 position_type[NUM_LIGHTS]; //position.xyz and type.w
-        vec4 inner_outer_ConeCos[NUM_LIGHTS]; //innerConeCos.x and outerConeCos.y
+        vec4 direction_range[MAX_LIGHTS]; //direction.xyz and range.w
+        vec4 color_intensity[MAX_LIGHTS]; //color.xyz and intensity.w
+        vec4 position_type[MAX_LIGHTS]; //position.xyz and type.w
+        vec4 inner_outer_ConeCos[MAX_LIGHTS]; //innerConeCos.x and outerConeCos.y
     } lighting;
 #endif
 
 #ifdef USE_SHADOWS
     uniform sampler2D shadowMap;
 
-    in vec4 lightProjPos[NUM_LIGHTS];
+    in vec4 lightProjPos[MAX_LIGHTS];
 #endif
 
 struct MaterialInfo{
@@ -160,23 +160,7 @@ void main() {
 
     // Apply light sources
     #ifdef USE_PUNCTUAL
-        for (int i = 0; i < NUM_LIGHTS; ++i){
-
-            float shadow = 1.0;
-             #ifdef USE_SHADOWS
-                // perform perspective divide
-                vec3 proj_coords = lightProjPos[i].xyz / lightProjPos[i].w;
-                // transform to [0,1] range
-                proj_coords = proj_coords * 0.5 + 0.5;
-                // get closest depth value from light's perspective (using [0,1] range frag_pos_light as coords)
-                float closest_depth = decodeDepth(texture(shadowMap, proj_coords.xy)); 
-                // get depth of current fragment from light's perspective
-                float current_depth = proj_coords.z;
-                // check whether current frag pos is in shadow
-                shadow = current_depth > closest_depth  ? 1.0 : 0.0;
-                shadow = 1.0 - shadow;
-            #endif
-
+        for (int i = 0; i < MAX_LIGHTS; ++i){
 
             //Cannot be in function to avoid GLES2 index errors
             Light light = Light(
@@ -191,6 +175,22 @@ void main() {
             ); 
 
             if (light.intensity > 0.0){
+
+                float shadow = 1.0;
+                #ifdef USE_SHADOWS
+                    // perform perspective divide
+                    vec3 proj_coords = lightProjPos[i].xyz / lightProjPos[i].w;
+                    // transform to [0,1] range
+                    proj_coords = proj_coords * 0.5 + 0.5;
+                    // get closest depth value from light's perspective (using [0,1] range frag_pos_light as coords)
+                    float closest_depth = decodeDepth(texture(shadowMap, proj_coords.xy)); 
+                    // get depth of current fragment from light's perspective
+                    float current_depth = proj_coords.z;
+                    // check whether current frag pos is in shadow
+                    shadow = current_depth > closest_depth  ? 1.0 : 0.0;
+                    shadow = 1.0 - shadow;
+                #endif
+
                 vec3 pointToLight;
                 if(light.type != LightType_Directional) {
                     pointToLight = light.position - v_position;

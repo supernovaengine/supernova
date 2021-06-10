@@ -30,10 +30,10 @@ namespace Supernova{
 	} u_fs_pbrParams_t;
 
 	typedef struct u_lighting_t {
-	    Supernova::Vector4 direction_range[NUM_LIGHTS];
-	    Supernova::Vector4 color_intensity[NUM_LIGHTS];
-	    Supernova::Vector4 position_type[NUM_LIGHTS];
-	    Supernova::Vector4 inner_outer_ConeCos[NUM_LIGHTS];
+	    Supernova::Vector4 direction_range[MAX_LIGHTS];
+	    Supernova::Vector4 color_intensity[MAX_LIGHTS];
+	    Supernova::Vector4 position_type[MAX_LIGHTS];
+	    Supernova::Vector4 inner_outer_ConeCos[MAX_LIGHTS];
 	} u_lighting_t;
 
 	class RenderSystem : public SubSystem {

@@ -44,39 +44,44 @@ def get_output(shader, project, lang):
     return outpath
 
 @click.command()
-@click.option('--shader', '-s', required=True, help="Target shader language")
+@click.option('--shaders', '-s', required=True, help="Target shader language, seperated by ';'")
 @click.option('--lang', '-l', required=True, type=click.Choice(['glsl330', 'glsl100', 'glsl300es', 'hlsl4', 'hlsl5'], case_sensitive=False), help="Target shader language")
 @click.option('--project', '-p', default='../../project', type=click.Path(), help="Source root path of project files")
-@click.option('--num-lights', '-nl', default=6, type=int, help="Value of NUM_LIGHTS macro")
-def generate(shader, lang, project, num_lights):
+@click.option('--max-lights', '-ml', default=6, type=int, help="Value of MAX_LIGHTS macro")
+def generate(shaders, lang, project, max_lights):
 
-    print('Generating', shader, 'for', lang)
+    shadersList = [x.strip() for x in shaders.split(';')]
 
-    splitShader = shader.split('_')
-    shaderType = splitShader[0]
-    properties = ''
-    if len(splitShader) >= 2:
-        properties = splitShader[1]
+    for shader in shadersList:
 
-    defines = 'NUM_LIGHTS='+str(num_lights)
+        print('Generating', shader, 'for', lang)
 
-    while properties != '':
-        if len(defines) > 0:
-            defines += ';'
-        defines += get_define(properties[:3])
-        properties = properties[3:]
+        splitShader = shader.split('_')
+        shaderType = splitShader[0]
+        properties = ''
+        if len(splitShader) >= 2:
+            properties = splitShader[1]
 
-    vert = get_vert(shaderType)
-    frag = get_frag(shaderType)
-    output = get_output(shader, project, lang)
+        defines = 'MAX_LIGHTS='+str(max_lights)
 
-    print(defines)
+        while properties != '':
+            if len(defines) > 0:
+                defines += ';'
+            defines += get_define(properties[:3])
+            properties = properties[3:]
 
-    command = subprocess.run(["bin/supershader", "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines], capture_output=True)
+        vert = get_vert(shaderType)
+        frag = get_frag(shaderType)
+        output = get_output(shader, project, lang)
 
-    sys.stdout.buffer.write(command.stdout)
-    sys.stderr.buffer.write(command.stderr)
-    sys.exit(command.returncode)
+        #print(defines)
+
+        command = subprocess.run(["bin/supershader", "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines], capture_output=True)
+
+        sys.stdout.buffer.write(command.stdout)
+        sys.stderr.buffer.write(command.stderr)
+        if command.returncode != 0:
+            sys.exit(command.returncode)
 
 if __name__ == '__main__':
     generate()

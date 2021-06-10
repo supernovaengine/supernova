@@ -24,6 +24,8 @@ namespace Supernova{
         static std::shared_ptr<ShaderRender> get(ShaderType shaderType, std::string properties);
         static void remove(ShaderType shaderType, std::string properties);
 
+        static std::vector<std::string>& getMissingShaders();
+
         static std::string getMeshProperties(bool unlit, bool uv1, bool uv2, 
 						bool punctual, bool shadows, bool normals, bool normalMap, 
 						bool tangents, bool vertexColorVec3, bool vertexColorVec4);

@@ -180,3 +180,10 @@ TextureRender* Texture::getRender(){
 bool Texture::isTransparent(){
     return transparent;
 }
+
+bool Texture::empty(){
+    if (!needLoad && !render)
+        return true;
+
+    return false;
+}

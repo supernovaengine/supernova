@@ -39,8 +39,8 @@ Model carro(&scene);
 PlaneTerrain plane(&scene);
 SkyBox sky(&scene);
 Light lightDir(&scene);
-Light lightPoint(&scene);
-Light lightSpot(&scene);
+//Light lightPoint(&scene);
+//Light lightSpot(&scene);
 
 float rotationY = 0;
 float speed = 0;
@@ -55,20 +55,20 @@ void init(){
     lightDir.setPosition(0.0f, 0.0f, 0.0f);
     lightDir.setIntensity(1.0);
 
-    lightPoint.setType(LightType::POINT);
-    lightPoint.setDirection(0.0, 0.0, 0.0);
-    lightPoint.setRange(0.0);
-    lightPoint.setPosition(300.0f, 30.0f, 80.0f);
-    lightPoint.setIntensity(10000.0);
+    //lightPoint.setType(LightType::POINT);
+    //lightPoint.setDirection(0.0, 0.0, 0.0);
+    //lightPoint.setRange(0.0);
+    //lightPoint.setPosition(300.0f, 30.0f, 80.0f);
+    //lightPoint.setIntensity(10000.0);
 
-    lightSpot.setType(LightType::SPOT);
-    lightSpot.setDirection(0.0f, -0.6, 0.4);
-    lightSpot.setRange(0.0);
-    lightSpot.setPosition(0.0f, 80.0f/5, 30.0f/5);
-    lightSpot.setIntensity(10000.0);
-    lightSpot.setConeAngle(25, 35);
+    //lightSpot.setType(LightType::SPOT);
+    //lightSpot.setDirection(0.0f, -0.6, 0.4);
+    //lightSpot.setRange(0.0);
+    //lightSpot.setPosition(0.0f, 80.0f/5, 30.0f/5);
+    //lightSpot.setIntensity(10000.0);
+    //lightSpot.setConeAngle(25, 35);
 
-    carro.addChild(&lightSpot);
+    //carro.addChild(&lightSpot);
 
     sky.setTextureLeft("ely_hills/hills_lf.tga");
     sky.setTextureRight("ely_hills/hills_rt.tga");

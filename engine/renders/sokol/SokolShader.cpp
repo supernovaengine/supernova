@@ -24,24 +24,6 @@ int SokolShader::roundup(int val, int round_to) {
 }
 
 bool SokolShader::createShader(ShaderData& shaderData){
-    /*
-    if (shaderType == ShaderType::MESH_PBR_UNLIT){
-        shader = sg_make_shader(meshPBR_unlit_shader_desc(sg_query_backend()));
-    }else if (shaderType == ShaderType::MESH_PBR){
-        shader = sg_make_shader(meshPBR_shader_desc(sg_query_backend()));
-    }else if (shaderType == ShaderType::MESH_PBR_NOTAN){
-        shader = sg_make_shader(meshPBR_noTan_shader_desc(sg_query_backend()));
-    }else if (shaderType == ShaderType::MESH_PBR_NONMAP){
-        shader = sg_make_shader(meshPBR_noNmap_shader_desc(sg_query_backend()));
-    }else if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN){
-        shader = sg_make_shader(meshPBR_noNmap_noTan_shader_desc(sg_query_backend()));
-    }else if (shaderType == ShaderType::SKYBOX){
-        shader = sg_make_shader(skybox_shader_desc(sg_query_backend()));
-    }else if (shaderType == ShaderType::DEPTH){
-        shader = sg_make_shader(depth_shader_desc(sg_query_backend()));
-    }
-    */
-
     sg_shader_desc shader_desc = {0};
 
     for (int i = 0; i < shaderData.stages.size(); i++){
@@ -111,12 +93,8 @@ bool SokolShader::createShader(ShaderData& shaderData){
     }
 
     shader = sg_make_shader(&shader_desc);
-    //shader = sg_make_shader(skybox_shader_desc(sg_query_backend()));
 
-    if (shader.id != SG_INVALID_ID)
-        return true;
-
-    return false;
+    return isCreated();
 }
 
 void SokolShader::destroyShader(){
@@ -125,6 +103,13 @@ void SokolShader::destroyShader(){
     }
     
     shader.id = SG_INVALID_ID;
+}
+
+bool SokolShader::isCreated(){
+    if (shader.id != SG_INVALID_ID)
+        return true;
+
+    return false;
 }
 
 sg_shader SokolShader::get(){

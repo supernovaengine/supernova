@@ -7,6 +7,8 @@ if(DEFINED NO_CPP_INIT)
     unset(NO_CPP_INIT CACHE)
 endif()
 
+add_definitions("-DPROJECT_ROOT=\"${PROJECT_ROOT}\"")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 include_directories(libs/json)

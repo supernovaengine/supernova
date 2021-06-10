@@ -77,8 +77,8 @@ u_lighting_t RenderSystem::collectLights(){
 	auto lights = scene->getComponentArray<LightComponent>();
 
 	int numLights = lights->size();
-	if (numLights > NUM_LIGHTS)
-		numLights = NUM_LIGHTS;
+	if (numLights > MAX_LIGHTS)
+		numLights = MAX_LIGHTS;
 	
 	for (int i = 0; i < numLights; i++){
 		LightComponent& light = lights->getComponentFromIndex(i);
@@ -110,7 +110,7 @@ u_lighting_t RenderSystem::collectLights(){
 	}
 
 	// Setting intensity of other lights to zero
-	for (int i = numLights; i < NUM_LIGHTS; i++){
+	for (int i = numLights; i < MAX_LIGHTS; i++){
 		lightsBlock.color_intensity[i].w = 0.0;
 	}
 
@@ -160,6 +160,11 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			}
 		}
 
+		if (!mesh.submeshes[i].material.normalTexture.empty()){
+			mesh.submeshes[i].hasNormalMap = true;
+		}
+
+
 		ShaderType shaderType = ShaderType::MESH;
 
 		bool p_unlit = false;
@@ -186,6 +191,13 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(p_unlit, true, false, p_punctual, p_castShadows, p_hasNormal, p_hasNormalMap, p_hasTangent, false, true);
 		mesh.submeshes[i].shader = ShaderPool::get(shaderType, mesh.submeshes[i].shaderProperties);
+		if (hasLights && mesh.castShadows){
+			mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, "");
+			if (!mesh.submeshes[i].depthShader->isCreated())
+				return false;
+		}
+		if (!mesh.submeshes[i].shader->isCreated())
+			return false;
 		render->loadShader(mesh.submeshes[i].shader.get());
 		ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
 
@@ -218,13 +230,10 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 			textureRender = mesh.submeshes[i].material.normalTexture.getRender();
 			slotTex = shaderData.getTextureIndex(TextureShaderType::NORMAL, ShaderStageType::FRAGMENT);
-			if (textureRender){
+			if (textureRender)
 				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-				//mesh.submeshes[i].hasNormalMap = true;
-			}else{
+			else
 				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyNormal);
-				//mesh.submeshes[i].hasNormalMap = false;
-			}
 
 			textureRender = mesh.submeshes[i].material.occlusionTexture.getRender();
 			slotTex = shaderData.getTextureIndex(TextureShaderType::OCCULSION, ShaderStageType::FRAGMENT);
@@ -289,16 +298,13 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 			depthRender->beginLoad(mesh.submeshes[i].primitiveType, true);
 
-			ShaderType shaderType = ShaderType::DEPTH;
-
-			mesh.submeshes[i].depthShader = ShaderPool::get(shaderType, "");
 			depthRender->loadShader(mesh.submeshes[i].depthShader.get());
 
 			for (auto const& buf : mesh.buffers){
         		if (buf.second->isRenderAttributes()) {
 					if (buf.second->getAttributes().count(AttributeType::POSITION)){
 						Attribute posattr = buf.second->getAttributes()[AttributeType::POSITION];
-						render->loadAttribute(shaderData.getAttrIndex(AttributeType::POSITION), buf.second->getRender(), posattr.getElements(), posattr.getDataType(), buf.second->getStride(), posattr.getOffset(), posattr.getNormalized());
+						depthRender->loadAttribute(shaderData.getAttrIndex(AttributeType::POSITION), buf.second->getRender(), posattr.getElements(), posattr.getDataType(), buf.second->getStride(), posattr.getOffset(), posattr.getNormalized());
 					}
         		}
 				if (buf.second->getBufferType() == BufferType::INDEX_BUFFER){
@@ -312,7 +318,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				if (attr.first == AttributeType::INDEX){
 					depthRender->loadIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
 				}else if (attr.first == AttributeType::POSITION){
-					render->loadAttribute(shaderData.getAttrIndex(AttributeType::POSITION), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+					depthRender->loadAttribute(shaderData.getAttrIndex(AttributeType::POSITION), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
 				}
 			}
 
@@ -341,7 +347,7 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 			render->beginDraw();
 
 			if (hasLights){
-				render->applyUniform(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16 * NUM_LIGHTS, &lights);
+				render->applyUniform(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16 * MAX_LIGHTS, &lights);
 			}
 
 			render->applyUniform(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16, &pbrParams_fs);
@@ -378,6 +384,8 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 	ShaderType shaderType = ShaderType::SKYBOX;
 
 	sky.shader = ShaderPool::get(shaderType, "");
+	if (!sky.shader->isCreated())
+		return false;
 	render->loadShader(sky.shader.get());
 	ShaderData& shaderData = sky.shader.get()->shaderData;
 
@@ -539,7 +547,7 @@ void RenderSystem::draw(){
 	//---------Draw all meshes----------
 	auto meshes = scene->getComponentArray<MeshComponent>();
 
-/*
+
 	//---------Depth shader----------
 	auto lights = scene->getComponentArray<LightComponent>();
 	LightComponent& light = lights->getComponentFromIndex(0);
@@ -563,7 +571,7 @@ void RenderSystem::draw(){
 	}
 
 	depthRender.endFrameBuffer();
-*/	
+	
 	//---------Draw transparent meshes----------
 	sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
 	sceneRender.applyViewport(Engine::getViewRect());
@@ -611,6 +619,26 @@ void RenderSystem::draw(){
 	}
 
 	sceneRender.endFrameBuffer();
+
+	//---------Missing some shaders----------
+	if (ShaderPool::getMissingShaders().size() > 0){
+		std::string misShaders;
+		for (int i = 0; i < ShaderPool::getMissingShaders().size(); i++){
+			if (!misShaders.empty())
+				misShaders += "; ";
+			misShaders += ShaderPool::getMissingShaders()[i];
+		}
+		Log::Verbose(
+			"\n"
+			"-------------------\n"
+			"Supernova is missing some shaders, you need to use Supershader tool to create these shaders in project assets directory.\n"
+			"Go to directory \"tools/supershader\" and execute the command:\n"
+			"\n"
+			"> python supershader.py -s \"%s\" -p \"%s\" -l glsl330\n"
+			"-------------------"
+			, misShaders.c_str(), PROJECT_ROOT);
+		exit(1);
+	}
 	
 	SystemRender::commit();
 }

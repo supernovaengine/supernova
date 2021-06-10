@@ -13,6 +13,11 @@ shaders_t& ShaderPool::getMap(){
     return *map;
 };
 
+std::vector<std::string>& ShaderPool::getMissingShaders(){
+    static std::vector<std::string>* missingshaders = new std::vector<std::string>();
+    return *missingshaders;
+};
+
 std::string ShaderPool::getShaderFile(std::string shaderStr){
 	std::string filename = shaderStr;
 
@@ -59,17 +64,22 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, std::string
 	}
 
 	SBSReader sbs;
-	sbs.read("shader://"+getShaderFile(shaderStr));
-
 	const auto resource =  std::make_shared<ShaderRender>();
-	resource->createShader(sbs.getShaderData());
-	shared = resource;
+
+	if (sbs.read("shader://"+getShaderFile(shaderStr))){
+		resource->createShader(sbs.getShaderData());
+	}else{
+		getMissingShaders().push_back(shaderStr);
+	}
 	
+	shared = resource;
+
 	return resource;
 }
 
 void ShaderPool::remove(ShaderType shaderType, std::string properties){
 	std::string shaderStr = getShaderStr(shaderType, properties);
+	int teste = getMap().count(shaderStr);
 	if (getMap().count(shaderStr)){
 		auto& shared = getMap()[shaderStr];
 		if (shared.use_count() <= 1){
