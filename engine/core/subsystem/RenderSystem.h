@@ -70,8 +70,8 @@ namespace Supernova{
 	public:
 		RenderSystem(Scene* scene);
 
-		bool loadMesh(MeshComponent& mesh);
-		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, u_lighting_t& lights);
+		bool loadMesh(MeshComponent& mesh, FramebufferRender& lightFb);
+		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, u_lighting_t& lights, Matrix4 lightSpaceMatrix);
 		void drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix);
 
 		bool loadSky(SkyComponent& sky);

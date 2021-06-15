@@ -87,7 +87,8 @@ namespace Supernova{
         PBR_VS_PARAMS,
         MATERIAL,
         PBR_FS_PARAMS,
-        LIGHTING,
+        VS_LIGHTING,
+        FS_LIGHTING,
         VIEWPROJECTIONSKY,
         DEPTH_VS_PARAMS
         //CAMERA
@@ -150,6 +151,7 @@ namespace Supernova{
         METALLICROUGHNESS,
         OCCULSION,
         NORMAL,
+        SHADOWMAP1,
         SKYCUBE
         //SHADOWMAP2D
         //SHADOWMAPCUBE

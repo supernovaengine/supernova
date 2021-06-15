@@ -17,8 +17,9 @@ namespace Supernova{
         FramebufferRender& operator=(const FramebufferRender& rhs);
         virtual ~FramebufferRender();
 
-        TextureRender* createFramebuffer(int width, int height);
+        bool createFramebuffer(int width, int height);
         void destroyFramebuffer();
+        TextureRender* getColorTexture();
     };
 }
 

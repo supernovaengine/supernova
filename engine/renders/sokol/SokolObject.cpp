@@ -2,7 +2,6 @@
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 #include "math/Matrix4.h"
-#include "shaders/shaders.h"
 #include "Log.h"
 
 using namespace Supernova;
@@ -31,79 +30,6 @@ SokolObject& SokolObject::operator=(const SokolObject& rhs) {
     bufferToBindSlot = rhs.bufferToBindSlot;
     
     return *this;
-}
-
-size_t SokolObject::getAttributesIndex(AttributeType type, ShaderType shaderType){
-    if (type == AttributeType::POSITION){
-        if (shaderType == ShaderType::MESH_PBR_UNLIT)
-            return ATTR_meshPBR_unlit_vs_a_position;
-        if (shaderType == ShaderType::MESH_PBR)
-            return ATTR_meshPBR_vs_a_position;
-        if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN)
-            return ATTR_meshPBR_noNmap_noTan_vs_a_position;
-        if (shaderType == ShaderType::MESH_PBR_NONMAP)
-            return ATTR_meshPBR_noNmap_vs_a_position;
-        if (shaderType == ShaderType::MESH_PBR_NOTAN)
-            return ATTR_meshPBR_noTan_vs_a_position;
-        if (shaderType == ShaderType::SKYBOX)
-            return ATTR_skybox_vs_a_position;
-        if (shaderType == ShaderType::DEPTH)
-            return ATTR_depth_vs_a_position;
-    }else if (type == AttributeType::TEXCOORD1){
-        if (shaderType == ShaderType::MESH_PBR_UNLIT)
-            return ATTR_meshPBR_unlit_vs_a_texcoord1;
-        if (shaderType == ShaderType::MESH_PBR)
-            return ATTR_meshPBR_vs_a_texcoord1;
-        if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN)
-            return ATTR_meshPBR_noNmap_noTan_vs_a_texcoord1;
-        if (shaderType == ShaderType::MESH_PBR_NONMAP)
-            return ATTR_meshPBR_noNmap_vs_a_texcoord1;
-        if (shaderType == ShaderType::MESH_PBR_NOTAN)
-            return ATTR_meshPBR_noTan_vs_a_texcoord1;
-    }else if (type == AttributeType::NORMAL){
-        if (shaderType == ShaderType::MESH_PBR)
-            return ATTR_meshPBR_vs_a_normal;
-        if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN)
-            return ATTR_meshPBR_noNmap_noTan_vs_a_normal;
-        if (shaderType == ShaderType::MESH_PBR_NONMAP)
-            return ATTR_meshPBR_noNmap_vs_a_normal;
-        if (shaderType == ShaderType::MESH_PBR_NOTAN)
-            return ATTR_meshPBR_noTan_vs_a_normal;
-    }else if (type == AttributeType::COLOR){
-        if (shaderType == ShaderType::MESH_PBR)
-            return ATTR_meshPBR_vs_a_color;
-        if (shaderType == ShaderType::MESH_PBR_NONMAP_NOTAN)
-            return ATTR_meshPBR_noNmap_noTan_vs_a_color;
-        if (shaderType == ShaderType::MESH_PBR_NONMAP)
-            return ATTR_meshPBR_noNmap_noTan_vs_a_color;
-        if (shaderType == ShaderType::MESH_PBR_NOTAN)
-            return ATTR_meshPBR_noNmap_noTan_vs_a_color;
-    }else if (type == AttributeType::TANGENT){
-        if (shaderType == ShaderType::MESH_PBR)
-            return ATTR_meshPBR_vs_a_tangent;
-        if (shaderType == ShaderType::MESH_PBR_NONMAP)
-            return ATTR_meshPBR_noNmap_vs_a_tangent;
-    }
-
-    return -1;
-}
-
-size_t SokolObject::getTextureSampler(TextureShaderType type){
-    if (type == TextureShaderType::BASECOLOR){
-        return SLOT_u_baseColorTexture;
-    }else if (type == TextureShaderType::METALLICROUGHNESS){
-        return SLOT_u_metallicRoughnessTexture;
-    }else if (type == TextureShaderType::EMISSIVE){
-        return SLOT_u_emissiveTexture;
-    }else if (type == TextureShaderType::NORMAL){
-        return SLOT_u_normalTexture;
-    }else if (type == TextureShaderType::OCCULSION){
-        return SLOT_u_occlusionTexture;
-    }else if (type == TextureShaderType::SKYCUBE){
-        return SLOT_u_skyTexture;
-    }
-
-    return -1;
 }
 
 sg_vertex_format SokolObject::getVertexFormat(unsigned int elements, AttributeDataType dataType, bool normalized){
@@ -153,47 +79,29 @@ sg_primitive_type SokolObject::getPrimitiveType(PrimitiveType primitiveType){
     return SG_PRIMITIVETYPE_TRIANGLES;
 }
 
-UniformStageSlot SokolObject::getUniformStageSlot(UniformType type){
-
-    //Vertex uniforms
-    if (type == UniformType::PBR_VS_PARAMS){
-        return {SG_SHADERSTAGE_VS, SLOT_u_vs_pbrParams};
-    }else if (type == UniformType::VIEWPROJECTIONSKY){
-        return {SG_SHADERSTAGE_VS, SLOT_viewProjectionSky};
-    }else if (type == UniformType::DEPTH_VS_PARAMS){
-        return {SG_SHADERSTAGE_VS, SLOT_u_vs_depthParams};
-    }
-
-    //Fragment uniforms
-    if (type == UniformType::PBR_FS_PARAMS){
-        return {SG_SHADERSTAGE_FS, SLOT_u_fs_pbrParams};
-    }else if (type == UniformType::LIGHTING){
-        return {SG_SHADERSTAGE_FS, SLOT_u_fs_lighting};
-    }
-
-    return {SG_SHADERSTAGE_VS, -1};
-}
-
 void SokolObject::beginLoad(PrimitiveType primitiveType, bool depth){
     bind = {0};
     pip = {0};
     pipeline_desc = {0};
 
-    //pipeline_desc.cull_mode = SG_CULLMODE_FRONT;
-    pipeline_desc.face_winding = SG_FACEWINDING_CW;
-
-    pipeline_desc.depth.write_enabled = true;
-    pipeline_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
-
-    pipeline_desc.colors[0].write_mask = SG_COLORMASK_RGB;
-    pipeline_desc.colors[0].blend.enabled = true;
-    pipeline_desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
-    pipeline_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-
     if (depth){
+        pipeline_desc.cull_mode = SG_CULLMODE_FRONT;
         pipeline_desc.sample_count = 1;
         pipeline_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
+        pipeline_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
+        pipeline_desc.depth.write_enabled = true;
         pipeline_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
+    }else{
+        //pipeline_desc.cull_mode = SG_CULLMODE_FRONT;
+        pipeline_desc.face_winding = SG_FACEWINDING_CW;
+
+        pipeline_desc.depth.write_enabled = true;
+        pipeline_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
+
+        pipeline_desc.colors[0].write_mask = SG_COLORMASK_RGB;
+        pipeline_desc.colors[0].blend.enabled = true;
+        pipeline_desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
+        pipeline_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
     }
 
     pipeline_desc.primitive_type = getPrimitiveType(primitiveType);

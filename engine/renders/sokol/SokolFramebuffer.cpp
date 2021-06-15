@@ -14,7 +14,7 @@ SokolFramebuffer& SokolFramebuffer::operator=(const SokolFramebuffer& rhs){
     return *this;
 }
 
-TextureRender* SokolFramebuffer::createFramebuffer(int width, int height){
+bool SokolFramebuffer::createFramebuffer(int width, int height){
     colorTexture.createShadowMapColorTexture(width, height);
 
     sg_image_desc img_desc = {0};
@@ -37,9 +37,9 @@ TextureRender* SokolFramebuffer::createFramebuffer(int width, int height){
     pass = sg_make_pass(&pass_desc);
 
     if (pass.id != SG_INVALID_ID)
-        return &colorTexture;
+        return true;
 
-    return NULL;
+    return false;
 }
 
 void SokolFramebuffer::destroyFramebuffer(){
@@ -48,6 +48,10 @@ void SokolFramebuffer::destroyFramebuffer(){
     }
 
     pass.id = SG_INVALID_ID;
+}
+
+TextureRender* SokolFramebuffer::getColorTexture(){
+    return &colorTexture;
 }
 
 sg_pass SokolFramebuffer::get(){

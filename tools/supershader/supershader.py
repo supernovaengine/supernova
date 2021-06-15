@@ -74,8 +74,7 @@ def generate(shaders, lang, project, max_lights):
         frag = get_frag(shaderType)
         output = get_output(shader, project, lang)
 
-        #print(defines)
-
+        #print("bin/supershader", "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines)
         command = subprocess.run(["bin/supershader", "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines], capture_output=True)
 
         sys.stdout.buffer.write(command.stdout)

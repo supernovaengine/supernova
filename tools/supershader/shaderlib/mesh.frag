@@ -49,7 +49,7 @@ uniform u_fs_pbrParams {
 #endif
 
 #ifdef USE_SHADOWS
-    uniform sampler2D shadowMap;
+    uniform sampler2D u_shadowMap;
 
     in vec4 lightProjPos[MAX_LIGHTS];
 #endif
@@ -97,6 +97,10 @@ const float M_PI = 3.141592653589793;
 #include "includes/brdf.glsl"
 #ifdef USE_PUNCTUAL
     #include "includes/punctual.glsl"
+#endif
+#ifdef USE_SHADOWS
+    #include "includes/depth_util.glsl"
+    #include "includes/shadows.glsl"
 #endif
 
 void main() {
@@ -176,21 +180,6 @@ void main() {
 
             if (light.intensity > 0.0){
 
-                float shadow = 1.0;
-                #ifdef USE_SHADOWS
-                    // perform perspective divide
-                    vec3 proj_coords = lightProjPos[i].xyz / lightProjPos[i].w;
-                    // transform to [0,1] range
-                    proj_coords = proj_coords * 0.5 + 0.5;
-                    // get closest depth value from light's perspective (using [0,1] range frag_pos_light as coords)
-                    float closest_depth = decodeDepth(texture(shadowMap, proj_coords.xy)); 
-                    // get depth of current fragment from light's perspective
-                    float current_depth = proj_coords.z;
-                    // check whether current frag pos is in shadow
-                    shadow = current_depth > closest_depth  ? 1.0 : 0.0;
-                    shadow = 1.0 - shadow;
-                #endif
-
                 vec3 pointToLight;
                 if(light.type != LightType_Directional) {
                     pointToLight = light.position - v_position;
@@ -205,6 +194,11 @@ void main() {
                 float NdotH = clampedDot(n, h);
                 float LdotH = clampedDot(l, h);
                 float VdotH = clampedDot(v, h);
+
+                float shadow = 1.0;
+                #ifdef USE_SHADOWS
+                    shadow = 1.0 - shadowCalculationPCF(lightProjPos[i], NdotL, vec2(2048.0, 2048.0));
+                #endif
 
                 if (NdotL > 0.0 || NdotV > 0.0){
                     // Calculation of analytical light

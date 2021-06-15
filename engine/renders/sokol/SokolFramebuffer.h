@@ -20,8 +20,9 @@ namespace Supernova{
         SokolFramebuffer(const SokolFramebuffer& rhs);
         SokolFramebuffer& operator=(const SokolFramebuffer& rhs);
 
-        TextureRender* createFramebuffer(int width, int height);
+        bool createFramebuffer(int width, int height);
         void destroyFramebuffer();
+        TextureRender* getColorTexture();
 
         sg_pass get();
     };

@@ -102,7 +102,7 @@ u_lighting_t RenderSystem::collectLights(){
 		lightsBlock.inner_outer_ConeCos[i] = Vector4(light.innerConeCos, light.outerConeCos, 0.0f, 0.0);
 
 		if (light.type == LightType::DIRECTIONAL){
-			Matrix4 projectionMatrix = Matrix4::orthoMatrix(-100, 100, -100, 100, -100, 100);
+			Matrix4 projectionMatrix = Matrix4::orthoMatrix(-500, 500, -500, 500, -500, 500);
 			Matrix4 viewMatrix = Matrix4::lookAtMatrix(transform->worldPosition, light.direction, Vector3(0, 1, 0));
 
 			light.lightViewProjection = projectionMatrix * viewMatrix;
@@ -117,7 +117,7 @@ u_lighting_t RenderSystem::collectLights(){
 	return lightsBlock;
 }
 
-bool RenderSystem::loadMesh(MeshComponent& mesh){
+bool RenderSystem::loadMesh(MeshComponent& mesh, FramebufferRender& lightFb){
 
 	bufferNameToRender.clear();
 
@@ -184,7 +184,9 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			if (mesh.submeshes[i].hasNormalMap){
 				p_hasNormalMap = true;
 			}
-			p_castShadows = false;
+			if (mesh.castShadows){
+				p_castShadows = true;
+			}
 		}else{
 			p_unlit = true;
 		}
@@ -204,9 +206,9 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		mesh.submeshes[i].slotVSParams = shaderData.getUniformIndex(UniformType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
 		mesh.submeshes[i].slotFSParams = shaderData.getUniformIndex(UniformType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
 		if (hasLights){
-			mesh.submeshes[i].slotFSLighting = shaderData.getUniformIndex(UniformType::LIGHTING, ShaderStageType::FRAGMENT);
+			mesh.submeshes[i].slotFSLighting = shaderData.getUniformIndex(UniformType::FS_LIGHTING, ShaderStageType::FRAGMENT);
 			if (mesh.castShadows){
-				mesh.submeshes[i].slotVSDepthParams = shaderData.getUniformIndex(UniformType::LIGHTING, ShaderStageType::VERTEX);
+				mesh.submeshes[i].slotVSLighting = shaderData.getUniformIndex(UniformType::VS_LIGHTING, ShaderStageType::VERTEX);
 			}
 		}
 
@@ -248,6 +250,11 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
 			else
 				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
+
+			if (mesh.castShadows){
+				slotTex = shaderData.getTextureIndex(TextureShaderType::SHADOWMAP1, ShaderStageType::FRAGMENT);
+				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, lightFb.getColorTexture());
+			}
 		}
 
 		if (Engine::isAutomaticTransparency() && !mesh.transparency){
@@ -299,12 +306,15 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			depthRender->beginLoad(mesh.submeshes[i].primitiveType, true);
 
 			depthRender->loadShader(mesh.submeshes[i].depthShader.get());
+			ShaderData& depthShaderData = mesh.submeshes[i].depthShader.get()->shaderData;
+
+			mesh.submeshes[i].slotVSDepthParams = depthShaderData.getUniformIndex(UniformType::DEPTH_VS_PARAMS, ShaderStageType::VERTEX);
 
 			for (auto const& buf : mesh.buffers){
         		if (buf.second->isRenderAttributes()) {
 					if (buf.second->getAttributes().count(AttributeType::POSITION)){
 						Attribute posattr = buf.second->getAttributes()[AttributeType::POSITION];
-						depthRender->loadAttribute(shaderData.getAttrIndex(AttributeType::POSITION), buf.second->getRender(), posattr.getElements(), posattr.getDataType(), buf.second->getStride(), posattr.getOffset(), posattr.getNormalized());
+						depthRender->loadAttribute(depthShaderData.getAttrIndex(AttributeType::POSITION), buf.second->getRender(), posattr.getElements(), posattr.getDataType(), buf.second->getStride(), posattr.getOffset(), posattr.getNormalized());
 					}
         		}
 				if (buf.second->getBufferType() == BufferType::INDEX_BUFFER){
@@ -318,7 +328,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				if (attr.first == AttributeType::INDEX){
 					depthRender->loadIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
 				}else if (attr.first == AttributeType::POSITION){
-					depthRender->loadAttribute(shaderData.getAttrIndex(AttributeType::POSITION), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+					depthRender->loadAttribute(depthShaderData.getAttrIndex(AttributeType::POSITION), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
 				}
 			}
 
@@ -332,7 +342,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 	return true;
 }
 
-void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, u_lighting_t& lights){
+void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, u_lighting_t& lights, Matrix4 lightSpaceMatrix){
 	if (mesh.loaded){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender* render = &mesh.submeshes[i].render;
@@ -344,10 +354,18 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 			pbrParams_fs.emissiveFactor = mesh.submeshes[i].material.emissiveFactor;
 			pbrParams_fs.eyePos = camTransform.worldPosition;
 
+			Matrix4 lightSpaces[MAX_LIGHTS];
+			for (int i = 0; i < MAX_LIGHTS; i++){
+				lightSpaces[i] = lightSpaceMatrix;
+			}
+
 			render->beginDraw();
 
 			if (hasLights){
 				render->applyUniform(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16 * MAX_LIGHTS, &lights);
+				if (mesh.castShadows){
+					render->applyUniform(mesh.submeshes[i].slotVSLighting, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16 * MAX_LIGHTS, &lightSpaces);
+				}
 			}
 
 			render->applyUniform(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16, &pbrParams_fs);
@@ -564,7 +582,7 @@ void RenderSystem::draw(){
 
 		if (transform){
 			if (!mesh.loaded){
-				loadMesh(mesh);
+				loadMesh(mesh, light.lightFb);
 			}
 			drawMeshDepth(mesh, light.lightViewProjection * transform->modelMatrix);
 		}
@@ -587,11 +605,11 @@ void RenderSystem::draw(){
 
 		if (transform){
 			if (!mesh.loaded){
-				loadMesh(mesh);
+				loadMesh(mesh, light.lightFb);
 			}
 			if (!mesh.transparency){
 				//Draw opaque meshes
-				drawMesh(mesh, *transform, cameraTransform, lightsFormated);
+				drawMesh(mesh, *transform, cameraTransform, lightsFormated, light.lightViewProjection * transform->modelMatrix);
 			}else{
 				transparentMeshes.push({&mesh, transform, transform->distanceToCamera});
 			}
@@ -613,7 +631,7 @@ void RenderSystem::draw(){
 		TransparentMeshesData meshData = transparentMeshes.top();
 
 		//Draw transparent meshes
-		drawMesh(*meshData.mesh, *meshData.transform, cameraTransform, lightsFormated);
+		drawMesh(*meshData.mesh, *meshData.transform, cameraTransform, lightsFormated, light.lightViewProjection * transform->modelMatrix);
 
 		transparentMeshes.pop();
 	}

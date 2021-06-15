@@ -15,10 +15,14 @@ FramebufferRender::~FramebufferRender(){
     //Cannot destroy because its a handle
 }
 
-TextureRender* FramebufferRender::createFramebuffer(int width, int height){
+bool FramebufferRender::createFramebuffer(int width, int height){
     return backend.createFramebuffer(width, height);
 }
 
 void FramebufferRender::destroyFramebuffer(){
     backend.destroyFramebuffer();
+}
+
+TextureRender* FramebufferRender::getColorTexture(){
+    return backend.getColorTexture();
 }

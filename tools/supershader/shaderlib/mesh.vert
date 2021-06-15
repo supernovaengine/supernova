@@ -74,10 +74,8 @@ vec3 getTangent(){
 #endif
 
 void main() {
-    #ifndef MATERIAL_UNLIT
-        vec4 pos = pbrParams.modelMatrix * getPosition();
-        v_position = vec3(pos.xyz) / pos.w;
-    #endif
+    vec4 pos = pbrParams.modelMatrix * getPosition();
+    v_position = vec3(pos.xyz) / pos.w;
 
     #ifdef HAS_NORMALS
     #ifdef HAS_TANGENTS

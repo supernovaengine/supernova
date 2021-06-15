@@ -50,7 +50,7 @@ Camera camera(&scene);
 void init(){
 
     lightDir.setType(LightType::DIRECTIONAL);
-    lightDir.setDirection(0.8f, -0.2, 0.0);
+    lightDir.setDirection(0.5f, -0.5, 0.0);
     lightDir.setRange(0.0);
     lightDir.setPosition(0.0f, 0.0f, 0.0f);
     lightDir.setIntensity(1.0);
@@ -80,7 +80,7 @@ void init(){
     //camera.setOrtho(0, 500, 0, 500, -10, 10);
     camera.activate();
 
-    camera.setPosition(0,30,100);
+    camera.setPosition(0,80,100);
     //camera.getComponent<CameraComponent>().view = Vector3(0,0,0);
 
     //carro.loadOBJ("jeep/Jeep.obj");
