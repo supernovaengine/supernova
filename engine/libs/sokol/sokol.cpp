@@ -7,6 +7,9 @@
     #define GL_GLEXT_PROTOTYPES
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
+
+    //TODO: Use WEBGL2 too
+    //#include <GLES3/gl3.h>
 #endif
 
 #if defined(_WIN32)

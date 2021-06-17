@@ -105,8 +105,8 @@ int SupernovaWeb::init(int argc, char **argv){
     attr.failIfMajorPerformanceCaveat = false;
     attr.enableExtensionsByDefault = true;
     attr.premultipliedAlpha = true;
-    attr.majorVersion = true;
-    attr.minorVersion = false;
+    attr.majorVersion = 2;
+    attr.minorVersion = 0;
     EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_create_context("#canvas", &attr);
     
     emscripten_webgl_make_context_current(ctx);

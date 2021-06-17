@@ -251,7 +251,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh, FramebufferRender& lightFb){
 			else
 				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
 
-			if (mesh.castShadows){
+			if (hasLights && mesh.castShadows){
 				slotTex = shaderData.getTextureIndex(TextureShaderType::SHADOWMAP1, ShaderStageType::FRAGMENT);
 				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, lightFb.getColorTexture());
 			}
@@ -652,9 +652,9 @@ void RenderSystem::draw(){
 			"Supernova is missing some shaders, you need to use Supershader tool to create these shaders in project assets directory.\n"
 			"Go to directory \"tools/supershader\" and execute the command:\n"
 			"\n"
-			"> python supershader.py -s \"%s\" -p \"%s\" -l glsl330\n"
+			"> python supershader.py -s \"%s\" -p \"%s\" -l %s\n"
 			"-------------------"
-			, misShaders.c_str(), PROJECT_ROOT);
+			, misShaders.c_str(), PROJECT_ROOT, ShaderPool::getShaderLangStr().c_str());
 		exit(1);
 	}
 	

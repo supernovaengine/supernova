@@ -65,7 +65,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
             ${EM_ADDITIONAL_LINK_FLAGS} \
             -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\" \
             -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\""
-    )
+    )# Todo: "-s USE_WEBGL2=1" for WEBGL2
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")

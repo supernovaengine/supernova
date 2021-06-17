@@ -18,12 +18,21 @@ std::vector<std::string>& ShaderPool::getMissingShaders(){
     return *missingshaders;
 };
 
+std::string ShaderPool::getShaderLangStr(){
+	if (Engine::getPlatform() == Platform::LINUX){
+		return "glsl330";
+	}else if (Engine::getPlatform() == Platform::WEB){
+		return "glsl100";
+	}
+
+	return "<unknown>";
+}
+
+
 std::string ShaderPool::getShaderFile(std::string shaderStr){
 	std::string filename = shaderStr;
 
-	if (Engine::getPlatform() == Platform::LINUX){
-		filename += "_glsl330";
-	}
+	filename += "_" + getShaderLangStr();
 
 	filename += ".sbs";
 
