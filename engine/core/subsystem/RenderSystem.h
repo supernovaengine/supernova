@@ -29,12 +29,16 @@ namespace Supernova{
     	uint8_t _pad_60[4];
 	} u_fs_pbrParams_t;
 
-	typedef struct u_lighting_t {
-	    Supernova::Vector4 direction_range[MAX_LIGHTS];
-	    Supernova::Vector4 color_intensity[MAX_LIGHTS];
-	    Supernova::Vector4 position_type[MAX_LIGHTS];
-	    Supernova::Vector4 inner_outer_ConeCos[MAX_LIGHTS];
-	} u_lighting_t;
+	typedef struct vs_lighting_t {
+	    Matrix4 lightViewProjectionMatrix[MAX_LIGHTS];
+	} vs_lighting_t;
+
+	typedef struct fs_lighting_t {
+	    Vector4 direction_range[MAX_LIGHTS];
+	    Vector4 color_intensity[MAX_LIGHTS];
+	    Vector4 position_type[MAX_LIGHTS];
+	    Vector4 inner_outer_ConeCos[MAX_LIGHTS];
+	} fs_lighting_t;
 
 	class RenderSystem : public SubSystem {
 	private:
@@ -60,18 +64,22 @@ namespace Supernova{
 		static bool emptyTexturesCreated;
 		
 		bool hasLights;
+		bool hasShadows;
+
+		vs_lighting_t vs_lighting;
+		fs_lighting_t fs_lighting;
 
 		std::map<std::string, BufferRender*> bufferNameToRender;
 		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
 
 		void createEmptyTextures();
-		u_lighting_t collectLights();
+		void processLights();
 
 	public:
 		RenderSystem(Scene* scene);
 
-		bool loadMesh(MeshComponent& mesh, FramebufferRender& lightFb);
-		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, u_lighting_t& lights, Matrix4 lightSpaceMatrix);
+		bool loadMesh(MeshComponent& mesh);
+		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform);
 		void drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix);
 
 		bool loadSky(SkyComponent& sky);

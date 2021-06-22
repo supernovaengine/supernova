@@ -10,6 +10,8 @@ struct Light{
 
     float innerConeCos;
     float outerConeCos;
+
+    bool shadows;
 };
 
 const int LightType_Directional = 0;

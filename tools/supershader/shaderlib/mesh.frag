@@ -44,14 +44,14 @@ uniform u_fs_pbrParams {
         vec4 direction_range[MAX_LIGHTS]; //direction.xyz and range.w
         vec4 color_intensity[MAX_LIGHTS]; //color.xyz and intensity.w
         vec4 position_type[MAX_LIGHTS]; //position.xyz and type.w
-        vec4 inner_outer_ConeCos[MAX_LIGHTS]; //innerConeCos.x and outerConeCos.y
+        vec4 inCone_ouCone_shadows[MAX_LIGHTS]; //innerConeCos.x, outerConeCos.y and shadows.z
     } lighting;
 #endif
 
 #ifdef USE_SHADOWS
     uniform sampler2D u_shadowMap;
 
-    in vec4 lightProjPos[MAX_LIGHTS];
+    in vec4 v_lightMVPMatrix[MAX_LIGHTS];
 #endif
 
 struct MaterialInfo{
@@ -174,8 +174,9 @@ void main() {
                 lighting.position_type[i].xyz,
                 lighting.direction_range[i].w,
                 lighting.color_intensity[i].w,
-                lighting.inner_outer_ConeCos[i].x,
-                lighting.inner_outer_ConeCos[i].y
+                lighting.inCone_ouCone_shadows[i].x,
+                lighting.inCone_ouCone_shadows[i].y,
+                (lighting.inCone_ouCone_shadows[i].z == 1.0)?true:false
             ); 
 
             if (light.intensity > 0.0){
@@ -197,7 +198,9 @@ void main() {
 
                 float shadow = 1.0;
                 #ifdef USE_SHADOWS
-                    shadow = 1.0 - shadowCalculationPCF(lightProjPos[i], NdotL, vec2(2048.0, 2048.0));
+                    if (light.shadows){
+                        shadow = 1.0 - shadowCalculationPCF(v_lightMVPMatrix[i], NdotL, vec2(2048.0, 2048.0));
+                    }
                 #endif
 
                 if (NdotL > 0.0 || NdotV > 0.0){

@@ -25,7 +25,8 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 	signature.set(scene->getComponentType<Transform>());
 	signature.set(scene->getComponentType<MeshComponent>());
 
-	hasLights = true;
+	hasLights = false;
+	hasShadows = false;
 }
 
 void RenderSystem::load(){
@@ -71,14 +72,18 @@ void RenderSystem::createEmptyTextures(){
 	}
 }
 
-u_lighting_t RenderSystem::collectLights(){
-	u_lighting_t lightsBlock;
+void RenderSystem::processLights(){
+	hasLights = false;
+	hasShadows = false;
 
 	auto lights = scene->getComponentArray<LightComponent>();
 
 	int numLights = lights->size();
 	if (numLights > MAX_LIGHTS)
 		numLights = MAX_LIGHTS;
+
+	if (numLights > 0)
+		hasLights = true;
 	
 	for (int i = 0; i < numLights; i++){
 		LightComponent& light = lights->getComponentFromIndex(i);
@@ -95,29 +100,32 @@ u_lighting_t RenderSystem::collectLights(){
 			type = 1;
 		if (light.type == LightType::SPOT)
 			type = 2;
+		
+		if (light.shadows)
+			hasShadows = true;
 
-		lightsBlock.direction_range[i] = Vector4(light.worldDirection.x, light.worldDirection.y, light.worldDirection.z, light.range);
-		lightsBlock.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
-		lightsBlock.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
-		lightsBlock.inner_outer_ConeCos[i] = Vector4(light.innerConeCos, light.outerConeCos, 0.0f, 0.0);
+		fs_lighting.direction_range[i] = Vector4(light.worldDirection.x, light.worldDirection.y, light.worldDirection.z, light.range);
+		fs_lighting.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
+		fs_lighting.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
+		fs_lighting.inner_outer_ConeCos[i] = Vector4(light.innerConeCos, light.outerConeCos, (light.shadows)?1.0:0.0, 0.0);
 
 		if (light.type == LightType::DIRECTIONAL){
 			Matrix4 projectionMatrix = Matrix4::orthoMatrix(-500, 500, -500, 500, -500, 500);
 			Matrix4 viewMatrix = Matrix4::lookAtMatrix(transform->worldPosition, light.direction, Vector3(0, 1, 0));
 
-			light.lightViewProjection = projectionMatrix * viewMatrix;
+			light.lightViewProjectionMatrix = projectionMatrix * viewMatrix;
 		}
+
+		vs_lighting.lightViewProjectionMatrix[i] = light.lightViewProjectionMatrix;
 	}
 
 	// Setting intensity of other lights to zero
 	for (int i = numLights; i < MAX_LIGHTS; i++){
-		lightsBlock.color_intensity[i].w = 0.0;
+		fs_lighting.color_intensity[i].w = 0.0;
 	}
-
-	return lightsBlock;
 }
 
-bool RenderSystem::loadMesh(MeshComponent& mesh, FramebufferRender& lightFb){
+bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 	bufferNameToRender.clear();
 
@@ -184,7 +192,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh, FramebufferRender& lightFb){
 			if (mesh.submeshes[i].hasNormalMap){
 				p_hasNormalMap = true;
 			}
-			if (mesh.castShadows){
+			if (hasShadows && mesh.castShadows){
 				p_castShadows = true;
 			}
 		}else{
@@ -193,7 +201,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh, FramebufferRender& lightFb){
 
 		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(p_unlit, true, false, p_punctual, p_castShadows, p_hasNormal, p_hasNormalMap, p_hasTangent, false, true);
 		mesh.submeshes[i].shader = ShaderPool::get(shaderType, mesh.submeshes[i].shaderProperties);
-		if (hasLights && mesh.castShadows){
+		if (hasShadows && mesh.castShadows){
 			mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, "");
 			if (!mesh.submeshes[i].depthShader->isCreated())
 				return false;
@@ -207,7 +215,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh, FramebufferRender& lightFb){
 		mesh.submeshes[i].slotFSParams = shaderData.getUniformIndex(UniformType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
 		if (hasLights){
 			mesh.submeshes[i].slotFSLighting = shaderData.getUniformIndex(UniformType::FS_LIGHTING, ShaderStageType::FRAGMENT);
-			if (mesh.castShadows){
+			if (hasShadows && mesh.castShadows){
 				mesh.submeshes[i].slotVSLighting = shaderData.getUniformIndex(UniformType::VS_LIGHTING, ShaderStageType::VERTEX);
 			}
 		}
@@ -251,9 +259,13 @@ bool RenderSystem::loadMesh(MeshComponent& mesh, FramebufferRender& lightFb){
 			else
 				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
 
-			if (hasLights && mesh.castShadows){
-				slotTex = shaderData.getTextureIndex(TextureShaderType::SHADOWMAP1, ShaderStageType::FRAGMENT);
-				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, lightFb.getColorTexture());
+			if (hasShadows && mesh.castShadows){
+				auto lights = scene->getComponentArray<LightComponent>();
+				for (int l = 0; l < lights->size(); l++){
+					LightComponent& light = lights->getComponentFromIndex(l);
+					slotTex = shaderData.getTextureIndex(TextureShaderType::SHADOWMAP1, ShaderStageType::FRAGMENT);
+					render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.lightFb.getColorTexture());
+				}
 			}
 		}
 
@@ -300,7 +312,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh, FramebufferRender& lightFb){
 		render->endLoad();
 
 		//----------Start depth shader---------------
-		if (hasLights && mesh.castShadows){
+		if (hasShadows && mesh.castShadows){
 			ObjectRender* depthRender = &mesh.submeshes[i].depthRender;
 
 			depthRender->beginLoad(mesh.submeshes[i].primitiveType, true);
@@ -342,7 +354,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh, FramebufferRender& lightFb){
 	return true;
 }
 
-void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, u_lighting_t& lights, Matrix4 lightSpaceMatrix){
+void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform){
 	if (mesh.loaded){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender* render = &mesh.submeshes[i].render;
@@ -354,17 +366,12 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 			pbrParams_fs.emissiveFactor = mesh.submeshes[i].material.emissiveFactor;
 			pbrParams_fs.eyePos = camTransform.worldPosition;
 
-			Matrix4 lightSpaces[MAX_LIGHTS];
-			for (int i = 0; i < MAX_LIGHTS; i++){
-				lightSpaces[i] = lightSpaceMatrix;
-			}
-
 			render->beginDraw();
 
 			if (hasLights){
-				render->applyUniform(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16 * MAX_LIGHTS, &lights);
-				if (mesh.castShadows){
-					render->applyUniform(mesh.submeshes[i].slotVSLighting, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16 * MAX_LIGHTS, &lightSpaces);
+				render->applyUniform(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16 * MAX_LIGHTS, &fs_lighting);
+				if (hasShadows && mesh.castShadows){
+					render->applyUniform(mesh.submeshes[i].slotVSLighting, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16 * MAX_LIGHTS, &vs_lighting);
 				}
 			}
 
@@ -379,7 +386,7 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 }
 
 void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix){
-	if (mesh.loaded && hasLights && mesh.castShadows){
+	if (mesh.loaded && mesh.castShadows){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender* depthRender = &mesh.submeshes[i].depthRender;
 
@@ -562,39 +569,37 @@ void RenderSystem::update(double dt){
 
 void RenderSystem::draw(){
 
-	//---------Draw all meshes----------
 	auto meshes = scene->getComponentArray<MeshComponent>();
 
+	processLights();
 
 	//---------Depth shader----------
-	auto lights = scene->getComponentArray<LightComponent>();
-	LightComponent& light = lights->getComponentFromIndex(0);
-	Entity entity = lights->getEntity(0);
-	Transform* transform = scene->findComponent<Transform>(entity);
+	if (hasShadows){
+		auto lights = scene->getComponentArray<LightComponent>();
+		
+		for (int l = 0; l < lights->size(); l++){
+			LightComponent& light = lights->getComponentFromIndex(l);
 
-	depthRender.startFrameBuffer(&light.lightFb);
-	//depthRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
-	
-	for (int i = 0; i < meshes->size(); i++){
-		MeshComponent& mesh = meshes->getComponentFromIndex(i);
-		Entity entity = meshes->getEntity(i);
-		Transform* transform = scene->findComponent<Transform>(entity);
+			depthRender.startFrameBuffer(&light.lightFb);
+			for (int i = 0; i < meshes->size(); i++){
+				MeshComponent& mesh = meshes->getComponentFromIndex(i);
+				Entity entity = meshes->getEntity(i);
+				Transform* transform = scene->findComponent<Transform>(entity);
 
-		if (transform){
-			if (!mesh.loaded){
-				loadMesh(mesh, light.lightFb);
+				if (transform){
+					if (!mesh.loaded){
+						loadMesh(mesh);
+					}
+					drawMeshDepth(mesh, light.lightViewProjectionMatrix * transform->modelMatrix);
+				}
 			}
-			drawMeshDepth(mesh, light.lightViewProjection * transform->modelMatrix);
+			depthRender.endFrameBuffer();
 		}
 	}
-
-	depthRender.endFrameBuffer();
 	
 	//---------Draw transparent meshes----------
 	sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
 	sceneRender.applyViewport(Engine::getViewRect());
-
-	u_lighting_t lightsFormated = collectLights();
 
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
 	
@@ -605,11 +610,11 @@ void RenderSystem::draw(){
 
 		if (transform){
 			if (!mesh.loaded){
-				loadMesh(mesh, light.lightFb);
+				loadMesh(mesh);
 			}
 			if (!mesh.transparency){
 				//Draw opaque meshes
-				drawMesh(mesh, *transform, cameraTransform, lightsFormated, light.lightViewProjection * transform->modelMatrix);
+				drawMesh(mesh, *transform, cameraTransform);
 			}else{
 				transparentMeshes.push({&mesh, transform, transform->distanceToCamera});
 			}
@@ -631,7 +636,7 @@ void RenderSystem::draw(){
 		TransparentMeshesData meshData = transparentMeshes.top();
 
 		//Draw transparent meshes
-		drawMesh(*meshData.mesh, *meshData.transform, cameraTransform, lightsFormated, light.lightViewProjection * transform->modelMatrix);
+		drawMesh(*meshData.mesh, *meshData.transform, cameraTransform);
 
 		transparentMeshes.pop();
 	}
@@ -672,7 +677,7 @@ void RenderSystem::entityDestroyed(Entity entity){
 			//Destroy shader
 			submesh.shader.reset();
 			ShaderPool::remove(ShaderType::MESH, mesh->submeshes[i].shaderProperties);
-			if (hasLights && mesh->castShadows)
+			if (hasShadows && mesh->castShadows)
 				ShaderPool::remove(ShaderType::DEPTH, "");
 
 			//Destroy texture
