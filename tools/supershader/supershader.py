@@ -43,8 +43,17 @@ def get_output(shader, project, lang):
     outpath = os.path.join(project, "assets/shaders", shader+"_"+lang)
     return outpath
 
+def get_default_shaders():
+    s =  "mesh_Uv1PucNorNmpTanVc4;"
+    s += "mesh_Uv1PucShwNorNmpTanVc4;"
+    s += "mesh_Uv1PucNorVc4;"
+    s += "mesh_Uv1PucShwNorVc4;"
+    s += "depth;"
+    s += "sky"
+    return s
+
 @click.command()
-@click.option('--shaders', '-s', required=True, help="Target shader language, seperated by ';'")
+@click.option('--shaders', '-s', default=get_default_shaders(), help="Target shader language, seperated by ';'")
 @click.option('--lang', '-l', required=True, type=click.Choice(['glsl330', 'glsl100', 'glsl300es', 'hlsl4', 'hlsl5'], case_sensitive=False), help="Target shader language")
 @click.option('--project', '-p', default='../../project', type=click.Path(), help="Source root path of project files")
 @click.option('--max-lights', '-ml', default=6, type=int, help="Value of MAX_LIGHTS macro")

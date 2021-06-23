@@ -109,13 +109,6 @@ void RenderSystem::processLights(){
 		fs_lighting.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
 		fs_lighting.inner_outer_ConeCos[i] = Vector4(light.innerConeCos, light.outerConeCos, (light.shadows)?1.0:0.0, 0.0);
 
-		if (light.type == LightType::DIRECTIONAL){
-			Matrix4 projectionMatrix = Matrix4::orthoMatrix(-500, 500, -500, 500, -500, 500);
-			Matrix4 viewMatrix = Matrix4::lookAtMatrix(transform->worldPosition, light.direction, Vector3(0, 1, 0));
-
-			light.lightViewProjectionMatrix = projectionMatrix * viewMatrix;
-		}
-
 		vs_lighting.lightViewProjectionMatrix[i] = light.lightViewProjectionMatrix;
 	}
 
@@ -524,9 +517,20 @@ void RenderSystem::updateSkyViewProjection(CameraComponent& camera){
 
 void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& transform){
 	light.worldDirection = transform.worldRotation * light.direction;
+
+	if (hasShadows){
+		if (light.type == LightType::DIRECTIONAL){
+			Matrix4 projectionMatrix = Matrix4::orthoMatrix(-500, 500, -500, 500, -500, 500);
+			Matrix4 viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection, Vector3(0, 1, 0));
+
+			light.lightViewProjectionMatrix = projectionMatrix * viewMatrix;
+		}
+	}
 }
 
 void RenderSystem::update(double dt){
+	processLights();
+
 	CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
 
@@ -568,10 +572,7 @@ void RenderSystem::update(double dt){
 }
 
 void RenderSystem::draw(){
-
 	auto meshes = scene->getComponentArray<MeshComponent>();
-
-	processLights();
 
 	//---------Depth shader----------
 	if (hasShadows){
