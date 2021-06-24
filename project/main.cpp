@@ -39,6 +39,7 @@ Model carro(&scene);
 PlaneTerrain plane(&scene);
 SkyBox sky(&scene);
 Light lightDir(&scene);
+Light lightDir2(&scene);
 //Light lightPoint(&scene);
 //Light lightSpot(&scene);
 
@@ -54,6 +55,12 @@ void init(){
     lightDir.setRange(0.0);
     lightDir.setPosition(0.0f, 0.0f, 0.0f);
     lightDir.setIntensity(1.0);
+
+    lightDir2.setType(LightType::DIRECTIONAL);
+    lightDir2.setDirection(-0.5f, -0.5, 0.0);
+    lightDir2.setRange(0.0);
+    lightDir2.setPosition(0.0f, 0.0f, 0.0f);
+    lightDir2.setIntensity(0.5);
 
     //lightPoint.setType(LightType::POINT);
     //lightPoint.setDirection(0.0, 0.0, 0.0);

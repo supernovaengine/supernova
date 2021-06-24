@@ -152,6 +152,13 @@ namespace Supernova{
         OCCULSION,
         NORMAL,
         SHADOWMAP1,
+        SHADOWMAP2,
+        SHADOWMAP3,
+        SHADOWMAP4,
+        SHADOWMAP5,
+        SHADOWMAP6,
+        SHADOWMAP7,
+        SHADOWMAP8,
         SKYCUBE
         //SHADOWMAP2D
         //SHADOWMAPCUBE

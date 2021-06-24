@@ -44,12 +44,17 @@ uniform u_fs_pbrParams {
         vec4 direction_range[MAX_LIGHTS]; //direction.xyz and range.w
         vec4 color_intensity[MAX_LIGHTS]; //color.xyz and intensity.w
         vec4 position_type[MAX_LIGHTS]; //position.xyz and type.w
-        vec4 inCone_ouCone_shadows[MAX_LIGHTS]; //innerConeCos.x, outerConeCos.y and shadows.z
+        vec4 inCone_ouCone_shadows[MAX_LIGHTS]; //innerConeCos.x, outerConeCos.y, shadows.z, shadowMapIndex.w
     } lighting;
 #endif
 
 #ifdef USE_SHADOWS
-    uniform sampler2D u_shadowMap;
+    uniform sampler2D u_shadowMap1;
+    uniform sampler2D u_shadowMap2;
+    uniform sampler2D u_shadowMap3;
+    uniform sampler2D u_shadowMap4;
+    uniform sampler2D u_shadowMap5;
+    uniform sampler2D u_shadowMap6;
 
     in vec4 v_lightMVPMatrix[MAX_LIGHTS];
 #endif
@@ -176,7 +181,8 @@ void main() {
                 lighting.color_intensity[i].w,
                 lighting.inCone_ouCone_shadows[i].x,
                 lighting.inCone_ouCone_shadows[i].y,
-                (lighting.inCone_ouCone_shadows[i].z == 1.0)?true:false
+                (lighting.inCone_ouCone_shadows[i].z == 1.0)?true:false,
+                int(lighting.inCone_ouCone_shadows[i].w)
             ); 
 
             if (light.intensity > 0.0){
@@ -199,7 +205,7 @@ void main() {
                 float shadow = 1.0;
                 #ifdef USE_SHADOWS
                     if (light.shadows){
-                        shadow = 1.0 - shadowCalculationPCF(v_lightMVPMatrix[i], NdotL, vec2(2048.0, 2048.0));
+                        shadow = 1.0 - shadowCalculationPCF(v_lightMVPMatrix[i], NdotL, vec2(2048.0, 2048.0), light.shadowMapIndex);
                     }
                 #endif
 

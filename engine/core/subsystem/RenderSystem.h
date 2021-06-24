@@ -37,7 +37,7 @@ namespace Supernova{
 	    Vector4 direction_range[MAX_LIGHTS];
 	    Vector4 color_intensity[MAX_LIGHTS];
 	    Vector4 position_type[MAX_LIGHTS];
-	    Vector4 inner_outer_ConeCos[MAX_LIGHTS];
+	    Vector4 inCon_ouCon_shadows[MAX_LIGHTS];
 	} fs_lighting_t;
 
 	class RenderSystem : public SubSystem {
@@ -74,6 +74,7 @@ namespace Supernova{
 
 		void createEmptyTextures();
 		void processLights();
+		TextureShaderType getShadowMapByIndex(int index);
 
 	public:
 		RenderSystem(Scene* scene);

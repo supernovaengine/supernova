@@ -107,7 +107,7 @@ void RenderSystem::processLights(){
 		fs_lighting.direction_range[i] = Vector4(light.worldDirection.x, light.worldDirection.y, light.worldDirection.z, light.range);
 		fs_lighting.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
 		fs_lighting.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
-		fs_lighting.inner_outer_ConeCos[i] = Vector4(light.innerConeCos, light.outerConeCos, (light.shadows)?1.0:0.0, 0.0);
+		fs_lighting.inCon_ouCon_shadows[i] = Vector4(light.innerConeCos, light.outerConeCos, (light.shadows)?1.0:0.0, i+1);
 
 		vs_lighting.lightViewProjectionMatrix[i] = light.lightViewProjectionMatrix;
 	}
@@ -116,6 +116,28 @@ void RenderSystem::processLights(){
 	for (int i = numLights; i < MAX_LIGHTS; i++){
 		fs_lighting.color_intensity[i].w = 0.0;
 	}
+}
+
+TextureShaderType RenderSystem::getShadowMapByIndex(int index){
+	if (index == 1){
+		return TextureShaderType::SHADOWMAP1;
+	}else if (index == 2){
+		return TextureShaderType::SHADOWMAP2;
+	}else if (index == 3){
+		return TextureShaderType::SHADOWMAP3;
+	}else if (index == 4){
+		return TextureShaderType::SHADOWMAP4;
+	}else if (index == 5){
+		return TextureShaderType::SHADOWMAP5;
+	}else if (index == 6){
+		return TextureShaderType::SHADOWMAP6;
+	}else if (index == 7){
+		return TextureShaderType::SHADOWMAP7;
+	}else if (index == 8){
+		return TextureShaderType::SHADOWMAP8;
+	}
+
+	return TextureShaderType::SHADOWMAP1;
 }
 
 bool RenderSystem::loadMesh(MeshComponent& mesh){
@@ -256,8 +278,14 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				auto lights = scene->getComponentArray<LightComponent>();
 				for (int l = 0; l < lights->size(); l++){
 					LightComponent& light = lights->getComponentFromIndex(l);
-					slotTex = shaderData.getTextureIndex(TextureShaderType::SHADOWMAP1, ShaderStageType::FRAGMENT);
+					slotTex = shaderData.getTextureIndex(getShadowMapByIndex(l+1), ShaderStageType::FRAGMENT);
 					render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.lightFb.getColorTexture());
+				}
+				if (MAX_SHADOWSMAP > lights->size()){
+					for (int s = lights->size(); s < MAX_SHADOWSMAP; s++){
+						slotTex = shaderData.getTextureIndex(getShadowMapByIndex(s+1), ShaderStageType::FRAGMENT);
+						render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
+					}
 				}
 			}
 		}

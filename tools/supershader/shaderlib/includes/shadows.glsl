@@ -1,4 +1,20 @@
-float shadowCalculationPCF(vec4 frag_pos_light_space, float NdotL, vec2 shadow_map_size) {
+vec4 getShadowMap(int index, vec2 coords) {
+    if (index == 1){
+        return texture(u_shadowMap1, coords);
+    }else if (index == 2){
+        return texture(u_shadowMap2, coords);
+    }else if (index == 3){
+        return texture(u_shadowMap3, coords);
+    }else if (index == 4){
+        return texture(u_shadowMap4, coords);
+    }else if (index == 5){
+        return texture(u_shadowMap5, coords);
+    }else if (index == 6){
+        return texture(u_shadowMap6, coords);
+    }
+}
+
+float shadowCalculationPCF(vec4 frag_pos_light_space, float NdotL, vec2 shadowMapSize, int shadowMapIndex) {
     vec3 proj_coords = frag_pos_light_space.xyz / frag_pos_light_space.w;
     // proj_coords is in [-1,1] range, transform to [0,1] range
     proj_coords = proj_coords * 0.5 + 0.5;
@@ -7,10 +23,10 @@ float shadowCalculationPCF(vec4 frag_pos_light_space, float NdotL, vec2 shadow_m
     float bias = max(0.005 * (1.0 - NdotL), 0.0005);
     // check whether current frag pos is in shadow
     float shadow = 0.0;
-    vec2 texel_size = 1.0 / shadow_map_size;
+    vec2 texel_size = 1.0 / shadowMapSize;
     for(int x = -1; x <= 1; ++x) {
         for(int y = -1; y <= 1; ++y) {
-            float pcf_depth = decodeDepth(texture(u_shadowMap, proj_coords.xy + vec2(x, y) * texel_size)); 
+            float pcf_depth = decodeDepth(getShadowMap(shadowMapIndex, proj_coords.xy + vec2(x, y) * texel_size));
             shadow += current_depth - bias > pcf_depth  ? 1.0 : 0.0;        
         }    
     }
