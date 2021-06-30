@@ -19,6 +19,8 @@ namespace Supernova{
 
         bool createFramebuffer(int width, int height);
         void destroyFramebuffer();
+        bool isCreated();
+
         TextureRender* getColorTexture();
     };
 }

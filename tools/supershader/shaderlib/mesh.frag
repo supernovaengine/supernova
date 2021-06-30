@@ -217,7 +217,7 @@ void main() {
                     f_specular += shadow * intensity * NdotL * BRDF_specularGGX(materialInfo.f0, materialInfo.f90, materialInfo.alphaRoughness, VdotH, NdotL, NdotV, NdotH);
                 }
             }
-    }
+        }
     #endif
 
     f_emissive = pbrParams.emissiveFactor;

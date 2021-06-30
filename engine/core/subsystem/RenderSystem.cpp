@@ -32,13 +32,6 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 void RenderSystem::load(){
 	createEmptyTextures();
 	depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
-
-	//TODO: Remove from here, to can create lights at runtime
-	auto lights = scene->getComponentArray<LightComponent>();	
-	for (int i = 0; i < lights->size(); i++){
-		LightComponent& light = lights->getComponentFromIndex(i);
-		light.lightFb.createFramebuffer(2048, 2048);
-	}
 }
 
 void RenderSystem::createEmptyTextures(){
@@ -101,8 +94,11 @@ void RenderSystem::processLights(){
 		if (light.type == LightType::SPOT)
 			type = 2;
 		
-		if (light.shadows)
+		if (light.shadows){
 			hasShadows = true;
+			if (!light.framebuffer.isCreated())
+				light.framebuffer.createFramebuffer(2048, 2048);
+		}
 
 		fs_lighting.direction_range[i] = Vector4(light.worldDirection.x, light.worldDirection.y, light.worldDirection.z, light.range);
 		fs_lighting.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
@@ -279,7 +275,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				for (int l = 0; l < lights->size(); l++){
 					LightComponent& light = lights->getComponentFromIndex(l);
 					slotTex = shaderData.getTextureIndex(getShadowMapByIndex(l+1), ShaderStageType::FRAGMENT);
-					render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.lightFb.getColorTexture());
+					render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer.getColorTexture());
 				}
 				if (MAX_SHADOWSMAP > lights->size()){
 					for (int s = lights->size(); s < MAX_SHADOWSMAP; s++){
@@ -546,13 +542,24 @@ void RenderSystem::updateSkyViewProjection(CameraComponent& camera){
 void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& transform){
 	light.worldDirection = transform.worldRotation * light.direction;
 
-	if (hasShadows){
-		if (light.type == LightType::DIRECTIONAL){
-			Matrix4 projectionMatrix = Matrix4::orthoMatrix(-500, 500, -500, 500, -500, 500);
-			Matrix4 viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection, Vector3(0, 1, 0));
-
-			light.lightViewProjectionMatrix = projectionMatrix * viewMatrix;
+	if (hasShadows && (light.intensity > 0)){
+		Matrix4 projectionMatrix;
+		
+		Vector3 up = Vector3(0, 1, 0);
+		if (light.worldDirection.crossProduct(up) == Vector3::ZERO){
+			up = Vector3(0, 0, 1);
 		}
+		
+		Matrix4 viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
+		
+		if (light.type == LightType::DIRECTIONAL){
+			projectionMatrix = Matrix4::orthoMatrix(-500, 500, -500, 500, -500, 500);
+		}else if (light.type == LightType::SPOT){
+			float teste = acos(light.outerConeCos)*2;
+			projectionMatrix = Matrix4::perspectiveMatrix(acos(light.outerConeCos)*2, 1, 1, 1000);
+		}
+		
+		light.lightViewProjectionMatrix = projectionMatrix * viewMatrix;
 	}
 }
 
@@ -609,20 +616,22 @@ void RenderSystem::draw(){
 		for (int l = 0; l < lights->size(); l++){
 			LightComponent& light = lights->getComponentFromIndex(l);
 
-			depthRender.startFrameBuffer(&light.lightFb);
-			for (int i = 0; i < meshes->size(); i++){
-				MeshComponent& mesh = meshes->getComponentFromIndex(i);
-				Entity entity = meshes->getEntity(i);
-				Transform* transform = scene->findComponent<Transform>(entity);
+			if (light.intensity > 0){
+				depthRender.startFrameBuffer(&light.framebuffer);
+				for (int i = 0; i < meshes->size(); i++){
+					MeshComponent& mesh = meshes->getComponentFromIndex(i);
+					Entity entity = meshes->getEntity(i);
+					Transform* transform = scene->findComponent<Transform>(entity);
 
-				if (transform){
-					if (!mesh.loaded){
-						loadMesh(mesh);
+					if (transform){
+						if (!mesh.loaded){
+							loadMesh(mesh);
+						}
+						drawMeshDepth(mesh, light.lightViewProjectionMatrix * transform->modelMatrix);
 					}
-					drawMeshDepth(mesh, light.lightViewProjectionMatrix * transform->modelMatrix);
 				}
+				depthRender.endFrameBuffer();
 			}
-			depthRender.endFrameBuffer();
 		}
 	}
 	

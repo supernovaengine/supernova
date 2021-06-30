@@ -23,6 +23,10 @@ void FramebufferRender::destroyFramebuffer(){
     backend.destroyFramebuffer();
 }
 
+bool FramebufferRender::isCreated(){
+    return backend.isCreated();
+}
+
 TextureRender* FramebufferRender::getColorTexture(){
     return backend.getColorTexture();
 }

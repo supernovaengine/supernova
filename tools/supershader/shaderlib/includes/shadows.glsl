@@ -20,7 +20,7 @@ float shadowCalculationPCF(vec4 frag_pos_light_space, float NdotL, vec2 shadowMa
     proj_coords = proj_coords * 0.5 + 0.5;
     float current_depth = proj_coords.z;
     // calculate bias (based on depth map resolution and slope)
-    float bias = max(0.005 * (1.0 - NdotL), 0.0005);
+    float bias = max(0.0005 * (1.0 - NdotL), 0.00005);
     // check whether current frag pos is in shadow
     float shadow = 0.0;
     vec2 texel_size = 1.0 / shadowMapSize;

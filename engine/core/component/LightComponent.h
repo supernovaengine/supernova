@@ -25,12 +25,12 @@ namespace Supernova{
         float range = 0.0;
         float intensity = 1.0;
 
-        float innerConeCos = 0.0;
+        float innerConeCos = 0.0; //half cone
         float outerConeCos = 0.0;
 
         bool shadows = true;
         Matrix4 lightViewProjectionMatrix;
-        FramebufferRender lightFb;
+        FramebufferRender framebuffer;
     };
     
 }

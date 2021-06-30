@@ -35,11 +35,8 @@ bool SokolFramebuffer::createFramebuffer(int width, int height){
     pass_desc.label = "shadow-map-pass";
 
     pass = sg_make_pass(&pass_desc);
-
-    if (pass.id != SG_INVALID_ID)
-        return true;
-
-    return false;
+    
+    return isCreated();
 }
 
 void SokolFramebuffer::destroyFramebuffer(){
@@ -48,6 +45,13 @@ void SokolFramebuffer::destroyFramebuffer(){
     }
 
     pass.id = SG_INVALID_ID;
+}
+
+bool SokolFramebuffer::isCreated(){
+    if (pass.id != SG_INVALID_ID)
+        return true;
+
+    return false;
 }
 
 TextureRender* SokolFramebuffer::getColorTexture(){

@@ -55,6 +55,10 @@ void Light::setRange(float range){
 
 void Light::setIntensity(float intensity){
     LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    Transform& transform = scene->getComponent<Transform>(entity);
+
+    if (intensity > 0 && lightcomp.intensity == 0)
+        transform.needUpdate = true; //Does not affect children
 
     lightcomp.intensity = intensity;
 }
@@ -62,6 +66,6 @@ void Light::setIntensity(float intensity){
 void Light::setConeAngle(float inner, float outer){
     LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
 
-    lightcomp.innerConeCos = cos(Angle::defaultToRad(inner));
-    lightcomp.outerConeCos = cos(Angle::defaultToRad(outer));
+    lightcomp.innerConeCos = cos(Angle::defaultToRad(inner / 2));
+    lightcomp.outerConeCos = cos(Angle::defaultToRad(outer / 2));
 }

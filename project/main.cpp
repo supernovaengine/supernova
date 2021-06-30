@@ -41,7 +41,7 @@ SkyBox sky(&scene);
 Light lightDir(&scene);
 Light lightDir2(&scene);
 //Light lightPoint(&scene);
-//Light lightSpot(&scene);
+Light lightSpot(&scene);
 
 float rotationY = 0;
 float speed = 0;
@@ -60,7 +60,7 @@ void init(){
     lightDir2.setDirection(-0.5f, -0.5, 0.0);
     lightDir2.setRange(0.0);
     lightDir2.setPosition(0.0f, 0.0f, 0.0f);
-    lightDir2.setIntensity(0.5);
+    lightDir2.setIntensity(0.0);
 
     //lightPoint.setType(LightType::POINT);
     //lightPoint.setDirection(0.0, 0.0, 0.0);
@@ -68,12 +68,12 @@ void init(){
     //lightPoint.setPosition(300.0f, 30.0f, 80.0f);
     //lightPoint.setIntensity(10000.0);
 
-    //lightSpot.setType(LightType::SPOT);
-    //lightSpot.setDirection(0.0f, -0.6, 0.4);
-    //lightSpot.setRange(0.0);
-    //lightSpot.setPosition(0.0f, 80.0f/5, 30.0f/5);
-    //lightSpot.setIntensity(10000.0);
-    //lightSpot.setConeAngle(25, 35);
+    lightSpot.setType(LightType::SPOT);
+    lightSpot.setDirection(0.0f, -0.6, 0.4);
+    lightSpot.setRange(0.0);
+    lightSpot.setPosition(0.0f, 100.0f, -300.0f);
+    lightSpot.setIntensity(100000.0);
+    lightSpot.setConeAngle(50, 70);
 
     //carro.addChild(&lightSpot);
 
