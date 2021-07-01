@@ -18,7 +18,7 @@ namespace Supernova{
 
         void setClearColor(Vector4 clearColor);
 
-        void startFrameBuffer(FramebufferRender* framebuffer);
+        void startFrameBuffer(FramebufferRender* framebuffer, size_t face);
         void startDefaultFrameBuffer(int width, int height);
 
         void applyViewport(Rect rect);

@@ -11,22 +11,23 @@ namespace Supernova{
     class SokolFramebuffer{
 
     private:
-        sg_pass pass;
+        sg_pass pass[6];
 
         TextureRender colorTexture;
+        TextureRender depthTexture;
 
     public:
         SokolFramebuffer();
         SokolFramebuffer(const SokolFramebuffer& rhs);
         SokolFramebuffer& operator=(const SokolFramebuffer& rhs);
 
-        bool createFramebuffer(int width, int height);
+        bool createFramebuffer(TextureType textureType, int width, int height);
         void destroyFramebuffer();
         bool isCreated();
-        
+
         TextureRender* getColorTexture();
 
-        sg_pass get();
+        sg_pass get(size_t face);
     };
 }
 

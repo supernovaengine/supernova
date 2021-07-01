@@ -97,7 +97,7 @@ void RenderSystem::processLights(){
 		if (light.shadows){
 			hasShadows = true;
 			if (!light.framebuffer.isCreated())
-				light.framebuffer.createFramebuffer(2048, 2048);
+				light.framebuffer.createFramebuffer(TextureType::TEXTURE_2D, 2048, 2048);
 		}
 
 		fs_lighting.direction_range[i] = Vector4(light.worldDirection.x, light.worldDirection.y, light.worldDirection.z, light.range);
@@ -555,7 +555,7 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 		if (light.type == LightType::DIRECTIONAL){
 			projectionMatrix = Matrix4::orthoMatrix(-500, 500, -500, 500, -500, 500);
 		}else if (light.type == LightType::SPOT){
-			float teste = acos(light.outerConeCos)*2;
+			//TODO: aspect based on shadow map size
 			projectionMatrix = Matrix4::perspectiveMatrix(acos(light.outerConeCos)*2, 1, 1, 1000);
 		}
 		
@@ -617,7 +617,7 @@ void RenderSystem::draw(){
 			LightComponent& light = lights->getComponentFromIndex(l);
 
 			if (light.intensity > 0){
-				depthRender.startFrameBuffer(&light.framebuffer);
+				depthRender.startFrameBuffer(&light.framebuffer, 0);
 				for (int i = 0; i < meshes->size(); i++){
 					MeshComponent& mesh = meshes->getComponentFromIndex(i);
 					Entity entity = meshes->getEntity(i);

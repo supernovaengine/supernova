@@ -19,8 +19,8 @@ void SceneRender::setClearColor(Vector4 clearColor){
     backend.setClearColor(clearColor);
 }
 
-void SceneRender::startFrameBuffer(FramebufferRender* framebuffer){
-    backend.startFrameBuffer(framebuffer);
+void SceneRender::startFrameBuffer(FramebufferRender* framebuffer, size_t face){
+    backend.startFrameBuffer(framebuffer, face);
 }
 
 void SceneRender::startDefaultFrameBuffer(int width, int height){

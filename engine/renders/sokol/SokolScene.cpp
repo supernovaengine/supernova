@@ -26,8 +26,8 @@ void SokolScene::setClearColor(Vector4 clearColor){
     pass_action.colors[0].value = { clearColor.x, clearColor.y, clearColor.z, clearColor.w };
 }
 
-void SokolScene::startFrameBuffer(FramebufferRender* framebuffer){
-    sg_pass pass = framebuffer->backend.get();
+void SokolScene::startFrameBuffer(FramebufferRender* framebuffer, size_t face){
+    sg_pass pass = framebuffer->backend.get(face);
     sg_begin_pass(pass, &pass_action);
 }
 

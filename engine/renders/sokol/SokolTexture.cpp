@@ -58,16 +58,22 @@ bool SokolTexture::createTexture(std::string label, int width, int height, Color
     return false;
 }
 
-bool SokolTexture::createShadowMapColorTexture(int width, int height){
+bool SokolTexture::createShadowMapTexture(TextureType type, bool depth, int width, int height){
     sg_image_desc img_desc = {0};
     img_desc.render_target = true;
+    img_desc.type = getTextureType(type);
     img_desc.width = width;
     img_desc.height = height;
-    img_desc.pixel_format = SG_PIXELFORMAT_RGBA8;
     img_desc.min_filter = SG_FILTER_LINEAR;
     img_desc.mag_filter = SG_FILTER_LINEAR;
     img_desc.sample_count = 1;
-    img_desc.label = "shadow-map-color-image";
+    if (depth){
+        img_desc.pixel_format = SG_PIXELFORMAT_DEPTH;
+        img_desc.label = "shadow-map-depth-image";
+    } else {
+        img_desc.pixel_format = SG_PIXELFORMAT_RGBA8;
+        img_desc.label = "shadow-map-color-image";
+    }
 
     image = sg_make_image(&img_desc);
 
