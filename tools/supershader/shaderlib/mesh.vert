@@ -51,7 +51,7 @@ out vec2 v_uv2;
         mat4 lightVPMatrix[MAX_LIGHTS];
     };
     
-    out vec4 v_lightMVPMatrix[MAX_LIGHTS];
+    out vec4 v_lightProjPos[MAX_LIGHTS];
 #endif
 
 vec4 getPosition(){
@@ -106,7 +106,7 @@ void main() {
 
     #ifdef USE_SHADOWS
     for (int i = 0; i < MAX_LIGHTS; ++i){
-        v_lightMVPMatrix[i] = lightVPMatrix[i] * pbrParams.modelMatrix * getPosition();
+        v_lightProjPos[i] = lightVPMatrix[i] * pos;
     }
     #endif
 

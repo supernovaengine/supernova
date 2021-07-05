@@ -56,7 +56,7 @@ uniform u_fs_pbrParams {
     uniform sampler2D u_shadowMap5;
     uniform sampler2D u_shadowMap6;
 
-    in vec4 v_lightMVPMatrix[MAX_LIGHTS];
+    in vec4 v_lightProjPos[MAX_LIGHTS];
 #endif
 
 struct MaterialInfo{
@@ -205,7 +205,7 @@ void main() {
                 float shadow = 1.0;
                 #ifdef USE_SHADOWS
                     if (light.shadows){
-                        shadow = 1.0 - shadowCalculationPCF(v_lightMVPMatrix[i], NdotL, vec2(2048.0, 2048.0), light.shadowMapIndex);
+                        shadow = 1.0 - shadowCalculationPCF(v_lightProjPos[i], NdotL, vec2(2048.0, 2048.0), light.shadowMapIndex);
                     }
                 #endif
 
