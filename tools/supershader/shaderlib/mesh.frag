@@ -56,6 +56,8 @@ uniform u_fs_pbrParams {
     uniform sampler2D u_shadowMap5;
     uniform sampler2D u_shadowMap6;
 
+    uniform samplerCube u_shadowCubeMap1;
+
     in vec4 v_lightProjPos[MAX_LIGHTS];
 #endif
 
@@ -116,7 +118,7 @@ void main() {
         return;
     #endif
 
-    vec3 v = normalize(pbrParams.eyePos- v_position);
+    vec3 v = normalize(pbrParams.eyePos - v_position);
     NormalInfo normalInfo = getNormalInfo(v);
     vec3 n = normalInfo.n;
     vec3 t = normalInfo.t;
@@ -205,7 +207,11 @@ void main() {
                 float shadow = 1.0;
                 #ifdef USE_SHADOWS
                     if (light.shadows){
-                        shadow = 1.0 - shadowCalculationPCF(v_lightProjPos[i], NdotL, vec2(2048.0, 2048.0), light.shadowMapIndex);
+                        if(light.type != LightType_Point){ 
+                            shadow = 1.0 - shadowCalculationPCF(v_lightProjPos[i], NdotL, vec2(2048.0, 2048.0), light.shadowMapIndex);
+                        }else{
+                            shadow = 1.0 - shadowCubeCalculationPCF(-pointToLight, NdotL);
+                        }
                     }
                 #endif
 

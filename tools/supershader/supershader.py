@@ -48,6 +48,7 @@ def get_default_shaders():
     s += "mesh_Uv1PucShwNorNmpTanVc4;"
     s += "mesh_Uv1PucNorVc4;"
     s += "mesh_Uv1PucShwNorVc4;"
+    s += "mesh_UltUv1Vc4;"
     s += "depth;"
     s += "sky"
     return s

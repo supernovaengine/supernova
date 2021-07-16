@@ -59,6 +59,7 @@ namespace Supernova{
 
 		static TextureRender emptyWhite;
 		static TextureRender emptyBlack;
+		static TextureRender emptyCubeBlack;
 		static TextureRender emptyNormal;
 
 		static bool emptyTexturesCreated;
@@ -75,6 +76,7 @@ namespace Supernova{
 		void createEmptyTextures();
 		void processLights();
 		TextureShaderType getShadowMapByIndex(int index);
+		TextureShaderType getShadowMapCubeByIndex(int index);
 
 	public:
 		RenderSystem(Scene* scene);

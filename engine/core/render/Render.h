@@ -159,6 +159,7 @@ namespace Supernova{
         SHADOWMAP6,
         SHADOWMAP7,
         SHADOWMAP8,
+        SHADOWCUBEMAP1,
         SKYCUBE
         //SHADOWMAP2D
         //SHADOWMAPCUBE

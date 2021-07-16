@@ -17,6 +17,7 @@ using namespace Supernova;
 
 TextureRender RenderSystem::emptyWhite;
 TextureRender RenderSystem::emptyBlack;
+TextureRender RenderSystem::emptyCubeBlack;
 TextureRender RenderSystem::emptyNormal;
 
 bool RenderSystem::emptyTexturesCreated = false;
@@ -36,12 +37,20 @@ void RenderSystem::load(){
 
 void RenderSystem::createEmptyTextures(){
 	if (!emptyTexturesCreated){
-		TextureDataSize texData[1];
+		TextureDataSize texData[6];
 
     	uint32_t pixels[64];
 
-		texData[0].data = (void*)pixels;
-		texData[0].size = 8 * 8 * 4;
+		for (int i = 0; i < 6; i++){
+			texData[i].data = (void*)pixels;
+			texData[i].size = 8 * 8 * 4;
+		}
+
+		for (int i = 0; i < 64; i++) {
+        	pixels[i] = 0xFF808080;
+    	}
+
+		emptyNormal.createTexture("empty|normal", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, texData);
 
 		for (int i = 0; i < 64; i++) {
         	pixels[i] = 0xFFFFFFFF;
@@ -54,12 +63,7 @@ void RenderSystem::createEmptyTextures(){
     	}
 
 		emptyBlack.createTexture("empty|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, texData);
-
-		for (int i = 0; i < 64; i++) {
-        	pixels[i] = 0xFF808080;
-    	}
-
-		emptyNormal.createTexture("empty|normal", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, texData);
+		emptyCubeBlack.createTexture("empty|cube|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_CUBE, 6, texData);
 
 		emptyTexturesCreated = true;
 	}
@@ -68,6 +72,9 @@ void RenderSystem::createEmptyTextures(){
 void RenderSystem::processLights(){
 	hasLights = false;
 	hasShadows = false;
+
+	int freeShadowMap = 1;
+	int freeShadowCubeMap = 1;
 
 	auto lights = scene->getComponentArray<LightComponent>();
 
@@ -93,19 +100,32 @@ void RenderSystem::processLights(){
 			type = 1;
 		if (light.type == LightType::SPOT)
 			type = 2;
+
+		light.shadowMapIndex = 0;
 		
 		if (light.shadows){
 			hasShadows = true;
-			if (!light.framebuffer.isCreated())
-				light.framebuffer.createFramebuffer(TextureType::TEXTURE_2D, 2048, 2048);
+			if (light.type == LightType::POINT){
+				if (!light.framebuffer.isCreated())
+					light.framebuffer.createFramebuffer(TextureType::TEXTURE_CUBE, 2048, 2048);
+				light.shadowMapIndex = freeShadowCubeMap++;
+			}else{
+				if (!light.framebuffer.isCreated())
+					light.framebuffer.createFramebuffer(TextureType::TEXTURE_2D, 2048, 2048);
+				light.shadowMapIndex = freeShadowMap++;
+			}
 		}
 
 		fs_lighting.direction_range[i] = Vector4(light.worldDirection.x, light.worldDirection.y, light.worldDirection.z, light.range);
 		fs_lighting.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
 		fs_lighting.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
-		fs_lighting.inCon_ouCon_shadows[i] = Vector4(light.innerConeCos, light.outerConeCos, (light.shadows)?1.0:0.0, i+1);
+		fs_lighting.inCon_ouCon_shadows[i] = Vector4(light.innerConeCos, light.outerConeCos, (light.shadows)?1.0:0.0, light.shadowMapIndex);
 
-		vs_lighting.lightViewProjectionMatrix[i] = light.lightViewProjectionMatrix;
+		if (light.type != LightType::POINT){
+			vs_lighting.lightViewProjectionMatrix[i] = light.lightViewProjectionMatrix[0];
+		}else{
+			vs_lighting.lightViewProjectionMatrix[i].identity();
+		}
 	}
 
 	// Setting intensity of other lights to zero
@@ -134,6 +154,14 @@ TextureShaderType RenderSystem::getShadowMapByIndex(int index){
 	}
 
 	return TextureShaderType::SHADOWMAP1;
+}
+
+TextureShaderType RenderSystem::getShadowMapCubeByIndex(int index){
+	if (index == 1){
+		return TextureShaderType::SHADOWCUBEMAP1;
+	}
+
+	return TextureShaderType::SHADOWCUBEMAP1;
 }
 
 bool RenderSystem::loadMesh(MeshComponent& mesh){
@@ -271,16 +299,31 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
 
 			if (hasShadows && mesh.castShadows){
+				size_t num2DShadows = 0;
+				size_t numCubeShadows = 0;
 				auto lights = scene->getComponentArray<LightComponent>();
 				for (int l = 0; l < lights->size(); l++){
 					LightComponent& light = lights->getComponentFromIndex(l);
-					slotTex = shaderData.getTextureIndex(getShadowMapByIndex(l+1), ShaderStageType::FRAGMENT);
-					render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer.getColorTexture());
+					if (light.type != LightType::POINT){
+						slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex), ShaderStageType::FRAGMENT);
+						render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer.getColorTexture());
+						num2DShadows++;
+					}else{
+						slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(light.shadowMapIndex), ShaderStageType::FRAGMENT);
+						render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer.getColorTexture());
+						numCubeShadows++;
+					}
 				}
-				if (MAX_SHADOWSMAP > lights->size()){
-					for (int s = lights->size(); s < MAX_SHADOWSMAP; s++){
+				if (MAX_SHADOWSMAP > num2DShadows){
+					for (int s = num2DShadows; s < MAX_SHADOWSMAP; s++){
 						slotTex = shaderData.getTextureIndex(getShadowMapByIndex(s+1), ShaderStageType::FRAGMENT);
 						render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
+					}
+				}
+				if (MAX_SHADOWSCUBEMAP > numCubeShadows){
+					for (int s = numCubeShadows; s < MAX_SHADOWSCUBEMAP; s++){
+						slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(s+1), ShaderStageType::FRAGMENT);
+						render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyCubeBlack);
 					}
 				}
 			}
@@ -543,23 +586,44 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 	light.worldDirection = transform.worldRotation * light.direction;
 
 	if (hasShadows && (light.intensity > 0)){
-		Matrix4 projectionMatrix;
 		
 		Vector3 up = Vector3(0, 1, 0);
 		if (light.worldDirection.crossProduct(up) == Vector3::ZERO){
 			up = Vector3(0, 0, 1);
 		}
 		
-		Matrix4 viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
-		
+		Matrix4 projectionMatrix;
+		Matrix4 viewMatrix[6];
+
+		//TODO: perspective aspect based on shadow map size
 		if (light.type == LightType::DIRECTIONAL){
+			viewMatrix[0] = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
+
 			projectionMatrix = Matrix4::orthoMatrix(-500, 500, -500, 500, -500, 500);
+
+			light.lightViewProjectionMatrix[0] = projectionMatrix * viewMatrix[0];
 		}else if (light.type == LightType::SPOT){
-			//TODO: aspect based on shadow map size
+			viewMatrix[0] = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
+
 			projectionMatrix = Matrix4::perspectiveMatrix(acos(light.outerConeCos)*2, 1, 1, 1000);
+
+			light.lightViewProjectionMatrix[0] = projectionMatrix * viewMatrix[0];
+		}else if (light.type == LightType::POINT){
+			viewMatrix[0] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3( 1.f, 0.f, 0.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
+			viewMatrix[1] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3(-1.f, 0.f, 0.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
+			viewMatrix[2] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3( 0.f, 1.f, 0.f) + transform.worldPosition, Vector3(0.f,  0.f, 1.f));
+			viewMatrix[3] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3( 0.f,-1.f, 0.f) + transform.worldPosition, Vector3(0.f,  0.f,-1.f));
+			viewMatrix[4] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3( 0.f, 0.f, 1.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
+			viewMatrix[5] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3( 0.f, 0.f,-1.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
+
+			projectionMatrix = Matrix4::perspectiveMatrix(Angle::degToRad(90), 1, 1, 1000);
+
+			for (int f = 0; f < 6; f++){
+				light.lightViewProjectionMatrix[f] = projectionMatrix * viewMatrix[f];
+			}
 		}
 		
-		light.lightViewProjectionMatrix = projectionMatrix * viewMatrix;
+		
 	}
 }
 
@@ -617,20 +681,23 @@ void RenderSystem::draw(){
 			LightComponent& light = lights->getComponentFromIndex(l);
 
 			if (light.intensity > 0){
-				depthRender.startFrameBuffer(&light.framebuffer, 0);
-				for (int i = 0; i < meshes->size(); i++){
-					MeshComponent& mesh = meshes->getComponentFromIndex(i);
-					Entity entity = meshes->getEntity(i);
-					Transform* transform = scene->findComponent<Transform>(entity);
+				size_t faces = (light.type != LightType::POINT)? 1 : 6;
+				for (int f = 0; f < faces; f++){
+					depthRender.startFrameBuffer(&light.framebuffer, f);
+					for (int i = 0; i < meshes->size(); i++){
+						MeshComponent& mesh = meshes->getComponentFromIndex(i);
+						Entity entity = meshes->getEntity(i);
+						Transform* transform = scene->findComponent<Transform>(entity);
 
-					if (transform){
-						if (!mesh.loaded){
-							loadMesh(mesh);
+						if (transform){
+							if (!mesh.loaded){
+								loadMesh(mesh);
+							}
+							drawMeshDepth(mesh, light.lightViewProjectionMatrix[f] * transform->modelMatrix);
 						}
-						drawMeshDepth(mesh, light.lightViewProjectionMatrix * transform->modelMatrix);
 					}
+					depthRender.endFrameBuffer();
 				}
-				depthRender.endFrameBuffer();
 			}
 		}
 	}

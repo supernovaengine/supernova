@@ -147,6 +147,8 @@ int ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
         texstr = "u_shadowMap7";
     }else if (type == TextureShaderType::SHADOWMAP8){
         texstr = "u_shadowMap8";
+    }else if (type == TextureShaderType::SHADOWCUBEMAP1){
+        texstr = "u_shadowCubeMap1";
     }else if (type == TextureShaderType::SKYCUBE){
         texstr = "u_skyTexture";
     }

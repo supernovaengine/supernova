@@ -29,8 +29,9 @@ namespace Supernova{
         float outerConeCos = 0.0;
 
         bool shadows = true;
-        Matrix4 lightViewProjectionMatrix;
+        Matrix4 lightViewProjectionMatrix[6];
         FramebufferRender framebuffer;
+        int shadowMapIndex;
     };
     
 }
