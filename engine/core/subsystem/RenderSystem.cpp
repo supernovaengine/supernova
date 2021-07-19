@@ -32,6 +32,7 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 
 void RenderSystem::load(){
 	createEmptyTextures();
+	checkLightsAndShadow();
 	depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
 }
 
@@ -69,6 +70,24 @@ void RenderSystem::createEmptyTextures(){
 	}
 }
 
+void RenderSystem::checkLightsAndShadow(){
+	auto lights = scene->getComponentArray<LightComponent>();
+
+	int numLights = lights->size();
+	if (numLights > MAX_LIGHTS)
+		numLights = MAX_LIGHTS;
+
+	if (numLights > 0)
+		hasLights = true;
+	
+	for (int i = 0; i < numLights; i++){
+		LightComponent& light = lights->getComponentFromIndex(i);
+		if (light.shadows){
+			hasShadows = true;
+		}
+	}
+}
+
 void RenderSystem::processLights(){
 	hasLights = false;
 	hasShadows = false;
@@ -83,7 +102,7 @@ void RenderSystem::processLights(){
 		numLights = MAX_LIGHTS;
 
 	if (numLights > 0)
-		hasLights = true;
+		hasLights = true; // Re-check lights on, after checked in checkLightsAndShadow()
 	
 	for (int i = 0; i < numLights; i++){
 		LightComponent& light = lights->getComponentFromIndex(i);
@@ -104,7 +123,7 @@ void RenderSystem::processLights(){
 		light.shadowMapIndex = -1;
 		
 		if (light.shadows){
-			hasShadows = true;
+			hasShadows = true; // Re-check shadows on, after checked in checkLightsAndShadow()
 			if (light.type == LightType::POINT){
 				if (!light.framebuffer.isCreated())
 					light.framebuffer.createFramebuffer(TextureType::TEXTURE_CUBE, 2048, 2048);
@@ -640,8 +659,6 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 }
 
 void RenderSystem::update(double dt){
-	processLights();
-
 	CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
 
@@ -680,6 +697,8 @@ void RenderSystem::update(double dt){
 		transform.needUpdate = false;
 	}
 	camera.needUpdate = false;
+
+	processLights();
 }
 
 void RenderSystem::draw(){

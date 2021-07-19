@@ -80,6 +80,7 @@ namespace Supernova{
 		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
 
 		void createEmptyTextures();
+		void checkLightsAndShadow();
 		void processLights();
 		TextureShaderType getShadowMapByIndex(int index);
 		TextureShaderType getShadowMapCubeByIndex(int index);
