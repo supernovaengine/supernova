@@ -86,10 +86,12 @@ int ShaderData::getUniformIndex(UniformType type, ShaderStageType stage){
         ustr = "u_vs_pbrParams";
     }else if (type == UniformType::PBR_FS_PARAMS){
         ustr = "u_fs_pbrParams";
-    }else if (type == UniformType::VS_LIGHTING){
-        ustr = "u_vs_lighting";
     }else if (type == UniformType::FS_LIGHTING){
         ustr = "u_fs_lighting";
+    }else if (type == UniformType::VS_SHADOWS){
+        ustr = "u_vs_shadows";
+    }else if (type == UniformType::FS_SHADOWS){
+        ustr = "u_fs_shadows";
     }else if (type == UniformType::VIEWPROJECTIONSKY){
         ustr = "u_vsSkyParams";
     }else if (type == UniformType::DEPTH_VS_PARAMS){

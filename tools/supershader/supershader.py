@@ -58,7 +58,9 @@ def get_default_shaders():
 @click.option('--lang', '-l', required=True, type=click.Choice(['glsl330', 'glsl100', 'glsl300es', 'hlsl4', 'hlsl5'], case_sensitive=False), help="Target shader language")
 @click.option('--project', '-p', default='../../project', type=click.Path(), help="Source root path of project files")
 @click.option('--max-lights', '-ml', default=6, type=int, help="Value of MAX_LIGHTS macro")
-def generate(shaders, lang, project, max_lights):
+@click.option('--max-shadowsmap', default=6, type=int, help="Value of MAX_SHADOWSMAP macro")
+@click.option('--max-shadowscubemap', default=1, type=int, help="Value of MAX_SHADOWSCUBEMAP macro")
+def generate(shaders, lang, project, max_lights, max_shadowsmap, max_shadowscubemap):
 
     shadersList = [x.strip() for x in shaders.split(';')]
 
@@ -72,7 +74,10 @@ def generate(shaders, lang, project, max_lights):
         if len(splitShader) >= 2:
             properties = splitShader[1]
 
-        defines = 'MAX_LIGHTS='+str(max_lights)
+        defines = ''
+        defines += 'MAX_LIGHTS='+str(max_lights)
+        defines += ';MAX_SHADOWSMAP='+str(max_shadowsmap)
+        defines += ';MAX_SHADOWSCUBEMAP='+str(max_shadowscubemap)
 
         while properties != '':
             if len(defines) > 0:

@@ -73,8 +73,8 @@ void RenderSystem::processLights(){
 	hasLights = false;
 	hasShadows = false;
 
-	int freeShadowMap = 1;
-	int freeShadowCubeMap = 1;
+	int freeShadowMap = 0;
+	int freeShadowCubeMap = MAX_SHADOWSMAP;
 
 	auto lights = scene->getComponentArray<LightComponent>();
 
@@ -101,7 +101,7 @@ void RenderSystem::processLights(){
 		if (light.type == LightType::SPOT)
 			type = 2;
 
-		light.shadowMapIndex = 0;
+		light.shadowMapIndex = -1;
 		
 		if (light.shadows){
 			hasShadows = true;
@@ -122,10 +122,11 @@ void RenderSystem::processLights(){
 		fs_lighting.inCon_ouCon_shadows[i] = Vector4(light.innerConeCos, light.outerConeCos, (light.shadows)?1.0:0.0, light.shadowMapIndex);
 
 		if (light.type != LightType::POINT){
-			vs_lighting.lightViewProjectionMatrix[i] = light.lightViewProjectionMatrix[0];
-		}else{
-			vs_lighting.lightViewProjectionMatrix[i].identity();
+			vs_shadows.lightViewProjectionMatrix[light.shadowMapIndex] = light.cameras[0].lightViewProjectionMatrix;
 		}
+		fs_shadows.maxBias_minBias_texSize[light.shadowMapIndex] = Vector4(0.0005f, 0.00005f, 2048.0f, 2048.0f);
+		fs_shadows.nearFar_calcNearFar[light.shadowMapIndex] = Vector4(1.0f, 1000.0f, light.calculedNearFar.x, light.calculedNearFar.y);
+
 	}
 
 	// Setting intensity of other lights to zero
@@ -135,21 +136,21 @@ void RenderSystem::processLights(){
 }
 
 TextureShaderType RenderSystem::getShadowMapByIndex(int index){
-	if (index == 1){
+	if (index == 0){
 		return TextureShaderType::SHADOWMAP1;
-	}else if (index == 2){
+	}else if (index == 1){
 		return TextureShaderType::SHADOWMAP2;
-	}else if (index == 3){
+	}else if (index == 2){
 		return TextureShaderType::SHADOWMAP3;
-	}else if (index == 4){
+	}else if (index == 3){
 		return TextureShaderType::SHADOWMAP4;
-	}else if (index == 5){
+	}else if (index == 4){
 		return TextureShaderType::SHADOWMAP5;
-	}else if (index == 6){
+	}else if (index == 5){
 		return TextureShaderType::SHADOWMAP6;
-	}else if (index == 7){
+	}else if (index == 6){
 		return TextureShaderType::SHADOWMAP7;
-	}else if (index == 8){
+	}else if (index == 7){
 		return TextureShaderType::SHADOWMAP8;
 	}
 
@@ -157,7 +158,8 @@ TextureShaderType RenderSystem::getShadowMapByIndex(int index){
 }
 
 TextureShaderType RenderSystem::getShadowMapCubeByIndex(int index){
-	if (index == 1){
+	index -= MAX_SHADOWSMAP;
+	if (index == 0){
 		return TextureShaderType::SHADOWCUBEMAP1;
 	}
 
@@ -255,7 +257,8 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		if (hasLights){
 			mesh.submeshes[i].slotFSLighting = shaderData.getUniformIndex(UniformType::FS_LIGHTING, ShaderStageType::FRAGMENT);
 			if (hasShadows && mesh.castShadows){
-				mesh.submeshes[i].slotVSLighting = shaderData.getUniformIndex(UniformType::VS_LIGHTING, ShaderStageType::VERTEX);
+				mesh.submeshes[i].slotVSShadows = shaderData.getUniformIndex(UniformType::VS_SHADOWS, ShaderStageType::VERTEX);
+				mesh.submeshes[i].slotFSShadows = shaderData.getUniformIndex(UniformType::FS_SHADOWS, ShaderStageType::FRAGMENT);
 			}
 		}
 
@@ -316,13 +319,13 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				}
 				if (MAX_SHADOWSMAP > num2DShadows){
 					for (int s = num2DShadows; s < MAX_SHADOWSMAP; s++){
-						slotTex = shaderData.getTextureIndex(getShadowMapByIndex(s+1), ShaderStageType::FRAGMENT);
+						slotTex = shaderData.getTextureIndex(getShadowMapByIndex(s), ShaderStageType::FRAGMENT);
 						render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
 					}
 				}
 				if (MAX_SHADOWSCUBEMAP > numCubeShadows){
 					for (int s = numCubeShadows; s < MAX_SHADOWSCUBEMAP; s++){
-						slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(s+1), ShaderStageType::FRAGMENT);
+						slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(s+MAX_SHADOWSMAP), ShaderStageType::FRAGMENT);
 						render->loadTexture(slotTex, ShaderStageType::FRAGMENT, &emptyCubeBlack);
 					}
 				}
@@ -431,7 +434,8 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 			if (hasLights){
 				render->applyUniform(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16 * MAX_LIGHTS, &fs_lighting);
 				if (hasShadows && mesh.castShadows){
-					render->applyUniform(mesh.submeshes[i].slotVSLighting, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16 * MAX_LIGHTS, &vs_lighting);
+					render->applyUniform(mesh.submeshes[i].slotVSShadows, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16 * (MAX_SHADOWSMAP), &vs_shadows);
+					render->applyUniform(mesh.submeshes[i].slotFSShadows, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 8 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP), &fs_shadows);
 				}
 			}
 
@@ -601,13 +605,13 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 
 			projectionMatrix = Matrix4::orthoMatrix(-500, 500, -500, 500, -500, 500);
 
-			light.lightViewProjectionMatrix[0] = projectionMatrix * viewMatrix[0];
+			light.cameras[0].lightViewProjectionMatrix = projectionMatrix * viewMatrix[0];
 		}else if (light.type == LightType::SPOT){
 			viewMatrix[0] = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
 
 			projectionMatrix = Matrix4::perspectiveMatrix(acos(light.outerConeCos)*2, 1, 1, 1000);
 
-			light.lightViewProjectionMatrix[0] = projectionMatrix * viewMatrix[0];
+			light.cameras[0].lightViewProjectionMatrix = projectionMatrix * viewMatrix[0];
 		}else if (light.type == LightType::POINT){
 			viewMatrix[0] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3( 1.f, 0.f, 0.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
 			viewMatrix[1] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3(-1.f, 0.f, 0.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
@@ -619,8 +623,16 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 			projectionMatrix = Matrix4::perspectiveMatrix(Angle::degToRad(90), 1, 1, 1000);
 
 			for (int f = 0; f < 6; f++){
-				light.lightViewProjectionMatrix[f] = projectionMatrix * viewMatrix[f];
+				light.cameras[f].lightViewProjectionMatrix = projectionMatrix * viewMatrix[f];
 			}
+
+			//TODO: remove this
+			float n = 1.0;
+			float f = 1000.0;
+
+			float nfsub = f - n;
+			light.calculedNearFar.x = (f + n) / nfsub * 0.5f + 0.5f;
+			light.calculedNearFar.y =-(f * n) / nfsub;
 		}
 		
 		
@@ -693,7 +705,7 @@ void RenderSystem::draw(){
 							if (!mesh.loaded){
 								loadMesh(mesh);
 							}
-							drawMeshDepth(mesh, light.lightViewProjectionMatrix[f] * transform->modelMatrix);
+							drawMeshDepth(mesh, light.cameras[f].lightViewProjectionMatrix * transform->modelMatrix);
 						}
 					}
 					depthRender.endFrameBuffer();

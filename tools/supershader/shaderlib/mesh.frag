@@ -49,6 +49,14 @@ uniform u_fs_pbrParams {
 #endif
 
 #ifdef USE_SHADOWS
+
+    uniform u_fs_shadows {
+        vec4 maxBias_minBias_texSize[MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP];
+        vec4 nearFar_calcNearFar[MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP];
+    } uShadows;
+
+    in vec4 v_lightProjPos[MAX_SHADOWSMAP];
+
     uniform sampler2D u_shadowMap1;
     uniform sampler2D u_shadowMap2;
     uniform sampler2D u_shadowMap3;
@@ -57,8 +65,6 @@ uniform u_fs_pbrParams {
     uniform sampler2D u_shadowMap6;
 
     uniform samplerCube u_shadowCubeMap1;
-
-    in vec4 v_lightProjPos[MAX_LIGHTS];
 #endif
 
 struct MaterialInfo{
@@ -208,9 +214,9 @@ void main() {
                 #ifdef USE_SHADOWS
                     if (light.shadows){
                         if(light.type != LightType_Point){ 
-                            shadow = 1.0 - shadowCalculationPCF(v_lightProjPos[i], NdotL, vec2(2048.0, 2048.0), light.shadowMapIndex);
+                            shadow = 1.0 - shadowCalculationPCF(light.shadowMapIndex, NdotL);
                         }else{
-                            shadow = 1.0 - shadowCubeCalculationPCF(-pointToLight, NdotL);
+                            shadow = 1.0 - shadowCubeCalculationPCF(light.shadowMapIndex, -pointToLight, NdotL);
                         }
                     }
                 #endif

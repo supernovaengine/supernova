@@ -46,8 +46,9 @@ namespace Supernova{
 
         int slotVSParams = -1;
         int slotFSParams = -1;
-        int slotVSLighting = -1;
         int slotFSLighting = -1;
+        int slotVSShadows = -1;
+        int slotFSShadows = -1;
         int slotVSDepthParams = -1;
 
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;

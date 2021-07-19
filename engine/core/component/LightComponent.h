@@ -14,6 +14,11 @@ namespace Supernova{
         SPOT
     };
 
+    struct LightCamera{
+        Matrix4 lightViewProjectionMatrix;
+        Vector2 cameraNearFar = Vector2(0.0, 0.0);
+    };
+
     struct LightComponent{
         LightType type = LightType::DIRECTIONAL;
 
@@ -29,7 +34,8 @@ namespace Supernova{
         float outerConeCos = 0.0;
 
         bool shadows = true;
-        Matrix4 lightViewProjectionMatrix[6];
+        LightCamera cameras[6];
+        Vector2 calculedNearFar = Vector2(0.0, 0.0); // used for point light shadow in distanceToDepthValue in shader
         FramebufferRender framebuffer;
         int shadowMapIndex;
     };
