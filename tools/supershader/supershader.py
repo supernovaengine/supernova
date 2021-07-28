@@ -60,7 +60,8 @@ def get_default_shaders():
 @click.option('--max-lights', '-ml', default=6, type=int, help="Value of MAX_LIGHTS macro")
 @click.option('--max-shadowsmap', default=6, type=int, help="Value of MAX_SHADOWSMAP macro")
 @click.option('--max-shadowscubemap', default=1, type=int, help="Value of MAX_SHADOWSCUBEMAP macro")
-def generate(shaders, lang, project, max_lights, max_shadowsmap, max_shadowscubemap):
+@click.option('--max-shadowcascades', default=4, type=int, help="Value of MAX_SHADOWCASCADES macro")
+def generate(shaders, lang, project, max_lights, max_shadowsmap, max_shadowscubemap, max_shadowcascades):
 
     shadersList = [x.strip() for x in shaders.split(';')]
 
@@ -78,6 +79,7 @@ def generate(shaders, lang, project, max_lights, max_shadowsmap, max_shadowscube
         defines += 'MAX_LIGHTS='+str(max_lights)
         defines += ';MAX_SHADOWSMAP='+str(max_shadowsmap)
         defines += ';MAX_SHADOWSCUBEMAP='+str(max_shadowscubemap)
+        defines += ';MAX_SHADOWCASCADES='+str(max_shadowcascades)
 
         while properties != '':
             if len(defines) > 0:

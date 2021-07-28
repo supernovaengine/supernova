@@ -33,7 +33,7 @@ namespace Supernova{
 	    Vector4 direction_range[MAX_LIGHTS];
 	    Vector4 color_intensity[MAX_LIGHTS];
 	    Vector4 position_type[MAX_LIGHTS];
-	    Vector4 inCon_ouCon_shadows[MAX_LIGHTS];
+	    Vector4 inCon_ouCon_shadows_cascades[MAX_LIGHTS];
 	} fs_lighting_t;
 
 	typedef struct vs_shadows_t {
@@ -41,8 +41,7 @@ namespace Supernova{
 	} vs_shadows_t;
 
 	typedef struct fs_shadows_t {
-        Vector4 maxBias_minBias_texSize[MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP];
-        Vector4 nearFar_calcNearFar[MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP];
+        Vector4 bias_texSize_nearFar[MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP];
 	} fs_shadows_t;
 
 	class RenderSystem : public SubSystem {
@@ -84,6 +83,8 @@ namespace Supernova{
 		void processLights();
 		TextureShaderType getShadowMapByIndex(int index);
 		TextureShaderType getShadowMapCubeByIndex(int index);
+
+		float lerp(float a, float b, float fraction);
 
 	public:
 		RenderSystem(Scene* scene);

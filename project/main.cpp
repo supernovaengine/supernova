@@ -38,9 +38,9 @@ Model carro(&scene);
 //Mesh* child11;
 PlaneTerrain plane(&scene);
 SkyBox sky(&scene);
-//Light lightDir(&scene);
+Light lightDir(&scene);
 //Light lightDir2(&scene);
-//Light lightPoint(&scene);
+Light lightPoint(&scene);
 Light lightSpot(&scene);
 
 float rotationY = 0;
@@ -50,11 +50,11 @@ Camera camera(&scene);
 
 void init(){
 
-    //lightDir.setType(LightType::DIRECTIONAL);
-    //lightDir.setDirection(0.5f, -0.5, 0.0);
-    //lightDir.setRange(0.0);
-    //lightDir.setPosition(0.0f, 0.0f, 0.0f);
-    //lightDir.setIntensity(1.0);
+    lightDir.setType(LightType::DIRECTIONAL);
+    lightDir.setDirection(0.5f, -0.5, 0.0);
+    lightDir.setRange(0.0);
+    lightDir.setPosition(0.0f, 0.0f, 0.0f);
+    lightDir.setIntensity(1.0);
 
     //lightDir2.setType(LightType::DIRECTIONAL);
     //lightDir2.setDirection(-0.5f, -0.5, 0.0);
@@ -62,11 +62,11 @@ void init(){
     //lightDir2.setPosition(0.0f, 0.0f, 0.0f);
     //lightDir2.setIntensity(1.0);
 
-    //lightPoint.setType(LightType::POINT);
-    //lightPoint.setDirection(0.0, 0.0, 0.0);
-    //lightPoint.setRange(0.0);
-    //lightPoint.setPosition(300.0f, 80.0f, 80.0f);
-    //lightPoint.setIntensity(100000.0);
+    lightPoint.setType(LightType::POINT);
+    lightPoint.setDirection(0.0, 0.0, 0.0);
+    lightPoint.setRange(0.0);
+    lightPoint.setPosition(300.0f, 80.0f, 80.0f);
+    lightPoint.setIntensity(100000.0);
 
     lightSpot.setType(LightType::SPOT);
     lightSpot.setDirection(0.0f, -0.7, 0.3);

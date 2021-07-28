@@ -44,18 +44,18 @@ uniform u_fs_pbrParams {
         vec4 direction_range[MAX_LIGHTS]; //direction.xyz and range.w
         vec4 color_intensity[MAX_LIGHTS]; //color.xyz and intensity.w
         vec4 position_type[MAX_LIGHTS]; //position.xyz and type.w
-        vec4 inCone_ouCone_shadows[MAX_LIGHTS]; //innerConeCos.x, outerConeCos.y, shadows.z, shadowMapIndex.w
+        vec4 inCone_ouCone_shadows_cascades[MAX_LIGHTS]; //innerConeCos.x, outerConeCos.y, shadowMapIndex.z (-1.0 if no shadow), numCascades.w
     } lighting;
 #endif
 
 #ifdef USE_SHADOWS
 
     uniform u_fs_shadows {
-        vec4 maxBias_minBias_texSize[MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP];
-        vec4 nearFar_calcNearFar[MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP];
+        vec4 bias_texSize_nearFar[MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP];
     } uShadows;
 
     in vec4 v_lightProjPos[MAX_SHADOWSMAP];
+    in float v_clipSpacePosZ;
 
     uniform sampler2D u_shadowMap1;
     uniform sampler2D u_shadowMap2;
@@ -187,10 +187,11 @@ void main() {
                 lighting.position_type[i].xyz,
                 lighting.direction_range[i].w,
                 lighting.color_intensity[i].w,
-                lighting.inCone_ouCone_shadows[i].x,
-                lighting.inCone_ouCone_shadows[i].y,
-                (lighting.inCone_ouCone_shadows[i].z == 1.0)?true:false,
-                int(lighting.inCone_ouCone_shadows[i].w)
+                lighting.inCone_ouCone_shadows_cascades[i].x,
+                lighting.inCone_ouCone_shadows_cascades[i].y,
+                (lighting.inCone_ouCone_shadows_cascades[i].z < 0.0)?false:true,
+                int(lighting.inCone_ouCone_shadows_cascades[i].z),
+                int(lighting.inCone_ouCone_shadows_cascades[i].w)
             ); 
 
             if (light.intensity > 0.0){
@@ -213,9 +214,11 @@ void main() {
                 float shadow = 1.0;
                 #ifdef USE_SHADOWS
                     if (light.shadows){
-                        if(light.type != LightType_Point){ 
+                        if(light.type == LightType_Spot){ 
                             shadow = 1.0 - shadowCalculationPCF(light.shadowMapIndex, NdotL);
-                        }else{
+                        }else if(light.type == LightType_Directional){
+                            shadow = 1.0 - shadowCascadedCalculationPCF(light.shadowMapIndex, light.numShadowCascades, NdotL);
+                        }else if(light.type == LightType_Point){
                             shadow = 1.0 - shadowCubeCalculationPCF(light.shadowMapIndex, -pointToLight, NdotL);
                         }
                     }

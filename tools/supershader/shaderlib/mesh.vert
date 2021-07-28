@@ -52,6 +52,7 @@ out vec2 v_uv2;
     };
     
     out vec4 v_lightProjPos[MAX_SHADOWSMAP];
+    out float v_clipSpacePosZ;
 #endif
 
 vec4 getPosition(){
@@ -111,4 +112,8 @@ void main() {
     #endif
 
     gl_Position = pbrParams.mvpMatrix * getPosition();
+
+    #ifdef USE_SHADOWS
+        v_clipSpacePosZ = gl_Position.z;
+    #endif
 }

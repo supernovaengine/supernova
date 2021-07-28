@@ -13,6 +13,7 @@ struct Light{
 
     bool shadows;
     int shadowMapIndex;
+    int numShadowCascades;
 };
 
 const int LightType_Directional = 0;

@@ -5,6 +5,7 @@
 #include "component/CameraComponent.h"
 #include "component/Transform.h"
 #include "render/FramebufferRender.h"
+#include "Supernova.h"
 
 namespace Supernova{
 
@@ -16,7 +17,8 @@ namespace Supernova{
 
     struct LightCamera{
         Matrix4 lightViewProjectionMatrix;
-        Vector2 cameraNearFar = Vector2(0.0, 0.0);
+        // for point light all cameras are same calculated value that is used by distanceToDepthValue in shader
+        Vector2 nearFar = Vector2(0.0, 0.0);
     };
 
     struct LightComponent{
@@ -35,9 +37,10 @@ namespace Supernova{
 
         bool shadows = true;
         LightCamera cameras[6];
-        Vector2 calculedNearFar = Vector2(0.0, 0.0); // used for point light shadow in distanceToDepthValue in shader
-        FramebufferRender framebuffer;
+        FramebufferRender framebuffer[MAX_SHADOWCASCADES];
         int shadowMapIndex;
+
+        unsigned int numShadowCascades = 2;
     };
     
 }
