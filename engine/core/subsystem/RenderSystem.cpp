@@ -641,8 +641,12 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 			float shadowSplitLogFactor = .7f;
 			float shadowNearPlaneOffset = 10;
 
-			CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
+			Matrix4 projectionMatrix[light.numShadowCascades];
+			Matrix4 viewMatrix;
 
+			viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
+
+			CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
 			float zFar = camera.perspectiveFar;
             float zNear = camera.perspectiveNear;
             float fov = 0;
@@ -651,8 +655,8 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
             std::vector<float> splitFar;
             std::vector<float> splitNear;
 
+			// Split perspective frustrum to create cascades
             if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
-
                 Matrix4 projection = camera.projectionMatrix;
                 Matrix4 invProjection = projection.inverse();
                 std::vector<Vector4> v1 = {
@@ -674,8 +678,7 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
                 splitFar = std::vector<float> { zFar, zFar, zFar };
                 splitNear = std::vector<float> { zNear, zNear, zNear };
                 float j = 1.f;
-                for (auto i = 0u; i < light.numShadowCascades - 1; ++i, j+= 1.f)
-                {
+                for (auto i = 0u; i < light.numShadowCascades - 1; ++i, j+= 1.f){
                     splitFar[i] = lerp(
                             zNear + (j / (float)light.numShadowCascades) * (zFar - zNear),
                             zNear * powf(zFar / zNear, j / (float)light.numShadowCascades),
@@ -683,20 +686,12 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
                     );
                     splitNear[i + 1] = splitFar[i];
                 }
-
             }
 
-			Matrix4 projectionMatrix[light.numShadowCascades];
-			Matrix4 viewMatrix;
-
-			viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
-
+			// Get frustrum box and create light ortho
 			for (int ca = 0; ca < light.numShadowCascades; ca++) {
-
 				Matrix4 sceneCameraInv = (Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca], splitFar[ca]) * camera.viewMatrix).inverse();
-
 				Matrix4 t = viewMatrix * sceneCameraInv;
-
 				std::vector<Vector4> v = {
 						t * Vector4(-1.f, 1.f, -1.f, 1.f),
 						t * Vector4(1.f, 1.f, -1.f, 1.f),
@@ -715,8 +710,7 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 				float minZ = std::numeric_limits<float>::max();
 				float maxZ = std::numeric_limits<float>::min();
 
-				for (auto& p : v)
-				{
+				for (auto& p : v){
 					p = p / p.w;
 
 					if (p.x < minX) minX = p.x;
@@ -727,13 +721,12 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 					if (p.z > maxZ) maxZ = p.z;
 				}
 
-				//projectionMatrix[ca] = Matrix4::orthoMatrix(minX, maxX, minY, maxY, minZ, maxZ+shadowNearPlaneOffset);
 				projectionMatrix[ca] = Matrix4::orthoMatrix(minX, maxX, minY, maxY, -maxZ-shadowNearPlaneOffset, -minZ);
 
 				light.cameras[ca].lightViewProjectionMatrix = projectionMatrix[ca] * viewMatrix;
 				light.cameras[ca].nearFar = Vector2(splitNear[ca], splitFar[ca]);
-
 			}
+
 		}else if (light.type == LightType::SPOT){
 			Matrix4 projectionMatrix;
 			Matrix4 viewMatrix;
