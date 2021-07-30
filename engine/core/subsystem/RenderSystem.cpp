@@ -639,7 +639,6 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 		if (light.type == LightType::DIRECTIONAL){
 			
 			float shadowSplitLogFactor = .7f;
-			float shadowNearPlaneOffset = 10;
 
 			Matrix4 projectionMatrix[light.numShadowCascades];
 			Matrix4 viewMatrix;
@@ -651,6 +650,8 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
             float zNear = camera.perspectiveNear;
             float fov = 0;
             float ratio = 1;
+
+			float farPlaneOffset = (zFar - zNear) * 0.005;
 
             std::vector<float> splitFar;
             std::vector<float> splitNear;
@@ -690,7 +691,7 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 
 			// Get frustrum box and create light ortho
 			for (int ca = 0; ca < light.numShadowCascades; ca++) {
-				Matrix4 sceneCameraInv = (Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca], splitFar[ca]) * camera.viewMatrix).inverse();
+				Matrix4 sceneCameraInv = (Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca], splitFar[ca]+farPlaneOffset) * camera.viewMatrix).inverse();
 				Matrix4 t = viewMatrix * sceneCameraInv;
 				std::vector<Vector4> v = {
 						t * Vector4(-1.f, 1.f, -1.f, 1.f),
@@ -704,11 +705,11 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 				};
 
 				float minX = std::numeric_limits<float>::max();
-				float maxX = std::numeric_limits<float>::min();
+				float maxX = std::numeric_limits<float>::lowest();
 				float minY = std::numeric_limits<float>::max();
-				float maxY = std::numeric_limits<float>::min();
+				float maxY = std::numeric_limits<float>::lowest();
 				float minZ = std::numeric_limits<float>::max();
-				float maxZ = std::numeric_limits<float>::min();
+				float maxZ = std::numeric_limits<float>::lowest();
 
 				for (auto& p : v){
 					p = p / p.w;
@@ -721,7 +722,7 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 					if (p.z > maxZ) maxZ = p.z;
 				}
 
-				projectionMatrix[ca] = Matrix4::orthoMatrix(minX, maxX, minY, maxY, -maxZ-shadowNearPlaneOffset, -minZ);
+				projectionMatrix[ca] = Matrix4::orthoMatrix(minX, maxX, minY, maxY, -maxZ, -minZ);
 
 				light.cameras[ca].lightViewProjectionMatrix = projectionMatrix[ca] * viewMatrix;
 				light.cameras[ca].nearFar = Vector2(splitNear[ca], splitFar[ca]);

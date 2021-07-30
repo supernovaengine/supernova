@@ -40,7 +40,7 @@ namespace Supernova{
         FramebufferRender framebuffer[MAX_SHADOWCASCADES];
         int shadowMapIndex;
 
-        unsigned int numShadowCascades = 2;
+        unsigned int numShadowCascades = 3;
     };
     
 }
