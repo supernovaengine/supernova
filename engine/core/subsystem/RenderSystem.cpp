@@ -127,19 +127,40 @@ void RenderSystem::processLights(){
 			hasShadows = true; // Re-check shadows on, after checked in checkLightsAndShadow()
 			if (light.type == LightType::POINT){
 				if (!light.framebuffer[0].isCreated())
-					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_CUBE, 2048, 2048);
-				light.shadowMapIndex = freeShadowCubeMap++;
+					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_CUBE, light.mapResolution, light.mapResolution);
+
+				if ((freeShadowCubeMap - MAX_SHADOWSMAP) < MAX_SHADOWSCUBEMAP){
+					light.shadowMapIndex = freeShadowCubeMap++;
+				}
 			}else if (light.type == LightType::SPOT){
 				if (!light.framebuffer[0].isCreated())
-					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_2D, 2048, 2048);
-				light.shadowMapIndex = freeShadowMap++;
+					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution);
+
+				if (freeShadowMap < MAX_SHADOWSMAP){
+					light.shadowMapIndex = freeShadowMap++;
+				}
 			}else if (light.type == LightType::DIRECTIONAL){
 				for (int c = 0; c < light.numShadowCascades; c++){
 					if (!light.framebuffer[c].isCreated())
-						light.framebuffer[c].createFramebuffer(TextureType::TEXTURE_2D, 2048, 2048);
+						light.framebuffer[c].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution);
 				}
-				light.shadowMapIndex = freeShadowMap;
-				freeShadowMap += light.numShadowCascades;
+
+				if ((freeShadowMap + light.numShadowCascades - 1) < MAX_SHADOWSMAP){
+					light.shadowMapIndex = freeShadowMap;
+					freeShadowMap += light.numShadowCascades;
+				}
+			}
+
+			if (light.shadowMapIndex >= 0){
+				size_t numMaps = (light.type == LightType::DIRECTIONAL) ? light.numShadowCascades : 1;
+				for (int c = 0; c < numMaps; c++){
+					if (light.type != LightType::POINT){
+						vs_shadows.lightViewProjectionMatrix[light.shadowMapIndex+c] = light.cameras[c].lightViewProjectionMatrix;
+					}
+					fs_shadows.bias_texSize_nearFar[light.shadowMapIndex+c] = Vector4(light.shadowBias, light.mapResolution, light.cameras[c].nearFar.x, light.cameras[c].nearFar.y);
+				}
+			}else{
+				Log::Warn("There are no shadow maps available");
 			}
 		}
 
@@ -147,14 +168,6 @@ void RenderSystem::processLights(){
 		fs_lighting.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
 		fs_lighting.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
 		fs_lighting.inCon_ouCon_shadows_cascades[i] = Vector4(light.innerConeCos, light.outerConeCos, light.shadowMapIndex, light.numShadowCascades);
-
-		size_t numMaps = (light.type == LightType::DIRECTIONAL) ? light.numShadowCascades : 1;
-		for (int c = 0; c < numMaps; c++){
-			if (light.type != LightType::POINT){
-				vs_shadows.lightViewProjectionMatrix[light.shadowMapIndex+c] = light.cameras[c].lightViewProjectionMatrix;
-			}
-			fs_shadows.bias_texSize_nearFar[light.shadowMapIndex+c] = Vector4(0.0005f, 2048.0f, light.cameras[c].nearFar.x, light.cameras[c].nearFar.y);
-		}
 
 	}
 
@@ -336,19 +349,21 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				auto lights = scene->getComponentArray<LightComponent>();
 				for (int l = 0; l < lights->size(); l++){
 					LightComponent& light = lights->getComponentFromIndex(l);
-					if (light.type == LightType::POINT){
-						slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(light.shadowMapIndex), ShaderStageType::FRAGMENT);
-						render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer[0].getColorTexture());
-						numCubeShadows++;
-					}else if (light.type == LightType::SPOT){
-						slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex), ShaderStageType::FRAGMENT);
-						render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer[0].getColorTexture());
-						num2DShadows++;
-					}else if (light.type == LightType::DIRECTIONAL){
-						for (int c = 0; c < light.numShadowCascades; c++){
-							slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex+c), ShaderStageType::FRAGMENT);
-							render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer[c].getColorTexture());
+					if (light.shadowMapIndex >= 0){
+						if (light.type == LightType::POINT){
+							slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(light.shadowMapIndex), ShaderStageType::FRAGMENT);
+							render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer[0].getColorTexture());
+							numCubeShadows++;
+						}else if (light.type == LightType::SPOT){
+							slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex), ShaderStageType::FRAGMENT);
+							render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer[0].getColorTexture());
 							num2DShadows++;
+						}else if (light.type == LightType::DIRECTIONAL){
+							for (int c = 0; c < light.numShadowCascades; c++){
+								slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex+c), ShaderStageType::FRAGMENT);
+								render->loadTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer[c].getColorTexture());
+								num2DShadows++;
+							}
 						}
 					}
 				}
@@ -676,8 +691,10 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
                 fov = atanf(1.f / projection[1][1]) * 2.f;
                 ratio = projection[1][1] / projection[0][0];
 
-                splitFar = std::vector<float> { zFar, zFar, zFar };
-                splitNear = std::vector<float> { zNear, zNear, zNear };
+				splitFar.resize(light.numShadowCascades);
+				splitNear.resize(light.numShadowCascades);
+				splitNear[0] = zNear;
+				splitFar[light.numShadowCascades - 1] = zFar;
                 float j = 1.f;
                 for (auto i = 0u; i < light.numShadowCascades - 1; ++i, j+= 1.f){
                     splitFar[i] = lerp(
