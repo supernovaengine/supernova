@@ -83,6 +83,7 @@ namespace Supernova{
 		void processLights();
 		TextureShaderType getShadowMapByIndex(int index);
 		TextureShaderType getShadowMapCubeByIndex(int index);
+		void configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera);
 
 		float lerp(float a, float b, float fraction);
 

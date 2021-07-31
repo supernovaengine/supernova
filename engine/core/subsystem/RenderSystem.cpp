@@ -636,6 +636,25 @@ void RenderSystem::updateSkyViewProjection(CameraComponent& camera){
 	}
 }
 
+void RenderSystem::configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera){
+	if (light.shadowCameraNearFar.x == 0.0){
+		if (camera.type == CameraType::CAMERA_PERSPECTIVE)
+			light.shadowCameraNearFar.x = camera.perspectiveNear;
+		else
+			light.shadowCameraNearFar.x = camera.orthoNear;
+	}
+	if (light.shadowCameraNearFar.y == 0.0){
+		if (light.range == 0.0){
+			if (camera.type == CameraType::CAMERA_PERSPECTIVE)
+				light.shadowCameraNearFar.y = camera.perspectiveFar;
+			else
+				light.shadowCameraNearFar.y = camera.orthoFar;
+		}else{
+			light.shadowCameraNearFar.y = light.range;
+		}
+	}
+}
+
 float RenderSystem::lerp(float a, float b, float fraction) {
     return (a * (1.0f - fraction)) + (b * fraction);
 }
@@ -650,6 +669,8 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 			up = Vector3(0, 0, 1);
 		}
 
+		CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
+
 		//TODO: perspective aspect based on shadow map size
 		if (light.type == LightType::DIRECTIONAL){
 			
@@ -660,7 +681,6 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 
 			viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
 
-			CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
 			float zFar = camera.perspectiveFar;
             float zNear = camera.perspectiveNear;
             float fov = 0;
@@ -749,15 +769,19 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 			Matrix4 projectionMatrix;
 			Matrix4 viewMatrix;
 
+			configureLightShadowNearFar(light, camera);
+
 			viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
 
-			projectionMatrix = Matrix4::perspectiveMatrix(acos(light.outerConeCos)*2, 1, 1, 1000);
+			projectionMatrix = Matrix4::perspectiveMatrix(acos(light.outerConeCos)*2, 1, light.shadowCameraNearFar.x, light.shadowCameraNearFar.y);
 
 			light.cameras[0].lightViewProjectionMatrix = projectionMatrix * viewMatrix;
-			light.cameras[0].nearFar = Vector2(1, 1000);
+			light.cameras[0].nearFar = light.shadowCameraNearFar;
 		}else if (light.type == LightType::POINT){
 			Matrix4 projectionMatrix;
 			Matrix4 viewMatrix[6];
+
+			configureLightShadowNearFar(light, camera);
 
 			viewMatrix[0] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3( 1.f, 0.f, 0.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
 			viewMatrix[1] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3(-1.f, 0.f, 0.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
@@ -766,16 +790,12 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 			viewMatrix[4] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3( 0.f, 0.f, 1.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
 			viewMatrix[5] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3( 0.f, 0.f,-1.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
 
-			projectionMatrix = Matrix4::perspectiveMatrix(Angle::degToRad(90), 1, 1, 1000);
+			projectionMatrix = Matrix4::perspectiveMatrix(Angle::degToRad(90), 1, light.shadowCameraNearFar.x, light.shadowCameraNearFar.y);
 
-			//TODO: remove this
-			float n = 1.0;
-			float f = 1000.0;
 			Vector2 calculedNearFar;
-
-			float nfsub = f - n;
-			calculedNearFar.x = (f + n) / nfsub * 0.5f + 0.5f;
-			calculedNearFar.y =-(f * n) / nfsub;
+			float nfsub = light.shadowCameraNearFar.y - light.shadowCameraNearFar.x;
+			calculedNearFar.x = (light.shadowCameraNearFar.y + light.shadowCameraNearFar.x) / nfsub * 0.5f + 0.5f;
+			calculedNearFar.y =-(light.shadowCameraNearFar.y * light.shadowCameraNearFar.x) / nfsub;
 
 			for (int f = 0; f < 6; f++){
 				light.cameras[f].lightViewProjectionMatrix = projectionMatrix * viewMatrix[f];
