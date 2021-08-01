@@ -124,6 +124,11 @@ void RenderSystem::processLights(){
 		light.shadowMapIndex = -1;
 		
 		if (light.shadows){
+			if (light.numShadowCascades > MAX_SHADOWCASCADES){
+				light.numShadowCascades = MAX_SHADOWCASCADES;
+				Log::Warn("Shadow cascades number is bigger than max value");
+			}
+
 			hasShadows = true; // Re-check shadows on, after checked in checkLightsAndShadow()
 			if (light.type == LightType::POINT){
 				if (!light.framebuffer[0].isCreated())
@@ -160,7 +165,8 @@ void RenderSystem::processLights(){
 					fs_shadows.bias_texSize_nearFar[light.shadowMapIndex+c] = Vector4(light.shadowBias, light.mapResolution, light.cameras[c].nearFar.x, light.cameras[c].nearFar.y);
 				}
 			}else{
-				Log::Warn("There are no shadow maps available");
+				light.shadows = false;
+				Log::Warn("There are no shadow maps available for all lights, some light shadow will be disabled");
 			}
 		}
 
@@ -659,6 +665,40 @@ float RenderSystem::lerp(float a, float b, float fraction) {
     return (a * (1.0f - fraction)) + (b * fraction);
 }
 
+Matrix4 RenderSystem::getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv){
+	Matrix4 t = viewMatrix * sceneCameraInv;
+	std::vector<Vector4> v = {
+			t * Vector4(-1.f, 1.f, -1.f, 1.f),
+			t * Vector4(1.f, 1.f, -1.f, 1.f),
+			t * Vector4(1.f, -1.f, -1.f, 1.f),
+			t * Vector4(-1.f, -1.f, -1.f, 1.f),
+			t * Vector4(-1.f, 1.f, 1.f, 1.f),
+			t * Vector4(1.f, 1.f, 1.f, 1.f),
+			t * Vector4(1.f, -1.f, 1.f, 1.f),
+			t * Vector4(-1.f, -1.f, 1.f, 1.f)
+	};
+
+	float minX = std::numeric_limits<float>::max();
+	float maxX = std::numeric_limits<float>::lowest();
+	float minY = std::numeric_limits<float>::max();
+	float maxY = std::numeric_limits<float>::lowest();
+	float minZ = std::numeric_limits<float>::max();
+	float maxZ = std::numeric_limits<float>::lowest();
+
+	for (auto& p : v){
+		p = p / p.w;
+
+		if (p.x < minX) minX = p.x;
+		if (p.x > maxX) maxX = p.x;
+		if (p.y < minY) minY = p.y;
+		if (p.y > maxY) maxY = p.y;
+		if (p.z < minZ) minZ = p.z;
+		if (p.z > maxZ) maxZ = p.z;
+	}
+
+	return Matrix4::orthoMatrix(minX, maxX, minY, maxY, -maxZ, -minZ);
+}
+
 void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& transform){
 	light.worldDirection = transform.worldRotation * light.direction;
 
@@ -681,18 +721,19 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 
 			viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
 
-			float zFar = camera.perspectiveFar;
-            float zNear = camera.perspectiveNear;
-            float fov = 0;
-            float ratio = 1;
+			if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
 
-			float farPlaneOffset = (zFar - zNear) * 0.005;
+				float zFar = camera.perspectiveFar;
+				float zNear = camera.perspectiveNear;
+				float fov = 0;
+				float ratio = 1;
 
-            std::vector<float> splitFar;
-            std::vector<float> splitNear;
+				float farPlaneOffset = (zFar - zNear) * 0.005;
 
-			// Split perspective frustrum to create cascades
-            if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
+				std::vector<float> splitFar;
+				std::vector<float> splitNear;
+
+				// Split perspective frustrum to create cascades
                 Matrix4 projection = camera.projectionMatrix;
                 Matrix4 invProjection = projection.inverse();
                 std::vector<Vector4> v1 = {
@@ -724,45 +765,31 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
                     );
                     splitNear[i + 1] = splitFar[i];
                 }
-            }
 
-			// Get frustrum box and create light ortho
-			for (int ca = 0; ca < light.numShadowCascades; ca++) {
-				Matrix4 sceneCameraInv = (Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca], splitFar[ca]+farPlaneOffset) * camera.viewMatrix).inverse();
-				Matrix4 t = viewMatrix * sceneCameraInv;
-				std::vector<Vector4> v = {
-						t * Vector4(-1.f, 1.f, -1.f, 1.f),
-						t * Vector4(1.f, 1.f, -1.f, 1.f),
-						t * Vector4(1.f, -1.f, -1.f, 1.f),
-						t * Vector4(-1.f, -1.f, -1.f, 1.f),
-						t * Vector4(-1.f, 1.f, 1.f, 1.f),
-						t * Vector4(1.f, 1.f, 1.f, 1.f),
-						t * Vector4(1.f, -1.f, 1.f, 1.f),
-						t * Vector4(-1.f, -1.f, 1.f, 1.f)
-				};
+				// Get frustrum box and create light ortho
+				for (int ca = 0; ca < light.numShadowCascades; ca++) {
+					Matrix4 sceneCameraInv = (Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca], splitFar[ca]+farPlaneOffset) * camera.viewMatrix).inverse();
 
-				float minX = std::numeric_limits<float>::max();
-				float maxX = std::numeric_limits<float>::lowest();
-				float minY = std::numeric_limits<float>::max();
-				float maxY = std::numeric_limits<float>::lowest();
-				float minZ = std::numeric_limits<float>::max();
-				float maxZ = std::numeric_limits<float>::lowest();
+					projectionMatrix[ca] = getDirLightProjection(viewMatrix, sceneCameraInv);
 
-				for (auto& p : v){
-					p = p / p.w;
+					light.cameras[ca].lightViewProjectionMatrix = projectionMatrix[ca] * viewMatrix;
+					light.cameras[ca].nearFar = Vector2(splitNear[ca], splitFar[ca]);
+				}
+				
+			} else {
 
-					if (p.x < minX) minX = p.x;
-					if (p.x > maxX) maxX = p.x;
-					if (p.y < minY) minY = p.y;
-					if (p.y > maxY) maxY = p.y;
-					if (p.z < minZ) minZ = p.z;
-					if (p.z > maxZ) maxZ = p.z;
+				if (light.numShadowCascades > 1){
+					light.numShadowCascades = 1;
+					Log::Warn("Can not have multiple cascades shadows when using ortho scene camera. Reducing num shadow cascades to 1");
 				}
 
-				projectionMatrix[ca] = Matrix4::orthoMatrix(minX, maxX, minY, maxY, -maxZ, -minZ);
+				Matrix4 sceneCameraInv = camera.viewProjectionMatrix.inverse();
 
-				light.cameras[ca].lightViewProjectionMatrix = projectionMatrix[ca] * viewMatrix;
-				light.cameras[ca].nearFar = Vector2(splitNear[ca], splitFar[ca]);
+				projectionMatrix[0] = getDirLightProjection(viewMatrix, sceneCameraInv);
+
+				light.cameras[0].lightViewProjectionMatrix = projectionMatrix[0] * viewMatrix;
+				light.cameras[0].nearFar = Vector2(-1, 1);
+				
 			}
 
 		}else if (light.type == LightType::SPOT){

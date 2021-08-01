@@ -43,7 +43,6 @@ namespace Supernova{
         float shadowBias = 0.0005f;
         unsigned int mapResolution = 2048;
         Vector2 shadowCameraNearFar = Vector2(0.0f, 0.0f); // when zero it gets value from scene camera or light range
-
         unsigned int numShadowCascades = 3;
     };
     
