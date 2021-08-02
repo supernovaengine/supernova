@@ -54,7 +54,7 @@ namespace Supernova {
     class ShaderData {
     public:
         ShaderLang lang;
-        unsigned int profileVersion;
+        unsigned int version;
         bool es;
         std::vector<ShaderStage> stages;
 

@@ -20,7 +20,7 @@ ShaderData::~ShaderData(){
 
 ShaderData::ShaderData(const ShaderData& d){
     this->lang = d.lang;
-    this->profileVersion = d.profileVersion;
+    this->version = d.version;
     this->stages = d.stages;
 
     for (int i = 0; i < stages.size(); i++){
@@ -31,7 +31,7 @@ ShaderData::ShaderData(const ShaderData& d){
 
 ShaderData& ShaderData::operator = (const ShaderData& d){
     this->lang = d.lang;
-    this->profileVersion = d.profileVersion;
+    this->version = d.version;
     this->stages = d.stages;
 
     for (int i = 0; i < stages.size(); i++){

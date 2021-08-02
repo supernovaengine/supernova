@@ -83,7 +83,7 @@ void init(){
     sky.setTextureUp("ely_hills/hills_up.tga");
     sky.setTextureDown("ely_hills/hills_dn.tga");
 
-    //camera.setOrtho(0, 500, 0, 500, -10, 10);
+    //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
     camera.activate();
 
     camera.setPosition(0,80,100);

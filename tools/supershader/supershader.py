@@ -8,6 +8,7 @@ import os
 import sys
 import subprocess
 import click
+import platform
 
 def get_define(property):
     if property == 'Ult':
@@ -53,6 +54,25 @@ def get_default_shaders():
     s += "sky"
     return s
 
+def get_bin_exec():
+    plt = platform.system()
+
+    execname = "supershader"
+    binpath = "bin"
+    outpath = os.path.join(binpath, execname)
+
+    if plt == "Windows":
+        outpath = os.path.join(binpath, "windows", execname, ".exe")
+    elif plt == "Linux":
+        outpath = os.path.join(binpath, "linux", execname)
+    elif plt == "Darwin":
+        outpath = os.path.join(binpath, "macos", execname)
+    else:
+        print("Unidentified system")
+        sys.exit(1)
+    
+    return outpath
+
 @click.command()
 @click.option('--shaders', '-s', default=get_default_shaders(), help="Target shader language, seperated by ';'")
 @click.option('--lang', '-l', required=True, type=click.Choice(['glsl330', 'glsl100', 'glsl300es', 'hlsl4', 'hlsl5'], case_sensitive=False), help="Target shader language")
@@ -91,8 +111,8 @@ def generate(shaders, lang, project, max_lights, max_shadowsmap, max_shadowscube
         frag = get_frag(shaderType)
         output = get_output(shader, project, lang)
 
-        #print("bin/supershader", "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines)
-        command = subprocess.run(["bin/supershader", "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines], capture_output=True)
+        #print(get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines)
+        command = subprocess.run([get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines], capture_output=True)
 
         sys.stdout.buffer.write(command.stdout)
         sys.stderr.buffer.write(command.stderr)

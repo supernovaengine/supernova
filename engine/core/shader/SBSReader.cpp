@@ -46,7 +46,7 @@
 struct sbs_chunk {
     uint32_t sbs_version;
     uint32_t lang;
-    uint32_t profile_version;
+    uint32_t version;
     uint16_t es;
 };
 
@@ -128,7 +128,7 @@ bool SBSReader::read(std::string filepath){
         return false;
     }
 
-    shaderData.profileVersion = sinfo.profile_version;
+    shaderData.version = sinfo.version;
     shaderData.es = sinfo.es;
 
     if (sinfo.lang == SBS_LANG_GLSL){
