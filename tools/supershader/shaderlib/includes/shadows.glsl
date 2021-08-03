@@ -73,6 +73,10 @@ float shadowCalculationAux(int shadowMapIndex, Shadow shadowConf, float NdotL){
     proj_coords = proj_coords * 0.5 + 0.5;
     float currentDepth = proj_coords.z;
 
+    #ifndef IS_GLSL
+        proj_coords.y = 1.0 - proj_coords.y;
+    #endif
+
     float bias = max(shadowConf.maxBias * (1.0 - NdotL), shadowConf.minBias);
 
     vec2 texel_size = 1.0 / shadowConf.mapSize;
