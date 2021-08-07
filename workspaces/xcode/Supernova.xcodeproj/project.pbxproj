@@ -336,6 +336,21 @@
 		71BE626825B1DC7D006D6E02 /* liblua-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BE602825B1C49C006D6E02 /* liblua-macos.a */; };
 		71BE626925B1DC7D006D6E02 /* libluaintf-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BE610F25B1D06E006D6E02 /* libluaintf-macos.a */; };
 		71BE626A25B1DC7D006D6E02 /* libstb-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BE612625B1D088006D6E02 /* libstb-macos.a */; };
+		71CC839526B8C4D800EEBB93 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC839326B8C4D800EEBB93 /* Light.cpp */; };
+		71CC839626B8C4D800EEBB93 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC839326B8C4D800EEBB93 /* Light.cpp */; };
+		71CC839726B8C4D800EEBB93 /* Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 71CC839426B8C4D800EEBB93 /* Light.h */; };
+		71CC839A26B8C4FD00EEBB93 /* FramebufferRender.h in Headers */ = {isa = PBXBuildFile; fileRef = 71CC839826B8C4FC00EEBB93 /* FramebufferRender.h */; };
+		71CC839B26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC839926B8C4FD00EEBB93 /* FramebufferRender.cpp */; };
+		71CC839C26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC839926B8C4FD00EEBB93 /* FramebufferRender.cpp */; };
+		71CC83A226B8C54A00EEBB93 /* SBSReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC839E26B8C54A00EEBB93 /* SBSReader.cpp */; };
+		71CC83A326B8C54A00EEBB93 /* SBSReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC839E26B8C54A00EEBB93 /* SBSReader.cpp */; };
+		71CC83A426B8C54A00EEBB93 /* ShaderData.h in Headers */ = {isa = PBXBuildFile; fileRef = 71CC839F26B8C54A00EEBB93 /* ShaderData.h */; };
+		71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 71CC83A026B8C54A00EEBB93 /* SBSReader.h */; };
+		71CC83A626B8C54A00EEBB93 /* ShaderData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC83A126B8C54A00EEBB93 /* ShaderData.cpp */; };
+		71CC83A726B8C54A00EEBB93 /* ShaderData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC83A126B8C54A00EEBB93 /* ShaderData.cpp */; };
+		71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 71CC83A826B8D54800EEBB93 /* SokolFramebuffer.h */; };
+		71CC83AB26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC83A926B8D54800EEBB93 /* SokolFramebuffer.cpp */; };
+		71CC83AC26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC83A926B8D54800EEBB93 /* SokolFramebuffer.cpp */; };
 		71E36B5625D5994100EFEED4 /* Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5325D5994100EFEED4 /* Model.cpp */; };
 		71E36B5725D5994100EFEED4 /* Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5325D5994100EFEED4 /* Model.cpp */; };
 		71E36B5825D5994100EFEED4 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5425D5994100EFEED4 /* Mesh.cpp */; };
@@ -751,6 +766,18 @@
 		71BE623525B1DB9E006D6E02 /* ShaderPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderPool.cpp; sourceTree = "<group>"; };
 		71BE623625B1DB9E006D6E02 /* TexturePool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TexturePool.h; sourceTree = "<group>"; };
 		71BE623725B1DB9E006D6E02 /* ShaderPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderPool.h; sourceTree = "<group>"; };
+		71CC839126B8C49B00EEBB93 /* SkyComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SkyComponent.h; sourceTree = "<group>"; };
+		71CC839226B8C49B00EEBB93 /* LightComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LightComponent.h; sourceTree = "<group>"; };
+		71CC839326B8C4D800EEBB93 /* Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Light.cpp; sourceTree = "<group>"; };
+		71CC839426B8C4D800EEBB93 /* Light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Light.h; sourceTree = "<group>"; };
+		71CC839826B8C4FC00EEBB93 /* FramebufferRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FramebufferRender.h; sourceTree = "<group>"; };
+		71CC839926B8C4FD00EEBB93 /* FramebufferRender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FramebufferRender.cpp; sourceTree = "<group>"; };
+		71CC839E26B8C54A00EEBB93 /* SBSReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBSReader.cpp; sourceTree = "<group>"; };
+		71CC839F26B8C54A00EEBB93 /* ShaderData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderData.h; sourceTree = "<group>"; };
+		71CC83A026B8C54A00EEBB93 /* SBSReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBSReader.h; sourceTree = "<group>"; };
+		71CC83A126B8C54A00EEBB93 /* ShaderData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderData.cpp; sourceTree = "<group>"; };
+		71CC83A826B8D54800EEBB93 /* SokolFramebuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SokolFramebuffer.h; sourceTree = "<group>"; };
+		71CC83A926B8D54800EEBB93 /* SokolFramebuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SokolFramebuffer.cpp; sourceTree = "<group>"; };
 		71E36B5225D5994100EFEED4 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
 		71E36B5325D5994100EFEED4 /* Model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Model.cpp; sourceTree = "<group>"; };
 		71E36B5425D5994100EFEED4 /* Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mesh.cpp; sourceTree = "<group>"; };
@@ -1011,6 +1038,7 @@
 				7162FC2D25962A0E0075B97D /* Scene.cpp */,
 				7162FC8625962A0E0075B97D /* Scene.h */,
 				71BE622C25B1DB9D006D6E02 /* script */,
+				71CC839D26B8C54A00EEBB93 /* shader */,
 				7162FC6F25962A0E0075B97D /* subsystem */,
 				7162FC7A25962A0E0075B97D /* Supernova.h */,
 				71BE61FF25B1DB22006D6E02 /* System.cpp */,
@@ -1054,6 +1082,8 @@
 			children = (
 				7162FC4125962A0E0075B97D /* BufferRender.cpp */,
 				7162FC3F25962A0E0075B97D /* BufferRender.h */,
+				71CC839926B8C4FD00EEBB93 /* FramebufferRender.cpp */,
+				71CC839826B8C4FC00EEBB93 /* FramebufferRender.h */,
 				7162FC3E25962A0E0075B97D /* ObjectRender.cpp */,
 				7162FC3D25962A0E0075B97D /* ObjectRender.h */,
 				7162FC4325962A0E0075B97D /* Render.h */,
@@ -1073,7 +1103,9 @@
 			isa = PBXGroup;
 			children = (
 				7162FC4625962A0E0075B97D /* CameraComponent.h */,
+				71CC839226B8C49B00EEBB93 /* LightComponent.h */,
 				7162FC4525962A0E0075B97D /* MeshComponent.h */,
+				71CC839126B8C49B00EEBB93 /* SkyComponent.h */,
 				7162FC4725962A0E0075B97D /* Transform.h */,
 			);
 			path = component;
@@ -1115,6 +1147,8 @@
 			children = (
 				7162FC6425962A0E0075B97D /* Camera.cpp */,
 				7162FC6525962A0E0075B97D /* Camera.h */,
+				71CC839326B8C4D800EEBB93 /* Light.cpp */,
+				71CC839426B8C4D800EEBB93 /* Light.h */,
 				71E36B5425D5994100EFEED4 /* Mesh.cpp */,
 				71E36B5525D5994100EFEED4 /* Mesh.h */,
 				71E36B5325D5994100EFEED4 /* Model.cpp */,
@@ -1180,6 +1214,8 @@
 				7162FC9225962A0E0075B97D /* shaders */,
 				7162FC8B25962A0E0075B97D /* SokolBuffer.cpp */,
 				7162FC8E25962A0E0075B97D /* SokolBuffer.h */,
+				71CC83A926B8D54800EEBB93 /* SokolFramebuffer.cpp */,
+				71CC83A826B8D54800EEBB93 /* SokolFramebuffer.h */,
 				7162FC8925962A0E0075B97D /* SokolObject.cpp */,
 				7162FC8A25962A0E0075B97D /* SokolObject.h */,
 				7162FC9525962A0E0075B97D /* SokolScene.cpp */,
@@ -1431,6 +1467,17 @@
 			path = pool;
 			sourceTree = "<group>";
 		};
+		71CC839D26B8C54A00EEBB93 /* shader */ = {
+			isa = PBXGroup;
+			children = (
+				71CC839E26B8C54A00EEBB93 /* SBSReader.cpp */,
+				71CC83A026B8C54A00EEBB93 /* SBSReader.h */,
+				71CC83A126B8C54A00EEBB93 /* ShaderData.cpp */,
+				71CC839F26B8C54A00EEBB93 /* ShaderData.h */,
+			);
+			path = shader;
+			sourceTree = "<group>";
+		};
 		71E36B8125D5996400EFEED4 /* ecs */ = {
 			isa = PBXGroup;
 			children = (
@@ -1558,14 +1605,19 @@
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
 				71BE620025B1DB22006D6E02 /* System.h in Headers */,
 				71F97A8D262D1D5900CD6F2B /* SkyBox.h in Headers */,
+				71CC839726B8C4D800EEBB93 /* Light.h in Headers */,
+				71CC839A26B8C4FD00EEBB93 /* FramebufferRender.h in Headers */,
 				71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */,
 				71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */,
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
+				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,
+				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
 				71BE622225B1DB83006D6E02 /* TextureData.h in Headers */,
 				71BE621425B1DB37006D6E02 /* Function.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
 				71BE624625B1DB9E006D6E02 /* ShaderPool.h in Headers */,
 				71BE623F25B1DB9E006D6E02 /* LuaBinding.h in Headers */,
+				71CC83A426B8C54A00EEBB93 /* ShaderData.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2144,12 +2196,15 @@
 				71BE623B25B1DB9E006D6E02 /* LuaFunction.cpp in Sources */,
 				713D8294259D307F00567F9F /* Data.cpp in Sources */,
 				71BE623D25B1DB9E006D6E02 /* LuaScript.cpp in Sources */,
+				71CC83A726B8C54A00EEBB93 /* ShaderData.cpp in Sources */,
+				71CC839626B8C4D800EEBB93 /* Light.cpp in Sources */,
 				713D8295259D307F00567F9F /* UserSettings.cpp in Sources */,
 				71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
 				713D8296259D307F00567F9F /* File.cpp in Sources */,
 				713D8297259D307F00567F9F /* FileData.cpp in Sources */,
 				713D8298259D307F00567F9F /* ShaderRender.cpp in Sources */,
 				713D8299259D307F00567F9F /* ObjectRender.cpp in Sources */,
+				71CC839C26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */,
 				713D829A259D307F00567F9F /* TextureRender.cpp in Sources */,
 				713D829B259D307F00567F9F /* BufferRender.cpp in Sources */,
 				713D82EB259D333100567F9F /* Buffer.cpp in Sources */,
@@ -2165,6 +2220,7 @@
 				713D82A4259D307F00567F9F /* AlignedBox.cpp in Sources */,
 				7128D0AF25BB18DC00965B51 /* StringUtils.cpp in Sources */,
 				713D82A5259D307F00567F9F /* Plane.cpp in Sources */,
+				71CC83A326B8C54A00EEBB93 /* SBSReader.cpp in Sources */,
 				713D82A6259D307F00567F9F /* Angle.cpp in Sources */,
 				71F97A8F262D1D5900CD6F2B /* SkyBox.cpp in Sources */,
 				71BE624425B1DB9E006D6E02 /* ShaderPool.cpp in Sources */,
@@ -2185,6 +2241,7 @@
 				71BE621125B1DB37006D6E02 /* Input.cpp in Sources */,
 				713D82B3259D307F00567F9F /* SokolObject.cpp in Sources */,
 				713D82B4259D307F00567F9F /* SokolBuffer.cpp in Sources */,
+				71CC83AC26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
 				713D82B5259D307F00567F9F /* SokolShader.cpp in Sources */,
 				713D82B6259D307F00567F9F /* SokolTexture.cpp in Sources */,
 				713D82B7259D307F00567F9F /* SokolScene.cpp in Sources */,
@@ -2243,12 +2300,15 @@
 				71BE623A25B1DB9E006D6E02 /* LuaFunction.cpp in Sources */,
 				7162FE0F2596A5BE0075B97D /* SokolTexture.cpp in Sources */,
 				71BE623C25B1DB9E006D6E02 /* LuaScript.cpp in Sources */,
+				71CC83A626B8C54A00EEBB93 /* ShaderData.cpp in Sources */,
+				71CC839526B8C4D800EEBB93 /* Light.cpp in Sources */,
 				7162FE102596A5BE0075B97D /* SokolScene.cpp in Sources */,
 				71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
 				7162FD1225963AE00075B97D /* Log.cpp in Sources */,
 				7162FD1325963AE00075B97D /* Scene.cpp in Sources */,
 				7162FD1625963AE00075B97D /* Data.cpp in Sources */,
 				7162FD1725963AE00075B97D /* UserSettings.cpp in Sources */,
+				71CC839B26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */,
 				7162FD1925963AE00075B97D /* File.cpp in Sources */,
 				7162FD1A25963AE00075B97D /* FileData.cpp in Sources */,
 				7162FD1C25963AE00075B97D /* ShaderRender.cpp in Sources */,
@@ -2264,6 +2324,7 @@
 				7162FD3125963AE00075B97D /* Ray.cpp in Sources */,
 				7128D0AE25BB18DC00965B51 /* StringUtils.cpp in Sources */,
 				7162FD3225963AE00075B97D /* Matrix3.cpp in Sources */,
+				71CC83A226B8C54A00EEBB93 /* SBSReader.cpp in Sources */,
 				7162FD3725963AE00075B97D /* Rect.cpp in Sources */,
 				71F97A8E262D1D5900CD6F2B /* SkyBox.cpp in Sources */,
 				71BE624325B1DB9E006D6E02 /* ShaderPool.cpp in Sources */,
@@ -2284,6 +2345,7 @@
 				71BE621025B1DB37006D6E02 /* Input.cpp in Sources */,
 				7162FD5825963AE00075B97D /* InterleavedBuffer.cpp in Sources */,
 				7162FD5925963AE00075B97D /* Buffer.cpp in Sources */,
+				71CC83AB26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
 				7162FD5C25963AE00075B97D /* Attribute.cpp in Sources */,
 				7162FD5E25963AE10075B97D /* ExternalBuffer.cpp in Sources */,
 				7162FD6025963AE10075B97D /* IndexBuffer.cpp in Sources */,

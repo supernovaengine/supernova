@@ -75,7 +75,7 @@ def get_bin_exec():
 
 @click.command()
 @click.option('--shaders', '-s', default=get_default_shaders(), help="Target shader language, seperated by ';'")
-@click.option('--lang', '-l', required=True, type=click.Choice(['glsl330', 'glsl100', 'glsl300es', 'hlsl4', 'hlsl5'], case_sensitive=False), help="Target shader language")
+@click.option('--lang', '-l', required=True, help="Target shader language")
 @click.option('--project', '-p', default='../../project', type=click.Path(), help="Source root path of project files")
 @click.option('--max-lights', '-ml', default=6, type=int, help="Value of MAX_LIGHTS macro")
 @click.option('--max-shadowsmap', default=6, type=int, help="Value of MAX_SHADOWSMAP macro")

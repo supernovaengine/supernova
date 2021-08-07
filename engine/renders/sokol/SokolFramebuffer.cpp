@@ -28,7 +28,7 @@ bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int
         return false;
     }
     colorTexture.createShadowMapTexture(textureType, false, width, height);
-    depthTexture.createShadowMapTexture(textureType, true, width, height);
+    depthTexture.createShadowMapTexture(TextureType::TEXTURE_2D, true, width, height);
 
     size_t faces = (textureType == TextureType::TEXTURE_CUBE)? 6 : 1;
 
@@ -37,7 +37,6 @@ bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int
         pass_desc.color_attachments[0].image = colorTexture.backend.get();
         pass_desc.color_attachments[0].slice = i;
         pass_desc.depth_stencil_attachment.image = depthTexture.backend.get();
-        pass_desc.depth_stencil_attachment.slice = i;
         pass_desc.label = "shadow-map-pass";
 
         pass[i] = sg_make_pass(&pass_desc);

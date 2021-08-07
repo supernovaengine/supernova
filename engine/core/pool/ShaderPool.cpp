@@ -23,6 +23,10 @@ std::string ShaderPool::getShaderLangStr(){
 		return "glsl330";
 	}else if (Engine::getPlatform() == Platform::WEB){
 		return "glsl100";
+	}else if (Engine::getPlatform() == Platform::MACOS){
+		return "msl21_macos";
+	}else if (Engine::getPlatform() == Platform::IOS){
+		return "msl21_ios";
 	}
 
 	return "<unknown>";

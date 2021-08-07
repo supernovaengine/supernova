@@ -14,6 +14,10 @@
 #include <memory>
 #include <cmath>
 
+#ifndef PROJECT_ROOT
+#define PROJECT_ROOT "<PROJECT_ROOT>"
+#endif
+
 using namespace Supernova;
 
 TextureRender RenderSystem::emptyWhite;
@@ -981,7 +985,7 @@ void RenderSystem::draw(){
 			"Supernova is missing some shaders, you need to use Supershader tool to create these shaders in project assets directory.\n"
 			"Go to directory \"tools/supershader\" and execute the command:\n"
 			"\n"
-			"> python supershader.py -s \"%s\" -p \"%s\" -l %s\n"
+			"> python3 supershader.py -s \"%s\" -p \"%s\" -l %s\n"
 			"-------------------"
 			, misShaders.c_str(), PROJECT_ROOT, ShaderPool::getShaderLangStr().c_str());
 		exit(1);
