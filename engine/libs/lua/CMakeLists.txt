@@ -36,6 +36,10 @@ set (
     lzio.c
 )
 
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    add_definitions("-DLUA_USE_POSIX")
+endif()
+
 add_library(
     lua
 

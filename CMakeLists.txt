@@ -165,7 +165,8 @@ endif()
 if(DEFINED ASSETS_DEST_DIR)
     add_custom_command(
         TARGET ${APP_NAME} POST_BUILD
-        COMMAND "${CMAKE_COMMAND}" -E rm -rf ${ASSETS_DEST_DIR}
+        COMMAND "${CMAKE_COMMAND}" -E remove_directory ${ASSETS_DEST_DIR} # deprecated in CMmake 3.17
+        #COMMAND "${CMAKE_COMMAND}" -E rm -rf ${ASSETS_DEST_DIR} # for future use
         COMMAND "${CMAKE_COMMAND}" -E copy_directory ${PROJECT_ROOT}/assets ${ASSETS_DEST_DIR}
         )
 endif()
