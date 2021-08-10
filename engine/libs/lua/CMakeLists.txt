@@ -1,8 +1,5 @@
-# By default Lua-Intf expect the Lua library to build under C++
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x c++")
-
 set (
-    lua_src
+    LUA_SOURCE
 
     lapi.c
     lauxlib.c
@@ -44,10 +41,11 @@ add_library(
 
     STATIC
 
-    ${lua_src}
+    ${LUA_SOURCE}
 )
 
+# By default Lua-Intf expect the Lua library to build under C++
 set_source_files_properties(
-    ${lua_src}
+    ${LUA_SOURCE}
     PROPERTIES LANGUAGE CXX
 )

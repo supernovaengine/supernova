@@ -134,7 +134,7 @@ void main() {
     float TdotV = clampedDot(t, v);
     float BdotV = clampedDot(b, v);
 
-    MaterialInfo materialInfo;
+    MaterialInfo materialInfo = {0.0, vec3(0.0), 0.0, vec3(0.0), vec3(0.0), 0.0, vec3(0.0), vec3(0.0)};
     materialInfo.baseColor = baseColor.rgb;
 
     // The default index of refraction of 1.5 yields a dielectric normal incidence reflectance of 0.04.

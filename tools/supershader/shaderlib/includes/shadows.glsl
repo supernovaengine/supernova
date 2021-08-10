@@ -19,6 +19,8 @@ Shadow getShadow2DConf(int index){
             );
         }
     }
+
+    return Shadow(0.0, 0.0, vec2(0.0), vec2(0.0), vec4(0.0));
 }
 
 Shadow getShadowCubeConf(int index){
@@ -33,6 +35,8 @@ Shadow getShadowCubeConf(int index){
             );
         }
     }
+
+    return Shadow(0.0, 0.0, vec2(0.0), vec2(0.0), vec4(0.0));
 }
 
 vec4 getShadowMap(int index, vec2 coords) {
@@ -49,6 +53,8 @@ vec4 getShadowMap(int index, vec2 coords) {
     }else if (index == 5){
         return texture(u_shadowMap6, coords);
     }
+
+    return vec4(0.0);
 }
 
 vec4 getShadowCubeMap(int index, vec3 coords) {
@@ -56,6 +62,8 @@ vec4 getShadowCubeMap(int index, vec3 coords) {
     if (index == 0){
         return texture(u_shadowCubeMap1, coords);
     }
+
+    return vec4(0.0);
 }
 
 float shadowCompare(int shadowMapIndex, float currentDepth, float bias, vec2 texCoords){
@@ -111,20 +119,22 @@ float shadowCascadedCalculationPCF(int shadowMapIndex, int numShadowCascades, fl
             }
         }
     }
+
+    return 0.0;
 }
 
 // use a calculated near-far, not a real camera near-far
-float distanceToDepthValue(vec3 vector, vec2 calcNearFar){
+float distanceToDepthValue(vec3 distance, vec2 calcNearFar){
     //https://stackoverflow.com/questions/48654578/omnidirectional-lighting-in-opengl-glsl-4-1
     //https://stackoverflow.com/questions/10786951/omnidirectional-shadow-mapping-with-depth-cubemap    
 
-    vec3 absv = abs(vector);
+    vec3 absv = abs(distance);
     float z   = max(absv.x, max(absv.y, absv.z));
     return calcNearFar.x + calcNearFar.y / z;
 }
 
 float shadowCubeCompare(int shadowMapIndex, float currentDepth, float bias, vec3 texCoords){
-    float closestDepth = decodeDepth(texture(u_shadowCubeMap1, texCoords));
+    float closestDepth = decodeDepth(getShadowCubeMap(shadowMapIndex, texCoords));
 
     if(currentDepth - bias > closestDepth)
         return 1;

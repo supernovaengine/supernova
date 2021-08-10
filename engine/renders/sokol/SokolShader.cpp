@@ -3,7 +3,6 @@
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 #include "math/Matrix4.h"
-#include "shaders/shaders.h"
 #include "Log.h"
 
 using namespace Supernova;
@@ -35,7 +34,7 @@ bool SokolShader::createShader(ShaderData& shaderData){
             stage_desc->d3d11_target = "vs_5_0";
         }else if (stage->type == ShaderStageType::FRAGMENT){
             stage_desc = &shader_desc.fs;
-            stage_desc->d3d11_target = "fs_5_0";
+            stage_desc->d3d11_target = "ps_5_0";
         }
 
         if (shaderData.lang == ShaderLang::MSL){

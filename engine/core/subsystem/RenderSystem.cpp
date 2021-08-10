@@ -720,7 +720,7 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 			
 			float shadowSplitLogFactor = .7f;
 
-			Matrix4 projectionMatrix[light.numShadowCascades];
+			Matrix4 projectionMatrix[MAX_SHADOWCASCADES];
 			Matrix4 viewMatrix;
 
 			viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);

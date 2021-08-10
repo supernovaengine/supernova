@@ -25,6 +25,7 @@ set(COMPILE_ZLIB OFF)
 set(IS_ARM OFF)
 set(SUPERNOVA_GLES2 ON)
 
+set(PROJECT_EXEC_FLAGS)
 set(PLATFORM_ROOT)
 set(PLATFORM_SOURCE)
 set(PLATFORM_LIBS)
@@ -68,11 +69,32 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     )# Todo: "-s USE_WEBGL2=1" for WEBGL2
 endif()
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    add_definitions("-DSUPERNOVA_SOKOL")
+    add_definitions("-DSOKOL_D3D11")
+    #add_definitions("-DSOKOL_GLCORE33")
+
+    set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/$<CONFIG>/assets)
+
+    set(PROJECT_EXEC_FLAGS WIN32)
+
+    set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
+
+    list(APPEND PLATFORM_SOURCE
+        ${PLATFORM_ROOT}/SupernovaSokol.cpp
+        ${PLATFORM_ROOT}/main.cpp
+    )
+
+    list(APPEND PLATFORM_LIBS
+        #kernel32 user32 shell32 dxgi d3d11 ole32 gdi32
+    )
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions("-DSUPERNOVA_SOKOL")
     add_definitions("-DSOKOL_GLCORE33")
 
-    file(COPY "${PROJECT_ROOT}/assets" DESTINATION ${CMAKE_BINARY_DIR})
+    set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
 
     set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
 
@@ -94,7 +116,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     #add_definitions("-DSOKOL_GLCORE33")
     add_definitions("-DSOKOL_METAL")
 
-    file(COPY "${PROJECT_ROOT}/assets" DESTINATION ${CMAKE_BINARY_DIR})
+    set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
 
     set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
 
@@ -129,6 +151,7 @@ set(all_code_files
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL Android)
     add_executable(
         ${APP_NAME}
+        ${PROJECT_EXEC_FLAGS}
         ${all_code_files}
     )
 else()
@@ -137,6 +160,14 @@ else()
         SHARED
         ${all_code_files}
     )
+endif()
+
+if(DEFINED ASSETS_DEST_DIR)
+    add_custom_command(
+        TARGET ${APP_NAME} POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E rm -rf ${ASSETS_DEST_DIR}
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory ${PROJECT_ROOT}/assets ${ASSETS_DEST_DIR}
+        )
 endif()
 
 set_target_properties(

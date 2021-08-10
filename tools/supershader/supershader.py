@@ -62,7 +62,7 @@ def get_bin_exec():
     outpath = os.path.join(binpath, execname)
 
     if plt == "Windows":
-        outpath = os.path.join(binpath, "windows", execname, ".exe")
+        outpath = os.path.join(binpath, "windows", execname + ".exe")
     elif plt == "Linux":
         outpath = os.path.join(binpath, "linux", execname)
     elif plt == "Darwin":

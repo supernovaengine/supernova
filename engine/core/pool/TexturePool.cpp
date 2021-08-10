@@ -34,7 +34,7 @@ std::shared_ptr<TextureRender> TexturePool::get(std::string id, TextureType type
 		numFaces = 6;
 	}
 
-	TextureDataSize texData[numFaces];
+	TextureDataSize texData[6];
 
 	for (int f = 0; f < numFaces; f++){
 		texData[f] = {data[f].getSize(), data[f].getData()};

@@ -27,6 +27,8 @@ std::string ShaderPool::getShaderLangStr(){
 		return "msl21_macos";
 	}else if (Engine::getPlatform() == Platform::IOS){
 		return "msl21_ios";
+	}else if (Engine::getPlatform() == Platform::WINDOWS){
+		return "hlsl5";
 	}
 
 	return "<unknown>";

@@ -73,7 +73,6 @@
 #include "action/particlemod/ParticleVelocityMod.h"
 */
 #include <map>
-#include <unistd.h>
 #include <locale>
 #include <vector>
 #include <memory>

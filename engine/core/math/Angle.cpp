@@ -1,6 +1,8 @@
 #include "Angle.h"
 
 #include "Engine.h"
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <math.h>
 
 using namespace Supernova;

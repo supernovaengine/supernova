@@ -8,7 +8,8 @@ using namespace Supernova;
 
 SokolScene::SokolScene(){
     pass_action = {0};
-    pass_action.colors[0] = { .action = SG_ACTION_CLEAR, .value = { 0.1f, 0.1f, 0.1f, 1.0f } };
+    pass_action.colors[0].action = SG_ACTION_CLEAR;
+    pass_action.colors[0].value = { 0.1f, 0.1f, 0.1f, 1.0f };
 }
 
 SokolScene::SokolScene(const SokolScene& rhs) : pass_action(rhs.pass_action) {}

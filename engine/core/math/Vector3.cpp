@@ -123,7 +123,7 @@ float Vector3::dotProduct(const Vector3& v) const{
 }
 
 float Vector3::absDotProduct(const Vector3& v) const{
-    return abs(x * v.x) + abs(y * v.y) + abs(z * v.z);
+    return fabsf(x * v.x) + fabsf(y * v.y) + fabsf(z * v.z);
 }
 
 float Vector3::distance(const Vector3& rhs) const{
