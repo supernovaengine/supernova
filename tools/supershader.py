@@ -76,7 +76,7 @@ def get_bin_exec():
 @click.command()
 @click.option('--shaders', '-s', default=get_default_shaders(), help="Target shader language, seperated by ';'")
 @click.option('--lang', '-l', required=True, help="Target shader language")
-@click.option('--project', '-p', default='../../project', type=click.Path(), help="Source root path of project files")
+@click.option('--project', '-p', default='../project', type=click.Path(), help="Source root path of project files")
 @click.option('--max-lights', '-ml', default=6, type=int, help="Value of MAX_LIGHTS macro")
 @click.option('--max-shadowsmap', default=6, type=int, help="Value of MAX_SHADOWSMAP macro")
 @click.option('--max-shadowscubemap', default=1, type=int, help="Value of MAX_SHADOWSCUBEMAP macro")

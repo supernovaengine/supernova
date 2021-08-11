@@ -310,10 +310,7 @@
 		71BE620025B1DB22006D6E02 /* System.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE61FE25B1DB22006D6E02 /* System.h */; };
 		71BE620125B1DB22006D6E02 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61FF25B1DB22006D6E02 /* System.cpp */; };
 		71BE620225B1DB22006D6E02 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61FF25B1DB22006D6E02 /* System.cpp */; };
-		71BE621025B1DB37006D6E02 /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE620C25B1DB37006D6E02 /* Input.cpp */; };
-		71BE621125B1DB37006D6E02 /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE620C25B1DB37006D6E02 /* Input.cpp */; };
 		71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */; };
-		71BE621325B1DB37006D6E02 /* Input.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE620E25B1DB37006D6E02 /* Input.h */; };
 		71BE621425B1DB37006D6E02 /* Function.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE620F25B1DB37006D6E02 /* Function.h */; };
 		71BE622025B1DB83006D6E02 /* TextureData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE621E25B1DB83006D6E02 /* TextureData.cpp */; };
 		71BE622125B1DB83006D6E02 /* TextureData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE621E25B1DB83006D6E02 /* TextureData.cpp */; };
@@ -750,9 +747,7 @@
 		71BE61F325B1DAE9006D6E02 /* shaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shaders.h; sourceTree = "<group>"; };
 		71BE61FE25B1DB22006D6E02 /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = System.h; sourceTree = "<group>"; };
 		71BE61FF25B1DB22006D6E02 /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = System.cpp; sourceTree = "<group>"; };
-		71BE620C25B1DB37006D6E02 /* Input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Input.cpp; sourceTree = "<group>"; };
 		71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FunctionSubscribe.h; sourceTree = "<group>"; };
-		71BE620E25B1DB37006D6E02 /* Input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Input.h; sourceTree = "<group>"; };
 		71BE620F25B1DB37006D6E02 /* Function.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Function.h; sourceTree = "<group>"; };
 		71BE621E25B1DB83006D6E02 /* TextureData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureData.cpp; sourceTree = "<group>"; };
 		71BE621F25B1DB83006D6E02 /* TextureData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureData.h; sourceTree = "<group>"; };
@@ -1054,8 +1049,6 @@
 			children = (
 				71BE620F25B1DB37006D6E02 /* Function.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
-				71BE620C25B1DB37006D6E02 /* Input.cpp */,
-				71BE620E25B1DB37006D6E02 /* Input.h */,
 				7128D0AC25BB18DC00965B51 /* StringUtils.cpp */,
 				7128D0AD25BB18DC00965B51 /* StringUtils.h */,
 			);
@@ -1599,7 +1592,6 @@
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
 				71BE624025B1DB9E006D6E02 /* LuaFunction.h in Headers */,
 				71BE61F425B1DAE9006D6E02 /* shaders.h in Headers */,
-				71BE621325B1DB37006D6E02 /* Input.h in Headers */,
 				71F97AAF262D1D8000CD6F2B /* Color.h in Headers */,
 				71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */,
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
@@ -2238,7 +2230,6 @@
 				713D82B0259D307F00567F9F /* Attribute.cpp in Sources */,
 				713D82B1259D307F00567F9F /* ExternalBuffer.cpp in Sources */,
 				713D82B2259D307F00567F9F /* IndexBuffer.cpp in Sources */,
-				71BE621125B1DB37006D6E02 /* Input.cpp in Sources */,
 				713D82B3259D307F00567F9F /* SokolObject.cpp in Sources */,
 				713D82B4259D307F00567F9F /* SokolBuffer.cpp in Sources */,
 				71CC83AC26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
@@ -2342,7 +2333,6 @@
 				7162FD4A25963AE00075B97D /* Texture.cpp in Sources */,
 				7162FD4D25963AE00075B97D /* RenderSystem.cpp in Sources */,
 				7162FD4F25963AE00075B97D /* Engine.cpp in Sources */,
-				71BE621025B1DB37006D6E02 /* Input.cpp in Sources */,
 				7162FD5825963AE00075B97D /* InterleavedBuffer.cpp in Sources */,
 				7162FD5925963AE00075B97D /* Buffer.cpp in Sources */,
 				71CC83AB26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
