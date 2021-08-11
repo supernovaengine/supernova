@@ -124,7 +124,7 @@ def build(platform, project, supernova, appname, output, build, no_lua_init, no_
     native_build_config = []
 
     if output==None:
-        build_dir = create_build_dir("project_"+platform)
+        build_dir = create_build_dir(os.path.join("build",platform))
     else:
         build_dir = create_build_dir(output)
 
