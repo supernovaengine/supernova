@@ -25,7 +25,7 @@ set(COMPILE_ZLIB OFF)
 set(IS_ARM OFF)
 set(SUPERNOVA_GLES2 ON)
 
-set(PROJECT_EXEC_FLAGS)
+set(PLATFORM_EXEC_FLAGS)
 set(PLATFORM_ROOT)
 set(PLATFORM_SOURCE)
 set(PLATFORM_LIBS)
@@ -66,7 +66,35 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
             ${EM_ADDITIONAL_LINK_FLAGS} \
             -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\" \
             -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\""
-    )# Todo: "-s USE_WEBGL2=1" for WEBGL2
+            # Todo: "-s USE_WEBGL2=1" for WEBGL2
+    )
+endif()
+
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
+    add_definitions("-DSUPERNOVA_ANDROID")
+    add_definitions("-DSOKOL_GLES2")
+    add_definitions("-D\"lua_getlocaledecpoint()='.'\"")
+    add_definitions("-DLUA_ANSI")
+    add_definitions("-DLUA_USE_C89")
+    add_definitions("-DWITH_MINIAUDIO") # For SoLoud
+
+    set(APP_NAME supernova-android) # Android uses a fixed library name
+
+    if( ANDROID_ABI MATCHES "^arm(eabi)?(-v7a)?(64-v8a)?$" )
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon")
+        set(IS_ARM ON)
+    endif()
+
+    set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/android)
+
+    list(APPEND PLATFORM_SOURCE
+        ${PLATFORM_ROOT}/AndroidJNI.cpp
+        ${PLATFORM_ROOT}/SupernovaAndroid.cpp
+    )
+
+    list(APPEND PLATFORM_LIBS
+        log android EGL GLESv2 OpenSLES
+    )
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -76,7 +104,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
     set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/$<CONFIG>/assets)
 
-    set(PROJECT_EXEC_FLAGS WIN32)
+    set(PLATFORM_EXEC_FLAGS WIN32)
 
     set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
 
@@ -151,7 +179,7 @@ set(all_code_files
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL Android)
     add_executable(
         ${APP_NAME}
-        ${PROJECT_EXEC_FLAGS}
+        ${PLATFORM_EXEC_FLAGS}
         ${all_code_files}
     )
 else()

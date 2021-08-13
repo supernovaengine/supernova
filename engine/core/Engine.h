@@ -22,12 +22,12 @@ namespace Supernova {
     };
 
     enum class Platform{
-        MACOS,
-        IOS,
-        WEB,
-        ANDROID,
-        LINUX,
-        WINDOWS
+        MacOS,
+        iOS,
+        Web,
+        Android,
+        Linux,
+        Windows
     };
 
     class Engine {

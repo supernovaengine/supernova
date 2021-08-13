@@ -3,13 +3,19 @@
 
 #define SOKOL_IMPL
 
-#ifdef SUPERNOVA_WEB
+#if defined(SUPERNOVA_WEB)
     #define GL_GLEXT_PROTOTYPES
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
 
     //TODO: Use WEBGL2 too
     //#include <GLES3/gl3.h>
+#endif
+
+#if defined(SUPERNOVA_ANDROID)
+//#define GL_GLEXT_PROTOTYPES
+#include <GLES2/gl2.h>
+//#include <GLES2/gl2ext.h> // instancing not working on Android and GLES2
 #endif
 
 #if defined(_WIN32)

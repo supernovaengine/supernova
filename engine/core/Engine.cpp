@@ -191,22 +191,22 @@ float Engine::getSceneUpdateTime(){
 
 Platform Engine::getPlatform(){
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    return Platform::WINDOWS;
+    return Platform::Windows;
 #elif __APPLE__
     #include <TargetConditionals.h>
     #if TARGET_IPHONE_SIMULATOR
-    return Platform::IOS;
+    return Platform::iOS;
     #elif TARGET_OS_IPHONE
-    return Platform::IOS;
+    return Platform::iOS;
     #elif TARGET_OS_MAC
-    return Platform::MACOS;
+    return Platform::MacOS;
     #endif
 #elif __ANDROID__
-    return Platform::ANDROID;
+    return Platform::Android;
 #elif __EMSCRIPTEN__
-    return Platform::WEB;
+    return Platform::Web;
 #elif __linux__
-    return Platform::LINUX;
+    return Platform::Linux;
 #endif
 }
 

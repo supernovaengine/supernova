@@ -20,7 +20,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     find_package(Threads REQUIRED)
     target_compile_options(sokol PUBLIC "-pthread")
-
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
