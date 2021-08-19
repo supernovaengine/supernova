@@ -14,6 +14,9 @@ import android.widget.TextView.OnEditorActionListener;
 import android.text.TextWatcher;
 import android.text.Editable;
 
+// As reference:
+// see https://github.com/godotengine/godot/blob/master/platform/android/java/lib/src/org/godotengine/godot/input/GodotTextInputWrapper.java
+
 public class TextInput extends EditText implements TextWatcher, OnEditorActionListener{
 
 	private final static int HANDLER_OPEN_KEYBOARD = 2;
@@ -106,9 +109,9 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 				@Override
 				public void run() {
 					if (before < count) {
-						JNIWrapper.system_text_input(String.valueOf(s.charAt(start + before)));
+						JNIWrapper.system_char_input(s.charAt(start + before));
 					} else {
-						JNIWrapper.system_text_input("\b");
+						JNIWrapper.system_char_input('\b');
 					}
 				}
 			});
@@ -121,7 +124,12 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 		// TODO Auto-generated method stub
 	}
 
+	//KeyEvent getCharacters is no longer used by the input system.
 	@Override
+	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+		return false;
+	}
+/*
 	public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
 		if (this == v && this.isFullScreenEdit()) {
 			final String characters = event.getCharacters();
@@ -129,14 +137,17 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 			view.queueEvent(new Runnable() {
 				@Override
 				public void run() {
-					JNIWrapper.system_text_input(characters);
+					for (int i = 0; i < characters.length(); i++) {
+						final int ch = characters.codePointAt(i);
+						JNIWrapper.system_char_input(ch);
+					}
 				}
 			});
 		}
 
 		return false;
 	}
-
+*/
 	public void showKeyboard() {
 		final Message msg = new Message();
 		msg.what = HANDLER_OPEN_KEYBOARD;
@@ -150,5 +161,4 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 		msg.obj = this;
 		sHandler.sendMessage(msg);
 	}
-
 }
