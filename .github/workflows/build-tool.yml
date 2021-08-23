@@ -44,8 +44,7 @@ jobs:
       - name: Export Emscripten environment variable
         if: startsWith(matrix.config.platform, 'web')
         run: |
-          export EMSCRIPTEN=$(dirname $(which emcc))
-          echo "::set-env name=EMSCRIPTEN::$EMSCRIPTEN"
+          echo "EMSCRIPTEN=$(dirname $(which emcc))" >> $GITHUB_ENV
 
       - name: Install dependencies on Windows
         if: startsWith(matrix.config.os, 'windows')
