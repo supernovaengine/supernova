@@ -16,7 +16,7 @@ jobs:
       matrix:
         config: 
         - {
-            name: "Windows Latest MSVC",
+            name: "Windows MSVC",
             os: windows-latest,
             artifact: "windows_msvc",
             cc: "cl",
@@ -24,7 +24,7 @@ jobs:
             generators: "Visual Studio 16 2019"
           }
         - {
-            name: "Ubuntu Latest GCC",
+            name: "Ubuntu GCC",
             os: ubuntu-latest,
             artifact: "ubuntu_gcc",
             cc: "gcc",
@@ -32,7 +32,7 @@ jobs:
             generators: "Ninja"
           }
         - {
-            name: "macOS Latest Clang",
+            name: "macOS Clang",
             os: macos-latest,
             artifact: "macos_clang",
             cc: "clang",
@@ -59,7 +59,7 @@ jobs:
         if: startsWith(matrix.config.os, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install libxi-dev ninja-build cmake
+          sudo apt-get install libxi-dev libxcursor-dev ninja-build cmake
           ninja --version
           cmake --version
           gcc --version
