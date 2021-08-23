@@ -223,6 +223,8 @@ GraphicBackend Engine::getGraphicBackend(){
     return GraphicBackend::METAL;
 #elif defined(SOKOL_WGPU)
     return GraphicBackend::WGPU;
+#elif defined(SUPERNOVA_APPLE) //Xcode template
+    return GraphicBackend::METAL;
 #endif
 }
 
