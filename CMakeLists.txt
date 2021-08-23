@@ -256,3 +256,8 @@ target_link_libraries(
     supernova
     ${PLATFORM_LIBS}
  )
+
+install(TARGETS ${APP_NAME}
+        RUNTIME DESTINATION bin)
+
+install(DIRECTORY ${ASSETS_DEST_DIR} DESTINATION bin)

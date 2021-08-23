@@ -1,4 +1,4 @@
-name: CMake Build Matrix
+name: CMake build for desktop
 
 on: push
     
@@ -83,7 +83,6 @@ jobs:
           cmake \
             -S . \
             -B build \
-            -DSUPERSHADER_VERSION:STRING="${{ github.event.release.tag_name }}" \
             -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} \
             -G "${{ matrix.config.generators }}" \
             -DCMAKE_INSTALL_PREFIX:PATH=instdir
