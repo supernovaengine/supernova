@@ -25,7 +25,7 @@ jobs:
             os: macos-latest,
             platform: "macos"
           }
-          - {
+        - {
             name: "Web (Emscripten)",
             os: ubuntu-latest,
             platform: "web"
