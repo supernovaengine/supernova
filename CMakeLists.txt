@@ -6,19 +6,36 @@ endif()
 
 project(${APP_NAME})
 
-if(NOT DEFINED SUPERNOVA_ROOT)
+if(NOT SUPERNOVA_ROOT)
     set(SUPERNOVA_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 if (NOT EXISTS "${SUPERNOVA_ROOT}")
     message(FATAL_ERROR "Can't find Supernova root directory: ${SUPERNOVA_ROOT}")
 endif()
 
-if(NOT DEFINED PROJECT_ROOT)
+if(NOT PROJECT_ROOT)
     set(PROJECT_ROOT ${SUPERNOVA_ROOT}/project)
 endif()
 if (NOT EXISTS "${PROJECT_ROOT}")
     message(FATAL_ERROR "Can't find project root directory: ${PROJECT_ROOT}")
 endif()
+
+if(NOT GRAPHIC_BACKEND)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+        set(GRAPHIC_BACKEND "gles3")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
+        set(GRAPHIC_BACKEND "gles2")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        set(GRAPHIC_BACKEND "d3d11")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        set(GRAPHIC_BACKEND "glcore33")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        set(GRAPHIC_BACKEND "metal")
+    else()
+        message(FATAL_ERROR "GRAPHIC_BACKEND is not set")
+    endif()
+endif()
+message(STATUS "Graphic backend is set to ${GRAPHIC_BACKEND}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(COMPILE_ZLIB OFF)
@@ -32,9 +49,17 @@ set(PLATFORM_LIBS)
 set(PLATFORM_RESOURCES)
 set(PLATFORM_PROPERTIES)
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     add_definitions("-DSUPERNOVA_WEB")
-    add_definitions("-DSOKOL_GLES2")
+
+    if(GRAPHIC_BACKEND STREQUAL "gles2")
+        add_definitions("-DSOKOL_GLES2")
+        set(USE_WEBGL2 "-s USE_WEBGL2=0")
+    elseif(GRAPHIC_BACKEND STREQUAL "gles3")
+        add_definitions("-DSOKOL_GLES3")
+        set(USE_WEBGL2 "-s USE_WEBGL2=1")
+    endif()
+
     add_definitions("-DWITH_SDL_STATIC") # For SoLoud
 
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
@@ -65,14 +90,20 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
             ${EM_PRELOAD_FILES} \
             ${EM_ADDITIONAL_LINK_FLAGS} \
             -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\" \
-            -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\""
-            # Todo: "-s USE_WEBGL2=1" for WEBGL2
+            -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\" \
+            ${USE_WEBGL2}"
     )
 endif()
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
     add_definitions("-DSUPERNOVA_ANDROID")
-    add_definitions("-DSOKOL_GLES2")
+
+    if(GRAPHIC_BACKEND STREQUAL "gles2")
+        add_definitions("-DSOKOL_GLES2")
+    elseif(GRAPHIC_BACKEND STREQUAL "gles3")
+        add_definitions("-DSOKOL_GLES3")
+    endif()
+
     add_definitions("-D\"lua_getlocaledecpoint()='.'\"")
     add_definitions("-DLUA_ANSI")
     add_definitions("-DLUA_USE_C89")
@@ -99,8 +130,12 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DSUPERNOVA_SOKOL")
-    add_definitions("-DSOKOL_D3D11")
-    #add_definitions("-DSOKOL_GLCORE33")
+
+    if(GRAPHIC_BACKEND STREQUAL "glcore33")
+        add_definitions("-DSOKOL_GLCORE33")
+    elseif(GRAPHIC_BACKEND STREQUAL "d3d11")
+        add_definitions("-DSOKOL_D3D11")
+    endif()
 
     set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/$<CONFIG>/assets)
 
@@ -120,7 +155,10 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions("-DSUPERNOVA_SOKOL")
-    add_definitions("-DSOKOL_GLCORE33")
+
+    if(GRAPHIC_BACKEND STREQUAL "glcore33")
+        add_definitions("-DSOKOL_GLCORE33")
+    endif()
 
     set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
 
@@ -141,8 +179,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     link_directories(/usr/local/lib)
 
     add_definitions("-DSUPERNOVA_SOKOL")
-    #add_definitions("-DSOKOL_GLCORE33")
-    add_definitions("-DSOKOL_METAL")
+
+    if(GRAPHIC_BACKEND STREQUAL "glcore33")
+        add_definitions("-DSOKOL_GLCORE33")
+    elseif(GRAPHIC_BACKEND STREQUAL "metal")
+        add_definitions("-DSOKOL_METAL")
+    endif()
 
     set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
 

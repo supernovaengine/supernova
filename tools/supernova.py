@@ -108,10 +108,11 @@ def create_build_dir(name):
 @click.option('--appname', '-a', default='supernova-project', help="Project target name")
 @click.option('--output', '-o', type=click.Path(), help="Output directory")
 @click.option('--build/--no-build', '-b', default=False, help="Build or no build generated Xcode project")
+@click.option('--graphic-backend', '-g', type=click.Choice(['glcore33', 'gles2', 'gles3', 'metal', 'd3d11'], case_sensitive=False), help="Prefered graphic API")
 @click.option('--no-cpp-init', is_flag=True, help="No call C++ init on project start")
 @click.option('--no-lua-init', is_flag=True, help="No call Lua on project start")
 @click.option('--em-shell-file', type=click.Path(), help="Emscripten shell file")
-def build(platform, project, supernova, appname, output, build, no_lua_init, no_cpp_init, em_shell_file):
+def build(platform, project, supernova, appname, output, build, graphic_backend, no_lua_init, no_cpp_init, em_shell_file):
 
     projectRoot = os.path.abspath(project)
     supernovaRoot = os.path.abspath(supernova)
@@ -127,6 +128,9 @@ def build(platform, project, supernova, appname, output, build, no_lua_init, no_
         build_dir = create_build_dir(os.path.join("build",platform))
     else:
         build_dir = create_build_dir(output)
+
+    if graphic_backend==None:
+        graphic_backend=''
 
     if no_cpp_init:
         cmake_definitions.append("-DNO_CPP_INIT=1")
@@ -190,6 +194,7 @@ def build(platform, project, supernova, appname, output, build, no_lua_init, no_
     cmake_command = [
         "cmake",
         "-DPROJECT_ROOT="+projectRoot,
+        "-DGRAPHIC_BACKEND="+graphic_backend,
         "-DAPP_NAME="+appname,
         "-G", system_output,
         source_path,

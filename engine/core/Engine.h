@@ -30,6 +30,15 @@ namespace Supernova {
         Windows
     };
 
+    enum class GraphicBackend{
+        GLCORE33,
+        GLES2,
+        GLES3,
+        D3D11,
+        METAL,
+        WGPU
+    };
+
     class Engine {
         
     private:
@@ -123,6 +132,7 @@ namespace Supernova {
         static float getSceneUpdateTime();
         
         static Platform getPlatform();
+        static GraphicBackend getGraphicBackend();
         static float getFramerate();
         static float getDeltatime();
 

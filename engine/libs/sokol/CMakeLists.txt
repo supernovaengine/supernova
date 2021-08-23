@@ -32,16 +32,18 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     include_directories (/usr/local/include)
     link_directories(/usr/local/lib)
 
+    if(GRAPHIC_BACKEND STREQUAL "glcore33")
+        set(SOKOL_LINK_LIBRARIES "-framework OpenGL")
+    elseif(GRAPHIC_BACKEND STREQUAL "metal")
+        set(SOKOL_LINK_LIBRARIES "-framework Metal -framework MetalKit -framework Quartz")
+    endif()
+
     target_link_libraries(
         sokol
 
         "-framework Cocoa"
 
-        # For OpenGL
-        #"-framework OpenGL"
-
-        # For Metal
-        "-framework Metal -framework MetalKit -framework Quartz"
+        ${SOKOL_LINK_LIBRARIES}
 
         # For sokol_audio.h
         #"-framework AudioToolbox"

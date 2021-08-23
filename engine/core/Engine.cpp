@@ -210,6 +210,22 @@ Platform Engine::getPlatform(){
 #endif
 }
 
+GraphicBackend Engine::getGraphicBackend(){
+#if defined(SOKOL_GLCORE33)
+    return GraphicBackend::GLCORE33;
+#elif defined(SOKOL_GLES2)
+    return GraphicBackend::GLES2;
+#elif defined(SOKOL_GLES3)
+    return GraphicBackend::GLES3;
+#elif defined(SOKOL_D3D11)
+    return GraphicBackend::D3D11;
+#elif defined(SOKOL_METAL)
+    return GraphicBackend::METAL;
+#elif defined(SOKOL_WGPU)
+    return GraphicBackend::WGPU;
+#endif
+}
+
 float Engine::getFramerate(){
     return framerate;
 }

@@ -19,17 +19,19 @@ std::vector<std::string>& ShaderPool::getMissingShaders(){
 };
 
 std::string ShaderPool::getShaderLangStr(){
-	if (Engine::getPlatform() == Platform::Linux){
+	if (Engine::getGraphicBackend() == GraphicBackend::GLCORE33){
 		return "glsl330";
-	}else if (Engine::getPlatform() == Platform::Web){
+	}else if (Engine::getGraphicBackend() == GraphicBackend::GLES2){
 		return "glsl100";
-	}else if (Engine::getPlatform() == Platform::Android){
-		return "glsl100";
-	}else if (Engine::getPlatform() == Platform::MacOS){
-		return "msl21_macos";
-	}else if (Engine::getPlatform() == Platform::iOS){
-		return "msl21_ios";
-	}else if (Engine::getPlatform() == Platform::Windows){
+	}else if (Engine::getGraphicBackend() == GraphicBackend::GLES3){
+		return "glsl300es";
+	}else if (Engine::getGraphicBackend() == GraphicBackend::METAL){
+		if (Engine::getPlatform() == Platform::MacOS){
+			return "msl21_macos";
+		}else if (Engine::getPlatform() == Platform::iOS){
+			return "msl21_ios";
+		}
+	}else if (Engine::getGraphicBackend() == GraphicBackend::D3D11){
 		return "hlsl5";
 	}
 
