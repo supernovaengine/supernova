@@ -59,7 +59,7 @@ jobs:
         if: startsWith(matrix.config.os, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install libxi-dev libxcursor-dev ninja-build cmake
+          sudo apt-get install libxi-dev libxcursor-dev libgl1-mesa-dev ninja-build cmake
           ninja --version
           cmake --version
           gcc --version
