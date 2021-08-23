@@ -1,0 +1,39 @@
+name: Xcode Template
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    name: Build for ${{ matrix.config.name }}
+    runs-on: macOS-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config: 
+        - {
+            name: "iOS",
+            scheme: "Supernova iOS",
+            sdk: iphonesimulator
+          }
+        - {
+            name: "MacOS",
+            scheme: "Supernova macOS",
+            sdk: macosx
+          }
+
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Xcode version
+        run: /usr/bin/xcodebuild -version
+             
+      - name: Create assets dir if not exist
+        run: mkdir -p project/assets
+             
+      - name: Build with Xcode
+        run: |
+          cd workspaces/xcode/
+          xcodebuild build -sdk ${{ matrix.config.sdk }} -project Supernova.xcodeproj -configuration Debug -scheme ${{ matrix.config.scheme }}

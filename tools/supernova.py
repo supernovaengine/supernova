@@ -102,7 +102,7 @@ def create_build_dir(name):
     return build_dir
 
 @click.command()
-@click.option('--platform', '-p', required=True, type=click.Choice(['ios', 'web'], case_sensitive=False), help="Plataform build type")
+@click.option('--platform', '-p', required=True, type=click.Choice(['ios', 'web', 'linux', 'windows', 'macos'], case_sensitive=False), help="Plataform build type")
 @click.option('--project', '-s', default='../project', type=click.Path(), help="Source root path of project files")
 @click.option('--supernova', '-r', default='..', type=click.Path(), help="Supernova root directory")
 @click.option('--appname', '-a', default='supernova-project', help="Project target name")
@@ -117,7 +117,7 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
     projectRoot = os.path.abspath(project)
     supernovaRoot = os.path.abspath(supernova)
 
-    system_output = ""
+    cmake_generator = ""
     source_path = supernovaRoot
     cmake_definitions = []
 
@@ -129,8 +129,8 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
     else:
         build_dir = create_build_dir(output)
 
-    if graphic_backend==None:
-        graphic_backend=''
+    if graphic_backend!=None:
+        cmake_definitions.append("-DGRAPHIC_BACKEND="+graphic_backend)
 
     if no_cpp_init:
         cmake_definitions.append("-DNO_CPP_INIT=1")
@@ -153,9 +153,9 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
 
         from sys import platform
         if platform == "linux" or platform == "linux2" or platform == "darwin":
-            system_output = "Unix Makefiles"
+            cmake_generator = "Unix Makefiles"
         elif platform == "win32":
-            system_output = "MinGW Makefiles"
+            cmake_generator = "MinGW Makefiles"
         
         cmake_definitions.extend([
             "-DCMAKE_BUILD_TYPE=Debug",
@@ -167,14 +167,22 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
                 '-DEM_ADDITIONAL_LINK_FLAGS=--shell-file "' + em_shell_file + '"'
             ])
         
+####
+## Preparing Ninja (Linux, Windows, MacOS) environment
+####
+    if (platform == "linux" or platform == "windows"  or platform == "macos"):
 
+        cmake_generator = "Ninja"
+        build_config_mode = "Debug"
+
+        build_config = ["--config", build_config_mode]
 
 ####
 ## Preparing ios (Apple) environment
 ####
     if (platform == "ios"):
 
-        system_output = "Xcode"
+        cmake_generator = "Xcode"
         system_name = "iOS"
         OSX_SDK="iphoneos"
         build_config_mode = "Debug"
@@ -194,9 +202,8 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
     cmake_command = [
         "cmake",
         "-DPROJECT_ROOT="+projectRoot,
-        "-DGRAPHIC_BACKEND="+graphic_backend,
         "-DAPP_NAME="+appname,
-        "-G", system_output,
+        "-G", cmake_generator,
         source_path,
         ]
     cmake_command.extend(cmake_definitions)
