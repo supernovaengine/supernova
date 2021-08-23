@@ -1,4 +1,4 @@
-name: Xcode Template
+name: Xcode template
 
 on: [push, pull_request]
 

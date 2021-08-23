@@ -219,7 +219,7 @@ set(all_code_files
     ${PLATFORM_RESOURCES}
 )
 
-if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL Android)
+if(NOT CMAKE_SYSTEM_NAME STREQUAL Android)
     add_executable(
         ${APP_NAME}
         ${PLATFORM_EXEC_FLAGS}
@@ -240,6 +240,9 @@ if(DEFINED ASSETS_DEST_DIR)
         #COMMAND "${CMAKE_COMMAND}" -E rm -rf ${ASSETS_DEST_DIR} # for future use
         COMMAND "${CMAKE_COMMAND}" -E copy_directory ${PROJECT_ROOT}/assets ${ASSETS_DEST_DIR}
         )
+
+    install(TARGETS ${APP_NAME} RUNTIME DESTINATION bin)
+    install(DIRECTORY ${ASSETS_DEST_DIR} DESTINATION bin)
 endif()
 
 set_target_properties(
@@ -256,8 +259,3 @@ target_link_libraries(
     supernova
     ${PLATFORM_LIBS}
  )
-
-install(TARGETS ${APP_NAME}
-        RUNTIME DESTINATION bin)
-
-install(DIRECTORY ${ASSETS_DEST_DIR} DESTINATION bin)

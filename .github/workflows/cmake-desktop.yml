@@ -1,4 +1,4 @@
-name: CMake build for desktop
+name: CMake desktop
 
 on: push
     
@@ -6,7 +6,6 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Debug
   TARGET: supernova-project
-  TARGET_SOURCE_DIR: src
 
 jobs:
   build:
@@ -60,7 +59,7 @@ jobs:
         if: startsWith(matrix.config.os, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install ninja-build cmake
+          sudo apt-get install libxi-dev ninja-build cmake
           ninja --version
           cmake --version
           gcc --version
@@ -96,7 +95,7 @@ jobs:
 
       - name: Install Strip
         shell: bash
-        run: cmake --install build/${{env.TARGET_SOURCE_DIR}} --config ${{env.BUILD_TYPE}} --strip
+        run: cmake --install build --config ${{env.BUILD_TYPE}} --strip
         
       - name: List directories
         shell: bash
