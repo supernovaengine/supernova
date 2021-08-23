@@ -34,4 +34,4 @@ jobs:
       - name: Build with Xcode
         run: |
           cd workspaces/xcode/
-          xcodebuild build -sdk ${{ matrix.config.sdk }} -project Supernova.xcodeproj -configuration Debug -scheme ${{ matrix.config.scheme }}
+          xcodebuild build -sdk ${{ matrix.config.sdk }} -project Supernova.xcodeproj -configuration Debug -scheme "${{ matrix.config.scheme }}"
