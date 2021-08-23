@@ -166,11 +166,21 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
             cmake_definitions.extend([
                 '-DEM_ADDITIONAL_LINK_FLAGS=--shell-file "' + em_shell_file + '"'
             ])
+
+####
+## Preparing Visual Studio 16 2019 (Windows) environment
+####
+    if (platform == "windows"):
+
+        cmake_generator = "Visual Studio 16 2019"
+        build_config_mode = "Debug"
+
+        build_config = ["--config", build_config_mode]
         
 ####
-## Preparing Ninja (Linux, Windows, MacOS) environment
+## Preparing Ninja (Linux, MacOS) environment
 ####
-    if (platform == "linux" or platform == "windows"  or platform == "macos"):
+    if (platform == "linux" or platform == "macos"):
 
         cmake_generator = "Ninja"
         build_config_mode = "Debug"
