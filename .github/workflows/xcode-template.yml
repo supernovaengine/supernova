@@ -22,8 +22,6 @@ jobs:
             sdk: macosx
           }
 
-    runs-on: macOS-latest
-
     steps:
       - uses: actions/checkout@v2
 

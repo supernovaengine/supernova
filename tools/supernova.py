@@ -151,10 +151,10 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
             print ("Not found EMSCRIPTEN_ROOT or EMSCRIPTEN environment variable")
             sys.exit(os.EX_CONFIG)
 
-        from sys import platform
-        if platform == "linux" or platform == "linux2" or platform == "darwin":
+        from sys import platform as sys_platform
+        if sys_platform == "linux" or sys_platform == "linux2" or sys_platform == "darwin":
             cmake_generator = "Unix Makefiles"
-        elif platform == "win32":
+        elif sys_platform == "win32":
             cmake_generator = "MinGW Makefiles"
         
         cmake_definitions.extend([
