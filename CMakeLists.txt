@@ -139,6 +139,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         add_definitions("-DSOKOL_D3D11")
     endif()
 
+    add_definitions("-DWITH_MINIAUDIO") # For SoLoud
+
     set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/$<CONFIG>/assets)
 
     set(PLATFORM_EXEC_FLAGS WIN32)
@@ -161,6 +163,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if(GRAPHIC_BACKEND STREQUAL "glcore33")
         add_definitions("-DSOKOL_GLCORE33")
     endif()
+
+    add_definitions("-DWITH_MINIAUDIO") # For SoLoud
 
     set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
 
@@ -188,6 +192,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         add_definitions("-DSOKOL_METAL")
     endif()
 
+    add_definitions("-DWITH_MINIAUDIO") # For SoLoud
+
     set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
 
     set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
@@ -200,6 +206,69 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     list(APPEND PLATFORM_LIBS
         
     )
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    add_definitions("-DSUPERNOVA_APPLE")
+
+    if(GRAPHIC_BACKEND STREQUAL "metal")
+        add_definitions("-DSOKOL_METAL")
+    endif()
+
+    add_definitions("-DWITH_MINIAUDIO") # For SoLoud
+
+    set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/apple)
+
+    set(APP_BUNDLE_IDENTIFIER "org.supernovaengine.supernova")
+
+    set(PRODUCT_NAME ${APP_NAME})
+    set(EXECUTABLE_NAME ${APP_NAME})
+
+    set(MACOSX_BUNDLE_EXECUTABLE_NAME ${APP_NAME})
+    set(MACOSX_BUNDLE_INFO_STRING ${APP_BUNDLE_IDENTIFIER})
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER ${APP_BUNDLE_IDENTIFIER})
+    set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_BUNDLE_IDENTIFIER})
+    set(MACOSX_BUNDLE_ICON_FILE "")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING "1.0")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
+    set(MACOSX_BUNDLE_COPYRIGHT "(c) 2021 Eduardo Doria")
+
+    include_directories (/System/Library/Frameworks)
+
+    list(APPEND PLATFORM_SOURCE
+        ${PLATFORM_ROOT}/ios/main.m
+        ${PLATFORM_ROOT}/ios/AppDelegate.h
+        ${PLATFORM_ROOT}/ios/AppDelegate.m
+        ${PLATFORM_ROOT}/ios/EngineView.h
+        ${PLATFORM_ROOT}/ios/EngineView.mm
+        ${PLATFORM_ROOT}/ios/ViewController.h
+        ${PLATFORM_ROOT}/ios/ViewController.mm
+        ${PLATFORM_ROOT}/Renderer.h
+        ${PLATFORM_ROOT}/Renderer.mm
+        ${PLATFORM_ROOT}/SupernovaApple.h
+        ${PLATFORM_ROOT}/SupernovaApple.mm
+    )
+
+    list(APPEND PLATFORM_RESOURCES
+        ${PLATFORM_ROOT}/ios/LaunchScreen.storyboard
+        ${PLATFORM_ROOT}/ios/Main.storyboard
+    )
+
+    #find_library(UIKIT_LIBRARY UIKit)
+    #find_library(OPENGLES_LIBRARY OpenGLES)
+    #find_library(AV_FOUNDATION_LIBRARY AVFoundation)
+    #find_library(QUARTZCORE_LIBRARY QuartzCore)
+    #find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+
+    #list(APPEND PLATFORM_LIBS
+    #    ${UIKIT_LIBRARY} ${OPENGLES_LIBRARY} ${AV_FOUNDATION_LIBRARY} ${QUARTZCORE_LIBRARY} ${AUDIOTOOLBOX_LIBRARY}
+    #)
+
+    list(APPEND PLATFORM_PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST "${PLATFORM_ROOT}/ios/plist.in"
+    )
+
 endif()
 
 include_directories (${PLATFORM_ROOT})
