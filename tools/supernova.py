@@ -168,7 +168,7 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
             ])
 
 ####
-## Preparing Visual Studio 16 2019 (Windows) environment
+## Preparing Visual Studio (Windows) environment
 ####
     if (platform == "windows"):
 

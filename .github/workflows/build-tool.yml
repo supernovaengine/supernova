@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: Build for ${{ matrix.config.name }}
+    name: Build for ${{ matrix.config.name }} using ${{ matrix.config.backend_name }}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -12,23 +12,52 @@ jobs:
         config: 
         - {
             name: "Windows",
+            backend_name: "DirectX",
             os: windows-latest,
-            platform: "windows"
+            platform: "windows",
+            backend: "d3d11"
+          }
+        - {
+            name: "Windows",
+            backend_name: "OpenGL",
+            os: windows-latest,
+            platform: "windows",
+            backend: "glcore33"
           }
         - {
             name: "Ubuntu",
+            backend_name: "OpenGL",
             os: ubuntu-latest,
-            platform: "linux"
+            platform: "linux",
+            backend: "glcore33"
           }
         - {
             name: "macOS",
+            backend_name: "Metal",
             os: macos-latest,
-            platform: "macos"
+            platform: "macos",
+            backend: "metal"
+          }
+        - {
+            name: "macOS",
+            backend_name: "OpenGL",
+            os: macos-latest,
+            platform: "macos",
+            backend: "glcore33"
           }
         - {
             name: "Web (Emscripten)",
+            backend_name: "WebGL",
             os: ubuntu-latest,
-            platform: "web"
+            platform: "web",
+            backend: "gles2"
+          }
+          - {
+            name: "Web (Emscripten)",
+            backend_name: "WebGL 2",
+            os: ubuntu-latest,
+            platform: "web",
+            backend: "gles3"
           }
 
     steps:
@@ -68,4 +97,4 @@ jobs:
       - name: Build
         run: |
           cd tools/
-          python3 supernova.py --build --platform ${{ matrix.config.platform }}
+          python3 supernova.py --build --platform ${{ matrix.config.platform }} --graphic-backend ${{ matrix.config.backend }}
