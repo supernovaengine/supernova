@@ -52,7 +52,7 @@ jobs:
             platform: "web",
             backend: "gles2"
           }
-          - {
+        - {
             name: "Web (Emscripten)",
             backend_name: "WebGL 2",
             os: ubuntu-latest,
