@@ -22,26 +22,35 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_options(sokol PUBLIC "-pthread")
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set_source_files_properties(sokol.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 
-    set(CMAKE_XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC "YES")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
+
+    set_target_properties(
+        sokol
+        PROPERTIES
+        XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC "YES"
+    )
 
     include_directories (/usr/local/include)
     link_directories(/usr/local/lib)
 
-    if(GRAPHIC_BACKEND STREQUAL "glcore33")
-        set(SOKOL_LINK_LIBRARIES "-framework OpenGL")
-    elseif(GRAPHIC_BACKEND STREQUAL "metal")
-        set(SOKOL_LINK_LIBRARIES "-framework Metal -framework MetalKit -framework Quartz")
+    if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        if(GRAPHIC_BACKEND STREQUAL "glcore33")
+            set(SOKOL_LINK_LIBRARIES "-framework Cocoa -framework OpenGL")
+        elseif(GRAPHIC_BACKEND STREQUAL "metal")
+            set(SOKOL_LINK_LIBRARIES "-framework Cocoa -framework Metal -framework MetalKit -framework Quartz")
+        endif()
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+        if(GRAPHIC_BACKEND STREQUAL "metal")
+            set(SOKOL_LINK_LIBRARIES "-framework UIKit -framework Metal -framework MetalKit")
+        endif()
     endif()
 
     target_link_libraries(
         sokol
-
-        "-framework Cocoa"
 
         ${SOKOL_LINK_LIBRARIES}
 

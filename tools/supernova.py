@@ -102,7 +102,7 @@ def create_build_dir(name):
     return build_dir
 
 @click.command()
-@click.option('--platform', '-p', required=True, type=click.Choice(['ios', 'web', 'linux', 'windows', 'macos'], case_sensitive=False), help="Plataform build type")
+@click.option('--platform', '-p', required=True, type=click.Choice(['web', 'linux', 'windows', 'macos', 'macos-xcode', 'ios-xcode'], case_sensitive=False), help="Plataform build type")
 @click.option('--project', '-s', default='../project', type=click.Path(), help="Source root path of project files")
 @click.option('--supernova', '-r', default='..', type=click.Path(), help="Supernova root directory")
 @click.option('--appname', '-a', default='supernova-project', help="Project target name")
@@ -188,9 +188,32 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
         build_config = ["--config", build_config_mode]
 
 ####
+## Preparing macOS (Xcode generator) environment
+####
+    if (platform == "macos-xcode"):
+
+        cmake_generator = "Xcode"
+        build_config_mode = "Debug"
+
+        build_config = ["--config", build_config_mode]    
+
+    #    cmake_generator = "Xcode"
+    #    system_name = "macOS"
+    #    OSX_SDK="macosx"
+    #    build_config_mode = "Debug"
+    #    build_sdk = "macosx"
+#
+    #    build_config = ["--config", build_config_mode]
+    #    native_build_config = ["-sdk", build_sdk]
+    #    cmake_definitions.extend([
+    #        "-DCMAKE_SYSTEM_NAME="+system_name,
+    #        "-DCMAKE_OSX_SYSROOT="+OSX_SDK
+    #    ])
+
+####
 ## Preparing ios (Apple) environment
 ####
-    if (platform == "ios"):
+    if (platform == "ios-xcode"):
 
         cmake_generator = "Xcode"
         system_name = "iOS"
@@ -223,7 +246,7 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
 ####
 ## Adding folder reference to iOS project
 ####
-    if (platform == "ios"):
+    if (platform == "ios-xcode" or platform == "macos-xcode"):
         xcode_project = os.path.join(appname+".xcodeproj", "project.pbxproj")
         assets_path = os.path.join(projectRoot, "assets")
         lua_path = os.path.join(projectRoot, "lua")

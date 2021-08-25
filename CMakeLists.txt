@@ -33,6 +33,8 @@ if(NOT GRAPHIC_BACKEND)
         set(GRAPHIC_BACKEND "glcore33")
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         set(GRAPHIC_BACKEND "metal")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+        set(GRAPHIC_BACKEND "metal")
     else()
         message(FATAL_ERROR "GRAPHIC_BACKEND is not set")
     endif()
@@ -181,11 +183,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    include_directories (/usr/local/include)
-    link_directories(/usr/local/lib)
-
-    add_definitions("-DSUPERNOVA_SOKOL")
-
     if(GRAPHIC_BACKEND STREQUAL "glcore33")
         add_definitions("-DSOKOL_GLCORE33")
     elseif(GRAPHIC_BACKEND STREQUAL "metal")
@@ -194,18 +191,55 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 
     add_definitions("-DWITH_MINIAUDIO") # For SoLoud
 
-    set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
 
-    set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
+    if (CMAKE_GENERATOR STREQUAL "Xcode")
+        add_definitions("-DSUPERNOVA_APPLE")
 
-    list(APPEND PLATFORM_SOURCE
-        ${PLATFORM_ROOT}/SupernovaSokol.cpp
-        ${PLATFORM_ROOT}/main.cpp
-    )
-   
-    list(APPEND PLATFORM_LIBS
-        
-    )
+        set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/apple)
+
+        set(APP_BUNDLE_IDENTIFIER "org.supernovaengine.supernova")
+
+        set(PLATFORM_EXEC_FLAGS MACOSX_BUNDLE)
+
+        include_directories (/System/Library/Frameworks)
+
+        list(APPEND PLATFORM_SOURCE
+            ${PLATFORM_ROOT}/macos/main.m
+            ${PLATFORM_ROOT}/macos/AppDelegate.h
+            ${PLATFORM_ROOT}/macos/AppDelegate.m
+            ${PLATFORM_ROOT}/macos/EngineView.h
+            ${PLATFORM_ROOT}/macos/EngineView.mm
+            ${PLATFORM_ROOT}/macos/ViewController.h
+            ${PLATFORM_ROOT}/macos/ViewController.m
+            ${PLATFORM_ROOT}/Renderer.h
+            ${PLATFORM_ROOT}/Renderer.mm
+            ${PLATFORM_ROOT}/SupernovaApple.h
+            ${PLATFORM_ROOT}/SupernovaApple.mm
+        )
+
+        list(APPEND PLATFORM_RESOURCES
+            ${PLATFORM_ROOT}/macos/Main.storyboard
+        )
+
+        list(APPEND PLATFORM_PROPERTIES
+            MACOSX_BUNDLE_INFO_PLIST "${PLATFORM_ROOT}/macos/Info.plist"
+            XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC "YES"
+            #XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${PLATFORM_ROOT}/macos/Supernova_macOS.entitlements" # error EXC_BAD_INSTRUCTION
+        )
+    else()
+        add_definitions("-DSUPERNOVA_SOKOL")
+
+        set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
+
+        set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
+
+        list(APPEND PLATFORM_SOURCE
+            ${PLATFORM_ROOT}/SupernovaSokol.cpp
+            ${PLATFORM_ROOT}/main.cpp
+        )
+    endif()
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
@@ -221,19 +255,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
 
     set(APP_BUNDLE_IDENTIFIER "org.supernovaengine.supernova")
 
-    set(PRODUCT_NAME ${APP_NAME})
-    set(EXECUTABLE_NAME ${APP_NAME})
-
-    set(MACOSX_BUNDLE_EXECUTABLE_NAME ${APP_NAME})
-    set(MACOSX_BUNDLE_INFO_STRING ${APP_BUNDLE_IDENTIFIER})
-    set(MACOSX_BUNDLE_GUI_IDENTIFIER ${APP_BUNDLE_IDENTIFIER})
-    set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_BUNDLE_IDENTIFIER})
-    set(MACOSX_BUNDLE_ICON_FILE "")
-    set(MACOSX_BUNDLE_LONG_VERSION_STRING "1.0")
-    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0")
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "1.0")
-    set(MACOSX_BUNDLE_COPYRIGHT "(c) 2021 Eduardo Doria")
-
     include_directories (/System/Library/Frameworks)
 
     list(APPEND PLATFORM_SOURCE
@@ -243,7 +264,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
         ${PLATFORM_ROOT}/ios/EngineView.h
         ${PLATFORM_ROOT}/ios/EngineView.mm
         ${PLATFORM_ROOT}/ios/ViewController.h
-        ${PLATFORM_ROOT}/ios/ViewController.mm
+        ${PLATFORM_ROOT}/ios/ViewController.m
         ${PLATFORM_ROOT}/Renderer.h
         ${PLATFORM_ROOT}/Renderer.mm
         ${PLATFORM_ROOT}/SupernovaApple.h
@@ -255,18 +276,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
         ${PLATFORM_ROOT}/ios/Main.storyboard
     )
 
-    #find_library(UIKIT_LIBRARY UIKit)
-    #find_library(OPENGLES_LIBRARY OpenGLES)
-    #find_library(AV_FOUNDATION_LIBRARY AVFoundation)
-    #find_library(QUARTZCORE_LIBRARY QuartzCore)
-    #find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
-
-    #list(APPEND PLATFORM_LIBS
-    #    ${UIKIT_LIBRARY} ${OPENGLES_LIBRARY} ${AV_FOUNDATION_LIBRARY} ${QUARTZCORE_LIBRARY} ${AUDIOTOOLBOX_LIBRARY}
-    #)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
 
     list(APPEND PLATFORM_PROPERTIES
-        MACOSX_BUNDLE_INFO_PLIST "${PLATFORM_ROOT}/ios/plist.in"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER ${APP_BUNDLE_IDENTIFIER}
+        MACOSX_BUNDLE_INFO_PLIST "${PLATFORM_ROOT}/ios/Info.plist"
+        XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC "YES"
     )
 
 endif()

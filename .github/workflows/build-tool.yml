@@ -46,6 +46,20 @@ jobs:
             backend: "glcore33"
           }
         - {
+            name: "macOS Xcode",
+            backend_name: "Metal",
+            os: macos-latest,
+            platform: "macos-xcode",
+            backend: "metal"
+          }
+        - {
+            name: "iOS Xcode",
+            backend_name: "Metal",
+            os: macos-latest,
+            platform: "ios-xcode",
+            backend: "metal"
+          }
+        - {
             name: "Web (Emscripten)",
             backend_name: "WebGL",
             os: ubuntu-latest,
