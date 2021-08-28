@@ -54,6 +54,15 @@ def get_default_shaders():
     s += "sky"
     return s
 
+def get_default_langs():
+    l =  "glsl330;"
+    l += "glsl300es;"
+    l += "glsl100;"
+    l += "msl21_ios;"
+    l += "msl21_macos;"
+    l += "hlsl5"
+    return l
+
 def get_bin_exec():
     plt = platform.system()
 
@@ -74,50 +83,53 @@ def get_bin_exec():
     return outpath
 
 @click.command()
-@click.option('--shaders', '-s', default=get_default_shaders(), help="Target shader language, seperated by ';'")
-@click.option('--lang', '-l', required=True, help="Target shader language")
+@click.option('--shaders', '-s', default=get_default_shaders(), help="Target shader type, seperated by ';'")
+@click.option('--langs', '-l', default=get_default_langs(), required=True, help="Target shader language, seperated by ';'")
 @click.option('--project', '-p', default='../project', type=click.Path(), help="Source root path of project files")
 @click.option('--max-lights', '-ml', default=6, type=int, help="Value of MAX_LIGHTS macro")
 @click.option('--max-shadowsmap', default=6, type=int, help="Value of MAX_SHADOWSMAP macro")
 @click.option('--max-shadowscubemap', default=1, type=int, help="Value of MAX_SHADOWSCUBEMAP macro")
 @click.option('--max-shadowcascades', default=4, type=int, help="Value of MAX_SHADOWCASCADES macro")
-def generate(shaders, lang, project, max_lights, max_shadowsmap, max_shadowscubemap, max_shadowcascades):
+def generate(shaders, langs, project, max_lights, max_shadowsmap, max_shadowscubemap, max_shadowcascades):
 
     shadersList = [x.strip() for x in shaders.split(';')]
+    langsList = [x.strip() for x in langs.split(';')]
 
-    for shader in shadersList:
+    for lang in langsList:
 
-        print('Generating', shader, 'for', lang)
+        for shader in shadersList:
 
-        splitShader = shader.split('_')
-        shaderType = splitShader[0]
-        properties = ''
-        if len(splitShader) >= 2:
-            properties = splitShader[1]
+            print('Generating', shader, 'for', lang)
 
-        defines = ''
-        defines += 'MAX_LIGHTS='+str(max_lights)
-        defines += ';MAX_SHADOWSMAP='+str(max_shadowsmap)
-        defines += ';MAX_SHADOWSCUBEMAP='+str(max_shadowscubemap)
-        defines += ';MAX_SHADOWCASCADES='+str(max_shadowcascades)
+            splitShader = shader.split('_')
+            shaderType = splitShader[0]
+            properties = ''
+            if len(splitShader) >= 2:
+                properties = splitShader[1]
 
-        while properties != '':
-            if len(defines) > 0:
-                defines += ';'
-            defines += get_define(properties[:3])
-            properties = properties[3:]
+            defines = ''
+            defines += 'MAX_LIGHTS='+str(max_lights)
+            defines += ';MAX_SHADOWSMAP='+str(max_shadowsmap)
+            defines += ';MAX_SHADOWSCUBEMAP='+str(max_shadowscubemap)
+            defines += ';MAX_SHADOWCASCADES='+str(max_shadowcascades)
 
-        vert = get_vert(shaderType)
-        frag = get_frag(shaderType)
-        output = get_output(shader, project, lang)
+            while properties != '':
+                if len(defines) > 0:
+                    defines += ';'
+                defines += get_define(properties[:3])
+                properties = properties[3:]
 
-        #print(get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines)
-        command = subprocess.run([get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines], capture_output=True)
+            vert = get_vert(shaderType)
+            frag = get_frag(shaderType)
+            output = get_output(shader, project, lang)
 
-        sys.stdout.buffer.write(command.stdout)
-        sys.stderr.buffer.write(command.stderr)
-        if command.returncode != 0:
-            sys.exit(command.returncode)
+            #print(get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines)
+            command = subprocess.run([get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines], capture_output=True)
+
+            sys.stdout.buffer.write(command.stdout)
+            sys.stderr.buffer.write(command.stderr)
+            if command.returncode != 0:
+                sys.exit(command.returncode)
 
 if __name__ == '__main__':
     generate()

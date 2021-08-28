@@ -57,14 +57,43 @@ uniform u_fs_pbrParams {
     in vec4 v_lightProjPos[MAX_SHADOWSMAP];
     in float v_clipSpacePosZ;
 
+    #if MAX_SHADOWSMAP >= 1
     uniform sampler2D u_shadowMap1;
+    #endif
+    #if MAX_SHADOWSMAP >= 2
     uniform sampler2D u_shadowMap2;
+    #endif
+    #if MAX_SHADOWSMAP >= 3
     uniform sampler2D u_shadowMap3;
+    #endif
+    #if MAX_SHADOWSMAP >= 4
     uniform sampler2D u_shadowMap4;
+    #endif
+    #if MAX_SHADOWSMAP >= 5
     uniform sampler2D u_shadowMap5;
+    #endif
+    #if MAX_SHADOWSMAP >= 6
     uniform sampler2D u_shadowMap6;
+    #endif
+    #if MAX_SHADOWSMAP >= 7
+    uniform sampler2D u_shadowMap7;
+    #endif
+    #if MAX_SHADOWSMAP >= 8
+    uniform sampler2D u_shadowMap8;
+    #endif
 
+    #if MAX_SHADOWSCUBEMAP >= 1
     uniform samplerCube u_shadowCubeMap1;
+    #endif
+    #if MAX_SHADOWSCUBEMAP >= 2
+    uniform samplerCube u_shadowCubeMap2;
+    #endif
+    #if MAX_SHADOWSCUBEMAP >= 3
+    uniform samplerCube u_shadowCubeMap3;
+    #endif
+    #if MAX_SHADOWSCUBEMAP >= 4
+    uniform samplerCube u_shadowCubeMap4;
+    #endif
 #endif
 
 struct MaterialInfo{

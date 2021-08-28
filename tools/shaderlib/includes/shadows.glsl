@@ -41,17 +41,37 @@ Shadow getShadowCubeConf(int index){
 
 vec4 getShadowMap(int index, vec2 coords) {
     if (index == 0){
+        #if MAX_SHADOWSMAP >= 1
         return texture(u_shadowMap1, coords);
+        #endif
     }else if (index == 1){
+        #if MAX_SHADOWSMAP >= 2
         return texture(u_shadowMap2, coords);
+        #endif
     }else if (index == 2){
+        #if MAX_SHADOWSMAP >= 3
         return texture(u_shadowMap3, coords);
+        #endif
     }else if (index == 3){
+        #if MAX_SHADOWSMAP >= 4
         return texture(u_shadowMap4, coords);
+        #endif
     }else if (index == 4){
+        #if MAX_SHADOWSMAP >= 5
         return texture(u_shadowMap5, coords);
+        #endif
     }else if (index == 5){
+        #if MAX_SHADOWSMAP >= 6
         return texture(u_shadowMap6, coords);
+        #endif
+    }else if (index == 6){
+        #if MAX_SHADOWSMAP >= 7
+        return texture(u_shadowMap7, coords);
+        #endif
+    }else if (index == 7){
+        #if MAX_SHADOWSMAP >= 8
+        return texture(u_shadowMap8, coords);
+        #endif
     }
 
     return vec4(0.0);
@@ -60,7 +80,21 @@ vec4 getShadowMap(int index, vec2 coords) {
 vec4 getShadowCubeMap(int index, vec3 coords) {
     index -= MAX_SHADOWSMAP;
     if (index == 0){
+        #if MAX_SHADOWSCUBEMAP >= 1
         return texture(u_shadowCubeMap1, coords);
+        #endif
+    }else if (index == 1){
+        #if MAX_SHADOWSCUBEMAP >= 2
+        return texture(u_shadowCubeMap2, coords);
+        #endif
+    }else if (index == 2){
+        #if MAX_SHADOWSCUBEMAP >= 3
+        return texture(u_shadowCubeMap3, coords);
+        #endif
+    }else if (index == 3){
+        #if MAX_SHADOWSCUBEMAP >= 4
+        return texture(u_shadowCubeMap4, coords);
+        #endif
     }
 
     return vec4(0.0);
