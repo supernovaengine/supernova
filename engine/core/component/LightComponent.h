@@ -35,15 +35,15 @@ namespace Supernova{
         float innerConeCos = 0.0; //half cone
         float outerConeCos = 0.0;
 
-        bool shadows = true;
-        LightCamera cameras[6];
-        FramebufferRender framebuffer[MAX_SHADOWCASCADES];
-        int shadowMapIndex;
-
+        bool shadows = false;
         float shadowBias = 0.0001f;
         unsigned int mapResolution = 2048;
         Vector2 shadowCameraNearFar = Vector2(0.0f, 0.0f); // when zero it gets value from scene camera or light range
         unsigned int numShadowCascades = 3;
+
+        LightCamera cameras[6];
+        FramebufferRender framebuffer[MAX_SHADOWCASCADES];
+        int shadowMapIndex;
     };
     
 }

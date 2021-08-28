@@ -1,3 +1,8 @@
+//#include "Supernova.h"
+//using namespace Supernova;
+//void init(){
+//}
+
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -55,18 +60,21 @@ void init(){
     lightDir.setRange(0.0);
     lightDir.setPosition(0.0f, 0.0f, 0.0f);
     lightDir.setIntensity(1.0);
+    lightDir.setShadows(true);
 
     //lightDir2.setType(LightType::DIRECTIONAL);
     //lightDir2.setDirection(-0.5f, -0.5, 0.0);
     //lightDir2.setRange(0.0);
     //lightDir2.setPosition(0.0f, 0.0f, 0.0f);
     //lightDir2.setIntensity(1.0);
+    //lightDir2.setShadows(false);
 
     lightPoint.setType(LightType::POINT);
     lightPoint.setDirection(0.0, 0.0, 0.0);
     lightPoint.setRange(0.0);
     lightPoint.setPosition(300.0f, 80.0f, 80.0f);
     lightPoint.setIntensity(100000.0);
+    lightPoint.setShadows(true);
 
     lightSpot.setType(LightType::SPOT);
     lightSpot.setDirection(0.0f, -0.7, 0.3);
@@ -74,6 +82,7 @@ void init(){
     lightSpot.setPosition(0.0f, 150.0f/200.0, 0.0f);
     lightSpot.setIntensity(100000.0);
     lightSpot.setConeAngle(50, 70);
+    lightSpot.setShadows(true);
     carro.addChild(&lightSpot);
 
     sky.setTextureLeft("ely_hills/hills_lf.tga");
@@ -98,66 +107,61 @@ void init(){
     carro.setScale(200);
 
     carro.setName("carro");
- /*
-    child1.addVertex(-50.0f,  -50.0f);
-    child1.addVertex(50.0f,  -50.0f);
-    child1.addVertex(-50.0f,  50.0f);
-    child1.addVertex(-50.0f,  50.0f);
-    child1.addVertex(50.0f,  -50.0f);
-    child1.addVertex(50.0f,  50.0f);
-    child1.generateTexcoords();
-    child1.setTexture("pista.png");
-    child1.setName("child1");
-*/
+ 
+    //child1.addVertex(-50.0f,  -50.0f);
+    //child1.addVertex(50.0f,  -50.0f);
+    //child1.addVertex(-50.0f,  50.0f);
+    //child1.addVertex(-50.0f,  50.0f);
+    //child1.addVertex(50.0f,  -50.0f);
+    //child1.addVertex(50.0f,  50.0f);
+    //child1.generateTexcoords();
+    //child1.setTexture("pista.png");
+    //child1.setName("child1");
 
     plane.create(4000, 4000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);
     plane.setTexture("pista.png");
     plane.setPosition(-2000,0,-2000);
 
-/*   
-    std::vector<std::string> teste = System::instance().args;
+   
+//    std::vector<std::string> teste = System::instance().args;
+//
+//    child2.addVertex(0.0f,  1.0f);
+//    child2.addVertex(0.5f,  -1.0f);
+//    child2.addVertex(-0.5f,  -1.0f);
+//    child2.setName("child2");
+// 
+//    child11= new Mesh(&scene);
+//    child11->addVertex(0.0f,  1.0f);
+//    child11->addVertex(0.5f,  -1.0f);
+//    child11->addVertex(-0.5f,  -1.0f);
+//    child11->setName("child11");
+//
+//    chefao.addVertex(0.0f,  1.0f);
+//    chefao.addVertex(0.5f,  -0.5f);
+//    chefao.addVertex(-0.5f,  -0.5f);
+//    chefao.setName("chefao");
+//
+//    //objeto.addChild(&child1);
+//    chefao.addChild(&child1);
+//    chefao.addChild(&child2);
+//    child1.addChild(child11);
+//    objeto.addChild(&chefao);
+//
+//    std::vector<int> vetor;
+//    vetor.push_back(0);
+//    vetor.push_back(1);
+//    vetor.push_back(2);
+//    vetor.push_back(0);
+//    vetor.push_back(0);
+//    vetor.push_back(3);
+//    vetor.push_back(4);
+//    vetor.push_back(5);
+//    vetor.push_back(6);
+//    vetor.push_back(7);
+//
+//    move_range<int>(3, 2, 6, vetor);
 
-    child2.addVertex(0.0f,  1.0f);
-    child2.addVertex(0.5f,  -1.0f);
-    child2.addVertex(-0.5f,  -1.0f);
-    child2.setName("child2");
-    */
-    /*
-    child11= new Mesh(&scene);
-    child11->addVertex(0.0f,  1.0f);
-    child11->addVertex(0.5f,  -1.0f);
-    child11->addVertex(-0.5f,  -1.0f);
-    child11->setName("child11");
-
-    chefao.addVertex(0.0f,  1.0f);
-    chefao.addVertex(0.5f,  -0.5f);
-    chefao.addVertex(-0.5f,  -0.5f);
-    chefao.setName("chefao");
-    */
-/*
-    //objeto.addChild(&child1);
-    chefao.addChild(&child1);
-    chefao.addChild(&child2);
-    child1.addChild(child11);
-    objeto.addChild(&chefao);
-*/
-
-/*
-    std::vector<int> vetor;
-    vetor.push_back(0);
-    vetor.push_back(1);
-    vetor.push_back(2);
-    vetor.push_back(0);
-    vetor.push_back(0);
-    vetor.push_back(3);
-    vetor.push_back(4);
-    vetor.push_back(5);
-    vetor.push_back(6);
-    vetor.push_back(7);
-
-    move_range<int>(3, 2, 6, vetor);
-*/
     //Engine::setScalingMode(Scaling::LETTERBOX);
     
     Engine::setAllowEventsOutCanvas(true);

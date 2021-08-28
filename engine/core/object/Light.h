@@ -26,6 +26,12 @@ namespace Supernova{
         void setIntensity(float intensity);
 
         void setConeAngle(float inner, float outer);
+
+        void setShadows(bool shadows);
+        void setBias(float bias);
+        void setShadowMapSize(unsigned int size);
+        void setShadowCameraNearFar(float near, float far);
+        void setNumCascades(unsigned int numCascades);
     };
 }
 

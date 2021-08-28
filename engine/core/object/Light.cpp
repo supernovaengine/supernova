@@ -69,3 +69,33 @@ void Light::setConeAngle(float inner, float outer){
     lightcomp.innerConeCos = cos(Angle::defaultToRad(inner / 2));
     lightcomp.outerConeCos = cos(Angle::defaultToRad(outer / 2));
 }
+
+void Light::setShadows(bool shadows){
+    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+
+    lightcomp.shadows = shadows;
+}
+
+void Light::setBias(float bias){
+    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    
+    lightcomp.shadowBias = bias;
+}
+
+void Light::setShadowMapSize(unsigned int size){
+    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    
+    lightcomp.mapResolution = size;
+}
+
+void Light::setShadowCameraNearFar(float near, float far){
+    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    
+    lightcomp.shadowCameraNearFar = Vector2(near, far);
+}
+
+void Light::setNumCascades(unsigned int numCascades){
+    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    
+    lightcomp.numShadowCascades = numCascades;
+}

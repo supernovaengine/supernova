@@ -8,6 +8,7 @@ using namespace Supernova;
 Scene::Scene(){
 	registerComponent<MeshComponent>();
 	registerComponent<SkyComponent>();
+	registerComponent<SpriteComponent>();
     registerComponent<Transform>();
 	registerComponent<CameraComponent>();
 	registerComponent<LightComponent>();

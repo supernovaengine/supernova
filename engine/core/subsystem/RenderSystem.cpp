@@ -890,7 +890,7 @@ void RenderSystem::draw(){
 		for (int l = 0; l < lights->size(); l++){
 			LightComponent& light = lights->getComponentFromIndex(l);
 
-			if (light.intensity > 0){
+			if (light.intensity > 0 && light.shadows){
 				size_t cameras = 1;
 				if (light.type == LightType::POINT){
 					cameras = 6;

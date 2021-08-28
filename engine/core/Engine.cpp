@@ -282,7 +282,8 @@ void Engine::systemInit(int argc, char* argv[]){
 void Engine::systemViewLoaded(){
     SystemRender::setup();
     onViewLoaded.call();
-    mainScene->load();
+    if (getScene())
+        mainScene->load();
 }
 
 void Engine::systemViewChanged(){
