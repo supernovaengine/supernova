@@ -4,6 +4,7 @@
 #include "SubSystem.h"
 #include "component/MeshComponent.h"
 #include "component/SkyComponent.h"
+#include "component/SpriteComponent.h"
 #include "component/CameraComponent.h"
 #include "component/LightComponent.h"
 #include "component/Transform.h"
@@ -94,6 +95,8 @@ namespace Supernova{
 		bool loadMesh(MeshComponent& mesh);
 		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform);
 		void drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix);
+
+		bool loadSprite(SpriteComponent& sprite);
 
 		bool loadSky(SkyComponent& sky);
 		void drawSky(SkyComponent& sky);

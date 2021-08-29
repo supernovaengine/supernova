@@ -15,7 +15,6 @@ namespace Supernova{
 
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
-        ShaderType shaderType;
         int slotVSParams = -1;
 
         Texture texture;

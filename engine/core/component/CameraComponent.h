@@ -14,7 +14,7 @@ namespace Supernova{
 
     struct CameraComponent{
 
-        CameraType type = CameraType::CAMERA_PERSPECTIVE;
+        CameraType type = CameraType::CAMERA_2D;
         
         Matrix4 projectionMatrix;
         Matrix4 viewMatrix;

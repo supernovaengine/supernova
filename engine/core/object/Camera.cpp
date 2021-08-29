@@ -37,7 +37,7 @@ Camera::Camera(Scene* scene): Object(scene){
     cameraComponent.perspectiveNear = 1;
     cameraComponent.perspectiveFar = 2000;
 
-    cameraComponent.type = CameraType::CAMERA_PERSPECTIVE;
+    cameraComponent.type = CameraType::CAMERA_2D;
 }
 
 void Camera::activate(){
@@ -74,6 +74,16 @@ void Camera::setPerspective(float y_fov, float aspect, float near, float far){
     camera.automatic = false;
 
     updateCamera(camera);
+}
+
+void Camera::setType(CameraType type){
+    CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+    
+    if (camera.type != type){
+        camera.type = type;
+
+        updateCamera(camera);
+    }
 }
 
 void Camera::setView(Vector3 view){

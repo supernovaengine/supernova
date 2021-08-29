@@ -15,9 +15,8 @@ namespace Supernova{
         Buffer* buffer;
         Buffer* indices;
 
-        //ObjectRender render;
-        //std::shared_ptr<ShaderRender> shader;
-        //ShaderType shaderType;
+        ObjectRender render;
+        std::shared_ptr<ShaderRender> shader;
         //int slotVSParams = -1;
 
         //Texture texture;

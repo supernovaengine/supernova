@@ -477,6 +477,28 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 	return true;
 }
 
+bool RenderSystem::loadSprite(SpriteComponent& sprite){
+
+	ObjectRender* render = &sprite.render;
+
+	render->beginLoad(PrimitiveType::TRIANGLES, false);
+
+	ShaderType shaderType = ShaderType::SKYBOX;
+
+	sprite.shader = ShaderPool::get(shaderType, "");
+	if (!sprite.shader->isCreated())
+		return false;
+	render->loadShader(sprite.shader.get());
+	ShaderData& shaderData = sprite.shader.get()->shaderData;
+
+	sprite.buffer->getRender()->createBuffer(sprite.buffer->getSize(), sprite.buffer->getData(), sprite.buffer->getBufferType(), false);
+	sprite.indices->getRender()->createBuffer(sprite.indices->getSize(), sprite.indices->getData(), sprite.indices->getBufferType(), false);
+	
+	sprite.loaded = true;
+
+	return true;
+}
+
 void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform){
 	if (mesh.loaded){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
@@ -882,6 +904,7 @@ void RenderSystem::update(double dt){
 
 void RenderSystem::draw(){
 	auto meshes = scene->getComponentArray<MeshComponent>();
+	auto sprites = scene->getComponentArray<SpriteComponent>();
 
 	//---------Depth shader----------
 	if (hasShadows){
@@ -959,6 +982,19 @@ void RenderSystem::draw(){
 		drawSky(*sky);
 	}
 
+	for (int i = 0; i < sprites->size(); i++){
+		SpriteComponent& sprite = sprites->getComponentFromIndex(i);
+		Entity entity = sprites->getEntity(i);
+		Transform* transform = scene->findComponent<Transform>(entity);
+
+		if (transform){
+			if (!sprite.loaded){
+				loadSprite(sprite);
+			}
+			//drawMesh(mesh, *transform, cameraTransform);
+		}
+	}
+
 	//---------Draw opaque meshes----------
 	while (!transparentMeshes.empty()){
 		TransparentMeshesData meshData = transparentMeshes.top();
@@ -1025,7 +1061,7 @@ void RenderSystem::entityDestroyed(Entity entity){
 	if (sky){
 		//Destroy shader
 		sky->shader.reset();
-		ShaderPool::remove(sky->shaderType, "");
+		ShaderPool::remove(ShaderType::SKYBOX, "");
 
 		//Destroy texture
 		sky->texture.destroy();

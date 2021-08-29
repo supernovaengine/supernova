@@ -1,7 +1,23 @@
-//#include "Supernova.h"
-//using namespace Supernova;
-//void init(){
-//}
+
+/*
+#include "Supernova.h"
+using namespace Supernova;
+
+#include "Sprite.h"
+#include "Camera.h"
+
+Scene scene;
+Sprite sprite(&scene);
+Camera camera(&scene);
+
+void init(){
+
+    camera.activate();
+
+    Engine::setScene(&scene);
+}
+*/
+
 
 #include "Supernova.h"
 #include "Mesh.h"
@@ -93,6 +109,7 @@ void init(){
     sky.setTextureDown("ely_hills/hills_dn.tga");
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
+    camera.setType(CameraType::CAMERA_PERSPECTIVE);
     camera.activate();
 
     camera.setPosition(0,80,100);

@@ -20,6 +20,8 @@ namespace Supernova{
         void setOrtho(float left, float right, float bottom, float top, float near, float far);
         void setPerspective(float y_fov, float aspect, float near, float far);
 
+        void setType(CameraType type);
+
         void setView(Vector3 view);
         void setView(const float x, const float y, const float z);
         Vector3 getView();
