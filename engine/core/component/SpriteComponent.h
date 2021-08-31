@@ -14,12 +14,16 @@ namespace Supernova{
 
         Buffer* buffer;
         Buffer* indices;
+        int vertexCount = 0;
 
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
-        //int slotVSParams = -1;
+        std::string shaderProperties;
+        int slotVSParams = -1;
+        int slotFSParams = -1;
 
-        //Texture texture;
+        Texture texture;
+        Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0);
     };
     
 }

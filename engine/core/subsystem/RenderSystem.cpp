@@ -483,20 +483,57 @@ bool RenderSystem::loadSprite(SpriteComponent& sprite){
 
 	render->beginLoad(PrimitiveType::TRIANGLES, false);
 
-	ShaderType shaderType = ShaderType::SKYBOX;
+	TextureRender* textureRender = sprite.texture.getRender();
 
-	sprite.shader = ShaderPool::get(shaderType, "");
+	bool p_hasTexture = false;
+	if (textureRender){
+		p_hasTexture = true;
+	}
+	
+	ShaderType shaderType = ShaderType::SPRITE;
+
+	sprite.shaderProperties = ShaderPool::getSpriteProperties(p_hasTexture, false, true);
+	sprite.shader = ShaderPool::get(shaderType, sprite.shaderProperties);
 	if (!sprite.shader->isCreated())
 		return false;
 	render->loadShader(sprite.shader.get());
 	ShaderData& shaderData = sprite.shader.get()->shaderData;
 
+	sprite.slotVSParams = shaderData.getUniformIndex(UniformType::SPRITE_VS_PARAMS, ShaderStageType::VERTEX);
+	sprite.slotFSParams = shaderData.getUniformIndex(UniformType::SPRITE_FS_PARAMS, ShaderStageType::FRAGMENT);
+
 	sprite.buffer->getRender()->createBuffer(sprite.buffer->getSize(), sprite.buffer->getData(), sprite.buffer->getBufferType(), false);
+	if (sprite.buffer->isRenderAttributes()) {
+        for (auto const &attr : sprite.buffer->getAttributes()) {
+			render->loadAttribute(shaderData.getAttrIndex(attr.first), sprite.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), sprite.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+        }
+    }
+
 	sprite.indices->getRender()->createBuffer(sprite.indices->getSize(), sprite.indices->getData(), sprite.indices->getBufferType(), false);
+	sprite.vertexCount = sprite.indices->getCount();
+	Attribute indexattr = sprite.indices->getAttributes()[AttributeType::INDEX];
+	render->loadIndex(sprite.indices->getRender(), indexattr.getDataType(), indexattr.getOffset());
+
+	if (textureRender)
+		render->loadTexture(shaderData.getTextureIndex(TextureShaderType::SPRITE, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
 	
 	sprite.loaded = true;
 
+	render->endLoad();
+
 	return true;
+}
+
+void RenderSystem::drawSprite(SpriteComponent& sprite, Transform& transform){
+	if (sprite.loaded){
+		ObjectRender* render = &sprite.render;
+		if (render){
+			render->beginDraw();
+			render->applyUniform(sprite.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &transform.modelViewProjectionMatrix);
+			render->applyUniform(sprite.slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 4, &sprite.color);
+			render->draw(sprite.vertexCount);
+		}
+	}
 }
 
 void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform){
@@ -991,7 +1028,7 @@ void RenderSystem::draw(){
 			if (!sprite.loaded){
 				loadSprite(sprite);
 			}
-			//drawMesh(mesh, *transform, cameraTransform);
+			drawSprite(sprite, *transform);
 		}
 	}
 
@@ -1032,7 +1069,6 @@ void RenderSystem::draw(){
 
 void RenderSystem::entityDestroyed(Entity entity){
 	auto mesh = scene->findComponent<MeshComponent>(entity);
-	
 	if (mesh){
 		for (int i = 0; i < mesh->numSubmeshes; i++){
 
@@ -1072,6 +1108,27 @@ void RenderSystem::entityDestroyed(Entity entity){
 		//Destroy buffer
 		if (sky->buffer){
 			sky->buffer->getRender()->destroyBuffer();
+		}
+	}
+
+	auto sprite = scene->findComponent<SpriteComponent>(entity);
+	if (sprite){
+		//Destroy shader
+		sprite->shader.reset();
+		ShaderPool::remove(ShaderType::SPRITE, sprite->shaderProperties);
+
+		//Destroy texture
+		sprite->texture.destroy();
+
+		//Destroy render
+		sprite->render.destroy();
+
+		//Destroy buffer
+		if (sprite->buffer){
+			sprite->buffer->getRender()->destroyBuffer();
+		}
+		if (sprite->indices){
+			sprite->indices->getRender()->destroyBuffer();
 		}
 	}
 

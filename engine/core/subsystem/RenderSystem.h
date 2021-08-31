@@ -97,6 +97,7 @@ namespace Supernova{
 		void drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix);
 
 		bool loadSprite(SpriteComponent& sprite);
+		void drawSprite(SpriteComponent& sprite, Transform& transform);
 
 		bool loadSky(SkyComponent& sky);
 		void drawSky(SkyComponent& sky);

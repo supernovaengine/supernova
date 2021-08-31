@@ -131,8 +131,6 @@ struct NormalInfo {
 const float normalScale = 1.0;
 const float occlusionStrength = 1.0;
 
-const float GAMMA = 2.2;
-const float INV_GAMMA = 1.0 / GAMMA;
 const float M_PI = 3.141592653589793;
 
 #include "includes/pbr.glsl"

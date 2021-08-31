@@ -1,16 +1,6 @@
 // Based on https://github.com/KhronosGroup/glTF-Sample-Viewer shaders
 
-vec3 linearTosRGB(vec3 color){
-    return pow(color, vec3(INV_GAMMA));
-}
-
-vec3 sRGBToLinear(vec3 srgbIn){
-    return vec3(pow(srgbIn.xyz, vec3(GAMMA)));
-}
-
-vec4 sRGBToLinear(vec4 srgbIn){
-    return vec4(sRGBToLinear(srgbIn.xyz), srgbIn.w);
-}
+#include "includes/srgb.glsl"
 
 float clampedDot(vec3 x, vec3 y){
     return clamp(dot(x, y), 0.0, 1.0);

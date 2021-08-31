@@ -96,6 +96,10 @@ int ShaderData::getUniformIndex(UniformType type, ShaderStageType stage){
         ustr = "u_vsSkyParams";
     }else if (type == UniformType::DEPTH_VS_PARAMS){
         ustr = "u_vs_depthParams";
+    }else if (type == UniformType::SPRITE_VS_PARAMS){
+        ustr = "u_vs_spriteParams";
+    }else if (type == UniformType::SPRITE_FS_PARAMS){
+        ustr = "u_fs_spriteParams";
     }
 
     if (ustr.empty()){
@@ -153,6 +157,8 @@ int ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
         texstr = "u_shadowCubeMap1";
     }else if (type == TextureShaderType::SKYCUBE){
         texstr = "u_skyTexture";
+    }else if (type == TextureShaderType::SPRITE){
+        texstr = "u_spriteTexture";
     }
 
     if (texstr.empty()){

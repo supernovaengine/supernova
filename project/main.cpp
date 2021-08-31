@@ -1,24 +1,37 @@
 
-/*
+
 #include "Supernova.h"
 using namespace Supernova;
 
 #include "Sprite.h"
 #include "Camera.h"
+#include "PlaneTerrain.h"
 
 Scene scene;
 Sprite sprite(&scene);
 Camera camera(&scene);
+//PlaneTerrain plane(&scene);
 
 void init(){
 
     camera.activate();
+    //camera.setType(CameraType::CAMERA_PERSPECTIVE);
+
+    camera.setPosition(0,8,-100);
+
+    sprite.setTexture("pista.png");
+    sprite.setColor(0.2, 0.0, 0.5, 1.0);
+
+    //plane.create(4000, 4000);
+    //plane.setColor(0.5, 0.3, 0.7, 1.0);
+    //plane.setTexture("pista.png");
+    //plane.setPosition(-2000,0,-2000);
 
     Engine::setScene(&scene);
 }
-*/
 
 
+/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -385,3 +398,4 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
+*/

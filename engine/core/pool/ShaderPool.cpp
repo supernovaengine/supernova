@@ -57,6 +57,8 @@ std::string ShaderPool::getShaderStr(ShaderType shaderType, std::string properti
 		str = "mesh";
 	}else if (shaderType == ShaderType::SKYBOX){
 		str = "sky";
+	}else if (shaderType == ShaderType::SPRITE){
+		str = "sprite";
 	}else if (shaderType == ShaderType::DEPTH){
 		str = "depth";
 	}else if (shaderType == ShaderType::LINES){
@@ -131,6 +133,19 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 		prop += "Nmp";
 	if (tangents)
 		prop += "Tan";
+	if (vertexColorVec3)
+		prop += "Vc3";
+	if (vertexColorVec4)
+		prop += "Vc4";
+
+	return prop;
+}
+
+std::string ShaderPool::getSpriteProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4){
+	std::string prop;
+
+	if (texture)
+		prop += "Tex";
 	if (vertexColorVec3)
 		prop += "Vc3";
 	if (vertexColorVec4)

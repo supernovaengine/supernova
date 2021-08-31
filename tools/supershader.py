@@ -13,6 +13,8 @@ import platform
 def get_define(property):
     if property == 'Ult':
         return 'MATERIAL_UNLIT'
+    elif property == 'Tex':
+        return 'HAS_TEXTURE'
     elif property == 'Uv1':
         return 'HAS_UV_SET1'
     elif property == 'Uv2':
@@ -51,7 +53,9 @@ def get_default_shaders():
     s += "mesh_Uv1PucShwNorVc4;"
     s += "mesh_UltUv1Vc4;"
     s += "depth;"
-    s += "sky"
+    s += "sky;"
+    s += "sprite_Vc4;"
+    s += "sprite_TexVc4"
     return s
 
 def get_default_langs():

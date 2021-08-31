@@ -25,20 +25,11 @@ namespace Supernova{
     public:
         Sprite(Scene* scene);
 
-        template <typename T>
-        void addComponent(T &&component) {
-            scene->addComponent<T>(entity, std::forward<T>(component));
-        }
-    
-        template <typename T>
-        void removeComponent() {
-            scene->removeComponent<T>(entity);
-        }
-    
-        template<typename T>
-    	T& getComponent() {
-    		return scene->getComponent<T>(entity);
-    	}
+        void setColor(Vector4 color);
+        void setColor(float red, float green, float blue, float alpha);
+        Vector4 getColor();
+
+        void setTexture(std::string path);
 
     };
 }

@@ -1,5 +1,7 @@
 #include "Sprite.h"
 
+#include "math/Color.h"
+
 using namespace Supernova;
 
 Sprite::Sprite(Scene* scene): Object(scene){
@@ -30,17 +32,42 @@ Sprite::Sprite(Scene* scene): Object(scene){
 
     Attribute* attColor = buffer.getAttribute(AttributeType::COLOR);
 
-    buffer.addVector4(attColor, Vector4(1.0f, 0.1f, 1.0f, 1.0f));
-    buffer.addVector4(attColor, Vector4(1.0f, 0.1f, 1.0f, 1.0f));
-    buffer.addVector4(attColor, Vector4(1.0f, 0.1f, 1.0f, 1.0f));
-    buffer.addVector4(attColor, Vector4(1.0f, 0.1f, 1.0f, 1.0f));
+    buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
-    static const unsigned int indices_array[] = {
+
+    static const uint16_t indices_array[] = {
         0,  1,  2,
-        0,  2,  3
+        0,  2,  3,
     };
 
     indices.setValues(
         0, indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
+}
+
+void Sprite::setColor(Vector4 color){
+    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+
+    spritecomp.color = Color::sRGBToLinear(color);
+}
+
+void Sprite::setColor(float red, float green, float blue, float alpha){
+    setColor(Vector4(red, green, blue, alpha));
+}
+
+Vector4 Sprite::getColor(){
+    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+
+    return Color::linearTosRGB(spritecomp.color);
+}
+
+void Sprite::setTexture(std::string path){
+    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+
+    spritecomp.texture.setPath(path);
+
+    //TODO: update texture, reload entity
 }
