@@ -21,7 +21,7 @@ namespace Supernova{
         virtual ~Mesh();
 
         void addVertex(Vector3 vertex);
-        void addVertex(float x, float y);
+        void addVertex(float x, float y, float z);
 
         void setTexture(std::string path);
         
@@ -30,8 +30,6 @@ namespace Supernova{
         Vector4 getColor();
 
         void addSubmeshAttribute(Submesh& submesh, std::string bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized);
-
-        void generateTexcoords();
     };
 }
 

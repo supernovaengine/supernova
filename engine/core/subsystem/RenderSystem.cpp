@@ -481,7 +481,7 @@ bool RenderSystem::loadSprite(SpriteComponent& sprite){
 
 	ObjectRender* render = &sprite.render;
 
-	render->beginLoad(PrimitiveType::TRIANGLES, false);
+	render->beginLoad(sprite.primitiveType, false);
 
 	TextureRender* textureRender = sprite.texture.getRender();
 
@@ -509,10 +509,14 @@ bool RenderSystem::loadSprite(SpriteComponent& sprite){
         }
     }
 
-	sprite.indices->getRender()->createBuffer(sprite.indices->getSize(), sprite.indices->getData(), sprite.indices->getBufferType(), false);
-	sprite.vertexCount = sprite.indices->getCount();
-	Attribute indexattr = sprite.indices->getAttributes()[AttributeType::INDEX];
-	render->loadIndex(sprite.indices->getRender(), indexattr.getDataType(), indexattr.getOffset());
+	if (sprite.indices->getCount() > 0){
+		sprite.indices->getRender()->createBuffer(sprite.indices->getSize(), sprite.indices->getData(), sprite.indices->getBufferType(), false);
+		sprite.vertexCount = sprite.indices->getCount();
+		Attribute indexattr = sprite.indices->getAttributes()[AttributeType::INDEX];
+		render->loadIndex(sprite.indices->getRender(), indexattr.getDataType(), indexattr.getOffset());
+	}else{
+		sprite.vertexCount = sprite.buffer->getCount();
+	}
 
 	if (textureRender)
 		render->loadTexture(shaderData.getTextureIndex(TextureShaderType::SPRITE, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);

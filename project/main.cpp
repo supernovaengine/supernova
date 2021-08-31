@@ -1,16 +1,14 @@
-
-
 #include "Supernova.h"
 using namespace Supernova;
 
 #include "Sprite.h"
 #include "Camera.h"
-#include "PlaneTerrain.h"
+#include "Polygon.h"
 
 Scene scene;
 Sprite sprite(&scene);
 Camera camera(&scene);
-//PlaneTerrain plane(&scene);
+Polygon polygon(&scene);
 
 void init(){
 
@@ -20,7 +18,14 @@ void init(){
     camera.setPosition(0,8,-100);
 
     sprite.setTexture("pista.png");
-    sprite.setColor(0.2, 0.0, 0.5, 1.0);
+    //sprite.setColor(0.2, 0.0, 0.5, 1.0);
+
+    polygon.addVertex(0, 0);
+    polygon.addVertex(300, 0);
+    polygon.addVertex(0, 300);
+    polygon.addVertex(300, 300);
+    polygon.setColor(1.0, 0.3, 0.8, 1.0);
+    polygon.setPosition(300, 200, 0);
 
     //plane.create(4000, 4000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);
@@ -137,16 +142,6 @@ void init(){
     carro.setScale(200);
 
     carro.setName("carro");
- 
-    //child1.addVertex(-50.0f,  -50.0f);
-    //child1.addVertex(50.0f,  -50.0f);
-    //child1.addVertex(-50.0f,  50.0f);
-    //child1.addVertex(-50.0f,  50.0f);
-    //child1.addVertex(50.0f,  -50.0f);
-    //child1.addVertex(50.0f,  50.0f);
-    //child1.generateTexcoords();
-    //child1.setTexture("pista.png");
-    //child1.setName("child1");
 
     plane.create(4000, 4000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);

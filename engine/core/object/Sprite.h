@@ -8,28 +8,13 @@
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
 
-#include "Object.h"
-#include "Scene.h"
-#include "Entity.h"
+#include "Polygon.h"
 
 namespace Supernova{
-    class Sprite: public Object{
-
-    protected:
-        //Entity entity;
-        //Scene* scene;
-
-        InterleavedBuffer buffer;
-        IndexBuffer indices;
+    class Sprite: public Polygon{
 
     public:
         Sprite(Scene* scene);
-
-        void setColor(Vector4 color);
-        void setColor(float red, float green, float blue, float alpha);
-        Vector4 getColor();
-
-        void setTexture(std::string path);
 
     };
 }

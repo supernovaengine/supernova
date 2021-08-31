@@ -4,12 +4,13 @@
 
 using namespace Supernova;
 
-Sprite::Sprite(Scene* scene): Object(scene){
+Sprite::Sprite(Scene* scene): Polygon(scene){
     addComponent<SpriteComponent>({});
 
     SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
     spritecomp.buffer = &buffer;
     spritecomp.indices = &indices;
+    spritecomp.primitiveType = PrimitiveType::TRIANGLES;
 
 	buffer.clearAll();
 	buffer.addAttribute(AttributeType::POSITION, 3);
@@ -46,28 +47,4 @@ Sprite::Sprite(Scene* scene): Object(scene){
     indices.setValues(
         0, indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
-}
-
-void Sprite::setColor(Vector4 color){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
-
-    spritecomp.color = Color::sRGBToLinear(color);
-}
-
-void Sprite::setColor(float red, float green, float blue, float alpha){
-    setColor(Vector4(red, green, blue, alpha));
-}
-
-Vector4 Sprite::getColor(){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
-
-    return Color::linearTosRGB(spritecomp.color);
-}
-
-void Sprite::setTexture(std::string path){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
-
-    spritecomp.texture.setPath(path);
-
-    //TODO: update texture, reload entity
 }

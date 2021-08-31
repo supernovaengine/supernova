@@ -52,7 +52,7 @@ namespace Supernova{
         int slotVSDepthParams = -1;
 
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;
-        int vertexCount = 0;
+        unsigned int vertexCount = 0;
         
         bool hasNormalMap = false;
         bool hasTangent = false;
