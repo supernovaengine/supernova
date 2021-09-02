@@ -25,6 +25,9 @@ namespace Supernova{
 	    EntityManager entityManager;
 	    ComponentManager componentManager;
 		std::unordered_map<const char*, std::shared_ptr<SubSystem>> systems;
+
+		void sortComponentsByTransform(Signature entitySignature);
+		void moveChildAux(Entity entity, bool increase, bool stopIfFound);
 		
 	public:
 	
@@ -39,7 +42,7 @@ namespace Supernova{
 
 		void updateCameraSize();
 
-		size_t findFamilyEndIndex(Entity entity);
+		size_t findBranchLastIndex(Entity entity);
 	
 		//Entity methods
 
@@ -48,6 +51,11 @@ namespace Supernova{
 		void destroyEntity(Entity entity);
 
 		void addEntityChild(Entity parent, Entity child);
+
+		void moveChildToFirst(Entity entity);
+		void moveChildUp(Entity entity);
+		void moveChildDown(Entity entity);
+		void moveChildToLast(Entity entity);
 	
 	    // Component methods
 

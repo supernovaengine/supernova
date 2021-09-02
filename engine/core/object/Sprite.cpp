@@ -5,11 +5,8 @@
 using namespace Supernova;
 
 Sprite::Sprite(Scene* scene): Polygon(scene){
-    addComponent<SpriteComponent>({});
 
     SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
-    spritecomp.buffer = &buffer;
-    spritecomp.indices = &indices;
     spritecomp.primitiveType = PrimitiveType::TRIANGLES;
 
 	buffer.clearAll();

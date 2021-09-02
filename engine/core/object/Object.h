@@ -22,6 +22,11 @@ namespace Supernova{
         Object* createChild();
         void addChild(Object* child);
 
+        void moveToFirst();
+        void moveUp();
+        void moveDown();
+        void moveToLast();
+
         void setName(std::string name);
         std::string getName();
 
@@ -54,6 +59,8 @@ namespace Supernova{
     	T& getComponent() {
     		return scene->getComponent<T>(entity);
     	}
+
+        Entity getEntity();
 
         void updateTransform();
     };

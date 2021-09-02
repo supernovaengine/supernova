@@ -4,11 +4,18 @@ using namespace Supernova;
 #include "Sprite.h"
 #include "Camera.h"
 #include "Polygon.h"
+#include "Input.h"
 
 Scene scene;
-Sprite sprite(&scene);
 Camera camera(&scene);
+
+Polygon polygonroot(&scene);
 Polygon polygon(&scene);
+Polygon polygon2(&scene);
+Polygon polygon3(&scene);
+Sprite sprite(&scene);
+
+void onKeyDown(int key, bool repeat, int mods);
 
 void init(){
 
@@ -19,13 +26,45 @@ void init(){
 
     sprite.setTexture("pista.png");
     //sprite.setColor(0.2, 0.0, 0.5, 1.0);
+    sprite.setName("Sprite");
+    sprite.setPosition(20,20,0);
+
+    polygonroot.addVertex(0, 0);
+    polygonroot.addVertex(30, 0);
+    polygonroot.addVertex(0, 30);
+    polygonroot.addVertex(30, 30);
+    polygonroot.setColor(0.8, 0.8, 0.5, 1.0);
+    polygonroot.setPosition(0, 0, 0);
+    polygonroot.setName("PolygonRoot");
+
+    polygonroot.addChild(&polygon);
+    polygonroot.addChild(&polygon2);
+    polygonroot.addChild(&polygon3);
+    polygonroot.addChild(&sprite);
 
     polygon.addVertex(0, 0);
     polygon.addVertex(300, 0);
     polygon.addVertex(0, 300);
     polygon.addVertex(300, 300);
     polygon.setColor(1.0, 0.3, 0.8, 1.0);
-    polygon.setPosition(300, 200, 0);
+    polygon.setPosition(50, 50, 0);
+    polygon.setName("Polygon1");
+
+    polygon2.addVertex(0, 0);
+    polygon2.addVertex(300, 0);
+    polygon2.addVertex(0, 300);
+    polygon2.addVertex(300, 300);
+    polygon2.setColor(1.0, 0.5, 1.0, 1.0);
+    polygon2.setPosition(70, 70, 0);
+    polygon2.setName("Polygon2");
+
+    polygon3.addVertex(0, 0);
+    polygon3.addVertex(300, 0);
+    polygon3.addVertex(0, 300);
+    polygon3.addVertex(300, 300);
+    polygon3.setColor(0.5, 1.0, 1.0, 1.0);
+    polygon3.setPosition(100, 100, 0);
+    polygon3.setName("Polygon3");
 
     //plane.create(4000, 4000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);
@@ -33,6 +72,22 @@ void init(){
     //plane.setPosition(-2000,0,-2000);
 
     Engine::setScene(&scene);
+    Engine::onKeyDown = onKeyDown;
+}
+
+void onKeyDown(int key, bool repeat, int mods){
+    if (key == S_KEY_A){
+        sprite.moveToLast();
+    }
+    if (key == S_KEY_F){
+        sprite.moveToFirst();
+    }
+    if (key == S_KEY_S){
+        sprite.moveDown();
+    }
+    if (key == S_KEY_D){
+        sprite.moveUp();
+    }
 }
 
 

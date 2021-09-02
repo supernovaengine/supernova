@@ -117,10 +117,30 @@ void Object::addChild(Object* child){
     scene->addEntityChild(this->entity, child->entity);
 }
 
+void Object::moveToFirst(){
+    scene->moveChildToFirst(this->entity);
+}
+
+void Object::moveUp(){
+    scene->moveChildUp(this->entity);
+}
+
+void Object::moveDown(){
+    scene->moveChildDown(this->entity);
+}
+
+void Object::moveToLast(){
+    scene->moveChildToLast(this->entity);
+}
+
+Entity Object::getEntity(){
+    return entity;
+}
+
 void Object::updateTransform(){
     auto transforms = scene->getComponentArray<Transform>();
     size_t startIndex = transforms->getIndex(entity);
-    size_t endIndex = scene->findFamilyEndIndex(entity);
+    size_t endIndex = scene->findBranchLastIndex(entity);
 
     for (int i = startIndex; i <= endIndex; i++){
 		Transform& transform = transforms->getComponentFromIndex(i);
