@@ -36,6 +36,8 @@ void Polygon::addVertex(float x, float y){
 
 void Polygon::generateTexcoords(){
 
+    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+
     float min_X = std::numeric_limits<float>::max();
     float max_X = std::numeric_limits<float>::min();
     float min_Y = std::numeric_limits<float>::max();
@@ -66,8 +68,8 @@ void Polygon::generateTexcoords(){
        // }
     }
 
-    //width = (int)(max_X - min_X);
-    //height = (int)(max_Y - min_Y);
+    spritecomp.width = (int)(max_X - min_X);
+    spritecomp.height = (int)(max_Y - min_Y);
 }
 
 void Polygon::setColor(Vector4 color){
@@ -92,4 +94,20 @@ void Polygon::setTexture(std::string path){
     spritecomp.texture.setPath(path);
 
     //TODO: update texture, reload entity
+}
+
+void Polygon::setTextureRect(float x, float y, float width, float height){
+    setTextureRect(Rect(x, y, width, height));
+}
+
+void Polygon::setTextureRect(Rect textureRect){
+    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+
+    spritecomp.textureRect = textureRect;
+}
+
+Rect Polygon::getTextureRect(){
+    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+
+    return spritecomp.textureRect;
 }

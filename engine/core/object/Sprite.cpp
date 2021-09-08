@@ -5,6 +5,7 @@
 using namespace Supernova;
 
 Sprite::Sprite(Scene* scene): Polygon(scene){
+    addComponent<AnimatedSpriteComponent>({});
 
     SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
     spritecomp.primitiveType = PrimitiveType::TRIANGLES;
@@ -44,4 +45,70 @@ Sprite::Sprite(Scene* scene): Polygon(scene){
     indices.setValues(
         0, indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
+}
+
+void Sprite::addFrame(int id, std::string name, Rect rect){
+    AnimatedSpriteComponent& animsprite = scene->getComponent<AnimatedSpriteComponent>(entity);
+    if (id >= 0 && id < MAX_SPRITE_FRAMES){
+        animsprite.framesRect[id] = {name, rect, true};
+    }else{
+        Log::Error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
+    }
+}
+
+void Sprite::addFrame(std::string name, float x, float y, float width, float height){
+    AnimatedSpriteComponent& animsprite = scene->getComponent<AnimatedSpriteComponent>(entity);
+
+    int id = 0;
+    while ( (animsprite.framesRect[id].active = true) && (id < MAX_SPRITE_FRAMES) ) {
+        id++;
+    }
+
+    if (id < MAX_SPRITE_FRAMES){
+        addFrame(id, name, Rect(x, y, width, height));
+    }else{
+        Log::Error("Cannot set frame %s. Sprite frames reached limit of %i", name.c_str(), MAX_SPRITE_FRAMES);
+    }
+}
+
+void Sprite::addFrame(float x, float y, float width, float height){
+    addFrame("", x, y, width, height);
+}
+
+void Sprite::addFrame(Rect rect){
+    addFrame(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+}
+
+void Sprite::removeFrame(int id){
+    AnimatedSpriteComponent& animsprite = scene->getComponent<AnimatedSpriteComponent>(entity);
+    animsprite.framesRect[id].active = false;
+}
+
+void Sprite::removeFrame(std::string name){
+    AnimatedSpriteComponent& animsprite = scene->getComponent<AnimatedSpriteComponent>(entity);
+
+    for (int id = 0; id < MAX_SPRITE_FRAMES; id++){
+        if (animsprite.framesRect[id].name == name){
+            animsprite.framesRect[id].active = false;
+        }
+    }
+}
+
+void Sprite::setFrame(int id){
+    if (id >= 0 && id < MAX_SPRITE_FRAMES){
+        AnimatedSpriteComponent& animsprite = scene->getComponent<AnimatedSpriteComponent>(entity);
+        setTextureRect(animsprite.framesRect[id].rect);
+    }
+}
+
+void Sprite::setFrame(std::string name){
+    AnimatedSpriteComponent& animsprite = scene->getComponent<AnimatedSpriteComponent>(entity);
+    int id = 0;
+    while ( (animsprite.framesRect[id].active = false) && (id < MAX_SPRITE_FRAMES) ) {
+        id++;
+    }
+
+    if (id < MAX_SPRITE_FRAMES){
+        setFrame(id);
+    }
 }

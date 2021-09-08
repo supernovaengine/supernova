@@ -31,6 +31,10 @@ namespace Supernova{
 
         void setTexture(std::string path);
 
+        void setTextureRect(float x, float y, float width, float height);
+        void setTextureRect(Rect textureRect);
+        Rect getTextureRect();
+
     };
 }
 

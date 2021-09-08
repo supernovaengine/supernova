@@ -1,10 +1,7 @@
 #ifndef MESH_COMPONENT_H
 #define MESH_COMPONENT_H
 
-#ifndef MAX_SUBMESHES
-#define MAX_SUBMESHES 4
-#endif
-
+#include "Supernova.h"
 #include "math/Vector3.h"
 #include "math/Quaternion.h"
 #include "buffer/Buffer.h"

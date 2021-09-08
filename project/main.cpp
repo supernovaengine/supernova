@@ -26,6 +26,9 @@ void init(){
 
     sprite.setTexture("pista.png");
     //sprite.setColor(0.2, 0.0, 0.5, 1.0);
+    sprite.addFrame(0, "", Rect(0.5, 0.5, 0.5, 0.5));
+    sprite.addFrame(1, "", Rect(0.5, 0.0, 0.5, 0.5));
+    sprite.addFrame(2, "", Rect(0.0, 0.5, 0.5, 0.5));
     sprite.setName("Sprite");
     sprite.setPosition(20,20,0);
 
@@ -87,6 +90,16 @@ void onKeyDown(int key, bool repeat, int mods){
     }
     if (key == S_KEY_D){
         sprite.moveUp();
+    }
+
+    if (key == S_KEY_1){
+        sprite.setFrame(0);
+    }
+    if (key == S_KEY_2){
+        sprite.setFrame(1);
+    }
+    if (key == S_KEY_3){
+        sprite.setFrame(2);
     }
 }
 

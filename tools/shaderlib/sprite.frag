@@ -2,6 +2,7 @@
 
 uniform u_fs_spriteParams {
     vec4 color;
+    vec4 textureRect;
 } spriteParams;
 
 out vec4 g_finalColor;
@@ -36,7 +37,8 @@ vec4 getVertexColor(){
 vec4 getBaseColor(){
     vec4 baseColor = spriteParams.color;
     #ifdef HAS_TEXTURE
-        baseColor *= sRGBToLinear(texture(u_spriteTexture, v_uv1));
+        vec2 uv = v_uv1 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
+        baseColor *= sRGBToLinear(texture(u_spriteTexture, uv));
     #endif
     return baseColor * getVertexColor();
 }

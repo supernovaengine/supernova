@@ -9,6 +9,7 @@ Scene::Scene(){
 	registerComponent<MeshComponent>();
 	registerComponent<SkyComponent>();
 	registerComponent<SpriteComponent>();
+	registerComponent<AnimatedSpriteComponent>();
     registerComponent<Transform>();
 	registerComponent<CameraComponent>();
 	registerComponent<LightComponent>();

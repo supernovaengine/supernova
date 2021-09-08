@@ -534,7 +534,8 @@ void RenderSystem::drawSprite(SpriteComponent& sprite, Transform& transform){
 		if (render){
 			render->beginDraw();
 			render->applyUniform(sprite.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &transform.modelViewProjectionMatrix);
-			render->applyUniform(sprite.slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 4, &sprite.color);
+			//Color and textureRect
+			render->applyUniform(sprite.slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 8, &sprite.color);
 			render->draw(sprite.vertexCount);
 		}
 	}

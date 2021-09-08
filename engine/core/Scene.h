@@ -11,6 +11,7 @@
 #include "component/MeshComponent.h"
 #include "component/SkyComponent.h"
 #include "component/SpriteComponent.h"
+#include "component/AnimatedSpriteComponent.h"
 #include "component/Transform.h"
 #include "component/LightComponent.h"
 #include "subsystem/RenderSystem.h"

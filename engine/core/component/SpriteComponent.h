@@ -26,6 +26,7 @@ namespace Supernova{
 
         Texture texture;
         Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0);
+        Rect textureRect = Rect(0.0, 0.0, 1.0, 1.0);
     };
     
 }
