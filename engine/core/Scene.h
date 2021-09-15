@@ -11,10 +11,13 @@
 #include "component/MeshComponent.h"
 #include "component/SkyComponent.h"
 #include "component/SpriteComponent.h"
-#include "component/AnimatedSpriteComponent.h"
+#include "component/SpriteAnimationComponent.h"
 #include "component/Transform.h"
 #include "component/LightComponent.h"
+#include "component/ActionComponent.h"
+
 #include "subsystem/RenderSystem.h"
+#include "subsystem/ActionSystem.h"
 
 namespace Supernova{
 
@@ -80,6 +83,10 @@ namespace Supernova{
 		    signature.set(componentManager.getComponentType<T>(), false);
 		    entityManager.setSignature(entity, signature); 
 	    }
+
+		Signature getSignature(Entity entity){
+			return entityManager.getSignature(entity);
+		}
 
 		template<typename T>
 	    T* findComponent(Entity entity) {

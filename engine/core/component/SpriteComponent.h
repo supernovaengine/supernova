@@ -3,8 +3,15 @@
 
 #include "buffer/Buffer.h"
 #include "texture/Texture.h"
+#include "render/ObjectRender.h"
 
 namespace Supernova{
+
+    struct FrameData{
+        bool active = false;
+        std::string name;
+        Rect rect;
+    };
 
     struct SpriteComponent{
         bool loaded = false;
@@ -23,6 +30,8 @@ namespace Supernova{
 
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;
         unsigned int vertexCount = 0;
+
+        FrameData framesRect[MAX_SPRITE_FRAMES];
 
         Texture texture;
         Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0);

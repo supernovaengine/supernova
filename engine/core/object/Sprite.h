@@ -25,6 +25,8 @@ namespace Supernova{
 
         void setFrame(int id);
         void setFrame(std::string name);
+
+        void addAnimation(int id, std::vector<int> framesTime, std::vector<int> frames, bool loop);
     };
 }
 

@@ -167,10 +167,6 @@ namespace Supernova {
 		}
 
 		T& getComponent(Entity entity) {
-			if (entityToIndexMap.find(entity) == entityToIndexMap.end()){
-				Log::Error("Retrieving non-existent component");
-			}
-
 			return componentArray[entityToIndexMap[entity]];
 		}
 

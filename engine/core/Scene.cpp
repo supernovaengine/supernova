@@ -9,12 +9,14 @@ Scene::Scene(){
 	registerComponent<MeshComponent>();
 	registerComponent<SkyComponent>();
 	registerComponent<SpriteComponent>();
-	registerComponent<AnimatedSpriteComponent>();
+	registerComponent<SpriteAnimationComponent>();
     registerComponent<Transform>();
 	registerComponent<CameraComponent>();
 	registerComponent<LightComponent>();
+	registerComponent<ActionComponent>();
 
 	registerSystem<RenderSystem>();
+	registerSystem<ActionSystem>();
 
 	camera = NULL_ENTITY;
 }
@@ -186,13 +188,13 @@ void Scene::addEntityChild(Entity parent, Entity child){
 
 void Scene::sortComponentsByTransform(Signature entitySignature){
 	// Mesh component
-	if (entitySignature.test(componentManager.getComponentType<MeshComponent>())){
+	if (entitySignature.test(getComponentType<MeshComponent>())){
 		auto meshes = componentManager.getComponentArray<MeshComponent>();
 		meshes->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// Sprite component
-	if (entitySignature.test(componentManager.getComponentType<SpriteComponent>())){
+	if (entitySignature.test(getComponentType<SpriteComponent>())){
 		auto sprites = componentManager.getComponentArray<SpriteComponent>();
 		sprites->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}

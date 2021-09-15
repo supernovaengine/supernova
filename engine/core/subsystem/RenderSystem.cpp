@@ -29,7 +29,6 @@ bool RenderSystem::emptyTexturesCreated = false;
 
 RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 	signature.set(scene->getComponentType<Transform>());
-	signature.set(scene->getComponentType<MeshComponent>());
 
 	hasLights = false;
 	hasShadows = false;

@@ -1,3 +1,4 @@
+
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -5,6 +6,7 @@ using namespace Supernova;
 #include "Camera.h"
 #include "Polygon.h"
 #include "Input.h"
+#include "SpriteAnimation.h"
 
 Scene scene;
 Camera camera(&scene);
@@ -14,6 +16,7 @@ Polygon polygon(&scene);
 Polygon polygon2(&scene);
 Polygon polygon3(&scene);
 Sprite sprite(&scene);
+SpriteAnimation spriteanim(&scene);
 
 void onKeyDown(int key, bool repeat, int mods);
 
@@ -31,6 +34,10 @@ void init(){
     sprite.addFrame(2, "", Rect(0.0, 0.5, 0.5, 0.5));
     sprite.setName("Sprite");
     sprite.setPosition(20,20,0);
+
+    spriteanim.setTarget(&sprite);
+
+    spriteanim.setAnimation({0, 1, 2}, {100, 100, 100}, true);
 
     polygonroot.addVertex(0, 0);
     polygonroot.addVertex(30, 0);
@@ -100,6 +107,10 @@ void onKeyDown(int key, bool repeat, int mods){
     }
     if (key == S_KEY_3){
         sprite.setFrame(2);
+    }
+
+    if (key == S_KEY_R){
+        spriteanim.start();
     }
 }
 
