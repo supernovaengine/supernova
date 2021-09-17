@@ -13,11 +13,8 @@ namespace Supernova{
     public:
         SpriteAnimation(Scene* scene);
 
-        void setAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop);
-       /* setAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
-        setAnimation(int interval, int startFrame, int endFrame, bool loop);
-        setAnimation(int interval, std::vector<int> frames, bool loop);
-        */
+        void setAnimation(std::vector<int> frames, std::vector<int> framesTime, bool loop);
+        void setAnimation(int startFrame, int endFrame, int interval, bool loop);
     };
 }
 

@@ -159,15 +159,24 @@ namespace Supernova {
 		}
 
 		T* findComponent(Entity entity) {
-			if (entityToIndexMap.find(entity) == entityToIndexMap.end()){
-				return NULL;
+			auto it = entityToIndexMap.find(entity);
+
+			if (it == entityToIndexMap.end()) {
+				 return NULL;
 			}
 
-			return &componentArray[entityToIndexMap[entity]];
+			return &componentArray[it->second];
 		}
 
 		T& getComponent(Entity entity) {
-			return componentArray[entityToIndexMap[entity]];
+			try{
+
+				return componentArray[entityToIndexMap.at(entity)];
+
+			}catch (const std::out_of_range& e){
+				Log::Error("Retrieving non-existent component: %s", e.what());
+				throw;
+			}
 		}
 
 		T* findComponentFromIndex(size_t index) {
@@ -179,18 +188,25 @@ namespace Supernova {
 		}
 
 		T& getComponentFromIndex(size_t index) {
-			if (index < 0 || index >= componentArray.size()){
-				Log::Error("Retrieving non-existent component");
-			}
+			try{
 
-			return componentArray[index];
+				return componentArray.at(index);
+
+			}catch (const std::out_of_range& e){
+				Log::Error("Retrieving non-existent component: %s", e.what());
+				throw;
+			}
 		}
 
 		size_t getIndex(Entity entity){
-			if (entityToIndexMap.find(entity) == entityToIndexMap.end()){
-				return -1;
+			try{
+
+				return entityToIndexMap.at(entity);
+
+			}catch (const std::out_of_range& e){
+				Log::Error("Retrieving non-existent component: %s", e.what());
+				throw;
 			}
-			return entityToIndexMap[entity];
 		}
 
 		Entity getEntity(size_t index){
@@ -198,6 +214,7 @@ namespace Supernova {
 				Log::Error("Entity not found");
 				return NULL_ENTITY;
 			}
+
 			return indexToEntityMap[index];
 		}
 

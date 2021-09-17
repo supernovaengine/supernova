@@ -30,10 +30,10 @@ void Action::stop(){
     action.stopTrigger = true;
 }
 
-void Action::setTarget(Object* object){
+void Action::setTarget(Entity target){
     ActionComponent& action = scene->getComponent<ActionComponent>(entity);
 
-    action.target = object->getEntity();
+    action.target = target;
 }
 
 Entity Action::getEntity(){

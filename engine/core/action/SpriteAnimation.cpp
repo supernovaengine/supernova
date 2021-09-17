@@ -25,3 +25,17 @@ void SpriteAnimation::setAnimation(std::vector<int> frames, std::vector<int> fra
 
     spriteanim.loop = loop;
 }
+
+void SpriteAnimation::setAnimation(int startFrame, int endFrame, int interval, bool loop){
+    std::vector<int> frames;
+    std::vector<int> framesTime;
+
+    if (startFrame > 0 || endFrame > 0) {
+        for (int i=startFrame; i<=endFrame; i++){
+            frames.push_back(i);
+            framesTime.push_back(interval);
+        }
+    }
+
+    setAnimation(frames, framesTime, loop);
+}

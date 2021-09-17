@@ -35,7 +35,7 @@ void init(){
     sprite.setName("Sprite");
     sprite.setPosition(20,20,0);
 
-    spriteanim.setTarget(&sprite);
+    spriteanim.setTarget(sprite.getEntity());
 
     spriteanim.setAnimation({0, 1, 2}, {100, 100, 100}, true);
 
@@ -110,7 +110,13 @@ void onKeyDown(int key, bool repeat, int mods){
     }
 
     if (key == S_KEY_R){
-        spriteanim.start();
+        //spriteanim.start();
+        sprite.startAnimation({0, 1, 2}, {100, 100, 100}, true);
+    }
+
+    if (key == S_KEY_T){
+        //spriteanim.start();
+        sprite.stopAnimation();
     }
 }
 

@@ -43,7 +43,11 @@ void ActionSystem::spriteAction(double dt, ActionComponent& action, SpriteCompon
             spriteanim.frameTimeIndex = 0;
     }
 
-    sprite.textureRect = sprite.framesRect[spriteanim.frames[spriteanim.frameIndex]].rect;
+    if (spriteanim.frameIndex < MAX_SPRITE_FRAMES){
+        FrameData frameData = sprite.framesRect[spriteanim.frames[spriteanim.frameIndex]];
+        if (frameData.active)
+            sprite.textureRect = frameData.rect;
+    }
 }
 
 void ActionSystem::load(){
@@ -78,11 +82,13 @@ void ActionSystem::update(double dt){
         }
 
         Entity target = action.target;
-        Signature targetSignature = scene->getSignature(target);
-        Entity entity = actions->getEntity(i);
-        Signature signature = scene->getSignature(entity);
 
-        if (action.state == ActionState::Running){
+        if ((action.state == ActionState::Running) && (target != NULL_ENTITY)){
+
+            Signature targetSignature = scene->getSignature(target);
+            Entity entity = actions->getEntity(i);
+            Signature signature = scene->getSignature(entity);
+
             if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
                 SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
                 if (targetSignature.test(scene->getComponentType<SpriteComponent>())){

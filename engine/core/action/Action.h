@@ -7,7 +7,6 @@
 
 #include "Scene.h"
 #include "Entity.h"
-#include "object/Object.h"
 
 namespace Supernova{
     class Action{
@@ -22,7 +21,7 @@ namespace Supernova{
         void pause();
         void stop();
 
-        void setTarget(Object* object);
+        void setTarget(Entity target);
 
         template <typename T>
         void addComponent(T &&component) {

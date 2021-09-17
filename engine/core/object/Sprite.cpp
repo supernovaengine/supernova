@@ -5,6 +5,8 @@
 using namespace Supernova;
 
 Sprite::Sprite(Scene* scene): Polygon(scene){
+    animation = NULL;
+
     SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
     spritecomp.primitiveType = PrimitiveType::TRIANGLES;
 
@@ -43,6 +45,11 @@ Sprite::Sprite(Scene* scene): Polygon(scene){
     indices.setValues(
         0, indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
+}
+
+Sprite::~Sprite(){
+    if (animation)
+        delete animation;
 }
 
 void Sprite::addFrame(int id, std::string name, Rect rect){
@@ -111,6 +118,26 @@ void Sprite::setFrame(std::string name){
     }
 }
 
-void Sprite::addAnimation(int id, std::vector<int> framesTime, std::vector<int> frames, bool loop){
+void Sprite::startAnimation(std::vector<int> frames, std::vector<int> framesTime, bool loop){
+    if (!animation){
+        animation = new SpriteAnimation(scene);
+        animation->setTarget(entity);
+    }
+    animation->setAnimation(frames, framesTime, loop);
+    animation->start();
+}
 
+void Sprite::startAnimation(int startFrame, int endFrame, int interval, bool loop){
+    if (!animation){
+        animation = new SpriteAnimation(scene);
+        animation->setTarget(entity);
+    }
+    animation->setAnimation(startFrame, endFrame, interval, loop);
+    animation->start();
+}
+
+void Sprite::stopAnimation(){
+    if (animation){
+        animation->stop();
+    }
 }

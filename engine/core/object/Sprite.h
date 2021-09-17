@@ -7,14 +7,19 @@
 
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
+#include "action/SpriteAnimation.h"
 
 #include "Polygon.h"
 
 namespace Supernova{
     class Sprite: public Polygon{
 
+    protected:
+        SpriteAnimation* animation;
+
     public:
         Sprite(Scene* scene);
+        virtual ~Sprite();
 
         void addFrame(int id, std::string name, Rect rect);
         void addFrame(std::string name, float x, float y, float width, float height);
@@ -26,7 +31,9 @@ namespace Supernova{
         void setFrame(int id);
         void setFrame(std::string name);
 
-        void addAnimation(int id, std::vector<int> framesTime, std::vector<int> frames, bool loop);
+        void startAnimation(std::vector<int> frames, std::vector<int> framesTime, bool loop);
+        void startAnimation(int startFrame, int endFrame, int interval, bool loop);
+        void stopAnimation();
     };
 }
 
