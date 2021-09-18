@@ -111,10 +111,13 @@ void onKeyDown(int key, bool repeat, int mods){
 
     if (key == S_KEY_R){
         //spriteanim.start();
-        sprite.startAnimation({0, 1, 2}, {100, 100, 100}, true);
+        sprite.startAnimation({0, 1, 2}, {1000, 1000, 1000}, true);
     }
-
     if (key == S_KEY_T){
+        //spriteanim.start();
+        sprite.pauseAnimation();
+    }
+    if (key == S_KEY_Y){
         //spriteanim.start();
         sprite.stopAnimation();
     }

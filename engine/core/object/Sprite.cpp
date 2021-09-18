@@ -136,6 +136,12 @@ void Sprite::startAnimation(int startFrame, int endFrame, int interval, bool loo
     animation->start();
 }
 
+void Sprite::pauseAnimation(){
+    if (animation){
+        animation->pause();
+    }
+}
+
 void Sprite::stopAnimation(){
     if (animation){
         animation->stop();

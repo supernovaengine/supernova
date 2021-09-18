@@ -21,7 +21,27 @@ void ActionSystem::actionPause(ActionComponent& action){
 
 }
 
-void ActionSystem::spriteAction(double dt, ActionComponent& action, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
+void ActionSystem::setSpriteTextureRect(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
+    if (spriteanim.frameIndex < MAX_SPRITE_FRAMES){
+        FrameData frameData = sprite.framesRect[spriteanim.frames[spriteanim.frameIndex]];
+        if (frameData.active)
+            sprite.textureRect = frameData.rect;
+    }
+}
+
+void ActionSystem::spriteActionStart(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
+    setSpriteTextureRect(sprite, spriteanim);
+}
+
+void ActionSystem::spriteActionStop(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
+    spriteanim.frameIndex = 0;
+    spriteanim.frameTimeIndex = 0;
+    spriteanim.spriteFrameCount = 0;
+
+    setSpriteTextureRect(sprite, spriteanim);
+}
+
+void ActionSystem::spriteActionUpdate(double dt, ActionComponent& action, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
     spriteanim.spriteFrameCount += dt * 1000;
     while (spriteanim.spriteFrameCount >= spriteanim.framesTime[spriteanim.frameTimeIndex]) {
 
@@ -41,12 +61,8 @@ void ActionSystem::spriteAction(double dt, ActionComponent& action, SpriteCompon
         
         if (spriteanim.frameTimeIndex >= spriteanim.framesTimeSize)
             spriteanim.frameTimeIndex = 0;
-    }
 
-    if (spriteanim.frameIndex < MAX_SPRITE_FRAMES){
-        FrameData frameData = sprite.framesRect[spriteanim.frames[spriteanim.frameIndex]];
-        if (frameData.active)
-            sprite.textureRect = frameData.rect;
+        setSpriteTextureRect(sprite, spriteanim);
     }
 }
 
@@ -67,12 +83,40 @@ void ActionSystem::update(double dt){
             action.state = ActionState::Running;
             action.startTrigger = false;
             actionStart(action);
+
+            Entity entity = actions->getEntity(i);
+            Signature targetSignature = scene->getSignature(action.target);
+            Signature signature = scene->getSignature(entity);
+
+            if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
+                SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
+                if (targetSignature.test(scene->getComponentType<SpriteComponent>())){
+                    SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+
+                    spriteActionStart(sprite, spriteanim);
+
+                }
+            }
         }
 
 		if (action.stopTrigger == true && (action.state == ActionState::Running || action.state == ActionState::Paused)){
             action.state = ActionState::Stopped;
             action.stopTrigger = false;
             actionStop(action);
+
+            Entity entity = actions->getEntity(i);
+            Signature targetSignature = scene->getSignature(action.target);
+            Signature signature = scene->getSignature(entity);
+
+            if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
+                SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
+                if (targetSignature.test(scene->getComponentType<SpriteComponent>())){
+                    SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+
+                    spriteActionStop(sprite, spriteanim);
+
+                }
+            }
         }
 
         if (action.pauseTrigger == true && action.state == ActionState::Running){
@@ -81,20 +125,18 @@ void ActionSystem::update(double dt){
             actionPause(action);
         }
 
-        Entity target = action.target;
+        if ((action.state == ActionState::Running) && (action.target != NULL_ENTITY)){
 
-        if ((action.state == ActionState::Running) && (target != NULL_ENTITY)){
-
-            Signature targetSignature = scene->getSignature(target);
             Entity entity = actions->getEntity(i);
+            Signature targetSignature = scene->getSignature(action.target);
             Signature signature = scene->getSignature(entity);
 
             if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
                 SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
                 if (targetSignature.test(scene->getComponentType<SpriteComponent>())){
-                    SpriteComponent& sprite = scene->getComponent<SpriteComponent>(target);
+                    SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
 
-                    spriteAction(dt, action, sprite, spriteanim);
+                    spriteActionUpdate(dt, action, sprite, spriteanim);
 
                 }
             }

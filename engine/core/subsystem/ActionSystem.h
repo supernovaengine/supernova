@@ -16,7 +16,11 @@ namespace Supernova{
         void actionStop(ActionComponent& action);
         void actionPause(ActionComponent& action);
 
-		void spriteAction(double dt, ActionComponent& action, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
+		// Sprite action functions
+		void setSpriteTextureRect(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
+		void spriteActionStart(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
+		void spriteActionStop(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
+		void spriteActionUpdate(double dt, ActionComponent& action, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
 
 	public:
 		ActionSystem(Scene* scene);
