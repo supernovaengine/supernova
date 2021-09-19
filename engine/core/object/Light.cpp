@@ -20,14 +20,14 @@ Light::~Light(){
 }
 
 void Light::setType(LightType type){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
 
     lightcomp.type = type;
 }
 
 void Light::setDirection(Vector3 direction){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
-    Transform& transform = scene->getComponent<Transform>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
+    Transform& transform = getComponent<Transform>();
 
     lightcomp.direction = direction;
     transform.needUpdate = true; //Does not affect children
@@ -38,7 +38,7 @@ void Light::setDirection(const float x, const float y, const float z){
 }
 
 void Light::setColor(Vector3 color){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
 
     lightcomp.color = Color::sRGBToLinear(color);
 }
@@ -48,14 +48,14 @@ void Light::setColor(const float r, const float g, const float b){
 }
 
 void Light::setRange(float range){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
 
     lightcomp.range = range;
 }
 
 void Light::setIntensity(float intensity){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
-    Transform& transform = scene->getComponent<Transform>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
+    Transform& transform = getComponent<Transform>();
 
     if (intensity > 0 && lightcomp.intensity == 0)
         transform.needUpdate = true; //Does not affect children
@@ -64,38 +64,38 @@ void Light::setIntensity(float intensity){
 }
 
 void Light::setConeAngle(float inner, float outer){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
 
     lightcomp.innerConeCos = cos(Angle::defaultToRad(inner / 2));
     lightcomp.outerConeCos = cos(Angle::defaultToRad(outer / 2));
 }
 
 void Light::setShadows(bool shadows){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
 
     lightcomp.shadows = shadows;
 }
 
 void Light::setBias(float bias){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
     
     lightcomp.shadowBias = bias;
 }
 
 void Light::setShadowMapSize(unsigned int size){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
     
     lightcomp.mapResolution = size;
 }
 
 void Light::setShadowCameraNearFar(float near, float far){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
     
     lightcomp.shadowCameraNearFar = Vector2(near, far);
 }
 
 void Light::setNumCascades(unsigned int numCascades){
-    LightComponent& lightcomp = scene->getComponent<LightComponent>(entity);
+    LightComponent& lightcomp = getComponent<LightComponent>();
     
     lightcomp.numShadowCascades = numCascades;
 }

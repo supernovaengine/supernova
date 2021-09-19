@@ -18,6 +18,7 @@ Polygon polygon3(&scene);
 Sprite sprite(&scene);
 SpriteAnimation spriteanim(&scene);
 
+void onActionStart();
 void onKeyDown(int key, bool repeat, int mods);
 
 void init(){
@@ -38,6 +39,7 @@ void init(){
     spriteanim.setTarget(sprite.getEntity());
 
     spriteanim.setAnimation({0, 1, 2}, {100, 100, 100}, true);
+    spriteanim.getComponent<ActionComponent>().onStart = onActionStart;
 
     polygonroot.addVertex(0, 0);
     polygonroot.addVertex(30, 0);
@@ -85,6 +87,10 @@ void init(){
     Engine::onKeyDown = onKeyDown;
 }
 
+void onActionStart(){
+    Log::Verbose("Action Start");
+}
+
 void onKeyDown(int key, bool repeat, int mods){
     if (key == S_KEY_A){
         sprite.moveToLast();
@@ -110,16 +116,16 @@ void onKeyDown(int key, bool repeat, int mods){
     }
 
     if (key == S_KEY_R){
-        //spriteanim.start();
-        sprite.startAnimation({0, 1, 2}, {1000, 1000, 1000}, true);
+        spriteanim.start();
+        //sprite.startAnimation({0, 1, 2}, {1000, 1000, 1000}, true);
     }
     if (key == S_KEY_T){
-        //spriteanim.start();
-        sprite.pauseAnimation();
+        spriteanim.pause();
+        //sprite.pauseAnimation();
     }
     if (key == S_KEY_Y){
-        //spriteanim.start();
-        sprite.stopAnimation();
+        spriteanim.stop();
+        //sprite.stopAnimation();
     }
 }
 

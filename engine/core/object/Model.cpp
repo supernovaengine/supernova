@@ -17,7 +17,7 @@
 using namespace Supernova;
 
 Model::Model(Scene* scene): Mesh(scene){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+    MeshComponent& mesh = getComponent<MeshComponent>();
     mesh.buffers["vertices"] = &buffer;
     mesh.buffers["indices"] = &indices;
 
@@ -273,7 +273,7 @@ bool Model::loadOBJ(const char* filename){
         buffer.clear();
         indices.clear();
 
-        MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+        MeshComponent& mesh = getComponent<MeshComponent>();
 
         mesh.numSubmeshes = materials.size();
 
@@ -400,7 +400,7 @@ bool Model::loadGLTF(const char* filename) {
     if (!gltfModel)
         gltfModel = new tinygltf::Model();
 
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+    MeshComponent& mesh = getComponent<MeshComponent>();
 
     tinygltf::TinyGLTF loader;
     std::string err;

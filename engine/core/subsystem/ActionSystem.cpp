@@ -10,15 +10,15 @@ ActionSystem::ActionSystem(Scene* scene): SubSystem(scene){
 }
 
 void ActionSystem::actionStart(ActionComponent& action){
-
+    action.onStart.call();
 }
 
 void ActionSystem::actionStop(ActionComponent& action){
-
+    action.onStop.call();
 }
 
 void ActionSystem::actionPause(ActionComponent& action){
-
+    action.onPause.call();
 }
 
 void ActionSystem::setSpriteTextureRect(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){

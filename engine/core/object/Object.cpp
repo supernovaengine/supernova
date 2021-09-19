@@ -18,17 +18,17 @@ Object::~Object(){
 }
 
 void Object::setName(std::string name){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
     transform.name = name;
 }
 
 std::string Object::getName(){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
     return transform.name;
 }
 
 void Object::setPosition(Vector3 position){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
 
     if (transform.position != position){
         transform.position = position;
@@ -42,17 +42,17 @@ void Object::setPosition(const float x, const float y, const float z){
 }
 
 Vector3 Object::getPosition(){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
     return transform.position;
 }
 
 Vector3 Object::getWorldPosition(){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
     return transform.worldPosition;
 }
 
 void Object::setRotation(Quaternion rotation){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
 
     if (transform.rotation != rotation){
         transform.rotation = rotation;
@@ -72,12 +72,12 @@ void Object::setRotation(const float xAngle, const float yAngle, const float zAn
 }
 
 Quaternion Object::getRotation(){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
     return transform.rotation;
 }
 
 Quaternion Object::getWorldRotation(){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
     return transform.worldRotation;
 }
 
@@ -86,7 +86,7 @@ void Object::setScale(const float factor){
 }
 
 void Object::setScale(Vector3 scale){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
 
     if (transform.scale != scale){
         transform.scale = scale;
@@ -96,12 +96,12 @@ void Object::setScale(Vector3 scale){
 }
 
 Vector3 Object::getScale(){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
     return transform.scale;
 }
 
 Vector3 Object::getWorldScale(){
-    Transform& transform = scene->getComponent<Transform>(entity);
+    Transform& transform = getComponent<Transform>();
     return transform.worldScale;
 }
 

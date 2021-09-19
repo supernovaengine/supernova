@@ -8,7 +8,7 @@ using namespace Supernova;
 
 
 PlaneTerrain::PlaneTerrain(Scene* scene): Mesh(scene){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+    MeshComponent& mesh = getComponent<MeshComponent>();
     mesh.buffers["vertices"] = &buffer;
     mesh.buffers["indices"] = &indices;
 
@@ -30,7 +30,7 @@ void PlaneTerrain::create(float width, float depth){
     buffer.clear();
     indices.clear();
 
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+    MeshComponent& mesh = getComponent<MeshComponent>();
 
     Attribute* attVertex = buffer.getAttribute(AttributeType::POSITION);
     buffer.addVector3(attVertex, Vector3(0, 0, 0));

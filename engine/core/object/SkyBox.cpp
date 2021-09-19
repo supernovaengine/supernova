@@ -11,7 +11,7 @@ SkyBox::SkyBox(Scene* scene){
     this->entity = scene->createEntity();
     addComponent<SkyComponent>({});
 
-    SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+    SkyComponent& sky = getComponent<SkyComponent>();
     sky.buffer = &buffer;
 
 	buffer.clearAll();
@@ -66,43 +66,43 @@ void SkyBox::setTextures(std::string textureFront, std::string textureBack,
                         std::string textureLeft, std::string textureRight, 
                         std::string textureUp, std::string textureDown){
     
-    SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+    SkyComponent& sky = getComponent<SkyComponent>();
 
     sky.texture.setCubePaths(textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
 }
 
 void SkyBox::setTextureFront(std::string textureFront){
-    SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+    SkyComponent& sky = getComponent<SkyComponent>();
 
     sky.texture.setCubePath(5, textureFront);
 }
 
 void SkyBox::setTextureBack(std::string textureBack){
-    SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+    SkyComponent& sky = getComponent<SkyComponent>();
 
     sky.texture.setCubePath(4, textureBack);
 }
 
 void SkyBox::setTextureLeft(std::string textureLeft){
-    SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+    SkyComponent& sky = getComponent<SkyComponent>();
 
     sky.texture.setCubePath(1, textureLeft);
 }
 
 void SkyBox::setTextureRight(std::string textureRight){
-    SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+    SkyComponent& sky = getComponent<SkyComponent>();
 
     sky.texture.setCubePath(0, textureRight);
 }
 
 void SkyBox::setTextureUp(std::string textureUp){
-    SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+    SkyComponent& sky = getComponent<SkyComponent>();
 
     sky.texture.setCubePath(2, textureUp);
 }
 
 void SkyBox::setTextureDown(std::string textureDown){
-    SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+    SkyComponent& sky = getComponent<SkyComponent>();
 
     sky.texture.setCubePath(3, textureDown);
 }

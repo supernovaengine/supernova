@@ -18,7 +18,12 @@ namespace Supernova{
         bool startTrigger = false;
         bool stopTrigger = false;
         bool pauseTrigger = false;
+
+        FunctionSubscribe<void()> onStart;
+        FunctionSubscribe<void()> onPause;
+        FunctionSubscribe<void()> onStop;
     };
+
     
 }
 

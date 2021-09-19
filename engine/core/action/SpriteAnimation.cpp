@@ -11,7 +11,7 @@ SpriteAnimation::SpriteAnimation(Scene* scene): Action(scene){
 }
 
 void SpriteAnimation::setAnimation(std::vector<int> frames, std::vector<int> framesTime, bool loop){
-    SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
+    SpriteAnimationComponent& spriteanim = getComponent<SpriteAnimationComponent>();
 
     spriteanim.framesTimeSize = framesTime.size();
     for (int i = 0; i < framesTime.size(); i++){

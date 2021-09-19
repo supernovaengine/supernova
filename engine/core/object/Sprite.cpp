@@ -7,7 +7,7 @@ using namespace Supernova;
 Sprite::Sprite(Scene* scene): Polygon(scene){
     animation = NULL;
 
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
     spritecomp.primitiveType = PrimitiveType::TRIANGLES;
 
 	buffer.clearAll();
@@ -53,7 +53,7 @@ Sprite::~Sprite(){
 }
 
 void Sprite::addFrame(int id, std::string name, Rect rect){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
     if (id >= 0 && id < MAX_SPRITE_FRAMES){
         spritecomp.framesRect[id] = {true, name, rect};
     }else{
@@ -62,7 +62,7 @@ void Sprite::addFrame(int id, std::string name, Rect rect){
 }
 
 void Sprite::addFrame(std::string name, float x, float y, float width, float height){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     int id = 0;
     while ( (spritecomp.framesRect[id].active = true) && (id < MAX_SPRITE_FRAMES) ) {
@@ -85,12 +85,12 @@ void Sprite::addFrame(Rect rect){
 }
 
 void Sprite::removeFrame(int id){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
     spritecomp.framesRect[id].active = false;
 }
 
 void Sprite::removeFrame(std::string name){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     for (int id = 0; id < MAX_SPRITE_FRAMES; id++){
         if (spritecomp.framesRect[id].name == name){
@@ -101,13 +101,13 @@ void Sprite::removeFrame(std::string name){
 
 void Sprite::setFrame(int id){
     if (id >= 0 && id < MAX_SPRITE_FRAMES){
-        SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+        SpriteComponent& spritecomp = getComponent<SpriteComponent>();
         setTextureRect(spritecomp.framesRect[id].rect);
     }
 }
 
 void Sprite::setFrame(std::string name){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
     int id = 0;
     while ( (spritecomp.framesRect[id].active = false) && (id < MAX_SPRITE_FRAMES) ) {
         id++;

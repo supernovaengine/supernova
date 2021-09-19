@@ -11,7 +11,7 @@ using namespace Supernova;
 Mesh::Mesh(Scene* scene): Object(scene){
     addComponent<MeshComponent>({});
 
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+    MeshComponent& mesh = getComponent<MeshComponent>();
     mesh.buffers["vertices"] = &buffer;
 
 	buffer.clearAll();
@@ -37,7 +37,7 @@ void Mesh::addVertex(float x, float y, float z){
 }
 
 void Mesh::setTexture(std::string path){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+    MeshComponent& mesh = getComponent<MeshComponent>();
 
     mesh.submeshes[0].material.baseColorTexture.setPath(path);
 
@@ -45,7 +45,7 @@ void Mesh::setTexture(std::string path){
 }
 
 void Mesh::setColor(Vector4 color){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+    MeshComponent& mesh = getComponent<MeshComponent>();
 
     mesh.submeshes[0].material.baseColorFactor = Color::sRGBToLinear(color);
 }
@@ -55,7 +55,7 @@ void Mesh::setColor(float red, float green, float blue, float alpha){
 }
 
 Vector4 Mesh::getColor(){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+    MeshComponent& mesh = getComponent<MeshComponent>();
 
     return Color::linearTosRGB(mesh.submeshes[0].material.baseColorFactor);
 }

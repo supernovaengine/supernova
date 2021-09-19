@@ -7,7 +7,7 @@ using namespace Supernova;
 Polygon::Polygon(Scene* scene): Object(scene){
     addComponent<SpriteComponent>({});
 
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
     spritecomp.buffer = &buffer;
     spritecomp.indices = &indices;
     spritecomp.primitiveType = PrimitiveType::TRIANGLE_STRIP;
@@ -25,7 +25,7 @@ void Polygon::addVertex(Vector3 vertex){
 
     if (buffer.getCount() > 3){
         generateTexcoords();
-    //    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+    //    MeshComponent& mesh = getComponent<MeshComponent>();
     //    mesh.primitiveType = S_PRIMITIVE_TRIANGLE_STRIP;
     }
 }
@@ -36,7 +36,7 @@ void Polygon::addVertex(float x, float y){
 
 void Polygon::generateTexcoords(){
 
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     float min_X = std::numeric_limits<float>::max();
     float max_X = std::numeric_limits<float>::min();
@@ -73,7 +73,7 @@ void Polygon::generateTexcoords(){
 }
 
 void Polygon::setColor(Vector4 color){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     spritecomp.color = Color::sRGBToLinear(color);
 }
@@ -83,13 +83,13 @@ void Polygon::setColor(float red, float green, float blue, float alpha){
 }
 
 Vector4 Polygon::getColor(){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     return Color::linearTosRGB(spritecomp.color);
 }
 
 void Polygon::setTexture(std::string path){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     spritecomp.texture.setPath(path);
 
@@ -101,13 +101,13 @@ void Polygon::setTextureRect(float x, float y, float width, float height){
 }
 
 void Polygon::setTextureRect(Rect textureRect){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     spritecomp.textureRect = textureRect;
 }
 
 Rect Polygon::getTextureRect(){
-    SpriteComponent& spritecomp = scene->getComponent<SpriteComponent>(entity);
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     return spritecomp.textureRect;
 }

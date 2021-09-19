@@ -13,25 +13,25 @@ Action::Action(Scene* scene){
 }
 
 void Action::start(){
-    ActionComponent& action = scene->getComponent<ActionComponent>(entity);
+    ActionComponent& action = getComponent<ActionComponent>();
 
     action.startTrigger = true;
 }
 
 void Action::pause(){
-    ActionComponent& action = scene->getComponent<ActionComponent>(entity);
+    ActionComponent& action = getComponent<ActionComponent>();
 
     action.pauseTrigger = true;
 }
 
 void Action::stop(){
-    ActionComponent& action = scene->getComponent<ActionComponent>(entity);
+    ActionComponent& action = getComponent<ActionComponent>();
 
     action.stopTrigger = true;
 }
 
 void Action::setTarget(Entity target){
-    ActionComponent& action = scene->getComponent<ActionComponent>(entity);
+    ActionComponent& action = getComponent<ActionComponent>();
 
     action.target = target;
 }

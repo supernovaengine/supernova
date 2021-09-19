@@ -12,8 +12,8 @@ using namespace Supernova;
 Camera::Camera(Scene* scene): Object(scene){
     addComponent<CameraComponent>({});
 
-    CameraComponent& cameraComponent = scene->getComponent<CameraComponent>(entity);
-    Transform& transform = scene->getComponent<Transform>(entity);
+    CameraComponent& cameraComponent = getComponent<CameraComponent>();
+    Transform& transform = getComponent<Transform>();
 
     transform.position = Vector3(0, 0, 1);
 
@@ -45,7 +45,7 @@ void Camera::activate(){
 }
 
 void Camera::setOrtho(float left, float right, float bottom, float top, float near, float far){
-    CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+    CameraComponent& camera = getComponent<CameraComponent>();
 
     camera.type = CameraType::CAMERA_ORTHO;
 
@@ -62,7 +62,7 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
 }
 
 void Camera::setPerspective(float y_fov, float aspect, float near, float far){
-    CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+    CameraComponent& camera = getComponent<CameraComponent>();
 
     camera.type = CameraType::CAMERA_PERSPECTIVE;
 
@@ -77,7 +77,7 @@ void Camera::setPerspective(float y_fov, float aspect, float near, float far){
 }
 
 void Camera::setType(CameraType type){
-    CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+    CameraComponent& camera = getComponent<CameraComponent>();
     
     if (camera.type != type){
         camera.type = type;
@@ -87,7 +87,7 @@ void Camera::setType(CameraType type){
 }
 
 void Camera::setView(Vector3 view){
-    CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+    CameraComponent& camera = getComponent<CameraComponent>();
 
     if (camera.view != view){
         camera.view = view;
@@ -101,12 +101,12 @@ void Camera::setView(const float x, const float y, const float z){
 }
 
 Vector3 Camera::getView(){
-    CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+    CameraComponent& camera = getComponent<CameraComponent>();
     return camera.view;
 }
 
 void Camera::setUp(Vector3 up){
-    CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+    CameraComponent& camera = getComponent<CameraComponent>();
     
     if (camera.up != up){
         camera.up = up;
@@ -120,14 +120,14 @@ void Camera::setUp(const float x, const float y, const float z){
 }
 
 Vector3 Camera::getUp(){
-    CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+    CameraComponent& camera = getComponent<CameraComponent>();
     return camera.up;
 }
 
 void Camera::rotateView(float angle){
     if (angle != 0){
-        CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
-        Transform& transf = scene->getComponent<Transform>(entity);
+        CameraComponent& camera = getComponent<CameraComponent>();
+        Transform& transf = getComponent<Transform>();
 
         Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
 
@@ -143,8 +143,8 @@ void Camera::rotateView(float angle){
 
 void Camera::rotatePosition(float angle){
     if (angle != 0){
-        CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
-        Transform& transf = scene->getComponent<Transform>(entity);
+        CameraComponent& camera = getComponent<CameraComponent>();
+        Transform& transf = getComponent<Transform>();
 
         Vector3 positionCenter(transf.position.x - camera.view.x, transf.position.y - camera.view.y, transf.position.z - camera.view.z);
 
@@ -161,8 +161,8 @@ void Camera::rotatePosition(float angle){
 
 void Camera::elevateView(float angle){
     if (angle != 0){
-        CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
-        Transform& transf = scene->getComponent<Transform>(entity);
+        CameraComponent& camera = getComponent<CameraComponent>();
+        Transform& transf = getComponent<Transform>();
 
         Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
 
@@ -178,8 +178,8 @@ void Camera::elevateView(float angle){
 
 void Camera::elevatePosition(float angle){
     if (angle != 0){
-        CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
-        Transform& transf = scene->getComponent<Transform>(entity);
+        CameraComponent& camera = getComponent<CameraComponent>();
+        Transform& transf = getComponent<Transform>();
 
         Vector3 positionCenter(transf.position.x - camera.view.x, transf.position.y - camera.view.y, transf.position.z - camera.view.z);
 
@@ -196,8 +196,8 @@ void Camera::elevatePosition(float angle){
 
 void Camera::moveForward(float distance){
     if (distance != 0){
-        CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
-        Transform& transf = scene->getComponent<Transform>(entity);
+        CameraComponent& camera = getComponent<CameraComponent>();
+        Transform& transf = getComponent<Transform>();
 
         Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
 
@@ -213,8 +213,8 @@ void Camera::moveForward(float distance){
 
 void Camera::walkForward(float distance){
     if (distance != 0){
-        CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
-        Transform& transf = scene->getComponent<Transform>(entity);
+        CameraComponent& camera = getComponent<CameraComponent>();
+        Transform& transf = getComponent<Transform>();
 
         Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
 
@@ -232,8 +232,8 @@ void Camera::walkForward(float distance){
 
 void Camera::slide(float distance){
     if (distance != 0){
-        CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
-        Transform& transf = scene->getComponent<Transform>(entity);
+        CameraComponent& camera = getComponent<CameraComponent>();
+        Transform& transf = getComponent<Transform>();
 
         Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
 
@@ -252,6 +252,6 @@ void Camera::updateCamera(CameraComponent& camera){
 }
 
 void Camera::updateCamera(){
-    CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+    CameraComponent& camera = getComponent<CameraComponent>();
     updateCamera(camera);
 }

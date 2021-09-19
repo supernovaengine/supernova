@@ -126,6 +126,15 @@ void LuaFunction::call(int p1, bool p2, int p3){
 };
 
 template<>
+void LuaFunction::call(Entity p1){
+    if (function != 0){
+        lua_rawgeti(LuaBinding::getLuaState(), LUA_REGISTRYINDEX, function);
+        lua_pushnumber(LuaBinding::getLuaState(), p1);
+        LuaBinding::luaCallback(1, 0, 0);
+    }
+};
+
+template<>
 void LuaFunction::call(Object* p1){
     if (function != 0){
         lua_rawgeti(LuaBinding::getLuaState(), LUA_REGISTRYINDEX, function);
