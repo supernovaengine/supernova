@@ -6,7 +6,10 @@ using namespace Supernova;
 #include "Camera.h"
 #include "Polygon.h"
 #include "Input.h"
+#include "Angle.h"
 #include "SpriteAnimation.h"
+#include "RotationAction.h"
+#include "ScaleAction.h"
 
 Scene scene;
 Camera camera(&scene);
@@ -17,6 +20,8 @@ Polygon polygon2(&scene);
 Polygon polygon3(&scene);
 Sprite sprite(&scene);
 SpriteAnimation spriteanim(&scene);
+RotationAction rotationaction(&scene);
+ScaleAction scaleaction(&scene);
 
 void onActionStart();
 void onKeyDown(int key, bool repeat, int mods);
@@ -40,6 +45,16 @@ void init(){
 
     spriteanim.setAnimation({0, 1, 2}, {100, 100, 100}, true);
     spriteanim.getComponent<ActionComponent>().onStart = onActionStart;
+
+    Quaternion startRot;
+    Quaternion endRot;
+    startRot.fromAngle(Angle::degToDefault(0));
+    endRot.fromAngle(Angle::degToDefault(180));
+    rotationaction.setAction(startRot, endRot, 5, false);
+    rotationaction.setTarget(polygonroot.getEntity());
+
+    scaleaction.setAction(Vector3(1,1,1), Vector3(2,2,2), 10, false);
+    scaleaction.setTarget(sprite.getEntity());
 
     polygonroot.addVertex(0, 0);
     polygonroot.addVertex(30, 0);
@@ -116,8 +131,10 @@ void onKeyDown(int key, bool repeat, int mods){
     }
 
     if (key == S_KEY_R){
-        spriteanim.start();
         //sprite.startAnimation({0, 1, 2}, {1000, 1000, 1000}, true);
+        spriteanim.start();
+        //rotationaction.start();
+        scaleaction.start();
     }
     if (key == S_KEY_T){
         spriteanim.pause();

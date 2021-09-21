@@ -15,6 +15,10 @@
 #include "component/Transform.h"
 #include "component/LightComponent.h"
 #include "component/ActionComponent.h"
+#include "component/EaseComponent.h"
+#include "component/TimedActionComponent.h"
+#include "component/RotationActionComponent.h"
+#include "component/ScaleActionComponent.h"
 
 #include "subsystem/RenderSystem.h"
 #include "subsystem/ActionSystem.h"
@@ -46,7 +50,7 @@ namespace Supernova{
 
 		void updateCameraSize();
 
-		size_t findBranchLastIndex(Entity entity);
+		int32_t findBranchLastIndex(Entity entity);
 	
 		//Entity methods
 

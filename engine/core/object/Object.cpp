@@ -33,7 +33,7 @@ void Object::setPosition(Vector3 position){
     if (transform.position != position){
         transform.position = position;
 
-        updateTransform();
+        transform.needUpdate = true;
     }
 }
 
@@ -57,7 +57,7 @@ void Object::setRotation(Quaternion rotation){
     if (transform.rotation != rotation){
         transform.rotation = rotation;
 
-        updateTransform();
+        transform.needUpdate = true;
     }
 }
 
@@ -91,7 +91,7 @@ void Object::setScale(Vector3 scale){
     if (transform.scale != scale){
         transform.scale = scale;
 
-        updateTransform();
+        transform.needUpdate = true;
     }
 }
 
@@ -138,12 +138,6 @@ Entity Object::getEntity(){
 }
 
 void Object::updateTransform(){
-    auto transforms = scene->getComponentArray<Transform>();
-    size_t startIndex = transforms->getIndex(entity);
-    size_t endIndex = scene->findBranchLastIndex(entity);
-
-    for (int i = startIndex; i <= endIndex; i++){
-		Transform& transform = transforms->getComponentFromIndex(i);
-        transform.needUpdate = true;
-	}
+    Transform& transform = getComponent<Transform>();
+    transform.needUpdate = true;
 }

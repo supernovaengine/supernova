@@ -292,6 +292,7 @@ include_directories (${SUPERNOVA_ROOT}/engine/libs/sokol)
 include_directories (${SUPERNOVA_ROOT}/engine/core)
 include_directories (${SUPERNOVA_ROOT}/engine/core/action)
 include_directories (${SUPERNOVA_ROOT}/engine/core/ecs)
+include_directories (${SUPERNOVA_ROOT}/engine/core/math)
 include_directories (${SUPERNOVA_ROOT}/engine/core/object)
 include_directories (${SUPERNOVA_ROOT}/engine/renders)
 

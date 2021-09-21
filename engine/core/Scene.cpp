@@ -14,6 +14,10 @@ Scene::Scene(){
 	registerComponent<CameraComponent>();
 	registerComponent<LightComponent>();
 	registerComponent<ActionComponent>();
+	registerComponent<EaseComponent>();
+	registerComponent<TimedActionComponent>();
+	registerComponent<RotationActionComponent>();
+	registerComponent<ScaleActionComponent>();
 
 	registerSystem<RenderSystem>();
 	registerSystem<ActionSystem>();
@@ -97,7 +101,7 @@ void Scene::destroyEntity(Entity entity){
 	entityManager.destroy(entity);
 }
 
-size_t Scene::findBranchLastIndex(Entity entity){
+int32_t Scene::findBranchLastIndex(Entity entity){
 	auto transforms = componentManager.getComponentArray<Transform>();
 
 	size_t index = transforms->getIndex(entity);

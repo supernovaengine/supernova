@@ -909,11 +909,20 @@ void RenderSystem::update(double dt){
 		camera.needUpdate = true;
 	}
 
+	std::vector<Entity> parentList;
 	auto transforms = scene->getComponentArray<Transform>();
+
 	for (int i = 0; i < transforms->size(); i++){
 		Transform& transform = transforms->getComponentFromIndex(i);
-		
+
+		// Finding childs
+		if (std::find(parentList.begin(), parentList.end(), transform.parent) != parentList.end()){
+			transform.needUpdate = true;
+		}
+
 		if (transform.needUpdate){
+			Entity entity = transforms->getEntity(i);
+			parentList.push_back(entity);
 			updateTransform(transform);
 		}
 	}

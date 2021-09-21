@@ -66,6 +66,42 @@ void ActionSystem::spriteActionUpdate(double dt, ActionComponent& action, Sprite
     }
 }
 
+void ActionSystem::timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, EaseComponent& ease){
+    timedaction.timecount += dt;
+
+    if ((timedaction.time == 1) && !timedaction.loop){
+        action.stopTrigger = true;
+        //onFinish.call(object);
+    } else {
+        if (timedaction.duration >= 0) {
+
+            if (timedaction.timecount >= timedaction.duration){
+                if (!timedaction.loop){
+                    timedaction.timecount = timedaction.duration;
+                }else{
+                    timedaction.timecount -= timedaction.duration;
+                }
+            }
+
+            timedaction.time = timedaction.timecount / timedaction.duration;
+        }
+
+        timedaction.value = ease.function.call(timedaction.time);
+        //Log::Debug("step time %f value %f \n", timedaction.time, timedaction.value);
+    }
+}
+
+void ActionSystem::rotationActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, RotationActionComponent& rotaction, Transform& transform){
+    transform.rotation = transform.rotation.slerp(timedaction.value, rotaction.startRotation, rotaction.endRotation);
+    transform.needUpdate = true;
+}
+
+void ActionSystem::scaleActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ScaleActionComponent& scaleaction, Transform& transform){
+    Vector3 scale = (scaleaction.endScale - scaleaction.startScale) * timedaction.value;
+    transform.scale = scaleaction.startScale + scale;
+    transform.needUpdate = true;
+}
+
 void ActionSystem::load(){
 
 }
@@ -78,7 +114,8 @@ void ActionSystem::update(double dt){
     auto actions = scene->getComponentArray<ActionComponent>();
     for (int i = 0; i < actions->size(); i++){
 		ActionComponent& action = actions->getComponentFromIndex(i);
-		
+
+        // Action start
 		if (action.startTrigger == true && (action.state == ActionState::Stopped || action.state == ActionState::Paused)){
             action.state = ActionState::Running;
             action.startTrigger = false;
@@ -99,6 +136,7 @@ void ActionSystem::update(double dt){
             }
         }
 
+        // Action stop
 		if (action.stopTrigger == true && (action.state == ActionState::Running || action.state == ActionState::Paused)){
             action.state = ActionState::Stopped;
             action.stopTrigger = false;
@@ -119,24 +157,52 @@ void ActionSystem::update(double dt){
             }
         }
 
+        // Action pause
         if (action.pauseTrigger == true && action.state == ActionState::Running){
             action.state = ActionState::Paused;
             action.pauseTrigger = false;
             actionPause(action);
         }
 
+        // Action update
         if ((action.state == ActionState::Running) && (action.target != NULL_ENTITY)){
 
             Entity entity = actions->getEntity(i);
             Signature targetSignature = scene->getSignature(action.target);
             Signature signature = scene->getSignature(entity);
 
+            //Sprite animation
             if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
                 SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
                 if (targetSignature.test(scene->getComponentType<SpriteComponent>())){
                     SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
 
                     spriteActionUpdate(dt, action, sprite, spriteanim);
+
+                }
+            }
+
+            //Transform animation
+            if (signature.test(scene->getComponentType<TimedActionComponent>()) && signature.test(scene->getComponentType<EaseComponent>())){
+                TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
+                EaseComponent& ease = scene->getComponent<EaseComponent>(entity);
+
+                timedActionUpdate(dt, action, timedaction, ease);
+
+                if (targetSignature.test(scene->getComponentType<Transform>())){
+                    Transform& transform = scene->getComponent<Transform>(action.target);
+
+                    if (signature.test(scene->getComponentType<RotationActionComponent>())){
+                        RotationActionComponent& rotaction = scene->getComponent<RotationActionComponent>(entity);
+
+                        rotationActionUpdate(dt, action, timedaction, rotaction, transform);
+                    }
+
+                    if (signature.test(scene->getComponentType<ScaleActionComponent>())){
+                        ScaleActionComponent& scaleaction = scene->getComponent<ScaleActionComponent>(entity);
+
+                        scaleActionUpdate(dt, action, timedaction, scaleaction, transform);
+                    }
 
                 }
             }

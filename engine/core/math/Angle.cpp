@@ -16,7 +16,7 @@ float Angle::radToDefault(float radians){
 }
 
 float Angle::degToDefault(float degrees){
-    if (Engine::isUseDegrees()){
+    if (!Engine::isUseDegrees()){
         return degrees * (M_PI / 180.0);
     }else{
         return degrees;
@@ -32,7 +32,7 @@ float Angle::defaultToRad(float angle){
 }
 
 float Angle::defaultToDeg(float angle){
-  if (Engine::isUseDegrees()){
+  if (!Engine::isUseDegrees()){
       return angle * (180.0 / M_PI);
   }else{
       return angle;

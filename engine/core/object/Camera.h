@@ -40,7 +40,6 @@ namespace Supernova{
         void walkForward(float distance);
         void slide(float distance);
 
-        void updateCamera(CameraComponent& camera);
         void updateCamera();
     };
 

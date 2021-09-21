@@ -58,7 +58,7 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
     
     camera.automatic = false;
 
-    updateCamera(camera);
+    camera.needUpdate = true;
 }
 
 void Camera::setPerspective(float y_fov, float aspect, float near, float far){
@@ -73,7 +73,7 @@ void Camera::setPerspective(float y_fov, float aspect, float near, float far){
     
     camera.automatic = false;
 
-    updateCamera(camera);
+    camera.needUpdate = true;
 }
 
 void Camera::setType(CameraType type){
@@ -82,7 +82,7 @@ void Camera::setType(CameraType type){
     if (camera.type != type){
         camera.type = type;
 
-        updateCamera(camera);
+        camera.needUpdate = true;
     }
 }
 
@@ -92,7 +92,7 @@ void Camera::setView(Vector3 view){
     if (camera.view != view){
         camera.view = view;
 
-        updateCamera(camera);
+        camera.needUpdate = true;
     }
 }
 
@@ -111,7 +111,7 @@ void Camera::setUp(Vector3 up){
     if (camera.up != up){
         camera.up = up;
 
-        updateCamera(camera);
+        camera.needUpdate = true;
     }
 }
 
@@ -137,7 +137,7 @@ void Camera::rotateView(float angle){
 
         camera.view = Vector3(viewCenter.x + transf.position.x, viewCenter.y + transf.position.y, viewCenter.z + transf.position.z);
 
-        updateCamera(camera);
+        camera.needUpdate = true;
     }
 }
 
@@ -154,8 +154,8 @@ void Camera::rotatePosition(float angle){
 
         transf.position = Vector3(positionCenter.x + camera.view.x, positionCenter.y + camera.view.y, positionCenter.z + camera.view.z);
 
-        updateTransform();
-        updateCamera(camera);
+        transf.needUpdate = true;
+        camera.needUpdate = true;
     }
 }
 
@@ -172,7 +172,7 @@ void Camera::elevateView(float angle){
 
         camera.view = Vector3(viewCenter.x + transf.position.x, viewCenter.y + transf.position.y, viewCenter.z + transf.position.z);
 
-        updateCamera(camera);
+        camera.needUpdate = true;
     }
 }
 
@@ -189,8 +189,8 @@ void Camera::elevatePosition(float angle){
 
         transf.position = Vector3(positionCenter.x + camera.view.x, positionCenter.y + camera.view.y, positionCenter.z + camera.view.z);
 
-        updateTransform();
-        updateCamera(camera);
+        transf.needUpdate = true;
+        camera.needUpdate = true;
     }
 }
 
@@ -206,8 +206,8 @@ void Camera::moveForward(float distance){
         camera.view = camera.view + (viewCenter.normalize() * distance);
         transf.position = transf.position + (viewCenter.normalize() * distance);
 
-        updateTransform();
-        updateCamera(camera);
+        transf.needUpdate = true;
+        camera.needUpdate = true;
     }
 }
 
@@ -225,8 +225,8 @@ void Camera::walkForward(float distance){
         camera.view = camera.view + (walkVector.normalize() * distance);
         transf.position = transf.position + (walkVector.normalize() * distance);
 
-        updateTransform();
-        updateCamera(camera);
+        transf.needUpdate = true;
+        camera.needUpdate = true;
     }
 }
 
@@ -242,16 +242,12 @@ void Camera::slide(float distance){
         camera.view = camera.view + (slideVector.normalize() * distance);
         transf.position = transf.position + (slideVector.normalize() * distance);
 
-        updateTransform();
-        updateCamera(camera);
+        transf.needUpdate = true;
+        camera.needUpdate = true;
     }
-}
-
-void Camera::updateCamera(CameraComponent& camera){
-    camera.needUpdate = true;
 }
 
 void Camera::updateCamera(){
     CameraComponent& camera = getComponent<CameraComponent>();
-    updateCamera(camera);
+    camera.needUpdate = true;
 }
