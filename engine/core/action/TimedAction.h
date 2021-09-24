@@ -6,6 +6,7 @@
 #define TIMEDACTION_H
 
 #include "Action.h"
+#include "Ease.h"
 
 namespace Supernova{
     class TimedAction: public Action{

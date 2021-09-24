@@ -17,6 +17,7 @@
 #include "component/ActionComponent.h"
 #include "component/EaseComponent.h"
 #include "component/TimedActionComponent.h"
+#include "component/PositionActionComponent.h"
 #include "component/RotationActionComponent.h"
 #include "component/ScaleActionComponent.h"
 

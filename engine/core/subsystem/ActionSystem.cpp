@@ -91,6 +91,12 @@ void ActionSystem::timedActionUpdate(double dt, ActionComponent& action, TimedAc
     }
 }
 
+void ActionSystem::positionActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, PositionActionComponent& posaction, Transform& transform){
+    Vector3 position = (posaction.endPosition - posaction.startPosition) * timedaction.value;
+    transform.position = posaction.startPosition + position;
+    transform.needUpdate = true;
+}
+
 void ActionSystem::rotationActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, RotationActionComponent& rotaction, Transform& transform){
     transform.rotation = transform.rotation.slerp(timedaction.value, rotaction.startRotation, rotaction.endRotation);
     transform.needUpdate = true;
@@ -191,6 +197,12 @@ void ActionSystem::update(double dt){
 
                 if (targetSignature.test(scene->getComponentType<Transform>())){
                     Transform& transform = scene->getComponent<Transform>(action.target);
+
+                    if (signature.test(scene->getComponentType<PositionActionComponent>())){
+                        PositionActionComponent& posaction = scene->getComponent<PositionActionComponent>(entity);
+
+                        positionActionUpdate(dt, action, timedaction, posaction, transform);
+                    }
 
                     if (signature.test(scene->getComponentType<RotationActionComponent>())){
                         RotationActionComponent& rotaction = scene->getComponent<RotationActionComponent>(entity);

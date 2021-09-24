@@ -8,6 +8,7 @@ using namespace Supernova;
 #include "Input.h"
 #include "Angle.h"
 #include "SpriteAnimation.h"
+#include "PositionAction.h"
 #include "RotationAction.h"
 #include "ScaleAction.h"
 
@@ -20,6 +21,7 @@ Polygon polygon2(&scene);
 Polygon polygon3(&scene);
 Sprite sprite(&scene);
 SpriteAnimation spriteanim(&scene);
+PositionAction positionaction(&scene);
 RotationAction rotationaction(&scene);
 ScaleAction scaleaction(&scene);
 
@@ -55,6 +57,10 @@ void init(){
 
     scaleaction.setAction(Vector3(1,1,1), Vector3(2,2,2), 10, false);
     scaleaction.setTarget(sprite.getEntity());
+
+    positionaction.setAction(Vector3(20,20,0), Vector3(200,200,0), 5, false);
+    positionaction.setTarget(sprite.getEntity());
+    positionaction.setFunctionType(S_EASE_ELASTIC_IN_OUT);
 
     polygonroot.addVertex(0, 0);
     polygonroot.addVertex(30, 0);
@@ -133,8 +139,9 @@ void onKeyDown(int key, bool repeat, int mods){
     if (key == S_KEY_R){
         //sprite.startAnimation({0, 1, 2}, {1000, 1000, 1000}, true);
         spriteanim.start();
+        positionaction.start();
         //rotationaction.start();
-        scaleaction.start();
+        //scaleaction.start();
     }
     if (key == S_KEY_T){
         spriteanim.pause();

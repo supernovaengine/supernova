@@ -4,7 +4,6 @@
 
 #include "TimedAction.h"
 #include "util/Function.h"
-#include "Ease.h"
 
 using namespace Supernova;
 

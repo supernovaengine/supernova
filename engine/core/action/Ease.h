@@ -41,19 +41,19 @@
 
 namespace Supernova {
     namespace Ease {
-        float linear(float time){
+        inline float linear(float time){
             return time;
         }
 
-        float easeInQuad(float time){
+        inline float easeInQuad(float time){
             return time * time;
         }
 
-        float easeOutQuad(float time){
+        inline float easeOutQuad(float time){
             return time * (2 - time);
         }
 
-        float easeInOutQuad(float time){
+        inline float easeInOutQuad(float time){
             if ((time *= 2) < 1) {
                 return 0.5 * time * time;
             }
@@ -62,16 +62,16 @@ namespace Supernova {
             return - 0.5 * (time * (time - 2) - 1);
         }
 
-        float easeInCubic(float time){
+        inline float easeInCubic(float time){
             return time * time * time;
         }
 
-        float easeOutCubic(float time){
+        inline float easeOutCubic(float time){
             time--;
             return time * time * time + 1;
         }
 
-        float easeInOutCubic(float time){
+        inline float easeInOutCubic(float time){
             if ((time *= 2) < 1) {
                 return 0.5 * time * time * time;
             }
@@ -79,16 +79,16 @@ namespace Supernova {
             return 0.5 * (time * time * time + 2);
         }
 
-        float easeInQuart(float time){
+        inline float easeInQuart(float time){
             return time * time * time * time;
         }
 
-        float easeOutQuart(float time){
+        inline float easeOutQuart(float time){
             time--;
             return 1 - (time * time * time * time);
         }
 
-        float easeInOutQuart(float time){
+        inline float easeInOutQuart(float time){
             if ((time *= 2) < 1) {
                 return 0.5 * time * time * time * time;
             }
@@ -96,16 +96,16 @@ namespace Supernova {
             return - 0.5 * (time * time * time * time - 2);
         }
 
-        float easeInQuint(float time){
+        inline float easeInQuint(float time){
             return time * time * time * time * time;
         }
 
-        float easeOutQuint(float time){
+        inline float easeOutQuint(float time){
             time--;
             return time * time * time * time * time + 1;
         }
 
-        float easeInOutQuint(float time){
+        inline float easeInOutQuint(float time){
             if ((time *= 2) < 1) {
                 return 0.5 * time * time * time * time * time;
             }
@@ -114,27 +114,27 @@ namespace Supernova {
             return 0.5 * (time * time * time * time * time + 2);
         }
 
-        float easeInSine(float time){
+        inline float easeInSine(float time){
             return 1 - cos(time * M_PI / 2);
         }
 
-        float easeOutSine(float time){
+        inline float easeOutSine(float time){
             return sin(time * M_PI / 2);
         }
 
-        float easeInOutSine(float time){
+        inline float easeInOutSine(float time){
             return 0.5 * (1 - cos(M_PI * time));
         }
 
-        float easeInExpo(float time){
+        inline float easeInExpo(float time){
             return time == 0 ? 0 : pow(1024, time - 1);
         }
 
-        float easeOutExpo(float time){
+        inline float easeOutExpo(float time){
             return time == 1 ? 1 : 1 - pow(2, - 10 * time);
         }
 
-        float easeInOutExpo(float time){
+        inline float easeInOutExpo(float time){
             if (time == 0) {
                 return 0;
             }
@@ -150,16 +150,16 @@ namespace Supernova {
             return 0.5 * (- pow(2, - 10 * (time - 1)) + 2);
         }
 
-        float easeInCirc(float time){
+        inline float easeInCirc(float time){
             return 1 - sqrt(1 - time * time);
         }
 
-        float easeOutCirc(float time){
+        inline float easeOutCirc(float time){
             time--;
             return sqrt(1 - (time * time));
         }
 
-        float easeInOutCirc(float time){
+        inline float easeInOutCirc(float time){
             if ((time *= 2) < 1) {
                 return - 0.5 * (sqrt(1 - time * time) - 1);
             }
@@ -168,7 +168,7 @@ namespace Supernova {
             return 0.5 * (sqrt(1 - time * time) + 1);
         }
 
-        float easeInElastic(float time){
+        inline float easeInElastic(float time){
             if (time == 0) {
                 return 0;
             }
@@ -180,7 +180,7 @@ namespace Supernova {
             return -pow(2, 10 * (time - 1)) * sin((time - 1.1) * 5 * M_PI);
         }
 
-        float easeOutElastic(float time){
+        inline float easeOutElastic(float time){
             if (time == 0) {
                 return 0;
             }
@@ -192,7 +192,7 @@ namespace Supernova {
             return pow(2, -10 * time) * sin((time - 0.1) * 5 * M_PI) + 1;
         }
 
-        float easeInOutElastic(float time){
+        inline float easeInOutElastic(float time){
             if (time == 0) {
                 return 0;
             }
@@ -210,20 +210,20 @@ namespace Supernova {
             return 0.5 * pow(2, -10 * (time - 1)) * sin((time - 1.1) * 5 * M_PI) + 1;
         }
 
-        float easeInBack(float time){
+        inline float easeInBack(float time){
             float s = 1.70158;
 
             return time * time * ((s + 1) * time - s);
         }
 
-        float easeOutBack(float time){
+        inline float easeOutBack(float time){
             float s = 1.70158;
 
             time--;
             return time * time * ((s + 1) * time + s) + 1;
         }
 
-        float easeInOutBack(float time){
+        inline float easeInOutBack(float time){
             float s = 1.70158 * 1.525;
 
             if ((time *= 2) < 1) {
@@ -234,7 +234,7 @@ namespace Supernova {
             return 0.5 * (time * time * ((s + 1) * time + s) + 2);
         }
 
-        float easeOutBounce(float time){
+        inline float easeOutBounce(float time){
             if (time < (1 / 2.75)) {
                 return 7.5625 * time * time;
             } else if (time < (2 / 2.75)) {
@@ -249,11 +249,11 @@ namespace Supernova {
             }
         }
 
-        float easeInBounce(float time){
+        inline float easeInBounce(float time){
             return 1 - easeOutBounce(1 - time);
         }
 
-        float easeInOutBounce(float time){
+        inline float easeInOutBounce(float time){
             if (time < 0.5) {
                 return easeInBounce(time * 2) * 0.5;
             }

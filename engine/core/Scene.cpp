@@ -16,6 +16,7 @@ Scene::Scene(){
 	registerComponent<ActionComponent>();
 	registerComponent<EaseComponent>();
 	registerComponent<TimedActionComponent>();
+	registerComponent<PositionActionComponent>();
 	registerComponent<RotationActionComponent>();
 	registerComponent<ScaleActionComponent>();
 
