@@ -11,6 +11,7 @@ using namespace Supernova;
 #include "PositionAction.h"
 #include "RotationAction.h"
 #include "ScaleAction.h"
+#include "ColorAction.h"
 
 Scene scene;
 Camera camera(&scene);
@@ -24,6 +25,7 @@ SpriteAnimation spriteanim(&scene);
 PositionAction positionaction(&scene);
 RotationAction rotationaction(&scene);
 ScaleAction scaleaction(&scene);
+ColorAction coloraction(&scene);
 
 void onActionStart();
 void onKeyDown(int key, bool repeat, int mods);
@@ -57,6 +59,9 @@ void init(){
 
     scaleaction.setAction(Vector3(1,1,1), Vector3(2,2,2), 10, false);
     scaleaction.setTarget(sprite.getEntity());
+
+    coloraction.setAction(sprite.getColor(), Vector4(0.0, 0.0, 1.0, 1.0), 5, false);
+    coloraction.setTarget(sprite.getEntity());
 
     positionaction.setAction(Vector3(20,20,0), Vector3(200,200,0), 5, false);
     positionaction.setTarget(sprite.getEntity());
@@ -142,6 +147,7 @@ void onKeyDown(int key, bool repeat, int mods){
         positionaction.start();
         //rotationaction.start();
         //scaleaction.start();
+        coloraction.start();
     }
     if (key == S_KEY_T){
         spriteanim.pause();

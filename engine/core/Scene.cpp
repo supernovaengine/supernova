@@ -19,6 +19,7 @@ Scene::Scene(){
 	registerComponent<PositionActionComponent>();
 	registerComponent<RotationActionComponent>();
 	registerComponent<ScaleActionComponent>();
+	registerComponent<ColorActionComponent>();
 
 	registerSystem<RenderSystem>();
 	registerSystem<ActionSystem>();

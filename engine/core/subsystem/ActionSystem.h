@@ -4,6 +4,7 @@
 #include "SubSystem.h"
 
 #include "component/Transform.h"
+#include "component/SpriteComponent.h"
 #include "component/ActionComponent.h"
 #include "component/EaseComponent.h"
 #include "component/TimedActionComponent.h"
@@ -12,6 +13,7 @@
 #include "component/PositionActionComponent.h"
 #include "component/RotationActionComponent.h"
 #include "component/ScaleActionComponent.h"
+#include "component/ColorActionComponent.h"
 
 namespace Supernova{
 
@@ -34,6 +36,7 @@ namespace Supernova{
 		void rotationActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, RotationActionComponent& rotaction, Transform& transform);
 		void scaleActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ScaleActionComponent& scaleaction, Transform& transform);
 
+		void colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, SpriteComponent& sprite);
 	public:
 		ActionSystem(Scene* scene);
 	

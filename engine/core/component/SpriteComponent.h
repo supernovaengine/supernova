@@ -4,6 +4,8 @@
 #include "buffer/Buffer.h"
 #include "texture/Texture.h"
 #include "render/ObjectRender.h"
+#include "math/Rect.h"
+#include "Supernova.h"
 
 namespace Supernova{
 
@@ -34,7 +36,7 @@ namespace Supernova{
         FrameData framesRect[MAX_SPRITE_FRAMES];
 
         Texture texture;
-        Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0);
+        Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0); //linear color
         Rect textureRect = Rect(0.0, 0.0, 1.0, 1.0);
     };
     

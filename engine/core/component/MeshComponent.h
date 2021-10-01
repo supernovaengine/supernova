@@ -14,7 +14,7 @@
 namespace Supernova{
 
     struct Material{
-        Vector4 baseColorFactor = Vector4(1.0, 1.0, 1.0, 1.0);
+        Vector4 baseColorFactor = Vector4(1.0, 1.0, 1.0, 1.0);  //linear color
         Texture baseColorTexture;
 
         Vector3 emissiveFactor = Vector3(0.0, 0.0, 0.0);

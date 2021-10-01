@@ -20,6 +20,7 @@
 #include "component/PositionActionComponent.h"
 #include "component/RotationActionComponent.h"
 #include "component/ScaleActionComponent.h"
+#include "component/ColorActionComponent.h"
 
 #include "subsystem/RenderSystem.h"
 #include "subsystem/ActionSystem.h"

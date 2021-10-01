@@ -1,6 +1,7 @@
 #include "ActionSystem.h"
 
 #include "Scene.h"
+#include "math/Color.h"
 
 using namespace Supernova;
 
@@ -108,6 +109,11 @@ void ActionSystem::scaleActionUpdate(double dt, ActionComponent& action, TimedAc
     transform.needUpdate = true;
 }
 
+void ActionSystem::colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, SpriteComponent& sprite){
+    Vector4 color = (coloraction.endColor - coloraction.startColor) * timedaction.value;
+    sprite.color = Color::sRGBToLinear(coloraction.startColor + color);
+}
+
 void ActionSystem::load(){
 
 }
@@ -188,13 +194,13 @@ void ActionSystem::update(double dt){
                 }
             }
 
-            //Transform animation
             if (signature.test(scene->getComponentType<TimedActionComponent>()) && signature.test(scene->getComponentType<EaseComponent>())){
                 TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
                 EaseComponent& ease = scene->getComponent<EaseComponent>(entity);
 
                 timedActionUpdate(dt, action, timedaction, ease);
 
+                //Transform animation
                 if (targetSignature.test(scene->getComponentType<Transform>())){
                     Transform& transform = scene->getComponent<Transform>(action.target);
 
@@ -214,6 +220,18 @@ void ActionSystem::update(double dt){
                         ScaleActionComponent& scaleaction = scene->getComponent<ScaleActionComponent>(entity);
 
                         scaleActionUpdate(dt, action, timedaction, scaleaction, transform);
+                    }
+
+                }
+
+                //Color animation
+                if (signature.test(scene->getComponentType<ColorActionComponent>())){
+                    ColorActionComponent& coloraction = scene->getComponent<ColorActionComponent>(entity);
+
+                    if (targetSignature.test(scene->getComponentType<SpriteComponent>())){
+                        SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+
+                        colorActionSpriteUpdate(dt, action, timedaction, coloraction, sprite);
                     }
 
                 }
