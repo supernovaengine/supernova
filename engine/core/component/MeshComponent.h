@@ -8,26 +8,11 @@
 #include "render/ObjectRender.h"
 #include "render/TextureRender.h"
 #include "texture/TextureData.h"
+#include "util/Material.h"
 #include <map>
 #include <memory>
 
 namespace Supernova{
-
-    struct Material{
-        Vector4 baseColorFactor = Vector4(1.0, 1.0, 1.0, 1.0);  //linear color
-        Texture baseColorTexture;
-
-        Vector3 emissiveFactor = Vector3(0.0, 0.0, 0.0);
-        Texture emissiveTexture;
-
-        float metallicFactor = 1.0;
-        float roughnessFactor = 1.0;
-        Texture metallicRoughnessTexture;
-
-        Texture occlusionTexture;
-
-        Texture normalTexture;
-    };
 
     struct Submesh{
         Material material;

@@ -92,7 +92,7 @@ void RenderSystem::checkLightsAndShadow(){
 	}
 }
 
-void RenderSystem::processLights(){
+bool RenderSystem::processLights(){
 	hasLights = false;
 	hasShadows = false;
 
@@ -107,6 +107,13 @@ void RenderSystem::processLights(){
 
 	if (numLights > 0)
 		hasLights = true; // Re-check lights on, after checked in checkLightsAndShadow()
+
+	Entity camera = scene->getCamera();
+	if (camera == NULL_ENTITY){
+		return false;
+	}
+
+	Transform& cameraTransform =  scene->getComponent<Transform>(camera);
 	
 	for (int i = 0; i < numLights; i++){
 		LightComponent& light = lights->getComponentFromIndex(i);
@@ -177,13 +184,15 @@ void RenderSystem::processLights(){
 		fs_lighting.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
 		fs_lighting.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
 		fs_lighting.inCon_ouCon_shadows_cascades[i] = Vector4(light.innerConeCos, light.outerConeCos, light.shadowMapIndex, light.numShadowCascades);
-
+		fs_lighting.eyePos = Vector4(cameraTransform.worldPosition.x, cameraTransform.worldPosition.y, cameraTransform.worldPosition.z, 0.0);
 	}
 
 	// Setting intensity of other lights to zero
 	for (int i = numLights; i < MAX_LIGHTS; i++){
 		fs_lighting.color_intensity[i].w = 0.0;
 	}
+
+	return true;
 }
 
 TextureShaderType RenderSystem::getShadowMapByIndex(int index){
@@ -544,25 +553,18 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 	if (mesh.loaded){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender* render = &mesh.submeshes[i].render;
-			
-			u_fs_pbrParams_t pbrParams_fs;
-			pbrParams_fs.baseColorFactor = mesh.submeshes[i].material.baseColorFactor;
-			pbrParams_fs.metallicFactor = mesh.submeshes[i].material.metallicFactor;
-			pbrParams_fs.roughnessFactor = mesh.submeshes[i].material.roughnessFactor;
-			pbrParams_fs.emissiveFactor = mesh.submeshes[i].material.emissiveFactor;
-			pbrParams_fs.eyePos = camTransform.worldPosition;
 
 			render->beginDraw();
 
 			if (hasLights){
-				render->applyUniform(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16 * MAX_LIGHTS, &fs_lighting);
+				render->applyUniform(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16 * MAX_LIGHTS + 4, &fs_lighting);
 				if (hasShadows && mesh.castShadows){
 					render->applyUniform(mesh.submeshes[i].slotVSShadows, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16 * (MAX_SHADOWSMAP), &vs_shadows);
 					render->applyUniform(mesh.submeshes[i].slotFSShadows, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 4 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP), &fs_shadows);
 				}
 			}
 
-			render->applyUniform(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16, &pbrParams_fs);
+			render->applyUniform(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 12, &mesh.submeshes[i].material);
 
 			//model, normal and mvp matrix
 			render->applyUniform(mesh.submeshes[i].slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 48, &transform.modelMatrix);

@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
 #include "Entity.h"
 #include "Log.h"
 

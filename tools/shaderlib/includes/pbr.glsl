@@ -49,7 +49,7 @@ vec4 getEmissiveTexture(){
 }
 
 // Get normal, tangent and bitangent vectors.
-NormalInfo getNormalInfo(vec3 v){
+NormalInfo getNormalInfo(){
     vec2 UV = v_uv1;
     vec3 uv_dx = dFdx(vec3(UV, 0.0));
     vec3 uv_dy = dFdy(vec3(UV, 0.0));

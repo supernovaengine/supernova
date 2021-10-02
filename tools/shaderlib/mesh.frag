@@ -34,9 +34,6 @@ uniform u_fs_pbrParams {
     float metallicFactor;
     float roughnessFactor;
     vec3 emissiveFactor;
-
-    //Camera Position
-    vec3 eyePos;
 } pbrParams;
 
 #ifdef USE_PUNCTUAL
@@ -45,6 +42,7 @@ uniform u_fs_pbrParams {
         vec4 color_intensity[MAX_LIGHTS]; //color.xyz and intensity.w
         vec4 position_type[MAX_LIGHTS]; //position.xyz and type.w
         vec4 inCone_ouCone_shadows_cascades[MAX_LIGHTS]; //innerConeCos.x, outerConeCos.y, shadowMapIndex.z (-1.0 if no shadow), numCascades.w
+        vec4 eyePos; //eyePos.xyz
     } lighting;
 #endif
 
@@ -151,15 +149,10 @@ void main() {
         return;
     #endif
 
-    vec3 v = normalize(pbrParams.eyePos - v_position);
-    NormalInfo normalInfo = getNormalInfo(v);
+    NormalInfo normalInfo = getNormalInfo();
     vec3 n = normalInfo.n;
     vec3 t = normalInfo.t;
     vec3 b = normalInfo.b;
-
-    float NdotV = clampedDot(n, v);
-    float TdotV = clampedDot(t, v);
-    float BdotV = clampedDot(b, v);
 
     MaterialInfo materialInfo = {0.0, vec3(0.0), 0.0, vec3(0.0), vec3(0.0), 0.0, vec3(0.0), vec3(0.0)};
     materialInfo.baseColor = baseColor.rgb;
@@ -204,6 +197,8 @@ void main() {
 
     // Apply light sources
     #ifdef USE_PUNCTUAL
+        vec3 v = normalize(lighting.eyePos.xyz - v_position);
+
         for (int i = 0; i < MAX_LIGHTS; ++i){
 
             //Cannot be in function to avoid GLES2 index errors

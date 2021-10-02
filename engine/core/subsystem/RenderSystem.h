@@ -18,23 +18,12 @@
 #include <queue>
 
 namespace Supernova{
-
-	typedef struct u_fs_pbrParams_t {
-    	Supernova::Vector4 baseColorFactor;
-    	float metallicFactor;
-    	float roughnessFactor;
-    	uint8_t _pad_24[8];
-    	Supernova::Vector3 emissiveFactor;
-    	uint8_t _pad_44[4];
-    	Supernova::Vector3 eyePos;
-    	uint8_t _pad_60[4];
-	} u_fs_pbrParams_t;
-
 	typedef struct fs_lighting_t {
 	    Vector4 direction_range[MAX_LIGHTS];
 	    Vector4 color_intensity[MAX_LIGHTS];
 	    Vector4 position_type[MAX_LIGHTS];
 	    Vector4 inCon_ouCon_shadows_cascades[MAX_LIGHTS];
+		Vector4 eyePos;
 	} fs_lighting_t;
 
 	typedef struct vs_shadows_t {
@@ -81,7 +70,7 @@ namespace Supernova{
 
 		void createEmptyTextures();
 		void checkLightsAndShadow();
-		void processLights();
+		bool processLights();
 		TextureShaderType getShadowMapByIndex(int index);
 		TextureShaderType getShadowMapCubeByIndex(int index);
 		void configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera);
