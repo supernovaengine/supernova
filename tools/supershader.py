@@ -33,6 +33,8 @@ def get_define(property):
         return 'HAS_VERTEX_COLOR_VEC3'
     elif property == 'Vc4':
         return 'HAS_VERTEX_COLOR_VEC4'
+    elif property == 'Txr':
+        return 'HAS_TEXTURERECT'
     else:
         sys.exit('Not found value for property: '+property)
 
@@ -52,10 +54,11 @@ def get_default_shaders():
     s += "mesh_Uv1PucNorVc4;"
     s += "mesh_Uv1PucShwNorVc4;"
     s += "mesh_UltUv1Vc4;"
+    s += "mesh_UltUv1Vc4Txr;"
     s += "depth;"
     s += "sky;"
-    s += "sprite_Vc4;"
-    s += "sprite_TexVc4"
+    s += "ui_Vc4;"
+    s += "ui_TexVc4"
     return s
 
 def get_default_langs():

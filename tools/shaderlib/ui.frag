@@ -1,14 +1,13 @@
 #version 450
 
-uniform u_fs_spriteParams {
+uniform u_fs_uiParams {
     vec4 color;
-    vec4 textureRect;
-} spriteParams;
+} uiParams;
 
 out vec4 g_finalColor;
 
 #ifdef HAS_TEXTURE
-    uniform sampler2D u_spriteTexture;
+    uniform sampler2D u_uiTexture;
     in vec2 v_uv1;
 #endif
 
@@ -35,10 +34,9 @@ vec4 getVertexColor(){
 }
 
 vec4 getBaseColor(){
-    vec4 baseColor = spriteParams.color;
+    vec4 baseColor = uiParams.color;
     #ifdef HAS_TEXTURE
-        vec2 uv = v_uv1 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
-        baseColor *= sRGBToLinear(texture(u_spriteTexture, uv));
+        baseColor *= sRGBToLinear(texture(u_uiTexture, v_uv1));
     #endif
     return baseColor * getVertexColor();
 }

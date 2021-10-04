@@ -39,7 +39,7 @@ namespace Supernova{
         MESH,
         SKYBOX,
         DEPTH,
-        SPRITE
+        UI
     };
 
     enum class AttributeType{
@@ -89,7 +89,8 @@ namespace Supernova{
         VIEWPROJECTIONSKY,
         DEPTH_VS_PARAMS,
         SPRITE_VS_PARAMS,
-        SPRITE_FS_PARAMS
+        UI_VS_PARAMS,
+        UI_FS_PARAMS
         //CAMERA
         /*
         MVPMATRIX,
@@ -160,7 +161,7 @@ namespace Supernova{
         SHADOWMAP8,
         SHADOWCUBEMAP1,
         SKYCUBE,
-        SPRITE
+        UI
         //SHADOWMAP2D
         //SHADOWMAPCUBE
         //HEIGHTDATA

@@ -57,8 +57,8 @@ std::string ShaderPool::getShaderStr(ShaderType shaderType, std::string properti
 		str = "mesh";
 	}else if (shaderType == ShaderType::SKYBOX){
 		str = "sky";
-	}else if (shaderType == ShaderType::SPRITE){
-		str = "sprite";
+	}else if (shaderType == ShaderType::UI){
+		str = "ui";
 	}else if (shaderType == ShaderType::DEPTH){
 		str = "depth";
 	}else if (shaderType == ShaderType::LINES){
@@ -114,7 +114,8 @@ void ShaderPool::remove(ShaderType shaderType, std::string properties){
 
 std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2, 
 						bool punctual, bool shadows, bool normals, bool normalMap, 
-						bool tangents, bool vertexColorVec3, bool vertexColorVec4){
+						bool tangents, bool vertexColorVec3, bool vertexColorVec4, 
+						bool textureRect){
 	std::string prop;
 
 	if (unlit)
@@ -137,11 +138,13 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 		prop += "Vc3";
 	if (vertexColorVec4)
 		prop += "Vc4";
+	if (textureRect)
+		prop += "Txr";
 
 	return prop;
 }
 
-std::string ShaderPool::getSpriteProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4){
+std::string ShaderPool::getUIProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4){
 	std::string prop;
 
 	if (texture)

@@ -5,22 +5,24 @@
 using namespace Supernova;
 
 Polygon::Polygon(Scene* scene): Object(scene){
-    addComponent<SpriteComponent>({});
+    addComponent<UIRenderComponent>({});
 
-    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-    spritecomp.buffer = &buffer;
-    spritecomp.indices = &indices;
-    spritecomp.primitiveType = PrimitiveType::TRIANGLE_STRIP;
+    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
+    uicomp.buffer = &buffer;
+    uicomp.indices = &indices;
+    uicomp.primitiveType = PrimitiveType::TRIANGLE_STRIP;
 
 	buffer.clearAll();
 	buffer.addAttribute(AttributeType::POSITION, 3);
 	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    buffer.addAttribute(AttributeType::NORMAL, 3);
     buffer.addAttribute(AttributeType::COLOR, 4);
 }
 
 void Polygon::addVertex(Vector3 vertex){
 
     buffer.addVector3(AttributeType::POSITION, vertex);
+    buffer.addVector3(AttributeType::NORMAL, Vector3(1.0f, 1.0f, 1.0f));
     buffer.addVector4(AttributeType::COLOR, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
     if (buffer.getCount() > 3){
@@ -36,7 +38,7 @@ void Polygon::addVertex(float x, float y){
 
 void Polygon::generateTexcoords(){
 
-    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
 
     float min_X = std::numeric_limits<float>::max();
     float max_X = std::numeric_limits<float>::min();
@@ -68,14 +70,14 @@ void Polygon::generateTexcoords(){
        // }
     }
 
-    spritecomp.width = (int)(max_X - min_X);
-    spritecomp.height = (int)(max_Y - min_Y);
+    uicomp.width = (int)(max_X - min_X);
+    uicomp.height = (int)(max_Y - min_Y);
 }
 
 void Polygon::setColor(Vector4 color){
-    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
 
-    spritecomp.color = Color::sRGBToLinear(color);
+    uicomp.color = Color::sRGBToLinear(color);
 }
 
 void Polygon::setColor(float red, float green, float blue, float alpha){
@@ -83,31 +85,15 @@ void Polygon::setColor(float red, float green, float blue, float alpha){
 }
 
 Vector4 Polygon::getColor(){
-    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
 
-    return Color::linearTosRGB(spritecomp.color);
+    return Color::linearTosRGB(uicomp.color);
 }
 
 void Polygon::setTexture(std::string path){
-    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
 
-    spritecomp.texture.setPath(path);
+    uicomp.texture.setPath(path);
 
     //TODO: update texture, reload entity
-}
-
-void Polygon::setTextureRect(float x, float y, float width, float height){
-    setTextureRect(Rect(x, y, width, height));
-}
-
-void Polygon::setTextureRect(Rect textureRect){
-    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-
-    spritecomp.textureRect = textureRect;
-}
-
-Rect Polygon::getTextureRect(){
-    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-
-    return spritecomp.textureRect;
 }

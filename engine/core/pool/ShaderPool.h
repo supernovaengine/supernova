@@ -29,8 +29,10 @@ namespace Supernova{
 
         static std::string getMeshProperties(bool unlit, bool uv1, bool uv2, 
 						bool punctual, bool shadows, bool normals, bool normalMap, 
-						bool tangents, bool vertexColorVec3, bool vertexColorVec4);
-        static std::string getSpriteProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4);
+						bool tangents, bool vertexColorVec3, bool vertexColorVec4,
+                        bool textureRect);
+
+        static std::string getUIProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4);
     };
 }
 

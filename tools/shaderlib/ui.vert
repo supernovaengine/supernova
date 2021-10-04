@@ -1,8 +1,8 @@
 #version 450
 
-uniform u_vs_spriteParams {
+uniform u_vs_uiParams {
     mat4 mvpMatrix;
-} spriteParams;
+} uiParams;
 
 in vec3 a_position;
 
@@ -33,5 +33,5 @@ void main() {
         v_color = a_color;
     #endif
 
-    gl_Position = spriteParams.mvpMatrix * vec4(a_position, 1.0);
+    gl_Position = uiParams.mvpMatrix * vec4(a_position, 1.0);
 }

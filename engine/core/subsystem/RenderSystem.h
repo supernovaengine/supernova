@@ -4,7 +4,7 @@
 #include "SubSystem.h"
 #include "component/MeshComponent.h"
 #include "component/SkyComponent.h"
-#include "component/SpriteComponent.h"
+#include "component/UIRenderComponent.h"
 #include "component/CameraComponent.h"
 #include "component/LightComponent.h"
 #include "component/Transform.h"
@@ -75,6 +75,7 @@ namespace Supernova{
 		TextureShaderType getShadowMapCubeByIndex(int index);
 		void configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera);
 		Matrix4 getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv);
+		void loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool castShadows);
 
 		float lerp(float a, float b, float fraction);
 
@@ -85,8 +86,8 @@ namespace Supernova{
 		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform);
 		void drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix);
 
-		bool loadSprite(SpriteComponent& sprite);
-		void drawSprite(SpriteComponent& sprite, Transform& transform);
+		bool loadUI(UIRenderComponent& ui);
+		void drawUI(UIRenderComponent& ui, Transform& transform);
 
 		bool loadSky(SkyComponent& sky);
 		void drawSky(SkyComponent& sky);

@@ -29,9 +29,12 @@ namespace Supernova{
         int slotVSParams = -1;
         int slotFSParams = -1;
         int slotFSLighting = -1;
+        int slotVSSprite = -1;
         int slotVSShadows = -1;
         int slotFSShadows = -1;
         int slotVSDepthParams = -1;
+
+        Rect textureRect = Rect(0.0, 0.0, 1.0, 1.0);
 
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;
         unsigned int vertexCount = 0;
@@ -39,6 +42,7 @@ namespace Supernova{
         bool hasNormalMap = false;
         bool hasTangent = false;
         bool hasVertexColor = false;
+        bool hasTextureRect = false;
     };
 
     struct MeshComponent{

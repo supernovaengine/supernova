@@ -5,10 +5,10 @@
 
 #include "component/Transform.h"
 #include "component/SpriteComponent.h"
+#include "component/MeshComponent.h"
 #include "component/ActionComponent.h"
 #include "component/EaseComponent.h"
 #include "component/TimedActionComponent.h"
-#include "component/SpriteComponent.h"
 #include "component/SpriteAnimationComponent.h"
 #include "component/PositionActionComponent.h"
 #include "component/RotationActionComponent.h"
@@ -25,10 +25,10 @@ namespace Supernova{
         void actionPause(ActionComponent& action);
 
 		// Sprite action functions
-		void setSpriteTextureRect(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
-		void spriteActionStart(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
-		void spriteActionStop(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
-		void spriteActionUpdate(double dt, ActionComponent& action, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
+		void setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
+		void spriteActionStart(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
+		void spriteActionStop(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
+		void spriteActionUpdate(double dt, ActionComponent& action, MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
 
 		void timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, EaseComponent& ease);
 
@@ -36,7 +36,7 @@ namespace Supernova{
 		void rotationActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, RotationActionComponent& rotaction, Transform& transform);
 		void scaleActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ScaleActionComponent& scaleaction, Transform& transform);
 
-		void colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, SpriteComponent& sprite);
+		void colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, MeshComponent& mesh);
 	public:
 		ActionSystem(Scene* scene);
 	

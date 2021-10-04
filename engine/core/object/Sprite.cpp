@@ -4,16 +4,16 @@
 
 using namespace Supernova;
 
-Sprite::Sprite(Scene* scene): Polygon(scene){
+Sprite::Sprite(Scene* scene): Mesh(scene){
     animation = NULL;
+    addComponent<SpriteComponent>({});
+
+    MeshComponent& mesh = getComponent<MeshComponent>();
+    mesh.buffers["vertices"] = &buffer;
+    mesh.buffers["indices"] = &indices;
+    mesh.submeshes[0].hasTextureRect = true;
 
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-    spritecomp.primitiveType = PrimitiveType::TRIANGLES;
-
-	buffer.clearAll();
-	buffer.addAttribute(AttributeType::POSITION, 3);
-	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-    buffer.addAttribute(AttributeType::COLOR, 4);
 
     Attribute* attVertex = buffer.getAttribute(AttributeType::POSITION);
 
@@ -28,6 +28,13 @@ Sprite::Sprite(Scene* scene): Polygon(scene){
     buffer.addVector2(attTexcoord, Vector2(0.99f, 0.01f));
     buffer.addVector2(attTexcoord, Vector2(0.99f, 0.99f));
     buffer.addVector2(attTexcoord, Vector2(0.01f, 0.99f));
+
+    Attribute* attNormal = buffer.getAttribute(AttributeType::NORMAL);
+
+    buffer.addVector3(attNormal, Vector3(1.0f, 1.0f, 1.0f));
+    buffer.addVector3(attNormal, Vector3(1.0f, 1.0f, 1.0f));
+    buffer.addVector3(attNormal, Vector3(1.0f, 1.0f, 1.0f));
+    buffer.addVector3(attNormal, Vector3(1.0f, 1.0f, 1.0f));
 
     Attribute* attColor = buffer.getAttribute(AttributeType::COLOR);
 
@@ -50,6 +57,22 @@ Sprite::Sprite(Scene* scene): Polygon(scene){
 Sprite::~Sprite(){
     if (animation)
         delete animation;
+}
+
+void Sprite::setTextureRect(float x, float y, float width, float height){
+    setTextureRect(Rect(x, y, width, height));
+}
+
+void Sprite::setTextureRect(Rect textureRect){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.submeshes[0].textureRect = textureRect;
+}
+
+Rect Sprite::getTextureRect(){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.submeshes[0].textureRect;
 }
 
 void Sprite::addFrame(int id, std::string name, Rect rect){

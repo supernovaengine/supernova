@@ -22,27 +22,27 @@ void ActionSystem::actionPause(ActionComponent& action){
     action.onPause.call();
 }
 
-void ActionSystem::setSpriteTextureRect(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
+void ActionSystem::setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
     if (spriteanim.frameIndex < MAX_SPRITE_FRAMES){
         FrameData frameData = sprite.framesRect[spriteanim.frames[spriteanim.frameIndex]];
         if (frameData.active)
-            sprite.textureRect = frameData.rect;
+            mesh.submeshes[0].textureRect = frameData.rect;
     }
 }
 
-void ActionSystem::spriteActionStart(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
-    setSpriteTextureRect(sprite, spriteanim);
+void ActionSystem::spriteActionStart(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
+    setSpriteTextureRect(mesh, sprite, spriteanim);
 }
 
-void ActionSystem::spriteActionStop(SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
+void ActionSystem::spriteActionStop(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
     spriteanim.frameIndex = 0;
     spriteanim.frameTimeIndex = 0;
     spriteanim.spriteFrameCount = 0;
 
-    setSpriteTextureRect(sprite, spriteanim);
+    setSpriteTextureRect(mesh, sprite, spriteanim);
 }
 
-void ActionSystem::spriteActionUpdate(double dt, ActionComponent& action, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
+void ActionSystem::spriteActionUpdate(double dt, ActionComponent& action, MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
     spriteanim.spriteFrameCount += dt * 1000;
     while (spriteanim.spriteFrameCount >= spriteanim.framesTime[spriteanim.frameTimeIndex]) {
 
@@ -63,7 +63,7 @@ void ActionSystem::spriteActionUpdate(double dt, ActionComponent& action, Sprite
         if (spriteanim.frameTimeIndex >= spriteanim.framesTimeSize)
             spriteanim.frameTimeIndex = 0;
 
-        setSpriteTextureRect(sprite, spriteanim);
+        setSpriteTextureRect(mesh, sprite, spriteanim);
     }
 }
 
@@ -109,9 +109,9 @@ void ActionSystem::scaleActionUpdate(double dt, ActionComponent& action, TimedAc
     transform.needUpdate = true;
 }
 
-void ActionSystem::colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, SpriteComponent& sprite){
+void ActionSystem::colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, MeshComponent& mesh){
     Vector4 color = (coloraction.endColor - coloraction.startColor) * timedaction.value;
-    sprite.color = Color::sRGBToLinear(coloraction.startColor + color);
+    mesh.submeshes[0].material.baseColorFactor = Color::sRGBToLinear(coloraction.startColor + color);
 }
 
 void ActionSystem::load(){
@@ -139,10 +139,11 @@ void ActionSystem::update(double dt){
 
             if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
                 SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
-                if (targetSignature.test(scene->getComponentType<SpriteComponent>())){
+                if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
                     SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+                    MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
-                    spriteActionStart(sprite, spriteanim);
+                    spriteActionStart(mesh, sprite, spriteanim);
 
                 }
             }
@@ -160,10 +161,11 @@ void ActionSystem::update(double dt){
 
             if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
                 SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
-                if (targetSignature.test(scene->getComponentType<SpriteComponent>())){
+                if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
                     SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+                    MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
-                    spriteActionStop(sprite, spriteanim);
+                    spriteActionStop(mesh, sprite, spriteanim);
 
                 }
             }
@@ -186,10 +188,11 @@ void ActionSystem::update(double dt){
             //Sprite animation
             if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
                 SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
-                if (targetSignature.test(scene->getComponentType<SpriteComponent>())){
+                if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
                     SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+                    MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
-                    spriteActionUpdate(dt, action, sprite, spriteanim);
+                    spriteActionUpdate(dt, action, mesh, sprite, spriteanim);
 
                 }
             }
@@ -228,10 +231,10 @@ void ActionSystem::update(double dt){
                 if (signature.test(scene->getComponentType<ColorActionComponent>())){
                     ColorActionComponent& coloraction = scene->getComponent<ColorActionComponent>(entity);
 
-                    if (targetSignature.test(scene->getComponentType<SpriteComponent>())){
-                        SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+                    if (targetSignature.test(scene->getComponentType<MeshComponent>())){
+                        MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
-                        colorActionSpriteUpdate(dt, action, timedaction, coloraction, sprite);
+                        colorActionSpriteUpdate(dt, action, timedaction, coloraction, mesh);
                     }
 
                 }

@@ -9,10 +9,10 @@
 #include "buffer/IndexBuffer.h"
 #include "action/SpriteAnimation.h"
 
-#include "Polygon.h"
+#include "Mesh.h"
 
 namespace Supernova{
-    class Sprite: public Polygon{
+    class Sprite: public Mesh{
 
     protected:
         SpriteAnimation* animation;
@@ -20,6 +20,10 @@ namespace Supernova{
     public:
         Sprite(Scene* scene);
         virtual ~Sprite();
+
+        void setTextureRect(float x, float y, float width, float height);
+        void setTextureRect(Rect textureRect);
+        Rect getTextureRect();
 
         void addFrame(int id, std::string name, Rect rect);
         void addFrame(std::string name, float x, float y, float width, float height);
@@ -35,6 +39,7 @@ namespace Supernova{
         void startAnimation(int startFrame, int endFrame, int interval, bool loop);
         void pauseAnimation();
         void stopAnimation();
+
     };
 }
 

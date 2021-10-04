@@ -1,4 +1,4 @@
-/*
+
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -103,6 +103,7 @@ void init(){
     polygon3.setColor(0.5, 1.0, 1.0, 1.0);
     polygon3.setPosition(100, 100, 0);
     polygon3.setName("Polygon3");
+    polygon3.setTexture("pista.png");
 
     //plane.create(4000, 4000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);
@@ -158,9 +159,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
-*/
 
 
+/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -237,7 +238,7 @@ void init(){
     lightSpot.setType(LightType::SPOT);
     lightSpot.setDirection(0.0f, -0.7, 0.3);
     lightSpot.setRange(0.0);
-    lightSpot.setPosition(0.0f, 150.0f/200.0, 0.0f);
+    lightSpot.setPosition(0.0f, 150.0f/5.0, 0.0f);
     lightSpot.setIntensity(100000.0);
     lightSpot.setConeAngle(50, 70);
     lightSpot.setShadows(true);
@@ -257,13 +258,13 @@ void init(){
     camera.setPosition(0,80,100);
     //carro.addChild(&camera);
 
-    //carro.loadOBJ("jeep/Jeep.obj");
-    //carro.setPosition(0, 0, 20);
-    //carro.setScale(5);
+    carro.loadOBJ("jeep/Jeep.obj");
+    carro.setPosition(0, 0, 20);
+    carro.setScale(5);
 
-    carro.loadGLTF("WaterBottle.glb");
-    carro.setPosition(0, 30, 20);
-    carro.setScale(200);
+    //carro.loadGLTF("WaterBottle.glb");
+    //carro.setPosition(0, 30, 20);
+    //carro.setScale(200);
 
     carro.setName("carro");
 
@@ -517,3 +518,4 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
+*/

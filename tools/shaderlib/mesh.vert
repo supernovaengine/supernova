@@ -6,6 +6,12 @@ uniform u_vs_pbrParams {
     mat4 mvpMatrix;
 } pbrParams;
 
+#ifdef HAS_TEXTURERECT
+    uniform u_vs_spriteParams {
+        vec4 textureRect;
+    } spriteParams;
+#endif
+
 in vec3 a_position;
 out vec3 v_position;
 
@@ -95,10 +101,16 @@ void main() {
 
     #ifdef HAS_UV_SET1
         v_uv1 = a_texcoord1;
+        #ifdef HAS_TEXTURERECT
+            v_uv1 = a_texcoord1 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
+        #endif
     #endif
 
     #ifdef HAS_UV_SET2
         v_uv2 = a_texcoord2;
+        #ifdef HAS_TEXTURERECT
+            v_uv2 = a_texcoord2 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
+        #endif
     #endif
 
     #if defined(HAS_VERTEX_COLOR_VEC3) || defined(HAS_VERTEX_COLOR_VEC4)
