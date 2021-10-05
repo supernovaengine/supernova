@@ -12,12 +12,7 @@ ColorAction::ColorAction(Scene* scene): TimedAction(scene){
 }
 
 void ColorAction::setAction(Vector4 startColor, Vector4 endColor, float duration, bool loop){
-    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
-
-    timedAction.duration = duration;
-    timedAction.loop = loop;
-    timedAction.time = 0;
-    timedAction.value = 0;
+    TimedAction::setAction(duration, loop);
 
     ColorActionComponent& colorAction = getComponent<ColorActionComponent>();
 

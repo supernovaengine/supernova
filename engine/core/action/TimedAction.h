@@ -11,6 +11,9 @@
 namespace Supernova{
     class TimedAction: public Action{
 
+    protected:
+        void setAction(float duration, bool loop);
+
     public:
         TimedAction(Scene* scene);
 

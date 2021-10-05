@@ -11,12 +11,7 @@ ScaleAction::ScaleAction(Scene* scene): TimedAction(scene){
 }
 
 void ScaleAction::setAction(Vector3 startScale, Vector3 endScale, float duration, bool loop){
-    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
-
-    timedAction.duration = duration;
-    timedAction.loop = loop;
-    timedAction.time = 0;
-    timedAction.value = 0;
+    TimedAction::setAction(duration, loop);
 
     ScaleActionComponent& scaleAction = getComponent<ScaleActionComponent>();
 

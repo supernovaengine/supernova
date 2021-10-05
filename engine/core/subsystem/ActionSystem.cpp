@@ -67,6 +67,12 @@ void ActionSystem::spriteActionUpdate(double dt, ActionComponent& action, MeshCo
     }
 }
 
+void ActionSystem::timedActionStop(TimedActionComponent& timedaction){
+    timedaction.timecount = 0;
+    timedaction.time = 0;
+    timedaction.value = 0;
+}
+
 void ActionSystem::timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, EaseComponent& ease){
     timedaction.timecount += dt;
 
@@ -168,6 +174,12 @@ void ActionSystem::update(double dt){
                     spriteActionStop(mesh, sprite, spriteanim);
 
                 }
+            }
+
+            if (signature.test(scene->getComponentType<TimedActionComponent>())){
+                TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
+
+                timedActionStop(timedaction);
             }
         }
 

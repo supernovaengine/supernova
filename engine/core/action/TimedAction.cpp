@@ -15,6 +15,16 @@ TimedAction::TimedAction(Scene* scene): Action(scene){
     ease.function = Ease::linear;
 }
 
+void TimedAction::setAction(float duration, bool loop){
+    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
+
+    timedAction.duration = duration;
+    timedAction.loop = loop;
+    timedAction.timecount = 0;
+    timedAction.time = 0;
+    timedAction.value = 0;
+}
+
 void TimedAction::setFunction(std::function<float(float)> function){
     EaseComponent& ease = getComponent<EaseComponent>();
 

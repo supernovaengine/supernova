@@ -11,12 +11,7 @@ PositionAction::PositionAction(Scene* scene): TimedAction(scene){
 }
 
 void PositionAction::setAction(Vector3 startPosition, Vector3 endPosition, float duration, bool loop){
-    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
-
-    timedAction.duration = duration;
-    timedAction.loop = loop;
-    timedAction.time = 0;
-    timedAction.value = 0;
+    TimedAction::setAction(duration, loop);
 
     PositionActionComponent& posAction = getComponent<PositionActionComponent>();
 
