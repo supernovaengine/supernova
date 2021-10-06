@@ -49,9 +49,12 @@ bool SokolShader::createShader(ShaderData& shaderData){
 
         // attributes
         for (int a = 0; a < stage->attributes.size(); a++) {
-            shader_desc.attrs[a].name = stage->attributes[a].name.c_str();
-            shader_desc.attrs[a].sem_name = stage->attributes[a].semanticName.c_str();
-            shader_desc.attrs[a].sem_index = stage->attributes[a].semanticIndex;
+            int location = stage->attributes[a].location;
+            if (location >= 0){
+                shader_desc.attrs[location].name = stage->attributes[a].name.c_str();
+                shader_desc.attrs[location].sem_name = stage->attributes[a].semanticName.c_str();
+                shader_desc.attrs[location].sem_index = stage->attributes[a].semanticIndex;
+            }
         }
     
         // uniform blocks
