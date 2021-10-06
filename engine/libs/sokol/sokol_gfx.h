@@ -3110,7 +3110,7 @@ typedef struct {
 } _sg_pipeline_common_t;
 
 _SOKOL_PRIVATE void _sg_pipeline_common_init(_sg_pipeline_common_t* cmn, const sg_pipeline_desc* desc) {
-    SOKOL_ASSERT(desc->color_count < SG_MAX_COLOR_ATTACHMENTS);
+    SOKOL_ASSERT((desc->color_count >= 1) && (desc->color_count <= SG_MAX_COLOR_ATTACHMENTS));
     cmn->shader_id = desc->shader;
     cmn->index_type = desc->index_type;
     for (int i = 0; i < SG_MAX_SHADERSTAGE_BUFFERS; i++) {
@@ -9333,13 +9333,17 @@ _SOKOL_PRIVATE MTLLoadAction _sg_mtl_load_action(sg_action a) {
 _SOKOL_PRIVATE MTLResourceOptions _sg_mtl_buffer_resource_options(sg_usage usg) {
     switch (usg) {
         case SG_USAGE_IMMUTABLE:
+            #if defined(_SG_TARGET_MACOS)
+            return MTLResourceStorageModeManaged;
+            #else
             return MTLResourceStorageModeShared;
+            #endif
         case SG_USAGE_DYNAMIC:
         case SG_USAGE_STREAM:
             #if defined(_SG_TARGET_MACOS)
-            return MTLCPUCacheModeWriteCombined|MTLResourceStorageModeManaged;
+            return MTLResourceCPUCacheModeWriteCombined|MTLResourceStorageModeManaged;
             #else
-            return MTLCPUCacheModeWriteCombined;
+            return MTLResourceCPUCacheModeWriteCombined|MTLResourceStorageModeShared;
             #endif
         default:
             SOKOL_UNREACHABLE;
@@ -9985,14 +9989,10 @@ _SOKOL_PRIVATE void _sg_mtl_setup_backend(const sg_desc* desc) {
     _sg.mtl.sem = dispatch_semaphore_create(SG_NUM_INFLIGHT_FRAMES);
     _sg.mtl.device = (__bridge id<MTLDevice>) desc->context.metal.device;
     _sg.mtl.cmd_queue = [_sg.mtl.device newCommandQueue];
-    MTLResourceOptions res_opts = MTLResourceCPUCacheModeWriteCombined;
-    #if defined(_SG_TARGET_MACOS)
-    res_opts |= MTLResourceStorageModeManaged;
-    #endif
     for (int i = 0; i < SG_NUM_INFLIGHT_FRAMES; i++) {
         _sg.mtl.uniform_buffers[i] = [_sg.mtl.device
             newBufferWithLength:(NSUInteger)_sg.mtl.ub_size
-            options:res_opts
+            options:MTLResourceCPUCacheModeWriteCombined|MTLResourceStorageModeShared
         ];
     }
     _sg_mtl_init_caps();
@@ -10109,11 +10109,12 @@ _SOKOL_PRIVATE void _sg_mtl_copy_image_data(const _sg_image_t* img, __unsafe_unr
             const uint8_t* data_ptr = (const uint8_t*)data->subimage[face_index][mip_index].ptr;
             const int mip_width = _sg_max(img->cmn.width >> mip_index, 1);
             const int mip_height = _sg_max(img->cmn.height >> mip_index, 1);
-            /* special case PVRTC formats: bytePerRow must be 0 */
+            /* special case PVRTC formats: bytePerRow and bytes_per_slice must be 0 */
             int bytes_per_row = 0;
-            int bytes_per_slice = _sg_surface_pitch(img->cmn.pixel_format, mip_width, mip_height, 1);
+            int bytes_per_slice = 0;
             if (!_sg_mtl_is_pvrtc(img->cmn.pixel_format)) {
                 bytes_per_row = _sg_row_pitch(img->cmn.pixel_format, mip_width, 1);
+                bytes_per_slice = _sg_surface_pitch(img->cmn.pixel_format, mip_width, mip_height, 1);
             }
             MTLRegion region;
             if (img->cmn.type == SG_IMAGETYPE_3D) {
@@ -10179,18 +10180,18 @@ _SOKOL_PRIVATE bool _sg_mtl_init_texdesc_common(MTLTextureDescriptor* mtl_desc, 
         mtl_desc.arrayLength = 1;
     }
     mtl_desc.usage = MTLTextureUsageShaderRead;
+    MTLResourceOptions res_options = 0;
     if (img->cmn.usage != SG_USAGE_IMMUTABLE) {
-        mtl_desc.cpuCacheMode = MTLCPUCacheModeWriteCombined;
+        res_options |= MTLResourceCPUCacheModeWriteCombined;
     }
     #if defined(_SG_TARGET_MACOS)
         /* macOS: use managed textures */
-        mtl_desc.resourceOptions = MTLResourceStorageModeManaged;
-        mtl_desc.storageMode = MTLStorageModeManaged;
+        res_options |= MTLResourceStorageModeManaged;
     #else
         /* iOS: use CPU/GPU shared memory */
-        mtl_desc.resourceOptions = MTLResourceStorageModeShared;
-        mtl_desc.storageMode = MTLStorageModeShared;
+        res_options |= MTLResourceStorageModeShared;
     #endif
+    mtl_desc.resourceOptions = res_options;
     return true;
 }
 
@@ -10198,11 +10199,8 @@ _SOKOL_PRIVATE bool _sg_mtl_init_texdesc_common(MTLTextureDescriptor* mtl_desc, 
 _SOKOL_PRIVATE void _sg_mtl_init_texdesc_rt(MTLTextureDescriptor* mtl_desc, _sg_image_t* img) {
     SOKOL_ASSERT(img->cmn.render_target);
     _SOKOL_UNUSED(img);
-    /* reset the cpuCacheMode to 'default' */
-    mtl_desc.cpuCacheMode = MTLCPUCacheModeDefaultCache;
     /* render targets are only visible to the GPU */
     mtl_desc.resourceOptions = MTLResourceStorageModePrivate;
-    mtl_desc.storageMode = MTLStorageModePrivate;
     /* non-MSAA render targets are shader-readable */
     mtl_desc.usage = MTLTextureUsageShaderRead | MTLTextureUsageRenderTarget;
 }
@@ -10210,11 +10208,8 @@ _SOKOL_PRIVATE void _sg_mtl_init_texdesc_rt(MTLTextureDescriptor* mtl_desc, _sg_
 /* initialize MTLTextureDescritor with MSAA attributes */
 _SOKOL_PRIVATE void _sg_mtl_init_texdesc_rt_msaa(MTLTextureDescriptor* mtl_desc, _sg_image_t* img) {
     SOKOL_ASSERT(img->cmn.sample_count > 1);
-    /* reset the cpuCacheMode to 'default' */
-    mtl_desc.cpuCacheMode = MTLCPUCacheModeDefaultCache;
     /* render targets are only visible to the GPU */
     mtl_desc.resourceOptions = MTLResourceStorageModePrivate;
-    mtl_desc.storageMode = MTLStorageModePrivate;
     /* MSAA render targets are not shader-readable (instead they are resolved) */
     mtl_desc.usage = MTLTextureUsageRenderTarget;
     mtl_desc.textureType = MTLTextureType2DMultisample;
@@ -10720,10 +10715,6 @@ _SOKOL_PRIVATE void _sg_mtl_commit(void) {
     SOKOL_ASSERT(_sg.mtl.drawable_cb || _sg.mtl.drawable_userdata_cb);
     SOKOL_ASSERT(nil == _sg.mtl.cmd_encoder);
     SOKOL_ASSERT(nil != _sg.mtl.cmd_buffer);
-
-    #if defined(_SG_TARGET_MACOS)
-    [_sg.mtl.uniform_buffers[_sg.mtl.cur_frame_rotate_index] didModifyRange:NSMakeRange(0, (NSUInteger)_sg.mtl.cur_ub_offset)];
-    #endif
 
     /* present, commit and signal semaphore when done */
     id<MTLDrawable> cur_drawable = nil;
@@ -15382,6 +15373,7 @@ SOKOL_API_IMPL void sg_apply_uniforms(sg_shader_stage stage, int ub_index, const
     }
     if (!_sg.next_draw_valid) {
         _SG_TRACE_NOARGS(err_draw_invalid);
+        return;
     }
     _sg_apply_uniforms(stage, ub_index, data);
     _SG_TRACE_ARGS(apply_uniforms, stage, ub_index, data);
@@ -15565,6 +15557,7 @@ SOKOL_API_IMPL sg_image_info sg_query_image_info(sg_image img_id) {
         info.slot.state = img->slot.state;
         info.slot.res_id = img->slot.id;
         info.slot.ctx_id = img->slot.ctx_id;
+        info.upd_frame_index = img->cmn.upd_frame_index;
         #if defined(SOKOL_D3D11)
         info.num_slots = 1;
         info.active_slot = 0;

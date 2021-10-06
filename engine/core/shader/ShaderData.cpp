@@ -72,7 +72,7 @@ int ShaderData::getAttrIndex(AttributeType type){
     if (vsIndex != -1){
         for (int a = 0; a < stages[vsIndex].attributes.size(); a++){
             if (stages[vsIndex].attributes[a].name == attrstr)
-                attrIndex = a;
+                attrIndex = stages[vsIndex].attributes[a].location;
         }
     }
 

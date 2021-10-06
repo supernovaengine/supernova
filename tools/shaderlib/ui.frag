@@ -6,16 +6,16 @@ uniform u_fs_uiParams {
 
 out vec4 g_finalColor;
 
-#ifdef HAS_TEXTURE
-    uniform sampler2D u_uiTexture;
-    in vec2 v_uv1;
-#endif
-
 #ifdef HAS_VERTEX_COLOR_VEC3
     in vec3 v_color;
 #endif
 #ifdef HAS_VERTEX_COLOR_VEC4
     in vec4 v_color;
+#endif
+
+#ifdef HAS_TEXTURE
+    uniform sampler2D u_uiTexture;
+    in vec2 v_uv1;
 #endif
 
 #include "includes/srgb.glsl"

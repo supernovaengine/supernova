@@ -31,10 +31,10 @@ Sprite::Sprite(Scene* scene): Mesh(scene){
 
     Attribute* attNormal = buffer.getAttribute(AttributeType::NORMAL);
 
-    buffer.addVector3(attNormal, Vector3(1.0f, 1.0f, 1.0f));
-    buffer.addVector3(attNormal, Vector3(1.0f, 1.0f, 1.0f));
-    buffer.addVector3(attNormal, Vector3(1.0f, 1.0f, 1.0f));
-    buffer.addVector3(attNormal, Vector3(1.0f, 1.0f, 1.0f));
+    buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
 
     Attribute* attColor = buffer.getAttribute(AttributeType::COLOR);
 

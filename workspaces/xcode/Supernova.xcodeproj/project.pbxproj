@@ -168,6 +168,31 @@
 		713D8341259D408300567F9F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 713D8334259D407A00567F9F /* ViewController.m */; };
 		713D834E259D408800567F9F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 713D8335259D407A00567F9F /* main.m */; };
 		713D835B259D408C00567F9F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 713D8336259D407A00567F9F /* AppDelegate.m */; };
+		71451BBE270CA16200712643 /* ActionSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BBC270CA16200712643 /* ActionSystem.cpp */; };
+		71451BBF270CA16200712643 /* ActionSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BBC270CA16200712643 /* ActionSystem.cpp */; };
+		71451BC0270CA16200712643 /* ActionSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BBD270CA16200712643 /* ActionSystem.h */; };
+		71451BD1270CA17F00712643 /* SpriteAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BC2270CA17F00712643 /* SpriteAnimation.cpp */; };
+		71451BD2270CA17F00712643 /* SpriteAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BC2270CA17F00712643 /* SpriteAnimation.cpp */; };
+		71451BD4270CA17F00712643 /* TimedAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BC4270CA17F00712643 /* TimedAction.cpp */; };
+		71451BD5270CA17F00712643 /* TimedAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BC4270CA17F00712643 /* TimedAction.cpp */; };
+		71451BD7270CA17F00712643 /* ColorAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BC6270CA17F00712643 /* ColorAction.cpp */; };
+		71451BD8270CA17F00712643 /* ColorAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BC6270CA17F00712643 /* ColorAction.cpp */; };
+		71451BDC270CA17F00712643 /* RotationAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BCA270CA17F00712643 /* RotationAction.cpp */; };
+		71451BDD270CA17F00712643 /* RotationAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BCA270CA17F00712643 /* RotationAction.cpp */; };
+		71451BDF270CA17F00712643 /* PositionAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BCC270CA17F00712643 /* PositionAction.cpp */; };
+		71451BE0270CA17F00712643 /* PositionAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BCC270CA17F00712643 /* PositionAction.cpp */; };
+		71451BE2270CA17F00712643 /* ScaleAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BCE270CA17F00712643 /* ScaleAction.cpp */; };
+		71451BE3270CA17F00712643 /* ScaleAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BCE270CA17F00712643 /* ScaleAction.cpp */; };
+		71451BE4270CA17F00712643 /* Action.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BCF270CA17F00712643 /* Action.cpp */; };
+		71451BE5270CA17F00712643 /* Action.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BCF270CA17F00712643 /* Action.cpp */; };
+		71451BEB270CA2C900712643 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BE7270CA2C900712643 /* Sprite.cpp */; };
+		71451BEC270CA2C900712643 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BE7270CA2C900712643 /* Sprite.cpp */; };
+		71451BED270CA2C900712643 /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BE8270CA2C900712643 /* Polygon.cpp */; };
+		71451BEE270CA2C900712643 /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BE8270CA2C900712643 /* Polygon.cpp */; };
+		71451BEF270CA2C900712643 /* Polygon.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BE9270CA2C900712643 /* Polygon.h */; };
+		71451BF0270CA2C900712643 /* Sprite.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BEA270CA2C900712643 /* Sprite.h */; };
+		71451BF3270CA3EA00712643 /* Material.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BF1270CA3EA00712643 /* Material.h */; };
+		71451BF4270CA3EA00712643 /* FrameData.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BF2270CA3EA00712643 /* FrameData.h */; };
 		7158F43F259C2C82006E55D3 /* Renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7158F43E259C2C82006E55D3 /* Renderer.mm */; };
 		7158F440259C2C82006E55D3 /* Renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7158F43E259C2C82006E55D3 /* Renderer.mm */; };
 		7162FD1225963AE00075B97D /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC2C25962A0E0075B97D /* Log.cpp */; };
@@ -306,7 +331,6 @@
 		71BE61CC25B1DA3E006D6E02 /* stb_image_write.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61C225B1DA3E006D6E02 /* stb_image_write.c */; };
 		71BE61CD25B1DA3E006D6E02 /* stb_rect_pack.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61C325B1DA3E006D6E02 /* stb_rect_pack.c */; };
 		71BE61CE25B1DA3E006D6E02 /* stb_vorbis.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE61C425B1DA3E006D6E02 /* stb_vorbis.h */; };
-		71BE61F425B1DAE9006D6E02 /* shaders.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE61F325B1DAE9006D6E02 /* shaders.h */; };
 		71BE620025B1DB22006D6E02 /* System.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE61FE25B1DB22006D6E02 /* System.h */; };
 		71BE620125B1DB22006D6E02 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61FF25B1DB22006D6E02 /* System.cpp */; };
 		71BE620225B1DB22006D6E02 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61FF25B1DB22006D6E02 /* System.cpp */; };
@@ -553,6 +577,39 @@
 		713D8335259D407A00567F9F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		713D8336259D407A00567F9F /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		713D8337259D407A00567F9F /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		71451BB2270C9D0F00712643 /* SpriteComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpriteComponent.h; sourceTree = "<group>"; };
+		71451BB3270C9D0F00712643 /* ColorActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorActionComponent.h; sourceTree = "<group>"; };
+		71451BB4270C9D0F00712643 /* ActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ActionComponent.h; sourceTree = "<group>"; };
+		71451BB5270C9D0F00712643 /* PositionActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PositionActionComponent.h; sourceTree = "<group>"; };
+		71451BB6270C9D0F00712643 /* UIRenderComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UIRenderComponent.h; sourceTree = "<group>"; };
+		71451BB7270C9D0F00712643 /* SpriteAnimationComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpriteAnimationComponent.h; sourceTree = "<group>"; };
+		71451BB8270C9D0F00712643 /* ScaleActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScaleActionComponent.h; sourceTree = "<group>"; };
+		71451BB9270C9D0F00712643 /* TimedActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimedActionComponent.h; sourceTree = "<group>"; };
+		71451BBA270C9D0F00712643 /* EaseComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EaseComponent.h; sourceTree = "<group>"; };
+		71451BBB270C9D1000712643 /* RotationActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RotationActionComponent.h; sourceTree = "<group>"; };
+		71451BBC270CA16200712643 /* ActionSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ActionSystem.cpp; sourceTree = "<group>"; };
+		71451BBD270CA16200712643 /* ActionSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActionSystem.h; sourceTree = "<group>"; };
+		71451BC2270CA17F00712643 /* SpriteAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpriteAnimation.cpp; sourceTree = "<group>"; };
+		71451BC3270CA17F00712643 /* PositionAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PositionAction.h; sourceTree = "<group>"; };
+		71451BC4270CA17F00712643 /* TimedAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TimedAction.cpp; sourceTree = "<group>"; };
+		71451BC5270CA17F00712643 /* Action.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Action.h; sourceTree = "<group>"; };
+		71451BC6270CA17F00712643 /* ColorAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ColorAction.cpp; sourceTree = "<group>"; };
+		71451BC7270CA17F00712643 /* ColorAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorAction.h; sourceTree = "<group>"; };
+		71451BC8270CA17F00712643 /* RotationAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotationAction.h; sourceTree = "<group>"; };
+		71451BC9270CA17F00712643 /* Ease.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ease.h; sourceTree = "<group>"; };
+		71451BCA270CA17F00712643 /* RotationAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RotationAction.cpp; sourceTree = "<group>"; };
+		71451BCB270CA17F00712643 /* ScaleAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScaleAction.h; sourceTree = "<group>"; };
+		71451BCC270CA17F00712643 /* PositionAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PositionAction.cpp; sourceTree = "<group>"; };
+		71451BCD270CA17F00712643 /* SpriteAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteAnimation.h; sourceTree = "<group>"; };
+		71451BCE270CA17F00712643 /* ScaleAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScaleAction.cpp; sourceTree = "<group>"; };
+		71451BCF270CA17F00712643 /* Action.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Action.cpp; sourceTree = "<group>"; };
+		71451BD0270CA17F00712643 /* TimedAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimedAction.h; sourceTree = "<group>"; };
+		71451BE7270CA2C900712643 /* Sprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sprite.cpp; sourceTree = "<group>"; };
+		71451BE8270CA2C900712643 /* Polygon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Polygon.cpp; sourceTree = "<group>"; };
+		71451BE9270CA2C900712643 /* Polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Polygon.h; sourceTree = "<group>"; };
+		71451BEA270CA2C900712643 /* Sprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sprite.h; sourceTree = "<group>"; };
+		71451BF1270CA3EA00712643 /* Material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Material.h; sourceTree = "<group>"; };
+		71451BF2270CA3EA00712643 /* FrameData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrameData.h; sourceTree = "<group>"; };
 		7158F43D259C2C82006E55D3 /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
 		7158F43E259C2C82006E55D3 /* Renderer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Renderer.mm; sourceTree = "<group>"; };
 		7162F8CE259547DA0075B97D /* Supernova.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Supernova.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -744,7 +801,6 @@
 		71BE61C225B1DA3E006D6E02 /* stb_image_write.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image_write.c; sourceTree = "<group>"; };
 		71BE61C325B1DA3E006D6E02 /* stb_rect_pack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_rect_pack.c; sourceTree = "<group>"; };
 		71BE61C425B1DA3E006D6E02 /* stb_vorbis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_vorbis.h; sourceTree = "<group>"; };
-		71BE61F325B1DAE9006D6E02 /* shaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shaders.h; sourceTree = "<group>"; };
 		71BE61FE25B1DB22006D6E02 /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = System.h; sourceTree = "<group>"; };
 		71BE61FF25B1DB22006D6E02 /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = System.cpp; sourceTree = "<group>"; };
 		71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FunctionSubscribe.h; sourceTree = "<group>"; };
@@ -968,6 +1024,28 @@
 			path = ios;
 			sourceTree = "<group>";
 		};
+		71451BC1270CA17F00712643 /* action */ = {
+			isa = PBXGroup;
+			children = (
+				71451BC2270CA17F00712643 /* SpriteAnimation.cpp */,
+				71451BC3270CA17F00712643 /* PositionAction.h */,
+				71451BC4270CA17F00712643 /* TimedAction.cpp */,
+				71451BC5270CA17F00712643 /* Action.h */,
+				71451BC6270CA17F00712643 /* ColorAction.cpp */,
+				71451BC7270CA17F00712643 /* ColorAction.h */,
+				71451BC8270CA17F00712643 /* RotationAction.h */,
+				71451BC9270CA17F00712643 /* Ease.h */,
+				71451BCA270CA17F00712643 /* RotationAction.cpp */,
+				71451BCB270CA17F00712643 /* ScaleAction.h */,
+				71451BCC270CA17F00712643 /* PositionAction.cpp */,
+				71451BCD270CA17F00712643 /* SpriteAnimation.h */,
+				71451BCE270CA17F00712643 /* ScaleAction.cpp */,
+				71451BCF270CA17F00712643 /* Action.cpp */,
+				71451BD0270CA17F00712643 /* TimedAction.h */,
+			);
+			path = action;
+			sourceTree = "<group>";
+		};
 		7162F8BF259547D60075B97D = {
 			isa = PBXGroup;
 			children = (
@@ -1016,6 +1094,7 @@
 		7162FC2A25962A0E0075B97D /* core */ = {
 			isa = PBXGroup;
 			children = (
+				71451BC1270CA17F00712643 /* action */,
 				7162FC7B25962A0E0075B97D /* buffer */,
 				7162FC4425962A0E0075B97D /* component */,
 				71E36B8125D5996400EFEED4 /* ecs */,
@@ -1047,8 +1126,10 @@
 		7162FC2E25962A0E0075B97D /* util */ = {
 			isa = PBXGroup;
 			children = (
+				71451BF2270CA3EA00712643 /* FrameData.h */,
 				71BE620F25B1DB37006D6E02 /* Function.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
+				71451BF1270CA3EA00712643 /* Material.h */,
 				7128D0AC25BB18DC00965B51 /* StringUtils.cpp */,
 				7128D0AD25BB18DC00965B51 /* StringUtils.h */,
 			);
@@ -1095,11 +1176,21 @@
 		7162FC4425962A0E0075B97D /* component */ = {
 			isa = PBXGroup;
 			children = (
+				71451BB4270C9D0F00712643 /* ActionComponent.h */,
 				7162FC4625962A0E0075B97D /* CameraComponent.h */,
+				71451BB3270C9D0F00712643 /* ColorActionComponent.h */,
+				71451BBA270C9D0F00712643 /* EaseComponent.h */,
 				71CC839226B8C49B00EEBB93 /* LightComponent.h */,
 				7162FC4525962A0E0075B97D /* MeshComponent.h */,
+				71451BB5270C9D0F00712643 /* PositionActionComponent.h */,
+				71451BBB270C9D1000712643 /* RotationActionComponent.h */,
+				71451BB8270C9D0F00712643 /* ScaleActionComponent.h */,
 				71CC839126B8C49B00EEBB93 /* SkyComponent.h */,
+				71451BB7270C9D0F00712643 /* SpriteAnimationComponent.h */,
+				71451BB2270C9D0F00712643 /* SpriteComponent.h */,
+				71451BB9270C9D0F00712643 /* TimedActionComponent.h */,
 				7162FC4725962A0E0075B97D /* Transform.h */,
+				71451BB6270C9D0F00712643 /* UIRenderComponent.h */,
 			);
 			path = component;
 			sourceTree = "<group>";
@@ -1150,8 +1241,12 @@
 				7162FC6825962A0E0075B97D /* Object.h */,
 				71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */,
 				71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */,
+				71451BE8270CA2C900712643 /* Polygon.cpp */,
+				71451BE9270CA2C900712643 /* Polygon.h */,
 				71F97A89262D1D5900CD6F2B /* SkyBox.cpp */,
 				71F97A88262D1D5900CD6F2B /* SkyBox.h */,
+				71451BE7270CA2C900712643 /* Sprite.cpp */,
+				71451BEA270CA2C900712643 /* Sprite.h */,
 			);
 			path = object;
 			sourceTree = "<group>";
@@ -1170,6 +1265,8 @@
 		7162FC6F25962A0E0075B97D /* subsystem */ = {
 			isa = PBXGroup;
 			children = (
+				71451BBC270CA16200712643 /* ActionSystem.cpp */,
+				71451BBD270CA16200712643 /* ActionSystem.h */,
 				7162FC7025962A0E0075B97D /* RenderSystem.cpp */,
 				7162FC7125962A0E0075B97D /* RenderSystem.h */,
 			);
@@ -1204,7 +1301,6 @@
 		7162FC8825962A0E0075B97D /* sokol */ = {
 			isa = PBXGroup;
 			children = (
-				7162FC9225962A0E0075B97D /* shaders */,
 				7162FC8B25962A0E0075B97D /* SokolBuffer.cpp */,
 				7162FC8E25962A0E0075B97D /* SokolBuffer.h */,
 				71CC83A926B8D54800EEBB93 /* SokolFramebuffer.cpp */,
@@ -1221,14 +1317,6 @@
 				7162FC8D25962A0E0075B97D /* SokolTexture.h */,
 			);
 			path = sokol;
-			sourceTree = "<group>";
-		};
-		7162FC9225962A0E0075B97D /* shaders */ = {
-			isa = PBXGroup;
-			children = (
-				71BE61F325B1DAE9006D6E02 /* shaders.h */,
-			);
-			path = shaders;
 			sourceTree = "<group>";
 		};
 		7162FC9625962A0E0075B97D /* libs */ = {
@@ -1591,8 +1679,8 @@
 			files = (
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
 				71BE624025B1DB9E006D6E02 /* LuaFunction.h in Headers */,
-				71BE61F425B1DAE9006D6E02 /* shaders.h in Headers */,
 				71F97AAF262D1D8000CD6F2B /* Color.h in Headers */,
+				71451BF3270CA3EA00712643 /* Material.h in Headers */,
 				71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */,
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
 				71BE620025B1DB22006D6E02 /* System.h in Headers */,
@@ -1602,14 +1690,18 @@
 				71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */,
 				71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */,
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
+				71451BF0270CA2C900712643 /* Sprite.h in Headers */,
 				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,
 				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
 				71BE622225B1DB83006D6E02 /* TextureData.h in Headers */,
+				71451BF4270CA3EA00712643 /* FrameData.h in Headers */,
+				71451BEF270CA2C900712643 /* Polygon.h in Headers */,
 				71BE621425B1DB37006D6E02 /* Function.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
 				71BE624625B1DB9E006D6E02 /* ShaderPool.h in Headers */,
 				71BE623F25B1DB9E006D6E02 /* LuaBinding.h in Headers */,
 				71CC83A426B8C54A00EEBB93 /* ShaderData.h in Headers */,
+				71451BC0270CA16200712643 /* ActionSystem.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2183,24 +2275,30 @@
 				713D8304259D34F900567F9F /* Ray.cpp in Sources */,
 				71F97AB1262D1D8000CD6F2B /* Color.cpp in Sources */,
 				713D8292259D307E00567F9F /* Log.cpp in Sources */,
+				71451BDD270CA17F00712643 /* RotationAction.cpp in Sources */,
 				71BE624225B1DB9E006D6E02 /* TexturePool.cpp in Sources */,
 				713D8293259D307F00567F9F /* Scene.cpp in Sources */,
 				71BE623B25B1DB9E006D6E02 /* LuaFunction.cpp in Sources */,
 				713D8294259D307F00567F9F /* Data.cpp in Sources */,
+				71451BBF270CA16200712643 /* ActionSystem.cpp in Sources */,
 				71BE623D25B1DB9E006D6E02 /* LuaScript.cpp in Sources */,
 				71CC83A726B8C54A00EEBB93 /* ShaderData.cpp in Sources */,
 				71CC839626B8C4D800EEBB93 /* Light.cpp in Sources */,
 				713D8295259D307F00567F9F /* UserSettings.cpp in Sources */,
 				71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
 				713D8296259D307F00567F9F /* File.cpp in Sources */,
+				71451BE3270CA17F00712643 /* ScaleAction.cpp in Sources */,
 				713D8297259D307F00567F9F /* FileData.cpp in Sources */,
+				71451BEC270CA2C900712643 /* Sprite.cpp in Sources */,
 				713D8298259D307F00567F9F /* ShaderRender.cpp in Sources */,
 				713D8299259D307F00567F9F /* ObjectRender.cpp in Sources */,
 				71CC839C26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */,
 				713D829A259D307F00567F9F /* TextureRender.cpp in Sources */,
 				713D829B259D307F00567F9F /* BufferRender.cpp in Sources */,
 				713D82EB259D333100567F9F /* Buffer.cpp in Sources */,
+				71451BD8270CA17F00712643 /* ColorAction.cpp in Sources */,
 				713D829C259D307F00567F9F /* SceneRender.cpp in Sources */,
+				71451BE5270CA17F00712643 /* Action.cpp in Sources */,
 				713D829D259D307F00567F9F /* Vector4.cpp in Sources */,
 				713D829E259D307F00567F9F /* Vector3.cpp in Sources */,
 				7128D10125C2354A00965B51 /* SystemRender.cpp in Sources */,
@@ -2220,19 +2318,23 @@
 				713D82A8259D307F00567F9F /* Camera.cpp in Sources */,
 				713D82A9259D307F00567F9F /* Object.cpp in Sources */,
 				71BE623925B1DB9E006D6E02 /* LuaBinding.cpp in Sources */,
+				71451BD2270CA17F00712643 /* SpriteAnimation.cpp in Sources */,
 				7128D08725BB033D00965B51 /* Input.cpp in Sources */,
 				713D82AB259D307F00567F9F /* Texture.cpp in Sources */,
+				71451BE0270CA17F00712643 /* PositionAction.cpp in Sources */,
 				713D82AD259D307F00567F9F /* RenderSystem.cpp in Sources */,
 				713D82AE259D307F00567F9F /* Engine.cpp in Sources */,
 				713D82AF259D307F00567F9F /* InterleavedBuffer.cpp in Sources */,
 				7128D11F25C2356200965B51 /* SokolSystem.cpp in Sources */,
 				71BE620225B1DB22006D6E02 /* System.cpp in Sources */,
 				713D82B0259D307F00567F9F /* Attribute.cpp in Sources */,
+				71451BEE270CA2C900712643 /* Polygon.cpp in Sources */,
 				713D82B1259D307F00567F9F /* ExternalBuffer.cpp in Sources */,
 				713D82B2259D307F00567F9F /* IndexBuffer.cpp in Sources */,
 				713D82B3259D307F00567F9F /* SokolObject.cpp in Sources */,
 				713D82B4259D307F00567F9F /* SokolBuffer.cpp in Sources */,
 				71CC83AC26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
+				71451BD5270CA17F00712643 /* TimedAction.cpp in Sources */,
 				713D82B5259D307F00567F9F /* SokolShader.cpp in Sources */,
 				713D82B6259D307F00567F9F /* SokolTexture.cpp in Sources */,
 				713D82B7259D307F00567F9F /* SokolScene.cpp in Sources */,
@@ -2286,24 +2388,30 @@
 				7162FE0C2596A5BE0075B97D /* SokolObject.cpp in Sources */,
 				71F97AB0262D1D8000CD6F2B /* Color.cpp in Sources */,
 				7162FE0D2596A5BE0075B97D /* SokolBuffer.cpp in Sources */,
+				71451BDC270CA17F00712643 /* RotationAction.cpp in Sources */,
 				71BE624125B1DB9E006D6E02 /* TexturePool.cpp in Sources */,
 				7162FE0E2596A5BE0075B97D /* SokolShader.cpp in Sources */,
 				71BE623A25B1DB9E006D6E02 /* LuaFunction.cpp in Sources */,
 				7162FE0F2596A5BE0075B97D /* SokolTexture.cpp in Sources */,
+				71451BBE270CA16200712643 /* ActionSystem.cpp in Sources */,
 				71BE623C25B1DB9E006D6E02 /* LuaScript.cpp in Sources */,
 				71CC83A626B8C54A00EEBB93 /* ShaderData.cpp in Sources */,
 				71CC839526B8C4D800EEBB93 /* Light.cpp in Sources */,
 				7162FE102596A5BE0075B97D /* SokolScene.cpp in Sources */,
 				71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
 				7162FD1225963AE00075B97D /* Log.cpp in Sources */,
+				71451BE2270CA17F00712643 /* ScaleAction.cpp in Sources */,
 				7162FD1325963AE00075B97D /* Scene.cpp in Sources */,
+				71451BEB270CA2C900712643 /* Sprite.cpp in Sources */,
 				7162FD1625963AE00075B97D /* Data.cpp in Sources */,
 				7162FD1725963AE00075B97D /* UserSettings.cpp in Sources */,
 				71CC839B26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */,
 				7162FD1925963AE00075B97D /* File.cpp in Sources */,
 				7162FD1A25963AE00075B97D /* FileData.cpp in Sources */,
 				7162FD1C25963AE00075B97D /* ShaderRender.cpp in Sources */,
+				71451BD7270CA17F00712643 /* ColorAction.cpp in Sources */,
 				7162FD2125963AE00075B97D /* ObjectRender.cpp in Sources */,
+				71451BE4270CA17F00712643 /* Action.cpp in Sources */,
 				7162FD2325963AE00075B97D /* TextureRender.cpp in Sources */,
 				7162FD2425963AE00075B97D /* BufferRender.cpp in Sources */,
 				7128D10025C2354A00965B51 /* SystemRender.cpp in Sources */,
@@ -2323,19 +2431,23 @@
 				7162FD3925963AE00075B97D /* Quaternion.cpp in Sources */,
 				7162FD3B25963AE00075B97D /* AlignedBox.cpp in Sources */,
 				71BE623825B1DB9E006D6E02 /* LuaBinding.cpp in Sources */,
+				71451BD1270CA17F00712643 /* SpriteAnimation.cpp in Sources */,
 				7128D08625BB033D00965B51 /* Input.cpp in Sources */,
 				7162FD3D25963AE00075B97D /* Plane.cpp in Sources */,
+				71451BDF270CA17F00712643 /* PositionAction.cpp in Sources */,
 				7162FD3F25963AE00075B97D /* Angle.cpp in Sources */,
 				7162FD4325963AE00075B97D /* Camera.cpp in Sources */,
 				7162FD4525963AE00075B97D /* Object.cpp in Sources */,
 				7128D11E25C2356200965B51 /* SokolSystem.cpp in Sources */,
 				71BE620125B1DB22006D6E02 /* System.cpp in Sources */,
 				7162FD4A25963AE00075B97D /* Texture.cpp in Sources */,
+				71451BED270CA2C900712643 /* Polygon.cpp in Sources */,
 				7162FD4D25963AE00075B97D /* RenderSystem.cpp in Sources */,
 				7162FD4F25963AE00075B97D /* Engine.cpp in Sources */,
 				7162FD5825963AE00075B97D /* InterleavedBuffer.cpp in Sources */,
 				7162FD5925963AE00075B97D /* Buffer.cpp in Sources */,
 				71CC83AB26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
+				71451BD4270CA17F00712643 /* TimedAction.cpp in Sources */,
 				7162FD5C25963AE00075B97D /* Attribute.cpp in Sources */,
 				7162FD5E25963AE10075B97D /* ExternalBuffer.cpp in Sources */,
 				7162FD6025963AE10075B97D /* IndexBuffer.cpp in Sources */,

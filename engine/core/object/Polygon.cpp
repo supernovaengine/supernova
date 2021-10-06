@@ -15,14 +15,12 @@ Polygon::Polygon(Scene* scene): Object(scene){
 	buffer.clearAll();
 	buffer.addAttribute(AttributeType::POSITION, 3);
 	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-    buffer.addAttribute(AttributeType::NORMAL, 3);
     buffer.addAttribute(AttributeType::COLOR, 4);
 }
 
 void Polygon::addVertex(Vector3 vertex){
 
     buffer.addVector3(AttributeType::POSITION, vertex);
-    buffer.addVector3(AttributeType::NORMAL, Vector3(1.0f, 1.0f, 1.0f));
     buffer.addVector4(AttributeType::COLOR, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
     if (buffer.getCount() > 3){

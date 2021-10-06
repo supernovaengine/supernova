@@ -25,12 +25,12 @@ in vec3 a_position;
 
 void main() {
 
-    #ifdef HAS_TEXTURE
-        v_uv1 = a_texcoord1;
-    #endif
-
     #if defined(HAS_VERTEX_COLOR_VEC3) || defined(HAS_VERTEX_COLOR_VEC4)
         v_color = a_color;
+    #endif
+
+    #ifdef HAS_TEXTURE
+        v_uv1 = a_texcoord1;
     #endif
 
     gl_Position = uiParams.mvpMatrix * vec4(a_position, 1.0);
