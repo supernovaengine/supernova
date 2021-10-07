@@ -69,7 +69,7 @@ bool FileData::beginWith(std::string path, std::string prefix){
 std::string FileData::getBaseDir(std::string filepath){
     size_t found;
 
-    found=filepath.find_last_of(System::instance().getDirSeparator());
+    found=filepath.find_last_of("/\\");
 
     std::string result = filepath.substr(0,found);
 
