@@ -55,6 +55,12 @@ int ShaderData::getAttrIndex(AttributeType type){
         attrstr = "a_tangent";
     }else if (type == AttributeType::COLOR){
         attrstr = "a_color";
+    }else if (type == AttributeType::COLOR){
+        attrstr = "a_color";
+    }else if (type == AttributeType::POINTSIZE){
+        attrstr = "a_pointsize";
+    }else if (type == AttributeType::POINTROTATION){
+        attrstr = "a_pointrotation";
     }
 
     if (attrstr.empty()){

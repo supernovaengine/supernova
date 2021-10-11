@@ -48,10 +48,11 @@ namespace Supernova{
         TEXCOORD1,
         NORMAL,
         TANGENT,
-        COLOR
+        COLOR,
+        POINTSIZE,
+        POINTROTATION
         //BONEWEIGHTS,
         //BONEIDS,
-        //POINTSIZES,
         //POINTCOLORS,
         //POINTROTATIONS,
         //TEXTURERECTS,

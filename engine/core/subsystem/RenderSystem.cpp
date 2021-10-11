@@ -627,7 +627,6 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	ShaderData& shaderData = particles.shader.get()->shaderData;
 
 	particles.slotVSParams = shaderData.getUniformIndex(UniformType::POINTS_VS_PARAMS, ShaderStageType::VERTEX);
-	//ui.slotFSParams = shaderData.getUniformIndex(UniformType::UI_FS_PARAMS, ShaderStageType::FRAGMENT);
 
 	particles.buffer->getRender()->createBuffer(particles.buffer->getSize(), particles.buffer->getData(), particles.buffer->getBufferType(), false);
 	if (particles.buffer->isRenderAttributes()) {

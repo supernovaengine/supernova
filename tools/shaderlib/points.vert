@@ -6,6 +6,11 @@ uniform u_vs_pointsParams {
 
 in vec3 a_position;
 
+in float a_pointsize;
+
+in float a_pointrotation;
+out float v_pointrotation;
+
 #ifdef HAS_VERTEX_COLOR_VEC3
     in vec3 a_color;
     out vec3 v_color;
@@ -16,11 +21,6 @@ in vec3 a_position;
     out vec4 v_color;
 #endif
 
-#ifdef HAS_TEXTURE
-    in vec2 a_texcoord1;
-    out vec2 v_uv1;
-#endif
-
 
 void main() {
 
@@ -28,10 +28,8 @@ void main() {
         v_color = a_color;
     #endif
 
-    #ifdef HAS_TEXTURE
-        v_uv1 = a_texcoord1;
-    #endif
+    v_pointrotation = a_pointrotation;
 
     gl_Position = pointsParams.mvpMatrix * vec4(a_position, 1.0);
-    gl_PointSize = 30.0;
+    gl_PointSize = a_pointsize;
 }

@@ -2,6 +2,8 @@
 
 out vec4 g_finalColor;
 
+in float v_pointrotation;
+
 #ifdef HAS_VERTEX_COLOR_VEC3
     in vec3 v_color;
 #endif
@@ -11,7 +13,6 @@ out vec4 g_finalColor;
 
 #ifdef HAS_TEXTURE
     uniform sampler2D u_pointsTexture;
-    in vec2 v_uv1;
 #endif
 
 #include "includes/srgb.glsl"
@@ -32,7 +33,15 @@ vec4 getVertexColor(){
 vec4 getBaseColor(){
     vec4 baseColor = vec4(1.0, 1.0, 1.0, 1.0);
     #ifdef HAS_TEXTURE
-        baseColor *= sRGBToLinear(texture(u_pointsTexture, v_uv1));
+
+        vec2 resultCoord = gl_PointCoord;
+
+        if (v_pointrotation != 0.0){
+            resultCoord = vec2(cos(v_pointrotation) * (resultCoord.x - 0.5) + sin(v_pointrotation) * (resultCoord.y - 0.5) + 0.5,
+                            cos(v_pointrotation) * (resultCoord.y - 0.5) - sin(v_pointrotation) * (resultCoord.x - 0.5) + 0.5);
+        }
+
+        baseColor *= sRGBToLinear(texture(u_pointsTexture, resultCoord));
     #endif
     return baseColor * getVertexColor();
 }
