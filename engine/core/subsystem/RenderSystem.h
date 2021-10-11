@@ -7,6 +7,7 @@
 #include "component/UIRenderComponent.h"
 #include "component/CameraComponent.h"
 #include "component/LightComponent.h"
+#include "component/ParticlesComponent.h"
 #include "component/Transform.h"
 #include "render/ObjectRender.h"
 #include "render/SceneRender.h"
@@ -88,6 +89,9 @@ namespace Supernova{
 
 		bool loadUI(UIRenderComponent& ui);
 		void drawUI(UIRenderComponent& ui, Transform& transform);
+
+		bool loadParticles(ParticlesComponent& particles);
+		void drawParticles(ParticlesComponent& particles, Transform& transform);
 
 		bool loadSky(SkyComponent& sky);
 		void drawSky(SkyComponent& sky);

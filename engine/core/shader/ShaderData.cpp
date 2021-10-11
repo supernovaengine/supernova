@@ -102,6 +102,8 @@ int ShaderData::getUniformIndex(UniformType type, ShaderStageType stage){
         ustr = "u_fs_uiParams";
     }else if (type == UniformType::SPRITE_VS_PARAMS){
         ustr = "u_vs_spriteParams";
+    }else if (type == UniformType::POINTS_VS_PARAMS){
+        ustr = "u_vs_pointsParams";
     }
 
     if (ustr.empty()){
@@ -161,6 +163,8 @@ int ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
         texstr = "u_skyTexture";
     }else if (type == TextureShaderType::UI){
         texstr = "u_uiTexture";
+    }else if (type == TextureShaderType::POINTS){
+        texstr = "u_pointsTexture";
     }
 
     if (texstr.empty()){

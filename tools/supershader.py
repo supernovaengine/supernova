@@ -58,7 +58,9 @@ def get_default_shaders():
     s += "depth;"
     s += "sky;"
     s += "ui_Vc4;"
-    s += "ui_TexVc4"
+    s += "ui_TexVc4;"
+    s += "points_Vc4;"
+    s += "points_TexVc4"
     return s
 
 def get_default_langs():

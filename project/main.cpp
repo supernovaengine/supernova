@@ -12,6 +12,7 @@ using namespace Supernova;
 #include "RotationAction.h"
 #include "ScaleAction.h"
 #include "ColorAction.h"
+#include "Particles.h"
 
 Scene scene;
 Camera camera(&scene);
@@ -26,6 +27,7 @@ PositionAction positionaction(&scene);
 RotationAction rotationaction(&scene);
 ScaleAction scaleaction(&scene);
 ColorAction coloraction(&scene);
+Particles particles(&scene);
 
 void onActionStart();
 void onKeyDown(int key, bool repeat, int mods);
@@ -104,6 +106,10 @@ void init(){
     polygon3.setPosition(100, 100, 0);
     polygon3.setName("Polygon3");
     polygon3.setTexture("pista.png");
+
+    particles.setPosition(300, 400, 0);
+    particles.addParticle(Vector3(30, 30, 0), Vector4(1.0, 0.0, 0.0, 1.0));
+    particles.addParticle(Vector3(20, 60, 0), Vector4(0.0, 1.0, 0.0, 1.0));
 
     //plane.create(4000, 4000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);

@@ -526,8 +526,22 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 	}
 }
 
-bool RenderSystem::loadUI(UIRenderComponent& ui){
+void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix){
+	if (mesh.loaded && mesh.castShadows){
+		for (int i = 0; i < mesh.numSubmeshes; i++){
+			ObjectRender& depthRender = mesh.submeshes[i].depthRender;
 
+			depthRender.beginDraw();
+
+			//mvp matrix
+			depthRender.applyUniform(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &modelLightSpaceMatrix);
+
+			depthRender.draw(mesh.submeshes[i].vertexCount);
+		}
+	}
+}
+
+bool RenderSystem::loadUI(UIRenderComponent& ui){
 	ObjectRender& render = ui.render;
 
 	render.beginLoad(ui.primitiveType, false);
@@ -580,29 +594,67 @@ bool RenderSystem::loadUI(UIRenderComponent& ui){
 void RenderSystem::drawUI(UIRenderComponent& ui, Transform& transform){
 	if (ui.loaded){
 
-		ObjectRender* render = &ui.render;
+		ObjectRender& render = ui.render;
 
-		render->beginDraw();
-		render->applyUniform(ui.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &transform.modelViewProjectionMatrix);
+		render.beginDraw();
+		render.applyUniform(ui.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &transform.modelViewProjectionMatrix);
 		//Color
-		render->applyUniform(ui.slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 4, &ui.color);
-		render->draw(ui.vertexCount);
+		render.applyUniform(ui.slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 4, &ui.color);
+		render.draw(ui.vertexCount);
 
 	}
 }
 
-void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix){
-	if (mesh.loaded && mesh.castShadows){
-		for (int i = 0; i < mesh.numSubmeshes; i++){
-			ObjectRender* depthRender = &mesh.submeshes[i].depthRender;
+bool RenderSystem::loadParticles(ParticlesComponent& particles){
+	ObjectRender& render = particles.render;
 
-			depthRender->beginDraw();
-			
-			//mvp matrix
-			depthRender->applyUniform(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &modelLightSpaceMatrix);
+	render.beginLoad(PrimitiveType::POINTS, false);
 
-			depthRender->draw(mesh.submeshes[i].vertexCount);
-		}
+	TextureRender* textureRender = particles.texture.getRender();
+
+	bool p_hasTexture = false;
+	if (textureRender){
+		p_hasTexture = true;
+	}
+
+	ShaderType shaderType = ShaderType::POINTS;
+
+	particles.shaderProperties = ShaderPool::getPointsProperties(p_hasTexture, false, true);
+	particles.shader = ShaderPool::get(shaderType, particles.shaderProperties);
+	if (!particles.shader->isCreated())
+		return false;
+	render.loadShader(particles.shader.get());
+	ShaderData& shaderData = particles.shader.get()->shaderData;
+
+	particles.slotVSParams = shaderData.getUniformIndex(UniformType::POINTS_VS_PARAMS, ShaderStageType::VERTEX);
+	//ui.slotFSParams = shaderData.getUniformIndex(UniformType::UI_FS_PARAMS, ShaderStageType::FRAGMENT);
+
+	particles.buffer->getRender()->createBuffer(particles.buffer->getSize(), particles.buffer->getData(), particles.buffer->getBufferType(), false);
+	if (particles.buffer->isRenderAttributes()) {
+        for (auto const &attr : particles.buffer->getAttributes()) {
+			render.loadAttribute(shaderData.getAttrIndex(attr.first), particles.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), particles.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+        }
+    }
+	particles.particlesCount = particles.buffer->getCount();
+
+	if (textureRender)
+		render.loadTexture(shaderData.getTextureIndex(TextureShaderType::POINTS, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
+
+	particles.loaded = true;
+
+	render.endLoad();
+
+	return true;
+}
+
+void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform){
+	if (particles.loaded){
+
+		ObjectRender& render = particles.render;
+
+		render.beginDraw();
+		render.applyUniform(particles.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &transform.modelViewProjectionMatrix);
+		render.draw(particles.particlesCount);
 	}
 }
 
@@ -645,12 +697,11 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 
 void RenderSystem::drawSky(SkyComponent& sky){
 	if (sky.loaded){
-		ObjectRender* render = &sky.render;
-		if (render){
-			render->beginDraw();
-			render->applyUniform(sky.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &sky.skyViewProjectionMatrix);
-			render->draw(36);
-		}
+		ObjectRender& render = sky.render;
+
+		render.beginDraw();
+		render.applyUniform(sky.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &sky.skyViewProjectionMatrix);
+		render.draw(36);
 	}
 }
 
@@ -1051,6 +1102,14 @@ void RenderSystem::draw(){
 				loadUI(ui);
 			}
 			drawUI(ui, transform);
+
+		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
+			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+
+			if (!particles.loaded){
+				loadParticles(particles);
+			}
+			drawParticles(particles, transform);
 
 		}
 	}
