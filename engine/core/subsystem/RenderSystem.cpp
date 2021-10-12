@@ -634,7 +634,7 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 			render.loadAttribute(shaderData.getAttrIndex(attr.first), particles.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), particles.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
         }
     }
-	particles.particlesCount = particles.buffer->getCount();
+	particles.particlesCount = particles.particles.size();
 
 	if (textureRender)
 		render.loadTexture(shaderData.getTextureIndex(TextureShaderType::POINTS, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);

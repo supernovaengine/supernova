@@ -613,6 +613,7 @@ bool Model::loadGLTF(const char* filename) {
 
         }
 
+        //TODO: Remove this
         if (!mesh.submeshes[i].hasVertexColor){
             tinygltf::Accessor accessor = gltfModel->accessors[primitive.attributes["POSITION"]];
             unsigned int count = accessor.count * 4;

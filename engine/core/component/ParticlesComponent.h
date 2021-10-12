@@ -6,10 +6,19 @@
 
 namespace Supernova{
 
+    struct ParticleData{
+        Vector3 position;
+        Vector4 color;
+        float size;
+        float rotation;
+    };
+
     struct ParticlesComponent{
         bool loaded = false;
 
         Buffer* buffer;
+
+        std::vector<ParticleData> particles;
 
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
