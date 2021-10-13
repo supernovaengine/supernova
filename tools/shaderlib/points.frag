@@ -11,6 +11,10 @@ in float v_pointrotation;
     in vec4 v_color;
 #endif
 
+#ifdef HAS_TEXTURERECT
+    in vec4 v_texturerect;
+#endif
+
 #ifdef HAS_TEXTURE
     uniform sampler2D u_pointsTexture;
 #endif
@@ -40,6 +44,10 @@ vec4 getBaseColor(){
             resultCoord = vec2(cos(v_pointrotation) * (resultCoord.x - 0.5) + sin(v_pointrotation) * (resultCoord.y - 0.5) + 0.5,
                             cos(v_pointrotation) * (resultCoord.y - 0.5) - sin(v_pointrotation) * (resultCoord.x - 0.5) + 0.5);
         }
+
+        #ifdef HAS_TEXTURERECT
+            resultCoord = resultCoord * v_texturerect.zw + v_texturerect.xy;
+        #endif
 
         baseColor *= sRGBToLinear(texture(u_pointsTexture, resultCoord));
     #endif

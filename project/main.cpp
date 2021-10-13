@@ -109,7 +109,7 @@ void init(){
 
     particles.setPosition(300, 400, 0);
     particles.addParticle(Vector3(30, 30, 0), Vector4(1.0, 1.0, 1.0, 1.0), 50, 40);
-    particles.addParticle(Vector3(20, 60, 0), Vector4(0.0, 1.0, 0.0, 1.0), 40, 0);
+    particles.addParticle(Vector3(20, 60, 0), Vector4(0.0, 1.0, 0.0, 1.0), 40, 0, Rect(0, 0, 0.5, 0.5));
     particles.setTexture("pista.png");
 
     //plane.create(4000, 4000);

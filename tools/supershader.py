@@ -60,7 +60,8 @@ def get_default_shaders():
     s += "ui_Vc4;"
     s += "ui_TexVc4;"
     s += "points_Vc4;"
-    s += "points_TexVc4"
+    s += "points_TexVc4;"
+    s += "points_TexVc4Txr"
     return s
 
 def get_default_langs():

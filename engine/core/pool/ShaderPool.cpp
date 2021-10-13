@@ -157,7 +157,7 @@ std::string ShaderPool::getUIProperties(bool texture, bool vertexColorVec3, bool
 	return prop;
 }
 
-std::string ShaderPool::getPointsProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4){
+std::string ShaderPool::getPointsProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4, bool textureRect){
 	std::string prop;
 
 	if (texture)
@@ -166,6 +166,8 @@ std::string ShaderPool::getPointsProperties(bool texture, bool vertexColorVec3, 
 		prop += "Vc3";
 	if (vertexColorVec4)
 		prop += "Vc4";
+	if (textureRect)
+		prop += "Txr";
 
 	return prop;
 }

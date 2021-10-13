@@ -11,6 +11,7 @@ namespace Supernova{
         Vector4 color;
         float size;
         float rotation;
+        Rect textureRect;
     };
 
     struct ParticlesComponent{
@@ -29,6 +30,8 @@ namespace Supernova{
         unsigned int particlesCount = 0;
 
         Texture texture;
+
+        bool hasTextureRect = false;
     };
     
 }

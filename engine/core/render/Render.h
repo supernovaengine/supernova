@@ -50,12 +50,12 @@ namespace Supernova{
         TANGENT,
         COLOR,
         POINTSIZE,
-        POINTROTATION
+        POINTROTATION,
+        TEXTURERECT
         //BONEWEIGHTS,
         //BONEIDS,
         //POINTCOLORS,
         //POINTROTATIONS,
-        //TEXTURERECTS,
         //MORPHTARGET0,
         //MORPHTARGET1,
         //MORPHTARGET2,

@@ -613,13 +613,17 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	TextureRender* textureRender = particles.texture.getRender();
 
 	bool p_hasTexture = false;
+	bool p_hasTextureRect = false;
 	if (textureRender){
 		p_hasTexture = true;
+		if (particles.hasTextureRect){
+			p_hasTextureRect = true;
+		}
 	}
 
 	ShaderType shaderType = ShaderType::POINTS;
 
-	particles.shaderProperties = ShaderPool::getPointsProperties(p_hasTexture, false, true);
+	particles.shaderProperties = ShaderPool::getPointsProperties(p_hasTexture, false, true, p_hasTextureRect);
 	particles.shader = ShaderPool::get(shaderType, particles.shaderProperties);
 	if (!particles.shader->isCreated())
 		return false;

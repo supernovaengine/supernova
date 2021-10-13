@@ -61,6 +61,8 @@ int ShaderData::getAttrIndex(AttributeType type){
         attrstr = "a_pointsize";
     }else if (type == AttributeType::POINTROTATION){
         attrstr = "a_pointrotation";
+    }else if (type == AttributeType::TEXTURERECT){
+        attrstr = "a_texturerect";
     }
 
     if (attrstr.empty()){

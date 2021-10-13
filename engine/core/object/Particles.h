@@ -21,6 +21,7 @@ namespace Supernova{
         void addParticle(Vector3 position);
         void addParticle(Vector3 position, Vector4 color);
         void addParticle(Vector3 position, Vector4 color, float size, float rotation);
+        void addParticle(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect);
         void addParticle(float x, float y, float z);
 
         void setTexture(std::string path);
