@@ -21,6 +21,7 @@ Buffer::Buffer(){
     renderAttributes = false;
 
     type = BufferType::VERTEX_BUFFER;
+    usage = BufferUsage::IMMUTABLE;
 /*
     static const char alphanum[] =
             "0123456789"
@@ -344,12 +345,20 @@ unsigned int Buffer::getCount(){
     return count;
 }
 
-void Buffer::setBufferType(BufferType type){
+void Buffer::setType(BufferType type){
     this->type = type;
 }
 
-BufferType Buffer::getBufferType(){
+BufferType Buffer::getType(){
     return type;
+}
+
+void Buffer::setUsage(BufferUsage usage){
+    this->usage = usage;
+}
+
+BufferUsage Buffer::getUsage(){
+    return usage;
 }
 
 bool Buffer::isRenderAttributes() const {

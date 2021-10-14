@@ -33,6 +33,12 @@ namespace Supernova{
         INDEX_BUFFER
     };
 
+    enum class BufferUsage{ //see sokol_gfx.h for details
+        IMMUTABLE,
+        DYNAMIC,
+        STREAM
+    };
+
     enum class ShaderType{
         POINTS,
         LINES, // Not used yet

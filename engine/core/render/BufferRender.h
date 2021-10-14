@@ -17,8 +17,8 @@ namespace Supernova{
         BufferRender& operator=(const BufferRender& rhs);
         virtual ~BufferRender();
 
-        bool createBuffer(unsigned int size, void* data, BufferType type, bool dynamic);
-
+        bool createBuffer(unsigned int size, void* data, BufferType type, BufferUsage usage);
+        void updateBuffer(unsigned int size, void* data);
         void destroyBuffer();
     };
 }

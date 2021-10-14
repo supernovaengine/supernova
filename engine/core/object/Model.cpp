@@ -110,9 +110,9 @@ bool Model::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, int& eBuffe
         mesh.buffers[name] = &eBuffers[eBufferIndex];
 
         if (bufferView.target == 34962) { //GL_ARRAY_BUFFER
-            eBuffers[eBufferIndex].setBufferType(BufferType::VERTEX_BUFFER);
+            eBuffers[eBufferIndex].setType(BufferType::VERTEX_BUFFER);
         } else if (bufferView.target == 34963) { //GL_ELEMENT_ARRAY_BUFFER
-            eBuffers[eBufferIndex].setBufferType(BufferType::INDEX_BUFFER);
+            eBuffers[eBufferIndex].setType(BufferType::INDEX_BUFFER);
         }
 
         eBuffers[eBufferIndex].setData(&gltfModel->buffers[bufferView.buffer].data.at(0) + bufferView.byteOffset, bufferView.byteLength);
@@ -626,7 +626,7 @@ bool Model::loadGLTF(const char* filename) {
             }
             std::string bufferName = "extraBuffer"+std::to_string(i);
             mesh.buffers[bufferName] = &eBuffers[eBufferIndex];
-            eBuffers[eBufferIndex].setBufferType(BufferType::VERTEX_BUFFER);
+            eBuffers[eBufferIndex].setType(BufferType::VERTEX_BUFFER);
             eBuffers[eBufferIndex].setData((unsigned char*)(&extraBuffer.at(0)), sizeof(float)*count);
             eBuffers[eBufferIndex].setRenderAttributes(false);
             addSubmeshAttribute(mesh.submeshes[i], bufferName, AttributeType::COLOR, 4, AttributeDataType::FLOAT, sizeof(float)*4, 0, false);

@@ -314,7 +314,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 	std::map<std::string, unsigned int> bufferStride;
 
 	for (auto const& buf : mesh.buffers){
-		buf.second->getRender()->createBuffer(buf.second->getSize(), buf.second->getData(), buf.second->getBufferType(), false);
+		buf.second->getRender()->createBuffer(buf.second->getSize(), buf.second->getData(), buf.second->getType(), buf.second->getUsage());
 		bufferNameToRender[buf.first] = buf.second->getRender();
 		bufferStride[buf.first] = buf.second->getStride();
 	}
@@ -430,7 +430,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 					render.loadAttribute(shaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
             	}
         	}
-			if (buf.second->getBufferType() == BufferType::INDEX_BUFFER){
+			if (buf.second->getType() == BufferType::INDEX_BUFFER){
 				indexCount = buf.second->getCount();
 				Attribute indexattr = buf.second->getAttributes()[AttributeType::INDEX];
 				render.loadIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
@@ -472,7 +472,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 						depthRender.loadAttribute(depthShaderData.getAttrIndex(AttributeType::POSITION), buf.second->getRender(), posattr.getElements(), posattr.getDataType(), buf.second->getStride(), posattr.getOffset(), posattr.getNormalized());
 					}
         		}
-				if (buf.second->getBufferType() == BufferType::INDEX_BUFFER){
+				if (buf.second->getType() == BufferType::INDEX_BUFFER){
 					indexCount = buf.second->getCount();
 					Attribute indexattr = buf.second->getAttributes()[AttributeType::INDEX];
 					depthRender.loadIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
@@ -565,7 +565,7 @@ bool RenderSystem::loadUI(UIRenderComponent& ui){
 	ui.slotVSParams = shaderData.getUniformIndex(UniformType::UI_VS_PARAMS, ShaderStageType::VERTEX);
 	ui.slotFSParams = shaderData.getUniformIndex(UniformType::UI_FS_PARAMS, ShaderStageType::FRAGMENT);
 
-	ui.buffer->getRender()->createBuffer(ui.buffer->getSize(), ui.buffer->getData(), ui.buffer->getBufferType(), false);
+	ui.buffer->getRender()->createBuffer(ui.buffer->getSize(), ui.buffer->getData(), ui.buffer->getType(), ui.buffer->getUsage());
 	if (ui.buffer->isRenderAttributes()) {
         for (auto const &attr : ui.buffer->getAttributes()) {
 			render.loadAttribute(shaderData.getAttrIndex(attr.first), ui.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), ui.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
@@ -573,7 +573,7 @@ bool RenderSystem::loadUI(UIRenderComponent& ui){
     }
 
 	if (ui.indices->getCount() > 0){
-		ui.indices->getRender()->createBuffer(ui.indices->getSize(), ui.indices->getData(), ui.indices->getBufferType(), false);
+		ui.indices->getRender()->createBuffer(ui.indices->getSize(), ui.indices->getData(), ui.indices->getType(), ui.indices->getUsage());
 		ui.vertexCount = ui.indices->getCount();
 		Attribute indexattr = ui.indices->getAttributes()[AttributeType::INDEX];
 		render.loadIndex(ui.indices->getRender(), indexattr.getDataType(), indexattr.getOffset());
@@ -632,7 +632,7 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 
 	particles.slotVSParams = shaderData.getUniformIndex(UniformType::POINTS_VS_PARAMS, ShaderStageType::VERTEX);
 
-	particles.buffer->getRender()->createBuffer(particles.buffer->getSize(), particles.buffer->getData(), particles.buffer->getBufferType(), false);
+	particles.buffer->getRender()->createBuffer(particles.buffer->getSize(), particles.buffer->getData(), particles.buffer->getType(), particles.buffer->getUsage());
 	if (particles.buffer->isRenderAttributes()) {
         for (auto const &attr : particles.buffer->getAttributes()) {
 			render.loadAttribute(shaderData.getAttrIndex(attr.first), particles.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), particles.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
@@ -683,7 +683,7 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 		return false;
 	}
 
-	sky.buffer->getRender()->createBuffer(sky.buffer->getSize(), sky.buffer->getData(), sky.buffer->getBufferType(), false);
+	sky.buffer->getRender()->createBuffer(sky.buffer->getSize(), sky.buffer->getData(), sky.buffer->getType(), sky.buffer->getUsage());
 
 	if (sky.buffer->isRenderAttributes()) {
         for (auto const &attr : sky.buffer->getAttributes()) {

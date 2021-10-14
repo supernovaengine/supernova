@@ -21,6 +21,7 @@ Particles::Particles(Scene* scene): Object(scene){
     buffer.addAttribute(AttributeType::TEXTURERECT, 4, 9 * sizeof(float));
     buffer.setStride(13 * sizeof(float));
     buffer.setRenderAttributes(true);
+    buffer.setUsage(BufferUsage::STREAM);
 }
 
 Particles::~Particles(){

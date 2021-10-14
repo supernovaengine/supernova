@@ -15,8 +15,12 @@ BufferRender::~BufferRender(){
     //Cannot destroy because its a handle
 }
 
-bool BufferRender::createBuffer(unsigned int size, void* data, BufferType type, bool dynamic){
-    return backend.createBuffer(size, data, type, dynamic);
+bool BufferRender::createBuffer(unsigned int size, void* data, BufferType type, BufferUsage usage){
+    return backend.createBuffer(size, data, type, usage);
+}
+
+void BufferRender::updateBuffer(unsigned int size, void* data){
+    backend.updateBuffer(size, data);
 }
 
 void BufferRender::destroyBuffer(){

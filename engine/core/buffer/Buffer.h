@@ -24,6 +24,7 @@ namespace Supernova {
         std::map<AttributeType, Attribute> attributes;
         unsigned int count;
         BufferType type;
+        BufferUsage usage;
 
         unsigned char* data;
         size_t size;
@@ -96,8 +97,11 @@ namespace Supernova {
 
         unsigned int getCount();
 
-        void setBufferType(BufferType type);
-        BufferType getBufferType();
+        void setType(BufferType type);
+        BufferType getType();
+
+        void setUsage(BufferUsage usage);
+        BufferUsage getUsage();
 
         bool isRenderAttributes() const;
         void setRenderAttributes(bool renderAttributes);
