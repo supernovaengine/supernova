@@ -32,6 +32,8 @@ namespace Supernova{
         Texture texture;
 
         bool hasTextureRect = false;
+
+        bool needUpdate = true;
     };
     
 }

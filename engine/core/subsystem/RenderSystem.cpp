@@ -653,6 +653,11 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform){
 	if (particles.loaded){
 
+		if (particles.needUpdate){
+			particles.buffer->getRender()->updateBuffer(particles.buffer->getSize(), particles.buffer->getData());
+			particles.needUpdate = false;
+		}
+
 		ObjectRender& render = particles.render;
 
 		render.beginDraw();

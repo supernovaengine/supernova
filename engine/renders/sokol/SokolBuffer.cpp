@@ -40,10 +40,6 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
 
     buffer = sg_make_buffer(&vbuf_desc);
 
-    if (usage != BufferUsage::IMMUTABLE){
-        updateBuffer(size, data);
-    }
-
     if (buffer.id != SG_INVALID_ID)
         return true;
 
