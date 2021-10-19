@@ -14,13 +14,11 @@ Particles::Particles(Scene* scene): Object(scene){
     particomp.buffer = &buffer;
 
 	buffer.clearAll();
-	buffer.addAttribute(AttributeType::POSITION, 3, 0);
-    buffer.addAttribute(AttributeType::COLOR, 4, 3 * sizeof(float));
-    buffer.addAttribute(AttributeType::POINTSIZE, 1, 7 * sizeof(float));
-    buffer.addAttribute(AttributeType::POINTROTATION, 1, 8 * sizeof(float));
-    buffer.addAttribute(AttributeType::TEXTURERECT, 4, 9 * sizeof(float));
-    buffer.setStride(13 * sizeof(float));
-    buffer.setRenderAttributes(true);
+	buffer.addAttribute(AttributeType::POSITION, 3);
+    buffer.addAttribute(AttributeType::COLOR, 4);
+    buffer.addAttribute(AttributeType::POINTSIZE, 1);
+    buffer.addAttribute(AttributeType::POINTROTATION, 1);
+    buffer.addAttribute(AttributeType::TEXTURERECT, 4);
     buffer.setUsage(BufferUsage::STREAM);
 }
 
@@ -32,7 +30,6 @@ void Particles::addParticle(Vector3 position){
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
     particomp.particles.push_back({position, Vector4(1.0f, 1.0f, 1.0f, 1.0f), 30, 0, Rect(0, 0, 1, 1)});
 
-    buffer.setData((unsigned char*)(&particomp.particles.at(0)), sizeof(ParticleData)*particomp.particles.size());
     particomp.needUpdate = true;
 }
 
@@ -40,7 +37,6 @@ void Particles::addParticle(Vector3 position, Vector4 color){
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
     particomp.particles.push_back({position, color, 30, 0, Rect(0, 0, 1, 1)});
 
-    buffer.setData((unsigned char*)(&particomp.particles.at(0)), sizeof(ParticleData)*particomp.particles.size());
     particomp.needUpdate = true;
 }
 
@@ -48,7 +44,6 @@ void Particles::addParticle(Vector3 position, Vector4 color, float size, float r
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
     particomp.particles.push_back({position, color, size, rotation, Rect(0, 0, 1, 1)});
 
-    buffer.setData((unsigned char*)(&particomp.particles.at(0)), sizeof(ParticleData)*particomp.particles.size());
     particomp.needUpdate = true;
 }
 
@@ -57,7 +52,6 @@ void Particles::addParticle(Vector3 position, Vector4 color, float size, float r
     particomp.particles.push_back({position, color, size, rotation, textureRect});
     particomp.hasTextureRect = true;
 
-    buffer.setData((unsigned char*)(&particomp.particles.at(0)), sizeof(ParticleData)*particomp.particles.size());
     particomp.needUpdate = true;
 }
 

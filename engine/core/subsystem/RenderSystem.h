@@ -91,7 +91,7 @@ namespace Supernova{
 		void drawUI(UIRenderComponent& ui, Transform& transform);
 
 		bool loadParticles(ParticlesComponent& particles);
-		void drawParticles(ParticlesComponent& particles, Transform& transform);
+		void drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform);
 
 		bool loadSky(SkyComponent& sky);
 		void drawSky(SkyComponent& sky);
@@ -100,6 +100,7 @@ namespace Supernova{
 		void updateCamera(CameraComponent& camera, Transform& transform);
 		void updateSkyViewProjection(CameraComponent& camera);
 		void updateLightFromTransform(LightComponent& light, Transform& transform);
+		void updateParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform);
 	
 		virtual void load();
 		virtual void draw();

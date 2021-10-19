@@ -632,7 +632,10 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 
 	particles.slotVSParams = shaderData.getUniformIndex(UniformType::POINTS_VS_PARAMS, ShaderStageType::VERTEX);
 
-	particles.buffer->getRender()->createBuffer(particles.buffer->getSize(), particles.buffer->getData(), particles.buffer->getType(), particles.buffer->getUsage());
+	// Now buffer size is zero than it needed to be calculated
+	size_t bufferSize = particles.particles.size() * particles.buffer->getStride();
+
+	particles.buffer->getRender()->createBuffer(bufferSize, particles.buffer->getData(), particles.buffer->getType(), particles.buffer->getUsage());
 	if (particles.buffer->isRenderAttributes()) {
         for (auto const &attr : particles.buffer->getAttributes()) {
 			render.loadAttribute(shaderData.getAttrIndex(attr.first), particles.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), particles.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
@@ -650,12 +653,21 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	return true;
 }
 
-void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform){
+void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform){
 	if (particles.loaded){
 
-		if (particles.needUpdate){
+		if (particles.needUpdateBuffer){
+			particles.buffer->clear();
+			for (int i = 0; i < particles.particles.size(); i++){
+				particles.buffer->addVector3(AttributeType::POSITION, particles.particles[i].position);
+				particles.buffer->addVector4(AttributeType::COLOR, particles.particles[i].color);
+				particles.buffer->addFloat(AttributeType::POINTSIZE, particles.particles[i].size);
+				particles.buffer->addFloat(AttributeType::POINTROTATION, particles.particles[i].rotation);
+				particles.buffer->addVector4(AttributeType::TEXTURERECT, particles.particles[i].textureRect.getVector());
+			}
+
 			particles.buffer->getRender()->updateBuffer(particles.buffer->getSize(), particles.buffer->getData());
-			particles.needUpdate = false;
+			particles.needUpdateBuffer = false;
 		}
 
 		ObjectRender& render = particles.render;
@@ -785,6 +797,22 @@ void RenderSystem::updateSkyViewProjection(CameraComponent& camera){
 
 		sky->skyViewProjectionMatrix = camera.projectionMatrix * skyViewMatrix;
 	}
+}
+
+void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform){
+	auto comparePoints = [&particles, &transform, &camTransform](const ParticleData& a, const ParticleData& b) -> bool {
+		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
+		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
+		if (distanceToCameraA > distanceToCameraB) {
+			particles.needUpdate = true;
+			return true;
+		}
+		return false;
+	};
+
+	std::sort(particles.particles.begin(), particles.particles.end(), comparePoints);
+
+	particles.needUpdateBuffer = true;
 }
 
 void RenderSystem::configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera){
@@ -1013,16 +1041,30 @@ void RenderSystem::update(double dt){
 	for (int i = 0; i < transforms->size(); i++){
 		Transform& transform = transforms->getComponentFromIndex(i);
 
+		Entity entity = transforms->getEntity(i);
+		Signature signature = scene->getSignature(entity);
+
 		if (camera.needUpdate || transform.needUpdate){
 			transform.modelViewProjectionMatrix = camera.viewProjectionMatrix * transform.modelMatrix;
 			transform.distanceToCamera = (cameraTransform.worldPosition - transform.worldPosition).length();
 
-			Entity entity = transforms->getEntity(i);
-			LightComponent* light = scene->findComponent<LightComponent>(entity);
-			if (light){
-				updateLightFromTransform(*light, transform);
+        	if (signature.test(scene->getComponentType<LightComponent>())){
+				LightComponent& light = scene->getComponent<LightComponent>(entity);
+
+				updateLightFromTransform(light, transform);
 			}
 		}
+
+        if (signature.test(scene->getComponentType<ParticlesComponent>())){
+			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+			
+			if (particles.needUpdate || camera.needUpdate || transform.needUpdate){
+				updateParticles(particles, transform, cameraTransform);
+			}
+
+			particles.needUpdate = false;
+		}
+
 		transform.needUpdate = false;
 	}
 	camera.needUpdate = false;
@@ -1117,7 +1159,7 @@ void RenderSystem::draw(){
 			if (!particles.loaded){
 				loadParticles(particles);
 			}
-			drawParticles(particles, transform);
+			drawParticles(particles, transform, cameraTransform);
 
 		}
 	}

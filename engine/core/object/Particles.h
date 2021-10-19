@@ -6,13 +6,13 @@
 #define PARTICLES_H
 
 #include "Object.h"
-#include "buffer/ExternalBuffer.h"
+#include "buffer/InterleavedBuffer.h"
 
 namespace Supernova{
 
     class Particles: public Object{
     protected:
-        ExternalBuffer buffer;
+        InterleavedBuffer buffer;
 
     public:
         Particles(Scene* scene);

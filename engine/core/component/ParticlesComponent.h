@@ -12,6 +12,10 @@ namespace Supernova{
         float size;
         float rotation;
         Rect textureRect;
+
+        float life;
+        Vector3 velocity;
+        Vector3 acceleration;
     };
 
     struct ParticlesComponent{
@@ -19,13 +23,12 @@ namespace Supernova{
 
         Buffer* buffer;
 
-        std::vector<ParticleData> particles;
+        std::vector<ParticleData> particles; //must be sorted
 
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
         std::string shaderProperties;
         int slotVSParams = -1;
-        //int slotFSParams = -1;
 
         unsigned int particlesCount = 0;
 
@@ -34,6 +37,7 @@ namespace Supernova{
         bool hasTextureRect = false;
 
         bool needUpdate = true;
+        bool needUpdateBuffer = false;
     };
     
 }
