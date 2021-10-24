@@ -16,6 +16,7 @@ void ColorAction::setAction(Vector4 startColor, Vector4 endColor, float duration
 
     ColorActionComponent& colorAction = getComponent<ColorActionComponent>();
 
+    //sRGB color
     colorAction.startColor = startColor;
     colorAction.endColor = endColor;
 }

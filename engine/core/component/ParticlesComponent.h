@@ -18,12 +18,23 @@ namespace Supernova{
         Vector3 acceleration;
     };
 
+    struct ParticleShaderData{
+        Vector3 position;
+        Vector4 color;
+        float size;
+        float rotation;
+        Rect textureRect;
+    };
+
     struct ParticlesComponent{
         bool loaded = false;
 
         Buffer* buffer;
 
-        std::vector<ParticleData> particles; //must be sorted
+        std::vector<ParticleData> particles;
+        std::vector<ParticleShaderData> shaderParticles; //must be sorted
+
+        int maxParticles = 100;
 
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;

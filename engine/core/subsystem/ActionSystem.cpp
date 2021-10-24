@@ -120,6 +120,63 @@ void ActionSystem::colorActionSpriteUpdate(double dt, ActionComponent& action, T
     mesh.submeshes[0].material.baseColorFactor = Color::sRGBToLinear(coloraction.startColor + color);
 }
 
+int ActionSystem::findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
+
+    for (int i=partanim.lastUsedParticle; i<particles.maxParticles; i++){
+        if (particles.particles[i].life <= 0){
+            partanim.lastUsedParticle = i;
+            return i;
+        }
+    }
+
+    for (int i=0; i<partanim.lastUsedParticle; i++){
+        if (particles.particles[i].life <= 0){
+            partanim.lastUsedParticle = i;
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim){
+    partanim.emitter = true;
+}
+
+void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, ParticlesComponent& particles){
+    if (partanim.emitter){
+        partanim.newParticlesCount += dt * partanim.minRate;
+
+        int newparticles = (int)partanim.newParticlesCount;
+        partanim.newParticlesCount -= newparticles;
+
+        if (newparticles > partanim.maxRate)
+            newparticles = partanim.maxRate;
+
+        for(int i=0; i<newparticles; i++){
+            int particleIndex = findUnusedParticle(particles, partanim);
+        /*
+            if (particleIndex >= 0){
+
+                particles->setParticleLife(particleIndex, 10);
+                particles->setParticlePosition(particleIndex, Vector3(0,0,0));
+                particles->setParticleVelocity(particleIndex, Vector3(0,0,0));
+                particles->setParticleAcceleration(particleIndex, Vector3(0,0,0));
+                particles->setParticleColor(particleIndex, Vector4(1,1,1,1));
+                particles->setParticleSize(particleIndex, 1);
+                particles->setParticleSprite(particleIndex, -1);
+
+                for (int init=0; init < particlesInit.size(); init++){
+                    particlesInit[init]->execute(particles, particleIndex);
+                }
+
+            }
+        */
+        }
+
+    }
+}
+
 void ActionSystem::load(){
 
 }
@@ -150,6 +207,15 @@ void ActionSystem::update(double dt){
                     MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
                     spriteActionStart(mesh, sprite, spriteanim);
+
+                }
+            }
+
+            if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
+                ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
+                if (targetSignature.test(scene->getComponentType<ParticlesComponent>()) ){
+
+                    particleActionStart(partanim);
 
                 }
             }
@@ -209,6 +275,17 @@ void ActionSystem::update(double dt){
                 }
             }
 
+            //Particles
+            if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
+                ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
+
+                if (targetSignature.test(scene->getComponentType<ParticlesComponent>())){
+                    ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(action.target);
+
+                    particlesActionUpdate(dt, entity, action, partanim, particles);
+                }
+            }
+
             if (signature.test(scene->getComponentType<TimedActionComponent>()) && signature.test(scene->getComponentType<EaseComponent>())){
                 TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
                 EaseComponent& ease = scene->getComponent<EaseComponent>(entity);
@@ -236,7 +313,6 @@ void ActionSystem::update(double dt){
 
                         scaleActionUpdate(dt, action, timedaction, scaleaction, transform);
                     }
-
                 }
 
                 //Color animation
@@ -248,7 +324,6 @@ void ActionSystem::update(double dt){
 
                         colorActionSpriteUpdate(dt, action, timedaction, coloraction, mesh);
                     }
-
                 }
             }
         }

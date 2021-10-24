@@ -657,15 +657,6 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 	if (particles.loaded){
 
 		if (particles.needUpdateBuffer){
-			particles.buffer->clear();
-			for (int i = 0; i < particles.particles.size(); i++){
-				particles.buffer->addVector3(AttributeType::POSITION, particles.particles[i].position);
-				particles.buffer->addVector4(AttributeType::COLOR, particles.particles[i].color);
-				particles.buffer->addFloat(AttributeType::POINTSIZE, particles.particles[i].size);
-				particles.buffer->addFloat(AttributeType::POINTROTATION, particles.particles[i].rotation);
-				particles.buffer->addVector4(AttributeType::TEXTURERECT, particles.particles[i].textureRect.getVector());
-			}
-
 			particles.buffer->getRender()->updateBuffer(particles.buffer->getSize(), particles.buffer->getData());
 			particles.needUpdateBuffer = false;
 		}
@@ -800,7 +791,7 @@ void RenderSystem::updateSkyViewProjection(CameraComponent& camera){
 }
 
 void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform){
-	auto comparePoints = [&particles, &transform, &camTransform](const ParticleData& a, const ParticleData& b) -> bool {
+	auto comparePoints = [&particles, &transform, &camTransform](const ParticleShaderData& a, const ParticleShaderData& b) -> bool {
 		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
 		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
 		if (distanceToCameraA > distanceToCameraB) {
@@ -810,7 +801,15 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 		return false;
 	};
 
-	std::sort(particles.particles.begin(), particles.particles.end(), comparePoints);
+	for (int i = 0; i < particles.particles.size(); i++){
+		particles.shaderParticles[i].position = particles.particles[i].position;
+		particles.shaderParticles[i].color = particles.particles[i].color;
+		particles.shaderParticles[i].size = particles.particles[i].size;
+		particles.shaderParticles[i].rotation = particles.particles[i].rotation;
+		particles.shaderParticles[i].textureRect = particles.particles[i].textureRect;
+	}
+
+	std::sort(particles.shaderParticles.begin(), particles.shaderParticles.end(), comparePoints);
 
 	particles.needUpdateBuffer = true;
 }
