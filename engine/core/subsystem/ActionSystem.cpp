@@ -122,7 +122,7 @@ void ActionSystem::colorActionSpriteUpdate(double dt, ActionComponent& action, T
 
 int ActionSystem::findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
-    for (int i=partanim.lastUsedParticle; i<particles.maxParticles; i++){
+    for (int i=partanim.lastUsedParticle; i<particles.particles.size(); i++){
         if (particles.particles[i].life <= 0){
             partanim.lastUsedParticle = i;
             return i;
@@ -139,41 +139,112 @@ int ActionSystem::findUnusedParticle(ParticlesComponent& particles, ParticlesAni
     return -1;
 }
 
+void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
+
+    ParticleVelocityInitializer& velInit = partanim.velocityInitializer;
+    Vector3 velocity;
+
+    if (velInit.minVelocity != velInit.maxVelocity) {
+        velocity = Vector3(velInit.minVelocity.x + ((velInit.maxVelocity.x - velInit.minVelocity.x) * (float) rand() / (float) RAND_MAX),
+                           velInit.minVelocity.y + ((velInit.maxVelocity.y - velInit.minVelocity.y) * (float) rand() / (float) RAND_MAX),
+                           velInit.minVelocity.z + ((velInit.maxVelocity.z - velInit.minVelocity.z) * (float) rand() / (float) RAND_MAX));
+    }else{
+        velocity = velInit.maxVelocity;
+    }
+
+    particles.particles[idx].velocity = velocity;
+    //printf("Particle %i velocity %f %f %f", (int)i, velocity.x, velocity.y, velocity.z);
+
+}
+
+void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
+
+    float life = particles.particles[idx].life;
+
+    ParticleVelocityModifier& velMod = partanim.velocityModifier;
+
+    float time;
+    if ((velMod.fromLife != velMod.toLife) && (life <= velMod.fromLife) && (life >= velMod.toLife)) {
+        time = (life - velMod.fromLife) / (velMod.toLife - velMod.fromLife);
+    }else{
+        time = -1;
+    }
+
+    float value = time; //TODO: EASE function
+
+    if (value >= 0 && value <= 1){
+        Vector3 velocity = velMod.fromVelocity + ((velMod.toVelocity - velMod.fromVelocity) * value);
+        particles.particles[idx].velocity = velocity;
+    }
+
+}
+
 void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim){
     partanim.emitter = true;
 }
 
 void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, ParticlesComponent& particles){
     if (partanim.emitter){
-        partanim.newParticlesCount += dt * partanim.minRate;
+        partanim.newParticlesCount += dt * partanim.rate;
 
         int newparticles = (int)partanim.newParticlesCount;
         partanim.newParticlesCount -= newparticles;
-
-        if (newparticles > partanim.maxRate)
-            newparticles = partanim.maxRate;
+        if (newparticles > partanim.maxPerUpdate)
+            newparticles = partanim.maxPerUpdate;
 
         for(int i=0; i<newparticles; i++){
             int particleIndex = findUnusedParticle(particles, partanim);
-        /*
+
             if (particleIndex >= 0){
 
-                particles->setParticleLife(particleIndex, 10);
-                particles->setParticlePosition(particleIndex, Vector3(0,0,0));
-                particles->setParticleVelocity(particleIndex, Vector3(0,0,0));
-                particles->setParticleAcceleration(particleIndex, Vector3(0,0,0));
-                particles->setParticleColor(particleIndex, Vector4(1,1,1,1));
-                particles->setParticleSize(particleIndex, 1);
-                particles->setParticleSprite(particleIndex, -1);
+                particles.particles[particleIndex].life = 10;
+                particles.particles[particleIndex].position = Vector3(0,0,0);
+                particles.particles[particleIndex].velocity = Vector3(0,0,0);
+                particles.particles[particleIndex].acceleration = Vector3(0,0,0);
+                particles.particles[particleIndex].color = Vector4(1,1,1,1);
+                particles.particles[particleIndex].size = 20;
+                //particles->setParticleSprite(particleIndex, -1);
 
-                for (int init=0; init < particlesInit.size(); init++){
-                    particlesInit[init]->execute(particles, particleIndex);
-                }
+                applyParticleInitializers(particleIndex, particles, partanim);
 
+                particles.needUpdate = true;
             }
-        */
-        }
 
+        }
+    }
+
+    bool existParticles = false;
+    for(int i=0; i<particles.particles.size(); i++){
+
+        float life = particles.particles[i].life;
+
+        if(life > 0.0f){
+
+            applyParticleModifiers(i, particles, partanim);
+
+            Vector3 velocity = particles.particles[i].velocity;
+            Vector3 position = particles.particles[i].position;
+            Vector3 acceleration = particles.particles[i].acceleration;
+
+            velocity += acceleration * dt * 0.5f;
+            position += velocity * dt;
+            life -= dt;
+
+            particles.particles[i].life = life;
+            particles.particles[i].velocity = velocity;
+            particles.particles[i].position = position;
+
+            existParticles = true;
+
+            particles.needUpdate = true;
+
+            //printf("1.Particle %i life %f position %f %f %f\n", i, life, position.x, position.y, position.z);
+        }
+    }
+
+    if (!existParticles && !partanim.emitter){
+        action.stopTrigger = true;
+        //onFinish.call(object);
     }
 }
 

@@ -11,6 +11,7 @@
 #include "pool/TexturePool.h"
 #include "math/Vector3.h"
 #include "math/Angle.h"
+#include "buffer/ExternalBuffer.h"
 #include <memory>
 #include <cmath>
 
@@ -654,7 +655,7 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 }
 
 void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform){
-	if (particles.loaded){
+	if (particles.loaded && particles.buffer->getSize() > 0){
 
 		if (particles.needUpdateBuffer){
 			particles.buffer->getRender()->updateBuffer(particles.buffer->getSize(), particles.buffer->getData());
@@ -791,25 +792,28 @@ void RenderSystem::updateSkyViewProjection(CameraComponent& camera){
 }
 
 void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform){
-	auto comparePoints = [&particles, &transform, &camTransform](const ParticleShaderData& a, const ParticleShaderData& b) -> bool {
-		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
-		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
-		if (distanceToCameraA > distanceToCameraB) {
-			particles.needUpdate = true;
-			return true;
-		}
-		return false;
-	};
+	particles.shaderParticles.resize(particles.particles.size());
 
+	particles.numVisible = 0;
 	for (int i = 0; i < particles.particles.size(); i++){
-		particles.shaderParticles[i].position = particles.particles[i].position;
-		particles.shaderParticles[i].color = particles.particles[i].color;
-		particles.shaderParticles[i].size = particles.particles[i].size;
-		particles.shaderParticles[i].rotation = particles.particles[i].rotation;
-		particles.shaderParticles[i].textureRect = particles.particles[i].textureRect;
+		if (particles.particles[i].life > 0){
+			particles.shaderParticles[particles.numVisible].position = particles.particles[i].position;
+			particles.shaderParticles[particles.numVisible].color = particles.particles[i].color;
+			particles.shaderParticles[particles.numVisible].size = particles.particles[i].size;
+			particles.shaderParticles[particles.numVisible].rotation = particles.particles[i].rotation;
+			particles.shaderParticles[particles.numVisible].textureRect = particles.particles[i].textureRect;
+			particles.numVisible++;
+		}
 	}
 
+	auto comparePoints = [&transform, &camTransform](const ParticleShaderData& a, const ParticleShaderData& b) -> bool {
+		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
+		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
+		return distanceToCameraA > distanceToCameraB;
+	};
 	std::sort(particles.shaderParticles.begin(), particles.shaderParticles.end(), comparePoints);
+
+	((ExternalBuffer*)particles.buffer)->setData((unsigned char*)(&particles.shaderParticles.at(0)), sizeof(ParticleShaderData)*particles.numVisible);
 
 	particles.needUpdateBuffer = true;
 }

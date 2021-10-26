@@ -42,6 +42,8 @@ namespace Supernova{
 		void colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, MeshComponent& mesh);
 
 		int findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
 		void particleActionStart(ParticlesAnimationComponent& partanim);
 		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, ParticlesComponent& particles);
 

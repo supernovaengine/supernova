@@ -29,9 +29,6 @@ Particles::~Particles(){
 }
 
 void Particles::updateParticlesSize(ParticlesComponent& particomp){
-    particomp.shaderParticles.resize(particomp.particles.size());
-    buffer.setData((unsigned char*)(&particomp.shaderParticles.at(0)), sizeof(ParticleShaderData)*particomp.shaderParticles.size());
-
     particomp.needUpdate = true;
 }
 

@@ -34,8 +34,8 @@ namespace Supernova{
         std::vector<ParticleData> particles;
         std::vector<ParticleShaderData> shaderParticles; //must be sorted
 
-        int maxParticles = 100;
-
+        //int maxParticles = 100;
+        unsigned int numVisible = 0;
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
         std::string shaderProperties;

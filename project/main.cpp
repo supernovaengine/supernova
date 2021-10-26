@@ -13,6 +13,7 @@ using namespace Supernova;
 #include "ScaleAction.h"
 #include "ColorAction.h"
 #include "Particles.h"
+#include "ParticlesAnimation.h"
 
 Scene scene;
 Camera camera(&scene);
@@ -28,6 +29,8 @@ RotationAction rotationaction(&scene);
 ScaleAction scaleaction(&scene);
 ColorAction coloraction(&scene);
 Particles particles(&scene);
+ParticlesAnimation partianim(&scene);
+
 
 void onActionStart();
 void onKeyDown(int key, bool repeat, int mods);
@@ -112,6 +115,9 @@ void init(){
     particles.addParticle(Vector3(20, 60, 0), Vector4(0.0, 1.0, 0.0, 1.0), 40, 0, Rect(0, 0, 0.5, 0.5));
     particles.setTexture("pista.png");
 
+    partianim.setTarget(particles.getEntity());
+    partianim.setVelocityInitializer(Vector3(0,10,0), Vector3(0,50,0));
+    partianim.setVelocityModifier(8, 5, Vector3(0,10,0), Vector3(0,300,0));
     //plane.create(4000, 4000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);
     //plane.setTexture("pista.png");
@@ -156,6 +162,7 @@ void onKeyDown(int key, bool repeat, int mods){
         //rotationaction.start();
         //scaleaction.start();
         coloraction.start();
+        partianim.start();
     }
     if (key == S_KEY_T){
         spriteanim.pause();
