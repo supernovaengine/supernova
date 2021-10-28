@@ -5,6 +5,9 @@
 #ifndef PARTICLESANIMATION_COMPONENT_H
 #define PARTICLESANIMATION_COMPONENT_H
 
+#include "util/Function.h"
+#include "action/Ease.h"
+
 namespace Supernova{
 
     struct ParticleVelocityInitializer{
@@ -18,6 +21,23 @@ namespace Supernova{
 
         Vector3 fromVelocity = Vector3(0,0,0);
         Vector3 toVelocity = Vector3(0,0,0);
+
+        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+    };
+
+    struct ParticleSizeInitializer{
+        float minSize = 1;
+        float maxSize = 1;
+    };
+
+    struct ParticleSizeModifier{
+        float fromLife = 0;
+        float toLife = 0;
+
+        float fromSize = 0;
+        float toSize = 0;
+
+        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
     };
 
     struct ParticlesAnimationComponent{
@@ -31,6 +51,9 @@ namespace Supernova{
 
         ParticleVelocityInitializer velocityInitializer;
         ParticleVelocityModifier velocityModifier;
+
+        ParticleSizeInitializer sizeInitializer;
+        ParticleSizeModifier sizeModifier;
     };
 
 }

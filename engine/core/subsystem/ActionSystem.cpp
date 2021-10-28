@@ -73,7 +73,7 @@ void ActionSystem::timedActionStop(TimedActionComponent& timedaction){
     timedaction.value = 0;
 }
 
-void ActionSystem::timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, EaseComponent& ease){
+void ActionSystem::timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction){
     timedaction.timecount += dt;
 
     if ((timedaction.time == 1) && !timedaction.loop){
@@ -93,7 +93,7 @@ void ActionSystem::timedActionUpdate(double dt, ActionComponent& action, TimedAc
             timedaction.time = timedaction.timecount / timedaction.duration;
         }
 
-        timedaction.value = ease.function.call(timedaction.time);
+        timedaction.value = timedaction.function.call(timedaction.time);
         //Log::Debug("step time %f value %f \n", timedaction.time, timedaction.value);
     }
 }
@@ -139,42 +139,66 @@ int ActionSystem::findUnusedParticle(ParticlesComponent& particles, ParticlesAni
     return -1;
 }
 
+float ActionSystem::getFloatInitializerValue(float min, float max){
+    if (min != max) {
+        return min + ((max - min) * (float) rand() / (float) RAND_MAX);
+    }
+    return max;
+}
+
+Vector3 ActionSystem::getVector3InitializerValue(Vector3 min, Vector3 max){
+    if (min != max) {
+        return Vector3( min.x + ((max.x - min.x) * (float) rand() / (float) RAND_MAX),
+                        min.y + ((max.y - min.y) * (float) rand() / (float) RAND_MAX),
+                        min.z + ((max.z - min.z) * (float) rand() / (float) RAND_MAX));
+    }
+    return max;
+}
+
 void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
     ParticleVelocityInitializer& velInit = partanim.velocityInitializer;
-    Vector3 velocity;
+    particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
 
-    if (velInit.minVelocity != velInit.maxVelocity) {
-        velocity = Vector3(velInit.minVelocity.x + ((velInit.maxVelocity.x - velInit.minVelocity.x) * (float) rand() / (float) RAND_MAX),
-                           velInit.minVelocity.y + ((velInit.maxVelocity.y - velInit.minVelocity.y) * (float) rand() / (float) RAND_MAX),
-                           velInit.minVelocity.z + ((velInit.maxVelocity.z - velInit.minVelocity.z) * (float) rand() / (float) RAND_MAX));
-    }else{
-        velocity = velInit.maxVelocity;
+    ParticleSizeInitializer& sizeInit = partanim.sizeInitializer;
+    particles.particles[idx].size = getFloatInitializerValue(sizeInit.minSize, sizeInit.maxSize);
+
+}
+
+float ActionSystem::getTimeFromModifierLife(float life, float fromLife, float toLife){
+    if ((fromLife != toLife) && (life <= fromLife) && (life >= toLife)) {
+        return (life - fromLife) / (toLife - fromLife);
     }
 
-    particles.particles[idx].velocity = velocity;
-    //printf("Particle %i velocity %f %f %f", (int)i, velocity.x, velocity.y, velocity.z);
+    return -1;
+}
 
+float ActionSystem::getFloatModifierValue(float value, float fromValue, float toValue){
+    return fromValue + ((toValue - fromValue) * value);
+}
+
+Vector3 ActionSystem::getVector3ModifierValue(float value, Vector3 fromValue, Vector3 toValue){
+    return fromValue + ((toValue - fromValue) * value);
 }
 
 void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
     float life = particles.particles[idx].life;
+    float value;
+    float time;
 
     ParticleVelocityModifier& velMod = partanim.velocityModifier;
-
-    float time;
-    if ((velMod.fromLife != velMod.toLife) && (life <= velMod.fromLife) && (life >= velMod.toLife)) {
-        time = (life - velMod.fromLife) / (velMod.toLife - velMod.fromLife);
-    }else{
-        time = -1;
+    time = getTimeFromModifierLife(life, velMod.fromLife, velMod.toLife);
+    value = velMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].velocity = getVector3ModifierValue(value,  velMod.fromVelocity, velMod.toVelocity);
     }
 
-    float value = time; //TODO: EASE function
-
+    ParticleSizeModifier& sizeMod = partanim.sizeModifier;
+    time = getTimeFromModifierLife(life, sizeMod.fromLife, sizeMod.toLife);
+    value = sizeMod.function.call(time);
     if (value >= 0 && value <= 1){
-        Vector3 velocity = velMod.fromVelocity + ((velMod.toVelocity - velMod.fromVelocity) * value);
-        particles.particles[idx].velocity = velocity;
+        particles.particles[idx].size = getFloatModifierValue(value, sizeMod.fromSize, sizeMod.toSize);
     }
 
 }
@@ -199,10 +223,10 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
 
                 particles.particles[particleIndex].life = 10;
                 particles.particles[particleIndex].position = Vector3(0,0,0);
-                particles.particles[particleIndex].velocity = Vector3(0,0,0);
+                //particles.particles[particleIndex].velocity = Vector3(0,0,0);
                 particles.particles[particleIndex].acceleration = Vector3(0,0,0);
                 particles.particles[particleIndex].color = Vector4(1,1,1,1);
-                particles.particles[particleIndex].size = 20;
+                //particles.particles[particleIndex].size = 20;
                 //particles->setParticleSprite(particleIndex, -1);
 
                 applyParticleInitializers(particleIndex, particles, partanim);
@@ -238,7 +262,7 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
 
             particles.needUpdate = true;
 
-            //printf("1.Particle %i life %f position %f %f %f\n", i, life, position.x, position.y, position.z);
+            printf("1.Particle %i life %f position %f %f %f\n", i, life, position.x, position.y, position.z);
         }
     }
 
@@ -357,11 +381,10 @@ void ActionSystem::update(double dt){
                 }
             }
 
-            if (signature.test(scene->getComponentType<TimedActionComponent>()) && signature.test(scene->getComponentType<EaseComponent>())){
+            if (signature.test(scene->getComponentType<TimedActionComponent>())){
                 TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
-                EaseComponent& ease = scene->getComponent<EaseComponent>(entity);
 
-                timedActionUpdate(dt, action, timedaction, ease);
+                timedActionUpdate(dt, action, timedaction);
 
                 //Transform animation
                 if (targetSignature.test(scene->getComponentType<Transform>())){

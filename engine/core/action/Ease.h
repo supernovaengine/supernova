@@ -261,6 +261,74 @@ namespace Supernova {
 
             return easeOutBounce(time * 2 - 1) * 0.5 + 0.5;
         }
+
+        inline Function<float(float)> getFunction(int functionType){
+            if (functionType == S_LINEAR){
+                return Function<float(float)>(Ease::linear);
+            }else if(functionType == S_EASE_QUAD_IN){
+                return Function<float(float)>(Ease::easeInQuad);
+            }else if(functionType == S_EASE_QUAD_OUT){
+                return Function<float(float)>(Ease::easeOutQuad);
+            }else if(functionType == S_EASE_QUAD_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutQuad);
+            }else if(functionType == S_EASE_CUBIC_IN){
+                return Function<float(float)>(Ease::easeInCubic);
+            }else if(functionType == S_EASE_CUBIC_OUT){
+                return Function<float(float)>(Ease::easeOutCubic);
+            }else if(functionType == S_EASE_CUBIC_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutCubic);
+            }else if(functionType == S_EASE_QUART_IN){
+                return Function<float(float)>(Ease::easeInQuart);
+            }else if(functionType == S_EASE_QUART_OUT){
+                return Function<float(float)>(Ease::easeOutQuart);
+            }else if(functionType == S_EASE_QUART_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutQuart);
+            }else if(functionType == S_EASE_QUINT_IN){
+                return Function<float(float)>(Ease::easeInQuint);
+            }else if(functionType == S_EASE_QUINT_OUT){
+                return Function<float(float)>(Ease::easeOutQuint);
+            }else if(functionType == S_EASE_QUINT_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutQuint);
+            }else if(functionType == S_EASE_SINE_IN){
+                return Function<float(float)>(Ease::easeInSine);
+            }else if(functionType == S_EASE_SINE_OUT){
+                return Function<float(float)>(Ease::easeOutSine);
+            }else if(functionType == S_EASE_SINE_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutSine);
+            }else if(functionType == S_EASE_EXPO_IN){
+                return Function<float(float)>(Ease::easeInExpo);
+            }else if(functionType == S_EASE_EXPO_OUT){
+                return Function<float(float)>(Ease::easeOutExpo);
+            }else if(functionType == S_EASE_EXPO_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutExpo);
+            }else if(functionType == S_EASE_CIRC_IN){
+                return Function<float(float)>(Ease::easeInCirc);
+            }else if(functionType == S_EASE_CIRC_OUT){
+                return Function<float(float)>(Ease::easeOutCirc);
+            }else if(functionType == S_EASE_CIRC_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutCirc);
+            }else if(functionType == S_EASE_ELASTIC_IN){
+                return Function<float(float)>(Ease::easeInElastic);
+            }else if(functionType == S_EASE_ELASTIC_OUT){
+                return Function<float(float)>(Ease::easeOutElastic);
+            }else if(functionType == S_EASE_ELASTIC_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutElastic);
+            }else if(functionType == S_EASE_BACK_IN){
+                return Function<float(float)>(Ease::easeInBack);
+            }else if(functionType == S_EASE_BACK_OUT){
+                return Function<float(float)>(Ease::easeOutBack);
+            }else if(functionType == S_EASE_BACK_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutBack);
+            }else if(functionType == S_EASE_BOUNCE_IN){
+                return Function<float(float)>(Ease::easeInBounce);
+            }else if(functionType == S_EASE_BOUNCE_OUT){
+                return Function<float(float)>(Ease::easeOutBounce);
+            }else if(functionType == S_EASE_BOUNCE_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutBounce);
+            }
+
+            return Function<float(float)>(Ease::linear);
+        }
     }
 }
 

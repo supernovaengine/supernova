@@ -5,8 +5,8 @@
 
 namespace Supernova {
 
-    // 64 should be max number of components types
-    using Signature = std::bitset<64>;
+    // 32 should be max number of components types
+    using Signature = std::bitset<32>;
 
 }
 

@@ -1,6 +1,8 @@
 #ifndef TIMEDACTION_COMPONENT_H
 #define TIMEDACTION_COMPONENT_H
 
+#include "action/Ease.h"
+
 namespace Supernova{
 
     struct TimedActionComponent{
@@ -11,6 +13,8 @@ namespace Supernova{
         
         float time;
         float value;
+
+        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
     };
 
 }

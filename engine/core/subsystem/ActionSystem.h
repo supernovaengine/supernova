@@ -7,7 +7,6 @@
 #include "component/SpriteComponent.h"
 #include "component/MeshComponent.h"
 #include "component/ActionComponent.h"
-#include "component/EaseComponent.h"
 #include "component/TimedActionComponent.h"
 #include "component/SpriteAnimationComponent.h"
 #include "component/PositionActionComponent.h"
@@ -33,7 +32,7 @@ namespace Supernova{
 		void spriteActionUpdate(double dt, ActionComponent& action, MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
 
 		void timedActionStop(TimedActionComponent& timedaction);
-		void timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, EaseComponent& ease);
+		void timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction);
 
 		void positionActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, PositionActionComponent& posaction, Transform& transform);
 		void rotationActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, RotationActionComponent& rotaction, Transform& transform);
@@ -41,9 +40,16 @@ namespace Supernova{
 
 		void colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, MeshComponent& mesh);
 
+		//Particle helpers functions
 		int findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+		float getFloatInitializerValue(float min, float max);
+		Vector3 getVector3InitializerValue(Vector3 min, Vector3 max);
 		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+		float getTimeFromModifierLife(float life, float fromLife, float toLife);
+		float getFloatModifierValue(float value, float fromValue, float toValue);
+		Vector3 getVector3ModifierValue(float value, Vector3 fromValue, Vector3 toValue);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+
 		void particleActionStart(ParticlesAnimationComponent& partanim);
 		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, ParticlesComponent& particles);
 
