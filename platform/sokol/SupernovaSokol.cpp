@@ -37,3 +37,7 @@ void SupernovaSokol::exitFullscreen(){
 std::string SupernovaSokol::getAssetPath(){
     return "assets";
 }
+
+std::string SupernovaSokol::getLuaPath(){
+    return "lua";
+}

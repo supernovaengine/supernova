@@ -144,6 +144,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DWITH_MINIAUDIO") # For SoLoud
 
     set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/$<CONFIG>/assets)
+    set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/$<CONFIG>/lua)
 
     set(PLATFORM_EXEC_FLAGS WIN32)
 
@@ -169,6 +170,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions("-DWITH_MINIAUDIO") # For SoLoud
 
     set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
+    set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/lua)
 
     set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
 
@@ -232,6 +234,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         add_definitions("-DSUPERNOVA_SOKOL")
 
         set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
+        set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/lua)
 
         set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
 
@@ -326,6 +329,8 @@ else()
     )
 endif()
 
+install(TARGETS ${APP_NAME} RUNTIME DESTINATION bin)
+
 if(DEFINED ASSETS_DEST_DIR)
     add_custom_command(
         TARGET ${APP_NAME} POST_BUILD
@@ -334,8 +339,17 @@ if(DEFINED ASSETS_DEST_DIR)
         COMMAND "${CMAKE_COMMAND}" -E copy_directory ${PROJECT_ROOT}/assets ${ASSETS_DEST_DIR}
         )
 
-    install(TARGETS ${APP_NAME} RUNTIME DESTINATION bin)
     install(DIRECTORY ${ASSETS_DEST_DIR} DESTINATION bin)
+endif()
+if(DEFINED LUA_DEST_DIR)
+    add_custom_command(
+        TARGET ${APP_NAME} POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E remove_directory ${LUA_DEST_DIR} # deprecated in CMmake 3.17
+        #COMMAND "${CMAKE_COMMAND}" -E rm -rf ${LUA_DEST_DIR} # for future use
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory ${PROJECT_ROOT}/lua ${LUA_DEST_DIR}
+        )
+
+    install(DIRECTORY ${LUA_DEST_DIR} DESTINATION bin)
 endif()
 
 set_target_properties(
