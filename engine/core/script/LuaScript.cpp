@@ -8,25 +8,24 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-#include "LuaIntf/LuaIntf.h"
+#include "sol.hpp"
 #include "LuaBinding.h"
 
 using namespace Supernova;
 
 void LuaScript::setObject(const char* global, Object* object){
     lua_State *L = LuaBinding::getLuaState();
-    LuaIntf::Lua::setGlobal(L, global, object);
+
+    sol::state_view lua(L);
+
+    lua[global] = object;
 }
 
 Object* LuaScript::getObject(const char* global){
     lua_State *L = LuaBinding::getLuaState();
 
-    Object* object = NULL;
+    sol::state_view lua(L);
 
-    lua_getglobal(L, global);
-    if (lua_isuserdata(L, -1))
-        object = LuaIntf::CppObject::get<Object>(L, -1, false);
-
-    return object;
+    return lua[global];
 }
 

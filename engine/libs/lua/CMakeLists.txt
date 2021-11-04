@@ -8,7 +8,6 @@ set (
     lapi.c
     lauxlib.c
     lbaselib.c
-    lbitlib.c
     lcode.c
     lcorolib.c
     lctype.c

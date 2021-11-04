@@ -28,11 +28,11 @@ void TimedAction::setFunction(std::function<float(float)> function){
     timedAction.function = function;
 }
 
-int TimedAction::setFunction(lua_State* L){
+void TimedAction::setFunction(sol::function function){
     TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
 
     timedAction.function.remove();
-    return timedAction.function.set(L);
+    timedAction.function = function;
 }
 
 void TimedAction::setFunctionType(int functionType){

@@ -87,11 +87,11 @@ std::string System::getAssetPath(){
 }
 
 std::string System::getUserDataPath(){
-    return "";
+    return getAssetPath();
 }
 
 std::string System::getLuaPath(){
-    return "";
+    return getAssetPath();
 }
 
 std::string System::getShaderPath(){

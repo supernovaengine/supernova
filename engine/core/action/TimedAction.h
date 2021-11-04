@@ -18,7 +18,7 @@ namespace Supernova{
         TimedAction(Scene* scene);
 
         void setFunction(std::function<float(float)> function);
-        int setFunction(lua_State* L);
+        void setFunction(sol::function);
 
         void setFunctionType(int functionType);
     };

@@ -8,6 +8,7 @@
 #include "System.h"
 #include "Input.h"
 #include "render/SystemRender.h"
+#include "script/LuaBinding.h"
 
 #include "sokol_time.h"
 
@@ -273,6 +274,9 @@ void Engine::systemInit(int argc, char* argv[]){
     
     std::vector<std::string> args(argv, argv + argc);
     System::instance().args = args;
+
+    LuaBinding::createLuaState();
+    LuaBinding::bind();
 
     #ifndef NO_CPP_INIT
     init();

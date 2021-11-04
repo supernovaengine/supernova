@@ -81,8 +81,8 @@ namespace Supernova {
         
     public:
         
-        Engine();
-        virtual ~Engine();
+        //Engine();
+        //virtual ~Engine();
         
         //-----Supernova config-----
         static void setScene(Scene *mainScene);

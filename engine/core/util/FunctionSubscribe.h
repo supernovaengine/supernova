@@ -75,8 +75,8 @@ namespace Supernova {
             return *this;
         }
 
-        FunctionSubscribe& operator = (lua_State *L){
-            add("luaFunction", L);
+        FunctionSubscribe& operator = (sol::function function){
+            add("luaFunction", function);
 
             return *this;
         }
@@ -87,8 +87,8 @@ namespace Supernova {
             return *this;
         }
 
-        bool add(const std::string& tag, lua_State *L) {
-            addImpl(tag, L);
+        bool add(const std::string& tag, sol::function function) {
+            addImpl(tag, function);
             return true;
         }
 

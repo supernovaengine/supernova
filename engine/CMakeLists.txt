@@ -9,20 +9,20 @@ endif()
 
 add_definitions("-DPROJECT_ROOT=\"${PROJECT_ROOT}\"")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
+include_directories(libs)
+include_directories(libs/sol)
 include_directories(libs/json)
 
 include_directories(libs/sokol)
 include_directories(libs/lua)
-include_directories(libs/luaintf)
 include_directories(libs/stb)
 include_directories(libs/tinyobjloader)
 include_directories(libs/tinygltf)
 
 add_subdirectory(libs/sokol)
 add_subdirectory(libs/lua)
-add_subdirectory(libs/luaintf)
 add_subdirectory(libs/stb)
 add_subdirectory(libs/tinyobjloader)
 add_subdirectory(libs/tinygltf)
@@ -42,7 +42,7 @@ add_library(
 target_link_libraries(
     supernova
 
-    sokol lua luaintf stb tinyobjloader tinygltf
+    sokol lua stb tinyobjloader tinygltf
 
     #supernova-renders
     #soloud box2d tinyxml2
