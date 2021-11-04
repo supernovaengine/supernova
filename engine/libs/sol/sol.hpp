@@ -2376,11 +2376,11 @@ namespace sol {
 // beginning of sol/compatibility/lua_version.hpp
 
 #if SOL_IS_ON(SOL_USE_CXX_LUA_I_)
-	#include <lua.h>
-	#include <lualib.h>
-	#include <lauxlib.h>
+	#include "lua.h"
+	#include "lualib.h"
+	#include "lauxlib.h"
 #elif SOL_IS_ON(SOL_USE_LUA_HPP_I_)
-	#include <lua.hpp>
+	#include "lua.hpp"
 #else
 	extern "C" {
 		#include <lua.h>
@@ -2524,9 +2524,9 @@ namespace sol {
 #if defined(__cplusplus) && !defined(COMPAT53_LUA_CPP)
 extern "C" {
 #endif
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
 #if defined(__cplusplus) && !defined(COMPAT53_LUA_CPP)
 }
 #endif
@@ -3780,9 +3780,9 @@ COMPAT53_API void luaL_requiref(lua_State* L, const char* modname, lua_CFunction
 #if defined(__cplusplus) && !defined(COMPAT53_LUA_CPP)
 extern "C" {
 #endif
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
 #if defined(__cplusplus) && !defined(COMPAT53_LUA_CPP)
 }
 #endif
