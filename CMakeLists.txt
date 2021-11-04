@@ -329,7 +329,9 @@ else()
     )
 endif()
 
-install(TARGETS ${APP_NAME} RUNTIME DESTINATION bin)
+if(DEFINED ASSETS_DEST_DIR OR DEFINED LUA_DEST_DIR)
+    install(TARGETS ${APP_NAME} RUNTIME DESTINATION bin)
+endif()
 
 if(DEFINED ASSETS_DEST_DIR)
     add_custom_command(
