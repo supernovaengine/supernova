@@ -39,8 +39,12 @@ set (
     lzio.c
 )
 
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    add_definitions("-DLUA_USE_POSIX")
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    add_definitions("-DLUA_USE_WINDOWS")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    add_definitions("-DLUA_USE_MACOSX")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_definitions("-DLUA_USE_LINUX")
 endif()
 
 add_library(
