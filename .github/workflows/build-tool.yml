@@ -82,7 +82,7 @@ jobs:
         uses: mymindstorm/setup-emsdk@v9
         with:
           version: latest
-          actions-cache-folder: 'emsdk-cache'
+          actions-cache-folder: 'emsdk-cache-${{ matrix.config.backend }}'
         
       - name: Export Emscripten environment variable
         if: startsWith(matrix.config.platform, 'web')

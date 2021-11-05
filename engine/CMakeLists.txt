@@ -47,3 +47,11 @@ target_link_libraries(
     #supernova-renders
     #soloud box2d tinyxml2
 )
+
+set_target_properties(
+    supernova
+
+    PROPERTIES
+
+    CXX_STANDARD 17
+)
