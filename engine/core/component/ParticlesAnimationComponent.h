@@ -40,6 +40,19 @@ namespace Supernova{
         Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
     };
 
+    struct ParticleSpriteInitializer{
+        std::vector<int> frames;
+    };
+
+    struct ParticleSpriteModifier{
+        float fromLife = 0;
+        float toLife = 0;
+
+        std::vector<int> frames;
+
+        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+    };
+
     struct ParticlesAnimationComponent{
         float newParticlesCount = 0;
         bool emitter = false;
@@ -54,6 +67,9 @@ namespace Supernova{
 
         ParticleSizeInitializer sizeInitializer;
         ParticleSizeModifier sizeModifier;
+
+        ParticleSpriteInitializer spriteInitializer;
+        ParticleSpriteModifier spriteModifier;
     };
 
 }

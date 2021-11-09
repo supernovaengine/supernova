@@ -48,14 +48,14 @@ void Particles::addParticle(Vector3 position, Vector4 color){
 
 void Particles::addParticle(Vector3 position, Vector4 color, float size, float rotation){
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
-    particomp.particles.push_back({position, color, size, rotation, Rect(0, 0, 1, 1)});
+    particomp.particles.push_back({position, color, size, Angle::defaultToRad(rotation), Rect(0, 0, 1, 1)});
 
     updateParticlesSize(particomp);
 }
 
 void Particles::addParticle(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect){
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
-    particomp.particles.push_back({position, color, size, rotation, textureRect});
+    particomp.particles.push_back({position, color, size, Angle::defaultToRad(rotation), textureRect});
     particomp.hasTextureRect = true;
 
     updateParticlesSize(particomp);
@@ -71,4 +71,51 @@ void Particles::setTexture(std::string path){
     particomp.texture.setPath(path);
 
     //TODO: update texture, reload entity
+}
+
+void Particles::addSpriteFrame(int id, std::string name, Rect rect){
+    ParticlesComponent& particomp = getComponent<ParticlesComponent>();
+    if (id >= 0 && id < MAX_SPRITE_FRAMES){
+        particomp.framesRect[id] = {true, name, rect};
+    }else{
+        Log::Error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
+    }
+}
+
+void Particles::addSpriteFrame(std::string name, float x, float y, float width, float height){
+    ParticlesComponent& particomp = getComponent<ParticlesComponent>();
+
+    int id = 0;
+    while ( (particomp.framesRect[id].active = true) && (id < MAX_SPRITE_FRAMES) ) {
+        id++;
+    }
+
+    if (id < MAX_SPRITE_FRAMES){
+        addSpriteFrame(id, name, Rect(x, y, width, height));
+    }else{
+        Log::Error("Cannot set frame %s. Sprite frames reached limit of %i", name.c_str(), MAX_SPRITE_FRAMES);
+    }
+}
+
+void Particles::addSpriteFrame(float x, float y, float width, float height){
+    addSpriteFrame("", x, y, width, height);
+}
+
+void Particles::addSpriteFrame(Rect rect){
+    addSpriteFrame(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+}
+
+void Particles::removeSpriteFrame(int id){
+    ParticlesComponent& particomp = getComponent<ParticlesComponent>();
+    particomp.framesRect[id].active = false;
+}
+
+void Particles::removeSpriteFrame(std::string name){
+    ParticlesComponent& particomp = getComponent<ParticlesComponent>();
+
+    for (int id = 0; id < MAX_SPRITE_FRAMES; id++){
+        if (particomp.framesRect[id].name == name){
+            particomp.framesRect[id].active = false;
+        }
+    }
 }

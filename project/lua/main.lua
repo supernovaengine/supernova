@@ -5,7 +5,7 @@ function eduardo()
     print('Update')
 end
 
-Engine.setScalingMode(Scaling.CROP)
+--Engine.setScalingMode(Scaling.CROP)
 --v1.onUpdate = eduardo
 
 --Engine.onUpdate2(eduardo)

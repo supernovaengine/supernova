@@ -3,6 +3,8 @@
 
 #include "buffer/Buffer.h"
 #include "texture/Texture.h"
+#include "util/FrameData.h"
+#include "Supernova.h"
 
 namespace Supernova{
 
@@ -33,6 +35,8 @@ namespace Supernova{
 
         std::vector<ParticleData> particles;
         std::vector<ParticleShaderData> shaderParticles; //must be sorted
+
+        FrameData framesRect[MAX_SPRITE_FRAMES];
 
         //int maxParticles = 100;
         unsigned int numVisible = 0;

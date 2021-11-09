@@ -60,3 +60,32 @@ void ParticlesAnimation::setSizeModifier(float fromLife, float toLife, float fro
     partAnim.sizeModifier.toSize = toSize;
     partAnim.sizeModifier.function = Ease::getFunction(functionType);
 }
+
+void ParticlesAnimation::setSpriteIntializer(std::vector<int> frames){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.spriteInitializer.frames = frames;
+}
+
+void ParticlesAnimation::setSpriteIntializer(int minFrame, int maxFrame){
+    if (minFrame <= maxFrame){
+        ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+        partAnim.spriteInitializer.frames.clear();
+        for (int i = minFrame; i <= maxFrame; i++){
+            partAnim.spriteInitializer.frames.push_back(i);
+        }
+    }
+}
+
+void ParticlesAnimation::setSpriteModifier(float fromLife, float toLife, std::vector<int> frames){
+    setSpriteModifier(fromLife, toLife, frames, S_LINEAR);
+}
+
+void ParticlesAnimation::setSpriteModifier(float fromLife, float toLife, std::vector<int> frames, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.spriteModifier.fromLife = fromLife;
+    partAnim.spriteModifier.toLife = toLife;
+    partAnim.spriteModifier.frames = frames;
+    partAnim.spriteModifier.function = Ease::getFunction(functionType);
+}

@@ -125,19 +125,27 @@ void Sprite::removeFrame(std::string name){
 void Sprite::setFrame(int id){
     if (id >= 0 && id < MAX_SPRITE_FRAMES){
         SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-        setTextureRect(spritecomp.framesRect[id].rect);
+        if (spritecomp.framesRect[id].active){
+            setTextureRect(spritecomp.framesRect[id].rect);
+        }else{
+            Log::Error("Cannot use non active sprite frame: %i", id);
+        }
+    }else{
+        Log::Error("Cannot use invalid sprite frame: %i", id);
     }
 }
 
 void Sprite::setFrame(std::string name){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
     int id = 0;
-    while ( (spritecomp.framesRect[id].active = false) && (id < MAX_SPRITE_FRAMES) ) {
+    while ( (!spritecomp.framesRect[id].active) && (id < MAX_SPRITE_FRAMES) ) {
         id++;
     }
 
     if (id < MAX_SPRITE_FRAMES){
         setFrame(id);
+    }else{
+        Log::Error("Cannot use nonexistent sprite frame: %s", name.c_str());
     }
 }
 

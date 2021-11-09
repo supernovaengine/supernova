@@ -139,20 +139,32 @@ int ActionSystem::findUnusedParticle(ParticlesComponent& particles, ParticlesAni
     return -1;
 }
 
-float ActionSystem::getFloatInitializerValue(float min, float max){
+float ActionSystem::getFloatInitializerValue(float& min, float& max){
     if (min != max) {
         return min + ((max - min) * (float) rand() / (float) RAND_MAX);
     }
     return max;
 }
 
-Vector3 ActionSystem::getVector3InitializerValue(Vector3 min, Vector3 max){
+Vector3 ActionSystem::getVector3InitializerValue(Vector3& min, Vector3& max){
     if (min != max) {
         return Vector3( min.x + ((max.x - min.x) * (float) rand() / (float) RAND_MAX),
                         min.y + ((max.y - min.y) * (float) rand() / (float) RAND_MAX),
                         min.z + ((max.z - min.z) * (float) rand() / (float) RAND_MAX));
     }
     return max;
+}
+
+Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, ParticlesComponent& particles){
+    if (frames.size() > 0){
+        int id = frames[int(frames.size()*rand()/(RAND_MAX + 1.0))];
+
+        if (id >= 0 && id < MAX_SPRITE_FRAMES && particles.framesRect[id].active){
+            return particles.framesRect[id].rect;
+        }
+    }
+
+    return Rect(0,0,1,1);
 }
 
 void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
@@ -163,9 +175,12 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
     ParticleSizeInitializer& sizeInit = partanim.sizeInitializer;
     particles.particles[idx].size = getFloatInitializerValue(sizeInit.minSize, sizeInit.maxSize);
 
+    ParticleSpriteInitializer& spriteInit = partanim.spriteInitializer;
+    particles.particles[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, particles);
+
 }
 
-float ActionSystem::getTimeFromModifierLife(float life, float fromLife, float toLife){
+float ActionSystem::getTimeFromModifierLife(float& life, float& fromLife, float& toLife){
     if ((fromLife != toLife) && (life <= fromLife) && (life >= toLife)) {
         return (life - fromLife) / (toLife - fromLife);
     }
@@ -173,12 +188,24 @@ float ActionSystem::getTimeFromModifierLife(float life, float fromLife, float to
     return -1;
 }
 
-float ActionSystem::getFloatModifierValue(float value, float fromValue, float toValue){
+float ActionSystem::getFloatModifierValue(float& value, float& fromValue, float& toValue){
     return fromValue + ((toValue - fromValue) * value);
 }
 
-Vector3 ActionSystem::getVector3ModifierValue(float value, Vector3 fromValue, Vector3 toValue){
+Vector3 ActionSystem::getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue){
     return fromValue + ((toValue - fromValue) * value);
+}
+
+Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, ParticlesComponent& particles){
+    if (frames.size() > 0){
+        int id = frames[(int)(frames.size() * value)];
+
+        if (id >= 0 && id < MAX_SPRITE_FRAMES && particles.framesRect[id].active){
+            return particles.framesRect[id].rect;
+        }
+    }
+
+    return Rect(0,0,1,1);
 }
 
 void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
@@ -201,6 +228,12 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
         particles.particles[idx].size = getFloatModifierValue(value, sizeMod.fromSize, sizeMod.toSize);
     }
 
+    ParticleSpriteModifier& spriteMod = partanim.spriteModifier;
+    time = getTimeFromModifierLife(life, spriteMod.fromLife, spriteMod.toLife);
+    value = spriteMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].textureRect = getSpriteModifierValue(value, spriteMod.frames, particles);
+    }
 }
 
 void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim){
@@ -227,7 +260,7 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
                 particles.particles[particleIndex].acceleration = Vector3(0,0,0);
                 particles.particles[particleIndex].color = Vector4(1,1,1,1);
                 //particles.particles[particleIndex].size = 20;
-                //particles->setParticleSprite(particleIndex, -1);
+                //particles.particles[particleIndex].textureRect = Rect(0,0,1,1);
 
                 applyParticleInitializers(particleIndex, particles, partanim);
 
@@ -262,7 +295,7 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
 
             particles.needUpdate = true;
 
-            printf("1.Particle %i life %f position %f %f %f\n", i, life, position.x, position.y, position.z);
+            //printf("1.Particle %i life %f position %f %f %f\n", i, life, position.x, position.y, position.z);
         }
     }
 

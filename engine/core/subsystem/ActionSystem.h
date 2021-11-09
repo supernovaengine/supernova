@@ -42,12 +42,16 @@ namespace Supernova{
 
 		//Particle helpers functions
 		int findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
-		float getFloatInitializerValue(float min, float max);
-		Vector3 getVector3InitializerValue(Vector3 min, Vector3 max);
+
+		float getFloatInitializerValue(float& min, float& max);
+		Vector3 getVector3InitializerValue(Vector3& min, Vector3& max);
+		Rect getSpriteInitializerValue(std::vector<int>& frames, ParticlesComponent& particles);
 		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
-		float getTimeFromModifierLife(float life, float fromLife, float toLife);
-		float getFloatModifierValue(float value, float fromValue, float toValue);
-		Vector3 getVector3ModifierValue(float value, Vector3 fromValue, Vector3 toValue);
+
+		float getTimeFromModifierLife(float& life, float& fromLife, float& toLife);
+		float getFloatModifierValue(float& value, float& fromValue, float& toValue);
+		Vector3 getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue);
+		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, ParticlesComponent& particles);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
 
 		void particleActionStart(ParticlesAnimationComponent& partanim);

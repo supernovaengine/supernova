@@ -110,15 +110,22 @@ void init(){
     polygon3.setName("Polygon3");
     polygon3.setTexture("pista.png");
 
-    particles.setPosition(300, 400, 0);
+    particles.setPosition(300, 100, 0);
     particles.addParticle(Vector3(30, 30, 0), Vector4(1.0, 1.0, 1.0, 1.0), 50, 40);
     particles.addParticle(Vector3(20, 60, 0), Vector4(0.0, 1.0, 0.0, 1.0), 40, 0, Rect(0, 0, 0.5, 0.5));
     particles.setTexture("pista.png");
+
+    particles.addSpriteFrame(0, "", Rect(0.5, 0.5, 0.5, 0.5));
+    particles.addSpriteFrame(1, "", Rect(0.5, 0.0, 0.5, 0.5));
+    particles.addSpriteFrame(2, "", Rect(0.0, 0.5, 0.5, 0.5));
 
     partianim.setTarget(particles.getEntity());
     partianim.setVelocityInitializer(Vector3(0,10,0), Vector3(0,50,0));
     partianim.setVelocityModifier(8, 5, Vector3(0,10,0), Vector3(0,300,0), S_EASE_CUBIC_IN_OUT);
     partianim.setSizeInitializer(10, 50);
+    partianim.setSpriteIntializer(0, 2);
+    partianim.setSpriteModifier(8, 5, {0,1,2});
+
     //plane.create(4000, 4000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);
     //plane.setTexture("pista.png");

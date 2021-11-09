@@ -22,6 +22,11 @@ namespace Supernova{
         void setSizeInitializer(float minSize, float maxSize);
         void setSizeModifier(float fromLife, float toLife, float fromSize, float toSize);
         void setSizeModifier(float fromLife, float toLife, float fromSize, float toSize, int functionType);
+
+        void setSpriteIntializer(std::vector<int> frames);
+        void setSpriteIntializer(int minFrame, int maxFrame);
+        void setSpriteModifier(float fromLife, float toLife, std::vector<int> frames);
+        void setSpriteModifier(float fromLife, float toLife, std::vector<int> frames, int functionType);
     };
 }
 
