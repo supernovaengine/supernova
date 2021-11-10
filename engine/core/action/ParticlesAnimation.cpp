@@ -89,3 +89,28 @@ void ParticlesAnimation::setSpriteModifier(float fromLife, float toLife, std::ve
     partAnim.spriteModifier.frames = frames;
     partAnim.spriteModifier.function = Ease::getFunction(functionType);
 }
+
+void ParticlesAnimation::setRotationInitializer(float rotation){
+    setRotationInitializer(rotation, rotation);
+}
+
+void ParticlesAnimation::setRotationInitializer(float minRotation, float maxRotation){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.rotationInitializer.minRotation = minRotation;
+    partAnim.rotationInitializer.maxRotation = maxRotation;
+}
+
+void ParticlesAnimation::setRotationModifier(float fromLife, float toLife, float fromRotation, float toRotation){
+    setRotationModifier(fromLife, toLife, fromRotation, toRotation, S_LINEAR);
+}
+
+void ParticlesAnimation::setRotationModifier(float fromLife, float toLife, float fromRotation, float toRotation, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.rotationModifier.fromLife = fromLife;
+    partAnim.rotationModifier.toLife = toLife;
+    partAnim.rotationModifier.fromRotation = fromRotation;
+    partAnim.rotationModifier.toRotation = toRotation;
+    partAnim.rotationModifier.function = Ease::getFunction(functionType);
+}

@@ -54,7 +54,7 @@ namespace Supernova{
 		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, ParticlesComponent& particles);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
 
-		void particleActionStart(ParticlesAnimationComponent& partanim);
+		void particleActionStart(ParticlesAnimationComponent& partanim, ParticlesComponent& particles);
 		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, ParticlesComponent& particles);
 
 	public:

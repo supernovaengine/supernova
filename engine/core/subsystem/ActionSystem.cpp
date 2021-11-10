@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "math/Color.h"
+#include "math/Angle.h"
 
 using namespace Supernova;
 
@@ -178,6 +179,9 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
     ParticleSpriteInitializer& spriteInit = partanim.spriteInitializer;
     particles.particles[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, particles);
 
+    ParticleRotationInitializer& rotInit = partanim.rotationInitializer;
+    particles.particles[idx].rotation = Angle::defaultToRad(getFloatInitializerValue(rotInit.minRotation, rotInit.maxRotation));
+
 }
 
 float ActionSystem::getTimeFromModifierLife(float& life, float& fromLife, float& toLife){
@@ -234,9 +238,22 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     if (value >= 0 && value <= 1){
         particles.particles[idx].textureRect = getSpriteModifierValue(value, spriteMod.frames, particles);
     }
+
+    ParticleRotationModifier& rotMod = partanim.rotationModifier;
+    time = getTimeFromModifierLife(life, rotMod.fromLife, rotMod.toLife);
+    value = rotMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].rotation = Angle::defaultToRad(getFloatModifierValue(value, rotMod.fromRotation, rotMod.toRotation));
+    }
 }
 
-void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim){
+void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, ParticlesComponent& particles){
+    // Creating particles
+    particles.particles.clear();
+    for (int i = 0; i < particles.maxParticles; i++){
+        particles.particles.push_back({});
+    }
+
     partanim.emitter = true;
 }
 
@@ -342,8 +359,9 @@ void ActionSystem::update(double dt){
             if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
                 ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
                 if (targetSignature.test(scene->getComponentType<ParticlesComponent>()) ){
+                    ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(action.target);
 
-                    particleActionStart(partanim);
+                    particleActionStart(partanim, particles);
 
                 }
             }

@@ -634,7 +634,7 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	particles.slotVSParams = shaderData.getUniformIndex(UniformType::POINTS_VS_PARAMS, ShaderStageType::VERTEX);
 
 	// Now buffer size is zero than it needed to be calculated
-	size_t bufferSize = particles.particles.size() * particles.buffer->getStride();
+	size_t bufferSize = particles.maxParticles * particles.buffer->getStride();
 
 	particles.buffer->getRender()->createBuffer(bufferSize, particles.buffer->getData(), particles.buffer->getType(), particles.buffer->getUsage());
 	if (particles.buffer->isRenderAttributes()) {
@@ -642,7 +642,6 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 			render.loadAttribute(shaderData.getAttrIndex(attr.first), particles.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), particles.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
         }
     }
-	particles.particlesCount = particles.particles.size();
 
 	if (textureRender)
 		render.loadTexture(shaderData.getTextureIndex(TextureShaderType::POINTS, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
@@ -666,7 +665,7 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 
 		render.beginDraw();
 		render.applyUniform(particles.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &transform.modelViewProjectionMatrix);
-		render.draw(particles.particlesCount);
+		render.draw(particles.particles.size());
 	}
 }
 

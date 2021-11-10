@@ -9,15 +9,15 @@
 namespace Supernova{
 
     struct ParticleData{
-        Vector3 position;
-        Vector4 color;
-        float size;
-        float rotation;
-        Rect textureRect;
+        Vector3 position = Vector3(0,0,0);
+        Vector4 color = Vector4(1,1,1,1);
+        float size = 1;
+        float rotation = 0;
+        Rect textureRect = Rect(0,0,1,1);
 
-        float life;
-        Vector3 velocity;
-        Vector3 acceleration;
+        float life = 1;
+        Vector3 velocity = Vector3(0,0,0);
+        Vector3 acceleration = Vector3(0,0,0);;
     };
 
     struct ParticleShaderData{
@@ -38,14 +38,12 @@ namespace Supernova{
 
         FrameData framesRect[MAX_SPRITE_FRAMES];
 
-        //int maxParticles = 100;
+        unsigned int maxParticles = 100;
         unsigned int numVisible = 0;
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
         std::string shaderProperties;
         int slotVSParams = -1;
-
-        unsigned int particlesCount = 0;
 
         Texture texture;
 

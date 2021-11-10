@@ -40,5 +40,5 @@ void main() {
     #endif
 
     gl_Position = pointsParams.mvpMatrix * vec4(a_position, 1.0);
-    gl_PointSize = a_pointsize;
+    gl_PointSize = a_pointsize / gl_Position.w;
 }

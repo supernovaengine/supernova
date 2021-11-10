@@ -27,6 +27,11 @@ namespace Supernova{
         void setSpriteIntializer(int minFrame, int maxFrame);
         void setSpriteModifier(float fromLife, float toLife, std::vector<int> frames);
         void setSpriteModifier(float fromLife, float toLife, std::vector<int> frames, int functionType);
+
+        void setRotationInitializer(float rotation);
+        void setRotationInitializer(float minRotation, float maxRotation);
+        void setRotationModifier(float fromLife, float toLife, float fromRotation, float toRotation);
+        void setRotationModifier(float fromLife, float toLife, float fromRotation, float toRotation, int functionType);
     };
 }
 
