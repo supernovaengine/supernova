@@ -10,14 +10,19 @@
 
 namespace Supernova{
 
+    struct ParticleLifeInitializer{
+        float minLife = 10;
+        float maxLife = 10;
+    };
+
     struct ParticleVelocityInitializer{
         Vector3 minVelocity = Vector3(0,0,0);
         Vector3 maxVelocity = Vector3(0,0,0);
     };
 
     struct ParticleVelocityModifier{
-        float fromLife = 0;
-        float toLife = 0;
+        float fromTime = 0;
+        float toTime = 0;
 
         Vector3 fromVelocity = Vector3(0,0,0);
         Vector3 toVelocity = Vector3(0,0,0);
@@ -31,8 +36,8 @@ namespace Supernova{
     };
 
     struct ParticleSizeModifier{
-        float fromLife = 0;
-        float toLife = 0;
+        float fromTime = 0;
+        float toTime = 0;
 
         float fromSize = 0;
         float toSize = 0;
@@ -45,8 +50,8 @@ namespace Supernova{
     };
 
     struct ParticleSpriteModifier{
-        float fromLife = 0;
-        float toLife = 0;
+        float fromTime = 0;
+        float toTime = 0;
 
         std::vector<int> frames;
 
@@ -59,8 +64,8 @@ namespace Supernova{
     };
 
     struct ParticleRotationModifier{
-        float fromLife = 0;
-        float toLife = 0;
+        float fromTime = 0;
+        float toTime = 0;
 
         float fromRotation = 0;
         float toRotation = 0;
@@ -76,6 +81,8 @@ namespace Supernova{
         int maxPerUpdate = 100;
 
         int lastUsedParticle = 0;
+
+        ParticleLifeInitializer lifeInitializer;
 
         ParticleVelocityInitializer velocityInitializer;
         ParticleVelocityModifier velocityModifier;

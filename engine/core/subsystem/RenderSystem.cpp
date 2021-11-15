@@ -795,7 +795,7 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 
 	particles.numVisible = 0;
 	for (int i = 0; i < particles.particles.size(); i++){
-		if (particles.particles[i].life > 0){
+		if (particles.particles[i].life > particles.particles[i].time){
 			particles.shaderParticles[particles.numVisible].position = particles.particles[i].position;
 			particles.shaderParticles[particles.numVisible].color = particles.particles[i].color;
 			particles.shaderParticles[particles.numVisible].size = particles.particles[i].size;

@@ -11,6 +11,17 @@ ParticlesAnimation::ParticlesAnimation(Scene* scene): Action(scene){
     addComponent<ParticlesAnimationComponent>({});
 }
 
+void ParticlesAnimation::setLifeInitializer(float life){
+    setLifeInitializer(life, life);
+}
+
+void ParticlesAnimation::setLifeInitializer(float minLife, float maxLife){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.lifeInitializer.minLife = minLife;
+    partAnim.lifeInitializer.maxLife = maxLife;
+}
+
 void ParticlesAnimation::setVelocityInitializer(Vector3 velocity){
     setVelocityInitializer(velocity, velocity);
 }
@@ -22,15 +33,15 @@ void ParticlesAnimation::setVelocityInitializer(Vector3 minVelocity, Vector3 max
     partAnim.velocityInitializer.maxVelocity = maxVelocity;
 }
 
-void ParticlesAnimation::setVelocityModifier(float fromLife, float toLife, Vector3 fromVelocity, Vector3 toVelocity){
-    setVelocityModifier(fromLife, toLife, fromVelocity, toVelocity, S_LINEAR);
+void ParticlesAnimation::setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity){
+    setVelocityModifier(fromTime, toTime, fromVelocity, toVelocity, S_LINEAR);
 }
 
-void ParticlesAnimation::setVelocityModifier(float fromLife, float toLife, Vector3 fromVelocity, Vector3 toVelocity, int functionType){
+void ParticlesAnimation::setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity, int functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
-    partAnim.velocityModifier.fromLife = fromLife;
-    partAnim.velocityModifier.toLife = toLife;
+    partAnim.velocityModifier.fromTime = fromTime;
+    partAnim.velocityModifier.toTime = toTime;
     partAnim.velocityModifier.fromVelocity = fromVelocity;
     partAnim.velocityModifier.toVelocity = toVelocity;
     partAnim.velocityModifier.function = Ease::getFunction(functionType);
@@ -47,15 +58,15 @@ void ParticlesAnimation::setSizeInitializer(float minSize, float maxSize){
     partAnim.sizeInitializer.maxSize = maxSize;
 }
 
-void ParticlesAnimation::setSizeModifier(float fromLife, float toLife, float fromSize, float toSize){
-    setSizeModifier(fromLife, toLife, fromSize, toSize, S_LINEAR);
+void ParticlesAnimation::setSizeModifier(float fromTime, float toTime, float fromSize, float toSize){
+    setSizeModifier(fromTime, toTime, fromSize, toSize, S_LINEAR);
 }
 
-void ParticlesAnimation::setSizeModifier(float fromLife, float toLife, float fromSize, float toSize, int functionType){
+void ParticlesAnimation::setSizeModifier(float fromTime, float toTime, float fromSize, float toSize, int functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
-    partAnim.sizeModifier.fromLife = fromLife;
-    partAnim.sizeModifier.toLife = toLife;
+    partAnim.sizeModifier.fromTime = fromTime;
+    partAnim.sizeModifier.toTime = toTime;
     partAnim.sizeModifier.fromSize = fromSize;
     partAnim.sizeModifier.toSize = toSize;
     partAnim.sizeModifier.function = Ease::getFunction(functionType);
@@ -77,15 +88,15 @@ void ParticlesAnimation::setSpriteIntializer(int minFrame, int maxFrame){
     }
 }
 
-void ParticlesAnimation::setSpriteModifier(float fromLife, float toLife, std::vector<int> frames){
-    setSpriteModifier(fromLife, toLife, frames, S_LINEAR);
+void ParticlesAnimation::setSpriteModifier(float fromTime, float toTime, std::vector<int> frames){
+    setSpriteModifier(fromTime, toTime, frames, S_LINEAR);
 }
 
-void ParticlesAnimation::setSpriteModifier(float fromLife, float toLife, std::vector<int> frames, int functionType){
+void ParticlesAnimation::setSpriteModifier(float fromTime, float toTime, std::vector<int> frames, int functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
-    partAnim.spriteModifier.fromLife = fromLife;
-    partAnim.spriteModifier.toLife = toLife;
+    partAnim.spriteModifier.fromTime = fromTime;
+    partAnim.spriteModifier.toTime = toTime;
     partAnim.spriteModifier.frames = frames;
     partAnim.spriteModifier.function = Ease::getFunction(functionType);
 }
@@ -101,15 +112,15 @@ void ParticlesAnimation::setRotationInitializer(float minRotation, float maxRota
     partAnim.rotationInitializer.maxRotation = maxRotation;
 }
 
-void ParticlesAnimation::setRotationModifier(float fromLife, float toLife, float fromRotation, float toRotation){
-    setRotationModifier(fromLife, toLife, fromRotation, toRotation, S_LINEAR);
+void ParticlesAnimation::setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation){
+    setRotationModifier(fromTime, toTime, fromRotation, toRotation, S_LINEAR);
 }
 
-void ParticlesAnimation::setRotationModifier(float fromLife, float toLife, float fromRotation, float toRotation, int functionType){
+void ParticlesAnimation::setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation, int functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
-    partAnim.rotationModifier.fromLife = fromLife;
-    partAnim.rotationModifier.toLife = toLife;
+    partAnim.rotationModifier.fromTime = fromTime;
+    partAnim.rotationModifier.toTime = toTime;
     partAnim.rotationModifier.fromRotation = fromRotation;
     partAnim.rotationModifier.toRotation = toRotation;
     partAnim.rotationModifier.function = Ease::getFunction(functionType);

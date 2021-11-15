@@ -124,14 +124,14 @@ void ActionSystem::colorActionSpriteUpdate(double dt, ActionComponent& action, T
 int ActionSystem::findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
     for (int i=partanim.lastUsedParticle; i<particles.particles.size(); i++){
-        if (particles.particles[i].life <= 0){
+        if (particles.particles[i].life <= particles.particles[i].time){
             partanim.lastUsedParticle = i;
             return i;
         }
     }
 
     for (int i=0; i<partanim.lastUsedParticle; i++){
-        if (particles.particles[i].life <= 0){
+        if (particles.particles[i].life <= particles.particles[i].time){
             partanim.lastUsedParticle = i;
             return i;
         }
@@ -170,6 +170,9 @@ Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, Particles
 
 void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
+    ParticleLifeInitializer& lifeInit = partanim.lifeInitializer;
+    particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
+
     ParticleVelocityInitializer& velInit = partanim.velocityInitializer;
     particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
 
@@ -184,9 +187,9 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
 
 }
 
-float ActionSystem::getTimeFromModifierLife(float& life, float& fromLife, float& toLife){
-    if ((fromLife != toLife) && (life <= fromLife) && (life >= toLife)) {
-        return (life - fromLife) / (toLife - fromLife);
+float ActionSystem::getTimeFromParticleTime(float& time, float& fromTime, float& toTime){
+    if ((fromTime != toTime) && (time >= fromTime) && (time <= toTime)) {
+        return (time - fromTime) / (toTime - fromTime);
     }
 
     return -1;
@@ -214,33 +217,33 @@ Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames
 
 void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
-    float life = particles.particles[idx].life;
+    float particleTime = particles.particles[idx].time;
     float value;
     float time;
 
     ParticleVelocityModifier& velMod = partanim.velocityModifier;
-    time = getTimeFromModifierLife(life, velMod.fromLife, velMod.toLife);
+    time = getTimeFromParticleTime(particleTime, velMod.fromTime, velMod.toTime);
     value = velMod.function.call(time);
     if (value >= 0 && value <= 1){
         particles.particles[idx].velocity = getVector3ModifierValue(value,  velMod.fromVelocity, velMod.toVelocity);
     }
 
     ParticleSizeModifier& sizeMod = partanim.sizeModifier;
-    time = getTimeFromModifierLife(life, sizeMod.fromLife, sizeMod.toLife);
+    time = getTimeFromParticleTime(particleTime, sizeMod.fromTime, sizeMod.toTime);
     value = sizeMod.function.call(time);
     if (value >= 0 && value <= 1){
         particles.particles[idx].size = getFloatModifierValue(value, sizeMod.fromSize, sizeMod.toSize);
     }
 
     ParticleSpriteModifier& spriteMod = partanim.spriteModifier;
-    time = getTimeFromModifierLife(life, spriteMod.fromLife, spriteMod.toLife);
+    time = getTimeFromParticleTime(particleTime, spriteMod.fromTime, spriteMod.toTime);
     value = spriteMod.function.call(time);
     if (value >= 0 && value <= 1){
         particles.particles[idx].textureRect = getSpriteModifierValue(value, spriteMod.frames, particles);
     }
 
     ParticleRotationModifier& rotMod = partanim.rotationModifier;
-    time = getTimeFromModifierLife(life, rotMod.fromLife, rotMod.toLife);
+    time = getTimeFromParticleTime(particleTime, rotMod.fromTime, rotMod.toTime);
     value = rotMod.function.call(time);
     if (value >= 0 && value <= 1){
         particles.particles[idx].rotation = Angle::defaultToRad(getFloatModifierValue(value, rotMod.fromRotation, rotMod.toRotation));
@@ -252,6 +255,8 @@ void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, Pa
     particles.particles.clear();
     for (int i = 0; i < particles.maxParticles; i++){
         particles.particles.push_back({});
+        particles.particles.back().life = 0;
+        particles.particles.back().time = 0;
     }
 
     partanim.emitter = true;
@@ -271,7 +276,9 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
 
             if (particleIndex >= 0){
 
-                particles.particles[particleIndex].life = 10;
+                particles.particles[particleIndex].time = 0;
+
+                //particles.particles[particleIndex].life = 10;
                 particles.particles[particleIndex].position = Vector3(0,0,0);
                 //particles.particles[particleIndex].velocity = Vector3(0,0,0);
                 particles.particles[particleIndex].acceleration = Vector3(0,0,0);
@@ -291,8 +298,9 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
     for(int i=0; i<particles.particles.size(); i++){
 
         float life = particles.particles[i].life;
+        float time = particles.particles[i].time;
 
-        if(life > 0.0f){
+        if(life > time){
 
             applyParticleModifiers(i, particles, partanim);
 
@@ -302,9 +310,9 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
 
             velocity += acceleration * dt * 0.5f;
             position += velocity * dt;
-            life -= dt;
+            time += dt;
 
-            particles.particles[i].life = life;
+            particles.particles[i].time = time;
             particles.particles[i].velocity = velocity;
             particles.particles[i].position = position;
 
@@ -312,7 +320,7 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
 
             particles.needUpdate = true;
 
-            //printf("1.Particle %i life %f position %f %f %f\n", i, life, position.x, position.y, position.z);
+            //printf("1.Particle %i life %f time %f position %f %f %f\n", i, life, time, position.x, position.y, position.z);
         }
     }
 

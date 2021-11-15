@@ -48,7 +48,7 @@ namespace Supernova{
 		Rect getSpriteInitializerValue(std::vector<int>& frames, ParticlesComponent& particles);
 		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
 
-		float getTimeFromModifierLife(float& life, float& fromLife, float& toLife);
+		float getTimeFromParticleTime(float& time, float& fromTime, float& toTime);
 		float getFloatModifierValue(float& value, float& fromValue, float& toValue);
 		Vector3 getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue);
 		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, ParticlesComponent& particles);

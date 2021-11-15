@@ -13,25 +13,28 @@ namespace Supernova{
     public:
         ParticlesAnimation(Scene* scene);
 
+        void setLifeInitializer(float life);
+        void setLifeInitializer(float minLife, float maxLife);
+
         void setVelocityInitializer(Vector3 velocity);
         void setVelocityInitializer(Vector3 minVelocity, Vector3 maxVelocity);
-        void setVelocityModifier(float fromLife, float toLife, Vector3 fromVelocity, Vector3 toVelocity);
-        void setVelocityModifier(float fromLife, float toLife, Vector3 fromVelocity, Vector3 toVelocity, int functionType);
+        void setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity);
+        void setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity, int functionType);
 
         void setSizeInitializer(float size);
         void setSizeInitializer(float minSize, float maxSize);
-        void setSizeModifier(float fromLife, float toLife, float fromSize, float toSize);
-        void setSizeModifier(float fromLife, float toLife, float fromSize, float toSize, int functionType);
+        void setSizeModifier(float fromTime, float toTime, float fromSize, float toSize);
+        void setSizeModifier(float fromTime, float toTime, float fromSize, float toSize, int functionType);
 
         void setSpriteIntializer(std::vector<int> frames);
         void setSpriteIntializer(int minFrame, int maxFrame);
-        void setSpriteModifier(float fromLife, float toLife, std::vector<int> frames);
-        void setSpriteModifier(float fromLife, float toLife, std::vector<int> frames, int functionType);
+        void setSpriteModifier(float fromTime, float toTime, std::vector<int> frames);
+        void setSpriteModifier(float fromTime, float toTime, std::vector<int> frames, int functionType);
 
         void setRotationInitializer(float rotation);
         void setRotationInitializer(float minRotation, float maxRotation);
-        void setRotationModifier(float fromLife, float toLife, float fromRotation, float toRotation);
-        void setRotationModifier(float fromLife, float toLife, float fromRotation, float toRotation, int functionType);
+        void setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation);
+        void setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation, int functionType);
     };
 }
 
