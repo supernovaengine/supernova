@@ -22,6 +22,31 @@ void ParticlesAnimation::setLifeInitializer(float minLife, float maxLife){
     partAnim.lifeInitializer.maxLife = maxLife;
 }
 
+void ParticlesAnimation::setPositionInitializer(Vector3 position){
+    setPositionInitializer(position, position);
+}
+
+void ParticlesAnimation::setPositionInitializer(Vector3 minPosition, Vector3 maxPosition){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.positionInitializer.minPosition = minPosition;
+    partAnim.positionInitializer.maxPosition = maxPosition;
+}
+
+void ParticlesAnimation::setPositionModifier(float fromTime, float toTime, Vector3 fromPosition, Vector3 toPosition){
+    setPositionModifier(fromTime, toTime, fromPosition, toPosition, S_LINEAR);
+}
+
+void ParticlesAnimation::setPositionModifier(float fromTime, float toTime, Vector3 fromPosition, Vector3 toPosition, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.positionModifier.fromTime = fromTime;
+    partAnim.positionModifier.toTime = toTime;
+    partAnim.positionModifier.fromPosition = fromPosition;
+    partAnim.positionModifier.toPosition = toPosition;
+    partAnim.positionModifier.function = Ease::getFunction(functionType);
+}
+
 void ParticlesAnimation::setVelocityInitializer(Vector3 velocity){
     setVelocityInitializer(velocity, velocity);
 }

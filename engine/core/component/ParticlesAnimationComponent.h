@@ -15,6 +15,21 @@ namespace Supernova{
         float maxLife = 10;
     };
 
+    struct ParticlePositionInitializer{
+        Vector3 minPosition = Vector3(0,0,0);
+        Vector3 maxPosition = Vector3(0,0,0);
+    };
+
+    struct ParticlePositionModifier{
+        float fromTime = 0;
+        float toTime = 0;
+
+        Vector3 fromPosition = Vector3(0,0,0);
+        Vector3 toPosition = Vector3(0,0,0);
+
+        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+    };
+
     struct ParticleVelocityInitializer{
         Vector3 minVelocity = Vector3(0,0,0);
         Vector3 maxVelocity = Vector3(0,0,0);
@@ -83,6 +98,9 @@ namespace Supernova{
         int lastUsedParticle = 0;
 
         ParticleLifeInitializer lifeInitializer;
+
+        ParticlePositionInitializer positionInitializer;
+        ParticlePositionModifier positionModifier;
 
         ParticleVelocityInitializer velocityInitializer;
         ParticleVelocityModifier velocityModifier;

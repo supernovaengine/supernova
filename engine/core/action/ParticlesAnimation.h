@@ -16,6 +16,11 @@ namespace Supernova{
         void setLifeInitializer(float life);
         void setLifeInitializer(float minLife, float maxLife);
 
+        void setPositionInitializer(Vector3 position);
+        void setPositionInitializer(Vector3 minPosition, Vector3 maxPosition);
+        void setPositionModifier(float fromTime, float toTime, Vector3 fromPosition, Vector3 toPosition);
+        void setPositionModifier(float fromTime, float toTime, Vector3 fromPosition, Vector3 toPosition, int functionType);
+
         void setVelocityInitializer(Vector3 velocity);
         void setVelocityInitializer(Vector3 minVelocity, Vector3 maxVelocity);
         void setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity);

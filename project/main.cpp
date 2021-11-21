@@ -121,6 +121,8 @@ void init(){
 
     partianim.setTarget(particles.getEntity());
     partianim.setLifeInitializer(10);
+    partianim.setPositionInitializer(Vector3(0,0,0), Vector3(300,0,0));
+    //partianim.setPositionModifier(2,4, Vector3(0,0,0), Vector3(0,300,0));
     partianim.setVelocityInitializer(Vector3(0,10,0), Vector3(0,50,0));
     partianim.setVelocityModifier(5, 8, Vector3(0,10,0), Vector3(0,300,0), S_EASE_CUBIC_IN_OUT);
     partianim.setSizeInitializer(10, 50);

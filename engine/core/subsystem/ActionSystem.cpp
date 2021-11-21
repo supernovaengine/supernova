@@ -173,6 +173,9 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
     ParticleLifeInitializer& lifeInit = partanim.lifeInitializer;
     particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
 
+    ParticlePositionInitializer& posInit = partanim.positionInitializer;
+    particles.particles[idx].position = getVector3InitializerValue(posInit.minPosition, posInit.maxPosition);
+
     ParticleVelocityInitializer& velInit = partanim.velocityInitializer;
     particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
 
@@ -220,6 +223,13 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     float particleTime = particles.particles[idx].time;
     float value;
     float time;
+
+    ParticlePositionModifier& posMod = partanim.positionModifier;
+    time = getTimeFromParticleTime(particleTime, posMod.fromTime, posMod.toTime);
+    value = posMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].position = getVector3ModifierValue(value,  posMod.fromPosition, posMod.toPosition);
+    }
 
     ParticleVelocityModifier& velMod = partanim.velocityModifier;
     time = getTimeFromParticleTime(particleTime, velMod.fromTime, velMod.toTime);
@@ -279,7 +289,7 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
                 particles.particles[particleIndex].time = 0;
 
                 //particles.particles[particleIndex].life = 10;
-                particles.particles[particleIndex].position = Vector3(0,0,0);
+                //particles.particles[particleIndex].position = Vector3(0,0,0);
                 //particles.particles[particleIndex].velocity = Vector3(0,0,0);
                 particles.particles[particleIndex].acceleration = Vector3(0,0,0);
                 particles.particles[particleIndex].color = Vector4(1,1,1,1);
