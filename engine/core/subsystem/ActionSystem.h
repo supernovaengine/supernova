@@ -13,6 +13,7 @@
 #include "component/RotationActionComponent.h"
 #include "component/ScaleActionComponent.h"
 #include "component/ColorActionComponent.h"
+#include "component/AlphaActionComponent.h"
 #include "component/ParticlesComponent.h"
 #include "component/ParticlesAnimationComponent.h"
 
@@ -39,6 +40,7 @@ namespace Supernova{
 		void scaleActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ScaleActionComponent& scaleaction, Transform& transform);
 
 		void colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, MeshComponent& mesh);
+		void alphaActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, MeshComponent& mesh);
 
 		//Particle helpers functions
 		int findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim);

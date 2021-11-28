@@ -12,6 +12,7 @@ using namespace Supernova;
 #include "RotationAction.h"
 #include "ScaleAction.h"
 #include "ColorAction.h"
+#include "AlphaAction.h"
 #include "Particles.h"
 #include "ParticlesAnimation.h"
 
@@ -28,6 +29,7 @@ PositionAction positionaction(&scene);
 RotationAction rotationaction(&scene);
 ScaleAction scaleaction(&scene);
 ColorAction coloraction(&scene);
+AlphaAction alphaaction(&scene);
 Particles particles(&scene);
 ParticlesAnimation partianim(&scene);
 
@@ -67,6 +69,9 @@ void init(){
 
     coloraction.setAction(sprite.getColor(), Vector4(0.0, 0.0, 1.0, 1.0), 5, false);
     coloraction.setTarget(sprite.getEntity());
+
+    alphaaction.setAction(1.0, 0.5, 5, false);
+    alphaaction.setTarget(sprite.getEntity());
 
     positionaction.setAction(Vector3(20,20,0), Vector3(200,200,0), 5, false);
     positionaction.setTarget(sprite.getEntity());
@@ -125,6 +130,11 @@ void init(){
     //partianim.setPositionModifier(2,4, Vector3(0,0,0), Vector3(0,300,0));
     partianim.setVelocityInitializer(Vector3(0,10,0), Vector3(0,50,0));
     partianim.setVelocityModifier(5, 8, Vector3(0,10,0), Vector3(0,300,0), S_EASE_CUBIC_IN_OUT);
+    //partianim.setAccelerationInitializer(Vector3(0,100,0), Vector3(0,200,0));
+    partianim.setColorInitializer(Vector3(0,0,0), Vector3(1,1,1));
+    //partianim.setColorModifier(2, 5, Vector3(1,1,1), Vector3(1,0,0));
+    //partianim.setAlphaInitializer(0, 1);
+    partianim.setAlphaModifier(4, 6, 1, 0.2);
     partianim.setSizeInitializer(10, 50);
     partianim.setSpriteIntializer(0, 2);
     //partianim.setSpriteModifier(5, 8, {0,1,2});
@@ -175,6 +185,7 @@ void onKeyDown(int key, bool repeat, int mods){
         //rotationaction.start();
         //scaleaction.start();
         coloraction.start();
+        alphaaction.start();
         partianim.start();
     }
     if (key == S_KEY_T){

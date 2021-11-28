@@ -5,14 +5,15 @@
 #ifndef COLORACTION_COMPONENT_H
 #define COLORACTION_COMPONENT_H
 
-#include "math/Vector4.h"
+#include "math/Vector3.h"
 
 namespace Supernova{
 
     struct ColorActionComponent{
-        //sRGB color
-        Vector4 endColor;
-        Vector4 startColor;
+        Vector3 endColor;
+        Vector3 startColor;
+
+        bool useSRGB = true;
     };
 
 }

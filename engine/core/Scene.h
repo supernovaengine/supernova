@@ -21,6 +21,7 @@
 #include "component/RotationActionComponent.h"
 #include "component/ScaleActionComponent.h"
 #include "component/ColorActionComponent.h"
+#include "component/AlphaActionComponent.h"
 #include "component/ParticlesComponent.h"
 #include "component/ParticlesAnimationComponent.h"
 

@@ -13,6 +13,7 @@ namespace Supernova{
     public:
         ColorAction(Scene* scene);
 
+        void setAction(Vector3 startColor, Vector3 endColor, float duration, bool loop=false);
         void setAction(Vector4 startColor, Vector4 endColor, float duration, bool loop=false);
     };
 }

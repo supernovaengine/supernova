@@ -26,6 +26,21 @@ namespace Supernova{
         void setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity);
         void setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity, int functionType);
 
+        void setAccelerationInitializer(Vector3 acceleration);
+        void setAccelerationInitializer(Vector3 minAcceleration, Vector3 maxAcceleration);
+        void setAccelerationModifier(float fromTime, float toTime, Vector3 fromAcceleration, Vector3 toAcceleration);
+        void setAccelerationModifier(float fromTime, float toTime, Vector3 fromAcceleration, Vector3 toAcceleration, int functionType);
+
+        void setColorInitializer(Vector3 color);
+        void setColorInitializer(Vector3 minColor, Vector3 maxColor);
+        void setColorModifier(float fromTime, float toTime, Vector3 fromColor, Vector3 toColor);
+        void setColorModifier(float fromTime, float toTime, Vector3 fromColor, Vector3 toColor, int functionType);
+
+        void setAlphaInitializer(float alpha);
+        void setAlphaInitializer(float minAlpha, float maxAlpha);
+        void setAlphaModifier(float fromTime, float toTime, float fromAlpha, float toAlpha);
+        void setAlphaModifier(float fromTime, float toTime, float fromAlpha, float toAlpha, int functionType);
+
         void setSizeInitializer(float size);
         void setSizeInitializer(float minSize, float maxSize);
         void setSizeModifier(float fromTime, float toTime, float fromSize, float toSize);

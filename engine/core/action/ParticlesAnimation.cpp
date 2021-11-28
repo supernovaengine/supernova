@@ -72,6 +72,81 @@ void ParticlesAnimation::setVelocityModifier(float fromTime, float toTime, Vecto
     partAnim.velocityModifier.function = Ease::getFunction(functionType);
 }
 
+void ParticlesAnimation::setAccelerationInitializer(Vector3 acceleration){
+    setAccelerationInitializer(acceleration, acceleration);
+}
+
+void ParticlesAnimation::setAccelerationInitializer(Vector3 minAcceleration, Vector3 maxAcceleration){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.accelerationInitializer.minAcceleration = minAcceleration;
+    partAnim.accelerationInitializer.maxAcceleration = maxAcceleration;
+}
+
+void ParticlesAnimation::setAccelerationModifier(float fromTime, float toTime, Vector3 fromAcceleration, Vector3 toAcceleration){
+    setAccelerationModifier(fromTime, toTime, fromAcceleration, toAcceleration, S_LINEAR);
+}
+
+void ParticlesAnimation::setAccelerationModifier(float fromTime, float toTime, Vector3 fromAcceleration, Vector3 toAcceleration, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.accelerationModifier.fromTime = fromTime;
+    partAnim.accelerationModifier.toTime = toTime;
+    partAnim.accelerationModifier.fromAcceleration = fromAcceleration;
+    partAnim.accelerationModifier.toAcceleration = toAcceleration;
+    partAnim.accelerationModifier.function = Ease::getFunction(functionType);
+}
+
+void ParticlesAnimation::setColorInitializer(Vector3 color){
+    setColorInitializer(color, color);
+}
+
+void ParticlesAnimation::setColorInitializer(Vector3 minColor, Vector3 maxColor){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.colorInitializer.minColor = minColor;
+    partAnim.colorInitializer.maxColor = maxColor;
+}
+
+void ParticlesAnimation::setColorModifier(float fromTime, float toTime, Vector3 fromColor, Vector3 toColor){
+    setColorModifier(fromTime, toTime, fromColor, toColor, S_LINEAR);
+}
+
+void ParticlesAnimation::setColorModifier(float fromTime, float toTime, Vector3 fromColor, Vector3 toColor, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.colorModifier.fromTime = fromTime;
+    partAnim.colorModifier.toTime = toTime;
+    partAnim.colorModifier.fromColor = fromColor;
+    partAnim.colorModifier.toColor = toColor;
+    partAnim.colorModifier.function = Ease::getFunction(functionType);
+}
+
+void ParticlesAnimation::setAlphaInitializer(float alpha){
+    setAlphaInitializer(alpha, alpha);
+}
+
+void ParticlesAnimation::setAlphaInitializer(float minAlpha, float maxAlpha){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.alphaInitializer.minAlpha = minAlpha;
+    partAnim.alphaInitializer.maxAlpha = maxAlpha;
+}
+
+void ParticlesAnimation::setAlphaModifier(float fromTime, float toTime, float fromAlpha, float toAlpha){
+    setAlphaModifier(fromTime, toTime, fromAlpha, toAlpha, S_LINEAR);
+}
+
+void ParticlesAnimation::setAlphaModifier(float fromTime, float toTime, float fromAlpha, float toAlpha, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.alphaModifier.fromTime = fromTime;
+    partAnim.alphaModifier.toTime = toTime;
+    partAnim.alphaModifier.fromAlpha = fromAlpha;
+    partAnim.alphaModifier.toAlpha = toAlpha;
+    partAnim.alphaModifier.function = Ease::getFunction(functionType);
+}
+
 void ParticlesAnimation::setSizeInitializer(float size){
     setSizeInitializer(size, size);
 }

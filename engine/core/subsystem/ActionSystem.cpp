@@ -117,8 +117,18 @@ void ActionSystem::scaleActionUpdate(double dt, ActionComponent& action, TimedAc
 }
 
 void ActionSystem::colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, MeshComponent& mesh){
-    Vector4 color = (coloraction.endColor - coloraction.startColor) * timedaction.value;
-    mesh.submeshes[0].material.baseColorFactor = Color::sRGBToLinear(coloraction.startColor + color);
+    Vector3 color = (coloraction.endColor - coloraction.startColor) * timedaction.value;
+    if (coloraction.useSRGB){
+        mesh.submeshes[0].material.baseColorFactor = Color::sRGBToLinear(coloraction.startColor + color);
+    }else{
+        mesh.submeshes[0].material.baseColorFactor = coloraction.startColor + color;
+    }
+}
+
+void ActionSystem::alphaActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, MeshComponent& mesh){
+    float alpha = (alphaaction.endAlpha - alphaaction.startAlpha) * timedaction.value;
+
+    mesh.submeshes[0].material.baseColorFactor.w = alphaaction.startAlpha + alpha;
 }
 
 int ActionSystem::findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
@@ -179,6 +189,18 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
     ParticleVelocityInitializer& velInit = partanim.velocityInitializer;
     particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
 
+    ParticleAccelerationInitializer& accInit = partanim.accelerationInitializer;
+    particles.particles[idx].acceleration = getVector3InitializerValue(accInit.minAcceleration, accInit.maxAcceleration);
+
+    ParticleColorInitializer& colInit = partanim.colorInitializer;
+    particles.particles[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
+    if (partanim.colorInitializer.useSRGB){
+        particles.particles[idx].color = Color::sRGBToLinear(particles.particles[idx].color);
+    }
+
+    ParticleAlphaInitializer& alpInit = partanim.alphaInitializer;
+    particles.particles[idx].color.w = getFloatInitializerValue(alpInit.minAlpha, alpInit.maxAlpha);
+
     ParticleSizeInitializer& sizeInit = partanim.sizeInitializer;
     particles.particles[idx].size = getFloatInitializerValue(sizeInit.minSize, sizeInit.maxSize);
 
@@ -228,14 +250,38 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     time = getTimeFromParticleTime(particleTime, posMod.fromTime, posMod.toTime);
     value = posMod.function.call(time);
     if (value >= 0 && value <= 1){
-        particles.particles[idx].position = getVector3ModifierValue(value,  posMod.fromPosition, posMod.toPosition);
+        particles.particles[idx].position = getVector3ModifierValue(value, posMod.fromPosition, posMod.toPosition);
     }
 
     ParticleVelocityModifier& velMod = partanim.velocityModifier;
     time = getTimeFromParticleTime(particleTime, velMod.fromTime, velMod.toTime);
     value = velMod.function.call(time);
     if (value >= 0 && value <= 1){
-        particles.particles[idx].velocity = getVector3ModifierValue(value,  velMod.fromVelocity, velMod.toVelocity);
+        particles.particles[idx].velocity = getVector3ModifierValue(value, velMod.fromVelocity, velMod.toVelocity);
+    }
+
+    ParticleAccelerationModifier& accMod = partanim.accelerationModifier;
+    time = getTimeFromParticleTime(particleTime, accMod.fromTime, accMod.toTime);
+    value = accMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].acceleration = getVector3ModifierValue(value, accMod.fromAcceleration, accMod.toAcceleration);
+    }
+
+    ParticleColorModifier& colMod = partanim.colorModifier;
+    time = getTimeFromParticleTime(particleTime, colMod.fromTime, colMod.toTime);
+    value = colMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].color = getVector3ModifierValue(value, colMod.fromColor, colMod.toColor);
+        if (partanim.colorModifier.useSRGB){
+            particles.particles[idx].color = Color::sRGBToLinear(particles.particles[idx].color);
+        }
+    }
+
+    ParticleAlphaModifier& alpMod = partanim.alphaModifier;
+    time = getTimeFromParticleTime(particleTime, alpMod.fromTime, alpMod.toTime);
+    value = alpMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].color.w = getFloatModifierValue(value, alpMod.fromAlpha, alpMod.toAlpha);
     }
 
     ParticleSizeModifier& sizeMod = partanim.sizeModifier;
@@ -287,14 +333,6 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
             if (particleIndex >= 0){
 
                 particles.particles[particleIndex].time = 0;
-
-                //particles.particles[particleIndex].life = 10;
-                //particles.particles[particleIndex].position = Vector3(0,0,0);
-                //particles.particles[particleIndex].velocity = Vector3(0,0,0);
-                particles.particles[particleIndex].acceleration = Vector3(0,0,0);
-                particles.particles[particleIndex].color = Vector4(1,1,1,1);
-                //particles.particles[particleIndex].size = 20;
-                //particles.particles[particleIndex].textureRect = Rect(0,0,1,1);
 
                 applyParticleInitializers(particleIndex, particles, partanim);
 
@@ -486,6 +524,17 @@ void ActionSystem::update(double dt){
                         MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
                         colorActionSpriteUpdate(dt, action, timedaction, coloraction, mesh);
+                    }
+                }
+
+                //Alpha animation
+                if (signature.test(scene->getComponentType<AlphaActionComponent>())){
+                    AlphaActionComponent& alphaaction = scene->getComponent<AlphaActionComponent>(entity);
+
+                    if (targetSignature.test(scene->getComponentType<MeshComponent>())){
+                        MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
+
+                        alphaActionSpriteUpdate(dt, action, timedaction, alphaaction, mesh);
                     }
                 }
             }

@@ -20,6 +20,7 @@ Scene::Scene(){
 	registerComponent<RotationActionComponent>();
 	registerComponent<ScaleActionComponent>();
 	registerComponent<ColorActionComponent>();
+	registerComponent<AlphaActionComponent>();
 	registerComponent<ParticlesComponent>();
 	registerComponent<ParticlesAnimationComponent>();
 
