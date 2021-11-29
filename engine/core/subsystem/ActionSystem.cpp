@@ -116,7 +116,7 @@ void ActionSystem::scaleActionUpdate(double dt, ActionComponent& action, TimedAc
     transform.needUpdate = true;
 }
 
-void ActionSystem::colorActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, MeshComponent& mesh){
+void ActionSystem::colorActionMeshUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, MeshComponent& mesh){
     Vector3 color = (coloraction.endColor - coloraction.startColor) * timedaction.value;
     if (coloraction.useSRGB){
         mesh.submeshes[0].material.baseColorFactor = Color::sRGBToLinear(coloraction.startColor + color);
@@ -125,10 +125,25 @@ void ActionSystem::colorActionSpriteUpdate(double dt, ActionComponent& action, T
     }
 }
 
-void ActionSystem::alphaActionSpriteUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, MeshComponent& mesh){
+void ActionSystem::colorActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, UIRenderComponent& uirender){
+    Vector3 color = (coloraction.endColor - coloraction.startColor) * timedaction.value;
+    if (coloraction.useSRGB){
+        uirender.color = Color::sRGBToLinear(coloraction.startColor + color);
+    }else{
+        uirender.color = coloraction.startColor + color;
+    }
+}
+
+void ActionSystem::alphaActionMeshUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, MeshComponent& mesh){
     float alpha = (alphaaction.endAlpha - alphaaction.startAlpha) * timedaction.value;
 
     mesh.submeshes[0].material.baseColorFactor.w = alphaaction.startAlpha + alpha;
+}
+
+void ActionSystem::alphaActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, UIRenderComponent& uirender){
+    float alpha = (alphaaction.endAlpha - alphaaction.startAlpha) * timedaction.value;
+
+    uirender.color.w = alphaaction.startAlpha + alpha;
 }
 
 int ActionSystem::findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
@@ -523,7 +538,12 @@ void ActionSystem::update(double dt){
                     if (targetSignature.test(scene->getComponentType<MeshComponent>())){
                         MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
-                        colorActionSpriteUpdate(dt, action, timedaction, coloraction, mesh);
+                        colorActionMeshUpdate(dt, action, timedaction, coloraction, mesh);
+                    }
+                    if (targetSignature.test(scene->getComponentType<UIRenderComponent>())){
+                        UIRenderComponent& uirender = scene->getComponent<UIRenderComponent>(action.target);
+
+                        colorActionUIUpdate(dt, action, timedaction, coloraction, uirender);
                     }
                 }
 
@@ -534,7 +554,12 @@ void ActionSystem::update(double dt){
                     if (targetSignature.test(scene->getComponentType<MeshComponent>())){
                         MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
-                        alphaActionSpriteUpdate(dt, action, timedaction, alphaaction, mesh);
+                        alphaActionMeshUpdate(dt, action, timedaction, alphaaction, mesh);
+                    }
+                    if (targetSignature.test(scene->getComponentType<UIRenderComponent>())){
+                        UIRenderComponent& uirender = scene->getComponent<UIRenderComponent>(action.target);
+
+                        alphaActionUIUpdate(dt, action, timedaction, alphaaction, uirender);
                     }
                 }
             }
