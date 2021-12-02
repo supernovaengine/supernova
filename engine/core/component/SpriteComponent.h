@@ -11,6 +11,10 @@ namespace Supernova{
         int height = 200;
 
         FrameData framesRect[MAX_SPRITE_FRAMES];
+
+        bool billboard = false;
+        bool fakeBillboard = false;
+        bool cylindricalBillboard = false;
     };
     
 }

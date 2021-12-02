@@ -1,4 +1,4 @@
-
+/*
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -197,9 +197,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
+*/
 
 
-/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -211,6 +211,7 @@ void onKeyDown(int key, bool repeat, int mods){
 #include "PlaneTerrain.h"
 #include "SkyBox.h"
 #include "Light.h"
+#include "Sprite.h"
 #include "math/Angle.h"
 
 using namespace Supernova;
@@ -240,10 +241,11 @@ Model carro(&scene);
 //Mesh* child11;
 PlaneTerrain plane(&scene);
 SkyBox sky(&scene);
-Light lightDir(&scene);
+//Light lightDir(&scene);
 //Light lightDir2(&scene);
-Light lightPoint(&scene);
-Light lightSpot(&scene);
+//Light lightPoint(&scene);
+//Light lightSpot(&scene);
+Sprite sprite(&scene, 20, 20);
 
 float rotationY = 0;
 float speed = 0;
@@ -252,12 +254,12 @@ Camera camera(&scene);
 
 void init(){
 
-    lightDir.setType(LightType::DIRECTIONAL);
-    lightDir.setDirection(0.5f, -0.5, 0.0);
-    lightDir.setRange(0.0);
-    lightDir.setPosition(0.0f, 0.0f, 0.0f);
-    lightDir.setIntensity(1.0);
-    lightDir.setShadows(true);
+    //lightDir.setType(LightType::DIRECTIONAL);
+    //lightDir.setDirection(0.5f, -0.5, 0.0);
+    //lightDir.setRange(0.0);
+    //lightDir.setPosition(0.0f, 0.0f, 0.0f);
+    //lightDir.setIntensity(1.0);
+    //lightDir.setShadows(true);
 
     //lightDir2.setType(LightType::DIRECTIONAL);
     //lightDir2.setDirection(-0.5f, -0.5, 0.0);
@@ -266,21 +268,21 @@ void init(){
     //lightDir2.setIntensity(1.0);
     //lightDir2.setShadows(false);
 
-    lightPoint.setType(LightType::POINT);
-    lightPoint.setDirection(0.0, 0.0, 0.0);
-    lightPoint.setRange(0.0);
-    lightPoint.setPosition(300.0f, 80.0f, 80.0f);
-    lightPoint.setIntensity(100000.0);
-    lightPoint.setShadows(true);
+    //lightPoint.setType(LightType::POINT);
+    //lightPoint.setDirection(0.0, 0.0, 0.0);
+    //lightPoint.setRange(0.0);
+    //lightPoint.setPosition(300.0f, 80.0f, 80.0f);
+    //lightPoint.setIntensity(100000.0);
+    //lightPoint.setShadows(true);
 
-    lightSpot.setType(LightType::SPOT);
-    lightSpot.setDirection(0.0f, -0.7, 0.3);
-    lightSpot.setRange(0.0);
-    lightSpot.setPosition(0.0f, 150.0f/5.0, 0.0f);
-    lightSpot.setIntensity(100000.0);
-    lightSpot.setConeAngle(50, 70);
-    lightSpot.setShadows(true);
-    carro.addChild(&lightSpot);
+    //lightSpot.setType(LightType::SPOT);
+    //lightSpot.setDirection(0.0f, -0.7, 0.3);
+    //lightSpot.setRange(0.0);
+    //lightSpot.setPosition(0.0f, 150.0f/5.0, 0.0f);
+    //lightSpot.setIntensity(100000.0);
+    //lightSpot.setConeAngle(50, 70);
+    //lightSpot.setShadows(true);
+    //carro.addChild(&lightSpot);
 
     sky.setTextureLeft("ely_hills/hills_lf.tga");
     sky.setTextureRight("ely_hills/hills_rt.tga");
@@ -288,6 +290,10 @@ void init(){
     sky.setTextureFront("ely_hills/hills_ft.tga");
     sky.setTextureUp("ely_hills/hills_up.tga");
     sky.setTextureDown("ely_hills/hills_dn.tga");
+
+    sprite.setTexture("block.png");
+    sprite.setBillboard(true, true, true);
+    carro.addChild(&sprite);
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
     camera.setType(CameraType::CAMERA_PERSPECTIVE);
@@ -409,7 +415,7 @@ void onUpdate(){
 
     carro.setPosition(carro.getPosition() + (vDirection*speed));
     carro.setRotation(0, rotationY, 0);
-    //camera.walkForward(0.5);
+    //camera.walkForward(-0.5);
 
     camera.setView(carro.getPosition());
 }
@@ -556,4 +562,3 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
-*/

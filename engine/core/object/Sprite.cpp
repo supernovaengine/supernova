@@ -4,7 +4,7 @@
 
 using namespace Supernova;
 
-Sprite::Sprite(Scene* scene): Mesh(scene){
+Sprite::Sprite(Scene* scene, float width, float height): Mesh(scene){
     animation = NULL;
     addComponent<SpriteComponent>({});
 
@@ -14,6 +14,9 @@ Sprite::Sprite(Scene* scene): Mesh(scene){
     mesh.submeshes[0].hasTextureRect = true;
 
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    spritecomp.width = width;
+    spritecomp.height = height;
 
     Attribute* attVertex = buffer.getAttribute(AttributeType::POSITION);
 
@@ -57,6 +60,14 @@ Sprite::Sprite(Scene* scene): Mesh(scene){
 Sprite::~Sprite(){
     if (animation)
         delete animation;
+}
+
+void Sprite::setBillboard(bool billboard, bool fake, bool cylindrical){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    spritecomp.billboard = billboard;
+    spritecomp.fakeBillboard = fake;
+    spritecomp.cylindricalBillboard = cylindrical;
 }
 
 void Sprite::setTextureRect(float x, float y, float width, float height){

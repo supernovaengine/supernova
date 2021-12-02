@@ -18,8 +18,10 @@ namespace Supernova{
         SpriteAnimation* animation;
 
     public:
-        Sprite(Scene* scene);
+        Sprite(Scene* scene, float width, float height);
         virtual ~Sprite();
+
+        void setBillboard(bool billboard, bool fake = true, bool cylindrical = true);
 
         void setTextureRect(float x, float y, float width, float height);
         void setTextureRect(Rect textureRect);

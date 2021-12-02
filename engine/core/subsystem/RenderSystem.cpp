@@ -1047,7 +1047,60 @@ void RenderSystem::update(double dt){
 		Signature signature = scene->getSignature(entity);
 
 		if (camera.needUpdate || transform.needUpdate){
-			transform.modelViewProjectionMatrix = camera.viewProjectionMatrix * transform.modelMatrix;
+
+			bool usingFakeBillboard = false;
+
+			if (signature.test(scene->getComponentType<SpriteComponent>())){
+				SpriteComponent& sprite = scene->getComponent<SpriteComponent>(entity);
+
+				if (sprite.billboard && !sprite.fakeBillboard){
+
+					Vector3 camPos = cameraTransform.worldPosition;
+
+					if (sprite.cylindricalBillboard)
+						camPos.y = transform.worldPosition.y;
+
+					Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp);
+
+					Quaternion oldRotation = transform.rotation;
+
+					transform.rotation.fromRotationMatrix(m1);
+					if (transform.parent != NULL_ENTITY){
+						auto transformParent = scene->getComponent<Transform>(transform.parent);
+						transform.rotation = transformParent.worldRotation.inverse() * transform.rotation;
+					}
+
+					if (transform.rotation != oldRotation){
+						updateTransform(transform);
+					}
+
+				}
+
+				if (sprite.billboard && sprite.fakeBillboard){
+					Matrix4 modelViewMatrix = camera.viewMatrix * transform.modelMatrix;
+
+					modelViewMatrix.set(0,0, transform.worldScale.x);
+					modelViewMatrix.set(0,1, 0.0);
+					modelViewMatrix.set(0,2, 0.0);
+
+					if (!sprite.cylindricalBillboard) {
+						modelViewMatrix.set(1, 0, 0.0);
+						modelViewMatrix.set(1, 1, transform.worldScale.y);
+						modelViewMatrix.set(1, 2, 0.0);
+					}
+
+					modelViewMatrix.set(2,0, 0.0);
+					modelViewMatrix.set(2,1, 0.0);
+					modelViewMatrix.set(2,2, transform.worldScale.z);
+
+					transform.modelViewProjectionMatrix = camera.projectionMatrix * modelViewMatrix;
+					usingFakeBillboard = true;
+				}
+			}
+
+			if (!usingFakeBillboard){
+				transform.modelViewProjectionMatrix = camera.viewProjectionMatrix * transform.modelMatrix;
+			}
 			transform.distanceToCamera = (cameraTransform.worldPosition - transform.worldPosition).length();
 
         	if (signature.test(scene->getComponentType<LightComponent>())){
@@ -1106,7 +1159,6 @@ void RenderSystem::draw(){
 						MeshComponent& mesh = meshes->getComponentFromIndex(i);
 						Entity entity = meshes->getEntity(i);
 						Transform* transform = scene->findComponent<Transform>(entity);
-						SpriteComponent* sprite = scene->findComponent<SpriteComponent>(entity);
 
 						if (transform){
 							if (!mesh.loaded){
@@ -1135,7 +1187,6 @@ void RenderSystem::draw(){
 
         if (signature.test(scene->getComponentType<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-			SpriteComponent* sprite = scene->findComponent<SpriteComponent>(entity);
 
 			if (!mesh.loaded){
 				loadMesh(mesh);
