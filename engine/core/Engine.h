@@ -5,6 +5,7 @@
 #ifndef engine_h
 #define engine_h
 
+#include "Supernova.h"
 #include "util/FunctionSubscribe.h"
 #include "math/Rect.h"
 
@@ -43,7 +44,7 @@ namespace Supernova {
         
     private:
         //-----Supernova config-----
-        static Scene *mainScene;
+        static Scene* scenes[MAX_SCENE_LAYERS];
         
         static int canvasWidth;
         static int canvasHeight;
@@ -85,8 +86,9 @@ namespace Supernova {
         //virtual ~Engine();
         
         //-----Supernova config-----
-        static void setScene(Scene *mainScene);
+        static void setScene(Scene* scene);
         static Scene* getScene();
+        static void addSceneLayer(Scene* scene);
         
         static int getCanvasWidth();
         static int getCanvasHeight();

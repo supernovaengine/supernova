@@ -19,9 +19,9 @@ namespace Supernova {
         Matrix4();
         Matrix4(const Matrix4 &matrix);
         Matrix4 (float fEntry00, float fEntry10, float fEntry20, float fEntry30,
-                          float fEntry01, float fEntry11, float fEntry21, float fEntry31,
-                          float fEntry02, float fEntry12, float fEntry22, float fEntry32,
-                          float fEntry03, float fEntry13, float fEntry23, float fEntry33);
+                float fEntry01, float fEntry11, float fEntry21, float fEntry31,
+                float fEntry02, float fEntry12, float fEntry22, float fEntry32,
+                float fEntry03, float fEntry13, float fEntry23, float fEntry33);
         Matrix4(const float **matrix);
 
         Matrix4 &operator=(const Matrix4 &);

@@ -49,6 +49,7 @@ namespace Supernova{
 			}
 		};
 
+		Scene* scene;
 		SceneRender sceneRender;
 		SceneRender depthRender;
 

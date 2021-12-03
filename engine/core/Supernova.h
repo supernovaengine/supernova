@@ -1,6 +1,10 @@
 #ifndef supernova_h
 #define supernova_h
 
+#ifndef MAX_SCENE_LAYERS
+#define MAX_SCENE_LAYERS 3
+#endif
+
 #ifndef MAX_LIGHTS
 #define MAX_LIGHTS 6
 #endif

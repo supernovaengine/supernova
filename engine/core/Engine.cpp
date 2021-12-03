@@ -4,7 +4,6 @@
 
 #include "Engine.h"
 #include "Scene.h"
-#include "Supernova.h"
 #include "System.h"
 #include "Input.h"
 #include "render/SystemRender.h"
@@ -15,7 +14,7 @@
 using namespace Supernova;
 
 //-----Supernova user config-----
-Scene *Engine::mainScene = NULL;
+Scene* Engine::scenes[MAX_SCENE_LAYERS] = {NULL};
 
 int Engine::canvasWidth;
 int Engine::canvasHeight;
@@ -67,12 +66,28 @@ FunctionSubscribe<void(int,bool,int)> Engine::onKeyUp;
 FunctionSubscribe<void(wchar_t)> Engine::onCharInput;
 
 
-void Engine::setScene(Scene *mainScene){
-    Engine::mainScene = mainScene;
+void Engine::setScene(Scene* scene){
+    Engine::scenes[0] = scene;
+    scene->setMainScene(true);
 }
 
 Scene* Engine::getScene(){
-    return mainScene;
+    return Engine::scenes[0];
+}
+
+void Engine::addSceneLayer(Scene* scene){
+    bool foundSlot = false;
+    for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+        if (!scenes[i]){
+            scenes[i] = scene;
+            scenes[i]->setMainScene(false);
+
+            foundSlot = true;
+        }
+    }
+    if (!foundSlot){
+        Log::Error("Scene layers is full. Max scenes is: %i", MAX_SCENE_LAYERS);
+    }
 }
 
 int Engine::getCanvasWidth(){
@@ -286,8 +301,10 @@ void Engine::systemInit(int argc, char* argv[]){
 void Engine::systemViewLoaded(){
     SystemRender::setup();
     onViewLoaded.call();
-    if (getScene())
-        mainScene->load();
+    for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+        if (scenes[i])
+            scenes[i]->load();
+    }
 }
 
 void Engine::systemViewChanged(){
@@ -341,8 +358,9 @@ void Engine::systemViewChanged(){
     
     viewRect.setRect(viewX, viewY, viewWidth, viewHeight);
 
-    if (Engine::getScene() != NULL){
-        Engine::getScene()->updateCameraSize();
+    for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+        if (scenes[i])
+            scenes[i]->updateCameraSize();
     }
 
     onViewChanged.call();
@@ -361,21 +379,30 @@ void Engine::systemDraw(){
 
         Engine::onUpdate.call();
 
-        if (isFixedTimeSceneUpdate() && Engine::getScene())
-            mainScene->update(updateTime);
+        if (isFixedTimeSceneUpdate()){
+            for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+                if (scenes[i])
+                    scenes[i]->update(updateTime);
+            }
+        }
     }
     if (updateLoops > 100){
         Log::Warn("More than 100 updates in a frame");
     }
 
-    if (!isFixedTimeSceneUpdate() && Engine::getScene()){
-        mainScene->update(deltatime);
+    if (!isFixedTimeSceneUpdate()){
+        for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+            if (scenes[i])
+                scenes[i]->update(deltatime);
+        }
     }
 
     Engine::onDraw.call();
 
-    if (Engine::getScene())
-        mainScene->draw();
+    for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+        if (scenes[i])
+            scenes[i]->draw();
+    }
     
     //SoundManager::checkActive();
 }

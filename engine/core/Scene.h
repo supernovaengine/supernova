@@ -34,11 +34,15 @@ namespace Supernova{
 	private:
 
 		Entity camera;
-	
+		bool mainScene;
+
+		Vector4 color;
+
 	    EntityManager entityManager;
 	    ComponentManager componentManager;
 		std::unordered_map<const char*, std::shared_ptr<SubSystem>> systems;
 
+		Entity createDefaultCamera();
 		void sortComponentsByTransform(Signature entitySignature);
 		void moveChildAux(Entity entity, bool increase, bool stopIfFound);
 		
@@ -52,6 +56,13 @@ namespace Supernova{
 
 		void setCamera(Entity camera);
 		Entity getCamera();
+
+		void setMainScene(bool mainScene);
+		bool isMainScene();
+
+		void setColor(Vector4 color);
+		void setColor(float red, float green, float blue, float alpha);
+		Vector4 getColor();
 
 		void updateCameraSize();
 

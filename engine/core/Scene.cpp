@@ -28,6 +28,9 @@ Scene::Scene(){
 	registerSystem<ActionSystem>();
 
 	camera = NULL_ENTITY;
+
+	mainScene = false;
+	color = Vector4(0.1, 0.1, 0.1, 1.0);
 }
 
 void Scene::setCamera(Entity camera){
@@ -40,6 +43,34 @@ void Scene::setCamera(Entity camera){
 
 Entity Scene::getCamera(){
 	return camera;
+}
+
+Entity Scene::createDefaultCamera(){
+	Entity defaultCamera = createEntity();
+	addComponent<CameraComponent>(defaultCamera, {});
+	addComponent<Transform>(defaultCamera, {});
+
+	return defaultCamera;
+}
+
+void Scene::setMainScene(bool mainScene){
+	this->mainScene = mainScene;
+}
+
+bool Scene::isMainScene(){
+	return mainScene;
+}
+
+void Scene::setColor(Vector4 color){
+	this->color = color;
+}
+
+void Scene::setColor(float red, float green, float blue, float alpha){
+	setColor(Vector4(red, green, blue, alpha));
+}
+
+Vector4 Scene::getColor(){
+	return color;
 }
 
 void Scene::updateCameraSize(){
@@ -73,6 +104,10 @@ void Scene::updateCameraSize(){
 }
 
 void Scene::load(){
+	if (camera == NULL_ENTITY){
+		camera = createDefaultCamera();
+	}
+
 	for (auto const& pair : systems){
 		pair.second->load();
 	}

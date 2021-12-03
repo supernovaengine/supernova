@@ -31,6 +31,8 @@ bool RenderSystem::emptyTexturesCreated = false;
 RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 	signature.set(scene->getComponentType<Transform>());
 
+	this->scene = scene;
+
 	hasLights = false;
 	hasShadows = false;
 }
@@ -38,6 +40,10 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 void RenderSystem::load(){
 	createEmptyTextures();
 	checkLightsAndShadow();
+
+	if (scene->isMainScene()){
+		sceneRender.setClearColor(scene->getColor());
+	}
 	depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
 }
 
@@ -1079,9 +1085,9 @@ void RenderSystem::update(double dt){
 				if (sprite.billboard && sprite.fakeBillboard){
 					Matrix4 modelViewMatrix = camera.viewMatrix * transform.modelMatrix;
 
-					modelViewMatrix.set(0,0, transform.worldScale.x);
-					modelViewMatrix.set(0,1, 0.0);
-					modelViewMatrix.set(0,2, 0.0);
+					modelViewMatrix.set(0, 0, transform.worldScale.x);
+					modelViewMatrix.set(0, 1, 0.0);
+					modelViewMatrix.set(0, 2, 0.0);
 
 					if (!sprite.cylindricalBillboard) {
 						modelViewMatrix.set(1, 0, 0.0);
@@ -1089,9 +1095,9 @@ void RenderSystem::update(double dt){
 						modelViewMatrix.set(1, 2, 0.0);
 					}
 
-					modelViewMatrix.set(2,0, 0.0);
-					modelViewMatrix.set(2,1, 0.0);
-					modelViewMatrix.set(2,2, transform.worldScale.z);
+					modelViewMatrix.set(2, 0, 0.0);
+					modelViewMatrix.set(2, 1, 0.0);
+					modelViewMatrix.set(2, 2, transform.worldScale.z);
 
 					transform.modelViewProjectionMatrix = camera.projectionMatrix * modelViewMatrix;
 					usingFakeBillboard = true;

@@ -17,13 +17,13 @@ using namespace Supernova;
 #include "ParticlesAnimation.h"
 
 Scene scene;
-Camera camera(&scene);
+//Camera camera(&scene);
 
 Polygon polygonroot(&scene);
 Polygon polygon(&scene);
 Polygon polygon2(&scene);
 Polygon polygon3(&scene);
-Sprite sprite(&scene);
+Sprite sprite(&scene, 200, 200);
 SpriteAnimation spriteanim(&scene);
 PositionAction positionaction(&scene);
 RotationAction rotationaction(&scene);
@@ -39,10 +39,10 @@ void onKeyDown(int key, bool repeat, int mods);
 
 void init(){
 
-    camera.activate();
+    //camera.activate();
     //camera.setType(CameraType::CAMERA_PERSPECTIVE);
 
-    camera.setPosition(0,8,-100);
+    //camera.setPosition(0,8,-100);
 
     sprite.setTexture("pista.png");
     //sprite.setColor(0.2, 0.0, 0.5, 1.0);
@@ -233,6 +233,7 @@ void onTouchEnd(int pointer, float x, float y);
 void onTouchCancel();
 
 Scene scene;
+Scene uiscene;
 //Mesh child2(&scene);
 //Object objeto(&scene);
 //Mesh child1(&scene);
@@ -246,6 +247,7 @@ SkyBox sky(&scene);
 //Light lightPoint(&scene);
 //Light lightSpot(&scene);
 Sprite sprite(&scene, 20, 20);
+Sprite spriteui(&uiscene, 200, 200);
 
 float rotationY = 0;
 float speed = 0;
@@ -294,6 +296,8 @@ void init(){
     sprite.setTexture("block.png");
     sprite.setBillboard(true, true, true);
     carro.addChild(&sprite);
+
+    spriteui.setTexture("block.png");
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
     camera.setType(CameraType::CAMERA_PERSPECTIVE);
@@ -381,6 +385,7 @@ void init(){
     Engine::onTouchCancel = onTouchCancel;
 
     Engine::setScene(&scene);
+    Engine::addSceneLayer(&uiscene);
 }
 
 void onUpdate(){
