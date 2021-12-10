@@ -24,9 +24,7 @@
 #include "component/AlphaActionComponent.h"
 #include "component/ParticlesComponent.h"
 #include "component/ParticlesAnimationComponent.h"
-
-#include "subsystem/RenderSystem.h"
-#include "subsystem/ActionSystem.h"
+#include "component/TextComponent.h"
 
 namespace Supernova{
 

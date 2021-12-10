@@ -1,3 +1,7 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #include "RenderSystem.h"
 #include "object/Camera.h"
 #include "math/Quaternion.h"
@@ -556,13 +560,20 @@ bool RenderSystem::loadUI(UIRenderComponent& ui){
 	TextureRender* textureRender = ui.texture.getRender();
 
 	bool p_hasTexture = false;
+	bool p_vertexColorVec4 = true;
+	bool p_hasFontAtlasTexture = false;
 	if (textureRender){
-		p_hasTexture = true;
+		if (ui.isFont){
+			p_vertexColorVec4 = false;
+			p_hasFontAtlasTexture = true;
+		}else{
+			p_hasTexture = true;
+		}
 	}
 	
 	ShaderType shaderType = ShaderType::UI;
 
-	ui.shaderProperties = ShaderPool::getUIProperties(p_hasTexture, false, true);
+	ui.shaderProperties = ShaderPool::getUIProperties(p_hasTexture, p_hasFontAtlasTexture, false, p_vertexColorVec4);
 	ui.shader = ShaderPool::get(shaderType, ui.shaderProperties);
 	if (!ui.shader->isCreated())
 		return false;

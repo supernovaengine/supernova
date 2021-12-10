@@ -144,11 +144,13 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 	return prop;
 }
 
-std::string ShaderPool::getUIProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4){
+std::string ShaderPool::getUIProperties(bool texture, bool fontAtlasTexture, bool vertexColorVec3, bool vertexColorVec4){
 	std::string prop;
 
 	if (texture)
 		prop += "Tex";
+	if (fontAtlasTexture)
+		prop += "Ftx";
 	if (vertexColorVec3)
 		prop += "Vc3";
 	if (vertexColorVec4)

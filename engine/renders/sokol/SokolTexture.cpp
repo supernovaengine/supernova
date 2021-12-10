@@ -30,7 +30,7 @@ bool SokolTexture::createTexture(std::string label, int width, int height, Color
     sg_pixel_format pixelFormat;
     if (colorFormat == ColorFormat::RGBA){
         pixelFormat = SG_PIXELFORMAT_RGBA8;
-    }else if (colorFormat == ColorFormat::GRAY){
+    }else if (colorFormat == ColorFormat::RED){
         pixelFormat = SG_PIXELFORMAT_R8;
     }else{
         Log::Error("Renders only support 8bpp and 32bpp textures");

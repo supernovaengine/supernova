@@ -63,7 +63,7 @@ bool TextureData::loadTextureFromFile(const char* filename) {
 
     //Renders (not GL) only support 8bpp and 32bpp
     int desired_channels = 1;
-    color_format = ColorFormat::GRAY;
+    color_format = ColorFormat::RED;
 
     if (channels != 1){
         desired_channels = 4;

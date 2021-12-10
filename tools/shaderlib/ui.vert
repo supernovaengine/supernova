@@ -16,7 +16,7 @@ in vec3 a_position;
     out vec4 v_color;
 #endif
 
-#ifdef HAS_TEXTURE
+#if defined(HAS_TEXTURE) || defined(HAS_FONTATLAS_TEXTURE)
     in vec2 a_texcoord1;
     out vec2 v_uv1;
 #endif
@@ -29,7 +29,7 @@ void main() {
         v_color = a_color;
     #endif
 
-    #ifdef HAS_TEXTURE
+    #if defined(HAS_TEXTURE) || defined(HAS_FONTATLAS_TEXTURE)
         v_uv1 = a_texcoord1;
     #endif
 

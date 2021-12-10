@@ -10,6 +10,7 @@ Texture::Texture(){
     this->render = NULL;
     this->loadFromPath = false;
     this->transparent = false;
+    this->releaseDataAfterLoad = true;
     this->needLoad = false;
 }
 
@@ -19,6 +20,7 @@ Texture::Texture(std::string path){
     this->id = path;
     this->type = TextureType::TEXTURE_2D;
     this->loadFromPath = true;
+    this->releaseDataAfterLoad = true;
     this->needLoad = true;
     this->transparent = false;
 }
@@ -29,6 +31,7 @@ Texture::Texture(TextureData data, std::string id){
     this->id = id;
     this->type = TextureType::TEXTURE_2D;
     this->loadFromPath = false;
+    this->releaseDataAfterLoad = false;
     this->needLoad = true;
     this->transparent = false;
 }
@@ -42,6 +45,7 @@ Texture::Texture(const Texture& rhs){
         data[i] = rhs.data[i];
     }
     loadFromPath = rhs.loadFromPath;
+    releaseDataAfterLoad = rhs.releaseDataAfterLoad;
     needLoad = rhs.needLoad;
     transparent = rhs.transparent;
 }
@@ -55,6 +59,7 @@ Texture& Texture::operator=(const Texture& rhs){
         data[i] = rhs.data[i];
     }
     loadFromPath = rhs.loadFromPath;
+    releaseDataAfterLoad = rhs.releaseDataAfterLoad;
     needLoad = rhs.needLoad;
     transparent = rhs.transparent;
 
@@ -70,6 +75,7 @@ void Texture::setPath(std::string path){
     this->id = path;
     this->type = TextureType::TEXTURE_2D;
     this->loadFromPath = true;
+    this->releaseDataAfterLoad = true;
     this->needLoad = true;
     this->transparent = false;
 }
@@ -79,6 +85,7 @@ void Texture::setData(TextureData data, std::string id){
     this->id = id;
     this->type = TextureType::TEXTURE_2D;
     this->loadFromPath = false;
+    this->releaseDataAfterLoad = false;
     this->needLoad = true;
     this->transparent = false;
 }
@@ -88,6 +95,7 @@ void Texture::setCubePath(size_t index, std::string path){
 
     this->type = TextureType::TEXTURE_CUBE;
     this->loadFromPath = true;
+    this->releaseDataAfterLoad = true;
     this->needLoad = true;
     this->transparent = false;
 
@@ -108,6 +116,7 @@ void Texture::setCubePaths(std::string front, std::string back, std::string left
 
     this->type = TextureType::TEXTURE_CUBE;
     this->loadFromPath = true;
+    this->releaseDataAfterLoad = true;
     this->needLoad = true;
     this->transparent = false;
 
@@ -148,8 +157,7 @@ bool Texture::load(){
 
 	render = TexturePool::get(id, type, data);
 
-    if (loadFromPath){
-        //Prevent GLTF release because GLTF can have multiple textures with the same data
+    if (releaseDataAfterLoad){
         for (int f = 0; f < numFaces; f++){
     	    data[f].releaseImageData();
 	    }
@@ -175,6 +183,10 @@ TextureRender* Texture::getRender(){
         return NULL;
 
     return render.get();
+}
+
+void Texture::setReleaseDataAfterLoad(bool releaseDataAfterLoad){
+    this->releaseDataAfterLoad = releaseDataAfterLoad;
 }
 
 bool Texture::isTransparent(){

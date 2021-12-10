@@ -197,7 +197,7 @@ namespace Supernova{
     };
 
     enum class ColorFormat{
-        GRAY,
+        RED,
         RGBA
     };
 

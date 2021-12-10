@@ -137,7 +137,7 @@ bool Model::loadGLTFTexture(int textureIndex, Texture& texture, std::string text
 
         ColorFormat colorFormat;    
         if (image.component == 1){
-            colorFormat = ColorFormat::GRAY;
+            colorFormat = ColorFormat::RED;
         }else if (image.component == 4){
             colorFormat = ColorFormat::RGBA;
         }else{
@@ -149,6 +149,9 @@ bool Model::loadGLTFTexture(int textureIndex, Texture& texture, std::string text
 
         std::string id = textureName + "|" + image.name;
         texture.setData(textureData, id);
+        // Prevent GLTF release because GLTF can have multiple textures with the same data
+        // Image data is stored in tinygltf::Image
+        texture.setReleaseDataAfterLoad(false);
     }
 
     return true;

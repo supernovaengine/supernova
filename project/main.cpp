@@ -213,6 +213,7 @@ void onKeyDown(int key, bool repeat, int mods){
 #include "Light.h"
 #include "Sprite.h"
 #include "math/Angle.h"
+#include "Text.h"
 
 using namespace Supernova;
 
@@ -233,7 +234,6 @@ void onTouchEnd(int pointer, float x, float y);
 void onTouchCancel();
 
 Scene scene;
-Scene uiscene;
 //Mesh child2(&scene);
 //Object objeto(&scene);
 //Mesh child1(&scene);
@@ -246,8 +246,11 @@ SkyBox sky(&scene);
 //Light lightDir2(&scene);
 //Light lightPoint(&scene);
 //Light lightSpot(&scene);
-Sprite sprite(&scene, 20, 20);
+//Sprite billboard(&scene, 20, 20);
+
+Scene uiscene;
 Sprite spriteui(&uiscene, 200, 200);
+Text text(&uiscene);
 
 float rotationY = 0;
 float speed = 0;
@@ -293,11 +296,15 @@ void init(){
     sky.setTextureUp("ely_hills/hills_up.tga");
     sky.setTextureDown("ely_hills/hills_dn.tga");
 
-    sprite.setTexture("block.png");
-    sprite.setBillboard(true, true, true);
-    carro.addChild(&sprite);
+    //billboard.setTexture("block.png");
+    //billboard.setBillboard(true, true, true);
+    //carro.addChild(&billboard);
 
     spriteui.setTexture("block.png");
+    spriteui.setPosition(200,200,0);
+
+    text.setColor(0.0, 0.0, 0.0, 1.0);
+    text.setPosition(200,200,0);
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
     camera.setType(CameraType::CAMERA_PERSPECTIVE);
@@ -306,13 +313,13 @@ void init(){
     camera.setPosition(0,80,100);
     //carro.addChild(&camera);
 
-    carro.loadOBJ("jeep/Jeep.obj");
-    carro.setPosition(0, 0, 20);
-    carro.setScale(5);
+    //carro.loadOBJ("jeep/Jeep.obj");
+    //carro.setPosition(0, 0, 20);
+    //carro.setScale(5);
 
-    //carro.loadGLTF("WaterBottle.glb");
-    //carro.setPosition(0, 30, 20);
-    //carro.setScale(200);
+    carro.loadGLTF("WaterBottle.glb");
+    carro.setPosition(0, 30, 20);
+    carro.setScale(200);
 
     carro.setName("carro");
 

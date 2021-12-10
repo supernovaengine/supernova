@@ -1,3 +1,7 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef ACTIONSYSTEM_H
 #define ACTIONSYSTEM_H
 
@@ -74,4 +78,4 @@ namespace Supernova{
 
 }
 
-#endif //RENDERSYSTEM_H
+#endif //ACTIONSYSTEM_H

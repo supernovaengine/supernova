@@ -29,6 +29,8 @@ def get_define(property):
         return 'HAS_NORMAL_MAP'
     elif property == 'Tan':
         return 'HAS_TANGENTS'
+    elif property == 'Ftx':
+        return 'HAS_FONTATLAS_TEXTURE'
     elif property == 'Vc3':
         return 'HAS_VERTEX_COLOR_VEC3'
     elif property == 'Vc4':
@@ -59,6 +61,7 @@ def get_default_shaders():
     s += "sky;"
     s += "ui_Vc4;"
     s += "ui_TexVc4;"
+    s += "ui_Ftx;"
     s += "points_Vc4;"
     s += "points_TexVc4;"
     s += "points_TexVc4Txr"

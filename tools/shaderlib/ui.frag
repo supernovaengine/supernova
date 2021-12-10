@@ -13,7 +13,7 @@ out vec4 g_finalColor;
     in vec4 v_color;
 #endif
 
-#ifdef HAS_TEXTURE
+#if defined(HAS_TEXTURE) || defined(HAS_FONTATLAS_TEXTURE)
     uniform sampler2D u_uiTexture;
     in vec2 v_uv1;
 #endif
@@ -37,6 +37,9 @@ vec4 getBaseColor(){
     vec4 baseColor = uiParams.color;
     #ifdef HAS_TEXTURE
         baseColor *= sRGBToLinear(texture(u_uiTexture, v_uv1));
+    #endif
+    #ifdef HAS_FONTATLAS_TEXTURE
+        baseColor *= vec4(1.0, 1.0, 1.0, texture(u_uiTexture, v_uv1).r);
     #endif
     return baseColor * getVertexColor();
 }

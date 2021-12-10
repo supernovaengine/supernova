@@ -21,6 +21,7 @@ namespace Supernova{
             bool loadFromPath;
             bool transparent;
 
+            bool releaseDataAfterLoad;
             bool needLoad;
 
         public:
@@ -42,6 +43,8 @@ namespace Supernova{
             void destroy();
 
             TextureRender* getRender();
+
+            void setReleaseDataAfterLoad(bool releaseDataAfterLoad);
 
             bool isTransparent();
             bool empty();

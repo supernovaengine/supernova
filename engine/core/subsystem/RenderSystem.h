@@ -1,3 +1,7 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H
 
