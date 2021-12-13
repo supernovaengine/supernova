@@ -552,7 +552,31 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMat
 	}
 }
 
-bool RenderSystem::loadUI(UIRenderComponent& ui){
+void RenderSystem::destroyMesh(MeshComponent& mesh){
+	for (int i = 0; i < mesh.numSubmeshes; i++){
+
+		Submesh& submesh = mesh.submeshes[i];
+
+		//Destroy shader
+		submesh.shader.reset();
+		ShaderPool::remove(ShaderType::MESH, mesh.submeshes[i].shaderProperties);
+		if (hasShadows && mesh.castShadows)
+			ShaderPool::remove(ShaderType::DEPTH, "");
+
+		//Destroy texture
+		submesh.material.baseColorTexture.destroy();
+
+		//Destroy render
+		submesh.render.destroy();
+	}
+
+	//Destroy buffers
+	for (auto const& buf : mesh.buffers){
+		buf.second->getRender()->destroyBuffer();
+	}
+}
+
+bool RenderSystem::loadUI(UIRenderComponent& ui, bool isText){
 	ObjectRender& render = ui.render;
 
 	render.beginLoad(ui.primitiveType, false);
@@ -563,7 +587,7 @@ bool RenderSystem::loadUI(UIRenderComponent& ui){
 	bool p_vertexColorVec4 = true;
 	bool p_hasFontAtlasTexture = false;
 	if (textureRender){
-		if (ui.isFont){
+		if (isText){
 			p_vertexColorVec4 = false;
 			p_hasFontAtlasTexture = true;
 		}else{
@@ -583,15 +607,28 @@ bool RenderSystem::loadUI(UIRenderComponent& ui){
 	ui.slotVSParams = shaderData.getUniformIndex(UniformType::UI_VS_PARAMS, ShaderStageType::VERTEX);
 	ui.slotFSParams = shaderData.getUniformIndex(UniformType::UI_FS_PARAMS, ShaderStageType::FRAGMENT);
 
-	ui.buffer->getRender()->createBuffer(ui.buffer->getSize(), ui.buffer->getData(), ui.buffer->getType(), ui.buffer->getUsage());
+	size_t bufferSize;
+	size_t minBufferSize;
+
+	bufferSize = ui.buffer->getSize();
+	minBufferSize = ui.minBufferCount * ui.buffer->getStride();
+	if (minBufferSize > bufferSize)
+		bufferSize = minBufferSize;
+
+	ui.buffer->getRender()->createBuffer(bufferSize, ui.buffer->getData(), ui.buffer->getType(), ui.buffer->getUsage());
 	if (ui.buffer->isRenderAttributes()) {
         for (auto const &attr : ui.buffer->getAttributes()) {
 			render.loadAttribute(shaderData.getAttrIndex(attr.first), ui.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), ui.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
         }
     }
 
+	bufferSize = ui.indices->getSize();
+	minBufferSize = ui.minIndicesCount * ui.indices->getStride();
+	if (minBufferSize > bufferSize)
+		bufferSize = minBufferSize;
+
 	if (ui.indices->getCount() > 0){
-		ui.indices->getRender()->createBuffer(ui.indices->getSize(), ui.indices->getData(), ui.indices->getType(), ui.indices->getUsage());
+		ui.indices->getRender()->createBuffer(bufferSize, ui.indices->getData(), ui.indices->getType(), ui.indices->getUsage());
 		ui.vertexCount = ui.indices->getCount();
 		Attribute indexattr = ui.indices->getAttributes()[AttributeType::INDEX];
 		render.loadIndex(ui.indices->getRender(), indexattr.getDataType(), indexattr.getOffset());
@@ -610,7 +647,20 @@ bool RenderSystem::loadUI(UIRenderComponent& ui){
 }
 
 void RenderSystem::drawUI(UIRenderComponent& ui, Transform& transform){
-	if (ui.loaded){
+	if (ui.loaded && ui.buffer->getSize() > 0){
+
+		if (ui.needUpdateBuffer){
+			ui.buffer->getRender()->updateBuffer(ui.buffer->getSize(), ui.buffer->getData());
+
+			if (ui.indices->getCount() > 0){
+				ui.indices->getRender()->updateBuffer(ui.indices->getSize(), ui.indices->getData());
+				ui.vertexCount = ui.indices->getCount();
+			}else{
+				ui.vertexCount = ui.buffer->getCount();
+			}
+
+			ui.needUpdateBuffer = false;
+		}
 
 		ObjectRender& render = ui.render;
 
@@ -620,6 +670,26 @@ void RenderSystem::drawUI(UIRenderComponent& ui, Transform& transform){
 		render.applyUniform(ui.slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 4, &ui.color);
 		render.draw(ui.vertexCount);
 
+	}
+}
+
+void RenderSystem::destroyUI(UIRenderComponent& ui){
+	//Destroy shader
+	ui.shader.reset();
+	ShaderPool::remove(ShaderType::UI, ui.shaderProperties);
+
+	//Destroy texture
+	ui.texture.destroy();
+
+	//Destroy render
+	ui.render.destroy();
+
+	//Destroy buffer
+	if (ui.buffer){
+		ui.buffer->getRender()->destroyBuffer();
+	}
+	if (ui.indices){
+		ui.indices->getRender()->destroyBuffer();
 	}
 }
 
@@ -686,6 +756,23 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 	}
 }
 
+void RenderSystem::destroyParticles(ParticlesComponent& particles){
+	//Destroy shader
+	particles.shader.reset();
+	ShaderPool::remove(ShaderType::POINTS, particles.shaderProperties);
+
+	//Destroy texture
+	particles.texture.destroy();
+
+	//Destroy render
+	particles.render.destroy();
+
+	//Destroy buffer
+	if (particles.buffer){
+		particles.buffer->getRender()->destroyBuffer();
+	}
+}
+
 bool RenderSystem::loadSky(SkyComponent& sky){
 
 	ObjectRender* render = &sky.render;
@@ -730,6 +817,23 @@ void RenderSystem::drawSky(SkyComponent& sky){
 		render.beginDraw();
 		render.applyUniform(sky.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &sky.skyViewProjectionMatrix);
 		render.draw(36);
+	}
+}
+
+void RenderSystem::destroySky(SkyComponent& sky){
+	//Destroy shader
+	sky.shader.reset();
+	ShaderPool::remove(ShaderType::SKYBOX, "");
+
+	//Destroy texture
+	sky.texture.destroy();
+
+	//Destroy render
+	sky.render.destroy();
+
+	//Destroy buffer
+	if (sky.buffer){
+		sky.buffer->getRender()->destroyBuffer();
 	}
 }
 
@@ -1218,8 +1322,13 @@ void RenderSystem::draw(){
 		}else if (signature.test(scene->getComponentType<UIRenderComponent>())){
 			UIRenderComponent& ui = scene->getComponent<UIRenderComponent>(entity);
 
+			bool isText = false;
+			if (signature.test(scene->getComponentType<TextComponent>())){
+				isText = true;
+			}
+
 			if (!ui.loaded){
-				loadUI(ui);
+				loadUI(ui, isText);
 			}
 			drawUI(ui, transform);
 
@@ -1280,68 +1389,21 @@ void RenderSystem::draw(){
 }
 
 void RenderSystem::entityDestroyed(Entity entity){
-	auto mesh = scene->findComponent<MeshComponent>(entity);
-	if (mesh){
-		for (int i = 0; i < mesh->numSubmeshes; i++){
+	Signature signature = scene->getSignature(entity);
 
-			Submesh& submesh = mesh->submeshes[i];
-
-			//Destroy shader
-			submesh.shader.reset();
-			ShaderPool::remove(ShaderType::MESH, mesh->submeshes[i].shaderProperties);
-			if (hasShadows && mesh->castShadows)
-				ShaderPool::remove(ShaderType::DEPTH, "");
-
-			//Destroy texture
-			submesh.material.baseColorTexture.destroy();
-
-			//Destroy render
-			submesh.render.destroy();
-		}
-
-		//Destroy buffers
-		for (auto const& buf : mesh->buffers){
-			buf.second->getRender()->destroyBuffer();
-		}
+	if (signature.test(scene->getComponentType<MeshComponent>())){
+		destroyMesh(scene->getComponent<MeshComponent>(entity));
 	}
 
-	auto sky = scene->findComponent<SkyComponent>(entity);
-	if (sky){
-		//Destroy shader
-		sky->shader.reset();
-		ShaderPool::remove(ShaderType::SKYBOX, "");
-
-		//Destroy texture
-		sky->texture.destroy();
-
-		//Destroy render
-		sky->render.destroy();
-
-		//Destroy buffer
-		if (sky->buffer){
-			sky->buffer->getRender()->destroyBuffer();
-		}
+	if (signature.test(scene->getComponentType<UIRenderComponent>())){
+		destroyUI(scene->getComponent<UIRenderComponent>(entity));
 	}
 
-	auto ui = scene->findComponent<UIRenderComponent>(entity);
-	if (ui){
-		//Destroy shader
-		ui->shader.reset();
-		ShaderPool::remove(ShaderType::UI, ui->shaderProperties);
-
-		//Destroy texture
-		ui->texture.destroy();
-
-		//Destroy render
-		ui->render.destroy();
-
-		//Destroy buffer
-		if (ui->buffer){
-			ui->buffer->getRender()->destroyBuffer();
-		}
-		if (ui->indices){
-			ui->indices->getRender()->destroyBuffer();
-		}
+	if (signature.test(scene->getComponentType<ParticlesComponent>())){
+		destroyParticles(scene->getComponent<ParticlesComponent>(entity));
 	}
 
+	if (signature.test(scene->getComponentType<SkyComponent>())){
+		destroySky(scene->getComponent<SkyComponent>(entity));
+	}
 }

@@ -31,6 +31,8 @@ void UISystem::loadFontAtlas(TextComponent& text, UIRenderComponent& ui){
 
     ui.texture.setData(*textureData, fontId + std::string("|") + std::to_string(text.fontSize));
     ui.texture.setReleaseDataAfterLoad(true);
+
+    text.loaded = true;
 }
 
 void UISystem::createText(TextComponent& text, UIRenderComponent& ui){
@@ -44,6 +46,8 @@ void UISystem::createText(TextComponent& text, UIRenderComponent& ui){
     ui.indices->setValues(
             0, ui.indices->getAttribute(AttributeType::INDEX),
             indices_array.size(), (char*)&indices_array[0], sizeof(uint16_t));
+
+    ui.needUpdateBuffer = true;
 }
 
 void UISystem::load(){
@@ -66,7 +70,9 @@ void UISystem::update(double dt){
             if (signature.test(scene->getComponentType<UIRenderComponent>())){
                 UIRenderComponent& ui = scene->getComponent<UIRenderComponent>(entity);
 
-                loadFontAtlas(text, ui);
+                if (!text.loaded){
+                    loadFontAtlas(text, ui);
+                }
                 createText(text, ui);
             }
 
@@ -82,7 +88,7 @@ void UISystem::entityDestroyed(Entity entity){
     if (signature.test(scene->getComponentType<TextComponent>())){
         TextComponent& text = scene->getComponent<TextComponent>(entity);
 
-        if (!text.stbtext){
+        if (text.stbtext){
             delete text.stbtext;
         }
     }

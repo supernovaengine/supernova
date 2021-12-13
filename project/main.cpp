@@ -242,14 +242,14 @@ Model carro(&scene);
 //Mesh* child11;
 PlaneTerrain plane(&scene);
 SkyBox sky(&scene);
-//Light lightDir(&scene);
+Light lightDir(&scene);
 //Light lightDir2(&scene);
-//Light lightPoint(&scene);
-//Light lightSpot(&scene);
+Light lightPoint(&scene);
+Light lightSpot(&scene);
 //Sprite billboard(&scene, 20, 20);
 
 Scene uiscene;
-Sprite spriteui(&uiscene, 200, 200);
+//Sprite spriteui(&uiscene, 200, 200);
 Text text(&uiscene);
 
 float rotationY = 0;
@@ -259,12 +259,12 @@ Camera camera(&scene);
 
 void init(){
 
-    //lightDir.setType(LightType::DIRECTIONAL);
-    //lightDir.setDirection(0.5f, -0.5, 0.0);
-    //lightDir.setRange(0.0);
-    //lightDir.setPosition(0.0f, 0.0f, 0.0f);
-    //lightDir.setIntensity(1.0);
-    //lightDir.setShadows(true);
+    lightDir.setType(LightType::DIRECTIONAL);
+    lightDir.setDirection(0.5f, -0.5, 0.0);
+    lightDir.setRange(0.0);
+    lightDir.setPosition(0.0f, 0.0f, 0.0f);
+    lightDir.setIntensity(1.0);
+    lightDir.setShadows(true);
 
     //lightDir2.setType(LightType::DIRECTIONAL);
     //lightDir2.setDirection(-0.5f, -0.5, 0.0);
@@ -273,21 +273,21 @@ void init(){
     //lightDir2.setIntensity(1.0);
     //lightDir2.setShadows(false);
 
-    //lightPoint.setType(LightType::POINT);
-    //lightPoint.setDirection(0.0, 0.0, 0.0);
-    //lightPoint.setRange(0.0);
-    //lightPoint.setPosition(300.0f, 80.0f, 80.0f);
-    //lightPoint.setIntensity(100000.0);
-    //lightPoint.setShadows(true);
+    lightPoint.setType(LightType::POINT);
+    lightPoint.setDirection(0.0, 0.0, 0.0);
+    lightPoint.setRange(0.0);
+    lightPoint.setPosition(300.0f, 80.0f, 80.0f);
+    lightPoint.setIntensity(100000.0);
+    lightPoint.setShadows(true);
 
-    //lightSpot.setType(LightType::SPOT);
-    //lightSpot.setDirection(0.0f, -0.7, 0.3);
-    //lightSpot.setRange(0.0);
-    //lightSpot.setPosition(0.0f, 150.0f/5.0, 0.0f);
-    //lightSpot.setIntensity(100000.0);
-    //lightSpot.setConeAngle(50, 70);
-    //lightSpot.setShadows(true);
-    //carro.addChild(&lightSpot);
+    lightSpot.setType(LightType::SPOT);
+    lightSpot.setDirection(0.0f, -0.7, 0.3);
+    lightSpot.setRange(0.0);
+    lightSpot.setPosition(0.0f, 150.0f/5.0, 0.0f);
+    lightSpot.setIntensity(100000.0);
+    lightSpot.setConeAngle(50, 70);
+    lightSpot.setShadows(true);
+    carro.addChild(&lightSpot);
 
     sky.setTextureLeft("ely_hills/hills_lf.tga");
     sky.setTextureRight("ely_hills/hills_rt.tga");
@@ -300,8 +300,8 @@ void init(){
     //billboard.setBillboard(true, true, true);
     //carro.addChild(&billboard);
 
-    spriteui.setTexture("block.png");
-    spriteui.setPosition(200,200,0);
+    //spriteui.setTexture("block.png");
+    //spriteui.setPosition(200,200,0);
 
     text.setColor(0.0, 0.0, 0.0, 1.0);
     text.setPosition(200,200,0);
@@ -313,13 +313,13 @@ void init(){
     camera.setPosition(0,80,100);
     //carro.addChild(&camera);
 
-    //carro.loadOBJ("jeep/Jeep.obj");
-    //carro.setPosition(0, 0, 20);
-    //carro.setScale(5);
+    carro.loadOBJ("jeep/Jeep.obj");
+    carro.setPosition(0, 0, 20);
+    carro.setScale(5);
 
-    carro.loadGLTF("WaterBottle.glb");
-    carro.setPosition(0, 30, 20);
-    carro.setScale(200);
+    //carro.loadGLTF("WaterBottle.glb");
+    //carro.setPosition(0, 30, 20);
+    //carro.setScale(200);
 
     carro.setName("carro");
 
@@ -396,6 +396,8 @@ void init(){
 }
 
 void onUpdate(){
+    text.setText(std::to_string(Engine::getFramerate()));
+
     if (Input::isKeyPressed(S_KEY_LEFT)){
         rotationY += 4;
     }

@@ -12,26 +12,29 @@ Text::Text(Scene* scene): Object(scene){
     uicomp.buffer = &buffer;
     uicomp.indices = &indices;
     uicomp.primitiveType = PrimitiveType::TRIANGLES;
-    uicomp.isFont = true;
 
 	buffer.clearAll();
 	buffer.addAttribute(AttributeType::POSITION, 3);
 	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    buffer.setUsage(BufferUsage::DYNAMIC);
+
+    indices.setUsage(BufferUsage::DYNAMIC);
 
     TextComponent& textcomp = getComponent<TextComponent>();
     textcomp.text = "";
 
-    setText("Edu");
+    uicomp.minBufferCount = textcomp.maxLength * 4;
+    uicomp.minIndicesCount = textcomp.maxLength * 6;
 }
 
 Text::~Text() {
 }
 
 void Text::setText(std::string text){
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
     TextComponent& textcomp = getComponent<TextComponent>();
 
     textcomp.text = text;
+    textcomp.needUpdate = true;
 }
 
 void Text::setColor(Vector4 color){

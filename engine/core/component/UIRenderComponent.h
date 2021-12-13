@@ -16,6 +16,9 @@ namespace Supernova{
         Buffer* buffer;
         Buffer* indices;
 
+        unsigned int minBufferCount = 0;
+        unsigned int minIndicesCount = 0;
+
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
         std::string shaderProperties;
@@ -25,10 +28,10 @@ namespace Supernova{
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;
         unsigned int vertexCount = 0;
 
-        bool isFont = false;
-
         Texture texture;
         Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0); //linear color
+
+        bool needUpdateBuffer = false;
     };
     
 }

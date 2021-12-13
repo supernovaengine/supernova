@@ -8,10 +8,13 @@ namespace Supernova{
     class STBText;
 
     struct TextComponent{
+        bool loaded = false;
+
         std::string font = "";
         std::string text = "";
         unsigned int fontSize = 40;
         bool multiline = true;
+        unsigned int maxLength = 100;
 
         std::vector<Vector2> charPositions;
 

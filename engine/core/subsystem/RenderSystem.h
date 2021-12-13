@@ -91,15 +91,19 @@ namespace Supernova{
 		bool loadMesh(MeshComponent& mesh);
 		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform);
 		void drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix);
+		void destroyMesh(MeshComponent& mesh);
 
-		bool loadUI(UIRenderComponent& ui);
+		bool loadUI(UIRenderComponent& ui, bool isText);
 		void drawUI(UIRenderComponent& ui, Transform& transform);
+		void destroyUI(UIRenderComponent& ui);
 
 		bool loadParticles(ParticlesComponent& particles);
 		void drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform);
+		void destroyParticles(ParticlesComponent& particles);
 
 		bool loadSky(SkyComponent& sky);
 		void drawSky(SkyComponent& sky);
+		void destroySky(SkyComponent& sky);
 
 		void updateTransform(Transform& transform);
 		void updateCamera(CameraComponent& camera, Transform& transform);
