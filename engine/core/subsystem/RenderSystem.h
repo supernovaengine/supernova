@@ -109,7 +109,7 @@ namespace Supernova{
 		void updateCamera(CameraComponent& camera, Transform& transform);
 		void updateSkyViewProjection(CameraComponent& camera);
 		void updateLightFromTransform(LightComponent& light, Transform& transform);
-		void updateParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform);
+		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform);
 	
 		virtual void load();
 		virtual void draw();

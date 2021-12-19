@@ -700,6 +700,12 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 
 	TextureRender* textureRender = particles.texture.getRender();
 
+	if (Engine::isAutomaticTransparency() && !particles.transparency){
+		if (particles.texture.isTransparent()){ // Particle color is not tested here
+			particles.transparency = true;
+		}
+	}
+
 	bool p_hasTexture = false;
 	bool p_hasTextureRect = false;
 	if (textureRender){
@@ -911,12 +917,14 @@ void RenderSystem::updateSkyViewProjection(CameraComponent& camera){
 	}
 }
 
-void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform){
-	particles.shaderParticles.resize(particles.particles.size());
+void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform){
+	particles.shaderParticles.clear();
+	particles.shaderParticles.reserve(particles.particles.size());
 
 	particles.numVisible = 0;
 	for (int i = 0; i < particles.particles.size(); i++){
 		if (particles.particles[i].life > particles.particles[i].time){
+			particles.shaderParticles.push_back({});
 			particles.shaderParticles[particles.numVisible].position = particles.particles[i].position;
 			particles.shaderParticles[particles.numVisible].color = particles.particles[i].color;
 			particles.shaderParticles[particles.numVisible].size = particles.particles[i].size;
@@ -926,12 +934,14 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 		}
 	}
 
-	auto comparePoints = [&transform, &camTransform](const ParticleShaderData& a, const ParticleShaderData& b) -> bool {
-		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
-		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
-		return distanceToCameraA > distanceToCameraB;
-	};
-	std::sort(particles.shaderParticles.begin(), particles.shaderParticles.end(), comparePoints);
+	if (particles.transparency && camera.type != CameraType::CAMERA_2D){
+		auto comparePoints = [&transform, &camTransform](const ParticleShaderData& a, const ParticleShaderData& b) -> bool {
+			float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
+			float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
+			return distanceToCameraA > distanceToCameraB;
+		};
+		std::sort(particles.shaderParticles.begin(), particles.shaderParticles.end(), comparePoints);
+	}
 
 	((ExternalBuffer*)particles.buffer)->setData((unsigned char*)(&particles.shaderParticles.at(0)), sizeof(ParticleShaderData)*particles.numVisible);
 
@@ -1235,7 +1245,7 @@ void RenderSystem::update(double dt){
 			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
 			
 			if (particles.needUpdate || camera.needUpdate || transform.needUpdate){
-				updateParticles(particles, transform, cameraTransform);
+				updateParticles(particles, transform, camera, cameraTransform);
 			}
 
 			particles.needUpdate = false;

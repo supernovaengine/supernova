@@ -49,6 +49,7 @@ namespace Supernova{
 
         Texture texture;
 
+        bool transparency = false;
         bool hasTextureRect = false;
 
         bool needUpdate = true;
