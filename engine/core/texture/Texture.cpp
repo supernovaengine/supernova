@@ -71,6 +71,8 @@ Texture::~Texture(){
 }
 
 void Texture::setPath(std::string path){
+    destroy();
+
     this->paths[0] = path;
     this->id = path;
     this->type = TextureType::TEXTURE_2D;
@@ -81,6 +83,8 @@ void Texture::setPath(std::string path){
 }
 
 void Texture::setData(TextureData data, std::string id){
+    destroy();
+
     this->data[0] = data;
     this->id = id;
     this->type = TextureType::TEXTURE_2D;
@@ -91,6 +95,8 @@ void Texture::setData(TextureData data, std::string id){
 }
 
 void Texture::setCubePath(size_t index, std::string path){
+    destroy();
+
     this->paths[index] = path;
 
     this->type = TextureType::TEXTURE_CUBE;
@@ -107,6 +113,8 @@ void Texture::setCubePath(size_t index, std::string path){
 }
 
 void Texture::setCubePaths(std::string front, std::string back, std::string left, std::string right, std::string up, std::string down){
+    destroy();
+
     this->paths[5] = front;
     this->paths[4] = back;
     this->paths[1] = left;
@@ -169,7 +177,7 @@ bool Texture::load(){
 }
 
 void Texture::destroy(){
-    if (!id.empty()){
+    if (!id.empty() && render){
 	    render.reset();
 	    TexturePool::remove(id);
     }

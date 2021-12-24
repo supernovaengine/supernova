@@ -43,6 +43,8 @@ namespace Supernova{
         bool hasTangent = false;
         bool hasVertexColor = false;
         bool hasTextureRect = false;
+
+        bool needUpdateTexture = false;
     };
 
     struct MeshComponent{

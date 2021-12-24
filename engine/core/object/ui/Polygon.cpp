@@ -93,5 +93,5 @@ void Polygon::setTexture(std::string path){
 
     uicomp.texture.setPath(path);
 
-    //TODO: update texture, reload entity
+    uicomp.needUpdateTexture = true;
 }

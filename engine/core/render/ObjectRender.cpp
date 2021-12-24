@@ -19,20 +19,20 @@ void ObjectRender::beginLoad(PrimitiveType primitiveType, bool depth){
     backend.beginLoad(primitiveType, depth);
 }
 
-void ObjectRender::loadIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset){
-    backend.loadIndex(buffer, dataType, offset);
+void ObjectRender::addIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset){
+    backend.addIndex(buffer, dataType, offset);
 }
 
-void ObjectRender::loadAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
-    backend.loadAttribute(slotAttribute, buffer, elements, dataType, stride, offset, normalized);
+void ObjectRender::addAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
+    backend.addAttribute(slotAttribute, buffer, elements, dataType, stride, offset, normalized);
 }
 
-void ObjectRender::loadShader(ShaderRender* shader){
-    backend.loadShader(shader);
+void ObjectRender::addShader(ShaderRender* shader){
+    backend.addShader(shader);
 }
 
-void ObjectRender::loadTexture(int slotTexture, ShaderStageType stage, TextureRender* texture){
-    backend.loadTexture(slotTexture, stage, texture);
+void ObjectRender::addTexture(int slotTexture, ShaderStageType stage, TextureRender* texture){
+    backend.addTexture(slotTexture, stage, texture);
 }
 
 void ObjectRender::endLoad(){

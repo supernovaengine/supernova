@@ -1,4 +1,4 @@
-/*
+
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -187,6 +187,8 @@ void onKeyDown(int key, bool repeat, int mods){
         coloraction.start();
         alphaaction.start();
         partianim.start();
+
+        polygon3.setTexture("block.png");
     }
     if (key == S_KEY_T){
         spriteanim.pause();
@@ -197,9 +199,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
-*/
 
 
+/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -452,6 +454,8 @@ void onTouchCancel(){
 }
 
 void onMouseDown(int button, int mods){
+    //plane.setTexture("block.png");
+
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)
         modifier += "shift;";
@@ -576,3 +580,4 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
+*/

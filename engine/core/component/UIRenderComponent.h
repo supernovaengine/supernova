@@ -32,6 +32,7 @@ namespace Supernova{
         Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0); //linear color
 
         bool needUpdateBuffer = false;
+        bool needUpdateTexture = false;
     };
     
 }

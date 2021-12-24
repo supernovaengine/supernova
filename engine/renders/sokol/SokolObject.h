@@ -46,10 +46,10 @@ namespace Supernova{
         SokolObject& operator=(const SokolObject& rhs);
 
         void beginLoad(PrimitiveType primitiveType, bool depth);
-        void loadIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset);
-        void loadAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized);
-        void loadShader(ShaderRender* shader);
-        void loadTexture(int slotTexture, ShaderStageType stage, TextureRender* texture);
+        void addIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset);
+        void addAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized);
+        void addShader(ShaderRender* shader);
+        void addTexture(int slotTexture, ShaderStageType stage, TextureRender* texture);
         void endLoad();
 
         void beginDraw();

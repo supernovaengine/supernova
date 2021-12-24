@@ -41,7 +41,7 @@ void Mesh::setTexture(std::string path){
 
     mesh.submeshes[0].material.baseColorTexture.setPath(path);
 
-    //TODO: update texture, reload entity
+    mesh.submeshes[0].needUpdateTexture = true;
 }
 
 void Mesh::setColor(Vector4 color){

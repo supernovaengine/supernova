@@ -110,7 +110,7 @@ void SokolObject::beginLoad(PrimitiveType primitiveType, bool depth){
     bufferToBindSlot.clear();
 }
 
-void SokolObject::loadIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset){
+void SokolObject::addIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset){
     sg_buffer ibuf = buffer->backend.get();
     bind.index_buffer = ibuf;
     bind.index_buffer_offset = offset;
@@ -124,7 +124,7 @@ void SokolObject::loadIndex(BufferRender* buffer, AttributeDataType dataType, si
     }
 }
 
-void SokolObject::loadAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
+void SokolObject::addAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
     if (slotAttribute != -1){
         sg_buffer vbuf = buffer->backend.get();
         
@@ -145,11 +145,11 @@ void SokolObject::loadAttribute(int slotAttribute, BufferRender* buffer, unsigne
     }
 }
 
-void SokolObject::loadShader(ShaderRender* shader){
+void SokolObject::addShader(ShaderRender* shader){
     pipeline_desc.shader = shader->backend.get();
 }
 
-void SokolObject::loadTexture(int slotTexture, ShaderStageType stage, TextureRender* texture){
+void SokolObject::addTexture(int slotTexture, ShaderStageType stage, TextureRender* texture){
     if (slotTexture != -1){
         sg_image image = texture->backend.get();
         if (stage == ShaderStageType::VERTEX){
