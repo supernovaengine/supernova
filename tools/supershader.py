@@ -52,10 +52,15 @@ def get_output(shader, project, lang):
 
 def get_default_shaders():
     s =  "mesh_Uv1PucNorNmpTanVc4;"
+    s =  "mesh_Uv1PucNorNmpTan;"
     s += "mesh_Uv1PucShwNorNmpTanVc4;"
+    s += "mesh_Uv1PucShwNorNmpTan;"
     s += "mesh_Uv1PucNorVc4;"
+    s += "mesh_Uv1PucNor;"
     s += "mesh_Uv1PucShwNorVc4;"
+    s += "mesh_Uv1PucShwNor;"
     s += "mesh_UltUv1Vc4;"
+    s += "mesh_UltUv1;"
     s += "mesh_UltUv1Vc4Txr;"
     s += "depth;"
     s += "sky;"

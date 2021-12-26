@@ -375,6 +375,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		bool p_hasTangent = false;
 		bool p_castShadows = false;
 		bool p_textureRect = false;
+		bool p_vertexColorVec4 = false;
 
 		if (hasLights){
 			p_punctual = true;
@@ -395,8 +396,11 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		if (mesh.submeshes[i].hasTextureRect){
 			p_textureRect = true;
 		}
+		if (mesh.submeshes[i].hasVertexColor){
+			p_vertexColorVec4 = true;
+		}
 
-		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(p_unlit, true, false, p_punctual, p_castShadows, p_hasNormal, p_hasNormalMap, p_hasTangent, false, true, p_textureRect);
+		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(p_unlit, true, false, p_punctual, p_castShadows, p_hasNormal, p_hasNormalMap, p_hasTangent, false, p_vertexColorVec4, p_textureRect);
 		mesh.submeshes[i].shader = ShaderPool::get(shaderType, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
 			mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, "");
@@ -505,6 +509,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		//----------End depth shader---------------
 	}
 
+	mesh.needReload = false;
 	mesh.loaded = true;
 
 	return true;
@@ -581,12 +586,23 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 
 		//Destroy render
 		submesh.render.destroy();
+
+		//Shaders uniforms
+		submesh.slotVSParams = -1;
+		submesh.slotFSParams = -1;
+		submesh.slotFSLighting = -1;
+		submesh.slotVSSprite = -1;
+		submesh.slotVSShadows = -1;
+		submesh.slotFSShadows = -1;
+		submesh.slotVSDepthParams = -1;
 	}
 
 	//Destroy buffers
 	for (auto const& buf : mesh.buffers){
 		buf.second->getRender()->destroyBuffer();
 	}
+
+	mesh.loaded = false;
 }
 
 bool RenderSystem::loadUI(UIRenderComponent& ui, bool isText){
@@ -715,6 +731,12 @@ void RenderSystem::destroyUI(UIRenderComponent& ui){
 	if (ui.indices){
 		ui.indices->getRender()->destroyBuffer();
 	}
+
+	//Shaders uniforms
+	ui.slotVSParams = -1;
+	ui.slotFSParams = -1;
+
+	ui.loaded = false;
 }
 
 bool RenderSystem::loadParticles(ParticlesComponent& particles){
@@ -763,6 +785,8 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	if (textureRender)
 		render.addTexture(shaderData.getTextureIndex(TextureShaderType::POINTS, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
 
+	particles.needUpdateTexture = false;
+
 	particles.loaded = true;
 
 	render.endLoad();
@@ -772,6 +796,15 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 
 void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform){
 	if (particles.loaded && particles.buffer && particles.buffer->getSize() > 0){
+
+		if (particles.needUpdateTexture){
+			ShaderData& shaderData = particles.shader.get()->shaderData;
+			TextureRender* textureRender = particles.texture.getRender();
+			if (textureRender)
+				particles.render.addTexture(shaderData.getTextureIndex(TextureShaderType::POINTS, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
+
+			particles.needUpdateTexture = false;
+		}
 
 		if (particles.needUpdateBuffer){
 			particles.buffer->getRender()->updateBuffer(particles.buffer->getSize(), particles.buffer->getData());
@@ -801,6 +834,11 @@ void RenderSystem::destroyParticles(ParticlesComponent& particles){
 	if (particles.buffer){
 		particles.buffer->getRender()->destroyBuffer();
 	}
+
+	//Shaders uniforms
+	particles.slotVSParams = -1;
+
+	particles.loaded = false;
 }
 
 bool RenderSystem::loadSky(SkyComponent& sky){
@@ -819,11 +857,14 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 
 	sky.slotVSParams = shaderData.getUniformIndex(UniformType::VIEWPROJECTIONSKY, ShaderStageType::VERTEX);
 
-	if (sky.texture.load()){
-		render->addTexture(shaderData.getTextureIndex(TextureShaderType::SKYCUBE, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, sky.texture.getRender());
+	TextureRender* textureRender = sky.texture.getRender();
+	if (textureRender){
+		render->addTexture(shaderData.getTextureIndex(TextureShaderType::SKYCUBE, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
 	} else {
 		return false;
 	}
+
+	sky.needUpdateTexture = false;
 
 	sky.buffer->getRender()->createBuffer(sky.buffer->getSize(), sky.buffer->getData(), sky.buffer->getType(), sky.buffer->getUsage());
 
@@ -842,6 +883,16 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 
 void RenderSystem::drawSky(SkyComponent& sky){
 	if (sky.loaded){
+
+		if (sky.needUpdateTexture){
+			ShaderData& shaderData = sky.shader.get()->shaderData;
+			TextureRender* textureRender = sky.texture.getRender();
+			if (textureRender)
+				sky.render.addTexture(shaderData.getTextureIndex(TextureShaderType::SKYCUBE, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
+
+			sky.needUpdateTexture = false;
+		}
+
 		ObjectRender& render = sky.render;
 
 		render.beginDraw();
@@ -865,6 +916,11 @@ void RenderSystem::destroySky(SkyComponent& sky){
 	if (sky.buffer){
 		sky.buffer->getRender()->destroyBuffer();
 	}
+
+	//Shaders uniforms
+	sky.slotVSParams = -1;
+
+	sky.loaded = false;
 }
 
 void RenderSystem::updateTransform(Transform& transform){
@@ -1316,6 +1372,9 @@ void RenderSystem::draw(){
 						Transform* transform = scene->findComponent<Transform>(entity);
 
 						if (transform){
+							if (mesh.loaded && mesh.needReload){
+								destroyMesh(mesh);
+							}
 							if (!mesh.loaded){
 								loadMesh(mesh);
 							}
@@ -1343,6 +1402,9 @@ void RenderSystem::draw(){
         if (signature.test(scene->getComponentType<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
+			if (mesh.loaded && mesh.needReload){
+				destroyMesh(mesh);
+			}
 			if (!mesh.loaded){
 				loadMesh(mesh);
 			}

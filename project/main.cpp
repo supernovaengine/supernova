@@ -1,4 +1,4 @@
-
+/*
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -166,6 +166,8 @@ void onKeyDown(int key, bool repeat, int mods){
     }
     if (key == S_KEY_D){
         sprite.moveUp();
+
+        particles.setTexture("block.png");
     }
 
     if (key == S_KEY_1){
@@ -199,9 +201,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
+*/
 
 
-/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -315,11 +317,11 @@ void init(){
     camera.setPosition(0,80,100);
     //carro.addChild(&camera);
 
-    carro.loadOBJ("jeep/Jeep.obj");
+    carro.loadModel("jeep/Jeep.obj");
     carro.setPosition(0, 0, 20);
     carro.setScale(5);
 
-    //carro.loadGLTF("WaterBottle.glb");
+    //carro.loadModel("WaterBottle.glb");
     //carro.setPosition(0, 30, 20);
     //carro.setScale(200);
 
@@ -456,6 +458,12 @@ void onTouchCancel(){
 void onMouseDown(int button, int mods){
     //plane.setTexture("block.png");
 
+    //sky.setTextures("ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga");
+
+    carro.loadModel("WaterBottle.glb");
+    //carro.setPosition(0, 30, 20);
+    carro.setScale(200);
+
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)
         modifier += "shift;";
@@ -483,6 +491,7 @@ void onMouseDown(int button, int mods){
 }
 
 void onMouseUp(int button, int mods){
+    //carro.setTexture("block.png");
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)
         modifier += "shift;";
@@ -580,4 +589,3 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
-*/

@@ -27,16 +27,14 @@ namespace Supernova{
         ExternalBuffer eBuffers[MAX_EXTERNAL_BUFFERS];
         std::vector<float> extraBuffer;
 
-        //Not working property
-        //void computeGLTFTangent(int accessorIndicesIndex, int accessorPosIndex, int accessorUVIndex);
-        //std::vector<Vector3> tangentBuffer;
-
     public:
         Model(Scene* scene); 
         virtual ~Model();   
 
         bool loadOBJ(const char* filename);
         bool loadGLTF(const char* filename);
+
+        bool loadModel(const char* filename);
     };
 }
 

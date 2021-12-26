@@ -18,6 +18,8 @@ namespace Supernova{
         int slotVSParams = -1;
 
         Texture texture;
+
+        bool needUpdateTexture = false;
     };
     
 }

@@ -70,7 +70,7 @@ void Particles::setTexture(std::string path){
 
     particomp.texture.setPath(path);
 
-    //TODO: update texture, reload entity
+    particomp.needUpdateTexture = true;
 }
 
 void Particles::addSpriteFrame(int id, std::string name, Rect rect){

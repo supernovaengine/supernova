@@ -156,88 +156,7 @@ bool Model::loadGLTFTexture(int textureIndex, Texture& texture, std::string text
 
     return true;
 }
-/*
-void Model::computeGLTFTangent(int accessorIndicesIndex, int accessorPosIndex, int accessorUVIndex){
-    const tinygltf::Accessor& accessorIndices = gltfModel->accessors[accessorIndicesIndex];
-    const tinygltf::BufferView& bufferViewIndices = gltfModel->bufferViews[accessorIndices.bufferView];
-    int byteStrideIndices = accessorIndices.ByteStride(gltfModel->bufferViews[accessorIndices.bufferView]);
-    unsigned char* dataIndices = &gltfModel->buffers[bufferViewIndices.buffer].data.at(0) + bufferViewIndices.byteOffset;
 
-    size_t indicesTypeSize = 0;
-    if (accessorIndices.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT) {
-        indicesTypeSize = sizeof(unsigned short);
-	} else if (accessorIndices.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT) {
-        indicesTypeSize = sizeof(unsigned int);
-    }
-
-    std::vector<unsigned int> indices;
-    indices.resize(accessorIndices.count);
-    for (int i = 0; i < accessorIndices.count; i++) {
-        indices[i] = 0;
-        memcpy(&indices[i], &dataIndices[i * byteStrideIndices], indicesTypeSize);
-    }
-
-    const tinygltf::Accessor& accessorPos = gltfModel->accessors[accessorPosIndex];
-    const tinygltf::BufferView& bufferViewPos = gltfModel->bufferViews[accessorPos.bufferView];
-    int byteStridePos = accessorPos.ByteStride(gltfModel->bufferViews[accessorPos.bufferView]);
-    unsigned char* dataPos = &gltfModel->buffers[bufferViewPos.buffer].data.at(0) + bufferViewPos.byteOffset;
-
-    const tinygltf::Accessor& accessorUV = gltfModel->accessors[accessorUVIndex];
-    const tinygltf::BufferView& bufferViewUV = gltfModel->bufferViews[accessorUV.bufferView];
-    int byteStrideUV = accessorUV.ByteStride(gltfModel->bufferViews[accessorUV.bufferView]);
-    unsigned char* dataUV = &gltfModel->buffers[bufferViewUV.buffer].data.at(0) + bufferViewUV.byteOffset;
-
-    tangentBuffer.clear();
-    tangentBuffer.resize(accessorPos.count);
-
-    if (accessorPos.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT && accessorUV.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT){
-        for (int i = 0; i < indices.size() - 2; i += 3) {
-            Vector3 posFirst;
-            memcpy(&posFirst[0], &dataPos[indices[i + 0] * byteStridePos], sizeof(float)*3);
-
-            Vector3 posSecond;
-            memcpy(&posSecond[0], &dataPos[indices[i + 1] * byteStridePos], sizeof(float)*3);
-
-            Vector3 posThird;
-            memcpy(&posThird[0], &dataPos[indices[i + 2] * byteStridePos], sizeof(float)*3);
-
-            Vector2 uvFirst;
-            memcpy(&uvFirst[0], &dataUV[indices[i + 0] * byteStrideUV], sizeof(float)*2);
-
-            Vector2 uvSecond;
-            memcpy(&uvSecond[0], &dataUV[indices[i + 1] * byteStrideUV], sizeof(float)*2);
-
-            Vector2 uvThird;
-            memcpy(&uvThird[0], &dataUV[indices[i + 2] * byteStrideUV], sizeof(float)*2);
-
-
-            Vector3 edge1 = posSecond - posFirst;
-			Vector3 edge2 = posThird - posFirst;
-
-			Vector2 uv1 = uvSecond - uvFirst;
-			Vector2 uv2 = uvThird - uvFirst;
-
-			float f = 1.0f / uv1.x * uv2.y - uv2.x * uv1.y;
-
-			Vector3 tangent = Vector3(
-				f * (uv2.y * edge1.x - uv1.y * edge2.x),
-				f * (uv2.y * edge1.y - uv1.y * edge2.y),
-				f * (uv2.y * edge1.z - uv1.y * edge2.z)
-            ).normalize();
-
-			//Vector3 bitangent = Vector3(
-			//	f * (uv1.x * edge2.x - uv2.x * edge1.x),
-			//	f * (uv1.x * edge2.y - uv2.x * edge1.y),
-			//	f * (uv1.x * edge2.z - uv2.x * edge1.z)
-			//).normalize();
-
-            memcpy(&tangentBuffer[indices[i + 0]], &tangent[0], sizeof(float)*3);
-            memcpy(&tangentBuffer[indices[i + 1]], &tangent[0], sizeof(float)*3);
-            memcpy(&tangentBuffer[indices[i + 2]], &tangent[0], sizeof(float)*3);
-        }
-    }
-}
-*/
 std::string Model::getBufferName(int bufferViewIndex){
     const tinygltf::BufferView &bufferView = gltfModel->bufferViews[bufferViewIndex];
 
@@ -246,6 +165,20 @@ std::string Model::getBufferName(int bufferViewIndex){
     else
         return "buffer"+std::to_string(bufferViewIndex);
 
+}
+
+bool Model::loadModel(const char* filename){
+    std::string ext = FileData::getFilePathExtension(filename);
+
+    if (ext.compare("obj") == 0) {
+        if (!loadOBJ(filename))
+            return false;
+    }else{
+        if (!loadGLTF(filename))
+            return false;
+    }
+
+    return true;
 }
 
 bool Model::loadOBJ(const char* filename){
@@ -281,6 +214,9 @@ bool Model::loadOBJ(const char* filename){
         mesh.numSubmeshes = materials.size();
 
         for (size_t i = 0; i < materials.size(); i++) {
+
+            mesh.submeshes[i].attributes.clear();
+
             // Convert the blinn-phong model to the pbr metallic-roughness model
             // Based on https://github.com/CesiumGS/obj2gltf
             const float specularIntensity = materials[i].specular[0] * 0.2125 + materials[i].specular[1] * 0.7154 + materials[i].specular[2] * 0.0721; //luminance
@@ -393,6 +329,8 @@ bool Model::loadOBJ(const char* filename){
         }
 
         std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
+
+        mesh.needReload = true;
     }
     
     return true;
@@ -447,6 +385,8 @@ bool Model::loadGLTF(const char* filename) {
     mesh.numSubmeshes = gltfmesh.primitives.size();
 
     for (size_t i = 0; i < gltfmesh.primitives.size(); i++) {
+
+        mesh.submeshes[i].attributes.clear();
 
         tinygltf::Primitive primitive = gltfmesh.primitives[i];
         tinygltf::Accessor indexAccessor = gltfModel->accessors[primitive.indices];
@@ -615,48 +555,6 @@ bool Model::loadGLTF(const char* filename) {
                 Log::Warn("Model attribute missing: %s", attrib.first.c_str());
 
         }
-
-        //TODO: Remove this
-        if (!mesh.submeshes[i].hasVertexColor){
-            tinygltf::Accessor accessor = gltfModel->accessors[primitive.attributes["POSITION"]];
-            unsigned int count = accessor.count * 4;
-            extraBuffer.resize(count);
-            for (int i = 0; i < accessor.count; i++){
-                extraBuffer[(i*4)+0] = 1.0;
-                extraBuffer[(i*4)+1] = 1.0;
-                extraBuffer[(i*4)+2] = 1.0;
-                extraBuffer[(i*4)+3] = 1.0;
-            }
-            std::string bufferName = "extraBuffer"+std::to_string(i);
-            mesh.buffers[bufferName] = &eBuffers[eBufferIndex];
-            eBuffers[eBufferIndex].setType(BufferType::VERTEX_BUFFER);
-            eBuffers[eBufferIndex].setData((unsigned char*)(&extraBuffer.at(0)), sizeof(float)*count);
-            eBuffers[eBufferIndex].setRenderAttributes(false);
-            addSubmeshAttribute(mesh.submeshes[i], bufferName, AttributeType::COLOR, 4, AttributeDataType::FLOAT, sizeof(float)*4, 0, false);
-            eBufferIndex++;
-            if (eBufferIndex > MAX_EXTERNAL_BUFFERS){
-                Log::Error("External buffer limit reached for GLTF model: %s", filename);
-            }
-        }
-
-        //if (!mesh.submeshes[i].hasTangent){
-        //    if (primitive.attributes.count("TEXCOORD_0")){ //TODO: Check correct texcoord of Position
-        //        computeGLTFTangent(primitive.indices, primitive.attributes["POSITION"], primitive.attributes["TEXCOORD_0"]);
-        //        if (tangentBuffer.size() > 0){
-        //            unsigned int count = tangentBuffer.size() * 3;
-        //            std::string bufferName = "tangentBuffer"+std::to_string(i);
-        //            mesh.buffers[bufferName] = &eBuffers[eBufferIndex];
-        //            eBuffers[eBufferIndex].setBufferType(BufferType::VERTEX_BUFFER);
-        //            eBuffers[eBufferIndex].setData((unsigned char*)(&tangentBuffer.at(0)), sizeof(float)*count);
-        //            eBuffers[eBufferIndex].setRenderAttributes(false);
-        //            addSubmeshAttribute(mesh.submeshes[i], bufferName, AttributeType::TANGENTS, 3, AttributeDataType::FLOAT, sizeof(float)*3, 0, false);
-        //            eBufferIndex++;
-        //            if (eBufferIndex > MAX_EXTERNAL_BUFFERS){
-        //                Log::Error("External buffer limit reached for GLTF model: %s", filename);
-        //            }
-        //        }
-        //    }
-        //}
 
     /*
         morphTargets = false;
@@ -953,6 +851,8 @@ bool Model::loadGLTF(const char* filename) {
     //END DEBUG
 */
     std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
+
+    mesh.needReload = true;
 
     return true;
 }
