@@ -670,9 +670,10 @@ bool RenderSystem::loadUI(UIRenderComponent& ui, bool isText){
 	
 	ui.needUpdateTexture = false;
 
-	ui.loaded = true;
-
 	render.endLoad();
+
+	ui.needReload = false;
+	ui.loaded = true;
 
 	return true;
 }
@@ -1422,7 +1423,9 @@ void RenderSystem::draw(){
 			if (signature.test(scene->getComponentType<TextComponent>())){
 				isText = true;
 			}
-
+			if (ui.loaded && ui.needReload){
+				destroyUI(ui);
+			}
 			if (!ui.loaded){
 				loadUI(ui, isText);
 			}

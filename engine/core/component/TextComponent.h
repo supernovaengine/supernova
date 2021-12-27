@@ -23,7 +23,8 @@ namespace Supernova{
 
         STBText* stbtext = NULL;
 
-        bool needUpdate = true;
+        bool needReload = false;
+        bool needUpdateText = true;
     };
 
 }

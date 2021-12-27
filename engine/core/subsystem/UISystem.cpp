@@ -14,15 +14,15 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
     signature.set(scene->getComponentType<UIRenderComponent>());
 }
 
-void UISystem::loadFontAtlas(TextComponent& text, UIRenderComponent& ui){
+bool UISystem::loadFontAtlas(TextComponent& text, UIRenderComponent& ui){
     if (!text.stbtext){
         text.stbtext = new STBText();
     }
 
     TextureData* textureData = text.stbtext->load(text.font, text.fontSize);
     if (!textureData) {
-        //TODO: Error
-        //return false;
+        Log::Error("Cannot load font atlas from: %s", text.font.c_str());
+        return false;
     }
 
     std::string fontId = text.font;
@@ -32,12 +32,18 @@ void UISystem::loadFontAtlas(TextComponent& text, UIRenderComponent& ui){
     ui.texture.setData(*textureData, fontId + std::string("|") + std::to_string(text.fontSize));
     ui.texture.setReleaseDataAfterLoad(true);
 
+    ui.needUpdateTexture = true;
+
+    text.needReload = false;
     text.loaded = true;
+
+    return true;
 }
 
 void UISystem::createText(TextComponent& text, UIRenderComponent& ui){
 
     ui.buffer->clear();
+    ui.indices->clear();
 
     std::vector<uint16_t> indices_array;
 
@@ -63,13 +69,16 @@ void UISystem::update(double dt){
     for (int i = 0; i < texts->size(); i++){
 		TextComponent& text = texts->getComponentFromIndex(i);
 
-        if (text.needUpdate){
+        if (text.needUpdateText){
             Entity entity = texts->getEntity(i);
             Signature signature = scene->getSignature(entity);
 
             if (signature.test(scene->getComponentType<UIRenderComponent>())){
                 UIRenderComponent& ui = scene->getComponent<UIRenderComponent>(entity);
-
+                if (text.loaded && text.needReload){
+                    ui.texture.destroy(); //texture.setData also destroy it
+                    text.loaded = false;
+                }
                 if (!text.loaded){
                     loadFontAtlas(text, ui);
                 }
@@ -77,7 +86,7 @@ void UISystem::update(double dt){
             }
 
 
-            text.needUpdate = false;
+            text.needUpdateText = false;
         }
     }
 }

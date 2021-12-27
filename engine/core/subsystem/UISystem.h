@@ -16,7 +16,7 @@ namespace Supernova{
 
     private:
 
-        void loadFontAtlas(TextComponent& text, UIRenderComponent& ui);
+        bool loadFontAtlas(TextComponent& text, UIRenderComponent& ui);
         void createText(TextComponent& text, UIRenderComponent& ui);
 
 	public:

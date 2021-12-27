@@ -460,9 +460,13 @@ void onMouseDown(int button, int mods){
 
     //sky.setTextures("ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga");
 
-    carro.loadModel("WaterBottle.glb");
+    //carro.loadModel("WaterBottle.glb");
     //carro.setPosition(0, 30, 20);
-    carro.setScale(200);
+    //carro.setScale(200);
+
+    //text.setFontSize(80);
+    //text.setFont("FreeMono.ttf");
+    //text.setMaxLength(50);
 
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)

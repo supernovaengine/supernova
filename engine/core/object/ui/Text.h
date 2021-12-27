@@ -23,11 +23,31 @@ namespace Supernova{
         Text(Scene* scene);
         virtual ~Text();
 
+        void setSize(int width, int height);
+        void setWidth(int width);
+        void setHeight(int height);
+
+        void setMaxLength(unsigned int maxLength);
+
         void setText(std::string text);
+        std::string getText();
+
+        void setFont(std::string font);
+        std::string getFont();
+
+        void setFontSize(unsigned int fontSize);
+        void setMultiline(bool multiline);
 
         void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);
         Vector4 getColor();
+
+        float getAscent();
+        float getDescent();
+        float getLineGap();
+        int getLineHeight();
+        unsigned int getNumChars();
+        Vector2 getCharPosition(unsigned int index);
     };
 }
 

@@ -33,6 +33,7 @@ namespace Supernova{
 
         bool needUpdateBuffer = false;
         bool needUpdateTexture = false;
+        bool needReload = false;
     };
     
 }
