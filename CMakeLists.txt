@@ -156,7 +156,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     )
 
     list(APPEND PLATFORM_LIBS
-        #kernel32 user32 shell32 dxgi d3d11 ole32 gdi32
+
     )
 endif()
 

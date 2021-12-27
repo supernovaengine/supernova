@@ -8,6 +8,16 @@ add_library(
 
 )
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_link_libraries(
+            sokol
+
+            kernel32 user32 shell32 dxgi d3d11 ole32 gdi32
+        )
+    endif()
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(
         sokol
