@@ -1,4 +1,4 @@
-/*
+
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -67,10 +67,10 @@ void init(){
     scaleaction.setAction(Vector3(1,1,1), Vector3(2,2,2), 10, false);
     scaleaction.setTarget(sprite.getEntity());
 
-    coloraction.setAction(sprite.getColor(), Vector4(0.0, 0.0, 1.0, 1.0), 5, false);
+    coloraction.setAction(sprite.getColor(), Vector4(0.0, 1.0, 1.0, 1.0), 5, false);
     coloraction.setTarget(sprite.getEntity());
 
-    alphaaction.setAction(1.0, 0.5, 5, false);
+    alphaaction.setAction(1.0, 0.9, 5, false);
     alphaaction.setTarget(sprite.getEntity());
 
     positionaction.setAction(Vector3(20,20,0), Vector3(200,200,0), 5, false);
@@ -167,7 +167,8 @@ void onKeyDown(int key, bool repeat, int mods){
     if (key == S_KEY_D){
         sprite.moveUp();
 
-        particles.setTexture("block.png");
+        //particles.setTexture("block.png");
+        //particles.setMaxParticles(10);
     }
 
     if (key == S_KEY_1){
@@ -201,9 +202,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
-*/
 
 
+/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -593,3 +594,4 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
+*/

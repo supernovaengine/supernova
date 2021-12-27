@@ -68,11 +68,13 @@ void Text::setMaxLength(unsigned int maxLength){
     TextComponent& textcomp = getComponent<TextComponent>();
     UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
 
-    textcomp.maxLength = maxLength;
+    if (textcomp.maxLength != maxLength){
+        textcomp.maxLength = maxLength;
 
-    textcomp.needReload = true;
-    textcomp.needUpdateText = true;
-    uicomp.needReload = true;
+        textcomp.needReload = true;
+        textcomp.needUpdateText = true;
+        uicomp.needReload = true;
+    }
 }
 
 void Text::setText(std::string text){
@@ -96,10 +98,12 @@ std::string Text::getText(){
 void Text::setFont(std::string font){
     TextComponent& textcomp = getComponent<TextComponent>();
 
-    textcomp.font = font;
+    if (textcomp.font != font){
+        textcomp.font = font;
 
-    textcomp.needReload = true;
-    textcomp.needUpdateText = true;
+        textcomp.needReload = true;
+        textcomp.needUpdateText = true;
+    }
 }
 
 std::string Text::getFont(){

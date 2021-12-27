@@ -28,29 +28,41 @@ Particles::~Particles(){
 
 }
 
-void Particles::updateParticlesSize(ParticlesComponent& particomp){
-    particomp.needUpdate = true;
+void Particles::setMaxParticles(unsigned int maxParticles){
+    ParticlesComponent& particomp = getComponent<ParticlesComponent>();
+
+    if (particomp.maxParticles != maxParticles){
+        particomp.maxParticles = maxParticles;
+
+        particomp.needReload = true;
+    }
+}
+
+unsigned int Particles::getMaxParticles(){
+    ParticlesComponent& particomp = getComponent<ParticlesComponent>();
+
+    return particomp.maxParticles;
 }
 
 void Particles::addParticle(Vector3 position){
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
     particomp.particles.push_back({position, Vector4(1.0f, 1.0f, 1.0f, 1.0f), 30, 0, Rect(0, 0, 1, 1)});
 
-    updateParticlesSize(particomp);
+    particomp.needUpdate = true;
 }
 
 void Particles::addParticle(Vector3 position, Vector4 color){
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
     particomp.particles.push_back({position, color, 30, 0, Rect(0, 0, 1, 1)});
 
-    updateParticlesSize(particomp);
+    particomp.needUpdate = true;
 }
 
 void Particles::addParticle(Vector3 position, Vector4 color, float size, float rotation){
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
     particomp.particles.push_back({position, color, size, Angle::defaultToRad(rotation), Rect(0, 0, 1, 1)});
 
-    updateParticlesSize(particomp);
+    particomp.needUpdate = true;
 }
 
 void Particles::addParticle(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect){
@@ -58,7 +70,7 @@ void Particles::addParticle(Vector3 position, Vector4 color, float size, float r
     particomp.particles.push_back({position, color, size, Angle::defaultToRad(rotation), textureRect});
     particomp.hasTextureRect = true;
 
-    updateParticlesSize(particomp);
+    particomp.needUpdate = true;
 }
 
 void Particles::addParticle(float x, float y, float z){

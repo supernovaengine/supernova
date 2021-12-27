@@ -42,6 +42,7 @@ namespace Supernova{
 
         unsigned int maxParticles = 100;
         unsigned int numVisible = 0;
+
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
         std::string shaderProperties;
@@ -55,6 +56,7 @@ namespace Supernova{
         bool needUpdate = true;
         bool needUpdateBuffer = false;
         bool needUpdateTexture = false;
+        bool needReload = false;
     };
     
 }

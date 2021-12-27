@@ -14,11 +14,12 @@ namespace Supernova{
     protected:
         ExternalBuffer buffer;
 
-        void updateParticlesSize(ParticlesComponent& particomp);
-
     public:
         Particles(Scene* scene);
         virtual ~Particles();
+
+        void setMaxParticles(unsigned int maxParticles);
+        unsigned int getMaxParticles();
 
         void addParticle(Vector3 position);
         void addParticle(Vector3 position, Vector4 color);

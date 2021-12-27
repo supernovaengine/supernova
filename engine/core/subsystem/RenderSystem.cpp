@@ -788,9 +788,10 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 
 	particles.needUpdateTexture = false;
 
-	particles.loaded = true;
-
 	render.endLoad();
+
+	particles.needReload = false;
+	particles.loaded = true;
 
 	return true;
 }
@@ -875,9 +876,9 @@ bool RenderSystem::loadSky(SkyComponent& sky){
         }
     }
 
-	sky.loaded = true;
-
 	render->endLoad();
+
+	sky.loaded = true;
 
 	return true;
 }
@@ -1003,7 +1004,8 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 	particles.shaderParticles.reserve(particles.particles.size());
 
 	particles.numVisible = 0;
-	for (int i = 0; i < particles.particles.size(); i++){
+	size_t particlesSize = (particles.particles.size() < particles.maxParticles)? particles.particles.size() : particles.maxParticles;
+	for (int i = 0; i < particlesSize; i++){
 		if (particles.particles[i].life > particles.particles[i].time){
 			particles.shaderParticles.push_back({});
 			particles.shaderParticles[particles.numVisible].position = particles.particles[i].position;
@@ -1024,8 +1026,11 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 		std::sort(particles.shaderParticles.begin(), particles.shaderParticles.end(), comparePoints);
 	}
 
-	((ExternalBuffer*)particles.buffer)->setData((unsigned char*)(&particles.shaderParticles.at(0)), sizeof(ParticleShaderData)*particles.numVisible);
-
+	if (particles.numVisible > 0){
+		((ExternalBuffer*)particles.buffer)->setData((unsigned char*)(&particles.shaderParticles.at(0)), sizeof(ParticleShaderData)*particles.numVisible);
+	}else{
+		((ExternalBuffer*)particles.buffer)->setData((unsigned char*)nullptr, 0);
+	}
 	particles.needUpdateBuffer = true;
 }
 
@@ -1434,6 +1439,9 @@ void RenderSystem::draw(){
 		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
 			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
 
+			if (particles.loaded && particles.needReload){
+				destroyParticles(particles);
+			}
 			if (!particles.loaded){
 				loadParticles(particles);
 			}
