@@ -8,20 +8,23 @@ add_library(
 
 )
 
+set(SOKOL_LINK_LIBRARIES)
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_link_libraries(
-            sokol
-
-            kernel32 user32 shell32 dxgi d3d11 ole32 gdi32
+        list(APPEND SOKOL_LINK_LIBRARIES
+            user32 shell32 dxgi ole32 gdi32
         )
+        if(GRAPHIC_BACKEND STREQUAL "d3d11")
+            list(APPEND SOKOL_LINK_LIBRARIES
+                d3d11
+            )
+        endif()
     endif()
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_link_libraries(
-        sokol
-
+    list(APPEND SOKOL_LINK_LIBRARIES
         GL dl m pthread X11 Xi Xcursor
 
         # For sokol_audio.h
@@ -48,23 +51,25 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
     link_directories(/usr/local/lib)
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        list(APPEND SOKOL_LINK_LIBRARIES "-framework Cocoa")
         if(GRAPHIC_BACKEND STREQUAL "glcore33")
-            set(SOKOL_LINK_LIBRARIES "-framework Cocoa -framework OpenGL")
+            list(APPEND SOKOL_LINK_LIBRARIES "-framework OpenGL")
         elseif(GRAPHIC_BACKEND STREQUAL "metal")
-            set(SOKOL_LINK_LIBRARIES "-framework Cocoa -framework Metal -framework MetalKit -framework Quartz")
+            list(APPEND SOKOL_LINK_LIBRARIES "-framework Metal -framework MetalKit -framework Quartz")
         endif()
     elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+        list(APPEND SOKOL_LINK_LIBRARIES "-framework UIKit")
         if(GRAPHIC_BACKEND STREQUAL "metal")
-            set(SOKOL_LINK_LIBRARIES "-framework UIKit -framework Metal -framework MetalKit")
+            list(APPEND SOKOL_LINK_LIBRARIES "-framework Metal -framework MetalKit")
         endif()
     endif()
 
-    target_link_libraries(
-        sokol
-
-        ${SOKOL_LINK_LIBRARIES}
-
-        # For sokol_audio.h
-        #"-framework AudioToolbox"
-    )
+    # For sokol_audio.h
+    #"-framework AudioToolbox"
 endif()
+
+target_link_libraries(
+    sokol
+
+    ${SOKOL_LINK_LIBRARIES}
+)

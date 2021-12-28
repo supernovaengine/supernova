@@ -155,9 +155,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         ${PLATFORM_ROOT}/main.cpp
     )
 
-    list(APPEND PLATFORM_LIBS
-
-    )
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        list(APPEND PLATFORM_LIBS
+            -static -static-libgcc -static-libstdc++
+        )
+    endif()
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
