@@ -6,7 +6,7 @@
 
 &nbsp;
 
-**This version is deprecated, working now on [ecs](https://github.com/supernovaengine/supernova/tree/ecs) branch**
+**This version is deprecated**
 
 &nbsp;
 
@@ -14,22 +14,10 @@ Supernova is a **free** and open source cross-platform game engine for create 2D
 
 Licensed under MIT license, you can use freely for whatever you want, including commercial projects.
 
-Now it supports:
+It supports:
   - Android
   - iOS
   - Web (with Emscripten)
-
-For future versions:
-  - Windows
-  - OSX
-  - Linux
-
-
-## Getting started
-
-Visit our wiki to see tutorials and documentation:
-
-https://github.com/deslon/supernova/wiki
 
 ## Code sample
 ### Triangle Hello World (Lua)
