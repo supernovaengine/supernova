@@ -14,6 +14,8 @@ namespace Supernova{
     	uint8_t _pad_24[8];
     	Vector3 emissiveFactor = Vector3(0.0, 0.0, 0.0);
     	uint8_t _pad_44[4];
+        Vector3 ambientLight = Vector3(1.0, 1.0, 1.0);
+        float ambientFactor = 0.2;
 
         Texture baseColorTexture;
         Texture emissiveTexture;

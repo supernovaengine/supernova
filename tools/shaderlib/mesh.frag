@@ -34,6 +34,8 @@ uniform u_fs_pbrParams {
     float metallicFactor;
     float roughnessFactor;
     vec3 emissiveFactor;
+    vec3 ambientLight;
+    float ambientFactor;
 } pbrParams;
 
 #ifdef USE_PUNCTUAL
@@ -186,8 +188,9 @@ void main() {
     #ifdef USE_IBL
         //TODO
     #else
-        // Add simple ambient light
-        f_diffuse += vec3(1.0, 1.0, 1.0) * pow(0.1, GAMMA) * baseColor.rgb;
+        // Simple ambient light
+        // convert ambientFactor to linear
+        f_diffuse += pbrParams.ambientLight * pow(pbrParams.ambientFactor, GAMMA) * baseColor.rgb;
     #endif
 
     float ao = getOcclusionTexture().r;

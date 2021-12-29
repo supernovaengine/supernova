@@ -374,6 +374,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		bool p_hasNormal = false;
 		bool p_hasTangent = false;
 		bool p_castShadows = false;
+		bool p_shadowsPCF = false;
 		bool p_textureRect = false;
 		bool p_vertexColorVec4 = false;
 
@@ -389,6 +390,9 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			}
 			if (hasShadows && mesh.castShadows){
 				p_castShadows = true;
+				if (scene->isShadowsPCF()){
+					p_shadowsPCF = true;
+				}
 			}
 		}else{
 			p_unlit = true;
@@ -400,7 +404,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			p_vertexColorVec4 = true;
 		}
 
-		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(p_unlit, true, false, p_punctual, p_castShadows, p_hasNormal, p_hasNormalMap, p_hasTangent, false, p_vertexColorVec4, p_textureRect);
+		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(p_unlit, true, false, p_punctual, p_castShadows, p_shadowsPCF, p_hasNormal, p_hasNormalMap, p_hasTangent, false, p_vertexColorVec4, p_textureRect);
 		mesh.submeshes[i].shader = ShaderPool::get(shaderType, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
 			mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, "");
@@ -541,7 +545,7 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 				render.applyUniform(mesh.submeshes[i].slotVSSprite, ShaderStageType::VERTEX, UniformDataType::FLOAT, 4, &mesh.submeshes[i].textureRect);
 			}
 
-			render.applyUniform(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 12, &mesh.submeshes[i].material);
+			render.applyUniform(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16, &mesh.submeshes[i].material);
 
 			//model, normal and mvp matrix
 			render.applyUniform(mesh.submeshes[i].slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 48, &transform.modelMatrix);

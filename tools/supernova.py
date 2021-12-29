@@ -158,7 +158,7 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
             cmake_generator = "MinGW Makefiles"
         
         cmake_definitions.extend([
-            "-DCMAKE_BUILD_TYPE=Debug",
+            "-DCMAKE_BUILD_TYPE=Release",
             "-DCMAKE_TOOLCHAIN_FILE="+emscripten+"/cmake/Modules/Platform/Emscripten.cmake"
         ])
 
@@ -173,7 +173,7 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
     if (platform == "windows"):
 
         cmake_generator = "Visual Studio 16 2019"
-        build_config_mode = "Debug"
+        build_config_mode = "Release"
 
         build_config = ["--config", build_config_mode]
         
@@ -183,7 +183,7 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
     if (platform == "linux" or platform == "macos"):
 
         cmake_generator = "Ninja"
-        build_config_mode = "Debug"
+        build_config_mode = "Release"
 
         build_config = ["--config", build_config_mode]
 
@@ -193,14 +193,14 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
     if (platform == "macos-xcode"):
 
         cmake_generator = "Xcode"
-        build_config_mode = "Debug"
+        build_config_mode = "Release"
 
         build_config = ["--config", build_config_mode]    
 
     #    cmake_generator = "Xcode"
     #    system_name = "macOS"
     #    OSX_SDK="macosx"
-    #    build_config_mode = "Debug"
+    #    build_config_mode = "Release"
     #    build_sdk = "macosx"
 #
     #    build_config = ["--config", build_config_mode]
@@ -218,7 +218,7 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
         cmake_generator = "Xcode"
         system_name = "iOS"
         OSX_SDK="iphoneos"
-        build_config_mode = "Debug"
+        build_config_mode = "Release"
         build_sdk = "iphonesimulator"
 
         build_config = ["--config", build_config_mode]

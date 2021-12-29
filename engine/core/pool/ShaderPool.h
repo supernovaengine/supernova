@@ -28,9 +28,8 @@ namespace Supernova{
         static std::vector<std::string>& getMissingShaders();
 
         static std::string getMeshProperties(bool unlit, bool uv1, bool uv2, 
-						bool punctual, bool shadows, bool normals, bool normalMap, 
-						bool tangents, bool vertexColorVec3, bool vertexColorVec4,
-                        bool textureRect);
+						bool punctual, bool shadows, bool shadowsPCF, bool normals, bool normalMap, 
+						bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect);
         static std::string getUIProperties(bool texture, bool fontAtlasTexture, bool vertexColorVec3, bool vertexColorVec4);
         static std::string getPointsProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4, bool textureRect);
     };

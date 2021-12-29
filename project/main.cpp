@@ -308,7 +308,7 @@ void init(){
     //spriteui.setTexture("block.png");
     //spriteui.setPosition(200,200,0);
 
-    text.setColor(0.0, 0.0, 0.0, 1.0);
+    //text.setColor(0.0, 0.0, 0.0, 1.0);
     text.setPosition(200,200,0);
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);

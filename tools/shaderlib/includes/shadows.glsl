@@ -117,16 +117,21 @@ float shadowCalculationAux(int shadowMapIndex, Shadow shadowConf, float NdotL){
 
     float bias = max(shadowConf.maxBias * (1.0 - NdotL), shadowConf.minBias);
 
-    vec2 texel_size = 1.0 / shadowConf.mapSize;
-    for(int x = -1; x <= 1; ++x) {
-        for(int y = -1; y <= 1; ++y) {
-            shadow += shadowCompare(shadowMapIndex, currentDepth, bias, proj_coords.xy + vec2(x, y) * texel_size);        
-        }    
-    }
-    shadow /= 9.0;
+    #ifdef USE_SHADOWS_PCF
 
-    // if no PCF
-    //shadow = shadowCompare(shadowMapIndex, currentDepth, bias, proj_coords.xy);
+        vec2 texel_size = 1.0 / shadowConf.mapSize;
+        for(int x = -1; x <= 1; ++x) {
+            for(int y = -1; y <= 1; ++y) {
+                shadow += shadowCompare(shadowMapIndex, currentDepth, bias, proj_coords.xy + vec2(x, y) * texel_size);
+            }
+        }
+        shadow /= 9.0;
+
+    #else
+
+        shadow = shadowCompare(shadowMapIndex, currentDepth, bias, proj_coords.xy);
+
+    #endif
 
     // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
     if(proj_coords.z > 1.0)
@@ -185,25 +190,30 @@ float shadowCubeCalculationPCF(int shadowMapIndex, vec3 fragToLight, float NdotL
 
     float bias = max(shadowConf.maxBias * (1.0 - NdotL), shadowConf.minBias);
 
-    //float diskRadius = 0.05;
-    //float dp = ( length( fragToLight ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear );
-    //float diskRadius = (1.0 + dp) / 4.0;
-    float diskRadius = length( fragToLight ) * 0.0005;
+    #ifdef USE_SHADOWS_PCF
 
-    // To reduce iterations
-    shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3( 0.f, 0.f, 0.f) * diskRadius);
-    shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3( 1.f, 1.f, 1.f) * diskRadius);
-    shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3( 1.f,-1.f, 1.f) * diskRadius);
-    shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3(-1.f,-1.f, 1.f) * diskRadius);
-    shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3(-1.f, 1.f, 1.f) * diskRadius);
-    shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3( 1.f, 1.f,-1.f) * diskRadius);
-    shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3( 1.f,-1.f,-1.f) * diskRadius);
-    shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3(-1.f,-1.f,-1.f) * diskRadius);
-    shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3(-1.f, 1.f,-1.f) * diskRadius);
-    shadow /= float(9);
+        //float diskRadius = 0.05;
+        //float dp = ( length( fragToLight ) - shadowCameraNear ) / ( shadowCameraFar - shadowCameraNear );
+        //float diskRadius = (1.0 + dp) / 4.0;
+        float diskRadius = length( fragToLight ) * 0.0005;
 
-    // if no PCF
-    //shadow = shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight);
+        // To reduce iterations
+        shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3( 0.f, 0.f, 0.f) * diskRadius);
+        shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3( 1.f, 1.f, 1.f) * diskRadius);
+        shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3( 1.f,-1.f, 1.f) * diskRadius);
+        shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3(-1.f,-1.f, 1.f) * diskRadius);
+        shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3(-1.f, 1.f, 1.f) * diskRadius);
+        shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3( 1.f, 1.f,-1.f) * diskRadius);
+        shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3( 1.f,-1.f,-1.f) * diskRadius);
+        shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3(-1.f,-1.f,-1.f) * diskRadius);
+        shadow += shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight + vec3(-1.f, 1.f,-1.f) * diskRadius);
+        shadow /= float(9);
+
+    #else
+
+        shadow = shadowCubeCompare(shadowMapIndex, currentDepth, bias, fragToLight);
+
+    #endif
 
     return shadow;
 }

@@ -35,6 +35,7 @@ namespace Supernova{
 		bool mainScene;
 
 		Vector4 color;
+		bool shadowsPCF;
 
 	    EntityManager entityManager;
 	    ComponentManager componentManager;
@@ -61,6 +62,9 @@ namespace Supernova{
 		void setColor(Vector4 color);
 		void setColor(float red, float green, float blue, float alpha);
 		Vector4 getColor();
+
+		void setShadowsPCF(bool shadowsPCF);
+		bool isShadowsPCF();
 
 		void updateCameraSize();
 

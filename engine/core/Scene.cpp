@@ -37,6 +37,7 @@ Scene::Scene(){
 
 	mainScene = false;
 	color = Vector4(0.1, 0.1, 0.1, 1.0);
+	shadowsPCF = true;
 }
 
 void Scene::setCamera(Entity camera){
@@ -77,6 +78,14 @@ void Scene::setColor(float red, float green, float blue, float alpha){
 
 Vector4 Scene::getColor(){
 	return color;
+}
+
+void Scene::setShadowsPCF(bool shadowsPCF){
+	this->shadowsPCF = shadowsPCF;
+}
+
+bool Scene::isShadowsPCF(){
+	return this->shadowsPCF;
 }
 
 void Scene::updateCameraSize(){

@@ -23,6 +23,8 @@ def get_define(property):
         return 'USE_PUNCTUAL'
     elif property == 'Shw':
         return 'USE_SHADOWS'
+    elif property == 'Pcf':
+        return 'USE_SHADOWS_PCF'
     elif property == 'Nor':
         return 'HAS_NORMALS'
     elif property == 'Nmp':
@@ -52,13 +54,13 @@ def get_output(shader, project, lang):
 
 def get_default_shaders():
     s =  "mesh_Uv1PucNorNmpTanVc4;"
-    s =  "mesh_Uv1PucNorNmpTan;"
-    s += "mesh_Uv1PucShwNorNmpTanVc4;"
-    s += "mesh_Uv1PucShwNorNmpTan;"
+    s += "mesh_Uv1PucNorNmpTan;"
+    s += "mesh_Uv1PucShwPcfNorNmpTanVc4;"
+    s += "mesh_Uv1PucShwPcfNorNmpTan;"
     s += "mesh_Uv1PucNorVc4;"
     s += "mesh_Uv1PucNor;"
-    s += "mesh_Uv1PucShwNorVc4;"
-    s += "mesh_Uv1PucShwNor;"
+    s += "mesh_Uv1PucShwPcfNorVc4;"
+    s += "mesh_Uv1PucShwPcfNor;"
     s += "mesh_UltUv1Vc4;"
     s += "mesh_UltUv1;"
     s += "mesh_UltUv1Vc4Txr;"
@@ -104,11 +106,12 @@ def get_bin_exec():
 @click.option('--shaders', '-s', default=get_default_shaders(), help="Target shader type, seperated by ';'")
 @click.option('--langs', '-l', default=get_default_langs(), required=True, help="Target shader language, seperated by ';'")
 @click.option('--project', '-p', default='../project', type=click.Path(), help="Source root path of project files")
+@click.option('--verbose/--no-verbose', '-v', default=False, help="Output more information")
 @click.option('--max-lights', '-ml', default=6, type=int, help="Value of MAX_LIGHTS macro")
 @click.option('--max-shadowsmap', default=6, type=int, help="Value of MAX_SHADOWSMAP macro")
 @click.option('--max-shadowscubemap', default=1, type=int, help="Value of MAX_SHADOWSCUBEMAP macro")
 @click.option('--max-shadowcascades', default=4, type=int, help="Value of MAX_SHADOWCASCADES macro")
-def generate(shaders, langs, project, max_lights, max_shadowsmap, max_shadowscubemap, max_shadowcascades):
+def generate(shaders, langs, project, verbose, max_lights, max_shadowsmap, max_shadowscubemap, max_shadowcascades):
 
     shadersList = [x.strip() for x in shaders.split(';')]
     langsList = [x.strip() for x in langs.split(';')]
@@ -141,7 +144,8 @@ def generate(shaders, langs, project, max_lights, max_shadowsmap, max_shadowscub
             frag = get_frag(shaderType)
             output = get_output(shader, project, lang)
 
-            #print(get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines)
+            if verbose:
+                print(get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines)
             command = subprocess.run([get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines], capture_output=True)
 
             sys.stdout.buffer.write(command.stdout)
