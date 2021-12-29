@@ -1,7 +1,12 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef EASE_H
 #define EASE_H
 
-#include "util/Function.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #define S_LINEAR 0
 #define S_EASE_QUAD_IN 1
@@ -36,56 +41,295 @@
 #define S_EASE_BOUNCE_IN_OUT 30
 
 namespace Supernova {
+    namespace Ease {
+        inline float linear(float time){
+            return time;
+        }
 
-    class Ease {
+        inline float easeInQuad(float time){
+            return time * time;
+        }
 
-    protected:
+        inline float easeOutQuad(float time){
+            return time * (2 - time);
+        }
 
-        Function<float(float)> function;
+        inline float easeInOutQuad(float time){
+            if ((time *= 2) < 1) {
+                return 0.5 * time * time;
+            }
 
-    public:
+            time--;
+            return - 0.5 * (time * (time - 2) - 1);
+        }
 
-        Ease();
-        virtual ~Ease();
+        inline float easeInCubic(float time){
+            return time * time * time;
+        }
 
-        static float linear(float time);
-        static float easeInQuad(float time);
-        static float easeOutQuad(float time);
-        static float easeInOutQuad(float time);
-        static float easeInCubic(float time);
-        static float easeOutCubic(float time);
-        static float easeInOutCubic(float time);
-        static float easeInQuart(float time);
-        static float easeOutQuart(float time);
-        static float easeInOutQuart(float time);
-        static float easeInQuint(float time);
-        static float easeOutQuint(float time);
-        static float easeInOutQuint(float time);
-        static float easeInSine(float time);
-        static float easeOutSine(float time);
-        static float easeInOutSine(float time);
-        static float easeInExpo(float time);
-        static float easeOutExpo(float time);
-        static float easeInOutExpo(float time);
-        static float easeInCirc(float time);
-        static float easeOutCirc(float time);
-        static float easeInOutCirc(float time);
-        static float easeInElastic(float time);
-        static float easeOutElastic(float time);
-        static float easeInOutElastic(float time);
-        static float easeInBack(float time);
-        static float easeOutBack(float time);
-        static float easeInOutBack(float time);
-        static float easeInBounce(float time);
-        static float easeOutBounce(float time);
-        static float easeInOutBounce(float time);
+        inline float easeOutCubic(float time){
+            time--;
+            return time * time * time + 1;
+        }
 
-        void setFunction(std::function<float(float)> function);
-        int setFunction(lua_State* L);
+        inline float easeInOutCubic(float time){
+            if ((time *= 2) < 1) {
+                return 0.5 * time * time * time;
+            }
+            time -= 2;
+            return 0.5 * (time * time * time + 2);
+        }
 
-        void setFunctionType(int functionType);
+        inline float easeInQuart(float time){
+            return time * time * time * time;
+        }
 
-    };
+        inline float easeOutQuart(float time){
+            time--;
+            return 1 - (time * time * time * time);
+        }
+
+        inline float easeInOutQuart(float time){
+            if ((time *= 2) < 1) {
+                return 0.5 * time * time * time * time;
+            }
+            time -= 2;
+            return - 0.5 * (time * time * time * time - 2);
+        }
+
+        inline float easeInQuint(float time){
+            return time * time * time * time * time;
+        }
+
+        inline float easeOutQuint(float time){
+            time--;
+            return time * time * time * time * time + 1;
+        }
+
+        inline float easeInOutQuint(float time){
+            if ((time *= 2) < 1) {
+                return 0.5 * time * time * time * time * time;
+            }
+
+            time -= 2;
+            return 0.5 * (time * time * time * time * time + 2);
+        }
+
+        inline float easeInSine(float time){
+            return 1 - cos(time * M_PI / 2);
+        }
+
+        inline float easeOutSine(float time){
+            return sin(time * M_PI / 2);
+        }
+
+        inline float easeInOutSine(float time){
+            return 0.5 * (1 - cos(M_PI * time));
+        }
+
+        inline float easeInExpo(float time){
+            return time == 0 ? 0 : pow(1024, time - 1);
+        }
+
+        inline float easeOutExpo(float time){
+            return time == 1 ? 1 : 1 - pow(2, - 10 * time);
+        }
+
+        inline float easeInOutExpo(float time){
+            if (time == 0) {
+                return 0;
+            }
+
+            if (time == 1) {
+                return 1;
+            }
+
+            if ((time *= 2) < 1) {
+                return 0.5 * pow(1024, time - 1);
+            }
+
+            return 0.5 * (- pow(2, - 10 * (time - 1)) + 2);
+        }
+
+        inline float easeInCirc(float time){
+            return 1 - sqrt(1 - time * time);
+        }
+
+        inline float easeOutCirc(float time){
+            time--;
+            return sqrt(1 - (time * time));
+        }
+
+        inline float easeInOutCirc(float time){
+            if ((time *= 2) < 1) {
+                return - 0.5 * (sqrt(1 - time * time) - 1);
+            }
+
+            time -= 2;
+            return 0.5 * (sqrt(1 - time * time) + 1);
+        }
+
+        inline float easeInElastic(float time){
+            if (time == 0) {
+                return 0;
+            }
+
+            if (time == 1) {
+                return 1;
+            }
+
+            return -pow(2, 10 * (time - 1)) * sin((time - 1.1) * 5 * M_PI);
+        }
+
+        inline float easeOutElastic(float time){
+            if (time == 0) {
+                return 0;
+            }
+
+            if (time == 1) {
+                return 1;
+            }
+
+            return pow(2, -10 * time) * sin((time - 0.1) * 5 * M_PI) + 1;
+        }
+
+        inline float easeInOutElastic(float time){
+            if (time == 0) {
+                return 0;
+            }
+
+            if (time == 1) {
+                return 1;
+            }
+
+            time *= 2;
+
+            if (time < 1) {
+                return -0.5 * pow(2, 10 * (time - 1)) * sin((time - 1.1) * 5 * M_PI);
+            }
+
+            return 0.5 * pow(2, -10 * (time - 1)) * sin((time - 1.1) * 5 * M_PI) + 1;
+        }
+
+        inline float easeInBack(float time){
+            float s = 1.70158;
+
+            return time * time * ((s + 1) * time - s);
+        }
+
+        inline float easeOutBack(float time){
+            float s = 1.70158;
+
+            time--;
+            return time * time * ((s + 1) * time + s) + 1;
+        }
+
+        inline float easeInOutBack(float time){
+            float s = 1.70158 * 1.525;
+
+            if ((time *= 2) < 1) {
+                return 0.5 * (time * time * ((s + 1) * time - s));
+            }
+
+            time -= 2;
+            return 0.5 * (time * time * ((s + 1) * time + s) + 2);
+        }
+
+        inline float easeOutBounce(float time){
+            if (time < (1 / 2.75)) {
+                return 7.5625 * time * time;
+            } else if (time < (2 / 2.75)) {
+                time -= (1.5 / 2.75);
+                return 7.5625 * time * time + 0.75;
+            } else if (time < (2.5 / 2.75)) {
+                time -= (2.25 / 2.75);
+                return 7.5625 * time * time + 0.9375;
+            } else {
+                time -= (2.625 / 2.75);
+                return 7.5625 * time * time + 0.984375;
+            }
+        }
+
+        inline float easeInBounce(float time){
+            return 1 - easeOutBounce(1 - time);
+        }
+
+        inline float easeInOutBounce(float time){
+            if (time < 0.5) {
+                return easeInBounce(time * 2) * 0.5;
+            }
+
+            return easeOutBounce(time * 2 - 1) * 0.5 + 0.5;
+        }
+
+        inline Function<float(float)> getFunction(int functionType){
+            if (functionType == S_LINEAR){
+                return Function<float(float)>(Ease::linear);
+            }else if(functionType == S_EASE_QUAD_IN){
+                return Function<float(float)>(Ease::easeInQuad);
+            }else if(functionType == S_EASE_QUAD_OUT){
+                return Function<float(float)>(Ease::easeOutQuad);
+            }else if(functionType == S_EASE_QUAD_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutQuad);
+            }else if(functionType == S_EASE_CUBIC_IN){
+                return Function<float(float)>(Ease::easeInCubic);
+            }else if(functionType == S_EASE_CUBIC_OUT){
+                return Function<float(float)>(Ease::easeOutCubic);
+            }else if(functionType == S_EASE_CUBIC_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutCubic);
+            }else if(functionType == S_EASE_QUART_IN){
+                return Function<float(float)>(Ease::easeInQuart);
+            }else if(functionType == S_EASE_QUART_OUT){
+                return Function<float(float)>(Ease::easeOutQuart);
+            }else if(functionType == S_EASE_QUART_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutQuart);
+            }else if(functionType == S_EASE_QUINT_IN){
+                return Function<float(float)>(Ease::easeInQuint);
+            }else if(functionType == S_EASE_QUINT_OUT){
+                return Function<float(float)>(Ease::easeOutQuint);
+            }else if(functionType == S_EASE_QUINT_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutQuint);
+            }else if(functionType == S_EASE_SINE_IN){
+                return Function<float(float)>(Ease::easeInSine);
+            }else if(functionType == S_EASE_SINE_OUT){
+                return Function<float(float)>(Ease::easeOutSine);
+            }else if(functionType == S_EASE_SINE_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutSine);
+            }else if(functionType == S_EASE_EXPO_IN){
+                return Function<float(float)>(Ease::easeInExpo);
+            }else if(functionType == S_EASE_EXPO_OUT){
+                return Function<float(float)>(Ease::easeOutExpo);
+            }else if(functionType == S_EASE_EXPO_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutExpo);
+            }else if(functionType == S_EASE_CIRC_IN){
+                return Function<float(float)>(Ease::easeInCirc);
+            }else if(functionType == S_EASE_CIRC_OUT){
+                return Function<float(float)>(Ease::easeOutCirc);
+            }else if(functionType == S_EASE_CIRC_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutCirc);
+            }else if(functionType == S_EASE_ELASTIC_IN){
+                return Function<float(float)>(Ease::easeInElastic);
+            }else if(functionType == S_EASE_ELASTIC_OUT){
+                return Function<float(float)>(Ease::easeOutElastic);
+            }else if(functionType == S_EASE_ELASTIC_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutElastic);
+            }else if(functionType == S_EASE_BACK_IN){
+                return Function<float(float)>(Ease::easeInBack);
+            }else if(functionType == S_EASE_BACK_OUT){
+                return Function<float(float)>(Ease::easeOutBack);
+            }else if(functionType == S_EASE_BACK_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutBack);
+            }else if(functionType == S_EASE_BOUNCE_IN){
+                return Function<float(float)>(Ease::easeInBounce);
+            }else if(functionType == S_EASE_BOUNCE_OUT){
+                return Function<float(float)>(Ease::easeOutBounce);
+            }else if(functionType == S_EASE_BOUNCE_IN_OUT){
+                return Function<float(float)>(Ease::easeInOutBounce);
+            }
+
+            return Function<float(float)>(Ease::linear);
+        }
+    }
 }
 
 

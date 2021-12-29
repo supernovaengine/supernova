@@ -72,19 +72,25 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_init_1native(JNIEnv 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1start(JNIEnv * env, jclass cls) {
 	UNUSED(env);
 	UNUSED(cls);
-	Supernova::Engine::systemStart();
+	Supernova::Engine::systemInit(0, nullptr);
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1surface_1created(JNIEnv * env, jclass cls) {
 	UNUSED(env);
 	UNUSED(cls);
-	Supernova::Engine::systemSurfaceCreated();
+	Supernova::Engine::systemViewLoaded();
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1surface_1changed(JNIEnv * env, jclass cls) {
 	UNUSED(env);
 	UNUSED(cls);
-	Supernova::Engine::systemSurfaceChanged();
+	Supernova::Engine::systemViewChanged();
+}
+
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1shutdown(JNIEnv * env, jclass cls) {
+    UNUSED(env);
+    UNUSED(cls);
+    Supernova::Engine::systemShutdown();
 }
 
 JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1draw(JNIEnv * env, jclass cls) {
@@ -117,26 +123,32 @@ JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1touch_1end(J
     Supernova::Engine::systemTouchEnd(pointer, x, y);
 }
 
-JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1touch_1drag(JNIEnv * env, jclass cls, jint pointer, jfloat x, jfloat y) {
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1touch_1move(JNIEnv * env, jclass cls, jint pointer, jfloat x, jfloat y) {
 	UNUSED(env);
 	UNUSED(cls);
-    Supernova::Engine::systemTouchDrag(pointer, x, y);
+    Supernova::Engine::systemTouchMove(pointer, x, y);
 }
 
-JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1key_1down(JNIEnv * env, jclass cls, jint key) {
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1touch_1cancel(JNIEnv * env, jclass cls) {
 	UNUSED(env);
 	UNUSED(cls);
-    Supernova::Engine::systemKeyDown(key);
+	Supernova::Engine::systemTouchCancel();
 }
 
-JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1key_1up(JNIEnv * env, jclass cls, jint key) {
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1key_1down(JNIEnv * env, jclass cls, jint key, jboolean repeat, jint mods) {
 	UNUSED(env);
 	UNUSED(cls);
-    Supernova::Engine::systemKeyUp(key);
+    Supernova::Engine::systemKeyDown(key, repeat, mods);
 }
 
-JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1text_1input(JNIEnv * env, jclass cls, jstring text) {
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1key_1up(JNIEnv * env, jclass cls, jint key, jboolean repeat, jint mods) {
+	UNUSED(env);
 	UNUSED(cls);
-	const char *nativeString = env->GetStringUTFChars(text, 0);
-    Supernova::Engine::systemTextInput(nativeString);
+    Supernova::Engine::systemKeyUp(key, repeat, mods);
+}
+
+JNIEXPORT void JNICALL Java_com_deslon_supernova_JNIWrapper_system_1char_1input(JNIEnv * env, jclass cls, jint codepoint) {
+	UNUSED(env);
+	UNUSED(cls);
+    Supernova::Engine::systemCharInput(codepoint);
 }

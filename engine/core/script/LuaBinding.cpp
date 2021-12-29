@@ -4,86 +4,82 @@
 
 #include "LuaBinding.h"
 
+#include "Log.h"
+#include "System.h"
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
 
-#include "LuaIntf/LuaIntf.h"
+#include "sol.hpp"
 
 #include "Engine.h"
-#include "system/System.h"
 #include "Object.h"
-#include "GraphicObject.h"
-#include "Log.h"
+//#include "GraphicObject.h"
+//#include "Log.h"
 #include "Scene.h"
-#include "Polygon.h"
-#include "Cube.h"
-#include "PlaneTerrain.h"
-#include "Model.h"
-#include "math/Ray.h"
-#include "math/Quaternion.h"
-#include "math/Plane.h"
-#include "Mesh.h"
-#include "Mesh2D.h"
-#include "Image.h"
-#include "ui/UIObject.h"
-#include "ui/UIImage.h"
-#include "Light.h"
-#include "PointLight.h"
-#include "SpotLight.h"
-#include "DirectionalLight.h"
-#include "Sound.h"
-#include "SkyBox.h"
-#include "Points.h"
-#include "Particles.h"
-#include "ui/Text.h"
-#include "Input.h"
-#include "Sprite.h"
-#include "util/Function.h"
-#include "util/FunctionSubscribe.h"
-#include "physics/Contact2D.h"
-#include "action/Action.h"
-#include "action/Ease.h"
-#include "action/TimeAction.h"
-#include "action/MoveAction.h"
-#include "action/RotateAction.h"
-#include "action/ScaleAction.h"
-#include "action/ColorAction.h"
-#include "action/AlphaAction.h"
-#include "action/SpriteAnimation.h"
-#include "action/ParticlesAnimation.h"
-#include "action/particleinit/ParticleInit.h"
-#include "action/particleinit/ParticleAccelerationInit.h"
-#include "action/particleinit/ParticleAlphaInit.h"
-#include "action/particleinit/ParticleColorInit.h"
-#include "action/particleinit/ParticleLifeInit.h"
-#include "action/particleinit/ParticlePositionInit.h"
-#include "action/particleinit/ParticleRotationInit.h"
-#include "action/particleinit/ParticleSizeInit.h"
-#include "action/particleinit/ParticleSpriteInit.h"
-#include "action/particleinit/ParticleVelocityInit.h"
-#include "action/particlemod/ParticleMod.h"
-#include "action/particlemod/ParticleAlphaMod.h"
-#include "action/particlemod/ParticleColorMod.h"
-#include "action/particlemod/ParticlePositionMod.h"
-#include "action/particlemod/ParticleRotationMod.h"
-#include "action/particlemod/ParticleSizeMod.h"
-#include "action/particlemod/ParticleSpriteMod.h"
-#include "action/particlemod/ParticleVelocityMod.h"
+//#include "Polygon.h"
+//#include "Cube.h"
+//#include "PlaneTerrain.h"
+//#include "Model.h"
+//#include "math/Ray.h"
+//#include "math/Quaternion.h"
+//#include "math/Plane.h"
+//#include "Mesh.h"
+//#include "Mesh2D.h"
+//#include "Image.h"
+//#include "ui/UIObject.h"
+//#include "ui/UIImage.h"
+//#include "Light.h"
+//#include "PointLight.h"
+//#include "SpotLight.h"
+//#include "DirectionalLight.h"
+//#include "Sound.h"
+//#include "SkyBox.h"
+//#include "Points.h"
+//#include "Particles.h"
+//#include "ui/Text.h"
+//#include "Input.h"
+//#include "Sprite.h"
+//#include "util/Function.h"
+//#include "util/FunctionSubscribe.h"
+//#include "physics/Contact2D.h"
+//#include "action/Action.h"
+//#include "action/Ease.h"
+//#include "action/TimeAction.h"
+//#include "action/MoveAction.h"
+//#include "action/RotateAction.h"
+//#include "action/ScaleAction.h"
+//#include "action/ColorAction.h"
+//#include "action/AlphaAction.h"
+//#include "action/SpriteAnimation.h"
+//#include "action/ParticlesAnimation.h"
+//#include "action/particleinit/ParticleInit.h"
+//#include "action/particleinit/ParticleAccelerationInit.h"
+//#include "action/particleinit/ParticleAlphaInit.h"
+//#include "action/particleinit/ParticleColorInit.h"
+//#include "action/particleinit/ParticleLifeInit.h"
+//#include "action/particleinit/ParticlePositionInit.h"
+//#include "action/particleinit/ParticleRotationInit.h"
+//#include "action/particleinit/ParticleSizeInit.h"
+//#include "action/particleinit/ParticleSpriteInit.h"
+//#include "action/particleinit/ParticleVelocityInit.h"
+//#include "action/particlemod/ParticleMod.h"
+//#include "action/particlemod/ParticleAlphaMod.h"
+//#include "action/particlemod/ParticleColorMod.h"
+//#include "action/particlemod/ParticlePositionMod.h"
+//#include "action/particlemod/ParticleRotationMod.h"
+//#include "action/particlemod/ParticleSizeMod.h"
+//#include "action/particlemod/ParticleSpriteMod.h"
+//#include "action/particlemod/ParticleVelocityMod.h"
 
 #include <map>
-#include <unistd.h>
 #include <locale>
+#include <vector>
+#include <memory>
 
 using namespace Supernova;
 
-
-namespace LuaIntf
-{
-	LUA_USING_SHARED_PTR_TYPE(std::shared_ptr)
-    LUA_USING_LIST_TYPE(std::vector)
-    LUA_USING_MAP_TYPE(std::map)
-}
 
 
 lua_State *LuaBinding::luastate;
@@ -169,8 +165,8 @@ int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
     return 0;
 }
 
-int LuaBinding::setLuaPath(const char* path)
-{
+// Note it can be done in the same way with Sol2: https://github.com/ThePhD/sol2/issues/692
+int LuaBinding::setLuaPath(const char* path) {
     lua_State *L = LuaBinding::getLuaState();
 
     lua_getglobal( L, "package" );
@@ -225,6 +221,21 @@ int LuaBinding::moduleLoader(lua_State *L) {
     return 1;
 }
 
+//The same msghandler of lua.c
+int LuaBinding::handleLuaError(lua_State* L) {
+    const char *msg = lua_tostring(L, 1);
+    if (msg == NULL) {  /* is error object not a string? */
+    if (luaL_callmeta(L, 1, "__tostring") &&  /* does it have a metamethod */
+        lua_type(L, -1) == LUA_TSTRING)  /* that produces a string? */
+        return 1;  /* that is the message */
+    else
+        msg = lua_pushfstring(L, "(error object is a %s value)",
+                                luaL_typename(L, 1));
+    }
+    luaL_traceback(L, L, msg, 1);  /* append a standard traceback */
+    return 1;  /* return the traceback */
+}
+
 void LuaBinding::bind(){
 
     lua_State *L = LuaBinding::getLuaState();
@@ -248,10 +259,13 @@ void LuaBinding::bind(){
         filedata.open(luafile_subdir.c_str());
     }
 
+    lua_pushcfunction(L, handleLuaError);
+    int msgh = lua_gettop(L);
+
     //int luaL_dofile (lua_State *L, const char *filename);
     if (luaL_loadbuffer(L,(const char*)filedata.getMemPtr(),filedata.length(), luafile.c_str()) == 0){
         #ifndef NO_LUA_INIT
-        if(lua_pcall(L, 0, LUA_MULTRET, 0) != 0){
+        if(lua_pcall(L, 0, LUA_MULTRET, msgh) != 0){
             Log::Error("Lua Error: %s\n", lua_tostring(L,-1));
             lua_close(L);
         }
@@ -265,6 +279,41 @@ void LuaBinding::bind(){
 
 void LuaBinding::registerClasses(lua_State *L){
 
+    //sol::state lua;
+    sol::state_view lua(L);
+
+    // luaL_openlibs() opened all libraries already: base, string, io, os, package, table, debug
+    //lua.open_libraries(sol::lib::base);
+
+    lua.new_enum("Scaling",
+                "FITWIDTH", Scaling::FITWIDTH,
+                "FITHEIGHT", Scaling::FITHEIGHT,
+                "LETTERBOX", Scaling::LETTERBOX,
+                "CROP", Scaling::CROP,
+                "STRETCH", Scaling::STRETCH)
+                ;
+
+    lua.new_usertype<Engine>("Engine",
+            sol::default_constructor,
+	        "setScene", &Engine::setScene,
+            "getCanvasWidth", &Engine::getCanvasWidth,
+            "setScalingMode", &Engine::setScalingMode,
+            "onViewLoaded", sol::property([] () { return &Engine::onViewLoaded; }, [] (sol::function func) { Engine::onViewLoaded.add("luaFunction", func);}),
+            "onUpdate", sol::property([] () { return &Engine::onUpdate; }, [] (sol::function func) { Engine::onUpdate.add("luaFunction", func);})
+            );
+
+    // sol::meta_function::call and other metafunctions are automatically generated: https://sol2.readthedocs.io/en/latest/api/usertype.html
+    lua.new_usertype<FunctionSubscribe<void()>>("FunctionSubscribe_V",
+            sol::default_constructor,
+            "call", &FunctionSubscribe<void()>::call,
+            "add", (bool (FunctionSubscribe<void()>::*)(const std::string&, sol::function))&FunctionSubscribe<void()>::add
+            );
+
+    lua.new_usertype<Scene>("Scene",
+	     sol::default_constructor
+         );
+
+/*
     LuaIntf::LuaBinding(L).beginClass<Engine>("Engine")
             .addConstructor(LUA_ARGS())
             .addStaticFunction("setScene", &Engine::setScene)
@@ -933,4 +982,5 @@ void LuaBinding::registerClasses(lua_State *L){
             .addFunction("getFromVelocity", &ParticleVelocityMod::getFromVelocity)
             .addFunction("getToVelocity", &ParticleVelocityMod::getToVelocity)
             .endClass();
+*/
 }

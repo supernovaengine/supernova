@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <string>
-#include "system/System.h"
+#include "System.h"
 
 class SupernovaAndroid: public Supernova::System {
 

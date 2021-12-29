@@ -3,14 +3,14 @@
 //
 
 #include "IndexBuffer.h"
-#include "render/ProgramRender.h"
+#include "render/ObjectRender.h"
 
 using namespace Supernova;
 
 IndexBuffer::IndexBuffer(): Buffer(){
     createIndexAttribute();
 
-    type = S_BUFFERTYPE_INDEX;
+    type = BufferType::INDEX_BUFFER;
 }
 
 IndexBuffer::~IndexBuffer(){
@@ -18,7 +18,8 @@ IndexBuffer::~IndexBuffer(){
 }
 
 void IndexBuffer::createIndexAttribute(){
-    Buffer::addAttribute(S_INDEXATTRIBUTE, 1, sizeof(unsigned int), 0);
+    Buffer::addAttribute(AttributeType::INDEX, AttributeDataType::UNSIGNED_SHORT, 1, 0);
+    Buffer::setStride(sizeof(uint16_t));
 }
 
 bool IndexBuffer::resize(size_t pos) {

@@ -5,9 +5,6 @@
 // (c) 2019 Eduardo Doria.
 //
 
-#define S_BUFFERTYPE_VERTEX 0
-#define S_BUFFERTYPE_INDEX 1
-
 #include <string>
 #include <map>
 
@@ -15,6 +12,8 @@
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 #include "Attribute.h"
+#include "render/Render.h"
+#include "render/BufferRender.h"
 
 
 namespace Supernova {
@@ -22,14 +21,18 @@ namespace Supernova {
     class Buffer {
 
     protected:
-        std::map<int, Attribute> attributes;
+        std::map<AttributeType, Attribute> attributes;
         unsigned int count;
-        int type;
+        BufferType type;
+        BufferUsage usage;
 
         unsigned char* data;
         size_t size;
+        unsigned int stride;
 
         bool renderAttributes;
+
+        BufferRender render;
 
     public:
         Buffer();
@@ -40,25 +43,31 @@ namespace Supernova {
 
         void clearAll();
 
-        void addAttribute(int attribute, unsigned int elements, unsigned int stride, size_t offset);
-        void addAttribute(int attribute, Attribute Attribute);
+        void addAttribute(AttributeType attribute, AttributeDataType dataType, unsigned int elements, size_t offset);
+        void addAttribute(AttributeType attribute, unsigned int elements, size_t offset);
+        void addAttribute(AttributeType attribute, Attribute Attribute);
 
-        Attribute* getAttribute(int attribute);
-        std::map<int, Attribute> getAttributes();
+        BufferRender* getRender();
 
-        void addUInt(int attribute, unsigned int value);
-        void addFloat(int attribute, float value);
-        void addVector2(int attribute, Vector2 vector);
-        void addVector3(int attribute, Vector3 vector);
-        void addVector4(int attribute, Vector4 vector);
+        Attribute* getAttribute(AttributeType attribute);
+        std::map<AttributeType, Attribute> getAttributes();
 
-        void addUInt(Attribute* attribute, unsigned int value);
+        void addUInt16(AttributeType attribute, uint16_t value);
+        void addUInt32(AttributeType attribute, uint32_t value);
+        void addFloat(AttributeType attribute, float value);
+        void addVector2(AttributeType attribute, Vector2 vector);
+        void addVector3(AttributeType attribute, Vector3 vector);
+        void addVector4(AttributeType attribute, Vector4 vector);
+
+        void addUInt16(Attribute* attribute, uint16_t value);
+        void addUInt32(Attribute* attribute, uint32_t value);
         void addFloat(Attribute* attribute, float value);
         void addVector2(Attribute* attribute, Vector2 vector);
         void addVector3(Attribute* attribute, Vector3 vector);
         void addVector4(Attribute* attribute, Vector4 vector);
 
-        void setUInt(unsigned int index, Attribute* attribute, unsigned int value);
+        void setUInt16(unsigned int index, Attribute* attribute, uint16_t value);
+        void setUInt32(unsigned int index, Attribute* attribute, uint32_t value);
         void setFloat(unsigned int index, Attribute* attribute, float value);
         void setVector2(unsigned int index, Attribute* attribute, Vector2 vector);
         void setVector3(unsigned int index, Attribute* attribute, Vector3 vector);
@@ -66,13 +75,15 @@ namespace Supernova {
 
         void setValues(unsigned int index, Attribute* attribute, unsigned int numValues, char* vector, size_t typesize);
 
-        unsigned int getUInt(int attribute, unsigned int index);
-        float getFloat(int attribute, unsigned int index);
-        Vector2 getVector2(int attribute, unsigned int index);
-        Vector3 getVector3(int attribute, unsigned int index);
-        Vector4 getVector4(int attribute, unsigned int index);
+        uint16_t getUInt16(AttributeType attribute, unsigned int index);
+        uint32_t getUInt32(AttributeType attribute, unsigned int index);
+        float getFloat(AttributeType attribute, unsigned int index);
+        Vector2 getVector2(AttributeType attribute, unsigned int index);
+        Vector3 getVector3(AttributeType attribute, unsigned int index);
+        Vector4 getVector4(AttributeType attribute, unsigned int index);
 
-        unsigned int getUInt(Attribute* attribute, unsigned int index, int elementIndex = 0);
+        uint16_t getUInt16(Attribute* attribute, unsigned int index, int elementIndex = 0);
+        uint32_t getUInt32(Attribute* attribute, unsigned int index, int elementIndex = 0);
         float getFloat(Attribute* attribute, unsigned int index, int elementIndex = 0);
         Vector2 getVector2(Attribute* attribute, unsigned int index);
         Vector3 getVector3(Attribute* attribute, unsigned int index);
@@ -81,10 +92,16 @@ namespace Supernova {
         unsigned char* getData();
         size_t getSize();
 
+        void setStride(unsigned int stride);
+        unsigned int getStride();
+
         unsigned int getCount();
 
-        void setBufferType(int type);
-        int getBufferType();
+        void setType(BufferType type);
+        BufferType getType();
+
+        void setUsage(BufferUsage usage);
+        BufferUsage getUsage();
 
         bool isRenderAttributes() const;
         void setRenderAttributes(bool renderAttributes);

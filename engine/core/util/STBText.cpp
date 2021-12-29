@@ -5,7 +5,7 @@
 #include "io/Data.h"
 #include <codecvt>
 #include <locale>
-#include "ui/DefaultFont.h"
+#include "DefaultFont.h"
 
 using namespace Supernova;
 
@@ -136,10 +136,10 @@ TextureData* STBText::load(std::string fontpath, unsigned int fontSize){
     stbtt_PackEnd(&context);
 
     unsigned int textureSize = atlasWidth * atlasHeight * sizeof(unsigned char);
-    return new TextureData(atlasWidth, atlasHeight, textureSize, S_COLOR_ALPHA, 1, (void*)atlasData);
+    return new TextureData(atlasWidth, atlasHeight, textureSize, ColorFormat::RED, 1, (void*)atlasData);
 }
 
-void STBText::createText(std::string text, Buffer* buffer, std::vector<unsigned int>& indices, std::vector<Vector2>& charPositions,
+void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
                          int& width, int& height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert){
     
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
@@ -148,9 +148,8 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<unsigned 
     float offsetX = 0;
     float offsetY = 0;
 
-    Attribute* atrVertice = buffer->getAttribute(S_VERTEXATTRIBUTE_VERTICES);
-    Attribute* atrTexcoord = buffer->getAttribute(S_VERTEXATTRIBUTE_TEXTURECOORDS);
-    Attribute* atrNormal = buffer->getAttribute(S_VERTEXATTRIBUTE_NORMALS);
+    Attribute* atrVertice = buffer->getAttribute(AttributeType::POSITION);
+    Attribute* atrTexcoord = buffer->getAttribute(AttributeType::TEXCOORD1);
 
     if (multiline && userDefinedWidth){
 
@@ -243,11 +242,6 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<unsigned 
             buffer->addVector2(atrTexcoord, Vector2(quad.s1, quad.t0));
             buffer->addVector2(atrTexcoord, Vector2(quad.s1, quad.t1));
             buffer->addVector2(atrTexcoord, Vector2(quad.s0, quad.t1));
-
-            buffer->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-            buffer->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-            buffer->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-            buffer->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
                 
             indices.push_back(ind);
             indices.push_back(ind+1);
@@ -268,10 +262,6 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<unsigned 
         buffer->addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
         buffer->addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
         buffer->addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
-
-        buffer->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-        buffer->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
-        buffer->addVector3(atrNormal, Vector3(0.0f, 0.0f, 1.0f));
         
         indices.push_back(0);
         indices.push_back(1);

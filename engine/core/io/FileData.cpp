@@ -6,7 +6,7 @@
 
 #include "FileData.h"
 #include "Data.h"
-#include "system/System.h"
+#include "System.h"
 #include <stack>
 
 using namespace Supernova;
@@ -69,7 +69,7 @@ bool FileData::beginWith(std::string path, std::string prefix){
 std::string FileData::getBaseDir(std::string filepath){
     size_t found;
 
-    found=filepath.find_last_of(System::instance().getDirSeparator());
+    found=filepath.find_last_of("/\\");
 
     std::string result = filepath.substr(0,found);
 
@@ -149,6 +149,10 @@ std::string FileData::getSystemPath(std::string path){
         path = path.substr(6, path.length());
         return System::instance().getLuaPath() + "/" + FileData::simplifyPath(path);
     }
+    if (beginWith(path, "shader://")){
+        path = path.substr(9, path.length());
+        return System::instance().getShaderPath() + "/" + FileData::simplifyPath(path);
+    }
     if (beginWith(path, "/")){
         path = path.substr(1, path.length());
         return System::instance().getAssetPath() + "/" + FileData::simplifyPath(path);
@@ -156,13 +160,9 @@ std::string FileData::getSystemPath(std::string path){
     return System::instance().getAssetPath() + "/" + FileData::simplifyPath(path);
 }
 
-std::string FileData::readString(int aOffset){
-    unsigned int stringlen = length();
+std::string FileData::readString(unsigned int stringlen){
     std::string s( stringlen, '\0' );
-    
-    seek(aOffset);
     read((unsigned char*)&s[0], stringlen);
-
     return s;
 }
 

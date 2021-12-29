@@ -5,6 +5,8 @@
 #ifndef luabinding_h
 #define luabinding_h
 
+//#include "lua.h"
+
 typedef struct lua_State lua_State;
 typedef int (*lua_CFunction) (lua_State *L);
 
@@ -22,9 +24,10 @@ namespace Supernova {
         static int setLuaSearcher(lua_CFunction f, bool cleanSearchers = false);
         
         static int moduleLoader(lua_State *L);
-        
-        static void bind();
+        static int handleLuaError(lua_State* L);
         static void registerClasses(lua_State *L);
+
+        static void bind();
 
     public:
         LuaBinding();

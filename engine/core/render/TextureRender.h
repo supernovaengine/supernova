@@ -1,70 +1,29 @@
-
 #ifndef TextureRender_h
 #define TextureRender_h
 
-#include "image/TextureData.h"
-#include <vector>
-#include <string>
-#include <unordered_map>
+#include "Render.h"
+#include "sokol/SokolTexture.h"
 
-#define TEXTURE_CUBE_FACE_POSITIVE_X 0
-#define TEXTURE_CUBE_FACE_NEGATIVE_X 1
-#define TEXTURE_CUBE_FACE_POSITIVE_Y 2
-#define TEXTURE_CUBE_FACE_NEGATIVE_Y 3
-#define TEXTURE_CUBE_FACE_POSITIVE_Z 4
-#define TEXTURE_CUBE_FACE_NEGATIVE_Z 5
+namespace Supernova{
+    class TextureRender{
 
-namespace Supernova {
-
-    class TextureRender {
-        
-    private:
-        
-        typedef std::unordered_map< std::string, std::shared_ptr<TextureRender> >::iterator it_type;
-        static std::unordered_map< std::string, std::shared_ptr<TextureRender> > texturesRender;
-        
-        bool loaded;
-        
-        int colorFormat;
-        int width;
-        int height;
-        
-        static TextureRender::it_type findToRemove();
-        
-    protected:
-
-        bool nearestScale;
-        
-        TextureRender();
-        
     public:
-        
-        virtual ~TextureRender();
-        
-        static std::shared_ptr<TextureRender> sharedInstance(std::string id);
-        static void deleteUnused();
-        
-        bool isLoaded();
-        
-        int getColorFormat();
-        int getWidth();
-        int getHeight();
+        //***Backend***
+        SokolTexture backend;
+        //***
 
-        void setNearestScale(bool nearestScale);
-        
-        virtual bool loadTexture(TextureData* texturedata);
-        virtual bool loadTextureCube(std::vector<TextureData*> texturesdata);
-        virtual bool loadTextureFrame(int width, int height, bool depthframe);
-        virtual bool loadTextureFrameCube(int width, int height);
-        
-        virtual void initTextureFrame() = 0;
-        virtual void initTextureFrame(int cubeFace) = 0;
-        virtual void endTextureFrame() = 0;
-        
-        virtual void deleteTexture();
-        
+        TextureRender();
+        TextureRender(const TextureRender& rhs);
+        TextureRender& operator=(const TextureRender& rhs);
+
+        virtual ~TextureRender();
+
+        bool createTexture(std::string label, int width, int height, ColorFormat colorFormat, TextureType type, int numFaces, TextureDataSize* texData);
+        bool createShadowMapTexture(TextureType type, bool depth, int width, int height);
+
+        void destroyTexture();
     };
-    
 }
+
 
 #endif /* TextureRender_h */

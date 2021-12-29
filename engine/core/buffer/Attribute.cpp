@@ -7,21 +7,21 @@
 using namespace Supernova;
 
 Attribute::Attribute(){
-    setDataType(DataType::FLOAT);
+    setDataType(AttributeDataType::FLOAT);
     setBuffer("");
     setElements(0);
-    setStride(0);
     setOffset(0);
     setCount(0);
+    setNormalized(true);
 }
 
-Attribute::Attribute(DataType dataType, std::string bufferName, unsigned int elements, unsigned int stride, size_t offset){
+Attribute::Attribute(AttributeDataType dataType, std::string bufferName, unsigned int elements, size_t offset, bool normalized){
     setDataType(dataType);
     setBuffer(bufferName);
     setElements(elements);
-    setStride(stride);
     setOffset(offset);
     setCount(0);
+    setNormalized(normalized);
 }
 
 Attribute::~Attribute(){
@@ -32,27 +32,27 @@ Attribute::Attribute(const Attribute& a){
     this->dataType = a.dataType;
     this->buffer = a.buffer;
     this->elements = a.elements;
-    this->stride = a.stride;
     this->offset = a.offset;
     this->count = a.count;
+    this->normalized = a.normalized;
 }
 
 Attribute& Attribute::operator = (const Attribute& a){
     this->dataType = a.dataType;
     this->buffer = a.buffer;
     this->elements = a.elements;
-    this->stride = a.stride;
     this->offset = a.offset;
     this->count = a.count;
+    this->normalized = a.normalized;
 
     return *this;
 }
 
-DataType Attribute::getDataType() const {
+AttributeDataType Attribute::getDataType() const {
     return dataType;
 }
 
-void Attribute::setDataType(DataType dataType) {
+void Attribute::setDataType(AttributeDataType dataType) {
     Attribute::dataType = dataType;
 }
 
@@ -72,14 +72,6 @@ void Attribute::setElements(unsigned int elements){
     this->elements = elements;
 }
 
-unsigned int Attribute::getStride() const{
-    return stride;
-}
-
-void Attribute::setStride(unsigned int stride){
-    this->stride = stride;
-}
-
 const size_t &Attribute::getOffset() const{
     return offset;
 }
@@ -94,4 +86,12 @@ unsigned int Attribute::getCount() const {
 
 void Attribute::setCount(unsigned int count) {
     Attribute::count = count;
+}
+
+bool Attribute::getNormalized() const {
+    return normalized;
+}
+
+void Attribute::setNormalized(bool normalized) {
+    this->normalized = normalized;
 }

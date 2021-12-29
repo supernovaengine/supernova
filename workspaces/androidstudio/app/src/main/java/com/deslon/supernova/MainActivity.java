@@ -167,8 +167,15 @@ public class MainActivity extends Activity {
 								glSurfaceView.queueEvent(new Runnable() {
 									@Override
 									public void run() {
-										JNIWrapper.system_touch_drag(pointerId, normalizedX, normalizedY);
+										JNIWrapper.system_touch_move(pointerId, normalizedX, normalizedY);
 									}
+								});
+								break;
+							}
+							case MotionEvent.ACTION_CANCEL: {
+								glSurfaceView.queueEvent(new Runnable() {
+									@Override
+									public void run() { JNIWrapper.system_touch_cancel(); }
 								});
 								break;
 							}
@@ -219,6 +226,14 @@ public class MainActivity extends Activity {
 		}
 
 		JNIWrapper.system_resume();
+	}
+
+	@Override
+	public void onDestroy() {
+    	// error when shutdown: call to OpenGL ES API with no current context (logged once per thread)
+		//JNIWrapper.system_shutdown();
+
+		super.onDestroy();
 	}
 
 	public void showSoftKeyboard(){

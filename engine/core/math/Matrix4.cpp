@@ -3,7 +3,7 @@
 #include "Angle.h"
 #include <cmath>
 #include <cassert>
-#include <string>
+#include <string.h>
 #include <iostream>
 #include <iomanip>
 
@@ -20,9 +20,9 @@ Matrix4::Matrix4(const Matrix4 &matrix)
 }
 
 Matrix4::Matrix4 (float fEntry00, float fEntry10, float fEntry20, float fEntry30,
-         float fEntry01, float fEntry11, float fEntry21, float fEntry31,
-         float fEntry02, float fEntry12, float fEntry22, float fEntry32,
-         float fEntry03, float fEntry13, float fEntry23, float fEntry33)
+                float fEntry01, float fEntry11, float fEntry21, float fEntry31,
+                float fEntry02, float fEntry12, float fEntry22, float fEntry32,
+                float fEntry03, float fEntry13, float fEntry23, float fEntry33)
 {
     matrix[0][0] = fEntry00;
     matrix[0][1] = fEntry01;

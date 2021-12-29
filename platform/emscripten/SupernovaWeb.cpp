@@ -8,7 +8,7 @@
 
 #include "Engine.h"
 #include "Input.h"
-#include "system/System.h"
+#include "System.h"
 #include "Log.h"
 
 int SupernovaWeb::syncWaitTime;
@@ -44,20 +44,6 @@ extern "C" {
 
 
 
-int main(int argc, char **argv) {
-
-    int sWidth = 960;
-    int sHeight = 540;
-    if ((argv[1] != NULL && argv[1] != 0) && (argv[2] != NULL && argv[2] != 0)){
-        sWidth = atoi(argv[1]);
-        sHeight = atoi(argv[2]);
-    }
-
-    return SupernovaWeb::init(sWidth, sHeight);
-}
-
-
-
 SupernovaWeb::SupernovaWeb(){
 
 }
@@ -74,7 +60,14 @@ int SupernovaWeb::getScreenHeight(){
     return screenHeight;
 }
 
-int SupernovaWeb::init(int width, int height){
+int SupernovaWeb::init(int argc, char **argv){
+
+    int sWidth = 960;
+    int sHeight = 540;
+    if ((argv[1] != NULL && argv[1] != 0) && (argv[2] != NULL && argv[2] != 0)){
+        sWidth = atoi(argv[1]);
+        sHeight = atoi(argv[2]);
+    }
 
     EMSCRIPTEN_RESULT ret = emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
     ret = emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, key_callback);
@@ -100,9 +93,7 @@ int SupernovaWeb::init(int width, int height){
 		});
 	);
 
-    SupernovaWeb::screenWidth = width;
-    SupernovaWeb::screenHeight = height;
-    Supernova::Engine::systemStart();
+    Supernova::Engine::systemInit(argc, argv);
 
     EmscriptenWebGLContextAttributes attr;
     emscripten_webgl_init_context_attributes(&attr);
@@ -114,14 +105,16 @@ int SupernovaWeb::init(int width, int height){
     attr.failIfMajorPerformanceCaveat = false;
     attr.enableExtensionsByDefault = true;
     attr.premultipliedAlpha = true;
-    attr.majorVersion = true;
-    attr.minorVersion = false;
+    attr.majorVersion = 2;
+    attr.minorVersion = 0;
     EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_create_context("#canvas", &attr);
     
     emscripten_webgl_make_context_current(ctx);
 
-    Supernova::Engine::systemSurfaceCreated();
-    changeCanvasSize(width, height);
+    SupernovaWeb::screenWidth = sWidth;
+    SupernovaWeb::screenHeight = sHeight;
+    Supernova::Engine::systemViewLoaded();
+    changeCanvasSize(sWidth, sHeight);
 
     emscripten_set_main_loop(renderLoop, 0, 1);
 
@@ -133,7 +126,7 @@ void SupernovaWeb::changeCanvasSize(int width, int height){
 
     SupernovaWeb::screenWidth = width;
     SupernovaWeb::screenHeight = height;
-    Supernova::Engine::systemSurfaceChanged();
+    Supernova::Engine::systemViewChanged();
 }
 
 bool SupernovaWeb::isFullscreen(){
@@ -191,75 +184,95 @@ EM_BOOL SupernovaWeb::canvas_resize(int eventType, const void *reserved, void *u
 
     SupernovaWeb::screenWidth = w;
     SupernovaWeb::screenHeight = h;
-    Supernova::Engine::systemSurfaceChanged();
+    Supernova::Engine::systemViewChanged();
 
     return 0;
 }
 
-void SupernovaWeb::unicode_to_utf8(char *b, unsigned long c) {
-	if (c<0x80) *b++=c;
-	else if (c<0x800) *b++=192+c/64, *b++=128+c%64;
-	else if (c-0xd800u<0x800) return;
-	else if (c<0x10000) *b++=224+c/4096, *b++=128+c/64%64, *b++=128+c%64;
-	else if (c<0x110000) *b++=240+c/262144, *b++=128+c/4096%64, *b++=128+c/64%64, *b++=128+c%64;
+wchar_t SupernovaWeb::toCodepoint(const std::string &u){
+    int l = u.length();
+    if (l<1) return -1; unsigned char u0 = u[0]; if (u0>=0   && u0<=127) return u0;
+    if (l<2) return -1; unsigned char u1 = u[1]; if (u0>=192 && u0<=223) return (u0-192)*64 + (u1-128);
+    //if (u[0]==0xed && (u[1] & 0xa0) == 0xa0) return -1; //code points, 0xd800 to 0xdfff
+    if (l<3) return -1; unsigned char u2 = u[2]; if (u0>=224 && u0<=239) return (u0-224)*4096 + (u1-128)*64 + (u2-128);
+    if (l<4) return -1; unsigned char u3 = u[3]; if (u0>=240 && u0<=247) return (u0-240)*262144 + (u1-128)*4096 + (u2-128)*64 + (u3-128);
+    return -1;
 }
 
-size_t SupernovaWeb::utf8len(const char *s) {
-    size_t len = 0;
-    for (; *s; ++s) if ((*s & 0xC0) != 0x80) ++len;
-    return len;
+std::string SupernovaWeb::toUTF8(wchar_t cp) {
+    char ch[5] = {0x00};
+    if(cp <= 0x7F) { 
+        ch[0] = cp; 
+    }
+    else if(cp <= 0x7FF) { 
+        ch[0] = (cp >> 6) + 192; 
+        ch[1] = (cp & 63) + 128; 
+    }
+    else if(0xd800 <= cp && cp <= 0xdfff) {}
+    else if(cp <= 0xFFFF) { 
+        ch[0] = (cp >> 12) + 224; 
+        ch[1]= ((cp >> 6) & 63) + 128; 
+        ch[2]= (cp & 63) + 128; 
+    }
+    else if(cp <= 0x10FFFF) { 
+        ch[0] = (cp >> 18) + 240; 
+        ch[1] = ((cp >> 12) & 63) + 128; 
+        ch[2] = ((cp >> 6) & 63) + 128; 
+        ch[3]= (cp & 63) + 128; 
+    }
+    return std::string(ch);
 }
 
 EM_BOOL SupernovaWeb::key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData){
-/*
-    if (eventType == EMSCRIPTEN_EVENT_KEYPRESS && (!strcmp(e->key, "f") || e->which == 102)) {
-        if (!isFullscreen()){
-            requestFullscreen();
-        }else{
-            exitFullscreen();
+    const char *key=e->key;
+    if ( (!key)||(!(*key)) ){
+        key = toUTF8(e->keyCode).c_str();
+    }
+    if (!(*key)){
+        key = toUTF8(e->which).c_str();
+    }
+
+    int modifiers = 0;
+    if (e->ctrlKey) modifiers |= S_MODIFIER_CONTROL;
+    if (e->shiftKey) modifiers |= S_MODIFIER_SHIFT;
+    if (e->altKey)  modifiers |= S_MODIFIER_ALT;
+    if (e->metaKey) modifiers |= S_MODIFIER_SUPER;
+
+    int code = supernova_input(e->code);
+    if (code==0){
+        code = supernova_legacy_input(e->which);
+    }
+    if (code==0){
+        code = supernova_legacy_input(e->keyCode);
+    }
+
+    int skey=0;
+    if ((!strcmp(key,"Tab"))||(*key=='\t')) skey=1;
+    if ((!strcmp(key,"Backspace"))||(*key=='\b')) skey=2;
+    if ((!strcmp(key,"Enter"))||(*key=='\r')) skey=4;
+    if ((!strcmp(key,"Escape"))||(*key=='\e')) skey=8;
+
+    if (eventType == EMSCRIPTEN_EVENT_KEYDOWN){
+        Supernova::Engine::systemKeyDown(code, e->repeat, modifiers);
+        if (skey==1) Supernova::Engine::systemCharInput('\t');
+        if (skey==2) Supernova::Engine::systemCharInput('\b');
+        if (skey==4) Supernova::Engine::systemCharInput('\r');
+        if (skey==8) Supernova::Engine::systemCharInput('\e');
+
+    }else if (eventType == EMSCRIPTEN_EVENT_KEYUP){
+        Supernova::Engine::systemKeyUp(code, e->repeat, modifiers);
+
+    }else if (eventType == EMSCRIPTEN_EVENT_KEYPRESS){
+        wchar_t cp = toCodepoint(std::string(e->key));
+        if (cp == 0) cp = e->which;
+        if (cp == 0) cp = e->keyCode;
+
+        if (skey == 0 && cp != 0){
+            Supernova::Engine::systemCharInput(cp);
         }
     }
-*/
-  const char *key=e->key;
-  char keybuff[5] = {0};
-  if ( (!key)||(!(*key)) ){
-      unicode_to_utf8(keybuff, e->keyCode);
-      key = keybuff;
-  }
-  if (!(*key)){
-      unicode_to_utf8(keybuff, e->which);
-      key = keybuff;
-  }
 
-  int code = supernova_input(e->code);
-  if (code==0){
-      code = supernova_legacy_input(e->which);
-  }
-  if (code==0){
-      code = supernova_legacy_input(e->keyCode);
-  }
-
-   int skey=0;
-   if ((!strcmp(key,"Tab"))||(*key=='\t')) skey=1;
-   if ((!strcmp(key,"Backspace"))||(*key=='\b')) skey=2;
-   if ((!strcmp(key,"Enter"))||(*key=='\r')) skey=4;
-   if ((!strcmp(key,"Escape"))||(*key=='\e')) skey=8;
-
-   if (eventType == EMSCRIPTEN_EVENT_KEYDOWN){
-       Supernova::Engine::systemKeyDown(code);
-       if (skey==1) Supernova::Engine::systemTextInput("\t");
-       if (skey==2) Supernova::Engine::systemTextInput("\b");
-       if (skey==4) Supernova::Engine::systemTextInput("\r");
-       if (skey==8) Supernova::Engine::systemTextInput("\e");
-   }else if (eventType == EMSCRIPTEN_EVENT_KEYUP){
-       Supernova::Engine::systemKeyUp(code);
-   }else if (eventType == EMSCRIPTEN_EVENT_KEYPRESS){
-       if ((utf8len(key)==1)&&(!skey)){
-           Supernova::Engine::systemTextInput(key);
-       }
-    }
-
- return 0;
+    return 0;
 }
 
 EM_BOOL SupernovaWeb::mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData) {
@@ -272,34 +285,45 @@ EM_BOOL SupernovaWeb::mouse_callback(int eventType, const EmscriptenMouseEvent *
     if (e->canvasX > width) return 0;
     if (e->canvasY > height) return 0;
 
-    const float normalized_x = (e->targetX / (float) width) * 2.f - 1.f;
-    const float normalized_y = (e->targetY / (float) height) * 2.f - 1.f;
+    int modifiers = 0;
+    if (e->ctrlKey) modifiers |= S_MODIFIER_CONTROL;
+    if (e->shiftKey) modifiers |= S_MODIFIER_SHIFT;
+    if (e->altKey) modifiers |= S_MODIFIER_ALT;
+    if (e->metaKey) modifiers |= S_MODIFIER_SUPER;
 
-    Supernova::Engine::systemMouseMove(normalized_x, normalized_y);
-    if ((e->movementX != 0 || e->movementY != 0) && e->buttons != 0) {
-        Supernova::Engine::systemMouseDrag(supernova_mouse_button(e->button), normalized_x, normalized_y);
-    }
-
+    Supernova::Engine::systemMouseMove(e->targetX, e->targetY, modifiers);
     if (eventType == EMSCRIPTEN_EVENT_MOUSEDOWN && e->buttons != 0){
-        Supernova::Engine::systemMouseDown(supernova_mouse_button(e->button), normalized_x, normalized_y);
+        Supernova::Engine::systemMouseDown(supernova_mouse_button(e->button), e->targetX, e->targetY, modifiers);
     }
     if (eventType == EMSCRIPTEN_EVENT_MOUSEUP){
-        Supernova::Engine::systemMouseUp(supernova_mouse_button(e->button), normalized_x, normalized_y);
+        Supernova::Engine::systemMouseUp(supernova_mouse_button(e->button), e->targetX, e->targetY, modifiers);
     }
-    if (eventType == EMSCRIPTEN_EVENT_DBLCLICK){
+    if (eventType == EMSCRIPTEN_EVENT_MOUSEENTER){
+        Supernova::Engine::systemMouseEnter();
+    }
+    if (eventType == EMSCRIPTEN_EVENT_MOUSELEAVE){
+        Supernova::Engine::systemMouseLeave();
     }
 
     return 0;
 }
 
 EM_BOOL SupernovaWeb::wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData) {
-    /*
-  printf("mouse_wheel, screen: (%ld,%ld), client: (%ld,%ld),%s%s%s%s button: %hu, buttons: %hu, canvas: (%ld,%ld), target: (%ld, %ld), delta:(%g,%g,%g), deltaMode:%lu\n",
-    e->mouse.screenX, e->mouse.screenY, e->mouse.clientX, e->mouse.clientY,
-    e->mouse.ctrlKey ? " CTRL" : "", e->mouse.shiftKey ? " SHIFT" : "", e->mouse.altKey ? " ALT" : "", e->mouse.metaKey ? " META" : "",
-    e->mouse.button, e->mouse.buttons, e->mouse.canvasX, e->mouse.canvasY, e->mouse.targetX, e->mouse.targetY,
-    (float)e->deltaX, (float)e->deltaY, (float)e->deltaZ, e->deltaMode);
-    */
+    float scale;
+    switch (e->deltaMode) {
+        case DOM_DELTA_PIXEL: scale = -0.04f; break;
+        case DOM_DELTA_LINE:  scale = -1.33f; break;
+        case DOM_DELTA_PAGE:  scale = -10.0f; break;
+        default:              scale = -0.1f; break;
+    }
+
+    int modifiers = 0;
+    if (e->mouse.ctrlKey) modifiers |= S_MODIFIER_CONTROL;
+    if (e->mouse.shiftKey) modifiers |= S_MODIFIER_SHIFT;
+    if (e->mouse.altKey) modifiers |= S_MODIFIER_ALT;
+    if (e->mouse.metaKey) modifiers |= S_MODIFIER_SUPER;
+
+    Supernova::Engine::systemMouseScroll(scale * (float)e->deltaX, scale * (float)e->deltaY, modifiers);
 
   return 0;
 }

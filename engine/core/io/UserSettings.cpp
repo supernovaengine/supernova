@@ -3,7 +3,7 @@
 //
 
 #include "UserSettings.h"
-#include "system/System.h"
+#include "System.h"
 
 using namespace Supernova;
 

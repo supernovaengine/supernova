@@ -1,69 +1,41 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #include "Action.h"
-
-#include "Engine.h"
-#include "Object.h"
-#include "Log.h"
-
-//
-// (c) 2018 Eduardo Doria.
-//
 
 using namespace Supernova;
 
-Action::Action(){
-    this->object = NULL;
-    this->running = false;
-    this->timecount = 0;
+Action::Action(Scene* scene){
+    this->scene = scene;
+    this->entity = scene->createEntity();
+    addComponent<ActionComponent>({});
 }
 
-Action::~Action(){
-    if (object)
-        object->removeAction(this);
+void Action::start(){
+    ActionComponent& action = getComponent<ActionComponent>();
+
+    action.startTrigger = true;
 }
 
-Object* Action::getObject(){
-    return object;
+void Action::pause(){
+    ActionComponent& action = getComponent<ActionComponent>();
+
+    action.pauseTrigger = true;
 }
 
-void Action::setTimecount(float timecount){
-    this->timecount = timecount;
+void Action::stop(){
+    ActionComponent& action = getComponent<ActionComponent>();
+
+    action.stopTrigger = true;
 }
 
-bool Action::isRunning(){
-    return running;
+void Action::setTarget(Entity target){
+    ActionComponent& action = getComponent<ActionComponent>();
+
+    action.target = target;
 }
 
-bool Action::run(){
-    running = true;
-    if (timecount == 0)
-        onStart.call(object);
-    onRun.call(object);
-
-    return true;
-}
-
-bool Action::pause(){
-    running = false;
-    onPause.call(object);
-    
-    return true;
-}
-
-bool Action::stop(){
-    running = false;
-    timecount = 0;
-    onStop.call(object);
-    
-    return true;
-}
-
-bool Action::update(float interval){
-    if (running){
-        timecount += interval;
-        onUpdate.call(object, interval);
-    }else{
-        return false;
-    }
-
-    return true;
+Entity Action::getEntity(){
+    return entity;
 }

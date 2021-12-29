@@ -1,53 +1,36 @@
 #include "SceneRender.h"
-#include "math/Angle.h"
-#include "Engine.h"
-#include "gles2/GLES2Scene.h"
+
+#include "sokol/SokolScene.h"
 
 using namespace Supernova;
 
-SceneRender::SceneRender(){
-    useLight = false;
-    childScene = false;
-    useDepth = false;
-    useTransparency = false;
-    drawingShadow = false;
+SceneRender::SceneRender(){ }
+
+SceneRender::SceneRender(const SceneRender& rhs) : backend(rhs.backend) { }
+
+SceneRender& SceneRender::operator=(const SceneRender& rhs) { 
+    backend = rhs.backend; 
+    return *this; 
 }
 
-SceneRender::~SceneRender(){
+SceneRender::~SceneRender(){ }
 
+void SceneRender::setClearColor(Vector4 clearColor){
+    backend.setClearColor(clearColor);
 }
 
-SceneRender* SceneRender::newInstance(){
-    if (Engine::getRenderAPI() == S_GLES2){
-        return new GLES2Scene();
-    }
-
-    return NULL;
+void SceneRender::startFrameBuffer(FramebufferRender* framebuffer, size_t face){
+    backend.startFrameBuffer(framebuffer, face);
 }
 
-void SceneRender::setUseLight(bool useLight){
-    this->useLight = useLight;
+void SceneRender::startDefaultFrameBuffer(int width, int height){
+    backend.startDefaultFrameBuffer(width, height);
 }
 
-void SceneRender::setChildScene(bool childScene){
-    this->childScene = childScene;
+void SceneRender::applyViewport(Rect rect){
+    backend.applyViewport(rect);
 }
 
-void SceneRender::setUseDepth(bool useDepth){
-    this->useDepth = useDepth;
-}
-
-void SceneRender::setUseTransparency(bool useTransparency){
-    this->useTransparency = useTransparency;
-}
-
-void SceneRender::setDrawingShadow(bool drawingShadow){
-    this->drawingShadow = drawingShadow;
-}
-
-bool SceneRender::load(){
-    return true;
-}
-bool SceneRender::draw(){
-    return true;
+void SceneRender::endFrameBuffer(){
+    backend.endFrameBuffer();
 }

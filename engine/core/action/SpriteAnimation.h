@@ -1,37 +1,21 @@
-#ifndef SpriteAnimation_h
-#define SpriteAnimation_h
+//
+// (c) 2021 Eduardo Doria.
+//
+
+#ifndef SPRITEANIMATION_H
+#define SPRITEANIMATION_H
 
 #include "Action.h"
-#include <vector>
 
 namespace Supernova{
-    
     class SpriteAnimation: public Action{
-        
-    protected:
-        bool loop;
-        std::vector<int> framesTime;
-        std::vector<int> frames;
-        int framesIndex;
-        int framesTimeIndex;
-        unsigned int spriteFrameCount;
-        
-        int startFrame;
-        int endFrame;
-        
+
     public:
-        SpriteAnimation(std::vector<int> framesTime, std::vector<int> frames, bool loop);
-        SpriteAnimation(std::vector<int> framesTime, int startFrame, int endFrame, bool loop);
-        SpriteAnimation(int interval, int startFrame, int endFrame, bool loop);
-        SpriteAnimation(int interval, std::vector<int> frames, bool loop);
-        virtual ~SpriteAnimation();
-        
-        virtual bool run();
-        virtual bool pause();
-        virtual bool stop();
-        
-        virtual bool update(float interval);
+        SpriteAnimation(Scene* scene);
+
+        void setAnimation(std::vector<int> frames, std::vector<int> framesTime, bool loop);
+        void setAnimation(int startFrame, int endFrame, int interval, bool loop);
     };
 }
 
-#endif /* SpriteAnimation_h */
+#endif //SPRITEANIMATION_H

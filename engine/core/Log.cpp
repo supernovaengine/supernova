@@ -1,5 +1,5 @@
 #include "Log.h"
-#include "system/System.h"
+#include "System.h"
 #include <stdarg.h>
 
 using namespace Supernova;

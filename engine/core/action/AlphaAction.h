@@ -1,26 +1,19 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef ALPHAACTION_H
 #define ALPHAACTION_H
 
-#include "TimeAction.h"
+#include "TimedAction.h"
 
 namespace Supernova{
-
-    class AlphaAction: public TimeAction{
-
-    protected:
-        float endAlpha;
-        float startAlpha;
-
-        bool objectStartAlpha;
+    class AlphaAction: public TimedAction{
 
     public:
-        AlphaAction(float endAlpha, float duration, bool loop=false);
-        AlphaAction(float startAlpha, float endAlpha, float duration, bool loop=false);
-        virtual ~AlphaAction();
+        AlphaAction(Scene* scene);
 
-        virtual bool run();
-
-        virtual bool update(float interval);
+        void setAction(float startAlpha, float endAlpha, float duration, bool loop=false);
     };
 }
 

@@ -7,12 +7,11 @@ def projectSourceRootAbs = file(projectSourceRoot).toString()
 def supernovaRootAbs = file(supernovaRoot).toString()
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.deslon.supernova"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

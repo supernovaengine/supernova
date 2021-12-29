@@ -1,194 +1,227 @@
-#include "ParticlesAnimation.h"
-#include "Particles.h"
-#include "Log.h"
+//
+// (c) 2021 Eduardo Doria.
+//
 
-#include <stdlib.h> 
+#include "ParticlesAnimation.h"
+#include "Ease.h"
 
 using namespace Supernova;
 
-
-ParticlesAnimation::ParticlesAnimation(): Action(){
-    newParticlesCount = 0;
-    emitter = true;
-
-    initOwned = true;
-    modOwned = true;
+ParticlesAnimation::ParticlesAnimation(Scene* scene): Action(scene){
+    addComponent<ParticlesAnimationComponent>({});
 }
 
-ParticlesAnimation::~ParticlesAnimation(){
-    if (initOwned)
-        deleteInits();
-
-    if (modOwned)
-        deleteMods();
-    
+void ParticlesAnimation::setLifeInitializer(float life){
+    setLifeInitializer(life, life);
 }
 
-void ParticlesAnimation::addInit(ParticleInit* particleInit){
-    particlesInit.push_back(particleInit);
+void ParticlesAnimation::setLifeInitializer(float minLife, float maxLife){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.lifeInitializer.minLife = minLife;
+    partAnim.lifeInitializer.maxLife = maxLife;
 }
 
-void ParticlesAnimation::removeInit(ParticleInit* particleInit){
-    std::vector<ParticleInit*>::iterator i = std::remove(particlesInit.begin(), particlesInit.end(), particleInit);
-    particlesInit.erase(i,particlesInit.end());
+void ParticlesAnimation::setPositionInitializer(Vector3 position){
+    setPositionInitializer(position, position);
 }
 
-void ParticlesAnimation::deleteInits(){
-    for (std::vector<ParticleInit*>::iterator it = particlesInit.begin() ; it != particlesInit.end(); ++it) {
-        delete (*it);
-    }
-    particlesInit.clear();
+void ParticlesAnimation::setPositionInitializer(Vector3 minPosition, Vector3 maxPosition){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.positionInitializer.minPosition = minPosition;
+    partAnim.positionInitializer.maxPosition = maxPosition;
 }
 
-void ParticlesAnimation::setInitOwned(bool initOwned){
-    this->initOwned = initOwned;
+void ParticlesAnimation::setPositionModifier(float fromTime, float toTime, Vector3 fromPosition, Vector3 toPosition){
+    setPositionModifier(fromTime, toTime, fromPosition, toPosition, S_LINEAR);
 }
 
-void ParticlesAnimation::addMod(ParticleMod* particleMod){
-    particlesMod.push_back(particleMod);
+void ParticlesAnimation::setPositionModifier(float fromTime, float toTime, Vector3 fromPosition, Vector3 toPosition, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.positionModifier.fromTime = fromTime;
+    partAnim.positionModifier.toTime = toTime;
+    partAnim.positionModifier.fromPosition = fromPosition;
+    partAnim.positionModifier.toPosition = toPosition;
+    partAnim.positionModifier.function = Ease::getFunction(functionType);
 }
 
-void ParticlesAnimation::removeMod(ParticleMod* particleMod){
-    std::vector<ParticleMod*>::iterator i = std::remove(particlesMod.begin(), particlesMod.end(), particleMod);
-    particlesMod.erase(i,particlesMod.end());
+void ParticlesAnimation::setVelocityInitializer(Vector3 velocity){
+    setVelocityInitializer(velocity, velocity);
 }
 
-void ParticlesAnimation::deleteMods(){
-    for (std::vector<ParticleMod*>::iterator it = particlesMod.begin() ; it != particlesMod.end(); ++it) {
-        delete (*it);
-    }
-    particlesMod.clear();
+void ParticlesAnimation::setVelocityInitializer(Vector3 minVelocity, Vector3 maxVelocity){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.velocityInitializer.minVelocity = minVelocity;
+    partAnim.velocityInitializer.maxVelocity = maxVelocity;
 }
 
-void ParticlesAnimation::setModOwned(bool modOwned){
-    this->modOwned = modOwned;
+void ParticlesAnimation::setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity){
+    setVelocityModifier(fromTime, toTime, fromVelocity, toVelocity, S_LINEAR);
 }
 
-bool ParticlesAnimation::run(){
-    if (!Action::run())
-        return false;
-    
-    if (Particles* particles = dynamic_cast<Particles*>(object)) {
-        emitter = true;
-    }else{
-        Log::Error("Object in ParticlesAnimation must be a Particles type");
-        stop();
-    }
-    
-    return true;
+void ParticlesAnimation::setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.velocityModifier.fromTime = fromTime;
+    partAnim.velocityModifier.toTime = toTime;
+    partAnim.velocityModifier.fromVelocity = fromVelocity;
+    partAnim.velocityModifier.toVelocity = toVelocity;
+    partAnim.velocityModifier.function = Ease::getFunction(functionType);
 }
 
-bool ParticlesAnimation::pause(){
-    return Action::pause();
+void ParticlesAnimation::setAccelerationInitializer(Vector3 acceleration){
+    setAccelerationInitializer(acceleration, acceleration);
 }
 
-bool ParticlesAnimation::stop(){
-    if (!Action::stop())
-        return false;
-    
-    if (Particles* particles = dynamic_cast<Particles*>(object)){
-        for (int i = 0; i < particles->getMaxParticles(); i++) {
-            particles->setParticleLife(i, -1);
+void ParticlesAnimation::setAccelerationInitializer(Vector3 minAcceleration, Vector3 maxAcceleration){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.accelerationInitializer.minAcceleration = minAcceleration;
+    partAnim.accelerationInitializer.maxAcceleration = maxAcceleration;
+}
+
+void ParticlesAnimation::setAccelerationModifier(float fromTime, float toTime, Vector3 fromAcceleration, Vector3 toAcceleration){
+    setAccelerationModifier(fromTime, toTime, fromAcceleration, toAcceleration, S_LINEAR);
+}
+
+void ParticlesAnimation::setAccelerationModifier(float fromTime, float toTime, Vector3 fromAcceleration, Vector3 toAcceleration, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.accelerationModifier.fromTime = fromTime;
+    partAnim.accelerationModifier.toTime = toTime;
+    partAnim.accelerationModifier.fromAcceleration = fromAcceleration;
+    partAnim.accelerationModifier.toAcceleration = toAcceleration;
+    partAnim.accelerationModifier.function = Ease::getFunction(functionType);
+}
+
+void ParticlesAnimation::setColorInitializer(Vector3 color){
+    setColorInitializer(color, color);
+}
+
+void ParticlesAnimation::setColorInitializer(Vector3 minColor, Vector3 maxColor){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.colorInitializer.minColor = minColor;
+    partAnim.colorInitializer.maxColor = maxColor;
+}
+
+void ParticlesAnimation::setColorModifier(float fromTime, float toTime, Vector3 fromColor, Vector3 toColor){
+    setColorModifier(fromTime, toTime, fromColor, toColor, S_LINEAR);
+}
+
+void ParticlesAnimation::setColorModifier(float fromTime, float toTime, Vector3 fromColor, Vector3 toColor, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.colorModifier.fromTime = fromTime;
+    partAnim.colorModifier.toTime = toTime;
+    partAnim.colorModifier.fromColor = fromColor;
+    partAnim.colorModifier.toColor = toColor;
+    partAnim.colorModifier.function = Ease::getFunction(functionType);
+}
+
+void ParticlesAnimation::setAlphaInitializer(float alpha){
+    setAlphaInitializer(alpha, alpha);
+}
+
+void ParticlesAnimation::setAlphaInitializer(float minAlpha, float maxAlpha){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.alphaInitializer.minAlpha = minAlpha;
+    partAnim.alphaInitializer.maxAlpha = maxAlpha;
+}
+
+void ParticlesAnimation::setAlphaModifier(float fromTime, float toTime, float fromAlpha, float toAlpha){
+    setAlphaModifier(fromTime, toTime, fromAlpha, toAlpha, S_LINEAR);
+}
+
+void ParticlesAnimation::setAlphaModifier(float fromTime, float toTime, float fromAlpha, float toAlpha, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.alphaModifier.fromTime = fromTime;
+    partAnim.alphaModifier.toTime = toTime;
+    partAnim.alphaModifier.fromAlpha = fromAlpha;
+    partAnim.alphaModifier.toAlpha = toAlpha;
+    partAnim.alphaModifier.function = Ease::getFunction(functionType);
+}
+
+void ParticlesAnimation::setSizeInitializer(float size){
+    setSizeInitializer(size, size);
+}
+
+void ParticlesAnimation::setSizeInitializer(float minSize, float maxSize){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.sizeInitializer.minSize = minSize;
+    partAnim.sizeInitializer.maxSize = maxSize;
+}
+
+void ParticlesAnimation::setSizeModifier(float fromTime, float toTime, float fromSize, float toSize){
+    setSizeModifier(fromTime, toTime, fromSize, toSize, S_LINEAR);
+}
+
+void ParticlesAnimation::setSizeModifier(float fromTime, float toTime, float fromSize, float toSize, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.sizeModifier.fromTime = fromTime;
+    partAnim.sizeModifier.toTime = toTime;
+    partAnim.sizeModifier.fromSize = fromSize;
+    partAnim.sizeModifier.toSize = toSize;
+    partAnim.sizeModifier.function = Ease::getFunction(functionType);
+}
+
+void ParticlesAnimation::setSpriteIntializer(std::vector<int> frames){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.spriteInitializer.frames = frames;
+}
+
+void ParticlesAnimation::setSpriteIntializer(int minFrame, int maxFrame){
+    if (minFrame <= maxFrame){
+        ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+        partAnim.spriteInitializer.frames.clear();
+        for (int i = minFrame; i <= maxFrame; i++){
+            partAnim.spriteInitializer.frames.push_back(i);
         }
-        
-        particles->updateParticles();
-    }
-    
-    newParticlesCount = 0;
-    emitter = true;
-    
-    return true;
-}
-
-void ParticlesAnimation::startEmitter(){
-    if (!running) {
-        emitter = true;
-    }else{
-        run();
     }
 }
 
-void ParticlesAnimation::stopEmitter(){
-    emitter = false;
+void ParticlesAnimation::setSpriteModifier(float fromTime, float toTime, std::vector<int> frames){
+    setSpriteModifier(fromTime, toTime, frames, S_LINEAR);
 }
 
-bool ParticlesAnimation::isEmitting(){
-    return emitter;
+void ParticlesAnimation::setSpriteModifier(float fromTime, float toTime, std::vector<int> frames, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.spriteModifier.fromTime = fromTime;
+    partAnim.spriteModifier.toTime = toTime;
+    partAnim.spriteModifier.frames = frames;
+    partAnim.spriteModifier.function = Ease::getFunction(functionType);
 }
 
-bool ParticlesAnimation::update(float interval){
-    if (!Action::update(interval))
-        return false;
+void ParticlesAnimation::setRotationInitializer(float rotation){
+    setRotationInitializer(rotation, rotation);
+}
 
-    if (Particles* particles = dynamic_cast<Particles*>(object)){
+void ParticlesAnimation::setRotationInitializer(float minRotation, float maxRotation){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
-        if (emitter){
-            newParticlesCount += interval * particles->getMinRate();
+    partAnim.rotationInitializer.minRotation = minRotation;
+    partAnim.rotationInitializer.maxRotation = maxRotation;
+}
 
-            int newparticles = (int)newParticlesCount;
-            newParticlesCount -= newparticles;
+void ParticlesAnimation::setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation){
+    setRotationModifier(fromTime, toTime, fromRotation, toRotation, S_LINEAR);
+}
 
-            if (newparticles > particles->getMaxRate())
-                newparticles = particles->getMaxRate();
+void ParticlesAnimation::setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation, int functionType){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
-            for(int i=0; i<newparticles; i++){
-                int particleIndex = particles->findUnusedParticle();
-                
-                if (particleIndex >= 0){
-
-                    particles->setParticleLife(particleIndex, 10);
-                    particles->setParticlePosition(particleIndex, Vector3(0,0,0));
-                    particles->setParticleVelocity(particleIndex, Vector3(0,0,0));
-                    particles->setParticleAcceleration(particleIndex, Vector3(0,0,0));
-                    particles->setParticleColor(particleIndex, Vector4(1,1,1,1));
-                    particles->setParticleSize(particleIndex, 1);
-                    particles->setParticleSprite(particleIndex, -1);
-
-                    for (int init=0; init < particlesInit.size(); init++){
-                        particlesInit[init]->execute(particles, particleIndex);
-                    }
-                    
-                }
-            }
-        }
-
-        bool existParticles = false;
-        for(int i=0; i<particles->getMaxParticles(); i++){
-            
-            float life = particles->getParticleLife(i);
-            
-            if(life > 0.0f){
-
-                for (int mod=0; mod < particlesMod.size(); mod++){
-                    particlesMod[mod]->execute(particles, i, life);
-                }
-                
-                Vector3 velocity = particles->getParticleVelocity(i);
-                Vector3 position = particles->getParticlePosition(i);
-                Vector3 acceleration = particles->getParticleAcceleration(i);
-                
-                velocity += acceleration * interval * 0.5f;
-                position += velocity * interval;
-                life -= interval;
-
-                particles->setParticleLife(i, life);
-                particles->setParticleVelocity(i, velocity);
-                particles->setParticlePosition(i, position);
-                
-                existParticles = true;
-                
-                //printf("1.Particle %i life %f position %f %f %f\n", i, life, position.x, position.y, position.z);
-            }
-        }
-        
-        if (!existParticles && !emitter){
-            stop();
-            onFinish.call(object);
-        }
-
-        particles->updateParticles();
-
-    }
-
-    return true;
+    partAnim.rotationModifier.fromTime = fromTime;
+    partAnim.rotationModifier.toTime = toTime;
+    partAnim.rotationModifier.fromRotation = fromRotation;
+    partAnim.rotationModifier.toRotation = toRotation;
+    partAnim.rotationModifier.function = Ease::getFunction(functionType);
 }

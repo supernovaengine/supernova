@@ -1,7 +1,8 @@
 #include "Matrix3.h"
 
 #include "math/Angle.h"
-#include <string>
+#include <string.h>
+#include <algorithm>
 #include <assert.h>
 
 using namespace Supernova;

@@ -8,7 +8,7 @@
 #include "buffer/InterleavedBuffer.h"
 #include "stb_rect_pack.h"
 #include "stb_truetype.h"
-#include "Texture.h"
+#include "texture/Texture.h"
 
 namespace Supernova {
 
@@ -43,11 +43,11 @@ namespace Supernova {
         int getLineHeight();
 
         TextureData* load(std::string fontpath, unsigned int fontSize);
-        void createText(std::string text, Buffer* buffer, std::vector<unsigned int>& indices, std::vector<Vector2>& charPositions,
+        void createText(std::string text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
                         int& width, int& height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert);
         
     };
     
 }
 
-#endif /* Text_h */
+#endif /* STBText_h */

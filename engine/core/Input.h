@@ -1,6 +1,16 @@
 #ifndef Input_h
 #define Input_h
 
+//Based on GLFW modifier bits
+#define S_MODIFIER_SHIFT          0x0001
+#define S_MODIFIER_CONTROL        0x0002
+#define S_MODIFIER_ALT            0x0004
+#define S_MODIFIER_SUPER          0x0008
+#define S_MODIFIER_CAPS_LOCK      0x0010
+#define S_MODIFIER_NUM_LOCK       0x0020
+
+//Based on GLFW key codes
+#define S_KEY_UNKNOWN             -1
 #define S_KEY_SPACE               32
 #define S_KEY_APOSTROPHE          39  /* ' */
 #define S_KEY_COMMA               44  /* , */
@@ -49,7 +59,8 @@
 #define S_KEY_BACKSLASH           92  /* \ */
 #define S_KEY_RIGHT_BRACKET       93  /* ] */
 #define S_KEY_GRAVE_ACCENT        96 /* ` */
-
+#define S_KEY_WORLD_1             161 /* non-US #1 */
+#define S_KEY_WORLD_2             162 /* non-US #2 */
 #define S_KEY_ESCAPE              256
 #define S_KEY_ENTER               257
 #define S_KEY_TAB                 258
@@ -81,6 +92,19 @@
 #define S_KEY_F10                 299
 #define S_KEY_F11                 300
 #define S_KEY_F12                 301
+#define S_KEY_F13                 302
+#define S_KEY_F14                 303
+#define S_KEY_F15                 304
+#define S_KEY_F16                 305
+#define S_KEY_F17                 306
+#define S_KEY_F18                 307
+#define S_KEY_F19                 308
+#define S_KEY_F20                 309
+#define S_KEY_F21                 310
+#define S_KEY_F22                 311
+#define S_KEY_F23                 312
+#define S_KEY_F24                 313
+#define S_KEY_F25                 314
 #define S_KEY_KP_0                320
 #define S_KEY_KP_1                321
 #define S_KEY_KP_2                322
@@ -107,6 +131,7 @@
 #define S_KEY_RIGHT_ALT           346
 #define S_KEY_RIGHT_SUPER         347
 #define S_KEY_MENU                348
+#define S_KEY_LAST                S_KEY_MENU
 
 //Mouse
 #define S_MOUSE_BUTTON_1    1
@@ -124,9 +149,15 @@
 #define S_MOUSE_BUTTON_MIDDLE   S_MOUSE_BUTTON_3
 
 #include <map>
+#include <vector>
 #include "math/Vector2.h"
 
 namespace Supernova {
+
+    typedef struct Touch{
+        int pointer;
+        Vector2 position;
+    } Touch;
     
     class Input {
         
@@ -136,10 +167,11 @@ namespace Supernova {
         
         static std::map<int,bool> keyPressed;
         static std::map<int,bool> mousePressed;
-        static bool touchStarted;
-        
         static Vector2 mousePosition;
-        static Vector2 touchPosition;
+        static Vector2 mouseScroll;
+        static std::vector<Touch> touches;
+        static bool mousedEntered;
+        static int modifiers;
         
         static void addKeyPressed(int key);
         static void releaseKeyPressed(int key);
@@ -147,19 +179,36 @@ namespace Supernova {
         static void addMousePressed(int key);
         static void releaseMousePressed(int key);
         static void setMousePosition(float x, float y);
+        static void setMouseScroll(float xoffset, float yoffset);
         
-        static void addTouchStarted();
-        static void releaseTouchStarted();
-        static void setTouchPosition(float x, float y);
+        static void addTouch(int pointer, float x, float y);
+        static void setTouchPosition(int pointer, float x, float y);
+        static void removeTouch(int pointer);
+        static void clearTouches();
+
+        static void addMouseEntered();
+        static void releaseMouseEntered();
+        
+        static void setModifiers(int mods);
         
     public:
         
         static bool isKeyPressed(int key);
         static bool isMousePressed(int key);
         static bool isTouch();
+        static bool isMouseEntered();
         
         static Vector2 getMousePosition();
+        static Vector2 getMouseScroll();
         static Vector2 getTouchPosition();
+        
+        static Vector2 getTouchPosition(int pointer);
+        static std::vector<Touch> getTouches();
+        static size_t numTouches();
+        
+        static int getModifiers();
+        
+        static size_t findTouchIndex(int pointer);
     };
 }
 

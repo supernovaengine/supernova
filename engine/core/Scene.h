@@ -1,153 +1,159 @@
-#ifndef scene_h
-#define scene_h
+#ifndef SCENE_H
+#define SCENE_H
 
-#define S_OPTION_NO 0
-#define S_OPTION_YES 1
-#define S_OPTION_AUTOMATIC 2
-
-#include "Object.h"
-#include "Camera.h"
-#include "render/SceneRender.h"
-#include "Light.h"
-#include "Fog.h"
-#include "SkyBox.h"
+#include "Entity.h"
+#include "SubSystem.h"
+#include "EntityManager.h"
+#include "ComponentManager.h"
 #include <vector>
-#include <map>
-#include "ui/UIObject.h"
-#include "util/LightData.h"
-#include "math/Matrix4.h"
-#include "physics/PhysicsWorld.h"
+#include <unordered_map>
 
-namespace Supernova {
+#include "component/MeshComponent.h"
+#include "component/SkyComponent.h"
+#include "component/UIRenderComponent.h"
+#include "component/SpriteComponent.h"
+#include "component/SpriteAnimationComponent.h"
+#include "component/Transform.h"
+#include "component/LightComponent.h"
+#include "component/ActionComponent.h"
+#include "component/TimedActionComponent.h"
+#include "component/PositionActionComponent.h"
+#include "component/RotationActionComponent.h"
+#include "component/ScaleActionComponent.h"
+#include "component/ColorActionComponent.h"
+#include "component/AlphaActionComponent.h"
+#include "component/ParticlesComponent.h"
+#include "component/ParticlesAnimationComponent.h"
+#include "component/TextComponent.h"
 
-    class Scene: public Object {
-        friend class Engine;
-        friend class Object;
-        friend class GraphicObject;
-        friend class Mesh;
-        friend class Points;
-    private:
+namespace Supernova{
 
-        SceneRender* render;
-        Texture* textureFrame;
+	class Scene{
+	private:
 
-        Vector3 drawShadowLightPos;
-        Vector2 drawShadowCameraNearFar;
-        bool drawIsPointShadow;
-        
-        LightData lightData;
+		Entity camera;
+		bool mainScene;
 
-        Matrix4 viewProjectionMatrix;
+		Vector4 color;
+		bool shadowsPCF;
 
-        Camera* camera;
-        bool userCamera;
-        
-        std::multimap<float, GraphicObject*> transparentQueue;
+	    EntityManager entityManager;
+	    ComponentManager componentManager;
+		std::unordered_map<const char*, std::shared_ptr<SubSystem>> systems;
 
-        std::vector<Light*> lights;
-        std::vector<Scene*> subScenes;
-        std::vector<UIObject*> guiObjects;
+		Entity createDefaultCamera();
+		void sortComponentsByTransform(Signature entitySignature);
+		void moveChildAux(Entity entity, bool increase, bool stopIfFound);
+		
+	public:
+	
+		Scene();
 
-        PhysicsWorld* physicsWorld;
-        SkyBox* sky;
-        Fog* fog;
-        
-        Vector3 ambientLight;
+		void load();
+		void draw();
+		void update(double dt);
 
-        bool loadedShadow;
-        bool drawingShadow;
-        bool childScene;
-        bool useTransparency;
-        bool useDepth;
-        bool useLight;
+		void setCamera(Entity camera);
+		Entity getCamera();
 
-        bool ownedPhysicsWorld;
+		void setMainScene(bool mainScene);
+		bool isMainScene();
 
-        // S_OPTION
-        int userDefinedTransparency;
-        int userDefinedDepth;
-        
-        void addLight (Light* light);
-        void removeLight (Light* light);
-        
-        void addSubScene (Scene* scene);
-        void removeSubScene (Scene* scene);
-        
-        void addGUIObject (UIObject* guiobject);
-        void removeGUIObject (UIObject* guiobject);
+		void setColor(Vector4 color);
+		void setColor(float red, float green, float blue, float alpha);
+		Vector4 getColor();
 
-        void setSky(SkyBox* sky);
+		void setShadowsPCF(bool shadowsPCF);
+		bool isShadowsPCF();
 
-        bool addLightProperties(ObjectRender* render);
-        bool addFogProperties(ObjectRender* render);
+		void updateCameraSize();
 
-        void resetSceneProperties();
-        void drawTransparentMeshes();
-        void drawSky();
+		int32_t findBranchLastIndex(Entity entity);
+	
+		//Entity methods
 
-        void drawChildScenes();
-        bool renderDraw(bool shadowMap=false, bool cubeMap=false, int cubeFace=0);
+	    Entity createEntity();
+	
+		void destroyEntity(Entity entity);
 
-    public:
+		void addEntityChild(Entity parent, Entity child);
 
-        Scene();
-        virtual ~Scene();
-        
-        SceneRender* getSceneRender();
-        Vector3 getDrawShadowLightPos();
+		void moveChildToFirst(Entity entity);
+		void moveChildUp(Entity entity);
+		void moveChildDown(Entity entity);
+		void moveChildToLast(Entity entity);
+	
+	    // Component methods
 
-        void setAmbientLight(Vector3 ambientLight);
-        void setAmbientLight(const float ambientFactor);
+	    template<typename T>
+	    void registerComponent(){
+		    componentManager.registerComponent<T>();
+	    }
+	
+	    template<typename T>
+	    void addComponent(Entity entity, T component){
+		    componentManager.addComponent<T>(entity, component);
+		    auto signature = entityManager.getSignature(entity);
+		    signature.set(componentManager.getComponentType<T>(), true);
+		    entityManager.setSignature(entity, signature);
+	    }
+	
+	    template<typename T>
+	    void removeComponent(Entity entity){
+		    componentManager.removeComponent<T>(entity);
+		    auto signature = entityManager.getSignature(entity);
+		    signature.set(componentManager.getComponentType<T>(), false);
+		    entityManager.setSignature(entity, signature); 
+	    }
 
-        void setOwnedPhysicsWorld(bool ownedPhysicsWorld);
+		Signature getSignature(Entity entity){
+			return entityManager.getSignature(entity);
+		}
 
-        PhysicsWorld2D* createPhysicsWorld2D();
-        //void createPhysicsWorld3D();
+		template<typename T>
+	    T* findComponent(Entity entity) {
+		    return componentManager.findComponent<T>(entity);
+	    }
+	
+	    template<typename T>
+	    T& getComponent(Entity entity) {
+		    return componentManager.getComponent<T>(entity);
+	    }
 
-        void setPhysicsWorld(PhysicsWorld* physicsWorld);
-        PhysicsWorld* getPhysicsWorld();
-        
-        Vector3* getAmbientLight();
-        std::vector<Light*>* getLights();
-        LightData* getLightData();
+		template<typename T>
+	    T* findComponentFromIndex(size_t index) {
+		    return componentManager.findComponentFromIndex<T>(index);
+	    }
 
-        bool isLoadedShadow();
-        bool isDrawingShadow();
-        bool isChildScene();
-        bool isUseDepth();
-        bool isUseLight();
-        bool isUseTransparency();
+		template<typename T>
+	    T& getComponentFromIndex(size_t index) {
+		    return componentManager.getComponentFromIndex<T>(index);
+	    }
+	
+	    template<typename T>
+	    ComponentType getComponentType(){
+		    return componentManager.getComponentType<T>();
+	    }
 
-        void setTransparency(bool transparency);
-        void setDepth(bool depth);
+		template<typename T>
+		std::shared_ptr<ComponentArray<T>> getComponentArray() {
+			return componentManager.getComponentArray<T>();
+		}
+	
+		// System methods
+	
+		template<typename T>
+		std::shared_ptr<T> registerSystem(){
+			const char* typeName = typeid(T).name();
+	
+			assert(systems.find(typeName) == systems.end() && "Registering system more than once.");
+	
+			auto system = std::make_shared<T>(this);
+			systems.insert({typeName, system});
+			return system;
+		}
+	};
 
-        int getUserDefinedTransparency();
-        int getUserDefinedDepth();
-        
-        void setFog(Fog* fog);
-
-        bool is3D();
-
-        void setCamera(Camera* camera);
-        Camera* getCamera();
-
-        void doCamera();
-
-        void setTextureFrame(Texture* textureFrame);
-        Texture* getTextureFrame();
-
-        bool updateCameraSize();
-
-        virtual void updateVPMatrix(Matrix4* viewMatrix, Matrix4* projectionMatrix, Matrix4* viewProjectionMatrix, Vector3* cameraPosition);
-
-        void updatePhysics(float time);
-
-        virtual bool load();
-        virtual bool draw();
-        virtual void update();
-        virtual void destroy();
-    };
-    
 }
 
-#endif /* scene_h */
+#endif //SCENE_H

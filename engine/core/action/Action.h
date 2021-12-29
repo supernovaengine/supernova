@@ -1,51 +1,45 @@
-#ifndef Action_h
-#define Action_h
-
 //
-// (c) 2018 Eduardo Doria.
+// (c) 2021 Eduardo Doria.
 //
 
-#include "util/FunctionSubscribe.h"
+#ifndef ACTION_H
+#define ACTION_H
+
+#include "Scene.h"
+#include "Entity.h"
 
 namespace Supernova{
-
-    class Object;
-
     class Action{
-
-        friend class Object;
-        friend class Animation;
-        
     protected:
-        
-        float timecount;
-        
-        bool running;
-        Object* object;
-        
+        Entity entity;
+        Scene* scene;
+
     public:
-        Action();
-        virtual ~Action();
+        Action(Scene* scene);
 
-        FunctionSubscribe<void(Object*)> onStart;
-        FunctionSubscribe<void(Object*)> onRun;
-        FunctionSubscribe<void(Object*)> onPause;
-        FunctionSubscribe<void(Object*)> onStop;
-        FunctionSubscribe<void(Object*)> onFinish;
-        FunctionSubscribe<void(Object*,float)> onUpdate;
+        void start();
+        void pause();
+        void stop();
 
-        Object* getObject();
+        void setTarget(Entity target);
 
-        void setTimecount(float timecount);
+        template <typename T>
+        void addComponent(T &&component) {
+            scene->addComponent<T>(entity, std::forward<T>(component));
+        }
+    
+        template <typename T>
+        void removeComponent() {
+            scene->removeComponent<T>(entity);
+        }
+    
+        template<typename T>
+    	T& getComponent() {
+    		return scene->getComponent<T>(entity);
+    	}
 
-        bool isRunning();
-
-        virtual bool run();
-        virtual bool pause();
-        virtual bool stop();
-
-        virtual bool update(float interval);
+        Entity getEntity();
     };
 }
 
-#endif /* Action_h */
+#endif //ACTION_H

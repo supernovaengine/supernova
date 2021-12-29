@@ -1,32 +1,21 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef COLORACTION_H
 #define COLORACTION_H
 
-#include "TimeAction.h"
-#include "math/Vector4.h"
+#include "TimedAction.h"
 
 namespace Supernova{
-
-    class ColorAction: public TimeAction{
-
-    protected:
-        Vector4 endColor;
-        Vector4 startColor;
-
-        bool objectStartColor;
-        bool useAlpha;
+    class ColorAction: public TimedAction{
 
     public:
-        ColorAction(Vector4 endColor, float duration, bool loop=false);
-        ColorAction(Vector4 startColor, Vector4 endColor, float duration, bool loop=false);
-        ColorAction(float endRed, float endGreen, float endBlue, float duration, bool loop=false);
-        ColorAction(float startRed, float startGreen, float startBlue, float endRed, float endGreen, float endBlue, float duration, bool loop=false);
-        virtual ~ColorAction();
+        ColorAction(Scene* scene);
 
-        virtual bool run();
-
-        virtual bool update(float interval);
+        void setAction(Vector3 startColor, Vector3 endColor, float duration, bool loop=false);
+        void setAction(Vector4 startColor, Vector4 endColor, float duration, bool loop=false);
     };
 }
-
 
 #endif //COLORACTION_H

@@ -1,31 +1,20 @@
+//
+// (c) 2021 Eduardo Doria.
+//
+
 #ifndef SCALEACTION_H
 #define SCALEACTION_H
 
-#include "TimeAction.h"
-#include "math/Vector3.h"
+#include "TimedAction.h"
 
 namespace Supernova{
-
-    class ScaleAction: public TimeAction {
-
-    protected:
-        Vector3 endScale;
-        Vector3 startScale;
-
-        bool objectStartScale;
+    class ScaleAction: public TimedAction{
 
     public:
-        ScaleAction(Vector3 endScale, float duration, bool loop=false);
-        ScaleAction(Vector3 startScale, Vector3 endScalel, float duration, bool loop=false);
-        virtual ~ScaleAction();
+        ScaleAction(Scene* scene);
 
-        virtual bool run();
-
-        virtual bool update(float interval);
-
+        void setAction(Vector3 startScale, Vector3 endScale, float duration, bool loop=false);
     };
-
 }
-
 
 #endif //SCALEACTION_H
