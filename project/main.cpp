@@ -219,6 +219,7 @@ void onKeyDown(int key, bool repeat, int mods){
 #include "Sprite.h"
 #include "math/Angle.h"
 #include "Text.h"
+#include "Image.h"
 
 using namespace Supernova;
 
@@ -256,6 +257,7 @@ Light lightSpot(&scene);
 Scene uiscene;
 //Sprite spriteui(&uiscene, 200, 200);
 Text text(&uiscene);
+Image image(&uiscene);
 
 float rotationY = 0;
 float speed = 0;
@@ -310,6 +312,9 @@ void init(){
 
     //text.setColor(0.0, 0.0, 0.0, 1.0);
     text.setPosition(200,200,0);
+
+    image.setTexture("pista.png");
+    image.setMargin(20);
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
     camera.setType(CameraType::CAMERA_PERSPECTIVE);

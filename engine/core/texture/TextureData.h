@@ -14,6 +14,8 @@ namespace Supernova {
         ColorFormat color_format;
         int channels;
         void* data;
+
+        bool transparent;
         
         bool dataOwned;
         
@@ -51,6 +53,7 @@ namespace Supernova {
         int getChannels();
         void* getData();
 
+        bool isTransparent();
     };
     
 }

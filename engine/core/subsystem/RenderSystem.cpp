@@ -434,7 +434,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		mesh.submeshes[i].needUpdateTexture = false;
 
 		if (Engine::isAutomaticTransparency() && !mesh.transparency){
-			if (mesh.submeshes[i].material.baseColorTexture.isTransparent() || mesh.submeshes[i].material.baseColorFactor.w != 1.0){
+			if (mesh.submeshes[i].material.baseColorTexture.getData().isTransparent() || mesh.submeshes[i].material.baseColorFactor.w != 1.0){
 				mesh.transparency = true;
 			}
 		}
@@ -752,7 +752,7 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	TextureRender* textureRender = particles.texture.getRender();
 
 	if (Engine::isAutomaticTransparency() && !particles.transparency){
-		if (particles.texture.isTransparent()){ // Particle color is not tested here
+		if (particles.texture.getData().isTransparent()){ // Particle color is not tested here
 			particles.transparency = true;
 		}
 	}

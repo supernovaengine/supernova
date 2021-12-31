@@ -7,6 +7,7 @@
 #include "stb_image.h"
 #include "Log.h"
 #include "Texture.h"
+#include "Engine.h"
 
 using namespace Supernova;
 
@@ -17,6 +18,8 @@ TextureData::TextureData() {
     this->color_format = ColorFormat::RGBA;
     this->channels = 0;
     this->data = NULL;
+
+    this->transparent = false;
     
     this->dataOwned = false;
 }
@@ -28,6 +31,8 @@ TextureData::TextureData(int width, int height, unsigned int size, ColorFormat c
     this->color_format = color_format;
     this->channels = channels;
     this->data = data;
+
+    this->transparent = false;
     
     this->dataOwned = false;
 }
@@ -80,6 +85,10 @@ bool TextureData::loadTextureFromFile(const char* filename) {
     //Considering one byte per channel
     size = width * height * desired_channels; //in bytes
     //----- End std_image read texture
+
+    if (Engine::isAutomaticTransparency){
+        transparent = hasAlpha();
+    }
     
     return true;
 
@@ -93,6 +102,8 @@ void TextureData::copy ( const TextureData& v ){
     this->channels = v.channels;
 
     this->dataOwned = v.dataOwned;
+
+    this->transparent = v.transparent;
 
     this->data = v.data;
 }
@@ -284,4 +295,8 @@ int TextureData::getChannels(){
 
 void* TextureData::getData(){
     return data;
+}
+
+bool TextureData::isTransparent(){
+    return transparent;
 }

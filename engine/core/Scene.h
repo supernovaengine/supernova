@@ -25,6 +25,7 @@
 #include "component/ParticlesComponent.h"
 #include "component/ParticlesAnimationComponent.h"
 #include "component/TextComponent.h"
+#include "component/ImageComponent.h"
 
 namespace Supernova{
 

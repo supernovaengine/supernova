@@ -9,7 +9,6 @@ using namespace Supernova;
 Texture::Texture(){
     this->render = NULL;
     this->loadFromPath = false;
-    this->transparent = false;
     this->releaseDataAfterLoad = true;
     this->needLoad = false;
 }
@@ -22,7 +21,6 @@ Texture::Texture(std::string path){
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
     this->needLoad = true;
-    this->transparent = false;
 }
 
 Texture::Texture(TextureData data, std::string id){
@@ -33,7 +31,6 @@ Texture::Texture(TextureData data, std::string id){
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
     this->needLoad = true;
-    this->transparent = false;
 }
 
 Texture::Texture(const Texture& rhs){
@@ -47,7 +44,6 @@ Texture::Texture(const Texture& rhs){
     loadFromPath = rhs.loadFromPath;
     releaseDataAfterLoad = rhs.releaseDataAfterLoad;
     needLoad = rhs.needLoad;
-    transparent = rhs.transparent;
 }
 
 Texture& Texture::operator=(const Texture& rhs){
@@ -61,7 +57,6 @@ Texture& Texture::operator=(const Texture& rhs){
     loadFromPath = rhs.loadFromPath;
     releaseDataAfterLoad = rhs.releaseDataAfterLoad;
     needLoad = rhs.needLoad;
-    transparent = rhs.transparent;
 
     return *this; 
 }
@@ -79,7 +74,6 @@ void Texture::setPath(std::string path){
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
     this->needLoad = true;
-    this->transparent = false;
 }
 
 void Texture::setData(TextureData data, std::string id){
@@ -91,7 +85,6 @@ void Texture::setData(TextureData data, std::string id){
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
     this->needLoad = true;
-    this->transparent = false;
 }
 
 void Texture::setCubePath(size_t index, std::string path){
@@ -103,7 +96,6 @@ void Texture::setCubePath(size_t index, std::string path){
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
     this->needLoad = true;
-    this->transparent = false;
 
     std::string id = "cube";
     for (int f = 0; f < 6; f++){
@@ -126,7 +118,6 @@ void Texture::setCubePaths(std::string front, std::string back, std::string left
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
     this->needLoad = true;
-    this->transparent = false;
 
     std::string id = "cube";
     for (int f = 0; f < 6; f++){
@@ -159,10 +150,6 @@ bool Texture::load(){
 	    }
     }
 
-    if (Engine::isAutomaticTransparency()){
-		transparent = data[0].hasAlpha();
-	}
-
 	render = TexturePool::get(id, type, data);
 
     if (releaseDataAfterLoad){
@@ -193,12 +180,12 @@ TextureRender* Texture::getRender(){
     return render.get();
 }
 
-void Texture::setReleaseDataAfterLoad(bool releaseDataAfterLoad){
-    this->releaseDataAfterLoad = releaseDataAfterLoad;
+TextureData& Texture::getData(size_t index){
+    return data[index];
 }
 
-bool Texture::isTransparent(){
-    return transparent;
+void Texture::setReleaseDataAfterLoad(bool releaseDataAfterLoad){
+    this->releaseDataAfterLoad = releaseDataAfterLoad;
 }
 
 bool Texture::empty(){

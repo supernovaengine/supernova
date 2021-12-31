@@ -19,8 +19,6 @@ namespace Supernova{
             TextureData data[6];
 
             bool loadFromPath;
-            bool transparent;
-
             bool releaseDataAfterLoad;
             bool needLoad;
 
@@ -43,10 +41,10 @@ namespace Supernova{
             void destroy();
 
             TextureRender* getRender();
+            TextureData& getData(size_t index = 0);
 
             void setReleaseDataAfterLoad(bool releaseDataAfterLoad);
 
-            bool isTransparent();
             bool empty();
     };
 }

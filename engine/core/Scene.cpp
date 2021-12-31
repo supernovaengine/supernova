@@ -28,6 +28,7 @@ Scene::Scene(){
 	registerComponent<ParticlesComponent>();
 	registerComponent<ParticlesAnimationComponent>();
 	registerComponent<TextComponent>();
+	registerComponent<ImageComponent>();
 
 	registerSystem<RenderSystem>();
 	registerSystem<ActionSystem>();
