@@ -27,6 +27,9 @@ namespace Supernova{
         void setWidth(int width);
         void setHeight(int height);
 
+        int getWidth();
+        int getHeight();
+
         void setMaxLength(unsigned int maxLength);
 
         void setText(std::string text);

@@ -609,7 +609,7 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 	mesh.loaded = false;
 }
 
-bool RenderSystem::loadUI(UIRenderComponent& ui, bool isText){
+bool RenderSystem::loadUI(UIComponent& ui, bool isText){
 	ObjectRender& render = ui.render;
 
 	render.beginLoad(ui.primitiveType, false);
@@ -682,7 +682,7 @@ bool RenderSystem::loadUI(UIRenderComponent& ui, bool isText){
 	return true;
 }
 
-void RenderSystem::drawUI(UIRenderComponent& ui, Transform& transform){
+void RenderSystem::drawUI(UIComponent& ui, Transform& transform){
 	if (ui.loaded && ui.buffer && ui.buffer->getSize() > 0){
 
 		if (ui.needUpdateTexture){
@@ -718,7 +718,7 @@ void RenderSystem::drawUI(UIRenderComponent& ui, Transform& transform){
 	}
 }
 
-void RenderSystem::destroyUI(UIRenderComponent& ui){
+void RenderSystem::destroyUI(UIComponent& ui){
 	//Destroy shader
 	ui.shader.reset();
 	ShaderPool::remove(ShaderType::UI, ui.shaderProperties);
@@ -1425,8 +1425,8 @@ void RenderSystem::draw(){
 				transparentMeshes.push({&mesh, &transform, transform.distanceToCamera});
 			}
 
-		}else if (signature.test(scene->getComponentType<UIRenderComponent>())){
-			UIRenderComponent& ui = scene->getComponent<UIRenderComponent>(entity);
+		}else if (signature.test(scene->getComponentType<UIComponent>())){
+			UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
 			bool isText = false;
 			if (signature.test(scene->getComponentType<TextComponent>())){
@@ -1508,8 +1508,8 @@ void RenderSystem::entityDestroyed(Entity entity){
 
 	//TODO: Destroy lights?
 
-	if (signature.test(scene->getComponentType<UIRenderComponent>())){
-		destroyUI(scene->getComponent<UIRenderComponent>(entity));
+	if (signature.test(scene->getComponentType<UIComponent>())){
+		destroyUI(scene->getComponent<UIComponent>(entity));
 	}
 
 	if (signature.test(scene->getComponentType<ParticlesComponent>())){

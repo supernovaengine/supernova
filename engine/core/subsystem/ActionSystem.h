@@ -10,7 +10,7 @@
 #include "component/Transform.h"
 #include "component/SpriteComponent.h"
 #include "component/MeshComponent.h"
-#include "component/UIRenderComponent.h"
+#include "component/UIComponent.h"
 #include "component/ActionComponent.h"
 #include "component/TimedActionComponent.h"
 #include "component/SpriteAnimationComponent.h"
@@ -45,9 +45,9 @@ namespace Supernova{
 		void scaleActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ScaleActionComponent& scaleaction, Transform& transform);
 
 		void colorActionMeshUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, MeshComponent& mesh);
-		void colorActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, UIRenderComponent& uirender);
+		void colorActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, UIComponent& uirender);
 		void alphaActionMeshUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, MeshComponent& mesh);
-		void alphaActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, UIRenderComponent& uirender);
+		void alphaActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, UIComponent& uirender);
 
 		//Particle helpers functions
 		int findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim);

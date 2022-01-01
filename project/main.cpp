@@ -1,4 +1,4 @@
-
+/*
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -202,9 +202,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
+*/
 
 
-/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -474,6 +474,8 @@ void onMouseDown(int button, int mods){
     //text.setFont("FreeMono.ttf");
     //text.setMaxLength(50);
 
+    image.setSize(image.getWidth()-10, image.getHeight()-10);
+
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)
         modifier += "shift;";
@@ -599,4 +601,3 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
-*/

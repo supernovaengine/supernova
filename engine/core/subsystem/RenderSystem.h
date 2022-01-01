@@ -8,7 +8,7 @@
 #include "SubSystem.h"
 #include "component/MeshComponent.h"
 #include "component/SkyComponent.h"
-#include "component/UIRenderComponent.h"
+#include "component/UIComponent.h"
 #include "component/CameraComponent.h"
 #include "component/LightComponent.h"
 #include "component/ParticlesComponent.h"
@@ -93,9 +93,9 @@ namespace Supernova{
 		void drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix);
 		void destroyMesh(MeshComponent& mesh);
 
-		bool loadUI(UIRenderComponent& ui, bool isText);
-		void drawUI(UIRenderComponent& ui, Transform& transform);
-		void destroyUI(UIRenderComponent& ui);
+		bool loadUI(UIComponent& ui, bool isText);
+		void drawUI(UIComponent& ui, Transform& transform);
+		void destroyUI(UIComponent& ui);
 
 		bool loadParticles(ParticlesComponent& particles);
 		void drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform);

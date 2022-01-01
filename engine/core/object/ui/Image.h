@@ -24,6 +24,9 @@ namespace Supernova{
         void setMargin(int margin);
 
         void setTexture(std::string path);
+
+        int getWidth();
+        int getHeight();
     };
 }
 

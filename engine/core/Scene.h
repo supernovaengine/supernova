@@ -10,7 +10,7 @@
 
 #include "component/MeshComponent.h"
 #include "component/SkyComponent.h"
-#include "component/UIRenderComponent.h"
+#include "component/UIComponent.h"
 #include "component/SpriteComponent.h"
 #include "component/SpriteAnimationComponent.h"
 #include "component/Transform.h"

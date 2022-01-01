@@ -12,7 +12,7 @@ using namespace Supernova;
 Scene::Scene(){
 	registerComponent<MeshComponent>();
 	registerComponent<SkyComponent>();
-	registerComponent<UIRenderComponent>();
+	registerComponent<UIComponent>();
 	registerComponent<SpriteComponent>();
 	registerComponent<SpriteAnimationComponent>();
     registerComponent<Transform>();
@@ -254,8 +254,8 @@ void Scene::sortComponentsByTransform(Signature entitySignature){
 	}
 
 	// UI Render component
-	if (entitySignature.test(getComponentType<UIRenderComponent>())){
-		auto ui = componentManager.getComponentArray<UIRenderComponent>();
+	if (entitySignature.test(getComponentType<UIComponent>())){
+		auto ui = componentManager.getComponentArray<UIComponent>();
 		ui->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 }

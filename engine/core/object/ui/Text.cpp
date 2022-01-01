@@ -6,10 +6,10 @@
 using namespace Supernova;
 
 Text::Text(Scene* scene): Object(scene){
-    addComponent<UIRenderComponent>({});
+    addComponent<UIComponent>({});
     addComponent<TextComponent>({});
 
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
+    UIComponent& uicomp = getComponent<UIComponent>();
     uicomp.buffer = &buffer;
     uicomp.indices = &indices;
     uicomp.primitiveType = PrimitiveType::TRIANGLES;
@@ -34,7 +34,7 @@ Text::~Text() {
 
 void Text::setSize(int width, int height){
     TextComponent& textcomp = getComponent<TextComponent>();
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
+    UIComponent& uicomp = getComponent<UIComponent>();
 
     uicomp.width = width;
     uicomp.height = height;
@@ -46,7 +46,7 @@ void Text::setSize(int width, int height){
 
 void Text::setWidth(int width){
     TextComponent& textcomp = getComponent<TextComponent>();
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
+    UIComponent& uicomp = getComponent<UIComponent>();
 
     uicomp.width = width;
     textcomp.userDefinedWidth = true;
@@ -56,7 +56,7 @@ void Text::setWidth(int width){
 
 void Text::setHeight(int height){
     TextComponent& textcomp = getComponent<TextComponent>();
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
+    UIComponent& uicomp = getComponent<UIComponent>();
 
     uicomp.height = height;
     textcomp.userDefinedHeight = true;
@@ -64,9 +64,21 @@ void Text::setHeight(int height){
     textcomp.needUpdateText = true;
 }
 
+int Text::getWidth(){
+    UIComponent& uicomp = getComponent<UIComponent>();
+
+    return uicomp.width;
+}
+
+int Text::getHeight(){
+    UIComponent& uicomp = getComponent<UIComponent>();
+
+    return uicomp.height;
+}
+
 void Text::setMaxLength(unsigned int maxLength){
     TextComponent& textcomp = getComponent<TextComponent>();
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
+    UIComponent& uicomp = getComponent<UIComponent>();
 
     if (textcomp.maxLength != maxLength){
         textcomp.maxLength = maxLength;
@@ -129,7 +141,7 @@ void Text::setMultiline(bool multiline){
 }
 
 void Text::setColor(Vector4 color){
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
+    UIComponent& uicomp = getComponent<UIComponent>();
 
     uicomp.color = Color::sRGBToLinear(color);
 }
@@ -139,7 +151,7 @@ void Text::setColor(float red, float green, float blue, float alpha){
 }
 
 Vector4 Text::getColor(){
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
+    UIComponent& uicomp = getComponent<UIComponent>();
 
     return Color::linearTosRGB(uicomp.color);
 }

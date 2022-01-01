@@ -531,7 +531,7 @@
 		71451BB3270C9D0F00712643 /* ColorActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorActionComponent.h; sourceTree = "<group>"; };
 		71451BB4270C9D0F00712643 /* ActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ActionComponent.h; sourceTree = "<group>"; };
 		71451BB5270C9D0F00712643 /* PositionActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PositionActionComponent.h; sourceTree = "<group>"; };
-		71451BB6270C9D0F00712643 /* UIRenderComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UIRenderComponent.h; sourceTree = "<group>"; };
+		71451BB6270C9D0F00712643 /* UIComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UIComponent.h; sourceTree = "<group>"; };
 		71451BB7270C9D0F00712643 /* SpriteAnimationComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpriteAnimationComponent.h; sourceTree = "<group>"; };
 		71451BB8270C9D0F00712643 /* ScaleActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScaleActionComponent.h; sourceTree = "<group>"; };
 		71451BB9270C9D0F00712643 /* TimedActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimedActionComponent.h; sourceTree = "<group>"; };
@@ -1128,7 +1128,7 @@
 				71ABBD11277A3166001CE3AF /* TextComponent.h */,
 				71451BB9270C9D0F00712643 /* TimedActionComponent.h */,
 				7162FC4725962A0E0075B97D /* Transform.h */,
-				71451BB6270C9D0F00712643 /* UIRenderComponent.h */,
+				71451BB6270C9D0F00712643 /* UIComponent.h */,
 			);
 			path = component;
 			sourceTree = "<group>";

@@ -11,10 +11,10 @@ using namespace Supernova;
 
 
 UISystem::UISystem(Scene* scene): SubSystem(scene){
-    signature.set(scene->getComponentType<UIRenderComponent>());
+    signature.set(scene->getComponentType<UIComponent>());
 }
 
-bool UISystem::createImagePatches(ImageComponent& img, UIRenderComponent& ui){
+bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
 
     ui.texture.load();
     unsigned int texWidth = ui.texture.getData().getWidth();
@@ -120,10 +120,12 @@ bool UISystem::createImagePatches(ImageComponent& img, UIRenderComponent& ui){
         0, ui.indices->getAttribute(AttributeType::INDEX),
         54, (char*)&indices_array[0], sizeof(uint16_t));
 
+    ui.needUpdateBuffer = true;
+
     return true;
 }
 
-bool UISystem::loadFontAtlas(TextComponent& text, UIRenderComponent& ui){
+bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui){
     if (!text.stbtext){
         text.stbtext = new STBText();
     }
@@ -149,7 +151,7 @@ bool UISystem::loadFontAtlas(TextComponent& text, UIRenderComponent& ui){
     return true;
 }
 
-void UISystem::createText(TextComponent& text, UIRenderComponent& ui){
+void UISystem::createText(TextComponent& text, UIComponent& ui){
 
     ui.buffer->clear();
     ui.indices->clear();
@@ -182,8 +184,8 @@ void UISystem::update(double dt){
             Entity entity = images->getEntity(i);
             Signature signature = scene->getSignature(entity);
 
-            if (signature.test(scene->getComponentType<UIRenderComponent>())){
-                UIRenderComponent& ui = scene->getComponent<UIRenderComponent>(entity);
+            if (signature.test(scene->getComponentType<UIComponent>())){
+                UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
                 createImagePatches(img, ui);
             }
@@ -200,8 +202,8 @@ void UISystem::update(double dt){
             Entity entity = texts->getEntity(i);
             Signature signature = scene->getSignature(entity);
 
-            if (signature.test(scene->getComponentType<UIRenderComponent>())){
-                UIRenderComponent& ui = scene->getComponent<UIRenderComponent>(entity);
+            if (signature.test(scene->getComponentType<UIComponent>())){
+                UIComponent& ui = scene->getComponent<UIComponent>(entity);
                 if (text.loaded && text.needReload){
                     ui.texture.destroy(); //texture.setData also destroy it
                     text.loaded = false;

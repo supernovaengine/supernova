@@ -7,7 +7,7 @@
 
 #include "SubSystem.h"
 
-#include "component/UIRenderComponent.h"
+#include "component/UIComponent.h"
 #include "component/TextComponent.h"
 #include "component/ImageComponent.h"
 
@@ -18,11 +18,11 @@ namespace Supernova{
     private:
 
 		//Image
-		bool createImagePatches(ImageComponent& img, UIRenderComponent& ui);
+		bool createImagePatches(ImageComponent& img, UIComponent& ui);
 
 		// Text
-		bool loadFontAtlas(TextComponent& text, UIRenderComponent& ui);
-		void createText(TextComponent& text, UIRenderComponent& ui);
+		bool loadFontAtlas(TextComponent& text, UIComponent& ui);
+		void createText(TextComponent& text, UIComponent& ui);
 
 	public:
 		UISystem(Scene* scene);

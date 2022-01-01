@@ -1,5 +1,5 @@
-#ifndef UIRENDER_COMPONENT_H
-#define UIRENDER_COMPONENT_H
+#ifndef UI_COMPONENT_H
+#define UI_COMPONENT_H
 
 #include "buffer/Buffer.h"
 #include "texture/Texture.h"
@@ -7,7 +7,7 @@
 
 namespace Supernova{
 
-    struct UIRenderComponent{
+    struct UIComponent{
         bool loaded = false;
 
         int width = 0;
@@ -38,4 +38,4 @@ namespace Supernova{
     
 }
 
-#endif //UIRENDER_COMPONENT_H
+#endif //UI_COMPONENT_H
