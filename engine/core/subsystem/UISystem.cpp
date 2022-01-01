@@ -16,14 +16,19 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
 
 bool UISystem::createImagePatches(ImageComponent& img, UIRenderComponent& ui){
 
-    //ui.texture.load();
-    //unsigned int texWidth = ui.texture.getData().getWidth();
-    //unsigned int texHeight = ui.texture.getData().getHeight();
+    ui.texture.load();
+    unsigned int texWidth = ui.texture.getData().getWidth();
+    unsigned int texHeight = ui.texture.getData().getHeight();
 
-    //if (texWidth == 0 || texHeight == 0){
-    //    Log::Error("Cannot create UI image without texture");
-    //    return false;
-    //}
+    if (texWidth == 0 || texHeight == 0){
+        Log::Error("Cannot create UI image without texture");
+        return false;
+    }
+
+    if (ui.width == 0 && ui.height == 0){
+        ui.width = texWidth;
+        ui.height = texHeight;
+    }
 
     ui.buffer->clear();
     ui.indices->clear();

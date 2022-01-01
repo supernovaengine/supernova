@@ -10,8 +10,8 @@ namespace Supernova{
     struct UIRenderComponent{
         bool loaded = false;
 
-        int width = 200;
-        int height = 200;
+        int width = 0;
+        int height = 0;
 
         Buffer* buffer;
         Buffer* indices;

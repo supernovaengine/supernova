@@ -1,4 +1,4 @@
-/*
+
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -202,9 +202,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
-*/
 
 
+/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -256,8 +256,8 @@ Light lightSpot(&scene);
 
 Scene uiscene;
 //Sprite spriteui(&uiscene, 200, 200);
-Text text(&uiscene);
 Image image(&uiscene);
+Text text(&uiscene);
 
 float rotationY = 0;
 float speed = 0;
@@ -599,3 +599,4 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
+*/

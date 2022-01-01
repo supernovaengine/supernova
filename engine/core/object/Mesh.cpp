@@ -25,17 +25,6 @@ Mesh::~Mesh(){
 
 }
 
-void Mesh::addVertex(Vector3 vertex){
-    buffer.addVector3(AttributeType::POSITION, vertex);
-    buffer.addVector2(AttributeType::TEXCOORD1, Vector2(0.0f, 0.0f));
-    buffer.addVector3(AttributeType::NORMAL, Vector3(0.0f, 0.0f, 1.0f));
-    buffer.addVector4(AttributeType::COLOR, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-}
-
-void Mesh::addVertex(float x, float y, float z){
-   addVertex(Vector3(x, y, z));
-}
-
 void Mesh::setTexture(std::string path){
     MeshComponent& mesh = getComponent<MeshComponent>();
 

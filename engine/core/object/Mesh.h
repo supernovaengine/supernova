@@ -20,9 +20,6 @@ namespace Supernova{
         Mesh(Scene* scene);
         virtual ~Mesh();
 
-        void addVertex(Vector3 vertex);
-        void addVertex(float x, float y, float z);
-
         void setTexture(std::string path);
         
         void setColor(Vector4 color);

@@ -1,32 +1,25 @@
-#include "Polygon.h"
+//
+// (c) 2022 Eduardo Doria.
+//
 
-#include "math/Color.h"
+
+#include "Polygon.h"
 
 using namespace Supernova;
 
-Polygon::Polygon(Scene* scene): Object(scene){
-    addComponent<UIRenderComponent>({});
-
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
-    uicomp.buffer = &buffer;
-    uicomp.indices = &indices;
-    uicomp.primitiveType = PrimitiveType::TRIANGLE_STRIP;
-
-	buffer.clearAll();
-	buffer.addAttribute(AttributeType::POSITION, 3);
-	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-    buffer.addAttribute(AttributeType::COLOR, 4);
+Polygon::Polygon(Scene* scene): Mesh(scene){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;
 }
 
 void Polygon::addVertex(Vector3 vertex){
 
     buffer.addVector3(AttributeType::POSITION, vertex);
+    buffer.addVector3(AttributeType::NORMAL, Vector3(0.0f, 0.0f, 1.0f));
     buffer.addVector4(AttributeType::COLOR, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
     if (buffer.getCount() > 3){
         generateTexcoords();
-    //    MeshComponent& mesh = getComponent<MeshComponent>();
-    //    mesh.primitiveType = S_PRIMITIVE_TRIANGLE_STRIP;
     }
 }
 
@@ -35,9 +28,6 @@ void Polygon::addVertex(float x, float y){
 }
 
 void Polygon::generateTexcoords(){
-
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
-
     float min_X = std::numeric_limits<float>::max();
     float max_X = std::numeric_limits<float>::min();
     float min_Y = std::numeric_limits<float>::max();
@@ -68,30 +58,6 @@ void Polygon::generateTexcoords(){
        // }
     }
 
-    uicomp.width = (int)(max_X - min_X);
-    uicomp.height = (int)(max_Y - min_Y);
-}
-
-void Polygon::setColor(Vector4 color){
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
-
-    uicomp.color = Color::sRGBToLinear(color);
-}
-
-void Polygon::setColor(float red, float green, float blue, float alpha){
-    setColor(Vector4(red, green, blue, alpha));
-}
-
-Vector4 Polygon::getColor(){
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
-
-    return Color::linearTosRGB(uicomp.color);
-}
-
-void Polygon::setTexture(std::string path){
-    UIRenderComponent& uicomp = getComponent<UIRenderComponent>();
-
-    uicomp.texture.setPath(path);
-
-    uicomp.needUpdateTexture = true;
+    //width = (int)(max_X - min_X);
+    //height = (int)(max_Y - min_Y);
 }
