@@ -257,6 +257,8 @@ Light lightSpot(&scene);
 Scene uiscene;
 //Sprite spriteui(&uiscene, 200, 200);
 Image image(&uiscene);
+Image image2(&uiscene);
+Text label(&uiscene);
 Text text(&uiscene);
 
 float rotationY = 0;
@@ -315,6 +317,16 @@ void init(){
 
     image.setTexture("pista.png");
     image.setMargin(20);
+
+    image2.setPosition(150,150,0);
+    image2.setSize(300,300);
+    image2.setTexture("block.png");
+    image2.setMargin(20);
+    image.addChild(&image2);
+
+    image2.addChild(&label);
+    label.setText("Testing!!!!!");
+    label.setPosition(150, 150, 0);
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
     camera.setType(CameraType::CAMERA_PERSPECTIVE);

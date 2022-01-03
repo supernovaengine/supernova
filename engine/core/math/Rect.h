@@ -39,7 +39,7 @@ namespace Supernova {
         void setRect(float x, float y, float width, float height);
         void setRect(Rect rect);
 
-        void fitOnRect(Rect& rect);
+        Rect& fitOnRect(Rect& rect);
 
         bool isNormalized();
         bool isZero();

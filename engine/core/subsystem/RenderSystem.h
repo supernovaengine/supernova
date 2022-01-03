@@ -9,6 +9,7 @@
 #include "component/MeshComponent.h"
 #include "component/SkyComponent.h"
 #include "component/UIComponent.h"
+#include "component/ImageComponent.h"
 #include "component/CameraComponent.h"
 #include "component/LightComponent.h"
 #include "component/ParticlesComponent.h"
@@ -82,11 +83,11 @@ namespace Supernova{
 		void configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera);
 		Matrix4 getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv);
 		void loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool castShadows);
+		Rect getScissorRect(UIComponent& ui, ImageComponent& img, Transform& transform, CameraComponent& camera);
 
 		float lerp(float a, float b, float fraction);
 
-	public:
-		RenderSystem(Scene* scene);
+	protected:
 
 		bool loadMesh(MeshComponent& mesh);
 		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform);
@@ -110,6 +111,10 @@ namespace Supernova{
 		void updateSkyViewProjection(CameraComponent& camera);
 		void updateLightFromTransform(LightComponent& light, Transform& transform);
 		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform);
+
+	public:
+
+		RenderSystem(Scene* scene);
 	
 		virtual void load();
 		virtual void draw();

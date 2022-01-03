@@ -25,6 +25,7 @@ namespace Supernova{
         void startDefaultFrameBuffer(int width, int height);
 
         void applyViewport(Rect rect);
+        void applyScissor(Rect rect);
 
         void endFrameBuffer();
     };

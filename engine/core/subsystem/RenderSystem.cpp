@@ -929,6 +929,71 @@ void RenderSystem::destroySky(SkyComponent& sky){
 	sky.loaded = false;
 }
 
+Rect RenderSystem::getScissorRect(UIComponent& ui, ImageComponent& img, Transform& transform, CameraComponent& camera){
+	int objScreenPosX = 0;
+	int objScreenPosY = 0;
+	int objScreenWidth = 0;
+	int objScreenHeight = 0;
+
+	//if (!scene->getTextureFrame()) {
+
+	float scaleX = transform.worldScale.x;
+	float scaleY = transform.worldScale.y;
+
+	float tempX = (2 * transform.worldPosition.x / (float) Engine::getCanvasWidth()) - 1;
+	float tempY = (2 * transform.worldPosition.y / (float) Engine::getCanvasHeight()) - 1;
+
+	float widthRatio = scaleX * (Engine::getViewRect().getWidth() / (float) Engine::getCanvasWidth());
+	float heightRatio = scaleY * (Engine::getViewRect().getHeight() / (float) Engine::getCanvasHeight());
+
+	objScreenPosX = (tempX * Engine::getViewRect().getWidth() + (float) System::instance().getScreenWidth()) / 2;
+	objScreenPosY = (tempY * Engine::getViewRect().getHeight() + (float) System::instance().getScreenHeight()) / 2;
+	objScreenWidth = ui.width * widthRatio;
+	objScreenHeight = ui.height * heightRatio;
+
+	if (camera.type == CameraType::CAMERA_2D)
+		objScreenPosY = (float) System::instance().getScreenHeight() - objScreenHeight - objScreenPosY;
+
+	if (!(img.patchMarginLeft == 0 && img.patchMarginTop == 0 && img.patchMarginRight == 0 && img.patchMarginBottom == 0)) {
+		float borderScreenLeft = img.patchMarginLeft * widthRatio;
+		float borderScreenTop = img.patchMarginTop * heightRatio;
+		float borderScreenRight = img.patchMarginRight * widthRatio;
+		float borderScreenBottom = img.patchMarginBottom * heightRatio;
+
+		objScreenPosX += borderScreenLeft;
+		objScreenPosY += borderScreenTop;
+		objScreenWidth -= (borderScreenLeft + borderScreenRight);
+		objScreenHeight -= (borderScreenTop + borderScreenBottom);
+	}
+/*
+	}else {
+
+		objScreenPosX = getWorldPosition().x;
+		objScreenPosY = getWorldPosition().y;
+		objScreenWidth = width;
+		objScreenHeight = height;
+
+		if (!scene->getScene()->is3D())
+			objScreenPosY = (float) scene->getTextureFrame()->getTextureFrameHeight() - objScreenHeight - objScreenPosY;
+
+		if (!(clipBorder[0] == 0 && clipBorder[1] == 0 && clipBorder[2] == 0 && clipBorder[3] == 0)) {
+			float borderScreenLeft = clipBorder[0];
+			float borderScreenTop = clipBorder[1];
+			float borderScreenRight = clipBorder[2];
+			float borderScreenBottom = clipBorder[3];
+
+			objScreenPosX += borderScreenLeft;
+			objScreenPosY += borderScreenTop;
+			objScreenWidth -= (borderScreenLeft + borderScreenRight);
+			objScreenHeight -= (borderScreenTop + borderScreenBottom);
+		}
+
+	}
+*/
+
+	return Rect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight);
+}
+
 void RenderSystem::updateTransform(Transform& transform){
 	Matrix4 scaleMatrix = Matrix4::scaleMatrix(transform.scale);
     Matrix4 translateMatrix = Matrix4::translateMatrix(transform.position);
@@ -1404,6 +1469,9 @@ void RenderSystem::draw(){
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
 	CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
 
+	std::vector<Entity> parentListScissor;
+	Rect activeScissor;
+
 	for (int i = 0; i < transforms->size(); i++){
 		Transform& transform = transforms->getComponentFromIndex(i);
 		Entity entity = transforms->getEntity(i);
@@ -1428,6 +1496,12 @@ void RenderSystem::draw(){
 		}else if (signature.test(scene->getComponentType<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
+			if (std::find(parentListScissor.begin(), parentListScissor.end(), transform.parent) == parentListScissor.end()){
+				activeScissor = Rect(0,0,System::instance().getScreenWidth(), System::instance().getScreenHeight());
+				sceneRender.applyScissor(activeScissor);
+				parentListScissor.clear();
+			}
+
 			bool isText = false;
 			if (signature.test(scene->getComponentType<TextComponent>())){
 				isText = true;
@@ -1439,6 +1513,14 @@ void RenderSystem::draw(){
 				loadUI(ui, isText);
 			}
 			drawUI(ui, transform);
+
+			if (signature.test(scene->getComponentType<ImageComponent>())){
+				ImageComponent& img = scene->getComponent<ImageComponent>(entity);
+
+				activeScissor = getScissorRect(ui, img, transform, camera).fitOnRect(activeScissor);
+				sceneRender.applyScissor(activeScissor);
+				parentListScissor.push_back(entity);
+			}
 
 		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
 			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);

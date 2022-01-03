@@ -92,7 +92,7 @@ void Rect::setRect(Rect rect){
     setRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
 }
 
-void Rect::fitOnRect(Rect& rect){
+Rect& Rect::fitOnRect(Rect& rect){
     if (x < rect.getX())
         x = rect.getX();
 
@@ -104,6 +104,8 @@ void Rect::fitOnRect(Rect& rect){
 
     if (y + height >= rect.getY() + rect.getHeight())
         height = rect.getY() + rect.getHeight() - y;
+
+    return *this;
 }
 
 bool Rect::isNormalized(){

@@ -37,7 +37,11 @@ void SokolScene::startDefaultFrameBuffer(int width, int height){
 }
 
 void SokolScene::applyViewport(Rect rect){
-    sg_apply_viewport(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), false);
+    sg_apply_viewport((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), false);
+}
+
+void SokolScene::applyScissor(Rect rect){
+    sg_apply_scissor_rect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), false);
 }
 
 void SokolScene::endFrameBuffer(){

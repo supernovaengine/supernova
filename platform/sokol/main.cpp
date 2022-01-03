@@ -72,7 +72,7 @@ sapp_desc sokol_main(int argc, char* argv[]) {
     app_desc.width = 800;
     app_desc.height = 600;
     app_desc.sample_count = 4;
-    app_desc.gl_force_gles2 = true;
+    app_desc.gl_force_gles2 = false;
     app_desc.window_title = "Supernova";
 
     Supernova::Engine::systemInit(argc, argv);
