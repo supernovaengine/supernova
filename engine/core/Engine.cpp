@@ -77,8 +77,9 @@ Scene* Engine::getScene(){
 
 void Engine::addSceneLayer(Scene* scene){
     bool foundSlot = false;
-    for (int i = 0; i < MAX_SCENE_LAYERS; i++){
-        if (!scenes[i]){
+    // 0 is reserved to mainScene
+    for (int i = 1; i < MAX_SCENE_LAYERS; i++){
+        if (!scenes[i] && !foundSlot){
             scenes[i] = scene;
             scenes[i]->setMainScene(false);
 
@@ -404,6 +405,7 @@ void Engine::systemDraw(){
             scenes[i]->draw();
     }
     
+    SystemRender::commit();
     //SoundManager::checkActive();
 }
 

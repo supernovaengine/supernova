@@ -1577,8 +1577,6 @@ void RenderSystem::draw(){
 			, misShaders.c_str(), PROJECT_ROOT, ShaderPool::getShaderLangStr().c_str());
 		exit(1);
 	}
-	
-	SystemRender::commit();
 }
 
 void RenderSystem::entityDestroyed(Entity entity){
