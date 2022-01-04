@@ -175,10 +175,10 @@ namespace Supernova {
         static FunctionSubscribe<void(int,float,float)> onTouchEnd;
         static FunctionSubscribe<void(int,float,float)> onTouchMove;
         static FunctionSubscribe<void()> onTouchCancel;
-        static FunctionSubscribe<void(int,int)> onMouseDown;
-        static FunctionSubscribe<void(int,int)> onMouseUp;
-        static FunctionSubscribe<void(float,float)> onMouseScroll;
-        static FunctionSubscribe<void(float,float)> onMouseMove;
+        static FunctionSubscribe<void(int,float,float,int)> onMouseDown;
+        static FunctionSubscribe<void(int,float,float,int)> onMouseUp;
+        static FunctionSubscribe<void(float,float,int)> onMouseScroll;
+        static FunctionSubscribe<void(float,float,int)> onMouseMove;
         static FunctionSubscribe<void()> onMouseEnter;
         static FunctionSubscribe<void()> onMouseLeave;
         static FunctionSubscribe<void(int,bool,int)> onKeyDown;

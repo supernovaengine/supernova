@@ -8,10 +8,14 @@
 namespace Supernova{
 
     struct UIComponent{
-        bool loaded = false;
-
+        // UI part
         int width = 0;
         int height = 0;
+
+        bool focused = false;
+
+        // Render part
+        bool loaded = false;
 
         Buffer* buffer;
         Buffer* indices;

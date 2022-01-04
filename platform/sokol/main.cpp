@@ -29,6 +29,8 @@ int convMouseButtom(sapp_mousebutton mouse_button){
 static void sokol_event(const sapp_event* e) {
     if (e->type == SAPP_EVENTTYPE_RESIZED)
         Supernova::Engine::systemViewChanged();
+    else if (e->type == SAPP_EVENTTYPE_CHAR)
+        Supernova::Engine::onCharInput(e->char_code);
     else if (e->type == SAPP_EVENTTYPE_KEY_DOWN)
         //Use same keycode of GLFW
         Supernova::Engine::systemKeyDown(e->key_code, e->key_repeat, e->modifiers);

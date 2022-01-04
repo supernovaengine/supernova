@@ -228,10 +228,10 @@ void onCharInput(wchar_t);
 void onViewLoaded();
 void onKeyDown(int key, bool repeat, int mods);
 void onKeyUp(int key, bool repeat, int mods);
-void onMouseDown(int button, int mods);
-void onMouseUp(int button, int mods);
-void onMouseMove(float x, float y);
-void onMouseScroll(float xoffset, float yoffset);
+void onMouseDown(int button, float x, float y, int mods);
+void onMouseUp(int button, float x, float y, int mods);
+void onMouseMove(float x, float y, int mods);
+void onMouseScroll(float xoffset, float yoffset, int mods);
 void onMouseEnter();
 void onMouseLeave();
 void onTouchStart(int pointer, float x, float y);
@@ -473,7 +473,7 @@ void onTouchCancel(){
     Log::Verbose("Touch cancel");
 }
 
-void onMouseDown(int button, int mods){
+void onMouseDown(int button, float x, float y, int mods){
     //plane.setTexture("block.png");
 
     //sky.setTextures("ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga", "ely_hills/hills_up.tga");
@@ -514,7 +514,7 @@ void onMouseDown(int button, int mods){
     Log::Verbose("Mouse down - %s - %s", bt.c_str(), modifier.c_str());
 }
 
-void onMouseUp(int button, int mods){
+void onMouseUp(int button, float x, float y, int mods){
     //carro.setTexture("block.png");
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)
@@ -542,11 +542,11 @@ void onMouseUp(int button, int mods){
     Log::Verbose("Mouse up - %s - %s", bt.c_str(), modifier.c_str());
 }
 
-void onMouseMove(float x, float y){
+void onMouseMove(float x, float y, int mods){
     //Log::Verbose("Mouse %f %f", x, y);
 }
 
-void onMouseScroll(float xoffset, float yoffset){
+void onMouseScroll(float xoffset, float yoffset, int mods){
     if (xoffset != 0 || yoffset != 0)
         Log::Verbose("Mouse scroll %f %f", xoffset, yoffset);
 }

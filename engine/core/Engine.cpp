@@ -55,10 +55,10 @@ FunctionSubscribe<void(int,float,float)> Engine::onTouchStart;
 FunctionSubscribe<void(int,float,float)> Engine::onTouchEnd;
 FunctionSubscribe<void(int,float,float)> Engine::onTouchMove;
 FunctionSubscribe<void()> Engine::onTouchCancel;
-FunctionSubscribe<void(int,int)> Engine::onMouseDown;
-FunctionSubscribe<void(int,int)> Engine::onMouseUp;
-FunctionSubscribe<void(float,float)> Engine::onMouseScroll;
-FunctionSubscribe<void(float,float)> Engine::onMouseMove;
+FunctionSubscribe<void(int,float,float,int)> Engine::onMouseDown;
+FunctionSubscribe<void(int,float,float,int)> Engine::onMouseUp;
+FunctionSubscribe<void(float,float,int)> Engine::onMouseScroll;
+FunctionSubscribe<void(float,float,int)> Engine::onMouseMove;
 FunctionSubscribe<void()> Engine::onMouseEnter;
 FunctionSubscribe<void()> Engine::onMouseLeave;
 FunctionSubscribe<void(int,bool,int)> Engine::onKeyDown;
@@ -444,7 +444,7 @@ void Engine::systemTouchStart(int pointer, float x, float y){
         //-----------------
         if (Engine::isCallMouseInTouchEvent()){
             //-----------------
-            Engine::onMouseDown.call(100, 0);
+            Engine::onMouseDown.call(100, x, y, 0);
             Input::addMousePressed(100);
             Input::setMousePosition(x, y);
             //-----------------
@@ -460,7 +460,7 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
         //-----------------
         if (Engine::isCallMouseInTouchEvent()){
             //-----------------
-            Engine::onMouseUp.call(100, 0);
+            Engine::onMouseUp.call(100, x, y, 0);
             Input::releaseMousePressed(100);
             Input::setMousePosition(x, y);
             //-----------------
@@ -476,7 +476,7 @@ void Engine::systemTouchMove(int pointer, float x, float y){
         //-----------------
         if (Engine::isCallMouseInTouchEvent()){
             //-----------------
-            Engine::onMouseMove.call(x, y);
+            Engine::onMouseMove.call(x, y, 0);
             Input::setMousePosition(x, y);
             //-----------------
         }
@@ -493,7 +493,7 @@ void Engine::systemTouchCancel(){
 void Engine::systemMouseDown(int button, float x, float y, int mods){
     if (transformCoordPos(x, y)){
         //-----------------
-        Engine::onMouseDown.call(button, mods);
+        Engine::onMouseDown.call(button, x, y, mods);
         Input::addMousePressed(button);
         Input::setMousePosition(x, y);
         Input::setModifiers(mods);
@@ -509,7 +509,7 @@ void Engine::systemMouseDown(int button, float x, float y, int mods){
 void Engine::systemMouseUp(int button, float x, float y, int mods){
     if (transformCoordPos(x, y)){
         //-----------------
-        Engine::onMouseUp.call(button, mods);
+        Engine::onMouseUp.call(button, x, y, mods);
         Input::releaseMousePressed(button);
         Input::setMousePosition(x, y);
         Input::setModifiers(mods);
@@ -526,7 +526,7 @@ void Engine::systemMouseUp(int button, float x, float y, int mods){
 void Engine::systemMouseMove(float x, float y, int mods){
     if (transformCoordPos(x, y)){
         //-----------------
-        Engine::onMouseMove.call(x, y);
+        Engine::onMouseMove.call(x, y, mods);
         Input::setMousePosition(x, y);
         Input::setModifiers(mods);
         //-----------------
@@ -543,7 +543,7 @@ void Engine::systemMouseMove(float x, float y, int mods){
 
 void Engine::systemMouseScroll(float xoffset, float yoffset, int mods){
     //-----------------
-    Engine::onMouseScroll.call(xoffset, yoffset);
+    Engine::onMouseScroll.call(xoffset, yoffset, mods);
     Input::setMouseScroll(xoffset, yoffset);
     Input::setModifiers(mods);
     //-----------------

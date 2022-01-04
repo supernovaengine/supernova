@@ -1,5 +1,5 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2022 Eduardo Doria.
 //
 
 #ifndef UISYSTEM_H
@@ -17,6 +17,8 @@ namespace Supernova{
 
     private:
 
+		std::string eventId;
+
 		//Image
 		bool createImagePatches(ImageComponent& img, UIComponent& ui);
 
@@ -24,8 +26,15 @@ namespace Supernova{
 		bool loadFontAtlas(TextComponent& text, UIComponent& ui);
 		void createText(TextComponent& text, UIComponent& ui);
 
+		void eventOnCharInput(wchar_t codepoint);
+		void eventOnMouseDown(int button, float x, float y, int mods);
+		void eventOnMouseUp(int button, float x, float y, int mods);
+		void eventOnTouchStart(int pointer, float x, float y);
+		void eventOnTouchEnd(int pointer, float x, float y);
+
 	public:
 		UISystem(Scene* scene);
+		virtual ~UISystem();
 
 		virtual void load();
 		virtual void draw();

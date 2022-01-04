@@ -1,17 +1,29 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2022 Eduardo Doria.
 //
 
 #include "UISystem.h"
 
 #include "Scene.h"
 #include "util/STBText.h"
+#include "util/UniqueToken.h"
+#include "util/StringUtils.h"
 
 using namespace Supernova;
 
 
 UISystem::UISystem(Scene* scene): SubSystem(scene){
     signature.set(scene->getComponentType<UIComponent>());
+
+    eventId.clear();
+}
+
+UISystem::~UISystem(){
+    Engine::onCharInput.remove(eventId);
+    Engine::onMouseDown.remove(eventId);
+    Engine::onMouseUp.remove(eventId);
+    Engine::onTouchStart.remove(eventId);
+    Engine::onTouchEnd.remove(eventId);
 }
 
 bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
@@ -168,7 +180,16 @@ void UISystem::createText(TextComponent& text, UIComponent& ui){
 }
 
 void UISystem::load(){
-
+    if (eventId.empty()){
+        eventId = "UIObject|" + UniqueToken::get();
+    }
+    // Cannot be on constructor to prevent static initialization order fiasco:
+    // http://www.parashift.com/c++-faq-lite/static-init-order.html
+    Engine::onCharInput.add<UISystem, &UISystem::eventOnCharInput>(eventId, this);
+    Engine::onMouseDown.add<UISystem, &UISystem::eventOnMouseDown>(eventId, this);
+    Engine::onMouseUp.add<UISystem, &UISystem::eventOnMouseUp>(eventId, this);
+    Engine::onTouchStart.add<UISystem, &UISystem::eventOnTouchStart>(eventId, this);
+    Engine::onTouchEnd.add<UISystem, &UISystem::eventOnTouchEnd>(eventId, this);
 }
 
 void UISystem::draw(){
@@ -230,4 +251,24 @@ void UISystem::entityDestroyed(Entity entity){
             delete text.stbtext;
         }
     }
+}
+
+void UISystem::eventOnCharInput(wchar_t codepoint){
+    //Log::Verbose("%s",StringUtils::toUTF8(codepoint).c_str());
+}
+
+void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
+
+}
+
+void UISystem::eventOnMouseUp(int button, float x, float y, int mods){
+
+}
+
+void UISystem::eventOnTouchStart(int pointer, float x, float y){
+
+}
+
+void UISystem::eventOnTouchEnd(int pointer, float x, float y){
+
 }
