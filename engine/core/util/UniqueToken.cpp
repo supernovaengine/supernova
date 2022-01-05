@@ -10,17 +10,18 @@ using namespace Supernova;
 int UniqueToken::id;
 
 std::string UniqueToken::randString(const int len){
-    char rand_id[len];
     static const char alphanum[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-    for (int i = 0; i < len; ++i) {
-        rand_id[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
-    }
-    rand_id[len] = 0;
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    std::string tmp_s;
+    tmp_s.reserve(len);
 
-    return std::string(rand_id);
+    for (int i = 0; i < len; ++i) {
+        tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+
+    return tmp_s;
 }
 
 std::string UniqueToken::get(){

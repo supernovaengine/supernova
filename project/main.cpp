@@ -561,6 +561,7 @@ void onMouseLeave(){
 
 void onCharInput(wchar_t codepoint){
     Log::Verbose("%s",StringUtils::toUTF8(codepoint).c_str());
+    label.setText(StringUtils::toUTF8(codepoint));
 }
 
 void onKeyDown(int key, bool repeat, int mods){
