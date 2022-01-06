@@ -35,7 +35,7 @@ jobs:
             app_backend: "sokol"
           }
         - {
-            name: "Ubuntu",
+            name: "Ubuntu (GLFW)",
             backend_name: "OpenGL",
             os: ubuntu-latest,
             platform: "linux",
@@ -115,7 +115,7 @@ jobs:
         if: startsWith(matrix.config.os, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install libxi-dev libxcursor-dev libgl1-mesa-dev ninja-build cmake
+          sudo apt-get install libglfw3-dev libxi-dev libxcursor-dev libgl1-mesa-dev ninja-build cmake
 
       - name: Install dependencies on macOS
         if: startsWith(matrix.config.os, 'macos')

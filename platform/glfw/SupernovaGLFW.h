@@ -1,3 +1,7 @@
+//
+// (c) 2022 Eduardo Doria.
+//
+
 #ifndef SupernovaGLFW_h
 #define SupernovaGLFW_h
 

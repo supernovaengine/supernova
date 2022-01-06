@@ -54,12 +54,13 @@ add_library(
 
     ${LUA_SOURCE}
 )
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    target_link_libraries(
+        lua
 
-target_link_libraries(
-    lua
-
-    dl
-)
+        dl
+    )
+endif()
 
 # By default Lua-Intf expect the Lua library to build under C++
 set_source_files_properties(
