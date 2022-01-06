@@ -15,63 +15,80 @@ jobs:
             backend_name: "DirectX",
             os: windows-latest,
             platform: "windows",
-            backend: "d3d11"
+            gfx_backend: "d3d11",
+            app_backend: "sokol"
           }
         - {
             name: "Windows",
             backend_name: "OpenGL",
             os: windows-latest,
             platform: "windows",
-            backend: "glcore33"
+            gfx_backend: "glcore33",
+            app_backend: "sokol"
           }
         - {
             name: "Ubuntu",
             backend_name: "OpenGL",
             os: ubuntu-latest,
             platform: "linux",
-            backend: "glcore33"
+            gfx_backend: "glcore33",
+            app_backend: "sokol"
+          }
+        - {
+            name: "Ubuntu",
+            backend_name: "OpenGL",
+            os: ubuntu-latest,
+            platform: "linux",
+            gfx_backend: "glcore33",
+            app_backend: "glfw"
           }
         - {
             name: "macOS",
             backend_name: "Metal",
             os: macos-latest,
             platform: "macos",
-            backend: "metal"
+            gfx_backend: "metal",
+            app_backend: "sokol"
           }
         - {
             name: "macOS",
             backend_name: "OpenGL",
             os: macos-latest,
             platform: "macos",
-            backend: "glcore33"
+            gfx_backend: "glcore33",
+            app_backend: "sokol"
           }
         - {
             name: "macOS Xcode",
             backend_name: "Metal",
             os: macos-latest,
             platform: "macos-xcode",
-            backend: "metal"
+            gfx_backend: "metal",
+            app_backend: "apple"
           }
         - {
             name: "iOS Xcode",
             backend_name: "Metal",
             os: macos-latest,
             platform: "ios-xcode",
-            backend: "metal"
+            gfx_backend: "metal",
+            app_backend: "apple"
           }
         - {
             name: "Web (Emscripten)",
             backend_name: "WebGL",
             os: ubuntu-latest,
             platform: "web",
-            backend: "gles2"
+            gfx_backend: "gles2",
+            app_backend: "emscripten"
           }
         - {
             name: "Web (Emscripten)",
             backend_name: "WebGL 2",
             os: ubuntu-latest,
             platform: "web",
-            backend: "gles3"
+            gfx_backend: "gles3",
+            app_backend: "emscripten"
           }
 
     steps:
@@ -111,4 +128,4 @@ jobs:
       - name: Build
         run: |
           cd tools/
-          python3 supernova.py --build --platform ${{ matrix.config.platform }} --graphic-backend ${{ matrix.config.backend }}
+          python3 supernova.py --build --platform ${{ matrix.config.platform }} --graphic-backend ${{ matrix.config.gfx_backend }} --app-backend ${{ matrix.config.app_backend }}

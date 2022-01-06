@@ -55,8 +55,15 @@ add_library(
     ${LUA_SOURCE}
 )
 
+target_link_libraries(
+    lua
+
+    dl
+)
+
 # By default Lua-Intf expect the Lua library to build under C++
 set_source_files_properties(
     ${LUA_SOURCE}
+
     PROPERTIES LANGUAGE CXX
 )

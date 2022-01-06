@@ -109,10 +109,11 @@ def create_build_dir(name):
 @click.option('--output', '-o', type=click.Path(), help="Output directory")
 @click.option('--build/--no-build', '-b', default=False, help="Build or no build generated Xcode project")
 @click.option('--graphic-backend', '-g', type=click.Choice(['glcore33', 'gles2', 'gles3', 'metal', 'd3d11'], case_sensitive=False), help="Prefered graphic API")
+@click.option('--app-backend', '-m', type=click.Choice(['emscripten', 'android', 'sokol', 'glfw', 'apple'], case_sensitive=False), help="Prefered application API")
 @click.option('--no-cpp-init', is_flag=True, help="No call C++ init on project start")
 @click.option('--no-lua-init', is_flag=True, help="No call Lua on project start")
 @click.option('--em-shell-file', type=click.Path(), help="Emscripten shell file")
-def build(platform, project, supernova, appname, output, build, graphic_backend, no_lua_init, no_cpp_init, em_shell_file):
+def build(platform, project, supernova, appname, output, build, graphic_backend, app_backend, no_lua_init, no_cpp_init, em_shell_file):
 
     projectRoot = os.path.abspath(project)
     supernovaRoot = os.path.abspath(supernova)
@@ -131,6 +132,9 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
 
     if graphic_backend!=None:
         cmake_definitions.append("-DGRAPHIC_BACKEND="+graphic_backend)
+
+    if app_backend!=None:
+        cmake_definitions.append("-DAPP_BACKEND="+app_backend)
 
     if no_cpp_init:
         cmake_definitions.append("-DNO_CPP_INIT=1")

@@ -41,6 +41,30 @@ if(NOT GRAPHIC_BACKEND)
 endif()
 message(STATUS "Graphic backend is set to ${GRAPHIC_BACKEND}")
 
+if(NOT APP_BACKEND)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+        set(APP_BACKEND "emscripten")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
+        set(APP_BACKEND "android")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        set(APP_BACKEND "sokol")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        #set(APP_BACKEND "sokol")
+        set(APP_BACKEND "glfw")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        if (CMAKE_GENERATOR STREQUAL "Xcode")
+            set(APP_BACKEND "apple")
+        else()
+            set(APP_BACKEND "sokol")
+        endif()
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+        set(APP_BACKEND "apple")
+    else()
+        message(FATAL_ERROR "APP_BACKEND is not set")
+    endif()
+endif()
+message(STATUS "Application backend is set to ${APP_BACKEND}")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(COMPILE_ZLIB OFF)
 set(IS_ARM OFF)
@@ -163,8 +187,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    add_definitions("-DSUPERNOVA_SOKOL")
-
     if(GRAPHIC_BACKEND STREQUAL "glcore33")
         add_definitions("-DSOKOL_GLCORE33")
     endif()
@@ -174,16 +196,33 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
     set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/lua)
 
-    set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
+    if (APP_BACKEND STREQUAL "glfw")
+        add_definitions("-DSUPERNOVA_GLFW")
 
-    list(APPEND PLATFORM_SOURCE
-        ${PLATFORM_ROOT}/SupernovaSokol.cpp
-        ${PLATFORM_ROOT}/main.cpp
-    )
+        set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/glfw)
 
-    list(APPEND PLATFORM_LIBS
-        
-    )
+        list(APPEND PLATFORM_SOURCE
+            ${PLATFORM_ROOT}/SupernovaGLFW.cpp
+            ${PLATFORM_ROOT}/main.cpp
+        )
+
+        list(APPEND PLATFORM_LIBS
+            GL dl m glfw
+        )
+    else()
+        add_definitions("-DSUPERNOVA_SOKOL")
+
+        set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
+
+        list(APPEND PLATFORM_SOURCE
+            ${PLATFORM_ROOT}/SupernovaSokol.cpp
+            ${PLATFORM_ROOT}/main.cpp
+        )
+
+        list(APPEND PLATFORM_LIBS
+
+        )
+    endif()
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -198,7 +237,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
 
-    if (CMAKE_GENERATOR STREQUAL "Xcode")
+    if (APP_BACKEND STREQUAL "apple")
         add_definitions("-DSUPERNOVA_APPLE")
 
         set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/apple)

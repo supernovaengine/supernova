@@ -26,6 +26,9 @@ using namespace Supernova;
 #ifdef  SUPERNOVA_SOKOL
 #include "SupernovaSokol.h"
 #endif
+#ifdef  SUPERNOVA_GLFW
+#include "SupernovaGLFW.h"
+#endif
 #ifdef  SUPERNOVA_APPLE
 #include "SupernovaApple.h"
 #endif
@@ -42,6 +45,9 @@ System& System::instance(){
 #endif
 #ifdef  SUPERNOVA_SOKOL
     static System *instance = new SupernovaSokol();
+#endif
+#ifdef  SUPERNOVA_GLFW
+    static System *instance = new SupernovaGLFW();
 #endif
 #ifdef  SUPERNOVA_APPLE
     static System *instance = new SupernovaApple();

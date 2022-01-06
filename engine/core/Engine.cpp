@@ -496,7 +496,8 @@ void Engine::systemMouseDown(int button, float x, float y, int mods){
         Engine::onMouseDown.call(button, x, y, mods);
         Input::addMousePressed(button);
         Input::setMousePosition(x, y);
-        Input::setModifiers(mods);
+        if (mods != 0)
+            Input::setModifiers(mods);
         //-----------------
         if (Engine::isCallTouchInMouseEvent()){
             //-----------------
@@ -512,7 +513,8 @@ void Engine::systemMouseUp(int button, float x, float y, int mods){
         Engine::onMouseUp.call(button, x, y, mods);
         Input::releaseMousePressed(button);
         Input::setMousePosition(x, y);
-        Input::setModifiers(mods);
+        if (mods != 0)
+            Input::setModifiers(mods);
         //-----------------
         if (Engine::isCallTouchInMouseEvent()){
             //-----------------
@@ -528,7 +530,8 @@ void Engine::systemMouseMove(float x, float y, int mods){
         //-----------------
         Engine::onMouseMove.call(x, y, mods);
         Input::setMousePosition(x, y);
-        Input::setModifiers(mods);
+        if (mods != 0)
+            Input::setModifiers(mods);
         //-----------------
         if (Engine::isCallTouchInMouseEvent()){
             //-----------------
@@ -545,7 +548,8 @@ void Engine::systemMouseScroll(float xoffset, float yoffset, int mods){
     //-----------------
     Engine::onMouseScroll.call(xoffset, yoffset, mods);
     Input::setMouseScroll(xoffset, yoffset);
-    Input::setModifiers(mods);
+    if (mods != 0)
+        Input::setModifiers(mods);
     //-----------------
 }
 
@@ -567,6 +571,8 @@ void Engine::systemKeyDown(int key, bool repeat, int mods){
     //-----------------
     Engine::onKeyDown.call(key, repeat, mods);
     Input::addKeyPressed(key);
+    if (mods != 0)
+        Input::setModifiers(mods);
     //-----------------
 }
 
@@ -574,6 +580,7 @@ void Engine::systemKeyUp(int key, bool repeat, int mods){
     //-----------------
     Engine::onKeyUp.call(key, repeat, mods);
     Input::releaseKeyPressed(key);
+    Input::setModifiers(mods); // Now it can be 0
     //-----------------
 }
 
