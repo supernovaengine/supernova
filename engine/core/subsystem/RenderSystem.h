@@ -58,6 +58,8 @@ namespace Supernova{
 		SceneRender sceneRender;
 		SceneRender depthRender;
 
+		FramebufferRender sceneFramebuffer;
+
 		static TextureRender emptyWhite;
 		static TextureRender emptyBlack;
 		static TextureRender emptyCubeBlack;

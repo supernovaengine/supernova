@@ -38,6 +38,8 @@ namespace Supernova{
 		Vector4 color;
 		bool shadowsPCF;
 
+		bool renderToTexture;
+
 	    EntityManager entityManager;
 	    ComponentManager componentManager;
 		std::unordered_map<const char*, std::shared_ptr<SubSystem>> systems;
@@ -66,6 +68,9 @@ namespace Supernova{
 
 		void setShadowsPCF(bool shadowsPCF);
 		bool isShadowsPCF();
+
+		void setRenderToTexture(bool renderToTexture);
+		bool isRenderToTexture();
 
 		void updateCameraSize();
 

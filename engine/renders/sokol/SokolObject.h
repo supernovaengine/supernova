@@ -45,7 +45,7 @@ namespace Supernova{
         SokolObject(const SokolObject& rhs);
         SokolObject& operator=(const SokolObject& rhs);
 
-        void beginLoad(PrimitiveType primitiveType, bool depth);
+        void beginLoad(PrimitiveType primitiveType, bool depth, bool renderToTexture);
         void addIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset);
         void addAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized);
         void addShader(ShaderRender* shader);

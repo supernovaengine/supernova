@@ -39,6 +39,8 @@ Scene::Scene(){
 	mainScene = false;
 	color = Vector4(0.1, 0.1, 0.1, 1.0);
 	shadowsPCF = true;
+
+	renderToTexture = false;
 }
 
 void Scene::setCamera(Entity camera){
@@ -87,6 +89,14 @@ void Scene::setShadowsPCF(bool shadowsPCF){
 
 bool Scene::isShadowsPCF(){
 	return this->shadowsPCF;
+}
+
+void Scene::setRenderToTexture(bool renderToTexture){
+	this->renderToTexture = renderToTexture;
+}
+
+bool Scene::isRenderToTexture(){
+	return renderToTexture;
 }
 
 void Scene::updateCameraSize(){

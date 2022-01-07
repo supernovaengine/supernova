@@ -15,8 +15,8 @@ ObjectRender::~ObjectRender(){
     //Cannot destroy because its a handle
 }
 
-void ObjectRender::beginLoad(PrimitiveType primitiveType, bool depth){
-    backend.beginLoad(primitiveType, depth);
+void ObjectRender::beginLoad(PrimitiveType primitiveType, bool depth, bool renderToTexture){
+    backend.beginLoad(primitiveType, depth, renderToTexture);
 }
 
 void ObjectRender::addIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset){

@@ -1,4 +1,4 @@
-/*
+
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -15,6 +15,8 @@ using namespace Supernova;
 #include "AlphaAction.h"
 #include "Particles.h"
 #include "ParticlesAnimation.h"
+#include "Image.h"
+#include "Text.h"
 
 Scene scene;
 //Camera camera(&scene);
@@ -32,6 +34,12 @@ ColorAction coloraction(&scene);
 AlphaAction alphaaction(&scene);
 Particles particles(&scene);
 ParticlesAnimation partianim(&scene);
+
+Scene uiscene;
+//Sprite spriteui(&uiscene, 200, 200);
+Image image(&uiscene);
+Image image2(&uiscene);
+Text label(&uiscene);
 
 
 void onActionStart();
@@ -146,7 +154,24 @@ void init(){
     //plane.setTexture("pista.png");
     //plane.setPosition(-2000,0,-2000);
 
+
+    image.setTexture("pista.png");
+    image.setMargin(20);
+
+    image2.setPosition(150,150,0);
+    image2.setSize(300,300);
+    image2.setTexture("block.png");
+    image2.setMargin(20);
+    image.addChild(&image2);
+
+    image2.addChild(&label);
+    label.setText("Testing!!!!!");
+    label.setPosition(150, 150, 0);
+
     Engine::setScene(&scene);
+    Engine::addSceneLayer(&uiscene);
+    uiscene.setRenderToTexture(true);
+
     Engine::onKeyDown = onKeyDown;
 }
 
@@ -202,9 +227,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
-*/
 
 
+/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -614,3 +639,4 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
+*/

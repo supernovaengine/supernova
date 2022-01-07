@@ -49,6 +49,12 @@ void RenderSystem::load(){
 		sceneRender.setClearColor(scene->getColor());
 	}
 	depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
+
+	if (scene->isRenderToTexture()){
+		int teste = 0;
+		if (!sceneFramebuffer.isCreated())
+			sceneFramebuffer.createFramebuffer(TextureType::TEXTURE_2D, 512, 512);
+	}
 }
 
 void RenderSystem::createEmptyTextures(){
@@ -338,7 +344,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 		ObjectRender& render = mesh.submeshes[i].render;
 
-		render.beginLoad(mesh.submeshes[i].primitiveType, false);
+		render.beginLoad(mesh.submeshes[i].primitiveType, false, scene->isRenderToTexture());
 
 		for (auto const& buf : mesh.buffers){
         	if (buf.second->isRenderAttributes()) {
@@ -479,7 +485,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		if (hasShadows && mesh.castShadows){
 			ObjectRender& depthRender = mesh.submeshes[i].depthRender;
 
-			depthRender.beginLoad(mesh.submeshes[i].primitiveType, true);
+			depthRender.beginLoad(mesh.submeshes[i].primitiveType, true, scene->isRenderToTexture());
 
 			depthRender.addShader(mesh.submeshes[i].depthShader.get());
 			ShaderData& depthShaderData = mesh.submeshes[i].depthShader.get()->shaderData;
@@ -612,7 +618,7 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 bool RenderSystem::loadUI(UIComponent& ui, bool isText){
 	ObjectRender& render = ui.render;
 
-	render.beginLoad(ui.primitiveType, false);
+	render.beginLoad(ui.primitiveType, false, scene->isRenderToTexture());
 
 	TextureRender* textureRender = ui.texture.getRender();
 
@@ -747,7 +753,7 @@ void RenderSystem::destroyUI(UIComponent& ui){
 bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	ObjectRender& render = particles.render;
 
-	render.beginLoad(PrimitiveType::POINTS, false);
+	render.beginLoad(PrimitiveType::POINTS, false, scene->isRenderToTexture());
 
 	TextureRender* textureRender = particles.texture.getRender();
 
@@ -851,7 +857,7 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 
 	ObjectRender* render = &sky.render;
 
-	render->beginLoad(PrimitiveType::TRIANGLES, false);
+	render->beginLoad(PrimitiveType::TRIANGLES, false, scene->isRenderToTexture());
 
 	ShaderType shaderType = ShaderType::SKYBOX;
 
@@ -1462,13 +1468,17 @@ void RenderSystem::draw(){
 		}
 	}
 	
-	//---------Draw opaque meshes and UI----------
-	sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
-	sceneRender.applyViewport(Engine::getViewRect());
+	if (!scene->isRenderToTexture()){
+		sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
+		sceneRender.applyViewport(Engine::getViewRect());
+	}else{
+		sceneRender.startFrameBuffer(&sceneFramebuffer);
+	}
 
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
 	CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
 
+	//---------Draw opaque meshes and UI----------
 	std::vector<Entity> parentListScissor;
 	Rect activeScissor;
 

@@ -79,7 +79,7 @@ sg_primitive_type SokolObject::getPrimitiveType(PrimitiveType primitiveType){
     return SG_PRIMITIVETYPE_TRIANGLES;
 }
 
-void SokolObject::beginLoad(PrimitiveType primitiveType, bool depth){
+void SokolObject::beginLoad(PrimitiveType primitiveType, bool depth, bool renderToTexture){
     bind = {0};
     pip = {0};
     pipeline_desc = {0};
@@ -97,6 +97,12 @@ void SokolObject::beginLoad(PrimitiveType primitiveType, bool depth){
 
         pipeline_desc.depth.write_enabled = true;
         pipeline_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
+
+        if (renderToTexture){
+            pipeline_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
+            pipeline_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
+            pipeline_desc.depth.write_enabled = true;
+        }
 
         pipeline_desc.colors[0].write_mask = SG_COLORMASK_RGB;
         pipeline_desc.colors[0].blend.enabled = true;
