@@ -68,3 +68,9 @@ set_source_files_properties(
 
     PROPERTIES LANGUAGE CXX
 )
+
+set_target_properties(
+    lua
+    PROPERTIES
+    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+)

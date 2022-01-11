@@ -9,7 +9,7 @@ endif()
 
 add_definitions("-DPROJECT_ROOT=\"${PROJECT_ROOT}\"")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 include_directories(libs)
 include_directories(libs/sol)
@@ -54,4 +54,5 @@ set_target_properties(
     PROPERTIES
 
     CXX_STANDARD 17
+    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )

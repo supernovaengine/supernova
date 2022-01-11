@@ -65,7 +65,7 @@ if(NOT APP_BACKEND)
 endif()
 message(STATUS "Application backend is set to ${APP_BACKEND}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(COMPILE_ZLIB OFF)
 set(IS_ARM OFF)
 set(SUPERNOVA_GLES2 ON)
@@ -184,9 +184,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
             -static -static-libgcc -static-libstdc++
         )
     else()
-        list(APPEND PLATFORM_LIBS
-            kernel32 user32 gdi32
-         )
         list(APPEND PLATFORM_PROPERTIES
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
         )
