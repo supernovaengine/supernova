@@ -21,6 +21,7 @@ namespace Supernova{
         virtual ~Mesh();
 
         void setTexture(std::string path);
+        void setTexture(FramebufferRender* framebuffer);
         
         void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);

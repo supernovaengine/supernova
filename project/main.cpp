@@ -1,4 +1,115 @@
+#include "Supernova.h"
+using namespace Supernova;
 
+#include "Sprite.h"
+#include "Camera.h"
+#include "Polygon.h"
+#include "Input.h"
+#include "Angle.h"
+#include "SpriteAnimation.h"
+#include "PositionAction.h"
+#include "RotationAction.h"
+#include "ScaleAction.h"
+#include "ColorAction.h"
+#include "AlphaAction.h"
+#include "Particles.h"
+#include "ParticlesAnimation.h"
+#include "Image.h"
+#include "Text.h"
+
+Scene scene;
+//Camera camera(&scene);
+
+
+Polygon polygon3(&scene);
+
+Scene uiscene;
+//Sprite spriteui(&uiscene, 200, 200);
+Image image(&uiscene);
+//Image image2(&uiscene);
+//Text label(&uiscene);
+
+
+void onActionStart();
+void onKeyDown(int key, bool repeat, int mods);
+
+void init(){
+
+    //camera.activate();
+    //camera.setType(CameraType::CAMERA_PERSPECTIVE);
+
+    //camera.setPosition(0,8,-100);
+
+    polygon3.addVertex(0, 0);
+    polygon3.addVertex(800, 0);
+    polygon3.addVertex(0, 800);
+    polygon3.addVertex(800, 800);
+    //polygon3.setColor(0.5, 1.0, 1.0, 1.0);
+    polygon3.setPosition(100, 100, 0);
+    polygon3.setName("Polygon3");
+    polygon3.setTexture(&uiscene.getFramebuffer());
+
+
+    image.setTexture("pista.png");
+    image.setMargin(20);
+/*
+    image2.setPosition(150,150,0);
+    image2.setSize(300,300);
+    image2.setTexture("block.png");
+    image2.setMargin(20);
+    image.addChild(&image2);
+
+    image2.addChild(&label);
+    label.setText("Testing!!!!!");
+    label.setPosition(150, 150, 0);
+*/
+    Engine::setScene(&scene);
+    Engine::addSceneLayer(&uiscene);
+    uiscene.setRenderToTexture(true);
+
+    Engine::onKeyDown = onKeyDown;
+}
+
+void onActionStart(){
+    Log::Verbose("Action Start");
+}
+
+void onKeyDown(int key, bool repeat, int mods){
+    if (key == S_KEY_A){
+    }
+    if (key == S_KEY_F){
+    }
+    if (key == S_KEY_S){
+    }
+    if (key == S_KEY_D){
+
+        //particles.setTexture("block.png");
+        //particles.setMaxParticles(10);
+    }
+
+    if (key == S_KEY_1){
+    }
+    if (key == S_KEY_2){
+    }
+    if (key == S_KEY_3){
+    }
+
+    if (key == S_KEY_R){
+
+        //polygon3.setTexture("block.png");
+        //polygon3.setTexture(*uiscene.getTexureRender());
+    }
+    if (key == S_KEY_T){
+
+        image.setPosition(image.getPosition().x + 100, image.getPosition().y + 100, 0);
+        //sprite.pauseAnimation();
+    }
+    if (key == S_KEY_Y){
+        //sprite.stopAnimation();
+    }
+}
+
+/*
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -34,12 +145,6 @@ ColorAction coloraction(&scene);
 AlphaAction alphaaction(&scene);
 Particles particles(&scene);
 ParticlesAnimation partianim(&scene);
-
-Scene uiscene;
-//Sprite spriteui(&uiscene, 200, 200);
-Image image(&uiscene);
-Image image2(&uiscene);
-Text label(&uiscene);
 
 
 void onActionStart();
@@ -115,13 +220,12 @@ void init(){
     polygon2.setName("Polygon2");
 
     polygon3.addVertex(0, 0);
-    polygon3.addVertex(300, 0);
-    polygon3.addVertex(0, 300);
-    polygon3.addVertex(300, 300);
+    polygon3.addVertex(800, 0);
+    polygon3.addVertex(0, 800);
+    polygon3.addVertex(800, 800);
     polygon3.setColor(0.5, 1.0, 1.0, 1.0);
     polygon3.setPosition(100, 100, 0);
     polygon3.setName("Polygon3");
-    polygon3.setTexture("pista.png");
 
     particles.setPosition(300, 100, 0);
     particles.addParticle(Vector3(30, 30, 0), Vector4(1.0, 1.0, 1.0, 1.0), 50, 40);
@@ -169,8 +273,6 @@ void init(){
     label.setPosition(150, 150, 0);
 
     Engine::setScene(&scene);
-    Engine::addSceneLayer(&uiscene);
-    uiscene.setRenderToTexture(true);
 
     Engine::onKeyDown = onKeyDown;
 }
@@ -227,7 +329,7 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
-
+*/
 
 /*
 #include "Supernova.h"

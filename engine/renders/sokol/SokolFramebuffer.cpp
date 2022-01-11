@@ -66,8 +66,8 @@ bool SokolFramebuffer::isCreated(){
     return false;
 }
 
-TextureRender* SokolFramebuffer::getColorTexture(){
-    return &colorTexture;
+TextureRender& SokolFramebuffer::getColorTexture(){
+    return colorTexture;
 }
 
 sg_pass SokolFramebuffer::get(size_t face){

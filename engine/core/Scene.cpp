@@ -43,6 +43,10 @@ Scene::Scene(){
 	renderToTexture = false;
 }
 
+Scene::~Scene(){
+	framebuffer.destroyFramebuffer();
+}
+
 void Scene::setCamera(Entity camera){
 	if (findComponent<CameraComponent>(camera)){
 		this->camera = camera;
@@ -97,6 +101,10 @@ void Scene::setRenderToTexture(bool renderToTexture){
 
 bool Scene::isRenderToTexture(){
 	return renderToTexture;
+}
+
+FramebufferRender& Scene::getFramebuffer(){
+	return framebuffer;
 }
 
 void Scene::updateCameraSize(){

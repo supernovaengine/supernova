@@ -27,6 +27,6 @@ bool FramebufferRender::isCreated(){
     return backend.isCreated();
 }
 
-TextureRender* FramebufferRender::getColorTexture(){
+TextureRender& FramebufferRender::getColorTexture(){
     return backend.getColorTexture();
 }

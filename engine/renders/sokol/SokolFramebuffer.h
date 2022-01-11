@@ -25,7 +25,7 @@ namespace Supernova{
         void destroyFramebuffer();
         bool isCreated();
 
-        TextureRender* getColorTexture();
+        TextureRender& getColorTexture();
 
         sg_pass get(size_t face);
     };

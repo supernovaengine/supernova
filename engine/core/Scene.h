@@ -39,6 +39,7 @@ namespace Supernova{
 		bool shadowsPCF;
 
 		bool renderToTexture;
+		FramebufferRender framebuffer;
 
 	    EntityManager entityManager;
 	    ComponentManager componentManager;
@@ -51,6 +52,7 @@ namespace Supernova{
 	public:
 	
 		Scene();
+		virtual ~Scene();
 
 		void load();
 		void draw();
@@ -71,6 +73,8 @@ namespace Supernova{
 
 		void setRenderToTexture(bool renderToTexture);
 		bool isRenderToTexture();
+
+		FramebufferRender& getFramebuffer();
 
 		void updateCameraSize();
 

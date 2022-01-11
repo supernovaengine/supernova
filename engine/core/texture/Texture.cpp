@@ -8,6 +8,7 @@ using namespace Supernova;
 
 Texture::Texture(){
     this->render = NULL;
+    this->framebuffer = NULL;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = true;
     this->needLoad = false;
@@ -15,6 +16,7 @@ Texture::Texture(){
 
 Texture::Texture(std::string path){
     this->render = NULL;
+    this->framebuffer = NULL;
     this->paths[0] = path;
     this->id = path;
     this->type = TextureType::TEXTURE_2D;
@@ -25,6 +27,7 @@ Texture::Texture(std::string path){
 
 Texture::Texture(TextureData data, std::string id){
     this->render = NULL;
+    this->framebuffer = NULL;
     this->data[0] = data;
     this->id = id;
     this->type = TextureType::TEXTURE_2D;
@@ -35,6 +38,7 @@ Texture::Texture(TextureData data, std::string id){
 
 Texture::Texture(const Texture& rhs){
     render = rhs.render;
+    framebuffer = rhs.framebuffer;
     type = rhs.type;
     id = rhs.id;
     for (int i = 0; i < 6; i++){
@@ -48,6 +52,7 @@ Texture::Texture(const Texture& rhs){
 
 Texture& Texture::operator=(const Texture& rhs){
     render = rhs.render;
+    framebuffer = rhs.framebuffer;
     type = rhs.type;
     id = rhs.id;
     for (int i = 0; i < 6; i++){
@@ -70,6 +75,7 @@ void Texture::setPath(std::string path){
 
     this->paths[0] = path;
     this->id = path;
+    this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_2D;
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
@@ -81,6 +87,7 @@ void Texture::setData(TextureData data, std::string id){
 
     this->data[0] = data;
     this->id = id;
+    this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_2D;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
@@ -92,6 +99,7 @@ void Texture::setCubePath(size_t index, std::string path){
 
     this->paths[index] = path;
 
+    this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_CUBE;
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
@@ -114,6 +122,7 @@ void Texture::setCubePaths(std::string front, std::string back, std::string left
     this->paths[2] = up;
     this->paths[3] = down;
 
+    this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_CUBE;
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
@@ -124,6 +133,16 @@ void Texture::setCubePaths(std::string front, std::string back, std::string left
         id = id + "|" + paths[f];
     }
     this->id = id;
+}
+
+void Texture::setFramebuffer(FramebufferRender* framebuffer){
+    destroy();
+
+    this->framebuffer = framebuffer;
+    this->id.clear();
+    this->loadFromPath = false;
+    this->releaseDataAfterLoad = false;
+    this->needLoad = false;
 }
 
 bool Texture::load(){
@@ -171,6 +190,9 @@ void Texture::destroy(){
 }
 
 TextureRender* Texture::getRender(){
+    if (framebuffer)
+        return &framebuffer->getColorTexture();
+
     if (needLoad && !render)
         load();
 

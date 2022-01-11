@@ -41,19 +41,21 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 	hasShadows = false;
 }
 
+RenderSystem::~RenderSystem(){
+}
+
 void RenderSystem::load(){
 	createEmptyTextures();
 	checkLightsAndShadow();
 
-	if (scene->isMainScene()){
+	if (scene->isMainScene() || scene->isRenderToTexture()){
 		sceneRender.setClearColor(scene->getColor());
 	}
 	depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
 
 	if (scene->isRenderToTexture()){
-		int teste = 0;
-		if (!sceneFramebuffer.isCreated())
-			sceneFramebuffer.createFramebuffer(TextureType::TEXTURE_2D, 512, 512);
+		if (!scene->getFramebuffer().isCreated())
+			scene->getFramebuffer().createFramebuffer(TextureType::TEXTURE_2D, 512, 512);
 	}
 }
 
@@ -292,16 +294,16 @@ void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 				if (light.shadowMapIndex >= 0){
 					if (light.type == LightType::POINT){
 						slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(light.shadowMapIndex), ShaderStageType::FRAGMENT);
-						render.addTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer[0].getColorTexture());
+						render.addTexture(slotTex, ShaderStageType::FRAGMENT, &light.framebuffer[0].getColorTexture());
 						numCubeShadows++;
 					}else if (light.type == LightType::SPOT){
 						slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex), ShaderStageType::FRAGMENT);
-						render.addTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer[0].getColorTexture());
+						render.addTexture(slotTex, ShaderStageType::FRAGMENT, &light.framebuffer[0].getColorTexture());
 						num2DShadows++;
 					}else if (light.type == LightType::DIRECTIONAL){
 						for (int c = 0; c < light.numShadowCascades; c++){
 							slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex+c), ShaderStageType::FRAGMENT);
-							render.addTexture(slotTex, ShaderStageType::FRAGMENT, light.framebuffer[c].getColorTexture());
+							render.addTexture(slotTex, ShaderStageType::FRAGMENT, &light.framebuffer[c].getColorTexture());
 							num2DShadows++;
 						}
 					}
@@ -1472,7 +1474,7 @@ void RenderSystem::draw(){
 		sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
 		sceneRender.applyViewport(Engine::getViewRect());
 	}else{
-		sceneRender.startFrameBuffer(&sceneFramebuffer);
+		sceneRender.startFrameBuffer(&scene->getFramebuffer());
 	}
 
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
@@ -1596,7 +1598,7 @@ void RenderSystem::entityDestroyed(Entity entity){
 		destroyMesh(scene->getComponent<MeshComponent>(entity));
 	}
 
-	//TODO: Destroy lights?
+	//TODO: Destroy lights? Framebuffer
 
 	if (signature.test(scene->getComponentType<UIComponent>())){
 		destroyUI(scene->getComponent<UIComponent>(entity));

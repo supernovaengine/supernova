@@ -7,7 +7,7 @@
 namespace Supernova{
 
     struct SpriteComponent{
-        int width = 200;
+        int width = 200; //TODO
         int height = 200;
 
         FrameData framesRect[MAX_SPRITE_FRAMES];
