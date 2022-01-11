@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.15)
 
 if(NOT DEFINED APP_NAME)
    set(APP_NAME supernova-project)
@@ -182,6 +182,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         list(APPEND PLATFORM_LIBS
             -static -static-libgcc -static-libstdc++
+        )
+    else()
+        list(APPEND PLATFORM_PROPERTIES
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
         )
     endif()
 endif()
