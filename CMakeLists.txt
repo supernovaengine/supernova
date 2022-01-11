@@ -184,6 +184,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
             -static -static-libgcc -static-libstdc++
         )
     else()
+        list(APPEND PLATFORM_LIBS
+            kernel32 user32 gdi32
+         )
         list(APPEND PLATFORM_PROPERTIES
             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
         )
