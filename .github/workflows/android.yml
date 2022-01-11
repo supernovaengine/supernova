@@ -15,6 +15,12 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
+          
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install cmake
+          cmake --version
 
       - name: Build with Gradle
         run: | 
