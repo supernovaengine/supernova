@@ -245,6 +245,10 @@
 		71ABBD342783C8BB001CE3AF /* Image.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD322783C8BA001CE3AF /* Image.h */; };
 		71ABBD352783C8BB001CE3AF /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD332783C8BB001CE3AF /* Image.cpp */; };
 		71ABBD362783C8BB001CE3AF /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD332783C8BB001CE3AF /* Image.cpp */; };
+		71ABBD382791167A001CE3AF /* ImageComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD372791167A001CE3AF /* ImageComponent.h */; };
+		71ABBD3B279116E1001CE3AF /* UniqueToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD39279116E1001CE3AF /* UniqueToken.cpp */; };
+		71ABBD3C279116E1001CE3AF /* UniqueToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD39279116E1001CE3AF /* UniqueToken.cpp */; };
+		71ABBD3D279116E1001CE3AF /* UniqueToken.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD3A279116E1001CE3AF /* UniqueToken.h */; };
 		71BE608225B1C55B006D6E02 /* lauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BE604225B1C55B006D6E02 /* lauxlib.c */; };
 		71BE608325B1C55B006D6E02 /* lmem.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE604325B1C55B006D6E02 /* lmem.h */; };
 		71BE608425B1C55B006D6E02 /* llimits.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE604425B1C55B006D6E02 /* llimits.h */; };
@@ -683,6 +687,9 @@
 		71ABBD2E2783C8A7001CE3AF /* Polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Polygon.h; sourceTree = "<group>"; };
 		71ABBD322783C8BA001CE3AF /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
 		71ABBD332783C8BB001CE3AF /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Image.cpp; sourceTree = "<group>"; };
+		71ABBD372791167A001CE3AF /* ImageComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageComponent.h; sourceTree = "<group>"; };
+		71ABBD39279116E1001CE3AF /* UniqueToken.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UniqueToken.cpp; sourceTree = "<group>"; };
+		71ABBD3A279116E1001CE3AF /* UniqueToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UniqueToken.h; sourceTree = "<group>"; };
 		71BE602825B1C49C006D6E02 /* liblua-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "liblua-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BE604225B1C55B006D6E02 /* lauxlib.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = lauxlib.c; sourceTree = "<group>"; };
 		71BE604325B1C55B006D6E02 /* lmem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lmem.h; sourceTree = "<group>"; };
@@ -1072,6 +1079,8 @@
 				71ABBD27277A3210001CE3AF /* STBText.h */,
 				7128D0AC25BB18DC00965B51 /* StringUtils.cpp */,
 				7128D0AD25BB18DC00965B51 /* StringUtils.h */,
+				71ABBD39279116E1001CE3AF /* UniqueToken.cpp */,
+				71ABBD3A279116E1001CE3AF /* UniqueToken.h */,
 			);
 			path = util;
 			sourceTree = "<group>";
@@ -1120,6 +1129,7 @@
 				71ABBD12277A3166001CE3AF /* AlphaActionComponent.h */,
 				7162FC4625962A0E0075B97D /* CameraComponent.h */,
 				71451BB3270C9D0F00712643 /* ColorActionComponent.h */,
+				71ABBD372791167A001CE3AF /* ImageComponent.h */,
 				71CC839226B8C49B00EEBB93 /* LightComponent.h */,
 				7162FC4525962A0E0075B97D /* MeshComponent.h */,
 				717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */,
@@ -1579,6 +1589,7 @@
 				71F97AAF262D1D8000CD6F2B /* Color.h in Headers */,
 				71451BF3270CA3EA00712643 /* Material.h in Headers */,
 				71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */,
+				71ABBD382791167A001CE3AF /* ImageComponent.h in Headers */,
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
 				71ABBD1E277A31BA001CE3AF /* Text.h in Headers */,
 				71BE620025B1DB22006D6E02 /* System.h in Headers */,
@@ -1593,6 +1604,7 @@
 				71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */,
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
 				71451BF0270CA2C900712643 /* Sprite.h in Headers */,
+				71ABBD3D279116E1001CE3AF /* UniqueToken.h in Headers */,
 				717D9B462733788C002C0803 /* sol.hpp in Headers */,
 				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,
 				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
@@ -2119,6 +2131,7 @@
 				713D8294259D307F00567F9F /* Data.cpp in Sources */,
 				71451BBF270CA16200712643 /* ActionSystem.cpp in Sources */,
 				71BE623D25B1DB9E006D6E02 /* LuaScript.cpp in Sources */,
+				71ABBD3C279116E1001CE3AF /* UniqueToken.cpp in Sources */,
 				71CC83A726B8C54A00EEBB93 /* ShaderData.cpp in Sources */,
 				71CC839626B8C4D800EEBB93 /* Light.cpp in Sources */,
 				714BBF7527148B85004A15EE /* Particles.cpp in Sources */,
@@ -2238,6 +2251,7 @@
 				7162FE0F2596A5BE0075B97D /* SokolTexture.cpp in Sources */,
 				71451BBE270CA16200712643 /* ActionSystem.cpp in Sources */,
 				71BE623C25B1DB9E006D6E02 /* LuaScript.cpp in Sources */,
+				71ABBD3B279116E1001CE3AF /* UniqueToken.cpp in Sources */,
 				71CC83A626B8C54A00EEBB93 /* ShaderData.cpp in Sources */,
 				71CC839526B8C4D800EEBB93 /* Light.cpp in Sources */,
 				714BBF7427148B85004A15EE /* Particles.cpp in Sources */,
