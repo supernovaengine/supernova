@@ -21,7 +21,7 @@ namespace Supernova{
         SokolFramebuffer(const SokolFramebuffer& rhs);
         SokolFramebuffer& operator=(const SokolFramebuffer& rhs);
 
-        bool createFramebuffer(TextureType textureType, int width, int height);
+        bool createFramebuffer(TextureType textureType, int width, int height, bool shadowMap);
         void destroyFramebuffer();
         bool isCreated();
 

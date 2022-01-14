@@ -1,3 +1,4 @@
+
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -52,17 +53,17 @@ void init(){
 
     image.setTexture("pista.png");
     image.setMargin(20);
-/*
-    image2.setPosition(150,150,0);
-    image2.setSize(300,300);
-    image2.setTexture("block.png");
-    image2.setMargin(20);
-    image.addChild(&image2);
 
-    image2.addChild(&label);
-    label.setText("Testing!!!!!");
-    label.setPosition(150, 150, 0);
-*/
+    //image2.setPosition(150,150,0);
+    //image2.setSize(300,300);
+    //image2.setTexture("block.png");
+    //image2.setMargin(20);
+    //image.addChild(&image2);
+
+    //image2.addChild(&label);
+    //label.setText("Testing!!!!!");
+    //label.setPosition(150, 150, 0);
+
     Engine::setScene(&scene);
     Engine::addSceneLayer(&uiscene);
     uiscene.setRenderToTexture(true);
@@ -108,6 +109,7 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
+
 
 /*
 #include "Supernova.h"

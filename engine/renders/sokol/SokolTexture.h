@@ -21,7 +21,7 @@ namespace Supernova{
         SokolTexture& operator=(const SokolTexture& rhs);
 
         bool createTexture(std::string label, int width, int height, ColorFormat colorFormat, TextureType type, int numFaces, TextureDataSize* texData);
-        bool createShadowMapTexture(TextureType type, bool depth, int width, int height);
+        bool createFramebufferTexture(TextureType type, bool depth, bool shadowMap, int width, int height);
 
         void destroyTexture();
 

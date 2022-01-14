@@ -11,9 +11,3 @@ add_library(
     stb_image_write.c
 
 )
-
-set_target_properties(
-    stb
-    PROPERTIES
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-)

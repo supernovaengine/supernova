@@ -86,7 +86,7 @@ bool TextureData::loadTextureFromFile(const char* filename) {
     size = width * height * desired_channels; //in bytes
     //----- End std_image read texture
 
-    if (Engine::isAutomaticTransparency){
+    if (Engine::isAutomaticTransparency()){
         transparent = hasAlpha();
     }
     

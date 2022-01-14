@@ -21,12 +21,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
             )
         endif()
     endif()
-
-    set_target_properties(
-        sokol
-        PROPERTIES
-        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-    )
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")

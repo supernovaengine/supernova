@@ -54,5 +54,4 @@ set_target_properties(
     PROPERTIES
 
     CXX_STANDARD 17
-    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
 )

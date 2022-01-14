@@ -22,13 +22,13 @@ SokolFramebuffer& SokolFramebuffer::operator=(const SokolFramebuffer& rhs){
     return *this;
 }
 
-bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int height){
+bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int height, bool shadowMap){
     if ((textureType != TextureType::TEXTURE_2D) && (textureType != TextureType::TEXTURE_CUBE)){
         Log::Error("Framebuffer texture type must be 2D or CUBE");
         return false;
     }
-    colorTexture.createShadowMapTexture(textureType, false, width, height);
-    depthTexture.createShadowMapTexture(TextureType::TEXTURE_2D, true, width, height);
+    colorTexture.createFramebufferTexture(textureType, false, shadowMap, width, height);
+    depthTexture.createFramebufferTexture(TextureType::TEXTURE_2D, true, shadowMap, width, height);
 
     size_t faces = (textureType == TextureType::TEXTURE_CUBE)? 6 : 1;
 

@@ -102,6 +102,8 @@ void SokolObject::beginLoad(PrimitiveType primitiveType, bool depth, bool render
             pipeline_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
             pipeline_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
             pipeline_desc.depth.write_enabled = true;
+
+            pipeline_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
         }
 
         pipeline_desc.colors[0].write_mask = SG_COLORMASK_RGB;

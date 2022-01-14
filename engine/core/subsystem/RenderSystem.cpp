@@ -55,7 +55,7 @@ void RenderSystem::load(){
 
 	if (scene->isRenderToTexture()){
 		if (!scene->getFramebuffer().isCreated())
-			scene->getFramebuffer().createFramebuffer(TextureType::TEXTURE_2D, 512, 512);
+			scene->getFramebuffer().createFramebuffer(TextureType::TEXTURE_2D, 512, 512, false);
 	}
 }
 
@@ -161,14 +161,14 @@ bool RenderSystem::processLights(){
 			hasShadows = true; // Re-check shadows on, after checked in checkLightsAndShadow()
 			if (light.type == LightType::POINT){
 				if (!light.framebuffer[0].isCreated())
-					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_CUBE, light.mapResolution, light.mapResolution);
+					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_CUBE, light.mapResolution, light.mapResolution, true);
 
 				if ((freeShadowCubeMap - MAX_SHADOWSMAP) < MAX_SHADOWSCUBEMAP){
 					light.shadowMapIndex = freeShadowCubeMap++;
 				}
 			}else if (light.type == LightType::SPOT){
 				if (!light.framebuffer[0].isCreated())
-					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution);
+					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, true);
 
 				if (freeShadowMap < MAX_SHADOWSMAP){
 					light.shadowMapIndex = freeShadowMap++;
@@ -176,7 +176,7 @@ bool RenderSystem::processLights(){
 			}else if (light.type == LightType::DIRECTIONAL){
 				for (int c = 0; c < light.numShadowCascades; c++){
 					if (!light.framebuffer[c].isCreated())
-						light.framebuffer[c].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution);
+						light.framebuffer[c].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, true);
 				}
 
 				if ((freeShadowMap + light.numShadowCascades - 1) < MAX_SHADOWSMAP){
