@@ -43,8 +43,8 @@ void ObjectRender::beginDraw(){
     backend.beginDraw();
 }
 
-void ObjectRender::applyUniform(int slotUniform, ShaderStageType stage, UniformDataType datatype, unsigned int count, void* data){
-    backend.applyUniform(slotUniform, stage, datatype, count, data);
+void ObjectRender::applyUniformBlock(int slotUniform, ShaderStageType stage, unsigned int count, void* data){
+    backend.applyUniformBlock(slotUniform, stage, count, data);
 }
 
 void ObjectRender::draw(int vertexCount){

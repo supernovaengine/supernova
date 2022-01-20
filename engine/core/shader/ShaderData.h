@@ -21,9 +21,20 @@ namespace Supernova {
 
     struct ShaderUniform {
         std::string name;
+        ShaderUniformType type;
+        unsigned int arrayCount;
+        unsigned int offset;
+    };
+
+    struct ShaderUniformBlock {
+        std::string name;
+        std::string instName;
         int  set;
         int  binding;
         unsigned int sizeBytes;
+        bool flattened;
+
+        std::vector<ShaderUniform> uniforms;
     };
 
     struct ShaderTexture {
@@ -47,7 +58,7 @@ namespace Supernova {
         ShaderBinSource bytecode;
 
         std::vector<ShaderAttr> attributes;
-        std::vector<ShaderUniform> uniforms;
+        std::vector<ShaderUniformBlock> uniformblocks;
         std::vector<ShaderTexture> textures;
     };
 
@@ -66,7 +77,7 @@ namespace Supernova {
         ShaderData& operator = (const ShaderData& d);
 
         int getAttrIndex(AttributeType type);
-        int getUniformIndex(UniformType type, ShaderStageType stage);
+        int getUniformBlockIndex(UniformBlockType type, ShaderStageType stage);
         int getTextureIndex(TextureShaderType type, ShaderStageType stage);
 
         void releaseSourceData();

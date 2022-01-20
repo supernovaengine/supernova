@@ -244,7 +244,7 @@
             the default framebuffer size as float values instead of integer. This
             may help to prevent casting back and forth between int and float
             in more strongly typed languages than C and C++.
-            
+
         double sapp_frame_duration(void)
             Returns the frame duration in seconds averaged over a number of
             frames to smooth out any jittering spikes.
@@ -1813,7 +1813,7 @@ _SOKOL_PRIVATE void _sapp_ring_init(_sapp_ring_t* ring) {
 _SOKOL_PRIVATE bool _sapp_ring_full(_sapp_ring_t* ring) {
     return _sapp_ring_idx(ring->head + 1) == ring->tail;
 }
-    
+
 _SOKOL_PRIVATE bool _sapp_ring_empty(_sapp_ring_t* ring) {
     return ring->head == ring->tail;
 }
@@ -1845,7 +1845,7 @@ _SOKOL_PRIVATE double _sapp_ring_dequeue(_sapp_ring_t* ring) {
 
 /*
     NOTE:
-    
+
     Q: Why not use CAMetalDrawable.presentedTime on macOS and iOS?
     A: The value appears to be highly unstable during the first few
     seconds, sometimes several frames are dropped in sequence, or
@@ -2102,6 +2102,8 @@ typedef struct {
     ID3D11DepthStencilView* dsv;
     DXGI_SWAP_CHAIN_DESC swap_chain_desc;
     IDXGISwapChain* swap_chain;
+    IDXGIDevice1* dxgi_device;
+    bool use_dxgi_frame_stats;
     UINT sync_refresh_count;
 } _sapp_d3d11_t;
 #endif
@@ -5619,12 +5621,21 @@ _SOKOL_PRIVATE void _sapp_win32_uwp_init_keytable(void) {
 #define _SAPP_SAFE_RELEASE(obj) if (obj) { _sapp_d3d11_Release(obj); obj=0; }
 
 static const IID _sapp_IID_ID3D11Texture2D = { 0x6f15aaf2,0xd208,0x4e89,0x9a,0xb4,0x48,0x95,0x35,0xd3,0x4f,0x9c };
+static const IID _sapp_IID_IDXGIDevice1    = { 0x77db970f,0x6276,0x48ba,0xba,0x28,0x07,0x01,0x43,0xb4,0x39,0x2c };
 
 static inline HRESULT _sapp_dxgi_GetBuffer(IDXGISwapChain* self, UINT Buffer, REFIID riid, void** ppSurface) {
     #if defined(__cplusplus)
         return self->GetBuffer(Buffer, riid, ppSurface);
     #else
         return self->lpVtbl->GetBuffer(self, Buffer, riid, ppSurface);
+    #endif
+}
+
+static inline HRESULT _sapp_d3d11_QueryInterface(ID3D11Device* self, REFIID riid, void** ppvObject) {
+    #if defined(__cplusplus)
+        return self->QueryInterface(riid, ppvObject);
+    #else
+        return self->lpVtbl->QueryInterface(self, riid, ppvObject);
     #endif
 }
 
@@ -5684,6 +5695,14 @@ static inline HRESULT _sapp_dxgi_GetFrameStatistics(IDXGISwapChain* self, DXGI_F
     #endif
 }
 
+static inline HRESULT _sapp_dxgi_SetMaximumFrameLatency(IDXGIDevice1* self, UINT MaxLatency) {
+    #if defined(__cplusplus)
+        return self->SetMaximumFrameLatency(MaxLatency);
+    #else
+        return self->lpVtbl->SetMaximumFrameLatency(self, MaxLatency);
+    #endif
+}
+
 _SOKOL_PRIVATE void _sapp_d3d11_create_device_and_swapchain(void) {
     DXGI_SWAP_CHAIN_DESC* sc_desc = &_sapp.d3d11.swap_chain_desc;
     sc_desc->BufferDesc.Width = (UINT)_sapp.framebuffer_width;
@@ -5696,10 +5715,12 @@ _SOKOL_PRIVATE void _sapp_d3d11_create_device_and_swapchain(void) {
     if (_sapp.win32.is_win10_or_greater) {
         sc_desc->BufferCount = 2;
         sc_desc->SwapEffect = (DXGI_SWAP_EFFECT) _SAPP_DXGI_SWAP_EFFECT_FLIP_DISCARD;
+        _sapp.d3d11.use_dxgi_frame_stats = true;
     }
     else {
         sc_desc->BufferCount = 1;
         sc_desc->SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+        _sapp.d3d11.use_dxgi_frame_stats = false;
     }
     sc_desc->SampleDesc.Count = 1;
     sc_desc->SampleDesc.Quality = 0;
@@ -5724,10 +5745,24 @@ _SOKOL_PRIVATE void _sapp_d3d11_create_device_and_swapchain(void) {
         &_sapp.d3d11.device_context);   /* ppImmediateContext */
     _SOKOL_UNUSED(hr);
     SOKOL_ASSERT(SUCCEEDED(hr) && _sapp.d3d11.swap_chain && _sapp.d3d11.device && _sapp.d3d11.device_context);
+
+    // mimimize frame latency
+    #ifdef __cplusplus
+    hr = _sapp_d3d11_QueryInterface(_sapp.d3d11.device, _sapp_IID_IDXGIDevice1, (void**)&_sapp.d3d11.dxgi_device);
+    #else
+    hr = _sapp_d3d11_QueryInterface(_sapp.d3d11.device, &_sapp_IID_IDXGIDevice1, (void**)&_sapp.d3d11.dxgi_device);
+    #endif
+    if (SUCCEEDED(hr) && _sapp.d3d11.dxgi_device) {
+        _sapp_dxgi_SetMaximumFrameLatency(_sapp.d3d11.dxgi_device, 1);
+    }
+    else {
+        SOKOL_LOG("sokol_app.h: could not obtain IDXGIDevice1 interface\n");
+    }
 }
 
 _SOKOL_PRIVATE void _sapp_d3d11_destroy_device_and_swapchain(void) {
     _SAPP_SAFE_RELEASE(_sapp.d3d11.swap_chain);
+    _SAPP_SAFE_RELEASE(_sapp.d3d11.dxgi_device);
     _SAPP_SAFE_RELEASE(_sapp.d3d11.device_context);
     _SAPP_SAFE_RELEASE(_sapp.d3d11.device);
 }
@@ -5799,14 +5834,22 @@ _SOKOL_PRIVATE void _sapp_d3d11_resize_default_render_target(void) {
     }
 }
 
-_SOKOL_PRIVATE void _sapp_d3d11_present(void) {
+_SOKOL_PRIVATE void _sapp_d3d11_present(bool do_not_wait) {
     /* do MSAA resolve if needed */
     if (_sapp.sample_count > 1) {
         SOKOL_ASSERT(_sapp.d3d11.rt);
         SOKOL_ASSERT(_sapp.d3d11.msaa_rt);
         _sapp_d3d11_ResolveSubresource(_sapp.d3d11.device_context, (ID3D11Resource*)_sapp.d3d11.rt, 0, (ID3D11Resource*)_sapp.d3d11.msaa_rt, 0, DXGI_FORMAT_B8G8R8A8_UNORM);
     }
-    _sapp_dxgi_Present(_sapp.d3d11.swap_chain, (UINT)_sapp.swap_interval, 0);
+    UINT flags = 0;
+    if (_sapp.win32.is_win10_or_greater && do_not_wait) {
+        /* this hack/workaround somewhat improves window-movement and -sizing
+            responsiveness when rendering is controlled via WM_TIMER during window
+            move and resize on NVIDIA cards on Win10 with recent drivers.
+        */
+        flags = DXGI_PRESENT_DO_NOT_WAIT;
+    }
+    _sapp_dxgi_Present(_sapp.d3d11.swap_chain, (UINT)_sapp.swap_interval, flags);
 }
 
 #endif /* SOKOL_D3D11 */
@@ -6330,24 +6373,25 @@ _SOKOL_PRIVATE void _sapp_win32_files_dropped(HDROP hdrop) {
 _SOKOL_PRIVATE void _sapp_win32_timing_measure(void) {
     #if defined(SOKOL_D3D11)
         // on D3D11, use the more precise DXGI timestamp
-        DXGI_FRAME_STATISTICS dxgi_stats;
-        _SAPP_CLEAR(DXGI_FRAME_STATISTICS, dxgi_stats);
-        HRESULT hr = _sapp_dxgi_GetFrameStatistics(_sapp.d3d11.swap_chain, &dxgi_stats);
-        if (SUCCEEDED(hr)) {
-            if (dxgi_stats.SyncRefreshCount != _sapp.d3d11.sync_refresh_count) {
-                if ((_sapp.d3d11.sync_refresh_count + 1) != dxgi_stats.SyncRefreshCount) {
-                    _sapp_timing_external_reset(&_sapp.timing);
+        if (_sapp.d3d11.use_dxgi_frame_stats) {
+            DXGI_FRAME_STATISTICS dxgi_stats;
+            _SAPP_CLEAR(DXGI_FRAME_STATISTICS, dxgi_stats);
+            HRESULT hr = _sapp_dxgi_GetFrameStatistics(_sapp.d3d11.swap_chain, &dxgi_stats);
+            if (SUCCEEDED(hr)) {
+                if (dxgi_stats.SyncRefreshCount != _sapp.d3d11.sync_refresh_count) {
+                    if ((_sapp.d3d11.sync_refresh_count + 1) != dxgi_stats.SyncRefreshCount) {
+                        _sapp_timing_external_reset(&_sapp.timing);
+                    }
+                    _sapp.d3d11.sync_refresh_count = dxgi_stats.SyncRefreshCount;
+                    LARGE_INTEGER qpc = dxgi_stats.SyncQPCTime;
+                    const uint64_t now = (uint64_t)_sapp_int64_muldiv(qpc.QuadPart - _sapp.timing.timestamp.win.start.QuadPart, 1000000000, _sapp.timing.timestamp.win.freq.QuadPart);
+                    _sapp_timing_external(&_sapp.timing, (double)now / 1000000000.0);
                 }
-                _sapp.d3d11.sync_refresh_count = dxgi_stats.SyncRefreshCount;
-                LARGE_INTEGER qpc = dxgi_stats.SyncQPCTime;
-                const uint64_t now = (uint64_t)_sapp_int64_muldiv(qpc.QuadPart - _sapp.timing.timestamp.win.start.QuadPart, 1000000000, _sapp.timing.timestamp.win.freq.QuadPart);
-                _sapp_timing_external(&_sapp.timing, (double)now / 1000000000.0);
+                return;
             }
         }
-        else {
-            // fallback if GetFrameStats doesn't work for some reason
-            _sapp_timing_measure(&_sapp.timing);
-        }
+        // fallback if swap model isn't "flip-discard" or GetFrameStatistics failed for another reason
+        _sapp_timing_measure(&_sapp.timing);
     #endif
     #if defined(SOKOL_GLCORE33)
         _sapp_timing_measure(&_sapp.timing);
@@ -6540,7 +6584,8 @@ _SOKOL_PRIVATE LRESULT CALLBACK _sapp_win32_wndproc(HWND hWnd, UINT uMsg, WPARAM
                 _sapp_win32_timing_measure();
                 _sapp_frame();
                 #if defined(SOKOL_D3D11)
-                    _sapp_d3d11_present();
+                    // present with DXGI_PRESENT_DO_NOT_WAIT
+                    _sapp_d3d11_present(true);
                 #endif
                 #if defined(SOKOL_GLCORE33)
                     _sapp_wgl_swap_buffers();
@@ -6555,6 +6600,17 @@ _SOKOL_PRIVATE LRESULT CALLBACK _sapp_win32_wndproc(HWND hWnd, UINT uMsg, WPARAM
                     _sapp_win32_uwp_app_event(SAPP_EVENTTYPE_RESIZED);
                 }
                 */
+                break;
+            case WM_NCLBUTTONDOWN:
+                /* workaround for half-second pause when starting to move window
+                    see: https://gamedev.net/forums/topic/672094-keeping-things-moving-during-win32-moveresize-events/5254386/
+                */
+                if (SendMessage(_sapp.win32.hwnd, WM_NCHITTEST, wParam, lParam) == HTCAPTION) {
+                    POINT point;
+                    GetCursorPos(&point);
+                    ScreenToClient(_sapp.win32.hwnd, &point);
+                    PostMessage(_sapp.win32.hwnd, WM_MOUSEMOVE, 0, (uint32_t)point.x)|(((uint32_t)point.y) << 16));
+                }
                 break;
             case WM_DROPFILES:
                 _sapp_win32_files_dropped((HDROP)wParam);
@@ -6924,7 +6980,7 @@ _SOKOL_PRIVATE void _sapp_win32_run(const sapp_desc* desc) {
         }
         _sapp_frame();
         #if defined(SOKOL_D3D11)
-            _sapp_d3d11_present();
+            _sapp_d3d11_present(false);
             if (IsIconic(_sapp.win32.hwnd)) {
                 Sleep((DWORD)(16 * _sapp.swap_interval));
             }

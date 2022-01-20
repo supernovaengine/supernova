@@ -32,12 +32,8 @@ namespace Supernova{
         std::unordered_map< uint32_t, size_t > bufferToBindSlot;
 
 
-        size_t getAttributesIndex(AttributeType type, ShaderType shaderType);
-        size_t getTextureSampler(TextureShaderType type);
         sg_vertex_format getVertexFormat(unsigned int elements, AttributeDataType dataType, bool normalized);
         sg_primitive_type getPrimitiveType(PrimitiveType primitiveType);
-
-        UniformStageSlot getUniformStageSlot(UniformType type);
 
     public:
 
@@ -53,7 +49,7 @@ namespace Supernova{
         void endLoad();
 
         void beginDraw();
-        void applyUniform(int slotUniform, ShaderStageType stage, UniformDataType datatype, unsigned int count, void* data);
+        void applyUniformBlock(int slotUniform, ShaderStageType stage, unsigned int count, void* data);
         void draw(int vertexCount);
 
         void destroy();

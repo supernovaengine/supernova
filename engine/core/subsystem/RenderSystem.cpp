@@ -424,17 +424,17 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		render.addShader(mesh.submeshes[i].shader.get());
 		ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
 
-		mesh.submeshes[i].slotVSParams = shaderData.getUniformIndex(UniformType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
-		mesh.submeshes[i].slotFSParams = shaderData.getUniformIndex(UniformType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
+		mesh.submeshes[i].slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
+		mesh.submeshes[i].slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
 		if (hasLights){
-			mesh.submeshes[i].slotFSLighting = shaderData.getUniformIndex(UniformType::FS_LIGHTING, ShaderStageType::FRAGMENT);
+			mesh.submeshes[i].slotFSLighting = shaderData.getUniformBlockIndex(UniformBlockType::FS_LIGHTING, ShaderStageType::FRAGMENT);
 			if (hasShadows && mesh.castShadows){
-				mesh.submeshes[i].slotVSShadows = shaderData.getUniformIndex(UniformType::VS_SHADOWS, ShaderStageType::VERTEX);
-				mesh.submeshes[i].slotFSShadows = shaderData.getUniformIndex(UniformType::FS_SHADOWS, ShaderStageType::FRAGMENT);
+				mesh.submeshes[i].slotVSShadows = shaderData.getUniformBlockIndex(UniformBlockType::VS_SHADOWS, ShaderStageType::VERTEX);
+				mesh.submeshes[i].slotFSShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOWS, ShaderStageType::FRAGMENT);
 			}
 		}
 		if (mesh.submeshes[i].hasTextureRect){
-			mesh.submeshes[i].slotVSSprite = shaderData.getUniformIndex(UniformType::SPRITE_VS_PARAMS, ShaderStageType::VERTEX);
+			mesh.submeshes[i].slotVSSprite = shaderData.getUniformBlockIndex(UniformBlockType::SPRITE_VS_PARAMS, ShaderStageType::VERTEX);
 		}
 
 		loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.castShadows);
@@ -492,7 +492,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			depthRender.addShader(mesh.submeshes[i].depthShader.get());
 			ShaderData& depthShaderData = mesh.submeshes[i].depthShader.get()->shaderData;
 
-			mesh.submeshes[i].slotVSDepthParams = depthShaderData.getUniformIndex(UniformType::DEPTH_VS_PARAMS, ShaderStageType::VERTEX);
+			mesh.submeshes[i].slotVSDepthParams = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_PARAMS, ShaderStageType::VERTEX);
 
 			for (auto const& buf : mesh.buffers){
         		if (buf.second->isRenderAttributes()) {
@@ -542,21 +542,21 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 			render.beginDraw();
 
 			if (hasLights){
-				render.applyUniform(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16 * MAX_LIGHTS + 4, &fs_lighting);
+				render.applyUniformBlock(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
 				if (hasShadows && mesh.castShadows){
-					render.applyUniform(mesh.submeshes[i].slotVSShadows, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16 * (MAX_SHADOWSMAP), &vs_shadows);
-					render.applyUniform(mesh.submeshes[i].slotFSShadows, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 4 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP), &fs_shadows);
+					render.applyUniformBlock(mesh.submeshes[i].slotVSShadows, ShaderStageType::VERTEX, sizeof(float) * (16 * MAX_SHADOWSMAP), &vs_shadows);
+					render.applyUniformBlock(mesh.submeshes[i].slotFSShadows, ShaderStageType::FRAGMENT, sizeof(float) * (4 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP)), &fs_shadows);
 				}
 			}
 
 			if (mesh.submeshes[i].hasTextureRect){
-				render.applyUniform(mesh.submeshes[i].slotVSSprite, ShaderStageType::VERTEX, UniformDataType::FLOAT, 4, &mesh.submeshes[i].textureRect);
+				render.applyUniformBlock(mesh.submeshes[i].slotVSSprite, ShaderStageType::VERTEX, sizeof(float) * 4, &mesh.submeshes[i].textureRect);
 			}
-
-			render.applyUniform(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 16, &mesh.submeshes[i].material);
+			size_t teste = sizeof(float);
+			render.applyUniformBlock(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 16, &mesh.submeshes[i].material);
 
 			//model, normal and mvp matrix
-			render.applyUniform(mesh.submeshes[i].slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 48, &transform.modelMatrix);
+			render.applyUniformBlock(mesh.submeshes[i].slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 48, &transform.modelMatrix);
 
 			render.draw(mesh.submeshes[i].vertexCount);
 		}
@@ -571,7 +571,7 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMat
 			depthRender.beginDraw();
 
 			//mvp matrix
-			depthRender.applyUniform(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &modelLightSpaceMatrix);
+			depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 16, &modelLightSpaceMatrix);
 
 			depthRender.draw(mesh.submeshes[i].vertexCount);
 		}
@@ -645,8 +645,8 @@ bool RenderSystem::loadUI(UIComponent& ui, bool isText){
 	render.addShader(ui.shader.get());
 	ShaderData& shaderData = ui.shader.get()->shaderData;
 
-	ui.slotVSParams = shaderData.getUniformIndex(UniformType::UI_VS_PARAMS, ShaderStageType::VERTEX);
-	ui.slotFSParams = shaderData.getUniformIndex(UniformType::UI_FS_PARAMS, ShaderStageType::FRAGMENT);
+	ui.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_VS_PARAMS, ShaderStageType::VERTEX);
+	ui.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_FS_PARAMS, ShaderStageType::FRAGMENT);
 
 	size_t bufferSize;
 	size_t minBufferSize;
@@ -718,9 +718,9 @@ void RenderSystem::drawUI(UIComponent& ui, Transform& transform){
 		ObjectRender& render = ui.render;
 
 		render.beginDraw();
-		render.applyUniform(ui.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &transform.modelViewProjectionMatrix);
+		render.applyUniformBlock(ui.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		//Color
-		render.applyUniform(ui.slotFSParams, ShaderStageType::FRAGMENT, UniformDataType::FLOAT, 4, &ui.color);
+		render.applyUniformBlock(ui.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &ui.color);
 		render.draw(ui.vertexCount);
 
 	}
@@ -783,7 +783,7 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	render.addShader(particles.shader.get());
 	ShaderData& shaderData = particles.shader.get()->shaderData;
 
-	particles.slotVSParams = shaderData.getUniformIndex(UniformType::POINTS_VS_PARAMS, ShaderStageType::VERTEX);
+	particles.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::POINTS_VS_PARAMS, ShaderStageType::VERTEX);
 
 	// Now buffer size is zero than it needed to be calculated
 	size_t bufferSize = particles.maxParticles * particles.buffer->getStride();
@@ -828,7 +828,7 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 		ObjectRender& render = particles.render;
 
 		render.beginDraw();
-		render.applyUniform(particles.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &transform.modelViewProjectionMatrix);
+		render.applyUniformBlock(particles.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		render.draw(particles.particles.size());
 	}
 }
@@ -869,7 +869,7 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 	render->addShader(sky.shader.get());
 	ShaderData& shaderData = sky.shader.get()->shaderData;
 
-	sky.slotVSParams = shaderData.getUniformIndex(UniformType::VIEWPROJECTIONSKY, ShaderStageType::VERTEX);
+	sky.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::VIEWPROJECTIONSKY, ShaderStageType::VERTEX);
 
 	TextureRender* textureRender = sky.texture.getRender();
 	if (textureRender){
@@ -910,7 +910,7 @@ void RenderSystem::drawSky(SkyComponent& sky){
 		ObjectRender& render = sky.render;
 
 		render.beginDraw();
-		render.applyUniform(sky.slotVSParams, ShaderStageType::VERTEX, UniformDataType::FLOAT, 16, &sky.skyViewProjectionMatrix);
+		render.applyUniformBlock(sky.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &sky.skyViewProjectionMatrix);
 		render.draw(36);
 	}
 }

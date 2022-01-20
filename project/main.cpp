@@ -1,4 +1,4 @@
-
+/*
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -109,9 +109,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
+*/
 
 
-/*
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -222,9 +222,9 @@ void init(){
     polygon2.setName("Polygon2");
 
     polygon3.addVertex(0, 0);
-    polygon3.addVertex(800, 0);
-    polygon3.addVertex(0, 800);
-    polygon3.addVertex(800, 800);
+    polygon3.addVertex(300, 0);
+    polygon3.addVertex(0, 300);
+    polygon3.addVertex(300, 300);
     polygon3.setColor(0.5, 1.0, 1.0, 1.0);
     polygon3.setPosition(100, 100, 0);
     polygon3.setName("Polygon3");
@@ -259,20 +259,6 @@ void init(){
     //plane.setColor(0.5, 0.3, 0.7, 1.0);
     //plane.setTexture("pista.png");
     //plane.setPosition(-2000,0,-2000);
-
-
-    image.setTexture("pista.png");
-    image.setMargin(20);
-
-    image2.setPosition(150,150,0);
-    image2.setSize(300,300);
-    image2.setTexture("block.png");
-    image2.setMargin(20);
-    image.addChild(&image2);
-
-    image2.addChild(&label);
-    label.setText("Testing!!!!!");
-    label.setPosition(150, 150, 0);
 
     Engine::setScene(&scene);
 
@@ -331,7 +317,7 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
-*/
+
 
 /*
 #include "Supernova.h"

@@ -13,6 +13,10 @@ namespace Supernova{
         sg_shader shader;
 
         int roundup(int val, int round_to);
+        sg_uniform_type uniformToSokolType(ShaderUniformType type);
+        sg_uniform_type flattenedUniformToSokolType(ShaderUniformType type);
+        sg_sampler_type samplerToSokolType(TextureSamplerType type);
+        sg_image_type textureToSokolType(TextureType type);
 
     public:
         SokolShader();

@@ -86,7 +86,7 @@ namespace Supernova{
         FLOAT
     };
 
-    enum class UniformType{
+    enum class UniformBlockType{
         PBR_VS_PARAMS,
         MATERIAL,
         PBR_FS_PARAMS,
@@ -178,11 +178,6 @@ namespace Supernova{
         //TERRAINDETAIL
     };
 
-    enum class UniformDataType {
-        FLOAT,
-        INT
-    };
-
     enum class TextureType {
         TEXTURE_2D,
         TEXTURE_3D,
@@ -234,6 +229,19 @@ namespace Supernova{
         INT2,
         INT3,
         INT4
+    };
+
+    enum class ShaderUniformType{
+        FLOAT,
+        FLOAT2,
+        FLOAT3,
+        FLOAT4,
+        INT,
+        INT2,
+        INT3,
+        INT4,
+        MAT3,
+        MAT4
     };
 
     enum class ShaderStageType{

@@ -87,30 +87,30 @@ int ShaderData::getAttrIndex(AttributeType type){
     return attrIndex;
 }
 
-int ShaderData::getUniformIndex(UniformType type, ShaderStageType stage){
+int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stage){
     std::string ustr;
     
-    if (type == UniformType::PBR_VS_PARAMS){
+    if (type == UniformBlockType::PBR_VS_PARAMS){
         ustr = "u_vs_pbrParams";
-    }else if (type == UniformType::PBR_FS_PARAMS){
+    }else if (type == UniformBlockType::PBR_FS_PARAMS){
         ustr = "u_fs_pbrParams";
-    }else if (type == UniformType::FS_LIGHTING){
+    }else if (type == UniformBlockType::FS_LIGHTING){
         ustr = "u_fs_lighting";
-    }else if (type == UniformType::VS_SHADOWS){
+    }else if (type == UniformBlockType::VS_SHADOWS){
         ustr = "u_vs_shadows";
-    }else if (type == UniformType::FS_SHADOWS){
+    }else if (type == UniformBlockType::FS_SHADOWS){
         ustr = "u_fs_shadows";
-    }else if (type == UniformType::VIEWPROJECTIONSKY){
+    }else if (type == UniformBlockType::VIEWPROJECTIONSKY){
         ustr = "u_vsSkyParams";
-    }else if (type == UniformType::DEPTH_VS_PARAMS){
+    }else if (type == UniformBlockType::DEPTH_VS_PARAMS){
         ustr = "u_vs_depthParams";
-    }else if (type == UniformType::UI_VS_PARAMS){
+    }else if (type == UniformBlockType::UI_VS_PARAMS){
         ustr = "u_vs_uiParams";
-    }else if (type == UniformType::UI_FS_PARAMS){
+    }else if (type == UniformBlockType::UI_FS_PARAMS){
         ustr = "u_fs_uiParams";
-    }else if (type == UniformType::SPRITE_VS_PARAMS){
+    }else if (type == UniformBlockType::SPRITE_VS_PARAMS){
         ustr = "u_vs_spriteParams";
-    }else if (type == UniformType::POINTS_VS_PARAMS){
+    }else if (type == UniformBlockType::POINTS_VS_PARAMS){
         ustr = "u_vs_pointsParams";
     }
 
@@ -127,8 +127,8 @@ int ShaderData::getUniformIndex(UniformType type, ShaderStageType stage){
 
     int uniIndex = -1;
     if (sIndex != -1){
-        for (int u = 0; u < stages[sIndex].uniforms.size(); u++){
-            if (stages[sIndex].uniforms[u].name == ustr)
+        for (int u = 0; u < stages[sIndex].uniformblocks.size(); u++){
+            if (stages[sIndex].uniformblocks[u].name == ustr)
                 uniIndex = u;
         }
     }

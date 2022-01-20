@@ -178,19 +178,15 @@ void SokolObject::beginDraw(){
     sg_apply_bindings(&bind);
 }
 
-void SokolObject::applyUniform(int slotUniform, ShaderStageType stage, UniformDataType datatype, unsigned int count, void* data){
+void SokolObject::applyUniformBlock(int slotUniform, ShaderStageType stage, unsigned int count, void* data){
     if (slotUniform != -1){
-        if (datatype == UniformDataType::FLOAT){
-            sg_shader_stage sg_stage;
-            if (stage == ShaderStageType::VERTEX){
-                sg_stage = SG_SHADERSTAGE_VS;
-            }else if (stage == ShaderStageType::FRAGMENT){
-                sg_stage = SG_SHADERSTAGE_FS;
-            }
-            sg_apply_uniforms(sg_stage, slotUniform, {data, sizeof(float) * count});
-        }else{
-            Log::Error("Sokol backend only supports float uniforms");
+        sg_shader_stage sg_stage;
+        if (stage == ShaderStageType::VERTEX){
+            sg_stage = SG_SHADERSTAGE_VS;
+        }else if (stage == ShaderStageType::FRAGMENT){
+            sg_stage = SG_SHADERSTAGE_FS;
         }
+        sg_apply_uniforms(sg_stage, slotUniform, {data, count});
     }
 }
 

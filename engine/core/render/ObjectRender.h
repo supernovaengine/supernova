@@ -29,7 +29,7 @@ namespace Supernova {
         void endLoad();
 
         void beginDraw();
-        void applyUniform(int slotUniform, ShaderStageType stage, UniformDataType datatype, unsigned int count, void* data);
+        void applyUniformBlock(int slotUniform, ShaderStageType stage, unsigned int count, void* data);
         void draw(int vertexCount);
 
         void destroy();

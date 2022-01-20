@@ -9,6 +9,8 @@
 
 #define makefourcc(_a, _b, _c, _d) (((uint32_t)(_a) | ((uint32_t)(_b) << 8) | ((uint32_t)(_c) << 16) | ((uint32_t)(_d) << 24)))
 
+#define SBS_NAME_SIZE 32
+
 //----------Begin SBS format---------------
 #pragma pack(push, 1)
 
@@ -34,6 +36,17 @@
 #define SBS_VERTEXTYPE_INT3     makefourcc('I', 'N', 'T', '3')
 #define SBS_VERTEXTYPE_INT4     makefourcc('I', 'N', 'T', '4')
 
+#define SBS_UNIFORMTYPE_FLOAT    makefourcc('F', 'L', 'T', '1')
+#define SBS_UNIFORMTYPE_FLOAT2   makefourcc('F', 'L', 'T', '2')
+#define SBS_UNIFORMTYPE_FLOAT3   makefourcc('F', 'L', 'T', '3')
+#define SBS_UNIFORMTYPE_FLOAT4   makefourcc('F', 'L', 'T', '4')
+#define SBS_UNIFORMTYPE_INT      makefourcc('I', 'N', 'T', '1')
+#define SBS_UNIFORMTYPE_INT2     makefourcc('I', 'N', 'T', '2')
+#define SBS_UNIFORMTYPE_INT3     makefourcc('I', 'N', 'T', '3')
+#define SBS_UNIFORMTYPE_INT4     makefourcc('I', 'N', 'T', '4')
+#define SBS_UNIFORMTYPE_MAT3     makefourcc('M', 'A', 'T', '3')
+#define SBS_UNIFORMTYPE_MAT4     makefourcc('M', 'A', 'T', '4')
+
 #define SBS_TEXTURE_2D          makefourcc('2', 'D', ' ', ' ')
 #define SBS_TEXTURE_3D          makefourcc('3', 'D', ' ', ' ')
 #define SBS_TEXTURE_CUBE        makefourcc('C', 'U', 'B', 'E')
@@ -57,22 +70,23 @@ struct sbs_stage {
 
 // REFL
 struct sbs_chunk_refl {
-    char     name[32];
+    char     name[SBS_NAME_SIZE];
     uint32_t num_inputs;
     uint32_t num_textures;
     uint32_t num_uniform_blocks;
+    uint32_t num_uniforms;
 };
 
 struct sbs_refl_input {
-    char     name[32];
+    char     name[SBS_NAME_SIZE];
     int32_t  location;
-    char     semantic_name[32];
+    char     semantic_name[SBS_NAME_SIZE];
     uint32_t semantic_index;
     uint32_t type;
 };
 
 struct sbs_refl_texture {
-    char     name[32];
+    char     name[SBS_NAME_SIZE];
     uint32_t set;
     int32_t  binding;
     uint32_t type;
@@ -80,10 +94,20 @@ struct sbs_refl_texture {
 }; 
 
 struct sbs_refl_uniformblock {
-    char     name[32];
+    uint32_t num_uniforms;
+    char     name[SBS_NAME_SIZE];
+    char     inst_name[SBS_NAME_SIZE];
     uint32_t set;
     int32_t  binding;
     uint32_t size_bytes;
+    bool     flattened;
+};
+
+struct sbs_refl_uniform {
+    char     name[SBS_NAME_SIZE];
+    uint32_t type;
+    uint32_t array_count;
+    uint32_t offset;
 };
 
 #pragma pack(pop)
@@ -207,19 +231,8 @@ bool SBSReader::read(std::string filepath){
                 }else if (in.type == SBS_VERTEXTYPE_INT4){
                     attr.type = ShaderVertexType::INT4;
                 }
+
                 shaderStage->attributes.push_back(attr);
-            }
-
-            for (uint32_t i = 0; i < refl_chunk.num_uniform_blocks; i++) {
-                sbs_refl_uniformblock u;
-                file.read((unsigned char*)&u, sizeof(u));
-
-                ShaderUniform uniform;
-                uniform.name = std::string(u.name);
-                uniform.set = u.set;
-                uniform.binding = u.binding;
-                uniform.sizeBytes = u.size_bytes;
-                shaderStage->uniforms.push_back(uniform);
             }
 
             for (uint32_t i = 0; i < refl_chunk.num_textures; i++) {
@@ -254,6 +267,54 @@ bool SBSReader::read(std::string filepath){
                 }
 
                 shaderStage->textures.push_back(texture);
+            }
+
+            for (uint32_t i = 0; i < refl_chunk.num_uniform_blocks; i++) {
+                sbs_refl_uniformblock ub;
+                file.read((unsigned char*)&ub, sizeof(ub));
+
+                ShaderUniformBlock uniformblock;
+                uniformblock.name = std::string(ub.name);
+                uniformblock.instName = std::string(ub.inst_name);
+                uniformblock.set = ub.set;
+                uniformblock.binding = ub.binding;
+                uniformblock.sizeBytes = ub.size_bytes;
+                uniformblock.flattened = ub.flattened;
+
+                for (uint32_t j = 0; j < ub.num_uniforms; j++) {
+                    sbs_refl_uniform u;
+                    file.read((unsigned char*)&u, sizeof(u));
+
+                    ShaderUniform uniform;
+                    uniform.name = std::string(ub.inst_name) + "." + std::string(u.name);
+                    uniform.arrayCount = u.array_count;
+                    uniform.offset = u.offset;
+                    if (u.type == SBS_UNIFORMTYPE_FLOAT){
+                        uniform.type = ShaderUniformType::FLOAT;
+                    }else if (u.type == SBS_UNIFORMTYPE_FLOAT2){
+                        uniform.type = ShaderUniformType::FLOAT2;
+                    }else if (u.type == SBS_UNIFORMTYPE_FLOAT3){
+                        uniform.type = ShaderUniformType::FLOAT3;
+                    }else if (u.type == SBS_UNIFORMTYPE_FLOAT4){
+                        uniform.type = ShaderUniformType::FLOAT4;
+                    }else if (u.type == SBS_UNIFORMTYPE_INT){
+                        uniform.type = ShaderUniformType::INT;
+                    }else if (u.type == SBS_UNIFORMTYPE_INT2){
+                        uniform.type = ShaderUniformType::INT2;
+                    }else if (u.type == SBS_UNIFORMTYPE_INT3){
+                        uniform.type = ShaderUniformType::INT3;
+                    }else if (u.type == SBS_UNIFORMTYPE_INT4){
+                        uniform.type = ShaderUniformType::INT4;
+                    }else if (u.type == SBS_UNIFORMTYPE_MAT3){
+                        uniform.type = ShaderUniformType::MAT3;
+                    }else if (u.type == SBS_UNIFORMTYPE_MAT4){
+                        uniform.type = ShaderUniformType::MAT4;
+                    }
+
+                    uniformblock.uniforms.push_back(uniform);
+                }
+
+                shaderStage->uniformblocks.push_back(uniformblock);
             }
         }
 

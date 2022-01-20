@@ -22,6 +22,84 @@ int SokolShader::roundup(int val, int round_to) {
     return (val + (round_to - 1)) & ~(round_to - 1);
 }
 
+sg_uniform_type SokolShader::uniformToSokolType(ShaderUniformType type){
+    if (type == ShaderUniformType::FLOAT){
+        return SG_UNIFORMTYPE_FLOAT;
+    }else if (type == ShaderUniformType::FLOAT2){
+        return SG_UNIFORMTYPE_FLOAT2;
+    }else if (type == ShaderUniformType::FLOAT3){
+        return SG_UNIFORMTYPE_FLOAT3;
+    }else if (type == ShaderUniformType::FLOAT4){
+        return SG_UNIFORMTYPE_FLOAT4;
+    }else if (type == ShaderUniformType::INT){
+        return SG_UNIFORMTYPE_INT;
+    }else if (type == ShaderUniformType::INT2){
+        return SG_UNIFORMTYPE_INT2;
+    }else if (type == ShaderUniformType::INT3){
+        return SG_UNIFORMTYPE_INT3;
+    }else if (type == ShaderUniformType::INT4){
+        return SG_UNIFORMTYPE_INT4;
+    }else if (type == ShaderUniformType::MAT3){
+        Log::Error("Sokol cannot support MAT3 uniform type");
+    }else if (type == ShaderUniformType::MAT4){
+        return SG_UNIFORMTYPE_MAT4;
+    }
+
+    return SG_UNIFORMTYPE_INVALID;
+}
+
+sg_uniform_type SokolShader::flattenedUniformToSokolType(ShaderUniformType type){
+    if (type == ShaderUniformType::FLOAT){
+        return SG_UNIFORMTYPE_FLOAT4;
+    }else if (type == ShaderUniformType::FLOAT2){
+        return SG_UNIFORMTYPE_FLOAT4;
+    }else if (type == ShaderUniformType::FLOAT3){
+        return SG_UNIFORMTYPE_FLOAT4;
+    }else if (type == ShaderUniformType::FLOAT4){
+        return SG_UNIFORMTYPE_FLOAT4;
+    }else if (type == ShaderUniformType::INT){
+        return SG_UNIFORMTYPE_INT4;
+    }else if (type == ShaderUniformType::INT2){
+        return SG_UNIFORMTYPE_INT4;
+    }else if (type == ShaderUniformType::INT3){
+        return SG_UNIFORMTYPE_INT4;
+    }else if (type == ShaderUniformType::INT4){
+        return SG_UNIFORMTYPE_INT4;
+    }else if (type == ShaderUniformType::MAT3){
+        return SG_UNIFORMTYPE_FLOAT4;
+    }else if (type == ShaderUniformType::MAT4){
+        return SG_UNIFORMTYPE_FLOAT4;
+    }
+
+    return SG_UNIFORMTYPE_INVALID;
+}
+
+sg_sampler_type SokolShader::samplerToSokolType(TextureSamplerType type){
+    if (type == TextureSamplerType::FLOAT){
+        return SG_SAMPLERTYPE_FLOAT;
+    }else if (type == TextureSamplerType::UINT){
+        return SG_SAMPLERTYPE_UINT;
+    }else if (type == TextureSamplerType::SINT){
+        return SG_SAMPLERTYPE_SINT;
+    }
+
+    return SG_SAMPLERTYPE_FLOAT;
+}
+
+sg_image_type SokolShader::textureToSokolType(TextureType type){
+    if (type == TextureType::TEXTURE_2D){
+        return SG_IMAGETYPE_2D;
+    }else if (type == TextureType::TEXTURE_3D){
+        return SG_IMAGETYPE_3D;
+    }else if (type == TextureType::TEXTURE_CUBE){
+        return SG_IMAGETYPE_CUBE;
+    }else if (type == TextureType::TEXTURE_ARRAY){
+        return SG_IMAGETYPE_ARRAY;
+    }
+
+    return SG_IMAGETYPE_2D;
+}
+
 bool SokolShader::createShader(ShaderData& shaderData){
     sg_shader_desc shader_desc = {0};
 
@@ -58,14 +136,23 @@ bool SokolShader::createShader(ShaderData& shaderData){
         }
     
         // uniform blocks
-        for (int u = 0; u < stage->uniforms.size(); u++) {
-            sg_shader_uniform_block_desc* ub = &stage_desc->uniform_blocks[stage->uniforms[u].binding];
-            ub->size = roundup(stage->uniforms[u].sizeBytes, 16);
-            // GL/GLES always flatten UBs to not declare individual uniforms and use only one glUniform4fv call
-            if (shaderData.lang == ShaderLang::GLSL) {
-                ub->uniforms[0].array_count = ub->size / 16;
-                ub->uniforms[0].name = stage->uniforms[u].name.c_str();
-                ub->uniforms[0].type = SG_UNIFORMTYPE_FLOAT4;
+        for (int ub = 0; ub < stage->uniformblocks.size(); ub++) {
+            sg_shader_uniform_block_desc* ubdesc = &stage_desc->uniform_blocks[stage->uniformblocks[ub].binding];
+            ubdesc->size = roundup(stage->uniformblocks[ub].sizeBytes, 16);
+            ubdesc->layout = SG_UNIFORMLAYOUT_STD140;
+            // GL/GLES always flatten UBs if same type inside to not declare individual uniforms and use only one glUniform4fv call
+            if ((shaderData.lang == ShaderLang::GLSL) && (stage->uniformblocks[ub].uniforms.size() > 0)) {
+                if (stage->uniformblocks[ub].flattened){
+                    ubdesc->uniforms[0].name = stage->uniformblocks[ub].name.c_str();
+                    ubdesc->uniforms[0].type = flattenedUniformToSokolType(stage->uniformblocks[ub].uniforms[0].type);
+                    ubdesc->uniforms[0].array_count = ubdesc->size / 16;
+                }else{
+                    for (int u = 0; u < (int)stage->uniformblocks[ub].uniforms.size(); u++) {
+                        ubdesc->uniforms[u].name = stage->uniformblocks[ub].uniforms[u].name.c_str();
+                        ubdesc->uniforms[u].type = uniformToSokolType(stage->uniformblocks[ub].uniforms[u].type);
+                        ubdesc->uniforms[u].array_count = stage->uniformblocks[ub].uniforms[u].arrayCount;
+                    }
+                }
             }
         }
 
@@ -73,24 +160,8 @@ bool SokolShader::createShader(ShaderData& shaderData){
         for (int t = 0; t < stage->textures.size(); t++) {
             sg_shader_image_desc* img = &stage_desc->images[stage->textures[t].binding];
             img->name = stage->textures[t].name.c_str();
-
-            if (stage->textures[t].samplerType == TextureSamplerType::FLOAT){
-                img->sampler_type = SG_SAMPLERTYPE_FLOAT;
-            }else if (stage->textures[t].samplerType == TextureSamplerType::UINT){
-                img->sampler_type = SG_SAMPLERTYPE_UINT;
-            }else if (stage->textures[t].samplerType == TextureSamplerType::SINT){
-                img->sampler_type = SG_SAMPLERTYPE_SINT;
-            }
-
-            if (stage->textures[t].type == TextureType::TEXTURE_2D){
-                img->image_type = SG_IMAGETYPE_2D;
-            }else if (stage->textures[t].type == TextureType::TEXTURE_3D){
-                img->image_type = SG_IMAGETYPE_3D;
-            }else if (stage->textures[t].type == TextureType::TEXTURE_CUBE){
-                img->image_type = SG_IMAGETYPE_CUBE;
-            }else if (stage->textures[t].type == TextureType::TEXTURE_ARRAY){
-                img->image_type = SG_IMAGETYPE_ARRAY;
-            }
+            img->image_type = textureToSokolType(stage->textures[t].type);
+            img->sampler_type = samplerToSokolType(stage->textures[t].samplerType);
         }
     }
 
