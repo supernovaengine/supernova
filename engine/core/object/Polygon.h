@@ -10,14 +10,16 @@
 namespace Supernova{
     class Polygon: public Mesh{
 
-    protected:
-        void generateTexcoords();
-
     public:
         Polygon(Scene* scene);
 
         void addVertex(Vector3 vertex);
         void addVertex(float x, float y);
+
+        int getWidth();
+        int getHeight();
+
+        void setFlipY(bool flipY);
     };
 }
 

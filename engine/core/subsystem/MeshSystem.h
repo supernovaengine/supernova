@@ -9,6 +9,7 @@
 
 #include "component/MeshComponent.h"
 #include "component/SpriteComponent.h"
+#include "component/PolygonComponent.h"
 #include "component/CameraComponent.h"
 
 namespace Supernova{
@@ -17,7 +18,10 @@ namespace Supernova{
 
     private:
         void createSprite(SpriteComponent& sprite, MeshComponent& mesh);
-		void checkFlipY(SpriteComponent& sprite, CameraComponent& camera, MeshComponent& mesh);
+
+		void createPolygon(PolygonComponent& polygon, MeshComponent& mesh);
+
+		void changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh);
 
 	public:
 		MeshSystem(Scene* scene);

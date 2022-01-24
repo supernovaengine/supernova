@@ -22,8 +22,8 @@ Scene scene;
 //Camera camera(&scene);
 
 
-//Polygon polygon3(&scene);
-Sprite sprite(&scene);
+Polygon polygon3(&scene);
+//Sprite sprite(&scene);
 
 Scene uiscene;
 //Sprite spriteui(&uiscene, 200, 200);
@@ -42,17 +42,17 @@ void init(){
 
     //camera.setPosition(0,8,-100);
 
-    //polygon3.addVertex(0, 0);
-    //polygon3.addVertex(800, 0);
-    //polygon3.addVertex(0, 800);
-    //polygon3.addVertex(800, 800);
-    ////polygon3.setColor(0.5, 1.0, 1.0, 1.0);
-    //polygon3.setPosition(100, 100, 0);
-    //polygon3.setName("Polygon3");
-    //polygon3.setTexture(&uiscene.getFramebuffer());
+    polygon3.addVertex(0, 0);
+    polygon3.addVertex(800, 0);
+    polygon3.addVertex(0, 800);
+    polygon3.addVertex(800, 800);
+    //polygon3.setColor(0.5, 1.0, 1.0, 1.0);
+    polygon3.setPosition(100, 100, 0);
+    polygon3.setName("Polygon3");
+    polygon3.setTexture(&uiscene.getFramebuffer());
 
-    sprite.setTexture(&uiscene.getFramebuffer());
-    sprite.setSize(500, 500);
+    //sprite.setTexture(&uiscene.getFramebuffer());
+    //sprite.setSize(500, 500);
 
     image.setTexture("pista.png");
     image.setMargin(20);
