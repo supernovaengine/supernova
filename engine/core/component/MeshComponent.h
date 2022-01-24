@@ -59,6 +59,7 @@ namespace Supernova{
         bool castShadows = true;
         bool transparency = false;
 
+        bool needUpdateBuffer = false;
         bool needReload = false;
     };
     

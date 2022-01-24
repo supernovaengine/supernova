@@ -4,8 +4,9 @@
 #include "Engine.h"
 
 #include "subsystem/RenderSystem.h"
-#include "subsystem/ActionSystem.h"
+#include "subsystem/MeshSystem.h"
 #include "subsystem/UISystem.h"
+#include "subsystem/ActionSystem.h"
 
 using namespace Supernova;
 
@@ -31,8 +32,9 @@ Scene::Scene(){
 	registerComponent<ImageComponent>();
 
 	registerSystem<RenderSystem>();
-	registerSystem<ActionSystem>();
+	registerSystem<MeshSystem>();
 	registerSystem<UISystem>();
+	registerSystem<ActionSystem>();
 
 	camera = NULL_ENTITY;
 

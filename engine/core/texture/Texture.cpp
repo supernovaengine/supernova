@@ -216,3 +216,10 @@ bool Texture::empty(){
 
     return false;
 }
+
+bool Texture::hasTextureFrame(){
+    if (framebuffer)
+        return true;
+
+    return false;
+}

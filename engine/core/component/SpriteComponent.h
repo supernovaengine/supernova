@@ -7,14 +7,18 @@
 namespace Supernova{
 
     struct SpriteComponent{
-        int width = 200; //TODO
-        int height = 200;
+        int width = 100;
+        int height = 100;
 
         FrameData framesRect[MAX_SPRITE_FRAMES];
 
         bool billboard = false;
         bool fakeBillboard = false;
         bool cylindricalBillboard = false;
+
+        bool flipY = false;
+
+        bool needUpdateSprite = true;
     };
     
 }

@@ -4,7 +4,7 @@
 
 using namespace Supernova;
 
-Sprite::Sprite(Scene* scene, float width, float height): Mesh(scene){
+Sprite::Sprite(Scene* scene): Mesh(scene){
     animation = NULL;
     addComponent<SpriteComponent>({});
 
@@ -13,53 +13,69 @@ Sprite::Sprite(Scene* scene, float width, float height): Mesh(scene){
     mesh.buffers["indices"] = &indices;
     mesh.submeshes[0].hasTextureRect = true;
 
-    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-
-    spritecomp.width = width;
-    spritecomp.height = height;
-
-    Attribute* attVertex = buffer.getAttribute(AttributeType::POSITION);
-
-    buffer.addVector3(attVertex, Vector3(0, 0, 0));
-    buffer.addVector3(attVertex, Vector3(spritecomp.width, 0, 0));
-    buffer.addVector3(attVertex, Vector3(spritecomp.width,  spritecomp.height, 0));
-    buffer.addVector3(attVertex, Vector3(0,  spritecomp.height, 0));
-
-    Attribute* attTexcoord = buffer.getAttribute(AttributeType::TEXCOORD1);
-
-    buffer.addVector2(attTexcoord, Vector2(0.01f, 0.01f));
-    buffer.addVector2(attTexcoord, Vector2(0.99f, 0.01f));
-    buffer.addVector2(attTexcoord, Vector2(0.99f, 0.99f));
-    buffer.addVector2(attTexcoord, Vector2(0.01f, 0.99f));
-
-    Attribute* attNormal = buffer.getAttribute(AttributeType::NORMAL);
-
-    buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
-
-    Attribute* attColor = buffer.getAttribute(AttributeType::COLOR);
-
-    buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-    buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-    buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-    buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-
-
-    static const uint16_t indices_array[] = {
-        0,  1,  2,
-        0,  2,  3,
-    };
-
-    indices.setValues(
-        0, indices.getAttribute(AttributeType::INDEX),
-        6, (char*)&indices_array[0], sizeof(uint16_t));
+    buffer.setUsage(BufferUsage::DYNAMIC);
 }
 
 Sprite::~Sprite(){
     if (animation)
         delete animation;
+}
+
+void Sprite::setSize(int width, int height){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    if ((spritecomp.width != width) || (spritecomp.height != height)){
+        spritecomp.width = width;
+        spritecomp.height = height;
+
+        spritecomp.needUpdateSprite = true;
+    }
+}
+
+void Sprite::setWidth(int width){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    if (spritecomp.width != width){
+        spritecomp.width = width;
+
+        spritecomp.needUpdateSprite = true;
+    }
+}
+
+void Sprite::setHeight(int height){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    if (spritecomp.height != height){
+        spritecomp.height = height;
+
+        spritecomp.needUpdateSprite = true;
+    }
+}
+
+int Sprite::getWidth(){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    return spritecomp.width;
+}
+
+int Sprite::getHeight(){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    return spritecomp.height;
+}
+
+void Sprite::setFlipY(bool flipY){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    if (!Engine::isAutomaticFlipY()){
+        if (spritecomp.flipY != flipY){
+            spritecomp.flipY = flipY;
+
+            spritecomp.needUpdateSprite = true;
+        }
+    }else{
+        Log::Error("FlipY cannot be changed until disabled automatic by Engine::setAutomaticFlipY()");
+    }
 }
 
 void Sprite::setBillboard(bool billboard, bool fake, bool cylindrical){

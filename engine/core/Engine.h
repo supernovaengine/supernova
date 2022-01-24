@@ -62,6 +62,7 @@ namespace Supernova {
         static bool defaultNearestScaleTexture;
         static bool defaultResampleToPOTTexture;
         static bool automaticTransparency;
+        static bool automaticFlipY;
 
         static bool allowEventsOutCanvas;
         
@@ -121,6 +122,9 @@ namespace Supernova {
 
         static void setAutomaticTransparency(bool automaticTransparency);
         static bool isAutomaticTransparency();
+
+        static void setAutomaticFlipY(bool automaticFlipY);
+        static bool isAutomaticFlipY();
 
         static void setAllowEventsOutCanvas(bool allowEventsOutCanvas);
         static bool isAllowEventsOutCanvas();

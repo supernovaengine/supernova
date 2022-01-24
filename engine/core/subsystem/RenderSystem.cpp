@@ -529,6 +529,16 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform){
 	if (mesh.loaded){
+
+		if (mesh.needUpdateBuffer){
+			for (auto const& buf : mesh.buffers){
+				if (buf.second->getUsage() != BufferUsage::IMMUTABLE)
+					buf.second->getRender()->updateBuffer(buf.second->getSize(), buf.second->getData());
+			}
+
+			mesh.needUpdateBuffer = false;
+		}
+
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& render = mesh.submeshes[i].render;
 

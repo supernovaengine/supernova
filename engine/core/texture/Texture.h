@@ -49,6 +49,7 @@ namespace Supernova{
             void setReleaseDataAfterLoad(bool releaseDataAfterLoad);
 
             bool empty();
+            bool hasTextureFrame();
     };
 }
 

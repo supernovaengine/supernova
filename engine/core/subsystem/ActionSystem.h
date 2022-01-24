@@ -70,8 +70,8 @@ namespace Supernova{
 		ActionSystem(Scene* scene);
 	
 		virtual void load();
-		virtual void draw();
 		virtual void update(double dt);
+		virtual void draw();
 
 		virtual void entityDestroyed(Entity entity);
 	};

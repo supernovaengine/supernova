@@ -32,6 +32,7 @@ bool Engine::useDegrees;
 bool Engine::defaultNearestScaleTexture;
 bool Engine::defaultResampleToPOTTexture;
 bool Engine::automaticTransparency;
+bool Engine::automaticFlipY;
 bool Engine::allowEventsOutCanvas;
 bool Engine::fixedTimeSceneUpdate;
 bool Engine::fixedTimePhysics;
@@ -174,6 +175,14 @@ bool Engine::isAutomaticTransparency(){
     return automaticTransparency;
 }
 
+void Engine::setAutomaticFlipY(bool automaticFlipY){
+    Engine::automaticFlipY = automaticFlipY;
+}
+
+bool Engine::isAutomaticFlipY(){
+    return automaticFlipY;
+}
+
 void Engine::setAllowEventsOutCanvas(bool allowEventsOutCanvas){
     Engine::allowEventsOutCanvas = allowEventsOutCanvas;
 }
@@ -283,6 +292,7 @@ void Engine::systemInit(int argc, char* argv[]){
     Engine::setDefaultNearestScaleTexture(false);
     Engine::setDefaultResampleToPOTTexture(true);
     Engine::setAutomaticTransparency(true);
+    Engine::setAutomaticFlipY(true);
     Engine::setAllowEventsOutCanvas(false);
     Engine::setFixedTimeSceneUpdate(false);
 
