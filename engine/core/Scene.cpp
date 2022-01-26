@@ -44,6 +44,8 @@ Scene::Scene(){
 	shadowsPCF = true;
 
 	renderToTexture = false;
+	framebufferWidth = 512;
+	framebufferHeight = 512;
 }
 
 Scene::~Scene(){
@@ -110,15 +112,32 @@ FramebufferRender& Scene::getFramebuffer(){
 	return framebuffer;
 }
 
+void Scene::setFramebufferSize(int width, int height){
+	this->framebufferWidth = width;
+	this->framebufferHeight = height;
+
+	if (renderToTexture){
+		updateCameraSize();
+	}
+}
+
+int Scene::getFramebufferWidth(){
+	return framebufferWidth;
+}
+
+int Scene::getFramebufferHeight(){
+	return framebufferHeight;
+}
+
 void Scene::updateCameraSize(){
 	CameraComponent* cameraComp = findComponent<CameraComponent>(camera);
 	if (cameraComp){
 		Rect rect;
-    	//if (textureFrame == NULL) {
-        	rect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
-    	//}else{
-    	//    rect = Rect(0, 0, textureFrame->getTextureFrameWidth(), textureFrame->getTextureFrameHeight());
-    	//}
+		if (!renderToTexture) {
+			rect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
+		}else{
+			rect = Rect(0, 0, framebufferWidth, framebufferHeight);
+		}
 
     	if (cameraComp->automatic){
         	float newLeft = rect.getX();

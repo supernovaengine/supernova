@@ -41,6 +41,8 @@ namespace Supernova{
 
 		bool renderToTexture;
 		FramebufferRender framebuffer;
+		int framebufferWidth;
+		int framebufferHeight;
 
 	    EntityManager entityManager;
 	    ComponentManager componentManager;
@@ -76,6 +78,10 @@ namespace Supernova{
 		bool isRenderToTexture();
 
 		FramebufferRender& getFramebuffer();
+
+		void setFramebufferSize(int width, int height);
+		int getFramebufferWidth();
+		int getFramebufferHeight();
 
 		void updateCameraSize();
 

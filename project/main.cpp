@@ -56,6 +56,7 @@ void init(){
 
     image.setTexture("pista.png");
     image.setMargin(20);
+    image.setSize(200,200);
 
     //image2.setPosition(150,150,0);
     //image2.setSize(300,300);
@@ -70,6 +71,8 @@ void init(){
     Engine::setScene(&scene);
     Engine::addSceneLayer(&uiscene);
     uiscene.setRenderToTexture(true);
+    uiscene.setFramebufferSize(300,300);
+    uiscene.setColor(0.0, 0.0, 1.0, 1.0);
 
     Engine::onKeyDown = onKeyDown;
 }

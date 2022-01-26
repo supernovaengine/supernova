@@ -55,7 +55,7 @@ void RenderSystem::load(){
 
 	if (scene->isRenderToTexture()){
 		if (!scene->getFramebuffer().isCreated())
-			scene->getFramebuffer().createFramebuffer(TextureType::TEXTURE_2D, 512, 512, false);
+			scene->getFramebuffer().createFramebuffer(TextureType::TEXTURE_2D, scene->getFramebufferWidth(), scene->getFramebufferHeight(), false);
 	}
 }
 
