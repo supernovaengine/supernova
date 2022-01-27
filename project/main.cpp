@@ -28,8 +28,8 @@ Polygon polygon3(&scene);
 Scene uiscene;
 //Sprite spriteui(&uiscene, 200, 200);
 Image image(&uiscene);
-//Image image2(&uiscene);
-//Text label(&uiscene);
+Image image2(&uiscene);
+Text label(&uiscene);
 
 
 void onActionStart();
@@ -58,20 +58,20 @@ void init(){
     image.setMargin(20);
     image.setSize(200,200);
 
-    //image2.setPosition(150,150,0);
-    //image2.setSize(300,300);
-    //image2.setTexture("block.png");
-    //image2.setMargin(20);
+    image2.setPosition(150,150,0);
+    image2.setSize(300,300);
+    image2.setTexture("block.png");
+    image2.setMargin(20);
     //image.addChild(&image2);
 
-    //image2.addChild(&label);
-    //label.setText("Testing!!!!!");
-    //label.setPosition(150, 150, 0);
+    image2.addChild(&label);
+    label.setText("Testing!!!!!");
+    label.setPosition(150, 150, 0);
 
     Engine::setScene(&scene);
     Engine::addSceneLayer(&uiscene);
     uiscene.setRenderToTexture(true);
-    uiscene.setFramebufferSize(300,300);
+    //uiscene.setFramebufferSize(300,300);
     uiscene.setColor(0.0, 0.0, 1.0, 1.0);
 
     Engine::onKeyDown = onKeyDown;
@@ -102,6 +102,8 @@ void onKeyDown(int key, bool repeat, int mods){
     }
 
     if (key == S_KEY_R){
+
+        image2.setSize(image2.getWidth()-10, image2.getHeight()-10);
 
         //polygon3.setTexture("block.png");
         //polygon3.setTexture(*uiscene.getTexureRender());

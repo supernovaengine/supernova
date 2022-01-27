@@ -120,6 +120,8 @@ void MeshSystem::createPolygon(PolygonComponent& polygon, MeshComponent& mesh){
 
     polygon.width = (int)(max_X - min_X);
     polygon.height = (int)(max_Y - min_Y);
+
+    mesh.needUpdateBuffer = true;
 }
 
 void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh){
