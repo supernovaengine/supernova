@@ -254,6 +254,19 @@ GraphicBackend Engine::getGraphicBackend(){
 #endif
 }
 
+bool Engine::isOpenGL(){
+    GraphicBackend gbackend = getGraphicBackend();
+
+    if (gbackend == GraphicBackend::GLCORE33)
+        return true;
+    if (gbackend == GraphicBackend::GLES2)
+        return true;
+    if (gbackend == GraphicBackend::GLES3)
+        return true;
+
+    return false;
+}
+
 float Engine::getFramerate(){
     return framerate;
 }

@@ -139,6 +139,7 @@ namespace Supernova {
         
         static Platform getPlatform();
         static GraphicBackend getGraphicBackend();
+        static bool isOpenGL();
         static float getFramerate();
         static float getDeltatime();
 

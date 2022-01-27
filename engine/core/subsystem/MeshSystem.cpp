@@ -131,7 +131,7 @@ void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent
             flipY = !flipY;
         }
 
-        if (mesh.submeshes[0].material.baseColorTexture.hasTextureFrame()){
+        if (mesh.submeshes[0].material.baseColorTexture.hasTextureFrame() && Engine::isOpenGL()){
             flipY = !flipY;
         }
     }
