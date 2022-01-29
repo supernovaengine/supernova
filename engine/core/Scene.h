@@ -26,6 +26,7 @@
 #include "component/ParticlesAnimationComponent.h"
 #include "component/TextComponent.h"
 #include "component/ImageComponent.h"
+#include "component/ButtonComponent.h"
 #include "component/PolygonComponent.h"
 
 namespace Supernova{
@@ -168,6 +169,17 @@ namespace Supernova{
 			auto system = std::make_shared<T>(this);
 			systems.insert({typeName, system});
 			return system;
+		}
+
+		template<typename T>
+		std::shared_ptr<T> getSystem(){
+			const char* typeName = typeid(T).name();
+
+			std::unordered_map<const char*, std::shared_ptr<SubSystem>>::iterator it = systems.find(typeName);
+
+			assert(it != systems.end() && "System not found.");
+
+			return std::dynamic_pointer_cast<T>(it->second);
 		}
 	};
 

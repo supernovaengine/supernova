@@ -1,24 +1,12 @@
 #include "Image.h"
 
+#include "math/Color.h"
 
 using namespace Supernova;
 
 Image::Image(Scene* scene): Object(scene){
     addComponent<UIComponent>({});
     addComponent<ImageComponent>({});
-
-    UIComponent& uicomp = getComponent<UIComponent>();
-    uicomp.buffer = &buffer;
-    uicomp.indices = &indices;
-    uicomp.primitiveType = PrimitiveType::TRIANGLES;
-
-	buffer.clearAll();
-	buffer.addAttribute(AttributeType::POSITION, 3);
-	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-    buffer.addAttribute(AttributeType::COLOR, 4);
-    buffer.setUsage(BufferUsage::DYNAMIC);
-
-    indices.setUsage(BufferUsage::DYNAMIC);
 }
 
 void Image::setSize(int width, int height){
@@ -48,6 +36,24 @@ void Image::setTexture(std::string path){
     uicomp.texture.setPath(path);
 
     uicomp.needUpdateTexture = true;
+}
+
+void Image::setTexture(FramebufferRender* framebuffer){
+    UIComponent& uicomp = getComponent<UIComponent>();
+
+    uicomp.texture.setFramebuffer(framebuffer);
+
+    uicomp.needUpdateTexture = true;
+}
+
+void Image::setColor(Vector4 color){
+    UIComponent& uicomp = getComponent<UIComponent>();
+
+    uicomp.color = Color::sRGBToLinear(color);
+}
+
+void Image::setColor(float red, float green, float blue, float alpha){
+    setColor(Vector4(red, green, blue, alpha));
 }
 
 int Image::getWidth(){

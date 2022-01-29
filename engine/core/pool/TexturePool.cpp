@@ -12,7 +12,7 @@ textures_t& TexturePool::getMap(){
     return *map;
 };
 
-std::shared_ptr<TextureRender> TexturePool::get(std::string id){
+std::shared_ptr<TexturePoolData> TexturePool::get(std::string id){
 	auto& shared = getMap()[id];
 
 	if (shared.use_count() > 0){
@@ -22,7 +22,7 @@ std::shared_ptr<TextureRender> TexturePool::get(std::string id){
 	return NULL;
 }
 
-std::shared_ptr<TextureRender> TexturePool::get(std::string id, TextureType type, TextureData* data){
+std::shared_ptr<TexturePoolData> TexturePool::get(std::string id, TextureType type, TextureData data[6]){
 	auto& shared = getMap()[id];
 
 	if (shared.use_count() > 0){
@@ -34,14 +34,19 @@ std::shared_ptr<TextureRender> TexturePool::get(std::string id, TextureType type
 		numFaces = 6;
 	}
 
-	TextureDataSize texData[6];
+	const auto resource =  std::make_shared<TexturePoolData>();
+
+	void* data_array[6];
+	size_t size_array[6];
 
 	for (int f = 0; f < numFaces; f++){
-		texData[f] = {data[f].getSize(), data[f].getData()};
+		data_array[f] = data[f].getData();
+		size_array[f] = (size_t)data[f].getSize();
+
+		resource->data[f] = data[f];
 	}
 
-	const auto resource =  std::make_shared<TextureRender>();
-	resource->createTexture(id, data[0].getWidth(), data[0].getHeight(), data[0].getColorFormat(), type, numFaces, texData);
+	resource->render.createTexture(id, data[0].getWidth(), data[0].getHeight(), data[0].getColorFormat(), type, numFaces, data_array, size_array);
 	shared = resource;
 
 	return resource;
@@ -51,7 +56,7 @@ void TexturePool::remove(std::string id){
 	if (getMap().count(id)){
 		auto& shared = getMap()[id];
 		if (shared.use_count() <= 1){
-			shared->destroyTexture();
+			shared->render.destroyTexture();
 			getMap().erase(id);
 		}
 	}else{

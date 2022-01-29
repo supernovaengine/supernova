@@ -10,6 +10,7 @@
 #include "component/UIComponent.h"
 #include "component/TextComponent.h"
 #include "component/ImageComponent.h"
+#include "component/ButtonComponent.h"
 
 namespace Supernova{
 
@@ -25,6 +26,9 @@ namespace Supernova{
 		// Text
 		bool loadFontAtlas(TextComponent& text, UIComponent& ui);
 		void createText(TextComponent& text, UIComponent& ui);
+
+		//Button
+		void createButton(Entity entity, ButtonComponent& button);
 
 		void eventOnCharInput(wchar_t codepoint);
 		void eventOnMouseDown(int button, float x, float y, int mods);

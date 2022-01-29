@@ -5,19 +5,12 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include "buffer/InterleavedBuffer.h"
-#include "buffer/IndexBuffer.h"
-
 #include "Object.h"
 
 namespace Supernova{
     class STBText;
 
     class Text: public Object{
-
-    protected:
-        InterleavedBuffer buffer;
-        IndexBuffer indices;
 
     public:
         Text(Scene* scene);

@@ -11,15 +11,21 @@
 #include <memory>
 
 namespace Supernova{
-    typedef std::unordered_map< std::string, std::shared_ptr<TextureRender> > textures_t;
+
+    struct TexturePoolData{
+        TextureRender render;
+        TextureData data[6];
+    };
+
+    typedef std::unordered_map< std::string, std::shared_ptr<TexturePoolData> > textures_t;
 
     class TexturePool{
     private:
         static textures_t& getMap();
 
     public:
-        static std::shared_ptr<TextureRender> get(std::string id);
-        static std::shared_ptr<TextureRender> get(std::string id, TextureType type, TextureData* data);
+        static std::shared_ptr<TexturePoolData> get(std::string id);
+        static std::shared_ptr<TexturePoolData> get(std::string id, TextureType type, TextureData data[6]);
         static void remove(std::string id);
 
     };

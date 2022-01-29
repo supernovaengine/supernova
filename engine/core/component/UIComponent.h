@@ -4,6 +4,8 @@
 #include "buffer/Buffer.h"
 #include "texture/Texture.h"
 #include "render/ObjectRender.h"
+#include "buffer/InterleavedBuffer.h"
+#include "buffer/IndexBuffer.h"
 
 namespace Supernova{
 
@@ -17,8 +19,8 @@ namespace Supernova{
         // Render part
         bool loaded = false;
 
-        Buffer* buffer;
-        Buffer* indices;
+        InterleavedBuffer buffer;
+        IndexBuffer indices;
 
         unsigned int minBufferCount = 0;
         unsigned int minIndicesCount = 0;

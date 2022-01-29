@@ -196,11 +196,6 @@ namespace Supernova{
         RGBA
     };
 
-    struct TextureDataSize{
-        unsigned int size;
-        void* data;
-    };
-
 /*
     typedef struct shaderConfig{
         int programDefs;

@@ -18,7 +18,7 @@ namespace Supernova{
 
         virtual ~TextureRender();
 
-        bool createTexture(std::string label, int width, int height, ColorFormat colorFormat, TextureType type, int numFaces, TextureDataSize* texData);
+        bool createTexture(std::string label, int width, int height, ColorFormat colorFormat, TextureType type, int numFaces, void* data[6], size_t size[6]);
         bool createFramebufferTexture(TextureType type, bool depth, bool shadowMap, int width, int height);
 
         void destroyTexture();

@@ -4,6 +4,7 @@
 #include "render/TextureRender.h"
 #include "render/FramebufferRender.h"
 #include "texture/TextureData.h"
+#include "pool/TexturePool.h"
 #include <string>
 #include <memory>
 
@@ -11,7 +12,7 @@ namespace Supernova{
 
     class Texture{
         private:
-            std::shared_ptr<TextureRender> render = NULL;
+            std::shared_ptr<TexturePoolData> renderAndData = NULL;
             FramebufferRender* framebuffer;
 
             TextureType type;

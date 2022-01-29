@@ -61,33 +61,34 @@ void RenderSystem::load(){
 
 void RenderSystem::createEmptyTextures(){
 	if (!emptyTexturesCreated){
-		TextureDataSize texData[6];
+		void* data_array[6];
+		size_t size_array[6];
 
     	uint32_t pixels[64];
 
 		for (int i = 0; i < 6; i++){
-			texData[i].data = (void*)pixels;
-			texData[i].size = 8 * 8 * 4;
+			data_array[i]  = (void*)pixels;
+			size_array[i] = 8 * 8 * 4;
 		}
 
 		for (int i = 0; i < 64; i++) {
         	pixels[i] = 0xFF808080;
     	}
 
-		emptyNormal.createTexture("empty|normal", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, texData);
+		emptyNormal.createTexture("empty|normal", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array);
 
 		for (int i = 0; i < 64; i++) {
         	pixels[i] = 0xFFFFFFFF;
     	}
 
-		emptyWhite.createTexture("empty|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, texData);
+		emptyWhite.createTexture("empty|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array);
 
 		for (int i = 0; i < 64; i++) {
         	pixels[i] = 0xFF000000;
     	}
 
-		emptyBlack.createTexture("empty|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, texData);
-		emptyCubeBlack.createTexture("empty|cube|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_CUBE, 6, texData);
+		emptyBlack.createTexture("empty|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array);
+		emptyCubeBlack.createTexture("empty|cube|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_CUBE, 6, data_array, size_array);
 
 		emptyTexturesCreated = true;
 	}
@@ -661,30 +662,30 @@ bool RenderSystem::loadUI(UIComponent& ui, bool isText){
 	size_t bufferSize;
 	size_t minBufferSize;
 
-	bufferSize = ui.buffer->getSize();
-	minBufferSize = ui.minBufferCount * ui.buffer->getStride();
+	bufferSize = ui.buffer.getSize();
+	minBufferSize = ui.minBufferCount * ui.buffer.getStride();
 	if (minBufferSize > bufferSize)
 		bufferSize = minBufferSize;
 
-	ui.buffer->getRender()->createBuffer(bufferSize, ui.buffer->getData(), ui.buffer->getType(), ui.buffer->getUsage());
-	if (ui.buffer->isRenderAttributes()) {
-        for (auto const &attr : ui.buffer->getAttributes()) {
-			render.addAttribute(shaderData.getAttrIndex(attr.first), ui.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), ui.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+	ui.buffer.getRender()->createBuffer(bufferSize, ui.buffer.getData(), ui.buffer.getType(), ui.buffer.getUsage());
+	if (ui.buffer.isRenderAttributes()) {
+        for (auto const &attr : ui.buffer.getAttributes()) {
+			render.addAttribute(shaderData.getAttrIndex(attr.first), ui.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), ui.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
         }
     }
 
-	bufferSize = ui.indices->getSize();
-	minBufferSize = ui.minIndicesCount * ui.indices->getStride();
+	bufferSize = ui.indices.getSize();
+	minBufferSize = ui.minIndicesCount * ui.indices.getStride();
 	if (minBufferSize > bufferSize)
 		bufferSize = minBufferSize;
 
-	if (ui.indices->getCount() > 0){
-		ui.indices->getRender()->createBuffer(bufferSize, ui.indices->getData(), ui.indices->getType(), ui.indices->getUsage());
-		ui.vertexCount = ui.indices->getCount();
-		Attribute indexattr = ui.indices->getAttributes()[AttributeType::INDEX];
-		render.addIndex(ui.indices->getRender(), indexattr.getDataType(), indexattr.getOffset());
+	if (ui.indices.getCount() > 0){
+		ui.indices.getRender()->createBuffer(bufferSize, ui.indices.getData(), ui.indices.getType(), ui.indices.getUsage());
+		ui.vertexCount = ui.indices.getCount();
+		Attribute indexattr = ui.indices.getAttributes()[AttributeType::INDEX];
+		render.addIndex(ui.indices.getRender(), indexattr.getDataType(), indexattr.getOffset());
 	}else{
-		ui.vertexCount = ui.buffer->getCount();
+		ui.vertexCount = ui.buffer.getCount();
 	}
 
 	if (textureRender)
@@ -701,7 +702,7 @@ bool RenderSystem::loadUI(UIComponent& ui, bool isText){
 }
 
 void RenderSystem::drawUI(UIComponent& ui, Transform& transform){
-	if (ui.loaded && ui.buffer && ui.buffer->getSize() > 0){
+	if (ui.loaded && ui.buffer.getSize() > 0){
 
 		if (ui.needUpdateTexture){
 			ShaderData& shaderData = ui.shader.get()->shaderData;
@@ -713,13 +714,13 @@ void RenderSystem::drawUI(UIComponent& ui, Transform& transform){
 		}
 
 		if (ui.needUpdateBuffer){
-			ui.buffer->getRender()->updateBuffer(ui.buffer->getSize(), ui.buffer->getData());
+			ui.buffer.getRender()->updateBuffer(ui.buffer.getSize(), ui.buffer.getData());
 
-			if (ui.indices->getCount() > 0){
-				ui.indices->getRender()->updateBuffer(ui.indices->getSize(), ui.indices->getData());
-				ui.vertexCount = ui.indices->getCount();
+			if (ui.indices.getCount() > 0){
+				ui.indices.getRender()->updateBuffer(ui.indices.getSize(), ui.indices.getData());
+				ui.vertexCount = ui.indices.getCount();
 			}else{
-				ui.vertexCount = ui.buffer->getCount();
+				ui.vertexCount = ui.buffer.getCount();
 			}
 
 			ui.needUpdateBuffer = false;
@@ -748,11 +749,11 @@ void RenderSystem::destroyUI(UIComponent& ui){
 	ui.render.destroy();
 
 	//Destroy buffer
-	if (ui.buffer){
-		ui.buffer->getRender()->destroyBuffer();
+	if (ui.buffer.getSize() > 0){
+		ui.buffer.getRender()->destroyBuffer();
 	}
-	if (ui.indices){
-		ui.indices->getRender()->destroyBuffer();
+	if (ui.indices.getSize() > 0){
+		ui.indices.getRender()->destroyBuffer();
 	}
 
 	//Shaders uniforms

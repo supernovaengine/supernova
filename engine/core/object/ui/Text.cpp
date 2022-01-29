@@ -8,24 +8,6 @@ using namespace Supernova;
 Text::Text(Scene* scene): Object(scene){
     addComponent<UIComponent>({});
     addComponent<TextComponent>({});
-
-    UIComponent& uicomp = getComponent<UIComponent>();
-    uicomp.buffer = &buffer;
-    uicomp.indices = &indices;
-    uicomp.primitiveType = PrimitiveType::TRIANGLES;
-
-	buffer.clearAll();
-	buffer.addAttribute(AttributeType::POSITION, 3);
-	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-    buffer.setUsage(BufferUsage::DYNAMIC);
-
-    indices.setUsage(BufferUsage::DYNAMIC);
-
-    TextComponent& textcomp = getComponent<TextComponent>();
-    textcomp.text = "";
-
-    uicomp.minBufferCount = textcomp.maxLength * 4;
-    uicomp.minIndicesCount = textcomp.maxLength * 6;
 }
 
 Text::~Text() {

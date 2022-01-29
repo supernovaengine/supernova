@@ -1,13 +1,12 @@
 #include "Texture.h"
 
-#include "pool/TexturePool.h"
 #include "Engine.h"
 #include "Log.h"
 
 using namespace Supernova;
 
 Texture::Texture(){
-    this->render = NULL;
+    this->renderAndData = NULL;
     this->framebuffer = NULL;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = true;
@@ -15,7 +14,7 @@ Texture::Texture(){
 }
 
 Texture::Texture(std::string path){
-    this->render = NULL;
+    this->renderAndData = NULL;
     this->framebuffer = NULL;
     this->paths[0] = path;
     this->id = path;
@@ -26,7 +25,7 @@ Texture::Texture(std::string path){
 }
 
 Texture::Texture(TextureData data, std::string id){
-    this->render = NULL;
+    this->renderAndData = NULL;
     this->framebuffer = NULL;
     this->data[0] = data;
     this->id = id;
@@ -37,7 +36,7 @@ Texture::Texture(TextureData data, std::string id){
 }
 
 Texture::Texture(const Texture& rhs){
-    render = rhs.render;
+    renderAndData = rhs.renderAndData;
     framebuffer = rhs.framebuffer;
     type = rhs.type;
     id = rhs.id;
@@ -51,7 +50,7 @@ Texture::Texture(const Texture& rhs){
 }
 
 Texture& Texture::operator=(const Texture& rhs){
-    render = rhs.render;
+    renderAndData = rhs.renderAndData;
     framebuffer = rhs.framebuffer;
     type = rhs.type;
     id = rhs.id;
@@ -150,9 +149,13 @@ bool Texture::load(){
     if (!needLoad)
         return false;
 
-    render = TexturePool::get(id);
-    if (render)
+    renderAndData = TexturePool::get(id);
+    if (renderAndData){
+        for (int f = 0; f < 6; f++){
+            data[f] = renderAndData->data[f];
+        }
         return true;
+    }
 
     int numFaces = 1;
 	if (type == TextureType::TEXTURE_CUBE){
@@ -169,7 +172,7 @@ bool Texture::load(){
 	    }
     }
 
-	render = TexturePool::get(id, type, data);
+	renderAndData = TexturePool::get(id, type, data);
 
     if (releaseDataAfterLoad){
         for (int f = 0; f < numFaces; f++){
@@ -183,8 +186,8 @@ bool Texture::load(){
 }
 
 void Texture::destroy(){
-    if (!id.empty() && render){
-	    render.reset();
+    if (!id.empty() && renderAndData){
+	    renderAndData.reset();
 	    TexturePool::remove(id);
     }
 }
@@ -193,13 +196,13 @@ TextureRender* Texture::getRender(){
     if (framebuffer)
         return &framebuffer->getColorTexture();
 
-    if (needLoad && !render)
+    if (needLoad && !renderAndData)
         load();
 
-    if (!needLoad && !render)
+    if (!needLoad && !renderAndData)
         return NULL;
 
-    return render.get();
+    return &renderAndData->render;
 }
 
 TextureData& Texture::getData(size_t index){
@@ -211,7 +214,7 @@ void Texture::setReleaseDataAfterLoad(bool releaseDataAfterLoad){
 }
 
 bool Texture::empty(){
-    if (!needLoad && !render)
+    if (!needLoad && !renderAndData)
         return true;
 
     return false;

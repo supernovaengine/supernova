@@ -30,6 +30,7 @@ Scene::Scene(){
 	registerComponent<ParticlesAnimationComponent>();
 	registerComponent<TextComponent>();
 	registerComponent<ImageComponent>();
+	registerComponent<ButtonComponent>();
 	registerComponent<PolygonComponent>();
 
 	registerSystem<RenderSystem>();

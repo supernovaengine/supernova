@@ -25,7 +25,7 @@ sg_image_type SokolTexture::getTextureType(TextureType textureType){
     return SG_IMAGETYPE_2D;
 }
 
-bool SokolTexture::createTexture(std::string label, int width, int height, ColorFormat colorFormat, TextureType type, int numFaces, TextureDataSize* texData){
+bool SokolTexture::createTexture(std::string label, int width, int height, ColorFormat colorFormat, TextureType type, int numFaces, void* data[6], size_t size[6]){
 
     sg_pixel_format pixelFormat;
     if (colorFormat == ColorFormat::RGBA){
@@ -46,8 +46,8 @@ bool SokolTexture::createTexture(std::string label, int width, int height, Color
     image_desc.label = label.c_str();
 
     for (int f = 0; f < numFaces; f++){
-        image_desc.data.subimage[f][0].ptr = texData[f].data;
-        image_desc.data.subimage[f][0].size = (size_t)texData[f].size;
+        image_desc.data.subimage[f][0].ptr = data[f];
+        image_desc.data.subimage[f][0].size = size[f];
     }
 
     image = sg_make_image(&image_desc);

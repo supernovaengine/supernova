@@ -1,4 +1,4 @@
-
+/*
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -117,7 +117,7 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
-
+*/
 
 /*
 #include "Supernova.h"
@@ -146,7 +146,7 @@ Polygon polygonroot(&scene);
 Polygon polygon(&scene);
 Polygon polygon2(&scene);
 Polygon polygon3(&scene);
-Sprite sprite(&scene, 200, 200);
+Sprite sprite(&scene);
 SpriteAnimation spriteanim(&scene);
 PositionAction positionaction(&scene);
 RotationAction rotationaction(&scene);
@@ -174,6 +174,7 @@ void init(){
     sprite.addFrame(2, "", Rect(0.0, 0.5, 0.5, 0.5));
     sprite.setName("Sprite");
     sprite.setPosition(20,20,0);
+    sprite.setSize(200,200);
 
     spriteanim.setTarget(sprite.getEntity());
 
@@ -327,7 +328,7 @@ void onKeyDown(int key, bool repeat, int mods){
 }
 */
 
-/*
+
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -343,6 +344,7 @@ void onKeyDown(int key, bool repeat, int mods){
 #include "math/Angle.h"
 #include "Text.h"
 #include "Image.h"
+#include "Button.h"
 
 using namespace Supernova;
 
@@ -383,6 +385,7 @@ Image image(&uiscene);
 Image image2(&uiscene);
 Text label(&uiscene);
 Text text(&uiscene);
+Button button(&uiscene);
 
 float rotationY = 0;
 float speed = 0;
@@ -450,6 +453,10 @@ void init(){
     image2.addChild(&label);
     label.setText("Testing!!!!!");
     label.setPosition(150, 150, 0);
+
+    button.setTexture("pista.png");
+    button.setColor(1.0, 0.0,1.0, 1.0);
+    //button.setSize(300,200);
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
     camera.setType(CameraType::CAMERA_PERSPECTIVE);
@@ -737,4 +744,3 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
-*/

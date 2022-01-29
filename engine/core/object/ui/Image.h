@@ -5,9 +5,6 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "buffer/InterleavedBuffer.h"
-#include "buffer/IndexBuffer.h"
-
 #include "Object.h"
 
 namespace Supernova{
@@ -24,6 +21,11 @@ namespace Supernova{
         void setMargin(int margin);
 
         void setTexture(std::string path);
+        void setTexture(FramebufferRender* framebuffer);
+
+        void setColor(Vector4 color);
+        void setColor(float red, float green, float blue, float alpha);
+        Vector4 getColor();
 
         int getWidth();
         int getHeight();

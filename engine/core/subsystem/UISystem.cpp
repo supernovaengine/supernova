@@ -42,61 +42,69 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
         ui.height = texHeight;
     }
 
-    ui.buffer->clear();
-    ui.indices->clear();
+    ui.primitiveType = PrimitiveType::TRIANGLES;
 
-    Attribute* atrVertex = ui.buffer->getAttribute(AttributeType::POSITION);
+	ui.buffer.clearAll();
+	ui.buffer.addAttribute(AttributeType::POSITION, 3);
+	ui.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    ui.buffer.addAttribute(AttributeType::COLOR, 4);
+    ui.buffer.setUsage(BufferUsage::DYNAMIC);
 
-    ui.buffer->addVector3(atrVertex, Vector3(0, 0, 0)); //0
-    ui.buffer->addVector3(atrVertex, Vector3(ui.width, 0, 0)); //1
-    ui.buffer->addVector3(atrVertex, Vector3(ui.width,  ui.height, 0)); //2
-    ui.buffer->addVector3(atrVertex, Vector3(0,  ui.height, 0)); //3
+    ui.indices.clear();
+    ui.indices.setUsage(BufferUsage::DYNAMIC);
 
-    ui.buffer->addVector3(atrVertex, Vector3(img.patchMarginLeft, img.patchMarginTop, 0)); //4
-    ui.buffer->addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight, img.patchMarginTop, 0)); //5
-    ui.buffer->addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight,  ui.height-img.patchMarginBottom, 0)); //6
-    ui.buffer->addVector3(atrVertex, Vector3(img.patchMarginLeft,  ui.height-img.patchMarginBottom, 0)); //7
+    Attribute* atrVertex = ui.buffer.getAttribute(AttributeType::POSITION);
 
-    ui.buffer->addVector3(atrVertex, Vector3(img.patchMarginLeft, 0, 0)); //8
-    ui.buffer->addVector3(atrVertex, Vector3(0, img.patchMarginTop, 0)); //9
+    ui.buffer.addVector3(atrVertex, Vector3(0, 0, 0)); //0
+    ui.buffer.addVector3(atrVertex, Vector3(ui.width, 0, 0)); //1
+    ui.buffer.addVector3(atrVertex, Vector3(ui.width,  ui.height, 0)); //2
+    ui.buffer.addVector3(atrVertex, Vector3(0,  ui.height, 0)); //3
 
-    ui.buffer->addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight, 0, 0)); //10
-    ui.buffer->addVector3(atrVertex, Vector3(ui.width, img.patchMarginTop, 0)); //11
+    ui.buffer.addVector3(atrVertex, Vector3(img.patchMarginLeft, img.patchMarginTop, 0)); //4
+    ui.buffer.addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight, img.patchMarginTop, 0)); //5
+    ui.buffer.addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight,  ui.height-img.patchMarginBottom, 0)); //6
+    ui.buffer.addVector3(atrVertex, Vector3(img.patchMarginLeft,  ui.height-img.patchMarginBottom, 0)); //7
 
-    ui.buffer->addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight, ui.height, 0)); //12
-    ui.buffer->addVector3(atrVertex, Vector3(ui.width, ui.height-img.patchMarginBottom, 0)); //13
+    ui.buffer.addVector3(atrVertex, Vector3(img.patchMarginLeft, 0, 0)); //8
+    ui.buffer.addVector3(atrVertex, Vector3(0, img.patchMarginTop, 0)); //9
 
-    ui.buffer->addVector3(atrVertex, Vector3(img.patchMarginLeft, ui.height, 0)); //14
-    ui.buffer->addVector3(atrVertex, Vector3(0, ui.height-img.patchMarginBottom, 0)); //15
+    ui.buffer.addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight, 0, 0)); //10
+    ui.buffer.addVector3(atrVertex, Vector3(ui.width, img.patchMarginTop, 0)); //11
 
-    Attribute* atrTexcoord = ui.buffer->getAttribute(AttributeType::TEXCOORD1);
+    ui.buffer.addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight, ui.height, 0)); //12
+    ui.buffer.addVector3(atrVertex, Vector3(ui.width, ui.height-img.patchMarginBottom, 0)); //13
 
-    ui.buffer->addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
-    ui.buffer->addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
-    ui.buffer->addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
-    ui.buffer->addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
+    ui.buffer.addVector3(atrVertex, Vector3(img.patchMarginLeft, ui.height, 0)); //14
+    ui.buffer.addVector3(atrVertex, Vector3(0, ui.height-img.patchMarginBottom, 0)); //15
 
-    ui.buffer->addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)ui.width, img.patchMarginTop/(float)ui.height));
-    ui.buffer->addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), img.patchMarginTop/(float)ui.height));
-    ui.buffer->addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), 1.0f-(img.patchMarginBottom/(float)ui.height)));
-    ui.buffer->addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)ui.width, 1.0f-(img.patchMarginBottom/(float)ui.height)));
+    Attribute* atrTexcoord = ui.buffer.getAttribute(AttributeType::TEXCOORD1);
 
-    ui.buffer->addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)ui.width, 0));
-    ui.buffer->addVector2(atrTexcoord, Vector2(0, img.patchMarginTop/(float)ui.height));
+    ui.buffer.addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
+    ui.buffer.addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
 
-    ui.buffer->addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), 0));
-    ui.buffer->addVector2(atrTexcoord, Vector2(1.0f, img.patchMarginTop/(float)ui.height));
+    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)ui.width, img.patchMarginTop/(float)ui.height));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), img.patchMarginTop/(float)ui.height));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), 1.0f-(img.patchMarginBottom/(float)ui.height)));
+    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)ui.width, 1.0f-(img.patchMarginBottom/(float)ui.height)));
 
-    ui.buffer->addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), 1.0f));
-    ui.buffer->addVector2(atrTexcoord, Vector2(1.0f, 1.0f-(img.patchMarginBottom/(float)ui.height)));
+    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)ui.width, 0));
+    ui.buffer.addVector2(atrTexcoord, Vector2(0, img.patchMarginTop/(float)ui.height));
 
-    ui.buffer->addVector2(atrTexcoord, Vector2((img.patchMarginLeft/(float)ui.width), 1.0f));
-    ui.buffer->addVector2(atrTexcoord, Vector2(0, 1.0f-(img.patchMarginBottom/(float)ui.height)));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), 0));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, img.patchMarginTop/(float)ui.height));
 
-    Attribute* atrColor = ui.buffer->getAttribute(AttributeType::COLOR);
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), 1.0f));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f-(img.patchMarginBottom/(float)ui.height)));
 
-    for (int i = 0; i < ui.buffer->getCount(); i++){
-        ui.buffer->addVector4(atrColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    ui.buffer.addVector2(atrTexcoord, Vector2((img.patchMarginLeft/(float)ui.width), 1.0f));
+    ui.buffer.addVector2(atrTexcoord, Vector2(0, 1.0f-(img.patchMarginBottom/(float)ui.height)));
+
+    Attribute* atrColor = ui.buffer.getAttribute(AttributeType::COLOR);
+
+    for (int i = 0; i < ui.buffer.getCount(); i++){
+        ui.buffer.addVector4(atrColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
     static const uint16_t indices_array[] = {
@@ -128,8 +136,8 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
         9,  7, 15
     };
 
-    ui.indices->setValues(
-        0, ui.indices->getAttribute(AttributeType::INDEX),
+    ui.indices.setValues(
+        0, ui.indices.getAttribute(AttributeType::INDEX),
         54, (char*)&indices_array[0], sizeof(uint16_t));
 
     ui.needUpdateBuffer = true;
@@ -165,18 +173,40 @@ bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui){
 
 void UISystem::createText(TextComponent& text, UIComponent& ui){
 
-    ui.buffer->clear();
-    ui.indices->clear();
+    ui.primitiveType = PrimitiveType::TRIANGLES;
+
+    ui.buffer.clearAll();
+	ui.buffer.addAttribute(AttributeType::POSITION, 3);
+	ui.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    ui.buffer.setUsage(BufferUsage::DYNAMIC);
+
+    ui.indices.clear();
+    ui.indices.setUsage(BufferUsage::DYNAMIC);
+
+    ui.minBufferCount = text.maxLength * 4;
+    ui.minIndicesCount = text.maxLength * 6;
 
     std::vector<uint16_t> indices_array;
 
-    text.stbtext->createText(text.text, ui.buffer, indices_array, text.charPositions, ui.width, ui.height, text.userDefinedWidth, text.userDefinedHeight, text.multiline, false);
+    text.stbtext->createText(text.text, &ui.buffer, indices_array, text.charPositions, ui.width, ui.height, text.userDefinedWidth, text.userDefinedHeight, text.multiline, false);
 
-    ui.indices->setValues(
-            0, ui.indices->getAttribute(AttributeType::INDEX),
+    ui.indices.setValues(
+            0, ui.indices.getAttribute(AttributeType::INDEX),
             indices_array.size(), (char*)&indices_array[0], sizeof(uint16_t));
 
     ui.needUpdateBuffer = true;
+}
+
+void UISystem::createButton(Entity entity, ButtonComponent& button){
+    if (button.label == NULL_ENTITY){
+        button.label = scene->createEntity();
+
+        scene->addComponent<Transform>(button.label, {});
+        scene->addComponent<UIComponent>(button.label, {});
+        scene->addComponent<TextComponent>(button.label, {});
+
+        scene->addEntityChild(entity, button.label);
+    }
 }
 
 void UISystem::load(){
@@ -197,6 +227,22 @@ void UISystem::draw(){
 }
 
 void UISystem::update(double dt){
+
+    // Buttons
+    auto buttons = scene->getComponentArray<ButtonComponent>();
+    for (int i = 0; i < buttons->size(); i++){
+        ButtonComponent& button = buttons->getComponentFromIndex(i);
+
+        if (button.needUpdateButton){
+            Entity entity = buttons->getEntity(i);
+
+            createButton(entity, button);
+        }
+
+        button.needUpdateButton = false;
+    }
+
+    // Images
     auto images = scene->getComponentArray<ImageComponent>();
     for (int i = 0; i < images->size(); i++){
         ImageComponent& img = images->getComponentFromIndex(i);
@@ -215,6 +261,7 @@ void UISystem::update(double dt){
         img.needUpdate = false;
     }
 
+    // Texts
     auto texts = scene->getComponentArray<TextComponent>();
     for (int i = 0; i < texts->size(); i++){
 		TextComponent& text = texts->getComponentFromIndex(i);
