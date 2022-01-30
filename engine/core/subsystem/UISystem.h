@@ -28,7 +28,7 @@ namespace Supernova{
 		void createText(TextComponent& text, UIComponent& ui);
 
 		//Button
-		void createButton(Entity entity, ButtonComponent& button);
+		void updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui);
 
 		void eventOnCharInput(wchar_t codepoint);
 		void eventOnMouseDown(int button, float x, float y, int mods);
@@ -39,6 +39,8 @@ namespace Supernova{
 	public:
 		UISystem(Scene* scene);
 		virtual ~UISystem();
+
+		void createButtonLabel(Entity entity, ButtonComponent& button);
 
 		virtual void load();
 		virtual void update(double dt);

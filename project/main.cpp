@@ -385,7 +385,7 @@ Image image(&uiscene);
 Image image2(&uiscene);
 Text label(&uiscene);
 Text text(&uiscene);
-Button button(&uiscene);
+Button uibutton(&uiscene);
 
 float rotationY = 0;
 float speed = 0;
@@ -454,9 +454,13 @@ void init(){
     label.setText("Testing!!!!!");
     label.setPosition(150, 150, 0);
 
-    button.setTexture("pista.png");
-    button.setColor(1.0, 0.0,1.0, 1.0);
-    //button.setSize(300,200);
+    uibutton.setTexture("ui/Button_Normal.png");
+    uibutton.setMargin(5);
+    //uibutton.setColor(1.0, 0.0,1.0, 1.0);
+    uibutton.setLabel("Eduardo");
+    uibutton.setLabelColor(0,0,0,1);
+    uibutton.setSize(300,200);
+    uibutton.setPosition(500,500,0);
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
     camera.setType(CameraType::CAMERA_PERSPECTIVE);
@@ -616,7 +620,7 @@ void onMouseDown(int button, float x, float y, int mods){
     //text.setFont("FreeMono.ttf");
     //text.setMaxLength(50);
 
-    image.setSize(image.getWidth()-10, image.getHeight()-10);
+    uibutton.setSize(uibutton.getWidth()-10, uibutton.getHeight()-10);
 
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)

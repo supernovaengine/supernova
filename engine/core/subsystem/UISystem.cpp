@@ -84,22 +84,22 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
     ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
     ui.buffer.addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
 
-    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)ui.width, img.patchMarginTop/(float)ui.height));
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), img.patchMarginTop/(float)ui.height));
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), 1.0f-(img.patchMarginBottom/(float)ui.height)));
-    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)ui.width, 1.0f-(img.patchMarginBottom/(float)ui.height)));
+    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)texWidth, img.patchMarginTop/(float)texHeight));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)texWidth), img.patchMarginTop/(float)texHeight));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)texWidth), 1.0f-(img.patchMarginBottom/(float)texHeight)));
+    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)texWidth, 1.0f-(img.patchMarginBottom/(float)texHeight)));
 
-    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)ui.width, 0));
-    ui.buffer.addVector2(atrTexcoord, Vector2(0, img.patchMarginTop/(float)ui.height));
+    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)texWidth, 0));
+    ui.buffer.addVector2(atrTexcoord, Vector2(0, img.patchMarginTop/(float)texHeight));
 
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), 0));
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, img.patchMarginTop/(float)ui.height));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)texWidth), 0));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, img.patchMarginTop/(float)texHeight));
 
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)ui.width), 1.0f));
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f-(img.patchMarginBottom/(float)ui.height)));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)texWidth), 1.0f));
+    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f-(img.patchMarginBottom/(float)texHeight)));
 
-    ui.buffer.addVector2(atrTexcoord, Vector2((img.patchMarginLeft/(float)ui.width), 1.0f));
-    ui.buffer.addVector2(atrTexcoord, Vector2(0, 1.0f-(img.patchMarginBottom/(float)ui.height)));
+    ui.buffer.addVector2(atrTexcoord, Vector2((img.patchMarginLeft/(float)texWidth), 1.0f));
+    ui.buffer.addVector2(atrTexcoord, Vector2(0, 1.0f-(img.patchMarginBottom/(float)texHeight)));
 
     Attribute* atrColor = ui.buffer.getAttribute(AttributeType::COLOR);
 
@@ -197,7 +197,7 @@ void UISystem::createText(TextComponent& text, UIComponent& ui){
     ui.needUpdateBuffer = true;
 }
 
-void UISystem::createButton(Entity entity, ButtonComponent& button){
+void UISystem::createButtonLabel(Entity entity, ButtonComponent& button){
     if (button.label == NULL_ENTITY){
         button.label = scene->createEntity();
 
@@ -206,6 +206,37 @@ void UISystem::createButton(Entity entity, ButtonComponent& button){
         scene->addComponent<TextComponent>(button.label, {});
 
         scene->addEntityChild(entity, button.label);
+    }
+}
+
+void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui){
+
+    createButtonLabel(entity, button);
+
+    Transform& labeltransform = scene->getComponent<Transform>(button.label);
+    TextComponent& labeltext = scene->getComponent<TextComponent>(button.label);
+    UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
+
+    float labelX = 0;
+    float labelY = (ui.height / 2) + (labelui.height / 2) - img.patchMarginBottom;
+
+    if (labelui.width > (ui.width - img.patchMarginRight)) {
+        labelX = img.patchMarginLeft;
+        int labelWidth = ui.width - img.patchMarginRight;
+
+        if (labelui.width != labelWidth){
+            labelui.width = labelWidth;
+            labeltext.userDefinedWidth = true;
+            labeltext.needUpdateText = true;
+        }
+    } else {
+        labelX = (ui.width / 2) - (labelui.width / 2);
+    }
+    Vector3 labelPosition = Vector3(labelX, labelY, 0);
+
+    if (labeltransform.position != labelPosition){
+        labeltransform.position = labelPosition;
+        labeltransform.needUpdate = true;
     }
 }
 
@@ -228,20 +259,6 @@ void UISystem::draw(){
 
 void UISystem::update(double dt){
 
-    // Buttons
-    auto buttons = scene->getComponentArray<ButtonComponent>();
-    for (int i = 0; i < buttons->size(); i++){
-        ButtonComponent& button = buttons->getComponentFromIndex(i);
-
-        if (button.needUpdateButton){
-            Entity entity = buttons->getEntity(i);
-
-            createButton(entity, button);
-        }
-
-        button.needUpdateButton = false;
-    }
-
     // Images
     auto images = scene->getComponentArray<ImageComponent>();
     for (int i = 0; i < images->size(); i++){
@@ -255,6 +272,13 @@ void UISystem::update(double dt){
                 UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
                 createImagePatches(img, ui);
+            }
+
+            // Need to centralize button label
+            if (signature.test(scene->getComponentType<ButtonComponent>())){
+                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+
+                button.needUpdateButton = true;
             }
         }
 
@@ -282,9 +306,28 @@ void UISystem::update(double dt){
                 createText(text, ui);
             }
 
-
             text.needUpdateText = false;
         }
+    }
+
+    // Buttons
+    auto buttons = scene->getComponentArray<ButtonComponent>();
+    for (int i = 0; i < buttons->size(); i++){
+        ButtonComponent& button = buttons->getComponentFromIndex(i);
+
+        if (button.needUpdateButton){
+            Entity entity = buttons->getEntity(i);
+            Signature signature = scene->getSignature(entity);
+
+            if (signature.test(scene->getComponentType<UIComponent>()) && signature.test(scene->getComponentType<ImageComponent>())){
+                UIComponent& ui = scene->getComponent<UIComponent>(entity);
+                ImageComponent& image = scene->getComponent<ImageComponent>(entity);
+
+                updateButton(entity, button, image, ui);
+            }
+        }
+
+        button.needUpdateButton = false;
     }
 }
 
@@ -296,6 +339,14 @@ void UISystem::entityDestroyed(Entity entity){
 
         if (text.stbtext){
             delete text.stbtext;
+        }
+    }
+
+    if (signature.test(scene->getComponentType<ButtonComponent>())){
+        ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+
+        if (button.label != NULL_ENTITY){
+            scene->destroyEntity(button.label);
         }
     }
 }
