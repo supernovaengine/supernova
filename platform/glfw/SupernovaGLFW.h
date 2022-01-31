@@ -22,6 +22,9 @@ private:
     static int screenWidth;
     static int screenHeight;
 
+    static double mousePosX;
+    static double mousePosY;
+
     static GLFWwindow* window;
     static GLFWmonitor* monitor;
 

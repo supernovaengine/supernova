@@ -139,8 +139,8 @@ public class MainActivity extends Activity {
 						int pointerIndex = event.getActionIndex();
 
 						final int pointerId = event.getPointerId(pointerIndex);
-	                    final float normalizedX = (event.getX(pointerIndex) / (float) v.getWidth()) * 2 - 1;
-	                    final float normalizedY = (event.getY(pointerIndex) / (float) v.getHeight()) * 2 - 1;
+						final float pointerX = event.getX(pointerIndex);
+						final float pointerY = event.getY(pointerIndex);
 
 						switch (event.getActionMasked()) {
 							case MotionEvent.ACTION_DOWN:
@@ -148,7 +148,7 @@ public class MainActivity extends Activity {
 								glSurfaceView.queueEvent(new Runnable() {
 									@Override
 									public void run() {
-										JNIWrapper.system_touch_start(pointerId, normalizedX, normalizedY);
+										JNIWrapper.system_touch_start(pointerId, pointerX, pointerY);
 									}
 								});
 								break;
@@ -158,7 +158,7 @@ public class MainActivity extends Activity {
 								glSurfaceView.queueEvent(new Runnable() {
 									@Override
 									public void run() {
-										JNIWrapper.system_touch_end(pointerId, normalizedX, normalizedY);
+										JNIWrapper.system_touch_end(pointerId, pointerX, pointerY);
 									}
 								});
 								break;
@@ -167,7 +167,7 @@ public class MainActivity extends Activity {
 								glSurfaceView.queueEvent(new Runnable() {
 									@Override
 									public void run() {
-										JNIWrapper.system_touch_move(pointerId, normalizedX, normalizedY);
+										JNIWrapper.system_touch_move(pointerId, pointerX, pointerY);
 									}
 								});
 								break;

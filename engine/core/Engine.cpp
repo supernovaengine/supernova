@@ -467,8 +467,8 @@ void Engine::systemTouchStart(int pointer, float x, float y){
         //-----------------
         if (Engine::isCallMouseInTouchEvent()){
             //-----------------
-            Engine::onMouseDown.call(100, x, y, 0);
-            Input::addMousePressed(100);
+            Engine::onMouseDown.call(S_MOUSE_BUTTON_1, x, y, 0);
+            Input::addMousePressed(S_MOUSE_BUTTON_1);
             Input::setMousePosition(x, y);
             //-----------------
         }
@@ -483,8 +483,8 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
         //-----------------
         if (Engine::isCallMouseInTouchEvent()){
             //-----------------
-            Engine::onMouseUp.call(100, x, y, 0);
-            Input::releaseMousePressed(100);
+            Engine::onMouseUp.call(S_MOUSE_BUTTON_1, x, y, 0);
+            Input::releaseMousePressed(S_MOUSE_BUTTON_1);
             Input::setMousePosition(x, y);
             //-----------------
         }
@@ -524,8 +524,8 @@ void Engine::systemMouseDown(int button, float x, float y, int mods){
         //-----------------
         if (Engine::isCallTouchInMouseEvent()){
             //-----------------
-            Engine::onTouchStart.call(100, x, y);
-            Input::addTouch(100, x, y);
+            Engine::onTouchStart.call(0, x, y);
+            Input::addTouch(0, x, y);
             //-----------------
         }
     }
@@ -541,8 +541,8 @@ void Engine::systemMouseUp(int button, float x, float y, int mods){
         //-----------------
         if (Engine::isCallTouchInMouseEvent()){
             //-----------------
-            Engine::onTouchEnd.call(100, x, y);
-            Input::removeTouch(100);
+            Engine::onTouchEnd.call(0, x, y);
+            Input::removeTouch(0);
             //-----------------
         }
     }
@@ -559,8 +559,8 @@ void Engine::systemMouseMove(float x, float y, int mods){
         if (Engine::isCallTouchInMouseEvent()){
             //-----------------
             if (Input::isMousePressed(S_MOUSE_BUTTON_LEFT) || Input::isMousePressed(S_MOUSE_BUTTON_RIGHT)){
-                Engine::onTouchMove.call(100, x, y);
-                Input::setTouchPosition(100, x, y);
+                Engine::onTouchMove.call(0, x, y);
+                Input::setTouchPosition(0, x, y);
             }
             //-----------------
         }

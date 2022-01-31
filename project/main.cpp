@@ -454,7 +454,8 @@ void init(){
     label.setText("Testing!!!!!");
     label.setPosition(150, 150, 0);
 
-    uibutton.setTexture("ui/Button_Normal.png");
+    uibutton.setTextureNormal("ui/Button_Normal.png");
+    uibutton.setTexturePressed("ui/Button_Press.png");
     uibutton.setMargin(5);
     //uibutton.setColor(1.0, 0.0,1.0, 1.0);
     uibutton.setLabel("Eduardo");
@@ -620,7 +621,7 @@ void onMouseDown(int button, float x, float y, int mods){
     //text.setFont("FreeMono.ttf");
     //text.setMaxLength(50);
 
-    uibutton.setSize(uibutton.getWidth()-10, uibutton.getHeight()-10);
+    //uibutton.setSize(uibutton.getWidth()-10, uibutton.getHeight()-10);
 
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)

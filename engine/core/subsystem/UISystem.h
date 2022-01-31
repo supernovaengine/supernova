@@ -11,6 +11,7 @@
 #include "component/TextComponent.h"
 #include "component/ImageComponent.h"
 #include "component/ButtonComponent.h"
+#include "component/Transform.h"
 
 namespace Supernova{
 
@@ -35,6 +36,8 @@ namespace Supernova{
 		void eventOnMouseUp(int button, float x, float y, int mods);
 		void eventOnTouchStart(int pointer, float x, float y);
 		void eventOnTouchEnd(int pointer, float x, float y);
+
+		bool isCoordInside(float x, float y, Transform& transform, UIComponent& ui);
 
 	public:
 		UISystem(Scene* scene);

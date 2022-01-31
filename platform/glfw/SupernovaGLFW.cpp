@@ -14,6 +14,9 @@ int SupernovaGLFW::windowHeight;
 int SupernovaGLFW::screenWidth;
 int SupernovaGLFW::screenHeight;
 
+double SupernovaGLFW::mousePosX;
+double SupernovaGLFW::mousePosY;
+
 GLFWwindow* SupernovaGLFW::window;
 GLFWmonitor* SupernovaGLFW::monitor;
 
@@ -43,12 +46,14 @@ int SupernovaGLFW::init(int argc, char **argv){
 
     glfwSetMouseButtonCallback(window, [](GLFWwindow*, int btn, int action, int mods) {
         if (action==GLFW_PRESS){
-            Supernova::Engine::systemMouseDown(btn, 0, 0, mods);
+            Supernova::Engine::systemMouseDown(btn, float(mousePosX), float(mousePosY), mods);
         }else if (action==GLFW_RELEASE){
-            Supernova::Engine::systemMouseUp(btn, 0, 0, mods);
+            Supernova::Engine::systemMouseUp(btn, float(mousePosX), float(mousePosY), mods);
         }
     });
     glfwSetCursorPosCallback(window, [](GLFWwindow*, double pos_x, double pos_y) {
+        mousePosX = pos_x;
+        mousePosY = pos_y;
         Supernova::Engine::systemMouseMove(float(pos_x), float(pos_y), 0);
     });
     glfwSetScrollCallback(window, [](GLFWwindow*, double pos_x, double pos_y){

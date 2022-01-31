@@ -11,6 +11,10 @@ namespace Supernova{
     struct ButtonComponent{
         Entity label = NULL_ENTITY;
 
+        Texture textureNormal;
+        Texture texturePressed;
+        Texture textureDisabled;
+
         bool needUpdateButton = true;
     };
 

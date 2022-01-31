@@ -294,7 +294,7 @@ void Scene::sortComponentsByTransform(Signature entitySignature){
 		meshes->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
-	// UI Render component
+	// UI component
 	if (entitySignature.test(getComponentType<UIComponent>())){
 		auto ui = componentManager.getComponentArray<UIComponent>();
 		ui->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());

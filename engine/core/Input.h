@@ -134,14 +134,14 @@
 #define S_KEY_LAST                S_KEY_MENU
 
 //Mouse
-#define S_MOUSE_BUTTON_1    1
-#define S_MOUSE_BUTTON_2    2
-#define S_MOUSE_BUTTON_3    3
-#define S_MOUSE_BUTTON_4    4
-#define S_MOUSE_BUTTON_5    5
-#define S_MOUSE_BUTTON_6    6
-#define S_MOUSE_BUTTON_7    7
-#define S_MOUSE_BUTTON_8    8
+#define S_MOUSE_BUTTON_1    0
+#define S_MOUSE_BUTTON_2    1
+#define S_MOUSE_BUTTON_3    2
+#define S_MOUSE_BUTTON_4    3
+#define S_MOUSE_BUTTON_5    4
+#define S_MOUSE_BUTTON_6    5
+#define S_MOUSE_BUTTON_7    6
+#define S_MOUSE_BUTTON_8    7
 
 #define S_MOUSE_BUTTON_LAST     S_MOUSE_BUTTON_8
 #define S_MOUSE_BUTTON_LEFT     S_MOUSE_BUTTON_1

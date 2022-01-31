@@ -19,6 +19,10 @@ namespace Supernova{
         void setLabelColor(Vector4 color);
         void setLabelColor(float red, float green, float blue, float alpha);
         Vector4 getLabelColor();
+
+        void setTextureNormal(std::string path);
+        void setTexturePressed(std::string path);
+        void setTextureDisabled(std::string path);
     };
 }
 

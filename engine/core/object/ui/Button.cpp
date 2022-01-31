@@ -49,3 +49,27 @@ Vector4 Button::getLabelColor(){
 
     return uilabel.color;
 }
+
+void Button::setTextureNormal(std::string path){
+    ButtonComponent& btcomp = getComponent<ButtonComponent>();
+
+    btcomp.textureNormal.setPath(path);
+
+    btcomp.needUpdateButton = true;
+}
+
+void Button::setTexturePressed(std::string path){
+    ButtonComponent& btcomp = getComponent<ButtonComponent>();
+
+    btcomp.texturePressed.setPath(path);
+
+    btcomp.needUpdateButton = true;
+}
+
+void Button::setTextureDisabled(std::string path){
+    ButtonComponent& btcomp = getComponent<ButtonComponent>();
+
+    btcomp.textureDisabled.setPath(path);
+
+    btcomp.needUpdateButton = true;
+}

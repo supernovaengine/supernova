@@ -5,6 +5,8 @@
 #include "UISystem.h"
 
 #include "Scene.h"
+#include "Input.h"
+#include "Engine.h"
 #include "util/STBText.h"
 #include "util/UniqueToken.h"
 #include "util/StringUtils.h"
@@ -238,6 +240,9 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
         labeltransform.position = labelPosition;
         labeltransform.needUpdate = true;
     }
+
+    ui.texture = button.textureNormal;
+    ui.needUpdateTexture = true;
 }
 
 void UISystem::load(){
@@ -258,32 +263,6 @@ void UISystem::draw(){
 }
 
 void UISystem::update(double dt){
-
-    // Images
-    auto images = scene->getComponentArray<ImageComponent>();
-    for (int i = 0; i < images->size(); i++){
-        ImageComponent& img = images->getComponentFromIndex(i);
-
-        if (img.needUpdate){
-            Entity entity = images->getEntity(i);
-            Signature signature = scene->getSignature(entity);
-
-            if (signature.test(scene->getComponentType<UIComponent>())){
-                UIComponent& ui = scene->getComponent<UIComponent>(entity);
-
-                createImagePatches(img, ui);
-            }
-
-            // Need to centralize button label
-            if (signature.test(scene->getComponentType<ButtonComponent>())){
-                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-
-                button.needUpdateButton = true;
-            }
-        }
-
-        img.needUpdate = false;
-    }
 
     // Texts
     auto texts = scene->getComponentArray<TextComponent>();
@@ -329,6 +308,32 @@ void UISystem::update(double dt){
 
         button.needUpdateButton = false;
     }
+
+    // Images
+    auto images = scene->getComponentArray<ImageComponent>();
+    for (int i = 0; i < images->size(); i++){
+        ImageComponent& img = images->getComponentFromIndex(i);
+
+        if (img.needUpdate){
+            Entity entity = images->getEntity(i);
+            Signature signature = scene->getSignature(entity);
+
+            if (signature.test(scene->getComponentType<UIComponent>())){
+                UIComponent& ui = scene->getComponent<UIComponent>(entity);
+
+                createImagePatches(img, ui);
+            }
+
+            // Need to centralize button label
+            if (signature.test(scene->getComponentType<ButtonComponent>())){
+                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+
+                button.needUpdateButton = true;
+            }
+        }
+
+        img.needUpdate = false;
+    }
 }
 
 void UISystem::entityDestroyed(Entity entity){
@@ -356,17 +361,75 @@ void UISystem::eventOnCharInput(wchar_t codepoint){
 }
 
 void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
+    auto uis = scene->getComponentArray<UIComponent>();
+    int lastUI = -1;
 
+    for (int i = 0; i < uis->size(); i++){
+        UIComponent& ui = uis->getComponentFromIndex(i);
+
+        Entity entity = uis->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+        if (signature.test(scene->getComponentType<Transform>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
+
+            if (isCoordInside(x, y, transform, ui)){
+                lastUI = i;
+                if (signature.test(scene->getComponentType<ButtonComponent>())){
+                    ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+
+                    ui.texture = button.texturePressed;
+                    ui.needUpdateTexture = true;
+                }
+            }
+        }
+    }
+
+    if (lastUI =! -1){
+
+    }
 }
 
 void UISystem::eventOnMouseUp(int button, float x, float y, int mods){
+    auto uis = scene->getComponentArray<UIComponent>();
+    for (int i = 0; i < uis->size(); i++){
+        UIComponent& ui = uis->getComponentFromIndex(i);
 
+        Entity entity = uis->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+        if (signature.test(scene->getComponentType<Transform>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
+
+            if (signature.test(scene->getComponentType<ButtonComponent>())){
+                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+
+                ui.texture = button.textureNormal;
+                ui.needUpdateTexture = true;
+            }
+        }
+    }
 }
 
 void UISystem::eventOnTouchStart(int pointer, float x, float y){
-
+    if (!Engine::isCallMouseInTouchEvent()){
+        eventOnMouseDown(S_MOUSE_BUTTON_1, x, y, 0);
+    }
 }
 
 void UISystem::eventOnTouchEnd(int pointer, float x, float y){
+    if (!Engine::isCallMouseInTouchEvent()){
+        eventOnMouseUp(S_MOUSE_BUTTON_1, x, y, 0);
+    }
+}
 
+bool UISystem::isCoordInside(float x, float y, Transform& transform, UIComponent& ui){
+    Vector3 point = transform.worldRotation.getRotationMatrix() * Vector3(x, y, 0);
+    Vector2 center(0, 0);
+
+    if (point.x >= (transform.worldPosition.x - center.x) and
+        point.x <= (transform.worldPosition.x - center.x + abs(ui.width * transform.worldScale.x)) and
+        point.y >= (transform.worldPosition.y - center.y) and
+        point.y <= (transform.worldPosition.y - center.y + abs(ui.height * transform.worldScale.y))) {
+        return true;
+    }
+    return false;
 }
