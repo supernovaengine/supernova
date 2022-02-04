@@ -482,9 +482,9 @@ bool UISystem::isCoordInside(float x, float y, Transform& transform, UIComponent
     Vector3 point = transform.worldRotation.getRotationMatrix() * Vector3(x, y, 0);
     Vector2 center = Vector2(0, 0);
 
-    if (point.x >= (transform.worldPosition.x - center.x) and
-        point.x <= (transform.worldPosition.x - center.x + abs(ui.width * transform.worldScale.x)) and
-        point.y >= (transform.worldPosition.y - center.y) and
+    if (point.x >= (transform.worldPosition.x - center.x) &&
+        point.x <= (transform.worldPosition.x - center.x + abs(ui.width * transform.worldScale.x)) &&
+        point.y >= (transform.worldPosition.y - center.y) &&
         point.y <= (transform.worldPosition.y - center.y + abs(ui.height * transform.worldScale.y))) {
         return true;
     }
