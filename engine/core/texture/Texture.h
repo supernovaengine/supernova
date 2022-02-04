@@ -39,12 +39,16 @@ namespace Supernova{
             Texture(const Texture& rhs);
             Texture& operator=(const Texture& rhs);
 
+            bool operator == ( const Texture& rhs ) const;
+            bool operator != ( const Texture& rhs ) const;
+
             virtual ~Texture();
 
             bool load();
             void destroy();
 
             TextureRender* getRender();
+            std::string getPath(size_t index = 0);
             TextureData& getData(size_t index = 0);
 
             void setReleaseDataAfterLoad(bool releaseDataAfterLoad);

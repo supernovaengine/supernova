@@ -65,6 +65,38 @@ Texture& Texture::operator=(const Texture& rhs){
     return *this; 
 }
 
+bool Texture::operator == ( const Texture& rhs ) const{
+    return (
+        framebuffer == rhs.framebuffer &&
+        type == rhs.type &&
+        id == rhs.id &&
+        paths[0] == rhs.paths[0] &&
+        paths[1] == rhs.paths[1] &&
+        paths[2] == rhs.paths[2] &&
+        paths[3] == rhs.paths[3] &&
+        paths[4] == rhs.paths[4] &&
+        paths[5] == rhs.paths[5] &&
+        loadFromPath == rhs.loadFromPath &&
+        releaseDataAfterLoad == rhs.releaseDataAfterLoad
+     );
+}
+
+bool Texture::operator != ( const Texture& rhs ) const{
+    return (
+        framebuffer != rhs.framebuffer ||
+        type != rhs.type ||
+        id != rhs.id ||
+        paths[0] != rhs.paths[0] ||
+        paths[1] != rhs.paths[1] ||
+        paths[2] != rhs.paths[2] ||
+        paths[3] != rhs.paths[3] ||
+        paths[4] != rhs.paths[4] ||
+        paths[5] != rhs.paths[5] ||
+        loadFromPath != rhs.loadFromPath ||
+        releaseDataAfterLoad != rhs.releaseDataAfterLoad
+    );
+}
+
 Texture::~Texture(){
 
 }
@@ -203,6 +235,10 @@ TextureRender* Texture::getRender(){
         return NULL;
 
     return &renderAndData->render;
+}
+
+std::string Texture::getPath(size_t index){
+    return paths[index];
 }
 
 TextureData& Texture::getData(size_t index){

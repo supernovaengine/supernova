@@ -5,6 +5,7 @@
 #ifndef BUTTON_COMPONENT_H
 #define BUTTON_COMPONENT_H
 
+#include "util/FunctionSubscribe.h"
 
 namespace Supernova{
 
@@ -14,6 +15,12 @@ namespace Supernova{
         Texture textureNormal;
         Texture texturePressed;
         Texture textureDisabled;
+
+        FunctionSubscribe<void()> onPress;
+        FunctionSubscribe<void()> onRelease;
+
+        bool pressed = false;
+        bool disabled = false;
 
         bool needUpdateButton = true;
     };

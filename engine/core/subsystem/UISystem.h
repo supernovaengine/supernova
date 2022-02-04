@@ -34,6 +34,7 @@ namespace Supernova{
 		void eventOnCharInput(wchar_t codepoint);
 		void eventOnMouseDown(int button, float x, float y, int mods);
 		void eventOnMouseUp(int button, float x, float y, int mods);
+		void eventOnMouseMove(float x, float y, int mods);
 		void eventOnTouchStart(int pointer, float x, float y);
 		void eventOnTouchEnd(int pointer, float x, float y);
 

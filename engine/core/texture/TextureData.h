@@ -27,6 +27,8 @@ namespace Supernova {
         TextureData(int width, int height, unsigned int size, ColorFormat color_format, int channels, void* data);
         TextureData(const TextureData& v);
         TextureData& operator = ( const TextureData& v );
+        bool operator == ( const TextureData& v ) const;
+        bool operator != ( const TextureData& v ) const;
         virtual ~TextureData();
         void copy(const TextureData& v);
         

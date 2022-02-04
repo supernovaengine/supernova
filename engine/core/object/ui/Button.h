@@ -23,6 +23,8 @@ namespace Supernova{
         void setTextureNormal(std::string path);
         void setTexturePressed(std::string path);
         void setTextureDisabled(std::string path);
+
+        void setDisabled(bool disabled);
     };
 }
 

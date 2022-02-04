@@ -73,3 +73,11 @@ void Button::setTextureDisabled(std::string path){
 
     btcomp.needUpdateButton = true;
 }
+
+void Button::setDisabled(bool disabled){
+    ButtonComponent& btcomp = getComponent<ButtonComponent>();
+
+    btcomp.disabled = disabled;
+
+    btcomp.needUpdateButton = true;
+}

@@ -6,6 +6,7 @@
 #include "render/ObjectRender.h"
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
+#include "util/FunctionSubscribe.h"
 
 namespace Supernova{
 
@@ -36,6 +37,9 @@ namespace Supernova{
 
         Texture texture;
         Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0); //linear color
+
+        FunctionSubscribe<void()> onMouseMove;
+        bool mouseMoved = false;
 
         bool needUpdateBuffer = false;
         bool needUpdateTexture = false;

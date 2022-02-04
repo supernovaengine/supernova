@@ -47,6 +47,32 @@ TextureData& TextureData::operator = ( const TextureData& v ){
     return *this;
 }
 
+bool TextureData::operator == ( const TextureData& v ) const{
+    return (
+        v.width == width &&
+        v.height == height &&
+        v.size == size &&
+        v.color_format == color_format &&
+        v.channels == channels &&
+        v.data == data &&
+        v.transparent == transparent &&
+        v.dataOwned == dataOwned
+    );
+}
+
+bool TextureData::operator != ( const TextureData& v ) const{
+    return (
+        v.width != width ||
+        v.height != height ||
+        v.size != size ||
+        v.color_format != color_format ||
+        v.channels != channels ||
+        v.data != data ||
+        v.transparent != transparent ||
+        v.dataOwned != dataOwned
+    );
+}
+
 bool TextureData::loadTextureFromFile(const char* filename) {
     
     Data filedata;

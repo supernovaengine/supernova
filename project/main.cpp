@@ -364,6 +364,10 @@ void onTouchMove(int pointer, float x, float y);
 void onTouchEnd(int pointer, float x, float y);
 void onTouchCancel();
 
+void onButtonPress();
+void onButtonRelease();
+void onButtonMouseMove();
+
 Scene scene;
 //Mesh child2(&scene);
 //Object objeto(&scene);
@@ -385,7 +389,9 @@ Image image(&uiscene);
 Image image2(&uiscene);
 Text label(&uiscene);
 Text text(&uiscene);
+Button uibutton2(&uiscene);
 Button uibutton(&uiscene);
+
 
 float rotationY = 0;
 float speed = 0;
@@ -456,12 +462,26 @@ void init(){
 
     uibutton.setTextureNormal("ui/Button_Normal.png");
     uibutton.setTexturePressed("ui/Button_Press.png");
+    uibutton.setTextureDisabled("ui/Button_Disable.png");
     uibutton.setMargin(5);
     //uibutton.setColor(1.0, 0.0,1.0, 1.0);
     uibutton.setLabel("Eduardo");
     uibutton.setLabelColor(0,0,0,1);
     uibutton.setSize(300,200);
     uibutton.setPosition(500,500,0);
+    //uibutton.setDisabled(true);
+    uibutton.getComponent<ButtonComponent>().onPress = onButtonPress;
+    uibutton.getComponent<ButtonComponent>().onRelease = onButtonRelease;
+    uibutton.getComponent<UIComponent>().onMouseMove = onButtonMouseMove;
+
+    uibutton2.setTextureNormal("ui/Button_Normal.png");
+    uibutton2.setTexturePressed("ui/Button_Press.png");
+    uibutton2.setTextureDisabled("ui/Button_Disable.png");
+    uibutton2.setMargin(5);
+    uibutton2.setLabel("Teste");
+    uibutton2.setLabelColor(0,0,0,1);
+    uibutton2.setSize(200,200);
+    uibutton2.setPosition(400,400,0);
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
     camera.setType(CameraType::CAMERA_PERSPECTIVE);
@@ -589,6 +609,19 @@ void onUpdate(){
     //camera.walkForward(-0.5);
 
     camera.setView(carro.getPosition());
+}
+
+void onButtonPress(){
+    Log::Verbose("Button pressed!!");
+}
+
+void onButtonRelease(){
+    Log::Verbose("Button released!!");
+    uibutton2.setDisabled(true);
+}
+
+void onButtonMouseMove(){
+    Log::Verbose("Button mouse move!!");
 }
 
 void onViewLoaded(){

@@ -24,6 +24,7 @@ UISystem::~UISystem(){
     Engine::onCharInput.remove(eventId);
     Engine::onMouseDown.remove(eventId);
     Engine::onMouseUp.remove(eventId);
+    Engine::onMouseMove.remove(eventId);
     Engine::onTouchStart.remove(eventId);
     Engine::onTouchEnd.remove(eventId);
 }
@@ -215,6 +216,12 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
 
     createButtonLabel(entity, button);
 
+    if (!ui.loaded){
+        button.textureNormal.load();
+        button.texturePressed.load();
+        button.textureDisabled.load();
+    }
+
     Transform& labeltransform = scene->getComponent<Transform>(button.label);
     TextComponent& labeltext = scene->getComponent<TextComponent>(button.label);
     UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
@@ -241,8 +248,24 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
         labeltransform.needUpdate = true;
     }
 
-    ui.texture = button.textureNormal;
-    ui.needUpdateTexture = true;
+    if (button.disabled){
+        if (ui.texture != button.textureDisabled){
+            ui.texture = button.textureDisabled;
+            ui.needUpdateTexture = true;
+        }
+    }else{
+        if (!button.pressed){
+            if (ui.texture != button.textureNormal){
+                ui.texture = button.textureNormal;
+                ui.needUpdateTexture = true;
+            }
+        }else{
+            if (ui.texture != button.texturePressed){
+                ui.texture = button.texturePressed;
+                ui.needUpdateTexture = true;
+            }
+        }
+    }
 }
 
 void UISystem::load(){
@@ -254,6 +277,7 @@ void UISystem::load(){
     Engine::onCharInput.add<UISystem, &UISystem::eventOnCharInput>(eventId, this);
     Engine::onMouseDown.add<UISystem, &UISystem::eventOnMouseDown>(eventId, this);
     Engine::onMouseUp.add<UISystem, &UISystem::eventOnMouseUp>(eventId, this);
+    Engine::onMouseMove.add<UISystem, &UISystem::eventOnMouseMove>(eventId, this);
     Engine::onTouchStart.add<UISystem, &UISystem::eventOnTouchStart>(eventId, this);
     Engine::onTouchEnd.add<UISystem, &UISystem::eventOnTouchEnd>(eventId, this);
 }
@@ -373,19 +397,23 @@ void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
             Transform& transform = scene->getComponent<Transform>(entity);
 
             if (isCoordInside(x, y, transform, ui)){
-                lastUI = i;
                 if (signature.test(scene->getComponentType<ButtonComponent>())){
-                    ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-
-                    ui.texture = button.texturePressed;
-                    ui.needUpdateTexture = true;
+                    lastUI = i;
                 }
             }
         }
     }
 
-    if (lastUI =! -1){
-
+    if (lastUI != -1){
+        UIComponent& ui = uis->getComponentFromIndex(lastUI);
+        Entity entity = uis->getEntity(lastUI);
+        ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+        if (!button.disabled){
+            ui.texture = button.texturePressed;
+            ui.needUpdateTexture = true;
+            button.onPress.call();
+            button.pressed = true;
+        }
     }
 }
 
@@ -396,16 +424,45 @@ void UISystem::eventOnMouseUp(int button, float x, float y, int mods){
 
         Entity entity = uis->getEntity(i);
         Signature signature = scene->getSignature(entity);
+        if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<ButtonComponent>())){
+            ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+            if (!button.disabled){
+                ui.texture = button.textureNormal;
+                ui.needUpdateTexture = true;
+                if (button.pressed){
+                    button.pressed = false;
+                    button.onRelease.call();
+                }
+            }
+        }
+    }
+}
+
+void UISystem::eventOnMouseMove(float x, float y, int mods){
+    auto uis = scene->getComponentArray<UIComponent>();
+    int lastUI = -1;
+
+    for (int i = 0; i < uis->size(); i++){
+        UIComponent& ui = uis->getComponentFromIndex(i);
+
+        Entity entity = uis->getEntity(i);
+        Signature signature = scene->getSignature(entity);
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
-            if (signature.test(scene->getComponentType<ButtonComponent>())){
-                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-
-                ui.texture = button.textureNormal;
-                ui.needUpdateTexture = true;
+            if ((!ui.mouseMoved) && isCoordInside(x, y, transform, ui)){
+                lastUI = i;
             }
         }
+
+        ui.mouseMoved = false;
+    }
+
+    if (lastUI != -1){
+        UIComponent& ui = uis->getComponentFromIndex(lastUI);
+
+        ui.onMouseMove.call();
+        ui.mouseMoved = true;
     }
 }
 
@@ -423,7 +480,7 @@ void UISystem::eventOnTouchEnd(int pointer, float x, float y){
 
 bool UISystem::isCoordInside(float x, float y, Transform& transform, UIComponent& ui){
     Vector3 point = transform.worldRotation.getRotationMatrix() * Vector3(x, y, 0);
-    Vector2 center(0, 0);
+    Vector2 center = Vector2(0, 0);
 
     if (point.x >= (transform.worldPosition.x - center.x) and
         point.x <= (transform.worldPosition.x - center.x + abs(ui.width * transform.worldScale.x)) and
