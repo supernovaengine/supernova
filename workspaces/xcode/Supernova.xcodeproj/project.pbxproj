@@ -145,6 +145,17 @@
 		713D8341259D408300567F9F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 713D8334259D407A00567F9F /* ViewController.m */; };
 		713D834E259D408800567F9F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 713D8335259D407A00567F9F /* main.m */; };
 		713D835B259D408C00567F9F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 713D8336259D407A00567F9F /* AppDelegate.m */; };
+		713E580627BA9CB700376680 /* MeshPolygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713E580427BA9CB700376680 /* MeshPolygon.cpp */; };
+		713E580727BA9CB700376680 /* MeshPolygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713E580427BA9CB700376680 /* MeshPolygon.cpp */; };
+		713E580827BA9CB700376680 /* MeshPolygon.h in Headers */ = {isa = PBXBuildFile; fileRef = 713E580527BA9CB700376680 /* MeshPolygon.h */; };
+		713E580D27BA9CE400376680 /* TextEdit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713E580927BA9CE400376680 /* TextEdit.cpp */; };
+		713E580E27BA9CE400376680 /* TextEdit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713E580927BA9CE400376680 /* TextEdit.cpp */; };
+		713E580F27BA9CE400376680 /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713E580A27BA9CE400376680 /* Polygon.cpp */; };
+		713E581027BA9CE400376680 /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 713E580A27BA9CE400376680 /* Polygon.cpp */; };
+		713E581127BA9CE400376680 /* TextEdit.h in Headers */ = {isa = PBXBuildFile; fileRef = 713E580B27BA9CE400376680 /* TextEdit.h */; };
+		713E581227BA9CE400376680 /* Polygon.h in Headers */ = {isa = PBXBuildFile; fileRef = 713E580C27BA9CE400376680 /* Polygon.h */; };
+		713E581527BA9D1300376680 /* PolygonComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 713E581327BA9D1300376680 /* PolygonComponent.h */; };
+		713E581627BA9D1300376680 /* TextEditComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 713E581427BA9D1300376680 /* TextEditComponent.h */; };
 		71451BBE270CA16200712643 /* ActionSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BBC270CA16200712643 /* ActionSystem.cpp */; };
 		71451BBF270CA16200712643 /* ActionSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BBC270CA16200712643 /* ActionSystem.cpp */; };
 		71451BC0270CA16200712643 /* ActionSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BBD270CA16200712643 /* ActionSystem.h */; };
@@ -239,9 +250,6 @@
 		71ABBD2A277A3210001CE3AF /* STBText.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD26277A3210001CE3AF /* STBText.cpp */; };
 		71ABBD2B277A3210001CE3AF /* STBText.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD27277A3210001CE3AF /* STBText.h */; };
 		71ABBD2C277A3210001CE3AF /* DefaultFont.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD28277A3210001CE3AF /* DefaultFont.h */; };
-		71ABBD2F2783C8A7001CE3AF /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD2D2783C8A7001CE3AF /* Polygon.cpp */; };
-		71ABBD302783C8A7001CE3AF /* Polygon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD2D2783C8A7001CE3AF /* Polygon.cpp */; };
-		71ABBD312783C8A7001CE3AF /* Polygon.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD2E2783C8A7001CE3AF /* Polygon.h */; };
 		71ABBD342783C8BB001CE3AF /* Image.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD322783C8BA001CE3AF /* Image.h */; };
 		71ABBD352783C8BB001CE3AF /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD332783C8BB001CE3AF /* Image.cpp */; };
 		71ABBD362783C8BB001CE3AF /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD332783C8BB001CE3AF /* Image.cpp */; };
@@ -542,6 +550,14 @@
 		713D8335259D407A00567F9F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		713D8336259D407A00567F9F /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		713D8337259D407A00567F9F /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		713E580427BA9CB700376680 /* MeshPolygon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MeshPolygon.cpp; sourceTree = "<group>"; };
+		713E580527BA9CB700376680 /* MeshPolygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshPolygon.h; sourceTree = "<group>"; };
+		713E580927BA9CE400376680 /* TextEdit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextEdit.cpp; sourceTree = "<group>"; };
+		713E580A27BA9CE400376680 /* Polygon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Polygon.cpp; sourceTree = "<group>"; };
+		713E580B27BA9CE400376680 /* TextEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextEdit.h; sourceTree = "<group>"; };
+		713E580C27BA9CE400376680 /* Polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Polygon.h; sourceTree = "<group>"; };
+		713E581327BA9D1300376680 /* PolygonComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolygonComponent.h; sourceTree = "<group>"; };
+		713E581427BA9D1300376680 /* TextEditComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextEditComponent.h; sourceTree = "<group>"; };
 		71451BB2270C9D0F00712643 /* SpriteComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpriteComponent.h; sourceTree = "<group>"; };
 		71451BB3270C9D0F00712643 /* ColorActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorActionComponent.h; sourceTree = "<group>"; };
 		71451BB4270C9D0F00712643 /* ActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ActionComponent.h; sourceTree = "<group>"; };
@@ -691,8 +707,6 @@
 		71ABBD26277A3210001CE3AF /* STBText.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = STBText.cpp; sourceTree = "<group>"; };
 		71ABBD27277A3210001CE3AF /* STBText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STBText.h; sourceTree = "<group>"; };
 		71ABBD28277A3210001CE3AF /* DefaultFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultFont.h; sourceTree = "<group>"; };
-		71ABBD2D2783C8A7001CE3AF /* Polygon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Polygon.cpp; sourceTree = "<group>"; };
-		71ABBD2E2783C8A7001CE3AF /* Polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Polygon.h; sourceTree = "<group>"; };
 		71ABBD322783C8BA001CE3AF /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
 		71ABBD332783C8BB001CE3AF /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Image.cpp; sourceTree = "<group>"; };
 		71ABBD372791167A001CE3AF /* ImageComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageComponent.h; sourceTree = "<group>"; };
@@ -1147,9 +1161,10 @@
 				71ABBD372791167A001CE3AF /* ImageComponent.h */,
 				71CC839226B8C49B00EEBB93 /* LightComponent.h */,
 				7162FC4525962A0E0075B97D /* MeshComponent.h */,
+				71ABBD3E27A879B9001CE3AF /* MeshPolygonComponent.h */,
 				717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */,
 				714BBF7127148B69004A15EE /* ParticlesComponent.h */,
-				71ABBD3E27A879B9001CE3AF /* MeshPolygonComponent.h */,
+				713E581327BA9D1300376680 /* PolygonComponent.h */,
 				71451BB5270C9D0F00712643 /* PositionActionComponent.h */,
 				71451BBB270C9D1000712643 /* RotationActionComponent.h */,
 				71451BB8270C9D0F00712643 /* ScaleActionComponent.h */,
@@ -1157,6 +1172,7 @@
 				71451BB7270C9D0F00712643 /* SpriteAnimationComponent.h */,
 				71451BB2270C9D0F00712643 /* SpriteComponent.h */,
 				71ABBD11277A3166001CE3AF /* TextComponent.h */,
+				713E581427BA9D1300376680 /* TextEditComponent.h */,
 				71451BB9270C9D0F00712643 /* TimedActionComponent.h */,
 				7162FC4725962A0E0075B97D /* Transform.h */,
 				71451BB6270C9D0F00712643 /* UIComponent.h */,
@@ -1204,6 +1220,8 @@
 				71CC839426B8C4D800EEBB93 /* Light.h */,
 				71E36B5425D5994100EFEED4 /* Mesh.cpp */,
 				71E36B5525D5994100EFEED4 /* Mesh.h */,
+				713E580427BA9CB700376680 /* MeshPolygon.cpp */,
+				713E580527BA9CB700376680 /* MeshPolygon.h */,
 				71E36B5325D5994100EFEED4 /* Model.cpp */,
 				71E36B5225D5994100EFEED4 /* Model.h */,
 				7162FC6625962A0E0075B97D /* Object.cpp */,
@@ -1212,8 +1230,6 @@
 				714BBF7327148B84004A15EE /* Particles.h */,
 				71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */,
 				71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */,
-				71ABBD2D2783C8A7001CE3AF /* Polygon.cpp */,
-				71ABBD2E2783C8A7001CE3AF /* Polygon.h */,
 				71F97A89262D1D5900CD6F2B /* SkyBox.cpp */,
 				71F97A88262D1D5900CD6F2B /* SkyBox.h */,
 				71451BE7270CA2C900712643 /* Sprite.cpp */,
@@ -1382,8 +1398,12 @@
 				71ABBD4327A879D4001CE3AF /* Button.h */,
 				71ABBD332783C8BB001CE3AF /* Image.cpp */,
 				71ABBD322783C8BA001CE3AF /* Image.h */,
+				713E580A27BA9CE400376680 /* Polygon.cpp */,
+				713E580C27BA9CE400376680 /* Polygon.h */,
 				71ABBD18277A31BA001CE3AF /* Text.cpp */,
 				71ABBD19277A31BA001CE3AF /* Text.h */,
+				713E580927BA9CE400376680 /* TextEdit.cpp */,
+				713E580B27BA9CE400376680 /* TextEdit.h */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -1608,6 +1628,7 @@
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
 				71F97AAF262D1D8000CD6F2B /* Color.h in Headers */,
 				71451BF3270CA3EA00712643 /* Material.h in Headers */,
+				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
 				71ABBD4127A879B9001CE3AF /* ButtonComponent.h in Headers */,
 				71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */,
 				71ABBD382791167A001CE3AF /* ImageComponent.h in Headers */,
@@ -1623,6 +1644,7 @@
 				717D9B4127337850002C0803 /* ParticlesAnimationComponent.h in Headers */,
 				71CC839A26B8C4FD00EEBB93 /* FramebufferRender.h in Headers */,
 				71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */,
+				713E581227BA9CE400376680 /* Polygon.h in Headers */,
 				71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */,
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
 				71451BF0270CA2C900712643 /* Sprite.h in Headers */,
@@ -1630,7 +1652,6 @@
 				717D9B462733788C002C0803 /* sol.hpp in Headers */,
 				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,
 				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
-				71ABBD312783C8A7001CE3AF /* Polygon.h in Headers */,
 				717D9B482733788C002C0803 /* forward.hpp in Headers */,
 				71BE622225B1DB83006D6E02 /* TextureData.h in Headers */,
 				71ABBD342783C8BB001CE3AF /* Image.h in Headers */,
@@ -1639,13 +1660,16 @@
 				71ABBD2C277A3210001CE3AF /* DefaultFont.h in Headers */,
 				71ABBD14277A3166001CE3AF /* AlphaActionComponent.h in Headers */,
 				71451BF4270CA3EA00712643 /* FrameData.h in Headers */,
+				713E580827BA9CB700376680 /* MeshPolygon.h in Headers */,
 				71ABBD23277A31E6001CE3AF /* UISystem.h in Headers */,
 				71ABBD4027A879B9001CE3AF /* MeshPolygonComponent.h in Headers */,
 				71BE621425B1DB37006D6E02 /* Function.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
+				713E581627BA9D1300376680 /* TextEditComponent.h in Headers */,
 				71BE624625B1DB9E006D6E02 /* ShaderPool.h in Headers */,
 				71BE623F25B1DB9E006D6E02 /* LuaBinding.h in Headers */,
 				717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */,
+				713E581127BA9CE400376680 /* TextEdit.h in Headers */,
 				71CC83A426B8C54A00EEBB93 /* ShaderData.h in Headers */,
 				71451BC0270CA16200712643 /* ActionSystem.h in Headers */,
 				71ABBD4627A879D4001CE3AF /* Button.h in Headers */,
@@ -2145,6 +2169,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				713D8304259D34F900567F9F /* Ray.cpp in Sources */,
+				713E581027BA9CE400376680 /* Polygon.cpp in Sources */,
 				71F97AB1262D1D8000CD6F2B /* Color.cpp in Sources */,
 				713D8292259D307E00567F9F /* Log.cpp in Sources */,
 				71451BDD270CA17F00712643 /* RotationAction.cpp in Sources */,
@@ -2184,12 +2209,13 @@
 				713D82A2259D307F00567F9F /* Rect.cpp in Sources */,
 				713D82A3259D307F00567F9F /* Quaternion.cpp in Sources */,
 				713D82A4259D307F00567F9F /* AlignedBox.cpp in Sources */,
+				713E580E27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AF25BB18DC00965B51 /* StringUtils.cpp in Sources */,
 				713D82A5259D307F00567F9F /* Plane.cpp in Sources */,
-				71ABBD302783C8A7001CE3AF /* Polygon.cpp in Sources */,
 				71CC83A326B8C54A00EEBB93 /* SBSReader.cpp in Sources */,
 				713D82A6259D307F00567F9F /* Angle.cpp in Sources */,
 				71F97A8F262D1D5900CD6F2B /* SkyBox.cpp in Sources */,
+				713E580727BA9CB700376680 /* MeshPolygon.cpp in Sources */,
 				71BE624425B1DB9E006D6E02 /* ShaderPool.cpp in Sources */,
 				71BE622125B1DB83006D6E02 /* TextureData.cpp in Sources */,
 				713D82A8259D307F00567F9F /* Camera.cpp in Sources */,
@@ -2267,6 +2293,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7162FE0C2596A5BE0075B97D /* SokolObject.cpp in Sources */,
+				713E580F27BA9CE400376680 /* Polygon.cpp in Sources */,
 				71F97AB0262D1D8000CD6F2B /* Color.cpp in Sources */,
 				7162FE0D2596A5BE0075B97D /* SokolBuffer.cpp in Sources */,
 				71451BDC270CA17F00712643 /* RotationAction.cpp in Sources */,
@@ -2306,12 +2333,13 @@
 				7162FD2D25963AE00075B97D /* Vector2.cpp in Sources */,
 				7162FD2E25963AE00075B97D /* Matrix4.cpp in Sources */,
 				7162FD3125963AE00075B97D /* Ray.cpp in Sources */,
+				713E580D27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AE25BB18DC00965B51 /* StringUtils.cpp in Sources */,
 				7162FD3225963AE00075B97D /* Matrix3.cpp in Sources */,
-				71ABBD2F2783C8A7001CE3AF /* Polygon.cpp in Sources */,
 				71CC83A226B8C54A00EEBB93 /* SBSReader.cpp in Sources */,
 				7162FD3725963AE00075B97D /* Rect.cpp in Sources */,
 				71F97A8E262D1D5900CD6F2B /* SkyBox.cpp in Sources */,
+				713E580627BA9CB700376680 /* MeshPolygon.cpp in Sources */,
 				71BE624325B1DB9E006D6E02 /* ShaderPool.cpp in Sources */,
 				71BE622025B1DB83006D6E02 /* TextureData.cpp in Sources */,
 				7162FD3925963AE00075B97D /* Quaternion.cpp in Sources */,
