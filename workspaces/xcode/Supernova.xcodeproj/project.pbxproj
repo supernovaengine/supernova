@@ -249,7 +249,7 @@
 		71ABBD3B279116E1001CE3AF /* UniqueToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD39279116E1001CE3AF /* UniqueToken.cpp */; };
 		71ABBD3C279116E1001CE3AF /* UniqueToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD39279116E1001CE3AF /* UniqueToken.cpp */; };
 		71ABBD3D279116E1001CE3AF /* UniqueToken.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD3A279116E1001CE3AF /* UniqueToken.h */; };
-		71ABBD4027A879B9001CE3AF /* PolygonComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD3E27A879B9001CE3AF /* PolygonComponent.h */; };
+		71ABBD4027A879B9001CE3AF /* MeshPolygonComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD3E27A879B9001CE3AF /* MeshPolygonComponent.h */; };
 		71ABBD4127A879B9001CE3AF /* ButtonComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD3F27A879B9001CE3AF /* ButtonComponent.h */; };
 		71ABBD4427A879D4001CE3AF /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD4227A879D4001CE3AF /* Button.cpp */; };
 		71ABBD4527A879D4001CE3AF /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD4227A879D4001CE3AF /* Button.cpp */; };
@@ -698,7 +698,7 @@
 		71ABBD372791167A001CE3AF /* ImageComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageComponent.h; sourceTree = "<group>"; };
 		71ABBD39279116E1001CE3AF /* UniqueToken.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UniqueToken.cpp; sourceTree = "<group>"; };
 		71ABBD3A279116E1001CE3AF /* UniqueToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UniqueToken.h; sourceTree = "<group>"; };
-		71ABBD3E27A879B9001CE3AF /* PolygonComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolygonComponent.h; sourceTree = "<group>"; };
+		71ABBD3E27A879B9001CE3AF /* MeshPolygonComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshPolygonComponent.h; sourceTree = "<group>"; };
 		71ABBD3F27A879B9001CE3AF /* ButtonComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ButtonComponent.h; sourceTree = "<group>"; };
 		71ABBD4227A879D4001CE3AF /* Button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Button.cpp; sourceTree = "<group>"; };
 		71ABBD4327A879D4001CE3AF /* Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Button.h; sourceTree = "<group>"; };
@@ -1149,7 +1149,7 @@
 				7162FC4525962A0E0075B97D /* MeshComponent.h */,
 				717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */,
 				714BBF7127148B69004A15EE /* ParticlesComponent.h */,
-				71ABBD3E27A879B9001CE3AF /* PolygonComponent.h */,
+				71ABBD3E27A879B9001CE3AF /* MeshPolygonComponent.h */,
 				71451BB5270C9D0F00712643 /* PositionActionComponent.h */,
 				71451BBB270C9D1000712643 /* RotationActionComponent.h */,
 				71451BB8270C9D0F00712643 /* ScaleActionComponent.h */,
@@ -1640,7 +1640,7 @@
 				71ABBD14277A3166001CE3AF /* AlphaActionComponent.h in Headers */,
 				71451BF4270CA3EA00712643 /* FrameData.h in Headers */,
 				71ABBD23277A31E6001CE3AF /* UISystem.h in Headers */,
-				71ABBD4027A879B9001CE3AF /* PolygonComponent.h in Headers */,
+				71ABBD4027A879B9001CE3AF /* MeshPolygonComponent.h in Headers */,
 				71BE621425B1DB37006D6E02 /* Function.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
 				71BE624625B1DB9E006D6E02 /* ShaderPool.h in Headers */,

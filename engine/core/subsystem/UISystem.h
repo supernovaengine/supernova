@@ -11,6 +11,8 @@
 #include "component/TextComponent.h"
 #include "component/ImageComponent.h"
 #include "component/ButtonComponent.h"
+#include "component/PolygonComponent.h"
+#include "component/TextEditComponent.h"
 #include "component/Transform.h"
 
 namespace Supernova{
@@ -31,6 +33,9 @@ namespace Supernova{
 		//Button
 		void updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui);
 
+		//UI Polygon
+		void createUIPolygon(PolygonComponent& polygon, UIComponent& ui);
+
 		void eventOnCharInput(wchar_t codepoint);
 		void eventOnMouseDown(int button, float x, float y, int mods);
 		void eventOnMouseUp(int button, float x, float y, int mods);
@@ -45,6 +50,7 @@ namespace Supernova{
 		virtual ~UISystem();
 
 		void createButtonLabel(Entity entity, ButtonComponent& button);
+		void createTextEditObjects(Entity entity, TextEditComponent& button);
 
 		virtual void load();
 		virtual void update(double dt);

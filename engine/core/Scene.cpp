@@ -31,6 +31,8 @@ Scene::Scene(){
 	registerComponent<TextComponent>();
 	registerComponent<ImageComponent>();
 	registerComponent<ButtonComponent>();
+	registerComponent<TextEditComponent>();
+	registerComponent<MeshPolygonComponent>();
 	registerComponent<PolygonComponent>();
 
 	registerSystem<RenderSystem>();

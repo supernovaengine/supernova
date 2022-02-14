@@ -119,13 +119,14 @@ void onKeyDown(int key, bool repeat, int mods){
 }
 */
 
-/*
+
 #include "Supernova.h"
 using namespace Supernova;
 
 #include "Sprite.h"
 #include "Camera.h"
 #include "Polygon.h"
+#include "MeshPolygon.h"
 #include "Input.h"
 #include "Angle.h"
 #include "SpriteAnimation.h"
@@ -143,8 +144,8 @@ Scene scene;
 //Camera camera(&scene);
 
 Polygon polygonroot(&scene);
-Polygon polygon(&scene);
-Polygon polygon2(&scene);
+MeshPolygon polygon(&scene);
+MeshPolygon polygon2(&scene);
 Polygon polygon3(&scene);
 Sprite sprite(&scene);
 SpriteAnimation spriteanim(&scene);
@@ -326,9 +327,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
-*/
 
 
+/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -782,3 +783,4 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
+*/

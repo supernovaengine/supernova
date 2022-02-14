@@ -2,16 +2,16 @@
 // (c) 2022 Eduardo Doria.
 //
 
-#ifndef POLYGON_H
-#define POLYGON_H
+#ifndef MESHPOLYGON_H
+#define MESHPOLYGON_H
 
 #include "Mesh.h"
 
 namespace Supernova{
-    class Polygon: public Mesh{
+    class MeshPolygon: public Mesh{
 
     public:
-        Polygon(Scene* scene);
+        MeshPolygon(Scene* scene);
 
         void addVertex(Vector3 vertex);
         void addVertex(float x, float y);
@@ -23,4 +23,4 @@ namespace Supernova{
     };
 }
 
-#endif //POLYGON_H
+#endif //MESHPOLYGON_H

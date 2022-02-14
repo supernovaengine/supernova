@@ -268,6 +268,62 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
     }
 }
 
+void UISystem::createTextEditObjects(Entity entity, TextEditComponent& button){
+    // Label and cursor
+}
+
+void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui){
+
+    ui.primitiveType = PrimitiveType::TRIANGLE_STRIP;
+
+    ui.buffer.clearAll();
+	ui.buffer.addAttribute(AttributeType::POSITION, 3);
+	ui.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    ui.buffer.addAttribute(AttributeType::COLOR, 4);
+    ui.buffer.setUsage(BufferUsage::DYNAMIC);
+
+    ui.indices.clear();
+
+    for (int i = 0; i < polygon.points.size(); i++){
+        ui.buffer.addVector3(AttributeType::POSITION, polygon.points[i].position);
+        ui.buffer.addVector3(AttributeType::NORMAL, Vector3(0.0f, 0.0f, 1.0f));
+        ui.buffer.addVector4(AttributeType::COLOR, polygon.points[i].color);
+    }
+
+    // Generation texcoords
+    float min_X = std::numeric_limits<float>::max();
+    float max_X = std::numeric_limits<float>::min();
+    float min_Y = std::numeric_limits<float>::max();
+    float max_Y = std::numeric_limits<float>::min();
+
+    Attribute* attVertex = ui.buffer.getAttribute(AttributeType::POSITION);
+
+    for (unsigned int i = 0; i < ui.buffer.getCount(); i++){
+        min_X = fmin(min_X, ui.buffer.getFloat(attVertex, i, 0));
+        min_Y = fmin(min_Y, ui.buffer.getFloat(attVertex, i, 1));
+        max_X = fmax(max_X, ui.buffer.getFloat(attVertex, i, 0));
+        max_Y = fmax(max_Y, ui.buffer.getFloat(attVertex, i, 1));
+    }
+
+    double k_X = 1/(max_X - min_X);
+    double k_Y = 1/(max_Y - min_Y);
+
+    float u = 0;
+    float v = 0;
+
+    for ( unsigned int i = 0; i < ui.buffer.getCount(); i++){
+        u = (ui.buffer.getFloat(attVertex, i, 0) - min_X) * k_X;
+        v = (ui.buffer.getFloat(attVertex, i, 1) - min_Y) * k_Y;
+
+        ui.buffer.addVector2(AttributeType::TEXCOORD1, Vector2(u, v));
+    }
+
+    ui.width = (int)(max_X - min_X);
+    ui.height = (int)(max_Y - min_Y);
+
+    ui.needUpdateBuffer = true;
+}
+
 void UISystem::load(){
     if (eventId.empty()){
         eventId = "UIObject|" + UniqueToken::get();
@@ -357,6 +413,25 @@ void UISystem::update(double dt){
         }
 
         img.needUpdate = false;
+    }
+
+    //UI Polygons
+    auto polygons = scene->getComponentArray<PolygonComponent>();
+    for (int i = 0; i < polygons->size(); i++){
+        PolygonComponent& polygon = polygons->getComponentFromIndex(i);
+
+        if (polygon.needUpdatePolygon){
+            Entity entity = polygons->getEntity(i);
+            Signature signature = scene->getSignature(entity);
+
+            if (signature.test(scene->getComponentType<UIComponent>())){
+                UIComponent& ui = scene->getComponent<UIComponent>(entity);
+
+                createUIPolygon(polygon, ui);
+            }
+        }
+
+        polygon.needUpdatePolygon = false;
     }
 }
 

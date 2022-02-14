@@ -3,46 +3,46 @@
 //
 
 
-#include "Polygon.h"
+#include "MeshPolygon.h"
 
 #include "Engine.h"
-#include "component/PolygonComponent.h"
+#include "component/MeshPolygonComponent.h"
 
 using namespace Supernova;
 
-Polygon::Polygon(Scene* scene): Mesh(scene){
-    addComponent<PolygonComponent>({});
+MeshPolygon::MeshPolygon(Scene* scene): Mesh(scene){
+    addComponent<MeshPolygonComponent>({});
 
     MeshComponent& mesh = getComponent<MeshComponent>();
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;
 }
 
-void Polygon::addVertex(Vector3 vertex){
-    PolygonComponent& pcomp = getComponent<PolygonComponent>();
+void MeshPolygon::addVertex(Vector3 vertex){
+    MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
 
     pcomp.points.push_back({vertex, Vector4(1.0f, 1.0f, 1.0f, 1.0f)});
 
     pcomp.needUpdatePolygon = true;
 }
 
-void Polygon::addVertex(float x, float y){
+void MeshPolygon::addVertex(float x, float y){
    addVertex(Vector3(x, y, 0));
 }
 
-int Polygon::getWidth(){
-    PolygonComponent& pcomp = getComponent<PolygonComponent>();
+int MeshPolygon::getWidth(){
+    MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
 
     return pcomp.width;
 }
 
-int Polygon::getHeight(){
-    PolygonComponent& pcomp = getComponent<PolygonComponent>();
+int MeshPolygon::getHeight(){
+    MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
 
     return pcomp.height;
 }
 
-void Polygon::setFlipY(bool flipY){
-    PolygonComponent& pcomp = getComponent<PolygonComponent>();
+void MeshPolygon::setFlipY(bool flipY){
+    MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
 
     if (!Engine::isAutomaticFlipY()){
         if (pcomp.flipY != flipY){

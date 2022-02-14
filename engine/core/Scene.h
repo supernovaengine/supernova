@@ -27,6 +27,8 @@
 #include "component/TextComponent.h"
 #include "component/ImageComponent.h"
 #include "component/ButtonComponent.h"
+#include "component/TextEditComponent.h"
+#include "component/MeshPolygonComponent.h"
 #include "component/PolygonComponent.h"
 
 namespace Supernova{

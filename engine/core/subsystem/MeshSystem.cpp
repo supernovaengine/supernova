@@ -76,7 +76,7 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh){
     mesh.needUpdateBuffer = true;
 }
 
-void MeshSystem::createPolygon(PolygonComponent& polygon, MeshComponent& mesh){
+void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
     Buffer* buffer = mesh.buffers["vertices"];
 
     buffer->clear();
@@ -164,9 +164,9 @@ void MeshSystem::update(double dt){
         }
     }
 
-    auto polygons = scene->getComponentArray<PolygonComponent>();
+    auto polygons = scene->getComponentArray<MeshPolygonComponent>();
     for (int i = 0; i < polygons->size(); i++){
-		PolygonComponent& polygon = polygons->getComponentFromIndex(i);
+		MeshPolygonComponent& polygon = polygons->getComponentFromIndex(i);
 
         if (polygon.needUpdatePolygon){
             Entity entity = polygons->getEntity(i);
@@ -178,7 +178,7 @@ void MeshSystem::update(double dt){
                 CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
                 changeFlipY(polygon.flipY, camera, mesh);
 
-                createPolygon(polygon, mesh);
+                createMeshPolygon(polygon, mesh);
             }
 
             polygon.needUpdatePolygon = false;

@@ -5,23 +5,15 @@
 #ifndef POLYGON_COMPONENT_H
 #define POLYGON_COMPONENT_H
 
-#include "math/Vector3.h"
-#include "math/Vector4.h"
-
 namespace Supernova{
 
-    struct Point{
+    struct PolygonPoint{
         Vector3 position;
         Vector4 color;
     };
 
     struct PolygonComponent{
-        std::vector<Point> points;
-
-        int width = 0;
-        int height = 0;
-
-        bool flipY = false;
+        std::vector<PolygonPoint> points;
 
         bool needUpdatePolygon = true;
     };
