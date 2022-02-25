@@ -196,14 +196,17 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>
             offsetY += lineHeight;
             offsetX = 0;
             lineCount++;
+
+            continue;
         }
 
         //When char is not in bitmap
         if (intchar < firstChar || intchar > lastChar) {
-            if (firstChar <= 127 && lastChar >= 127)
-                intchar = 127;
-            else
-                intchar = firstChar;
+            //if (firstChar <= 127 && lastChar >= 127)
+            //    intchar = 127;
+            //else
+            //    intchar = firstChar;
+            continue;
         }
 
         stbtt_aligned_quad quad;

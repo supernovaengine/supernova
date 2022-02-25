@@ -12,7 +12,7 @@ namespace Supernova{
     };
 
     struct ActionComponent{
-        Entity target;
+        Entity target = NULL_ENTITY;
         ActionState state = ActionState::Stopped;
 
         bool startTrigger = false;

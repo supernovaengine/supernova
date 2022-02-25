@@ -119,7 +119,7 @@ void onKeyDown(int key, bool repeat, int mods){
 }
 */
 
-
+/*
 #include "Supernova.h"
 using namespace Supernova;
 
@@ -327,9 +327,9 @@ void onKeyDown(int key, bool repeat, int mods){
         //sprite.stopAnimation();
     }
 }
+*/
 
 
-/*
 #include "Supernova.h"
 #include "Mesh.h"
 #include "Object.h"
@@ -346,6 +346,7 @@ void onKeyDown(int key, bool repeat, int mods){
 #include "Text.h"
 #include "Image.h"
 #include "Button.h"
+#include "TextEdit.h"
 
 using namespace Supernova;
 
@@ -392,6 +393,7 @@ Text label(&uiscene);
 Text text(&uiscene);
 Button uibutton2(&uiscene);
 Button uibutton(&uiscene);
+TextEdit textedit(&uiscene);
 
 
 float rotationY = 0;
@@ -466,8 +468,7 @@ void init(){
     uibutton.setTextureDisabled("ui/Button_Disable.png");
     uibutton.setMargin(5);
     //uibutton.setColor(1.0, 0.0,1.0, 1.0);
-    uibutton.setLabel("Eduardo");
-    uibutton.setLabelColor(0,0,0,1);
+    uibutton.setLabel("Eduardooooooo000o2");
     uibutton.setSize(300,200);
     uibutton.setPosition(500,500,0);
     //uibutton.setDisabled(true);
@@ -480,9 +481,15 @@ void init(){
     uibutton2.setTextureDisabled("ui/Button_Disable.png");
     uibutton2.setMargin(5);
     uibutton2.setLabel("Teste");
-    uibutton2.setLabelColor(0,0,0,1);
     uibutton2.setSize(200,200);
     uibutton2.setPosition(400,400,0);
+
+    textedit.setTexture("ui/Button_Disable.png");
+    textedit.setMargin(5);
+    textedit.setPosition(500,300,0);
+    textedit.setSize(200,80);
+    textedit.setText("oii");
+    //textedit.setTextColor(Vector4(0,0,0,1));
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
     camera.setType(CameraType::CAMERA_PERSPECTIVE);
@@ -574,7 +581,7 @@ void init(){
 }
 
 void onUpdate(){
-    text.setText(std::to_string(Engine::getFramerate()));
+    //text.setText(std::to_string(Engine::getFramerate()));
 
     if (Input::isKeyPressed(S_KEY_LEFT)){
         rotationY += 4;
@@ -783,4 +790,3 @@ void onKeyUp(int key, bool repeat, int mods){
     
     Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
-*/

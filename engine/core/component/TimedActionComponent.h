@@ -6,13 +6,13 @@
 namespace Supernova{
 
     struct TimedActionComponent{
-        float timecount;
+        float timecount = 0;
+
+        float time = 0;
+        float value = 0;
         
-        float duration;
-        bool loop;
-        
-        float time;
-        float value;
+        float duration = 0;
+        bool loop = false;
 
         Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
     };

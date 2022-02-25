@@ -14,6 +14,14 @@ namespace Supernova{
         TextEdit(Scene* scene);
 
         void setDisabled(bool disabled);
+
+
+        void setText(std::string text);
+        std::string getText();
+
+        void setTextColor(Vector4 color);
+        void setTextColor(float red, float green, float blue, float alpha);
+        Vector4 getTextColor();
     };
 }
 

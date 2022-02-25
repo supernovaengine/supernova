@@ -23,6 +23,8 @@ namespace Supernova{
         Matrix4 normalMatrix;
         Matrix4 modelViewProjectionMatrix;
 
+        bool visible = true;
+
         Entity parent = NULL_ENTITY;
 
         float distanceToCamera = 0;

@@ -10,6 +10,9 @@ Button::Button(Scene* scene): Image(scene){
 
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     scene->getSystem<UISystem>()->createButtonLabel(entity, btcomp);
+
+    UIComponent& uilabel = scene->getComponent<UIComponent>(btcomp.label);
+    uilabel.color = Vector4(0.0, 0.0, 0.0, 1.0);
 }
 
 void Button::setLabel(std::string text){
@@ -56,6 +59,8 @@ void Button::setTextureNormal(std::string path){
     btcomp.textureNormal.setPath(path);
 
     btcomp.needUpdateButton = true;
+
+    setTexture(path);
 }
 
 void Button::setTexturePressed(std::string path){

@@ -667,6 +667,9 @@ bool RenderSystem::loadUI(UIComponent& ui, bool isText){
 	if (minBufferSize > bufferSize)
 		bufferSize = minBufferSize;
 
+	if (bufferSize == 0)
+		return false;
+
 	ui.buffer.getRender()->createBuffer(bufferSize, ui.buffer.getData(), ui.buffer.getType(), ui.buffer.getUsage());
 	if (ui.buffer.isRenderAttributes()) {
         for (auto const &attr : ui.buffer.getAttributes()) {
@@ -1472,7 +1475,8 @@ void RenderSystem::draw(){
 							if (!mesh.loaded){
 								loadMesh(mesh);
 							}
-							drawMeshDepth(mesh, light.cameras[c].lightViewProjectionMatrix * transform->modelMatrix);
+							if (transform->visible)
+								drawMeshDepth(mesh, light.cameras[c].lightViewProjectionMatrix * transform->modelMatrix);
 						}
 					}
 					depthRender.endFrameBuffer();
@@ -1509,11 +1513,13 @@ void RenderSystem::draw(){
 			if (!mesh.loaded){
 				loadMesh(mesh);
 			}
-			if (!mesh.transparency || camera.type == CameraType::CAMERA_2D){
-				//Draw opaque meshes if 3D camera
-				drawMesh(mesh, transform, cameraTransform);
-			}else{
-				transparentMeshes.push({&mesh, &transform, transform.distanceToCamera});
+			if (transform.visible){
+				if (!mesh.transparency || camera.type == CameraType::CAMERA_2D){
+					//Draw opaque meshes if 3D camera
+					drawMesh(mesh, transform, cameraTransform);
+				}else{
+					transparentMeshes.push({&mesh, &transform, transform.distanceToCamera});
+				}
 			}
 
 		}else if (signature.test(scene->getComponentType<UIComponent>())){
@@ -1535,7 +1541,8 @@ void RenderSystem::draw(){
 			if (!ui.loaded){
 				loadUI(ui, isText);
 			}
-			drawUI(ui, transform);
+			if (transform.visible)
+				drawUI(ui, transform);
 
 			if (signature.test(scene->getComponentType<ImageComponent>())){
 				ImageComponent& img = scene->getComponent<ImageComponent>(entity);
@@ -1554,7 +1561,8 @@ void RenderSystem::draw(){
 			if (!particles.loaded){
 				loadParticles(particles);
 			}
-			drawParticles(particles, transform, cameraTransform);
+			if (transform.visible)
+				drawParticles(particles, transform, cameraTransform);
 
 		}
 	}

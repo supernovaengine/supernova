@@ -33,6 +33,10 @@ namespace Supernova{
 		//Button
 		void updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui);
 
+		//TextEdit
+		void updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui);
+		void blinkCursorTextEdit(double dt, TextEditComponent& textedit, UIComponent& ui);
+
 		//UI Polygon
 		void createUIPolygon(PolygonComponent& polygon, UIComponent& ui);
 
@@ -50,7 +54,7 @@ namespace Supernova{
 		virtual ~UISystem();
 
 		void createButtonLabel(Entity entity, ButtonComponent& button);
-		void createTextEditObjects(Entity entity, TextEditComponent& button);
+		void createTextEditObjects(Entity entity, TextEditComponent& textedit);
 
 		virtual void load();
 		virtual void update(double dt);

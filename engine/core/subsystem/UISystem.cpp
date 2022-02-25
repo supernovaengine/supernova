@@ -7,6 +7,7 @@
 #include "Scene.h"
 #include "Input.h"
 #include "Engine.h"
+#include "System.h"
 #include "util/STBText.h"
 #include "util/UniqueToken.h"
 #include "util/StringUtils.h"
@@ -268,8 +269,105 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
     }
 }
 
-void UISystem::createTextEditObjects(Entity entity, TextEditComponent& button){
-    // Label and cursor
+void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit){
+    if (textedit.text == NULL_ENTITY){
+        textedit.text = scene->createEntity();
+
+        scene->addComponent<Transform>(textedit.text, {});
+        scene->addComponent<UIComponent>(textedit.text, {});
+        scene->addComponent<TextComponent>(textedit.text, {});
+
+        scene->addEntityChild(entity, textedit.text);
+    }
+
+    if (textedit.cursor == NULL_ENTITY){
+        textedit.cursor = scene->createEntity();
+
+        scene->addComponent<Transform>(textedit.cursor, {});
+        scene->addComponent<UIComponent>(textedit.cursor, {});
+        scene->addComponent<PolygonComponent>(textedit.cursor, {});
+
+        scene->addEntityChild(entity, textedit.cursor);
+    }
+
+}
+
+void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui){
+    createTextEditObjects(entity, textedit);
+
+    int heightArea = ui.height - img.patchMarginTop - img.patchMarginBottom;
+
+    // Text
+    Transform& texttransform = scene->getComponent<Transform>(textedit.text);
+    UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
+    TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
+
+    text.multiline = false;
+
+    //int textHeight = ui.height - img.patchMarginTop - img.patchMarginBottom;
+    //float teste = (float)textHeight / textui.height;
+    //texttransform.scale = Vector3((float)textHeight / textui.height, (float)textHeight / textui.height, 1.0);
+
+/*
+    if (textui.height > (ui.height - img.patchMarginTop - img.patchMarginBottom)) {
+        int textHeight = ui.height - img.patchMarginTop - img.patchMarginBottom;
+
+        texttransform.scale = Vector3(1.5, 1.5, 1.0);
+
+        if (textui.height != textHeight){
+            textui.height = textHeight;
+            text.userDefinedHeight = true;
+            text.needUpdateText = true;
+        }
+    }
+    */
+
+    float textX = img.patchMarginLeft;
+    float textY = (ui.height / 2) + (textui.height / 2) - img.patchMarginBottom;
+
+    Vector3 textPosition = Vector3(textX, textY, 0);
+
+    if (texttransform.position != textPosition){
+        texttransform.position = textPosition;
+        texttransform.needUpdate = true;
+    }
+
+    // Cursor
+    Transform& cursortransform = scene->getComponent<Transform>(textedit.cursor);
+    UIComponent& cursorui = scene->getComponent<UIComponent>(textedit.cursor);
+    PolygonComponent& cursor = scene->getComponent<PolygonComponent>(textedit.cursor);
+
+    float cursorHeight = textui.height;
+
+    cursor.points.clear();
+    cursor.points.push_back({Vector3(0,  0, 0),                                 Vector4(1.0, 1.0, 1.0, 1.0)});
+    cursor.points.push_back({Vector3(textedit.cursorWidth, 0, 0),               Vector4(1.0, 1.0, 1.0, 1.0)});
+    cursor.points.push_back({Vector3(0,  cursorHeight, 0),                      Vector4(1.0, 1.0, 1.0, 1.0)});
+    cursor.points.push_back({Vector3(textedit.cursorWidth, cursorHeight, 0),    Vector4(1.0, 1.0, 1.0, 1.0)});
+
+    float cursorX = img.patchMarginLeft + textui.width;
+    float cursorY = img.patchMarginTop + ((float)heightArea / 2) - ((float)cursorHeight / 2);
+
+    cursorui.color = textedit.cursorColor;
+    cursortransform.position = Vector3(cursorX, cursorY, 0.0);
+    cursortransform.needUpdate = true;
+
+    cursor.needUpdatePolygon = true;
+}
+
+void UISystem::blinkCursorTextEdit(double dt, TextEditComponent& textedit, UIComponent& ui){
+    textedit.cursorBlinkTimer += dt;
+
+    Transform& cursortransform = scene->getComponent<Transform>(textedit.cursor);
+
+    if (ui.focused){
+        if (textedit.cursorBlinkTimer > 0.6) {
+            cursortransform.visible = !cursortransform.visible;
+            textedit.cursorBlinkTimer = 0;
+        }
+    }else{
+        cursortransform.visible = false;
+    }
 }
 
 void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui){
@@ -344,6 +442,32 @@ void UISystem::draw(){
 
 void UISystem::update(double dt){
 
+    // Images
+    auto images = scene->getComponentArray<ImageComponent>();
+    for (int i = 0; i < images->size(); i++){
+        ImageComponent& img = images->getComponentFromIndex(i);
+
+        if (img.needUpdate){
+            Entity entity = images->getEntity(i);
+            Signature signature = scene->getSignature(entity);
+
+            if (signature.test(scene->getComponentType<UIComponent>())){
+                UIComponent& ui = scene->getComponent<UIComponent>(entity);
+
+                createImagePatches(img, ui);
+            }
+
+            // Need to centralize button label
+            if (signature.test(scene->getComponentType<ButtonComponent>())){
+                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+
+                button.needUpdateButton = true;
+            }
+
+            img.needUpdate = false;
+        }
+    }
+
     // Texts
     auto texts = scene->getComponentArray<TextComponent>();
     for (int i = 0; i < texts->size(); i++){
@@ -369,6 +493,25 @@ void UISystem::update(double dt){
         }
     }
 
+    //UI Polygons
+    auto polygons = scene->getComponentArray<PolygonComponent>();
+    for (int i = 0; i < polygons->size(); i++){
+        PolygonComponent& polygon = polygons->getComponentFromIndex(i);
+
+        if (polygon.needUpdatePolygon){
+            Entity entity = polygons->getEntity(i);
+            Signature signature = scene->getSignature(entity);
+
+            if (signature.test(scene->getComponentType<UIComponent>())){
+                UIComponent& ui = scene->getComponent<UIComponent>(entity);
+
+                createUIPolygon(polygon, ui);
+            }
+
+            polygon.needUpdatePolygon = false;
+        }
+    }
+
     // Buttons
     auto buttons = scene->getComponentArray<ButtonComponent>();
     for (int i = 0; i < buttons->size(); i++){
@@ -384,54 +527,31 @@ void UISystem::update(double dt){
 
                 updateButton(entity, button, image, ui);
             }
-        }
 
-        button.needUpdateButton = false;
+            button.needUpdateButton = false;
+        }
     }
 
-    // Images
-    auto images = scene->getComponentArray<ImageComponent>();
-    for (int i = 0; i < images->size(); i++){
-        ImageComponent& img = images->getComponentFromIndex(i);
+    // Textedits
+    auto textedits = scene->getComponentArray<TextEditComponent>();
+    for (int i = 0; i < textedits->size(); i++){
+        TextEditComponent& textedit = textedits->getComponentFromIndex(i);
 
-        if (img.needUpdate){
-            Entity entity = images->getEntity(i);
-            Signature signature = scene->getSignature(entity);
+        Entity entity = textedits->getEntity(i);
+        Signature signature = scene->getSignature(entity);
 
-            if (signature.test(scene->getComponentType<UIComponent>())){
-                UIComponent& ui = scene->getComponent<UIComponent>(entity);
+        if (signature.test(scene->getComponentType<UIComponent>()) && signature.test(scene->getComponentType<ImageComponent>())){
+            UIComponent& ui = scene->getComponent<UIComponent>(entity);
+            ImageComponent& image = scene->getComponent<ImageComponent>(entity);
 
-                createImagePatches(img, ui);
+            if (textedit.needUpdateTextEdit){
+                updateTextEdit(entity, textedit, image, ui);
+
+                textedit.needUpdateTextEdit = false;
             }
 
-            // Need to centralize button label
-            if (signature.test(scene->getComponentType<ButtonComponent>())){
-                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-
-                button.needUpdateButton = true;
-            }
+            blinkCursorTextEdit(dt, textedit, ui);
         }
-
-        img.needUpdate = false;
-    }
-
-    //UI Polygons
-    auto polygons = scene->getComponentArray<PolygonComponent>();
-    for (int i = 0; i < polygons->size(); i++){
-        PolygonComponent& polygon = polygons->getComponentFromIndex(i);
-
-        if (polygon.needUpdatePolygon){
-            Entity entity = polygons->getEntity(i);
-            Signature signature = scene->getSignature(entity);
-
-            if (signature.test(scene->getComponentType<UIComponent>())){
-                UIComponent& ui = scene->getComponent<UIComponent>(entity);
-
-                createUIPolygon(polygon, ui);
-            }
-        }
-
-        polygon.needUpdatePolygon = false;
     }
 }
 
@@ -456,7 +576,27 @@ void UISystem::entityDestroyed(Entity entity){
 }
 
 void UISystem::eventOnCharInput(wchar_t codepoint){
-    //Log::Verbose("%s",StringUtils::toUTF8(codepoint).c_str());
+    auto uis = scene->getComponentArray<UIComponent>();
+    for (int i = 0; i < uis->size(); i++){
+        UIComponent& ui = uis->getComponentFromIndex(i);
+
+        Entity entity = uis->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+        if (signature.test(scene->getComponentType<TextEditComponent>())){
+            TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
+
+            if (ui.focused){
+                TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
+                if (codepoint == '\b'){
+                    text.text = "edu";
+                }
+                text.text = text.text + StringUtils::toUTF8(codepoint);
+                text.needUpdateText = true;
+
+                textedit.needUpdateTextEdit = true;
+            }
+        }
+    }
 }
 
 void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
@@ -472,23 +612,34 @@ void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
             Transform& transform = scene->getComponent<Transform>(entity);
 
             if (isCoordInside(x, y, transform, ui)){
-                if (signature.test(scene->getComponentType<ButtonComponent>())){
+                if (signature.test(scene->getComponentType<ButtonComponent>()) || signature.test(scene->getComponentType<TextEditComponent>())){
                     lastUI = i;
                 }
             }
         }
+
+        ui.focused = false;
     }
 
     if (lastUI != -1){
         UIComponent& ui = uis->getComponentFromIndex(lastUI);
         Entity entity = uis->getEntity(lastUI);
-        ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-        if (!button.disabled){
-            ui.texture = button.texturePressed;
-            ui.needUpdateTexture = true;
-            button.onPress.call();
-            button.pressed = true;
+        Signature signature = scene->getSignature(entity);
+
+        if (signature.test(scene->getComponentType<ButtonComponent>())){
+            ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+            if (!button.disabled){
+                ui.texture = button.texturePressed;
+                ui.needUpdateTexture = true;
+                button.onPress.call();
+                button.pressed = true;
+            }
         }
+        if (signature.test(scene->getComponentType<TextEditComponent>())){
+            System::instance().showVirtualKeyboard();
+        }
+
+        ui.focused = true;
     }
 }
 
