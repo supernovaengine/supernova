@@ -19,6 +19,24 @@ void Image::setSize(int width, int height){
     img.needUpdate = true;
 }
 
+void Image::setWidth(int width){
+    UIComponent& uicomp = getComponent<UIComponent>();
+    ImageComponent& img = getComponent<ImageComponent>();
+
+    uicomp.width = width;
+
+    img.needUpdate = true;
+}
+
+void Image::setHeight(int height){
+    UIComponent& uicomp = getComponent<UIComponent>();
+    ImageComponent& img = getComponent<ImageComponent>();
+
+    uicomp.height = height;
+
+    img.needUpdate = true;
+}
+
 void Image::setMargin(int margin){
     ImageComponent& img = getComponent<ImageComponent>();
     

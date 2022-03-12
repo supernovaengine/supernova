@@ -143,7 +143,14 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>
                          int& width, int& height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert){
     
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
-    std::wstring utf16String = convert.from_bytes( text );
+    std::wstring utf16String;
+
+    try {
+        utf16String = convert.from_bytes( text );
+    } catch(const std::range_error& e) {
+        utf16String = convert.from_bytes(text.substr(0, convert.converted()));
+        Log::Warn("Invalid character");
+    }
     
     float offsetX = 0;
     float offsetY = 0;
@@ -202,11 +209,10 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>
 
         //When char is not in bitmap
         if (intchar < firstChar || intchar > lastChar) {
-            //if (firstChar <= 127 && lastChar >= 127)
-            //    intchar = 127;
-            //else
-            //    intchar = firstChar;
-            continue;
+            if (firstChar <= 127 && lastChar >= 127)
+                intchar = 127;
+            else
+                intchar = firstChar;
         }
 
         stbtt_aligned_quad quad;

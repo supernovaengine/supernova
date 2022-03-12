@@ -483,12 +483,16 @@ void init(){
     uibutton2.setLabel("Teste");
     uibutton2.setSize(200,200);
     uibutton2.setPosition(400,400,0);
+    uibutton2.setFontSize(30);
 
     textedit.setTexture("ui/Button_Disable.png");
     textedit.setMargin(5);
     textedit.setPosition(500,300,0);
-    textedit.setSize(200,80);
-    textedit.setText("oii");
+    //textedit.setSize(200,50);
+    textedit.setWidth(300);
+    //textedit.setText("oii");
+    textedit.setFontSize(20);
+    textedit.setMaxTextSize(400);
     //textedit.setTextColor(Vector4(0,0,0,1));
 
     //camera.setOrtho(-500, 500, -500, 500, 1, 2000);
@@ -581,7 +585,7 @@ void init(){
 }
 
 void onUpdate(){
-    //text.setText(std::to_string(Engine::getFramerate()));
+    label.setText(std::to_string(Engine::getFramerate()));
 
     if (Input::isKeyPressed(S_KEY_LEFT)){
         rotationY += 4;
@@ -660,7 +664,7 @@ void onMouseDown(int button, float x, float y, int mods){
 
     //text.setFontSize(80);
     //text.setFont("FreeMono.ttf");
-    //text.setMaxLength(50);
+    //text.setMaxTextSize(50);
 
     //uibutton.setSize(uibutton.getWidth()-10, uibutton.getHeight()-10);
 
@@ -737,7 +741,7 @@ void onMouseLeave(){
 
 void onCharInput(wchar_t codepoint){
     Log::Verbose("%s",StringUtils::toUTF8(codepoint).c_str());
-    label.setText(StringUtils::toUTF8(codepoint));
+    //label.setText(StringUtils::toUTF8(codepoint));
 }
 
 void onKeyDown(int key, bool repeat, int mods){
@@ -764,10 +768,10 @@ void onKeyDown(int key, bool repeat, int mods){
 
 void onKeyUp(int key, bool repeat, int mods){
     if (key == S_KEY_F){
-        if (!System::instance().isFullscreen())
-            System::instance().requestFullscreen();
-        else
-            System::instance().exitFullscreen();
+        //if (!System::instance().isFullscreen())
+            //System::instance().requestFullscreen();
+        //else
+            //System::instance().exitFullscreen();
     }
 
     std::string modifier = "";

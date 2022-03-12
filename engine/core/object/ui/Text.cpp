@@ -10,6 +10,9 @@ Text::Text(Scene* scene): Object(scene){
     addComponent<TextComponent>({});
 }
 
+Text::Text(Scene* scene, Entity entity): Object(scene, entity){
+}
+
 Text::~Text() {
 
 }
@@ -58,12 +61,12 @@ int Text::getHeight(){
     return uicomp.height;
 }
 
-void Text::setMaxLength(unsigned int maxLength){
+void Text::setMaxTextSize(unsigned int maxTextSize){
     TextComponent& textcomp = getComponent<TextComponent>();
     UIComponent& uicomp = getComponent<UIComponent>();
 
-    if (textcomp.maxLength != maxLength){
-        textcomp.maxLength = maxLength;
+    if (textcomp.maxTextSize != maxTextSize){
+        textcomp.maxTextSize = maxTextSize;
 
         textcomp.needReload = true;
         textcomp.needUpdateText = true;
@@ -74,9 +77,9 @@ void Text::setMaxLength(unsigned int maxLength){
 void Text::setText(std::string text){
     TextComponent& textcomp = getComponent<TextComponent>();
 
-    if (text.length() > textcomp.maxLength){
-        text.resize(textcomp.maxLength);
-        Log::Warn("Text is bigger than maxLength: %i", textcomp.maxLength);
+    if (text.length() > textcomp.maxTextSize){
+        text.resize(textcomp.maxTextSize);
+        Log::Warn("Text is bigger than maxTextSize: %i", textcomp.maxTextSize);
     }
 
     textcomp.text = text;

@@ -9,12 +9,34 @@ using namespace Supernova;
 Object::Object(Scene* scene){
     this->scene = scene;
     this->entity = scene->createEntity();
+    this->entityOwned = true;
+
     addComponent<Transform>({});
 }
 
+Object::Object(Scene* scene, Entity entity){
+    this->scene = scene;
+    this->entity = entity;
+    this->entityOwned = false;
+}
+
 Object::~Object(){
-    if (scene)
+    if (scene && entityOwned)
         scene->destroyEntity(entity); 
+}
+
+Object::Object(const Object& rhs){
+    scene = rhs.scene;
+    entity = rhs.entity;
+    entityOwned = rhs.entityOwned;
+}
+
+Object& Object::operator=(const Object& rhs){
+    scene = rhs.scene;
+    entity = rhs.entity;
+    entityOwned = rhs.entityOwned;
+
+    return *this;
 }
 
 void Object::setName(std::string name){

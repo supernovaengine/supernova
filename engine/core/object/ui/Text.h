@@ -14,6 +14,7 @@ namespace Supernova{
 
     public:
         Text(Scene* scene);
+        Text(Scene* scene, Entity entity);
         virtual ~Text();
 
         void setSize(int width, int height);
@@ -23,7 +24,7 @@ namespace Supernova{
         int getWidth();
         int getHeight();
 
-        void setMaxLength(unsigned int maxLength);
+        void setMaxTextSize(unsigned int maxTextSize);
 
         void setText(std::string text);
         std::string getText();

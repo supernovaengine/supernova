@@ -6,6 +6,7 @@
 #define TEXTEDIT_H
 
 #include "Image.h"
+#include "Text.h"
 
 namespace Supernova{
     class TextEdit: public Image{
@@ -13,8 +14,9 @@ namespace Supernova{
     public:
         TextEdit(Scene* scene);
 
-        void setDisabled(bool disabled);
+        Text getTextObject();
 
+        void setDisabled(bool disabled);
 
         void setText(std::string text);
         std::string getText();
@@ -22,6 +24,12 @@ namespace Supernova{
         void setTextColor(Vector4 color);
         void setTextColor(float red, float green, float blue, float alpha);
         Vector4 getTextColor();
+
+        void setTextFont(std::string font);
+        std::string getTextFont();
+
+        void setFontSize(unsigned int fontSize);
+        void setMaxTextSize(unsigned int maxTextSize);
     };
 }
 

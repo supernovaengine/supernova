@@ -3,7 +3,9 @@ package com.deslon.supernova;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.os.Handler;
 import android.os.Message;
@@ -42,8 +44,13 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 	}
 
 	protected void initView() {
+		this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+		//this.setRawInputType(InputType.TYPE_CLASS_TEXT);
+		this.setImeOptions(EditorInfo.IME_ACTION_DONE | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+		//this.setSingleLine(true);
 		this.setPadding(0, 0, 0, 0);
 		this.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+		getText().insert(this.getSelectionStart(), " ");
 
 		sHandler = new Handler() {
 			@Override
@@ -109,12 +116,18 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 				@Override
 				public void run() {
 					if (before < count) {
-						JNIWrapper.system_char_input(s.charAt(start + before));
+						if (start != 0 || s.charAt(start + before) != ' '){
+							JNIWrapper.system_char_input(s.charAt(start + before));
+						}
 					} else {
 						JNIWrapper.system_char_input('\b');
 					}
 				}
 			});
+		}
+
+		if (getText().toString().isEmpty()){
+			getText().insert(this.getSelectionStart(), " ");
 		}
 
 	}

@@ -15,9 +15,15 @@ namespace Supernova{
         Entity entity;
         Scene* scene;
 
+        bool entityOwned;
+
     public:
         Object(Scene* scene);
+        Object(Scene* scene, Entity entity);
         virtual ~Object();
+
+        Object(const Object& rhs);
+        Object& operator=(const Object& rhs);
 
         Object* createChild();
         void addChild(Object* child);

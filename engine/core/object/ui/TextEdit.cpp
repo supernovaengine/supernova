@@ -15,6 +15,12 @@ TextEdit::TextEdit(Scene* scene): Image(scene){
     uitext.color = Vector4(0.0, 0.0, 0.0, 1.0);
 }
 
+Text TextEdit::getTextObject(){
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+
+    return Text(scene, tecomp.text);
+}
+
 void TextEdit::setDisabled(bool disabled){
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
 
@@ -27,9 +33,9 @@ void TextEdit::setText(std::string text){
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(tecomp.text);
 
-    if (text.length() > textcomp.maxLength){
-        text.resize(textcomp.maxLength);
-        Log::Warn("Text is bigger than maxLength: %i", textcomp.maxLength);
+    if (text.length() > textcomp.maxTextSize){
+        text.resize(textcomp.maxTextSize);
+        Log::Warn("Text is bigger than maxTextSize: %i", textcomp.maxTextSize);
     }
 
     textcomp.text = text;
@@ -59,4 +65,31 @@ Vector4 TextEdit::getTextColor(){
     UIComponent& uitext = scene->getComponent<UIComponent>(tecomp.text);
 
     return uitext.color;
+}
+
+void TextEdit::setTextFont(std::string font){
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+
+    getTextObject().setFont(font);
+
+    tecomp.needUpdateTextEdit = true;
+}
+
+std::string TextEdit::getTextFont(){
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+    TextComponent& textcomp = scene->getComponent<TextComponent>(tecomp.text);
+
+    return textcomp.font;
+}
+
+void TextEdit::setFontSize(unsigned int fontSize){
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+
+    getTextObject().setFontSize(fontSize);
+
+    tecomp.needUpdateTextEdit = true;
+}
+
+void TextEdit::setMaxTextSize(unsigned int maxTextSize){
+    getTextObject().setMaxTextSize(maxTextSize);
 }

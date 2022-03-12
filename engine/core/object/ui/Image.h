@@ -18,6 +18,8 @@ namespace Supernova{
         Image(Scene* scene);
 
         void setSize(int width, int height);
+        void setWidth(int width);
+        void setHeight(int height);
         void setMargin(int margin);
 
         void setTexture(std::string path);

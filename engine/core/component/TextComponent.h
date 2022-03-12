@@ -14,7 +14,7 @@ namespace Supernova{
         std::string text = "";
         unsigned int fontSize = 40;
         bool multiline = true;
-        unsigned int maxLength = 100;
+        unsigned int maxTextSize = 100;
 
         std::vector<Vector2> charPositions;
 

@@ -31,10 +31,18 @@ static void sokol_event(const sapp_event* e) {
         Supernova::Engine::systemViewChanged();
     else if (e->type == SAPP_EVENTTYPE_CHAR)
         Supernova::Engine::onCharInput(e->char_code);
-    else if (e->type == SAPP_EVENTTYPE_KEY_DOWN)
+    else if (e->type == SAPP_EVENTTYPE_KEY_DOWN){
+        if (e->key_code == SAPP_KEYCODE_TAB)
+            Supernova::Engine::systemCharInput('\t');
+        if (e->key_code == SAPP_KEYCODE_BACKSPACE)
+            Supernova::Engine::systemCharInput('\b');
+        if (e->key_code == SAPP_KEYCODE_ENTER)
+            Supernova::Engine::systemCharInput('\r');
+        if (e->key_code == SAPP_KEYCODE_ESCAPE)
+            Supernova::Engine::systemCharInput('\e');
         //Use same keycode of GLFW
         Supernova::Engine::systemKeyDown(e->key_code, e->key_repeat, e->modifiers);
-    else if (e->type == SAPP_EVENTTYPE_KEY_UP)
+    }else if (e->type == SAPP_EVENTTYPE_KEY_UP)
         //Use same keycode of GLFW
         Supernova::Engine::systemKeyUp(e->key_code, e->key_repeat, e->modifiers);
     else if (e->type == SAPP_EVENTTYPE_SUSPENDED)

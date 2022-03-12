@@ -15,13 +15,19 @@ Button::Button(Scene* scene): Image(scene){
     uilabel.color = Vector4(0.0, 0.0, 0.0, 1.0);
 }
 
+Text Button::getLabelObject(){
+    ButtonComponent& btcomp = getComponent<ButtonComponent>();
+
+    return Text(scene, btcomp.label);
+}
+
 void Button::setLabel(std::string text){
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(btcomp.label);
 
-    if (text.length() > textcomp.maxLength){
-        text.resize(textcomp.maxLength);
-        Log::Warn("Text is bigger than maxLength: %i", textcomp.maxLength);
+    if (text.length() > textcomp.maxTextSize){
+        text.resize(textcomp.maxTextSize);
+        Log::Warn("Text is bigger than maxTextSize: %i", textcomp.maxTextSize);
     }
 
     textcomp.text = text;
@@ -51,6 +57,29 @@ Vector4 Button::getLabelColor(){
     UIComponent& uilabel = scene->getComponent<UIComponent>(btcomp.label);
 
     return uilabel.color;
+}
+
+void Button::setLabelFont(std::string font){
+    ButtonComponent& btcomp = getComponent<ButtonComponent>();
+
+    getLabelObject().setFont(font);
+
+    btcomp.needUpdateButton = true;
+}
+
+std::string Button::getLabelFont(){
+    ButtonComponent& btcomp = getComponent<ButtonComponent>();
+    TextComponent& textcomp = scene->getComponent<TextComponent>(btcomp.label);
+
+    return textcomp.font;
+}
+
+void Button::setFontSize(unsigned int fontSize){
+    ButtonComponent& btcomp = getComponent<ButtonComponent>();
+
+    getLabelObject().setFontSize(fontSize);
+
+    btcomp.needUpdateButton = true;
 }
 
 void Button::setTextureNormal(std::string path){

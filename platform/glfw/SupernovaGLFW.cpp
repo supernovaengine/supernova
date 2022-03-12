@@ -61,6 +61,14 @@ int SupernovaGLFW::init(int argc, char **argv){
     });
     glfwSetKeyCallback(window, [](GLFWwindow*, int key, int /*scancode*/, int action, int mods){
         if (action==GLFW_PRESS){
+            if (key == GLFW_KEY_TAB)
+                Supernova::Engine::systemCharInput('\t');
+            if (key == GLFW_KEY_BACKSPACE)
+                Supernova::Engine::systemCharInput('\b');
+            if (key == GLFW_KEY_ENTER)
+                Supernova::Engine::systemCharInput('\r');
+            if (key == GLFW_KEY_ESCAPE)
+                Supernova::Engine::systemCharInput('\e');
             Supernova::Engine::systemKeyDown(key, false, mods);
         }else if (action==GLFW_REPEAT){
             Supernova::Engine::systemKeyDown(key, true, mods);

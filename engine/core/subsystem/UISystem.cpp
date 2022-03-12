@@ -4,6 +4,8 @@
 
 #include "UISystem.h"
 
+#include <locale>
+#include <codecvt>
 #include "Scene.h"
 #include "Input.h"
 #include "Engine.h"
@@ -187,8 +189,8 @@ void UISystem::createText(TextComponent& text, UIComponent& ui){
     ui.indices.clear();
     ui.indices.setUsage(BufferUsage::DYNAMIC);
 
-    ui.minBufferCount = text.maxLength * 4;
-    ui.minIndicesCount = text.maxLength * 6;
+    ui.minBufferCount = text.maxTextSize * 4;
+    ui.minIndicesCount = text.maxTextSize * 6;
 
     std::vector<uint16_t> indices_array;
 
@@ -295,35 +297,28 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
 void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui){
     createTextEditObjects(entity, textedit);
 
-    int heightArea = ui.height - img.patchMarginTop - img.patchMarginBottom;
-
     // Text
     Transform& texttransform = scene->getComponent<Transform>(textedit.text);
     UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
     TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
 
+    if (ui.height == 0){
+        ui.height = textui.height + img.patchMarginTop + img.patchMarginBottom;
+        img.needUpdate = true;
+    }
+
+    int heightArea = ui.height - img.patchMarginTop - img.patchMarginBottom;
+    int widthArea = ui.width - img.patchMarginRight - img.patchMarginLeft - textedit.cursorWidth;
+
     text.multiline = false;
 
-    //int textHeight = ui.height - img.patchMarginTop - img.patchMarginBottom;
-    //float teste = (float)textHeight / textui.height;
-    //texttransform.scale = Vector3((float)textHeight / textui.height, (float)textHeight / textui.height, 1.0);
-
-/*
-    if (textui.height > (ui.height - img.patchMarginTop - img.patchMarginBottom)) {
-        int textHeight = ui.height - img.patchMarginTop - img.patchMarginBottom;
-
-        texttransform.scale = Vector3(1.5, 1.5, 1.0);
-
-        if (textui.height != textHeight){
-            textui.height = textHeight;
-            text.userDefinedHeight = true;
-            text.needUpdateText = true;
-        }
+    int textXOffset = 0;
+    if (textui.width > widthArea){
+        textXOffset = textui.width - widthArea;
     }
-    */
 
-    float textX = img.patchMarginLeft;
-    float textY = (ui.height / 2) + (textui.height / 2) - img.patchMarginBottom;
+    float textX = img.patchMarginLeft - textXOffset;
+    float textY = (heightArea / 2) + (textui.height / 2);
 
     Vector3 textPosition = Vector3(textX, textY, 0);
 
@@ -345,7 +340,7 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     cursor.points.push_back({Vector3(0,  cursorHeight, 0),                      Vector4(1.0, 1.0, 1.0, 1.0)});
     cursor.points.push_back({Vector3(textedit.cursorWidth, cursorHeight, 0),    Vector4(1.0, 1.0, 1.0, 1.0)});
 
-    float cursorX = img.patchMarginLeft + textui.width;
+    float cursorX = textX + textui.width;
     float cursorY = img.patchMarginTop + ((float)heightArea / 2) - ((float)cursorHeight / 2);
 
     cursorui.color = textedit.cursorColor;
@@ -588,9 +583,15 @@ void UISystem::eventOnCharInput(wchar_t codepoint){
             if (ui.focused){
                 TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
                 if (codepoint == '\b'){
-                    text.text = "edu";
+                    if (text.text.length() > 0){
+                        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > convert;
+                        std::wstring utf16OldText = convert.from_bytes(text.text);
+
+                        text.text = convert.to_bytes(utf16OldText.substr(0, utf16OldText.size() - 1));
+                    }
+                }else{
+                    text.text = text.text + StringUtils::toUTF8(codepoint);
                 }
-                text.text = text.text + StringUtils::toUTF8(codepoint);
                 text.needUpdateText = true;
 
                 textedit.needUpdateTextEdit = true;
@@ -637,9 +638,13 @@ void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
         }
         if (signature.test(scene->getComponentType<TextEditComponent>())){
             System::instance().showVirtualKeyboard();
+        }else{
+            System::instance().hideVirtualKeyboard();
         }
 
         ui.focused = true;
+    }else{
+        System::instance().hideVirtualKeyboard();
     }
 }
 
