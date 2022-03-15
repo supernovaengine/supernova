@@ -52,8 +52,11 @@ int SupernovaGLFW::init(int argc, char **argv){
         }
     });
     glfwSetCursorPosCallback(window, [](GLFWwindow*, double pos_x, double pos_y) {
-        mousePosX = pos_x;
-        mousePosY = pos_y;
+        float xscale, yscale;
+        glfwGetWindowContentScale(window, &xscale, &yscale);
+
+        mousePosX = pos_x * xscale;
+        mousePosY = pos_y * yscale;
         Supernova::Engine::systemMouseMove(float(pos_x), float(pos_y), 0);
     });
     glfwSetScrollCallback(window, [](GLFWwindow*, double pos_x, double pos_y){
@@ -80,8 +83,11 @@ int SupernovaGLFW::init(int argc, char **argv){
         Supernova::Engine::onCharInput(codepoint);
     });
 
-    SupernovaGLFW::screenWidth = windowWidth;
-    SupernovaGLFW::screenHeight = windowHeight;
+    int cur_width, cur_height;
+    glfwGetFramebufferSize(window, &cur_width, &cur_height);
+
+    SupernovaGLFW::screenWidth = cur_width;
+    SupernovaGLFW::screenHeight = cur_height;
 
     Supernova::Engine::systemViewLoaded();
     Supernova::Engine::systemViewChanged();

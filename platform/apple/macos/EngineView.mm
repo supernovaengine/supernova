@@ -39,27 +39,26 @@ static const NSRange _emptyRange = { NSNotFound, 0 };
 }
 
 -(void)keyDown:(NSEvent*)event{
-    NSString *eventChars = [event charactersIgnoringModifiers];
-    unichar keyChar = [eventChars characterAtIndex:0];
-
-    if (( keyChar == NSEnterCharacter ) || ( keyChar == NSCarriageReturnCharacter )){
-        Supernova::Engine::systemCharInput('\r');
-    }
-    if (( keyChar == NSDeleteCharacter ) || ( keyChar == NSBackspaceCharacter )){
-        Supernova::Engine::systemCharInput('\b');
-    }
-    if ( keyChar == NSTabCharacter ){
+    NSUInteger keyCode = [event keyCode];
+    if ( keyCode == 48 ){ //Tab key
         Supernova::Engine::systemCharInput('\t');
     }
-    if ( [event keyCode] == 53 ){ //Escape key
+    if ( keyCode == 51 ){ //Delete key
+        Supernova::Engine::systemCharInput('\b');
+    }
+    if ( keyCode == 36 ){ //Return/Enter key
+        Supernova::Engine::systemCharInput('\r');
+    }
+    if ( keyCode == 53 ){ //Escape key
         Supernova::Engine::systemCharInput('\e');
     }
 
     const int key = (int)[self convertKey:[event keyCode]];
     const int mods = (int)[self convertModFlags:[event modifierFlags]];
-    
+
     Supernova::Engine::systemKeyDown(key, [event isARepeat], mods);
-    
+
+    [self unmarkText]; // prevent send backspace char by insertText after pressed accented chars
     [self interpretKeyEvents:@[event]];
 }
 

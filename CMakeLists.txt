@@ -33,6 +33,7 @@ if(NOT GRAPHIC_BACKEND)
         set(GRAPHIC_BACKEND "glcore33")
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         set(GRAPHIC_BACKEND "metal")
+        #set(GRAPHIC_BACKEND "glcore33")
     elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
         set(GRAPHIC_BACKEND "metal")
     else()
@@ -56,6 +57,7 @@ if(NOT APP_BACKEND)
             set(APP_BACKEND "apple")
         else()
             set(APP_BACKEND "sokol")
+            #set(APP_BACKEND "glfw")
         endif()
     elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
         set(APP_BACKEND "apple")
@@ -274,17 +276,32 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             #XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${PLATFORM_ROOT}/macos/Supernova_macOS.entitlements" # error EXC_BAD_INSTRUCTION
         )
     else()
-        add_definitions("-DSUPERNOVA_SOKOL")
-
         set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
         set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/lua)
 
-        set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
+        if (APP_BACKEND STREQUAL "glfw")
+            add_definitions("-DSUPERNOVA_GLFW")
 
-        list(APPEND PLATFORM_SOURCE
-            ${PLATFORM_ROOT}/SupernovaSokol.cpp
-            ${PLATFORM_ROOT}/main.cpp
-        )
+            set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/glfw)
+
+            list(APPEND PLATFORM_SOURCE
+                ${PLATFORM_ROOT}/SupernovaGLFW.cpp
+                ${PLATFORM_ROOT}/main.cpp
+            )
+
+            list(APPEND PLATFORM_LIBS
+                glfw
+            )
+        else()
+            add_definitions("-DSUPERNOVA_SOKOL")
+
+            set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/sokol)
+
+            list(APPEND PLATFORM_SOURCE
+                ${PLATFORM_ROOT}/SupernovaSokol.cpp
+                ${PLATFORM_ROOT}/main.cpp
+            )
+        endif()
     endif()
 endif()
 
