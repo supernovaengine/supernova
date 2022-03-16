@@ -33,32 +33,18 @@ static const NSRange _emptyRange = { NSNotFound, 0 };
 }
 
 - (void)engineInit{
+    _trackingArea = nil;
     _markedText = [[NSMutableAttributedString alloc] init];
     
     [self createKeyCodeArray];
 }
 
 -(void)keyDown:(NSEvent*)event{
-    NSUInteger keyCode = [event keyCode];
-    if ( keyCode == 48 ){ //Tab key
-        Supernova::Engine::systemCharInput('\t');
-    }
-    if ( keyCode == 51 ){ //Delete key
-        Supernova::Engine::systemCharInput('\b');
-    }
-    if ( keyCode == 36 ){ //Return/Enter key
-        Supernova::Engine::systemCharInput('\r');
-    }
-    if ( keyCode == 53 ){ //Escape key
-        Supernova::Engine::systemCharInput('\e');
-    }
-
     const int key = (int)[self convertKey:[event keyCode]];
     const int mods = (int)[self convertModFlags:[event modifierFlags]];
 
     Supernova::Engine::systemKeyDown(key, [event isARepeat], mods);
 
-    [self unmarkText]; // prevent send backspace char by insertText after pressed accented chars
     [self interpretKeyEvents:@[event]];
 }
 
@@ -83,7 +69,6 @@ static const NSRange _emptyRange = { NSNotFound, 0 };
 }
 
 - (void)updateTrackingAreas {
-    [super updateTrackingAreas];
     if(_trackingArea != nil) {
         [self removeTrackingArea:_trackingArea];
         //[trackingArea release];
@@ -95,6 +80,7 @@ static const NSRange _emptyRange = { NSNotFound, 0 };
                                                    owner:self
                                                 userInfo:nil];
     [self addTrackingArea:_trackingArea];
+    [super updateTrackingAreas];
 }
 
 -(CGPoint)getMousePoint:(NSEvent*)event{
@@ -238,7 +224,8 @@ static const NSRange _emptyRange = { NSNotFound, 0 };
 }
 
 - (BOOL)hasMarkedText{
-    return [_markedText length] > 0;
+    //return [_markedText length] > 0;
+    return true; // to send all keyboard events (ex: backspace) to insertText
 }
 
 - (nullable NSAttributedString *)attributedSubstringForProposedRange:(NSRange)range actualRange:(nullable NSRangePointer)actualRange {
