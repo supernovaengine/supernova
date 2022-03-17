@@ -176,7 +176,8 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
 ####
     if (platform == "windows"):
 
-        cmake_generator = "Visual Studio 16 2019"
+        #cmake_generator = "Visual Studio 16 2019"
+        cmake_generator = "Visual Studio 17 2022" #TODO: make this editable
         build_config_mode = "Release"
 
         build_config = ["--config", build_config_mode]
