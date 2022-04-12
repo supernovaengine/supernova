@@ -120,3 +120,33 @@ void SkyBox::setTextureDown(std::string textureDown){
 
     sky.needUpdateTexture = true;
 }
+
+void SkyBox::setColor(Vector4 color){
+    SkyComponent& sky = getComponent<SkyComponent>();
+
+    sky.color = color;
+}
+
+void SkyBox::setColor(const float r, const float g, const float b){
+    SkyComponent& sky = getComponent<SkyComponent>();
+
+    sky.color = Vector4(r, g, b, sky.color.w);
+}
+
+void SkyBox::setAlpha(const float alpha){
+    SkyComponent& sky = getComponent<SkyComponent>();
+
+    sky.color = Vector4(sky.color.x, sky.color.y, sky.color.z, alpha);
+}
+
+Vector4 SkyBox::getColor(){
+    SkyComponent& sky = getComponent<SkyComponent>();
+
+    return sky.color;
+}
+
+float SkyBox::getAlpha(){
+    SkyComponent& sky = getComponent<SkyComponent>();
+
+    return sky.color.w;
+}

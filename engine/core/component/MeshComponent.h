@@ -29,6 +29,7 @@ namespace Supernova{
         int slotVSParams = -1;
         int slotFSParams = -1;
         int slotFSLighting = -1;
+        int slotFSFog = -1;
         int slotVSSprite = -1;
         int slotVSShadows = -1;
         int slotFSShadows = -1;

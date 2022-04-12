@@ -16,8 +16,10 @@ namespace Supernova{
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
         int slotVSParams = -1;
+        int slotFSParams = -1;
 
         Texture texture;
+        Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0); //sRGB
 
         bool needUpdateTexture = false;
     };

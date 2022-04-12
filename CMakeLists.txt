@@ -361,6 +361,7 @@ include_directories (${SUPERNOVA_ROOT}/engine/core/ecs)
 include_directories (${SUPERNOVA_ROOT}/engine/core/math)
 include_directories (${SUPERNOVA_ROOT}/engine/core/object)
 include_directories (${SUPERNOVA_ROOT}/engine/core/object/ui)
+include_directories (${SUPERNOVA_ROOT}/engine/core/object/environment)
 include_directories (${SUPERNOVA_ROOT}/engine/core/script)
 include_directories (${SUPERNOVA_ROOT}/engine/renders)
 

@@ -33,6 +33,12 @@ namespace Supernova{
         void setTextureUp(std::string textureUp);
         void setTextureDown(std::string textureDown);
 
+        void setColor(Vector4 color);
+        void setColor(const float r, const float g, const float b);
+        void setAlpha(const float alpha);
+        Vector4 getColor();
+        float getAlpha();
+
         template <typename T>
         void addComponent(T &&component) {
             scene->addComponent<T>(entity, std::forward<T>(component));

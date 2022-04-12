@@ -39,6 +39,7 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 
 	hasLights = false;
 	hasShadows = false;
+	hasFog = false;
 }
 
 RenderSystem::~RenderSystem(){
@@ -49,7 +50,7 @@ void RenderSystem::load(){
 	checkLightsAndShadow();
 
 	if (scene->isMainScene() || scene->isRenderToTexture()){
-		sceneRender.setClearColor(scene->getColor());
+		sceneRender.setClearColor(scene->getBackgroundColor());
 	}
 	depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
 
@@ -213,6 +214,31 @@ bool RenderSystem::processLights(){
 	}
 
 	return true;
+}
+
+bool RenderSystem::processFog(){
+
+	hasFog = scene->isFogEnabled();
+
+	if (hasFog){
+		Fog fog = scene->getFog();
+
+		int fogTypeI;
+		if (fog.getType() == FogType::LINEAR){
+			fogTypeI = 0;
+		}else if (fog.getType() == FogType::EXPONENTIAL){
+			fogTypeI = 1;
+		}else if (fog.getType() == FogType::EXPONENTIALSQUARED){
+			fogTypeI = 2;
+		}
+
+		fs_fog.color_type = Vector4(fog.getColor().x, fog.getColor().y, fog.getColor().z, fogTypeI);
+		fs_fog.density_start_end = Vector4(fog.getDensity(), 0.0, fog.getLinearStart(), fog.getLinearEnd());
+
+		return true;
+	}
+
+	return false;
 }
 
 TextureShaderType RenderSystem::getShadowMapByIndex(int index){
@@ -386,6 +412,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		bool p_shadowsPCF = false;
 		bool p_textureRect = false;
 		bool p_vertexColorVec4 = false;
+		bool p_hasFog = false;
 
 		if (hasLights){
 			p_punctual = true;
@@ -413,7 +440,11 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			p_vertexColorVec4 = true;
 		}
 
-		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(p_unlit, true, false, p_punctual, p_castShadows, p_shadowsPCF, p_hasNormal, p_hasNormalMap, p_hasTangent, false, p_vertexColorVec4, p_textureRect);
+		if (hasFog){
+			p_hasFog = true;
+		}
+
+		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(p_unlit, true, false, p_punctual, p_castShadows, p_shadowsPCF, p_hasNormal, p_hasNormalMap, p_hasTangent, false, p_vertexColorVec4, p_textureRect, p_hasFog);
 		mesh.submeshes[i].shader = ShaderPool::get(shaderType, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
 			mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, "");
@@ -427,6 +458,9 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 		mesh.submeshes[i].slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
 		mesh.submeshes[i].slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
+		if (hasFog){
+			mesh.submeshes[i].slotFSFog = shaderData.getUniformBlockIndex(UniformBlockType::FS_FOG, ShaderStageType::FRAGMENT);
+		}
 		if (hasLights){
 			mesh.submeshes[i].slotFSLighting = shaderData.getUniformBlockIndex(UniformBlockType::FS_LIGHTING, ShaderStageType::FRAGMENT);
 			if (hasShadows && mesh.castShadows){
@@ -552,6 +586,10 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 
 			render.beginDraw();
 
+			if (hasFog){
+				render.applyUniformBlock(mesh.submeshes[i].slotFSFog, ShaderStageType::FRAGMENT, sizeof(float) * 8, &fs_fog);
+			}
+
 			if (hasLights){
 				render.applyUniformBlock(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
 				if (hasShadows && mesh.castShadows){
@@ -590,6 +628,9 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMat
 }
 
 void RenderSystem::destroyMesh(MeshComponent& mesh){
+	if (!mesh.loaded)
+		return;
+
 	for (int i = 0; i < mesh.numSubmeshes; i++){
 
 		Submesh& submesh = mesh.submeshes[i];
@@ -741,6 +782,9 @@ void RenderSystem::drawUI(UIComponent& ui, Transform& transform){
 }
 
 void RenderSystem::destroyUI(UIComponent& ui){
+	if (!ui.loaded)
+		return;
+
 	//Destroy shader
 	ui.shader.reset();
 	ShaderPool::remove(ShaderType::UI, ui.shaderProperties);
@@ -848,6 +892,9 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 }
 
 void RenderSystem::destroyParticles(ParticlesComponent& particles){
+	if (!particles.loaded)
+		return;
+
 	//Destroy shader
 	particles.shader.reset();
 	ShaderPool::remove(ShaderType::POINTS, particles.shaderProperties);
@@ -883,7 +930,8 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 	render->addShader(sky.shader.get());
 	ShaderData& shaderData = sky.shader.get()->shaderData;
 
-	sky.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::VIEWPROJECTIONSKY, ShaderStageType::VERTEX);
+	sky.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::SKY_VS_PARAMS, ShaderStageType::VERTEX);
+	sky.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::SKY_FS_PARAMS, ShaderStageType::FRAGMENT);
 
 	TextureRender* textureRender = sky.texture.getRender();
 	if (textureRender){
@@ -925,11 +973,15 @@ void RenderSystem::drawSky(SkyComponent& sky){
 
 		render.beginDraw();
 		render.applyUniformBlock(sky.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &sky.skyViewProjectionMatrix);
+		render.applyUniformBlock(sky.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &sky.color);
 		render.draw(36);
 	}
 }
 
 void RenderSystem::destroySky(SkyComponent& sky){
+	if (!sky.loaded)
+		return;
+
 	//Destroy shader
 	sky.shader.reset();
 	ShaderPool::remove(ShaderType::SKYBOX, "");
@@ -947,6 +999,7 @@ void RenderSystem::destroySky(SkyComponent& sky){
 
 	//Shaders uniforms
 	sky.slotVSParams = -1;
+	sky.slotFSParams = -1;
 
 	sky.loaded = false;
 }
@@ -1433,6 +1486,7 @@ void RenderSystem::update(double dt){
 	camera.needUpdate = false;
 
 	processLights();
+	processFog();
 }
 
 void RenderSystem::draw(){

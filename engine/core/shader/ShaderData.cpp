@@ -96,12 +96,16 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
         ustr = "u_fs_pbrParams";
     }else if (type == UniformBlockType::FS_LIGHTING){
         ustr = "u_fs_lighting";
+    }else if (type == UniformBlockType::FS_FOG){
+        ustr = "u_fs_fog";
     }else if (type == UniformBlockType::VS_SHADOWS){
         ustr = "u_vs_shadows";
     }else if (type == UniformBlockType::FS_SHADOWS){
         ustr = "u_fs_shadows";
-    }else if (type == UniformBlockType::VIEWPROJECTIONSKY){
-        ustr = "u_vsSkyParams";
+    }else if (type == UniformBlockType::SKY_VS_PARAMS){
+        ustr = "u_vs_skyParams";
+    }else if (type == UniformBlockType::SKY_FS_PARAMS){
+        ustr = "u_fs_skyParams";
     }else if (type == UniformBlockType::DEPTH_VS_PARAMS){
         ustr = "u_vs_depthParams";
     }else if (type == UniformBlockType::UI_VS_PARAMS){

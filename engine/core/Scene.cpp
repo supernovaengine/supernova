@@ -7,6 +7,7 @@
 #include "subsystem/MeshSystem.h"
 #include "subsystem/UISystem.h"
 #include "subsystem/ActionSystem.h"
+#include "math/Color.h"
 
 using namespace Supernova;
 
@@ -43,8 +44,10 @@ Scene::Scene(){
 	camera = NULL_ENTITY;
 
 	mainScene = false;
-	color = Vector4(0.1, 0.1, 0.1, 1.0);
+	backgroundColor = Vector4(0.1, 0.1, 0.1, 1.0); //sRGB
 	shadowsPCF = true;
+
+	hasFog = false;
 
 	renderToTexture = false;
 	framebufferWidth = 512;
@@ -83,16 +86,16 @@ bool Scene::isMainScene(){
 	return mainScene;
 }
 
-void Scene::setColor(Vector4 color){
-	this->color = color;
+void Scene::setBackgroundColor(Vector4 color){
+	this->backgroundColor = color;
 }
 
-void Scene::setColor(float red, float green, float blue, float alpha){
-	setColor(Vector4(red, green, blue, alpha));
+void Scene::setBackgroundColor(float red, float green, float blue){
+	setBackgroundColor(Vector4(red, green, blue, 1.0));
 }
 
-Vector4 Scene::getColor(){
-	return color;
+Vector4 Scene::getBackgroundColor(){
+	return backgroundColor;
 }
 
 void Scene::setShadowsPCF(bool shadowsPCF){
@@ -101,6 +104,18 @@ void Scene::setShadowsPCF(bool shadowsPCF){
 
 bool Scene::isShadowsPCF(){
 	return this->shadowsPCF;
+}
+
+void Scene::setFog(bool hasFog){
+	this->hasFog = hasFog;
+}
+
+bool Scene::isFogEnabled(){
+	return this->hasFog;
+}
+
+Fog Scene::getFog(){
+	return fog;
 }
 
 void Scene::setRenderToTexture(bool renderToTexture){

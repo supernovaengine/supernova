@@ -32,6 +32,11 @@ namespace Supernova{
 		Vector4 eyePos;
 	} fs_lighting_t;
 
+	typedef struct fs_fog_t {
+		Vector4 color_type;
+		Vector4 density_start_end;
+	} fs_fog_t;
+
 	typedef struct vs_shadows_t {
 	    Matrix4 lightViewProjectionMatrix[MAX_SHADOWSMAP];
 	} vs_shadows_t;
@@ -67,10 +72,12 @@ namespace Supernova{
 		
 		bool hasLights;
 		bool hasShadows;
+		bool hasFog;
 
 		fs_lighting_t fs_lighting;
 		vs_shadows_t vs_shadows;
 		fs_shadows_t fs_shadows;
+		fs_fog_t fs_fog;
 
 		std::map<std::string, BufferRender*> bufferNameToRender;
 		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
@@ -78,6 +85,7 @@ namespace Supernova{
 		void createEmptyTextures();
 		void checkLightsAndShadow();
 		bool processLights();
+		bool processFog();
 		TextureShaderType getShadowMapByIndex(int index);
 		TextureShaderType getShadowMapCubeByIndex(int index);
 		void configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera);

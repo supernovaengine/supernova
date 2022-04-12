@@ -6,6 +6,10 @@ in vec3 uv;
 
 uniform samplerCube u_skyTexture;
 
-void main(){    
-    frag_color = texture(u_skyTexture, uv);
+uniform u_fs_skyParams {
+    vec4 color; //sRGB
+} skyParams;
+
+void main(){
+    frag_color = skyParams.color * texture(u_skyTexture, uv);
 }

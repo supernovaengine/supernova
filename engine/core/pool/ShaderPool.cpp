@@ -114,7 +114,7 @@ void ShaderPool::remove(ShaderType shaderType, std::string properties){
 
 std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2, 
 						bool punctual, bool shadows, bool shadowsPCF, bool normals, bool normalMap, 
-						bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect){
+						bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect, bool fog){
 	std::string prop;
 
 	if (unlit)
@@ -141,6 +141,8 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 		prop += "Vc4";
 	if (textureRect)
 		prop += "Txr";
+	if (fog)
+		prop += "Fog";
 
 	return prop;
 }

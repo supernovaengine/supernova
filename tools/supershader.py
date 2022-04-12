@@ -39,6 +39,8 @@ def get_define(property):
         return 'HAS_VERTEX_COLOR_VEC4'
     elif property == 'Txr':
         return 'HAS_TEXTURERECT'
+    elif property == 'Fog':
+        return 'HAS_FOG'
     else:
         sys.exit('Not found value for property: '+property)
 
@@ -54,16 +56,27 @@ def get_output(shader, project, lang):
 
 def get_default_shaders():
     s =  "mesh_Uv1PucNorNmpTanVc4;"
+    s =  "mesh_Uv1PucNorNmpTanVc4Fog;"
     s += "mesh_Uv1PucNorNmpTan;"
+    s += "mesh_Uv1PucNorNmpTanFog;"
     s += "mesh_Uv1PucShwPcfNorNmpTanVc4;"
+    s += "mesh_Uv1PucShwPcfNorNmpTanVc4Fog;"
     s += "mesh_Uv1PucShwPcfNorNmpTan;"
+    s += "mesh_Uv1PucShwPcfNorNmpTanFog;"
     s += "mesh_Uv1PucNorVc4;"
+    s += "mesh_Uv1PucNorVc4Fog;"
     s += "mesh_Uv1PucNor;"
+    s += "mesh_Uv1PucNorFog;"
     s += "mesh_Uv1PucShwPcfNorVc4;"
+    s += "mesh_Uv1PucShwPcfNorVc4Fog;"
     s += "mesh_Uv1PucShwPcfNor;"
+    s += "mesh_Uv1PucShwPcfNorFog;"
     s += "mesh_UltUv1Vc4;"
+    s += "mesh_UltUv1Vc4Fog;"
     s += "mesh_UltUv1;"
+    s += "mesh_UltUv1Fog;"
     s += "mesh_UltUv1Vc4Txr;"
+    s += "mesh_UltUv1Vc4TxrFog;"
     s += "depth;"
     s += "sky;"
     s += "ui_Vc4;"

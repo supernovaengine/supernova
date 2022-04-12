@@ -8,6 +8,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include "object/environment/Fog.h"
+
 #include "component/MeshComponent.h"
 #include "component/SkyComponent.h"
 #include "component/UIComponent.h"
@@ -39,8 +41,11 @@ namespace Supernova{
 		Entity camera;
 		bool mainScene;
 
-		Vector4 color;
+		Vector4 backgroundColor;
 		bool shadowsPCF;
+
+		bool hasFog;
+		Fog fog;
 
 		bool renderToTexture;
 		FramebufferRender framebuffer;
@@ -70,12 +75,16 @@ namespace Supernova{
 		void setMainScene(bool mainScene);
 		bool isMainScene();
 
-		void setColor(Vector4 color);
-		void setColor(float red, float green, float blue, float alpha);
-		Vector4 getColor();
+		void setBackgroundColor(Vector4 color);
+		void setBackgroundColor(float red, float green, float blue);
+		Vector4 getBackgroundColor();
 
 		void setShadowsPCF(bool shadowsPCF);
 		bool isShadowsPCF();
+
+		void setFog(bool hasFog);
+		bool isFogEnabled();
+		Fog getFog();
 
 		void setRenderToTexture(bool renderToTexture);
 		bool isRenderToTexture();

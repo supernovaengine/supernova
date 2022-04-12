@@ -490,7 +490,7 @@ void init(){
     textedit.setPosition(500,300,0);
     //textedit.setSize(200,50);
     textedit.setWidth(300);
-    //textedit.setText("oii");
+    textedit.setText("oii");
     textedit.setFontSize(20);
     textedit.setMaxTextSize(400);
     //textedit.setTextColor(Vector4(0,0,0,1));
@@ -580,8 +580,14 @@ void init(){
     Engine::onTouchEnd = onTouchEnd;
     Engine::onTouchCancel = onTouchCancel;
 
+    sky.setAlpha(0.2);
+
+    scene.setBackgroundColor(0.8, 0.8, 0.8);
+    scene.setFog(true);
+    scene.getFog().setType(FogType::EXPONENTIALSQUARED);
+
     Engine::setScene(&scene);
-    Engine::addSceneLayer(&uiscene);
+    //Engine::addSceneLayer(&uiscene);
 }
 
 void onUpdate(){
