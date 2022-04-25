@@ -17,6 +17,8 @@
 using namespace Supernova;
 
 Model::Model(Scene* scene): Mesh(scene){
+    addComponent<ModelComponent>({});
+
     MeshComponent& mesh = getComponent<MeshComponent>();
     mesh.buffers["vertices"] = &buffer;
     mesh.buffers["indices"] = &indices;
@@ -100,7 +102,7 @@ std::string Model::readFileToString(const char* filename){
     return filedata.readString(filedata.length());
 }
 
-bool Model::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, int& eBufferIndex){
+bool Model::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, int& eBufferIndex, const int stride){
     const tinygltf::BufferView &bufferView = gltfModel->bufferViews[bufferViewIndex];
     const std::string name = getBufferName(bufferViewIndex);
 
@@ -116,6 +118,7 @@ bool Model::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, int& eBuffe
         }
 
         eBuffers[eBufferIndex].setData(&gltfModel->buffers[bufferView.buffer].data.at(0) + bufferView.byteOffset, bufferView.byteLength);
+        eBuffers[eBufferIndex].setStride(stride);
 
         eBufferIndex++;
         if (eBufferIndex > MAX_EXTERNAL_BUFFERS){
@@ -179,6 +182,88 @@ bool Model::loadModel(const char* filename){
     }
 
     return true;
+}
+
+Entity Model::generateSketetalStructure(ModelComponent& model, int nodeIndex, int skinIndex){
+    tinygltf::Node node = gltfModel->nodes[nodeIndex];
+    tinygltf::Skin skin = gltfModel->skins[skinIndex];
+
+    int index = -1;
+
+    for (int j = 0; j < skin.joints.size(); j++) {
+        if (nodeIndex == skin.joints[j])
+            index = j;
+    }
+
+    Matrix4 offsetMatrix;
+
+    if (skin.inverseBindMatrices >= 0) {
+
+        tinygltf::Accessor accessor = gltfModel->accessors[skin.inverseBindMatrices];
+        tinygltf::BufferView bufferView = gltfModel->bufferViews[accessor.bufferView];
+
+        float *matrices = (float *) (&gltfModel->buffers[bufferView.buffer].data.at(0) +
+                                     bufferView.byteOffset + accessor.byteOffset +
+                                     (16 * sizeof(float) * index));
+
+        if (accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT || accessor.type != TINYGLTF_TYPE_MAT4) {
+            Log::Error("Skeleton error: Unknown inverse bind matrix data type");
+
+            return NULL_ENTITY;
+        }
+
+        offsetMatrix = Matrix4(
+                matrices[0], matrices[4], matrices[8], matrices[12],
+                matrices[1], matrices[5], matrices[9], matrices[13],
+                matrices[2], matrices[6], matrices[10], matrices[14],
+                matrices[3], matrices[7], matrices[11], matrices[15]);
+
+    }
+
+    Entity bone;
+
+    bone = scene->createEntity();
+    scene->addComponent<Transform>(bone, {});
+    scene->addComponent<BoneComponent>(bone, {});
+
+    Transform& bonetransform = scene->getComponent<Transform>(bone);
+    BoneComponent& bonecomp = scene->getComponent<BoneComponent>(bone);
+
+    bonecomp.index = index;
+    bonecomp.name = node.name;
+    if (node.translation.size() == 3){
+        bonecomp.bindPosition = Vector3(node.translation[0], node.translation[1], node.translation[2]);
+    }else{
+        bonecomp.bindPosition = Vector3(0.0, 0.0, 0.0);
+    }
+    if (node.rotation.size() == 4){
+        bonecomp.bindRotation = Quaternion(node.rotation[3], node.rotation[0], node.rotation[1], node.rotation[2]);
+    }else{
+        bonecomp.bindRotation = Quaternion(1.0, 0.0, 0.0, 0.0);
+    }
+    if (node.scale.size() == 3){
+        bonecomp.bindScale = Vector3(node.scale[0], node.scale[1], node.scale[2]);
+    }else{
+        bonecomp.bindScale = Vector3(1.0, 1.0, 1.0);
+    }
+
+    // move to bind
+    bonetransform.position = bonecomp.bindPosition;
+    bonetransform.rotation = bonecomp.bindRotation;
+    bonetransform.scale = bonecomp.bindScale;
+
+    bonecomp.offsetMatrix = offsetMatrix;
+    bonecomp.model = entity;
+
+    model.bonesNameMapping[bonecomp.name] = bone;
+    model.bonesIdMapping[nodeIndex] = bone;
+
+    for (size_t i = 0; i < node.children.size(); i++){
+        // here bonetransform and bonecomp losts references
+        scene->addEntityChild(bone, generateSketetalStructure(model, node.children[i], skinIndex));
+    }
+
+    return bone;
 }
 
 bool Model::loadOBJ(const char* filename){
@@ -342,6 +427,7 @@ bool Model::loadGLTF(const char* filename) {
         gltfModel = new tinygltf::Model();
 
     MeshComponent& mesh = getComponent<MeshComponent>();
+    ModelComponent& model = getComponent<ModelComponent>();
 
     tinygltf::TinyGLTF loader;
     std::string err;
@@ -474,7 +560,7 @@ bool Model::loadGLTF(const char* filename) {
             mat.emissiveFactor[1],
             mat.emissiveFactor[2]);
 
-        loadGLTFBuffer(indexAccessor.bufferView, mesh, eBufferIndex);
+        loadGLTFBuffer(indexAccessor.bufferView, mesh, eBufferIndex, 0);
 
         addSubmeshAttribute(mesh.submeshes[i], getBufferName(indexAccessor.bufferView), AttributeType::INDEX, 1, indexType, indexAccessor.count, indexAccessor.byteOffset, false);
 
@@ -483,7 +569,7 @@ bool Model::loadGLTF(const char* filename) {
             int byteStride = accessor.ByteStride(gltfModel->bufferViews[accessor.bufferView]);
             std::string bufferName = getBufferName(accessor.bufferView);
 
-            loadGLTFBuffer(accessor.bufferView, mesh, eBufferIndex);
+            loadGLTFBuffer(accessor.bufferView, mesh, eBufferIndex, byteStride);
 
             int elements = 1;
             if (accessor.type != TINYGLTF_TYPE_SCALAR) {
@@ -510,133 +596,150 @@ bool Model::loadGLTF(const char* filename) {
             }
 
             AttributeType attType;
-            bool verifyAttrs = false;
+            bool foundAttrs = false;
             if (attrib.first.compare("POSITION") == 0){
                 mesh.defaultBuffer = bufferName;
                 attType = AttributeType::POSITION;
-                verifyAttrs = true;
+                foundAttrs = true;
             }
             if (attrib.first.compare("NORMAL") == 0){
                 attType = AttributeType::NORMAL;
-                verifyAttrs = true;
+                foundAttrs = true;
             }
             if (attrib.first.compare("TANGENT") == 0){
                 attType = AttributeType::TANGENT;
-                verifyAttrs = true;
+                foundAttrs = true;
             }
             if (attrib.first.compare("TEXCOORD_0") == 0){
                 attType = AttributeType::TEXCOORD1;
-                verifyAttrs = true;
+                foundAttrs = true;
             }
             if (attrib.first.compare("TEXCOORD_1") == 0){
                 //attType = AttributeType::TEXTURECOORDS;
-                //verifyAttrs = true;
+                //foundAttrs = true;
             }
             if (attrib.first.compare("COLOR_0") == 0){
                 if (elements == 4){
                     attType = AttributeType::COLOR;
-                    verifyAttrs = true;
+                    foundAttrs = true;
                     mesh.submeshes[i].hasVertexColor = true;
                 } else {
                     Log::Warn("Not supported vector(3) of: %s", attrib.first.c_str());
                 }
             }
             if (attrib.first.compare("JOINTS_0") == 0){
-                //attType = S_VERTEXATTRIBUTE_BONEIDS;
+                //TODO: Check if type is UNSIGNED_SHORT because Sokol normalize it
+                attType = AttributeType::BONEIDS;
+                foundAttrs = true;
             }
             if (attrib.first.compare("WEIGHTS_0") == 0){
-                //attType = S_VERTEXATTRIBUTE_BONEWEIGHTS;
+                attType = AttributeType::BONEWEIGHTS;
+                foundAttrs = true;
             }
 
-            if (verifyAttrs) {
+            if (foundAttrs) {
                 mesh.buffers[bufferName]->setRenderAttributes(false);
-                addSubmeshAttribute(mesh.submeshes[i], bufferName, attType, elements, dataType, byteStride, indexAccessor.byteOffset, indexAccessor.normalized);
+                addSubmeshAttribute(mesh.submeshes[i], bufferName, attType, elements, dataType, accessor.count, accessor.byteOffset, accessor.normalized);
             } else
                 Log::Warn("Model attribute missing: %s", attrib.first.c_str());
 
         }
 
-    /*
-        morphTargets = false;
+        model.morphTargets = false;
         bool morphNormals = false;
 
         int morphIndex = 0;
         for (auto &morphs : primitive.targets) {
             for (auto &attribMorph : morphs) {
 
-                morphTargets = true;
+                model.morphTargets = true;
 
                 tinygltf::Accessor accessor = gltfModel->accessors[attribMorph.second];
                 int byteStride = accessor.ByteStride(gltfModel->bufferViews[accessor.bufferView]);
                 std::string bufferName = getBufferName(accessor.bufferView);
 
-                loadGLTFBuffer(accessor.bufferView);
+                loadGLTFBuffer(accessor.bufferView, mesh, eBufferIndex, byteStride);
 
                 int elements = 1;
                 if (accessor.type != TINYGLTF_TYPE_SCALAR) {
                     elements = accessor.type;
                 }
 
-                DataType dataType;
+                AttributeDataType dataType;
 
                 if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_BYTE){
-                    dataType = DataType::BYTE;
+                    dataType = AttributeDataType::BYTE;
                 }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE){
-                    dataType = DataType::UNSIGNED_BYTE;
+                    dataType = AttributeDataType::UNSIGNED_BYTE;
                 }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_SHORT){
-                    dataType = DataType::SHORT;
+                    dataType = AttributeDataType::SHORT;
                 }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT){
-                    dataType = DataType::UNSIGNED_SHORT;
+                    dataType = AttributeDataType::UNSIGNED_SHORT;
                 }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT){
-                    dataType = DataType::UNSIGNED_INT;
+                    dataType = AttributeDataType::UNSIGNED_INT;
                 }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT){
-                    dataType = DataType::FLOAT;
+                    dataType = AttributeDataType::FLOAT;
                 }else{
                     Log::Error("Unknown data type %i of morph target %s", accessor.componentType, attribMorph.first.c_str());
                     continue;
                 }
 
-                int attType = -1;
+                AttributeType attType;
+                bool foundMorph = false;
+
                 if (attribMorph.first.compare("POSITION") == 0){
                     if (morphIndex == 0){
-                        attType = S_VERTEXATTRIBUTE_MORPHTARGET0;
+                        attType = AttributeType::MORPHTARGET0;
+                        foundMorph = true;
                     } else if (morphIndex == 1){
-                        attType = S_VERTEXATTRIBUTE_MORPHTARGET1;
+                        attType = AttributeType::MORPHTARGET1;
+                        foundMorph = true;
                     } else if (morphIndex == 2){
-                        attType = S_VERTEXATTRIBUTE_MORPHTARGET2;
+                        attType = AttributeType::MORPHTARGET2;
+                        foundMorph = true;
                     } else if (morphIndex == 3){
-                        attType = S_VERTEXATTRIBUTE_MORPHTARGET3;
+                        attType = AttributeType::MORPHTARGET3;
+                        foundMorph = true;
                     }
                     if (!morphNormals){
                         if (morphIndex == 4){
-                            attType = S_VERTEXATTRIBUTE_MORPHTARGET4;
+                            attType = AttributeType::MORPHTARGET4;
+                            foundMorph = true;
                         } else if (morphIndex == 5){
-                            attType = S_VERTEXATTRIBUTE_MORPHTARGET5;
+                            attType = AttributeType::MORPHTARGET5;
+                            foundMorph = true;
                         } else if (morphIndex == 6){
-                            attType = S_VERTEXATTRIBUTE_MORPHTARGET6;
+                            attType = AttributeType::MORPHTARGET6;
+                            foundMorph = true;
                         } else if (morphIndex == 7){
-                            attType = S_VERTEXATTRIBUTE_MORPHTARGET7;
+                            attType = AttributeType::MORPHTARGET7;
+                            foundMorph = true;
                         }
                     }
                 }
                 if (attribMorph.first.compare("NORMAL") == 0){
                     morphNormals = true;
                     if (morphIndex == 0){
-                        attType = S_VERTEXATTRIBUTE_MORPHNORMAL0;
+                        attType = AttributeType::MORPHNORMAL0;
+                        foundMorph = true;
                     } else if (morphIndex == 1){
-                        attType = S_VERTEXATTRIBUTE_MORPHNORMAL1;
+                        attType = AttributeType::MORPHNORMAL1;
+                        foundMorph = true;
                     } else if (morphIndex == 2){
-                        attType = S_VERTEXATTRIBUTE_MORPHNORMAL2;
+                        attType = AttributeType::MORPHNORMAL2;
+                        foundMorph = true;
                     } else if (morphIndex == 3){
-                        attType = S_VERTEXATTRIBUTE_MORPHNORMAL3;
+                        attType = AttributeType::MORPHNORMAL3;
+                        foundMorph = true;
                     }
                 }
                 if (attribMorph.first.compare("TANGENT") == 0){
+                    //TODO
                 }
 
-                if (attType > -1) {
-                    buffers[bufferName]->setRenderAttributes(false);
-                    submeshes[i]->addAttribute(bufferName, attType, elements, dataType, byteStride, accessor.byteOffset);
+                if (foundMorph) {
+                    mesh.buffers[bufferName]->setRenderAttributes(false);
+                    addSubmeshAttribute(mesh.submeshes[i], bufferName, attType, elements, dataType, accessor.count, accessor.byteOffset, accessor.normalized);
                 }
             }
             morphIndex++;
@@ -647,26 +750,25 @@ bool Model::loadGLTF(const char* filename) {
             morphWeightSize = 4;
         }
 
-        if (morphTargets){
-            morphWeights.resize(morphWeightSize);
+        if (model.morphTargets){
+            model.morphWeights.resize(morphWeightSize);
             for (int w = 0; w < gltfmesh.weights.size(); w++) {
                 if (w < morphWeightSize){
-                    morphWeights[w] = gltfmesh.weights[w];
+                    model.morphWeights[w] = gltfmesh.weights[w];
                 }
             }
 
             //Getting morph target names from mesh extra property
-            morphNameMapping.clear();
+            model.morphNameMapping.clear();
             if (gltfmesh.extras.Has("targetNames") && gltfmesh.extras.Get("targetNames").IsArray()){
                 for (int t = 0; t < gltfmesh.extras.Get("targetNames").Size(); t++){
-                    morphNameMapping[gltfmesh.extras.Get("targetNames").Get(t).Get<std::string>()] = t;
+                    model.morphNameMapping[gltfmesh.extras.Get("targetNames").Get(t).Get<std::string>()] = t;
                 }
             }
         }
-    */
+
     }
 
-/*
     int skinIndex = -1;
     int skeletonRoot = -1;
     std::map<int, int> nodesParent;
@@ -702,17 +804,21 @@ bool Model::loadGLTF(const char* filename) {
             }
         }
 
-        bonesNameMapping.clear();
-        bonesIdMapping.clear();
+        model.bonesNameMapping.clear();
+        model.bonesIdMapping.clear();
 
-        skeleton = generateSketetalStructure(skeletonRoot, skinIndex);
+        model.skeleton = generateSketetalStructure(model, skeletonRoot, skinIndex);
 
-        if (skeleton) {
-            bonesMatrix.resize(skin.joints.size());
-            addObject(skeleton);
+        if (model.skeleton != NULL_ENTITY) {
+            if (skin.joints.size() > MAX_BONES){
+                Log::Error("Cannot create skinning bigger than %i", MAX_BONES);
+                return false;
+            }
+            mesh.bonesMatrix.resize(MAX_BONES);
+            scene->addEntityChild(entity, model.skeleton);
         }
     }
-
+    /*
     clearAnimations();
 
     for (size_t i = 0; i < gltfModel->animations.size(); i++) {
@@ -855,4 +961,26 @@ bool Model::loadGLTF(const char* filename) {
     mesh.needReload = true;
 
     return true;
+}
+
+Bone Model::getBone(std::string name){
+    ModelComponent& model = getComponent<ModelComponent>();
+
+    try{
+        return Bone(scene, model.bonesNameMapping.at(name));
+    }catch (const std::out_of_range& e){
+		Log::Error("Retrieving non-existent bone: %s", e.what());
+		throw;
+	}
+}
+
+Bone Model::getBone(int id){
+    ModelComponent& model = getComponent<ModelComponent>();
+
+    try{
+        return Bone(scene, model.bonesIdMapping.at(id));
+    }catch (const std::out_of_range& e){
+		Log::Error("Retrieving non-existent bone: %s", e.what());
+		throw;
+	}
 }

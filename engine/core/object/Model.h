@@ -6,6 +6,7 @@
 #define MODEL_H
 
 #include "Mesh.h"
+#include "Bone.h"
 #include "buffer/ExternalBuffer.h"
 
 #define MAX_EXTERNAL_BUFFERS 9
@@ -19,9 +20,11 @@ namespace Supernova{
         static bool readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *);
         static std::string readFileToString(const char* filename);
 
-        bool loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, int& eBufferIndex);
+        bool loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, int& eBufferIndex, const int stride);
         bool loadGLTFTexture(int textureIndex, Texture& texture, std::string textureName);
         std::string getBufferName(int bufferViewIndex);
+
+        Entity generateSketetalStructure(ModelComponent& model, int nodeIndex, int skinIndex);
 
         tinygltf::Model* gltfModel;
         ExternalBuffer eBuffers[MAX_EXTERNAL_BUFFERS];
@@ -35,6 +38,9 @@ namespace Supernova{
         bool loadGLTF(const char* filename);
 
         bool loadModel(const char* filename);
+
+        Bone getBone(std::string name);
+        Bone getBone(int id);
     };
 }
 

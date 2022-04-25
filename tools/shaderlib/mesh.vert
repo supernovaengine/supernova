@@ -56,43 +56,83 @@ out vec2 v_uv2;
     uniform u_vs_shadows {
         mat4 lightVPMatrix[MAX_SHADOWSMAP];
     };
-    
+ 
     out vec4 v_lightProjPos[MAX_SHADOWSMAP];
     out float v_clipSpacePosZ;
 #endif
 
-vec4 getPosition(){
-    vec4 pos = vec4(a_position, 1.0);
-    return pos;
+#ifdef HAS_SKINNING
+    in vec4 a_boneWeights;
+    in vec4 a_boneIds;
+
+    uniform u_vs_skinning {
+        mat4 bonesMatrix[MAX_BONES];
+    };
+#endif
+
+vec4 getPosition(mat4 boneTransform){
+    vec3 pos = a_position;
+
+    #ifdef HAS_SKINNING
+        vec4 skinVertex = vec4(pos, 1.0);
+        skinVertex = boneTransform * skinVertex;
+        pos = vec3(skinVertex) / skinVertex.w;
+    #endif
+
+    return vec4(pos, 1.0);
 }
 
 #ifdef HAS_NORMALS
-vec3 getNormal(){
+vec3 getNormal(mat4 boneTransform){
     vec3 normal = a_normal;
+
+    #ifdef HAS_SKINNING
+        vec4 skinNormal = vec4(normal, 1.0);
+        skinNormal = boneTransform * skinNormal;
+        normal = vec3(skinNormal) / skinNormal.w;
+    #endif
+
     return normalize(normal);
 }
 #endif
 
 #ifdef HAS_TANGENTS
-vec3 getTangent(){
+vec3 getTangent(mat4 boneTransform){
     vec3 tangent = a_tangent.xyz;
+
+    #ifdef HAS_SKINNING
+        vec4 skinTangent = vec4(tangent, 1.0);
+        skinTangent = boneTransform * skinTangent;
+        tangent = vec3(skinTangent) / skinTangent.w;
+    #endif
+
     return normalize(tangent);
 }
 #endif
 
 void main() {
-    vec4 pos = pbrParams.modelMatrix * getPosition();
+    mat4 boneTransform = mat4(0.0);
+    #ifdef HAS_SKINNING
+        //sokol send boneIds (USHORT4N) normalized, needed "expand" the normalized vertex shader
+        boneTransform += bonesMatrix[int(a_boneIds[0] * 65535.0)] * a_boneWeights[0];
+        boneTransform += bonesMatrix[int(a_boneIds[1] * 65535.0)] * a_boneWeights[1];
+        boneTransform += bonesMatrix[int(a_boneIds[2] * 65535.0)] * a_boneWeights[2];
+        boneTransform += bonesMatrix[int(a_boneIds[3] * 65535.0)] * a_boneWeights[3];
+    #endif
+
+    vec4 bonePosition = getPosition(boneTransform);
+    vec4 pos = pbrParams.modelMatrix * bonePosition;
     v_position = vec3(pos.xyz) / pos.w;
 
     #ifdef HAS_NORMALS
     #ifdef HAS_TANGENTS
-        vec3 tangent = getTangent();
-        vec3 normalW = normalize(vec3(pbrParams.normalMatrix * vec4(getNormal(), 0.0)));
+        vec3 tangent = getTangent(boneTransform);
+        vec3 normalW = normalize(vec3(pbrParams.normalMatrix * vec4(getNormal(boneTransform), 0.0)));
         vec3 tangentW = normalize(vec3(pbrParams.modelMatrix * vec4(tangent, 0.0)));
         vec3 bitangentW = cross(normalW, tangentW) * a_tangent.w;
         v_tbn = mat3(tangentW, bitangentW, normalW);
     #else // !HAS_TANGENTS
-        v_normal = normalize(vec3(pbrParams.normalMatrix * vec4(getNormal(), 0.0)));
+        v_normal = normalize(vec3(pbrParams.normalMatrix * vec4(getNormal(boneTransform), 0.0)));
     #endif
     #endif
 
@@ -123,7 +163,7 @@ void main() {
     }
     #endif
 
-    gl_Position = pbrParams.mvpMatrix * getPosition();
+    gl_Position = pbrParams.mvpMatrix * bonePosition;
 
     #ifdef USE_SHADOWS
         v_clipSpacePosZ = gl_Position.z;

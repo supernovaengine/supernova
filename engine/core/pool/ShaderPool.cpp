@@ -114,7 +114,8 @@ void ShaderPool::remove(ShaderType shaderType, std::string properties){
 
 std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2, 
 						bool punctual, bool shadows, bool shadowsPCF, bool normals, bool normalMap, 
-						bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect, bool fog){
+						bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect, 
+						bool fog, bool skinning){
 	std::string prop;
 
 	if (unlit)
@@ -143,6 +144,17 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 		prop += "Txr";
 	if (fog)
 		prop += "Fog";
+	if (skinning)
+		prop += "Ski";
+
+	return prop;
+}
+
+std::string ShaderPool::getDepthMeshProperties(bool skinning){
+	std::string prop;
+
+	if (skinning)
+		prop += "Ski";
 
 	return prop;
 }

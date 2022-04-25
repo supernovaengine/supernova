@@ -25,6 +25,7 @@ namespace Supernova{
         std::shared_ptr<ShaderRender> depthShader;
 
         std::string shaderProperties;
+        std::string depthShaderProperties;
 
         int slotVSParams = -1;
         int slotFSParams = -1;
@@ -33,17 +34,22 @@ namespace Supernova{
         int slotVSSprite = -1;
         int slotVSShadows = -1;
         int slotFSShadows = -1;
+        int slotVSSkinning = -1;
+
         int slotVSDepthParams = -1;
+        int slotVSDepthSkinning = -1;
 
         Rect textureRect = Rect(0.0, 0.0, 1.0, 1.0);
 
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;
         unsigned int vertexCount = 0;
         
+        bool hasTexture1 = false;
         bool hasNormalMap = false;
         bool hasTangent = false;
         bool hasVertexColor = false;
         bool hasTextureRect = false;
+        bool hasSkinning = false;
 
         bool needUpdateTexture = false;
     };
@@ -56,6 +62,9 @@ namespace Supernova{
 
         Submesh submeshes[MAX_SUBMESHES];
         unsigned int numSubmeshes = 1;
+
+        std::vector<Matrix4> bonesMatrix;
+        //std::vector<float> morphWeights;
 
         bool castShadows = true;
         bool transparency = false;

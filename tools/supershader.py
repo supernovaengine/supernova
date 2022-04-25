@@ -41,6 +41,8 @@ def get_define(property):
         return 'HAS_TEXTURERECT'
     elif property == 'Fog':
         return 'HAS_FOG'
+    elif property == 'Ski':
+        return 'HAS_SKINNING'
     else:
         sys.exit('Not found value for property: '+property)
 
@@ -56,7 +58,9 @@ def get_output(shader, project, lang):
 
 def get_default_shaders():
     s =  "mesh_Uv1PucNorNmpTanVc4;"
-    s =  "mesh_Uv1PucNorNmpTanVc4Fog;"
+    s += "mesh_Uv1PucNorNmpTanVc4Fog;"
+    s += "mesh_Uv1PucNorNmpTanVc4Ski;"
+    s += "mesh_Uv1PucNorNmpTanVc4FogSki;"
     s += "mesh_Uv1PucNorNmpTan;"
     s += "mesh_Uv1PucNorNmpTanFog;"
     s += "mesh_Uv1PucShwPcfNorNmpTanVc4;"
@@ -70,14 +74,19 @@ def get_default_shaders():
     s += "mesh_Uv1PucShwPcfNorVc4;"
     s += "mesh_Uv1PucShwPcfNorVc4Fog;"
     s += "mesh_Uv1PucShwPcfNor;"
+    s += "mesh_Uv1PucShwPcfNorSki;"
     s += "mesh_Uv1PucShwPcfNorFog;"
+    s += "mesh_Uv1PucShwPcfNorFogSki;"
     s += "mesh_UltUv1Vc4;"
     s += "mesh_UltUv1Vc4Fog;"
     s += "mesh_UltUv1;"
     s += "mesh_UltUv1Fog;"
     s += "mesh_UltUv1Vc4Txr;"
     s += "mesh_UltUv1Vc4TxrFog;"
+    s += "mesh_PucShwPcfNorSki;"
+    s += "mesh_PucShwPcfNor;"
     s += "depth;"
+    s += "depth_Ski;"
     s += "sky;"
     s += "ui_Vc4;"
     s += "ui_TexVc4;"
@@ -146,6 +155,7 @@ def generate(shaders, langs, project, verbose, max_lights, max_shadowsmap, max_s
             defines += ';MAX_SHADOWSMAP='+str(max_shadowsmap)
             defines += ';MAX_SHADOWSCUBEMAP='+str(max_shadowscubemap)
             defines += ';MAX_SHADOWCASCADES='+str(max_shadowcascades)
+            defines += ';MAX_BONES='+str(70)
 
             while properties != '':
                 if len(defines) > 0:

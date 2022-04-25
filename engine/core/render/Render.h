@@ -57,23 +57,21 @@ namespace Supernova{
         COLOR,
         POINTSIZE,
         POINTROTATION,
-        TEXTURERECT
-        //BONEWEIGHTS,
-        //BONEIDS,
-        //POINTCOLORS,
-        //POINTROTATIONS,
-        //MORPHTARGET0,
-        //MORPHTARGET1,
-        //MORPHTARGET2,
-        //MORPHTARGET3,
-        //MORPHTARGET4,
-        //MORPHTARGET5,
-        //MORPHTARGET6,
-        //MORPHTARGET7,
-        //MORPHNORMAL0,
-        //MORPHNORMAL1,
-        //MORPHNORMAL2,
-        //MORPHNORMAL3
+        TEXTURERECT,
+        BONEWEIGHTS,
+        BONEIDS,
+        MORPHTARGET0,
+        MORPHTARGET1,
+        MORPHTARGET2,
+        MORPHTARGET3,
+        MORPHTARGET4,
+        MORPHTARGET5,
+        MORPHTARGET6,
+        MORPHTARGET7,
+        MORPHNORMAL0,
+        MORPHNORMAL1,
+        MORPHNORMAL2,
+        MORPHNORMAL3
     };
 
     enum class AttributeDataType{
@@ -101,6 +99,8 @@ namespace Supernova{
         UI_VS_PARAMS,
         UI_FS_PARAMS,
         POINTS_VS_PARAMS,
+        VS_SKINNING,
+        DEPTH_VS_SKINNING
         //CAMERA
         /*
         MVPMATRIX,

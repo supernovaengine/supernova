@@ -13,6 +13,8 @@ using namespace Supernova;
 
 Scene::Scene(){
 	registerComponent<MeshComponent>();
+	registerComponent<ModelComponent>();
+	registerComponent<BoneComponent>();
 	registerComponent<SkyComponent>();
 	registerComponent<UIComponent>();
 	registerComponent<SpriteComponent>();
@@ -311,10 +313,34 @@ void Scene::sortComponentsByTransform(Signature entitySignature){
 		meshes->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
+	// Model component
+	if (entitySignature.test(getComponentType<ModelComponent>())){
+		auto models = componentManager.getComponentArray<ModelComponent>();
+		models->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
+	}
+
+	// Bone component
+	if (entitySignature.test(getComponentType<BoneComponent>())){
+		auto bones = componentManager.getComponentArray<BoneComponent>();
+		bones->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
+	}
+
+	// Polygon component
+	if (entitySignature.test(getComponentType<PolygonComponent>())){
+		auto polygons = componentManager.getComponentArray<PolygonComponent>();
+		polygons->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
+	}
+
 	// UI component
 	if (entitySignature.test(getComponentType<UIComponent>())){
 		auto ui = componentManager.getComponentArray<UIComponent>();
 		ui->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
+	}
+
+	// Particles component
+	if (entitySignature.test(getComponentType<ParticlesComponent>())){
+		auto particles = componentManager.getComponentArray<ParticlesComponent>();
+		particles->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 }
 

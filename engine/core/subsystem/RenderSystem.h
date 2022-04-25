@@ -7,6 +7,7 @@
 
 #include "SubSystem.h"
 #include "component/MeshComponent.h"
+#include "component/ModelComponent.h"
 #include "component/SkyComponent.h"
 #include "component/UIComponent.h"
 #include "component/ImageComponent.h"

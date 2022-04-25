@@ -63,6 +63,10 @@ int ShaderData::getAttrIndex(AttributeType type){
         attrstr = "a_pointrotation";
     }else if (type == AttributeType::TEXTURERECT){
         attrstr = "a_texturerect";
+    }else if (type == AttributeType::BONEIDS){
+        attrstr = "a_boneIds";
+    }else if (type == AttributeType::BONEWEIGHTS){
+        attrstr = "a_boneWeights";
     }
 
     if (attrstr.empty()){
@@ -116,6 +120,10 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
         ustr = "u_vs_spriteParams";
     }else if (type == UniformBlockType::POINTS_VS_PARAMS){
         ustr = "u_vs_pointsParams";
+    }else if (type == UniformBlockType::VS_SKINNING){
+        ustr = "u_vs_skinning";
+    }else if (type == UniformBlockType::DEPTH_VS_SKINNING){
+        ustr = "u_vs_skinning";
     }
 
     if (ustr.empty()){

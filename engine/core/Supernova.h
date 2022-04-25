@@ -29,6 +29,10 @@
 #define MAX_SPRITE_FRAMES 64
 #endif
 
+#ifndef MAX_BONES
+#define MAX_BONES 70
+#endif
+
 #include "Engine.h"
 
 void init();

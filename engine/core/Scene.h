@@ -11,6 +11,8 @@
 #include "object/environment/Fog.h"
 
 #include "component/MeshComponent.h"
+#include "component/ModelComponent.h"
+#include "component/BoneComponent.h"
 #include "component/SkyComponent.h"
 #include "component/UIComponent.h"
 #include "component/SpriteComponent.h"

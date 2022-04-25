@@ -18,7 +18,6 @@ namespace Supernova{
 
     private:
         void createSprite(SpriteComponent& sprite, MeshComponent& mesh);
-
 		void createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
 
 		void changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh);
