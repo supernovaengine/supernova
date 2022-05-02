@@ -24,6 +24,8 @@ namespace Supernova{
         bool loadGLTFTexture(int textureIndex, Texture& texture, std::string textureName);
         std::string getBufferName(int bufferViewIndex);
 
+        Matrix4 getGLTFNodeMatrix(int nodeIndex);
+        Matrix4 getGLTFMeshGlobalMatrix(int nodeIndex, std::map<int, int>& nodesParent);
         Entity generateSketetalStructure(ModelComponent& model, int nodeIndex, int skinIndex);
 
         tinygltf::Model* gltfModel;

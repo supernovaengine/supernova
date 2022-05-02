@@ -184,6 +184,62 @@ bool Model::loadModel(const char* filename){
     return true;
 }
 
+Matrix4 Model::getGLTFNodeMatrix(int nodeIndex){
+    tinygltf::Node node = gltfModel->nodes[nodeIndex];
+
+    Matrix4 matrix;
+
+    if (node.matrix.size() == 16){
+        matrix = Matrix4(
+                node.matrix[0],node.matrix[4],node.matrix[8], node.matrix[12],
+                node.matrix[1],node.matrix[5],node.matrix[9], node.matrix[13],
+                node.matrix[2],node.matrix[6],node.matrix[10],node.matrix[14],
+                node.matrix[3],node.matrix[7],node.matrix[11],node.matrix[15]);
+    }else{
+
+        Vector3 translation;
+        Vector3 scale;
+        Quaternion rotation;
+
+        if (node.translation.size() == 3){
+            translation = Vector3(node.translation[0], node.translation[1], node.translation[2]);
+        }else{
+            translation = Vector3(0.0, 0.0, 0.0);
+        }
+        if (node.rotation.size() == 4){
+            rotation = Quaternion(node.rotation[3], node.rotation[0], node.rotation[1], node.rotation[2]);
+        }else{
+            rotation = Quaternion(1.0, 0.0, 0.0, 0.0);
+        }
+        if (node.scale.size() == 3){
+            scale = Vector3(node.scale[0], node.scale[1], node.scale[2]);
+        }else{
+            scale = Vector3(1.0, 1.0, 1.0);
+        }
+
+        Matrix4 scaleMatrix = Matrix4::scaleMatrix(scale);
+        Matrix4 translateMatrix = Matrix4::translateMatrix(translation);
+        Matrix4 rotationMatrix = rotation.getRotationMatrix();
+
+        matrix = translateMatrix * rotationMatrix * scaleMatrix;
+    }
+
+    return matrix;
+}
+
+Matrix4 Model::getGLTFMeshGlobalMatrix(int nodeIndex, std::map<int, int>& nodesParent){
+
+    Matrix4 matrix = getGLTFNodeMatrix(nodeIndex);
+
+    int parent = nodesParent[nodeIndex];
+
+    if (parent >= 0){
+        return getGLTFMeshGlobalMatrix(parent, nodesParent) * matrix;
+    }
+
+    return matrix;
+}
+
 Entity Model::generateSketetalStructure(ModelComponent& model, int nodeIndex, int skinIndex){
     tinygltf::Node node = gltfModel->nodes[nodeIndex];
     tinygltf::Skin skin = gltfModel->skins[skinIndex];
@@ -231,21 +287,9 @@ Entity Model::generateSketetalStructure(ModelComponent& model, int nodeIndex, in
 
     bonecomp.index = index;
     bonecomp.name = node.name;
-    if (node.translation.size() == 3){
-        bonecomp.bindPosition = Vector3(node.translation[0], node.translation[1], node.translation[2]);
-    }else{
-        bonecomp.bindPosition = Vector3(0.0, 0.0, 0.0);
-    }
-    if (node.rotation.size() == 4){
-        bonecomp.bindRotation = Quaternion(node.rotation[3], node.rotation[0], node.rotation[1], node.rotation[2]);
-    }else{
-        bonecomp.bindRotation = Quaternion(1.0, 0.0, 0.0, 0.0);
-    }
-    if (node.scale.size() == 3){
-        bonecomp.bindScale = Vector3(node.scale[0], node.scale[1], node.scale[2]);
-    }else{
-        bonecomp.bindScale = Vector3(1.0, 1.0, 1.0);
-    }
+
+    Matrix4 matrix = getGLTFNodeMatrix(nodeIndex);
+    matrix.decompose(bonecomp.bindPosition, bonecomp.bindScale, bonecomp.bindRotation);
 
     // move to bind
     bonetransform.position = bonecomp.bindPosition;
@@ -428,6 +472,7 @@ bool Model::loadGLTF(const char* filename) {
 
     MeshComponent& mesh = getComponent<MeshComponent>();
     ModelComponent& model = getComponent<ModelComponent>();
+    Transform& transform = getComponent<Transform>();
 
     tinygltf::TinyGLTF loader;
     std::string err;
@@ -465,6 +510,30 @@ bool Model::loadGLTF(const char* filename) {
         Log::Verbose("Failed to load glTF: %s", filename);
         return false;
     }
+
+    int meshNode = -1;
+    std::map<int, int> nodesParent;
+
+    for (size_t i = 0; i < gltfModel->nodes.size(); i++) {
+        nodesParent[i] = -1;
+    }
+
+    for (size_t i = 0; i < gltfModel->nodes.size(); i++) {
+        tinygltf::Node node = gltfModel->nodes[i];
+
+        if (node.mesh == meshIndex){
+            meshNode = i;
+        }
+
+        for (int c = 0; c < node.children.size(); c++){
+            nodesParent[node.children[c]] = i;
+        }
+    }
+
+    // getting mesh transform based on GLTF scene root node
+    Matrix4 matrix = getGLTFMeshGlobalMatrix(meshNode, nodesParent);
+    matrix.decompose(transform.position, transform.scale, transform.rotation);
+    transform.needUpdate = true;
 
     tinygltf::Mesh gltfmesh = gltfModel->meshes[meshIndex];
 
@@ -769,25 +838,8 @@ bool Model::loadGLTF(const char* filename) {
 
     }
 
-    int skinIndex = -1;
+    int skinIndex = gltfModel->nodes[meshNode].skin;
     int skeletonRoot = -1;
-    std::map<int, int> nodesParent;
-
-    for (size_t i = 0; i < gltfModel->nodes.size(); i++) {
-        nodesParent[i] = -1;
-    }
-
-    for (size_t i = 0; i < gltfModel->nodes.size(); i++) {
-        tinygltf::Node node = gltfModel->nodes[i];
-
-        if (node.mesh == meshIndex && node.skin >= 0){
-            skinIndex = node.skin;
-        }
-
-        for (int c = 0; c < node.children.size(); c++){
-            nodesParent[node.children[c]] = i;
-        }
-    }
 
     if (skinIndex >= 0){
         tinygltf::Skin skin = gltfModel->skins[skinIndex];
