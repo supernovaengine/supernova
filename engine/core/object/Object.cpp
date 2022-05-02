@@ -127,6 +127,12 @@ Vector3 Object::getWorldScale(){
     return transform.worldScale;
 }
 
+void Object::setModelMatrix(Matrix4 modelMatrix){
+    Transform& transform = getComponent<Transform>();
+    transform.modelMatrix = modelMatrix;
+    transform.staticObject = true;
+}
+
 Object* Object::createChild(){
     Object* child = new Object(scene);
 

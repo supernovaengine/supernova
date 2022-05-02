@@ -3,10 +3,12 @@
 #define matrix4_h
 
 #include "math/Vector3.h"
+#include "math/Matrix3.h"
 #include "math/Vector4.h"
 
-
 namespace Supernova {
+
+    class Quaternion;
 
     class Matrix4{
 
@@ -42,11 +44,15 @@ namespace Supernova {
         void set(const int col,const int row,const float val);
         float get(const int col,const int row) const;
 
+        void setRow(const unsigned int row, const Vector4& vec);
+        void setColumn(const unsigned int column, const Vector4& vec);
+
         void identity();
         void translateInPlace(float x, float y, float z);
 
         Matrix4 inverse();
         Matrix4 transpose();
+        float determinant();
 
         static Matrix4 translateMatrix(float x, float y, float z);
         static Matrix4 translateMatrix(const Vector3& position);
@@ -65,6 +71,7 @@ namespace Supernova {
         static Matrix4 orthoMatrix(float l, float r, float b, float t, float n, float f);
         static Matrix4 perspectiveMatrix(float y_fov, float aspect, float near, float far);
 
+        void decompose(Vector3& position, Vector3& scale, Quaternion& rotation);
     };
     
 }

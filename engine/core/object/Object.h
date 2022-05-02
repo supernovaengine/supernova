@@ -50,6 +50,8 @@ namespace Supernova{
         void setScale(Vector3 scale);
         Vector3 getScale();
         Vector3 getWorldScale();
+
+        void setModelMatrix(Matrix4 modelMatrix);
     
         template <typename T>
         void addComponent(T &&component) {

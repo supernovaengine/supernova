@@ -1128,11 +1128,13 @@ Rect RenderSystem::getScissorRect(UIComponent& ui, ImageComponent& img, Transfor
 }
 
 void RenderSystem::updateTransform(Transform& transform){
-	Matrix4 scaleMatrix = Matrix4::scaleMatrix(transform.scale);
-    Matrix4 translateMatrix = Matrix4::translateMatrix(transform.position);
-    Matrix4 rotationMatrix = transform.rotation.getRotationMatrix();
+	if (!transform.staticObject){
+		Matrix4 scaleMatrix = Matrix4::scaleMatrix(transform.scale);
+		Matrix4 translateMatrix = Matrix4::translateMatrix(transform.position);
+		Matrix4 rotationMatrix = transform.rotation.getRotationMatrix();
 
-	transform.modelMatrix = translateMatrix * rotationMatrix * scaleMatrix;
+		transform.modelMatrix = translateMatrix * rotationMatrix * scaleMatrix;
+	}
 
 	if (transform.parent != NULL_ENTITY){
 		auto transformParent = scene->getComponent<Transform>(transform.parent);

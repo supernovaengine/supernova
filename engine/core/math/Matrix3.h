@@ -37,6 +37,9 @@ namespace Supernova {
         void set(const int col,const int row,const float val);
         float get(const int col,const int row) const;
 
+        void setRow(const unsigned int row, const Vector3& vec);
+        void setColumn(const unsigned int column, const Vector3& vec);
+
         void identity();
 
         bool calcInverse(Matrix3& rkInverse, float fTolerance) const;

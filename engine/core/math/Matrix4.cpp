@@ -6,6 +6,7 @@
 #include <string.h>
 #include <iostream>
 #include <iomanip>
+#include "math/Quaternion.h"
 
 using namespace Supernova;
 
@@ -178,6 +179,22 @@ Vector4 Matrix4::column(const unsigned int column) const
     return Vector4(matrix[column][0], matrix[column][1], matrix[column][2], matrix[column][3]);
 }
 
+void Matrix4::setRow(const unsigned int row, const Vector4& vec){
+    assert(row < 4);
+    matrix[0][row] = vec.x;
+    matrix[1][row] = vec.y;
+    matrix[2][row] = vec.z;
+    matrix[3][row] = vec.w;
+}
+
+void Matrix4::setColumn(const unsigned int column, const Vector4& vec){
+    assert(column < 4);
+    matrix[column][0] = vec.x;
+    matrix[column][1] = vec.y;
+    matrix[column][2] = vec.z;
+    matrix[column][3] = vec.w;
+}
+
 void Matrix4::identity(){
     int i, j;
     for(i=0; i<4; ++i)
@@ -203,6 +220,22 @@ Matrix4 Matrix4::transpose(){
             tmp.set(j,i,get(i,j));
 
     return tmp;
+}
+
+float Matrix4::determinant(){
+    return
+         matrix[0][3] * matrix[1][2] * matrix[2][1] * matrix[3][0] - matrix[0][2] * matrix[1][3] * matrix[2][1] * matrix[3][0] -
+         matrix[0][3] * matrix[1][1] * matrix[2][2] * matrix[3][0] + matrix[0][1] * matrix[1][3] * matrix[2][2] * matrix[3][0] +
+         matrix[0][2] * matrix[1][1] * matrix[2][3] * matrix[3][0] - matrix[0][1] * matrix[1][2] * matrix[2][3] * matrix[3][0] -
+         matrix[0][3] * matrix[1][2] * matrix[2][0] * matrix[3][1] + matrix[0][2] * matrix[1][3] * matrix[2][0] * matrix[3][1] +
+         matrix[0][3] * matrix[1][0] * matrix[2][2] * matrix[3][1] - matrix[0][0] * matrix[1][3] * matrix[2][2] * matrix[3][1] -
+         matrix[0][2] * matrix[1][0] * matrix[2][3] * matrix[3][1] + matrix[0][0] * matrix[1][2] * matrix[2][3] * matrix[3][1] +
+         matrix[0][3] * matrix[1][1] * matrix[2][0] * matrix[3][2] - matrix[0][1] * matrix[1][3] * matrix[2][0] * matrix[3][2] -
+         matrix[0][3] * matrix[1][0] * matrix[2][1] * matrix[3][2] + matrix[0][0] * matrix[1][3] * matrix[2][1] * matrix[3][2] +
+         matrix[0][1] * matrix[1][0] * matrix[2][3] * matrix[3][2] - matrix[0][0] * matrix[1][1] * matrix[2][3] * matrix[3][2] -
+         matrix[0][2] * matrix[1][1] * matrix[2][0] * matrix[3][3] + matrix[0][1] * matrix[1][2] * matrix[2][0] * matrix[3][3] +
+         matrix[0][2] * matrix[1][0] * matrix[2][1] * matrix[3][3] - matrix[0][0] * matrix[1][2] * matrix[2][1] * matrix[3][3] -
+         matrix[0][1] * matrix[1][0] * matrix[2][2] * matrix[3][3] + matrix[0][0] * matrix[1][1] * matrix[2][2] * matrix[3][3];
 }
 
 Matrix4 Matrix4::inverse(){
@@ -578,4 +611,24 @@ Matrix4 Matrix4::perspectiveMatrix(float y_fov, float aspect, float near, float 
     r.set(3, 3, 0.f);
 
     return r;
+}
+
+void Matrix4::decompose(Vector3& position, Vector3& scale, Quaternion& rotation){
+    position.x = matrix[3][0];
+	position.y = matrix[3][1];
+	position.z = matrix[3][2];
+
+    scale.x = Vector3(matrix[0][0], matrix[0][1], matrix[0][2]).length();
+	scale.y = Vector3(matrix[1][0], matrix[1][1], matrix[1][2]).length();
+	scale.z = Vector3(matrix[2][0], matrix[2][1], matrix[2][2]).length();
+
+    if (determinant() < 0) scale = -scale;
+
+    Matrix4 rotationM = Matrix4(
+            matrix[0][0]/scale.x, matrix[1][0]/scale.y, matrix[2][0]/scale.z, 0.0,
+            matrix[0][1]/scale.x, matrix[1][1]/scale.y, matrix[2][1]/scale.z, 0.0,
+            matrix[0][2]/scale.x, matrix[1][2]/scale.y, matrix[2][2]/scale.z, 0.0,
+            0.0, 0.0,  0.0, 1.0);
+
+    rotation.fromRotationMatrix(rotationM);
 }

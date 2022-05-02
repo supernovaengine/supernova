@@ -128,6 +128,20 @@ Vector3 Matrix3::column(const unsigned int column) const {
     return Vector3(matrix[column][0], matrix[column][1], matrix[column][2]);
 }
 
+void Matrix3::setRow(const unsigned int row, const Vector3& vec){
+    assert(row < 3);
+    matrix[0][row] = vec.x;
+    matrix[1][row] = vec.y;
+    matrix[2][row] = vec.z;
+}
+
+void Matrix3::setColumn(const unsigned int column, const Vector3& vec){
+    assert(column < 3);
+    matrix[column][0] = vec.x;
+    matrix[column][1] = vec.y;
+    matrix[column][2] = vec.z;
+}
+
 void Matrix3::identity() {
     int i, j;
     for(i=0; i<3; ++i)
