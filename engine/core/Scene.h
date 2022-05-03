@@ -86,7 +86,7 @@ namespace Supernova{
 
 		void setFog(bool hasFog);
 		bool isFogEnabled();
-		Fog getFog();
+		Fog& getFog();
 
 		void setRenderToTexture(bool renderToTexture);
 		bool isRenderToTexture();

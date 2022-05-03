@@ -10,9 +10,9 @@ using namespace Supernova;
 Fog::Fog(){
     type = FogType::LINEAR;
     color = Color::sRGBToLinear(Vector3(0.8, 0.8, 0.8));
-    density = 0.001;
-    linearStart = 100;
-    linearEnd = 600;
+    density = 0.01;
+    linearStart = 10;
+    linearEnd = 60;
 }
 
 FogType Fog::getType(){

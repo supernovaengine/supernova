@@ -395,6 +395,8 @@ Button uibutton2(&uiscene);
 Button uibutton(&uiscene);
 TextEdit textedit(&uiscene);
 
+//Object node0(&scene);
+//Object node1(&scene);
 
 float rotationY = 0;
 float speed = 0;
@@ -420,15 +422,15 @@ void init(){
     lightPoint.setType(LightType::POINT);
     lightPoint.setDirection(0.0, 0.0, 0.0);
     lightPoint.setRange(0.0);
-    lightPoint.setPosition(300.0f, 80.0f, 80.0f);
-    lightPoint.setIntensity(100000.0);
+    lightPoint.setPosition(30.0f, 8.0f, 8.0f);
+    lightPoint.setIntensity(1000.0);
     lightPoint.setShadows(true);
 
     lightSpot.setType(LightType::SPOT);
     lightSpot.setDirection(0.0f, -0.7, 0.3);
     lightSpot.setRange(0.0);
-    lightSpot.setPosition(0.0f, 150.0f/5.0, 0.0f);
-    lightSpot.setIntensity(100000.0);
+    lightSpot.setPosition(0.0f, 15.0f, 0.0f);
+    lightSpot.setIntensity(1000.0);
     lightSpot.setConeAngle(50, 70);
     lightSpot.setShadows(true);
     carro.addChild(&lightSpot);
@@ -499,20 +501,18 @@ void init(){
     camera.setType(CameraType::CAMERA_PERSPECTIVE);
     camera.activate();
 
-    camera.setPosition(0,80,100);
+    camera.setPosition(0,8,10);
     //carro.addChild(&camera);
 
-    carro.loadModel("RiggedSimple.glb");
-    carro.setPosition(0, 20, 20);
-    carro.setScale(5);
+    //carro.loadModel("RiggedSimple.glb");
+    //carro.setPosition(0, 0, 0);
+    //carro.setScale(10);
 
-    //carro.loadModel("jeep/Jeep.obj");
-    //carro.setPosition(0, 0, 20);
-    //carro.setScale(5);
+    carro.loadModel("jeep/Jeep.obj");
 
     //carro.loadModel("WaterBottle.glb");
     //carro.setPosition(0, 30, 20);
-    //carro.setScale(200);
+    //carro.setScale(20);
 
     carro.setName("carro");
 
@@ -587,8 +587,8 @@ void init(){
     sky.setAlpha(0.2);
 
     scene.setBackgroundColor(0.8, 0.8, 0.8);
-    //scene.setFog(true);
-    //scene.getFog().setType(FogType::EXPONENTIALSQUARED);
+    scene.setFog(true);
+    scene.getFog().setType(FogType::EXPONENTIALSQUARED);
 
     Engine::setScene(&scene);
     //Engine::addSceneLayer(&uiscene);
@@ -608,20 +608,20 @@ void onUpdate(){
     if (rotationY < 0) rotationY = 360 + rotationY;
 
     
-    if (speed >= 0.3){
-         speed -= 0.3;
-    }else if (speed <= -0.3){
-        speed += 0.3;
+    if (speed >= 0.1){
+         speed -= 0.1;
+    }else if (speed <= -0.1){
+        speed += 0.1;
     }else{
         speed = 0;
     }
     if (Input::isKeyPressed(S_KEY_UP)){
-        if (speed < 10)
-            speed += 1;
+        if (speed < 5)
+            speed += 0.5;
     }
     if (Input::isKeyPressed(S_KEY_DOWN)){
-        if (speed > -10)
-            speed -= 1;
+        if (speed > -5)
+            speed -= 0.5;
     }
 
     Vector3 vDirection(cos(Angle::degToRad(rotationY-90)), 0, -sin(Angle::degToRad(rotationY-90)));
@@ -678,9 +678,9 @@ void onMouseDown(int button, float x, float y, int mods){
 
     //uibutton.setSize(uibutton.getWidth()-10, uibutton.getHeight()-10);
 
-    Vector3 bonePos = carro.getBone(4).getPosition();
-    bonePos.y = bonePos.y + 1;
-    carro.getBone(4).setPosition(bonePos);
+    //Vector3 bonePos = carro.getBone(4).getPosition();
+    //bonePos.y = bonePos.y + 1;
+    //carro.getBone(4).setPosition(bonePos);
 
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)

@@ -35,7 +35,7 @@ Camera::Camera(Scene* scene): Object(scene){
     }
 
     cameraComponent.perspectiveNear = 1;
-    cameraComponent.perspectiveFar = 2000;
+    cameraComponent.perspectiveFar = 200;
 
     cameraComponent.type = CameraType::CAMERA_2D;
 }

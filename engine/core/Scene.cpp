@@ -116,7 +116,7 @@ bool Scene::isFogEnabled(){
 	return this->hasFog;
 }
 
-Fog Scene::getFog(){
+Fog& Scene::getFog(){
 	return fog;
 }
 
