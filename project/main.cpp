@@ -504,11 +504,9 @@ void init(){
     camera.setPosition(0,8,10);
     //carro.addChild(&camera);
 
-    //carro.loadModel("RiggedSimple.glb");
-    //carro.setPosition(0, 0, 0);
-    //carro.setScale(10);
+    carro.loadModel("AnimatedMorphCube.glb");
 
-    carro.loadModel("jeep/Jeep.obj");
+    //carro.loadModel("jeep/Jeep.obj");
 
     //carro.loadModel("WaterBottle.glb");
     //carro.setPosition(0, 30, 20);
@@ -586,9 +584,9 @@ void init(){
 
     sky.setAlpha(0.2);
 
-    scene.setBackgroundColor(0.8, 0.8, 0.8);
-    scene.setFog(true);
-    scene.getFog().setType(FogType::EXPONENTIALSQUARED);
+    //scene.setBackgroundColor(0.8, 0.8, 0.8);
+    //scene.setFog(true);
+    //scene.getFog().setType(FogType::EXPONENTIALSQUARED);
 
     Engine::setScene(&scene);
     //Engine::addSceneLayer(&uiscene);
@@ -681,6 +679,9 @@ void onMouseDown(int button, float x, float y, int mods){
     //Vector3 bonePos = carro.getBone(4).getPosition();
     //bonePos.y = bonePos.y + 1;
     //carro.getBone(4).setPosition(bonePos);
+
+    carro.setMorphWeight(1, 2);
+    carro.setMorphWeight(0, 2);
 
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)

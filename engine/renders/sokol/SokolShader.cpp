@@ -125,13 +125,17 @@ bool SokolShader::createShader(ShaderData& shaderData){
             stage_desc->source = stage->source.c_str();
         }
 
-        // attributes
-        for (int a = 0; a < stage->attributes.size(); a++) {
-            int location = stage->attributes[a].location;
-            if (location >= 0){
-                shader_desc.attrs[location].name = stage->attributes[a].name.c_str();
-                shader_desc.attrs[location].sem_name = stage->attributes[a].semanticName.c_str();
-                shader_desc.attrs[location].sem_index = stage->attributes[a].semanticIndex;
+        if (SG_MAX_VERTEX_ATTRIBUTES < stage->attributes.size()){
+            Log::Error("Number of attributes of shader is bigger than SG_MAX_VERTEX_ATTRIBUTES");
+        }else{
+            // attributes
+            for (int a = 0; a < stage->attributes.size(); a++) {
+                int location = stage->attributes[a].location;
+                if (location >= 0){
+                    shader_desc.attrs[location].name = stage->attributes[a].name.c_str();
+                    shader_desc.attrs[location].sem_name = stage->attributes[a].semanticName.c_str();
+                    shader_desc.attrs[location].sem_index = stage->attributes[a].semanticIndex;
+                }
             }
         }
     

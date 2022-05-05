@@ -18,8 +18,6 @@ namespace Supernova{
         std::map<std::string, Entity> bonesNameMapping;
         std::map<int, Entity> bonesIdMapping;
 
-        bool morphTargets;
-        std::vector<float> morphWeights;
         std::map<std::string, int> morphNameMapping;
     };
 

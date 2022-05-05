@@ -35,9 +35,11 @@ namespace Supernova{
         int slotVSShadows = -1;
         int slotFSShadows = -1;
         int slotVSSkinning = -1;
+        int slotVSMorphTarget = -1;
 
         int slotVSDepthParams = -1;
         int slotVSDepthSkinning = -1;
+        int slotVSDepthMorphTarget = -1;
 
         Rect textureRect = Rect(0.0, 0.0, 1.0, 1.0);
 
@@ -47,9 +49,12 @@ namespace Supernova{
         bool hasTexture1 = false;
         bool hasNormalMap = false;
         bool hasTangent = false;
-        bool hasVertexColor = false;
+        bool hasVertexColor4 = false;
         bool hasTextureRect = false;
         bool hasSkinning = false;
+        bool hasMorphTarget = false;
+        bool hasMorphNormal = false;
+        bool hasMorphTangent = false;
 
         bool needUpdateTexture = false;
     };
@@ -63,8 +68,8 @@ namespace Supernova{
         Submesh submeshes[MAX_SUBMESHES];
         unsigned int numSubmeshes = 1;
 
-        std::vector<Matrix4> bonesMatrix;
-        //std::vector<float> morphWeights;
+        Matrix4 bonesMatrix[MAX_BONES];
+        float morphWeights[MAX_MORPHTARGETS];
 
         bool castShadows = true;
         bool transparency = false;

@@ -33,6 +33,14 @@
 #define MAX_BONES 70
 #endif
 
+#ifndef MAX_MORPHTARGETS
+#define MAX_MORPHTARGETS 8
+#endif
+
+#ifndef MAX_EXTERNAL_BUFFERS
+#define MAX_EXTERNAL_BUFFERS 10
+#endif
+
 #include "Engine.h"
 
 void init();

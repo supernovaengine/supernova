@@ -67,6 +67,34 @@ int ShaderData::getAttrIndex(AttributeType type){
         attrstr = "a_boneIds";
     }else if (type == AttributeType::BONEWEIGHTS){
         attrstr = "a_boneWeights";
+    }else if (type == AttributeType::MORPHTARGET0){
+        attrstr = "a_morphTarget0";
+    }else if (type == AttributeType::MORPHTARGET1){
+        attrstr = "a_morphTarget1";
+    }else if (type == AttributeType::MORPHTARGET2){
+        attrstr = "a_morphTarget2";
+    }else if (type == AttributeType::MORPHTARGET3){
+        attrstr = "a_morphTarget3";
+    }else if (type == AttributeType::MORPHTARGET4){
+        attrstr = "a_morphTarget4";
+    }else if (type == AttributeType::MORPHTARGET5){
+        attrstr = "a_morphTarget5";
+    }else if (type == AttributeType::MORPHTARGET6){
+        attrstr = "a_morphTarget6";
+    }else if (type == AttributeType::MORPHTARGET7){
+        attrstr = "a_morphTarget7";
+    }else if (type == AttributeType::MORPHNORMAL0){
+        attrstr = "a_morphNormal0";
+    }else if (type == AttributeType::MORPHNORMAL1){
+        attrstr = "a_morphNormal1";
+    }else if (type == AttributeType::MORPHNORMAL2){
+        attrstr = "a_morphNormal2";
+    }else if (type == AttributeType::MORPHNORMAL3){
+        attrstr = "a_morphNormal3";
+    }else if (type == AttributeType::MORPHTANGENT0){
+        attrstr = "a_morphTangent0";
+    }else if (type == AttributeType::MORPHTANGENT1){
+        attrstr = "a_morphTangent1";
     }
 
     if (attrstr.empty()){
@@ -124,6 +152,10 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
         ustr = "u_vs_skinning";
     }else if (type == UniformBlockType::DEPTH_VS_SKINNING){
         ustr = "u_vs_skinning";
+    }else if (type == UniformBlockType::VS_MORPHTARGET){
+        ustr = "u_vs_morphtarget";
+    }else if (type == UniformBlockType::DEPTH_VS_MORPHTARGET){
+        ustr = "u_vs_morphtarget";
     }
 
     if (ustr.empty()){

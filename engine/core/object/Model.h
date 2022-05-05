@@ -9,8 +9,6 @@
 #include "Bone.h"
 #include "buffer/ExternalBuffer.h"
 
-#define MAX_EXTERNAL_BUFFERS 9
-
 namespace tinygltf {class Model;}
 
 namespace Supernova{
@@ -43,6 +41,11 @@ namespace Supernova{
 
         Bone getBone(std::string name);
         Bone getBone(int id);
+
+        float getMorphWeight(std::string name);
+        float getMorphWeight(int id);
+        void setMorphWeight(std::string name, float value);
+        void setMorphWeight(int id, float value);
     };
 }
 

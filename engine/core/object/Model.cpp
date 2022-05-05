@@ -691,7 +691,7 @@ bool Model::loadGLTF(const char* filename) {
                 if (elements == 4){
                     attType = AttributeType::COLOR;
                     foundAttrs = true;
-                    mesh.submeshes[i].hasVertexColor = true;
+                    mesh.submeshes[i].hasVertexColor4 = true;
                 } else {
                     Log::Warn("Not supported vector(3) of: %s", attrib.first.c_str());
                 }
@@ -714,14 +714,15 @@ bool Model::loadGLTF(const char* filename) {
 
         }
 
-        model.morphTargets = false;
+        bool morphTargets = false;
         bool morphNormals = false;
+        bool morphTangents = false;
 
         int morphIndex = 0;
         for (auto &morphs : primitive.targets) {
             for (auto &attribMorph : morphs) {
 
-                model.morphTargets = true;
+                morphTargets = true;
 
                 tinygltf::Accessor accessor = gltfModel->accessors[attribMorph.second];
                 int byteStride = accessor.ByteStride(gltfModel->bufferViews[accessor.bufferView]);
@@ -763,26 +764,29 @@ bool Model::loadGLTF(const char* filename) {
                     } else if (morphIndex == 1){
                         attType = AttributeType::MORPHTARGET1;
                         foundMorph = true;
-                    } else if (morphIndex == 2){
-                        attType = AttributeType::MORPHTARGET2;
-                        foundMorph = true;
-                    } else if (morphIndex == 3){
-                        attType = AttributeType::MORPHTARGET3;
-                        foundMorph = true;
                     }
-                    if (!morphNormals){
-                        if (morphIndex == 4){
-                            attType = AttributeType::MORPHTARGET4;
+                    if ((!morphNormals && morphTangents) || (morphNormals && !morphTangents)){
+                        if (morphIndex == 2){
+                            attType = AttributeType::MORPHTARGET2;
                             foundMorph = true;
-                        } else if (morphIndex == 5){
-                            attType = AttributeType::MORPHTARGET5;
+                        } else if (morphIndex == 3){
+                            attType = AttributeType::MORPHTARGET3;
                             foundMorph = true;
-                        } else if (morphIndex == 6){
-                            attType = AttributeType::MORPHTARGET6;
-                            foundMorph = true;
-                        } else if (morphIndex == 7){
-                            attType = AttributeType::MORPHTARGET7;
-                            foundMorph = true;
+                        }
+                        if (!morphNormals && !morphTangents){
+                            if (morphIndex == 4){
+                                attType = AttributeType::MORPHTARGET4;
+                                foundMorph = true;
+                            } else if (morphIndex == 5){
+                                attType = AttributeType::MORPHTARGET5;
+                                foundMorph = true;
+                            } else if (morphIndex == 6){
+                                attType = AttributeType::MORPHTARGET6;
+                                foundMorph = true;
+                            } else if (morphIndex == 7){
+                                attType = AttributeType::MORPHTARGET7;
+                                foundMorph = true;
+                            }
                         }
                     }
                 }
@@ -803,7 +807,14 @@ bool Model::loadGLTF(const char* filename) {
                     }
                 }
                 if (attribMorph.first.compare("TANGENT") == 0){
-                    //TODO
+                    morphTangents = true;
+                    if (morphIndex == 0){
+                        attType = AttributeType::MORPHTANGENT0;
+                        foundMorph = true;
+                    } else if (morphIndex == 1){
+                        attType = AttributeType::MORPHTANGENT1;
+                        foundMorph = true;
+                    }
                 }
 
                 if (foundMorph) {
@@ -819,11 +830,10 @@ bool Model::loadGLTF(const char* filename) {
             morphWeightSize = 4;
         }
 
-        if (model.morphTargets){
-            model.morphWeights.resize(morphWeightSize);
+        if (morphTargets){
             for (int w = 0; w < gltfmesh.weights.size(); w++) {
-                if (w < morphWeightSize){
-                    model.morphWeights[w] = gltfmesh.weights[w];
+                if (w < MAX_MORPHTARGETS){
+                    mesh.morphWeights[w] = gltfmesh.weights[w];
                 }
             }
 
@@ -866,7 +876,6 @@ bool Model::loadGLTF(const char* filename) {
                 Log::Error("Cannot create skinning bigger than %i", MAX_BONES);
                 return false;
             }
-            mesh.bonesMatrix.resize(MAX_BONES);
             scene->addEntityChild(entity, model.skeleton);
         }
     }
@@ -1035,4 +1044,48 @@ Bone Model::getBone(int id){
 		Log::Error("Retrieving non-existent bone: %s", e.what());
 		throw;
 	}
+}
+
+float Model::getMorphWeight(std::string name){
+    ModelComponent& model = getComponent<ModelComponent>();
+
+    if (model.morphNameMapping.count(name)){
+        return getMorphWeight(model.morphNameMapping.at(name));
+    }else{
+        Log::Error("Retrieving non-existent morph weight '%s'", name.c_str());
+    }
+
+    return 0;
+}
+
+float Model::getMorphWeight(int id){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    if (id >= 0 && id < MAX_MORPHTARGETS){
+        return mesh.morphWeights[id];
+    }else{
+        Log::Error("Retrieving non-existent morph weight '%i'", id);
+    }
+
+    return 0;
+}
+
+void Model::setMorphWeight(std::string name, float value){
+    ModelComponent& model = getComponent<ModelComponent>();
+
+    if (model.morphNameMapping.count(name)){
+        setMorphWeight(model.morphNameMapping.at(name), value);
+    }else{
+        Log::Error("Retrieving non-existent morph weight '%s'", name.c_str());
+    }
+}
+
+void Model::setMorphWeight(int id, float value){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    if (id >= 0 && id < MAX_MORPHTARGETS){
+        mesh.morphWeights[id] = value;
+    }else{
+        Log::Error("Retrieving non-existent morph weight '%i'", id);
+    }
 }

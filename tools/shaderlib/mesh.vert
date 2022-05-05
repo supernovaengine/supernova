@@ -61,23 +61,14 @@ out vec2 v_uv2;
     out float v_clipSpacePosZ;
 #endif
 
-#ifdef HAS_SKINNING
-    in vec4 a_boneWeights;
-    in vec4 a_boneIds;
-
-    uniform u_vs_skinning {
-        mat4 bonesMatrix[MAX_BONES];
-    };
-#endif
+#include "includes/skinning.glsl"
+#include "includes/morphtarget.glsl"
 
 vec4 getPosition(mat4 boneTransform){
     vec3 pos = a_position;
 
-    #ifdef HAS_SKINNING
-        vec4 skinVertex = vec4(pos, 1.0);
-        skinVertex = boneTransform * skinVertex;
-        pos = vec3(skinVertex) / skinVertex.w;
-    #endif
+    pos = getMorphPosition(pos);
+    pos = getSkinPosition(pos, boneTransform);
 
     return vec4(pos, 1.0);
 }
@@ -86,11 +77,8 @@ vec4 getPosition(mat4 boneTransform){
 vec3 getNormal(mat4 boneTransform){
     vec3 normal = a_normal;
 
-    #ifdef HAS_SKINNING
-        vec4 skinNormal = vec4(normal, 1.0);
-        skinNormal = boneTransform * skinNormal;
-        normal = vec3(skinNormal) / skinNormal.w;
-    #endif
+    normal = getMorphNormal(normal);
+    normal = getSkinNormal(normal, boneTransform);
 
     return normalize(normal);
 }
@@ -100,25 +88,15 @@ vec3 getNormal(mat4 boneTransform){
 vec3 getTangent(mat4 boneTransform){
     vec3 tangent = a_tangent.xyz;
 
-    #ifdef HAS_SKINNING
-        vec4 skinTangent = vec4(tangent, 1.0);
-        skinTangent = boneTransform * skinTangent;
-        tangent = vec3(skinTangent) / skinTangent.w;
-    #endif
+    tangent = getMorphTangent(tangent);
+    tangent = getSkinTangent(tangent, boneTransform);
 
     return normalize(tangent);
 }
 #endif
 
 void main() {
-    mat4 boneTransform = mat4(0.0);
-    #ifdef HAS_SKINNING
-        //sokol send boneIds (USHORT4N) normalized, needed "expand" the normalized vertex shader
-        boneTransform += bonesMatrix[int(a_boneIds[0] * 65535.0)] * a_boneWeights[0];
-        boneTransform += bonesMatrix[int(a_boneIds[1] * 65535.0)] * a_boneWeights[1];
-        boneTransform += bonesMatrix[int(a_boneIds[2] * 65535.0)] * a_boneWeights[2];
-        boneTransform += bonesMatrix[int(a_boneIds[3] * 65535.0)] * a_boneWeights[3];
-    #endif
+    mat4 boneTransform = getBoneTransform();
 
     vec4 bonePosition = getPosition(boneTransform);
     vec4 pos = pbrParams.modelMatrix * bonePosition;

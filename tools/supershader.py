@@ -43,6 +43,12 @@ def get_define(property):
         return 'HAS_FOG'
     elif property == 'Ski':
         return 'HAS_SKINNING'
+    elif property == 'Mta':
+        return 'HAS_MORPHTARGET'
+    elif property == 'Mnr':
+        return 'HAS_MORPHNORMAL'
+    elif property == 'Mtg':
+        return 'HAS_MORPHTANGENT'
     else:
         sys.exit('Not found value for property: '+property)
 
@@ -85,8 +91,13 @@ def get_default_shaders():
     s += "mesh_UltUv1Vc4TxrFog;"
     s += "mesh_PucShwPcfNorSki;"
     s += "mesh_PucShwPcfNor;"
+    s += "mesh_PucShwPcfNorTanMtaMnr;"
+    s += "mesh_PucShwPcfNorTanMtaMnrMtg;"
+    s += "mesh_PucShwPcfNorTanFogMtaMnr;"
+    s += "mesh_PucShwPcfNorTanFogMtaMnrMtg;"
     s += "depth;"
     s += "depth_Ski;"
+    s += "depth_Mta;"
     s += "sky;"
     s += "ui_Vc4;"
     s += "ui_TexVc4;"
@@ -156,6 +167,7 @@ def generate(shaders, langs, project, verbose, max_lights, max_shadowsmap, max_s
             defines += ';MAX_SHADOWSCUBEMAP='+str(max_shadowscubemap)
             defines += ';MAX_SHADOWCASCADES='+str(max_shadowcascades)
             defines += ';MAX_BONES='+str(70)
+            defines += ';MAX_MORPHTARGETS='+str(2) #8/4 because it uses vec4 in shader
 
             while properties != '':
                 if len(defines) > 0:
@@ -168,7 +180,7 @@ def generate(shaders, langs, project, verbose, max_lights, max_shadowsmap, max_s
             output = get_output(shader, project, lang)
 
             if verbose:
-                print(get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines)
+                print(get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", "'"+defines+"'")
             command = subprocess.run([get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", defines], capture_output=True)
 
             sys.stdout.buffer.write(command.stdout)

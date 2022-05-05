@@ -369,7 +369,10 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 		mesh.submeshes[i].hasNormalMap = false;
 		mesh.submeshes[i].hasTangent = false;
-		mesh.submeshes[i].hasVertexColor = false;
+		mesh.submeshes[i].hasVertexColor4 = false;
+		mesh.submeshes[i].hasSkinning = false;
+		mesh.submeshes[i].hasMorphTarget = false;
+		mesh.submeshes[i].hasMorphNormal = false;
 
 		ObjectRender& render = mesh.submeshes[i].render;
 
@@ -385,10 +388,19 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 						mesh.submeshes[i].hasTangent = true;
 					}
 					if (attr.first == AttributeType::COLOR){
-						mesh.submeshes[i].hasVertexColor = true;
+						mesh.submeshes[i].hasVertexColor4 = true;
 					}
 					if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
 						mesh.submeshes[i].hasSkinning = true;
+					}
+					if (attr.first == AttributeType::MORPHTARGET0){
+						mesh.submeshes[i].hasMorphTarget = true;
+					}
+					if (attr.first == AttributeType::MORPHNORMAL0){
+						mesh.submeshes[i].hasMorphNormal = true;
+					}
+					if (attr.first == AttributeType::MORPHTANGENT0){
+						mesh.submeshes[i].hasMorphTangent = true;
 					}
             	}
         	}
@@ -401,10 +413,19 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				mesh.submeshes[i].hasTangent = true;
 			}
 			if (attr.first == AttributeType::COLOR){
-				mesh.submeshes[i].hasVertexColor = true;
+				mesh.submeshes[i].hasVertexColor4 = true;
 			}
 			if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
 				mesh.submeshes[i].hasSkinning = true;
+			}
+			if (attr.first == AttributeType::MORPHTARGET0){
+				mesh.submeshes[i].hasMorphTarget = true;
+			}
+			if (attr.first == AttributeType::MORPHNORMAL0){
+				mesh.submeshes[i].hasMorphNormal = true;
+			}
+			if (attr.first == AttributeType::MORPHTANGENT0){
+				mesh.submeshes[i].hasMorphTangent = true;
 			}
 		}
 
@@ -423,10 +444,6 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		bool p_hasTangent = false;
 		bool p_castShadows = false;
 		bool p_shadowsPCF = false;
-		bool p_textureRect = false;
-		bool p_vertexColorVec4 = false;
-		bool p_hasFog = false;
-		bool p_hasSkinning = false;
 
 		if (mesh.submeshes[i].hasTexture1){
 			p_hasTexture1 = true;
@@ -450,28 +467,15 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		}else{
 			p_unlit = true;
 		}
-		if (mesh.submeshes[i].hasTextureRect){
-			p_textureRect = true;
-		}
-		if (mesh.submeshes[i].hasVertexColor){
-			p_vertexColorVec4 = true;
-		}
-
-		if (hasFog){
-			p_hasFog = true;
-		}
-		if (mesh.submeshes[i].hasSkinning){
-			p_hasSkinning = true;
-		}
 
 		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(
 						p_unlit, p_hasTexture1, false, p_punctual, 
 						p_castShadows, p_shadowsPCF, p_hasNormal, p_hasNormalMap, 
-						p_hasTangent, false, p_vertexColorVec4, p_textureRect, 
-						p_hasFog, p_hasSkinning);
+						p_hasTangent, false, mesh.submeshes[i].hasVertexColor4, mesh.submeshes[i].hasTextureRect, 
+						hasFog, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent);
 		mesh.submeshes[i].shader = ShaderPool::get(shaderType, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
-			mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(p_hasSkinning);
+			mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget);
 			mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, mesh.submeshes[i].depthShaderProperties);
 			if (!mesh.submeshes[i].depthShader->isCreated())
 				return false;
@@ -498,6 +502,9 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		}
 		if (mesh.submeshes[i].hasSkinning){
 			mesh.submeshes[i].slotVSSkinning = shaderData.getUniformBlockIndex(UniformBlockType::VS_SKINNING, ShaderStageType::VERTEX);
+		}
+		if (mesh.submeshes[i].hasMorphTarget){
+			mesh.submeshes[i].slotVSMorphTarget = shaderData.getUniformBlockIndex(UniformBlockType::VS_MORPHTARGET, ShaderStageType::VERTEX);
 		}
 
 		loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.castShadows);
@@ -560,21 +567,31 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			if (mesh.submeshes[i].hasSkinning){
 				mesh.submeshes[i].slotVSDepthSkinning = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_SKINNING, ShaderStageType::VERTEX);
 			}
+			if (mesh.submeshes[i].hasMorphTarget){
+				mesh.submeshes[i].slotVSDepthMorphTarget = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_MORPHTARGET, ShaderStageType::VERTEX);
+			}
 
 			for (auto const& buf : mesh.buffers){
         		if (buf.second->isRenderAttributes()) {
-					if (buf.second->getAttributes().count(AttributeType::POSITION)){
-						Attribute posattr = buf.second->getAttributes()[AttributeType::POSITION];
-						depthRender.addAttribute(depthShaderData.getAttrIndex(AttributeType::POSITION), buf.second->getRender(), posattr.getElements(), posattr.getDataType(), buf.second->getStride(), posattr.getOffset(), posattr.getNormalized());
-					}
-					if (mesh.submeshes[i].hasSkinning){
-						if (buf.second->getAttributes().count(AttributeType::BONEIDS)){
-							Attribute boneattr = buf.second->getAttributes()[AttributeType::BONEIDS];
-							depthRender.addAttribute(depthShaderData.getAttrIndex(AttributeType::BONEIDS), buf.second->getRender(), boneattr.getElements(), boneattr.getDataType(), buf.second->getStride(), boneattr.getOffset(), boneattr.getNormalized());
+					for (auto const &attr : buf.second->getAttributes()){
+						if (attr.first == AttributeType::POSITION){
+							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
 						}
-						if (buf.second->getAttributes().count(AttributeType::BONEWEIGHTS)){
-							Attribute boneattr = buf.second->getAttributes()[AttributeType::BONEWEIGHTS];
-							depthRender.addAttribute(depthShaderData.getAttrIndex(AttributeType::BONEWEIGHTS), buf.second->getRender(), boneattr.getElements(), boneattr.getDataType(), buf.second->getStride(), boneattr.getOffset(), boneattr.getNormalized());
+						if (mesh.submeshes[i].hasSkinning){
+							if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
+								depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+							}
+						}
+						if (mesh.submeshes[i].hasMorphTarget){
+							if (attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET1 ||
+								attr.first == AttributeType::MORPHTARGET2 || attr.first == AttributeType::MORPHTARGET3 ||
+								attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET4 ||
+								attr.first == AttributeType::MORPHTARGET6 || attr.first == AttributeType::MORPHTARGET7 ||
+								attr.first == AttributeType::MORPHNORMAL0 || attr.first == AttributeType::MORPHNORMAL1 ||
+								attr.first == AttributeType::MORPHNORMAL2 || attr.first == AttributeType::MORPHNORMAL3 ||
+								attr.first == AttributeType::MORPHTANGENT0 || attr.first == AttributeType::MORPHTANGENT1){
+								depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+							}
 						}
 					}
         		}
@@ -593,6 +610,17 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				}
 				if (mesh.submeshes[i].hasSkinning){
 					if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
+						depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+					}
+				}
+				if (mesh.submeshes[i].hasMorphTarget){
+					if (attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET1 ||
+						attr.first == AttributeType::MORPHTARGET2 || attr.first == AttributeType::MORPHTARGET3 ||
+						attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET4 ||
+						attr.first == AttributeType::MORPHTARGET6 || attr.first == AttributeType::MORPHTARGET7 ||
+						attr.first == AttributeType::MORPHNORMAL0 || attr.first == AttributeType::MORPHNORMAL1 ||
+						attr.first == AttributeType::MORPHNORMAL2 || attr.first == AttributeType::MORPHNORMAL3 ||
+						attr.first == AttributeType::MORPHTANGENT0 || attr.first == AttributeType::MORPHTANGENT1){
 						depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
 					}
 				}
@@ -650,7 +678,11 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 			}
 
 			if (mesh.submeshes[i].hasSkinning){
-				render.applyUniformBlock(mesh.submeshes[i].slotVSSkinning, ShaderStageType::VERTEX, sizeof(float) * 16 * MAX_BONES, &(mesh.bonesMatrix.front()));
+				render.applyUniformBlock(mesh.submeshes[i].slotVSSkinning, ShaderStageType::VERTEX, sizeof(float) * 16 * MAX_BONES, &mesh.bonesMatrix);
+			}
+
+			if (mesh.submeshes[i].hasMorphTarget){
+				render.applyUniformBlock(mesh.submeshes[i].slotVSMorphTarget, ShaderStageType::VERTEX, sizeof(float) * MAX_MORPHTARGETS, &mesh.morphWeights);
 			}
 
 			render.applyUniformBlock(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 16, &mesh.submeshes[i].material);
@@ -674,7 +706,10 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMat
 			depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 16, &modelLightSpaceMatrix);
 
 			if (mesh.submeshes[i].hasSkinning){
-				depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthSkinning, ShaderStageType::VERTEX, sizeof(float) * 16 * MAX_BONES, &(mesh.bonesMatrix.front()));
+				depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthSkinning, ShaderStageType::VERTEX, sizeof(float) * 16 * MAX_BONES, &mesh.bonesMatrix);
+			}
+			if (mesh.submeshes[i].hasMorphTarget){
+				depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthMorphTarget, ShaderStageType::VERTEX, sizeof(float) * MAX_MORPHTARGETS, &mesh.morphWeights);
 			}
 
 			depthRender.draw(mesh.submeshes[i].vertexCount);
@@ -714,9 +749,11 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 		submesh.slotVSShadows = -1;
 		submesh.slotFSShadows = -1;
 		submesh.slotVSSkinning = -1;
+		submesh.slotVSMorphTarget = -1;
 
 		submesh.slotVSDepthParams = -1;
 		submesh.slotVSDepthSkinning = -1;
+		submesh.slotVSDepthMorphTarget = -1;
 	}
 
 	//Destroy buffers
