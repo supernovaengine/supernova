@@ -59,6 +59,10 @@ def get_frag(shaderType):
     return 'shaderlib/'+shaderType+'.frag'
 
 def get_output(shader, project, lang):
+    shadersdir = os.path.join(project, "assets/shaders")
+    if not os.path.exists(shadersdir):
+        print('Creating shaders dir: ', shadersdir)
+        os.makedirs(shadersdir)
     outpath = os.path.join(project, "assets/shaders", shader+"_"+lang)
     return outpath
 
@@ -153,8 +157,6 @@ def generate(shaders, langs, project, verbose, max_lights, max_shadowsmap, max_s
 
         for shader in shadersList:
 
-            print('Generating', shader, 'for', lang)
-
             splitShader = shader.split('_')
             shaderType = splitShader[0]
             properties = ''
@@ -178,6 +180,8 @@ def generate(shaders, langs, project, verbose, max_lights, max_shadowsmap, max_s
             vert = get_vert(shaderType)
             frag = get_frag(shaderType)
             output = get_output(shader, project, lang)
+
+            print('Generating', shader, 'for', lang)
 
             if verbose:
                 print(get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--defines", "'"+defines+"'")

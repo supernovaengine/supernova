@@ -169,8 +169,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
     add_definitions("-DWITH_MINIAUDIO") # For SoLoud
 
-    set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/$<CONFIG>/assets)
-    set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/$<CONFIG>/lua)
+    if (EXISTS "${PROJECT_ROOT}/assets")
+        set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/$<CONFIG>/assets)
+    endif()
+    if (EXISTS "${PROJECT_ROOT}/lua")
+        set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/$<CONFIG>/lua)
+    endif()
 
     set(PLATFORM_EXEC_FLAGS WIN32)
 
@@ -197,8 +201,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     add_definitions("-DWITH_MINIAUDIO") # For SoLoud
 
-    set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
-    set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/lua)
+    if (EXISTS "${PROJECT_ROOT}/assets")
+        set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
+    endif()
+    if (EXISTS "${PROJECT_ROOT}/lua")
+        set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/lua)
+    endif()
 
     if (APP_BACKEND STREQUAL "glfw")
         add_definitions("-DSUPERNOVA_GLFW")
@@ -276,8 +284,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             #XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${PLATFORM_ROOT}/macos/Supernova_macOS.entitlements" # error EXC_BAD_INSTRUCTION
         )
     else()
-        set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
-        set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/lua)
+        if (EXISTS "${PROJECT_ROOT}/assets")
+            set(ASSETS_DEST_DIR ${CMAKE_BINARY_DIR}/assets)
+        endif()
+        if (EXISTS "${PROJECT_ROOT}/lua")
+            set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/lua)
+        endif()
 
         if (APP_BACKEND STREQUAL "glfw")
             add_definitions("-DSUPERNOVA_GLFW")
