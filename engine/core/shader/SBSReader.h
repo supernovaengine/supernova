@@ -7,6 +7,7 @@
 
 #include <string>
 #include "ShaderData.h"
+#include "io/FileData.h"
 
 namespace Supernova {
 
@@ -14,11 +15,14 @@ namespace Supernova {
     private:
         ShaderData shaderData;
 
+        bool read(FileData& file);
+
     public:
         SBSReader();
         virtual ~SBSReader();
 
         bool read(std::string filepath);
+        bool read(std::vector<unsigned char> datashader);
 
         ShaderData& getShaderData();
     };

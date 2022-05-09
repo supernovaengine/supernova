@@ -401,6 +401,10 @@ void ActionSystem::load(){
 
 }
 
+void ActionSystem::destroy(){
+
+}
+
 void ActionSystem::draw(){
 
 }

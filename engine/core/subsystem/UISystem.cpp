@@ -24,12 +24,6 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
 }
 
 UISystem::~UISystem(){
-    Engine::onCharInput.remove(eventId);
-    Engine::onMouseDown.remove(eventId);
-    Engine::onMouseUp.remove(eventId);
-    Engine::onMouseMove.remove(eventId);
-    Engine::onTouchStart.remove(eventId);
-    Engine::onTouchEnd.remove(eventId);
 }
 
 bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
@@ -429,6 +423,15 @@ void UISystem::load(){
     Engine::onMouseMove.add<UISystem, &UISystem::eventOnMouseMove>(eventId, this);
     Engine::onTouchStart.add<UISystem, &UISystem::eventOnTouchStart>(eventId, this);
     Engine::onTouchEnd.add<UISystem, &UISystem::eventOnTouchEnd>(eventId, this);
+}
+
+void UISystem::destroy(){
+    Engine::onCharInput.remove(eventId);
+    Engine::onMouseDown.remove(eventId);
+    Engine::onMouseUp.remove(eventId);
+    Engine::onMouseMove.remove(eventId);
+    Engine::onTouchStart.remove(eventId);
+    Engine::onTouchEnd.remove(eventId);
 }
 
 void UISystem::draw(){

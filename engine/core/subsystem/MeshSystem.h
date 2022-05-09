@@ -27,6 +27,7 @@ namespace Supernova{
 		virtual ~MeshSystem();
 
 		virtual void load();
+		virtual void destroy();
         virtual void update(double dt);
 		virtual void draw();
 

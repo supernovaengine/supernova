@@ -18,6 +18,7 @@ namespace Supernova{
         static shaders_t& getMap();
 
         static std::string getShaderFile(std::string shaderStr);
+        static std::string getShaderName(std::string shaderStr);
         static std::string getShaderStr(ShaderType shaderType, std::string properties);
 
     public:

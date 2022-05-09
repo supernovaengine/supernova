@@ -60,6 +60,10 @@ void RenderSystem::load(){
 	}
 }
 
+void RenderSystem::destroy(){
+
+}
+
 void RenderSystem::createEmptyTextures(){
 	if (!emptyTexturesCreated){
 		void* data_array[6];

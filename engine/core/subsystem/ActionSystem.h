@@ -70,6 +70,7 @@ namespace Supernova{
 		ActionSystem(Scene* scene);
 	
 		virtual void load();
+		virtual void destroy();
 		virtual void update(double dt);
 		virtual void draw();
 

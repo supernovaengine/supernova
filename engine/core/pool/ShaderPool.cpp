@@ -3,6 +3,28 @@
 #include "Log.h"
 #include "Engine.h"
 #include "shader/SBSReader.h"
+#include "util/Base64.h"
+
+#ifdef SOKOL_GLCORE33
+#include "render/shaders/glsl330.h"
+#endif
+#ifdef SOKOL_GLES2
+#include "render/shaders/glsl100.h"
+#endif
+#ifdef SOKOL_GLES3
+#include "render/shaders/glsl300es.h"
+#endif
+#ifdef SOKOL_D3D11
+#include "render/shaders/hlsl5.h"
+#endif
+#ifdef SOKOL_METAL
+#include <TargetConditionals.h>
+#if TARGET_OS_IPHONE
+#include "render/shaders/msl21ios.h"
+#elif TARGET_OS_MAC
+#include "render/shaders/msl21macos.h"
+#endif
+#endif
 
 using namespace Supernova;
 
@@ -27,9 +49,9 @@ std::string ShaderPool::getShaderLangStr(){
 		return "glsl300es";
 	}else if (Engine::getGraphicBackend() == GraphicBackend::METAL){
 		if (Engine::getPlatform() == Platform::MacOS){
-			return "msl21_macos";
+			return "msl21macos";
 		}else if (Engine::getPlatform() == Platform::iOS){
-			return "msl21_ios";
+			return "msl21ios";
 		}
 	}else if (Engine::getGraphicBackend() == GraphicBackend::D3D11){
 		return "hlsl5";
@@ -40,13 +62,19 @@ std::string ShaderPool::getShaderLangStr(){
 
 
 std::string ShaderPool::getShaderFile(std::string shaderStr){
-	std::string filename = shaderStr;
-
-	filename += "_" + getShaderLangStr();
+	std::string filename = getShaderName(shaderStr);
 
 	filename += ".sbs";
 
 	return filename;
+}
+
+std::string ShaderPool::getShaderName(std::string shaderStr){
+	std::string name = shaderStr;
+
+	name += "_" + getShaderLangStr();
+
+	return name;
 }
 
 std::string ShaderPool::getShaderStr(ShaderType shaderType, std::string properties){
@@ -87,7 +115,10 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, std::string
 	SBSReader sbs;
 	const auto resource =  std::make_shared<ShaderRender>();
 
-	if (sbs.read("shader://"+getShaderFile(shaderStr))){
+	std::string base64Shd = getBase64Shader(getShaderName(shaderStr));
+	if (!base64Shd.empty() && sbs.read(Base64::decode(base64Shd))){ // from c header
+		resource->createShader(sbs.getShaderData());
+	}else if (sbs.read("shader://"+getShaderFile(shaderStr))){ // from file in assets/shaders dir
 		resource->createShader(sbs.getShaderData());
 	}else{
 		getMissingShaders().push_back(shaderStr);

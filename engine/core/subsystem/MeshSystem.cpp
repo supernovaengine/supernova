@@ -141,6 +141,10 @@ void MeshSystem::load(){
 
 }
 
+void MeshSystem::destroy(){
+
+}
+
 void MeshSystem::update(double dt){
 
     auto sprites = scene->getComponentArray<SpriteComponent>();

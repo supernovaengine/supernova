@@ -220,7 +220,7 @@ Platform Engine::getPlatform(){
     return Platform::Windows;
 #elif __APPLE__
     #include <TargetConditionals.h>
-    #if TARGET_IPHONE_SIMULATOR
+    #if TARGET_OS_SIMULATOR
     return Platform::iOS;
     #elif TARGET_OS_IPHONE
     return Platform::iOS;
@@ -433,6 +433,10 @@ void Engine::systemDraw(){
 }
 
 void Engine::systemShutdown(){
+    for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+        if (scenes[i])
+            scenes[i]->destroy();
+    }
     SystemRender::shutdown();
     Engine::onShutdown.call();
 }

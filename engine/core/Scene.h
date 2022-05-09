@@ -68,6 +68,7 @@ namespace Supernova{
 		virtual ~Scene();
 
 		void load();
+		void destroy();
 		void draw();
 		void update(double dt);
 

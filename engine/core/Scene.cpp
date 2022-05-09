@@ -57,7 +57,7 @@ Scene::Scene(){
 }
 
 Scene::~Scene(){
-	framebuffer.destroyFramebuffer();
+	destroy();
 }
 
 void Scene::setCamera(Entity camera){
@@ -187,6 +187,13 @@ void Scene::load(){
 	for (auto const& pair : systems){
 		pair.second->load();
 	}
+}
+
+void Scene::destroy(){
+	for (auto const& pair : systems){
+		pair.second->destroy();
+	}
+	framebuffer.destroyFramebuffer();
 }
 
 void Scene::draw(){

@@ -127,6 +127,7 @@ namespace Supernova{
 		virtual ~RenderSystem();
 	
 		virtual void load();
+		virtual void destroy();
 		virtual void draw();
 		virtual void update(double dt);
 

@@ -24,6 +24,8 @@ namespace Supernova{
 		virtual void load() = 0;
 
 		virtual void draw() = 0;
+
+		virtual void destroy() = 0;
 	
 		virtual void update(double dt) = 0;
 
