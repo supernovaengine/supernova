@@ -268,7 +268,7 @@ def generate(shaders, langs, engine_root, verbose, max_lights, max_shadowsmap, m
             sys.stderr.buffer.write(command.stderr)
             if command.returncode != 0:
                 sys.exit(command.returncode)
-            
+
     create_c_header(engine_root)
 
 

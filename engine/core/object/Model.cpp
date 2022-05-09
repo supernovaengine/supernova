@@ -798,12 +798,15 @@ bool Model::loadGLTF(const char* filename) {
                     } else if (morphIndex == 1){
                         attType = AttributeType::MORPHNORMAL1;
                         foundMorph = true;
-                    } else if (morphIndex == 2){
-                        attType = AttributeType::MORPHNORMAL2;
-                        foundMorph = true;
-                    } else if (morphIndex == 3){
-                        attType = AttributeType::MORPHNORMAL3;
-                        foundMorph = true;
+                    }
+                    if (!morphTangents){
+                        if (morphIndex == 2){
+                            attType = AttributeType::MORPHNORMAL2;
+                            foundMorph = true;
+                        } else if (morphIndex == 3){
+                            attType = AttributeType::MORPHNORMAL3;
+                            foundMorph = true;
+                        }
                     }
                 }
                 if (attribMorph.first.compare("TANGENT") == 0){
