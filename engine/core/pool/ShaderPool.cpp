@@ -17,7 +17,7 @@
 #ifdef SOKOL_D3D11
 #include "render/shaders/hlsl5.h"
 #endif
-#ifdef SOKOL_METAL
+#if SOKOL_METAL || SUPERNOVA_APPLE
 #include <TargetConditionals.h>
 #if TARGET_OS_IPHONE
 #include "render/shaders/msl21ios.h"

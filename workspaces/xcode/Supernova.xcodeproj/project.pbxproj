@@ -81,6 +81,15 @@
 		710AD70425B6058100A7B12F /* libstb-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 710AD6E325B6053400A7B12F /* libstb-ios.a */; };
 		710AD75225B7343400A7B12F /* EngineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710AD75125B7343400A7B12F /* EngineView.mm */; };
 		710AD78625B7A1F600A7B12F /* EngineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710AD76C25B79D8300A7B12F /* EngineView.mm */; };
+		71165BB7282979BE00CF79C1 /* msl21ios.h in Headers */ = {isa = PBXBuildFile; fileRef = 71165BB1282979BE00CF79C1 /* msl21ios.h */; };
+		71165BB8282979BE00CF79C1 /* glsl300es.h in Headers */ = {isa = PBXBuildFile; fileRef = 71165BB2282979BE00CF79C1 /* glsl300es.h */; };
+		71165BB9282979BE00CF79C1 /* glsl100.h in Headers */ = {isa = PBXBuildFile; fileRef = 71165BB3282979BE00CF79C1 /* glsl100.h */; };
+		71165BBA282979BE00CF79C1 /* msl21macos.h in Headers */ = {isa = PBXBuildFile; fileRef = 71165BB4282979BE00CF79C1 /* msl21macos.h */; };
+		71165BBB282979BE00CF79C1 /* glsl330.h in Headers */ = {isa = PBXBuildFile; fileRef = 71165BB5282979BE00CF79C1 /* glsl330.h */; };
+		71165BBC282979BE00CF79C1 /* hlsl5.h in Headers */ = {isa = PBXBuildFile; fileRef = 71165BB6282979BE00CF79C1 /* hlsl5.h */; };
+		71165BBF282981BE00CF79C1 /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71165BBD282981BE00CF79C1 /* Base64.cpp */; };
+		71165BC0282981BE00CF79C1 /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71165BBD282981BE00CF79C1 /* Base64.cpp */; };
+		71165BC1282981BE00CF79C1 /* Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 71165BBE282981BE00CF79C1 /* Base64.h */; };
 		7128CEE425BA705600965B51 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7128CEE325BA705600965B51 /* Main.storyboard */; };
 		7128CFAD25BA717500965B51 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7128CFAA25BA717500965B51 /* LaunchScreen.storyboard */; };
 		7128CFAE25BA717500965B51 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7128CFAB25BA717500965B51 /* Main.storyboard */; };
@@ -531,6 +540,14 @@
 		710AD75125B7343400A7B12F /* EngineView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EngineView.mm; sourceTree = "<group>"; };
 		710AD76B25B79D6700A7B12F /* EngineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EngineView.h; sourceTree = "<group>"; };
 		710AD76C25B79D8300A7B12F /* EngineView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EngineView.mm; sourceTree = "<group>"; };
+		71165BB1282979BE00CF79C1 /* msl21ios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = msl21ios.h; sourceTree = "<group>"; };
+		71165BB2282979BE00CF79C1 /* glsl300es.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glsl300es.h; sourceTree = "<group>"; };
+		71165BB3282979BE00CF79C1 /* glsl100.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glsl100.h; sourceTree = "<group>"; };
+		71165BB4282979BE00CF79C1 /* msl21macos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = msl21macos.h; sourceTree = "<group>"; };
+		71165BB5282979BE00CF79C1 /* glsl330.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glsl330.h; sourceTree = "<group>"; };
+		71165BB6282979BE00CF79C1 /* hlsl5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hlsl5.h; sourceTree = "<group>"; };
+		71165BBD282981BE00CF79C1 /* Base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Base64.cpp; sourceTree = "<group>"; };
+		71165BBE282981BE00CF79C1 /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
 		7128CEE325BA705600965B51 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		7128CFAA25BA717500965B51 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7128CFAB25BA717500965B51 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -974,6 +991,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		71165BB0282979BE00CF79C1 /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				71165BB1282979BE00CF79C1 /* msl21ios.h */,
+				71165BB2282979BE00CF79C1 /* glsl300es.h */,
+				71165BB3282979BE00CF79C1 /* glsl100.h */,
+				71165BB4282979BE00CF79C1 /* msl21macos.h */,
+				71165BB5282979BE00CF79C1 /* glsl330.h */,
+				71165BB6282979BE00CF79C1 /* hlsl5.h */,
+			);
+			path = shaders;
+			sourceTree = "<group>";
+		};
 		713D831D259D3F8F00567F9F /* macos */ = {
 			isa = PBXGroup;
 			children = (
@@ -1112,6 +1142,8 @@
 		7162FC2E25962A0E0075B97D /* util */ = {
 			isa = PBXGroup;
 			children = (
+				71165BBD282981BE00CF79C1 /* Base64.cpp */,
+				71165BBE282981BE00CF79C1 /* Base64.h */,
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
 				71451BF2270CA3EA00712643 /* FrameData.h */,
 				71BE620F25B1DB37006D6E02 /* Function.h */,
@@ -1156,6 +1188,7 @@
 				7162FC3A25962A0E0075B97D /* SceneRender.h */,
 				7162FC3925962A0E0075B97D /* ShaderRender.cpp */,
 				7162FC3C25962A0E0075B97D /* ShaderRender.h */,
+				71165BB0282979BE00CF79C1 /* shaders */,
 				7128D0FE25C2354A00965B51 /* SystemRender.cpp */,
 				7128D0FF25C2354A00965B51 /* SystemRender.h */,
 				7162FC4025962A0E0075B97D /* TextureRender.cpp */,
@@ -1653,12 +1686,15 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71165BB9282979BE00CF79C1 /* glsl100.h in Headers */,
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
 				71F97AAF262D1D8000CD6F2B /* Color.h in Headers */,
 				71451BF3270CA3EA00712643 /* Material.h in Headers */,
 				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
 				71ABBD4127A879B9001CE3AF /* ButtonComponent.h in Headers */,
 				71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */,
+				71165BB7282979BE00CF79C1 /* msl21ios.h in Headers */,
+				71165BBB282979BE00CF79C1 /* glsl330.h in Headers */,
 				71ABBD382791167A001CE3AF /* ImageComponent.h in Headers */,
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
 				71ABBD1E277A31BA001CE3AF /* Text.h in Headers */,
@@ -1671,6 +1707,7 @@
 				71CC839726B8C4D800EEBB93 /* Light.h in Headers */,
 				717D9B4127337850002C0803 /* ParticlesAnimationComponent.h in Headers */,
 				71CC839A26B8C4FD00EEBB93 /* FramebufferRender.h in Headers */,
+				71165BBC282979BE00CF79C1 /* hlsl5.h in Headers */,
 				7170A3D82818A8A30003E965 /* Fog.h in Headers */,
 				71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */,
 				713E581227BA9CE400376680 /* Polygon.h in Headers */,
@@ -1698,7 +1735,10 @@
 				71BE621425B1DB37006D6E02 /* Function.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
 				713E581627BA9D1300376680 /* TextEditComponent.h in Headers */,
+				71165BB8282979BE00CF79C1 /* glsl300es.h in Headers */,
 				71BE624625B1DB9E006D6E02 /* ShaderPool.h in Headers */,
+				71165BC1282981BE00CF79C1 /* Base64.h in Headers */,
+				71165BBA282979BE00CF79C1 /* msl21macos.h in Headers */,
 				71BE623F25B1DB9E006D6E02 /* LuaBinding.h in Headers */,
 				717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */,
 				713E581127BA9CE400376680 /* TextEdit.h in Headers */,
@@ -2232,6 +2272,7 @@
 				71451BD8270CA17F00712643 /* ColorAction.cpp in Sources */,
 				713D829C259D307F00567F9F /* SceneRender.cpp in Sources */,
 				71451BE5270CA17F00712643 /* Action.cpp in Sources */,
+				71165BC0282981BE00CF79C1 /* Base64.cpp in Sources */,
 				713D829D259D307F00567F9F /* Vector4.cpp in Sources */,
 				713D829E259D307F00567F9F /* Vector3.cpp in Sources */,
 				7128D10125C2354A00965B51 /* SystemRender.cpp in Sources */,
@@ -2358,6 +2399,7 @@
 				71451BD7270CA17F00712643 /* ColorAction.cpp in Sources */,
 				7162FD2125963AE00075B97D /* ObjectRender.cpp in Sources */,
 				71451BE4270CA17F00712643 /* Action.cpp in Sources */,
+				71165BBF282981BE00CF79C1 /* Base64.cpp in Sources */,
 				7162FD2325963AE00075B97D /* TextureRender.cpp in Sources */,
 				7162FD2425963AE00075B97D /* BufferRender.cpp in Sources */,
 				7128D10025C2354A00965B51 /* SystemRender.cpp in Sources */,
