@@ -1,5 +1,7 @@
 #version 450
 
+#define DEPTH_SHADER
+
 uniform u_vs_depthParams {
     mat4 lightMVPMatrix;
 } depthParams;

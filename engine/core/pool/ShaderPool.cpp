@@ -131,7 +131,6 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, std::string
 
 void ShaderPool::remove(ShaderType shaderType, std::string properties){
 	std::string shaderStr = getShaderStr(shaderType, properties);
-	int teste = getMap().count(shaderStr);
 	if (getMap().count(shaderStr)){
 		auto& shared = getMap()[shaderStr];
 		if (shared.use_count() <= 1){
@@ -187,13 +186,17 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 	return prop;
 }
 
-std::string ShaderPool::getDepthMeshProperties(bool skinning, bool morphTarget){
+std::string ShaderPool::getDepthMeshProperties(bool skinning, bool morphTarget, bool morphNormal, bool morphTangent){
 	std::string prop;
 
 	if (skinning)
 		prop += "Ski";
 	if (morphTarget)
 		prop += "Mta";
+	if (morphNormal)
+		prop += "Mnr";
+	if (morphTangent)
+		prop += "Mtg";
 
 	return prop;
 }

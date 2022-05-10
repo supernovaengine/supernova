@@ -479,7 +479,8 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 						hasFog, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent);
 		mesh.submeshes[i].shader = ShaderPool::get(shaderType, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
-			mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget);
+			mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(
+				mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent);
 			mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, mesh.submeshes[i].depthShaderProperties);
 			if (!mesh.submeshes[i].depthShader->isCreated())
 				return false;

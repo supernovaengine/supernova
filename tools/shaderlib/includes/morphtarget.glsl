@@ -12,18 +12,20 @@
         in vec3 a_morphTarget7;
     #endif
 
-    #ifdef HAS_MORPHNORMAL
-        in vec3 a_morphNormal0;
-        in vec3 a_morphNormal1;
-        #if !defined(HAS_MORPHTANGENT)
-            in vec3 a_morphNormal2;
-            in vec3 a_morphNormal3;
+    #ifndef DEPTH_SHADER
+        #ifdef HAS_MORPHNORMAL
+            in vec3 a_morphNormal0;
+            in vec3 a_morphNormal1;
+            #if !defined(HAS_MORPHTANGENT)
+                in vec3 a_morphNormal2;
+                in vec3 a_morphNormal3;
+            #endif
         #endif
-    #endif
 
-    #ifdef HAS_MORPHTANGENT
-        in vec3 a_morphTangent0;
-        in vec3 a_morphTangent1;
+        #ifdef HAS_MORPHTANGENT
+            in vec3 a_morphTangent0;
+            in vec3 a_morphTangent1;
+        #endif
     #endif
 
     uniform u_vs_morphtarget {
@@ -50,24 +52,26 @@ vec3 getMorphPosition(vec3 pos){
     return pos;
 }
 
-vec3 getMorphNormal(vec3 normal){
-    #ifdef HAS_MORPHNORMAL
-        normal += (morphWeights[0].x * a_morphNormal0);
-        normal += (morphWeights[0].y * a_morphNormal1);
-        #if !defined(HAS_MORPHTANGENT)
-            normal += (morphWeights[0].z * a_morphNormal2);
-            normal += (morphWeights[0].w * a_morphNormal3);
+#ifndef DEPTH_SHADER
+    vec3 getMorphNormal(vec3 normal){
+        #ifdef HAS_MORPHNORMAL
+            normal += (morphWeights[0].x * a_morphNormal0);
+            normal += (morphWeights[0].y * a_morphNormal1);
+            #if !defined(HAS_MORPHTANGENT)
+                normal += (morphWeights[0].z * a_morphNormal2);
+                normal += (morphWeights[0].w * a_morphNormal3);
+            #endif
         #endif
-    #endif
 
-    return normal;
-}
+        return normal;
+    }
 
-vec3 getMorphTangent(vec3 tangent){
-    #ifdef HAS_MORPHTANGENT
-        tangent += (morphWeights[0].x * a_morphTangent0);
-        tangent += (morphWeights[0].y * a_morphTangent1);
-    #endif
+    vec3 getMorphTangent(vec3 tangent){
+        #ifdef HAS_MORPHTANGENT
+            tangent += (morphWeights[0].x * a_morphTangent0);
+            tangent += (morphWeights[0].y * a_morphTangent1);
+        #endif
 
-    return tangent;
-}
+        return tangent;
+    }
+#endif
