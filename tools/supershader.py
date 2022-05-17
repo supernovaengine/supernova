@@ -182,11 +182,16 @@ def create_c_header(engine_root):
             shadername = os.path.splitext(os.path.basename(file))[0]
             shaderslist.append(shadername)
 
+            stringSize = 100
+            encodedShaderChunks = [encodedShader[i:i+stringSize] for i in range(0, len(encodedShader), stringSize)]
+
             headerfile.write("static const std::string ")
             headerfile.write(shadername)
-            headerfile.write(" = \"")
-            headerfile.write(encodedShader)
-            headerfile.write("\";")
+            headerfile.write(" = ")
+            for encodedShaderChunk in encodedShaderChunks:
+                headerfile.write("\n")
+                headerfile.write("    \"" + encodedShaderChunk + "\"")
+            headerfile.write(";")
             headerfile.write("\n")
 
 
