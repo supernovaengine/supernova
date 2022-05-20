@@ -7483,4 +7483,5 @@ std::string getBase64Shader(std::string name) {
     }
     return "";
 }
+
 #endif //SHADER_glsl330_h

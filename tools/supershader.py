@@ -64,7 +64,7 @@ def get_binary_shader_dir():
     return os.path.join("binshaders")
 
 def get_header_output(engine_root):
-    return os.path.join(engine_root, "engine", "core", "render", "shaders")
+    return os.path.join(engine_root, "engine", "shaders")
 
 def get_sbs_output(shader, lang):
     shadersdir = get_binary_shader_dir()
@@ -216,6 +216,7 @@ def create_c_header(engine_root):
         headerfile.write("    return \"\";")
         headerfile.write("\n")
         headerfile.write("}")
+        headerfile.write("\n")
         headerfile.write("\n")
 
         headerfile.write("#endif //SHADER_"+lang+"_h")

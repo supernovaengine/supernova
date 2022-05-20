@@ -6,23 +6,23 @@
 #include "util/Base64.h"
 
 #ifdef SOKOL_GLCORE33
-#include "render/shaders/glsl330.h"
+#include "glsl330.h"
 #endif
 #ifdef SOKOL_GLES2
-#include "render/shaders/glsl100.h"
+#include "glsl100.h"
 #endif
 #ifdef SOKOL_GLES3
-#include "render/shaders/glsl300es.h"
+#include "glsl300es.h"
 #endif
 #ifdef SOKOL_D3D11
-#include "render/shaders/hlsl5.h"
+#include "hlsl5.h"
 #endif
 #if SOKOL_METAL || SUPERNOVA_APPLE
 #include <TargetConditionals.h>
 #if TARGET_OS_IPHONE
-#include "render/shaders/msl21ios.h"
+#include "msl21ios.h"
 #elif TARGET_OS_MAC
-#include "render/shaders/msl21macos.h"
+#include "msl21macos.h"
 #endif
 #endif
 

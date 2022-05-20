@@ -11,6 +11,8 @@ add_definitions("-DPROJECT_ROOT=\"${PROJECT_ROOT}\"")
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
+include_directories(shaders)
+
 include_directories(libs)
 include_directories(libs/sol)
 include_directories(libs/json)
