@@ -13,7 +13,6 @@ namespace Supernova{
         Entity model = NULL_ENTITY;
 
         int index;
-        std::string name;
 
         Vector3 bindPosition;
         Quaternion bindRotation;
