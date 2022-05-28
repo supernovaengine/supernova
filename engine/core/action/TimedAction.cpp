@@ -12,11 +12,12 @@ TimedAction::TimedAction(Scene* scene): Action(scene){
 }
 
 void TimedAction::setAction(float duration, bool loop){
+    ActionComponent& action = getComponent<ActionComponent>();
     TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
 
+    action.timecount = 0;
     timedAction.duration = duration;
     timedAction.loop = loop;
-    timedAction.timecount = 0;
     timedAction.time = 0;
     timedAction.value = 0;
 }

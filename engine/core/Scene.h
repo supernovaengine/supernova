@@ -34,6 +34,9 @@
 #include "component/TextEditComponent.h"
 #include "component/MeshPolygonComponent.h"
 #include "component/PolygonComponent.h"
+#include "component/AnimationComponent.h"
+#include "component/KeyframeTracksComponent.h"
+#include "component/MorphTracksComponent.h"
 
 namespace Supernova{
 

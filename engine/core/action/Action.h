@@ -14,14 +14,23 @@ namespace Supernova{
         Entity entity;
         Scene* scene;
 
+        bool entityOwned;
+
     public:
         Action(Scene* scene);
+        Action(Scene* scene, Entity entity);
+        virtual ~Action();
+
+        Action(const Action& rhs);
+        Action& operator=(const Action& rhs);
 
         void start();
         void pause();
         void stop();
 
         void setTarget(Entity target);
+
+        bool isRunning();
 
         template <typename T>
         void addComponent(T &&component) {

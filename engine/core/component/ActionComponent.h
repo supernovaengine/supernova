@@ -14,6 +14,7 @@ namespace Supernova{
     struct ActionComponent{
         Entity target = NULL_ENTITY;
         ActionState state = ActionState::Stopped;
+        float timecount = 0;
 
         bool startTrigger = false;
         bool stopTrigger = false;

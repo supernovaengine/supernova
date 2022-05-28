@@ -192,7 +192,7 @@ void init(){
     scaleaction.setAction(Vector3(1,1,1), Vector3(2,2,2), 10, false);
     scaleaction.setTarget(sprite.getEntity());
 
-    coloraction.setAction(sprite.getColor(), Vector4(0.0, 1.0, 1.0, 1.0), 5, false);
+    coloraction.setAction(sprite.getColor(), Vector4(0.0, 0.0, 1.0, 1.0), 5, false);
     coloraction.setTarget(sprite.getEntity());
 
     alphaaction.setAction(1.0, 0.9, 5, false);
@@ -509,7 +509,7 @@ void init(){
     //carro.loadModel("jeep/Jeep.obj");
 
     //carro.loadModel("WaterBottle.glb");
-    //carro.setPosition(0, 30, 20);
+    carro.setPosition(0, 3, 0);
     //carro.setScale(20);
 
     carro.setName("carro");
@@ -680,8 +680,10 @@ void onMouseDown(int button, float x, float y, int mods){
     //bonePos.y = bonePos.y + 1;
     //carro.getBone(4).setPosition(bonePos);
 
-    carro.setMorphWeight(1, 2);
-    carro.setMorphWeight(0, 2);
+    //carro.setMorphWeight(1, 0.5);
+    //carro.setMorphWeight(0, 0.5);
+
+    carro.getAnimation(0).start();
 
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)

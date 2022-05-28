@@ -6,8 +6,6 @@
 namespace Supernova{
 
     struct TimedActionComponent{
-        float timecount = 0;
-
         float time = 0;
         float value = 0;
         

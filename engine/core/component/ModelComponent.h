@@ -19,6 +19,8 @@ namespace Supernova{
         std::map<int, Entity> bonesIdMapping;
 
         std::map<std::string, int> morphNameMapping;
+
+        std::vector<Entity> animations;
     };
 
 }

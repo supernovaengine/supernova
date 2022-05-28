@@ -37,6 +37,9 @@ Scene::Scene(){
 	registerComponent<TextEditComponent>();
 	registerComponent<MeshPolygonComponent>();
 	registerComponent<PolygonComponent>();
+	registerComponent<AnimationComponent>();
+	registerComponent<KeyframeTracksComponent>();
+	registerComponent<MorphTracksComponent>();
 
 	registerSystem<RenderSystem>();
 	registerSystem<MeshSystem>();

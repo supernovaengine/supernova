@@ -27,6 +27,45 @@ void ActionSystem::actionPause(ActionComponent& action){
     action.onPause.call();
 }
 
+void ActionSystem::animationUpdate(double dt, ActionComponent& action, AnimationComponent& animcomp){
+    int totalActionsPassed = 0;
+
+    for (int i = 0; i < animcomp.actions.size(); i++){
+
+        float timeDiff = action.timecount - animcomp.actions[i].startTime;
+        float duration = animcomp.actions[i].endTime - animcomp.actions[i].startTime;
+
+        Signature isignature = scene->getSignature(animcomp.actions[i].action);
+
+        if (isignature.test(scene->getComponentType<ActionComponent>())){
+            ActionComponent& iaction = scene->getComponent<ActionComponent>(animcomp.actions[i].action);
+
+            if (timeDiff >= 0) {
+                //TODO: Support loop actions
+                if (timeDiff <= duration) {
+                    if (iaction.state != ActionState::Running) {
+                        iaction.startTrigger = true;
+                    }
+                    iaction.timecount = timeDiff;
+                }else{
+                    totalActionsPassed++;
+                }
+            }
+
+        }
+
+    }
+
+    if (totalActionsPassed == animcomp.actions.size() || action.timecount >= animcomp.endTime) {
+        if (!animcomp.loop) {
+            action.stopTrigger = true;
+            //onFinish.call(object);
+        }else{
+            action.timecount = animcomp.startTime;
+        }
+    }
+}
+
 void ActionSystem::setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
     if (spriteanim.frameIndex < MAX_SPRITE_FRAMES){
         FrameData frameData = sprite.framesRect[spriteanim.frames[spriteanim.frameIndex]];
@@ -72,14 +111,14 @@ void ActionSystem::spriteActionUpdate(double dt, ActionComponent& action, MeshCo
     }
 }
 
-void ActionSystem::timedActionStop(TimedActionComponent& timedaction){
-    timedaction.timecount = 0;
+void ActionSystem::timedActionStop(ActionComponent& action, TimedActionComponent& timedaction){
+    action.timecount = 0;
     timedaction.time = 0;
     timedaction.value = 0;
 }
 
 void ActionSystem::timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction){
-    timedaction.timecount += dt;
+    action.timecount += dt;
 
     if ((timedaction.time == 1) && !timedaction.loop){
         action.stopTrigger = true;
@@ -87,15 +126,15 @@ void ActionSystem::timedActionUpdate(double dt, ActionComponent& action, TimedAc
     } else {
         if (timedaction.duration >= 0) {
 
-            if (timedaction.timecount >= timedaction.duration){
+            if (action.timecount >= timedaction.duration){
                 if (!timedaction.loop){
-                    timedaction.timecount = timedaction.duration;
+                    action.timecount = timedaction.duration;
                 }else{
-                    timedaction.timecount -= timedaction.duration;
+                    action.timecount -= timedaction.duration;
                 }
             }
 
-            timedaction.time = timedaction.timecount / timedaction.duration;
+            timedaction.time = action.timecount / timedaction.duration;
         }
 
         timedaction.value = timedaction.function.call(timedaction.time);
@@ -397,6 +436,35 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
     }
 }
 
+void ActionSystem::keyframeUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, KeyframeTracksComponent& keyframe){
+    if (keyframe.times.size() == 0)
+        return;
+
+    float actualTime = timedaction.duration * timedaction.value;
+
+    if (actualTime < keyframe.times[0]) {
+        keyframe.index = 0;
+        keyframe.progress = 0;
+        return;
+    }
+
+    keyframe.index = 0;
+    while ((keyframe.index+1) < keyframe.times.size() && keyframe.times[keyframe.index+1] < actualTime){
+        keyframe.index++;
+    }
+}
+
+void ActionSystem::morphTracksUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, KeyframeTracksComponent& keyframe, MorphTracksComponent& morpthtracks, MeshComponent& mesh){
+    if (morpthtracks.values[keyframe.index].size() == morpthtracks.values[keyframe.index+1].size()) {
+        for (int morphIndex = 0; morphIndex < morpthtracks.values[keyframe.index].size(); morphIndex++) {
+            float weight = (morpthtracks.values[keyframe.index + 1][morphIndex] - morpthtracks.values[keyframe.index][morphIndex]) * keyframe.progress;
+            mesh.morphWeights[morphIndex] = morpthtracks.values[keyframe.index][morphIndex] + weight;
+        }
+    }else{
+        Log::Error("MorphTrack of index %i is different size than index %i", keyframe.index, keyframe.index+1);
+    }
+}
+
 void ActionSystem::load(){
 
 }
@@ -413,6 +481,10 @@ void ActionSystem::update(double dt){
     auto actions = scene->getComponentArray<ActionComponent>();
     for (int i = 0; i < actions->size(); i++){
 		ActionComponent& action = actions->getComponentFromIndex(i);
+
+        if (action.target == NULL_ENTITY){
+            continue;
+        }
 
         // Action start
 		if (action.startTrigger == true && (action.state == ActionState::Stopped || action.state == ActionState::Paused)){
@@ -470,7 +542,7 @@ void ActionSystem::update(double dt){
             if (signature.test(scene->getComponentType<TimedActionComponent>())){
                 TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
 
-                timedActionStop(timedaction);
+                timedActionStop(action, timedaction);
             }
         }
 
@@ -487,6 +559,13 @@ void ActionSystem::update(double dt){
             Entity entity = actions->getEntity(i);
             Signature targetSignature = scene->getSignature(action.target);
             Signature signature = scene->getSignature(entity);
+
+             //Animation
+            if (signature.test(scene->getComponentType<AnimationComponent>())){
+                AnimationComponent& animcomp = scene->getComponent<AnimationComponent>(entity);
+
+                animationUpdate(dt, action, animcomp);
+            }
 
             //Sprite animation
             if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
@@ -568,6 +647,23 @@ void ActionSystem::update(double dt){
                         UIComponent& uirender = scene->getComponent<UIComponent>(action.target);
 
                         alphaActionUIUpdate(dt, action, timedaction, alphaaction, uirender);
+                    }
+                }
+
+                //keyframe animation
+                if (signature.test(scene->getComponentType<KeyframeTracksComponent>())){
+                    KeyframeTracksComponent& keyframe = scene->getComponent<KeyframeTracksComponent>(entity);
+
+                    keyframeUpdate(dt, action, timedaction, keyframe);
+
+                    if (signature.test(scene->getComponentType<MorphTracksComponent>())){
+                        MorphTracksComponent& morpthtracks = scene->getComponent<MorphTracksComponent>(entity);
+
+                        if (targetSignature.test(scene->getComponentType<MeshComponent>())){
+                            MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
+
+                            morphTracksUpdate(dt, action, timedaction, keyframe, morpthtracks, mesh);
+                        }
                     }
                 }
             }

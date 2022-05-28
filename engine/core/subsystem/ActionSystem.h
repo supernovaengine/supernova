@@ -21,6 +21,9 @@
 #include "component/AlphaActionComponent.h"
 #include "component/ParticlesComponent.h"
 #include "component/ParticlesAnimationComponent.h"
+#include "component/AnimationComponent.h"
+#include "component/KeyframeTracksComponent.h"
+#include "component/MorphTracksComponent.h"
 
 namespace Supernova{
 
@@ -31,13 +34,15 @@ namespace Supernova{
         void actionStop(ActionComponent& action);
         void actionPause(ActionComponent& action);
 
+		void animationUpdate(double dt, ActionComponent& action, AnimationComponent& animcomp);
+
 		// Sprite action functions
 		void setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
 		void spriteActionStart(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
 		void spriteActionStop(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
 		void spriteActionUpdate(double dt, ActionComponent& action, MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
 
-		void timedActionStop(TimedActionComponent& timedaction);
+		void timedActionStop(ActionComponent& action, TimedActionComponent& timedaction);
 		void timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction);
 
 		void positionActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, PositionActionComponent& posaction, Transform& transform);
@@ -65,6 +70,10 @@ namespace Supernova{
 
 		void particleActionStart(ParticlesAnimationComponent& partanim, ParticlesComponent& particles);
 		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, ParticlesComponent& particles);
+
+		//Keyframe
+		void keyframeUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, KeyframeTracksComponent& keyframe);
+		void morphTracksUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, KeyframeTracksComponent& keyframe, MorphTracksComponent& morpthtracks, MeshComponent& mesh);
 
 	public:
 		ActionSystem(Scene* scene);

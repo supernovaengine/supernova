@@ -9,8 +9,12 @@
 #include "texture/TextureData.h"
 #include "pool/TexturePool.h"
 
+#include "component/ActionComponent.h"
+#include "component/AnimationComponent.h"
+
 #include <algorithm>
 #include <sstream>
+#include <cfloat>
 #include "tiny_obj_loader.h"
 #include "tiny_gltf.h"
 
@@ -308,6 +312,15 @@ Entity Model::generateSketetalStructure(ModelComponent& model, int nodeIndex, in
     }
 
     return bone;
+}
+
+void Model::clearAnimations(){
+    ModelComponent& model = getComponent<ModelComponent>();
+
+    for (int i = 0; i < model.animations.size(); i++){
+        scene->destroyEntity(model.animations[i]);
+    }
+    model.animations.clear();
 }
 
 bool Model::loadOBJ(const char* filename){
@@ -882,16 +895,23 @@ bool Model::loadGLTF(const char* filename) {
             scene->addEntityChild(entity, model.skeleton);
         }
     }
-    /*
+
     clearAnimations();
 
     for (size_t i = 0; i < gltfModel->animations.size(); i++) {
         const tinygltf::Animation &animation = gltfModel->animations[i];
 
-        Animation* anim = new Animation();
-        anim->setName(animation.name);
+        Entity anim;
 
-        animations.push_back(anim);
+        anim = scene->createEntity();
+        scene->addComponent<ActionComponent>(anim, {});
+        scene->addComponent<AnimationComponent>(anim, {});
+
+        AnimationComponent& animcomp = scene->getComponent<AnimationComponent>(anim);
+
+        animcomp.name = animation.name;
+
+        model.animations.push_back(anim);
 
         float startTime = FLT_MAX;
         float endTime = 0;
@@ -921,57 +941,76 @@ bool Model::loadGLTF(const char* filename) {
                                            bufferViewOut.byteOffset + accessorOut.byteOffset);
 
                 float trackStartTime = timeValues[0];
-                float trackEndTIme = timeValues[accessorIn.count - 1];
+                float trackEndTime = timeValues[accessorIn.count - 1];
 
                 if (trackStartTime < startTime)
                     startTime = trackStartTime;
 
-                if (trackEndTIme > endTime)
-                    endTime = trackEndTIme;
+                if (trackEndTime > endTime)
+                    endTime = trackEndTime;
 
-                KeyframeTrack *track = NULL;
+                Entity track;
 
+                track = scene->createEntity();
+
+                scene->addComponent<ActionComponent>(track, {});
+                scene->addComponent<TimedActionComponent>(track, {});
+                scene->addComponent<KeyframeTracksComponent>(track, {});
+
+                ActionComponent& actiontrack = scene->getComponent<ActionComponent>(track);
+                TimedActionComponent& timedactiontrack = scene->getComponent<TimedActionComponent>(track);
+                KeyframeTracksComponent& keyframe = scene->getComponent<KeyframeTracksComponent>(track);
+
+                bool foundTrack = false;
                 if (channel.target_path.compare("translation") == 0) {
-                    track = new TranslateTracks();
+                    foundTrack = true;
+                    //track = new TranslateTracks();
                     for (int c = 0; c < accessorIn.count; c++) {
                         Vector3 positionAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
-                        ((TranslateTracks *) track)->addKeyframe(timeValues[c], positionAc);
+                        //((TranslateTracks *) track)->addKeyframe(timeValues[c], positionAc);
                     }
                 }
                 if (channel.target_path.compare("rotation") == 0) {
-                    track = new RotateTracks();
+                    foundTrack = true;
+                    //track = new RotateTracks();
                     for (int c = 0; c < accessorIn.count; c++) {
                         Quaternion rotationAc(values[(4 * c) + 3], values[4 * c],
                                               values[(4 * c) + 1], values[(4 * c) + 2]);
-                        ((RotateTracks *) track)->addKeyframe(timeValues[c], rotationAc);
+                        //((RotateTracks *) track)->addKeyframe(timeValues[c], rotationAc);
                     }
                 }
                 if (channel.target_path.compare("scale") == 0) {
-                    track = new ScaleTracks();
+                    foundTrack = true;
+                    //track = new ScaleTracks();
                     for (int c = 0; c < accessorIn.count; c++) {
                         Vector3 scaleAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
-                        ((ScaleTracks *) track)->addKeyframe(timeValues[c], scaleAc);
+                        //((ScaleTracks *) track)->addKeyframe(timeValues[c], scaleAc);
                     }
                 }
                 if (channel.target_path.compare("weights") == 0) {
-                    track = new MorphTracks();
+                    foundTrack = true;
+                    scene->addComponent<MorphTracksComponent>(track, {});
+                    MorphTracksComponent& morphtracks = scene->getComponent<MorphTracksComponent>(track);
                     int morphNum = accessorOut.count / accessorIn.count;
                     for (int c = 0; c < accessorIn.count; c++) {
                         std::vector<float> weightsAc;
                         for (int m = 0; m < morphNum; m++) {
-                            weightsAc.push_back(values[morphNum * c] + m);
+                            weightsAc.push_back(values[(morphNum * c) + m]);
                         }
-                        ((MorphTracks *) track)->addKeyframe(timeValues[c], weightsAc);
+
+                        keyframe.times.push_back(timeValues[c]);
+                        morphtracks.values.push_back(weightsAc);
                     }
                 }
 
-                if (track) {
-                    track->setDuration(trackEndTIme - trackStartTime);
-                    if (bonesIdMapping.count(channel.target_node)) {
-                        anim->addActionFrame(trackStartTime, track, bonesIdMapping[channel.target_node]);
+                if (foundTrack) {
+                    timedactiontrack.duration = trackEndTime - trackStartTime;
+                    if (model.bonesIdMapping.count(channel.target_node)) {
+                        actiontrack.target = model.bonesIdMapping[channel.target_node];
                     } else {
-                        anim->addActionFrame(trackStartTime, track, this);
+                        actiontrack.target = entity;
                     }
+                    animcomp.actions.push_back({trackStartTime, trackEndTime, track});
                 }
 
             }else{
@@ -979,16 +1018,18 @@ bool Model::loadGLTF(const char* filename) {
             }
         }
 
-        if (anim->getStartTime() < startTime)
-            anim->setStartTime(startTime);
+        if (animcomp.startTime < startTime)
+            animcomp.startTime = startTime;
 
-        if (anim->getEndTime() > endTime)
-            anim->setEndTime(endTime);
+        if (animcomp.endTime > endTime)
+            animcomp.endTime = endTime;
 
-        addAction(anim);
+        ActionComponent& animaction = scene->getComponent<ActionComponent>(anim);
+
+        animaction.target = entity;
 
     }
-*/
+
 /*
     //BEGIN DEBUG
     for (auto &gltfmesh : gltfModel->meshes) {
@@ -1025,6 +1066,34 @@ bool Model::loadGLTF(const char* filename) {
     mesh.needReload = true;
 
     return true;
+}
+
+Animation Model::getAnimation(int index){
+    ModelComponent& model = getComponent<ModelComponent>();
+
+    try{
+        return Animation(scene, model.animations.at(index));
+    }catch (const std::out_of_range& e){
+		Log::Error("Retrieving non-existent animation: %s", e.what());
+		throw;
+	}
+}
+
+Animation Model::findAnimation(std::string name){
+    ModelComponent& model = getComponent<ModelComponent>();
+
+    for (int i = 0; i < model.animations.size(); i++){
+        Signature signature = scene->getSignature(model.animations[i]);
+        if (signature.test(scene->getComponentType<AnimationComponent>())){
+            AnimationComponent& animcomp = scene->getComponent<AnimationComponent>(model.animations[i]);
+
+            if (animcomp.name == name){
+                return Animation(scene, model.animations[i]);
+            }
+        }
+    }
+    Log::Error("Retrieving non-existent bone: %s", name.c_str());
+    throw std::out_of_range("vector animations is out of range");
 }
 
 Bone Model::getBone(std::string name){

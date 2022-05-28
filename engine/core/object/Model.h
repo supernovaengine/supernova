@@ -7,6 +7,7 @@
 
 #include "Mesh.h"
 #include "Bone.h"
+#include "action/Animation.h"
 #include "buffer/ExternalBuffer.h"
 
 namespace tinygltf {class Model;}
@@ -26,6 +27,8 @@ namespace Supernova{
         Matrix4 getGLTFMeshGlobalMatrix(int nodeIndex, std::map<int, int>& nodesParent);
         Entity generateSketetalStructure(ModelComponent& model, int nodeIndex, int skinIndex);
 
+        void clearAnimations();
+
         tinygltf::Model* gltfModel;
         ExternalBuffer eBuffers[MAX_EXTERNAL_BUFFERS];
         std::vector<float> extraBuffer;
@@ -38,6 +41,9 @@ namespace Supernova{
         bool loadGLTF(const char* filename);
 
         bool loadModel(const char* filename);
+
+        Animation getAnimation(int index);
+        Animation findAnimation(std::string name);
 
         Bone getBone(std::string name);
         Bone getBone(int id);
