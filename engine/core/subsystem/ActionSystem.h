@@ -23,6 +23,9 @@
 #include "component/ParticlesAnimationComponent.h"
 #include "component/AnimationComponent.h"
 #include "component/KeyframeTracksComponent.h"
+#include "component/TranslateTracksComponent.h"
+#include "component/RotateTracksComponent.h"
+#include "component/ScaleTracksComponent.h"
 #include "component/MorphTracksComponent.h"
 
 namespace Supernova{
@@ -30,20 +33,25 @@ namespace Supernova{
 	class ActionSystem : public SubSystem {
 
     private:
-        void actionStart(ActionComponent& action);
-        void actionStop(ActionComponent& action);
-        void actionPause(ActionComponent& action);
+		void actionStart(Entity entity);
+		void actionStop(Entity entity);
+		void actionPause(Entity entity);
 
-		void animationUpdate(double dt, ActionComponent& action, AnimationComponent& animcomp);
+		void actionComponentStart(ActionComponent& action);
+		void actionComponentStop(ActionComponent& action);
+		void actionComponentPause(ActionComponent& action);
+		void actionUpdate(double dt, ActionComponent& action);
+
+		void animationUpdate(double dt, Entity entity, ActionComponent& action, AnimationComponent& animcomp);
 
 		// Sprite action functions
 		void setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
 		void spriteActionStart(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
 		void spriteActionStop(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
-		void spriteActionUpdate(double dt, ActionComponent& action, MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
+		void spriteActionUpdate(double dt, Entity entity, ActionComponent& action, MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);
 
-		void timedActionStop(ActionComponent& action, TimedActionComponent& timedaction);
-		void timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction);
+		void timedActionStop(TimedActionComponent& timedaction);
+		void timedActionUpdate(double dt, Entity entity, ActionComponent& action, TimedActionComponent& timedaction);
 
 		void positionActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, PositionActionComponent& posaction, Transform& transform);
 		void rotationActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, RotationActionComponent& rotaction, Transform& transform);
@@ -73,7 +81,10 @@ namespace Supernova{
 
 		//Keyframe
 		void keyframeUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, KeyframeTracksComponent& keyframe);
-		void morphTracksUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, KeyframeTracksComponent& keyframe, MorphTracksComponent& morpthtracks, MeshComponent& mesh);
+		void translateTracksUpdate(KeyframeTracksComponent& keyframe, TranslateTracksComponent& translatetracks, Transform& transform);
+		void scaleTracksUpdate(KeyframeTracksComponent& keyframe, ScaleTracksComponent& scaletracks, Transform& transform);
+		void rotateTracksUpdate(KeyframeTracksComponent& keyframe, RotateTracksComponent& rotatetracks, Transform& transform);
+		void morphTracksUpdate(KeyframeTracksComponent& keyframe, MorphTracksComponent& morpthtracks, MeshComponent& mesh);
 
 	public:
 		ActionSystem(Scene* scene);

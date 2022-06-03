@@ -913,7 +913,6 @@ bool Model::loadGLTF(const char* filename) {
 
         model.animations.push_back(anim);
 
-        float startTime = FLT_MAX;
         float endTime = 0;
 
         for (size_t j = 0; j < animation.channels.size(); j++) {
@@ -940,11 +939,7 @@ bool Model::loadGLTF(const char* filename) {
                 float *values = (float *) (&gltfModel->buffers[bufferViewOut.buffer].data.at(0) +
                                            bufferViewOut.byteOffset + accessorOut.byteOffset);
 
-                float trackStartTime = timeValues[0];
                 float trackEndTime = timeValues[accessorIn.count - 1];
-
-                if (trackStartTime < startTime)
-                    startTime = trackStartTime;
 
                 if (trackEndTime > endTime)
                     endTime = trackEndTime;
@@ -964,27 +959,35 @@ bool Model::loadGLTF(const char* filename) {
                 bool foundTrack = false;
                 if (channel.target_path.compare("translation") == 0) {
                     foundTrack = true;
-                    //track = new TranslateTracks();
+                    scene->addComponent<TranslateTracksComponent>(track, {});
+                    TranslateTracksComponent& translatetracks = scene->getComponent<TranslateTracksComponent>(track);
                     for (int c = 0; c < accessorIn.count; c++) {
                         Vector3 positionAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
-                        //((TranslateTracks *) track)->addKeyframe(timeValues[c], positionAc);
+
+                        keyframe.times.push_back(timeValues[c]);
+                        translatetracks.values.push_back(positionAc);
                     }
                 }
                 if (channel.target_path.compare("rotation") == 0) {
                     foundTrack = true;
-                    //track = new RotateTracks();
+                    scene->addComponent<RotateTracksComponent>(track, {});
+                    RotateTracksComponent& rotatetracks = scene->getComponent<RotateTracksComponent>(track);
                     for (int c = 0; c < accessorIn.count; c++) {
-                        Quaternion rotationAc(values[(4 * c) + 3], values[4 * c],
-                                              values[(4 * c) + 1], values[(4 * c) + 2]);
-                        //((RotateTracks *) track)->addKeyframe(timeValues[c], rotationAc);
+                        Quaternion rotationAc(values[(4 * c) + 3], values[4 * c], values[(4 * c) + 1], values[(4 * c) + 2]);
+
+                        keyframe.times.push_back(timeValues[c]);
+                        rotatetracks.values.push_back(rotationAc);
                     }
                 }
                 if (channel.target_path.compare("scale") == 0) {
                     foundTrack = true;
-                    //track = new ScaleTracks();
+                    scene->addComponent<ScaleTracksComponent>(track, {});
+                    ScaleTracksComponent& scaletracks = scene->getComponent<ScaleTracksComponent>(track);
                     for (int c = 0; c < accessorIn.count; c++) {
                         Vector3 scaleAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
-                        //((ScaleTracks *) track)->addKeyframe(timeValues[c], scaleAc);
+
+                        keyframe.times.push_back(timeValues[c]);
+                        scaletracks.values.push_back(scaleAc);
                     }
                 }
                 if (channel.target_path.compare("weights") == 0) {
@@ -1004,13 +1007,15 @@ bool Model::loadGLTF(const char* filename) {
                 }
 
                 if (foundTrack) {
-                    timedactiontrack.duration = trackEndTime - trackStartTime;
+                    timedactiontrack.duration = trackEndTime;
                     if (model.bonesIdMapping.count(channel.target_node)) {
                         actiontrack.target = model.bonesIdMapping[channel.target_node];
                     } else {
                         actiontrack.target = entity;
                     }
-                    animcomp.actions.push_back({trackStartTime, trackEndTime, track});
+                    animcomp.actions.push_back({0, trackEndTime, track});
+                }else{
+                    scene->destroyEntity(track);
                 }
 
             }else{
@@ -1018,15 +1023,13 @@ bool Model::loadGLTF(const char* filename) {
             }
         }
 
-        if (animcomp.startTime < startTime)
-            animcomp.startTime = startTime;
-
-        if (animcomp.endTime > endTime)
+        if ((animcomp.endTime > endTime) || (animcomp.endTime == 0))
             animcomp.endTime = endTime;
 
-        ActionComponent& animaction = scene->getComponent<ActionComponent>(anim);
+        // need to get here because other actions were created
+        ActionComponent& anim_actioncomp = scene->getComponent<ActionComponent>(anim);
 
-        animaction.target = entity;
+        anim_actioncomp.target = entity;
 
     }
 

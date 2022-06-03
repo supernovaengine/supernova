@@ -40,6 +40,9 @@ Scene::Scene(){
 	registerComponent<AnimationComponent>();
 	registerComponent<KeyframeTracksComponent>();
 	registerComponent<MorphTracksComponent>();
+	registerComponent<RotateTracksComponent>();
+	registerComponent<TranslateTracksComponent>();
+	registerComponent<ScaleTracksComponent>();
 
 	registerSystem<RenderSystem>();
 	registerSystem<MeshSystem>();

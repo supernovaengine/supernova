@@ -8,7 +8,7 @@ namespace Supernova{
     struct KeyframeTracksComponent{
         std::vector<float> times;
         int index = 0;
-        float progress = 0;
+        float interpolation = 0;
     };
 
 }

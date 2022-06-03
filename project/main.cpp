@@ -684,6 +684,7 @@ void onMouseDown(int button, float x, float y, int mods){
     //carro.setMorphWeight(0, 0.5);
 
     carro.getAnimation(0).start();
+    carro.getAnimation(0).setLoop(true);
 
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)

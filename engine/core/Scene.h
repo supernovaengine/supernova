@@ -37,6 +37,9 @@
 #include "component/AnimationComponent.h"
 #include "component/KeyframeTracksComponent.h"
 #include "component/MorphTracksComponent.h"
+#include "component/RotateTracksComponent.h"
+#include "component/TranslateTracksComponent.h"
+#include "component/ScaleTracksComponent.h"
 
 namespace Supernova{
 

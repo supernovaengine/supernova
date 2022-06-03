@@ -15,19 +15,95 @@ ActionSystem::ActionSystem(Scene* scene): SubSystem(scene){
     signature.set(scene->getComponentType<ActionComponent>());
 }
 
-void ActionSystem::actionStart(ActionComponent& action){
+void ActionSystem::actionStart(Entity entity){
+    ActionComponent& action = scene->getComponent<ActionComponent>(entity);
+
+    actionComponentStart(action);
+
+    Signature targetSignature = scene->getSignature(action.target);
+    Signature signature = scene->getSignature(entity);
+
+    if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
+        SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
+        if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
+            SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+            MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
+
+            spriteActionStart(mesh, sprite, spriteanim);
+
+        }
+    }
+
+    if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
+        ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
+        if (targetSignature.test(scene->getComponentType<ParticlesComponent>()) ){
+            ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(action.target);
+
+            particleActionStart(partanim, particles);
+
+        }
+    }
+}
+
+void ActionSystem::actionComponentStart(ActionComponent& action){
+    action.state = ActionState::Running;
+    action.startTrigger = false;
+
     action.onStart.call();
 }
 
-void ActionSystem::actionStop(ActionComponent& action){
+void ActionSystem::actionStop(Entity entity){
+    ActionComponent& action = scene->getComponent<ActionComponent>(entity);
+
+    actionComponentStop(action);
+
+    Signature targetSignature = scene->getSignature(action.target);
+    Signature signature = scene->getSignature(entity);
+
+    if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
+        SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
+        if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
+            SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+            MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
+
+            spriteActionStop(mesh, sprite, spriteanim);
+
+        }
+    }
+
+    if (signature.test(scene->getComponentType<TimedActionComponent>())){
+        TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
+
+        timedActionStop(timedaction);
+    }
+}
+
+void ActionSystem::actionComponentStop(ActionComponent& action){
+    action.state = ActionState::Stopped;
+    action.stopTrigger = false;
+    action.timecount = 0;
+
     action.onStop.call();
 }
 
-void ActionSystem::actionPause(ActionComponent& action){
+void ActionSystem::actionPause(Entity entity){
+    ActionComponent& action = scene->getComponent<ActionComponent>(entity);
+
+    actionComponentPause(action);
+}
+
+void ActionSystem::actionComponentPause(ActionComponent& action){
+    action.state = ActionState::Paused;
+    action.pauseTrigger = false;
+
     action.onPause.call();
 }
 
-void ActionSystem::animationUpdate(double dt, ActionComponent& action, AnimationComponent& animcomp){
+void ActionSystem::actionUpdate(double dt, ActionComponent& action){
+    action.timecount += dt;
+}
+
+void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& action, AnimationComponent& animcomp){
     int totalActionsPassed = 0;
 
     for (int i = 0; i < animcomp.actions.size(); i++){
@@ -38,13 +114,13 @@ void ActionSystem::animationUpdate(double dt, ActionComponent& action, Animation
         Signature isignature = scene->getSignature(animcomp.actions[i].action);
 
         if (isignature.test(scene->getComponentType<ActionComponent>())){
-            ActionComponent& iaction = scene->getComponent<ActionComponent>(animcomp.actions[i].action);
 
             if (timeDiff >= 0) {
                 //TODO: Support loop actions
                 if (timeDiff <= duration) {
+                    ActionComponent& iaction = scene->getComponent<ActionComponent>(animcomp.actions[i].action);
                     if (iaction.state != ActionState::Running) {
-                        iaction.startTrigger = true;
+                        actionStart(animcomp.actions[i].action);
                     }
                     iaction.timecount = timeDiff;
                 }else{
@@ -58,10 +134,10 @@ void ActionSystem::animationUpdate(double dt, ActionComponent& action, Animation
 
     if (totalActionsPassed == animcomp.actions.size() || action.timecount >= animcomp.endTime) {
         if (!animcomp.loop) {
-            action.stopTrigger = true;
+            actionStop(entity);
             //onFinish.call(object);
         }else{
-            action.timecount = animcomp.startTime;
+            action.timecount = 0;
         }
     }
 }
@@ -86,7 +162,7 @@ void ActionSystem::spriteActionStop(MeshComponent& mesh, SpriteComponent& sprite
     setSpriteTextureRect(mesh, sprite, spriteanim);
 }
 
-void ActionSystem::spriteActionUpdate(double dt, ActionComponent& action, MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
+void ActionSystem::spriteActionUpdate(double dt, Entity entity, ActionComponent& action, MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
     spriteanim.spriteFrameCount += dt * 1000;
     while (spriteanim.spriteFrameCount >= spriteanim.framesTime[spriteanim.frameTimeIndex]) {
 
@@ -97,7 +173,7 @@ void ActionSystem::spriteActionUpdate(double dt, ActionComponent& action, MeshCo
 
         if (spriteanim.frameIndex == spriteanim.framesSize - 1) {
             if (!spriteanim.loop) {
-                action.stopTrigger = true;
+                actionStop(entity);
             }
         }
 
@@ -111,17 +187,14 @@ void ActionSystem::spriteActionUpdate(double dt, ActionComponent& action, MeshCo
     }
 }
 
-void ActionSystem::timedActionStop(ActionComponent& action, TimedActionComponent& timedaction){
-    action.timecount = 0;
+void ActionSystem::timedActionStop(TimedActionComponent& timedaction){
     timedaction.time = 0;
     timedaction.value = 0;
 }
 
-void ActionSystem::timedActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction){
-    action.timecount += dt;
-
+void ActionSystem::timedActionUpdate(double dt, Entity entity, ActionComponent& action, TimedActionComponent& timedaction){
     if ((timedaction.time == 1) && !timedaction.loop){
-        action.stopTrigger = true;
+        actionStop(entity);
         //onFinish.call(object);
     } else {
         if (timedaction.duration >= 0) {
@@ -431,7 +504,7 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
     }
 
     if (!existParticles && !partanim.emitter){
-        action.stopTrigger = true;
+        actionStop(entity);
         //onFinish.call(object);
     }
 }
@@ -440,28 +513,69 @@ void ActionSystem::keyframeUpdate(double dt, ActionComponent& action, TimedActio
     if (keyframe.times.size() == 0)
         return;
 
-    float actualTime = timedaction.duration * timedaction.value;
+    float currentTime = (timedaction.duration * timedaction.value);
 
-    if (actualTime < keyframe.times[0]) {
-        keyframe.index = 0;
-        keyframe.progress = 0;
-        return;
-    }
+    keyframe.interpolation = 0;
 
     keyframe.index = 0;
-    while ((keyframe.index+1) < keyframe.times.size() && keyframe.times[keyframe.index+1] < actualTime){
+    while (keyframe.index < keyframe.times.size() && keyframe.times[keyframe.index] < currentTime){
         keyframe.index++;
+    }
+
+    float previousTime = 0;
+    float nextTime = keyframe.times[keyframe.index];
+
+    if (keyframe.index > 0){
+        previousTime = keyframe.times[keyframe.index-1];
+    }
+
+    if (nextTime > previousTime){
+        keyframe.interpolation = (currentTime - previousTime) / (nextTime - previousTime);
     }
 }
 
-void ActionSystem::morphTracksUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, KeyframeTracksComponent& keyframe, MorphTracksComponent& morpthtracks, MeshComponent& mesh){
-    if (morpthtracks.values[keyframe.index].size() == morpthtracks.values[keyframe.index+1].size()) {
+void ActionSystem::translateTracksUpdate(KeyframeTracksComponent& keyframe, TranslateTracksComponent& translatetracks, Transform& transform){
+    Vector3 previousTranslation = translatetracks.values[0];
+    if (keyframe.index > 0){
+        previousTranslation = translatetracks.values[keyframe.index-1];
+    }
+
+    transform.position = previousTranslation + keyframe.interpolation * (translatetracks.values[keyframe.index] - previousTranslation);
+    transform.needUpdate = true;
+}
+
+void ActionSystem::scaleTracksUpdate(KeyframeTracksComponent& keyframe, ScaleTracksComponent& scaletracks, Transform& transform){
+    Vector3 previousScale = scaletracks.values[0];
+    if (keyframe.index > 0){
+        previousScale = scaletracks.values[keyframe.index-1];
+    }
+
+    transform.scale = previousScale + keyframe.interpolation * (scaletracks.values[keyframe.index] - previousScale);
+    transform.needUpdate = true;
+}
+
+void ActionSystem::rotateTracksUpdate(KeyframeTracksComponent& keyframe, RotateTracksComponent& rotatetracks, Transform& transform){
+    Quaternion previousRotation = rotatetracks.values[0];
+    if (keyframe.index > 0){
+        previousRotation = rotatetracks.values[keyframe.index-1];
+    }
+
+    transform.rotation = previousRotation + keyframe.interpolation * (rotatetracks.values[keyframe.index] - previousRotation);
+    transform.needUpdate = true;
+}
+
+void ActionSystem::morphTracksUpdate(KeyframeTracksComponent& keyframe, MorphTracksComponent& morpthtracks, MeshComponent& mesh){
+    std::vector<float> previousMorph = morpthtracks.values[0];
+    if (keyframe.index > 0){
+        previousMorph = morpthtracks.values[keyframe.index-1];
+    }
+
+    if ((keyframe.index == 0) || (morpthtracks.values[keyframe.index].size() == morpthtracks.values[keyframe.index-1].size())) {
         for (int morphIndex = 0; morphIndex < morpthtracks.values[keyframe.index].size(); morphIndex++) {
-            float weight = (morpthtracks.values[keyframe.index + 1][morphIndex] - morpthtracks.values[keyframe.index][morphIndex]) * keyframe.progress;
-            mesh.morphWeights[morphIndex] = morpthtracks.values[keyframe.index][morphIndex] + weight;
+            mesh.morphWeights[morphIndex] = previousMorph[morphIndex] + keyframe.interpolation * (morpthtracks.values[keyframe.index][morphIndex] - previousMorph[morphIndex]);
         }
     }else{
-        Log::Error("MorphTrack of index %i is different size than index %i", keyframe.index, keyframe.index+1);
+        Log::Error("MorphTrack of index %i is different size than index %i", keyframe.index, keyframe.index-1);
     }
 }
 
@@ -488,69 +602,20 @@ void ActionSystem::update(double dt){
 
         // Action start
 		if (action.startTrigger == true && (action.state == ActionState::Stopped || action.state == ActionState::Paused)){
-            action.state = ActionState::Running;
-            action.startTrigger = false;
-            actionStart(action);
-
             Entity entity = actions->getEntity(i);
-            Signature targetSignature = scene->getSignature(action.target);
-            Signature signature = scene->getSignature(entity);
-
-            if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
-                SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
-                if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
-                    SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
-                    MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
-
-                    spriteActionStart(mesh, sprite, spriteanim);
-
-                }
-            }
-
-            if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
-                ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
-                if (targetSignature.test(scene->getComponentType<ParticlesComponent>()) ){
-                    ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(action.target);
-
-                    particleActionStart(partanim, particles);
-
-                }
-            }
+            actionStart(entity);
         }
 
         // Action stop
 		if (action.stopTrigger == true && (action.state == ActionState::Running || action.state == ActionState::Paused)){
-            action.state = ActionState::Stopped;
-            action.stopTrigger = false;
-            actionStop(action);
-
             Entity entity = actions->getEntity(i);
-            Signature targetSignature = scene->getSignature(action.target);
-            Signature signature = scene->getSignature(entity);
-
-            if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
-                SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
-                if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
-                    SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
-                    MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
-
-                    spriteActionStop(mesh, sprite, spriteanim);
-
-                }
-            }
-
-            if (signature.test(scene->getComponentType<TimedActionComponent>())){
-                TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
-
-                timedActionStop(action, timedaction);
-            }
+            actionStop(entity);
         }
 
         // Action pause
         if (action.pauseTrigger == true && action.state == ActionState::Running){
-            action.state = ActionState::Paused;
-            action.pauseTrigger = false;
-            actionPause(action);
+            Entity entity = actions->getEntity(i);
+            actionPause(entity);
         }
 
         // Action update
@@ -560,11 +625,11 @@ void ActionSystem::update(double dt){
             Signature targetSignature = scene->getSignature(action.target);
             Signature signature = scene->getSignature(entity);
 
-             //Animation
+            //Animation
             if (signature.test(scene->getComponentType<AnimationComponent>())){
                 AnimationComponent& animcomp = scene->getComponent<AnimationComponent>(entity);
 
-                animationUpdate(dt, action, animcomp);
+                animationUpdate(dt, entity, action, animcomp);
             }
 
             //Sprite animation
@@ -574,7 +639,7 @@ void ActionSystem::update(double dt){
                     SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
                     MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
-                    spriteActionUpdate(dt, action, mesh, sprite, spriteanim);
+                    spriteActionUpdate(dt, entity, action, mesh, sprite, spriteanim);
 
                 }
             }
@@ -593,7 +658,7 @@ void ActionSystem::update(double dt){
             if (signature.test(scene->getComponentType<TimedActionComponent>())){
                 TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
 
-                timedActionUpdate(dt, action, timedaction);
+                timedActionUpdate(dt, entity, action, timedaction);
 
                 //Transform animation
                 if (targetSignature.test(scene->getComponentType<Transform>())){
@@ -656,17 +721,49 @@ void ActionSystem::update(double dt){
 
                     keyframeUpdate(dt, action, timedaction, keyframe);
 
+                    if (signature.test(scene->getComponentType<TranslateTracksComponent>())){
+                        TranslateTracksComponent& translatetracks = scene->getComponent<TranslateTracksComponent>(entity);
+
+                        if (targetSignature.test(scene->getComponentType<Transform>())){
+                            Transform& transform = scene->getComponent<Transform>(action.target);
+
+                            translateTracksUpdate(keyframe, translatetracks, transform);
+                        }
+                    }
+
+                    if (signature.test(scene->getComponentType<RotateTracksComponent>())){
+                        RotateTracksComponent& rotatetracks = scene->getComponent<RotateTracksComponent>(entity);
+
+                        if (targetSignature.test(scene->getComponentType<Transform>())){
+                            Transform& transform = scene->getComponent<Transform>(action.target);
+
+                            rotateTracksUpdate(keyframe, rotatetracks, transform);
+                        }
+                    }
+
+                    if (signature.test(scene->getComponentType<ScaleTracksComponent>())){
+                        ScaleTracksComponent& scaletracks = scene->getComponent<ScaleTracksComponent>(entity);
+
+                        if (targetSignature.test(scene->getComponentType<Transform>())){
+                            Transform& transform = scene->getComponent<Transform>(action.target);
+
+                            scaleTracksUpdate(keyframe, scaletracks, transform);
+                        }
+                    }
+
                     if (signature.test(scene->getComponentType<MorphTracksComponent>())){
                         MorphTracksComponent& morpthtracks = scene->getComponent<MorphTracksComponent>(entity);
 
                         if (targetSignature.test(scene->getComponentType<MeshComponent>())){
                             MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
-                            morphTracksUpdate(dt, action, timedaction, keyframe, morpthtracks, mesh);
+                            morphTracksUpdate(keyframe, morpthtracks, mesh);
                         }
                     }
                 }
             }
+
+            actionUpdate(dt, action);
         }
 
 	}

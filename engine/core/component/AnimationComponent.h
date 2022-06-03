@@ -13,13 +13,12 @@ namespace Supernova{
 
     struct AnimationComponent{
         std::vector<ActionFrame> actions;
-        bool ownedActions;
-        bool loop;
+        bool ownedActions = true;
+        bool loop = false;
 
         std::string name;
 
-        float startTime;
-        float endTime;
+        float endTime = 0;
     };
 
     
