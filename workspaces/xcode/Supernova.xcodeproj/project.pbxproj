@@ -404,6 +404,27 @@
 		71E36BD625D59A1400EFEED4 /* tiny_obj_loader.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E36BB425D599C000EFEED4 /* tiny_obj_loader.h */; };
 		71E36BD825D59A1400EFEED4 /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71E36BB325D599C000EFEED4 /* tiny_obj_loader.cc */; };
 		71E36BEE25D59A3800EFEED4 /* libtinyobjloader-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71E36BDD25D59A1400EFEED4 /* libtinyobjloader-ios.a */; };
+		71E544FE284D5BB700C68FAB /* Animation.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E544F3284D5BB700C68FAB /* Animation.h */; };
+		71E544FF284D5BB700C68FAB /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E544F4284D5BB700C68FAB /* Animation.cpp */; };
+		71E54500284D5BB700C68FAB /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E544F4284D5BB700C68FAB /* Animation.cpp */; };
+		71E54501284D5BB700C68FAB /* TranslateTracks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E544F6284D5BB700C68FAB /* TranslateTracks.cpp */; };
+		71E54502284D5BB700C68FAB /* TranslateTracks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E544F6284D5BB700C68FAB /* TranslateTracks.cpp */; };
+		71E54503284D5BB700C68FAB /* ScaleTracks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E544F7284D5BB700C68FAB /* ScaleTracks.cpp */; };
+		71E54504284D5BB700C68FAB /* ScaleTracks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E544F7284D5BB700C68FAB /* ScaleTracks.cpp */; };
+		71E54505284D5BB700C68FAB /* TranslateTracks.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E544F8284D5BB700C68FAB /* TranslateTracks.h */; };
+		71E54506284D5BB700C68FAB /* MorphTracks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E544F9284D5BB700C68FAB /* MorphTracks.cpp */; };
+		71E54507284D5BB700C68FAB /* MorphTracks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E544F9284D5BB700C68FAB /* MorphTracks.cpp */; };
+		71E54508284D5BB700C68FAB /* MorphTracks.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E544FA284D5BB700C68FAB /* MorphTracks.h */; };
+		71E54509284D5BB700C68FAB /* RotateTracks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E544FB284D5BB700C68FAB /* RotateTracks.cpp */; };
+		71E5450A284D5BB700C68FAB /* RotateTracks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E544FB284D5BB700C68FAB /* RotateTracks.cpp */; };
+		71E5450B284D5BB700C68FAB /* RotateTracks.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E544FC284D5BB700C68FAB /* RotateTracks.h */; };
+		71E5450C284D5BB700C68FAB /* ScaleTracks.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E544FD284D5BB700C68FAB /* ScaleTracks.h */; };
+		71E54513284D5BE000C68FAB /* MorphTracksComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E5450D284D5BDF00C68FAB /* MorphTracksComponent.h */; };
+		71E54514284D5BE000C68FAB /* ScaleTracksComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E5450E284D5BDF00C68FAB /* ScaleTracksComponent.h */; };
+		71E54515284D5BE000C68FAB /* AnimationComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E5450F284D5BDF00C68FAB /* AnimationComponent.h */; };
+		71E54516284D5BE000C68FAB /* RotateTracksComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E54510284D5BE000C68FAB /* RotateTracksComponent.h */; };
+		71E54517284D5BE000C68FAB /* TranslateTracksComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E54511284D5BE000C68FAB /* TranslateTracksComponent.h */; };
+		71E54518284D5BE000C68FAB /* KeyframeTracksComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */; };
 		71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */; };
 		71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */; };
 		71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */; };
@@ -864,6 +885,22 @@
 		71E36BB325D599C000EFEED4 /* tiny_obj_loader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_obj_loader.cc; sourceTree = "<group>"; };
 		71E36BB425D599C000EFEED4 /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
 		71E36BDD25D59A1400EFEED4 /* libtinyobjloader-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinyobjloader-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		71E544F3284D5BB700C68FAB /* Animation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Animation.h; sourceTree = "<group>"; };
+		71E544F4284D5BB700C68FAB /* Animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Animation.cpp; sourceTree = "<group>"; };
+		71E544F6284D5BB700C68FAB /* TranslateTracks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TranslateTracks.cpp; sourceTree = "<group>"; };
+		71E544F7284D5BB700C68FAB /* ScaleTracks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScaleTracks.cpp; sourceTree = "<group>"; };
+		71E544F8284D5BB700C68FAB /* TranslateTracks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TranslateTracks.h; sourceTree = "<group>"; };
+		71E544F9284D5BB700C68FAB /* MorphTracks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MorphTracks.cpp; sourceTree = "<group>"; };
+		71E544FA284D5BB700C68FAB /* MorphTracks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MorphTracks.h; sourceTree = "<group>"; };
+		71E544FB284D5BB700C68FAB /* RotateTracks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RotateTracks.cpp; sourceTree = "<group>"; };
+		71E544FC284D5BB700C68FAB /* RotateTracks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotateTracks.h; sourceTree = "<group>"; };
+		71E544FD284D5BB700C68FAB /* ScaleTracks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScaleTracks.h; sourceTree = "<group>"; };
+		71E5450D284D5BDF00C68FAB /* MorphTracksComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MorphTracksComponent.h; sourceTree = "<group>"; };
+		71E5450E284D5BDF00C68FAB /* ScaleTracksComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScaleTracksComponent.h; sourceTree = "<group>"; };
+		71E5450F284D5BDF00C68FAB /* AnimationComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimationComponent.h; sourceTree = "<group>"; };
+		71E54510284D5BE000C68FAB /* RotateTracksComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotateTracksComponent.h; sourceTree = "<group>"; };
+		71E54511284D5BE000C68FAB /* TranslateTracksComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TranslateTracksComponent.h; sourceTree = "<group>"; };
+		71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyframeTracksComponent.h; sourceTree = "<group>"; };
 		71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaneTerrain.cpp; sourceTree = "<group>"; };
 		71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaneTerrain.h; sourceTree = "<group>"; };
 		71F97AAD262D1D8000CD6F2B /* Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
@@ -1032,9 +1069,12 @@
 				71451BC5270CA17F00712643 /* Action.h */,
 				71ABBD0C277A313C001CE3AF /* AlphaAction.cpp */,
 				71ABBD0D277A313C001CE3AF /* AlphaAction.h */,
+				71E544F4284D5BB700C68FAB /* Animation.cpp */,
+				71E544F3284D5BB700C68FAB /* Animation.h */,
 				71451BC6270CA17F00712643 /* ColorAction.cpp */,
 				71451BC7270CA17F00712643 /* ColorAction.h */,
 				71451BC9270CA17F00712643 /* Ease.h */,
+				71E544F5284D5BB700C68FAB /* keyframe */,
 				717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */,
 				717D9B3C2733783D002C0803 /* ParticlesAnimation.h */,
 				71451BCC270CA17F00712643 /* PositionAction.cpp */,
@@ -1189,21 +1229,26 @@
 			children = (
 				71451BB4270C9D0F00712643 /* ActionComponent.h */,
 				71ABBD12277A3166001CE3AF /* AlphaActionComponent.h */,
+				71E5450F284D5BDF00C68FAB /* AnimationComponent.h */,
 				7170A3C92818A87E0003E965 /* BoneComponent.h */,
 				71ABBD3F27A879B9001CE3AF /* ButtonComponent.h */,
 				7162FC4625962A0E0075B97D /* CameraComponent.h */,
 				71451BB3270C9D0F00712643 /* ColorActionComponent.h */,
 				71ABBD372791167A001CE3AF /* ImageComponent.h */,
+				71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */,
 				71CC839226B8C49B00EEBB93 /* LightComponent.h */,
 				7162FC4525962A0E0075B97D /* MeshComponent.h */,
 				71ABBD3E27A879B9001CE3AF /* MeshPolygonComponent.h */,
 				7170A3CA2818A87E0003E965 /* ModelComponent.h */,
+				71E5450D284D5BDF00C68FAB /* MorphTracksComponent.h */,
 				717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */,
 				714BBF7127148B69004A15EE /* ParticlesComponent.h */,
 				713E581327BA9D1300376680 /* PolygonComponent.h */,
 				71451BB5270C9D0F00712643 /* PositionActionComponent.h */,
+				71E54510284D5BE000C68FAB /* RotateTracksComponent.h */,
 				71451BBB270C9D1000712643 /* RotationActionComponent.h */,
 				71451BB8270C9D0F00712643 /* ScaleActionComponent.h */,
+				71E5450E284D5BDF00C68FAB /* ScaleTracksComponent.h */,
 				71CC839126B8C49B00EEBB93 /* SkyComponent.h */,
 				71451BB7270C9D0F00712643 /* SpriteAnimationComponent.h */,
 				71451BB2270C9D0F00712643 /* SpriteComponent.h */,
@@ -1211,6 +1256,7 @@
 				713E581427BA9D1300376680 /* TextEditComponent.h */,
 				71451BB9270C9D0F00712643 /* TimedActionComponent.h */,
 				7162FC4725962A0E0075B97D /* Transform.h */,
+				71E54511284D5BE000C68FAB /* TranslateTracksComponent.h */,
 				71451BB6270C9D0F00712643 /* UIComponent.h */,
 			);
 			path = component;
@@ -1610,6 +1656,21 @@
 			path = tinyobjloader;
 			sourceTree = "<group>";
 		};
+		71E544F5284D5BB700C68FAB /* keyframe */ = {
+			isa = PBXGroup;
+			children = (
+				71E544F6284D5BB700C68FAB /* TranslateTracks.cpp */,
+				71E544F7284D5BB700C68FAB /* ScaleTracks.cpp */,
+				71E544F8284D5BB700C68FAB /* TranslateTracks.h */,
+				71E544F9284D5BB700C68FAB /* MorphTracks.cpp */,
+				71E544FA284D5BB700C68FAB /* MorphTracks.h */,
+				71E544FB284D5BB700C68FAB /* RotateTracks.cpp */,
+				71E544FC284D5BB700C68FAB /* RotateTracks.h */,
+				71E544FD284D5BB700C68FAB /* ScaleTracks.h */,
+			);
+			path = keyframe;
+			sourceTree = "<group>";
+		};
 		71F97B1D262D1E2B00CD6F2B /* tinygltf */ = {
 			isa = PBXGroup;
 			children = (
@@ -1687,8 +1748,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				718FDDF72837CA9A00AF314C /* glsl100.h in Headers */,
+				71E54516284D5BE000C68FAB /* RotateTracksComponent.h in Headers */,
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
 				71F97AAF262D1D8000CD6F2B /* Color.h in Headers */,
+				71E544FE284D5BB700C68FAB /* Animation.h in Headers */,
 				71451BF3270CA3EA00712643 /* Material.h in Headers */,
 				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
 				71ABBD4127A879B9001CE3AF /* ButtonComponent.h in Headers */,
@@ -1698,9 +1761,13 @@
 				71ABBD382791167A001CE3AF /* ImageComponent.h in Headers */,
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
 				71ABBD1E277A31BA001CE3AF /* Text.h in Headers */,
+				71E54505284D5BB700C68FAB /* TranslateTracks.h in Headers */,
+				71E54517284D5BE000C68FAB /* TranslateTracksComponent.h in Headers */,
+				71E54514284D5BE000C68FAB /* ScaleTracksComponent.h in Headers */,
 				71ABBD4B27A87A2E001CE3AF /* MeshSystem.h in Headers */,
 				7170A3D72818A8A30003E965 /* SkyBox.h in Headers */,
 				71BE620025B1DB22006D6E02 /* System.h in Headers */,
+				71E54508284D5BB700C68FAB /* MorphTracks.h in Headers */,
 				71ABBD10277A313C001CE3AF /* AlphaAction.h in Headers */,
 				71ABBD2B277A3210001CE3AF /* STBText.h in Headers */,
 				717D9B4B27337B72002C0803 /* lopnames.h in Headers */,
@@ -1716,6 +1783,7 @@
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
 				71451BF0270CA2C900712643 /* Sprite.h in Headers */,
 				71ABBD3D279116E1001CE3AF /* UniqueToken.h in Headers */,
+				71E54513284D5BE000C68FAB /* MorphTracksComponent.h in Headers */,
 				717D9B462733788C002C0803 /* sol.hpp in Headers */,
 				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,
 				7170A3CB2818A87E0003E965 /* BoneComponent.h in Headers */,
@@ -1724,13 +1792,16 @@
 				71BE622225B1DB83006D6E02 /* TextureData.h in Headers */,
 				71ABBD342783C8BB001CE3AF /* Image.h in Headers */,
 				71ABBD13277A3166001CE3AF /* TextComponent.h in Headers */,
+				71E5450C284D5BB700C68FAB /* ScaleTracks.h in Headers */,
 				717D9B472733788C002C0803 /* config.hpp in Headers */,
+				71E54515284D5BE000C68FAB /* AnimationComponent.h in Headers */,
 				71ABBD2C277A3210001CE3AF /* DefaultFont.h in Headers */,
 				71ABBD14277A3166001CE3AF /* AlphaActionComponent.h in Headers */,
 				71451BF4270CA3EA00712643 /* FrameData.h in Headers */,
 				7170A3CC2818A87E0003E965 /* ModelComponent.h in Headers */,
 				713E580827BA9CB700376680 /* MeshPolygon.h in Headers */,
 				71ABBD23277A31E6001CE3AF /* UISystem.h in Headers */,
+				71E54518284D5BE000C68FAB /* KeyframeTracksComponent.h in Headers */,
 				71ABBD4027A879B9001CE3AF /* MeshPolygonComponent.h in Headers */,
 				71BE621425B1DB37006D6E02 /* Function.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
@@ -1742,6 +1813,7 @@
 				71BE623F25B1DB9E006D6E02 /* LuaBinding.h in Headers */,
 				717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */,
 				713E581127BA9CE400376680 /* TextEdit.h in Headers */,
+				71E5450B284D5BB700C68FAB /* RotateTracks.h in Headers */,
 				71CC83A426B8C54A00EEBB93 /* ShaderData.h in Headers */,
 				71451BC0270CA16200712643 /* ActionSystem.h in Headers */,
 				71ABBD4627A879D4001CE3AF /* Button.h in Headers */,
@@ -2305,19 +2377,24 @@
 				71ABBD4A27A87A2E001CE3AF /* MeshSystem.cpp in Sources */,
 				71ABBD25277A31E6001CE3AF /* UISystem.cpp in Sources */,
 				713D82AF259D307F00567F9F /* InterleavedBuffer.cpp in Sources */,
+				71E54500284D5BB700C68FAB /* Animation.cpp in Sources */,
 				7128D11F25C2356200965B51 /* SokolSystem.cpp in Sources */,
 				71BE620225B1DB22006D6E02 /* System.cpp in Sources */,
 				7170A3DA2818A8A30003E965 /* SkyBox.cpp in Sources */,
 				713D82B0259D307F00567F9F /* Attribute.cpp in Sources */,
+				71E54502284D5BB700C68FAB /* TranslateTracks.cpp in Sources */,
 				713D82B1259D307F00567F9F /* ExternalBuffer.cpp in Sources */,
+				71E54504284D5BB700C68FAB /* ScaleTracks.cpp in Sources */,
 				7170A3D62818A8A30003E965 /* Bone.cpp in Sources */,
 				713D82B2259D307F00567F9F /* IndexBuffer.cpp in Sources */,
 				713D82B3259D307F00567F9F /* SokolObject.cpp in Sources */,
 				713D82B4259D307F00567F9F /* SokolBuffer.cpp in Sources */,
 				71CC83AC26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
+				71E54507284D5BB700C68FAB /* MorphTracks.cpp in Sources */,
 				71451BD5270CA17F00712643 /* TimedAction.cpp in Sources */,
 				713D82B5259D307F00567F9F /* SokolShader.cpp in Sources */,
 				71ABBD362783C8BB001CE3AF /* Image.cpp in Sources */,
+				71E5450A284D5BB700C68FAB /* RotateTracks.cpp in Sources */,
 				713D82B6259D307F00567F9F /* SokolTexture.cpp in Sources */,
 				713D82B7259D307F00567F9F /* SokolScene.cpp in Sources */,
 			);
@@ -2432,19 +2509,24 @@
 				71ABBD4927A87A2E001CE3AF /* MeshSystem.cpp in Sources */,
 				71ABBD24277A31E6001CE3AF /* UISystem.cpp in Sources */,
 				7162FD4525963AE00075B97D /* Object.cpp in Sources */,
+				71E544FF284D5BB700C68FAB /* Animation.cpp in Sources */,
 				7128D11E25C2356200965B51 /* SokolSystem.cpp in Sources */,
 				71BE620125B1DB22006D6E02 /* System.cpp in Sources */,
 				7170A3D92818A8A30003E965 /* SkyBox.cpp in Sources */,
 				7162FD4A25963AE00075B97D /* Texture.cpp in Sources */,
+				71E54501284D5BB700C68FAB /* TranslateTracks.cpp in Sources */,
 				7162FD4D25963AE00075B97D /* RenderSystem.cpp in Sources */,
+				71E54503284D5BB700C68FAB /* ScaleTracks.cpp in Sources */,
 				7170A3D52818A8A30003E965 /* Bone.cpp in Sources */,
 				7162FD4F25963AE00075B97D /* Engine.cpp in Sources */,
 				7162FD5825963AE00075B97D /* InterleavedBuffer.cpp in Sources */,
 				7162FD5925963AE00075B97D /* Buffer.cpp in Sources */,
 				71CC83AB26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
+				71E54506284D5BB700C68FAB /* MorphTracks.cpp in Sources */,
 				71451BD4270CA17F00712643 /* TimedAction.cpp in Sources */,
 				7162FD5C25963AE00075B97D /* Attribute.cpp in Sources */,
 				71ABBD352783C8BB001CE3AF /* Image.cpp in Sources */,
+				71E54509284D5BB700C68FAB /* RotateTracks.cpp in Sources */,
 				7162FD5E25963AE10075B97D /* ExternalBuffer.cpp in Sources */,
 				7162FD6025963AE10075B97D /* IndexBuffer.cpp in Sources */,
 			);
