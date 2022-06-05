@@ -201,6 +201,7 @@ void init(){
     positionaction.setAction(Vector3(20,20,0), Vector3(200,200,0), 5, false);
     positionaction.setTarget(sprite.getEntity());
     positionaction.setFunctionType(S_EASE_ELASTIC_IN_OUT);
+    positionaction.setSpeed(1);
 
     polygonroot.addVertex(0, 0);
     polygonroot.addVertex(30, 0);
@@ -505,6 +506,7 @@ void init(){
     //carro.addChild(&camera);
 
     carro.loadModel("AnimatedMorphCube.glb");
+    carro.getAnimation(0).setSpeed(2);
 
     //carro.loadModel("jeep/Jeep.obj");
 

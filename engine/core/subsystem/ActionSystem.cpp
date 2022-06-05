@@ -100,7 +100,7 @@ void ActionSystem::actionComponentPause(ActionComponent& action){
 }
 
 void ActionSystem::actionUpdate(double dt, ActionComponent& action){
-    action.timecount += dt;
+    action.timecount += dt * action.speed;
 }
 
 void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& action, AnimationComponent& animcomp){
@@ -109,7 +109,7 @@ void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& ac
     for (int i = 0; i < animcomp.actions.size(); i++){
 
         float timeDiff = action.timecount - animcomp.actions[i].startTime;
-        float duration = animcomp.actions[i].endTime - animcomp.actions[i].startTime;
+        float duration = (animcomp.actions[i].endTime - animcomp.actions[i].startTime) / action.speed;
 
         Signature isignature = scene->getSignature(animcomp.actions[i].action);
 
@@ -122,7 +122,8 @@ void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& ac
                     if (iaction.state != ActionState::Running) {
                         actionStart(animcomp.actions[i].action);
                     }
-                    iaction.timecount = timeDiff;
+                    iaction.speed = action.speed;
+                    iaction.timecount = timeDiff * action.speed;
                 }else{
                     totalActionsPassed++;
                 }
@@ -132,7 +133,7 @@ void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& ac
 
     }
 
-    if (totalActionsPassed == animcomp.actions.size() || action.timecount >= animcomp.endTime) {
+    if (totalActionsPassed == animcomp.actions.size() || action.timecount >= (animcomp.endTime / action.speed)) {
         if (!animcomp.loop) {
             actionStop(entity);
             //onFinish.call(object);
@@ -205,17 +206,19 @@ void ActionSystem::timedActionUpdate(double dt, Entity entity, ActionComponent& 
         actionStop(entity);
         //onFinish.call(object);
     } else {
-        if (timedaction.duration >= 0) {
+        float duration = timedaction.duration / action.speed;
 
-            if (action.timecount >= timedaction.duration){
+        if (duration >= 0) {
+
+            if (action.timecount >= duration){
                 if (!timedaction.loop){
-                    action.timecount = timedaction.duration;
+                    action.timecount = duration;
                 }else{
-                    action.timecount -= timedaction.duration;
+                    action.timecount -= duration;
                 }
             }
 
-            timedaction.time = action.timecount / timedaction.duration;
+            timedaction.time = action.timecount / duration;
         }
 
         timedaction.value = timedaction.function.call(timedaction.time);

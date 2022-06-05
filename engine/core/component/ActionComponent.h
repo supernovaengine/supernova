@@ -16,6 +16,8 @@ namespace Supernova{
         ActionState state = ActionState::Stopped;
         float timecount = 0;
 
+        float speed = 1;
+
         bool startTrigger = false;
         bool stopTrigger = false;
         bool pauseTrigger = false;

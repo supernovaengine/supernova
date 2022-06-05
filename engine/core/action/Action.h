@@ -30,6 +30,9 @@ namespace Supernova{
 
         void setTarget(Entity target);
 
+        void setSpeed(float speed);
+        float getSpeed();
+
         bool isRunning();
 
         template <typename T>
