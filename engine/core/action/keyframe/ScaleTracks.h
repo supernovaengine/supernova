@@ -5,10 +5,10 @@
 #ifndef SCALETRACKS_H
 #define SCALETRACKS_H
 
-#include "action/TimedAction.h"
+#include "action/Action.h"
 
 namespace Supernova{
-    class ScaleTracks: public TimedAction{
+    class ScaleTracks: public Action{
 
     public:
         ScaleTracks(Scene* scene);

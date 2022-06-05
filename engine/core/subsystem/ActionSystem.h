@@ -33,9 +33,8 @@ namespace Supernova{
 	class ActionSystem : public SubSystem {
 
     private:
-		void actionStart(Entity entity);
-		void actionStop(Entity entity);
-		void actionPause(Entity entity);
+
+		void actionStateChange(Entity entity, ActionComponent& action);
 
 		void actionComponentStart(ActionComponent& action);
 		void actionComponentStop(ActionComponent& action);
@@ -80,7 +79,7 @@ namespace Supernova{
 		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, ParticlesComponent& particles);
 
 		//Keyframe
-		void keyframeUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, KeyframeTracksComponent& keyframe);
+		void keyframeUpdate(double dt, ActionComponent& action, KeyframeTracksComponent& keyframe);
 		void translateTracksUpdate(KeyframeTracksComponent& keyframe, TranslateTracksComponent& translatetracks, Transform& transform);
 		void scaleTracksUpdate(KeyframeTracksComponent& keyframe, ScaleTracksComponent& scaletracks, Transform& transform);
 		void rotateTracksUpdate(KeyframeTracksComponent& keyframe, RotateTracksComponent& rotatetracks, Transform& transform);
@@ -88,6 +87,10 @@ namespace Supernova{
 
 	public:
 		ActionSystem(Scene* scene);
+
+		void actionStart(Entity entity);
+		void actionStop(Entity entity);
+		void actionPause(Entity entity);
 	
 		virtual void load();
 		virtual void destroy();

@@ -949,11 +949,9 @@ bool Model::loadGLTF(const char* filename) {
                 track = scene->createEntity();
 
                 scene->addComponent<ActionComponent>(track, {});
-                scene->addComponent<TimedActionComponent>(track, {});
                 scene->addComponent<KeyframeTracksComponent>(track, {});
 
                 ActionComponent& actiontrack = scene->getComponent<ActionComponent>(track);
-                TimedActionComponent& timedactiontrack = scene->getComponent<TimedActionComponent>(track);
                 KeyframeTracksComponent& keyframe = scene->getComponent<KeyframeTracksComponent>(track);
 
                 bool foundTrack = false;
@@ -1007,7 +1005,6 @@ bool Model::loadGLTF(const char* filename) {
                 }
 
                 if (foundTrack) {
-                    timedactiontrack.duration = trackEndTime;
                     if (model.bonesIdMapping.count(channel.target_node)) {
                         actiontrack.target = model.bonesIdMapping[channel.target_node];
                     } else {

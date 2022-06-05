@@ -5,10 +5,10 @@
 #ifndef ROTATETRACKS_H
 #define ROTATETRACKS_H
 
-#include "action/TimedAction.h"
+#include "action/Action.h"
 
 namespace Supernova{
-    class RotateTracks: public TimedAction{
+    class RotateTracks: public Action{
 
     public:
         RotateTracks(Scene* scene);

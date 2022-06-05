@@ -5,10 +5,10 @@
 #ifndef TRANSLATETRACKS_H
 #define TRANSLATETRACKS_H
 
-#include "action/TimedAction.h"
+#include "action/Action.h"
 
 namespace Supernova{
-    class TranslateTracks: public TimedAction{
+    class TranslateTracks: public Action{
 
     public:
         TranslateTracks(Scene* scene);

@@ -5,10 +5,10 @@
 #ifndef MORPHTRACKS_H
 #define MORPHTRACKS_H
 
-#include "action/TimedAction.h"
+#include "action/Action.h"
 
 namespace Supernova{
-    class MorphTracks: public TimedAction{
+    class MorphTracks: public Action{
 
     public:
         MorphTracks(Scene* scene);

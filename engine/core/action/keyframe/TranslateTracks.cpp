@@ -9,12 +9,12 @@
 
 using namespace Supernova;
 
-TranslateTracks::TranslateTracks(Scene* scene): TimedAction(scene){
+TranslateTracks::TranslateTracks(Scene* scene): Action(scene){
     addComponent<KeyframeTracksComponent>({});
     addComponent<TranslateTracksComponent>({});
 }
 
-TranslateTracks::TranslateTracks(Scene* scene, std::vector<float> times, std::vector<Vector3> values): TimedAction(scene){
+TranslateTracks::TranslateTracks(Scene* scene, std::vector<float> times, std::vector<Vector3> values): Action(scene){
     addComponent<KeyframeTracksComponent>({});
     addComponent<TranslateTracksComponent>({});
 

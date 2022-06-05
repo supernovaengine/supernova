@@ -9,12 +9,12 @@
 
 using namespace Supernova;
 
-MorphTracks::MorphTracks(Scene* scene): TimedAction(scene){
+MorphTracks::MorphTracks(Scene* scene): Action(scene){
     addComponent<KeyframeTracksComponent>({});
     addComponent<MorphTracksComponent>({});
 }
 
-MorphTracks::MorphTracks(Scene* scene, std::vector<float> times, std::vector<std::vector<float>> values): TimedAction(scene){
+MorphTracks::MorphTracks(Scene* scene, std::vector<float> times, std::vector<std::vector<float>> values): Action(scene){
     addComponent<KeyframeTracksComponent>({});
     addComponent<MorphTracksComponent>({});
 

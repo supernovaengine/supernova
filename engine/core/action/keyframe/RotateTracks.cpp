@@ -9,12 +9,12 @@
 
 using namespace Supernova;
 
-RotateTracks::RotateTracks(Scene* scene): TimedAction(scene){
+RotateTracks::RotateTracks(Scene* scene): Action(scene){
     addComponent<KeyframeTracksComponent>({});
     addComponent<RotateTracksComponent>({});
 }
 
-RotateTracks::RotateTracks(Scene* scene, std::vector<float> times, std::vector<Quaternion> values): TimedAction(scene){
+RotateTracks::RotateTracks(Scene* scene, std::vector<float> times, std::vector<Quaternion> values): Action(scene){
     addComponent<KeyframeTracksComponent>({});
     addComponent<RotateTracksComponent>({});
 
