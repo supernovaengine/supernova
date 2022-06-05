@@ -137,6 +137,23 @@ void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent
     }
 }
 
+void MeshSystem::destroyModel(ModelComponent& model){
+    for (auto const& bone : model.bonesIdMapping){
+        scene->destroyEntity(bone.second);
+    }
+    model.bonesIdMapping.clear();
+    model.bonesNameMapping.clear();
+
+    for (int i = 0; i < model.animations.size(); i++){
+        scene->destroyEntity(model.animations[i]);
+    }
+    model.animations.clear();
+
+    model.morphNameMapping.clear();
+
+    model.skeleton = NULL_ENTITY;
+}
+
 void MeshSystem::load(){
 
 }
@@ -196,5 +213,9 @@ void MeshSystem::draw(){
 }
 
 void MeshSystem::entityDestroyed(Entity entity){
+	Signature signature = scene->getSignature(entity);
 
+	if (signature.test(scene->getComponentType<ModelComponent>())){
+        destroyModel(scene->getComponent<ModelComponent>(entity));
+	}
 }

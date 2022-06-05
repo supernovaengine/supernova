@@ -8,6 +8,7 @@
 #include "SubSystem.h"
 
 #include "component/MeshComponent.h"
+#include "component/ModelComponent.h"
 #include "component/SpriteComponent.h"
 #include "component/MeshPolygonComponent.h"
 #include "component/CameraComponent.h"
@@ -25,6 +26,8 @@ namespace Supernova{
 	public:
 		MeshSystem(Scene* scene);
 		virtual ~MeshSystem();
+
+		void destroyModel(ModelComponent& model);
 
 		virtual void load();
 		virtual void destroy();

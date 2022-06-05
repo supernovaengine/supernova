@@ -9,6 +9,7 @@
 #include "texture/TextureData.h"
 #include "pool/TexturePool.h"
 
+#include "subsystem/MeshSystem.h"
 #include "component/ActionComponent.h"
 #include "component/AnimationComponent.h"
 
@@ -486,6 +487,8 @@ bool Model::loadGLTF(const char* filename) {
     MeshComponent& mesh = getComponent<MeshComponent>();
     ModelComponent& model = getComponent<ModelComponent>();
     Transform& transform = getComponent<Transform>();
+
+    scene->getSystem<MeshSystem>()->destroyModel(model);
 
     tinygltf::TinyGLTF loader;
     std::string err;

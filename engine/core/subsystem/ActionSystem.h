@@ -42,6 +42,7 @@ namespace Supernova{
 		void actionUpdate(double dt, ActionComponent& action);
 
 		void animationUpdate(double dt, Entity entity, ActionComponent& action, AnimationComponent& animcomp);
+		void animationDestroy(AnimationComponent& animcomp);
 
 		// Sprite action functions
 		void setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim);

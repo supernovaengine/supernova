@@ -142,6 +142,14 @@ void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& ac
     }
 }
 
+void ActionSystem::animationDestroy(AnimationComponent& animcomp){
+    if (animcomp.ownedActions){
+        for (int i = 0; i < animcomp.actions.size(); i++){
+            scene->destroyEntity(animcomp.actions[i].action);
+        }
+    }
+}
+
 void ActionSystem::setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
     if (spriteanim.frameIndex < MAX_SPRITE_FRAMES){
         FrameData frameData = sprite.framesRect[spriteanim.frames[spriteanim.frameIndex]];
@@ -784,5 +792,9 @@ void ActionSystem::update(double dt){
 }
 
 void ActionSystem::entityDestroyed(Entity entity){
+	Signature signature = scene->getSignature(entity);
 
+	if (signature.test(scene->getComponentType<AnimationComponent>())){
+		animationDestroy(scene->getComponent<AnimationComponent>(entity));
+	}
 }
