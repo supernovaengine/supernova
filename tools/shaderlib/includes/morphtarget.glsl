@@ -13,7 +13,7 @@
     #endif
 
     #ifndef DEPTH_SHADER
-        #ifdef HAS_MORPHNORMAL
+        #if defined(HAS_NORMALS) && defined(HAS_MORPHNORMAL)
             in vec3 a_morphNormal0;
             in vec3 a_morphNormal1;
             #if !defined(HAS_MORPHTANGENT)
@@ -22,7 +22,7 @@
             #endif
         #endif
 
-        #ifdef HAS_MORPHTANGENT
+        #if defined(HAS_TANGENTS) && defined(HAS_MORPHTANGENT)
             in vec3 a_morphTangent0;
             in vec3 a_morphTangent1;
         #endif
@@ -54,7 +54,7 @@ vec3 getMorphPosition(vec3 pos){
 
 #ifndef DEPTH_SHADER
     vec3 getMorphNormal(vec3 normal){
-        #ifdef HAS_MORPHNORMAL
+        #if defined(HAS_NORMALS) && defined(HAS_MORPHNORMAL)
             normal += (morphWeights[0].x * a_morphNormal0);
             normal += (morphWeights[0].y * a_morphNormal1);
             #if !defined(HAS_MORPHTANGENT)
@@ -67,7 +67,7 @@ vec3 getMorphPosition(vec3 pos){
     }
 
     vec3 getMorphTangent(vec3 tangent){
-        #ifdef HAS_MORPHTANGENT
+        #if defined(HAS_TANGENTS) && defined(HAS_MORPHTANGENT)
             tangent += (morphWeights[0].x * a_morphTangent0);
             tangent += (morphWeights[0].y * a_morphTangent1);
         #endif
