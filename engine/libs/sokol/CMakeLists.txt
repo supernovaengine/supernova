@@ -9,6 +9,7 @@ add_library(
 )
 
 set(SOKOL_LINK_LIBRARIES)
+set(SOKOL_PROPERTIES)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -41,9 +42,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
 
-    set_target_properties(
-        sokol
-        PROPERTIES
+    list(APPEND SOKOL_PROPERTIES
         XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC "YES"
     )
 
@@ -67,6 +66,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
     # For sokol_audio.h
     #"-framework AudioToolbox"
 endif()
+
+set_target_properties(
+    sokol
+    PROPERTIES
+
+    CXX_STANDARD 17
+    ${SOKOL_PROPERTIES}
+)
 
 target_link_libraries(
     sokol
