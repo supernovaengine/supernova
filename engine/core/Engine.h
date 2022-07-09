@@ -40,6 +40,13 @@ namespace Supernova {
         WGPU
     };
 
+    // texture power of two strategy
+    enum class TextureStrategy{
+        FIT,
+        RESAMPLE,
+        NONE
+    };
+
     class Engine {
         
     private:
@@ -55,6 +62,7 @@ namespace Supernova {
         static Rect viewRect;
 
         static Scaling scalingMode;
+        static TextureStrategy textureStrategy;
         
         static bool callMouseInTouchEvent;
         static bool callTouchInMouseEvent;
@@ -104,6 +112,9 @@ namespace Supernova {
         
         static void setScalingMode(Scaling scalingMode);
         static Scaling getScalingMode();
+
+        static void setTextureStrategy(TextureStrategy textureStrategy);
+        static TextureStrategy getTextureStrategy();
         
         static void setCallMouseInTouchEvent(bool callMouseInTouchEvent);
         static bool isCallMouseInTouchEvent();

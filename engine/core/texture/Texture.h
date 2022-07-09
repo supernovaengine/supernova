@@ -21,6 +21,8 @@ namespace Supernova{
             std::string paths[6];
             TextureData data[6];
 
+            int numFaces;
+
             bool loadFromPath;
             bool releaseDataAfterLoad;
             bool needLoad;
@@ -52,6 +54,7 @@ namespace Supernova{
             TextureData& getData(size_t index = 0);
 
             void setReleaseDataAfterLoad(bool releaseDataAfterLoad);
+            void releaseData();
 
             bool empty();
             bool hasTextureFrame();

@@ -16,6 +16,7 @@
 #include "math/Vector3.h"
 #include "math/Angle.h"
 #include "buffer/ExternalBuffer.h"
+#include "math/AlignedBox.h"
 #include <memory>
 #include <cmath>
 
@@ -1226,6 +1227,8 @@ void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 
 	//Update ViewProjectionMatrix
 	camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
+
+	camera.needUpdateFrustumPlanes = true;
 }
 
 void RenderSystem::updateSkyViewProjection(CameraComponent& camera){
@@ -1278,6 +1281,210 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 		((ExternalBuffer*)particles.buffer)->setData((unsigned char*)nullptr, 0);
 	}
 	particles.needUpdateBuffer = true;
+}
+
+void RenderSystem::updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
+	for (int i = 0; i < terrain.numNodes; i++){
+		terrain.nodes[i].visible = false;
+	}
+
+	for (int i = 0; i < (terrain.rootGridSize*terrain.rootGridSize); i++){
+		terrainNodeLODSelect(terrain, transform, camera, cameraTransform, terrain.nodes[terrain.grid[i]], terrain.levels-1);
+	}
+}
+
+void RenderSystem::setTerrainNodeIndex(TerrainComponent& terrain, TerrainNode& terrainNode, size_t size, size_t offset){
+	terrainNode.indexAttribute.setElements(1);
+	terrainNode.indexAttribute.setDataType(AttributeDataType::UNSIGNED_SHORT);
+	terrainNode.indexAttribute.setCount(size);
+	terrainNode.indexAttribute.setOffset(offset);
+	terrainNode.indexAttribute.setNormalized(false);
+
+	if (terrainNode.hasChilds){
+		for (int i = 0; i < 4; i++){
+			setTerrainNodeIndex(terrain, terrain.nodes[terrainNode.childs[i]], size, offset);
+		}
+	}
+}
+
+AlignedBox RenderSystem::getTerrainNodeAlignedBox(Transform& transform, TerrainNode& terrainNode){
+    float halfSize = terrainNode.size/2;
+    Vector3 worldHalfScale(halfSize * transform.worldScale.x, 1, halfSize * transform.worldScale.z);
+    Vector3 worldPosition = transform.modelMatrix * Vector3(terrainNode.position.x, 0, terrainNode.position.y);
+
+    Vector3 c1 = Vector3(worldPosition.x - worldHalfScale.x, terrainNode.minHeight, worldPosition.z - worldHalfScale.z);
+    Vector3 c2 = Vector3(worldPosition.x + worldHalfScale.x, terrainNode.maxHeight, worldPosition.z + worldHalfScale.z);
+
+    return AlignedBox(c1, c2);
+};
+
+bool RenderSystem::isTerrainNodeInSphere(Vector3 position, float radius, const AlignedBox& box) {
+	float r2 = radius*radius;
+
+	Vector3 c1 = box.getMinimum();
+	Vector3 c2 = box.getMaximum();
+	Vector3 distV;
+
+	if (position.x < c1.x) distV.x = (position.x - c1.x);
+	else if (position.x > c2.x) distV.x = (position.x - c2.x);
+	if (position.y < c1.y) distV.y = (position.y - c1.y);
+	else if (position.y > c2.y) distV.y = (position.y - c2.y);
+	if (position.z < c1.z) distV.z = (position.z - c1.z);
+	else if (position.z > c2.z) distV.z = (position.z - c2.z);
+
+	float dist2 = distV.dotProduct(distV);
+
+	return dist2 <= r2;
+}
+
+bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform, TerrainNode& terrainNode, int lodLevel){
+    terrainNode.currentRange = terrain.ranges[lodLevel];
+
+    AlignedBox box = getTerrainNodeAlignedBox(transform, terrainNode);
+
+    if (!isTerrainNodeInSphere(cameraTransform.worldPosition, terrain.ranges[lodLevel], box)) {
+        return false;
+    }
+
+    if (!isInsideCamera(camera, box)) {
+        return true;
+    }
+
+    if( lodLevel == 0 ) {
+        //Full resolution
+        terrainNode.resolution = terrain.resolution;
+		terrainNode.visible = true;
+		setTerrainNodeIndex(terrain, terrainNode, terrain.fullResNode.indexCount, terrain.fullResNode.indexOffset * sizeof(uint16_t));
+
+        return true;
+    } else {
+
+        if( !isTerrainNodeInSphere(cameraTransform.worldPosition, terrain.ranges[lodLevel-1], box) ) {
+            //Full resolution
+			terrainNode.resolution = terrain.resolution;
+			terrainNode.visible = true;
+			setTerrainNodeIndex(terrain, terrainNode, terrain.fullResNode.indexCount, terrain.fullResNode.indexOffset * sizeof(uint16_t));
+        } else {
+            for (int i = 0; i < 4; i++) {
+                TerrainNode& child = terrain.nodes[terrainNode.childs[i]];
+				if (!terrainNodeLODSelect(terrain, transform, camera, cameraTransform, child, lodLevel-1)){
+                    //Half resolution
+                    child.resolution = terrain.resolution / 2;
+                    child.currentRange = terrainNode.currentRange;
+					child.visible = true;
+					setTerrainNodeIndex(terrain, child, terrain.halfResNode.indexCount, terrain.halfResNode.indexOffset * sizeof(uint16_t));
+                }
+            }
+        }
+
+        return true;
+    }
+
+}
+
+float RenderSystem::getCameraFar(CameraComponent& camera){
+	if (camera.type == CameraType::CAMERA_PERSPECTIVE){
+		return camera.perspectiveFar;
+	}else{
+		return camera.orthoFar;
+	}
+}
+
+bool RenderSystem::isInsideCamera(CameraComponent& camera, const AlignedBox& box){
+
+    if (box.isNull() || box.isInfinite())
+        return false;
+
+    updateCameraFrustumPlanes(camera);
+
+    Vector3 centre = box.getCenter();
+    Vector3 halfSize = box.getHalfSize();
+
+    for (int plane = 0; plane < 6; ++plane){
+        if (plane == FRUSTUM_PLANE_FAR && getCameraFar(camera) == 0)
+            continue;
+
+        Plane::Side side = camera.frustumPlanes[plane].getSide(centre, halfSize);
+        if (side == Plane::NEGATIVE_SIDE){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& point){
+    updateCameraFrustumPlanes(camera);
+
+    for (int plane = 0; plane < 6; ++plane){
+        if (plane == FRUSTUM_PLANE_FAR && getCameraFar(camera) == 0)
+            continue;
+
+        if (camera.frustumPlanes[plane].getSide(point) == Plane::NEGATIVE_SIDE){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius){
+    updateCameraFrustumPlanes(camera);
+
+    for (int plane = 0; plane < 6; ++plane){
+        if (plane == FRUSTUM_PLANE_FAR && getCameraFar(camera) == 0)
+            continue;
+
+        if (camera.frustumPlanes[plane].getDistance(center) < -radius){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool RenderSystem::updateCameraFrustumPlanes(CameraComponent& camera){
+    if (!camera.needUpdateFrustumPlanes)
+        return false;
+
+    camera.needUpdateFrustumPlanes = false;
+
+    camera.frustumPlanes[FRUSTUM_PLANE_LEFT].normal.x = camera.viewProjectionMatrix[0][3] + camera.viewProjectionMatrix[0][0];
+    camera.frustumPlanes[FRUSTUM_PLANE_LEFT].normal.y = camera.viewProjectionMatrix[1][3] + camera.viewProjectionMatrix[1][0];
+    camera.frustumPlanes[FRUSTUM_PLANE_LEFT].normal.z = camera.viewProjectionMatrix[2][3] + camera.viewProjectionMatrix[2][0];
+    camera.frustumPlanes[FRUSTUM_PLANE_LEFT].d = camera.viewProjectionMatrix[3][3] + camera.viewProjectionMatrix[3][0];
+
+    camera.frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.x = camera.viewProjectionMatrix[0][3] - camera.viewProjectionMatrix[0][0];
+    camera.frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.y = camera.viewProjectionMatrix[1][3] - camera.viewProjectionMatrix[1][0];
+    camera.frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.z = camera.viewProjectionMatrix[2][3] - camera.viewProjectionMatrix[2][0];
+    camera.frustumPlanes[FRUSTUM_PLANE_RIGHT].d = camera.viewProjectionMatrix[3][3] - camera.viewProjectionMatrix[3][0];
+
+    camera.frustumPlanes[FRUSTUM_PLANE_TOP].normal.x = camera.viewProjectionMatrix[0][3] - camera.viewProjectionMatrix[0][1];
+    camera.frustumPlanes[FRUSTUM_PLANE_TOP].normal.y = camera.viewProjectionMatrix[1][3] - camera.viewProjectionMatrix[1][1];
+    camera.frustumPlanes[FRUSTUM_PLANE_TOP].normal.z = camera.viewProjectionMatrix[2][3] - camera.viewProjectionMatrix[2][1];
+    camera.frustumPlanes[FRUSTUM_PLANE_TOP].d = camera.viewProjectionMatrix[3][3] - camera.viewProjectionMatrix[3][1];
+
+    camera.frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.x = camera.viewProjectionMatrix[0][3] + camera.viewProjectionMatrix[0][1];
+    camera.frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.y = camera.viewProjectionMatrix[1][3] + camera.viewProjectionMatrix[1][1];
+    camera.frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.z = camera.viewProjectionMatrix[2][3] + camera.viewProjectionMatrix[2][1];
+    camera.frustumPlanes[FRUSTUM_PLANE_BOTTOM].d = camera.viewProjectionMatrix[3][3] + camera.viewProjectionMatrix[3][1];
+
+    camera.frustumPlanes[FRUSTUM_PLANE_NEAR].normal.x = camera.viewProjectionMatrix[0][3] + camera.viewProjectionMatrix[0][2];
+    camera.frustumPlanes[FRUSTUM_PLANE_NEAR].normal.y = camera.viewProjectionMatrix[1][3] + camera.viewProjectionMatrix[1][2];
+    camera.frustumPlanes[FRUSTUM_PLANE_NEAR].normal.z = camera.viewProjectionMatrix[2][3] + camera.viewProjectionMatrix[2][2];
+    camera.frustumPlanes[FRUSTUM_PLANE_NEAR].d = camera.viewProjectionMatrix[3][3] + camera.viewProjectionMatrix[3][2];
+
+    camera.frustumPlanes[FRUSTUM_PLANE_FAR].normal.x = camera.viewProjectionMatrix[0][3] - camera.viewProjectionMatrix[0][2];
+    camera.frustumPlanes[FRUSTUM_PLANE_FAR].normal.y = camera.viewProjectionMatrix[1][3] - camera.viewProjectionMatrix[1][2];
+    camera.frustumPlanes[FRUSTUM_PLANE_FAR].normal.z = camera.viewProjectionMatrix[2][3] - camera.viewProjectionMatrix[2][2];
+    camera.frustumPlanes[FRUSTUM_PLANE_FAR].d = camera.viewProjectionMatrix[3][3] - camera.viewProjectionMatrix[3][2];
+
+    for (int i=0; i<6; i++){
+        float length = camera.frustumPlanes[i].normal.normalizeL();
+        camera.frustumPlanes[i].d /= length;
+    }
+
+    return true;
 }
 
 void RenderSystem::configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera){
@@ -1590,6 +1797,12 @@ void RenderSystem::update(double dt){
 					if (bone.index >= 0 && bone.index < MAX_BONES)
 						mesh.bonesMatrix[bone.index] = skinning;
 				}
+			}
+
+			if (signature.test(scene->getComponentType<TerrainComponent>())){
+				TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+
+				updateTerrain(terrain, transform, camera, cameraTransform);
 			}
 		}
 

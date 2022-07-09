@@ -340,6 +340,7 @@ void onKeyDown(int key, bool repeat, int mods){
 #include "Input.h"
 #include "Model.h"
 #include "PlaneTerrain.h"
+#include "Terrain.h"
 #include "SkyBox.h"
 #include "Light.h"
 #include "Sprite.h"
@@ -378,7 +379,8 @@ Scene scene;
 Model carro(&scene);
 //Mesh chefao(&scene);
 //Mesh* child11;
-PlaneTerrain plane(&scene);
+//PlaneTerrain plane(&scene);
+Terrain terrain(&scene);
 SkyBox sky(&scene);
 Light lightDir(&scene);
 //Light lightDir2(&scene);
@@ -516,10 +518,12 @@ void init(){
 
     carro.setName("carro");
 
-    plane.create(4000, 4000);
+    //plane.create(4000, 4000);
     //plane.setColor(0.5, 0.3, 0.7, 1.0);
-    plane.setTexture("pista.png");
-    plane.setPosition(-2000,0,-2000);
+    //plane.setTexture("pista.png");
+    //plane.setPosition(-2000,0,-2000);
+
+    terrain.setHeightMap("heightmap.png");
 
    
 //    std::vector<std::string> teste = System::instance().args;

@@ -25,6 +25,7 @@ int Engine::preferedCanvasHeight;
 Rect Engine::viewRect;
 
 Scaling Engine::scalingMode;
+TextureStrategy Engine::textureStrategy;
 
 bool Engine::callMouseInTouchEvent;
 bool Engine::callTouchInMouseEvent;
@@ -125,6 +126,14 @@ void Engine::setScalingMode(Scaling scalingMode){
 
 Scaling Engine::getScalingMode(){
     return scalingMode;
+}
+
+void Engine::setTextureStrategy(TextureStrategy textureStrategy){
+    Engine::textureStrategy = textureStrategy;
+}
+
+TextureStrategy Engine::getTextureStrategy(){
+    return textureStrategy;
 }
 
 void Engine::setCallMouseInTouchEvent(bool callMouseInTouchEvent){
@@ -299,6 +308,7 @@ void Engine::systemInit(int argc, char* argv[]){
 
     Engine::setCanvasSize(1000,480);
     Engine::setScalingMode(Scaling::FITWIDTH);
+    Engine::setTextureStrategy(TextureStrategy::RESAMPLE);
     Engine::setCallMouseInTouchEvent(false);
     Engine::setCallTouchInMouseEvent(false);
     Engine::setUseDegrees(true);

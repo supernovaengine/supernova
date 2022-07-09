@@ -8,6 +8,7 @@ using namespace Supernova;
 Texture::Texture(){
     this->renderAndData = NULL;
     this->framebuffer = NULL;
+    this->numFaces = 1;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = true;
     this->needLoad = false;
@@ -19,6 +20,7 @@ Texture::Texture(std::string path){
     this->paths[0] = path;
     this->id = path;
     this->type = TextureType::TEXTURE_2D;
+    this->numFaces = 1;
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
     this->needLoad = true;
@@ -30,6 +32,7 @@ Texture::Texture(TextureData data, std::string id){
     this->data[0] = data;
     this->id = id;
     this->type = TextureType::TEXTURE_2D;
+    this->numFaces = 1;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
     this->needLoad = true;
@@ -44,6 +47,7 @@ Texture::Texture(const Texture& rhs){
         paths[i] = rhs.paths[i];
         data[i] = rhs.data[i];
     }
+    numFaces = rhs.numFaces;
     loadFromPath = rhs.loadFromPath;
     releaseDataAfterLoad = rhs.releaseDataAfterLoad;
     needLoad = rhs.needLoad;
@@ -58,6 +62,7 @@ Texture& Texture::operator=(const Texture& rhs){
         paths[i] = rhs.paths[i];
         data[i] = rhs.data[i];
     }
+    numFaces = rhs.numFaces;
     loadFromPath = rhs.loadFromPath;
     releaseDataAfterLoad = rhs.releaseDataAfterLoad;
     needLoad = rhs.needLoad;
@@ -76,6 +81,7 @@ bool Texture::operator == ( const Texture& rhs ) const{
         paths[3] == rhs.paths[3] &&
         paths[4] == rhs.paths[4] &&
         paths[5] == rhs.paths[5] &&
+        numFaces == rhs.numFaces &&
         loadFromPath == rhs.loadFromPath &&
         releaseDataAfterLoad == rhs.releaseDataAfterLoad
      );
@@ -92,6 +98,7 @@ bool Texture::operator != ( const Texture& rhs ) const{
         paths[3] != rhs.paths[3] ||
         paths[4] != rhs.paths[4] ||
         paths[5] != rhs.paths[5] ||
+        numFaces == rhs.numFaces ||
         loadFromPath != rhs.loadFromPath ||
         releaseDataAfterLoad != rhs.releaseDataAfterLoad
     );
@@ -108,6 +115,7 @@ void Texture::setPath(std::string path){
     this->id = path;
     this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_2D;
+    this->numFaces = 1;
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
     this->needLoad = true;
@@ -120,6 +128,7 @@ void Texture::setData(TextureData data, std::string id){
     this->id = id;
     this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_2D;
+    this->numFaces = 1;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
     this->needLoad = true;
@@ -132,6 +141,7 @@ void Texture::setCubePath(size_t index, std::string path){
 
     this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_CUBE;
+    this->numFaces = 6;
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
     this->needLoad = true;
@@ -155,6 +165,7 @@ void Texture::setCubePaths(std::string front, std::string back, std::string left
 
     this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_CUBE;
+    this->numFaces = 6;
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
     this->needLoad = true;
@@ -171,6 +182,7 @@ void Texture::setFramebuffer(FramebufferRender* framebuffer){
 
     this->framebuffer = framebuffer;
     this->id.clear();
+    this->numFaces = 6;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
     this->needLoad = false;
@@ -189,7 +201,7 @@ bool Texture::load(){
         return true;
     }
 
-    int numFaces = 1;
+    numFaces = 1;
 	if (type == TextureType::TEXTURE_CUBE){
 		numFaces = 6;
 	}
@@ -201,6 +213,12 @@ bool Texture::load(){
 			    return false;
             }
     	    data[f].loadTextureFromFile(paths[f].c_str());
+
+            if (Engine::getTextureStrategy() == TextureStrategy::FIT){
+                data[f].fitPowerOfTwo();
+            }else if (Engine::getTextureStrategy() == TextureStrategy::RESAMPLE){
+                data[f].resamplePowerOfTwo();
+            }
 	    }
     }
 
@@ -247,6 +265,12 @@ TextureData& Texture::getData(size_t index){
 
 void Texture::setReleaseDataAfterLoad(bool releaseDataAfterLoad){
     this->releaseDataAfterLoad = releaseDataAfterLoad;
+}
+
+void Texture::releaseData(){
+    for (int f = 0; f < numFaces; f++){
+        data[f].releaseImageData();
+    }
 }
 
 bool Texture::empty(){

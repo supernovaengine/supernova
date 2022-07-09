@@ -14,6 +14,7 @@
 #include "component/CameraComponent.h"
 #include "component/LightComponent.h"
 #include "component/ParticlesComponent.h"
+#include "component/TerrainComponent.h"
 #include "component/Transform.h"
 #include "render/ObjectRender.h"
 #include "render/SceneRender.h"
@@ -94,6 +95,12 @@ namespace Supernova{
 		void loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool castShadows);
 		Rect getScissorRect(UIComponent& ui, ImageComponent& img, Transform& transform, CameraComponent& camera);
 
+		// terrain
+		void setTerrainNodeIndex(TerrainComponent& terrain, TerrainNode& terrainNode, size_t size, size_t offset);
+		bool terrainNodeLODSelect(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform, TerrainNode& terrainNode, int lodLevel);
+		AlignedBox getTerrainNodeAlignedBox(Transform& transform, TerrainNode& terrainNode);
+		bool isTerrainNodeInSphere(Vector3 position, float radius, const AlignedBox& box);
+
 		float lerp(float a, float b, float fraction);
 
 	protected:
@@ -120,11 +127,19 @@ namespace Supernova{
 		void updateSkyViewProjection(CameraComponent& camera);
 		void updateLightFromTransform(LightComponent& light, Transform& transform);
 		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform);
+		void updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
+		bool updateCameraFrustumPlanes(CameraComponent& camera);
 
 	public:
 
 		RenderSystem(Scene* scene);
 		virtual ~RenderSystem();
+
+		// camera
+		float getCameraFar(CameraComponent& camera);
+		bool isInsideCamera(CameraComponent& camera, const AlignedBox& box);
+		bool isInsideCamera(CameraComponent& camera, const Vector3& point);
+		bool isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius);
 	
 		virtual void load();
 		virtual void destroy();

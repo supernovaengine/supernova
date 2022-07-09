@@ -43,6 +43,7 @@ Scene::Scene(){
 	registerComponent<RotateTracksComponent>();
 	registerComponent<TranslateTracksComponent>();
 	registerComponent<ScaleTracksComponent>();
+	registerComponent<TerrainComponent>();
 
 	registerSystem<RenderSystem>();
 	registerSystem<MeshSystem>();

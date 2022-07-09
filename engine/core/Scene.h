@@ -40,6 +40,7 @@
 #include "component/RotateTracksComponent.h"
 #include "component/TranslateTracksComponent.h"
 #include "component/ScaleTracksComponent.h"
+#include "component/TerrainComponent.h"
 
 namespace Supernova{
 
