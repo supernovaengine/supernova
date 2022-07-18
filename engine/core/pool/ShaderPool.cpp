@@ -145,7 +145,8 @@ void ShaderPool::remove(ShaderType shaderType, std::string properties){
 std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2, 
 						bool punctual, bool shadows, bool shadowsPCF, bool normals, bool normalMap, 
 						bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect, 
-						bool fog, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent){
+						bool fog, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent,
+						bool terrain){
 	std::string prop;
 
 	if (unlit)
@@ -182,6 +183,8 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 		prop += "Mnr";
 	if (morphTangent)
 		prop += "Mtg";
+	if (terrain)
+		prop += "Ter";
 
 	return prop;
 }

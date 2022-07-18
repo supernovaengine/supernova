@@ -47,6 +47,11 @@ namespace Supernova{
         Vector4 bias_texSize_nearFar[MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP];
 	} fs_shadows_t;
 
+	typedef struct vs_depth_t {
+		Matrix4 modelMatrix;
+	    Matrix4 lightSpaceMatrix;
+	} vs_depth_t;
+
 	class RenderSystem : public SubSystem {
 	private:
 		struct TransparentMeshesData{
@@ -107,8 +112,11 @@ namespace Supernova{
 
 		bool loadMesh(MeshComponent& mesh);
 		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform);
-		void drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix);
+		void drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams);
 		void destroyMesh(MeshComponent& mesh);
+
+		bool loadTerrain(TerrainComponent& terrain);
+		void drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform);
 
 		bool loadUI(UIComponent& ui, bool isText);
 		void drawUI(UIComponent& ui, Transform& transform);

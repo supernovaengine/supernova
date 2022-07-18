@@ -104,7 +104,9 @@ namespace Supernova{
         VS_SKINNING,
         DEPTH_VS_SKINNING,
         VS_MORPHTARGET,
-        DEPTH_VS_MORPHTARGET
+        DEPTH_VS_MORPHTARGET,
+        TERRAIN_VS_PARAMS,
+        TERRAINNODE_VS_PARAMS
         /*
         TERRAINSIZE,
         TERRAINMAXHEIGHT,
@@ -136,7 +138,8 @@ namespace Supernova{
         SHADOWCUBEMAP1,
         SKYCUBE,
         UI,
-        POINTS
+        POINTS,
+        HEIGHTMAP
         //SHADOWMAP2D
         //SHADOWMAPCUBE
         //HEIGHTDATA

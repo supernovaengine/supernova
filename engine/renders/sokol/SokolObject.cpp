@@ -175,7 +175,6 @@ void SokolObject::endLoad(){
 
 void SokolObject::beginDraw(){
     sg_apply_pipeline(pip);
-    sg_apply_bindings(&bind);
 }
 
 void SokolObject::applyUniformBlock(int slotUniform, ShaderStageType stage, unsigned int count, void* data){
@@ -191,6 +190,7 @@ void SokolObject::applyUniformBlock(int slotUniform, ShaderStageType stage, unsi
 }
 
 void SokolObject::draw(int vertexCount){
+    sg_apply_bindings(&bind);
     sg_draw(0, vertexCount, 1);
 }
 

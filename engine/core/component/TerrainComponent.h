@@ -8,6 +8,7 @@
 
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
+#include "util/Material.h"
 #include "Supernova.h"
 
 namespace Supernova{
@@ -20,15 +21,16 @@ namespace Supernova{
     struct TerrainNode{
         Attribute indexAttribute;
 
+        //-----u_vs_terrainNodeParams
         Vector2 position = Vector2(0, 0);
         float size = 0;
-        //Terrain* terrain;
+        float currentRange = 0;
+        float resolution = 0; //int
+        uint8_t _pad_20[12];
+        //-----
 
         size_t childs[4];
         bool hasChilds = false;
-
-        float currentRange = 0;
-        int resolution = 0;
 
         float maxHeight = 0;
         float minHeight = 0;
@@ -37,8 +39,32 @@ namespace Supernova{
     };
 
     struct TerrainComponent{
+        bool loaded = false;
+
+        Material material;
+
         InterleavedBuffer buffer;
         IndexBuffer indices;
+
+        ObjectRender render;
+        ObjectRender depthRender;
+
+        std::shared_ptr<ShaderRender> shader;
+        std::shared_ptr<ShaderRender> depthShader;
+
+        std::string shaderProperties;
+        std::string depthShaderProperties;
+
+        int slotVSParams = -1;
+        int slotFSParams = -1;
+        int slotFSLighting = -1;
+        int slotFSFog = -1;
+        int slotVSShadows = -1;
+        int slotFSShadows = -1;
+        int slotVSTerrain = -1;
+        int slotVSTerrainNode = -1;
+
+        bool castShadows = true;
 
         Texture heightMap;
 
@@ -56,16 +82,24 @@ namespace Supernova{
 
         size_t grid[MAX_TERRAINGRID]; //root nodes
 
+        //-----u_vs_terrainParams
         float terrainSize = 200;
         float maxHeight = 10;
+        float resolution = 32; //int
+        uint8_t _pad_12[4];
+        Vector3 eyePos;
+        uint8_t _pad_28[4];
+        //-----
+
         int rootGridSize = 2;
         int levels = 6;
-        int resolution = 32;
 
         int textureBaseTiles = 1;
         int textureDetailTiles = 20;
 
         bool needUpdateTerrain = true;
+        bool needUpdateTexture = false;
+        bool needReload = false;
     };
     
 }

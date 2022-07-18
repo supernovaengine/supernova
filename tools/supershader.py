@@ -51,6 +51,8 @@ def get_define(property):
         return 'HAS_MORPHNORMAL'
     elif property == 'Mtg':
         return 'HAS_MORPHTANGENT'
+    elif property == 'Ter':
+        return 'HAS_TERRAIN'
     else:
         sys.exit('Not found value for property: '+property)
 
@@ -98,6 +100,9 @@ def get_default_shaders():
     s += "mesh_UltUv1Vc4;"
     s += "mesh_UltUv1Vc4Fog;"
     s += "mesh_UltUv1;"
+    s += "mesh_PucShwPcfNorTer;"
+    s += "mesh_UltUv1Ter;"
+    s += "mesh_UltTer;"
     s += "mesh_UltUv1Fog;"
     s += "mesh_UltUv1Vc4Txr;"
     s += "mesh_UltUv1Vc4TxrFog;"
@@ -113,6 +118,7 @@ def get_default_shaders():
     s += "depth_Mta;"
     s += "depth_MtaMnr;"
     s += "depth_MtaMnrMtg;"
+    #s += "depth_Ter;"
     s += "sky;"
     s += "ui_Vc4;"
     s += "ui_TexVc4;"

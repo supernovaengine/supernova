@@ -18,6 +18,12 @@ namespace Supernova{
         void setHeightMap(std::string path);
         void setHeightMap(FramebufferRender* framebuffer);
 
+        void setTexture(std::string path);
+        void setTexture(FramebufferRender* framebuffer);
+
+        void setColor(Vector4 color);
+        void setColor(float red, float green, float blue, float alpha);
+        Vector4 getColor();
     };
 
 }

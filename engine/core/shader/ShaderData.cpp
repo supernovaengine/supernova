@@ -156,6 +156,10 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
         ustr = "u_vs_morphtarget";
     }else if (type == UniformBlockType::DEPTH_VS_MORPHTARGET){
         ustr = "u_vs_morphtarget";
+    }else if (type == UniformBlockType::TERRAIN_VS_PARAMS){
+        ustr = "u_vs_terrainParams";
+    }else if (type == UniformBlockType::TERRAINNODE_VS_PARAMS){
+        ustr = "u_vs_terrainNodeParams";
     }
 
     if (ustr.empty()){
@@ -217,6 +221,8 @@ int ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
         texstr = "u_uiTexture";
     }else if (type == TextureShaderType::POINTS){
         texstr = "u_pointsTexture";
+    }else if (type == TextureShaderType::HEIGHTMAP){
+        texstr = "u_heightData";
     }
 
     if (texstr.empty()){

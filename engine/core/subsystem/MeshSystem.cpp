@@ -153,6 +153,7 @@ TerrainNodeIndex MeshSystem::createPlaneNodeBuffer(TerrainComponent& terrain, in
     Attribute* attVertex = terrain.buffer.getAttribute(AttributeType::POSITION);
     Attribute* attTexcoord = terrain.buffer.getAttribute(AttributeType::TEXCOORD1);
     Attribute* attNormal = terrain.buffer.getAttribute(AttributeType::NORMAL);
+
     Attribute* attIndice = terrain.indices.getAttribute(AttributeType::INDEX);
 
     int bufferCount = terrain.buffer.getCount();

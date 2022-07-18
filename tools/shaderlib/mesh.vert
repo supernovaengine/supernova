@@ -63,22 +63,31 @@ out vec2 v_uv2;
 
 #include "includes/skinning.glsl"
 #include "includes/morphtarget.glsl"
+#ifdef HAS_TERRAIN
+    #include "includes/terrain_vs.glsl"
+#endif
 
 vec4 getPosition(mat4 boneTransform){
     vec3 pos = a_position;
 
     pos = getMorphPosition(pos);
     pos = getSkinPosition(pos, boneTransform);
+    #ifdef HAS_TERRAIN
+        pos = getTerrainPosition(pos);
+    #endif
 
     return vec4(pos, 1.0);
 }
 
 #ifdef HAS_NORMALS
-vec3 getNormal(mat4 boneTransform){
+vec3 getNormal(mat4 boneTransform, vec4 position){
     vec3 normal = a_normal;
 
     normal = getMorphNormal(normal);
     normal = getSkinNormal(normal, boneTransform);
+    #ifdef HAS_TERRAIN
+        normal = getTerrainNormal(normal, position.xyz);
+    #endif
 
     return normalize(normal);
 }
@@ -98,19 +107,19 @@ vec3 getTangent(mat4 boneTransform){
 void main() {
     mat4 boneTransform = getBoneTransform();
 
-    vec4 bonePosition = getPosition(boneTransform);
-    vec4 pos = pbrParams.modelMatrix * bonePosition;
-    v_position = vec3(pos.xyz) / pos.w;
+    vec4 pos = getPosition(boneTransform);
+    vec4 worldPos = pbrParams.modelMatrix * pos;
+    v_position = vec3(worldPos.xyz) / worldPos.w;
 
     #ifdef HAS_NORMALS
     #ifdef HAS_TANGENTS
         vec3 tangent = getTangent(boneTransform);
-        vec3 normalW = normalize(vec3(pbrParams.normalMatrix * vec4(getNormal(boneTransform), 0.0)));
+        vec3 normalW = normalize(vec3(pbrParams.normalMatrix * vec4(getNormal(boneTransform, pos), 0.0)));
         vec3 tangentW = normalize(vec3(pbrParams.modelMatrix * vec4(tangent, 0.0)));
         vec3 bitangentW = cross(normalW, tangentW) * a_tangent.w;
         v_tbn = mat3(tangentW, bitangentW, normalW);
     #else // !HAS_TANGENTS
-        v_normal = normalize(vec3(pbrParams.normalMatrix * vec4(getNormal(boneTransform), 0.0)));
+        v_normal = normalize(vec3(pbrParams.normalMatrix * vec4(getNormal(boneTransform, pos), 0.0)));
     #endif
     #endif
 
@@ -137,11 +146,11 @@ void main() {
 
     #ifdef USE_SHADOWS
     for (int i = 0; i < MAX_SHADOWSMAP; ++i){
-        v_lightProjPos[i] = lightVPMatrix[i] * pos;
+        v_lightProjPos[i] = lightVPMatrix[i] * worldPos;
     }
     #endif
 
-    gl_Position = pbrParams.mvpMatrix * bonePosition;
+    gl_Position = pbrParams.mvpMatrix * pos;
 
     #ifdef USE_SHADOWS
         v_clipSpacePosZ = gl_Position.z;

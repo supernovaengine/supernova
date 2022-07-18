@@ -504,13 +504,14 @@ void init(){
     camera.setType(CameraType::CAMERA_PERSPECTIVE);
     camera.activate();
 
-    camera.setPosition(0,8,10);
-    //carro.addChild(&camera);
+    camera.setPosition(0,16,-30);
+    camera.setName("camera");
+    carro.addChild(&camera);
 
-    carro.loadModel("AnimatedMorphCube.glb");
-    carro.getAnimation(0).setSpeed(2);
+    //carro.loadModel("AnimatedMorphCube.glb");
+    //carro.getAnimation(0).setSpeed(2);
 
-    //carro.loadModel("jeep/Jeep.obj");
+    carro.loadModel("jeep/Jeep.obj");
 
     //carro.loadModel("WaterBottle.glb");
     carro.setPosition(0, 3, 0);
@@ -523,7 +524,9 @@ void init(){
     //plane.setTexture("pista.png");
     //plane.setPosition(-2000,0,-2000);
 
+    terrain.setName("terrain");
     terrain.setHeightMap("heightmap.png");
+    terrain.setTexture("pista.png");
 
    
 //    std::vector<std::string> teste = System::instance().args;
@@ -634,7 +637,7 @@ void onUpdate(){
     carro.setRotation(0, rotationY, 0);
     //camera.walkForward(-0.5);
 
-    camera.setView(carro.getPosition());
+    //camera.setView(carro.getPosition());
 }
 
 void onButtonPress(){
@@ -689,8 +692,8 @@ void onMouseDown(int button, float x, float y, int mods){
     //carro.setMorphWeight(1, 0.5);
     //carro.setMorphWeight(0, 0.5);
 
-    carro.getAnimation(0).start();
-    carro.getAnimation(0).setLoop(true);
+    //carro.getAnimation(0).start();
+    //carro.getAnimation(0).setLoop(true);
 
     std::string modifier = "";
     if (mods & S_MODIFIER_SHIFT)

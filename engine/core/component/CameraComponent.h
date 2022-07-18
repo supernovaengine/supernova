@@ -47,7 +47,7 @@ namespace Supernova{
         float y_fov = 0.75;
         float aspect = 1.0;
         float perspectiveNear = 1;
-        float perspectiveFar = 2000;
+        float perspectiveFar = 200;
 
         bool needUpdateFrustumPlanes = true;
         Plane frustumPlanes[6];

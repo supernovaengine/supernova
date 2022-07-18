@@ -20,10 +20,6 @@
 #include <memory>
 #include <cmath>
 
-#ifndef PROJECT_ROOT
-#define PROJECT_ROOT "<PROJECT_ROOT>"
-#endif
-
 using namespace Supernova;
 
 TextureRender RenderSystem::emptyWhite;
@@ -438,9 +434,6 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			mesh.submeshes[i].hasNormalMap = true;
 		}
 
-
-		ShaderType shaderType = ShaderType::MESH;
-
 		bool p_unlit = false;
 		bool p_punctual = false;
 		bool p_hasTexture1 = false;
@@ -477,8 +470,9 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 						p_unlit, p_hasTexture1, false, p_punctual, 
 						p_castShadows, p_shadowsPCF, p_hasNormal, p_hasNormalMap, 
 						p_hasTangent, false, mesh.submeshes[i].hasVertexColor4, mesh.submeshes[i].hasTextureRect, 
-						hasFog, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent);
-		mesh.submeshes[i].shader = ShaderPool::get(shaderType, mesh.submeshes[i].shaderProperties);
+						hasFog, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent,
+						false);
+		mesh.submeshes[i].shader = ShaderPool::get(ShaderType::MESH, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
 			mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(
 				mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent);
@@ -701,7 +695,7 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 	}
 }
 
-void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMatrix){
+void RenderSystem::drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams){
 	if (mesh.loaded && mesh.castShadows){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& depthRender = mesh.submeshes[i].depthRender;
@@ -709,7 +703,7 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, Matrix4 modelLightSpaceMat
 			depthRender.beginDraw();
 
 			//mvp matrix
-			depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 16, &modelLightSpaceMatrix);
+			depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 32, &vsDepthParams);
 
 			if (mesh.submeshes[i].hasSkinning){
 				depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthSkinning, ShaderStageType::VERTEX, sizeof(float) * 16 * MAX_BONES, &mesh.bonesMatrix);
@@ -770,6 +764,125 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 	mesh.loaded = false;
 }
 
+bool RenderSystem::loadTerrain(TerrainComponent& terrain){
+
+	terrain.buffer.getRender()->createBuffer(terrain.buffer.getSize(), terrain.buffer.getData(), terrain.buffer.getType(), terrain.buffer.getUsage());
+	terrain.indices.getRender()->createBuffer(terrain.indices.getSize(), terrain.indices.getData(), terrain.indices.getType(), terrain.indices.getUsage());
+
+	terrain.render.beginLoad(PrimitiveType::TRIANGLES, false, scene->isRenderToTexture());
+
+	bool p_unlit = false;
+	bool p_punctual = false;
+	bool p_hasTexture1 = false;
+	bool p_hasNormal = false;
+	bool p_castShadows = false;
+	bool p_shadowsPCF = false;
+
+	if (hasLights){
+		p_punctual = true;
+
+		p_hasNormal = true;
+		if (hasShadows && terrain.castShadows){
+			p_castShadows = true;
+			if (scene->isShadowsPCF()){
+				p_shadowsPCF = true;
+			}
+		}
+	}else{
+		p_unlit = true;
+	}
+
+	terrain.shaderProperties = ShaderPool::getMeshProperties(
+					p_unlit, p_hasTexture1, false, p_punctual, 
+					p_castShadows, p_shadowsPCF, p_hasNormal, false, 
+					false, false, false, false, 
+					hasFog, false, false, false, false,
+					true);
+	terrain.shader = ShaderPool::get(ShaderType::MESH, terrain.shaderProperties);
+	if (hasShadows && terrain.castShadows){
+		terrain.depthShaderProperties = ShaderPool::getDepthMeshProperties(
+			false, false, false, false);
+		terrain.depthShader = ShaderPool::get(ShaderType::DEPTH, terrain.depthShaderProperties);
+		if (!terrain.depthShader->isCreated())
+			return false;
+	}
+	if (!terrain.shader->isCreated())
+		return false;
+	terrain.render.addShader(terrain.shader.get());
+	ShaderData& shaderData = terrain.shader.get()->shaderData;
+
+	terrain.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
+	terrain.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
+	if (hasFog){
+		terrain.slotFSFog = shaderData.getUniformBlockIndex(UniformBlockType::FS_FOG, ShaderStageType::FRAGMENT);
+	}
+	if (hasLights){
+		terrain.slotFSLighting = shaderData.getUniformBlockIndex(UniformBlockType::FS_LIGHTING, ShaderStageType::FRAGMENT);
+		if (hasShadows && terrain.castShadows){
+			terrain.slotVSShadows = shaderData.getUniformBlockIndex(UniformBlockType::VS_SHADOWS, ShaderStageType::VERTEX);
+			terrain.slotFSShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOWS, ShaderStageType::FRAGMENT);
+		}
+	}
+	terrain.slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS, ShaderStageType::VERTEX);
+	terrain.slotVSTerrainNode = shaderData.getUniformBlockIndex(UniformBlockType::TERRAINNODE_VS_PARAMS, ShaderStageType::VERTEX);
+
+	loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.castShadows);
+	terrain.render.addTexture(shaderData.getTextureIndex(TextureShaderType::HEIGHTMAP, ShaderStageType::VERTEX), ShaderStageType::VERTEX, terrain.heightMap.getRender());
+
+	terrain.needUpdateTexture = false;
+
+	for (auto const &attr : terrain.buffer.getAttributes()) {
+		terrain.render.addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+	}
+
+	//TODO: REMOVE THIS
+	terrain.render.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, 0);
+
+	terrain.render.endLoad();
+
+	terrain.loaded = true;
+
+	return true;
+}
+
+void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform){
+	if (terrain.loaded){
+
+		if (terrain.needUpdateTexture){
+			ShaderData& shaderData = terrain.shader.get()->shaderData;
+			loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.castShadows);
+
+			terrain.needUpdateTexture = false;
+		}
+
+		terrain.render.beginDraw();
+
+		if (hasLights){
+			terrain.render.applyUniformBlock(terrain.slotFSLighting, ShaderStageType::FRAGMENT, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
+			if (hasShadows && terrain.castShadows){
+				terrain.render.applyUniformBlock(terrain.slotVSShadows, ShaderStageType::VERTEX, sizeof(float) * (16 * MAX_SHADOWSMAP), &vs_shadows);
+				terrain.render.applyUniformBlock(terrain.slotFSShadows, ShaderStageType::FRAGMENT, sizeof(float) * (4 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP)), &fs_shadows);
+			}
+		}
+
+		terrain.render.applyUniformBlock(terrain.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 16, &terrain.material);
+
+		//model, normal and mvp matrix
+		terrain.render.applyUniformBlock(terrain.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 48, &transform.modelMatrix);
+
+		terrain.render.applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.terrainSize);
+
+		for (int i = 0; i < terrain.numNodes; i++){
+			if (terrain.nodes[i].visible){
+				terrain.render.applyUniformBlock(terrain.slotVSTerrainNode, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.nodes[i].position);
+				terrain.render.addIndex(terrain.indices.getRender(), terrain.nodes[i].indexAttribute.getDataType(), terrain.nodes[i].indexAttribute.getOffset());
+				terrain.render.draw(terrain.nodes[i].indexAttribute.getCount());
+			}
+		}
+
+	}
+}
+
 bool RenderSystem::loadUI(UIComponent& ui, bool isText){
 	ObjectRender& render = ui.render;
 
@@ -788,11 +901,9 @@ bool RenderSystem::loadUI(UIComponent& ui, bool isText){
 			p_hasTexture = true;
 		}
 	}
-	
-	ShaderType shaderType = ShaderType::UI;
 
 	ui.shaderProperties = ShaderPool::getUIProperties(p_hasTexture, p_hasFontAtlasTexture, false, p_vertexColorVec4);
-	ui.shader = ShaderPool::get(shaderType, ui.shaderProperties);
+	ui.shader = ShaderPool::get(ShaderType::UI, ui.shaderProperties);
 	if (!ui.shader->isCreated())
 		return false;
 	render.addShader(ui.shader.get());
@@ -933,10 +1044,8 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 		}
 	}
 
-	ShaderType shaderType = ShaderType::POINTS;
-
 	particles.shaderProperties = ShaderPool::getPointsProperties(p_hasTexture, false, true, p_hasTextureRect);
-	particles.shader = ShaderPool::get(shaderType, particles.shaderProperties);
+	particles.shader = ShaderPool::get(ShaderType::POINTS, particles.shaderProperties);
 	if (!particles.shader->isCreated())
 		return false;
 	render.addShader(particles.shader.get());
@@ -1023,9 +1132,7 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 
 	render->beginLoad(PrimitiveType::TRIANGLES, false, scene->isRenderToTexture());
 
-	ShaderType shaderType = ShaderType::SKYBOX;
-
-	sky.shader = ShaderPool::get(shaderType, "");
+	sky.shader = ShaderPool::get(ShaderType::SKYBOX, "");
 	if (!sky.shader->isCreated())
 		return false;
 	render->addShader(sky.shader.get());
@@ -1291,6 +1398,8 @@ void RenderSystem::updateTerrain(TerrainComponent& terrain, Transform& transform
 	for (int i = 0; i < (terrain.rootGridSize*terrain.rootGridSize); i++){
 		terrainNodeLODSelect(terrain, transform, camera, cameraTransform, terrain.nodes[terrain.grid[i]], terrain.levels-1);
 	}
+
+	terrain.eyePos = Vector3(cameraTransform.worldPosition.x, cameraTransform.worldPosition.y, cameraTransform.worldPosition.z);
 }
 
 void RenderSystem::setTerrainNodeIndex(TerrainComponent& terrain, TerrainNode& terrainNode, size_t size, size_t offset){
@@ -1683,10 +1792,6 @@ void RenderSystem::update(double dt){
 	CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
 	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
 
-	if (cameraTransform.needUpdate){
-		camera.needUpdate = true;
-	}
-
 	std::vector<Entity> parentList;
 	auto transforms = scene->getComponentArray<Transform>();
 
@@ -1703,6 +1808,10 @@ void RenderSystem::update(double dt){
 			parentList.push_back(entity);
 			updateTransform(transform);
 		}
+	}
+
+	if (cameraTransform.needUpdate){
+		camera.needUpdate = true;
 	}
 
 	if (camera.needUpdate){
@@ -1865,7 +1974,7 @@ void RenderSystem::draw(){
 								loadMesh(mesh);
 							}
 							if (transform->visible)
-								drawMeshDepth(mesh, light.cameras[c].lightViewProjectionMatrix * transform->modelMatrix);
+								drawMeshDepth(mesh, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
 						}
 					}
 					depthRender.endFrameBuffer();
@@ -1888,6 +1997,16 @@ void RenderSystem::draw(){
 	std::vector<Entity> parentListScissor;
 	Rect activeScissor;
 
+	//---------Draw sky----------
+	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
+	if (sky){
+		if (!sky->loaded){
+			loadSky(*sky);
+		}
+
+		drawSky(*sky);
+	}
+
 	for (int i = 0; i < transforms->size(); i++){
 		Transform& transform = transforms->getComponentFromIndex(i);
 		Entity entity = transforms->getEntity(i);
@@ -1909,6 +2028,19 @@ void RenderSystem::draw(){
 				}else{
 					transparentMeshes.push({&mesh, &transform, transform.distanceToCamera});
 				}
+			}
+
+		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
+			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+
+			if (terrain.loaded && terrain.needReload){
+				//destroyMesh(mesh);
+			}
+			if (!terrain.loaded){
+				loadTerrain(terrain);
+			}
+			if (transform.visible){
+				drawTerrain(terrain, transform, cameraTransform);
 			}
 
 		}else if (signature.test(scene->getComponentType<UIComponent>())){
@@ -1956,16 +2088,6 @@ void RenderSystem::draw(){
 		}
 	}
 
-	//---------Draw sky----------
-	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
-	if (sky){
-		if (!sky->loaded){
-			loadSky(*sky);
-		}
-
-		drawSky(*sky);
-	}
-
 	//---------Draw transparent meshes----------
 	while (!transparentMeshes.empty()){
 		TransparentMeshesData meshData = transparentMeshes.top();
@@ -1992,9 +2114,9 @@ void RenderSystem::draw(){
 			"Supernova is missing some shaders, you need to use Supershader tool to create these shaders in project assets directory.\n"
 			"Go to directory \"tools/supershader\" and execute the command:\n"
 			"\n"
-			"> python3 supershader.py -s \"%s\" -p \"%s\" -l %s\n"
+			"> python3 supershader.py -s \"%s\" -l %s\n"
 			"-------------------"
-			, misShaders.c_str(), PROJECT_ROOT, ShaderPool::getShaderLangStr().c_str());
+			, misShaders.c_str(), ShaderPool::getShaderLangStr().c_str());
 		exit(1);
 	}
 }
