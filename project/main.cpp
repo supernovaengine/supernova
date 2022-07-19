@@ -430,7 +430,7 @@ void init(){
     lightPoint.setShadows(true);
 
     lightSpot.setType(LightType::SPOT);
-    lightSpot.setDirection(0.0f, -0.7, 0.3);
+    lightSpot.setDirection(0.0f, -0.3, 0.7);
     lightSpot.setRange(0.0);
     lightSpot.setPosition(0.0f, 15.0f, 0.0f);
     lightSpot.setIntensity(1000.0);

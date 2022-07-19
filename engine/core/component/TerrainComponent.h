@@ -64,6 +64,8 @@ namespace Supernova{
         int slotVSTerrain = -1;
         int slotVSTerrainNode = -1;
 
+        int slotVSDepthParams = -1;
+
         bool castShadows = true;
 
         Texture heightMap;

@@ -189,7 +189,7 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 	return prop;
 }
 
-std::string ShaderPool::getDepthMeshProperties(bool skinning, bool morphTarget, bool morphNormal, bool morphTangent){
+std::string ShaderPool::getDepthMeshProperties(bool skinning, bool morphTarget, bool morphNormal, bool morphTangent, bool terrain){
 	std::string prop;
 
 	if (skinning)
@@ -200,6 +200,8 @@ std::string ShaderPool::getDepthMeshProperties(bool skinning, bool morphTarget, 
 		prop += "Mnr";
 	if (morphTangent)
 		prop += "Mtg";
+	if (terrain)
+		prop += "Ter";
 
 	return prop;
 }

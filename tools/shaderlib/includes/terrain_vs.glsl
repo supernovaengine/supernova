@@ -28,7 +28,7 @@ float getHeight(vec3 position) {
 }
 
 // must be called BEFORE getTerrainNormal because morphValue
-vec3 getTerrainPosition(vec3 pos){
+vec3 getTerrainPosition(vec3 pos, mat4 modelMatrix){
     pos = terrainNode.size * pos;
     pos = pos + vec3(terrainNode.pos[0], 0.0, terrainNode.pos[1]);
 
@@ -37,7 +37,7 @@ vec3 getTerrainPosition(vec3 pos){
     float morphStart = 0.0;
     float morphEnd = 0.4;
 
-    float dist = distance(terrain.eyePos, vec3(pbrParams.modelMatrix * vec4(pos, 1.0)));
+    float dist = distance(terrain.eyePos, vec3(modelMatrix * vec4(pos, 1.0)));
 
     float nextlevel_thresh = ((terrainNode.range - dist) / terrainNode.size * terrainNode.resolution / float(terrain.resolution));
     morphFactor = 1.0 - smoothstep(morphStart, morphEnd, nextlevel_thresh);

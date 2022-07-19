@@ -25,7 +25,7 @@ void main() {
     pos = getMorphPosition(pos);
     pos = getSkinPosition(pos, getBoneTransform());
     #ifdef HAS_TERRAIN
-        pos = getTerrainPosition(pos);
+        pos = getTerrainPosition(pos, depthParams.modelMatrix);
     #endif
 
     gl_Position = lightMVPMatrix * vec4(pos, 1.0);

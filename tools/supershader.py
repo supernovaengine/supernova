@@ -118,7 +118,7 @@ def get_default_shaders():
     s += "depth_Mta;"
     s += "depth_MtaMnr;"
     s += "depth_MtaMnrMtg;"
-    #s += "depth_Ter;"
+    s += "depth_Ter;"
     s += "sky;"
     s += "ui_Vc4;"
     s += "ui_TexVc4;"
