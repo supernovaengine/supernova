@@ -1,10 +1,12 @@
-uniform sampler2D u_heightData;
+uniform sampler2D u_heightMap;
 
 uniform u_vs_terrainParams {
+    vec3 eyePos;
     float size;
     float maxHeight;
     float resolution;
-    vec3 eyePos;
+    float textureBaseTiles; //int
+    float textureDetailTiles; //int
 } terrain;
 
 uniform u_vs_terrainNodeParams {
@@ -14,7 +16,12 @@ uniform u_vs_terrainNodeParams {
     float resolution; //int
 } terrainNode;
 
+out vec2 v_terrainTextureCoords;
+out vec2 v_terrainTextureDetailTiled;
+
+
 float morphFactor;
+
 
 vec2 morphVertex(vec2 gridPos, vec2 worldPos, float morph) {
     vec2 gridDim = vec2(terrainNode.resolution, terrainNode.resolution);
@@ -24,7 +31,7 @@ vec2 morphVertex(vec2 gridPos, vec2 worldPos, float morph) {
 }
 
 float getHeight(vec3 position) {
-    return texture(u_heightData, (position.xz + (terrain.size/2.0)) / terrain.size).r * terrain.maxHeight;
+    return texture(u_heightMap, (position.xz + (terrain.size/2.0)) / terrain.size).r * terrain.maxHeight;
 }
 
 // must be called BEFORE getTerrainNormal because morphValue
@@ -73,6 +80,8 @@ vec3 getTerrainNormal(vec3 normal, vec3 position){
     return normal;
 }
 
-//v_TerrainTextureCoords = (localPos.xz + (u_terrainSize/2.0)) / u_terrainSize;
-//v_TerrainTextureDetailTiled = v_TerrainTextureCoords * float(u_terrainTextureDetailTiles);
-//terrainTextureBaseTiled = v_TerrainTextureCoords * float(u_terrainTextureBaseTiles);
+vec2 getTerrainTiledTexture(vec3 position){
+    v_terrainTextureCoords = (position.xz + (terrain.size/2.0)) / terrain.size;
+    v_terrainTextureDetailTiled = v_terrainTextureCoords * float(terrain.textureDetailTiles);
+    return v_terrainTextureCoords * float(terrain.textureBaseTiles);
+}

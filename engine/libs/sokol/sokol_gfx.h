@@ -800,7 +800,7 @@ enum {
     SG_NUM_INFLIGHT_FRAMES = 2,
     SG_MAX_COLOR_ATTACHMENTS = 4,
     SG_MAX_SHADERSTAGE_BUFFERS = 10,
-    SG_MAX_SHADERSTAGE_IMAGES = 12,
+    SG_MAX_SHADERSTAGE_IMAGES = 18,
     SG_MAX_SHADERSTAGE_UBS = 4,
     SG_MAX_UB_MEMBERS = 16,
     SG_MAX_VERTEX_ATTRIBUTES = 16,      /* NOTE: actual max vertex attrs can be less on GLES2, see sg_limits! */

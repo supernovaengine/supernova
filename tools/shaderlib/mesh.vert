@@ -132,6 +132,9 @@ void main() {
             v_uv1 = a_texcoord1 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
         #endif
     #endif
+    #ifdef HAS_TERRAIN
+        v_uv1 = getTerrainTiledTexture(pos.xyz);
+    #endif
 
     #ifdef HAS_UV_SET2
         v_uv2 = a_texcoord2;

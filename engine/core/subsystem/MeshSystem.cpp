@@ -151,7 +151,6 @@ TerrainNodeIndex MeshSystem::createPlaneNodeBuffer(TerrainComponent& terrain, in
     float segment_height = (float)height / gridY;
 
     Attribute* attVertex = terrain.buffer.getAttribute(AttributeType::POSITION);
-    Attribute* attTexcoord = terrain.buffer.getAttribute(AttributeType::TEXCOORD1);
     Attribute* attNormal = terrain.buffer.getAttribute(AttributeType::NORMAL);
 
     Attribute* attIndice = terrain.indices.getAttribute(AttributeType::INDEX);
@@ -166,8 +165,6 @@ TerrainNodeIndex MeshSystem::createPlaneNodeBuffer(TerrainComponent& terrain, in
 
             terrain.buffer.addVector3(attVertex, Vector3(x, 0, -y));
             terrain.buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
-            terrain.buffer.addVector2(attTexcoord, Vector2((float)ix / gridX, (float)iy / gridY));
-
         }
     }
 
@@ -295,7 +292,6 @@ void MeshSystem::createTerrainNode(TerrainComponent& terrain, float x, float y, 
 void MeshSystem::createTerrain(TerrainComponent& terrain){
     terrain.buffer.clearAll();
     terrain.buffer.addAttribute(AttributeType::POSITION, 3);
-	terrain.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
 	terrain.buffer.addAttribute(AttributeType::NORMAL, 3);
 
     terrain.indices.clear();

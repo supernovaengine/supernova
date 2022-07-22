@@ -149,9 +149,16 @@ const float M_PI = 3.141592653589793;
     #include "includes/depth_util.glsl"
     #include "includes/shadows.glsl"
 #endif
+#ifdef HAS_TERRAIN
+    #include "includes/terrain_fs.glsl"
+#endif
 
 void main() {
     vec4 baseColor = getBaseColor();
+
+    #ifdef HAS_TERRAIN
+        baseColor = getTerrainColor(baseColor);
+    #endif
 
     #ifdef MATERIAL_UNLIT
         g_finalColor = (vec4(linearTosRGB(baseColor.rgb), baseColor.a));

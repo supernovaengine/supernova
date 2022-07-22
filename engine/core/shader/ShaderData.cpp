@@ -222,7 +222,15 @@ int ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
     }else if (type == TextureShaderType::POINTS){
         texstr = "u_pointsTexture";
     }else if (type == TextureShaderType::HEIGHTMAP){
-        texstr = "u_heightData";
+        texstr = "u_heightMap";
+    }else if (type == TextureShaderType::BLENDMAP){
+        texstr = "u_blendMap";
+    }else if (type == TextureShaderType::TERRAINDETAIL_RED){
+        texstr = "u_terrainDetailR";
+    }else if (type == TextureShaderType::TERRAINDETAIL_GREEN){
+        texstr = "u_terrainDetailG";
+    }else if (type == TextureShaderType::TERRAINDETAIL_BLUE){
+        texstr = "u_terrainDetailB";
     }
 
     if (texstr.empty()){

@@ -139,12 +139,11 @@ namespace Supernova{
         SKYCUBE,
         UI,
         POINTS,
-        HEIGHTMAP
-        //SHADOWMAP2D
-        //SHADOWMAPCUBE
-        //HEIGHTDATA
-        //BLENDMAP
-        //TERRAINDETAIL
+        HEIGHTMAP,
+        BLENDMAP,
+        TERRAINDETAIL_RED,
+        TERRAINDETAIL_GREEN,
+        TERRAINDETAIL_BLUE
     };
 
     enum class TextureType {

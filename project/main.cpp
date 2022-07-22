@@ -527,6 +527,10 @@ void init(){
     terrain.setName("terrain");
     terrain.setHeightMap("heightmap.png");
     terrain.setTexture("pista.png");
+    terrain.setBlendMap("blendmap.png");
+    terrain.setTextureDetailRed("block.png");
+    terrain.setTextureDetailGreen("block.png");
+    terrain.setTextureDetailBlue("block.png");
 
    
 //    std::vector<std::string> teste = System::instance().args;

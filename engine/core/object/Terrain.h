@@ -18,6 +18,13 @@ namespace Supernova{
         void setHeightMap(std::string path);
         void setHeightMap(FramebufferRender* framebuffer);
 
+        void setBlendMap(std::string path);
+        void setBlendMap(FramebufferRender* framebuffer);
+
+        void setTextureDetailRed(std::string path);
+        void setTextureDetailGreen(std::string path);
+        void setTextureDetailBlue(std::string path);
+
         void setTexture(std::string path);
         void setTexture(FramebufferRender* framebuffer);
 

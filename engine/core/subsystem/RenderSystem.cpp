@@ -275,16 +275,16 @@ TextureShaderType RenderSystem::getShadowMapCubeByIndex(int index){
 
 void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool castShadows){
 	TextureRender* textureRender = NULL;
+	int slotTex = -1;
+
 	textureRender = material.baseColorTexture.getRender();
+	slotTex = shaderData.getTextureIndex(TextureShaderType::BASECOLOR, ShaderStageType::FRAGMENT);
 	if (textureRender)
-		render.addTexture(shaderData.getTextureIndex(TextureShaderType::BASECOLOR, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
 	else
-		render.addTexture(shaderData.getTextureIndex(TextureShaderType::BASECOLOR, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, &emptyWhite);
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 
 	if (hasLights){
-		TextureRender* textureRender = NULL;
-		int slotTex = -1;
-
 		textureRender = material.metallicRoughnessTexture.getRender();
 		slotTex = shaderData.getTextureIndex(TextureShaderType::METALLICROUGHNESS, ShaderStageType::FRAGMENT);
 		if (textureRender)
@@ -352,6 +352,46 @@ void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 		}
 
 	}
+}
+
+void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& shaderData){
+	TextureRender* textureRender = NULL;
+	int slotTex = -1;
+
+	textureRender = terrain.heightMap.getRender();
+	slotTex = shaderData.getTextureIndex(TextureShaderType::HEIGHTMAP, ShaderStageType::VERTEX);
+	if (textureRender)
+		terrain.render.addTexture(slotTex, ShaderStageType::VERTEX, textureRender);
+	else
+		terrain.render.addTexture(slotTex, ShaderStageType::VERTEX, &emptyWhite);
+
+	textureRender = terrain.blendMap.getRender();
+	slotTex = shaderData.getTextureIndex(TextureShaderType::BLENDMAP, ShaderStageType::FRAGMENT);
+	if (textureRender)
+		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+	else
+		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
+
+	textureRender = terrain.textureDetailRed.getRender();
+	slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_RED, ShaderStageType::FRAGMENT);
+	if (textureRender)
+		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+	else
+		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+
+	textureRender = terrain.textureDetailGreen.getRender();
+	slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_GREEN, ShaderStageType::FRAGMENT);
+	if (textureRender)
+		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+	else
+		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+
+	textureRender = terrain.textureDetailBlue.getRender();
+	slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_BLUE, ShaderStageType::FRAGMENT);
+	if (textureRender)
+		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+	else
+		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 }
 
 bool RenderSystem::loadMesh(MeshComponent& mesh){
@@ -773,7 +813,6 @@ bool RenderSystem::loadTerrain(TerrainComponent& terrain){
 
 	bool p_unlit = false;
 	bool p_punctual = false;
-	bool p_hasTexture1 = false;
 	bool p_hasNormal = false;
 	bool p_castShadows = false;
 	bool p_shadowsPCF = false;
@@ -793,7 +832,7 @@ bool RenderSystem::loadTerrain(TerrainComponent& terrain){
 	}
 
 	terrain.shaderProperties = ShaderPool::getMeshProperties(
-					p_unlit, p_hasTexture1, false, p_punctual, 
+					p_unlit, false, false, p_punctual, 
 					p_castShadows, p_shadowsPCF, p_hasNormal, false, 
 					false, false, false, false, 
 					hasFog, false, false, false, false,
@@ -827,7 +866,7 @@ bool RenderSystem::loadTerrain(TerrainComponent& terrain){
 	terrain.slotVSTerrainNode = shaderData.getUniformBlockIndex(UniformBlockType::TERRAINNODE_VS_PARAMS, ShaderStageType::VERTEX);
 
 	loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.castShadows);
-	terrain.render.addTexture(shaderData.getTextureIndex(TextureShaderType::HEIGHTMAP, ShaderStageType::VERTEX), ShaderStageType::VERTEX, terrain.heightMap.getRender());
+	loadTerrainTextures(terrain, shaderData);
 
 	terrain.needUpdateTexture = false;
 
@@ -873,6 +912,7 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 		if (terrain.needUpdateTexture){
 			ShaderData& shaderData = terrain.shader.get()->shaderData;
 			loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.castShadows);
+			loadTerrainTextures(terrain, shaderData);
 
 			terrain.needUpdateTexture = false;
 		}
@@ -892,7 +932,7 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 		//model, normal and mvp matrix
 		terrain.render.applyUniformBlock(terrain.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 48, &transform.modelMatrix);
 
-		terrain.render.applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.terrainSize);
+		terrain.render.applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.eyePos);
 
 		for (int i = 0; i < terrain.numNodes; i++){
 			if (terrain.nodes[i].visible){
@@ -911,7 +951,7 @@ void RenderSystem::drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDept
 		//model, mvp matrix
 		terrain.depthRender.applyUniformBlock(terrain.slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 32, &vsDepthParams);
 
-		terrain.depthRender.applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.terrainSize);
+		terrain.depthRender.applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.eyePos);
 
 		for (int i = 0; i < terrain.numNodes; i++){
 			if (terrain.nodes[i].visible){

@@ -98,6 +98,7 @@ namespace Supernova{
 		void configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera);
 		Matrix4 getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv);
 		void loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool castShadows);
+		void loadTerrainTextures(TerrainComponent& terrain, ShaderData& shaderData);
 		Rect getScissorRect(UIComponent& ui, ImageComponent& img, Transform& transform, CameraComponent& camera);
 
 		// terrain

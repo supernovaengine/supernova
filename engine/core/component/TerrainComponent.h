@@ -69,6 +69,10 @@ namespace Supernova{
         bool castShadows = true;
 
         Texture heightMap;
+        Texture blendMap;
+        Texture textureDetailRed;
+        Texture textureDetailGreen;
+        Texture textureDetailBlue;
 
         TerrainNodeIndex fullResNode = {0, 0};
         TerrainNodeIndex halfResNode = {0, 0};
@@ -85,19 +89,16 @@ namespace Supernova{
         size_t grid[MAX_TERRAINGRID]; //root nodes
 
         //-----u_vs_terrainParams
+        Vector3 eyePos;
         float terrainSize = 200;
         float maxHeight = 10;
         float resolution = 32; //int
-        uint8_t _pad_12[4];
-        Vector3 eyePos;
-        uint8_t _pad_28[4];
+        float textureBaseTiles = 1; //int
+        float textureDetailTiles = 20; //int
         //-----
 
         int rootGridSize = 2;
         int levels = 6;
-
-        int textureBaseTiles = 1;
-        int textureDetailTiles = 20;
 
         bool needUpdateTerrain = true;
         bool needUpdateTexture = false;
