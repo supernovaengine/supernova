@@ -119,6 +119,7 @@ namespace Supernova{
 		bool loadTerrain(TerrainComponent& terrain);
 		void drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform);
 		void drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams);
+		void destroyTerrain(TerrainComponent& terrain);
 
 		bool loadUI(UIComponent& ui, bool isText);
 		void drawUI(UIComponent& ui, Transform& transform);

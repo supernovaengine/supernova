@@ -780,6 +780,7 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 
 		//Destroy render
 		submesh.render.destroy();
+		submesh.depthRender.destroy();
 
 		//Shaders uniforms
 		submesh.slotVSParams = -1;
@@ -961,6 +962,46 @@ void RenderSystem::drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDept
 			}
 		}
 	}
+}
+
+void RenderSystem::destroyTerrain(TerrainComponent& terrain){
+	if (!terrain.loaded)
+		return;
+
+	//Destroy shader
+	terrain.shader.reset();
+	ShaderPool::remove(ShaderType::MESH, terrain.shaderProperties);
+	if (hasShadows && terrain.castShadows)
+		ShaderPool::remove(ShaderType::DEPTH, terrain.depthShaderProperties);
+
+	//Destroy texture
+	terrain.material.baseColorTexture.destroy();
+	terrain.material.metallicRoughnessTexture.destroy();
+	terrain.material.normalTexture.destroy();
+	terrain.material.occlusionTexture.destroy();
+	terrain.material.emissiveTexture.destroy();
+
+	//Destroy render
+	terrain.render.destroy();
+	terrain.depthRender.destroy();
+
+	//Shaders uniforms
+	terrain.slotVSParams = -1;
+	terrain.slotFSParams = -1;
+	terrain.slotFSLighting = -1;
+	terrain.slotFSFog = -1;
+	terrain.slotVSShadows = -1;
+	terrain.slotFSShadows = -1;
+	terrain.slotVSTerrain = -1;
+	terrain.slotVSTerrainNode = -1;
+
+	terrain.slotVSDepthParams = -1;
+
+	//Destroy buffers
+	terrain.buffer.getRender()->destroyBuffer();
+	terrain.indices.getRender()->destroyBuffer();
+
+	terrain.loaded = false;
 }
 
 bool RenderSystem::loadUI(UIComponent& ui, bool isText){
@@ -2066,7 +2107,7 @@ void RenderSystem::draw(){
 
 						if (transform){
 							if (terrain.loaded && terrain.needReload){
-								//destroyTerrain(terrain);
+								destroyTerrain(terrain);
 							}
 							if (!terrain.loaded){
 								loadTerrain(terrain);
@@ -2133,7 +2174,7 @@ void RenderSystem::draw(){
 			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
 
 			if (terrain.loaded && terrain.needReload){
-				//destroyTerrain(terrain);
+				destroyTerrain(terrain);
 			}
 			if (!terrain.loaded){
 				loadTerrain(terrain);
