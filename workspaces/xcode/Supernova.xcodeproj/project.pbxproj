@@ -179,12 +179,16 @@
 		71451BEB270CA2C900712643 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BE7270CA2C900712643 /* Sprite.cpp */; };
 		71451BEC270CA2C900712643 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BE7270CA2C900712643 /* Sprite.cpp */; };
 		71451BF0270CA2C900712643 /* Sprite.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BEA270CA2C900712643 /* Sprite.h */; };
-		71451BF3270CA3EA00712643 /* Material.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BF1270CA3EA00712643 /* Material.h */; };
 		71451BF4270CA3EA00712643 /* FrameData.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BF2270CA3EA00712643 /* FrameData.h */; };
 		714BBF7427148B85004A15EE /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714BBF7227148B84004A15EE /* Particles.cpp */; };
 		714BBF7527148B85004A15EE /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714BBF7227148B84004A15EE /* Particles.cpp */; };
 		7158F43F259C2C82006E55D3 /* Renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7158F43E259C2C82006E55D3 /* Renderer.mm */; };
 		7158F440259C2C82006E55D3 /* Renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7158F43E259C2C82006E55D3 /* Renderer.mm */; };
+		715CB114288CD3F60049344B /* TerrainComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 715CB113288CD3F60049344B /* TerrainComponent.h */; };
+		715CB117288CD40E0049344B /* Terrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715CB115288CD40E0049344B /* Terrain.cpp */; };
+		715CB118288CD40E0049344B /* Terrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715CB115288CD40E0049344B /* Terrain.cpp */; };
+		715CB119288CD40E0049344B /* Terrain.h in Headers */ = {isa = PBXBuildFile; fileRef = 715CB116288CD40E0049344B /* Terrain.h */; };
+		715CB11B288CD57A0049344B /* Material.h in Headers */ = {isa = PBXBuildFile; fileRef = 715CB11A288CD5790049344B /* Material.h */; };
 		7162FD1225963AE00075B97D /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC2C25962A0E0075B97D /* Log.cpp */; };
 		7162FD1325963AE00075B97D /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC2D25962A0E0075B97D /* Scene.cpp */; };
 		7162FD1625963AE00075B97D /* Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC3225962A0E0075B97D /* Data.cpp */; };
@@ -626,13 +630,16 @@
 		71451BD0270CA17F00712643 /* TimedAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimedAction.h; sourceTree = "<group>"; };
 		71451BE7270CA2C900712643 /* Sprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sprite.cpp; sourceTree = "<group>"; };
 		71451BEA270CA2C900712643 /* Sprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sprite.h; sourceTree = "<group>"; };
-		71451BF1270CA3EA00712643 /* Material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Material.h; sourceTree = "<group>"; };
 		71451BF2270CA3EA00712643 /* FrameData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrameData.h; sourceTree = "<group>"; };
 		714BBF7127148B69004A15EE /* ParticlesComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParticlesComponent.h; sourceTree = "<group>"; };
 		714BBF7227148B84004A15EE /* Particles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particles.cpp; sourceTree = "<group>"; };
 		714BBF7327148B84004A15EE /* Particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particles.h; sourceTree = "<group>"; };
 		7158F43D259C2C82006E55D3 /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
 		7158F43E259C2C82006E55D3 /* Renderer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Renderer.mm; sourceTree = "<group>"; };
+		715CB113288CD3F60049344B /* TerrainComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TerrainComponent.h; sourceTree = "<group>"; };
+		715CB115288CD40E0049344B /* Terrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Terrain.cpp; sourceTree = "<group>"; };
+		715CB116288CD40E0049344B /* Terrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Terrain.h; sourceTree = "<group>"; };
+		715CB11A288CD5790049344B /* Material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Material.h; sourceTree = "<group>"; };
 		7162F8CE259547DA0075B97D /* Supernova.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Supernova.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7162F8E4259547DA0075B97D /* Supernova.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Supernova.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7162FC2B25962A0E0075B97D /* Engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
@@ -1176,7 +1183,6 @@
 				71451BF2270CA3EA00712643 /* FrameData.h */,
 				71BE620F25B1DB37006D6E02 /* Function.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
-				71451BF1270CA3EA00712643 /* Material.h */,
 				71ABBD26277A3210001CE3AF /* STBText.cpp */,
 				71ABBD27277A3210001CE3AF /* STBText.h */,
 				7128D0AC25BB18DC00965B51 /* StringUtils.cpp */,
@@ -1252,6 +1258,7 @@
 				71CC839126B8C49B00EEBB93 /* SkyComponent.h */,
 				71451BB7270C9D0F00712643 /* SpriteAnimationComponent.h */,
 				71451BB2270C9D0F00712643 /* SpriteComponent.h */,
+				715CB113288CD3F60049344B /* TerrainComponent.h */,
 				71ABBD11277A3166001CE3AF /* TextComponent.h */,
 				713E581427BA9D1300376680 /* TextEditComponent.h */,
 				71451BB9270C9D0F00712643 /* TimedActionComponent.h */,
@@ -1317,6 +1324,8 @@
 				71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */,
 				71451BE7270CA2C900712643 /* Sprite.cpp */,
 				71451BEA270CA2C900712643 /* Sprite.h */,
+				715CB115288CD40E0049344B /* Terrain.cpp */,
+				715CB116288CD40E0049344B /* Terrain.h */,
 				71ABBD16277A31BA001CE3AF /* ui */,
 			);
 			path = object;
@@ -1325,10 +1334,11 @@
 		7162FC6A25962A0E0075B97D /* texture */ = {
 			isa = PBXGroup;
 			children = (
-				71BE621E25B1DB83006D6E02 /* TextureData.cpp */,
-				71BE621F25B1DB83006D6E02 /* TextureData.h */,
+				715CB11A288CD5790049344B /* Material.h */,
 				7162FC6C25962A0E0075B97D /* Texture.cpp */,
 				7162FC6D25962A0E0075B97D /* Texture.h */,
+				71BE621E25B1DB83006D6E02 /* TextureData.cpp */,
+				71BE621F25B1DB83006D6E02 /* TextureData.h */,
 			);
 			path = texture;
 			sourceTree = "<group>";
@@ -1752,7 +1762,6 @@
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
 				71F97AAF262D1D8000CD6F2B /* Color.h in Headers */,
 				71E544FE284D5BB700C68FAB /* Animation.h in Headers */,
-				71451BF3270CA3EA00712643 /* Material.h in Headers */,
 				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
 				71ABBD4127A879B9001CE3AF /* ButtonComponent.h in Headers */,
 				71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */,
@@ -1773,12 +1782,14 @@
 				717D9B4B27337B72002C0803 /* lopnames.h in Headers */,
 				71CC839726B8C4D800EEBB93 /* Light.h in Headers */,
 				717D9B4127337850002C0803 /* ParticlesAnimationComponent.h in Headers */,
+				715CB119288CD40E0049344B /* Terrain.h in Headers */,
 				71CC839A26B8C4FD00EEBB93 /* FramebufferRender.h in Headers */,
 				718FDDFA2837CA9A00AF314C /* hlsl5.h in Headers */,
 				7170A3D82818A8A30003E965 /* Fog.h in Headers */,
 				71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */,
 				713E581227BA9CE400376680 /* Polygon.h in Headers */,
 				71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */,
+				715CB114288CD3F60049344B /* TerrainComponent.h in Headers */,
 				7170A3D42818A8A30003E965 /* Bone.h in Headers */,
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
 				71451BF0270CA2C900712643 /* Sprite.h in Headers */,
@@ -1815,6 +1826,7 @@
 				713E581127BA9CE400376680 /* TextEdit.h in Headers */,
 				71E5450B284D5BB700C68FAB /* RotateTracks.h in Headers */,
 				71CC83A426B8C54A00EEBB93 /* ShaderData.h in Headers */,
+				715CB11B288CD57A0049344B /* Material.h in Headers */,
 				71451BC0270CA16200712643 /* ActionSystem.h in Headers */,
 				71ABBD4627A879D4001CE3AF /* Button.h in Headers */,
 				717D9B4C27337B72002C0803 /* ljumptab.h in Headers */,
@@ -2367,6 +2379,7 @@
 				7170A3DC2818A8A30003E965 /* Fog.cpp in Sources */,
 				71BE623925B1DB9E006D6E02 /* LuaBinding.cpp in Sources */,
 				71451BD2270CA17F00712643 /* SpriteAnimation.cpp in Sources */,
+				715CB118288CD40E0049344B /* Terrain.cpp in Sources */,
 				7128D08725BB033D00965B51 /* Input.cpp in Sources */,
 				713D82AB259D307F00567F9F /* Texture.cpp in Sources */,
 				71451BE0270CA17F00712643 /* PositionAction.cpp in Sources */,
@@ -2499,6 +2512,7 @@
 				7170A3DB2818A8A30003E965 /* Fog.cpp in Sources */,
 				71BE623825B1DB9E006D6E02 /* LuaBinding.cpp in Sources */,
 				71451BD1270CA17F00712643 /* SpriteAnimation.cpp in Sources */,
+				715CB117288CD40E0049344B /* Terrain.cpp in Sources */,
 				7128D08625BB033D00965B51 /* Input.cpp in Sources */,
 				7162FD3D25963AE00075B97D /* Plane.cpp in Sources */,
 				71451BDF270CA17F00712643 /* PositionAction.cpp in Sources */,

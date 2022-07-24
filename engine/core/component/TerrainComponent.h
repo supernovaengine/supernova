@@ -8,7 +8,7 @@
 
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
-#include "util/Material.h"
+#include "texture/Material.h"
 #include "Supernova.h"
 
 namespace Supernova{

@@ -8,7 +8,7 @@
 #include "render/ObjectRender.h"
 #include "render/TextureRender.h"
 #include "texture/TextureData.h"
-#include "util/Material.h"
+#include "texture/Material.h"
 #include <map>
 #include <memory>
 
