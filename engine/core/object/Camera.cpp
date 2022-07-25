@@ -37,7 +37,8 @@ Camera::Camera(Scene* scene): Object(scene){
     cameraComponent.perspectiveNear = 1;
     cameraComponent.perspectiveFar = 200;
 
-    cameraComponent.type = CameraType::CAMERA_2D;
+    // default CameraComponent is CAMERA_2D
+    cameraComponent.type = CameraType::CAMERA_PERSPECTIVE;
 }
 
 void Camera::activate(){

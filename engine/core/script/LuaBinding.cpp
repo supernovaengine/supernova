@@ -18,7 +18,7 @@
 //#include "GraphicObject.h"
 //#include "Log.h"
 #include "Scene.h"
-//#include "Polygon.h"
+#include "Polygon.h"
 //#include "Cube.h"
 //#include "PlaneTerrain.h"
 //#include "Model.h"
@@ -296,6 +296,7 @@ void LuaBinding::registerClasses(lua_State *L){
     lua.new_usertype<Engine>("Engine",
             sol::default_constructor,
 	        "setScene", &Engine::setScene,
+            "setCanvasSize", &Engine::setCanvasSize,
             "getCanvasWidth", &Engine::getCanvasWidth,
             "setScalingMode", &Engine::setScalingMode,
             "onViewLoaded", sol::property([] () { return &Engine::onViewLoaded; }, [] (sol::function func) { Engine::onViewLoaded.add("luaFunction", func);}),
@@ -312,6 +313,26 @@ void LuaBinding::registerClasses(lua_State *L){
     lua.new_usertype<Scene>("Scene",
 	     sol::default_constructor
          );
+
+    lua.new_usertype<Object>("Object",
+	     sol::constructors<Object(Scene*)>(),
+         "setPosition", sol::overload( sol::resolve<void(float, float, float)>(&Object::setPosition), sol::resolve<void(Vector3)>(&Object::setPosition) )
+         );
+
+    lua.new_usertype<Polygon>("Polygon",
+        sol::constructors<Polygon(Scene*)>(),
+        sol::base_classes, sol::bases<Object>(),
+        "addVertex", sol::overload( sol::resolve<void(float, float)>(&Polygon::addVertex), sol::resolve<void(Vector3)>(&Polygon::addVertex) ),
+        "setColor", sol::resolve<void(float, float, float, float)>(&Polygon::setColor),
+        "getWidth", &Polygon::getWidth
+        );
+
+    lua.new_usertype<Vector3>("Vector3",
+        sol::constructors<Vector3(float, float, float)>(),
+        "x", &Vector3::x,
+        "y", &Vector3::y,
+        "z", &Vector3::z
+        );
 
 /*
     LuaIntf::LuaBinding(L).beginClass<Engine>("Engine")

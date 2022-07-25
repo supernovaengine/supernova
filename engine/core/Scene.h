@@ -61,6 +61,10 @@ namespace Supernova{
 		int framebufferWidth;
 		int framebufferHeight;
 
+		bool hasSceneAmbientLight;
+		Vector3 ambientLight;
+		float ambientFactor;
+
 	    EntityManager entityManager;
 	    ComponentManager componentManager;
 		std::unordered_map<const char*, std::shared_ptr<SubSystem>> systems;
@@ -95,6 +99,12 @@ namespace Supernova{
 		void setFog(bool hasFog);
 		bool isFogEnabled();
 		Fog& getFog();
+
+		void setAmbientLight(float ambientFactor, Vector3 ambientLight = Vector3(1.0, 1.0, 1.0));
+		float getAnbientFactor();
+		Vector3 getAnbientLight();
+		bool isEnabledSceneAmbientLight();
+		void disableSceneAmbientLight();
 
 		void setRenderToTexture(bool renderToTexture);
 		bool isRenderToTexture();

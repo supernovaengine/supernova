@@ -698,6 +698,10 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 
 				mesh.submeshes[i].needUpdateTexture = false;
 			}
+			if (scene->isEnabledSceneAmbientLight()){
+				mesh.submeshes[i].material.ambientFactor = scene->getAnbientFactor();
+				mesh.submeshes[i].material.ambientLight = scene->getAnbientLight();
+			}
 
 			render.beginDraw();
 
@@ -916,6 +920,10 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 			loadTerrainTextures(terrain, shaderData);
 
 			terrain.needUpdateTexture = false;
+		}
+		if (scene->isEnabledSceneAmbientLight()){
+			terrain.material.ambientFactor = scene->getAnbientFactor();
+			terrain.material.ambientLight = scene->getAnbientLight();
 		}
 
 		terrain.render.beginDraw();

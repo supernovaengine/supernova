@@ -58,6 +58,10 @@ Scene::Scene(){
 
 	hasFog = false;
 
+	hasSceneAmbientLight = false;
+	Vector3 ambientLight = Vector3(1.0, 1.0, 1.0);
+	float ambientFactor = 0.2;
+
 	renderToTexture = false;
 	framebufferWidth = 512;
 	framebufferHeight = 512;
@@ -83,6 +87,9 @@ Entity Scene::createDefaultCamera(){
 	Entity defaultCamera = createEntity();
 	addComponent<CameraComponent>(defaultCamera, {});
 	addComponent<Transform>(defaultCamera, {});
+
+	CameraComponent& camera = getComponent<CameraComponent>(defaultCamera);
+	camera.type = CameraType::CAMERA_2D;
 
 	return defaultCamera;
 }
@@ -125,6 +132,28 @@ bool Scene::isFogEnabled(){
 
 Fog& Scene::getFog(){
 	return fog;
+}
+
+void Scene::setAmbientLight(float ambientFactor, Vector3 ambientLight){
+	this->ambientFactor = ambientFactor;
+	this->ambientLight = ambientLight;
+	this->hasSceneAmbientLight = true;
+}
+
+float Scene::getAnbientFactor(){
+	return this->ambientFactor;
+}
+
+Vector3 Scene::getAnbientLight(){
+	return this->ambientLight;
+}
+
+bool Scene::isEnabledSceneAmbientLight(){
+	return this->hasSceneAmbientLight;
+}
+
+void Scene::disableSceneAmbientLight(){
+	this->hasSceneAmbientLight = false;
 }
 
 void Scene::setRenderToTexture(bool renderToTexture){
