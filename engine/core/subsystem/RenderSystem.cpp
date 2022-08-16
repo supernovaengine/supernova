@@ -699,8 +699,8 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 				mesh.submeshes[i].needUpdateTexture = false;
 			}
 			if (scene->isEnabledSceneAmbientLight()){
-				mesh.submeshes[i].material.ambientFactor = scene->getAnbientFactor();
-				mesh.submeshes[i].material.ambientLight = scene->getAnbientLight();
+				mesh.submeshes[i].material.ambientFactor = scene->getAmbientFactor();
+				mesh.submeshes[i].material.ambientLight = scene->getAmbientLight();
 			}
 
 			render.beginDraw();
@@ -810,6 +810,12 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 }
 
 bool RenderSystem::loadTerrain(TerrainComponent& terrain){
+
+	if (!terrain.heightMapLoaded)
+		return false;
+
+	if (terrain.buffer.getSize() == 0 || terrain.indices.getSize() == 0)
+		return false;
 
 	terrain.buffer.getRender()->createBuffer(terrain.buffer.getSize(), terrain.buffer.getData(), terrain.buffer.getType(), terrain.buffer.getUsage());
 	terrain.indices.getRender()->createBuffer(terrain.indices.getSize(), terrain.indices.getData(), terrain.indices.getType(), terrain.indices.getUsage());
@@ -922,8 +928,8 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 			terrain.needUpdateTexture = false;
 		}
 		if (scene->isEnabledSceneAmbientLight()){
-			terrain.material.ambientFactor = scene->getAnbientFactor();
-			terrain.material.ambientLight = scene->getAnbientLight();
+			terrain.material.ambientFactor = scene->getAmbientFactor();
+			terrain.material.ambientLight = scene->getAmbientLight();
 		}
 
 		terrain.render.beginDraw();
@@ -1520,15 +1526,17 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 }
 
 void RenderSystem::updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
-	for (int i = 0; i < terrain.numNodes; i++){
-		terrain.nodes[i].visible = false;
-	}
+	if (terrain.heightMapLoaded){
+		for (int i = 0; i < terrain.numNodes; i++){
+			terrain.nodes[i].visible = false;
+		}
 
-	for (int i = 0; i < (terrain.rootGridSize*terrain.rootGridSize); i++){
-		terrainNodeLODSelect(terrain, transform, camera, cameraTransform, terrain.nodes[terrain.grid[i]], terrain.levels-1);
-	}
+		for (int i = 0; i < (terrain.rootGridSize*terrain.rootGridSize); i++){
+			terrainNodeLODSelect(terrain, transform, camera, cameraTransform, terrain.nodes[terrain.grid[i]], terrain.levels-1);
+		}
 
-	terrain.eyePos = Vector3(cameraTransform.worldPosition.x, cameraTransform.worldPosition.y, cameraTransform.worldPosition.z);
+		terrain.eyePos = Vector3(cameraTransform.worldPosition.x, cameraTransform.worldPosition.y, cameraTransform.worldPosition.z);
+	}
 }
 
 void RenderSystem::setTerrainNodeIndex(TerrainComponent& terrain, TerrainNode& terrainNode, size_t size, size_t offset){

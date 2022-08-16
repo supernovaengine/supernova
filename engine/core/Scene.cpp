@@ -140,11 +140,11 @@ void Scene::setAmbientLight(float ambientFactor, Vector3 ambientLight){
 	this->hasSceneAmbientLight = true;
 }
 
-float Scene::getAnbientFactor(){
+float Scene::getAmbientFactor(){
 	return this->ambientFactor;
 }
 
-Vector3 Scene::getAnbientLight(){
+Vector3 Scene::getAmbientLight(){
 	return this->ambientLight;
 }
 

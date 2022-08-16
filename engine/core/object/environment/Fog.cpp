@@ -47,6 +47,14 @@ void Fog::setDensity(float density){
     this->density = density;
 }
 
+void Fog::setLinearStart(float start){
+    this->linearStart = start;
+}
+
+void Fog::setLinearEnd(float end){
+    this->linearEnd = end;
+}
+
 void Fog::setLinearStartEnd(float start, float end){
     this->linearStart = start;
     this->linearEnd = end;

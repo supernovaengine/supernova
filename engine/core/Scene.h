@@ -101,8 +101,8 @@ namespace Supernova{
 		Fog& getFog();
 
 		void setAmbientLight(float ambientFactor, Vector3 ambientLight = Vector3(1.0, 1.0, 1.0));
-		float getAnbientFactor();
-		Vector3 getAnbientLight();
+		float getAmbientFactor();
+		Vector3 getAmbientLight();
 		bool isEnabledSceneAmbientLight();
 		void disableSceneAmbientLight();
 

@@ -10,8 +10,8 @@
 namespace Supernova{
     enum class FogType{
         LINEAR,
-		EXPONENTIAL,
-		EXPONENTIALSQUARED
+		    EXPONENTIAL,
+		    EXPONENTIALSQUARED
     };
 
     class Fog{
@@ -35,6 +35,8 @@ namespace Supernova{
         void setType(FogType type);
         void setColor(Vector3 color);
         void setDensity(float density);
+        void setLinearStart(float start);
+        void setLinearEnd(float end);
         void setLinearStartEnd(float start, float end);
 
     };

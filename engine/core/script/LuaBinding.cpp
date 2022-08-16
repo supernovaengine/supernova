@@ -15,63 +15,10 @@
 
 #include "Engine.h"
 #include "Object.h"
-//#include "GraphicObject.h"
-//#include "Log.h"
+#include "Log.h"
 #include "Scene.h"
 #include "Polygon.h"
-//#include "Cube.h"
-//#include "PlaneTerrain.h"
-//#include "Model.h"
-//#include "math/Ray.h"
-//#include "math/Quaternion.h"
-//#include "math/Plane.h"
-//#include "Mesh.h"
-//#include "Mesh2D.h"
-//#include "Image.h"
-//#include "ui/UIObject.h"
-//#include "ui/UIImage.h"
-//#include "Light.h"
-//#include "PointLight.h"
-//#include "SpotLight.h"
-//#include "DirectionalLight.h"
-//#include "Sound.h"
-//#include "SkyBox.h"
-//#include "Points.h"
-//#include "Particles.h"
-//#include "ui/Text.h"
-//#include "Input.h"
-//#include "Sprite.h"
-//#include "util/Function.h"
-//#include "util/FunctionSubscribe.h"
-//#include "physics/Contact2D.h"
-//#include "action/Action.h"
-//#include "action/Ease.h"
-//#include "action/TimeAction.h"
-//#include "action/MoveAction.h"
-//#include "action/RotateAction.h"
-//#include "action/ScaleAction.h"
-//#include "action/ColorAction.h"
-//#include "action/AlphaAction.h"
-//#include "action/SpriteAnimation.h"
-//#include "action/ParticlesAnimation.h"
-//#include "action/particleinit/ParticleInit.h"
-//#include "action/particleinit/ParticleAccelerationInit.h"
-//#include "action/particleinit/ParticleAlphaInit.h"
-//#include "action/particleinit/ParticleColorInit.h"
-//#include "action/particleinit/ParticleLifeInit.h"
-//#include "action/particleinit/ParticlePositionInit.h"
-//#include "action/particleinit/ParticleRotationInit.h"
-//#include "action/particleinit/ParticleSizeInit.h"
-//#include "action/particleinit/ParticleSpriteInit.h"
-//#include "action/particleinit/ParticleVelocityInit.h"
-//#include "action/particlemod/ParticleMod.h"
-//#include "action/particlemod/ParticleAlphaMod.h"
-//#include "action/particlemod/ParticleColorMod.h"
-//#include "action/particlemod/ParticlePositionMod.h"
-//#include "action/particlemod/ParticleRotationMod.h"
-//#include "action/particlemod/ParticleSizeMod.h"
-//#include "action/particlemod/ParticleSpriteMod.h"
-//#include "action/particlemod/ParticleVelocityMod.h"
+#include "Terrain.h"
 
 #include <map>
 #include <locale>
@@ -285,22 +232,101 @@ void LuaBinding::registerClasses(lua_State *L){
     // luaL_openlibs() opened all libraries already: base, string, io, os, package, table, debug
     //lua.open_libraries(sol::lib::base);
 
+    lua.new_usertype<Entity>("Entity");
+
     lua.new_enum("Scaling",
                 "FITWIDTH", Scaling::FITWIDTH,
                 "FITHEIGHT", Scaling::FITHEIGHT,
                 "LETTERBOX", Scaling::LETTERBOX,
                 "CROP", Scaling::CROP,
-                "STRETCH", Scaling::STRETCH)
-                ;
+                "STRETCH", Scaling::STRETCH
+                );
+
+    lua.new_enum("Platform",
+                "MacOS", Platform::MacOS,
+                "iOS", Platform::iOS,
+                "Web", Platform::Web,
+                "Android", Platform::Android,
+                "Linux", Platform::Linux,
+                "Windows", Platform::Windows
+                );
+
+    lua.new_enum("GraphicBackend",
+                "GLCORE33", GraphicBackend::GLCORE33,
+                "GLES2", GraphicBackend::GLES2,
+                "GLES3", GraphicBackend::GLES3,
+                "D3D11", GraphicBackend::D3D11,
+                "METAL", GraphicBackend::METAL,
+                "WGPU", GraphicBackend::WGPU
+                );
+
+    lua.new_enum("TextureStrategy",
+                "FIT", TextureStrategy::FIT,
+                "RESAMPLE", TextureStrategy::RESAMPLE,
+                "NONE", TextureStrategy::NONE
+                );
+
+    lua.new_enum("TextureType",
+                "TEXTURE_2D", TextureType::TEXTURE_2D,
+                "TEXTURE_3D", TextureType::TEXTURE_3D,
+                "TEXTURE_CUBE", TextureType::TEXTURE_CUBE,
+                "TEXTURE_ARRAY", TextureType::TEXTURE_ARRAY
+                );
+
+    lua.new_enum("ColorFormat",
+            "RED", ColorFormat::RED,
+            "RGBA", ColorFormat::RGBA
+            );
 
     lua.new_usertype<Engine>("Engine",
             sol::default_constructor,
 	        "setScene", &Engine::setScene,
+            "getScene", &Engine::getScene,
+            //"scene", sol::property(&Engine::getScene, &Engine::setScene),
+            "addSceneLayer", &Engine::addSceneLayer,
+            "canvasWidth", sol::property(&Engine::getCanvasWidth),
+            "canvasHeight", sol::property(&Engine::getCanvasHeight),
             "setCanvasSize", &Engine::setCanvasSize,
-            "getCanvasWidth", &Engine::getCanvasWidth,
-            "setScalingMode", &Engine::setScalingMode,
+            "preferedCanvasWidth", sol::property(&Engine::getPreferedCanvasWidth),
+            "preferedCanvasHeight", sol::property(&Engine::getPreferedCanvasHeight),
+            "calculateCanvas", &Engine::calculateCanvas,
+            "viewRect", sol::property(&Engine::getViewRect),
+            "scalingMode", sol::property(&Engine::getScalingMode, &Engine::setScalingMode),
+            "textureStrategy", sol::property(&Engine::getTextureStrategy, &Engine::setTextureStrategy),
+            "callMouseInTouchEvent", sol::property(&Engine::isCallMouseInTouchEvent, &Engine::setCallMouseInTouchEvent),
+            "callTouchInMouseEvent", sol::property(&Engine::isCallTouchInMouseEvent, &Engine::setCallTouchInMouseEvent),
+            "useDegrees", sol::property(&Engine::isUseDegrees, &Engine::setUseDegrees),
+            "defaultNearestScaleTexture", sol::property(&Engine::isDefaultNearestScaleTexture, &Engine::setDefaultNearestScaleTexture),
+            "defaultResampleToPOTTexture", sol::property(&Engine::isDefaultResampleToPOTTexture, &Engine::setDefaultResampleToPOTTexture),
+            "automaticTransparency", sol::property(&Engine::isAutomaticTransparency, &Engine::setAutomaticTransparency),
+            "setAutomaticFlipY", sol::property(&Engine::isAutomaticFlipY, &Engine::setAutomaticFlipY),
+            "allowEventsOutCanvas", sol::property(&Engine::isAllowEventsOutCanvas, &Engine::setAllowEventsOutCanvas),
+            "fixedTimeSceneUpdate", sol::property(&Engine::isFixedTimeSceneUpdate, &Engine::setFixedTimeSceneUpdate),
+            "updateTime", sol::property(&Engine::getUpdateTime, &Engine::setUpdateTime),
+            "sceneUpdateTime", sol::property(&Engine::getSceneUpdateTime),
+            "platform", sol::property(&Engine::getPlatform),
+            "graphicBackend", sol::property(&Engine::getGraphicBackend),
+            "openGL", sol::property(&Engine::isOpenGL),
+            "framerate", sol::property(&Engine::getFramerate),
+            "deltatime", sol::property(&Engine::getDeltatime),
             "onViewLoaded", sol::property([] () { return &Engine::onViewLoaded; }, [] (sol::function func) { Engine::onViewLoaded.add("luaFunction", func);}),
-            "onUpdate", sol::property([] () { return &Engine::onUpdate; }, [] (sol::function func) { Engine::onUpdate.add("luaFunction", func);})
+            "onViewChanged", sol::property([] () { return &Engine::onViewChanged; }, [] (sol::function func) { Engine::onViewChanged.add("luaFunction", func);}),
+            "onDraw", sol::property([] () { return &Engine::onDraw; }, [] (sol::function func) { Engine::onDraw.add("luaFunction", func);}),
+            "onUpdate", sol::property([] () { return &Engine::onUpdate; }, [] (sol::function func) { Engine::onUpdate.add("luaFunction", func);}),
+            "onShutdown", sol::property([] () { return &Engine::onShutdown; }, [] (sol::function func) { Engine::onShutdown.add("luaFunction", func);}),
+            "onTouchStart", sol::property([] () { return &Engine::onTouchStart; }, [] (sol::function func) { Engine::onTouchStart.add("luaFunction", func);}),
+            "onTouchEnd", sol::property([] () { return &Engine::onTouchEnd; }, [] (sol::function func) { Engine::onTouchEnd.add("luaFunction", func);}),
+            "onTouchMove", sol::property([] () { return &Engine::onTouchMove; }, [] (sol::function func) { Engine::onTouchMove.add("luaFunction", func);}),
+            "onTouchCancel", sol::property([] () { return &Engine::onTouchCancel; }, [] (sol::function func) { Engine::onTouchCancel.add("luaFunction", func);}),
+            "onMouseDown", sol::property([] () { return &Engine::onMouseDown; }, [] (sol::function func) { Engine::onMouseDown.add("luaFunction", func);}),
+            "onMouseUp", sol::property([] () { return &Engine::onMouseUp; }, [] (sol::function func) { Engine::onMouseUp.add("luaFunction", func);}),
+            "onMouseScroll", sol::property([] () { return &Engine::onMouseScroll; }, [] (sol::function func) { Engine::onMouseScroll.add("luaFunction", func);}),
+            "onMouseMove", sol::property([] () { return &Engine::onMouseMove; }, [] (sol::function func) { Engine::onMouseMove.add("luaFunction", func);}),
+            "onMouseEnter", sol::property([] () { return &Engine::onMouseEnter; }, [] (sol::function func) { Engine::onMouseEnter.add("luaFunction", func);}),
+            "onMouseLeave", sol::property([] () { return &Engine::onMouseLeave; }, [] (sol::function func) { Engine::onMouseLeave.add("luaFunction", func);}),
+            "onKeyDown", sol::property([] () { return &Engine::onKeyDown; }, [] (sol::function func) { Engine::onKeyDown.add("luaFunction", func);}),
+            "onKeyUp", sol::property([] () { return &Engine::onKeyUp; }, [] (sol::function func) { Engine::onKeyUp.add("luaFunction", func);}),
+            "onCharInput", sol::property([] () { return &Engine::onCharInput; }, [] (sol::function func) { Engine::onCharInput.add("luaFunction", func);})
             );
 
     // sol::meta_function::call and other metafunctions are automatically generated: https://sol2.readthedocs.io/en/latest/api/usertype.html
@@ -310,14 +336,123 @@ void LuaBinding::registerClasses(lua_State *L){
             "add", (bool (FunctionSubscribe<void()>::*)(const std::string&, sol::function))&FunctionSubscribe<void()>::add
             );
 
+    lua.new_usertype<FunctionSubscribe<void(int,float,float)>>("FunctionSubscribe_V_IFF",
+            sol::default_constructor,
+            "call", &FunctionSubscribe<void(int,float,float)>::call,
+            "add", (bool (FunctionSubscribe<void(int,float,float)>::*)(const std::string&, sol::function))&FunctionSubscribe<void(int,float,float)>::add
+            );
+
+    lua.new_usertype<FunctionSubscribe<void(int,float,float,int)>>("FunctionSubscribe_V_IFFI",
+            sol::default_constructor,
+            "call", &FunctionSubscribe<void(int,float,float,int)>::call,
+            "add", (bool (FunctionSubscribe<void(int,float,float,int)>::*)(const std::string&, sol::function))&FunctionSubscribe<void(int,float,float,int)>::add
+            );
+
+    lua.new_usertype<FunctionSubscribe<void(int,bool,int)>>("FunctionSubscribe_V_IBI",
+            sol::default_constructor,
+            "call", &FunctionSubscribe<void(int,bool,int)>::call,
+            "add", (bool (FunctionSubscribe<void(int,bool,int)>::*)(const std::string&, sol::function))&FunctionSubscribe<void(int,bool,int)>::add
+            );
+
+    lua.new_usertype<FunctionSubscribe<void(wchar_t)>>("FunctionSubscribe_V_W",
+            sol::default_constructor,
+            "call", &FunctionSubscribe<void(wchar_t)>::call,
+            "add", (bool (FunctionSubscribe<void(wchar_t)>::*)(const std::string&, sol::function))&FunctionSubscribe<void(wchar_t)>::add
+            );
+
+    lua.new_enum("FogType",
+                "LINEAR", FogType::LINEAR,
+                "EXPONENTIAL", FogType::EXPONENTIAL,
+                "EXPONENTIALSQUARED", FogType::EXPONENTIALSQUARED
+                );
+
+    lua.new_usertype<Fog>("Fog",
+	        sol::default_constructor,
+            "type", sol::property(&Fog::getType, &Fog::setType),
+            "color", sol::property(&Fog::getColor, &Fog::setColor),
+            "density", sol::property(&Fog::getDensity, &Fog::setDensity),
+            "linearStart", sol::property(&Fog::getLinearStart, &Fog::setLinearStart),
+            "linearEnd", sol::property(&Fog::getLinearEnd, &Fog::setLinearEnd),
+            "setLinearStartEnd", &Fog::setLinearStartEnd
+         );
+
+    lua.new_usertype<TextureRender>("TextureRender",  
+            sol::default_constructor,
+            "createTexture", &TextureRender::createTexture,
+            "createFramebufferTexture", &TextureRender::createFramebufferTexture,
+            "destroyTexture", &TextureRender::destroyTexture
+         );
+
+    lua.new_usertype<FramebufferRender>("FramebufferRender",  
+            sol::default_constructor,
+            "createFramebuffer", &FramebufferRender::createFramebuffer,
+            "destroyFramebuffer", &FramebufferRender::destroyFramebuffer,
+            "isCreated", &FramebufferRender::isCreated,
+            "colorTexture", sol::property(&FramebufferRender::getColorTexture)
+         );
+
     lua.new_usertype<Scene>("Scene",
-	     sol::default_constructor
+	     sol::default_constructor,
+         "load", &Scene::load,
+         "destroy", &Scene::destroy,
+         "draw", &Scene::draw,
+         "update", &Scene::update,
+         "camera", sol::property(&Scene::getCamera, &Scene::setCamera),
+         "setCamera", &Scene::setCamera,
+         "getCamera", &Scene::getCamera,
+         "setMainScene", &Scene::setMainScene,
+         "isMainScene", &Scene::isMainScene,
+         "setBackgroundColor", sol::overload( sol::resolve<void(float, float, float)>(&Scene::setBackgroundColor), sol::resolve<void(Vector4)>(&Scene::setBackgroundColor) ),
+         "getBackgroundColor", &Scene::getBackgroundColor,
+         "setShadowsPCF", &Scene::setShadowsPCF,
+         "isShadowsPCF", &Scene::isShadowsPCF,
+         "setFog", &Scene::setFog,
+         "isFogEnabled", &Scene::isFogEnabled,
+         "getFog", &Scene::getFog,
+         "setAmbientLight", &Scene::setAmbientLight,
+         "getAmbientFactor", &Scene::getAmbientFactor,
+         "getAmbientLight", &Scene::getAmbientLight,
+         "isEnabledSceneAmbientLight", &Scene::isEnabledSceneAmbientLight,
+         "disableSceneAmbientLight", &Scene::disableSceneAmbientLight,
+         "setRenderToTexture", &Scene::setRenderToTexture,
+         "isRenderToTexture", &Scene::isRenderToTexture,
+         "getFramebuffer", &Scene::getFramebuffer,
+         "setFramebufferSize", &Scene::setFramebufferSize,
+         "getFramebufferWidth", &Scene::getFramebufferWidth,
+         "getFramebufferHeight", &Scene::getFramebufferHeight,
+         "updateCameraSize", &Scene::updateCameraSize,
+         "findBranchLastIndex", &Scene::findBranchLastIndex,
+         "createEntity", &Scene::createEntity,
+         "destroyEntity", &Scene::destroyEntity,
+         "addEntityChild", &Scene::addEntityChild,
+         "moveChildToFirst", &Scene::moveChildToFirst,
+         "moveChildUp", &Scene::moveChildUp,
+         "moveChildDown", &Scene::moveChildDown,
+         "moveChildToLast", &Scene::moveChildToLast
          );
 
     lua.new_usertype<Object>("Object",
-	     sol::constructors<Object(Scene*)>(),
-         "setPosition", sol::overload( sol::resolve<void(float, float, float)>(&Object::setPosition), sol::resolve<void(Vector3)>(&Object::setPosition) )
-         );
+	    sol::constructors<Object(Scene*)>(),
+        "createChild", &Object::createChild,
+        "addChild", &Object::addChild,
+        "moveToFirst", &Object::moveToFirst,
+        "moveUp", &Object::moveUp,
+        "moveDown", &Object::moveDown,
+        "moveToLast", &Object::moveToLast,
+        "name", sol::property(&Object::getName, &Object::setName),
+        "position", sol::property(&Object::getPosition, sol::resolve<void(Vector3)>(&Object::setPosition)),
+        "setPosition", sol::overload( sol::resolve<void(float, float, float)>(&Object::setPosition), sol::resolve<void(Vector3)>(&Object::setPosition) ),
+        "worldPosition", sol::property(&Object::getWorldPosition),
+        "scale", sol::property(&Object::getScale, sol::resolve<void(Vector3)>(&Object::setScale)),
+        "setScale", sol::overload( sol::resolve<void(float)>(&Object::setScale), sol::resolve<void(Vector3)>(&Object::setScale) ),
+        "worldScale", sol::property(&Object::getWorldScale),
+        "setModelMatrix", &Object::setModelMatrix,
+        //"addComponent", &Object::addComponent,
+        //"removeComponent", &Object::removeComponent, 
+        //"getComponent", &Object::getComponent,
+        "entity", sol::property(&Object::getEntity),
+        "updateTransform", &Object::updateTransform
+        );
 
     lua.new_usertype<Polygon>("Polygon",
         sol::constructors<Polygon(Scene*)>(),
@@ -327,11 +462,47 @@ void LuaBinding::registerClasses(lua_State *L){
         "getWidth", &Polygon::getWidth
         );
 
+
+    lua.new_usertype<Terrain>("Terrain",
+        sol::constructors<Terrain(Scene*)>(),
+        sol::base_classes, sol::bases<Object>(),
+        "heightMap", sol::property(sol::resolve<void(std::string)>(&Terrain::setHeightMap)),
+        "setHeightMap", sol::overload( sol::resolve<void(std::string)>(&Terrain::setHeightMap), sol::resolve<void(FramebufferRender*)>(&Terrain::setHeightMap) ),
+        "blendMap", sol::property(sol::resolve<void(std::string)>(&Terrain::setBlendMap)),
+        "setBlendMap", sol::overload( sol::resolve<void(std::string)>(&Terrain::setBlendMap), sol::resolve<void(FramebufferRender*)>(&Terrain::setBlendMap) ),
+        "textureDetailRed", sol::property(&Terrain::setTextureDetailRed),
+        "setTextureDetailRed", &Terrain::setTextureDetailRed,
+        "textureDetailGreen", sol::property(&Terrain::setTextureDetailGreen),
+        "setTextureDetailGreen", &Terrain::setTextureDetailGreen,
+        "textureDetailBlue", sol::property(&Terrain::setTextureDetailBlue),
+        "setTextureDetailBlue", &Terrain::setTextureDetailBlue,
+        "texture", sol::property(sol::resolve<void(std::string)>(&Terrain::setTexture)),
+        "setTexture", sol::overload( sol::resolve<void(std::string)>(&Terrain::setTexture), sol::resolve<void(FramebufferRender*)>(&Terrain::setTexture) ),
+        "color", sol::property(&Terrain::getColor, sol::resolve<void(Vector4)>(&Terrain::setColor)),
+        "setColor", sol::overload( sol::resolve<void(Vector4)>(&Terrain::setColor), sol::resolve<void(float, float, float, float)>(&Terrain::setColor) )  
+        );
+
     lua.new_usertype<Vector3>("Vector3",
         sol::constructors<Vector3(float, float, float)>(),
         "x", &Vector3::x,
         "y", &Vector3::y,
         "z", &Vector3::z
+        );
+
+    lua.new_usertype<Vector4>("Vector4",
+        sol::constructors<Vector4(float, float, float, float)>(),
+        "x", &Vector4::x,
+        "y", &Vector4::y,
+        "z", &Vector4::z,
+        "w", &Vector4::w
+        );
+
+    lua.new_usertype<Rect>("Rect",
+        sol::constructors<Rect(), Rect(float, float, float, float)>(),
+        "x", sol::property(&Rect::getX),
+        "y", sol::property(&Rect::getY),
+        "width", sol::property(&Rect::getWidth),
+        "height", sol::property(&Rect::getHeight)
         );
 
 /*
