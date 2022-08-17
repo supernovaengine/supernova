@@ -161,6 +161,8 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DSUPERNOVA_SOKOL")
 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
+
     if(GRAPHIC_BACKEND STREQUAL "glcore33")
         add_definitions("-DSOKOL_GLCORE33")
     elseif(GRAPHIC_BACKEND STREQUAL "d3d11")
