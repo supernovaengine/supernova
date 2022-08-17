@@ -25,6 +25,7 @@ namespace Supernova{
         int getHeight();
 
         void setMaxTextSize(unsigned int maxTextSize);
+        unsigned int getMaxTextSize();
 
         void setText(std::string text);
         std::string getText();
@@ -33,7 +34,10 @@ namespace Supernova{
         std::string getFont();
 
         void setFontSize(unsigned int fontSize);
+        unsigned int getFontSize();
+
         void setMultiline(bool multiline);
+        bool getMultiline();
 
         void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);

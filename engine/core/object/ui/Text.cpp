@@ -74,6 +74,12 @@ void Text::setMaxTextSize(unsigned int maxTextSize){
     }
 }
 
+unsigned int Text::getMaxTextSize(){
+    TextComponent& textcomp = getComponent<TextComponent>();
+
+    return textcomp.maxTextSize;
+}
+
 void Text::setText(std::string text){
     TextComponent& textcomp = getComponent<TextComponent>();
 
@@ -118,11 +124,23 @@ void Text::setFontSize(unsigned int fontSize){
     textcomp.needUpdateText = true;
 }
 
+unsigned int Text::getFontSize(){
+    TextComponent& textcomp = getComponent<TextComponent>();
+
+    return textcomp.fontSize;
+}
+
 void Text::setMultiline(bool multiline){
     TextComponent& textcomp = getComponent<TextComponent>();
 
     textcomp.multiline = multiline;
     textcomp.needUpdateText = true;
+}
+
+bool Text::getMultiline(){
+    TextComponent& textcomp = getComponent<TextComponent>();
+
+    return textcomp.multiline;
 }
 
 void Text::setColor(Vector4 color){

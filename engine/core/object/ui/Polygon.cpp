@@ -52,6 +52,12 @@ void Polygon::setColor(float red, float green, float blue, float alpha){
     setColor(Vector4(red, green, blue, alpha));
 }
 
+Vector4 Polygon::getColor(){
+    UIComponent& uicomp = getComponent<UIComponent>();
+
+    return uicomp.color;
+}
+
 int Polygon::getWidth(){
     UIComponent& ui = getComponent<UIComponent>();
 
