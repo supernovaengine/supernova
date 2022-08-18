@@ -158,13 +158,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
     )
 endif()
 
+
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DSUPERNOVA_SOKOL")
 
     if (MSVC)
-        add_compile_options("/bigobj")
+        add_compile_options(/bigobj)
     else ()
-        add_compile_options("-Wa,-mbig-obj")
+        add_compile_options(-Wa,-mbig-obj -O2)
     endif()
 
     if(GRAPHIC_BACKEND STREQUAL "glcore33")
