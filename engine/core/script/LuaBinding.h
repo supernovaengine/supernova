@@ -26,6 +26,7 @@ namespace Supernova {
         static int moduleLoader(lua_State *L);
         static int handleLuaError(lua_State* L);
         static void registerClasses(lua_State *L);
+        static void registerObjectClasses(lua_State *L);
 
         static void bind();
 

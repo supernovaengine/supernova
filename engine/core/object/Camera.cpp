@@ -87,6 +87,12 @@ void Camera::setType(CameraType type){
     }
 }
 
+CameraType Camera::getType(){
+    CameraComponent& camera = getComponent<CameraComponent>();
+    
+    return camera.type;
+}
+
 void Camera::setView(Vector3 view){
     CameraComponent& camera = getComponent<CameraComponent>();
 
