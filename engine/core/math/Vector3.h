@@ -2,6 +2,7 @@
 #define vector3_h
 
 #include <math.h>
+#include <string>
 
 namespace Supernova { class Vector3; }
 Supernova::Vector3 operator * ( float f, const Supernova::Vector3& v );
@@ -32,6 +33,8 @@ namespace Supernova {
         Vector3( const float* const v );
 
         Vector3( const Vector3& v );
+
+        std::string toString() const;
 
         float operator [] ( unsigned i ) const;
 
@@ -66,6 +69,10 @@ namespace Supernova {
 
         Vector3& operator /= ( float f );
 
+        bool operator < ( const Vector3& v ) const;
+
+        bool operator > ( const Vector3& v ) const;
+
         float length () const;
 
         float squaredLength () const;
@@ -84,10 +91,6 @@ namespace Supernova {
         Vector3 crossProduct( const Vector3& v ) const;
 
         Vector3 midPoint( const Vector3& v ) const;
-
-        bool operator < ( const Vector3& v ) const;
-
-        bool operator > ( const Vector3& v ) const;
 
         void makeFloor( const Vector3& v );
 

@@ -122,7 +122,7 @@ bool Scene::isShadowsPCF(){
 	return this->shadowsPCF;
 }
 
-void Scene::setFog(bool hasFog){
+void Scene::setFogEnabled(bool hasFog){
 	this->hasFog = hasFog;
 }
 
@@ -140,20 +140,30 @@ void Scene::setAmbientLight(float ambientFactor, Vector3 ambientLight){
 	this->hasSceneAmbientLight = true;
 }
 
-float Scene::getAmbientFactor(){
+void Scene::setAmbientLight(float ambientFactor){
+	this->ambientFactor = ambientFactor;
+	this->hasSceneAmbientLight = true;
+}
+
+void Scene::setAmbientLight(Vector3 ambientLight){
+	this->ambientLight = ambientLight;
+	this->hasSceneAmbientLight = true;
+}
+
+float Scene::getAmbientLightFactor(){
 	return this->ambientFactor;
 }
 
-Vector3 Scene::getAmbientLight(){
+Vector3 Scene::getAmbientLightColor(){
 	return this->ambientLight;
 }
 
-bool Scene::isEnabledSceneAmbientLight(){
+bool Scene::isSceneAmbientLightEnabled(){
 	return this->hasSceneAmbientLight;
 }
 
-void Scene::disableSceneAmbientLight(){
-	this->hasSceneAmbientLight = false;
+void Scene::setSceneAmbientLightEnabled(bool hasSceneAmbientLight){
+	this->hasSceneAmbientLight = hasSceneAmbientLight;
 }
 
 void Scene::setRenderToTexture(bool renderToTexture){

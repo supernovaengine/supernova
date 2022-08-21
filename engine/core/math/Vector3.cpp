@@ -23,6 +23,10 @@ Vector3::Vector3( const float* const v ) : x(v[0]), y(v[1]), z(v[2]) {}
 
 Vector3::Vector3( const Vector3& v ) : x(v.x), y(v.y), z(v.z) {}
 
+std::string Vector3::toString() const{
+    return "Vector3(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")"; 
+}
+
 float Vector3::operator [] ( unsigned i ) const{
     return *(&x+i);
 }
@@ -59,7 +63,7 @@ Vector3 Vector3::operator * ( float f ) const{
     return Vector3(x * f, y * f, z * f);
 }
 
-Vector3 Vector3::operator * ( const Vector3& v) const{
+Vector3 Vector3::operator * ( const Vector3& v ) const{
     return Vector3(x * v.x, y * v.y, z * v.z);
 }
 
@@ -108,6 +112,14 @@ Vector3& Vector3::operator /= ( float f ){
     z *= f;
     
     return *this;
+}
+
+bool Vector3::operator < ( const Vector3& v ) const{
+    return ( x < v.x && y < v.y && z < v.z );
+}
+
+bool Vector3::operator > ( const Vector3& v ) const{
+    return ( x > v.x && y > v.y && z > v.z );
 }
 
 float Vector3::length () const{
@@ -167,14 +179,6 @@ Vector3 Vector3::crossProduct( const Vector3& v ) const{
 
 Vector3 Vector3::midPoint( const Vector3& v ) const{
     return Vector3( ( x + v.x ) * 0.5f, ( y + v.y ) * 0.5f, ( z + v.z ) * 0.5f );
-}
-
-bool Vector3::operator < ( const Vector3& v ) const{
-    return ( x < v.x && y < v.y && z < v.z );
-}
-
-bool Vector3::operator > ( const Vector3& v ) const{
-    return ( x > v.x && y > v.y && z > v.z );
 }
 
 void Vector3::makeFloor( const Vector3& v ){

@@ -49,7 +49,7 @@ lua_State* LuaBinding::getLuaState(){
 void LuaBinding::luaCallback(int nargs, int nresults, int msgh){
     int status = lua_pcall(LuaBinding::getLuaState(), nargs, nresults, msgh);
     if (status != 0){
-        Log::Error("Lua Error: %s\n", lua_tostring(LuaBinding::getLuaState(), -1));
+        Log::Error("Lua Error: %s", lua_tostring(LuaBinding::getLuaState(), -1));
     }
 }
 
@@ -180,7 +180,7 @@ int LuaBinding::handleLuaError(lua_State* L) {
     return 1;  /* return the traceback */
 }
 
-void LuaBinding::bind(){
+void LuaBinding::init(){
 
     lua_State *L = LuaBinding::getLuaState();
     luaL_openlibs(L);
@@ -210,12 +210,12 @@ void LuaBinding::bind(){
     if (luaL_loadbuffer(L,(const char*)filedata.getMemPtr(),filedata.length(), luafile.c_str()) == 0){
         #ifndef NO_LUA_INIT
         if(lua_pcall(L, 0, LUA_MULTRET, msgh) != 0){
-            Log::Error("Lua Error: %s\n", lua_tostring(L,-1));
+            Log::Error("Lua Error: %s", lua_tostring(L,-1));
             lua_close(L);
         }
         #endif
     }else{
-        Log::Error("Lua Error: %s\n", lua_tostring(L,-1));
+        Log::Error("Lua Error: %s", lua_tostring(L,-1));
         lua_close(L);
     }
 
@@ -312,72 +312,56 @@ void LuaBinding::registerClasses(lua_State *L){
             "openGL", sol::property(&Engine::isOpenGL),
             "framerate", sol::property(&Engine::getFramerate),
             "deltatime", sol::property(&Engine::getDeltatime),
-            "onViewLoaded", sol::property([] () { return &Engine::onViewLoaded; }, [] (sol::function func) { Engine::onViewLoaded.add("luaFunction", func);}),
-            "onViewChanged", sol::property([] () { return &Engine::onViewChanged; }, [] (sol::function func) { Engine::onViewChanged.add("luaFunction", func);}),
-            "onDraw", sol::property([] () { return &Engine::onDraw; }, [] (sol::function func) { Engine::onDraw.add("luaFunction", func);}),
-            "onUpdate", sol::property([] () { return &Engine::onUpdate; }, [] (sol::function func) { Engine::onUpdate.add("luaFunction", func);}),
-            "onShutdown", sol::property([] () { return &Engine::onShutdown; }, [] (sol::function func) { Engine::onShutdown.add("luaFunction", func);}),
-            "onTouchStart", sol::property([] () { return &Engine::onTouchStart; }, [] (sol::function func) { Engine::onTouchStart.add("luaFunction", func);}),
-            "onTouchEnd", sol::property([] () { return &Engine::onTouchEnd; }, [] (sol::function func) { Engine::onTouchEnd.add("luaFunction", func);}),
-            "onTouchMove", sol::property([] () { return &Engine::onTouchMove; }, [] (sol::function func) { Engine::onTouchMove.add("luaFunction", func);}),
-            "onTouchCancel", sol::property([] () { return &Engine::onTouchCancel; }, [] (sol::function func) { Engine::onTouchCancel.add("luaFunction", func);}),
-            "onMouseDown", sol::property([] () { return &Engine::onMouseDown; }, [] (sol::function func) { Engine::onMouseDown.add("luaFunction", func);}),
-            "onMouseUp", sol::property([] () { return &Engine::onMouseUp; }, [] (sol::function func) { Engine::onMouseUp.add("luaFunction", func);}),
-            "onMouseScroll", sol::property([] () { return &Engine::onMouseScroll; }, [] (sol::function func) { Engine::onMouseScroll.add("luaFunction", func);}),
-            "onMouseMove", sol::property([] () { return &Engine::onMouseMove; }, [] (sol::function func) { Engine::onMouseMove.add("luaFunction", func);}),
-            "onMouseEnter", sol::property([] () { return &Engine::onMouseEnter; }, [] (sol::function func) { Engine::onMouseEnter.add("luaFunction", func);}),
-            "onMouseLeave", sol::property([] () { return &Engine::onMouseLeave; }, [] (sol::function func) { Engine::onMouseLeave.add("luaFunction", func);}),
-            "onKeyDown", sol::property([] () { return &Engine::onKeyDown; }, [] (sol::function func) { Engine::onKeyDown.add("luaFunction", func);}),
-            "onKeyUp", sol::property([] () { return &Engine::onKeyUp; }, [] (sol::function func) { Engine::onKeyUp.add("luaFunction", func);}),
-            "onCharInput", sol::property([] () { return &Engine::onCharInput; }, [] (sol::function func) { Engine::onCharInput.add("luaFunction", func);})
+            "onViewLoaded", sol::property([] () { return &Engine::onViewLoaded; }, [] (sol::protected_function func) { Engine::onViewLoaded.add("luaFunction", func);}),
+            "onViewChanged", sol::property([] () { return &Engine::onViewChanged; }, [] (sol::protected_function func) { Engine::onViewChanged.add("luaFunction", func);}),
+            "onDraw", sol::property([] () { return &Engine::onDraw; }, [] (sol::protected_function func) { Engine::onDraw.add("luaFunction", func);}),
+            "onUpdate", sol::property([] () { return &Engine::onUpdate; }, [] (sol::protected_function func) { Engine::onUpdate.add("luaFunction", func);}),
+            "onShutdown", sol::property([] () { return &Engine::onShutdown; }, [] (sol::protected_function func) { Engine::onShutdown.add("luaFunction", func);}),
+            "onTouchStart", sol::property([] () { return &Engine::onTouchStart; }, [] (sol::protected_function func) { Engine::onTouchStart.add("luaFunction", func);}),
+            "onTouchEnd", sol::property([] () { return &Engine::onTouchEnd; }, [] (sol::protected_function func) { Engine::onTouchEnd.add("luaFunction", func);}),
+            "onTouchMove", sol::property([] () { return &Engine::onTouchMove; }, [] (sol::protected_function func) { Engine::onTouchMove.add("luaFunction", func);}),
+            "onTouchCancel", sol::property([] () { return &Engine::onTouchCancel; }, [] (sol::protected_function func) { Engine::onTouchCancel.add("luaFunction", func);}),
+            "onMouseDown", sol::property([] () { return &Engine::onMouseDown; }, [] (sol::protected_function func) { Engine::onMouseDown.add("luaFunction", func);}),
+            "onMouseUp", sol::property([] () { return &Engine::onMouseUp; }, [] (sol::protected_function func) { Engine::onMouseUp.add("luaFunction", func);}),
+            "onMouseScroll", sol::property([] () { return &Engine::onMouseScroll; }, [] (sol::protected_function func) { Engine::onMouseScroll.add("luaFunction", func);}),
+            "onMouseMove", sol::property([] () { return &Engine::onMouseMove; }, [] (sol::protected_function func) { Engine::onMouseMove.add("luaFunction", func);}),
+            "onMouseEnter", sol::property([] () { return &Engine::onMouseEnter; }, [] (sol::protected_function func) { Engine::onMouseEnter.add("luaFunction", func);}),
+            "onMouseLeave", sol::property([] () { return &Engine::onMouseLeave; }, [] (sol::protected_function func) { Engine::onMouseLeave.add("luaFunction", func);}),
+            "onKeyDown", sol::property([] () { return &Engine::onKeyDown; }, [] (sol::protected_function func) { Engine::onKeyDown.add("luaFunction", func);}),
+            "onKeyUp", sol::property([] () { return &Engine::onKeyUp; }, [] (sol::protected_function func) { Engine::onKeyUp.add("luaFunction", func);}),
+            "onCharInput", sol::property([] () { return &Engine::onCharInput; }, [] (sol::protected_function func) { Engine::onCharInput.add("luaFunction", func);})
             );
 
     // sol::meta_function::call and other metafunctions are automatically generated: https://sol2.readthedocs.io/en/latest/api/usertype.html
     lua.new_usertype<FunctionSubscribe<void()>>("FunctionSubscribe_V",
             sol::default_constructor,
             "call", &FunctionSubscribe<void()>::call,
-            "add", (bool (FunctionSubscribe<void()>::*)(const std::string&, sol::function))&FunctionSubscribe<void()>::add
+            "add", (bool (FunctionSubscribe<void()>::*)(const std::string&, sol::protected_function))&FunctionSubscribe<void()>::add
             );
 
     lua.new_usertype<FunctionSubscribe<void(int,float,float)>>("FunctionSubscribe_V_IFF",
             sol::default_constructor,
             "call", &FunctionSubscribe<void(int,float,float)>::call,
-            "add", (bool (FunctionSubscribe<void(int,float,float)>::*)(const std::string&, sol::function))&FunctionSubscribe<void(int,float,float)>::add
+            "add", (bool (FunctionSubscribe<void(int,float,float)>::*)(const std::string&, sol::protected_function))&FunctionSubscribe<void(int,float,float)>::add
             );
 
     lua.new_usertype<FunctionSubscribe<void(int,float,float,int)>>("FunctionSubscribe_V_IFFI",
             sol::default_constructor,
             "call", &FunctionSubscribe<void(int,float,float,int)>::call,
-            "add", (bool (FunctionSubscribe<void(int,float,float,int)>::*)(const std::string&, sol::function))&FunctionSubscribe<void(int,float,float,int)>::add
+            "add", (bool (FunctionSubscribe<void(int,float,float,int)>::*)(const std::string&, sol::protected_function))&FunctionSubscribe<void(int,float,float,int)>::add
             );
 
     lua.new_usertype<FunctionSubscribe<void(int,bool,int)>>("FunctionSubscribe_V_IBI",
             sol::default_constructor,
             "call", &FunctionSubscribe<void(int,bool,int)>::call,
-            "add", (bool (FunctionSubscribe<void(int,bool,int)>::*)(const std::string&, sol::function))&FunctionSubscribe<void(int,bool,int)>::add
+            "add", (bool (FunctionSubscribe<void(int,bool,int)>::*)(const std::string&, sol::protected_function))&FunctionSubscribe<void(int,bool,int)>::add
             );
 
     lua.new_usertype<FunctionSubscribe<void(wchar_t)>>("FunctionSubscribe_V_W",
             sol::default_constructor,
             "call", &FunctionSubscribe<void(wchar_t)>::call,
-            "add", (bool (FunctionSubscribe<void(wchar_t)>::*)(const std::string&, sol::function))&FunctionSubscribe<void(wchar_t)>::add
+            "add", (bool (FunctionSubscribe<void(wchar_t)>::*)(const std::string&, sol::protected_function))&FunctionSubscribe<void(wchar_t)>::add
             );
-
-    lua.new_enum("FogType",
-                "LINEAR", FogType::LINEAR,
-                "EXPONENTIAL", FogType::EXPONENTIAL,
-                "EXPONENTIALSQUARED", FogType::EXPONENTIALSQUARED
-                );
-
-    lua.new_usertype<Fog>("Fog",
-	        sol::default_constructor,
-            "type", sol::property(&Fog::getType, &Fog::setType),
-            "color", sol::property(&Fog::getColor, &Fog::setColor),
-            "density", sol::property(&Fog::getDensity, &Fog::setDensity),
-            "linearStart", sol::property(&Fog::getLinearStart, &Fog::setLinearStart),
-            "linearEnd", sol::property(&Fog::getLinearEnd, &Fog::setLinearEnd),
-            "setLinearStartEnd", &Fog::setLinearStartEnd
-         );
 
     lua.new_usertype<TextureRender>("TextureRender",  
             sol::default_constructor,
@@ -403,20 +387,29 @@ void LuaBinding::registerClasses(lua_State *L){
          "camera", sol::property(&Scene::getCamera, &Scene::setCamera),
          "setCamera", &Scene::setCamera,
          "getCamera", &Scene::getCamera,
+         "mainScene", sol::property(&Scene::isMainScene, &Scene::setMainScene),
          "setMainScene", &Scene::setMainScene,
          "isMainScene", &Scene::isMainScene,
+         "backgroundColor", sol::property( &Scene::getBackgroundColor, sol::resolve<void(Vector4)>(&Scene::setBackgroundColor)),
          "setBackgroundColor", sol::overload( sol::resolve<void(float, float, float)>(&Scene::setBackgroundColor), sol::resolve<void(Vector4)>(&Scene::setBackgroundColor) ),
          "getBackgroundColor", &Scene::getBackgroundColor,
+         "shadowsPCF", sol::property(&Scene::isShadowsPCF, &Scene::setShadowsPCF),
          "setShadowsPCF", &Scene::setShadowsPCF,
          "isShadowsPCF", &Scene::isShadowsPCF,
-         "setFog", &Scene::setFog,
+         "fogEnabled", sol::property(&Scene::isFogEnabled, &Scene::setFogEnabled),
+         "setFogEnabled", &Scene::setFogEnabled,
          "isFogEnabled", &Scene::isFogEnabled,
+         "fog", sol::property(&Scene::getFog),
          "getFog", &Scene::getFog,
-         "setAmbientLight", &Scene::setAmbientLight,
-         "getAmbientFactor", &Scene::getAmbientFactor,
-         "getAmbientLight", &Scene::getAmbientLight,
-         "isEnabledSceneAmbientLight", &Scene::isEnabledSceneAmbientLight,
-         "disableSceneAmbientLight", &Scene::disableSceneAmbientLight,
+         "ambientLightColor", sol::property(&Scene::getAmbientLightColor, sol::resolve<void(Vector3)>(&Scene::setAmbientLight)),
+         "setAmbientLight", sol::overload( sol::resolve<void(float)>(&Scene::setAmbientLight), sol::resolve<void(Vector3)>(&Scene::setAmbientLight), sol::resolve<void(float, Vector3)>(&Scene::setAmbientLight) ),
+         "getAmbientLightColor", &Scene::getAmbientLightColor,
+         "ambientLightFactor", sol::property(&Scene::getAmbientLightFactor, sol::resolve<void(float)>(&Scene::setAmbientLight)),
+         "getAmbientLightFactor", &Scene::getAmbientLightFactor,
+         "sceneAmbientLightEnabled", sol::property(&Scene::isSceneAmbientLightEnabled, &Scene::setSceneAmbientLightEnabled),
+         "isSceneAmbientLightEnabled", &Scene::isSceneAmbientLightEnabled,
+         "setSceneAmbientLightEnabled", &Scene::setSceneAmbientLightEnabled,
+         "renderToTexture", sol::property(&Scene::isRenderToTexture, &Scene::setRenderToTexture),
          "setRenderToTexture", &Scene::setRenderToTexture,
          "isRenderToTexture", &Scene::isRenderToTexture,
          "getFramebuffer", &Scene::getFramebuffer,
@@ -434,34 +427,6 @@ void LuaBinding::registerClasses(lua_State *L){
          "moveChildToLast", &Scene::moveChildToLast
          );
 
-    lua.new_usertype<Vector2>("Vector2",
-        sol::constructors<Vector2(float, float)>(),
-        "x", &Vector2::x,
-        "y", &Vector2::y
-        );
-
-    lua.new_usertype<Vector3>("Vector3",
-        sol::constructors<Vector3(float, float, float)>(),
-        "x", &Vector3::x,
-        "y", &Vector3::y,
-        "z", &Vector3::z
-        );
-
-    lua.new_usertype<Vector4>("Vector4",
-        sol::constructors<Vector4(float, float, float, float)>(),
-        "x", &Vector4::x,
-        "y", &Vector4::y,
-        "z", &Vector4::z,
-        "w", &Vector4::w
-        );
-
-    lua.new_usertype<Rect>("Rect",
-        sol::constructors<Rect(), Rect(float, float, float, float)>(),
-        "x", sol::property(&Rect::getX),
-        "y", sol::property(&Rect::getY),
-        "width", sol::property(&Rect::getWidth),
-        "height", sol::property(&Rect::getHeight)
-        );
-
     registerObjectClasses(L);
+    registerMathClasses(L);
 }

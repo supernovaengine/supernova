@@ -96,15 +96,19 @@ namespace Supernova{
 		void setShadowsPCF(bool shadowsPCF);
 		bool isShadowsPCF();
 
-		void setFog(bool hasFog);
+		void setFogEnabled(bool hasFog);
 		bool isFogEnabled();
 		Fog& getFog();
 
-		void setAmbientLight(float ambientFactor, Vector3 ambientLight = Vector3(1.0, 1.0, 1.0));
-		float getAmbientFactor();
-		Vector3 getAmbientLight();
-		bool isEnabledSceneAmbientLight();
-		void disableSceneAmbientLight();
+		void setAmbientLight(float ambientFactor, Vector3 ambientLight);
+		void setAmbientLight(float ambientFactor);
+		void setAmbientLight(Vector3 ambientLight);
+
+		float getAmbientLightFactor();
+		Vector3 getAmbientLightColor();
+
+		bool isSceneAmbientLightEnabled();
+		void setSceneAmbientLightEnabled(bool hasSceneAmbientLight);
 
 		void setRenderToTexture(bool renderToTexture);
 		bool isRenderToTexture();

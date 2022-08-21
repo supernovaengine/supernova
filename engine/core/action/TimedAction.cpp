@@ -29,7 +29,7 @@ void TimedAction::setFunction(std::function<float(float)> function){
     timedAction.function = function;
 }
 
-void TimedAction::setFunction(sol::function function){
+void TimedAction::setFunction(sol::protected_function function){
     TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
 
     timedAction.function.remove();

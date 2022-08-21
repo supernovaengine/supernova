@@ -7,6 +7,8 @@
 
 #include <functional>
 #include <string>
+#include "Log.h"
+#include "LuaBinding.h"
 #include "sol/sol.hpp"
 
 namespace Supernova {
@@ -20,7 +22,7 @@ namespace Supernova {
     private:
 
         std::function<Ret(Args...)> cFunction;
-        sol::function luaFunction;
+        sol::protected_function luaFunction;
 
     public:
 
@@ -37,7 +39,7 @@ namespace Supernova {
             this->set(function);
         }
 
-        Function(sol::function function){
+        Function(sol::protected_function function){
             this->set(function);
         }
 
@@ -48,7 +50,7 @@ namespace Supernova {
             return *this;
         }
 
-        Function& operator = (sol::function function){
+        Function& operator = (sol::protected_function function){
             this->set(function);
 
             return *this;
@@ -60,7 +62,7 @@ namespace Supernova {
             return *this;
         }
 
-        void set(sol::function function) {
+        void set(sol::protected_function function) {
             luaFunction = function;
         }
 
@@ -78,7 +80,15 @@ namespace Supernova {
             if (cFunction)
                 return cFunction(args...);
 
-            return (Ret)luaFunction(args...);
+            auto luafunc = luaFunction(args...);
+            if (!luafunc.valid()) {
+                sol::error err = luafunc;
+                Log::Error("Lua Error: %s", err.what());
+            }else{
+                return (Ret)luafunc;
+            }
+
+            return Ret();
         }
 
         Ret operator()(Args... args) {

@@ -26,16 +26,22 @@ namespace Supernova {
         static int moduleLoader(lua_State *L);
         static int handleLuaError(lua_State* L);
         static void registerClasses(lua_State *L);
-        static void registerObjectClasses(lua_State *L);
 
-        static void bind();
+        // in binding directory
+        static void registerObjectClasses(lua_State *L);
+        static void registerMathClasses(lua_State *L);
+
+        static void init();
 
     public:
         LuaBinding();
         virtual ~LuaBinding();
         
         static lua_State* getLuaState();
+        
+        // old lua function call
         static void luaCallback(int nargs, int nresults, int msgh);
+
         static void stackDump (lua_State *L);
         
     };
