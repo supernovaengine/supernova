@@ -26,9 +26,12 @@ namespace Supernova {
                 float fEntry03, float fEntry13, float fEntry23, float fEntry33);
         Matrix4(const float **matrix);
 
+        std::string toString() const;
+
         Matrix4 &operator=(const Matrix4 &);
         Matrix4  operator*(const Matrix4 &) const;
         Matrix4  operator+(const Matrix4 &) const;
+        Matrix4  operator-(const Matrix4 &) const;
         Matrix4 &operator*=(const Matrix4 &);
         Vector3 operator*(const Vector3 &) const;
         Vector4 operator*(const Vector4 &) const;

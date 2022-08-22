@@ -4,7 +4,7 @@
 
 #include "Camera.h"
 
-#include "math/Angle.h"
+#include "util/Angle.h"
 #include "Engine.h"
 
 using namespace Supernova;

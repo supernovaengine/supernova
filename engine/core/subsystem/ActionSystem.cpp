@@ -6,7 +6,7 @@
 
 #include "Scene.h"
 #include "util/Color.h"
-#include "math/Angle.h"
+#include "util/Angle.h"
 
 using namespace Supernova;
 

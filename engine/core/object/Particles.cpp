@@ -3,7 +3,7 @@
 //
 
 #include "Particles.h"
-#include "math/Angle.h"
+#include "util/Angle.h"
 
 using namespace Supernova;
 

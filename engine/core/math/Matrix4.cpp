@@ -1,6 +1,6 @@
 #include "Matrix4.h"
 
-#include "Angle.h"
+#include "util/Angle.h"
 #include <cmath>
 #include <cassert>
 #include <string.h>
@@ -10,21 +10,18 @@
 
 using namespace Supernova;
 
-Matrix4::Matrix4()
-{
+Matrix4::Matrix4(){
     identity();
 }
 
-Matrix4::Matrix4(const Matrix4 &matrix)
-{
+Matrix4::Matrix4(const Matrix4 &matrix){
     (*this) = matrix;
 }
 
 Matrix4::Matrix4 (float fEntry00, float fEntry10, float fEntry20, float fEntry30,
                 float fEntry01, float fEntry11, float fEntry21, float fEntry31,
                 float fEntry02, float fEntry12, float fEntry22, float fEntry32,
-                float fEntry03, float fEntry13, float fEntry23, float fEntry33)
-{
+                float fEntry03, float fEntry13, float fEntry23, float fEntry33){
     matrix[0][0] = fEntry00;
     matrix[0][1] = fEntry01;
     matrix[0][2] = fEntry02;
@@ -43,21 +40,18 @@ Matrix4::Matrix4 (float fEntry00, float fEntry10, float fEntry20, float fEntry30
     matrix[3][3] = fEntry33;
 }
 
-Matrix4::Matrix4(const float **matrix)
-{
+Matrix4::Matrix4(const float **matrix){
     std::copy(&matrix[0][0], &matrix[0][0]+16,&this->matrix[0][0]);
 }
 
 
-Matrix4& Matrix4::operator=(const Matrix4 &m)
-{
+Matrix4& Matrix4::operator=(const Matrix4 &m){
     memcpy(this->matrix,m.matrix,sizeof(matrix));
 
     return *this;
 }
 
-Matrix4 Matrix4::operator *(const Matrix4 &m) const
-{
+Matrix4 Matrix4::operator *(const Matrix4 &m) const{
     Matrix4 prod;
 
     for (int c=0;c<4;c++)
@@ -71,8 +65,16 @@ Matrix4 Matrix4::operator *(const Matrix4 &m) const
     return prod;
 }
 
-Matrix4 Matrix4::operator +(const Matrix4 &m) const
-{
+std::string Matrix4::toString() const{
+    return "Matrix4("+
+        std::to_string(matrix[0][0]) + ", " + std::to_string(matrix[0][1]) + ", " + std::to_string(matrix[0][2]) + ", " + std::to_string(matrix[0][3]) + ", " +
+        std::to_string(matrix[1][0]) + ", " + std::to_string(matrix[1][1]) + ", " + std::to_string(matrix[1][2]) + ", " + std::to_string(matrix[1][3]) + ", " +
+        std::to_string(matrix[2][0]) + ", " + std::to_string(matrix[2][1]) + ", " + std::to_string(matrix[2][2]) + ", " + std::to_string(matrix[2][3]) + ", " +
+        std::to_string(matrix[3][0]) + ", " + std::to_string(matrix[3][1]) + ", " + std::to_string(matrix[3][2]) + ", " + std::to_string(matrix[3][3]) +
+        ")"; 
+}
+
+Matrix4 Matrix4::operator +(const Matrix4 &m) const{
     Matrix4 prod;
     Vector4 resul;
     int i;
@@ -86,14 +88,26 @@ Matrix4 Matrix4::operator +(const Matrix4 &m) const
     return prod;
 }
 
-Matrix4& Matrix4::operator*=(const Matrix4 &m)
-{
+Matrix4 Matrix4::operator -(const Matrix4 &m) const{
+    Matrix4 prod;
+    Vector4 resul;
+    int i;
+    for(i=0; i<4; ++i){
+        resul = row(i) - m.row(i);
+        prod.set(0, i, resul.x);
+        prod.set(1, i, resul.y);
+        prod.set(2, i, resul.z);
+        prod.set(3, i, resul.w);
+    }
+    return prod;
+}
+
+Matrix4& Matrix4::operator*=(const Matrix4 &m){
 
     return (*this) = (*this)*m;
 }
 
-Vector3 Matrix4::operator*(const Vector3 &v) const
-{
+Vector3 Matrix4::operator*(const Vector3 &v) const{
     float prod[4] = { 0,0,0,0 };
 
     for (int r=0;r<4;r++)
@@ -109,8 +123,7 @@ Vector3 Matrix4::operator*(const Vector3 &v) const
     return Vector3(prod[0]*div,prod[1]*div,prod[2]*div);
 }
 
-Vector4 Matrix4::operator*(const Vector4 &v) const
-{
+Vector4 Matrix4::operator*(const Vector4 &v) const{
 
     float prod[4] = { 0,0,0,0 };
 
@@ -124,57 +137,46 @@ Vector4 Matrix4::operator*(const Vector4 &v) const
     return Vector4(prod[0] ,prod[1] ,prod[2], prod[3]);
 }
 
-const float* Matrix4::operator[](int iCol) const
-{
+const float* Matrix4::operator[](int iCol) const{
     assert( iCol < 4 );
     return matrix[iCol];
 }
 
-float* Matrix4::operator[](int iCol)
-{
+float* Matrix4::operator[](int iCol){
     assert( iCol < 4 );
     return matrix[iCol];
 }
 
-bool Matrix4::operator==(const Matrix4 &m) const
-{
+bool Matrix4::operator==(const Matrix4 &m) const{
     return !memcmp(matrix,m.matrix,sizeof(matrix));
 }
 
-bool Matrix4::operator!=(const Matrix4 &m) const
-{
+bool Matrix4::operator!=(const Matrix4 &m) const{
     return memcmp(matrix,m.matrix,sizeof(matrix))!=0;
 }
 
-Matrix4::operator float *()
-{
+Matrix4::operator float *(){
     return (float*)matrix;
 }
 
-
-Matrix4::operator const float *() const
-{
+Matrix4::operator const float *() const{
      return (float*)matrix;
 }
 
-void Matrix4::set(const int col,const int row,const float val)
-{
+void Matrix4::set(const int col,const int row,const float val){
     matrix[col][row] = val;
 }
 
-float Matrix4::get(const int col,const int row) const
-{
+float Matrix4::get(const int col,const int row) const{
     return matrix[col][row];
 }
 
 
-Vector4 Matrix4::row(const unsigned int row) const
-{
+Vector4 Matrix4::row(const unsigned int row) const{
     return Vector4(matrix[0][row], matrix[1][row], matrix[2][row], matrix[3][row]);
 }
 
-Vector4 Matrix4::column(const unsigned int column) const
-{
+Vector4 Matrix4::column(const unsigned int column) const{
 
     return Vector4(matrix[column][0], matrix[column][1], matrix[column][2], matrix[column][3]);
 }

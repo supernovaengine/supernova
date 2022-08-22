@@ -15,7 +15,11 @@
 #include "Vector4.h"
 #include "Matrix3.h"
 #include "Matrix4.h"
+#include "Quaternion.h"
 #include "Rect.h"
+#include "Ray.h"
+#include "Plane.h"
+#include "AlignedBox.h"
 
 using namespace Supernova;
 
@@ -128,6 +132,109 @@ void LuaBinding::registerMathClasses(lua_State *L){
         sol::meta_function::equal_to, &Matrix3::operator==,
         sol::meta_function::subtraction, sol::resolve<Matrix3(const Matrix3&) const>(&Matrix3::operator-),
         sol::meta_function::addition, sol::resolve<Matrix3(const Matrix3&) const>(&Matrix3::operator+),
-        sol::meta_function::multiplication, sol::overload( sol::resolve<Matrix3(const Matrix3&) const>(&Matrix3::operator*), sol::resolve<Vector3(const Vector3 &) const>(&Matrix3::operator*) )
+        sol::meta_function::multiplication, sol::overload( sol::resolve<Matrix3(const Matrix3&) const>(&Matrix3::operator*), sol::resolve<Vector3(const Vector3 &) const>(&Matrix3::operator*) ),
+        "row", &Matrix3::row,
+        "column", &Matrix3::column,
+        "set", &Matrix3::set,
+        "get", &Matrix3::get,
+        "setRow", &Matrix3::setRow,
+        "setColumn", &Matrix3::setColumn,
+        "identity", &Matrix3::identity,
+        "calcInverse", &Matrix3::calcInverse,
+        "inverse", &Matrix3::inverse,
+        "transpose", &Matrix3::transpose,
+        "rotateMatrix", sol::overload( sol::resolve<Matrix3(const float, const Vector3 &)>(&Matrix3::rotateMatrix), sol::resolve<Matrix3(const float, const float)>(&Matrix3::rotateMatrix) ),
+        "rotateXMatrix", &Matrix3::rotateXMatrix,
+        "rotateYMatrix", &Matrix3::rotateYMatrix,
+        "rotateZMatrix", &Matrix3::rotateZMatrix,
+        "scaleMatrix", sol::overload( sol::resolve<Matrix3(const float)>(&Matrix3::scaleMatrix), sol::resolve<Matrix3(const Vector3&)>(&Matrix3::scaleMatrix) )
         );
+
+    lua.new_usertype<Matrix4>("Matrix4",
+        sol::constructors<Matrix4(), Matrix4(float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float)>(),
+        sol::meta_function::to_string, &Matrix4::toString,
+        sol::meta_function::equal_to, &Matrix4::operator==,
+        sol::meta_function::subtraction, sol::resolve<Matrix4(const Matrix4&) const>(&Matrix4::operator-),
+        sol::meta_function::addition, sol::resolve<Matrix4(const Matrix4&) const>(&Matrix4::operator+),
+        sol::meta_function::multiplication, sol::overload( sol::resolve<Matrix4(const Matrix4&) const>(&Matrix4::operator*), sol::resolve<Vector3(const Vector3 &) const>(&Matrix4::operator*), sol::resolve<Vector4(const Vector4 &) const>(&Matrix4::operator*) ),
+        "row", &Matrix4::row,
+        "column", &Matrix4::column,
+        "set", &Matrix4::set,
+        "get", &Matrix4::get,
+        "setRow", &Matrix4::setRow,
+        "setColumn", &Matrix4::setColumn,
+        "identity", &Matrix4::identity,
+        "translateInPlace", &Matrix4::translateInPlace,
+        "inverse", &Matrix4::inverse,
+        "transpose", &Matrix4::transpose,
+        "determinant", &Matrix4::determinant,
+        "translateMatrix", sol::overload( sol::resolve<Matrix4(float, float, float)>(&Matrix4::translateMatrix), sol::resolve<Matrix4(const Vector3&)>(&Matrix4::translateMatrix) ),
+        "rotateMatrix", sol::overload( sol::resolve<Matrix4(const float, const Vector3 &)>(&Matrix4::rotateMatrix), sol::resolve<Matrix4(const float, const float)>(&Matrix4::rotateMatrix) ),
+        "rotateXMatrix", &Matrix4::rotateXMatrix,
+        "rotateYMatrix", &Matrix4::rotateYMatrix,
+        "rotateZMatrix", &Matrix4::rotateZMatrix,
+        "scaleMatrix", sol::overload( sol::resolve<Matrix4(const float)>(&Matrix4::scaleMatrix), sol::resolve<Matrix4(const Vector3&)>(&Matrix4::scaleMatrix) ),
+        "lookAtMatrix", &Matrix4::lookAtMatrix,
+        "frustumMatrix", &Matrix4::frustumMatrix,
+        "orthoMatrix", &Matrix4::orthoMatrix,
+        "perspectiveMatrix", &Matrix4::perspectiveMatrix,
+        "decompose", &Matrix4::decompose
+        );
+
+    lua.new_usertype<Quaternion>("Quaternion",
+        sol::constructors<Quaternion(), Quaternion(float, float, float, float)>(),
+        sol::meta_function::to_string, &Quaternion::toString,
+        sol::meta_function::index, [](Quaternion& q, const int index) { if (index < 0 or index > 2) return 0.0f; return q[index]; },
+        sol::meta_function::new_index, [](Quaternion& q, const int index, double x) { if (index < 0 or index > 2) return; q[index] = x; },
+        sol::meta_function::equal_to, &Quaternion::operator==,
+        sol::meta_function::subtraction, sol::resolve<Quaternion(const Quaternion&) const>(&Quaternion::operator-),
+        sol::meta_function::addition, sol::resolve<Quaternion(const Quaternion&) const>(&Quaternion::operator+),
+        sol::meta_function::multiplication, sol::overload( sol::resolve<Quaternion(const Quaternion&) const>(&Quaternion::operator*), sol::resolve<Quaternion(float) const>(&Quaternion::operator*) ),
+        sol::meta_function::unary_minus, sol::resolve<Quaternion() const>(&Quaternion::operator-),
+        "fromAxes", sol::resolve<void(const Vector3&, const Vector3&, const Vector3&)>(&Quaternion::fromAxes),
+        "fromRotationMatrix", &Quaternion::fromRotationMatrix,
+        "getRotationMatrix", &Quaternion::getRotationMatrix,
+        "fromAngle", &Quaternion::fromAngle,
+        "fromAngleAxis", &Quaternion::fromAngleAxis,
+        "xAxis", &Quaternion::xAxis,
+        "yAxis", &Quaternion::yAxis,
+        "zAxis", &Quaternion::zAxis,
+        "dot", &Quaternion::dot,
+        "norm", &Quaternion::norm,
+        "inverse", &Quaternion::inverse,
+        "unitInverse", &Quaternion::unitInverse,
+        "exp", &Quaternion::exp,
+        "log", &Quaternion::log,
+        "slerp", &Quaternion::slerp,
+        "slerpExtraSpins", &Quaternion::slerpExtraSpins,
+        "squad", &Quaternion::squad,
+        "nlerp", &Quaternion::nlerp,
+        "normalise", &Quaternion::normalise,
+        "getRoll", &Quaternion::getRoll,
+        "getPitch", &Quaternion::getPitch,
+        "getYaw", &Quaternion::getYaw
+        );
+
+    lua.new_usertype<Plane>("Plane",
+        sol::constructors<Plane(), Plane(float, float, float, float)>()
+        );
+
+    lua.new_usertype<AlignedBox>("AlignedBox",
+        sol::constructors<AlignedBox(), AlignedBox(const Vector3&, const Vector3&), AlignedBox(float, float, float, float, float, float)>()
+        );
+
+    lua.new_usertype<Ray>("Ray",
+        sol::constructors<Ray(), Vector4(Vector3, Vector3)>(),
+        "origin", sol::property(&Ray::getOrigin, &Ray::setOrigin),
+        "setOrigin", &Ray::setOrigin,
+        "getOrigin", &Ray::getOrigin,
+        "direction", sol::property(&Ray::getDirection, &Ray::setDirection),
+        "setDirection", &Ray::setDirection,
+        "getDirection", &Ray::getDirection,
+        "point", sol::property(&Ray::getPoint, &Ray::setOrigin),
+        "getPoint", &Ray::getPoint,
+        "intersects", sol::overload( sol::resolve<float(Plane)>(&Ray::intersects), sol::resolve<float(AlignedBox)>(&Ray::intersects) ),
+        "intersectionPoint", sol::overload( sol::resolve<Vector3(Plane)>(&Ray::intersectionPoint), sol::resolve<Vector3(AlignedBox)>(&Ray::intersectionPoint) )
+        );
+
 }

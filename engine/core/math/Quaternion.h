@@ -20,7 +20,7 @@ namespace Supernova {
         Quaternion(const Vector3* akAxis);
         Quaternion(const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);
 
-        void swap(Quaternion& other);
+        std::string toString() const;
 
         float operator [] ( const size_t i ) const;
         float& operator [] ( const size_t i );
@@ -42,6 +42,8 @@ namespace Supernova {
         Vector3 operator * (const Vector3& v) const;
         const Quaternion& operator + () const;
         Quaternion operator - () const;
+
+        void swap(Quaternion& other);
 
         void fromAxes (const Vector3* akAxis);
         void fromAxes (const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);

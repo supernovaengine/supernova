@@ -344,7 +344,7 @@ void onKeyDown(int key, bool repeat, int mods){
 #include "SkyBox.h"
 #include "Light.h"
 #include "Sprite.h"
-#include "math/Angle.h"
+#include "util/Angle.h"
 #include "Text.h"
 #include "Image.h"
 #include "Button.h"

@@ -1,6 +1,6 @@
 #include "Matrix3.h"
 
-#include "math/Angle.h"
+#include "util/Angle.h"
 #include <string.h>
 #include <algorithm>
 #include <assert.h>

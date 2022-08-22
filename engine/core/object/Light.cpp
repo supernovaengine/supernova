@@ -4,7 +4,7 @@
 
 #include "Light.h"
 
-#include "math/Angle.h"
+#include "util/Angle.h"
 #include "util/Color.h"
 #include <math.h>
 

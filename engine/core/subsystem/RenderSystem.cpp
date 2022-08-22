@@ -14,7 +14,7 @@
 #include "pool/ShaderPool.h"
 #include "pool/TexturePool.h"
 #include "math/Vector3.h"
-#include "math/Angle.h"
+#include "util/Angle.h"
 #include "buffer/ExternalBuffer.h"
 #include "math/AlignedBox.h"
 #include <memory>

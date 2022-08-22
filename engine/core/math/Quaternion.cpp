@@ -1,6 +1,6 @@
 #include "Quaternion.h"
 
-#include "Angle.h"
+#include "util/Angle.h"
 #include <algorithm>
 #include <assert.h>
 #define _USE_MATH_DEFINES
@@ -33,12 +33,8 @@ Quaternion::Quaternion(const Vector3& xaxis, const Vector3& yaxis, const Vector3
     this->fromAxes(xaxis, yaxis, zaxis);
 }
 
-void Quaternion::swap(Quaternion& other)
-{
-    std::swap(w, other.w);
-    std::swap(x, other.x);
-    std::swap(y, other.y);
-    std::swap(z, other.z);
+std::string Quaternion::toString() const{
+    return "Quaternion(" + std::to_string(w) + ", " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")"; 
 }
 
 float Quaternion::operator [] ( const size_t i ) const
@@ -153,6 +149,13 @@ const Quaternion& Quaternion::operator + () const{
 
 Quaternion Quaternion::operator - () const{
     return Quaternion(-w, -x, -y, -z);
+}
+
+void Quaternion::swap(Quaternion& other){
+    std::swap(w, other.w);
+    std::swap(x, other.x);
+    std::swap(y, other.y);
+    std::swap(z, other.z);
 }
 
 void Quaternion::fromAxes (const Vector3* akAxis){
