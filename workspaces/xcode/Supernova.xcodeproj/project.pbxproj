@@ -7,6 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7105A55828B305910092EA05 /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55628B305910092EA05 /* Color.cpp */; };
+		7105A55928B305910092EA05 /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55628B305910092EA05 /* Color.cpp */; };
+		7105A55A28B305910092EA05 /* Color.h in Headers */ = {isa = PBXBuildFile; fileRef = 7105A55728B305910092EA05 /* Color.h */; };
+		7105A56228B305B20092EA05 /* ObjectClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55C28B305B20092EA05 /* ObjectClassesLua.cpp */; };
+		7105A56328B305B20092EA05 /* ObjectClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55C28B305B20092EA05 /* ObjectClassesLua.cpp */; };
+		7105A56428B305B20092EA05 /* CoreClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55D28B305B20092EA05 /* CoreClassesLua.cpp */; };
+		7105A56528B305B20092EA05 /* CoreClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55D28B305B20092EA05 /* CoreClassesLua.cpp */; };
+		7105A56628B305B20092EA05 /* MathClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55E28B305B20092EA05 /* MathClassesLua.cpp */; };
+		7105A56728B305B20092EA05 /* MathClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55E28B305B20092EA05 /* MathClassesLua.cpp */; };
+		7105A56828B305B20092EA05 /* ECSClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55F28B305B20092EA05 /* ECSClassesLua.cpp */; };
+		7105A56928B305B20092EA05 /* ECSClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55F28B305B20092EA05 /* ECSClassesLua.cpp */; };
+		7105A56A28B305B20092EA05 /* UtilClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A56028B305B20092EA05 /* UtilClassesLua.cpp */; };
+		7105A56B28B305B20092EA05 /* UtilClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A56028B305B20092EA05 /* UtilClassesLua.cpp */; };
+		7105A56C28B305B20092EA05 /* IOClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A56128B305B20092EA05 /* IOClassesLua.cpp */; };
+		7105A56D28B305B20092EA05 /* IOClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A56128B305B20092EA05 /* IOClassesLua.cpp */; };
 		710AD65825B604BE00A7B12F /* lvm.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE606F25B1C55B006D6E02 /* lvm.h */; };
 		710AD65925B604BE00A7B12F /* ldo.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE605B25B1C55B006D6E02 /* ldo.h */; };
 		710AD65A25B604BE00A7B12F /* llex.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE605E25B1C55B006D6E02 /* llex.h */; };
@@ -432,9 +447,6 @@
 		71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */; };
 		71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */; };
 		71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */; };
-		71F97AAF262D1D8000CD6F2B /* Color.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97AAD262D1D8000CD6F2B /* Color.h */; };
-		71F97AB0262D1D8000CD6F2B /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97AAE262D1D8000CD6F2B /* Color.cpp */; };
-		71F97AB1262D1D8000CD6F2B /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97AAE262D1D8000CD6F2B /* Color.cpp */; };
 		71F97B21262D1E2B00CD6F2B /* tiny_gltf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */; };
 		71F97B22262D1E2B00CD6F2B /* tiny_gltf.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */; };
 		71F97B43262D1E6500CD6F2B /* libstb-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BE612625B1D088006D6E02 /* libstb-macos.a */; };
@@ -559,6 +571,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7105A55628B305910092EA05 /* Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Color.cpp; sourceTree = "<group>"; };
+		7105A55728B305910092EA05 /* Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
+		7105A55C28B305B20092EA05 /* ObjectClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectClassesLua.cpp; sourceTree = "<group>"; };
+		7105A55D28B305B20092EA05 /* CoreClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CoreClassesLua.cpp; sourceTree = "<group>"; };
+		7105A55E28B305B20092EA05 /* MathClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MathClassesLua.cpp; sourceTree = "<group>"; };
+		7105A55F28B305B20092EA05 /* ECSClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ECSClassesLua.cpp; sourceTree = "<group>"; };
+		7105A56028B305B20092EA05 /* UtilClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UtilClassesLua.cpp; sourceTree = "<group>"; };
+		7105A56128B305B20092EA05 /* IOClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOClassesLua.cpp; sourceTree = "<group>"; };
 		710AD69A25B604BE00A7B12F /* liblua-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "liblua-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		710AD6E325B6053400A7B12F /* libstb-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libstb-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		710AD75025B733E100A7B12F /* EngineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EngineView.h; sourceTree = "<group>"; };
@@ -910,8 +930,6 @@
 		71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyframeTracksComponent.h; sourceTree = "<group>"; };
 		71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaneTerrain.cpp; sourceTree = "<group>"; };
 		71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaneTerrain.h; sourceTree = "<group>"; };
-		71F97AAD262D1D8000CD6F2B /* Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
-		71F97AAE262D1D8000CD6F2B /* Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Color.cpp; sourceTree = "<group>"; };
 		71F97AD2262D1DF200CD6F2B /* libtinygltf-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinygltf-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_gltf.cc; sourceTree = "<group>"; };
 		71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_gltf.h; sourceTree = "<group>"; };
@@ -1035,6 +1053,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7105A55B28B305B20092EA05 /* binding */ = {
+			isa = PBXGroup;
+			children = (
+				7105A55D28B305B20092EA05 /* CoreClassesLua.cpp */,
+				7105A55F28B305B20092EA05 /* ECSClassesLua.cpp */,
+				7105A56128B305B20092EA05 /* IOClassesLua.cpp */,
+				7105A55E28B305B20092EA05 /* MathClassesLua.cpp */,
+				7105A55C28B305B20092EA05 /* ObjectClassesLua.cpp */,
+				7105A56028B305B20092EA05 /* UtilClassesLua.cpp */,
+			);
+			path = binding;
+			sourceTree = "<group>";
+		};
 		713D831D259D3F8F00567F9F /* macos */ = {
 			isa = PBXGroup;
 			children = (
@@ -1179,6 +1210,8 @@
 			children = (
 				71165BBD282981BE00CF79C1 /* Base64.cpp */,
 				71165BBE282981BE00CF79C1 /* Base64.h */,
+				7105A55628B305910092EA05 /* Color.cpp */,
+				7105A55728B305910092EA05 /* Color.h */,
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
 				71451BF2270CA3EA00712643 /* FrameData.h */,
 				71BE620F25B1DB37006D6E02 /* Function.h */,
@@ -1276,8 +1309,6 @@
 				7162FC4E25962A0E0075B97D /* AlignedBox.h */,
 				7162FC5E25962A0E0075B97D /* Angle.cpp */,
 				7162FC5325962A0E0075B97D /* Angle.h */,
-				71F97AAE262D1D8000CD6F2B /* Color.cpp */,
-				71F97AAD262D1D8000CD6F2B /* Color.h */,
 				7162FC5125962A0E0075B97D /* Matrix3.cpp */,
 				7162FC5B25962A0E0075B97D /* Matrix3.h */,
 				7162FC4D25962A0E0075B97D /* Matrix4.cpp */,
@@ -1614,6 +1645,7 @@
 		71BE622C25B1DB9D006D6E02 /* script */ = {
 			isa = PBXGroup;
 			children = (
+				7105A55B28B305B20092EA05 /* binding */,
 				71BE622D25B1DB9D006D6E02 /* LuaBinding.cpp */,
 				71BE623125B1DB9D006D6E02 /* LuaBinding.h */,
 				71BE622F25B1DB9D006D6E02 /* LuaScript.cpp */,
@@ -1760,7 +1792,6 @@
 				718FDDF72837CA9A00AF314C /* glsl100.h in Headers */,
 				71E54516284D5BE000C68FAB /* RotateTracksComponent.h in Headers */,
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
-				71F97AAF262D1D8000CD6F2B /* Color.h in Headers */,
 				71E544FE284D5BB700C68FAB /* Animation.h in Headers */,
 				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
 				71ABBD4127A879B9001CE3AF /* ButtonComponent.h in Headers */,
@@ -1801,6 +1832,7 @@
 				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
 				717D9B482733788C002C0803 /* forward.hpp in Headers */,
 				71BE622225B1DB83006D6E02 /* TextureData.h in Headers */,
+				7105A55A28B305910092EA05 /* Color.h in Headers */,
 				71ABBD342783C8BB001CE3AF /* Image.h in Headers */,
 				71ABBD13277A3166001CE3AF /* TextComponent.h in Headers */,
 				71E5450C284D5BB700C68FAB /* ScaleTracks.h in Headers */,
@@ -2326,13 +2358,14 @@
 			files = (
 				713D8304259D34F900567F9F /* Ray.cpp in Sources */,
 				713E581027BA9CE400376680 /* Polygon.cpp in Sources */,
-				71F97AB1262D1D8000CD6F2B /* Color.cpp in Sources */,
 				713D8292259D307E00567F9F /* Log.cpp in Sources */,
+				7105A56928B305B20092EA05 /* ECSClassesLua.cpp in Sources */,
 				71451BDD270CA17F00712643 /* RotationAction.cpp in Sources */,
 				71ABBD0F277A313C001CE3AF /* AlphaAction.cpp in Sources */,
 				71BE624225B1DB9E006D6E02 /* TexturePool.cpp in Sources */,
 				713D8293259D307F00567F9F /* Scene.cpp in Sources */,
 				717D9B3E2733783D002C0803 /* ParticlesAnimation.cpp in Sources */,
+				7105A56D28B305B20092EA05 /* IOClassesLua.cpp in Sources */,
 				713D8294259D307F00567F9F /* Data.cpp in Sources */,
 				71451BBF270CA16200712643 /* ActionSystem.cpp in Sources */,
 				71BE623D25B1DB9E006D6E02 /* LuaScript.cpp in Sources */,
@@ -2341,6 +2374,7 @@
 				71CC839626B8C4D800EEBB93 /* Light.cpp in Sources */,
 				714BBF7527148B85004A15EE /* Particles.cpp in Sources */,
 				713D8295259D307F00567F9F /* UserSettings.cpp in Sources */,
+				7105A56B28B305B20092EA05 /* UtilClassesLua.cpp in Sources */,
 				71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
 				713D8296259D307F00567F9F /* File.cpp in Sources */,
 				71ABBD2A277A3210001CE3AF /* STBText.cpp in Sources */,
@@ -2361,6 +2395,7 @@
 				713D829E259D307F00567F9F /* Vector3.cpp in Sources */,
 				7128D10125C2354A00965B51 /* SystemRender.cpp in Sources */,
 				713D829F259D307F00567F9F /* Vector2.cpp in Sources */,
+				7105A56328B305B20092EA05 /* ObjectClassesLua.cpp in Sources */,
 				713D82A0259D307F00567F9F /* Matrix4.cpp in Sources */,
 				713D82A1259D307F00567F9F /* Matrix3.cpp in Sources */,
 				713D82A2259D307F00567F9F /* Rect.cpp in Sources */,
@@ -2368,6 +2403,7 @@
 				713D82A4259D307F00567F9F /* AlignedBox.cpp in Sources */,
 				713E580E27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AF25BB18DC00965B51 /* StringUtils.cpp in Sources */,
+				7105A56728B305B20092EA05 /* MathClassesLua.cpp in Sources */,
 				713D82A5259D307F00567F9F /* Plane.cpp in Sources */,
 				71CC83A326B8C54A00EEBB93 /* SBSReader.cpp in Sources */,
 				713D82A6259D307F00567F9F /* Angle.cpp in Sources */,
@@ -2392,6 +2428,7 @@
 				713D82AF259D307F00567F9F /* InterleavedBuffer.cpp in Sources */,
 				71E54500284D5BB700C68FAB /* Animation.cpp in Sources */,
 				7128D11F25C2356200965B51 /* SokolSystem.cpp in Sources */,
+				7105A56528B305B20092EA05 /* CoreClassesLua.cpp in Sources */,
 				71BE620225B1DB22006D6E02 /* System.cpp in Sources */,
 				7170A3DA2818A8A30003E965 /* SkyBox.cpp in Sources */,
 				713D82B0259D307F00567F9F /* Attribute.cpp in Sources */,
@@ -2400,6 +2437,7 @@
 				71E54504284D5BB700C68FAB /* ScaleTracks.cpp in Sources */,
 				7170A3D62818A8A30003E965 /* Bone.cpp in Sources */,
 				713D82B2259D307F00567F9F /* IndexBuffer.cpp in Sources */,
+				7105A55928B305910092EA05 /* Color.cpp in Sources */,
 				713D82B3259D307F00567F9F /* SokolObject.cpp in Sources */,
 				713D82B4259D307F00567F9F /* SokolBuffer.cpp in Sources */,
 				71CC83AC26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
@@ -2459,13 +2497,14 @@
 			files = (
 				7162FE0C2596A5BE0075B97D /* SokolObject.cpp in Sources */,
 				713E580F27BA9CE400376680 /* Polygon.cpp in Sources */,
-				71F97AB0262D1D8000CD6F2B /* Color.cpp in Sources */,
 				7162FE0D2596A5BE0075B97D /* SokolBuffer.cpp in Sources */,
+				7105A56828B305B20092EA05 /* ECSClassesLua.cpp in Sources */,
 				71451BDC270CA17F00712643 /* RotationAction.cpp in Sources */,
 				71ABBD0E277A313C001CE3AF /* AlphaAction.cpp in Sources */,
 				71BE624125B1DB9E006D6E02 /* TexturePool.cpp in Sources */,
 				7162FE0E2596A5BE0075B97D /* SokolShader.cpp in Sources */,
 				717D9B3D2733783D002C0803 /* ParticlesAnimation.cpp in Sources */,
+				7105A56C28B305B20092EA05 /* IOClassesLua.cpp in Sources */,
 				7162FE0F2596A5BE0075B97D /* SokolTexture.cpp in Sources */,
 				71451BBE270CA16200712643 /* ActionSystem.cpp in Sources */,
 				71BE623C25B1DB9E006D6E02 /* LuaScript.cpp in Sources */,
@@ -2474,6 +2513,7 @@
 				71CC839526B8C4D800EEBB93 /* Light.cpp in Sources */,
 				714BBF7427148B85004A15EE /* Particles.cpp in Sources */,
 				7162FE102596A5BE0075B97D /* SokolScene.cpp in Sources */,
+				7105A56A28B305B20092EA05 /* UtilClassesLua.cpp in Sources */,
 				71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
 				7162FD1225963AE00075B97D /* Log.cpp in Sources */,
 				71ABBD29277A3210001CE3AF /* STBText.cpp in Sources */,
@@ -2494,6 +2534,7 @@
 				7162FD2425963AE00075B97D /* BufferRender.cpp in Sources */,
 				7128D10025C2354A00965B51 /* SystemRender.cpp in Sources */,
 				7162FD2525963AE00075B97D /* SceneRender.cpp in Sources */,
+				7105A56228B305B20092EA05 /* ObjectClassesLua.cpp in Sources */,
 				7162FD2A25963AE00075B97D /* Vector4.cpp in Sources */,
 				7162FD2B25963AE00075B97D /* Vector3.cpp in Sources */,
 				7162FD2D25963AE00075B97D /* Vector2.cpp in Sources */,
@@ -2501,6 +2542,7 @@
 				7162FD3125963AE00075B97D /* Ray.cpp in Sources */,
 				713E580D27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AE25BB18DC00965B51 /* StringUtils.cpp in Sources */,
+				7105A56628B305B20092EA05 /* MathClassesLua.cpp in Sources */,
 				7162FD3225963AE00075B97D /* Matrix3.cpp in Sources */,
 				71CC83A226B8C54A00EEBB93 /* SBSReader.cpp in Sources */,
 				7162FD3725963AE00075B97D /* Rect.cpp in Sources */,
@@ -2525,6 +2567,7 @@
 				7162FD4525963AE00075B97D /* Object.cpp in Sources */,
 				71E544FF284D5BB700C68FAB /* Animation.cpp in Sources */,
 				7128D11E25C2356200965B51 /* SokolSystem.cpp in Sources */,
+				7105A56428B305B20092EA05 /* CoreClassesLua.cpp in Sources */,
 				71BE620125B1DB22006D6E02 /* System.cpp in Sources */,
 				7170A3D92818A8A30003E965 /* SkyBox.cpp in Sources */,
 				7162FD4A25963AE00075B97D /* Texture.cpp in Sources */,
@@ -2533,6 +2576,7 @@
 				71E54503284D5BB700C68FAB /* ScaleTracks.cpp in Sources */,
 				7170A3D52818A8A30003E965 /* Bone.cpp in Sources */,
 				7162FD4F25963AE00075B97D /* Engine.cpp in Sources */,
+				7105A55828B305910092EA05 /* Color.cpp in Sources */,
 				7162FD5825963AE00075B97D /* InterleavedBuffer.cpp in Sources */,
 				7162FD5925963AE00075B97D /* Buffer.cpp in Sources */,
 				71CC83AB26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
