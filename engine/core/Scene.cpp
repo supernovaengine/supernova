@@ -7,7 +7,7 @@
 #include "subsystem/MeshSystem.h"
 #include "subsystem/UISystem.h"
 #include "subsystem/ActionSystem.h"
-#include "math/Color.h"
+#include "util/Color.h"
 
 using namespace Supernova;
 

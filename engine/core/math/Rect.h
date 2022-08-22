@@ -7,6 +7,7 @@
 //
 
 #include "Vector4.h"
+#include <string>
 
 namespace Supernova {
 
@@ -21,6 +22,8 @@ namespace Supernova {
         Rect(float x, float y, float width, float height);
         Rect(const Rect& t);
         Rect(const Vector4& v);
+
+        std::string toString() const;
         
         Rect& operator = (const Rect& t);
         Rect& operator = (const Vector4& v);

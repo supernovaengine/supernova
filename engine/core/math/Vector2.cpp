@@ -32,9 +32,8 @@ Vector2::Vector2( const int afCoordinate[2] ){
 Vector2::Vector2( float* const r ): x( r[0] ), y( r[1] ){
 }
 
-void Vector2::swap(Vector2& other){
-    std::swap(x, other.x);
-    std::swap(y, other.y);
+std::string Vector2::toString() const{
+    return "Vector2(" + std::to_string(x) + ", " + std::to_string(y) + ")"; 
 }
 
 float Vector2::operator [] ( const size_t i ) const{
@@ -199,6 +198,24 @@ Vector2& Vector2::operator *= ( const Vector2& rkVector ){
     return *this;
 }
 
+bool Vector2::operator < ( const Vector2& rhs ) const{
+    if( x < rhs.x && y < rhs.y )
+        return true;
+    return false;
+}
+
+
+bool Vector2::operator > ( const Vector2& rhs ) const{
+    if( x > rhs.x && y > rhs.y )
+        return true;
+    return false;
+}
+
+void Vector2::swap(Vector2& other){
+    std::swap(x, other.x);
+    std::swap(y, other.y);
+}
+
 float Vector2::length () const{
     return sqrt( x * x + y * y );
 }
@@ -242,20 +259,6 @@ Vector2 Vector2::midPoint( const Vector2& vec ) const{
     return Vector2(
                    ( x + vec.x ) * 0.5f,
                    ( y + vec.y ) * 0.5f );
-}
-
-
-bool Vector2::operator < ( const Vector2& rhs ) const{
-    if( x < rhs.x && y < rhs.y )
-        return true;
-    return false;
-}
-
-
-bool Vector2::operator > ( const Vector2& rhs ) const{
-    if( x > rhs.x && y > rhs.y )
-        return true;
-    return false;
 }
 
 void Vector2::makeFloor( const Vector2& cmp ){

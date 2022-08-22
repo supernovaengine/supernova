@@ -41,8 +41,8 @@ namespace Supernova {
 
         explicit Vector4( const Vector3& rhs, const float fW );
 
+        std::string toString() const;
 
-        void swap(Vector4& other);
 
         float operator [] ( const size_t i ) const;
 
@@ -97,6 +97,12 @@ namespace Supernova {
         Vector4& operator /= ( const float fScalar );
 
         Vector4& operator /= ( const Vector4& rkVector );
+
+        bool operator < ( const Vector4& v ) const;
+
+        bool operator > ( const Vector4& v ) const;
+
+        void swap(Vector4& other);
 
         void divideByW();
 

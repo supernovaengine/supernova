@@ -57,6 +57,10 @@ bool Rect::operator != (const Rect& t){
     return ((this->x != t.x) || (this->y != t.y) || (this->width != t.width) || (this->height != t.height));
 }
 
+std::string Rect::toString() const{
+    return "Rect(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(width) + ", " + std::to_string(height) + ")"; 
+}
+
 float Rect::getX(){
     return x;
 }

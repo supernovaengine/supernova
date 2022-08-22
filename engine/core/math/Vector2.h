@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <math.h>
+#include <string>
 
 namespace Supernova { class Vector2; }
 Supernova::Vector2 operator * ( const float fScalar, const Supernova::Vector2& rkVector );
@@ -40,8 +41,8 @@ namespace Supernova {
 
         explicit Vector2( float* const r );
 
+        std::string toString() const;
 
-        void swap(Vector2& other);
 
         float operator [] ( const size_t i ) const;
 
@@ -95,7 +96,12 @@ namespace Supernova {
 
         Vector2& operator /= ( const Vector2& rkVector );
 
+        bool operator < ( const Vector2& rhs ) const;
 
+        bool operator > ( const Vector2& rhs ) const;
+
+
+        void swap(Vector2& other);
         float length () const;
         float squaredLength () const;
         float distance(const Vector2& rhs) const;
@@ -104,10 +110,6 @@ namespace Supernova {
 
         float normalize();
         Vector2 midPoint( const Vector2& vec ) const;
-
-        bool operator < ( const Vector2& rhs ) const;
-
-        bool operator > ( const Vector2& rhs ) const;
 
         void makeFloor( const Vector2& cmp );
         void makeCeil( const Vector2& cmp );

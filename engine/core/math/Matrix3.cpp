@@ -33,6 +33,13 @@ Matrix3::Matrix3(const float **matrix) {
     std::copy(&matrix[0][0], &matrix[0][0]+16, &this->matrix[0][0]);
 }
 
+std::string Matrix3::toString() const{
+    return "Matrix3("+
+        std::to_string(matrix[0][0]) + ", " + std::to_string(matrix[0][1]) + ", " + std::to_string(matrix[0][2]) + ", " +
+        std::to_string(matrix[1][0]) + ", " + std::to_string(matrix[1][1]) + ", " + std::to_string(matrix[1][2]) + ", " +
+        std::to_string(matrix[2][0]) + ", " + std::to_string(matrix[2][1]) + ", " + std::to_string(matrix[2][2]) +
+        ")"; 
+}
 
 Matrix3& Matrix3::operator=(const Matrix3 &m) {
     memcpy(this->matrix, m.matrix, sizeof(matrix));
@@ -59,6 +66,19 @@ Matrix3 Matrix3::operator +(const Matrix3 &m) const {
     int i;
     for(i=0; i<3; ++i){
         resul = row(i) + m.row(i);
+        prod.set(0, i, resul.x);
+        prod.set(1, i, resul.y);
+        prod.set(2, i, resul.z);
+    }
+    return prod;
+}
+
+Matrix3 Matrix3::operator -(const Matrix3 &m) const {
+    Matrix3 prod;
+    Vector3 resul;
+    int i;
+    for(i=0; i<3; ++i){
+        resul = row(i) - m.row(i);
         prod.set(0, i, resul.x);
         prod.set(1, i, resul.y);
         prod.set(2, i, resul.z);

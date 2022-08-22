@@ -3,7 +3,7 @@
 //
 
 #include "Fog.h"
-#include "math/Color.h"
+#include "util/Color.h"
 
 using namespace Supernova;
 

@@ -5,7 +5,7 @@
 #include "ActionSystem.h"
 
 #include "Scene.h"
-#include "math/Color.h"
+#include "util/Color.h"
 #include "math/Angle.h"
 
 using namespace Supernova;

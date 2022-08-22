@@ -4,7 +4,7 @@
 
 #include "Mesh.h"
 #include "render/ObjectRender.h"
-#include "math/Color.h"
+#include "util/Color.h"
 
 using namespace Supernova;
 

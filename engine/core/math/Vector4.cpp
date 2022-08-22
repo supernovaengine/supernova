@@ -34,12 +34,8 @@ Vector4::Vector4( const Vector3& rhs ): x(rhs.x), y(rhs.y), z(rhs.z), w(0.0f){
 Vector4::Vector4( const Vector3& rhs, const float fW ): x(rhs.x), y(rhs.y), z(rhs.z), w(fW){
 }
 
-
-void Vector4::swap(Vector4& other){
-    std::swap(x, other.x);
-    std::swap(y, other.y);
-    std::swap(z, other.z);
-    std::swap(w, other.w);
+std::string Vector4::toString() const{
+    return "Vector4(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ", " + std::to_string(w) + ")"; 
 }
 
 float Vector4::operator [] ( const size_t i ) const{
@@ -272,6 +268,21 @@ Vector4& Vector4::operator /= ( const Vector4& rkVector ){
     w /= rkVector.w;
     
     return *this;
+}
+
+bool Vector4::operator < ( const Vector4& v ) const{
+    return ( x < v.x && y < v.y && z < v.z && w < v.w );
+}
+
+bool Vector4::operator > ( const Vector4& v ) const{
+    return ( x > v.x && y > v.y && z > v.z  && w > v.w );
+}
+
+void Vector4::swap(Vector4& other){
+    std::swap(x, other.x);
+    std::swap(y, other.y);
+    std::swap(z, other.z);
+    std::swap(w, other.w);
 }
 
 void Vector4::divideByW(){

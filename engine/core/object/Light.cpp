@@ -5,7 +5,7 @@
 #include "Light.h"
 
 #include "math/Angle.h"
-#include "math/Color.h"
+#include "util/Color.h"
 #include <math.h>
 
 using namespace Supernova;
