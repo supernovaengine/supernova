@@ -135,7 +135,6 @@
 		713D82A3259D307F00567F9F /* Quaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5825962A0E0075B97D /* Quaternion.cpp */; };
 		713D82A4259D307F00567F9F /* AlignedBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5A25962A0E0075B97D /* AlignedBox.cpp */; };
 		713D82A5259D307F00567F9F /* Plane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5C25962A0E0075B97D /* Plane.cpp */; };
-		713D82A6259D307F00567F9F /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5E25962A0E0075B97D /* Angle.cpp */; };
 		713D82A8259D307F00567F9F /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC6425962A0E0075B97D /* Camera.cpp */; };
 		713D82A9259D307F00567F9F /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC6625962A0E0075B97D /* Object.cpp */; };
 		713D82AB259D307F00567F9F /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC6C25962A0E0075B97D /* Texture.cpp */; };
@@ -225,7 +224,6 @@
 		7162FD3925963AE00075B97D /* Quaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5825962A0E0075B97D /* Quaternion.cpp */; };
 		7162FD3B25963AE00075B97D /* AlignedBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5A25962A0E0075B97D /* AlignedBox.cpp */; };
 		7162FD3D25963AE00075B97D /* Plane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5C25962A0E0075B97D /* Plane.cpp */; };
-		7162FD3F25963AE00075B97D /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5E25962A0E0075B97D /* Angle.cpp */; };
 		7162FD4325963AE00075B97D /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC6425962A0E0075B97D /* Camera.cpp */; };
 		7162FD4525963AE00075B97D /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC6625962A0E0075B97D /* Object.cpp */; };
 		7162FD4A25963AE00075B97D /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC6C25962A0E0075B97D /* Texture.cpp */; };
@@ -444,6 +442,9 @@
 		71E54516284D5BE000C68FAB /* RotateTracksComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E54510284D5BE000C68FAB /* RotateTracksComponent.h */; };
 		71E54517284D5BE000C68FAB /* TranslateTracksComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E54511284D5BE000C68FAB /* TranslateTracksComponent.h */; };
 		71E54518284D5BE000C68FAB /* KeyframeTracksComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */; };
+		71ED64C528B45E0B005D2D96 /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ED64C328B45E0B005D2D96 /* Angle.cpp */; };
+		71ED64C628B45E0B005D2D96 /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ED64C328B45E0B005D2D96 /* Angle.cpp */; };
+		71ED64C728B45E0B005D2D96 /* Angle.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ED64C428B45E0B005D2D96 /* Angle.h */; };
 		71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */; };
 		71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */; };
 		71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */; };
@@ -697,7 +698,6 @@
 		7162FC5025962A0E0075B97D /* Ray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Ray.cpp; sourceTree = "<group>"; };
 		7162FC5125962A0E0075B97D /* Matrix3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Matrix3.cpp; sourceTree = "<group>"; };
 		7162FC5225962A0E0075B97D /* Plane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Plane.h; sourceTree = "<group>"; };
-		7162FC5325962A0E0075B97D /* Angle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Angle.h; sourceTree = "<group>"; };
 		7162FC5425962A0E0075B97D /* Matrix4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Matrix4.h; sourceTree = "<group>"; };
 		7162FC5525962A0E0075B97D /* Rect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rect.h; sourceTree = "<group>"; };
 		7162FC5625962A0E0075B97D /* Rect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rect.cpp; sourceTree = "<group>"; };
@@ -708,7 +708,6 @@
 		7162FC5B25962A0E0075B97D /* Matrix3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Matrix3.h; sourceTree = "<group>"; };
 		7162FC5C25962A0E0075B97D /* Plane.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Plane.cpp; sourceTree = "<group>"; };
 		7162FC5D25962A0E0075B97D /* Vector3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector3.h; sourceTree = "<group>"; };
-		7162FC5E25962A0E0075B97D /* Angle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Angle.cpp; sourceTree = "<group>"; };
 		7162FC6425962A0E0075B97D /* Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
 		7162FC6525962A0E0075B97D /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		7162FC6625962A0E0075B97D /* Object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Object.cpp; sourceTree = "<group>"; };
@@ -928,6 +927,8 @@
 		71E54510284D5BE000C68FAB /* RotateTracksComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotateTracksComponent.h; sourceTree = "<group>"; };
 		71E54511284D5BE000C68FAB /* TranslateTracksComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TranslateTracksComponent.h; sourceTree = "<group>"; };
 		71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyframeTracksComponent.h; sourceTree = "<group>"; };
+		71ED64C328B45E0B005D2D96 /* Angle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Angle.cpp; sourceTree = "<group>"; };
+		71ED64C428B45E0B005D2D96 /* Angle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Angle.h; sourceTree = "<group>"; };
 		71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaneTerrain.cpp; sourceTree = "<group>"; };
 		71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaneTerrain.h; sourceTree = "<group>"; };
 		71F97AD2262D1DF200CD6F2B /* libtinygltf-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinygltf-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1208,6 +1209,8 @@
 		7162FC2E25962A0E0075B97D /* util */ = {
 			isa = PBXGroup;
 			children = (
+				71ED64C328B45E0B005D2D96 /* Angle.cpp */,
+				71ED64C428B45E0B005D2D96 /* Angle.h */,
 				71165BBD282981BE00CF79C1 /* Base64.cpp */,
 				71165BBE282981BE00CF79C1 /* Base64.h */,
 				7105A55628B305910092EA05 /* Color.cpp */,
@@ -1307,8 +1310,6 @@
 			children = (
 				7162FC5A25962A0E0075B97D /* AlignedBox.cpp */,
 				7162FC4E25962A0E0075B97D /* AlignedBox.h */,
-				7162FC5E25962A0E0075B97D /* Angle.cpp */,
-				7162FC5325962A0E0075B97D /* Angle.h */,
 				7162FC5125962A0E0075B97D /* Matrix3.cpp */,
 				7162FC5B25962A0E0075B97D /* Matrix3.h */,
 				7162FC4D25962A0E0075B97D /* Matrix4.cpp */,
@@ -1861,6 +1862,7 @@
 				715CB11B288CD57A0049344B /* Material.h in Headers */,
 				71451BC0270CA16200712643 /* ActionSystem.h in Headers */,
 				71ABBD4627A879D4001CE3AF /* Button.h in Headers */,
+				71ED64C728B45E0B005D2D96 /* Angle.h in Headers */,
 				717D9B4C27337B72002C0803 /* ljumptab.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2406,7 +2408,6 @@
 				7105A56728B305B20092EA05 /* MathClassesLua.cpp in Sources */,
 				713D82A5259D307F00567F9F /* Plane.cpp in Sources */,
 				71CC83A326B8C54A00EEBB93 /* SBSReader.cpp in Sources */,
-				713D82A6259D307F00567F9F /* Angle.cpp in Sources */,
 				713E580727BA9CB700376680 /* MeshPolygon.cpp in Sources */,
 				71BE624425B1DB9E006D6E02 /* ShaderPool.cpp in Sources */,
 				71BE622125B1DB83006D6E02 /* TextureData.cpp in Sources */,
@@ -2440,6 +2441,7 @@
 				7105A55928B305910092EA05 /* Color.cpp in Sources */,
 				713D82B3259D307F00567F9F /* SokolObject.cpp in Sources */,
 				713D82B4259D307F00567F9F /* SokolBuffer.cpp in Sources */,
+				71ED64C628B45E0B005D2D96 /* Angle.cpp in Sources */,
 				71CC83AC26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
 				71E54507284D5BB700C68FAB /* MorphTracks.cpp in Sources */,
 				71451BD5270CA17F00712643 /* TimedAction.cpp in Sources */,
@@ -2559,7 +2561,6 @@
 				7162FD3D25963AE00075B97D /* Plane.cpp in Sources */,
 				71451BDF270CA17F00712643 /* PositionAction.cpp in Sources */,
 				71ABBD4427A879D4001CE3AF /* Button.cpp in Sources */,
-				7162FD3F25963AE00075B97D /* Angle.cpp in Sources */,
 				7162FD4325963AE00075B97D /* Camera.cpp in Sources */,
 				71ABBD1C277A31BA001CE3AF /* Text.cpp in Sources */,
 				71ABBD4927A87A2E001CE3AF /* MeshSystem.cpp in Sources */,
@@ -2579,6 +2580,7 @@
 				7105A55828B305910092EA05 /* Color.cpp in Sources */,
 				7162FD5825963AE00075B97D /* InterleavedBuffer.cpp in Sources */,
 				7162FD5925963AE00075B97D /* Buffer.cpp in Sources */,
+				71ED64C528B45E0B005D2D96 /* Angle.cpp in Sources */,
 				71CC83AB26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
 				71E54506284D5BB700C68FAB /* MorphTracks.cpp in Sources */,
 				71451BD4270CA17F00712643 /* TimedAction.cpp in Sources */,
