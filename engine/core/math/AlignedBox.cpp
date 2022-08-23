@@ -71,19 +71,19 @@ bool AlignedBox::operator!= (const AlignedBox& rhs) const {
 }
 
 
-const Vector3& AlignedBox::getMinimum(void) const {
+const Vector3& AlignedBox::getMinimum() const {
     return mMinimum;
 }
 
-Vector3& AlignedBox::getMinimum(void) {
+Vector3& AlignedBox::getMinimum() {
     return mMinimum;
 }
 
-const Vector3& AlignedBox::getMaximum(void) const {
+const Vector3& AlignedBox::getMaximum() const {
     return mMaximum;
 }
 
-Vector3& AlignedBox::getMaximum(void) {
+Vector3& AlignedBox::getMaximum() {
     return mMaximum;
 }
 
@@ -388,7 +388,7 @@ void AlignedBox::scale(const Vector3& s) {
 }
 
 bool AlignedBox::intersects(const Plane& p) const {
-    return (p.getSide(*this) == Plane::BOTH_SIDE);
+    return (p.getSide(*this) == Plane::Side::BOTH_SIDE);
 }
 
 bool AlignedBox::intersects(const Vector3& v) const {

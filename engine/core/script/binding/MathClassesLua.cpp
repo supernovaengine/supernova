@@ -216,12 +216,79 @@ void LuaBinding::registerMathClasses(lua_State *L){
         );
 
     lua.new_usertype<Plane>("Plane",
-        sol::constructors<Plane(), Plane(float, float, float, float)>()
+        sol::constructors<Plane(), Plane(const Vector3&, float), Plane(float, float, float, float), Plane(const Vector3&, const Vector3&), Plane(const Vector3&, const Vector3&, const Vector3&)>(),
+        sol::meta_function::unary_minus, sol::resolve<Plane() const>(&Plane::operator-),
+        sol::meta_function::equal_to, &Plane::operator==,
+        "side", sol::property( sol::resolve<Plane::Side(const Vector3&) const>(&Plane::getSide) ),
+        "getSide", sol::overload( sol::resolve<Plane::Side(const Vector3&) const>(&Plane::getSide), sol::resolve<Plane::Side(const Vector3&, const Vector3&) const>(&Plane::getSide), sol::resolve<Plane::Side(const AlignedBox&) const>(&Plane::getSide) ),
+        "distance", sol::property( &Plane::getDistance ),
+        "getDistance", &Plane::getDistance,
+        "redefine", sol::overload( sol::resolve<void(const Vector3&, const Vector3&, const Vector3&)>(&Plane::redefine), sol::resolve<void(const Vector3&, const Vector3&)>(&Plane::redefine) ),
+        "projectVector", &Plane::projectVector,
+        "normalize", &Plane::normalize,
+        "Side", lua.create_table_with(
+            "NO_SIDE", Plane::Side::NO_SIDE,
+            "POSITIVE_SIDE", Plane::Side::POSITIVE_SIDE,
+            "NEGATIVE_SIDE", Plane::Side::NEGATIVE_SIDE,
+            "BOTH_SIDE", Plane::Side::BOTH_SIDE
+            )
         );
 
     lua.new_usertype<AlignedBox>("AlignedBox",
-        sol::constructors<AlignedBox(), AlignedBox(const Vector3&, const Vector3&), AlignedBox(float, float, float, float, float, float)>()
+        sol::constructors<AlignedBox(), AlignedBox(AlignedBox::BoxType), AlignedBox(const Vector3&, const Vector3&), AlignedBox(float, float, float, float, float, float)>(),
+        sol::meta_function::equal_to, &AlignedBox::operator==,
+        "minimum", sol::property( sol::resolve<Vector3&()>(&AlignedBox::getMinimum), sol::resolve<void(const Vector3&)>(&AlignedBox::setMinimum) ),
+        "getMinimum",  sol::resolve<Vector3&()>(&AlignedBox::getMinimum),
+        "setMinimum", sol::overload( sol::resolve<void(const Vector3&)>(&AlignedBox::setMinimum), sol::resolve<void(float, float, float)>(&AlignedBox::setMinimum) ),
+        "setMinimumX", &AlignedBox::setMinimumX,
+        "setMinimumY", &AlignedBox::setMinimumY,
+        "setMinimumZ", &AlignedBox::setMinimumZ,
+        "maximum", sol::property( sol::resolve<Vector3&()>(&AlignedBox::getMaximum), sol::resolve<void(const Vector3&)>(&AlignedBox::setMaximum) ),
+        "getMaximum",  sol::resolve<Vector3&()>(&AlignedBox::getMaximum),
+        "setMaximum", sol::overload( sol::resolve<void(const Vector3&)>(&AlignedBox::setMaximum), sol::resolve<void(float, float, float)>(&AlignedBox::setMaximum) ),
+        "setMaximumX", &AlignedBox::setMaximumX,
+        "setMaximumY", &AlignedBox::setMaximumY,
+        "setMaximumZ", &AlignedBox::setMaximumZ,
+        "setExtents", sol::overload( sol::resolve<void(const Vector3&, const Vector3&)>(&AlignedBox::setExtents), sol::resolve<void(float, float, float, float, float, float)>(&AlignedBox::setExtents) ),
+        "getAllCorners", &AlignedBox::getAllCorners,
+        "getCorner", &AlignedBox::getCorner,
+        "merge", sol::overload( sol::resolve<void(const AlignedBox&)>(&AlignedBox::merge), sol::resolve<void(const Vector3&)>(&AlignedBox::merge) ),
+        "transform", &AlignedBox::transform,
+        "null", sol::property( &AlignedBox::isNull, &AlignedBox::setNull ),
+        "setNull", &AlignedBox::setNull,
+        "isNull", &AlignedBox::isNull,
+        "finite", sol::property( &AlignedBox::isFinite ),
+        "isFinite", &AlignedBox::isFinite,
+        "infinite", sol::property( &AlignedBox::isInfinite, &AlignedBox::setInfinite ),
+        "setInfinite", &AlignedBox::setInfinite,
+        "isInfinite", &AlignedBox::isInfinite,
+        "intersects", sol::overload( sol::resolve<bool(const AlignedBox&) const>(&AlignedBox::intersects), sol::resolve<bool(const Plane&) const>(&AlignedBox::intersects), sol::resolve<bool(const Vector3&) const>(&AlignedBox::intersects) ),
+        "intersection", &AlignedBox::intersection,
+        "volume", &AlignedBox::volume,
+        "scale", &AlignedBox::scale,
+        "getCenter", &AlignedBox::getCenter,
+        "getSize", &AlignedBox::getSize,
+        "getHalfSize", &AlignedBox::getHalfSize,
+        "contains", sol::overload( sol::resolve<bool(const Vector3&) const>(&AlignedBox::contains), sol::resolve<bool(const AlignedBox&) const>(&AlignedBox::contains) ),
+        "squaredDistance", &AlignedBox::squaredDistance,
+        "distance", &AlignedBox::distance,
+        "BoxType", lua.create_table_with(
+            "BOXTYPE_NULL", AlignedBox::BoxType::BOXTYPE_NULL,
+            "BOXTYPE_FINITE", AlignedBox::BoxType::BOXTYPE_FINITE,
+            "BOXTYPE_INFINITE", AlignedBox::BoxType::BOXTYPE_INFINITE
+            ),
+        "CornerEnum", lua.create_table_with(
+            "FAR_LEFT_BOTTOM", AlignedBox::CornerEnum::FAR_LEFT_BOTTOM,
+            "FAR_LEFT_TOP", AlignedBox::CornerEnum::FAR_LEFT_TOP,
+            "FAR_RIGHT_TOP", AlignedBox::CornerEnum::FAR_RIGHT_TOP,
+            "FAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::FAR_RIGHT_BOTTOM,
+            "NEAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::NEAR_RIGHT_BOTTOM,
+            "NEAR_LEFT_BOTTOM", AlignedBox::CornerEnum::NEAR_LEFT_BOTTOM,
+            "NEAR_LEFT_TOP", AlignedBox::CornerEnum::NEAR_LEFT_TOP,
+            "NEAR_RIGHT_TOP", AlignedBox::CornerEnum::NEAR_RIGHT_TOP
+            )
         );
+
 
     lua.new_usertype<Ray>("Ray",
         sol::constructors<Ray(), Vector4(Vector3, Vector3)>(),

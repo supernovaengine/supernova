@@ -50,11 +50,11 @@ namespace Supernova{
         bool operator== (const AlignedBox& rhs) const;
         bool operator!= (const AlignedBox& rhs) const;
 
-        const Vector3& getMinimum(void) const;
-        Vector3& getMinimum(void);
+        const Vector3& getMinimum() const;
+        Vector3& getMinimum();
 
-        const Vector3& getMaximum(void) const;
-        Vector3& getMaximum(void);
+        const Vector3& getMaximum() const;
+        Vector3& getMaximum();
 
         void setMinimum( const Vector3& vec );
         void setMinimum( float x, float y, float z );
@@ -88,6 +88,8 @@ namespace Supernova{
         bool isInfinite(void) const;
 
         bool intersects(const AlignedBox& b2) const;
+        bool intersects(const Plane& p) const;
+        bool intersects(const Vector3& v) const;
 
         AlignedBox intersection(const AlignedBox& b2) const;
 
@@ -95,17 +97,15 @@ namespace Supernova{
 
         void scale(const Vector3& s);
 
-        bool intersects(const Plane& p) const;
-        bool intersects(const Vector3& v) const;
-
         Vector3 getCenter(void) const;
         Vector3 getSize(void) const;
         Vector3 getHalfSize(void) const;
 
         bool contains(const Vector3& v) const;
+        bool contains(const AlignedBox& other) const;
+
         float squaredDistance(const Vector3& v) const;
         float distance (const Vector3& v) const;
-        bool contains(const AlignedBox& other) const;
         
     };
     

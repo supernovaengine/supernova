@@ -1651,7 +1651,7 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const AlignedBox& box
             continue;
 
         Plane::Side side = camera.frustumPlanes[plane].getSide(centre, halfSize);
-        if (side == Plane::NEGATIVE_SIDE){
+        if (side == Plane::Side::NEGATIVE_SIDE){
             return false;
         }
     }
@@ -1666,7 +1666,7 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& point)
         if (plane == FRUSTUM_PLANE_FAR && getCameraFar(camera) == 0)
             continue;
 
-        if (camera.frustumPlanes[plane].getSide(point) == Plane::NEGATIVE_SIDE){
+        if (camera.frustumPlanes[plane].getSide(point) == Plane::Side::NEGATIVE_SIDE){
             return false;
         }
     }
