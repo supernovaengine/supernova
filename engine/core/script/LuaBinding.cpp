@@ -229,8 +229,6 @@ void LuaBinding::registerClasses(lua_State *L){
     // luaL_openlibs() opened all libraries already: base, string, io, os, package, table, debug
     //lua.open_libraries(sol::lib::base);
 
-    lua.new_usertype<Entity>("Entity");
-
     lua.new_enum("Scaling",
                 "FITWIDTH", Scaling::FITWIDTH,
                 "FITHEIGHT", Scaling::FITHEIGHT,
