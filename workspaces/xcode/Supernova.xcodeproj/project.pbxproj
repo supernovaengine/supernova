@@ -266,6 +266,8 @@
 		717D9B4C27337B72002C0803 /* ljumptab.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B4A27337B72002C0803 /* ljumptab.h */; };
 		717D9B4E27338381002C0803 /* lua in Resources */ = {isa = PBXBuildFile; fileRef = 717D9B4D273382C8002C0803 /* lua */; };
 		717D9B4F27338382002C0803 /* lua in Resources */ = {isa = PBXBuildFile; fileRef = 717D9B4D273382C8002C0803 /* lua */; };
+		7185BF9028BAFC2000B82865 /* ActionClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7185BF8F28BAFC2000B82865 /* ActionClassesLua.cpp */; };
+		7185BF9128BAFC2000B82865 /* ActionClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7185BF8F28BAFC2000B82865 /* ActionClassesLua.cpp */; };
 		718FDDF52837CA9A00AF314C /* msl21ios.h in Headers */ = {isa = PBXBuildFile; fileRef = 718FDDEF2837CA9A00AF314C /* msl21ios.h */; };
 		718FDDF62837CA9A00AF314C /* glsl300es.h in Headers */ = {isa = PBXBuildFile; fileRef = 718FDDF02837CA9A00AF314C /* glsl300es.h */; };
 		718FDDF72837CA9A00AF314C /* glsl100.h in Headers */ = {isa = PBXBuildFile; fileRef = 718FDDF12837CA9A00AF314C /* glsl100.h */; };
@@ -770,6 +772,7 @@
 		717D9B4927337B72002C0803 /* lopnames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lopnames.h; sourceTree = "<group>"; };
 		717D9B4A27337B72002C0803 /* ljumptab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ljumptab.h; sourceTree = "<group>"; };
 		717D9B4D273382C8002C0803 /* lua */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lua; sourceTree = "<group>"; };
+		7185BF8F28BAFC2000B82865 /* ActionClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ActionClassesLua.cpp; sourceTree = "<group>"; };
 		718FDDEF2837CA9A00AF314C /* msl21ios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = msl21ios.h; sourceTree = "<group>"; };
 		718FDDF02837CA9A00AF314C /* glsl300es.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glsl300es.h; sourceTree = "<group>"; };
 		718FDDF12837CA9A00AF314C /* glsl100.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glsl100.h; sourceTree = "<group>"; };
@@ -1057,6 +1060,7 @@
 		7105A55B28B305B20092EA05 /* binding */ = {
 			isa = PBXGroup;
 			children = (
+				7185BF8F28BAFC2000B82865 /* ActionClassesLua.cpp */,
 				7105A55D28B305B20092EA05 /* CoreClassesLua.cpp */,
 				7105A55F28B305B20092EA05 /* ECSClassesLua.cpp */,
 				7105A56128B305B20092EA05 /* IOClassesLua.cpp */,
@@ -2402,6 +2406,7 @@
 				713D82A1259D307F00567F9F /* Matrix3.cpp in Sources */,
 				713D82A2259D307F00567F9F /* Rect.cpp in Sources */,
 				713D82A3259D307F00567F9F /* Quaternion.cpp in Sources */,
+				7185BF9128BAFC2000B82865 /* ActionClassesLua.cpp in Sources */,
 				713D82A4259D307F00567F9F /* AlignedBox.cpp in Sources */,
 				713E580E27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AF25BB18DC00965B51 /* StringUtils.cpp in Sources */,
@@ -2541,6 +2546,7 @@
 				7162FD2B25963AE00075B97D /* Vector3.cpp in Sources */,
 				7162FD2D25963AE00075B97D /* Vector2.cpp in Sources */,
 				7162FD2E25963AE00075B97D /* Matrix4.cpp in Sources */,
+				7185BF9028BAFC2000B82865 /* ActionClassesLua.cpp in Sources */,
 				7162FD3125963AE00075B97D /* Ray.cpp in Sources */,
 				713E580D27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AE25BB18DC00965B51 /* StringUtils.cpp in Sources */,
