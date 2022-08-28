@@ -63,6 +63,12 @@ void Action::setTarget(Entity target){
     action.target = target;
 }
 
+Entity Action::getTarget(){
+    ActionComponent& action = getComponent<ActionComponent>();
+
+    return action.target;
+}
+
 void Action::setSpeed(float speed){
     ActionComponent& action = getComponent<ActionComponent>();
 

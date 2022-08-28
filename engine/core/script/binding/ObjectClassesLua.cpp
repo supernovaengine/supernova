@@ -18,6 +18,12 @@
 #include "Mesh.h"
 #include "Text.h"
 #include "Fog.h"
+#include "Bone.h"
+#include "Model.h"
+#include "MeshPolygon.h"
+#include "Particles.h"
+#include "PlaneTerrain.h"
+#include "Sprite.h"
 
 using namespace Supernova;
 
@@ -187,4 +193,102 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         "charPosition", sol::property(&Text::getCharPosition),
         "getCharPosition", &Text::getCharPosition
         );
+
+    lua.new_usertype<Bone>("Bone",
+        sol::constructors<Bone(Scene*, Entity)>(),
+        sol::base_classes, sol::bases<Object>()
+        );
+
+    lua.new_usertype<Model>("Model",
+        sol::constructors<Model(Scene*)>(),
+        sol::base_classes, sol::bases<Object>(),
+        "loadOBJ", &Model::loadOBJ,
+        "loadGLTF", &Model::loadGLTF,
+        "loadModel", &Model::loadModel,
+        "getAnimation", &Model::getAnimation,
+        "findAnimation", &Model::findAnimation,
+        "getBone", sol::overload( sol::resolve<Bone(std::string)>(&Model::getBone), sol::resolve<Bone(int)>(&Model::getBone) ),
+        "getMorphWeight", sol::overload( sol::resolve<float(std::string)>(&Model::getMorphWeight), sol::resolve<float(int)>(&Model::getMorphWeight) ),
+        "setMorphWeight", sol::overload( sol::resolve<void(std::string, float)>(&Model::setMorphWeight), sol::resolve<void(int, float)>(&Model::setMorphWeight) )
+        );
+
+    lua.new_usertype<MeshPolygon>("MeshPolygon",
+        sol::constructors<MeshPolygon(Scene*)>(),
+        sol::base_classes, sol::bases<Object>(),
+        "addVertex", sol::overload( sol::resolve<void(Vector3)>(&MeshPolygon::addVertex), sol::resolve<void(float, float)>(&MeshPolygon::addVertex) ),
+        "width", sol::property(&MeshPolygon::getWidth),
+        "getWidth", &MeshPolygon::getWidth,
+        "height", sol::property(&MeshPolygon::getHeight),
+        "getHeight", &MeshPolygon::getHeight,
+        "flipY", sol::property(&MeshPolygon::isFlipY, &MeshPolygon::setFlipY),
+        "setFlipY", &MeshPolygon::setFlipY,
+        "isFlipY", &MeshPolygon::isFlipY
+        );
+
+    lua.new_usertype<Particles>("Particles",
+        sol::constructors<Particles(Scene*)>(),
+        sol::base_classes, sol::bases<Object>(),
+        "maxParticles", sol::property(&Particles::getMaxParticles, &Particles::setMaxParticles),
+        "setMaxParticles", &Particles::setMaxParticles,
+        "getMaxParticles", &Particles::getMaxParticles,
+        "addParticle", sol::overload( 
+            sol::resolve<void(Vector3)>(&Particles::addParticle), 
+            sol::resolve<void(Vector3, Vector4)>(&Particles::addParticle),
+            sol::resolve<void(Vector3, Vector4, float, float)>(&Particles::addParticle),
+            sol::resolve<void(Vector3, Vector4, float, float, Rect)>(&Particles::addParticle),
+            sol::resolve<void(float, float, float)>(&Particles::addParticle) ),
+        "addSpriteFrame", sol::overload( 
+            sol::resolve<void(int, std::string, Rect)>(&Particles::addSpriteFrame), 
+            sol::resolve<void(std::string, float, float, float, float)>(&Particles::addSpriteFrame),
+            sol::resolve<void(float, float, float, float)>(&Particles::addSpriteFrame),
+            sol::resolve<void(Rect)>(&Particles::addSpriteFrame)),
+        "removeSpriteFrame", sol::overload( 
+            sol::resolve<void(int)>(&Particles::removeSpriteFrame), 
+            sol::resolve<void(std::string)>(&Particles::removeSpriteFrame)),
+        "setTexture", &Particles::setTexture
+        );
+
+    lua.new_usertype<PlaneTerrain>("PlaneTerrain",
+        sol::constructors<PlaneTerrain(Scene*)>(),
+        sol::base_classes, sol::bases<Object>(),
+        "create", &PlaneTerrain::create
+    );
+
+    lua.new_usertype<Sprite>("Sprite",
+        sol::constructors<Sprite(Scene*)>(),
+        sol::base_classes, sol::bases<Object>(),
+        "setSize", &Sprite::setSize,
+        "width", sol::property(&Sprite::getWidth,  &Sprite::setWidth),
+        "setWidth", &Sprite::setWidth,
+        "getWidth", &Sprite::getWidth,
+        "height", sol::property(&Sprite::getHeight,  &Sprite::setHeight),
+        "setHeight", &Sprite::setHeight,
+        "getHeight", &Sprite::getHeight,
+        "flipY", sol::property(&Sprite::isFlipY, &Sprite::setFlipY),
+        "setFlipY", &Sprite::setFlipY,
+        "isFlipY", &Sprite::isFlipY,
+        "setBillboard", &Sprite::setBillboard,
+        "textureRect", sol::property(&Sprite::getTextureRect, sol::resolve<void(Rect)>(&Sprite::setTextureRect)),
+        "setTextureRect", sol::overload( 
+            sol::resolve<void(Rect)>(&Sprite::setTextureRect), 
+            sol::resolve<void(float, float, float, float)>(&Sprite::setTextureRect) ),
+        "getTextureRect", &Sprite::getTextureRect,
+        "addFrame", sol::overload( 
+            sol::resolve<void(int, std::string, Rect)>(&Sprite::addFrame), 
+            sol::resolve<void(std::string, float, float, float, float)>(&Sprite::addFrame),
+            sol::resolve<void(float, float, float, float)>(&Sprite::addFrame),
+            sol::resolve<void(Rect)>(&Sprite::addFrame) ),
+        "removeFrame", sol::overload( 
+            sol::resolve<void(int)>(&Sprite::removeFrame), 
+            sol::resolve<void(std::string)>(&Sprite::removeFrame) ),
+        "setFrame", sol::overload( 
+            sol::resolve<void(int)>(&Sprite::setFrame), 
+            sol::resolve<void(std::string)>(&Sprite::setFrame) ),
+        "startAnimation", sol::overload( 
+            sol::resolve<void(std::vector<int>, std::vector<int>, bool)>(&Sprite::startAnimation), 
+            sol::resolve<void(int, int, int, bool)>(&Sprite::startAnimation) ),
+        "pauseAnimation", &Sprite::pauseAnimation,
+        "stopAnimation", &Sprite::stopAnimation
+    );
+
 }

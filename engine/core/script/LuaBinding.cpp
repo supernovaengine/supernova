@@ -427,6 +427,7 @@ void LuaBinding::registerClasses(lua_State *L){
          "moveChildToLast", &Scene::moveChildToLast
          );
 
+    registerActionClasses(L);
     registerCoreClasses(L);
     registerECSClasses(L);
     registerIOClasses(L);

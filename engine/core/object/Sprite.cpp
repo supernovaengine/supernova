@@ -78,6 +78,12 @@ void Sprite::setFlipY(bool flipY){
     }
 }
 
+bool Sprite::isFlipY(){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    return spritecomp.flipY;
+}
+
 void Sprite::setBillboard(bool billboard, bool fake, bool cylindrical){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 

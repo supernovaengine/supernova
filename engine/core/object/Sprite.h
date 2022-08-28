@@ -29,6 +29,7 @@ namespace Supernova{
         int getHeight();
 
         void setFlipY(bool flipY);
+        bool isFlipY();
 
         void setBillboard(bool billboard, bool fake = true, bool cylindrical = true);
 

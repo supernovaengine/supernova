@@ -28,6 +28,7 @@ namespace Supernova {
         static void registerClasses(lua_State *L);
 
         // in binding directory
+        static void registerActionClasses(lua_State *L);
         static void registerCoreClasses(lua_State *L);
         static void registerECSClasses(lua_State *L);
         static void registerIOClasses(lua_State *L);

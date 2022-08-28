@@ -29,6 +29,7 @@ namespace Supernova{
         void stop();
 
         void setTarget(Entity target);
+        Entity getTarget();
 
         void setSpeed(float speed);
         float getSpeed();
