@@ -12,6 +12,7 @@
 
 #include "action/Action.h"
 #include "action/Animation.h"
+#include "action/Ease.h"
 
 using namespace Supernova;
 
@@ -49,6 +50,11 @@ void LuaBinding::registerActionClasses(lua_State *L){
         "setName", &Animation::setName,
         "addActionFrame", sol::overload( sol::resolve<void(float, float, Entity, Entity)>(&Animation::addActionFrame), sol::resolve<void(float, Entity, Entity)>(&Animation::addActionFrame) ),
         "getActionFrame", &Animation::getActionFrame
+        );
+
+    lua.new_usertype<Ease>("Ease",
+        "linear", Ease::linear,
+        "easeInQuad", Ease::easeInQuad
         );
 
 }

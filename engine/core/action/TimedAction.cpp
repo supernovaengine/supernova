@@ -36,7 +36,7 @@ void TimedAction::setFunction(sol::protected_function function){
     timedAction.function = function;
 }
 
-void TimedAction::setFunctionType(int functionType){
+void TimedAction::setFunctionType(EaseType functionType){
     TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
 
     timedAction.function.remove();

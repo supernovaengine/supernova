@@ -34,10 +34,10 @@ void ParticlesAnimation::setPositionInitializer(Vector3 minPosition, Vector3 max
 }
 
 void ParticlesAnimation::setPositionModifier(float fromTime, float toTime, Vector3 fromPosition, Vector3 toPosition){
-    setPositionModifier(fromTime, toTime, fromPosition, toPosition, S_LINEAR);
+    setPositionModifier(fromTime, toTime, fromPosition, toPosition, EaseType::LINEAR);
 }
 
-void ParticlesAnimation::setPositionModifier(float fromTime, float toTime, Vector3 fromPosition, Vector3 toPosition, int functionType){
+void ParticlesAnimation::setPositionModifier(float fromTime, float toTime, Vector3 fromPosition, Vector3 toPosition, EaseType functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
     partAnim.positionModifier.fromTime = fromTime;
@@ -59,10 +59,10 @@ void ParticlesAnimation::setVelocityInitializer(Vector3 minVelocity, Vector3 max
 }
 
 void ParticlesAnimation::setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity){
-    setVelocityModifier(fromTime, toTime, fromVelocity, toVelocity, S_LINEAR);
+    setVelocityModifier(fromTime, toTime, fromVelocity, toVelocity, EaseType::LINEAR);
 }
 
-void ParticlesAnimation::setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity, int functionType){
+void ParticlesAnimation::setVelocityModifier(float fromTime, float toTime, Vector3 fromVelocity, Vector3 toVelocity, EaseType functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
     partAnim.velocityModifier.fromTime = fromTime;
@@ -84,10 +84,10 @@ void ParticlesAnimation::setAccelerationInitializer(Vector3 minAcceleration, Vec
 }
 
 void ParticlesAnimation::setAccelerationModifier(float fromTime, float toTime, Vector3 fromAcceleration, Vector3 toAcceleration){
-    setAccelerationModifier(fromTime, toTime, fromAcceleration, toAcceleration, S_LINEAR);
+    setAccelerationModifier(fromTime, toTime, fromAcceleration, toAcceleration, EaseType::LINEAR);
 }
 
-void ParticlesAnimation::setAccelerationModifier(float fromTime, float toTime, Vector3 fromAcceleration, Vector3 toAcceleration, int functionType){
+void ParticlesAnimation::setAccelerationModifier(float fromTime, float toTime, Vector3 fromAcceleration, Vector3 toAcceleration, EaseType functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
     partAnim.accelerationModifier.fromTime = fromTime;
@@ -109,10 +109,10 @@ void ParticlesAnimation::setColorInitializer(Vector3 minColor, Vector3 maxColor)
 }
 
 void ParticlesAnimation::setColorModifier(float fromTime, float toTime, Vector3 fromColor, Vector3 toColor){
-    setColorModifier(fromTime, toTime, fromColor, toColor, S_LINEAR);
+    setColorModifier(fromTime, toTime, fromColor, toColor, EaseType::LINEAR);
 }
 
-void ParticlesAnimation::setColorModifier(float fromTime, float toTime, Vector3 fromColor, Vector3 toColor, int functionType){
+void ParticlesAnimation::setColorModifier(float fromTime, float toTime, Vector3 fromColor, Vector3 toColor, EaseType functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
     partAnim.colorModifier.fromTime = fromTime;
@@ -134,10 +134,10 @@ void ParticlesAnimation::setAlphaInitializer(float minAlpha, float maxAlpha){
 }
 
 void ParticlesAnimation::setAlphaModifier(float fromTime, float toTime, float fromAlpha, float toAlpha){
-    setAlphaModifier(fromTime, toTime, fromAlpha, toAlpha, S_LINEAR);
+    setAlphaModifier(fromTime, toTime, fromAlpha, toAlpha, EaseType::LINEAR);
 }
 
-void ParticlesAnimation::setAlphaModifier(float fromTime, float toTime, float fromAlpha, float toAlpha, int functionType){
+void ParticlesAnimation::setAlphaModifier(float fromTime, float toTime, float fromAlpha, float toAlpha, EaseType functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
     partAnim.alphaModifier.fromTime = fromTime;
@@ -159,10 +159,10 @@ void ParticlesAnimation::setSizeInitializer(float minSize, float maxSize){
 }
 
 void ParticlesAnimation::setSizeModifier(float fromTime, float toTime, float fromSize, float toSize){
-    setSizeModifier(fromTime, toTime, fromSize, toSize, S_LINEAR);
+    setSizeModifier(fromTime, toTime, fromSize, toSize, EaseType::LINEAR);
 }
 
-void ParticlesAnimation::setSizeModifier(float fromTime, float toTime, float fromSize, float toSize, int functionType){
+void ParticlesAnimation::setSizeModifier(float fromTime, float toTime, float fromSize, float toSize, EaseType functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
     partAnim.sizeModifier.fromTime = fromTime;
@@ -189,10 +189,10 @@ void ParticlesAnimation::setSpriteIntializer(int minFrame, int maxFrame){
 }
 
 void ParticlesAnimation::setSpriteModifier(float fromTime, float toTime, std::vector<int> frames){
-    setSpriteModifier(fromTime, toTime, frames, S_LINEAR);
+    setSpriteModifier(fromTime, toTime, frames, EaseType::LINEAR);
 }
 
-void ParticlesAnimation::setSpriteModifier(float fromTime, float toTime, std::vector<int> frames, int functionType){
+void ParticlesAnimation::setSpriteModifier(float fromTime, float toTime, std::vector<int> frames, EaseType functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
     partAnim.spriteModifier.fromTime = fromTime;
@@ -213,10 +213,10 @@ void ParticlesAnimation::setRotationInitializer(float minRotation, float maxRota
 }
 
 void ParticlesAnimation::setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation){
-    setRotationModifier(fromTime, toTime, fromRotation, toRotation, S_LINEAR);
+    setRotationModifier(fromTime, toTime, fromRotation, toRotation, EaseType::LINEAR);
 }
 
-void ParticlesAnimation::setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation, int functionType){
+void ParticlesAnimation::setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation, EaseType functionType){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
 
     partAnim.rotationModifier.fromTime = fromTime;
