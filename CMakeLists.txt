@@ -166,7 +166,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     if (MSVC)
         add_compile_options(/bigobj)
     else ()
-        add_compile_options(-Wa,-mbig-obj -O2)
+        add_compile_options(-Wa,-mbig-obj -O1)
     endif()
 
     if(GRAPHIC_BACKEND STREQUAL "glcore33")
