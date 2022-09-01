@@ -20,8 +20,8 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // This file was generated with a script.
-// Generated 2020-10-15 05:19:08.645208 UTC
-// This header was generated with sol v3.2.3 (revision e5e6466e)
+// Generated 2022-06-25 08:14:19.336233 UTC
+// This header was generated with sol v3.3.0 (revision eba86625)
 // https://github.com/ThePhD/sol2
 
 #ifndef SOL_SINGLE_CONFIG_HPP
@@ -32,6 +32,7 @@
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 #define SOL_USING_CXX_LUA 1
 #define SOL_ALL_SAFETIES_ON 1
+#define SOL_DEFAULT_AUTOMAGICAL_USERTYPES 0
 
 // end of sol/config.hpp
 
