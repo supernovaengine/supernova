@@ -431,5 +431,7 @@ void LuaBinding::registerClasses(lua_State *L){
     registerIOClasses(L);
     registerMathClasses(L);
     registerObjectClasses(L);
+    registerObjectEnvClasses(L);
+    registerObjectUIClasses(L);
     registerUtilClasses(L);
 }

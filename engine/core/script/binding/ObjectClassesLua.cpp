@@ -16,7 +16,6 @@
 #include "Terrain.h"
 #include "Light.h"
 #include "Mesh.h"
-#include "Text.h"
 #include "Fog.h"
 #include "Bone.h"
 #include "Model.h"
@@ -30,22 +29,6 @@ using namespace Supernova;
 void LuaBinding::registerObjectClasses(lua_State *L){
     sol::state_view lua(L);
 
-
-    lua.new_enum("FogType",
-                "LINEAR", FogType::LINEAR,
-                "EXPONENTIAL", FogType::EXPONENTIAL,
-                "EXPONENTIALSQUARED", FogType::EXPONENTIALSQUARED
-                );
-
-    lua.new_usertype<Fog>("Fog",
-	        sol::default_constructor,
-            "type", sol::property(&Fog::getType, &Fog::setType),
-            "color", sol::property(&Fog::getColor, &Fog::setColor),
-            "density", sol::property(&Fog::getDensity, &Fog::setDensity),
-            "linearStart", sol::property(&Fog::getLinearStart, &Fog::setLinearStart),
-            "linearEnd", sol::property(&Fog::getLinearEnd, &Fog::setLinearEnd),
-            "setLinearStartEnd", &Fog::setLinearStartEnd
-         );
 
     lua.new_usertype<Object>("Object",
 	    sol::constructors<Object(Scene*)>(),
@@ -158,40 +141,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         "setTexture", sol::overload( sol::resolve<void(std::string)>(&Terrain::setTexture), sol::resolve<void(FramebufferRender*)>(&Terrain::setTexture) ),
         "color", sol::property(&Terrain::getColor, sol::resolve<void(Vector4)>(&Terrain::setColor)),
         "setColor", sol::overload( sol::resolve<void(Vector4)>(&Terrain::setColor), sol::resolve<void(float, float, float, float)>(&Terrain::setColor) )  
-        );
-
-    lua.new_usertype<Text>("Text",
-        sol::constructors<Text(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "setSize", &Text::setSize,
-        "width", sol::property(&Text::getWidth, &Text::setWidth),
-        "setWidth", &Text::setWidth,
-        "height", sol::property(&Text::getHeight, &Text::setHeight),
-        "setHeight", &Text::setHeight,
-        "maxTextSize", sol::property(&Text::getMaxTextSize, &Text::setMaxTextSize),
-        "setMaxTextSize", &Text::setMaxTextSize,
-        "text", sol::property(&Text::getText, &Text::setText),
-        "setText", &Text::setText,
-        "font", sol::property(&Text::getFont, &Text::setFont),
-        "setFont", &Text::setFont,
-        "fontSize", sol::property(&Text::getFontSize, &Text::setFontSize),
-        "setFontSize", &Text::setFontSize,
-        "multiline", sol::property(&Text::getMultiline, &Text::setMultiline),
-        "setMultiline", &Text::setMultiline,
-        "color", sol::property(&Text::getColor, sol::resolve<void(Vector4)>(&Text::setColor)),
-        "setColor", sol::overload( sol::resolve<void(Vector4)>(&Text::setColor), sol::resolve<void(float, float, float, float)>(&Text::setColor) ),
-        "ascent", sol::property(&Text::getAscent),
-        "getAscent", &Text::getAscent,
-        "descent", sol::property(&Text::getDescent),
-        "getDescent", &Text::getDescent,
-        "lineGap", sol::property(&Text::getLineGap),
-        "getLineGap", &Text::getLineGap,
-        "lineHeight", sol::property(&Text::getLineHeight),
-        "getLineHeight", &Text::getLineHeight,
-        "numChars", sol::property(&Text::getNumChars),
-        "getNumChars", &Text::getNumChars,
-        "charPosition", sol::property(&Text::getCharPosition),
-        "getCharPosition", &Text::getCharPosition
         );
 
     lua.new_usertype<Bone>("Bone",
