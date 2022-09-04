@@ -32,7 +32,6 @@
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 #define SOL_USING_CXX_LUA 1
 #define SOL_ALL_SAFETIES_ON 1
-#define SOL_DEFAULT_AUTOMAGICAL_USERTYPES 0
 
 // end of sol/config.hpp
 

@@ -96,10 +96,9 @@ jobs:
 
       - name: Install Emscripten
         if: startsWith(matrix.config.platform, 'web')
-        uses: mymindstorm/setup-emsdk@v9
+        uses: mymindstorm/setup-emsdk@v11
         with:
           version: latest
-          actions-cache-folder: 'emsdk-cache-${{ matrix.config.backend }}'
         
       - name: Export Emscripten environment variable
         if: startsWith(matrix.config.platform, 'web')
