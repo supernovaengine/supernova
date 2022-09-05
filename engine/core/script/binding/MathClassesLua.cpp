@@ -234,59 +234,59 @@ void LuaBinding::registerMathClasses(lua_State *L){
             )
         );
 
-    lua.new_usertype<AlignedBox>("AlignedBox",
+    auto alignedbox = lua.new_usertype<AlignedBox>("AlignedBox",
         sol::constructors<AlignedBox(), AlignedBox(AlignedBox::BoxType), AlignedBox(const Vector3&, const Vector3&), AlignedBox(float, float, float, float, float, float)>(),
-        sol::meta_function::equal_to, &AlignedBox::operator==,
-        "minimum", sol::property( sol::resolve<Vector3&()>(&AlignedBox::getMinimum), sol::resolve<void(const Vector3&)>(&AlignedBox::setMinimum) ),
-        "getMinimum",  sol::resolve<Vector3&()>(&AlignedBox::getMinimum),
-        "setMinimum", sol::overload( sol::resolve<void(const Vector3&)>(&AlignedBox::setMinimum), sol::resolve<void(float, float, float)>(&AlignedBox::setMinimum) ),
-        "setMinimumX", &AlignedBox::setMinimumX,
-        "setMinimumY", &AlignedBox::setMinimumY,
-        "setMinimumZ", &AlignedBox::setMinimumZ,
-        "maximum", sol::property( sol::resolve<Vector3&()>(&AlignedBox::getMaximum), sol::resolve<void(const Vector3&)>(&AlignedBox::setMaximum) ),
-        "getMaximum",  sol::resolve<Vector3&()>(&AlignedBox::getMaximum),
-        "setMaximum", sol::overload( sol::resolve<void(const Vector3&)>(&AlignedBox::setMaximum), sol::resolve<void(float, float, float)>(&AlignedBox::setMaximum) ),
-        "setMaximumX", &AlignedBox::setMaximumX,
-        "setMaximumY", &AlignedBox::setMaximumY,
-        "setMaximumZ", &AlignedBox::setMaximumZ,
-        "setExtents", sol::overload( sol::resolve<void(const Vector3&, const Vector3&)>(&AlignedBox::setExtents), sol::resolve<void(float, float, float, float, float, float)>(&AlignedBox::setExtents) ),
-        "getAllCorners", &AlignedBox::getAllCorners,
-        "getCorner", &AlignedBox::getCorner,
-        "merge", sol::overload( sol::resolve<void(const AlignedBox&)>(&AlignedBox::merge), sol::resolve<void(const Vector3&)>(&AlignedBox::merge) ),
-        "transform", &AlignedBox::transform,
-        "null", sol::property( &AlignedBox::isNull, &AlignedBox::setNull ),
-        "setNull", &AlignedBox::setNull,
-        "isNull", &AlignedBox::isNull,
-        "finite", sol::property( &AlignedBox::isFinite ),
-        "isFinite", &AlignedBox::isFinite,
-        "infinite", sol::property( &AlignedBox::isInfinite, &AlignedBox::setInfinite ),
-        "setInfinite", &AlignedBox::setInfinite,
-        "isInfinite", &AlignedBox::isInfinite,
-        "intersects", sol::overload( sol::resolve<bool(const AlignedBox&) const>(&AlignedBox::intersects), sol::resolve<bool(const Plane&) const>(&AlignedBox::intersects), sol::resolve<bool(const Vector3&) const>(&AlignedBox::intersects) ),
-        "intersection", &AlignedBox::intersection,
-        "volume", &AlignedBox::volume,
-        "scale", &AlignedBox::scale,
-        "getCenter", &AlignedBox::getCenter,
-        "getSize", &AlignedBox::getSize,
-        "getHalfSize", &AlignedBox::getHalfSize,
-        "contains", sol::overload( sol::resolve<bool(const Vector3&) const>(&AlignedBox::contains), sol::resolve<bool(const AlignedBox&) const>(&AlignedBox::contains) ),
-        "squaredDistance", &AlignedBox::squaredDistance,
-        "distance", &AlignedBox::distance,
-        "BoxType", lua.create_table_with(
-            "BOXTYPE_NULL", AlignedBox::BoxType::BOXTYPE_NULL,
-            "BOXTYPE_FINITE", AlignedBox::BoxType::BOXTYPE_FINITE,
-            "BOXTYPE_INFINITE", AlignedBox::BoxType::BOXTYPE_INFINITE
-            ),
-        "CornerEnum", lua.create_table_with(
-            "FAR_LEFT_BOTTOM", AlignedBox::CornerEnum::FAR_LEFT_BOTTOM,
-            "FAR_LEFT_TOP", AlignedBox::CornerEnum::FAR_LEFT_TOP,
-            "FAR_RIGHT_TOP", AlignedBox::CornerEnum::FAR_RIGHT_TOP,
-            "FAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::FAR_RIGHT_BOTTOM,
-            "NEAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::NEAR_RIGHT_BOTTOM,
-            "NEAR_LEFT_BOTTOM", AlignedBox::CornerEnum::NEAR_LEFT_BOTTOM,
-            "NEAR_LEFT_TOP", AlignedBox::CornerEnum::NEAR_LEFT_TOP,
-            "NEAR_RIGHT_TOP", AlignedBox::CornerEnum::NEAR_RIGHT_TOP
-            )
+        sol::meta_function::equal_to, &AlignedBox::operator==);
+
+    alignedbox["minimum"] = sol::property( sol::resolve<Vector3&()>(&AlignedBox::getMinimum), sol::resolve<void(const Vector3&)>(&AlignedBox::setMinimum) );
+    alignedbox["getMinimum"] =  sol::resolve<Vector3&()>(&AlignedBox::getMinimum);
+    alignedbox["setMinimum"] = sol::overload( sol::resolve<void(const Vector3&)>(&AlignedBox::setMinimum), sol::resolve<void(float, float, float)>(&AlignedBox::setMinimum) );
+    alignedbox["setMinimumX"] = &AlignedBox::setMinimumX;
+    alignedbox["setMinimumY"] = &AlignedBox::setMinimumY;
+    alignedbox["setMinimumZ"] = &AlignedBox::setMinimumZ;
+    alignedbox["maximum"] = sol::property( sol::resolve<Vector3&()>(&AlignedBox::getMaximum), sol::resolve<void(const Vector3&)>(&AlignedBox::setMaximum) );
+    alignedbox["getMaximum"] =  sol::resolve<Vector3&()>(&AlignedBox::getMaximum);
+    alignedbox["setMaximum"] = sol::overload( sol::resolve<void(const Vector3&)>(&AlignedBox::setMaximum), sol::resolve<void(float, float, float)>(&AlignedBox::setMaximum) );
+    alignedbox["setMaximumX"] = &AlignedBox::setMaximumX;
+    alignedbox["setMaximumY"] = &AlignedBox::setMaximumY;
+    alignedbox["setMaximumZ"] = &AlignedBox::setMaximumZ;
+    alignedbox["setExtents"] = sol::overload( sol::resolve<void(const Vector3&, const Vector3&)>(&AlignedBox::setExtents), sol::resolve<void(float, float, float, float, float, float)>(&AlignedBox::setExtents) );
+    alignedbox["getAllCorners"] = &AlignedBox::getAllCorners;
+    alignedbox["getCorner"] = &AlignedBox::getCorner;
+    alignedbox["merge"] = sol::overload( sol::resolve<void(const AlignedBox&)>(&AlignedBox::merge), sol::resolve<void(const Vector3&)>(&AlignedBox::merge) );
+    alignedbox["transform"] = &AlignedBox::transform;
+    alignedbox["null"] = sol::property( &AlignedBox::isNull, &AlignedBox::setNull );
+    alignedbox["setNull"] = &AlignedBox::setNull;
+    alignedbox["isNull"] = &AlignedBox::isNull;
+    alignedbox["finite"] = sol::property( &AlignedBox::isFinite );
+    alignedbox["isFinite"] = &AlignedBox::isFinite;
+    alignedbox["infinite"] = sol::property( &AlignedBox::isInfinite, &AlignedBox::setInfinite );
+    alignedbox["setInfinite"] = &AlignedBox::setInfinite;
+    alignedbox["isInfinite"] = &AlignedBox::isInfinite;
+    alignedbox["intersects"] = sol::overload( sol::resolve<bool(const AlignedBox&) const>(&AlignedBox::intersects), sol::resolve<bool(const Plane&) const>(&AlignedBox::intersects), sol::resolve<bool(const Vector3&) const>(&AlignedBox::intersects) );
+    alignedbox["intersection"] = &AlignedBox::intersection;
+    alignedbox["volume"] = &AlignedBox::volume;
+    alignedbox["scale"] = &AlignedBox::scale;
+    alignedbox["getCenter"] = &AlignedBox::getCenter;
+    alignedbox["getSize"] = &AlignedBox::getSize;
+    alignedbox["getHalfSize"] = &AlignedBox::getHalfSize;
+    alignedbox["contains"] = sol::overload( sol::resolve<bool(const Vector3&) const>(&AlignedBox::contains), sol::resolve<bool(const AlignedBox&) const>(&AlignedBox::contains) );
+    alignedbox["squaredDistance"] = &AlignedBox::squaredDistance;
+    alignedbox["distance"] = &AlignedBox::distance;
+    alignedbox["BoxType"] = lua.create_table_with(
+        "BOXTYPE_NULL", AlignedBox::BoxType::BOXTYPE_NULL,
+        "BOXTYPE_FINITE", AlignedBox::BoxType::BOXTYPE_FINITE,
+        "BOXTYPE_INFINITE", AlignedBox::BoxType::BOXTYPE_INFINITE
+        );
+    alignedbox["CornerEnum"] = lua.create_table_with(
+        "FAR_LEFT_BOTTOM", AlignedBox::CornerEnum::FAR_LEFT_BOTTOM,
+        "FAR_LEFT_TOP", AlignedBox::CornerEnum::FAR_LEFT_TOP,
+        "FAR_RIGHT_TOP", AlignedBox::CornerEnum::FAR_RIGHT_TOP,
+        "FAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::FAR_RIGHT_BOTTOM,
+        "NEAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::NEAR_RIGHT_BOTTOM,
+        "NEAR_LEFT_BOTTOM", AlignedBox::CornerEnum::NEAR_LEFT_BOTTOM,
+        "NEAR_LEFT_TOP", AlignedBox::CornerEnum::NEAR_LEFT_TOP,
+        "NEAR_RIGHT_TOP", AlignedBox::CornerEnum::NEAR_RIGHT_TOP
         );
 
 
