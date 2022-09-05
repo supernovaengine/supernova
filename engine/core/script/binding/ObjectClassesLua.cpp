@@ -10,6 +10,7 @@
 
 #include "sol.hpp"
 
+#include "Fog.h"
 #include "Object.h"
 #include "Camera.h"
 #include "Polygon.h"
@@ -23,6 +24,7 @@
 #include "Particles.h"
 #include "PlaneTerrain.h"
 #include "Sprite.h"
+#include "Text.h"
 
 using namespace Supernova;
 
@@ -30,214 +32,263 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     sol::state_view lua(L);
 
 
-    lua.new_usertype<Object>("Object",
-	    sol::constructors<Object(Scene*)>(),
-        "createChild", &Object::createChild,
-        "addChild", &Object::addChild,
-        "moveToFirst", &Object::moveToFirst,
-        "moveUp", &Object::moveUp,
-        "moveDown", &Object::moveDown,
-        "moveToLast", &Object::moveToLast,
-        "name", sol::property(&Object::getName, &Object::setName),
-        "position", sol::property(&Object::getPosition, sol::resolve<void(Vector3)>(&Object::setPosition)),
-        "setPosition", sol::overload( sol::resolve<void(float, float, float)>(&Object::setPosition), sol::resolve<void(Vector3)>(&Object::setPosition) ),
-        "worldPosition", sol::property(&Object::getWorldPosition),
-        "scale", sol::property(&Object::getScale, sol::resolve<void(Vector3)>(&Object::setScale)),
-        "setScale", sol::overload( sol::resolve<void(float)>(&Object::setScale), sol::resolve<void(Vector3)>(&Object::setScale) ),
-        "worldScale", sol::property(&Object::getWorldScale),
-        "mModelMatrix", sol::property(&Object::setModelMatrix),
-        "setModelMatrix", &Object::setModelMatrix,
-        //"addComponent", &Object::addComponent,
-        //"removeComponent", &Object::removeComponent, 
-        //"getComponent", &Object::getComponent,
-        "entity", sol::property(&Object::getEntity),
-        "updateTransform", &Object::updateTransform
-        );
+    lua.new_enum("FogType",
+                "LINEAR", FogType::LINEAR,
+                "EXPONENTIAL", FogType::EXPONENTIAL,
+                "EXPONENTIALSQUARED", FogType::EXPONENTIALSQUARED
+                );
 
-    lua.new_usertype<Camera>("Camera",
+    auto fog = lua.new_usertype<Fog>("Fog",
+	        sol::default_constructor);
+
+    fog["type"] = sol::property(&Fog::getType, &Fog::setType);
+    fog["color"] = sol::property(&Fog::getColor, &Fog::setColor);
+    fog["density"] = sol::property(&Fog::getDensity, &Fog::setDensity);
+    fog["linearStart"] = sol::property(&Fog::getLinearStart, &Fog::setLinearStart);
+    fog["linearEnd"] = sol::property(&Fog::getLinearEnd, &Fog::setLinearEnd);
+    fog["setLinearStartEnd"] = &Fog::setLinearStartEnd;
+
+
+    auto object = lua.new_usertype<Object>("Object",
+	    sol::constructors<Object(Scene*)>());
+
+    object["createChild"] = &Object::createChild;
+    object["addChild"] = &Object::addChild;
+    object["moveToFirst"] = &Object::moveToFirst;
+    object["moveUp"] = &Object::moveUp;
+    object["moveDown"] = &Object::moveDown;
+    object["moveToLast"] = &Object::moveToLast;
+    object["name"] = sol::property(&Object::getName, &Object::setName);
+    object["position"] = sol::property(&Object::getPosition, sol::resolve<void(Vector3)>(&Object::setPosition));
+    object["setPosition"] = sol::overload( sol::resolve<void(float, float, float)>(&Object::setPosition), sol::resolve<void(Vector3)>(&Object::setPosition) );
+    object["worldPosition"] = sol::property(&Object::getWorldPosition);
+    object["scale"] = sol::property(&Object::getScale, sol::resolve<void(Vector3)>(&Object::setScale));
+    object["setScale"] = sol::overload( sol::resolve<void(float)>(&Object::setScale), sol::resolve<void(Vector3)>(&Object::setScale) );
+    object["worldScale"] = sol::property(&Object::getWorldScale);
+    object["mModelMatrix"] = sol::property(&Object::setModelMatrix);
+    object["setModelMatrix"] = &Object::setModelMatrix;
+    object["entity"] = sol::property(&Object::getEntity);
+    object["updateTransform"] = &Object::updateTransform;
+
+    auto camera = lua.new_usertype<Camera>("Camera",
         sol::constructors<Camera(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "activate", &Camera::activate,
-        "setOrtho", &Camera::setOrtho,
-        "setPerspective", &Camera::setPerspective,
-        "setType", &Camera::setType,
-        "type", sol::property(&Camera::getType, &Camera::setType),
-        "setView", sol::overload( sol::resolve<void(const float, const float, const float)>(&Camera::setView), sol::resolve<void(Vector3)>(&Camera::setView) ),
-        "view", sol::property(&Camera::getView, sol::resolve<void(Vector3)>(&Camera::setView)),
-        "setUp", sol::overload( sol::resolve<void(const float, const float, const float)>(&Camera::setUp), sol::resolve<void(Vector3)>(&Camera::setUp) ),
-        "up", sol::property(&Camera::getUp, sol::resolve<void(Vector3)>(&Camera::setUp)),
-        "rotateView", &Camera::rotateView,
-        "rotatePosition", &Camera::rotatePosition,
-        "elevateView", &Camera::elevateView,
-        "elevatePosition", &Camera::elevatePosition,
-        "moveForward", &Camera::moveForward,
-        "walkForward", &Camera::walkForward,
-        "slide", &Camera::slide,
-        "updateCamera", &Camera::updateCamera
-        );
+        sol::base_classes, sol::bases<Object>());
 
-    lua.new_usertype<Light>("Light",
+    camera["activate"] = &Camera::activate;
+    camera["setOrtho"] = &Camera::setOrtho;
+    camera["setPerspective"] = &Camera::setPerspective;
+    camera["setType"] = &Camera::setType;
+    camera["type"] = sol::property(&Camera::getType, &Camera::setType);
+    camera["setView"] = sol::overload( sol::resolve<void(const float, const float, const float)>(&Camera::setView), sol::resolve<void(Vector3)>(&Camera::setView) );
+    camera["view"] = sol::property(&Camera::getView, sol::resolve<void(Vector3)>(&Camera::setView));
+    camera["setUp"] = sol::overload( sol::resolve<void(const float, const float, const float)>(&Camera::setUp), sol::resolve<void(Vector3)>(&Camera::setUp) );
+    camera["up"] = sol::property(&Camera::getUp, sol::resolve<void(Vector3)>(&Camera::setUp));
+    camera["rotateView"] = &Camera::rotateView;
+    camera["rotatePosition"] = &Camera::rotatePosition;
+    camera["elevateView"] = &Camera::elevateView;
+    camera["elevatePosition"] = &Camera::elevatePosition;
+    camera["moveForward"] = &Camera::moveForward;
+    camera["walkForward"] = &Camera::walkForward;
+    camera["slide"] = &Camera::slide;
+    camera["updateCamera"] = &Camera::updateCamera;
+
+    auto light = lua.new_usertype<Light>("Light",
         sol::constructors<Light(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "type", sol::property(&Light::getType, &Light::setType),
-        "setType", &Light::setType,
-        "direction", sol::property(&Light::getDirection, sol::resolve<void(Vector3)>(&Light::setDirection)),
-        "setDirection", sol::overload( sol::resolve<void(const float, const float, const float)>(&Light::setDirection), sol::resolve<void(Vector3)>(&Light::setDirection) ),
-        "color", sol::property(&Light::getColor, sol::resolve<void(Vector3)>(&Light::setColor)),
-        "setColor", sol::overload( sol::resolve<void(Vector3)>(&Light::setColor), sol::resolve<void(const float, const float, const float)>(&Light::setColor) ),
-        "range", sol::property(&Light::getRange, &Light::setRange),
-        "setRange", &Light::setRange,
-        "intensity", sol::property(&Light::getIntensity, &Light::setIntensity),
-        "setIntensity", &Light::setIntensity,
-        "setConeAngle", &Light::setConeAngle,
-        "innerConeAngle", sol::property(&Light::getInnerConeAngle, &Light::setInnerConeAngle),
-        "setInnerConeAngle", &Light::setInnerConeAngle,
-        "outerConeAngle", sol::property(&Light::getOuterConeAngle, &Light::setOuterConeAngle),
-        "setOuterConeAngle", &Light::setOuterConeAngle,
-        "shadows", sol::property(&Light::isShadows, &Light::setShadows),
-        "setShadows", &Light::setShadows,
-        "setShadowCameraNearFar", &Light::setShadowCameraNearFar,
-        "cameraNear", sol::property(&Light::getCameraNear, &Light::setCameraNear),
-        "setCameraNear", &Light::setCameraNear,
-        "cameraFar", sol::property(&Light::getCameraFar, &Light::setCameraFar),
-        "setCameraFar", &Light::setCameraFar,
-        "numCascades", sol::property(&Light::getNumCascades, &Light::setNumCascades),
-        "setNumCascades", &Light::setNumCascades
-        );
+        sol::base_classes, sol::bases<Object>());
 
-    lua.new_usertype<Mesh>("Mesh",
+    light["type"] = sol::property(&Light::getType, &Light::setType);
+    light["setType"] = &Light::setType;
+    light["direction"] = sol::property(&Light::getDirection, sol::resolve<void(Vector3)>(&Light::setDirection));
+    light["setDirection"] = sol::overload( sol::resolve<void(const float, const float, const float)>(&Light::setDirection), sol::resolve<void(Vector3)>(&Light::setDirection) );
+    light["color"] = sol::property(&Light::getColor, sol::resolve<void(Vector3)>(&Light::setColor));
+    light["setColor"] = sol::overload( sol::resolve<void(Vector3)>(&Light::setColor), sol::resolve<void(const float, const float, const float)>(&Light::setColor) );
+    light["range"] = sol::property(&Light::getRange, &Light::setRange);
+    light["setRange"] = &Light::setRange;
+    light["intensity"] = sol::property(&Light::getIntensity, &Light::setIntensity);
+    light["setIntensity"] = &Light::setIntensity;
+    light["setConeAngle"] = &Light::setConeAngle;
+    light["innerConeAngle"] = sol::property(&Light::getInnerConeAngle, &Light::setInnerConeAngle);
+    light["setInnerConeAngle"] = &Light::setInnerConeAngle;
+    light["outerConeAngle"] = sol::property(&Light::getOuterConeAngle, &Light::setOuterConeAngle);
+    light["setOuterConeAngle"] = &Light::setOuterConeAngle;
+    light["shadows"] = sol::property(&Light::isShadows, &Light::setShadows);
+    light["setShadows"] = &Light::setShadows;
+    light["setShadowCameraNearFar"] = &Light::setShadowCameraNearFar;
+    light["cameraNear"] = sol::property(&Light::getCameraNear, &Light::setCameraNear);
+    light["setCameraNear"] = &Light::setCameraNear;
+    light["cameraFar"] = sol::property(&Light::getCameraFar, &Light::setCameraFar);
+    light["setCameraFar"] = &Light::setCameraFar;
+    light["numCascades"] = sol::property(&Light::getNumCascades, &Light::setNumCascades);
+    light["setNumCascades"] = &Light::setNumCascades;
+
+    auto mesh = lua.new_usertype<Mesh>("Mesh",
         sol::constructors<Mesh(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "texture", sol::property(sol::resolve<void(std::string)>(&Mesh::setTexture)),
-        "setTexture", sol::overload( sol::resolve<void(std::string)>(&Mesh::setTexture), sol::resolve<void(FramebufferRender*)>(&Mesh::setTexture) )
-        );
+        sol::base_classes, sol::bases<Object>());
+    
+    mesh["texture"] = sol::property(sol::resolve<void(std::string)>(&Mesh::setTexture));
+    mesh["setTexture"] = sol::overload( sol::resolve<void(std::string)>(&Mesh::setTexture), sol::resolve<void(FramebufferRender*)>(&Mesh::setTexture) );
 
-    lua.new_usertype<Polygon>("Polygon",
+    auto polygon = lua.new_usertype<Polygon>("Polygon",
         sol::constructors<Polygon(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "addVertex", sol::overload( sol::resolve<void(float, float)>(&Polygon::addVertex), sol::resolve<void(Vector3)>(&Polygon::addVertex) ),
-        "color", sol::property(&Polygon::getColor, sol::resolve<void(Vector4)>(&Polygon::setColor)),
-        "setColor", sol::overload( sol::resolve<void(float, float, float, float)>(&Polygon::setColor), sol::resolve<void(Vector4)>(&Polygon::setColor) ),
-        "texture", sol::property(sol::resolve<void(std::string)>(&Polygon::setTexture)),
-        "setTexture", sol::overload( sol::resolve<void(std::string)>(&Polygon::setTexture), sol::resolve<void(FramebufferRender*)>(&Polygon::setTexture) ),
-        "getWidth", &Polygon::getWidth
-        );
+        sol::base_classes, sol::bases<Object>());
+
+    polygon["addVertex"] = sol::overload( sol::resolve<void(float, float)>(&Polygon::addVertex), sol::resolve<void(Vector3)>(&Polygon::addVertex) );
+    polygon["color"] = sol::property(&Polygon::getColor, sol::resolve<void(Vector4)>(&Polygon::setColor));
+    polygon["setColor"] = sol::overload( sol::resolve<void(float, float, float, float)>(&Polygon::setColor), sol::resolve<void(Vector4)>(&Polygon::setColor) );
+    polygon["texture"] = sol::property(sol::resolve<void(std::string)>(&Polygon::setTexture));
+    polygon["setTexture"] = sol::overload( sol::resolve<void(std::string)>(&Polygon::setTexture), sol::resolve<void(FramebufferRender*)>(&Polygon::setTexture) );
+    polygon["getWidth"] = &Polygon::getWidth;
 
 
-    lua.new_usertype<Terrain>("Terrain",
+    auto terrain = lua.new_usertype<Terrain>("Terrain",
         sol::constructors<Terrain(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "heightMap", sol::property(sol::resolve<void(std::string)>(&Terrain::setHeightMap)),
-        "setHeightMap", sol::overload( sol::resolve<void(std::string)>(&Terrain::setHeightMap), sol::resolve<void(FramebufferRender*)>(&Terrain::setHeightMap) ),
-        "blendMap", sol::property(sol::resolve<void(std::string)>(&Terrain::setBlendMap)),
-        "setBlendMap", sol::overload( sol::resolve<void(std::string)>(&Terrain::setBlendMap), sol::resolve<void(FramebufferRender*)>(&Terrain::setBlendMap) ),
-        "textureDetailRed", sol::property(&Terrain::setTextureDetailRed),
-        "setTextureDetailRed", &Terrain::setTextureDetailRed,
-        "textureDetailGreen", sol::property(&Terrain::setTextureDetailGreen),
-        "setTextureDetailGreen", &Terrain::setTextureDetailGreen,
-        "textureDetailBlue", sol::property(&Terrain::setTextureDetailBlue),
-        "setTextureDetailBlue", &Terrain::setTextureDetailBlue,
-        "texture", sol::property(sol::resolve<void(std::string)>(&Terrain::setTexture)),
-        "setTexture", sol::overload( sol::resolve<void(std::string)>(&Terrain::setTexture), sol::resolve<void(FramebufferRender*)>(&Terrain::setTexture) ),
-        "color", sol::property(&Terrain::getColor, sol::resolve<void(Vector4)>(&Terrain::setColor)),
-        "setColor", sol::overload( sol::resolve<void(Vector4)>(&Terrain::setColor), sol::resolve<void(float, float, float, float)>(&Terrain::setColor) )  
-        );
+        sol::base_classes, sol::bases<Object>());
+
+    terrain["heightMap"] = sol::property(sol::resolve<void(std::string)>(&Terrain::setHeightMap));
+    terrain["setHeightMap"] = sol::overload( sol::resolve<void(std::string)>(&Terrain::setHeightMap), sol::resolve<void(FramebufferRender*)>(&Terrain::setHeightMap) );
+    terrain["blendMap"] = sol::property(sol::resolve<void(std::string)>(&Terrain::setBlendMap));
+    terrain["setBlendMap"] = sol::overload( sol::resolve<void(std::string)>(&Terrain::setBlendMap), sol::resolve<void(FramebufferRender*)>(&Terrain::setBlendMap) );
+    terrain["textureDetailRed"] = sol::property(&Terrain::setTextureDetailRed);
+    terrain["setTextureDetailRed"] = &Terrain::setTextureDetailRed;
+    terrain["textureDetailGreen"] = sol::property(&Terrain::setTextureDetailGreen);
+    terrain["setTextureDetailGreen"] = &Terrain::setTextureDetailGreen;
+    terrain["textureDetailBlue"] = sol::property(&Terrain::setTextureDetailBlue);
+    terrain["setTextureDetailBlue"] = &Terrain::setTextureDetailBlue;
+    terrain["texture"] = sol::property(sol::resolve<void(std::string)>(&Terrain::setTexture));
+    terrain["setTexture"] = sol::overload( sol::resolve<void(std::string)>(&Terrain::setTexture), sol::resolve<void(FramebufferRender*)>(&Terrain::setTexture) );
+    terrain["color"] = sol::property(&Terrain::getColor, sol::resolve<void(Vector4)>(&Terrain::setColor));
+    terrain["setColor"] = sol::overload( sol::resolve<void(Vector4)>(&Terrain::setColor), sol::resolve<void(float, float, float, float)>(&Terrain::setColor) );
 
     lua.new_usertype<Bone>("Bone",
         sol::constructors<Bone(Scene*, Entity)>(),
         sol::base_classes, sol::bases<Object>()
         );
 
-    lua.new_usertype<Model>("Model",
+    auto model = lua.new_usertype<Model>("Model",
         sol::constructors<Model(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "loadOBJ", &Model::loadOBJ,
-        "loadGLTF", &Model::loadGLTF,
-        "loadModel", &Model::loadModel,
-        "getAnimation", &Model::getAnimation,
-        "findAnimation", &Model::findAnimation,
-        "getBone", sol::overload( sol::resolve<Bone(std::string)>(&Model::getBone), sol::resolve<Bone(int)>(&Model::getBone) ),
-        "getMorphWeight", sol::overload( sol::resolve<float(std::string)>(&Model::getMorphWeight), sol::resolve<float(int)>(&Model::getMorphWeight) ),
-        "setMorphWeight", sol::overload( sol::resolve<void(std::string, float)>(&Model::setMorphWeight), sol::resolve<void(int, float)>(&Model::setMorphWeight) )
-        );
+        sol::base_classes, sol::bases<Object>());
 
-    lua.new_usertype<MeshPolygon>("MeshPolygon",
+    model["loadOBJ"] = &Model::loadOBJ;
+    model["loadGLTF"] = &Model::loadGLTF;
+    model["loadModel"] = &Model::loadModel;
+    model["getAnimation"] = &Model::getAnimation;
+    model["findAnimation"] = &Model::findAnimation;
+    model["getBone"] = sol::overload( sol::resolve<Bone(std::string)>(&Model::getBone), sol::resolve<Bone(int)>(&Model::getBone) );
+    model["getMorphWeight"] = sol::overload( sol::resolve<float(std::string)>(&Model::getMorphWeight), sol::resolve<float(int)>(&Model::getMorphWeight) );
+    model["setMorphWeight"] = sol::overload( sol::resolve<void(std::string, float)>(&Model::setMorphWeight), sol::resolve<void(int, float)>(&Model::setMorphWeight) );
+
+
+    auto meshpolygon = lua.new_usertype<MeshPolygon>("MeshPolygon",
         sol::constructors<MeshPolygon(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "addVertex", sol::overload( sol::resolve<void(Vector3)>(&MeshPolygon::addVertex), sol::resolve<void(float, float)>(&MeshPolygon::addVertex) ),
-        "width", sol::property(&MeshPolygon::getWidth),
-        "getWidth", &MeshPolygon::getWidth,
-        "height", sol::property(&MeshPolygon::getHeight),
-        "getHeight", &MeshPolygon::getHeight,
-        "flipY", sol::property(&MeshPolygon::isFlipY, &MeshPolygon::setFlipY),
-        "setFlipY", &MeshPolygon::setFlipY,
-        "isFlipY", &MeshPolygon::isFlipY
-        );
+        sol::base_classes, sol::bases<Object>());
 
-    lua.new_usertype<Particles>("Particles",
+    meshpolygon["addVertex"] = sol::overload( sol::resolve<void(Vector3)>(&MeshPolygon::addVertex), sol::resolve<void(float, float)>(&MeshPolygon::addVertex) );
+    meshpolygon["width"] = sol::property(&MeshPolygon::getWidth);
+    meshpolygon["getWidth"] = &MeshPolygon::getWidth;
+    meshpolygon["height"] = sol::property(&MeshPolygon::getHeight);
+    meshpolygon["getHeight"] = &MeshPolygon::getHeight;
+    meshpolygon["flipY"] = sol::property(&MeshPolygon::isFlipY, &MeshPolygon::setFlipY);
+    meshpolygon["setFlipY"] = &MeshPolygon::setFlipY;
+    meshpolygon["isFlipY"] = &MeshPolygon::isFlipY;
+
+    auto particles = lua.new_usertype<Particles>("Particles",
         sol::constructors<Particles(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "maxParticles", sol::property(&Particles::getMaxParticles, &Particles::setMaxParticles),
-        "setMaxParticles", &Particles::setMaxParticles,
-        "getMaxParticles", &Particles::getMaxParticles,
-        "addParticle", sol::overload( 
-            sol::resolve<void(Vector3)>(&Particles::addParticle), 
-            sol::resolve<void(Vector3, Vector4)>(&Particles::addParticle),
-            sol::resolve<void(Vector3, Vector4, float, float)>(&Particles::addParticle),
-            sol::resolve<void(Vector3, Vector4, float, float, Rect)>(&Particles::addParticle),
-            sol::resolve<void(float, float, float)>(&Particles::addParticle) ),
-        "addSpriteFrame", sol::overload( 
-            sol::resolve<void(int, std::string, Rect)>(&Particles::addSpriteFrame), 
-            sol::resolve<void(std::string, float, float, float, float)>(&Particles::addSpriteFrame),
-            sol::resolve<void(float, float, float, float)>(&Particles::addSpriteFrame),
-            sol::resolve<void(Rect)>(&Particles::addSpriteFrame)),
-        "removeSpriteFrame", sol::overload( 
-            sol::resolve<void(int)>(&Particles::removeSpriteFrame), 
-            sol::resolve<void(std::string)>(&Particles::removeSpriteFrame)),
-        "setTexture", &Particles::setTexture
-        );
+        sol::base_classes, sol::bases<Object>());
+        
+    particles["maxParticles"]  = sol::property(&Particles::getMaxParticles, &Particles::setMaxParticles);
+    particles["setMaxParticles"] = &Particles::setMaxParticles;
+    particles["getMaxParticles"] = &Particles::getMaxParticles;
+    particles["addParticle"] = sol::overload( 
+        sol::resolve<void(Vector3)>(&Particles::addParticle), 
+        sol::resolve<void(Vector3, Vector4)>(&Particles::addParticle),
+        sol::resolve<void(Vector3, Vector4, float, float)>(&Particles::addParticle),
+        sol::resolve<void(Vector3, Vector4, float, float, Rect)>(&Particles::addParticle),
+        sol::resolve<void(float, float, float)>(&Particles::addParticle) );
+    particles["addSpriteFrame"] = sol::overload( 
+        sol::resolve<void(int, std::string, Rect)>(&Particles::addSpriteFrame), 
+        sol::resolve<void(std::string, float, float, float, float)>(&Particles::addSpriteFrame),
+        sol::resolve<void(float, float, float, float)>(&Particles::addSpriteFrame),
+        sol::resolve<void(Rect)>(&Particles::addSpriteFrame));
+    particles["removeSpriteFrame"] = sol::overload( 
+        sol::resolve<void(int)>(&Particles::removeSpriteFrame), 
+        sol::resolve<void(std::string)>(&Particles::removeSpriteFrame));
+    particles["setTexture"] = &Particles::setTexture;
 
-    lua.new_usertype<PlaneTerrain>("PlaneTerrain",
+    auto planeterrain = lua.new_usertype<PlaneTerrain>("PlaneTerrain",
         sol::constructors<PlaneTerrain(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "create", &PlaneTerrain::create
-    );
+        sol::base_classes, sol::bases<Object>());
+    
+    planeterrain["create"] = &PlaneTerrain::create;
 
-    lua.new_usertype<Sprite>("Sprite",
+    auto sprite = lua.new_usertype<Sprite>("Sprite",
         sol::constructors<Sprite(Scene*)>(),
-        sol::base_classes, sol::bases<Object>(),
-        "setSize", &Sprite::setSize,
-        "width", sol::property(&Sprite::getWidth,  &Sprite::setWidth),
-        "setWidth", &Sprite::setWidth,
-        "getWidth", &Sprite::getWidth,
-        "height", sol::property(&Sprite::getHeight,  &Sprite::setHeight),
-        "setHeight", &Sprite::setHeight,
-        "getHeight", &Sprite::getHeight,
-        "flipY", sol::property(&Sprite::isFlipY, &Sprite::setFlipY),
-        "setFlipY", &Sprite::setFlipY,
-        "isFlipY", &Sprite::isFlipY,
-        "setBillboard", &Sprite::setBillboard,
-        "textureRect", sol::property(&Sprite::getTextureRect, sol::resolve<void(Rect)>(&Sprite::setTextureRect)),
-        "setTextureRect", sol::overload( 
-            sol::resolve<void(Rect)>(&Sprite::setTextureRect), 
-            sol::resolve<void(float, float, float, float)>(&Sprite::setTextureRect) ),
-        "getTextureRect", &Sprite::getTextureRect,
-        "addFrame", sol::overload( 
-            sol::resolve<void(int, std::string, Rect)>(&Sprite::addFrame), 
-            sol::resolve<void(std::string, float, float, float, float)>(&Sprite::addFrame),
-            sol::resolve<void(float, float, float, float)>(&Sprite::addFrame),
-            sol::resolve<void(Rect)>(&Sprite::addFrame) ),
-        "removeFrame", sol::overload( 
-            sol::resolve<void(int)>(&Sprite::removeFrame), 
-            sol::resolve<void(std::string)>(&Sprite::removeFrame) ),
-        "setFrame", sol::overload( 
-            sol::resolve<void(int)>(&Sprite::setFrame), 
-            sol::resolve<void(std::string)>(&Sprite::setFrame) ),
-        "startAnimation", sol::overload( 
-            sol::resolve<void(std::vector<int>, std::vector<int>, bool)>(&Sprite::startAnimation), 
-            sol::resolve<void(int, int, int, bool)>(&Sprite::startAnimation) ),
-        "pauseAnimation", &Sprite::pauseAnimation,
-        "stopAnimation", &Sprite::stopAnimation
-    );
+        sol::base_classes, sol::bases<Object>());
+
+    sprite["setSize"] = &Sprite::setSize;
+    sprite["width"] = sol::property(&Sprite::getWidth,  &Sprite::setWidth);
+    sprite["setWidth"] = &Sprite::setWidth;
+    sprite["getWidth"] = &Sprite::getWidth;
+    sprite["height"] = sol::property(&Sprite::getHeight,  &Sprite::setHeight);
+    sprite["setHeight"] = &Sprite::setHeight;
+    sprite["getHeight"] = &Sprite::getHeight;
+    sprite["flipY"] = sol::property(&Sprite::isFlipY, &Sprite::setFlipY);
+    sprite["setFlipY"] = &Sprite::setFlipY;
+    sprite["isFlipY"] = &Sprite::isFlipY;
+    sprite["setBillboard"] = &Sprite::setBillboard;
+    sprite["textureRect"] = sol::property(&Sprite::getTextureRect, sol::resolve<void(Rect)>(&Sprite::setTextureRect));
+    sprite["setTextureRect"] = sol::overload( 
+        sol::resolve<void(Rect)>(&Sprite::setTextureRect), 
+        sol::resolve<void(float, float, float, float)>(&Sprite::setTextureRect) );
+    sprite["getTextureRect"] = &Sprite::getTextureRect;
+    sprite["addFrame"] = sol::overload( 
+        sol::resolve<void(int, std::string, Rect)>(&Sprite::addFrame), 
+        sol::resolve<void(std::string, float, float, float, float)>(&Sprite::addFrame),
+        sol::resolve<void(float, float, float, float)>(&Sprite::addFrame),
+        sol::resolve<void(Rect)>(&Sprite::addFrame) );
+    sprite["removeFrame"] = sol::overload( 
+        sol::resolve<void(int)>(&Sprite::removeFrame), 
+        sol::resolve<void(std::string)>(&Sprite::removeFrame) );
+    sprite["setFrame"] = sol::overload( 
+        sol::resolve<void(int)>(&Sprite::setFrame), 
+        sol::resolve<void(std::string)>(&Sprite::setFrame) );
+    sprite["startAnimation"] = sol::overload( 
+        sol::resolve<void(std::vector<int>, std::vector<int>, bool)>(&Sprite::startAnimation), 
+        sol::resolve<void(int, int, int, bool)>(&Sprite::startAnimation) );
+    sprite["pauseAnimation"] = &Sprite::pauseAnimation;
+    sprite["stopAnimation"] = &Sprite::stopAnimation;
+
+    auto text = lua.new_usertype<Text>("Text",
+        sol::constructors<Text(Scene*)>(),
+        sol::base_classes, sol::bases<Object>());
+
+    text["setSize"] = &Text::setSize;
+    text["width"] = sol::property(&Text::getWidth, &Text::setWidth);
+    text["setWidth"] = &Text::setWidth;
+    text["height"] = sol::property(&Text::getHeight, &Text::setHeight);
+    text["setHeight"] = &Text::setHeight;
+    text["maxTextSize"] = sol::property(&Text::getMaxTextSize, &Text::setMaxTextSize);
+    text["setMaxTextSize"] = &Text::setMaxTextSize;
+    text["text"] = sol::property(&Text::getText, &Text::setText);
+    text["setText"] = &Text::setText;
+    text["font"] = sol::property(&Text::getFont, &Text::setFont);
+    text["setFont"] = &Text::setFont;
+    text["fontSize"] = sol::property(&Text::getFontSize, &Text::setFontSize);
+    text["setFontSize"] = &Text::setFontSize;
+    text["multiline"] = sol::property(&Text::getMultiline, &Text::setMultiline);
+    text["setMultiline"] = &Text::setMultiline;
+    text["color"] = sol::property(&Text::getColor, sol::resolve<void(Vector4)>(&Text::setColor));
+    text["setColor"] = sol::overload( sol::resolve<void(Vector4)>(&Text::setColor), sol::resolve<void(float, float, float, float)>(&Text::setColor) );
+    text["ascent"] = sol::property(&Text::getAscent);
+    text["getAscent"] = &Text::getAscent;
+    text["descent"] = sol::property(&Text::getDescent);
+    text["getDescent"] = &Text::getDescent;
+    text["lineGap"] = sol::property(&Text::getLineGap);
+    text["getLineGap"] = &Text::getLineGap;
+    text["lineHeight"] = sol::property(&Text::getLineHeight);
+    text["getLineHeight"] = &Text::getLineHeight;
+    text["numChars"] = sol::property(&Text::getNumChars);
+    text["getNumChars"] = &Text::getNumChars;
+    text["charPosition"] = sol::property(&Text::getCharPosition);
+    text["getCharPosition"] = &Text::getCharPosition;
 
 }
