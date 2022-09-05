@@ -14536,7 +14536,7 @@ namespace sol { namespace stack {
 
 namespace sol { namespace stack {
 
-#if SOL_IS_ON(SOL_COMPILER_GCC)
+#if SOL_IS_ON(SOL_COMPILER_GCC) && !SOL_IS_ON(SOL_COMPILER_CLANG)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
@@ -14627,7 +14627,7 @@ namespace sol { namespace stack {
 		}
 	} // namespace stack_detail
 
-#if SOL_IS_ON(SOL_COMPILER_GCC)
+#if SOL_IS_ON(SOL_COMPILER_GCC) && !SOL_IS_ON(SOL_COMPILER_CLANG)
 #pragma GCC diagnostic pop
 #endif
 
@@ -17289,7 +17289,7 @@ namespace sol {
 			return status() == call_status::ok || status() == call_status::yielded;
 		}
 
-#if SOL_IS_ON(SOL_COMPILER_GCC)
+#if SOL_IS_ON(SOL_COMPILER_GCC) && !SOL_IS_ON(SOL_COMPILER_CLANG)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
@@ -17335,7 +17335,7 @@ namespace sol {
 			}
 		}
 
-#if SOL_IS_ON(SOL_COMPILER_GCC)
+#if SOL_IS_ON(SOL_COMPILER_GCC) && !SOL_IS_ON(SOL_COMPILER_CLANG)
 #pragma GCC diagnostic pop
 #endif
 
