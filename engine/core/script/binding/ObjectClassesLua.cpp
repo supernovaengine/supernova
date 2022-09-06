@@ -39,7 +39,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
                 );
 
     auto fog = lua.new_usertype<Fog>("Fog",
-	        sol::default_constructor);
+	        sol::call_constructor, sol::default_constructor);
 
     fog["type"] = sol::property(&Fog::getType, &Fog::setType);
     fog["color"] = sol::property(&Fog::getColor, &Fog::setColor);
@@ -50,7 +50,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
 
 
     auto object = lua.new_usertype<Object>("Object",
-	    sol::constructors<Object(Scene*)>());
+	    sol::call_constructor, sol::constructors<Object(Scene*)>());
 
     object["createChild"] = &Object::createChild;
     object["addChild"] = &Object::addChild;
@@ -71,7 +71,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     object["updateTransform"] = &Object::updateTransform;
 
     auto camera = lua.new_usertype<Camera>("Camera",
-        sol::constructors<Camera(Scene*)>(),
+        sol::call_constructor, sol::constructors<Camera(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
 
     camera["activate"] = &Camera::activate;
@@ -93,7 +93,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     camera["updateCamera"] = &Camera::updateCamera;
 
     auto light = lua.new_usertype<Light>("Light",
-        sol::constructors<Light(Scene*)>(),
+        sol::call_constructor, sol::constructors<Light(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
 
     light["type"] = sol::property(&Light::getType, &Light::setType);
@@ -122,14 +122,14 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     light["setNumCascades"] = &Light::setNumCascades;
 
     auto mesh = lua.new_usertype<Mesh>("Mesh",
-        sol::constructors<Mesh(Scene*)>(),
+        sol::call_constructor, sol::constructors<Mesh(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
     
     mesh["texture"] = sol::property(sol::resolve<void(std::string)>(&Mesh::setTexture));
     mesh["setTexture"] = sol::overload( sol::resolve<void(std::string)>(&Mesh::setTexture), sol::resolve<void(FramebufferRender*)>(&Mesh::setTexture) );
 
     auto polygon = lua.new_usertype<Polygon>("Polygon",
-        sol::constructors<Polygon(Scene*)>(),
+        sol::call_constructor, sol::constructors<Polygon(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
 
     polygon["addVertex"] = sol::overload( sol::resolve<void(float, float)>(&Polygon::addVertex), sol::resolve<void(Vector3)>(&Polygon::addVertex) );
@@ -141,7 +141,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
 
 
     auto terrain = lua.new_usertype<Terrain>("Terrain",
-        sol::constructors<Terrain(Scene*)>(),
+        sol::call_constructor, sol::constructors<Terrain(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
 
     terrain["heightMap"] = sol::property(sol::resolve<void(std::string)>(&Terrain::setHeightMap));
@@ -160,12 +160,12 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     terrain["setColor"] = sol::overload( sol::resolve<void(Vector4)>(&Terrain::setColor), sol::resolve<void(float, float, float, float)>(&Terrain::setColor) );
 
     lua.new_usertype<Bone>("Bone",
-        sol::constructors<Bone(Scene*, Entity)>(),
+        sol::call_constructor, sol::constructors<Bone(Scene*, Entity)>(),
         sol::base_classes, sol::bases<Object>()
         );
 
     auto model = lua.new_usertype<Model>("Model",
-        sol::constructors<Model(Scene*)>(),
+        sol::call_constructor, sol::constructors<Model(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
 
     model["loadOBJ"] = &Model::loadOBJ;
@@ -179,7 +179,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
 
 
     auto meshpolygon = lua.new_usertype<MeshPolygon>("MeshPolygon",
-        sol::constructors<MeshPolygon(Scene*)>(),
+        sol::call_constructor, sol::constructors<MeshPolygon(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
 
     meshpolygon["addVertex"] = sol::overload( sol::resolve<void(Vector3)>(&MeshPolygon::addVertex), sol::resolve<void(float, float)>(&MeshPolygon::addVertex) );
@@ -192,7 +192,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     meshpolygon["isFlipY"] = &MeshPolygon::isFlipY;
 
     auto particles = lua.new_usertype<Particles>("Particles",
-        sol::constructors<Particles(Scene*)>(),
+        sol::call_constructor, sol::constructors<Particles(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
         
     particles["maxParticles"]  = sol::property(&Particles::getMaxParticles, &Particles::setMaxParticles);
@@ -215,13 +215,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     particles["setTexture"] = &Particles::setTexture;
 
     auto planeterrain = lua.new_usertype<PlaneTerrain>("PlaneTerrain",
-        sol::constructors<PlaneTerrain(Scene*)>(),
+        sol::call_constructor, sol::constructors<PlaneTerrain(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
     
     planeterrain["create"] = &PlaneTerrain::create;
 
     auto sprite = lua.new_usertype<Sprite>("Sprite",
-        sol::constructors<Sprite(Scene*)>(),
+        sol::call_constructor, sol::constructors<Sprite(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
 
     sprite["setSize"] = &Sprite::setSize;
@@ -258,7 +258,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     sprite["stopAnimation"] = &Sprite::stopAnimation;
 
     auto text = lua.new_usertype<Text>("Text",
-        sol::constructors<Text(Scene*)>(),
+        sol::call_constructor, sol::constructors<Text(Scene*)>(),
         sol::base_classes, sol::bases<Object>());
 
     text["setSize"] = &Text::setSize;

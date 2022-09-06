@@ -20,7 +20,7 @@ void LuaBinding::registerActionClasses(lua_State *L){
     sol::state_view lua(L);
 
     lua.new_usertype<Action>("Action",
-        sol::constructors<Action(Scene*),Action(Scene*, Entity)>(),
+        sol::call_constructor, sol::constructors<Action(Scene*),Action(Scene*, Entity)>(),
         "start", &Action::start,
         "pause", &Action::pause,
         "target", sol::property(&Action::getTarget, &Action::setTarget),
@@ -34,7 +34,7 @@ void LuaBinding::registerActionClasses(lua_State *L){
         );
 
     lua.new_usertype<Animation>("Animation",
-        sol::constructors<Animation(Scene*),Animation(Scene*, Entity)>(),
+        sol::call_constructor, sol::constructors<Animation(Scene*),Animation(Scene*, Entity)>(),
         sol::base_classes, sol::bases<Action>(),
         "loop", sol::property(&Animation::isLoop, &Animation::setLoop),
         "isLoop", &Animation::isLoop,
