@@ -25,7 +25,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
     lua.new_usertype<Signature>("Signature");
 
     lua.new_usertype<EntityManager>("EntityManager",
-        sol::no_constructor,
+        sol::call_constructor, sol::default_constructor,
         "createEntity", &EntityManager::createEntity,
         "destroy", &EntityManager::destroy,
         "setSignature", &EntityManager::setSignature,
