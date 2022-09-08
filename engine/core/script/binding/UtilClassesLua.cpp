@@ -17,6 +17,8 @@
 using namespace Supernova;
 
 void LuaBinding::registerUtilClasses(lua_State *L){
+#ifndef DISABLE_LUA_BINDINGS
+
     sol::state_view lua(L);
 
     auto angle = lua.new_usertype<Angle>("Angle",
@@ -41,4 +43,5 @@ void LuaBinding::registerUtilClasses(lua_State *L){
     color["linearTosRGB"] = sol::overload(sol::resolve<Vector3(Vector3)>(Color::linearTosRGB), sol::resolve<Vector4(Vector4)>(Color::linearTosRGB));
     color["sRGBToLinear"] = sol::overload(sol::resolve<Vector3(Vector3)>(Color::sRGBToLinear), sol::resolve<Vector4(Vector4)>(Color::sRGBToLinear));
 
+#endif //DISABLE_LUA_BINDINGS
 }

@@ -17,10 +17,12 @@
 using namespace Supernova;
 
 void LuaBinding::registerIOClasses(lua_State *L){
+#ifndef DISABLE_LUA_BINDINGS
+
     sol::state_view lua(L);
-/*
+
     auto filedata = lua.new_usertype<FileData>("FileData",
-        sol::call_constructor, sol::default_constructor);
+        sol::no_constructor);
 
     filedata["newFile"] = sol::overload(sol::resolve<FileData*(bool)>(FileData::newFile), sol::resolve<FileData*(const char *, bool)>(FileData::newFile));
     filedata["newFile"] = &FileData::getBaseDir;
@@ -37,5 +39,18 @@ void LuaBinding::registerIOClasses(lua_State *L){
     filedata["pos"] = &FileData::pos;
     filedata["readString"] = &FileData::readString;
     filedata["writeString"] = &FileData::writeString;
-    */
+
+
+    auto file = lua.new_usertype<File>("File",
+        sol::call_constructor, sol::constructors<File(), File(const char *, bool)>(),
+        sol::base_classes, sol::bases<FileData>());
+
+
+    auto data = lua.new_usertype<Data>("Data",
+        sol::call_constructor, sol::constructors<Data(), Data(unsigned char *, unsigned int, bool, bool), Data(const char *)>(),
+        sol::base_classes, sol::bases<FileData>());
+
+    data["open"] = sol::overload(sol::resolve<unsigned int(unsigned char *, unsigned int, bool, bool)>(&Data::open), sol::resolve<unsigned int(const char *)>(&Data::open), sol::resolve<unsigned int(File *)>(&Data::open));
+
+#endif //DISABLE_LUA_BINDINGS
 }

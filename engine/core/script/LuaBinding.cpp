@@ -218,6 +218,10 @@ void LuaBinding::init(){
 }
 
 void LuaBinding::registerClasses(lua_State *L){
+#ifndef DISABLE_LUA_BINDINGS
+    // luaL_openlibs() opened all libraries already: base, string, io, os, package, table, debug
+    //lua.open_libraries(sol::lib::base);
+
     registerActionClasses(L);
     registerCoreClasses(L);
     registerECSClasses(L);
@@ -225,4 +229,6 @@ void LuaBinding::registerClasses(lua_State *L){
     registerMathClasses(L);
     registerObjectClasses(L);
     registerUtilClasses(L);
+
+#endif //DISABLE_LUA_BINDINGS
 }

@@ -18,6 +18,8 @@
 using namespace Supernova;
 
 void LuaBinding::registerECSClasses(lua_State *L){
+#ifndef DISABLE_LUA_BINDINGS
+
     sol::state_view lua(L);
 
     lua.new_usertype<Entity>("Entity");
@@ -31,4 +33,6 @@ void LuaBinding::registerECSClasses(lua_State *L){
         "setSignature", &EntityManager::setSignature,
         "setSignature", &EntityManager::setSignature
     );
+
+#endif //DISABLE_LUA_BINDINGS
 }

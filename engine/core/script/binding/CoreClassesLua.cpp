@@ -17,10 +17,9 @@
 using namespace Supernova;
 
 void LuaBinding::registerCoreClasses(lua_State *L){
-    sol::state_view lua(L);
+#ifndef DISABLE_LUA_BINDINGS
 
-    // luaL_openlibs() opened all libraries already: base, string, io, os, package, table, debug
-    //lua.open_libraries(sol::lib::base);
+    sol::state_view lua(L);
 
     lua.new_enum("Scaling",
                 "FITWIDTH", Scaling::FITWIDTH,
@@ -218,4 +217,5 @@ void LuaBinding::registerCoreClasses(lua_State *L){
     scene["moveChildDown"] = &Scene::moveChildDown;
     scene["moveChildToLast"] = &Scene::moveChildToLast;
 
+#endif //DISABLE_LUA_BINDINGS
 }

@@ -28,6 +28,8 @@
 using namespace Supernova;
 
 void LuaBinding::registerActionClasses(lua_State *L){
+#ifndef DISABLE_LUA_BINDINGS
+
     sol::state_view lua(L);
 
     auto action = lua.new_usertype<Action>("Action",
@@ -233,4 +235,5 @@ void LuaBinding::registerActionClasses(lua_State *L){
     translatetracks["setTimes"] = &TranslateTracks::setTimes;
     translatetracks["setValues"] = &TranslateTracks::setValues;
 
+#endif //DISABLE_LUA_BINDINGS
 }
