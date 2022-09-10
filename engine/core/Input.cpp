@@ -77,6 +77,10 @@ bool Input::isMousePressed(int key){
     return mousePressed[key];
 }
 
+bool Input::isTouch(){
+    return (touches.size() > 0);
+}
+
 bool Input::isMouseEntered(){
     return mousedEntered;
 }

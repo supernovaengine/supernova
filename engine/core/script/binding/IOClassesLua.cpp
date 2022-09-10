@@ -13,6 +13,7 @@
 #include "io/Data.h"
 #include "io/File.h"
 #include "io/FileData.h"
+#include "io/UserSettings.h"
 
 using namespace Supernova;
 
@@ -51,6 +52,25 @@ void LuaBinding::registerIOClasses(lua_State *L){
         sol::base_classes, sol::bases<FileData>());
 
     data["open"] = sol::overload(sol::resolve<unsigned int(unsigned char *, unsigned int, bool, bool)>(&Data::open), sol::resolve<unsigned int(const char *)>(&Data::open), sol::resolve<unsigned int(File *)>(&Data::open));
+
+
+    auto usersettings = lua.new_usertype<UserSettings>("UserSettings",
+        sol::no_constructor);
+
+    usersettings["getBoolForKey"] = sol::overload(sol::resolve<bool(const char *)>(&UserSettings::getBoolForKey), sol::resolve<bool(const char *, bool)>(&UserSettings::getBoolForKey));
+    usersettings["getIntegerForKey"] = sol::overload(sol::resolve<int(const char *)>(&UserSettings::getIntegerForKey), sol::resolve<int(const char *, int)>(&UserSettings::getIntegerForKey));
+    usersettings["getLongForKey"] = sol::overload(sol::resolve<long(const char *)>(&UserSettings::getLongForKey), sol::resolve<long(const char *, long)>(&UserSettings::getLongForKey));
+    usersettings["getFloatForKey"] = sol::overload(sol::resolve<float(const char *)>(&UserSettings::getFloatForKey), sol::resolve<float(const char *, float)>(&UserSettings::getFloatForKey));
+    usersettings["getDoubleForKey"] = sol::overload(sol::resolve<double(const char *)>(&UserSettings::getDoubleForKey), sol::resolve<double(const char *, double)>(&UserSettings::getDoubleForKey));
+    usersettings["getStringForKey"] = sol::overload(sol::resolve<std::string(const char *)>(&UserSettings::getStringForKey), sol::resolve<std::string(const char *, std::string)>(&UserSettings::getStringForKey));
+    usersettings["getDataForKey"] = sol::overload(sol::resolve<Data(const char *)>(&UserSettings::getDataForKey), sol::resolve<Data(const char *, const Data&)>(&UserSettings::getDataForKey));
+    usersettings["setBoolForKey"] = &UserSettings::setBoolForKey;
+    usersettings["setIntegerForKey"] = &UserSettings::setIntegerForKey;
+    usersettings["setLongForKey"] = &UserSettings::setLongForKey;
+    usersettings["setFloatForKey"] = &UserSettings::setFloatForKey;
+    usersettings["setDoubleForKey"] = &UserSettings::setDoubleForKey;
+    usersettings["setStringForKey"] = &UserSettings::setStringForKey;
+    usersettings["setDataForKey"] = &UserSettings::setDataForKey;
 
 #endif //DISABLE_LUA_BINDINGS
 }

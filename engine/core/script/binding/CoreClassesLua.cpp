@@ -13,6 +13,8 @@
 #include "Engine.h"
 #include "Log.h"
 #include "Scene.h"
+#include "Log.h"
+#include "Input.h"
 
 using namespace Supernova;
 
@@ -216,6 +218,167 @@ void LuaBinding::registerCoreClasses(lua_State *L){
     scene["moveChildUp"] = &Scene::moveChildUp;
     scene["moveChildDown"] = &Scene::moveChildDown;
     scene["moveChildToLast"] = &Scene::moveChildToLast;
+
+
+    auto log = lua.new_usertype<Log>("Log",
+        sol::no_constructor);
+
+    log["Print"] = &Log::Print;
+    log["Verbose"] = &Log::Verbose;
+    log["Debug"] = &Log::Debug;
+    log["Warn"] = &Log::Warn;
+    log["Error"] = &Log::Error;
+
+
+    auto touch = lua.new_usertype<Touch>("Touch",
+        sol::no_constructor);
+
+    touch["pointer"] = &Touch::pointer;
+    touch["position"] = &Touch::position;
+
+    auto input = lua.new_usertype<Input>("Input",
+        sol::no_constructor);
+
+    input["MODIFIER_SHIFT"] = sol::var(S_MODIFIER_SHIFT);
+    input["MODIFIER_CONTROL"] = sol::var(S_MODIFIER_CONTROL);
+    input["MODIFIER_ALT"] = sol::var(S_MODIFIER_ALT);
+    input["MODIFIER_SUPER"] = sol::var(S_MODIFIER_SUPER);
+    input["MODIFIER_CAPS_LOCK"] = sol::var(S_MODIFIER_CAPS_LOCK);
+    input["MODIFIER_NUM_LOCK"] = sol::var(S_MODIFIER_NUM_LOCK);
+    input["KEY_UNKNOWN"] = sol::var(S_KEY_UNKNOWN);
+    input["KEY_SPACE"] = sol::var(S_KEY_SPACE);
+    input["KEY_APOSTROPHE"] = sol::var(S_KEY_APOSTROPHE);
+    input["KEY_COMMA"] = sol::var(S_KEY_COMMA);
+    input["KEY_MINUS"] = sol::var(S_KEY_MINUS);
+    input["KEY_PERIOD"] = sol::var(S_KEY_PERIOD);
+    input["KEY_SLASH"] = sol::var(S_KEY_SLASH);
+    input["KEY_0"] = sol::var(S_KEY_0);
+    input["KEY_1"] = sol::var(S_KEY_1);
+    input["KEY_2"] = sol::var(S_KEY_2);
+    input["KEY_3"] = sol::var(S_KEY_3);
+    input["KEY_4"] = sol::var(S_KEY_4);
+    input["KEY_5"] = sol::var(S_KEY_5);
+    input["KEY_6"] = sol::var(S_KEY_6);
+    input["KEY_7"] = sol::var(S_KEY_7);
+    input["KEY_8"] = sol::var(S_KEY_8);
+    input["KEY_9"] = sol::var(S_KEY_9);
+    input["KEY_SEMICOLON"] = sol::var(S_KEY_SEMICOLON);
+    input["KEY_EQUAL"] = sol::var(S_KEY_EQUAL);
+    input["KEY_A"] = sol::var(S_KEY_A);
+    input["KEY_B"] = sol::var(S_KEY_B);
+    input["KEY_C"] = sol::var(S_KEY_C);
+    input["KEY_D"] = sol::var(S_KEY_D);
+    input["KEY_E"] = sol::var(S_KEY_E);
+    input["KEY_F"] = sol::var(S_KEY_F);
+    input["KEY_G"] = sol::var(S_KEY_G);
+    input["KEY_H"] = sol::var(S_KEY_H);
+    input["KEY_I"] = sol::var(S_KEY_I);
+    input["KEY_J"] = sol::var(S_KEY_J);
+    input["KEY_K"] = sol::var(S_KEY_K);
+    input["KEY_L"] = sol::var(S_KEY_L);
+    input["KEY_M"] = sol::var(S_KEY_M);
+    input["KEY_N"] = sol::var(S_KEY_N);
+    input["KEY_O"] = sol::var(S_KEY_O);
+    input["KEY_P"] = sol::var(S_KEY_P);
+    input["KEY_Q"] = sol::var(S_KEY_Q);
+    input["KEY_R"] = sol::var(S_KEY_R);
+    input["KEY_S"] = sol::var(S_KEY_S);
+    input["KEY_T"] = sol::var(S_KEY_T);
+    input["KEY_U"] = sol::var(S_KEY_U);
+    input["KEY_V"] = sol::var(S_KEY_V);
+    input["KEY_W"] = sol::var(S_KEY_W);
+    input["KEY_X"] = sol::var(S_KEY_X);
+    input["KEY_Y"] = sol::var(S_KEY_Y);
+    input["KEY_Z"] = sol::var(S_KEY_Z);
+    input["KEY_LEFT_BRACKET"] = sol::var(S_KEY_LEFT_BRACKET);
+    input["KEY_BACKSLASH"] = sol::var(S_KEY_BACKSLASH);
+    input["KEY_RIGHT_BRACKET"] = sol::var(S_KEY_RIGHT_BRACKET);
+    input["KEY_GRAVE_ACCENT"] = sol::var(S_KEY_GRAVE_ACCENT);
+    input["KEY_WORLD_1"] = sol::var(S_KEY_WORLD_1);
+    input["KEY_WORLD_2"] = sol::var(S_KEY_WORLD_2);
+    input["KEY_ESCAPE"] = sol::var(S_KEY_ESCAPE);
+    input["KEY_ENTER"] = sol::var(S_KEY_ENTER);
+    input["KEY_TAB"] = sol::var(S_KEY_TAB);
+    input["KEY_BACKSPACE"] = sol::var(S_KEY_BACKSPACE);
+    input["KEY_INSERT"] = sol::var(S_KEY_INSERT);
+    input["KEY_DELETE"] = sol::var(S_KEY_DELETE);
+    input["KEY_RIGHT"] = sol::var(S_KEY_RIGHT);
+    input["KEY_LEFT"] = sol::var(S_KEY_LEFT);
+    input["KEY_DOWN"] = sol::var(S_KEY_DOWN);
+    input["KEY_UP"] = sol::var(S_KEY_UP);
+    input["KEY_PAGE_UP"] = sol::var(S_KEY_PAGE_UP);
+    input["KEY_PAGE_DOWN"] = sol::var(S_KEY_PAGE_DOWN);
+    input["KEY_HOME"] = sol::var(S_KEY_HOME);
+    input["KEY_END"] = sol::var(S_KEY_END);
+    input["KEY_CAPS_LOCK"] = sol::var(S_KEY_CAPS_LOCK);
+    input["KEY_SCROLL_LOCK"] = sol::var(S_KEY_SCROLL_LOCK);
+    input["KEY_NUM_LOCK"] = sol::var(S_KEY_NUM_LOCK);
+    input["KEY_PRINT_SCREEN"] = sol::var(S_KEY_PRINT_SCREEN);
+    input["KEY_PAUSE"] = sol::var(S_KEY_PAUSE);
+    input["KEY_F1"] = sol::var(S_KEY_F1);
+    input["KEY_F2"] = sol::var(S_KEY_F2);
+    input["KEY_F3"] = sol::var(S_KEY_F3);
+    input["KEY_F4"] = sol::var(S_KEY_F4);
+    input["KEY_F5"] = sol::var(S_KEY_F5);
+    input["KEY_F6"] = sol::var(S_KEY_F6);
+    input["KEY_F7"] = sol::var(S_KEY_F7);
+    input["KEY_F8"] = sol::var(S_KEY_F8);
+    input["KEY_F9"] = sol::var(S_KEY_F9);
+    input["KEY_F10"] = sol::var(S_KEY_F10);
+    input["KEY_F11"] = sol::var(S_KEY_F11);
+    input["KEY_F12"] = sol::var(S_KEY_F12);
+    input["KEY_F13"] = sol::var(S_KEY_F13);
+    input["KEY_F14"] = sol::var(S_KEY_F14);
+    input["KEY_F15"] = sol::var(S_KEY_F15);
+    input["KEY_F16"] = sol::var(S_KEY_F16);
+    input["KEY_F17"] = sol::var(S_KEY_F17);
+    input["KEY_F18"] = sol::var(S_KEY_F18);
+    input["KEY_F19"] = sol::var(S_KEY_F19);
+    input["KEY_F20"] = sol::var(S_KEY_F20);
+    input["KEY_F21"] = sol::var(S_KEY_F21);
+    input["KEY_F22"] = sol::var(S_KEY_F22);
+    input["KEY_F23"] = sol::var(S_KEY_F23);
+    input["KEY_F24"] = sol::var(S_KEY_F24);
+    input["KEY_F25"] = sol::var(S_KEY_F25);
+    input["KEY_KP_0"] = sol::var(S_KEY_KP_0);
+    input["KEY_KP_1"] = sol::var(S_KEY_KP_1);
+    input["KEY_KP_2"] = sol::var(S_KEY_KP_2);
+    input["KEY_KP_3"] = sol::var(S_KEY_KP_3);
+    input["KEY_KP_4"] = sol::var(S_KEY_KP_4);
+    input["KEY_KP_5"] = sol::var(S_KEY_KP_5);
+    input["KEY_KP_6"] = sol::var(S_KEY_KP_6);
+    input["KEY_KP_7"] = sol::var(S_KEY_KP_7);
+    input["KEY_KP_8"] = sol::var(S_KEY_KP_8);
+    input["KEY_KP_9"] = sol::var(S_KEY_KP_9);
+    input["KEY_KP_DECIMAL"] = sol::var(S_KEY_KP_DECIMAL);
+    input["KEY_KP_DIVIDE"] = sol::var(S_KEY_KP_DIVIDE);
+    input["KEY_KP_MULTIPLY"] = sol::var(S_KEY_KP_MULTIPLY);
+    input["KEY_KP_SUBTRACT"] = sol::var(S_KEY_KP_SUBTRACT);
+    input["KEY_KP_ADD"] = sol::var(S_KEY_KP_ADD);
+    input["KEY_KP_ENTER"] = sol::var(S_KEY_KP_ENTER);
+    input["KEY_KP_EQUAL"] = sol::var(S_KEY_KP_EQUAL);
+    input["KEY_LEFT_SHIFT"] = sol::var(S_KEY_LEFT_SHIFT);
+    input["KEY_LEFT_CONTROL"] = sol::var(S_KEY_LEFT_CONTROL);
+    input["KEY_LEFT_ALT"] = sol::var(S_KEY_LEFT_ALT);
+    input["KEY_LEFT_SUPER"] = sol::var(S_KEY_LEFT_SUPER);
+    input["KEY_RIGHT_SHIFT"] = sol::var(S_KEY_RIGHT_SHIFT);
+    input["KEY_RIGHT_CONTROL"] = sol::var(S_KEY_RIGHT_CONTROL);
+    input["KEY_RIGHT_ALT"] = sol::var(S_KEY_RIGHT_ALT);
+    input["KEY_RIGHT_SUPER"] = sol::var(S_KEY_RIGHT_SUPER);
+    input["KEY_MENU"] = sol::var(S_KEY_MENU);
+    input["KEY_LAST"] = sol::var(S_KEY_LAST);
+
+    input["isKeyPressed"] = &Input::isKeyPressed;
+    input["isMousePressed"] = &Input::isMousePressed;
+    input["isTouch"] = &Input::isTouch;
+    input["isMouseEntered"] = &Input::isMouseEntered;
+    input["getMousePosition"] = &Input::getMousePosition;
+    input["getMouseScroll"] = &Input::getMouseScroll;
+    input["getTouchPosition"] = &Input::getTouchPosition;
+    input["getTouches"] = &Input::getTouches;
+    input["numTouches"] = &Input::numTouches;
+    input["getModifiers"] = &Input::getModifiers;
+    input["findTouchIndex"] = &Input::findTouchIndex;
 
 #endif //DISABLE_LUA_BINDINGS
 }

@@ -200,9 +200,8 @@ namespace Supernova {
         
         static Vector2 getMousePosition();
         static Vector2 getMouseScroll();
-        static Vector2 getTouchPosition();
-        
         static Vector2 getTouchPosition(int pointer);
+
         static std::vector<Touch> getTouches();
         static size_t numTouches();
         
