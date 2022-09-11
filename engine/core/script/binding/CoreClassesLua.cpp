@@ -74,7 +74,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
             );
 
     auto engine = lua.new_usertype<Engine>("Engine",
-            sol::call_constructor, sol::default_constructor);
+            sol::no_constructor);
 
     //engine["scene"] = sol::property(&Engine::getScene, &Engine::setScene);
     engine["setScene"] = &Engine::setScene;
