@@ -8,8 +8,6 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-#include "sol.hpp"
-
 #include "io/Data.h"
 #include "io/File.h"
 #include "io/FileData.h"
@@ -19,7 +17,7 @@ using namespace Supernova;
 
 void LuaBinding::registerIOClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
-
+/*
     sol::state_view lua(L);
 
     auto filedata = lua.new_usertype<FileData>("FileData",
@@ -71,6 +69,6 @@ void LuaBinding::registerIOClasses(lua_State *L){
     usersettings["setDoubleForKey"] = &UserSettings::setDoubleForKey;
     usersettings["setStringForKey"] = &UserSettings::setStringForKey;
     usersettings["setDataForKey"] = &UserSettings::setDataForKey;
-
+*/
 #endif //DISABLE_LUA_BINDINGS
 }

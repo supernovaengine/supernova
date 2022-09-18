@@ -268,72 +268,72 @@ namespace Supernova {
             return easeOutBounce(time * 2 - 1) * 0.5 + 0.5;
         }
 
-        static inline Function<float(float)> getFunction(EaseType functionType){
+        static inline std::function<float(float)> getFunction(EaseType functionType){
             if (functionType == EaseType::LINEAR){
-                return Function<float(float)>(Ease::linear);
+                return Ease::linear;
             }else if(functionType == EaseType::QUAD_IN){
-                return Function<float(float)>(Ease::easeInQuad);
+                return Ease::easeInQuad;
             }else if(functionType == EaseType::QUAD_OUT){
-                return Function<float(float)>(Ease::easeOutQuad);
+                return Ease::easeOutQuad;
             }else if(functionType == EaseType::QUAD_IN_OUT){
-                return Function<float(float)>(Ease::easeInOutQuad);
+                return Ease::easeInOutQuad;
             }else if(functionType == EaseType::CUBIC_IN){
-                return Function<float(float)>(Ease::easeInCubic);
+                return Ease::easeInCubic;
             }else if(functionType == EaseType::CUBIC_OUT){
-                return Function<float(float)>(Ease::easeOutCubic);
+                return Ease::easeOutCubic;
             }else if(functionType == EaseType::CUBIC_IN_OUT){
-                return Function<float(float)>(Ease::easeInOutCubic);
+                return Ease::easeInOutCubic;
             }else if(functionType == EaseType::QUART_IN){
-                return Function<float(float)>(Ease::easeInQuart);
+                return Ease::easeInQuart;
             }else if(functionType == EaseType::QUART_OUT){
-                return Function<float(float)>(Ease::easeOutQuart);
+                return Ease::easeOutQuart;
             }else if(functionType == EaseType::QUART_IN_OUT){
-                return Function<float(float)>(Ease::easeInOutQuart);
+                return Ease::easeInOutQuart;
             }else if(functionType == EaseType::QUINT_IN){
-                return Function<float(float)>(Ease::easeInQuint);
+                return Ease::easeInQuint;
             }else if(functionType == EaseType::QUINT_OUT){
-                return Function<float(float)>(Ease::easeOutQuint);
+                return Ease::easeOutQuint;
             }else if(functionType == EaseType::QUINT_IN_OUT){
-                return Function<float(float)>(Ease::easeInOutQuint);
+                return Ease::easeInOutQuint;
             }else if(functionType == EaseType::SINE_IN){
-                return Function<float(float)>(Ease::easeInSine);
+                return Ease::easeInSine;
             }else if(functionType == EaseType::SINE_OUT){
-                return Function<float(float)>(Ease::easeOutSine);
+                return Ease::easeOutSine;
             }else if(functionType == EaseType::SINE_IN_OUT){
-                return Function<float(float)>(Ease::easeInOutSine);
+                return Ease::easeInOutSine;
             }else if(functionType == EaseType::EXPO_IN){
-                return Function<float(float)>(Ease::easeInExpo);
+                return Ease::easeInExpo;
             }else if(functionType == EaseType::EXPO_OUT){
-                return Function<float(float)>(Ease::easeOutExpo);
+                return Ease::easeOutExpo;
             }else if(functionType == EaseType::EXPO_IN_OUT){
-                return Function<float(float)>(Ease::easeInOutExpo);
+                return Ease::easeInOutExpo;
             }else if(functionType == EaseType::CIRC_IN){
-                return Function<float(float)>(Ease::easeInCirc);
+                return Ease::easeInCirc;
             }else if(functionType == EaseType::CIRC_OUT){
-                return Function<float(float)>(Ease::easeOutCirc);
+                return Ease::easeOutCirc;
             }else if(functionType == EaseType::CIRC_IN_OUT){
-                return Function<float(float)>(Ease::easeInOutCirc);
+                return Ease::easeInOutCirc;
             }else if(functionType == EaseType::ELASTIC_IN){
-                return Function<float(float)>(Ease::easeInElastic);
+                return Ease::easeInElastic;
             }else if(functionType == EaseType::ELASTIC_OUT){
-                return Function<float(float)>(Ease::easeOutElastic);
+                return Ease::easeOutElastic;
             }else if(functionType == EaseType::ELASTIC_IN_OUT){
-                return Function<float(float)>(Ease::easeInOutElastic);
+                return Ease::easeInOutElastic;
             }else if(functionType == EaseType::BACK_IN){
-                return Function<float(float)>(Ease::easeInBack);
+                return Ease::easeInBack;
             }else if(functionType == EaseType::BACK_OUT){
-                return Function<float(float)>(Ease::easeOutBack);
+                return Ease::easeOutBack;
             }else if(functionType == EaseType::BACK_IN_OUT){
-                return Function<float(float)>(Ease::easeInOutBack);
+                return Ease::easeInOutBack;
             }else if(functionType == EaseType::BOUNCE_IN){
-                return Function<float(float)>(Ease::easeInBounce);
+                return Ease::easeInBounce;
             }else if(functionType == EaseType::BOUNCE_OUT){
-                return Function<float(float)>(Ease::easeOutBounce);
+                return Ease::easeOutBounce;
             }else if(functionType == EaseType::BOUNCE_IN_OUT){
-                return Function<float(float)>(Ease::easeInOutBounce);
+                return Ease::easeInOutBounce;
             }
 
-            return Function<float(float)>(Ease::linear);
+            return Ease::linear;
         }
     };
 }

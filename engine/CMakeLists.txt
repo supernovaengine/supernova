@@ -14,7 +14,7 @@ add_definitions("-DPROJECT_ROOT=\"${PROJECT_ROOT}\"")
 include_directories(shaders)
 
 include_directories(libs)
-include_directories(libs/sol)
+include_directories(libs/luabridge3)
 include_directories(libs/json)
 
 include_directories(libs/sokol)

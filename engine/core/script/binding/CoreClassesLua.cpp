@@ -8,7 +8,8 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-#include "sol.hpp"
+#include "LuaBridge.h"
+#include "EnumWrapper.h"
 
 #include "Engine.h"
 #include "Log.h"
@@ -16,62 +17,161 @@
 #include "Log.h"
 #include "Input.h"
 
+namespace luabridge
+{
+    template<> struct Stack<Supernova::Scaling> : EnumWrapper<Supernova::Scaling>{};
+    template<> struct Stack<Supernova::Platform> : EnumWrapper<Supernova::Platform>{};
+    template<> struct Stack<Supernova::GraphicBackend> : EnumWrapper<Supernova::GraphicBackend>{};
+    template<> struct Stack<Supernova::TextureStrategy> : EnumWrapper<Supernova::TextureStrategy>{};
+    template<> struct Stack<Supernova::TextureType> : EnumWrapper<Supernova::TextureType>{};
+    template<> struct Stack<Supernova::ColorFormat> : EnumWrapper<Supernova::ColorFormat>{};
+    template<> struct Stack<Supernova::LightType> : EnumWrapper<Supernova::LightType>{};
+}
+
 using namespace Supernova;
 
 void LuaBinding::registerCoreClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
 
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("Scaling")
+        .addProperty("FITWIDTH", Scaling::FITWIDTH)
+        .addProperty("FITHEIGHT", Scaling::FITHEIGHT)
+        .addProperty("LETTERBOX", Scaling::LETTERBOX)
+        .addProperty("CROP", Scaling::CROP)
+        .addProperty("STRETCH", Scaling::STRETCH)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("Platform")
+        .addProperty("MacOS", Platform::MacOS)
+        .addProperty("iOS", Platform::iOS)
+        .addProperty("Web", Platform::Web)
+        .addProperty("Android", Platform::Android)
+        .addProperty("Linux", Platform::Linux)
+        .addProperty("Windows", Platform::Windows)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("GraphicBackend")
+        .addProperty("GLCORE33", GraphicBackend::GLCORE33)
+        .addProperty("GLES2", GraphicBackend::GLES2)
+        .addProperty("GLES3", GraphicBackend::GLES3)
+        .addProperty("D3D11", GraphicBackend::D3D11)
+        .addProperty("METAL", GraphicBackend::METAL)
+        .addProperty("WGPU", GraphicBackend::WGPU)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("TextureStrategy")
+        .addProperty("FIT", TextureStrategy::FIT)
+        .addProperty("RESAMPLE", TextureStrategy::RESAMPLE)
+        .addProperty("NONE", TextureStrategy::NONE)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("TextureType")
+        .addProperty("TEXTURE_2D", TextureType::TEXTURE_2D)
+        .addProperty("TEXTURE_3D", TextureType::TEXTURE_3D)
+        .addProperty("TEXTURE_CUBE", TextureType::TEXTURE_CUBE)
+        .addProperty("TEXTURE_ARRAY", TextureType::TEXTURE_ARRAY)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("ColorFormat")
+        .addProperty("RED", ColorFormat::RED)
+        .addProperty("RGBA", ColorFormat::RGBA)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("LightType")
+        .addProperty("DIRECTIONAL", LightType::DIRECTIONAL)
+        .addProperty("POINT", LightType::POINT)
+        .addProperty("SPOT", LightType::SPOT)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Engine>("Engine")
+        .addStaticProperty("scene", &Engine::getScene, &Engine::setScene)
+        .addStaticFunction("setScene", &Engine::setScene)
+        .addStaticFunction("getScene", &Engine::getScene)
+        .addStaticFunction("addSceneLayer", &Engine::addSceneLayer)
+        .addStaticProperty("canvasWidth", &Engine::getCanvasWidth)
+        .addStaticProperty("canvasHeight", &Engine::getCanvasHeight)
+        .addStaticFunction("setCanvasSize", &Engine::setCanvasSize)
+        .addStaticProperty("preferedCanvasWidth", &Engine::getPreferedCanvasWidth)
+        .addStaticProperty("preferedCanvasHeight", &Engine::getPreferedCanvasHeight)
+        .addStaticFunction("calculateCanvas", &Engine::calculateCanvas)
+        .addStaticProperty("viewRect", &Engine::getViewRect)
+        .addStaticProperty("scalingMode", &Engine::getScalingMode, &Engine::setScalingMode)
+        .addStaticProperty("textureStrategy", &Engine::getTextureStrategy, &Engine::setTextureStrategy)
+        .addStaticProperty("callMouseInTouchEvent", &Engine::isCallMouseInTouchEvent, &Engine::setCallMouseInTouchEvent)
+        .addStaticProperty("callTouchInMouseEvent", &Engine::isCallTouchInMouseEvent, &Engine::setCallTouchInMouseEvent)
+        .addStaticFunction("setCallTouchInMouseEvent", &Engine::setCallTouchInMouseEvent)
+        .addStaticProperty("useDegrees", &Engine::isUseDegrees, &Engine::setUseDegrees)
+        .addStaticProperty("defaultNearestScaleTexture", &Engine::isDefaultNearestScaleTexture, &Engine::setDefaultNearestScaleTexture)
+        .addStaticProperty("defaultResampleToPOTTexture", &Engine::isDefaultResampleToPOTTexture, &Engine::setDefaultResampleToPOTTexture)
+        .addStaticProperty("automaticTransparency", &Engine::isAutomaticTransparency, &Engine::setAutomaticTransparency)
+        .addStaticProperty("automaticFlipY", &Engine::isAutomaticFlipY, &Engine::setAutomaticFlipY)
+        .addStaticProperty("allowEventsOutCanvas", &Engine::isAllowEventsOutCanvas, &Engine::setAllowEventsOutCanvas)
+        .addStaticProperty("fixedTimeSceneUpdate", &Engine::isFixedTimeSceneUpdate, &Engine::setFixedTimeSceneUpdate)
+        .addStaticProperty("updateTime", &Engine::getUpdateTime, &Engine::setUpdateTime)
+        .addStaticFunction("setUpdateTimeMS", &Engine::setUpdateTimeMS)
+        .addStaticProperty("sceneUpdateTime", &Engine::getSceneUpdateTime)
+        .addStaticProperty("platform", &Engine::getPlatform)
+        .addStaticProperty("graphicBackend", &Engine::getGraphicBackend)
+        .addStaticProperty("openGL", &Engine::isOpenGL)
+        .addStaticProperty("framerate", &Engine::getFramerate)
+        .addStaticProperty("deltatime", &Engine::getDeltatime)
+
+
+        .addStaticProperty("onViewLoaded", [] () { return &Engine::onViewLoaded; }, [] (lua_State* L) { Engine::onViewLoaded = L; })
+        .addStaticProperty("onCanvasChanged", [] () { return &Engine::onViewChanged; }, [] (lua_State* L) { Engine::onViewChanged = L; })
+        .addStaticProperty("onDraw", [] () { return &Engine::onDraw; }, [] (lua_State* L) { Engine::onDraw = L; })
+        .addStaticProperty("onUpdate", [] () { return &Engine::onUpdate; }, [] (lua_State* L) { Engine::onUpdate = L; })
+        //.addStaticProperty("onShutdown", [] () { return &Engine::onShutdown; }, [] (lua_State* L) { Engine::onShutdown = L; })
+        //.addStaticProperty("onTouchStart", [] () { return &Engine::onTouchStart; }, [] (lua_State* L) { Engine::onTouchStart = L; })
+
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<FunctionSubscribe<void()>>("FunctionSubscribe_V")
+        .addFunction("__call", &FunctionSubscribe<void()>::call)
+        .addFunction("call", &FunctionSubscribe<void()>::call)
+        .addFunction("add", (bool (FunctionSubscribe<void()>::*)(const std::string&, lua_State*))&FunctionSubscribe<void()>::add)
+        .endClass();
+/*
+    luabridge::getGlobalNamespace(L)
+        .beginClass<FunctionSubscribe<void(int,float,float)>>("FunctionSubscribe_V_IFF")
+        .addFunction("__call", &FunctionSubscribe<void(int,float,float)>::call)
+        .addFunction("call", &FunctionSubscribe<void(int,float,float)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<void(int,float,float)>::*)(const std::string&, lua_State*))&FunctionSubscribe<void(int,float,float)>::add)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<FunctionSubscribe<void(int,float,float,int)>>("FunctionSubscribe_V_IFFI")
+        .addFunction("__call", &FunctionSubscribe<void(int,float,float,int)>::call)
+        .addFunction("call", &FunctionSubscribe<void(int,float,float,int)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<void(int,float,float,int)>::*)(const std::string&, lua_State*))&FunctionSubscribe<void(int,float,float,int)>::add)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<FunctionSubscribe<void(int,bool,int)>>("FunctionSubscribe_V_IBI")
+        .addFunction("__call", &FunctionSubscribe<void(int,bool,int)>::call)
+        .addFunction("call", &FunctionSubscribe<void(int,bool,int)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<void(int,bool,int)>::*)(const std::string&, lua_State*))&FunctionSubscribe<void(int,bool,int)>::add)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<FunctionSubscribe<void(wchar_t)>>("FunctionSubscribe_V_W")
+        .addFunction("__call", &FunctionSubscribe<void(wchar_t)>::call)
+        .addFunction("call", &FunctionSubscribe<void(wchar_t)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<void(wchar_t)>::*)(const std::string&, lua_State*))&FunctionSubscribe<void(wchar_t)>::add)
+        .endClass();
+*/
+/*
     sol::state_view lua(L);
 
-    lua.new_enum("Scaling",
-                "FITWIDTH", Scaling::FITWIDTH,
-                "FITHEIGHT", Scaling::FITHEIGHT,
-                "LETTERBOX", Scaling::LETTERBOX,
-                "CROP", Scaling::CROP,
-                "STRETCH", Scaling::STRETCH
-                );
-
-    lua.new_enum("Platform",
-                "MacOS", Platform::MacOS,
-                "iOS", Platform::iOS,
-                "Web", Platform::Web,
-                "Android", Platform::Android,
-                "Linux", Platform::Linux,
-                "Windows", Platform::Windows
-                );
-
-    lua.new_enum("GraphicBackend",
-                "GLCORE33", GraphicBackend::GLCORE33,
-                "GLES2", GraphicBackend::GLES2,
-                "GLES3", GraphicBackend::GLES3,
-                "D3D11", GraphicBackend::D3D11,
-                "METAL", GraphicBackend::METAL,
-                "WGPU", GraphicBackend::WGPU
-                );
-
-    lua.new_enum("TextureStrategy",
-                "FIT", TextureStrategy::FIT,
-                "RESAMPLE", TextureStrategy::RESAMPLE,
-                "NONE", TextureStrategy::NONE
-                );
-
-    lua.new_enum("TextureType",
-                "TEXTURE_2D", TextureType::TEXTURE_2D,
-                "TEXTURE_3D", TextureType::TEXTURE_3D,
-                "TEXTURE_CUBE", TextureType::TEXTURE_CUBE,
-                "TEXTURE_ARRAY", TextureType::TEXTURE_ARRAY
-                );
-
-    lua.new_enum("ColorFormat",
-            "RED", ColorFormat::RED,
-            "RGBA", ColorFormat::RGBA
-            );
-
-    lua.new_enum("LightType",
-            "DIRECTIONAL", LightType::DIRECTIONAL,
-            "POINT", LightType::POINT,
-            "SPOT", LightType::SPOT
-            );
 
     auto engine = lua.new_usertype<Engine>("Engine",
             sol::no_constructor);
@@ -379,6 +479,6 @@ void LuaBinding::registerCoreClasses(lua_State *L){
     input["numTouches"] = &Input::numTouches;
     input["getModifiers"] = &Input::getModifiers;
     input["findTouchIndex"] = &Input::findTouchIndex;
-
+*/
 #endif //DISABLE_LUA_BINDINGS
 }

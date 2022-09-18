@@ -208,8 +208,12 @@ bool Engine::isFixedTimeSceneUpdate() {
     return fixedTimeSceneUpdate;
 }
 
-void Engine::setUpdateTime(unsigned int updateTimeMS){
+void Engine::setUpdateTimeMS(unsigned int updateTimeMS){
     Engine::updateTime = updateTimeMS / 1000.0f;
+}
+
+void Engine::setUpdateTime(float updateTime){
+    Engine::updateTime = updateTime;
 }
 
 float Engine::getUpdateTime(){

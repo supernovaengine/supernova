@@ -8,8 +8,6 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-#include "sol.hpp"
-
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
@@ -25,6 +23,7 @@ using namespace Supernova;
 
 void LuaBinding::registerMathClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
+/*
     sol::state_view lua(L);
 
     auto vector2 = lua.new_usertype<Vector2>("Vector2",
@@ -302,6 +301,6 @@ void LuaBinding::registerMathClasses(lua_State *L){
     ray["getPoint"] = &Ray::getPoint;
     ray["intersects"] = sol::overload( sol::resolve<float(Plane)>(&Ray::intersects), sol::resolve<float(AlignedBox)>(&Ray::intersects) );
     ray["intersectionPoint"] = sol::overload( sol::resolve<Vector3(Plane)>(&Ray::intersectionPoint), sol::resolve<Vector3(AlignedBox)>(&Ray::intersectionPoint) );
-
+*/
 #endif //DISABLE_LUA_BINDINGS
 }

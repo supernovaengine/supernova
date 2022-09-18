@@ -5,7 +5,6 @@
 #ifndef PARTICLESANIMATION_COMPONENT_H
 #define PARTICLESANIMATION_COMPONENT_H
 
-#include "util/Function.h"
 #include "action/Ease.h"
 
 namespace Supernova{
@@ -27,7 +26,7 @@ namespace Supernova{
         Vector3 fromPosition = Vector3(0,0,0);
         Vector3 toPosition = Vector3(0,0,0);
 
-        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+        FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
     struct ParticleVelocityInitializer{
@@ -42,7 +41,7 @@ namespace Supernova{
         Vector3 fromVelocity = Vector3(0,0,0);
         Vector3 toVelocity = Vector3(0,0,0);
 
-        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+        FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
     struct ParticleAccelerationInitializer{
@@ -57,7 +56,7 @@ namespace Supernova{
         Vector3 fromAcceleration = Vector3(0,0,0);
         Vector3 toAcceleration = Vector3(0,0,0);
 
-        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+        FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
     struct ParticleColorInitializer{
@@ -74,7 +73,7 @@ namespace Supernova{
         Vector3 fromColor = Vector3(0,0,0);
         Vector3 toColor = Vector3(0,0,0);
 
-        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+        FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
 
         bool useSRGB = true;
     };
@@ -91,7 +90,7 @@ namespace Supernova{
         float fromAlpha = 0;
         float toAlpha= 0;
 
-        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+        FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
     struct ParticleSizeInitializer{
@@ -106,7 +105,7 @@ namespace Supernova{
         float fromSize = 0;
         float toSize = 0;
 
-        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+        FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
     struct ParticleSpriteInitializer{
@@ -119,7 +118,7 @@ namespace Supernova{
 
         std::vector<int> frames;
 
-        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+        FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
     struct ParticleRotationInitializer{
@@ -134,7 +133,7 @@ namespace Supernova{
         float fromRotation = 0;
         float toRotation = 0;
 
-        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+        FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
     struct ParticlesAnimationComponent{

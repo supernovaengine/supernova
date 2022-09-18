@@ -12,7 +12,7 @@ namespace Supernova{
         float duration = 0;
         bool loop = false;
 
-        Function<float(float)> function = Supernova::Function<float(float)>(Ease::linear);
+        FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
 }

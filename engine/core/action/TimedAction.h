@@ -18,7 +18,6 @@ namespace Supernova{
         TimedAction(Scene* scene);
 
         void setFunction(std::function<float(float)> function);
-        void setFunction(sol::protected_function);
 
         void setFunctionType(EaseType functionType);
     };

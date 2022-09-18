@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <functional>
 #include <stdexcept>
+#include <memory>
 #include "Entity.h"
 #include "Log.h"
 

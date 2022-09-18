@@ -8,8 +8,6 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-#include "sol.hpp"
-
 #include "Fog.h"
 #include "Object.h"
 #include "Camera.h"
@@ -30,6 +28,7 @@ using namespace Supernova;
 
 void LuaBinding::registerObjectClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
+/*
     sol::state_view lua(L);
 
 
@@ -291,6 +290,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     text["getNumChars"] = &Text::getNumChars;
     text["charPosition"] = sol::property(&Text::getCharPosition);
     text["getCharPosition"] = &Text::getCharPosition;
-
+*/
 #endif //DISABLE_LUA_BINDINGS
 }

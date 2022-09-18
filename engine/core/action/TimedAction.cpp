@@ -3,7 +3,6 @@
 //
 
 #include "TimedAction.h"
-#include "util/Function.h"
 
 using namespace Supernova;
 
@@ -25,20 +24,11 @@ void TimedAction::setAction(float duration, bool loop){
 void TimedAction::setFunction(std::function<float(float)> function){
     TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
 
-    timedAction.function.remove();
-    timedAction.function = function;
-}
-
-void TimedAction::setFunction(sol::protected_function function){
-    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
-
-    timedAction.function.remove();
     timedAction.function = function;
 }
 
 void TimedAction::setFunctionType(EaseType functionType){
     TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
 
-    timedAction.function.remove();
     timedAction.function = Ease::getFunction(functionType);
 }

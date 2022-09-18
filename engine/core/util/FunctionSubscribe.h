@@ -15,7 +15,8 @@
 #include <string>
 #include <vector>
 #include <algorithm> 
-#include "Function.h"
+
+#include "LuaFunction.h"
 
 template<size_t>
 struct MyPlaceholder {};
@@ -33,7 +34,10 @@ namespace Supernova {
 
     private:
 
-        bool addImpl(const std::string& tag, Function<Ret(Args...)> function) {
+        std::vector<std::function<Ret(Args...)>> functions;
+        std::vector<std::string> tags;
+
+        bool addImpl(const std::string& tag, std::function<Ret(Args...)> function) {
             if (find(tags.begin(), tags.end(), tag) != tags.end())
             {
                 return false;
@@ -55,12 +59,29 @@ namespace Supernova {
             return {};
         }
 
-        std::vector<Function<Ret(Args...)>> functions;
-        std::vector<std::string> tags;
-
     public:
 
         FunctionSubscribe() {
+        }
+
+        FunctionSubscribe(std::function<Ret(Args...)> function) {
+            add("userFunction", function);
+        }
+
+        FunctionSubscribe(lua_State *L) {
+            add("userFunction", L);
+        }
+
+        FunctionSubscribe& operator = (std::function<Ret(Args...)> function){
+            add("userFunction", function);
+
+            return *this;
+        }
+
+        FunctionSubscribe& operator = (lua_State *L){
+            add("userFunction", L);
+
+            return *this;
         }
 
         FunctionSubscribe(const FunctionSubscribe& t){
@@ -75,19 +96,8 @@ namespace Supernova {
             return *this;
         }
 
-        FunctionSubscribe& operator = (sol::protected_function function){
-            add("luaFunction", function);
-
-            return *this;
-        }
-
-        FunctionSubscribe& operator = (std::function<Ret(Args...)> function){
-            add("userFunction", function);
-
-            return *this;
-        }
-
-        bool add(const std::string& tag, sol::protected_function function) {
+        bool add(const std::string& tag, lua_State *L) {
+            std::function<Ret(Args...)> function = LuaFunction<Ret>(L);
             addImpl(tag, function);
             return true;
         }
@@ -141,16 +151,18 @@ namespace Supernova {
             return true;
         }
 
-        void call(Args... args){
+        Ret call(Args... args){
             for (auto& function : functions)
             {
-                function(args...);
+                return function(args...);
             };
+
+            return Ret();
         }
 
-        void operator()(Args... args)
+        Ret operator()(Args... args)
         {
-            call(args...);
+            return call(args...);
         }
     };
 }

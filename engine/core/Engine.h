@@ -143,7 +143,8 @@ namespace Supernova {
         static void setFixedTimeSceneUpdate(bool fixedTimeSceneUpdate);
         static bool isFixedTimeSceneUpdate();
 
-        static void setUpdateTime(unsigned int updateTimeMS);
+        static void setUpdateTimeMS(unsigned int updateTimeMS);
+        static void setUpdateTime(float updateTime);
         static float getUpdateTime();
 
         static float getSceneUpdateTime();

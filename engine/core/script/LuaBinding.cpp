@@ -11,8 +11,6 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-#include "sol.hpp"
-
 #include <map>
 #include <locale>
 #include <vector>
@@ -218,6 +216,7 @@ void LuaBinding::init(){
 }
 
 void LuaBinding::registerClasses(lua_State *L){
+
 #ifndef DISABLE_LUA_BINDINGS
     // luaL_openlibs() opened all libraries already: base, string, io, os, package, table, debug
     //lua.open_libraries(sol::lib::base);
