@@ -259,9 +259,6 @@
 		717D9B3E2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
 		717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B3C2733783D002C0803 /* ParticlesAnimation.h */; };
 		717D9B4127337850002C0803 /* ParticlesAnimationComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */; };
-		717D9B462733788C002C0803 /* sol.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B432733788C002C0803 /* sol.hpp */; };
-		717D9B472733788C002C0803 /* config.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B442733788C002C0803 /* config.hpp */; };
-		717D9B482733788C002C0803 /* forward.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B452733788C002C0803 /* forward.hpp */; };
 		717D9B4B27337B72002C0803 /* lopnames.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B4927337B72002C0803 /* lopnames.h */; };
 		717D9B4C27337B72002C0803 /* ljumptab.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B4A27337B72002C0803 /* ljumptab.h */; };
 		717D9B4E27338381002C0803 /* lua in Resources */ = {isa = PBXBuildFile; fileRef = 717D9B4D273382C8002C0803 /* lua */; };
@@ -380,7 +377,6 @@
 		71BE620125B1DB22006D6E02 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61FF25B1DB22006D6E02 /* System.cpp */; };
 		71BE620225B1DB22006D6E02 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61FF25B1DB22006D6E02 /* System.cpp */; };
 		71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */; };
-		71BE621425B1DB37006D6E02 /* Function.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE620F25B1DB37006D6E02 /* Function.h */; };
 		71BE622025B1DB83006D6E02 /* TextureData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE621E25B1DB83006D6E02 /* TextureData.cpp */; };
 		71BE622125B1DB83006D6E02 /* TextureData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71BE621E25B1DB83006D6E02 /* TextureData.cpp */; };
 		71BE622225B1DB83006D6E02 /* TextureData.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE621F25B1DB83006D6E02 /* TextureData.h */; };
@@ -458,6 +454,12 @@
 		71F97B7F262D1FFE00CD6F2B /* tiny_gltf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */; };
 		71F97B98262D202300CD6F2B /* libstb-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 710AD6E325B6053400A7B12F /* libstb-ios.a */; };
 		71F97B9B262D203E00CD6F2B /* libtinygltf-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */; };
+		71FCE4BE28E0FA01003C5217 /* LuaFunction.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4BA28E0FA01003C5217 /* LuaFunction.h */; };
+		71FCE4BF28E0FA01003C5217 /* LuaFunctionBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */; };
+		71FCE4C028E0FA01003C5217 /* LuaFunctionBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */; };
+		71FCE4C128E0FA01003C5217 /* LuaFunctionBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */; };
+		71FCE4C228E0FA01003C5217 /* EnumWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4BD28E0FA01003C5217 /* EnumWrapper.h */; };
+		71FCE4C528E0FA31003C5217 /* LuaBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4C428E0FA31003C5217 /* LuaBridge.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -766,9 +768,6 @@
 		717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlesAnimation.cpp; sourceTree = "<group>"; };
 		717D9B3C2733783D002C0803 /* ParticlesAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimation.h; sourceTree = "<group>"; };
 		717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimationComponent.h; sourceTree = "<group>"; };
-		717D9B432733788C002C0803 /* sol.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sol.hpp; sourceTree = "<group>"; };
-		717D9B442733788C002C0803 /* config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = config.hpp; sourceTree = "<group>"; };
-		717D9B452733788C002C0803 /* forward.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = forward.hpp; sourceTree = "<group>"; };
 		717D9B4927337B72002C0803 /* lopnames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lopnames.h; sourceTree = "<group>"; };
 		717D9B4A27337B72002C0803 /* ljumptab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ljumptab.h; sourceTree = "<group>"; };
 		717D9B4D273382C8002C0803 /* lua */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lua; sourceTree = "<group>"; };
@@ -877,7 +876,6 @@
 		71BE61FE25B1DB22006D6E02 /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = System.h; sourceTree = "<group>"; };
 		71BE61FF25B1DB22006D6E02 /* System.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = System.cpp; sourceTree = "<group>"; };
 		71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FunctionSubscribe.h; sourceTree = "<group>"; };
-		71BE620F25B1DB37006D6E02 /* Function.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Function.h; sourceTree = "<group>"; };
 		71BE621E25B1DB83006D6E02 /* TextureData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureData.cpp; sourceTree = "<group>"; };
 		71BE621F25B1DB83006D6E02 /* TextureData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureData.h; sourceTree = "<group>"; };
 		71BE622D25B1DB9D006D6E02 /* LuaBinding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaBinding.cpp; sourceTree = "<group>"; };
@@ -939,6 +937,11 @@
 		71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_gltf.h; sourceTree = "<group>"; };
 		71F97B57262D1EF200CD6F2B /* json.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = json.hpp; sourceTree = "<group>"; };
 		71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinygltf-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		71FCE4BA28E0FA01003C5217 /* LuaFunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunction.h; sourceTree = "<group>"; };
+		71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaFunctionBase.cpp; sourceTree = "<group>"; };
+		71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunctionBase.h; sourceTree = "<group>"; };
+		71FCE4BD28E0FA01003C5217 /* EnumWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumWrapper.h; sourceTree = "<group>"; };
+		71FCE4C428E0FA31003C5217 /* LuaBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaBridge.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1221,7 +1224,6 @@
 				7105A55728B305910092EA05 /* Color.h */,
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
 				71451BF2270CA3EA00712643 /* FrameData.h */,
-				71BE620F25B1DB37006D6E02 /* Function.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
 				71ABBD26277A3210001CE3AF /* STBText.cpp */,
 				71ABBD27277A3210001CE3AF /* STBText.h */,
@@ -1445,8 +1447,8 @@
 			children = (
 				71F97B56262D1EF200CD6F2B /* json */,
 				71BE604125B1C55B006D6E02 /* lua */,
+				71FCE4C328E0FA31003C5217 /* luabridge3 */,
 				7162FC9725962A0E0075B97D /* sokol */,
-				717D9B422733788C002C0803 /* sol */,
 				71BE61B925B1DA3E006D6E02 /* stb */,
 				71F97B1D262D1E2B00CD6F2B /* tinygltf */,
 				71E36BB125D599C000EFEED4 /* tinyobjloader */,
@@ -1519,16 +1521,6 @@
 				7170A3D02818A8A30003E965 /* SkyBox.h */,
 			);
 			path = environment;
-			sourceTree = "<group>";
-		};
-		717D9B422733788C002C0803 /* sol */ = {
-			isa = PBXGroup;
-			children = (
-				717D9B432733788C002C0803 /* sol.hpp */,
-				717D9B442733788C002C0803 /* config.hpp */,
-				717D9B452733788C002C0803 /* forward.hpp */,
-			);
-			path = sol;
 			sourceTree = "<group>";
 		};
 		718FDDEE2837CA9A00AF314C /* shaders */ = {
@@ -1650,6 +1642,10 @@
 		71BE622C25B1DB9D006D6E02 /* script */ = {
 			isa = PBXGroup;
 			children = (
+				71FCE4BD28E0FA01003C5217 /* EnumWrapper.h */,
+				71FCE4BA28E0FA01003C5217 /* LuaFunction.h */,
+				71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */,
+				71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */,
 				7105A55B28B305B20092EA05 /* binding */,
 				71BE622D25B1DB9D006D6E02 /* LuaBinding.cpp */,
 				71BE623125B1DB9D006D6E02 /* LuaBinding.h */,
@@ -1735,6 +1731,14 @@
 			path = json;
 			sourceTree = "<group>";
 		};
+		71FCE4C328E0FA31003C5217 /* luabridge3 */ = {
+			isa = PBXGroup;
+			children = (
+				71FCE4C428E0FA31003C5217 /* LuaBridge.h */,
+			);
+			path = luabridge3;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1800,6 +1804,7 @@
 				71E544FE284D5BB700C68FAB /* Animation.h in Headers */,
 				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
 				71ABBD4127A879B9001CE3AF /* ButtonComponent.h in Headers */,
+				71FCE4C528E0FA31003C5217 /* LuaBridge.h in Headers */,
 				71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */,
 				718FDDF52837CA9A00AF314C /* msl21ios.h in Headers */,
 				718FDDF92837CA9A00AF314C /* glsl330.h in Headers */,
@@ -1825,23 +1830,22 @@
 				71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */,
 				713E581227BA9CE400376680 /* Polygon.h in Headers */,
 				71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */,
+				71FCE4C228E0FA01003C5217 /* EnumWrapper.h in Headers */,
 				715CB114288CD3F60049344B /* TerrainComponent.h in Headers */,
 				7170A3D42818A8A30003E965 /* Bone.h in Headers */,
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
 				71451BF0270CA2C900712643 /* Sprite.h in Headers */,
 				71ABBD3D279116E1001CE3AF /* UniqueToken.h in Headers */,
 				71E54513284D5BE000C68FAB /* MorphTracksComponent.h in Headers */,
-				717D9B462733788C002C0803 /* sol.hpp in Headers */,
 				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,
+				71FCE4BE28E0FA01003C5217 /* LuaFunction.h in Headers */,
 				7170A3CB2818A87E0003E965 /* BoneComponent.h in Headers */,
 				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
-				717D9B482733788C002C0803 /* forward.hpp in Headers */,
 				71BE622225B1DB83006D6E02 /* TextureData.h in Headers */,
 				7105A55A28B305910092EA05 /* Color.h in Headers */,
 				71ABBD342783C8BB001CE3AF /* Image.h in Headers */,
 				71ABBD13277A3166001CE3AF /* TextComponent.h in Headers */,
 				71E5450C284D5BB700C68FAB /* ScaleTracks.h in Headers */,
-				717D9B472733788C002C0803 /* config.hpp in Headers */,
 				71E54515284D5BE000C68FAB /* AnimationComponent.h in Headers */,
 				71ABBD2C277A3210001CE3AF /* DefaultFont.h in Headers */,
 				71ABBD14277A3166001CE3AF /* AlphaActionComponent.h in Headers */,
@@ -1851,7 +1855,6 @@
 				71ABBD23277A31E6001CE3AF /* UISystem.h in Headers */,
 				71E54518284D5BE000C68FAB /* KeyframeTracksComponent.h in Headers */,
 				71ABBD4027A879B9001CE3AF /* MeshPolygonComponent.h in Headers */,
-				71BE621425B1DB37006D6E02 /* Function.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
 				713E581627BA9D1300376680 /* TextEditComponent.h in Headers */,
 				718FDDF62837CA9A00AF314C /* glsl300es.h in Headers */,
@@ -1859,6 +1862,7 @@
 				71165BC1282981BE00CF79C1 /* Base64.h in Headers */,
 				718FDDF82837CA9A00AF314C /* msl21macos.h in Headers */,
 				71BE623F25B1DB9E006D6E02 /* LuaBinding.h in Headers */,
+				71FCE4C128E0FA01003C5217 /* LuaFunctionBase.h in Headers */,
 				717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */,
 				713E581127BA9CE400376680 /* TextEdit.h in Headers */,
 				71E5450B284D5BB700C68FAB /* RotateTracks.h in Headers */,
@@ -2395,6 +2399,7 @@
 				713D82EB259D333100567F9F /* Buffer.cpp in Sources */,
 				71451BD8270CA17F00712643 /* ColorAction.cpp in Sources */,
 				713D829C259D307F00567F9F /* SceneRender.cpp in Sources */,
+				71FCE4C028E0FA01003C5217 /* LuaFunctionBase.cpp in Sources */,
 				71451BE5270CA17F00712643 /* Action.cpp in Sources */,
 				71165BC0282981BE00CF79C1 /* Base64.cpp in Sources */,
 				713D829D259D307F00567F9F /* Vector4.cpp in Sources */,
@@ -2535,6 +2540,7 @@
 				7162FD1C25963AE00075B97D /* ShaderRender.cpp in Sources */,
 				71451BD7270CA17F00712643 /* ColorAction.cpp in Sources */,
 				7162FD2125963AE00075B97D /* ObjectRender.cpp in Sources */,
+				71FCE4BF28E0FA01003C5217 /* LuaFunctionBase.cpp in Sources */,
 				71451BE4270CA17F00712643 /* Action.cpp in Sources */,
 				71165BBF282981BE00CF79C1 /* Base64.cpp in Sources */,
 				7162FD2325963AE00075B97D /* TextureRender.cpp in Sources */,
