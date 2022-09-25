@@ -8,6 +8,8 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+#include "LuaBridge.h"
+
 #include "ecs/Entity.h"
 #include "ecs/Signature.h"
 #include "ecs/EntityManager.h"
@@ -17,6 +19,15 @@ using namespace Supernova;
 
 void LuaBinding::registerECSClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
+
+// not need, this is only unsigned ind
+//    luabridge::getGlobalNamespace(L)
+//        .beginClass<Entity>("Entity")
+//        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Signature>("Signature")
+        .endClass();
 /*
     sol::state_view lua(L);
 

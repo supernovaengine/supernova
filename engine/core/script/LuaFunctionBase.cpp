@@ -15,31 +15,13 @@ using namespace Supernova;
 
 LuaFunctionBase::LuaFunctionBase(lua_State *vm, const std::string &func): m_vm(vm) {
     // get the function
-
-    //lua_getfield(m_vm, LUA_GLOBALSINDEX, func.c_str());
     lua_getglobal(m_vm, func.c_str());
 
-    // ensure it's a function
-    if (!lua_isfunction(m_vm, -1)) {
-        // throw an exception; you'd use your own exception class here
-        // of course, but for sake of simplicity i use runtime_error
-        lua_pop(m_vm, 1);
-        throw std::runtime_error("not a valid function");
-    }
-    // store it in registry for later use
-    m_func = luaL_ref(m_vm, LUA_REGISTRYINDEX);
+    store_function();
 }
 
 LuaFunctionBase::LuaFunctionBase(lua_State *vm): m_vm(vm) {
-    // ensure it's a function
-    if (!lua_isfunction(m_vm, -1)) {
-        // throw an exception; you'd use your own exception class here
-        // of course, but for sake of simplicity i use runtime_error
-        lua_pop(m_vm, 1);
-        throw std::runtime_error("not a valid function");
-    }
-    // store it in registry for later use
-    m_func = luaL_ref(m_vm, LUA_REGISTRYINDEX);
+    store_function();
 }
 
 LuaFunctionBase::LuaFunctionBase(const LuaFunctionBase &other): m_vm(other.m_vm) {
@@ -60,6 +42,18 @@ LuaFunctionBase& LuaFunctionBase::operator=(const LuaFunctionBase &other){
         m_func = luaL_ref(m_vm, LUA_REGISTRYINDEX);
     }
     return *this;
+}
+
+void LuaFunctionBase::store_function(){
+    // ensure it's a function
+    if (!lua_isfunction(m_vm, -1)) {
+        // throw an exception; you'd use your own exception class here
+        // of course, but for sake of simplicity i use runtime_error
+        lua_pop(m_vm, 1);
+        throw std::runtime_error("not a valid function");
+    }
+    // store it in registry for later use
+    m_func = luaL_ref(m_vm, LUA_REGISTRYINDEX);
 }
 
 void LuaFunctionBase::push_function(lua_State *vm, int func){

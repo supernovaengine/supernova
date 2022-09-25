@@ -56,6 +56,17 @@ namespace Supernova{
             return value_extractor<Ret>::get(m_vm);
         }
 
+        template <typename T1, typename T2, typename T3, typename T4>
+        Ret operator()(const T1 &p1, const T2 &p2, const T3 &p3, const T4 &p4){
+            push_function(m_vm, m_func);
+            push_value(m_vm, p1);
+            push_value(m_vm, p2);
+            push_value(m_vm, p3);
+            push_value(m_vm, p4);
+            call(4);
+            return value_extractor<Ret>::get(m_vm);
+        }
+
         // et cetera, provide as many overloads as you need
     };
 
@@ -98,6 +109,16 @@ namespace Supernova{
             push_value(m_vm, p2);
             push_value(m_vm, p3);
             call(3);
+        }
+
+        template <typename T1, typename T2, typename T3, typename T4>
+        void operator()(const T1 &p1, const T2 &p2, const T3 &p3, const T4 &p4){
+            push_function(m_vm, m_func);
+            push_value(m_vm, p1);
+            push_value(m_vm, p2);
+            push_value(m_vm, p3);
+            push_value(m_vm, p4);
+            call(4);
         }
 
         // et cetera, provide as many overloads as you need

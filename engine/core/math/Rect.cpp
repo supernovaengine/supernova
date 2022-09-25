@@ -61,20 +61,36 @@ std::string Rect::toString() const{
     return "Rect(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(width) + ", " + std::to_string(height) + ")"; 
 }
 
-float Rect::getX(){
+float Rect::getX() const{
     return x;
 }
 
-float Rect::getY(){
+void Rect::setX(float x){
+    this->x = x;
+}
+
+float Rect::getY() const{
     return y;
 }
 
-float Rect::getWidth(){
+void Rect::setY(float y){
+    this->y = y;
+}
+
+float Rect::getWidth() const{
     return width;
 }
 
-float Rect::getHeight(){
+void Rect::setWidth(float width){
+    this->width = width;
+}
+
+float Rect::getHeight() const{
     return height;
+}
+
+void Rect::setHeight(float height){
+    this->height = height;
 }
 
 Vector4 Rect::getVector(){

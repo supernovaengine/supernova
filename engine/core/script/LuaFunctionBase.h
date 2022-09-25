@@ -10,6 +10,10 @@ namespace Supernova{
     // the base function wrapper class
     class LuaFunctionBase{
 
+    private:
+
+        void store_function();
+
     protected:
         // the virtual machine and the registry reference to the function
         lua_State *m_vm;

@@ -79,7 +79,7 @@ void Scene::setCamera(Entity camera){
 	}
 }
 
-Entity Scene::getCamera(){
+Entity Scene::getCamera() const{
 	return camera;
 }
 
@@ -98,7 +98,7 @@ void Scene::setMainScene(bool mainScene){
 	this->mainScene = mainScene;
 }
 
-bool Scene::isMainScene(){
+bool Scene::isMainScene() const{
 	return mainScene;
 }
 
@@ -110,7 +110,7 @@ void Scene::setBackgroundColor(float red, float green, float blue){
 	setBackgroundColor(Vector4(red, green, blue, 1.0));
 }
 
-Vector4 Scene::getBackgroundColor(){
+Vector4 Scene::getBackgroundColor() const{
 	return backgroundColor;
 }
 
@@ -118,7 +118,7 @@ void Scene::setShadowsPCF(bool shadowsPCF){
 	this->shadowsPCF = shadowsPCF;
 }
 
-bool Scene::isShadowsPCF(){
+bool Scene::isShadowsPCF() const{
 	return this->shadowsPCF;
 }
 
@@ -126,7 +126,7 @@ void Scene::setFogEnabled(bool hasFog){
 	this->hasFog = hasFog;
 }
 
-bool Scene::isFogEnabled(){
+bool Scene::isFogEnabled() const{
 	return this->hasFog;
 }
 
@@ -150,15 +150,15 @@ void Scene::setAmbientLight(Vector3 ambientLight){
 	this->hasSceneAmbientLight = true;
 }
 
-float Scene::getAmbientLightFactor(){
+float Scene::getAmbientLightFactor() const{
 	return this->ambientFactor;
 }
 
-Vector3 Scene::getAmbientLightColor(){
+Vector3 Scene::getAmbientLightColor() const{
 	return this->ambientLight;
 }
 
-bool Scene::isSceneAmbientLightEnabled(){
+bool Scene::isSceneAmbientLightEnabled() const{
 	return this->hasSceneAmbientLight;
 }
 
@@ -170,7 +170,7 @@ void Scene::setRenderToTexture(bool renderToTexture){
 	this->renderToTexture = renderToTexture;
 }
 
-bool Scene::isRenderToTexture(){
+bool Scene::isRenderToTexture() const{
 	return renderToTexture;
 }
 

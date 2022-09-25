@@ -30,10 +30,14 @@ namespace Supernova {
         bool operator == (const Rect& t);
         bool operator != (const Rect& t);
         
-        float getX();
-        float getY();
-        float getWidth();
-        float getHeight();
+        float getX() const;
+        void setX(float x);
+        float getY() const;
+        void setY(float y);
+        float getWidth() const;
+        void setWidth(float width);
+        float getHeight() const;
+        void setHeight(float height);
 
         Vector4 getVector();
         

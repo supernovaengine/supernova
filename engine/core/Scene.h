@@ -84,34 +84,34 @@ namespace Supernova{
 		void update(double dt);
 
 		void setCamera(Entity camera);
-		Entity getCamera();
+		Entity getCamera() const;
 
 		void setMainScene(bool mainScene);
-		bool isMainScene();
+		bool isMainScene() const;
 
 		void setBackgroundColor(Vector4 color);
 		void setBackgroundColor(float red, float green, float blue);
-		Vector4 getBackgroundColor();
+		Vector4 getBackgroundColor() const;
 
 		void setShadowsPCF(bool shadowsPCF);
-		bool isShadowsPCF();
+		bool isShadowsPCF() const;
 
 		void setFogEnabled(bool hasFog);
-		bool isFogEnabled();
+		bool isFogEnabled() const;
 		Fog& getFog();
 
 		void setAmbientLight(float ambientFactor, Vector3 ambientLight);
 		void setAmbientLight(float ambientFactor);
 		void setAmbientLight(Vector3 ambientLight);
 
-		float getAmbientLightFactor();
-		Vector3 getAmbientLightColor();
+		float getAmbientLightFactor() const;
+		Vector3 getAmbientLightColor() const;
 
-		bool isSceneAmbientLightEnabled();
+		bool isSceneAmbientLightEnabled() const;
 		void setSceneAmbientLightEnabled(bool hasSceneAmbientLight);
 
 		void setRenderToTexture(bool renderToTexture);
-		bool isRenderToTexture();
+		bool isRenderToTexture() const;
 
 		FramebufferRender& getFramebuffer();
 
