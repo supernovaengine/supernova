@@ -67,7 +67,7 @@ namespace Supernova{
 
 	    EntityManager entityManager;
 	    ComponentManager componentManager;
-		std::unordered_map<const char*, std::shared_ptr<SubSystem>> systems;
+		std::vector<std::pair<const char*, std::shared_ptr<SubSystem>>> systems;
 
 		Entity createDefaultCamera();
 		void sortComponentsByTransform(Signature entitySignature);
@@ -199,10 +199,12 @@ namespace Supernova{
 		std::shared_ptr<T> registerSystem(){
 			const char* typeName = typeid(T).name();
 	
-			assert(systems.find(typeName) == systems.end() && "Registering system more than once.");
+			auto it = std::find_if(systems.begin(), systems.end(), [&](const auto& pair) { return pair.first == typeName; });
+
+			assert(it == systems.end() && "Registering system more than once");
 	
 			auto system = std::make_shared<T>(this);
-			systems.insert({typeName, system});
+			systems.push_back(std::make_pair(typeName, system));
 			return system;
 		}
 
@@ -210,7 +212,7 @@ namespace Supernova{
 		std::shared_ptr<T> getSystem(){
 			const char* typeName = typeid(T).name();
 
-			std::unordered_map<const char*, std::shared_ptr<SubSystem>>::iterator it = systems.find(typeName);
+			auto it = std::find_if(systems.begin(), systems.end(), [&](const auto& pair) { return pair.first == typeName; });
 
 			assert(it != systems.end() && "System not found.");
 

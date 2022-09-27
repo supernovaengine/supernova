@@ -45,10 +45,10 @@ Scene::Scene(){
 	registerComponent<ScaleTracksComponent>();
 	registerComponent<TerrainComponent>();
 
-	registerSystem<RenderSystem>();
+	registerSystem<ActionSystem>();
 	registerSystem<MeshSystem>();
 	registerSystem<UISystem>();
-	registerSystem<ActionSystem>();
+	registerSystem<RenderSystem>();
 
 	camera = NULL_ENTITY;
 
