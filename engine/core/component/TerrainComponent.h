@@ -83,7 +83,9 @@ namespace Supernova{
         Vector2 offset;
         std::vector<float> ranges;
 
-        TerrainNode nodes[MAX_TERRAINNODES];
+        //avoid chkstk.asm stack overflow error in Windows
+        //TerrainNode nodes[MAX_TERRAINNODES];
+        std::vector<TerrainNode> nodes = std::vector<TerrainNode>(MAX_TERRAINNODES);
         unsigned int numNodes = 0;
 
         size_t grid[MAX_TERRAINGRID]; //root nodes
