@@ -306,12 +306,7 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
     }
 
     size_t idealSize = getTerrainGridArraySize(terrain.rootGridSize, terrain.levels);
-    if (idealSize > MAX_TERRAINNODES){
-        Log::Error("Cannot create full terrain, increase MAX_TERRAINNODES to %u", idealSize);
-        return;
-    }else if (idealSize < (MAX_TERRAINNODES/4)){
-        Log::Warn("MAX_TERRAINNODES of %u is too big for this terrain. Ideal size is %u", MAX_TERRAINNODES, idealSize);
-    }
+    terrain.nodes.resize(idealSize);
 
     if (MAX_TERRAINGRID < (terrain.rootGridSize*terrain.rootGridSize)){
         Log::Error("Cannot create full terrain, increase MAX_TERRAINGRID to %u", (terrain.rootGridSize*terrain.rootGridSize));

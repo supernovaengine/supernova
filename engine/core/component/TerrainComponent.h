@@ -2,9 +2,6 @@
 #define TERRAIN_COMPONENT_H
 
 #define MAX_TERRAINGRID 16
-#define MAX_TERRAINNODES 5460
-// to get best terrainnodes number, use this formula:
-// ( 4⁰ + 4¹ + 4² + ... + 4^(levels-1) ) * rootGridSize²
 
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
@@ -83,9 +80,8 @@ namespace Supernova{
         Vector2 offset;
         std::vector<float> ranges;
 
-        //avoid chkstk.asm stack overflow error in Windows
-        //TerrainNode nodes[MAX_TERRAINNODES];
-        std::vector<TerrainNode> nodes = std::vector<TerrainNode>(MAX_TERRAINNODES);
+        //using std::vector to avoid chkstk.asm stack overflow error in Windows
+        std::vector<TerrainNode> nodes;
         unsigned int numNodes = 0;
 
         size_t grid[MAX_TERRAINGRID]; //root nodes
