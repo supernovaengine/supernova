@@ -62,7 +62,7 @@
 
 #if defined(LUAU_FASTMATH_BEGIN)
 #define LUABRIDGE_ON_LUAU 1
-#elif defined(LUA_JROOT)
+#elif defined(LUAJIT_VERSION)
 #define LUABRIDGE_ON_LUAJIT 1
 #elif defined(LUA_VERSION_NUM)
 #define LUABRIDGE_ON_LUA 1
@@ -336,6 +336,49 @@ inline lua_Integer tointeger(lua_State* L, int idx, int* isnum)
 }
 
 /**
+ * @brief Register main thread, only supported on 5.1.
+ */
+inline constexpr char main_thread_name[] = "__luabridge_main_thread";
+
+inline void register_main_thread(lua_State* threadL)
+{
+#if LUA_VERSION_NUM < 502
+    if (threadL == nullptr)
+        lua_pushnil(threadL);
+    else
+        lua_pushthread(threadL);
+
+    lua_setglobal(threadL, main_thread_name);
+#else
+    unused(threadL);
+#endif
+}
+
+/**
+ * @brief Get main thread, not supported on 5.1.
+ */
+inline lua_State* main_thread(lua_State* threadL)
+{
+#if LUA_VERSION_NUM < 502
+    lua_getglobal(threadL, main_thread_name);
+    if (lua_isthread(threadL, -1))
+    {
+        auto L = lua_tothread(threadL, -1);
+        lua_pop(threadL, 1);
+        return L;
+    }
+    assert(false); // Have you forgot to call luabridge::registerMainThread ?
+    lua_pop(threadL, 1);
+    return threadL;
+#else
+    lua_rawgeti(threadL, LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD);
+    lua_State* L = lua_tothread(threadL, -1);
+    lua_pop(threadL, 1);
+    return L;
+#endif
+}
+
+/**
  * @brief Get a table value, bypassing metamethods.
  */
 inline void rawgetfield(lua_State* L, int index, char const* key)
@@ -444,6 +487,51 @@ void* lua_newuserdata_aligned(lua_State* L, Args&&... args)
     new (aligned) T(std::forward<Args>(args)...);
 
     return pointer;
+}
+
+/**
+ * @brief Safe error able to walk backwards for error reporting correctly.
+ */
+inline int raise_lua_error(lua_State *L, const char *fmt, ...)
+{
+    va_list argp;
+    va_start(argp, fmt);
+
+    bool pushed_error = false;
+    for (int level = 2; level > 0; --level)
+    {
+        lua_Debug ar;
+
+#if LUABRIDGE_ON_LUAU
+        if (lua_getinfo(L, level, "sl", &ar) == 0)
+            continue;
+#else
+        if (lua_getstack(L, level, &ar) == 0 || lua_getinfo(L, "Sl", &ar) == 0)
+            continue;
+#endif
+
+        if (ar.currentline <= 0)
+            continue;
+
+        lua_pushfstring(L, "%s:%d: ", ar.short_src, ar.currentline);
+        pushed_error = true;
+
+        break;
+    }
+
+    if (! pushed_error)
+        lua_pushliteral(L, "");
+
+    lua_pushvfstring(L, fmt, argp);
+    va_end(argp);
+    lua_concat(L, 2);
+
+#if LUABRIDGE_ON_LUAU
+    lua_error(L);
+    return 1;
+#else
+    return lua_error(L);
+#endif
 }
 
 /**
@@ -677,6 +765,12 @@ public:
     {
         exceptionsEnabled() = true;
 
+#if LUABRIDGE_HAS_EXCEPTIONS && LUABRIDGE_ON_LUAJIT
+        lua_pushlightuserdata(L, (void*)luajitWrapperCallback);
+        luaJIT_setmode(L, -1, LUAJIT_MODE_WRAPCFUNC | LUAJIT_MODE_ON);
+        lua_pop(L, 1);
+#endif
+
 #if LUABRIDGE_ON_LUAU
         auto callbacks = lua_callbacks(L);
         callbacks->panic = +[](lua_State* L, int) { panicHandlerCallback(L); };
@@ -730,6 +824,21 @@ private:
         std::abort();
 #endif
     }
+
+#if LUABRIDGE_HAS_EXCEPTIONS && LUABRIDGE_ON_LUAJIT
+    static int luajitWrapperCallback(lua_State* L, lua_CFunction f)
+    {
+        try
+        {
+            return f(L);
+        }
+        catch (const std::exception& e)
+        {
+            lua_pushstring(L, e.what());
+            return lua_error(L);
+        }
+    }
+#endif
 
     static bool& exceptionsEnabled()
     {
@@ -3588,26 +3697,25 @@ struct function
     template <class F>
     static int call(lua_State* L, F func)
     {
+        std::error_code ec;
+        bool result = false;
+
 #if LUABRIDGE_HAS_EXCEPTIONS
         try
         {
 #endif
-            std::error_code ec;
-            bool result = Stack<ReturnType>::push(L, std::apply(func, make_arguments_list<ArgsPack, Start>(L)), ec);
-            if (! result)
-                luaL_error(L, "%s", ec.message().c_str());
+            result = Stack<ReturnType>::push(L, std::apply(func, make_arguments_list<ArgsPack, Start>(L)), ec);
 
 #if LUABRIDGE_HAS_EXCEPTIONS
         }
         catch (const std::exception& e)
         {
-            luaL_error(L, "%s", e.what());
-        }
-        catch (...)
-        {
-            luaL_error(L, "Error while calling function");
+            raise_lua_error(L, "%s", e.what());
         }
 #endif
+
+        if (! result)
+            raise_lua_error(L, "%s", ec.message().c_str());
 
         return 1;
     }
@@ -3615,28 +3723,27 @@ struct function
     template <class T, class F>
     static int call(lua_State* L, T* ptr, F func)
     {
+        std::error_code ec;
+        bool result = false;
+
 #if LUABRIDGE_HAS_EXCEPTIONS
         try
         {
 #endif
             auto f = [ptr, func](auto&&... args) -> ReturnType { return (ptr->*func)(std::forward<decltype(args)>(args)...); };
 
-            std::error_code ec;
-            bool result = Stack<ReturnType>::push(L, std::apply(f, make_arguments_list<ArgsPack, Start>(L)), ec);
-            if (! result)
-                luaL_error(L, "%s", ec.message().c_str());
+            result = Stack<ReturnType>::push(L, std::apply(f, make_arguments_list<ArgsPack, Start>(L)), ec);
 
 #if LUABRIDGE_HAS_EXCEPTIONS
         }
         catch (const std::exception& e)
         {
-            luaL_error(L, "%s", e.what());
-        }
-        catch (...)
-        {
-            luaL_error(L, "Error while calling method");
+            raise_lua_error(L, "%s", e.what());
         }
 #endif
+
+        if (! result)
+            raise_lua_error(L, "%s", ec.message().c_str());
 
         return 1;
     }
@@ -3658,11 +3765,7 @@ struct function<void, ArgsPack, Start>
         }
         catch (const std::exception& e)
         {
-            luaL_error(L, "%s", e.what());
-        }
-        catch (...)
-        {
-            luaL_error(L, "Error while calling function");
+            raise_lua_error(L, "%s", e.what());
         }
 #endif
 
@@ -3684,11 +3787,7 @@ struct function<void, ArgsPack, Start>
         }
         catch (const std::exception& e)
         {
-            luaL_error(L, "%s", e.what());
-        }
-        catch (...)
-        {
-            luaL_error(L, "Error while calling method");
+            raise_lua_error(L, "%s", e.what());
         }
 #endif
 
@@ -3979,7 +4078,7 @@ struct property_getter<T, void>
 
         std::error_code ec;
         if (! Stack<T&>::push(L, *ptr, ec))
-            luaL_error(L, "%s", ec.message().c_str());
+            raise_lua_error(L, "%s", ec.message().c_str());
 
         return 1;
     }
@@ -4019,25 +4118,25 @@ struct property_getter
 
         T C::** mp = static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
 
+        std::error_code ec;
+        bool result = false;
+
 #if LUABRIDGE_HAS_EXCEPTIONS
         try
         {
 #endif
-            std::error_code ec;
-            if (! Stack<T&>::push(L, c->**mp, ec))
-                luaL_error(L, "%s", ec.message().c_str());
+            result = Stack<T&>::push(L, c->**mp, ec);
 
 #if LUABRIDGE_HAS_EXCEPTIONS
         }
         catch (const std::exception& e)
         {
-            luaL_error(L, "%s", e.what());
-        }
-        catch (...)
-        {
-            luaL_error(L, "Error while getting property");
+            raise_lua_error(L, "%s", e.what());
         }
 #endif
+
+        if (!result)
+            raise_lua_error(L, "%s", ec.message().c_str());
 
         return 1;
     }
@@ -4130,11 +4229,7 @@ struct property_setter
         }
         catch (const std::exception& e)
         {
-            luaL_error(L, "%s", e.what());
-        }
-        catch (...)
-        {
-            luaL_error(L, "Error while setting property");
+            raise_lua_error(L, "%s", e.what());
         }
 #endif
 
@@ -4405,7 +4500,7 @@ protected:
     };
 
     LuaRefBase(lua_State* L)
-        : m_L(L)
+        : m_L(main_thread(L))
     {
     }
 
@@ -5232,6 +5327,7 @@ class LuaRef : public LuaRefBase<LuaRef, LuaRef>
      */
     LuaRef(lua_State* L, int index, FromStack)
         : LuaRefBase(L)
+        , m_ref(LUA_NOREF)
     {
 #if LUABRIDGE_SAFE_STACK_CHECKS
         if (! lua_checkstack(m_L, 1))
@@ -5253,6 +5349,7 @@ public:
      */
     LuaRef(lua_State* L)
         : LuaRefBase(L)
+        , m_ref(LUA_NOREF)
     {
     }
 
@@ -5266,6 +5363,7 @@ public:
     template <class T>
     LuaRef(lua_State* L, const T& v)
         : LuaRefBase(L)
+        , m_ref(LUA_NOREF)
     {
         std::error_code ec;
         if (! Stack<T>::push(m_L, v, ec))
@@ -6594,8 +6692,36 @@ class Namespace : public detail::Registrar
          *
          * @returns This class registration object.
          */
+        template <class U, typename = std::enable_if_t<!std::is_invocable_v<U>>>
+        Class<T>& addStaticProperty(const char* name, const U* value)
+        {
+            assert(name != nullptr);
+            assertStackState(); // Stack: const table (co), class table (cl), static table (st)
 
-        template <class U>
+            lua_pushlightuserdata(L, const_cast<U*>(value)); // Stack: co, cl, st, pointer
+            lua_pushcclosure_x(L, &detail::property_getter<U>::call, 1); // Stack: co, cl, st, getter
+            detail::add_property_getter(L, name, -2); // Stack: co, cl, st
+
+            lua_pushstring(L, name); // Stack: co, cl, st, name
+            lua_pushcclosure_x(L, &detail::read_only_error, 1); // Stack: co, cl, st, function
+
+            detail::add_property_setter(L, name, -2); // Stack: co, cl, st
+
+            return *this;
+        }
+
+        /**
+         * @brief Add or replace a static property.
+         *
+         * @tparam U The type of the property.
+         *
+         * @param name The property name.
+         * @param value A property value pointer.
+         * @param isWritable True for a read-write, false for read-only property.
+         *
+         * @returns This class registration object.
+         */
+        template <class U, typename = std::enable_if_t<!std::is_invocable_v<U>>>
         Class<T>& addStaticProperty(const char* name, U* value, bool isWritable = true)
         {
             assert(name != nullptr);
@@ -6633,7 +6759,6 @@ class Namespace : public detail::Registrar
          *
          * @returns This class registration object.
          */
-        
         template <class U>
         Class<T>& addStaticProperty(const char* name, U (*get)(), void (*set)(U) = nullptr)
         {
@@ -7628,7 +7753,7 @@ public:
         {
             using U = std::underlying_type_t<Getter>;
 
-            auto enumGet = [get] { return static_cast<U>(get); };
+            auto enumGet = [get = std::move(get)] { return static_cast<U>(get); };
 
             using GetType = decltype(enumGet);
             lua_newuserdata_aligned<GetType>(L, std::move(enumGet)); // Stack: ns, function userdata (ud)
@@ -7838,6 +7963,21 @@ inline Namespace getGlobalNamespace(lua_State* L)
 inline Namespace getNamespaceFromStack(lua_State* L)
 {
     return Namespace::getNamespaceFromStack(L);
+}
+
+//=================================================================================================
+/**
+ * @brief Registers main thread.
+ *
+ * This is a backward compatibility mitigation for lua 5.1 not supporting LUA_RIDX_MAINTHREAD.
+ *
+ * @param L The main Lua state that will be regstered as main thread.
+ *
+ * @returns A namespace registration object.
+ */
+inline void registerMainThread(lua_State* L)
+{
+    register_main_thread(L);
 }
 
 } // namespace luabridge
