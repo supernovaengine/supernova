@@ -15,23 +15,23 @@ Fog::Fog(){
     linearEnd = 60;
 }
 
-FogType Fog::getType(){
+FogType Fog::getType() const{
     return type;
 }
 
-Vector3 Fog::getColor(){
+Vector3 Fog::getColor() const{
     return color;
 }
 
-float Fog::getDensity(){
+float Fog::getDensity() const{
     return density;
 }
 
-float Fog::getLinearStart(){
+float Fog::getLinearStart() const{
     return linearStart;
 }
 
-float Fog::getLinearEnd(){
+float Fog::getLinearEnd() const{
     return linearEnd;
 }
 

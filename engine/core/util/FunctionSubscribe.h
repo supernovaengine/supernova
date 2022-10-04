@@ -64,6 +64,18 @@ namespace Supernova {
         FunctionSubscribe() {
         }
 
+        FunctionSubscribe(const FunctionSubscribe& t){
+            this->functions = t.functions;
+            this->tags = t.tags;
+        }
+
+        FunctionSubscribe& operator = (const FunctionSubscribe& t){
+            this->functions = t.functions;
+            this->tags = t.tags;
+
+            return *this;
+        }
+
         FunctionSubscribe(std::function<Ret(Args...)> function) {
             add("userFunction", function);
         }
@@ -80,18 +92,6 @@ namespace Supernova {
 
         FunctionSubscribe& operator = (lua_State *L){
             add("userFunction", L);
-
-            return *this;
-        }
-
-        FunctionSubscribe(const FunctionSubscribe& t){
-            this->functions = t.functions;
-            this->tags = t.tags;
-        }
-
-        FunctionSubscribe& operator = (const FunctionSubscribe& t){
-            this->functions = t.functions;
-            this->tags = t.tags;
 
             return *this;
         }

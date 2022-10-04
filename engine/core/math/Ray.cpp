@@ -33,7 +33,7 @@ void Ray::setOrigin(Vector3 origin){
     this->origin = origin;
 }
 
-Vector3 Ray::getOrigin(){
+Vector3 Ray::getOrigin() const{
     return origin;
 }
 
@@ -41,12 +41,12 @@ void Ray::setDirection(Vector3 direction){
     this->direction = direction;
 }
 
-Vector3 Ray::getDirection(){
+Vector3 Ray::getDirection() const{
     return direction;
 }
 
-Vector3 Ray::getPoint(float t) {
-    return Vector3(origin + (direction * t));
+Vector3 Ray::getPoint(float distance){
+    return Vector3(origin + (direction * distance));
 }
 
 Vector3 Ray::intersectionPoint(Plane plane) {

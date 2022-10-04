@@ -29,12 +29,12 @@ namespace Supernova{
         void stop();
 
         void setTarget(Entity target);
-        Entity getTarget();
+        Entity getTarget() const;
 
         void setSpeed(float speed);
-        float getSpeed();
+        float getSpeed() const;
 
-        bool isRunning();
+        bool isRunning() const;
 
         template <typename T>
         void addComponent(T &&component) {
@@ -47,11 +47,11 @@ namespace Supernova{
         }
     
         template<typename T>
-    	T& getComponent() {
+    	T& getComponent() const {
     		return scene->getComponent<T>(entity);
     	}
 
-        Entity getEntity();
+        Entity getEntity() const;
     };
 }
 

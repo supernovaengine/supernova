@@ -63,7 +63,7 @@ void Action::setTarget(Entity target){
     action.target = target;
 }
 
-Entity Action::getTarget(){
+Entity Action::getTarget() const{
     ActionComponent& action = getComponent<ActionComponent>();
 
     return action.target;
@@ -75,18 +75,18 @@ void Action::setSpeed(float speed){
     action.speed = speed;
 }
 
-float Action::getSpeed(){
+float Action::getSpeed() const{
     ActionComponent& action = getComponent<ActionComponent>();
 
     return action.speed;
 }
 
-bool Action::isRunning(){
+bool Action::isRunning() const{
     ActionComponent& action = getComponent<ActionComponent>();
 
     return (action.state == ActionState::Running);
 }
 
-Entity Action::getEntity(){
+Entity Action::getEntity() const{
     return entity;
 }

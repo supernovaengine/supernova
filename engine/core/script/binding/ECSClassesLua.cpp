@@ -17,31 +17,42 @@
 
 using namespace Supernova;
 
+namespace luabridge
+{
+    // Entity type is not necessary here because it already exists Stack<unsigned int>
+
+    template <>
+    struct Stack <Signature>
+    {
+        static bool push(lua_State* L, Signature sig, std::error_code& ec)
+        {
+            lua_pushstring(L, sig.to_string().c_str());
+            return true;
+        }
+
+        static Signature get(lua_State* L, int index)
+        {
+            return Signature(lua_tostring(L, index));
+        }
+
+        static bool isInstance (lua_State* L, int index)
+        {
+            return lua_type(L, index) == LUA_TSTRING;
+        }
+    };
+}
+
 void LuaBinding::registerECSClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
 
-// not need, this is only unsigned ind
-//    luabridge::getGlobalNamespace(L)
-//        .beginClass<Entity>("Entity")
-//        .endClass();
-
     luabridge::getGlobalNamespace(L)
-        .beginClass<Signature>("Signature")
+        .beginClass<EntityManager>("EntityManager")
+        .addConstructor <void (*) (void)> ()
+        .addFunction("createEntity", &EntityManager::createEntity)
+        .addFunction("destroy", &EntityManager::destroy)
+        .addFunction("setSignature", &EntityManager::setSignature)
+        .addFunction("getSignature", &EntityManager::getSignature)
         .endClass();
-/*
-    sol::state_view lua(L);
 
-    lua.new_usertype<Entity>("Entity");
-
-    lua.new_usertype<Signature>("Signature");
-
-    lua.new_usertype<EntityManager>("EntityManager",
-        sol::call_constructor, sol::default_constructor,
-        "createEntity", &EntityManager::createEntity,
-        "destroy", &EntityManager::destroy,
-        "setSignature", &EntityManager::setSignature,
-        "setSignature", &EntityManager::setSignature
-    );
-*/
 #endif //DISABLE_LUA_BINDINGS
 }

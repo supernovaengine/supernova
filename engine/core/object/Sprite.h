@@ -25,17 +25,17 @@ namespace Supernova{
         void setWidth(int width);
         void setHeight(int height);
 
-        int getWidth();
-        int getHeight();
+        int getWidth() const;
+        int getHeight() const;
 
         void setFlipY(bool flipY);
-        bool isFlipY();
+        bool isFlipY() const;
 
         void setBillboard(bool billboard, bool fake = true, bool cylindrical = true);
 
         void setTextureRect(float x, float y, float width, float height);
         void setTextureRect(Rect textureRect);
-        Rect getTextureRect();
+        Rect getTextureRect() const;
 
         void addFrame(int id, std::string name, Rect rect);
         void addFrame(std::string name, float x, float y, float width, float height);

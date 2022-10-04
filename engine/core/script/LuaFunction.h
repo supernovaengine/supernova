@@ -18,13 +18,16 @@ namespace Supernova{
         LuaFunction(lua_State *vm, const std::string &func)
         : LuaFunctionBase(vm, func){ }
 
+        LuaFunction(lua_State *vm)
+        : LuaFunctionBase(vm){ }
+
         Ret operator()() {
             // push the function from the registry
             push_function(m_vm, m_func);
             // call the function on top of the stack (throws exception on error)
-            call(0);
+            call(0, 1);
             // return the value
-            return value_extractor<Ret>::get(m_vm);
+            return get_value<Ret>(m_vm);
         }
 
         template <typename T1>
@@ -32,8 +35,8 @@ namespace Supernova{
             push_function(m_vm, m_func);
             // push the argument and call with 1 arg
             push_value(m_vm, p1);
-            call(1);
-            return value_extractor<Ret>::get(m_vm);
+            call(1, 1);
+            return get_value<Ret>(m_vm);
         }
 
         template <typename T1, typename T2>
@@ -42,8 +45,8 @@ namespace Supernova{
             // push the arguments and call with 2 args
             push_value(m_vm, p1);
             push_value(m_vm, p2);
-            call(2);
-            return value_extractor<Ret>::get(m_vm);
+            call(2, 1);
+            return get_value<Ret>(m_vm);
         }
 
         template <typename T1, typename T2, typename T3>
@@ -52,8 +55,8 @@ namespace Supernova{
             push_value(m_vm, p1);
             push_value(m_vm, p2);
             push_value(m_vm, p3);
-            call(3);
-            return value_extractor<Ret>::get(m_vm);
+            call(3, 1);
+            return get_value<Ret>(m_vm);
         }
 
         template <typename T1, typename T2, typename T3, typename T4>
@@ -63,8 +66,8 @@ namespace Supernova{
             push_value(m_vm, p2);
             push_value(m_vm, p3);
             push_value(m_vm, p4);
-            call(4);
-            return value_extractor<Ret>::get(m_vm);
+            call(4, 1);
+            return get_value<Ret>(m_vm);
         }
 
         // et cetera, provide as many overloads as you need

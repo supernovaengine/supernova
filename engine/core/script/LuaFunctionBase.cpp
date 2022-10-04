@@ -5,6 +5,7 @@
 #include "LuaFunction.h"
 
 #include "util/StringUtils.h"
+#include "LuaBinding.h"
 
 #include "lua.h"
 #include "lualib.h"
@@ -97,48 +98,29 @@ void LuaFunctionBase::push_value(lua_State *vm, wchar_t s){
 }
 
 template <>
-struct LuaFunctionBase::value_extractor<lua_Integer>{
-    static lua_Integer get(lua_State *vm){
-        lua_Integer val = lua_tointeger(vm, -1);
-        lua_pop(vm, 1);
-        return val;
-    }
-};
+int LuaFunctionBase::get_value<int>(lua_State* vm){
+    int val = lua_tointeger(vm, -1);
+    lua_pop(vm, 1);
+    return val;
+}
 
 template <>
-struct LuaFunctionBase::value_extractor<lua_Number>{
-    static lua_Number get(lua_State *vm){
-        lua_Number val = lua_tonumber(vm, -1);
-        lua_pop(vm, 1);
-        return val;
-    }
-};
-
-#if _WIN64 || __x86_64__
-template <>
-struct LuaFunctionBase::value_extractor<int>{
-    static int get(lua_State *vm){
-        int val = lua_tointeger(vm, -1);
-        lua_pop(vm, 1);
-        return val;
-    }
-};
-#endif // _64
+float LuaFunctionBase::get_value<float>(lua_State* vm){
+    float val = lua_tonumber(vm, -1);
+    lua_pop(vm, 1);
+    return val;
+}
 
 template <>
-struct LuaFunctionBase::value_extractor<bool>{
-    static bool get(lua_State *vm){
-        bool val = lua_toboolean(vm, -1);
-        lua_pop(vm, 1);
-        return val;
-    }
-};
+bool LuaFunctionBase::get_value<bool>(lua_State* vm){
+    bool val = lua_toboolean(vm, -1);
+    lua_pop(vm, 1);
+    return val;
+}
 
 template <>
-struct LuaFunctionBase::value_extractor<std::string>{
-    static std::string get(lua_State *vm){
-        std::string val = lua_tostring(vm, -1);
-        lua_pop(vm, 1);
-        return val;
-    }
-};
+std::string LuaFunctionBase::get_value<std::string>(lua_State* vm){
+    std::string val = lua_tostring(vm, -1);
+    lua_pop(vm, 1);
+    return val;
+}

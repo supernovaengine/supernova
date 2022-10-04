@@ -21,15 +21,15 @@ namespace Supernova{
         void setPerspective(float y_fov, float aspect, float near, float far);
 
         void setType(CameraType type);
-        CameraType getType();
+        CameraType getType() const;
 
         void setView(Vector3 view);
         void setView(const float x, const float y, const float z);
-        Vector3 getView();
+        Vector3 getView() const;
 
         void setUp(Vector3 up);
         void setUp(const float x, const float y, const float z);
-        Vector3 getUp();
+        Vector3 getUp() const;
 
         void rotateView(float angle);
         void rotatePosition(float angle);

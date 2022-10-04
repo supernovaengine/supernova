@@ -52,19 +52,19 @@ void Polygon::setColor(float red, float green, float blue, float alpha){
     setColor(Vector4(red, green, blue, alpha));
 }
 
-Vector4 Polygon::getColor(){
+Vector4 Polygon::getColor() const{
     UIComponent& uicomp = getComponent<UIComponent>();
 
     return uicomp.color;
 }
 
-int Polygon::getWidth(){
+int Polygon::getWidth() const{
     UIComponent& ui = getComponent<UIComponent>();
 
     return ui.width;
 }
 
-int Polygon::getHeight(){
+int Polygon::getHeight() const{
     UIComponent& ui = getComponent<UIComponent>();
 
     return ui.height;

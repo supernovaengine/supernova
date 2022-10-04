@@ -20,7 +20,7 @@ namespace Supernova{
         int getHeight();
 
         void setFlipY(bool flipY);
-        bool isFlipY();
+        bool isFlipY() const;
     };
 }
 

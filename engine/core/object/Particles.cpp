@@ -38,7 +38,7 @@ void Particles::setMaxParticles(unsigned int maxParticles){
     }
 }
 
-unsigned int Particles::getMaxParticles(){
+unsigned int Particles::getMaxParticles() const{
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
 
     return particomp.maxParticles;

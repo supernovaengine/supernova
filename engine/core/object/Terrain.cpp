@@ -97,7 +97,7 @@ void Terrain::setColor(float red, float green, float blue, float alpha){
     setColor(Vector4(red, green, blue, alpha));
 }
 
-Vector4 Terrain::getColor(){
+Vector4 Terrain::getColor() const{
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     return Color::linearTosRGB(terrain.material.baseColorFactor);

@@ -21,34 +21,34 @@ namespace Supernova{
         void setWidth(int width);
         void setHeight(int height);
 
-        int getWidth();
-        int getHeight();
+        int getWidth() const;
+        int getHeight() const;
 
         void setMaxTextSize(unsigned int maxTextSize);
-        unsigned int getMaxTextSize();
+        unsigned int getMaxTextSize() const;
 
         void setText(std::string text);
-        std::string getText();
+        std::string getText() const;
 
         void setFont(std::string font);
-        std::string getFont();
+        std::string getFont() const;
 
         void setFontSize(unsigned int fontSize);
-        unsigned int getFontSize();
+        unsigned int getFontSize() const;
 
         void setMultiline(bool multiline);
-        bool getMultiline();
+        bool getMultiline() const;
 
         void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);
-        Vector4 getColor();
+        Vector4 getColor() const;
 
-        float getAscent();
-        float getDescent();
-        float getLineGap();
-        int getLineHeight();
-        unsigned int getNumChars();
-        Vector2 getCharPosition(unsigned int index);
+        float getAscent() const;
+        float getDescent() const;
+        float getLineGap() const;
+        int getLineHeight() const;
+        unsigned int getNumChars() const;
+        Vector2 getCharPosition(unsigned int index) const;
     };
 }
 

@@ -29,7 +29,7 @@ Animation& Animation::operator=(const Animation& rhs){
     return *this;
 }
 
-bool Animation::isLoop(){
+bool Animation::isLoop() const{
     AnimationComponent& animation = getComponent<AnimationComponent>();
 
     return animation.loop;
@@ -47,13 +47,13 @@ void Animation::setEndTime(float endTime){
     animation.endTime = endTime;
 }
 
-float Animation::getEndTime(){
+float Animation::getEndTime() const{
     AnimationComponent& animation = getComponent<AnimationComponent>();
 
     return animation.endTime;
 }
 
-bool Animation::isOwnedActions(){
+bool Animation::isOwnedActions() const{
     AnimationComponent& animation = getComponent<AnimationComponent>();
 
     return animation.ownedActions;
@@ -65,7 +65,7 @@ void Animation::setOwnedActions(bool ownedActions){
     animation.ownedActions = ownedActions;
 }
 
-const std::string &Animation::getName() {
+const std::string &Animation::getName() const{
     AnimationComponent& animation = getComponent<AnimationComponent>();
 
     return animation.name;

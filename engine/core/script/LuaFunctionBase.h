@@ -44,8 +44,7 @@ namespace Supernova{
         // of a function is always specified explicitly
 
         template <typename T>
-        struct value_extractor
-        { };
+        static T get_value(lua_State *vm);
 
     public:
         LuaFunctionBase(lua_State *vm, const std::string &func);

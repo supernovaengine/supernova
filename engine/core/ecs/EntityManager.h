@@ -34,12 +34,12 @@ namespace Supernova{
         	signatures[entity] = signature;
         }
 
-        Signature getSignature(Entity entity) {
+        Signature getSignature(Entity entity) const{
         	if (signatures.count(entity)==0){
                  Log::Error("Entity does not exist");
             }
 
-        	return signatures[entity];
+        	return signatures.at(entity);
         }
     };
 

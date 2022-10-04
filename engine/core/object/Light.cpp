@@ -25,7 +25,7 @@ void Light::setType(LightType type){
     lightcomp.type = type;
 }
 
-LightType Light::getType(){
+LightType Light::getType() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.type;
@@ -43,7 +43,7 @@ void Light::setDirection(const float x, const float y, const float z){
     setDirection(Vector3(x,y,z));
 }
 
-Vector3 Light::getDirection(){
+Vector3 Light::getDirection() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.direction;
@@ -59,7 +59,7 @@ void Light::setColor(const float r, const float g, const float b){
     setColor(Vector3(r,g,b));
 }
 
-Vector3 Light::getColor(){
+Vector3 Light::getColor() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.color;
@@ -71,7 +71,7 @@ void Light::setRange(float range){
     lightcomp.range = range;
 }
 
-float Light::getRange(){
+float Light::getRange() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.range;
@@ -87,7 +87,7 @@ void Light::setIntensity(float intensity){
     lightcomp.intensity = intensity;
 }
 
-float  Light::getIntensity(){
+float  Light::getIntensity() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.intensity;
@@ -106,7 +106,7 @@ void Light::setInnerConeAngle(float inner){
     lightcomp.innerConeCos = cos(Angle::defaultToRad(inner / 2));
 }
 
-float Light::getInnerConeAngle(){
+float Light::getInnerConeAngle() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.innerConeCos;
@@ -118,7 +118,7 @@ void Light::setOuterConeAngle(float outer){
     lightcomp.outerConeCos = cos(Angle::defaultToRad(outer / 2));
 }
 
-float Light::getOuterConeAngle(){
+float Light::getOuterConeAngle() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.outerConeCos;
@@ -130,7 +130,7 @@ void Light::setShadows(bool shadows){
     lightcomp.shadows = shadows;
 }
 
-bool Light::isShadows(){
+bool Light::isShadows() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.shadows;
@@ -142,7 +142,7 @@ void Light::setBias(float bias){
     lightcomp.shadowBias = bias;
 }
 
-float Light::getBias(){
+float Light::getBias() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.shadowBias;
@@ -154,7 +154,7 @@ void Light::setShadowMapSize(unsigned int size){
     lightcomp.mapResolution = size;
 }
 
-unsigned int Light::getShadowMapSize(){
+unsigned int Light::getShadowMapSize() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.mapResolution;
@@ -172,7 +172,7 @@ void Light::setCameraNear(float near){
     lightcomp.shadowCameraNearFar.x = near;
 }
 
-float Light::getCameraNear(){
+float Light::getCameraNear() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.shadowCameraNearFar.x;
@@ -184,7 +184,7 @@ void Light::setCameraFar(float far){
     lightcomp.shadowCameraNearFar.y = far;
 }
 
-float Light::getCameraFar(){
+float Light::getCameraFar() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.shadowCameraNearFar.y;
@@ -196,7 +196,7 @@ void Light::setNumCascades(unsigned int numCascades){
     lightcomp.numShadowCascades = numCascades;
 }
 
-float Light::getNumCascades(){
+float Light::getNumCascades() const{
     LightComponent& lightcomp = getComponent<LightComponent>();
 
     return lightcomp.numShadowCascades;

@@ -52,13 +52,13 @@ void Sprite::setHeight(int height){
     }
 }
 
-int Sprite::getWidth(){
+int Sprite::getWidth() const{
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     return spritecomp.width;
 }
 
-int Sprite::getHeight(){
+int Sprite::getHeight() const{
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     return spritecomp.height;
@@ -78,7 +78,7 @@ void Sprite::setFlipY(bool flipY){
     }
 }
 
-bool Sprite::isFlipY(){
+bool Sprite::isFlipY() const{
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     return spritecomp.flipY;
@@ -102,7 +102,7 @@ void Sprite::setTextureRect(Rect textureRect){
     mesh.submeshes[0].textureRect = textureRect;
 }
 
-Rect Sprite::getTextureRect(){
+Rect Sprite::getTextureRect() const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return mesh.submeshes[0].textureRect;

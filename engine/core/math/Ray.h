@@ -24,10 +24,10 @@ namespace Supernova {
         Vector3 operator*(float t);
 
         void setOrigin(Vector3 point);
-        Vector3 getOrigin();
+        Vector3 getOrigin() const;
 
         void setDirection(Vector3 direction);
-        Vector3 getDirection();
+        Vector3 getDirection() const;
 
         Vector3 getPoint(float distance);
 

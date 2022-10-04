@@ -26,11 +26,11 @@ namespace Supernova{
     public:
         Fog();
 
-        FogType getType();
-        Vector3 getColor();
-        float getDensity();
-        float getLinearStart();
-        float getLinearEnd();
+        FogType getType() const;
+        Vector3 getColor() const;
+        float getDensity() const;
+        float getLinearStart() const;
+        float getLinearEnd() const;
 
         void setType(FogType type);
         void setColor(Vector3 color);

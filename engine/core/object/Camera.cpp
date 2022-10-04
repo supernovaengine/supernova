@@ -87,7 +87,7 @@ void Camera::setType(CameraType type){
     }
 }
 
-CameraType Camera::getType(){
+CameraType Camera::getType() const{
     CameraComponent& camera = getComponent<CameraComponent>();
     
     return camera.type;
@@ -107,7 +107,7 @@ void Camera::setView(const float x, const float y, const float z){
     setView(Vector3(x,y,z));
 }
 
-Vector3 Camera::getView(){
+Vector3 Camera::getView() const{
     CameraComponent& camera = getComponent<CameraComponent>();
     return camera.view;
 }
@@ -126,7 +126,7 @@ void Camera::setUp(const float x, const float y, const float z){
     setUp(Vector3(x,y,z));
 }
 
-Vector3 Camera::getUp(){
+Vector3 Camera::getUp() const{
     CameraComponent& camera = getComponent<CameraComponent>();
     return camera.up;
 }

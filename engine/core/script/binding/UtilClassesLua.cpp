@@ -8,6 +8,8 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+#include "LuaBridge.h"
+
 #include "util/Angle.h"
 #include "util/Base64.h"
 #include "util/Color.h"
@@ -16,30 +18,28 @@ using namespace Supernova;
 
 void LuaBinding::registerUtilClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
-/*
-    sol::state_view lua(L);
 
-    auto angle = lua.new_usertype<Angle>("Angle",
-        sol::no_constructor);
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Angle>("Angle")
+        .addStaticFunction("radToDefault", &Angle::radToDefault)
+        .addStaticFunction("degToDefault", &Angle::degToDefault)
+        .addStaticFunction("defaultToRad", &Angle::defaultToRad)
+        .addStaticFunction("defaultToDeg", &Angle::defaultToDeg)
+        .addStaticFunction("radToDeg", &Angle::radToDeg)
+        .addStaticFunction("degToRad", &Angle::degToRad)
+        .endClass();
 
-    angle["radToDefault"] = Angle::radToDefault;
-    angle["degToDefault"] = Angle::degToDefault;
-    angle["defaultToRad"] = Angle::defaultToRad;
-    angle["defaultToDeg"] = Angle::defaultToDeg;
-    angle["radToDeg"] = Angle::radToDeg;
-    angle["degToRad"] = Angle::degToRad;
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Base64>("Base64")
+        //.addStaticFunction("encode", &Base64::encode)  //TODO: read and write data in Lua
+        //.addStaticFunction("decode", &Base64::decode)
+        .endClass();
 
-    auto base64 = lua.new_usertype<Base64>("Base64",
-        sol::no_constructor);
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Color>("Color")
+        .addStaticFunction("linearTosRGB", (Vector4(*)(Vector4))&Color::linearTosRGB)
+        .addStaticFunction("sRGBToLinear", (Vector4(*)(Vector4))&Color::sRGBToLinear)
+        .endClass();
 
-    base64["encode"] = Base64::encode;
-    base64["decode"] = Base64::decode;
-
-    auto color = lua.new_usertype<Color>("Color",
-        sol::no_constructor);
-
-    color["linearTosRGB"] = sol::overload(sol::resolve<Vector3(Vector3)>(Color::linearTosRGB), sol::resolve<Vector4(Vector4)>(Color::linearTosRGB));
-    color["sRGBToLinear"] = sol::overload(sol::resolve<Vector3(Vector3)>(Color::sRGBToLinear), sol::resolve<Vector4(Vector4)>(Color::sRGBToLinear));
-*/
 #endif //DISABLE_LUA_BINDINGS
 }

@@ -55,7 +55,7 @@ void MeshPolygon::setFlipY(bool flipY){
     }
 }
 
-bool MeshPolygon::isFlipY(){
+bool MeshPolygon::isFlipY() const{
     MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
 
     return pcomp.flipY;

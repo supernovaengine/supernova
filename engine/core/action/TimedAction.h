@@ -17,7 +17,7 @@ namespace Supernova{
     public:
         TimedAction(Scene* scene);
 
-        void setFunction(std::function<float(float)> function);
+        void setFunction(FunctionSubscribe<float(float)> function);
 
         void setFunctionType(EaseType functionType);
     };

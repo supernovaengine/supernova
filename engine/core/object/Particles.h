@@ -19,7 +19,7 @@ namespace Supernova{
         virtual ~Particles();
 
         void setMaxParticles(unsigned int maxParticles);
-        unsigned int getMaxParticles();
+        unsigned int getMaxParticles() const;
 
         void addParticle(Vector3 position);
         void addParticle(Vector3 position, Vector4 color);

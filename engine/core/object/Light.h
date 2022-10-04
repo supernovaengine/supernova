@@ -15,45 +15,45 @@ namespace Supernova{
         virtual ~Light();
 
         void setType(LightType type);
-        LightType getType();
+        LightType getType() const;
 
         void setDirection(Vector3 direction);
         void setDirection(const float x, const float y, const float z);
-        Vector3 getDirection();
+        Vector3 getDirection() const;
 
         void setColor(Vector3 color);
         void setColor(const float r, const float g, const float b);
-        Vector3 getColor();
+        Vector3 getColor() const;
 
         void setRange(float range);
-        float getRange();
+        float getRange() const;
 
         void setIntensity(float intensity);
-        float getIntensity();
+        float getIntensity() const;
 
         void setConeAngle(float inner, float outer);
         void setInnerConeAngle(float inner);
-        float getInnerConeAngle();
+        float getInnerConeAngle() const;
         void setOuterConeAngle(float outer);
-        float getOuterConeAngle();
+        float getOuterConeAngle() const;
 
         void setShadows(bool shadows);
-        bool isShadows();
+        bool isShadows() const;
 
         void setBias(float bias);
-        float getBias();
+        float getBias() const;
 
         void setShadowMapSize(unsigned int size);
-        unsigned int getShadowMapSize();
+        unsigned int getShadowMapSize() const;
 
         void setShadowCameraNearFar(float near, float far);
         void setCameraNear(float near);
-        float getCameraNear();
+        float getCameraNear() const;
         void setCameraFar(float far);
-        float getCameraFar();
+        float getCameraFar() const;
 
         void setNumCascades(unsigned int numCascades);
-        float getNumCascades();
+        float getNumCascades() const;
     };
 }
 

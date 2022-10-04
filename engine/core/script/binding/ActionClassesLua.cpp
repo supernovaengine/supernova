@@ -8,6 +8,9 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+#include "LuaBridge.h"
+#include "EnumWrapper.h"
+
 #include "action/Action.h"
 #include "action/TimedAction.h"
 #include "action/AlphaAction.h"
@@ -25,214 +28,192 @@
 
 using namespace Supernova;
 
+namespace luabridge
+{
+    template<> struct Stack<EaseType> : EnumWrapper<EaseType>{};
+}
+
 void LuaBinding::registerActionClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
-/*
-    sol::state_view lua(L);
 
-    auto action = lua.new_usertype<Action>("Action",
-        sol::call_constructor, sol::constructors<Action(Scene*), Action(Scene*, Entity)>());
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("EaseType")
+        .addProperty("LINEAR", EaseType::LINEAR)
+        .addProperty("QUAD_IN", EaseType::QUAD_IN)
+        .addProperty("QUAD_OUT", EaseType::QUAD_OUT)
+        .addProperty("QUAD_IN_OUT", EaseType::QUAD_IN_OUT)
+        .addProperty("CUBIC_IN", EaseType::CUBIC_IN)
+        .addProperty("CUBIC_OUT", EaseType::CUBIC_OUT)
+        .addProperty("CUBIC_IN_OUT", EaseType::CUBIC_IN_OUT)
+        .addProperty("QUART_IN", EaseType::QUART_IN)
+        .addProperty("QUART_OUT", EaseType::QUART_OUT)
+        .addProperty("QUART_IN_OUT", EaseType::QUART_IN_OUT)
+        .addProperty("QUINT_IN", EaseType::QUINT_IN)
+        .addProperty("QUINT_OUT", EaseType::QUINT_OUT)
+        .addProperty("QUINT_IN_OUT", EaseType::QUINT_IN_OUT)
+        .addProperty("SINE_IN", EaseType::SINE_IN)
+        .addProperty("SINE_OUT", EaseType::SINE_OUT)
+        .addProperty("SINE_IN_OUT", EaseType::SINE_IN_OUT)
+        .addProperty("EXPO_IN", EaseType::EXPO_IN)
+        .addProperty("EXPO_OUT", EaseType::EXPO_OUT)
+        .addProperty("EXPO_IN_OUT", EaseType::EXPO_IN_OUT)
+        .addProperty("CIRC_IN", EaseType::CIRC_IN)
+        .addProperty("CIRC_OUT", EaseType::CIRC_OUT)
+        .addProperty("CIRC_IN_OUT", EaseType::CIRC_IN_OUT)
+        .addProperty("ELASTIC_IN", EaseType::ELASTIC_IN)
+        .addProperty("ELASTIC_OUT", EaseType::ELASTIC_OUT)
+        .addProperty("ELASTIC_IN_OUT", EaseType::ELASTIC_IN_OUT)
+        .addProperty("BACK_IN", EaseType::BACK_IN)
+        .addProperty("BACK_OUT", EaseType::BACK_OUT)
+        .addProperty("BACK_IN_OUT", EaseType::BACK_IN_OUT)
+        .addProperty("BOUNCE_IN", EaseType::BOUNCE_IN)
+        .addProperty("BOUNCE_OUT", EaseType::BOUNCE_OUT)
+        .addProperty("BOUNCE_IN_OUT", EaseType::BOUNCE_IN_OUT)
+        .endNamespace();
 
-    action["start"] = &Action::start;
-    action["pause"] = &Action::pause;
-    action["target"] = sol::property(&Action::getTarget, &Action::setTarget);
-    action["setTarget"] = &Action::setTarget;
-    action["getTarget"] = &Action::getTarget;
-    action["speed"] = sol::property(&Action::getSpeed, &Action::setSpeed);
-    action["setSpeed"] = &Action::setSpeed;
-    action["getSpeed"] = &Action::getSpeed;
-    action["entity"] = sol::property(&Action::getEntity);
-    action["getEntity"] = &Action::getEntity;
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Action>("Action")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("start", &Action::start)
+        .addFunction("pause", &Action::pause)
+        .addProperty("target", &Action::getTarget, &Action::setTarget)
+        .addProperty("speed", &Action::getSpeed, &Action::setSpeed)
+        .addProperty("entity", &Action::getEntity)
+        .endClass();
 
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<TimedAction, Action>("TimedAction")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setFunction", [] (TimedAction* self, lua_State* L) { self->setFunction(L); })
+        .addFunction("setFunctionType", &TimedAction::setFunctionType)
+        .endClass();
 
-    auto timedaction = lua.new_usertype<TimedAction>("TimedAction",
-        sol::call_constructor, sol::constructors<TimedAction(Scene*)>(),
-        sol::base_classes, sol::bases<Action>());
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<AlphaAction, TimedAction>("AlphaAction")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setAction", &AlphaAction::setAction)
+        .endClass();
 
-    timedaction["setFunction"] = sol::resolve<void(sol::protected_function)>(&TimedAction::setFunction);
-    timedaction["setFunctionType"] = &TimedAction::setFunctionType;
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<ColorAction, TimedAction>("ColorAction")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setAction", (void(ColorAction::*)(Vector3, Vector3, float, bool))&ColorAction::setAction)
+        .endClass();
 
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<PositionAction, TimedAction>("PositionAction")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setAction", &PositionAction::setAction)
+        .endClass();
 
-    auto alphaaction = lua.new_usertype<AlphaAction>("AlphaAction",
-        sol::call_constructor, sol::constructors<AlphaAction(Scene*)>(),
-        sol::base_classes, sol::bases<TimedAction>());
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<ScaleAction, TimedAction>("ScaleAction")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setAction", &ScaleAction::setAction)
+        .endClass();
 
-    alphaaction["setAction"] = &AlphaAction::setAction;
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<ParticlesAnimation, Action>("ParticlesAnimation")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setLifeInitializer", (void(ParticlesAnimation::*)(float, float))&ParticlesAnimation::setLifeInitializer)
+        .addFunction("setPositionInitializer", (void(ParticlesAnimation::*)(Vector3, Vector3))&ParticlesAnimation::setPositionInitializer)
+        .addFunction("setPositionModifier", (void(ParticlesAnimation::*)(float, float, Vector3, Vector3, EaseType))&ParticlesAnimation::setPositionModifier)
+        .addFunction("setVelocityInitializer", (void(ParticlesAnimation::*)(Vector3, Vector3))&ParticlesAnimation::setVelocityInitializer)
+        .addFunction("setVelocityModifier", (void(ParticlesAnimation::*)(float, float, Vector3, Vector3, EaseType))&ParticlesAnimation::setVelocityModifier)
+        .addFunction("setAccelerationInitializer", (void(ParticlesAnimation::*)(Vector3, Vector3))&ParticlesAnimation::setAccelerationInitializer)
+        .addFunction("setAccelerationModifier", (void(ParticlesAnimation::*)(float, float, Vector3, Vector3, EaseType))&ParticlesAnimation::setAccelerationModifier)
+        .addFunction("setColorInitializer", (void(ParticlesAnimation::*)(Vector3, Vector3))&ParticlesAnimation::setColorInitializer)
+        .addFunction("setColorModifier", (void(ParticlesAnimation::*)(float, float, Vector3, Vector3, EaseType))&ParticlesAnimation::setColorModifier)
+        .addFunction("setAlphaInitializer", (void(ParticlesAnimation::*)(float, float))&ParticlesAnimation::setAlphaInitializer)
+        .addFunction("setAlphaModifier", (void(ParticlesAnimation::*)(float, float, float, float, EaseType))&ParticlesAnimation::setAlphaModifier)
+        .addFunction("setSizeInitializer", (void(ParticlesAnimation::*)(float, float))&ParticlesAnimation::setSizeInitializer)
+        .addFunction("setSizeModifier", (void(ParticlesAnimation::*)(float, float, float, float, EaseType))&ParticlesAnimation::setSizeModifier)
+        .addFunction("setSpriteIntializer", (void(ParticlesAnimation::*)(std::vector<int>))&ParticlesAnimation::setSpriteIntializer)
+        .addFunction("setSpriteModifier", (void(ParticlesAnimation::*)(float, float, std::vector<int>, EaseType))&ParticlesAnimation::setSpriteModifier)
+        .addFunction("setRotationInitializer", (void(ParticlesAnimation::*)(float, float))&ParticlesAnimation::setRotationInitializer)
+        .addFunction("setRotationModifier", (void(ParticlesAnimation::*)(float, float, float, float, EaseType))&ParticlesAnimation::setRotationModifier)
+        .endClass();
 
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<SpriteAnimation, Action>("SpriteAnimation")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setAnimation", (void(SpriteAnimation::*)(std::vector<int>, std::vector<int>, bool))&SpriteAnimation::setAnimation)
+        .endClass();
 
-    auto coloraction = lua.new_usertype<ColorAction>("ColorAction",
-        sol::call_constructor, sol::constructors<ColorAction(Scene*)>(),
-        sol::base_classes, sol::bases<TimedAction>());
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Animation, Action>("Animation")
+        .addConstructor <void (*) (Scene*)> ()
+        .addProperty("loop", &Animation::isLoop, &Animation::setLoop)
+        .addProperty("endTime", &Animation::getEndTime, &Animation::setEndTime)
+        .addProperty("ownedActions", &Animation::isOwnedActions, &Animation::setOwnedActions)
+        .addProperty("name", &Animation::getName, &Animation::setName)
+        .addFunction("addActionFrame", (void(Animation::*)(float, float, Entity, Entity))&Animation::addActionFrame)
+        .addFunction("getActionFrame", &Animation::getActionFrame)
+        .endClass();
 
-    coloraction["setAction"] = sol::overload(sol::resolve<void(Vector3, Vector3, float, bool)>(&ColorAction::setAction), sol::resolve<void(Vector4, Vector4, float, bool)>(&ColorAction::setAction));
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Ease>("Ease")
+        .addStaticFunction("linear", &Ease::linear)
+        .addStaticFunction("easeInQuad", &Ease::easeInQuad)
+        .addStaticFunction("easeOutQuad", &Ease::easeOutQuad)
+        .addStaticFunction("easeInOutQuad", &Ease::easeInOutQuad)
+        .addStaticFunction("easeInCubic", &Ease::easeInCubic)
+        .addStaticFunction("easeOutCubic", &Ease::easeOutCubic)
+        .addStaticFunction("easeInOutCubic", &Ease::easeInOutCubic)
+        .addStaticFunction("easeInQuart", &Ease::easeInQuart)
+        .addStaticFunction("easeOutQuart", &Ease::easeOutQuart)
+        .addStaticFunction("easeInQuint", &Ease::easeOutQuint)
+        .addStaticFunction("easeOutQuint", &Ease::easeOutQuint)
+        .addStaticFunction("easeInOutQuint", &Ease::easeInOutQuint)
+        .addStaticFunction("easeInSine", &Ease::easeInSine)
+        .addStaticFunction("easeOutSine", &Ease::easeOutSine)
+        .addStaticFunction("easeInOutSine", &Ease::easeInOutSine)
+        .addStaticFunction("easeInExpo", &Ease::easeInExpo)
+        .addStaticFunction("easeOutExpo", &Ease::easeOutExpo)
+        .addStaticFunction("easeInOutExpo", &Ease::easeInOutExpo)
+        .addStaticFunction("easeInCirc", &Ease::easeInCirc)
+        .addStaticFunction("easeOutCirc", &Ease::easeOutCirc)
+        .addStaticFunction("easeInOutCirc", &Ease::easeInOutCirc)
+        .addStaticFunction("easeInElastic", &Ease::easeInElastic)
+        .addStaticFunction("easeOutElastic", &Ease::easeOutElastic)
+        .addStaticFunction("easeInOutElastic", &Ease::easeInOutElastic)
+        .addStaticFunction("easeInBack", &Ease::easeInBack)
+        .addStaticFunction("easeOutBack", &Ease::easeOutBack)
+        .addStaticFunction("easeInOutBack", &Ease::easeInOutBack)
+        .addStaticFunction("easeOutBounce", &Ease::easeOutBounce)
+        .addStaticFunction("easeInBounce", &Ease::easeInBounce)
+        .addStaticFunction("easeInOutBounce", &Ease::easeInOutBounce)
 
+        .addStaticFunction("getFunction", &Ease::getFunction)
+        .endClass();
 
-    auto positionaction = lua.new_usertype<PositionAction>("PositionAction",
-        sol::call_constructor, sol::constructors<PositionAction(Scene*)>(),
-        sol::base_classes, sol::bases<TimedAction>());
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<MorphTracks, Action>("MorphTracks")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setTimes", &MorphTracks::setTimes)
+        .addFunction("setValues", &MorphTracks::setValues)
+        .endClass();
 
-    positionaction["setAction"] = &PositionAction::setAction;
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<RotateTracks, Action>("RotateTracks")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setTimes", &RotateTracks::setTimes)
+        .addFunction("setValues", &RotateTracks::setValues)
+        .endClass();
 
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<ScaleTracks, Action>("ScaleTracks")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setTimes", &ScaleTracks::setTimes)
+        .addFunction("setValues", &ScaleTracks::setValues)
+        .endClass();
 
-    auto scaleaction = lua.new_usertype<ScaleAction>("ScaleAction",
-        sol::call_constructor, sol::constructors<ScaleAction(Scene*)>(),
-        sol::base_classes, sol::bases<TimedAction>());
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<TranslateTracks, Action>("TranslateTracks")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setTimes", &TranslateTracks::setTimes)
+        .addFunction("setValues", &TranslateTracks::setValues)
+        .endClass();
 
-    scaleaction["setAction"] = &ScaleAction::setAction;
-
-
-    auto particlesanimation = lua.new_usertype<ParticlesAnimation>("ParticlesAnimation",
-        sol::call_constructor, sol::constructors<ParticlesAnimation(Scene*)>(),
-        sol::base_classes, sol::bases<Action>());
-
-    particlesanimation["setLifeInitializer"] = sol::overload(sol::resolve<void(float)>(&ParticlesAnimation::setLifeInitializer), sol::resolve<void(float, float)>(&ParticlesAnimation::setLifeInitializer));
-    particlesanimation["setPositionInitializer"] = sol::overload(sol::resolve<void(Vector3)>(&ParticlesAnimation::setPositionInitializer), sol::resolve<void(Vector3, Vector3)>(&ParticlesAnimation::setPositionInitializer));
-    particlesanimation["setPositionModifier"] = sol::overload(sol::resolve<void(float, float, Vector3, Vector3)>(&ParticlesAnimation::setPositionModifier), sol::resolve<void(float, float, Vector3, Vector3, EaseType)>(&ParticlesAnimation::setPositionModifier));
-    particlesanimation["setVelocityInitializer"] = sol::overload(sol::resolve<void(Vector3)>(&ParticlesAnimation::setVelocityInitializer), sol::resolve<void(Vector3, Vector3)>(&ParticlesAnimation::setVelocityInitializer));
-    particlesanimation["setVelocityModifier"] = sol::overload(sol::resolve<void(float, float, Vector3, Vector3)>(&ParticlesAnimation::setVelocityModifier), sol::resolve<void(float, float, Vector3, Vector3, EaseType)>(&ParticlesAnimation::setVelocityModifier));
-    particlesanimation["setAccelerationInitializer"] = sol::overload(sol::resolve<void(Vector3)>(&ParticlesAnimation::setAccelerationInitializer), sol::resolve<void(Vector3, Vector3)>(&ParticlesAnimation::setAccelerationInitializer));
-    particlesanimation["setAccelerationModifier"] = sol::overload(sol::resolve<void(float, float, Vector3, Vector3)>(&ParticlesAnimation::setAccelerationModifier), sol::resolve<void(float, float, Vector3, Vector3, EaseType)>(&ParticlesAnimation::setAccelerationModifier));
-    particlesanimation["setColorInitializer"] = sol::overload(sol::resolve<void(Vector3)>(&ParticlesAnimation::setColorInitializer), sol::resolve<void(Vector3, Vector3)>(&ParticlesAnimation::setColorInitializer));
-    particlesanimation["setColorModifier"] = sol::overload(sol::resolve<void(float, float, Vector3, Vector3)>(&ParticlesAnimation::setColorModifier), sol::resolve<void(float, float, Vector3, Vector3, EaseType)>(&ParticlesAnimation::setColorModifier));
-    particlesanimation["setAlphaInitializer"] = sol::overload(sol::resolve<void(float)>(&ParticlesAnimation::setAlphaInitializer), sol::resolve<void(float, float)>(&ParticlesAnimation::setAlphaInitializer));
-    particlesanimation["setAlphaModifier"] = sol::overload(sol::resolve<void(float, float, float, float)>(&ParticlesAnimation::setAlphaModifier), sol::resolve<void(float, float, float, float, EaseType)>(&ParticlesAnimation::setAlphaModifier));
-    particlesanimation["setSizeInitializer"] = sol::overload(sol::resolve<void(float)>(&ParticlesAnimation::setSizeInitializer), sol::resolve<void(float, float)>(&ParticlesAnimation::setSizeInitializer));
-    particlesanimation["setSizeModifier"] = sol::overload(sol::resolve<void(float, float, float, float)>(&ParticlesAnimation::setSizeModifier), sol::resolve<void(float, float, float, float, EaseType)>(&ParticlesAnimation::setSizeModifier));
-    particlesanimation["setSpriteIntializer"] = sol::overload(sol::resolve<void(std::vector<int>)>(&ParticlesAnimation::setSpriteIntializer), sol::resolve<void(int, int)>(&ParticlesAnimation::setSpriteIntializer));
-    particlesanimation["setSpriteModifier"] = sol::overload(sol::resolve<void(float, float, std::vector<int>)>(&ParticlesAnimation::setSpriteModifier), sol::resolve<void(float, float, std::vector<int>, EaseType)>(&ParticlesAnimation::setSpriteModifier));
-    particlesanimation["setRotationInitializer"] = sol::overload(sol::resolve<void(float)>(&ParticlesAnimation::setRotationInitializer), sol::resolve<void(float, float)>(&ParticlesAnimation::setRotationInitializer));
-    particlesanimation["setRotationModifier"] = sol::overload(sol::resolve<void(float, float, float, float)>(&ParticlesAnimation::setRotationModifier), sol::resolve<void(float, float, float, float, EaseType)>(&ParticlesAnimation::setRotationModifier));
-
-
-    auto spriteanimation = lua.new_usertype<SpriteAnimation>("SpriteAnimation",
-        sol::call_constructor, sol::constructors<SpriteAnimation(Scene*)>(),
-        sol::base_classes, sol::bases<Action>());
-
-    spriteanimation["setAnimation"] = sol::overload(sol::resolve<void(std::vector<int>, std::vector<int>, bool)>(&SpriteAnimation::setAnimation), sol::resolve<void(int, int, int, bool)>(&SpriteAnimation::setAnimation));
-
-
-    auto animation = lua.new_usertype<Animation>("Animation",
-        sol::call_constructor, sol::constructors<Animation(Scene*), Animation(Scene*, Entity)>(),
-        sol::base_classes, sol::bases<Action>());
-
-    animation["loop"] = sol::property(&Animation::isLoop, &Animation::setLoop);
-    animation["isLoop"] = &Animation::isLoop;
-    animation["setLoop"] = &Animation::setLoop;
-    animation["endTime"] = sol::property(&Animation::getEndTime, &Animation::setEndTime);
-    animation["setEndTime"] = &Animation::setEndTime;
-    animation["getEndTime"] = &Animation::getEndTime;
-    animation["ownedActions"] = sol::property(&Animation::isOwnedActions, &Animation::setOwnedActions);
-    animation["isOwnedActions"] = &Animation::isOwnedActions;
-    animation["setOwnedActions"] = &Animation::setOwnedActions;
-    animation["name"] = sol::property(&Animation::getName, &Animation::setName);
-    animation["getName"] = &Animation::getName;
-    animation["setName"] = &Animation::setName;
-    animation["addActionFrame"] = sol::overload( sol::resolve<void(float, float, Entity, Entity)>(&Animation::addActionFrame), sol::resolve<void(float, Entity, Entity)>(&Animation::addActionFrame) );
-    animation["getActionFrame"] = &Animation::getActionFrame;
- 
-
-    lua.new_enum("EaseType",
-        "LINEAR", EaseType::LINEAR,
-        "QUAD_IN", EaseType::QUAD_IN,
-        "QUAD_OUT", EaseType::QUAD_OUT,
-        "QUAD_IN_OUT", EaseType::QUAD_IN_OUT,
-        "CUBIC_IN", EaseType::CUBIC_IN,
-        "CUBIC_OUT", EaseType::CUBIC_OUT,
-        "CUBIC_IN_OUT", EaseType::CUBIC_IN_OUT,
-        "QUART_IN", EaseType::QUART_IN,
-        "QUART_OUT", EaseType::QUART_OUT,
-        "QUART_IN_OUT", EaseType::QUART_IN_OUT,
-        "QUINT_IN", EaseType::QUINT_IN,
-        "QUINT_OUT", EaseType::QUINT_OUT,
-        "QUINT_IN_OUT", EaseType::QUINT_IN_OUT,
-        "SINE_IN", EaseType::SINE_IN,
-        "SINE_OUT", EaseType::SINE_OUT,
-        "SINE_IN_OUT", EaseType::SINE_IN_OUT,
-        "EXPO_IN", EaseType::EXPO_IN,
-        "EXPO_OUT", EaseType::EXPO_OUT,
-        "EXPO_IN_OUT", EaseType::EXPO_IN_OUT,
-        "CIRC_IN", EaseType::CIRC_IN,
-        "CIRC_OUT", EaseType::CIRC_OUT,
-        "CIRC_IN_OUT", EaseType::CIRC_IN_OUT,
-        "ELASTIC_IN", EaseType::ELASTIC_IN,
-        "ELASTIC_OUT", EaseType::ELASTIC_OUT,
-        "ELASTIC_IN_OUT", EaseType::ELASTIC_IN_OUT,
-        "BACK_IN", EaseType::BACK_IN,
-        "BACK_OUT", EaseType::BACK_OUT,
-        "BACK_IN_OUT", EaseType::BACK_IN_OUT,
-        "BOUNCE_IN", EaseType::BOUNCE_IN,
-        "BOUNCE_OUT", EaseType::BOUNCE_OUT,
-        "BOUNCE_IN_OUT", EaseType::BOUNCE_IN_OUT
-        );
-
-    auto ease = lua.new_usertype<Ease>("Ease",
-        sol::no_constructor);
-
-    ease["linear"] = Ease::linear;
-    ease["easeInQuad"] = Ease::easeInQuad;
-    ease["easeOutQuad"] = Ease::easeOutQuad;
-    ease["easeInOutQuad"] = Ease::easeInOutQuad;
-    ease["easeInCubic"] = Ease::easeInCubic;
-    ease["easeOutCubic"] = Ease::easeOutCubic;
-    ease["easeInOutCubic"] = Ease::easeInOutCubic;
-    ease["easeInQuart"] = Ease::easeInQuart;
-    ease["easeOutQuart"] = Ease::easeOutQuart;
-    ease["easeInQuint"] = Ease::easeOutQuint;
-    ease["easeOutQuint"] = Ease::easeOutQuint;
-    ease["easeInOutQuint"] = Ease::easeInOutQuint;
-    ease["easeInSine"] = Ease::easeInSine;
-    ease["easeOutSine"] = Ease::easeOutSine;
-    ease["easeInOutSine"] = Ease::easeInOutSine;
-    ease["easeInExpo"] = Ease::easeInExpo;
-    ease["easeOutExpo"] = Ease::easeOutExpo;
-    ease["easeInOutExpo"] = Ease::easeInOutExpo;
-    ease["easeInCirc"] = Ease::easeInCirc;
-    ease["easeOutCirc"] = Ease::easeOutCirc;
-    ease["easeInOutCirc"] = Ease::easeInOutCirc;
-    ease["easeInElastic"] = Ease::easeInElastic;
-    ease["easeOutElastic"] = Ease::easeOutElastic;
-    ease["easeInOutElastic"] = Ease::easeInOutElastic;
-    ease["easeInBack"] = Ease::easeInBack;
-    ease["easeOutBack"] = Ease::easeOutBack;
-    ease["easeInOutBack"] = Ease::easeInOutBack;
-    ease["easeOutBounce"] = Ease::easeOutBounce;
-    ease["easeInBounce"] = Ease::easeInBounce;
-    ease["easeInOutBounce"] = Ease::easeInOutBounce;
-
-    ease["getFunction"] = Ease::getFunction;
-
-
-    auto morphtracks = lua.new_usertype<MorphTracks>("MorphTracks",
-        sol::call_constructor, sol::constructors<MorphTracks(Scene*), MorphTracks(Scene*, std::vector<float>, std::vector<std::vector<float>>)>(),
-        sol::base_classes, sol::bases<Action>());
-    
-    morphtracks["setTimes"] = &MorphTracks::setTimes;
-    morphtracks["setValues"] = &MorphTracks::setValues;
-
-
-    auto rotatetracks = lua.new_usertype<RotateTracks>("RotateTracks",
-        sol::call_constructor, sol::constructors<RotateTracks(Scene*), RotateTracks(Scene*, std::vector<float>, std::vector<Quaternion>)>(),
-        sol::base_classes, sol::bases<Action>());
-    
-    rotatetracks["setTimes"] = &RotateTracks::setTimes;
-    rotatetracks["setValues"] = &RotateTracks::setValues;
-
-
-    auto scaletracks = lua.new_usertype<ScaleTracks>("ScaleTracks",
-        sol::call_constructor, sol::constructors<ScaleTracks(Scene*), ScaleTracks(Scene*, std::vector<float>, std::vector<Vector3>)>(),
-        sol::base_classes, sol::bases<Action>());
-    
-    scaletracks["setTimes"] = &ScaleTracks::setTimes;
-    scaletracks["setValues"] = &ScaleTracks::setValues;
-
-
-    auto translatetracks = lua.new_usertype<TranslateTracks>("TranslateTracks",
-        sol::call_constructor, sol::constructors<TranslateTracks(Scene*), TranslateTracks(Scene*, std::vector<float>, std::vector<Vector3>)>(),
-        sol::base_classes, sol::bases<Action>());
-    
-    translatetracks["setTimes"] = &TranslateTracks::setTimes;
-    translatetracks["setValues"] = &TranslateTracks::setValues;
-*/
 #endif //DISABLE_LUA_BINDINGS
-
 }

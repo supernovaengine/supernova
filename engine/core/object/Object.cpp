@@ -44,7 +44,7 @@ void Object::setName(std::string name){
     transform.name = name;
 }
 
-std::string Object::getName(){
+std::string Object::getName() const{
     Transform& transform = getComponent<Transform>();
     return transform.name;
 }
@@ -63,12 +63,12 @@ void Object::setPosition(const float x, const float y, const float z){
     setPosition(Vector3(x,y,z));
 }
 
-Vector3 Object::getPosition(){
+Vector3 Object::getPosition() const{
     Transform& transform = getComponent<Transform>();
     return transform.position;
 }
 
-Vector3 Object::getWorldPosition(){
+Vector3 Object::getWorldPosition() const{
     Transform& transform = getComponent<Transform>();
     return transform.worldPosition;
 }
@@ -93,12 +93,12 @@ void Object::setRotation(const float xAngle, const float yAngle, const float zAn
     setRotation(qz * (qy * qx)); //order ZYX
 }
 
-Quaternion Object::getRotation(){
+Quaternion Object::getRotation() const{
     Transform& transform = getComponent<Transform>();
     return transform.rotation;
 }
 
-Quaternion Object::getWorldRotation(){
+Quaternion Object::getWorldRotation() const{
     Transform& transform = getComponent<Transform>();
     return transform.worldRotation;
 }
@@ -117,12 +117,12 @@ void Object::setScale(Vector3 scale){
     }
 }
 
-Vector3 Object::getScale(){
+Vector3 Object::getScale() const{
     Transform& transform = getComponent<Transform>();
     return transform.scale;
 }
 
-Vector3 Object::getWorldScale(){
+Vector3 Object::getWorldScale() const{
     Transform& transform = getComponent<Transform>();
     return transform.worldScale;
 }
@@ -161,7 +161,7 @@ void Object::moveToLast(){
     scene->moveChildToLast(this->entity);
 }
 
-Entity Object::getEntity(){
+Entity Object::getEntity() const{
     return entity;
 }
 

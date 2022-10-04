@@ -50,7 +50,7 @@ namespace Supernova{
         }
     
         template<typename T>
-    	T& getComponent() {
+    	T& getComponent() const {
     		return scene->getComponent<T>(entity);
     	}
 

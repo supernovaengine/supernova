@@ -18,16 +18,16 @@ namespace Supernova{
         Animation(const Animation& rhs);
         Animation& operator=(const Animation& rhs);
 
-        bool isLoop();
+        bool isLoop() const;
         void setLoop(bool loop);
 
         void setEndTime(float endTime);
-        float getEndTime();
+        float getEndTime() const;
 
-        bool isOwnedActions();
+        bool isOwnedActions() const;
         void setOwnedActions(bool ownedActions);
 
-        const std::string &getName();
+        const std::string &getName() const;
         void setName(const std::string &name);
 
         void addActionFrame(float startTime, float endTime, Entity action, Entity target);

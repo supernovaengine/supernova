@@ -27,7 +27,6 @@ namespace luabridge
     template<> struct Stack<TextureStrategy> : EnumWrapper<TextureStrategy>{};
     template<> struct Stack<TextureType> : EnumWrapper<TextureType>{};
     template<> struct Stack<ColorFormat> : EnumWrapper<ColorFormat>{};
-    template<> struct Stack<LightType> : EnumWrapper<LightType>{};
 
     template <>
     struct Stack <Touch>
@@ -129,13 +128,6 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
-        .beginNamespace("LightType")
-        .addProperty("DIRECTIONAL", LightType::DIRECTIONAL)
-        .addProperty("POINT", LightType::POINT)
-        .addProperty("SPOT", LightType::SPOT)
-        .endNamespace();
-
-    luabridge::getGlobalNamespace(L)
         .beginClass<Engine>("Engine")
 
         .addStaticProperty("scene", &Engine::getScene, &Engine::setScene)
@@ -228,16 +220,19 @@ void LuaBinding::registerCoreClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<TextureRender>("TextureRender")
+        .addConstructor <void (*) (void)> ()
         .endClass();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<FramebufferRender>("FramebufferRender")
+        .addConstructor <void (*) (void)> ()
         .addFunction("isCreated", &FramebufferRender::isCreated)
         .addFunction("getColorTexture", &FramebufferRender::getColorTexture)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Scene>("Scene")
+        .addConstructor <void (*) (void)> ()
         .addFunction("load", &Scene::load)
         .addFunction("destroy", &Scene::destroy)
         .addFunction("draw", &Scene::draw)

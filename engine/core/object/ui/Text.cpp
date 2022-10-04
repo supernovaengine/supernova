@@ -49,13 +49,13 @@ void Text::setHeight(int height){
     textcomp.needUpdateText = true;
 }
 
-int Text::getWidth(){
+int Text::getWidth() const{
     UIComponent& uicomp = getComponent<UIComponent>();
 
     return uicomp.width;
 }
 
-int Text::getHeight(){
+int Text::getHeight() const{
     UIComponent& uicomp = getComponent<UIComponent>();
 
     return uicomp.height;
@@ -74,7 +74,7 @@ void Text::setMaxTextSize(unsigned int maxTextSize){
     }
 }
 
-unsigned int Text::getMaxTextSize(){
+unsigned int Text::getMaxTextSize() const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     return textcomp.maxTextSize;
@@ -92,7 +92,7 @@ void Text::setText(std::string text){
     textcomp.needUpdateText = true;
 }
 
-std::string Text::getText(){
+std::string Text::getText() const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     return textcomp.text;
@@ -109,7 +109,7 @@ void Text::setFont(std::string font){
     }
 }
 
-std::string Text::getFont(){
+std::string Text::getFont() const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     return textcomp.font;
@@ -124,7 +124,7 @@ void Text::setFontSize(unsigned int fontSize){
     textcomp.needUpdateText = true;
 }
 
-unsigned int Text::getFontSize(){
+unsigned int Text::getFontSize() const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     return textcomp.fontSize;
@@ -137,7 +137,7 @@ void Text::setMultiline(bool multiline){
     textcomp.needUpdateText = true;
 }
 
-bool Text::getMultiline(){
+bool Text::getMultiline() const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     return textcomp.multiline;
@@ -153,13 +153,13 @@ void Text::setColor(float red, float green, float blue, float alpha){
     setColor(Vector4(red, green, blue, alpha));
 }
 
-Vector4 Text::getColor(){
+Vector4 Text::getColor() const{
     UIComponent& uicomp = getComponent<UIComponent>();
 
     return Color::linearTosRGB(uicomp.color);
 }
 
-float Text::getAscent(){
+float Text::getAscent() const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     if (!textcomp.stbtext)
@@ -168,7 +168,7 @@ float Text::getAscent(){
         return textcomp.stbtext->getAscent();
 }
 
-float Text::getDescent(){
+float Text::getDescent() const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     if (!textcomp.stbtext)
@@ -177,7 +177,7 @@ float Text::getDescent(){
         return textcomp.stbtext->getDescent();
 }
 
-float Text::getLineGap(){
+float Text::getLineGap() const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     if (!textcomp.stbtext)
@@ -186,7 +186,7 @@ float Text::getLineGap(){
         return textcomp.stbtext->getLineGap();
 }
 
-int Text::getLineHeight(){
+int Text::getLineHeight() const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     if (!textcomp.stbtext)
@@ -195,13 +195,13 @@ int Text::getLineHeight(){
         return textcomp.stbtext->getLineHeight();
 }
 
-unsigned int Text::getNumChars(){
+unsigned int Text::getNumChars() const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     return textcomp.charPositions.size();
 }
 
-Vector2 Text::getCharPosition(unsigned int index){
+Vector2 Text::getCharPosition(unsigned int index) const{
     TextComponent& textcomp = getComponent<TextComponent>();
 
     if (index >= 0 && index < textcomp.charPositions.size()){

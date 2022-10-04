@@ -34,22 +34,22 @@ namespace Supernova{
         void moveToLast();
 
         void setName(std::string name);
-        std::string getName();
+        std::string getName() const;
 
         void setPosition(Vector3 position);
         void setPosition(const float x, const float y, const float z);
-        Vector3 getPosition();
-        Vector3 getWorldPosition();
+        Vector3 getPosition() const;
+        Vector3 getWorldPosition() const;
 
         void setRotation(Quaternion rotation);
         void setRotation(const float xAngle, const float yAngle, const float zAngle);
-        Quaternion getRotation();
-        Quaternion getWorldRotation();
+        Quaternion getRotation() const;
+        Quaternion getWorldRotation() const;
 
         void setScale(const float factor);
         void setScale(Vector3 scale);
-        Vector3 getScale();
-        Vector3 getWorldScale();
+        Vector3 getScale() const;
+        Vector3 getWorldScale() const;
 
         void setModelMatrix(Matrix4 modelMatrix);
     
@@ -64,11 +64,11 @@ namespace Supernova{
         }
     
         template<typename T>
-    	T& getComponent() {
+    	T& getComponent() const {
     		return scene->getComponent<T>(entity);
     	}
 
-        Entity getEntity();
+        Entity getEntity() const;
 
         void updateTransform();
     };
