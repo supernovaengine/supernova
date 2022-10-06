@@ -15,7 +15,7 @@ Button::Button(Scene* scene): Image(scene){
     uilabel.color = Vector4(0.0, 0.0, 0.0, 1.0);
 }
 
-Text Button::getLabelObject(){
+Text Button::getLabelObject() const{
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
 
     return Text(scene, btcomp.label);
@@ -34,7 +34,7 @@ void Button::setLabel(std::string text){
     textcomp.needUpdateText = true;
 }
 
-std::string Button::getLabel(){
+std::string Button::getLabel() const{
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(btcomp.label);
 
@@ -48,11 +48,11 @@ void Button::setLabelColor(Vector4 color){
     uilabel.color = color;
 }
 
-void Button::setLabelColor(float red, float green, float blue, float alpha){
+void Button::setLabelColor(const float red, const float green, const float blue, const float alpha){
     setLabelColor(Vector4(red, green, blue, alpha));
 }
 
-Vector4 Button::getLabelColor(){
+Vector4 Button::getLabelColor() const{
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     UIComponent& uilabel = scene->getComponent<UIComponent>(btcomp.label);
 
@@ -67,7 +67,7 @@ void Button::setLabelFont(std::string font){
     btcomp.needUpdateButton = true;
 }
 
-std::string Button::getLabelFont(){
+std::string Button::getLabelFont() const{
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(btcomp.label);
 
@@ -80,6 +80,12 @@ void Button::setFontSize(unsigned int fontSize){
     getLabelObject().setFontSize(fontSize);
 
     btcomp.needUpdateButton = true;
+}
+
+unsigned int Button::getFontSize() const{
+    ButtonComponent& btcomp = getComponent<ButtonComponent>();
+
+    return getLabelObject().getFontSize();
 }
 
 void Button::setTextureNormal(std::string path){
@@ -114,4 +120,10 @@ void Button::setDisabled(bool disabled){
     btcomp.disabled = disabled;
 
     btcomp.needUpdateButton = true;
+}
+
+bool Button::getDisabled() const{
+    ButtonComponent& btcomp = getComponent<ButtonComponent>();
+
+    return btcomp.disabled;
 }

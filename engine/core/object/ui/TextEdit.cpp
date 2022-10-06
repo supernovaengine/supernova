@@ -15,7 +15,7 @@ TextEdit::TextEdit(Scene* scene): Image(scene){
     uitext.color = Vector4(0.0, 0.0, 0.0, 1.0);
 }
 
-Text TextEdit::getTextObject(){
+Text TextEdit::getTextObject() const{
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
 
     return Text(scene, tecomp.text);
@@ -27,6 +27,12 @@ void TextEdit::setDisabled(bool disabled){
     tecomp.disabled = disabled;
 
     tecomp.needUpdateTextEdit = true;
+}
+
+bool TextEdit::getDisabled() const{
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+
+    return  tecomp.disabled;
 }
 
 void TextEdit::setText(std::string text){
@@ -42,7 +48,7 @@ void TextEdit::setText(std::string text){
     textcomp.needUpdateText = true;
 }
 
-std::string TextEdit::getText(){
+std::string TextEdit::getText() const{
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(tecomp.text);
 
@@ -56,11 +62,11 @@ void TextEdit::setTextColor(Vector4 color){
     uitext.color = color;
 }
 
-void TextEdit::setTextColor(float red, float green, float blue, float alpha){
+void TextEdit::setTextColor(const float red, const float green, const float blue, const float alpha){
     setTextColor(Vector4(red, green, blue, alpha));
 }
 
-Vector4 TextEdit::getTextColor(){
+Vector4 TextEdit::getTextColor() const{
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
     UIComponent& uitext = scene->getComponent<UIComponent>(tecomp.text);
 
@@ -75,7 +81,7 @@ void TextEdit::setTextFont(std::string font){
     tecomp.needUpdateTextEdit = true;
 }
 
-std::string TextEdit::getTextFont(){
+std::string TextEdit::getTextFont() const{
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(tecomp.text);
 
@@ -90,6 +96,16 @@ void TextEdit::setFontSize(unsigned int fontSize){
     tecomp.needUpdateTextEdit = true;
 }
 
+unsigned int TextEdit::getFontSize() const{
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+
+    return getTextObject().getFontSize();
+}
+
 void TextEdit::setMaxTextSize(unsigned int maxTextSize){
     getTextObject().setMaxTextSize(maxTextSize);
+}
+
+unsigned int TextEdit::getMaxTextSize() const{
+    return getTextObject().getMaxTextSize();
 }

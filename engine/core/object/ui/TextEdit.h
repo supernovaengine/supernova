@@ -14,22 +14,26 @@ namespace Supernova{
     public:
         TextEdit(Scene* scene);
 
-        Text getTextObject();
+        Text getTextObject() const;
 
         void setDisabled(bool disabled);
+        bool getDisabled() const;
 
         void setText(std::string text);
-        std::string getText();
+        std::string getText() const;
 
         void setTextColor(Vector4 color);
-        void setTextColor(float red, float green, float blue, float alpha);
-        Vector4 getTextColor();
+        void setTextColor(const float red, const float green, const float blue, const float alpha);
+        Vector4 getTextColor() const;
 
         void setTextFont(std::string font);
-        std::string getTextFont();
+        std::string getTextFont() const;
 
         void setFontSize(unsigned int fontSize);
+        unsigned int getFontSize() const;
+
         void setMaxTextSize(unsigned int maxTextSize);
+        unsigned int getMaxTextSize() const;
     };
 }
 

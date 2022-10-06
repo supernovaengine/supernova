@@ -26,6 +26,9 @@
 #include "PlaneTerrain.h"
 #include "Sprite.h"
 #include "Text.h"
+#include "Image.h"
+#include "Button.h"
+#include "TextEdit.h"
 
 using namespace Supernova;
 
@@ -162,22 +165,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<Mesh, Object>("Mesh")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setTexture", (void(Mesh::*)(std::string))&Mesh::setTexture)
-        .endClass();
-
-    luabridge::getGlobalNamespace(L)
-        .deriveClass<Polygon, Object>("Polygon")
-        .addConstructor <void (*) (Scene*)> ()
-        .addFunction("addVertex", +[](Polygon* self, lua_State* L) -> void { 
-            if (lua_gettop(L) != 2 && lua_gettop(L) != 3) throw luaL_error(L, "incorrect argument number");
-            if (lua_isnumber(L, 2) && lua_isnumber(L, 3)) self->addVertex(lua_tonumber(L, 2), lua_tonumber(L, 3));
-            else if (luabridge::Stack<Vector3>::isInstance(L, -1)) self->addVertex(luabridge::Stack<Vector3>::get(L, -1));
-            else throw luaL_error(L, "incorrect argument type");
-            })
-        .addProperty("color", &Polygon::getColor, (void(Polygon::*)(Vector4))&Polygon::setColor)
-        .addFunction("setColor", (void(Polygon::*)(float, float, float, float))&Polygon::setColor)
-        .addFunction("setTexture", (void(Polygon::*)(std::string))&Polygon::setTexture)
-        .addProperty("width", [] (Polygon* self) -> int { return self->getWidth(); })
-        .addProperty("height", [] (Polygon* self) -> int { return self->getHeight(); })
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -327,6 +314,22 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
+        .deriveClass<Polygon, Object>("Polygon")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("addVertex", +[](Polygon* self, lua_State* L) -> void { 
+            if (lua_gettop(L) != 2 && lua_gettop(L) != 3) throw luaL_error(L, "incorrect argument number");
+            if (lua_isnumber(L, 2) && lua_isnumber(L, 3)) self->addVertex(lua_tonumber(L, 2), lua_tonumber(L, 3));
+            else if (luabridge::Stack<Vector3>::isInstance(L, -1)) self->addVertex(luabridge::Stack<Vector3>::get(L, -1));
+            else throw luaL_error(L, "incorrect argument type");
+            })
+        .addProperty("color", &Polygon::getColor, (void(Polygon::*)(Vector4))&Polygon::setColor)
+        .addFunction("setColor", (void(Polygon::*)(float, float, float, float))&Polygon::setColor)
+        .addFunction("setTexture", (void(Polygon::*)(std::string))&Polygon::setTexture)
+        .addProperty("width", [] (Polygon* self) -> int { return self->getWidth(); })
+        .addProperty("height", [] (Polygon* self) -> int { return self->getHeight(); })
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .deriveClass<Text, Object>("Text")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setSize", &Text::setSize)
@@ -345,6 +348,50 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getLineHeight", &Text::getLineHeight)
         .addFunction("getNumChars", &Text::getNumChars)
         .addFunction("getCharPosition", &Text::getCharPosition)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Image, Object>("Image")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setSize", &Image::setSize)
+        .addProperty("width", &Image::getWidth, &Image::setWidth)
+        .addProperty("height", &Image::getHeight, &Image::setHeight)
+        .addFunction("setMargin", &Image::setMargin)
+        .addProperty("marginBottom", &Image::getMarginBottom, &Image::setMarginBottom)
+        .addProperty("marginLeft", &Image::getMarginLeft, &Image::setMarginLeft)
+        .addProperty("marginRight", &Image::getMarginRight, &Image::setMarginRight)
+        .addProperty("marginTop", &Image::getMarginTop, &Image::setMarginTop)
+        .addFunction("setTexture", (void(Image::*)(std::string))&Image::setTexture)
+        .addProperty("color", &Image::getColor, (void(Image::*)(Vector4))&Image::setColor)
+        .addFunction("setColor", (void(Image::*)(const float, const float, const float, const float))&Image::setColor)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Button, Image>("Button")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("getLabelObject", &Button::getLabelObject)
+        .addProperty("label", &Button::getLabel, &Button::setLabel)
+        .addProperty("labelColor", &Button::getLabelColor, (void(Button::*)(Vector4))&Button::setLabelColor)
+        .addFunction("setLabelColor", (void(Button::*)(const float, const float, const float, const float))&Button::setLabelColor)
+        .addProperty("labelFont", &Button::getLabelFont, &Button::setLabelFont)
+        .addProperty("fontSize", &Button::getFontSize, &Button::setFontSize)
+        .addFunction("setTextureNormal", (void(Button::*)(std::string))&Button::setTextureNormal)
+        .addFunction("setTexturePressed", (void(Button::*)(std::string))&Button::setTexturePressed)
+        .addFunction("setTextureDisabled", (void(Button::*)(std::string))&Button::setTextureDisabled)
+        .addProperty("disabled", &Button::getDisabled, &Button::setDisabled)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<TextEdit, Image>("TextEdit")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("getTextObject", &TextEdit::getTextObject)
+        .addProperty("disabled", &TextEdit::getDisabled, &TextEdit::setDisabled)
+        .addProperty("text", &TextEdit::getText, &TextEdit::setText)
+        .addProperty("textColor", &TextEdit::getTextColor, (void(TextEdit::*)(Vector4))&TextEdit::setTextColor)
+        .addFunction("setTextColor", (void(TextEdit::*)(const float, const float, const float, const float))&TextEdit::setTextColor)
+        .addProperty("textFont", &TextEdit::getTextFont, &TextEdit::setTextFont)
+        .addProperty("fontSize", &TextEdit::getFontSize, &TextEdit::setFontSize)
+        .addProperty("maxTextSize", &TextEdit::getMaxTextSize, &TextEdit::setMaxTextSize)
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

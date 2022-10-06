@@ -14,25 +14,27 @@ namespace Supernova{
     public:
         Button(Scene* scene);
 
-        Text getLabelObject();
+        Text getLabelObject() const;
 
         void setLabel(std::string text);
-        std::string getLabel();
+        std::string getLabel() const;
 
         void setLabelColor(Vector4 color);
-        void setLabelColor(float red, float green, float blue, float alpha);
-        Vector4 getLabelColor();
+        void setLabelColor(const float red, const float green, const float blue, const float alpha);
+        Vector4 getLabelColor() const;
 
         void setLabelFont(std::string font);
-        std::string getLabelFont();
+        std::string getLabelFont() const;
 
         void setFontSize(unsigned int fontSize);
+        unsigned int getFontSize() const;
 
         void setTextureNormal(std::string path);
         void setTexturePressed(std::string path);
         void setTextureDisabled(std::string path);
 
         void setDisabled(bool disabled);
+        bool getDisabled() const;
     };
 }
 
