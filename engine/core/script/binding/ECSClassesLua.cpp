@@ -24,14 +24,16 @@ namespace luabridge
     template <>
     struct Stack <Signature>
     {
-        static bool push(lua_State* L, Signature sig, std::error_code& ec)
+        static Result push(lua_State* L, Signature sig)
         {
             lua_pushstring(L, sig.to_string().c_str());
-            return true;
+            return {};
         }
 
-        static Signature get(lua_State* L, int index)
+        static TypeResult<Signature> get(lua_State* L, int index)
         {
+            if (lua_type(L, index) != LUA_TSTRING)
+                return makeErrorCode(ErrorCode::InvalidTypeCast);
             return Signature(lua_tostring(L, index));
         }
 

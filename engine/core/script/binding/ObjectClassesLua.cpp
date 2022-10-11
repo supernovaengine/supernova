@@ -219,7 +219,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("addVertex", +[](MeshPolygon* self, lua_State* L) -> void { 
             if (lua_gettop(L) != 2 && lua_gettop(L) != 3) throw luaL_error(L, "incorrect argument number");
             if (lua_isnumber(L, 2) && lua_isnumber(L, 3)) self->addVertex(lua_tonumber(L, 2), lua_tonumber(L, 3));
-            else if (luabridge::Stack<Vector3>::isInstance(L, -1)) self->addVertex(luabridge::Stack<Vector3>::get(L, -1));
+            else if (luabridge::Stack<Vector3>::isInstance(L, -1)) self->addVertex(luabridge::Stack<Vector3>::get(L, -1).value());
             else throw luaL_error(L, "incorrect argument type");
             })
         .addProperty("width", [] (MeshPolygon* self) -> int { return self->getWidth(); })
@@ -234,13 +234,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("addParticle", +[](Particles* self, lua_State* L) -> void { 
             if (lua_gettop(L) > 6) throw luaL_error(L, "incorrect argument number");
             if (luabridge::Stack<Vector3>::isInstance(L, 2) && luabridge::Stack<Vector4>::isInstance(L, 3) && lua_isnumber(L, 4) && lua_isnumber(L, 5) && luabridge::Stack<Rect>::isInstance(L, 6)) 
-                self->addParticle(luabridge::Stack<Vector3>::get(L, 2), luabridge::Stack<Vector4>::get(L, 3), lua_tonumber(L, 4), lua_tonumber(L, 5), luabridge::Stack<Rect>::get(L, 6));
+                self->addParticle(luabridge::Stack<Vector3>::get(L, 2).value(), luabridge::Stack<Vector4>::get(L, 3).value(), lua_tonumber(L, 4), lua_tonumber(L, 5), luabridge::Stack<Rect>::get(L, 6).value());
             else if (luabridge::Stack<Vector3>::isInstance(L, 2) && luabridge::Stack<Vector4>::isInstance(L, 3) && lua_isnumber(L, 4) && lua_isnumber(L, 5))
-                self->addParticle(luabridge::Stack<Vector3>::get(L, 2), luabridge::Stack<Vector4>::get(L, 3), lua_tonumber(L, 4), lua_tonumber(L, 5));
+                self->addParticle(luabridge::Stack<Vector3>::get(L, 2).value(), luabridge::Stack<Vector4>::get(L, 3).value(), lua_tonumber(L, 4), lua_tonumber(L, 5));
             else if (luabridge::Stack<Vector3>::isInstance(L, 2) && luabridge::Stack<Vector4>::isInstance(L, 3))
-                self->addParticle(luabridge::Stack<Vector3>::get(L, 2), luabridge::Stack<Vector4>::get(L, 3));
+                self->addParticle(luabridge::Stack<Vector3>::get(L, 2).value(), luabridge::Stack<Vector4>::get(L, 3).value());
             else if (luabridge::Stack<Vector3>::isInstance(L, 2))
-                self->addParticle(luabridge::Stack<Vector3>::get(L, 2));
+                self->addParticle(luabridge::Stack<Vector3>::get(L, 2).value());
             else throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("addSpriteFrame", +[](Particles* self, lua_State* L) -> void { 
@@ -250,7 +250,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             else if (lua_isstring(L, 2) && lua_isnumber(L, 3) && lua_isnumber(L, 4) && lua_isnumber(L, 5) && lua_isnumber(L, 6))
                 self->addSpriteFrame(lua_tostring(L, 2), lua_tonumber(L, 3), lua_tonumber(L, 4), lua_tonumber(L, 5), lua_tonumber(L, 6));
             else if (lua_isinteger(L, 2) && lua_isstring(L, 3) && luabridge::Stack<Rect>::isInstance(L, 4))
-                self->addSpriteFrame(lua_tointeger(L, 2), lua_tostring(L, 3), luabridge::Stack<Rect>::get(L, 4));
+                self->addSpriteFrame(lua_tointeger(L, 2), lua_tostring(L, 3), luabridge::Stack<Rect>::get(L, 4).value());
             else throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("removeSpriteFrame", +[](Particles* self, lua_State* L) -> void { 
@@ -282,11 +282,11 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("addFrame", +[](Sprite* self, lua_State* L) -> void { 
             if (lua_gettop(L) > 6) throw luaL_error(L, "incorrect argument number");
             if (lua_isinteger(L, 2) && lua_isstring(L, 3) && luabridge::Stack<Rect>::isInstance(L, 4))
-                self->addFrame(lua_tointeger(L, 2), lua_tostring(L, 3), luabridge::Stack<Rect>::get(L, 4));
+                self->addFrame(lua_tointeger(L, 2), lua_tostring(L, 3), luabridge::Stack<Rect>::get(L, 4).value());
             else if (lua_isstring(L, 2) && lua_isnumber(L, 3) && lua_isnumber(L, 4) && lua_isnumber(L, 5) && lua_isnumber(L, 6))
                 self->addFrame(lua_tostring(L, 2), lua_tonumber(L, 3), lua_tonumber(L, 4), lua_tonumber(L, 5), lua_tonumber(L, 6));
             else if (lua_isinteger(L, 2) && lua_isstring(L, 3) && luabridge::Stack<Rect>::isInstance(L, 4))
-                self->addFrame(lua_tointeger(L, 2), lua_tostring(L, 3), luabridge::Stack<Rect>::get(L, 4));
+                self->addFrame(lua_tointeger(L, 2), lua_tostring(L, 3), luabridge::Stack<Rect>::get(L, 4).value());
             else throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("removeFrame", +[](Sprite* self, lua_State* L) -> void { 
@@ -304,7 +304,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("startAnimation", +[](Sprite* self, lua_State* L) -> void { 
             if (lua_gettop(L) > 5) throw luaL_error(L, "incorrect argument number");
             if (luabridge::Stack<std::vector<int>>::isInstance(L, 2) && luabridge::Stack<std::vector<int>>::isInstance(L, 3) && lua_isboolean(L, 4))
-                self->startAnimation(luabridge::Stack<std::vector<int>>::get(L, 2), luabridge::Stack<std::vector<int>>::get(L, 3), lua_toboolean(L, 4));
+                self->startAnimation(luabridge::Stack<std::vector<int>>::get(L, 2).value(), luabridge::Stack<std::vector<int>>::get(L, 3).value(), lua_toboolean(L, 4));
             else if (lua_isinteger(L, 2) && lua_isinteger(L, 3) && lua_isinteger(L, 4) && lua_isboolean(L, 5)) 
                 self->startAnimation(lua_tointeger(L, 2), lua_tointeger(L, 3), lua_tointeger(L, 4), lua_toboolean(L, 5));
             else throw luaL_error(L, "incorrect argument type");
@@ -319,7 +319,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("addVertex", +[](Polygon* self, lua_State* L) -> void { 
             if (lua_gettop(L) != 2 && lua_gettop(L) != 3) throw luaL_error(L, "incorrect argument number");
             if (lua_isnumber(L, 2) && lua_isnumber(L, 3)) self->addVertex(lua_tonumber(L, 2), lua_tonumber(L, 3));
-            else if (luabridge::Stack<Vector3>::isInstance(L, -1)) self->addVertex(luabridge::Stack<Vector3>::get(L, -1));
+            else if (luabridge::Stack<Vector3>::isInstance(L, -1)) self->addVertex(luabridge::Stack<Vector3>::get(L, -1).value());
             else throw luaL_error(L, "incorrect argument type");
             })
         .addProperty("color", &Polygon::getColor, (void(Polygon::*)(Vector4))&Polygon::setColor)

@@ -55,13 +55,13 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__div", +[](Vector2* self, lua_State* L) -> Vector2 { 
             if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
             if (lua_isnumber(L, -1)) return self->operator/(lua_tonumber(L, -1));
-            if (luabridge::Stack<Vector2>::isInstance(L, -1)) return self->operator/(luabridge::Stack<Vector2>::get(L, -1));
+            if (luabridge::Stack<Vector2>::isInstance(L, -1)) return self->operator/(luabridge::Stack<Vector2>::get(L, -1).value());
             throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("__mul", +[](Vector2* self, lua_State* L) -> Vector2 { 
             if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
             if (lua_isnumber(L, -1)) return self->operator*(lua_tonumber(L, -1));
-            if (luabridge::Stack<Vector2>::isInstance(L, -1)) return self->operator*(luabridge::Stack<Vector2>::get(L, -1));
+            if (luabridge::Stack<Vector2>::isInstance(L, -1)) return self->operator*(luabridge::Stack<Vector2>::get(L, -1).value());
             throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("__unm", (Vector2 (Vector2::*)() const)&Vector2::operator-)
@@ -104,7 +104,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__mul", +[](Vector3* self, lua_State* L) -> Vector3 { 
             if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
             if (lua_isnumber(L, -1)) return self->operator*(lua_tonumber(L, -1));
-            if (luabridge::Stack<Vector3>::isInstance(L, -1)) return self->operator*(luabridge::Stack<Vector3>::get(L, -1));
+            if (luabridge::Stack<Vector3>::isInstance(L, -1)) return self->operator*(luabridge::Stack<Vector3>::get(L, -1).value());
             throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("__unm", (Vector3 (Vector3::*)() const)&Vector3::operator-)
@@ -147,13 +147,13 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__div", +[](Vector4* self, lua_State* L) -> Vector4 { 
             if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
             if (lua_isnumber(L, -1)) return self->operator/(lua_tonumber(L, -1));
-            if (luabridge::Stack<Vector4>::isInstance(L, -1)) return self->operator/(luabridge::Stack<Vector4>::get(L, -1));
+            if (luabridge::Stack<Vector4>::isInstance(L, -1)) return self->operator/(luabridge::Stack<Vector4>::get(L, -1).value());
             throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("__mul", +[](Vector4* self, lua_State* L) -> Vector4 { 
             if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
             if (lua_isnumber(L, -1)) return self->operator*(lua_tonumber(L, -1));
-            if (luabridge::Stack<Vector4>::isInstance(L, -1)) return self->operator*(luabridge::Stack<Vector4>::get(L, -1));
+            if (luabridge::Stack<Vector4>::isInstance(L, -1)) return self->operator*(luabridge::Stack<Vector4>::get(L, -1).value());
             throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("__unm", (Vector4 (Vector4::*)() const)&Vector4::operator-)
@@ -317,13 +317,13 @@ void LuaBinding::registerMathClasses(lua_State *L){
                     return new (ptr) Plane();
                 if (lua_gettop(L) == 4)
                     return new (ptr) Plane(
-                        luabridge::Stack<Vector3>::get(L, 2),
-                        luabridge::Stack<Vector3>::get(L, 3));
+                        luabridge::Stack<Vector3>::get(L, 2).value(),
+                        luabridge::Stack<Vector3>::get(L, 3).value());
                 if (lua_gettop(L) == 5)
                     return new (ptr) Plane(
-                        luabridge::Stack<Vector3>::get(L, 2),
-                        luabridge::Stack<Vector3>::get(L, 3),
-                        luabridge::Stack<Vector3>::get(L, 4)); 
+                        luabridge::Stack<Vector3>::get(L, 2).value(),
+                        luabridge::Stack<Vector3>::get(L, 3).value(),
+                        luabridge::Stack<Vector3>::get(L, 4).value()); 
                 if (lua_gettop(L) == 6)
                     return new (ptr) Plane(
                         luaL_checknumber(L, 2), luaL_checknumber(L, 3), 
@@ -359,8 +359,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
                     return new (ptr) AlignedBox();
                 if (lua_gettop(L) == 4)
                     return new (ptr) AlignedBox(
-                        luabridge::Stack<Vector3>::get(L, 2),
-                        luabridge::Stack<Vector3>::get(L, 3)); 
+                        luabridge::Stack<Vector3>::get(L, 2).value(),
+                        luabridge::Stack<Vector3>::get(L, 3).value()); 
                 if (lua_gettop(L) == 8)
                     return new (ptr) AlignedBox(
                         luaL_checknumber(L, 2), luaL_checknumber(L, 3), 
@@ -384,8 +384,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("getCorner", &AlignedBox::getCorner)
         .addFunction("merge", +[](AlignedBox* self, lua_State* L) -> void { 
             if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) self->merge(luabridge::Stack<AlignedBox>::get(L, -1));
-            else if (luabridge::Stack<Vector3>::isInstance(L, -1)) self->merge(luabridge::Stack<Vector3>::get(L, -1));
+            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) self->merge(luabridge::Stack<AlignedBox>::get(L, -1).value());
+            else if (luabridge::Stack<Vector3>::isInstance(L, -1)) self->merge(luabridge::Stack<Vector3>::get(L, -1).value());
             else throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("transform", &AlignedBox::transform)
@@ -396,9 +396,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("setInfinite", &AlignedBox::isNull)
         .addFunction("intersects", +[](AlignedBox* self, lua_State* L) -> bool { 
             if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->intersects(luabridge::Stack<AlignedBox>::get(L, -1));
-            if (luabridge::Stack<Plane>::isInstance(L, -1)) return self->intersects(luabridge::Stack<Plane>::get(L, -1));
-            if (luabridge::Stack<Vector3>::isInstance(L, -1)) return self->intersects(luabridge::Stack<Vector3>::get(L, -1));
+            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->intersects(luabridge::Stack<AlignedBox>::get(L, -1).value());
+            if (luabridge::Stack<Plane>::isInstance(L, -1)) return self->intersects(luabridge::Stack<Plane>::get(L, -1).value());
+            if (luabridge::Stack<Vector3>::isInstance(L, -1)) return self->intersects(luabridge::Stack<Vector3>::get(L, -1).value());
             throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("intersection", &AlignedBox::intersection)
@@ -409,8 +409,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("getHalfSize", &AlignedBox::getHalfSize)
         .addFunction("contains", +[](AlignedBox* self, lua_State* L) -> bool { 
             if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->contains(luabridge::Stack<AlignedBox>::get(L, -1));
-            if (luabridge::Stack<Vector3>::isInstance(L, -1)) return self->contains(luabridge::Stack<Vector3>::get(L, -1));
+            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->contains(luabridge::Stack<AlignedBox>::get(L, -1).value());
+            if (luabridge::Stack<Vector3>::isInstance(L, -1)) return self->contains(luabridge::Stack<Vector3>::get(L, -1).value());
             throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("squaredDistance", &AlignedBox::squaredDistance)
@@ -450,8 +450,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
                     return new (ptr) Ray();
                 if (lua_gettop(L) == 4)
                     return new (ptr) Ray(
-                        luabridge::Stack<Vector3>::get(L, 2),
-                        luabridge::Stack<Vector3>::get(L, 3));
+                        luabridge::Stack<Vector3>::get(L, 2).value(),
+                        luabridge::Stack<Vector3>::get(L, 3).value());
                 throw luaL_error(L, "This is not a valid constructor");
             }
         )
@@ -460,14 +460,14 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("getPoint", &Ray::getPoint)
         .addFunction("intersects", +[](Ray* self, lua_State* L) -> float { 
             if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->intersects(luabridge::Stack<AlignedBox>::get(L, -1));
-            if (luabridge::Stack<Plane>::isInstance(L, -1)) return self->intersects(luabridge::Stack<Plane>::get(L, -1));
+            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->intersects(luabridge::Stack<AlignedBox>::get(L, -1).value());
+            if (luabridge::Stack<Plane>::isInstance(L, -1)) return self->intersects(luabridge::Stack<Plane>::get(L, -1).value());
             throw luaL_error(L, "incorrect argument type");
             })
         .addFunction("intersectionPoint", +[](Ray* self, lua_State* L) -> Vector3 { 
             if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->intersectionPoint(luabridge::Stack<AlignedBox>::get(L, -1));
-            if (luabridge::Stack<Plane>::isInstance(L, -1)) return self->intersectionPoint(luabridge::Stack<Plane>::get(L, -1));
+            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->intersectionPoint(luabridge::Stack<AlignedBox>::get(L, -1).value());
+            if (luabridge::Stack<Plane>::isInstance(L, -1)) return self->intersectionPoint(luabridge::Stack<Plane>::get(L, -1).value());
             throw luaL_error(L, "incorrect argument type");
             })
         .endClass();

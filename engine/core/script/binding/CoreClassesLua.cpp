@@ -31,29 +31,36 @@ namespace luabridge
     template <>
     struct Stack <Touch>
     {
-        static bool push(lua_State* L, Touch touch, std::error_code& ec)
+        static Result push(lua_State* L, Touch touch)
         {
             lua_newtable(L);
 
             lua_pushinteger(L, touch.pointer);
             lua_setfield(L, -2, "pointer");
 
-            if (!luabridge::push(L, touch.position, ec))
-                return false;
+            if (!luabridge::push(L, touch.position))
+                return makeErrorCode(ErrorCode::LuaStackOverflow);
             lua_setfield(L, -2, "position");
 
-            return true;
+            return {};
         }
 
-        static Touch get(lua_State* L, int index)
+        static TypeResult<Touch> get(lua_State* L, int index)
         {
             lua_getfield(L, index, "pointer");
+            if (lua_type(L, -1) != LUA_TNUMBER)
+                return makeErrorCode(ErrorCode::InvalidTypeCast);
+            if (! is_integral_representable_by<int>(L, -1))
+                return makeErrorCode(ErrorCode::IntegerDoesntFitIntoLuaInteger);
             int pointer = lua_tointeger(L, -1);
 
             lua_getfield(L, index, "position");
-            Vector2 position = luabridge::get<Vector2>(L, -1);
+            auto result = luabridge::get<Vector2>(L, -1);
+            if (! result)
+                return result.error();
+            Vector2 position = *result;
 
-            return {pointer, position};
+            return (Touch){pointer, position};
         }
 
         static bool isInstance (lua_State* L, int index)
