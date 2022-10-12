@@ -36,15 +36,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector2>("Vector2")
-        .addConstructor (
-            [](void* ptr, lua_State* L) { 
-                if (lua_gettop(L) == 2)
-                    return new (ptr) Vector2();
-                if (lua_gettop(L) == 4)
-                    return new (ptr) Vector2(luaL_checknumber(L, 2), luaL_checknumber(L, 3)); 
-                throw luaL_error(L, "This is not a valid constructor");
-            }
-        )
+        .addConstructor<void(), void(float, float)>()
         .addProperty("x", &Vector2::x, true)
         .addProperty("y", &Vector2::y, true)
         .addFunction("__tostring", &Vector2::toString)
@@ -52,18 +44,12 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__lt", &Vector2::operator<)
         .addFunction("__sub", (Vector2 (Vector2::*)(const Vector2&) const)&Vector2::operator-)
         .addFunction("__add", (Vector2 (Vector2::*)(const Vector2&) const)&Vector2::operator+)
-        .addFunction("__div", +[](Vector2* self, lua_State* L) -> Vector2 { 
-            if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (lua_isnumber(L, -1)) return self->operator/(lua_tonumber(L, -1));
-            if (luabridge::Stack<Vector2>::isInstance(L, -1)) return self->operator/(luabridge::Stack<Vector2>::get(L, -1).value());
-            throw luaL_error(L, "incorrect argument type");
-            })
-        .addFunction("__mul", +[](Vector2* self, lua_State* L) -> Vector2 { 
-            if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (lua_isnumber(L, -1)) return self->operator*(lua_tonumber(L, -1));
-            if (luabridge::Stack<Vector2>::isInstance(L, -1)) return self->operator*(luabridge::Stack<Vector2>::get(L, -1).value());
-            throw luaL_error(L, "incorrect argument type");
-            })
+        .addFunction("__div", 
+            luabridge::overload<const Vector2&>(&Vector2::operator/),
+            luabridge::overload<float>(&Vector2::operator/))
+        .addFunction("__mul", 
+            luabridge::overload<const Vector2&>(&Vector2::operator*),
+            luabridge::overload<float>(&Vector2::operator*))
         .addFunction("__unm", (Vector2 (Vector2::*)() const)&Vector2::operator-)
         .addFunction("swap", &Vector2::swap)
         .addFunction("length", &Vector2::length)
@@ -83,15 +69,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector3>("Vector3")
-        .addConstructor (
-            [](void* ptr, lua_State* L) { 
-                if (lua_gettop(L) == 2)
-                    return new (ptr) Vector3();
-                if (lua_gettop(L) == 5)
-                    return new (ptr) Vector3(luaL_checknumber(L, 2), luaL_checknumber(L, 3), luaL_checknumber(L, 4)); 
-                throw luaL_error(L, "This is not a valid constructor");
-            }
-        )
+        .addConstructor<void(), void(float, float, float)>()
         .addProperty("x", &Vector3::x, true)
         .addProperty("y", &Vector3::y, true)
         .addProperty("z", &Vector3::z, true)
@@ -101,12 +79,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__sub", (Vector3 (Vector3::*)(const Vector3&) const)&Vector3::operator-)
         .addFunction("__add", (Vector3 (Vector3::*)(const Vector3&) const)&Vector3::operator+)
         .addFunction("__div", (Vector3 (Vector3::*)(const Vector3&) const)&Vector3::operator/)
-        .addFunction("__mul", +[](Vector3* self, lua_State* L) -> Vector3 { 
-            if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (lua_isnumber(L, -1)) return self->operator*(lua_tonumber(L, -1));
-            if (luabridge::Stack<Vector3>::isInstance(L, -1)) return self->operator*(luabridge::Stack<Vector3>::get(L, -1).value());
-            throw luaL_error(L, "incorrect argument type");
-            })
+        .addFunction("__mul", 
+            luabridge::overload<const Vector3&>(&Vector3::operator*),
+            luabridge::overload<float>(&Vector3::operator*))
         .addFunction("__unm", (Vector3 (Vector3::*)() const)&Vector3::operator-)
         .addFunction("length", &Vector3::length)
         .addFunction("squaredLength", &Vector3::squaredLength)
@@ -125,16 +100,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector4>("Vector4")
-        .addConstructor (
-            [](void* ptr, lua_State* L) { 
-                if (lua_gettop(L) == 2)
-                    return new (ptr) Vector4();
-                if (lua_gettop(L) == 6)
-                    return new (ptr) Vector4(luaL_checknumber(L, 2), luaL_checknumber(L, 3), luaL_checknumber(L, 4), luaL_checknumber(L, 5)); 
-                throw luaL_error(L, "This is not a valid constructor");
-            }
-        )
-        .addConstructor <void (*) (float, float, float, float)> ()
+        .addConstructor<void(), void(float, float, float, float)>()
         .addProperty("x", &Vector4::x, true)
         .addProperty("y", &Vector4::y, true)
         .addProperty("z", &Vector4::z, true)
@@ -144,18 +110,12 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__lt", &Vector4::operator<)
         .addFunction("__sub", (Vector4 (Vector4::*)(const Vector4&) const)&Vector4::operator-)
         .addFunction("__add", (Vector4 (Vector4::*)(const Vector4&) const)&Vector4::operator+)
-        .addFunction("__div", +[](Vector4* self, lua_State* L) -> Vector4 { 
-            if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (lua_isnumber(L, -1)) return self->operator/(lua_tonumber(L, -1));
-            if (luabridge::Stack<Vector4>::isInstance(L, -1)) return self->operator/(luabridge::Stack<Vector4>::get(L, -1).value());
-            throw luaL_error(L, "incorrect argument type");
-            })
-        .addFunction("__mul", +[](Vector4* self, lua_State* L) -> Vector4 { 
-            if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (lua_isnumber(L, -1)) return self->operator*(lua_tonumber(L, -1));
-            if (luabridge::Stack<Vector4>::isInstance(L, -1)) return self->operator*(luabridge::Stack<Vector4>::get(L, -1).value());
-            throw luaL_error(L, "incorrect argument type");
-            })
+        .addFunction("__div", 
+            luabridge::overload<const Vector4&>(&Vector4::operator/),
+            luabridge::overload<float>(&Vector4::operator/))
+        .addFunction("__mul", 
+            luabridge::overload<const Vector4&>(&Vector4::operator*),
+            luabridge::overload<float>(&Vector4::operator*))
         .addFunction("__unm", (Vector4 (Vector4::*)() const)&Vector4::operator-)
         .addFunction("swap", &Vector4::swap)
         .addFunction("divideByW", &Vector4::divideByW)
@@ -165,15 +125,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Rect>("Rect")
-        .addConstructor (
-            [](void* ptr, lua_State* L) { 
-                if (lua_gettop(L) == 2)
-                    return new (ptr) Rect();
-                if (lua_gettop(L) == 6)
-                    return new (ptr) Rect(luaL_checknumber(L, 2), luaL_checknumber(L, 3), luaL_checknumber(L, 4), luaL_checknumber(L, 5)); 
-                throw luaL_error(L, "This is not a valid constructor");
-            }
-        )
+        .addConstructor<void(), void(float, float, float, float)>()
         .addProperty("x", &Rect::getX, &Rect::setX)
         .addProperty("y", &Rect::getY, &Rect::setY)
         .addProperty("width", &Rect::getWidth, &Rect::setWidth)
@@ -181,7 +133,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__tostring", &Rect::toString)
         .addFunction("__eq", &Rect::operator==)
         .addFunction("getVector", &Rect::getVector)
-        .addFunction("setRect", (void (Rect::*)(float, float, float, float))&Rect::setRect)
+        .addFunction("setRect", 
+            luabridge::overload<Rect>(&Rect::setRect),
+            luabridge::overload<float, float, float, float>(&Rect::setRect))
         .addFunction("fitOnRect", &Rect::fitOnRect)
         .addFunction("isNormalized", &Rect::isNormalized)
         .addFunction("isZero", &Rect::isZero)
@@ -189,18 +143,12 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Matrix3>("Matrix3")
-        .addConstructor (
-            [](void* ptr, lua_State* L) { 
-                if (lua_gettop(L) == 2)
-                    return new (ptr) Matrix3();
-                if (lua_gettop(L) == 11)
-                    return new (ptr) Matrix3(
-                        luaL_checknumber(L, 2), luaL_checknumber(L, 3), luaL_checknumber(L, 4), 
-                        luaL_checknumber(L, 5), luaL_checknumber(L, 6), luaL_checknumber(L, 7), 
-                        luaL_checknumber(L, 8), luaL_checknumber(L, 9), luaL_checknumber(L, 10)); 
-                throw luaL_error(L, "This is not a valid constructor");
-            }
-        )
+        .addConstructor<
+            void(), 
+            void(
+                float, float, float, 
+                float, float, float, 
+                float, float, float)>()
         .addFunction("__tostring", &Matrix3::toString)
         .addFunction("__eq", &Matrix3::operator==)
         .addFunction("__sub", (Matrix3 (Matrix3::*)(const Matrix3&) const)&Matrix3::operator-)
@@ -216,28 +164,26 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("calcInverse", &Matrix3::calcInverse)
         .addFunction("inverse", &Matrix3::inverse)
         .addFunction("transpose", &Matrix3::transpose)
-        .addStaticFunction("rotateMatrix", (Matrix3 (*)(const float, const Vector3&))&Matrix3::rotateMatrix)
+        .addStaticFunction("rotateMatrix", 
+            luabridge::overload<const float, const Vector3&>(&Matrix3::rotateMatrix),
+            luabridge::overload<const float, const float>(&Matrix3::rotateMatrix))
         .addStaticFunction("rotateXMatrix", &Matrix3::rotateXMatrix)
         .addStaticFunction("rotateYMatrix", &Matrix3::rotateYMatrix)
         .addStaticFunction("rotateZMatrix", &Matrix3::rotateZMatrix)
-        .addStaticFunction("scaleMatrix", (Matrix3 (*)(const Vector3&))&Matrix3::scaleMatrix)
+        .addStaticFunction("scaleMatrix", 
+            luabridge::overload<const Vector3&>(&Matrix3::scaleMatrix),
+            luabridge::overload<const float>(&Matrix3::scaleMatrix))
         .endClass();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Matrix4>("Matrix4")
-        .addConstructor (
-            [](void* ptr, lua_State* L) { 
-                if (lua_gettop(L) == 2)
-                    return new (ptr) Matrix4();
-                if (lua_gettop(L) == 18)
-                    return new (ptr) Matrix4(
-                        luaL_checknumber(L, 2), luaL_checknumber(L, 3), luaL_checknumber(L, 4), luaL_checknumber(L, 5),
-                        luaL_checknumber(L, 6), luaL_checknumber(L, 7), luaL_checknumber(L, 8), luaL_checknumber(L, 9),
-                        luaL_checknumber(L, 10), luaL_checknumber(L, 11), luaL_checknumber(L, 12), luaL_checknumber(L, 13),
-                        luaL_checknumber(L, 14), luaL_checknumber(L, 15), luaL_checknumber(L, 16), luaL_checknumber(L, 17)); 
-                throw luaL_error(L, "This is not a valid constructor");
-            }
-        )
+        .addConstructor<
+            void(), 
+            void(
+                float, float, float, float,
+                float, float, float, float,
+                float, float, float, float,
+                float, float, float, float)>()
         .addFunction("__tostring", &Matrix4::toString)
         .addFunction("__eq", &Matrix4::operator==)
         .addFunction("__sub", (Matrix4 (Matrix4::*)(const Matrix4&) const)&Matrix4::operator-)
@@ -254,12 +200,18 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("inverse", &Matrix4::inverse)
         .addFunction("transpose", &Matrix4::transpose)
         .addFunction("determinant", &Matrix4::determinant)
-        .addStaticFunction("translateMatrix", (Matrix4 (*)(const Vector3&))&Matrix4::translateMatrix)
-        .addStaticFunction("rotateMatrix", (Matrix4 (*)(const float, const Vector3&))&Matrix4::rotateMatrix)
+        .addStaticFunction("translateMatrix", 
+            luabridge::overload<const Vector3&>(&Matrix4::translateMatrix),
+            luabridge::overload<const float, const float, const float>(&Matrix4::translateMatrix))
+        .addStaticFunction("rotateMatrix", 
+            luabridge::overload<const float, const Vector3&>(&Matrix4::rotateMatrix),
+            luabridge::overload<const float, const float>(&Matrix4::rotateMatrix))
         .addStaticFunction("rotateXMatrix", &Matrix4::rotateXMatrix)
         .addStaticFunction("rotateYMatrix", &Matrix4::rotateYMatrix)
         .addStaticFunction("rotateZMatrix", &Matrix4::rotateZMatrix)
-        .addStaticFunction("scaleMatrix", (Matrix4 (*)(const Vector3&))&Matrix4::scaleMatrix)
+        .addStaticFunction("scaleMatrix", 
+            luabridge::overload<const Vector3&>(&Matrix4::scaleMatrix),
+            luabridge::overload<const float>(&Matrix4::scaleMatrix))
         .addStaticFunction("lookAtMatrix", &Matrix4::lookAtMatrix)
         .addStaticFunction("frustumMatrix", &Matrix4::frustumMatrix)
         .addStaticFunction("orthoMatrix", &Matrix4::orthoMatrix)
@@ -269,15 +221,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Quaternion>("Quaternion")
-        .addConstructor (
-            [](void* ptr, lua_State* L) { 
-                if (lua_gettop(L) == 2)
-                    return new (ptr) Quaternion();
-                if (lua_gettop(L) == 6)
-                    return new (ptr) Quaternion(luaL_checknumber(L, 2), luaL_checknumber(L, 3), luaL_checknumber(L, 4), luaL_checknumber(L, 5)); 
-                throw luaL_error(L, "This is not a valid constructor");
-            }
-        )
+        .addConstructor<void(), void(float, float, float, float)>()
         .addFunction("__tostring", &Quaternion::toString)
         .addFunction("__eq", &Quaternion::operator==)
         .addFunction("__sub", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator-)
@@ -285,7 +229,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__mul", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator*)
         .addFunction("__mul", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator*)
         .addFunction("__unm", (Quaternion (Quaternion::*)() const)&Quaternion::operator-)
-        .addFunction("fromAxes", (void (Quaternion::*)(const Vector3&, const Vector3&, const Vector3&))&Quaternion::fromAxes)
+        .addFunction("fromAxes", 
+            luabridge::overload<const Vector3*>(&Quaternion::fromAxes),
+            luabridge::overload<const Vector3&, const Vector3&, const Vector3&>(&Quaternion::fromAxes))
         .addFunction("fromRotationMatrix", &Quaternion::fromRotationMatrix)
         .addFunction("getRotationMatrix", &Quaternion::getRotationMatrix)
         .addFunction("fromAngle", &Quaternion::fromAngle)
@@ -311,31 +257,22 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Plane>("Plane")
-        .addConstructor (
-            [](void* ptr, lua_State* L) { 
-                if (lua_gettop(L) == 2)
-                    return new (ptr) Plane();
-                if (lua_gettop(L) == 4)
-                    return new (ptr) Plane(
-                        luabridge::Stack<Vector3>::get(L, 2).value(),
-                        luabridge::Stack<Vector3>::get(L, 3).value());
-                if (lua_gettop(L) == 5)
-                    return new (ptr) Plane(
-                        luabridge::Stack<Vector3>::get(L, 2).value(),
-                        luabridge::Stack<Vector3>::get(L, 3).value(),
-                        luabridge::Stack<Vector3>::get(L, 4).value()); 
-                if (lua_gettop(L) == 6)
-                    return new (ptr) Plane(
-                        luaL_checknumber(L, 2), luaL_checknumber(L, 3), 
-                        luaL_checknumber(L, 4), luaL_checknumber(L, 5)); 
-                throw luaL_error(L, "This is not a valid constructor");
-            }
-        )
+        .addConstructor<
+            void(), 
+            void(const Vector3&, float), 
+            void(float, float, float, float), 
+            void(const Vector3&, const Vector3&), 
+            void(const Vector3&, const Vector3&, const Vector3&)>()
         .addFunction("__unm", (Plane (Plane::*)() const)&Plane::operator-)
         .addFunction("__eq", &Plane::operator==)
-        .addFunction("getSide", (Plane::Side (Plane::*)(const Vector3&) const)&Plane::getSide)
+        .addFunction("getSide", 
+            luabridge::overload<const Vector3&>(&Plane::getSide),
+            luabridge::overload<const Vector3&, const Vector3&>(&Plane::getSide),
+            luabridge::overload<const AlignedBox&>(&Plane::getSide))
         .addFunction("getDistance", &Plane::getDistance)
-        .addFunction("redefine", (void (Plane::*)(const Vector3&, const Vector3&, const Vector3&))&Plane::redefine)
+        .addFunction("redefine", 
+            luabridge::overload<const Vector3&, const Vector3&, const Vector3&>(&Plane::redefine),
+            luabridge::overload<const Vector3&, const Vector3&>(&Plane::redefine))
         .addFunction("projectVector", &Plane::projectVector)
         .addFunction("normalize", &Plane::normalize)
         .addStaticProperty("Side", [](lua_State* L) {
@@ -353,22 +290,11 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<AlignedBox>("AlignedBox")
-        .addConstructor (
-            [](void* ptr, lua_State* L) { 
-                if (lua_gettop(L) == 2)
-                    return new (ptr) AlignedBox();
-                if (lua_gettop(L) == 4)
-                    return new (ptr) AlignedBox(
-                        luabridge::Stack<Vector3>::get(L, 2).value(),
-                        luabridge::Stack<Vector3>::get(L, 3).value()); 
-                if (lua_gettop(L) == 8)
-                    return new (ptr) AlignedBox(
-                        luaL_checknumber(L, 2), luaL_checknumber(L, 3), 
-                        luaL_checknumber(L, 4), luaL_checknumber(L, 5), 
-                        luaL_checknumber(L, 6), luaL_checknumber(L, 7)); 
-                throw luaL_error(L, "This is not a valid constructor");
-            }
-        )
+        .addConstructor<
+            void(), 
+            void(AlignedBox::BoxType), 
+            void(const Vector3&, const Vector3&), 
+            void(float, float, float, float, float, float)>()
         .addProperty("minimum", (const Vector3&(AlignedBox::*)() const)&AlignedBox::getMinimum, (void(AlignedBox::*)(const Vector3&))&AlignedBox::setMinimum)
         .addFunction("setMinimum", (void(AlignedBox::*)(float, float, float))&AlignedBox::setMinimum)
         .addFunction("setMinimumX", &AlignedBox::setMinimumX)
@@ -379,40 +305,33 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("setMaximumX", &AlignedBox::setMaximumX)
         .addFunction("setMaximumY", &AlignedBox::setMaximumY)
         .addFunction("setMaximumZ", &AlignedBox::setMaximumZ)
-        .addFunction("setExtents", (void(AlignedBox::*)(const Vector3&, const Vector3&))&AlignedBox::setExtents)
+        .addFunction("setExtents", 
+            luabridge::overload<const Vector3&, const Vector3&>(&AlignedBox::setExtents),
+            luabridge::overload<float, float, float, float, float, float>(&AlignedBox::setExtents))
         .addFunction("getAllCorners", &AlignedBox::getAllCorners)
         .addFunction("getCorner", &AlignedBox::getCorner)
-        .addFunction("merge", +[](AlignedBox* self, lua_State* L) -> void { 
-            if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) self->merge(luabridge::Stack<AlignedBox>::get(L, -1).value());
-            else if (luabridge::Stack<Vector3>::isInstance(L, -1)) self->merge(luabridge::Stack<Vector3>::get(L, -1).value());
-            else throw luaL_error(L, "incorrect argument type");
-            })
+        .addFunction("merge", 
+            luabridge::overload<const AlignedBox&>(&AlignedBox::merge),
+            luabridge::overload<const Vector3&>(&AlignedBox::merge))
         .addFunction("transform", &AlignedBox::transform)
         .addFunction("isNull", &AlignedBox::isNull)
         .addFunction("setNull", &AlignedBox::setNull)
         .addFunction("isFinite", &AlignedBox::isFinite)
         .addFunction("isInfinite", &AlignedBox::isInfinite)
         .addFunction("setInfinite", &AlignedBox::isNull)
-        .addFunction("intersects", +[](AlignedBox* self, lua_State* L) -> bool { 
-            if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->intersects(luabridge::Stack<AlignedBox>::get(L, -1).value());
-            if (luabridge::Stack<Plane>::isInstance(L, -1)) return self->intersects(luabridge::Stack<Plane>::get(L, -1).value());
-            if (luabridge::Stack<Vector3>::isInstance(L, -1)) return self->intersects(luabridge::Stack<Vector3>::get(L, -1).value());
-            throw luaL_error(L, "incorrect argument type");
-            })
+        .addFunction("intersects", 
+            luabridge::overload<const AlignedBox&>(&AlignedBox::intersects),
+            luabridge::overload<const Plane&>(&AlignedBox::intersects),
+            luabridge::overload<const Vector3&>(&AlignedBox::intersects))
         .addFunction("intersection", &AlignedBox::intersection)
         .addFunction("volume", &AlignedBox::volume)
         .addFunction("scale", &AlignedBox::scale)
         .addFunction("getCenter", &AlignedBox::getCenter)
         .addFunction("getSize", &AlignedBox::getSize)
         .addFunction("getHalfSize", &AlignedBox::getHalfSize)
-        .addFunction("contains", +[](AlignedBox* self, lua_State* L) -> bool { 
-            if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->contains(luabridge::Stack<AlignedBox>::get(L, -1).value());
-            if (luabridge::Stack<Vector3>::isInstance(L, -1)) return self->contains(luabridge::Stack<Vector3>::get(L, -1).value());
-            throw luaL_error(L, "incorrect argument type");
-            })
+        .addFunction("contains", 
+            luabridge::overload<const AlignedBox&>(&AlignedBox::contains),
+            luabridge::overload<const Vector3&>(&AlignedBox::contains))
         .addFunction("squaredDistance", &AlignedBox::squaredDistance)
         .addFunction("distance", &AlignedBox::distance)
         .addStaticProperty("BoxType", [](lua_State* L) {
@@ -444,32 +363,16 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Ray>("Ray")
-        .addConstructor (
-            [](void* ptr, lua_State* L) { 
-                if (lua_gettop(L) == 2)
-                    return new (ptr) Ray();
-                if (lua_gettop(L) == 4)
-                    return new (ptr) Ray(
-                        luabridge::Stack<Vector3>::get(L, 2).value(),
-                        luabridge::Stack<Vector3>::get(L, 3).value());
-                throw luaL_error(L, "This is not a valid constructor");
-            }
-        )
+        .addConstructor<void(), void(Vector3, Vector3)>()
         .addProperty("origin", &Ray::getOrigin, &Ray::setOrigin)
         .addProperty("direction", &Ray::getDirection, &Ray::setDirection)
         .addFunction("getPoint", &Ray::getPoint)
-        .addFunction("intersects", +[](Ray* self, lua_State* L) -> float { 
-            if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->intersects(luabridge::Stack<AlignedBox>::get(L, -1).value());
-            if (luabridge::Stack<Plane>::isInstance(L, -1)) return self->intersects(luabridge::Stack<Plane>::get(L, -1).value());
-            throw luaL_error(L, "incorrect argument type");
-            })
-        .addFunction("intersectionPoint", +[](Ray* self, lua_State* L) -> Vector3 { 
-            if (lua_gettop(L) != 2) throw luaL_error(L, "incorrect argument number");
-            if (luabridge::Stack<AlignedBox>::isInstance(L, -1)) return self->intersectionPoint(luabridge::Stack<AlignedBox>::get(L, -1).value());
-            if (luabridge::Stack<Plane>::isInstance(L, -1)) return self->intersectionPoint(luabridge::Stack<Plane>::get(L, -1).value());
-            throw luaL_error(L, "incorrect argument type");
-            })
+        .addFunction("intersects", 
+            luabridge::overload<AlignedBox>(&Ray::intersects),
+            luabridge::overload<Plane>(&Ray::intersects))
+        .addFunction("intersectionPoint", 
+            luabridge::overload<AlignedBox>(&Ray::intersectionPoint),
+            luabridge::overload<Plane>(&Ray::intersectionPoint))
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

@@ -41,8 +41,8 @@ namespace Supernova{
         AlignedBox();
         AlignedBox(BoxType e);
         AlignedBox(const AlignedBox & rkBox);
-        AlignedBox( const Vector3& min, const Vector3& max );
-        AlignedBox(float mx, float my, float mz, float Mx, float My, float Mz );
+        AlignedBox(const Vector3& min, const Vector3& max);
+        AlignedBox(float mx, float my, float mz, float Mx, float My, float Mz);
 
         ~AlignedBox();
 

@@ -60,7 +60,8 @@ namespace luabridge
                 return result.error();
             Vector2 position = *result;
 
-            return (Touch){pointer, position};
+            Touch touch = {pointer, position};
+            return touch;
         }
 
         static bool isInstance (lua_State* L, int index)

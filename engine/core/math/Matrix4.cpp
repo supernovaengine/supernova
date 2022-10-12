@@ -294,7 +294,7 @@ Matrix4 Matrix4::translateMatrix(const Vector3& position){
     return r;
 }
 
-Matrix4 Matrix4::translateMatrix(float x, float y, float z){
+Matrix4 Matrix4::translateMatrix(const float x, const float y, const float z){
     Matrix4 r;
 
     r.set(3, 0, x);

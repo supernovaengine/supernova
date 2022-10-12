@@ -85,6 +85,14 @@ void Particles::setTexture(std::string path){
     particomp.needUpdateTexture = true;
 }
 
+void Particles::setTexture(FramebufferRender* framebuffer){
+    ParticlesComponent& particomp = getComponent<ParticlesComponent>();
+
+    particomp.texture.setFramebuffer(framebuffer);
+
+    particomp.needUpdateTexture = true;
+}
+
 void Particles::addSpriteFrame(int id, std::string name, Rect rect){
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
     if (id >= 0 && id < MAX_SPRITE_FRAMES){

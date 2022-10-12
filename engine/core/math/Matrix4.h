@@ -57,7 +57,7 @@ namespace Supernova {
         Matrix4 transpose();
         float determinant();
 
-        static Matrix4 translateMatrix(float x, float y, float z);
+        static Matrix4 translateMatrix(const float x, const float y, const float z);
         static Matrix4 translateMatrix(const Vector3& position);
 
         static Matrix4 rotateMatrix(const float angle, const Vector3 &axis);

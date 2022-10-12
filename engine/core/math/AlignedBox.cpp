@@ -333,6 +333,30 @@ bool AlignedBox::intersects(const AlignedBox& b2) const {
 
 }
 
+bool AlignedBox::intersects(const Plane& p) const {
+    return (p.getSide(*this) == Plane::Side::BOTH_SIDE);
+}
+
+bool AlignedBox::intersects(const Vector3& v) const {
+    switch (mBoxType)
+    {
+        case BOXTYPE_NULL:
+            return false;
+
+        case BOXTYPE_FINITE:
+            return(v.x >= mMinimum.x  &&  v.x <= mMaximum.x  &&
+                   v.y >= mMinimum.y  &&  v.y <= mMaximum.y  &&
+                   v.z >= mMinimum.z  &&  v.z <= mMaximum.z);
+
+        case BOXTYPE_INFINITE:
+            return true;
+
+        default:
+            assert( false );
+            return false;
+    }
+}
+
 AlignedBox AlignedBox::intersection(const AlignedBox& b2) const {
     if (this->isNull() || b2.isNull()) {
         return AlignedBox();
@@ -385,30 +409,6 @@ void AlignedBox::scale(const Vector3& s) {
     Vector3 min = mMinimum * s;
     Vector3 max = mMaximum * s;
     setExtents(min, max);
-}
-
-bool AlignedBox::intersects(const Plane& p) const {
-    return (p.getSide(*this) == Plane::Side::BOTH_SIDE);
-}
-
-bool AlignedBox::intersects(const Vector3& v) const {
-    switch (mBoxType)
-    {
-        case BOXTYPE_NULL:
-            return false;
-
-        case BOXTYPE_FINITE:
-            return(v.x >= mMinimum.x  &&  v.x <= mMaximum.x  &&
-                   v.y >= mMinimum.y  &&  v.y <= mMaximum.y  &&
-                   v.z >= mMinimum.z  &&  v.z <= mMaximum.z);
-
-        case BOXTYPE_INFINITE:
-            return true;
-
-        default:
-            assert( false );
-            return false;
-    }
 }
 
 Vector3 AlignedBox::getCenter(void) const {
