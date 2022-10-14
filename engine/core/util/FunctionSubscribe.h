@@ -77,21 +77,21 @@ namespace Supernova {
         }
 
         FunctionSubscribe(std::function<Ret(Args...)> function) {
-            add("userFunction", function);
+            add("cFunction", function);
         }
 
         FunctionSubscribe(lua_State *L) {
-            add("userFunction", L);
+            add("luaFunction", L);
         }
 
         FunctionSubscribe& operator = (std::function<Ret(Args...)> function){
-            add("userFunction", function);
+            add("cFunction", function);
 
             return *this;
         }
 
         FunctionSubscribe& operator = (lua_State *L){
-            add("userFunction", L);
+            add("luaFunction", L);
 
             return *this;
         }

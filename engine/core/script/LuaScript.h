@@ -10,8 +10,8 @@
 namespace Supernova {
     class LuaScript {
     public:
-        static void setObject(const char* global, Object* object);
-        static Object* getObject(const char* global);
+        static void setObject(std::string global, Object* object);
+        static Object* getObject(std::string global);
     };
 
 }

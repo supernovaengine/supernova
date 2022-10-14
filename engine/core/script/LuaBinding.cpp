@@ -34,6 +34,8 @@ LuaBinding::~LuaBinding() {
 
 void LuaBinding::createLuaState(){
     LuaBinding::luastate = luaL_newstate();
+
+    registerClasses(luastate);
 }
 
 lua_State* LuaBinding::getLuaState(){
@@ -177,9 +179,6 @@ int LuaBinding::handleLuaError(lua_State* L) {
 void LuaBinding::init(){
 
     lua_State *L = LuaBinding::getLuaState();
-    luaL_openlibs(L);
-
-    registerClasses(L);
 
     std::string luadir = std::string("lua") + System::instance().getDirSeparator();
 
@@ -216,10 +215,9 @@ void LuaBinding::init(){
 }
 
 void LuaBinding::registerClasses(lua_State *L){
-
 #ifndef DISABLE_LUA_BINDINGS
-    // luaL_openlibs() opened all libraries already: base, string, io, os, package, table, debug
-    //lua.open_libraries(sol::lib::base);
+    // luaL_openlibs() open all libraries: base, string, io, os, package, table, debug
+    luaL_openlibs(L);
 
     registerActionClasses(L);
     registerCoreClasses(L);

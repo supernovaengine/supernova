@@ -329,8 +329,8 @@ void Engine::systemInit(int argc, char* argv[]){
     System::instance().args = args;
 
     LuaBinding::createLuaState();
-    LuaBinding::init();
 
+    LuaBinding::init();
     #ifndef NO_CPP_INIT
     init();
     #endif
