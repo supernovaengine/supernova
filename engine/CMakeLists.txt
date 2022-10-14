@@ -22,12 +22,14 @@ include_directories(libs/lua)
 include_directories(libs/stb)
 include_directories(libs/tinyobjloader)
 include_directories(libs/tinygltf)
+include_directories(libs/tinyxml2)
 
 add_subdirectory(libs/sokol)
 add_subdirectory(libs/lua)
 add_subdirectory(libs/stb)
 add_subdirectory(libs/tinyobjloader)
 add_subdirectory(libs/tinygltf)
+add_subdirectory(libs/tinyxml2)
 
 file(GLOB_RECURSE SUPERNOVA_SRCS core/*.cpp)
 file(GLOB RENDER_SOKOL_SRC renders/sokol/*.cpp)
@@ -44,7 +46,7 @@ add_library(
 target_link_libraries(
     supernova
 
-    sokol lua stb tinyobjloader tinygltf
+    sokol lua stb tinyobjloader tinygltf tinyxml2
 
     #supernova-renders
     #soloud box2d tinyxml2

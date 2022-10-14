@@ -161,6 +161,8 @@ std::string FileData::getSystemPath(std::string path){
 }
 
 std::string FileData::readString(unsigned int stringlen){
+    if (stringlen == 0)
+        stringlen = length();
     std::string s( stringlen, '\0' );
     read((unsigned char*)&s[0], stringlen);
     return s;
