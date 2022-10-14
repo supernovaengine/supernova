@@ -22,6 +22,10 @@
 		7105A56B28B305B20092EA05 /* UtilClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A56028B305B20092EA05 /* UtilClassesLua.cpp */; };
 		7105A56C28B305B20092EA05 /* IOClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A56128B305B20092EA05 /* IOClassesLua.cpp */; };
 		7105A56D28B305B20092EA05 /* IOClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A56128B305B20092EA05 /* IOClassesLua.cpp */; };
+		7108CB7C28F8F2B600FF7AC6 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7108CB7A28F8F2B600FF7AC6 /* tinyxml2.cpp */; };
+		7108CB7D28F8F2B600FF7AC6 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7108CB7A28F8F2B600FF7AC6 /* tinyxml2.cpp */; };
+		7108CB7E28F8F2B600FF7AC6 /* tinyxml2.h in Headers */ = {isa = PBXBuildFile; fileRef = 7108CB7B28F8F2B600FF7AC6 /* tinyxml2.h */; };
+		7108CB8028F8F4AF00FF7AC6 /* tinyxml2.h in Headers */ = {isa = PBXBuildFile; fileRef = 7108CB7B28F8F2B600FF7AC6 /* tinyxml2.h */; };
 		710AD65825B604BE00A7B12F /* lvm.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE606F25B1C55B006D6E02 /* lvm.h */; };
 		710AD65925B604BE00A7B12F /* ldo.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE605B25B1C55B006D6E02 /* ldo.h */; };
 		710AD65A25B604BE00A7B12F /* llex.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE605E25B1C55B006D6E02 /* llex.h */; };
@@ -115,6 +119,11 @@
 		7128D11D25C2356200965B51 /* SokolSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 7128D11B25C2356200965B51 /* SokolSystem.h */; };
 		7128D11E25C2356200965B51 /* SokolSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7128D11C25C2356200965B51 /* SokolSystem.cpp */; };
 		7128D11F25C2356200965B51 /* SokolSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7128D11C25C2356200965B51 /* SokolSystem.cpp */; };
+		71393EE128F8EF6B0074442E /* libtinyxml2-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71393EBB28F8EEF60074442E /* libtinyxml2-ios.a */; };
+		71393EE228F8EF780074442E /* libtinyxml2-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71393EC828F8EF0C0074442E /* libtinyxml2-macos.a */; };
+		71393EE528F8EF9F0074442E /* XMLUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71393EE328F8EF9E0074442E /* XMLUtils.cpp */; };
+		71393EE628F8EF9F0074442E /* XMLUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71393EE328F8EF9E0074442E /* XMLUtils.cpp */; };
+		71393EE928F8EF9F0074442E /* XMLUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 71393EE428F8EF9F0074442E /* XMLUtils.h */; };
 		713D8292259D307E00567F9F /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC2C25962A0E0075B97D /* Log.cpp */; };
 		713D8293259D307F00567F9F /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC2D25962A0E0075B97D /* Scene.cpp */; };
 		713D8294259D307F00567F9F /* Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC3225962A0E0075B97D /* Data.cpp */; };
@@ -477,6 +486,20 @@
 			remoteGlobalIDString = 710AD6D225B6053400A7B12F;
 			remoteInfo = "stb-ios";
 		};
+		71393EEC28F8F0370074442E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7162F8C0259547D60075B97D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 71393EC728F8EF0C0074442E;
+			remoteInfo = "tinyxml2-macos";
+		};
+		71393EEE28F8F0400074442E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7162F8C0259547D60075B97D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 71393EBA28F8EEF60074442E;
+			remoteInfo = "tinyxml2-ios";
+		};
 		713D82CC259D31D200567F9F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7162F8C0259547D60075B97D /* Project object */;
@@ -584,6 +607,8 @@
 		7105A55F28B305B20092EA05 /* ECSClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ECSClassesLua.cpp; sourceTree = "<group>"; };
 		7105A56028B305B20092EA05 /* UtilClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UtilClassesLua.cpp; sourceTree = "<group>"; };
 		7105A56128B305B20092EA05 /* IOClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOClassesLua.cpp; sourceTree = "<group>"; };
+		7108CB7A28F8F2B600FF7AC6 /* tinyxml2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml2.cpp; sourceTree = "<group>"; };
+		7108CB7B28F8F2B600FF7AC6 /* tinyxml2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml2.h; sourceTree = "<group>"; };
 		710AD69A25B604BE00A7B12F /* liblua-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "liblua-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		710AD6E325B6053400A7B12F /* libstb-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libstb-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		710AD75025B733E100A7B12F /* EngineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EngineView.h; sourceTree = "<group>"; };
@@ -607,6 +632,10 @@
 		7128D0FF25C2354A00965B51 /* SystemRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemRender.h; sourceTree = "<group>"; };
 		7128D11B25C2356200965B51 /* SokolSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SokolSystem.h; sourceTree = "<group>"; };
 		7128D11C25C2356200965B51 /* SokolSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SokolSystem.cpp; sourceTree = "<group>"; };
+		71393EBB28F8EEF60074442E /* libtinyxml2-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinyxml2-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		71393EC828F8EF0C0074442E /* libtinyxml2-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinyxml2-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		71393EE328F8EF9E0074442E /* XMLUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XMLUtils.cpp; sourceTree = "<group>"; };
+		71393EE428F8EF9F0074442E /* XMLUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLUtils.h; sourceTree = "<group>"; };
 		713D823E259CC4FF00567F9F /* libsupernova-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libsupernova-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		713D82C5259D316E00567F9F /* libsokol-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libsokol-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		713D831E259D3F8F00567F9F /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -959,10 +988,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		71393EB828F8EEF60074442E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71393EC628F8EF0C0074442E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		713D823B259CC4FF00567F9F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71393EE128F8EF6B0074442E /* libtinyxml2-ios.a in Frameworks */,
 				71F97B9B262D203E00CD6F2B /* libtinygltf-ios.a in Frameworks */,
 				71E36BEE25D59A3800EFEED4 /* libtinyobjloader-ios.a in Frameworks */,
 				710AD70425B6058100A7B12F /* libstb-ios.a in Frameworks */,
@@ -998,6 +1042,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71393EE228F8EF780074442E /* libtinyxml2-macos.a in Frameworks */,
 				71F97B69262D1FC300CD6F2B /* libtinygltf-macos.a in Frameworks */,
 				71E36BC625D599E200EFEED4 /* libtinyobjloader-macos.a in Frameworks */,
 				71BE626825B1DC7D006D6E02 /* liblua-macos.a in Frameworks */,
@@ -1072,6 +1117,15 @@
 				7105A56028B305B20092EA05 /* UtilClassesLua.cpp */,
 			);
 			path = binding;
+			sourceTree = "<group>";
+		};
+		71393ED328F8EF200074442E /* tinyxml2 */ = {
+			isa = PBXGroup;
+			children = (
+				7108CB7A28F8F2B600FF7AC6 /* tinyxml2.cpp */,
+				7108CB7B28F8F2B600FF7AC6 /* tinyxml2.h */,
+			);
+			path = tinyxml2;
 			sourceTree = "<group>";
 		};
 		713D831D259D3F8F00567F9F /* macos */ = {
@@ -1165,6 +1219,8 @@
 				71E36BDD25D59A1400EFEED4 /* libtinyobjloader-ios.a */,
 				71F97AD2262D1DF200CD6F2B /* libtinygltf-macos.a */,
 				71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */,
+				71393EBB28F8EEF60074442E /* libtinyxml2-ios.a */,
+				71393EC828F8EF0C0074442E /* libtinyxml2-macos.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1231,6 +1287,8 @@
 				7128D0AD25BB18DC00965B51 /* StringUtils.h */,
 				71ABBD39279116E1001CE3AF /* UniqueToken.cpp */,
 				71ABBD3A279116E1001CE3AF /* UniqueToken.h */,
+				71393EE328F8EF9E0074442E /* XMLUtils.cpp */,
+				71393EE428F8EF9F0074442E /* XMLUtils.h */,
 			);
 			path = util;
 			sourceTree = "<group>";
@@ -1452,6 +1510,7 @@
 				71BE61B925B1DA3E006D6E02 /* stb */,
 				71F97B1D262D1E2B00CD6F2B /* tinygltf */,
 				71E36BB125D599C000EFEED4 /* tinyobjloader */,
+				71393ED328F8EF200074442E /* tinyxml2 */,
 			);
 			path = libs;
 			sourceTree = "<group>";
@@ -1742,6 +1801,14 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		7108CB7F28F8F4A700FF7AC6 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7108CB8028F8F4AF00FF7AC6 /* tinyxml2.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		710AD65725B604BE00A7B12F /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1787,6 +1854,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		71393EC428F8EF0C0074442E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7108CB7E28F8F2B600FF7AC6 /* tinyxml2.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		713D82BE259D316E00567F9F /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1829,6 +1904,7 @@
 				7170A3D82818A8A30003E965 /* Fog.h in Headers */,
 				71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */,
 				713E581227BA9CE400376680 /* Polygon.h in Headers */,
+				71393EE928F8EF9F0074442E /* XMLUtils.h in Headers */,
 				71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */,
 				71FCE4C228E0FA01003C5217 /* EnumWrapper.h in Headers */,
 				715CB114288CD3F60049344B /* TerrainComponent.h in Headers */,
@@ -1996,6 +2072,40 @@
 			productReference = 710AD6E325B6053400A7B12F /* libstb-ios.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		71393EBA28F8EEF60074442E /* tinyxml2-ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 71393EC128F8EEF60074442E /* Build configuration list for PBXNativeTarget "tinyxml2-ios" */;
+			buildPhases = (
+				7108CB7F28F8F4A700FF7AC6 /* Headers */,
+				71393EB728F8EEF60074442E /* Sources */,
+				71393EB828F8EEF60074442E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "tinyxml2-ios";
+			productName = "tinyxml2-ios";
+			productReference = 71393EBB28F8EEF60074442E /* libtinyxml2-ios.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		71393EC728F8EF0C0074442E /* tinyxml2-macos */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 71393ED028F8EF0C0074442E /* Build configuration list for PBXNativeTarget "tinyxml2-macos" */;
+			buildPhases = (
+				71393EC428F8EF0C0074442E /* Headers */,
+				71393EC528F8EF0C0074442E /* Sources */,
+				71393EC628F8EF0C0074442E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "tinyxml2-macos";
+			productName = "tinyxml2-macos";
+			productReference = 71393EC828F8EF0C0074442E /* libtinyxml2-macos.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		713D823D259CC4FF00567F9F /* supernova-ios */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 713D8246259CC50000567F9F /* Build configuration list for PBXNativeTarget "supernova-ios" */;
@@ -2007,6 +2117,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				71393EEF28F8F0400074442E /* PBXTargetDependency */,
 				71F97B9A262D203300CD6F2B /* PBXTargetDependency */,
 				71E36BED25D59A3000EFEED4 /* PBXTargetDependency */,
 				710AD70125B6056E00A7B12F /* PBXTargetDependency */,
@@ -2082,6 +2193,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				71393EED28F8F0370074442E /* PBXTargetDependency */,
 				71F97B68262D1FBB00CD6F2B /* PBXTargetDependency */,
 				71E36BC525D599DB00EFEED4 /* PBXTargetDependency */,
 				71BE626325B1DC6E006D6E02 /* PBXTargetDependency */,
@@ -2222,6 +2334,12 @@
 			attributes = {
 				LastUpgradeCheck = 1230;
 				TargetAttributes = {
+					71393EBA28F8EEF60074442E = {
+						CreatedOnToolsVersion = 14.0.1;
+					};
+					71393EC728F8EF0C0074442E = {
+						CreatedOnToolsVersion = 14.0.1;
+					};
 					713D823D259CC4FF00567F9F = {
 						CreatedOnToolsVersion = 12.3;
 					};
@@ -2278,6 +2396,8 @@
 				71E36BD425D59A1400EFEED4 /* tinyobjloader-ios */,
 				71F97AD1262D1DF200CD6F2B /* tinygltf-macos */,
 				71F97B79262D1FFE00CD6F2B /* tinygltf-ios */,
+				71393EC728F8EF0C0074442E /* tinyxml2-macos */,
+				71393EBA28F8EEF60074442E /* tinyxml2-ios */,
 			);
 		};
 /* End PBXProject section */
@@ -2362,6 +2482,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		71393EB728F8EEF60074442E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7108CB7C28F8F2B600FF7AC6 /* tinyxml2.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71393EC528F8EF0C0074442E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7108CB7D28F8F2B600FF7AC6 /* tinyxml2.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		713D823A259CC4FF00567F9F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2386,6 +2522,7 @@
 				713D8295259D307F00567F9F /* UserSettings.cpp in Sources */,
 				7105A56B28B305B20092EA05 /* UtilClassesLua.cpp in Sources */,
 				71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
+				71393EE628F8EF9F0074442E /* XMLUtils.cpp in Sources */,
 				713D8296259D307F00567F9F /* File.cpp in Sources */,
 				71ABBD2A277A3210001CE3AF /* STBText.cpp in Sources */,
 				71451BE3270CA17F00712643 /* ScaleAction.cpp in Sources */,
@@ -2527,6 +2664,7 @@
 				7162FE102596A5BE0075B97D /* SokolScene.cpp in Sources */,
 				7105A56A28B305B20092EA05 /* UtilClassesLua.cpp in Sources */,
 				71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
+				71393EE528F8EF9F0074442E /* XMLUtils.cpp in Sources */,
 				7162FD1225963AE00075B97D /* Log.cpp in Sources */,
 				71ABBD29277A3210001CE3AF /* STBText.cpp in Sources */,
 				71451BE2270CA17F00712643 /* ScaleAction.cpp in Sources */,
@@ -2710,6 +2848,16 @@
 			target = 710AD6D225B6053400A7B12F /* stb-ios */;
 			targetProxy = 710AD70025B6056E00A7B12F /* PBXContainerItemProxy */;
 		};
+		71393EED28F8F0370074442E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 71393EC728F8EF0C0074442E /* tinyxml2-macos */;
+			targetProxy = 71393EEC28F8F0370074442E /* PBXContainerItemProxy */;
+		};
+		71393EEF28F8F0400074442E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 71393EBA28F8EEF60074442E /* tinyxml2-ios */;
+			targetProxy = 71393EEE28F8F0400074442E /* PBXContainerItemProxy */;
+		};
 		713D82CD259D31D200567F9F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 713D82BD259D316E00567F9F /* sokol-ios */;
@@ -2827,6 +2975,65 @@
 				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		71393EC228F8EEF60074442E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_STYLE = Automatic;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		71393EC328F8EEF60074442E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_STYLE = Automatic;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		71393ED128F8EF0C0074442E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		71393ED228F8EF0C0074442E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -3407,6 +3614,24 @@
 			buildConfigurations = (
 				710AD6E125B6053400A7B12F /* Debug */,
 				710AD6E225B6053400A7B12F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		71393EC128F8EEF60074442E /* Build configuration list for PBXNativeTarget "tinyxml2-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				71393EC228F8EEF60074442E /* Debug */,
+				71393EC328F8EEF60074442E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		71393ED028F8EF0C0074442E /* Build configuration list for PBXNativeTarget "tinyxml2-macos" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				71393ED128F8EF0C0074442E /* Debug */,
+				71393ED228F8EF0C0074442E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
