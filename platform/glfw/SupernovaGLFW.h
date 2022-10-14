@@ -44,6 +44,7 @@ public:
     virtual void exitFullscreen();
 
     virtual std::string getAssetPath();
+    virtual std::string getUserDataPath();
     virtual std::string getLuaPath();
     
 };

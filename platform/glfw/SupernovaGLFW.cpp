@@ -157,6 +157,10 @@ std::string SupernovaGLFW::getAssetPath(){
     return "assets";
 }
 
+std::string SupernovaGLFW::getUserDataPath(){
+    return ".";
+}
+
 std::string SupernovaGLFW::getLuaPath(){
     return "lua";
 }

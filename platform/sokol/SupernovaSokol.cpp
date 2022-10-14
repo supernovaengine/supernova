@@ -38,6 +38,10 @@ std::string SupernovaSokol::getAssetPath(){
     return "assets";
 }
 
+std::string SupernovaSokol::getUserDataPath(){
+    return ".";
+}
+
 std::string SupernovaSokol::getLuaPath(){
     return "lua";
 }

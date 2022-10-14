@@ -10,8 +10,6 @@
 using namespace Supernova;
 
 tinyxml2::XMLElement* XMLUtils::getNodeForKey(const char* XMLFilePath, const char* rootName, const char* key, tinyxml2::XMLElement** rootNode, tinyxml2::XMLDocument* doc){
-
-
     tinyxml2::XMLElement* curNode = NULL;
 
     *rootNode = NULL;
@@ -112,7 +110,7 @@ void XMLUtils::setValueForKey(const char* XMLFilePath, const char* rootName, con
         if (file.open(XMLFilePath, true) == FileErrors::NO_ERROR) {
             doc.SaveFile(file.getFilePtr());
         } else {
-            Log::Error("Can't save XML file: %s", XMLFilePath);
+            Log::Error("Can't save XML file: %s. Does dir '%s' exist?", XMLFilePath, FileData::getSystemPath(XMLFilePath).c_str());
         }
     }
 }
@@ -138,7 +136,7 @@ void XMLUtils::removeKey(const char* XMLFilePath, const char* rootName, const ch
             if (file.open(XMLFilePath, true) == FileErrors::NO_ERROR) {
                 doc.SaveFile(file.getFilePtr());
             } else {
-                Log::Error("Can't save XML file: %s", XMLFilePath);
+                Log::Error("Can't save XML file: %s. Does dir '%s' exist?", XMLFilePath, FileData::getSystemPath(XMLFilePath).c_str());
             }
         }
 
