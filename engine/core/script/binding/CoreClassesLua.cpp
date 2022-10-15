@@ -16,6 +16,7 @@
 #include "Scene.h"
 #include "Log.h"
 #include "Input.h"
+#include "System.h"
 
 using namespace Supernova;
 
@@ -423,6 +424,22 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticFunction("numTouches", &Input::numTouches)
         .addStaticFunction("getModifiers", &Input::getModifiers)
         .addStaticFunction("findTouchIndex", &Input::findTouchIndex)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<System>("System")
+        .addStaticFunction("getScreenWidth", [] () { return System::instance().getScreenWidth(); })
+        .addStaticFunction("getScreenHeight", [] () { return System::instance().getScreenHeight(); })
+        .addStaticFunction("showVirtualKeyboard", [] () { System::instance().showVirtualKeyboard(); })
+        .addStaticFunction("hideVirtualKeyboard", [] () { System::instance().hideVirtualKeyboard(); })
+        .addStaticFunction("isFullscreen", [] () { return System::instance().isFullscreen(); })
+        .addStaticFunction("requestFullscreen", [] () { System::instance().requestFullscreen(); })
+        .addStaticFunction("exitFullscreen", [] () { System::instance().exitFullscreen(); })
+        .addStaticFunction("getDirSeparator", [] () { return System::instance().getDirSeparator(); })
+        .addStaticFunction("getAssetPath", [] () { return System::instance().getAssetPath(); })
+        .addStaticFunction("getUserDataPath", [] () { return System::instance().getUserDataPath(); })
+        .addStaticFunction("getLuaPath", [] () { return System::instance().getLuaPath(); })
+        .addStaticFunction("getShaderPath", [] () { return System::instance().getShaderPath(); })
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

@@ -29,9 +29,10 @@ namespace Supernova {
         static System& instance();
 
         virtual ~System() {}
-        
-        virtual sg_context_desc getSokolContext();
 
+        // *******
+        // Used for user and Lua
+        // *******
         virtual int getScreenWidth() = 0;
         virtual int getScreenHeight() = 0;
 
@@ -48,6 +49,11 @@ namespace Supernova {
         virtual std::string getUserDataPath();
         virtual std::string getLuaPath();
         virtual std::string getShaderPath();
+
+        // *******
+        // Used only for engine
+        // *******
+        virtual sg_context_desc getSokolContext();
 
         virtual FILE* platformFopen(const char* fname, const char* mode);
         virtual bool syncFileSystem();
