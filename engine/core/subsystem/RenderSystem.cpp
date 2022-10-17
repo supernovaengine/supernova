@@ -396,6 +396,15 @@ void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& sh
 
 bool RenderSystem::loadMesh(MeshComponent& mesh){
 
+	bool allBuffersEmpty = true;
+	for (auto const& buff : mesh.buffers){
+		if (buff.second->getSize() > 0)
+			allBuffersEmpty = false;
+	}
+
+	if (allBuffersEmpty)
+		return false;
+
 	bufferNameToRender.clear();
 
 	std::map<std::string, unsigned int> bufferStride;

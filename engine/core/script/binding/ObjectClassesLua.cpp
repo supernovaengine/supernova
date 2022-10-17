@@ -12,6 +12,7 @@
 #include "EnumWrapper.h"
 
 #include "Fog.h"
+#include "SkyBox.h"
 #include "Object.h"
 #include "Camera.h"
 #include "Polygon.h"
@@ -83,6 +84,21 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("linearStart", &Fog::getLinearStart, &Fog::setLinearStart)
         .addProperty("linearEnd", &Fog::getLinearEnd, &Fog::setLinearEnd)
         .addFunction("setLinearStartEnd", &Fog::setLinearStartEnd)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<SkyBox>("SkyBox")
+        .addConstructor <void (Scene*)> ()
+        .addFunction("setTextures", &SkyBox::setTextures)
+        .addFunction("setTextureFront", &SkyBox::setTextureFront)
+        .addFunction("setTextureBack", &SkyBox::setTextureBack)
+        .addFunction("setTextureLeft", &SkyBox::setTextureLeft)
+        .addFunction("setTextureRight", &SkyBox::setTextureRight)
+        .addFunction("setTextureUp", &SkyBox::setTextureUp)
+        .addFunction("setTextureDown", &SkyBox::setTextureDown)
+        .addProperty("color", &SkyBox::getColor, (void(SkyBox::*)(Vector4))&SkyBox::setColor)
+        .addFunction("setColor", (void(SkyBox::*)(const float, const float, const float))&SkyBox::setColor)
+        .addProperty("alpha", &SkyBox::getAlpha, &SkyBox::setAlpha)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

@@ -139,13 +139,13 @@ void SkyBox::setAlpha(const float alpha){
     sky.color = Vector4(sky.color.x, sky.color.y, sky.color.z, alpha);
 }
 
-Vector4 SkyBox::getColor(){
+Vector4 SkyBox::getColor() const{
     SkyComponent& sky = getComponent<SkyComponent>();
 
     return sky.color;
 }
 
-float SkyBox::getAlpha(){
+float SkyBox::getAlpha() const{
     SkyComponent& sky = getComponent<SkyComponent>();
 
     return sky.color.w;
