@@ -48,13 +48,6 @@ uniform u_fs_pbrParams {
     } lighting;
 #endif
 
-#ifdef HAS_FOG
-    uniform u_fs_fog {
-        vec4 color_type;
-        vec4 density_start_end;
-    } fog;
-#endif
-
 #ifdef USE_SHADOWS
 
     uniform u_fs_shadows {
@@ -152,6 +145,9 @@ const float M_PI = 3.141592653589793;
 #ifdef HAS_TERRAIN
     #include "includes/terrain_fs.glsl"
 #endif
+#ifdef HAS_FOG
+    #include "includes/fog.glsl"
+#endif
 
 void main() {
     vec4 baseColor = getBaseColor();
@@ -161,6 +157,9 @@ void main() {
     #endif
 
     #ifdef MATERIAL_UNLIT
+        #ifdef HAS_FOG
+            baseColor.rgb = getFogColor(baseColor.rgb);
+        #endif
         g_finalColor = (vec4(linearTosRGB(baseColor.rgb), baseColor.a));
         return;
     #endif
@@ -280,25 +279,7 @@ void main() {
     vec3 color = f_emissive + f_diffuse + f_specular;
 
     #ifdef HAS_FOG
-        int fogType = int(fog.color_type.w);
-        vec3 fogColor = fog.color_type.xyz;
-        float fogDensity = fog.density_start_end.x;
-        float fogLinearStart = fog.density_start_end.z;
-        float fogLinearEnd = fog.density_start_end.w;
-
-        float fogFactor = 0.0;
-        const float LOG2 = 1.442695;
-        float fogDist = (gl_FragCoord.z / gl_FragCoord.w);
-        if (fogType == 0){
-            fogFactor = (fogLinearEnd - fogDist)/(fogLinearEnd - fogLinearStart);
-        }else if (fogType == 1){
-            fogFactor = exp2( -fogDensity * fogDist * LOG2);
-        }else if (fogType == 2){
-            fogFactor = exp2( -fogDensity * fogDensity * fogDist * fogDist * LOG2);
-        }
-        fogFactor = clamp(fogFactor, 0.0, 1.0);
-
-        color = mix(fogColor, color, fogFactor);
+        color.rgb = getFogColor(color.rgb);
     #endif
 
     g_finalColor = vec4(linearTosRGB(color.rgb), baseColor.a);

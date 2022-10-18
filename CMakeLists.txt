@@ -384,6 +384,8 @@ include_directories (${SUPERNOVA_ROOT}/engine/core/object)
 include_directories (${SUPERNOVA_ROOT}/engine/core/object/ui)
 include_directories (${SUPERNOVA_ROOT}/engine/core/object/environment)
 include_directories (${SUPERNOVA_ROOT}/engine/core/script)
+include_directories (${SUPERNOVA_ROOT}/engine/core/texture)
+include_directories (${SUPERNOVA_ROOT}/engine/core/util)
 include_directories (${SUPERNOVA_ROOT}/engine/renders)
 
 add_subdirectory(${SUPERNOVA_ROOT}/engine)

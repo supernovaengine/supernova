@@ -252,7 +252,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("setBackgroundColor", (void (Scene::*)(float, float, float))&Scene::setBackgroundColor)
         .addProperty("shadowsPCF", &Scene::isShadowsPCF, &Scene::setShadowsPCF)
         .addProperty("fogEnabled", &Scene::isFogEnabled, &Scene::setFogEnabled)
-        .addFunction("getFog", &Scene::getFog)
+        .addProperty("fog", [] (Scene* self, lua_State* L) { return self->getFog(); })
         .addProperty("ambientLightColor", &Scene::getAmbientLightColor, (void (Scene::*)(Vector3))&Scene::setAmbientLight)
         .addProperty("ambientLightFactor", &Scene::getAmbientLightFactor, (void (Scene::*)(float))&Scene::setAmbientLight)
         .addFunction("setAmbientLight", (void (Scene::*)(float, Vector3))&Scene::setAmbientLight)

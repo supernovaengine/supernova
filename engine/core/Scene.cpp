@@ -59,8 +59,8 @@ Scene::Scene(){
 	hasFog = false;
 
 	hasSceneAmbientLight = false;
-	Vector3 ambientLight = Vector3(1.0, 1.0, 1.0);
-	float ambientFactor = 0.2;
+	ambientLight = Vector3(1.0, 1.0, 1.0);
+	ambientFactor = 0.2;
 
 	renderToTexture = false;
 	framebufferWidth = 512;
