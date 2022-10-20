@@ -183,6 +183,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Mesh::setTexture),
             luabridge::overload<FramebufferRender*>(&Mesh::setTexture))
+        .addProperty("color", &Mesh::getColor, (void(Mesh::*)(Vector4))&Mesh::setColor)
+        .addFunction("setColor", (void(Mesh::*)(const float, const float, const float, const float))&Mesh::setColor)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

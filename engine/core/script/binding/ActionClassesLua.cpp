@@ -16,6 +16,7 @@
 #include "action/AlphaAction.h"
 #include "action/ColorAction.h"
 #include "action/PositionAction.h"
+#include "action/RotationAction.h"
 #include "action/ScaleAction.h"
 #include "action/Animation.h"
 #include "action/ParticlesAnimation.h"
@@ -79,6 +80,7 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addProperty("target", &Action::getTarget, &Action::setTarget)
         .addProperty("speed", &Action::getSpeed, &Action::setSpeed)
         .addProperty("entity", &Action::getEntity)
+        .addFunction("getActionComponent", &Action::getComponent<ActionComponent>)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -86,6 +88,7 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setFunction", [] (TimedAction* self, lua_State* L) { self->setFunction(L); })
         .addFunction("setFunctionType", &TimedAction::setFunctionType)
+        .addFunction("getTimedActionComponent", &TimedAction::getComponent<TimedActionComponent>)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -106,6 +109,12 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .deriveClass<PositionAction, TimedAction>("PositionAction")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setAction", &PositionAction::setAction)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<RotationAction, TimedAction>("RotationAction")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setAction", &RotationAction::setAction)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

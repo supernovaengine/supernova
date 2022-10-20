@@ -228,6 +228,13 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
+        .beginClass<FunctionSubscribe<float(float)>>("FunctionSubscribe_F_F")
+        .addFunction("__call", &FunctionSubscribe<float(float)>::call)
+        .addFunction("call", &FunctionSubscribe<float(float)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<float(float)>::*)(const std::string&, lua_State*))&FunctionSubscribe<float(float)>::add)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<TextureRender>("TextureRender")
         .addConstructor <void (*) (void)> ()
         .endClass();

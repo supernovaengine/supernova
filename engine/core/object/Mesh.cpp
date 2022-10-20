@@ -51,7 +51,7 @@ void Mesh::setColor(float red, float green, float blue, float alpha){
     setColor(Vector4(red, green, blue, alpha));
 }
 
-Vector4 Mesh::getColor(){
+Vector4 Mesh::getColor() const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return Color::linearTosRGB(mesh.submeshes[0].material.baseColorFactor);

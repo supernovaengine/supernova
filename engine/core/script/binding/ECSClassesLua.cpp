@@ -15,6 +15,9 @@
 #include "ecs/EntityManager.h"
 #include "ecs/ComponentArray.h"
 
+#include "component/ActionComponent.h"
+#include "component/TimedActionComponent.h"
+
 using namespace Supernova;
 
 namespace luabridge
@@ -54,6 +57,18 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("destroy", &EntityManager::destroy)
         .addFunction("setSignature", &EntityManager::setSignature)
         .addFunction("getSignature", &EntityManager::getSignature)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<ActionComponent>("ActionComponent")
+        .addProperty("onStart", [] (ActionComponent* self, lua_State* L) { return &self->onStart; }, [] (ActionComponent* self, lua_State* L) { self->onStart = L; })
+        .addProperty("onPause", [] (ActionComponent* self, lua_State* L) { return &self->onPause; }, [] (ActionComponent* self, lua_State* L) { self->onPause = L; })
+        .addProperty("onStop", [] (ActionComponent* self, lua_State* L) { return &self->onStop; }, [] (ActionComponent* self, lua_State* L) { self->onStop = L; })
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<TimedActionComponent>("TimedActionComponent")
+        .addProperty("function", [] (TimedActionComponent* self, lua_State* L) { return &self->function; }, [] (TimedActionComponent* self, lua_State* L) { self->function = L; })
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS
