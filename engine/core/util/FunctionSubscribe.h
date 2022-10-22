@@ -152,12 +152,18 @@ namespace Supernova {
         }
 
         Ret call(Args... args){
-            for (auto& function : functions)
-            {
-                return function(args...);
-            };
-
-            return Ret();
+            if constexpr (std::is_void<Ret>::value) {
+                for (auto& function : functions)
+                {
+                    function(args...);
+                };
+            } else {
+                for (auto& function : functions)
+                {
+                    return function(args...);
+                };
+                return Ret();
+            }
         }
 
         Ret operator()(Args... args)

@@ -413,7 +413,7 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui){
 
 void UISystem::load(){
     if (eventId.empty()){
-        eventId = "UIObject|" + UniqueToken::get();
+        eventId = "UISystem|" + UniqueToken::get();
     }
     // Cannot be on constructor to prevent static initialization order fiasco:
     // http://www.parashift.com/c++-faq-lite/static-init-order.html
