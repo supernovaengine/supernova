@@ -32,6 +32,7 @@ using namespace Supernova;
 namespace luabridge
 {
     template<> struct Stack<EaseType> : EnumWrapper<EaseType>{};
+    template<> struct Stack<ActionState> : EnumWrapper<ActionState>{};
 }
 
 void LuaBinding::registerActionClasses(lua_State *L){
@@ -177,6 +178,7 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addFunction("setRotationModifier", 
             luabridge::overload<float, float, float, float>(&ParticlesAnimation::setRotationModifier),
             luabridge::overload<float, float, float, float, EaseType>(&ParticlesAnimation::setRotationModifier))
+        .addFunction("getParticlesAnimationComponent", &ParticlesAnimation::getComponent<ParticlesAnimationComponent>)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

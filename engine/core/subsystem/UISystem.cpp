@@ -214,7 +214,10 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
     createButtonLabel(entity, button);
 
     if (!ui.loaded){
-        button.textureNormal.load();
+        if (!button.textureNormal.load()){
+            button.textureNormal = ui.texture;
+            button.textureNormal.load();
+        }
         button.texturePressed.load();
         button.textureDisabled.load();
     }

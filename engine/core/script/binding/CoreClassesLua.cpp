@@ -28,6 +28,7 @@ namespace luabridge
     template<> struct Stack<TextureStrategy> : EnumWrapper<TextureStrategy>{};
     template<> struct Stack<TextureType> : EnumWrapper<TextureType>{};
     template<> struct Stack<ColorFormat> : EnumWrapper<ColorFormat>{};
+    template<> struct Stack<PrimitiveType> : EnumWrapper<PrimitiveType>{};
 
     template <>
     struct Stack <Touch>

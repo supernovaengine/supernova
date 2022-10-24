@@ -347,6 +347,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<FramebufferRender*>(&Image::setTexture))
         .addProperty("color", &Image::getColor, (void(Image::*)(Vector4))&Image::setColor)
         .addFunction("setColor", (void(Image::*)(const float, const float, const float, const float))&Image::setColor)
+        .addFunction("getUIComponent", &Image::getComponent<UIComponent>)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -362,6 +363,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTexturePressed", (void(Button::*)(std::string))&Button::setTexturePressed)
         .addFunction("setTextureDisabled", (void(Button::*)(std::string))&Button::setTextureDisabled)
         .addProperty("disabled", &Button::getDisabled, &Button::setDisabled)
+        .addFunction("getButtonComponent", &Button::getComponent<ButtonComponent>)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
