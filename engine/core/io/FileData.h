@@ -46,7 +46,8 @@ namespace Supernova {
         virtual void seek(int aOffset) = 0;
         virtual unsigned int pos() = 0;
 
-        std::string readString(unsigned int stringlen = 0);
+        std::string readString();
+        std::string readString(unsigned int stringlen);
         unsigned int writeString(std::string s);
     };
     

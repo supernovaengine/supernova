@@ -33,7 +33,7 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
     unsigned int texHeight = ui.texture.getData().getHeight();
 
     if (texWidth == 0 || texHeight == 0){
-        Log::Error("Cannot create UI image without texture");
+        Log::Warn("Cannot create UI image without texture");
         return false;
     }
 

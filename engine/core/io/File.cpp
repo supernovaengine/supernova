@@ -34,7 +34,11 @@ File& File::operator = ( const File& f ){
 
 File::~File() {
     if (fileHandle)
-        fclose(fileHandle);
+        close();
+}
+
+int File::eof() {
+    return feof(fileHandle);
 }
 
 unsigned int File::read(unsigned char *aDst, unsigned int aBytes) {
@@ -81,6 +85,10 @@ unsigned int File::open(const char *aFilename, bool write){
     return FileErrors::NO_ERROR;
 }
 
-int File::eof() {
-    return feof(fileHandle);
+void File::flush(){
+    fflush(fileHandle);
+}
+
+void File::close(){
+    fclose(fileHandle);
 }

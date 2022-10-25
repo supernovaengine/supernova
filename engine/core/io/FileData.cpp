@@ -160,9 +160,11 @@ std::string FileData::getSystemPath(std::string path){
     return System::instance().getAssetPath() + "/" + FileData::simplifyPath(path);
 }
 
+std::string FileData::readString(){
+    return readString(length());
+}
+
 std::string FileData::readString(unsigned int stringlen){
-    if (stringlen == 0)
-        stringlen = length();
     std::string s( stringlen, '\0' );
     read((unsigned char*)&s[0], stringlen);
     return s;

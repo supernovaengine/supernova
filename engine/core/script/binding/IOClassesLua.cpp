@@ -9,6 +9,7 @@
 #include "lauxlib.h"
 
 #include "LuaBridge.h"
+#include "EnumWrapper.h"
 
 #include "io/Data.h"
 #include "io/File.h"
@@ -17,8 +18,21 @@
 
 using namespace Supernova;
 
+namespace luabridge
+{
+    template<> struct Stack<FileErrors> : EnumWrapper<FileErrors>{};
+}
+
 void LuaBinding::registerIOClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("FileErrors")
+        .addProperty("NO_ERROR", FileErrors::NO_ERROR)
+        .addProperty("INVALID_PARAMETER", FileErrors::INVALID_PARAMETER)
+        .addProperty("FILE_NOT_FOUND", FileErrors::FILE_NOT_FOUND)
+        .addProperty("OUT_OF_MEMORY", FileErrors::OUT_OF_MEMORY)
+        .endNamespace();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<FileData>("FileData")
@@ -37,13 +51,18 @@ void LuaBinding::registerIOClasses(lua_State *L){
         .addFunction("length", &FileData::length)
         .addFunction("seek", &FileData::seek)
         .addFunction("pos", &FileData::pos)
-        .addFunction("readString", &FileData::readString)
+        .addFunction("readString", 
+            luabridge::overload<>(&FileData::readString),
+            luabridge::overload<unsigned int>(&FileData::readString))
         .addFunction("writeString", &FileData::writeString)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
         .deriveClass<File, FileData>("File")
         .addConstructor<void(), void(const char*, bool)> ()
+        .addFunction("open", &File::open)
+        .addFunction("flush", &File::flush)
+        .addFunction("close", &File::close)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -82,6 +101,7 @@ void LuaBinding::registerIOClasses(lua_State *L){
         .addStaticFunction("setDoubleForKey", &UserSettings::setDoubleForKey)
         .addStaticFunction("setStringForKey", &UserSettings::setStringForKey)
         .addStaticFunction("setDataForKey", &UserSettings::setDataForKey)
+        .addStaticFunction("removeKey", &UserSettings::removeKey)
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

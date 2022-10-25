@@ -138,6 +138,14 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("PrimitiveType")
+        .addProperty("TRIANGLES", PrimitiveType::TRIANGLES)
+        .addProperty("TRIANGLE_STRIP", PrimitiveType::TRIANGLE_STRIP)
+        .addProperty("POINTS", PrimitiveType::POINTS)
+        .addProperty("LINES", PrimitiveType::LINES)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<Engine>("Engine")
 
         .addStaticProperty("scene", &Engine::getScene, &Engine::setScene)

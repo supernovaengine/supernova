@@ -74,6 +74,13 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("ActionState")
+        .addProperty("Running", ActionState::Running)
+        .addProperty("Paused", ActionState::Paused)
+        .addProperty("Stopped", ActionState::Stopped)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<Action>("Action")
         .addConstructor <void(Scene*), void(Scene*, Entity)> ()
         .addFunction("start", &Action::start)

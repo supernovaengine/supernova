@@ -32,8 +32,11 @@ namespace Supernova {
         virtual unsigned int length();
         virtual void seek(int aOffset);
         virtual unsigned int pos();
-        unsigned int open(const char *aFilename, bool write = false);
         virtual FILE * getFilePtr();
+
+        unsigned int open(const char *aFilename, bool write = false);
+        void flush();
+        void close();
     };
     
 }
