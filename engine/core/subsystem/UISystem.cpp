@@ -33,7 +33,7 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
     unsigned int texHeight = ui.texture.getData().getHeight();
 
     if (texWidth == 0 || texHeight == 0){
-        Log::Warn("Cannot create UI image without texture");
+        Log::warn("Cannot create UI image without texture");
         return false;
     }
 
@@ -152,7 +152,7 @@ bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui){
 
     TextureData* textureData = text.stbtext->load(text.font, text.fontSize);
     if (!textureData) {
-        Log::Error("Cannot load font atlas from: %s", text.font.c_str());
+        Log::error("Cannot load font atlas from: %s", text.font.c_str());
         return false;
     }
 

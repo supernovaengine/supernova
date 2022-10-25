@@ -5,12 +5,12 @@ namespace Supernova {
 
     class Log {
     public:
-        static void Print(const char* text, ...);
+        static void print(const char* text, ...);
 
-        static void Verbose(const char* text, ...);
-        static void Debug(const char* text, ...);
-        static void Warn(const char* text, ...);
-        static void Error(const char* text, ...);
+        static void verbose(const char* text, ...);
+        static void debug(const char* text, ...);
+        static void warn(const char* text, ...);
+        static void error(const char* text, ...);
     };
 
 }

@@ -158,7 +158,7 @@ bool RenderSystem::processLights(){
 		if (light.shadows){
 			if (light.numShadowCascades > MAX_SHADOWCASCADES){
 				light.numShadowCascades = MAX_SHADOWCASCADES;
-				Log::Warn("Shadow cascades number is bigger than max value");
+				Log::warn("Shadow cascades number is bigger than max value");
 			}
 
 			hasShadows = true; // Re-check shadows on, after checked in checkLightsAndShadow()
@@ -198,7 +198,7 @@ bool RenderSystem::processLights(){
 				}
 			}else{
 				light.shadows = false;
-				Log::Warn("There are no shadow maps available for all lights, some light shadow will be disabled");
+				Log::warn("There are no shadow maps available for all lights, some light shadow will be disabled");
 			}
 		}
 
@@ -1880,7 +1880,7 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 
 				if (light.numShadowCascades > 1){
 					light.numShadowCascades = 1;
-					Log::Warn("Can not have multiple cascades shadows when using ortho scene camera. Reducing num shadow cascades to 1");
+					Log::warn("Can not have multiple cascades shadows when using ortho scene camera. Reducing num shadow cascades to 1");
 				}
 
 				Matrix4 sceneCameraInv = camera.viewProjectionMatrix.inverse();
@@ -2273,7 +2273,7 @@ void RenderSystem::draw(){
 				misShaders += "; ";
 			misShaders += ShaderPool::getMissingShaders()[i];
 		}
-		Log::Verbose(
+		Log::verbose(
 			"\n"
 			"-------------------\n"
 			"Supernova is missing some shaders, you need to use Supershader tool to create these shaders in project assets directory.\n"

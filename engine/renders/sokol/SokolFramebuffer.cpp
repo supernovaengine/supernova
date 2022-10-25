@@ -24,7 +24,7 @@ SokolFramebuffer& SokolFramebuffer::operator=(const SokolFramebuffer& rhs){
 
 bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int height, bool shadowMap){
     if ((textureType != TextureType::TEXTURE_2D) && (textureType != TextureType::TEXTURE_CUBE)){
-        Log::Error("Framebuffer texture type must be 2D or CUBE");
+        Log::error("Framebuffer texture type must be 2D or CUBE");
         return false;
     }
     colorTexture.createFramebufferTexture(textureType, false, shadowMap, width, height);

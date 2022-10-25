@@ -108,7 +108,7 @@ ActionFrame Animation::getActionFrame(unsigned int index){
     try{
         return animation.actions.at(index);
     }catch (const std::out_of_range& e){
-		Log::Error("Retrieving non-existent action: %s", e.what());
+		Log::error("Retrieving non-existent action: %s", e.what());
 		throw;
 	}
 }

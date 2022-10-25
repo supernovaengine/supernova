@@ -79,19 +79,19 @@ TextureData* STBText::load(std::string fontpath, unsigned int fontSize){
 
     if (!fontpath.empty()) {
         if (fontData.open(fontpath.c_str()) != FileErrors::NO_ERROR) {
-            Log::Error("Font file not found: %s", fontpath.c_str());
+            Log::error("Font file not found: %s", fontpath.c_str());
             return NULL;
         }
     }else{
         if (fontData.open(roboto_v20_latin_regular_ttf, roboto_v20_latin_regular_ttf_len, false, false) != FileErrors::NO_ERROR) {
-            Log::Error("Can't open default font");
+            Log::error("Can't open default font");
             return NULL;
         }
     }
 
     stbtt_fontinfo info;
     if (!stbtt_InitFont(&info, fontData.getMemPtr(), 0)) {
-        Log::Error("Failed to initialize font: %s", fontpath.c_str());
+        Log::error("Failed to initialize font: %s", fontpath.c_str());
         return NULL;
     }
     float scale = stbtt_ScaleForPixelHeight(&info, fontSize);
@@ -117,7 +117,7 @@ TextureData* STBText::load(std::string fontpath, unsigned int fontSize){
         atlasData = new unsigned char[atlasWidth * atlasHeight];
 
         if (!stbtt_PackBegin(&context, atlasData, atlasWidth, atlasHeight, 0, 1, nullptr)){
-            Log::Error("Failed to initialize font");
+            Log::error("Failed to initialize font");
             return NULL;
         }
 
@@ -130,7 +130,7 @@ TextureData* STBText::load(std::string fontpath, unsigned int fontSize){
         }
     }
     if (atlasWidth > atlasLimit){
-        Log::Error("Failed to pack font");
+        Log::error("Failed to pack font");
         return NULL;
     }
     stbtt_PackEnd(&context);
@@ -149,7 +149,7 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>
         utf16String = convert.from_bytes( text );
     } catch(const std::range_error& e) {
         utf16String = convert.from_bytes(text.substr(0, convert.converted()));
-        Log::Warn("Invalid character");
+        Log::warn("Invalid character");
     }
     
     float offsetX = 0;

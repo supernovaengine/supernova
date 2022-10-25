@@ -31,7 +31,7 @@ namespace Supernova {
 				++nextComponentTypeId;
 
 			} else {
-				Log::Error("Registering component type more than once");
+				Log::error("Registering component type more than once");
 			}
 
 		}
@@ -41,7 +41,7 @@ namespace Supernova {
 			const char* typeName = typeid(T).name();
 
 			if (componentTypeIds.find(typeName) == componentTypeIds.end())
-				Log::Error("Component not registered before use");
+				Log::error("Component not registered before use");
 
 			return componentTypeIds[typeName];
 		}
@@ -51,7 +51,7 @@ namespace Supernova {
 			const char* typeName = typeid(T).name();
 
 			if (componentTypeIds.find(typeName) == componentTypeIds.end())
-				Log::Error("Component not registered before use");
+				Log::error("Component not registered before use");
 
 			return std::static_pointer_cast<ComponentArray<T>>(componentArrays[typeName]);
 		}

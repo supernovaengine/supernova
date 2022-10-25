@@ -299,7 +299,7 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
     terrain.heightMap.setReleaseDataAfterLoad(false);
 
     if (!terrain.heightMap.load()){
-        Log::Error("Terrain must have a heightmap");
+        Log::error("Terrain must have a heightmap");
         return;
     }else{
         terrain.heightMapLoaded = true;
@@ -309,7 +309,7 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
     terrain.nodes.resize(idealSize);
 
     if (MAX_TERRAINGRID < (terrain.rootGridSize*terrain.rootGridSize)){
-        Log::Error("Cannot create full terrain, increase MAX_TERRAINGRID to %u", (terrain.rootGridSize*terrain.rootGridSize));
+        Log::error("Cannot create full terrain, increase MAX_TERRAINGRID to %u", (terrain.rootGridSize*terrain.rootGridSize));
         return;
     }
 
@@ -330,7 +330,7 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
         float lastLevel = maxDistance;
         if (maxDistance < (rootNodeSize * 2)){
             lastLevel = rootNodeSize * 2;
-            Log::Warn("Terrain quadtree root is not in camera field of view. Increase terrain root grid.");
+            Log::warn("Terrain quadtree root is not in camera field of view. Increase terrain root grid.");
         }
 
         terrain.ranges.clear();

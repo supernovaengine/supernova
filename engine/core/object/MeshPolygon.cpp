@@ -51,7 +51,7 @@ void MeshPolygon::setFlipY(bool flipY){
             pcomp.needUpdatePolygon = true;
         }
     }else{
-        Log::Error("FlipY cannot be changed until disabled automatic by Engine::setAutomaticFlipY()");
+        Log::error("FlipY cannot be changed until disabled automatic by Engine::setAutomaticFlipY()");
     }
 }
 

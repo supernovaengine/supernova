@@ -56,7 +56,7 @@ tinyxml2::XMLElement* XMLUtils::getNodeForKey(const char* XMLFilePath, const cha
 
 const char* XMLUtils::getValueForKey(const char* XMLFilePath, const char* rootName, const char *key){
     if (!key) {
-        Log::Error("Can't get value in XML (%s): Key is invalid", XMLFilePath);
+        Log::error("Can't get value in XML (%s): Key is invalid", XMLFilePath);
         return NULL;
     }
 
@@ -76,10 +76,10 @@ const char* XMLUtils::getValueForKey(const char* XMLFilePath, const char* rootNa
 
 void XMLUtils::setValueForKey(const char* XMLFilePath, const char* rootName, const char* key, const char* value) {
     if (!key)
-        Log::Error("Can't set value in XML (%s): Key is invalid", XMLFilePath);
+        Log::error("Can't set value in XML (%s): Key is invalid", XMLFilePath);
 
     if (!value)
-        Log::Error("Can't set value in XML (%s): Value is invalid", XMLFilePath);
+        Log::error("Can't set value in XML (%s): Value is invalid", XMLFilePath);
 
     if (key && value) {
         tinyxml2::XMLDocument doc;
@@ -110,14 +110,14 @@ void XMLUtils::setValueForKey(const char* XMLFilePath, const char* rootName, con
         if (file.open(XMLFilePath, true) == FileErrors::NO_ERROR) {
             doc.SaveFile(file.getFilePtr());
         } else {
-            Log::Error("Can't save XML file: %s. Does dir '%s' exist?", XMLFilePath, FileData::getSystemPath(XMLFilePath).c_str());
+            Log::error("Can't save XML file: %s. Does dir '%s' exist?", XMLFilePath, FileData::getSystemPath(XMLFilePath).c_str());
         }
     }
 }
 
 void XMLUtils::removeKey(const char* XMLFilePath, const char* rootName, const char *key){
     if (!key) {
-        Log::Error("Can't delete value in XML (%s): Key is invalid", XMLFilePath);
+        Log::error("Can't delete value in XML (%s): Key is invalid", XMLFilePath);
 
     } else {
 
@@ -136,7 +136,7 @@ void XMLUtils::removeKey(const char* XMLFilePath, const char* rootName, const ch
             if (file.open(XMLFilePath, true) == FileErrors::NO_ERROR) {
                 doc.SaveFile(file.getFilePtr());
             } else {
-                Log::Error("Can't save XML file: %s. Does dir '%s' exist?", XMLFilePath, FileData::getSystemPath(XMLFilePath).c_str());
+                Log::error("Can't save XML file: %s. Does dir '%s' exist?", XMLFilePath, FileData::getSystemPath(XMLFilePath).c_str());
             }
         }
 

@@ -98,7 +98,7 @@ int ShaderData::getAttrIndex(AttributeType type){
     }
 
     if (attrstr.empty()){
-        Log::Error("Trying to get a not mapped attribute");
+        Log::error("Trying to get a not mapped attribute");
         return -1;
     }
 
@@ -163,7 +163,7 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
     }
 
     if (ustr.empty()){
-        Log::Error("Trying to get a not mapped uniform");
+        Log::error("Trying to get a not mapped uniform");
         return -1;
     }
 
@@ -234,7 +234,7 @@ int ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
     }
 
     if (texstr.empty()){
-        Log::Error("Trying to get a not mapped texture");
+        Log::error("Trying to get a not mapped texture");
         return -1;
     }
 

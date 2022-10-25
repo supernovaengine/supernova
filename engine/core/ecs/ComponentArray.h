@@ -54,7 +54,7 @@ namespace Supernova {
 				componentArray.push_back(component);
 
 			} else {
-				Log::Error("Component added to same entity more than once");
+				Log::error("Component added to same entity more than once");
 			}
 		}
 
@@ -78,7 +78,7 @@ namespace Supernova {
                 indexToEntityMap.erase(componentSize);
 
 			} else {
-				Log::Error("Removing non-existent component");
+				Log::error("Removing non-existent component");
 			}
 		}
 
@@ -176,7 +176,7 @@ namespace Supernova {
 				return componentArray[entityToIndexMap.at(entity)];
 
 			}catch (const std::out_of_range& e){
-				Log::Error("Retrieving non-existent component: %s", e.what());
+				Log::error("Retrieving non-existent component: %s", e.what());
 				throw;
 			}
 		}
@@ -195,7 +195,7 @@ namespace Supernova {
 				return componentArray.at(index);
 
 			}catch (const std::out_of_range& e){
-				Log::Error("Retrieving non-existent component: %s", e.what());
+				Log::error("Retrieving non-existent component: %s", e.what());
 				throw;
 			}
 		}
@@ -206,14 +206,14 @@ namespace Supernova {
 				return entityToIndexMap.at(entity);
 
 			}catch (const std::out_of_range& e){
-				Log::Error("Retrieving non-existent component: %s", e.what());
+				Log::error("Retrieving non-existent component: %s", e.what());
 				throw;
 			}
 		}
 
 		Entity getEntity(size_t index){
 			if (indexToEntityMap.find(index) == indexToEntityMap.end()){
-				Log::Error("Entity not found");
+				Log::error("Entity not found");
 				return NULL_ENTITY;
 			}
 

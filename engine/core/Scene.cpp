@@ -75,7 +75,7 @@ void Scene::setCamera(Entity camera){
 	if (findComponent<CameraComponent>(camera)){
 		this->camera = camera;
 	}else{
-		Log::Error("Invalid camera entity: need CameraComponent");
+		Log::error("Invalid camera entity: need CameraComponent");
 	}
 }
 
@@ -316,10 +316,10 @@ void Scene::addEntityChild(Entity parent, Entity child){
 		auto transforms = componentManager.getComponentArray<Transform>();
 
 		//----------DEBUG
-		//Log::Debug("Add child - BEFORE");
+		//Log::debug("Add child - BEFORE");
 		//for (int i = 0; i < transforms->size(); i++){
 		//	auto transform = transforms->getComponentFromIndex(i);
-		//	Log::Debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
+		//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
 		//}
 		//----------DEBUG
 
@@ -347,12 +347,12 @@ void Scene::addEntityChild(Entity parent, Entity child){
 		}
 
 		//----------DEBUG
-		//Log::Debug("Add child - AFTER");
+		//Log::debug("Add child - AFTER");
 		//for (int i = 0; i < transforms->size(); i++){
 		//	auto transform = transforms->getComponentFromIndex(i);
-		//	Log::Debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
+		//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
 		//}
-		//Log::Debug("\n");
+		//Log::debug("\n");
 		//----------DEBUG
 	}
 

@@ -195,7 +195,7 @@ void System::setDataForKey(const char *key, Data& value){
     if (value.getMemPtr()) {
         System::instance().setStringForKey(key, Base64::encode(value.getMemPtr(), value.length()));
     }else{
-        Log::Error("No data to add for key: %s", key);
+        Log::error("No data to add for key: %s", key);
     }
 }
 

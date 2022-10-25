@@ -89,7 +89,7 @@ void Engine::addSceneLayer(Scene* scene){
         }
     }
     if (!foundSlot){
-        Log::Error("Scene layers is full. Max scenes is: %i", MAX_SCENE_LAYERS);
+        Log::error("Scene layers is full. Max scenes is: %i", MAX_SCENE_LAYERS);
     }
 }
 
@@ -425,7 +425,7 @@ void Engine::systemDraw(){
         }
     }
     if (updateLoops > 100){
-        Log::Warn("More than 100 updates in a frame");
+        Log::warn("More than 100 updates in a frame");
     }
 
     if (!isFixedTimeSceneUpdate()){

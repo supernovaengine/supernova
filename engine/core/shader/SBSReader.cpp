@@ -133,7 +133,7 @@ bool SBSReader::read(std::string filepath){
     File file;
 
     if (file.open(filepath.c_str()) != FileErrors::NO_ERROR){
-        Log::Error("Cannot open SBS file: %s", filepath.c_str());
+        Log::error("Cannot open SBS file: %s", filepath.c_str());
         return false;
     }
 
@@ -144,7 +144,7 @@ bool SBSReader::read(std::vector<unsigned char> datashader){
     Data data;
 
     if (data.open(&(datashader.front()), datashader.size(), false, false) != FileErrors::NO_ERROR){
-        Log::Error("Cannot read SBS file");
+        Log::error("Cannot read SBS file");
         return false;
     }
 
@@ -154,7 +154,7 @@ bool SBSReader::read(std::vector<unsigned char> datashader){
 bool SBSReader::read(FileData& file){
     uint32_t sbs = file.read32();
     if (sbs != SBS_CHUNK) {
-        Log::Error("Invalid sbs file format");
+        Log::error("Invalid sbs file format");
         return false;
     }
 
@@ -164,7 +164,7 @@ bool SBSReader::read(FileData& file){
     file.read((unsigned char*)&sinfo, sizeof(sinfo));
 
     if (sinfo.sbs_version != 100){
-        Log::Error("Invalid sbs file version");
+        Log::error("Invalid sbs file version");
         return false;
     }
 
@@ -197,7 +197,7 @@ bool SBSReader::read(FileData& file){
         } else if (sbsstage.type == SBS_STAGE_FRAGMENT) {
             shaderStage->type = ShaderStageType::FRAGMENT;
         } else {
-            Log::Error("SBS Stage not implemented");
+            Log::error("SBS Stage not implemented");
             return false;
         }
 

@@ -96,7 +96,7 @@ std::string ShaderPool::getShaderStr(ShaderType shaderType, std::string properti
 	}
 
 	if (str.empty())
-		Log::Error("Erro mapping shader type to string");
+		Log::error("Erro mapping shader type to string");
 
 	if (!properties.empty())
 		str += "_" + properties;
@@ -138,7 +138,7 @@ void ShaderPool::remove(ShaderType shaderType, std::string properties){
 			getMap().erase(shaderStr);
 		}
 	}else{
-		Log::Debug("Trying to destroy a not existent shader");
+		Log::debug("Trying to destroy a not existent shader");
 	}
 }
 

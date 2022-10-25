@@ -57,7 +57,7 @@ bool Model::readWholeFile(std::vector<unsigned char> *out, std::string *err, con
     Data filedata;
 
     if (filedata.open(filepath.c_str()) != FileErrors::NO_ERROR){
-        Log::Error("Model file not found: %s", filepath.c_str());
+        Log::error("Model file not found: %s", filepath.c_str());
         return false;
     }
 
@@ -100,7 +100,7 @@ std::string Model::readFileToString(const char* filename){
     Data filedata;
 
     if (filedata.open(filename) != FileErrors::NO_ERROR){
-        Log::Error("Model file not found: %s", filename);
+        Log::error("Model file not found: %s", filename);
         return "";
     }
     filedata.seek(0);
@@ -127,7 +127,7 @@ bool Model::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, int& eBuffe
 
         eBufferIndex++;
         if (eBufferIndex > MAX_EXTERNAL_BUFFERS){
-            Log::Error("External buffer limit reached for GLTF model");
+            Log::error("External buffer limit reached for GLTF model");
         }
 
         return true;
@@ -149,7 +149,7 @@ bool Model::loadGLTFTexture(int textureIndex, Texture& texture, std::string text
         }else if (image.component == 4){
             colorFormat = ColorFormat::RGBA;
         }else{
-            Log::Error("Not compatible image %i: Renders only support 8bpp and 32bpp", textureName.c_str());
+            Log::error("Not compatible image %i: Renders only support 8bpp and 32bpp", textureName.c_str());
             return false;
         }
 
@@ -268,7 +268,7 @@ Entity Model::generateSketetalStructure(ModelComponent& model, int nodeIndex, in
                                      (16 * sizeof(float) * index));
 
         if (accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT || accessor.type != TINYGLTF_TYPE_MAT4) {
-            Log::Error("Skeleton error: Unknown inverse bind matrix data type");
+            Log::error("Skeleton error: Unknown inverse bind matrix data type");
 
             return NULL_ENTITY;
         }
@@ -339,11 +339,11 @@ bool Model::loadOBJ(const char* filename){
     bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename, baseDir.c_str());
 
     if (!warn.empty()) {
-        Log::Warn("Loading OBJ model (%s): %s", filename, warn.c_str());
+        Log::warn("Loading OBJ model (%s): %s", filename, warn.c_str());
     }
 
     if (!err.empty()) {
-        Log::Error("Can't load OBJ model (%s): %s", filename, err.c_str());
+        Log::error("Can't load OBJ model (%s): %s", filename, err.c_str());
         return false;
     }
 
@@ -514,16 +514,16 @@ bool Model::loadGLTF(const char* filename) {
     }
 
     if (!warn.empty()) {
-        Log::Warn("Loading GLTF model (%s): %s", filename, warn.c_str());
+        Log::warn("Loading GLTF model (%s): %s", filename, warn.c_str());
     }
 
     if (!err.empty()) {
-        Log::Error("Can't load GLTF model (%s): %s", filename, err.c_str());
+        Log::error("Can't load GLTF model (%s): %s", filename, err.c_str());
         return false;
     }
 
     if (!res) {
-        Log::Verbose("Failed to load glTF: %s", filename);
+        Log::verbose("Failed to load glTF: %s", filename);
         return false;
     }
 
@@ -571,7 +571,7 @@ bool Model::loadGLTF(const char* filename) {
         }else if (indexAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT){
             indexType = AttributeDataType::UNSIGNED_INT;
         }else{
-            Log::Error("Unknown index type %i", indexAccessor.componentType);
+            Log::error("Unknown index type %i", indexAccessor.componentType);
             continue;
         }
 
@@ -582,7 +582,7 @@ bool Model::loadGLTF(const char* filename) {
             continue;
 
         if (mat.pbrMetallicRoughness.baseColorTexture.texCoord != 0){
-            Log::Error("Not supported texcoord for %s, only one per submesh: %s", "baseColorTexture", filename);
+            Log::error("Not supported texcoord for %s, only one per submesh: %s", "baseColorTexture", filename);
             continue;
         }
 
@@ -593,7 +593,7 @@ bool Model::loadGLTF(const char* filename) {
             continue;
 
         if (mat.pbrMetallicRoughness.metallicRoughnessTexture.texCoord != 0){
-            Log::Error("Not supported texcoord for %s, only one per submesh: %s", "metallicRoughnessTexture", filename);
+            Log::error("Not supported texcoord for %s, only one per submesh: %s", "metallicRoughnessTexture", filename);
             continue;
         }
 
@@ -604,7 +604,7 @@ bool Model::loadGLTF(const char* filename) {
             continue;
 
         if (mat.occlusionTexture.texCoord != 0){
-            Log::Error("Not supported texcoord for %s, only one per submesh: %s", "occlusionTexture", filename);
+            Log::error("Not supported texcoord for %s, only one per submesh: %s", "occlusionTexture", filename);
             continue;
         }
 
@@ -615,7 +615,7 @@ bool Model::loadGLTF(const char* filename) {
             continue;
 
         if (mat.emissiveTexture.texCoord != 0){
-            Log::Error("Not supported texcoord for %s, only one per submesh: %s", "emissiveTexture", filename);
+            Log::error("Not supported texcoord for %s, only one per submesh: %s", "emissiveTexture", filename);
             continue;
         }
 
@@ -626,7 +626,7 @@ bool Model::loadGLTF(const char* filename) {
             continue;
 
         if (mat.normalTexture.texCoord != 0){
-            Log::Error("Not supported texcoord for %s, only one per submesh: %s", "normalTexture", filename);
+            Log::error("Not supported texcoord for %s, only one per submesh: %s", "normalTexture", filename);
             continue;
         }
 
@@ -676,7 +676,7 @@ bool Model::loadGLTF(const char* filename) {
             }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT){
                 dataType = AttributeDataType::FLOAT;
             }else{
-                Log::Error("Unknown data type %i of %s", accessor.componentType, attrib.first.c_str());
+                Log::error("Unknown data type %i of %s", accessor.componentType, attrib.first.c_str());
                 continue;
             }
 
@@ -709,7 +709,7 @@ bool Model::loadGLTF(const char* filename) {
                     foundAttrs = true;
                     mesh.submeshes[i].hasVertexColor4 = true;
                 } else {
-                    Log::Warn("Not supported vector(3) of: %s", attrib.first.c_str());
+                    Log::warn("Not supported vector(3) of: %s", attrib.first.c_str());
                 }
             }
             if (attrib.first.compare("JOINTS_0") == 0){
@@ -726,7 +726,7 @@ bool Model::loadGLTF(const char* filename) {
                 mesh.buffers[bufferName]->setRenderAttributes(false);
                 addSubmeshAttribute(mesh.submeshes[i], bufferName, attType, elements, dataType, accessor.count, accessor.byteOffset, accessor.normalized);
             } else
-                Log::Warn("Model attribute missing: %s", attrib.first.c_str());
+                Log::warn("Model attribute missing: %s", attrib.first.c_str());
 
         }
 
@@ -766,7 +766,7 @@ bool Model::loadGLTF(const char* filename) {
                 }else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT){
                     dataType = AttributeDataType::FLOAT;
                 }else{
-                    Log::Error("Unknown data type %i of morph target %s", accessor.componentType, attribMorph.first.c_str());
+                    Log::error("Unknown data type %i of morph target %s", accessor.componentType, attribMorph.first.c_str());
                     continue;
                 }
 
@@ -892,7 +892,7 @@ bool Model::loadGLTF(const char* filename) {
 
         if (model.skeleton != NULL_ENTITY) {
             if (skin.joints.size() > MAX_BONES){
-                Log::Error("Cannot create skinning bigger than %i", MAX_BONES);
+                Log::error("Cannot create skinning bigger than %i", MAX_BONES);
                 return false;
             }
             scene->addEntityChild(entity, model.skeleton);
@@ -933,7 +933,7 @@ bool Model::loadGLTF(const char* filename) {
             if (accessorOut.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT) {
 
                 if (accessorIn.count != accessorOut.count) {
-                    Log::Error("Incorrect frame size in animation: %s, sampler: %i",
+                    Log::error("Incorrect frame size in animation: %s, sampler: %i",
                                animation.name.c_str(), channel.sampler);
                 }
 
@@ -1019,7 +1019,7 @@ bool Model::loadGLTF(const char* filename) {
                 }
 
             }else{
-                Log::Error("Cannot load animation: %s, channel %i: no float elements", animation.name.c_str(), j);
+                Log::error("Cannot load animation: %s, channel %i: no float elements", animation.name.c_str(), j);
             }
         }
 
@@ -1036,29 +1036,29 @@ bool Model::loadGLTF(const char* filename) {
 /*
     //BEGIN DEBUG
     for (auto &gltfmesh : gltfModel->meshes) {
-        Log::Verbose("mesh : %s", gltfmesh.name.c_str());
+        Log::verbose("mesh : %s", gltfmesh.name.c_str());
         for (auto &primitive : gltfmesh.primitives) {
             const tinygltf::Accessor &indexAccessor = gltfModel->accessors[primitive.indices];
 
-            Log::Verbose("indexaccessor: count %i, type %i", indexAccessor.count,
+            Log::verbose("indexaccessor: count %i, type %i", indexAccessor.count,
                     indexAccessor.componentType);
 
             tinygltf::Material &mat = gltfModel->materials[primitive.material];
             for (auto &mats : mat.values) {
-                Log::Verbose("mat : %s", mats.first.c_str());
+                Log::verbose("mat : %s", mats.first.c_str());
             }
 
             for (auto &image : gltfModel->images) {
-                Log::Verbose("image name : %s", image.uri.c_str());
-                Log::Verbose("  size : %i", image.image.size());
-                Log::Verbose("  w/h : %i/%i", image.width, image.height);
+                Log::verbose("image name : %s", image.uri.c_str());
+                Log::verbose("  size : %i", image.image.size());
+                Log::verbose("  w/h : %i/%i", image.width, image.height);
             }
 
-            Log::Verbose("indices : %i", primitive.indices);
-            Log::Verbose("mode     : %i", primitive.mode);
+            Log::verbose("indices : %i", primitive.indices);
+            Log::verbose("mode     : %i", primitive.mode);
 
             for (auto &attrib : primitive.attributes) {
-                Log::Verbose("attribute : %s", attrib.first.c_str());
+                Log::verbose("attribute : %s", attrib.first.c_str());
             }
         }
     }
@@ -1077,7 +1077,7 @@ Animation Model::getAnimation(int index){
     try{
         return Animation(scene, model.animations.at(index));
     }catch (const std::out_of_range& e){
-		Log::Error("Retrieving non-existent animation: %s", e.what());
+		Log::error("Retrieving non-existent animation: %s", e.what());
 		throw;
 	}
 }
@@ -1095,7 +1095,7 @@ Animation Model::findAnimation(std::string name){
             }
         }
     }
-    Log::Error("Retrieving non-existent bone: %s", name.c_str());
+    Log::error("Retrieving non-existent bone: %s", name.c_str());
     throw std::out_of_range("vector animations is out of range");
 }
 
@@ -1105,7 +1105,7 @@ Bone Model::getBone(std::string name){
     try{
         return Bone(scene, model.bonesNameMapping.at(name));
     }catch (const std::out_of_range& e){
-		Log::Error("Retrieving non-existent bone: %s", e.what());
+		Log::error("Retrieving non-existent bone: %s", e.what());
 		throw;
 	}
 }
@@ -1116,7 +1116,7 @@ Bone Model::getBone(int id){
     try{
         return Bone(scene, model.bonesIdMapping.at(id));
     }catch (const std::out_of_range& e){
-		Log::Error("Retrieving non-existent bone: %s", e.what());
+		Log::error("Retrieving non-existent bone: %s", e.what());
 		throw;
 	}
 }
@@ -1127,7 +1127,7 @@ float Model::getMorphWeight(std::string name){
     if (model.morphNameMapping.count(name)){
         return getMorphWeight(model.morphNameMapping.at(name));
     }else{
-        Log::Error("Retrieving non-existent morph weight '%s'", name.c_str());
+        Log::error("Retrieving non-existent morph weight '%s'", name.c_str());
     }
 
     return 0;
@@ -1139,7 +1139,7 @@ float Model::getMorphWeight(int id){
     if (id >= 0 && id < MAX_MORPHTARGETS){
         return mesh.morphWeights[id];
     }else{
-        Log::Error("Retrieving non-existent morph weight '%i'", id);
+        Log::error("Retrieving non-existent morph weight '%i'", id);
     }
 
     return 0;
@@ -1151,7 +1151,7 @@ void Model::setMorphWeight(std::string name, float value){
     if (model.morphNameMapping.count(name)){
         setMorphWeight(model.morphNameMapping.at(name), value);
     }else{
-        Log::Error("Retrieving non-existent morph weight '%s'", name.c_str());
+        Log::error("Retrieving non-existent morph weight '%s'", name.c_str());
     }
 }
 
@@ -1161,6 +1161,6 @@ void Model::setMorphWeight(int id, float value){
     if (id >= 0 && id < MAX_MORPHTARGETS){
         mesh.morphWeights[id] = value;
     }else{
-        Log::Error("Retrieving non-existent morph weight '%i'", id);
+        Log::error("Retrieving non-existent morph weight '%i'", id);
     }
 }

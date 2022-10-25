@@ -74,7 +74,7 @@ void Sprite::setFlipY(bool flipY){
             spritecomp.needUpdateSprite = true;
         }
     }else{
-        Log::Error("FlipY cannot be changed until disabled automatic by Engine::setAutomaticFlipY()");
+        Log::error("FlipY cannot be changed until disabled automatic by Engine::setAutomaticFlipY()");
     }
 }
 
@@ -113,7 +113,7 @@ void Sprite::addFrame(int id, std::string name, Rect rect){
     if (id >= 0 && id < MAX_SPRITE_FRAMES){
         spritecomp.framesRect[id] = {true, name, rect};
     }else{
-        Log::Error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
+        Log::error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
     }
 }
 
@@ -128,7 +128,7 @@ void Sprite::addFrame(std::string name, float x, float y, float width, float hei
     if (id < MAX_SPRITE_FRAMES){
         addFrame(id, name, Rect(x, y, width, height));
     }else{
-        Log::Error("Cannot set frame %s. Sprite frames reached limit of %i", name.c_str(), MAX_SPRITE_FRAMES);
+        Log::error("Cannot set frame %s. Sprite frames reached limit of %i", name.c_str(), MAX_SPRITE_FRAMES);
     }
 }
 
@@ -161,10 +161,10 @@ void Sprite::setFrame(int id){
         if (spritecomp.framesRect[id].active){
             setTextureRect(spritecomp.framesRect[id].rect);
         }else{
-            Log::Error("Cannot use non active sprite frame: %i", id);
+            Log::error("Cannot use non active sprite frame: %i", id);
         }
     }else{
-        Log::Error("Cannot use invalid sprite frame: %i", id);
+        Log::error("Cannot use invalid sprite frame: %i", id);
     }
 }
 
@@ -178,7 +178,7 @@ void Sprite::setFrame(std::string name){
     if (id < MAX_SPRITE_FRAMES){
         setFrame(id);
     }else{
-        Log::Error("Cannot use nonexistent sprite frame: %s", name.c_str());
+        Log::error("Cannot use nonexistent sprite frame: %s", name.c_str());
     }
 }
 

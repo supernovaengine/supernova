@@ -222,7 +222,7 @@ void ActionSystem::timedActionUpdate(double dt, Entity entity, ActionComponent& 
         }
 
         timedaction.value = timedaction.function.call(timedaction.time);
-        //Log::Debug("step time %f value %f \n", timedaction.time, timedaction.value);
+        //Log::debug("step time %f value %f \n", timedaction.time, timedaction.value);
     }
 }
 
@@ -590,7 +590,7 @@ void ActionSystem::morphTracksUpdate(KeyframeTracksComponent& keyframe, MorphTra
             mesh.morphWeights[morphIndex] = previousMorph[morphIndex] + keyframe.interpolation * (morpthtracks.values[keyframe.index][morphIndex] - previousMorph[morphIndex]);
         }
     }else{
-        Log::Error("MorphTrack of index %i is different size than index %i", keyframe.index, keyframe.index-1);
+        Log::error("MorphTrack of index %i is different size than index %i", keyframe.index, keyframe.index-1);
     }
 }
 

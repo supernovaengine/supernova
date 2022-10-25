@@ -80,11 +80,11 @@ bool TextureData::loadTextureFromFile(const char* filename) {
     int res = filedata.open(filename);
     
     if (res==FileErrors::FILE_NOT_FOUND){
-        Log::Error("Texture file not found: %s", filename);
+        Log::error("Texture file not found: %s", filename);
         return false;
     }
     if (res==FileErrors::INVALID_PARAMETER){
-        Log::Error("Texture file path is invalid: %s", filename);
+        Log::error("Texture file path is invalid: %s", filename);
         return false;
     }
     filedata.seek(0);
@@ -104,7 +104,7 @@ bool TextureData::loadTextureFromFile(const char* filename) {
     data = stbi_load_from_memory((stbi_uc const *)filedata.getMemPtr(), filedata.length(), &width, &height, &channels, desired_channels);
 
     if (!data){
-        Log::Error("Error loading texture file (%s): %s", filename, stbi_failure_reason());
+        Log::error("Error loading texture file (%s): %s", filename, stbi_failure_reason());
         return false;
     }
 

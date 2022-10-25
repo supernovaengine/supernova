@@ -40,7 +40,7 @@ sg_uniform_type SokolShader::uniformToSokolType(ShaderUniformType type){
     }else if (type == ShaderUniformType::INT4){
         return SG_UNIFORMTYPE_INT4;
     }else if (type == ShaderUniformType::MAT3){
-        Log::Error("Sokol cannot support MAT3 uniform type");
+        Log::error("Sokol cannot support MAT3 uniform type");
     }else if (type == ShaderUniformType::MAT4){
         return SG_UNIFORMTYPE_MAT4;
     }
@@ -126,7 +126,7 @@ bool SokolShader::createShader(ShaderData& shaderData){
         }
 
         if (SG_MAX_VERTEX_ATTRIBUTES < stage->attributes.size()){
-            Log::Error("Number of attributes of shader is bigger than SG_MAX_VERTEX_ATTRIBUTES");
+            Log::error("Number of attributes of shader is bigger than SG_MAX_VERTEX_ATTRIBUTES");
         }else{
             // attributes
             for (int a = 0; a < stage->attributes.size(); a++) {

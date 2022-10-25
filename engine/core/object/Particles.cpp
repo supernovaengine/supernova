@@ -98,7 +98,7 @@ void Particles::addSpriteFrame(int id, std::string name, Rect rect){
     if (id >= 0 && id < MAX_SPRITE_FRAMES){
         particomp.framesRect[id] = {true, name, rect};
     }else{
-        Log::Error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
+        Log::error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
     }
 }
 
@@ -113,7 +113,7 @@ void Particles::addSpriteFrame(std::string name, float x, float y, float width, 
     if (id < MAX_SPRITE_FRAMES){
         addSpriteFrame(id, name, Rect(x, y, width, height));
     }else{
-        Log::Error("Cannot set frame %s. Sprite frames reached limit of %i", name.c_str(), MAX_SPRITE_FRAMES);
+        Log::error("Cannot set frame %s. Sprite frames reached limit of %i", name.c_str(), MAX_SPRITE_FRAMES);
     }
 }
 

@@ -89,7 +89,7 @@ void Buffer::addAttribute(AttributeType attribute, Attribute attributeData){
     //if (size == 0) {
     attributes[attribute] = attributeData;
     //}else{
-    //    Log::Error("Cannot add attribute with not cleared buffer");
+    //    Log::error("Cannot add attribute with not cleared buffer");
     //}
 }
 
@@ -207,7 +207,7 @@ void Buffer::setValues(unsigned int index, Attribute* attribute, unsigned int nu
                 count = attribute->count;
         }
     }else{
-        Log::Error("Error add value, attribute not exist");
+        Log::error("Error add value, attribute not exist");
     }
 }
 
@@ -243,10 +243,10 @@ uint16_t Buffer::getUInt16(Attribute* attribute, unsigned int index, int element
         if ((pos+sizeof(uint16_t)) <= size){
             memcpy(&ret, &data[pos], sizeof(uint16_t));
         }else{
-            Log::Error("Attribute index is bigger than buffer");
+            Log::error("Attribute index is bigger than buffer");
         }
     }else{
-        Log::Error("Element index is not correct");
+        Log::error("Element index is not correct");
     }
 
     return ret;
@@ -260,10 +260,10 @@ uint32_t Buffer::getUInt32(Attribute* attribute, unsigned int index, int element
         if ((pos+sizeof(uint32_t)) <= size){
             memcpy(&ret, &data[pos], sizeof(uint32_t));
         }else{
-            Log::Error("Attribute index is bigger than buffer");
+            Log::error("Attribute index is bigger than buffer");
         }
     }else{
-        Log::Error("Element index is not correct");
+        Log::error("Element index is not correct");
     }
 
     return ret;
@@ -277,10 +277,10 @@ float Buffer::getFloat(Attribute* attribute, unsigned int index, int elementInde
         if ((pos+sizeof(float)) <= size){
             memcpy(&ret, &data[pos], sizeof(float));
         }else{
-            Log::Error("Attribute index is bigger than buffer");
+            Log::error("Attribute index is bigger than buffer");
         }
     }else{
-        Log::Error("Element index is not correct");
+        Log::error("Element index is not correct");
     }
 
     return ret;
@@ -293,7 +293,7 @@ Vector2 Buffer::getVector2(Attribute* attribute, unsigned int index){
     if ((pos + 2*sizeof(float)) <= size){
         memcpy(&ret, &data[pos], sizeof(float) * 2);
     }else{
-        Log::Error("Attribute index is bigger than buffer");
+        Log::error("Attribute index is bigger than buffer");
     }
 
     return ret;
@@ -306,7 +306,7 @@ Vector3 Buffer::getVector3(Attribute* attribute, unsigned int index){
     if ((pos + 3*sizeof(float)) <= size){
         memcpy(&ret, &data[pos], sizeof(float) * 3);
     }else{
-        Log::Error("Attribute index is bigger than buffer");
+        Log::error("Attribute index is bigger than buffer");
     }
 
     return ret;
@@ -319,7 +319,7 @@ Vector4 Buffer::getVector4(Attribute* attribute, unsigned int index){
     if ((pos + 4*sizeof(float)) <= size){
         memcpy(&ret, &data[pos], sizeof(float) * 4);
     }else{
-        Log::Error("Attribute index is bigger than buffer");
+        Log::error("Attribute index is bigger than buffer");
     }
 
     return ret;

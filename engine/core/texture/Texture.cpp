@@ -209,7 +209,7 @@ bool Texture::load(){
     if (loadFromPath){
 	    for (int f = 0; f < numFaces; f++){
             if (paths[f].empty() && type == TextureType::TEXTURE_CUBE){
-            	Log::Error("Cube texture is missing textures");
+            	Log::error("Cube texture is missing textures");
 			    return false;
             }
     	    data[f].loadTextureFromFile(paths[f].c_str());

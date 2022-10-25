@@ -28,7 +28,7 @@ namespace Supernova{
 
         void setSignature(Entity entity, Signature signature) {
         	if (signatures.count(entity)==0){
-                Log::Error("Entity does not exist");
+                Log::error("Entity does not exist");
             }
 
         	signatures[entity] = signature;
@@ -36,7 +36,7 @@ namespace Supernova{
 
         Signature getSignature(Entity entity) const{
         	if (signatures.count(entity)==0){
-                 Log::Error("Entity does not exist");
+                 Log::error("Entity does not exist");
             }
 
         	return signatures.at(entity);

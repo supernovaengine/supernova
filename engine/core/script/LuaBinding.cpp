@@ -45,30 +45,30 @@ lua_State* LuaBinding::getLuaState(){
 void LuaBinding::luaCallback(int nargs, int nresults, int msgh){
     int status = lua_pcall(LuaBinding::getLuaState(), nargs, nresults, msgh);
     if (status != 0){
-        Log::Error("Lua Error: %s", lua_tostring(LuaBinding::getLuaState(), -1));
+        Log::error("Lua Error: %s", lua_tostring(LuaBinding::getLuaState(), -1));
     }
 }
 
 void LuaBinding::stackDump (lua_State *L) {
     int i = lua_gettop(L);
-    Log::Debug(" ----------------  Stack Dump ----------------" );
+    Log::debug(" ----------------  Stack Dump ----------------" );
     while(  i   ) {
         int t = lua_type(L, i);
         switch (t) {
             case LUA_TSTRING:
-                Log::Debug("%d:`%s'", i, lua_tostring(L, i));
+                Log::debug("%d:`%s'", i, lua_tostring(L, i));
                 break;
             case LUA_TBOOLEAN:
-                Log::Debug("%d: %s",i,lua_toboolean(L, i) ? "true" : "false");
+                Log::debug("%d: %s",i,lua_toboolean(L, i) ? "true" : "false");
                 break;
             case LUA_TNUMBER:
-                Log::Debug("%d: %g",  i, lua_tonumber(L, i));
+                Log::debug("%d: %g",  i, lua_tonumber(L, i));
                 break;
-            default: Log::Debug("%d: %s", i, lua_typename(L, t)); break;
+            default: Log::debug("%d: %s", i, lua_typename(L, t)); break;
         }
         i--;
     }
-    Log::Debug("--------------- Stack Dump Finished ---------------" );
+    Log::debug("--------------- Stack Dump Finished ---------------" );
 }
 
 int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
@@ -203,12 +203,12 @@ void LuaBinding::init(){
     if (luaL_loadbuffer(L,(const char*)filedata.getMemPtr(),filedata.length(), luafile.c_str()) == 0){
         #ifndef NO_LUA_INIT
         if(lua_pcall(L, 0, LUA_MULTRET, msgh) != 0){
-            Log::Error("Lua Error: %s", lua_tostring(L,-1));
+            Log::error("Lua Error: %s", lua_tostring(L,-1));
             lua_close(L);
         }
         #endif
     }else{
-        Log::Error("Lua Error: %s", lua_tostring(L,-1));
+        Log::error("Lua Error: %s", lua_tostring(L,-1));
         lua_close(L);
     }
 
