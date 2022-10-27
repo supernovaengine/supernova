@@ -41,6 +41,7 @@
 #include "component/TranslateTracksComponent.h"
 #include "component/ScaleTracksComponent.h"
 #include "component/TerrainComponent.h"
+#include "component/AudioComponent.h"
 
 namespace Supernova{
 

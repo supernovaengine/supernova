@@ -30,6 +30,7 @@
 #include "Image.h"
 #include "Button.h"
 #include "TextEdit.h"
+#include "Audio.h"
 
 using namespace Supernova;
 
@@ -377,6 +378,38 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("textFont", &TextEdit::getTextFont, &TextEdit::setTextFont)
         .addProperty("fontSize", &TextEdit::getFontSize, &TextEdit::setFontSize)
         .addProperty("maxTextSize", &TextEdit::getMaxTextSize, &TextEdit::setMaxTextSize)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Audio, Object>("Audio")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("load", &Audio::load)
+        .addFunction("destroy", &Audio::destroy)
+        .addFunction("play", &Audio::play)
+        .addFunction("pause", &Audio::pause)
+        .addFunction("stop", &Audio::stop)
+        .addFunction("seek", &Audio::seek)
+        .addFunction("getLength", &Audio::getLength)
+        .addFunction("getPlayingTime", &Audio::getPlayingTime)
+        .addFunction("isPlaying", &Audio::isPlaying)
+        .addFunction("isPaused", &Audio::isPaused)
+        .addFunction("isStopped", &Audio::isStopped)
+        .addProperty("3DSound", &Audio::is3DSound, &Audio::set3DSound)
+        .addProperty("clockedSound", &Audio::isClockedSound, &Audio::setClockedSound)
+        .addProperty("volume", &Audio::getVolume, &Audio::setVolume)
+        .addProperty("speed", &Audio::getSpeed, &Audio::setSpeed)
+        .addProperty("pan", &Audio::getPan, &Audio::setPan)
+        .addProperty("lopping", &Audio::isLopping, &Audio::setLopping)
+        .addProperty("loopingPoint", &Audio::getLoopingPoint, &Audio::setLoopingPoint)
+        .addProperty("protectVoice", &Audio::isProtectVoice, &Audio::setProtectVoice)
+        .addFunction("setInaudibleBehavior", &Audio::setInaudibleBehavior)
+        .addFunction("setMinMaxDistance", &Audio::setMinMaxDistance)
+        .addProperty("minDistance", &Audio::getMinDistance, &Audio::setMinDistance)
+        .addProperty("maxDistance", &Audio::getMaxDistance, &Audio::setMaxDistance)
+        .addProperty("attenuationModel", &Audio::getAttenuationModel, &Audio::setAttenuationModel)
+        .addProperty("attenuationRolloffFactor", &Audio::getAttenuationRolloffFactor, &Audio::setAttenuationRolloffFactor)
+        .addProperty("dopplerFactor", &Audio::getDopplerFactor, &Audio::setDopplerFactor)
+        .addFunction("getAudioComponent", &Image::getComponent<AudioComponent>)
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

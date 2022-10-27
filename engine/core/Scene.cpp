@@ -7,6 +7,7 @@
 #include "subsystem/MeshSystem.h"
 #include "subsystem/UISystem.h"
 #include "subsystem/ActionSystem.h"
+#include "subsystem/AudioSystem.h"
 #include "util/Color.h"
 
 using namespace Supernova;
@@ -44,11 +45,13 @@ Scene::Scene(){
 	registerComponent<TranslateTracksComponent>();
 	registerComponent<ScaleTracksComponent>();
 	registerComponent<TerrainComponent>();
+	registerComponent<AudioComponent>();
 
 	registerSystem<ActionSystem>();
 	registerSystem<MeshSystem>();
 	registerSystem<UISystem>();
 	registerSystem<RenderSystem>();
+	registerSystem<AudioSystem>();
 
 	camera = NULL_ENTITY;
 

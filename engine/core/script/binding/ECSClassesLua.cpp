@@ -9,6 +9,7 @@
 #include "lauxlib.h"
 
 #include "LuaBridge.h"
+#include "EnumWrapper.h"
 
 #include "ecs/Entity.h"
 #include "ecs/Signature.h"
@@ -21,12 +22,16 @@
 #include "component/UIComponent.h"
 #include "component/ButtonComponent.h"
 #include "component/ParticlesAnimationComponent.h"
+#include "component/AudioComponent.h"
 
 using namespace Supernova;
 
 namespace luabridge
 {
     // Entity type is not necessary here because it already exists Stack<unsigned int>
+
+    template<> struct Stack<AudioState> : EnumWrapper<AudioState>{};
+    template<> struct Stack<Audio3DAttenuation> : EnumWrapper<Audio3DAttenuation>{};
 
     template <>
     struct Stack <Signature>
@@ -53,6 +58,21 @@ namespace luabridge
 
 void LuaBinding::registerECSClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("AudioState")
+        .addProperty("Playing", AudioState::Playing)
+        .addProperty("Paused", AudioState::Paused)
+        .addProperty("Stopped", AudioState::Stopped)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("Audio3DAttenuation")
+        .addProperty("NO_ATTENUATION", Audio3DAttenuation::NO_ATTENUATION)
+        .addProperty("INVERSE_DISTANCE", Audio3DAttenuation::INVERSE_DISTANCE)
+        .addProperty("LINEAR_DISTANCE", Audio3DAttenuation::LINEAR_DISTANCE)
+        .addProperty("EXPONENTIAL_DISTANCE", Audio3DAttenuation::EXPONENTIAL_DISTANCE)
+        .endNamespace();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<EntityManager>("EntityManager")
@@ -275,6 +295,38 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("spriteModifier", &ParticlesAnimationComponent::spriteModifier)
         .addProperty("rotationInitializer", &ParticlesAnimationComponent::rotationInitializer)
         .addProperty("rotationModifier", &ParticlesAnimationComponent::rotationModifier)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<AudioComponent>("AudioComponent")
+        .addProperty("handle", &AudioComponent::handle)
+        .addProperty("state", &AudioComponent::state)
+        .addProperty("filename", &AudioComponent::filename)
+        .addProperty("loaded", &AudioComponent::loaded)
+        .addProperty("enableClocked", &AudioComponent::enableClocked)
+        .addProperty("enable3D", &AudioComponent::enable3D)
+        .addProperty("lastPosition", &AudioComponent::lastPosition)
+        .addProperty("startTrigger", &AudioComponent::startTrigger)
+        .addProperty("stopTrigger", &AudioComponent::stopTrigger)
+        .addProperty("pauseTrigger", &AudioComponent::pauseTrigger)
+        .addProperty("onStart", [] (AudioComponent* self, lua_State* L) { return &self->onStart; }, [] (AudioComponent* self, lua_State* L) { self->onStart = L; })
+        .addProperty("onPause", [] (AudioComponent* self, lua_State* L) { return &self->onPause; }, [] (AudioComponent* self, lua_State* L) { self->onPause = L; })
+        .addProperty("onStop", [] (AudioComponent* self, lua_State* L) { return &self->onStop; }, [] (AudioComponent* self, lua_State* L) { self->onStop = L; })
+        .addProperty("volume", &AudioComponent::volume)
+        .addProperty("pan", &AudioComponent::pan)
+        .addProperty("looping", &AudioComponent::looping)
+        .addProperty("loopingPoint", &AudioComponent::loopingPoint)
+        .addProperty("protectVoice", &AudioComponent::protectVoice)
+        .addProperty("inaudibleBehaviorMustTick", &AudioComponent::inaudibleBehaviorMustTick)
+        .addProperty("inaudibleBehaviorKill", &AudioComponent::inaudibleBehaviorKill)
+        .addProperty("minDistance", &AudioComponent::minDistance)
+        .addProperty("maxDistance", &AudioComponent::maxDistance)
+        .addProperty("attenuationModel", &AudioComponent::attenuationModel)
+        .addProperty("attenuationRolloffFactor", &AudioComponent::attenuationRolloffFactor)
+        .addProperty("dopplerFactor", &AudioComponent::dopplerFactor)
+        .addProperty("length", &AudioComponent::length)
+        .addProperty("playingTime", &AudioComponent::playingTime)
+        .addProperty("needUpdate", &AudioComponent::needUpdate)
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

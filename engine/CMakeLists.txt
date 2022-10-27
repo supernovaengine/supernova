@@ -20,6 +20,7 @@ include_directories(libs/json)
 include_directories(libs/sokol)
 include_directories(libs/lua)
 include_directories(libs/stb)
+include_directories(libs/soloud/include)
 include_directories(libs/tinyobjloader)
 include_directories(libs/tinygltf)
 include_directories(libs/tinyxml2)
@@ -27,6 +28,7 @@ include_directories(libs/tinyxml2)
 add_subdirectory(libs/sokol)
 add_subdirectory(libs/lua)
 add_subdirectory(libs/stb)
+add_subdirectory(libs/soloud)
 add_subdirectory(libs/tinyobjloader)
 add_subdirectory(libs/tinygltf)
 add_subdirectory(libs/tinyxml2)
@@ -46,10 +48,8 @@ add_library(
 target_link_libraries(
     supernova
 
-    sokol lua stb tinyobjloader tinygltf tinyxml2
-
-    #supernova-renders
-    #soloud box2d tinyxml2
+    sokol lua stb tinyobjloader tinygltf tinyxml2 soloud
+    #box2d
 )
 
 set_target_properties(

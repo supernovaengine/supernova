@@ -29,7 +29,7 @@ extern "C" {
     }
     EMSCRIPTEN_KEEPALIVE void syncfs_enable_callback(const char* err) {
 	    if (!err || err[0]) {
-		    Supernova::Log::Error("Failed to enable IndexedDB: %s", err);
+		    Supernova::Log::error("Failed to enable IndexedDB: %s", err);
             SupernovaWeb::setEnabledIDB(false);
 	    }else{
             SupernovaWeb::setEnabledIDB(true);
@@ -37,7 +37,7 @@ extern "C" {
     }
     EMSCRIPTEN_KEEPALIVE void syncfs_callback(const char* err) {
 	    if (!err || err[0]) {
-		    Supernova::Log::Error("Failed to save in iDB file system: %s", err);
+		    Supernova::Log::error("Failed to save in iDB file system: %s", err);
 	    }
     }
 }

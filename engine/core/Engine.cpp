@@ -8,6 +8,7 @@
 #include "Input.h"
 #include "render/SystemRender.h"
 #include "script/LuaBinding.h"
+#include "subsystem/AudioSystem.h"
 
 #include "sokol_time.h"
 
@@ -443,7 +444,7 @@ void Engine::systemDraw(){
     }
     
     SystemRender::commit();
-    //SoundManager::checkActive();
+    AudioSystem::checkActive();
 }
 
 void Engine::systemShutdown(){
@@ -456,11 +457,11 @@ void Engine::systemShutdown(){
 }
 
 void Engine::systemPause(){
-    //SoundManager::pauseAll();
+    AudioSystem::pauseAll();
 }
 
 void Engine::systemResume(){
-    //SoundManager::resumeAll();
+    AudioSystem::resumeAll();
 }
 
 bool Engine::transformCoordPos(float& x, float& y){

@@ -2059,6 +2059,12 @@ void RenderSystem::update(double dt){
 
 				updateTerrain(terrain, transform, camera, cameraTransform);
 			}
+
+			if (signature.test(scene->getComponentType<AudioComponent>())){
+				AudioComponent& audio = scene->getComponent<AudioComponent>(entity);
+
+				audio.needUpdate = true;
+			}
 		}
 
         if (signature.test(scene->getComponentType<ParticlesComponent>())){
