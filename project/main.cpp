@@ -78,7 +78,7 @@ void init(){
 }
 
 void onActionStart(){
-    Log::Verbose("Action Start");
+    Log::verbose("Action Start");
 }
 
 void onKeyDown(int key, bool repeat, int mods){
@@ -277,7 +277,7 @@ void init(){
 }
 
 void onActionStart(){
-    Log::Verbose("Action Start");
+    Log::verbose("Action Start");
 }
 
 void onKeyDown(int key, bool repeat, int mods){
@@ -349,6 +349,7 @@ void onKeyDown(int key, bool repeat, int mods){
 #include "Image.h"
 #include "Button.h"
 #include "TextEdit.h"
+#include "Audio.h"
 
 using namespace Supernova;
 
@@ -387,6 +388,7 @@ Light lightDir(&scene);
 Light lightPoint(&scene);
 Light lightSpot(&scene);
 //Sprite billboard(&scene, 20, 20);
+Audio audio(&scene);
 
 Scene uiscene;
 //Sprite spriteui(&uiscene, 200, 200);
@@ -506,7 +508,7 @@ void init(){
 
     camera.setPosition(0,16,-30);
     camera.setName("camera");
-    carro.addChild(&camera);
+    //carro.addChild(&camera);
 
     //carro.loadModel("AnimatedMorphCube.glb");
     //carro.getAnimation(0).setSpeed(2);
@@ -532,6 +534,11 @@ void init(){
     terrain.setTextureDetailGreen("block.png");
     terrain.setTextureDetailBlue("block.png");
 
+    audio.set3DSound(true); //TODO: RELOAD
+    audio.load("song.mp3");
+    audio.play();
+
+    carro.addChild(&audio);
    
 //    std::vector<std::string> teste = System::instance().args;
 //
@@ -645,16 +652,16 @@ void onUpdate(){
 }
 
 void onButtonPress(){
-    Log::Verbose("Button pressed!!");
+    Log::verbose("Button pressed!!");
 }
 
 void onButtonRelease(){
-    Log::Verbose("Button released!!");
+    Log::verbose("Button released!!");
     uibutton2.setDisabled(true);
 }
 
 void onButtonMouseMove(){
-    Log::Verbose("Button mouse move!!");
+    Log::verbose("Button mouse move!!");
 }
 
 void onViewLoaded(){
@@ -662,16 +669,16 @@ void onViewLoaded(){
 }
 
 void onTouchStart(int pointer, float x, float y){
-    Log::Verbose("Touch start %i - %f %f", pointer, x, y);
+    Log::verbose("Touch start %i - %f %f", pointer, x, y);
 }
 void onTouchMove(int pointer, float x, float y){
-    Log::Verbose("Touch move %i - %f %f", pointer, x, y);
+    Log::verbose("Touch move %i - %f %f", pointer, x, y);
 }
 void onTouchEnd(int pointer, float x, float y){
-    Log::Verbose("Touch end %i - %f %f", pointer, x, y);
+    Log::verbose("Touch end %i - %f %f", pointer, x, y);
 }
 void onTouchCancel(){
-    Log::Verbose("Touch cancel");
+    Log::verbose("Touch cancel");
 }
 
 void onMouseDown(int button, float x, float y, int mods){
@@ -722,7 +729,7 @@ void onMouseDown(int button, float x, float y, int mods){
         bt = "middle";
 
 
-    Log::Verbose("Mouse down - %s - %s", bt.c_str(), modifier.c_str());
+    Log::verbose("Mouse down - %s - %s", bt.c_str(), modifier.c_str());
 }
 
 void onMouseUp(int button, float x, float y, int mods){
@@ -750,28 +757,28 @@ void onMouseUp(int button, float x, float y, int mods){
         bt = "middle";
 
 
-    Log::Verbose("Mouse up - %s - %s", bt.c_str(), modifier.c_str());
+    Log::verbose("Mouse up - %s - %s", bt.c_str(), modifier.c_str());
 }
 
 void onMouseMove(float x, float y, int mods){
-    //Log::Verbose("Mouse %f %f", x, y);
+    //Log::verbose("Mouse %f %f", x, y);
 }
 
 void onMouseScroll(float xoffset, float yoffset, int mods){
     if (xoffset != 0 || yoffset != 0)
-        Log::Verbose("Mouse scroll %f %f", xoffset, yoffset);
+        Log::verbose("Mouse scroll %f %f", xoffset, yoffset);
 }
 
 void onMouseEnter(){
-    //Log::Verbose("Mouse enter");
+    //Log::verbose("Mouse enter");
 }
 
 void onMouseLeave(){
-    //Log::Verbose("Mouse leave");
+    //Log::verbose("Mouse leave");
 }
 
 void onCharInput(wchar_t codepoint){
-    Log::Verbose("%s",StringUtils::toUTF8(codepoint).c_str());
+    Log::verbose("%s",StringUtils::toUTF8(codepoint).c_str());
     //label.setText(StringUtils::toUTF8(codepoint));
 }
 
@@ -794,7 +801,7 @@ void onKeyDown(int key, bool repeat, int mods){
     if (repeat)
         rstr = "repeated";
     
-    Log::Verbose("KeyDown: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
+    Log::verbose("KeyDown: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
 
 void onKeyUp(int key, bool repeat, int mods){
@@ -823,5 +830,5 @@ void onKeyUp(int key, bool repeat, int mods){
     if (repeat)
         rstr = "repeated";
     
-    Log::Verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
+    Log::verbose("KeyUp: %i - %s - %s",key, modifier.c_str(), rstr.c_str());
 }
