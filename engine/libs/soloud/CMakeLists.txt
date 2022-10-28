@@ -4,6 +4,8 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../stb")
 
+set(PLATFORM_LIBS)
+
 add_library(
 
     soloud
@@ -54,9 +56,17 @@ add_library(
 if(APPLE)
     #set_source_files_properties(src/backend/miniaudio/soloud_miniaudio.cpp PROPERTIES LANGUAGE OBJCXX)
     set_source_files_properties(src/backend/miniaudio/soloud_miniaudio.cpp PROPERTIES XCODE_EXPLICIT_FILE_TYPE "sourcecode.cpp.objcpp")
+    
+    find_library(AV_FOUNDATION_LIBRARY AVFoundation)
+    find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+
+    list(APPEND PLATFORM_LIBS
+        ${AV_FOUNDATION_LIBRARY} ${AUDIOTOOLBOX_LIBRARY}
+    )
 endif()
 
 target_link_libraries(
         soloud
         stb
+        ${PLATFORM_LIBS}
 )
