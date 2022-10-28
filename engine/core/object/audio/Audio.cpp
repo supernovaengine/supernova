@@ -16,7 +16,7 @@ Audio::~Audio(){
 
 }
 
-int Audio::load(std::string filename){
+int Audio::loadAudio(std::string filename){
     AudioComponent& audio = getComponent<AudioComponent>();
 
     audio.filename = filename;
@@ -24,7 +24,7 @@ int Audio::load(std::string filename){
     return scene->getSystem<AudioSystem>()->loadAudio(audio, entity);
 }
 
-void Audio::destroy(){
+void Audio::destroyAudio(){
     AudioComponent& audio = getComponent<AudioComponent>();
 
     scene->getSystem<AudioSystem>()->destroyAudio(audio);

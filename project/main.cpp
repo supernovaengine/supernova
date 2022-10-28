@@ -535,7 +535,7 @@ void init(){
     terrain.setTextureDetailBlue("block.png");
 
     audio.set3DSound(true); //TODO: RELOAD
-    audio.load("song.mp3");
+    audio.loadAudio("song.mp3");
     audio.play();
 
     carro.addChild(&audio);
