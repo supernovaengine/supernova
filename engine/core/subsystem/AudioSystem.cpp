@@ -44,9 +44,9 @@ void AudioSystem::deInit(){
 bool AudioSystem::loadAudio(AudioComponent& audio, Entity entity){
     Data filedata;
 
-    if (filedata.open(audio.filename.c_str()) != FileErrors::NO_ERROR){
+    if (filedata.open(audio.filename.c_str()) != FileErrors::FILEDATA_OK){
         Log::error("Audio file not found: %s", audio.filename.c_str());
-        return SoLoud::SOLOUD_ERRORS::FILE_NOT_FOUND;
+        return false;
     }
 
     SoLoud::result res = samples[entity].loadMem(filedata.getMemPtr(), filedata.length(), false, false);

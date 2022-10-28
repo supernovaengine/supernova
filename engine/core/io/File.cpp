@@ -82,7 +82,7 @@ unsigned int File::open(const char *aFilename, bool write){
     }
     if (!fileHandle)
         return FileErrors::FILE_NOT_FOUND;
-    return FileErrors::NO_ERROR;
+    return FileErrors::FILEDATA_OK;
 }
 
 void File::flush(){

@@ -132,7 +132,7 @@ SBSReader::~SBSReader(){
 bool SBSReader::read(std::string filepath){
     File file;
 
-    if (file.open(filepath.c_str()) != FileErrors::NO_ERROR){
+    if (file.open(filepath.c_str()) != FileErrors::FILEDATA_OK){
         Log::error("Cannot open SBS file: %s", filepath.c_str());
         return false;
     }
@@ -143,7 +143,7 @@ bool SBSReader::read(std::string filepath){
 bool SBSReader::read(std::vector<unsigned char> datashader){
     Data data;
 
-    if (data.open(&(datashader.front()), datashader.size(), false, false) != FileErrors::NO_ERROR){
+    if (data.open(&(datashader.front()), datashader.size(), false, false) != FileErrors::FILEDATA_OK){
         Log::error("Cannot read SBS file");
         return false;
     }

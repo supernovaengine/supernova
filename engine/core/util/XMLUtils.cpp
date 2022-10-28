@@ -17,7 +17,7 @@ tinyxml2::XMLElement* XMLUtils::getNodeForKey(const char* XMLFilePath, const cha
     File file;
 
     std::string xmlBuffer = "";
-    if (file.open(XMLFilePath) == FileErrors::NO_ERROR)
+    if (file.open(XMLFilePath) == FileErrors::FILEDATA_OK)
         xmlBuffer = file.readString();
 
     if (!xmlBuffer.empty()) {
@@ -107,7 +107,7 @@ void XMLUtils::setValueForKey(const char* XMLFilePath, const char* rootName, con
         }
 
         File file;
-        if (file.open(XMLFilePath, true) == FileErrors::NO_ERROR) {
+        if (file.open(XMLFilePath, true) == FileErrors::FILEDATA_OK) {
             doc.SaveFile(file.getFilePtr());
         } else {
             Log::error("Can't save XML file: %s. Does dir '%s' exist?", XMLFilePath, FileData::getSystemPath(XMLFilePath).c_str());
@@ -133,7 +133,7 @@ void XMLUtils::removeKey(const char* XMLFilePath, const char* rootName, const ch
             doc.DeleteNode(node);
 
             File file;
-            if (file.open(XMLFilePath, true) == FileErrors::NO_ERROR) {
+            if (file.open(XMLFilePath, true) == FileErrors::FILEDATA_OK) {
                 doc.SaveFile(file.getFilePtr());
             } else {
                 Log::error("Can't save XML file: %s. Does dir '%s' exist?", XMLFilePath, FileData::getSystemPath(XMLFilePath).c_str());

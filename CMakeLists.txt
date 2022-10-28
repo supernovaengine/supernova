@@ -91,7 +91,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
         set(USE_WEBGL2 "-s USE_WEBGL2=1")
     endif()
 
-    add_definitions("-DWITH_SDL_STATIC") # For SoLoud
+    add_definitions("-DWITH_MINIAUDIO") # For SoLoud
 
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
 

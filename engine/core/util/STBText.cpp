@@ -78,12 +78,12 @@ TextureData* STBText::load(std::string fontpath, unsigned int fontSize){
     Data fontData;
 
     if (!fontpath.empty()) {
-        if (fontData.open(fontpath.c_str()) != FileErrors::NO_ERROR) {
+        if (fontData.open(fontpath.c_str()) != FileErrors::FILEDATA_OK) {
             Log::error("Font file not found: %s", fontpath.c_str());
             return NULL;
         }
     }else{
-        if (fontData.open(roboto_v20_latin_regular_ttf, roboto_v20_latin_regular_ttf_len, false, false) != FileErrors::NO_ERROR) {
+        if (fontData.open(roboto_v20_latin_regular_ttf, roboto_v20_latin_regular_ttf_len, false, false) != FileErrors::FILEDATA_OK) {
             Log::error("Can't open default font");
             return NULL;
         }

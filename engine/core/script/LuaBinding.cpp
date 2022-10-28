@@ -191,7 +191,7 @@ void LuaBinding::init(){
     Data filedata;
 
     //First try open on root assets dir
-    if (filedata.open(luafile.c_str()) != FileErrors::NO_ERROR){
+    if (filedata.open(luafile.c_str()) != FileErrors::FILEDATA_OK){
         //Second try to open on lua dir
         filedata.open(luafile_subdir.c_str());
     }

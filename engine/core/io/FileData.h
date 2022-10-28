@@ -13,7 +13,7 @@
 namespace Supernova {
 
     enum FileErrors{
-        NO_ERROR       = 0,
+        FILEDATA_OK       = 0,
         INVALID_PARAMETER = 1,
         FILE_NOT_FOUND    = 2,
         OUT_OF_MEMORY    = 3

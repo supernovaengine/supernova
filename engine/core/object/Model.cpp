@@ -56,7 +56,7 @@ bool Model::fileExists(const std::string &abs_filename, void *) {
 bool Model::readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *) {
     Data filedata;
 
-    if (filedata.open(filepath.c_str()) != FileErrors::NO_ERROR){
+    if (filedata.open(filepath.c_str()) != FileErrors::FILEDATA_OK){
         Log::error("Model file not found: %s", filepath.c_str());
         return false;
     }
@@ -99,7 +99,7 @@ bool Model::readWholeFile(std::vector<unsigned char> *out, std::string *err, con
 std::string Model::readFileToString(const char* filename){
     Data filedata;
 
-    if (filedata.open(filename) != FileErrors::NO_ERROR){
+    if (filedata.open(filename) != FileErrors::FILEDATA_OK){
         Log::error("Model file not found: %s", filename);
         return "";
     }

@@ -28,7 +28,7 @@ void LuaBinding::registerIOClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginNamespace("FileErrors")
-        .addProperty("NO_ERROR", FileErrors::NO_ERROR)
+        .addProperty("NO_ERROR", FileErrors::FILEDATA_OK)
         .addProperty("INVALID_PARAMETER", FileErrors::INVALID_PARAMETER)
         .addProperty("FILE_NOT_FOUND", FileErrors::FILE_NOT_FOUND)
         .addProperty("OUT_OF_MEMORY", FileErrors::OUT_OF_MEMORY)

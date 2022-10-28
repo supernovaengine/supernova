@@ -4,7 +4,7 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../stb")
 
-set(PLATFORM_LIBS)
+set(SOLOUD_PLATFORM_LIBS)
 
 add_library(
 
@@ -60,7 +60,7 @@ if(APPLE)
     find_library(AV_FOUNDATION_LIBRARY AVFoundation)
     find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
 
-    list(APPEND PLATFORM_LIBS
+    list(APPEND SOLOUD_PLATFORM_LIBS
         ${AV_FOUNDATION_LIBRARY} ${AUDIOTOOLBOX_LIBRARY}
     )
 endif()
@@ -68,5 +68,5 @@ endif()
 target_link_libraries(
         soloud
         stb
-        ${PLATFORM_LIBS}
+        ${SOLOUD_PLATFORM_LIBS}
 )

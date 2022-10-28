@@ -108,12 +108,12 @@ unsigned int Data::open(unsigned char *aData, unsigned int aDataLength, bool aCo
         if (dataPtr == NULL)
             return FileErrors::OUT_OF_MEMORY;
         memcpy(dataPtr, aData, aDataLength);
-        return FileErrors::NO_ERROR;
+        return FileErrors::FILEDATA_OK;
     }
 
     dataPtr = aData;
     dataOwned = aTakeOwnership;
-    return FileErrors::NO_ERROR;
+    return FileErrors::FILEDATA_OK;
 }
 
 unsigned int Data::open(const char *aFilename) {
@@ -133,7 +133,7 @@ unsigned int Data::open(const char *aFilename) {
         return FileErrors::OUT_OF_MEMORY;
     df.read(dataPtr, dataLength);
     dataOwned = true;
-    return FileErrors::NO_ERROR;
+    return FileErrors::FILEDATA_OK;
 }
 
 unsigned int Data::open(File *aFile) {
@@ -148,7 +148,7 @@ unsigned int Data::open(File *aFile) {
         return FileErrors::OUT_OF_MEMORY;
     aFile->read(dataPtr, dataLength);
     dataOwned = true;
-    return FileErrors::NO_ERROR;
+    return FileErrors::FILEDATA_OK;
 }
 
 int Data::eof() {
