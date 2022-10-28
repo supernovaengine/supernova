@@ -283,6 +283,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             ${PLATFORM_ROOT}/SupernovaApple.mm
         )
 
+        find_library(AV_FOUNDATION_LIBRARY AVFoundation)
+        find_library(AUDIOTOOLBOX_LIBRARY AudioToolbox)
+
+        list(APPEND PLATFORM_LIBS
+            ${AV_FOUNDATION_LIBRARY} ${AUDIOTOOLBOX_LIBRARY}
+        )
+
         list(APPEND PLATFORM_RESOURCES
             ${PLATFORM_ROOT}/macos/Main.storyboard
         )
