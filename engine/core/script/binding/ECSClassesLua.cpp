@@ -31,7 +31,7 @@ namespace luabridge
     // Entity type is not necessary here because it already exists Stack<unsigned int>
 
     template<> struct Stack<AudioState> : EnumWrapper<AudioState>{};
-    template<> struct Stack<Audio3DAttenuation> : EnumWrapper<Audio3DAttenuation>{};
+    template<> struct Stack<AudioAttenuation> : EnumWrapper<AudioAttenuation>{};
 
     template <>
     struct Stack <Signature>
@@ -67,11 +67,11 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
-        .beginNamespace("Audio3DAttenuation")
-        .addProperty("NO_ATTENUATION", Audio3DAttenuation::NO_ATTENUATION)
-        .addProperty("INVERSE_DISTANCE", Audio3DAttenuation::INVERSE_DISTANCE)
-        .addProperty("LINEAR_DISTANCE", Audio3DAttenuation::LINEAR_DISTANCE)
-        .addProperty("EXPONENTIAL_DISTANCE", Audio3DAttenuation::EXPONENTIAL_DISTANCE)
+        .beginNamespace("AudioAttenuation")
+        .addProperty("NO_ATTENUATION", AudioAttenuation::NO_ATTENUATION)
+        .addProperty("INVERSE_DISTANCE", AudioAttenuation::INVERSE_DISTANCE)
+        .addProperty("LINEAR_DISTANCE", AudioAttenuation::LINEAR_DISTANCE)
+        .addProperty("EXPONENTIAL_DISTANCE", AudioAttenuation::EXPONENTIAL_DISTANCE)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)

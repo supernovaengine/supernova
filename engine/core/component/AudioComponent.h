@@ -11,7 +11,7 @@ namespace Supernova{
         Stopped
     };
 
-    enum class Audio3DAttenuation{
+    enum class AudioAttenuation{
         NO_ATTENUATION,
         INVERSE_DISTANCE,
         LINEAR_DISTANCE,
@@ -49,7 +49,7 @@ namespace Supernova{
         // for 3D sound
         float minDistance = 1.0;
         float maxDistance = 1000.0;
-        Audio3DAttenuation attenuationModel = Audio3DAttenuation::NO_ATTENUATION;
+        AudioAttenuation attenuationModel = AudioAttenuation::NO_ATTENUATION;
         float attenuationRolloffFactor = 1.0; // means that end of max distance sound will be zero
         float dopplerFactor = 1.0;
 

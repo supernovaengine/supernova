@@ -231,14 +231,14 @@ float Audio::getMaxDistance() const{
     return audio.maxDistance;
 }
 
-void Audio::setAttenuationModel(Audio3DAttenuation attenuationModel){
+void Audio::setAttenuationModel(AudioAttenuation attenuationModel){
     AudioComponent& audio = getComponent<AudioComponent>();
 
     audio.attenuationModel = attenuationModel;
     audio.needUpdate = true;
 }
 
-Audio3DAttenuation Audio::getAttenuationModel() const{
+AudioAttenuation Audio::getAttenuationModel() const{
     AudioComponent& audio = getComponent<AudioComponent>();
 
     return audio.attenuationModel;

@@ -206,11 +206,11 @@ void AudioSystem::update(double dt){
                         Vector3 camVelocity = cameraLastPosition - camWorldPos;
 
                         unsigned int attModel = SoLoud::AudioSource::NO_ATTENUATION;
-                        if (audio.attenuationModel == Audio3DAttenuation::INVERSE_DISTANCE)
+                        if (audio.attenuationModel == AudioAttenuation::INVERSE_DISTANCE)
                             attModel = SoLoud::AudioSource::INVERSE_DISTANCE;
-                        if (audio.attenuationModel == Audio3DAttenuation::LINEAR_DISTANCE)
+                        if (audio.attenuationModel == AudioAttenuation::LINEAR_DISTANCE)
                             attModel = SoLoud::AudioSource::LINEAR_DISTANCE;
-                        if (audio.attenuationModel == Audio3DAttenuation::EXPONENTIAL_DISTANCE)
+                        if (audio.attenuationModel == AudioAttenuation::EXPONENTIAL_DISTANCE)
                             attModel = SoLoud::AudioSource::EXPONENTIAL_DISTANCE;
 
                         soloud.set3dSourceMinMaxDistance(audio.handle, audio.minDistance, audio.maxDistance);

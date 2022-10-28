@@ -62,8 +62,8 @@ namespace Supernova {
         void setMaxDistance(float maxDistance);
         float getMaxDistance() const;
 
-        void setAttenuationModel(Audio3DAttenuation attenuationModel);
-        Audio3DAttenuation getAttenuationModel() const;
+        void setAttenuationModel(AudioAttenuation attenuationModel);
+        AudioAttenuation getAttenuationModel() const;
 
         void setAttenuationRolloffFactor(float attenuationRolloffFactor);
         float getAttenuationRolloffFactor() const;
