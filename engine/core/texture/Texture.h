@@ -53,6 +53,9 @@ namespace Supernova{
             std::string getPath(size_t index = 0);
             TextureData& getData(size_t index = 0);
 
+            int getWidth();
+            int getHeight();
+
             void setReleaseDataAfterLoad(bool releaseDataAfterLoad);
             void releaseData();
 

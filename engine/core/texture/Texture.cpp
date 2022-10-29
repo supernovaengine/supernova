@@ -190,6 +190,9 @@ void Texture::setFramebuffer(FramebufferRender* framebuffer){
 
 bool Texture::load(){
 
+    if (framebuffer)
+        return true;
+
     if (!needLoad)
         return false;
 
@@ -261,6 +264,20 @@ std::string Texture::getPath(size_t index){
 
 TextureData& Texture::getData(size_t index){
     return data[index];
+}
+
+int Texture::getWidth(){
+    if (this->framebuffer){
+        return framebuffer->getWidth();
+    }
+    return getData().getWidth();
+}
+
+int Texture::getHeight(){
+    if (this->framebuffer){
+        return framebuffer->getWidth();
+    }
+    return getData().getWidth();
 }
 
 void Texture::setReleaseDataAfterLoad(bool releaseDataAfterLoad){

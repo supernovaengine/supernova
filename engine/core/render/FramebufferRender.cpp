@@ -2,7 +2,10 @@
 
 using namespace Supernova;
 
-FramebufferRender::FramebufferRender(){ }
+FramebufferRender::FramebufferRender(){
+    this->width = 0;
+    this->height = 0;
+ }
 
 FramebufferRender::FramebufferRender(const FramebufferRender& rhs) : backend(rhs.backend) { }
 
@@ -16,6 +19,8 @@ FramebufferRender::~FramebufferRender(){
 }
 
 bool FramebufferRender::createFramebuffer(TextureType textureType, int width, int height, bool shadowMap){
+    this->width = width;
+    this->height = height;
     return backend.createFramebuffer(textureType, width, height, shadowMap);
 }
 
@@ -29,4 +34,12 @@ bool FramebufferRender::isCreated(){
 
 TextureRender& FramebufferRender::getColorTexture(){
     return backend.getColorTexture();
+}
+
+int FramebufferRender::getWidth(){
+    return this->width;
+}
+
+int FramebufferRender::getHeight(){
+    return this->height;
 }

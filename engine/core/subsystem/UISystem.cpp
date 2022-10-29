@@ -29,8 +29,8 @@ UISystem::~UISystem(){
 bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
 
     ui.texture.load();
-    unsigned int texWidth = ui.texture.getData().getWidth();
-    unsigned int texHeight = ui.texture.getData().getHeight();
+    unsigned int texWidth = ui.texture.getWidth();
+    unsigned int texHeight = ui.texture.getHeight();
 
     if (texWidth == 0 || texHeight == 0){
         Log::warn("Cannot create UI image without texture");
@@ -315,7 +315,8 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     }
 
     float textX = img.patchMarginLeft - textXOffset;
-    float textY = (heightArea / 2) + (textui.height / 2);
+    // descend is negative
+    float textY = img.patchMarginTop + (heightArea / 2) + (textui.height / 2) + text.stbtext->getDescent();
 
     Vector3 textPosition = Vector3(textX, textY, 0);
 

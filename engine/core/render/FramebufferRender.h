@@ -11,6 +11,8 @@ namespace Supernova{
         //***Backend***
         SokolFramebuffer backend;
         //***
+        int width;
+        int height;
         
         FramebufferRender();
         FramebufferRender(const FramebufferRender& rhs);
@@ -22,6 +24,9 @@ namespace Supernova{
         bool isCreated();
 
         TextureRender& getColorTexture();
+
+        int getWidth();
+        int getHeight();
     };
 }
 
