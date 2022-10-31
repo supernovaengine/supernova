@@ -1,14 +1,3 @@
-if(DEFINED NO_LUA_INIT)
-    add_definitions("-DNO_LUA_INIT=${NO_LUA_INIT}")
-    unset(NO_LUA_INIT CACHE)
-endif()
-if(DEFINED NO_CPP_INIT)
-    add_definitions("-DNO_CPP_INIT=${NO_CPP_INIT}")
-    unset(NO_CPP_INIT CACHE)
-endif()
-
-add_definitions("-DPROJECT_ROOT=\"${PROJECT_ROOT}\"")
-
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 include_directories(shaders)
@@ -32,6 +21,17 @@ add_subdirectory(libs/soloud)
 add_subdirectory(libs/tinyobjloader)
 add_subdirectory(libs/tinygltf)
 add_subdirectory(libs/tinyxml2)
+
+if(DEFINED NO_LUA_INIT)
+    add_definitions("-DNO_LUA_INIT=${NO_LUA_INIT}")
+    unset(NO_LUA_INIT CACHE)
+endif()
+if(DEFINED NO_CPP_INIT)
+    add_definitions("-DNO_CPP_INIT=${NO_CPP_INIT}")
+    unset(NO_CPP_INIT CACHE)
+endif()
+
+#add_definitions("-DPROJECT_ROOT=\"${PROJECT_ROOT}\"")
 
 file(GLOB_RECURSE SUPERNOVA_SRCS core/*.cpp)
 file(GLOB RENDER_SOKOL_SRC renders/sokol/*.cpp)
