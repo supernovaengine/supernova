@@ -280,10 +280,10 @@ EM_BOOL SupernovaWeb::mouse_callback(int eventType, const EmscriptenMouseEvent *
     int width = SupernovaWeb::screenWidth;
     int height = SupernovaWeb::screenHeight;
 
-    if (e->canvasX < 0) return 0;
-    if (e->canvasY < 0) return 0;
-    if (e->canvasX > width) return 0;
-    if (e->canvasY > height) return 0;
+    if (e->targetX < 0) return 0;
+    if (e->targetY < 0) return 0;
+    if (e->targetX > width) return 0;
+    if (e->targetY > height) return 0;
 
     int modifiers = 0;
     if (e->ctrlKey) modifiers |= S_MODIFIER_CONTROL;

@@ -117,7 +117,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
 
     list(APPEND PLATFORM_PROPERTIES
         LINK_FLAGS
-            "-g4 -s ALLOW_MEMORY_GROWTH=1 \
+            "-gsource-map -s ALLOW_MEMORY_GROWTH=1 \
             ${EM_PRELOAD_FILES} \
             ${EM_ADDITIONAL_LINK_FLAGS} \
             -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\" \
