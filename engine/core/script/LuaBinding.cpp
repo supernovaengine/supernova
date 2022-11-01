@@ -201,12 +201,10 @@ void LuaBinding::init(){
 
     //int luaL_dofile (lua_State *L, const char *filename);
     if (luaL_loadbuffer(L,(const char*)filedata.getMemPtr(),filedata.length(), luafile.c_str()) == 0){
-        #ifndef NO_LUA_INIT
         if(lua_pcall(L, 0, LUA_MULTRET, msgh) != 0){
             Log::error("Lua Error: %s", lua_tostring(L,-1));
             lua_close(L);
         }
-        #endif
     }else{
         Log::error("Lua Error: %s", lua_tostring(L,-1));
         lua_close(L);
