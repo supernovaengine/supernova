@@ -270,14 +270,14 @@ int Texture::getWidth(){
     if (this->framebuffer){
         return framebuffer->getWidth();
     }
-    return getData().getWidth();
+    return getData().getOriginalWidth();
 }
 
 int Texture::getHeight(){
     if (this->framebuffer){
-        return framebuffer->getWidth();
+        return framebuffer->getHeight();
     }
-    return getData().getWidth();
+    return getData().getOriginalHeight();
 }
 
 void Texture::setReleaseDataAfterLoad(bool releaseDataAfterLoad){

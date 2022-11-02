@@ -10,6 +10,10 @@ namespace Supernova {
 
         int width;
         int height;
+
+        int originalWidth;
+        int originalHeight;
+
         unsigned int size; //in bytes
         ColorFormat color_format;
         int channels;
@@ -50,6 +54,8 @@ namespace Supernova {
 
         int getWidth();
         int getHeight();
+        int getOriginalWidth();
+        int getOriginalHeight();
         unsigned int getSize();
         ColorFormat getColorFormat();
         int getChannels();

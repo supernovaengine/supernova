@@ -14,6 +14,8 @@ using namespace Supernova;
 TextureData::TextureData() {
     this->width = 0;
     this->height = 0;
+    this->originalWidth = 0;
+    this->originalHeight = 0;
     this->size = 0;
     this->color_format = ColorFormat::RGBA;
     this->channels = 0;
@@ -27,6 +29,8 @@ TextureData::TextureData() {
 TextureData::TextureData(int width, int height, unsigned int size, ColorFormat color_format, int channels, void* data){
     this->width = width;
     this->height = height;
+    this->originalWidth = width;
+    this->originalHeight = height;
     this->size = size;
     this->color_format = color_format;
     this->channels = channels;
@@ -51,6 +55,8 @@ bool TextureData::operator == ( const TextureData& v ) const{
     return (
         v.width == width &&
         v.height == height &&
+        v.originalWidth == originalWidth &&
+        v.originalHeight == originalHeight &&
         v.size == size &&
         v.color_format == color_format &&
         v.channels == channels &&
@@ -64,6 +70,8 @@ bool TextureData::operator != ( const TextureData& v ) const{
     return (
         v.width != width ||
         v.height != height ||
+        v.originalWidth != originalWidth ||
+        v.originalHeight != originalHeight ||
         v.size != size ||
         v.color_format != color_format ||
         v.channels != channels ||
@@ -112,6 +120,9 @@ bool TextureData::loadTextureFromFile(const char* filename) {
     size = width * height * desired_channels; //in bytes
     //----- End std_image read texture
 
+    originalWidth = width;
+    originalHeight = height;
+
     if (Engine::isAutomaticTransparency()){
         transparent = hasAlpha();
     }
@@ -123,6 +134,8 @@ bool TextureData::loadTextureFromFile(const char* filename) {
 void TextureData::copy ( const TextureData& v ){
     this->width = v.width;
     this->height = v.height;
+    this->originalWidth = v.originalWidth;
+    this->originalHeight = v.originalHeight;
     this->size = v.size;
     this->color_format = v.color_format;
     this->channels = v.channels;
@@ -305,6 +318,14 @@ int TextureData::getWidth(){
 
 int TextureData::getHeight(){
     return height;
+}
+
+int TextureData::getOriginalWidth(){
+    return originalWidth;
+}
+
+int TextureData::getOriginalHeight(){
+    return originalHeight;
 }
 
 unsigned int TextureData::getSize(){
