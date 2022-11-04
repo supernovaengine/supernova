@@ -94,7 +94,6 @@ void LuaBinding::registerActionClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .deriveClass<TimedAction, Action>("TimedAction")
         .addConstructor <void (*) (Scene*)> ()
-        .addFunction("setFunction", [] (TimedAction* self, lua_State* L) { self->setFunction(L); })
         .addFunction("setFunctionType", &TimedAction::setFunctionType)
         .addFunction("getTimedActionComponent", &TimedAction::getComponent<TimedActionComponent>)
         .addFunction("getTime", &TimedAction::getTime)

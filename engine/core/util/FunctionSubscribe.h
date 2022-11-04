@@ -40,7 +40,7 @@ namespace Supernova {
         bool addImpl(const std::string& tag, std::function<Ret(Args...)> function) {
             if (find(tags.begin(), tags.end(), tag) != tags.end())
             {
-                return false;
+                remove(tag);
             }
 
             functions.push_back(function);

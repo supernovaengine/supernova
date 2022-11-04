@@ -21,12 +21,6 @@ void TimedAction::setAction(float duration, bool loop){
     timedAction.value = 0;
 }
 
-void TimedAction::setFunction(FunctionSubscribe<float(float)> function){
-    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
-
-    timedAction.function = function;
-}
-
 void TimedAction::setFunctionType(EaseType functionType){
     TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
 
