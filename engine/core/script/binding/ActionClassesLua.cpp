@@ -85,8 +85,12 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addConstructor <void(Scene*), void(Scene*, Entity)> ()
         .addFunction("start", &Action::start)
         .addFunction("pause", &Action::pause)
+        .addFunction("stop", &Action::stop)
         .addProperty("target", &Action::getTarget, &Action::setTarget)
         .addProperty("speed", &Action::getSpeed, &Action::setSpeed)
+        .addFunction("isRunning", &Action::isRunning)
+        .addFunction("isStopped", &Action::isStopped)
+        .addFunction("isPaused", &Action::isPaused)
         .addProperty("entity", &Action::getEntity)
         .addFunction("getActionComponent", &Action::getComponent<ActionComponent>)
         .endClass();

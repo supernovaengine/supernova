@@ -35,6 +35,8 @@ namespace Supernova{
         float getSpeed() const;
 
         bool isRunning() const;
+        bool isStopped() const;
+        bool isPaused() const;
 
         template <typename T>
         void addComponent(T &&component) {

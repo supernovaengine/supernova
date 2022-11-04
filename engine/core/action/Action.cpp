@@ -87,6 +87,18 @@ bool Action::isRunning() const{
     return (action.state == ActionState::Running);
 }
 
+bool Action::isStopped() const{
+    ActionComponent& action = getComponent<ActionComponent>();
+
+    return (action.state == ActionState::Stopped);
+}
+
+bool Action::isPaused() const{
+    ActionComponent& action = getComponent<ActionComponent>();
+
+    return (action.state == ActionState::Paused);
+}
+
 Entity Action::getEntity() const{
     return entity;
 }
