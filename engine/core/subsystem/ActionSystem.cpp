@@ -20,27 +20,29 @@ void ActionSystem::actionStart(Entity entity){
 
     actionComponentStart(action);
 
-    Signature targetSignature = scene->getSignature(action.target);
-    Signature signature = scene->getSignature(entity);
+    if (action.target != NULL_ENTITY){
+        Signature targetSignature = scene->getSignature(action.target);
+        Signature signature = scene->getSignature(entity);
 
-    if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
-        SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
-        if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
-            SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
-            MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
+        if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
+            SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
+            if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
+                SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+                MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
-            spriteActionStart(mesh, sprite, spriteanim);
+                spriteActionStart(mesh, sprite, spriteanim);
 
+            }
         }
-    }
 
-    if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
-        ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
-        if (targetSignature.test(scene->getComponentType<ParticlesComponent>()) ){
-            ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(action.target);
+        if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
+            ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
+            if (targetSignature.test(scene->getComponentType<ParticlesComponent>()) ){
+                ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(action.target);
 
-            particleActionStart(partanim, particles);
+                particleActionStart(partanim, particles);
 
+            }
         }
     }
 }
@@ -57,24 +59,26 @@ void ActionSystem::actionStop(Entity entity){
 
     actionComponentStop(action);
 
-    Signature targetSignature = scene->getSignature(action.target);
-    Signature signature = scene->getSignature(entity);
+    if (action.target != NULL_ENTITY){
+        Signature targetSignature = scene->getSignature(action.target);
+        Signature signature = scene->getSignature(entity);
 
-    if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
-        SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
-        if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
-            SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
-            MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
+        if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
+            SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
+            if (targetSignature.test(scene->getComponentType<SpriteComponent>()) && targetSignature.test(scene->getComponentType<MeshComponent>())){
+                SpriteComponent& sprite = scene->getComponent<SpriteComponent>(action.target);
+                MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
-            spriteActionStop(mesh, sprite, spriteanim);
+                spriteActionStop(mesh, sprite, spriteanim);
 
+            }
         }
-    }
 
-    if (signature.test(scene->getComponentType<TimedActionComponent>())){
-        TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
+        if (signature.test(scene->getComponentType<TimedActionComponent>())){
+            TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
 
-        timedActionStop(timedaction);
+            timedActionStop(timedaction);
+        }
     }
 }
 
