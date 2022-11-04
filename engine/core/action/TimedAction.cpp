@@ -32,3 +32,39 @@ void TimedAction::setFunctionType(EaseType functionType){
 
     timedAction.function = Ease::getFunction(functionType);
 }
+
+float TimedAction::getValue() const{
+    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
+
+    return timedAction.value;
+}
+
+float TimedAction::getTime() const{
+    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
+
+    return timedAction.time;
+}
+
+void TimedAction::setDuration(float duration){
+    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
+
+    timedAction.duration = duration;
+}
+
+float TimedAction::getDuration() const{
+    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
+
+    return timedAction.duration;
+}
+
+void TimedAction::setLoop(bool loop){
+    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
+
+    timedAction.loop = loop;
+}
+
+bool TimedAction::isLoop() const{
+    TimedActionComponent& timedAction = getComponent<TimedActionComponent>();
+
+    return timedAction.loop;
+}

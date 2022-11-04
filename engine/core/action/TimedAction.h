@@ -20,6 +20,15 @@ namespace Supernova{
         void setFunction(FunctionSubscribe<float(float)> function);
 
         void setFunctionType(EaseType functionType);
+
+        float getValue() const;
+        float getTime() const;
+
+        void setDuration(float duration);
+        float getDuration() const;
+
+        void setLoop(bool loop);
+        bool isLoop() const;
     };
 }
 

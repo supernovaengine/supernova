@@ -97,6 +97,10 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addFunction("setFunction", [] (TimedAction* self, lua_State* L) { self->setFunction(L); })
         .addFunction("setFunctionType", &TimedAction::setFunctionType)
         .addFunction("getTimedActionComponent", &TimedAction::getComponent<TimedActionComponent>)
+        .addFunction("getTime", &TimedAction::getTime)
+        .addFunction("getValue", &TimedAction::getValue)
+        .addProperty("duration", &TimedAction::getDuration, &TimedAction::setDuration)
+        .addProperty("loop", &TimedAction::isLoop, &TimedAction::setLoop)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
