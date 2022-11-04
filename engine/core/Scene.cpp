@@ -398,6 +398,12 @@ void Scene::sortComponentsByTransform(Signature entitySignature){
 		auto particles = componentManager.getComponentArray<ParticlesComponent>();
 		particles->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
+
+	// Audio component
+	if (entitySignature.test(getComponentType<AudioComponent>())){
+		auto audios = componentManager.getComponentArray<AudioComponent>();
+		audios->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
+	}
 }
 
 void Scene::moveChildAux(Entity entity, bool increase, bool stopIfFound){
