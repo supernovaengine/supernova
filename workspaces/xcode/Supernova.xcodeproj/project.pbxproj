@@ -569,7 +569,7 @@
 		71FCE4BF28E0FA01003C5217 /* LuaFunctionBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */; };
 		71FCE4C028E0FA01003C5217 /* LuaFunctionBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */; };
 		71FCE4C128E0FA01003C5217 /* LuaFunctionBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */; };
-		71FCE4C228E0FA01003C5217 /* EnumWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4BD28E0FA01003C5217 /* EnumWrapper.h */; };
+		71FCE4C228E0FA01003C5217 /* LuaBridgeAddon.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4BD28E0FA01003C5217 /* LuaBridgeAddon.h */; };
 		71FCE4C528E0FA31003C5217 /* LuaBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4C428E0FA31003C5217 /* LuaBridge.h */; };
 /* End PBXBuildFile section */
 
@@ -1188,7 +1188,7 @@
 		71FCE4BA28E0FA01003C5217 /* LuaFunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunction.h; sourceTree = "<group>"; };
 		71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaFunctionBase.cpp; sourceTree = "<group>"; };
 		71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunctionBase.h; sourceTree = "<group>"; };
-		71FCE4BD28E0FA01003C5217 /* EnumWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumWrapper.h; sourceTree = "<group>"; };
+		71FCE4BD28E0FA01003C5217 /* LuaBridgeAddon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaBridgeAddon.h; sourceTree = "<group>"; };
 		71FCE4C428E0FA31003C5217 /* LuaBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaBridge.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -2100,7 +2100,7 @@
 		71BE622C25B1DB9D006D6E02 /* script */ = {
 			isa = PBXGroup;
 			children = (
-				71FCE4BD28E0FA01003C5217 /* EnumWrapper.h */,
+				71FCE4BD28E0FA01003C5217 /* LuaBridgeAddon.h */,
 				71FCE4BA28E0FA01003C5217 /* LuaFunction.h */,
 				71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */,
 				71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */,
@@ -2307,7 +2307,7 @@
 				713E581227BA9CE400376680 /* Polygon.h in Headers */,
 				71393EE928F8EF9F0074442E /* XMLUtils.h in Headers */,
 				71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */,
-				71FCE4C228E0FA01003C5217 /* EnumWrapper.h in Headers */,
+				71FCE4C228E0FA01003C5217 /* LuaBridgeAddon.h in Headers */,
 				715CB114288CD3F60049344B /* TerrainComponent.h in Headers */,
 				7170A3D42818A8A30003E965 /* Bone.h in Headers */,
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,

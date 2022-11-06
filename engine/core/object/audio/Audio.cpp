@@ -87,13 +87,13 @@ bool Audio::isStopped(){
     return (audio.state == AudioState::Stopped);
 }
 
-void Audio::set3DSound(bool enable3D){
+void Audio::setSound3D(bool enable3D){
     AudioComponent& audio = getComponent<AudioComponent>();
 
     audio.enable3D = enable3D;
 }
 
-bool Audio::is3DSound() const{
+bool Audio::isSound3D() const{
     AudioComponent& audio = getComponent<AudioComponent>();
 
     return audio.enable3D;

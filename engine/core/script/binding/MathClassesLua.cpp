@@ -9,7 +9,7 @@
 #include "lauxlib.h"
 
 #include "LuaBridge.h"
-#include "EnumWrapper.h"
+#include "LuaBridgeAddon.h"
 
 #include "Vector2.h"
 #include "Vector3.h"
@@ -45,11 +45,11 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__sub", (Vector2 (Vector2::*)(const Vector2&) const)&Vector2::operator-)
         .addFunction("__add", (Vector2 (Vector2::*)(const Vector2&) const)&Vector2::operator+)
         .addFunction("__div", 
-            luabridge::overload<const Vector2&>(&Vector2::operator/),
-            luabridge::overload<float>(&Vector2::operator/))
+            luabridge::overload<float>(&Vector2::operator/),
+            luabridge::overload<const Vector2&>(&Vector2::operator/))
         .addFunction("__mul", 
-            luabridge::overload<const Vector2&>(&Vector2::operator*),
-            luabridge::overload<float>(&Vector2::operator*))
+            luabridge::overload<float>(&Vector2::operator*),
+            luabridge::overload<const Vector2&>(&Vector2::operator*))
         .addFunction("__unm", (Vector2 (Vector2::*)() const)&Vector2::operator-)
         .addFunction("swap", &Vector2::swap)
         .addFunction("length", &Vector2::length)
@@ -80,8 +80,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__add", (Vector3 (Vector3::*)(const Vector3&) const)&Vector3::operator+)
         .addFunction("__div", (Vector3 (Vector3::*)(const Vector3&) const)&Vector3::operator/)
         .addFunction("__mul", 
-            luabridge::overload<const Vector3&>(&Vector3::operator*),
-            luabridge::overload<float>(&Vector3::operator*))
+            luabridge::overload<float>(&Vector3::operator*), // need float operator first to fix estrange error in Emscripten
+            luabridge::overload<const Vector3&>(&Vector3::operator*))
         .addFunction("__unm", (Vector3 (Vector3::*)() const)&Vector3::operator-)
         .addFunction("length", &Vector3::length)
         .addFunction("squaredLength", &Vector3::squaredLength)
@@ -111,11 +111,11 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__sub", (Vector4 (Vector4::*)(const Vector4&) const)&Vector4::operator-)
         .addFunction("__add", (Vector4 (Vector4::*)(const Vector4&) const)&Vector4::operator+)
         .addFunction("__div", 
-            luabridge::overload<const Vector4&>(&Vector4::operator/),
-            luabridge::overload<float>(&Vector4::operator/))
+            luabridge::overload<float>(&Vector4::operator/),
+            luabridge::overload<const Vector4&>(&Vector4::operator/))
         .addFunction("__mul", 
-            luabridge::overload<const Vector4&>(&Vector4::operator*),
-            luabridge::overload<float>(&Vector4::operator*))
+            luabridge::overload<float>(&Vector4::operator*),
+            luabridge::overload<const Vector4&>(&Vector4::operator*))
         .addFunction("__unm", (Vector4 (Vector4::*)() const)&Vector4::operator-)
         .addFunction("swap", &Vector4::swap)
         .addFunction("divideByW", &Vector4::divideByW)
@@ -226,7 +226,6 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("__eq", &Quaternion::operator==)
         .addFunction("__sub", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator-)
         .addFunction("__add", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator+)
-        .addFunction("__mul", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator*)
         .addFunction("__mul", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator*)
         .addFunction("__unm", (Quaternion (Quaternion::*)() const)&Quaternion::operator-)
         .addFunction("fromAxes", 

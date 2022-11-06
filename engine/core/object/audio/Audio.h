@@ -28,8 +28,8 @@ namespace Supernova {
         bool isPaused();
         bool isStopped();
 
-        void set3DSound(bool enable3D);
-        bool is3DSound() const;
+        void setSound3D(bool enable3D);
+        bool isSound3D() const;
 
         void setClockedSound(bool enableClocked);
         bool isClockedSound() const;

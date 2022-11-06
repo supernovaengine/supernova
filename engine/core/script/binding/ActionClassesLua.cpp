@@ -9,7 +9,7 @@
 #include "lauxlib.h"
 
 #include "LuaBridge.h"
-#include "EnumWrapper.h"
+#include "LuaBridgeAddon.h"
 
 #include "action/Action.h"
 #include "action/TimedAction.h"
@@ -28,12 +28,6 @@
 #include "action/keyframe/TranslateTracks.h"
 
 using namespace Supernova;
-
-namespace luabridge
-{
-    template<> struct Stack<EaseType> : EnumWrapper<EaseType>{};
-    template<> struct Stack<ActionState> : EnumWrapper<ActionState>{};
-}
 
 void LuaBinding::registerActionClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS

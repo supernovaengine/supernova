@@ -9,7 +9,7 @@
 #include "lauxlib.h"
 
 #include "LuaBridge.h"
-#include "EnumWrapper.h"
+#include "LuaBridgeAddon.h"
 
 #include "Engine.h"
 #include "Log.h"
@@ -19,70 +19,6 @@
 #include "System.h"
 
 using namespace Supernova;
-
-namespace luabridge
-{
-    template<> struct Stack<Scaling> : EnumWrapper<Scaling>{};
-    template<> struct Stack<Platform> : EnumWrapper<Platform>{};
-    template<> struct Stack<GraphicBackend> : EnumWrapper<GraphicBackend>{};
-    template<> struct Stack<TextureStrategy> : EnumWrapper<TextureStrategy>{};
-    template<> struct Stack<TextureType> : EnumWrapper<TextureType>{};
-    template<> struct Stack<ColorFormat> : EnumWrapper<ColorFormat>{};
-    template<> struct Stack<PrimitiveType> : EnumWrapper<PrimitiveType>{};
-
-    template <>
-    struct Stack <Touch>
-    {
-        static Result push(lua_State* L, Touch touch)
-        {
-            lua_newtable(L);
-
-            lua_pushinteger(L, touch.pointer);
-            lua_setfield(L, -2, "pointer");
-
-            if (!luabridge::push(L, touch.position))
-                return makeErrorCode(ErrorCode::LuaStackOverflow);
-            lua_setfield(L, -2, "position");
-
-            return {};
-        }
-
-        static TypeResult<Touch> get(lua_State* L, int index)
-        {
-            lua_getfield(L, index, "pointer");
-            if (lua_type(L, -1) != LUA_TNUMBER)
-                return makeErrorCode(ErrorCode::InvalidTypeCast);
-            if (! is_integral_representable_by<int>(L, -1))
-                return makeErrorCode(ErrorCode::IntegerDoesntFitIntoLuaInteger);
-            int pointer = lua_tointeger(L, -1);
-
-            lua_getfield(L, index, "position");
-            auto result = luabridge::get<Vector2>(L, -1);
-            if (! result)
-                return result.error();
-            Vector2 position = *result;
-
-            Touch touch = {pointer, position};
-            return touch;
-        }
-
-        static bool isInstance (lua_State* L, int index)
-        {
-            if (lua_type (L, index) != LUA_TTABLE)
-                return false;
-            if (lua_getfield(L, index, "pointer") != LUA_TNUMBER)
-                return false;
-            if (!is_integral_representable_by<int>(L, -1))
-                return false;
-            if (lua_getfield(L, index, "position") != LUA_TUSERDATA)
-                return false;
-            if (!Stack<Vector2>::isInstance(L, -1))
-                return false;
-
-            return true;
-        }
-    };
-}
 
 void LuaBinding::registerCoreClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS

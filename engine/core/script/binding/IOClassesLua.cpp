@@ -9,7 +9,7 @@
 #include "lauxlib.h"
 
 #include "LuaBridge.h"
-#include "EnumWrapper.h"
+#include "LuaBridgeAddon.h"
 
 #include "io/Data.h"
 #include "io/File.h"
@@ -17,11 +17,6 @@
 #include "io/UserSettings.h"
 
 using namespace Supernova;
-
-namespace luabridge
-{
-    template<> struct Stack<FileErrors> : EnumWrapper<FileErrors>{};
-}
 
 void LuaBinding::registerIOClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS

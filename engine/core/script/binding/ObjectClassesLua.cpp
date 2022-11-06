@@ -9,7 +9,7 @@
 #include "lauxlib.h"
 
 #include "LuaBridge.h"
-#include "EnumWrapper.h"
+#include "LuaBridgeAddon.h"
 
 #include "Fog.h"
 #include "SkyBox.h"
@@ -34,13 +34,6 @@
 
 using namespace Supernova;
 
-namespace luabridge
-{
-    template<> struct Stack<FogType> : EnumWrapper<FogType>{};
-    template<> struct Stack<CameraType> : EnumWrapper<CameraType>{};
-    template<> struct Stack<FrustumPlane> : EnumWrapper<FrustumPlane>{};
-    template<> struct Stack<LightType> : EnumWrapper<LightType>{};
-}
 
 void LuaBinding::registerObjectClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
@@ -394,7 +387,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("isPlaying", &Audio::isPlaying)
         .addFunction("isPaused", &Audio::isPaused)
         .addFunction("isStopped", &Audio::isStopped)
-        .addProperty("3DSound", &Audio::is3DSound, &Audio::set3DSound)
+        .addProperty("sound3D", &Audio::isSound3D, &Audio::setSound3D)
         .addProperty("clockedSound", &Audio::isClockedSound, &Audio::setClockedSound)
         .addProperty("volume", &Audio::getVolume, &Audio::setVolume)
         .addProperty("speed", &Audio::getSpeed, &Audio::setSpeed)

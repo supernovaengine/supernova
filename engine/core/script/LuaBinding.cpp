@@ -11,6 +11,9 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
+#include "LuaBridge.h"
+#include "LuaBridgeAddon.h"
+
 #include <map>
 #include <locale>
 #include <vector>
