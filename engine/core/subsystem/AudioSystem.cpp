@@ -49,7 +49,11 @@ bool AudioSystem::loadAudio(AudioComponent& audio, Entity entity){
         return false;
     }
 
-    SoLoud::result res = samples[entity].loadMem(filedata.getMemPtr(), filedata.length(), false, false);
+    if (!audio.sample){
+        audio.sample = new SoLoud::Wav();
+    }
+
+    SoLoud::result res = audio.sample->loadMem(filedata.getMemPtr(), filedata.length(), false, false);
 
     if (res == SoLoud::SOLOUD_ERRORS::FILE_LOAD_FAILED){
         Log::error("Audio file type of '%s' could not be loaded", audio.filename.c_str());
@@ -62,10 +66,10 @@ bool AudioSystem::loadAudio(AudioComponent& audio, Entity entity){
         return false;
     }
 
-    samples[entity].setSingleInstance(true);
-    samples[entity].setVolume(1.0);
+    audio.sample->setSingleInstance(true);
+    audio.sample->setVolume(1.0);
 
-    audio.length = samples[entity].getLength();
+    audio.length = audio.sample->getLength();
 
     audio.loaded = true;
 
@@ -146,15 +150,15 @@ void AudioSystem::update(double dt){
                     init();
                     if (audio.enable3D){
                         if (audio.enableClocked){
-                            audio.handle = soloud.play3dClocked(Engine::getDeltatime(), samples[entity], worldPosition.x, worldPosition.y, worldPosition.z);
+                            audio.handle = soloud.play3dClocked(Engine::getDeltatime(), *audio.sample, worldPosition.x, worldPosition.y, worldPosition.z);
                         }else{
-                            audio.handle = soloud.play3d(samples[entity], worldPosition.x, worldPosition.y, worldPosition.z);
+                            audio.handle = soloud.play3d(*audio.sample, worldPosition.x, worldPosition.y, worldPosition.z);
                         }
                     }else{
                         if (audio.enableClocked){
-                            audio.handle = soloud.playClocked(Engine::getDeltatime(), samples[entity]);
+                            audio.handle = soloud.playClocked(Engine::getDeltatime(), *audio.sample);
                         }else{
-                            audio.handle = soloud.play(samples[entity]);
+                            audio.handle = soloud.play(*audio.sample);
                         }
                     }
                 }else{
@@ -244,5 +248,13 @@ void AudioSystem::draw(){
 }
 
 void AudioSystem::entityDestroyed(Entity entity){
+    Signature signature = scene->getSignature(entity);
 
+    if (signature.test(scene->getComponentType<AudioComponent>())){
+        AudioComponent& audio = scene->getComponent<AudioComponent>(entity);
+
+        if (audio.sample){
+            delete audio.sample;
+        }
+    }
 }

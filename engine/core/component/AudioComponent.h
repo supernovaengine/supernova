@@ -3,6 +3,10 @@
 
 #include "Supernova.h"
 
+namespace SoLoud{
+    class Wav;
+}
+
 namespace Supernova{
 
     enum class AudioState{
@@ -19,7 +23,9 @@ namespace Supernova{
     };
 
     struct AudioComponent{
+        SoLoud::Wav* sample = nullptr;
         unsigned int handle; //Soloud handle
+
         AudioState state = AudioState::Stopped;
 
         std::string filename;

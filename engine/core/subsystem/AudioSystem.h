@@ -8,8 +8,6 @@
 #include "SubSystem.h"
 
 #include "soloud.h"
-#include "soloud_wav.h"
-#include <map>
 
 #include "component/AudioComponent.h"
 
@@ -24,8 +22,6 @@ namespace Supernova{
 
 		static void init();
 		static void deInit();
-
-		std::map<Entity, SoLoud::Wav> samples;
 
 		Vector3 cameraLastPosition;
 
