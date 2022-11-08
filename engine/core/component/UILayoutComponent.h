@@ -15,17 +15,18 @@ namespace Supernova{
         float anchorRight = 0.5;
         float anchorBottom = 0.5;
 
-        float marginLeft = -74;
-        float marginTop = -52;
-        float marginRight = 74;
-        float marginBottom = 52;
+        float marginLeft = 0;
+        float marginTop = 0;
+        float marginRight = 0;
+        float marginBottom = 0;
 
         FunctionSubscribe<void()> onMouseMove;
         bool mouseMoved = false;
 
         bool focused = false;
 
-        bool needUpdateAnchors = true;
+        bool needUpdateSizes = false;
+        bool needUpdateAnchors = false;
     };
     
 }

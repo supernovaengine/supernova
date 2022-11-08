@@ -304,7 +304,7 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
 
     if (layout.height == 0){
         layout.height = textlayout.height + img.patchMarginTop + img.patchMarginBottom;
-        //img.needUpdate = true;
+        layout.needUpdateSizes = true;
     }
 
     int heightArea = layout.height - img.patchMarginTop - img.patchMarginBottom;
@@ -448,8 +448,11 @@ void UISystem::draw(){
 void UISystem::update(double dt){
 
     auto layouts = scene->getComponentArray<UILayoutComponent>();
-    for (int i = 0; i <layouts->size(); i++){
+    // inverse of render order to load childs first (must be ordered by Translate)
+    for (int i = layouts->size()-1; i >= 0; i--){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
+        Entity entity = layouts->getEntity(i);
+        Signature signature = scene->getSignature(entity);
 
         if (layout.needUpdateAnchors){
             if (layout.anchorRight < layout.anchorLeft)
@@ -462,146 +465,112 @@ void UISystem::update(double dt){
             float abAnchorTop = Engine::getCanvasHeight() * layout.anchorTop;
             float abAnchorBottom = Engine::getCanvasHeight() * layout.anchorBottom;
 
-            Entity entity = layouts->getEntity(i);
-            Signature signature = scene->getSignature(entity);
-
             if (signature.test(scene->getComponentType<Transform>())){
                 Transform& transform = scene->getComponent<Transform>(entity);
 
-                //transform.position.x = abAnchorLeft + layout.marginLeft;
-                //transform.position.y = abAnchorTop + layout.marginTop;
-                //layout.width = abAnchorRight - transform.position.x + layout.marginRight;
-                //layout.height = abAnchorBottom - transform.position.y + layout.marginBottom;
+                transform.position.x = abAnchorLeft + layout.marginLeft;
+                transform.position.y = abAnchorTop + layout.marginTop;
+
+                float width = abAnchorRight - transform.position.x + layout.marginRight;
+                float height = abAnchorBottom - transform.position.y + layout.marginBottom;
+
+                if (width != 0 && height != 0){
+                    layout.width = width;
+                    layout.height = height;
+                    layout.needUpdateSizes = true;
+                }
             }
 
             layout.needUpdateAnchors = false;
         }
 
-        
-    }
+        if (layout.needUpdateSizes){
+            if (signature.test(scene->getComponentType<ImageComponent>())){
+                ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
-    // Images
-    auto images = scene->getComponentArray<ImageComponent>();
-    for (int i = 0; i < images->size(); i++){
-        ImageComponent& img = images->getComponentFromIndex(i);
-
-        if (img.needUpdatePatches){
-            Entity entity = images->getEntity(i);
-            Signature signature = scene->getSignature(entity);
-
-            if (signature.test(scene->getComponentType<UILayoutComponent>()) && signature.test(scene->getComponentType<UIComponent>())){
-                UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
-                UIComponent& ui = scene->getComponent<UIComponent>(entity);
-
-                createImagePatches(img, ui, layout);
+                img.needUpdatePatches = true;
             }
 
-            // Need to centralize button label
             if (signature.test(scene->getComponentType<ButtonComponent>())){
                 ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-
+                // need to centralize button label
                 button.needUpdateButton = true;
             }
 
-            img.needUpdatePatches = false;
+            layout.needUpdateSizes = false;
         }
-    }
 
-    // Texts
-    auto texts = scene->getComponentArray<TextComponent>();
-    for (int i = 0; i < texts->size(); i++){
-		TextComponent& text = texts->getComponentFromIndex(i);
+        if (signature.test(scene->getComponentType<UIComponent>())){
+            UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-        if (text.needUpdateText){
-            Entity entity = texts->getEntity(i);
-            Signature signature = scene->getSignature(entity);
+            // Texts
+            if (signature.test(scene->getComponentType<TextComponent>())){
+                TextComponent& text = scene->getComponent<TextComponent>(entity);
 
-            if (signature.test(scene->getComponentType<UIComponent>()) && signature.test(scene->getComponentType<UILayoutComponent>())){
-                UIComponent& ui = scene->getComponent<UIComponent>(entity);
-                UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
-                if (text.loaded && text.needReload){
-                    ui.texture.destroy(); //texture.setData also destroy it
-                    text.loaded = false;
+                if (text.needUpdateText){
+                    if (text.loaded && text.needReload){
+                        ui.texture.destroy(); //texture.setData also destroy it
+                        text.loaded = false;
+                    }
+                    if (!text.loaded){
+                        loadFontAtlas(text, ui, layout);
+                    }
+                    createText(text, ui, layout);
+
+                    text.needUpdateText = false;
                 }
-                if (!text.loaded){
-                    loadFontAtlas(text, ui, layout);
-                }
-                createText(text, ui, layout);
             }
 
-            text.needUpdateText = false;
-        }
-    }
+            // UI Polygons
+            if (signature.test(scene->getComponentType<PolygonComponent>())){
+                PolygonComponent& polygon = scene->getComponent<PolygonComponent>(entity);
 
-    //UI Polygons
-    auto polygons = scene->getComponentArray<PolygonComponent>();
-    for (int i = 0; i < polygons->size(); i++){
-        PolygonComponent& polygon = polygons->getComponentFromIndex(i);
+                if (polygon.needUpdatePolygon){
+                    createUIPolygon(polygon, ui, layout);
 
-        if (polygon.needUpdatePolygon){
-            Entity entity = polygons->getEntity(i);
-            Signature signature = scene->getSignature(entity);
-
-            if (signature.test(scene->getComponentType<UIComponent>()) && signature.test(scene->getComponentType<UILayoutComponent>())){
-                UIComponent& ui = scene->getComponent<UIComponent>(entity);
-                UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
-
-                createUIPolygon(polygon, ui, layout);
+                    polygon.needUpdatePolygon = false;
+                }
             }
 
-            polygon.needUpdatePolygon = false;
-        }
-    }
-
-    // Buttons
-    auto buttons = scene->getComponentArray<ButtonComponent>();
-    for (int i = 0; i < buttons->size(); i++){
-        ButtonComponent& button = buttons->getComponentFromIndex(i);
-
-        if (button.needUpdateButton){
-            Entity entity = buttons->getEntity(i);
-            Signature signature = scene->getSignature(entity);
-
-            if (signature.test(scene->getComponentType<UILayoutComponent>()) && 
-                signature.test(scene->getComponentType<UIComponent>()) &&
-                signature.test(scene->getComponentType<ImageComponent>())){
-
-                UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
-                UIComponent& ui = scene->getComponent<UIComponent>(entity);
+            // Images
+            if (signature.test(scene->getComponentType<ImageComponent>())){
                 ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
-                updateButton(entity, button, img, ui, layout);
+                if (img.needUpdatePatches){
+                    createImagePatches(img, ui, layout);
+
+                    img.needUpdatePatches = false;
+                }
+
+                // Buttons
+                if (signature.test(scene->getComponentType<ButtonComponent>())){
+                    ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+
+                    if (button.needUpdateButton){
+                        updateButton(entity, button, img, ui, layout);
+                        
+                        button.needUpdateButton = false;
+                    }
+                }
+
+                // Textedits
+                if (signature.test(scene->getComponentType<TextEditComponent>())){
+                    TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
+
+                    if (textedit.needUpdateTextEdit){
+                        updateTextEdit(entity, textedit, img, ui, layout);
+
+                        textedit.needUpdateTextEdit = false;
+                    }
+
+                    blinkCursorTextEdit(dt, textedit, layout);
+                }
             }
 
-            button.needUpdateButton = false;
         }
+        
     }
 
-    // Textedits
-    auto textedits = scene->getComponentArray<TextEditComponent>();
-    for (int i = 0; i < textedits->size(); i++){
-        TextEditComponent& textedit = textedits->getComponentFromIndex(i);
-
-        Entity entity = textedits->getEntity(i);
-        Signature signature = scene->getSignature(entity);
-
-            if (signature.test(scene->getComponentType<UILayoutComponent>()) && 
-                signature.test(scene->getComponentType<UIComponent>()) &&
-                signature.test(scene->getComponentType<ImageComponent>())){
-
-            UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
-            UIComponent& ui = scene->getComponent<UIComponent>(entity);
-            ImageComponent& img = scene->getComponent<ImageComponent>(entity);
-
-            if (textedit.needUpdateTextEdit){
-                updateTextEdit(entity, textedit, img, ui, layout);
-
-                textedit.needUpdateTextEdit = false;
-            }
-
-            blinkCursorTextEdit(dt, textedit, layout);
-        }
-    }
 }
 
 void UISystem::entityDestroyed(Entity entity){
@@ -666,8 +635,10 @@ void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
-            if (isCoordInside(x, y, transform, layout)){
-                if (signature.test(scene->getComponentType<ButtonComponent>()) || signature.test(scene->getComponentType<TextEditComponent>())){
+            if (isCoordInside(x, y, transform, layout)){ //TODO: isCoordInside to polygon
+                if (signature.test(scene->getComponentType<ButtonComponent>()) || 
+                    signature.test(scene->getComponentType<TextEditComponent>()) ||
+                    signature.test(scene->getComponentType<ImageComponent>())){
                     lastUI = i;
                 }
             }
@@ -757,13 +728,13 @@ void UISystem::eventOnMouseMove(float x, float y, int mods){
 }
 
 void UISystem::eventOnTouchStart(int pointer, float x, float y){
-    if (!Engine::isCallMouseInTouchEvent()){
+    if (!Engine::isCallMouseInTouchEvent() && !Engine::isCallTouchInMouseEvent()){
         eventOnMouseDown(S_MOUSE_BUTTON_1, x, y, 0);
     }
 }
 
 void UISystem::eventOnTouchEnd(int pointer, float x, float y){
-    if (!Engine::isCallMouseInTouchEvent()){
+    if (!Engine::isCallMouseInTouchEvent() && !Engine::isCallTouchInMouseEvent()){
         eventOnMouseUp(S_MOUSE_BUTTON_1, x, y, 0);
     }
 }

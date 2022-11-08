@@ -14,30 +14,27 @@ UIObject::UIObject(Scene* scene): Object(scene){
 
 void UIObject::setSize(int width, int height){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
-    UIComponent& img = getComponent<UIComponent>();
 
     layout.width = width;
     layout.height = height;
 
-    //img.needUpdate = true;
+    layout.needUpdateSizes = true;
 }
 
 void UIObject::setWidth(int width){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
-    UIComponent& img = getComponent<UIComponent>();
 
     layout.width = width;
 
-    //img.needUpdate = true;
+    layout.needUpdateSizes = true;
 }
 
 void UIObject::setHeight(int height){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
-    UIComponent& img = getComponent<UIComponent>();
 
     layout.height = height;
 
-    //img.needUpdate = true;
+    layout.needUpdateSizes = true;
 }
 
 int UIObject::getWidth() const{
