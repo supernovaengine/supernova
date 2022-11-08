@@ -9,6 +9,7 @@
 #include "component/MeshComponent.h"
 #include "component/ModelComponent.h"
 #include "component/SkyComponent.h"
+#include "component/UILayoutComponent.h"
 #include "component/UIComponent.h"
 #include "component/ImageComponent.h"
 #include "component/CameraComponent.h"
@@ -99,7 +100,7 @@ namespace Supernova{
 		Matrix4 getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv);
 		void loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool castShadows);
 		void loadTerrainTextures(TerrainComponent& terrain, ShaderData& shaderData);
-		Rect getScissorRect(UIComponent& ui, ImageComponent& img, Transform& transform, CameraComponent& camera);
+		Rect getScissorRect(UILayoutComponent& layout, ImageComponent& img, Transform& transform, CameraComponent& camera);
 
 		// terrain
 		void setTerrainNodeIndex(TerrainComponent& terrain, TerrainNode& terrainNode, size_t size, size_t offset);
@@ -121,9 +122,9 @@ namespace Supernova{
 		void drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams);
 		void destroyTerrain(TerrainComponent& terrain);
 
-		bool loadUI(UIComponent& ui, bool isText);
-		void drawUI(UIComponent& ui, Transform& transform);
-		void destroyUI(UIComponent& ui);
+		bool loadUI(UIComponent& uirender, bool isText);
+		void drawUI(UIComponent& uirender, Transform& transform);
+		void destroyUI(UIComponent& uirender);
 
 		bool loadParticles(ParticlesComponent& particles);
 		void drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform);

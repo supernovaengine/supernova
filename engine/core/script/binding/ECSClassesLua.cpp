@@ -19,6 +19,7 @@
 #include "component/ActionComponent.h"
 #include "component/TimedActionComponent.h"
 #include "component/UIComponent.h"
+#include "component/UILayoutComponent.h"
 #include "component/ButtonComponent.h"
 #include "component/ParticlesAnimationComponent.h"
 #include "component/AudioComponent.h"
@@ -76,10 +77,24 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .endClass();
     
     luabridge::getGlobalNamespace(L)
+        .beginClass<UILayoutComponent>("UILayoutComponent")
+        .addProperty("width", &UILayoutComponent::width)
+        .addProperty("height", &UILayoutComponent::height)
+        .addProperty("focused", &UILayoutComponent::focused)
+        .addProperty("anchorLeft", &UILayoutComponent::anchorLeft)
+        .addProperty("anchorTop", &UILayoutComponent::anchorTop)
+        .addProperty("anchorRight", &UILayoutComponent::anchorRight)
+        .addProperty("anchorBottom", &UILayoutComponent::anchorBottom)
+        .addProperty("marginLeft", &UILayoutComponent::marginLeft)
+        .addProperty("marginTop", &UILayoutComponent::marginTop)
+        .addProperty("marginRight", &UILayoutComponent::marginRight)
+        .addProperty("marginBottom", &UILayoutComponent::marginBottom)
+        .addProperty("onMouseMove", [] (UILayoutComponent* self, lua_State* L) { return &self->onMouseMove; }, [] (UILayoutComponent* self, lua_State* L) { self->onMouseMove = L; })
+        .addProperty("mouseMoved", &UILayoutComponent::mouseMoved)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<UIComponent>("UIComponent")
-        .addProperty("width", &UIComponent::width)
-        .addProperty("height", &UIComponent::height)
-        .addProperty("focused", &UIComponent::focused)
         .addProperty("loaded", &UIComponent::loaded)
         //.addProperty("buffer", &UIComponent::buffer)
         //.addProperty("indices", &UIComponent::indices)
@@ -94,11 +109,9 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("vertexCount", &UIComponent::vertexCount)
         .addProperty("texture", &UIComponent::texture)
         .addProperty("color", &UIComponent::color)
-        .addProperty("onMouseMove", [] (UIComponent* self, lua_State* L) { return &self->onMouseMove; }, [] (UIComponent* self, lua_State* L) { self->onMouseMove = L; })
-        .addProperty("mouseMoved", &UIComponent::mouseMoved)
+        .addProperty("needReload", &UIComponent::needReload)
         .addProperty("needUpdateBuffer", &UIComponent::needUpdateBuffer)
         .addProperty("needUpdateTexture", &UIComponent::needUpdateTexture)
-        .addProperty("needReload", &UIComponent::needReload)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

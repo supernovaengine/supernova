@@ -18,7 +18,7 @@ using namespace Supernova;
 
 
 UISystem::UISystem(Scene* scene): SubSystem(scene){
-    signature.set(scene->getComponentType<UIComponent>());
+    signature.set(scene->getComponentType<UILayoutComponent>());
 
     eventId.clear();
 }
@@ -26,7 +26,7 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
 UISystem::~UISystem(){
 }
 
-bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
+bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
 
     ui.texture.load();
     unsigned int texWidth = ui.texture.getWidth();
@@ -37,9 +37,9 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
         return false;
     }
 
-    if (ui.width == 0 && ui.height == 0){
-        ui.width = texWidth;
-        ui.height = texHeight;
+    if (layout.width == 0 && layout.height == 0){
+        layout.width = texWidth;
+        layout.height = texHeight;
     }
 
     ui.primitiveType = PrimitiveType::TRIANGLES;
@@ -56,26 +56,26 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
     Attribute* atrVertex = ui.buffer.getAttribute(AttributeType::POSITION);
 
     ui.buffer.addVector3(atrVertex, Vector3(0, 0, 0)); //0
-    ui.buffer.addVector3(atrVertex, Vector3(ui.width, 0, 0)); //1
-    ui.buffer.addVector3(atrVertex, Vector3(ui.width,  ui.height, 0)); //2
-    ui.buffer.addVector3(atrVertex, Vector3(0,  ui.height, 0)); //3
+    ui.buffer.addVector3(atrVertex, Vector3(layout.width, 0, 0)); //1
+    ui.buffer.addVector3(atrVertex, Vector3(layout.width,  layout.height, 0)); //2
+    ui.buffer.addVector3(atrVertex, Vector3(0,  layout.height, 0)); //3
 
     ui.buffer.addVector3(atrVertex, Vector3(img.patchMarginLeft, img.patchMarginTop, 0)); //4
-    ui.buffer.addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight, img.patchMarginTop, 0)); //5
-    ui.buffer.addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight,  ui.height-img.patchMarginBottom, 0)); //6
-    ui.buffer.addVector3(atrVertex, Vector3(img.patchMarginLeft,  ui.height-img.patchMarginBottom, 0)); //7
+    ui.buffer.addVector3(atrVertex, Vector3(layout.width-img.patchMarginRight, img.patchMarginTop, 0)); //5
+    ui.buffer.addVector3(atrVertex, Vector3(layout.width-img.patchMarginRight,  layout.height-img.patchMarginBottom, 0)); //6
+    ui.buffer.addVector3(atrVertex, Vector3(img.patchMarginLeft,  layout.height-img.patchMarginBottom, 0)); //7
 
     ui.buffer.addVector3(atrVertex, Vector3(img.patchMarginLeft, 0, 0)); //8
     ui.buffer.addVector3(atrVertex, Vector3(0, img.patchMarginTop, 0)); //9
 
-    ui.buffer.addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight, 0, 0)); //10
-    ui.buffer.addVector3(atrVertex, Vector3(ui.width, img.patchMarginTop, 0)); //11
+    ui.buffer.addVector3(atrVertex, Vector3(layout.width-img.patchMarginRight, 0, 0)); //10
+    ui.buffer.addVector3(atrVertex, Vector3(layout.width, img.patchMarginTop, 0)); //11
 
-    ui.buffer.addVector3(atrVertex, Vector3(ui.width-img.patchMarginRight, ui.height, 0)); //12
-    ui.buffer.addVector3(atrVertex, Vector3(ui.width, ui.height-img.patchMarginBottom, 0)); //13
+    ui.buffer.addVector3(atrVertex, Vector3(layout.width-img.patchMarginRight, layout.height, 0)); //12
+    ui.buffer.addVector3(atrVertex, Vector3(layout.width, layout.height-img.patchMarginBottom, 0)); //13
 
-    ui.buffer.addVector3(atrVertex, Vector3(img.patchMarginLeft, ui.height, 0)); //14
-    ui.buffer.addVector3(atrVertex, Vector3(0, ui.height-img.patchMarginBottom, 0)); //15
+    ui.buffer.addVector3(atrVertex, Vector3(img.patchMarginLeft, layout.height, 0)); //14
+    ui.buffer.addVector3(atrVertex, Vector3(0, layout.height-img.patchMarginBottom, 0)); //15
 
     Attribute* atrTexcoord = ui.buffer.getAttribute(AttributeType::TEXCOORD1);
 
@@ -145,7 +145,7 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui){
     return true;
 }
 
-bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui){
+bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
     if (!text.stbtext){
         text.stbtext = new STBText();
     }
@@ -171,7 +171,7 @@ bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui){
     return true;
 }
 
-void UISystem::createText(TextComponent& text, UIComponent& ui){
+void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
 
     ui.primitiveType = PrimitiveType::TRIANGLES;
 
@@ -188,7 +188,7 @@ void UISystem::createText(TextComponent& text, UIComponent& ui){
 
     std::vector<uint16_t> indices_array;
 
-    text.stbtext->createText(text.text, &ui.buffer, indices_array, text.charPositions, ui.width, ui.height, text.userDefinedWidth, text.userDefinedHeight, text.multiline, false);
+    text.stbtext->createText(text.text, &ui.buffer, indices_array, text.charPositions, layout.width, layout.height, text.userDefinedWidth, text.userDefinedHeight, text.multiline, false);
 
     ui.indices.setValues(
             0, ui.indices.getAttribute(AttributeType::INDEX),
@@ -202,6 +202,7 @@ void UISystem::createButtonLabel(Entity entity, ButtonComponent& button){
         button.label = scene->createEntity();
 
         scene->addComponent<Transform>(button.label, {});
+        scene->addComponent<UILayoutComponent>(button.label, {});
         scene->addComponent<UIComponent>(button.label, {});
         scene->addComponent<TextComponent>(button.label, {});
 
@@ -209,7 +210,7 @@ void UISystem::createButtonLabel(Entity entity, ButtonComponent& button){
     }
 }
 
-void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui){
+void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
 
     createButtonLabel(entity, button);
 
@@ -224,22 +225,22 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
 
     Transform& labeltransform = scene->getComponent<Transform>(button.label);
     TextComponent& labeltext = scene->getComponent<TextComponent>(button.label);
-    UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
+    UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
 
     float labelX = 0;
-    float labelY = (ui.height / 2) + (labelui.height / 2) - img.patchMarginBottom;
+    float labelY = (layout.height / 2) + (labellayout.height / 2) - img.patchMarginBottom;
 
-    if (labelui.width > (ui.width - img.patchMarginRight)) {
+    if (labellayout.width > (layout.width - img.patchMarginRight)) {
         labelX = img.patchMarginLeft;
-        int labelWidth = ui.width - img.patchMarginRight;
+        int labelWidth = layout.width - img.patchMarginRight;
 
-        if (labelui.width != labelWidth){
-            labelui.width = labelWidth;
+        if (labellayout.width != labelWidth){
+            labellayout.width = labelWidth;
             labeltext.userDefinedWidth = true;
             labeltext.needUpdateText = true;
         }
     } else {
-        labelX = (ui.width / 2) - (labelui.width / 2);
+        labelX = (layout.width / 2) - (labellayout.width / 2);
     }
     Vector3 labelPosition = Vector3(labelX, labelY, 0);
 
@@ -273,6 +274,7 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
         textedit.text = scene->createEntity();
 
         scene->addComponent<Transform>(textedit.text, {});
+        scene->addComponent<UILayoutComponent>(textedit.text, {});
         scene->addComponent<UIComponent>(textedit.text, {});
         scene->addComponent<TextComponent>(textedit.text, {});
 
@@ -283,6 +285,7 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
         textedit.cursor = scene->createEntity();
 
         scene->addComponent<Transform>(textedit.cursor, {});
+        scene->addComponent<UILayoutComponent>(textedit.cursor, {});
         scene->addComponent<UIComponent>(textedit.cursor, {});
         scene->addComponent<PolygonComponent>(textedit.cursor, {});
 
@@ -291,32 +294,32 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
 
 }
 
-void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui){
+void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
     createTextEditObjects(entity, textedit);
 
     // Text
     Transform& texttransform = scene->getComponent<Transform>(textedit.text);
-    UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
+    UILayoutComponent& textlayout = scene->getComponent<UILayoutComponent>(textedit.text);
     TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
 
-    if (ui.height == 0){
-        ui.height = textui.height + img.patchMarginTop + img.patchMarginBottom;
-        img.needUpdate = true;
+    if (layout.height == 0){
+        layout.height = textlayout.height + img.patchMarginTop + img.patchMarginBottom;
+        //img.needUpdate = true;
     }
 
-    int heightArea = ui.height - img.patchMarginTop - img.patchMarginBottom;
-    int widthArea = ui.width - img.patchMarginRight - img.patchMarginLeft - textedit.cursorWidth;
+    int heightArea = layout.height - img.patchMarginTop - img.patchMarginBottom;
+    int widthArea = layout.width - img.patchMarginRight - img.patchMarginLeft - textedit.cursorWidth;
 
     text.multiline = false;
 
     int textXOffset = 0;
-    if (textui.width > widthArea){
-        textXOffset = textui.width - widthArea;
+    if (textlayout.width > widthArea){
+        textXOffset = textlayout.width - widthArea;
     }
 
     float textX = img.patchMarginLeft - textXOffset;
     // descend is negative
-    float textY = img.patchMarginTop + (heightArea / 2) + (textui.height / 2) + text.stbtext->getDescent();
+    float textY = img.patchMarginTop + (heightArea / 2) + (textlayout.height / 2) + text.stbtext->getDescent();
 
     Vector3 textPosition = Vector3(textX, textY, 0);
 
@@ -330,7 +333,7 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     UIComponent& cursorui = scene->getComponent<UIComponent>(textedit.cursor);
     PolygonComponent& cursor = scene->getComponent<PolygonComponent>(textedit.cursor);
 
-    float cursorHeight = textui.height;
+    float cursorHeight = textlayout.height;
 
     cursor.points.clear();
     cursor.points.push_back({Vector3(0,  0, 0),                                 Vector4(1.0, 1.0, 1.0, 1.0)});
@@ -338,22 +341,22 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     cursor.points.push_back({Vector3(0,  cursorHeight, 0),                      Vector4(1.0, 1.0, 1.0, 1.0)});
     cursor.points.push_back({Vector3(textedit.cursorWidth, cursorHeight, 0),    Vector4(1.0, 1.0, 1.0, 1.0)});
 
-    float cursorX = textX + textui.width;
+    float cursorX = textX + textlayout.width;
     float cursorY = img.patchMarginTop + ((float)heightArea / 2) - ((float)cursorHeight / 2);
 
-    cursorui.color = textedit.cursorColor;
+    cursorimg.color = textedit.cursorColor;
     cursortransform.position = Vector3(cursorX, cursorY, 0.0);
     cursortransform.needUpdate = true;
 
     cursor.needUpdatePolygon = true;
 }
 
-void UISystem::blinkCursorTextEdit(double dt, TextEditComponent& textedit, UIComponent& ui){
+void UISystem::blinkCursorTextEdit(double dt, TextEditComponent& textedit, UILayoutComponent& layout){
     textedit.cursorBlinkTimer += dt;
 
     Transform& cursortransform = scene->getComponent<Transform>(textedit.cursor);
 
-    if (ui.focused){
+    if (layout.focused){
         if (textedit.cursorBlinkTimer > 0.6) {
             cursortransform.visible = !cursortransform.visible;
             textedit.cursorBlinkTimer = 0;
@@ -363,7 +366,7 @@ void UISystem::blinkCursorTextEdit(double dt, TextEditComponent& textedit, UICom
     }
 }
 
-void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui){
+void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout){
 
     ui.primitiveType = PrimitiveType::TRIANGLE_STRIP;
 
@@ -409,8 +412,8 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui){
         ui.buffer.addVector2(AttributeType::TEXCOORD1, Vector2(u, v));
     }
 
-    ui.width = (int)(max_X - min_X);
-    ui.height = (int)(max_Y - min_Y);
+    layout.width = (int)(max_X - min_X);
+    layout.height = (int)(max_Y - min_Y);
 
     ui.needUpdateBuffer = true;
 }
@@ -444,19 +447,53 @@ void UISystem::draw(){
 
 void UISystem::update(double dt){
 
+    auto layouts = scene->getComponentArray<UILayoutComponent>();
+    for (int i = 0; i <layouts->size(); i++){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
+
+        if (layout.needUpdateAnchors){
+            if (layout.anchorRight < layout.anchorLeft)
+                layout.anchorRight = layout.anchorLeft;
+            if (layout.anchorBottom < layout.anchorTop)
+                layout.anchorBottom = layout.anchorTop;
+
+            float abAnchorLeft = Engine::getCanvasWidth() * layout.anchorLeft;
+            float abAnchorRight = Engine::getCanvasWidth() * layout.anchorRight;
+            float abAnchorTop = Engine::getCanvasHeight() * layout.anchorTop;
+            float abAnchorBottom = Engine::getCanvasHeight() * layout.anchorBottom;
+
+            Entity entity = layouts->getEntity(i);
+            Signature signature = scene->getSignature(entity);
+
+            if (signature.test(scene->getComponentType<Transform>())){
+                Transform& transform = scene->getComponent<Transform>(entity);
+
+                //transform.position.x = abAnchorLeft + layout.marginLeft;
+                //transform.position.y = abAnchorTop + layout.marginTop;
+                //layout.width = abAnchorRight - transform.position.x + layout.marginRight;
+                //layout.height = abAnchorBottom - transform.position.y + layout.marginBottom;
+            }
+
+            layout.needUpdateAnchors = false;
+        }
+
+        
+    }
+
     // Images
     auto images = scene->getComponentArray<ImageComponent>();
     for (int i = 0; i < images->size(); i++){
         ImageComponent& img = images->getComponentFromIndex(i);
 
-        if (img.needUpdate){
+        if (img.needUpdatePatches){
             Entity entity = images->getEntity(i);
             Signature signature = scene->getSignature(entity);
 
-            if (signature.test(scene->getComponentType<UIComponent>())){
+            if (signature.test(scene->getComponentType<UILayoutComponent>()) && signature.test(scene->getComponentType<UIComponent>())){
+                UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
                 UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-                createImagePatches(img, ui);
+                createImagePatches(img, ui, layout);
             }
 
             // Need to centralize button label
@@ -466,7 +503,7 @@ void UISystem::update(double dt){
                 button.needUpdateButton = true;
             }
 
-            img.needUpdate = false;
+            img.needUpdatePatches = false;
         }
     }
 
@@ -479,16 +516,17 @@ void UISystem::update(double dt){
             Entity entity = texts->getEntity(i);
             Signature signature = scene->getSignature(entity);
 
-            if (signature.test(scene->getComponentType<UIComponent>())){
+            if (signature.test(scene->getComponentType<UIComponent>()) && signature.test(scene->getComponentType<UILayoutComponent>())){
                 UIComponent& ui = scene->getComponent<UIComponent>(entity);
+                UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
                 if (text.loaded && text.needReload){
                     ui.texture.destroy(); //texture.setData also destroy it
                     text.loaded = false;
                 }
                 if (!text.loaded){
-                    loadFontAtlas(text, ui);
+                    loadFontAtlas(text, ui, layout);
                 }
-                createText(text, ui);
+                createText(text, ui, layout);
             }
 
             text.needUpdateText = false;
@@ -504,10 +542,11 @@ void UISystem::update(double dt){
             Entity entity = polygons->getEntity(i);
             Signature signature = scene->getSignature(entity);
 
-            if (signature.test(scene->getComponentType<UIComponent>())){
+            if (signature.test(scene->getComponentType<UIComponent>()) && signature.test(scene->getComponentType<UILayoutComponent>())){
                 UIComponent& ui = scene->getComponent<UIComponent>(entity);
+                UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
 
-                createUIPolygon(polygon, ui);
+                createUIPolygon(polygon, ui, layout);
             }
 
             polygon.needUpdatePolygon = false;
@@ -523,11 +562,15 @@ void UISystem::update(double dt){
             Entity entity = buttons->getEntity(i);
             Signature signature = scene->getSignature(entity);
 
-            if (signature.test(scene->getComponentType<UIComponent>()) && signature.test(scene->getComponentType<ImageComponent>())){
-                UIComponent& ui = scene->getComponent<UIComponent>(entity);
-                ImageComponent& image = scene->getComponent<ImageComponent>(entity);
+            if (signature.test(scene->getComponentType<UILayoutComponent>()) && 
+                signature.test(scene->getComponentType<UIComponent>()) &&
+                signature.test(scene->getComponentType<ImageComponent>())){
 
-                updateButton(entity, button, image, ui);
+                UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
+                UIComponent& ui = scene->getComponent<UIComponent>(entity);
+                ImageComponent& img = scene->getComponent<ImageComponent>(entity);
+
+                updateButton(entity, button, img, ui, layout);
             }
 
             button.needUpdateButton = false;
@@ -542,17 +585,21 @@ void UISystem::update(double dt){
         Entity entity = textedits->getEntity(i);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<UIComponent>()) && signature.test(scene->getComponentType<ImageComponent>())){
+            if (signature.test(scene->getComponentType<UILayoutComponent>()) && 
+                signature.test(scene->getComponentType<UIComponent>()) &&
+                signature.test(scene->getComponentType<ImageComponent>())){
+
+            UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
-            ImageComponent& image = scene->getComponent<ImageComponent>(entity);
+            ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
             if (textedit.needUpdateTextEdit){
-                updateTextEdit(entity, textedit, image, ui);
+                updateTextEdit(entity, textedit, img, ui, layout);
 
                 textedit.needUpdateTextEdit = false;
             }
 
-            blinkCursorTextEdit(dt, textedit, ui);
+            blinkCursorTextEdit(dt, textedit, layout);
         }
     }
 }
@@ -578,16 +625,16 @@ void UISystem::entityDestroyed(Entity entity){
 }
 
 void UISystem::eventOnCharInput(wchar_t codepoint){
-    auto uis = scene->getComponentArray<UIComponent>();
-    for (int i = 0; i < uis->size(); i++){
-        UIComponent& ui = uis->getComponentFromIndex(i);
+    auto layouts = scene->getComponentArray<UILayoutComponent>();
+    for (int i = 0; i < layouts->size(); i++){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
 
-        Entity entity = uis->getEntity(i);
+        Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
         if (signature.test(scene->getComponentType<TextEditComponent>())){
             TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
 
-            if (ui.focused){
+            if (layout.focused){
                 TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
                 if (codepoint == '\b'){
                     if (text.text.length() > 0){
@@ -608,33 +655,34 @@ void UISystem::eventOnCharInput(wchar_t codepoint){
 }
 
 void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
-    auto uis = scene->getComponentArray<UIComponent>();
+    auto layouts = scene->getComponentArray<UILayoutComponent>();
     int lastUI = -1;
 
-    for (int i = 0; i < uis->size(); i++){
-        UIComponent& ui = uis->getComponentFromIndex(i);
+    for (int i = 0; i < layouts->size(); i++){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
 
-        Entity entity = uis->getEntity(i);
+        Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
-            if (isCoordInside(x, y, transform, ui)){
+            if (isCoordInside(x, y, transform, layout)){
                 if (signature.test(scene->getComponentType<ButtonComponent>()) || signature.test(scene->getComponentType<TextEditComponent>())){
                     lastUI = i;
                 }
             }
         }
 
-        ui.focused = false;
+        layout.focused = false;
     }
 
     if (lastUI != -1){
-        UIComponent& ui = uis->getComponentFromIndex(lastUI);
-        Entity entity = uis->getEntity(lastUI);
+        UILayoutComponent& layout = layouts->getComponentFromIndex(lastUI);
+        Entity entity = layouts->getEntity(lastUI);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<ButtonComponent>())){
+        if (signature.test(scene->getComponentType<UIComponent>()) && signature.test(scene->getComponentType<ButtonComponent>())){
+            UIComponent& ui = scene->getComponent<UIComponent>(entity);
             ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
             if (!button.disabled){
                 ui.texture = button.texturePressed;
@@ -649,20 +697,24 @@ void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
             System::instance().hideVirtualKeyboard();
         }
 
-        ui.focused = true;
+        layout.focused = true;
     }else{
         System::instance().hideVirtualKeyboard();
     }
 }
 
 void UISystem::eventOnMouseUp(int button, float x, float y, int mods){
-    auto uis = scene->getComponentArray<UIComponent>();
-    for (int i = 0; i < uis->size(); i++){
-        UIComponent& ui = uis->getComponentFromIndex(i);
+    auto layouts = scene->getComponentArray<UILayoutComponent>();
+    for (int i = 0; i < layouts->size(); i++){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
 
-        Entity entity = uis->getEntity(i);
+        Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<ButtonComponent>())){
+        if (signature.test(scene->getComponentType<Transform>()) && 
+            signature.test(scene->getComponentType<UIComponent>()) && 
+            signature.test(scene->getComponentType<ButtonComponent>())){
+
+            UIComponent& ui = scene->getComponent<UIComponent>(entity);
             ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
             if (!button.disabled){
                 ui.texture = button.textureNormal;
@@ -677,30 +729,30 @@ void UISystem::eventOnMouseUp(int button, float x, float y, int mods){
 }
 
 void UISystem::eventOnMouseMove(float x, float y, int mods){
-    auto uis = scene->getComponentArray<UIComponent>();
+    auto layouts = scene->getComponentArray<UILayoutComponent>();
     int lastUI = -1;
 
-    for (int i = 0; i < uis->size(); i++){
-        UIComponent& ui = uis->getComponentFromIndex(i);
+    for (int i = 0; i < layouts->size(); i++){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
 
-        Entity entity = uis->getEntity(i);
+        Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
-            if ((!ui.mouseMoved) && isCoordInside(x, y, transform, ui)){
+            if ((!layout.mouseMoved) && isCoordInside(x, y, transform, layout)){
                 lastUI = i;
             }
         }
 
-        ui.mouseMoved = false;
+        layout.mouseMoved = false;
     }
 
     if (lastUI != -1){
-        UIComponent& ui = uis->getComponentFromIndex(lastUI);
+        UILayoutComponent& layout = layouts->getComponentFromIndex(lastUI);
 
-        ui.onMouseMove.call();
-        ui.mouseMoved = true;
+        layout.onMouseMove.call();
+        layout.mouseMoved = true;
     }
 }
 
@@ -716,14 +768,14 @@ void UISystem::eventOnTouchEnd(int pointer, float x, float y){
     }
 }
 
-bool UISystem::isCoordInside(float x, float y, Transform& transform, UIComponent& ui){
+bool UISystem::isCoordInside(float x, float y, Transform& transform, UILayoutComponent& layout){
     Vector3 point = transform.worldRotation.getRotationMatrix() * Vector3(x, y, 0);
     Vector2 center = Vector2(0, 0);
 
     if (point.x >= (transform.worldPosition.x - center.x) &&
-        point.x <= (transform.worldPosition.x - center.x + abs(ui.width * transform.worldScale.x)) &&
+        point.x <= (transform.worldPosition.x - center.x + abs(layout.width * transform.worldScale.x)) &&
         point.y >= (transform.worldPosition.y - center.y) &&
-        point.y <= (transform.worldPosition.y - center.y + abs(ui.height * transform.worldScale.y))) {
+        point.y <= (transform.worldPosition.y - center.y + abs(layout.height * transform.worldScale.y))) {
         return true;
     }
     return false;

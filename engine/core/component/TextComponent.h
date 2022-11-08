@@ -2,6 +2,7 @@
 #define TEXT_COMPONENT_H
 
 #include "Supernova.h"
+#include "math/Vector2.h"
 
 namespace Supernova{
 

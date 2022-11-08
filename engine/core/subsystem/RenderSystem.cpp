@@ -1027,12 +1027,12 @@ void RenderSystem::destroyTerrain(TerrainComponent& terrain){
 	terrain.loaded = false;
 }
 
-bool RenderSystem::loadUI(UIComponent& ui, bool isText){
-	ObjectRender& render = ui.render;
+bool RenderSystem::loadUI(UIComponent& uirender, bool isText){
+	ObjectRender& render = uirender.render;
 
-	render.beginLoad(ui.primitiveType, false, scene->isRenderToTexture());
+	render.beginLoad(uirender.primitiveType, false, scene->isRenderToTexture());
 
-	TextureRender* textureRender = ui.texture.getRender();
+	TextureRender* textureRender = uirender.texture.getRender();
 
 	bool p_hasTexture = false;
 	bool p_vertexColorVec4 = true;
@@ -1046,124 +1046,124 @@ bool RenderSystem::loadUI(UIComponent& ui, bool isText){
 		}
 	}
 
-	ui.shaderProperties = ShaderPool::getUIProperties(p_hasTexture, p_hasFontAtlasTexture, false, p_vertexColorVec4);
-	ui.shader = ShaderPool::get(ShaderType::UI, ui.shaderProperties);
-	if (!ui.shader->isCreated())
+	uirender.shaderProperties = ShaderPool::getUIProperties(p_hasTexture, p_hasFontAtlasTexture, false, p_vertexColorVec4);
+	uirender.shader = ShaderPool::get(ShaderType::UI, uirender.shaderProperties);
+	if (!uirender.shader->isCreated())
 		return false;
-	render.addShader(ui.shader.get());
-	ShaderData& shaderData = ui.shader.get()->shaderData;
+	render.addShader(uirender.shader.get());
+	ShaderData& shaderData = uirender.shader.get()->shaderData;
 
-	ui.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_VS_PARAMS, ShaderStageType::VERTEX);
-	ui.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_FS_PARAMS, ShaderStageType::FRAGMENT);
+	uirender.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_VS_PARAMS, ShaderStageType::VERTEX);
+	uirender.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_FS_PARAMS, ShaderStageType::FRAGMENT);
 
 	size_t bufferSize;
 	size_t minBufferSize;
 
-	bufferSize = ui.buffer.getSize();
-	minBufferSize = ui.minBufferCount * ui.buffer.getStride();
+	bufferSize = uirender.buffer.getSize();
+	minBufferSize = uirender.minBufferCount * uirender.buffer.getStride();
 	if (minBufferSize > bufferSize)
 		bufferSize = minBufferSize;
 
 	if (bufferSize == 0)
 		return false;
 
-	ui.buffer.getRender()->createBuffer(bufferSize, ui.buffer.getData(), ui.buffer.getType(), ui.buffer.getUsage());
-	if (ui.buffer.isRenderAttributes()) {
-        for (auto const &attr : ui.buffer.getAttributes()) {
-			render.addAttribute(shaderData.getAttrIndex(attr.first), ui.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), ui.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+	uirender.buffer.getRender()->createBuffer(bufferSize, uirender.buffer.getData(), uirender.buffer.getType(), uirender.buffer.getUsage());
+	if (uirender.buffer.isRenderAttributes()) {
+        for (auto const &attr : uirender.buffer.getAttributes()) {
+			render.addAttribute(shaderData.getAttrIndex(attr.first), uirender.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), uirender.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
         }
     }
 
-	bufferSize = ui.indices.getSize();
-	minBufferSize = ui.minIndicesCount * ui.indices.getStride();
+	bufferSize = uirender.indices.getSize();
+	minBufferSize = uirender.minIndicesCount * uirender.indices.getStride();
 	if (minBufferSize > bufferSize)
 		bufferSize = minBufferSize;
 
-	if (ui.indices.getCount() > 0){
-		ui.indices.getRender()->createBuffer(bufferSize, ui.indices.getData(), ui.indices.getType(), ui.indices.getUsage());
-		ui.vertexCount = ui.indices.getCount();
-		Attribute indexattr = ui.indices.getAttributes()[AttributeType::INDEX];
-		render.addIndex(ui.indices.getRender(), indexattr.getDataType(), indexattr.getOffset());
+	if (uirender.indices.getCount() > 0){
+		uirender.indices.getRender()->createBuffer(bufferSize, uirender.indices.getData(), uirender.indices.getType(), uirender.indices.getUsage());
+		uirender.vertexCount = uirender.indices.getCount();
+		Attribute indexattr = uirender.indices.getAttributes()[AttributeType::INDEX];
+		render.addIndex(uirender.indices.getRender(), indexattr.getDataType(), indexattr.getOffset());
 	}else{
-		ui.vertexCount = ui.buffer.getCount();
+		uirender.vertexCount = uirender.buffer.getCount();
 	}
 
 	if (textureRender)
 		render.addTexture(shaderData.getTextureIndex(TextureShaderType::UI, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
 	
-	ui.needUpdateTexture = false;
+	uirender.needUpdateTexture = false;
 
 	render.endLoad();
 
-	ui.needReload = false;
-	ui.loaded = true;
+	uirender.needReload = false;
+	uirender.loaded = true;
 
 	return true;
 }
 
-void RenderSystem::drawUI(UIComponent& ui, Transform& transform){
-	if (ui.loaded && ui.buffer.getSize() > 0){
+void RenderSystem::drawUI(UIComponent& uirender, Transform& transform){
+	if (uirender.loaded && uirender.buffer.getSize() > 0){
 
-		if (ui.needUpdateTexture){
-			ShaderData& shaderData = ui.shader.get()->shaderData;
-			TextureRender* textureRender = ui.texture.getRender();
+		if (uirender.needUpdateTexture){
+			ShaderData& shaderData = uirender.shader.get()->shaderData;
+			TextureRender* textureRender = uirender.texture.getRender();
 			if (textureRender)
-				ui.render.addTexture(shaderData.getTextureIndex(TextureShaderType::UI, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
+				uirender.render.addTexture(shaderData.getTextureIndex(TextureShaderType::UI, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
 
-			ui.needUpdateTexture = false;
+			uirender.needUpdateTexture = false;
 		}
 
-		if (ui.needUpdateBuffer){
-			ui.buffer.getRender()->updateBuffer(ui.buffer.getSize(), ui.buffer.getData());
+		if (uirender.needUpdateBuffer){
+			uirender.buffer.getRender()->updateBuffer(uirender.buffer.getSize(), uirender.buffer.getData());
 
-			if (ui.indices.getCount() > 0){
-				ui.indices.getRender()->updateBuffer(ui.indices.getSize(), ui.indices.getData());
-				ui.vertexCount = ui.indices.getCount();
+			if (uirender.indices.getCount() > 0){
+				uirender.indices.getRender()->updateBuffer(uirender.indices.getSize(), uirender.indices.getData());
+				uirender.vertexCount = uirender.indices.getCount();
 			}else{
-				ui.vertexCount = ui.buffer.getCount();
+				uirender.vertexCount = uirender.buffer.getCount();
 			}
 
-			ui.needUpdateBuffer = false;
+			uirender.needUpdateBuffer = false;
 		}
 
-		ObjectRender& render = ui.render;
+		ObjectRender& render = uirender.render;
 
 		render.beginDraw();
-		render.applyUniformBlock(ui.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
+		render.applyUniformBlock(uirender.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		//Color
-		render.applyUniformBlock(ui.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &ui.color);
-		render.draw(ui.vertexCount);
+		render.applyUniformBlock(uirender.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &uirender.color);
+		render.draw(uirender.vertexCount);
 
 	}
 }
 
-void RenderSystem::destroyUI(UIComponent& ui){
-	if (!ui.loaded)
+void RenderSystem::destroyUI(UIComponent& uirender){
+	if (!uirender.loaded)
 		return;
 
 	//Destroy shader
-	ui.shader.reset();
-	ShaderPool::remove(ShaderType::UI, ui.shaderProperties);
+	uirender.shader.reset();
+	ShaderPool::remove(ShaderType::UI, uirender.shaderProperties);
 
 	//Destroy texture
-	ui.texture.destroy();
+	uirender.texture.destroy();
 
 	//Destroy render
-	ui.render.destroy();
+	uirender.render.destroy();
 
 	//Destroy buffer
-	if (ui.buffer.getSize() > 0){
-		ui.buffer.getRender()->destroyBuffer();
+	if (uirender.buffer.getSize() > 0){
+		uirender.buffer.getRender()->destroyBuffer();
 	}
-	if (ui.indices.getSize() > 0){
-		ui.indices.getRender()->destroyBuffer();
+	if (uirender.indices.getSize() > 0){
+		uirender.indices.getRender()->destroyBuffer();
 	}
 
 	//Shaders uniforms
-	ui.slotVSParams = -1;
-	ui.slotFSParams = -1;
+	uirender.slotVSParams = -1;
+	uirender.slotFSParams = -1;
 
-	ui.loaded = false;
+	uirender.loaded = false;
 }
 
 bool RenderSystem::loadParticles(ParticlesComponent& particles){
@@ -1356,7 +1356,7 @@ void RenderSystem::destroySky(SkyComponent& sky){
 	sky.loaded = false;
 }
 
-Rect RenderSystem::getScissorRect(UIComponent& ui, ImageComponent& img, Transform& transform, CameraComponent& camera){
+Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img, Transform& transform, CameraComponent& camera){
 	int objScreenPosX = 0;
 	int objScreenPosY = 0;
 	int objScreenWidth = 0;
@@ -1375,8 +1375,8 @@ Rect RenderSystem::getScissorRect(UIComponent& ui, ImageComponent& img, Transfor
 
 		objScreenPosX = (tempX * Engine::getViewRect().getWidth() + (float) System::instance().getScreenWidth()) / 2;
 		objScreenPosY = (tempY * Engine::getViewRect().getHeight() + (float) System::instance().getScreenHeight()) / 2;
-		objScreenWidth = ui.width * widthRatio;
-		objScreenHeight = ui.height * heightRatio;
+		objScreenWidth = layout.width * widthRatio;
+		objScreenHeight = layout.height * heightRatio;
 
 		if (camera.type == CameraType::CAMERA_2D)
 			objScreenPosY = (float) System::instance().getScreenHeight() - objScreenHeight - objScreenPosY;
@@ -1397,8 +1397,8 @@ Rect RenderSystem::getScissorRect(UIComponent& ui, ImageComponent& img, Transfor
 
 		objScreenPosX = transform.worldPosition.x;
 		objScreenPosY = transform.worldPosition.y;
-		objScreenWidth = ui.width;
-		objScreenHeight = ui.height;
+		objScreenWidth = layout.width;
+		objScreenHeight = layout.height;
 
 		if (camera.type == CameraType::CAMERA_2D)
 			objScreenPosY = (float) scene->getFramebufferHeight() - objScreenHeight - objScreenPosY;
@@ -2236,10 +2236,11 @@ void RenderSystem::draw(){
 			if (transform.visible)
 				drawUI(ui, transform);
 
-			if (signature.test(scene->getComponentType<ImageComponent>())){
+			if (signature.test(scene->getComponentType<UILayoutComponent>()) && signature.test(scene->getComponentType<ImageComponent>())){
+				UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
 				ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
-				activeScissor = getScissorRect(ui, img, transform, camera).fitOnRect(activeScissor);
+				activeScissor = getScissorRect(layout, img, transform, camera).fitOnRect(activeScissor);
 				sceneRender.applyScissor(activeScissor);
 				parentListScissor.push_back(entity);
 			}

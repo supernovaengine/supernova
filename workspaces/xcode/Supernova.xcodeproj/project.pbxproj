@@ -400,7 +400,7 @@
 		71ABBD342783C8BB001CE3AF /* Image.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD322783C8BA001CE3AF /* Image.h */; };
 		71ABBD352783C8BB001CE3AF /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD332783C8BB001CE3AF /* Image.cpp */; };
 		71ABBD362783C8BB001CE3AF /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD332783C8BB001CE3AF /* Image.cpp */; };
-		71ABBD382791167A001CE3AF /* ImageComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD372791167A001CE3AF /* ImageComponent.h */; };
+		71ABBD382791167A001CE3AF /* UIComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD372791167A001CE3AF /* UIComponent.h */; };
 		71ABBD3B279116E1001CE3AF /* UniqueToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD39279116E1001CE3AF /* UniqueToken.cpp */; };
 		71ABBD3C279116E1001CE3AF /* UniqueToken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD39279116E1001CE3AF /* UniqueToken.cpp */; };
 		71ABBD3D279116E1001CE3AF /* UniqueToken.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD3A279116E1001CE3AF /* UniqueToken.h */; };
@@ -799,7 +799,7 @@
 		71451BB3270C9D0F00712643 /* ColorActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorActionComponent.h; sourceTree = "<group>"; };
 		71451BB4270C9D0F00712643 /* ActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ActionComponent.h; sourceTree = "<group>"; };
 		71451BB5270C9D0F00712643 /* PositionActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PositionActionComponent.h; sourceTree = "<group>"; };
-		71451BB6270C9D0F00712643 /* UIComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UIComponent.h; sourceTree = "<group>"; };
+		71451BB6270C9D0F00712643 /* UILayoutComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UILayoutComponent.h; sourceTree = "<group>"; };
 		71451BB7270C9D0F00712643 /* SpriteAnimationComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpriteAnimationComponent.h; sourceTree = "<group>"; };
 		71451BB8270C9D0F00712643 /* ScaleActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScaleActionComponent.h; sourceTree = "<group>"; };
 		71451BB9270C9D0F00712643 /* TimedActionComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimedActionComponent.h; sourceTree = "<group>"; };
@@ -1039,7 +1039,7 @@
 		71ABBD28277A3210001CE3AF /* DefaultFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DefaultFont.h; sourceTree = "<group>"; };
 		71ABBD322783C8BA001CE3AF /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
 		71ABBD332783C8BB001CE3AF /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Image.cpp; sourceTree = "<group>"; };
-		71ABBD372791167A001CE3AF /* ImageComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageComponent.h; sourceTree = "<group>"; };
+		71ABBD372791167A001CE3AF /* UIComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIComponent.h; sourceTree = "<group>"; };
 		71ABBD39279116E1001CE3AF /* UniqueToken.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UniqueToken.cpp; sourceTree = "<group>"; };
 		71ABBD3A279116E1001CE3AF /* UniqueToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UniqueToken.h; sourceTree = "<group>"; };
 		71ABBD3E27A879B9001CE3AF /* MeshPolygonComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshPolygonComponent.h; sourceTree = "<group>"; };
@@ -1582,7 +1582,7 @@
 				71ABBD3F27A879B9001CE3AF /* ButtonComponent.h */,
 				7162FC4625962A0E0075B97D /* CameraComponent.h */,
 				71451BB3270C9D0F00712643 /* ColorActionComponent.h */,
-				71ABBD372791167A001CE3AF /* ImageComponent.h */,
+				71ABBD372791167A001CE3AF /* UIComponent.h */,
 				71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */,
 				71CC839226B8C49B00EEBB93 /* LightComponent.h */,
 				7162FC4525962A0E0075B97D /* MeshComponent.h */,
@@ -1606,7 +1606,7 @@
 				71451BB9270C9D0F00712643 /* TimedActionComponent.h */,
 				7162FC4725962A0E0075B97D /* Transform.h */,
 				71E54511284D5BE000C68FAB /* TranslateTracksComponent.h */,
-				71451BB6270C9D0F00712643 /* UIComponent.h */,
+				71451BB6270C9D0F00712643 /* UILayoutComponent.h */,
 			);
 			path = component;
 			sourceTree = "<group>";
@@ -2284,7 +2284,7 @@
 				718FDDF52837CA9A00AF314C /* msl21ios.h in Headers */,
 				718FDDF92837CA9A00AF314C /* glsl330.h in Headers */,
 				717AD96A290B6602007D7DB5 /* Audio.h in Headers */,
-				71ABBD382791167A001CE3AF /* ImageComponent.h in Headers */,
+				71ABBD382791167A001CE3AF /* UIComponent.h in Headers */,
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
 				71ABBD1E277A31BA001CE3AF /* Text.h in Headers */,
 				71E54505284D5BB700C68FAB /* TranslateTracks.h in Headers */,

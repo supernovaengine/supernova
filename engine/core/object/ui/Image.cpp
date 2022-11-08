@@ -1,55 +1,19 @@
+//
+// (c) 2022 Eduardo Doria.
+//
+
 #include "Image.h"
 
 #include "util/Color.h"
 
 using namespace Supernova;
 
-Image::Image(Scene* scene): Object(scene){
+Image::Image(Scene* scene): UIObject(scene){
     addComponent<UIComponent>({});
     addComponent<ImageComponent>({});
 }
 
-void Image::setSize(int width, int height){
-    UIComponent& uicomp = getComponent<UIComponent>();
-    ImageComponent& img = getComponent<ImageComponent>();
-
-    uicomp.width = width;
-    uicomp.height = height;
-
-    img.needUpdate = true;
-}
-
-void Image::setWidth(int width){
-    UIComponent& uicomp = getComponent<UIComponent>();
-    ImageComponent& img = getComponent<ImageComponent>();
-
-    uicomp.width = width;
-
-    img.needUpdate = true;
-}
-
-void Image::setHeight(int height){
-    UIComponent& uicomp = getComponent<UIComponent>();
-    ImageComponent& img = getComponent<ImageComponent>();
-
-    uicomp.height = height;
-
-    img.needUpdate = true;
-}
-
-int Image::getWidth() const{
-    UIComponent& uicomp = getComponent<UIComponent>();
-
-    return uicomp.width;
-}
-
-int Image::getHeight() const{
-    UIComponent& uicomp = getComponent<UIComponent>();
-
-    return uicomp.height;
-}
-
-void Image::setMargin(int margin){
+void Image::setPatchMargin(int margin){
     ImageComponent& img = getComponent<ImageComponent>();
     
     img.patchMarginBottom = margin;
@@ -57,85 +21,85 @@ void Image::setMargin(int margin){
     img.patchMarginRight = margin;
     img.patchMarginTop = margin;
 
-    img.needUpdate = true;
+    img.needUpdatePatches = true;
 }
 
-void Image::setMarginBottom(int marginBottom){
+void Image::setPatchMarginBottom(int marginBottom){
     ImageComponent& img = getComponent<ImageComponent>();
     
     img.patchMarginBottom = marginBottom;
 
-    img.needUpdate = true;
+    img.needUpdatePatches = true;
 }
 
-void Image::setMarginLeft(int marginLeft){
+void Image::setPatchMarginLeft(int marginLeft){
     ImageComponent& img = getComponent<ImageComponent>();
     
     img.patchMarginLeft = marginLeft;
 
-    img.needUpdate = true;
+    img.needUpdatePatches = true;
 }
 
-void Image::setMarginRight(int marginRight){
+void Image::setPatchMarginRight(int marginRight){
     ImageComponent& img = getComponent<ImageComponent>();
     
     img.patchMarginRight = marginRight;
 
-    img.needUpdate = true;
+    img.needUpdatePatches = true;
 }
 
-void Image::setMarginTop(int marginTop){
+void Image::setPatchMarginTop(int marginTop){
     ImageComponent& img = getComponent<ImageComponent>();
 
     img.patchMarginTop = marginTop;
 
-    img.needUpdate = true;
+    img.needUpdatePatches = true;
 }
 
-int Image::getMarginBottom() const{
+int Image::getPatchMarginBottom() const{
     ImageComponent& img = getComponent<ImageComponent>();
     
     return img.patchMarginBottom;
 }
 
-int Image::getMarginLeft() const{
+int Image::getPatchMarginLeft() const{
     ImageComponent& img = getComponent<ImageComponent>();
     
     return img.patchMarginLeft;
 }
 
-int Image::getMarginRight() const{
+int Image::getPatchMarginRight() const{
     ImageComponent& img = getComponent<ImageComponent>();
     
     return img.patchMarginRight;
 }
 
-int Image::getMarginTop() const{
+int Image::getPatchMarginTop() const{
     ImageComponent& img = getComponent<ImageComponent>();
     
     return img.patchMarginTop;
 }
 
 void Image::setTexture(std::string path){
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
-    uicomp.texture.setPath(path);
+    ui.texture.setPath(path);
 
-    uicomp.needUpdateTexture = true;
+    ui.needUpdateTexture = true;
 }
 
 void Image::setTexture(FramebufferRender* framebuffer){
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
-    uicomp.texture.setFramebuffer(framebuffer);
+    ui.texture.setFramebuffer(framebuffer);
 
-    uicomp.needUpdateTexture = true;
+    ui.needUpdateTexture = true;
 }
 
 void Image::setColor(Vector4 color){
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
-    uicomp.color = Color::sRGBToLinear(color);
+    ui.color = Color::sRGBToLinear(color);
 }
 
 void Image::setColor(const float red, const float green, const float blue, const float alpha){
@@ -143,7 +107,7 @@ void Image::setColor(const float red, const float green, const float blue, const
 }
 
 Vector4 Image::getColor() const{
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
-    return Color::linearTosRGB(uicomp.color);
+    return Color::linearTosRGB(ui.color);
 }

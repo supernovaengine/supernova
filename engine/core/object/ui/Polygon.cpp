@@ -10,6 +10,7 @@
 using namespace Supernova;
 
 Polygon::Polygon(Scene* scene): Object(scene){
+    addComponent<UILayoutComponent>({});
     addComponent<UIComponent>({});
     addComponent<PolygonComponent>({});
 }
@@ -27,25 +28,25 @@ void Polygon::addVertex(float x, float y){
 }
 
 void Polygon::setTexture(std::string path){
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
-    uicomp.texture.setPath(path);
+    ui.texture.setPath(path);
 
-    uicomp.needUpdateTexture = true;
+    ui.needUpdateTexture = true;
 }
 
 void Polygon::setTexture(FramebufferRender* framebuffer){
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
-    uicomp.texture.setFramebuffer(framebuffer);
+    ui.texture.setFramebuffer(framebuffer);
 
-    uicomp.needUpdateTexture = true;
+    ui.needUpdateTexture = true;
 }
 
 void Polygon::setColor(Vector4 color){
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
-    uicomp.color = Color::sRGBToLinear(color);
+    ui.color = Color::sRGBToLinear(color);
 }
 
 void Polygon::setColor(float red, float green, float blue, float alpha){
@@ -53,19 +54,19 @@ void Polygon::setColor(float red, float green, float blue, float alpha){
 }
 
 Vector4 Polygon::getColor() const{
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
-    return uicomp.color;
+    return ui.color;
 }
 
 int Polygon::getWidth() const{
-    UIComponent& ui = getComponent<UIComponent>();
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return ui.width;
+    return layout.width;
 }
 
 int Polygon::getHeight() const{
-    UIComponent& ui = getComponent<UIComponent>();
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return ui.height;
+    return layout.height;
 }

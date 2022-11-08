@@ -6,6 +6,7 @@
 #define BUTTON_COMPONENT_H
 
 #include "util/FunctionSubscribe.h"
+#include "texture/Texture.h"
 
 namespace Supernova{
 

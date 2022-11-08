@@ -7,9 +7,10 @@
 
 #include "SubSystem.h"
 
-#include "component/UIComponent.h"
+#include "component/UILayoutComponent.h"
 #include "component/TextComponent.h"
 #include "component/ImageComponent.h"
+#include "component/UIComponent.h"
 #include "component/ButtonComponent.h"
 #include "component/PolygonComponent.h"
 #include "component/TextEditComponent.h"
@@ -24,21 +25,21 @@ namespace Supernova{
 		std::string eventId;
 
 		//Image
-		bool createImagePatches(ImageComponent& img, UIComponent& ui);
+		bool createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
 
 		// Text
-		bool loadFontAtlas(TextComponent& text, UIComponent& ui);
-		void createText(TextComponent& text, UIComponent& ui);
+		bool loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutComponent& layout);
+		void createText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout);
 
 		//Button
-		void updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui);
+		void updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
 
 		//TextEdit
-		void updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui);
-		void blinkCursorTextEdit(double dt, TextEditComponent& textedit, UIComponent& ui);
+		void updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
+		void blinkCursorTextEdit(double dt, TextEditComponent& textedit, UILayoutComponent& layout);
 
 		//UI Polygon
-		void createUIPolygon(PolygonComponent& polygon, UIComponent& ui);
+		void createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout);
 
 		void eventOnCharInput(wchar_t codepoint);
 		void eventOnMouseDown(int button, float x, float y, int mods);
@@ -47,7 +48,7 @@ namespace Supernova{
 		void eventOnTouchStart(int pointer, float x, float y);
 		void eventOnTouchEnd(int pointer, float x, float y);
 
-		bool isCoordInside(float x, float y, Transform& transform, UIComponent& ui);
+		bool isCoordInside(float x, float y, Transform& transform, UILayoutComponent& layout);
 
 	public:
 		UISystem(Scene* scene);

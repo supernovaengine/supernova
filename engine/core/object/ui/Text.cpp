@@ -6,6 +6,7 @@
 using namespace Supernova;
 
 Text::Text(Scene* scene): Object(scene){
+    addComponent<UILayoutComponent>({});
     addComponent<UIComponent>({});
     addComponent<TextComponent>({});
 }
@@ -19,10 +20,10 @@ Text::~Text() {
 
 void Text::setSize(int width, int height){
     TextComponent& textcomp = getComponent<TextComponent>();
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    uicomp.width = width;
-    uicomp.height = height;
+    layout.width = width;
+    layout.height = height;
     textcomp.userDefinedWidth = true;
     textcomp.userDefinedHeight = true;
 
@@ -31,9 +32,9 @@ void Text::setSize(int width, int height){
 
 void Text::setWidth(int width){
     TextComponent& textcomp = getComponent<TextComponent>();
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    uicomp.width = width;
+    layout.width = width;
     textcomp.userDefinedWidth = true;
 
     textcomp.needUpdateText = true;
@@ -41,36 +42,36 @@ void Text::setWidth(int width){
 
 void Text::setHeight(int height){
     TextComponent& textcomp = getComponent<TextComponent>();
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    uicomp.height = height;
+    layout.height = height;
     textcomp.userDefinedHeight = true;
 
     textcomp.needUpdateText = true;
 }
 
 int Text::getWidth() const{
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return uicomp.width;
+    return layout.width;
 }
 
 int Text::getHeight() const{
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return uicomp.height;
+    return layout.height;
 }
 
 void Text::setMaxTextSize(unsigned int maxTextSize){
     TextComponent& textcomp = getComponent<TextComponent>();
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
     if (textcomp.maxTextSize != maxTextSize){
         textcomp.maxTextSize = maxTextSize;
 
         textcomp.needReload = true;
         textcomp.needUpdateText = true;
-        uicomp.needReload = true;
+        ui.needReload = true;
     }
 }
 
@@ -144,9 +145,9 @@ bool Text::getMultiline() const{
 }
 
 void Text::setColor(Vector4 color){
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
-    uicomp.color = Color::sRGBToLinear(color);
+    ui.color = Color::sRGBToLinear(color);
 }
 
 void Text::setColor(float red, float green, float blue, float alpha){
@@ -154,9 +155,9 @@ void Text::setColor(float red, float green, float blue, float alpha){
 }
 
 Vector4 Text::getColor() const{
-    UIComponent& uicomp = getComponent<UIComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
 
-    return Color::linearTosRGB(uicomp.color);
+    return Color::linearTosRGB(ui.color);
 }
 
 float Text::getAscent() const{

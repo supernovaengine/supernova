@@ -10,6 +10,7 @@
 #include "component/Transform.h"
 #include "component/SpriteComponent.h"
 #include "component/MeshComponent.h"
+#include "component/UILayoutComponent.h"
 #include "component/UIComponent.h"
 #include "component/ActionComponent.h"
 #include "component/TimedActionComponent.h"

@@ -17,7 +17,7 @@ Scene::Scene(){
 	registerComponent<ModelComponent>();
 	registerComponent<BoneComponent>();
 	registerComponent<SkyComponent>();
-	registerComponent<UIComponent>();
+	registerComponent<UILayoutComponent>();
 	registerComponent<SpriteComponent>();
 	registerComponent<SpriteAnimationComponent>();
     registerComponent<Transform>();
@@ -33,6 +33,7 @@ Scene::Scene(){
 	registerComponent<ParticlesComponent>();
 	registerComponent<ParticlesAnimationComponent>();
 	registerComponent<TextComponent>();
+	registerComponent<UIComponent>();
 	registerComponent<ImageComponent>();
 	registerComponent<ButtonComponent>();
 	registerComponent<TextEditComponent>();
@@ -385,6 +386,12 @@ void Scene::sortComponentsByTransform(Signature entitySignature){
 	if (entitySignature.test(getComponentType<PolygonComponent>())){
 		auto polygons = componentManager.getComponentArray<PolygonComponent>();
 		polygons->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
+	}
+
+	// UI layout component
+	if (entitySignature.test(getComponentType<UILayoutComponent>())){
+		auto layout = componentManager.getComponentArray<UILayoutComponent>();
+		layout->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// UI component

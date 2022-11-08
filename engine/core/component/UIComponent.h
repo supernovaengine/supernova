@@ -1,3 +1,7 @@
+//
+// (c) 2022 Eduardo Doria.
+//
+
 #ifndef UI_COMPONENT_H
 #define UI_COMPONENT_H
 
@@ -6,17 +10,10 @@
 #include "render/ObjectRender.h"
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
-#include "util/FunctionSubscribe.h"
 
 namespace Supernova{
 
     struct UIComponent{
-        // UI part
-        int width = 0;
-        int height = 0;
-
-        bool focused = false;
-
         // Render part
         bool loaded = false;
 
@@ -38,14 +35,12 @@ namespace Supernova{
         Texture texture;
         Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0); //linear color
 
-        FunctionSubscribe<void()> onMouseMove;
-        bool mouseMoved = false;
+        bool needReload = false;
 
         bool needUpdateBuffer = false;
         bool needUpdateTexture = false;
-        bool needReload = false;
     };
-    
+
 }
 
 #endif //UI_COMPONENT_H

@@ -326,16 +326,22 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .deriveClass<Image, Object>("Image")
+        .deriveClass<UIObject, Object>("UIObject")
         .addConstructor <void (*) (Scene*)> ()
-        .addFunction("setSize", &Image::setSize)
-        .addProperty("width", &Image::getWidth, &Image::setWidth)
-        .addProperty("height", &Image::getHeight, &Image::setHeight)
-        .addFunction("setMargin", &Image::setMargin)
-        .addProperty("marginBottom", &Image::getMarginBottom, &Image::setMarginBottom)
-        .addProperty("marginLeft", &Image::getMarginLeft, &Image::setMarginLeft)
-        .addProperty("marginRight", &Image::getMarginRight, &Image::setMarginRight)
-        .addProperty("marginTop", &Image::getMarginTop, &Image::setMarginTop)
+        .addFunction("setSize", &UIObject::setSize)
+        .addProperty("width", &UIObject::getWidth, &Image::setWidth)
+        .addProperty("height", &UIObject::getHeight, &UIObject::setHeight)
+        .addFunction("getUILayoutComponent", &Image::getComponent<UILayoutComponent>)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Image, UIObject>("Image")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setPatchMargin", &Image::setPatchMargin)
+        .addProperty("patchMarginBottom", &Image::getPatchMarginBottom, &Image::setPatchMarginBottom)
+        .addProperty("patchMarginLeft", &Image::getPatchMarginLeft, &Image::setPatchMarginLeft)
+        .addProperty("patchMarginRight", &Image::getPatchMarginRight, &Image::setPatchMarginRight)
+        .addProperty("patchMarginTop", &Image::getPatchMarginTop, &Image::setPatchMarginTop)
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Image::setTexture),
             luabridge::overload<FramebufferRender*>(&Image::setTexture))
