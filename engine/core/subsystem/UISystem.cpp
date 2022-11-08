@@ -344,7 +344,7 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     float cursorX = textX + textlayout.width;
     float cursorY = img.patchMarginTop + ((float)heightArea / 2) - ((float)cursorHeight / 2);
 
-    cursorimg.color = textedit.cursorColor;
+    cursorui.color = textedit.cursorColor;
     cursortransform.position = Vector3(cursorX, cursorY, 0.0);
     cursortransform.needUpdate = true;
 

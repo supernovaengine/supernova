@@ -366,6 +366,10 @@
 		717AD96F290B661A007D7DB5 /* AudioSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD96C290B661A007D7DB5 /* AudioSystem.h */; };
 		717AD97A290B68B4007D7DB5 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 717AD979290B68B4007D7DB5 /* AVFoundation.framework */; };
 		717AD981290B691E007D7DB5 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 717AD980290B691E007D7DB5 /* AudioToolbox.framework */; };
+		717AD9842919E1CB007D7DB5 /* UIObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD9822919E1CB007D7DB5 /* UIObject.cpp */; };
+		717AD9852919E1CB007D7DB5 /* UIObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD9822919E1CB007D7DB5 /* UIObject.cpp */; };
+		717AD9862919E1CB007D7DB5 /* UIObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD9832919E1CB007D7DB5 /* UIObject.h */; };
+		717AD9882919E1E9007D7DB5 /* ImageComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD9872919E1E9007D7DB5 /* ImageComponent.h */; };
 		717D9B3D2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
 		717D9B3E2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
 		717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B3C2733783D002C0803 /* ParticlesAnimation.h */; };
@@ -1013,6 +1017,9 @@
 		717AD97B290B68F3007D7DB5 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.0.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
 		717AD97D290B6906007D7DB5 /* CoreAudioKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudioKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.0.sdk/System/Library/Frameworks/CoreAudioKit.framework; sourceTree = DEVELOPER_DIR; };
 		717AD980290B691E007D7DB5 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.0.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
+		717AD9822919E1CB007D7DB5 /* UIObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UIObject.cpp; sourceTree = "<group>"; };
+		717AD9832919E1CB007D7DB5 /* UIObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIObject.h; sourceTree = "<group>"; };
+		717AD9872919E1E9007D7DB5 /* ImageComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageComponent.h; sourceTree = "<group>"; };
 		717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlesAnimation.cpp; sourceTree = "<group>"; };
 		717D9B3C2733783D002C0803 /* ParticlesAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimation.h; sourceTree = "<group>"; };
 		717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimationComponent.h; sourceTree = "<group>"; };
@@ -1582,7 +1589,7 @@
 				71ABBD3F27A879B9001CE3AF /* ButtonComponent.h */,
 				7162FC4625962A0E0075B97D /* CameraComponent.h */,
 				71451BB3270C9D0F00712643 /* ColorActionComponent.h */,
-				71ABBD372791167A001CE3AF /* UIComponent.h */,
+				717AD9872919E1E9007D7DB5 /* ImageComponent.h */,
 				71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */,
 				71CC839226B8C49B00EEBB93 /* LightComponent.h */,
 				7162FC4525962A0E0075B97D /* MeshComponent.h */,
@@ -1606,6 +1613,7 @@
 				71451BB9270C9D0F00712643 /* TimedActionComponent.h */,
 				7162FC4725962A0E0075B97D /* Transform.h */,
 				71E54511284D5BE000C68FAB /* TranslateTracksComponent.h */,
+				71ABBD372791167A001CE3AF /* UIComponent.h */,
 				71451BB6270C9D0F00712643 /* UILayoutComponent.h */,
 			);
 			path = component;
@@ -2007,6 +2015,8 @@
 				71ABBD19277A31BA001CE3AF /* Text.h */,
 				713E580927BA9CE400376680 /* TextEdit.cpp */,
 				713E580B27BA9CE400376680 /* TextEdit.h */,
+				717AD9822919E1CB007D7DB5 /* UIObject.cpp */,
+				717AD9832919E1CB007D7DB5 /* UIObject.h */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -2316,6 +2326,7 @@
 				71E54513284D5BE000C68FAB /* MorphTracksComponent.h in Headers */,
 				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,
 				71FCE4BE28E0FA01003C5217 /* LuaFunction.h in Headers */,
+				717AD9882919E1E9007D7DB5 /* ImageComponent.h in Headers */,
 				7170A3CB2818A87E0003E965 /* BoneComponent.h in Headers */,
 				717AD964290B65E6007D7DB5 /* AudioComponent.h in Headers */,
 				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
@@ -2350,6 +2361,7 @@
 				71ABBD4627A879D4001CE3AF /* Button.h in Headers */,
 				71ED64C728B45E0B005D2D96 /* Angle.h in Headers */,
 				717D9B4C27337B72002C0803 /* ljumptab.h in Headers */,
+				717AD9862919E1CB007D7DB5 /* UIObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3002,6 +3014,7 @@
 			files = (
 				713D8304259D34F900567F9F /* Ray.cpp in Sources */,
 				713E581027BA9CE400376680 /* Polygon.cpp in Sources */,
+				717AD9852919E1CB007D7DB5 /* UIObject.cpp in Sources */,
 				713D8292259D307E00567F9F /* Log.cpp in Sources */,
 				7105A56928B305B20092EA05 /* ECSClassesLua.cpp in Sources */,
 				71451BDD270CA17F00712643 /* RotationAction.cpp in Sources */,
@@ -3146,6 +3159,7 @@
 			files = (
 				7162FE0C2596A5BE0075B97D /* SokolObject.cpp in Sources */,
 				713E580F27BA9CE400376680 /* Polygon.cpp in Sources */,
+				717AD9842919E1CB007D7DB5 /* UIObject.cpp in Sources */,
 				7162FE0D2596A5BE0075B97D /* SokolBuffer.cpp in Sources */,
 				7105A56828B305B20092EA05 /* ECSClassesLua.cpp in Sources */,
 				71451BDC270CA17F00712643 /* RotationAction.cpp in Sources */,
