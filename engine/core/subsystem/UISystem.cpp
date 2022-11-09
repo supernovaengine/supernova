@@ -418,6 +418,16 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILay
     ui.needUpdateBuffer = true;
 }
 
+void UISystem::updateAllAnchors(){
+    auto layouts = scene->getComponentArray<UILayoutComponent>();
+    for (int i = 0; i < layouts->size(); i++){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
+        if (layout.marginLeft != 0 || layout.marginTop != 0 || layout.marginRight != 0 || layout.marginBottom != 0){
+            layout.needUpdateAnchors = true;
+        }
+    }
+}
+
 void UISystem::load(){
     if (eventId.empty()){
         eventId = "UISystem|" + UniqueToken::get();
@@ -465,11 +475,19 @@ void UISystem::update(double dt){
             float abAnchorTop = Engine::getCanvasHeight() * layout.anchorTop;
             float abAnchorBottom = Engine::getCanvasHeight() * layout.anchorBottom;
 
+            if (layout.marginLeft == 0 && layout.marginTop == 0 && layout.marginRight == 0 && layout.marginBottom == 0){
+                layout.marginLeft = -layout.width / 2;
+                layout.marginTop = -layout.height / 2;
+                layout.marginRight = layout.width / 2;
+                layout.marginBottom = layout.height / 2;
+            }
+
             if (signature.test(scene->getComponentType<Transform>())){
                 Transform& transform = scene->getComponent<Transform>(entity);
 
                 transform.position.x = abAnchorLeft + layout.marginLeft;
                 transform.position.y = abAnchorTop + layout.marginTop;
+                transform.needUpdate = true;
 
                 float width = abAnchorRight - transform.position.x + layout.marginRight;
                 float height = abAnchorBottom - transform.position.y + layout.marginBottom;

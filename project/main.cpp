@@ -8,7 +8,8 @@ Image image(&scene);
 
 void init(){
 
-    image.setPosition(Vector3(200,200,0));
+    image.setAnchors(0.5,0.5,0.5,0.5);
+    image.setMargins(-205,-130,205,130);
     image.setTexture("supernova.png");
 
     Engine::setScalingMode(Scaling::FITWIDTH);

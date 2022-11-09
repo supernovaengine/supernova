@@ -331,6 +331,16 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setSize", &UIObject::setSize)
         .addProperty("width", &UIObject::getWidth, &Image::setWidth)
         .addProperty("height", &UIObject::getHeight, &UIObject::setHeight)
+        .addFunction("setAnchors", &UIObject::setAnchors)
+        .addProperty("anchorLeft", &UIObject::getAnchorLeft, &UIObject::setAnchorLeft)
+        .addProperty("anchorTop", &UIObject::getAnchorTop, &UIObject::setAnchorTop)
+        .addProperty("anchorRight", &UIObject::getAnchorRight, &UIObject::setAnchorRight)
+        .addProperty("anchorBottom", &UIObject::getAnchorBottom, &UIObject::setAnchorBottom)
+        .addFunction("setMargins", &UIObject::setMargins)
+        .addProperty("marginLeft", &UIObject::getMarginLeft, &UIObject::setMarginLeft)
+        .addProperty("marginTop", &UIObject::getMarginTop, &UIObject::setMarginTop)
+        .addProperty("marginRight", &UIObject::getMarginRight, &UIObject::setMarginRight)
+        .addProperty("marginBottom", &UIObject::getMarginBottom, &UIObject::setMarginBottom)
         .addFunction("getUILayoutComponent", &Image::getComponent<UILayoutComponent>)
         .endClass();
 

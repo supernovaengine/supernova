@@ -54,6 +54,7 @@ namespace Supernova{
 		UISystem(Scene* scene);
 		virtual ~UISystem();
 
+		void updateAllAnchors();
 		void createButtonLabel(Entity entity, ButtonComponent& button);
 		void createTextEditObjects(Entity entity, TextEditComponent& textedit);
 

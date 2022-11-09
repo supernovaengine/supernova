@@ -15,10 +15,10 @@ namespace Supernova{
         float anchorRight = 0.5;
         float anchorBottom = 0.5;
 
-        float marginLeft = 0;
-        float marginTop = 0;
-        float marginRight = 0;
-        float marginBottom = 0;
+        int marginLeft = 0;
+        int marginTop = 0;
+        int marginRight = 0;
+        int marginBottom = 0;
 
         FunctionSubscribe<void()> onMouseMove;
         bool mouseMoved = false;

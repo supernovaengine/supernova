@@ -9,6 +9,7 @@
 #include "render/SystemRender.h"
 #include "script/LuaBinding.h"
 #include "subsystem/AudioSystem.h"
+#include "subsystem/UISystem.h"
 
 #include "sokol_time.h"
 
@@ -400,8 +401,11 @@ void Engine::systemViewChanged(){
     viewRect.setRect(viewX, viewY, viewWidth, viewHeight);
 
     for (int i = 0; i < MAX_SCENE_LAYERS; i++){
-        if (scenes[i])
-            scenes[i]->updateCameraSize();
+        if (scenes[i]){
+            scenes[i]->updateCameraSize(); //TODO: put this in system
+            scenes[i]->getSystem<UISystem>()->updateAllAnchors();
+        }
+
     }
 
     onViewChanged.call();
