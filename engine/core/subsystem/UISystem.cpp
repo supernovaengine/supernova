@@ -606,6 +606,8 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.marginRight = 0;
         layout.marginBottom = 0;
     }
+
+    layout.anchorPreset = AnchorPreset::NONE;
 }
 
 void UISystem::load(){

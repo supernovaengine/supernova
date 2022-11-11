@@ -57,6 +57,7 @@ void UIObject::setAnchors(float anchorLeft, float anchorTop, float anchorRight, 
     layout.anchorRight = anchorRight;
     layout.anchorBottom = anchorBottom;
 
+    layout.anchorPreset = AnchorPreset::NONE;
     layout.needUpdateAnchors = true;
 }
 
@@ -65,6 +66,7 @@ void UIObject::setAnchorLeft(float anchorLeft){
 
     layout.anchorLeft = anchorLeft;
 
+    layout.anchorPreset = AnchorPreset::NONE;
     layout.needUpdateAnchors = true;
 }
 
@@ -73,6 +75,7 @@ void UIObject::setAnchorTop(float anchorTop){
 
     layout.anchorTop = anchorTop;
 
+    layout.anchorPreset = AnchorPreset::NONE;
     layout.needUpdateAnchors = true;
 }
 
@@ -81,6 +84,7 @@ void UIObject::setAnchorRight(float anchorRight){
 
     layout.anchorRight = anchorRight;
 
+    layout.anchorPreset = AnchorPreset::NONE;
     layout.needUpdateAnchors = true;
 }
 
@@ -89,6 +93,7 @@ void UIObject::setAnchorBottom(float anchorBottom){
 
     layout.anchorBottom = anchorBottom;
 
+    layout.anchorPreset = AnchorPreset::NONE;
     layout.needUpdateAnchors = true;
 }
 
@@ -124,6 +129,7 @@ void UIObject::setMargins(int marginLeft, int marginTop, int marginRight, int ma
     layout.marginRight = marginRight;
     layout.marginBottom = marginBottom;
 
+    layout.anchorPreset = AnchorPreset::NONE;
     layout.needUpdateAnchors = true;
 }
 
@@ -132,6 +138,7 @@ void UIObject::setMarginLeft(int marginLeft){
 
     layout.marginLeft = marginLeft;
 
+    layout.anchorPreset = AnchorPreset::NONE;
     layout.needUpdateAnchors = true;
 }
 
@@ -140,6 +147,7 @@ void UIObject::setMarginTop(int marginTop){
 
     layout.marginTop = marginTop;
 
+    layout.anchorPreset = AnchorPreset::NONE;
     layout.needUpdateAnchors = true;
 }
 
@@ -148,6 +156,7 @@ void UIObject::setMarginRight(int marginRight){
 
     layout.marginRight = marginRight;
 
+    layout.anchorPreset = AnchorPreset::NONE;
     layout.needUpdateAnchors = true;
 }
 
@@ -156,6 +165,7 @@ void UIObject::setMarginBottom(int marginBottom){
 
     layout.marginBottom = marginBottom;
 
+    layout.anchorPreset = AnchorPreset::NONE;
     layout.needUpdateAnchors = true;
 }
 
