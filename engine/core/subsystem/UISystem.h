@@ -50,13 +50,22 @@ namespace Supernova{
 
 		bool isCoordInside(float x, float y, Transform& transform, UILayoutComponent& layout);
 
+		void applyAnchorPreset(UILayoutComponent& layout);
+
 	public:
 		UISystem(Scene* scene);
 		virtual ~UISystem();
 
-		void updateAllAnchors();
+		// basic UIs
+		bool loadAndUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout);
+		bool loadAndUpdateImage(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
+		bool loadAndUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout);
+
+		// advanced UIs
 		void createButtonLabel(Entity entity, ButtonComponent& button);
 		void createTextEditObjects(Entity entity, TextEditComponent& textedit);
+
+		void updateAllAnchors();
 
 		virtual void load();
 		virtual void destroy();

@@ -211,7 +211,6 @@ void UISystem::createButtonLabel(Entity entity, ButtonComponent& button){
 }
 
 void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
-
     createButtonLabel(entity, button);
 
     if (!ui.loaded){
@@ -225,29 +224,13 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
 
     Transform& labeltransform = scene->getComponent<Transform>(button.label);
     TextComponent& labeltext = scene->getComponent<TextComponent>(button.label);
+    UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
     UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
 
-    float labelX = 0;
-    float labelY = (layout.height / 2) + (labellayout.height / 2) - img.patchMarginBottom;
-
-    if (labellayout.width > (layout.width - img.patchMarginRight)) {
-        labelX = img.patchMarginLeft;
-        int labelWidth = layout.width - img.patchMarginRight;
-
-        if (labellayout.width != labelWidth){
-            labellayout.width = labelWidth;
-            labeltext.userDefinedWidth = true;
-            labeltext.needUpdateText = true;
-        }
-    } else {
-        labelX = (layout.width / 2) - (labellayout.width / 2);
-    }
-    Vector3 labelPosition = Vector3(labelX, labelY, 0);
-
-    if (labeltransform.position != labelPosition){
-        labeltransform.position = labelPosition;
-        labeltransform.needUpdate = true;
-    }
+    loadAndUpdateText(labeltext, labelui, labellayout);
+    
+    labellayout.anchorPreset = AnchorPreset::CENTER;
+    labellayout.needUpdateAnchors = true;
 
     if (button.disabled){
         if (ui.texture != button.textureDisabled){
@@ -300,7 +283,10 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     // Text
     Transform& texttransform = scene->getComponent<Transform>(textedit.text);
     UILayoutComponent& textlayout = scene->getComponent<UILayoutComponent>(textedit.text);
+    UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
     TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
+
+    loadAndUpdateText(text, textui, textlayout);
 
     if (layout.height == 0){
         layout.height = textlayout.height + img.patchMarginTop + img.patchMarginBottom;
@@ -319,7 +305,7 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
 
     float textX = img.patchMarginLeft - textXOffset;
     // descend is negative
-    float textY = img.patchMarginTop + (heightArea / 2) + (textlayout.height / 2) + text.stbtext->getDescent();
+    float textY = img.patchMarginTop + (heightArea / 2) - (textlayout.height / 2);
 
     Vector3 textPosition = Vector3(textX, textY, 0);
 
@@ -330,8 +316,11 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
 
     // Cursor
     Transform& cursortransform = scene->getComponent<Transform>(textedit.cursor);
+    UILayoutComponent& cursorlayout = scene->getComponent<UILayoutComponent>(textedit.cursor);
     UIComponent& cursorui = scene->getComponent<UIComponent>(textedit.cursor);
     PolygonComponent& cursor = scene->getComponent<PolygonComponent>(textedit.cursor);
+
+    loadAndUpdatePolygon(cursor, cursorui, cursorlayout);
 
     float cursorHeight = textlayout.height;
 
@@ -418,13 +407,204 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILay
     ui.needUpdateBuffer = true;
 }
 
+bool UISystem::loadAndUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout){
+    if (polygon.needUpdatePolygon){
+        createUIPolygon(polygon, ui, layout);
+
+        polygon.needUpdatePolygon = false;
+    }
+
+    return true;
+}
+
+bool UISystem::loadAndUpdateImage(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
+
+    if (img.needUpdatePatches){
+        createImagePatches(img, ui, layout);
+
+        img.needUpdatePatches = false;
+    }
+
+    return true;
+}
+
+bool UISystem::loadAndUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
+    if (text.needUpdateText){
+        if (text.loaded && text.needReload){
+            ui.texture.destroy(); //texture.setData also destroy it
+            text.loaded = false;
+        }
+        if (!text.loaded){
+            loadFontAtlas(text, ui, layout);
+        }
+        createText(text, ui, layout);
+
+        text.needUpdateText = false;
+    }
+
+    return true;
+}
+
 void UISystem::updateAllAnchors(){
     auto layouts = scene->getComponentArray<UILayoutComponent>();
     for (int i = 0; i < layouts->size(); i++){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
-        if (layout.marginLeft != 0 || layout.marginTop != 0 || layout.marginRight != 0 || layout.marginBottom != 0){
-            layout.needUpdateAnchors = true;
+        Entity entity = layouts->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+        if (signature.test(scene->getComponentType<UIComponent>())){
+            UIComponent& ui = scene->getComponent<UIComponent>(entity);
+            if (ui.loaded){
+                layout.needUpdateAnchors = true;
+            }
         }
+    }
+}
+
+void UISystem::applyAnchorPreset(UILayoutComponent& layout){
+    if (layout.anchorPreset == AnchorPreset::TOP_LEFT){
+        layout.anchorLeft = 0;
+        layout.anchorTop = 0;
+        layout.anchorRight = 0;
+        layout.anchorBottom = 0;
+        layout.marginLeft = 0;
+        layout.marginTop = 0;
+        layout.marginRight = layout.width;
+        layout.marginBottom = layout.height;
+    }else if (layout.anchorPreset == AnchorPreset::TOP_RIGHT){
+        layout.anchorLeft = 1;
+        layout.anchorTop = 0;
+        layout.anchorRight = 1;
+        layout.anchorBottom = 0;
+        layout.marginLeft = -layout.width;
+        layout.marginTop = 0;
+        layout.marginRight = 0;
+        layout.marginBottom = layout.height;
+    }else if (layout.anchorPreset == AnchorPreset::BOTTOM_RIGHT){
+        layout.anchorLeft = 1;
+        layout.anchorTop = 1;
+        layout.anchorRight = 1;
+        layout.anchorBottom = 1;
+        layout.marginLeft = -layout.width;
+        layout.marginTop = -layout.height;
+        layout.marginRight = 0;
+        layout.marginBottom = 0;
+    }else if (layout.anchorPreset == AnchorPreset::BOTTOM_LEFT){
+        layout.anchorLeft = 0;
+        layout.anchorTop = 1;
+        layout.anchorRight = 0;
+        layout.anchorBottom = 1;
+        layout.marginLeft = 0;
+        layout.marginTop = -layout.height;
+        layout.marginRight = layout.width;
+        layout.marginBottom = 0;
+    }else if (layout.anchorPreset == AnchorPreset::CENTER_LEFT){
+        layout.anchorLeft = 0;
+        layout.anchorTop = 0.5;
+        layout.anchorRight = 0;
+        layout.anchorBottom = 0.5;
+        layout.marginLeft = 0;
+        layout.marginTop = -layout.height / 2;
+        layout.marginRight = layout.width;
+        layout.marginBottom = layout.height / 2;
+    }else if (layout.anchorPreset == AnchorPreset::CENTER_TOP){
+        layout.anchorLeft = 0.5;
+        layout.anchorTop = 0;
+        layout.anchorRight = 0.5;
+        layout.anchorBottom = 0;
+        layout.marginLeft = -layout.width / 2;
+        layout.marginTop = 0;
+        layout.marginRight = layout.width / 2;
+        layout.marginBottom = layout.height;
+    }else if (layout.anchorPreset == AnchorPreset::CENTER_RIGHT){
+        layout.anchorLeft = 1;
+        layout.anchorTop = 0.5;
+        layout.anchorRight = 1;
+        layout.anchorBottom = 0.5;
+        layout.marginLeft = -layout.width;
+        layout.marginTop = -layout.height / 2;
+        layout.marginRight = 0;
+        layout.marginBottom = layout.height / 2;
+    }else if (layout.anchorPreset == AnchorPreset::CENTER_BOTTOM){
+        layout.anchorLeft = 0.5;
+        layout.anchorTop = 1;
+        layout.anchorRight = 0.5;
+        layout.anchorBottom = 1;
+        layout.marginLeft = -layout.width / 2;
+        layout.marginTop = -layout.height;
+        layout.marginRight = layout.width / 2;
+        layout.marginBottom = 0;
+    }else if (layout.anchorPreset == AnchorPreset::CENTER){
+        layout.anchorLeft = 0.5;
+        layout.anchorTop = 0.5;
+        layout.anchorRight = 0.5;
+        layout.anchorBottom = 0.5;
+        layout.marginLeft = -layout.width / 2;
+        layout.marginTop = -layout.height / 2;
+        layout.marginRight = layout.width / 2;
+        layout.marginBottom = layout.height / 2;
+    }else if (layout.anchorPreset == AnchorPreset::LEFT_WIDE){
+        layout.anchorLeft = 0;
+        layout.anchorTop = 0;
+        layout.anchorRight = 0;
+        layout.anchorBottom = 1;
+        layout.marginLeft = 0;
+        layout.marginTop = 0;
+        layout.marginRight = layout.width;
+        layout.marginBottom = 0;
+    }else if (layout.anchorPreset == AnchorPreset::TOP_WIDE){
+        layout.anchorLeft = 0;
+        layout.anchorTop = 0;
+        layout.anchorRight = 1;
+        layout.anchorBottom = 0;
+        layout.marginLeft = 0;
+        layout.marginTop = 0;
+        layout.marginRight = 0;
+        layout.marginBottom = layout.height;
+    }else if (layout.anchorPreset == AnchorPreset::RIGHT_WIDE){
+        layout.anchorLeft = 1;
+        layout.anchorTop = 0;
+        layout.anchorRight = 1;
+        layout.anchorBottom = 1;
+        layout.marginLeft = -layout.width;
+        layout.marginTop = 0;
+        layout.marginRight = 0;
+        layout.marginBottom = 0;
+    }else if (layout.anchorPreset == AnchorPreset::BOTTOM_WIDE){
+        layout.anchorLeft = 0;
+        layout.anchorTop = 1;
+        layout.anchorRight = 1;
+        layout.anchorBottom = 1;
+        layout.marginLeft = 0;
+        layout.marginTop = -layout.height;
+        layout.marginRight = 0;
+        layout.marginBottom = 0;
+    }else if (layout.anchorPreset == AnchorPreset::VERTICAL_CENTER_WIDE){
+        layout.anchorLeft = 0.5;
+        layout.anchorTop = 0;
+        layout.anchorRight = 0.5;
+        layout.anchorBottom = 1;
+        layout.marginLeft = -layout.width / 2;
+        layout.marginTop = 0;
+        layout.marginRight = layout.width / 2;
+        layout.marginBottom = 0;
+    }else if (layout.anchorPreset == AnchorPreset::HORIZONTAL_CENTER_WIDE){
+        layout.anchorLeft = 0;
+        layout.anchorTop = 0.5;
+        layout.anchorRight = 1;
+        layout.anchorBottom = 0.5;
+        layout.marginLeft = 0;
+        layout.marginTop = -layout.height / 2;
+        layout.marginRight = 0;
+        layout.marginBottom = layout.height / 2;
+    }else if (layout.anchorPreset == AnchorPreset::FULL_SCREEN){
+        layout.anchorLeft = 0;
+        layout.anchorTop = 0;
+        layout.anchorRight = 1;
+        layout.anchorBottom = 1;
+        layout.marginLeft = 0;
+        layout.marginTop = 0;
+        layout.marginRight = 0;
+        layout.marginBottom = 0;
     }
 }
 
@@ -458,61 +638,17 @@ void UISystem::draw(){
 void UISystem::update(double dt){
 
     auto layouts = scene->getComponentArray<UILayoutComponent>();
-    // inverse of render order to load childs first (must be ordered by Translate)
-    for (int i = layouts->size()-1; i >= 0; i--){
+    // need to be ordered by Transform
+    for (int i = 0; i < layouts->size(); i++){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-
-        if (layout.needUpdateAnchors){
-            if (layout.anchorRight < layout.anchorLeft)
-                layout.anchorRight = layout.anchorLeft;
-            if (layout.anchorBottom < layout.anchorTop)
-                layout.anchorBottom = layout.anchorTop;
-
-            float abAnchorLeft = Engine::getCanvasWidth() * layout.anchorLeft;
-            float abAnchorRight = Engine::getCanvasWidth() * layout.anchorRight;
-            float abAnchorTop = Engine::getCanvasHeight() * layout.anchorTop;
-            float abAnchorBottom = Engine::getCanvasHeight() * layout.anchorBottom;
-
-            if (layout.marginLeft == 0 && layout.marginTop == 0 && layout.marginRight == 0 && layout.marginBottom == 0){
-                layout.marginLeft = -layout.width / 2;
-                layout.marginTop = -layout.height / 2;
-                layout.marginRight = layout.width / 2;
-                layout.marginBottom = layout.height / 2;
-            }
-
-            if (signature.test(scene->getComponentType<Transform>())){
-                Transform& transform = scene->getComponent<Transform>(entity);
-
-                transform.position.x = abAnchorLeft + layout.marginLeft;
-                transform.position.y = abAnchorTop + layout.marginTop;
-                transform.needUpdate = true;
-
-                float width = abAnchorRight - transform.position.x + layout.marginRight;
-                float height = abAnchorBottom - transform.position.y + layout.marginBottom;
-
-                if (width != 0 && height != 0){
-                    layout.width = width;
-                    layout.height = height;
-                    layout.needUpdateSizes = true;
-                }
-            }
-
-            layout.needUpdateAnchors = false;
-        }
 
         if (layout.needUpdateSizes){
             if (signature.test(scene->getComponentType<ImageComponent>())){
                 ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
                 img.needUpdatePatches = true;
-            }
-
-            if (signature.test(scene->getComponentType<ButtonComponent>())){
-                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-                // need to centralize button label
-                button.needUpdateButton = true;
             }
 
             layout.needUpdateSizes = false;
@@ -525,40 +661,21 @@ void UISystem::update(double dt){
             if (signature.test(scene->getComponentType<TextComponent>())){
                 TextComponent& text = scene->getComponent<TextComponent>(entity);
 
-                if (text.needUpdateText){
-                    if (text.loaded && text.needReload){
-                        ui.texture.destroy(); //texture.setData also destroy it
-                        text.loaded = false;
-                    }
-                    if (!text.loaded){
-                        loadFontAtlas(text, ui, layout);
-                    }
-                    createText(text, ui, layout);
-
-                    text.needUpdateText = false;
-                }
+                loadAndUpdateText(text, ui, layout);
             }
 
             // UI Polygons
             if (signature.test(scene->getComponentType<PolygonComponent>())){
                 PolygonComponent& polygon = scene->getComponent<PolygonComponent>(entity);
 
-                if (polygon.needUpdatePolygon){
-                    createUIPolygon(polygon, ui, layout);
-
-                    polygon.needUpdatePolygon = false;
-                }
+                loadAndUpdatePolygon(polygon, ui, layout);
             }
 
             // Images
             if (signature.test(scene->getComponentType<ImageComponent>())){
                 ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
-                if (img.needUpdatePatches){
-                    createImagePatches(img, ui, layout);
-
-                    img.needUpdatePatches = false;
-                }
+                loadAndUpdateImage(img, ui, layout);
 
                 // Buttons
                 if (signature.test(scene->getComponentType<ButtonComponent>())){
@@ -585,6 +702,58 @@ void UISystem::update(double dt){
                 }
             }
 
+        }
+
+        if (signature.test(scene->getComponentType<Transform>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
+
+            if (layout.needUpdateAnchors){
+                if (layout.anchorRight < layout.anchorLeft)
+                    layout.anchorRight = layout.anchorLeft;
+                if (layout.anchorBottom < layout.anchorTop)
+                    layout.anchorBottom = layout.anchorTop;
+
+                applyAnchorPreset(layout);
+            }
+
+            float abAnchorLeft = 0;
+            float abAnchorRight = 0;
+            float abAnchorTop = 0;
+            float abAnchorBottom = 0;
+            if (transform.parent == NULL_ENTITY){
+                abAnchorLeft = Engine::getCanvasWidth() * layout.anchorLeft;
+                abAnchorRight = Engine::getCanvasWidth() * layout.anchorRight;
+                abAnchorTop = Engine::getCanvasHeight() * layout.anchorTop;
+                abAnchorBottom = Engine::getCanvasHeight() * layout.anchorBottom;
+            }else{
+                UILayoutComponent& parentlayout = scene->getComponent<UILayoutComponent>(transform.parent);
+                abAnchorLeft = parentlayout.width * layout.anchorLeft;
+                abAnchorRight = parentlayout.width * layout.anchorRight;
+                abAnchorTop = parentlayout.height * layout.anchorTop;
+                abAnchorBottom = parentlayout.height * layout.anchorBottom;
+            }
+
+            if (layout.needUpdateAnchors){
+                transform.position.x = abAnchorLeft + layout.marginLeft;
+                transform.position.y = abAnchorTop + layout.marginTop;
+                transform.needUpdate = true;
+
+                float width = abAnchorRight - transform.position.x + layout.marginRight;
+                float height = abAnchorBottom - transform.position.y + layout.marginBottom;
+
+                if (width != 0 && height != 0){
+                    layout.width = width;
+                    layout.height = height;
+                    layout.needUpdateSizes = true;
+                }
+
+                layout.needUpdateAnchors = false;
+            }else{
+                layout.marginLeft = transform.position.x - abAnchorLeft;
+                layout.marginTop = transform.position.y - abAnchorTop;
+                layout.marginRight = layout.width + transform.position.x - abAnchorRight;
+                layout.marginBottom = layout.height + transform.position.y - abAnchorBottom;
+            }
         }
         
     }

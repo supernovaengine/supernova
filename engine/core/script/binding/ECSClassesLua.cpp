@@ -45,6 +45,27 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("AnchorPreset")
+        .addProperty("NONE", AnchorPreset::NONE)
+        .addProperty("TOP_LEFT", AnchorPreset::TOP_LEFT)
+        .addProperty("TOP_RIGHT", AnchorPreset::TOP_RIGHT)
+        .addProperty("BOTTOM_LEFT", AnchorPreset::BOTTOM_LEFT)
+        .addProperty("BOTTOM_RIGHT", AnchorPreset::BOTTOM_RIGHT)
+        .addProperty("CENTER_LEFT", AnchorPreset::CENTER_LEFT)
+        .addProperty("CENTER_TOP", AnchorPreset::CENTER_TOP)
+        .addProperty("CENTER_RIGHT", AnchorPreset::CENTER_RIGHT)
+        .addProperty("CENTER_BOTTOM", AnchorPreset::CENTER_BOTTOM)
+        .addProperty("CENTER", AnchorPreset::CENTER)
+        .addProperty("LEFT_WIDE", AnchorPreset::LEFT_WIDE)
+        .addProperty("TOP_WIDE", AnchorPreset::TOP_WIDE)
+        .addProperty("RIGHT_WIDE", AnchorPreset::RIGHT_WIDE)
+        .addProperty("BOTTOM_WIDE", AnchorPreset::BOTTOM_WIDE)
+        .addProperty("VERTICAL_CENTER_WIDE", AnchorPreset::VERTICAL_CENTER_WIDE)
+        .addProperty("HORIZONTAL_CENTER_WIDE", AnchorPreset::HORIZONTAL_CENTER_WIDE)
+        .addProperty("FULL_SCREEN", AnchorPreset::FULL_SCREEN)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<EntityManager>("EntityManager")
         .addConstructor <void (*) (void)> ()
         .addFunction("createEntity", &EntityManager::createEntity)
@@ -89,8 +110,11 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("marginTop", &UILayoutComponent::marginTop)
         .addProperty("marginRight", &UILayoutComponent::marginRight)
         .addProperty("marginBottom", &UILayoutComponent::marginBottom)
+        .addProperty("anchorPreset", &UILayoutComponent::anchorPreset)
         .addProperty("onMouseMove", [] (UILayoutComponent* self, lua_State* L) { return &self->onMouseMove; }, [] (UILayoutComponent* self, lua_State* L) { self->onMouseMove = L; })
         .addProperty("mouseMoved", &UILayoutComponent::mouseMoved)
+        .addProperty("needUpdateSizes", &UILayoutComponent::needUpdateSizes)
+        .addProperty("needUpdateAnchors", &UILayoutComponent::needUpdateAnchors)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

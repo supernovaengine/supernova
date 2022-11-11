@@ -182,3 +182,17 @@ int UIObject::getMarginBottom() const{
 
     return layout.marginBottom;
 }
+
+void UIObject::setAnchorPreset(AnchorPreset anchorPreset){
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    layout.anchorPreset = anchorPreset;
+
+    layout.needUpdateAnchors = true;
+}
+
+AnchorPreset UIObject::getAnchorPreset() const{
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    return layout.anchorPreset;
+}

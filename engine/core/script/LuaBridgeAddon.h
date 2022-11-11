@@ -54,6 +54,8 @@ namespace luabridge
 
     template<> struct Stack<FileErrors> : EnumWrapper<FileErrors>{};
 
+    template<> struct Stack<AnchorPreset> : EnumWrapper<AnchorPreset>{};
+
     template <>
     struct Stack <Touch>
     {

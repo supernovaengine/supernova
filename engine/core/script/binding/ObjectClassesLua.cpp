@@ -341,6 +341,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("marginTop", &UIObject::getMarginTop, &UIObject::setMarginTop)
         .addProperty("marginRight", &UIObject::getMarginRight, &UIObject::setMarginRight)
         .addProperty("marginBottom", &UIObject::getMarginBottom, &UIObject::setMarginBottom)
+        .addProperty("anchorPreset", &UIObject::getAnchorPreset, &UIObject::setAnchorPreset)
         .addFunction("getUILayoutComponent", &Image::getComponent<UILayoutComponent>)
         .endClass();
 

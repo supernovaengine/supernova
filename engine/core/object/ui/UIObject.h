@@ -45,6 +45,9 @@ namespace Supernova{
         int getMarginTop() const;
         int getMarginRight() const;
         int getMarginBottom() const;
+
+        void setAnchorPreset(AnchorPreset anchorPreset);
+        AnchorPreset getAnchorPreset() const;
     };
 }
 
