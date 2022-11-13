@@ -370,6 +370,10 @@
 		717AD9852919E1CB007D7DB5 /* UILayout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD9822919E1CB007D7DB5 /* UILayout.cpp */; };
 		717AD9862919E1CB007D7DB5 /* UILayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD9832919E1CB007D7DB5 /* UILayout.h */; };
 		717AD9882919E1E9007D7DB5 /* ImageComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD9872919E1E9007D7DB5 /* ImageComponent.h */; };
+		717AD98A292118EF007D7DB5 /* UIContainerComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD989292118EF007D7DB5 /* UIContainerComponent.h */; };
+		717AD98D29211976007D7DB5 /* Container.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD98B29211976007D7DB5 /* Container.h */; };
+		717AD98E29211976007D7DB5 /* Container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD98C29211976007D7DB5 /* Container.cpp */; };
+		717AD98F29211976007D7DB5 /* Container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD98C29211976007D7DB5 /* Container.cpp */; };
 		717D9B3D2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
 		717D9B3E2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
 		717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B3C2733783D002C0803 /* ParticlesAnimation.h */; };
@@ -1020,6 +1024,9 @@
 		717AD9822919E1CB007D7DB5 /* UILayout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UILayout.cpp; sourceTree = "<group>"; };
 		717AD9832919E1CB007D7DB5 /* UILayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UILayout.h; sourceTree = "<group>"; };
 		717AD9872919E1E9007D7DB5 /* ImageComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageComponent.h; sourceTree = "<group>"; };
+		717AD989292118EF007D7DB5 /* UIContainerComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIContainerComponent.h; sourceTree = "<group>"; };
+		717AD98B29211976007D7DB5 /* Container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Container.h; sourceTree = "<group>"; };
+		717AD98C29211976007D7DB5 /* Container.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Container.cpp; sourceTree = "<group>"; };
 		717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlesAnimation.cpp; sourceTree = "<group>"; };
 		717D9B3C2733783D002C0803 /* ParticlesAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimation.h; sourceTree = "<group>"; };
 		717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimationComponent.h; sourceTree = "<group>"; };
@@ -1614,6 +1621,7 @@
 				7162FC4725962A0E0075B97D /* Transform.h */,
 				71E54511284D5BE000C68FAB /* TranslateTracksComponent.h */,
 				71ABBD372791167A001CE3AF /* UIComponent.h */,
+				717AD989292118EF007D7DB5 /* UIContainerComponent.h */,
 				71451BB6270C9D0F00712643 /* UILayoutComponent.h */,
 			);
 			path = component;
@@ -2007,6 +2015,8 @@
 			children = (
 				71ABBD4227A879D4001CE3AF /* Button.cpp */,
 				71ABBD4327A879D4001CE3AF /* Button.h */,
+				717AD98C29211976007D7DB5 /* Container.cpp */,
+				717AD98B29211976007D7DB5 /* Container.h */,
 				71ABBD332783C8BB001CE3AF /* Image.cpp */,
 				71ABBD322783C8BA001CE3AF /* Image.h */,
 				713E580A27BA9CE400376680 /* Polygon.cpp */,
@@ -2322,6 +2332,7 @@
 				7170A3D42818A8A30003E965 /* Bone.h in Headers */,
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
 				71451BF0270CA2C900712643 /* Sprite.h in Headers */,
+				717AD98D29211976007D7DB5 /* Container.h in Headers */,
 				71ABBD3D279116E1001CE3AF /* UniqueToken.h in Headers */,
 				71E54513284D5BE000C68FAB /* MorphTracksComponent.h in Headers */,
 				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,
@@ -2331,6 +2342,7 @@
 				717AD964290B65E6007D7DB5 /* AudioComponent.h in Headers */,
 				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
 				71BE622225B1DB83006D6E02 /* TextureData.h in Headers */,
+				717AD98A292118EF007D7DB5 /* UIContainerComponent.h in Headers */,
 				7105A55A28B305910092EA05 /* Color.h in Headers */,
 				71ABBD342783C8BB001CE3AF /* Image.h in Headers */,
 				71ABBD13277A3166001CE3AF /* TextComponent.h in Headers */,
@@ -3039,6 +3051,7 @@
 				71451BE3270CA17F00712643 /* ScaleAction.cpp in Sources */,
 				713D8297259D307F00567F9F /* FileData.cpp in Sources */,
 				71451BEC270CA2C900712643 /* Sprite.cpp in Sources */,
+				717AD98F29211976007D7DB5 /* Container.cpp in Sources */,
 				713D8298259D307F00567F9F /* ShaderRender.cpp in Sources */,
 				713D8299259D307F00567F9F /* ObjectRender.cpp in Sources */,
 				71CC839C26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */,
@@ -3184,6 +3197,7 @@
 				71451BE2270CA17F00712643 /* ScaleAction.cpp in Sources */,
 				7162FD1325963AE00075B97D /* Scene.cpp in Sources */,
 				71451BEB270CA2C900712643 /* Sprite.cpp in Sources */,
+				717AD98E29211976007D7DB5 /* Container.cpp in Sources */,
 				7162FD1625963AE00075B97D /* Data.cpp in Sources */,
 				7162FD1725963AE00075B97D /* UserSettings.cpp in Sources */,
 				71CC839B26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */,
