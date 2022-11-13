@@ -9,8 +9,7 @@
 
 using namespace Supernova;
 
-Polygon::Polygon(Scene* scene): Object(scene){
-    addComponent<UILayoutComponent>({});
+Polygon::Polygon(Scene* scene): UIObject(scene){
     addComponent<UIComponent>({});
     addComponent<PolygonComponent>({});
 }
@@ -57,16 +56,4 @@ Vector4 Polygon::getColor() const{
     UIComponent& ui = getComponent<UIComponent>();
 
     return ui.color;
-}
-
-int Polygon::getWidth() const{
-    UILayoutComponent& layout = getComponent<UILayoutComponent>();
-
-    return layout.width;
-}
-
-int Polygon::getHeight() const{
-    UILayoutComponent& layout = getComponent<UILayoutComponent>();
-
-    return layout.height;
 }

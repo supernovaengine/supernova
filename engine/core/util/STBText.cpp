@@ -140,7 +140,7 @@ TextureData* STBText::load(std::string fontpath, unsigned int fontSize){
 }
 
 void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
-                         int& width, int& height, bool userDefinedWidth, bool userDefinedHeight, bool multiline, bool invert){
+                         int& width, int& height, bool fixedWidth, bool fixedHeight, bool multiline, bool invert){
     
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
     std::wstring utf16String;
@@ -158,7 +158,7 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>
     Attribute* atrVertice = buffer->getAttribute(AttributeType::POSITION);
     Attribute* atrTexcoord = buffer->getAttribute(AttributeType::TEXCOORD1);
 
-    if (multiline && userDefinedWidth){
+    if (multiline && fixedWidth){
 
         int lastSpace = 0;
         for (int i = 0; i < utf16String.size(); i++){
@@ -241,7 +241,7 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>
         if (offsetX > maxX1)
             maxX1 = offsetX;
             
-        if ((!userDefinedWidth || offsetX <= width) && (!userDefinedHeight || offsetY <= height)){
+        if ((!fixedWidth || offsetX <= width) && (!fixedHeight || offsetY <= height)){
             buffer->addVector3(atrVertice, Vector3(quad.x0, quad.y0, 0));
             buffer->addVector3(atrVertice, Vector3(quad.x1, quad.y0, 0));
             buffer->addVector3(atrVertice, Vector3(quad.x1, quad.y1, 0));
@@ -276,9 +276,9 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>
         indices.push_back(1);
         indices.push_back(2);
     }
-    if (!userDefinedWidth)
+    if (!fixedWidth)
         width = maxX1 - minX0;
-    if (!userDefinedHeight)
+    if (!fixedHeight)
         height = lineCount * lineHeight;
 
 }

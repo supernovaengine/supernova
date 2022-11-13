@@ -19,8 +19,8 @@ namespace Supernova{
 
         std::vector<Vector2> charPositions;
 
-        bool userDefinedWidth = false;
-        bool userDefinedHeight = false;
+        bool fixedWidth = false;
+        bool fixedHeight = false;
 
         STBText* stbtext = NULL;
 

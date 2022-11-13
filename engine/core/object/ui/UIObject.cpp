@@ -12,6 +12,9 @@ UIObject::UIObject(Scene* scene): Object(scene){
     addComponent<UILayoutComponent>({});
 }
 
+UIObject::UIObject(Scene* scene, Entity entity): Object(scene, entity){
+}
+
 void UIObject::setSize(int width, int height){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 

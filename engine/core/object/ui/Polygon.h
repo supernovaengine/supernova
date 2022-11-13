@@ -5,10 +5,10 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include "Object.h"
+#include "UIObject.h"
 
 namespace Supernova{
-    class Polygon: public Object{
+    class Polygon: public UIObject{
 
     public:
         Polygon(Scene* scene);
@@ -22,9 +22,6 @@ namespace Supernova{
         void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);
         Vector4 getColor() const;
-
-        int getWidth() const;
-        int getHeight() const;
     };
 }
 

@@ -8,6 +8,7 @@
 #include "SubSystem.h"
 
 #include "component/UILayoutComponent.h"
+#include "component/UIContainerComponent.h"
 #include "component/TextComponent.h"
 #include "component/ImageComponent.h"
 #include "component/UIComponent.h"

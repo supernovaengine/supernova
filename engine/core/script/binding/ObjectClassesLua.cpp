@@ -290,42 +290,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .deriveClass<Polygon, Object>("Polygon")
-        .addConstructor <void (*) (Scene*)> ()
-        .addFunction("addVertex", 
-            luabridge::overload<Vector3>(&Polygon::addVertex),
-            luabridge::overload<float, float>(&Polygon::addVertex))
-        .addProperty("color", &Polygon::getColor, (void(Polygon::*)(Vector4))&Polygon::setColor)
-        .addFunction("setColor", (void(Polygon::*)(float, float, float, float))&Polygon::setColor)
-        .addFunction("setTexture", 
-            luabridge::overload<std::string>(&Polygon::setTexture),
-            luabridge::overload<FramebufferRender*>(&Polygon::setTexture))
-        .addProperty("width", [] (Polygon* self) -> int { return self->getWidth(); })
-        .addProperty("height", [] (Polygon* self) -> int { return self->getHeight(); })
-        .endClass();
-
-    luabridge::getGlobalNamespace(L)
-        .deriveClass<Text, Object>("Text")
-        .addConstructor <void (*) (Scene*)> ()
-        .addFunction("setSize", &Text::setSize)
-        .addProperty("width", &Text::getWidth, &Text::setWidth)
-        .addProperty("height", &Text::getHeight, &Text::setHeight)
-        .addProperty("maxTextSize", &Text::getMaxTextSize, &Text::setMaxTextSize)
-        .addProperty("text", &Text::getText, &Text::setText)
-        .addProperty("font", &Text::getFont, &Text::setFont)
-        .addProperty("fontSize", &Text::getFontSize, &Text::setFontSize)
-        .addProperty("multiline", &Text::getMultiline, &Text::setMultiline)
-        .addProperty("color", &Text::getColor, (void(Text::*)(Vector4))&Text::setColor)
-        .addFunction("setColor", (void(Text::*)(float, float, float, float))&Text::setColor)
-        .addFunction("getAscent", &Text::getAscent)
-        .addFunction("getDescent", &Text::getDescent)
-        .addFunction("getLineGap", &Text::getLineGap)
-        .addFunction("getLineHeight", &Text::getLineHeight)
-        .addFunction("getNumChars", &Text::getNumChars)
-        .addFunction("getCharPosition", &Text::getCharPosition)
-        .endClass();
-
-    luabridge::getGlobalNamespace(L)
         .deriveClass<UIObject, Object>("UIObject")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setSize", &UIObject::setSize)
@@ -343,6 +307,40 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("marginBottom", &UIObject::getMarginBottom, &UIObject::setMarginBottom)
         .addProperty("anchorPreset", &UIObject::getAnchorPreset, &UIObject::setAnchorPreset)
         .addFunction("getUILayoutComponent", &Image::getComponent<UILayoutComponent>)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Polygon, UIObject>("Polygon")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("addVertex", 
+            luabridge::overload<Vector3>(&Polygon::addVertex),
+            luabridge::overload<float, float>(&Polygon::addVertex))
+        .addProperty("color", &Polygon::getColor, (void(Polygon::*)(Vector4))&Polygon::setColor)
+        .addFunction("setColor", (void(Polygon::*)(float, float, float, float))&Polygon::setColor)
+        .addFunction("setTexture", 
+            luabridge::overload<std::string>(&Polygon::setTexture),
+            luabridge::overload<FramebufferRender*>(&Polygon::setTexture))
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Text, UIObject>("Text")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("setFixedSize", &Text::setFixedSize)
+        .addProperty("fixedWidth", &Text::isFixedWidth, &Text::setFixedWidth)
+        .addProperty("fixedHeight", &Text::isFixedHeight, &Text::setFixedHeight)
+        .addProperty("maxTextSize", &Text::getMaxTextSize, &Text::setMaxTextSize)
+        .addProperty("text", &Text::getText, &Text::setText)
+        .addProperty("font", &Text::getFont, &Text::setFont)
+        .addProperty("fontSize", &Text::getFontSize, &Text::setFontSize)
+        .addProperty("multiline", &Text::getMultiline, &Text::setMultiline)
+        .addProperty("color", &Text::getColor, (void(Text::*)(Vector4))&Text::setColor)
+        .addFunction("setColor", (void(Text::*)(float, float, float, float))&Text::setColor)
+        .addFunction("getAscent", &Text::getAscent)
+        .addFunction("getDescent", &Text::getDescent)
+        .addFunction("getLineGap", &Text::getLineGap)
+        .addFunction("getLineHeight", &Text::getLineHeight)
+        .addFunction("getNumChars", &Text::getNumChars)
+        .addFunction("getCharPosition", &Text::getCharPosition)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

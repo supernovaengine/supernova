@@ -5,24 +5,25 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include "Object.h"
+#include "UIObject.h"
 
 namespace Supernova{
     class STBText;
 
-    class Text: public Object{
+    class Text: public UIObject{
 
     public:
         Text(Scene* scene);
         Text(Scene* scene, Entity entity);
         virtual ~Text();
 
-        void setSize(int width, int height);
-        void setWidth(int width);
-        void setHeight(int height);
+        void setFixedSize(bool fixedSize);
 
-        int getWidth() const;
-        int getHeight() const;
+        void setFixedWidth(bool fixedWidth);
+        bool isFixedWidth() const;
+
+        void setFixedHeight(bool fixedHeight);
+        bool isFixedHeight() const;
 
         void setMaxTextSize(unsigned int maxTextSize);
         unsigned int getMaxTextSize() const;

@@ -10,12 +10,9 @@
 namespace Supernova{
     class UIObject: public Object{
 
-    protected:
-        InterleavedBuffer buffer;
-        IndexBuffer indices;
-
     public:
         UIObject(Scene* scene);
+        UIObject(Scene* scene, Entity entity);
 
         void setSize(int width, int height);
         void setWidth(int width);

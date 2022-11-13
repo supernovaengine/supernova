@@ -188,7 +188,7 @@ void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponen
 
     std::vector<uint16_t> indices_array;
 
-    text.stbtext->createText(text.text, &ui.buffer, indices_array, text.charPositions, layout.width, layout.height, text.userDefinedWidth, text.userDefinedHeight, text.multiline, false);
+    text.stbtext->createText(text.text, &ui.buffer, indices_array, text.charPositions, layout.width, layout.height, text.fixedWidth, text.fixedHeight, text.multiline, false);
 
     ui.indices.setValues(
             0, ui.indices.getAttribute(AttributeType::INDEX),
@@ -606,8 +606,6 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.marginRight = 0;
         layout.marginBottom = 0;
     }
-
-    layout.anchorPreset = AnchorPreset::NONE;
 }
 
 void UISystem::load(){
@@ -639,8 +637,55 @@ void UISystem::draw(){
 
 void UISystem::update(double dt){
 
-    auto layouts = scene->getComponentArray<UILayoutComponent>();
     // need to be ordered by Transform
+    auto layouts = scene->getComponentArray<UILayoutComponent>();
+
+    // reverse Transform order
+    for (int i = layouts->size()-1; i >= 0; i--){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
+        Entity entity = layouts->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+
+        if (signature.test(scene->getComponentType<Transform>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
+            UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
+            if (parentcontainer){
+                if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
+                    layout.containerBoxIndex = parentcontainer->numBoxes;
+                    parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
+
+                    parentcontainer->numBoxes = parentcontainer->numBoxes + 1;
+                }else{
+                    transform.parent = NULL_ENTITY;
+                    Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
+                }
+            }
+        }
+
+        if (signature.test(scene->getComponentType<UIContainerComponent>())){
+            UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
+            // reseting all container boxes
+            if (container.numBoxes > 0){
+                for (int b = 0; b < MAX_CONTAINER_BOXES; b++){
+                    if (container.boxes[b].layout != NULL_ENTITY){
+                        if (container.type == ContainerType::HORIZONTAL){
+                            container.boxes[b].rect.setX(b * layout.width / container.numBoxes);
+                            container.boxes[b].rect.setY(0);
+                            container.boxes[b].rect.setWidth(layout.width / container.numBoxes);
+                            container.boxes[b].rect.setHeight(layout.height);
+                        }else if (container.type == ContainerType::VERTICAL){
+                            container.boxes[b].rect.setX(0);
+                            container.boxes[b].rect.setY(b * layout.height / container.numBoxes);
+                            container.boxes[b].rect.setWidth(layout.width);
+                            container.boxes[b].rect.setHeight(layout.height / container.numBoxes);
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
     for (int i = 0; i < layouts->size(); i++){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
         Entity entity = layouts->getEntity(i);
@@ -651,6 +696,14 @@ void UISystem::update(double dt){
                 ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
                 img.needUpdatePatches = true;
+            }
+
+            if (signature.test(scene->getComponentType<TextComponent>())){
+                TextComponent& text = scene->getComponent<TextComponent>(entity);
+
+                text.needUpdateText = true;
+                //text.fixedWidth = true;
+                //text.fixedHeight = true;
             }
 
             layout.needUpdateSizes = false;
@@ -728,11 +781,18 @@ void UISystem::update(double dt){
                 abAnchorTop = Engine::getCanvasHeight() * layout.anchorTop;
                 abAnchorBottom = Engine::getCanvasHeight() * layout.anchorBottom;
             }else{
-                UILayoutComponent& parentlayout = scene->getComponent<UILayoutComponent>(transform.parent);
-                abAnchorLeft = parentlayout.width * layout.anchorLeft;
-                abAnchorRight = parentlayout.width * layout.anchorRight;
-                abAnchorTop = parentlayout.height * layout.anchorTop;
-                abAnchorBottom = parentlayout.height * layout.anchorBottom;
+                UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
+                UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
+                if (parentlayout){
+                    Rect boxRect = Rect(0, 0, parentlayout->width, parentlayout->height);
+                    if (parentcontainer){
+                        boxRect = parentcontainer->boxes[layout.containerBoxIndex].rect;
+                    }
+                    abAnchorLeft = (boxRect.getWidth() * layout.anchorLeft) + boxRect.getX();
+                    abAnchorRight = (boxRect.getWidth() * layout.anchorRight) + boxRect.getX();
+                    abAnchorTop = (boxRect.getHeight() * layout.anchorTop) + boxRect.getY();
+                    abAnchorBottom = (boxRect.getHeight() * layout.anchorBottom) + boxRect.getY();
+                }
             }
 
             if (layout.needUpdateAnchors){
@@ -756,6 +816,15 @@ void UISystem::update(double dt){
                 layout.marginRight = layout.width + transform.position.x - abAnchorRight;
                 layout.marginBottom = layout.height + transform.position.y - abAnchorBottom;
             }
+        }
+
+        if (signature.test(scene->getComponentType<UIContainerComponent>())){
+            UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
+            // reseting all container boxes
+            for (int b = 0; b < MAX_CONTAINER_BOXES; b++){
+                container.boxes[b].layout = NULL_ENTITY;
+            }
+            container.numBoxes = 0;
         }
         
     }

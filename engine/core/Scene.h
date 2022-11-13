@@ -16,6 +16,7 @@
 #include "component/SkyComponent.h"
 #include "component/ImageComponent.h"
 #include "component/UILayoutComponent.h"
+#include "component/UIContainerComponent.h"
 #include "component/SpriteComponent.h"
 #include "component/SpriteAnimationComponent.h"
 #include "component/Transform.h"

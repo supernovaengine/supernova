@@ -20,6 +20,7 @@
 #include "component/TimedActionComponent.h"
 #include "component/UIComponent.h"
 #include "component/UILayoutComponent.h"
+#include "component/UIContainerComponent.h"
 #include "component/ButtonComponent.h"
 #include "component/ParticlesAnimationComponent.h"
 #include "component/AudioComponent.h"
@@ -63,6 +64,12 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("VERTICAL_CENTER_WIDE", AnchorPreset::VERTICAL_CENTER_WIDE)
         .addProperty("HORIZONTAL_CENTER_WIDE", AnchorPreset::HORIZONTAL_CENTER_WIDE)
         .addProperty("FULL_SCREEN", AnchorPreset::FULL_SCREEN)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("ContainerType")
+        .addProperty("VERTICAL", ContainerType::VERTICAL)
+        .addProperty("HORIZONTAL", ContainerType::HORIZONTAL)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)

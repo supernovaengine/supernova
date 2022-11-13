@@ -5,61 +5,47 @@
 
 using namespace Supernova;
 
-Text::Text(Scene* scene): Object(scene){
-    addComponent<UILayoutComponent>({});
+Text::Text(Scene* scene): UIObject(scene){
     addComponent<UIComponent>({});
     addComponent<TextComponent>({});
 }
 
-Text::Text(Scene* scene, Entity entity): Object(scene, entity){
+Text::Text(Scene* scene, Entity entity): UIObject(scene, entity){
 }
 
 Text::~Text() {
 
 }
 
-void Text::setSize(int width, int height){
+void Text::setFixedSize(bool fixedSize){
     TextComponent& textcomp = getComponent<TextComponent>();
-    UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.width = width;
-    layout.height = height;
-    textcomp.userDefinedWidth = true;
-    textcomp.userDefinedHeight = true;
-
-    textcomp.needUpdateText = true;
+    textcomp.fixedWidth = fixedSize;
+    textcomp.fixedHeight = fixedSize;
 }
 
-void Text::setWidth(int width){
+void Text::setFixedWidth(bool fixedWidth){
     TextComponent& textcomp = getComponent<TextComponent>();
-    UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.width = width;
-    textcomp.userDefinedWidth = true;
-
-    textcomp.needUpdateText = true;
+    textcomp.fixedWidth = fixedWidth;
 }
 
-void Text::setHeight(int height){
+bool Text::isFixedWidth() const{
     TextComponent& textcomp = getComponent<TextComponent>();
-    UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.height = height;
-    textcomp.userDefinedHeight = true;
-
-    textcomp.needUpdateText = true;
+    return textcomp.fixedWidth;
 }
 
-int Text::getWidth() const{
-    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+void Text::setFixedHeight(bool fixedHeight){
+    TextComponent& textcomp = getComponent<TextComponent>();
 
-    return layout.width;
+    textcomp.fixedHeight = fixedHeight;
 }
 
-int Text::getHeight() const{
-    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+bool Text::isFixedHeight() const{
+    TextComponent& textcomp = getComponent<TextComponent>();
 
-    return layout.height;
+    return textcomp.fixedHeight;
 }
 
 void Text::setMaxTextSize(unsigned int maxTextSize){

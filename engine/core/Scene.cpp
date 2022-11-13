@@ -17,6 +17,7 @@ Scene::Scene(){
 	registerComponent<ModelComponent>();
 	registerComponent<BoneComponent>();
 	registerComponent<SkyComponent>();
+	registerComponent<UIContainerComponent>();
 	registerComponent<UILayoutComponent>();
 	registerComponent<SpriteComponent>();
 	registerComponent<SpriteAnimationComponent>();

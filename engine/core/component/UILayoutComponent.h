@@ -46,6 +46,7 @@ namespace Supernova{
         bool mouseMoved = false;
 
         bool focused = false;
+        int containerBoxIndex = -1;
 
         bool needUpdateSizes = false;
         bool needUpdateAnchors = false;
