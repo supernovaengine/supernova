@@ -8,7 +8,7 @@
 
 using namespace Supernova;
 
-Image::Image(Scene* scene): UIObject(scene){
+Image::Image(Scene* scene): UILayout(scene){
     addComponent<UIComponent>({});
     addComponent<ImageComponent>({});
 }

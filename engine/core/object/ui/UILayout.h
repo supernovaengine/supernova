@@ -2,17 +2,17 @@
 // (c) 2022 Eduardo Doria.
 //
 
-#ifndef UIOBJECT_H
-#define UIOBJECT_H
+#ifndef UILAYOUT_H
+#define UILAYOUT_H
 
 #include "Object.h"
 
 namespace Supernova{
-    class UIObject: public Object{
+    class UILayout: public Object{
 
     public:
-        UIObject(Scene* scene);
-        UIObject(Scene* scene, Entity entity);
+        UILayout(Scene* scene);
+        UILayout(Scene* scene, Entity entity);
 
         void setSize(int width, int height);
         void setWidth(int width);
@@ -48,4 +48,4 @@ namespace Supernova{
     };
 }
 
-#endif //UIOBJECT_H
+#endif //UILAYOUT_H

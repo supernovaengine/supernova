@@ -290,27 +290,27 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .deriveClass<UIObject, Object>("UIObject")
+        .deriveClass<UILayout, Object>("UILayout")
         .addConstructor <void (*) (Scene*)> ()
-        .addFunction("setSize", &UIObject::setSize)
-        .addProperty("width", &UIObject::getWidth, &Image::setWidth)
-        .addProperty("height", &UIObject::getHeight, &UIObject::setHeight)
-        .addFunction("setAnchors", &UIObject::setAnchors)
-        .addProperty("anchorLeft", &UIObject::getAnchorLeft, &UIObject::setAnchorLeft)
-        .addProperty("anchorTop", &UIObject::getAnchorTop, &UIObject::setAnchorTop)
-        .addProperty("anchorRight", &UIObject::getAnchorRight, &UIObject::setAnchorRight)
-        .addProperty("anchorBottom", &UIObject::getAnchorBottom, &UIObject::setAnchorBottom)
-        .addFunction("setMargins", &UIObject::setMargins)
-        .addProperty("marginLeft", &UIObject::getMarginLeft, &UIObject::setMarginLeft)
-        .addProperty("marginTop", &UIObject::getMarginTop, &UIObject::setMarginTop)
-        .addProperty("marginRight", &UIObject::getMarginRight, &UIObject::setMarginRight)
-        .addProperty("marginBottom", &UIObject::getMarginBottom, &UIObject::setMarginBottom)
-        .addProperty("anchorPreset", &UIObject::getAnchorPreset, &UIObject::setAnchorPreset)
+        .addFunction("setSize", &UILayout::setSize)
+        .addProperty("width", &UILayout::getWidth, &Image::setWidth)
+        .addProperty("height", &UILayout::getHeight, &UILayout::setHeight)
+        .addFunction("setAnchors", &UILayout::setAnchors)
+        .addProperty("anchorLeft", &UILayout::getAnchorLeft, &UILayout::setAnchorLeft)
+        .addProperty("anchorTop", &UILayout::getAnchorTop, &UILayout::setAnchorTop)
+        .addProperty("anchorRight", &UILayout::getAnchorRight, &UILayout::setAnchorRight)
+        .addProperty("anchorBottom", &UILayout::getAnchorBottom, &UILayout::setAnchorBottom)
+        .addFunction("setMargins", &UILayout::setMargins)
+        .addProperty("marginLeft", &UILayout::getMarginLeft, &UILayout::setMarginLeft)
+        .addProperty("marginTop", &UILayout::getMarginTop, &UILayout::setMarginTop)
+        .addProperty("marginRight", &UILayout::getMarginRight, &UILayout::setMarginRight)
+        .addProperty("marginBottom", &UILayout::getMarginBottom, &UILayout::setMarginBottom)
+        .addProperty("anchorPreset", &UILayout::getAnchorPreset, &UILayout::setAnchorPreset)
         .addFunction("getUILayoutComponent", &Image::getComponent<UILayoutComponent>)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .deriveClass<Polygon, UIObject>("Polygon")
+        .deriveClass<Polygon, UILayout>("Polygon")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("addVertex", 
             luabridge::overload<Vector3>(&Polygon::addVertex),
@@ -323,7 +323,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .deriveClass<Text, UIObject>("Text")
+        .deriveClass<Text, UILayout>("Text")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setFixedSize", &Text::setFixedSize)
         .addProperty("fixedWidth", &Text::isFixedWidth, &Text::setFixedWidth)
@@ -344,7 +344,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .deriveClass<Image, UIObject>("Image")
+        .deriveClass<Image, UILayout>("Image")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setPatchMargin", &Image::setPatchMargin)
         .addProperty("patchMarginBottom", &Image::getPatchMarginBottom, &Image::setPatchMarginBottom)

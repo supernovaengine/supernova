@@ -5,10 +5,10 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include "UIObject.h"
+#include "UILayout.h"
 
 namespace Supernova{
-    class Polygon: public UIObject{
+    class Polygon: public UILayout{
 
     public:
         Polygon(Scene* scene);

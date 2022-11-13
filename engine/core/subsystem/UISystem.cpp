@@ -702,8 +702,6 @@ void UISystem::update(double dt){
                 TextComponent& text = scene->getComponent<TextComponent>(entity);
 
                 text.needUpdateText = true;
-                //text.fixedWidth = true;
-                //text.fixedHeight = true;
             }
 
             layout.needUpdateSizes = false;

@@ -5,12 +5,12 @@
 
 using namespace Supernova;
 
-Text::Text(Scene* scene): UIObject(scene){
+Text::Text(Scene* scene): UILayout(scene){
     addComponent<UIComponent>({});
     addComponent<TextComponent>({});
 }
 
-Text::Text(Scene* scene, Entity entity): UIObject(scene, entity){
+Text::Text(Scene* scene, Entity entity): UILayout(scene, entity){
 }
 
 Text::~Text() {

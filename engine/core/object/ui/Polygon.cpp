@@ -9,7 +9,7 @@
 
 using namespace Supernova;
 
-Polygon::Polygon(Scene* scene): UIObject(scene){
+Polygon::Polygon(Scene* scene): UILayout(scene){
     addComponent<UIComponent>({});
     addComponent<PolygonComponent>({});
 }

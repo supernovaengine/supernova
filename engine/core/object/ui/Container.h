@@ -5,10 +5,10 @@
 #ifndef CONTAINER_H
 #define CONTAINER_H
 
-#include "UIObject.h"
+#include "UILayout.h"
 
 namespace Supernova{
-    class Container: public UIObject{
+    class Container: public UILayout{
 
     public:
         Container(Scene* scene);

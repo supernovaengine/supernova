@@ -5,12 +5,12 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include "UIObject.h"
+#include "UILayout.h"
 
 namespace Supernova{
     class STBText;
 
-    class Text: public UIObject{
+    class Text: public UILayout{
 
     public:
         Text(Scene* scene);

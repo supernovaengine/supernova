@@ -5,10 +5,10 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "UIObject.h"
+#include "UILayout.h"
 
 namespace Supernova{
-    class Image: public UIObject{
+    class Image: public UILayout{
 
     protected:
         InterleavedBuffer buffer;

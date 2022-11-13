@@ -6,7 +6,7 @@
 
 using namespace Supernova;
 
-Container::Container(Scene* scene): UIObject(scene){
+Container::Container(Scene* scene): UILayout(scene){
     addComponent<UIContainerComponent>({});
 }
 
