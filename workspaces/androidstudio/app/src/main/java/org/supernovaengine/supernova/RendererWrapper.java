@@ -1,9 +1,8 @@
-package com.deslon.supernova;
+package org.supernovaengine.supernova;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGLConfig;
 
-import android.app.Activity;
 import android.content.res.AssetManager;
 import android.opengl.GLSurfaceView.Renderer;
 

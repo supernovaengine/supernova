@@ -1,4 +1,4 @@
-package com.deslon.supernova;
+package org.supernovaengine.supernova;
 
 import android.app.Activity;
 import android.content.res.AssetManager;

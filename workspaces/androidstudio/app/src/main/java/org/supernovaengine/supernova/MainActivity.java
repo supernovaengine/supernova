@@ -1,39 +1,28 @@
-package com.deslon.supernova;
-
-import java.io.IOException;
+package org.supernovaengine.supernova;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.ConfigurationInfo;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
+import android.graphics.Insets;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.View.OnKeyListener;
 import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
+import android.view.WindowMetrics;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.FrameLayout;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.content.SharedPreferences;
 
@@ -51,15 +40,46 @@ public class MainActivity extends Activity {
 
 	public int screenWidth;
 	public int screenHeight;
+
+	// need to check these suppressed methods after each new version by removing SuppressWarnings
+	@SuppressWarnings("deprecation")
+	private void calculateScreenSize(){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			WindowMetrics windowMetrics = getWindowManager().getCurrentWindowMetrics();
+			Insets insets = windowMetrics.getWindowInsets()
+					.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars());
+
+			screenWidth = windowMetrics.getBounds().width() - insets.left - insets.right;
+			screenHeight = windowMetrics.getBounds().height() - insets.top - insets.bottom;
+		} else {
+			DisplayMetrics displayMetrics = new DisplayMetrics();
+			getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+			screenWidth = displayMetrics.widthPixels;
+			screenHeight = displayMetrics.heightPixels;
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private void setFullScreen(){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			final WindowInsetsController insetsController = getWindow().getInsetsController();
+			if (insetsController != null) {
+				insetsController.hide(WindowInsets.Type.statusBars());
+			}
+		} else {
+			getWindow().setFlags(
+					WindowManager.LayoutParams.FLAG_FULLSCREEN,
+					WindowManager.LayoutParams.FLAG_FULLSCREEN
+			);
+		}
+	}
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-	    getWindow().setFlags(
-	            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-	            WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -76,11 +96,7 @@ public class MainActivity extends Activity {
 			//if (isProbablyEmulator())
 			glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 24, 8);
 
-			DisplayMetrics dm = new DisplayMetrics();
-			getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-			screenWidth = dm.widthPixels;
-			screenWidth = dm.heightPixels;
+			calculateScreenSize();
 
 			final RendererWrapper rendererWrapper = new RendererWrapper(MainActivity.this, this.getAssets());
 			
@@ -94,6 +110,8 @@ public class MainActivity extends Activity {
 			layout = new FrameLayout(this);
 			layout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 			setContentView(layout);
+
+			setFullScreen();
 
 			edittext = new TextInput(this);
 			layout.addView(edittext);

@@ -1,9 +1,9 @@
-package com.deslon.supernova;
+package org.supernovaengine.supernova;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.os.Looper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -52,7 +52,7 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 		this.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
 		getText().insert(this.getSelectionStart(), " ");
 
-		sHandler = new Handler() {
+		sHandler = new Handler(Looper.getMainLooper()) {
 			@Override
 			public void handleMessage(final Message msg) {
 				switch (msg.what) {

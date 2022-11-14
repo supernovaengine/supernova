@@ -6,12 +6,16 @@ def supernovaRoot = "../../.."
 def projectSourceRootAbs = file(projectSourceRoot).toString()
 def supernovaRootAbs = file(supernovaRoot).toString()
 
+// def platformVersion = 24    //openGLES 3.2 min api level
+// def platformVersion = 18    //openGLES 3 min api level
+// def platformVersion = 12    //openGLES 2 min api level
+
 android {
-    compileSdkVersion 29
+    compileSdkVersion 31
     defaultConfig {
-        applicationId "com.deslon.supernova"
-        minSdkVersion 16
-        targetSdkVersion 29
+        applicationId "com.yourcompany.project"
+        minSdkVersion 18
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -26,6 +30,7 @@ android {
             }
         }
     }
+    
     buildTypes {
         release {
             minifyEnabled false
@@ -45,6 +50,6 @@ android {
             assets.srcDirs = [projectSourceRootAbs+'/assets',projectSourceRootAbs+'/lua']
         }
     }
-    namespace 'org.supernovaengine.supernova'
 
+    namespace 'org.supernovaengine.supernova'
 }
