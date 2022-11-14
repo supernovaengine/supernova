@@ -14,7 +14,8 @@ namespace Supernova{
 
     struct ContainerBox{
         Entity layout = NULL_ENTITY;
-        Rect rect;
+        Rect rect = Rect(0,0,0,0);
+        bool expand = true;
     };
 
     struct UIContainerComponent{

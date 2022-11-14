@@ -63,7 +63,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("BOTTOM_WIDE", AnchorPreset::BOTTOM_WIDE)
         .addProperty("VERTICAL_CENTER_WIDE", AnchorPreset::VERTICAL_CENTER_WIDE)
         .addProperty("HORIZONTAL_CENTER_WIDE", AnchorPreset::HORIZONTAL_CENTER_WIDE)
-        .addProperty("FULL_SCREEN", AnchorPreset::FULL_SCREEN)
+        .addProperty("FULL_LAYOUT", AnchorPreset::FULL_LAYOUT)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)

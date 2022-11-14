@@ -15,6 +15,9 @@ namespace Supernova{
         
         void setType(ContainerType type);
         ContainerType getType() const;
+
+        void setBoxExpand(size_t id, bool expand);
+        bool isBoxExpand(size_t id) const;
     };
 }
 

@@ -30,6 +30,7 @@
 #include "Image.h"
 #include "Button.h"
 #include "TextEdit.h"
+#include "Container.h"
 #include "Audio.h"
 
 using namespace Supernova;
@@ -307,6 +308,14 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("marginBottom", &UILayout::getMarginBottom, &UILayout::setMarginBottom)
         .addProperty("anchorPreset", &UILayout::getAnchorPreset, &UILayout::setAnchorPreset)
         .addFunction("getUILayoutComponent", &Image::getComponent<UILayoutComponent>)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Container, UILayout>("Container")
+        .addConstructor <void (*) (Scene*)> ()
+        .addProperty("type", &Container::getType, &Container::setType)
+        .addFunction("setBoxExpand", &Container::setBoxExpand)
+        .addFunction("isBoxExpand", &Container::isBoxExpand)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

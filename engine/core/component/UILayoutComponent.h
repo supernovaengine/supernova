@@ -22,7 +22,7 @@ namespace Supernova{
         BOTTOM_WIDE,
         VERTICAL_CENTER_WIDE,
         HORIZONTAL_CENTER_WIDE,
-        FULL_SCREEN
+        FULL_LAYOUT
     };
 
     struct UILayoutComponent{

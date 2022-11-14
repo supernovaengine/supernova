@@ -6,6 +6,7 @@
 
 #include <locale>
 #include <codecvt>
+#include <algorithm>
 #include "Scene.h"
 #include "Input.h"
 #include "Engine.h"
@@ -596,7 +597,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.marginTop = -layout.height / 2;
         layout.marginRight = 0;
         layout.marginBottom = layout.height / 2;
-    }else if (layout.anchorPreset == AnchorPreset::FULL_SCREEN){
+    }else if (layout.anchorPreset == AnchorPreset::FULL_LAYOUT){
         layout.anchorLeft = 0;
         layout.anchorTop = 0;
         layout.anchorRight = 1;
@@ -653,6 +654,7 @@ void UISystem::update(double dt){
                 if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
                     layout.containerBoxIndex = parentcontainer->numBoxes;
                     parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
+                    parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
 
                     parentcontainer->numBoxes = parentcontainer->numBoxes + 1;
                 }else{
@@ -664,20 +666,53 @@ void UISystem::update(double dt){
 
         if (signature.test(scene->getComponentType<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
-            // reseting all container boxes
+            // configuring all container boxes
             if (container.numBoxes > 0){
+
+                if (layout.width == 0 || layout.height == 0){
+                    int genWidth = 0;
+                    int genHeight = 0;
+                    for (int b = 0; b < MAX_CONTAINER_BOXES; b++){
+                        if (container.boxes[b].layout != NULL_ENTITY){
+                            if (container.type == ContainerType::HORIZONTAL){
+                                genWidth += container.boxes[b].rect.getWidth();
+                                genHeight = std::max(genHeight, (int)container.boxes[b].rect.getHeight());
+                            }else if (container.type == ContainerType::VERTICAL){
+                                genWidth = std::max(genWidth, (int)container.boxes[b].rect.getWidth()); 
+                                genHeight += container.boxes[b].rect.getHeight();
+                            }
+                        }
+                    }
+                    layout.width = (layout.width > 0)? layout.width : genWidth;
+                    layout.height = (layout.height > 0)? layout.height : genHeight;
+                }
+
+                int totalWidth = layout.width;
+                int totalHeight = layout.height;
+
                 for (int b = 0; b < MAX_CONTAINER_BOXES; b++){
                     if (container.boxes[b].layout != NULL_ENTITY){
+                        // container.boxes[b].rect in setted by entity size in last iteration
                         if (container.type == ContainerType::HORIZONTAL){
-                            container.boxes[b].rect.setX(b * layout.width / container.numBoxes);
-                            container.boxes[b].rect.setY(0);
-                            container.boxes[b].rect.setWidth(layout.width / container.numBoxes);
+                            if (b > 0){
+                                container.boxes[b].rect.setX(container.boxes[b-1].rect.getX() + container.boxes[b-1].rect.getWidth());
+                            }
+                            if (container.boxes[b].expand){
+                                container.boxes[b].rect.setWidth(totalWidth / (container.numBoxes - b));
+                            }
                             container.boxes[b].rect.setHeight(layout.height);
+
+                            totalWidth = totalWidth - container.boxes[b].rect.getWidth();
                         }else if (container.type == ContainerType::VERTICAL){
-                            container.boxes[b].rect.setX(0);
-                            container.boxes[b].rect.setY(b * layout.height / container.numBoxes);
+                            if (b > 0){
+                                container.boxes[b].rect.setY(container.boxes[b-1].rect.getY() + container.boxes[b-1].rect.getHeight());
+                            }
+                            if (container.boxes[b].expand){
+                                container.boxes[b].rect.setHeight(totalHeight / (container.numBoxes - b));
+                            }
                             container.boxes[b].rect.setWidth(layout.width);
-                            container.boxes[b].rect.setHeight(layout.height / container.numBoxes);
+
+                            totalHeight = totalHeight - container.boxes[b].rect.getHeight();
                         }
                     }
                 }
