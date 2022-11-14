@@ -52,6 +52,7 @@ namespace Supernova {
     private:
         //-----Supernova config-----
         static Scene* scenes[MAX_SCENE_LAYERS];
+        static size_t numScenes;
         
         static int canvasWidth;
         static int canvasHeight;

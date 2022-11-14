@@ -35,6 +35,15 @@ namespace Supernova{
         Texture texture;
         Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0); //linear color
 
+        FunctionSubscribe<void()> onGetFocus;
+        FunctionSubscribe<void()> onLostFocus;
+        FunctionSubscribe<void(float, float)> onPointerMove;
+        FunctionSubscribe<void(float, float)> onPointerDown;
+        FunctionSubscribe<void(float, float)> onPointerUp;
+
+        bool pointerMoved = false;
+        bool focused = false;
+
         bool needReload = false;
 
         bool needUpdateBuffer = false;

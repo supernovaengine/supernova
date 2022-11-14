@@ -42,10 +42,6 @@ namespace Supernova{
 
         AnchorPreset anchorPreset = AnchorPreset::NONE;
 
-        FunctionSubscribe<void()> onMouseMove;
-        bool mouseMoved = false;
-
-        bool focused = false;
         int containerBoxIndex = -1;
 
         bool needUpdateSizes = false;

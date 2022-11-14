@@ -80,7 +80,7 @@ int SupernovaGLFW::init(int argc, char **argv){
         }
     });
     glfwSetCharCallback(window, [](GLFWwindow*, unsigned int codepoint){
-        Supernova::Engine::onCharInput(codepoint);
+        Supernova::Engine::systemCharInput(codepoint);
     });
 
     int cur_width, cur_height;

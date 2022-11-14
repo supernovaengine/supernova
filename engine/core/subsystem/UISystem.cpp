@@ -12,7 +12,6 @@
 #include "Engine.h"
 #include "System.h"
 #include "util/STBText.h"
-#include "util/UniqueToken.h"
 #include "util/StringUtils.h"
 
 using namespace Supernova;
@@ -341,12 +340,12 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     cursor.needUpdatePolygon = true;
 }
 
-void UISystem::blinkCursorTextEdit(double dt, TextEditComponent& textedit, UILayoutComponent& layout){
+void UISystem::blinkCursorTextEdit(double dt, TextEditComponent& textedit, UIComponent& ui){
     textedit.cursorBlinkTimer += dt;
 
     Transform& cursortransform = scene->getComponent<Transform>(textedit.cursor);
 
-    if (layout.focused){
+    if (ui.focused){
         if (textedit.cursorBlinkTimer > 0.6) {
             cursortransform.visible = !cursortransform.visible;
             textedit.cursorBlinkTimer = 0;
@@ -610,30 +609,12 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
 }
 
 void UISystem::load(){
-    if (eventId.empty()){
-        eventId = "UISystem|" + UniqueToken::get();
-    }
-    // Cannot be on constructor to prevent static initialization order fiasco:
-    // http://www.parashift.com/c++-faq-lite/static-init-order.html
-    Engine::onCharInput.add<UISystem, &UISystem::eventOnCharInput>(eventId, this);
-    Engine::onMouseDown.add<UISystem, &UISystem::eventOnMouseDown>(eventId, this);
-    Engine::onMouseUp.add<UISystem, &UISystem::eventOnMouseUp>(eventId, this);
-    Engine::onMouseMove.add<UISystem, &UISystem::eventOnMouseMove>(eventId, this);
-    Engine::onTouchStart.add<UISystem, &UISystem::eventOnTouchStart>(eventId, this);
-    Engine::onTouchEnd.add<UISystem, &UISystem::eventOnTouchEnd>(eventId, this);
 }
 
 void UISystem::destroy(){
-    Engine::onCharInput.remove(eventId);
-    Engine::onMouseDown.remove(eventId);
-    Engine::onMouseUp.remove(eventId);
-    Engine::onMouseMove.remove(eventId);
-    Engine::onTouchStart.remove(eventId);
-    Engine::onTouchEnd.remove(eventId);
 }
 
 void UISystem::draw(){
-
 }
 
 void UISystem::update(double dt){
@@ -786,7 +767,7 @@ void UISystem::update(double dt){
                         textedit.needUpdateTextEdit = false;
                     }
 
-                    blinkCursorTextEdit(dt, textedit, layout);
+                    blinkCursorTextEdit(dt, textedit, ui);
                 }
             }
 
@@ -891,10 +872,11 @@ void UISystem::eventOnCharInput(wchar_t codepoint){
 
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<TextEditComponent>())){
+        if (signature.test(scene->getComponentType<TextEditComponent>()) && signature.test(scene->getComponentType<UIComponent>())){
             TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
+            UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-            if (layout.focused){
+            if (ui.focused){
                 TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
                 if (codepoint == '\b'){
                     if (text.text.length() > 0){
@@ -914,7 +896,7 @@ void UISystem::eventOnCharInput(wchar_t codepoint){
     }
 }
 
-void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
+void UISystem::eventOnPointerDown(float x, float y){
     auto layouts = scene->getComponentArray<UILayoutComponent>();
     int lastUI = -1;
 
@@ -923,8 +905,9 @@ void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
 
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<Transform>())){
+        if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
             Transform& transform = scene->getComponent<Transform>(entity);
+            UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
             if (isCoordInside(x, y, transform, layout)){ //TODO: isCoordInside to polygon
                 if (signature.test(scene->getComponentType<ButtonComponent>()) || 
@@ -933,9 +916,12 @@ void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
                     lastUI = i;
                 }
             }
-        }
 
-        layout.focused = false;
+            if (ui.focused){
+                ui.focused = false;
+                ui.onLostFocus.call();
+            }
+        }
     }
 
     if (lastUI != -1){
@@ -943,54 +929,67 @@ void UISystem::eventOnMouseDown(int button, float x, float y, int mods){
         Entity entity = layouts->getEntity(lastUI);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<UIComponent>()) && signature.test(scene->getComponentType<ButtonComponent>())){
+        if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
-            ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-            if (!button.disabled){
-                ui.texture = button.texturePressed;
-                ui.needUpdateTexture = true;
-                button.onPress.call();
-                button.pressed = true;
+            
+            if (signature.test(scene->getComponentType<ButtonComponent>())){
+                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+                if (!button.disabled){
+                    ui.texture = button.texturePressed;
+                    ui.needUpdateTexture = true;
+                    button.onPress.call();
+                    button.pressed = true;
+                }
+            }
+
+            if (signature.test(scene->getComponentType<TextEditComponent>())){
+                System::instance().showVirtualKeyboard();
+            }else{
+                System::instance().hideVirtualKeyboard();
+            }
+
+            ui.onPointerDown(x - transform.worldPosition.x, y - transform.worldPosition.y);
+
+            if (!ui.focused){
+                ui.focused = true;
+                ui.onGetFocus.call();
             }
         }
-        if (signature.test(scene->getComponentType<TextEditComponent>())){
-            System::instance().showVirtualKeyboard();
-        }else{
-            System::instance().hideVirtualKeyboard();
-        }
-
-        layout.focused = true;
     }else{
         System::instance().hideVirtualKeyboard();
     }
 }
 
-void UISystem::eventOnMouseUp(int button, float x, float y, int mods){
+void UISystem::eventOnPointerUp(float x, float y){
     auto layouts = scene->getComponentArray<UILayoutComponent>();
     for (int i = 0; i < layouts->size(); i++){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
 
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<Transform>()) && 
-            signature.test(scene->getComponentType<UIComponent>()) && 
-            signature.test(scene->getComponentType<ButtonComponent>())){
-
+        if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
-            ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-            if (!button.disabled){
-                ui.texture = button.textureNormal;
-                ui.needUpdateTexture = true;
-                if (button.pressed){
-                    button.pressed = false;
-                    button.onRelease.call();
+
+            if (signature.test(scene->getComponentType<ButtonComponent>())){
+                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+                if (!button.disabled){
+                    ui.texture = button.textureNormal;
+                    ui.needUpdateTexture = true;
+                    if (button.pressed){
+                        button.pressed = false;
+                        button.onRelease.call();
+                    }
                 }
             }
+
+            ui.onPointerUp(x - transform.worldPosition.x, y - transform.worldPosition.y);
         }
     }
 }
 
-void UISystem::eventOnMouseMove(float x, float y, int mods){
+void UISystem::eventOnPointerMove(float x, float y){
     auto layouts = scene->getComponentArray<UILayoutComponent>();
     int lastUI = -1;
 
@@ -999,34 +998,32 @@ void UISystem::eventOnMouseMove(float x, float y, int mods){
 
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<Transform>())){
-            Transform& transform = scene->getComponent<Transform>(entity);
+        if (signature.test(scene->getComponentType<UIComponent>())){
+            UIComponent& ui = scene->getComponent<UIComponent>(entity);
+            if (signature.test(scene->getComponentType<Transform>())){
+                Transform& transform = scene->getComponent<Transform>(entity);
 
-            if ((!layout.mouseMoved) && isCoordInside(x, y, transform, layout)){
-                lastUI = i;
+                if ((!ui.pointerMoved) && isCoordInside(x, y, transform, layout)){
+                    lastUI = i;
+                }
             }
-        }
 
-        layout.mouseMoved = false;
+            ui.pointerMoved = false;
+        }
     }
 
     if (lastUI != -1){
         UILayoutComponent& layout = layouts->getComponentFromIndex(lastUI);
+        Entity entity = layouts->getEntity(lastUI);
+        Signature signature = scene->getSignature(entity);
 
-        layout.onMouseMove.call();
-        layout.mouseMoved = true;
-    }
-}
+        if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
+            UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-void UISystem::eventOnTouchStart(int pointer, float x, float y){
-    if (!Engine::isCallMouseInTouchEvent() && !Engine::isCallTouchInMouseEvent()){
-        eventOnMouseDown(S_MOUSE_BUTTON_1, x, y, 0);
-    }
-}
-
-void UISystem::eventOnTouchEnd(int pointer, float x, float y){
-    if (!Engine::isCallMouseInTouchEvent() && !Engine::isCallTouchInMouseEvent()){
-        eventOnMouseUp(S_MOUSE_BUTTON_1, x, y, 0);
+            ui.onPointerMove.call(x - transform.worldPosition.x, y - transform.worldPosition.y);
+            ui.pointerMoved = true;
+        }
     }
 }
 

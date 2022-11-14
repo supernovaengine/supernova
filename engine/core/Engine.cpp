@@ -17,6 +17,7 @@ using namespace Supernova;
 
 //-----Supernova user config-----
 Scene* Engine::scenes[MAX_SCENE_LAYERS] = {NULL};
+size_t Engine::numScenes = 0;
 
 int Engine::canvasWidth;
 int Engine::canvasHeight;
@@ -73,6 +74,8 @@ FunctionSubscribe<void(wchar_t)> Engine::onCharInput;
 void Engine::setScene(Scene* scene){
     Engine::scenes[0] = scene;
     scene->setMainScene(true);
+
+    numScenes++;
 }
 
 Scene* Engine::getScene(){
@@ -87,6 +90,7 @@ void Engine::addSceneLayer(Scene* scene){
             scenes[i] = scene;
             scenes[i]->setMainScene(false);
 
+            numScenes++;
             foundSlot = true;
         }
     }
@@ -343,7 +347,7 @@ void Engine::systemInit(int argc, char* argv[]){
 void Engine::systemViewLoaded(){
     SystemRender::setup();
     onViewLoaded.call();
-    for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+    for (int i = 0; i < numScenes; i++){
         if (scenes[i])
             scenes[i]->load();
     }
@@ -400,12 +404,11 @@ void Engine::systemViewChanged(){
     
     viewRect.setRect(viewX, viewY, viewWidth, viewHeight);
 
-    for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+    for (int i = 0; i < numScenes; i++){
         if (scenes[i]){
             scenes[i]->updateCameraSize(); //TODO: put this in system
             scenes[i]->getSystem<UISystem>()->updateAllAnchors();
         }
-
     }
 
     onViewChanged.call();
@@ -425,7 +428,7 @@ void Engine::systemDraw(){
         Engine::onUpdate.call();
 
         if (isFixedTimeSceneUpdate()){
-            for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+            for (int i = 0; i < numScenes; i++){
                 if (scenes[i])
                     scenes[i]->update(updateTime);
             }
@@ -436,7 +439,7 @@ void Engine::systemDraw(){
     }
 
     if (!isFixedTimeSceneUpdate()){
-        for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+        for (int i = 0; i < numScenes; i++){
             if (scenes[i])
                 scenes[i]->update(deltatime);
         }
@@ -444,7 +447,7 @@ void Engine::systemDraw(){
 
     Engine::onDraw.call();
 
-    for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+    for (int i = 0; i < numScenes; i++){
         if (scenes[i])
             scenes[i]->draw();
     }
@@ -454,7 +457,7 @@ void Engine::systemDraw(){
 }
 
 void Engine::systemShutdown(){
-    for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+    for (int i = 0; i < numScenes; i++){
         if (scenes[i])
             scenes[i]->destroy();
     }
@@ -497,6 +500,12 @@ void Engine::systemTouchStart(int pointer, float x, float y){
             Input::setMousePosition(x, y);
             //-----------------
         }
+
+        for (int i = 0; i < numScenes; i++){
+            if (scenes[i]){
+                scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
+            }
+        }
     }
 }
 
@@ -512,6 +521,12 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
             Input::releaseMousePressed(S_MOUSE_BUTTON_1);
             Input::setMousePosition(x, y);
             //-----------------
+        }
+
+        for (int i = 0; i < numScenes; i++){
+            if (scenes[i]){
+                scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
+            }
         }
     }
 }
@@ -553,6 +568,13 @@ void Engine::systemMouseDown(int button, float x, float y, int mods){
             Input::addTouch(0, x, y);
             //-----------------
         }
+
+        for (int i = 0; i < numScenes; i++){
+            if (scenes[i]){
+                if (button == S_MOUSE_BUTTON_1)
+                    scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
+            }
+        }
     }
 }
 void Engine::systemMouseUp(int button, float x, float y, int mods){
@@ -569,6 +591,13 @@ void Engine::systemMouseUp(int button, float x, float y, int mods){
             Engine::onTouchEnd.call(0, x, y);
             Input::removeTouch(0);
             //-----------------
+        }
+
+        for (int i = 0; i < numScenes; i++){
+            if (scenes[i]){
+                if (button == S_MOUSE_BUTTON_1)
+                    scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
+            }
         }
     }
 }
@@ -634,4 +663,10 @@ void Engine::systemKeyUp(int key, bool repeat, int mods){
 
 void Engine::systemCharInput(wchar_t codepoint){
     onCharInput.call(codepoint);
+
+    for (int i = 0; i < numScenes; i++){
+        if (scenes[i]){
+            scenes[i]->getSystem<UISystem>()->eventOnCharInput(codepoint);
+        }
+    }
 }

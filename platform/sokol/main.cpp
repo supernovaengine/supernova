@@ -30,7 +30,7 @@ static void sokol_event(const sapp_event* e) {
     if (e->type == SAPP_EVENTTYPE_RESIZED)
         Supernova::Engine::systemViewChanged();
     else if (e->type == SAPP_EVENTTYPE_CHAR)
-        Supernova::Engine::onCharInput(e->char_code);
+        Supernova::Engine::systemCharInput(e->char_code);
     else if (e->type == SAPP_EVENTTYPE_KEY_DOWN){
         if (e->key_code == SAPP_KEYCODE_TAB)
             Supernova::Engine::systemCharInput('\t');

@@ -37,17 +37,10 @@ namespace Supernova{
 
 		//TextEdit
 		void updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
-		void blinkCursorTextEdit(double dt, TextEditComponent& textedit, UILayoutComponent& layout);
+		void blinkCursorTextEdit(double dt, TextEditComponent& textedit, UIComponent& ui);
 
 		//UI Polygon
 		void createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout);
-
-		void eventOnCharInput(wchar_t codepoint);
-		void eventOnMouseDown(int button, float x, float y, int mods);
-		void eventOnMouseUp(int button, float x, float y, int mods);
-		void eventOnMouseMove(float x, float y, int mods);
-		void eventOnTouchStart(int pointer, float x, float y);
-		void eventOnTouchEnd(int pointer, float x, float y);
 
 		bool isCoordInside(float x, float y, Transform& transform, UILayoutComponent& layout);
 
@@ -56,6 +49,11 @@ namespace Supernova{
 	public:
 		UISystem(Scene* scene);
 		virtual ~UISystem();
+
+		void eventOnCharInput(wchar_t codepoint);
+		void eventOnPointerDown(float x, float y);
+		void eventOnPointerUp(float x, float y);
+		void eventOnPointerMove(float x, float y);
 
 		// basic UIs
 		bool loadAndUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout);
