@@ -19,7 +19,8 @@ namespace Supernova {
         FITHEIGHT,
         LETTERBOX,
         CROP,
-        STRETCH
+        STRETCH,
+        WINDOW
     };
 
     enum class Platform{

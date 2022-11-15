@@ -311,6 +311,10 @@ void Engine::calculateCanvas(){
             Engine::canvasHeight = preferedCanvasHeight;
             Engine::canvasWidth = screenWidth * preferedCanvasHeight / screenHeight;
         }
+        if (scalingMode == Scaling::WINDOW){
+            Engine::canvasHeight = screenHeight;
+            Engine::canvasWidth = screenWidth;
+        }
     }
 }
 
