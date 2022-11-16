@@ -25,8 +25,9 @@ namespace Supernova{
         Object(const Object& rhs);
         Object& operator=(const Object& rhs);
 
-        Object* createChild();
+        Object* createChild(); //TODO: add a template here
         void addChild(Object* child);
+        void addChild(Entity child);
 
         void moveToFirst();
         void moveUp();

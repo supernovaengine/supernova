@@ -145,6 +145,10 @@ void Object::addChild(Object* child){
     scene->addEntityChild(this->entity, child->entity);
 }
 
+void Object::addChild(Entity child){
+    scene->addEntityChild(this->entity, child);
+}
+
 void Object::moveToFirst(){
     scene->moveChildToFirst(this->entity);
 }

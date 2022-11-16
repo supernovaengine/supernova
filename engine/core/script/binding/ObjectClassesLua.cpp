@@ -100,7 +100,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .beginClass<Object>("Object")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("createChild", &Object::createChild)
-        .addFunction("addChild", &Object::addChild)
+        .addFunction("addChild", 
+            luabridge::overload<Object*>(&Object::addChild),
+            luabridge::overload<Entity>(&Object::addChild))
         .addFunction("moveToFirst", &Object::moveToFirst)
         .addFunction("moveUp", &Object::moveUp)
         .addFunction("moveDown", &Object::moveDown)
