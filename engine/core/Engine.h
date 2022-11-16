@@ -20,7 +20,7 @@ namespace Supernova {
         LETTERBOX,
         CROP,
         STRETCH,
-        WINDOW
+        NATIVE
     };
 
     enum class Platform{

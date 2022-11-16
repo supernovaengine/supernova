@@ -30,6 +30,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addProperty("LETTERBOX", Scaling::LETTERBOX)
         .addProperty("CROP", Scaling::CROP)
         .addProperty("STRETCH", Scaling::STRETCH)
+        .addProperty("NATIVE", Scaling::NATIVE)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
