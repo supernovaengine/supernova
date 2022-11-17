@@ -5,12 +5,16 @@ using namespace Supernova;
 FramebufferRender::FramebufferRender(){
     this->width = 0;
     this->height = 0;
+    this->needUpdate = false;
  }
 
 FramebufferRender::FramebufferRender(const FramebufferRender& rhs) : backend(rhs.backend) { }
 
 FramebufferRender& FramebufferRender::operator=(const FramebufferRender& rhs) { 
     backend = rhs.backend; 
+    width = rhs.width;
+    height = rhs.height;
+    needUpdate = rhs.needUpdate;
     return *this; 
 }
 

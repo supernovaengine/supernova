@@ -52,13 +52,21 @@ void RenderSystem::load(){
 	depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
 
 	if (scene->isRenderToTexture()){
-		if (!scene->getFramebuffer().isCreated())
-			scene->getFramebuffer().createFramebuffer(TextureType::TEXTURE_2D, scene->getFramebufferWidth(), scene->getFramebufferHeight(), false);
+		createOrUpdateFramebuffer();
 	}
 }
 
 void RenderSystem::destroy(){
 
+}
+
+void RenderSystem::createOrUpdateFramebuffer(){
+	if (scene->getFramebuffer().isCreated()){
+		scene->getFramebuffer().destroyFramebuffer();
+		scene->getFramebuffer().needUpdate = true;
+	}
+
+	scene->getFramebuffer().createFramebuffer(TextureType::TEXTURE_2D, scene->getFramebufferWidth(), scene->getFramebufferHeight(), false);
 }
 
 void RenderSystem::createEmptyTextures(){
@@ -701,7 +709,7 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& render = mesh.submeshes[i].render;
 
-			if (mesh.submeshes[i].needUpdateTexture){
+			if (mesh.submeshes[i].needUpdateTexture || mesh.submeshes[i].material.baseColorTexture.isFramebufferNeedUpdate()){
 				ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
 				loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.castShadows);
 
@@ -929,7 +937,7 @@ bool RenderSystem::loadTerrain(TerrainComponent& terrain){
 
 void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform){
 	if (terrain.loaded){
-		if (terrain.needUpdateTexture){
+		if (terrain.needUpdateTexture || terrain.material.baseColorTexture.isFramebufferNeedUpdate()){
 			ShaderData& shaderData = terrain.shader.get()->shaderData;
 			loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.castShadows);
 			loadTerrainTextures(terrain, shaderData);
@@ -1104,7 +1112,7 @@ bool RenderSystem::loadUI(UIComponent& uirender, bool isText){
 void RenderSystem::drawUI(UIComponent& uirender, Transform& transform){
 	if (uirender.loaded && uirender.buffer.getSize() > 0){
 
-		if (uirender.needUpdateTexture){
+		if (uirender.needUpdateTexture || uirender.texture.isFramebufferNeedUpdate()){
 			ShaderData& shaderData = uirender.shader.get()->shaderData;
 			TextureRender* textureRender = uirender.texture.getRender();
 			if (textureRender)
@@ -1223,7 +1231,7 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform){
 	if (particles.loaded && particles.buffer && particles.buffer->getSize() > 0){
 
-		if (particles.needUpdateTexture){
+		if (particles.needUpdateTexture || particles.texture.isFramebufferNeedUpdate()){
 			ShaderData& shaderData = particles.shader.get()->shaderData;
 			TextureRender* textureRender = particles.texture.getRender();
 			if (textureRender)
@@ -1312,7 +1320,7 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 void RenderSystem::drawSky(SkyComponent& sky){
 	if (sky.loaded){
 
-		if (sky.needUpdateTexture){
+		if (sky.needUpdateTexture || sky.texture.isFramebufferNeedUpdate()){
 			ShaderData& shaderData = sky.shader.get()->shaderData;
 			TextureRender* textureRender = sky.texture.getRender();
 			if (textureRender)
@@ -1635,6 +1643,38 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
         return true;
     }
 
+}
+
+void RenderSystem::updateCameraSize(Entity entity){
+	Signature signature = scene->getSignature(entity);
+	if (signature.test(scene->getComponentType<CameraComponent>())){
+		CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+		
+		Rect rect;
+		if (!scene->isRenderToTexture()) {
+			rect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
+		}else{
+			rect = Rect(0, 0, scene->getFramebufferWidth(), scene->getFramebufferHeight());
+		}
+
+		if (camera.automatic){
+			float newLeft = rect.getX();
+			float newBottom = rect.getY();
+			float newRight = rect.getWidth();
+			float newTop = rect.getHeight();
+			float newAspect = rect.getWidth() / rect.getHeight();
+
+			if ((camera.left != newLeft) || (camera.bottom != newBottom) || (camera.right != newRight) || (camera.top != newTop) || (camera.aspect != newAspect)){
+				camera.left = newLeft;
+				camera.bottom = newBottom;
+				camera.right = newRight;
+				camera.top = newTop;
+				camera.aspect = newAspect;
+
+				camera.needUpdate = true;
+			}
+		}
+	}
 }
 
 float RenderSystem::getCameraFar(CameraComponent& camera){

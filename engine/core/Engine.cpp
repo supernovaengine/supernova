@@ -9,6 +9,7 @@
 #include "render/SystemRender.h"
 #include "script/LuaBinding.h"
 #include "subsystem/AudioSystem.h"
+#include "subsystem/RenderSystem.h"
 #include "subsystem/UISystem.h"
 
 #include "sokol_time.h"
@@ -352,8 +353,7 @@ void Engine::systemViewLoaded(){
     SystemRender::setup();
     onViewLoaded.call();
     for (int i = 0; i < numScenes; i++){
-        if (scenes[i])
-            scenes[i]->load();
+        scenes[i]->load();
     }
 }
 
@@ -409,10 +409,8 @@ void Engine::systemViewChanged(){
     viewRect.setRect(viewX, viewY, viewWidth, viewHeight);
 
     for (int i = 0; i < numScenes; i++){
-        if (scenes[i]){
-            scenes[i]->updateCameraSize(); //TODO: put this in system
-            scenes[i]->getSystem<UISystem>()->updateAllAnchors();
-        }
+        scenes[i]->getSystem<RenderSystem>()->updateCameraSize(scenes[i]->getCamera());
+        scenes[i]->getSystem<UISystem>()->updateAllAnchors();
     }
 
     onViewChanged.call();
@@ -433,8 +431,7 @@ void Engine::systemDraw(){
 
         if (isFixedTimeSceneUpdate()){
             for (int i = 0; i < numScenes; i++){
-                if (scenes[i])
-                    scenes[i]->update(updateTime);
+                scenes[i]->update(updateTime);
             }
         }
     }
@@ -444,16 +441,18 @@ void Engine::systemDraw(){
 
     if (!isFixedTimeSceneUpdate()){
         for (int i = 0; i < numScenes; i++){
-            if (scenes[i])
-                scenes[i]->update(deltatime);
+            scenes[i]->update(deltatime);
         }
     }
 
     Engine::onDraw.call();
 
     for (int i = 0; i < numScenes; i++){
-        if (scenes[i])
-            scenes[i]->draw();
+        scenes[i]->draw();
+    }
+
+    for (int i = 0; i < numScenes; i++){
+        scenes[i]->getFramebuffer().needUpdate = false;
     }
     
     SystemRender::commit();
@@ -462,8 +461,7 @@ void Engine::systemDraw(){
 
 void Engine::systemShutdown(){
     for (int i = 0; i < numScenes; i++){
-        if (scenes[i])
-            scenes[i]->destroy();
+        scenes[i]->destroy();
     }
     SystemRender::shutdown();
     Engine::onShutdown.call();
@@ -506,9 +504,7 @@ void Engine::systemTouchStart(int pointer, float x, float y){
         }
 
         for (int i = 0; i < numScenes; i++){
-            if (scenes[i]){
-                scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
-            }
+            scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
         }
     }
 }
@@ -528,9 +524,7 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
         }
 
         for (int i = 0; i < numScenes; i++){
-            if (scenes[i]){
-                scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
-            }
+            scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
         }
     }
 }
@@ -574,10 +568,8 @@ void Engine::systemMouseDown(int button, float x, float y, int mods){
         }
 
         for (int i = 0; i < numScenes; i++){
-            if (scenes[i]){
-                if (button == S_MOUSE_BUTTON_1)
-                    scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
-            }
+            if (button == S_MOUSE_BUTTON_1)
+                scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
         }
     }
 }
@@ -598,10 +590,8 @@ void Engine::systemMouseUp(int button, float x, float y, int mods){
         }
 
         for (int i = 0; i < numScenes; i++){
-            if (scenes[i]){
-                if (button == S_MOUSE_BUTTON_1)
-                    scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
-            }
+            if (button == S_MOUSE_BUTTON_1)
+                scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
         }
     }
 }
@@ -669,8 +659,6 @@ void Engine::systemCharInput(wchar_t codepoint){
     onCharInput.call(codepoint);
 
     for (int i = 0; i < numScenes; i++){
-        if (scenes[i]){
-            scenes[i]->getSystem<UISystem>()->eventOnCharInput(codepoint);
-        }
+        scenes[i]->getSystem<UISystem>()->eventOnCharInput(codepoint);
     }
 }

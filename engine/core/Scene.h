@@ -122,8 +122,6 @@ namespace Supernova{
 		int getFramebufferWidth();
 		int getFramebufferHeight();
 
-		void updateCameraSize();
-
 		int32_t findBranchLastIndex(Entity entity);
 	
 		//Entity methods

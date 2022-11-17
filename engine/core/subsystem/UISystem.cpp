@@ -227,7 +227,7 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
     UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
     UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
 
-    loadAndUpdateText(labeltext, labelui, labellayout);
+    loadOrUpdateText(labeltext, labelui, labellayout);
     
     labellayout.anchorPreset = AnchorPreset::CENTER;
     labellayout.needUpdateAnchors = true;
@@ -286,7 +286,7 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
     TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
 
-    loadAndUpdateText(text, textui, textlayout);
+    loadOrUpdateText(text, textui, textlayout);
 
     if (layout.height == 0){
         layout.height = textlayout.height + img.patchMarginTop + img.patchMarginBottom;
@@ -320,7 +320,7 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     UIComponent& cursorui = scene->getComponent<UIComponent>(textedit.cursor);
     PolygonComponent& cursor = scene->getComponent<PolygonComponent>(textedit.cursor);
 
-    loadAndUpdatePolygon(cursor, cursorui, cursorlayout);
+    loadOrUpdatePolygon(cursor, cursorui, cursorlayout);
 
     float cursorHeight = textlayout.height;
 
@@ -407,7 +407,7 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILay
     ui.needUpdateBuffer = true;
 }
 
-bool UISystem::loadAndUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout){
+bool UISystem::loadOrUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout){
     if (polygon.needUpdatePolygon){
         createUIPolygon(polygon, ui, layout);
 
@@ -417,7 +417,7 @@ bool UISystem::loadAndUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, 
     return true;
 }
 
-bool UISystem::loadAndUpdateImage(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
+bool UISystem::loadOrUpdateImage(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
 
     if (img.needUpdatePatches){
         createImagePatches(img, ui, layout);
@@ -428,7 +428,7 @@ bool UISystem::loadAndUpdateImage(ImageComponent& img, UIComponent& ui, UILayout
     return true;
 }
 
-bool UISystem::loadAndUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
+bool UISystem::loadOrUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
     if (text.needUpdateText){
         if (text.loaded && text.needReload){
             ui.texture.destroy(); //texture.setData also destroy it
@@ -730,21 +730,21 @@ void UISystem::update(double dt){
             if (signature.test(scene->getComponentType<TextComponent>())){
                 TextComponent& text = scene->getComponent<TextComponent>(entity);
 
-                loadAndUpdateText(text, ui, layout);
+                loadOrUpdateText(text, ui, layout);
             }
 
             // UI Polygons
             if (signature.test(scene->getComponentType<PolygonComponent>())){
                 PolygonComponent& polygon = scene->getComponent<PolygonComponent>(entity);
 
-                loadAndUpdatePolygon(polygon, ui, layout);
+                loadOrUpdatePolygon(polygon, ui, layout);
             }
 
             // Images
             if (signature.test(scene->getComponentType<ImageComponent>())){
                 ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
-                loadAndUpdateImage(img, ui, layout);
+                loadOrUpdateImage(img, ui, layout);
 
                 // Buttons
                 if (signature.test(scene->getComponentType<ButtonComponent>())){

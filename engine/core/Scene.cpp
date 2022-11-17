@@ -188,7 +188,8 @@ void Scene::setFramebufferSize(int width, int height){
 	this->framebufferHeight = height;
 
 	if (renderToTexture){
-		updateCameraSize();
+		getSystem<RenderSystem>()->createOrUpdateFramebuffer();
+		getSystem<RenderSystem>()->updateCameraSize(camera);
 	}
 }
 
@@ -198,36 +199,6 @@ int Scene::getFramebufferWidth(){
 
 int Scene::getFramebufferHeight(){
 	return framebufferHeight;
-}
-
-void Scene::updateCameraSize(){
-	CameraComponent* cameraComp = findComponent<CameraComponent>(camera);
-	if (cameraComp){
-		Rect rect;
-		if (!renderToTexture) {
-			rect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
-		}else{
-			rect = Rect(0, 0, framebufferWidth, framebufferHeight);
-		}
-
-    	if (cameraComp->automatic){
-        	float newLeft = rect.getX();
-        	float newBottom = rect.getY();
-        	float newRight = rect.getWidth();
-        	float newTop = rect.getHeight();
-        	float newAspect = rect.getWidth() / rect.getHeight();
-
-        	if ((cameraComp->left != newLeft) || (cameraComp->bottom != newBottom) || (cameraComp->right != newRight) || (cameraComp->top != newTop) || (cameraComp->aspect != newAspect)){
-            	cameraComp->left = newLeft;
-            	cameraComp->bottom = newBottom;
-            	cameraComp->right = newRight;
-            	cameraComp->top = newTop;
-            	cameraComp->aspect = newAspect;
-
-            	cameraComp->needUpdate = true;
-        	}
-    	}
-	}
 }
 
 void Scene::load(){

@@ -303,3 +303,10 @@ bool Texture::hasTextureFrame(){
 
     return false;
 }
+
+bool Texture::isFramebufferNeedUpdate(){
+    if (framebuffer)
+        return &framebuffer->needUpdate;
+
+    return false;
+}

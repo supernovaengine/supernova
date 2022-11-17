@@ -13,6 +13,7 @@ namespace Supernova{
         //***
         int width;
         int height;
+        bool needUpdate;
         
         FramebufferRender();
         FramebufferRender(const FramebufferRender& rhs);

@@ -61,6 +61,7 @@ namespace Supernova{
 
             bool empty();
             bool hasTextureFrame();
+            bool isFramebufferNeedUpdate();
     };
 }
 

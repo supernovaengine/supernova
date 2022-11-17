@@ -215,7 +215,6 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("setFramebufferSize", &Scene::setFramebufferSize)
         .addFunction("getFramebufferWidth", &Scene::getFramebufferWidth)
         .addFunction("getFramebufferHeight", &Scene::getFramebufferHeight)
-        .addFunction("updateCameraSize", &Scene::updateCameraSize)
         .addFunction("findBranchLastIndex", &Scene::findBranchLastIndex)
         .addFunction("createEntity", &Scene::createEntity)
         .addFunction("destroyEntity", &Scene::destroyEntity)

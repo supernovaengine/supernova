@@ -147,7 +147,10 @@ namespace Supernova{
 		RenderSystem(Scene* scene);
 		virtual ~RenderSystem();
 
+		void createOrUpdateFramebuffer();
+
 		// camera
+		void updateCameraSize(Entity entity);
 		float getCameraFar(CameraComponent& camera);
 		bool isInsideCamera(CameraComponent& camera, const AlignedBox& box);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& point);
