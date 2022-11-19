@@ -25,7 +25,7 @@ namespace Supernova{
 
     public:
         static std::shared_ptr<TexturePoolData> get(std::string id);
-        static std::shared_ptr<TexturePoolData> get(std::string id, TextureType type, TextureData data[6]);
+        static std::shared_ptr<TexturePoolData> get(std::string id, TextureType type, TextureData data[6], TextureFilter minFilter, TextureFilter magFilter);
         static void remove(std::string id);
 
     };

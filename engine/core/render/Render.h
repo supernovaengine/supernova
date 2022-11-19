@@ -164,17 +164,14 @@ namespace Supernova{
         RGBA
     };
 
-/*
-    typedef struct shaderConfig{
-        int programDefs;
-        int numPointLights;
-        int numSpotLights;
-        int numDirLights;
-        int numShadows2D;
-        int numShadowsCube;
-        int numBlendMapColors;
-    } shaderConfig;
-*/
+    enum class TextureFilter{
+        NEAREST,
+        LINEAR,
+        NEAREST_MIPMAP_NEAREST,
+        NEAREST_MIPMAP_LINEAR,
+        LINEAR_MIPMAP_NEAREST,
+        LINEAR_MIPMAP_LINEAR
+    };
 
     //-------Start shader definition--------
     enum class ShaderLang{

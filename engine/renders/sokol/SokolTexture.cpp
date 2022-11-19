@@ -25,7 +25,136 @@ sg_image_type SokolTexture::getTextureType(TextureType textureType){
     return SG_IMAGETYPE_2D;
 }
 
-bool SokolTexture::createTexture(std::string label, int width, int height, ColorFormat colorFormat, TextureType type, int numFaces, void* data[6], size_t size[6]){
+sg_filter SokolTexture::getFilter(TextureFilter textureFilter){
+    if (textureFilter == TextureFilter::LINEAR){
+        return SG_FILTER_LINEAR;
+    }else if (textureFilter == TextureFilter::NEAREST){
+        return SG_FILTER_NEAREST;
+    }else if (textureFilter == TextureFilter::LINEAR_MIPMAP_LINEAR){
+        return SG_FILTER_LINEAR_MIPMAP_LINEAR;
+    }else if (textureFilter == TextureFilter::LINEAR_MIPMAP_NEAREST){
+        return SG_FILTER_LINEAR_MIPMAP_NEAREST;
+    }else if (textureFilter == TextureFilter::NEAREST_MIPMAP_NEAREST){
+        return SG_FILTER_NEAREST_MIPMAP_NEAREST;
+    }else if (textureFilter == TextureFilter::NEAREST_MIPMAP_LINEAR){
+        return SG_FILTER_NEAREST_MIPMAP_LINEAR;
+    }
+
+    return SG_FILTER_LINEAR;
+}
+
+
+
+// https://github.com/floooh/sokol/issues/102
+sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
+    sg_image_desc desc = *desc_;
+
+    unsigned pixel_size = 0;
+
+    if (desc.pixel_format == SG_PIXELFORMAT_RGBA8){
+        pixel_size = 4;
+    }else if (desc.pixel_format == SG_PIXELFORMAT_BGRA8){
+        pixel_size = 4;
+    }else if (desc.pixel_format == SG_PIXELFORMAT_R8){
+        pixel_size = 1;
+    }else{
+        Log::error("Undefined pixel format to generate mipmaps of %s", desc.label);
+        return sg_make_image(desc_);
+    }
+
+
+    int w = desc.width;
+    int h = desc.height * desc.num_slices;
+    int total_size = 0;
+    for (int level = 1; level < SG_MAX_MIPMAPS; ++level) {
+        w /=2;
+        h /=2;
+
+        if (w < 1 && h < 1)
+            break;
+
+        total_size += (w * h * pixel_size);
+    }
+
+    int cube_faces = 0;
+    for (; cube_faces < SG_CUBEFACE_NUM; ++cube_faces) {
+        if (!desc.data.subimage[cube_faces][0].ptr)
+            break;
+    }
+
+    total_size *= (cube_faces+1);
+    unsigned char *big_target = (unsigned char *)malloc(total_size);
+    unsigned char *target = big_target;
+
+    for (int cube_face = 0; cube_face < cube_faces; ++cube_face)
+    {
+        int target_width = desc.width;
+        int target_height = desc.height;
+        int dst_height = target_height * desc.num_slices;
+
+        for (int level = 1; level < SG_MAX_MIPMAPS; ++level) {
+            unsigned char* source = (unsigned char*)desc.data.subimage[cube_face][level - 1].ptr;
+            if (!source)
+                break;
+
+            int source_width = target_width;
+            int source_height = target_height;
+            target_width /= 2;
+            target_height /= 2;
+            if (target_width < 1 && target_height < 1)
+                break;
+
+            if (target_width < 1)
+                target_width = 1;
+
+            if (target_height < 1)
+                target_height = 1;
+
+            dst_height /= 2;
+            unsigned img_size = target_width * dst_height * pixel_size;
+            unsigned char *miptarget = target;
+
+            for (int slice = 0; slice < desc.num_slices; ++slice) {
+                for (int x = 0; x < target_width; ++x)
+                {
+                    for (int y = 0; y < target_height; ++y)
+                    {
+                        uint16_t colors[8] = { 0 };
+                        for (int chanell = 0; chanell < pixel_size; ++chanell)
+                        {
+                            int color = 0;
+                            int sx = x * 2;
+                            int sy = y * 2;
+                            color += source[source_width * pixel_size * sx + sy * pixel_size + chanell];
+                            color += source[source_width * pixel_size * (sx + 1) + sy * pixel_size + chanell];
+                            color += source[source_width * pixel_size * (sx + 1) + (sy + 1) * pixel_size + chanell];
+                            color += source[source_width * pixel_size * sx + (sy + 1) * pixel_size + chanell];
+                            color /= 4;
+                            miptarget[target_width * pixel_size * (x) + (y) * pixel_size + chanell] = (uint8_t)color;
+                        }
+                    }
+                }
+
+                source += (source_width * source_height * pixel_size);
+                miptarget += (target_width * target_height * pixel_size);
+            }
+            desc.data.subimage[cube_face][level].ptr = target;
+            desc.data.subimage[cube_face][level].size = img_size;
+            target += img_size;
+            if (desc.num_mipmaps <= level)
+                desc.num_mipmaps = level + 1;
+        }
+    }
+
+    sg_image img = sg_make_image(&desc);
+    free(big_target);
+    return img;
+}
+
+bool SokolTexture::createTexture(
+            std::string label, int width, int height, 
+            ColorFormat colorFormat, TextureType type, int numFaces, void* data[6], size_t size[6], 
+            TextureFilter minFilter, TextureFilter magFilter){
 
     sg_pixel_format pixelFormat;
     if (colorFormat == ColorFormat::RGBA){
@@ -41,8 +170,9 @@ bool SokolTexture::createTexture(std::string label, int width, int height, Color
     image_desc.width = width;
     image_desc.height = height;
     image_desc.pixel_format = pixelFormat;
-    image_desc.min_filter = SG_FILTER_LINEAR;
-    image_desc.mag_filter = SG_FILTER_LINEAR;
+    image_desc.num_slices = 1;
+    image_desc.min_filter = getFilter(minFilter);
+    image_desc.mag_filter = getFilter(magFilter);
     image_desc.label = label.c_str();
 
     for (int f = 0; f < numFaces; f++){
@@ -50,7 +180,14 @@ bool SokolTexture::createTexture(std::string label, int width, int height, Color
         image_desc.data.subimage[f][0].size = size[f];
     }
 
-    image = sg_make_image(&image_desc);
+    if (image_desc.min_filter == SG_FILTER_LINEAR_MIPMAP_LINEAR || 
+            image_desc.min_filter == SG_FILTER_LINEAR_MIPMAP_NEAREST ||
+            image_desc.min_filter == SG_FILTER_NEAREST_MIPMAP_LINEAR || 
+            image_desc.min_filter == SG_FILTER_NEAREST_MIPMAP_NEAREST){
+        image = generateMipmaps(&image_desc);
+    }else{
+        image = sg_make_image(&image_desc);
+    }
 
     if (image.id != SG_INVALID_ID)
         return true;

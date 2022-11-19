@@ -69,7 +69,6 @@ namespace Supernova {
         static bool callMouseInTouchEvent;
         static bool callTouchInMouseEvent;
         static bool useDegrees;
-        static bool defaultNearestScaleTexture;
         static bool defaultResampleToPOTTexture;
         static bool automaticTransparency;
         static bool automaticFlipY;
@@ -126,9 +125,6 @@ namespace Supernova {
         
         static void setUseDegrees(bool useDegrees);
         static bool isUseDegrees();
-        
-        static void setDefaultNearestScaleTexture(bool defaultNearestScaleTexture);
-        static bool isDefaultNearestScaleTexture();
 
         static void setDefaultResampleToPOTTexture(bool defaultResampleToPOTTexture);
         static bool isDefaultResampleToPOTTexture();

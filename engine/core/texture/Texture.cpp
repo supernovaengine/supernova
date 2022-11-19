@@ -12,6 +12,9 @@ Texture::Texture(){
     this->loadFromPath = false;
     this->releaseDataAfterLoad = true;
     this->needLoad = false;
+
+    this->minFilter = TextureFilter::LINEAR;
+    this->magFilter = TextureFilter::LINEAR;
 }
 
 Texture::Texture(std::string path){
@@ -24,6 +27,9 @@ Texture::Texture(std::string path){
     this->loadFromPath = true;
     this->releaseDataAfterLoad = true;
     this->needLoad = true;
+
+    this->minFilter = TextureFilter::LINEAR;
+    this->magFilter = TextureFilter::LINEAR;
 }
 
 Texture::Texture(TextureData data, std::string id){
@@ -36,6 +42,9 @@ Texture::Texture(TextureData data, std::string id){
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
     this->needLoad = true;
+
+    this->minFilter = TextureFilter::LINEAR;
+    this->magFilter = TextureFilter::LINEAR;
 }
 
 Texture::Texture(const Texture& rhs){
@@ -51,6 +60,8 @@ Texture::Texture(const Texture& rhs){
     loadFromPath = rhs.loadFromPath;
     releaseDataAfterLoad = rhs.releaseDataAfterLoad;
     needLoad = rhs.needLoad;
+    minFilter = rhs.minFilter;
+    magFilter = rhs.magFilter;
 }
 
 Texture& Texture::operator=(const Texture& rhs){
@@ -66,6 +77,8 @@ Texture& Texture::operator=(const Texture& rhs){
     loadFromPath = rhs.loadFromPath;
     releaseDataAfterLoad = rhs.releaseDataAfterLoad;
     needLoad = rhs.needLoad;
+    minFilter = rhs.minFilter;
+    magFilter = rhs.magFilter;
 
     return *this; 
 }
@@ -83,7 +96,9 @@ bool Texture::operator == ( const Texture& rhs ) const{
         paths[5] == rhs.paths[5] &&
         numFaces == rhs.numFaces &&
         loadFromPath == rhs.loadFromPath &&
-        releaseDataAfterLoad == rhs.releaseDataAfterLoad
+        releaseDataAfterLoad == rhs.releaseDataAfterLoad &&
+        minFilter == rhs.minFilter &&
+        magFilter == rhs.magFilter
      );
 }
 
@@ -100,7 +115,9 @@ bool Texture::operator != ( const Texture& rhs ) const{
         paths[5] != rhs.paths[5] ||
         numFaces == rhs.numFaces ||
         loadFromPath != rhs.loadFromPath ||
-        releaseDataAfterLoad != rhs.releaseDataAfterLoad
+        releaseDataAfterLoad != rhs.releaseDataAfterLoad ||
+        minFilter != rhs.minFilter ||
+        magFilter != rhs.magFilter
     );
 }
 
@@ -225,7 +242,7 @@ bool Texture::load(){
 	    }
     }
 
-	renderAndData = TexturePool::get(id, type, data);
+	renderAndData = TexturePool::get(id, type, data, minFilter, magFilter);
 
     if (releaseDataAfterLoad){
         for (int f = 0; f < numFaces; f++){
@@ -284,6 +301,10 @@ void Texture::setReleaseDataAfterLoad(bool releaseDataAfterLoad){
     this->releaseDataAfterLoad = releaseDataAfterLoad;
 }
 
+bool Texture::isReleaseDataAfterLoad() const{
+    return this->releaseDataAfterLoad;
+}
+
 void Texture::releaseData(){
     for (int f = 0; f < numFaces; f++){
         data[f].releaseImageData();
@@ -309,4 +330,20 @@ bool Texture::isFramebufferNeedUpdate(){
         return &framebuffer->needUpdate;
 
     return false;
+}
+
+void Texture::setMinFilter(TextureFilter filter){
+    minFilter = filter;
+}
+
+TextureFilter Texture::getMinFilter() const{
+    return minFilter;
+}
+
+void Texture::setMagFilter(TextureFilter filter){
+    magFilter = filter;
+}
+
+TextureFilter Texture::getMagFilter() const{
+    return magFilter;
 }

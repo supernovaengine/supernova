@@ -83,6 +83,16 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("TextureFilter")
+        .addProperty("NEAREST", TextureFilter::NEAREST)
+        .addProperty("LINEAR", TextureFilter::LINEAR)
+        .addProperty("NEAREST_MIPMAP_NEAREST", TextureFilter::NEAREST_MIPMAP_NEAREST)
+        .addProperty("NEAREST_MIPMAP_LINEAR", TextureFilter::NEAREST_MIPMAP_LINEAR)
+        .addProperty("LINEAR_MIPMAP_NEAREST", TextureFilter::LINEAR_MIPMAP_NEAREST)
+        .addProperty("LINEAR_MIPMAP_LINEAR", TextureFilter::LINEAR_MIPMAP_LINEAR)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<Engine>("Engine")
 
         .addStaticProperty("scene", &Engine::getScene, &Engine::setScene)
@@ -102,7 +112,6 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticProperty("callTouchInMouseEvent", &Engine::isCallTouchInMouseEvent, &Engine::setCallTouchInMouseEvent)
         .addStaticFunction("setCallTouchInMouseEvent", &Engine::setCallTouchInMouseEvent)
         .addStaticProperty("useDegrees", &Engine::isUseDegrees, &Engine::setUseDegrees)
-        .addStaticProperty("defaultNearestScaleTexture", &Engine::isDefaultNearestScaleTexture, &Engine::setDefaultNearestScaleTexture)
         .addStaticProperty("defaultResampleToPOTTexture", &Engine::isDefaultResampleToPOTTexture, &Engine::setDefaultResampleToPOTTexture)
         .addStaticProperty("automaticTransparency", &Engine::isAutomaticTransparency, &Engine::setAutomaticTransparency)
         .addStaticProperty("automaticFlipY", &Engine::isAutomaticFlipY, &Engine::setAutomaticFlipY)
@@ -178,6 +187,30 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("__call", &FunctionSubscribe<float(float)>::call)
         .addFunction("call", &FunctionSubscribe<float(float)>::call)
         .addFunction("add", (bool (FunctionSubscribe<float(float)>::*)(const std::string&, lua_State*))&FunctionSubscribe<float(float)>::add)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Texture>("Texture")
+        .addConstructor <void (*) (void), void (*) (std::string), void (*) (TextureData, std::string)> ()
+        .addFunction("setPath", &Texture::setPath)
+        .addFunction("setData", &Texture::setData)
+        .addFunction("setCubePath", &Texture::setCubePath)
+        .addFunction("setCubePaths", &Texture::setCubePaths)
+        .addFunction("setFramebuffer", &Texture::setFramebuffer)
+        .addFunction("load", &Texture::load)
+        .addFunction("destroy", &Texture::destroy)
+        .addFunction("getRender", &Texture::getRender)
+        .addFunction("getPath", &Texture::getPath)
+        .addFunction("getData", &Texture::getData)
+        .addFunction("getWidth", &Texture::getWidth)
+        .addFunction("getHeight", &Texture::getHeight)
+        .addProperty("releaseDataAfterLoad", &Texture::isReleaseDataAfterLoad, &Texture::setReleaseDataAfterLoad)
+        .addFunction("releaseData", &Texture::releaseData)
+        .addFunction("empty", &Texture::empty)
+        .addFunction("hasTextureFrame", &Texture::hasTextureFrame)
+        .addFunction("isFramebufferNeedUpdate", &Texture::isFramebufferNeedUpdate)
+        .addProperty("minFilter", &Texture::getMinFilter, &Texture::setMinFilter)
+        .addProperty("magFilter", &Texture::getMagFilter, &Texture::setMagFilter)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

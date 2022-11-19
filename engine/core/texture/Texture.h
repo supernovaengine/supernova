@@ -27,6 +27,10 @@ namespace Supernova{
             bool releaseDataAfterLoad;
             bool needLoad;
 
+            //render properties
+            TextureFilter minFilter;
+            TextureFilter magFilter;
+
         public:
             Texture();
             Texture(std::string path);
@@ -57,11 +61,19 @@ namespace Supernova{
             int getHeight();
 
             void setReleaseDataAfterLoad(bool releaseDataAfterLoad);
+            bool isReleaseDataAfterLoad() const;
+
             void releaseData();
 
             bool empty();
             bool hasTextureFrame();
             bool isFramebufferNeedUpdate();
+
+            void setMinFilter(TextureFilter filter);
+            TextureFilter getMinFilter() const;
+
+            void setMagFilter(TextureFilter filter);
+            TextureFilter getMagFilter() const;
     };
 }
 

@@ -85,20 +85,20 @@ void RenderSystem::createEmptyTextures(){
         	pixels[i] = 0xFF808080;
     	}
 
-		emptyNormal.createTexture("empty|normal", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array);
+		emptyNormal.createTexture("empty|normal", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, TextureFilter::NEAREST, TextureFilter::NEAREST);
 
 		for (int i = 0; i < 64; i++) {
         	pixels[i] = 0xFFFFFFFF;
     	}
 
-		emptyWhite.createTexture("empty|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array);
+		emptyWhite.createTexture("empty|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, TextureFilter::NEAREST, TextureFilter::NEAREST);
 
 		for (int i = 0; i < 64; i++) {
         	pixels[i] = 0xFF000000;
     	}
 
-		emptyBlack.createTexture("empty|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array);
-		emptyCubeBlack.createTexture("empty|cube|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_CUBE, 6, data_array, size_array);
+		emptyBlack.createTexture("empty|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, TextureFilter::NEAREST, TextureFilter::NEAREST);
+		emptyCubeBlack.createTexture("empty|cube|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_CUBE, 6, data_array, size_array, TextureFilter::NEAREST, TextureFilter::NEAREST);
 
 		emptyTexturesCreated = true;
 	}

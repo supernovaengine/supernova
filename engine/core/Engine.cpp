@@ -34,7 +34,6 @@ TextureStrategy Engine::textureStrategy;
 bool Engine::callMouseInTouchEvent;
 bool Engine::callTouchInMouseEvent;
 bool Engine::useDegrees;
-bool Engine::defaultNearestScaleTexture;
 bool Engine::defaultResampleToPOTTexture;
 bool Engine::automaticTransparency;
 bool Engine::automaticFlipY;
@@ -165,14 +164,6 @@ void Engine::setUseDegrees(bool useDegrees){
 
 bool Engine::isUseDegrees(){
     return Engine::useDegrees;
-}
-
-void Engine::setDefaultNearestScaleTexture(bool defaultNearestScaleTexture){
-    Engine::defaultNearestScaleTexture = defaultNearestScaleTexture;
-}
-
-bool Engine::isDefaultNearestScaleTexture(){
-    return defaultNearestScaleTexture;
 }
 
 void Engine::setDefaultResampleToPOTTexture(bool defaultResampleToPOTTexture){
@@ -327,7 +318,6 @@ void Engine::systemInit(int argc, char* argv[]){
     Engine::setCallMouseInTouchEvent(false);
     Engine::setCallTouchInMouseEvent(false);
     Engine::setUseDegrees(true);
-    Engine::setDefaultNearestScaleTexture(false);
     Engine::setDefaultResampleToPOTTexture(true);
     Engine::setAutomaticTransparency(true);
     Engine::setAutomaticFlipY(true);
