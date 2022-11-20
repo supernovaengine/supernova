@@ -72,10 +72,13 @@ FunctionSubscribe<void(wchar_t)> Engine::onCharInput;
 
 
 void Engine::setScene(Scene* scene){
-    Engine::scenes[0] = scene;
-    scene->setMainScene(true);
-
-    numScenes++;
+    if (scene){
+        if (!Engine::scenes[0]){
+            numScenes++;
+        }
+        Engine::scenes[0] = scene;
+        scene->setMainScene(true);
+    }
 }
 
 Scene* Engine::getScene(){
