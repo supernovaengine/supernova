@@ -197,3 +197,21 @@ Vector2 Text::getCharPosition(unsigned int index) const{
 
     throw std::out_of_range("charPositions out of range");
 }
+
+void Text::setFlipY(bool flipY){
+    UIComponent& ui = getComponent<UIComponent>();
+    TextComponent& textcomp = getComponent<TextComponent>();
+
+    ui.automaticFlipY = false;
+    if (ui.flipY != flipY){
+        ui.flipY = flipY;
+
+        textcomp.needUpdateText = true;
+    }
+}
+
+bool Text::isFlipY() const{
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return ui.flipY;
+}

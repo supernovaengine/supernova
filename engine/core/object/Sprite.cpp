@@ -67,14 +67,11 @@ int Sprite::getHeight() const{
 void Sprite::setFlipY(bool flipY){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
-    if (!Engine::isAutomaticFlipY()){
-        if (spritecomp.flipY != flipY){
-            spritecomp.flipY = flipY;
+    spritecomp.automaticFlipY = false;
+    if (spritecomp.flipY != flipY){
+        spritecomp.flipY = flipY;
 
-            spritecomp.needUpdateSprite = true;
-        }
-    }else{
-        Log::error("FlipY cannot be changed until disabled automatic by Engine::setAutomaticFlipY()");
+        spritecomp.needUpdateSprite = true;
     }
 }
 

@@ -142,6 +142,8 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("onPointerMove", [] (UIComponent* self, lua_State* L) { return &self->onPointerMove; }, [] (UIComponent* self, lua_State* L) { self->onPointerMove = L; })
         .addProperty("onPointerDown", [] (UIComponent* self, lua_State* L) { return &self->onPointerDown; }, [] (UIComponent* self, lua_State* L) { self->onPointerDown = L; })
         .addProperty("onPointerUp", [] (UIComponent* self, lua_State* L) { return &self->onPointerUp; }, [] (UIComponent* self, lua_State* L) { self->onPointerUp = L; })
+        .addProperty("automaticFlipY", &UIComponent::automaticFlipY)
+        .addProperty("flipY", &UIComponent::flipY)
         .addProperty("pointerMoved", &UIComponent::pointerMoved)
         .addProperty("focused", &UIComponent::focused)
         .addProperty("needReload", &UIComponent::needReload)

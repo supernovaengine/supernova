@@ -16,6 +16,7 @@
 #include "component/PolygonComponent.h"
 #include "component/TextEditComponent.h"
 #include "component/Transform.h"
+#include "component/CameraComponent.h"
 
 namespace Supernova{
 
@@ -45,6 +46,7 @@ namespace Supernova{
 		bool isCoordInside(float x, float y, Transform& transform, UILayoutComponent& layout);
 
 		void applyAnchorPreset(UILayoutComponent& layout);
+		void changeFlipY(UIComponent& ui, CameraComponent& camera);
 
 	public:
 		UISystem(Scene* scene);

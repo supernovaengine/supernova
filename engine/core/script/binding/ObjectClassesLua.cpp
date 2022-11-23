@@ -336,6 +336,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Polygon::setTexture),
             luabridge::overload<FramebufferRender*>(&Polygon::setTexture))
+        .addProperty("flipY", &Polygon::isFlipY, &Polygon::setFlipY)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -357,6 +358,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getLineHeight", &Text::getLineHeight)
         .addFunction("getNumChars", &Text::getNumChars)
         .addFunction("getCharPosition", &Text::getCharPosition)
+        .addProperty("flipY", &Text::isFlipY, &Text::setFlipY)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -372,6 +374,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<FramebufferRender*>(&Image::setTexture))
         .addProperty("color", &Image::getColor, (void(Image::*)(Vector4))&Image::setColor)
         .addFunction("setColor", (void(Image::*)(const float, const float, const float, const float))&Image::setColor)
+        .addProperty("flipY", &Image::isFlipY, &Image::setFlipY)
         .addFunction("getUIComponent", &Image::getComponent<UIComponent>)
         .endClass();
 

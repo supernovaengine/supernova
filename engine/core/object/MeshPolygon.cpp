@@ -44,14 +44,11 @@ int MeshPolygon::getHeight(){
 void MeshPolygon::setFlipY(bool flipY){
     MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
 
-    if (!Engine::isAutomaticFlipY()){
-        if (pcomp.flipY != flipY){
-            pcomp.flipY = flipY;
+    pcomp.automaticFlipY = false;
+    if (pcomp.flipY != flipY){
+        pcomp.flipY = flipY;
 
-            pcomp.needUpdatePolygon = true;
-        }
-    }else{
-        Log::error("FlipY cannot be changed until disabled automatic by Engine::setAutomaticFlipY()");
+        pcomp.needUpdatePolygon = true;
     }
 }
 

@@ -50,6 +50,9 @@ namespace Supernova{
         int getLineHeight() const;
         unsigned int getNumChars() const;
         Vector2 getCharPosition(unsigned int index) const;
+
+        void setFlipY(bool flipY);
+        bool isFlipY() const;
     };
 }
 

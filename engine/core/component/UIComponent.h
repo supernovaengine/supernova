@@ -41,6 +41,9 @@ namespace Supernova{
         FunctionSubscribe<void(float, float)> onPointerDown;
         FunctionSubscribe<void(float, float)> onPointerUp;
 
+        bool automaticFlipY = true;
+        bool flipY = false;
+
         bool pointerMoved = false;
         bool focused = false;
 

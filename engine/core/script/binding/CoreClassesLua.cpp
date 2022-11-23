@@ -114,7 +114,6 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticProperty("useDegrees", &Engine::isUseDegrees, &Engine::setUseDegrees)
         .addStaticProperty("defaultResampleToPOTTexture", &Engine::isDefaultResampleToPOTTexture, &Engine::setDefaultResampleToPOTTexture)
         .addStaticProperty("automaticTransparency", &Engine::isAutomaticTransparency, &Engine::setAutomaticTransparency)
-        .addStaticProperty("automaticFlipY", &Engine::isAutomaticFlipY, &Engine::setAutomaticFlipY)
         .addStaticProperty("allowEventsOutCanvas", &Engine::isAllowEventsOutCanvas, &Engine::setAllowEventsOutCanvas)
         .addStaticProperty("fixedTimeSceneUpdate", &Engine::isFixedTimeSceneUpdate, &Engine::setFixedTimeSceneUpdate)
         .addStaticProperty("updateTime", &Engine::getUpdateTime, &Engine::setUpdateTime)

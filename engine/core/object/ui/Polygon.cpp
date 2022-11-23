@@ -57,3 +57,21 @@ Vector4 Polygon::getColor() const{
 
     return ui.color;
 }
+
+void Polygon::setFlipY(bool flipY){
+    UIComponent& ui = getComponent<UIComponent>();
+    PolygonComponent& pcomp = getComponent<PolygonComponent>();
+
+    ui.automaticFlipY = false;
+    if (ui.flipY != flipY){
+        ui.flipY = flipY;
+
+        pcomp.needUpdatePolygon = true;
+    }
+}
+
+bool Polygon::isFlipY() const{
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return ui.flipY;
+}

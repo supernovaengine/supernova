@@ -16,6 +16,7 @@ namespace Supernova{
         bool fakeBillboard = false;
         bool cylindricalBillboard = false;
 
+        bool automaticFlipY = true;
         bool flipY = false;
 
         bool needUpdateSprite = true;

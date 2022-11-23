@@ -111,3 +111,21 @@ Vector4 Image::getColor() const{
 
     return Color::linearTosRGB(ui.color);
 }
+
+void Image::setFlipY(bool flipY){
+    UIComponent& ui = getComponent<UIComponent>();
+    ImageComponent& img = getComponent<ImageComponent>();
+
+    ui.automaticFlipY = false;
+    if (ui.flipY != flipY){
+        ui.flipY = flipY;
+
+        img.needUpdatePatches = true;
+    }
+}
+
+bool Image::isFlipY() const{
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return ui.flipY;
+}

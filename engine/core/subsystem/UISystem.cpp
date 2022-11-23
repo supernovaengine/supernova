@@ -101,6 +101,14 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
     ui.buffer.addVector2(atrTexcoord, Vector2((img.patchMarginLeft/(float)texWidth), 1.0f));
     ui.buffer.addVector2(atrTexcoord, Vector2(0, 1.0f-(img.patchMarginBottom/(float)texHeight)));
 
+    if (ui.flipY){
+        for (int i = 0; i < ui.buffer.getCount(); i++){
+            Vector2 uv = ui.buffer.getVector2(atrTexcoord, i);
+            uv.y = 1.0 - uv.y;
+            ui.buffer.setVector2(i, atrTexcoord, uv);
+        }
+    }
+
     Attribute* atrColor = ui.buffer.getAttribute(AttributeType::COLOR);
 
     for (int i = 0; i < ui.buffer.getCount(); i++){
@@ -188,7 +196,7 @@ void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponen
 
     std::vector<uint16_t> indices_array;
 
-    text.stbtext->createText(text.text, &ui.buffer, indices_array, text.charPositions, layout.width, layout.height, text.fixedWidth, text.fixedHeight, text.multiline, false);
+    text.stbtext->createText(text.text, &ui.buffer, indices_array, text.charPositions, layout.width, layout.height, text.fixedWidth, text.fixedHeight, text.multiline, ui.flipY);
 
     ui.indices.setValues(
             0, ui.indices.getAttribute(AttributeType::INDEX),
@@ -398,6 +406,8 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILay
         u = (ui.buffer.getFloat(attVertex, i, 0) - min_X) * k_X;
         v = (ui.buffer.getFloat(attVertex, i, 1) - min_Y) * k_Y;
 
+        if (ui.flipY)
+            v = 1.0 - v;
         ui.buffer.addVector2(AttributeType::TEXCOORD1, Vector2(u, v));
     }
 
@@ -608,6 +618,17 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
     }
 }
 
+void UISystem::changeFlipY(UIComponent& ui, CameraComponent& camera){
+    ui.flipY = false;
+    if (camera.type != CameraType::CAMERA_2D){
+        ui.flipY = !ui.flipY;
+    }
+
+    if (ui.texture.isFramebuffer() && Engine::isOpenGL()){
+        ui.flipY = !ui.flipY;
+    }
+}
+
 void UISystem::load(){
 }
 
@@ -725,6 +746,11 @@ void UISystem::update(double dt){
 
         if (signature.test(scene->getComponentType<UIComponent>())){
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
+
+            if (ui.automaticFlipY){
+                CameraComponent& camera = scene->getComponent<CameraComponent>(scene->getCamera());
+                changeFlipY(ui, camera);
+            }
 
             // Texts
             if (signature.test(scene->getComponentType<TextComponent>())){

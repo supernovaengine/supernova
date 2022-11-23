@@ -125,15 +125,13 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
 }
 
 void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh){
-    if (Engine::isAutomaticFlipY()){
-        flipY = false;
-        if (camera.type != CameraType::CAMERA_2D){
-            flipY = !flipY;
-        }
+    flipY = false;
+    if (camera.type != CameraType::CAMERA_2D){
+        flipY = !flipY;
+    }
 
-        if (mesh.submeshes[0].material.baseColorTexture.isFramebuffer() && Engine::isOpenGL()){
-            flipY = !flipY;
-        }
+    if (mesh.submeshes[0].material.baseColorTexture.isFramebuffer() && Engine::isOpenGL()){
+        flipY = !flipY;
     }
 }
 
@@ -400,7 +398,8 @@ void MeshSystem::update(double dt){
                 MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
                 CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
-                changeFlipY(sprite.flipY, camera, mesh);
+                if (sprite.automaticFlipY)
+                    changeFlipY(sprite.flipY, camera, mesh);
 
                 createSprite(sprite, mesh);
             }
@@ -421,7 +420,8 @@ void MeshSystem::update(double dt){
                 MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
                 CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
-                changeFlipY(polygon.flipY, camera, mesh);
+                if (polygon.automaticFlipY)
+                    changeFlipY(polygon.flipY, camera, mesh);
 
                 createMeshPolygon(polygon, mesh);
             }
