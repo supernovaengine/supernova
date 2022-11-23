@@ -52,6 +52,11 @@ namespace Supernova{
         bool needUpdateFrustumPlanes = true;
         Plane frustumPlanes[6];
 
+		bool renderToTexture = false;
+		FramebufferRender framebuffer;
+		int framebufferWidth = 512;
+		int framebufferHeight = 512;
+
         bool automatic = true;
         bool needUpdate = true;
     };

@@ -79,38 +79,10 @@ sg_primitive_type SokolObject::getPrimitiveType(PrimitiveType primitiveType){
     return SG_PRIMITIVETYPE_TRIANGLES;
 }
 
-void SokolObject::beginLoad(PrimitiveType primitiveType, bool depth, bool renderToTexture){
+void SokolObject::beginLoad(PrimitiveType primitiveType){
     bind = {0};
     pip = {0};
     pipeline_desc = {0};
-
-    if (depth){
-        pipeline_desc.cull_mode = SG_CULLMODE_FRONT;
-        pipeline_desc.sample_count = 1;
-        pipeline_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
-        pipeline_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
-        pipeline_desc.depth.write_enabled = true;
-        pipeline_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
-    }else{
-        //pipeline_desc.cull_mode = SG_CULLMODE_FRONT;
-        pipeline_desc.face_winding = SG_FACEWINDING_CW;
-
-        pipeline_desc.depth.write_enabled = true;
-        pipeline_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
-
-        if (renderToTexture){
-            pipeline_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
-            pipeline_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
-            pipeline_desc.depth.write_enabled = true;
-
-            pipeline_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
-        }
-
-        pipeline_desc.colors[0].write_mask = SG_COLORMASK_RGB;
-        pipeline_desc.colors[0].blend.enabled = true;
-        pipeline_desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
-        pipeline_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-    }
 
     pipeline_desc.primitive_type = getPrimitiveType(primitiveType);
 
@@ -165,16 +137,70 @@ void SokolObject::addTexture(int slotTexture, ShaderStageType stage, TextureRend
         }else if (stage == ShaderStageType::FRAGMENT){
             bind.fs_images[slotTexture] = image;
         }
-
     }
 }
 
-void SokolObject::endLoad(){
-    pip = sg_make_pipeline(&pipeline_desc);
+void SokolObject::endLoad(uint8_t pipelines){
+
+    if (pipelines & (int)PipelineType::PIP_DEPTH) {
+        sg_pipeline_desc pip_depth_desc = pipeline_desc;
+
+        pip_depth_desc.cull_mode = SG_CULLMODE_FRONT;
+        pip_depth_desc.sample_count = 1;
+        pip_depth_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
+        pip_depth_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
+        pip_depth_desc.depth.write_enabled = true;
+        pip_depth_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
+
+        depth_pip = sg_make_pipeline(&pip_depth_desc);
+    }
+
+    if (pipelines & (int)PipelineType::PIP_DEFAULT) {
+        sg_pipeline_desc pip_default_desc = pipeline_desc;
+
+        //pip_default_desc.cull_mode = SG_CULLMODE_FRONT;
+        pip_default_desc.face_winding = SG_FACEWINDING_CW;
+
+        pip_default_desc.depth.write_enabled = true;
+        pip_default_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
+
+        pip_default_desc.colors[0].write_mask = SG_COLORMASK_RGB;
+        pip_default_desc.colors[0].blend.enabled = true;
+        pip_default_desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
+        pip_default_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+
+        pip = sg_make_pipeline(&pip_default_desc);
+    }
+
+    if (pipelines & (int)PipelineType::PIP_RTT){
+        sg_pipeline_desc pip_rtt_desc = pipeline_desc;
+
+        pip_rtt_desc.face_winding = SG_FACEWINDING_CW;
+
+        pip_rtt_desc.depth.write_enabled = true;
+        pip_rtt_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
+
+        pip_rtt_desc.colors[0].write_mask = SG_COLORMASK_RGB;
+        pip_rtt_desc.colors[0].blend.enabled = true;
+        pip_rtt_desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
+        pip_rtt_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+
+        pip_rtt_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
+        pip_rtt_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
+
+        rtt_pip = sg_make_pipeline(&pip_rtt_desc);
+    }
+    
 }
 
-void SokolObject::beginDraw(){
-    sg_apply_pipeline(pip);
+void SokolObject::beginDraw(PipelineType pipType){
+    if (pipType == PipelineType::PIP_DEPTH){
+        sg_apply_pipeline(depth_pip);
+    }else if (pipType == PipelineType::PIP_RTT){
+        sg_apply_pipeline(rtt_pip);
+    }else{
+        sg_apply_pipeline(pip);
+    }
 }
 
 void SokolObject::applyUniformBlock(int slotUniform, ShaderStageType stage, unsigned int count, void* data){
@@ -195,9 +221,18 @@ void SokolObject::draw(int vertexCount){
 }
 
 void SokolObject::destroy(){
-    if (pip.id != SG_INVALID_ID && sg_isvalid()){
+    if (sg_isvalid())
+    if (pip.id != SG_INVALID_ID){
         sg_destroy_pipeline(pip);
+    }
+    if (depth_pip.id != SG_INVALID_ID){
+        sg_destroy_pipeline(depth_pip);
+    }
+    if (rtt_pip.id != SG_INVALID_ID){
+        sg_destroy_pipeline(rtt_pip);
     }
 
     pip.id = SG_INVALID_ID;
+    depth_pip.id = SG_INVALID_ID;
+    rtt_pip.id = SG_INVALID_ID;
 }

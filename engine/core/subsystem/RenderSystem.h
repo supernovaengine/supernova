@@ -81,6 +81,7 @@ namespace Supernova{
 		bool hasLights;
 		bool hasShadows;
 		bool hasFog;
+		bool hasMultipleCameras;
 
 		fs_lighting_t fs_lighting;
 		vs_shadows_t vs_shadows;
@@ -90,14 +91,16 @@ namespace Supernova{
 		std::map<std::string, BufferRender*> bufferNameToRender;
 		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
 
+		void createFramebuffer(CameraComponent& camera);
 		void createEmptyTextures();
 		void checkLightsAndShadow();
-		bool processLights();
+		bool processLights(Transform& cameraTransform);
 		bool processFog();
 		TextureShaderType getShadowMapByIndex(int index);
 		TextureShaderType getShadowMapCubeByIndex(int index);
 		void configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera);
 		Matrix4 getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv);
+		bool checkPBRFrabebufferUpdate(Material& material);
 		void loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool castShadows);
 		void loadTerrainTextures(TerrainComponent& terrain, ShaderData& shaderData);
 		Rect getScissorRect(UILayoutComponent& layout, ImageComponent& img, Transform& transform, CameraComponent& camera);
@@ -113,31 +116,31 @@ namespace Supernova{
 	protected:
 
 		bool loadMesh(MeshComponent& mesh);
-		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform);
+		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams);
 		void destroyMesh(MeshComponent& mesh);
 
 		bool loadTerrain(TerrainComponent& terrain);
-		void drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform);
+		void drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams);
 		void destroyTerrain(TerrainComponent& terrain);
 
 		bool loadUI(UIComponent& uirender, bool isText);
-		void drawUI(UIComponent& uirender, Transform& transform);
+		void drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture);
 		void destroyUI(UIComponent& uirender);
 
 		bool loadParticles(ParticlesComponent& particles);
-		void drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform);
+		void drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void destroyParticles(ParticlesComponent& particles);
 
 		bool loadSky(SkyComponent& sky);
-		void drawSky(SkyComponent& sky);
+		void drawSky(SkyComponent& sky, bool renderToTexture);
 		void destroySky(SkyComponent& sky);
 
 		void updateTransform(Transform& transform);
 		void updateCamera(CameraComponent& camera, Transform& transform);
 		void updateSkyViewProjection(CameraComponent& camera);
-		void updateLightFromTransform(LightComponent& light, Transform& transform);
+		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);
 		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform);
 		void updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 		bool updateCameraFrustumPlanes(CameraComponent& camera);
@@ -147,7 +150,7 @@ namespace Supernova{
 		RenderSystem(Scene* scene);
 		virtual ~RenderSystem();
 
-		void createOrUpdateFramebuffer();
+		void updateFramebuffer(CameraComponent& camera);
 
 		// camera
 		void updateCameraSize(Entity entity);
@@ -155,6 +158,9 @@ namespace Supernova{
 		bool isInsideCamera(CameraComponent& camera, const AlignedBox& box);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& point);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius);
+
+		// update aux function
+		void update(CameraComponent& camera, Transform& cameraTransform, bool isMainCamera);
 	
 		virtual void load();
 		virtual void destroy();

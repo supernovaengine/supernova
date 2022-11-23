@@ -6,6 +6,7 @@
 
 #include "util/Angle.h"
 #include "Engine.h"
+#include "subsystem/RenderSystem.h"
 
 using namespace Supernova;
 
@@ -39,6 +40,9 @@ Camera::Camera(Scene* scene): Object(scene){
 
     // default CameraComponent is CAMERA_2D
     cameraComponent.type = CameraType::CAMERA_PERSPECTIVE;
+}
+
+Camera::Camera(Scene* scene, Entity entity): Object(scene, entity){
 }
 
 void Camera::activate(){
@@ -252,6 +256,48 @@ void Camera::slide(float distance){
         transf.needUpdate = true;
         camera.needUpdate = true;
     }
+}
+
+void Camera::setRenderToTexture(bool renderToTexture){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+	camera.renderToTexture = renderToTexture;
+}
+
+bool Camera::isRenderToTexture() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+	return camera.renderToTexture;
+}
+
+FramebufferRender& Camera::getFramebuffer(){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+	return camera.framebuffer;
+}
+
+void Camera::setFramebufferSize(int width, int height){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+	camera.framebufferWidth = width;
+	camera.framebufferHeight = height;
+
+	if (camera.renderToTexture){
+		scene->getSystem<RenderSystem>()->updateFramebuffer(camera);
+		scene->getSystem<RenderSystem>()->updateCameraSize(entity);
+	}
+}
+
+int Camera::getFramebufferWidth(){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+	return camera.framebufferWidth;
+}
+
+int Camera::getFramebufferHeight(){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+	return camera.framebufferHeight;
 }
 
 void Camera::updateCamera(){

@@ -56,6 +56,7 @@ Scene::Scene(){
 	registerSystem<AudioSystem>();
 
 	camera = NULL_ENTITY;
+	defaultCamera = NULL_ENTITY;
 
 	mainScene = false;
 	backgroundColor = Vector4(0.1, 0.1, 0.1, 1.0); //sRGB
@@ -67,9 +68,9 @@ Scene::Scene(){
 	ambientLight = Vector3(1.0, 1.0, 1.0);
 	ambientFactor = 0.2;
 
-	renderToTexture = false;
-	framebufferWidth = 512;
-	framebufferHeight = 512;
+	if (camera == NULL_ENTITY){
+		camera = createDefaultCamera();
+	}
 }
 
 Scene::~Scene(){
@@ -79,6 +80,10 @@ Scene::~Scene(){
 void Scene::setCamera(Entity camera){
 	if (findComponent<CameraComponent>(camera)){
 		this->camera = camera;
+		if (defaultCamera != NULL_ENTITY){
+			destroyEntity(defaultCamera);
+			defaultCamera = NULL_ENTITY;
+		}
 	}else{
 		Log::error("Invalid camera entity: need CameraComponent");
 	}
@@ -89,7 +94,7 @@ Entity Scene::getCamera() const{
 }
 
 Entity Scene::createDefaultCamera(){
-	Entity defaultCamera = createEntity();
+	defaultCamera = createEntity();
 	addComponent<CameraComponent>(defaultCamera, {});
 	addComponent<Transform>(defaultCamera, {});
 
@@ -171,41 +176,7 @@ void Scene::setSceneAmbientLightEnabled(bool hasSceneAmbientLight){
 	this->hasSceneAmbientLight = hasSceneAmbientLight;
 }
 
-void Scene::setRenderToTexture(bool renderToTexture){
-	this->renderToTexture = renderToTexture;
-}
-
-bool Scene::isRenderToTexture() const{
-	return renderToTexture;
-}
-
-FramebufferRender& Scene::getFramebuffer(){
-	return framebuffer;
-}
-
-void Scene::setFramebufferSize(int width, int height){
-	this->framebufferWidth = width;
-	this->framebufferHeight = height;
-
-	if (renderToTexture){
-		getSystem<RenderSystem>()->createOrUpdateFramebuffer();
-		getSystem<RenderSystem>()->updateCameraSize(camera);
-	}
-}
-
-int Scene::getFramebufferWidth(){
-	return framebufferWidth;
-}
-
-int Scene::getFramebufferHeight(){
-	return framebufferHeight;
-}
-
 void Scene::load(){
-	if (camera == NULL_ENTITY){
-		camera = createDefaultCamera();
-	}
-
 	for (auto const& pair : systems){
 		pair.second->load();
 	}
@@ -215,7 +186,6 @@ void Scene::destroy(){
 	for (auto const& pair : systems){
 		pair.second->destroy();
 	}
-	framebuffer.destroyFramebuffer();
 }
 
 void Scene::draw(){

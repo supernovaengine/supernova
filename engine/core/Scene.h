@@ -52,17 +52,13 @@ namespace Supernova{
 
 		Entity camera;
 		bool mainScene;
+		Entity defaultCamera;
 
 		Vector4 backgroundColor;
 		bool shadowsPCF;
 
 		bool hasFog;
 		Fog fog;
-
-		bool renderToTexture;
-		FramebufferRender framebuffer;
-		int framebufferWidth;
-		int framebufferHeight;
 
 		bool hasSceneAmbientLight;
 		Vector3 ambientLight;
@@ -112,15 +108,6 @@ namespace Supernova{
 
 		bool isSceneAmbientLightEnabled() const;
 		void setSceneAmbientLightEnabled(bool hasSceneAmbientLight);
-
-		void setRenderToTexture(bool renderToTexture);
-		bool isRenderToTexture() const;
-
-		FramebufferRender& getFramebuffer();
-
-		void setFramebufferSize(int width, int height);
-		int getFramebufferWidth();
-		int getFramebufferHeight();
 
 		int32_t findBranchLastIndex(Entity entity);
 	

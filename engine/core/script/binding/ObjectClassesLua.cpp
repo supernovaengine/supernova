@@ -141,6 +141,11 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("moveForward", &Camera::moveForward)
         .addFunction("walkForward", &Camera::walkForward)
         .addFunction("slide", &Camera::slide)
+        .addProperty("renderToTexture", &Camera::isRenderToTexture, &Camera::setRenderToTexture)
+        .addFunction("getFramebuffer", &Camera::getFramebuffer)
+        .addFunction("setFramebufferSize", &Camera::setFramebufferSize)
+        .addFunction("getFramebufferWidth", &Camera::getFramebufferWidth)
+        .addFunction("getFramebufferHeight", &Camera::getFramebufferHeight)
         .addFunction("updateCamera", &Camera::updateCamera)
         .endClass();
 

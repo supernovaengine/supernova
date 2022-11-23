@@ -263,8 +263,10 @@ void Texture::destroy(){
 }
 
 TextureRender* Texture::getRender(){
-    if (framebuffer)
+    if (framebuffer){
+        lastFramebufferVersion = framebuffer->version;
         return &framebuffer->getColorTexture();
+    }
 
     if (needLoad && !renderAndData)
         load();
@@ -318,16 +320,17 @@ bool Texture::empty(){
     return false;
 }
 
-bool Texture::hasTextureFrame(){
+bool Texture::isFramebuffer(){
     if (framebuffer)
         return true;
 
     return false;
 }
 
-bool Texture::isFramebufferNeedUpdate(){
-    if (framebuffer)
-        return &framebuffer->needUpdate;
+bool Texture::isFramebufferOutdated(){
+    if (framebuffer){
+        return (lastFramebufferVersion != framebuffer->version);
+    }
 
     return false;
 }

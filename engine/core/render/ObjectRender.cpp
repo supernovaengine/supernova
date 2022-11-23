@@ -15,8 +15,8 @@ ObjectRender::~ObjectRender(){
     //Cannot destroy because its a handle
 }
 
-void ObjectRender::beginLoad(PrimitiveType primitiveType, bool depth, bool renderToTexture){
-    backend.beginLoad(primitiveType, depth, renderToTexture);
+void ObjectRender::beginLoad(PrimitiveType primitiveType){
+    backend.beginLoad(primitiveType);
 }
 
 void ObjectRender::addIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset){
@@ -35,12 +35,12 @@ void ObjectRender::addTexture(int slotTexture, ShaderStageType stage, TextureRen
     backend.addTexture(slotTexture, stage, texture);
 }
 
-void ObjectRender::endLoad(){
-    backend.endLoad();
+void ObjectRender::endLoad(uint8_t pipelines){
+    backend.endLoad(pipelines);
 }
 
-void ObjectRender::beginDraw(){
-    backend.beginDraw();
+void ObjectRender::beginDraw(PipelineType pipType){
+    backend.beginDraw(pipType);
 }
 
 void ObjectRender::applyUniformBlock(int slotUniform, ShaderStageType stage, unsigned int count, void* data){

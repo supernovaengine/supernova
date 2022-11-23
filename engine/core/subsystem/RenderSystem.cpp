@@ -37,6 +37,7 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 	hasLights = false;
 	hasShadows = false;
 	hasFog = false;
+	hasMultipleCameras = false;
 }
 
 RenderSystem::~RenderSystem(){
@@ -46,13 +47,21 @@ void RenderSystem::load(){
 	createEmptyTextures();
 	checkLightsAndShadow();
 
-	if (scene->isMainScene() || scene->isRenderToTexture()){
-		sceneRender.setClearColor(scene->getBackgroundColor());
+	if (scene->getCamera() != NULL_ENTITY){
+		CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
+		Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
+		
+		update(camera, cameraTransform, true); // first update
 	}
-	depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
 
-	if (scene->isRenderToTexture()){
-		createOrUpdateFramebuffer();
+	auto cameras = scene->getComponentArray<CameraComponent>();
+	for (int i = 0; i < cameras->size(); i++){
+		CameraComponent& camera = cameras->getComponentFromIndex(i);
+		if (camera.renderToTexture){
+			if (!camera.framebuffer.isCreated()){
+				createFramebuffer(camera);
+			}
+		}
 	}
 }
 
@@ -60,13 +69,17 @@ void RenderSystem::destroy(){
 
 }
 
-void RenderSystem::createOrUpdateFramebuffer(){
-	if (scene->getFramebuffer().isCreated()){
-		scene->getFramebuffer().destroyFramebuffer();
-		scene->getFramebuffer().needUpdate = true;
+void RenderSystem::createFramebuffer(CameraComponent& camera){
+	camera.framebuffer.createFramebuffer(TextureType::TEXTURE_2D, camera.framebufferWidth, camera.framebufferHeight, false);
+}
+
+void RenderSystem::updateFramebuffer(CameraComponent& camera){
+
+	if (camera.framebuffer.isCreated()){
+		camera.framebuffer.destroyFramebuffer();
 	}
 
-	scene->getFramebuffer().createFramebuffer(TextureType::TEXTURE_2D, scene->getFramebufferWidth(), scene->getFramebufferHeight(), false);
+	createFramebuffer(camera);
 }
 
 void RenderSystem::createEmptyTextures(){
@@ -122,7 +135,7 @@ void RenderSystem::checkLightsAndShadow(){
 	}
 }
 
-bool RenderSystem::processLights(){
+bool RenderSystem::processLights(Transform& cameraTransform){
 	hasLights = false;
 	hasShadows = false;
 
@@ -137,13 +150,6 @@ bool RenderSystem::processLights(){
 
 	if (numLights > 0)
 		hasLights = true; // Re-check lights on, after checked in checkLightsAndShadow()
-
-	Entity camera = scene->getCamera();
-	if (camera == NULL_ENTITY){
-		return false;
-	}
-
-	Transform& cameraTransform =  scene->getComponent<Transform>(camera);
 	
 	for (int i = 0; i < numLights; i++){
 		LightComponent& light = lights->getComponentFromIndex(i);
@@ -279,6 +285,15 @@ TextureShaderType RenderSystem::getShadowMapCubeByIndex(int index){
 	}
 
 	return TextureShaderType::SHADOWCUBEMAP1;
+}
+
+bool RenderSystem::checkPBRFrabebufferUpdate(Material& material){
+	return (
+		material.baseColorTexture.isFramebufferOutdated() ||
+		material.metallicRoughnessTexture.isFramebufferOutdated() ||
+		material.normalTexture.isFramebufferOutdated() ||
+		material.occlusionTexture.isFramebufferOutdated() ||
+		material.emissiveTexture.isFramebufferOutdated() );
 }
 
 void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool castShadows){
@@ -434,7 +449,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 		ObjectRender& render = mesh.submeshes[i].render;
 
-		render.beginLoad(mesh.submeshes[i].primitiveType, false, scene->isRenderToTexture());
+		render.beginLoad(mesh.submeshes[i].primitiveType);
 
 		for (auto const& buf : mesh.buffers){
         	if (buf.second->isRenderAttributes()) {
@@ -608,13 +623,13 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			mesh.submeshes[i].vertexCount = vertexBufferCount;
 		}
 
-		render.endLoad();
+		render.endLoad(PIP_DEFAULT | PIP_RTT);
 
 		//----------Start depth shader---------------
 		if (hasShadows && mesh.castShadows){
 			ObjectRender& depthRender = mesh.submeshes[i].depthRender;
 
-			depthRender.beginLoad(mesh.submeshes[i].primitiveType, true, scene->isRenderToTexture());
+			depthRender.beginLoad(mesh.submeshes[i].primitiveType);
 
 			depthRender.addShader(mesh.submeshes[i].depthShader.get());
 			ShaderData& depthShaderData = mesh.submeshes[i].depthShader.get()->shaderData;
@@ -683,7 +698,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				}
 			}
 
-			depthRender.endLoad();
+			depthRender.endLoad(PIP_DEPTH);
 		}
 		//----------End depth shader---------------
 	}
@@ -694,7 +709,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 	return true;
 }
 
-void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform){
+void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, bool renderToTexture){
 	if (mesh.loaded){
 
 		if (mesh.needUpdateBuffer){
@@ -709,7 +724,13 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& render = mesh.submeshes[i].render;
 
-			if (mesh.submeshes[i].needUpdateTexture || mesh.submeshes[i].material.baseColorTexture.isFramebufferNeedUpdate()){
+			if ( mesh.submeshes[i].material.baseColorTexture.isFramebuffer()){
+
+			}
+
+			bool needUpdateFramebuffer = checkPBRFrabebufferUpdate(mesh.submeshes[i].material);
+
+			if (mesh.submeshes[i].needUpdateTexture || needUpdateFramebuffer){
 				ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
 				loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.castShadows);
 
@@ -720,7 +741,7 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 				mesh.submeshes[i].material.ambientLight = scene->getAmbientLightColor();
 			}
 
-			render.beginDraw();
+			render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
 
 			if (hasFog){
 				render.applyUniformBlock(mesh.submeshes[i].slotFSFog, ShaderStageType::FRAGMENT, sizeof(float) * 8, &fs_fog);
@@ -761,7 +782,7 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& depthRender = mesh.submeshes[i].depthRender;
 
-			depthRender.beginDraw();
+			depthRender.beginDraw(PIP_DEPTH);
 
 			//model, mvp matrix
 			depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 32, &vsDepthParams);
@@ -837,7 +858,7 @@ bool RenderSystem::loadTerrain(TerrainComponent& terrain){
 	terrain.buffer.getRender()->createBuffer(terrain.buffer.getSize(), terrain.buffer.getData(), terrain.buffer.getType(), terrain.buffer.getUsage());
 	terrain.indices.getRender()->createBuffer(terrain.indices.getSize(), terrain.indices.getData(), terrain.indices.getType(), terrain.indices.getUsage());
 
-	terrain.render.beginLoad(PrimitiveType::TRIANGLES, false, scene->isRenderToTexture());
+	terrain.render.beginLoad(PrimitiveType::TRIANGLES);
 
 	bool p_unlit = false;
 	bool p_punctual = false;
@@ -904,12 +925,12 @@ bool RenderSystem::loadTerrain(TerrainComponent& terrain){
 	// empty to create index_type
 	terrain.render.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, 0);
 
-	terrain.render.endLoad();
+	terrain.render.endLoad(PIP_DEFAULT | PIP_RTT);
 
 	//----------Start depth shader---------------
 	if (hasShadows && terrain.castShadows){
 
-		terrain.depthRender.beginLoad(PrimitiveType::TRIANGLES, true, scene->isRenderToTexture());
+		terrain.depthRender.beginLoad(PrimitiveType::TRIANGLES);
 
 		terrain.depthRender.addShader(terrain.depthShader.get());
 		ShaderData& depthShaderData = terrain.depthShader.get()->shaderData;
@@ -926,7 +947,7 @@ bool RenderSystem::loadTerrain(TerrainComponent& terrain){
 		// empty to create index_type
 		terrain.depthRender.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, 0);
 
-		terrain.depthRender.endLoad();
+		terrain.depthRender.endLoad(PIP_DEPTH);
 	}
 	//----------End depth shader---------------
 
@@ -935,9 +956,11 @@ bool RenderSystem::loadTerrain(TerrainComponent& terrain){
 	return true;
 }
 
-void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform){
+void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture){
 	if (terrain.loaded){
-		if (terrain.needUpdateTexture || terrain.material.baseColorTexture.isFramebufferNeedUpdate()){
+		bool needUpdateFramebuffer = checkPBRFrabebufferUpdate(terrain.material);
+
+		if (terrain.needUpdateTexture || needUpdateFramebuffer){
 			ShaderData& shaderData = terrain.shader.get()->shaderData;
 			loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.castShadows);
 			loadTerrainTextures(terrain, shaderData);
@@ -949,7 +972,7 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 			terrain.material.ambientLight = scene->getAmbientLightColor();
 		}
 
-		terrain.render.beginDraw();
+		terrain.render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
 
 		if (hasLights){
 			terrain.render.applyUniformBlock(terrain.slotFSLighting, ShaderStageType::FRAGMENT, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
@@ -978,7 +1001,7 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 
 void RenderSystem::drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams){
 	if (terrain.loaded && terrain.castShadows){
-		terrain.depthRender.beginDraw();
+		terrain.depthRender.beginDraw(PIP_DEPTH);
 
 		//model, mvp matrix
 		terrain.depthRender.applyUniformBlock(terrain.slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 32, &vsDepthParams);
@@ -1038,7 +1061,7 @@ void RenderSystem::destroyTerrain(TerrainComponent& terrain){
 bool RenderSystem::loadUI(UIComponent& uirender, bool isText){
 	ObjectRender& render = uirender.render;
 
-	render.beginLoad(uirender.primitiveType, false, scene->isRenderToTexture());
+	render.beginLoad(uirender.primitiveType);
 
 	TextureRender* textureRender = uirender.texture.getRender();
 
@@ -1101,7 +1124,7 @@ bool RenderSystem::loadUI(UIComponent& uirender, bool isText){
 	
 	uirender.needUpdateTexture = false;
 
-	render.endLoad();
+	render.endLoad(PIP_DEFAULT | PIP_RTT);
 
 	uirender.needReload = false;
 	uirender.loaded = true;
@@ -1109,10 +1132,10 @@ bool RenderSystem::loadUI(UIComponent& uirender, bool isText){
 	return true;
 }
 
-void RenderSystem::drawUI(UIComponent& uirender, Transform& transform){
+void RenderSystem::drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture){
 	if (uirender.loaded && uirender.buffer.getSize() > 0){
 
-		if (uirender.needUpdateTexture || uirender.texture.isFramebufferNeedUpdate()){
+		if (uirender.needUpdateTexture || uirender.texture.isFramebufferOutdated()){
 			ShaderData& shaderData = uirender.shader.get()->shaderData;
 			TextureRender* textureRender = uirender.texture.getRender();
 			if (textureRender)
@@ -1136,7 +1159,7 @@ void RenderSystem::drawUI(UIComponent& uirender, Transform& transform){
 
 		ObjectRender& render = uirender.render;
 
-		render.beginDraw();
+		render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
 		render.applyUniformBlock(uirender.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		//Color
 		render.applyUniformBlock(uirender.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &uirender.color);
@@ -1177,7 +1200,7 @@ void RenderSystem::destroyUI(UIComponent& uirender){
 bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	ObjectRender& render = particles.render;
 
-	render.beginLoad(PrimitiveType::POINTS, false, scene->isRenderToTexture());
+	render.beginLoad(PrimitiveType::POINTS);
 
 	TextureRender* textureRender = particles.texture.getRender();
 
@@ -1220,7 +1243,7 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 
 	particles.needUpdateTexture = false;
 
-	render.endLoad();
+	render.endLoad(PIP_DEFAULT | PIP_RTT);
 
 	particles.needReload = false;
 	particles.loaded = true;
@@ -1228,10 +1251,10 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	return true;
 }
 
-void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform){
+void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture){
 	if (particles.loaded && particles.buffer && particles.buffer->getSize() > 0){
 
-		if (particles.needUpdateTexture || particles.texture.isFramebufferNeedUpdate()){
+		if (particles.needUpdateTexture || particles.texture.isFramebufferOutdated()){
 			ShaderData& shaderData = particles.shader.get()->shaderData;
 			TextureRender* textureRender = particles.texture.getRender();
 			if (textureRender)
@@ -1247,7 +1270,7 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 
 		ObjectRender& render = particles.render;
 
-		render.beginDraw();
+		render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
 		render.applyUniformBlock(particles.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		render.draw(particles.particles.size());
 	}
@@ -1282,7 +1305,7 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 
 	ObjectRender* render = &sky.render;
 
-	render->beginLoad(PrimitiveType::TRIANGLES, false, scene->isRenderToTexture());
+	render->beginLoad(PrimitiveType::TRIANGLES);
 
 	sky.shader = ShaderPool::get(ShaderType::SKYBOX, "");
 	if (!sky.shader->isCreated())
@@ -1310,17 +1333,17 @@ bool RenderSystem::loadSky(SkyComponent& sky){
         }
     }
 
-	render->endLoad();
+	render->endLoad(PIP_DEFAULT | PIP_RTT);
 
 	sky.loaded = true;
 
 	return true;
 }
 
-void RenderSystem::drawSky(SkyComponent& sky){
+void RenderSystem::drawSky(SkyComponent& sky, bool renderToTexture){
 	if (sky.loaded){
 
-		if (sky.needUpdateTexture || sky.texture.isFramebufferNeedUpdate()){
+		if (sky.needUpdateTexture || sky.texture.isFramebufferOutdated()){
 			ShaderData& shaderData = sky.shader.get()->shaderData;
 			TextureRender* textureRender = sky.texture.getRender();
 			if (textureRender)
@@ -1331,7 +1354,7 @@ void RenderSystem::drawSky(SkyComponent& sky){
 
 		ObjectRender& render = sky.render;
 
-		render.beginDraw();
+		render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
 		render.applyUniformBlock(sky.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &sky.skyViewProjectionMatrix);
 		render.applyUniformBlock(sky.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &sky.color);
 		render.draw(36);
@@ -1370,7 +1393,7 @@ Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img
 	int objScreenWidth = 0;
 	int objScreenHeight = 0;
 
-	if (!scene->isRenderToTexture()) {
+	if (!camera.renderToTexture) {
 
 		float scaleX = transform.worldScale.x;
 		float scaleY = transform.worldScale.y;
@@ -1409,7 +1432,7 @@ Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img
 		objScreenHeight = layout.height;
 
 		if (camera.type == CameraType::CAMERA_2D)
-			objScreenPosY = (float) scene->getFramebufferHeight() - objScreenHeight - objScreenPosY;
+			objScreenPosY = (float) camera.framebufferHeight - objScreenHeight - objScreenPosY;
 
 		if (!(img.patchMarginLeft == 0 && img.patchMarginTop == 0 && img.patchMarginRight == 0 && img.patchMarginBottom == 0)) {
 			float borderScreenLeft = img.patchMarginLeft;
@@ -1651,10 +1674,10 @@ void RenderSystem::updateCameraSize(Entity entity){
 		CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
 		
 		Rect rect;
-		if (!scene->isRenderToTexture()) {
+		if (!camera.renderToTexture) {
 			rect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
 		}else{
-			rect = Rect(0, 0, scene->getFramebufferWidth(), scene->getFramebufferHeight());
+			rect = Rect(0, 0, camera.framebufferWidth, camera.framebufferHeight);
 		}
 
 		if (camera.automatic){
@@ -1686,7 +1709,6 @@ float RenderSystem::getCameraFar(CameraComponent& camera){
 }
 
 bool RenderSystem::isInsideCamera(CameraComponent& camera, const AlignedBox& box){
-
     if (box.isNull() || box.isInfinite())
         return false;
 
@@ -1839,7 +1861,7 @@ Matrix4 RenderSystem::getDirLightProjection(const Matrix4& viewMatrix, const Mat
 	return Matrix4::orthoMatrix(minX, maxX, minY, maxY, -maxZ, -minZ);
 }
 
-void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& transform){
+void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera){
 	light.worldDirection = transform.worldRotation * light.direction;
 
 	if (hasShadows && (light.intensity > 0)){
@@ -1848,8 +1870,6 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 		if (light.worldDirection.crossProduct(up) == Vector3::ZERO){
 			up = Vector3(0, 0, 1);
 		}
-
-		CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
 
 		//TODO: perspective aspect based on shadow map size
 		if (light.type == LightType::DIRECTIONAL){
@@ -1975,9 +1995,26 @@ void RenderSystem::updateLightFromTransform(LightComponent& light, Transform& tr
 }
 
 void RenderSystem::update(double dt){
-	CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
-	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
+	Entity mainCamera = scene->getCamera();
 
+	auto cameras = scene->getComponentArray<CameraComponent>();
+	hasMultipleCameras = false;
+	for (int i = 0; i < cameras->size(); i++){
+		CameraComponent& camera = cameras->getComponentFromIndex(i);
+		Entity cameraEntity = cameras->getEntity(i);
+		if (camera.renderToTexture && cameraEntity != mainCamera){
+			hasMultipleCameras = true;
+			return; // if has offscreen camera update is made in draw pass
+		}
+	}
+
+	CameraComponent& camera =  scene->getComponent<CameraComponent>(mainCamera);
+	Transform& cameraTransform =  scene->getComponent<Transform>(mainCamera);
+
+	update(camera, cameraTransform, true);
+}
+
+void RenderSystem::update(CameraComponent& camera, Transform& cameraTransform, bool isMainCamera){
 	std::vector<Entity> parentList;
 	auto transforms = scene->getComponentArray<Transform>();
 
@@ -2068,11 +2105,23 @@ void RenderSystem::update(double dt){
 			}
 			transform.distanceToCamera = (cameraTransform.worldPosition - transform.worldPosition).length();
 
-        	if (signature.test(scene->getComponentType<LightComponent>())){
-				LightComponent& light = scene->getComponent<LightComponent>(entity);
+			if (signature.test(scene->getComponentType<TerrainComponent>())){
+				TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
 
-				updateLightFromTransform(light, transform);
+				updateTerrain(terrain, transform, camera, cameraTransform);
 			}
+
+			if (isMainCamera){
+				if (signature.test(scene->getComponentType<LightComponent>())){
+					LightComponent& light = scene->getComponent<LightComponent>(entity);
+					
+					updateLightFromScene(light, transform, camera);
+				}
+			}
+
+		}
+
+		if (transform.needUpdate){
 
 			if (signature.test(scene->getComponentType<ModelComponent>())){
 				ModelComponent& model = scene->getComponent<ModelComponent>(entity);
@@ -2094,17 +2143,12 @@ void RenderSystem::update(double dt){
 				}
 			}
 
-			if (signature.test(scene->getComponentType<TerrainComponent>())){
-				TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
-
-				updateTerrain(terrain, transform, camera, cameraTransform);
-			}
-
 			if (signature.test(scene->getComponentType<AudioComponent>())){
 				AudioComponent& audio = scene->getComponent<AudioComponent>(entity);
 
 				audio.needUpdate = true;
 			}
+
 		}
 
         if (signature.test(scene->getComponentType<ParticlesComponent>())){
@@ -2121,196 +2165,220 @@ void RenderSystem::update(double dt){
 	}
 	camera.needUpdate = false;
 
-	processLights();
+	processLights(cameraTransform);
 	processFog();
 }
 
 void RenderSystem::draw(){
 	auto transforms = scene->getComponentArray<Transform>();
+	auto cameras = scene->getComponentArray<CameraComponent>();
 
-	//---------Depth shader----------
-	if (hasShadows){
-		auto lights = scene->getComponentArray<LightComponent>();
-		auto meshes = scene->getComponentArray<MeshComponent>();
-		auto terrains = scene->getComponentArray<TerrainComponent>();
-		
-		for (int l = 0; l < lights->size(); l++){
-			LightComponent& light = lights->getComponentFromIndex(l);
+	for (int i = 0; i < cameras->size(); i++){
+		Entity cameraEntity = cameras->getEntity(i);
+		CameraComponent& camera = cameras->getComponentFromIndex(i);
+		Transform& cameraTransform = scene->getComponent<Transform>(cameraEntity);
 
-			if (light.intensity > 0 && light.shadows){
-				size_t cameras = 1;
-				if (light.type == LightType::POINT){
-					cameras = 6;
-				}else if (light.type == LightType::DIRECTIONAL){
-					cameras = light.numShadowCascades;
-				}
+		bool isMainCamera = (cameraEntity == scene->getCamera());
 
-				for (int c = 0; c < cameras; c++){
-					size_t face = 0;
-					size_t fb = c;
+		if (!isMainCamera && !camera.renderToTexture){
+			continue; // camera is not used
+		}
+		if (hasMultipleCameras){
+			camera.needUpdate = true;
+			update(camera, cameraTransform, isMainCamera);
+		}
+
+		//---------Depth shader----------
+		if (hasShadows && isMainCamera){
+			auto lights = scene->getComponentArray<LightComponent>();
+			auto meshes = scene->getComponentArray<MeshComponent>();
+			auto terrains = scene->getComponentArray<TerrainComponent>();
+
+			depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
+			
+			for (int l = 0; l < lights->size(); l++){
+				LightComponent& light = lights->getComponentFromIndex(l);
+
+				if (light.intensity > 0 && light.shadows){
+					size_t cameras = 1;
 					if (light.type == LightType::POINT){
-						face = c;
-						fb = 0;
+						cameras = 6;
+					}else if (light.type == LightType::DIRECTIONAL){
+						cameras = light.numShadowCascades;
 					}
 
-					depthRender.startFrameBuffer(&light.framebuffer[fb], face);
-					for (int i = 0; i < meshes->size(); i++){
-						MeshComponent& mesh = meshes->getComponentFromIndex(i);
-						Entity entity = meshes->getEntity(i);
-						Transform* transform = scene->findComponent<Transform>(entity);
+					for (int c = 0; c < cameras; c++){
+						size_t face = 0;
+						size_t fb = c;
+						if (light.type == LightType::POINT){
+							face = c;
+							fb = 0;
+						}
 
-						if (transform){
-							if (mesh.loaded && mesh.needReload){
-								destroyMesh(mesh);
-							}
-							if (!mesh.loaded){
-								loadMesh(mesh);
-							}
-							if (transform->visible){
-								drawMeshDepth(mesh, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
+						depthRender.startFrameBuffer(&light.framebuffer[fb], face);
+						for (int i = 0; i < meshes->size(); i++){
+							MeshComponent& mesh = meshes->getComponentFromIndex(i);
+							Entity entity = meshes->getEntity(i);
+							Transform* transform = scene->findComponent<Transform>(entity);
+
+							if (transform){
+								if (mesh.loaded && mesh.needReload){
+									destroyMesh(mesh);
+								}
+								if (!mesh.loaded){
+									loadMesh(mesh);
+								}
+								if (transform->visible){
+									drawMeshDepth(mesh, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
+								}
 							}
 						}
-					}
-					for (int i = 0; i < terrains->size(); i++){
-						TerrainComponent& terrain = terrains->getComponentFromIndex(i);
-						Entity entity = terrains->getEntity(i);
-						Transform* transform = scene->findComponent<Transform>(entity);
+						for (int i = 0; i < terrains->size(); i++){
+							TerrainComponent& terrain = terrains->getComponentFromIndex(i);
+							Entity entity = terrains->getEntity(i);
+							Transform* transform = scene->findComponent<Transform>(entity);
 
-						if (transform){
-							if (terrain.loaded && terrain.needReload){
-								destroyTerrain(terrain);
-							}
-							if (!terrain.loaded){
-								loadTerrain(terrain);
-							}
-							if (transform->visible){
-								drawTerrainDepth(terrain, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
+							if (transform){
+								if (terrain.loaded && terrain.needReload){
+									destroyTerrain(terrain);
+								}
+								if (!terrain.loaded){
+									loadTerrain(terrain);
+								}
+								if (transform->visible){
+									drawTerrainDepth(terrain, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
+								}
 							}
 						}
+						depthRender.endFrameBuffer();
 					}
-					depthRender.endFrameBuffer();
 				}
 			}
 		}
-	}
-	
-	if (!scene->isRenderToTexture()){
-		sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
-		sceneRender.applyViewport(Engine::getViewRect());
-	}else{
-		sceneRender.startFrameBuffer(&scene->getFramebuffer());
-	}
 
-	Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
-	CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
-
-	//---------Draw opaque meshes and UI----------
-	std::vector<Entity> parentListScissor;
-	Rect activeScissor;
-
-	//---------Draw sky----------
-	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
-	if (sky){
-		if (!sky->loaded){
-			loadSky(*sky);
+		if (scene->isMainScene() || camera.renderToTexture){
+			sceneRender.setClearColor(scene->getBackgroundColor());
+		}
+		
+		if (!camera.renderToTexture){
+			sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
+			sceneRender.applyViewport(Engine::getViewRect());
+		}else{
+			if (!camera.framebuffer.isCreated()){
+				createFramebuffer(camera);
+			}
+			sceneRender.startFrameBuffer(&camera.framebuffer);
 		}
 
-		drawSky(*sky);
-	}
+		//---------Draw opaque meshes and UI----------
+		std::vector<Entity> parentListScissor;
+		Rect activeScissor;
 
-	for (int i = 0; i < transforms->size(); i++){
-		Transform& transform = transforms->getComponentFromIndex(i);
-		Entity entity = transforms->getEntity(i);
-		Signature signature = scene->getSignature(entity);
-
-        if (signature.test(scene->getComponentType<MeshComponent>())){
-			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
-			if (mesh.loaded && mesh.needReload){
-				destroyMesh(mesh);
+		//---------Draw sky----------
+		SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
+		if (sky){
+			if (!sky->loaded){
+				loadSky(*sky);
 			}
-			if (!mesh.loaded){
-				loadMesh(mesh);
-			}
-			if (transform.visible){
-				if (!mesh.transparency || camera.type == CameraType::CAMERA_2D){
-					//Draw opaque meshes if 3D camera
-					drawMesh(mesh, transform, cameraTransform);
-				}else{
-					transparentMeshes.push({&mesh, &transform, transform.distanceToCamera});
+
+			drawSky(*sky, camera.renderToTexture);
+		}
+
+		for (int i = 0; i < transforms->size(); i++){
+			Transform& transform = transforms->getComponentFromIndex(i);
+			Entity entity = transforms->getEntity(i);
+			Signature signature = scene->getSignature(entity);
+
+			if (signature.test(scene->getComponentType<MeshComponent>())){
+				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+				if (mesh.loaded && mesh.needReload){
+					destroyMesh(mesh);
 				}
-			}
+				if (!mesh.loaded){
+					loadMesh(mesh);
+				}
+				if (transform.visible){
+					if (!mesh.transparency || camera.type == CameraType::CAMERA_2D){
+						//Draw opaque meshes if 3D camera
+						drawMesh(mesh, transform, cameraTransform, camera.renderToTexture);
+					}else{
+						transparentMeshes.push({&mesh, &transform, transform.distanceToCamera});
+					}
+				}
 
-		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
-			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+			}else if (signature.test(scene->getComponentType<TerrainComponent>())){
+				TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
 
-			if (terrain.loaded && terrain.needReload){
-				destroyTerrain(terrain);
-			}
-			if (!terrain.loaded){
-				loadTerrain(terrain);
-			}
-			if (transform.visible){
-				drawTerrain(terrain, transform, cameraTransform);
-			}
+				if (terrain.loaded && terrain.needReload){
+					destroyTerrain(terrain);
+				}
+				if (!terrain.loaded){
+					loadTerrain(terrain);
+				}
+				if (transform.visible){
+					drawTerrain(terrain, transform, cameraTransform, camera.renderToTexture);
+				}
 
-		}else if (signature.test(scene->getComponentType<UIComponent>())){
-			UIComponent& ui = scene->getComponent<UIComponent>(entity);
+			}else if (signature.test(scene->getComponentType<UIComponent>())){
+				UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-			if (std::find(parentListScissor.begin(), parentListScissor.end(), transform.parent) == parentListScissor.end()){
-				activeScissor = Rect(0,0,System::instance().getScreenWidth(), System::instance().getScreenHeight());
-				sceneRender.applyScissor(activeScissor);
-				parentListScissor.clear();
-			}
+				if (std::find(parentListScissor.begin(), parentListScissor.end(), transform.parent) == parentListScissor.end()){
+					activeScissor = Rect(0,0,System::instance().getScreenWidth(), System::instance().getScreenHeight());
+					sceneRender.applyScissor(activeScissor);
+					parentListScissor.clear();
+				}
 
-			bool isText = false;
-			if (signature.test(scene->getComponentType<TextComponent>())){
-				isText = true;
-			}
-			if (ui.loaded && ui.needReload){
-				destroyUI(ui);
-			}
-			if (!ui.loaded){
-				loadUI(ui, isText);
-			}
-			if (transform.visible)
-				drawUI(ui, transform);
+				bool isText = false;
+				if (signature.test(scene->getComponentType<TextComponent>())){
+					isText = true;
+				}
+				if (ui.loaded && ui.needReload){
+					destroyUI(ui);
+				}
+				if (!ui.loaded){
+					loadUI(ui, isText);
+				}
+				if (transform.visible)
+					drawUI(ui, transform, camera.renderToTexture);
 
-			if (signature.test(scene->getComponentType<UILayoutComponent>()) && signature.test(scene->getComponentType<ImageComponent>())){
-				UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
-				ImageComponent& img = scene->getComponent<ImageComponent>(entity);
+				if (signature.test(scene->getComponentType<UILayoutComponent>()) && signature.test(scene->getComponentType<ImageComponent>())){
+					UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
+					ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
-				activeScissor = getScissorRect(layout, img, transform, camera).fitOnRect(activeScissor);
-				sceneRender.applyScissor(activeScissor);
-				parentListScissor.push_back(entity);
+					activeScissor = getScissorRect(layout, img, transform, camera).fitOnRect(activeScissor);
+					sceneRender.applyScissor(activeScissor);
+					parentListScissor.push_back(entity);
+				}
+
+			}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
+				ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+
+				if (particles.loaded && particles.needReload){
+					destroyParticles(particles);
+				}
+				if (!particles.loaded){
+					loadParticles(particles);
+				}
+				if (transform.visible)
+					drawParticles(particles, transform, cameraTransform, camera.renderToTexture);
+
 			}
-
-		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
-			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
-
-			if (particles.loaded && particles.needReload){
-				destroyParticles(particles);
-			}
-			if (!particles.loaded){
-				loadParticles(particles);
-			}
-			if (transform.visible)
-				drawParticles(particles, transform, cameraTransform);
-
 		}
+
+		//---------Draw transparent meshes----------
+		while (!transparentMeshes.empty()){
+			TransparentMeshesData meshData = transparentMeshes.top();
+
+			//Draw transparent meshes
+			drawMesh(*meshData.mesh, *meshData.transform, cameraTransform, camera.renderToTexture);
+
+			transparentMeshes.pop();
+		}
+
+		sceneRender.endFrameBuffer();
+
 	}
-
-	//---------Draw transparent meshes----------
-	while (!transparentMeshes.empty()){
-		TransparentMeshesData meshData = transparentMeshes.top();
-
-		//Draw transparent meshes
-		drawMesh(*meshData.mesh, *meshData.transform, cameraTransform);
-
-		transparentMeshes.pop();
-	}
-
-	sceneRender.endFrameBuffer();
 
 	//---------Missing some shaders----------
 	if (ShaderPool::getMissingShaders().size() > 0){
@@ -2340,7 +2408,7 @@ void RenderSystem::entityDestroyed(Entity entity){
 		destroyMesh(scene->getComponent<MeshComponent>(entity));
 	}
 
-	//TODO: Destroy lights? Framebuffer
+	//TODO: Destroy lights?
 
 	if (signature.test(scene->getComponentType<UIComponent>())){
 		destroyUI(scene->getComponent<UIComponent>(entity));
@@ -2352,5 +2420,10 @@ void RenderSystem::entityDestroyed(Entity entity){
 
 	if (signature.test(scene->getComponentType<SkyComponent>())){
 		destroySky(scene->getComponent<SkyComponent>(entity));
+	}
+
+	if (signature.test(scene->getComponentType<CameraComponent>())){
+		CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+		camera.framebuffer.destroyFramebuffer();
 	}
 }

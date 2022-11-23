@@ -14,6 +14,7 @@ namespace Supernova{
         private:
             std::shared_ptr<TexturePoolData> renderAndData = NULL;
             FramebufferRender* framebuffer;
+            unsigned long lastFramebufferVersion = 0;
 
             TextureType type;
             std::string id;
@@ -66,8 +67,8 @@ namespace Supernova{
             void releaseData();
 
             bool empty();
-            bool hasTextureFrame();
-            bool isFramebufferNeedUpdate();
+            bool isFramebuffer();
+            bool isFramebufferOutdated();
 
             void setMinFilter(TextureFilter filter);
             TextureFilter getMinFilter() const;

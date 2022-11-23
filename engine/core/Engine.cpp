@@ -443,10 +443,6 @@ void Engine::systemDraw(){
     for (int i = 0; i < numScenes; i++){
         scenes[i]->draw();
     }
-
-    for (int i = 0; i < numScenes; i++){
-        scenes[i]->getFramebuffer().needUpdate = false;
-    }
     
     SystemRender::commit();
     AudioSystem::checkActive();

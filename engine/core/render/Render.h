@@ -1,23 +1,6 @@
 #ifndef Render_h
 #define Render_h
 
-#define S_TEXTURESAMPLER_DIFFUSE 1
-#define S_TEXTURESAMPLER_SHADOWMAP2D 2
-#define S_TEXTURESAMPLER_SHADOWMAPCUBE 3
-#define S_TEXTURESAMPLER_HEIGHTDATA 4
-#define S_TEXTURESAMPLER_BLENDMAP 5
-#define S_TEXTURESAMPLER_TERRAINDETAIL 6
-
-#define S_PROGRAM_USE_FOG  1 << 0
-#define S_PROGRAM_USE_TEXCOORD  1 << 1
-#define S_PROGRAM_USE_TEXRECT  1 << 2
-#define S_PROGRAM_USE_TEXCUBE  1 << 3
-#define S_PROGRAM_USE_SKINNING  1 << 4
-#define S_PROGRAM_USE_MORPHTARGET  1 << 5
-#define S_PROGRAM_USE_MORPHNORMAL  1 << 6
-#define S_PROGRAM_IS_SKY  1 << 7
-#define S_PROGRAM_IS_TEXT  1 << 8
-#define S_PROGRAM_IS_TERRAIN  1 << 9
 
 namespace Supernova{
 
@@ -171,6 +154,12 @@ namespace Supernova{
         NEAREST_MIPMAP_LINEAR,
         LINEAR_MIPMAP_NEAREST,
         LINEAR_MIPMAP_LINEAR
+    };
+
+    enum PipelineType {
+        PIP_DEFAULT = 1 << 0,
+        PIP_RTT     = 1 << 1,
+        PIP_DEPTH   = 1 << 2
     };
 
     //-------Start shader definition--------
