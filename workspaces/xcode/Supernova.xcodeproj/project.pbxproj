@@ -374,6 +374,9 @@
 		717AD98D29211976007D7DB5 /* Container.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD98B29211976007D7DB5 /* Container.h */; };
 		717AD98E29211976007D7DB5 /* Container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD98C29211976007D7DB5 /* Container.cpp */; };
 		717AD98F29211976007D7DB5 /* Container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD98C29211976007D7DB5 /* Container.cpp */; };
+		717AD992292FC30A007D7DB5 /* Framebuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD990292FC30A007D7DB5 /* Framebuffer.h */; };
+		717AD993292FC30A007D7DB5 /* Framebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD991292FC30A007D7DB5 /* Framebuffer.cpp */; };
+		717AD994292FC30A007D7DB5 /* Framebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD991292FC30A007D7DB5 /* Framebuffer.cpp */; };
 		717D9B3D2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
 		717D9B3E2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
 		717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B3C2733783D002C0803 /* ParticlesAnimation.h */; };
@@ -1027,6 +1030,8 @@
 		717AD989292118EF007D7DB5 /* UIContainerComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIContainerComponent.h; sourceTree = "<group>"; };
 		717AD98B29211976007D7DB5 /* Container.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Container.h; sourceTree = "<group>"; };
 		717AD98C29211976007D7DB5 /* Container.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Container.cpp; sourceTree = "<group>"; };
+		717AD990292FC30A007D7DB5 /* Framebuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Framebuffer.h; sourceTree = "<group>"; };
+		717AD991292FC30A007D7DB5 /* Framebuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Framebuffer.cpp; sourceTree = "<group>"; };
 		717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlesAnimation.cpp; sourceTree = "<group>"; };
 		717D9B3C2733783D002C0803 /* ParticlesAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimation.h; sourceTree = "<group>"; };
 		717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimationComponent.h; sourceTree = "<group>"; };
@@ -1689,6 +1694,8 @@
 		7162FC6A25962A0E0075B97D /* texture */ = {
 			isa = PBXGroup;
 			children = (
+				717AD991292FC30A007D7DB5 /* Framebuffer.cpp */,
+				717AD990292FC30A007D7DB5 /* Framebuffer.h */,
 				715CB11A288CD5790049344B /* Material.h */,
 				7162FC6C25962A0E0075B97D /* Texture.cpp */,
 				7162FC6D25962A0E0075B97D /* Texture.h */,
@@ -2310,6 +2317,7 @@
 				71E54505284D5BB700C68FAB /* TranslateTracks.h in Headers */,
 				71E54517284D5BE000C68FAB /* TranslateTracksComponent.h in Headers */,
 				71E54514284D5BE000C68FAB /* ScaleTracksComponent.h in Headers */,
+				717AD992292FC30A007D7DB5 /* Framebuffer.h in Headers */,
 				71ABBD4B27A87A2E001CE3AF /* MeshSystem.h in Headers */,
 				7170A3D72818A8A30003E965 /* SkyBox.h in Headers */,
 				71BE620025B1DB22006D6E02 /* System.h in Headers */,
@@ -3101,6 +3109,7 @@
 				71ABBD25277A31E6001CE3AF /* UISystem.cpp in Sources */,
 				713D82AF259D307F00567F9F /* InterleavedBuffer.cpp in Sources */,
 				71E54500284D5BB700C68FAB /* Animation.cpp in Sources */,
+				717AD994292FC30A007D7DB5 /* Framebuffer.cpp in Sources */,
 				7128D11F25C2356200965B51 /* SokolSystem.cpp in Sources */,
 				7105A56528B305B20092EA05 /* CoreClassesLua.cpp in Sources */,
 				71BE620225B1DB22006D6E02 /* System.cpp in Sources */,
@@ -3247,6 +3256,7 @@
 				71ABBD24277A31E6001CE3AF /* UISystem.cpp in Sources */,
 				7162FD4525963AE00075B97D /* Object.cpp in Sources */,
 				71E544FF284D5BB700C68FAB /* Animation.cpp in Sources */,
+				717AD993292FC30A007D7DB5 /* Framebuffer.cpp in Sources */,
 				7128D11E25C2356200965B51 /* SokolSystem.cpp in Sources */,
 				7105A56428B305B20092EA05 /* CoreClassesLua.cpp in Sources */,
 				71BE620125B1DB22006D6E02 /* System.cpp in Sources */,
