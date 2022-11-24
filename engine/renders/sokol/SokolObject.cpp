@@ -221,15 +221,16 @@ void SokolObject::draw(int vertexCount){
 }
 
 void SokolObject::destroy(){
-    if (sg_isvalid())
-    if (pip.id != SG_INVALID_ID){
-        sg_destroy_pipeline(pip);
-    }
-    if (depth_pip.id != SG_INVALID_ID){
-        sg_destroy_pipeline(depth_pip);
-    }
-    if (rtt_pip.id != SG_INVALID_ID){
-        sg_destroy_pipeline(rtt_pip);
+    if (sg_isvalid()){
+        if (pip.id != SG_INVALID_ID){
+            sg_destroy_pipeline(pip);
+        }
+        if (depth_pip.id != SG_INVALID_ID){
+            sg_destroy_pipeline(depth_pip);
+        }
+        if (rtt_pip.id != SG_INVALID_ID){
+            sg_destroy_pipeline(rtt_pip);
+        }
     }
 
     pip.id = SG_INVALID_ID;
