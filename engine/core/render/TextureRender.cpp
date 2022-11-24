@@ -23,8 +23,10 @@ bool TextureRender::createTexture(
     return backend.createTexture(label, width, height, colorFormat, type, numFaces, data, size, minFilter, magFilter);
 }
 
-bool TextureRender::createFramebufferTexture(TextureType type, bool depth, bool shadowMap, int width, int height){
-    return backend.createFramebufferTexture(type, depth, shadowMap, width, height);
+bool TextureRender::createFramebufferTexture(
+                TextureType type, bool depth, bool shadowMap, int width, int height, 
+                TextureFilter minFilter, TextureFilter magFilter){
+    return backend.createFramebufferTexture(type, depth, shadowMap, width, height, minFilter, magFilter);
 }
 
 void TextureRender::destroyTexture(){

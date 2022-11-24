@@ -16,17 +16,17 @@ namespace Supernova{
         virtual ~Terrain();
 
         void setHeightMap(std::string path);
-        void setHeightMap(FramebufferRender* framebuffer);
+        void setHeightMap(Framebuffer* framebuffer);
 
         void setBlendMap(std::string path);
-        void setBlendMap(FramebufferRender* framebuffer);
+        void setBlendMap(Framebuffer* framebuffer);
 
         void setTextureDetailRed(std::string path);
         void setTextureDetailGreen(std::string path);
         void setTextureDetailBlue(std::string path);
 
         void setTexture(std::string path);
-        void setTexture(FramebufferRender* framebuffer);
+        void setTexture(Framebuffer* framebuffer);
 
         void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);

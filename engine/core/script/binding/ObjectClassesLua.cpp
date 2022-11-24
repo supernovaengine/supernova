@@ -144,8 +144,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("renderToTexture", &Camera::isRenderToTexture, &Camera::setRenderToTexture)
         .addFunction("getFramebuffer", &Camera::getFramebuffer)
         .addFunction("setFramebufferSize", &Camera::setFramebufferSize)
-        .addFunction("getFramebufferWidth", &Camera::getFramebufferWidth)
-        .addFunction("getFramebufferHeight", &Camera::getFramebufferHeight)
+        .addFunction("setFramebufferFilter", &Camera::setFramebufferFilter)
         .addFunction("updateCamera", &Camera::updateCamera)
         .endClass();
 
@@ -184,7 +183,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Mesh::setTexture),
-            luabridge::overload<FramebufferRender*>(&Mesh::setTexture))
+            luabridge::overload<Framebuffer*>(&Mesh::setTexture))
         .addProperty("color", &Mesh::getColor, (void(Mesh::*)(Vector4))&Mesh::setColor)
         .addFunction("setColor", (void(Mesh::*)(const float, const float, const float, const float))&Mesh::setColor)
         .endClass();
@@ -199,7 +198,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTextureDetailBlue", (void(Terrain::*)(std::string))&Terrain::setTextureDetailBlue)
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Terrain::setTexture),
-            luabridge::overload<FramebufferRender*>(&Terrain::setTexture))
+            luabridge::overload<Framebuffer*>(&Terrain::setTexture))
         .addProperty("color", &Terrain::getColor, (void(Terrain::*)(Vector4))&Terrain::setColor)
         .addFunction("setColor", (void(Terrain::*)(float, float, float, float))&Terrain::setColor)
         .endClass();
@@ -259,7 +258,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<std::string>(&Particles::removeSpriteFrame))
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Particles::setTexture),
-            luabridge::overload<FramebufferRender*>(&Particles::setTexture))
+            luabridge::overload<Framebuffer*>(&Particles::setTexture))
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -335,7 +334,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setColor", (void(Polygon::*)(float, float, float, float))&Polygon::setColor)
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Polygon::setTexture),
-            luabridge::overload<FramebufferRender*>(&Polygon::setTexture))
+            luabridge::overload<Framebuffer*>(&Polygon::setTexture))
         .addProperty("flipY", &Polygon::isFlipY, &Polygon::setFlipY)
         .endClass();
 
@@ -371,7 +370,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("patchMarginTop", &Image::getPatchMarginTop, &Image::setPatchMarginTop)
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Image::setTexture),
-            luabridge::overload<FramebufferRender*>(&Image::setTexture))
+            luabridge::overload<Framebuffer*>(&Image::setTexture))
         .addProperty("color", &Image::getColor, (void(Image::*)(Vector4))&Image::setColor)
         .addFunction("setColor", (void(Image::*)(const float, const float, const float, const float))&Image::setColor)
         .addProperty("flipY", &Image::isFlipY, &Image::setFlipY)

@@ -30,7 +30,7 @@ namespace Supernova{
         int getPatchMarginTop() const;
 
         void setTexture(std::string path);
-        void setTexture(FramebufferRender* framebuffer);
+        void setTexture(Framebuffer* framebuffer);
 
         void setColor(Vector4 color);
         void setColor(const float red, const float green, const float blue, const float alpha);

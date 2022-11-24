@@ -11,23 +11,17 @@ namespace Supernova{
         //***Backend***
         SokolFramebuffer backend;
         //***
-        int width;
-        int height;
-        unsigned long version; // increment every creation
         
         FramebufferRender();
         FramebufferRender(const FramebufferRender& rhs);
         FramebufferRender& operator=(const FramebufferRender& rhs);
         virtual ~FramebufferRender();
 
-        bool createFramebuffer(TextureType textureType, int width, int height, bool shadowMap);
+        bool createFramebuffer(TextureType textureType, int width, int height, TextureFilter minFilter, TextureFilter magFilter, bool shadowMap);
         void destroyFramebuffer();
         bool isCreated();
 
         TextureRender& getColorTexture();
-
-        int getWidth();
-        int getHeight();
     };
 }
 

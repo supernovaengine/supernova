@@ -194,7 +194,7 @@ void Texture::setCubePaths(std::string front, std::string back, std::string left
     this->id = id;
 }
 
-void Texture::setFramebuffer(FramebufferRender* framebuffer){
+void Texture::setFramebuffer(Framebuffer* framebuffer){
     destroy();
 
     this->framebuffer = framebuffer;
@@ -264,8 +264,8 @@ void Texture::destroy(){
 
 TextureRender* Texture::getRender(){
     if (framebuffer){
-        lastFramebufferVersion = framebuffer->version;
-        return &framebuffer->getColorTexture();
+        lastFramebufferVersion = framebuffer->getVersion();
+        return &framebuffer->getRender().getColorTexture();
     }
 
     if (needLoad && !renderAndData)
@@ -329,24 +329,36 @@ bool Texture::isFramebuffer(){
 
 bool Texture::isFramebufferOutdated(){
     if (framebuffer){
-        return (lastFramebufferVersion != framebuffer->version);
+        return (lastFramebufferVersion != framebuffer->getVersion());
     }
 
     return false;
 }
 
 void Texture::setMinFilter(TextureFilter filter){
+    if (framebuffer){
+        framebuffer->setMinFilter(filter);
+    }
     minFilter = filter;
 }
 
 TextureFilter Texture::getMinFilter() const{
+    if (framebuffer){
+        return framebuffer->getMinFilter();
+    }
     return minFilter;
 }
 
 void Texture::setMagFilter(TextureFilter filter){
+    if (framebuffer){
+        framebuffer->setMagFilter(filter);
+    }
     magFilter = filter;
 }
 
 TextureFilter Texture::getMagFilter() const{
+    if (framebuffer){
+        return framebuffer->getMagFilter();
+    }
     return magFilter;
 }

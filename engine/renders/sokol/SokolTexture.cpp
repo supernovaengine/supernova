@@ -195,14 +195,16 @@ bool SokolTexture::createTexture(
     return false;
 }
 
-bool SokolTexture::createFramebufferTexture(TextureType type, bool depth, bool shadowMap, int width, int height){
+bool SokolTexture::createFramebufferTexture(
+            TextureType type, bool depth, bool shadowMap, int width, int height, 
+            TextureFilter minFilter, TextureFilter magFilter){
     sg_image_desc img_desc = {0};
     img_desc.render_target = true;
     img_desc.type = getTextureType(type);
     img_desc.width = width;
     img_desc.height = height;
-    img_desc.min_filter = SG_FILTER_LINEAR;
-    img_desc.mag_filter = SG_FILTER_LINEAR;
+    img_desc.min_filter = getFilter(minFilter);
+    img_desc.mag_filter = getFilter(magFilter);
     if (shadowMap){ //if not set Sokol gets default from sg_desc.context.sample_count
         img_desc.sample_count = 1;
     }

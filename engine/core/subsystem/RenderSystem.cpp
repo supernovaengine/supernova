@@ -58,7 +58,7 @@ void RenderSystem::load(){
 	for (int i = 0; i < cameras->size(); i++){
 		CameraComponent& camera = cameras->getComponentFromIndex(i);
 		if (camera.renderToTexture){
-			if (!camera.framebuffer.isCreated()){
+			if (!camera.framebuffer->isCreated()){
 				createFramebuffer(camera);
 			}
 		}
@@ -70,13 +70,12 @@ void RenderSystem::destroy(){
 }
 
 void RenderSystem::createFramebuffer(CameraComponent& camera){
-	camera.framebuffer.createFramebuffer(TextureType::TEXTURE_2D, camera.framebufferWidth, camera.framebufferHeight, false);
+	camera.framebuffer->create();
 }
 
 void RenderSystem::updateFramebuffer(CameraComponent& camera){
-
-	if (camera.framebuffer.isCreated()){
-		camera.framebuffer.destroyFramebuffer();
+	if (camera.framebuffer->isCreated()){
+		camera.framebuffer->destroy();
 	}
 
 	createFramebuffer(camera);
@@ -178,14 +177,14 @@ bool RenderSystem::processLights(Transform& cameraTransform){
 			hasShadows = true; // Re-check shadows on, after checked in checkLightsAndShadow()
 			if (light.type == LightType::POINT){
 				if (!light.framebuffer[0].isCreated())
-					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_CUBE, light.mapResolution, light.mapResolution, true);
+					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_CUBE, light.mapResolution, light.mapResolution, TextureFilter::LINEAR, TextureFilter::LINEAR, true);
 
 				if ((freeShadowCubeMap - MAX_SHADOWSMAP) < MAX_SHADOWSCUBEMAP){
 					light.shadowMapIndex = freeShadowCubeMap++;
 				}
 			}else if (light.type == LightType::SPOT){
 				if (!light.framebuffer[0].isCreated())
-					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, true);
+					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, TextureFilter::LINEAR, TextureFilter::LINEAR, true);
 
 				if (freeShadowMap < MAX_SHADOWSMAP){
 					light.shadowMapIndex = freeShadowMap++;
@@ -193,7 +192,7 @@ bool RenderSystem::processLights(Transform& cameraTransform){
 			}else if (light.type == LightType::DIRECTIONAL){
 				for (int c = 0; c < light.numShadowCascades; c++){
 					if (!light.framebuffer[c].isCreated())
-						light.framebuffer[c].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, true);
+						light.framebuffer[c].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, TextureFilter::LINEAR, TextureFilter::LINEAR, true);
 				}
 
 				if ((freeShadowMap + light.numShadowCascades - 1) < MAX_SHADOWSMAP){
@@ -1432,7 +1431,7 @@ Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img
 		objScreenHeight = layout.height;
 
 		if (camera.type == CameraType::CAMERA_2D)
-			objScreenPosY = (float) camera.framebufferHeight - objScreenHeight - objScreenPosY;
+			objScreenPosY = (float) camera.framebuffer->getHeight() - objScreenHeight - objScreenPosY;
 
 		if (!(img.patchMarginLeft == 0 && img.patchMarginTop == 0 && img.patchMarginRight == 0 && img.patchMarginBottom == 0)) {
 			float borderScreenLeft = img.patchMarginLeft;
@@ -1677,7 +1676,7 @@ void RenderSystem::updateCameraSize(Entity entity){
 		if (!camera.renderToTexture) {
 			rect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
 		}else{
-			rect = Rect(0, 0, camera.framebufferWidth, camera.framebufferHeight);
+			rect = Rect(0, 0, camera.framebuffer->getWidth(), camera.framebuffer->getHeight());
 		}
 
 		if (camera.automatic){
@@ -1881,6 +1880,7 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 			viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
 
+			//TODO: light directional cascades is only considering main camera
 			if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
 
 				float zFar = camera.perspectiveFar;
@@ -2264,10 +2264,10 @@ void RenderSystem::draw(){
 			sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
 			sceneRender.applyViewport(Engine::getViewRect());
 		}else{
-			if (!camera.framebuffer.isCreated()){
+			if (!camera.framebuffer->isCreated()){
 				createFramebuffer(camera);
 			}
-			sceneRender.startFrameBuffer(&camera.framebuffer);
+			sceneRender.startFrameBuffer(&camera.framebuffer->getRender());
 		}
 
 		//---------Draw opaque meshes and UI----------
@@ -2424,6 +2424,8 @@ void RenderSystem::entityDestroyed(Entity entity){
 
 	if (signature.test(scene->getComponentType<CameraComponent>())){
 		CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
-		camera.framebuffer.destroyFramebuffer();
+		if (camera.framebuffer){
+			delete camera.framebuffer; // destroy render is in destructor
+		}
 	}
 }

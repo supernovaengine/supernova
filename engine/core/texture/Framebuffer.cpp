@@ -1,0 +1,94 @@
+//
+// (c) 2022 Eduardo Doria.
+//
+
+#include "Framebuffer.h"
+
+#include "Engine.h"
+#include "Log.h"
+
+using namespace Supernova;
+
+Framebuffer::Framebuffer(){
+    this->width = 512;
+    this->height = 512;
+    this->minFilter = TextureFilter::LINEAR;
+    this->magFilter = TextureFilter::LINEAR;
+    this->version = 0;
+}
+
+Framebuffer::~Framebuffer(){
+    destroy();
+}
+
+Framebuffer::Framebuffer(const Framebuffer& rhs){
+    this->render = rhs.render;
+    this->width = rhs.width;
+    this->height = rhs.height;
+    this->minFilter = rhs.minFilter;
+    this->magFilter = rhs.magFilter;
+    this->version = rhs.version;
+}
+
+Framebuffer& Framebuffer::operator=(const Framebuffer& rhs){
+    this->render = rhs.render;
+    this->width = rhs.width;
+    this->height = rhs.height;
+    this->minFilter = rhs.minFilter;
+    this->magFilter = rhs.magFilter;
+    this->version = rhs.version;
+    return *this;
+}
+
+void Framebuffer::create(){
+    render.createFramebuffer(TextureType::TEXTURE_2D, width, height, minFilter, magFilter, false);
+    version++;
+}
+
+void Framebuffer::destroy(){
+    render.destroyFramebuffer();
+}
+
+bool Framebuffer::isCreated(){
+    return render.isCreated();
+}
+
+FramebufferRender& Framebuffer::getRender(){
+    return render;
+}
+
+unsigned long Framebuffer::getVersion(){
+    return this->version;
+}
+
+void Framebuffer::setWidth(int width){
+    this->width = width;
+}
+
+int Framebuffer::getWidth() const{
+    return this->width;
+}
+
+void Framebuffer::setHeight(int height){
+    this->height = height;
+}
+
+int Framebuffer::getHeight() const{
+    return this->height;
+}
+
+void Framebuffer::setMinFilter(TextureFilter filter){
+    this->minFilter = filter;
+}
+
+TextureFilter Framebuffer::getMinFilter() const{
+    return this->minFilter;
+}
+
+void Framebuffer::setMagFilter(TextureFilter filter){
+    this->magFilter = filter;
+}
+
+TextureFilter Framebuffer::getMagFilter() const{
+    return this->magFilter;
+}

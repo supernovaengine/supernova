@@ -213,6 +213,21 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
+        .beginClass<Framebuffer>("Framebuffer")
+        .addConstructor <void (*) (void)> ()
+        .addFunction("create", &Framebuffer::create)
+        .addFunction("destroy", &Framebuffer::destroy)
+        .addFunction("isCreated", &Framebuffer::isCreated)
+        .addFunction("getRender", &Framebuffer::getRender)
+        .addFunction("getVersion", &Framebuffer::getVersion)
+        .addFunction("create", &Framebuffer::create)
+        .addFunction("width", &Framebuffer::getWidth, &Framebuffer::setWidth)
+        .addFunction("height", &Framebuffer::getHeight, &Framebuffer::setHeight)
+        .addProperty("minFilter", &Framebuffer::getMinFilter, &Framebuffer::setMinFilter)
+        .addProperty("magFilter", &Framebuffer::getMagFilter, &Framebuffer::setMagFilter)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<TextureRender>("TextureRender")
         .addConstructor <void (*) (void)> ()
         .endClass();
@@ -224,8 +239,6 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("destroyFramebuffer", &FramebufferRender::destroyFramebuffer)
         .addFunction("isCreated", &FramebufferRender::isCreated)
         .addFunction("getColorTexture", &FramebufferRender::getColorTexture)
-        .addFunction("getWidth", &FramebufferRender::getWidth)
-        .addFunction("getHeight", &FramebufferRender::getHeight)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

@@ -45,11 +45,9 @@ namespace Supernova{
 		void setRenderToTexture(bool renderToTexture);
 		bool isRenderToTexture() const;
 
-		FramebufferRender& getFramebuffer();
-
+		Framebuffer* getFramebuffer();
 		void setFramebufferSize(int width, int height);
-		int getFramebufferWidth();
-		int getFramebufferHeight();
+		void setFramebufferFilter(TextureFilter filter);
 
         void updateCamera();
     };

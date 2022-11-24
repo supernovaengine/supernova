@@ -88,7 +88,7 @@ void Image::setTexture(std::string path){
     ui.needUpdateTexture = true;
 }
 
-void Image::setTexture(FramebufferRender* framebuffer){
+void Image::setTexture(Framebuffer* framebuffer){
     UIComponent& ui = getComponent<UIComponent>();
 
     ui.texture.setFramebuffer(framebuffer);

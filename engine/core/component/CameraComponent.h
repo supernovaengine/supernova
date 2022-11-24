@@ -4,6 +4,7 @@
 #include "math/Vector3.h"
 #include "math/Matrix4.h"
 #include "math/Plane.h"
+#include "texture/Framebuffer.h"
 
 namespace Supernova{
 
@@ -53,9 +54,8 @@ namespace Supernova{
         Plane frustumPlanes[6];
 
 		bool renderToTexture = false;
-		FramebufferRender framebuffer;
-		int framebufferWidth = 512;
-		int framebufferHeight = 512;
+        // need to be a pointer to not lost reference when component changes position
+		Framebuffer* framebuffer = new Framebuffer();
 
         bool automatic = true;
         bool needUpdate = true;

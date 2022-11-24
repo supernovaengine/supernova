@@ -23,7 +23,7 @@ void Terrain::setHeightMap(std::string path){
     terrain.needUpdateTexture = true;
 }
 
-void Terrain::setHeightMap(FramebufferRender* framebuffer){
+void Terrain::setHeightMap(Framebuffer* framebuffer){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     terrain.heightMap.setFramebuffer(framebuffer);
@@ -39,7 +39,7 @@ void Terrain::setBlendMap(std::string path){
     terrain.needUpdateTexture = true;
 }
 
-void Terrain::setBlendMap(FramebufferRender* framebuffer){
+void Terrain::setBlendMap(Framebuffer* framebuffer){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     terrain.blendMap.setFramebuffer(framebuffer);
@@ -79,7 +79,7 @@ void Terrain::setTexture(std::string path){
     terrain.needUpdateTexture = true;
 }
 
-void Terrain::setTexture(FramebufferRender* framebuffer){
+void Terrain::setTexture(Framebuffer* framebuffer){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     terrain.material.baseColorTexture.setFramebuffer(framebuffer);

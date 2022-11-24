@@ -85,7 +85,7 @@ void Particles::setTexture(std::string path){
     particomp.needUpdateTexture = true;
 }
 
-void Particles::setTexture(FramebufferRender* framebuffer){
+void Particles::setTexture(Framebuffer* framebuffer){
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
 
     particomp.texture.setFramebuffer(framebuffer);

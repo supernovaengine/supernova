@@ -34,7 +34,7 @@ void Polygon::setTexture(std::string path){
     ui.needUpdateTexture = true;
 }
 
-void Polygon::setTexture(FramebufferRender* framebuffer){
+void Polygon::setTexture(Framebuffer* framebuffer){
     UIComponent& ui = getComponent<UIComponent>();
 
     ui.texture.setFramebuffer(framebuffer);

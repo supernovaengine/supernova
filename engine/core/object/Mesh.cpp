@@ -33,7 +33,7 @@ void Mesh::setTexture(std::string path){
     mesh.submeshes[0].needUpdateTexture = true;
 }
 
-void Mesh::setTexture(FramebufferRender* framebuffer){
+void Mesh::setTexture(Framebuffer* framebuffer){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     mesh.submeshes[0].material.baseColorTexture.setFramebuffer(framebuffer);

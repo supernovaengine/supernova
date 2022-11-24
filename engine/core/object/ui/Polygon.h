@@ -17,7 +17,7 @@ namespace Supernova{
         void addVertex(float x, float y);
 
         void setTexture(std::string path);
-        void setTexture(FramebufferRender* framebuffer);
+        void setTexture(Framebuffer* framebuffer);
 
         void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);
