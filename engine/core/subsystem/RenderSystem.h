@@ -91,6 +91,9 @@ namespace Supernova{
 		std::map<std::string, BufferRender*> bufferNameToRender;
 		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
 
+		// update aux function
+		void updateByCamera(Entity entity, Transform& transform, Signature signature, CameraComponent& camera, Transform& cameraTransform);
+
 		void createFramebuffer(CameraComponent& camera);
 		void createEmptyTextures();
 		void checkLightsAndShadow();
@@ -158,9 +161,6 @@ namespace Supernova{
 		bool isInsideCamera(CameraComponent& camera, const AlignedBox& box);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& point);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius);
-
-		// update aux function
-		void update(CameraComponent& camera, Transform& cameraTransform, bool isMainCamera);
 	
 		virtual void load();
 		virtual void destroy();

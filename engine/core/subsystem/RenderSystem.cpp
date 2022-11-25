@@ -46,13 +46,8 @@ RenderSystem::~RenderSystem(){
 void RenderSystem::load(){
 	createEmptyTextures();
 	checkLightsAndShadow();
-
-	if (scene->getCamera() != NULL_ENTITY){
-		CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
-		Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
 		
-		update(camera, cameraTransform, true); // first update
-	}
+	update(0); // first update
 
 	auto cameras = scene->getComponentArray<CameraComponent>();
 	for (int i = 0; i < cameras->size(); i++){
@@ -1995,29 +1990,10 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 }
 
 void RenderSystem::update(double dt){
-	Entity mainCamera = scene->getCamera();
-
-	auto cameras = scene->getComponentArray<CameraComponent>();
-	hasMultipleCameras = false;
-	for (int i = 0; i < cameras->size(); i++){
-		CameraComponent& camera = cameras->getComponentFromIndex(i);
-		Entity cameraEntity = cameras->getEntity(i);
-		if (camera.renderToTexture && cameraEntity != mainCamera){
-			hasMultipleCameras = true;
-			return; // if has offscreen camera update is made in draw pass
-		}
-	}
-
-	CameraComponent& camera =  scene->getComponent<CameraComponent>(mainCamera);
-	Transform& cameraTransform =  scene->getComponent<Transform>(mainCamera);
-
-	update(camera, cameraTransform, true);
-}
-
-void RenderSystem::update(CameraComponent& camera, Transform& cameraTransform, bool isMainCamera){
-	std::vector<Entity> parentList;
 	auto transforms = scene->getComponentArray<Transform>();
+	auto cameras = scene->getComponentArray<CameraComponent>();
 
+	std::vector<Entity> parentList;
 	for (int i = 0; i < transforms->size(); i++){
 		Transform& transform = transforms->getComponentFromIndex(i);
 
@@ -2033,13 +2009,32 @@ void RenderSystem::update(CameraComponent& camera, Transform& cameraTransform, b
 		}
 	}
 
-	if (cameraTransform.needUpdate){
-		camera.needUpdate = true;
+	Entity mainCameraEntity = scene->getCamera();
+
+	hasMultipleCameras = false;
+	for (int i = 0; i < cameras->size(); i++){
+		CameraComponent& camera = cameras->getComponentFromIndex(i);
+		Entity cameraEntity = cameras->getEntity(i);
+		Transform& cameraTransform = scene->getComponent<Transform>(cameraEntity);
+		if (camera.renderToTexture && cameraEntity != mainCameraEntity){
+			hasMultipleCameras = true;
+		}
+
+		if (cameraTransform.needUpdate){
+			camera.needUpdate = true;
+		}
+		if (camera.needUpdate){
+			updateCamera(camera, cameraTransform);
+		}
 	}
 
-	if (camera.needUpdate){
-		updateCamera(camera, cameraTransform);
-		updateSkyViewProjection(camera);
+	CameraComponent& mainCamera =  scene->getComponent<CameraComponent>(mainCameraEntity);
+	Transform& mainCameraTransform =  scene->getComponent<Transform>(mainCameraEntity);
+
+	if (mainCamera.needUpdate){
+		if (!hasMultipleCameras){
+			updateSkyViewProjection(mainCamera);
+		}
 	}
 
 	for (int i = 0; i < transforms->size(); i++){
@@ -2048,75 +2043,24 @@ void RenderSystem::update(CameraComponent& camera, Transform& cameraTransform, b
 		Entity entity = transforms->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-		if (camera.needUpdate || transform.needUpdate){
+		if (mainCamera.needUpdate || transform.needUpdate){
 
-			bool usingFakeBillboard = false;
-
-			if (signature.test(scene->getComponentType<SpriteComponent>())){
-				SpriteComponent& sprite = scene->getComponent<SpriteComponent>(entity);
-
-				if (sprite.billboard && !sprite.fakeBillboard){
-
-					Vector3 camPos = cameraTransform.worldPosition;
-
-					if (sprite.cylindricalBillboard)
-						camPos.y = transform.worldPosition.y;
-
-					Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp);
-
-					Quaternion oldRotation = transform.rotation;
-
-					transform.rotation.fromRotationMatrix(m1);
-					if (transform.parent != NULL_ENTITY){
-						auto transformParent = scene->getComponent<Transform>(transform.parent);
-						transform.rotation = transformParent.worldRotation.inverse() * transform.rotation;
-					}
-
-					if (transform.rotation != oldRotation){
-						updateTransform(transform);
-					}
-
-				}
-
-				if (sprite.billboard && sprite.fakeBillboard){
-					Matrix4 modelViewMatrix = camera.viewMatrix * transform.modelMatrix;
-
-					modelViewMatrix.set(0, 0, transform.worldScale.x);
-					modelViewMatrix.set(0, 1, 0.0);
-					modelViewMatrix.set(0, 2, 0.0);
-
-					if (!sprite.cylindricalBillboard) {
-						modelViewMatrix.set(1, 0, 0.0);
-						modelViewMatrix.set(1, 1, transform.worldScale.y);
-						modelViewMatrix.set(1, 2, 0.0);
-					}
-
-					modelViewMatrix.set(2, 0, 0.0);
-					modelViewMatrix.set(2, 1, 0.0);
-					modelViewMatrix.set(2, 2, transform.worldScale.z);
-
-					transform.modelViewProjectionMatrix = camera.projectionMatrix * modelViewMatrix;
-					usingFakeBillboard = true;
-				}
+			// need to be updated for every camera
+			if (!hasMultipleCameras){
+				updateByCamera(entity, transform, signature, mainCamera, mainCameraTransform);
 			}
 
-			if (!usingFakeBillboard){
-				transform.modelViewProjectionMatrix = camera.viewProjectionMatrix * transform.modelMatrix;
+			// need to be updated ONLY for main camera
+			if (signature.test(scene->getComponentType<LightComponent>())){
+				LightComponent& light = scene->getComponent<LightComponent>(entity);
+				
+				updateLightFromScene(light, transform, mainCamera);
 			}
-			transform.distanceToCamera = (cameraTransform.worldPosition - transform.worldPosition).length();
+			
+			if (signature.test(scene->getComponentType<AudioComponent>())){
+				AudioComponent& audio = scene->getComponent<AudioComponent>(entity);
 
-			if (signature.test(scene->getComponentType<TerrainComponent>())){
-				TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
-
-				updateTerrain(terrain, transform, camera, cameraTransform);
-			}
-
-			if (isMainCamera){
-				if (signature.test(scene->getComponentType<LightComponent>())){
-					LightComponent& light = scene->getComponent<LightComponent>(entity);
-					
-					updateLightFromScene(light, transform, camera);
-				}
+				audio.needUpdate = true;
 			}
 
 		}
@@ -2143,19 +2087,15 @@ void RenderSystem::update(CameraComponent& camera, Transform& cameraTransform, b
 				}
 			}
 
-			if (signature.test(scene->getComponentType<AudioComponent>())){
-				AudioComponent& audio = scene->getComponent<AudioComponent>(entity);
-
-				audio.needUpdate = true;
-			}
-
 		}
 
         if (signature.test(scene->getComponentType<ParticlesComponent>())){
 			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
 
-			if (particles.needUpdate || camera.needUpdate || transform.needUpdate){
-				updateParticles(particles, transform, camera, cameraTransform);
+			if (particles.needUpdate || mainCamera.needUpdate || transform.needUpdate){
+				if (!hasMultipleCameras){
+					updateParticles(particles, transform, mainCamera, mainCameraTransform);
+				}
 			}
 
 			particles.needUpdate = false;
@@ -2163,15 +2103,152 @@ void RenderSystem::update(CameraComponent& camera, Transform& cameraTransform, b
 
 		transform.needUpdate = false;
 	}
-	camera.needUpdate = false;
 
-	processLights(cameraTransform);
+	for (int i = 0; i < cameras->size(); i++){
+		CameraComponent& camera = cameras->getComponentFromIndex(i);
+		if (camera.needUpdate){
+			camera.needUpdate = false;
+		}
+	}
+	
+	processLights(mainCameraTransform);
 	processFog();
+}
+
+void RenderSystem::updateByCamera(Entity entity, Transform& transform, Signature signature, CameraComponent& camera, Transform& cameraTransform){
+	bool usingFakeBillboard = false;
+
+	if (signature.test(scene->getComponentType<SpriteComponent>())){
+		SpriteComponent& sprite = scene->getComponent<SpriteComponent>(entity);
+
+		if (sprite.billboard && !sprite.fakeBillboard){
+
+			Vector3 camPos = cameraTransform.worldPosition;
+
+			if (sprite.cylindricalBillboard)
+				camPos.y = transform.worldPosition.y;
+
+			Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp);
+
+			Quaternion oldRotation = transform.rotation;
+
+			transform.rotation.fromRotationMatrix(m1);
+			if (transform.parent != NULL_ENTITY){
+				auto transformParent = scene->getComponent<Transform>(transform.parent);
+				transform.rotation = transformParent.worldRotation.inverse() * transform.rotation;
+			}
+
+			if (transform.rotation != oldRotation){
+				updateTransform(transform);
+			}
+
+		}
+
+		if (sprite.billboard && sprite.fakeBillboard){
+			Matrix4 modelViewMatrix = camera.viewMatrix * transform.modelMatrix;
+
+			modelViewMatrix.set(0, 0, transform.worldScale.x);
+			modelViewMatrix.set(0, 1, 0.0);
+			modelViewMatrix.set(0, 2, 0.0);
+
+			if (!sprite.cylindricalBillboard) {
+				modelViewMatrix.set(1, 0, 0.0);
+				modelViewMatrix.set(1, 1, transform.worldScale.y);
+				modelViewMatrix.set(1, 2, 0.0);
+			}
+
+			modelViewMatrix.set(2, 0, 0.0);
+			modelViewMatrix.set(2, 1, 0.0);
+			modelViewMatrix.set(2, 2, transform.worldScale.z);
+
+			transform.modelViewProjectionMatrix = camera.projectionMatrix * modelViewMatrix;
+			usingFakeBillboard = true;
+		}
+	}
+
+	if (!usingFakeBillboard){
+		transform.modelViewProjectionMatrix = camera.viewProjectionMatrix * transform.modelMatrix;
+	}
+	transform.distanceToCamera = (cameraTransform.worldPosition - transform.worldPosition).length();
+
+	if (signature.test(scene->getComponentType<TerrainComponent>())){
+		TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+
+		updateTerrain(terrain, transform, camera, cameraTransform);
+	}
 }
 
 void RenderSystem::draw(){
 	auto transforms = scene->getComponentArray<Transform>();
 	auto cameras = scene->getComponentArray<CameraComponent>();
+
+	//---------Depth shader----------
+	if (hasShadows){
+		auto lights = scene->getComponentArray<LightComponent>();
+		auto meshes = scene->getComponentArray<MeshComponent>();
+		auto terrains = scene->getComponentArray<TerrainComponent>();
+
+		depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
+		
+		for (int l = 0; l < lights->size(); l++){
+			LightComponent& light = lights->getComponentFromIndex(l);
+
+			if (light.intensity > 0 && light.shadows){
+				size_t cameras = 1;
+				if (light.type == LightType::POINT){
+					cameras = 6;
+				}else if (light.type == LightType::DIRECTIONAL){
+					cameras = light.numShadowCascades;
+				}
+
+				for (int c = 0; c < cameras; c++){
+					size_t face = 0;
+					size_t fb = c;
+					if (light.type == LightType::POINT){
+						face = c;
+						fb = 0;
+					}
+
+					depthRender.startFrameBuffer(&light.framebuffer[fb], face);
+					for (int i = 0; i < meshes->size(); i++){
+						MeshComponent& mesh = meshes->getComponentFromIndex(i);
+						Entity entity = meshes->getEntity(i);
+						Transform* transform = scene->findComponent<Transform>(entity);
+
+						if (transform){
+							if (mesh.loaded && mesh.needReload){
+								destroyMesh(mesh);
+							}
+							if (!mesh.loaded){
+								loadMesh(mesh);
+							}
+							if (transform->visible){
+								drawMeshDepth(mesh, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
+							}
+						}
+					}
+					for (int i = 0; i < terrains->size(); i++){
+						TerrainComponent& terrain = terrains->getComponentFromIndex(i);
+						Entity entity = terrains->getEntity(i);
+						Transform* transform = scene->findComponent<Transform>(entity);
+
+						if (transform){
+							if (terrain.loaded && terrain.needReload){
+								destroyTerrain(terrain);
+							}
+							if (!terrain.loaded){
+								loadTerrain(terrain);
+							}
+							if (transform->visible){
+								drawTerrainDepth(terrain, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
+							}
+						}
+					}
+					depthRender.endFrameBuffer();
+				}
+			}
+		}
+	}
 
 	for (int i = 0; i < cameras->size(); i++){
 		Entity cameraEntity = cameras->getEntity(i);
@@ -2182,78 +2259,6 @@ void RenderSystem::draw(){
 
 		if (!isMainCamera && !camera.renderToTexture){
 			continue; // camera is not used
-		}
-		if (hasMultipleCameras){
-			camera.needUpdate = true;
-			update(camera, cameraTransform, isMainCamera);
-		}
-
-		//---------Depth shader----------
-		if (hasShadows && isMainCamera){
-			auto lights = scene->getComponentArray<LightComponent>();
-			auto meshes = scene->getComponentArray<MeshComponent>();
-			auto terrains = scene->getComponentArray<TerrainComponent>();
-
-			depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
-			
-			for (int l = 0; l < lights->size(); l++){
-				LightComponent& light = lights->getComponentFromIndex(l);
-
-				if (light.intensity > 0 && light.shadows){
-					size_t cameras = 1;
-					if (light.type == LightType::POINT){
-						cameras = 6;
-					}else if (light.type == LightType::DIRECTIONAL){
-						cameras = light.numShadowCascades;
-					}
-
-					for (int c = 0; c < cameras; c++){
-						size_t face = 0;
-						size_t fb = c;
-						if (light.type == LightType::POINT){
-							face = c;
-							fb = 0;
-						}
-
-						depthRender.startFrameBuffer(&light.framebuffer[fb], face);
-						for (int i = 0; i < meshes->size(); i++){
-							MeshComponent& mesh = meshes->getComponentFromIndex(i);
-							Entity entity = meshes->getEntity(i);
-							Transform* transform = scene->findComponent<Transform>(entity);
-
-							if (transform){
-								if (mesh.loaded && mesh.needReload){
-									destroyMesh(mesh);
-								}
-								if (!mesh.loaded){
-									loadMesh(mesh);
-								}
-								if (transform->visible){
-									drawMeshDepth(mesh, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
-								}
-							}
-						}
-						for (int i = 0; i < terrains->size(); i++){
-							TerrainComponent& terrain = terrains->getComponentFromIndex(i);
-							Entity entity = terrains->getEntity(i);
-							Transform* transform = scene->findComponent<Transform>(entity);
-
-							if (transform){
-								if (terrain.loaded && terrain.needReload){
-									destroyTerrain(terrain);
-								}
-								if (!terrain.loaded){
-									loadTerrain(terrain);
-								}
-								if (transform->visible){
-									drawTerrainDepth(terrain, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
-								}
-							}
-						}
-						depthRender.endFrameBuffer();
-					}
-				}
-			}
 		}
 
 		if (scene->isMainScene() || camera.renderToTexture){
@@ -2277,6 +2282,10 @@ void RenderSystem::draw(){
 		//---------Draw sky----------
 		SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
 		if (sky){
+			if (hasMultipleCameras){
+				updateSkyViewProjection(camera);
+			}
+
 			if (!sky->loaded){
 				loadSky(*sky);
 			}
@@ -2288,6 +2297,10 @@ void RenderSystem::draw(){
 			Transform& transform = transforms->getComponentFromIndex(i);
 			Entity entity = transforms->getEntity(i);
 			Signature signature = scene->getSignature(entity);
+
+			if (hasMultipleCameras){
+				updateByCamera(entity, transform, signature, camera, cameraTransform);
+			}
 
 			if (signature.test(scene->getComponentType<MeshComponent>())){
 				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
@@ -2353,6 +2366,10 @@ void RenderSystem::draw(){
 
 			}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
 				ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+
+				if (hasMultipleCameras){
+					updateParticles(particles, transform, camera, cameraTransform);
+				}
 
 				if (particles.loaded && particles.needReload){
 					destroyParticles(particles);
