@@ -1989,6 +1989,59 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 	}
 }
 
+void RenderSystem::updateSpriteBillboard(SpriteComponent& sprite, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
+
+	if (sprite.billboard && !sprite.fakeBillboard){
+
+		Vector3 camPos = cameraTransform.worldPosition;
+
+		if (sprite.cylindricalBillboard)
+			camPos.y = transform.worldPosition.y;
+
+		Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp);
+
+		Quaternion oldRotation = transform.rotation;
+
+		transform.rotation.fromRotationMatrix(m1);
+		if (transform.parent != NULL_ENTITY){
+			auto transformParent = scene->getComponent<Transform>(transform.parent);
+			transform.rotation = transformParent.worldRotation.inverse() * transform.rotation;
+		}
+
+		if (transform.rotation != oldRotation){
+			updateTransform(transform);
+		}
+
+	}
+
+	if (sprite.billboard && sprite.fakeBillboard){
+		Matrix4 modelViewMatrix = camera.viewMatrix * transform.modelMatrix;
+
+		modelViewMatrix.set(0, 0, transform.worldScale.x);
+		modelViewMatrix.set(0, 1, 0.0);
+		modelViewMatrix.set(0, 2, 0.0);
+
+		if (!sprite.cylindricalBillboard) {
+			modelViewMatrix.set(1, 0, 0.0);
+			modelViewMatrix.set(1, 1, transform.worldScale.y);
+			modelViewMatrix.set(1, 2, 0.0);
+		}
+
+		modelViewMatrix.set(2, 0, 0.0);
+		modelViewMatrix.set(2, 1, 0.0);
+		modelViewMatrix.set(2, 2, transform.worldScale.z);
+
+		transform.modelViewProjectionMatrix = camera.projectionMatrix * modelViewMatrix;
+	}
+}
+
+void RenderSystem::updateMVP(Transform& transform, CameraComponent& camera, Transform& cameraTransform){
+	//TODO: it is not necessary mvp when sprite is billboard
+	transform.modelViewProjectionMatrix = camera.viewProjectionMatrix * transform.modelMatrix;
+
+	transform.distanceToCamera = (cameraTransform.worldPosition - transform.worldPosition).length();
+}
+
 void RenderSystem::update(double dt){
 	auto transforms = scene->getComponentArray<Transform>();
 	auto cameras = scene->getComponentArray<CameraComponent>();
@@ -2023,6 +2076,7 @@ void RenderSystem::update(double dt){
 		if (cameraTransform.needUpdate){
 			camera.needUpdate = true;
 		}
+		
 		if (camera.needUpdate){
 			updateCamera(camera, cameraTransform);
 		}
@@ -2047,7 +2101,19 @@ void RenderSystem::update(double dt){
 
 			// need to be updated for every camera
 			if (!hasMultipleCameras){
-				updateByCamera(entity, transform, signature, mainCamera, mainCameraTransform);
+				updateMVP(transform, mainCamera, mainCameraTransform);
+
+				if (signature.test(scene->getComponentType<SpriteComponent>())){
+					SpriteComponent& sprite = scene->getComponent<SpriteComponent>(entity);
+
+					updateSpriteBillboard(sprite, transform, mainCamera, mainCameraTransform);
+				}
+
+				if (signature.test(scene->getComponentType<TerrainComponent>())){
+					TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+
+					updateTerrain(terrain, transform, mainCamera, mainCameraTransform);
+				}
 			}
 
 			// need to be updated ONLY for main camera
@@ -2113,69 +2179,6 @@ void RenderSystem::update(double dt){
 	
 	processLights(mainCameraTransform);
 	processFog();
-}
-
-void RenderSystem::updateByCamera(Entity entity, Transform& transform, Signature signature, CameraComponent& camera, Transform& cameraTransform){
-	bool usingFakeBillboard = false;
-
-	if (signature.test(scene->getComponentType<SpriteComponent>())){
-		SpriteComponent& sprite = scene->getComponent<SpriteComponent>(entity);
-
-		if (sprite.billboard && !sprite.fakeBillboard){
-
-			Vector3 camPos = cameraTransform.worldPosition;
-
-			if (sprite.cylindricalBillboard)
-				camPos.y = transform.worldPosition.y;
-
-			Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp);
-
-			Quaternion oldRotation = transform.rotation;
-
-			transform.rotation.fromRotationMatrix(m1);
-			if (transform.parent != NULL_ENTITY){
-				auto transformParent = scene->getComponent<Transform>(transform.parent);
-				transform.rotation = transformParent.worldRotation.inverse() * transform.rotation;
-			}
-
-			if (transform.rotation != oldRotation){
-				updateTransform(transform);
-			}
-
-		}
-
-		if (sprite.billboard && sprite.fakeBillboard){
-			Matrix4 modelViewMatrix = camera.viewMatrix * transform.modelMatrix;
-
-			modelViewMatrix.set(0, 0, transform.worldScale.x);
-			modelViewMatrix.set(0, 1, 0.0);
-			modelViewMatrix.set(0, 2, 0.0);
-
-			if (!sprite.cylindricalBillboard) {
-				modelViewMatrix.set(1, 0, 0.0);
-				modelViewMatrix.set(1, 1, transform.worldScale.y);
-				modelViewMatrix.set(1, 2, 0.0);
-			}
-
-			modelViewMatrix.set(2, 0, 0.0);
-			modelViewMatrix.set(2, 1, 0.0);
-			modelViewMatrix.set(2, 2, transform.worldScale.z);
-
-			transform.modelViewProjectionMatrix = camera.projectionMatrix * modelViewMatrix;
-			usingFakeBillboard = true;
-		}
-	}
-
-	if (!usingFakeBillboard){
-		transform.modelViewProjectionMatrix = camera.viewProjectionMatrix * transform.modelMatrix;
-	}
-	transform.distanceToCamera = (cameraTransform.worldPosition - transform.worldPosition).length();
-
-	if (signature.test(scene->getComponentType<TerrainComponent>())){
-		TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
-
-		updateTerrain(terrain, transform, camera, cameraTransform);
-	}
 }
 
 void RenderSystem::draw(){
@@ -2299,7 +2302,13 @@ void RenderSystem::draw(){
 			Signature signature = scene->getSignature(entity);
 
 			if (hasMultipleCameras){
-				updateByCamera(entity, transform, signature, camera, cameraTransform);
+				updateMVP(transform, camera, cameraTransform);
+
+				if (signature.test(scene->getComponentType<SpriteComponent>())){
+					SpriteComponent& sprite = scene->getComponent<SpriteComponent>(entity);
+
+					updateSpriteBillboard(sprite, transform, camera, cameraTransform);
+				}
 			}
 
 			if (signature.test(scene->getComponentType<MeshComponent>())){
@@ -2322,6 +2331,10 @@ void RenderSystem::draw(){
 
 			}else if (signature.test(scene->getComponentType<TerrainComponent>())){
 				TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+
+				if (hasMultipleCameras){
+					updateTerrain(terrain, transform, camera, cameraTransform);
+				}
 
 				if (terrain.loaded && terrain.needReload){
 					destroyTerrain(terrain);

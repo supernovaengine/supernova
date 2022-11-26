@@ -16,6 +16,7 @@
 #include "component/LightComponent.h"
 #include "component/ParticlesComponent.h"
 #include "component/TerrainComponent.h"
+#include "component/SpriteComponent.h"
 #include "component/Transform.h"
 #include "render/ObjectRender.h"
 #include "render/SceneRender.h"
@@ -91,8 +92,10 @@ namespace Supernova{
 		std::map<std::string, BufferRender*> bufferNameToRender;
 		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
 
-		// update aux function
-		void updateByCamera(Entity entity, Transform& transform, Signature signature, CameraComponent& camera, Transform& cameraTransform);
+		void updateMVP(Transform& transform, CameraComponent& camera, Transform& cameraTransform);
+
+		// billboard
+		void updateSpriteBillboard(SpriteComponent& sprite, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 
 		void createFramebuffer(CameraComponent& camera);
 		void createEmptyTextures();
