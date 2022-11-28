@@ -15,8 +15,8 @@ FramebufferRender::~FramebufferRender(){
     //Cannot destroy because its a handle
 }
 
-bool FramebufferRender::createFramebuffer(TextureType textureType, int width, int height, TextureFilter minFilter, TextureFilter magFilter, bool shadowMap){
-    return backend.createFramebuffer(textureType, width, height, minFilter, magFilter, shadowMap);
+bool FramebufferRender::createFramebuffer(TextureType textureType, int width, int height, TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV, bool shadowMap){
+    return backend.createFramebuffer(textureType, width, height, minFilter, magFilter, wrapU, wrapV, shadowMap);
 }
 
 void FramebufferRender::destroyFramebuffer(){

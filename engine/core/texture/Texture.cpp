@@ -15,6 +15,8 @@ Texture::Texture(){
 
     this->minFilter = TextureFilter::LINEAR;
     this->magFilter = TextureFilter::LINEAR;
+    this->wrapU = TextureWrap::REPEAT;
+    this->wrapV = TextureWrap::REPEAT;
 }
 
 Texture::Texture(std::string path){
@@ -30,6 +32,8 @@ Texture::Texture(std::string path){
 
     this->minFilter = TextureFilter::LINEAR;
     this->magFilter = TextureFilter::LINEAR;
+    this->wrapU = TextureWrap::REPEAT;
+    this->wrapV = TextureWrap::REPEAT;
 }
 
 Texture::Texture(TextureData data, std::string id){
@@ -45,6 +49,8 @@ Texture::Texture(TextureData data, std::string id){
 
     this->minFilter = TextureFilter::LINEAR;
     this->magFilter = TextureFilter::LINEAR;
+    this->wrapU = TextureWrap::REPEAT;
+    this->wrapV = TextureWrap::REPEAT;
 }
 
 Texture::Texture(const Texture& rhs){
@@ -62,6 +68,8 @@ Texture::Texture(const Texture& rhs){
     needLoad = rhs.needLoad;
     minFilter = rhs.minFilter;
     magFilter = rhs.magFilter;
+    wrapU = rhs.wrapU;
+    wrapV = rhs.wrapV;
 }
 
 Texture& Texture::operator=(const Texture& rhs){
@@ -79,6 +87,8 @@ Texture& Texture::operator=(const Texture& rhs){
     needLoad = rhs.needLoad;
     minFilter = rhs.minFilter;
     magFilter = rhs.magFilter;
+    wrapU = rhs.wrapU;
+    wrapV = rhs.wrapV;
 
     return *this; 
 }
@@ -98,7 +108,9 @@ bool Texture::operator == ( const Texture& rhs ) const{
         loadFromPath == rhs.loadFromPath &&
         releaseDataAfterLoad == rhs.releaseDataAfterLoad &&
         minFilter == rhs.minFilter &&
-        magFilter == rhs.magFilter
+        magFilter == rhs.magFilter &&
+        wrapU == rhs.wrapU &&
+        wrapV == rhs.wrapV
      );
 }
 
@@ -117,7 +129,9 @@ bool Texture::operator != ( const Texture& rhs ) const{
         loadFromPath != rhs.loadFromPath ||
         releaseDataAfterLoad != rhs.releaseDataAfterLoad ||
         minFilter != rhs.minFilter ||
-        magFilter != rhs.magFilter
+        magFilter != rhs.magFilter ||
+        wrapU != rhs.wrapU ||
+        wrapV != rhs.wrapV
     );
 }
 
@@ -242,7 +256,7 @@ bool Texture::load(){
 	    }
     }
 
-	renderAndData = TexturePool::get(id, type, data, minFilter, magFilter);
+	renderAndData = TexturePool::get(id, type, data, minFilter, magFilter, wrapU, wrapV);
 
     if (releaseDataAfterLoad){
         for (int f = 0; f < numFaces; f++){
@@ -361,4 +375,32 @@ TextureFilter Texture::getMagFilter() const{
         return framebuffer->getMagFilter();
     }
     return magFilter;
+}
+
+void Texture::setWrapU(TextureWrap wrapU){
+    if (framebuffer){
+        framebuffer->setWrapU(wrapU);
+    }
+    this->wrapU = wrapU;
+}
+
+TextureWrap Texture::getWrapU() const{
+    if (framebuffer){
+        return framebuffer->getWrapU();
+    }
+    return wrapU;
+}
+
+void Texture::setWrapV(TextureWrap wrapV){
+    if (framebuffer){
+        framebuffer->setWrapV(wrapV);
+    }
+    this->wrapV = wrapV;
+}
+
+TextureWrap Texture::getWrapV() const{
+    if (framebuffer){
+        return framebuffer->getWrapV();
+    }
+    return wrapV;
 }

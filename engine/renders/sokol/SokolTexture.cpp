@@ -44,6 +44,19 @@ sg_filter SokolTexture::getFilter(TextureFilter textureFilter){
 }
 
 
+sg_wrap SokolTexture::getWrap(TextureWrap textureWrap){
+    if (textureWrap == TextureWrap::REPEAT){
+        return SG_WRAP_REPEAT;
+    }else if (textureWrap == TextureWrap::MIRRORED_REPEAT){
+        return SG_WRAP_MIRRORED_REPEAT;
+    }else if (textureWrap == TextureWrap::CLAMP_TO_EDGE){
+        return SG_WRAP_CLAMP_TO_EDGE;
+    }
+    // SG_WRAP_CLAMP_TO_BORDER is not used
+
+    return SG_WRAP_REPEAT;
+}
+
 
 // https://github.com/floooh/sokol/issues/102
 sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
@@ -154,7 +167,7 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
 bool SokolTexture::createTexture(
             std::string label, int width, int height, 
             ColorFormat colorFormat, TextureType type, int numFaces, void* data[6], size_t size[6], 
-            TextureFilter minFilter, TextureFilter magFilter){
+            TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
 
     sg_pixel_format pixelFormat;
     if (colorFormat == ColorFormat::RGBA){
@@ -173,6 +186,8 @@ bool SokolTexture::createTexture(
     image_desc.num_slices = 1;
     image_desc.min_filter = getFilter(minFilter);
     image_desc.mag_filter = getFilter(magFilter);
+    image_desc.wrap_u = getWrap(wrapU);
+    image_desc.wrap_v = getWrap(wrapV);
     image_desc.label = label.c_str();
 
     for (int f = 0; f < numFaces; f++){
@@ -197,7 +212,7 @@ bool SokolTexture::createTexture(
 
 bool SokolTexture::createFramebufferTexture(
             TextureType type, bool depth, bool shadowMap, int width, int height, 
-            TextureFilter minFilter, TextureFilter magFilter){
+            TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
     sg_image_desc img_desc = {0};
     img_desc.render_target = true;
     img_desc.type = getTextureType(type);
@@ -205,6 +220,8 @@ bool SokolTexture::createFramebufferTexture(
     img_desc.height = height;
     img_desc.min_filter = getFilter(minFilter);
     img_desc.mag_filter = getFilter(magFilter);
+    img_desc.wrap_u = getWrap(wrapU);
+    img_desc.wrap_v = getWrap(wrapV);
     if (shadowMap){ //if not set Sokol gets default from sg_desc.context.sample_count
         img_desc.sample_count = 1;
     }

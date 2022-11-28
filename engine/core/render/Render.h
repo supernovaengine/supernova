@@ -156,6 +156,12 @@ namespace Supernova{
         LINEAR_MIPMAP_LINEAR
     };
 
+    enum class TextureWrap{
+        REPEAT,
+        MIRRORED_REPEAT,
+        CLAMP_TO_EDGE
+    };
+
     enum PipelineType {
         PIP_DEFAULT = 1 << 0,
         PIP_RTT     = 1 << 1,

@@ -31,6 +31,8 @@ namespace Supernova{
             //render properties
             TextureFilter minFilter;
             TextureFilter magFilter;
+            TextureWrap wrapU;
+            TextureWrap wrapV;
 
         public:
             Texture();
@@ -75,6 +77,12 @@ namespace Supernova{
 
             void setMagFilter(TextureFilter filter);
             TextureFilter getMagFilter() const;
+
+            void setWrapU(TextureWrap wrapU);
+            TextureWrap getWrapU() const;
+
+            void setWrapV(TextureWrap wrapV);
+            TextureWrap getWrapV() const;
     };
 }
 

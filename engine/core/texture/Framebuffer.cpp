@@ -14,6 +14,8 @@ Framebuffer::Framebuffer(){
     this->height = 512;
     this->minFilter = TextureFilter::LINEAR;
     this->magFilter = TextureFilter::LINEAR;
+    this->wrapU = TextureWrap::REPEAT;
+    this->wrapV = TextureWrap::REPEAT;
     this->version = 0;
 }
 
@@ -27,6 +29,8 @@ Framebuffer::Framebuffer(const Framebuffer& rhs){
     this->height = rhs.height;
     this->minFilter = rhs.minFilter;
     this->magFilter = rhs.magFilter;
+    this->wrapU = rhs.wrapU;
+    this->wrapV = rhs.wrapV;
     this->version = rhs.version;
 }
 
@@ -36,12 +40,14 @@ Framebuffer& Framebuffer::operator=(const Framebuffer& rhs){
     this->height = rhs.height;
     this->minFilter = rhs.minFilter;
     this->magFilter = rhs.magFilter;
+    this->wrapU = rhs.wrapU;
+    this->wrapV = rhs.wrapV;
     this->version = rhs.version;
     return *this;
 }
 
 void Framebuffer::create(){
-    render.createFramebuffer(TextureType::TEXTURE_2D, width, height, minFilter, magFilter, false);
+    render.createFramebuffer(TextureType::TEXTURE_2D, width, height, minFilter, magFilter, wrapU, wrapV, false);
     version++;
 }
 
@@ -91,4 +97,20 @@ void Framebuffer::setMagFilter(TextureFilter filter){
 
 TextureFilter Framebuffer::getMagFilter() const{
     return this->magFilter;
+}
+
+void Framebuffer::setWrapU(TextureWrap wrapU){
+    this->wrapU = wrapU;
+}
+
+TextureWrap Framebuffer::getWrapU() const{
+    return this->wrapU;
+}
+
+void Framebuffer::setWrapV(TextureWrap wrapV){
+    this->wrapV = wrapV;
+}
+
+TextureWrap Framebuffer::getWrapV() const{
+    return this->wrapV;
 }

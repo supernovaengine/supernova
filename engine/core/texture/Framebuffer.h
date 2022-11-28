@@ -17,7 +17,8 @@ namespace Supernova{
             int height;
             TextureFilter minFilter;
             TextureFilter magFilter;
-
+            TextureWrap wrapU;
+            TextureWrap wrapV;
 
             unsigned long version; // increment every creation
 
@@ -45,7 +46,13 @@ namespace Supernova{
             TextureFilter getMinFilter() const;
 
             void setMagFilter(TextureFilter filter);
-            TextureFilter getMagFilter() const;          
+            TextureFilter getMagFilter() const;
+
+            void setWrapU(TextureWrap wrapU);
+            TextureWrap getWrapU() const;
+
+            void setWrapV(TextureWrap wrapV);
+            TextureWrap getWrapV() const;
     };
 }
 

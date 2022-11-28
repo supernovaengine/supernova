@@ -92,20 +92,28 @@ void RenderSystem::createEmptyTextures(){
         	pixels[i] = 0xFF808080;
     	}
 
-		emptyNormal.createTexture("empty|normal", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, TextureFilter::NEAREST, TextureFilter::NEAREST);
+		emptyNormal.createTexture(
+				"empty|normal", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, 
+				TextureFilter::NEAREST, TextureFilter::NEAREST, TextureWrap::REPEAT, TextureWrap::REPEAT);
 
 		for (int i = 0; i < 64; i++) {
         	pixels[i] = 0xFFFFFFFF;
     	}
 
-		emptyWhite.createTexture("empty|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, TextureFilter::NEAREST, TextureFilter::NEAREST);
+		emptyWhite.createTexture(
+				"empty|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, 
+				TextureFilter::NEAREST, TextureFilter::NEAREST, TextureWrap::REPEAT, TextureWrap::REPEAT);
 
 		for (int i = 0; i < 64; i++) {
         	pixels[i] = 0xFF000000;
     	}
 
-		emptyBlack.createTexture("empty|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, TextureFilter::NEAREST, TextureFilter::NEAREST);
-		emptyCubeBlack.createTexture("empty|cube|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_CUBE, 6, data_array, size_array, TextureFilter::NEAREST, TextureFilter::NEAREST);
+		emptyBlack.createTexture(
+				"empty|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, 
+				TextureFilter::NEAREST, TextureFilter::NEAREST, TextureWrap::REPEAT, TextureWrap::REPEAT);
+		emptyCubeBlack.createTexture(
+				"empty|cube|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_CUBE, 6, data_array, size_array, 
+				TextureFilter::NEAREST, TextureFilter::NEAREST, TextureWrap::REPEAT, TextureWrap::REPEAT);
 
 		emptyTexturesCreated = true;
 	}
@@ -172,14 +180,18 @@ bool RenderSystem::processLights(Transform& cameraTransform){
 			hasShadows = true; // Re-check shadows on, after checked in checkLightsAndShadow()
 			if (light.type == LightType::POINT){
 				if (!light.framebuffer[0].isCreated())
-					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_CUBE, light.mapResolution, light.mapResolution, TextureFilter::LINEAR, TextureFilter::LINEAR, true);
+					light.framebuffer[0].createFramebuffer(
+							TextureType::TEXTURE_CUBE, light.mapResolution, light.mapResolution, 
+							TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::REPEAT, TextureWrap::REPEAT, true);
 
 				if ((freeShadowCubeMap - MAX_SHADOWSMAP) < MAX_SHADOWSCUBEMAP){
 					light.shadowMapIndex = freeShadowCubeMap++;
 				}
 			}else if (light.type == LightType::SPOT){
 				if (!light.framebuffer[0].isCreated())
-					light.framebuffer[0].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, TextureFilter::LINEAR, TextureFilter::LINEAR, true);
+					light.framebuffer[0].createFramebuffer(
+							TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, 
+							TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::REPEAT, TextureWrap::REPEAT, true);
 
 				if (freeShadowMap < MAX_SHADOWSMAP){
 					light.shadowMapIndex = freeShadowMap++;
@@ -187,7 +199,9 @@ bool RenderSystem::processLights(Transform& cameraTransform){
 			}else if (light.type == LightType::DIRECTIONAL){
 				for (int c = 0; c < light.numShadowCascades; c++){
 					if (!light.framebuffer[c].isCreated())
-						light.framebuffer[c].createFramebuffer(TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, TextureFilter::LINEAR, TextureFilter::LINEAR, true);
+						light.framebuffer[c].createFramebuffer(
+								TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, 
+								TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::REPEAT, TextureWrap::REPEAT, true);
 				}
 
 				if ((freeShadowMap + light.numShadowCascades - 1) < MAX_SHADOWSMAP){

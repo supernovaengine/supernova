@@ -22,11 +22,11 @@ namespace Supernova{
         bool createTexture(
                 std::string label, int width, int height, 
                 ColorFormat colorFormat, TextureType type, int numFaces, void* data[6], size_t size[6],
-                TextureFilter minFilter, TextureFilter magFilter);
+                TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV);
 
         bool createFramebufferTexture(
                 TextureType type, bool depth, bool shadowMap, int width, int height, 
-                TextureFilter minFilter, TextureFilter magFilter);
+                TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV);
 
         void destroyTexture();
     };
