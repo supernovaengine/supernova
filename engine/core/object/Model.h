@@ -26,6 +26,8 @@ namespace Supernova{
         Matrix4 getGLTFNodeMatrix(int nodeIndex);
         Matrix4 getGLTFMeshGlobalMatrix(int nodeIndex, std::map<int, int>& nodesParent);
         Entity generateSketetalStructure(ModelComponent& model, int nodeIndex, int skinIndex);
+        TextureFilter convertFilter(int filter);
+        TextureWrap convertWrap(int wrap);
 
         void clearAnimations();
 
