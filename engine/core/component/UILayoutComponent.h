@@ -2,6 +2,7 @@
 #define UI_LAYOUT_COMPONENT_H
 
 #include "util/FunctionSubscribe.h"
+#include "math/Rect.h"
 
 namespace Supernova{
 
@@ -39,6 +40,8 @@ namespace Supernova{
         int marginTop = 0;
         int marginRight = 0;
         int marginBottom = 0;
+
+        Rect scissor = Rect(0, 0, 0, 0);
 
         AnchorPreset anchorPreset = AnchorPreset::NONE;
 

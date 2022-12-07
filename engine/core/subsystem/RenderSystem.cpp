@@ -2293,8 +2293,7 @@ void RenderSystem::draw(){
 		}
 
 		//---------Draw opaque meshes and UI----------
-		std::vector<Entity> parentListScissor;
-		Rect activeScissor;
+		bool hasActiveScissor = false;
 
 		//---------Draw sky----------
 		SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
@@ -2363,10 +2362,33 @@ void RenderSystem::draw(){
 			}else if (signature.test(scene->getComponentType<UIComponent>())){
 				UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-				if (std::find(parentListScissor.begin(), parentListScissor.end(), transform.parent) == parentListScissor.end()){
-					activeScissor = Rect(0,0,System::instance().getScreenWidth(), System::instance().getScreenHeight());
-					sceneRender.applyScissor(activeScissor);
-					parentListScissor.clear();
+				Rect parentScissor;
+				bool hasParentScissor = false;
+
+				if (transform.parent != NULL_ENTITY){
+					Signature parentSignature = scene->getSignature(transform.parent);
+					if (parentSignature.test(scene->getComponentType<UILayoutComponent>())){
+						UILayoutComponent& parentLayout = scene->getComponent<UILayoutComponent>(transform.parent);
+
+						parentScissor = parentLayout.scissor;
+						if (!parentScissor.isZero()){
+							if (!ui.ignoreScissor){
+								sceneRender.applyScissor(parentScissor);
+								hasActiveScissor = true;
+							}
+							hasParentScissor = true;
+						}
+					}
+				}
+
+				if (signature.test(scene->getComponentType<UILayoutComponent>()) && signature.test(scene->getComponentType<ImageComponent>())){
+					UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
+					ImageComponent& img = scene->getComponent<ImageComponent>(entity);
+					
+					layout.scissor = getScissorRect(layout, img, transform, camera);
+					if (hasParentScissor){
+						layout.scissor = layout.scissor.fitOnRect(parentScissor);
+					}
 				}
 
 				bool isText = false;
@@ -2381,15 +2403,6 @@ void RenderSystem::draw(){
 				}
 				if (transform.visible)
 					drawUI(ui, transform, camera.renderToTexture);
-
-				if (signature.test(scene->getComponentType<UILayoutComponent>()) && signature.test(scene->getComponentType<ImageComponent>())){
-					UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
-					ImageComponent& img = scene->getComponent<ImageComponent>(entity);
-
-					activeScissor = getScissorRect(layout, img, transform, camera).fitOnRect(activeScissor);
-					sceneRender.applyScissor(activeScissor);
-					parentListScissor.push_back(entity);
-				}
 
 			}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
 				ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
@@ -2407,6 +2420,11 @@ void RenderSystem::draw(){
 				if (transform.visible)
 					drawParticles(particles, transform, cameraTransform, camera.renderToTexture);
 
+			}
+
+			if (hasActiveScissor){
+				sceneRender.applyScissor(Rect(0, 0, System::instance().getScreenWidth(), System::instance().getScreenHeight()));
+				hasActiveScissor = false;
 			}
 		}
 

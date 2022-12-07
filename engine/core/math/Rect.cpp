@@ -125,6 +125,12 @@ Rect& Rect::fitOnRect(Rect& rect){
     if (y + height >= rect.getY() + rect.getHeight())
         height = rect.getY() + rect.getHeight() - y;
 
+    if (width < 0)
+        width = 0;
+
+    if (height < 0)
+        height = 0;
+
     return *this;
 }
 
