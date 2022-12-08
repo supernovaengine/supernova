@@ -2324,6 +2324,40 @@ void RenderSystem::draw(){
 				}
 			}
 
+			// apply scissor on UI
+			if (signature.test(scene->getComponentType<UILayoutComponent>())){
+				UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
+
+				Rect parentScissor;
+				bool hasParentScissor = false;
+
+				if (transform.parent != NULL_ENTITY){
+					Signature parentSignature = scene->getSignature(transform.parent);
+					if (parentSignature.test(scene->getComponentType<UILayoutComponent>())){
+						UILayoutComponent& parentLayout = scene->getComponent<UILayoutComponent>(transform.parent);
+
+						parentScissor = parentLayout.scissor;
+						if (!parentScissor.isZero()){
+							if (!layout.ignoreScissor){
+								sceneRender.applyScissor(parentScissor);
+								hasActiveScissor = true;
+							}
+							layout.scissor = parentScissor;
+							hasParentScissor = true;
+						}
+					}
+				}
+
+				if (signature.test(scene->getComponentType<ImageComponent>())){
+					ImageComponent& img = scene->getComponent<ImageComponent>(entity);
+
+					layout.scissor = getScissorRect(layout, img, transform, camera);
+					if (hasParentScissor){
+						layout.scissor = layout.scissor.fitOnRect(parentScissor);
+					}
+				}
+			}
+
 			if (signature.test(scene->getComponentType<MeshComponent>())){
 				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
@@ -2361,35 +2395,6 @@ void RenderSystem::draw(){
 
 			}else if (signature.test(scene->getComponentType<UIComponent>())){
 				UIComponent& ui = scene->getComponent<UIComponent>(entity);
-
-				Rect parentScissor;
-				bool hasParentScissor = false;
-
-				if (transform.parent != NULL_ENTITY){
-					Signature parentSignature = scene->getSignature(transform.parent);
-					if (parentSignature.test(scene->getComponentType<UILayoutComponent>())){
-						UILayoutComponent& parentLayout = scene->getComponent<UILayoutComponent>(transform.parent);
-
-						parentScissor = parentLayout.scissor;
-						if (!parentScissor.isZero()){
-							if (!ui.ignoreScissor){
-								sceneRender.applyScissor(parentScissor);
-								hasActiveScissor = true;
-							}
-							hasParentScissor = true;
-						}
-					}
-				}
-
-				if (signature.test(scene->getComponentType<UILayoutComponent>()) && signature.test(scene->getComponentType<ImageComponent>())){
-					UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
-					ImageComponent& img = scene->getComponent<ImageComponent>(entity);
-					
-					layout.scissor = getScissorRect(layout, img, transform, camera);
-					if (hasParentScissor){
-						layout.scissor = layout.scissor.fitOnRect(parentScissor);
-					}
-				}
 
 				bool isText = false;
 				if (signature.test(scene->getComponentType<TextComponent>())){

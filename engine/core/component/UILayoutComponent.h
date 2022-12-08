@@ -42,6 +42,7 @@ namespace Supernova{
         int marginBottom = 0;
 
         Rect scissor = Rect(0, 0, 0, 0);
+        bool ignoreScissor = false; // parent scissor
 
         AnchorPreset anchorPreset = AnchorPreset::NONE;
 

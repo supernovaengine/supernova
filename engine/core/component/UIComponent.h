@@ -44,8 +44,6 @@ namespace Supernova{
         bool automaticFlipY = true;
         bool flipY = false;
 
-        bool ignoreScissor = false;
-
         bool pointerMoved = false;
         bool focused = false;
 
