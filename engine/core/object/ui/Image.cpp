@@ -16,10 +16,21 @@ Image::Image(Scene* scene): UILayout(scene){
 void Image::setPatchMargin(int margin){
     ImageComponent& img = getComponent<ImageComponent>();
     
-    img.patchMarginBottom = margin;
     img.patchMarginLeft = margin;
     img.patchMarginRight = margin;
+    img.patchMarginBottom = margin;
     img.patchMarginTop = margin;
+
+    img.needUpdatePatches = true;
+}
+
+void Image::setPatchMargin(int marginLeft, int marginRight, int marginTop, int marginBottom){
+    ImageComponent& img = getComponent<ImageComponent>();
+
+    img.patchMarginLeft = marginLeft;
+    img.patchMarginRight = marginRight;
+    img.patchMarginBottom = marginBottom;
+    img.patchMarginTop = marginTop;
 
     img.needUpdatePatches = true;
 }

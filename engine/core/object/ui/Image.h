@@ -18,6 +18,7 @@ namespace Supernova{
         Image(Scene* scene);
 
         void setPatchMargin(int margin);
+        void setPatchMargin(int marginLeft, int marginRight, int marginTop, int marginBottom);
 
         void setPatchMarginBottom(int marginBottom);
         void setPatchMarginLeft(int marginLeft);

@@ -466,6 +466,8 @@ void UISystem::updateAllAnchors(){
             if (ui.loaded){
                 layout.needUpdateAnchors = true;
             }
+        }else{
+            layout.needUpdateAnchors = true;
         }
     }
 }
@@ -651,17 +653,25 @@ void UISystem::update(double dt){
 
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
-            UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
-            if (parentcontainer){
-                if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
-                    layout.containerBoxIndex = parentcontainer->numBoxes;
-                    parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
-                    parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
 
-                    parentcontainer->numBoxes = parentcontainer->numBoxes + 1;
-                }else{
-                    transform.parent = NULL_ENTITY;
-                    Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
+            UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
+            if (parentlayout){
+                if (parentlayout->needUpdateAnchors || parentlayout->needUpdateSizes){
+                    layout.needUpdateAnchors = true;
+                }
+
+                UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
+                if (parentcontainer){
+                    if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
+                        layout.containerBoxIndex = parentcontainer->numBoxes;
+                        parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
+                        parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
+
+                        parentcontainer->numBoxes = parentcontainer->numBoxes + 1;
+                    }else{
+                        transform.parent = NULL_ENTITY;
+                        Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
+                    }
                 }
             }
         }
@@ -692,25 +702,25 @@ void UISystem::update(double dt){
                 int totalWidth = layout.width;
                 int totalHeight = layout.height;
 
-                for (int b = 0; b < MAX_CONTAINER_BOXES; b++){
+                for (int b = (container.numBoxes-1); b >= 0; b--){
                     if (container.boxes[b].layout != NULL_ENTITY){
                         // container.boxes[b].rect in setted by entity size in last iteration
                         if (container.type == ContainerType::HORIZONTAL){
-                            if (b > 0){
-                                container.boxes[b].rect.setX(container.boxes[b-1].rect.getX() + container.boxes[b-1].rect.getWidth());
+                            if (b < (container.numBoxes-1)){
+                                container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
                             }
                             if (container.boxes[b].expand){
-                                container.boxes[b].rect.setWidth(totalWidth / (container.numBoxes - b));
+                                container.boxes[b].rect.setWidth(totalWidth / (b+1));
                             }
                             container.boxes[b].rect.setHeight(layout.height);
 
                             totalWidth = totalWidth - container.boxes[b].rect.getWidth();
                         }else if (container.type == ContainerType::VERTICAL){
-                            if (b > 0){
-                                container.boxes[b].rect.setY(container.boxes[b-1].rect.getY() + container.boxes[b-1].rect.getHeight());
+                            if (b < (container.numBoxes-1)){
+                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + container.boxes[b+1].rect.getHeight());
                             }
                             if (container.boxes[b].expand){
-                                container.boxes[b].rect.setHeight(totalHeight / (container.numBoxes - b));
+                                container.boxes[b].rect.setHeight(totalHeight / (b+1));
                             }
                             container.boxes[b].rect.setWidth(layout.width);
 
@@ -822,12 +832,22 @@ void UISystem::update(double dt){
                 abAnchorBottom = Engine::getCanvasHeight() * layout.anchorBottom;
             }else{
                 UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
-                UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
                 if (parentlayout){
                     Rect boxRect = Rect(0, 0, parentlayout->width, parentlayout->height);
+
+                    UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
                     if (parentcontainer){
                         boxRect = parentcontainer->boxes[layout.containerBoxIndex].rect;
                     }
+
+                    ImageComponent* parentimage = scene->findComponent<ImageComponent>(transform.parent);
+                    if (parentimage){
+                        boxRect.setX(boxRect.getX() + parentimage->patchMarginLeft);
+                        boxRect.setWidth(boxRect.getWidth() - parentimage->patchMarginRight - parentimage->patchMarginLeft);
+                        boxRect.setY(boxRect.getY() + parentimage->patchMarginTop);
+                        boxRect.setHeight(boxRect.getHeight() - parentimage->patchMarginBottom - parentimage->patchMarginTop);
+                    }
+
                     abAnchorLeft = (boxRect.getWidth() * layout.anchorLeft) + boxRect.getX();
                     abAnchorRight = (boxRect.getWidth() * layout.anchorRight) + boxRect.getX();
                     abAnchorTop = (boxRect.getHeight() * layout.anchorTop) + boxRect.getY();

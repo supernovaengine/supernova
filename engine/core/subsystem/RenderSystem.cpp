@@ -1427,7 +1427,7 @@ Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img
 			float borderScreenBottom = img.patchMarginBottom * heightRatio;
 
 			objScreenPosX += borderScreenLeft;
-			objScreenPosY += borderScreenTop;
+			objScreenPosY += borderScreenBottom; // scissor é bottom-left
 			objScreenWidth -= (borderScreenLeft + borderScreenRight);
 			objScreenHeight -= (borderScreenTop + borderScreenBottom);
 		}
@@ -1449,7 +1449,7 @@ Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img
 			float borderScreenBottom = img.patchMarginBottom;
 
 			objScreenPosX += borderScreenLeft;
-			objScreenPosY += borderScreenTop;
+			objScreenPosY += borderScreenTop; // TODO: check this
 			objScreenWidth -= (borderScreenLeft + borderScreenRight);
 			objScreenHeight -= (borderScreenTop + borderScreenBottom);
 		}

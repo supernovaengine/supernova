@@ -363,7 +363,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .deriveClass<Image, UILayout>("Image")
         .addConstructor <void (*) (Scene*)> ()
-        .addFunction("setPatchMargin", &Image::setPatchMargin)
+        .addFunction("setPatchMargin", 
+            luabridge::overload<int>(&Image::setPatchMargin),
+            luabridge::overload<int, int, int, int>(&Image::setPatchMargin))
         .addProperty("patchMarginBottom", &Image::getPatchMarginBottom, &Image::setPatchMarginBottom)
         .addProperty("patchMarginLeft", &Image::getPatchMarginLeft, &Image::setPatchMarginLeft)
         .addProperty("patchMarginRight", &Image::getPatchMarginRight, &Image::setPatchMarginRight)
