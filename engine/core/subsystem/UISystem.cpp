@@ -449,9 +449,8 @@ bool UISystem::loadOrUpdateText(TextComponent& text, UIComponent& ui, UILayoutCo
         }
         createText(text, ui, layout);
 
-        layout.needUpdateAnchors = true;
-
         text.needUpdateText = false;
+        layout.needUpdateAnchors = true;
     }
 
     return true;
@@ -732,14 +731,81 @@ void UISystem::update(double dt){
                 }
             }
         }
-
-
     }
 
     for (int i = 0; i < layouts->size(); i++){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
+
+        if (signature.test(scene->getComponentType<Transform>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
+
+            if (layout.needUpdateAnchors){
+                if (layout.anchorRight < layout.anchorLeft)
+                    layout.anchorRight = layout.anchorLeft;
+                if (layout.anchorBottom < layout.anchorTop)
+                    layout.anchorBottom = layout.anchorTop;
+
+                applyAnchorPreset(layout);
+            }
+
+            float abAnchorLeft = 0;
+            float abAnchorRight = 0;
+            float abAnchorTop = 0;
+            float abAnchorBottom = 0;
+            if (transform.parent == NULL_ENTITY){
+                abAnchorLeft = Engine::getCanvasWidth() * layout.anchorLeft;
+                abAnchorRight = Engine::getCanvasWidth() * layout.anchorRight;
+                abAnchorTop = Engine::getCanvasHeight() * layout.anchorTop;
+                abAnchorBottom = Engine::getCanvasHeight() * layout.anchorBottom;
+            }else{
+                UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
+                if (parentlayout){
+                    Rect boxRect = Rect(0, 0, parentlayout->width, parentlayout->height);
+
+                    UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
+                    if (parentcontainer){
+                        boxRect = parentcontainer->boxes[layout.containerBoxIndex].rect;
+                    }
+
+                    ImageComponent* parentimage = scene->findComponent<ImageComponent>(transform.parent);
+                    if (parentimage){
+                        boxRect.setX(boxRect.getX() + parentimage->patchMarginLeft);
+                        boxRect.setWidth(boxRect.getWidth() - parentimage->patchMarginRight - parentimage->patchMarginLeft);
+                        boxRect.setY(boxRect.getY() + parentimage->patchMarginTop);
+                        boxRect.setHeight(boxRect.getHeight() - parentimage->patchMarginBottom - parentimage->patchMarginTop);
+                    }
+
+                    abAnchorLeft = (boxRect.getWidth() * layout.anchorLeft) + boxRect.getX();
+                    abAnchorRight = (boxRect.getWidth() * layout.anchorRight) + boxRect.getX();
+                    abAnchorTop = (boxRect.getHeight() * layout.anchorTop) + boxRect.getY();
+                    abAnchorBottom = (boxRect.getHeight() * layout.anchorBottom) + boxRect.getY();
+                }
+            }
+
+            if (layout.needUpdateAnchors){
+                transform.position.x = abAnchorLeft + layout.marginLeft;
+                transform.position.y = abAnchorTop + layout.marginTop;
+                transform.needUpdate = true;
+
+                float width = abAnchorRight - transform.position.x + layout.marginRight;
+                float height = abAnchorBottom - transform.position.y + layout.marginBottom;
+
+                if (width != layout.width || height != layout.height){
+                    layout.width = width;
+                    layout.height = height;
+                    layout.needUpdateSizes = true;
+                }
+
+                layout.needUpdateAnchors = false;
+            }else{
+                layout.marginLeft = transform.position.x - abAnchorLeft;
+                layout.marginTop = transform.position.y - abAnchorTop;
+                layout.marginRight = layout.width + transform.position.x - abAnchorRight;
+                layout.marginBottom = layout.height + transform.position.y - abAnchorBottom;
+            }
+        }
 
         if (layout.needUpdateSizes){
             if (signature.test(scene->getComponentType<ImageComponent>())){
@@ -811,75 +877,6 @@ void UISystem::update(double dt){
                 }
             }
 
-        }
-
-        if (signature.test(scene->getComponentType<Transform>())){
-            Transform& transform = scene->getComponent<Transform>(entity);
-
-            if (layout.needUpdateAnchors){
-                if (layout.anchorRight < layout.anchorLeft)
-                    layout.anchorRight = layout.anchorLeft;
-                if (layout.anchorBottom < layout.anchorTop)
-                    layout.anchorBottom = layout.anchorTop;
-
-                applyAnchorPreset(layout);
-            }
-
-            float abAnchorLeft = 0;
-            float abAnchorRight = 0;
-            float abAnchorTop = 0;
-            float abAnchorBottom = 0;
-            if (transform.parent == NULL_ENTITY){
-                abAnchorLeft = Engine::getCanvasWidth() * layout.anchorLeft;
-                abAnchorRight = Engine::getCanvasWidth() * layout.anchorRight;
-                abAnchorTop = Engine::getCanvasHeight() * layout.anchorTop;
-                abAnchorBottom = Engine::getCanvasHeight() * layout.anchorBottom;
-            }else{
-                UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
-                if (parentlayout){
-                    Rect boxRect = Rect(0, 0, parentlayout->width, parentlayout->height);
-
-                    UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
-                    if (parentcontainer){
-                        boxRect = parentcontainer->boxes[layout.containerBoxIndex].rect;
-                    }
-
-                    ImageComponent* parentimage = scene->findComponent<ImageComponent>(transform.parent);
-                    if (parentimage){
-                        boxRect.setX(boxRect.getX() + parentimage->patchMarginLeft);
-                        boxRect.setWidth(boxRect.getWidth() - parentimage->patchMarginRight - parentimage->patchMarginLeft);
-                        boxRect.setY(boxRect.getY() + parentimage->patchMarginTop);
-                        boxRect.setHeight(boxRect.getHeight() - parentimage->patchMarginBottom - parentimage->patchMarginTop);
-                    }
-
-                    abAnchorLeft = (boxRect.getWidth() * layout.anchorLeft) + boxRect.getX();
-                    abAnchorRight = (boxRect.getWidth() * layout.anchorRight) + boxRect.getX();
-                    abAnchorTop = (boxRect.getHeight() * layout.anchorTop) + boxRect.getY();
-                    abAnchorBottom = (boxRect.getHeight() * layout.anchorBottom) + boxRect.getY();
-                }
-            }
-
-            if (layout.needUpdateAnchors){
-                transform.position.x = abAnchorLeft + layout.marginLeft;
-                transform.position.y = abAnchorTop + layout.marginTop;
-                transform.needUpdate = true;
-
-                float width = abAnchorRight - transform.position.x + layout.marginRight;
-                float height = abAnchorBottom - transform.position.y + layout.marginBottom;
-
-                if (width != layout.width || height != layout.height){
-                    layout.width = width;
-                    layout.height = height;
-                    layout.needUpdateSizes = true;
-                }
-
-                layout.needUpdateAnchors = false;
-            }else{
-                layout.marginLeft = transform.position.x - abAnchorLeft;
-                layout.marginTop = transform.position.y - abAnchorTop;
-                layout.marginRight = layout.width + transform.position.x - abAnchorRight;
-                layout.marginBottom = layout.height + transform.position.y - abAnchorBottom;
-            }
         }
 
         if (signature.test(scene->getComponentType<UIContainerComponent>())){
