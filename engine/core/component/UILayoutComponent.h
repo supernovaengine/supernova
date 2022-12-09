@@ -41,15 +41,15 @@ namespace Supernova{
         int marginRight = 0;
         int marginBottom = 0;
 
-        Rect scissor = Rect(0, 0, 0, 0);
-        bool ignoreScissor = false; // parent scissor
-
         AnchorPreset anchorPreset = AnchorPreset::NONE;
+        bool usingAnchors = false;
 
         int containerBoxIndex = -1;
 
+        Rect scissor = Rect(0, 0, 0, 0);
+        bool ignoreScissor = false; // ignore parent scissor
+
         bool needUpdateSizes = false;
-        bool needUpdateAnchors = false;
     };
     
 }

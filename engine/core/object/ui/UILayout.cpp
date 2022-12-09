@@ -61,7 +61,7 @@ void UILayout::setAnchors(float anchorLeft, float anchorTop, float anchorRight, 
     layout.anchorBottom = anchorBottom;
 
     layout.anchorPreset = AnchorPreset::NONE;
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 void UILayout::setAnchorLeft(float anchorLeft){
@@ -70,7 +70,7 @@ void UILayout::setAnchorLeft(float anchorLeft){
     layout.anchorLeft = anchorLeft;
 
     layout.anchorPreset = AnchorPreset::NONE;
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 void UILayout::setAnchorTop(float anchorTop){
@@ -79,7 +79,7 @@ void UILayout::setAnchorTop(float anchorTop){
     layout.anchorTop = anchorTop;
 
     layout.anchorPreset = AnchorPreset::NONE;
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 void UILayout::setAnchorRight(float anchorRight){
@@ -88,7 +88,7 @@ void UILayout::setAnchorRight(float anchorRight){
     layout.anchorRight = anchorRight;
 
     layout.anchorPreset = AnchorPreset::NONE;
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 void UILayout::setAnchorBottom(float anchorBottom){
@@ -97,7 +97,7 @@ void UILayout::setAnchorBottom(float anchorBottom){
     layout.anchorBottom = anchorBottom;
 
     layout.anchorPreset = AnchorPreset::NONE;
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 float UILayout::getAnchorLeft() const{
@@ -133,7 +133,7 @@ void UILayout::setMargins(int marginLeft, int marginTop, int marginRight, int ma
     layout.marginBottom = marginBottom;
 
     layout.anchorPreset = AnchorPreset::NONE;
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 void UILayout::setMarginLeft(int marginLeft){
@@ -142,7 +142,7 @@ void UILayout::setMarginLeft(int marginLeft){
     layout.marginLeft = marginLeft;
 
     layout.anchorPreset = AnchorPreset::NONE;
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 void UILayout::setMarginTop(int marginTop){
@@ -151,7 +151,7 @@ void UILayout::setMarginTop(int marginTop){
     layout.marginTop = marginTop;
 
     layout.anchorPreset = AnchorPreset::NONE;
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 void UILayout::setMarginRight(int marginRight){
@@ -160,7 +160,7 @@ void UILayout::setMarginRight(int marginRight){
     layout.marginRight = marginRight;
 
     layout.anchorPreset = AnchorPreset::NONE;
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 void UILayout::setMarginBottom(int marginBottom){
@@ -169,7 +169,7 @@ void UILayout::setMarginBottom(int marginBottom){
     layout.marginBottom = marginBottom;
 
     layout.anchorPreset = AnchorPreset::NONE;
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 int UILayout::getMarginLeft() const{
@@ -201,11 +201,23 @@ void UILayout::setAnchorPreset(AnchorPreset anchorPreset){
 
     layout.anchorPreset = anchorPreset;
 
-    layout.needUpdateAnchors = true;
+    layout.usingAnchors = true;
 }
 
 AnchorPreset UILayout::getAnchorPreset() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
     return layout.anchorPreset;
+}
+
+void UILayout::setUsingAnchors(bool usingAnchors){
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    layout.usingAnchors = usingAnchors;
+}
+
+bool UILayout::isUsingAnchors() const{
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    return layout.usingAnchors;
 }

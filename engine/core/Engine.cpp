@@ -393,7 +393,6 @@ void Engine::systemViewChanged(){
 
     for (int i = 0; i < numScenes; i++){
         scenes[i]->getSystem<RenderSystem>()->updateCameraSize(scenes[i]->getCamera());
-        scenes[i]->getSystem<UISystem>()->updateAllAnchors();
     }
 
     onViewChanged.call();

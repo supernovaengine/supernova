@@ -238,7 +238,7 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
     loadOrUpdateText(labeltext, labelui, labellayout);
     
     labellayout.anchorPreset = AnchorPreset::CENTER;
-    labellayout.needUpdateAnchors = true;
+    labellayout.usingAnchors = true;
 
     if (button.disabled){
         if (ui.texture != button.textureDisabled){
@@ -450,27 +450,9 @@ bool UISystem::loadOrUpdateText(TextComponent& text, UIComponent& ui, UILayoutCo
         createText(text, ui, layout);
 
         text.needUpdateText = false;
-        layout.needUpdateAnchors = true;
     }
 
     return true;
-}
-
-void UISystem::updateAllAnchors(){
-    auto layouts = scene->getComponentArray<UILayoutComponent>();
-    for (int i = 0; i < layouts->size(); i++){
-        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
-        Entity entity = layouts->getEntity(i);
-        Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<UIComponent>())){
-            UIComponent& ui = scene->getComponent<UIComponent>(entity);
-            if (ui.loaded){
-                layout.needUpdateAnchors = true;
-            }
-        }else{
-            layout.needUpdateAnchors = true;
-        }
-    }
 }
 
 void UISystem::applyAnchorPreset(UILayoutComponent& layout){
@@ -712,10 +694,6 @@ void UISystem::update(double dt){
 
             UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
             if (parentlayout){
-                if (parentlayout->needUpdateAnchors || parentlayout->needUpdateSizes){
-                    layout.needUpdateAnchors = true;
-                }
-
                 UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
                 if (parentcontainer){
                     if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
@@ -741,7 +719,7 @@ void UISystem::update(double dt){
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
-            if (layout.needUpdateAnchors){
+            if (layout.usingAnchors){
                 if (layout.anchorRight < layout.anchorLeft)
                     layout.anchorRight = layout.anchorLeft;
                 if (layout.anchorBottom < layout.anchorTop)
@@ -784,10 +762,16 @@ void UISystem::update(double dt){
                 }
             }
 
-            if (layout.needUpdateAnchors){
-                transform.position.x = abAnchorLeft + layout.marginLeft;
-                transform.position.y = abAnchorTop + layout.marginTop;
-                transform.needUpdate = true;
+            if (layout.usingAnchors){
+
+                float posX = abAnchorLeft + layout.marginLeft;
+                float posY = abAnchorTop + layout.marginTop;
+
+                if (posX != transform.position.x || posY != transform.position.y){
+                    transform.position.x = posX;
+                    transform.position.y = posY;
+                    transform.needUpdate = true;
+                }
 
                 float width = abAnchorRight - transform.position.x + layout.marginRight;
                 float height = abAnchorBottom - transform.position.y + layout.marginBottom;
@@ -798,7 +782,6 @@ void UISystem::update(double dt){
                     layout.needUpdateSizes = true;
                 }
 
-                layout.needUpdateAnchors = false;
             }else{
                 layout.marginLeft = transform.position.x - abAnchorLeft;
                 layout.marginTop = transform.position.y - abAnchorTop;
@@ -821,7 +804,6 @@ void UISystem::update(double dt){
             }
 
             layout.needUpdateSizes = false;
-            layout.needUpdateAnchors = true;
         }
 
         if (signature.test(scene->getComponentType<UIComponent>())){

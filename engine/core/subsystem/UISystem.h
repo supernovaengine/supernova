@@ -66,8 +66,6 @@ namespace Supernova{
 		void createButtonLabel(Entity entity, ButtonComponent& button);
 		void createTextEditObjects(Entity entity, TextEditComponent& textedit);
 
-		void updateAllAnchors();
-
 		virtual void load();
 		virtual void destroy();
 		virtual void update(double dt);

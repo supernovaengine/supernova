@@ -45,6 +45,9 @@ namespace Supernova{
 
         void setAnchorPreset(AnchorPreset anchorPreset);
         AnchorPreset getAnchorPreset() const;
+
+        void setUsingAnchors(bool usingAnchors);
+        bool isUsingAnchors() const;
     };
 }
 

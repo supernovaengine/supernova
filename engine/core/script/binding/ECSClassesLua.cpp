@@ -117,8 +117,11 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("marginRight", &UILayoutComponent::marginRight)
         .addProperty("marginBottom", &UILayoutComponent::marginBottom)
         .addProperty("anchorPreset", &UILayoutComponent::anchorPreset)
+        .addProperty("usingAnchors", &UILayoutComponent::usingAnchors)
+        .addProperty("containerBoxIndex", &UILayoutComponent::containerBoxIndex)
+        .addProperty("scissor", &UILayoutComponent::scissor)
+        .addProperty("ignoreScissor", &UILayoutComponent::ignoreScissor)
         .addProperty("needUpdateSizes", &UILayoutComponent::needUpdateSizes)
-        .addProperty("needUpdateAnchors", &UILayoutComponent::needUpdateAnchors)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
