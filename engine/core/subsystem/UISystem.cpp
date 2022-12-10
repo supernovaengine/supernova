@@ -667,7 +667,7 @@ void UISystem::update(double dt){
                             if (b < (container.numBoxes-1)){
                                 container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
                             }
-                            if (container.boxes[b].expand && layout.anchorPreset != AnchorPreset::NONE){
+                            if (container.boxes[b].expand){
                                 container.boxes[b].rect.setWidth(totalWidth / (b+1));
                             }
                             container.boxes[b].rect.setHeight(layout.height);
@@ -677,7 +677,7 @@ void UISystem::update(double dt){
                             if (b < (container.numBoxes-1)){
                                 container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + container.boxes[b+1].rect.getHeight());
                             }
-                            if (container.boxes[b].expand && layout.anchorPreset != AnchorPreset::NONE){
+                            if (container.boxes[b].expand){
                                 container.boxes[b].rect.setHeight(totalHeight / (b+1));
                             }
                             container.boxes[b].rect.setWidth(layout.width);
@@ -698,6 +698,7 @@ void UISystem::update(double dt){
                 if (parentcontainer){
                     if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
                         layout.containerBoxIndex = parentcontainer->numBoxes;
+                        layout.usingAnchors = true;
                         parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
                         parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
 
@@ -864,7 +865,7 @@ void UISystem::update(double dt){
         if (signature.test(scene->getComponentType<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
             // reseting all container boxes
-            for (int b = 0; b < MAX_CONTAINER_BOXES; b++){
+            for (int b = 0; b < container.numBoxes; b++){
                 container.boxes[b].layout = NULL_ENTITY;
             }
             container.numBoxes = 0;
