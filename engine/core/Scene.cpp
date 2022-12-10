@@ -68,6 +68,8 @@ Scene::Scene(){
 	ambientLight = Vector3(1.0, 1.0, 1.0);
 	ambientFactor = 0.2;
 
+	enableUIEvents = true;
+
 	if (camera == NULL_ENTITY){
 		camera = createDefaultCamera();
 	}
@@ -174,6 +176,14 @@ bool Scene::isSceneAmbientLightEnabled() const{
 
 void Scene::setSceneAmbientLightEnabled(bool hasSceneAmbientLight){
 	this->hasSceneAmbientLight = hasSceneAmbientLight;
+}
+
+bool Scene::isEnableUIEvents() const{
+	return this->enableUIEvents;
+}
+
+void Scene::setEnableUIEvents(bool enableUIEvents){
+	this->enableUIEvents = enableUIEvents;
 }
 
 void Scene::load(){

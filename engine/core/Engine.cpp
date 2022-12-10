@@ -482,7 +482,8 @@ void Engine::systemTouchStart(int pointer, float x, float y){
         }
 
         for (int i = 0; i < numScenes; i++){
-            scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
+            if (scenes[i]->isEnableUIEvents())
+                scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
         }
     }
 }
@@ -502,7 +503,8 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
         }
 
         for (int i = 0; i < numScenes; i++){
-            scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
+            if (scenes[i]->isEnableUIEvents())
+                scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
         }
     }
 }
@@ -546,8 +548,9 @@ void Engine::systemMouseDown(int button, float x, float y, int mods){
         }
 
         for (int i = 0; i < numScenes; i++){
-            if (button == S_MOUSE_BUTTON_1)
-                scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
+            if (scenes[i]->isEnableUIEvents())
+                if (button == S_MOUSE_BUTTON_1)
+                    scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
         }
     }
 }
@@ -568,8 +571,9 @@ void Engine::systemMouseUp(int button, float x, float y, int mods){
         }
 
         for (int i = 0; i < numScenes; i++){
-            if (button == S_MOUSE_BUTTON_1)
-                scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
+            if (scenes[i]->isEnableUIEvents())
+                if (button == S_MOUSE_BUTTON_1)
+                    scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
         }
     }
 }
@@ -637,6 +641,7 @@ void Engine::systemCharInput(wchar_t codepoint){
     onCharInput.call(codepoint);
 
     for (int i = 0; i < numScenes; i++){
-        scenes[i]->getSystem<UISystem>()->eventOnCharInput(codepoint);
+        if (scenes[i]->isEnableUIEvents())
+            scenes[i]->getSystem<UISystem>()->eventOnCharInput(codepoint);
     }
 }

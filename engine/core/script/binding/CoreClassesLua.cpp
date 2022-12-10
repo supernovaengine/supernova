@@ -259,6 +259,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addProperty("ambientLightFactor", &Scene::getAmbientLightFactor, (void (Scene::*)(float))&Scene::setAmbientLight)
         .addFunction("setAmbientLight", (void (Scene::*)(float, Vector3))&Scene::setAmbientLight)
         .addProperty("sceneAmbientLightEnabled", &Scene::isSceneAmbientLightEnabled, &Scene::setSceneAmbientLightEnabled)
+        .addProperty("enableUIEvents", &Scene::isEnableUIEvents, &Scene::setEnableUIEvents)
         .addFunction("findBranchLastIndex", &Scene::findBranchLastIndex)
         .addFunction("createEntity", &Scene::createEntity)
         .addFunction("destroyEntity", &Scene::destroyEntity)

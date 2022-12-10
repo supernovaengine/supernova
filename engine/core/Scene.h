@@ -64,6 +64,8 @@ namespace Supernova{
 		Vector3 ambientLight;
 		float ambientFactor;
 
+		bool enableUIEvents;
+
 	    EntityManager entityManager;
 	    ComponentManager componentManager;
 		std::vector<std::pair<const char*, std::shared_ptr<SubSystem>>> systems;
@@ -108,6 +110,9 @@ namespace Supernova{
 
 		bool isSceneAmbientLightEnabled() const;
 		void setSceneAmbientLightEnabled(bool hasSceneAmbientLight);
+
+		bool isEnableUIEvents() const;
+		void setEnableUIEvents(bool enableUIEvents);
 
 		int32_t findBranchLastIndex(Entity entity);
 	
