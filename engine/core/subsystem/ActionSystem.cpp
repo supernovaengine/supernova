@@ -104,12 +104,9 @@ void ActionSystem::actionComponentPause(ActionComponent& action){
 }
 
 void ActionSystem::actionUpdate(double dt, ActionComponent& action){
-    // need to re-check if running to not run after stopped
-    if (action.state == ActionState::Running){
-        action.timecount += dt * action.speed;
+    action.timecount += dt * action.speed;
 
-        action.onStep.call();
-    }
+    action.onStep.call();
 }
 
 void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& action, AnimationComponent& animcomp){
@@ -678,6 +675,7 @@ void ActionSystem::update(double dt){
                     MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
                     spriteActionUpdate(dt, entity, action, mesh, sprite, spriteanim);
+                    if (action.state != ActionState::Running) continue;
                 }
             }
 
@@ -689,6 +687,7 @@ void ActionSystem::update(double dt){
                     ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(action.target);
 
                     particlesActionUpdate(dt, entity, action, partanim, particles);
+                    if (action.state != ActionState::Running) continue;
                 }
             }
 
@@ -697,6 +696,7 @@ void ActionSystem::update(double dt){
                 KeyframeTracksComponent& keyframe = scene->getComponent<KeyframeTracksComponent>(entity);
 
                 keyframeUpdate(dt, action, keyframe);
+                if (action.state != ActionState::Running) continue;
 
                 if (signature.test(scene->getComponentType<TranslateTracksComponent>())){
                     TranslateTracksComponent& translatetracks = scene->getComponent<TranslateTracksComponent>(entity);
@@ -744,6 +744,7 @@ void ActionSystem::update(double dt){
                 TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
 
                 timedActionUpdate(dt, entity, action, timedaction);
+                if (action.state != ActionState::Running) continue;
 
                 //Transform animation
                 if (targetSignature.test(scene->getComponentType<Transform>())){
