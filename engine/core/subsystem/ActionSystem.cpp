@@ -17,12 +17,12 @@ ActionSystem::ActionSystem(Scene* scene): SubSystem(scene){
 
 void ActionSystem::actionStart(Entity entity){
     ActionComponent& action = scene->getComponent<ActionComponent>(entity);
+    Signature signature = scene->getSignature(entity);
 
     actionComponentStart(action);
 
     if (action.target != NULL_ENTITY){
         Signature targetSignature = scene->getSignature(action.target);
-        Signature signature = scene->getSignature(entity);
 
         if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
             SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
@@ -56,12 +56,18 @@ void ActionSystem::actionComponentStart(ActionComponent& action){
 
 void ActionSystem::actionStop(Entity entity){
     ActionComponent& action = scene->getComponent<ActionComponent>(entity);
+    Signature signature = scene->getSignature(entity);
 
     actionComponentStop(action);
 
+    if (signature.test(scene->getComponentType<TimedActionComponent>())){
+        TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
+
+        timedActionStop(timedaction);
+    }
+
     if (action.target != NULL_ENTITY){
         Signature targetSignature = scene->getSignature(action.target);
-        Signature signature = scene->getSignature(entity);
 
         if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
             SpriteAnimationComponent& spriteanim = scene->getComponent<SpriteAnimationComponent>(entity);
@@ -72,12 +78,6 @@ void ActionSystem::actionStop(Entity entity){
                 spriteActionStop(mesh, sprite, spriteanim);
 
             }
-        }
-
-        if (signature.test(scene->getComponentType<TimedActionComponent>())){
-            TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
-
-            timedActionStop(timedaction);
         }
     }
 }
@@ -104,7 +104,12 @@ void ActionSystem::actionComponentPause(ActionComponent& action){
 }
 
 void ActionSystem::actionUpdate(double dt, ActionComponent& action){
-    action.timecount += dt * action.speed;
+    // need to re-check if running to not run after stopped
+    if (action.state == ActionState::Running){
+        action.timecount += dt * action.speed;
+
+        action.onStep.call();
+    }
 }
 
 void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& action, AnimationComponent& animcomp){
@@ -656,11 +661,14 @@ void ActionSystem::update(double dt){
         actionStateChange(actions->getEntity(i), action);
 
         // Action update
-        if ((action.state == ActionState::Running) && (action.target != NULL_ENTITY)){
+        if (action.state == ActionState::Running){
 
             Entity entity = actions->getEntity(i);
-            Signature targetSignature = scene->getSignature(action.target);
             Signature signature = scene->getSignature(entity);
+            Signature targetSignature;
+            if (action.target != NULL_ENTITY){
+                targetSignature = scene->getSignature(action.target);
+            }
 
             //Sprite animation
             if (signature.test(scene->getComponentType<SpriteAnimationComponent>())){
@@ -683,6 +691,54 @@ void ActionSystem::update(double dt){
                     particlesActionUpdate(dt, entity, action, partanim, particles);
                 }
             }
+
+            //keyframe animation
+            if (signature.test(scene->getComponentType<KeyframeTracksComponent>())){
+                KeyframeTracksComponent& keyframe = scene->getComponent<KeyframeTracksComponent>(entity);
+
+                keyframeUpdate(dt, action, keyframe);
+
+                if (signature.test(scene->getComponentType<TranslateTracksComponent>())){
+                    TranslateTracksComponent& translatetracks = scene->getComponent<TranslateTracksComponent>(entity);
+
+                    if (targetSignature.test(scene->getComponentType<Transform>())){
+                        Transform& transform = scene->getComponent<Transform>(action.target);
+
+                        translateTracksUpdate(keyframe, translatetracks, transform);
+                    }
+                }
+
+                if (signature.test(scene->getComponentType<RotateTracksComponent>())){
+                    RotateTracksComponent& rotatetracks = scene->getComponent<RotateTracksComponent>(entity);
+
+                    if (targetSignature.test(scene->getComponentType<Transform>())){
+                        Transform& transform = scene->getComponent<Transform>(action.target);
+
+                        rotateTracksUpdate(keyframe, rotatetracks, transform);
+                    }
+                }
+
+                if (signature.test(scene->getComponentType<ScaleTracksComponent>())){
+                    ScaleTracksComponent& scaletracks = scene->getComponent<ScaleTracksComponent>(entity);
+
+                    if (targetSignature.test(scene->getComponentType<Transform>())){
+                        Transform& transform = scene->getComponent<Transform>(action.target);
+
+                        scaleTracksUpdate(keyframe, scaletracks, transform);
+                    }
+                }
+
+                if (signature.test(scene->getComponentType<MorphTracksComponent>())){
+                    MorphTracksComponent& morpthtracks = scene->getComponent<MorphTracksComponent>(entity);
+
+                    if (targetSignature.test(scene->getComponentType<MeshComponent>())){
+                        MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
+
+                        morphTracksUpdate(keyframe, morpthtracks, mesh);
+                    }
+                }
+            }
+
 
             if (signature.test(scene->getComponentType<TimedActionComponent>())){
                 TimedActionComponent& timedaction = scene->getComponent<TimedActionComponent>(entity);
@@ -743,53 +799,7 @@ void ActionSystem::update(double dt){
                         alphaActionUIUpdate(dt, action, timedaction, alphaaction, uirender);
                     }
                 }
-            }
 
-            //keyframe animation
-            if (signature.test(scene->getComponentType<KeyframeTracksComponent>())){
-                KeyframeTracksComponent& keyframe = scene->getComponent<KeyframeTracksComponent>(entity);
-
-                keyframeUpdate(dt, action, keyframe);
-
-                if (signature.test(scene->getComponentType<TranslateTracksComponent>())){
-                    TranslateTracksComponent& translatetracks = scene->getComponent<TranslateTracksComponent>(entity);
-
-                    if (targetSignature.test(scene->getComponentType<Transform>())){
-                        Transform& transform = scene->getComponent<Transform>(action.target);
-
-                        translateTracksUpdate(keyframe, translatetracks, transform);
-                    }
-                }
-
-                if (signature.test(scene->getComponentType<RotateTracksComponent>())){
-                    RotateTracksComponent& rotatetracks = scene->getComponent<RotateTracksComponent>(entity);
-
-                    if (targetSignature.test(scene->getComponentType<Transform>())){
-                        Transform& transform = scene->getComponent<Transform>(action.target);
-
-                        rotateTracksUpdate(keyframe, rotatetracks, transform);
-                    }
-                }
-
-                if (signature.test(scene->getComponentType<ScaleTracksComponent>())){
-                    ScaleTracksComponent& scaletracks = scene->getComponent<ScaleTracksComponent>(entity);
-
-                    if (targetSignature.test(scene->getComponentType<Transform>())){
-                        Transform& transform = scene->getComponent<Transform>(action.target);
-
-                        scaleTracksUpdate(keyframe, scaletracks, transform);
-                    }
-                }
-
-                if (signature.test(scene->getComponentType<MorphTracksComponent>())){
-                    MorphTracksComponent& morpthtracks = scene->getComponent<MorphTracksComponent>(entity);
-
-                    if (targetSignature.test(scene->getComponentType<MeshComponent>())){
-                        MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
-
-                        morphTracksUpdate(keyframe, morpthtracks, mesh);
-                    }
-                }
             }
 
             actionUpdate(dt, action);

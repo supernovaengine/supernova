@@ -25,6 +25,8 @@ namespace Supernova{
         FunctionSubscribe<void()> onStart;
         FunctionSubscribe<void()> onPause;
         FunctionSubscribe<void()> onStop;
+
+        FunctionSubscribe<void()> onStep;
     };
 
     
