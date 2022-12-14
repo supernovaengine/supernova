@@ -94,9 +94,6 @@ namespace Supernova{
 
 		void updateMVP(Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 
-		// billboard
-		void updateSpriteBillboard(SpriteComponent& sprite, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
-
 		void createFramebuffer(CameraComponent& camera);
 		void createEmptyTextures();
 		void checkLightsAndShadow();

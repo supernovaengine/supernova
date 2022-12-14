@@ -2003,13 +2003,12 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 	}
 }
 
-void RenderSystem::updateSpriteBillboard(SpriteComponent& sprite, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
-
-	if (sprite.billboard && !sprite.fakeBillboard){
+void RenderSystem::updateMVP(Transform& transform, CameraComponent& camera, Transform& cameraTransform){
+	if (transform.billboard && !transform.fakeBillboard){
 
 		Vector3 camPos = cameraTransform.worldPosition;
 
-		if (sprite.cylindricalBillboard)
+		if (transform.cylindricalBillboard)
 			camPos.y = transform.worldPosition.y;
 
 		Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp);
@@ -2028,14 +2027,14 @@ void RenderSystem::updateSpriteBillboard(SpriteComponent& sprite, Transform& tra
 
 	}
 
-	if (sprite.billboard && sprite.fakeBillboard){
+	if (transform.billboard && transform.fakeBillboard){
 		Matrix4 modelViewMatrix = camera.viewMatrix * transform.modelMatrix;
 
 		modelViewMatrix.set(0, 0, transform.worldScale.x);
 		modelViewMatrix.set(0, 1, 0.0);
 		modelViewMatrix.set(0, 2, 0.0);
 
-		if (!sprite.cylindricalBillboard) {
+		if (!transform.cylindricalBillboard) {
 			modelViewMatrix.set(1, 0, 0.0);
 			modelViewMatrix.set(1, 1, transform.worldScale.y);
 			modelViewMatrix.set(1, 2, 0.0);
@@ -2046,12 +2045,11 @@ void RenderSystem::updateSpriteBillboard(SpriteComponent& sprite, Transform& tra
 		modelViewMatrix.set(2, 2, transform.worldScale.z);
 
 		transform.modelViewProjectionMatrix = camera.projectionMatrix * modelViewMatrix;
-	}
-}
+	}else{
 
-void RenderSystem::updateMVP(Transform& transform, CameraComponent& camera, Transform& cameraTransform){
-	//TODO: it is not necessary mvp when sprite is billboard
-	transform.modelViewProjectionMatrix = camera.viewProjectionMatrix * transform.modelMatrix;
+		transform.modelViewProjectionMatrix = camera.viewProjectionMatrix * transform.modelMatrix;
+
+	}
 
 	transform.distanceToCamera = (cameraTransform.worldPosition - transform.worldPosition).length();
 }
@@ -2116,12 +2114,6 @@ void RenderSystem::update(double dt){
 			// need to be updated for every camera
 			if (!hasMultipleCameras){
 				updateMVP(transform, mainCamera, mainCameraTransform);
-
-				if (signature.test(scene->getComponentType<SpriteComponent>())){
-					SpriteComponent& sprite = scene->getComponent<SpriteComponent>(entity);
-
-					updateSpriteBillboard(sprite, transform, mainCamera, mainCameraTransform);
-				}
 
 				if (signature.test(scene->getComponentType<TerrainComponent>())){
 					TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
@@ -2316,12 +2308,6 @@ void RenderSystem::draw(){
 
 			if (hasMultipleCameras){
 				updateMVP(transform, camera, cameraTransform);
-
-				if (signature.test(scene->getComponentType<SpriteComponent>())){
-					SpriteComponent& sprite = scene->getComponent<SpriteComponent>(entity);
-
-					updateSpriteBillboard(sprite, transform, camera, cameraTransform);
-				}
 			}
 
 			// apply scissor on UI

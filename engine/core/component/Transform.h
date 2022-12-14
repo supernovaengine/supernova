@@ -31,6 +31,10 @@ namespace Supernova{
 
         float distanceToCamera = 0;
 
+        bool billboard = false;
+        bool fakeBillboard = false;
+        bool cylindricalBillboard = false;
+
         bool needUpdate = true;
     };
 

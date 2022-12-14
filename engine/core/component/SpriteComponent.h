@@ -12,10 +12,6 @@ namespace Supernova{
 
         FrameData framesRect[MAX_SPRITE_FRAMES];
 
-        bool billboard = false;
-        bool fakeBillboard = false;
-        bool cylindricalBillboard = false;
-
         bool automaticFlipY = true;
         bool flipY = false;
 

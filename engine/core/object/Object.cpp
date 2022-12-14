@@ -127,6 +127,14 @@ Vector3 Object::getWorldScale() const{
     return transform.worldScale;
 }
 
+void Object::setBillboard(bool billboard, bool fake, bool cylindrical){
+    Transform& transform = getComponent<Transform>();
+
+    transform.billboard = billboard;
+    transform.fakeBillboard = fake;
+    transform.cylindricalBillboard = cylindrical;
+}
+
 void Object::setModelMatrix(Matrix4 modelMatrix){
     Transform& transform = getComponent<Transform>();
     transform.modelMatrix = modelMatrix;

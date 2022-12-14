@@ -31,8 +31,6 @@ namespace Supernova{
         void setFlipY(bool flipY);
         bool isFlipY() const;
 
-        void setBillboard(bool billboard, bool fake = true, bool cylindrical = true);
-
         void setTextureRect(float x, float y, float width, float height);
         void setTextureRect(Rect textureRect);
         Rect getTextureRect() const;

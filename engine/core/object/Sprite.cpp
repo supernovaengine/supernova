@@ -81,14 +81,6 @@ bool Sprite::isFlipY() const{
     return spritecomp.flipY;
 }
 
-void Sprite::setBillboard(bool billboard, bool fake, bool cylindrical){
-    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-
-    spritecomp.billboard = billboard;
-    spritecomp.fakeBillboard = fake;
-    spritecomp.cylindricalBillboard = cylindrical;
-}
-
 void Sprite::setTextureRect(float x, float y, float width, float height){
     setTextureRect(Rect(x, y, width, height));
 }

@@ -52,6 +52,8 @@ namespace Supernova{
         Vector3 getScale() const;
         Vector3 getWorldScale() const;
 
+        void setBillboard(bool billboard, bool fake = true, bool cylindrical = true);
+
         void setModelMatrix(Matrix4 modelMatrix);
     
         template <typename T>
