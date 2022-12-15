@@ -277,6 +277,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("flipY", &Sprite::isFlipY, &Sprite::setFlipY)
         .addProperty("textureRect", &Sprite::getTextureRect, (void(Sprite::*)(Rect))&Sprite::setTextureRect)
         .addFunction("setTextureRect",(void(Sprite::*)(float, float, float, float)) &Sprite::setTextureRect)
+        .addProperty("pivot", &Sprite::getPivot, &Sprite::setPivot)
         .addFunction("addFrame", 
             luabridge::overload<int, std::string, Rect>(&Sprite::addFrame),
             luabridge::overload<std::string, float, float, float, float>(&Sprite::addFrame),
@@ -358,6 +359,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getNumChars", &Text::getNumChars)
         .addFunction("getCharPosition", &Text::getCharPosition)
         .addProperty("flipY", &Text::isFlipY, &Text::setFlipY)
+        .addProperty("pivotBaseline", &Text::isPivotBaseline, &Text::setPivotBaseline)
+        .addProperty("pivotCentered", &Text::isPivotCentered, &Text::setPivotCentered)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

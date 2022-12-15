@@ -215,3 +215,29 @@ bool Text::isFlipY() const{
 
     return ui.flipY;
 }
+
+void Text::setPivotBaseline(bool pivotBaseline){
+    TextComponent& textcomp = getComponent<TextComponent>();
+
+    textcomp.pivotBaseline = pivotBaseline;
+    textcomp.needUpdateText = true;
+}
+
+bool Text::isPivotBaseline() const{
+    TextComponent& textcomp = getComponent<TextComponent>();
+
+    return textcomp.pivotBaseline;
+}
+
+void Text::setPivotCentered(bool pivotCentered){
+    TextComponent& textcomp = getComponent<TextComponent>();
+
+    textcomp.pivotCentered = pivotCentered;
+    textcomp.needUpdateText = true;
+}
+
+bool Text::isPivotCentered() const{
+    TextComponent& textcomp = getComponent<TextComponent>();
+
+    return textcomp.pivotCentered;
+}

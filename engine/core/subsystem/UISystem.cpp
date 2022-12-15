@@ -198,6 +198,27 @@ void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponen
 
     text.stbtext->createText(text.text, &ui.buffer, indices_array, text.charPositions, layout.width, layout.height, text.fixedWidth, text.fixedHeight, text.multiline, ui.flipY);
 
+    if (text.pivotCentered || !text.pivotBaseline){
+        Attribute* atrVertice = ui.buffer.getAttribute(AttributeType::POSITION);
+        for (int i = 0; i < ui.buffer.getCount(); i++){
+            Vector3 vertice = ui.buffer.getVector3(atrVertice, i);
+
+            if (text.pivotCentered){
+                vertice.x = vertice.x - (layout.width / 2.0);
+            }
+
+            if (!text.pivotBaseline){
+                if (!ui.flipY){
+                    vertice.y = vertice.y + text.stbtext->getAscent();
+                }else{
+                    vertice.y = vertice.y + layout.height - text.stbtext->getAscent();
+                }
+            }
+
+            ui.buffer.setVector3(i, atrVertice, vertice);
+        }
+    }
+
     ui.indices.setValues(
             0, ui.indices.getAttribute(AttributeType::INDEX),
             indices_array.size(), (char*)&indices_array[0], sizeof(uint16_t));

@@ -97,6 +97,19 @@ Rect Sprite::getTextureRect() const{
     return mesh.submeshes[0].textureRect;
 }
 
+void Sprite::setPivot(PivotPreset pivot){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    spritecomp.pivot = pivot;
+    spritecomp.needUpdateSprite = true;
+}
+
+PivotPreset Sprite::getPivot() const{
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+
+    return spritecomp.pivot;
+}
+
 void Sprite::addFrame(int id, std::string name, Rect rect){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
     if (id >= 0 && id < MAX_SPRITE_FRAMES){

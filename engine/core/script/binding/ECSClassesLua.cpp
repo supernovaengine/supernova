@@ -24,6 +24,7 @@
 #include "component/ButtonComponent.h"
 #include "component/ParticlesAnimationComponent.h"
 #include "component/AudioComponent.h"
+#include "component/SpriteComponent.h"
 
 using namespace Supernova;
 
@@ -64,6 +65,19 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("VERTICAL_CENTER_WIDE", AnchorPreset::VERTICAL_CENTER_WIDE)
         .addProperty("HORIZONTAL_CENTER_WIDE", AnchorPreset::HORIZONTAL_CENTER_WIDE)
         .addProperty("FULL_LAYOUT", AnchorPreset::FULL_LAYOUT)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("PivotPreset")
+        .addProperty("CENTER", PivotPreset::CENTER)
+        .addProperty("TOP_CENTER", PivotPreset::TOP_CENTER)
+        .addProperty("BOTTOM_CENTER", PivotPreset::BOTTOM_CENTER)
+        .addProperty("LEFT_CENTER", PivotPreset::LEFT_CENTER)
+        .addProperty("RIGHT_CENTER", PivotPreset::RIGHT_CENTER)
+        .addProperty("TOP_LEFT", PivotPreset::TOP_LEFT)
+        .addProperty("BOTTOM_LEFT", PivotPreset::BOTTOM_LEFT)
+        .addProperty("TOP_RIGHT", PivotPreset::TOP_RIGHT)
+        .addProperty("BOTTOM_RIGHT", PivotPreset::BOTTOM_RIGHT)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)

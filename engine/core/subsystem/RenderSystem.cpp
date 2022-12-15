@@ -2003,7 +2003,7 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 	}
 }
 
-void RenderSystem::updateMVP(Transform& transform, CameraComponent& camera, Transform& cameraTransform){
+void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
 	if (transform.billboard && !transform.fakeBillboard){
 
 		Vector3 camPos = cameraTransform.worldPosition;
@@ -2011,7 +2011,7 @@ void RenderSystem::updateMVP(Transform& transform, CameraComponent& camera, Tran
 		if (transform.cylindricalBillboard)
 			camPos.y = transform.worldPosition.y;
 
-		Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp);
+		Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp).inverse();
 
 		Quaternion oldRotation = transform.rotation;
 
@@ -2022,12 +2022,34 @@ void RenderSystem::updateMVP(Transform& transform, CameraComponent& camera, Tran
 		}
 
 		if (transform.rotation != oldRotation){
-			updateTransform(transform);
+			transform.needUpdate = true;
+
+			std::vector<Entity> parentList;
+			auto transforms = scene->getComponentArray<Transform>();
+			for (int i = index; i < transforms->size(); i++){
+				Transform& transform = transforms->getComponentFromIndex(i);
+
+				// Finding childs
+				if (i > index){
+					if (std::find(parentList.begin(), parentList.end(), transform.parent) != parentList.end()){
+						transform.needUpdate = true;
+					}else{
+						break;
+					}
+				}
+
+				if (transform.needUpdate){
+					Entity entity = transforms->getEntity(i);
+					parentList.push_back(entity);
+					updateTransform(transform);
+				}
+			}
 		}
 
 	}
 
 	if (transform.billboard && transform.fakeBillboard){
+		
 		Matrix4 modelViewMatrix = camera.viewMatrix * transform.modelMatrix;
 
 		modelViewMatrix.set(0, 0, transform.worldScale.x);
@@ -2045,6 +2067,7 @@ void RenderSystem::updateMVP(Transform& transform, CameraComponent& camera, Tran
 		modelViewMatrix.set(2, 2, transform.worldScale.z);
 
 		transform.modelViewProjectionMatrix = camera.projectionMatrix * modelViewMatrix;
+
 	}else{
 
 		transform.modelViewProjectionMatrix = camera.viewProjectionMatrix * transform.modelMatrix;
@@ -2113,7 +2136,7 @@ void RenderSystem::update(double dt){
 
 			// need to be updated for every camera
 			if (!hasMultipleCameras){
-				updateMVP(transform, mainCamera, mainCameraTransform);
+				updateMVP(i, transform, mainCamera, mainCameraTransform);
 
 				if (signature.test(scene->getComponentType<TerrainComponent>())){
 					TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
@@ -2307,7 +2330,7 @@ void RenderSystem::draw(){
 			Signature signature = scene->getSignature(entity);
 
 			if (hasMultipleCameras){
-				updateMVP(transform, camera, cameraTransform);
+				updateMVP(i, transform, camera, cameraTransform);
 			}
 
 			// apply scissor on UI

@@ -92,7 +92,7 @@ namespace Supernova{
 		std::map<std::string, BufferRender*> bufferNameToRender;
 		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
 
-		void updateMVP(Transform& transform, CameraComponent& camera, Transform& cameraTransform);
+		void updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 
 		void createFramebuffer(CameraComponent& camera);
 		void createEmptyTextures();

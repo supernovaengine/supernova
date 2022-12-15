@@ -29,10 +29,35 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh){
 
     Attribute* attVertex = buffer->getAttribute(AttributeType::POSITION);
 
-    buffer->addVector3(attVertex, Vector3(0, 0, 0));
-    buffer->addVector3(attVertex, Vector3(sprite.width, 0, 0));
-    buffer->addVector3(attVertex, Vector3(sprite.width,  sprite.height, 0));
-    buffer->addVector3(attVertex, Vector3(0,  sprite.height, 0));
+    Vector2 pivotPos = Vector2(0, 0);
+
+    if (sprite.pivot == PivotPreset::BOTTOM_RIGHT){
+        pivotPos.x = sprite.width;
+    }else if (sprite.pivot == PivotPreset::TOP_RIGHT){
+        pivotPos.x = sprite.width;
+        pivotPos.y = sprite.height;
+    }else if (sprite.pivot == PivotPreset::TOP_LEFT){
+        pivotPos.y = sprite.height;
+    }else if (sprite.pivot == PivotPreset::TOP_CENTER){
+        pivotPos.x = sprite.width / 2.0;
+        pivotPos.y = sprite.height;
+    }else if (sprite.pivot == PivotPreset::BOTTOM_CENTER){
+        pivotPos.x = sprite.width / 2.0;
+    }else if (sprite.pivot == PivotPreset::RIGHT_CENTER){
+        pivotPos.x = sprite.width;
+        pivotPos.y = sprite.height / 2.0;
+    }else if (sprite.pivot == PivotPreset::LEFT_CENTER){
+        pivotPos.y = sprite.height / 2.0;
+    }
+
+    if (!sprite.flipY){
+        pivotPos.y = sprite.height - pivotPos.y;
+    }
+
+    buffer->addVector3(attVertex, Vector3(-pivotPos.x, -pivotPos.y, 0));
+    buffer->addVector3(attVertex, Vector3(sprite.width-pivotPos.x, -pivotPos.y, 0));
+    buffer->addVector3(attVertex, Vector3(sprite.width-pivotPos.x,  sprite.height-pivotPos.y, 0));
+    buffer->addVector3(attVertex, Vector3(-pivotPos.x,  sprite.height-pivotPos.y, 0));
 
     Attribute* attTexcoord = buffer->getAttribute(AttributeType::TEXCOORD1);
 

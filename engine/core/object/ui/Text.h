@@ -53,6 +53,12 @@ namespace Supernova{
 
         void setFlipY(bool flipY);
         bool isFlipY() const;
+
+        void setPivotBaseline(bool pivotBaseline);
+        bool isPivotBaseline() const;
+
+        void setPivotCentered(bool pivotCentered);
+        bool isPivotCentered() const;
     };
 }
 

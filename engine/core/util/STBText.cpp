@@ -154,11 +154,6 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>
     
     float offsetX = 0;
     float offsetY = 0;
-    if (!invert){
-        offsetY = this->ascent; // using pivot point at top-left
-    }else{
-        offsetY = this->descent; // using pivot point at bottom-left
-    }
 
     Attribute* atrVertice = buffer->getAttribute(AttributeType::POSITION);
     Attribute* atrTexcoord = buffer->getAttribute(AttributeType::TEXCOORD1);

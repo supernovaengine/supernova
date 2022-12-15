@@ -57,6 +57,7 @@ namespace luabridge
 
     template<> struct Stack<AnchorPreset> : EnumWrapper<AnchorPreset>{};
     template<> struct Stack<ContainerType> : EnumWrapper<ContainerType>{};
+    template<> struct Stack<PivotPreset> : EnumWrapper<PivotPreset>{};
 
     template <>
     struct Stack <Touch>

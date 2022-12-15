@@ -22,6 +22,9 @@ namespace Supernova{
         bool fixedWidth = false;
         bool fixedHeight = false;
 
+        bool pivotBaseline = false;
+        bool pivotCentered = false;
+
         STBText* stbtext = NULL;
 
         bool needReload = false;
