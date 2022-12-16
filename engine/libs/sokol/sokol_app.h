@@ -28,7 +28,6 @@
     Optionally provide the following defines with your own implementations:
 
         SOKOL_ASSERT(c)     - your own assert macro (default: assert(c))
-        SOKOL_LOG(msg)      - your own logging function (default: puts(msg))
         SOKOL_UNREACHABLE() - a guard macro for unreachable code (default: assert(false))
         SOKOL_ABORT()       - called after an unrecoverable error (default: abort())
         SOKOL_WIN32_FORCE_MAIN  - define this on Win32 to use a main() entry point instead of WinMain
@@ -204,7 +203,7 @@
             The fail callback is called when a fatal error is encountered
             during start which doesn't allow the program to continue.
             Providing a callback here gives you a chance to show an error message
-            to the user. The default behaviour is SOKOL_LOG(msg)
+            to the user. The default behaviour is SAPP_LOG(msg)
 
         As you can see, those 'standard callbacks' don't have a user_data
         argument, so any data that needs to be preserved between callbacks
@@ -634,8 +633,10 @@
         sapp_html5_fetch_dropped_file(&(sapp_html5_fetch_request){
             .dropped_file_index = 0,
             .callback = fetch_cb
-            .buffer_ptr = buf,
-            .buffer_size = buf_size,
+            .buffer = {
+                .ptr = buf,
+                .size = sizeof(buf)
+            },
             .user_data = ...
         });
 
@@ -649,9 +650,9 @@
             // IMPORTANT: check if the loading operation actually succeeded:
             if (response->succeeded) {
                 // the size of the loaded file:
-                const uint32_t num_bytes = response->fetched_size;
+                const size_t num_bytes = response->data.size;
                 // and the pointer to the data (same as 'buf' in the fetch-call):
-                const void* ptr = response->buffer_ptr;
+                const void* ptr = response->data.ptr;
             }
             else {
                 // on error check the error code:
@@ -1029,7 +1030,7 @@
                 .allocator = {
                     .alloc = my_alloc,
                     .free = my_free,
-                    .user_data = ...;
+                    .user_data = ...,
                 }
             };
         }
@@ -1038,6 +1039,29 @@
 
     This only affects memory allocation calls done by sokol_app.h
     itself though, not any allocations in OS libraries.
+
+
+    LOG FUNCTION OVERRIDE
+    =====================
+    You can override the log function at initialization time like this:
+
+        void my_log(const char* message, void* user_data) {
+            printf("sapp says: \s\n", message);
+        }
+
+        sapp_desc sokol_main(int argc, char* argv[]) {
+            return (sapp_desc){
+                // ...
+                .logger = {
+                    .log_cb = my_log,
+                    .user_data = ...,
+                }
+            };
+        }
+
+    If no overrides are provided, puts will be used on most platforms.
+    On Android, __android_log_write will be used instead.
+
 
     TEMP NOTE DUMP
     ==============
@@ -1276,6 +1300,23 @@ typedef enum sapp_keycode {
 } sapp_keycode;
 
 /*
+    Android specific 'tool type' enum for touch events. This lets the
+    application check what type of input device was used for
+    touch events.
+
+    NOTE: the values must remain in sync with the corresponding
+    Android SDK type, so don't change those.
+
+    See https://developer.android.com/reference/android/view/MotionEvent#TOOL_TYPE_UNKNOWN
+*/
+typedef enum sapp_android_tooltype {
+    SAPP_ANDROIDTOOLTYPE_UNKNOWN = 0,   // TOOL_TYPE_UNKNOWN
+    SAPP_ANDROIDTOOLTYPE_FINGER = 1,    // TOOL_TYPE_FINGER
+    SAPP_ANDROIDTOOLTYPE_STYLUS = 2,    // TOOL_TYPE_STYLUS
+    SAPP_ANDROIDTOOLTYPE_MOUSE = 3,     // TOOL_TYPE_MOUSE
+} sapp_android_tooltype;
+
+/*
     sapp_touchpoint
 
     Describes a single touchpoint in a multitouch event (TOUCHES_BEGAN,
@@ -1288,6 +1329,7 @@ typedef struct sapp_touchpoint {
     uintptr_t identifier;
     float pos_x;
     float pos_y;
+    sapp_android_tooltype android_tooltype; // only valid on Android
     bool changed;
 } sapp_touchpoint;
 
@@ -1424,6 +1466,17 @@ typedef struct sapp_allocator {
     void* user_data;
 } sapp_allocator;
 
+/*
+    sapp_logger
+
+    Used in sapp_desc to provide custom log callbacks to sokol_app.h.
+    Default behavior is SOKOL_LOG(message).
+*/
+typedef struct sapp_logger {
+    void (*log_cb)(const char* message, void* user_data);
+    void* user_data;
+} sapp_logger;
+
 typedef struct sapp_desc {
     void (*init_cb)(void);                  // these are the user-provided callbacks without user data
     void (*frame_cb)(void);
@@ -1453,6 +1506,7 @@ typedef struct sapp_desc {
     int max_dropped_file_path_length;   // max length in bytes of a dropped UTF-8 file path (default: 2048)
     sapp_icon_desc icon;                // the initial window icon to set
     sapp_allocator allocator;           // optional memory allocation overrides (default: malloc/free)
+    sapp_logger logger;                 // optional log callback overrides (default: SAPP_LOG(message))
 
     /* backend-specific options */
     bool gl_force_gles2;                // if true, setup GLES2/WebGL even if GLES3/WebGL2 is available
@@ -1479,21 +1533,19 @@ typedef enum sapp_html5_fetch_error {
 } sapp_html5_fetch_error;
 
 typedef struct sapp_html5_fetch_response {
-    bool succeeded;         /* true if the loading operation has succeeded */
+    bool succeeded;         // true if the loading operation has succeeded
     sapp_html5_fetch_error error_code;
-    int file_index;         /* index of the dropped file (0..sapp_get_num_dropped_filed()-1) */
-    uint32_t fetched_size;  /* size in bytes of loaded data */
-    void* buffer_ptr;       /* pointer to user-provided buffer which contains the loaded data */
-    uint32_t buffer_size;   /* size of user-provided buffer (buffer_size >= fetched_size) */
-    void* user_data;        /* user-provided user data pointer */
+    int file_index;         // index of the dropped file (0..sapp_get_num_dropped_filed()-1)
+    sapp_range data;        // pointer and size of the fetched data (data.ptr == buffer.ptr, data.size <= buffer.size)
+    sapp_range buffer;      // the user-provided buffer ptr/size pair (buffer.ptr == data.ptr, buffer.size >= data.size)
+    void* user_data;        // user-provided user data pointer
 } sapp_html5_fetch_response;
 
 typedef struct sapp_html5_fetch_request {
-    int dropped_file_index;                 /* 0..sapp_get_num_dropped_files()-1 */
-    void (*callback)(const sapp_html5_fetch_response*);     /* response callback function pointer (required) */
-    void* buffer_ptr;                       /* pointer to buffer to load data into */
-    uint32_t buffer_size;                   /* size in bytes of buffer */
-    void* user_data;                        /* optional userdata pointer */
+    int dropped_file_index; // 0..sapp_get_num_dropped_files()-1
+    void (*callback)(const sapp_html5_fetch_response*);     // response callback function pointer (required)
+    sapp_range buffer;      // ptr/size of a memory buffer to load the data into
+    void* user_data;        // optional userdata pointer
 } sapp_html5_fetch_request;
 
 /*
@@ -1747,7 +1799,7 @@ inline void sapp_run(const sapp_desc& desc) { return sapp_run(&desc); }
 #endif
 #ifndef SOKOL_DEBUG
     #ifndef NDEBUG
-        #define SOKOL_DEBUG (1)
+        #define SOKOL_DEBUG
     #endif
 #endif
 #ifndef SOKOL_ASSERT
@@ -1757,19 +1809,22 @@ inline void sapp_run(const sapp_desc& desc) { return sapp_run(&desc); }
 #ifndef SOKOL_UNREACHABLE
     #define SOKOL_UNREACHABLE SOKOL_ASSERT(false)
 #endif
-#ifndef SOKOL_LOG
-    #ifdef SOKOL_DEBUG
+
+#if !defined(SOKOL_DEBUG)
+    #define SAPP_LOG(s)
+#else
+    #define SAPP_LOG(s) _sapp_log(s)
+    #ifndef SOKOL_LOG
         #if defined(__ANDROID__)
             #include <android/log.h>
-            #define SOKOL_LOG(s) { SOKOL_ASSERT(s); __android_log_write(ANDROID_LOG_INFO, "SOKOL_APP", s); }
+            #define SOKOL_LOG(s) __android_log_write(ANDROID_LOG_INFO, "SOKOL_APP", s)
         #else
             #include <stdio.h>
-            #define SOKOL_LOG(s) { SOKOL_ASSERT(s); puts(s); }
+            #define SOKOL_LOG(s) puts(s)
         #endif
-    #else
-        #define SOKOL_LOG(s)
     #endif
 #endif
+
 #ifndef SOKOL_ABORT
     #define SOKOL_ABORT() abort()
 #endif
@@ -2719,6 +2774,18 @@ _SOKOL_PRIVATE void _sapp_free(void* ptr) {
     }
 }
 
+#if defined(SOKOL_DEBUG)
+_SOKOL_PRIVATE void _sapp_log(const char* msg) {
+    SOKOL_ASSERT(msg);
+    if (_sapp.desc.logger.log_cb) {
+        _sapp.desc.logger.log_cb(msg, _sapp.desc.logger.user_data);
+    }
+    else {
+        SOKOL_LOG(msg);
+    }
+}
+#endif
+
 _SOKOL_PRIVATE void _sapp_fail(const char* msg) {
     if (_sapp.desc.fail_cb) {
         _sapp.desc.fail_cb(msg);
@@ -2727,7 +2794,7 @@ _SOKOL_PRIVATE void _sapp_fail(const char* msg) {
         _sapp.desc.fail_userdata_cb(msg, _sapp.desc.user_data);
     }
     else {
-        SOKOL_LOG(msg);
+        SAPP_LOG(msg);
     }
     SOKOL_ABORT();
 }
@@ -2952,7 +3019,7 @@ _SOKOL_PRIVATE bool _sapp_image_validate(const sapp_image_desc* desc) {
     SOKOL_ASSERT(desc->pixels.size > 0);
     const size_t wh_size = (size_t)(desc->width * desc->height) * sizeof(uint32_t);
     if (wh_size != desc->pixels.size) {
-        SOKOL_LOG("Image data size mismatch (must be width*height*4 bytes)\n");
+        SAPP_LOG("Image data size mismatch (must be width*height*4 bytes)\n");
         return false;
     }
     return true;
@@ -3772,12 +3839,12 @@ _SOKOL_PRIVATE void _sapp_macos_frame(void) {
     NSPasteboard *pboard = [sender draggingPasteboard];
     if ([pboard.types containsObject:NSPasteboardTypeFileURL]) {
         _sapp_clear_drop_buffer();
-        _sapp.drop.num_files = ((int)pboard.pasteboardItems.count > _sapp.drop.max_files) ? _sapp.drop.max_files : pboard.pasteboardItems.count;
+        _sapp.drop.num_files = ((int)pboard.pasteboardItems.count > _sapp.drop.max_files) ? _sapp.drop.max_files : (int)pboard.pasteboardItems.count;
         bool drop_failed = false;
         for (int i = 0; i < _sapp.drop.num_files; i++) {
             NSURL *fileUrl = [NSURL fileURLWithPath:[pboard.pasteboardItems[(NSUInteger)i] stringForType:NSPasteboardTypeFileURL]];
             if (!_sapp_strcpy(fileUrl.standardizedURL.path.UTF8String, _sapp_dropped_file_path_ptr(i), _sapp.drop.max_path_length)) {
-                SOKOL_LOG("sokol_app.h: dropped file path too long (sapp_desc.max_dropped_file_path_length)\n");
+                SAPP_LOG("sokol_app.h: dropped file path too long (sapp_desc.max_dropped_file_path_length)\n");
                 drop_failed = true;
                 break;
             }
@@ -4050,7 +4117,7 @@ _SOKOL_PRIVATE void _sapp_macos_poll_input_events() {
 }
 - (void)flagsChanged:(NSEvent*)event {
     const uint32_t old_f = _sapp.macos.flags_changed_store;
-    const uint32_t new_f = event.modifierFlags;
+    const uint32_t new_f = (uint32_t)event.modifierFlags;
     _sapp.macos.flags_changed_store = new_f;
     sapp_keycode key_code = SAPP_KEYCODE_INVALID;
     bool down = false;
@@ -4162,11 +4229,6 @@ _SOKOL_PRIVATE void _sapp_ios_update_dimensions(void) {
                              (_sapp.framebuffer_height != cur_fb_height);
     if (dim_changed) {
         #if defined(SOKOL_METAL)
-            // NOTE: explicitely resize the drawable here again, despite MTKView using
-            // autoResizeDrawable, this seems to be the only way so that the MTKView's
-            // contentScaleFactor is honored, but also the correct screen size being
-            // reported when device rotations happen
-            // (see: https://github.com/floooh/sokol-samples/issues/101)
             const CGSize drawable_size = { (CGFloat) _sapp.framebuffer_width, (CGFloat) _sapp.framebuffer_height };
             _sapp.ios.view.drawableSize = drawable_size;
         #else
@@ -4240,6 +4302,11 @@ _SOKOL_PRIVATE void _sapp_ios_show_keyboard(bool shown) {
         _sapp.ios.view.colorPixelFormat = MTLPixelFormatBGRA8Unorm;
         _sapp.ios.view.depthStencilPixelFormat = MTLPixelFormatDepth32Float_Stencil8;
         _sapp.ios.view.sampleCount = (NSUInteger)_sapp.sample_count;
+        /* NOTE: iOS MTKView seems to ignore thew view's contentScaleFactor
+            and automatically renders at Retina resolution. We'll disable
+            autoResize and instead do the resizing in _sapp_ios_update_dimensions()
+        */
+        _sapp.ios.view.autoResizeDrawable = false;
         _sapp.ios.view.userInteractionEnabled = YES;
         _sapp.ios.view.multipleTouchEnabled = YES;
         _sapp.ios.view_ctrl = [[UIViewController alloc] init];
@@ -4417,6 +4484,10 @@ _SOKOL_PRIVATE void _sapp_ios_show_keyboard(bool shown) {
 /*== EMSCRIPTEN ==============================================================*/
 #if defined(_SAPP_EMSCRIPTEN)
 
+#if defined(EM_JS_DEPS)
+EM_JS_DEPS(sokol_app, "$withStackSave,$allocateUTF8OnStack");
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -4472,7 +4543,7 @@ EMSCRIPTEN_KEEPALIVE void _sapp_emsc_drop(int i, const char* name) {
         return;
     }
     if (!_sapp_strcpy(name, _sapp_dropped_file_path_ptr(i), _sapp.drop.max_path_length)) {
-        SOKOL_LOG("sokol_app.h: dropped file path too long!\n");
+        SAPP_LOG("sokol_app.h: dropped file path too long!\n");
         _sapp.drop.num_files = 0;
     }
 }
@@ -4503,9 +4574,10 @@ EMSCRIPTEN_KEEPALIVE void _sapp_emsc_invoke_fetch_cb(int index, int success, int
     response.succeeded = (0 != success);
     response.error_code = (sapp_html5_fetch_error) error_code;
     response.file_index = index;
-    response.fetched_size = fetched_size;
-    response.buffer_ptr = buf_ptr;
-    response.buffer_size = buf_size;
+    response.data.ptr = buf_ptr;
+    response.data.size = fetched_size;
+    response.buffer.ptr = buf_ptr;
+    response.buffer.size = buf_size;
     response.user_data = user_data;
     callback(&response);
 }
@@ -4516,7 +4588,7 @@ EMSCRIPTEN_KEEPALIVE void _sapp_emsc_invoke_fetch_cb(int index, int success, int
 
 /* Javascript helper functions for mobile virtual keyboard input */
 EM_JS(void, sapp_js_create_textfield, (void), {
-    var _sapp_inp = document.createElement("input");
+    const _sapp_inp = document.createElement("input");
     _sapp_inp.type = "text";
     _sapp_inp.id = "_sokol_app_input_element";
     _sapp_inp.autocapitalize = "none";
@@ -4536,7 +4608,7 @@ EM_JS(void, sapp_js_unfocus_textfield, (void), {
 });
 
 EM_JS(void, sapp_js_add_beforeunload_listener, (void), {
-    Module.sokol_beforeunload = function(event) {
+    Module.sokol_beforeunload = (event) => {
         if (__sapp_html5_get_ask_leave_site() != 0) {
             event.preventDefault();
             event.returnValue = ' ';
@@ -4550,10 +4622,10 @@ EM_JS(void, sapp_js_remove_beforeunload_listener, (void), {
 });
 
 EM_JS(void, sapp_js_add_clipboard_listener, (void), {
-    Module.sokol_paste = function(event) {
-        var pasted_str = event.clipboardData.getData('text');
+    Module.sokol_paste = (event) => {
+        const pasted_str = event.clipboardData.getData('text');
         withStackSave(() => {
-            var cstr = allocateUTF8OnStack(pasted_str);
+            const cstr = allocateUTF8OnStack(pasted_str);
             __sapp_emsc_onpaste(cstr);
         });
     };
@@ -4565,8 +4637,8 @@ EM_JS(void, sapp_js_remove_clipboard_listener, (void), {
 });
 
 EM_JS(void, sapp_js_write_clipboard, (const char* c_str), {
-    var str = UTF8ToString(c_str);
-    var ta = document.createElement('textarea');
+    const str = UTF8ToString(c_str);
+    const ta = document.createElement('textarea');
     ta.setAttribute('autocomplete', 'off');
     ta.setAttribute('autocorrect', 'off');
     ta.setAttribute('autocapitalize', 'off');
@@ -4588,30 +4660,29 @@ _SOKOL_PRIVATE void _sapp_emsc_set_clipboard_string(const char* str) {
 
 EM_JS(void, sapp_js_add_dragndrop_listeners, (const char* canvas_name_cstr), {
     Module.sokol_drop_files = [];
-    var canvas_name = UTF8ToString(canvas_name_cstr);
-    var canvas = document.getElementById(canvas_name);
-    Module.sokol_dragenter = function(event) {
+    const canvas_name = UTF8ToString(canvas_name_cstr);
+    const canvas = document.getElementById(canvas_name);
+    Module.sokol_dragenter = (event) => {
         event.stopPropagation();
         event.preventDefault();
     };
-    Module.sokol_dragleave = function(event) {
+    Module.sokol_dragleave = (event) => {
         event.stopPropagation();
         event.preventDefault();
     };
-    Module.sokol_dragover = function(event) {
+    Module.sokol_dragover = (event) => {
         event.stopPropagation();
         event.preventDefault();
     };
-    Module.sokol_drop = function(event) {
+    Module.sokol_drop = (event) => {
         event.stopPropagation();
         event.preventDefault();
-        var files = event.dataTransfer.files;
+        const files = event.dataTransfer.files;
         Module.sokol_dropped_files = files;
         __sapp_emsc_begin_drop(files.length);
-        var i;
-        for (i = 0; i < files.length; i++) {
+        for (let i = 0; i < files.length; i++) {
             withStackSave(() => {
-                var cstr = allocateUTF8OnStack(files[i].name);
+                const cstr = allocateUTF8OnStack(files[i].name);
                 __sapp_emsc_drop(i, cstr);
             });
         }
@@ -4625,18 +4696,20 @@ EM_JS(void, sapp_js_add_dragndrop_listeners, (const char* canvas_name_cstr), {
 });
 
 EM_JS(uint32_t, sapp_js_dropped_file_size, (int index), {
-    if ((index < 0) || (index >= Module.sokol_dropped_files.length)) {
+    \x2F\x2A\x2A @suppress {missingProperties} \x2A\x2F
+    const files = Module.sokol_dropped_files;
+    if ((index < 0) || (index >= files.length)) {
         return 0;
     }
     else {
-        return Module.sokol_dropped_files[index].size;
+        return files[index].size;
     }
 });
 
 EM_JS(void, sapp_js_fetch_dropped_file, (int index, _sapp_html5_fetch_callback callback, void* buf_ptr, uint32_t buf_size, void* user_data), {
-    var reader = new FileReader();
-    reader.onload = function(loadEvent) {
-        var content = loadEvent.target.result;
+    const reader = new FileReader();
+    reader.onload = (loadEvent) => {
+        const content = loadEvent.target.result;
         if (content.byteLength > buf_size) {
             // SAPP_HTML5_FETCH_ERROR_BUFFER_TOO_SMALL
             __sapp_emsc_invoke_fetch_cb(index, 0, 1, callback, 0, buf_ptr, buf_size, user_data);
@@ -4646,16 +4719,18 @@ EM_JS(void, sapp_js_fetch_dropped_file, (int index, _sapp_html5_fetch_callback c
             __sapp_emsc_invoke_fetch_cb(index, 1, 0, callback, content.byteLength, buf_ptr, buf_size, user_data);
         }
     };
-    reader.onerror = function() {
+    reader.onerror = () => {
         // SAPP_HTML5_FETCH_ERROR_OTHER
         __sapp_emsc_invoke_fetch_cb(index, 0, 2, callback, 0, buf_ptr, buf_size, user_data);
     };
-    reader.readAsArrayBuffer(Module.sokol_dropped_files[index]);
+    \x2F\x2A\x2A @suppress {missingProperties} \x2A\x2F
+    const files = Module.sokol_dropped_files;
+    reader.readAsArrayBuffer(files[index]);
 });
 
 EM_JS(void, sapp_js_remove_dragndrop_listeners, (const char* canvas_name_cstr), {
-    var canvas_name = UTF8ToString(canvas_name_cstr);
-    var canvas = document.getElementById(canvas_name);
+    const canvas_name = UTF8ToString(canvas_name_cstr);
+    const canvas = document.getElementById(canvas_name);
     canvas.removeEventListener('dragenter', Module.sokol_dragenter);
     canvas.removeEventListener('dragleave', Module.sokol_dragleave);
     canvas.removeEventListener('dragover',  Module.sokol_dragover);
@@ -4703,7 +4778,7 @@ _SOKOL_PRIVATE void _sapp_emsc_show_keyboard(bool show) {
 
 EM_JS(void, sapp_js_init, (const char* c_str_target), {
     // lookup and store canvas object by name
-    var target_str = UTF8ToString(c_str_target);
+    const target_str = UTF8ToString(c_str_target);
     Module.sapp_emsc_target = document.getElementById(target_str);
     if (!Module.sapp_emsc_target) {
         console.log("sokol_app.h: invalid target:" + target_str);
@@ -4768,7 +4843,7 @@ _SOKOL_PRIVATE void _sapp_emsc_update_mouse_lock_state(void) {
 // set mouse cursor type
 EM_JS(void, sapp_js_set_cursor, (int cursor_type, int shown), {
     if (Module.sapp_emsc_target) {
-        var cursor;
+        let cursor;
         if (shown === 0) {
             cursor = "none";
         }
@@ -4797,21 +4872,21 @@ _SOKOL_PRIVATE void _sapp_emsc_update_cursor(sapp_mouse_cursor cursor, bool show
 
 /* JS helper functions to update browser tab favicon */
 EM_JS(void, sapp_js_clear_favicon, (void), {
-    var link = document.getElementById('sokol-app-favicon');
+    const link = document.getElementById('sokol-app-favicon');
     if (link) {
         document.head.removeChild(link);
     }
 });
 
 EM_JS(void, sapp_js_set_favicon, (int w, int h, const uint8_t* pixels), {
-    var canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     canvas.width = w;
     canvas.height = h;
-    var ctx = canvas.getContext('2d');
-    var img_data = ctx.createImageData(w, h);
+    const ctx = canvas.getContext('2d');
+    const img_data = ctx.createImageData(w, h);
     img_data.data.set(HEAPU8.subarray(pixels, pixels + w*h*4));
     ctx.putImageData(img_data, 0, 0);
-    var new_link = document.createElement('link');
+    const new_link = document.createElement('link');
     new_link.id = 'sokol-app-favicon';
     new_link.rel = 'shortcut icon';
     new_link.href = canvas.toDataURL();
@@ -5406,17 +5481,17 @@ EMSCRIPTEN_KEEPALIVE void _sapp_emsc_wgpu_ready(int device_id, int swapchain_id,
 EM_JS(void, sapp_js_wgpu_init, (), {
     WebGPU.initManagers();
     // FIXME: the extension activation must be more clever here
-    navigator.gpu.requestAdapter().then(function(adapter) {
+    navigator.gpu.requestAdapter().then((adapter) => {
         console.log("wgpu adapter extensions: " + adapter.extensions);
-        adapter.requestDevice({ extensions: ["textureCompressionBC"]}).then(function(device) {
+        adapter.requestDevice({ extensions: ["textureCompressionBC"]}).then((device) => {
             var gpuContext = document.getElementById("canvas").getContext("gpupresent");
             console.log("wgpu device extensions: " + adapter.extensions);
-            gpuContext.getSwapChainPreferredFormat(device).then(function(fmt) {
-                var swapChainDescriptor = { device: device, format: fmt };
-                var swapChain = gpuContext.configureSwapChain(swapChainDescriptor);
-                var deviceId = WebGPU.mgrDevice.create(device);
-                var swapChainId = WebGPU.mgrSwapChain.create(swapChain);
-                var fmtId = WebGPU.TextureFormat.findIndex(function(elm) { return elm==fmt; });
+            gpuContext.getSwapChainPreferredFormat(device).then((fmt) => {
+                const swapChainDescriptor = { device: device, format: fmt };
+                const swapChain = gpuContext.configureSwapChain(swapChainDescriptor);
+                const deviceId = WebGPU.mgrDevice.create(device);
+                const swapChainId = WebGPU.mgrSwapChain.create(swapChain);
+                const fmtId = WebGPU.TextureFormat.findIndex(function(elm) { return elm==fmt; });
                 console.log("wgpu device: " + device);
                 console.log("wgpu swap chain: " + swapChain);
                 console.log("wgpu preferred format: " + fmt + " (" + fmtId + ")");
@@ -6079,7 +6154,7 @@ _SOKOL_PRIVATE void _sapp_d3d11_create_device_and_swapchain(void) {
         // ===
         //
         // ...just retry with the DEBUG flag switched off
-        SOKOL_LOG("sokol_app.h: D3D11CreateDeviceAndSwapChain() with D3D11_CREATE_DEVICE_DEBUG failed, retrying without debug flag.\n");
+        SAPP_LOG("sokol_app.h: D3D11CreateDeviceAndSwapChain() with D3D11_CREATE_DEVICE_DEBUG failed, retrying without debug flag.\n");
         create_flags &= ~D3D11_CREATE_DEVICE_DEBUG;
         hr = D3D11CreateDeviceAndSwapChain(
             NULL,                           /* pAdapter (use default) */
@@ -6112,16 +6187,16 @@ _SOKOL_PRIVATE void _sapp_d3d11_create_device_and_swapchain(void) {
                 _SAPP_SAFE_RELEASE(dxgi_factory);
             }
             else {
-                SOKOL_LOG("sokol_app.h: could not obtain IDXGIFactory object.\n");
+                SAPP_LOG("sokol_app.h: could not obtain IDXGIFactory object.\n");
             }
             _SAPP_SAFE_RELEASE(dxgi_adapter);
         }
         else {
-            SOKOL_LOG("sokol_app.h: could not obtain IDXGIAdapter object.\n");
+            SAPP_LOG("sokol_app.h: could not obtain IDXGIAdapter object.\n");
         }
     }
     else {
-        SOKOL_LOG("sokol_app.h: could not obtain IDXGIDevice1 interface\n");
+        SAPP_LOG("sokol_app.h: could not obtain IDXGIDevice1 interface\n");
     }
 }
 
@@ -6670,7 +6745,7 @@ _SOKOL_PRIVATE void _sapp_win32_lock_mouse(bool lock) {
             _sapp.win32.hwnd    // hwndTarget
         };
         if (!RegisterRawInputDevices(&rid, 1, sizeof(rid))) {
-            SOKOL_LOG("RegisterRawInputDevices() failed (on mouse lock).\n");
+            SAPP_LOG("RegisterRawInputDevices() failed (on mouse lock).\n");
         }
         /* in case the raw mouse device only supports absolute position reporting,
            we need to skip the dx/dy compution for the first WM_INPUT event
@@ -6681,7 +6756,7 @@ _SOKOL_PRIVATE void _sapp_win32_lock_mouse(bool lock) {
         /* disable raw input for mouse */
         const RAWINPUTDEVICE rid = { 0x01, 0x02, RIDEV_REMOVE, NULL };
         if (!RegisterRawInputDevices(&rid, 1, sizeof(rid))) {
-            SOKOL_LOG("RegisterRawInputDevices() failed (on mouse unlock).\n");
+            SAPP_LOG("RegisterRawInputDevices() failed (on mouse unlock).\n");
         }
 
         /* let the mouse roam freely again */
@@ -6821,7 +6896,7 @@ _SOKOL_PRIVATE void _sapp_win32_files_dropped(HDROP hdrop) {
         WCHAR* buffer = (WCHAR*) _sapp_malloc_clear(num_chars * sizeof(WCHAR));
         DragQueryFileW(hdrop, i, buffer, num_chars);
         if (!_sapp_win32_wide_to_utf8(buffer, _sapp_dropped_file_path_ptr((int)i), _sapp.drop.max_path_length)) {
-            SOKOL_LOG("sokol_app.h: dropped file path too long (sapp_desc.max_dropped_file_path_length)\n");
+            SAPP_LOG("sokol_app.h: dropped file path too long (sapp_desc.max_dropped_file_path_length)\n");
             drop_failed = true;
         }
         _sapp_free(buffer);
@@ -6997,7 +7072,7 @@ _SOKOL_PRIVATE LRESULT CALLBACK _sapp_win32_wndproc(HWND hWnd, UINT uMsg, WPARAM
                     UINT size = sizeof(_sapp.win32.raw_input_data);
                     // see: https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getrawinputdata
                     if ((UINT)-1 == GetRawInputData(ri, RID_INPUT, &_sapp.win32.raw_input_data, &size, sizeof(RAWINPUTHEADER))) {
-                        SOKOL_LOG("GetRawInputData() failed\n");
+                        SAPP_LOG("GetRawInputData() failed\n");
                         break;
                     }
                     const RAWINPUT* raw_mouse_data = (const RAWINPUT*) &_sapp.win32.raw_input_data;
@@ -7348,7 +7423,7 @@ _SOKOL_PRIVATE const char* _sapp_win32_get_clipboard_string(void) {
         return _sapp.clipboard.buffer;
     }
     if (!_sapp_win32_wide_to_utf8(wchar_buf, _sapp.clipboard.buffer, _sapp.clipboard.buf_size)) {
-        SOKOL_LOG("sokol_app.h: clipboard string didn't fit into clipboard buffer\n");
+        SAPP_LOG("sokol_app.h: clipboard string didn't fit into clipboard buffer\n");
     }
     GlobalUnlock(object);
     CloseClipboard();
@@ -7486,7 +7561,7 @@ _SOKOL_PRIVATE void _sapp_win32_run(const sapp_desc* desc) {
             }
             else {
                 TranslateMessage(&msg);
-                DispatchMessage(&msg);
+                DispatchMessageW(&msg);
             }
         }
         _sapp_frame();
@@ -8633,6 +8708,7 @@ _SOKOL_PRIVATE bool _sapp_android_init_egl(void) {
     if (eglInitialize(display, NULL, NULL) == EGL_FALSE) {
         return false;
     }
+    _sapp.gles2_fallback = _sapp.desc.gl_force_gles2;
 
     EGLint alpha_size = _sapp.desc.alpha ? 8 : 0;
     const EGLint cfg_attributes[] = {
@@ -8700,16 +8776,16 @@ _SOKOL_PRIVATE void _sapp_android_cleanup_egl(void) {
     if (_sapp.android.display != EGL_NO_DISPLAY) {
         eglMakeCurrent(_sapp.android.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if (_sapp.android.surface != EGL_NO_SURFACE) {
-            SOKOL_LOG("Destroying egl surface");
+            SAPP_LOG("Destroying egl surface");
             eglDestroySurface(_sapp.android.display, _sapp.android.surface);
             _sapp.android.surface = EGL_NO_SURFACE;
         }
         if (_sapp.android.context != EGL_NO_CONTEXT) {
-            SOKOL_LOG("Destroying egl context");
+            SAPP_LOG("Destroying egl context");
             eglDestroyContext(_sapp.android.display, _sapp.android.context);
             _sapp.android.context = EGL_NO_CONTEXT;
         }
-        SOKOL_LOG("Terminating egl display");
+        SAPP_LOG("Terminating egl display");
         eglTerminate(_sapp.android.display);
         _sapp.android.display = EGL_NO_DISPLAY;
     }
@@ -8750,7 +8826,7 @@ _SOKOL_PRIVATE void _sapp_android_cleanup_egl_surface(void) {
 _SOKOL_PRIVATE void _sapp_android_app_event(sapp_event_type type) {
     if (_sapp_events_enabled()) {
         _sapp_init_event(type);
-        SOKOL_LOG("event_cb()");
+        SAPP_LOG("event_cb()");
         _sapp_call_event(&_sapp.event);
     }
 }
@@ -8796,18 +8872,18 @@ _SOKOL_PRIVATE void _sapp_android_update_dimensions(ANativeWindow* window, bool 
     _sapp.dpi_scale = (float)_sapp.framebuffer_width / (float)_sapp.window_width;
     if (win_changed || fb_changed || force_update) {
         if (!_sapp.first_frame) {
-            SOKOL_LOG("SAPP_EVENTTYPE_RESIZED");
+            SAPP_LOG("SAPP_EVENTTYPE_RESIZED");
             _sapp_android_app_event(SAPP_EVENTTYPE_RESIZED);
         }
     }
 }
 
 _SOKOL_PRIVATE void _sapp_android_cleanup(void) {
-    SOKOL_LOG("Cleaning up");
+    SAPP_LOG("Cleaning up");
     if (_sapp.android.surface != EGL_NO_SURFACE) {
         /* egl context is bound, cleanup gracefully */
         if (_sapp.init_called && !_sapp.cleanup_called) {
-            SOKOL_LOG("cleanup_cb()");
+            SAPP_LOG("cleanup_cb()");
             _sapp_call_cleanup();
         }
     }
@@ -8844,22 +8920,22 @@ _SOKOL_PRIVATE bool _sapp_android_touch_event(const AInputEvent* e) {
     sapp_event_type type = SAPP_EVENTTYPE_INVALID;
     switch (action) {
         case AMOTION_EVENT_ACTION_DOWN:
-            SOKOL_LOG("Touch: down");
+            SAPP_LOG("Touch: down");
         case AMOTION_EVENT_ACTION_POINTER_DOWN:
-            SOKOL_LOG("Touch: ptr down");
+            SAPP_LOG("Touch: ptr down");
             type = SAPP_EVENTTYPE_TOUCHES_BEGAN;
             break;
         case AMOTION_EVENT_ACTION_MOVE:
             type = SAPP_EVENTTYPE_TOUCHES_MOVED;
             break;
         case AMOTION_EVENT_ACTION_UP:
-            SOKOL_LOG("Touch: up");
+            SAPP_LOG("Touch: up");
         case AMOTION_EVENT_ACTION_POINTER_UP:
-            SOKOL_LOG("Touch: ptr up");
+            SAPP_LOG("Touch: ptr up");
             type = SAPP_EVENTTYPE_TOUCHES_ENDED;
             break;
         case AMOTION_EVENT_ACTION_CANCEL:
-            SOKOL_LOG("Touch: cancel");
+            SAPP_LOG("Touch: cancel");
             type = SAPP_EVENTTYPE_TOUCHES_CANCELLED;
             break;
         default:
@@ -8879,7 +8955,7 @@ _SOKOL_PRIVATE bool _sapp_android_touch_event(const AInputEvent* e) {
         dst->identifier = (uintptr_t)AMotionEvent_getPointerId(e, (size_t)i);
         dst->pos_x = (AMotionEvent_getRawX(e, (size_t)i) / _sapp.window_width) * _sapp.framebuffer_width;
         dst->pos_y = (AMotionEvent_getRawY(e, (size_t)i) / _sapp.window_height) * _sapp.framebuffer_height;
-
+        dst->android_tooltype = (sapp_android_tooltype) AMotionEvent_getToolType(e, (size_t)i);
         if (action == AMOTION_EVENT_ACTION_POINTER_DOWN ||
             action == AMOTION_EVENT_ACTION_POINTER_UP) {
             dst->changed = (i == idx);
@@ -8910,7 +8986,7 @@ _SOKOL_PRIVATE int _sapp_android_input_cb(int fd, int events, void* data) {
     _SOKOL_UNUSED(fd);
     _SOKOL_UNUSED(data);
     if ((events & ALOOPER_EVENT_INPUT) == 0) {
-        SOKOL_LOG("_sapp_android_input_cb() encountered unsupported event");
+        SAPP_LOG("_sapp_android_input_cb() encountered unsupported event");
         return 1;
     }
     SOKOL_ASSERT(_sapp.android.current.input);
@@ -8931,13 +9007,13 @@ _SOKOL_PRIVATE int _sapp_android_input_cb(int fd, int events, void* data) {
 _SOKOL_PRIVATE int _sapp_android_main_cb(int fd, int events, void* data) {
     _SOKOL_UNUSED(data);
     if ((events & ALOOPER_EVENT_INPUT) == 0) {
-        SOKOL_LOG("_sapp_android_main_cb() encountered unsupported event");
+        SAPP_LOG("_sapp_android_main_cb() encountered unsupported event");
         return 1;
     }
 
     _sapp_android_msg_t msg;
     if (read(fd, &msg, sizeof(msg)) != sizeof(msg)) {
-        SOKOL_LOG("Could not write to read_from_main_fd");
+        SAPP_LOG("Could not write to read_from_main_fd");
         return 1;
     }
 
@@ -8945,7 +9021,7 @@ _SOKOL_PRIVATE int _sapp_android_main_cb(int fd, int events, void* data) {
     switch (msg) {
         case _SOKOL_ANDROID_MSG_CREATE:
             {
-                SOKOL_LOG("MSG_CREATE");
+                SAPP_LOG("MSG_CREATE");
                 SOKOL_ASSERT(!_sapp.valid);
                 bool result = _sapp_android_init_egl();
                 SOKOL_ASSERT(result); _SOKOL_UNUSED(result);
@@ -8954,36 +9030,36 @@ _SOKOL_PRIVATE int _sapp_android_main_cb(int fd, int events, void* data) {
             }
             break;
         case _SOKOL_ANDROID_MSG_RESUME:
-            SOKOL_LOG("MSG_RESUME");
+            SAPP_LOG("MSG_RESUME");
             _sapp.android.has_resumed = true;
             _sapp_android_app_event(SAPP_EVENTTYPE_RESUMED);
             break;
         case _SOKOL_ANDROID_MSG_PAUSE:
-            SOKOL_LOG("MSG_PAUSE");
+            SAPP_LOG("MSG_PAUSE");
             _sapp.android.has_resumed = false;
             _sapp_android_app_event(SAPP_EVENTTYPE_SUSPENDED);
             break;
         case _SOKOL_ANDROID_MSG_FOCUS:
-            SOKOL_LOG("MSG_FOCUS");
+            SAPP_LOG("MSG_FOCUS");
             _sapp.android.has_focus = true;
             break;
         case _SOKOL_ANDROID_MSG_NO_FOCUS:
-            SOKOL_LOG("MSG_NO_FOCUS");
+            SAPP_LOG("MSG_NO_FOCUS");
             _sapp.android.has_focus = false;
             break;
         case _SOKOL_ANDROID_MSG_SET_NATIVE_WINDOW:
-            SOKOL_LOG("MSG_SET_NATIVE_WINDOW");
+            SAPP_LOG("MSG_SET_NATIVE_WINDOW");
             if (_sapp.android.current.window != _sapp.android.pending.window) {
                 if (_sapp.android.current.window != NULL) {
                     _sapp_android_cleanup_egl_surface();
                 }
                 if (_sapp.android.pending.window != NULL) {
-                    SOKOL_LOG("Creating egl surface ...");
+                    SAPP_LOG("Creating egl surface ...");
                     if (_sapp_android_init_egl_surface(_sapp.android.pending.window)) {
-                        SOKOL_LOG("... ok!");
+                        SAPP_LOG("... ok!");
                         _sapp_android_update_dimensions(_sapp.android.pending.window, true);
                     } else {
-                        SOKOL_LOG("... failed!");
+                        SAPP_LOG("... failed!");
                         _sapp_android_shutdown();
                     }
                 }
@@ -8991,7 +9067,7 @@ _SOKOL_PRIVATE int _sapp_android_main_cb(int fd, int events, void* data) {
             _sapp.android.current.window = _sapp.android.pending.window;
             break;
         case _SOKOL_ANDROID_MSG_SET_INPUT_QUEUE:
-            SOKOL_LOG("MSG_SET_INPUT_QUEUE");
+            SAPP_LOG("MSG_SET_INPUT_QUEUE");
             if (_sapp.android.current.input != _sapp.android.pending.input) {
                 if (_sapp.android.current.input != NULL) {
                     AInputQueue_detachLooper(_sapp.android.current.input);
@@ -9008,13 +9084,13 @@ _SOKOL_PRIVATE int _sapp_android_main_cb(int fd, int events, void* data) {
             _sapp.android.current.input = _sapp.android.pending.input;
             break;
         case _SOKOL_ANDROID_MSG_DESTROY:
-            SOKOL_LOG("MSG_DESTROY");
+            SAPP_LOG("MSG_DESTROY");
             _sapp_android_cleanup();
             _sapp.valid = false;
             _sapp.android.is_thread_stopping = true;
             break;
         default:
-            SOKOL_LOG("Unknown msg type received");
+            SAPP_LOG("Unknown msg type received");
             break;
     }
     pthread_cond_broadcast(&_sapp.android.pt.cond); /* signal "received" */
@@ -9032,17 +9108,17 @@ _SOKOL_PRIVATE void _sapp_android_show_keyboard(bool shown) {
     SOKOL_ASSERT(_sapp.valid);
     /* This seems to be broken in the NDK, but there is (a very cumbersome) workaround... */
     if (shown) {
-        SOKOL_LOG("Showing keyboard");
+        SAPP_LOG("Showing keyboard");
         ANativeActivity_showSoftInput(_sapp.android.activity, ANATIVEACTIVITY_SHOW_SOFT_INPUT_FORCED);
     } else {
-        SOKOL_LOG("Hiding keyboard");
+        SAPP_LOG("Hiding keyboard");
         ANativeActivity_hideSoftInput(_sapp.android.activity, ANATIVEACTIVITY_HIDE_SOFT_INPUT_NOT_ALWAYS);
     }
 }
 
 _SOKOL_PRIVATE void* _sapp_android_loop(void* arg) {
     _SOKOL_UNUSED(arg);
-    SOKOL_LOG("Loop thread started");
+    SAPP_LOG("Loop thread started");
 
     _sapp.android.looper = ALooper_prepare(0 /* or ALOOPER_PREPARE_ALLOW_NON_CALLBACKS*/);
     ALooper_addFd(_sapp.android.looper,
@@ -9087,38 +9163,38 @@ _SOKOL_PRIVATE void* _sapp_android_loop(void* arg) {
     _sapp.android.is_thread_stopped = true;
     pthread_cond_broadcast(&_sapp.android.pt.cond);
     pthread_mutex_unlock(&_sapp.android.pt.mutex);
-    SOKOL_LOG("Loop thread done");
+    SAPP_LOG("Loop thread done");
     return NULL;
 }
 
 /* android main/ui thread */
 _SOKOL_PRIVATE void _sapp_android_msg(_sapp_android_msg_t msg) {
     if (write(_sapp.android.pt.write_from_main_fd, &msg, sizeof(msg)) != sizeof(msg)) {
-        SOKOL_LOG("Could not write to write_from_main_fd");
+        SAPP_LOG("Could not write to write_from_main_fd");
     }
 }
 
 _SOKOL_PRIVATE void _sapp_android_on_start(ANativeActivity* activity) {
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onStart()");
+    SAPP_LOG("NativeActivity onStart()");
 }
 
 _SOKOL_PRIVATE void _sapp_android_on_resume(ANativeActivity* activity) {
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onResume()");
+    SAPP_LOG("NativeActivity onResume()");
     _sapp_android_msg(_SOKOL_ANDROID_MSG_RESUME);
 }
 
 _SOKOL_PRIVATE void* _sapp_android_on_save_instance_state(ANativeActivity* activity, size_t* out_size) {
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onSaveInstanceState()");
+    SAPP_LOG("NativeActivity onSaveInstanceState()");
     *out_size = 0;
     return NULL;
 }
 
 _SOKOL_PRIVATE void _sapp_android_on_window_focus_changed(ANativeActivity* activity, int has_focus) {
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onWindowFocusChanged()");
+    SAPP_LOG("NativeActivity onWindowFocusChanged()");
     if (has_focus) {
         _sapp_android_msg(_SOKOL_ANDROID_MSG_FOCUS);
     } else {
@@ -9128,13 +9204,13 @@ _SOKOL_PRIVATE void _sapp_android_on_window_focus_changed(ANativeActivity* activ
 
 _SOKOL_PRIVATE void _sapp_android_on_pause(ANativeActivity* activity) {
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onPause()");
+    SAPP_LOG("NativeActivity onPause()");
     _sapp_android_msg(_SOKOL_ANDROID_MSG_PAUSE);
 }
 
 _SOKOL_PRIVATE void _sapp_android_on_stop(ANativeActivity* activity) {
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onStop()");
+    SAPP_LOG("NativeActivity onStop()");
 }
 
 _SOKOL_PRIVATE void _sapp_android_msg_set_native_window(ANativeWindow* window) {
@@ -9149,14 +9225,14 @@ _SOKOL_PRIVATE void _sapp_android_msg_set_native_window(ANativeWindow* window) {
 
 _SOKOL_PRIVATE void _sapp_android_on_native_window_created(ANativeActivity* activity, ANativeWindow* window) {
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onNativeWindowCreated()");
+    SAPP_LOG("NativeActivity onNativeWindowCreated()");
     _sapp_android_msg_set_native_window(window);
 }
 
 _SOKOL_PRIVATE void _sapp_android_on_native_window_destroyed(ANativeActivity* activity, ANativeWindow* window) {
     _SOKOL_UNUSED(activity);
     _SOKOL_UNUSED(window);
-    SOKOL_LOG("NativeActivity onNativeWindowDestroyed()");
+    SAPP_LOG("NativeActivity onNativeWindowDestroyed()");
     _sapp_android_msg_set_native_window(NULL);
 }
 
@@ -9172,26 +9248,26 @@ _SOKOL_PRIVATE void _sapp_android_msg_set_input_queue(AInputQueue* input) {
 
 _SOKOL_PRIVATE void _sapp_android_on_input_queue_created(ANativeActivity* activity, AInputQueue* queue) {
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onInputQueueCreated()");
+    SAPP_LOG("NativeActivity onInputQueueCreated()");
     _sapp_android_msg_set_input_queue(queue);
 }
 
 _SOKOL_PRIVATE void _sapp_android_on_input_queue_destroyed(ANativeActivity* activity, AInputQueue* queue) {
     _SOKOL_UNUSED(activity);
     _SOKOL_UNUSED(queue);
-    SOKOL_LOG("NativeActivity onInputQueueDestroyed()");
+    SAPP_LOG("NativeActivity onInputQueueDestroyed()");
     _sapp_android_msg_set_input_queue(NULL);
 }
 
 _SOKOL_PRIVATE void _sapp_android_on_config_changed(ANativeActivity* activity) {
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onConfigurationChanged()");
+    SAPP_LOG("NativeActivity onConfigurationChanged()");
     /* see android:configChanges in manifest */
 }
 
 _SOKOL_PRIVATE void _sapp_android_on_low_memory(ANativeActivity* activity) {
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onLowMemory()");
+    SAPP_LOG("NativeActivity onLowMemory()");
 }
 
 _SOKOL_PRIVATE void _sapp_android_on_destroy(ANativeActivity* activity) {
@@ -9204,7 +9280,7 @@ _SOKOL_PRIVATE void _sapp_android_on_destroy(ANativeActivity* activity) {
      * _sapp_android_on_stop(), the crash disappears. Is this a bug in NativeActivity?
      */
     _SOKOL_UNUSED(activity);
-    SOKOL_LOG("NativeActivity onDestroy()");
+    SAPP_LOG("NativeActivity onDestroy()");
 
     /* send destroy msg */
     pthread_mutex_lock(&_sapp.android.pt.mutex);
@@ -9221,7 +9297,7 @@ _SOKOL_PRIVATE void _sapp_android_on_destroy(ANativeActivity* activity) {
     close(_sapp.android.pt.read_from_main_fd);
     close(_sapp.android.pt.write_from_main_fd);
 
-    SOKOL_LOG("NativeActivity done");
+    SAPP_LOG("NativeActivity done");
 
     /* this is a bit naughty, but causes a clean restart of the app (static globals are reset) */
     exit(0);
@@ -9231,7 +9307,7 @@ JNIEXPORT
 void ANativeActivity_onCreate(ANativeActivity* activity, void* saved_state, size_t saved_state_size) {
     _SOKOL_UNUSED(saved_state);
     _SOKOL_UNUSED(saved_state_size);
-    SOKOL_LOG("NativeActivity onCreate()");
+    SAPP_LOG("NativeActivity onCreate()");
 
     // the NativeActity pointer needs to be available inside sokol_main()
     // (see https://github.com/floooh/sokol/issues/708), however _sapp_init_state()
@@ -9245,7 +9321,7 @@ void ANativeActivity_onCreate(ANativeActivity* activity, void* saved_state, size
 
     int pipe_fd[2];
     if (pipe(pipe_fd) != 0) {
-        SOKOL_LOG("Could not create thread pipe");
+        SAPP_LOG("Could not create thread pipe");
         return;
     }
     _sapp.android.pt.read_from_main_fd = pipe_fd[0];
@@ -9293,7 +9369,7 @@ void ANativeActivity_onCreate(ANativeActivity* activity, void* saved_state, size
     activity->callbacks->onConfigurationChanged = _sapp_android_on_config_changed;
     activity->callbacks->onLowMemory = _sapp_android_on_low_memory;
 
-    SOKOL_LOG("NativeActivity successfully created");
+    SAPP_LOG("NativeActivity successfully created");
 
     /* NOT A BUG: do NOT call sapp_discard_state() */
 }
@@ -10200,6 +10276,7 @@ _SOKOL_PRIVATE void _sapp_x11_query_system_dpi(void) {
              consistent user experience (matches Qt, Gtk, etc), although not
              always the most accurate one
     */
+    bool dpi_ok = false;
     char* rms = XResourceManagerString(_sapp.x11.display);
     if (rms) {
         XrmDatabase db = XrmGetStringDatabase(rms);
@@ -10209,10 +10286,16 @@ _SOKOL_PRIVATE void _sapp_x11_query_system_dpi(void) {
             if (XrmGetResource(db, "Xft.dpi", "Xft.Dpi", &type, &value)) {
                 if (type && strcmp(type, "String") == 0) {
                     _sapp.x11.dpi = atof(value.addr);
+                    dpi_ok = true;
                 }
             }
             XrmDestroyDatabase(db);
         }
+    }
+    // fallback if querying DPI had failed: assume the standard DPI 96.0f
+    if (!dpi_ok) {
+        _sapp.x11.dpi = 96.0f;
+        SAPP_LOG("sokol_app.h: failed to query system dpi value, assuming default 96.0");
     }
 }
 
@@ -11161,7 +11244,7 @@ _SOKOL_PRIVATE bool _sapp_x11_parse_dropped_files_list(const char* src) {
                 ((src_count == 6) && (src_chr != '/')) ||
                 ((src_count == 7) && (src_chr != '/')))
             {
-                SOKOL_LOG("sokol_app.h: dropped file URI doesn't start with file://");
+                SAPP_LOG("sokol_app.h: dropped file URI doesn't start with file://");
                 err = true;
                 break;
             }
@@ -11194,7 +11277,7 @@ _SOKOL_PRIVATE bool _sapp_x11_parse_dropped_files_list(const char* src) {
                 *dst_ptr++ = dst_chr;
             }
             else {
-                SOKOL_LOG("sokol_app.h: dropped file path too long (sapp_desc.max_dropped_file_path_length)");
+                SAPP_LOG("sokol_app.h: dropped file path too long (sapp_desc.max_dropped_file_path_length)");
                 err = true;
                 break;
             }
@@ -12084,15 +12167,15 @@ SOKOL_API_IMPL void sapp_html5_fetch_dropped_file(const sapp_html5_fetch_request
     SOKOL_ASSERT(_sapp.drop.enabled);
     SOKOL_ASSERT(request);
     SOKOL_ASSERT(request->callback);
-    SOKOL_ASSERT(request->buffer_ptr);
-    SOKOL_ASSERT(request->buffer_size > 0);
+    SOKOL_ASSERT(request->buffer.ptr);
+    SOKOL_ASSERT(request->buffer.size > 0);
     #if defined(_SAPP_EMSCRIPTEN)
         const int index = request->dropped_file_index;
         sapp_html5_fetch_error error_code = SAPP_HTML5_FETCH_ERROR_NO_ERROR;
         if ((index < 0) || (index >= _sapp.drop.num_files)) {
             error_code = SAPP_HTML5_FETCH_ERROR_OTHER;
         }
-        if (sapp_html5_get_dropped_file_size(index) > request->buffer_size) {
+        if (sapp_html5_get_dropped_file_size(index) > request->buffer.size) {
             error_code = SAPP_HTML5_FETCH_ERROR_BUFFER_TOO_SMALL;
         }
         if (SAPP_HTML5_FETCH_ERROR_NO_ERROR != error_code) {
@@ -12101,15 +12184,15 @@ SOKOL_API_IMPL void sapp_html5_fetch_dropped_file(const sapp_html5_fetch_request
                 (int)error_code,
                 request->callback,
                 0, // fetched_size
-                request->buffer_ptr,
-                request->buffer_size,
+                (void*)request->buffer.ptr,
+                request->buffer.size,
                 request->user_data);
         }
         else {
             sapp_js_fetch_dropped_file(index,
                 request->callback,
-                request->buffer_ptr,
-                request->buffer_size,
+                (void*)request->buffer.ptr,
+                request->buffer.size,
                 request->user_data);
         }
     #else
