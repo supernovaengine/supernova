@@ -209,3 +209,7 @@ Vector3 Vector3::perpendicular(void){
     
     return perp;
 }
+
+Vector3 Vector3::reflect(const Vector3& normal) const{
+    return Vector3( *this - ( 2 * this->dotProduct(normal) * normal ) );
+}

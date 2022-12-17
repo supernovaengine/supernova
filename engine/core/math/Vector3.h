@@ -98,6 +98,8 @@ namespace Supernova {
 
         Vector3 perpendicular(void);
 
+        Vector3 reflect(const Vector3& normal) const;
+
     };
     
 }

@@ -96,6 +96,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("makeFloor", &Vector3::makeFloor)
         .addFunction("makeCeil", &Vector3::makeCeil)
         .addFunction("perpendicular", &Vector3::perpendicular)
+        .addFunction("reflect", &Vector3::reflect)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
