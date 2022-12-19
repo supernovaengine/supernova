@@ -170,7 +170,6 @@ bool Model::loadGLTFTexture(int textureIndex, Texture& texture, std::string text
     if (textureIndex >= 0){
         tinygltf::Texture &tex = gltfModel->textures[textureIndex];
         tinygltf::Image &image = gltfModel->images[tex.source];
-        tinygltf::Sampler &sampler = gltfModel->samplers[tex.sampler];
 
         size_t imageSize = image.component * image.width * image.height; //in bytes
 
@@ -188,10 +187,14 @@ bool Model::loadGLTFTexture(int textureIndex, Texture& texture, std::string text
 
         std::string id = textureName + "|" + image.name;
         texture.setData(textureData, id);
-        texture.setMinFilter(convertFilter(sampler.minFilter));
-        texture.setMagFilter(convertFilter(sampler.magFilter));
-        texture.setWrapU(convertWrap(sampler.wrapS));
-        texture.setWrapV(convertWrap(sampler.wrapT));
+
+        if (tex.sampler >= 0){
+            tinygltf::Sampler &sampler = gltfModel->samplers[tex.sampler];
+            texture.setMinFilter(convertFilter(sampler.minFilter));
+            texture.setMagFilter(convertFilter(sampler.magFilter));
+            texture.setWrapU(convertWrap(sampler.wrapS));
+            texture.setWrapV(convertWrap(sampler.wrapT));
+        }
         // Prevent GLTF release because GLTF can have multiple textures with the same data
         // Image data is stored in tinygltf::Image
         texture.setReleaseDataAfterLoad(false);
