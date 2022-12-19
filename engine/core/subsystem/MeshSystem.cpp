@@ -19,7 +19,7 @@ MeshSystem::~MeshSystem(){
 
 }
 
-void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh){
+void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera){
 
     Buffer* buffer = mesh.buffers["vertices"];
     Buffer* indices = mesh.buffers["indices"];
@@ -50,7 +50,7 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh){
         pivotPos.y = sprite.height / 2.0;
     }
 
-    if (!sprite.flipY){
+    if (camera.type == CameraType::CAMERA_2D){
         pivotPos.y = sprite.height - pivotPos.y;
     }
 
@@ -96,7 +96,6 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh){
     indices->setValues(
         0, indices->getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
-
 
     mesh.needUpdateBuffer = true;
 }
@@ -426,7 +425,7 @@ void MeshSystem::update(double dt){
                 if (sprite.automaticFlipY)
                     changeFlipY(sprite.flipY, camera, mesh);
 
-                createSprite(sprite, mesh);
+                createSprite(sprite, mesh, camera);
             }
 
             sprite.needUpdateSprite = false;

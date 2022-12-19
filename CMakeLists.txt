@@ -16,6 +16,7 @@ file(TO_CMAKE_PATH ${SUPERNOVA_ROOT} SUPERNOVA_ROOT)
 
 #add_definitions(-DDISABLE_LUA_BINDINGS)
 #add_definitions(-DNO_LUA_INIT)
+#add_definitions(-DNO_CPP_INIT)
 if(NOT PROJECT_ROOT)
     set(PROJECT_ROOT ${SUPERNOVA_ROOT}/project)
 endif()

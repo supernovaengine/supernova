@@ -429,8 +429,10 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 	bool allBuffersEmpty = true;
 	for (auto const& buff : mesh.buffers){
-		if (buff.second->getSize() > 0)
+		if (buff.second->getSize() > 0){
 			allBuffersEmpty = false;
+			break;
+		}
 	}
 
 	if (allBuffersEmpty)
@@ -731,10 +733,6 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& render = mesh.submeshes[i].render;
-
-			if ( mesh.submeshes[i].material.baseColorTexture.isFramebuffer()){
-
-			}
 
 			bool needUpdateFramebuffer = checkPBRFrabebufferUpdate(mesh.submeshes[i].material);
 
@@ -1570,6 +1568,7 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 	}else{
 		((ExternalBuffer*)particles.buffer)->setData((unsigned char*)nullptr, 0);
 	}
+
 	particles.needUpdateBuffer = true;
 }
 
@@ -2328,6 +2327,10 @@ void RenderSystem::draw(){
 			Transform& transform = transforms->getComponentFromIndex(i);
 			Entity entity = transforms->getEntity(i);
 			Signature signature = scene->getSignature(entity);
+
+			if (signature.test(scene->getComponentType<CameraComponent>())){
+				continue;
+			}
 
 			if (hasMultipleCameras){
 				updateMVP(i, transform, camera, cameraTransform);

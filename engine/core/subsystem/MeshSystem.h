@@ -19,7 +19,7 @@ namespace Supernova{
 	class MeshSystem : public SubSystem {
 
     private:
-        void createSprite(SpriteComponent& sprite, MeshComponent& mesh);
+        void createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera);
 		void createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
 
 		void changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh);
