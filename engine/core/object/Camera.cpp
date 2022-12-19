@@ -135,6 +135,21 @@ Vector3 Camera::getUp() const{
     return camera.up;
 }
 
+Vector3 Camera::getWorldView() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+    return camera.worldView;
+}
+
+Vector3 Camera::getWorldUp() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+    return camera.worldUp;
+}
+
+Vector3 Camera::getWorldRight() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+    return camera.worldRight;
+}
+
 void Camera::rotateView(float angle){
     if (angle != 0){
         CameraComponent& camera = getComponent<CameraComponent>();

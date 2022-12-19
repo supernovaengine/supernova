@@ -32,6 +32,10 @@ namespace Supernova{
         void setUp(const float x, const float y, const float z);
         Vector3 getUp() const;
 
+        Vector3 getWorldView() const;
+        Vector3 getWorldUp() const;
+        Vector3 getWorldRight() const;
+
         void rotateView(float angle);
         void rotatePosition(float angle);
 
