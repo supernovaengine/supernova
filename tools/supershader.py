@@ -91,6 +91,7 @@ def get_default_shaders():
     s += "mesh_Uv1PucNorVc4Fog;"
     s += "mesh_Uv1PucNor;"
     s += "mesh_Uv1PucNorFog;"
+    s += "mesh_Uv1PucNorVc4Txr;"
     s += "mesh_Uv1PucShwPcfNorVc4;"
     s += "mesh_Uv1PucShwPcfNorVc4Fog;"
     s += "mesh_Uv1PucShwPcfNor;"

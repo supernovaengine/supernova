@@ -140,7 +140,7 @@ namespace Supernova{
 		void drawSky(SkyComponent& sky, bool renderToTexture);
 		void destroySky(SkyComponent& sky);
 
-		void updateTransform(Transform& transform);
+		
 		void updateCamera(CameraComponent& camera, Transform& transform);
 		void updateSkyViewProjection(CameraComponent& camera);
 		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);
@@ -154,6 +154,7 @@ namespace Supernova{
 		virtual ~RenderSystem();
 
 		void updateFramebuffer(CameraComponent& camera);
+		void updateTransform(Transform& transform);
 
 		// camera
 		void updateCameraSize(Entity entity);

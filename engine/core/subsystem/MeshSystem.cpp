@@ -48,6 +48,9 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
         pivotPos.y = sprite.height / 2.0;
     }else if (sprite.pivot == PivotPreset::LEFT_CENTER){
         pivotPos.y = sprite.height / 2.0;
+    }else if (sprite.pivot == PivotPreset::CENTER){
+        pivotPos.x = sprite.width / 2.0;
+        pivotPos.y = sprite.height / 2.0;
     }
 
     if (camera.type == CameraType::CAMERA_2D){
