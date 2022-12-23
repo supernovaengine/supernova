@@ -565,9 +565,6 @@
 		71ED64C528B45E0B005D2D96 /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ED64C328B45E0B005D2D96 /* Angle.cpp */; };
 		71ED64C628B45E0B005D2D96 /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ED64C328B45E0B005D2D96 /* Angle.cpp */; };
 		71ED64C728B45E0B005D2D96 /* Angle.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ED64C428B45E0B005D2D96 /* Angle.h */; };
-		71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */; };
-		71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */; };
-		71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */; };
 		71F97B21262D1E2B00CD6F2B /* tiny_gltf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */; };
 		71F97B22262D1E2B00CD6F2B /* tiny_gltf.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */; };
 		71F97B43262D1E6500CD6F2B /* libstb-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BE612625B1D088006D6E02 /* libstb-macos.a */; };
@@ -1197,8 +1194,6 @@
 		71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyframeTracksComponent.h; sourceTree = "<group>"; };
 		71ED64C328B45E0B005D2D96 /* Angle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Angle.cpp; sourceTree = "<group>"; };
 		71ED64C428B45E0B005D2D96 /* Angle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Angle.h; sourceTree = "<group>"; };
-		71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaneTerrain.cpp; sourceTree = "<group>"; };
-		71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaneTerrain.h; sourceTree = "<group>"; };
 		71F97AD2262D1DF200CD6F2B /* libtinygltf-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinygltf-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_gltf.cc; sourceTree = "<group>"; };
 		71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_gltf.h; sourceTree = "<group>"; };
@@ -1680,8 +1675,6 @@
 				7162FC6825962A0E0075B97D /* Object.h */,
 				714BBF7227148B84004A15EE /* Particles.cpp */,
 				714BBF7327148B84004A15EE /* Particles.h */,
-				71F97A87262D1D5900CD6F2B /* PlaneTerrain.cpp */,
-				71F97A8A262D1D5900CD6F2B /* PlaneTerrain.h */,
 				71451BE7270CA2C900712643 /* Sprite.cpp */,
 				71451BEA270CA2C900712643 /* Sprite.h */,
 				715CB115288CD40E0049344B /* Terrain.cpp */,
@@ -2334,7 +2327,6 @@
 				71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */,
 				713E581227BA9CE400376680 /* Polygon.h in Headers */,
 				71393EE928F8EF9F0074442E /* XMLUtils.h in Headers */,
-				71F97A90262D1D5900CD6F2B /* PlaneTerrain.h in Headers */,
 				71FCE4C228E0FA01003C5217 /* LuaBridgeAddon.h in Headers */,
 				715CB114288CD3F60049344B /* TerrainComponent.h in Headers */,
 				7170A3D42818A8A30003E965 /* Bone.h in Headers */,
@@ -3052,7 +3044,6 @@
 				714BBF7527148B85004A15EE /* Particles.cpp in Sources */,
 				713D8295259D307F00567F9F /* UserSettings.cpp in Sources */,
 				7105A56B28B305B20092EA05 /* UtilClassesLua.cpp in Sources */,
-				71F97A8C262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
 				71393EE628F8EF9F0074442E /* XMLUtils.cpp in Sources */,
 				713D8296259D307F00567F9F /* File.cpp in Sources */,
 				71ABBD2A277A3210001CE3AF /* STBText.cpp in Sources */,
@@ -3199,7 +3190,6 @@
 				714BBF7427148B85004A15EE /* Particles.cpp in Sources */,
 				7162FE102596A5BE0075B97D /* SokolScene.cpp in Sources */,
 				7105A56A28B305B20092EA05 /* UtilClassesLua.cpp in Sources */,
-				71F97A8B262D1D5900CD6F2B /* PlaneTerrain.cpp in Sources */,
 				71393EE528F8EF9F0074442E /* XMLUtils.cpp in Sources */,
 				7162FD1225963AE00075B97D /* Log.cpp in Sources */,
 				71ABBD29277A3210001CE3AF /* STBText.cpp in Sources */,
