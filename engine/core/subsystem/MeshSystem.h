@@ -24,6 +24,21 @@ namespace Supernova{
 
 		void changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh);
 
+		// Model
+		static std::string readFileToString(const char* filename);
+		static bool fileExists(const std::string &abs_filename, void *);
+		static bool readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *);
+		void addSubmeshAttribute(Submesh& submesh, std::string bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized);
+		bool loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, ModelComponent& model, int& eBufferIndex, const int stride);
+		bool loadGLTFTexture(int textureIndex, ModelComponent& model, Texture& texture, std::string textureName);
+		std::string getBufferName(int bufferViewIndex, ModelComponent& model);
+		Matrix4 getGLTFNodeMatrix(int nodeIndex, ModelComponent& model);
+		Matrix4 getGLTFMeshGlobalMatrix(int nodeIndex, ModelComponent& model, std::map<int, int>& nodesParent);
+		Entity generateSketetalStructure(Entity entity, ModelComponent& model, int nodeIndex, int skinIndex);
+		TextureFilter convertFilter(int filter);
+		TextureWrap convertWrap(int wrap);
+		void clearAnimations(ModelComponent& model);
+
 		// Terrain
 		size_t getTerrainGridArraySize(int rootGridSize, int levels);
 		float getTerrainHeight(TerrainComponent& terrain, float x, float y);
@@ -36,6 +51,10 @@ namespace Supernova{
 	public:
 		MeshSystem(Scene* scene);
 		virtual ~MeshSystem();
+
+		void createPlane(Entity entity, float width, float depth);
+		bool loadGLTF(Entity entity, std::string filename);
+		bool loadOBJ(Entity entity, std::string filename);
 
 		void destroyModel(ModelComponent& model);
 

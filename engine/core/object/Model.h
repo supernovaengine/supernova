@@ -8,41 +8,19 @@
 #include "Mesh.h"
 #include "Bone.h"
 #include "action/Animation.h"
-#include "buffer/ExternalBuffer.h"
 
 namespace tinygltf {class Model;}
 
 namespace Supernova{
     class Model: public Mesh{
-    private:
-        static bool fileExists(const std::string &abs_filename, void *);
-        static bool readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *);
-        static std::string readFileToString(const char* filename);
-
-        bool loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, int& eBufferIndex, const int stride);
-        bool loadGLTFTexture(int textureIndex, Texture& texture, std::string textureName);
-        std::string getBufferName(int bufferViewIndex);
-
-        Matrix4 getGLTFNodeMatrix(int nodeIndex);
-        Matrix4 getGLTFMeshGlobalMatrix(int nodeIndex, std::map<int, int>& nodesParent);
-        Entity generateSketetalStructure(ModelComponent& model, int nodeIndex, int skinIndex);
-        TextureFilter convertFilter(int filter);
-        TextureWrap convertWrap(int wrap);
-
-        void clearAnimations();
-
-        tinygltf::Model* gltfModel;
-        ExternalBuffer eBuffers[MAX_EXTERNAL_BUFFERS];
-        std::vector<float> extraBuffer;
-
     public:
-        Model(Scene* scene); 
-        virtual ~Model();   
+        Model(Scene* scene);
+        virtual ~Model();
 
-        bool loadOBJ(const char* filename);
-        bool loadGLTF(const char* filename);
+        bool loadModel(std::string filename);
 
-        bool loadModel(const char* filename);
+        bool loadOBJ(std::string filename);
+        bool loadGLTF(std::string filename);
 
         Animation getAnimation(int index);
         Animation findAnimation(std::string name);

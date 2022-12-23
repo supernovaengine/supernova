@@ -9,6 +9,8 @@
 #include "render/TextureRender.h"
 #include "texture/TextureData.h"
 #include "texture/Material.h"
+#include "buffer/InterleavedBuffer.h"
+#include "buffer/IndexBuffer.h"
 #include <map>
 #include <memory>
 
@@ -61,6 +63,9 @@ namespace Supernova{
 
     struct MeshComponent{
         bool loaded = false;
+
+        InterleavedBuffer buffer;
+        IndexBuffer indices;
 
         std::map<std::string, Buffer*> buffers;
         std::string defaultBuffer = "vertices";

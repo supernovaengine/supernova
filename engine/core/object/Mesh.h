@@ -27,6 +27,8 @@ namespace Supernova{
         void setColor(float red, float green, float blue, float alpha);
         Vector4 getColor() const;
 
+        void createPlane(float width, float depth);
+
         void addSubmeshAttribute(Submesh& submesh, std::string bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized);
     };
 }

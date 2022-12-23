@@ -24,7 +24,6 @@
 #include "Model.h"
 #include "MeshPolygon.h"
 #include "Particles.h"
-#include "PlaneTerrain.h"
 #include "Sprite.h"
 #include "Text.h"
 #include "Image.h"
@@ -190,6 +189,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<Framebuffer*>(&Mesh::setTexture))
         .addProperty("color", &Mesh::getColor, (void(Mesh::*)(Vector4))&Mesh::setColor)
         .addFunction("setColor", (void(Mesh::*)(const float, const float, const float, const float))&Mesh::setColor)
+        .addFunction("createPlane", &Mesh::createPlane)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -263,12 +263,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Particles::setTexture),
             luabridge::overload<Framebuffer*>(&Particles::setTexture))
-        .endClass();
-
-    luabridge::getGlobalNamespace(L)
-        .deriveClass<PlaneTerrain, Mesh>("PlaneTerrain")
-        .addConstructor <void (*) (Scene*)> ()
-        .addFunction("create", &PlaneTerrain::create)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

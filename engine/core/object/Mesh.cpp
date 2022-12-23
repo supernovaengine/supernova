@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "render/ObjectRender.h"
 #include "util/Color.h"
+#include "subsystem/MeshSystem.h"
 
 using namespace Supernova;
 
@@ -55,6 +56,10 @@ Vector4 Mesh::getColor() const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return Color::linearTosRGB(mesh.submeshes[0].material.baseColorFactor);
+}
+
+void Mesh::createPlane(float width, float depth){
+    scene->getSystem<MeshSystem>()->createPlane(entity, width, depth);
 }
 
 void Mesh::addSubmeshAttribute(Submesh& submesh, std::string bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized){
