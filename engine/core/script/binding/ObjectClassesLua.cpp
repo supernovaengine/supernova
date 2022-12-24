@@ -190,6 +190,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("color", &Mesh::getColor, (void(Mesh::*)(Vector4))&Mesh::setColor)
         .addFunction("setColor", (void(Mesh::*)(const float, const float, const float, const float))&Mesh::setColor)
         .addFunction("createPlane", &Mesh::createPlane)
+        .addFunction("createCube", &Mesh::createCube)
+        .addFunction("createSphere", &Mesh::createSphere)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

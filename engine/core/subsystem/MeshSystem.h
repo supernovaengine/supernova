@@ -53,6 +53,8 @@ namespace Supernova{
 		virtual ~MeshSystem();
 
 		void createPlane(Entity entity, float width, float depth);
+		void createCube(Entity entity, float width, float height, float depth);
+		void createSphere(Entity entity, float radius=1, float slices=36, float stacks=18);
 		bool loadGLTF(Entity entity, std::string filename);
 		bool loadOBJ(Entity entity, std::string filename);
 

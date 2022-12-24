@@ -756,11 +756,236 @@ void MeshSystem::createPlane(Entity entity, float width, float depth){
         0,  2,  3,
     };
 
+    addSubmeshAttribute(mesh.submeshes[0], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, 6, mesh.indices.getCount() * sizeof(uint16_t), false);
+
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
+}
 
-    addSubmeshAttribute(mesh.submeshes[1], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, 6, mesh.indices.getCount() * sizeof(uint16_t), false);
+void MeshSystem::createCube(Entity entity, float width, float height, float depth){
+    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+    mesh.buffers["vertices"] = &mesh.buffer;
+    mesh.buffers["indices"] = &mesh.indices;
+
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
+    mesh.numSubmeshes = 1;
+
+	mesh.buffer.clearAll();
+	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.addAttribute(AttributeType::COLOR, 4);
+
+    mesh.indices.clear();
+
+    Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
+
+    mesh.buffer.addVector3(attVertex, Vector3(0, 0,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(width, 0,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(width,  height,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(0, height,  depth));
+
+    mesh.buffer.addVector3(attVertex, Vector3(0, 0, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(width, 0, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(width,  height, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(0,  height, 0));
+
+    mesh.buffer.addVector3(attVertex, Vector3(0, 0,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(0,  height,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(0,  height, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(0, 0, 0));
+
+    mesh.buffer.addVector3(attVertex, Vector3(width, 0,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(width,  height,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(width,  height, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(width, 0, 0));
+
+    mesh.buffer.addVector3(attVertex, Vector3(0,  height,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(width,  height,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(width,  height, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(0,  height, 0));
+
+    mesh.buffer.addVector3(attVertex, Vector3(0, 0,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(width, 0,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(width, 0, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(0, 0, 0));
+
+    Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
+
+    for (int i = 0; i < 6; i++){
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(1.0f, 0.0f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(1.0f, 1.0f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f));
+    }
+
+    Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
+
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, -1.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, -1.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, -1.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, -1.0f));
+    
+    mesh.buffer.addVector3(attNormal, Vector3(-1.0f, 0.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(-1.0f, 0.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(-1.0f, 0.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(-1.0f, 0.0f, 0.0f));
+    
+    mesh.buffer.addVector3(attNormal, Vector3(1.0f, 0.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(1.0f, 0.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(1.0f, 0.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(1.0f, 0.0f, 0.0f));
+    
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+    
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, -1.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, -1.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, -1.0f, 0.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, -1.0f, 0.0f));
+
+    Attribute* attColor = mesh.buffer.getAttribute(AttributeType::COLOR);
+
+    for (int i = 0; i < 6; i++){
+        mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    }
+
+    static const uint16_t indices_array[] = {
+            /* front */
+            0,  1,  2,
+            0,  2,  3,
+            /* back */
+            4,  5,  6,
+            4,  6,  7,
+            /* left */
+            8,  9, 10,
+            8, 10, 11,
+            /* right */
+            12, 13, 14,
+            12, 14, 15,
+            /* top */
+            16, 17, 18,
+            16, 18, 19,
+            /* bottom */
+            20, 21, 22,
+            20, 22, 23,
+    };
+
+    addSubmeshAttribute(mesh.submeshes[0], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, 36, mesh.indices.getCount() * sizeof(uint16_t), false);
+
+    mesh.indices.setValues(
+        0, mesh.indices.getAttribute(AttributeType::INDEX),
+        36, (char*)&indices_array[0], sizeof(uint16_t));
+}
+
+void MeshSystem::createSphere(Entity entity, float radius, float slices, float stacks){
+    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+    mesh.buffers["vertices"] = &mesh.buffer;
+    mesh.buffers["indices"] = &mesh.indices;
+
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
+    mesh.numSubmeshes = 1;
+
+	mesh.buffer.clearAll();
+	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.addAttribute(AttributeType::COLOR, 4);
+
+    Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
+    Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
+    Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
+    Attribute* attColor = mesh.buffer.getAttribute(AttributeType::COLOR);
+
+    mesh.indices.clear();
+
+    float x, y, z, xy;                              // vertex position
+    float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
+    float s, t;                                     // vertex texCoord
+
+    float sectorStep = 2 * M_PI / slices;
+    float stackStep = M_PI / stacks;
+    float sectorAngle, stackAngle;
+
+    for(int i = 0; i <= stacks; ++i){
+        stackAngle = M_PI / 2 - i * stackStep;      // starting from pi/2 to -pi/2
+        xy = radius * cosf(stackAngle);             // r * cos(u)
+        z = radius * sinf(stackAngle);              // r * sin(u)
+
+        // add (sectorCount+1) vertices per stack
+        // the first and last vertices have same position and normal, but different tex coords
+        for(int j = 0; j <= slices; ++j){
+            sectorAngle = j * sectorStep;           // starting from 0 to 2pi
+
+            // vertex position (x, y, z)
+            x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
+            y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
+            mesh.buffer.addVector3(attVertex, Vector3(x, y, z));
+
+            // normalized vertex normal (nx, ny, nz)
+            nx = x * lengthInv;
+            ny = y * lengthInv;
+            nz = z * lengthInv;
+            mesh.buffer.addVector3(attNormal, Vector3(nx, ny, nz));
+
+            // vertex tex coord (s, t) range between [0, 1]
+            s = (float)j / slices;
+            t = (float)i / stacks;
+            mesh.buffer.addVector2(attTexcoord, Vector2(s, t));
+
+            // vertex color (white)
+            mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        }
+    }
+
+    // generate CCW index list of sphere triangles
+    std::vector<uint16_t> indices;
+    int k1, k2;
+    for(int i = 0; i < stacks; ++i)
+    {
+        k1 = i * (slices + 1);     // beginning of current stack
+        k2 = k1 + slices + 1;      // beginning of next stack
+
+        for(int j = 0; j < slices; ++j, ++k1, ++k2)
+        {
+            // 2 triangles per sector excluding first and last stacks
+            // k1 => k2 => k1+1
+            if(i != 0)
+            {
+                indices.push_back(k1);
+                indices.push_back(k2);
+                indices.push_back(k1 + 1);
+            }
+
+            // k1+1 => k2 => k2+1
+            if(i != (stacks-1))
+            {
+                indices.push_back(k1 + 1);
+                indices.push_back(k2);
+                indices.push_back(k2 + 1);
+            }
+
+        }
+    }
+
+    addSubmeshAttribute(mesh.submeshes[0], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indices.size(), mesh.indices.getCount() * sizeof(uint16_t), false);
+
+    mesh.indices.setValues(
+        0, mesh.indices.getAttribute(AttributeType::INDEX),
+        indices.size(), (char*)&indices[0], sizeof(uint16_t));
 }
 
 bool MeshSystem::loadGLTF(Entity entity, std::string filename){

@@ -28,8 +28,8 @@ namespace Supernova{
         Vector4 getColor() const;
 
         void createPlane(float width, float depth);
-
-        void addSubmeshAttribute(Submesh& submesh, std::string bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized);
+        void createCube(float width, float height, float depth);
+        void createSphere(float radius=1, float slices=36, float stacks=18);
     };
 }
 

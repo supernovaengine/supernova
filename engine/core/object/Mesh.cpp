@@ -62,15 +62,10 @@ void Mesh::createPlane(float width, float depth){
     scene->getSystem<MeshSystem>()->createPlane(entity, width, depth);
 }
 
-void Mesh::addSubmeshAttribute(Submesh& submesh, std::string bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized){
-    Attribute attData;
+void Mesh::createCube(float width, float height, float depth){
+    scene->getSystem<MeshSystem>()->createCube(entity, width, height, depth);
+}
 
-    attData.setBuffer(bufferName);
-    attData.setDataType(dataType);
-    attData.setElements(elements);
-    attData.setCount(size);
-    attData.setOffset(offset);
-    attData.setNormalized(normalized);
-
-    submesh.attributes[attribute] = attData;
+void Mesh::createSphere(float radius, float slices, float stacks){
+    scene->getSystem<MeshSystem>()->createSphere(entity, radius, slices, stacks);
 }
