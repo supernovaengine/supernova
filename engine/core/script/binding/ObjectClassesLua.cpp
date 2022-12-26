@@ -197,12 +197,15 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<float, float, float, unsigned int>(&Mesh::createCube))
         .addFunction("createSphere", 
             luabridge::overload<float>(&Mesh::createSphere),
-            luabridge::overload<float, float, float>(&Mesh::createSphere))
+            luabridge::overload<float, unsigned int, unsigned int>(&Mesh::createSphere))
         .addFunction("createCylinder", 
             luabridge::overload<float, float>(&Mesh::createCylinder),
             luabridge::overload<float, float, float>(&Mesh::createCylinder),
-            luabridge::overload<float, float, float, float>(&Mesh::createCylinder),
-            luabridge::overload<float, float, float, float, float>(&Mesh::createCylinder))
+            luabridge::overload<float, float, unsigned int, unsigned int>(&Mesh::createCylinder),
+            luabridge::overload<float, float, float, unsigned int, unsigned int>(&Mesh::createCylinder))
+        .addFunction("createTorus", 
+            luabridge::overload<float, float>(&Mesh::createTorus),
+            luabridge::overload<float, float, unsigned int, unsigned int>(&Mesh::createTorus))
         .endClass();
 
     luabridge::getGlobalNamespace(L)

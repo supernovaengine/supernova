@@ -931,7 +931,7 @@ void MeshSystem::createCube(Entity entity, float width, float height, float dept
         36, (char*)&indices_array[0], sizeof(uint16_t));
 }
 
-void MeshSystem::createSphere(Entity entity, float radius, float slices, float stacks){
+void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, unsigned int stacks){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
     mesh.buffers["vertices"] = &mesh.buffer;
@@ -1029,7 +1029,7 @@ void MeshSystem::createSphere(Entity entity, float radius, float slices, float s
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
 }
 
-void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius, float height, float slices, float stacks){
+void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
     mesh.buffers["vertices"] = &mesh.buffer;
@@ -1150,6 +1150,80 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
             indices.push_back(topVertexIndex);
             indices.push_back(k);
             indices.push_back(topVertexIndex + 1);
+        }
+    }
+
+    addSubmeshAttribute(mesh.submeshes[0], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indices.size(), mesh.indices.getCount() * sizeof(uint16_t), false);
+
+    mesh.indices.setValues(
+        0, mesh.indices.getAttribute(AttributeType::INDEX),
+        indices.size(), (char*)&indices[0], sizeof(uint16_t));
+}
+
+void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsigned int sides, unsigned int rings){
+    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+    mesh.buffers["vertices"] = &mesh.buffer;
+    mesh.buffers["indices"] = &mesh.indices;
+
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
+    mesh.numSubmeshes = 1;
+
+	mesh.buffer.clearAll();
+	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.addAttribute(AttributeType::COLOR, 4);
+
+    Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
+    Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
+    Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
+    Attribute* attColor = mesh.buffer.getAttribute(AttributeType::COLOR);
+
+    const float two_pi = 2.0f * M_PI;
+    const float dv = 1.0f / sides;
+    const float du = 1.0f / rings;
+
+    // generate vertices
+    for (uint32_t side = 0; side <= sides; side++) {
+        const float phi = (side * two_pi) / sides;
+        const float sin_phi = sinf(phi);
+        const float cos_phi = cosf(phi);
+        for (uint32_t ring = 0; ring <= rings; ring++) {
+            const float theta = (ring * two_pi) / rings;
+            const float sin_theta = sinf(theta);
+            const float cos_theta = cosf(theta);
+
+            // torus surface position
+            const float spx = sin_theta * (radius - (ringRadius * cos_phi));
+            const float spy = sin_phi * ringRadius;
+            const float spz = cos_theta * (radius - (ringRadius * cos_phi));
+
+            // torus position with ring-radius zero (for normal computation)
+            const float ipx = sin_theta * radius;
+            const float ipy = 0.0f;
+            const float ipz = cos_theta * radius;
+
+            mesh.buffer.addVector3(attVertex, Vector3(spx, spy, spz));
+            mesh.buffer.addVector3(attNormal, Vector3(spx - ipx, spy - ipy, spz - ipz));
+            mesh.buffer.addVector2(attTexcoord, Vector2(ring * du, 1.0f - side * dv));
+            mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        }
+    }
+
+    // generate indices
+    std::vector<uint16_t> indices;
+    for (uint16_t side = 0; side < sides; side++) {
+        const uint16_t row_a = side * (rings + 1);
+        const uint16_t row_b = row_a + rings + 1;
+        for (uint16_t ring = 0; ring < rings; ring++) {
+            indices.push_back(row_a + ring);
+            indices.push_back(row_a + ring + 1);
+            indices.push_back(row_b + ring + 1);
+
+            indices.push_back(row_a + ring);
+            indices.push_back(row_b + ring + 1);
+            indices.push_back(row_b + ring);
         }
     }
 

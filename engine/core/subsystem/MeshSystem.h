@@ -58,8 +58,9 @@ namespace Supernova{
 
 		void createPlane(Entity entity, float width=1, float depth=1, unsigned int tiles=1);
 		void createCube(Entity entity, float width=1, float height=1, float depth=1, unsigned int tiles=1);
-		void createSphere(Entity entity, float radius=1, float slices=36, float stacks=18);
-		void createCylinder(Entity entity, float baseRadius=1, float topRadius=1, float height=2, float slices=36, float stacks=18);
+		void createSphere(Entity entity, float radius=1, unsigned int slices=36, unsigned int stacks=18);
+		void createCylinder(Entity entity, float baseRadius=1, float topRadius=1, float height=2, unsigned int slices=36, unsigned int stacks=18);
+		void createTorus(Entity entity, float radius=1, float ringRadius=0.7, unsigned int sides=36, unsigned int rings=16);
 		bool loadGLTF(Entity entity, std::string filename);
 		bool loadOBJ(Entity entity, std::string filename);
 

@@ -78,7 +78,7 @@ void Mesh::createSphere(float radius){
     scene->getSystem<MeshSystem>()->createSphere(entity, radius);
 }
 
-void Mesh::createSphere(float radius, float slices, float stacks){
+void Mesh::createSphere(float radius, unsigned int slices, unsigned int stacks){
     scene->getSystem<MeshSystem>()->createSphere(entity, radius, slices, stacks);
 }
 
@@ -90,10 +90,18 @@ void Mesh::createCylinder(float baseRadius, float topRadius, float height){
     scene->getSystem<MeshSystem>()->createCylinder(entity, baseRadius, topRadius, height);
 }
 
-void Mesh::createCylinder(float radius, float height, float slices, float stacks){
+void Mesh::createCylinder(float radius, float height, unsigned int slices, unsigned int stacks){
     scene->getSystem<MeshSystem>()->createCylinder(entity, radius, radius, height, slices, stacks);
 }
 
-void Mesh::createCylinder(float baseRadius, float topRadius, float height, float slices, float stacks){
+void Mesh::createCylinder(float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
     scene->getSystem<MeshSystem>()->createCylinder(entity, baseRadius, topRadius, height, slices, stacks);
+}
+
+void Mesh::createTorus(float radius, float ringRadius){
+    scene->getSystem<MeshSystem>()->createTorus(entity, radius, ringRadius);
+}
+
+void Mesh::createTorus(float radius, float ringRadius, unsigned int sides, unsigned int rings){
+    scene->getSystem<MeshSystem>()->createTorus(entity, radius, ringRadius, sides, rings);
 }
