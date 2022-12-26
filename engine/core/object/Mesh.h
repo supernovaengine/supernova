@@ -28,8 +28,18 @@ namespace Supernova{
         Vector4 getColor() const;
 
         void createPlane(float width, float depth);
+        void createPlane(float width, float depth, unsigned int tiles);
+        
         void createCube(float width, float height, float depth);
-        void createSphere(float radius=1, float slices=36, float stacks=18);
+        void createCube(float width, float height, float depth, unsigned int tiles);
+
+        void createSphere(float radius);
+        void createSphere(float radius, float slices, float stacks);
+
+        void createCylinder(float radius, float height);
+        void createCylinder(float baseRadius, float topRadius, float height);
+        void createCylinder(float radius, float height, float slices, float stacks);
+        void createCylinder(float baseRadius, float topRadius, float height, float slices, float stacks);
     };
 }
 

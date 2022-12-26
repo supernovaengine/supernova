@@ -168,6 +168,47 @@ void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent
     }
 }
 
+std::vector<float> MeshSystem::getCylinderSideNormals(float baseRadius, float topRadius, float height, float slices){
+    float sectorStep = 2 * M_PI / slices;
+    float sectorAngle;  // radian
+
+    // compute the normal vector at 0 degree first
+    // tanA = (baseRadius-topRadius) / height
+    float yAngle = atan2(baseRadius - topRadius, height);
+    float x0 = cos(yAngle);     // nx
+    float y0 = sin(yAngle);     // ny
+    float z0 = 0;               // nz
+
+    // rotate (x0,y0,z0) per sector angle
+    std::vector<float> normals;
+    for(int i = 0; i <= slices; ++i)
+    {
+        sectorAngle = i * sectorStep;
+        normals.push_back(cos(sectorAngle)*x0 - sin(sectorAngle)*z0);   // nx
+        normals.push_back(y0);   // ny
+        normals.push_back(sin(sectorAngle)*x0 + cos(sectorAngle)*z0);  // nz
+    }
+
+    return normals;
+}
+
+// generate 3D vertices of a unit circle on XZ plane
+std::vector<float> MeshSystem::buildUnitCircleVertices(float slices){
+    float sectorStep = 2 * M_PI / slices;
+    float sectorAngle;  // radian
+
+    std::vector<float> unitCircleVertices;
+
+    for(int i = 0; i <= slices; ++i){
+        sectorAngle = i * sectorStep;
+        unitCircleVertices.push_back(cos(sectorAngle)); // x
+        unitCircleVertices.push_back(0);                // y
+        unitCircleVertices.push_back(sin(sectorAngle)); // z
+    }
+
+    return unitCircleVertices;
+}
+
 std::string MeshSystem::readFileToString(const char* filename){
     Data filedata;
 
@@ -710,7 +751,7 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
 
 }
 
-void MeshSystem::createPlane(Entity entity, float width, float depth){
+void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned int tiles){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
     mesh.buffers["vertices"] = &mesh.buffer;
@@ -735,9 +776,9 @@ void MeshSystem::createPlane(Entity entity, float width, float depth){
 
     Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
     mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
-    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f));
-    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f, 1.0f));
-    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f, 0.0f));
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 0.0f));
 
     Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
     mesh.buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
@@ -763,7 +804,7 @@ void MeshSystem::createPlane(Entity entity, float width, float depth){
         6, (char*)&indices_array[0], sizeof(uint16_t));
 }
 
-void MeshSystem::createCube(Entity entity, float width, float height, float depth){
+void MeshSystem::createCube(Entity entity, float width, float height, float depth, unsigned int tiles){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
     mesh.buffers["vertices"] = &mesh.buffer;
@@ -816,9 +857,9 @@ void MeshSystem::createCube(Entity entity, float width, float height, float dept
 
     for (int i = 0; i < 6; i++){
         mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(1.0f, 0.0f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(1.0f, 1.0f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 0.0f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 1.0f * tiles));
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f * tiles));
     }
 
     Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
@@ -978,6 +1019,137 @@ void MeshSystem::createSphere(Entity entity, float radius, float slices, float s
                 indices.push_back(k2 + 1);
             }
 
+        }
+    }
+
+    addSubmeshAttribute(mesh.submeshes[0], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indices.size(), mesh.indices.getCount() * sizeof(uint16_t), false);
+
+    mesh.indices.setValues(
+        0, mesh.indices.getAttribute(AttributeType::INDEX),
+        indices.size(), (char*)&indices[0], sizeof(uint16_t));
+}
+
+void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius, float height, float slices, float stacks){
+    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+    mesh.buffers["vertices"] = &mesh.buffer;
+    mesh.buffers["indices"] = &mesh.indices;
+
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
+    mesh.numSubmeshes = 1;
+
+	mesh.buffer.clearAll();
+	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.addAttribute(AttributeType::COLOR, 4);
+
+    Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
+    Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
+    Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
+    Attribute* attColor = mesh.buffer.getAttribute(AttributeType::COLOR);
+
+    float x, y, z;                                  // vertex position
+    float radius;                                   // radius for each stack
+
+    std::vector<float> sideNormals = getCylinderSideNormals(baseRadius, topRadius, height, slices);
+    std::vector<float> unitCircleVertices = buildUnitCircleVertices(slices);
+
+    // put vertices of side cylinder to array by scaling unit circle
+    for(int i = 0; i <= stacks; ++i){
+        y = -(height * 0.5f) + (float)i / stacks * height;      // vertex position y
+        radius = baseRadius + (float)i / stacks * (topRadius - baseRadius);     // lerp
+        float t = 1.0f - (float)i / stacks;   // top-to-bottom
+
+        for(int j = 0, k = 0; j <= slices; ++j, k += 3){
+            x = unitCircleVertices[k];
+            z = unitCircleVertices[k+2];
+            mesh.buffer.addVector3(attVertex, Vector3(x * radius, y, z * radius));
+            mesh.buffer.addVector3(attNormal, Vector3(sideNormals[k], sideNormals[k+1], sideNormals[k+2]));
+            mesh.buffer.addVector2(attTexcoord, Vector2((float)j / slices, t));
+            mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        }
+    }
+
+    // remember where the base.top vertices start
+    unsigned int baseVertexIndex = mesh.buffer.getCount();
+
+    // put vertices of base of cylinder
+    y = -height * 0.5f;
+    mesh.buffer.addVector3(attVertex, Vector3(0, y, 0));
+    mesh.buffer.addVector3(attNormal, Vector3(0, -1, 0));
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.5f, 0.5f));
+    mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    for(int i = 0, j = 0; i < slices; ++i, j += 3){
+        x = unitCircleVertices[j];
+        z = unitCircleVertices[j+2];
+        mesh.buffer.addVector3(attVertex, Vector3(x * baseRadius, y, z * baseRadius));
+        mesh.buffer.addVector3(attNormal, Vector3(0, -1, 0));
+        mesh.buffer.addVector2(attTexcoord, Vector2(-x * 0.5f + 0.5f, -z * 0.5f + 0.5f)); // flip horizontal
+        mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    }
+
+    // remember where the base vertices start
+    unsigned int topVertexIndex = mesh.buffer.getCount();
+
+    // put vertices of top of cylinder
+    y = height * 0.5f;
+    mesh.buffer.addVector3(attVertex, Vector3(0, y, 0));
+    mesh.buffer.addVector3(attNormal, Vector3(0, 1, 0));
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.5f, 0.5f));
+    mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    for(int i = 0, j = 0; i < slices; ++i, j += 3){
+        x = unitCircleVertices[j];
+        z = unitCircleVertices[j+2];
+        mesh.buffer.addVector3(attVertex, Vector3(x * topRadius, y, z * topRadius));
+        mesh.buffer.addVector3(attNormal, Vector3(0, 1, 0));
+        mesh.buffer.addVector2(attTexcoord, Vector2(x * 0.5f + 0.5f, -z * 0.5f + 0.5f));
+        mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    }
+
+    std::vector<uint16_t> indices;
+
+    // put indices for sides
+    unsigned int k1, k2;
+    for(int i = 0; i < stacks; ++i){
+        k1 = i * (slices + 1);     // bebinning of current stack
+        k2 = k1 + slices + 1;      // beginning of next stack
+
+        for(int j = 0; j < slices; ++j, ++k1, ++k2){
+            // 2 trianles per sector
+            indices.push_back(k1);
+            indices.push_back(k1 + 1);
+            indices.push_back(k2);
+
+            indices.push_back(k2);
+            indices.push_back(k1 + 1);
+            indices.push_back(k2 + 1);
+        }
+    }
+
+    // put indices for base
+    for(int i = 0, k = baseVertexIndex + 1; i < slices; ++i, ++k){
+        if(i < (slices - 1)){
+            indices.push_back(baseVertexIndex);
+            indices.push_back(k + 1);
+            indices.push_back(k);
+        }else{    // last triangle
+            indices.push_back(baseVertexIndex);
+            indices.push_back(baseVertexIndex + 1);
+            indices.push_back(k);
+        }
+    }
+
+    for(int i = 0, k = topVertexIndex + 1; i < slices; ++i, ++k)
+    {
+        if(i < (slices - 1)){
+            indices.push_back(topVertexIndex);
+            indices.push_back(k);
+            indices.push_back(k + 1);
+        }else{
+            indices.push_back(topVertexIndex);
+            indices.push_back(k);
+            indices.push_back(topVertexIndex + 1);
         }
     }
 

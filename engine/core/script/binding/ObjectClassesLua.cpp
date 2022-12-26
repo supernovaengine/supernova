@@ -189,9 +189,20 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<Framebuffer*>(&Mesh::setTexture))
         .addProperty("color", &Mesh::getColor, (void(Mesh::*)(Vector4))&Mesh::setColor)
         .addFunction("setColor", (void(Mesh::*)(const float, const float, const float, const float))&Mesh::setColor)
-        .addFunction("createPlane", &Mesh::createPlane)
-        .addFunction("createCube", &Mesh::createCube)
-        .addFunction("createSphere", &Mesh::createSphere)
+        .addFunction("createPlane", 
+            luabridge::overload<float, float>(&Mesh::createPlane),
+            luabridge::overload<float, float, unsigned int>(&Mesh::createPlane))
+        .addFunction("createCube", 
+            luabridge::overload<float, float, float>(&Mesh::createCube),
+            luabridge::overload<float, float, float, unsigned int>(&Mesh::createCube))
+        .addFunction("createSphere", 
+            luabridge::overload<float>(&Mesh::createSphere),
+            luabridge::overload<float, float, float>(&Mesh::createSphere))
+        .addFunction("createCylinder", 
+            luabridge::overload<float, float>(&Mesh::createCylinder),
+            luabridge::overload<float, float, float>(&Mesh::createCylinder),
+            luabridge::overload<float, float, float, float>(&Mesh::createCylinder),
+            luabridge::overload<float, float, float, float, float>(&Mesh::createCylinder))
         .endClass();
 
     luabridge::getGlobalNamespace(L)

@@ -24,6 +24,10 @@ namespace Supernova{
 
 		void changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh);
 
+		// Mesh aux
+		std::vector<float> getCylinderSideNormals(float baseRadius, float topRadius, float height, float slices);
+		std::vector<float> buildUnitCircleVertices(float slices);
+
 		// Model
 		static std::string readFileToString(const char* filename);
 		static bool fileExists(const std::string &abs_filename, void *);
@@ -52,9 +56,10 @@ namespace Supernova{
 		MeshSystem(Scene* scene);
 		virtual ~MeshSystem();
 
-		void createPlane(Entity entity, float width, float depth);
-		void createCube(Entity entity, float width, float height, float depth);
+		void createPlane(Entity entity, float width=1, float depth=1, unsigned int tiles=1);
+		void createCube(Entity entity, float width=1, float height=1, float depth=1, unsigned int tiles=1);
 		void createSphere(Entity entity, float radius=1, float slices=36, float stacks=18);
+		void createCylinder(Entity entity, float baseRadius=1, float topRadius=1, float height=2, float slices=36, float stacks=18);
 		bool loadGLTF(Entity entity, std::string filename);
 		bool loadOBJ(Entity entity, std::string filename);
 

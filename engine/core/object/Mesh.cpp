@@ -62,10 +62,38 @@ void Mesh::createPlane(float width, float depth){
     scene->getSystem<MeshSystem>()->createPlane(entity, width, depth);
 }
 
+void Mesh::createPlane(float width, float depth, unsigned int tiles){
+    scene->getSystem<MeshSystem>()->createPlane(entity, width, depth, tiles);
+}
+
 void Mesh::createCube(float width, float height, float depth){
     scene->getSystem<MeshSystem>()->createCube(entity, width, height, depth);
 }
 
+void Mesh::createCube(float width, float height, float depth, unsigned int tiles){
+    scene->getSystem<MeshSystem>()->createCube(entity, width, height, depth, tiles);
+}
+
+void Mesh::createSphere(float radius){
+    scene->getSystem<MeshSystem>()->createSphere(entity, radius);
+}
+
 void Mesh::createSphere(float radius, float slices, float stacks){
     scene->getSystem<MeshSystem>()->createSphere(entity, radius, slices, stacks);
+}
+
+void Mesh::createCylinder(float radius, float height){
+    scene->getSystem<MeshSystem>()->createCylinder(entity, radius, radius, height);
+}
+
+void Mesh::createCylinder(float baseRadius, float topRadius, float height){
+    scene->getSystem<MeshSystem>()->createCylinder(entity, baseRadius, topRadius, height);
+}
+
+void Mesh::createCylinder(float radius, float height, float slices, float stacks){
+    scene->getSystem<MeshSystem>()->createCylinder(entity, radius, radius, height, slices, stacks);
+}
+
+void Mesh::createCylinder(float baseRadius, float topRadius, float height, float slices, float stacks){
+    scene->getSystem<MeshSystem>()->createCylinder(entity, baseRadius, topRadius, height, slices, stacks);
 }
