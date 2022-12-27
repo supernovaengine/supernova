@@ -192,9 +192,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("createPlane", 
             luabridge::overload<float, float>(&Mesh::createPlane),
             luabridge::overload<float, float, unsigned int>(&Mesh::createPlane))
-        .addFunction("createCube", 
-            luabridge::overload<float, float, float>(&Mesh::createCube),
-            luabridge::overload<float, float, float, unsigned int>(&Mesh::createCube))
+        .addFunction("createBox", 
+            luabridge::overload<float, float, float>(&Mesh::createBox),
+            luabridge::overload<float, float, float, unsigned int>(&Mesh::createBox))
         .addFunction("createSphere", 
             luabridge::overload<float>(&Mesh::createSphere),
             luabridge::overload<float, unsigned int, unsigned int>(&Mesh::createSphere))

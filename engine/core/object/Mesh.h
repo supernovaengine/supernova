@@ -30,8 +30,8 @@ namespace Supernova{
         void createPlane(float width, float depth);
         void createPlane(float width, float depth, unsigned int tiles);
         
-        void createCube(float width, float height, float depth);
-        void createCube(float width, float height, float depth, unsigned int tiles);
+        void createBox(float width, float height, float depth);
+        void createBox(float width, float height, float depth, unsigned int tiles);
 
         void createSphere(float radius);
         void createSphere(float radius, unsigned int slices, unsigned int stacks);

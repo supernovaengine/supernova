@@ -768,11 +768,14 @@ void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned i
 
     mesh.indices.clear();
 
+    float halfWidth = width / 2.0;
+    float halfDepth = depth / 2.0;
+
     Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
-    mesh.buffer.addVector3(attVertex, Vector3(0, 0, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(0, 0, depth));
-    mesh.buffer.addVector3(attVertex, Vector3(width, 0, depth));
-    mesh.buffer.addVector3(attVertex, Vector3(width, 0, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, 0, -halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, 0, halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth, 0, halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth, 0, -halfDepth));
 
     Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
     mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
@@ -804,7 +807,7 @@ void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned i
         6, (char*)&indices_array[0], sizeof(uint16_t));
 }
 
-void MeshSystem::createCube(Entity entity, float width, float height, float depth, unsigned int tiles){
+void MeshSystem::createBox(Entity entity, float width, float height, float depth, unsigned int tiles){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
     mesh.buffers["vertices"] = &mesh.buffer;
@@ -821,37 +824,41 @@ void MeshSystem::createCube(Entity entity, float width, float height, float dept
 
     mesh.indices.clear();
 
+    float halfWidth = width / 2.0;
+    float halfHeight = height / 2.0;
+    float halfDepth = depth / 2.0;
+
     Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
 
-    mesh.buffer.addVector3(attVertex, Vector3(0, 0,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(width, 0,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(width,  height,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(0, height,  depth));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, halfHeight,  halfDepth));
 
-    mesh.buffer.addVector3(attVertex, Vector3(0, 0, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(width, 0, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(width,  height, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(0,  height, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight, -halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight, -halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight, -halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth,  halfHeight, -halfDepth));
 
-    mesh.buffer.addVector3(attVertex, Vector3(0, 0,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(0,  height,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(0,  height, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(0, 0, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth,  halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth,  halfHeight, -halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight, -halfDepth));
 
-    mesh.buffer.addVector3(attVertex, Vector3(width, 0,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(width,  height,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(width,  height, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(width, 0, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight, -halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight, -halfDepth));
 
-    mesh.buffer.addVector3(attVertex, Vector3(0,  height,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(width,  height,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(width,  height, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(0,  height, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth,  halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight, -halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth,  halfHeight, -halfDepth));
 
-    mesh.buffer.addVector3(attVertex, Vector3(0, 0,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(width, 0,  depth));
-    mesh.buffer.addVector3(attVertex, Vector3(width, 0, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(0, 0, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight,  halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight, -halfDepth));
+    mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight, -halfDepth));
 
     Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
 
@@ -953,7 +960,7 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
 
     mesh.indices.clear();
 
-    float x, y, z, xy;                              // vertex position
+    float x, y, z, xz;                              // vertex position
     float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
     float s, t;                                     // vertex texCoord
 
@@ -963,8 +970,8 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
 
     for(int i = 0; i <= stacks; ++i){
         stackAngle = M_PI / 2 - i * stackStep;      // starting from pi/2 to -pi/2
-        xy = radius * cosf(stackAngle);             // r * cos(u)
-        z = radius * sinf(stackAngle);              // r * sin(u)
+        xz = radius * cosf(stackAngle);             // r * cos(u)
+        y = radius * sinf(stackAngle);              // r * sin(u)
 
         // add (sectorCount+1) vertices per stack
         // the first and last vertices have same position and normal, but different tex coords
@@ -972,8 +979,8 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
             sectorAngle = j * sectorStep;           // starting from 0 to 2pi
 
             // vertex position (x, y, z)
-            x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
-            y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
+            x = xz * cosf(sectorAngle);             // r * cos(u) * cos(v)
+            z = xz * sinf(sectorAngle);             // r * cos(u) * sin(v)
             mesh.buffer.addVector3(attVertex, Vector3(x, y, z));
 
             // normalized vertex normal (nx, ny, nz)
@@ -995,30 +1002,25 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
     // generate CCW index list of sphere triangles
     std::vector<uint16_t> indices;
     int k1, k2;
-    for(int i = 0; i < stacks; ++i)
-    {
+    for(int i = 0; i < stacks; ++i){
         k1 = i * (slices + 1);     // beginning of current stack
         k2 = k1 + slices + 1;      // beginning of next stack
 
-        for(int j = 0; j < slices; ++j, ++k1, ++k2)
-        {
+        for(int j = 0; j < slices; ++j, ++k1, ++k2){
             // 2 triangles per sector excluding first and last stacks
             // k1 => k2 => k1+1
-            if(i != 0)
-            {
+            if(i != 0){
                 indices.push_back(k1);
                 indices.push_back(k2);
                 indices.push_back(k1 + 1);
             }
 
             // k1+1 => k2 => k2+1
-            if(i != (stacks-1))
-            {
+            if(i != (stacks-1)){
                 indices.push_back(k1 + 1);
                 indices.push_back(k2);
                 indices.push_back(k2 + 1);
             }
-
         }
     }
 

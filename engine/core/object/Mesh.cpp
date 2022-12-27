@@ -66,12 +66,12 @@ void Mesh::createPlane(float width, float depth, unsigned int tiles){
     scene->getSystem<MeshSystem>()->createPlane(entity, width, depth, tiles);
 }
 
-void Mesh::createCube(float width, float height, float depth){
-    scene->getSystem<MeshSystem>()->createCube(entity, width, height, depth);
+void Mesh::createBox(float width, float height, float depth){
+    scene->getSystem<MeshSystem>()->createBox(entity, width, height, depth);
 }
 
-void Mesh::createCube(float width, float height, float depth, unsigned int tiles){
-    scene->getSystem<MeshSystem>()->createCube(entity, width, height, depth, tiles);
+void Mesh::createBox(float width, float height, float depth, unsigned int tiles){
+    scene->getSystem<MeshSystem>()->createBox(entity, width, height, depth, tiles);
 }
 
 void Mesh::createSphere(float radius){
