@@ -224,6 +224,9 @@ bool Texture::load(){
     if (framebuffer)
         return true;
 
+    if (renderAndData)
+        return true;
+
     if (!needLoad)
         return false;
 
@@ -273,6 +276,9 @@ void Texture::destroy(){
     if (!id.empty() && renderAndData){
 	    renderAndData.reset();
 	    TexturePool::remove(id);
+        if (!framebuffer){
+            needLoad = true;
+        }
     }
 }
 

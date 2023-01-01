@@ -43,11 +43,27 @@ bool Model::loadModel(std::string filename){
 }
 
 bool Model::loadOBJ(std::string filename){
-    return scene->getSystem<MeshSystem>()->loadOBJ(entity, filename);
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    bool ret = scene->getSystem<MeshSystem>()->loadOBJ(entity, filename);
+
+    if (ret){
+        mesh.needReload = true;
+    }
+
+    return ret;
 }
 
 bool Model::loadGLTF(std::string filename){
-    return scene->getSystem<MeshSystem>()->loadGLTF(entity, filename);
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    bool ret = scene->getSystem<MeshSystem>()->loadGLTF(entity, filename);
+
+    if (ret){
+        mesh.needReload = true;
+    }
+
+    return ret;
 }
 
 Animation Model::getAnimation(int index){

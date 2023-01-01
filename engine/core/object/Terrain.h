@@ -31,6 +31,27 @@ namespace Supernova{
         void setColor(Vector4 color);
         void setColor(float red, float green, float blue, float alpha);
         Vector4 getColor() const;
+
+        void setSize(float size);
+        float getSize() const;
+
+        void setMaxHeight(float maxHeight);
+        float getMaxHeight() const;
+
+        void setResolution(int resolution);
+        int getResolution() const;
+
+        void setTextureBaseTiles(int textureBaseTiles);
+        int getTextureBaseTiles() const;
+
+        void setTextureDetailTiles(int textureDetailTiles);
+        int getTextureDetailTiles() const;
+
+        void setRootGridSize(int rootGridSize);
+        int getRootGridSize() const;
+
+        void setLevels(int levels);
+        int getLevels() const;
     };
 
 }

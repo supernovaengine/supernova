@@ -96,6 +96,9 @@ bool TextureData::loadTextureFromFile(const char* filename) {
         return false;
     }
     filedata.seek(0);
+
+    if (dataOwned && data)
+        releaseImageData();
     
     //----- Start std_image read texture
     stbi_info_from_memory((stbi_uc const *)filedata.getMemPtr(), filedata.length(), &width, &height, &channels);
@@ -154,6 +157,7 @@ TextureData::~TextureData() {
 
 void TextureData::releaseImageData(){
     free((void*)data);
+    data = NULL;
 }
 
 int TextureData::getNearestPowerOfTwo(int size){

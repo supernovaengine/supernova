@@ -102,3 +102,117 @@ Vector4 Terrain::getColor() const{
 
     return Color::linearTosRGB(terrain.material.baseColorFactor);
 }
+
+void Terrain::setSize(float size){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+    Transform& transform = getComponent<Transform>();
+
+    if (terrain.terrainSize != size){
+        terrain.terrainSize = size;
+
+        terrain.needUpdateTerrain = true;
+        transform.needUpdate = true;
+    }
+}
+
+float Terrain::getSize() const{
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return terrain.terrainSize;
+}
+
+void Terrain::setMaxHeight(float maxHeight){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    if (terrain.maxHeight != maxHeight){
+        terrain.maxHeight = maxHeight;
+        terrain.needUpdateTerrain = true;
+    }
+}
+
+float Terrain::getMaxHeight() const{
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return terrain.maxHeight;
+}
+
+void Terrain::setResolution(int resolution){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+    Transform& transform = getComponent<Transform>();
+
+    if (terrain.resolution != resolution){
+        terrain.resolution = resolution;
+
+        terrain.needUpdateTerrain = true;
+        terrain.needReload = true;
+        transform.needUpdate = true;
+    }
+}
+
+int Terrain::getResolution() const{
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return (int)terrain.resolution;
+}
+
+void Terrain::setTextureBaseTiles(int textureBaseTiles){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    terrain.textureBaseTiles = textureBaseTiles; // no need update terrain
+}
+
+int Terrain::getTextureBaseTiles() const{
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return (int)terrain.textureBaseTiles;
+}
+
+void Terrain::setTextureDetailTiles(int textureDetailTiles){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    terrain.textureDetailTiles = textureDetailTiles; // no need update terrain
+}
+
+int Terrain::getTextureDetailTiles() const{
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return (int)terrain.textureDetailTiles;
+}
+
+void Terrain::setRootGridSize(int rootGridSize){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+    Transform& transform = getComponent<Transform>();
+
+    if (terrain.rootGridSize != rootGridSize){
+        terrain.rootGridSize = rootGridSize;
+
+        terrain.needUpdateTerrain = true;
+        terrain.needReload = true;
+        transform.needUpdate = true;
+    }
+}
+
+int Terrain::getRootGridSize() const{
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return (int)terrain.rootGridSize;
+}
+
+void Terrain::setLevels(int levels){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+    Transform& transform = getComponent<Transform>();
+
+    if (terrain.levels != levels){
+        terrain.levels = levels;
+
+        terrain.needUpdateTerrain = true;
+        terrain.needReload = true;
+        transform.needUpdate = true;
+    }
+}
+
+int Terrain::getLevels() const{
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return (int)terrain.levels;
+}

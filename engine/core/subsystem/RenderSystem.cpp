@@ -957,6 +957,7 @@ bool RenderSystem::loadTerrain(TerrainComponent& terrain){
 	}
 	//----------End depth shader---------------
 
+	terrain.needReload = false;
 	terrain.loaded = true;
 
 	return true;
@@ -1028,18 +1029,27 @@ void RenderSystem::destroyTerrain(TerrainComponent& terrain){
 	if (!terrain.loaded)
 		return;
 
+	terrain.heightMap.releaseData();
+
 	//Destroy shader
 	terrain.shader.reset();
 	ShaderPool::remove(ShaderType::MESH, terrain.shaderProperties);
 	if (hasShadows && terrain.castShadows)
 		ShaderPool::remove(ShaderType::DEPTH, terrain.depthShaderProperties);
 
-	//Destroy texture
+	//Destroy PBR texture
 	terrain.material.baseColorTexture.destroy();
 	terrain.material.metallicRoughnessTexture.destroy();
 	terrain.material.normalTexture.destroy();
 	terrain.material.occlusionTexture.destroy();
 	terrain.material.emissiveTexture.destroy();
+
+	//Destroy terrain texture
+	terrain.heightMap.destroy();
+	terrain.blendMap.destroy();
+	terrain.textureDetailRed.destroy();
+	terrain.textureDetailGreen.destroy();
+	terrain.textureDetailBlue.destroy();
 
 	//Destroy render
 	terrain.render.destroy();
@@ -2483,11 +2493,15 @@ void RenderSystem::draw(){
 void RenderSystem::entityDestroyed(Entity entity){
 	Signature signature = scene->getSignature(entity);
 
+	//TODO: Destroy lights?
+
 	if (signature.test(scene->getComponentType<MeshComponent>())){
 		destroyMesh(scene->getComponent<MeshComponent>(entity));
 	}
 
-	//TODO: Destroy lights?
+	if (signature.test(scene->getComponentType<TerrainComponent>())){
+		destroyTerrain(scene->getComponent<TerrainComponent>(entity));
+	}
 
 	if (signature.test(scene->getComponentType<UIComponent>())){
 		destroyUI(scene->getComponent<UIComponent>(entity));

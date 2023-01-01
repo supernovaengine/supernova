@@ -747,8 +747,6 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
         }
     }
 
-    terrain.heightMap.releaseData();
-
 }
 
 void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned int tiles){
@@ -1826,8 +1824,6 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
 */
     std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
 
-    mesh.needReload = true;
-
     return true;
 }
 
@@ -1989,8 +1985,6 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
         }
 
         std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
-
-        mesh.needReload = true;
     }
 
     return true;

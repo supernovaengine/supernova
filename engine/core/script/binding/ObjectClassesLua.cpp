@@ -221,6 +221,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<Framebuffer*>(&Terrain::setTexture))
         .addProperty("color", &Terrain::getColor, (void(Terrain::*)(Vector4))&Terrain::setColor)
         .addFunction("setColor", (void(Terrain::*)(float, float, float, float))&Terrain::setColor)
+        .addProperty("size", &Terrain::getSize, &Terrain::setSize)
+        .addProperty("maxHeight", &Terrain::getMaxHeight, &Terrain::setMaxHeight)
+        .addProperty("resolution", &Terrain::getResolution, &Terrain::setResolution)
+        .addProperty("textureBaseTiles", &Terrain::getTextureBaseTiles, &Terrain::setTextureBaseTiles)
+        .addProperty("textureDetailTiles", &Terrain::getTextureDetailTiles, &Terrain::setTextureDetailTiles)
+        .addProperty("rootGridSize", &Terrain::getRootGridSize, &Terrain::setRootGridSize)
+        .addProperty("levels", &Terrain::getLevels, &Terrain::setLevels)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
