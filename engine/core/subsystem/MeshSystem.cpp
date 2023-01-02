@@ -106,7 +106,8 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
         0, indices->getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
 
-    mesh.needUpdateBuffer = true;
+    if (mesh.loaded)
+        mesh.needUpdateBuffer = true;
 }
 
 void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
@@ -154,7 +155,8 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
     polygon.width = (int)(max_X - min_X);
     polygon.height = (int)(max_Y - min_Y);
 
-    mesh.needUpdateBuffer = true;
+    if (mesh.loaded)
+        mesh.needUpdateBuffer = true;
 }
 
 void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh){

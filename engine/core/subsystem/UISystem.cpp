@@ -148,7 +148,8 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
         0, ui.indices.getAttribute(AttributeType::INDEX),
         54, (char*)&indices_array[0], sizeof(uint16_t));
 
-    ui.needUpdateBuffer = true;
+    if (ui.loaded)
+        ui.needUpdateBuffer = true;
 
     return true;
 }
@@ -223,7 +224,8 @@ void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponen
             0, ui.indices.getAttribute(AttributeType::INDEX),
             indices_array.size(), (char*)&indices_array[0], sizeof(uint16_t));
 
-    ui.needUpdateBuffer = true;
+    if (ui.loaded)
+        ui.needUpdateBuffer = true;
 }
 
 void UISystem::createButtonLabel(Entity entity, ButtonComponent& button){
@@ -435,7 +437,8 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILay
     layout.width = (int)(max_X - min_X);
     layout.height = (int)(max_Y - min_Y);
 
-    ui.needUpdateBuffer = true;
+    if (ui.loaded)
+        ui.needUpdateBuffer = true;
 }
 
 bool UISystem::loadOrUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout){

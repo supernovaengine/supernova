@@ -9,11 +9,6 @@
 
 namespace Supernova{
     class Image: public UILayout{
-
-    protected:
-        InterleavedBuffer buffer;
-        IndexBuffer indices;
-
     public:
         Image(Scene* scene);
 

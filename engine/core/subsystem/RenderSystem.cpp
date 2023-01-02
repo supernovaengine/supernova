@@ -1579,7 +1579,8 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 		((ExternalBuffer*)particles.buffer)->setData((unsigned char*)nullptr, 0);
 	}
 
-	particles.needUpdateBuffer = true;
+	if (particles.loaded)
+		particles.needUpdateBuffer = true;
 }
 
 void RenderSystem::updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
