@@ -8,12 +8,11 @@
 #include <vector>
 #include <unordered_map>
 
-#include "object/environment/Fog.h"
-
 #include "component/MeshComponent.h"
 #include "component/ModelComponent.h"
 #include "component/BoneComponent.h"
 #include "component/SkyComponent.h"
+#include "component/FogComponent.h"
 #include "component/ImageComponent.h"
 #include "component/UILayoutComponent.h"
 #include "component/UIContainerComponent.h"
@@ -44,6 +43,7 @@
 #include "component/ScaleTracksComponent.h"
 #include "component/TerrainComponent.h"
 #include "component/AudioComponent.h"
+#include "component/TilemapComponent.h"
 
 namespace Supernova{
 
@@ -56,9 +56,6 @@ namespace Supernova{
 
 		Vector4 backgroundColor;
 		bool shadowsPCF;
-
-		bool hasFog;
-		Fog fog;
 
 		bool hasSceneAmbientLight;
 		Vector3 ambientLight;
@@ -96,10 +93,6 @@ namespace Supernova{
 
 		void setShadowsPCF(bool shadowsPCF);
 		bool isShadowsPCF() const;
-
-		void setFogEnabled(bool hasFog);
-		bool isFogEnabled() const;
-		Fog& getFog();
 
 		void setAmbientLight(float ambientFactor, Vector3 ambientLight);
 		void setAmbientLight(float ambientFactor);

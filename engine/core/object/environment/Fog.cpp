@@ -7,55 +7,62 @@
 
 using namespace Supernova;
 
-Fog::Fog(){
-    type = FogType::LINEAR;
-    color = Color::sRGBToLinear(Vector3(0.8, 0.8, 0.8));
-    density = 0.01;
-    linearStart = 10;
-    linearEnd = 60;
+Fog::Fog(Scene* scene): EntityHandle(scene){
+    addComponent<FogComponent>({});
 }
 
 FogType Fog::getType() const{
-    return type;
+    FogComponent& fog = getComponent<FogComponent>();
+    return fog.type;
 }
 
 Vector3 Fog::getColor() const{
-    return color;
+    FogComponent& fog = getComponent<FogComponent>();
+    return Color::linearTosRGB(fog.color);
 }
 
 float Fog::getDensity() const{
-    return density;
+    FogComponent& fog = getComponent<FogComponent>();
+    return fog.density;
 }
 
 float Fog::getLinearStart() const{
-    return linearStart;
+    FogComponent& fog = getComponent<FogComponent>();
+    return fog.linearStart;
 }
 
 float Fog::getLinearEnd() const{
-    return linearEnd;
+    FogComponent& fog = getComponent<FogComponent>();
+    return fog.linearEnd;
 }
 
 void Fog::setType(FogType type){
-    this->type = type;
+    FogComponent& fog = getComponent<FogComponent>();
+    fog.type = type;
 }
 
 void Fog::setColor(Vector3 color){
-    this->color = Color::sRGBToLinear(color);
+    FogComponent& fog = getComponent<FogComponent>();
+    fog.color = Color::sRGBToLinear(color);
 }
 
 void Fog::setDensity(float density){
-    this->density = density;
+    FogComponent& fog = getComponent<FogComponent>();
+    fog.density = density;
 }
 
 void Fog::setLinearStart(float start){
-    this->linearStart = start;
+    FogComponent& fog = getComponent<FogComponent>();
+    fog.linearStart = start;
 }
 
 void Fog::setLinearEnd(float end){
-    this->linearEnd = end;
+    FogComponent& fog = getComponent<FogComponent>();
+    fog.linearEnd = end;
 }
 
 void Fog::setLinearStartEnd(float start, float end){
-    this->linearStart = start;
-    this->linearEnd = end;
+    FogComponent& fog = getComponent<FogComponent>();
+    fog.linearStart = start;
+    fog.linearEnd = end;
 }

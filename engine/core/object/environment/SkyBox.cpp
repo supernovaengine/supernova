@@ -6,9 +6,7 @@
 
 using namespace Supernova;
 
-SkyBox::SkyBox(Scene* scene){
-    this->scene = scene;
-    this->entity = scene->createEntity();
+SkyBox::SkyBox(Scene* scene): EntityHandle(scene){
     addComponent<SkyComponent>({});
 }
 

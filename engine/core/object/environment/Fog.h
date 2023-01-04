@@ -5,26 +5,15 @@
 #ifndef FOG_H
 #define FOG_H
 
-#include "math/Vector3.h"
+#include "object/EntityHandle.h"
+#include "component/FogComponent.h"
 
 namespace Supernova{
-    enum class FogType{
-        LINEAR,
-		    EXPONENTIAL,
-		    EXPONENTIALSQUARED
-    };
 
-    class Fog{
-
-    private:
-		FogType type;
-		Vector3 color; //linear
-		float density; //for  exponential fog
-		float linearStart;
-		float linearEnd;
+    class Fog: public EntityHandle {
 
     public:
-        Fog();
+        Fog(Scene* scene);
 
         FogType getType() const;
         Vector3 getColor() const;
@@ -38,7 +27,6 @@ namespace Supernova{
         void setLinearStart(float start);
         void setLinearEnd(float end);
         void setLinearStartEnd(float start, float end);
-
     };
 }
 

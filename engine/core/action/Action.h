@@ -1,28 +1,18 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #ifndef ACTION_H
 #define ACTION_H
 
-#include "Scene.h"
-#include "Entity.h"
+#include "object/EntityHandle.h"
 
 namespace Supernova{
-    class Action{
-    protected:
-        Entity entity;
-        Scene* scene;
-
-        bool entityOwned;
-
+    class Action: public EntityHandle{
     public:
         Action(Scene* scene);
         Action(Scene* scene, Entity entity);
         virtual ~Action();
-
-        Action(const Action& rhs);
-        Action& operator=(const Action& rhs);
 
         void start();
         void pause();
@@ -37,23 +27,6 @@ namespace Supernova{
         bool isRunning() const;
         bool isStopped() const;
         bool isPaused() const;
-
-        template <typename T>
-        void addComponent(T &&component) {
-            scene->addComponent<T>(entity, std::forward<T>(component));
-        }
-    
-        template <typename T>
-        void removeComponent() {
-            scene->removeComponent<T>(entity);
-        }
-    
-        template<typename T>
-    	T& getComponent() const {
-    		return scene->getComponent<T>(entity);
-    	}
-
-        Entity getEntity() const;
     };
 }
 

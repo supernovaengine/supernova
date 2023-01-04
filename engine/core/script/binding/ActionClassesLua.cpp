@@ -75,7 +75,7 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
-        .beginClass<Action>("Action")
+        .deriveClass<Action, EntityHandle>("Action")
         .addConstructor <void(Scene*), void(Scene*, Entity)> ()
         .addFunction("start", &Action::start)
         .addFunction("pause", &Action::pause)
@@ -85,7 +85,6 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addFunction("isRunning", &Action::isRunning)
         .addFunction("isStopped", &Action::isStopped)
         .addFunction("isPaused", &Action::isPaused)
-        .addProperty("entity", &Action::getEntity)
         .addFunction("getActionComponent", &Action::getComponent<ActionComponent>)
         .endClass();
 

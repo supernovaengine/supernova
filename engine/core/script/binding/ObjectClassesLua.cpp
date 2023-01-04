@@ -11,6 +11,7 @@
 #include "LuaBridge.h"
 #include "LuaBridgeAddon.h"
 
+#include "EntityHandle.h"
 #include "Fog.h"
 #include "SkyBox.h"
 #include "Object.h"
@@ -19,7 +20,6 @@
 #include "Terrain.h"
 #include "Light.h"
 #include "Mesh.h"
-#include "Fog.h"
 #include "Bone.h"
 #include "Model.h"
 #include "MeshPolygon.h"
@@ -37,13 +37,6 @@ using namespace Supernova;
 
 void LuaBinding::registerObjectClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
-
-    luabridge::getGlobalNamespace(L)
-        .beginNamespace("FogType")
-        .addProperty("LINEAR", FogType::LINEAR)
-        .addProperty("EXPONENTIAL", FogType::EXPONENTIAL)
-        .addProperty("EXPONENTIALSQUARED", FogType::EXPONENTIALSQUARED)
-        .endNamespace();
 
     luabridge::getGlobalNamespace(L)
         .beginNamespace("CameraType")
@@ -70,8 +63,14 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
-        .beginClass<Fog>("Fog")
-        .addConstructor <void (*) (void)> ()
+        .beginClass<EntityHandle>("EntityHandle")
+        .addConstructor <void (Scene*)> ()
+        .addProperty("entity", &EntityHandle::getEntity)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Fog, EntityHandle>("Fog")
+        .addConstructor <void (Scene*)> ()
         .addProperty("type", &Fog::getType, &Fog::setType)
         .addProperty("color", &Fog::getColor, &Fog::setColor)
         .addProperty("density", &Fog::getDensity, &Fog::setDensity)
@@ -81,7 +80,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .beginClass<SkyBox>("SkyBox")
+        .deriveClass<SkyBox, EntityHandle>("SkyBox")
         .addConstructor <void (Scene*)> ()
         .addFunction("setTextures", &SkyBox::setTextures)
         .addFunction("setTextureFront", &SkyBox::setTextureFront)
@@ -96,7 +95,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .beginClass<Object>("Object")
+        .deriveClass<Object, EntityHandle>("Object")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("createChild", &Object::createChild)
         .addFunction("addChild", 
@@ -118,7 +117,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getWorldScale", &Object::getWorldScale)
         .addFunction("setBillboard", &Sprite::setBillboard)
         .addFunction("setModelMatrix", &Object::setModelMatrix)
-        .addProperty("entity", &Object::getEntity)
         .addFunction("updateTransform", &Object::updateTransform)
         .endClass();
 

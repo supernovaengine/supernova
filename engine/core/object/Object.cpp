@@ -6,37 +6,14 @@
 
 using namespace Supernova;
 
-Object::Object(Scene* scene){
-    this->scene = scene;
-    this->entity = scene->createEntity();
-    this->entityOwned = true;
-
+Object::Object(Scene* scene): EntityHandle(scene){
     addComponent<Transform>({});
 }
 
-Object::Object(Scene* scene, Entity entity){
-    this->scene = scene;
-    this->entity = entity;
-    this->entityOwned = false;
+Object::Object(Scene* scene, Entity entity): EntityHandle(scene, entity){
 }
 
 Object::~Object(){
-    if (scene && entityOwned)
-        scene->destroyEntity(entity); 
-}
-
-Object::Object(const Object& rhs){
-    scene = rhs.scene;
-    entity = rhs.entity;
-    entityOwned = rhs.entityOwned;
-}
-
-Object& Object::operator=(const Object& rhs){
-    scene = rhs.scene;
-    entity = rhs.entity;
-    entityOwned = rhs.entityOwned;
-
-    return *this;
 }
 
 void Object::setName(std::string name){
@@ -171,10 +148,6 @@ void Object::moveDown(){
 
 void Object::moveToLast(){
     scene->moveChildToLast(this->entity);
-}
-
-Entity Object::getEntity() const{
-    return entity;
 }
 
 void Object::updateTransform(){

@@ -1,42 +1,19 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #include "Action.h"
 
 using namespace Supernova;
 
-Action::Action(Scene* scene){
-    this->scene = scene;
-    this->entity = scene->createEntity();
-    entityOwned = true;
-
+Action::Action(Scene* scene): EntityHandle(scene){
     addComponent<ActionComponent>({});
 }
 
-Action::Action(Scene* scene, Entity entity){
-    this->scene = scene;
-    this->entity = entity;
-    this->entityOwned = false;
+Action::Action(Scene* scene, Entity entity): EntityHandle(scene, entity){
 }
 
 Action::~Action(){
-    if (scene && entityOwned)
-        scene->destroyEntity(entity);
-}
-
-Action::Action(const Action& rhs){
-    scene = rhs.scene;
-    entity = rhs.entity;
-    entityOwned = rhs.entityOwned;
-}
-
-Action& Action::operator=(const Action& rhs){
-    scene = rhs.scene;
-    entity = rhs.entity;
-    entityOwned = rhs.entityOwned;
-
-    return *this;
 }
 
 void Action::start(){
@@ -97,8 +74,4 @@ bool Action::isPaused() const{
     ActionComponent& action = getComponent<ActionComponent>();
 
     return (action.state == ActionState::Paused);
-}
-
-Entity Action::getEntity() const{
-    return entity;
 }

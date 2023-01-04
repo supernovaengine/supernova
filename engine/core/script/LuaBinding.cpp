@@ -220,12 +220,12 @@ void LuaBinding::registerClasses(lua_State *L){
     // luaL_openlibs() open all libraries: base, string, io, os, package, table, debug
     luaL_openlibs(L);
 
-    registerActionClasses(L);
     registerCoreClasses(L);
+    registerObjectClasses(L);
+    registerActionClasses(L);
     registerECSClasses(L);
     registerIOClasses(L);
-    registerMathClasses(L);
-    registerObjectClasses(L);
+    registerMathClasses(L); 
     registerUtilClasses(L);
 
 #endif //DISABLE_LUA_BINDINGS

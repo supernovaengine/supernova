@@ -1,21 +1,14 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #ifndef SKYBOX_H
 #define SKYBOX_H
 
-#include "buffer/InterleavedBuffer.h"
-
-#include "Scene.h"
-#include "Entity.h"
+#include "object/EntityHandle.h"
 
 namespace Supernova{
-    class SkyBox{
-
-    protected:
-        Entity entity;
-        Scene* scene;
+    class SkyBox: public EntityHandle{
 
     public:
         SkyBox(Scene* scene);
@@ -36,21 +29,6 @@ namespace Supernova{
         void setAlpha(const float alpha);
         Vector4 getColor() const;
         float getAlpha() const;
-
-        template <typename T>
-        void addComponent(T &&component) {
-            scene->addComponent<T>(entity, std::forward<T>(component));
-        }
-    
-        template <typename T>
-        void removeComponent() {
-            scene->removeComponent<T>(entity);
-        }
-    
-        template<typename T>
-    	T& getComponent() const {
-    		return scene->getComponent<T>(entity);
-    	}
 
     };
 }

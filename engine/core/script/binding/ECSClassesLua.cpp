@@ -25,6 +25,7 @@
 #include "component/ParticlesAnimationComponent.h"
 #include "component/AudioComponent.h"
 #include "component/SpriteComponent.h"
+#include "component/FogComponent.h"
 
 using namespace Supernova;
 
@@ -84,6 +85,13 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .beginNamespace("ContainerType")
         .addProperty("VERTICAL", ContainerType::VERTICAL)
         .addProperty("HORIZONTAL", ContainerType::HORIZONTAL)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("FogType")
+        .addProperty("LINEAR", FogType::LINEAR)
+        .addProperty("EXPONENTIAL", FogType::EXPONENTIAL)
+        .addProperty("EXPONENTIALSQUARED", FogType::EXPONENTIALSQUARED)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)

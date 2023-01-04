@@ -17,6 +17,7 @@ Scene::Scene(){
 	registerComponent<ModelComponent>();
 	registerComponent<BoneComponent>();
 	registerComponent<SkyComponent>();
+	registerComponent<FogComponent>();
 	registerComponent<UIContainerComponent>();
 	registerComponent<UILayoutComponent>();
 	registerComponent<SpriteComponent>();
@@ -48,6 +49,7 @@ Scene::Scene(){
 	registerComponent<ScaleTracksComponent>();
 	registerComponent<TerrainComponent>();
 	registerComponent<AudioComponent>();
+	registerComponent<TilemapComponent>();
 
 	registerSystem<ActionSystem>();
 	registerSystem<MeshSystem>();
@@ -61,8 +63,6 @@ Scene::Scene(){
 	mainScene = false;
 	backgroundColor = Vector4(0.1, 0.1, 0.1, 1.0); //sRGB
 	shadowsPCF = true;
-
-	hasFog = false;
 
 	hasSceneAmbientLight = false;
 	ambientLight = Vector3(1.0, 1.0, 1.0);
@@ -132,18 +132,6 @@ void Scene::setShadowsPCF(bool shadowsPCF){
 
 bool Scene::isShadowsPCF() const{
 	return this->shadowsPCF;
-}
-
-void Scene::setFogEnabled(bool hasFog){
-	this->hasFog = hasFog;
-}
-
-bool Scene::isFogEnabled() const{
-	return this->hasFog;
-}
-
-Fog& Scene::getFog(){
-	return fog;
 }
 
 void Scene::setAmbientLight(float ambientFactor, Vector3 ambientLight){

@@ -1,29 +1,19 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "Scene.h"
-#include "Entity.h"
+#include "EntityHandle.h"
 
 namespace Supernova{
 
-    class Object{
-    protected:
-        Entity entity;
-        Scene* scene;
-
-        bool entityOwned;
-
+    class Object: public EntityHandle{
     public:
         Object(Scene* scene);
         Object(Scene* scene, Entity entity);
         virtual ~Object();
-
-        Object(const Object& rhs);
-        Object& operator=(const Object& rhs);
 
         Object* createChild(); //TODO: add a template here
         void addChild(Object* child);
@@ -55,23 +45,6 @@ namespace Supernova{
         void setBillboard(bool billboard, bool fake = true, bool cylindrical = true);
 
         void setModelMatrix(Matrix4 modelMatrix);
-    
-        template <typename T>
-        void addComponent(T &&component) {
-            scene->addComponent<T>(entity, std::forward<T>(component));
-        }
-    
-        template <typename T>
-        void removeComponent() {
-            scene->removeComponent<T>(entity);
-        }
-    
-        template<typename T>
-    	T& getComponent() const {
-    		return scene->getComponent<T>(entity);
-    	}
-
-        Entity getEntity() const;
 
         void updateTransform();
     };
