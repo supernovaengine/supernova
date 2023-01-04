@@ -114,6 +114,9 @@ namespace Supernova{
 		AlignedBox getTerrainNodeAlignedBox(Transform& transform, TerrainNode& terrainNode);
 		bool isTerrainNodeInSphere(Vector3 position, float radius, const AlignedBox& box);
 
+		// sky
+		void createSky(SkyComponent& sky);
+
 		float lerp(float a, float b, float fraction);
 
 	protected:

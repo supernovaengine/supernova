@@ -9,7 +9,7 @@ namespace Supernova{
     struct SkyComponent{
         bool loaded = false;
 
-        Buffer* buffer;
+        InterleavedBuffer buffer;
 
         Matrix4 skyViewProjectionMatrix;
 

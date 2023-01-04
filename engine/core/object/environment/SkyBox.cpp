@@ -10,56 +10,6 @@ SkyBox::SkyBox(Scene* scene){
     this->scene = scene;
     this->entity = scene->createEntity();
     addComponent<SkyComponent>({});
-
-    SkyComponent& sky = getComponent<SkyComponent>();
-    sky.buffer = &buffer;
-
-	buffer.clearAll();
-	buffer.addAttribute(AttributeType::POSITION, 3);
-
-    Attribute* attVertex = buffer.getAttribute(AttributeType::POSITION);
-    
-    buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    
-    buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    
-    buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    
-    buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    
-    buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-    
-    buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-    buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-    buffer.addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
 }
 
 void SkyBox::setTextures(std::string textureFront, std::string textureBack,  

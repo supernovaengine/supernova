@@ -17,8 +17,6 @@ namespace Supernova{
         Entity entity;
         Scene* scene;
 
-        InterleavedBuffer buffer;
-
     public:
         SkyBox(Scene* scene);
 
