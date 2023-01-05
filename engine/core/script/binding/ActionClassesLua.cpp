@@ -109,8 +109,9 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .deriveClass<ColorAction, TimedAction>("ColorAction")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setAction", 
-            luabridge::overload<Vector3, Vector3, float, bool>(&ColorAction::setAction),
             luabridge::overload<Vector4, Vector4, float, bool>(&ColorAction::setAction))
+            // TODO: overload error in Emscripten
+            //luabridge::overload<Vector3, Vector3, float, bool>(&ColorAction::setAction)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
