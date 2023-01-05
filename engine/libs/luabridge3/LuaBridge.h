@@ -2335,7 +2335,17 @@ struct TypeResult
         return m_value.value();
     }
 
-    const T& operator*() const
+    T& operator*() &
+    {
+        return m_value.value();
+    }
+
+    T operator*() &&
+    {
+        return std::move(m_value.value());
+    }
+
+    const T& operator*() const&
     {
         return m_value.value();
     }
@@ -2544,26 +2554,17 @@ inline void enableExceptions(lua_State* L) noexcept
 namespace luabridge {
 namespace detail {
 
-[[nodiscard]] static constexpr auto fnv1a(const char* s, std::size_t count) noexcept
+[[nodiscard]] constexpr auto fnv1a(const char* s, std::size_t count) noexcept
 {
-    if constexpr (sizeof(void*) == 4)
-    {
-        uint32_t seed = 2166136261u;
+    uint32_t seed = 2166136261u;
 
-        for (std::size_t i = 0; i < count; ++i)
-            seed ^= static_cast<uint32_t>(*s++) * 16777619u;
+    for (std::size_t i = 0; i < count; ++i)
+        seed ^= static_cast<uint32_t>(*s++) * 16777619u;
 
-        return seed;
-    }
+    if constexpr (sizeof(void*) == 8)
+        return static_cast<uint64_t>(seed);
     else
-    {
-        uint64_t seed = 14695981039346656037ull;
-
-        for (std::size_t i = 0; i < count; ++i)
-            seed ^= static_cast<uint64_t>(*s++) * 1099511628211ull;
-
         return seed;
-    }
 }
 
 template <class T>
@@ -2584,53 +2585,53 @@ template <class T, auto = typeName<T>().find_first_of('.')>
     return fnv1a(stripped.data(), stripped.size());
 }
 
-inline const void* getTypeKey() noexcept
+[[nodiscard]] inline const void* getTypeKey() noexcept
 {
     return reinterpret_cast<void*>(0x71);
 }
 
-inline const void* getConstKey() noexcept
+[[nodiscard]] inline const void* getConstKey() noexcept
 {
     return reinterpret_cast<void*>(0xc07);
 }
 
-inline const void* getClassKey() noexcept
+[[nodiscard]] inline const void* getClassKey() noexcept
 {
     return reinterpret_cast<void*>(0xc1a);
 }
 
-inline const void* getPropgetKey() noexcept
+[[nodiscard]] inline const void* getPropgetKey() noexcept
 {
     return reinterpret_cast<void*>(0x6e7);
 }
 
-inline const void* getPropsetKey() noexcept
+[[nodiscard]] inline const void* getPropsetKey() noexcept
 {
     return reinterpret_cast<void*>(0x5e7);
 }
 
-inline const void* getStaticKey() noexcept
+[[nodiscard]] inline const void* getStaticKey() noexcept
 {
     return reinterpret_cast<void*>(0x57a);
 }
 
-inline const void* getParentKey() noexcept
+[[nodiscard]] inline const void* getParentKey() noexcept
 {
     return reinterpret_cast<void*>(0xdad);
 }
 
-inline const void* getIndexFallbackKey()
+[[nodiscard]] inline const void* getIndexFallbackKey()
 {
   return reinterpret_cast<void*>(0x81ca);
 }
 
-inline const void* getNewIndexFallbackKey()
+[[nodiscard]] inline const void* getNewIndexFallbackKey()
 {
   return reinterpret_cast<void*>(0x8107);
 }
 
 template <class T>
-const void* getStaticRegistryKey() noexcept
+[[nodiscard]] const void* getStaticRegistryKey() noexcept
 {
     static auto value = typeHash<T>();
 
@@ -2638,7 +2639,7 @@ const void* getStaticRegistryKey() noexcept
 }
 
 template <class T>
-const void* getClassRegistryKey() noexcept
+[[nodiscard]] const void* getClassRegistryKey() noexcept
 {
     static auto value = typeHash<T>() ^ 1;
 
@@ -2646,7 +2647,7 @@ const void* getClassRegistryKey() noexcept
 }
 
 template <class T>
-const void* getConstRegistryKey() noexcept
+[[nodiscard]] const void* getConstRegistryKey() noexcept
 {
     static auto value = typeHash<T>() ^ 2;
 
@@ -4948,6 +4949,15 @@ struct Stack<std::list<T>>
 namespace luabridge {
 namespace detail {
 
+[[noreturn]] inline void unreachable()
+{
+#if __GNUC__ 
+    __builtin_unreachable();
+#elif _MSC_VER 
+    __assume(false);
+#endif
+}
+
 template< class T >
 struct remove_cvref
 {
@@ -5142,6 +5152,18 @@ struct is_const_member_function_pointer<R (T::*)(Args...)>
 
 template <class T, class R, class... Args>
 struct is_const_member_function_pointer<R (T::*)(Args...) const>
+{
+    static constexpr bool value = true;
+};
+
+template <class T, class R, class... Args>
+struct is_const_member_function_pointer<R (T::*)(Args...) noexcept>
+{
+    static constexpr bool value = false;
+};
+
+template <class T, class R, class... Args>
+struct is_const_member_function_pointer<R (T::*)(Args...) const noexcept>
 {
     static constexpr bool value = true;
 };
@@ -5633,7 +5655,7 @@ struct property_setter<T, void>
         if (! result)
             raise_lua_error(L, "%s", result.error().message().c_str());
 
-        *ptr = *result;
+        *ptr = std::move(*result);
 
         return 0;
     }
@@ -5674,7 +5696,7 @@ struct property_setter
             if (! result)
                 raise_lua_error(L, "%s", result.error().message().c_str());
 
-            c->** mp = *result;
+            c->** mp = std::move(*result);
 
 #if LUABRIDGE_HAS_EXCEPTIONS
         }
@@ -5982,6 +6004,15 @@ inline void push_function(lua_State* L, ReturnType (*fp)(Params...))
     lua_pushcclosure_x(L, &invoke_proxy_function<FnType>, 1);
 }
 
+template <class ReturnType, class... Params>
+inline void push_function(lua_State* L, ReturnType (*fp)(Params...) noexcept)
+{
+    using FnType = decltype(fp);
+
+    lua_pushlightuserdata(L, reinterpret_cast<void*>(fp));
+    lua_pushcclosure_x(L, &invoke_proxy_function<FnType>, 1);
+}
+
 template <class F, class = std::enable_if<is_callable_v<F> && !std::is_pointer_v<F> && !std::is_member_function_pointer_v<F>>>
 inline void push_function(lua_State* L, F&& f)
 {
@@ -6005,7 +6036,25 @@ void push_member_function(lua_State* L, ReturnType (*fp)(T*, Params...))
 }
 
 template <class T, class ReturnType, class... Params>
+void push_member_function(lua_State* L, ReturnType (*fp)(T*, Params...) noexcept)
+{
+    using FnType = decltype(fp);
+
+    lua_pushlightuserdata(L, reinterpret_cast<void*>(fp));
+    lua_pushcclosure_x(L, &invoke_proxy_function<FnType>, 1);
+}
+
+template <class T, class ReturnType, class... Params>
 void push_member_function(lua_State* L, ReturnType (*fp)(const T*, Params...))
+{
+    using FnType = decltype(fp);
+
+    lua_pushlightuserdata(L, reinterpret_cast<void*>(fp));
+    lua_pushcclosure_x(L, &invoke_proxy_function<FnType>, 1);
+}
+
+template <class T, class ReturnType, class... Params>
+void push_member_function(lua_State* L, ReturnType (*fp)(const T*, Params...) noexcept)
 {
     using FnType = decltype(fp);
 
@@ -6038,7 +6087,29 @@ void push_member_function(lua_State* L, ReturnType (U::*mfp)(Params...))
 }
 
 template <class T, class U, class ReturnType, class... Params>
+void push_member_function(lua_State* L, ReturnType (U::*mfp)(Params...) noexcept)
+{
+    static_assert(std::is_same_v<T, U> || std::is_base_of_v<U, T>);
+
+    using F = decltype(mfp);
+
+    new (lua_newuserdata_x<F>(L, sizeof(F))) F(mfp);
+    lua_pushcclosure_x(L, &invoke_member_function<F, T>, 1);
+}
+
+template <class T, class U, class ReturnType, class... Params>
 void push_member_function(lua_State* L, ReturnType (U::*mfp)(Params...) const)
+{
+    static_assert(std::is_same_v<T, U> || std::is_base_of_v<U, T>);
+
+    using F = decltype(mfp);
+
+    new (lua_newuserdata_x<F>(L, sizeof(F))) F(mfp);
+    lua_pushcclosure_x(L, &detail::invoke_const_member_function<F, T>, 1);
+}
+
+template <class T, class U, class ReturnType, class... Params>
+void push_member_function(lua_State* L, ReturnType (U::*mfp)(Params...) const noexcept)
 {
     static_assert(std::is_same_v<T, U> || std::is_base_of_v<U, T>);
 
@@ -6278,7 +6349,7 @@ protected:
     };
 
     LuaRefBase(lua_State* L)
-        : m_L(main_thread(L))
+        : m_L(L)
     {
     }
 
@@ -7836,6 +7907,32 @@ class Namespace : public detail::Registrar
             return *this;
         }
 
+        template <class U>
+        Class<T>& addStaticProperty(const char* name, U (*get)() noexcept, void (*set)(U) noexcept = nullptr)
+        {
+            assert(name != nullptr);
+            assertStackState(); 
+
+            lua_pushlightuserdata(L, reinterpret_cast<void*>(get)); 
+            lua_pushcclosure_x(L, &detail::invoke_proxy_function<U (*)() noexcept>, 1); 
+            detail::add_property_getter(L, name, -2); 
+
+            if (set != nullptr)
+            {
+                lua_pushlightuserdata(L, reinterpret_cast<void*>(set)); 
+                lua_pushcclosure_x(L, &detail::invoke_proxy_function<void (*)(U) noexcept>, 1); 
+            }
+            else
+            {
+                lua_pushstring(L, name); 
+                lua_pushcclosure_x(L, &detail::read_only_error, 1); 
+            }
+
+            detail::add_property_setter(L, name, -2); 
+
+            return *this;
+        }
+
         template <class Getter, class = std::enable_if_t<!std::is_pointer_v<Getter>>>
         Class<T>& addStaticProperty(const char* name, Getter get)
         {
@@ -7971,6 +8068,31 @@ class Namespace : public detail::Registrar
         }
 
         template <class TG, class TS = TG>
+        Class<T>& addProperty(const char* name, TG (T::*get)() const noexcept, void (T::*set)(TS) noexcept = nullptr)
+        {
+            using GetType = TG (T::*)() const noexcept;
+            using SetType = void (T::*)(TS) noexcept;
+
+            assert(name != nullptr);
+            assertStackState(); 
+
+            new (lua_newuserdata_x<GetType>(L, sizeof(GetType))) GetType(get); 
+            lua_pushcclosure_x(L, &detail::invoke_const_member_function<GetType, T>, 1); 
+            lua_pushvalue(L, -1); 
+            detail::add_property_getter(L, name, -5); 
+            detail::add_property_getter(L, name, -3); 
+
+            if (set != nullptr)
+            {
+                new (lua_newuserdata_x<SetType>(L, sizeof(SetType))) SetType(set); 
+                lua_pushcclosure_x(L, &detail::invoke_member_function<SetType, T>, 1); 
+                detail::add_property_setter(L, name, -3); 
+            }
+
+            return *this;
+        }
+
+        template <class TG, class TS = TG>
         Class<T>& addProperty(const char* name, TG (T::*get)(lua_State*) const, void (T::*set)(TS, lua_State*) = nullptr)
         {
             using GetType = TG (T::*)(lua_State*) const;
@@ -7996,7 +8118,32 @@ class Namespace : public detail::Registrar
         }
 
         template <class TG, class TS = TG>
-        Class<T>& addProperty(const char* name, TG (*get)(T const*), void (*set)(T*, TS) = nullptr)
+        Class<T>& addProperty(const char* name, TG (T::*get)(lua_State*) const noexcept, void (T::*set)(TS, lua_State*) noexcept = nullptr)
+        {
+            using GetType = TG (T::*)(lua_State*) const noexcept;
+            using SetType = void (T::*)(TS, lua_State*) noexcept;
+
+            assert(name != nullptr);
+            assertStackState(); 
+
+            new (lua_newuserdata_x<GetType>(L, sizeof(GetType))) GetType(get); 
+            lua_pushcclosure_x(L, &detail::invoke_const_member_function<GetType, T>, 1); 
+            lua_pushvalue(L, -1); 
+            detail::add_property_getter(L, name, -5); 
+            detail::add_property_getter(L, name, -3); 
+
+            if (set != nullptr)
+            {
+                new (lua_newuserdata_x<SetType>(L, sizeof(SetType))) SetType(set); 
+                lua_pushcclosure_x(L, &detail::invoke_member_function<SetType, T>, 1); 
+                detail::add_property_setter(L, name, -3); 
+            }
+
+            return *this;
+        }
+
+        template <class TG, class TS = TG>
+        Class<T>& addProperty(const char* name, TG (*get)(const T*), void (*set)(T*, TS) = nullptr)
         {
             assert(name != nullptr);
             assertStackState(); 
@@ -8011,6 +8158,28 @@ class Namespace : public detail::Registrar
             {
                 lua_pushlightuserdata( L, reinterpret_cast<void*>(set)); 
                 lua_pushcclosure_x(L, &detail::invoke_proxy_function<void (*)(T*, TS)>, 1); 
+                detail::add_property_setter(L, name, -3); 
+            }
+
+            return *this;
+        }
+
+        template <class TG, class TS = TG>
+        Class<T>& addProperty(const char* name, TG (*get)(const T*) noexcept, void (*set)(T*, TS) noexcept = nullptr)
+        {
+            assert(name != nullptr);
+            assertStackState(); 
+
+            lua_pushlightuserdata(L, reinterpret_cast<void*>(get)); 
+            lua_pushcclosure_x(L, &detail::invoke_proxy_function<TG (*)(const T*) noexcept>, 1); 
+            lua_pushvalue(L, -1); 
+            detail::add_property_getter(L, name, -5); 
+            detail::add_property_getter(L, name, -3); 
+
+            if (set != nullptr)
+            {
+                lua_pushlightuserdata( L, reinterpret_cast<void*>(set)); 
+                lua_pushcclosure_x(L, &detail::invoke_proxy_function<void (*)(T*, TS) noexcept>, 1); 
                 detail::add_property_setter(L, name, -3); 
             }
 
@@ -8675,6 +8844,39 @@ public:
         {
             lua_pushlightuserdata(L, reinterpret_cast<void*>(set)); 
             lua_pushcclosure_x(L, &detail::invoke_proxy_function<void (*)(TS)>, 1);
+        }
+        else
+        {
+            lua_pushstring(L, name);
+            lua_pushcclosure_x(L, &detail::read_only_error, 1);
+        }
+
+        detail::add_property_setter(L, name, -2);
+
+        return *this;
+    }
+
+    template <class TG, class TS = TG>
+    Namespace& addProperty(const char* name, TG (*get)() noexcept, void (*set)(TS) noexcept = nullptr)
+    {
+        if (m_stackSize == 1)
+        {
+            throw_or_assert<std::logic_error>("addProperty() called on global namespace");
+
+            return *this;
+        }
+
+        assert(name != nullptr);
+        assert(lua_istable(L, -1)); 
+
+        lua_pushlightuserdata(L, reinterpret_cast<void*>(get)); 
+        lua_pushcclosure_x(L, &detail::invoke_proxy_function<TG (*)() noexcept>, 1); 
+        detail::add_property_getter(L, name, -2);
+
+        if (set != nullptr)
+        {
+            lua_pushlightuserdata(L, reinterpret_cast<void*>(set)); 
+            lua_pushcclosure_x(L, &detail::invoke_proxy_function<void (*)(TS) noexcept>, 1);
         }
         else
         {
