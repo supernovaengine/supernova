@@ -26,14 +26,23 @@ MeshSystem::~MeshSystem(){
 }
 
 void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera){
+    mesh.buffers["vertices"] = &mesh.buffer;
+    mesh.buffers["indices"] = &mesh.indices;
 
-    Buffer* buffer = mesh.buffers["vertices"];
-    Buffer* indices = mesh.buffers["indices"];
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
+    mesh.numSubmeshes = 1;
 
-    buffer->clear();
-    indices->clear();
+	mesh.buffer.clearAll();
+	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
-    Attribute* attVertex = buffer->getAttribute(AttributeType::POSITION);
+    mesh.buffer.setUsage(BufferUsage::DYNAMIC);
+
+    mesh.indices.clear();
+
+    Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
 
     Vector2 pivotPos = Vector2(0, 0);
 
@@ -63,38 +72,38 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
         pivotPos.y = sprite.height - pivotPos.y;
     }
 
-    buffer->addVector3(attVertex, Vector3(-pivotPos.x, -pivotPos.y, 0));
-    buffer->addVector3(attVertex, Vector3(sprite.width-pivotPos.x, -pivotPos.y, 0));
-    buffer->addVector3(attVertex, Vector3(sprite.width-pivotPos.x,  sprite.height-pivotPos.y, 0));
-    buffer->addVector3(attVertex, Vector3(-pivotPos.x,  sprite.height-pivotPos.y, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(-pivotPos.x, -pivotPos.y, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(sprite.width-pivotPos.x, -pivotPos.y, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(sprite.width-pivotPos.x,  sprite.height-pivotPos.y, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(-pivotPos.x,  sprite.height-pivotPos.y, 0));
 
-    Attribute* attTexcoord = buffer->getAttribute(AttributeType::TEXCOORD1);
+    Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
 
     if (!sprite.flipY){ 
-        buffer->addVector2(attTexcoord, Vector2(0.01f, 0.01f));
-        buffer->addVector2(attTexcoord, Vector2(0.99f, 0.01f));
-        buffer->addVector2(attTexcoord, Vector2(0.99f, 0.99f));
-        buffer->addVector2(attTexcoord, Vector2(0.01f, 0.99f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.01f, 0.01f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.99f, 0.01f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.99f, 0.99f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.01f, 0.99f));
     }else{
-        buffer->addVector2(attTexcoord, Vector2(0.01f, 0.99f));
-        buffer->addVector2(attTexcoord, Vector2(0.99f, 0.99f));
-        buffer->addVector2(attTexcoord, Vector2(0.99f, 0.01f));
-        buffer->addVector2(attTexcoord, Vector2(0.01f, 0.01f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.01f, 0.99f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.99f, 0.99f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.99f, 0.01f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(0.01f, 0.01f));
     }
 
-    Attribute* attNormal = buffer->getAttribute(AttributeType::NORMAL);
+    Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
 
-    buffer->addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffer->addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffer->addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
-    buffer->addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+    mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
 
-    Attribute* attColor = buffer->getAttribute(AttributeType::COLOR);
+    Attribute* attColor = mesh.buffer.getAttribute(AttributeType::COLOR);
 
-    buffer->addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-    buffer->addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-    buffer->addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-    buffer->addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
 
     static const uint16_t indices_array[] = {
@@ -102,8 +111,8 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
         0,  2,  3,
     };
 
-    indices->setValues(
-        0, indices->getAttribute(AttributeType::INDEX),
+    mesh.indices.setValues(
+        0, mesh.indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
 
     if (mesh.loaded)
@@ -111,14 +120,21 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
 }
 
 void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
-    Buffer* buffer = mesh.buffers["vertices"];
+    mesh.buffers["vertices"] = &mesh.buffer;
 
-    buffer->clear();
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;
+    mesh.numSubmeshes = 1;
+
+	mesh.buffer.clearAll();
+	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     for (int i = 0; i < polygon.points.size(); i++){
-        buffer->addVector3(AttributeType::POSITION, polygon.points[i].position);
-        buffer->addVector3(AttributeType::NORMAL, Vector3(0.0f, 0.0f, 1.0f));
-        buffer->addVector4(AttributeType::COLOR, polygon.points[i].color);
+        mesh.buffer.addVector3(AttributeType::POSITION, polygon.points[i].position);
+        mesh.buffer.addVector3(AttributeType::NORMAL, Vector3(0.0f, 0.0f, 1.0f));
+        mesh.buffer.addVector4(AttributeType::COLOR, polygon.points[i].color);
     }
 
     // Generation texcoords
@@ -127,13 +143,13 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
     float min_Y = std::numeric_limits<float>::max();
     float max_Y = std::numeric_limits<float>::min();
 
-    Attribute* attVertex = buffer->getAttribute(AttributeType::POSITION);
+    Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
 
-    for (unsigned int i = 0; i < buffer->getCount(); i++){
-        min_X = fmin(min_X, buffer->getFloat(attVertex, i, 0));
-        min_Y = fmin(min_Y, buffer->getFloat(attVertex, i, 1));
-        max_X = fmax(max_X, buffer->getFloat(attVertex, i, 0));
-        max_Y = fmax(max_Y, buffer->getFloat(attVertex, i, 1));
+    for (unsigned int i = 0; i < mesh.buffer.getCount(); i++){
+        min_X = fmin(min_X, mesh.buffer.getFloat(attVertex, i, 0));
+        min_Y = fmin(min_Y, mesh.buffer.getFloat(attVertex, i, 1));
+        max_X = fmax(max_X, mesh.buffer.getFloat(attVertex, i, 0));
+        max_Y = fmax(max_Y, mesh.buffer.getFloat(attVertex, i, 1));
     }
 
     double k_X = 1/(max_X - min_X);
@@ -142,13 +158,13 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
     float u = 0;
     float v = 0;
 
-    for ( unsigned int i = 0; i < buffer->getCount(); i++){
-        u = (buffer->getFloat(attVertex, i, 0) - min_X) * k_X;
-        v = (buffer->getFloat(attVertex, i, 1) - min_Y) * k_Y;
+    for ( unsigned int i = 0; i < mesh.buffer.getCount(); i++){
+        u = (mesh.buffer.getFloat(attVertex, i, 0) - min_X) * k_X;
+        v = (mesh.buffer.getFloat(attVertex, i, 1) - min_Y) * k_Y;
         if (polygon.flipY) {
-            buffer->addVector2(AttributeType::TEXCOORD1, Vector2(u, 1.0 - v));
+            mesh.buffer.addVector2(AttributeType::TEXCOORD1, Vector2(u, 1.0 - v));
         }else{
-            buffer->addVector2(AttributeType::TEXCOORD1, Vector2(u, v));
+            mesh.buffer.addVector2(AttributeType::TEXCOORD1, Vector2(u, v));
         }
     }
 

@@ -1,7 +1,3 @@
-if (NOT MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x c++")
-endif()
-
 set (
     LUA_SOURCE
 
@@ -62,9 +58,12 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
     )
 endif()
 
-# By default Lua-Intf expect the Lua library to build under C++
-set_source_files_properties(
-    ${LUA_SOURCE}
-
-    PROPERTIES LANGUAGE CXX
-)
+# Lua in C++ was getting errors in luaD_rawrunprotected on Emscripten
+#if (NOT MSVC)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x c++")
+#endif()
+#set_source_files_properties(
+#    ${LUA_SOURCE}
+#
+#    PROPERTIES LANGUAGE CXX
+#)

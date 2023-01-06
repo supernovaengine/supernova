@@ -11,15 +11,6 @@ using namespace Supernova;
 
 Mesh::Mesh(Scene* scene): Object(scene){
     addComponent<MeshComponent>({});
-
-    MeshComponent& mesh = getComponent<MeshComponent>();
-    mesh.buffers["vertices"] = &buffer;
-
-	buffer.clearAll();
-	buffer.addAttribute(AttributeType::POSITION, 3);
-	buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-	buffer.addAttribute(AttributeType::NORMAL, 3);
-    buffer.addAttribute(AttributeType::COLOR, 4);
 }
 
 Mesh::~Mesh(){

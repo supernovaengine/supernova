@@ -12,10 +12,6 @@
 namespace Supernova{
 
     class Mesh: public Object{
-    protected:
-        InterleavedBuffer buffer;
-        IndexBuffer indices;
-
     public:
         Mesh(Scene* scene);
         virtual ~Mesh();

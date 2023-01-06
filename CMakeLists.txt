@@ -119,11 +119,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
 
     list(APPEND PLATFORM_PROPERTIES
         LINK_FLAGS
-            "-gsource-map -s ALLOW_MEMORY_GROWTH=1 \
-            ${EM_PRELOAD_FILES} \
-            ${EM_ADDITIONAL_LINK_FLAGS} \
+            "-g \
+            -s STACK_SIZE=5MB \
             -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\" \
             -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\" \
+            ${EM_PRELOAD_FILES} \
+            ${EM_ADDITIONAL_LINK_FLAGS} \
             ${USE_WEBGL2}"
     )
 endif()

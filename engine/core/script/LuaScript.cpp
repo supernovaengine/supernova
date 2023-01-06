@@ -4,9 +4,7 @@
 
 #include "LuaScript.h"
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include "lua.hpp"
 
 #include "LuaBridge.h"
 

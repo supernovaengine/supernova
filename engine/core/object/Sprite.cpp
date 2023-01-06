@@ -5,15 +5,8 @@
 using namespace Supernova;
 
 Sprite::Sprite(Scene* scene): Mesh(scene){
-    animation = NULL;
     addComponent<SpriteComponent>({});
-
-    MeshComponent& mesh = getComponent<MeshComponent>();
-    mesh.buffers["vertices"] = &buffer;
-    mesh.buffers["indices"] = &indices;
-    mesh.submeshes[0].hasTextureRect = true;
-
-    buffer.setUsage(BufferUsage::DYNAMIC);
+    animation = NULL;
 }
 
 Sprite::~Sprite(){
