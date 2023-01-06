@@ -120,6 +120,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     list(APPEND PLATFORM_PROPERTIES
         LINK_FLAGS
             "-g \
+            -s ALLOW_MEMORY_GROWTH=1 \
             -s STACK_SIZE=5MB \
             -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\" \
             -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\" \
