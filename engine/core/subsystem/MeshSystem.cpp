@@ -30,6 +30,7 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
     mesh.buffers["indices"] = &mesh.indices;
 
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
+    mesh.submeshes[0].hasTextureRect = true;
     mesh.numSubmeshes = 1;
 
 	mesh.buffer.clearAll();
