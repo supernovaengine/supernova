@@ -11,7 +11,7 @@ namespace Supernova{
 
     struct TileRectData{
         std::string name;
-        int submeshId;
+        int submeshId = -1;
         Rect rect;
     };
     
@@ -24,9 +24,16 @@ namespace Supernova{
     };
 
     struct TilemapComponent{
+        int width = 0;
+        int height = 0;
+
+        bool automaticFlipY = true;
+        bool flipY = false;
         
-        std::map<int, TileRectData> tilesRect;
-        std::map<int, TileData> tiles;
+        TileRectData tilesRect[MAX_TILEMAP_TILESRECT];
+        TileData tiles[MAX_TILEMAP_TILES];
+
+        bool needUpdateTilemap = true;
     };
 
 }

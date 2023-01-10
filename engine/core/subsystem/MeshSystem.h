@@ -13,6 +13,7 @@
 #include "component/MeshPolygonComponent.h"
 #include "component/CameraComponent.h"
 #include "component/TerrainComponent.h"
+#include "component/TilemapComponent.h"
 
 namespace Supernova{
 
@@ -21,8 +22,10 @@ namespace Supernova{
     private:
         void createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera);
 		void createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
+		void createTilemap(TilemapComponent& tilemap, MeshComponent& mesh);
 
 		void changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh);
+		Rect normalizeTileRect(Rect tileRect, unsigned int texWidth, unsigned int texHeight);
 
 		// Mesh aux
 		std::vector<float> getCylinderSideNormals(float baseRadius, float topRadius, float height, float slices);

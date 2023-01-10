@@ -12,13 +12,13 @@
 namespace Supernova{
 
     struct MeshPolygonComponent{
-        std::vector<PolygonPoint> points;
-
         int width = 0;
         int height = 0;
 
         bool automaticFlipY = true;
         bool flipY = false;
+
+        std::vector<PolygonPoint> points;
 
         bool needUpdatePolygon = true;
     };

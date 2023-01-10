@@ -22,10 +22,10 @@ namespace Supernova{
         int width = 100;
         int height = 100;
 
-        FrameData framesRect[MAX_SPRITE_FRAMES];
-
         bool automaticFlipY = true;
         bool flipY = false;
+
+        FrameData framesRect[MAX_SPRITE_FRAMES];
 
         PivotPreset pivot = PivotPreset::BOTTOM_LEFT;
 

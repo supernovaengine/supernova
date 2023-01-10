@@ -176,6 +176,113 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
         mesh.needUpdateBuffer = true;
 }
 
+void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
+    mesh.buffers["vertices"] = &mesh.buffer;
+    mesh.buffers["indices"] = &mesh.indices;
+
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
+    mesh.submeshes[0].hasTextureRect = true;
+    mesh.numSubmeshes = 1;
+
+	mesh.buffer.clearAll();
+	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.addAttribute(AttributeType::COLOR, 4);
+
+    mesh.buffer.setUsage(BufferUsage::DYNAMIC);
+
+    mesh.indices.clear();
+
+    tilemap.width = 0;
+    tilemap.height = 0;
+
+    std::vector<std::vector<uint16_t>> indexMap;
+    indexMap.resize(mesh.numSubmeshes);
+
+    for (int i = 0; i < MAX_TILEMAP_TILES; i++){
+
+        if (tilemap.tiles[i].width == 0 && tilemap.tiles[i].height == 0){
+            continue;
+        }
+
+        Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
+        mesh.buffer.addVector3(attVertex, Vector3(tilemap.tiles[i].position.x, tilemap.tiles[i].position.y, 0));
+        mesh.buffer.addVector3(attVertex, Vector3(tilemap.tiles[i].position.x + tilemap.tiles[i].width, tilemap.tiles[i].position.y, 0));
+        mesh.buffer.addVector3(attVertex, Vector3(tilemap.tiles[i].position.x + tilemap.tiles[i].width, tilemap.tiles[i].position.y + tilemap.tiles[i].height, 0));
+        mesh.buffer.addVector3(attVertex, Vector3(tilemap.tiles[i].position.x, tilemap.tiles[i].position.y + tilemap.tiles[i].height, 0));
+
+        if (tilemap.width < tilemap.tiles[i].position.x + tilemap.tiles[i].width)
+            tilemap.width = tilemap.tiles[i].position.x + tilemap.tiles[i].width;
+        if (tilemap.height < tilemap.tiles[i].position.y + tilemap.tiles[i].height)
+            tilemap.height = tilemap.tiles[i].position.y + tilemap.tiles[i].height;
+
+        TileRectData& rectData = tilemap.tilesRect[tilemap.tiles[i].rectId];
+        Rect& tileRect = rectData.rect;
+
+        Texture& texture = mesh.submeshes[rectData.submeshId].material.baseColorTexture;
+        Texture& mainTexture = mesh.submeshes[0].material.baseColorTexture;
+
+        if (texture.load()){
+            tileRect = normalizeTileRect(tileRect, texture.getWidth(), texture.getHeight());
+        }else if (mainTexture.load()){
+            tileRect = normalizeTileRect(tileRect, mainTexture.getWidth(), mainTexture.getHeight());
+        }
+
+        Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
+        if (tilemap.flipY){
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), 1 - tileRect.getY()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), 1 - tileRect.getY()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), 1 - tileRect.getY()+tileRect.getHeight()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), 1 - tileRect.getY()+tileRect.getHeight()));
+        }else{
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), tileRect.getY()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()+tileRect.getHeight()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), tileRect.getY()+tileRect.getHeight()));
+        }
+
+        Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
+        mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+        mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+        mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+        mesh.buffer.addVector3(attNormal, Vector3(0.0f, 0.0f, 1.0f));
+
+        Attribute* attColor = mesh.buffer.getAttribute(AttributeType::COLOR);
+        mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+
+        indexMap[rectData.submeshId].push_back(0 + (i*4));
+        indexMap[rectData.submeshId].push_back(1 + (i*4));
+        indexMap[rectData.submeshId].push_back(2 + (i*4));
+        indexMap[rectData.submeshId].push_back(0 + (i*4));
+        indexMap[rectData.submeshId].push_back(2 + (i*4));
+        indexMap[rectData.submeshId].push_back(3 + (i*4));
+
+    }
+
+    for (int i = 0; i < mesh.numSubmeshes; i++){
+
+        addSubmeshAttribute(mesh.submeshes[i], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indexMap[i].size(), mesh.indices.getCount() * sizeof(uint16_t), false);
+
+        mesh.indices.setValues(
+            mesh.indices.getCount(), mesh.indices.getAttribute(AttributeType::INDEX),
+            indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
+
+        //TODO: necessary?
+        //if (indexMap[i].size() == 0) {
+        //     submesh not visible
+        //} else {
+        //     submesh visible
+        //}
+    }
+
+    if (mesh.loaded)
+        mesh.needUpdateBuffer = true;
+}
+
 void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh){
     flipY = false;
     if (camera.type != CameraType::CAMERA_2D){
@@ -185,6 +292,20 @@ void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent
     if (mesh.submeshes[0].material.baseColorTexture.isFramebuffer() && Engine::isOpenGL()){
         flipY = !flipY;
     }
+}
+
+Rect MeshSystem::normalizeTileRect(Rect tileRect, unsigned int texWidth, unsigned int texHeight){
+    Rect normalized = tileRect;
+
+    if (!tileRect.isNormalized()){
+        // 0.1 and 0.2 to work with small and pixel perfect texture
+        normalized.setRect((tileRect.getX()+0.1) / (float) texWidth,
+                            (tileRect.getY()+0.1) / (float) texHeight,
+                            (tileRect.getWidth()-0.2) / (float) texWidth,
+                            (tileRect.getHeight()-0.2) / (float) texHeight);
+    }
+
+    return normalized;
 }
 
 std::vector<float> MeshSystem::getCylinderSideNormals(float baseRadius, float topRadius, float height, float slices){
@@ -2055,6 +2176,28 @@ void MeshSystem::update(double dt){
             }
 
             sprite.needUpdateSprite = false;
+        }
+    }
+
+    auto tilemaps = scene->getComponentArray<TilemapComponent>();
+    for (int i = 0; i < tilemaps->size(); i++){
+		TilemapComponent& tilemap = tilemaps->getComponentFromIndex(i);
+
+        if (tilemap.needUpdateTilemap){
+            Entity entity = tilemaps->getEntity(i);
+            Signature signature = scene->getSignature(entity);
+
+            if (signature.test(scene->getComponentType<MeshComponent>())){
+                MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+                CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
+                if (tilemap.automaticFlipY)
+                    changeFlipY(tilemap.flipY, camera, mesh);
+
+                createTilemap(tilemap, mesh);
+            }
+
+            tilemap.needUpdateTilemap = false;
         }
     }
 

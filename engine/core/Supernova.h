@@ -25,6 +25,14 @@
 #define MAX_SUBMESHES 4
 #endif
 
+#ifndef MAX_TILEMAP_TILESRECT
+#define MAX_TILEMAP_TILESRECT 20
+#endif
+
+#ifndef MAX_TILEMAP_TILES
+#define MAX_TILEMAP_TILES 100
+#endif
+
 #ifndef MAX_SPRITE_FRAMES
 #define MAX_SPRITE_FRAMES 64
 #endif
