@@ -42,7 +42,7 @@ void Tilemap::addRect(int id, std::string name, std::string texture, Rect rect){
     MeshComponent& mesh = getComponent<MeshComponent>();
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    int submeshId = 0; // submesh 0 will be always without texture
+    int submeshId = 0;
 
     if (id < 0){
         Log::error("Error adding rect with id %i", id);

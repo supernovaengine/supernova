@@ -71,7 +71,7 @@ namespace Supernova{
         std::string defaultBuffer = "vertices";
 
         Submesh submeshes[MAX_SUBMESHES];
-        unsigned int numSubmeshes = 1;
+        unsigned int numSubmeshes = 0;
 
         Matrix4 bonesMatrix[MAX_BONES];
         float morphWeights[MAX_MORPHTARGETS];
