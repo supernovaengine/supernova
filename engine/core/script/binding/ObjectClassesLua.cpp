@@ -18,6 +18,7 @@
 #include "Terrain.h"
 #include "Light.h"
 #include "Mesh.h"
+#include "Tilemap.h"
 #include "Bone.h"
 #include "Model.h"
 #include "MeshPolygon.h"
@@ -229,6 +230,31 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .deriveClass<Bone, Object>("Bone")
         .addConstructor <void (*) (Scene*, Entity)> ()
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Tilemap, Mesh>("Tilemap")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("findRectByString", &Tilemap::findRectByString)
+        .addFunction("findTileByString", &Tilemap::findTileByString)
+        .addFunction("addRect", 
+            luabridge::overload<int, std::string, std::string, Rect>(&Tilemap::addRect),
+            luabridge::overload<int, std::string, Rect>(&Tilemap::addRect),
+            luabridge::overload<std::string, float, float, float, float>(&Tilemap::addRect),
+            luabridge::overload<float, float, float, float>(&Tilemap::addRect),
+            luabridge::overload<Rect>(&Tilemap::addRect))
+        .addFunction("removeRect", 
+            luabridge::overload<int>(&Tilemap::removeRect),
+            luabridge::overload<std::string>(&Tilemap::removeRect))
+        .addFunction("addTile", 
+            luabridge::overload<int, std::string, int, Vector2, float, float>(&Tilemap::addTile),
+            luabridge::overload<std::string, int, Vector2, float, float>(&Tilemap::addTile),
+            luabridge::overload<int, Vector2, float, float>(&Tilemap::addTile),
+            luabridge::overload<std::string, std::string, Vector2, float, float>(&Tilemap::addTile),
+            luabridge::overload<std::string, Vector2, float, float>(&Tilemap::addTile))
+        .addFunction("removeTile", 
+            luabridge::overload<int>(&Tilemap::removeTile),
+            luabridge::overload<std::string>(&Tilemap::removeTile))
         .endClass();
 
     luabridge::getGlobalNamespace(L)
