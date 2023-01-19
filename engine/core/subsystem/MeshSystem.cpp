@@ -182,7 +182,6 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
 
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
-    mesh.numSubmeshes = 1;
 
 	mesh.buffer.clearAll();
 	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
