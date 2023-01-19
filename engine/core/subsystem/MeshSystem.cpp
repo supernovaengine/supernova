@@ -231,10 +231,11 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
 
         Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
         if (tilemap.flipY){
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), 1 - tileRect.getY()));
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), 1 - tileRect.getY()));
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), 1 - tileRect.getY()+tileRect.getHeight()));
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), 1 - tileRect.getY()+tileRect.getHeight()));
+
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), tileRect.getY()+tileRect.getHeight()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()+tileRect.getHeight()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), tileRect.getY()));
         }else{
             mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), tileRect.getY()));
             mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()));
