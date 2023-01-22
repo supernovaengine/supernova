@@ -49,6 +49,11 @@
 #define MAX_EXTERNAL_BUFFERS 10
 #endif
 
+// to prevent tiled texture getting part of neighborhood tile
+#ifndef TEXTURE_CUT_FACTOR
+#define TEXTURE_CUT_FACTOR 0.5
+#endif
+
 #include "Engine.h"
 
 void init();

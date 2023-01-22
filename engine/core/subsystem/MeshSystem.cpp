@@ -80,16 +80,34 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
 
     Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
 
+    Texture& mainTexture = mesh.submeshes[0].material.baseColorTexture;
+
+    mainTexture.load();
+    unsigned int texWidth = mainTexture.getWidth();
+    unsigned int texHeight = mainTexture.getHeight();
+
+    if (sprite.width == 0 && sprite.height == 0){
+        sprite.width = texWidth;
+        sprite.height = texHeight;
+    }
+
+    float texCutRatioW = 0;
+    float texCutRatioH = 0;
+    if (texWidth != 0 && texHeight != 0){
+        texCutRatioW = 1.0 / texWidth * TEXTURE_CUT_FACTOR;
+        texCutRatioH = 1.0 / texHeight * TEXTURE_CUT_FACTOR;
+    }
+
     if (!sprite.flipY){ 
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.01f, 0.01f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.99f, 0.01f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.99f, 0.99f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.01f, 0.99f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(texCutRatioW, texCutRatioH));
+        mesh.buffer.addVector2(attTexcoord, Vector2(1.0-texCutRatioW, texCutRatioH));
+        mesh.buffer.addVector2(attTexcoord, Vector2(1.0-texCutRatioW, 1.0-texCutRatioH));
+        mesh.buffer.addVector2(attTexcoord, Vector2(texCutRatioW, 1.0-texCutRatioH));
     }else{
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.01f, 0.99f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.99f, 0.99f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.99f, 0.01f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.01f, 0.01f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(texCutRatioW, 1.0-texCutRatioH));
+        mesh.buffer.addVector2(attTexcoord, Vector2(1.0-texCutRatioW, 1.0-texCutRatioH));
+        mesh.buffer.addVector2(attTexcoord, Vector2(1.0-texCutRatioW, texCutRatioH));
+        mesh.buffer.addVector2(attTexcoord, Vector2(texCutRatioW, texCutRatioH));
     }
 
     Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
@@ -222,24 +240,36 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
         Texture& texture = mesh.submeshes[rectData.submeshId].material.baseColorTexture;
         Texture& mainTexture = mesh.submeshes[0].material.baseColorTexture;
 
+        unsigned int texWidth = 0;
+        unsigned int texHeight = 0;
         if (texture.load()){
             tileRect = normalizeTileRect(tileRect, texture.getWidth(), texture.getHeight());
+            texWidth = texture.getWidth();
+            texHeight = texture.getHeight();
         }else if (mainTexture.load()){
             tileRect = normalizeTileRect(tileRect, mainTexture.getWidth(), mainTexture.getHeight());
+            texWidth = mainTexture.getWidth();
+            texHeight = mainTexture.getHeight();
+        }
+
+        float texCutRatioW = 0;
+        float texCutRatioH = 0;
+        if (texWidth != 0 && texHeight != 0){
+            texCutRatioW = 1.0 / texWidth * TEXTURE_CUT_FACTOR;
+            texCutRatioH = 1.0 / texHeight * TEXTURE_CUT_FACTOR;
         }
 
         Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
         if (tilemap.flipY){
-
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), tileRect.getY()+tileRect.getHeight()));
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()+tileRect.getHeight()));
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()));
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), tileRect.getY()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+texCutRatioW, tileRect.getY()+tileRect.getHeight()-texCutRatioH));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth()-texCutRatioW, tileRect.getY()+tileRect.getHeight()-texCutRatioH));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth()-texCutRatioW, tileRect.getY()+texCutRatioH));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+texCutRatioW, tileRect.getY()+texCutRatioH));
         }else{
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), tileRect.getY()));
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()));
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth(), tileRect.getY()+tileRect.getHeight()));
-            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX(), tileRect.getY()+tileRect.getHeight()));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+texCutRatioW, tileRect.getY()+texCutRatioH));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth()-texCutRatioW, tileRect.getY()+texCutRatioH));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+tileRect.getWidth()-texCutRatioW, tileRect.getY()+tileRect.getHeight()-texCutRatioH));
+            mesh.buffer.addVector2(attTexcoord, Vector2(tileRect.getX()+texCutRatioW, tileRect.getY()+tileRect.getHeight()-texCutRatioH));
         }
 
         Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
@@ -298,11 +328,10 @@ Rect MeshSystem::normalizeTileRect(Rect tileRect, unsigned int texWidth, unsigne
     Rect normalized = tileRect;
 
     if (!tileRect.isNormalized()){
-        // 0.1 and 0.2 to work with small and pixel perfect texture
-        normalized.setRect((tileRect.getX()+0.1) / (float) texWidth,
-                            (tileRect.getY()+0.1) / (float) texHeight,
-                            (tileRect.getWidth()-0.2) / (float) texWidth,
-                            (tileRect.getHeight()-0.2) / (float) texHeight);
+        normalized.setRect((tileRect.getX()) / (float) texWidth,
+                            (tileRect.getY()) / (float) texHeight,
+                            (tileRect.getWidth()) / (float) texWidth,
+                            (tileRect.getHeight()) / (float) texHeight);
     }
 
     return normalized;
