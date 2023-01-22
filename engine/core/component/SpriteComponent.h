@@ -19,8 +19,8 @@ namespace Supernova{
     };
 
     struct SpriteComponent{
-        int width = 100;
-        int height = 100;
+        int width = 0;
+        int height = 0;
 
         bool automaticFlipY = true;
         bool flipY = false;

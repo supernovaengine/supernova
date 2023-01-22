@@ -1,5 +1,5 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #include "Mesh.h"
@@ -14,7 +14,6 @@ Mesh::Mesh(Scene* scene): Object(scene){
 }
 
 Mesh::~Mesh(){
-
 }
 
 void Mesh::setTexture(std::string path){

@@ -73,13 +73,6 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
         pivotPos.y = sprite.height - pivotPos.y;
     }
 
-    mesh.buffer.addVector3(attVertex, Vector3(-pivotPos.x, -pivotPos.y, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(sprite.width-pivotPos.x, -pivotPos.y, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(sprite.width-pivotPos.x,  sprite.height-pivotPos.y, 0));
-    mesh.buffer.addVector3(attVertex, Vector3(-pivotPos.x,  sprite.height-pivotPos.y, 0));
-
-    Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
-
     Texture& mainTexture = mesh.submeshes[0].material.baseColorTexture;
 
     mainTexture.load();
@@ -90,6 +83,13 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
         sprite.width = texWidth;
         sprite.height = texHeight;
     }
+
+    mesh.buffer.addVector3(attVertex, Vector3(-pivotPos.x, -pivotPos.y, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(sprite.width-pivotPos.x, -pivotPos.y, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(sprite.width-pivotPos.x,  sprite.height-pivotPos.y, 0));
+    mesh.buffer.addVector3(attVertex, Vector3(-pivotPos.x,  sprite.height-pivotPos.y, 0));
+
+    Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
 
     float texCutRatioW = 0;
     float texCutRatioH = 0;

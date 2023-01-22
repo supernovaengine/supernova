@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #include "Sprite.h"
 
 #include "util/Color.h"
@@ -12,6 +16,17 @@ Sprite::Sprite(Scene* scene): Mesh(scene){
 Sprite::~Sprite(){
     if (animation)
         delete animation;
+}
+
+Sprite::Sprite(const Sprite& rhs): Mesh(rhs){
+    animation = rhs.animation;
+}
+
+Sprite& Sprite::operator=(const Sprite& rhs){
+    animation = rhs.animation;
+    Mesh::operator=(rhs);
+
+    return *this;
 }
 
 void Sprite::setSize(int width, int height){

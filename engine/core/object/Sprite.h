@@ -1,5 +1,5 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #ifndef SPRITE_H
@@ -14,12 +14,15 @@
 namespace Supernova{
     class Sprite: public Mesh{
 
-    protected:
+    private:
         SpriteAnimation* animation;
 
     public:
         Sprite(Scene* scene);
         virtual ~Sprite();
+
+        Sprite(const Sprite& rhs);
+        Sprite& operator=(const Sprite& rhs);
 
         void setSize(int width, int height);
         void setWidth(int width);
