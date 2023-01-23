@@ -24,23 +24,6 @@ namespace Supernova{
         Vector4 getColor() const;
 
         Material& getMaterial(unsigned int submesh = 0);
-
-        void createPlane(float width, float depth);
-        void createPlane(float width, float depth, unsigned int tiles);
-        
-        void createBox(float width, float height, float depth);
-        void createBox(float width, float height, float depth, unsigned int tiles);
-
-        void createSphere(float radius);
-        void createSphere(float radius, unsigned int slices, unsigned int stacks);
-
-        void createCylinder(float radius, float height);
-        void createCylinder(float baseRadius, float topRadius, float height);
-        void createCylinder(float radius, float height, unsigned int slices, unsigned int stacks);
-        void createCylinder(float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks);
-
-        void createTorus(float radius, float ringRadius);
-        void createTorus(float radius, float ringRadius, unsigned int sides, unsigned int rings);
     };
 }
 

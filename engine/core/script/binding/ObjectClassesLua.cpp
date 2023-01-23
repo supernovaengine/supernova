@@ -18,6 +18,7 @@
 #include "Terrain.h"
 #include "Light.h"
 #include "Mesh.h"
+#include "Shape.h"
 #include "Tilemap.h"
 #include "Bone.h"
 #include "Model.h"
@@ -188,23 +189,28 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("color", &Mesh::getColor, (void(Mesh::*)(Vector4))&Mesh::setColor)
         .addFunction("setColor", (void(Mesh::*)(const float, const float, const float, const float))&Mesh::setColor)
         .addFunction("getMaterial", &Mesh::getMaterial)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Shape, Mesh>("Shape")
+        .addConstructor <void (*) (Scene*)> ()
         .addFunction("createPlane", 
-            luabridge::overload<float, float>(&Mesh::createPlane),
-            luabridge::overload<float, float, unsigned int>(&Mesh::createPlane))
+            luabridge::overload<float, float>(&Shape::createPlane),
+            luabridge::overload<float, float, unsigned int>(&Shape::createPlane))
         .addFunction("createBox", 
-            luabridge::overload<float, float, float>(&Mesh::createBox),
-            luabridge::overload<float, float, float, unsigned int>(&Mesh::createBox))
+            luabridge::overload<float, float, float>(&Shape::createBox),
+            luabridge::overload<float, float, float, unsigned int>(&Shape::createBox))
         .addFunction("createSphere", 
-            luabridge::overload<float>(&Mesh::createSphere),
-            luabridge::overload<float, unsigned int, unsigned int>(&Mesh::createSphere))
+            luabridge::overload<float>(&Shape::createSphere),
+            luabridge::overload<float, unsigned int, unsigned int>(&Shape::createSphere))
         .addFunction("createCylinder", 
-            luabridge::overload<float, float>(&Mesh::createCylinder),
-            luabridge::overload<float, float, float>(&Mesh::createCylinder),
-            luabridge::overload<float, float, unsigned int, unsigned int>(&Mesh::createCylinder),
-            luabridge::overload<float, float, float, unsigned int, unsigned int>(&Mesh::createCylinder))
+            luabridge::overload<float, float>(&Shape::createCylinder),
+            luabridge::overload<float, float, float>(&Shape::createCylinder),
+            luabridge::overload<float, float, unsigned int, unsigned int>(&Shape::createCylinder),
+            luabridge::overload<float, float, float, unsigned int, unsigned int>(&Shape::createCylinder))
         .addFunction("createTorus", 
-            luabridge::overload<float, float>(&Mesh::createTorus),
-            luabridge::overload<float, float, unsigned int, unsigned int>(&Mesh::createTorus))
+            luabridge::overload<float, float>(&Shape::createTorus),
+            luabridge::overload<float, float, unsigned int, unsigned int>(&Shape::createTorus))
         .endClass();
 
     luabridge::getGlobalNamespace(L)
