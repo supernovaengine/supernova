@@ -77,7 +77,7 @@ namespace Supernova{
         float morphWeights[MAX_MORPHTARGETS];
 
         bool castShadows = true;
-        bool transparency = false;
+        bool transparent = false;
 
         bool needUpdateBuffer = false;
         bool needReload = false;

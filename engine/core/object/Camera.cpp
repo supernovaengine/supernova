@@ -314,7 +314,20 @@ void Camera::setFramebufferFilter(TextureFilter filter){
 	}
 }
 
+void Camera::setTransparentSort(bool transparentSort){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    camera.transparentSort = transparentSort;
+}
+
+bool Camera::isTransparentSort() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return camera.transparentSort;
+}
+
 void Camera::updateCamera(){
     CameraComponent& camera = getComponent<CameraComponent>();
+
     camera.needUpdate = true;
 }

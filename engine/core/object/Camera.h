@@ -46,12 +46,15 @@ namespace Supernova{
         void walkForward(float distance);
         void slide(float distance);
 
-		void setRenderToTexture(bool renderToTexture);
-		bool isRenderToTexture() const;
+        void setRenderToTexture(bool renderToTexture);
+        bool isRenderToTexture() const;
 
-		Framebuffer* getFramebuffer();
-		void setFramebufferSize(int width, int height);
-		void setFramebufferFilter(TextureFilter filter);
+        Framebuffer* getFramebuffer();
+        void setFramebufferSize(int width, int height);
+        void setFramebufferFilter(TextureFilter filter);
+
+        void setTransparentSort(bool transparentSort);
+        bool isTransparentSort() const;
 
         void updateCamera();
     };

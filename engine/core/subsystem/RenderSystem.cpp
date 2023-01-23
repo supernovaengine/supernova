@@ -591,9 +591,9 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 		mesh.submeshes[i].needUpdateTexture = false;
 
-		if (Engine::isAutomaticTransparency() && !mesh.transparency){
+		if (Engine::isAutomaticTransparency() && !mesh.transparent){
 			if (mesh.submeshes[i].material.baseColorTexture.getData().isTransparent() || mesh.submeshes[i].material.baseColorFactor.w != 1.0){
-				mesh.transparency = true;
+				mesh.transparent = true;
 			}
 		}
 	
@@ -1218,9 +1218,9 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 
 	TextureRender* textureRender = particles.texture.getRender();
 
-	if (Engine::isAutomaticTransparency() && !particles.transparency){
+	if (Engine::isAutomaticTransparency() && !particles.transparent){
 		if (particles.texture.getData().isTransparent()){ // Particle color is not tested here
-			particles.transparency = true;
+			particles.transparent = true;
 		}
 	}
 
@@ -1562,7 +1562,7 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 		}
 	}
 
-	if (particles.transparency && camera.type != CameraType::CAMERA_2D){
+	if (particles.transparent && camera.type != CameraType::CAMERA_2D){
 		auto comparePoints = [&transform, &camTransform](const ParticleShaderData& a, const ParticleShaderData& b) -> bool {
 			float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
 			float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
@@ -2438,8 +2438,8 @@ void RenderSystem::draw(){
 					loadMesh(mesh);
 				}
 				if (transform.visible){
-					if (!mesh.transparency || camera.type == CameraType::CAMERA_2D){
-						//Draw opaque meshes if 3D camera
+					if (!mesh.transparent || !camera.transparentSort){
+						//Draw opaque meshes if transparency is not necessary
 						drawMesh(mesh, transform, cameraTransform, camera.renderToTexture);
 					}else{
 						transparentMeshes.push({&mesh, &transform, transform.distanceToCamera});

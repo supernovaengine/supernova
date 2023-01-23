@@ -55,7 +55,9 @@ namespace Supernova{
 
 		bool renderToTexture = false;
         // need to be a pointer to not lost reference when component changes position
-		Framebuffer* framebuffer = new Framebuffer();
+        Framebuffer* framebuffer = new Framebuffer();
+
+        bool transparentSort = true;
 
         bool automatic = true;
         bool needUpdate = true;

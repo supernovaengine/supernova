@@ -2082,7 +2082,7 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
             //TODO: metallicroughnessTexture (map_Ks + map_Ns)
 
             if (materials[i].dissolve < 1){
-                mesh.transparency = true;
+                mesh.transparent = true;
             }
         }
 
