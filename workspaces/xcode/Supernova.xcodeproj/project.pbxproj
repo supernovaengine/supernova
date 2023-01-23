@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		710506AE297F4483002DD23C /* Shape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 710506AC297F4483002DD23C /* Shape.cpp */; };
+		710506AF297F4483002DD23C /* Shape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 710506AC297F4483002DD23C /* Shape.cpp */; };
+		710506B0297F4483002DD23C /* Shape.h in Headers */ = {isa = PBXBuildFile; fileRef = 710506AD297F4483002DD23C /* Shape.h */; };
 		7105A55828B305910092EA05 /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55628B305910092EA05 /* Color.cpp */; };
 		7105A55928B305910092EA05 /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A55628B305910092EA05 /* Color.cpp */; };
 		7105A55A28B305910092EA05 /* Color.h in Headers */ = {isa = PBXBuildFile; fileRef = 7105A55728B305910092EA05 /* Color.h */; };
@@ -756,6 +759,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		710506AC297F4483002DD23C /* Shape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shape.cpp; sourceTree = "<group>"; };
+		710506AD297F4483002DD23C /* Shape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shape.h; sourceTree = "<group>"; };
 		7105A55628B305910092EA05 /* Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Color.cpp; sourceTree = "<group>"; };
 		7105A55728B305910092EA05 /* Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
 		7105A55C28B305B20092EA05 /* ObjectClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ObjectClassesLua.cpp; sourceTree = "<group>"; };
@@ -1695,6 +1700,8 @@
 				7162FC6825962A0E0075B97D /* Object.h */,
 				714BBF7227148B84004A15EE /* Particles.cpp */,
 				714BBF7327148B84004A15EE /* Particles.h */,
+				710506AC297F4483002DD23C /* Shape.cpp */,
+				710506AD297F4483002DD23C /* Shape.h */,
 				71451BE7270CA2C900712643 /* Sprite.cpp */,
 				71451BEA270CA2C900712643 /* Sprite.h */,
 				715CB115288CD40E0049344B /* Terrain.cpp */,
@@ -2323,6 +2330,7 @@
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
 				71E544FE284D5BB700C68FAB /* Animation.h in Headers */,
 				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
+				710506B0297F4483002DD23C /* Shape.h in Headers */,
 				71ABBD4127A879B9001CE3AF /* ButtonComponent.h in Headers */,
 				71D7494E296731A800348AB8 /* FogComponent.h in Headers */,
 				71FCE4C528E0FA31003C5217 /* LuaBridge.h in Headers */,
@@ -3141,6 +3149,7 @@
 				7170A3D62818A8A30003E965 /* Bone.cpp in Sources */,
 				713D82B2259D307F00567F9F /* IndexBuffer.cpp in Sources */,
 				7105A55928B305910092EA05 /* Color.cpp in Sources */,
+				710506AF297F4483002DD23C /* Shape.cpp in Sources */,
 				713D82B3259D307F00567F9F /* SokolObject.cpp in Sources */,
 				713D82B4259D307F00567F9F /* SokolBuffer.cpp in Sources */,
 				71ED64C628B45E0B005D2D96 /* Angle.cpp in Sources */,
@@ -3289,6 +3298,7 @@
 				7170A3D52818A8A30003E965 /* Bone.cpp in Sources */,
 				7162FD4F25963AE00075B97D /* Engine.cpp in Sources */,
 				7105A55828B305910092EA05 /* Color.cpp in Sources */,
+				710506AE297F4483002DD23C /* Shape.cpp in Sources */,
 				7162FD5825963AE00075B97D /* InterleavedBuffer.cpp in Sources */,
 				7162FD5925963AE00075B97D /* Buffer.cpp in Sources */,
 				71ED64C528B45E0B005D2D96 /* Angle.cpp in Sources */,
