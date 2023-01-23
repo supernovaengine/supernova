@@ -187,6 +187,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<Framebuffer*>(&Mesh::setTexture))
         .addProperty("color", &Mesh::getColor, (void(Mesh::*)(Vector4))&Mesh::setColor)
         .addFunction("setColor", (void(Mesh::*)(const float, const float, const float, const float))&Mesh::setColor)
+        .addFunction("getMaterial", &Mesh::getMaterial)
         .addFunction("createPlane", 
             luabridge::overload<float, float>(&Mesh::createPlane),
             luabridge::overload<float, float, unsigned int>(&Mesh::createPlane))
@@ -239,6 +240,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("findRectByString", &Tilemap::findRectByString)
         .addFunction("findTileByString", &Tilemap::findTileByString)
         .addFunction("addRect", 
+            luabridge::overload<int, std::string, std::string, TextureFilter, Rect>(&Tilemap::addRect),
             luabridge::overload<int, std::string, std::string, Rect>(&Tilemap::addRect),
             luabridge::overload<int, std::string, Rect>(&Tilemap::addRect),
             luabridge::overload<std::string, float, float, float, float>(&Tilemap::addRect),

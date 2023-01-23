@@ -23,6 +23,8 @@ namespace Supernova{
         void setColor(float red, float green, float blue, float alpha);
         Vector4 getColor() const;
 
+        Material& getMaterial(unsigned int submesh = 0);
+
         void createPlane(float width, float depth);
         void createPlane(float width, float depth, unsigned int tiles);
         

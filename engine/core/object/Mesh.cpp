@@ -48,6 +48,12 @@ Vector4 Mesh::getColor() const{
     return Color::linearTosRGB(mesh.submeshes[0].material.baseColorFactor);
 }
 
+Material& Mesh::getMaterial(unsigned int submesh){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.submeshes[submesh].material;
+}
+
 void Mesh::createPlane(float width, float depth){
     scene->getSystem<MeshSystem>()->createPlane(entity, width, depth);
 }

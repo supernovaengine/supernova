@@ -91,6 +91,13 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("TextureWrap")
+        .addProperty("REPEAT", TextureWrap::REPEAT)
+        .addProperty("MIRRORED_REPEAT", TextureWrap::MIRRORED_REPEAT)
+        .addProperty("CLAMP_TO_EDGE", TextureWrap::CLAMP_TO_EDGE)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<Engine>("Engine")
 
         .addStaticProperty("scene", &Engine::getScene, &Engine::setScene)
@@ -208,6 +215,23 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("isFramebufferOutdated", &Texture::isFramebufferOutdated)
         .addProperty("minFilter", &Texture::getMinFilter, &Texture::setMinFilter)
         .addProperty("magFilter", &Texture::getMagFilter, &Texture::setMagFilter)
+        .addProperty("wrapU", &Texture::getWrapU, &Texture::setWrapU)
+        .addProperty("wrapV", &Texture::getWrapV, &Texture::setWrapV)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Material>("Material")
+        .addProperty("baseColorFactor", &Material::baseColorFactor)
+        .addProperty("metallicFactor", &Material::metallicFactor)
+        .addProperty("roughnessFactor", &Material::roughnessFactor)
+        .addProperty("emissiveFactor", &Material::emissiveFactor)
+        .addProperty("ambientLight", &Material::ambientLight)
+        .addProperty("ambientFactor", &Material::ambientFactor)
+        .addProperty("baseColorTexture", &Material::baseColorTexture)
+        .addProperty("emissiveTexture", &Material::emissiveTexture)
+        .addProperty("metallicRoughnessTexture", &Material::metallicRoughnessTexture)
+        .addProperty("occlusionTexture", &Material::occlusionTexture)
+        .addProperty("normalTexture", &Material::normalTexture)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

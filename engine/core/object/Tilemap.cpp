@@ -38,7 +38,7 @@ int Tilemap::findTileByString(std::string name){
     return -1;
 }
 
-void Tilemap::addRect(int id, std::string name, std::string texture, Rect rect){
+void Tilemap::addRect(int id, std::string name, std::string texture, TextureFilter texFilter, Rect rect){
     MeshComponent& mesh = getComponent<MeshComponent>();
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
@@ -72,12 +72,18 @@ void Tilemap::addRect(int id, std::string name, std::string texture, Rect rect){
         if (!textureFound) {
             submeshId = mesh.numSubmeshes;
             mesh.submeshes[submeshId].material.baseColorTexture.setPath(texture);
+            mesh.submeshes[submeshId].material.baseColorTexture.setMinFilter(texFilter);
+            mesh.submeshes[submeshId].material.baseColorTexture.setMagFilter(texFilter);
             mesh.submeshes[submeshId].needUpdateTexture = true;
             mesh.numSubmeshes++;
         }
     }
 
     tilemap.tilesRect[id] = {name, submeshId, rect};
+}
+
+void Tilemap::addRect(int id, std::string name, std::string texture, Rect rect){
+    addRect(id, name, texture, TextureFilter::LINEAR, rect);
 }
 
 void Tilemap::addRect(int id, std::string name, Rect rect){
