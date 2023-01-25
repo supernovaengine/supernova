@@ -13,6 +13,9 @@ namespace Supernova{
     public:
         Polygon(Scene* scene);
 
+        bool createPolygon();
+        bool load();
+
         void addVertex(Vector3 vertex);
         void addVertex(float x, float y);
 

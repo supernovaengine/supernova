@@ -72,6 +72,7 @@ namespace Supernova{
 		bool createOrUpdateSprite(SpriteComponent& sprite, MeshComponent& mesh);
 		bool createOrUpdateTerrain(TerrainComponent& terrain);
 		bool createOrUpdateMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
+		bool createOrUpdateTilemap(TilemapComponent& tilemap, MeshComponent& mesh);
 
 		virtual void load();
 		virtual void destroy();

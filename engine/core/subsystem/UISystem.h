@@ -58,9 +58,9 @@ namespace Supernova{
 		void eventOnPointerMove(float x, float y);
 
 		// basic UIs
-		bool loadOrUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout);
-		bool loadOrUpdateImage(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
-		bool loadOrUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout);
+		bool createOrUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout);
+		bool createOrUpdateImage(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
+		bool createOrUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout);
 
 		// advanced UIs
 		void createButtonLabel(Entity entity, ButtonComponent& button);

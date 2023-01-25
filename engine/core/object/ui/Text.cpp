@@ -3,6 +3,7 @@
 #include "util/Color.h"
 #include "util/STBText.h"
 #include "subsystem/RenderSystem.h"
+#include "subsystem/UISystem.h"
 
 using namespace Supernova;
 
@@ -16,6 +17,14 @@ Text::Text(Scene* scene, Entity entity): UILayout(scene, entity){
 
 Text::~Text() {
 
+}
+
+bool Text::createText(){
+    TextComponent& textcomp = getComponent<TextComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    return scene->getSystem<UISystem>()->createOrUpdateText(textcomp, ui, layout);
 }
 
 bool Text::load(){

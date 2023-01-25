@@ -3,6 +3,7 @@
 //
 
 #include "Tilemap.h"
+#include "subsystem/MeshSystem.h"
 
 using namespace Supernova;
 
@@ -12,6 +13,13 @@ Tilemap::Tilemap(Scene* scene): Mesh(scene){
 
 Tilemap::~Tilemap(){
 
+}
+
+bool Tilemap::createTilemap(){
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return scene->getSystem<MeshSystem>()->createOrUpdateTilemap(tilemap, mesh);
 }
 
 int Tilemap::findRectByString(std::string name){

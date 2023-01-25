@@ -2179,8 +2179,9 @@ void MeshSystem::destroyModel(ModelComponent& model){
 bool MeshSystem::createOrUpdateSprite(SpriteComponent& sprite, MeshComponent& mesh){
     if (sprite.needUpdateSprite){
         CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
-        if (sprite.automaticFlipY)
+        if (sprite.automaticFlipY){
             changeFlipY(sprite.flipY, camera, mesh);
+        }
 
         createSprite(sprite, mesh, camera);
 
@@ -2202,13 +2203,29 @@ bool MeshSystem::createOrUpdateTerrain(TerrainComponent& terrain){
 
 bool MeshSystem::createOrUpdateMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
     if (polygon.needUpdatePolygon){
-        CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
-        if (polygon.automaticFlipY)
+        if (polygon.automaticFlipY){
+            CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
             changeFlipY(polygon.flipY, camera, mesh);
+        }
 
         createMeshPolygon(polygon, mesh);
 
         polygon.needUpdatePolygon = false;
+    }
+
+    return true;
+}
+
+bool MeshSystem::createOrUpdateTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
+    if (tilemap.needUpdateTilemap){
+        if (tilemap.automaticFlipY){
+            CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
+            changeFlipY(tilemap.flipY, camera, mesh);
+        }
+
+        createTilemap(tilemap, mesh);
+
+        tilemap.needUpdateTilemap = false;
     }
 
     return true;
@@ -2242,21 +2259,13 @@ void MeshSystem::update(double dt){
     for (int i = 0; i < tilemaps->size(); i++){
 		TilemapComponent& tilemap = tilemaps->getComponentFromIndex(i);
 
-        if (tilemap.needUpdateTilemap){
-            Entity entity = tilemaps->getEntity(i);
-            Signature signature = scene->getSignature(entity);
+        Entity entity = tilemaps->getEntity(i);
+        Signature signature = scene->getSignature(entity);
 
-            if (signature.test(scene->getComponentType<MeshComponent>())){
-                MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+        if (signature.test(scene->getComponentType<MeshComponent>())){
+            MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
-                CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
-                if (tilemap.automaticFlipY)
-                    changeFlipY(tilemap.flipY, camera, mesh);
-
-                createTilemap(tilemap, mesh);
-            }
-
-            tilemap.needUpdateTilemap = false;
+            createOrUpdateTilemap(tilemap, mesh);
         }
     }
 

@@ -6,12 +6,28 @@
 #include "Polygon.h"
 
 #include "util/Color.h"
+#include "subsystem/RenderSystem.h"
+#include "subsystem/UISystem.h"
 
 using namespace Supernova;
 
 Polygon::Polygon(Scene* scene): UILayout(scene){
     addComponent<UIComponent>({});
     addComponent<PolygonComponent>({});
+}
+
+bool Polygon::createPolygon(){
+    PolygonComponent& pcomp = getComponent<PolygonComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    return scene->getSystem<UISystem>()->createOrUpdatePolygon(pcomp, ui, layout);
+}
+
+bool Polygon::load(){
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return scene->getSystem<RenderSystem>()->loadUI(ui, false);
 }
 
 void Polygon::addVertex(Vector3 vertex){

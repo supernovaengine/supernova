@@ -6,12 +6,21 @@
 
 #include "util/Color.h"
 #include "subsystem/RenderSystem.h"
+#include "subsystem/UISystem.h"
 
 using namespace Supernova;
 
 Image::Image(Scene* scene): UILayout(scene){
     addComponent<UIComponent>({});
     addComponent<ImageComponent>({});
+}
+
+bool Image::createImage(){
+    ImageComponent& img = getComponent<ImageComponent>();
+    UIComponent& ui = getComponent<UIComponent>();
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    return scene->getSystem<UISystem>()->createOrUpdateImage(img, ui, layout);
 }
 
 bool Image::load(){

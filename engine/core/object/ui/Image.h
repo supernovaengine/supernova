@@ -12,6 +12,7 @@ namespace Supernova{
     public:
         Image(Scene* scene);
 
+        bool createImage();
         bool load();
 
         void setPatchMargin(int margin);

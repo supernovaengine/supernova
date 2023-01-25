@@ -258,7 +258,7 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
     UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
     UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
 
-    loadOrUpdateText(labeltext, labelui, labellayout);
+    createOrUpdateText(labeltext, labelui, labellayout);
     
     labellayout.anchorPreset = AnchorPreset::CENTER;
     labellayout.usingAnchors = true;
@@ -317,7 +317,7 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
     TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
 
-    loadOrUpdateText(text, textui, textlayout);
+    createOrUpdateText(text, textui, textlayout);
 
     if (layout.height == 0){
         layout.height = textlayout.height + img.patchMarginTop + img.patchMarginBottom;
@@ -351,7 +351,7 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     UIComponent& cursorui = scene->getComponent<UIComponent>(textedit.cursor);
     PolygonComponent& cursor = scene->getComponent<PolygonComponent>(textedit.cursor);
 
-    loadOrUpdatePolygon(cursor, cursorui, cursorlayout);
+    createOrUpdatePolygon(cursor, cursorui, cursorlayout);
 
     float cursorHeight = textlayout.height;
 
@@ -441,8 +441,13 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILay
         ui.needUpdateBuffer = true;
 }
 
-bool UISystem::loadOrUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout){
+bool UISystem::createOrUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout){
     if (polygon.needUpdatePolygon){
+        if (ui.automaticFlipY){
+            CameraComponent& camera = scene->getComponent<CameraComponent>(scene->getCamera());
+            changeFlipY(ui, camera);
+        }
+
         createUIPolygon(polygon, ui, layout);
 
         polygon.needUpdatePolygon = false;
@@ -451,9 +456,13 @@ bool UISystem::loadOrUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, U
     return true;
 }
 
-bool UISystem::loadOrUpdateImage(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
-
+bool UISystem::createOrUpdateImage(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
     if (img.needUpdatePatches){
+        if (ui.automaticFlipY){
+            CameraComponent& camera = scene->getComponent<CameraComponent>(scene->getCamera());
+            changeFlipY(ui, camera);
+        }
+
         createImagePatches(img, ui, layout);
 
         img.needUpdatePatches = false;
@@ -462,8 +471,13 @@ bool UISystem::loadOrUpdateImage(ImageComponent& img, UIComponent& ui, UILayoutC
     return true;
 }
 
-bool UISystem::loadOrUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
+bool UISystem::createOrUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
     if (text.needUpdateText){
+        if (ui.automaticFlipY){
+            CameraComponent& camera = scene->getComponent<CameraComponent>(scene->getCamera());
+            changeFlipY(ui, camera);
+        }
+
         if (text.loaded && text.needReload){
             ui.texture.destroy(); //texture.setData also destroy it
             text.loaded = false;
@@ -834,30 +848,25 @@ void UISystem::update(double dt){
         if (signature.test(scene->getComponentType<UIComponent>())){
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-            if (ui.automaticFlipY){
-                CameraComponent& camera = scene->getComponent<CameraComponent>(scene->getCamera());
-                changeFlipY(ui, camera);
-            }
-
             // Texts
             if (signature.test(scene->getComponentType<TextComponent>())){
                 TextComponent& text = scene->getComponent<TextComponent>(entity);
 
-                loadOrUpdateText(text, ui, layout);
+                createOrUpdateText(text, ui, layout);
             }
 
             // UI Polygons
             if (signature.test(scene->getComponentType<PolygonComponent>())){
                 PolygonComponent& polygon = scene->getComponent<PolygonComponent>(entity);
 
-                loadOrUpdatePolygon(polygon, ui, layout);
+                createOrUpdatePolygon(polygon, ui, layout);
             }
 
             // Images
             if (signature.test(scene->getComponentType<ImageComponent>())){
                 ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
-                loadOrUpdateImage(img, ui, layout);
+                createOrUpdateImage(img, ui, layout);
 
                 // Buttons
                 if (signature.test(scene->getComponentType<ButtonComponent>())){

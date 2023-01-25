@@ -15,6 +15,8 @@ namespace Supernova{
         Tilemap(Scene* scene);
         virtual ~Tilemap();
 
+        bool createTilemap();
+
         int findRectByString(std::string name);
         int findTileByString(std::string name);
 
