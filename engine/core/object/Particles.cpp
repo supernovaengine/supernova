@@ -4,6 +4,7 @@
 
 #include "Particles.h"
 #include "util/Angle.h"
+#include "subsystem/RenderSystem.h"
 
 using namespace Supernova;
 
@@ -26,6 +27,12 @@ Particles::Particles(Scene* scene): Object(scene){
 
 Particles::~Particles(){
 
+}
+
+bool Particles::load(){
+    ParticlesComponent& particomp = getComponent<ParticlesComponent>();
+
+    return scene->getSystem<RenderSystem>()->loadParticles(particomp);
 }
 
 void Particles::setMaxParticles(unsigned int maxParticles){

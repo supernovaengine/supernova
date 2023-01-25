@@ -13,6 +13,8 @@ namespace Supernova{
     public:
         MeshPolygon(Scene* scene);
 
+        bool createPolygon();
+
         void addVertex(Vector3 vertex);
         void addVertex(float x, float y);
 

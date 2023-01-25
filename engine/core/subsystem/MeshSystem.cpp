@@ -2176,6 +2176,44 @@ void MeshSystem::destroyModel(ModelComponent& model){
     model.skeleton = NULL_ENTITY;
 }
 
+bool MeshSystem::createOrUpdateSprite(SpriteComponent& sprite, MeshComponent& mesh){
+    if (sprite.needUpdateSprite){
+        CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
+        if (sprite.automaticFlipY)
+            changeFlipY(sprite.flipY, camera, mesh);
+
+        createSprite(sprite, mesh, camera);
+
+        sprite.needUpdateSprite = false;
+    }
+
+    return true;
+}
+
+bool MeshSystem::createOrUpdateTerrain(TerrainComponent& terrain){
+    if (terrain.needUpdateTerrain){
+        createTerrain(terrain);
+
+        terrain.needUpdateTerrain = false;
+    }
+
+    return true;
+}
+
+bool MeshSystem::createOrUpdateMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
+    if (polygon.needUpdatePolygon){
+        CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
+        if (polygon.automaticFlipY)
+            changeFlipY(polygon.flipY, camera, mesh);
+
+        createMeshPolygon(polygon, mesh);
+
+        polygon.needUpdatePolygon = false;
+    }
+
+    return true;
+}
+
 void MeshSystem::load(){
 
 }
@@ -2190,21 +2228,13 @@ void MeshSystem::update(double dt){
     for (int i = 0; i < sprites->size(); i++){
 		SpriteComponent& sprite = sprites->getComponentFromIndex(i);
 
-        if (sprite.needUpdateSprite){
-            Entity entity = sprites->getEntity(i);
-            Signature signature = scene->getSignature(entity);
+        Entity entity = sprites->getEntity(i);
+        Signature signature = scene->getSignature(entity);
 
-            if (signature.test(scene->getComponentType<MeshComponent>())){
-                MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+        if (signature.test(scene->getComponentType<MeshComponent>())){
+            MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
-                CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
-                if (sprite.automaticFlipY)
-                    changeFlipY(sprite.flipY, camera, mesh);
-
-                createSprite(sprite, mesh, camera);
-            }
-
-            sprite.needUpdateSprite = false;
+            createOrUpdateSprite(sprite, mesh);
         }
     }
 
@@ -2234,21 +2264,13 @@ void MeshSystem::update(double dt){
     for (int i = 0; i < polygons->size(); i++){
 		MeshPolygonComponent& polygon = polygons->getComponentFromIndex(i);
 
-        if (polygon.needUpdatePolygon){
-            Entity entity = polygons->getEntity(i);
-            Signature signature = scene->getSignature(entity);
+        Entity entity = polygons->getEntity(i);
+        Signature signature = scene->getSignature(entity);
 
-            if (signature.test(scene->getComponentType<MeshComponent>())){
-                MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+        if (signature.test(scene->getComponentType<MeshComponent>())){
+            MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
-                CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
-                if (polygon.automaticFlipY)
-                    changeFlipY(polygon.flipY, camera, mesh);
-
-                createMeshPolygon(polygon, mesh);
-            }
-
-            polygon.needUpdatePolygon = false;
+            createOrUpdateMeshPolygon(polygon, mesh);
         }
     }
 
@@ -2256,14 +2278,7 @@ void MeshSystem::update(double dt){
     for (int i = 0; i < terrains->size(); i++){
 		TerrainComponent& terrain = terrains->getComponentFromIndex(i);
 
-        if (terrain.needUpdateTerrain){
-            Entity entity = terrains->getEntity(i);
-            Signature signature = scene->getSignature(entity);
-
-            createTerrain(terrain);
-
-            terrain.needUpdateTerrain = false;
-        }
+        createOrUpdateTerrain(terrain);
     }
 
 }

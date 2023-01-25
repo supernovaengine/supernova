@@ -69,6 +69,10 @@ namespace Supernova{
 
 		void destroyModel(ModelComponent& model);
 
+		bool createOrUpdateSprite(SpriteComponent& sprite, MeshComponent& mesh);
+		bool createOrUpdateTerrain(TerrainComponent& terrain);
+		bool createOrUpdateMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
+
 		virtual void load();
 		virtual void destroy();
         virtual void update(double dt);

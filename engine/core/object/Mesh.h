@@ -16,6 +16,8 @@ namespace Supernova{
         Mesh(Scene* scene);
         virtual ~Mesh();
 
+        bool load();
+
         void setTexture(std::string path);
         void setTexture(Framebuffer* framebuffer);
         

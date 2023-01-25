@@ -17,6 +17,8 @@ namespace Supernova{
         Text(Scene* scene, Entity entity);
         virtual ~Text();
 
+        bool load();
+
         void setFixedSize(bool fixedSize);
 
         void setFixedWidth(bool fixedWidth);

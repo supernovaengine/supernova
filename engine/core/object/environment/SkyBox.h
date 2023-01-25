@@ -13,6 +13,8 @@ namespace Supernova{
     public:
         SkyBox(Scene* scene);
 
+        bool load();
+
         void setTextures(std::string textureFront, std::string textureBack,  
                         std::string textureLeft, std::string textureRight, 
                         std::string textureUp, std::string textureDown);

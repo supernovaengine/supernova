@@ -2,6 +2,7 @@
 
 #include "util/Color.h"
 #include "util/STBText.h"
+#include "subsystem/RenderSystem.h"
 
 using namespace Supernova;
 
@@ -15,6 +16,12 @@ Text::Text(Scene* scene, Entity entity): UILayout(scene, entity){
 
 Text::~Text() {
 
+}
+
+bool Text::load(){
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return scene->getSystem<RenderSystem>()->loadUI(ui, true);
 }
 
 void Text::setFixedSize(bool fixedSize){

@@ -121,25 +121,20 @@ namespace Supernova{
 
 	protected:
 
-		bool loadMesh(MeshComponent& mesh);
 		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams);
 		void destroyMesh(MeshComponent& mesh);
 
-		bool loadTerrain(TerrainComponent& terrain);
 		void drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams);
 		void destroyTerrain(TerrainComponent& terrain);
 
-		bool loadUI(UIComponent& uirender, bool isText);
 		void drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture);
 		void destroyUI(UIComponent& uirender);
 
-		bool loadParticles(ParticlesComponent& particles);
 		void drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void destroyParticles(ParticlesComponent& particles);
 
-		bool loadSky(SkyComponent& sky);
 		void drawSky(SkyComponent& sky, bool renderToTexture);
 		void destroySky(SkyComponent& sky);
 
@@ -155,6 +150,12 @@ namespace Supernova{
 
 		RenderSystem(Scene* scene);
 		virtual ~RenderSystem();
+
+		bool loadMesh(MeshComponent& mesh);
+		bool loadTerrain(TerrainComponent& terrain);
+		bool loadParticles(ParticlesComponent& particles);
+		bool loadUI(UIComponent& uirender, bool isText);
+		bool loadSky(SkyComponent& sky);
 
 		void updateFramebuffer(CameraComponent& camera);
 		void updateTransform(Transform& transform);

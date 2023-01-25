@@ -15,6 +15,9 @@ namespace Supernova{
         Terrain(Scene* scene);
         virtual ~Terrain();
 
+        bool load();
+        bool createTerrain();
+
         void setHeightMap(std::string path);
         void setHeightMap(Framebuffer* framebuffer);
 

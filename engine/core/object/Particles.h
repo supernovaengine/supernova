@@ -18,6 +18,8 @@ namespace Supernova{
         Particles(Scene* scene);
         virtual ~Particles();
 
+        bool load();
+
         void setMaxParticles(unsigned int maxParticles);
         unsigned int getMaxParticles() const;
 

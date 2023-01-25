@@ -5,6 +5,8 @@
 #include "Sprite.h"
 
 #include "util/Color.h"
+#include "subsystem/MeshSystem.h"
+#include "subsystem/RenderSystem.h"
 
 using namespace Supernova;
 
@@ -27,6 +29,13 @@ Sprite& Sprite::operator=(const Sprite& rhs){
     Mesh::operator=(rhs);
 
     return *this;
+}
+
+bool Sprite::createSprite(){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return scene->getSystem<MeshSystem>()->createOrUpdateSprite(spritecomp, mesh);
 }
 
 void Sprite::setSize(int width, int height){

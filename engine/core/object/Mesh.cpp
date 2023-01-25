@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "render/ObjectRender.h"
 #include "util/Color.h"
+#include "subsystem/RenderSystem.h"
 
 using namespace Supernova;
 
@@ -13,6 +14,12 @@ Mesh::Mesh(Scene* scene): Object(scene){
 }
 
 Mesh::~Mesh(){
+}
+
+bool Mesh::load(){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return scene->getSystem<RenderSystem>()->loadMesh(mesh);
 }
 
 void Mesh::setTexture(std::string path){

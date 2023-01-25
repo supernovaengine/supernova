@@ -7,6 +7,7 @@
 
 #include "Engine.h"
 #include "component/MeshPolygonComponent.h"
+#include "subsystem/MeshSystem.h"
 
 using namespace Supernova;
 
@@ -15,6 +16,13 @@ MeshPolygon::MeshPolygon(Scene* scene): Mesh(scene){
 
     MeshComponent& mesh = getComponent<MeshComponent>();
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;
+}
+
+bool MeshPolygon::createPolygon(){
+    MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return scene->getSystem<MeshSystem>()->createOrUpdateMeshPolygon(pcomp, mesh);
 }
 
 void MeshPolygon::addVertex(Vector3 vertex){

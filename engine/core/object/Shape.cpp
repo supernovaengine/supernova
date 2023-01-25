@@ -4,6 +4,7 @@
 
 #include "Shape.h"
 #include "subsystem/MeshSystem.h"
+#include "subsystem/RenderSystem.h"
 
 using namespace Supernova;
 

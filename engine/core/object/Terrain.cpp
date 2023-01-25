@@ -5,6 +5,9 @@
 #include "Terrain.h"
 #include "util/Color.h"
 
+#include "subsystem/MeshSystem.h"
+#include "subsystem/RenderSystem.h"
+
 using namespace Supernova;
 
 Terrain::Terrain(Scene* scene): Object(scene){
@@ -13,6 +16,18 @@ Terrain::Terrain(Scene* scene): Object(scene){
 
 Terrain::~Terrain(){
 
+}
+
+bool Terrain::load(){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return scene->getSystem<RenderSystem>()->loadTerrain(terrain);
+}
+
+bool Terrain::createTerrain(){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return scene->getSystem<MeshSystem>()->createOrUpdateTerrain(terrain);
 }
 
 void Terrain::setHeightMap(std::string path){

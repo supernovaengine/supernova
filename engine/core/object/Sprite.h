@@ -24,6 +24,8 @@ namespace Supernova{
         Sprite(const Sprite& rhs);
         Sprite& operator=(const Sprite& rhs);
 
+        bool createSprite();
+
         void setSize(int width, int height);
         void setWidth(int width);
         void setHeight(int height);

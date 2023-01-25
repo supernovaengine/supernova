@@ -43,7 +43,6 @@ sg_filter SokolTexture::getFilter(TextureFilter textureFilter){
     return SG_FILTER_LINEAR;
 }
 
-
 sg_wrap SokolTexture::getWrap(TextureWrap textureWrap){
     if (textureWrap == TextureWrap::REPEAT){
         return SG_WRAP_REPEAT;
@@ -56,7 +55,6 @@ sg_wrap SokolTexture::getWrap(TextureWrap textureWrap){
 
     return SG_WRAP_REPEAT;
 }
-
 
 // https://github.com/floooh/sokol/issues/102
 sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){

@@ -3,11 +3,18 @@
 //
 
 #include "SkyBox.h"
+#include "subsystem/RenderSystem.h"
 
 using namespace Supernova;
 
 SkyBox::SkyBox(Scene* scene): EntityHandle(scene){
     addComponent<SkyComponent>({});
+}
+
+bool SkyBox::load(){
+    SkyComponent& sky = getComponent<SkyComponent>();
+
+    return scene->getSystem<RenderSystem>()->loadSky(sky);
 }
 
 void SkyBox::setTextures(std::string textureFront, std::string textureBack,  

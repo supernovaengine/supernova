@@ -5,12 +5,19 @@
 #include "Image.h"
 
 #include "util/Color.h"
+#include "subsystem/RenderSystem.h"
 
 using namespace Supernova;
 
 Image::Image(Scene* scene): UILayout(scene){
     addComponent<UIComponent>({});
     addComponent<ImageComponent>({});
+}
+
+bool Image::load(){
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return scene->getSystem<RenderSystem>()->loadUI(ui, false);
 }
 
 void Image::setPatchMargin(int margin){
