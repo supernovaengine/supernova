@@ -11,6 +11,30 @@ ParticlesAnimation::ParticlesAnimation(Scene* scene): Action(scene){
     addComponent<ParticlesAnimationComponent>({});
 }
 
+void ParticlesAnimation::setRate(int rate){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+    
+    partAnim.rate = rate;
+}
+
+int ParticlesAnimation::getRate() const{
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+    
+    return partAnim.rate;
+}
+
+void ParticlesAnimation::setMaxPerUpdate(int maxPerUpdate){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+    
+    partAnim.maxPerUpdate = maxPerUpdate;
+}
+
+int ParticlesAnimation::getMaxPerUpdate() const{
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+    
+    return partAnim.maxPerUpdate;
+}
+
 void ParticlesAnimation::setLifeInitializer(float life){
     setLifeInitializer(life, life);
 }

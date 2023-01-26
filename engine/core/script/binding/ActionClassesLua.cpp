@@ -132,6 +132,8 @@ void LuaBinding::registerActionClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .deriveClass<ParticlesAnimation, Action>("ParticlesAnimation")
         .addConstructor <void (*) (Scene*)> ()
+        .addProperty("rate", &ParticlesAnimation::getRate, &ParticlesAnimation::setRate)
+        .addProperty("maxPerUpdate", &ParticlesAnimation::getMaxPerUpdate, &ParticlesAnimation::setMaxPerUpdate)
         .addFunction("setLifeInitializer", 
             luabridge::overload<float>(&ParticlesAnimation::setLifeInitializer),
             luabridge::overload<float, float>(&ParticlesAnimation::setLifeInitializer))

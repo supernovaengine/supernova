@@ -13,6 +13,12 @@ namespace Supernova{
     public:
         ParticlesAnimation(Scene* scene);
 
+        void setRate(int rate);
+        int getRate() const;
+
+        void setMaxPerUpdate(int maxPerUpdate);
+        int getMaxPerUpdate() const;
+
         void setLifeInitializer(float life);
         void setLifeInitializer(float minLife, float maxLife);
 
