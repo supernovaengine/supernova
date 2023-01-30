@@ -135,6 +135,24 @@ void Tilemap::removeRect(std::string name){
         removeRect(rect);
 }
 
+TileRectData& Tilemap::getRect(int id){
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+
+    if (id >= 0 && id < MAX_TILEMAP_TILESRECT){
+        return tilemap.tilesRect[id];
+    }else{
+        throw std::out_of_range("error getting rect tilemap");
+    }
+}
+
+TileRectData& Tilemap::getRect(std::string name){
+    int rect = findRectByString(name);
+    if (rect >= 0)
+        return getRect(rect);
+
+    throw std::out_of_range("error getting rect tilemap");
+}
+
 void Tilemap::addTile(int id, std::string name, int rectId, Vector2 position, float width, float height){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
@@ -176,14 +194,46 @@ void Tilemap::removeTile(int id){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
     if (id >= 0 && id < MAX_TILEMAP_TILES){
-        tilemap.tiles[id] = {0};
+        tilemap.tiles[id] = {};
     }else{
         Log::error("Error removing tile with id %i", id);
     }
+
+    tilemap.needUpdateTilemap = true;
 }
 
 void Tilemap::removeTile(std::string name){
     int tile = findTileByString(name);
     if (tile >= 0)
         removeTile(tile);
+}
+
+TileData& Tilemap::getTile(int id){
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+
+    if (id >= 0 && id < MAX_TILEMAP_TILES){
+        return tilemap.tiles[id];
+    }else{
+        throw std::out_of_range("error getting tile");
+    }
+}
+
+TileData& Tilemap::getTile(std::string name){
+    int tile = findTileByString(name);
+    if (tile >= 0)
+        return getTile(tile);
+
+    throw std::out_of_range("error getting tile");
+}
+
+void Tilemap::setReserveTiles(unsigned int reserveTiles){
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+
+    tilemap.reserveTiles = reserveTiles;
+}
+
+unsigned int Tilemap::getReserveTiles() const{
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+
+    return tilemap.reserveTiles;
 }

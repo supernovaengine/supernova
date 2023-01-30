@@ -24,6 +24,7 @@
 #include "component/AudioComponent.h"
 #include "component/SpriteComponent.h"
 #include "component/FogComponent.h"
+#include "component/TilemapComponent.h"
 
 using namespace Supernova;
 
@@ -370,6 +371,35 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("length", &AudioComponent::length)
         .addProperty("playingTime", &AudioComponent::playingTime)
         .addProperty("needUpdate", &AudioComponent::needUpdate)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<TileRectData>("TileRectData")
+        .addProperty("name", &TileRectData::name)
+        .addProperty("submeshId", &TileRectData::submeshId)
+        .addProperty("rect", &TileRectData::rect)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<TileData>("TileData")
+        .addProperty("name", &TileData::name)
+        .addProperty("rectId", &TileData::rectId)
+        .addProperty("position", &TileData::position)
+        .addProperty("width", &TileData::width)
+        .addProperty("height", &TileData::height)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<TilemapComponent>("TilemapComponent")
+        .addProperty("width", &TilemapComponent::width)
+        .addProperty("height", &TilemapComponent::height)
+        .addProperty("automaticFlipY", &TilemapComponent::automaticFlipY)
+        .addProperty("flipY", &TilemapComponent::flipY)
+        .addProperty("reserveTiles", &TilemapComponent::reserveTiles)
+        .addProperty("numTiles", &TilemapComponent::numTiles)
+        //.addProperty("tilesRect", &TilemapComponent::tilesRect)
+        //.addProperty("tiles", &TilemapComponent::tiles)
+        .addProperty("needUpdateTilemap", &TilemapComponent::needUpdateTilemap)
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

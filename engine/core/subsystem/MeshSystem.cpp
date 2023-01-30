@@ -217,11 +217,20 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     std::vector<std::vector<uint16_t>> indexMap;
     indexMap.resize(mesh.numSubmeshes);
 
+    unsigned int numTiles = 0;
+    unsigned int reserveTiles = tilemap.reserveTiles;
+
     for (int i = 0; i < MAX_TILEMAP_TILES; i++){
 
-        if (tilemap.tiles[i].width == 0 && tilemap.tiles[i].height == 0){
+        if (tilemap.tiles[i].width == 0 && tilemap.tiles[i].height == 0 && reserveTiles == 0){
             continue;
         }
+
+        if (reserveTiles > 0){
+            reserveTiles--;
+        }
+
+        numTiles++;
 
         Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
         mesh.buffer.addVector3(attVertex, Vector3(tilemap.tiles[i].position.x, tilemap.tiles[i].position.y, 0));
@@ -309,8 +318,15 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
         //}
     }
 
-    if (mesh.loaded)
-        mesh.needUpdateBuffer = true;
+    if (mesh.loaded){
+        if (tilemap.numTiles < numTiles){
+            mesh.needReload = true;
+        }else{
+            mesh.needUpdateBuffer = true;
+        }
+    }
+
+    tilemap.numTiles = numTiles;
 }
 
 void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh){
