@@ -226,6 +226,10 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
             continue;
         }
 
+        if (tilemap.tiles[i].rectId < 0 || tilemap.tiles[i].rectId >= MAX_TILEMAP_TILESRECT){
+            continue;
+        }
+
         if (reserveTiles > 0){
             reserveTiles--;
         }
