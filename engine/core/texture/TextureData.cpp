@@ -119,8 +119,10 @@ bool TextureData::loadTextureFromFile(const char* filename) {
         return false;
     }
 
+    channels = desired_channels;
+
     //Considering one byte per channel
-    size = width * height * desired_channels; //in bytes
+    size = width * height * channels; //in bytes
     //----- End std_image read texture
 
     originalWidth = width;
