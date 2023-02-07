@@ -30,7 +30,7 @@
 #endif
 
 #ifndef MAX_TILEMAP_TILES
-#define MAX_TILEMAP_TILES 100
+#define MAX_TILEMAP_TILES 200
 #endif
 
 #ifndef MAX_SPRITE_FRAMES

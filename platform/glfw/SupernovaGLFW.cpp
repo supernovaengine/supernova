@@ -26,8 +26,8 @@ SupernovaGLFW::SupernovaGLFW(){
 }
 
 int SupernovaGLFW::init(int argc, char **argv){
-    windowWidth = 800;
-    windowHeight = 600;
+    windowWidth = 960;
+    windowHeight = 540;
 
     Supernova::Engine::systemInit(argc, argv);
 
