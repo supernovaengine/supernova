@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #ifndef log_h
 #define log_h
 

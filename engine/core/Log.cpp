@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #include "Log.h"
 #include "System.h"
 #include <stdarg.h>

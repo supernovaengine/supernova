@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #ifndef SCENE_H
 #define SCENE_H
 

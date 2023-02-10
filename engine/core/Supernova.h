@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #ifndef supernova_h
 #define supernova_h
 
