@@ -1,3 +1,8 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
+
 #ifndef Input_h
 #define Input_h
 
@@ -176,8 +181,8 @@ namespace Supernova {
         static void addKeyPressed(int key);
         static void releaseKeyPressed(int key);
         
-        static void addMousePressed(int key);
-        static void releaseMousePressed(int key);
+        static void addMousePressed(int button);
+        static void releaseMousePressed(int button);
         static void setMousePosition(float x, float y);
         static void setMouseScroll(float xoffset, float yoffset);
         
@@ -194,7 +199,7 @@ namespace Supernova {
     public:
         
         static bool isKeyPressed(int key);
-        static bool isMousePressed(int key);
+        static bool isMousePressed(int button);
         static bool isTouch();
         static bool isMouseEntered();
         

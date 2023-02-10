@@ -1,3 +1,8 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
+
 #include "Input.h"
 
 using namespace Supernova;
@@ -18,12 +23,12 @@ void Input::releaseKeyPressed(int key){
     keyPressed[key] = false;
 }
 
-void Input::addMousePressed(int key){
-    mousePressed[key] = true;
+void Input::addMousePressed(int button){
+    mousePressed[button] = true;
 }
 
-void Input::releaseMousePressed(int key){
-    mousePressed[key] = false;
+void Input::releaseMousePressed(int button){
+    mousePressed[button] = false;
 }
 
 void Input::setMousePosition(float x, float y){
@@ -73,8 +78,8 @@ bool Input::isKeyPressed(int key){
     return keyPressed[key];
 }
 
-bool Input::isMousePressed(int key){
-    return mousePressed[key];
+bool Input::isMousePressed(int button){
+    return mousePressed[button];
 }
 
 bool Input::isTouch(){
