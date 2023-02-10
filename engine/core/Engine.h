@@ -69,7 +69,6 @@ namespace Supernova {
         static bool callMouseInTouchEvent;
         static bool callTouchInMouseEvent;
         static bool useDegrees;
-        static bool defaultResampleToPOTTexture;
         static bool automaticTransparency;
 
         static bool allowEventsOutCanvas;
@@ -88,6 +87,7 @@ namespace Supernova {
         static float updateTime;
         
         static bool transformCoordPos(float& x, float& y);
+        static void calculateCanvas();
         
     public:
         
@@ -105,8 +105,6 @@ namespace Supernova {
         
         static int getPreferedCanvasWidth();
         static int getPreferedCanvasHeight();
-
-        static void calculateCanvas();
         
         static Rect getViewRect();
         
@@ -124,9 +122,6 @@ namespace Supernova {
         
         static void setUseDegrees(bool useDegrees);
         static bool isUseDegrees();
-
-        static void setDefaultResampleToPOTTexture(bool defaultResampleToPOTTexture);
-        static bool isDefaultResampleToPOTTexture();
 
         static void setAutomaticTransparency(bool automaticTransparency);
         static bool isAutomaticTransparency();

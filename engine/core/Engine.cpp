@@ -34,7 +34,6 @@ TextureStrategy Engine::textureStrategy;
 bool Engine::callMouseInTouchEvent;
 bool Engine::callTouchInMouseEvent;
 bool Engine::useDegrees;
-bool Engine::defaultResampleToPOTTexture;
 bool Engine::automaticTransparency;
 bool Engine::allowEventsOutCanvas;
 bool Engine::fixedTimeSceneUpdate;
@@ -166,14 +165,6 @@ void Engine::setUseDegrees(bool useDegrees){
 
 bool Engine::isUseDegrees(){
     return Engine::useDegrees;
-}
-
-void Engine::setDefaultResampleToPOTTexture(bool defaultResampleToPOTTexture){
-    Engine::defaultResampleToPOTTexture = defaultResampleToPOTTexture;
-}
-
-bool Engine::isDefaultResampleToPOTTexture(){
-    return defaultResampleToPOTTexture;
 }
 
 void Engine::setAutomaticTransparency(bool automaticTransparency){
@@ -312,7 +303,6 @@ void Engine::systemInit(int argc, char* argv[]){
     Engine::setCallMouseInTouchEvent(false);
     Engine::setCallTouchInMouseEvent(false);
     Engine::setUseDegrees(true);
-    Engine::setDefaultResampleToPOTTexture(true);
     Engine::setAutomaticTransparency(true);
     Engine::setAllowEventsOutCanvas(false);
     Engine::setFixedTimeSceneUpdate(false);
