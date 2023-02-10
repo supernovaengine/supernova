@@ -23,6 +23,14 @@ namespace Supernova {
         NATIVE
     };
 
+    // texture power of two strategy
+    enum class TextureStrategy{
+        FIT,
+        RESAMPLE,
+        NONE
+    };
+
+
     enum class Platform{
         MacOS,
         iOS,
@@ -39,13 +47,6 @@ namespace Supernova {
         D3D11,
         METAL,
         WGPU
-    };
-
-    // texture power of two strategy
-    enum class TextureStrategy{
-        FIT,
-        RESAMPLE,
-        NONE
     };
 
     class Engine {
@@ -72,9 +73,6 @@ namespace Supernova {
         static bool automaticTransparency;
 
         static bool allowEventsOutCanvas;
-        
-        static bool fixedTimePhysics;
-        static bool fixedTimeAnimations;
 
         static bool fixedTimeSceneUpdate;
 

@@ -37,8 +37,6 @@ bool Engine::useDegrees;
 bool Engine::automaticTransparency;
 bool Engine::allowEventsOutCanvas;
 bool Engine::fixedTimeSceneUpdate;
-bool Engine::fixedTimePhysics;
-bool Engine::fixedTimeAnimations;
 
 uint64_t Engine::lastTime = 0;
 float Engine::updateTimeCount = 0;
