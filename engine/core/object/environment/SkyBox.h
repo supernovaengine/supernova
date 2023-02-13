@@ -28,6 +28,7 @@ namespace Supernova{
 
         void setColor(Vector4 color);
         void setColor(const float r, const float g, const float b);
+        void setColor(const float r, const float g, const float b, const float a);
         void setAlpha(const float alpha);
         Vector4 getColor() const;
         float getAlpha() const;

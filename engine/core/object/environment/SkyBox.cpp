@@ -88,6 +88,12 @@ void SkyBox::setColor(const float r, const float g, const float b){
     sky.color = Vector4(r, g, b, sky.color.w);
 }
 
+void SkyBox::setColor(const float r, const float g, const float b, const float a){
+    SkyComponent& sky = getComponent<SkyComponent>();
+
+    sky.color = Vector4(r, g, b, a);
+}
+
 void SkyBox::setAlpha(const float alpha){
     SkyComponent& sky = getComponent<SkyComponent>();
 

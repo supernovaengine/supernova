@@ -108,8 +108,12 @@ void Terrain::setColor(Vector4 color){
     terrain.material.baseColorFactor = Color::sRGBToLinear(color);
 }
 
-void Terrain::setColor(float red, float green, float blue, float alpha){
+void Terrain::setColor(const float red, const float green, const float blue, const float alpha){
     setColor(Vector4(red, green, blue, alpha));
+}
+
+void Terrain::setColor(const float red, const float green, const float blue){
+    setColor(Vector4(red, green, blue, getColor().w));
 }
 
 Vector4 Terrain::getColor() const{

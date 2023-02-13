@@ -133,6 +133,10 @@ void Image::setColor(const float red, const float green, const float blue, const
     setColor(Vector4(red, green, blue, alpha));
 }
 
+void Image::setColor(const float red, const float green, const float blue){
+    setColor(Vector4(red, green, blue, getColor().w));
+}
+
 Vector4 Image::getColor() const{
     UIComponent& ui = getComponent<UIComponent>();
 

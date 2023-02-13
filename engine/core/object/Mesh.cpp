@@ -44,8 +44,12 @@ void Mesh::setColor(Vector4 color){
     mesh.submeshes[0].material.baseColorFactor = Color::sRGBToLinear(color);
 }
 
-void Mesh::setColor(float red, float green, float blue, float alpha){
+void Mesh::setColor(const float red, const float green, const float blue, const float alpha){
     setColor(Vector4(red, green, blue, alpha));
+}
+
+void Mesh::setColor(const float red, const float green, const float blue){
+    setColor(Vector4(red, green, blue, getColor().w));
 }
 
 Vector4 Mesh::getColor() const{

@@ -152,8 +152,12 @@ void Text::setColor(Vector4 color){
     ui.color = Color::sRGBToLinear(color);
 }
 
-void Text::setColor(float red, float green, float blue, float alpha){
+void Text::setColor(const float red, const float green, const float blue, const float alpha){
     setColor(Vector4(red, green, blue, alpha));
+}
+
+void Text::setColor(const float red, const float green, const float blue){
+    setColor(Vector4(red, green, blue, getColor().w));
 }
 
 Vector4 Text::getColor() const{

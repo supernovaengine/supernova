@@ -46,6 +46,10 @@ void Fog::setColor(Vector3 color){
     fog.color = Color::sRGBToLinear(color);
 }
 
+void Fog::setColor(float red, float green, float blue){
+    setColor(Vector3(red, green, blue));
+}
+
 void Fog::setDensity(float density){
     FogComponent& fog = getComponent<FogComponent>();
     fog.density = density;

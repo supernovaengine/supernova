@@ -64,8 +64,12 @@ void Polygon::setColor(Vector4 color){
     ui.color = Color::sRGBToLinear(color);
 }
 
-void Polygon::setColor(float red, float green, float blue, float alpha){
+void Polygon::setColor(const float red, const float green, const float blue, const float alpha){
     setColor(Vector4(red, green, blue, alpha));
+}
+
+void Polygon::setColor(const float red, const float green, const float blue){
+    setColor(Vector4(red, green, blue, getColor().w));
 }
 
 Vector4 Polygon::getColor() const{

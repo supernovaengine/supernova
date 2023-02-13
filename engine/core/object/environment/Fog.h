@@ -23,6 +23,7 @@ namespace Supernova{
 
         void setType(FogType type);
         void setColor(Vector3 color);
+        void setColor(float red, float green, float blue);
         void setDensity(float density);
         void setLinearStart(float start);
         void setLinearEnd(float end);

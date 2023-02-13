@@ -32,7 +32,8 @@ namespace Supernova{
         void setTexture(Framebuffer* framebuffer);
 
         void setColor(Vector4 color);
-        void setColor(float red, float green, float blue, float alpha);
+        void setColor(const float red, const float green, const float blue, const float alpha);
+        void setColor(const float red, const float green, const float blue);
         Vector4 getColor() const;
 
         void setSize(float size);

@@ -33,6 +33,7 @@ namespace Supernova{
 
         void setColor(Vector4 color);
         void setColor(const float red, const float green, const float blue, const float alpha);
+        void setColor(const float red, const float green, const float blue);
         Vector4 getColor() const;
 
         void setFlipY(bool flipY);
