@@ -83,6 +83,8 @@ namespace Supernova {
         static float framerate;
         
         static float updateTime;
+
+        static bool viewLoaded;
         
         static bool transformCoordPos(float& x, float& y);
         static void calculateCanvas();

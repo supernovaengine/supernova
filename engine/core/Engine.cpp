@@ -46,6 +46,8 @@ float Engine::framerate = 0;
 
 float Engine::updateTime = 0.03;
 
+bool Engine::viewLoaded = false;
+
 //-----Supernova user events-----
 FunctionSubscribe<void()> Engine::onViewLoaded;
 FunctionSubscribe<void()> Engine::onViewChanged;
@@ -69,11 +71,15 @@ FunctionSubscribe<void(wchar_t)> Engine::onCharInput;
 
 void Engine::setScene(Scene* scene){
     if (scene){
-        if (!Engine::scenes[0]){
+        if (!scenes[0]){
             numScenes++;
         }
-        Engine::scenes[0] = scene;
+        scenes[0] = scene;
         scene->setMainScene(true);
+        if (viewLoaded){
+            scene->load();
+            scene->updateSizeFromCamera();
+        }
     }
 }
 
@@ -87,7 +93,11 @@ void Engine::addSceneLayer(Scene* scene){
     for (int i = 1; i < MAX_SCENE_LAYERS; i++){
         if (!scenes[i] && !foundSlot){
             scenes[i] = scene;
-            scenes[i]->setMainScene(false);
+            scene->setMainScene(false);
+            if (viewLoaded){
+                scene->load();
+                scene->updateSizeFromCamera();
+            }
 
             numScenes++;
             foundSlot = true;
@@ -326,6 +336,7 @@ void Engine::systemViewLoaded(){
     for (int i = 0; i < numScenes; i++){
         scenes[i]->load();
     }
+    viewLoaded = true;
 }
 
 void Engine::systemViewChanged(){
@@ -380,7 +391,7 @@ void Engine::systemViewChanged(){
     viewRect.setRect(viewX, viewY, viewWidth, viewHeight);
 
     for (int i = 0; i < numScenes; i++){
-        scenes[i]->getSystem<RenderSystem>()->updateCameraSize(scenes[i]->getCamera());
+        scenes[i]->updateSizeFromCamera();
     }
 
     onViewChanged.call();

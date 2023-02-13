@@ -204,6 +204,10 @@ void Scene::update(double dt){
 	}
 }
 
+void Scene::updateSizeFromCamera(){
+	getSystem<RenderSystem>()->updateCameraSize(getCamera());
+}
+
 Entity Scene::createEntity(){
     return entityManager.createEntity();
 }
