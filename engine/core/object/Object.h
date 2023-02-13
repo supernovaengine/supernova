@@ -29,6 +29,7 @@ namespace Supernova{
 
         void setPosition(Vector3 position);
         void setPosition(const float x, const float y, const float z);
+        void setPosition(const float x, const float y);
         Vector3 getPosition() const;
         Vector3 getWorldPosition() const;
 

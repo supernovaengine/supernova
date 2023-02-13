@@ -110,7 +110,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("moveToLast", &Object::moveToLast)
         .addProperty("name", &Object::getName, &Object::setName)
         .addProperty("position", &Object::getPosition, (void(Object::*)(Vector3))&Object::setPosition)
-        .addFunction("setPosition", (void(Object::*)(const float, const float, const float))&Object::setPosition)
+        .addFunction("setPosition", 
+            luabridge::overload<const float, const float, const float>(&Object::setPosition),
+            luabridge::overload<const float, const float>(&Object::setPosition))
         .addFunction("getWorldPosition", &Object::getWorldPosition)
         .addProperty("rotation", &Object::getRotation, (void(Object::*)(Quaternion))&Object::setRotation)
         .addFunction("setRotation", (void(Object::*)(const float, const float, const float))&Object::setRotation)

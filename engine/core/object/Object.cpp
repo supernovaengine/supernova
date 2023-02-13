@@ -40,6 +40,10 @@ void Object::setPosition(const float x, const float y, const float z){
     setPosition(Vector3(x,y,z));
 }
 
+void Object::setPosition(const float x, const float y){
+    setPosition(Vector3(x,y,0));
+}
+
 Vector3 Object::getPosition() const{
     Transform& transform = getComponent<Transform>();
     return transform.position;
