@@ -70,16 +70,19 @@ FunctionSubscribe<void(wchar_t)> Engine::onCharInput;
 
 
 void Engine::setScene(Scene* scene){
+    numScenes = 0;
     if (scene){
-        if (!scenes[0]){
-            numScenes++;
+        includeScene(0, scene, true);
+
+        for (int i = 0; i < MAX_SCENE_LAYERS; i++){
+            if (scenes[i]){
+                numScenes++;
+            }else{
+                break;
+            }
         }
-        scenes[0] = scene;
-        scene->setMainScene(true);
-        if (viewLoaded){
-            scene->load();
-            scene->updateSizeFromCamera();
-        }
+    }else{
+        scenes[0] = NULL;
     }
 }
 
@@ -88,23 +91,63 @@ Scene* Engine::getScene(){
 }
 
 void Engine::addSceneLayer(Scene* scene){
-    bool foundSlot = false;
-    // 0 is reserved to mainScene
-    for (int i = 1; i < MAX_SCENE_LAYERS; i++){
-        if (!scenes[i] && !foundSlot){
-            scenes[i] = scene;
-            scene->setMainScene(false);
-            if (viewLoaded){
-                scene->load();
-                scene->updateSizeFromCamera();
+    if (scene){
+        bool foundSlot = false;
+        // 0 is reserved to mainScene
+        for (int i = 1; i < MAX_SCENE_LAYERS; i++){
+            if (scenes[i] == scene){
+                foundSlot = true;
+                break;
             }
+            if (!scenes[i]){
+                includeScene(i, scene, false);
 
-            numScenes++;
-            foundSlot = true;
+                numScenes++;
+                foundSlot = true;
+                break;
+            }
+        }
+        if (!foundSlot){
+            Log::error("Scene layers is full. MAX_SCENE_LAYERS is set to: %i", MAX_SCENE_LAYERS);
         }
     }
-    if (!foundSlot){
-        Log::error("Scene layers is full. Max scenes is: %i", MAX_SCENE_LAYERS);
+}
+
+void Engine::removeSceneLayer(Scene* scene){
+    if (scene){
+        for (int i = 1; i < MAX_SCENE_LAYERS; i++){
+            if (scenes[i] && scenes[i] == scene){
+                scenes[i] = NULL;
+                numScenes--;
+                rearrangeScenes(i);
+            }
+        }
+    }
+}
+
+void Engine::removeAllSceneLayers(){
+    for (int i = 1; i < MAX_SCENE_LAYERS; i++){
+        if (scenes[i]){
+            scenes[i] = NULL;
+            numScenes--;
+        }
+    }
+}
+
+void Engine::includeScene(size_t index, Scene* scene, bool mainScene){
+    scenes[index] = scene;
+    scene->setMainScene(mainScene);
+    if (viewLoaded){
+        scene->load();
+        scene->updateSizeFromCamera();
+    }
+}
+
+void Engine::rearrangeScenes(size_t index){
+    if (index >= 0 && index < (MAX_SCENE_LAYERS-1)){
+        for (int i = index; i < (MAX_SCENE_LAYERS-1); i++){
+            scenes[i] = scenes[i+1];
+        }
     }
 }
 

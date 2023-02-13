@@ -104,6 +104,8 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticFunction("setScene", &Engine::setScene)
         .addStaticFunction("getScene", &Engine::getScene)
         .addStaticFunction("addSceneLayer", &Engine::addSceneLayer)
+        .addStaticFunction("removeSceneLayer", &Engine::removeSceneLayer)
+        .addStaticFunction("removeAllSceneLayers", &Engine::removeAllSceneLayers)
         .addStaticProperty("canvasWidth", &Engine::getCanvasWidth)
         .addStaticProperty("canvasHeight", &Engine::getCanvasHeight)
         .addStaticFunction("setCanvasSize", &Engine::setCanvasSize)

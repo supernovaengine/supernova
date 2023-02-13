@@ -88,6 +88,8 @@ namespace Supernova {
         
         static bool transformCoordPos(float& x, float& y);
         static void calculateCanvas();
+        static void includeScene(size_t index, Scene* scene, bool mainScene);
+        static void rearrangeScenes(size_t index);
         
     public:
         
@@ -98,6 +100,8 @@ namespace Supernova {
         static void setScene(Scene* scene);
         static Scene* getScene();
         static void addSceneLayer(Scene* scene);
+        static void removeSceneLayer(Scene* scene);
+        static void removeAllSceneLayers();
         
         static int getCanvasWidth();
         static int getCanvasHeight();
