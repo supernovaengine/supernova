@@ -81,6 +81,12 @@ Scene::Scene(){
 
 Scene::~Scene(){
 	destroy();
+
+	std::vector<Entity> entityList = entityManager.getEntityList();
+	for(int entity : entityList){
+		destroyEntity(entity);
+	}
+
 }
 
 void Scene::setCamera(Entity camera){

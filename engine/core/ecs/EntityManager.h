@@ -2,6 +2,7 @@
 #define ENTITYMANAGER_H
 
 #include <map>
+#include <vector>
 #include "Entity.h"
 #include "Signature.h"
 #include "Log.h"
@@ -24,6 +25,14 @@ namespace Supernova{
 
         void destroy(Entity entity) {
             signatures.erase(entity);
+        }
+
+        std::vector<Entity> getEntityList(){
+            std::vector<Entity> list;
+            for (auto const& [key, val] : signatures){
+                list.push_back(key);
+            }
+            return list;
         }
 
         void setSignature(Entity entity, Signature signature) {

@@ -2252,7 +2252,7 @@ bool MeshSystem::createOrUpdateTilemap(TilemapComponent& tilemap, MeshComponent&
 }
 
 void MeshSystem::load(){
-
+    update(0);
 }
 
 void MeshSystem::destroy(){

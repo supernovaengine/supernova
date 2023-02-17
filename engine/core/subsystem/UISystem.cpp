@@ -538,7 +538,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.marginLeft = 0;
         layout.marginTop = -layout.height / 2;
         layout.marginRight = layout.width;
-        layout.marginBottom = layout.height / 2;
+        layout.marginBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::CENTER_TOP){
         layout.anchorLeft = 0.5;
         layout.anchorTop = 0;
@@ -546,7 +546,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorBottom = 0;
         layout.marginLeft = -layout.width / 2;
         layout.marginTop = 0;
-        layout.marginRight = layout.width / 2;
+        layout.marginRight = ceil(layout.width / 2.0);
         layout.marginBottom = layout.height;
     }else if (layout.anchorPreset == AnchorPreset::CENTER_RIGHT){
         layout.anchorLeft = 1;
@@ -556,7 +556,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.marginLeft = -layout.width;
         layout.marginTop = -layout.height / 2;
         layout.marginRight = 0;
-        layout.marginBottom = layout.height / 2;
+        layout.marginBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::CENTER_BOTTOM){
         layout.anchorLeft = 0.5;
         layout.anchorTop = 1;
@@ -564,7 +564,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorBottom = 1;
         layout.marginLeft = -layout.width / 2;
         layout.marginTop = -layout.height;
-        layout.marginRight = layout.width / 2;
+        layout.marginRight = ceil(layout.width / 2.0);
         layout.marginBottom = 0;
     }else if (layout.anchorPreset == AnchorPreset::CENTER){
         layout.anchorLeft = 0.5;
@@ -573,8 +573,8 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorBottom = 0.5;
         layout.marginLeft = -layout.width / 2;
         layout.marginTop = -layout.height / 2;
-        layout.marginRight = layout.width / 2;
-        layout.marginBottom = layout.height / 2;
+        layout.marginRight = ceil(layout.width / 2.0);
+        layout.marginBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::LEFT_WIDE){
         layout.anchorLeft = 0;
         layout.anchorTop = 0;
@@ -618,7 +618,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorBottom = 1;
         layout.marginLeft = -layout.width / 2;
         layout.marginTop = 0;
-        layout.marginRight = layout.width / 2;
+        layout.marginRight = ceil(layout.width / 2.0);
         layout.marginBottom = 0;
     }else if (layout.anchorPreset == AnchorPreset::HORIZONTAL_CENTER_WIDE){
         layout.anchorLeft = 0;
@@ -628,7 +628,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.marginLeft = 0;
         layout.marginTop = -layout.height / 2;
         layout.marginRight = 0;
-        layout.marginBottom = layout.height / 2;
+        layout.marginBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::FULL_LAYOUT){
         layout.anchorLeft = 0;
         layout.anchorTop = 0;
@@ -653,6 +653,7 @@ void UISystem::changeFlipY(UIComponent& ui, CameraComponent& camera){
 }
 
 void UISystem::load(){
+    update(0);
 }
 
 void UISystem::destroy(){

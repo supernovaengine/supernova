@@ -58,10 +58,86 @@ void RenderSystem::load(){
 			}
 		}
 	}
+
+	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
+	if (sky){
+		if (!sky->loaded){
+			loadSky(*sky);
+		}
+	}
+	auto transforms = scene->getComponentArray<Transform>();
+	for (int i = 0; i < transforms->size(); i++){
+		Transform& transform = transforms->getComponentFromIndex(i);
+		Entity entity = transforms->getEntity(i);
+		Signature signature = scene->getSignature(entity);
+
+		if (signature.test(scene->getComponentType<CameraComponent>())){
+			continue;
+		}else if (signature.test(scene->getComponentType<MeshComponent>())){
+			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+			if (!mesh.loaded){
+				loadMesh(mesh);
+			}
+		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
+			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+			if (!terrain.loaded){
+				loadTerrain(terrain);
+			}
+		}else if (signature.test(scene->getComponentType<UIComponent>())){
+			UIComponent& ui = scene->getComponent<UIComponent>(entity);
+			if (!ui.loaded){
+				bool isText = false;
+				if (signature.test(scene->getComponentType<TextComponent>())){
+					isText = true;
+				}
+				loadUI(ui, isText);
+			}
+		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
+			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+			if (!particles.loaded){
+				loadParticles(particles);
+			}
+		}
+	}
 }
 
 void RenderSystem::destroy(){
+	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
+	if (sky){
+		if (sky->loaded){
+			destroySky(*sky);
+		}
+	}
+	auto transforms = scene->getComponentArray<Transform>();
+	for (int i = 0; i < transforms->size(); i++){
+		Transform& transform = transforms->getComponentFromIndex(i);
+		Entity entity = transforms->getEntity(i);
+		Signature signature = scene->getSignature(entity);
 
+		if (signature.test(scene->getComponentType<CameraComponent>())){
+			continue;
+		}else if (signature.test(scene->getComponentType<MeshComponent>())){
+			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+			if (mesh.loaded){
+				destroyMesh(mesh);
+			}
+		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
+			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+			if (terrain.loaded){
+				destroyTerrain(terrain);
+			}
+		}else if (signature.test(scene->getComponentType<UIComponent>())){
+			UIComponent& ui = scene->getComponent<UIComponent>(entity);
+			if (ui.loaded){
+				destroyUI(ui);
+			}
+		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
+			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+			if (particles.loaded){
+				destroyParticles(particles);
+			}
+		}
+	}
 }
 
 void RenderSystem::createFramebuffer(CameraComponent& camera){
