@@ -536,7 +536,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorRight = 0;
         layout.anchorBottom = 0.5;
         layout.marginLeft = 0;
-        layout.marginTop = -layout.height / 2;
+        layout.marginTop = -floor(layout.height / 2.0);
         layout.marginRight = layout.width;
         layout.marginBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::CENTER_TOP){
@@ -544,7 +544,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorTop = 0;
         layout.anchorRight = 0.5;
         layout.anchorBottom = 0;
-        layout.marginLeft = -layout.width / 2;
+        layout.marginLeft = -floor(layout.width / 2.0);
         layout.marginTop = 0;
         layout.marginRight = ceil(layout.width / 2.0);
         layout.marginBottom = layout.height;
@@ -554,7 +554,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorRight = 1;
         layout.anchorBottom = 0.5;
         layout.marginLeft = -layout.width;
-        layout.marginTop = -layout.height / 2;
+        layout.marginTop = -floor(layout.height / 2.0);
         layout.marginRight = 0;
         layout.marginBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::CENTER_BOTTOM){
@@ -562,7 +562,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorTop = 1;
         layout.anchorRight = 0.5;
         layout.anchorBottom = 1;
-        layout.marginLeft = -layout.width / 2;
+        layout.marginLeft = -floor(layout.width / 2.0);
         layout.marginTop = -layout.height;
         layout.marginRight = ceil(layout.width / 2.0);
         layout.marginBottom = 0;
@@ -571,8 +571,8 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorTop = 0.5;
         layout.anchorRight = 0.5;
         layout.anchorBottom = 0.5;
-        layout.marginLeft = -layout.width / 2;
-        layout.marginTop = -layout.height / 2;
+        layout.marginLeft = -floor(layout.width / 2.0);
+        layout.marginTop = -floor(layout.height / 2.0);
         layout.marginRight = ceil(layout.width / 2.0);
         layout.marginBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::LEFT_WIDE){
@@ -616,7 +616,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorTop = 0;
         layout.anchorRight = 0.5;
         layout.anchorBottom = 1;
-        layout.marginLeft = -layout.width / 2;
+        layout.marginLeft = -floor(layout.width / 2.0);
         layout.marginTop = 0;
         layout.marginRight = ceil(layout.width / 2.0);
         layout.marginBottom = 0;
@@ -626,7 +626,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
         layout.anchorRight = 1;
         layout.anchorBottom = 0.5;
         layout.marginLeft = 0;
-        layout.marginTop = -layout.height / 2;
+        layout.marginTop = -floor(layout.height / 2.0);
         layout.marginRight = 0;
         layout.marginBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::FULL_LAYOUT){
