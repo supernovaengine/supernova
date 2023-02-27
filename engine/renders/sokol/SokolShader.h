@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #ifndef SokolShader_h
 #define SokolShader_h
 

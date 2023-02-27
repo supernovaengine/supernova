@@ -1,8 +1,13 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #include "SokolObject.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 #include "math/Matrix4.h"
 #include "Log.h"
+#include "SokolCmdBuffer.h"
 
 using namespace Supernova;
 
@@ -152,7 +157,8 @@ void SokolObject::endLoad(uint8_t pipelines){
         pip_depth_desc.depth.write_enabled = true;
         pip_depth_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
 
-        depth_pip = sg_make_pipeline(&pip_depth_desc);
+        depth_pip = SokolCmdBuffer::add_command_make_pipeline(pip_depth_desc);
+        //depth_pip = sg_make_pipeline(pip_depth_desc);
     }
 
     if (pipelines & (int)PipelineType::PIP_DEFAULT) {
@@ -169,7 +175,8 @@ void SokolObject::endLoad(uint8_t pipelines){
         pip_default_desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
         pip_default_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
 
-        pip = sg_make_pipeline(&pip_default_desc);
+        pip = SokolCmdBuffer::add_command_make_pipeline(pip_default_desc);
+        //pip = sg_make_pipeline(pip_default_desc);
     }
 
     if (pipelines & (int)PipelineType::PIP_RTT){
@@ -188,18 +195,22 @@ void SokolObject::endLoad(uint8_t pipelines){
         pip_rtt_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
         pip_rtt_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
 
-        rtt_pip = sg_make_pipeline(&pip_rtt_desc);
+        rtt_pip = SokolCmdBuffer::add_command_make_pipeline(pip_rtt_desc);
+        //rtt_pip = sg_make_pipeline(pip_rtt_desc);
     }
     
 }
 
 void SokolObject::beginDraw(PipelineType pipType){
     if (pipType == PipelineType::PIP_DEPTH){
-        sg_apply_pipeline(depth_pip);
+        SokolCmdBuffer::add_command_apply_pipeline(depth_pip);
+        //sg_apply_pipeline(depth_pip);
     }else if (pipType == PipelineType::PIP_RTT){
-        sg_apply_pipeline(rtt_pip);
+        SokolCmdBuffer::add_command_apply_pipeline(rtt_pip);
+        //sg_apply_pipeline(rtt_pip);
     }else{
-        sg_apply_pipeline(pip);
+        SokolCmdBuffer::add_command_apply_pipeline(pip);
+        //sg_apply_pipeline(pip);
     }
 }
 
@@ -211,25 +222,31 @@ void SokolObject::applyUniformBlock(int slotUniform, ShaderStageType stage, unsi
         }else if (stage == ShaderStageType::FRAGMENT){
             sg_stage = SG_SHADERSTAGE_FS;
         }
-        sg_apply_uniforms(sg_stage, slotUniform, {data, count});
+        SokolCmdBuffer::add_command_apply_uniforms(sg_stage, slotUniform, {data, count});
+        //sg_apply_uniforms(sg_stage, slotUniform, {data, count});
     }
 }
 
 void SokolObject::draw(int vertexCount){
-    sg_apply_bindings(&bind);
-    sg_draw(0, vertexCount, 1);
+    SokolCmdBuffer::add_command_apply_bindings(bind);
+    //sg_apply_bindings(bind);
+    SokolCmdBuffer::add_command_draw(0, vertexCount, 1);
+    //sg_draw(0, vertexCount, 1);
 }
 
 void SokolObject::destroy(){
     if (sg_isvalid()){
         if (pip.id != SG_INVALID_ID){
-            sg_destroy_pipeline(pip);
+            SokolCmdBuffer::add_command_destroy_pipeline(pip);
+            //sg_destroy_pipeline(pip);
         }
         if (depth_pip.id != SG_INVALID_ID){
-            sg_destroy_pipeline(depth_pip);
+            SokolCmdBuffer::add_command_destroy_pipeline(depth_pip);
+            //sg_destroy_pipeline(depth_pip);
         }
         if (rtt_pip.id != SG_INVALID_ID){
-            sg_destroy_pipeline(rtt_pip);
+            SokolCmdBuffer::add_command_destroy_pipeline(rtt_pip);
+            //sg_destroy_pipeline(rtt_pip);
         }
     }
 

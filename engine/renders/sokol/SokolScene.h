@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #ifndef sokolscene_h
 #define sokolscene_h
 

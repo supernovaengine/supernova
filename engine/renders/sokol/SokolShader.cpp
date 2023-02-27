@@ -1,9 +1,15 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #include "SokolShader.h"
 
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 #include "math/Matrix4.h"
 #include "Log.h"
+#include "SokolCmdBuffer.h"
+#include "render/ShaderRender.h"
 
 using namespace Supernova;
 
@@ -168,15 +174,16 @@ bool SokolShader::createShader(ShaderData& shaderData){
             img->sampler_type = samplerToSokolType(stage->textures[t].samplerType);
         }
     }
-
-    shader = sg_make_shader(&shader_desc);
+    shader = SokolCmdBuffer::add_command_make_shader(shader_desc);
+    //shader = sg_make_shader(shader_desc);
 
     return isCreated();
 }
 
 void SokolShader::destroyShader(){
     if (shader.id != SG_INVALID_ID && sg_isvalid()){
-        sg_destroy_shader(shader);
+        SokolCmdBuffer::add_command_destroy_shader(shader);
+        //sg_destroy_shader(shader);
     }
     
     shader.id = SG_INVALID_ID;

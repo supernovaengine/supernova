@@ -1,4 +1,10 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #include "ShaderRender.h"
+
+#include "SystemRender.h"
 
 using namespace Supernova;
 
@@ -19,10 +25,9 @@ ShaderRender::~ShaderRender(){
 bool ShaderRender::createShader(ShaderData& shaderData){
     this->shaderData = shaderData;
 
-    //Keep only reflection info
-    this->shaderData.releaseSourceData();
+    SystemRender::scheduleCleanup(ShaderRender::cleanupShader, &(this->shaderData));
     
-    return backend.createShader(shaderData);
+    return backend.createShader(this->shaderData);
 }
 
 void ShaderRender::destroyShader(){
@@ -31,4 +36,9 @@ void ShaderRender::destroyShader(){
 
 bool ShaderRender::isCreated(){
     return backend.isCreated();
+}
+
+void ShaderRender::cleanupShader(void* data){
+    //Keep only reflection info
+    static_cast<ShaderData*>(data)->releaseSourceData();
 }

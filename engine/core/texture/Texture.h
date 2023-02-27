@@ -34,6 +34,9 @@ namespace Supernova{
             TextureWrap wrapU;
             TextureWrap wrapV;
 
+            // render callback clean function
+            static void cleanupTexture(void* data);
+
         public:
             Texture();
             Texture(std::string path);

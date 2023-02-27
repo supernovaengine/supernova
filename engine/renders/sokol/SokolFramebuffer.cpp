@@ -1,5 +1,10 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #include "SokolFramebuffer.h"
 #include "Log.h"
+#include "SokolCmdBuffer.h"
 
 using namespace Supernova;
 
@@ -39,7 +44,8 @@ bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int
         pass_desc.depth_stencil_attachment.image = depthTexture.backend.get();
         pass_desc.label = "shadow-map-pass";
 
-        pass[i] = sg_make_pass(&pass_desc);
+        pass[i] = SokolCmdBuffer::add_command_make_pass(pass_desc);
+        //pass[i] = sg_make_pass(pass_desc);
     }
 
     return isCreated();
@@ -48,7 +54,8 @@ bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int
 void SokolFramebuffer::destroyFramebuffer(){
     if (pass[0].id != SG_INVALID_ID && sg_isvalid()){
         for (int i = 0; i < 6; i++){
-            sg_destroy_pass(pass[i]);
+            SokolCmdBuffer::add_command_destroy_pass(pass[i]);
+            //sg_destroy_pass(pass[i]);
         }
         colorTexture.destroyTexture();
         depthTexture.destroyTexture();

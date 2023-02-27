@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #include "TexturePool.h"
 
 #include "Engine.h"

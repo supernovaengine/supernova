@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #ifndef ShaderRender_h
 #define ShaderRender_h
 
@@ -6,6 +10,10 @@
 
 namespace Supernova{
     class ShaderRender{
+
+    private:
+        // render callback clean function
+        static void cleanupShader(void* data);
 
     public:
         //***Backend***

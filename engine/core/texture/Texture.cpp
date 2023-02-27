@@ -1,7 +1,12 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #include "Texture.h"
 
 #include "Engine.h"
 #include "Log.h"
+#include "render/SystemRender.h"
 
 using namespace Supernova;
 
@@ -139,6 +144,10 @@ Texture::~Texture(){
 
 }
 
+void Texture::cleanupTexture(void* data){
+    static_cast<Texture*>(data)->releaseData();
+}
+
 void Texture::setPath(std::string path){
     destroy();
 
@@ -262,9 +271,7 @@ bool Texture::load(){
 	renderAndData = TexturePool::get(id, type, data, minFilter, magFilter, wrapU, wrapV);
 
     if (releaseDataAfterLoad){
-        for (int f = 0; f < numFaces; f++){
-    	    data[f].releaseImageData();
-	    }
+        SystemRender::scheduleCleanup(cleanupTexture, this);
     }
 
     needLoad = false;

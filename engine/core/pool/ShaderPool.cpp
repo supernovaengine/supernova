@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #include "ShaderPool.h"
 
 #include "Log.h"
@@ -123,7 +127,7 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, std::string
 	}else{
 		getMissingShaders().push_back(shaderStr);
 	}
-	
+
 	shared = resource;
 
 	return resource;

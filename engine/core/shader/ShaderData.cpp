@@ -24,8 +24,10 @@ ShaderData::ShaderData(const ShaderData& d){
     this->stages = d.stages;
 
     for (int i = 0; i < stages.size(); i++){
-        this->stages[i].bytecode.data = new unsigned char[this->stages[i].bytecode.size];
-        memcpy(this->stages[i].bytecode.data, d.stages[i].bytecode.data, this->stages[i].bytecode.size);
+        if (this->stages[i].bytecode.data){
+            this->stages[i].bytecode.data = new unsigned char[this->stages[i].bytecode.size];
+            memcpy(this->stages[i].bytecode.data, d.stages[i].bytecode.data, this->stages[i].bytecode.size);
+        }
     }
 }
 
@@ -35,8 +37,10 @@ ShaderData& ShaderData::operator = (const ShaderData& d){
     this->stages = d.stages;
 
     for (int i = 0; i < stages.size(); i++){
-        this->stages[i].bytecode.data = new unsigned char[this->stages[i].bytecode.size];
-        memcpy(this->stages[i].bytecode.data, d.stages[i].bytecode.data, this->stages[i].bytecode.size);
+        if (this->stages[i].bytecode.data){
+            this->stages[i].bytecode.data = new unsigned char[this->stages[i].bytecode.size];
+            memcpy(this->stages[i].bytecode.data, d.stages[i].bytecode.data, this->stages[i].bytecode.size);
+        }
     }
 
     return *this;

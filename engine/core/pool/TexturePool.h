@@ -1,5 +1,5 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #ifndef TEXTUREPOOL_H

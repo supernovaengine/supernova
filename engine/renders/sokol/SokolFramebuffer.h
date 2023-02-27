@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #ifndef SokolFramebuffer_h
 #define SokolFramebuffer_h
 
