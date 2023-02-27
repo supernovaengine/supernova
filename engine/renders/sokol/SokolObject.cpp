@@ -15,6 +15,8 @@ using namespace Supernova;
 SokolObject::SokolObject(){
     bind = {}; 
     pip.id = SG_INVALID_ID;
+    depth_pip.id = SG_INVALID_ID;
+    rtt_pip.id = SG_INVALID_ID;
     pipeline_desc = {};
     bindSlotIndex = 0;
 }
@@ -22,6 +24,8 @@ SokolObject::SokolObject(){
 SokolObject::SokolObject(const SokolObject& rhs) {
     bind = rhs.bind; 
     pip = rhs.pip;
+    depth_pip = rhs.depth_pip;
+    rtt_pip = rhs.rtt_pip;
     pipeline_desc = rhs.pipeline_desc;
     bindSlotIndex = rhs.bindSlotIndex;
     bufferToBindSlot = rhs.bufferToBindSlot;
@@ -30,6 +34,8 @@ SokolObject::SokolObject(const SokolObject& rhs) {
 SokolObject& SokolObject::operator=(const SokolObject& rhs) { 
     bind = rhs.bind; 
     pip = rhs.pip;
+    depth_pip = rhs.depth_pip;
+    rtt_pip = rhs.rtt_pip;
     pipeline_desc = rhs.pipeline_desc;
     bindSlotIndex = rhs.bindSlotIndex;
     bufferToBindSlot = rhs.bufferToBindSlot;
@@ -87,6 +93,8 @@ sg_primitive_type SokolObject::getPrimitiveType(PrimitiveType primitiveType){
 void SokolObject::beginLoad(PrimitiveType primitiveType){
     bind = {0};
     pip = {0};
+    depth_pip = {0};
+    rtt_pip = {0};
     pipeline_desc = {0};
 
     pipeline_desc.primitive_type = getPrimitiveType(primitiveType);
