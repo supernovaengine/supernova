@@ -459,6 +459,10 @@
 		718FDDF82837CA9A00AF314C /* msl21macos.h in Headers */ = {isa = PBXBuildFile; fileRef = 718FDDF22837CA9A00AF314C /* msl21macos.h */; };
 		718FDDF92837CA9A00AF314C /* glsl330.h in Headers */ = {isa = PBXBuildFile; fileRef = 718FDDF32837CA9A00AF314C /* glsl330.h */; };
 		718FDDFA2837CA9A00AF314C /* hlsl5.h in Headers */ = {isa = PBXBuildFile; fileRef = 718FDDF42837CA9A00AF314C /* hlsl5.h */; };
+		71A41CB229AC3D0C006953D3 /* Semaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 71A41CB129AC3D0C006953D3 /* Semaphore.h */; };
+		71A41CB529AC3D7C006953D3 /* SokolCmdBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A41CB329AC3D7C006953D3 /* SokolCmdBuffer.cpp */; };
+		71A41CB629AC3D7C006953D3 /* SokolCmdBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A41CB329AC3D7C006953D3 /* SokolCmdBuffer.cpp */; };
+		71A41CB729AC3D7C006953D3 /* SokolCmdBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 71A41CB429AC3D7C006953D3 /* SokolCmdBuffer.h */; };
 		71ABBD0E277A313C001CE3AF /* AlphaAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD0C277A313C001CE3AF /* AlphaAction.cpp */; };
 		71ABBD0F277A313C001CE3AF /* AlphaAction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD0C277A313C001CE3AF /* AlphaAction.cpp */; };
 		71ABBD10277A313C001CE3AF /* AlphaAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD0D277A313C001CE3AF /* AlphaAction.h */; };
@@ -1117,6 +1121,9 @@
 		718FDDF22837CA9A00AF314C /* msl21macos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = msl21macos.h; sourceTree = "<group>"; };
 		718FDDF32837CA9A00AF314C /* glsl330.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glsl330.h; sourceTree = "<group>"; };
 		718FDDF42837CA9A00AF314C /* hlsl5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hlsl5.h; sourceTree = "<group>"; };
+		71A41CB129AC3D0C006953D3 /* Semaphore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Semaphore.h; sourceTree = "<group>"; };
+		71A41CB329AC3D7C006953D3 /* SokolCmdBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SokolCmdBuffer.cpp; sourceTree = "<group>"; };
+		71A41CB429AC3D7C006953D3 /* SokolCmdBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SokolCmdBuffer.h; sourceTree = "<group>"; };
 		71ABBD0C277A313C001CE3AF /* AlphaAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlphaAction.cpp; sourceTree = "<group>"; };
 		71ABBD0D277A313C001CE3AF /* AlphaAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlphaAction.h; sourceTree = "<group>"; };
 		71ABBD11277A3166001CE3AF /* TextComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextComponent.h; sourceTree = "<group>"; };
@@ -1557,6 +1564,7 @@
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
 				71451BF2270CA3EA00712643 /* FrameData.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
+				71A41CB129AC3D0C006953D3 /* Semaphore.h */,
 				71ABBD26277A3210001CE3AF /* STBText.cpp */,
 				71ABBD27277A3210001CE3AF /* STBText.h */,
 				7128D0AC25BB18DC00965B51 /* StringUtils.cpp */,
@@ -1774,6 +1782,8 @@
 			children = (
 				7162FC8B25962A0E0075B97D /* SokolBuffer.cpp */,
 				7162FC8E25962A0E0075B97D /* SokolBuffer.h */,
+				71A41CB329AC3D7C006953D3 /* SokolCmdBuffer.cpp */,
+				71A41CB429AC3D7C006953D3 /* SokolCmdBuffer.h */,
 				71CC83A926B8D54800EEBB93 /* SokolFramebuffer.cpp */,
 				71CC83A826B8D54800EEBB93 /* SokolFramebuffer.h */,
 				7162FC8925962A0E0075B97D /* SokolObject.cpp */,
@@ -2402,8 +2412,10 @@
 				717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */,
 				713E581127BA9CE400376680 /* TextEdit.h in Headers */,
 				71E5450B284D5BB700C68FAB /* RotateTracks.h in Headers */,
+				71A41CB229AC3D0C006953D3 /* Semaphore.h in Headers */,
 				71CC83A426B8C54A00EEBB93 /* ShaderData.h in Headers */,
 				715CB11B288CD57A0049344B /* Material.h in Headers */,
+				71A41CB729AC3D7C006953D3 /* SokolCmdBuffer.h in Headers */,
 				71451BC0270CA16200712643 /* ActionSystem.h in Headers */,
 				71ABBD4627A879D4001CE3AF /* Button.h in Headers */,
 				71ED64C728B45E0B005D2D96 /* Angle.h in Headers */,
@@ -3079,6 +3091,7 @@
 				71CC839626B8C4D800EEBB93 /* Light.cpp in Sources */,
 				714BBF7527148B85004A15EE /* Particles.cpp in Sources */,
 				713D8295259D307F00567F9F /* UserSettings.cpp in Sources */,
+				71A41CB629AC3D7C006953D3 /* SokolCmdBuffer.cpp in Sources */,
 				7105A56B28B305B20092EA05 /* UtilClassesLua.cpp in Sources */,
 				71393EE628F8EF9F0074442E /* XMLUtils.cpp in Sources */,
 				713D8296259D307F00567F9F /* File.cpp in Sources */,
@@ -3228,6 +3241,7 @@
 				71CC839526B8C4D800EEBB93 /* Light.cpp in Sources */,
 				714BBF7427148B85004A15EE /* Particles.cpp in Sources */,
 				7162FE102596A5BE0075B97D /* SokolScene.cpp in Sources */,
+				71A41CB529AC3D7C006953D3 /* SokolCmdBuffer.cpp in Sources */,
 				7105A56A28B305B20092EA05 /* UtilClassesLua.cpp in Sources */,
 				71393EE528F8EF9F0074442E /* XMLUtils.cpp in Sources */,
 				7162FD1225963AE00075B97D /* Log.cpp in Sources */,
