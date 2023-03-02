@@ -37,6 +37,7 @@ Live samples: https://samples.supernovaengine.org/
 * Textures and shaders pool
 * 3D audio
 * Cross-platform persistence system
+* Multithreading support
 
 ## Samples
 
