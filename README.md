@@ -9,6 +9,8 @@
 
 Supernova is a **free** and open source cross-platform game engine for create 2D and 3D projects with Lua or C++. It is lightweight and promote the simplest way to use de best performance of data-oriented design.
 
+![Screenshot1](https://supernovaengine.org/img/screen1.png)
+
 Live samples: https://samples.supernovaengine.org/
 
 ## Supports
@@ -38,6 +40,12 @@ Live samples: https://samples.supernovaengine.org/
 * 3D audio
 * Cross-platform persistence system
 * Multithreading support
+
+## Upcoming features
+
+ * 2D and 3D physics
+ * Instancing
+ * More UI components
 
 ## Samples
 
