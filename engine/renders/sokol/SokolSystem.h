@@ -15,11 +15,6 @@ namespace Supernova{
         static void commit();
         static void shutdown();
 
-        static void commitCommands();
-        static void executeCommands();
-        static void flushCommands();
-        static void waitForFlush();
-
         static void scheduleCleanup(void (*cleanupFunc)(void* cleanupData), void* cleanupData, int32_t numFramesToDefer = 0);
     };
 }

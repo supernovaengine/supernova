@@ -475,9 +475,6 @@ void Engine::systemDraw(){
         scenes[i]->draw();
     }
 
-    SystemRender::commitCommands();
-    SystemRender::executeCommands();
-    
     SystemRender::commit();
 
     AudioSystem::checkActive();
@@ -487,9 +484,6 @@ void Engine::systemShutdown(){
     for (int i = 0; i < numScenes; i++){
         scenes[i]->destroy();
     }
-
-    SystemRender::flushCommands();
-    SystemRender::waitForFlush();
 
     SystemRender::shutdown();
     Engine::onShutdown.call();

@@ -8,6 +8,18 @@
 #include "sokol_gfx.h"
 #include "SokolCmdBuffer.h"
 
+// Render thread
+// 
+// execute_commands() in render loop
+// wait_for_flush() on termination
+//
+//
+// Update thread
+// 
+// add_command_xxx()
+// commit_commands() when you're done for the frame
+// flush_commands() on termination, before exiting the thread
+
 using namespace Supernova;
 
 void SokolSystem::setup(){
@@ -23,29 +35,16 @@ void SokolSystem::setup(){
 }
 
 void SokolSystem::commit(){
+    SokolCmdBuffer::commit_commands();
+    SokolCmdBuffer::execute_commands();
     sg_commit();
 }
 
 void SokolSystem::shutdown(){
-    SokolCmdBuffer::finish();
-
-    sg_shutdown();
-}
-
-void SokolSystem::commitCommands(){
-    SokolCmdBuffer::commit_commands();
-}
-
-void SokolSystem::executeCommands(){
-    SokolCmdBuffer::execute_commands();
-}
-
-void SokolSystem::flushCommands(){
     SokolCmdBuffer::flush_commands();
-}
-
-void SokolSystem::waitForFlush(){
     SokolCmdBuffer::wait_for_flush();
+    SokolCmdBuffer::finish();
+    sg_shutdown();
 }
 
 void SokolSystem::scheduleCleanup(void (*cleanupFunc)(void* cleanupData), void* cleanupData, int32_t numFramesToDefer){
