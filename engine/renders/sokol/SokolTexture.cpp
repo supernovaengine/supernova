@@ -5,7 +5,7 @@
 #include "SokolTexture.h"
 
 #include "Log.h"
-#include "SokolCmdBuffer.h"
+#include "SokolCmdQueue.h"
 
 using namespace Supernova;
 
@@ -75,7 +75,7 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
         pixel_size = 1;
     }else{
         Log::error("Undefined pixel format to generate mipmaps of %s", desc.label);
-        return SokolCmdBuffer::add_command_make_image(*desc_);
+        return SokolCmdQueue::add_command_make_image(*desc_);
         //return sg_make_image(*desc_);
     }
 
@@ -163,7 +163,7 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
         }
     }
 
-    sg_image img = SokolCmdBuffer::add_command_make_image(desc);
+    sg_image img = SokolCmdQueue::add_command_make_image(desc);
     //sg_image img = sg_make_image(desc);
     free(big_target);
     return img;
@@ -206,7 +206,7 @@ bool SokolTexture::createTexture(
             image_desc.min_filter == SG_FILTER_NEAREST_MIPMAP_NEAREST){
         image = generateMipmaps(&image_desc);
     }else{
-        image = SokolCmdBuffer::add_command_make_image(image_desc);
+        image = SokolCmdQueue::add_command_make_image(image_desc);
         //image = sg_make_image(image_desc);
     }
 
@@ -239,7 +239,7 @@ bool SokolTexture::createFramebufferTexture(
         img_desc.label = "framebuffer-color-image";
     }
 
-    image = SokolCmdBuffer::add_command_make_image(img_desc);
+    image = SokolCmdQueue::add_command_make_image(img_desc);
     //image = sg_make_image(img_desc);
 
     if (image.id != SG_INVALID_ID)
@@ -250,7 +250,7 @@ bool SokolTexture::createFramebufferTexture(
 
 void SokolTexture::destroyTexture(){
     if (image.id != SG_INVALID_ID && sg_isvalid()){
-        SokolCmdBuffer::add_command_destroy_image(image);
+        SokolCmdQueue::add_command_destroy_image(image);
         //sg_destroy_image(image);
     }
 

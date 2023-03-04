@@ -4,7 +4,7 @@
 
 #include "SokolBuffer.h"
 #include "Log.h"
-#include "SokolCmdBuffer.h"
+#include "SokolCmdQueue.h"
 
 using namespace Supernova;
 
@@ -43,7 +43,7 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
         vbuf_desc.usage = SG_USAGE_STREAM;
     }
 
-    buffer = SokolCmdBuffer::add_command_make_buffer(vbuf_desc);
+    buffer = SokolCmdQueue::add_command_make_buffer(vbuf_desc);
     //buffer = sg_make_buffer(vbuf_desc);
 
     if (usage != BufferUsage::IMMUTABLE && data){
@@ -57,13 +57,13 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
 }
 
 void SokolBuffer::updateBuffer(unsigned int size, void* data){
-    SokolCmdBuffer::add_command_update_buffer(buffer, {data, (size_t)size});
+    SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
     //sg_update_buffer(buffer, {data, (size_t)size});
 }
 
 void SokolBuffer::destroyBuffer(){
     if (buffer.id != SG_INVALID_ID && sg_isvalid()){
-        SokolCmdBuffer::add_command_destroy_buffer(buffer);
+        SokolCmdQueue::add_command_destroy_buffer(buffer);
         //sg_destroy_buffer(buffer);
     }
 

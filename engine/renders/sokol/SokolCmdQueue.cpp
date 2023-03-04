@@ -7,21 +7,21 @@
 #include <cstring>
 #include <algorithm>
 
-#include "SokolCmdBuffer.h"
+#include "SokolCmdQueue.h"
 
 using namespace Supernova;
 
 // ----------------------------------------------------------------------------------------------------
 
-std::vector<SokolRenderCommand> SokolCmdBuffer::m_commands[2];
-int32_t SokolCmdBuffer::m_pending_commands_index = 0;
-int32_t SokolCmdBuffer::m_commit_commands_index = 1;
-std::vector<SokolRenderCleanup> SokolCmdBuffer::m_cleanups;
-Semaphore SokolCmdBuffer::m_update_semaphore;
-Semaphore SokolCmdBuffer::m_render_semaphore;
-std::atomic<bool> SokolCmdBuffer::m_flushing = false;
-std::mutex SokolCmdBuffer::m_execute_mutex;
-int32_t SokolCmdBuffer::m_frame_index = 0;
+std::vector<SokolRenderCommand> SokolCmdQueue::m_commands[2];
+int32_t SokolCmdQueue::m_pending_commands_index = 0;
+int32_t SokolCmdQueue::m_commit_commands_index = 1;
+std::vector<SokolRenderCleanup> SokolCmdQueue::m_cleanups;
+Semaphore SokolCmdQueue::m_update_semaphore;
+Semaphore SokolCmdQueue::m_render_semaphore;
+std::atomic<bool> SokolCmdQueue::m_flushing = false;
+std::mutex SokolCmdQueue::m_execute_mutex;
+int32_t SokolCmdQueue::m_frame_index = 0;
 
 
 
@@ -33,7 +33,7 @@ constexpr int32_t INITIAL_NUMBER_OF_CLEANUPS = 128;
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::start(){
+void SokolCmdQueue::start(){
 	// loop through commands
 	for (int32_t i = 0; i < 2; i ++)
 	{
@@ -50,14 +50,14 @@ void SokolCmdBuffer::start(){
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::finish(){
+void SokolCmdQueue::finish(){
 	// process cleanups
 	process_cleanups(-1);
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::execute_commands(bool resource_only)
+void SokolCmdQueue::execute_commands(bool resource_only)
 {
 	// not flushing?
 	if (!m_flushing)
@@ -172,7 +172,7 @@ void SokolCmdBuffer::execute_commands(bool resource_only)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::wait_for_flush()
+void SokolCmdQueue::wait_for_flush()
 {
 	// initialise finished flushing
 	bool finished_flushing = false;
@@ -243,7 +243,7 @@ void SokolCmdBuffer::wait_for_flush()
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_push_debug_group(const char* name)
+void SokolCmdQueue::add_command_push_debug_group(const char* name)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::PUSH_DEBUG_GROUP);
@@ -254,7 +254,7 @@ void SokolCmdBuffer::add_command_push_debug_group(const char* name)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_pop_debug_group()
+void SokolCmdQueue::add_command_pop_debug_group()
 {
 	// add command
 	/*SokolRenderCommand& command = */m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::POP_DEBUG_GROUP);
@@ -262,7 +262,7 @@ void SokolCmdBuffer::add_command_pop_debug_group()
 
 // ----------------------------------------------------------------------------------------------------
 
-sg_buffer SokolCmdBuffer::add_command_make_buffer(const sg_buffer_desc& desc)
+sg_buffer SokolCmdQueue::add_command_make_buffer(const sg_buffer_desc& desc)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::MAKE_BUFFER);
@@ -279,7 +279,7 @@ sg_buffer SokolCmdBuffer::add_command_make_buffer(const sg_buffer_desc& desc)
 
 // ----------------------------------------------------------------------------------------------------
 
-sg_image SokolCmdBuffer::add_command_make_image(const sg_image_desc& desc)
+sg_image SokolCmdQueue::add_command_make_image(const sg_image_desc& desc)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::MAKE_IMAGE);
@@ -296,7 +296,7 @@ sg_image SokolCmdBuffer::add_command_make_image(const sg_image_desc& desc)
 
 // ----------------------------------------------------------------------------------------------------
 
-sg_shader SokolCmdBuffer::add_command_make_shader(const sg_shader_desc& desc)
+sg_shader SokolCmdQueue::add_command_make_shader(const sg_shader_desc& desc)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::MAKE_SHADER);
@@ -313,7 +313,7 @@ sg_shader SokolCmdBuffer::add_command_make_shader(const sg_shader_desc& desc)
 
 // ----------------------------------------------------------------------------------------------------
 
-sg_pipeline SokolCmdBuffer::add_command_make_pipeline(const sg_pipeline_desc& desc)
+sg_pipeline SokolCmdQueue::add_command_make_pipeline(const sg_pipeline_desc& desc)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::MAKE_PIPELINE);
@@ -330,7 +330,7 @@ sg_pipeline SokolCmdBuffer::add_command_make_pipeline(const sg_pipeline_desc& de
 
 // ----------------------------------------------------------------------------------------------------
 
-sg_pass SokolCmdBuffer::add_command_make_pass(const sg_pass_desc& desc)
+sg_pass SokolCmdQueue::add_command_make_pass(const sg_pass_desc& desc)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::MAKE_PASS);
@@ -347,7 +347,7 @@ sg_pass SokolCmdBuffer::add_command_make_pass(const sg_pass_desc& desc)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_destroy_buffer(sg_buffer buffer)
+void SokolCmdQueue::add_command_destroy_buffer(sg_buffer buffer)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::DESTROY_BUFFER);
@@ -361,7 +361,7 @@ void SokolCmdBuffer::add_command_destroy_buffer(sg_buffer buffer)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_destroy_image(sg_image image)
+void SokolCmdQueue::add_command_destroy_image(sg_image image)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::DESTROY_IMAGE);
@@ -375,7 +375,7 @@ void SokolCmdBuffer::add_command_destroy_image(sg_image image)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_destroy_shader(sg_shader shader)
+void SokolCmdQueue::add_command_destroy_shader(sg_shader shader)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::DESTROY_SHADER);
@@ -389,7 +389,7 @@ void SokolCmdBuffer::add_command_destroy_shader(sg_shader shader)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_destroy_pipeline(sg_pipeline pipeline)
+void SokolCmdQueue::add_command_destroy_pipeline(sg_pipeline pipeline)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::DESTROY_PIPELINE);
@@ -403,7 +403,7 @@ void SokolCmdBuffer::add_command_destroy_pipeline(sg_pipeline pipeline)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_destroy_pass(sg_pass pass)
+void SokolCmdQueue::add_command_destroy_pass(sg_pass pass)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::DESTROY_PASS);
@@ -417,7 +417,7 @@ void SokolCmdBuffer::add_command_destroy_pass(sg_pass pass)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_update_buffer(sg_buffer buffer, const sg_range& data)
+void SokolCmdQueue::add_command_update_buffer(sg_buffer buffer, const sg_range& data)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::UPDATE_BUFFER);
@@ -429,7 +429,7 @@ void SokolCmdBuffer::add_command_update_buffer(sg_buffer buffer, const sg_range&
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_append_buffer(sg_buffer buffer, const sg_range& data)
+void SokolCmdQueue::add_command_append_buffer(sg_buffer buffer, const sg_range& data)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::APPEND_BUFFER);
@@ -441,7 +441,7 @@ void SokolCmdBuffer::add_command_append_buffer(sg_buffer buffer, const sg_range&
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_update_image(sg_image image, const sg_image_data& data)
+void SokolCmdQueue::add_command_update_image(sg_image image, const sg_image_data& data)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::UPDATE_IMAGE);
@@ -453,7 +453,7 @@ void SokolCmdBuffer::add_command_update_image(sg_image image, const sg_image_dat
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_begin_default_pass(const sg_pass_action& pass_action, int width, int height)
+void SokolCmdQueue::add_command_begin_default_pass(const sg_pass_action& pass_action, int width, int height)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::BEGIN_DEFAULT_PASS);
@@ -466,7 +466,7 @@ void SokolCmdBuffer::add_command_begin_default_pass(const sg_pass_action& pass_a
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_begin_pass(sg_pass pass, const sg_pass_action& pass_action)
+void SokolCmdQueue::add_command_begin_pass(sg_pass pass, const sg_pass_action& pass_action)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::BEGIN_PASS);
@@ -478,7 +478,7 @@ void SokolCmdBuffer::add_command_begin_pass(sg_pass pass, const sg_pass_action& 
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_apply_viewport(int x, int y, int width, int height, bool origin_top_left)
+void SokolCmdQueue::add_command_apply_viewport(int x, int y, int width, int height, bool origin_top_left)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::APPLY_VIEWPORT);
@@ -493,7 +493,7 @@ void SokolCmdBuffer::add_command_apply_viewport(int x, int y, int width, int hei
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_apply_scissor_rect(int x, int y, int width, int height, bool origin_top_left)
+void SokolCmdQueue::add_command_apply_scissor_rect(int x, int y, int width, int height, bool origin_top_left)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::APPLY_SCISSOR_RECT);
@@ -508,7 +508,7 @@ void SokolCmdBuffer::add_command_apply_scissor_rect(int x, int y, int width, int
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_apply_pipeline(sg_pipeline pipeline)
+void SokolCmdQueue::add_command_apply_pipeline(sg_pipeline pipeline)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::APPLY_PIPELINE);
@@ -519,7 +519,7 @@ void SokolCmdBuffer::add_command_apply_pipeline(sg_pipeline pipeline)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_apply_bindings(const sg_bindings& bindings)
+void SokolCmdQueue::add_command_apply_bindings(const sg_bindings& bindings)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::APPLY_BINDINGS);
@@ -530,7 +530,7 @@ void SokolCmdBuffer::add_command_apply_bindings(const sg_bindings& bindings)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_apply_uniforms(sg_shader_stage stage, int ub_index, const sg_range& data)
+void SokolCmdQueue::add_command_apply_uniforms(sg_shader_stage stage, int ub_index, const sg_range& data)
 {
 	// data size too big?
 	if ((size_t)data.size > sizeof(SokolRenderCommand::apply_uniforms.buf))
@@ -550,7 +550,7 @@ void SokolCmdBuffer::add_command_apply_uniforms(sg_shader_stage stage, int ub_in
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_draw(int base_element, int number_of_elements, int number_of_instances)
+void SokolCmdQueue::add_command_draw(int base_element, int number_of_elements, int number_of_instances)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::DRAW);
@@ -563,7 +563,7 @@ void SokolCmdBuffer::add_command_draw(int base_element, int number_of_elements, 
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_end_pass()
+void SokolCmdQueue::add_command_end_pass()
 {
 	// add command
 	/*SokolRenderCommand& command = */m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::END_PASS);
@@ -571,7 +571,7 @@ void SokolCmdBuffer::add_command_end_pass()
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_commit()
+void SokolCmdQueue::add_command_commit()
 {
 	// add command
 	/*SokolRenderCommand& command = */m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::COMMIT);
@@ -579,7 +579,7 @@ void SokolCmdBuffer::add_command_commit()
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::add_command_custom(void (*custom_cb)(void* custom_data), void* custom_data)
+void SokolCmdQueue::add_command_custom(void (*custom_cb)(void* custom_data), void* custom_data)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::CUSTOM);
@@ -591,7 +591,7 @@ void SokolCmdBuffer::add_command_custom(void (*custom_cb)(void* custom_data), vo
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::schedule_cleanup(void (*cleanup_cb)(void* cleanup_data), void* cleanup_data, int32_t number_of_frames_to_defer)
+void SokolCmdQueue::schedule_cleanup(void (*cleanup_cb)(void* cleanup_data), void* cleanup_data, int32_t number_of_frames_to_defer)
 {
 	// add cleanup
 	SokolRenderCleanup& cleanup = m_cleanups.emplace_back(cleanup_cb, cleanup_data);
@@ -602,7 +602,7 @@ void SokolCmdBuffer::schedule_cleanup(void (*cleanup_cb)(void* cleanup_data), vo
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::commit_commands()
+void SokolCmdQueue::commit_commands()
 {
 	// acquire render semaphore
 	m_render_semaphore.acquire();
@@ -625,7 +625,7 @@ void SokolCmdBuffer::commit_commands()
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::flush_commands()
+void SokolCmdQueue::flush_commands()
 {
 	// acquire render semaphore
 	m_render_semaphore.acquire();
@@ -645,7 +645,7 @@ void SokolCmdBuffer::flush_commands()
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdBuffer::process_cleanups(int32_t frame_index)
+void SokolCmdQueue::process_cleanups(int32_t frame_index)
 {
 	// loop through cleanups
 	for (auto& cleanup : m_cleanups)

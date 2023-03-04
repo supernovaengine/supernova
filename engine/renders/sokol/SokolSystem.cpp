@@ -6,7 +6,7 @@
 
 #include "System.h"
 #include "sokol_gfx.h"
-#include "SokolCmdBuffer.h"
+#include "SokolCmdQueue.h"
 
 // Render thread
 // 
@@ -31,22 +31,22 @@ void SokolSystem::setup(){
 
     sg_setup(&desc);
 
-    SokolCmdBuffer::start();
+    SokolCmdQueue::start();
 }
 
 void SokolSystem::commit(){
-    SokolCmdBuffer::commit_commands();
-    SokolCmdBuffer::execute_commands();
+    SokolCmdQueue::commit_commands();
+    SokolCmdQueue::execute_commands();
     sg_commit();
 }
 
 void SokolSystem::shutdown(){
-    SokolCmdBuffer::flush_commands();
-    SokolCmdBuffer::wait_for_flush();
-    SokolCmdBuffer::finish();
+    SokolCmdQueue::flush_commands();
+    SokolCmdQueue::wait_for_flush();
+    SokolCmdQueue::finish();
     sg_shutdown();
 }
 
 void SokolSystem::scheduleCleanup(void (*cleanupFunc)(void* cleanupData), void* cleanupData, int32_t numFramesToDefer){
-    SokolCmdBuffer::schedule_cleanup(cleanupFunc, cleanupData, numFramesToDefer);
+    SokolCmdQueue::schedule_cleanup(cleanupFunc, cleanupData, numFramesToDefer);
 }

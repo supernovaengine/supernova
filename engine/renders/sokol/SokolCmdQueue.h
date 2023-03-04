@@ -3,8 +3,8 @@
 // Based on: https://github.com/oviano/sokol-multithread
 // ---------------------------------------
 
-#ifndef SokolCmdBuffer_H
-#define SokolCmdBuffer_H
+#ifndef SokolCmdQueue_H
+#define SokolCmdQueue_H
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -225,7 +225,7 @@ namespace Supernova {
 
 // ----------------------------------------------------------------------------------------------------
 
-	class SokolCmdBuffer
+	class SokolCmdQueue
 	{
 	public:
 		static void start();
@@ -303,4 +303,4 @@ namespace Supernova {
 
 }
 
-#endif // SokolCmdBuffer_H
+#endif // SokolCmdQueue_H
