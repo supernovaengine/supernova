@@ -23,6 +23,8 @@ namespace Supernova{
 
         sg_image generateMipmaps(const sg_image_desc* desc_);
 
+        static void cleanupMipmapTexture(void* data);
+
     public:
         SokolTexture();
         SokolTexture(const SokolTexture& rhs);

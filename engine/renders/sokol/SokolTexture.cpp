@@ -61,6 +61,10 @@ sg_wrap SokolTexture::getWrap(TextureWrap textureWrap){
     return SG_WRAP_REPEAT;
 }
 
+void SokolTexture::cleanupMipmapTexture(void* data){
+    free(big_target);
+}
+
 // https://github.com/floooh/sokol/issues/102
 sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
     sg_image_desc desc = *desc_;
@@ -165,7 +169,7 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
 
     sg_image img = SokolCmdQueue::add_command_make_image(desc);
     //sg_image img = sg_make_image(desc);
-    free(big_target);
+    SystemRender::scheduleCleanup(cleanupMipmapTexture, big_target);
     return img;
 }
 
