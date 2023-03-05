@@ -2180,8 +2180,10 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
 }
 
 void MeshSystem::destroyModel(ModelComponent& model){
-    if (model.gltfModel)
+    if (model.gltfModel){
         delete model.gltfModel;
+        model.gltfModel = NULL;
+    }
 
     for (auto const& bone : model.bonesIdMapping){
         scene->destroyEntity(bone.second);

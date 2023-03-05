@@ -72,6 +72,10 @@ namespace Supernova{
 		SceneRender sceneRender;
 		SceneRender depthRender;
 
+		static uint32_t pixelsWhite[64];
+		static uint32_t pixelsBlack[64];
+		static uint32_t pixelsNormal[64];
+
 		static TextureRender emptyWhite;
 		static TextureRender emptyBlack;
 		static TextureRender emptyCubeBlack;

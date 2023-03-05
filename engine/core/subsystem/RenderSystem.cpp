@@ -22,6 +22,10 @@
 
 using namespace Supernova;
 
+uint32_t RenderSystem::pixelsWhite[64];
+uint32_t RenderSystem::pixelsBlack[64];
+uint32_t RenderSystem::pixelsNormal[64];
+
 TextureRender RenderSystem::emptyWhite;
 TextureRender RenderSystem::emptyBlack;
 TextureRender RenderSystem::emptyCubeBlack;
@@ -157,32 +161,40 @@ void RenderSystem::createEmptyTextures(){
 		void* data_array[6];
 		size_t size_array[6];
 
-    	uint32_t pixels[64];
-
-		for (int i = 0; i < 6; i++){
-			data_array[i]  = (void*)pixels;
-			size_array[i] = 8 * 8 * 4;
+		for (int i = 0; i < 64; i++) {
+			pixelsNormal[i] = 0xFF808080;
 		}
 
-		for (int i = 0; i < 64; i++) {
-        	pixels[i] = 0xFF808080;
-    	}
+		for (int i = 0; i < 6; i++){
+			data_array[i]  = (void*)pixelsNormal;
+			size_array[i] = 8 * 8 * 4;
+		}
 
 		emptyNormal.createTexture(
 				"empty|normal", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, 
 				TextureFilter::NEAREST, TextureFilter::NEAREST, TextureWrap::REPEAT, TextureWrap::REPEAT);
 
 		for (int i = 0; i < 64; i++) {
-        	pixels[i] = 0xFFFFFFFF;
-    	}
+			pixelsWhite[i] = 0xFFFFFFFF;
+		}
+
+		for (int i = 0; i < 6; i++){
+			data_array[i]  = (void*)pixelsWhite;
+			size_array[i] = 8 * 8 * 4;
+		}
 
 		emptyWhite.createTexture(
 				"empty|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, 
 				TextureFilter::NEAREST, TextureFilter::NEAREST, TextureWrap::REPEAT, TextureWrap::REPEAT);
 
 		for (int i = 0; i < 64; i++) {
-        	pixels[i] = 0xFF000000;
-    	}
+			pixelsBlack[i] = 0xFF000000;
+		}
+
+		for (int i = 0; i < 6; i++){
+			data_array[i]  = (void*)pixelsBlack;
+			size_array[i] = 8 * 8 * 4;
+		}
 
 		emptyBlack.createTexture(
 				"empty|black", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array, 

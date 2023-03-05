@@ -158,7 +158,7 @@ TextureData::~TextureData() {
 }
 
 void TextureData::releaseImageData(){
-    free((void*)data);
+    stbi_image_free(data);
     data = NULL;
 }
 
@@ -189,7 +189,7 @@ void TextureData::crop(int offsetX, int offsetY, int newWidth, int newHeight){
     int newRowsize = newWidth * channels;
     int bufsize = newWidth * newHeight * channels;
     
-    unsigned char* newData = new unsigned char[bufsize];
+    unsigned char* newData = (unsigned char*) malloc(bufsize*sizeof(unsigned char));
     
     int row_cnt;
     long off1 = 0;
@@ -203,7 +203,7 @@ void TextureData::crop(int offsetX, int offsetY, int newWidth, int newHeight){
         memcpy(newData+off2,(unsigned char*)data+off1+off3,newRowsize);
     }
 
-    free((void*)data);
+    stbi_image_free(data);
     
     width = newWidth;
     height = newHeight;
@@ -220,7 +220,7 @@ void TextureData::resample(int newWidth, int newHeight){
     if ((newWidth != width) || (newHeight != height)){
 
         int bufsize = newWidth * newHeight * channels;
-        unsigned char* newData = new unsigned char [bufsize];
+        unsigned char* newData = (unsigned char*) malloc(bufsize*sizeof(unsigned char));
     
         double scaleWidth =  (double)newWidth / (double)width;
         double scaleHeight = (double)newHeight / (double)height;
@@ -238,7 +238,7 @@ void TextureData::resample(int newWidth, int newHeight){
             }
         }
 
-        free((void*)data);
+        stbi_image_free(data);
     
         width = newWidth;
         height = newHeight;
@@ -258,7 +258,7 @@ void TextureData::fitSize(int newWidth, int newHeight){
     if ((newWidth != width) || (newHeight != height)){
 
         int bufsize = newWidth * newHeight * channels;
-        unsigned char* newData = new unsigned char [bufsize];
+        unsigned char* newData = (unsigned char*) malloc(bufsize*sizeof(unsigned char));
         
         int xOffset = 0;
         int yOffset = 0;
@@ -273,7 +273,7 @@ void TextureData::fitSize(int newWidth, int newHeight){
             memcpy( (unsigned char*)newData + channels * ( newWidth * ( yOffset + i ) + xOffset ), (unsigned char*)data + width * i * channels, width * channels );
         }
         
-        free((void*)data);
+        stbi_image_free(data);
         
         width = newWidth;
         height = newHeight;

@@ -199,7 +199,7 @@ namespace Supernova {
 				sg_shader_stage stage;
 				int ub_index;
 				size_t data_size;
-				char buf[512];
+				char buf[16384];
 			} apply_uniforms;
 			
 			struct

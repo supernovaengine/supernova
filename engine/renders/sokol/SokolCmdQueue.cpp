@@ -6,6 +6,7 @@
 #include <string>
 #include <cstring>
 #include <algorithm>
+#include <cassert>
 
 #include "SokolCmdQueue.h"
 
@@ -533,10 +534,7 @@ void SokolCmdQueue::add_command_apply_bindings(const sg_bindings& bindings)
 void SokolCmdQueue::add_command_apply_uniforms(sg_shader_stage stage, int ub_index, const sg_range& data)
 {
 	// data size too big?
-	if ((size_t)data.size > sizeof(SokolRenderCommand::apply_uniforms.buf))
-	{
-		return;
-	}
+	assert((size_t)data.size <= sizeof(SokolRenderCommand::apply_uniforms.buf));
 
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::APPLY_UNIFORMS);
