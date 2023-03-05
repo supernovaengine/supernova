@@ -262,8 +262,8 @@ bool Texture::load(){
 
             if (Engine::getTextureStrategy() == TextureStrategy::FIT){
                 data[f].fitPowerOfTwo();
-            }else if (Engine::getTextureStrategy() == TextureStrategy::RESAMPLE){
-                data[f].resamplePowerOfTwo();
+            }else if (Engine::getTextureStrategy() == TextureStrategy::RESIZE){
+                data[f].resizePowerOfTwo();
             }
 	    }
     }

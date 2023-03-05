@@ -1,3 +1,11 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
+#ifndef RESIZE_WITH_STB
+#define RESIZE_WITH_STB 0
+#endif
+
 #include "TextureData.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -5,6 +13,9 @@
 #include <string.h>
 #include "io/Data.h"
 #include "stb_image.h"
+#if RESIZE_WITH_STB
+#include "stb_image_resize.h"
+#endif
 #include "Log.h"
 #include "Texture.h"
 #include "Engine.h"
@@ -183,7 +194,7 @@ bool TextureData::hasAlpha(){
     return false;
 }
 
-void TextureData::crop(int offsetX, int offsetY, int newWidth, int newHeight){
+void TextureData::crop(int xOffset, int yOffset, int newWidth, int newHeight){
     
     int rowsize = width * channels;
     int newRowsize = newWidth * channels;
@@ -194,11 +205,11 @@ void TextureData::crop(int offsetX, int offsetY, int newWidth, int newHeight){
     int row_cnt;
     long off1 = 0;
     long off2 = 0;
-    long off3 = offsetX*channels;
+    long off3 = xOffset*channels;
     
-    for (row_cnt=offsetY;row_cnt<offsetY+(newHeight);row_cnt++) {
+    for (row_cnt=yOffset;row_cnt<yOffset+(newHeight);row_cnt++) {
         off1=row_cnt*rowsize;
-        off2=(row_cnt-offsetY)*newRowsize;
+        off2=(row_cnt-yOffset)*newRowsize;
         
         memcpy(newData+off2,(unsigned char*)data+off1+off3,newRowsize);
     }
@@ -211,20 +222,27 @@ void TextureData::crop(int offsetX, int offsetY, int newWidth, int newHeight){
     data = newData;
 }
 
-void TextureData::resamplePowerOfTwo(){
-    resample(getNearestPowerOfTwo(width), getNearestPowerOfTwo(height));
+void TextureData::resizePowerOfTwo(){
+    resize(getNearestPowerOfTwo(width), getNearestPowerOfTwo(height));
 }
 
-void TextureData::resample(int newWidth, int newHeight){
+void TextureData::resize(int newWidth, int newHeight){
 
     if ((newWidth != width) || (newHeight != height)){
 
         int bufsize = newWidth * newHeight * channels;
         unsigned char* newData = (unsigned char*) malloc(bufsize*sizeof(unsigned char));
-    
+
+        #if RESIZE_WITH_STB
+
+        stbir_resize_uint8((unsigned char*)data, width, height, 0,
+	                   newData, newWidth, newHeight, 0, channels);
+
+        #else
+
         double scaleWidth =  (double)newWidth / (double)width;
         double scaleHeight = (double)newHeight / (double)height;
-   
+
         for(int cy = 0; cy < newHeight; cy++){
             for(int cx = 0; cx < newWidth; cx++){
                 
@@ -238,6 +256,8 @@ void TextureData::resample(int newWidth, int newHeight){
             }
         }
 
+        #endif
+
         stbi_image_free(data);
     
         width = newWidth;
@@ -250,18 +270,15 @@ void TextureData::resample(int newWidth, int newHeight){
 }
 
 void TextureData::fitPowerOfTwo(){
-    fitSize(getNearestPowerOfTwo(width), getNearestPowerOfTwo(height));
+    fitSize(0, 0, getNearestPowerOfTwo(width), getNearestPowerOfTwo(height));
 }
 
-void TextureData::fitSize(int newWidth, int newHeight){
+void TextureData::fitSize(int xOffset, int yOffset, int newWidth, int newHeight){
     
     if ((newWidth != width) || (newHeight != height)){
 
         int bufsize = newWidth * newHeight * channels;
         unsigned char* newData = (unsigned char*) malloc(bufsize*sizeof(unsigned char));
-        
-        int xOffset = 0;
-        int yOffset = 0;
         
         for( unsigned int i = 0; i < bufsize; ++i )
         {

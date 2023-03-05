@@ -26,7 +26,7 @@ namespace Supernova {
     // texture power of two strategy
     enum class TextureStrategy{
         FIT,
-        RESAMPLE,
+        RESIZE,
         NONE
     };
 

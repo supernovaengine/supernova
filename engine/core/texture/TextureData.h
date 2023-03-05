@@ -1,3 +1,7 @@
+//
+// (c) 2023 Eduardo Doria.
+//
+
 #ifndef texturedata_h
 #define texturedata_h
 
@@ -41,11 +45,14 @@ namespace Supernova {
         void releaseImageData();
         
         bool hasAlpha();
-        void crop(int offsetX, int offsetY, int newWidth, int newHeight);
-        void resamplePowerOfTwo();
+
+        void resizePowerOfTwo();
         void fitPowerOfTwo();
-        void resample(int newWidth, int newHeight);
-        void fitSize(int newWidth, int newHeight);
+
+        void resize(int newWidth, int newHeight);
+        void crop(int xOffset, int yOffset, int newWidth, int newHeight);
+        void fitSize(int xOffset, int yOffset, int newWidth, int newHeight);
+
         void flipVertical();
 
         unsigned char getColorComponent(int x, int y, int color);

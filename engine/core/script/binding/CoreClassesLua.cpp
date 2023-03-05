@@ -54,7 +54,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .beginNamespace("TextureStrategy")
         .addProperty("FIT", TextureStrategy::FIT)
-        .addProperty("RESAMPLE", TextureStrategy::RESAMPLE)
+        .addProperty("RESIZE", TextureStrategy::RESIZE)
         .addProperty("NONE", TextureStrategy::NONE)
         .endNamespace();
 

@@ -350,7 +350,7 @@ void Engine::systemInit(int argc, char* argv[]){
 
     Engine::setCanvasSize(1000,480);
     Engine::setScalingMode(Scaling::FITWIDTH);
-    Engine::setTextureStrategy(TextureStrategy::RESAMPLE);
+    Engine::setTextureStrategy(TextureStrategy::RESIZE);
     Engine::setCallMouseInTouchEvent(false);
     Engine::setCallTouchInMouseEvent(false);
     Engine::setUseDegrees(true);
