@@ -6,6 +6,7 @@
 
 #include "Log.h"
 #include "SokolCmdQueue.h"
+#include "render/SystemRender.h"
 
 using namespace Supernova;
 
@@ -62,7 +63,7 @@ sg_wrap SokolTexture::getWrap(TextureWrap textureWrap){
 }
 
 void SokolTexture::cleanupMipmapTexture(void* data){
-    free(big_target);
+    free(data);
 }
 
 // https://github.com/floooh/sokol/issues/102
