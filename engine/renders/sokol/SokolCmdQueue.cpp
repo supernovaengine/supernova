@@ -147,7 +147,7 @@ void SokolCmdQueue::execute_commands(bool resource_only)
 				sg_apply_bindings(command.apply_bindings.bindings);
 				break;
 			case SokolRenderCommand::TYPE::APPLY_UNIFORMS:
-				sg_apply_uniforms(command.apply_uniforms.stage, command.apply_uniforms.ub_index, command.apply_uniforms.data);
+				sg_apply_uniforms(command.apply_uniforms.stage, command.apply_uniforms.ub_index, { command.apply_uniforms.buf, command.apply_uniforms.data_size });
 				break;
 			case SokolRenderCommand::TYPE::DRAW:
 				sg_draw(command.draw.base_element, command.draw.number_of_elements, command.draw.number_of_instances);
@@ -533,13 +533,17 @@ void SokolCmdQueue::add_command_apply_bindings(const sg_bindings& bindings)
 
 void SokolCmdQueue::add_command_apply_uniforms(sg_shader_stage stage, int ub_index, const sg_range& data)
 {
+	// data size too big?
+	assert((size_t)data.size <= sizeof(SokolRenderCommand::apply_uniforms.buf));
+
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::APPLY_UNIFORMS);
 
 	// copy args
 	command.apply_uniforms.stage = stage;
 	command.apply_uniforms.ub_index = ub_index;
-	command.apply_uniforms.data = data;
+	memcpy(command.apply_uniforms.buf, data.ptr, data.size);
+	command.apply_uniforms.data_size = data.size;
 }
 
 // ----------------------------------------------------------------------------------------------------
