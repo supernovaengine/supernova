@@ -29,8 +29,8 @@ int32_t SokolCmdQueue::m_frame_index = 0;
 
 // ----------------------------------------------------------------------------------------------------
 
-constexpr int32_t INITIAL_NUMBER_OF_COMMANDS = 512;
-constexpr int32_t INITIAL_NUMBER_OF_CLEANUPS = 128;
+constexpr int32_t INITIAL_NUMBER_OF_COMMANDS = 256;
+constexpr int32_t INITIAL_NUMBER_OF_CLEANUPS = 64;
 
 // ----------------------------------------------------------------------------------------------------
 
