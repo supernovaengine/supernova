@@ -37,6 +37,14 @@ void MeshPolygon::addVertex(float x, float y){
    addVertex(Vector3(x, y, 0));
 }
 
+void MeshPolygon::clearVertices(){
+    MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
+
+    pcomp.points.clear();
+
+    pcomp.needUpdatePolygon = true;
+}
+
 int MeshPolygon::getWidth(){
     MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
 

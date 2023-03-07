@@ -42,6 +42,14 @@ void Polygon::addVertex(float x, float y){
    addVertex(Vector3(x, y, 0));
 }
 
+void Polygon::clearVertices(){
+    PolygonComponent& pcomp = getComponent<PolygonComponent>();
+
+    pcomp.points.clear();
+
+    pcomp.needUpdatePolygon = true;
+}
+
 void Polygon::setTexture(std::string path){
     UIComponent& ui = getComponent<UIComponent>();
 

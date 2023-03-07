@@ -19,6 +19,8 @@ namespace Supernova{
         void addVertex(Vector3 vertex);
         void addVertex(float x, float y);
 
+        void clearVertices();
+
         void setTexture(std::string path);
         void setTexture(Framebuffer* framebuffer);
 

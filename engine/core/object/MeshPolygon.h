@@ -18,6 +18,8 @@ namespace Supernova{
         void addVertex(Vector3 vertex);
         void addVertex(float x, float y);
 
+        void clearVertices();
+
         int getWidth();
         int getHeight();
 
