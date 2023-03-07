@@ -12,6 +12,10 @@ void SystemRender::setup(){
     SokolSystem::setup();
 }
 
+void SystemRender::executeQueue(){
+    SokolSystem::executeQueue();
+}
+
 void SystemRender::commit(){
     SokolSystem::commit();
 }

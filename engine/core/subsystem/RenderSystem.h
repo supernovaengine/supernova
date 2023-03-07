@@ -101,7 +101,8 @@ namespace Supernova{
 		void createFramebuffer(CameraComponent& camera);
 		void createEmptyTextures();
 		void checkLightsAndShadow();
-		bool processLights(Transform& cameraTransform);
+		bool loadLights();
+		void processLights(Transform& cameraTransform);
 		bool processFog();
 		TextureShaderType getShadowMapByIndex(int index);
 		TextureShaderType getShadowMapCubeByIndex(int index);
@@ -144,7 +145,7 @@ namespace Supernova{
 
 		
 		void updateCamera(CameraComponent& camera, Transform& transform);
-		void updateSkyViewProjection(CameraComponent& camera);
+		void updateSkyViewProjection(SkyComponent& sky, CameraComponent& camera);
 		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);
 		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform);
 		void updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform);

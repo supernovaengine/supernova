@@ -62,47 +62,6 @@ void RenderSystem::load(){
 			}
 		}
 	}
-
-	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
-	if (sky){
-		if (!sky->loaded){
-			loadSky(*sky);
-		}
-	}
-	auto transforms = scene->getComponentArray<Transform>();
-	for (int i = 0; i < transforms->size(); i++){
-		Transform& transform = transforms->getComponentFromIndex(i);
-		Entity entity = transforms->getEntity(i);
-		Signature signature = scene->getSignature(entity);
-
-		if (signature.test(scene->getComponentType<CameraComponent>())){
-			continue;
-		}else if (signature.test(scene->getComponentType<MeshComponent>())){
-			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-			if (!mesh.loaded){
-				loadMesh(mesh);
-			}
-		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
-			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
-			if (!terrain.loaded){
-				loadTerrain(terrain);
-			}
-		}else if (signature.test(scene->getComponentType<UIComponent>())){
-			UIComponent& ui = scene->getComponent<UIComponent>(entity);
-			if (!ui.loaded){
-				bool isText = false;
-				if (signature.test(scene->getComponentType<TextComponent>())){
-					isText = true;
-				}
-				loadUI(ui, isText);
-			}
-		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
-			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
-			if (!particles.loaded){
-				loadParticles(particles);
-			}
-		}
-	}
 }
 
 void RenderSystem::destroy(){
@@ -225,7 +184,7 @@ void RenderSystem::checkLightsAndShadow(){
 	}
 }
 
-bool RenderSystem::processLights(Transform& cameraTransform){
+bool RenderSystem::loadLights(){
 	hasLights = false;
 	hasShadows = false;
 
@@ -243,19 +202,6 @@ bool RenderSystem::processLights(Transform& cameraTransform){
 	
 	for (int i = 0; i < numLights; i++){
 		LightComponent& light = lights->getComponentFromIndex(i);
-		Entity entity = lights->getEntity(i);
-		Transform* transform = scene->findComponent<Transform>(entity);
-
-		Vector3 worldPosition;
-		if (transform){
-			worldPosition = Vector3(transform->worldPosition);
-		}
-
-		int type = 0;
-		if (light.type == LightType::POINT)
-			type = 1;
-		if (light.type == LightType::SPOT)
-			type = 2;
 
 		light.shadowMapIndex = -1;
 		
@@ -298,6 +244,37 @@ bool RenderSystem::processLights(Transform& cameraTransform){
 				}
 			}
 
+		}
+
+	}
+
+	return true;
+}
+
+void RenderSystem::processLights(Transform& cameraTransform){
+	auto lights = scene->getComponentArray<LightComponent>();
+
+	int numLights = lights->size();
+	if (numLights > MAX_LIGHTS)
+		numLights = MAX_LIGHTS;
+
+	for (int i = 0; i < numLights; i++){
+		LightComponent& light = lights->getComponentFromIndex(i);
+		Entity entity = lights->getEntity(i);
+		Transform* transform = scene->findComponent<Transform>(entity);
+
+		Vector3 worldPosition;
+		if (transform){
+			worldPosition = Vector3(transform->worldPosition);
+		}
+
+		int type = 0;
+		if (light.type == LightType::POINT)
+			type = 1;
+		if (light.type == LightType::SPOT)
+			type = 2;
+
+		if (light.shadows){
 			if (light.shadowMapIndex >= 0){
 				size_t numMaps = (light.type == LightType::DIRECTIONAL) ? light.numShadowCascades : 1;
 				for (int c = 0; c < numMaps; c++){
@@ -323,8 +300,6 @@ bool RenderSystem::processLights(Transform& cameraTransform){
 	for (int i = numLights; i < MAX_LIGHTS; i++){
 		fs_lighting.color_intensity[i].w = 0.0;
 	}
-
-	return true;
 }
 
 bool RenderSystem::processFog(){
@@ -1615,21 +1590,18 @@ void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 	camera.needUpdateFrustumPlanes = true;
 }
 
-void RenderSystem::updateSkyViewProjection(CameraComponent& camera){
-	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
-	if (sky){
-		Matrix4 skyViewMatrix = camera.viewMatrix;
+void RenderSystem::updateSkyViewProjection(SkyComponent& sky, CameraComponent& camera){
+	Matrix4 skyViewMatrix = camera.viewMatrix;
 
-		skyViewMatrix.set(3,0,0);
-    	skyViewMatrix.set(3,1,0);
-    	skyViewMatrix.set(3,2,0);
-    	skyViewMatrix.set(3,3,1);
-    	skyViewMatrix.set(2,3,0);
-    	skyViewMatrix.set(1,3,0);
-    	skyViewMatrix.set(0,3,0);
+	skyViewMatrix.set(3,0,0);
+	skyViewMatrix.set(3,1,0);
+	skyViewMatrix.set(3,2,0);
+	skyViewMatrix.set(3,3,1);
+	skyViewMatrix.set(2,3,0);
+	skyViewMatrix.set(1,3,0);
+	skyViewMatrix.set(0,3,0);
 
-		sky->skyViewProjectionMatrix = camera.projectionMatrix * skyViewMatrix;
-	}
+	sky.skyViewProjectionMatrix = camera.projectionMatrix * skyViewMatrix;
 }
 
 void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform){
@@ -2265,9 +2237,18 @@ void RenderSystem::update(double dt){
 	CameraComponent& mainCamera =  scene->getComponent<CameraComponent>(mainCameraEntity);
 	Transform& mainCameraTransform =  scene->getComponent<Transform>(mainCameraEntity);
 
-	if (mainCamera.needUpdate){
-		if (!hasMultipleCameras){
-			updateSkyViewProjection(mainCamera);
+	loadLights();
+
+	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
+	if (sky){
+		if (mainCamera.needUpdate){
+			if (!hasMultipleCameras){
+				updateSkyViewProjection(*sky, mainCamera);
+			}
+		}
+
+		if (!sky->loaded){
+			loadSky(*sky);
 		}
 	}
 
@@ -2276,6 +2257,48 @@ void RenderSystem::update(double dt){
 
 		Entity entity = transforms->getEntity(i);
 		Signature signature = scene->getSignature(entity);
+
+		if (signature.test(scene->getComponentType<CameraComponent>())){
+			continue;
+		}else if (signature.test(scene->getComponentType<MeshComponent>())){
+			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+			if (mesh.loaded && mesh.needReload){
+				destroyMesh(mesh);
+			}
+			if (!mesh.loaded){
+				loadMesh(mesh);
+			}
+		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
+			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+			if (terrain.loaded && terrain.needReload){
+				destroyTerrain(terrain);
+			}
+			if (!terrain.loaded){
+				loadTerrain(terrain);
+			}
+		}else if (signature.test(scene->getComponentType<UIComponent>())){
+			UIComponent& ui = scene->getComponent<UIComponent>(entity);
+			if (!ui.loaded){
+				bool isText = false;
+				if (signature.test(scene->getComponentType<TextComponent>())){
+					isText = true;
+				}
+				if (ui.loaded && ui.needReload){
+					destroyUI(ui);
+				}
+				if (!ui.loaded){
+					loadUI(ui, isText);
+				}
+			}
+		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
+			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+			if (particles.loaded && particles.needReload){
+				destroyParticles(particles);
+			}
+			if (!particles.loaded){
+				loadParticles(particles);
+			}
+		}
 
 		if (mainCamera.needUpdate || transform.needUpdate){
 
@@ -2350,7 +2373,7 @@ void RenderSystem::update(double dt){
 			camera.needUpdate = false;
 		}
 	}
-	
+
 	processLights(mainCameraTransform);
 	processFog();
 }
@@ -2393,12 +2416,6 @@ void RenderSystem::draw(){
 						Transform* transform = scene->findComponent<Transform>(entity);
 
 						if (transform){
-							if (mesh.loaded && mesh.needReload){
-								destroyMesh(mesh);
-							}
-							if (!mesh.loaded){
-								loadMesh(mesh);
-							}
 							if (transform->visible){
 								drawMeshDepth(mesh, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
 							}
@@ -2410,12 +2427,6 @@ void RenderSystem::draw(){
 						Transform* transform = scene->findComponent<Transform>(entity);
 
 						if (transform){
-							if (terrain.loaded && terrain.needReload){
-								destroyTerrain(terrain);
-							}
-							if (!terrain.loaded){
-								loadTerrain(terrain);
-							}
 							if (transform->visible){
 								drawTerrainDepth(terrain, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
 							}
@@ -2459,7 +2470,7 @@ void RenderSystem::draw(){
 		SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
 		if (sky){
 			if (hasMultipleCameras){
-				updateSkyViewProjection(camera);
+				updateSkyViewProjection(*sky, camera);
 			}
 
 			if (!sky->loaded){
@@ -2519,12 +2530,6 @@ void RenderSystem::draw(){
 			if (signature.test(scene->getComponentType<MeshComponent>())){
 				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
-				if (mesh.loaded && mesh.needReload){
-					destroyMesh(mesh);
-				}
-				if (!mesh.loaded){
-					loadMesh(mesh);
-				}
 				if (transform.visible){
 					if (!mesh.transparent || !camera.transparentSort){
 						//Draw opaque meshes if transparency is not necessary
@@ -2541,12 +2546,6 @@ void RenderSystem::draw(){
 					updateTerrain(terrain, transform, camera, cameraTransform);
 				}
 
-				if (terrain.loaded && terrain.needReload){
-					destroyTerrain(terrain);
-				}
-				if (!terrain.loaded){
-					loadTerrain(terrain);
-				}
 				if (transform.visible){
 					drawTerrain(terrain, transform, cameraTransform, camera.renderToTexture);
 				}
@@ -2558,12 +2557,6 @@ void RenderSystem::draw(){
 				if (signature.test(scene->getComponentType<TextComponent>())){
 					isText = true;
 				}
-				if (ui.loaded && ui.needReload){
-					destroyUI(ui);
-				}
-				if (!ui.loaded){
-					loadUI(ui, isText);
-				}
 				if (transform.visible)
 					drawUI(ui, transform, camera.renderToTexture);
 
@@ -2574,12 +2567,6 @@ void RenderSystem::draw(){
 					updateParticles(particles, transform, camera, cameraTransform);
 				}
 
-				if (particles.loaded && particles.needReload){
-					destroyParticles(particles);
-				}
-				if (!particles.loaded){
-					loadParticles(particles);
-				}
 				if (transform.visible)
 					drawParticles(particles, transform, cameraTransform, camera.renderToTexture);
 

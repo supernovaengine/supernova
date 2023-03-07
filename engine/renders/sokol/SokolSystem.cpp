@@ -34,9 +34,12 @@ void SokolSystem::setup(){
     SokolCmdQueue::start();
 }
 
-void SokolSystem::commit(){
+void SokolSystem::executeQueue(){
     SokolCmdQueue::commit_commands();
     SokolCmdQueue::execute_commands();
+}
+
+void SokolSystem::commit(){
     sg_commit();
 }
 

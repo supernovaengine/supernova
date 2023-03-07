@@ -211,14 +211,14 @@ void SokolObject::endLoad(uint8_t pipelines){
 
 void SokolObject::beginDraw(PipelineType pipType){
     if (pipType == PipelineType::PIP_DEPTH){
-        SokolCmdQueue::add_command_apply_pipeline(depth_pip);
-        //sg_apply_pipeline(depth_pip);
+        //SokolCmdQueue::add_command_apply_pipeline(depth_pip);
+        sg_apply_pipeline(depth_pip);
     }else if (pipType == PipelineType::PIP_RTT){
-        SokolCmdQueue::add_command_apply_pipeline(rtt_pip);
-        //sg_apply_pipeline(rtt_pip);
+        //SokolCmdQueue::add_command_apply_pipeline(rtt_pip);
+        sg_apply_pipeline(rtt_pip);
     }else{
-        SokolCmdQueue::add_command_apply_pipeline(pip);
-        //sg_apply_pipeline(pip);
+        //SokolCmdQueue::add_command_apply_pipeline(pip);
+        sg_apply_pipeline(pip);
     }
 }
 
@@ -230,16 +230,16 @@ void SokolObject::applyUniformBlock(int slotUniform, ShaderStageType stage, unsi
         }else if (stage == ShaderStageType::FRAGMENT){
             sg_stage = SG_SHADERSTAGE_FS;
         }
-        SokolCmdQueue::add_command_apply_uniforms(sg_stage, slotUniform, {data, count});
-        //sg_apply_uniforms(sg_stage, slotUniform, {data, count});
+        //SokolCmdQueue::add_command_apply_uniforms(sg_stage, slotUniform, {data, count});
+        sg_apply_uniforms(sg_stage, slotUniform, {data, count});
     }
 }
 
 void SokolObject::draw(int vertexCount){
-    SokolCmdQueue::add_command_apply_bindings(bind);
-    //sg_apply_bindings(bind);
-    SokolCmdQueue::add_command_draw(0, vertexCount, 1);
-    //sg_draw(0, vertexCount, 1);
+    //SokolCmdQueue::add_command_apply_bindings(bind);
+    sg_apply_bindings(bind);
+    //SokolCmdQueue::add_command_draw(0, vertexCount, 1);
+    sg_draw(0, vertexCount, 1);
 }
 
 void SokolObject::destroy(){

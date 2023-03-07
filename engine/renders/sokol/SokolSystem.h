@@ -12,6 +12,7 @@ namespace Supernova{
 
     public:
         static void setup();
+        static void executeQueue();
         static void commit();
         static void shutdown();
 

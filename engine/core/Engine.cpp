@@ -469,6 +469,8 @@ void Engine::systemDraw(){
         }
     }
 
+    SystemRender::executeQueue();
+
     Engine::onDraw.call();
 
     for (int i = 0; i < numScenes; i++){
