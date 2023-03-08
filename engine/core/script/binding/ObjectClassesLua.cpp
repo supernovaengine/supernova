@@ -100,7 +100,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .deriveClass<Object, EntityHandle>("Object")
         .addConstructor <void (*) (Scene*)> ()
-        .addFunction("createChild", &Object::createChild)
         .addFunction("addChild", 
             luabridge::overload<Object*>(&Object::addChild),
             luabridge::overload<Entity>(&Object::addChild))

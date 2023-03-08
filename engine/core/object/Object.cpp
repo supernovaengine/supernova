@@ -122,14 +122,6 @@ void Object::setModelMatrix(Matrix4 modelMatrix){
     transform.staticObject = true;
 }
 
-Object* Object::createChild(){
-    Object* child = new Object(scene);
-
-    addChild(child);
-
-    return child;
-}
-
 void Object::addChild(Object* child){
     scene->addEntityChild(this->entity, child->entity);
 }

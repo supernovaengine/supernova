@@ -15,7 +15,6 @@ namespace Supernova{
         Object(Scene* scene, Entity entity);
         virtual ~Object();
 
-        Object* createChild(); //TODO: add a template here
         void addChild(Object* child);
         void addChild(Entity child);
 
