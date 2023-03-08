@@ -103,7 +103,7 @@ namespace Supernova{
 		void checkLightsAndShadow();
 		bool loadLights();
 		void processLights(Transform& cameraTransform);
-		bool processFog();
+		bool loadAndProcessFog();
 		TextureShaderType getShadowMapByIndex(int index);
 		TextureShaderType getShadowMapCubeByIndex(int index);
 		void configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera);

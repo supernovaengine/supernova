@@ -302,7 +302,7 @@ void RenderSystem::processLights(Transform& cameraTransform){
 	}
 }
 
-bool RenderSystem::processFog(){
+bool RenderSystem::loadAndProcessFog(){
 
 	FogComponent* fog = scene->findComponentFromIndex<FogComponent>(0);
 	hasFog = false;
@@ -2238,6 +2238,7 @@ void RenderSystem::update(double dt){
 	Transform& mainCameraTransform =  scene->getComponent<Transform>(mainCameraEntity);
 
 	loadLights();
+	loadAndProcessFog();
 
 	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
 	if (sky){
@@ -2375,7 +2376,6 @@ void RenderSystem::update(double dt){
 	}
 
 	processLights(mainCameraTransform);
-	processFog();
 }
 
 void RenderSystem::draw(){
