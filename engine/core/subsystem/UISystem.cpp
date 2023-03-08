@@ -495,149 +495,149 @@ bool UISystem::createOrUpdateText(TextComponent& text, UIComponent& ui, UILayout
 
 void UISystem::applyAnchorPreset(UILayoutComponent& layout){
     if (layout.anchorPreset == AnchorPreset::TOP_LEFT){
-        layout.anchorLeft = 0;
-        layout.anchorTop = 0;
-        layout.anchorRight = 0;
-        layout.anchorBottom = 0;
-        layout.marginLeft = 0;
-        layout.marginTop = 0;
-        layout.marginRight = layout.width;
-        layout.marginBottom = layout.height;
+        layout.anchorPointLeft = 0;
+        layout.anchorPointTop = 0;
+        layout.anchorPointRight = 0;
+        layout.anchorPointBottom = 0;
+        layout.anchorOffsetLeft = 0;
+        layout.anchorOffsetTop = 0;
+        layout.anchorOffsetRight = layout.width;
+        layout.anchorOffsetBottom = layout.height;
     }else if (layout.anchorPreset == AnchorPreset::TOP_RIGHT){
-        layout.anchorLeft = 1;
-        layout.anchorTop = 0;
-        layout.anchorRight = 1;
-        layout.anchorBottom = 0;
-        layout.marginLeft = -layout.width;
-        layout.marginTop = 0;
-        layout.marginRight = 0;
-        layout.marginBottom = layout.height;
+        layout.anchorPointLeft = 1;
+        layout.anchorPointTop = 0;
+        layout.anchorPointRight = 1;
+        layout.anchorPointBottom = 0;
+        layout.anchorOffsetLeft = -layout.width;
+        layout.anchorOffsetTop = 0;
+        layout.anchorOffsetRight = 0;
+        layout.anchorOffsetBottom = layout.height;
     }else if (layout.anchorPreset == AnchorPreset::BOTTOM_RIGHT){
-        layout.anchorLeft = 1;
-        layout.anchorTop = 1;
-        layout.anchorRight = 1;
-        layout.anchorBottom = 1;
-        layout.marginLeft = -layout.width;
-        layout.marginTop = -layout.height;
-        layout.marginRight = 0;
-        layout.marginBottom = 0;
+        layout.anchorPointLeft = 1;
+        layout.anchorPointTop = 1;
+        layout.anchorPointRight = 1;
+        layout.anchorPointBottom = 1;
+        layout.anchorOffsetLeft = -layout.width;
+        layout.anchorOffsetTop = -layout.height;
+        layout.anchorOffsetRight = 0;
+        layout.anchorOffsetBottom = 0;
     }else if (layout.anchorPreset == AnchorPreset::BOTTOM_LEFT){
-        layout.anchorLeft = 0;
-        layout.anchorTop = 1;
-        layout.anchorRight = 0;
-        layout.anchorBottom = 1;
-        layout.marginLeft = 0;
-        layout.marginTop = -layout.height;
-        layout.marginRight = layout.width;
-        layout.marginBottom = 0;
+        layout.anchorPointLeft = 0;
+        layout.anchorPointTop = 1;
+        layout.anchorPointRight = 0;
+        layout.anchorPointBottom = 1;
+        layout.anchorOffsetLeft = 0;
+        layout.anchorOffsetTop = -layout.height;
+        layout.anchorOffsetRight = layout.width;
+        layout.anchorOffsetBottom = 0;
     }else if (layout.anchorPreset == AnchorPreset::CENTER_LEFT){
-        layout.anchorLeft = 0;
-        layout.anchorTop = 0.5;
-        layout.anchorRight = 0;
-        layout.anchorBottom = 0.5;
-        layout.marginLeft = 0;
-        layout.marginTop = -floor(layout.height / 2.0);
-        layout.marginRight = layout.width;
-        layout.marginBottom = ceil(layout.height / 2.0);
+        layout.anchorPointLeft = 0;
+        layout.anchorPointTop = 0.5;
+        layout.anchorPointRight = 0;
+        layout.anchorPointBottom = 0.5;
+        layout.anchorOffsetLeft = 0;
+        layout.anchorOffsetTop = -floor(layout.height / 2.0);
+        layout.anchorOffsetRight = layout.width;
+        layout.anchorOffsetBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::CENTER_TOP){
-        layout.anchorLeft = 0.5;
-        layout.anchorTop = 0;
-        layout.anchorRight = 0.5;
-        layout.anchorBottom = 0;
-        layout.marginLeft = -floor(layout.width / 2.0);
-        layout.marginTop = 0;
-        layout.marginRight = ceil(layout.width / 2.0);
-        layout.marginBottom = layout.height;
+        layout.anchorPointLeft = 0.5;
+        layout.anchorPointTop = 0;
+        layout.anchorPointRight = 0.5;
+        layout.anchorPointBottom = 0;
+        layout.anchorOffsetLeft = -floor(layout.width / 2.0);
+        layout.anchorOffsetTop = 0;
+        layout.anchorOffsetRight = ceil(layout.width / 2.0);
+        layout.anchorOffsetBottom = layout.height;
     }else if (layout.anchorPreset == AnchorPreset::CENTER_RIGHT){
-        layout.anchorLeft = 1;
-        layout.anchorTop = 0.5;
-        layout.anchorRight = 1;
-        layout.anchorBottom = 0.5;
-        layout.marginLeft = -layout.width;
-        layout.marginTop = -floor(layout.height / 2.0);
-        layout.marginRight = 0;
-        layout.marginBottom = ceil(layout.height / 2.0);
+        layout.anchorPointLeft = 1;
+        layout.anchorPointTop = 0.5;
+        layout.anchorPointRight = 1;
+        layout.anchorPointBottom = 0.5;
+        layout.anchorOffsetLeft = -layout.width;
+        layout.anchorOffsetTop = -floor(layout.height / 2.0);
+        layout.anchorOffsetRight = 0;
+        layout.anchorOffsetBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::CENTER_BOTTOM){
-        layout.anchorLeft = 0.5;
-        layout.anchorTop = 1;
-        layout.anchorRight = 0.5;
-        layout.anchorBottom = 1;
-        layout.marginLeft = -floor(layout.width / 2.0);
-        layout.marginTop = -layout.height;
-        layout.marginRight = ceil(layout.width / 2.0);
-        layout.marginBottom = 0;
+        layout.anchorPointLeft = 0.5;
+        layout.anchorPointTop = 1;
+        layout.anchorPointRight = 0.5;
+        layout.anchorPointBottom = 1;
+        layout.anchorOffsetLeft = -floor(layout.width / 2.0);
+        layout.anchorOffsetTop = -layout.height;
+        layout.anchorOffsetRight = ceil(layout.width / 2.0);
+        layout.anchorOffsetBottom = 0;
     }else if (layout.anchorPreset == AnchorPreset::CENTER){
-        layout.anchorLeft = 0.5;
-        layout.anchorTop = 0.5;
-        layout.anchorRight = 0.5;
-        layout.anchorBottom = 0.5;
-        layout.marginLeft = -floor(layout.width / 2.0);
-        layout.marginTop = -floor(layout.height / 2.0);
-        layout.marginRight = ceil(layout.width / 2.0);
-        layout.marginBottom = ceil(layout.height / 2.0);
+        layout.anchorPointLeft = 0.5;
+        layout.anchorPointTop = 0.5;
+        layout.anchorPointRight = 0.5;
+        layout.anchorPointBottom = 0.5;
+        layout.anchorOffsetLeft = -floor(layout.width / 2.0);
+        layout.anchorOffsetTop = -floor(layout.height / 2.0);
+        layout.anchorOffsetRight = ceil(layout.width / 2.0);
+        layout.anchorOffsetBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::LEFT_WIDE){
-        layout.anchorLeft = 0;
-        layout.anchorTop = 0;
-        layout.anchorRight = 0;
-        layout.anchorBottom = 1;
-        layout.marginLeft = 0;
-        layout.marginTop = 0;
-        layout.marginRight = layout.width;
-        layout.marginBottom = 0;
+        layout.anchorPointLeft = 0;
+        layout.anchorPointTop = 0;
+        layout.anchorPointRight = 0;
+        layout.anchorPointBottom = 1;
+        layout.anchorOffsetLeft = 0;
+        layout.anchorOffsetTop = 0;
+        layout.anchorOffsetRight = layout.width;
+        layout.anchorOffsetBottom = 0;
     }else if (layout.anchorPreset == AnchorPreset::TOP_WIDE){
-        layout.anchorLeft = 0;
-        layout.anchorTop = 0;
-        layout.anchorRight = 1;
-        layout.anchorBottom = 0;
-        layout.marginLeft = 0;
-        layout.marginTop = 0;
-        layout.marginRight = 0;
-        layout.marginBottom = layout.height;
+        layout.anchorPointLeft = 0;
+        layout.anchorPointTop = 0;
+        layout.anchorPointRight = 1;
+        layout.anchorPointBottom = 0;
+        layout.anchorOffsetLeft = 0;
+        layout.anchorOffsetTop = 0;
+        layout.anchorOffsetRight = 0;
+        layout.anchorOffsetBottom = layout.height;
     }else if (layout.anchorPreset == AnchorPreset::RIGHT_WIDE){
-        layout.anchorLeft = 1;
-        layout.anchorTop = 0;
-        layout.anchorRight = 1;
-        layout.anchorBottom = 1;
-        layout.marginLeft = -layout.width;
-        layout.marginTop = 0;
-        layout.marginRight = 0;
-        layout.marginBottom = 0;
+        layout.anchorPointLeft = 1;
+        layout.anchorPointTop = 0;
+        layout.anchorPointRight = 1;
+        layout.anchorPointBottom = 1;
+        layout.anchorOffsetLeft = -layout.width;
+        layout.anchorOffsetTop = 0;
+        layout.anchorOffsetRight = 0;
+        layout.anchorOffsetBottom = 0;
     }else if (layout.anchorPreset == AnchorPreset::BOTTOM_WIDE){
-        layout.anchorLeft = 0;
-        layout.anchorTop = 1;
-        layout.anchorRight = 1;
-        layout.anchorBottom = 1;
-        layout.marginLeft = 0;
-        layout.marginTop = -layout.height;
-        layout.marginRight = 0;
-        layout.marginBottom = 0;
+        layout.anchorPointLeft = 0;
+        layout.anchorPointTop = 1;
+        layout.anchorPointRight = 1;
+        layout.anchorPointBottom = 1;
+        layout.anchorOffsetLeft = 0;
+        layout.anchorOffsetTop = -layout.height;
+        layout.anchorOffsetRight = 0;
+        layout.anchorOffsetBottom = 0;
     }else if (layout.anchorPreset == AnchorPreset::VERTICAL_CENTER_WIDE){
-        layout.anchorLeft = 0.5;
-        layout.anchorTop = 0;
-        layout.anchorRight = 0.5;
-        layout.anchorBottom = 1;
-        layout.marginLeft = -floor(layout.width / 2.0);
-        layout.marginTop = 0;
-        layout.marginRight = ceil(layout.width / 2.0);
-        layout.marginBottom = 0;
+        layout.anchorPointLeft = 0.5;
+        layout.anchorPointTop = 0;
+        layout.anchorPointRight = 0.5;
+        layout.anchorPointBottom = 1;
+        layout.anchorOffsetLeft = -floor(layout.width / 2.0);
+        layout.anchorOffsetTop = 0;
+        layout.anchorOffsetRight = ceil(layout.width / 2.0);
+        layout.anchorOffsetBottom = 0;
     }else if (layout.anchorPreset == AnchorPreset::HORIZONTAL_CENTER_WIDE){
-        layout.anchorLeft = 0;
-        layout.anchorTop = 0.5;
-        layout.anchorRight = 1;
-        layout.anchorBottom = 0.5;
-        layout.marginLeft = 0;
-        layout.marginTop = -floor(layout.height / 2.0);
-        layout.marginRight = 0;
-        layout.marginBottom = ceil(layout.height / 2.0);
+        layout.anchorPointLeft = 0;
+        layout.anchorPointTop = 0.5;
+        layout.anchorPointRight = 1;
+        layout.anchorPointBottom = 0.5;
+        layout.anchorOffsetLeft = 0;
+        layout.anchorOffsetTop = -floor(layout.height / 2.0);
+        layout.anchorOffsetRight = 0;
+        layout.anchorOffsetBottom = ceil(layout.height / 2.0);
     }else if (layout.anchorPreset == AnchorPreset::FULL_LAYOUT){
-        layout.anchorLeft = 0;
-        layout.anchorTop = 0;
-        layout.anchorRight = 1;
-        layout.anchorBottom = 1;
-        layout.marginLeft = 0;
-        layout.marginTop = 0;
-        layout.marginRight = 0;
-        layout.marginBottom = 0;
+        layout.anchorPointLeft = 0;
+        layout.anchorPointTop = 0;
+        layout.anchorPointRight = 1;
+        layout.anchorPointBottom = 1;
+        layout.anchorOffsetLeft = 0;
+        layout.anchorOffsetTop = 0;
+        layout.anchorOffsetRight = 0;
+        layout.anchorOffsetBottom = 0;
     }
 }
 
@@ -760,10 +760,10 @@ void UISystem::update(double dt){
             Transform& transform = scene->getComponent<Transform>(entity);
 
             if (layout.usingAnchors){
-                if (layout.anchorRight < layout.anchorLeft)
-                    layout.anchorRight = layout.anchorLeft;
-                if (layout.anchorBottom < layout.anchorTop)
-                    layout.anchorBottom = layout.anchorTop;
+                if (layout.anchorPointRight < layout.anchorPointLeft)
+                    layout.anchorPointRight = layout.anchorPointLeft;
+                if (layout.anchorPointBottom < layout.anchorPointTop)
+                    layout.anchorPointBottom = layout.anchorPointTop;
 
                 applyAnchorPreset(layout);
             }
@@ -773,10 +773,10 @@ void UISystem::update(double dt){
             float abAnchorTop = 0;
             float abAnchorBottom = 0;
             if (transform.parent == NULL_ENTITY){
-                abAnchorLeft = Engine::getCanvasWidth() * layout.anchorLeft;
-                abAnchorRight = Engine::getCanvasWidth() * layout.anchorRight;
-                abAnchorTop = Engine::getCanvasHeight() * layout.anchorTop;
-                abAnchorBottom = Engine::getCanvasHeight() * layout.anchorBottom;
+                abAnchorLeft = Engine::getCanvasWidth() * layout.anchorPointLeft;
+                abAnchorRight = Engine::getCanvasWidth() * layout.anchorPointRight;
+                abAnchorTop = Engine::getCanvasHeight() * layout.anchorPointTop;
+                abAnchorBottom = Engine::getCanvasHeight() * layout.anchorPointBottom;
             }else{
                 UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
                 if (parentlayout){
@@ -795,17 +795,17 @@ void UISystem::update(double dt){
                         boxRect.setHeight(boxRect.getHeight() - parentimage->patchMarginBottom - parentimage->patchMarginTop);
                     }
 
-                    abAnchorLeft = (boxRect.getWidth() * layout.anchorLeft) + boxRect.getX();
-                    abAnchorRight = (boxRect.getWidth() * layout.anchorRight) + boxRect.getX();
-                    abAnchorTop = (boxRect.getHeight() * layout.anchorTop) + boxRect.getY();
-                    abAnchorBottom = (boxRect.getHeight() * layout.anchorBottom) + boxRect.getY();
+                    abAnchorLeft = (boxRect.getWidth() * layout.anchorPointLeft) + boxRect.getX();
+                    abAnchorRight = (boxRect.getWidth() * layout.anchorPointRight) + boxRect.getX();
+                    abAnchorTop = (boxRect.getHeight() * layout.anchorPointTop) + boxRect.getY();
+                    abAnchorBottom = (boxRect.getHeight() * layout.anchorPointBottom) + boxRect.getY();
                 }
             }
 
             if (layout.usingAnchors){
 
-                float posX = abAnchorLeft + layout.marginLeft;
-                float posY = abAnchorTop + layout.marginTop;
+                float posX = abAnchorLeft + layout.anchorOffsetLeft;
+                float posY = abAnchorTop + layout.anchorOffsetTop;
 
                 if (posX != transform.position.x || posY != transform.position.y){
                     transform.position.x = posX;
@@ -813,8 +813,8 @@ void UISystem::update(double dt){
                     transform.needUpdate = true;
                 }
 
-                float width = abAnchorRight - transform.position.x + layout.marginRight;
-                float height = abAnchorBottom - transform.position.y + layout.marginBottom;
+                float width = abAnchorRight - transform.position.x + layout.anchorOffsetRight;
+                float height = abAnchorBottom - transform.position.y + layout.anchorOffsetBottom;
 
                 if (width != layout.width || height != layout.height){
                     layout.width = width;
@@ -823,10 +823,10 @@ void UISystem::update(double dt){
                 }
 
             }else{
-                layout.marginLeft = transform.position.x - abAnchorLeft;
-                layout.marginTop = transform.position.y - abAnchorTop;
-                layout.marginRight = layout.width + transform.position.x - abAnchorRight;
-                layout.marginBottom = layout.height + transform.position.y - abAnchorBottom;
+                layout.anchorOffsetLeft = transform.position.x - abAnchorLeft;
+                layout.anchorOffsetTop = transform.position.y - abAnchorTop;
+                layout.anchorOffsetRight = layout.width + transform.position.x - abAnchorRight;
+                layout.anchorOffsetBottom = layout.height + transform.position.y - abAnchorBottom;
             }
         }
 

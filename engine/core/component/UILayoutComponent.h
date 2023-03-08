@@ -31,15 +31,15 @@ namespace Supernova{
         int width = 0;
         int height = 0;
 
-        float anchorLeft = 0;
-        float anchorTop = 0;
-        float anchorRight = 0;
-        float anchorBottom = 0;
+        float anchorPointLeft = 0;
+        float anchorPointTop = 0;
+        float anchorPointRight = 0;
+        float anchorPointBottom = 0;
 
-        int marginLeft = 0;
-        int marginTop = 0;
-        int marginRight = 0;
-        int marginBottom = 0;
+        int anchorOffsetLeft = 0;
+        int anchorOffsetTop = 0;
+        int anchorOffsetRight = 0;
+        int anchorOffsetBottom = 0;
 
         AnchorPreset anchorPreset = AnchorPreset::NONE;
         bool usingAnchors = false;

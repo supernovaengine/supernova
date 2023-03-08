@@ -21,27 +21,27 @@ namespace Supernova{
         int getWidth() const;
         int getHeight() const;
 
-        void setAnchors(float anchorLeft, float anchorTop, float anchorRight, float anchorBottom);
-        void setAnchorLeft(float anchorLeft);
-        void setAnchorTop(float anchorTop);
-        void setAnchorRight(float anchorRight);
-        void setAnchorBottom(float anchorBottom);
+        void setAnchorPoints(float left, float top, float right, float bottom);
+        void setAnchorPointLeft(float left);
+        void setAnchorPointTop(float top);
+        void setAnchorPointRight(float right);
+        void setAnchorPointBottom(float bottom);
 
-        float getAnchorLeft() const;
-        float getAnchorTop() const;
-        float getAnchorRight() const;
-        float getAnchorBottom() const;
+        float getAnchorPointLeft() const;
+        float getAnchorPointTop() const;
+        float getAnchorPointRight() const;
+        float getAnchorPointBottom() const;
 
-        void setMargins(int marginLeft, int marginTop, int marginRight, int marginBottom);
-        void setMarginLeft(int marginLeft);
-        void setMarginTop(int marginTop);
-        void setMarginRight(int marginRight);
-        void setMarginBottom(int marginBottom);
+        void setAnchorOffsets(int left, int top, int right, int bottom);
+        void setAnchorOffsetLeft(int left);
+        void setAnchorOffsetTop(int top);
+        void setAnchorOffsetRight(int right);
+        void setAnchorOffsetBottom(int bottom);
 
-        int getMarginLeft() const;
-        int getMarginTop() const;
-        int getMarginRight() const;
-        int getMarginBottom() const;
+        int getAnchorOffsetLeft() const;
+        int getAnchorOffsetTop() const;
+        int getAnchorOffsetRight() const;
+        int getAnchorOffsetBottom() const;
 
         void setAnchorPreset(AnchorPreset anchorPreset);
         AnchorPreset getAnchorPreset() const;

@@ -52,148 +52,148 @@ int UILayout::getHeight() const{
     return layout.height;
 }
 
-void UILayout::setAnchors(float anchorLeft, float anchorTop, float anchorRight, float anchorBottom){
+void UILayout::setAnchorPoints(float left, float top, float right, float bottom){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.anchorLeft = anchorLeft;
-    layout.anchorTop = anchorTop;
-    layout.anchorRight = anchorRight;
-    layout.anchorBottom = anchorBottom;
+    layout.anchorPointLeft = left;
+    layout.anchorPointTop = top;
+    layout.anchorPointRight = right;
+    layout.anchorPointBottom = bottom;
 
     layout.anchorPreset = AnchorPreset::NONE;
     layout.usingAnchors = true;
 }
 
-void UILayout::setAnchorLeft(float anchorLeft){
+void UILayout::setAnchorPointLeft(float left){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.anchorLeft = anchorLeft;
+    layout.anchorPointLeft = left;
 
     layout.anchorPreset = AnchorPreset::NONE;
     layout.usingAnchors = true;
 }
 
-void UILayout::setAnchorTop(float anchorTop){
+void UILayout::setAnchorPointTop(float top){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.anchorTop = anchorTop;
+    layout.anchorPointTop = top;
 
     layout.anchorPreset = AnchorPreset::NONE;
     layout.usingAnchors = true;
 }
 
-void UILayout::setAnchorRight(float anchorRight){
+void UILayout::setAnchorPointRight(float right){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.anchorRight = anchorRight;
+    layout.anchorPointRight = right;
 
     layout.anchorPreset = AnchorPreset::NONE;
     layout.usingAnchors = true;
 }
 
-void UILayout::setAnchorBottom(float anchorBottom){
+void UILayout::setAnchorPointBottom(float bottom){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.anchorBottom = anchorBottom;
+    layout.anchorPointBottom = bottom;
 
     layout.anchorPreset = AnchorPreset::NONE;
     layout.usingAnchors = true;
 }
 
-float UILayout::getAnchorLeft() const{
+float UILayout::getAnchorPointLeft() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return layout.anchorLeft;
+    return layout.anchorPointLeft;
 }
 
-float UILayout::getAnchorTop() const{
+float UILayout::getAnchorPointTop() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return layout.anchorTop;
+    return layout.anchorPointTop;
 }
 
-float UILayout::getAnchorRight() const{
+float UILayout::getAnchorPointRight() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return layout.anchorRight;
+    return layout.anchorPointRight;
 }
 
-float UILayout::getAnchorBottom() const{
+float UILayout::getAnchorPointBottom() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return layout.anchorBottom;
+    return layout.anchorPointBottom;
 }
 
-void UILayout::setMargins(int marginLeft, int marginTop, int marginRight, int marginBottom){
+void UILayout::setAnchorOffsets(int left, int top, int right, int bottom){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.marginLeft = marginLeft;
-    layout.marginTop = marginTop;
-    layout.marginRight = marginRight;
-    layout.marginBottom = marginBottom;
+    layout.anchorOffsetLeft = left;
+    layout.anchorOffsetTop = top;
+    layout.anchorOffsetRight = right;
+    layout.anchorOffsetBottom = bottom;
 
     layout.anchorPreset = AnchorPreset::NONE;
     layout.usingAnchors = true;
 }
 
-void UILayout::setMarginLeft(int marginLeft){
+void UILayout::setAnchorOffsetLeft(int left){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.marginLeft = marginLeft;
+    layout.anchorOffsetLeft = left;
 
     layout.anchorPreset = AnchorPreset::NONE;
     layout.usingAnchors = true;
 }
 
-void UILayout::setMarginTop(int marginTop){
+void UILayout::setAnchorOffsetTop(int top){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.marginTop = marginTop;
+    layout.anchorOffsetTop = top;
 
     layout.anchorPreset = AnchorPreset::NONE;
     layout.usingAnchors = true;
 }
 
-void UILayout::setMarginRight(int marginRight){
+void UILayout::setAnchorOffsetRight(int right){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.marginRight = marginRight;
+    layout.anchorOffsetRight = right;
 
     layout.anchorPreset = AnchorPreset::NONE;
     layout.usingAnchors = true;
 }
 
-void UILayout::setMarginBottom(int marginBottom){
+void UILayout::setAnchorOffsetBottom(int bottom){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    layout.marginBottom = marginBottom;
+    layout.anchorOffsetBottom = bottom;
 
     layout.anchorPreset = AnchorPreset::NONE;
     layout.usingAnchors = true;
 }
 
-int UILayout::getMarginLeft() const{
+int UILayout::getAnchorOffsetLeft() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return layout.marginLeft;
+    return layout.anchorOffsetLeft;
 }
 
-int UILayout::getMarginTop() const{
+int UILayout::getAnchorOffsetTop() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return layout.marginBottom;
+    return layout.anchorOffsetTop;
 }
 
-int UILayout::getMarginRight() const{
+int UILayout::getAnchorOffsetRight() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return layout.marginBottom;
+    return layout.anchorOffsetRight;
 }
 
-int UILayout::getMarginBottom() const{
+int UILayout::getAnchorOffsetBottom() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
-    return layout.marginBottom;
+    return layout.anchorOffsetBottom;
 }
 
 void UILayout::setAnchorPreset(AnchorPreset anchorPreset){
