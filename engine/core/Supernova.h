@@ -59,6 +59,7 @@
 #endif
 
 #include "Engine.h"
+#include "Input.h"
 
 void init();
 
