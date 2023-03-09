@@ -16,8 +16,6 @@ namespace Supernova{
     struct ModelComponent{
         tinygltf::Model* gltfModel = NULL;
 
-        ExternalBuffer eBuffers[MAX_EXTERNAL_BUFFERS];
-
         Matrix4 inverseDerivedTransform;
         
         Entity skeleton;

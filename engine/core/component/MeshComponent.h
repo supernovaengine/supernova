@@ -11,6 +11,7 @@
 #include "texture/Material.h"
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
+#include "buffer/ExternalBuffer.h"
 #include <map>
 #include <memory>
 
@@ -66,9 +67,10 @@ namespace Supernova{
 
         InterleavedBuffer buffer;
         IndexBuffer indices;
+        ExternalBuffer eBuffers[MAX_EXTERNAL_BUFFERS];
+        unsigned int numExternalBuffers = 0;
 
-        std::map<std::string, Buffer*> buffers;
-        std::string defaultBuffer = "vertices";
+        unsigned int vertexCount = 0;
 
         Submesh submeshes[MAX_SUBMESHES];
         unsigned int numSubmeshes = 0;

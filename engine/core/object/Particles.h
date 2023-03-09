@@ -11,9 +11,6 @@
 namespace Supernova{
 
     class Particles: public Object{
-    protected:
-        ExternalBuffer buffer;
-
     public:
         Particles(Scene* scene);
         virtual ~Particles();

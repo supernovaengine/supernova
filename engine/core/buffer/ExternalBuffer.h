@@ -6,10 +6,14 @@
 #define EXTERNALBUFFER_H
 
 #include "buffer/Buffer.h"
+#include <string>
 
 namespace Supernova {
 
     class ExternalBuffer : public Buffer {
+
+    protected:
+        std::string name;
 
     public:
         ExternalBuffer();
@@ -17,6 +21,8 @@ namespace Supernova {
 
         void setData(unsigned char* data, size_t size);
 
+        void setName(std::string name);
+        std::string getName() const;
     };
 
 }

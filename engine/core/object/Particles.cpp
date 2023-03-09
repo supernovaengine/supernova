@@ -10,19 +10,6 @@ using namespace Supernova;
 
 Particles::Particles(Scene* scene): Object(scene){
     addComponent<ParticlesComponent>({});
-
-    ParticlesComponent& particomp = getComponent<ParticlesComponent>();
-    particomp.buffer = &buffer;
-
-	buffer.clearAll();
-    buffer.addAttribute(AttributeType::POSITION, 3, 0);
-    buffer.addAttribute(AttributeType::COLOR, 4, 3 * sizeof(float));
-    buffer.addAttribute(AttributeType::POINTSIZE, 1, 7 * sizeof(float));
-    buffer.addAttribute(AttributeType::POINTROTATION, 1, 8 * sizeof(float));
-    buffer.addAttribute(AttributeType::TEXTURERECT, 4, 9 * sizeof(float));
-    buffer.setStride(13 * sizeof(float));
-    buffer.setRenderAttributes(true);
-    buffer.setUsage(BufferUsage::STREAM);
 }
 
 Particles::~Particles(){

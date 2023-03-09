@@ -26,9 +26,6 @@ MeshSystem::~MeshSystem(){
 }
 
 void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera){
-    mesh.buffers["vertices"] = &mesh.buffer;
-    mesh.buffers["indices"] = &mesh.indices;
-
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
     mesh.numSubmeshes = 1;
@@ -139,8 +136,6 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
 }
 
 void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
-    mesh.buffers["vertices"] = &mesh.buffer;
-
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;
     mesh.numSubmeshes = 1;
 
@@ -195,9 +190,6 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
 }
 
 void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
-    mesh.buffers["vertices"] = &mesh.buffer;
-    mesh.buffers["indices"] = &mesh.indices;
-
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
 
@@ -476,26 +468,25 @@ void MeshSystem::addSubmeshAttribute(Submesh& submesh, std::string bufferName, A
     submesh.attributes[attribute] = attData;
 }
 
-bool MeshSystem::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, ModelComponent& model, int& eBufferIndex, const int stride){
+bool MeshSystem::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, ModelComponent& model, const int stride, std::vector<std::string>& loadedBuffers){
     const tinygltf::BufferView &bufferView = model.gltfModel->bufferViews[bufferViewIndex];
     const std::string name = getBufferName(bufferViewIndex, model);
 
-	//mesh.buffer.clearAll();
-
-    if (mesh.buffers.count(name) == 0 && bufferView.target != 0) {
-        mesh.buffers[name] = &model.eBuffers[eBufferIndex];
+    if (std::find(loadedBuffers.begin(), loadedBuffers.end(), name) == loadedBuffers.end() && bufferView.target != 0) {
+        loadedBuffers.push_back(name);
 
         if (bufferView.target == 34962) { //GL_ARRAY_BUFFER
-            model.eBuffers[eBufferIndex].setType(BufferType::VERTEX_BUFFER);
+            mesh.eBuffers[mesh.numExternalBuffers].setType(BufferType::VERTEX_BUFFER);
         } else if (bufferView.target == 34963) { //GL_ELEMENT_ARRAY_BUFFER
-            model.eBuffers[eBufferIndex].setType(BufferType::INDEX_BUFFER);
+            mesh.eBuffers[mesh.numExternalBuffers].setType(BufferType::INDEX_BUFFER);
         }
 
-        model.eBuffers[eBufferIndex].setData(&model.gltfModel->buffers[bufferView.buffer].data.at(0) + bufferView.byteOffset, bufferView.byteLength);
-        model.eBuffers[eBufferIndex].setStride(stride);
+        mesh.eBuffers[mesh.numExternalBuffers].setData(&model.gltfModel->buffers[bufferView.buffer].data.at(0) + bufferView.byteOffset, bufferView.byteLength);
+        mesh.eBuffers[mesh.numExternalBuffers].setStride(stride);
+        mesh.eBuffers[mesh.numExternalBuffers].setName(name);
 
-        eBufferIndex++;
-        if (eBufferIndex > MAX_EXTERNAL_BUFFERS){
+        mesh.numExternalBuffers++;
+        if (mesh.numExternalBuffers > MAX_EXTERNAL_BUFFERS){
             Log::error("External buffer limit reached for GLTF model");
         }
 
@@ -941,9 +932,6 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
 void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned int tiles){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
-    mesh.buffers["vertices"] = &mesh.buffer;
-    mesh.buffers["indices"] = &mesh.indices;
-
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
@@ -996,9 +984,6 @@ void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned i
 
 void MeshSystem::createBox(Entity entity, float width, float height, float depth, unsigned int tiles){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
-    mesh.buffers["vertices"] = &mesh.buffer;
-    mesh.buffers["indices"] = &mesh.indices;
 
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
@@ -1128,9 +1113,6 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
 void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, unsigned int stacks){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
-    mesh.buffers["vertices"] = &mesh.buffer;
-    mesh.buffers["indices"] = &mesh.indices;
-
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
@@ -1220,9 +1202,6 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
 
 void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
-    mesh.buffers["vertices"] = &mesh.buffer;
-    mesh.buffers["indices"] = &mesh.indices;
 
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
@@ -1352,9 +1331,6 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
 void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsigned int sides, unsigned int rings){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
-    mesh.buffers["vertices"] = &mesh.buffer;
-    mesh.buffers["indices"] = &mesh.indices;
-
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
@@ -1438,9 +1414,9 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
     std::string warn;
 
     int meshIndex = 0;
-    int eBufferIndex = 0;
+    std::vector<std::string> loadedBuffers;
 
-    mesh.buffers.clear();
+    mesh.numExternalBuffers = 0;
 
     loader.SetFsCallbacks({&fileExists, &tinygltf::ExpandFilePath, &readWholeFile, nullptr, nullptr});
     //loader.SetFsCallbacks({nullptr, nullptr, nullptr, nullptr, nullptr});
@@ -1592,7 +1568,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
             mat.emissiveFactor[1],
             mat.emissiveFactor[2]);
 
-        loadGLTFBuffer(indexAccessor.bufferView, mesh, model, eBufferIndex, 0);
+        loadGLTFBuffer(indexAccessor.bufferView, mesh, model, 0, loadedBuffers);
 
         addSubmeshAttribute(mesh.submeshes[i], getBufferName(indexAccessor.bufferView, model), AttributeType::INDEX, 1, indexType, indexAccessor.count, indexAccessor.byteOffset, false);
 
@@ -1601,7 +1577,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
             int byteStride = accessor.ByteStride(model.gltfModel->bufferViews[accessor.bufferView]);
             std::string bufferName = getBufferName(accessor.bufferView, model);
 
-            loadGLTFBuffer(accessor.bufferView, mesh, model, eBufferIndex, byteStride);
+            loadGLTFBuffer(accessor.bufferView, mesh, model, byteStride, loadedBuffers);
 
             int elements = 1;
             if (accessor.type != TINYGLTF_TYPE_SCALAR) {
@@ -1630,7 +1606,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
             AttributeType attType;
             bool foundAttrs = false;
             if (attrib.first.compare("POSITION") == 0){
-                mesh.defaultBuffer = bufferName;
+                mesh.vertexCount = accessor.count;
                 attType = AttributeType::POSITION;
                 foundAttrs = true;
             }
@@ -1670,7 +1646,10 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
             }
 
             if (foundAttrs) {
-                mesh.buffers[bufferName]->setRenderAttributes(false);
+                for (int i = 0; i < mesh.numExternalBuffers; i++){
+                    if (mesh.eBuffers[i].getName() == bufferName)
+                        mesh.eBuffers[i].setRenderAttributes(false);
+                }
                 addSubmeshAttribute(mesh.submeshes[i], bufferName, attType, elements, dataType, accessor.count, accessor.byteOffset, accessor.normalized);
             } else
                 Log::warn("Model attribute missing: %s", attrib.first.c_str());
@@ -1691,7 +1670,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
                 int byteStride = accessor.ByteStride(model.gltfModel->bufferViews[accessor.bufferView]);
                 std::string bufferName = getBufferName(accessor.bufferView, model);
 
-                loadGLTFBuffer(accessor.bufferView, mesh, model, eBufferIndex, byteStride);
+                loadGLTFBuffer(accessor.bufferView, mesh, model, byteStride, loadedBuffers);
 
                 int elements = 1;
                 if (accessor.type != TINYGLTF_TYPE_SCALAR) {
@@ -1784,7 +1763,10 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
                 }
 
                 if (foundMorph) {
-                    mesh.buffers[bufferName]->setRenderAttributes(false);
+                    for (int i = 0; i < mesh.numExternalBuffers; i++){
+                        if (mesh.eBuffers[i].getName() == bufferName)
+                            mesh.eBuffers[i].setRenderAttributes(false);
+                    }
                     addSubmeshAttribute(mesh.submeshes[i], bufferName, attType, elements, dataType, accessor.count, accessor.byteOffset, accessor.normalized);
                 }
             }
@@ -2044,9 +2026,6 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
     }
 
     if (ret) {
-
-        mesh.buffers["vertices"] = &mesh.buffer;
-        mesh.buffers["indices"] = &mesh.indices;
 
         mesh.buffer.clearAll();
         mesh.buffer.addAttribute(AttributeType::POSITION, 3);

@@ -5,6 +5,7 @@
 #include "texture/Texture.h"
 #include "util/FrameData.h"
 #include "Supernova.h"
+#include "buffer/ExternalBuffer.h"
 
 namespace Supernova{
 
@@ -33,7 +34,7 @@ namespace Supernova{
     struct ParticlesComponent{
         bool loaded = false;
 
-        Buffer* buffer;
+        ExternalBuffer buffer;
 
         std::vector<ParticleData> particles;
         std::vector<ParticleShaderData> shaderParticles; //must be sorted

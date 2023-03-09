@@ -488,12 +488,24 @@ void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& sh
 
 bool RenderSystem::loadMesh(MeshComponent& mesh){
 
+	std::map<std::string, Buffer*> buffers;
 	bool allBuffersEmpty = true;
-	for (auto const& buff : mesh.buffers){
-		if (buff.second->getSize() > 0){
-			allBuffersEmpty = false;
-			break;
-		}
+
+	if (mesh.buffer.getSize() > 0){
+		buffers["vertices"] = &mesh.buffer;
+		allBuffersEmpty = false;
+	}
+	if (mesh.buffer.getSize() > 0){
+		buffers["indices"] = &mesh.indices;
+		allBuffersEmpty = false;
+	}
+	for (int i = 0; i < mesh.numExternalBuffers; i++){
+		buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
+		allBuffersEmpty = false;
+	}
+
+	if (mesh.vertexCount == 0){
+		mesh.vertexCount = mesh.buffer.getSize();
 	}
 
 	if (allBuffersEmpty)
@@ -503,7 +515,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 	std::map<std::string, unsigned int> bufferStride;
 
-	for (auto const& buf : mesh.buffers){
+	for (auto const& buf : buffers){
 		buf.second->getRender()->createBuffer(buf.second->getSize(), buf.second->getData(), buf.second->getType(), buf.second->getUsage());
 		bufferNameToRender[buf.first] = buf.second->getRender();
 		bufferStride[buf.first] = buf.second->getStride();
@@ -522,7 +534,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 
 		render.beginLoad(mesh.submeshes[i].primitiveType);
 
-		for (auto const& buf : mesh.buffers){
+		for (auto const& buf : buffers){
         	if (buf.second->isRenderAttributes()) {
             	for (auto const &attr : buf.second->getAttributes()) {
 					if (attr.first == AttributeType::TEXCOORD1){
@@ -660,13 +672,9 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 			}
 		}
 	
-		unsigned int vertexBufferCount = 0;
 		unsigned int indexCount = 0;
 
-		for (auto const& buf : mesh.buffers){
-        	if (buf.first == mesh.defaultBuffer) {
-				vertexBufferCount = buf.second->getCount();
-        	}
+		for (auto const& buf : buffers){
         	if (buf.second->isRenderAttributes()) {
             	for (auto const &attr : buf.second->getAttributes()) {
 					render.addAttribute(shaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
@@ -691,7 +699,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		if (indexCount > 0){
 			mesh.submeshes[i].vertexCount = indexCount;
 		}else{
-			mesh.submeshes[i].vertexCount = vertexBufferCount;
+			mesh.submeshes[i].vertexCount = mesh.vertexCount;
 		}
 
 		render.endLoad(PIP_DEFAULT | PIP_RTT);
@@ -714,7 +722,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 				mesh.submeshes[i].slotVSDepthMorphTarget = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_MORPHTARGET, ShaderStageType::VERTEX);
 			}
 
-			for (auto const& buf : mesh.buffers){
+			for (auto const& buf : buffers){
         		if (buf.second->isRenderAttributes()) {
 					for (auto const &attr : buf.second->getAttributes()){
 						if (attr.first == AttributeType::POSITION){
@@ -784,9 +792,12 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 	if (mesh.loaded){
 
 		if (mesh.needUpdateBuffer){
-			for (auto const& buf : mesh.buffers){
-				if (buf.second->getUsage() != BufferUsage::IMMUTABLE)
-					buf.second->getRender()->updateBuffer(buf.second->getSize(), buf.second->getData());
+			if (mesh.buffer.getUsage() != BufferUsage::IMMUTABLE)
+				mesh.buffer.getRender()->updateBuffer(mesh.buffer.getSize(), mesh.buffer.getData());
+			if (mesh.indices.getUsage() != BufferUsage::IMMUTABLE)
+				mesh.indices.getRender()->updateBuffer(mesh.indices.getSize(), mesh.indices.getData());
+			for (int i = 0; i < mesh.numExternalBuffers; i++){
+				mesh.eBuffers[i].getRender()->updateBuffer(mesh.eBuffers[i].getSize(), mesh.eBuffers[i].getData());
 			}
 
 			mesh.needUpdateBuffer = false;
@@ -906,9 +917,11 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 		submesh.slotVSDepthMorphTarget = -1;
 	}
 
-	//Destroy buffers
-	for (auto const& buf : mesh.buffers){
-		buf.second->getRender()->destroyBuffer();
+	//Destroy buffer
+	mesh.buffer.getRender()->destroyBuffer();
+	mesh.indices.getRender()->destroyBuffer();
+	for (int i = 0; i < mesh.numExternalBuffers; i++){
+		mesh.eBuffers[i].getRender()->destroyBuffer();
 	}
 
 	mesh.loaded = false;
@@ -1305,13 +1318,23 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 
 	particles.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::POINTS_VS_PARAMS, ShaderStageType::VERTEX);
 
-	// Now buffer size is zero than it needed to be calculated
-	size_t bufferSize = particles.maxParticles * particles.buffer->getStride();
+	particles.buffer.clearAll();
+	particles.buffer.addAttribute(AttributeType::POSITION, 3, 0);
+	particles.buffer.addAttribute(AttributeType::COLOR, 4, 3 * sizeof(float));
+	particles.buffer.addAttribute(AttributeType::POINTSIZE, 1, 7 * sizeof(float));
+	particles.buffer.addAttribute(AttributeType::POINTROTATION, 1, 8 * sizeof(float));
+	particles.buffer.addAttribute(AttributeType::TEXTURERECT, 4, 9 * sizeof(float));
+	particles.buffer.setStride(13 * sizeof(float));
+	particles.buffer.setRenderAttributes(true);
+	particles.buffer.setUsage(BufferUsage::STREAM);
 
-	particles.buffer->getRender()->createBuffer(bufferSize, particles.buffer->getData(), particles.buffer->getType(), particles.buffer->getUsage());
-	if (particles.buffer->isRenderAttributes()) {
-        for (auto const &attr : particles.buffer->getAttributes()) {
-			render.addAttribute(shaderData.getAttrIndex(attr.first), particles.buffer->getRender(), attr.second.getElements(), attr.second.getDataType(), particles.buffer->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+	// Now buffer size is zero than it needed to be calculated
+	size_t bufferSize = particles.maxParticles * particles.buffer.getStride();
+
+	particles.buffer.getRender()->createBuffer(bufferSize, particles.buffer.getData(), particles.buffer.getType(), particles.buffer.getUsage());
+	if (particles.buffer.isRenderAttributes()) {
+        for (auto const &attr : particles.buffer.getAttributes()) {
+			render.addAttribute(shaderData.getAttrIndex(attr.first), particles.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), particles.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
         }
     }
 
@@ -1329,7 +1352,7 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 }
 
 void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture){
-	if (particles.loaded && particles.buffer && particles.buffer->getSize() > 0){
+	if (particles.loaded && particles.buffer.getSize() > 0){
 
 		if (particles.needUpdateTexture || particles.texture.isFramebufferOutdated()){
 			ShaderData& shaderData = particles.shader.get()->shaderData;
@@ -1341,7 +1364,7 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 		}
 
 		if (particles.needUpdateBuffer){
-			particles.buffer->getRender()->updateBuffer(particles.buffer->getSize(), particles.buffer->getData());
+			particles.buffer.getRender()->updateBuffer(particles.buffer.getSize(), particles.buffer.getData());
 			particles.needUpdateBuffer = false;
 		}
 
@@ -1368,9 +1391,7 @@ void RenderSystem::destroyParticles(ParticlesComponent& particles){
 	particles.render.destroy();
 
 	//Destroy buffer
-	if (particles.buffer){
-		particles.buffer->getRender()->destroyBuffer();
-	}
+	particles.buffer.getRender()->destroyBuffer();
 
 	//Shaders uniforms
 	particles.slotVSParams = -1;
@@ -1632,9 +1653,9 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 	}
 
 	if (particles.numVisible > 0){
-		((ExternalBuffer*)particles.buffer)->setData((unsigned char*)(&particles.shaderParticles.at(0)), sizeof(ParticleShaderData)*particles.numVisible);
+		particles.buffer.setData((unsigned char*)(&particles.shaderParticles.at(0)), sizeof(ParticleShaderData)*particles.numVisible);
 	}else{
-		((ExternalBuffer*)particles.buffer)->setData((unsigned char*)nullptr, 0);
+		particles.buffer.setData((unsigned char*)nullptr, 0);
 	}
 
 	if (particles.loaded)

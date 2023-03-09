@@ -57,8 +57,10 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
 }
 
 void SokolBuffer::updateBuffer(unsigned int size, void* data){
-    SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
-    //sg_update_buffer(buffer, {data, (size_t)size});
+    if (buffer.id != SG_INVALID_ID){
+        SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
+        //sg_update_buffer(buffer, {data, (size_t)size});
+    }
 }
 
 void SokolBuffer::destroyBuffer(){
