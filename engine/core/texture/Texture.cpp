@@ -144,10 +144,6 @@ Texture::~Texture(){
 
 }
 
-void Texture::cleanupTexture(void* data){
-    static_cast<Texture*>(data)->releaseData();
-}
-
 void Texture::setPath(std::string path){
     destroy();
 
@@ -271,7 +267,9 @@ bool Texture::load(){
 	renderAndData = TexturePool::get(id, type, data, minFilter, magFilter, wrapU, wrapV);
 
     if (releaseDataAfterLoad){
-        SystemRender::scheduleCleanup(cleanupTexture, this);
+        for (int f = 0; f < numFaces; f++){
+            SystemRender::scheduleCleanup(TextureData::cleanupTexture, data[f].getData());
+        }
     }
 
     needLoad = false;

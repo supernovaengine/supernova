@@ -169,8 +169,10 @@ TextureData::~TextureData() {
 }
 
 void TextureData::releaseImageData(){
-    stbi_image_free(data);
-    data = NULL;
+    if (data){
+        stbi_image_free(data);
+        data = NULL;
+    }
 }
 
 int TextureData::getNearestPowerOfTwo(int size){
@@ -369,4 +371,10 @@ void* TextureData::getData(){
 
 bool TextureData::isTransparent(){
     return transparent;
+}
+
+void TextureData::cleanupTexture(void* data){
+    if (data){
+        stbi_image_free(data);
+    }
 }

@@ -69,6 +69,9 @@ namespace Supernova {
         void* getData();
 
         bool isTransparent();
+
+        // render callback clean function
+        static void cleanupTexture(void* data);
     };
     
 }
