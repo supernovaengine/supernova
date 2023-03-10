@@ -737,7 +737,10 @@ void UISystem::update(double dt){
                 if (parentcontainer){
                     if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
                         layout.containerBoxIndex = parentcontainer->numBoxes;
-                        layout.usingAnchors = true;
+                        if (!layout.usingAnchors){
+                            layout.anchorPreset = AnchorPreset::TOP_LEFT;
+                            layout.usingAnchors = true;
+                        }
                         parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
                         parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
 
