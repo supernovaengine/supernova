@@ -25,8 +25,8 @@ using namespace Supernova;
 void SokolSystem::setup(){
     /* setup sokol_gfx */
     sg_desc desc = {0};
-    //desc.pipeline_pool_size = 2048;
-    //desc.buffer_pool_size = 1024;
+    desc.buffer_pool_size = 1024; //default: 128
+    desc.pipeline_pool_size = 512; //default: 64
     desc.context = System::instance().getSokolContext();
 
     sg_setup(&desc);
