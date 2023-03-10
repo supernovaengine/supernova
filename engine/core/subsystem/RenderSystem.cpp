@@ -495,7 +495,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 		buffers["vertices"] = &mesh.buffer;
 		allBuffersEmpty = false;
 	}
-	if (mesh.buffer.getSize() > 0){
+	if (mesh.indices.getSize() > 0){
 		buffers["indices"] = &mesh.indices;
 		allBuffersEmpty = false;
 	}
@@ -505,7 +505,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 	}
 
 	if (mesh.vertexCount == 0){
-		mesh.vertexCount = mesh.buffer.getSize();
+		mesh.vertexCount = mesh.buffer.getCount();
 	}
 
 	if (allBuffersEmpty)
