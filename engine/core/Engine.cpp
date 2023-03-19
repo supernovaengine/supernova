@@ -146,7 +146,9 @@ void Engine::includeScene(size_t index, Scene* scene, bool mainScene){
 void Engine::rearrangeScenes(size_t index){
     if (index >= 0 && index < (MAX_SCENE_LAYERS-1)){
         for (int i = index; i < (MAX_SCENE_LAYERS-1); i++){
-            scenes[i] = scenes[i+1];
+            Scene* temp = scenes[i+1];
+            scenes[i+1] = scenes[i];
+            scenes[i] = temp;
         }
     }
 }
