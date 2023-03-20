@@ -483,6 +483,13 @@ bool UISystem::createOrUpdateText(TextComponent& text, UIComponent& ui, UILayout
             text.loaded = false;
         }
         if (!text.loaded){
+            if (layout.width > 0){
+                text.fixedWidth = true;
+            }
+            if (layout.height > 0){
+                text.fixedHeight = true;
+            }
+
             loadFontAtlas(text, ui, layout);
         }
         createText(text, ui, layout);
