@@ -86,13 +86,15 @@ unsigned int Text::getMaxTextSize() const{
 void Text::setText(std::string text){
     TextComponent& textcomp = getComponent<TextComponent>();
 
-    if (text.length() > textcomp.maxTextSize){
-        text.resize(textcomp.maxTextSize);
-        Log::warn("Text is bigger than maxTextSize: %i", textcomp.maxTextSize);
-    }
+    if (textcomp.text != text){
+        if (text.length() > textcomp.maxTextSize){
+            text.resize(textcomp.maxTextSize);
+            Log::warn("Text is bigger than maxTextSize: %i", textcomp.maxTextSize);
+        }
 
-    textcomp.text = text;
-    textcomp.needUpdateText = true;
+        textcomp.text = text;
+        textcomp.needUpdateText = true;
+    }
 }
 
 std::string Text::getText() const{
