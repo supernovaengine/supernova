@@ -71,6 +71,8 @@ bool AudioSystem::loadAudio(AudioComponent& audio, Entity entity){
 
     audio.length = audio.sample->getLength();
 
+    init();
+
     audio.loaded = true;
 
     return true;
@@ -78,6 +80,10 @@ bool AudioSystem::loadAudio(AudioComponent& audio, Entity entity){
 
 void AudioSystem::destroyAudio(AudioComponent& audio){
     audio.loaded = false;
+    if (audio.sample){
+        delete audio.sample;
+        audio.sample = NULL;
+    }
 }
 
 bool AudioSystem::seekAudio(AudioComponent& audio, double time){
@@ -253,8 +259,6 @@ void AudioSystem::entityDestroyed(Entity entity){
     if (signature.test(scene->getComponentType<AudioComponent>())){
         AudioComponent& audio = scene->getComponent<AudioComponent>(entity);
 
-        if (audio.sample){
-            delete audio.sample;
-        }
+        destroyAudio(audio);
     }
 }
