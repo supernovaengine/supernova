@@ -17707,6 +17707,11 @@ DEVICE I/O
 #endif
 
 #ifndef MA_NO_DEVICE_IO
+#ifdef MA_WIN32
+    #include <objbase.h>
+    #include <mmreg.h>
+    #include <mmsystem.h>
+#endif
 
 #if defined(MA_APPLE) && (__MAC_OS_X_VERSION_MIN_REQUIRED < 101200)
     #include <mach/mach_time.h> /* For mach_absolute_time() */
@@ -20107,13 +20112,8 @@ static const IID MA_IID_IActivateAudioInterfaceCompletionHandler = {0x41D949AB, 
 
 static const IID MA_CLSID_MMDeviceEnumerator_Instance            = {0xBCDE0395, 0xE52F, 0x467C, {0x8E, 0x3D, 0xC4, 0x57, 0x92, 0x91, 0x69, 0x2E}}; /* BCDE0395-E52F-467C-8E3D-C4579291692E = __uuidof(MMDeviceEnumerator) */
 static const IID MA_IID_IMMDeviceEnumerator_Instance             = {0xA95664D2, 0x9614, 0x4F35, {0xA7, 0x46, 0xDE, 0x8D, 0xB6, 0x36, 0x17, 0xE6}}; /* A95664D2-9614-4F35-A746-DE8DB63617E6 = __uuidof(IMMDeviceEnumerator) */
-#ifdef __cplusplus
-#define MA_CLSID_MMDeviceEnumerator MA_CLSID_MMDeviceEnumerator_Instance
-#define MA_IID_IMMDeviceEnumerator  MA_IID_IMMDeviceEnumerator_Instance
-#else
 #define MA_CLSID_MMDeviceEnumerator &MA_CLSID_MMDeviceEnumerator_Instance
 #define MA_IID_IMMDeviceEnumerator  &MA_IID_IMMDeviceEnumerator_Instance
-#endif
 
 typedef struct ma_IUnknown                                 ma_IUnknown;
 #if defined(MA_WIN32_DESKTOP) || defined(MA_WIN32_GDK)
