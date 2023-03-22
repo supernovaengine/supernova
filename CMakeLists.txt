@@ -123,7 +123,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
         LINK_FLAGS
             "-g \
             -s ALLOW_MEMORY_GROWTH=1 \
-            -s STACK_SIZE=5MB \
+            -s INITIAL_MEMORY=32MB \
+            -s STACK_SIZE=4MB \
             -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\" \
             -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\" \
             ${EM_PRELOAD_FILES} \
