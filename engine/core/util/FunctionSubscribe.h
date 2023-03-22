@@ -143,7 +143,7 @@ namespace Supernova {
                 return false;
             }
 
-            auto index{ distance(tags.begin(), it) };
+            auto index{ std::distance(tags.begin(), it) };
             tags.erase(it);
 
             functions.erase(functions.begin() + index);
