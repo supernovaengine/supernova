@@ -54,10 +54,10 @@ tinyxml2::XMLElement* XMLUtils::getNodeForKey(const char* XMLFilePath, const cha
     return curNode;
 }
 
-const char* XMLUtils::getValueForKey(const char* XMLFilePath, const char* rootName, const char *key){
+std::string XMLUtils::getValueForKey(const char* XMLFilePath, const char* rootName, const char *key){
     if (!key) {
         Log::error("Can't get value in XML (%s): Key is invalid", XMLFilePath);
-        return NULL;
+        return "";
     }
 
     tinyxml2::XMLDocument doc;
@@ -68,10 +68,10 @@ const char* XMLUtils::getValueForKey(const char* XMLFilePath, const char* rootNa
 
     node = XMLUtils::getNodeForKey(XMLFilePath, rootName, key, &rootNode, &doc);
     if (node && node->FirstChild()){
-        return (const char*)(node->FirstChild()->Value());
+        return std::string(node->FirstChild()->Value());
     }
 
-    return NULL;
+    return "";
 }
 
 void XMLUtils::setValueForKey(const char* XMLFilePath, const char* rootName, const char* key, const char* value) {

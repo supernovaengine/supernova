@@ -163,12 +163,12 @@ Data System::getDataForKey(const char *key, const Data& defaultValue){
 }
 
 std::string System::getStringForKey(const char *key, std::string defaultValue){
-    const char* value = XMLUtils::getValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
+    std::string value = XMLUtils::getValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
 
-    if (!value)
+    if (value.empty())
         return defaultValue;
 
-    return std::string(value);
+    return value;
 }
 
 void System::setBoolForKey(const char *key, bool value){

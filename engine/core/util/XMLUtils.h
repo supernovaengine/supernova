@@ -6,6 +6,7 @@
 #define XMLUTILS_H
 
 #include "tinyxml2.h"
+#include <string>
 
 namespace Supernova {
     class XMLUtils {
@@ -14,7 +15,7 @@ namespace Supernova {
 
     public:
         static void setValueForKey(const char* XMLFilePath, const char* rootName, const char* key, const char* value);
-        static const char* getValueForKey(const char* XMLFilePath, const char* rootName, const char* key);
+        static std::string getValueForKey(const char* XMLFilePath, const char* rootName, const char* key);
         static void removeKey(const char* XMLFilePath, const char* rootName, const char *key);
     };
 }
