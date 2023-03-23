@@ -65,6 +65,16 @@ if(APPLE)
     )
 endif()
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_options(
+        soloud 
+
+        PUBLIC 
+
+        "-pthread"
+    )
+endif()
+
 target_link_libraries(
         soloud
         stb

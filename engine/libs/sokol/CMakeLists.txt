@@ -32,7 +32,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
 
     find_package(Threads REQUIRED)
-    target_compile_options(sokol PUBLIC "-pthread")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
@@ -66,6 +65,16 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
 
     # For sokol_audio.h
     #"-framework AudioToolbox"
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_options(
+        sokol 
+
+        PUBLIC 
+
+        "-pthread"
+    )
 endif()
 
 target_link_libraries(

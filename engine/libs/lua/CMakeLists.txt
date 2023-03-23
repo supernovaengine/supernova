@@ -50,6 +50,17 @@ add_library(
 
     ${LUA_SOURCE}
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_options(
+        lua 
+
+        PUBLIC 
+
+        "-pthread"
+    )
+endif()
+
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_link_libraries(
         lua

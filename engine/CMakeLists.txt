@@ -45,6 +45,16 @@ add_library(
     ${SUPERNOVA_SRCS}
 )
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_options(
+        supernova 
+
+        PUBLIC 
+
+        "-pthread"
+    )
+endif()
+
 target_link_libraries(
     supernova
 

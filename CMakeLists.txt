@@ -83,6 +83,7 @@ set(PLATFORM_SOURCE)
 set(PLATFORM_LIBS)
 set(PLATFORM_RESOURCES)
 set(PLATFORM_PROPERTIES)
+set(PLATFORM_OPTIONS)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     add_definitions("-DSUPERNOVA_WEB")
@@ -117,6 +118,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
 
     list(APPEND PLATFORM_LIBS
         idbfs.js
+    )
+
+    list(APPEND PLATFORM_OPTIONS
+        "-pthread"
     )
 
     list(APPEND PLATFORM_PROPERTIES
@@ -223,6 +228,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if (EXISTS "${PROJECT_ROOT}/lua")
         set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/lua)
     endif()
+
+    list(APPEND PLATFORM_OPTIONS
+        "-pthread"
+    )
 
     if (APP_BACKEND STREQUAL "glfw")
         add_definitions("-DSUPERNOVA_GLFW")
@@ -459,9 +468,18 @@ set_target_properties(
     CXX_STANDARD 17
 )
 
+target_compile_options(
+    ${APP_NAME}
+
+    PUBLIC 
+
+    ${PLATFORM_OPTIONS}
+)
+
 target_link_libraries(
     ${APP_NAME}
  
     supernova
     ${PLATFORM_LIBS}
  )
+ 

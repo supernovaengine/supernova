@@ -12,3 +12,13 @@ add_library(
     stb_image_resize.c
 
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_compile_options(
+        stb 
+
+        PUBLIC 
+
+        "-pthread"
+    )
+endif()
