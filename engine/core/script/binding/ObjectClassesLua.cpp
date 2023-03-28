@@ -119,7 +119,11 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("scale", &Object::getScale, (void(Object::*)(Vector3))&Object::setScale)
         .addFunction("setScale", (void(Object::*)(const float))&Object::setScale)
         .addFunction("getWorldScale", &Object::getWorldScale)
-        .addFunction("setBillboard", &Sprite::setBillboard)
+        .addProperty("visible", &Object::isVisible, &Object::setVisible)
+        .addFunction("setBillboard", (void(Object::*)(bool, bool, bool))&Object::setBillboard)
+        .addProperty("billboard", &Object::isBillboard, (void(Object::*)(bool))&Object::setBillboard)
+        .addProperty("fakeBillboard", &Object::isFakeBillboard, &Object::setFakeBillboard)
+        .addProperty("cylindricalBillboard", &Object::isCylindricalBillboard, &Object::setCylindricalBillboard)
         .addFunction("setModelMatrix", &Object::setModelMatrix)
         .addFunction("updateTransform", &Object::updateTransform)
         .endClass();

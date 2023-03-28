@@ -42,7 +42,19 @@ namespace Supernova{
         Vector3 getScale() const;
         Vector3 getWorldScale() const;
 
+        void setVisible(bool visible);
+        bool isVisible() const;
+
         void setBillboard(bool billboard, bool fake = true, bool cylindrical = true);
+
+        void setBillboard(bool billboard);
+        bool isBillboard() const;
+
+        void setFakeBillboard(bool fakeBillboard);
+        bool isFakeBillboard() const;
+
+        void setCylindricalBillboard(bool cylindricalBillboard);
+        bool isCylindricalBillboard() const;
 
         void setModelMatrix(Matrix4 modelMatrix);
 
