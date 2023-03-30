@@ -327,7 +327,8 @@ bool Camera::isTransparentSort() const{
 }
 
 void Camera::updateCamera(){
+    Transform& transform = getComponent<Transform>();
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    camera.needUpdate = true;
+    scene->getSystem<RenderSystem>()->updateCamera(camera, transform);
 }

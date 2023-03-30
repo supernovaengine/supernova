@@ -4,6 +4,8 @@
 
 #include "Object.h"
 
+#include "subsystem/RenderSystem.h"
+
 using namespace Supernova;
 
 Object::Object(Scene* scene): EntityHandle(scene){
@@ -194,5 +196,6 @@ void Object::moveToLast(){
 
 void Object::updateTransform(){
     Transform& transform = getComponent<Transform>();
-    transform.needUpdate = true;
+
+    scene->getSystem<RenderSystem>()->updateTransform(transform);
 }

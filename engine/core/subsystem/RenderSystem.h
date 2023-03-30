@@ -144,7 +144,6 @@ namespace Supernova{
 		void destroySky(SkyComponent& sky);
 
 		
-		void updateCamera(CameraComponent& camera, Transform& transform);
 		void updateSkyViewProjection(SkyComponent& sky, CameraComponent& camera);
 		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);
 		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform);
@@ -164,6 +163,7 @@ namespace Supernova{
 
 		void updateFramebuffer(CameraComponent& camera);
 		void updateTransform(Transform& transform);
+		void updateCamera(CameraComponent& camera, Transform& transform);
 
 		// camera
 		void updateCameraSize(Entity entity);
