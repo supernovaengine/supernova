@@ -221,3 +221,15 @@ bool UILayout::isUsingAnchors() const{
 
     return layout.usingAnchors;
 }
+
+void UILayout::setIgnoreScissor(bool ignoreScissor){
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    layout.ignoreScissor = ignoreScissor;
+}
+
+bool UILayout::isIgnoreScissor() const{
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    return layout.ignoreScissor;
+}

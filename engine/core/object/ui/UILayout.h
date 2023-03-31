@@ -48,6 +48,9 @@ namespace Supernova{
 
         void setUsingAnchors(bool usingAnchors);
         bool isUsingAnchors() const;
+
+        void setIgnoreScissor(bool ignoreScissor);
+        bool isIgnoreScissor() const;
     };
 }
 

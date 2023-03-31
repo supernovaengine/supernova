@@ -384,6 +384,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("anchorOffsetBottom", &UILayout::getAnchorOffsetBottom, &UILayout::setAnchorOffsetBottom)
         .addProperty("anchorPreset", &UILayout::getAnchorPreset, &UILayout::setAnchorPreset)
         .addProperty("usingAnchors", &UILayout::isUsingAnchors, &UILayout::setUsingAnchors)
+        .addProperty("ignoreScissor", &UILayout::isIgnoreScissor, &UILayout::setIgnoreScissor)
         .addFunction("getUILayoutComponent", &Image::getComponent<UILayoutComponent>)
         .endClass();
 
