@@ -42,34 +42,6 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
 
     Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
 
-    Vector2 pivotPos = Vector2(0, 0);
-
-    if (sprite.pivot == PivotPreset::BOTTOM_RIGHT){
-        pivotPos.x = sprite.width;
-    }else if (sprite.pivot == PivotPreset::TOP_RIGHT){
-        pivotPos.x = sprite.width;
-        pivotPos.y = sprite.height;
-    }else if (sprite.pivot == PivotPreset::TOP_LEFT){
-        pivotPos.y = sprite.height;
-    }else if (sprite.pivot == PivotPreset::TOP_CENTER){
-        pivotPos.x = sprite.width / 2.0;
-        pivotPos.y = sprite.height;
-    }else if (sprite.pivot == PivotPreset::BOTTOM_CENTER){
-        pivotPos.x = sprite.width / 2.0;
-    }else if (sprite.pivot == PivotPreset::RIGHT_CENTER){
-        pivotPos.x = sprite.width;
-        pivotPos.y = sprite.height / 2.0;
-    }else if (sprite.pivot == PivotPreset::LEFT_CENTER){
-        pivotPos.y = sprite.height / 2.0;
-    }else if (sprite.pivot == PivotPreset::CENTER){
-        pivotPos.x = sprite.width / 2.0;
-        pivotPos.y = sprite.height / 2.0;
-    }
-
-    if (camera.type == CameraType::CAMERA_2D){
-        pivotPos.y = sprite.height - pivotPos.y;
-    }
-
     Texture& mainTexture = mesh.submeshes[0].material.baseColorTexture;
 
     mainTexture.load();
@@ -79,6 +51,34 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
     if (sprite.width == 0 && sprite.height == 0){
         sprite.width = texWidth;
         sprite.height = texHeight;
+    }
+
+    Vector2 pivotPos = Vector2(0, 0);
+
+    if (sprite.pivotPreset == PivotPreset::BOTTOM_RIGHT){
+        pivotPos.x = sprite.width;
+    }else if (sprite.pivotPreset == PivotPreset::TOP_RIGHT){
+        pivotPos.x = sprite.width;
+        pivotPos.y = sprite.height;
+    }else if (sprite.pivotPreset == PivotPreset::TOP_LEFT){
+        pivotPos.y = sprite.height;
+    }else if (sprite.pivotPreset == PivotPreset::TOP_CENTER){
+        pivotPos.x = sprite.width / 2.0;
+        pivotPos.y = sprite.height;
+    }else if (sprite.pivotPreset == PivotPreset::BOTTOM_CENTER){
+        pivotPos.x = sprite.width / 2.0;
+    }else if (sprite.pivotPreset == PivotPreset::RIGHT_CENTER){
+        pivotPos.x = sprite.width;
+        pivotPos.y = sprite.height / 2.0;
+    }else if (sprite.pivotPreset == PivotPreset::LEFT_CENTER){
+        pivotPos.y = sprite.height / 2.0;
+    }else if (sprite.pivotPreset == PivotPreset::CENTER){
+        pivotPos.x = sprite.width / 2.0;
+        pivotPos.y = sprite.height / 2.0;
+    }
+
+    if (camera.type == CameraType::CAMERA_2D){
+        pivotPos.y = sprite.height - pivotPos.y;
     }
 
     mesh.buffer.addVector3(attVertex, Vector3(-pivotPos.x, -pivotPos.y, 0));

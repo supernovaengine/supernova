@@ -114,17 +114,17 @@ Rect Sprite::getTextureRect() const{
     return mesh.submeshes[0].textureRect;
 }
 
-void Sprite::setPivot(PivotPreset pivot){
+void Sprite::setPivotPreset(PivotPreset pivotPreset){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
-    spritecomp.pivot = pivot;
+    spritecomp.pivotPreset = pivotPreset;
     spritecomp.needUpdateSprite = true;
 }
 
-PivotPreset Sprite::getPivot() const{
+PivotPreset Sprite::getPivotPreset() const{
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
-    return spritecomp.pivot;
+    return spritecomp.pivotPreset;
 }
 
 void Sprite::addFrame(int id, std::string name, Rect rect){

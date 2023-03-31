@@ -27,7 +27,7 @@ namespace Supernova{
 
         FrameData framesRect[MAX_SPRITE_FRAMES];
 
-        PivotPreset pivot = PivotPreset::BOTTOM_LEFT;
+        PivotPreset pivotPreset = PivotPreset::BOTTOM_LEFT;
 
         bool needUpdateSprite = true;
     };

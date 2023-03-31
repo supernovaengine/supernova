@@ -40,8 +40,8 @@ namespace Supernova{
         void setTextureRect(Rect textureRect);
         Rect getTextureRect() const;
 
-        void setPivot(PivotPreset pivot);
-        PivotPreset getPivot() const;
+        void setPivotPreset(PivotPreset pivotPreset);
+        PivotPreset getPivotPreset() const;
 
         void addFrame(int id, std::string name, Rect rect);
         void addFrame(std::string name, float x, float y, float width, float height);

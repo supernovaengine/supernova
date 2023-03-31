@@ -347,7 +347,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("flipY", &Sprite::isFlipY, &Sprite::setFlipY)
         .addProperty("textureRect", &Sprite::getTextureRect, (void(Sprite::*)(Rect))&Sprite::setTextureRect)
         .addFunction("setTextureRect",(void(Sprite::*)(float, float, float, float)) &Sprite::setTextureRect)
-        .addProperty("pivot", &Sprite::getPivot, &Sprite::setPivot)
+        .addProperty("pivotPreset", &Sprite::getPivotPreset, &Sprite::setPivotPreset)
         .addFunction("addFrame", 
             luabridge::overload<int, std::string, Rect>(&Sprite::addFrame),
             luabridge::overload<std::string, float, float, float, float>(&Sprite::addFrame),
