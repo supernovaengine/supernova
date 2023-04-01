@@ -737,24 +737,25 @@ void UISystem::update(double dt){
 
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
+            if (transform.visible){
+                UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
+                if (parentlayout){
+                    UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
+                    if (parentcontainer){
+                        if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
+                            layout.containerBoxIndex = parentcontainer->numBoxes;
+                            if (!layout.usingAnchors){
+                                layout.anchorPreset = AnchorPreset::TOP_LEFT;
+                                layout.usingAnchors = true;
+                            }
+                            parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
+                            parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
 
-            UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
-            if (parentlayout){
-                UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
-                if (parentcontainer){
-                    if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
-                        layout.containerBoxIndex = parentcontainer->numBoxes;
-                        if (!layout.usingAnchors){
-                            layout.anchorPreset = AnchorPreset::TOP_LEFT;
-                            layout.usingAnchors = true;
+                            parentcontainer->numBoxes = parentcontainer->numBoxes + 1;
+                        }else{
+                            transform.parent = NULL_ENTITY;
+                            Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
                         }
-                        parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
-                        parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
-
-                        parentcontainer->numBoxes = parentcontainer->numBoxes + 1;
-                    }else{
-                        transform.parent = NULL_ENTITY;
-                        Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
                     }
                 }
             }
