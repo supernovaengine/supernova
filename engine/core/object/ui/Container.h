@@ -18,6 +18,7 @@ namespace Supernova{
 
         void resize();
 
+        void setBoxExpand(bool expand);
         void setBoxExpand(size_t id, bool expand);
         bool isBoxExpand(size_t id) const;
     };

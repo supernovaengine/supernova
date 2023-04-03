@@ -393,7 +393,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (*) (Scene*)> ()
         .addProperty("type", &Container::getType, &Container::setType)
         .addFunction("resize", &Container::resize)
-        .addFunction("setBoxExpand", &Container::setBoxExpand)
+        .addFunction("setBoxExpand", 
+            luabridge::overload<size_t, bool>(&Container::setBoxExpand),
+            luabridge::overload<bool>(&Container::setBoxExpand))
         .addFunction("isBoxExpand", &Container::isBoxExpand)
         .endClass();
 
