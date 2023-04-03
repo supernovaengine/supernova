@@ -392,6 +392,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<Container, UILayout>("Container")
         .addConstructor <void (*) (Scene*)> ()
         .addProperty("type", &Container::getType, &Container::setType)
+        .addFunction("resize", &Container::resize)
         .addFunction("setBoxExpand", &Container::setBoxExpand)
         .addFunction("isBoxExpand", &Container::isBoxExpand)
         .endClass();
