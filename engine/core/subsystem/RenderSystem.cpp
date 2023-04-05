@@ -1372,7 +1372,7 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 
 		render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
 		render.applyUniformBlock(particles.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
-		render.draw(particles.particles.size());
+		render.draw(particles.numVisible);
 	}
 }
 

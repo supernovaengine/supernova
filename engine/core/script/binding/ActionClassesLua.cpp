@@ -134,6 +134,8 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addConstructor <void (*) (Scene*)> ()
         .addProperty("rate", &ParticlesAnimation::getRate, &ParticlesAnimation::setRate)
         .addProperty("maxPerUpdate", &ParticlesAnimation::getMaxPerUpdate, &ParticlesAnimation::setMaxPerUpdate)
+        .addProperty("emitter", &ParticlesAnimation::isEmitter, &ParticlesAnimation::setEmitter)
+        .addProperty("loop", &ParticlesAnimation::isLoop, &ParticlesAnimation::setLoop)
         .addFunction("setLifeInitializer", 
             luabridge::overload<float>(&ParticlesAnimation::setLifeInitializer),
             luabridge::overload<float, float>(&ParticlesAnimation::setLifeInitializer))

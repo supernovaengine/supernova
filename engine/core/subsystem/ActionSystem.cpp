@@ -288,10 +288,12 @@ int ActionSystem::findUnusedParticle(ParticlesComponent& particles, ParticlesAni
         }
     }
 
-    for (int i=0; i<partanim.lastUsedParticle; i++){
-        if (particles.particles[i].life <= particles.particles[i].time){
-            partanim.lastUsedParticle = i;
-            return i;
+    if (partanim.loop){
+        for (int i=0; i<partanim.lastUsedParticle; i++){
+            if (particles.particles[i].life <= particles.particles[i].time){
+                partanim.lastUsedParticle = i;
+                return i;
+            }
         }
     }
 
@@ -485,14 +487,14 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
             int particleIndex = findUnusedParticle(particles, partanim);
 
             if (particleIndex >= 0){
-
                 particles.particles[particleIndex].time = 0;
-
                 applyParticleInitializers(particleIndex, particles, partanim);
-
                 particles.needUpdate = true;
+            }else{
+                if (!partanim.loop)
+                    partanim.emitter = false;
+                break;
             }
-
         }
     }
 

@@ -23,6 +23,30 @@ int ParticlesAnimation::getRate() const{
     return partAnim.rate;
 }
 
+void ParticlesAnimation::setEmitter(bool emitter){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.emitter = emitter;
+}
+
+bool ParticlesAnimation::isEmitter() const{
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    return partAnim.emitter;
+}
+
+void ParticlesAnimation::setLoop(bool loop){
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    partAnim.loop = loop;
+}
+
+bool ParticlesAnimation::isLoop() const{
+    ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
+
+    return partAnim.loop;
+}
+
 void ParticlesAnimation::setMaxPerUpdate(int maxPerUpdate){
     ParticlesAnimationComponent& partAnim = getComponent<ParticlesAnimationComponent>();
     

@@ -16,6 +16,12 @@ namespace Supernova{
         void setRate(int rate);
         int getRate() const;
 
+        void setEmitter(bool emitter);
+        bool isEmitter() const;
+
+        void setLoop(bool loop);
+        bool isLoop() const;
+
         void setMaxPerUpdate(int maxPerUpdate);
         int getMaxPerUpdate() const;
 
