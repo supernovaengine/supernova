@@ -94,8 +94,8 @@ namespace Supernova{
     };
 
     struct ParticleSizeInitializer{
-        float minSize = 1;
-        float maxSize = 1;
+        float minSize = 0;
+        float maxSize = 0;
     };
 
     struct ParticleSizeModifier{

@@ -455,6 +455,12 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
 }
 
 void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, ParticlesComponent& particles){
+    if (partanim.sizeInitializer.minSize == 0 && partanim.sizeInitializer.maxSize == 0){
+        float size = std::max(particles.texture.getWidth(), particles.texture.getHeight());
+        partanim.sizeInitializer.minSize = size;
+        partanim.sizeInitializer.maxSize = size;
+    }
+
     // Creating particles
     particles.particles.clear();
     for (int i = 0; i < particles.maxParticles; i++){
