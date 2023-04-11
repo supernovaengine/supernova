@@ -120,20 +120,31 @@ void SokolObject::addIndex(BufferRender* buffer, AttributeDataType dataType, siz
 void SokolObject::addAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
     if (slotAttribute != -1){
         sg_buffer vbuf = buffer->backend.get();
+
+        // D3D11 cannot have offset (AlignedByteOffset) bigger than 2048
+        // https://github.com/floooh/sokol/issues/818
+        #ifdef SOKOL_D3D11
+        size_t bufferOffset = offset;
+        size_t attrOffset = 0;
+        #else
+        size_t bufferOffset = 0;
+        size_t attrOffset = offset;
+        #endif
         
-        if (bufferToBindSlot.count(vbuf.id) == 0){
+        if (bufferToBindSlot.count({vbuf.id, bufferOffset}) == 0){
             bind.vertex_buffers[bindSlotIndex] = vbuf;
-            bufferToBindSlot[vbuf.id] = bindSlotIndex;
+            bind.vertex_buffer_offsets[bindSlotIndex] = bufferOffset;
+            bufferToBindSlot[{vbuf.id, bufferOffset}] = bindSlotIndex;
 
             pipeline_desc.layout.buffers[bindSlotIndex].stride = stride;
 
             bindSlotIndex++;
         }
 
-        size_t indexBuf = bufferToBindSlot[vbuf.id];
+        size_t indexBuf = bufferToBindSlot[{vbuf.id, bufferOffset}];
 
         pipeline_desc.layout.attrs[slotAttribute].buffer_index = indexBuf;
-        pipeline_desc.layout.attrs[slotAttribute].offset = offset;
+        pipeline_desc.layout.attrs[slotAttribute].offset = attrOffset;
         pipeline_desc.layout.attrs[slotAttribute].format = getVertexFormat(elements, dataType, normalized);
     }
 }

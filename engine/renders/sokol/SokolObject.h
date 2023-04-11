@@ -13,7 +13,7 @@
 
 #include "sokol_gfx.h"
 
-#include <unordered_map>
+#include <map>
 
 
 namespace Supernova{
@@ -21,6 +21,19 @@ namespace Supernova{
     struct UniformStageSlot{
         sg_shader_stage stage;
         int slot;
+    };
+
+    struct BufferInfo{
+        uint32_t id;
+        size_t offset;
+
+        bool const operator==(const BufferInfo &o) const {
+        return id == o.id && offset == o.offset;
+        }
+
+        bool const operator<(const BufferInfo &o) const {
+            return id < o.id || (id == o.id && offset < o.offset);
+        }
     };
 
     class SokolObject{
@@ -37,7 +50,7 @@ namespace Supernova{
 
         size_t bindSlotIndex;
 
-        std::unordered_map< uint32_t, size_t > bufferToBindSlot;
+        std::map< BufferInfo, size_t > bufferToBindSlot;
 
 
         sg_vertex_format getVertexFormat(unsigned int elements, AttributeDataType dataType, bool normalized);
