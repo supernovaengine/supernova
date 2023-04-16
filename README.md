@@ -7,7 +7,7 @@
 **Entity component system (ECS)** and **data-oriented design** engine using object oriented for API.
 
 
-Supernova is a **free** and open source cross-platform game engine for create 2D and 3D projects with Lua or C++. It is lightweight and promote the simplest way to use de best performance of data-oriented design.
+Supernova is a **free** and open-source, cross-platform game engine for creating 2D and 3D projects with Lua or C++. It is lightweight and promotes the simplest way to use the best performance of a data-oriented design.
 
 ![Screenshot1](https://supernovaengine.org/img/screen1.png)
 
