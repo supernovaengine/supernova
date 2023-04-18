@@ -472,6 +472,8 @@ void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, Pa
     }
 
     partanim.emitter = true;
+    partanim.newParticlesCount = 0;
+    partanim.lastUsedParticle = 0;
 }
 
 void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, ParticlesComponent& particles){

@@ -138,13 +138,13 @@ namespace Supernova{
 
     struct ParticlesAnimationComponent{
         float newParticlesCount = 0;
+        int lastUsedParticle = 0;
         bool emitter = false;
+
         bool loop = true;
 
         int rate = 5; //per second
         int maxPerUpdate = 100;
-
-        int lastUsedParticle = 0;
 
         ParticleLifeInitializer lifeInitializer;
 
