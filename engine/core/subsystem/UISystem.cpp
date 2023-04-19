@@ -79,27 +79,39 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
 
     Attribute* atrTexcoord = ui.buffer.getAttribute(AttributeType::TEXCOORD1);
 
-    ui.buffer.addVector2(atrTexcoord, Vector2(0.0f, 0.0f));
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, 0.0f));
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f));
-    ui.buffer.addVector2(atrTexcoord, Vector2(0.0f, 1.0f));
+    float texCutRatioW = 0;
+    float texCutRatioH = 0;
+    if (texWidth != 0 && texHeight != 0){
+        texCutRatioW = 1.0 / texWidth * TEXTURE_CUT_FACTOR;
+        texCutRatioH = 1.0 / texHeight * TEXTURE_CUT_FACTOR;
+    }
+
+    float x0 = texCutRatioW;
+    float x1 = 1.0-texCutRatioW;
+    float y0 = texCutRatioH;
+    float y1 = 1.0-texCutRatioH;
+
+    ui.buffer.addVector2(atrTexcoord, Vector2(x0, y0));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x1, y0));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x1, y1));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x0, y1));
 
     ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)texWidth, img.patchMarginTop/(float)texHeight));
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)texWidth), img.patchMarginTop/(float)texHeight));
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)texWidth), 1.0f-(img.patchMarginBottom/(float)texHeight)));
-    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)texWidth, 1.0f-(img.patchMarginBottom/(float)texHeight)));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x1-(img.patchMarginRight/(float)texWidth), img.patchMarginTop/(float)texHeight));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x1-(img.patchMarginRight/(float)texWidth), y1-(img.patchMarginBottom/(float)texHeight)));
+    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)texWidth, y1-(img.patchMarginBottom/(float)texHeight)));
 
-    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)texWidth, 0));
-    ui.buffer.addVector2(atrTexcoord, Vector2(0, img.patchMarginTop/(float)texHeight));
+    ui.buffer.addVector2(atrTexcoord, Vector2(img.patchMarginLeft/(float)texWidth, y0));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x0, img.patchMarginTop/(float)texHeight));
 
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)texWidth), 0));
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, img.patchMarginTop/(float)texHeight));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x1-(img.patchMarginRight/(float)texWidth), y0));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x1, img.patchMarginTop/(float)texHeight));
 
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f-(img.patchMarginRight/(float)texWidth), 1.0f));
-    ui.buffer.addVector2(atrTexcoord, Vector2(1.0f, 1.0f-(img.patchMarginBottom/(float)texHeight)));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x1-(img.patchMarginRight/(float)texWidth), y1));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x1, y1-(img.patchMarginBottom/(float)texHeight)));
 
-    ui.buffer.addVector2(atrTexcoord, Vector2((img.patchMarginLeft/(float)texWidth), 1.0f));
-    ui.buffer.addVector2(atrTexcoord, Vector2(0, 1.0f-(img.patchMarginBottom/(float)texHeight)));
+    ui.buffer.addVector2(atrTexcoord, Vector2((img.patchMarginLeft/(float)texWidth), y1));
+    ui.buffer.addVector2(atrTexcoord, Vector2(x0, y1-(img.patchMarginBottom/(float)texHeight)));
 
     if (ui.flipY){
         for (int i = 0; i < ui.buffer.getCount(); i++){
