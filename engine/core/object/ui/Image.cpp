@@ -137,10 +137,19 @@ void Image::setColor(const float red, const float green, const float blue){
     setColor(Vector4(red, green, blue, getColor().w));
 }
 
+void Image::setAlpha(const float alpha){
+    Vector4 color = getColor();
+    setColor(Vector4(color.x, color.y, color.z, alpha));
+}
+
 Vector4 Image::getColor() const{
     UIComponent& ui = getComponent<UIComponent>();
 
     return Color::linearTosRGB(ui.color);
+}
+
+float Image::getAlpha() const{
+    return getColor().w;
 }
 
 void Image::setFlipY(bool flipY){

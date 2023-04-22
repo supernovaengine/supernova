@@ -116,10 +116,19 @@ void Terrain::setColor(const float red, const float green, const float blue){
     setColor(Vector4(red, green, blue, getColor().w));
 }
 
+void Terrain::setAlpha(const float alpha){
+    Vector4 color = getColor();
+    setColor(Vector4(color.x, color.y, color.z, alpha));
+}
+
 Vector4 Terrain::getColor() const{
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     return Color::linearTosRGB(terrain.material.baseColorFactor);
+}
+
+float Terrain::getAlpha() const{
+    return getColor().w;
 }
 
 void Terrain::setSize(float size){

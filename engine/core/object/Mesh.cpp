@@ -52,10 +52,19 @@ void Mesh::setColor(const float red, const float green, const float blue){
     setColor(Vector4(red, green, blue, getColor().w));
 }
 
+void Mesh::setAlpha(const float alpha){
+    Vector4 color = getColor();
+    setColor(Vector4(color.x, color.y, color.z, alpha));
+}
+
 Vector4 Mesh::getColor() const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return Color::linearTosRGB(mesh.submeshes[0].material.baseColorFactor);
+}
+
+float Mesh::getAlpha() const{
+    return getColor().w;
 }
 
 Material& Mesh::getMaterial(unsigned int submesh){

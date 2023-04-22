@@ -198,6 +198,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setColor", 
             luabridge::overload<const float, const float, const float>(&Mesh::setColor),
             luabridge::overload<const float, const float, const float, const float>(&Mesh::setColor))
+        .addProperty("alpha", &Mesh::getAlpha, &Mesh::setAlpha)
         .addFunction("getMaterial", &Mesh::getMaterial)
         .endClass();
 
@@ -238,6 +239,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setColor", 
             luabridge::overload<const float, const float, const float>(&Terrain::setColor),
             luabridge::overload<const float, const float, const float, const float>(&Terrain::setColor))
+        .addProperty("alpha", &Terrain::getAlpha, &Terrain::setAlpha)
         .addProperty("size", &Terrain::getSize, &Terrain::setSize)
         .addProperty("maxHeight", &Terrain::getMaxHeight, &Terrain::setMaxHeight)
         .addProperty("resolution", &Terrain::getResolution, &Terrain::setResolution)
@@ -409,6 +411,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setColor", 
             luabridge::overload<const float, const float, const float>(&Polygon::setColor),
             luabridge::overload<const float, const float, const float, const float>(&Polygon::setColor))
+        .addProperty("alpha", &Polygon::getAlpha, &Polygon::setAlpha)
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Polygon::setTexture),
             luabridge::overload<Framebuffer*>(&Polygon::setTexture))
@@ -430,6 +433,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setColor", 
             luabridge::overload<const float, const float, const float>(&Text::setColor),
             luabridge::overload<const float, const float, const float, const float>(&Text::setColor))
+        .addProperty("alpha", &Text::getAlpha, &Text::setAlpha)
         .addFunction("getAscent", &Text::getAscent)
         .addFunction("getDescent", &Text::getDescent)
         .addFunction("getLineGap", &Text::getLineGap)
@@ -458,6 +462,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setColor", 
             luabridge::overload<const float, const float, const float>(&Image::setColor),
             luabridge::overload<const float, const float, const float, const float>(&Image::setColor))
+        .addProperty("alpha", &Image::getAlpha, &Image::setAlpha)
         .addProperty("flipY", &Image::isFlipY, &Image::setFlipY)
         .addFunction("getUIComponent", &Image::getComponent<UIComponent>)
         .endClass();

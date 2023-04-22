@@ -80,10 +80,19 @@ void Polygon::setColor(const float red, const float green, const float blue){
     setColor(Vector4(red, green, blue, getColor().w));
 }
 
+void Polygon::setAlpha(const float alpha){
+    Vector4 color = getColor();
+    setColor(Vector4(color.x, color.y, color.z, alpha));
+}
+
 Vector4 Polygon::getColor() const{
     UIComponent& ui = getComponent<UIComponent>();
 
     return ui.color;
+}
+
+float Polygon::getAlpha() const{
+    return getColor().w;
 }
 
 void Polygon::setFlipY(bool flipY){
