@@ -39,13 +39,10 @@ void TextEdit::setText(std::string text){
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(tecomp.text);
 
-    if (text.length() > textcomp.maxTextSize){
-        text.resize(textcomp.maxTextSize);
-        Log::warn("Text is bigger than maxTextSize: %i", textcomp.maxTextSize);
+    if (textcomp.text != text){
+        textcomp.text = text;
+        textcomp.needUpdateText = true;
     }
-
-    textcomp.text = text;
-    textcomp.needUpdateText = true;
 }
 
 std::string TextEdit::getText() const{

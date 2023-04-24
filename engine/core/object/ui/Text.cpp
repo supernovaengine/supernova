@@ -87,11 +87,6 @@ void Text::setText(std::string text){
     TextComponent& textcomp = getComponent<TextComponent>();
 
     if (textcomp.text != text){
-        if (text.length() > textcomp.maxTextSize){
-            text.resize(textcomp.maxTextSize);
-            Log::warn("Text is bigger than maxTextSize: %i", textcomp.maxTextSize);
-        }
-
         textcomp.text = text;
         textcomp.needUpdateText = true;
     }

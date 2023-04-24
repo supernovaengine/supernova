@@ -204,10 +204,18 @@ void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponen
     ui.indices.clear();
     ui.indices.setUsage(BufferUsage::DYNAMIC);
 
+    std::vector<uint16_t> indices_array;
+
+    if (text.text.length() > text.maxTextSize){
+        Log::warn("Text is bigger than maxTextSize: %i. Increasing it to: %i", text.maxTextSize, text.text.length());
+        text.maxTextSize = text.text.length();
+        if (ui.loaded){
+            ui.needReload = true;
+        }
+    }
+
     ui.minBufferCount = text.maxTextSize * 4;
     ui.minIndicesCount = text.maxTextSize * 6;
-
-    std::vector<uint16_t> indices_array;
 
     text.stbtext->createText(text.text, &ui.buffer, indices_array, text.charPositions, layout.width, layout.height, text.fixedWidth, text.fixedHeight, text.multiline, ui.flipY);
 

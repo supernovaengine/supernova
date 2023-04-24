@@ -25,13 +25,10 @@ void Button::setLabel(std::string text){
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(btcomp.label);
 
-    if (text.length() > textcomp.maxTextSize){
-        text.resize(textcomp.maxTextSize);
-        Log::warn("Text is bigger than maxTextSize: %i", textcomp.maxTextSize);
+    if (textcomp.text != text){
+        textcomp.text = text;
+        textcomp.needUpdateText = true;
     }
-
-    textcomp.text = text;
-    textcomp.needUpdateText = true;
 }
 
 std::string Button::getLabel() const{
