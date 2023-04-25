@@ -59,8 +59,8 @@ namespace Supernova {
         static int canvasWidth;
         static int canvasHeight;
         
-        static int preferedCanvasWidth;
-        static int preferedCanvasHeight;
+        static int preferredCanvasWidth;
+        static int preferredCanvasHeight;
         
         static Rect viewRect;
 
@@ -107,8 +107,8 @@ namespace Supernova {
         static int getCanvasHeight();
         static void setCanvasSize(int canvasWidth, int canvasHeight);
         
-        static int getPreferedCanvasWidth();
-        static int getPreferedCanvasHeight();
+        static int getPreferredCanvasWidth();
+        static int getPreferredCanvasHeight();
         
         static Rect getViewRect();
         

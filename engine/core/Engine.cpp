@@ -23,8 +23,8 @@ size_t Engine::numScenes = 0;
 int Engine::canvasWidth;
 int Engine::canvasHeight;
 
-int Engine::preferedCanvasWidth;
-int Engine::preferedCanvasHeight;
+int Engine::preferredCanvasWidth;
+int Engine::preferredCanvasHeight;
 
 Rect Engine::viewRect;
 
@@ -162,18 +162,18 @@ int Engine::getCanvasHeight(){
 }
 
 void Engine::setCanvasSize(int canvasWidth, int canvasHeight){
-    Engine::preferedCanvasWidth = canvasWidth;
-    Engine::preferedCanvasHeight = canvasHeight;
+    Engine::preferredCanvasWidth = canvasWidth;
+    Engine::preferredCanvasHeight = canvasHeight;
 
     calculateCanvas();
 }
 
-int Engine::getPreferedCanvasWidth(){
-    return Engine::preferedCanvasWidth;
+int Engine::getPreferredCanvasWidth(){
+    return Engine::preferredCanvasWidth;
 }
 
-int Engine::getPreferedCanvasHeight(){
-    return Engine::preferedCanvasHeight;
+int Engine::getPreferredCanvasHeight(){
+    return Engine::preferredCanvasHeight;
 }
 
 Rect Engine::getViewRect(){
@@ -325,8 +325,8 @@ float Engine::getDeltatime(){
 }
 
 void Engine::calculateCanvas(){
-    Engine::canvasWidth = preferedCanvasWidth;
-    Engine::canvasHeight = preferedCanvasHeight;
+    Engine::canvasWidth = preferredCanvasWidth;
+    Engine::canvasHeight = preferredCanvasHeight;
 
     int screenWidth = System::instance().getScreenWidth();
     int screenHeight = System::instance().getScreenHeight();
@@ -334,12 +334,12 @@ void Engine::calculateCanvas(){
     //When canvas size is changed
     if (screenWidth != 0 && screenHeight != 0){
         if (scalingMode == Scaling::FITWIDTH){
-            Engine::canvasWidth = preferedCanvasWidth;
-            Engine::canvasHeight = screenHeight * preferedCanvasWidth / screenWidth;
+            Engine::canvasWidth = preferredCanvasWidth;
+            Engine::canvasHeight = screenHeight * preferredCanvasWidth / screenWidth;
         }
         if (scalingMode == Scaling::FITHEIGHT){
-            Engine::canvasHeight = preferedCanvasHeight;
-            Engine::canvasWidth = screenWidth * preferedCanvasHeight / screenHeight;
+            Engine::canvasHeight = preferredCanvasHeight;
+            Engine::canvasWidth = screenWidth * preferredCanvasHeight / screenHeight;
         }
         if (scalingMode == Scaling::NATIVE){
             Engine::canvasHeight = screenHeight;
@@ -396,19 +396,19 @@ void Engine::systemViewChanged(){
     int viewHeight = screenHeight;
     
     float screenAspect = (float)screenWidth / (float)screenHeight;
-    float canvasAspect = (float)Engine::getPreferedCanvasWidth() / (float)Engine::getPreferedCanvasHeight();
+    float canvasAspect = (float)Engine::getPreferredCanvasWidth() / (float)Engine::getPreferredCanvasHeight();
     
     //When canvas size is not changed
     if (Engine::getScalingMode() == Scaling::LETTERBOX){
         if (screenAspect < canvasAspect){
-            float aspect = (float)screenWidth / (float)Engine::getPreferedCanvasWidth();
-            int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
+            float aspect = (float)screenWidth / (float)Engine::getPreferredCanvasWidth();
+            int newHeight = (int)((float)Engine::getPreferredCanvasHeight() * aspect);
             int dif = screenHeight - newHeight;
             viewY = (dif/2);
             viewHeight = screenHeight-(viewY*2); //diff could be odd, for this use view*2
         }else{
-            float aspect = (float)screenHeight / (float)Engine::getPreferedCanvasHeight();
-            int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
+            float aspect = (float)screenHeight / (float)Engine::getPreferredCanvasHeight();
+            int newWidth = (int)((float)Engine::getPreferredCanvasWidth() * aspect);
             int dif = screenWidth - newWidth;
             viewX = (dif/2);
             viewWidth = screenWidth-(viewX*2);
@@ -417,14 +417,14 @@ void Engine::systemViewChanged(){
     
     if (Engine::getScalingMode() == Scaling::CROP){
         if (screenAspect > canvasAspect){
-            float aspect = (float)screenWidth / (float)Engine::getPreferedCanvasWidth();
-            int newHeight = (int)((float)Engine::getPreferedCanvasHeight() * aspect);
+            float aspect = (float)screenWidth / (float)Engine::getPreferredCanvasWidth();
+            int newHeight = (int)((float)Engine::getPreferredCanvasHeight() * aspect);
             int dif = screenHeight - newHeight;
             viewY = (dif/2);
             viewHeight = screenHeight-(viewY*2);
         }else{
-            float aspect = (float)screenHeight / (float)Engine::getPreferedCanvasHeight();
-            int newWidth = (int)((float)Engine::getPreferedCanvasWidth() * aspect);
+            float aspect = (float)screenHeight / (float)Engine::getPreferredCanvasHeight();
+            int newWidth = (int)((float)Engine::getPreferredCanvasWidth() * aspect);
             int dif = screenWidth - newWidth;
             viewX = (dif/2);
             viewWidth = screenWidth-(viewX*2);
