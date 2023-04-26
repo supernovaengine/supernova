@@ -146,7 +146,7 @@ namespace Supernova{
 		
 		void updateSkyViewProjection(SkyComponent& sky, CameraComponent& camera);
 		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);
-		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform);
+		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentParticles);
 		void updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 		bool updateCameraFrustumPlanes(CameraComponent& camera);
 

@@ -77,9 +77,7 @@ void RenderSystem::destroy(){
 		Entity entity = transforms->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-		if (signature.test(scene->getComponentType<CameraComponent>())){
-			continue;
-		}else if (signature.test(scene->getComponentType<MeshComponent>())){
+		if (signature.test(scene->getComponentType<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 			if (mesh.loaded){
 				destroyMesh(mesh);
@@ -1625,9 +1623,13 @@ void RenderSystem::updateSkyViewProjection(SkyComponent& sky, CameraComponent& c
 	sky.skyViewProjectionMatrix = camera.projectionMatrix * skyViewMatrix;
 }
 
-void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform){
+void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentParticles){
 	particles.shaderParticles.clear();
 	particles.shaderParticles.reserve(particles.particles.size());
+
+	float screenScaleW = System::instance().getScreenWidth() / (float)Engine::getCanvasWidth();
+	float screenScaleH = System::instance().getScreenHeight() / (float)Engine::getCanvasHeight();
+	float screenScale = std::max(screenScaleW, screenScaleH);
 
 	particles.numVisible = 0;
 	size_t particlesSize = (particles.particles.size() < particles.maxParticles)? particles.particles.size() : particles.maxParticles;
@@ -1636,14 +1638,14 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 			particles.shaderParticles.push_back({});
 			particles.shaderParticles[particles.numVisible].position = particles.particles[i].position;
 			particles.shaderParticles[particles.numVisible].color = particles.particles[i].color;
-			particles.shaderParticles[particles.numVisible].size = particles.particles[i].size;
+			particles.shaderParticles[particles.numVisible].size = particles.particles[i].size * screenScale;
 			particles.shaderParticles[particles.numVisible].rotation = particles.particles[i].rotation;
 			particles.shaderParticles[particles.numVisible].textureRect = particles.particles[i].textureRect;
 			particles.numVisible++;
 		}
 	}
 
-	if (particles.transparent && camera.type != CameraType::CAMERA_2D){
+	if (sortTransparentParticles){
 		auto comparePoints = [&transform, &camTransform](const ParticleShaderData& a, const ParticleShaderData& b) -> bool {
 			float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
 			float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
@@ -2280,9 +2282,7 @@ void RenderSystem::update(double dt){
 		Entity entity = transforms->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-		if (signature.test(scene->getComponentType<CameraComponent>())){
-			continue;
-		}else if (signature.test(scene->getComponentType<MeshComponent>())){
+		if (signature.test(scene->getComponentType<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 			if (mesh.loaded && mesh.needReload){
 				destroyMesh(mesh);
@@ -2377,9 +2377,11 @@ void RenderSystem::update(double dt){
         if (signature.test(scene->getComponentType<ParticlesComponent>())){
 			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
 
-			if (particles.needUpdate || mainCamera.needUpdate || transform.needUpdate){
-				if (!hasMultipleCameras){
-					updateParticles(particles, transform, mainCamera, mainCameraTransform);
+			bool sortTransparentParticles = particles.transparent && mainCamera.type != CameraType::CAMERA_2D;
+
+			if (particles.needUpdate || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentParticles)){
+				if (!hasMultipleCameras || !sortTransparentParticles){
+					updateParticles(particles, transform, mainCamera, mainCameraTransform, sortTransparentParticles);
 				}
 			}
 
@@ -2584,8 +2586,10 @@ void RenderSystem::draw(){
 			}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
 				ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
 
-				if (hasMultipleCameras){
-					updateParticles(particles, transform, camera, cameraTransform);
+				bool sortTransparentParticles = particles.transparent && camera.type != CameraType::CAMERA_2D;
+
+				if (hasMultipleCameras && sortTransparentParticles){
+					updateParticles(particles, transform, camera, cameraTransform, sortTransparentParticles);
 				}
 
 				if (transform.visible)
