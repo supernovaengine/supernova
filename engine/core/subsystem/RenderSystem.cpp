@@ -1627,9 +1627,10 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 	particles.shaderParticles.clear();
 	particles.shaderParticles.reserve(particles.particles.size());
 
-	float screenScaleW = System::instance().getScreenWidth() / (float)Engine::getCanvasWidth();
-	float screenScaleH = System::instance().getScreenHeight() / (float)Engine::getCanvasHeight();
-	float screenScale = std::max(screenScaleW, screenScaleH);
+	// point particle sizes are in pixels, need to convert it to canvas size
+	float sizeScaleW = System::instance().getScreenWidth() / (float)Engine::getCanvasWidth();
+	float sizeScaleH = System::instance().getScreenHeight() / (float)Engine::getCanvasHeight();
+	float sizeScale = std::max(sizeScaleW, sizeScaleH);
 
 	particles.numVisible = 0;
 	size_t particlesSize = (particles.particles.size() < particles.maxParticles)? particles.particles.size() : particles.maxParticles;
@@ -1638,7 +1639,7 @@ void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& tra
 			particles.shaderParticles.push_back({});
 			particles.shaderParticles[particles.numVisible].position = particles.particles[i].position;
 			particles.shaderParticles[particles.numVisible].color = particles.particles[i].color;
-			particles.shaderParticles[particles.numVisible].size = particles.particles[i].size * screenScale;
+			particles.shaderParticles[particles.numVisible].size = particles.particles[i].size * sizeScale;
 			particles.shaderParticles[particles.numVisible].rotation = particles.particles[i].rotation;
 			particles.shaderParticles[particles.numVisible].textureRect = particles.particles[i].textureRect;
 			particles.numVisible++;
