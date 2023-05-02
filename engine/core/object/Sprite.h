@@ -55,6 +55,7 @@ namespace Supernova{
 
         void startAnimation(std::vector<int> frames, std::vector<int> framesTime, bool loop);
         void startAnimation(int startFrame, int endFrame, int interval, bool loop);
+        void startAnimation(std::string name, int interval, bool loop);
         void pauseAnimation();
         void stopAnimation();
 

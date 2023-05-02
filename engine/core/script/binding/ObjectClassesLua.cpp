@@ -363,7 +363,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<std::string>(&Sprite::setFrame))
         .addFunction("startAnimation", 
             luabridge::overload<std::vector<int>, std::vector<int>, bool>(&Sprite::startAnimation),
-            luabridge::overload<int, int, int, bool>(&Sprite::startAnimation))
+            luabridge::overload<int, int, int, bool>(&Sprite::startAnimation),
+            luabridge::overload<std::string, int, bool>(&Sprite::startAnimation))
         .addFunction("pauseAnimation", &Sprite::pauseAnimation)
         .addFunction("stopAnimation", &Sprite::stopAnimation)
         .endClass();

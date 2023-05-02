@@ -206,8 +206,13 @@ void Sprite::startAnimation(std::vector<int> frames, std::vector<int> framesTime
         animation = new SpriteAnimation(scene);
         animation->setTarget(entity);
     }
-    animation->setAnimation(frames, framesTime, loop);
-    animation->start();
+
+    if (frames.size() > 0 && framesTime.size() > 0){
+        animation->setAnimation(frames, framesTime, loop);
+        animation->start();
+    }else{
+        Log::error("Cannot start animation without frames or intervals");
+    }
 }
 
 void Sprite::startAnimation(int startFrame, int endFrame, int interval, bool loop){
@@ -215,8 +220,34 @@ void Sprite::startAnimation(int startFrame, int endFrame, int interval, bool loo
         animation = new SpriteAnimation(scene);
         animation->setTarget(entity);
     }
+
     animation->setAnimation(startFrame, endFrame, interval, loop);
     animation->start();
+}
+
+void Sprite::startAnimation(std::string name, int interval, bool loop){
+    if (!animation){
+        animation = new SpriteAnimation(scene);
+        animation->setTarget(entity);
+    }
+
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+    std::vector<int> frames;
+    std::vector<int> framesTime;
+
+    for (int id = 0; id < MAX_SPRITE_FRAMES; id ++){
+        if (spritecomp.framesRect[id].active && spritecomp.framesRect[id].name.find(name) != std::string::npos){
+            frames.push_back(id);
+            framesTime.push_back(interval);
+        }
+    }
+
+    if (frames.size() > 0){
+        animation->setAnimation(frames, framesTime, loop);
+        animation->start();
+    }else{
+        Log::error("Cannot start animation '%s' without frames", name.c_str());
+    }
 }
 
 void Sprite::pauseAnimation(){
