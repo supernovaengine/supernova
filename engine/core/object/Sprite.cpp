@@ -205,6 +205,8 @@ void Sprite::startAnimation(std::vector<int> frames, std::vector<int> framesTime
     if (!animation){
         animation = new SpriteAnimation(scene);
         animation->setTarget(entity);
+    }else if (animation->isRunning()){
+        stopAnimation();
     }
 
     if (frames.size() > 0 && framesTime.size() > 0){
@@ -219,6 +221,8 @@ void Sprite::startAnimation(int startFrame, int endFrame, int interval, bool loo
     if (!animation){
         animation = new SpriteAnimation(scene);
         animation->setTarget(entity);
+    }else if (animation->isRunning()){
+        stopAnimation();
     }
 
     animation->setAnimation(startFrame, endFrame, interval, loop);
@@ -229,6 +233,8 @@ void Sprite::startAnimation(std::string name, int interval, bool loop){
     if (!animation){
         animation = new SpriteAnimation(scene);
         animation->setTarget(entity);
+    }else if (animation->isRunning()){
+        stopAnimation();
     }
 
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
