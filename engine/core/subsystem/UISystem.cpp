@@ -694,6 +694,95 @@ void UISystem::update(double dt){
     // need to be ordered by Transform
     auto layouts = scene->getComponentArray<UILayoutComponent>();
 
+    // reverse Transform order
+    for (int i = layouts->size()-1; i >= 0; i--){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
+        Entity entity = layouts->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+
+        if (signature.test(scene->getComponentType<UIContainerComponent>())){
+            UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
+            // configuring all container boxes
+            if (container.numBoxes > 0){
+
+                int genWidth = 0;
+                int genHeight = 0;
+                int numBoxExpand = 0;
+                for (int b = 0; b < container.numBoxes; b++){
+                    if (container.boxes[b].layout != NULL_ENTITY){
+                        if (container.type == ContainerType::HORIZONTAL){
+                            genWidth += container.boxes[b].rect.getWidth();
+                            genHeight = std::max(genHeight, (int)container.boxes[b].rect.getHeight());
+                        }else if (container.type == ContainerType::VERTICAL){
+                            genWidth = std::max(genWidth, (int)container.boxes[b].rect.getWidth());
+                            genHeight += container.boxes[b].rect.getHeight();
+                        }
+                    }
+                    if (container.boxes[b].expand){
+                        numBoxExpand++;
+                    }
+                }
+
+                //TODO: Fix when container child is an image not loaded yet and size is 0.
+                //      Container size is setted without this image size and it keeps small.
+                //      To test: Use a container with defined size image and other non defined size.
+                layout.width = (layout.width > 0)? layout.width : genWidth;
+                layout.height = (layout.height > 0)? layout.height : genHeight;
+
+                for (int b = (container.numBoxes-1); b >= 0; b--){
+                    if (container.boxes[b].layout != NULL_ENTITY){
+                        // container.boxes[b].rect in setted by entity size in last iteration
+                        if (container.type == ContainerType::HORIZONTAL){
+                            if (b < (container.numBoxes-1)){
+                                container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
+                            }
+                            if (container.boxes[b].expand){
+                                float diff = layout.width - genWidth;
+                                container.boxes[b].rect.setWidth(container.boxes[b].rect.getWidth() + (diff / numBoxExpand));
+                            }
+                            container.boxes[b].rect.setHeight(layout.height);
+                        }else if (container.type == ContainerType::VERTICAL){
+                            if (b < (container.numBoxes-1)){
+                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + container.boxes[b+1].rect.getHeight());
+                            }
+                            if (container.boxes[b].expand){
+                                float diff = layout.height - genHeight;
+                                container.boxes[b].rect.setHeight(container.boxes[b].rect.getHeight() + (diff / numBoxExpand));
+                            }
+                            container.boxes[b].rect.setWidth(layout.width);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (signature.test(scene->getComponentType<Transform>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
+            if (transform.visible){
+                UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
+                if (parentlayout){
+                    UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
+                    if (parentcontainer){
+                        if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
+                            layout.containerBoxIndex = parentcontainer->numBoxes;
+                            if (!layout.usingAnchors){
+                                layout.anchorPreset = AnchorPreset::TOP_LEFT;
+                                layout.usingAnchors = true;
+                            }
+                            parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
+                            parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
+
+                            parentcontainer->numBoxes = parentcontainer->numBoxes + 1;
+                        }else{
+                            transform.parent = NULL_ENTITY;
+                            Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     for (int i = 0; i < layouts->size(); i++){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
         Entity entity = layouts->getEntity(i);
@@ -848,91 +937,6 @@ void UISystem::update(double dt){
             container.numBoxes = 0;
         }
         
-    }
-
-    // reverse Transform order
-    for (int i = layouts->size()-1; i >= 0; i--){
-        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
-        Entity entity = layouts->getEntity(i);
-        Signature signature = scene->getSignature(entity);
-
-        if (signature.test(scene->getComponentType<UIContainerComponent>())){
-            UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
-            // configuring all container boxes
-            if (container.numBoxes > 0){
-
-                int genWidth = 0;
-                int genHeight = 0;
-                int numBoxExpand = 0;
-                for (int b = 0; b < container.numBoxes; b++){
-                    if (container.boxes[b].layout != NULL_ENTITY){
-                        if (container.type == ContainerType::HORIZONTAL){
-                            genWidth += container.boxes[b].rect.getWidth();
-                            genHeight = std::max(genHeight, (int)container.boxes[b].rect.getHeight());
-                        }else if (container.type == ContainerType::VERTICAL){
-                            genWidth = std::max(genWidth, (int)container.boxes[b].rect.getWidth());
-                            genHeight += container.boxes[b].rect.getHeight();
-                        }
-                    }
-                    if (container.boxes[b].expand){
-                        numBoxExpand++;
-                    }
-                }
-                layout.width = (layout.width > 0)? layout.width : genWidth;
-                layout.height = (layout.height > 0)? layout.height : genHeight;
-
-                for (int b = (container.numBoxes-1); b >= 0; b--){
-                    if (container.boxes[b].layout != NULL_ENTITY){
-                        // container.boxes[b].rect in setted by entity size in last iteration
-                        if (container.type == ContainerType::HORIZONTAL){
-                            if (b < (container.numBoxes-1)){
-                                container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
-                            }
-                            if (container.boxes[b].expand){
-                                float diff = layout.width - genWidth;
-                                container.boxes[b].rect.setWidth(container.boxes[b].rect.getWidth() + (diff / numBoxExpand));
-                            }
-                            container.boxes[b].rect.setHeight(layout.height);
-                        }else if (container.type == ContainerType::VERTICAL){
-                            if (b < (container.numBoxes-1)){
-                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + container.boxes[b+1].rect.getHeight());
-                            }
-                            if (container.boxes[b].expand){
-                                float diff = layout.height - genHeight;
-                                container.boxes[b].rect.setHeight(container.boxes[b].rect.getHeight() + (diff / numBoxExpand));
-                            }
-                            container.boxes[b].rect.setWidth(layout.width);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (signature.test(scene->getComponentType<Transform>())){
-            Transform& transform = scene->getComponent<Transform>(entity);
-            if (transform.visible){
-                UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
-                if (parentlayout){
-                    UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
-                    if (parentcontainer){
-                        if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
-                            layout.containerBoxIndex = parentcontainer->numBoxes;
-                            if (!layout.usingAnchors){
-                                layout.anchorPreset = AnchorPreset::TOP_LEFT;
-                                layout.usingAnchors = true;
-                            }
-                            parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
-                            parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
-
-                            parentcontainer->numBoxes = parentcontainer->numBoxes + 1;
-                        }else{
-                            transform.parent = NULL_ENTITY;
-                            Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
-                        }
-                    }
-                }
-            }
-        }
     }
 
 }
