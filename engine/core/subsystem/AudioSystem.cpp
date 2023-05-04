@@ -13,7 +13,6 @@
 
 using namespace Supernova;
 
-SoLoud::Soloud AudioSystem::soloud;
 bool AudioSystem::inited = false;
 
 AudioSystem::AudioSystem(Scene* scene): SubSystem(scene){
@@ -22,9 +21,16 @@ AudioSystem::AudioSystem(Scene* scene): SubSystem(scene){
     cameraLastPosition = Vector3(0, 0, 0);
 }
 
+SoLoud::Soloud& AudioSystem::getSoloud(){
+    //To prevent similar problem of static init fiasco but on deinitialization
+    //https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
+    static SoLoud::Soloud* soloud = new SoLoud::Soloud();
+    return *soloud;
+};
+
 void AudioSystem::init(){
     if (!inited) {
-        soloud.init();
+        getSoloud().init();
 
         //Wait for mixing thread
         //SoLoud::Thread::sleep(10);
@@ -35,7 +41,7 @@ void AudioSystem::init(){
 
 void AudioSystem::deInit(){
     if (inited){
-        soloud.deinit();
+        getSoloud().deinit();
 
         inited = false;
     }
@@ -87,7 +93,7 @@ void AudioSystem::destroyAudio(AudioComponent& audio){
 }
 
 bool AudioSystem::seekAudio(AudioComponent& audio, double time){
-    SoLoud::result res = soloud.seek(audio.handle, time);
+    SoLoud::result res = getSoloud().seek(audio.handle, time);
 
     if (res != SoLoud::SOLOUD_ERRORS::SO_NO_ERROR)
         return false;
@@ -97,28 +103,36 @@ bool AudioSystem::seekAudio(AudioComponent& audio, double time){
 
 void AudioSystem::stopAll(){
     if (inited){
-        soloud.stopAll();
+        getSoloud().stopAll();
     }
 }
 
 void AudioSystem::pauseAll(){
     if (inited) {
-        soloud.setPauseAll(true);
+        getSoloud().setPauseAll(true);
     }
 }
 
 void AudioSystem::resumeAll(){
     if (inited) {
-        soloud.setPauseAll(false);
+        getSoloud().setPauseAll(false);
     }
 }
 
 void AudioSystem::checkActive(){
     if (inited) {
-        if (soloud.getVoiceCount() == 0){
+        if (getSoloud().getVoiceCount() == 0){
             deInit();
         }
     }
+}
+
+void AudioSystem::setGlobalVolume(float volume){
+    getSoloud().setGlobalVolume(volume);
+}
+
+float AudioSystem::getGlobalVolume(){
+    return getSoloud().getGlobalVolume();
 }
 
 void AudioSystem::load(){
@@ -156,19 +170,19 @@ void AudioSystem::update(double dt){
                     init();
                     if (audio.enable3D){
                         if (audio.enableClocked){
-                            audio.handle = soloud.play3dClocked(Engine::getDeltatime(), *audio.sample, worldPosition.x, worldPosition.y, worldPosition.z);
+                            audio.handle = getSoloud().play3dClocked(Engine::getDeltatime(), *audio.sample, worldPosition.x, worldPosition.y, worldPosition.z);
                         }else{
-                            audio.handle = soloud.play3d(*audio.sample, worldPosition.x, worldPosition.y, worldPosition.z);
+                            audio.handle = getSoloud().play3d(*audio.sample, worldPosition.x, worldPosition.y, worldPosition.z);
                         }
                     }else{
                         if (audio.enableClocked){
-                            audio.handle = soloud.playClocked(Engine::getDeltatime(), *audio.sample);
+                            audio.handle = getSoloud().playClocked(Engine::getDeltatime(), *audio.sample);
                         }else{
-                            audio.handle = soloud.play(*audio.sample);
+                            audio.handle = getSoloud().play(*audio.sample);
                         }
                     }
                 }else{
-                    soloud.setPause(audio.handle, false);
+                    getSoloud().setPause(audio.handle, false);
                 }
                 if (audio.enable3D){
                     Transform& cameraTransform =  scene->getComponent<Transform>(scene->getCamera());
@@ -182,27 +196,27 @@ void AudioSystem::update(double dt){
             if (audio.pauseTrigger){
                 audio.pauseTrigger = false;
 
-                soloud.setPause(audio.handle, true);
+                getSoloud().setPause(audio.handle, true);
                 audio.state = AudioState::Paused;
             }
             if (audio.stopTrigger){
                 audio.stopTrigger = false;
 
-                soloud.stop(audio.handle);
+                getSoloud().stop(audio.handle);
                 audio.state = AudioState::Stopped;
             }
 
             if (audio.state == AudioState::Playing){
-                audio.playingTime = soloud.getStreamTime(audio.handle);
+                audio.playingTime = getSoloud().getStreamTime(audio.handle);
 
                 if (audio.needUpdate){
-                    soloud.setVolume(audio.handle, audio.volume);
-                    soloud.setRelativePlaySpeed(audio.handle, audio.speed);
-                    soloud.setPan(audio.handle, audio.pan);
-                    soloud.setLooping(audio.handle, audio.looping);
-                    soloud.setLoopPoint(audio.handle, audio.loopingPoint);
-                    soloud.setProtectVoice(audio.handle, audio.protectVoice);
-                    soloud.setInaudibleBehavior(audio.handle, audio.inaudibleBehaviorMustTick, audio.inaudibleBehaviorKill);
+                    getSoloud().setVolume(audio.handle, audio.volume);
+                    getSoloud().setRelativePlaySpeed(audio.handle, audio.speed);
+                    getSoloud().setPan(audio.handle, audio.pan);
+                    getSoloud().setLooping(audio.handle, audio.looping);
+                    getSoloud().setLoopPoint(audio.handle, audio.loopingPoint);
+                    getSoloud().setProtectVoice(audio.handle, audio.protectVoice);
+                    getSoloud().setInaudibleBehavior(audio.handle, audio.inaudibleBehaviorMustTick, audio.inaudibleBehaviorKill);
 
                     if (audio.enable3D){
                         CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
@@ -223,20 +237,20 @@ void AudioSystem::update(double dt){
                         if (audio.attenuationModel == AudioAttenuation::EXPONENTIAL_DISTANCE)
                             attModel = SoLoud::AudioSource::EXPONENTIAL_DISTANCE;
 
-                        soloud.set3dSourceMinMaxDistance(audio.handle, audio.minDistance, audio.maxDistance);
-                        soloud.set3dSourceAttenuation(audio.handle, attModel, audio.attenuationRolloffFactor);
-                        soloud.set3dSourceDopplerFactor(audio.handle, audio.dopplerFactor);
-                        soloud.set3dSourceParameters(
+                        getSoloud().set3dSourceMinMaxDistance(audio.handle, audio.minDistance, audio.maxDistance);
+                        getSoloud().set3dSourceAttenuation(audio.handle, attModel, audio.attenuationRolloffFactor);
+                        getSoloud().set3dSourceDopplerFactor(audio.handle, audio.dopplerFactor);
+                        getSoloud().set3dSourceParameters(
                             audio.handle, 
                             worldPosition.x, worldPosition.y, worldPosition.z, 
                             velocity.x, velocity.y, velocity.z);
-                        soloud.set3dListenerParameters(
+                        getSoloud().set3dListenerParameters(
                             camWorldPos.x, camWorldPos.y, camWorldPos.z, 
                             camWorldView.x, camWorldView.y, camWorldView.z, 
                             camWorldUp.x, camWorldUp.y, camWorldUp.z,
                             camVelocity.x, camVelocity.y, camVelocity.z);
 
-                        soloud.update3dAudio();
+                        getSoloud().update3dAudio();
 
                         audio.lastPosition = worldPosition;
                         cameraLastPosition = camWorldPos;

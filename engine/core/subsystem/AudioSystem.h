@@ -7,17 +7,18 @@
 
 #include "SubSystem.h"
 
-#include "soloud.h"
-
 #include "component/AudioComponent.h"
 
+namespace SoLoud{
+	class Soloud;
+}
 
 namespace Supernova{
 
 	class AudioSystem : public SubSystem {
 
     private:
-        static SoLoud::Soloud soloud;
+        static SoLoud::Soloud& getSoloud();
 		static bool inited;
 
 		static void init();
@@ -30,6 +31,9 @@ namespace Supernova{
 		static void pauseAll();
 		static void resumeAll();
 		static void checkActive();
+
+		static void setGlobalVolume(float volume);
+		static float getGlobalVolume();
 
 		AudioSystem(Scene* scene);
 

@@ -13,6 +13,9 @@
 #include "ecs/EntityManager.h"
 #include "ecs/ComponentArray.h"
 
+//TODO: Add all systems
+#include "subsystem/AudioSystem.h"
+
 //TODO: Add all components and properties
 #include "component/ActionComponent.h"
 #include "component/TimedActionComponent.h"
@@ -92,6 +95,15 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("EXPONENTIAL", FogType::EXPONENTIAL)
         .addProperty("EXPONENTIALSQUARED", FogType::EXPONENTIALSQUARED)
         .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<AudioSystem>("AudioSystem")
+        .addStaticFunction("stopAll", &AudioSystem::stopAll)
+        .addStaticFunction("pauseAll", &AudioSystem::pauseAll)
+        .addStaticFunction("resumeAll", &AudioSystem::resumeAll)
+        .addStaticFunction("checkActive", &AudioSystem::checkActive)
+        .addStaticProperty("globalVolume", &AudioSystem::getGlobalVolume,  &AudioSystem::setGlobalVolume)
+        .endClass();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<EntityManager>("EntityManager")
