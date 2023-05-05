@@ -13,7 +13,7 @@ namespace Supernova{
 
     struct AnimationComponent{
         std::vector<ActionFrame> actions;
-        bool ownedActions = true;
+        bool ownedActions = false;
         bool loop = false;
 
         std::string name;

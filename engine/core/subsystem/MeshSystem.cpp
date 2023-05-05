@@ -1842,6 +1842,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
         AnimationComponent& animcomp = scene->getComponent<AnimationComponent>(anim);
 
         animcomp.name = animation.name;
+        animcomp.ownedActions = true;
 
         model.animations.push_back(anim);
 

@@ -207,7 +207,9 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addProperty("name", &Animation::getName, &Animation::setName)
         .addFunction("addActionFrame", 
             luabridge::overload<float, float, Entity, Entity>(&Animation::addActionFrame),
-            luabridge::overload<float, Entity, Entity>(&Animation::addActionFrame))
+            luabridge::overload<float, Entity, Entity>(&Animation::addActionFrame),
+            luabridge::overload<float, float, Entity>(&Animation::addActionFrame),
+            luabridge::overload<float, Entity>(&Animation::addActionFrame))
         .addFunction("getActionFrame", &Animation::getActionFrame)
         .endClass();
 

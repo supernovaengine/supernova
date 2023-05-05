@@ -32,6 +32,8 @@ namespace Supernova{
 
         void addActionFrame(float startTime, float endTime, Entity action, Entity target);
         void addActionFrame(float startTime, Entity timedaction, Entity target);
+        void addActionFrame(float startTime, float endTime, Entity action);
+        void addActionFrame(float startTime, Entity timedaction);
         ActionFrame getActionFrame(unsigned int index);
         void clearActionFrames();
     };

@@ -87,12 +87,18 @@ void Animation::addActionFrame(float startTime, float endTime, Entity action, En
     actionFrame.endTime = endTime;
     actionFrame.action = action;
 
-    actioncomp.target = target;
-
     animation.actions.push_back(actionFrame);
 
     if ((animation.endTime == 0) || (animation.endTime < endTime)){
         animation.endTime = endTime;
+    }
+
+    if (target != NULL_ENTITY){
+        actioncomp.target = target;
+
+        ActionComponent& childAction = scene->getComponent<ActionComponent>(action);
+
+        childAction.target = target;
     }
 }
 
@@ -100,6 +106,14 @@ void Animation::addActionFrame(float startTime, Entity timedaction, Entity targe
     TimedActionComponent& timedactioncomp = scene->getComponent<TimedActionComponent>(timedaction);
 
     addActionFrame(startTime, startTime + timedactioncomp.duration, timedaction, target);
+}
+
+void Animation::addActionFrame(float startTime, float endTime, Entity action){
+    addActionFrame(startTime, endTime, action, getTarget());
+}
+
+void Animation::addActionFrame(float startTime, Entity timedaction){
+    addActionFrame(startTime, timedaction, getTarget());
 }
 
 ActionFrame Animation::getActionFrame(unsigned int index){
