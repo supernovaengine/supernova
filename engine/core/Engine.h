@@ -180,6 +180,8 @@ namespace Supernova {
         static FunctionSubscribe<void()> onViewChanged;
         static FunctionSubscribe<void()> onDraw;
         static FunctionSubscribe<void()> onUpdate;
+        static FunctionSubscribe<void()> onPause;
+        static FunctionSubscribe<void()> onResume;
         static FunctionSubscribe<void()> onShutdown;
         static FunctionSubscribe<void(int,float,float)> onTouchStart;
         static FunctionSubscribe<void(int,float,float)> onTouchEnd;

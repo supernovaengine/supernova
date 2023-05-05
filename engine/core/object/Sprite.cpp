@@ -262,6 +262,12 @@ void Sprite::pauseAnimation(){
     }
 }
 
+void Sprite::resumeAnimation(){
+    if (animation){
+        animation->start();
+    }
+}
+
 void Sprite::stopAnimation(){
     if (animation){
         animation->stop();

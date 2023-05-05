@@ -53,6 +53,8 @@ FunctionSubscribe<void()> Engine::onViewLoaded;
 FunctionSubscribe<void()> Engine::onViewChanged;
 FunctionSubscribe<void()> Engine::onDraw;
 FunctionSubscribe<void()> Engine::onUpdate;
+FunctionSubscribe<void()> Engine::onPause;
+FunctionSubscribe<void()> Engine::onResume;
 FunctionSubscribe<void()> Engine::onShutdown;
 FunctionSubscribe<void(int,float,float)> Engine::onTouchStart;
 FunctionSubscribe<void(int,float,float)> Engine::onTouchEnd;
@@ -495,10 +497,12 @@ void Engine::systemShutdown(){
 
 void Engine::systemPause(){
     AudioSystem::pauseAll();
+    Engine::onPause.call();
 }
 
 void Engine::systemResume(){
     AudioSystem::resumeAll();
+    Engine::onResume.call();
 }
 
 bool Engine::transformCoordPos(float& x, float& y){
