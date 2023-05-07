@@ -114,8 +114,10 @@ bool Audio::isClockedSound() const{
 void Audio::setVolume(double volume){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.volume = volume;
-    audio.needUpdate = true;
+    if (audio.volume != volume){
+        audio.volume = volume;
+        audio.needUpdate = true;
+    }
 }
 
 double Audio::getVolume() const{
@@ -127,8 +129,10 @@ double Audio::getVolume() const{
 void Audio::setSpeed(float speed){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.speed = speed;
-    audio.needUpdate = true;
+    if (audio.speed != speed){
+        audio.speed = speed;
+        audio.needUpdate = true;
+    }
 }
 
 float Audio::getSpeed() const{
@@ -140,8 +144,10 @@ float Audio::getSpeed() const{
 void Audio::setPan(float pan){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.pan = pan;
-    audio.needUpdate = true;
+    if (audio.pan != pan){
+        audio.pan = pan;
+        audio.needUpdate = true;
+    }
 }
 
 float Audio::getPan() const{
@@ -153,8 +159,10 @@ float Audio::getPan() const{
 void Audio::setLopping(bool lopping){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.looping = lopping;
-    audio.needUpdate = true;
+    if (audio.looping != lopping){
+        audio.looping = lopping;
+        audio.needUpdate = true;
+    }
 }
 
 bool Audio::isLopping() const{
@@ -166,8 +174,10 @@ bool Audio::isLopping() const{
 void Audio::setLoopingPoint(double loopingPoint){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.loopingPoint = loopingPoint;
-    audio.needUpdate = true;
+    if (audio.loopingPoint != loopingPoint){
+        audio.loopingPoint = loopingPoint;
+        audio.needUpdate = true;
+    }
 }
 
 double Audio::getLoopingPoint() const{
@@ -179,8 +189,10 @@ double Audio::getLoopingPoint() const{
 void Audio::setProtectVoice(bool protectVoice){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.protectVoice = protectVoice;
-    audio.needUpdate = true;
+    if (audio.protectVoice != protectVoice){
+        audio.protectVoice = protectVoice;
+        audio.needUpdate = true;
+    }
 }
 
 bool Audio::isProtectVoice() const{
@@ -192,24 +204,30 @@ bool Audio::isProtectVoice() const{
 void Audio::setInaudibleBehavior(bool mustTick, bool kill){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.inaudibleBehaviorMustTick = mustTick;
-    audio.inaudibleBehaviorKill = kill;
-    audio.needUpdate = true;
+    if (audio.inaudibleBehaviorMustTick != mustTick || audio.inaudibleBehaviorKill != kill){
+        audio.inaudibleBehaviorMustTick = mustTick;
+        audio.inaudibleBehaviorKill = kill;
+        audio.needUpdate = true;
+    }
 }
 
 void Audio::setMinMaxDistance(float minDistance, float maxDistance){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.minDistance = minDistance;
-    audio.maxDistance = maxDistance;
-    audio.needUpdate = true;
+    if (audio.minDistance != minDistance || audio.maxDistance != maxDistance){
+        audio.minDistance = minDistance;
+        audio.maxDistance = maxDistance;
+        audio.needUpdate = true;
+    }
 }
 
 void Audio::setMinDistance(float minDistance){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.minDistance = minDistance;
-    audio.needUpdate = true;
+    if (audio.minDistance != minDistance){
+        audio.minDistance = minDistance;
+        audio.needUpdate = true;
+    }
 }
 
 float Audio::getMinDistance() const{
@@ -221,8 +239,10 @@ float Audio::getMinDistance() const{
 void Audio::setMaxDistance(float maxDistance){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.maxDistance = maxDistance;
-    audio.needUpdate = true;
+    if (audio.maxDistance != maxDistance){
+        audio.maxDistance = maxDistance;
+        audio.needUpdate = true;
+    }
 }
 
 float Audio::getMaxDistance() const{
@@ -234,8 +254,10 @@ float Audio::getMaxDistance() const{
 void Audio::setAttenuationModel(AudioAttenuation attenuationModel){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.attenuationModel = attenuationModel;
-    audio.needUpdate = true;
+    if (audio.attenuationModel != attenuationModel){
+        audio.attenuationModel = attenuationModel;
+        audio.needUpdate = true;
+    }
 }
 
 AudioAttenuation Audio::getAttenuationModel() const{
@@ -247,8 +269,10 @@ AudioAttenuation Audio::getAttenuationModel() const{
 void Audio::setAttenuationRolloffFactor(float attenuationRolloffFactor){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.attenuationRolloffFactor = attenuationRolloffFactor;
-    audio.needUpdate = true;
+    if (audio.attenuationRolloffFactor != attenuationRolloffFactor){
+        audio.attenuationRolloffFactor = attenuationRolloffFactor;
+        audio.needUpdate = true;
+    }
 }
 
 float Audio::getAttenuationRolloffFactor() const{
@@ -260,8 +284,10 @@ float Audio::getAttenuationRolloffFactor() const{
 void Audio::setDopplerFactor(float dopplerFactor){
     AudioComponent& audio = getComponent<AudioComponent>();
 
-    audio.dopplerFactor = dopplerFactor;
-    audio.needUpdate = true;
+    if (audio.dopplerFactor != dopplerFactor){
+        audio.dopplerFactor = dopplerFactor;
+        audio.needUpdate = true;
+    }
 }
 
 float Audio::getDopplerFactor() const{
