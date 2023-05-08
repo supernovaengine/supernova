@@ -50,7 +50,9 @@ void SupernovaAndroid::hideVirtualKeyboard(){
 std::string SupernovaAndroid::getUserDataPath() {
     JNIEnv* env = AndroidJNI::getEnv();
     jstring rv = (jstring)env->CallObjectMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getUserDataPathRef);
-    return env->GetStringUTFChars(rv, 0);
+    std::string value = env->GetStringUTFChars(rv, 0);
+    env->DeleteLocalRef(rv);
+    return value;
 }
 
 FILE* SupernovaAndroid::platformFopen(const char* fname, const char* mode) {
@@ -89,81 +91,103 @@ void SupernovaAndroid::platformLog(const int type, const char *fmt, va_list args
 
 bool SupernovaAndroid::getBoolForKey(const char *key, bool defaultValue){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    return env->CallBooleanMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getBoolForKeyRef, jstrKey, defaultValue);
+    jstring strKey = env->NewStringUTF(key);
+    bool value = env->CallBooleanMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getBoolForKeyRef, strKey, defaultValue);
+    env->DeleteLocalRef(strKey);
+    return value;
 }
 
 int SupernovaAndroid::getIntegerForKey(const char *key, int defaultValue){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    return env->CallIntMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getIntegerForKeyRef, jstrKey, defaultValue);
+    jstring strKey = env->NewStringUTF(key);
+    int value = env->CallIntMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getIntegerForKeyRef, strKey, defaultValue);
+    env->DeleteLocalRef(strKey);
+    return value;
 }
 
 long SupernovaAndroid::getLongForKey(const char *key, long defaultValue){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    return env->CallLongMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getLongForKeyRef, jstrKey, defaultValue);
+    jstring strKey = env->NewStringUTF(key);
+    long value = env->CallLongMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getLongForKeyRef, strKey, defaultValue);
+    env->DeleteLocalRef(strKey);
+    return value;
 }
 
 float SupernovaAndroid::getFloatForKey(const char *key, float defaultValue){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    return env->CallFloatMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getFloatForKeyRef, jstrKey, defaultValue);
+    jstring strKey = env->NewStringUTF(key);
+    float value = env->CallFloatMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getFloatForKeyRef, strKey, defaultValue);
+    env->DeleteLocalRef(strKey);
+    return value;
 }
 
 double SupernovaAndroid::getDoubleForKey(const char *key, double defaultValue){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    return env->CallDoubleMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getDoubleForKeyRef, jstrKey, defaultValue);
+    jstring strKey = env->NewStringUTF(key);
+    double value = env->CallDoubleMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getDoubleForKeyRef, strKey, defaultValue);
+    env->DeleteLocalRef(strKey);
+    return value;
 }
 
 std::string SupernovaAndroid::getStringForKey(const char *key, std::string defaultValue){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    jstring jstrDefaultValue = env->NewStringUTF(defaultValue.c_str());
-    jstring rv = (jstring)env->CallObjectMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getStringForKeyRef, jstrKey, jstrDefaultValue);
-    return env->GetStringUTFChars(rv, 0);
+    jstring strKey = env->NewStringUTF(key);
+    jstring strDefaultValue = env->NewStringUTF(defaultValue.c_str());
+    jstring rv = (jstring)env->CallObjectMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getStringForKeyRef, strKey, strDefaultValue);
+    std::string value = env->GetStringUTFChars(rv, 0);
+    env->DeleteLocalRef(strKey);
+    env->DeleteLocalRef(strDefaultValue);
+    env->DeleteLocalRef(rv);
+    return value;
 }
 
 void SupernovaAndroid::setBoolForKey(const char *key, bool value){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setBoolForKeyRef, jstrKey, value);
+    jstring strKey = env->NewStringUTF(key);
+    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setBoolForKeyRef, strKey, value);
+    env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::setIntegerForKey(const char *key, int value){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setIntegerForKeyRef, jstrKey, value);
+    jstring strKey = env->NewStringUTF(key);
+    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setIntegerForKeyRef, strKey, value);
+    env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::setLongForKey(const char *key, long value){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setLongForKeyRef, jstrKey, value);
+    jstring strKey = env->NewStringUTF(key);
+    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setLongForKeyRef, strKey, value);
+    env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::setFloatForKey(const char *key, float value){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setFloatForKeyRef, jstrKey, value);
+    jstring strKey = env->NewStringUTF(key);
+    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setFloatForKeyRef, strKey, value);
+    env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::setDoubleForKey(const char *key, double value){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setDoubleForKeyRef, jstrKey, value);
+    jstring strKey = env->NewStringUTF(key);
+    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setDoubleForKeyRef, strKey, value);
+    env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::setStringForKey(const char* key, std::string value){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    jstring jstrValue = env->NewStringUTF(value.c_str());
-    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setStringForKeyRef, jstrKey, jstrValue);
+    jstring strKey = env->NewStringUTF(key);
+    jstring strValue = env->NewStringUTF(value.c_str());
+    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::setStringForKeyRef, strKey, strValue);
+    env->DeleteLocalRef(strKey);
+    env->DeleteLocalRef(strValue);
 }
 
 void SupernovaAndroid::removeKey(const char* key){
     JNIEnv* env = AndroidJNI::getEnv();
-    jstring jstrKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::removeKeyRef, jstrKey);
+    jstring strKey = env->NewStringUTF(key);
+    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::removeKeyRef, strKey);
+    env->DeleteLocalRef(strKey);
 }
