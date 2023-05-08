@@ -3,6 +3,8 @@
 
 #include <jni.h>
 #include <android/asset_manager.h>
+#include <android/log.h>
+#include <pthread.h>
 
 class AndroidJNI {
 
@@ -31,10 +33,15 @@ public:
 
 	static jmethodID removeKeyRef;
 
+	static JavaVM* jvm;
 	static jobject mainActivityObjRef;
-	static JNIEnv *envRef;
 
 	static AAssetManager* android_asset_manager;
+
+	// used to get env of current thread
+	// inspired in: https://github.com/android/ndk-samples/blob/main/teapots/common/ndk_helper/JNIHelper.h
+	static JNIEnv* getEnv();
+	static void detachCurrentThreadDtor(void* p);
 };
 
 

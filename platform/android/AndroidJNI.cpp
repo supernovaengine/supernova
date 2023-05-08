@@ -30,16 +30,35 @@ jmethodID AndroidJNI::setStringForKeyRef;
 
 jmethodID AndroidJNI::removeKeyRef;
 
+JavaVM* AndroidJNI::jvm;
 jobject AndroidJNI::mainActivityObjRef;
-JNIEnv * AndroidJNI::envRef;
 
 AAssetManager* AndroidJNI::android_asset_manager;
 
 
+JNIEnv* AndroidJNI::getEnv() {
+	JNIEnv* env;
+	if (jvm->GetEnv((void**)&env, JNI_VERSION_1_4) == JNI_OK)
+		return env;
+	jvm->AttachCurrentThread(&env, NULL);
+	pthread_key_t key;
+	if (pthread_key_create(&key, detachCurrentThreadDtor) == 0) {
+		pthread_setspecific(key, (void*)env);
+	}
+	return env;
+}
+
+void AndroidJNI::detachCurrentThreadDtor(void* p) {
+	__android_log_print(ANDROID_LOG_INFO, "Supernova", "%s", "detached current thread");
+	if (p != nullptr) {
+		jvm->DetachCurrentThread();
+	}
+}
+
 JNIEXPORT void JNICALL Java_org_supernovaengine_supernova_JNIWrapper_init_1native(JNIEnv * env, jclass cls, jobject main_activity, jobject java_asset_manager) {
     UNUSED(cls);
 
-    AndroidJNI::envRef = env;
+	env->GetJavaVM(&(AndroidJNI::jvm));
     AndroidJNI::mainActivityClsRef = env->FindClass("org/supernovaengine/supernova/MainActivity");
 
     AndroidJNI::getScreenWidthRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getScreenWidth", "()I");
