@@ -206,3 +206,19 @@ void System::setStringForKey(const char* key, std::string value){
 void System::removeKey(const char *key){
     XMLUtils::removeKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
 }
+
+void System::initializeAdMob(){
+    Log::error("Cannot initialize AdMob in this system");
+}
+
+void System::loadInterstitialAd(){
+    Log::error("Cannot load InterstitialAd in this system");
+}
+
+bool System::isInterstitialAdLoaded(){
+    return false;
+}
+
+void System::showInterstitialAd(){
+    Log::error("Cannot show InterstitialAd in this system");
+}

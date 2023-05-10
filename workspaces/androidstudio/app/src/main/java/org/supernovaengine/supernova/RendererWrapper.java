@@ -9,16 +9,14 @@ import android.opengl.GLSurfaceView.Renderer;
 public class RendererWrapper implements Renderer{
 	
 	private final MainActivity mainActivity;
-	private final AssetManager assetManager;
 	
-	public RendererWrapper(MainActivity mainActivity, AssetManager assetManager) {
+	public RendererWrapper(MainActivity mainActivity) {
+		super();
 		this.mainActivity = mainActivity;
-		this.assetManager = assetManager;
 	}
 	
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		JNIWrapper.init_native(mainActivity, assetManager);
 		JNIWrapper.system_start();
 		JNIWrapper.system_surface_created();
 	}

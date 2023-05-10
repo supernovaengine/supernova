@@ -6,7 +6,15 @@
 
 #define UNUSED(x) (void)(x)
 
+JavaVM* AndroidJNI::jvm;
+
 jclass AndroidJNI::mainActivityClsRef;
+jclass AndroidJNI::admobWrapperClsRef;
+jclass AndroidJNI::userSettingsClsRef;
+
+jobject AndroidJNI::mainActivityObjRef;
+jobject AndroidJNI::admobWrapperObjRef;
+jobject AndroidJNI::userSettingsObjRef;
 
 jmethodID AndroidJNI::getScreenWidthRef;
 jmethodID AndroidJNI::getScreenHeightRef;
@@ -30,8 +38,10 @@ jmethodID AndroidJNI::setStringForKeyRef;
 
 jmethodID AndroidJNI::removeKeyRef;
 
-JavaVM* AndroidJNI::jvm;
-jobject AndroidJNI::mainActivityObjRef;
+jmethodID AndroidJNI::initializeAdMob;
+jmethodID AndroidJNI::loadInterstitialAd;
+jmethodID AndroidJNI::isInterstitialAdLoaded;
+jmethodID AndroidJNI::showInterstitialAd;
 
 AAssetManager* AndroidJNI::android_asset_manager;
 
@@ -55,11 +65,18 @@ void AndroidJNI::detachCurrentThreadDtor(void* p) {
 	}
 }
 
-JNIEXPORT void JNICALL Java_org_supernovaengine_supernova_JNIWrapper_init_1native(JNIEnv * env, jclass cls, jobject main_activity, jobject java_asset_manager) {
+JNIEXPORT void JNICALL Java_org_supernovaengine_supernova_JNIWrapper_init_1native(JNIEnv * env, jclass cls, jobject main_activity, jobject admob_wrapper, jobject user_settings, jobject java_asset_manager) {
     UNUSED(cls);
 
 	env->GetJavaVM(&(AndroidJNI::jvm));
+
     AndroidJNI::mainActivityClsRef = env->FindClass("org/supernovaengine/supernova/MainActivity");
+	AndroidJNI::admobWrapperClsRef = env->FindClass("org/supernovaengine/supernova/AdMobWrapper");
+	AndroidJNI::userSettingsClsRef = env->FindClass("org/supernovaengine/supernova/UserSettings");
+
+	AndroidJNI::mainActivityObjRef = env->NewGlobalRef(main_activity);
+	AndroidJNI::admobWrapperObjRef = env->NewGlobalRef(admob_wrapper);
+	AndroidJNI::userSettingsObjRef = env->NewGlobalRef(user_settings);
 
     AndroidJNI::getScreenWidthRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getScreenWidth", "()I");
     AndroidJNI::getScreenHeightRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getScreenHeight", "()I");
@@ -67,23 +84,26 @@ JNIEXPORT void JNICALL Java_org_supernovaengine_supernova_JNIWrapper_init_1nativ
 	AndroidJNI::showSoftKeyboardRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "showSoftKeyboard", "()V");
 	AndroidJNI::hideSoftKeyboardRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "hideSoftKeyboard", "()V");
 
-	AndroidJNI::getBoolForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getBoolForKey", "(Ljava/lang/String;Z)Z");
-	AndroidJNI::getIntegerForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getIntegerForKey", "(Ljava/lang/String;I)I");
-	AndroidJNI::getLongForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getLongForKey", "(Ljava/lang/String;J)J");
-	AndroidJNI::getFloatForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getFloatForKey", "(Ljava/lang/String;F)F");
-	AndroidJNI::getDoubleForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getDoubleForKey", "(Ljava/lang/String;D)D");
-	AndroidJNI::getStringForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "getStringForKey", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+	AndroidJNI::getBoolForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "getBoolForKey", "(Ljava/lang/String;Z)Z");
+	AndroidJNI::getIntegerForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "getIntegerForKey", "(Ljava/lang/String;I)I");
+	AndroidJNI::getLongForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "getLongForKey", "(Ljava/lang/String;J)J");
+	AndroidJNI::getFloatForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "getFloatForKey", "(Ljava/lang/String;F)F");
+	AndroidJNI::getDoubleForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "getDoubleForKey", "(Ljava/lang/String;D)D");
+	AndroidJNI::getStringForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "getStringForKey", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
 
-	AndroidJNI::setBoolForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setBoolForKey", "(Ljava/lang/String;Z)V");
-	AndroidJNI::setIntegerForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setIntegerForKey", "(Ljava/lang/String;I)V");
-	AndroidJNI::setLongForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setLongForKey", "(Ljava/lang/String;J)V");
-	AndroidJNI::setFloatForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setFloatForKey", "(Ljava/lang/String;F)V");
-	AndroidJNI::setDoubleForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setDoubleForKey", "(Ljava/lang/String;D)V");
-	AndroidJNI::setStringForKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "setStringForKey", "(Ljava/lang/String;Ljava/lang/String;)V");
+	AndroidJNI::setBoolForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "setBoolForKey", "(Ljava/lang/String;Z)V");
+	AndroidJNI::setIntegerForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "setIntegerForKey", "(Ljava/lang/String;I)V");
+	AndroidJNI::setLongForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "setLongForKey", "(Ljava/lang/String;J)V");
+	AndroidJNI::setFloatForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "setFloatForKey", "(Ljava/lang/String;F)V");
+	AndroidJNI::setDoubleForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "setDoubleForKey", "(Ljava/lang/String;D)V");
+	AndroidJNI::setStringForKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "setStringForKey", "(Ljava/lang/String;Ljava/lang/String;)V");
 
-	AndroidJNI::removeKeyRef = env->GetMethodID(AndroidJNI::mainActivityClsRef, "removeKey", "(Ljava/lang/String;)V");
+	AndroidJNI::removeKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "removeKey", "(Ljava/lang/String;)V");
 
-    AndroidJNI::mainActivityObjRef = env->NewGlobalRef(main_activity);
+    AndroidJNI::initializeAdMob = env->GetMethodID(AndroidJNI::admobWrapperClsRef, "initialize","()V");
+	AndroidJNI::loadInterstitialAd = env->GetMethodID(AndroidJNI::admobWrapperClsRef, "loadInterstitialAd","()V");
+	AndroidJNI::isInterstitialAdLoaded = env->GetMethodID(AndroidJNI::admobWrapperClsRef, "isInterstitialAdLoaded","()Z");
+    AndroidJNI::showInterstitialAd = env->GetMethodID(AndroidJNI::admobWrapperClsRef, "showInterstitialAd","()V");
 
 	AndroidJNI::android_asset_manager = AAssetManager_fromJava(env, java_asset_manager);
 }

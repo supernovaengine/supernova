@@ -14,7 +14,7 @@ android {
     compileSdkVersion 31
     defaultConfig {
         applicationId "com.yourcompany.project"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 31
         versionCode 1
         versionName "1.0"
@@ -52,4 +52,8 @@ android {
     }
 
     namespace 'org.supernovaengine.supernova'
+}
+
+dependencies {
+    implementation 'com.google.android.gms:play-services-ads:22.0.0'
 }

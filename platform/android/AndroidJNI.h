@@ -10,7 +10,16 @@ class AndroidJNI {
 
 public:
 
+	static JavaVM* jvm;
+
 	static jclass mainActivityClsRef;
+	static jclass admobWrapperClsRef;
+	static jclass userSettingsClsRef;
+
+	static jobject mainActivityObjRef;
+	static jobject admobWrapperObjRef;
+	static jobject userSettingsObjRef;
+
 	static jmethodID getScreenWidthRef;
 	static jmethodID getScreenHeightRef;
 	static jmethodID getUserDataPathRef;
@@ -33,8 +42,10 @@ public:
 
 	static jmethodID removeKeyRef;
 
-	static JavaVM* jvm;
-	static jobject mainActivityObjRef;
+	static jmethodID initializeAdMob;
+	static jmethodID loadInterstitialAd;
+	static jmethodID isInterstitialAdLoaded;
+	static jmethodID showInterstitialAd;
 
 	static AAssetManager* android_asset_manager;
 
@@ -46,7 +57,7 @@ public:
 
 
 extern "C" {
-	JNIEXPORT void JNICALL Java_org_supernovaengine_supernova_JNIWrapper_init_1native(JNIEnv * env, jclass cls, jobject main_activity, jobject java_asset_manager);
+	JNIEXPORT void JNICALL Java_org_supernovaengine_supernova_JNIWrapper_init_1native(JNIEnv * env, jclass cls, jobject main_activity, jobject admob_wrapper, jobject user_settings, jobject java_asset_manager);
 	JNIEXPORT void JNICALL Java_org_supernovaengine_supernova_JNIWrapper_system_1start(JNIEnv * env, jclass cls);
 	JNIEXPORT void JNICALL Java_org_supernovaengine_supernova_JNIWrapper_system_1surface_1created(JNIEnv * env, jclass cls);
 	JNIEXPORT void JNICALL Java_org_supernovaengine_supernova_JNIWrapper_system_1surface_1changed(JNIEnv * env, jclass cls);

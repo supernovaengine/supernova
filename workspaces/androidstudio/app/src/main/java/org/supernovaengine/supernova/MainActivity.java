@@ -29,14 +29,14 @@ import android.content.SharedPreferences;
 
 @SuppressLint("ClickableViewAccessibility")
 public class MainActivity extends Activity {
-    
+
 	private GLSurfaceView glSurfaceView;
 	private boolean rendererSet;
 
 	private FrameLayout layout;
 	private TextInput edittext;
-
-	private static final String PREFS_FILE_NAME = "UserSettings";
+	private AdMobWrapper admobWrapper;
+	private UserSettings userSettings;
 
 	public int screenWidth;
 	public int screenHeight;
@@ -90,6 +90,11 @@ public class MainActivity extends Activity {
 		final boolean supportsEs2 = 
 			configurationInfo.reqGlEsVersion >= 0x20000 || isProbablyEmulator();
 
+		admobWrapper = new AdMobWrapper(this);
+		userSettings = new UserSettings(this);
+
+		JNIWrapper.init_native(this, admobWrapper, userSettings, this.getAssets());
+
 		if (supportsEs2) {
 			glSurfaceView = new GLSurfaceView(this);
 
@@ -98,7 +103,7 @@ public class MainActivity extends Activity {
 
 			calculateScreenSize();
 
-			final RendererWrapper rendererWrapper = new RendererWrapper(MainActivity.this, this.getAssets());
+			final RendererWrapper rendererWrapper = new RendererWrapper(MainActivity.this);
 			
 			glSurfaceView.setEGLContextClientVersion(2);
 			glSurfaceView.setPreserveEGLContextOnPause(true);
@@ -210,7 +215,7 @@ public class MainActivity extends Activity {
 			return;
 		}
 	}
-    
+
 	private boolean isProbablyEmulator() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1
 				&& (Build.FINGERPRINT.startsWith("generic")
@@ -264,129 +269,6 @@ public class MainActivity extends Activity {
 
 	public String getUserDataPath() {
 		return getFilesDir().getAbsolutePath();
-	}
-
-	public boolean getBoolForKey(String key, boolean defaultValue) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-
-		try {
-			return sharedPref.getBoolean(key, defaultValue);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
-		return defaultValue;
-	}
-
-	public int getIntegerForKey(String key, int defaultValue) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-
-		try {
-			return sharedPref.getInt(key, defaultValue);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
-		return defaultValue;
-	}
-
-	public long getLongForKey(String key, long defaultValue) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-
-		try {
-			return sharedPref.getLong(key, defaultValue);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
-		return defaultValue;
-	}
-
-	public float getFloatForKey(String key, float defaultValue) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-
-		try {
-			return sharedPref.getFloat(key, defaultValue);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
-		return defaultValue;
-	}
-
-	public double getDoubleForKey(String key, double defaultValue) {
-		// SharedPreferences doesn't support double, using long to store
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-
-		try {
-			return Double.longBitsToDouble(sharedPref.getLong(key, Double.doubleToRawLongBits(defaultValue)));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
-		return defaultValue;
-	}
-
-	public String getStringForKey(String key, String defaultValue) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-
-		try {
-			return sharedPref.getString(key, defaultValue);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
-		return defaultValue;
-	}
-
-	public void setBoolForKey(String key, boolean value) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putBoolean(key, value);
-		editor.apply();
-	}
-
-	public void setIntegerForKey(String key, int value) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putInt(key, value);
-		editor.apply();
-	}
-
-	public void setLongForKey(String key, long value) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putLong(key, value);
-		editor.apply();
-	}
-
-	public void setFloatForKey(String key, float value) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putFloat(key, value);
-		editor.apply();
-	}
-
-	public void setDoubleForKey(String key, double value) {
-		// SharedPreferences doesn't support double, using long to store
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putLong(key, Double.doubleToRawLongBits(value));
-		editor.apply();
-	}
-
-	public void setStringForKey(String key, String value) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putString(key, value);
-		editor.apply();
-	}
-
-	public void removeKey(String key) {
-		SharedPreferences sharedPref = getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.remove(key);
-		editor.apply();
 	}
 
 }
