@@ -124,6 +124,7 @@ void SokolObject::addAttribute(int slotAttribute, BufferRender* buffer, unsigned
 
         // D3D11 cannot have offset (AlignedByteOffset) bigger than 2048
         // https://github.com/floooh/sokol/issues/818
+        // Metal also cannot use large offsets
         size_t bufferOffset = 0;
         size_t attrOffset = 0;
 
