@@ -8,6 +8,7 @@
 #include "math/Matrix4.h"
 #include "Log.h"
 #include "SokolCmdQueue.h"
+#include "Engine.h"
 
 using namespace Supernova;
 
@@ -123,13 +124,16 @@ void SokolObject::addAttribute(int slotAttribute, BufferRender* buffer, unsigned
 
         // D3D11 cannot have offset (AlignedByteOffset) bigger than 2048
         // https://github.com/floooh/sokol/issues/818
-        #ifdef SOKOL_D3D11
-        size_t bufferOffset = offset;
-        size_t attrOffset = 0;
-        #else
         size_t bufferOffset = 0;
-        size_t attrOffset = offset;
-        #endif
+        size_t attrOffset = 0;
+
+        if (Engine::isOpenGL()){
+            bufferOffset = 0;
+            attrOffset = offset;
+        }else{
+            bufferOffset = offset;
+            attrOffset = 0;
+        }
         
         if (bufferToBindSlot.count({vbuf.id, bufferOffset}) == 0){
             bind.vertex_buffers[bindSlotIndex] = vbuf;
