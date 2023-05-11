@@ -365,6 +365,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
         ${PLATFORM_ROOT}/ios/EngineView.mm
         ${PLATFORM_ROOT}/ios/ViewController.h
         ${PLATFORM_ROOT}/ios/ViewController.m
+        ${PLATFORM_ROOT}/ios/AdMobAdapter.h
+        ${PLATFORM_ROOT}/ios/AdMobAdapter.m
         ${PLATFORM_ROOT}/Renderer.h
         ${PLATFORM_ROOT}/Renderer.mm
         ${PLATFORM_ROOT}/SupernovaApple.h
@@ -374,6 +376,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     list(APPEND PLATFORM_RESOURCES
         ${PLATFORM_ROOT}/ios/LaunchScreen.storyboard
         ${PLATFORM_ROOT}/ios/Main.storyboard
+    )
+
+    list(APPEND PLATFORM_LIBS
+        -ObjC
     )
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
