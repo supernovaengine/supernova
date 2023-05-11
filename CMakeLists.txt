@@ -380,7 +380,16 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
 
     list(APPEND PLATFORM_LIBS
         -ObjC
+        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/FBLPromises.xcframework/ios-arm64_x86_64-simulator/FBLPromises.framework
+        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleAppMeasurement.xcframework/ios-arm64_i386_x86_64-simulator/GoogleAppMeasurement.framework
+        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleAppMeasurementIdentitySupport.xcframework/ios-arm64_i386_x86_64-simulator/GoogleAppMeasurementIdentitySupport.framework
+        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleMobileAds.xcframework/ios-arm64_x86_64-simulator/GoogleMobileAds.framework
+        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleUtilities.xcframework/ios-arm64_x86_64-simulator/GoogleUtilities.framework
+        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/UserMessagingPlatform.xcframework/ios-arm64_x86_64-simulator/UserMessagingPlatform.framework
+        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/nanopb.xcframework/ios-arm64_x86_64-simulator/nanopb.framework
     )
+
+    add_compile_options(-fmodules)
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fobjc-arc")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
