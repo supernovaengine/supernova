@@ -6,7 +6,7 @@
 #if TARGET_OS_IPHONE
 #import <MetalKit/MetalKit.h>
 
-#import "AdMobAdapter.h"
+#import "ios/AdMobAdapter.h"
 
 static AdMobAdapter* admob = nil;
 #endif
