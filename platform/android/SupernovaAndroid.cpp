@@ -197,9 +197,11 @@ void SupernovaAndroid::initializeAdMob(){
     env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::initializeAdMob);
 }
 
-void SupernovaAndroid::loadInterstitialAd(){
+void SupernovaAndroid::loadInterstitialAd(std::string adUnitID){
     JNIEnv* env = AndroidJNI::getEnv();
-    env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::loadInterstitialAd);
+    jstring strAdUnitID = env->NewStringUTF(adUnitID.c_str());
+    env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::loadInterstitialAd, strAdUnitID);
+    env->DeleteLocalRef(strAdUnitID);
 }
 
 bool SupernovaAndroid::isInterstitialAdLoaded(){

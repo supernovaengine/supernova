@@ -19,8 +19,6 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 public class AdMobWrapper {
     private Activity activity;
 
-    private static final String AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712";
-
     private InterstitialAd interstitialAd;
 
     public AdMobWrapper(final Activity activity) {
@@ -39,14 +37,14 @@ public class AdMobWrapper {
         });
     }
 
-    public void loadInterstitialAd() {
+    public void loadInterstitialAd(String adUnitID) {
         activity.runOnUiThread(new Runnable() {
             @Override public void run() {
 
                 AdRequest adRequest = new AdRequest.Builder().build();
                 InterstitialAd.load(
                         activity,
-                        AD_UNIT_ID,
+                        adUnitID,
                         adRequest,
                         new InterstitialAdLoadCallback() {
                             @Override

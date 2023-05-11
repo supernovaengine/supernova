@@ -101,7 +101,7 @@ JNIEXPORT void JNICALL Java_org_supernovaengine_supernova_JNIWrapper_init_1nativ
 	AndroidJNI::removeKeyRef = env->GetMethodID(AndroidJNI::userSettingsClsRef, "removeKey", "(Ljava/lang/String;)V");
 
     AndroidJNI::initializeAdMob = env->GetMethodID(AndroidJNI::admobWrapperClsRef, "initialize","()V");
-	AndroidJNI::loadInterstitialAd = env->GetMethodID(AndroidJNI::admobWrapperClsRef, "loadInterstitialAd","()V");
+	AndroidJNI::loadInterstitialAd = env->GetMethodID(AndroidJNI::admobWrapperClsRef, "loadInterstitialAd","(Ljava/lang/String;)V");
 	AndroidJNI::isInterstitialAdLoaded = env->GetMethodID(AndroidJNI::admobWrapperClsRef, "isInterstitialAdLoaded","()Z");
     AndroidJNI::showInterstitialAd = env->GetMethodID(AndroidJNI::admobWrapperClsRef, "showInterstitialAd","()V");
 
