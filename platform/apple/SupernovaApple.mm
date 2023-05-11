@@ -2,8 +2,13 @@
 
 #import "Renderer.h"
 #import <Foundation/Foundation.h>
+
 #if TARGET_OS_IPHONE
 #import <MetalKit/MetalKit.h>
+
+#import "AdMobAdapter.h"
+
+static AdMobAdapter* admob = nil;
 #endif
 
 static const void* osx_mtk_get_render_pass_descriptor(void* user_data) {
@@ -19,7 +24,16 @@ static const void* osx_mtk_get_drawable(void* user_data) {
 }
 
 SupernovaApple::SupernovaApple(){
+#if TARGET_OS_IPHONE
+    if (!admob)
+        admob = [[AdMobAdapter alloc]init];
+#endif
+}
 
+SupernovaApple::~SupernovaApple(){
+#if TARGET_OS_IPHONE
+    admob = nil;
+#endif
 }
 
 sg_context_desc SupernovaApple::getSokolContext(){
@@ -178,3 +192,28 @@ void SupernovaApple::removeKey(const char *key){
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:[NSString stringWithUTF8String:key]];
 }
 
+void SupernovaApple::initializeAdMob(){
+#if TARGET_OS_IPHONE
+    [admob initializeAdMob];
+#endif
+}
+
+void SupernovaApple::loadInterstitialAd(std::string adUnitID){
+#if TARGET_OS_IPHONE
+    [admob loadInterstitial:[NSString stringWithUTF8String:adUnitID.c_str()]];
+#endif
+}
+
+bool SupernovaApple::isInterstitialAdLoaded(){
+#if TARGET_OS_IPHONE
+    return [admob isInterstitialAdLoaded];
+#else
+    return false;
+#endif
+}
+
+void SupernovaApple::showInterstitialAd(){
+#if TARGET_OS_IPHONE
+    [admob showInterstitial];
+#endif
+}

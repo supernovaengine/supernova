@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -43,6 +43,14 @@
 		710AD70425B6058100A7B12F /* libstb-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 710AD6E325B6053400A7B12F /* libstb-ios.a */; };
 		710AD75225B7343400A7B12F /* EngineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710AD75125B7343400A7B12F /* EngineView.mm */; };
 		710AD78625B7A1F600A7B12F /* EngineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710AD76C25B79D8300A7B12F /* EngineView.mm */; };
+		711607002A0C2BE90052A9C3 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 711606F92A0C2BE80052A9C3 /* GoogleUtilities.xcframework */; };
+		711607012A0C2BE90052A9C3 /* FBLPromises.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 711606FA2A0C2BE80052A9C3 /* FBLPromises.xcframework */; };
+		711607022A0C2BE90052A9C3 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 711606FB2A0C2BE80052A9C3 /* nanopb.xcframework */; };
+		711607032A0C2BE90052A9C3 /* UserMessagingPlatform.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 711606FC2A0C2BE80052A9C3 /* UserMessagingPlatform.xcframework */; };
+		711607042A0C2BE90052A9C3 /* GoogleMobileAds.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 711606FD2A0C2BE80052A9C3 /* GoogleMobileAds.xcframework */; };
+		711607052A0C2BE90052A9C3 /* GoogleAppMeasurementIdentitySupport.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 711606FE2A0C2BE90052A9C3 /* GoogleAppMeasurementIdentitySupport.xcframework */; };
+		711607062A0C2BE90052A9C3 /* GoogleAppMeasurement.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 711606FF2A0C2BE90052A9C3 /* GoogleAppMeasurement.xcframework */; };
+		711607082A0D1F0C0052A9C3 /* AdMobAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 711607072A0D1F0C0052A9C3 /* AdMobAdapter.m */; };
 		71165BBF282981BE00CF79C1 /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71165BBD282981BE00CF79C1 /* Base64.cpp */; };
 		71165BC0282981BE00CF79C1 /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71165BBD282981BE00CF79C1 /* Base64.cpp */; };
 		71165BC1282981BE00CF79C1 /* Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 71165BBE282981BE00CF79C1 /* Base64.h */; };
@@ -785,6 +793,16 @@
 		710AD75125B7343400A7B12F /* EngineView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EngineView.mm; sourceTree = "<group>"; };
 		710AD76B25B79D6700A7B12F /* EngineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EngineView.h; sourceTree = "<group>"; };
 		710AD76C25B79D8300A7B12F /* EngineView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EngineView.mm; sourceTree = "<group>"; };
+		711606F72A0C2BD30052A9C3 /* GoogleMobileAdsSdkiOS-10.4.0 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "GoogleMobileAdsSdkiOS-10.4.0"; sourceTree = "<group>"; };
+		711606F92A0C2BE80052A9C3 /* GoogleUtilities.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleUtilities.xcframework; path = "GoogleMobileAdsSdkiOS-10.4.0/GoogleUtilities.xcframework"; sourceTree = "<group>"; };
+		711606FA2A0C2BE80052A9C3 /* FBLPromises.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FBLPromises.xcframework; path = "GoogleMobileAdsSdkiOS-10.4.0/FBLPromises.xcframework"; sourceTree = "<group>"; };
+		711606FB2A0C2BE80052A9C3 /* nanopb.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = nanopb.xcframework; path = "GoogleMobileAdsSdkiOS-10.4.0/nanopb.xcframework"; sourceTree = "<group>"; };
+		711606FC2A0C2BE80052A9C3 /* UserMessagingPlatform.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = UserMessagingPlatform.xcframework; path = "GoogleMobileAdsSdkiOS-10.4.0/UserMessagingPlatform.xcframework"; sourceTree = "<group>"; };
+		711606FD2A0C2BE80052A9C3 /* GoogleMobileAds.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleMobileAds.xcframework; path = "GoogleMobileAdsSdkiOS-10.4.0/GoogleMobileAds.xcframework"; sourceTree = "<group>"; };
+		711606FE2A0C2BE90052A9C3 /* GoogleAppMeasurementIdentitySupport.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleAppMeasurementIdentitySupport.xcframework; path = "GoogleMobileAdsSdkiOS-10.4.0/GoogleAppMeasurementIdentitySupport.xcframework"; sourceTree = "<group>"; };
+		711606FF2A0C2BE90052A9C3 /* GoogleAppMeasurement.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleAppMeasurement.xcframework; path = "GoogleMobileAdsSdkiOS-10.4.0/GoogleAppMeasurement.xcframework"; sourceTree = "<group>"; };
+		711607072A0D1F0C0052A9C3 /* AdMobAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdMobAdapter.m; sourceTree = "<group>"; };
+		711607092A0D1F360052A9C3 /* AdMobAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdMobAdapter.h; sourceTree = "<group>"; };
 		71165BBD282981BE00CF79C1 /* Base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Base64.cpp; sourceTree = "<group>"; };
 		71165BBE282981BE00CF79C1 /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
 		7128CEE325BA705600965B51 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -1294,6 +1312,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				711607002A0C2BE90052A9C3 /* GoogleUtilities.xcframework in Frameworks */,
+				711607012A0C2BE90052A9C3 /* FBLPromises.xcframework in Frameworks */,
+				711607022A0C2BE90052A9C3 /* nanopb.xcframework in Frameworks */,
+				711607032A0C2BE90052A9C3 /* UserMessagingPlatform.xcframework in Frameworks */,
+				711607042A0C2BE90052A9C3 /* GoogleMobileAds.xcframework in Frameworks */,
+				711607052A0C2BE90052A9C3 /* GoogleAppMeasurementIdentitySupport.xcframework in Frameworks */,
+				711607062A0C2BE90052A9C3 /* GoogleAppMeasurement.xcframework in Frameworks */,
 				717AD97A290B68B4007D7DB5 /* AVFoundation.framework in Frameworks */,
 				717AD981290B691E007D7DB5 /* AudioToolbox.framework in Frameworks */,
 				713D82D7259D324700567F9F /* libsupernova-ios.a in Frameworks */,
@@ -1445,6 +1470,8 @@
 				713D8335259D407A00567F9F /* main.m */,
 				713D8337259D407A00567F9F /* ViewController.h */,
 				713D8334259D407A00567F9F /* ViewController.m */,
+				711607072A0D1F0C0052A9C3 /* AdMobAdapter.m */,
+				711607092A0D1F360052A9C3 /* AdMobAdapter.h */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -1840,6 +1867,14 @@
 		7162FE06259644C40075B97D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				711606FA2A0C2BE80052A9C3 /* FBLPromises.xcframework */,
+				711606FF2A0C2BE90052A9C3 /* GoogleAppMeasurement.xcframework */,
+				711606FE2A0C2BE90052A9C3 /* GoogleAppMeasurementIdentitySupport.xcframework */,
+				711606FD2A0C2BE80052A9C3 /* GoogleMobileAds.xcframework */,
+				711606F92A0C2BE80052A9C3 /* GoogleUtilities.xcframework */,
+				711606FB2A0C2BE80052A9C3 /* nanopb.xcframework */,
+				711606FC2A0C2BE80052A9C3 /* UserMessagingPlatform.xcframework */,
+				711606F72A0C2BD30052A9C3 /* GoogleMobileAdsSdkiOS-10.4.0 */,
 				717AD980290B691E007D7DB5 /* AudioToolbox.framework */,
 				717AD97D290B6906007D7DB5 /* CoreAudioKit.framework */,
 				717AD97B290B68F3007D7DB5 /* CoreAudio.framework */,
@@ -2904,7 +2939,8 @@
 		7162F8C0259547D60075B97D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1420;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					71393EBA28F8EEF60074442E = {
 						CreatedOnToolsVersion = 14.0.1;
@@ -3208,6 +3244,7 @@
 				71E36B5625D5994100EFEED4 /* Model.cpp in Sources */,
 				713D835B259D408C00567F9F /* AppDelegate.m in Sources */,
 				713D82E4259D32FE00567F9F /* SupernovaApple.mm in Sources */,
+				711607082A0D1F0C0052A9C3 /* AdMobAdapter.m in Sources */,
 				7158F43F259C2C82006E55D3 /* Renderer.mm in Sources */,
 				7162FEAC25993F810075B97D /* main.cpp in Sources */,
 			);
@@ -3917,6 +3954,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/GoogleMobileAdsSdkiOS-10.4.0";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../engine/core",
 					"$(SRCROOT)/../../engine/renders",
@@ -3928,6 +3966,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = SupernovaEngine.Supernova;
 				PRODUCT_NAME = Supernova;
 				SDKROOT = iphoneos;
@@ -3942,6 +3982,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/GoogleMobileAdsSdkiOS-10.4.0";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../engine/core",
 					"$(SRCROOT)/../../engine/renders",
@@ -3953,6 +3994,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = SupernovaEngine.Supernova;
 				PRODUCT_NAME = Supernova;
 				SDKROOT = iphoneos;

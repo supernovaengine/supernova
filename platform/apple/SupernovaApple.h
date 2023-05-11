@@ -9,6 +9,8 @@ public:
 
     SupernovaApple();
     
+    virtual ~SupernovaApple();
+    
     virtual sg_context_desc getSokolContext();
 
     virtual int getScreenWidth();
@@ -38,6 +40,11 @@ public:
     virtual void setStringForKey(const char* key, std::string value);
 
     virtual void removeKey(const char *key);
+
+    virtual void initializeAdMob();
+    virtual void loadInterstitialAd(std::string adUnitID);
+    virtual bool isInterstitialAdLoaded();
+    virtual void showInterstitialAd();
 
 };
 

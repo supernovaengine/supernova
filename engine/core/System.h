@@ -79,7 +79,7 @@ namespace Supernova {
         virtual void removeKey(const char *key);
 
         virtual void initializeAdMob();
-        virtual void loadInterstitialAd();
+        virtual void loadInterstitialAd(std::string adUnitID);
         virtual bool isInterstitialAdLoaded();
         virtual void showInterstitialAd();
     };

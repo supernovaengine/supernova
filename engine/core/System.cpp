@@ -211,7 +211,7 @@ void System::initializeAdMob(){
     Log::error("Cannot initialize AdMob in this system");
 }
 
-void System::loadInterstitialAd(){
+void System::loadInterstitialAd(std::string adUnitID){
     Log::error("Cannot load InterstitialAd in this system");
 }
 
