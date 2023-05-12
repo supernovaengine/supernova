@@ -44,6 +44,26 @@
     [_renderer mtkView:_view drawableSizeWillChange:_view.drawableSize];
 
     _view.delegate = _renderer;
+    
+    // Pause game when application is backgrounded.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(pauseGame)
+                                                 name:UIApplicationDidEnterBackgroundNotification
+                                               object:nil];
+
+    // Resume game when application becomes active.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(resumeGame)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
+}
+
+- (void)pauseGame {
+    [_renderer pauseGame];
+}
+
+- (void)resumeGame {
+    [_renderer resumeGame];
 }
 
 @end
