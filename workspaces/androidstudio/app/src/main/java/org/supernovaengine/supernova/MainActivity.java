@@ -60,19 +60,15 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	private void setFullScreen(){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			final WindowInsetsController insetsController = getWindow().getInsetsController();
-			if (insetsController != null) {
-				insetsController.hide(WindowInsets.Type.statusBars());
-			}
-		} else {
-			getWindow().setFlags(
-					WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN
-			);
-		}
+		// Hide both the navigation bar and the status bar.
+		// SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+		// a general rule, you should design your app to hide the status bar whenever you
+		// hide the navigation bar.
+		View decorView = getWindow().getDecorView();
+		int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+						| View.SYSTEM_UI_FLAG_FULLSCREEN;
+		decorView.setSystemUiVisibility(uiOptions);
 	}
     
     @Override
