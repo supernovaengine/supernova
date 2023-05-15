@@ -55,7 +55,7 @@
 
 // to prevent tiled texture getting part of neighborhood tile
 #ifndef TEXTURE_CUT_FACTOR
-#define TEXTURE_CUT_FACTOR 0.5
+#define TEXTURE_CUT_FACTOR 1.0
 #endif
 
 #include "Engine.h"
