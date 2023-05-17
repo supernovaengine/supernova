@@ -9,7 +9,7 @@ public class JNIWrapper {
         System.loadLibrary("supernova-android");
     }
 
-	public static native void init_native(Activity mainActivity, AdMobWrapper admobWrapper, UserSettings userSettings, AssetManager assetManager);
+	public static native void init_native(MainActivity mainActivity, AdMobWrapper admobWrapper, UserSettings userSettings, AssetManager assetManager);
     
     public static native void system_start();
 	public static native void system_surface_created();
