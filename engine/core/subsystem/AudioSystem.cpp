@@ -15,6 +15,8 @@ using namespace Supernova;
 
 bool AudioSystem::inited = false;
 
+float AudioSystem::globalVolume = 1.0;
+
 AudioSystem::AudioSystem(Scene* scene): SubSystem(scene){
     signature.set(scene->getComponentType<AudioComponent>());
 
@@ -31,6 +33,7 @@ SoLoud::Soloud& AudioSystem::getSoloud(){
 void AudioSystem::init(){
     if (!inited) {
         getSoloud().init();
+        getSoloud().setGlobalVolume(globalVolume);
 
         //Wait for mixing thread
         //SoLoud::Thread::sleep(10);
@@ -127,12 +130,15 @@ void AudioSystem::checkActive(){
     }
 }
 
+// using global volume in a static var to save because init/deinit reset volume value
 void AudioSystem::setGlobalVolume(float volume){
-    getSoloud().setGlobalVolume(volume);
+    globalVolume = volume;
+    getSoloud().setGlobalVolume(globalVolume);
 }
 
 float AudioSystem::getGlobalVolume(){
-    return getSoloud().getGlobalVolume();
+    //return getSoloud().getGlobalVolume();
+    return globalVolume;
 }
 
 void AudioSystem::load(){
@@ -163,6 +169,18 @@ void AudioSystem::update(double dt){
         }
 
         if (audio.loaded){
+            if (audio.pauseTrigger){
+                audio.pauseTrigger = false;
+
+                getSoloud().setPause(audio.handle, true);
+                audio.state = AudioState::Paused;
+            }
+            if (audio.stopTrigger){
+                audio.stopTrigger = false;
+
+                getSoloud().stop(audio.handle);
+                audio.state = AudioState::Stopped;
+            }
             if (audio.startTrigger){
                 audio.startTrigger = false;
 
@@ -192,18 +210,6 @@ void AudioSystem::update(double dt){
                 }
 
                 audio.state = AudioState::Playing;
-            }
-            if (audio.pauseTrigger){
-                audio.pauseTrigger = false;
-
-                getSoloud().setPause(audio.handle, true);
-                audio.state = AudioState::Paused;
-            }
-            if (audio.stopTrigger){
-                audio.stopTrigger = false;
-
-                getSoloud().stop(audio.handle);
-                audio.state = AudioState::Stopped;
             }
 
             if (audio.state == AudioState::Playing){

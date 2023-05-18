@@ -24,6 +24,8 @@ namespace Supernova{
 		static void init();
 		static void deInit();
 
+		static float globalVolume;
+
 		Vector3 cameraLastPosition;
 
 	public:
