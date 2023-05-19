@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 #include "render/Render.h"
 
 namespace Supernova {
