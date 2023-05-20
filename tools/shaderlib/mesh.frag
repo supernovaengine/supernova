@@ -23,19 +23,23 @@ in vec2 v_uv2;
 out vec4 g_finalColor;
 
 uniform sampler2D u_baseColorTexture;
-uniform sampler2D u_metallicRoughnessTexture;
-uniform sampler2D u_normalTexture;
-uniform sampler2D u_occlusionTexture;
-uniform sampler2D u_emissiveTexture;
+#ifndef MATERIAL_UNLIT
+    uniform sampler2D u_metallicRoughnessTexture;
+    uniform sampler2D u_normalTexture;
+    uniform sampler2D u_occlusionTexture;
+    uniform sampler2D u_emissiveTexture;
+#endif
 
 uniform u_fs_pbrParams {
     //Metallic material
     vec4 baseColorFactor;
-    float metallicFactor;
-    float roughnessFactor;
-    vec3 emissiveFactor;
-    vec3 ambientLight;
-    float ambientFactor;
+    #ifndef MATERIAL_UNLIT
+        float metallicFactor;
+        float roughnessFactor;
+        vec3 emissiveFactor;
+        vec3 ambientLight;
+        float ambientFactor;
+    #endif
 } pbrParams;
 
 #ifdef USE_PUNCTUAL
@@ -164,123 +168,125 @@ void main() {
         return;
     #endif
 
-    NormalInfo normalInfo = getNormalInfo();
-    vec3 n = normalInfo.n;
-    vec3 t = normalInfo.t;
-    vec3 b = normalInfo.b;
+    #ifndef MATERIAL_UNLIT
+        NormalInfo normalInfo = getNormalInfo();
+        vec3 n = normalInfo.n;
+        vec3 t = normalInfo.t;
+        vec3 b = normalInfo.b;
 
-    MaterialInfo materialInfo = {0.0, vec3(0.0), 0.0, vec3(0.0), vec3(0.0), 0.0, vec3(0.0), vec3(0.0)};
-    materialInfo.baseColor = baseColor.rgb;
+        MaterialInfo materialInfo = {0.0, vec3(0.0), 0.0, vec3(0.0), vec3(0.0), 0.0, vec3(0.0), vec3(0.0)};
+        materialInfo.baseColor = baseColor.rgb;
 
-    // The default index of refraction of 1.5 yields a dielectric normal incidence reflectance of 0.04.
-    float ior = 1.5;
-    float f0_ior = 0.04;
+        // The default index of refraction of 1.5 yields a dielectric normal incidence reflectance of 0.04.
+        float ior = 1.5;
+        float f0_ior = 0.04;
 
-    materialInfo = getMetallicRoughnessInfo(materialInfo, f0_ior);
+        materialInfo = getMetallicRoughnessInfo(materialInfo, f0_ior);
 
-    materialInfo.perceptualRoughness = clamp(materialInfo.perceptualRoughness, 0.0, 1.0);
-    materialInfo.metallic = clamp(materialInfo.metallic, 0.0, 1.0);
+        materialInfo.perceptualRoughness = clamp(materialInfo.perceptualRoughness, 0.0, 1.0);
+        materialInfo.metallic = clamp(materialInfo.metallic, 0.0, 1.0);
 
-    // Roughness is authored as perceptual roughness; as is convention,
-    // convert to material roughness by squaring the perceptual roughness.
-    materialInfo.alphaRoughness = materialInfo.perceptualRoughness * materialInfo.perceptualRoughness;
+        // Roughness is authored as perceptual roughness; as is convention,
+        // convert to material roughness by squaring the perceptual roughness.
+        materialInfo.alphaRoughness = materialInfo.perceptualRoughness * materialInfo.perceptualRoughness;
 
-    // Compute reflectance.
-    float reflectance = max(max(materialInfo.f0.r, materialInfo.f0.g), materialInfo.f0.b);
+        // Compute reflectance.
+        float reflectance = max(max(materialInfo.f0.r, materialInfo.f0.g), materialInfo.f0.b);
 
-    // Anything less than 2% is physically impossible and is instead considered to be shadowing. Compare to "Real-Time-Rendering" 4th editon on page 325.
-    materialInfo.f90 = vec3(clamp(reflectance * 50.0, 0.0, 1.0));
+        // Anything less than 2% is physically impossible and is instead considered to be shadowing. Compare to "Real-Time-Rendering" 4th editon on page 325.
+        materialInfo.f90 = vec3(clamp(reflectance * 50.0, 0.0, 1.0));
 
-    materialInfo.n = n;
+        materialInfo.n = n;
 
-    // LIGHTING
-    vec3 f_specular = vec3(0.0);
-    vec3 f_diffuse = vec3(0.0);
-    vec3 f_emissive = vec3(0.0);
+        // LIGHTING
+        vec3 f_specular = vec3(0.0);
+        vec3 f_diffuse = vec3(0.0);
+        vec3 f_emissive = vec3(0.0);
 
-    #ifdef USE_IBL
-        //TODO
-    #else
-        // Simple ambient light
-        // convert ambientFactor to linear
-        f_diffuse += pbrParams.ambientLight * pow(pbrParams.ambientFactor, GAMMA) * baseColor.rgb;
-    #endif
+        #ifdef USE_IBL
+            //TODO
+        #else
+            // Simple ambient light
+            // convert ambientFactor to linear
+            f_diffuse += pbrParams.ambientLight * pow(pbrParams.ambientFactor, GAMMA) * baseColor.rgb;
+        #endif
 
-    float ao = getOcclusionTexture().r;
-    f_diffuse = mix(f_diffuse, f_diffuse * ao, occlusionStrength);
-    // apply ambient occlusion too all lighting that is not punctual
-    f_specular = mix(f_specular, f_specular * ao, occlusionStrength);
+        float ao = getOcclusionTexture().r;
+        f_diffuse = mix(f_diffuse, f_diffuse * ao, occlusionStrength);
+        // apply ambient occlusion too all lighting that is not punctual
+        f_specular = mix(f_specular, f_specular * ao, occlusionStrength);
 
-    // Apply light sources
-    #ifdef USE_PUNCTUAL
-        vec3 v = normalize(lighting.eyePos.xyz - v_position);
+        // Apply light sources
+        #ifdef USE_PUNCTUAL
+            vec3 v = normalize(lighting.eyePos.xyz - v_position);
 
-        for (int i = 0; i < MAX_LIGHTS; ++i){
+            for (int i = 0; i < MAX_LIGHTS; ++i){
 
-            //Cannot be in function to avoid GLES2 index errors
-            Light light = Light(
-                int(lighting.position_type[i].w),
-                lighting.direction_range[i].xyz,
-                lighting.color_intensity[i].xyz,
-                lighting.position_type[i].xyz,
-                lighting.direction_range[i].w,
-                lighting.color_intensity[i].w,
-                lighting.inCone_ouCone_shadows_cascades[i].x,
-                lighting.inCone_ouCone_shadows_cascades[i].y,
-                (lighting.inCone_ouCone_shadows_cascades[i].z < 0.0)?false:true,
-                int(lighting.inCone_ouCone_shadows_cascades[i].z),
-                int(lighting.inCone_ouCone_shadows_cascades[i].w)
-            ); 
+                //Cannot be in function to avoid GLES2 index errors
+                Light light = Light(
+                    int(lighting.position_type[i].w),
+                    lighting.direction_range[i].xyz,
+                    lighting.color_intensity[i].xyz,
+                    lighting.position_type[i].xyz,
+                    lighting.direction_range[i].w,
+                    lighting.color_intensity[i].w,
+                    lighting.inCone_ouCone_shadows_cascades[i].x,
+                    lighting.inCone_ouCone_shadows_cascades[i].y,
+                    (lighting.inCone_ouCone_shadows_cascades[i].z < 0.0)?false:true,
+                    int(lighting.inCone_ouCone_shadows_cascades[i].z),
+                    int(lighting.inCone_ouCone_shadows_cascades[i].w)
+                ); 
 
-            if (light.intensity > 0.0){
+                if (light.intensity > 0.0){
 
-                vec3 pointToLight;
-                if(light.type != LightType_Directional) {
-                    pointToLight = light.position - v_position;
-                } else {
-                    pointToLight = -light.direction;
-                }
-
-                vec3 l = normalize(pointToLight);   // Direction from surface point to light
-                vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
-                float NdotL = clampedDot(n, l);
-                float NdotV = clampedDot(n, v);
-                float NdotH = clampedDot(n, h);
-                float LdotH = clampedDot(l, h);
-                float VdotH = clampedDot(v, h);
-
-                float shadow = 1.0;
-                #ifdef USE_SHADOWS
-                    if (light.shadows){
-                        if(light.type == LightType_Spot){ 
-                            shadow = 1.0 - shadowCalculationPCF(light.shadowMapIndex, NdotL);
-                        }else if(light.type == LightType_Directional){
-                            shadow = 1.0 - shadowCascadedCalculationPCF(light.shadowMapIndex, light.numShadowCascades, NdotL);
-                        }else if(light.type == LightType_Point){
-                            shadow = 1.0 - shadowCubeCalculationPCF(light.shadowMapIndex, -pointToLight, NdotL);
-                        }
+                    vec3 pointToLight;
+                    if(light.type != LightType_Directional) {
+                        pointToLight = light.position - v_position;
+                    } else {
+                        pointToLight = -light.direction;
                     }
-                #endif
 
-                if (NdotL > 0.0 || NdotV > 0.0){
-                    // Calculation of analytical light
-                    // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
-                    vec3 intensity = getLighIntensity(light, pointToLight);
-                    f_diffuse += shadow * intensity * NdotL *  BRDF_lambertian(materialInfo.f0, materialInfo.f90, materialInfo.albedoColor, VdotH);
-                    f_specular += shadow * intensity * NdotL * BRDF_specularGGX(materialInfo.f0, materialInfo.f90, materialInfo.alphaRoughness, VdotH, NdotL, NdotV, NdotH);
+                    vec3 l = normalize(pointToLight);   // Direction from surface point to light
+                    vec3 h = normalize(l + v);          // Direction of the vector between l and v, called halfway vector
+                    float NdotL = clampedDot(n, l);
+                    float NdotV = clampedDot(n, v);
+                    float NdotH = clampedDot(n, h);
+                    float LdotH = clampedDot(l, h);
+                    float VdotH = clampedDot(v, h);
+
+                    float shadow = 1.0;
+                    #ifdef USE_SHADOWS
+                        if (light.shadows){
+                            if(light.type == LightType_Spot){ 
+                                shadow = 1.0 - shadowCalculationPCF(light.shadowMapIndex, NdotL);
+                            }else if(light.type == LightType_Directional){
+                                shadow = 1.0 - shadowCascadedCalculationPCF(light.shadowMapIndex, light.numShadowCascades, NdotL);
+                            }else if(light.type == LightType_Point){
+                                shadow = 1.0 - shadowCubeCalculationPCF(light.shadowMapIndex, -pointToLight, NdotL);
+                            }
+                        }
+                    #endif
+
+                    if (NdotL > 0.0 || NdotV > 0.0){
+                        // Calculation of analytical light
+                        // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
+                        vec3 intensity = getLighIntensity(light, pointToLight);
+                        f_diffuse += shadow * intensity * NdotL *  BRDF_lambertian(materialInfo.f0, materialInfo.f90, materialInfo.albedoColor, VdotH);
+                        f_specular += shadow * intensity * NdotL * BRDF_specularGGX(materialInfo.f0, materialInfo.f90, materialInfo.alphaRoughness, VdotH, NdotL, NdotV, NdotH);
+                    }
                 }
             }
-        }
+        #endif
+
+        f_emissive = pbrParams.emissiveFactor;
+        f_emissive *= sRGBToLinear(getEmissiveTexture().rgb);
+
+        vec3 color = f_emissive + f_diffuse + f_specular;
+
+        #ifdef HAS_FOG
+            color.rgb = getFogColor(color.rgb);
+        #endif
+
+        g_finalColor = vec4(linearTosRGB(color.rgb), baseColor.a);
     #endif
-
-    f_emissive = pbrParams.emissiveFactor;
-    f_emissive *= sRGBToLinear(getEmissiveTexture().rgb);
-
-    vec3 color = f_emissive + f_diffuse + f_specular;
-
-    #ifdef HAS_FOG
-        color.rgb = getFogColor(color.rgb);
-    #endif
-
-    g_finalColor = vec4(linearTosRGB(color.rgb), baseColor.a);
 }

@@ -843,7 +843,11 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 				render.applyUniformBlock(mesh.submeshes[i].slotVSMorphTarget, ShaderStageType::VERTEX, sizeof(float) * MAX_MORPHTARGETS, &mesh.morphWeights);
 			}
 
-			render.applyUniformBlock(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 16, &mesh.submeshes[i].material);
+			if (hasLights){
+				render.applyUniformBlock(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 16, &mesh.submeshes[i].material);
+			}else{
+				render.applyUniformBlock(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &mesh.submeshes[i].material);
+			}
 
 			//model, normal and mvp matrix
 			render.applyUniformBlock(mesh.submeshes[i].slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 48, &transform.modelMatrix);
@@ -1061,7 +1065,11 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 			}
 		}
 
-		terrain.render.applyUniformBlock(terrain.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 16, &terrain.material);
+		if (hasLights){
+			terrain.render.applyUniformBlock(terrain.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 16, &terrain.material);
+		}else{
+			terrain.render.applyUniformBlock(terrain.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &terrain.material);
+		}
 
 		//model, normal and mvp matrix
 		terrain.render.applyUniformBlock(terrain.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 48, &transform.modelMatrix);

@@ -24,29 +24,30 @@ vec4 getBaseColor(){
     baseColor *= sRGBToLinear(texture(u_baseColorTexture, v_uv1));
     return baseColor * getVertexColor();
 }
+#ifndef MATERIAL_UNLIT
+    MaterialInfo getMetallicRoughnessInfo(MaterialInfo info, float f0_ior){
+        info.metallic = pbrParams.metallicFactor;
+        info.perceptualRoughness = pbrParams.roughnessFactor;
+        // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
+        // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
+        vec4 mrSample = texture(u_metallicRoughnessTexture, v_uv1);
+        info.perceptualRoughness *= mrSample.g;
+        info.metallic *= mrSample.b;
+        // Achromatic f0 based on IOR.
+        vec3 f0 = vec3(f0_ior);
+        info.albedoColor = mix(info.baseColor.rgb * (vec3(1.0) - f0),  vec3(0), info.metallic);
+        info.f0 = mix(f0, info.baseColor.rgb, info.metallic);
+        return info;
+    }
 
-MaterialInfo getMetallicRoughnessInfo(MaterialInfo info, float f0_ior){
-    info.metallic = pbrParams.metallicFactor;
-    info.perceptualRoughness = pbrParams.roughnessFactor;
-    // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
-    // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
-    vec4 mrSample = texture(u_metallicRoughnessTexture, v_uv1);
-    info.perceptualRoughness *= mrSample.g;
-    info.metallic *= mrSample.b;
-    // Achromatic f0 based on IOR.
-    vec3 f0 = vec3(f0_ior);
-    info.albedoColor = mix(info.baseColor.rgb * (vec3(1.0) - f0),  vec3(0), info.metallic);
-    info.f0 = mix(f0, info.baseColor.rgb, info.metallic);
-    return info;
-}
+    vec4 getOcclusionTexture(){
+        return texture(u_occlusionTexture, v_uv1);
+    }
 
-vec4 getOcclusionTexture(){
-    return texture(u_occlusionTexture, v_uv1);
-}
-
-vec4 getEmissiveTexture(){
-    return texture(u_emissiveTexture, v_uv1);
-}
+    vec4 getEmissiveTexture(){
+        return texture(u_emissiveTexture, v_uv1);
+    }
+#endif
 
 // Get normal, tangent and bitangent vectors.
 NormalInfo getNormalInfo(){
