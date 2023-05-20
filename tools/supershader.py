@@ -136,7 +136,6 @@ def get_default_shaders():
 def get_default_langs():
     l =  "glsl330;"
     l += "glsl300es;"
-    l += "glsl100;"
     l += "msl21ios;"
     l += "msl21macos;"
     l += "hlsl5"

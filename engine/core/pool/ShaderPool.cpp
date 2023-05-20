@@ -47,8 +47,6 @@ std::vector<std::string>& ShaderPool::getMissingShaders(){
 std::string ShaderPool::getShaderLangStr(){
 	if (Engine::getGraphicBackend() == GraphicBackend::GLCORE33){
 		return "glsl330";
-	}else if (Engine::getGraphicBackend() == GraphicBackend::GLES2){
-		return "glsl100";
 	}else if (Engine::getGraphicBackend() == GraphicBackend::GLES3){
 		return "glsl300es";
 	}else if (Engine::getGraphicBackend() == GraphicBackend::METAL){

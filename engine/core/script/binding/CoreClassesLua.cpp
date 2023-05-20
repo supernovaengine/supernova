@@ -44,7 +44,6 @@ void LuaBinding::registerCoreClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .beginNamespace("GraphicBackend")
         .addProperty("GLCORE33", GraphicBackend::GLCORE33)
-        .addProperty("GLES2", GraphicBackend::GLES2)
         .addProperty("GLES3", GraphicBackend::GLES3)
         .addProperty("D3D11", GraphicBackend::D3D11)
         .addProperty("METAL", GraphicBackend::METAL)

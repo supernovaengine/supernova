@@ -94,8 +94,7 @@ public class MainActivity extends Activity {
 			= (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
 
-		final boolean supportsEs2 = 
-			configurationInfo.reqGlEsVersion >= 0x20000 || isProbablyEmulator();
+		final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x30000;
 
 		admobWrapper = new AdMobWrapper(this);
 		userSettings = new UserSettings(this);
@@ -105,7 +104,6 @@ public class MainActivity extends Activity {
 		if (supportsEs2) {
 			glSurfaceView = new GLSurfaceView(this);
 
-			//if (isProbablyEmulator())
 			glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 24, 8);
 
 			calculateScreenSize();
@@ -217,19 +215,10 @@ public class MainActivity extends Activity {
 		} else {
 			// Should never be seen in production, since the manifest filters
 			// unsupported devices.
-			Toast.makeText(this, "This device does not support OpenGL ES 2.0.",
+			Toast.makeText(this, "This device does not support OpenGL ES 3.0.",
 					Toast.LENGTH_LONG).show();
 			return;
 		}
-	}
-
-	private boolean isProbablyEmulator() {
-		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1
-				&& (Build.FINGERPRINT.startsWith("generic")
-						|| Build.FINGERPRINT.startsWith("unknown")
-						|| Build.MODEL.contains("google_sdk")
-						|| Build.MODEL.contains("Emulator")
-						|| Build.MODEL.contains("Android SDK built for x86"));
 	}
 
 	@Override

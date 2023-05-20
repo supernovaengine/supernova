@@ -290,8 +290,6 @@ Platform Engine::getPlatform(){
 GraphicBackend Engine::getGraphicBackend(){
 #if defined(SOKOL_GLCORE33)
     return GraphicBackend::GLCORE33;
-#elif defined(SOKOL_GLES2)
-    return GraphicBackend::GLES2;
 #elif defined(SOKOL_GLES3)
     return GraphicBackend::GLES3;
 #elif defined(SOKOL_D3D11)
@@ -309,8 +307,6 @@ bool Engine::isOpenGL(){
     GraphicBackend gbackend = getGraphicBackend();
 
     if (gbackend == GraphicBackend::GLCORE33)
-        return true;
-    if (gbackend == GraphicBackend::GLES2)
         return true;
     if (gbackend == GraphicBackend::GLES3)
         return true;
