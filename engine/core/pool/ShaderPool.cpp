@@ -12,9 +12,6 @@
 #ifdef SOKOL_GLCORE33
 #include "glsl330.h"
 #endif
-#ifdef SOKOL_GLES2
-#include "glsl100.h"
-#endif
 #ifdef SOKOL_GLES3
 #include "glsl300es.h"
 #endif

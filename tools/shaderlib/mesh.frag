@@ -223,6 +223,7 @@ void main() {
             for (int i = 0; i < MAX_LIGHTS; ++i){
 
                 //Cannot be in function to avoid GLES2 index errors
+                //TODO: check this again, removed GLES2 support
                 Light light = Light(
                     int(lighting.position_type[i].w),
                     lighting.direction_range[i].xyz,

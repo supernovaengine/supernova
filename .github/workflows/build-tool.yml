@@ -76,14 +76,6 @@ jobs:
           }
         - {
             name: "Web (Emscripten)",
-            backend_name: "WebGL",
-            os: ubuntu-latest,
-            platform: "web",
-            gfx_backend: "gles2",
-            app_backend: "emscripten"
-          }
-        - {
-            name: "Web (Emscripten)",
             backend_name: "WebGL 2",
             os: ubuntu-latest,
             platform: "web",
