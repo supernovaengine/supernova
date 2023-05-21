@@ -13,7 +13,7 @@ using namespace Supernova;
 
 SokolScene::SokolScene(){
     pass_action = {0};
-    pass_action.colors[0].action = SG_ACTION_LOAD;
+    pass_action.colors[0].load_action = SG_LOADACTION_LOAD;
 }
 
 SokolScene::SokolScene(const SokolScene& rhs) : pass_action(rhs.pass_action) {}
@@ -28,8 +28,8 @@ SokolScene::~SokolScene(){
 }
 
 void SokolScene::setClearColor(Vector4 clearColor){
-    pass_action.colors[0].action = SG_ACTION_CLEAR;
-    pass_action.colors[0].value = { clearColor.x, clearColor.y, clearColor.z, clearColor.w };
+    pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
+    pass_action.colors[0].clear_value = { clearColor.x, clearColor.y, clearColor.z, clearColor.w };
 }
 
 void SokolScene::startFrameBuffer(FramebufferRender* framebuffer, size_t face){
