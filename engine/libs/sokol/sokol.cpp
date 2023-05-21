@@ -4,10 +4,8 @@
 #define SOKOL_IMPL
 
 #if defined(SUPERNOVA_ANDROID)
-// instancing is not working on Android and GLES2
-// can not use internal Sokol GL Header because gl2ext.h
 #define SOKOL_EXTERNAL_GL_LOADER
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 #endif
 
 #if defined(_WIN32)
@@ -24,6 +22,7 @@
 #include "sokol_gfx.h"
 #include "sokol_time.h"
 //#include "sokol_audio.h"
+//#include "sokol_log.h"
 
 #ifdef SUPERNOVA_SOKOL
     #include "sokol_fetch.h"
