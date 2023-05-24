@@ -30,7 +30,7 @@ bool Text::createText(){
 bool Text::load(){
     UIComponent& ui = getComponent<UIComponent>();
 
-    return scene->getSystem<RenderSystem>()->loadUI(ui, true);
+    return scene->getSystem<RenderSystem>()->loadUI(entity, ui, true);
 }
 
 void Text::setFixedSize(bool fixedSize){

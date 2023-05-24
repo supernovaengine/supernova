@@ -21,7 +21,7 @@ Terrain::~Terrain(){
 bool Terrain::load(){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
-    return scene->getSystem<RenderSystem>()->loadTerrain(terrain);
+    return scene->getSystem<RenderSystem>()->loadTerrain(entity, terrain);
 }
 
 bool Terrain::createTerrain(){

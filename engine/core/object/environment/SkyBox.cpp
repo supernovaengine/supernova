@@ -14,7 +14,7 @@ SkyBox::SkyBox(Scene* scene): EntityHandle(scene){
 bool SkyBox::load(){
     SkyComponent& sky = getComponent<SkyComponent>();
 
-    return scene->getSystem<RenderSystem>()->loadSky(sky);
+    return scene->getSystem<RenderSystem>()->loadSky(entity, sky);
 }
 
 void SkyBox::setTextures(std::string textureFront, std::string textureBack,  

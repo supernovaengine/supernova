@@ -53,3 +53,7 @@ void SokolSystem::shutdown(){
 void SokolSystem::scheduleCleanup(void (*cleanupFunc)(void* cleanupData), void* cleanupData, int32_t numFramesToDefer){
     SokolCmdQueue::schedule_cleanup(cleanupFunc, cleanupData, numFramesToDefer);
 }
+
+void SokolSystem::addQueueCommand(void (*custom_cb)(void* custom_data), void* custom_data){
+    SokolCmdQueue::add_command_custom(custom_cb, custom_data);
+}

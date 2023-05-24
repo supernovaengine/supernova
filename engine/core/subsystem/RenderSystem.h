@@ -54,6 +54,11 @@ namespace Supernova{
 	    Matrix4 lightSpaceMatrix;
 	} vs_depth_t;
 
+	typedef struct check_load_t {
+		Scene* scene;
+		Entity entity;
+	} check_load_t;
+
 	class RenderSystem : public SubSystem {
 	private:
 		struct TransparentMeshesData{
@@ -95,6 +100,8 @@ namespace Supernova{
 
 		std::map<std::string, BufferRender*> bufferNameToRender;
 		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
+
+		static void changeLoaded(void* data);
 
 		void updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 
@@ -155,11 +162,11 @@ namespace Supernova{
 		RenderSystem(Scene* scene);
 		virtual ~RenderSystem();
 
-		bool loadMesh(MeshComponent& mesh);
-		bool loadTerrain(TerrainComponent& terrain);
-		bool loadParticles(ParticlesComponent& particles);
-		bool loadUI(UIComponent& uirender, bool isText);
-		bool loadSky(SkyComponent& sky);
+		bool loadMesh(Entity entity, MeshComponent& mesh);
+		bool loadTerrain(Entity entity, TerrainComponent& terrain);
+		bool loadParticles(Entity entity, ParticlesComponent& particles);
+		bool loadUI(Entity entity, UIComponent& uirender, bool isText);
+		bool loadSky(Entity entity, SkyComponent& sky);
 
 		void updateFramebuffer(CameraComponent& camera);
 		void updateTransform(Transform& transform);

@@ -17,6 +17,7 @@ namespace Supernova{
         static void shutdown();
 
         static void scheduleCleanup(void (*cleanupFunc)(void* cleanupData), void* cleanupData, int32_t numFramesToDefer = 0);
+        static void addQueueCommand(void (*custom_cb)(void* custom_data), void* custom_data);
     };
 }
 

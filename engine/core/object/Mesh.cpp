@@ -19,7 +19,7 @@ Mesh::~Mesh(){
 bool Mesh::load(){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
-    return scene->getSystem<RenderSystem>()->loadMesh(mesh);
+    return scene->getSystem<RenderSystem>()->loadMesh(entity, mesh);
 }
 
 void Mesh::setTexture(std::string path){

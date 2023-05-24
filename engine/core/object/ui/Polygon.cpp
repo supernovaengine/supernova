@@ -27,7 +27,7 @@ bool Polygon::createPolygon(){
 bool Polygon::load(){
     UIComponent& ui = getComponent<UIComponent>();
 
-    return scene->getSystem<RenderSystem>()->loadUI(ui, false);
+    return scene->getSystem<RenderSystem>()->loadUI(entity, ui, false);
 }
 
 void Polygon::addVertex(Vector3 vertex){

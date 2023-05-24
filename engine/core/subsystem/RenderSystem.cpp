@@ -484,7 +484,7 @@ void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& sh
 		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 }
 
-bool RenderSystem::loadMesh(MeshComponent& mesh){
+bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 
 	std::map<std::string, Buffer*> buffers;
 	bool allBuffersEmpty = true;
@@ -781,7 +781,7 @@ bool RenderSystem::loadMesh(MeshComponent& mesh){
 	}
 
 	mesh.needReload = false;
-	mesh.loaded = true;
+	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
 }
@@ -929,7 +929,7 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 	mesh.loaded = false;
 }
 
-bool RenderSystem::loadTerrain(TerrainComponent& terrain){
+bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
 
 	if (!terrain.heightMapLoaded)
 		return false;
@@ -1034,7 +1034,7 @@ bool RenderSystem::loadTerrain(TerrainComponent& terrain){
 	//----------End depth shader---------------
 
 	terrain.needReload = false;
-	terrain.loaded = true;
+	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
 }
@@ -1154,7 +1154,7 @@ void RenderSystem::destroyTerrain(TerrainComponent& terrain){
 	terrain.loaded = false;
 }
 
-bool RenderSystem::loadUI(UIComponent& uirender, bool isText){
+bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, bool isText){
 	ObjectRender& render = uirender.render;
 
 	render.beginLoad(uirender.primitiveType);
@@ -1223,7 +1223,7 @@ bool RenderSystem::loadUI(UIComponent& uirender, bool isText){
 	render.endLoad(PIP_DEFAULT | PIP_RTT);
 
 	uirender.needReload = false;
-	uirender.loaded = true;
+	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
 }
@@ -1293,7 +1293,7 @@ void RenderSystem::destroyUI(UIComponent& uirender){
 	uirender.loaded = false;
 }
 
-bool RenderSystem::loadParticles(ParticlesComponent& particles){
+bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
 	ObjectRender& render = particles.render;
 
 	render.beginLoad(PrimitiveType::POINTS);
@@ -1352,7 +1352,7 @@ bool RenderSystem::loadParticles(ParticlesComponent& particles){
 	render.endLoad(PIP_DEFAULT | PIP_RTT);
 
 	particles.needReload = false;
-	particles.loaded = true;
+	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
 }
@@ -1405,7 +1405,7 @@ void RenderSystem::destroyParticles(ParticlesComponent& particles){
 	particles.loaded = false;
 }
 
-bool RenderSystem::loadSky(SkyComponent& sky){
+bool RenderSystem::loadSky(Entity entity, SkyComponent& sky){
 
 	createSky(sky);
 
@@ -1441,7 +1441,7 @@ bool RenderSystem::loadSky(SkyComponent& sky){
 
 	render->endLoad(PIP_DEFAULT | PIP_RTT);
 
-	sky.loaded = true;
+	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
 }
@@ -2152,6 +2152,43 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 	}
 }
 
+void RenderSystem::changeLoaded(void* data){
+	check_load_t* loadObj = (check_load_t*)data;
+
+	Scene* scene = loadObj->scene;
+	Entity entity = loadObj->entity;
+
+	Signature signature = scene->getSignature(entity);
+
+	if (signature.test(scene->getComponentType<MeshComponent>())){
+		MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+		mesh.loaded = true;
+
+	}else if (signature.test(scene->getComponentType<UIComponent>())){
+		UIComponent& uirender = scene->getComponent<UIComponent>(entity);
+
+		uirender.loaded = true;
+
+	}else if (signature.test(scene->getComponentType<TerrainComponent>())){
+		TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+
+		terrain.loaded = true;
+
+	}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
+		ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+
+		particles.loaded = true;
+
+	}else if (signature.test(scene->getComponentType<SkyComponent>())){
+		SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+
+		sky.loaded = true;
+	}
+
+	delete (check_load_t*)data;
+}
+
 void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
 	if (transform.billboard && !transform.fakeBillboard){
 
@@ -2272,16 +2309,18 @@ void RenderSystem::update(double dt){
 	loadLights();
 	loadAndProcessFog();
 
-	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
-	if (sky){
+	auto skys = scene->getComponentArray<SkyComponent>();
+	if (skys->size() > 0){
+		SkyComponent& sky = skys->getComponentFromIndex(0);
+		Entity entity = skys->getEntity(0);
 		if (mainCamera.needUpdate){
 			if (!hasMultipleCameras){
-				updateSkyViewProjection(*sky, mainCamera);
+				updateSkyViewProjection(sky, mainCamera);
 			}
 		}
 
-		if (!sky->loaded){
-			loadSky(*sky);
+		if (!sky.loaded){
+			loadSky(entity, sky);
 		}
 	}
 
@@ -2297,7 +2336,7 @@ void RenderSystem::update(double dt){
 				destroyMesh(mesh);
 			}
 			if (!mesh.loaded){
-				loadMesh(mesh);
+				loadMesh(entity, mesh);
 			}
 		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
 			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
@@ -2305,7 +2344,7 @@ void RenderSystem::update(double dt){
 				destroyTerrain(terrain);
 			}
 			if (!terrain.loaded){
-				loadTerrain(terrain);
+				loadTerrain(entity, terrain);
 			}
 		}else if (signature.test(scene->getComponentType<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
@@ -2318,7 +2357,7 @@ void RenderSystem::update(double dt){
 					destroyUI(ui);
 				}
 				if (!ui.loaded){
-					loadUI(ui, isText);
+					loadUI(entity, ui, isText);
 				}
 			}
 		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
@@ -2327,7 +2366,7 @@ void RenderSystem::update(double dt){
 				destroyParticles(particles);
 			}
 			if (!particles.loaded){
-				loadParticles(particles);
+				loadParticles(entity, particles);
 			}
 		}
 
@@ -2499,17 +2538,15 @@ void RenderSystem::draw(){
 		bool hasActiveScissor = false;
 
 		//---------Draw sky----------
-		SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
-		if (sky){
+		auto skys = scene->getComponentArray<SkyComponent>();
+		if (skys->size() > 0){
+			SkyComponent& sky = skys->getComponentFromIndex(0);
+			Entity entity = skys->getEntity(0);
 			if (hasMultipleCameras){
-				updateSkyViewProjection(*sky, camera);
+				updateSkyViewProjection(sky, camera);
 			}
 
-			if (!sky->loaded){
-				loadSky(*sky);
-			}
-
-			drawSky(*sky, camera.renderToTexture);
+			drawSky(sky, camera.renderToTexture);
 		}
 
 		for (int i = 0; i < transforms->size(); i++){
