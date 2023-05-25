@@ -11,6 +11,8 @@
 #include "subsystem/AudioSystem.h"
 #include "subsystem/RenderSystem.h"
 #include "subsystem/UISystem.h"
+#include "pool/TexturePool.h"
+#include "pool/ShaderPool.h"
 
 #include "sokol_time.h"
 
@@ -131,9 +133,9 @@ void Engine::removeAllSceneLayers(){
     for (int i = 1; i < MAX_SCENE_LAYERS; i++){
         if (scenes[i]){
             scenes[i] = NULL;
-            numScenes--;
         }
     }
+    numScenes = 0;
 }
 
 void Engine::includeScene(size_t index, Scene* scene, bool mainScene){
@@ -483,12 +485,22 @@ void Engine::systemDraw(){
 }
 
 void Engine::systemShutdown(){
+    Engine::onShutdown.call();
+
     for (int i = 0; i < numScenes; i++){
         scenes[i]->destroy();
     }
 
+    TexturePool::clear();
+    ShaderPool::clear();
+
+    removeAllSceneLayers();
+
+    lastTime = 0;
+    updateTimeCount = 0;
+    viewLoaded = false;
+
     SystemRender::shutdown();
-    Engine::onShutdown.call();
 }
 
 void Engine::systemPause(){

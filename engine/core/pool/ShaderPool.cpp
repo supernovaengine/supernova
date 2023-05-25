@@ -234,3 +234,10 @@ std::string ShaderPool::getPointsProperties(bool texture, bool vertexColorVec3, 
 
 	return prop;
 }
+
+void ShaderPool::clear(){
+	for (auto& it: getMap()) {
+		it.second->destroyShader();
+	}
+	getMap().clear();
+}

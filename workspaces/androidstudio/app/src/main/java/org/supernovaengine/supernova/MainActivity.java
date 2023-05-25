@@ -245,8 +245,8 @@ public class MainActivity extends Activity {
 
 	@Override
 	public void onDestroy() {
-    	// error when shutdown: call to OpenGL ES API with no current context (logged once per thread)
-		//JNIWrapper.system_shutdown();
+    	// Android lifecycle preserves variables after onDestroy
+		JNIWrapper.system_shutdown();
 
 		super.onDestroy();
 	}
