@@ -267,8 +267,8 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
     if (!ui.loaded){
         if (!button.textureNormal.load()){
             button.textureNormal = ui.texture;
-            button.textureNormal.load();
         }
+        button.textureNormal.load();
         button.texturePressed.load();
         button.textureDisabled.load();
     }
@@ -278,6 +278,8 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
     UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
     UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
 
+    labellayout.width = 0;
+    labellayout.height = 0;
     createOrUpdateText(labeltext, labelui, labellayout);
     
     labellayout.anchorPreset = AnchorPreset::CENTER;
@@ -499,17 +501,9 @@ bool UISystem::createOrUpdateText(TextComponent& text, UIComponent& ui, UILayout
         }
 
         if (text.loaded && text.needReload){
-            ui.texture.destroy(); //texture.setData also destroy it
-            text.loaded = false;
+            destroyText(text);
         }
         if (!text.loaded){
-            if (layout.width > 0){
-                text.fixedWidth = true;
-            }
-            if (layout.height > 0){
-                text.fixedHeight = true;
-            }
-
             loadFontAtlas(text, ui, layout);
         }
         createText(text, ui, layout);
@@ -679,11 +673,52 @@ void UISystem::changeFlipY(UIComponent& ui, CameraComponent& camera){
     }
 }
 
+void UISystem::destroyText(TextComponent& text){
+    text.loaded = false;
+    text.needReload = false;
+
+    text.needUpdateText = true;
+}
+
+void UISystem::destroyButton(ButtonComponent& button){
+    button.textureNormal.destroy();
+    button.texturePressed.destroy();
+    button.textureDisabled.destroy();
+
+    button.needUpdateButton = true;
+}
+
+void UISystem::destroyTextEdit(TextEditComponent& textedit){
+    textedit.needUpdateTextEdit = true;
+}
+
 void UISystem::load(){
     update(0);
 }
 
 void UISystem::destroy(){
+    auto layouts = scene->getComponentArray<UILayoutComponent>();
+    for (int i = 0; i < layouts->size(); i++) {
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
+        Entity entity = layouts->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+
+        if (signature.test(scene->getComponentType<TextComponent>())) {
+            TextComponent &text = scene->getComponent<TextComponent>(entity);
+
+            destroyText(text);
+        }
+        if (signature.test(scene->getComponentType<ButtonComponent>())) {
+            ButtonComponent &button = scene->getComponent<ButtonComponent>(entity);
+
+            destroyButton(button);
+        }
+        if (signature.test(scene->getComponentType<TextEditComponent>())) {
+            TextEditComponent &textedit = scene->getComponent<TextEditComponent>(entity);
+
+            destroyTextEdit(textedit);
+        }
+    }
 }
 
 void UISystem::draw(){
@@ -947,17 +982,23 @@ void UISystem::entityDestroyed(Entity entity){
     if (signature.test(scene->getComponentType<TextComponent>())){
         TextComponent& text = scene->getComponent<TextComponent>(entity);
 
+        destroyText(text);
         if (text.stbtext){
             delete text.stbtext;
         }
     }
-
     if (signature.test(scene->getComponentType<ButtonComponent>())){
         ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
 
+        destroyButton(button);
         if (button.label != NULL_ENTITY){
             scene->destroyEntity(button.label);
         }
+    }
+    if (signature.test(scene->getComponentType<TextEditComponent>())){
+        TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
+
+        destroyTextEdit(textedit);
     }
 }
 

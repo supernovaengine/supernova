@@ -374,7 +374,9 @@ bool TextureData::isTransparent(){
 }
 
 void TextureData::cleanupTexture(void* data){
-    if (data){
-        stbi_image_free(data);
+    TextureData* texData = (TextureData*)data;
+    if (texData->data){
+        stbi_image_free(texData->data);
+        texData->data = NULL;
     }
 }

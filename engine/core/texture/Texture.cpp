@@ -268,7 +268,7 @@ bool Texture::load(){
 
     if (releaseDataAfterLoad){
         for (int f = 0; f < numFaces; f++){
-            SystemRender::scheduleCleanup(TextureData::cleanupTexture, data[f].getData());
+            SystemRender::scheduleCleanup(TextureData::cleanupTexture, &data[f]);
         }
     }
 
@@ -280,6 +280,7 @@ bool Texture::load(){
 void Texture::destroy(){
     if (!id.empty() && renderAndData){
 	    renderAndData.reset();
+        renderAndData = NULL;
 	    TexturePool::remove(id);
         if (!framebuffer){
             needLoad = true;

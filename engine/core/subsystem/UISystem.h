@@ -48,6 +48,10 @@ namespace Supernova{
 		void applyAnchorPreset(UILayoutComponent& layout);
 		void changeFlipY(UIComponent& ui, CameraComponent& camera);
 
+		void destroyText(TextComponent& text);
+		void destroyButton(ButtonComponent& button);
+		void destroyTextEdit(TextEditComponent& textedit);
+
 	public:
 		UISystem(Scene* scene);
 		virtual ~UISystem();
