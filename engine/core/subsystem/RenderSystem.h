@@ -150,6 +150,7 @@ namespace Supernova{
 		void drawSky(SkyComponent& sky, bool renderToTexture);
 		void destroySky(SkyComponent& sky);
 
+		void destroyLight(LightComponent& light);
 		
 		void updateSkyViewProjection(SkyComponent& sky, CameraComponent& camera);
 		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);

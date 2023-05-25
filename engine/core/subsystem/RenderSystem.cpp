@@ -97,6 +97,9 @@ void RenderSystem::destroy(){
 			if (particles.loaded){
 				destroyParticles(particles);
 			}
+		}else if (signature.test(scene->getComponentType<LightComponent>())){
+			LightComponent& light = scene->getComponent<LightComponent>(entity);
+			destroyLight(light);
 		}
 	}
 }
@@ -781,6 +784,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 	}
 
 	mesh.needReload = false;
+	mesh.loadCalled = true;
 	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
@@ -927,6 +931,7 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 	}
 
 	mesh.loaded = false;
+	mesh.loadCalled = false;
 }
 
 bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
@@ -1034,6 +1039,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
 	//----------End depth shader---------------
 
 	terrain.needReload = false;
+	terrain.loadCalled = true;
 	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
@@ -1152,6 +1158,7 @@ void RenderSystem::destroyTerrain(TerrainComponent& terrain){
 	terrain.indices.getRender()->destroyBuffer();
 
 	terrain.loaded = false;
+	terrain.loadCalled = false;
 }
 
 bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, bool isText){
@@ -1223,6 +1230,7 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, bool isText){
 	render.endLoad(PIP_DEFAULT | PIP_RTT);
 
 	uirender.needReload = false;
+	uirender.loadCalled = true;
 	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
@@ -1291,6 +1299,7 @@ void RenderSystem::destroyUI(UIComponent& uirender){
 	uirender.slotFSParams = -1;
 
 	uirender.loaded = false;
+	uirender.loadCalled = false;
 }
 
 bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
@@ -1352,6 +1361,7 @@ bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
 	render.endLoad(PIP_DEFAULT | PIP_RTT);
 
 	particles.needReload = false;
+	particles.loadCalled = true;
 	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
@@ -1403,6 +1413,7 @@ void RenderSystem::destroyParticles(ParticlesComponent& particles){
 	particles.slotVSParams = -1;
 
 	particles.loaded = false;
+	particles.loadCalled = false;
 }
 
 bool RenderSystem::loadSky(Entity entity, SkyComponent& sky){
@@ -1441,6 +1452,7 @@ bool RenderSystem::loadSky(Entity entity, SkyComponent& sky){
 
 	render->endLoad(PIP_DEFAULT | PIP_RTT);
 
+	sky.loadCalled = true;
 	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
@@ -1489,6 +1501,14 @@ void RenderSystem::destroySky(SkyComponent& sky){
 	sky.slotFSParams = -1;
 
 	sky.loaded = false;
+	sky.loadCalled = false;
+}
+
+void RenderSystem::destroyLight(LightComponent& light){
+	for (int i = 0; i < MAX_SHADOWCASCADES; i++) {
+		light.framebuffer[i].destroyFramebuffer();
+	}
+
 }
 
 Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img, Transform& transform, CameraComponent& camera){
@@ -2319,7 +2339,7 @@ void RenderSystem::update(double dt){
 			}
 		}
 
-		if (!sky.loaded){
+		if (!sky.loadCalled){
 			loadSky(entity, sky);
 		}
 	}
@@ -2335,7 +2355,7 @@ void RenderSystem::update(double dt){
 			if (mesh.loaded && mesh.needReload){
 				destroyMesh(mesh);
 			}
-			if (!mesh.loaded){
+			if (!mesh.loadCalled){
 				loadMesh(entity, mesh);
 			}
 		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
@@ -2343,7 +2363,7 @@ void RenderSystem::update(double dt){
 			if (terrain.loaded && terrain.needReload){
 				destroyTerrain(terrain);
 			}
-			if (!terrain.loaded){
+			if (!terrain.loadCalled){
 				loadTerrain(entity, terrain);
 			}
 		}else if (signature.test(scene->getComponentType<UIComponent>())){
@@ -2356,7 +2376,7 @@ void RenderSystem::update(double dt){
 				if (ui.loaded && ui.needReload){
 					destroyUI(ui);
 				}
-				if (!ui.loaded){
+				if (!ui.loadCalled){
 					loadUI(entity, ui, isText);
 				}
 			}
@@ -2365,7 +2385,7 @@ void RenderSystem::update(double dt){
 			if (particles.loaded && particles.needReload){
 				destroyParticles(particles);
 			}
-			if (!particles.loaded){
+			if (!particles.loadCalled){
 				loadParticles(entity, particles);
 			}
 		}
@@ -2687,7 +2707,9 @@ void RenderSystem::draw(){
 void RenderSystem::entityDestroyed(Entity entity){
 	Signature signature = scene->getSignature(entity);
 
-	//TODO: Destroy lights?
+	if (signature.test(scene->getComponentType<LightComponent>())){
+		destroyLight(scene->getComponent<LightComponent>(entity));
+	}
 
 	if (signature.test(scene->getComponentType<MeshComponent>())){
 		destroyMesh(scene->getComponent<MeshComponent>(entity));

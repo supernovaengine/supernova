@@ -16,6 +16,7 @@ namespace Supernova{
     struct UIComponent{
         // Render part
         bool loaded = false;
+        bool loadCalled = false;
 
         InterleavedBuffer buffer;
         IndexBuffer indices;

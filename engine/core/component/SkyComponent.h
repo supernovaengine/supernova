@@ -8,6 +8,7 @@ namespace Supernova{
 
     struct SkyComponent{
         bool loaded = false;
+        bool loadCalled = false;
 
         InterleavedBuffer buffer;
 

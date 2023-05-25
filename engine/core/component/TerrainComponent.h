@@ -37,6 +37,7 @@ namespace Supernova{
 
     struct TerrainComponent{
         bool loaded = false;
+        bool loadCalled = false;
 
         Material material;
 

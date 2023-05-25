@@ -64,6 +64,7 @@ namespace Supernova{
 
     struct MeshComponent{
         bool loaded = false;
+        bool loadCalled = false;
 
         InterleavedBuffer buffer;
         IndexBuffer indices;

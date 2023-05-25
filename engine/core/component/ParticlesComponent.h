@@ -33,6 +33,7 @@ namespace Supernova{
 
     struct ParticlesComponent{
         bool loaded = false;
+        bool loadCalled = false;
 
         ExternalBuffer buffer;
 
