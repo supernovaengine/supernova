@@ -46,6 +46,8 @@ namespace Supernova {
         static void luaCallback(int nargs, int nresults, int msgh);
 
         static void stackDump (lua_State *L);
+
+        static void cleanup();
         
     };
     

@@ -170,6 +170,11 @@ namespace Supernova {
         {
             return call(args...);
         }
+
+        void clear(){
+            functions.clear();
+            tags.clear();
+        }
     };
 }
 

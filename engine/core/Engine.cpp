@@ -487,6 +487,8 @@ void Engine::systemDraw(){
 void Engine::systemShutdown(){
     Engine::onShutdown.call();
 
+    LuaBinding::cleanup();
+
     for (int i = 0; i < numScenes; i++){
         scenes[i]->destroy();
     }

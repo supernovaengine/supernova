@@ -14,10 +14,10 @@ using namespace Supernova;
 
 
 SokolObject::SokolObject(){
-    bind = {}; 
     pip.id = SG_INVALID_ID;
     depth_pip.id = SG_INVALID_ID;
     rtt_pip.id = SG_INVALID_ID;
+    bind = {}; 
     pipeline_desc = {};
     bindSlotIndex = 0;
 }
@@ -277,4 +277,7 @@ void SokolObject::destroy(){
     pip.id = SG_INVALID_ID;
     depth_pip.id = SG_INVALID_ID;
     rtt_pip.id = SG_INVALID_ID;
+    bind = {}; 
+    pipeline_desc = {};
+    bindSlotIndex = 0;
 }

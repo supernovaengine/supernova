@@ -31,7 +31,9 @@ LuaFunctionBase::LuaFunctionBase(const LuaFunctionBase &other): m_vm(other.m_vm)
 
 LuaFunctionBase::~LuaFunctionBase(){
     // delete the reference from registry
-    luaL_unref(m_vm, LUA_REGISTRYINDEX, m_func);
+    if (lua_isfunction(m_vm, -1)) {
+        luaL_unref(m_vm, LUA_REGISTRYINDEX, m_func);
+    }
 }
 
 LuaFunctionBase& LuaFunctionBase::operator=(const LuaFunctionBase &other){

@@ -228,3 +228,10 @@ void LuaBinding::registerClasses(lua_State *L){
 
 #endif //DISABLE_LUA_BINDINGS
 }
+
+
+void LuaBinding::cleanup(){
+    lua_State *L = LuaBinding::getLuaState();
+
+    lua_close(L);
+}

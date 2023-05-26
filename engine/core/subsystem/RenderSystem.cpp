@@ -37,17 +37,17 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
 	signature.set(scene->getComponentType<Transform>());
 
 	this->scene = scene;
-
-	hasLights = false;
-	hasShadows = false;
-	hasFog = false;
-	hasMultipleCameras = false;
 }
 
 RenderSystem::~RenderSystem(){
 }
 
 void RenderSystem::load(){
+	hasLights = false;
+	hasShadows = false;
+	hasFog = false;
+	hasMultipleCameras = false;
+
 	createEmptyTextures();
 	checkLightsAndShadow();
 		
@@ -65,6 +65,13 @@ void RenderSystem::load(){
 }
 
 void RenderSystem::destroy(){
+	emptyWhite.destroyTexture();
+	emptyBlack.destroyTexture();
+	emptyCubeBlack.destroyTexture();
+	emptyNormal.destroyTexture();
+
+	emptyTexturesCreated = false;
+
 	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
 	if (sky){
 		if (sky->loaded){
