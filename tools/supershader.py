@@ -265,7 +265,6 @@ def generate(shaders, langs, engine_root, verbose, max_lights, max_shadowsmap, m
             defines += ';MAX_SHADOWSCUBEMAP='+str(max_shadowscubemap)
             defines += ';MAX_SHADOWCASCADES='+str(max_shadowcascades)
             defines += ';MAX_BONES='+str(70)
-            defines += ';MAX_MORPHTARGETS='+str(2) #8/4 because it uses vec4 in shader
 
             while properties != '':
                 if len(defines) > 0:

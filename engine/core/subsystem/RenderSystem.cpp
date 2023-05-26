@@ -847,7 +847,11 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 			}
 
 			if (mesh.submeshes[i].hasMorphTarget){
-				render.applyUniformBlock(mesh.submeshes[i].slotVSMorphTarget, ShaderStageType::VERTEX, sizeof(float) * MAX_MORPHTARGETS, &mesh.morphWeights);
+				if (!mesh.submeshes[i].hasMorphNormal && !mesh.submeshes[i].hasMorphTangent){
+					render.applyUniformBlock(mesh.submeshes[i].slotVSMorphTarget, ShaderStageType::VERTEX, sizeof(float) * MAX_MORPHTARGETS, &mesh.morphWeights);
+				}else{
+					render.applyUniformBlock(mesh.submeshes[i].slotVSMorphTarget, ShaderStageType::VERTEX, sizeof(float) * MAX_MORPHTARGETS / 2, &mesh.morphWeights);
+				}
 			}
 
 			if (hasLights){
@@ -878,7 +882,11 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams){
 				depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthSkinning, ShaderStageType::VERTEX, sizeof(float) * 16 * MAX_BONES, &mesh.bonesMatrix);
 			}
 			if (mesh.submeshes[i].hasMorphTarget){
-				depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthMorphTarget, ShaderStageType::VERTEX, sizeof(float) * MAX_MORPHTARGETS, &mesh.morphWeights);
+				if (!mesh.submeshes[i].hasMorphNormal && !mesh.submeshes[i].hasMorphTangent){
+					depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthMorphTarget, ShaderStageType::VERTEX, sizeof(float) * MAX_MORPHTARGETS, &mesh.morphWeights);
+				}else{
+					depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthMorphTarget, ShaderStageType::VERTEX, sizeof(float) * MAX_MORPHTARGETS / 2, &mesh.morphWeights);
+				}
 			}
 
 			depthRender.draw(mesh.submeshes[i].vertexCount);

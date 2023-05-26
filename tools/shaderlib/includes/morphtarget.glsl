@@ -29,7 +29,11 @@
     #endif
 
     uniform u_vs_morphtarget {
-        vec4 morphWeights[MAX_MORPHTARGETS];
+        #if !defined(HAS_MORPHNORMAL) && !defined(HAS_MORPHTANGENT)
+            vec4 morphWeights[2];
+        #else
+            vec4 morphWeights[1];
+        #endif
     };
 #endif
 
