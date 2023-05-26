@@ -151,6 +151,7 @@ namespace Supernova{
 		void destroySky(SkyComponent& sky);
 
 		void destroyLight(LightComponent& light);
+		void destroyCamera(CameraComponent& camera, bool entityDestroyed);
 		
 		void updateSkyViewProjection(SkyComponent& sky, CameraComponent& camera);
 		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);

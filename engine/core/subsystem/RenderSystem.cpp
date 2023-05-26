@@ -107,6 +107,9 @@ void RenderSystem::destroy(){
 		}else if (signature.test(scene->getComponentType<LightComponent>())){
 			LightComponent& light = scene->getComponent<LightComponent>(entity);
 			destroyLight(light);
+		}else if (signature.test(scene->getComponentType<CameraComponent>())){
+			CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+			destroyCamera(camera, false);
 		}
 	}
 }
@@ -1515,7 +1518,16 @@ void RenderSystem::destroyLight(LightComponent& light){
 	for (int i = 0; i < MAX_SHADOWCASCADES; i++) {
 		light.framebuffer[i].destroyFramebuffer();
 	}
+}
 
+void RenderSystem::destroyCamera(CameraComponent& camera, bool entityDestroyed){
+	if (camera.framebuffer){
+		if (entityDestroyed){
+			delete camera.framebuffer; // destroy framebuffer in destructor
+		}else{
+			camera.framebuffer->destroy();
+		}
+	}
 }
 
 Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img, Transform& transform, CameraComponent& camera){
@@ -2739,9 +2751,6 @@ void RenderSystem::entityDestroyed(Entity entity){
 	}
 
 	if (signature.test(scene->getComponentType<CameraComponent>())){
-		CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
-		if (camera.framebuffer){
-			delete camera.framebuffer; // destroy render is in destructor
-		}
+		destroyCamera(scene->getComponent<CameraComponent>(entity), true);
 	}
 }
