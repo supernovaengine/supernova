@@ -49,7 +49,6 @@ void RenderSystem::load(){
 	hasMultipleCameras = false;
 
 	createEmptyTextures();
-	checkLightsAndShadow();
 		
 	update(0); // first update
 
@@ -177,7 +176,10 @@ void RenderSystem::createEmptyTextures(){
 	}
 }
 
-void RenderSystem::checkLightsAndShadow(){
+int RenderSystem::checkLightsAndShadow(){
+	hasLights = false;
+	hasShadows = false;
+
 	auto lights = scene->getComponentArray<LightComponent>();
 
 	int numLights = lights->size();
@@ -193,23 +195,15 @@ void RenderSystem::checkLightsAndShadow(){
 			hasShadows = true;
 		}
 	}
+
+	return numLights;
 }
 
-bool RenderSystem::loadLights(){
-	hasLights = false;
-	hasShadows = false;
-
+bool RenderSystem::loadLights(int numLights){
 	int freeShadowMap = 0;
 	int freeShadowCubeMap = MAX_SHADOWSMAP;
 
 	auto lights = scene->getComponentArray<LightComponent>();
-
-	int numLights = lights->size();
-	if (numLights > MAX_LIGHTS)
-		numLights = MAX_LIGHTS;
-
-	if (numLights > 0)
-		hasLights = true; // Re-check lights on, after checked in checkLightsAndShadow()
 	
 	for (int i = 0; i < numLights; i++){
 		LightComponent& light = lights->getComponentFromIndex(i);
@@ -222,7 +216,6 @@ bool RenderSystem::loadLights(){
 				Log::warn("Shadow cascades number is bigger than max value");
 			}
 
-			hasShadows = true; // Re-check shadows on, after checked in checkLightsAndShadow()
 			if (light.type == LightType::POINT){
 				if (!light.framebuffer[0].isCreated())
 					light.framebuffer[0].createFramebuffer(
@@ -2303,6 +2296,8 @@ void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent
 }
 
 void RenderSystem::update(double dt){
+	int numLights = checkLightsAndShadow();
+
 	auto transforms = scene->getComponentArray<Transform>();
 	auto cameras = scene->getComponentArray<CameraComponent>();
 
@@ -2345,7 +2340,7 @@ void RenderSystem::update(double dt){
 	CameraComponent& mainCamera =  scene->getComponent<CameraComponent>(mainCameraEntity);
 	Transform& mainCameraTransform =  scene->getComponent<Transform>(mainCameraEntity);
 
-	loadLights();
+	loadLights(numLights);
 	loadAndProcessFog();
 
 	auto skys = scene->getComponentArray<SkyComponent>();

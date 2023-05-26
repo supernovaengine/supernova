@@ -107,8 +107,8 @@ namespace Supernova{
 
 		void createFramebuffer(CameraComponent& camera);
 		void createEmptyTextures();
-		void checkLightsAndShadow();
-		bool loadLights();
+		int checkLightsAndShadow();
+		bool loadLights(int numLights);
 		void processLights(Transform& cameraTransform);
 		bool loadAndProcessFog();
 		TextureShaderType getShadowMapByIndex(int index);
