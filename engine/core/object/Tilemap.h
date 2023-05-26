@@ -28,6 +28,7 @@ namespace Supernova{
         void addRect(Rect rect);
         void removeRect(int id);
         void removeRect(std::string name);
+        void clearRects();
 
         TileRectData& getRect(int id);
         TileRectData& getRect(std::string name);
@@ -39,12 +40,15 @@ namespace Supernova{
         void addTile(std::string rectString, Vector2 position, float width, float height);
         void removeTile(int id);
         void removeTile(std::string name);
+        void clearTiles();
 
         TileData& getTile(int id);
         TileData& getTile(std::string name);
 
         void setReserveTiles(unsigned int reserveTiles);
         unsigned int getReserveTiles() const;
+
+        void clearAll();
 
     };
 

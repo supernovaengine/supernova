@@ -135,6 +135,15 @@ void Tilemap::removeRect(std::string name){
         removeRect(rect);
 }
 
+void Tilemap::clearRects(){
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+
+    for (int i = 0; i < MAX_TILEMAP_TILESRECT; i++){
+        tilemap.tilesRect[i].submeshId = -1;
+        tilemap.tilesRect[i].name.clear();
+    }
+}
+
 TileRectData& Tilemap::getRect(int id){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
@@ -208,6 +217,16 @@ void Tilemap::removeTile(std::string name){
         removeTile(tile);
 }
 
+void Tilemap::clearTiles(){
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+
+    for (int i = 0; i < MAX_TILEMAP_TILES; i++){
+        tilemap.tiles[i].width = 0;
+        tilemap.tiles[i].height = 0;
+        tilemap.tiles[i].name.clear();
+    }
+}
+
 TileData& Tilemap::getTile(int id){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
@@ -236,4 +255,9 @@ unsigned int Tilemap::getReserveTiles() const{
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
     return tilemap.reserveTiles;
+}
+
+void Tilemap::clearAll(){
+    clearTiles();
+    clearRects();
 }

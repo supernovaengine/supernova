@@ -269,6 +269,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("removeRect", 
             luabridge::overload<int>(&Tilemap::removeRect),
             luabridge::overload<std::string>(&Tilemap::removeRect))
+        .addFunction("clearRects", &Tilemap::clearRects)
         .addFunction("getRect", 
             luabridge::overload<int>(&Tilemap::getRect),
             luabridge::overload<std::string>(&Tilemap::getRect))
@@ -281,10 +282,12 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("removeTile", 
             luabridge::overload<int>(&Tilemap::removeTile),
             luabridge::overload<std::string>(&Tilemap::removeTile))
+        .addFunction("clearTiles", &Tilemap::clearTiles)
         .addFunction("getTile", 
             luabridge::overload<int>(&Tilemap::getTile),
             luabridge::overload<std::string>(&Tilemap::getTile))
         .addProperty("reserveTiles", &Tilemap::getReserveTiles, &Tilemap::setReserveTiles)
+        .addFunction("clearAll", &Tilemap::clearAll)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
