@@ -70,7 +70,8 @@ void TexturePool::remove(std::string id){
 
 void TexturePool::clear(){
 	for (auto& it: getMap()) {
-		it.second->render.destroyTexture();
+		if (it.second)
+			it.second->render.destroyTexture();
 	}
 	getMap().clear();
 }
