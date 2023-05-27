@@ -274,45 +274,48 @@ void Scene::addEntityChild(Entity parent, Entity child){
 
 		auto transforms = componentManager.getComponentArray<Transform>();
 
-		//----------DEBUG
-		//Log::debug("Add child - BEFORE");
-		//for (int i = 0; i < transforms->size(); i++){
-		//	auto transform = transforms->getComponentFromIndex(i);
-		//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
-		//}
-		//----------DEBUG
+		if (transformChild.parent != parent) {
+			transformChild.parent = parent;
 
-		//size_t parentIndex = transforms->getIndex(parent);
-		size_t childIndex = transforms->getIndex(child);
+			//----------DEBUG
+			//Log::debug("Add child - BEFORE");
+			//for (int i = 0; i < transforms->size(); i++){
+			//	auto transform = transforms->getComponentFromIndex(i);
+			//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
+			//}
+			//----------DEBUG
 
-		transformChild.parent = parent;
+			//size_t parentIndex = transforms->getIndex(parent);
+			size_t childIndex = transforms->getIndex(child);
 
-		//find children of parent and child family
-		size_t newIndex = findBranchLastIndex(parent) + 1;
-		size_t lastChild = findBranchLastIndex(child);
+			//find children of parent and child family
+			size_t newIndex = findBranchLastIndex(parent) + 1;
+			size_t lastChild = findBranchLastIndex(child);
 
-		int length = lastChild - childIndex + 1;
+			int length = lastChild - childIndex + 1;
 
-		if (newIndex > childIndex){
-			newIndex = newIndex - length;
-		}
-
-		if (childIndex != newIndex){
-			if (length == 1){
-				transforms->moveEntityToIndex(child, newIndex);
-			}else{
-				transforms->moveEntityRangeToIndex(child, transforms->getEntity(lastChild), newIndex);
+			if (newIndex > childIndex) {
+				newIndex = newIndex - length;
 			}
-		}
 
-		//----------DEBUG
-		//Log::debug("Add child - AFTER");
-		//for (int i = 0; i < transforms->size(); i++){
-		//	auto transform = transforms->getComponentFromIndex(i);
-		//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
-		//}
-		//Log::debug("\n");
-		//----------DEBUG
+			if (childIndex != newIndex) {
+				if (length == 1) {
+					transforms->moveEntityToIndex(child, newIndex);
+				} else {
+					transforms->moveEntityRangeToIndex(child, transforms->getEntity(lastChild),
+													   newIndex);
+				}
+			}
+
+			//----------DEBUG
+			//Log::debug("Add child - AFTER");
+			//for (int i = 0; i < transforms->size(); i++){
+			//	auto transform = transforms->getComponentFromIndex(i);
+			//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
+			//}
+			//Log::debug("\n");
+			//----------DEBUG
+		}
 	}
 
 	sortComponentsByTransform(childSignature);
