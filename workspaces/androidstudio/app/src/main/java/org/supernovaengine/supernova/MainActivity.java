@@ -24,7 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.FrameLayout;
 import android.view.ViewGroup.LayoutParams;
-import android.content.SharedPreferences;
 
 
 @SuppressLint("ClickableViewAccessibility")
@@ -104,7 +103,8 @@ public class MainActivity extends Activity {
 		if (supportsEs2) {
 			glSurfaceView = new GLSurfaceView(this);
 
-			glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 24, 8);
+			EGLConfigChooser chooser = new EGLConfigChooser(8, 8, 8, 8, 24, 8, 4);
+			glSurfaceView.setEGLConfigChooser(chooser);
 
 			calculateScreenSize();
 
