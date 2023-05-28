@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.view.WindowMetrics;
 import android.view.inputmethod.EditorInfo;
@@ -24,6 +23,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.FrameLayout;
 import android.view.ViewGroup.LayoutParams;
+
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 
 @SuppressLint("ClickableViewAccessibility")
@@ -60,25 +63,14 @@ public class MainActivity extends Activity {
 	}
 
 	private void setFullScreen(){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			final WindowInsetsController insetsController = getWindow().getInsetsController();
-			if (insetsController != null) {
-				insetsController.hide(WindowInsets.Type.statusBars());
-			}
-		} else {
-			getWindow().setFlags(
-					WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN
-			);
-		}
-		// Hide both the navigation bar and the status bar.
-		// SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-		// a general rule, you should design your app to hide the status bar whenever you
-		// hide the navigation bar.
-		View decorView = getWindow().getDecorView();
-		int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-						| View.SYSTEM_UI_FLAG_FULLSCREEN;
-		decorView.setSystemUiVisibility(uiOptions);
+		WindowInsetsControllerCompat windowInsetsController =
+				WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+
+		windowInsetsController.setSystemBarsBehavior(
+				WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+		);
+
+		windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
 	}
     
     @Override
@@ -114,6 +106,10 @@ public class MainActivity extends Activity {
 			glSurfaceView.setPreserveEGLContextOnPause(true);
 			glSurfaceView.setRenderer(rendererWrapper);
 			glSurfaceView.setFocusableInTouchMode(true);
+
+			// for accessibility alerts in Google Play Console
+			glSurfaceView.setContentDescription("opengl view");
+
 			rendererSet = true;
 			//setContentView(glSurfaceView);
 

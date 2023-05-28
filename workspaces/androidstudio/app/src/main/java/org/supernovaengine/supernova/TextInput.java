@@ -50,6 +50,10 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 		//this.setSingleLine(true);
 		this.setPadding(0, 0, 0, 0);
 		this.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+
+		// for accessibility alerts in Google Play Console
+		this.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+
 		getText().insert(this.getSelectionStart(), " ");
 
 		sHandler = new Handler(Looper.getMainLooper()) {

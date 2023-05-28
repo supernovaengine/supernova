@@ -47,7 +47,8 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
     //buffer = sg_make_buffer(vbuf_desc);
 
     if (usage != BufferUsage::IMMUTABLE && data){
-        updateBuffer(size, data);
+        SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
+        //sg_update_buffer(buffer, {data, (size_t)size});
     }
 
     if (buffer.id != SG_INVALID_ID)
@@ -56,10 +57,11 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
     return false;
 }
 
+// called by draw
 void SokolBuffer::updateBuffer(unsigned int size, void* data){
     if (buffer.id != SG_INVALID_ID){
-        SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
-        //sg_update_buffer(buffer, {data, (size_t)size});
+        //SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
+        sg_update_buffer(buffer, {data, (size_t)size});
     }
 }
 
