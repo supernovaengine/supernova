@@ -5,6 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.os.Handler;
