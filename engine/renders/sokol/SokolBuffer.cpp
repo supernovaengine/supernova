@@ -5,6 +5,7 @@
 #include "SokolBuffer.h"
 #include "Log.h"
 #include "SokolCmdQueue.h"
+#include "Engine.h"
 
 using namespace Supernova;
 
@@ -43,12 +44,18 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
         vbuf_desc.usage = SG_USAGE_STREAM;
     }
 
-    buffer = SokolCmdQueue::add_command_make_buffer(vbuf_desc);
-    //buffer = sg_make_buffer(vbuf_desc);
+    if (Engine::isAsyncRender()){
+        buffer = SokolCmdQueue::add_command_make_buffer(vbuf_desc);
+    }else{
+        buffer = sg_make_buffer(vbuf_desc);
+    }
 
     if (usage != BufferUsage::IMMUTABLE && data && size > 0){
-        SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
-        //sg_update_buffer(buffer, {data, (size_t)size});
+        if (Engine::isAsyncRender()){
+            SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
+        }else{
+            sg_update_buffer(buffer, {data, (size_t)size});
+        }
     }
 
     if (buffer.id != SG_INVALID_ID)
@@ -67,8 +74,11 @@ void SokolBuffer::updateBuffer(unsigned int size, void* data){
 
 void SokolBuffer::destroyBuffer(){
     if (buffer.id != SG_INVALID_ID && sg_isvalid()){
-        SokolCmdQueue::add_command_destroy_buffer(buffer);
-        //sg_destroy_buffer(buffer);
+        if (Engine::isAsyncRender()){
+            SokolCmdQueue::add_command_destroy_buffer(buffer);
+        }else{
+            sg_destroy_buffer(buffer);
+        }
     }
 
     buffer.id = SG_INVALID_ID;

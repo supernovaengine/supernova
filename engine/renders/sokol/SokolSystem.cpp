@@ -7,6 +7,7 @@
 #include "System.h"
 #include "sokol_gfx.h"
 #include "SokolCmdQueue.h"
+#include "Engine.h"
 
 // Render thread
 // 
@@ -34,8 +35,11 @@ void SokolSystem::setup(){
     SokolCmdQueue::start();
 }
 
-void SokolSystem::executeQueue(){
+void SokolSystem::commitQueue(){
     SokolCmdQueue::commit_commands();
+}
+
+void SokolSystem::executeQueue(){
     SokolCmdQueue::execute_commands();
 }
 

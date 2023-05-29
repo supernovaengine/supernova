@@ -84,6 +84,8 @@ namespace Supernova {
         static float updateTime;
 
         static bool viewLoaded;
+
+        thread_local static bool asyncRender;
         
         static bool transformCoordPos(float& x, float& y);
         static void calculateCanvas();
@@ -146,6 +148,9 @@ namespace Supernova {
         static bool isOpenGL();
         static float getFramerate();
         static float getDeltatime();
+
+        static void startThread();
+        static bool isAsyncRender();
 
         //-----Supernova API functions-----
         static void systemInit(int argc, char* argv[]);

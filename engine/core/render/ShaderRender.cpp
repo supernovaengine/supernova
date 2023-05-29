@@ -25,9 +25,11 @@ ShaderRender::~ShaderRender(){
 bool ShaderRender::createShader(ShaderData& shaderData){
     this->shaderData = shaderData;
 
+    bool ret = backend.createShader(this->shaderData);
+
     SystemRender::scheduleCleanup(ShaderRender::cleanupShader, &(this->shaderData));
     
-    return backend.createShader(this->shaderData);
+    return ret;
 }
 
 void ShaderRender::destroyShader(){

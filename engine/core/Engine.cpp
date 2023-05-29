@@ -50,6 +50,8 @@ float Engine::updateTime = 0.03;
 
 bool Engine::viewLoaded = false;
 
+thread_local bool Engine::asyncRender = false;
+
 //-----Supernova user events-----
 FunctionSubscribe<void()> Engine::onViewLoaded;
 FunctionSubscribe<void()> Engine::onViewChanged;
@@ -322,6 +324,14 @@ float Engine::getFramerate(){
 
 float Engine::getDeltatime(){
     return deltatime;
+}
+
+void Engine::startThread(){
+    asyncRender = true;
+}
+
+bool Engine::isAsyncRender(){
+    return asyncRender;
 }
 
 void Engine::calculateCanvas(){

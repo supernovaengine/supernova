@@ -13,6 +13,7 @@
 #include "subsystem/ActionSystem.h"
 #include "subsystem/AudioSystem.h"
 #include "util/Color.h"
+#include "render/SystemRender.h"
 
 using namespace Supernova;
 
@@ -188,6 +189,9 @@ void Scene::setEnableUIEvents(bool enableUIEvents){
 void Scene::load(){
 	for (auto const& pair : systems){
 		pair.second->load();
+	}
+	if (Engine::isAsyncRender()){
+		SystemRender::commitQueue();
 	}
 }
 

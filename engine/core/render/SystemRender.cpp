@@ -5,11 +5,16 @@
 #include "SystemRender.h"
 
 #include "sokol/SokolSystem.h"
+#include "Engine.h"
 
 using namespace Supernova;
 
 void SystemRender::setup(){
     SokolSystem::setup();
+}
+
+void SystemRender::commitQueue(){
+    SokolSystem::commitQueue();
 }
 
 void SystemRender::executeQueue(){
@@ -25,9 +30,17 @@ void SystemRender::shutdown(){
 }
 
 void SystemRender::scheduleCleanup(void (*cleanupFunc)(void* cleanupData), void* cleanupData, int32_t numFramesToDefer){
-    SokolSystem::scheduleCleanup(cleanupFunc, cleanupData, numFramesToDefer);
+    if (Engine::isAsyncRender()){
+        SokolSystem::scheduleCleanup(cleanupFunc, cleanupData, numFramesToDefer);
+    }else{
+        cleanupFunc(cleanupData);
+    }
 }
 
 void SystemRender::addQueueCommand(void (*custom_cb)(void* custom_data), void* custom_data){
-    SokolSystem::addQueueCommand(custom_cb, custom_data);
+    if (Engine::isAsyncRender()){
+        SokolSystem::addQueueCommand(custom_cb, custom_data);
+    }else{
+        custom_cb(custom_data);
+    }
 }

@@ -295,6 +295,7 @@ namespace Supernova {
 		static Semaphore m_update_semaphore;
 		static Semaphore m_render_semaphore;
 		static std::atomic<bool> m_flushing;
+		static std::atomic<bool> m_commited;
 		static std::mutex m_execute_mutex;
 		static int32_t m_frame_index;
 	};

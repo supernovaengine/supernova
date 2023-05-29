@@ -7,6 +7,7 @@
 #include "Log.h"
 #include "SokolCmdQueue.h"
 #include "render/SystemRender.h"
+#include "Engine.h"
 
 using namespace Supernova;
 
@@ -80,8 +81,11 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
         pixel_size = 1;
     }else{
         Log::error("Undefined pixel format to generate mipmaps of %s", desc.label);
-        return SokolCmdQueue::add_command_make_image(*desc_);
-        //return sg_make_image(*desc_);
+        if (Engine::isAsyncRender()){
+            return SokolCmdQueue::add_command_make_image(*desc_);
+        }else{
+            return sg_make_image(*desc_);
+        }
     }
 
 
@@ -168,9 +172,15 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
         }
     }
 
-    sg_image img = SokolCmdQueue::add_command_make_image(desc);
-    //sg_image img = sg_make_image(desc);
+    sg_image img;
+
+    if (Engine::isAsyncRender()){
+        img = SokolCmdQueue::add_command_make_image(desc);
+    }else{
+        img = sg_make_image(desc);
+    }
     SystemRender::scheduleCleanup(cleanupMipmapTexture, big_target);
+    
     return img;
 }
 
@@ -211,8 +221,11 @@ bool SokolTexture::createTexture(
             image_desc.min_filter == SG_FILTER_NEAREST_MIPMAP_NEAREST){
         image = generateMipmaps(&image_desc);
     }else{
-        image = SokolCmdQueue::add_command_make_image(image_desc);
-        //image = sg_make_image(image_desc);
+        if (Engine::isAsyncRender()){
+            image = SokolCmdQueue::add_command_make_image(image_desc);
+        }else{
+            image = sg_make_image(image_desc);
+        }
     }
 
     if (image.id != SG_INVALID_ID)
@@ -244,8 +257,11 @@ bool SokolTexture::createFramebufferTexture(
         img_desc.label = "framebuffer-color-image";
     }
 
-    image = SokolCmdQueue::add_command_make_image(img_desc);
-    //image = sg_make_image(img_desc);
+    if (Engine::isAsyncRender()){
+        image = SokolCmdQueue::add_command_make_image(img_desc);
+    }else{
+        image = sg_make_image(img_desc);
+    }
 
     if (image.id != SG_INVALID_ID)
         return true;
@@ -255,8 +271,11 @@ bool SokolTexture::createFramebufferTexture(
 
 void SokolTexture::destroyTexture(){
     if (image.id != SG_INVALID_ID && sg_isvalid()){
-        SokolCmdQueue::add_command_destroy_image(image);
-        //sg_destroy_image(image);
+        if (Engine::isAsyncRender()){
+            SokolCmdQueue::add_command_destroy_image(image);
+        }else{
+            sg_destroy_image(image);
+        }
     }
 
     image.id = SG_INVALID_ID;

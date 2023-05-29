@@ -10,6 +10,7 @@
 #include "Log.h"
 #include "SokolCmdQueue.h"
 #include "render/ShaderRender.h"
+#include "Engine.h"
 
 using namespace Supernova;
 
@@ -174,16 +175,22 @@ bool SokolShader::createShader(ShaderData& shaderData){
             img->sampler_type = samplerToSokolType(stage->textures[t].samplerType);
         }
     }
-    shader = SokolCmdQueue::add_command_make_shader(shader_desc);
-    //shader = sg_make_shader(shader_desc);
+    if (Engine::isAsyncRender()){
+        shader = SokolCmdQueue::add_command_make_shader(shader_desc);
+    }else{
+        shader = sg_make_shader(shader_desc);
+    }
 
     return isCreated();
 }
 
 void SokolShader::destroyShader(){
     if (shader.id != SG_INVALID_ID && sg_isvalid()){
-        SokolCmdQueue::add_command_destroy_shader(shader);
-        //sg_destroy_shader(shader);
+        if (Engine::isAsyncRender()){
+            SokolCmdQueue::add_command_destroy_shader(shader);
+        }else{
+            sg_destroy_shader(shader);
+        }
     }
     
     shader.id = SG_INVALID_ID;

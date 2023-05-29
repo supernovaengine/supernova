@@ -21,6 +21,7 @@ std::vector<SokolRenderCleanup> SokolCmdQueue::m_cleanups;
 Semaphore SokolCmdQueue::m_update_semaphore;
 Semaphore SokolCmdQueue::m_render_semaphore;
 std::atomic<bool> SokolCmdQueue::m_flushing = false;
+std::atomic<bool> SokolCmdQueue::m_commited = false;
 std::mutex SokolCmdQueue::m_execute_mutex;
 int32_t SokolCmdQueue::m_frame_index = 0;
 
@@ -60,6 +61,15 @@ void SokolCmdQueue::finish(){
 
 void SokolCmdQueue::execute_commands(bool resource_only)
 {
+	// increase frame index
+	m_frame_index ++;
+
+	// not commited? exit
+	if (!m_commited)
+	{
+		return;
+	}
+
 	// not flushing?
 	if (!m_flushing)
 	{
@@ -166,6 +176,11 @@ void SokolCmdQueue::execute_commands(bool resource_only)
 			}
 		}
 	}
+
+	// process cleanups
+	process_cleanups(m_frame_index);
+
+	m_commited = false;
 
 	// release render semaphore
 	m_render_semaphore.release();
@@ -608,14 +623,11 @@ void SokolCmdQueue::commit_commands()
 	// clear commands
 	m_commands[m_commit_commands_index].resize(0);
 	
-	// process cleanups
-	process_cleanups(m_frame_index);
-	
 	// swap commands indexes
 	std::swap(m_pending_commands_index, m_commit_commands_index);
 
-	// increase frame index
-	m_frame_index ++;
+	// mark as commited
+	m_commited = true;
 
 	// release update semaphore
 	m_update_semaphore.release();
@@ -649,7 +661,7 @@ void SokolCmdQueue::process_cleanups(int32_t frame_index)
 	for (auto& cleanup : m_cleanups)
 	{
 		// call cleanup cb?
-		if ((cleanup.frame_index <= frame_index || frame_index < 0) && cleanup.cleanup_cb)
+		if ((cleanup.frame_index < frame_index || frame_index < 0) && cleanup.cleanup_cb)
 		{
 			// call cleanup cb
 			cleanup.cleanup_cb(cleanup.cleanup_data);
