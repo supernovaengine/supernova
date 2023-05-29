@@ -181,7 +181,7 @@ void SokolObject::endLoad(uint8_t pipelines){
         pip_depth_desc.depth.write_enabled = true;
         pip_depth_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
 
-        if (Engine::isAsyncRender()){
+        if (Engine::isAsyncThread()){
             depth_pip = SokolCmdQueue::add_command_make_pipeline(pip_depth_desc);
         }else{
             depth_pip = sg_make_pipeline(pip_depth_desc);
@@ -202,7 +202,7 @@ void SokolObject::endLoad(uint8_t pipelines){
         pip_default_desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
         pip_default_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
 
-        if (Engine::isAsyncRender()){
+        if (Engine::isAsyncThread()){
             pip = SokolCmdQueue::add_command_make_pipeline(pip_default_desc);
         }else{
             pip = sg_make_pipeline(pip_default_desc);
@@ -225,7 +225,7 @@ void SokolObject::endLoad(uint8_t pipelines){
         pip_rtt_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
         pip_rtt_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
 
-        if (Engine::isAsyncRender()){
+        if (Engine::isAsyncThread()){
             rtt_pip = SokolCmdQueue::add_command_make_pipeline(pip_rtt_desc);
         }else{
             rtt_pip = sg_make_pipeline(pip_rtt_desc);
@@ -270,21 +270,21 @@ void SokolObject::draw(int vertexCount){
 void SokolObject::destroy(){
     if (sg_isvalid()){
         if (pip.id != SG_INVALID_ID){
-            if (Engine::isAsyncRender()){
+            if (Engine::isAsyncThread()){
                 SokolCmdQueue::add_command_destroy_pipeline(pip);
             }else{
                 sg_destroy_pipeline(pip);
             }
         }
         if (depth_pip.id != SG_INVALID_ID){
-            if (Engine::isAsyncRender()){
+            if (Engine::isAsyncThread()){
                 SokolCmdQueue::add_command_destroy_pipeline(depth_pip);
             }else{
                 sg_destroy_pipeline(depth_pip);
             }
         }
         if (rtt_pip.id != SG_INVALID_ID){
-            if (Engine::isAsyncRender()){
+            if (Engine::isAsyncThread()){
                 SokolCmdQueue::add_command_destroy_pipeline(rtt_pip);
             }else{
                 sg_destroy_pipeline(rtt_pip);

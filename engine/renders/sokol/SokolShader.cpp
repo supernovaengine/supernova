@@ -175,7 +175,7 @@ bool SokolShader::createShader(ShaderData& shaderData){
             img->sampler_type = samplerToSokolType(stage->textures[t].samplerType);
         }
     }
-    if (Engine::isAsyncRender()){
+    if (Engine::isAsyncThread()){
         shader = SokolCmdQueue::add_command_make_shader(shader_desc);
     }else{
         shader = sg_make_shader(shader_desc);
@@ -186,7 +186,7 @@ bool SokolShader::createShader(ShaderData& shaderData){
 
 void SokolShader::destroyShader(){
     if (shader.id != SG_INVALID_ID && sg_isvalid()){
-        if (Engine::isAsyncRender()){
+        if (Engine::isAsyncThread()){
             SokolCmdQueue::add_command_destroy_shader(shader);
         }else{
             sg_destroy_shader(shader);

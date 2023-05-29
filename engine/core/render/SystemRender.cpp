@@ -30,7 +30,7 @@ void SystemRender::shutdown(){
 }
 
 void SystemRender::scheduleCleanup(void (*cleanupFunc)(void* cleanupData), void* cleanupData, int32_t numFramesToDefer){
-    if (Engine::isAsyncRender()){
+    if (Engine::isAsyncThread()){
         SokolSystem::scheduleCleanup(cleanupFunc, cleanupData, numFramesToDefer);
     }else{
         cleanupFunc(cleanupData);
@@ -38,7 +38,7 @@ void SystemRender::scheduleCleanup(void (*cleanupFunc)(void* cleanupData), void*
 }
 
 void SystemRender::addQueueCommand(void (*custom_cb)(void* custom_data), void* custom_data){
-    if (Engine::isAsyncRender()){
+    if (Engine::isAsyncThread()){
         SokolSystem::addQueueCommand(custom_cb, custom_data);
     }else{
         custom_cb(custom_data);

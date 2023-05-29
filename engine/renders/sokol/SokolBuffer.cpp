@@ -44,18 +44,14 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
         vbuf_desc.usage = SG_USAGE_STREAM;
     }
 
-    if (Engine::isAsyncRender()){
+    if (Engine::isAsyncThread()){
         buffer = SokolCmdQueue::add_command_make_buffer(vbuf_desc);
     }else{
         buffer = sg_make_buffer(vbuf_desc);
     }
 
-    if (usage != BufferUsage::IMMUTABLE && data && size > 0){
-        if (Engine::isAsyncRender()){
-            SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
-        }else{
-            sg_update_buffer(buffer, {data, (size_t)size});
-        }
+    if (usage != BufferUsage::IMMUTABLE){
+        updateBuffer(size, data);
     }
 
     if (buffer.id != SG_INVALID_ID)
@@ -66,15 +62,18 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
 
 // called by draw
 void SokolBuffer::updateBuffer(unsigned int size, void* data){
-    if (buffer.id != SG_INVALID_ID){
-        //SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
-        sg_update_buffer(buffer, {data, (size_t)size});
+    if (buffer.id != SG_INVALID_ID && data && size > 0){
+        if (Engine::isAsyncThread()){
+            SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
+        }else{
+            sg_update_buffer(buffer, {data, (size_t)size});
+        }
     }
 }
 
 void SokolBuffer::destroyBuffer(){
     if (buffer.id != SG_INVALID_ID && sg_isvalid()){
-        if (Engine::isAsyncRender()){
+        if (Engine::isAsyncThread()){
             SokolCmdQueue::add_command_destroy_buffer(buffer);
         }else{
             sg_destroy_buffer(buffer);

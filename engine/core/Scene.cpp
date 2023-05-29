@@ -190,7 +190,7 @@ void Scene::load(){
 	for (auto const& pair : systems){
 		pair.second->load();
 	}
-	if (Engine::isAsyncRender()){
+	if (Engine::isAsyncThread()){
 		SystemRender::commitQueue();
 	}
 }
@@ -198,6 +198,9 @@ void Scene::load(){
 void Scene::destroy(){
 	for (auto const& pair : systems){
 		pair.second->destroy();
+	}
+	if (Engine::isAsyncThread()){
+		SystemRender::commitQueue();
 	}
 }
 

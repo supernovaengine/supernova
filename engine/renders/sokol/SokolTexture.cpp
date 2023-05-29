@@ -81,7 +81,7 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
         pixel_size = 1;
     }else{
         Log::error("Undefined pixel format to generate mipmaps of %s", desc.label);
-        if (Engine::isAsyncRender()){
+        if (Engine::isAsyncThread()){
             return SokolCmdQueue::add_command_make_image(*desc_);
         }else{
             return sg_make_image(*desc_);
@@ -174,7 +174,7 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
 
     sg_image img;
 
-    if (Engine::isAsyncRender()){
+    if (Engine::isAsyncThread()){
         img = SokolCmdQueue::add_command_make_image(desc);
     }else{
         img = sg_make_image(desc);
@@ -221,7 +221,7 @@ bool SokolTexture::createTexture(
             image_desc.min_filter == SG_FILTER_NEAREST_MIPMAP_NEAREST){
         image = generateMipmaps(&image_desc);
     }else{
-        if (Engine::isAsyncRender()){
+        if (Engine::isAsyncThread()){
             image = SokolCmdQueue::add_command_make_image(image_desc);
         }else{
             image = sg_make_image(image_desc);
@@ -257,7 +257,7 @@ bool SokolTexture::createFramebufferTexture(
         img_desc.label = "framebuffer-color-image";
     }
 
-    if (Engine::isAsyncRender()){
+    if (Engine::isAsyncThread()){
         image = SokolCmdQueue::add_command_make_image(img_desc);
     }else{
         image = sg_make_image(img_desc);
@@ -271,7 +271,7 @@ bool SokolTexture::createFramebufferTexture(
 
 void SokolTexture::destroyTexture(){
     if (image.id != SG_INVALID_ID && sg_isvalid()){
-        if (Engine::isAsyncRender()){
+        if (Engine::isAsyncThread()){
             SokolCmdQueue::add_command_destroy_image(image);
         }else{
             sg_destroy_image(image);

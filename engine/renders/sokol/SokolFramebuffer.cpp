@@ -45,7 +45,7 @@ bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int
         pass_desc.depth_stencil_attachment.image = depthTexture.backend.get();
         pass_desc.label = "shadow-map-pass";
 
-        if (Engine::isAsyncRender()){
+        if (Engine::isAsyncThread()){
             pass[i] = SokolCmdQueue::add_command_make_pass(pass_desc);
         }else{
             pass[i] = sg_make_pass(pass_desc);
@@ -58,7 +58,7 @@ bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int
 void SokolFramebuffer::destroyFramebuffer(){
     if (pass[0].id != SG_INVALID_ID && sg_isvalid()){
         for (int i = 0; i < 6; i++){
-            if (Engine::isAsyncRender()){
+            if (Engine::isAsyncThread()){
                 SokolCmdQueue::add_command_destroy_pass(pass[i]);
             }else{
                 sg_destroy_pass(pass[i]);
