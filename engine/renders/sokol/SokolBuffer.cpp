@@ -46,7 +46,7 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
     buffer = SokolCmdQueue::add_command_make_buffer(vbuf_desc);
     //buffer = sg_make_buffer(vbuf_desc);
 
-    if (usage != BufferUsage::IMMUTABLE && data){
+    if (usage != BufferUsage::IMMUTABLE && data && size > 0){
         SokolCmdQueue::add_command_update_buffer(buffer, {data, (size_t)size});
         //sg_update_buffer(buffer, {data, (size_t)size});
     }
