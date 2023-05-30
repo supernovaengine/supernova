@@ -13,7 +13,6 @@
 #include "subsystem/ActionSystem.h"
 #include "subsystem/AudioSystem.h"
 #include "util/Color.h"
-#include "render/SystemRender.h"
 
 using namespace Supernova;
 
@@ -190,17 +189,11 @@ void Scene::load(){
 	for (auto const& pair : systems){
 		pair.second->load();
 	}
-	if (Engine::isAsyncThread()){
-		SystemRender::commitQueue();
-	}
 }
 
 void Scene::destroy(){
 	for (auto const& pair : systems){
 		pair.second->destroy();
-	}
-	if (Engine::isAsyncThread()){
-		SystemRender::commitQueue();
 	}
 }
 

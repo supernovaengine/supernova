@@ -107,9 +107,6 @@ public class MainActivity extends Activity {
 			glSurfaceView.setRenderer(rendererWrapper);
 			glSurfaceView.setFocusableInTouchMode(true);
 
-			// for accessibility alerts in Google Play Console
-			glSurfaceView.setContentDescription("opengl view");
-
 			rendererSet = true;
 			//setContentView(glSurfaceView);
 
@@ -122,6 +119,10 @@ public class MainActivity extends Activity {
 			edittext = new TextInput(this);
 			layout.addView(edittext);
 			//addContentView(edittext, new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+			// for accessibility alerts in Google Play Console
+			glSurfaceView.setContentDescription("opengl view");
+			layout.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
 
 			edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 				@Override

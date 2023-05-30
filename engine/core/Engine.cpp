@@ -51,6 +51,7 @@ float Engine::updateTime = 0.03;
 bool Engine::viewLoaded = false;
 
 thread_local bool Engine::asyncThread = false;
+Semaphore Engine::drawSemaphore;
 
 //-----Supernova user events-----
 FunctionSubscribe<void()> Engine::onViewLoaded;
@@ -76,6 +77,9 @@ FunctionSubscribe<void(wchar_t)> Engine::onCharInput;
 
 
 void Engine::setScene(Scene* scene){
+    if (asyncThread)
+        drawSemaphore.acquire();
+
     numScenes = 0;
     if (scene){
         includeScene(0, scene, true);
@@ -90,6 +94,9 @@ void Engine::setScene(Scene* scene){
     }else{
         scenes[0] = NULL;
     }
+
+    if (asyncThread)
+        drawSemaphore.release();
 }
 
 Scene* Engine::getScene(){
@@ -97,6 +104,9 @@ Scene* Engine::getScene(){
 }
 
 void Engine::addSceneLayer(Scene* scene){
+    if (asyncThread)
+        drawSemaphore.acquire();
+
     if (scene){
         bool foundSlot = false;
         // 0 is reserved to mainScene
@@ -117,9 +127,15 @@ void Engine::addSceneLayer(Scene* scene){
             Log::error("Scene layers is full. MAX_SCENE_LAYERS is set to: %i", MAX_SCENE_LAYERS);
         }
     }
+
+    if (asyncThread)
+        drawSemaphore.release();
 }
 
 void Engine::removeSceneLayer(Scene* scene){
+    if (asyncThread)
+        drawSemaphore.acquire();
+
     if (scene){
         for (int i = 1; i < MAX_SCENE_LAYERS; i++){
             if (scenes[i] && scenes[i] == scene){
@@ -129,15 +145,24 @@ void Engine::removeSceneLayer(Scene* scene){
             }
         }
     }
+
+    if (asyncThread)
+        drawSemaphore.release();
 }
 
 void Engine::removeAllSceneLayers(){
+    if (asyncThread)
+        drawSemaphore.acquire();
+
     for (int i = 1; i < MAX_SCENE_LAYERS; i++){
         if (scenes[i]){
             scenes[i] = NULL;
         }
     }
     numScenes = 0;
+
+    if (asyncThread)
+        drawSemaphore.release();
 }
 
 void Engine::includeScene(size_t index, Scene* scene, bool mainScene){
@@ -330,7 +355,12 @@ void Engine::startAsyncThread(){
     asyncThread = true;
 }
 
+void Engine::commitThreadQueue(){
+    SystemRender::commitQueue();
+}
+
 void Engine::endAsyncThread(){
+    commitThreadQueue();
     asyncThread = false;
 }
 
@@ -373,6 +403,8 @@ void Engine::systemInit(int argc, char* argv[]){
     Engine::setAutomaticTransparency(true);
     Engine::setAllowEventsOutCanvas(false);
     Engine::setFixedTimeSceneUpdate(false);
+
+    drawSemaphore.release();
 
     stm_setup();
     
@@ -485,6 +517,8 @@ void Engine::systemDraw(){
         }
     }
 
+    drawSemaphore.acquire();
+
     SystemRender::executeQueue();
 
     Engine::onDraw.call();
@@ -494,6 +528,8 @@ void Engine::systemDraw(){
     }
 
     SystemRender::commit();
+
+    drawSemaphore.acquire();
 
     AudioSystem::checkActive();
 }

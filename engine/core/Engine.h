@@ -8,6 +8,7 @@
 #include "Supernova.h"
 #include "util/FunctionSubscribe.h"
 #include "math/Rect.h"
+#include "util/Semaphore.h"
 
 namespace Supernova {
 
@@ -86,6 +87,7 @@ namespace Supernova {
         static bool viewLoaded;
 
         thread_local static bool asyncThread;
+        static Semaphore drawSemaphore;
         
         static bool transformCoordPos(float& x, float& y);
         static void calculateCanvas();
@@ -150,6 +152,7 @@ namespace Supernova {
         static float getDeltatime();
 
         static void startAsyncThread();
+        static void commitThreadQueue();
         static void endAsyncThread();
         static bool isAsyncThread();
 
