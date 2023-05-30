@@ -529,7 +529,7 @@ void Engine::systemDraw(){
 
     SystemRender::commit();
 
-    drawSemaphore.acquire();
+    drawSemaphore.release();
 
     AudioSystem::checkActive();
 }
