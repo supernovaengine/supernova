@@ -49,6 +49,7 @@ float Engine::framerate = 0;
 float Engine::updateTime = 0.03;
 
 bool Engine::viewLoaded = false;
+bool Engine::paused = false;
 
 thread_local bool Engine::asyncThread = false;
 Semaphore Engine::drawSemaphore;
@@ -493,31 +494,34 @@ void Engine::systemDraw(){
     deltatime = stm_sec(stm_laptime(&lastTime));
     framerate = 1 / deltatime;
 
-    int updateLoops = 0;
-    updateTimeCount += deltatime;
-    while (updateTimeCount >= updateTime && updateLoops <= 100){
-        updateLoops++;
-        updateTimeCount -= updateTime;
+    drawSemaphore.acquire();
 
-        Engine::onUpdate.call();
+    // avoid increment updateTimeCount after resume
+    if (!paused) {
+        int updateLoops = 0;
+        updateTimeCount += deltatime;
+        while (updateTimeCount >= updateTime && updateLoops <= 100) {
+            updateLoops++;
+            updateTimeCount -= updateTime;
 
-        if (isFixedTimeSceneUpdate()){
-            for (int i = 0; i < numScenes; i++){
-                scenes[i]->update(updateTime);
+            Engine::onUpdate.call();
+
+            if (isFixedTimeSceneUpdate()) {
+                for (int i = 0; i < numScenes; i++) {
+                    scenes[i]->update(updateTime);
+                }
+            }
+        }
+        if (updateLoops > 100) {
+            Log::warn("More than 100 updates in a frame");
+        }
+
+        if (!isFixedTimeSceneUpdate()) {
+            for (int i = 0; i < numScenes; i++) {
+                scenes[i]->update(deltatime);
             }
         }
     }
-    if (updateLoops > 100){
-        Log::warn("More than 100 updates in a frame");
-    }
-
-    if (!isFixedTimeSceneUpdate()){
-        for (int i = 0; i < numScenes; i++){
-            scenes[i]->update(deltatime);
-        }
-    }
-
-    drawSemaphore.acquire();
 
     SystemRender::executeQueue();
 
@@ -551,6 +555,7 @@ void Engine::systemShutdown(){
     lastTime = 0;
     updateTimeCount = 0;
     viewLoaded = false;
+    paused = false;
 
     SystemRender::shutdown();
 }
@@ -558,11 +563,13 @@ void Engine::systemShutdown(){
 void Engine::systemPause(){
     AudioSystem::pauseAll();
     Engine::onPause.call();
+    paused = true;
 }
 
 void Engine::systemResume(){
     AudioSystem::resumeAll();
     Engine::onResume.call();
+    paused = false;
 }
 
 bool Engine::transformCoordPos(float& x, float& y){

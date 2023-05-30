@@ -85,6 +85,7 @@ namespace Supernova {
         static float updateTime;
 
         static bool viewLoaded;
+        static bool paused;
 
         thread_local static bool asyncThread;
         static Semaphore drawSemaphore;

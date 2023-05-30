@@ -117,12 +117,17 @@ public class MainActivity extends Activity {
 			setFullScreen();
 
 			edittext = new TextInput(this);
+
 			layout.addView(edittext);
+			layout.addView(glSurfaceView);
 			//addContentView(edittext, new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
 			// for accessibility alerts in Google Play Console
 			glSurfaceView.setContentDescription("opengl view");
 			layout.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+			for (int i = 0; i < layout.getChildCount(); i++){
+				layout.getChildAt(i).setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+			}
 
 			edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 				@Override
@@ -136,7 +141,6 @@ public class MainActivity extends Activity {
                     return false;
 				}
 			});
-
 			edittext.setOnKeyListener(new View.OnKeyListener() {
 				@Override
 				public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -146,8 +150,6 @@ public class MainActivity extends Activity {
 					return false;
 				}
 			});
-
-			layout.addView(glSurfaceView);
 			edittext.setView(glSurfaceView);
 			
 			glSurfaceView.setOnKeyListener(new KeyListener(this, glSurfaceView));
