@@ -18,7 +18,7 @@ Buffer::Buffer(){
     size = 0;
     stride = 0;
 
-    renderAttributes = false;
+    renderAttributes = true;
 
     type = BufferType::VERTEX_BUFFER;
     usage = BufferUsage::IMMUTABLE;

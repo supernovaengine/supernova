@@ -9,9 +9,6 @@
 using namespace Supernova;
 
 InterleavedBuffer::InterleavedBuffer(): Buffer(){
-
-    renderAttributes = true;
-
     vertexSize = 0;
 }
 

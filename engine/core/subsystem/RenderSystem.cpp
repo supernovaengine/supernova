@@ -496,6 +496,7 @@ void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& sh
 bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 
 	std::map<std::string, Buffer*> buffers;
+	std::map<std::string, BufferRender*> bufferNameToRender;
 	bool allBuffersEmpty = true;
 
 	if (mesh.buffer.getSize() > 0){
@@ -517,8 +518,6 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 
 	if (allBuffersEmpty)
 		return false;
-
-	bufferNameToRender.clear();
 
 	std::map<std::string, unsigned int> bufferStride;
 
@@ -683,15 +682,16 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 
 		for (auto const& buf : buffers){
         	if (buf.second->isRenderAttributes()) {
-            	for (auto const &attr : buf.second->getAttributes()) {
-					render.addAttribute(shaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
-            	}
+				if (buf.second->getType() == BufferType::INDEX_BUFFER){
+					indexCount = buf.second->getCount();
+					Attribute indexattr = buf.second->getAttributes()[AttributeType::INDEX];
+					render.addIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
+				}else{
+					for (auto const &attr : buf.second->getAttributes()) {
+						render.addAttribute(shaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+					}
+				}
         	}
-			if (buf.second->getType() == BufferType::INDEX_BUFFER){
-				indexCount = buf.second->getCount();
-				Attribute indexattr = buf.second->getAttributes()[AttributeType::INDEX];
-				render.addIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
-			}
     	}
 
 		for (auto const& attr : mesh.submeshes[i].attributes){
@@ -731,33 +731,35 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 
 			for (auto const& buf : buffers){
         		if (buf.second->isRenderAttributes()) {
-					for (auto const &attr : buf.second->getAttributes()){
-						if (attr.first == AttributeType::POSITION){
-							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
-						}
-						if (mesh.submeshes[i].hasSkinning){
-							if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
+
+					if (buf.second->getType() == BufferType::INDEX_BUFFER){
+						indexCount = buf.second->getCount();
+						Attribute indexattr = buf.second->getAttributes()[AttributeType::INDEX];
+						depthRender.addIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
+					}else{
+						for (auto const &attr : buf.second->getAttributes()){
+							if (attr.first == AttributeType::POSITION){
 								depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
 							}
-						}
-						if (mesh.submeshes[i].hasMorphTarget){
-							if (attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET1 ||
-								attr.first == AttributeType::MORPHTARGET2 || attr.first == AttributeType::MORPHTARGET3 ||
-								attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET4 ||
-								attr.first == AttributeType::MORPHTARGET6 || attr.first == AttributeType::MORPHTARGET7 ||
-								attr.first == AttributeType::MORPHNORMAL0 || attr.first == AttributeType::MORPHNORMAL1 ||
-								attr.first == AttributeType::MORPHNORMAL2 || attr.first == AttributeType::MORPHNORMAL3 ||
-								attr.first == AttributeType::MORPHTANGENT0 || attr.first == AttributeType::MORPHTANGENT1){
-								depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+							if (mesh.submeshes[i].hasSkinning){
+								if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
+									depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+								}
+							}
+							if (mesh.submeshes[i].hasMorphTarget){
+								if (attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET1 ||
+									attr.first == AttributeType::MORPHTARGET2 || attr.first == AttributeType::MORPHTARGET3 ||
+									attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET4 ||
+									attr.first == AttributeType::MORPHTARGET6 || attr.first == AttributeType::MORPHTARGET7 ||
+									attr.first == AttributeType::MORPHNORMAL0 || attr.first == AttributeType::MORPHNORMAL1 ||
+									attr.first == AttributeType::MORPHNORMAL2 || attr.first == AttributeType::MORPHNORMAL3 ||
+									attr.first == AttributeType::MORPHTANGENT0 || attr.first == AttributeType::MORPHTANGENT1){
+									depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+								}
 							}
 						}
 					}
         		}
-				if (buf.second->getType() == BufferType::INDEX_BUFFER){
-					indexCount = buf.second->getCount();
-					Attribute indexattr = buf.second->getAttributes()[AttributeType::INDEX];
-					depthRender.addIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
-				}
     		}
 
 			for (auto const& attr : mesh.submeshes[i].attributes){
@@ -1023,7 +1025,9 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
 	terrain.needUpdateTexture = false;
 
 	for (auto const &attr : terrain.buffer.getAttributes()) {
-		terrain.render.addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+		if (terrain.buffer.isRenderAttributes()) {
+			terrain.render.addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+		}
 	}
 	// empty to create index_type
 	terrain.render.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, 0);
@@ -2541,6 +2545,8 @@ void RenderSystem::update(double dt){
 }
 
 void RenderSystem::draw(){
+	std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
+
 	auto transforms = scene->getComponentArray<Transform>();
 	auto cameras = scene->getComponentArray<CameraComponent>();
 

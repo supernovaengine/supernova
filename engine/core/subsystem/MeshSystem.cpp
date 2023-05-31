@@ -300,8 +300,6 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
 
     for (int i = 0; i < mesh.numSubmeshes; i++){
 
-        addSubmeshAttribute(mesh.submeshes[i], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indexMap[i].size(), mesh.indices.getCount() * sizeof(uint16_t), false);
-
         mesh.indices.setValues(
             mesh.indices.getCount(), mesh.indices.getAttribute(AttributeType::INDEX),
             indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
@@ -484,6 +482,7 @@ bool MeshSystem::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, ModelC
         mesh.eBuffers[mesh.numExternalBuffers].setData(&model.gltfModel->buffers[bufferView.buffer].data.at(0) + bufferView.byteOffset, bufferView.byteLength);
         mesh.eBuffers[mesh.numExternalBuffers].setStride(stride);
         mesh.eBuffers[mesh.numExternalBuffers].setName(name);
+        mesh.eBuffers[mesh.numExternalBuffers].setRenderAttributes(false);
 
         mesh.numExternalBuffers++;
         if (mesh.numExternalBuffers > MAX_EXTERNAL_BUFFERS){
@@ -975,8 +974,6 @@ void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned i
         0,  2,  3,
     };
 
-    addSubmeshAttribute(mesh.submeshes[0], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, 6, mesh.indices.getCount() * sizeof(uint16_t), false);
-
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
@@ -1103,8 +1100,6 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
             20, 22, 23,
     };
 
-    addSubmeshAttribute(mesh.submeshes[0], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, 36, mesh.indices.getCount() * sizeof(uint16_t), false);
-
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         36, (char*)&indices_array[0], sizeof(uint16_t));
@@ -1192,8 +1187,6 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
             }
         }
     }
-
-    addSubmeshAttribute(mesh.submeshes[0], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indices.size(), mesh.indices.getCount() * sizeof(uint16_t), false);
 
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
@@ -1321,8 +1314,6 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
         }
     }
 
-    addSubmeshAttribute(mesh.submeshes[0], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indices.size(), mesh.indices.getCount() * sizeof(uint16_t), false);
-
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
@@ -1391,8 +1382,6 @@ void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsi
             indices.push_back(row_b + ring);
         }
     }
-
-    addSubmeshAttribute(mesh.submeshes[0], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indices.size(), mesh.indices.getCount() * sizeof(uint16_t), false);
 
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
@@ -2151,6 +2140,7 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
             addSubmeshAttribute(mesh.submeshes[i], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indexMap[i].size(), mesh.indices.getCount() * sizeof(uint16_t), false);
 
             mesh.indices.setValues(mesh.indices.getCount(),  mesh.indices.getAttribute(AttributeType::INDEX), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
+            mesh.indices.setRenderAttributes(false);
         }
 
         std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);

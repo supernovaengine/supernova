@@ -98,9 +98,6 @@ namespace Supernova{
 		fs_shadows_t fs_shadows;
 		fs_fog_t fs_fog;
 
-		std::map<std::string, BufferRender*> bufferNameToRender;
-		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
-
 		static void changeLoaded(void* data);
 		static void changeDestroy(void* data);
 
