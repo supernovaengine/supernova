@@ -71,12 +71,15 @@ void RenderSystem::destroy(){
 
 	emptyTexturesCreated = false;
 
-	SkyComponent* sky = scene->findComponentFromIndex<SkyComponent>(0);
-	if (sky){
-		if (sky->loaded){
-			destroySky(*sky);
+	auto skys = scene->getComponentArray<SkyComponent>();
+	if (skys->size() > 0){
+		SkyComponent& sky = skys->getComponentFromIndex(0);
+		Entity entity = skys->getEntity(0);
+		if (sky.loadCalled){
+			destroySky(entity, sky);;
 		}
 	}
+
 	auto transforms = scene->getComponentArray<Transform>();
 	for (int i = 0; i < transforms->size(); i++){
 		Transform& transform = transforms->getComponentFromIndex(i);
@@ -86,22 +89,22 @@ void RenderSystem::destroy(){
 		if (signature.test(scene->getComponentType<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 			if (mesh.loaded){
-				destroyMesh(mesh);
+				destroyMesh(entity, mesh);
 			}
 		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
 			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
 			if (terrain.loaded){
-				destroyTerrain(terrain);
+				destroyTerrain(entity, terrain);
 			}
 		}else if (signature.test(scene->getComponentType<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
 			if (ui.loaded){
-				destroyUI(ui);
+				destroyUI(entity, ui);
 			}
 		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
 			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
 			if (particles.loaded){
-				destroyParticles(particles);
+				destroyParticles(entity, particles);
 			}
 		}else if (signature.test(scene->getComponentType<LightComponent>())){
 			LightComponent& light = scene->getComponent<LightComponent>(entity);
@@ -894,7 +897,7 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams){
 	}
 }
 
-void RenderSystem::destroyMesh(MeshComponent& mesh){
+void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 	if (!mesh.loaded)
 		return;
 
@@ -935,14 +938,16 @@ void RenderSystem::destroyMesh(MeshComponent& mesh){
 	}
 
 	//Destroy buffer
+	mesh.buffer.clearAll();
 	mesh.buffer.getRender()->destroyBuffer();
+	mesh.indices.clearAll();
 	mesh.indices.getRender()->destroyBuffer();
 	for (int i = 0; i < mesh.numExternalBuffers; i++){
+		mesh.eBuffers[i].clearAll();
 		mesh.eBuffers[i].getRender()->destroyBuffer();
 	}
 
-	mesh.loaded = false;
-	mesh.loadCalled = false;
+	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
 bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
@@ -1122,7 +1127,7 @@ void RenderSystem::drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDept
 	}
 }
 
-void RenderSystem::destroyTerrain(TerrainComponent& terrain){
+void RenderSystem::destroyTerrain(Entity entity, TerrainComponent& terrain){
 	if (!terrain.loaded)
 		return;
 
@@ -1165,11 +1170,12 @@ void RenderSystem::destroyTerrain(TerrainComponent& terrain){
 	terrain.slotVSDepthParams = -1;
 
 	//Destroy buffers
+	terrain.buffer.clearAll();
 	terrain.buffer.getRender()->destroyBuffer();
+	terrain.indices.clearAll();
 	terrain.indices.getRender()->destroyBuffer();
 
-	terrain.loaded = false;
-	terrain.loadCalled = false;
+	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
 bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, bool isText){
@@ -1283,7 +1289,7 @@ void RenderSystem::drawUI(UIComponent& uirender, Transform& transform, bool rend
 	}
 }
 
-void RenderSystem::destroyUI(UIComponent& uirender){
+void RenderSystem::destroyUI(Entity entity, UIComponent& uirender){
 	if (!uirender.loaded)
 		return;
 
@@ -1299,9 +1305,11 @@ void RenderSystem::destroyUI(UIComponent& uirender){
 
 	//Destroy buffer
 	if (uirender.buffer.getSize() > 0){
+		uirender.buffer.clearAll();
 		uirender.buffer.getRender()->destroyBuffer();
 	}
 	if (uirender.indices.getSize() > 0){
+		uirender.indices.clearAll();
 		uirender.indices.getRender()->destroyBuffer();
 	}
 
@@ -1309,8 +1317,7 @@ void RenderSystem::destroyUI(UIComponent& uirender){
 	uirender.slotVSParams = -1;
 	uirender.slotFSParams = -1;
 
-	uirender.loaded = false;
-	uirender.loadCalled = false;
+	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
 bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
@@ -1344,7 +1351,7 @@ bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
 
 	particles.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::POINTS_VS_PARAMS, ShaderStageType::VERTEX);
 
-	particles.buffer.clearAll();
+	particles.buffer.clear();
 	particles.buffer.addAttribute(AttributeType::POSITION, 3, 0);
 	particles.buffer.addAttribute(AttributeType::COLOR, 4, 3 * sizeof(float));
 	particles.buffer.addAttribute(AttributeType::POINTSIZE, 1, 7 * sizeof(float));
@@ -1403,7 +1410,7 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 	}
 }
 
-void RenderSystem::destroyParticles(ParticlesComponent& particles){
+void RenderSystem::destroyParticles(Entity entity, ParticlesComponent& particles){
 	if (!particles.loaded)
 		return;
 
@@ -1418,13 +1425,13 @@ void RenderSystem::destroyParticles(ParticlesComponent& particles){
 	particles.render.destroy();
 
 	//Destroy buffer
+	particles.buffer.clearAll();
 	particles.buffer.getRender()->destroyBuffer();
 
 	//Shaders uniforms
 	particles.slotVSParams = -1;
 
-	particles.loaded = false;
-	particles.loadCalled = false;
+	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
 bool RenderSystem::loadSky(Entity entity, SkyComponent& sky){
@@ -1490,7 +1497,7 @@ void RenderSystem::drawSky(SkyComponent& sky, bool renderToTexture){
 	}
 }
 
-void RenderSystem::destroySky(SkyComponent& sky){
+void RenderSystem::destroySky(Entity entity, SkyComponent& sky){
 	if (!sky.loaded)
 		return;
 
@@ -1505,14 +1512,14 @@ void RenderSystem::destroySky(SkyComponent& sky){
 	sky.render.destroy();
 
 	//Destroy buffer
+	sky.buffer.clearAll();
 	sky.buffer.getRender()->destroyBuffer();
 
 	//Shaders uniforms
 	sky.slotVSParams = -1;
 	sky.slotFSParams = -1;
 
-	sky.loaded = false;
-	sky.loadCalled = false;
+	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
 void RenderSystem::destroyLight(LightComponent& light){
@@ -1817,7 +1824,7 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
 }
 
 void RenderSystem::createSky(SkyComponent& sky){
-	sky.buffer.clearAll();
+	sky.buffer.clear();
 	sky.buffer.addAttribute(AttributeType::POSITION, 3);
 
 	Attribute* attVertex = sky.buffer.getAttribute(AttributeType::POSITION);
@@ -2229,6 +2236,48 @@ void RenderSystem::changeLoaded(void* data){
 	delete (check_load_t*)data;
 }
 
+void RenderSystem::changeDestroy(void* data){
+	check_load_t* loadObj = (check_load_t*)data;
+
+	Scene* scene = loadObj->scene;
+	Entity entity = loadObj->entity;
+
+	Signature signature = scene->getSignature(entity);
+
+	if (signature.test(scene->getComponentType<MeshComponent>())){
+		MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+		mesh.loaded = false;
+		mesh.loadCalled = false;
+
+	}else if (signature.test(scene->getComponentType<UIComponent>())){
+		UIComponent& uirender = scene->getComponent<UIComponent>(entity);
+
+		uirender.loaded = false;
+		uirender.loadCalled = false;
+
+	}else if (signature.test(scene->getComponentType<TerrainComponent>())){
+		TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+
+		terrain.loaded = false;
+		terrain.loadCalled = false;
+
+	}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
+		ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+
+		particles.loaded = false;
+		particles.loadCalled = false;
+
+	}else if (signature.test(scene->getComponentType<SkyComponent>())){
+		SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+
+		sky.loaded = false;
+		sky.loadCalled = false;
+	}
+
+	delete (check_load_t*)data;
+}
+
 void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
 	if (transform.billboard && !transform.fakeBillboard){
 
@@ -2375,7 +2424,7 @@ void RenderSystem::update(double dt){
 		if (signature.test(scene->getComponentType<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 			if (mesh.loaded && mesh.needReload){
-				destroyMesh(mesh);
+				destroyMesh(entity, mesh);
 			}
 			if (!mesh.loadCalled){
 				loadMesh(entity, mesh);
@@ -2383,7 +2432,7 @@ void RenderSystem::update(double dt){
 		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
 			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
 			if (terrain.loaded && terrain.needReload){
-				destroyTerrain(terrain);
+				destroyTerrain(entity, terrain);
 			}
 			if (!terrain.loadCalled){
 				loadTerrain(entity, terrain);
@@ -2396,7 +2445,7 @@ void RenderSystem::update(double dt){
 					isText = true;
 				}
 				if (ui.loaded && ui.needReload){
-					destroyUI(ui);
+					destroyUI(entity, ui);
 				}
 				if (!ui.loadCalled){
 					loadUI(entity, ui, isText);
@@ -2405,7 +2454,7 @@ void RenderSystem::update(double dt){
 		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
 			ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
 			if (particles.loaded && particles.needReload){
-				destroyParticles(particles);
+				destroyParticles(entity, particles);
 			}
 			if (!particles.loadCalled){
 				loadParticles(entity, particles);
@@ -2733,27 +2782,27 @@ void RenderSystem::entityDestroyed(Entity entity){
 		destroyLight(scene->getComponent<LightComponent>(entity));
 	}
 
+	if (signature.test(scene->getComponentType<CameraComponent>())){
+		destroyCamera(scene->getComponent<CameraComponent>(entity), true);
+	}
+
 	if (signature.test(scene->getComponentType<MeshComponent>())){
-		destroyMesh(scene->getComponent<MeshComponent>(entity));
+		destroyMesh(entity, scene->getComponent<MeshComponent>(entity));
 	}
 
 	if (signature.test(scene->getComponentType<TerrainComponent>())){
-		destroyTerrain(scene->getComponent<TerrainComponent>(entity));
+		destroyTerrain(entity, scene->getComponent<TerrainComponent>(entity));
 	}
 
 	if (signature.test(scene->getComponentType<UIComponent>())){
-		destroyUI(scene->getComponent<UIComponent>(entity));
+		destroyUI(entity, scene->getComponent<UIComponent>(entity));
 	}
 
 	if (signature.test(scene->getComponentType<ParticlesComponent>())){
-		destroyParticles(scene->getComponent<ParticlesComponent>(entity));
+		destroyParticles(entity, scene->getComponent<ParticlesComponent>(entity));
 	}
 
 	if (signature.test(scene->getComponentType<SkyComponent>())){
-		destroySky(scene->getComponent<SkyComponent>(entity));
-	}
-
-	if (signature.test(scene->getComponentType<CameraComponent>())){
-		destroyCamera(scene->getComponent<CameraComponent>(entity), true);
+		destroySky(entity, scene->getComponent<SkyComponent>(entity));
 	}
 }

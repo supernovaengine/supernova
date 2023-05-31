@@ -496,6 +496,8 @@ void Engine::systemDraw(){
 
     drawSemaphore.acquire();
 
+    SystemRender::executeQueue();
+
     // avoid increment updateTimeCount after resume
     if (!paused) {
         int updateLoops = 0;
@@ -522,8 +524,6 @@ void Engine::systemDraw(){
             }
         }
     }
-
-    SystemRender::executeQueue();
 
     Engine::onDraw.call();
 

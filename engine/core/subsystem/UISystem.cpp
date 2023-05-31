@@ -44,7 +44,7 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
 
     ui.primitiveType = PrimitiveType::TRIANGLES;
 
-	ui.buffer.clearAll();
+	ui.buffer.clear();
 	ui.buffer.addAttribute(AttributeType::POSITION, 3);
 	ui.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
     ui.buffer.addAttribute(AttributeType::COLOR, 4);
@@ -196,7 +196,7 @@ void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponen
 
     ui.primitiveType = PrimitiveType::TRIANGLES;
 
-    ui.buffer.clearAll();
+    ui.buffer.clear();
 	ui.buffer.addAttribute(AttributeType::POSITION, 3);
 	ui.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
     ui.buffer.setUsage(BufferUsage::DYNAMIC);
@@ -412,7 +412,7 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILay
 
     ui.primitiveType = PrimitiveType::TRIANGLE_STRIP;
 
-    ui.buffer.clearAll();
+    ui.buffer.clear();
 	ui.buffer.addAttribute(AttributeType::POSITION, 3);
 	ui.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
     ui.buffer.addAttribute(AttributeType::COLOR, 4);

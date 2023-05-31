@@ -30,7 +30,7 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
     mesh.submeshes[0].hasTextureRect = true;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clearAll();
+	mesh.buffer.clear();
 	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
 	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
 	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
@@ -139,7 +139,7 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clearAll();
+	mesh.buffer.clear();
 	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
 	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
 	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
@@ -193,7 +193,7 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
 
-	mesh.buffer.clearAll();
+	mesh.buffer.clear();
 	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
 	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
 	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
@@ -860,7 +860,7 @@ void MeshSystem::createTerrainNode(TerrainComponent& terrain, float x, float y, 
 }
 
 void MeshSystem::createTerrain(TerrainComponent& terrain){
-    terrain.buffer.clearAll();
+    terrain.buffer.clear();
     terrain.buffer.addAttribute(AttributeType::POSITION, 3);
 	terrain.buffer.addAttribute(AttributeType::NORMAL, 3);
 
@@ -935,7 +935,7 @@ void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned i
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clearAll();
+	mesh.buffer.clear();
 	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
 	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
 	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
@@ -988,7 +988,7 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clearAll();
+	mesh.buffer.clear();
 	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
 	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
 	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
@@ -1116,7 +1116,7 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clearAll();
+	mesh.buffer.clear();
 	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
 	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
 	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
@@ -1206,7 +1206,7 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clearAll();
+	mesh.buffer.clear();
 	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
 	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
 	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
@@ -1334,7 +1334,7 @@ void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsi
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clearAll();
+	mesh.buffer.clear();
 	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
 	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
 	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
@@ -2028,7 +2028,7 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
 
     if (ret) {
 
-        mesh.buffer.clearAll();
+        mesh.buffer.clear();
         mesh.buffer.addAttribute(AttributeType::POSITION, 3);
         mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
         mesh.buffer.addAttribute(AttributeType::NORMAL, 3);

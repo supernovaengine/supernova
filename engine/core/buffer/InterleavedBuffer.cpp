@@ -36,12 +36,11 @@ void InterleavedBuffer::clearAll(){
     Buffer::clearAll();
 
     vertexSize = 0;
+    vectorBuffer.clear(); // clear only here to not lost ref in async commands
 }
 
 void InterleavedBuffer::clear(){
-    Buffer::clear();
-
-    vectorBuffer.clear();
+    Buffer::clear(); 
 }
 
 void InterleavedBuffer::addAttribute(AttributeType attribute, int elements){

@@ -35,8 +35,12 @@ bool IndexBuffer::resize(size_t pos) {
     return true;
 }
 
-void IndexBuffer::clear(){
-    Buffer::clear();
+void IndexBuffer::clearAll(){
+    Buffer::clearAll();
 
     vectorBuffer.clear();
+}
+
+void IndexBuffer::clear(){
+    Buffer::clear();
 }

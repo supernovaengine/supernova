@@ -22,6 +22,7 @@ namespace Supernova {
         void createIndexAttribute();
 
         virtual bool resize(size_t pos);
+        virtual void clearAll();
         virtual void clear();
 
     };

@@ -102,6 +102,7 @@ namespace Supernova{
 		std::priority_queue<TransparentMeshesData, std::vector<TransparentMeshesData>, MeshComparison> transparentMeshes;
 
 		static void changeLoaded(void* data);
+		static void changeDestroy(void* data);
 
 		void updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 
@@ -135,20 +136,20 @@ namespace Supernova{
 
 		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams);
-		void destroyMesh(MeshComponent& mesh);
+		void destroyMesh(Entity entity, MeshComponent& mesh);
 
 		void drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams);
-		void destroyTerrain(TerrainComponent& terrain);
+		void destroyTerrain(Entity entity, TerrainComponent& terrain);
 
 		void drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture);
-		void destroyUI(UIComponent& uirender);
+		void destroyUI(Entity entity, UIComponent& uirender);
 
 		void drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture);
-		void destroyParticles(ParticlesComponent& particles);
+		void destroyParticles(Entity entity, ParticlesComponent& particles);
 
 		void drawSky(SkyComponent& sky, bool renderToTexture);
-		void destroySky(SkyComponent& sky);
+		void destroySky(Entity entity, SkyComponent& sky);
 
 		void destroyLight(LightComponent& light);
 		void destroyCamera(CameraComponent& camera, bool entityDestroyed);
