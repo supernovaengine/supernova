@@ -502,14 +502,23 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 	if (mesh.buffer.getSize() > 0){
 		buffers["vertices"] = &mesh.buffer;
 		allBuffersEmpty = false;
+		if (mesh.buffer.getUsage() != BufferUsage::IMMUTABLE){
+			mesh.needUpdateBuffer = true;
+		}
 	}
 	if (mesh.indices.getSize() > 0){
 		buffers["indices"] = &mesh.indices;
 		allBuffersEmpty = false;
+		if (mesh.indices.getUsage() != BufferUsage::IMMUTABLE){
+			mesh.needUpdateBuffer = true;
+		}
 	}
 	for (int i = 0; i < mesh.numExternalBuffers; i++){
 		buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
 		allBuffersEmpty = false;
+		if (mesh.eBuffers[i].getUsage() != BufferUsage::IMMUTABLE){
+			mesh.needUpdateBuffer = true;
+		}
 	}
 
 	if (mesh.vertexCount == 0){
@@ -695,11 +704,15 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
     	}
 
 		for (auto const& attr : mesh.submeshes[i].attributes){
-			if (attr.first == AttributeType::INDEX){
-				indexCount = attr.second.getCount();
-				render.addIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
+			if (bufferNameToRender.count(attr.second.getBuffer())){
+				if (attr.first == AttributeType::INDEX){
+					indexCount = attr.second.getCount();
+					render.addIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
+				}else{
+					render.addAttribute(shaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+				}
 			}else{
-				render.addAttribute(shaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+				Log::error("Cannot load submesh attribute from buffer name: %s", attr.second.getBuffer().c_str());
 			}
 		}
 
@@ -763,26 +776,30 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
     		}
 
 			for (auto const& attr : mesh.submeshes[i].attributes){
-				if (attr.first == AttributeType::INDEX){
-					depthRender.addIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
-				}else if (attr.first == AttributeType::POSITION){
-					depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
-				}
-				if (mesh.submeshes[i].hasSkinning){
-					if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
+				if (bufferNameToRender.count(attr.second.getBuffer())){
+					if (attr.first == AttributeType::INDEX){
+						depthRender.addIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
+					}else if (attr.first == AttributeType::POSITION){
 						depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
 					}
-				}
-				if (mesh.submeshes[i].hasMorphTarget){
-					if (attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET1 ||
-						attr.first == AttributeType::MORPHTARGET2 || attr.first == AttributeType::MORPHTARGET3 ||
-						attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET4 ||
-						attr.first == AttributeType::MORPHTARGET6 || attr.first == AttributeType::MORPHTARGET7 ||
-						attr.first == AttributeType::MORPHNORMAL0 || attr.first == AttributeType::MORPHNORMAL1 ||
-						attr.first == AttributeType::MORPHNORMAL2 || attr.first == AttributeType::MORPHNORMAL3 ||
-						attr.first == AttributeType::MORPHTANGENT0 || attr.first == AttributeType::MORPHTANGENT1){
-						depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+					if (mesh.submeshes[i].hasSkinning){
+						if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
+							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+						}
 					}
+					if (mesh.submeshes[i].hasMorphTarget){
+						if (attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET1 ||
+							attr.first == AttributeType::MORPHTARGET2 || attr.first == AttributeType::MORPHTARGET3 ||
+							attr.first == AttributeType::MORPHTARGET0 || attr.first == AttributeType::MORPHTARGET4 ||
+							attr.first == AttributeType::MORPHTARGET6 || attr.first == AttributeType::MORPHTARGET7 ||
+							attr.first == AttributeType::MORPHNORMAL0 || attr.first == AttributeType::MORPHNORMAL1 ||
+							attr.first == AttributeType::MORPHNORMAL2 || attr.first == AttributeType::MORPHNORMAL3 ||
+							attr.first == AttributeType::MORPHTANGENT0 || attr.first == AttributeType::MORPHTANGENT1){
+							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+						}
+					}
+				}else{
+					Log::error("Cannot load (depth) submesh attribute from buffer name: %s", attr.second.getBuffer().c_str());
 				}
 			}
 
@@ -807,7 +824,8 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 			if (mesh.indices.getUsage() != BufferUsage::IMMUTABLE)
 				mesh.indices.getRender()->updateBuffer(mesh.indices.getSize(), mesh.indices.getData());
 			for (int i = 0; i < mesh.numExternalBuffers; i++){
-				mesh.eBuffers[i].getRender()->updateBuffer(mesh.eBuffers[i].getSize(), mesh.eBuffers[i].getData());
+				if (mesh.eBuffers[i].getUsage() != BufferUsage::IMMUTABLE)
+					mesh.eBuffers[i].getRender()->updateBuffer(mesh.eBuffers[i].getSize(), mesh.eBuffers[i].getData());
 			}
 
 			mesh.needUpdateBuffer = false;
@@ -1228,6 +1246,9 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, bool isText){
 			render.addAttribute(shaderData.getAttrIndex(attr.first), uirender.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), uirender.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
         }
     }
+	if (uirender.buffer.getUsage() != BufferUsage::IMMUTABLE){
+		uirender.needUpdateBuffer = true;
+	}
 
 	bufferSize = uirender.indices.getSize();
 	minBufferSize = uirender.minIndicesCount * uirender.indices.getStride();
@@ -1239,6 +1260,9 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, bool isText){
 		uirender.vertexCount = uirender.indices.getCount();
 		Attribute indexattr = uirender.indices.getAttributes()[AttributeType::INDEX];
 		render.addIndex(uirender.indices.getRender(), indexattr.getDataType(), indexattr.getOffset());
+		if (uirender.indices.getUsage() != BufferUsage::IMMUTABLE){
+			uirender.needUpdateBuffer = true;
+		}
 	}else{
 		uirender.vertexCount = uirender.buffer.getCount();
 	}
@@ -1374,6 +1398,9 @@ bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
 			render.addAttribute(shaderData.getAttrIndex(attr.first), particles.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), particles.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
         }
     }
+	if (particles.buffer.getUsage() != BufferUsage::IMMUTABLE){
+		particles.needUpdateBuffer = true;
+	}
 
 	if (textureRender)
 		render.addTexture(shaderData.getTextureIndex(TextureShaderType::POINTS, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
