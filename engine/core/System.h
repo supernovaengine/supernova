@@ -78,10 +78,15 @@ namespace Supernova {
 
         virtual void removeKey(const char *key);
 
+        // Google AdMob SDK
         virtual void initializeAdMob();
         virtual void loadInterstitialAd(std::string adUnitID);
         virtual bool isInterstitialAdLoaded();
         virtual void showInterstitialAd();
+
+        // CrazyGames SDK
+        virtual void initializeCrazyGamesSDK();
+        virtual void showCrazyGamesAd(std::string type);
     };
 
 }

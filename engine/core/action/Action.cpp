@@ -75,3 +75,9 @@ bool Action::isPaused() const{
 
     return (action.state == ActionState::Paused);
 }
+
+float Action::getTimeCount() const{
+    ActionComponent& action = getComponent<ActionComponent>();
+
+    return action.timecount;
+}

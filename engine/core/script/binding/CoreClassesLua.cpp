@@ -462,6 +462,13 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticFunction("getUserDataPath", [] () { return System::instance().getUserDataPath(); })
         .addStaticFunction("getLuaPath", [] () { return System::instance().getLuaPath(); })
         .addStaticFunction("getShaderPath", [] () { return System::instance().getShaderPath(); })
+        //UserSettings not need here
+        .addStaticFunction("initializeAdMob", [] () { return System::instance().initializeAdMob(); })
+        .addStaticFunction("loadInterstitialAd", [] (std::string adUnitID) { return System::instance().loadInterstitialAd(adUnitID); })
+        .addStaticFunction("isInterstitialAdLoaded", [] () { return System::instance().isInterstitialAdLoaded(); })
+        .addStaticFunction("showInterstitialAd", [] () { return System::instance().showInterstitialAd(); })
+        .addStaticFunction("initializeCrazyGamesSDK", [] () { return System::instance().initializeCrazyGamesSDK(); })
+        .addStaticFunction("showCrazyGamesAd", [] (std::string type) { return System::instance().showCrazyGamesAd(type); })
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

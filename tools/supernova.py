@@ -108,12 +108,13 @@ def create_build_dir(name):
 @click.option('--appname', '-a', default='supernova-project', help="Project target name")
 @click.option('--output', '-o', type=click.Path(), help="Output directory")
 @click.option('--build/--no-build', '-b', default=False, help="Build or no build generated Xcode project")
+@click.option('--debug/--no-debug', '-d', default=False, help="Build type Debug or Release")
 @click.option('--graphic-backend', '-g', type=click.Choice(['glcore33', 'gles3', 'metal', 'd3d11'], case_sensitive=False), help="Preferred graphic API")
 @click.option('--app-backend', '-m', type=click.Choice(['emscripten', 'android', 'sokol', 'glfw', 'apple'], case_sensitive=False), help="Preferred application API")
 @click.option('--no-cpp-init', is_flag=True, help="No call C++ init on project start")
 @click.option('--no-lua-init', is_flag=True, help="No call Lua on project start")
 @click.option('--em-shell-file', type=click.Path(), help="Emscripten shell file")
-def build(platform, project, supernova, appname, output, build, graphic_backend, app_backend, no_lua_init, no_cpp_init, em_shell_file):
+def build(platform, project, supernova, appname, output, build, debug, graphic_backend, app_backend, no_lua_init, no_cpp_init, em_shell_file):
 
     projectRoot = os.path.abspath(project)
     supernovaRoot = os.path.abspath(supernova)
@@ -124,6 +125,10 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
 
     build_config = []
     native_build_config = []
+
+    build_type = "Release"
+    if debug:
+        build_type = "Debug"
 
     if output==None:
         build_dir = create_build_dir(os.path.join("build",platform))
@@ -162,7 +167,7 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
             cmake_generator = "MinGW Makefiles"
         
         cmake_definitions.extend([
-            "-DCMAKE_BUILD_TYPE=Release",
+            "-DCMAKE_BUILD_TYPE="+build_type,
             "-DCMAKE_TOOLCHAIN_FILE="+emscripten+"/cmake/Modules/Platform/Emscripten.cmake"
         ])
 
@@ -178,9 +183,8 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
 
         #cmake_generator = "Visual Studio 16 2019"
         cmake_generator = "Visual Studio 17 2022" #TODO: make this editable
-        build_config_mode = "Release"
 
-        build_config = ["--config", build_config_mode]
+        build_config = ["--config", build_type]
         
 ####
 ## Preparing Ninja (Linux, MacOS) environment
@@ -188,9 +192,8 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
     if (platform == "linux" or platform == "macos"):
 
         cmake_generator = "Ninja"
-        build_config_mode = "Release"
 
-        build_config = ["--config", build_config_mode]
+        build_config = ["--config", build_type]
 
 ####
 ## Preparing macOS (Xcode generator) environment
@@ -198,17 +201,15 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
     if (platform == "macos-xcode"):
 
         cmake_generator = "Xcode"
-        build_config_mode = "Release"
 
-        build_config = ["--config", build_config_mode]    
+        build_config = ["--config", build_type]
 
     #    cmake_generator = "Xcode"
     #    system_name = "macOS"
     #    OSX_SDK="macosx"
-    #    build_config_mode = "Release"
     #    build_sdk = "macosx"
 #
-    #    build_config = ["--config", build_config_mode]
+    #    build_config = ["--config", build_type]
     #    native_build_config = ["-sdk", build_sdk]
     #    cmake_definitions.extend([
     #        "-DCMAKE_SYSTEM_NAME="+system_name,
@@ -223,10 +224,9 @@ def build(platform, project, supernova, appname, output, build, graphic_backend,
         cmake_generator = "Xcode"
         system_name = "iOS"
         OSX_SDK="iphoneos"
-        build_config_mode = "Release"
         build_sdk = "iphonesimulator"
 
-        build_config = ["--config", build_config_mode]
+        build_config = ["--config", build_type]
         native_build_config = ["-sdk", build_sdk]
         cmake_definitions.extend([
             "-DCMAKE_SYSTEM_NAME="+system_name,

@@ -222,3 +222,11 @@ bool System::isInterstitialAdLoaded(){
 void System::showInterstitialAd(){
     Log::error("Cannot show InterstitialAd in this system");
 }
+
+void System::initializeCrazyGamesSDK(){
+    Log::error("Cannot initialize CrazyGames SDK in this system");
+}
+
+void System::showCrazyGamesAd(std::string type){
+    Log::error("Cannot show CrazyGames ad in this system");
+}

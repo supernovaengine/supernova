@@ -83,6 +83,7 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addFunction("isRunning", &Action::isRunning)
         .addFunction("isStopped", &Action::isStopped)
         .addFunction("isPaused", &Action::isPaused)
+        .addFunction("getTimeCount", &Action::getTimeCount)
         .addFunction("getActionComponent", &Action::getComponent<ActionComponent>)
         .endClass();
 

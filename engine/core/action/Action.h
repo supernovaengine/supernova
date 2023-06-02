@@ -27,6 +27,8 @@ namespace Supernova{
         bool isRunning() const;
         bool isStopped() const;
         bool isPaused() const;
+
+        float getTimeCount() const;
     };
 }
 

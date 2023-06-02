@@ -18,6 +18,7 @@ private:
     static EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData);
     static EM_BOOL wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData);
     static EM_BOOL canvas_resize(int eventType, const void *reserved, void *userData);
+    static EM_BOOL webgl_context_callback(int emsc_type, const void* reserved, void* user_data);
 
     static void renderLoop();
 
@@ -50,6 +51,9 @@ public:
     virtual std::string getStringForKey(const char *key, std::string defaultValue);
     virtual void setStringForKey(const char* key, std::string value);
     virtual void removeKey(const char *key);
+
+    virtual void initializeCrazyGamesSDK();
+    virtual void showCrazyGamesAd(std::string type);
     
 };
 

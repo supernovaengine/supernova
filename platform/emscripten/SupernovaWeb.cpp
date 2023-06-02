@@ -10,6 +10,7 @@
 #include "Input.h"
 #include "System.h"
 #include "Log.h"
+#include "AudioSystem.h"
 
 int SupernovaWeb::syncWaitTime;
 bool SupernovaWeb::enabledIDB;
@@ -18,16 +19,23 @@ int SupernovaWeb::screenWidth;
 int SupernovaWeb::screenHeight;
 
 extern "C" {
+    EMSCRIPTEN_KEEPALIVE 
     int getScreenWidth() {
         return Supernova::System::instance().getScreenWidth();
     }
+
+    EMSCRIPTEN_KEEPALIVE 
     int getScreenHeight() {
         return Supernova::System::instance().getScreenHeight();
     }
+
+    EMSCRIPTEN_KEEPALIVE 
     void changeCanvasSize(int nWidth, int nHeight){
         SupernovaWeb::changeCanvasSize(nWidth, nHeight);
     }
-    EMSCRIPTEN_KEEPALIVE void syncfs_enable_callback(const char* err) {
+
+    EMSCRIPTEN_KEEPALIVE 
+    void syncfs_enable_callback(const char* err) {
 	    if (!err || err[0]) {
 		    Supernova::Log::error("Failed to enable IndexedDB: %s", err);
             SupernovaWeb::setEnabledIDB(false);
@@ -35,10 +43,33 @@ extern "C" {
             SupernovaWeb::setEnabledIDB(true);
         }
     }
-    EMSCRIPTEN_KEEPALIVE void syncfs_callback(const char* err) {
+
+    EMSCRIPTEN_KEEPALIVE 
+    void syncfs_callback(const char* err) {
 	    if (!err || err[0]) {
 		    Supernova::Log::error("Failed to save in iDB file system: %s", err);
 	    }
+    }
+
+    EMSCRIPTEN_KEEPALIVE 
+    void crazygamesad_started_callback() {
+        Supernova::AudioSystem::pauseAll();
+        Supernova::Engine::systemPause();
+    }
+
+    EMSCRIPTEN_KEEPALIVE 
+    void crazygamesad_finished_callback() {
+        Supernova::AudioSystem::resumeAll();
+        Supernova::Engine::systemResume();
+    }
+
+    EMSCRIPTEN_KEEPALIVE 
+    void crazygamesad_error_callback(const char* err) {
+	    if (!err || err[0]) {
+		    Supernova::Log::error("Failed to load CrazyGames ad: %s", err);
+	    }
+        Supernova::AudioSystem::resumeAll();
+        Supernova::Engine::systemResume();
     }
 }
 
@@ -78,6 +109,8 @@ int SupernovaWeb::init(int argc, char **argv){
     ret = emscripten_set_dblclick_callback("#canvas", 0, 1, mouse_callback);
     ret = emscripten_set_mousemove_callback("#canvas", 0, 1, mouse_callback);
     ret = emscripten_set_wheel_callback("#canvas", 0, 1, wheel_callback);
+    ret = emscripten_set_webglcontextlost_callback("#canvas", 0, 1, webgl_context_callback);
+    ret = emscripten_set_webglcontextrestored_callback("#canvas", 0, 1, webgl_context_callback);
 
     //Removed because emscripten_set_canvas_element_size is not working on this callback
     //ret = emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, 0, 1, fullscreenchange_callback);
@@ -326,6 +359,16 @@ EM_BOOL SupernovaWeb::wheel_callback(int eventType, const EmscriptenWheelEvent *
     Supernova::Engine::systemMouseScroll(scale * (float)e->deltaX, scale * (float)e->deltaY, modifiers);
 
   return 0;
+}
+
+EM_BOOL SupernovaWeb::webgl_context_callback(int emsc_type, const void* reserved, void* user_data) {
+    switch (emsc_type) {
+        case EMSCRIPTEN_EVENT_WEBGLCONTEXTLOST:     Supernova::Engine::systemPause(); break;
+        case EMSCRIPTEN_EVENT_WEBGLCONTEXTRESTORED: Supernova::Engine::systemResume(); break;
+        default:                                    break;
+    }
+
+    return true;
 }
 
 int SupernovaWeb::supernova_mouse_button(int button){
@@ -593,4 +636,41 @@ void SupernovaWeb::removeKey(const char *key){
         var key = UTF8ToString($0);
         localStorage.removeItem(key);
     }, key);
+}
+
+void SupernovaWeb::initializeCrazyGamesSDK(){
+    EM_ASM(
+        function loadJS(FILE_URL, async = true) {
+            let scriptEle = document.createElement("script");
+
+            scriptEle.setAttribute("src", FILE_URL);
+            scriptEle.setAttribute("type", "text/javascript");
+            scriptEle.setAttribute("async", async);
+
+            document.body.appendChild(scriptEle);
+
+            // success event
+            scriptEle.addEventListener("load", () => {
+                //console.log("File loaded");
+            });
+            // error event
+            scriptEle.addEventListener("error", (ev) => {
+                //console.log("Error on loading file", ev);
+            });
+        }
+
+        loadJS("https://sdk.crazygames.com/crazygames-sdk-v2.js", false);
+    );
+}
+
+void SupernovaWeb::showCrazyGamesAd(std::string type){
+    EM_ASM({
+        var adtype = UTF8ToString($0);
+        const callbacks = ({
+            adFinished: () => ccall('crazygamesad_finished_callback', null),
+            adError: (error) => ccall('crazygamesad_error_callback', null, ['string'], [error ? error.message : ""]),
+            adStarted: () => ccall('crazygamesad_started_callback', null)
+        });
+        window.CrazyGames.SDK.ad.requestAd(adtype, callbacks);
+    }, type.c_str());
 }
