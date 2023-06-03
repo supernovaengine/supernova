@@ -655,7 +655,7 @@ void SupernovaWeb::initializeCrazyGamesSDK(){
             });
             // error event
             scriptEle.addEventListener("error", (ev) => {
-                //console.log("Error on loading file", ev);
+                console.log("Error on loading file", ev);
             });
         }
 
@@ -673,4 +673,34 @@ void SupernovaWeb::showCrazyGamesAd(std::string type){
         });
         window.CrazyGames.SDK.ad.requestAd(adtype, callbacks);
     }, type.c_str());
+}
+
+void SupernovaWeb::happytimeCrazyGames(){
+    EM_ASM(
+        window.CrazyGames.SDK.game.happytime();
+    );
+}
+
+void SupernovaWeb::gameplayStartCrazyGames(){
+    EM_ASM(
+        window.CrazyGames.SDK.game.gameplayStart();
+    );
+}
+
+void SupernovaWeb::gameplayStopCrazyGames(){
+    EM_ASM(
+        window.CrazyGames.SDK.game.gameplayStop();
+    );
+}
+
+void SupernovaWeb::loadingStartCrazyGames(){
+    EM_ASM(
+        window.CrazyGames.SDK.game.sdkGameLoadingStart();
+    );
+}
+
+void SupernovaWeb::loadingStopCrazyGames(){
+    EM_ASM(
+        window.CrazyGames.SDK.game.sdkGameLoadingStop();
+    );
 }

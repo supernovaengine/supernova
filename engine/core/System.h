@@ -87,6 +87,11 @@ namespace Supernova {
         // CrazyGames SDK
         virtual void initializeCrazyGamesSDK();
         virtual void showCrazyGamesAd(std::string type);
+        virtual void happytimeCrazyGames();
+        virtual void gameplayStartCrazyGames();
+        virtual void gameplayStopCrazyGames();
+        virtual void loadingStartCrazyGames();
+        virtual void loadingStopCrazyGames();
     };
 
 }

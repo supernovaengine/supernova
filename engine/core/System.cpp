@@ -230,3 +230,18 @@ void System::initializeCrazyGamesSDK(){
 void System::showCrazyGamesAd(std::string type){
     Log::error("Cannot show CrazyGames ad in this system");
 }
+
+void System::happytimeCrazyGames(){
+}
+
+void System::gameplayStartCrazyGames(){
+}
+
+void System::gameplayStopCrazyGames(){
+}
+
+void System::loadingStartCrazyGames(){
+}
+
+void System::loadingStopCrazyGames(){
+}
