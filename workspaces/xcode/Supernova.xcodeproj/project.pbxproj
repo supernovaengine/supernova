@@ -43,6 +43,8 @@
 		710AD70425B6058100A7B12F /* libstb-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 710AD6E325B6053400A7B12F /* libstb-ios.a */; };
 		710AD75225B7343400A7B12F /* EngineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710AD75125B7343400A7B12F /* EngineView.mm */; };
 		710AD78625B7A1F600A7B12F /* EngineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710AD76C25B79D8300A7B12F /* EngineView.mm */; };
+		710EE49D2A2E1E9200EB04EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 710EE49C2A2E1E9200EB04EC /* Assets.xcassets */; };
+		710EE49E2A2E1E9200EB04EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 710EE49C2A2E1E9200EB04EC /* Assets.xcassets */; };
 		711607082A0D1F0C0052A9C3 /* AdMobAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 711607072A0D1F0C0052A9C3 /* AdMobAdapter.m */; };
 		7116070B2A0D84660052A9C3 /* GoogleMobileAds.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7116070A2A0D84660052A9C3 /* GoogleMobileAds.xcframework */; };
 		711607122A0D86500052A9C3 /* GoogleAppMeasurement.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7116070C2A0D864F0052A9C3 /* GoogleAppMeasurement.xcframework */; };
@@ -57,8 +59,6 @@
 		7128CEE425BA705600965B51 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7128CEE325BA705600965B51 /* Main.storyboard */; };
 		7128CFAD25BA717500965B51 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7128CFAA25BA717500965B51 /* LaunchScreen.storyboard */; };
 		7128CFAE25BA717500965B51 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7128CFAB25BA717500965B51 /* Main.storyboard */; };
-		7128D02B25BA759F00965B51 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7128D02A25BA759F00965B51 /* Assets.xcassets */; };
-		7128D02C25BA759F00965B51 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7128D02A25BA759F00965B51 /* Assets.xcassets */; };
 		7128D08625BB033D00965B51 /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7128D08525BB033D00965B51 /* Input.cpp */; };
 		7128D08725BB033D00965B51 /* Input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7128D08525BB033D00965B51 /* Input.cpp */; };
 		7128D0AE25BB18DC00965B51 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7128D0AC25BB18DC00965B51 /* StringUtils.cpp */; };
@@ -793,6 +793,7 @@
 		710AD75125B7343400A7B12F /* EngineView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EngineView.mm; sourceTree = "<group>"; };
 		710AD76B25B79D6700A7B12F /* EngineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EngineView.h; sourceTree = "<group>"; };
 		710AD76C25B79D8300A7B12F /* EngineView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EngineView.mm; sourceTree = "<group>"; };
+		710EE49C2A2E1E9200EB04EC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		711607072A0D1F0C0052A9C3 /* AdMobAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdMobAdapter.m; sourceTree = "<group>"; };
 		711607092A0D1F360052A9C3 /* AdMobAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdMobAdapter.h; sourceTree = "<group>"; };
 		7116070A2A0D84660052A9C3 /* GoogleMobileAds.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleMobileAds.xcframework; path = "../../platform/apple/GoogleMobileAdsSdkiOS-10.4.0/GoogleMobileAds.xcframework"; sourceTree = "<group>"; };
@@ -810,7 +811,6 @@
 		7128CFAC25BA717500965B51 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7128D00425BA74A000965B51 /* Supernova_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Supernova_macOS.entitlements; sourceTree = "<group>"; };
 		7128D00525BA74A000965B51 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7128D02A25BA759F00965B51 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7128D05D25BB02F800965B51 /* Input.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Input.h; sourceTree = "<group>"; };
 		7128D08525BB033D00965B51 /* Input.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Input.cpp; sourceTree = "<group>"; };
 		7128D0AC25BB18DC00965B51 /* StringUtils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StringUtils.cpp; sourceTree = "<group>"; };
@@ -1507,6 +1507,7 @@
 		7162F8BF259547D60075B97D = {
 			isa = PBXGroup;
 			children = (
+				710EE49C2A2E1E9200EB04EC /* Assets.xcassets */,
 				7162FEAA25993F810075B97D /* project */,
 				7162FE2D2597C7990075B97D /* platform */,
 				7162FC2825962A0E0075B97D /* engine */,
@@ -1896,7 +1897,6 @@
 		7162FE2E2597C7990075B97D /* apple */ = {
 			isa = PBXGroup;
 			children = (
-				7128D02A25BA759F00965B51 /* Assets.xcassets */,
 				713D8332259D407A00567F9F /* ios */,
 				713D831D259D3F8F00567F9F /* macos */,
 				7158F43D259C2C82006E55D3 /* Renderer.h */,
@@ -3023,9 +3023,9 @@
 			files = (
 				7128CFAD25BA717500965B51 /* LaunchScreen.storyboard in Resources */,
 				71BE60E425B1D019006D6E02 /* assets in Resources */,
-				7128D02B25BA759F00965B51 /* Assets.xcassets in Resources */,
 				717D9B4E27338381002C0803 /* lua in Resources */,
 				7128CFAE25BA717500965B51 /* Main.storyboard in Resources */,
+				710EE49D2A2E1E9200EB04EC /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3035,7 +3035,7 @@
 			files = (
 				7128CEE425BA705600965B51 /* Main.storyboard in Resources */,
 				717D9B4F27338382002C0803 /* lua in Resources */,
-				7128D02C25BA759F00965B51 /* Assets.xcassets in Resources */,
+				710EE49E2A2E1E9200EB04EC /* Assets.xcassets in Resources */,
 				71BE60E525B1D019006D6E02 /* assets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3952,7 +3952,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/GoogleMobileAdsSdkiOS-10.4.0";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../engine/core",
 					"$(SRCROOT)/../../engine/renders",
@@ -3980,7 +3979,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/GoogleMobileAdsSdkiOS-10.4.0";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../engine/core",
 					"$(SRCROOT)/../../engine/renders",

@@ -8,6 +8,8 @@
 #import "AdMobAdapter.h"
 
 #import "AppDelegate.h"
+#import "ViewController.h"
+#import "Renderer.h"
 
 @import GoogleMobileAds;
 
@@ -15,9 +17,18 @@
 
 @property(nonatomic, strong) GADInterstitialAd *interstitial;
 
+@property(nonatomic, strong) ViewController *rootController;
+
 @end
 
 @implementation AdMobAdapter
+
+- (nonnull instancetype)init {
+    
+    _rootController = (ViewController*)[[(AppDelegate*) [[UIApplication sharedApplication]delegate] window] rootViewController];
+
+    return self;
+}
 
 - (void)initializeAdMob {
     [GADMobileAds.sharedInstance startWithCompletionHandler:nil];
@@ -43,10 +54,8 @@
 }
 
 - (void)showInterstitial {
-    UIViewController *rootController = (UIViewController*)[[(AppDelegate*)
-                                                            [[UIApplication sharedApplication]delegate] window] rootViewController];
     if (self.interstitial) {
-        [self.interstitial presentFromRootViewController:rootController];
+        [self.interstitial presentFromRootViewController:_rootController];
     } else {
         NSLog(@"Ad wasn't ready");
     }
@@ -55,16 +64,19 @@
 /// Tells the delegate that the ad failed to present full screen content.
 - (void)ad:(nonnull id<GADFullScreenPresentingAd>)ad
 didFailToPresentFullScreenContentWithError:(nonnull NSError *)error {
+    [Renderer resumeGame];
     NSLog(@"Ad did fail to present full screen content.");
 }
 
 /// Tells the delegate that the ad will present full screen content.
 - (void)adWillPresentFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad {
+    [Renderer pauseGame];
     NSLog(@"Ad will present full screen content.");
 }
 
 /// Tells the delegate that the ad dismissed full screen content.
 - (void)adDidDismissFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad {
+    [Renderer resumeGame];
    NSLog(@"Ad did dismiss full screen content.");
 }
 

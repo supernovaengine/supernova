@@ -9,9 +9,11 @@
 
 @interface AdMobAdapter : NSObject
 
+- (nonnull instancetype)init;
+
 - (void)initializeAdMob;
 
-- (void)loadInterstitial:(NSString *)adUnitID;
+- (void)loadInterstitial:(nonnull NSString *)adUnitID;
 
 - (bool)isInterstitialAdLoaded;
 

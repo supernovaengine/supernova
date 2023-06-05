@@ -59,11 +59,11 @@
 }
 
 - (void)pauseGame {
-    [_renderer pauseGame];
+    [Renderer pauseGame];
 }
 
 - (void)resumeGame {
-    [_renderer resumeGame];
+    [Renderer resumeGame];
 }
 
 @end

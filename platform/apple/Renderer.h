@@ -12,8 +12,8 @@
 
 - (void)destroyView;
 
-- (void)pauseGame;
-- (void)resumeGame;
++ (void)pauseGame;
++ (void)resumeGame;
 
 @property (class, nonatomic, assign, readonly, nullable) MTKView* view;
 @property (class, nonatomic, assign, readonly) CGSize screenSize;

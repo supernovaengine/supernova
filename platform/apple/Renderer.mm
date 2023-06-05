@@ -82,11 +82,11 @@ static CGSize _screenSize;
     Supernova::Engine::systemViewChanged();
 }
 
-- (void)pauseGame {
++ (void)pauseGame {
     Supernova::Engine::systemPause();
 }
 
-- (void)resumeGame {
++ (void)resumeGame {
     Supernova::Engine::systemResume();
 }
 
