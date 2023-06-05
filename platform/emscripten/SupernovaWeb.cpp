@@ -53,13 +53,11 @@ extern "C" {
 
     EMSCRIPTEN_KEEPALIVE 
     void crazygamesad_started_callback() {
-        Supernova::AudioSystem::pauseAll();
         Supernova::Engine::systemPause();
     }
 
     EMSCRIPTEN_KEEPALIVE 
     void crazygamesad_finished_callback() {
-        Supernova::AudioSystem::resumeAll();
         Supernova::Engine::systemResume();
     }
 
@@ -68,7 +66,6 @@ extern "C" {
 	    if (!err || err[0]) {
 		    Supernova::Log::error("Failed to load CrazyGames ad: %s", err);
 	    }
-        Supernova::AudioSystem::resumeAll();
         Supernova::Engine::systemResume();
     }
 }
