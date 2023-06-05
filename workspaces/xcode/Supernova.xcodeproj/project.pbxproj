@@ -45,6 +45,8 @@
 		710AD78625B7A1F600A7B12F /* EngineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710AD76C25B79D8300A7B12F /* EngineView.mm */; };
 		710EE49D2A2E1E9200EB04EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 710EE49C2A2E1E9200EB04EC /* Assets.xcassets */; };
 		710EE49E2A2E1E9200EB04EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 710EE49C2A2E1E9200EB04EC /* Assets.xcassets */; };
+		710EE4A02A2E291100EB04EC /* ios in Resources */ = {isa = PBXBuildFile; fileRef = 710EE49F2A2E291100EB04EC /* ios */; };
+		710EE4A22A2E2A2000EB04EC /* macos in Resources */ = {isa = PBXBuildFile; fileRef = 710EE4A12A2E2A2000EB04EC /* macos */; };
 		711607082A0D1F0C0052A9C3 /* AdMobAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 711607072A0D1F0C0052A9C3 /* AdMobAdapter.m */; };
 		7116070B2A0D84660052A9C3 /* GoogleMobileAds.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7116070A2A0D84660052A9C3 /* GoogleMobileAds.xcframework */; };
 		711607122A0D86500052A9C3 /* GoogleAppMeasurement.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7116070C2A0D864F0052A9C3 /* GoogleAppMeasurement.xcframework */; };
@@ -794,6 +796,8 @@
 		710AD76B25B79D6700A7B12F /* EngineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EngineView.h; sourceTree = "<group>"; };
 		710AD76C25B79D8300A7B12F /* EngineView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = EngineView.mm; sourceTree = "<group>"; };
 		710EE49C2A2E1E9200EB04EC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		710EE49F2A2E291100EB04EC /* ios */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ios; sourceTree = "<group>"; };
+		710EE4A12A2E2A2000EB04EC /* macos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = macos; sourceTree = "<group>"; };
 		711607072A0D1F0C0052A9C3 /* AdMobAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdMobAdapter.m; sourceTree = "<group>"; };
 		711607092A0D1F360052A9C3 /* AdMobAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdMobAdapter.h; sourceTree = "<group>"; };
 		7116070A2A0D84660052A9C3 /* GoogleMobileAds.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleMobileAds.xcframework; path = "../../platform/apple/GoogleMobileAdsSdkiOS-10.4.0/GoogleMobileAds.xcframework"; sourceTree = "<group>"; };
@@ -808,9 +812,7 @@
 		7128CEE325BA705600965B51 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		7128CFAA25BA717500965B51 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7128CFAB25BA717500965B51 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
-		7128CFAC25BA717500965B51 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7128D00425BA74A000965B51 /* Supernova_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Supernova_macOS.entitlements; sourceTree = "<group>"; };
-		7128D00525BA74A000965B51 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7128D05D25BB02F800965B51 /* Input.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Input.h; sourceTree = "<group>"; };
 		7128D08525BB033D00965B51 /* Input.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Input.cpp; sourceTree = "<group>"; };
 		7128D0AC25BB18DC00965B51 /* StringUtils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StringUtils.cpp; sourceTree = "<group>"; };
@@ -1442,7 +1444,6 @@
 		713D831D259D3F8F00567F9F /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				7128D00525BA74A000965B51 /* Info.plist */,
 				7128D00425BA74A000965B51 /* Supernova_macOS.entitlements */,
 				7128CEE325BA705600965B51 /* Main.storyboard */,
 				713D831E259D3F8F00567F9F /* AppDelegate.h */,
@@ -1459,7 +1460,6 @@
 		713D8332259D407A00567F9F /* ios */ = {
 			isa = PBXGroup;
 			children = (
-				7128CFAC25BA717500965B51 /* Info.plist */,
 				7128CFAA25BA717500965B51 /* LaunchScreen.storyboard */,
 				7128CFAB25BA717500965B51 /* Main.storyboard */,
 				713D8333259D407A00567F9F /* AppDelegate.h */,
@@ -1507,6 +1507,8 @@
 		7162F8BF259547D60075B97D = {
 			isa = PBXGroup;
 			children = (
+				710EE4A12A2E2A2000EB04EC /* macos */,
+				710EE49F2A2E291100EB04EC /* ios */,
 				710EE49C2A2E1E9200EB04EC /* Assets.xcassets */,
 				7162FEAA25993F810075B97D /* project */,
 				7162FE2D2597C7990075B97D /* platform */,
@@ -3021,6 +3023,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				710EE4A02A2E291100EB04EC /* ios in Resources */,
 				7128CFAD25BA717500965B51 /* LaunchScreen.storyboard in Resources */,
 				71BE60E425B1D019006D6E02 /* assets in Resources */,
 				717D9B4E27338381002C0803 /* lua in Resources */,
@@ -3037,6 +3040,7 @@
 				717D9B4F27338382002C0803 /* lua in Resources */,
 				710EE49E2A2E1E9200EB04EC /* Assets.xcassets in Resources */,
 				71BE60E525B1D019006D6E02 /* assets in Resources */,
+				710EE4A22A2E2A2000EB04EC /* macos in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3957,7 +3961,7 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 				);
-				INFOPLIST_FILE = ../../platform/apple/ios/Info.plist;
+				INFOPLIST_FILE = ios/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3984,7 +3988,7 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 				);
-				INFOPLIST_FILE = ../../platform/apple/ios/Info.plist;
+				INFOPLIST_FILE = ios/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -4018,7 +4022,7 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 				);
-				INFOPLIST_FILE = ../../platform/apple/macos/Info.plist;
+				INFOPLIST_FILE = macos/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -4048,7 +4052,7 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 				);
-				INFOPLIST_FILE = ../../platform/apple/macos/Info.plist;
+				INFOPLIST_FILE = macos/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
