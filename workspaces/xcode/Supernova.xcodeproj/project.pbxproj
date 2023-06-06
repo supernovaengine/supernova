@@ -315,8 +315,6 @@
 		717AD96D290B661A007D7DB5 /* AudioSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD96B290B661A007D7DB5 /* AudioSystem.cpp */; };
 		717AD96E290B661A007D7DB5 /* AudioSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD96B290B661A007D7DB5 /* AudioSystem.cpp */; };
 		717AD96F290B661A007D7DB5 /* AudioSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD96C290B661A007D7DB5 /* AudioSystem.h */; };
-		717AD97A290B68B4007D7DB5 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 717AD979290B68B4007D7DB5 /* AVFoundation.framework */; };
-		717AD981290B691E007D7DB5 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 717AD980290B691E007D7DB5 /* AudioToolbox.framework */; };
 		717AD9842919E1CB007D7DB5 /* UILayout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD9822919E1CB007D7DB5 /* UILayout.cpp */; };
 		717AD9852919E1CB007D7DB5 /* UILayout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD9822919E1CB007D7DB5 /* UILayout.cpp */; };
 		717AD9862919E1CB007D7DB5 /* UILayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD9832919E1CB007D7DB5 /* UILayout.h */; };
@@ -1056,11 +1054,6 @@
 		717AD96C290B661A007D7DB5 /* AudioSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioSystem.h; sourceTree = "<group>"; };
 		717AD970290B67A5007D7DB5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		717AD972290B67B8007D7DB5 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		717AD977290B689C007D7DB5 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.0.sdk/System/Library/Frameworks/AudioUnit.framework; sourceTree = DEVELOPER_DIR; };
-		717AD979290B68B4007D7DB5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.0.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		717AD97B290B68F3007D7DB5 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.0.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
-		717AD97D290B6906007D7DB5 /* CoreAudioKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudioKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.0.sdk/System/Library/Frameworks/CoreAudioKit.framework; sourceTree = DEVELOPER_DIR; };
-		717AD980290B691E007D7DB5 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.0.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
 		717AD9822919E1CB007D7DB5 /* UILayout.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UILayout.cpp; sourceTree = "<group>"; };
 		717AD9832919E1CB007D7DB5 /* UILayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UILayout.h; sourceTree = "<group>"; };
 		717AD9872919E1E9007D7DB5 /* ImageComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageComponent.h; sourceTree = "<group>"; };
@@ -1318,8 +1311,6 @@
 				711607162A0D86500052A9C3 /* GoogleAppMeasurementIdentitySupport.xcframework in Frameworks */,
 				711607172A0D86500052A9C3 /* UserMessagingPlatform.xcframework in Frameworks */,
 				7116070B2A0D84660052A9C3 /* GoogleMobileAds.xcframework in Frameworks */,
-				717AD97A290B68B4007D7DB5 /* AVFoundation.framework in Frameworks */,
-				717AD981290B691E007D7DB5 /* AudioToolbox.framework in Frameworks */,
 				713D82D7259D324700567F9F /* libsupernova-ios.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1874,11 +1865,6 @@
 				7116070F2A0D86500052A9C3 /* nanopb.xcframework */,
 				711607112A0D86500052A9C3 /* UserMessagingPlatform.xcframework */,
 				7116070A2A0D84660052A9C3 /* GoogleMobileAds.xcframework */,
-				717AD980290B691E007D7DB5 /* AudioToolbox.framework */,
-				717AD97D290B6906007D7DB5 /* CoreAudioKit.framework */,
-				717AD97B290B68F3007D7DB5 /* CoreAudio.framework */,
-				717AD979290B68B4007D7DB5 /* AVFoundation.framework */,
-				717AD977290B689C007D7DB5 /* AudioUnit.framework */,
 				717AD972290B67B8007D7DB5 /* AudioToolbox.framework */,
 				717AD970290B67A5007D7DB5 /* AVFoundation.framework */,
 			);
