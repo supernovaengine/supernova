@@ -45,8 +45,6 @@
 		710AD78625B7A1F600A7B12F /* EngineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710AD76C25B79D8300A7B12F /* EngineView.mm */; };
 		710EE49D2A2E1E9200EB04EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 710EE49C2A2E1E9200EB04EC /* Assets.xcassets */; };
 		710EE49E2A2E1E9200EB04EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 710EE49C2A2E1E9200EB04EC /* Assets.xcassets */; };
-		710EE4A02A2E291100EB04EC /* ios in Resources */ = {isa = PBXBuildFile; fileRef = 710EE49F2A2E291100EB04EC /* ios */; };
-		710EE4A22A2E2A2000EB04EC /* macos in Resources */ = {isa = PBXBuildFile; fileRef = 710EE4A12A2E2A2000EB04EC /* macos */; };
 		711607082A0D1F0C0052A9C3 /* AdMobAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 711607072A0D1F0C0052A9C3 /* AdMobAdapter.m */; };
 		7116070B2A0D84660052A9C3 /* GoogleMobileAds.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7116070A2A0D84660052A9C3 /* GoogleMobileAds.xcframework */; };
 		711607122A0D86500052A9C3 /* GoogleAppMeasurement.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7116070C2A0D864F0052A9C3 /* GoogleAppMeasurement.xcframework */; };
@@ -3023,7 +3021,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				710EE4A02A2E291100EB04EC /* ios in Resources */,
 				7128CFAD25BA717500965B51 /* LaunchScreen.storyboard in Resources */,
 				71BE60E425B1D019006D6E02 /* assets in Resources */,
 				717D9B4E27338381002C0803 /* lua in Resources */,
@@ -3040,7 +3037,6 @@
 				717D9B4F27338382002C0803 /* lua in Resources */,
 				710EE49E2A2E1E9200EB04EC /* Assets.xcassets in Resources */,
 				71BE60E525B1D019006D6E02 /* assets in Resources */,
-				710EE4A22A2E2A2000EB04EC /* macos in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
