@@ -52,9 +52,9 @@ static CGSize _screenSize;
         _device = view.device;
         
         //[view setPreferredFramesPerSecond:60];
+        //[view setSampleCount:4]; //causing issues in real devices when using SG_LOADACTION_LOAD
         [view setColorPixelFormat:MTLPixelFormatBGRA8Unorm];
         [view setDepthStencilPixelFormat:MTLPixelFormatDepth32Float_Stencil8];
-        [view setSampleCount:4];
         
         _screenSize.width = (float) view.drawableSize.width;
         _screenSize.height = (float) view.drawableSize.height;
