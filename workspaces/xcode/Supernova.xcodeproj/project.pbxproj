@@ -531,6 +531,10 @@
 		71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE623625B1DB9E006D6E02 /* TexturePool.h */; };
 		71BE624625B1DB9E006D6E02 /* ShaderPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 71BE623725B1DB9E006D6E02 /* ShaderPool.h */; };
 		71BE626A25B1DC7D006D6E02 /* libstb-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BE612625B1D088006D6E02 /* libstb-macos.a */; };
+		71C33FB62A315877007A5822 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5425D5994100EFEED4 /* Mesh.cpp */; };
+		71C33FB72A315878007A5822 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5425D5994100EFEED4 /* Mesh.cpp */; };
+		71C33FBC2A315918007A5822 /* Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5325D5994100EFEED4 /* Model.cpp */; };
+		71C33FBD2A315918007A5822 /* Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5325D5994100EFEED4 /* Model.cpp */; };
 		71CC839526B8C4D800EEBB93 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC839326B8C4D800EEBB93 /* Light.cpp */; };
 		71CC839626B8C4D800EEBB93 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71CC839326B8C4D800EEBB93 /* Light.cpp */; };
 		71CC839726B8C4D800EEBB93 /* Light.h in Headers */ = {isa = PBXBuildFile; fileRef = 71CC839426B8C4D800EEBB93 /* Light.h */; };
@@ -558,10 +562,6 @@
 		71D9B63729B563B500F00B88 /* stb_image_resize.h in Headers */ = {isa = PBXBuildFile; fileRef = 71D9B63429B563B500F00B88 /* stb_image_resize.h */; };
 		71D9B63829B563B500F00B88 /* stb_image_resize.c in Sources */ = {isa = PBXBuildFile; fileRef = 71D9B63529B563B500F00B88 /* stb_image_resize.c */; };
 		71D9B63929B563B500F00B88 /* stb_image_resize.c in Sources */ = {isa = PBXBuildFile; fileRef = 71D9B63529B563B500F00B88 /* stb_image_resize.c */; };
-		71E36B5625D5994100EFEED4 /* Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5325D5994100EFEED4 /* Model.cpp */; };
-		71E36B5725D5994100EFEED4 /* Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5325D5994100EFEED4 /* Model.cpp */; };
-		71E36B5825D5994100EFEED4 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5425D5994100EFEED4 /* Mesh.cpp */; };
-		71E36B5925D5994100EFEED4 /* Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71E36B5425D5994100EFEED4 /* Mesh.cpp */; };
 		71E36BB525D599C000EFEED4 /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71E36BB325D599C000EFEED4 /* tiny_obj_loader.cc */; };
 		71E36BB625D599C000EFEED4 /* tiny_obj_loader.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E36BB425D599C000EFEED4 /* tiny_obj_loader.h */; };
 		71E36BC625D599E200EFEED4 /* libtinyobjloader-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71E36B8C25D5999C00EFEED4 /* libtinyobjloader-macos.a */; };
@@ -3133,6 +3133,7 @@
 				717AD98F29211976007D7DB5 /* Container.cpp in Sources */,
 				713D8298259D307F00567F9F /* ShaderRender.cpp in Sources */,
 				713D8299259D307F00567F9F /* ObjectRender.cpp in Sources */,
+				71C33FB62A315877007A5822 /* Mesh.cpp in Sources */,
 				71CC839C26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */,
 				713D829A259D307F00567F9F /* TextureRender.cpp in Sources */,
 				713D829B259D307F00567F9F /* BufferRender.cpp in Sources */,
@@ -3204,6 +3205,7 @@
 				71D74956296731F200348AB8 /* EntityHandle.cpp in Sources */,
 				71ABBD362783C8BB001CE3AF /* Image.cpp in Sources */,
 				71E5450A284D5BB700C68FAB /* RotateTracks.cpp in Sources */,
+				71C33FBD2A315918007A5822 /* Model.cpp in Sources */,
 				713D82B6259D307F00567F9F /* SokolTexture.cpp in Sources */,
 				713D82B7259D307F00567F9F /* SokolScene.cpp in Sources */,
 			);
@@ -3221,11 +3223,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71E36B5825D5994100EFEED4 /* Mesh.cpp in Sources */,
 				713D834E259D408800567F9F /* main.m in Sources */,
 				710AD75225B7343400A7B12F /* EngineView.mm in Sources */,
 				713D8341259D408300567F9F /* ViewController.m in Sources */,
-				71E36B5625D5994100EFEED4 /* Model.cpp in Sources */,
 				713D835B259D408C00567F9F /* AppDelegate.m in Sources */,
 				713D82E4259D32FE00567F9F /* SupernovaApple.mm in Sources */,
 				711607082A0D1F0C0052A9C3 /* AdMobAdapter.m in Sources */,
@@ -3238,11 +3238,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71E36B5925D5994100EFEED4 /* Mesh.cpp in Sources */,
 				713D8324259D3F8F00567F9F /* main.m in Sources */,
 				710AD78625B7A1F600A7B12F /* EngineView.mm in Sources */,
 				713D8323259D3F8F00567F9F /* ViewController.m in Sources */,
-				71E36B5725D5994100EFEED4 /* Model.cpp in Sources */,
 				713D8325259D3F8F00567F9F /* AppDelegate.m in Sources */,
 				7162FE712597C99C0075B97D /* SupernovaApple.mm in Sources */,
 				7162FEAD25993F810075B97D /* main.cpp in Sources */,
@@ -3284,6 +3282,7 @@
 				717AD98E29211976007D7DB5 /* Container.cpp in Sources */,
 				7162FD1625963AE00075B97D /* Data.cpp in Sources */,
 				7162FD1725963AE00075B97D /* UserSettings.cpp in Sources */,
+				71C33FB72A315878007A5822 /* Mesh.cpp in Sources */,
 				71CC839B26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */,
 				7162FD1925963AE00075B97D /* File.cpp in Sources */,
 				7162FD1A25963AE00075B97D /* FileData.cpp in Sources */,
@@ -3355,6 +3354,7 @@
 				71D74955296731F200348AB8 /* EntityHandle.cpp in Sources */,
 				71ABBD352783C8BB001CE3AF /* Image.cpp in Sources */,
 				71E54509284D5BB700C68FAB /* RotateTracks.cpp in Sources */,
+				71C33FBC2A315918007A5822 /* Model.cpp in Sources */,
 				7162FD5E25963AE10075B97D /* ExternalBuffer.cpp in Sources */,
 				7162FD6025963AE10075B97D /* IndexBuffer.cpp in Sources */,
 			);
@@ -3627,10 +3627,10 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -3641,10 +3641,10 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -3656,10 +3656,10 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -3671,10 +3671,10 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -3683,7 +3683,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -3697,7 +3696,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -3716,7 +3714,6 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -3732,7 +3729,6 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -3753,7 +3749,6 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -3776,7 +3771,6 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -3798,10 +3792,10 @@
 					SOKOL_GFX_IMPL,
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/core";
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -3817,10 +3811,10 @@
 					SOKOL_GFX_IMPL,
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/core";
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -4065,7 +4059,6 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4091,7 +4084,6 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4111,7 +4103,6 @@
 					SOKOL_GFX_IMPL,
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/core";
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4131,7 +4122,6 @@
 					SOKOL_GFX_IMPL,
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/core";
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4152,7 +4142,6 @@
 					WITH_MINIAUDIO,
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/stb";
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4170,7 +4159,6 @@
 				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = WITH_MINIAUDIO;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/stb";
-				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4187,7 +4175,6 @@
 					WITH_MINIAUDIO,
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/stb";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -4203,7 +4190,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				GCC_PREPROCESSOR_DEFINITIONS = WITH_MINIAUDIO;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/stb";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -4219,7 +4205,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				EXECUTABLE_PREFIX = lib;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4232,7 +4217,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				EXECUTABLE_PREFIX = lib;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4248,7 +4232,6 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4264,7 +4247,6 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4279,7 +4261,6 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4294,7 +4275,6 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4308,10 +4288,10 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -4322,10 +4302,10 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -4338,7 +4318,6 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/json";
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4354,7 +4333,6 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/json";
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -4369,10 +4347,10 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/json";
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -4384,10 +4362,10 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/json";
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
