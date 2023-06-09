@@ -374,6 +374,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
 
     list(APPEND PLATFORM_LIBS
         -ObjC
+
+        # To run on iOS simulator
         ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/FBLPromises.xcframework/ios-arm64_x86_64-simulator/FBLPromises.framework
         ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleAppMeasurement.xcframework/ios-arm64_i386_x86_64-simulator/GoogleAppMeasurement.framework
         ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleAppMeasurementIdentitySupport.xcframework/ios-arm64_i386_x86_64-simulator/GoogleAppMeasurementIdentitySupport.framework
@@ -381,6 +383,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
         ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleUtilities.xcframework/ios-arm64_x86_64-simulator/GoogleUtilities.framework
         ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/UserMessagingPlatform.xcframework/ios-arm64_x86_64-simulator/UserMessagingPlatform.framework
         ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/nanopb.xcframework/ios-arm64_x86_64-simulator/nanopb.framework
+
+        # TODO: use here to run on real iOS devices
+        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/FBLPromises.xcframework/ios-arm64/FBLPromises.framework
+        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleAppMeasurement.xcframework/ios-arm64_armv7/GoogleAppMeasurement.framework
+        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleAppMeasurementIdentitySupport.xcframework/ios-arm64_armv7/GoogleAppMeasurementIdentitySupport.framework
+        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleMobileAds.xcframework/ios-arm64/GoogleMobileAds.framework
+        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/GoogleUtilities.xcframework/ios-arm64/GoogleUtilities.framework
+        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/UserMessagingPlatform.xcframework/ios-arm64_armv7/UserMessagingPlatform.framework
+        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.4.0/nanopb.xcframework/ios-arm64/nanopb.framework
     )
 
     add_compile_options(-fmodules)
