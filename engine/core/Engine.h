@@ -8,7 +8,7 @@
 #include "Supernova.h"
 #include "util/FunctionSubscribe.h"
 #include "math/Rect.h"
-#include "util/Semaphore.h"
+#include "util/ThreadUtils.h"
 
 namespace Supernova {
 
