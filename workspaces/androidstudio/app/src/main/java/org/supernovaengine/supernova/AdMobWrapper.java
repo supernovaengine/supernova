@@ -11,6 +11,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
@@ -33,6 +34,44 @@ public class AdMobWrapper {
                     @Override
                     public void onInitializationComplete(InitializationStatus initializationStatus) {}
                 });
+            }
+        });
+    }
+
+    public void tagForChildDirectedTreatment(boolean enable){
+        activity.runOnUiThread(new Runnable() {
+            @Override public void run() {
+                int tagValue;
+                if (enable) {
+                    tagValue = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE;
+                }else{
+                    tagValue = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE;
+                }
+
+                RequestConfiguration requestConfiguration = MobileAds.getRequestConfiguration()
+                        .toBuilder()
+                        .setTagForChildDirectedTreatment(tagValue)
+                        .build();
+                MobileAds.setRequestConfiguration(requestConfiguration);
+            }
+        });
+    }
+
+    public void tagForUnderAgeOfConsent(boolean enable){
+        activity.runOnUiThread(new Runnable() {
+            @Override public void run() {
+                int tagValue;
+                if (enable) {
+                    tagValue = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE;
+                }else{
+                    tagValue = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE;
+                }
+
+                RequestConfiguration requestConfiguration = MobileAds.getRequestConfiguration()
+                        .toBuilder()
+                        .setTagForUnderAgeOfConsent(tagValue)
+                        .build();
+                MobileAds.setRequestConfiguration(requestConfiguration);
             }
         });
     }

@@ -13,6 +13,10 @@
 
 - (void)initializeAdMob;
 
+- (void)tagForChildDirectedTreatment:(Boolean)enable;
+
+- (void)tagForUnderAgeOfConsent:(Boolean)enable;
+
 - (void)loadInterstitial:(nonnull NSString *)adUnitID;
 
 - (bool)isInterstitialAdLoaded;

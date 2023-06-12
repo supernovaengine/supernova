@@ -465,7 +465,6 @@
 		718FDDF82837CA9A00AF314C /* msl21macos.h in Headers */ = {isa = PBXBuildFile; fileRef = 718FDDF22837CA9A00AF314C /* msl21macos.h */; };
 		718FDDF92837CA9A00AF314C /* glsl330.h in Headers */ = {isa = PBXBuildFile; fileRef = 718FDDF32837CA9A00AF314C /* glsl330.h */; };
 		718FDDFA2837CA9A00AF314C /* hlsl5.h in Headers */ = {isa = PBXBuildFile; fileRef = 718FDDF42837CA9A00AF314C /* hlsl5.h */; };
-		71A41CB229AC3D0C006953D3 /* Semaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 71A41CB129AC3D0C006953D3 /* Semaphore.h */; };
 		71A41CB529AC3D7C006953D3 /* SokolCmdQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A41CB329AC3D7C006953D3 /* SokolCmdQueue.cpp */; };
 		71A41CB629AC3D7C006953D3 /* SokolCmdQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71A41CB329AC3D7C006953D3 /* SokolCmdQueue.cpp */; };
 		71A41CB729AC3D7C006953D3 /* SokolCmdQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 71A41CB429AC3D7C006953D3 /* SokolCmdQueue.h */; };
@@ -606,6 +605,7 @@
 		71FCE4C128E0FA01003C5217 /* LuaFunctionBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */; };
 		71FCE4C228E0FA01003C5217 /* LuaBridgeAddon.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4BD28E0FA01003C5217 /* LuaBridgeAddon.h */; };
 		71FCE4C528E0FA31003C5217 /* LuaBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4C428E0FA31003C5217 /* LuaBridge.h */; };
+		71FFE3FF2A369FE90089A6C9 /* ThreadUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FFE3FE2A369FE90089A6C9 /* ThreadUtils.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1135,7 +1135,6 @@
 		718FDDF22837CA9A00AF314C /* msl21macos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = msl21macos.h; sourceTree = "<group>"; };
 		718FDDF32837CA9A00AF314C /* glsl330.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glsl330.h; sourceTree = "<group>"; };
 		718FDDF42837CA9A00AF314C /* hlsl5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hlsl5.h; sourceTree = "<group>"; };
-		71A41CB129AC3D0C006953D3 /* Semaphore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Semaphore.h; sourceTree = "<group>"; };
 		71A41CB329AC3D7C006953D3 /* SokolCmdQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SokolCmdQueue.cpp; sourceTree = "<group>"; };
 		71A41CB429AC3D7C006953D3 /* SokolCmdQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SokolCmdQueue.h; sourceTree = "<group>"; };
 		71ABBD0C277A313C001CE3AF /* AlphaAction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlphaAction.cpp; sourceTree = "<group>"; };
@@ -1248,6 +1247,7 @@
 		71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunctionBase.h; sourceTree = "<group>"; };
 		71FCE4BD28E0FA01003C5217 /* LuaBridgeAddon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaBridgeAddon.h; sourceTree = "<group>"; };
 		71FCE4C428E0FA31003C5217 /* LuaBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaBridge.h; sourceTree = "<group>"; };
+		71FFE3FE2A369FE90089A6C9 /* ThreadUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThreadUtils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1588,11 +1588,11 @@
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
 				71451BF2270CA3EA00712643 /* FrameData.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
-				71A41CB129AC3D0C006953D3 /* Semaphore.h */,
 				71ABBD26277A3210001CE3AF /* STBText.cpp */,
 				71ABBD27277A3210001CE3AF /* STBText.h */,
 				7128D0AC25BB18DC00965B51 /* StringUtils.cpp */,
 				7128D0AD25BB18DC00965B51 /* StringUtils.h */,
+				71FFE3FE2A369FE90089A6C9 /* ThreadUtils.h */,
 				71ABBD39279116E1001CE3AF /* UniqueToken.cpp */,
 				71ABBD3A279116E1001CE3AF /* UniqueToken.h */,
 				71393EE328F8EF9E0074442E /* XMLUtils.cpp */,
@@ -2410,6 +2410,7 @@
 				71FCE4BE28E0FA01003C5217 /* LuaFunction.h in Headers */,
 				717AD9882919E1E9007D7DB5 /* ImageComponent.h in Headers */,
 				7170A3CB2818A87E0003E965 /* BoneComponent.h in Headers */,
+				71FFE3FF2A369FE90089A6C9 /* ThreadUtils.h in Headers */,
 				717AD964290B65E6007D7DB5 /* AudioComponent.h in Headers */,
 				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
 				71BE622225B1DB83006D6E02 /* TextureData.h in Headers */,
@@ -2440,7 +2441,6 @@
 				717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */,
 				713E581127BA9CE400376680 /* TextEdit.h in Headers */,
 				71E5450B284D5BB700C68FAB /* RotateTracks.h in Headers */,
-				71A41CB229AC3D0C006953D3 /* Semaphore.h in Headers */,
 				71CC83A426B8C54A00EEBB93 /* ShaderData.h in Headers */,
 				715CB11B288CD57A0049344B /* Material.h in Headers */,
 				71A41CB729AC3D7C006953D3 /* SokolCmdQueue.h in Headers */,

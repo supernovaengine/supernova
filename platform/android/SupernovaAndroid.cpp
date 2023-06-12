@@ -197,6 +197,16 @@ void SupernovaAndroid::initializeAdMob(){
     env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::initializeAdMob);
 }
 
+void SupernovaAndroid::tagForChildDirectedTreatmentAdMob(bool enable){
+    JNIEnv* env = AndroidJNI::getEnv();
+    env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::tagForChildDirectedTreatmentAdMob, enable);
+}
+
+void SupernovaAndroid::tagForUnderAgeOfConsentAdMob(bool enable){
+    JNIEnv* env = AndroidJNI::getEnv();
+    env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::tagForUnderAgeOfConsentAdMob, enable);
+}
+
 void SupernovaAndroid::loadInterstitialAd(std::string adUnitID){
     JNIEnv* env = AndroidJNI::getEnv();
     jstring strAdUnitID = env->NewStringUTF(adUnitID.c_str());

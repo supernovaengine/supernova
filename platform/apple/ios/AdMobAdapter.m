@@ -34,6 +34,22 @@
     [GADMobileAds.sharedInstance startWithCompletionHandler:nil];
 }
 
+- (void)tagForChildDirectedTreatment:(Boolean)enable {
+    if (enable){
+        [GADMobileAds.sharedInstance.requestConfiguration tagForChildDirectedTreatment:YES];
+    }else{
+        [GADMobileAds.sharedInstance.requestConfiguration tagForChildDirectedTreatment:NO];
+    }
+}
+
+- (void)tagForUnderAgeOfConsent:(Boolean)enable {
+    if (enable){
+        [GADMobileAds.sharedInstance.requestConfiguration tagForUnderAgeOfConsent:YES];
+    }else{
+        [GADMobileAds.sharedInstance.requestConfiguration tagForUnderAgeOfConsent:NO];
+    }
+}
+
 - (void)loadInterstitial:(NSString *)adUnitID {
     GADRequest *request = [GADRequest request];
     [GADInterstitialAd

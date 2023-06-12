@@ -192,28 +192,28 @@ void SupernovaApple::removeKey(const char *key){
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:[NSString stringWithUTF8String:key]];
 }
 
-void SupernovaApple::initializeAdMob(){
 #if TARGET_OS_IPHONE
+void SupernovaApple::initializeAdMob(){
     [admob initializeAdMob];
-#endif
+}
+
+void SupernovaApple::tagForChildDirectedTreatmentAdMob(bool enable){
+    [admob tagForChildDirectedTreatment:enable];
+}
+
+void SupernovaApple::tagForUnderAgeOfConsentAdMob(bool enable){
+    [admob tagForUnderAgeOfConsent:enable];
 }
 
 void SupernovaApple::loadInterstitialAd(std::string adUnitID){
-#if TARGET_OS_IPHONE
     [admob loadInterstitial:[NSString stringWithUTF8String:adUnitID.c_str()]];
-#endif
 }
 
 bool SupernovaApple::isInterstitialAdLoaded(){
-#if TARGET_OS_IPHONE
     return [admob isInterstitialAdLoaded];
-#else
-    return false;
-#endif
 }
 
 void SupernovaApple::showInterstitialAd(){
-#if TARGET_OS_IPHONE
     [admob showInterstitial];
-#endif
 }
+#endif

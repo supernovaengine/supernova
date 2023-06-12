@@ -43,6 +43,8 @@ public:
 	static jmethodID removeKeyRef;
 
 	static jmethodID initializeAdMob;
+	static jmethodID tagForChildDirectedTreatmentAdMob;
+	static jmethodID tagForUnderAgeOfConsentAdMob;
 	static jmethodID loadInterstitialAd;
 	static jmethodID isInterstitialAdLoaded;
 	static jmethodID showInterstitialAd;

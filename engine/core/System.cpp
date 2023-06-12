@@ -211,6 +211,14 @@ void System::initializeAdMob(){
     Log::error("Cannot initialize AdMob in this system");
 }
 
+void System::tagForChildDirectedTreatmentAdMob(bool enable){
+    Log::error("Cannot tagForChildDirectedTreatment AdMob in this system");
+}
+
+void System::tagForUnderAgeOfConsentAdMob(bool enable){
+    Log::error("Cannot tagForUnderAgeOfConsent AdMob in this system");
+}
+
 void System::loadInterstitialAd(std::string adUnitID){
     Log::error("Cannot load InterstitialAd in this system");
 }
