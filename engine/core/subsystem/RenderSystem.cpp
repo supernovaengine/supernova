@@ -958,12 +958,12 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 	}
 
 	//Destroy buffer
-	mesh.buffer.clearAll();
+	//mesh.buffer.clearAll();
 	mesh.buffer.getRender()->destroyBuffer();
-	mesh.indices.clearAll();
+	//mesh.indices.clearAll();
 	mesh.indices.getRender()->destroyBuffer();
 	for (int i = 0; i < mesh.numExternalBuffers; i++){
-		mesh.eBuffers[i].clearAll();
+		//mesh.eBuffers[i].clearAll();
 		mesh.eBuffers[i].getRender()->destroyBuffer();
 	}
 
@@ -1192,9 +1192,9 @@ void RenderSystem::destroyTerrain(Entity entity, TerrainComponent& terrain){
 	terrain.slotVSDepthParams = -1;
 
 	//Destroy buffers
-	terrain.buffer.clearAll();
+	//terrain.buffer.clearAll();
 	terrain.buffer.getRender()->destroyBuffer();
-	terrain.indices.clearAll();
+	//terrain.indices.clearAll();
 	terrain.indices.getRender()->destroyBuffer();
 
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
@@ -1333,11 +1333,11 @@ void RenderSystem::destroyUI(Entity entity, UIComponent& uirender){
 
 	//Destroy buffer
 	if (uirender.buffer.getSize() > 0){
-		uirender.buffer.clearAll();
+		//uirender.buffer.clearAll();
 		uirender.buffer.getRender()->destroyBuffer();
 	}
 	if (uirender.indices.getSize() > 0){
-		uirender.indices.clearAll();
+		//uirender.indices.clearAll();
 		uirender.indices.getRender()->destroyBuffer();
 	}
 
@@ -1456,7 +1456,7 @@ void RenderSystem::destroyParticles(Entity entity, ParticlesComponent& particles
 	particles.render.destroy();
 
 	//Destroy buffer
-	particles.buffer.clearAll();
+	//particles.buffer.clearAll();
 	particles.buffer.getRender()->destroyBuffer();
 
 	//Shaders uniforms
@@ -1543,7 +1543,7 @@ void RenderSystem::destroySky(Entity entity, SkyComponent& sky){
 	sky.render.destroy();
 
 	//Destroy buffer
-	sky.buffer.clearAll();
+	//sky.buffer.clearAll();
 	sky.buffer.getRender()->destroyBuffer();
 
 	//Shaders uniforms
