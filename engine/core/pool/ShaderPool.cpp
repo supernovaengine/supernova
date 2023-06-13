@@ -117,8 +117,10 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, std::string
 	std::string base64Shd = getBase64Shader(getShaderName(shaderStr));
 	if (!base64Shd.empty() && sbs.read(Base64::decode(base64Shd))){ // from c header
 		resource->createShader(sbs.getShaderData());
+		//Log::debug("Create shader %s", shaderStr.c_str());
 	}else if (sbs.read("shader://"+getShaderFile(shaderStr))){ // from file in assets/shaders dir
 		resource->createShader(sbs.getShaderData());
+		//Log::debug("Create shader %s", shaderStr.c_str());
 	}else{
 		getMissingShaders().push_back(shaderStr);
 	}
@@ -134,6 +136,7 @@ void ShaderPool::remove(ShaderType shaderType, std::string properties){
 		auto& shared = getMap()[shaderStr];
 		if (shared.use_count() <= 1){
 			shared->destroyShader();
+			//Log::debug("Remove shader %s", shaderStr.c_str());
 			getMap().erase(shaderStr);
 		}
 	}else{
@@ -240,5 +243,6 @@ void ShaderPool::clear(){
 		if (it.second)
 			it.second->destroyShader();
 	}
+	//Log::debug("Remove all shaders");
 	getMap().clear();
 }

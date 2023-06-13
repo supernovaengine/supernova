@@ -7,7 +7,7 @@
 
 #include "render/TextureRender.h"
 #include "texture/TextureData.h"
-#include <unordered_map>
+#include <map>
 #include <memory>
 
 namespace Supernova{
@@ -17,7 +17,7 @@ namespace Supernova{
         TextureData data[6];
     };
 
-    typedef std::unordered_map< std::string, std::shared_ptr<TexturePoolData> > textures_t;
+    typedef std::map< std::string, std::shared_ptr<TexturePoolData> > textures_t;
 
     class TexturePool{
     private:

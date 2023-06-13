@@ -6,12 +6,12 @@
 #define SHADERPOOL_H
 
 #include "render/ShaderRender.h"
-#include <unordered_map>
+#include <map>
 #include <memory>
 
 namespace Supernova{
 
-    typedef std::unordered_map<std::string, std::shared_ptr<ShaderRender>> shaders_t;
+    typedef std::map<std::string, std::shared_ptr<ShaderRender>> shaders_t;
 
     class ShaderPool{  
     private:

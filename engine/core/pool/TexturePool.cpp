@@ -51,6 +51,7 @@ std::shared_ptr<TexturePoolData> TexturePool::get(std::string id, TextureType ty
 	}
 
 	resource->render.createTexture(id, data[0].getWidth(), data[0].getHeight(), data[0].getColorFormat(), type, numFaces, data_array, size_array, minFilter, magFilter, wrapU, wrapV);
+	//Log::debug("Create texture %s", id.c_str());
 	shared = resource;
 
 	return resource;
@@ -61,6 +62,7 @@ void TexturePool::remove(std::string id){
 		auto& shared = getMap()[id];
 		if (shared.use_count() <= 1){
 			shared->render.destroyTexture();
+			//Log::debug("Remove texture %s", id.c_str());
 			getMap().erase(id);
 		}
 	}else{
@@ -73,5 +75,6 @@ void TexturePool::clear(){
 		if (it.second)
 			it.second->render.destroyTexture();
 	}
+	//Log::debug("Remove all textures");
 	getMap().clear();
 }
