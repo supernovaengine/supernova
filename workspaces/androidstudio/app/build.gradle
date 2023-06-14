@@ -50,6 +50,7 @@ android {
 
     sourceSets {
         main {
+            java.srcDirs = [supernovaRootAbs+'/platform/android/java']
             assets.srcDirs = [projectSourceRootAbs+'/assets',projectSourceRootAbs+'/lua']
         }
     }
