@@ -65,7 +65,7 @@ Scene::Scene(){
 	defaultCamera = NULL_ENTITY;
 
 	mainScene = false;
-	backgroundColor = Vector4(0.1, 0.1, 0.1, 1.0); //sRGB
+	backgroundColor = Vector4(0.0, 0.0, 0.0, 1.0); //sRGB
 	shadowsPCF = true;
 
 	hasSceneAmbientLight = false;

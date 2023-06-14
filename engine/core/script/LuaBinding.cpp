@@ -233,5 +233,7 @@ void LuaBinding::registerClasses(lua_State *L){
 void LuaBinding::cleanup(){
     lua_State *L = LuaBinding::getLuaState();
 
-    lua_close(L);
+    if (L) {
+        lua_close(L);
+    }
 }

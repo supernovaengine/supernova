@@ -1,6 +1,7 @@
 package org.supernovaengine.supernova;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.opengl.GLSurfaceView;
 import android.os.Looper;
 import android.util.AttributeSet;
@@ -54,6 +55,7 @@ public class TextInput extends EditText implements TextWatcher, OnEditorActionLi
 
 		// for accessibility alerts in Google Play Console
 		this.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+		this.setHintTextColor(Color.WHITE);
 
 		getText().insert(this.getSelectionStart(), " ");
 
