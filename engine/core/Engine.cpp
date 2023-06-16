@@ -48,10 +48,12 @@ float Engine::framerate = 0;
 
 float Engine::updateTime = 0.03;
 
-bool Engine::viewLoaded = false;
-bool Engine::paused = false;
+std::atomic<bool> Engine::viewLoaded = false;
+std::atomic<bool> Engine::shutdownCalled = false;
+std::atomic<bool> Engine::paused = false;
 
 thread_local bool Engine::asyncThread = false;
+Semaphore Engine::loadSemaphore;
 Semaphore Engine::drawSemaphore;
 
 //-----Supernova user events-----
@@ -352,6 +354,14 @@ float Engine::getDeltatime(){
     return deltatime;
 }
 
+Semaphore& Engine::getLoadSemaphore(){
+    return loadSemaphore;
+}
+
+Semaphore& Engine::getDrawSemaphore(){
+    return drawSemaphore;
+}
+
 void Engine::startAsyncThread(){
     asyncThread = true;
 }
@@ -367,6 +377,10 @@ void Engine::endAsyncThread(){
 
 bool Engine::isAsyncThread(){
     return asyncThread;
+}
+
+bool Engine::isShutdownCalled(){
+    return shutdownCalled;
 }
 
 void Engine::calculateCanvas(){
@@ -405,6 +419,13 @@ void Engine::systemInit(int argc, char* argv[]){
     Engine::setAllowEventsOutCanvas(false);
     Engine::setFixedTimeSceneUpdate(false);
 
+    lastTime = 0;
+    updateTimeCount = 0;
+    viewLoaded = false;
+    shutdownCalled = false;
+    paused = false;
+
+    loadSemaphore.release();
     drawSemaphore.release();
 
     stm_setup();
@@ -539,6 +560,8 @@ void Engine::systemDraw(){
 }
 
 void Engine::systemShutdown(){
+    loadSemaphore.acquire();
+
     Engine::onShutdown.call();
 
     LuaBinding::cleanup();
@@ -552,12 +575,10 @@ void Engine::systemShutdown(){
 
     removeAllSceneLayers();
 
-    lastTime = 0;
-    updateTimeCount = 0;
-    viewLoaded = false;
-    paused = false;
-
     SystemRender::shutdown();
+
+    shutdownCalled = true;
+    loadSemaphore.release();
 }
 
 void Engine::systemPause(){

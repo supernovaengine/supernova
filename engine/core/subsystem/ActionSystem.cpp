@@ -615,6 +615,24 @@ void ActionSystem::load(){
 
 void ActionSystem::destroy(){
 
+    auto actions = scene->getComponentArray<ActionComponent>();
+    for (int i = 0; i < actions->size(); i++) {
+        ActionComponent &action = actions->getComponentFromIndex(i);
+        Entity entity = actions->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+
+        action.state = ActionState::Stopped;
+        action.timecount = 0;
+        action.startTrigger = false;
+        action.stopTrigger = false;
+        action.pauseTrigger = false;
+
+        if (signature.test(scene->getComponentType<TimedActionComponent>())) {
+            TimedActionComponent &timedaction = scene->getComponent<TimedActionComponent>(entity);
+            timedaction.time = 0;
+            timedaction.value = 0;
+        }
+    }
 }
 
 void ActionSystem::draw(){

@@ -12,15 +12,16 @@ namespace Supernova{
     };
 
     struct ActionComponent{
-        Entity target = NULL_ENTITY;
         ActionState state = ActionState::Stopped;
         float timecount = 0;
-
-        float speed = 1;
 
         bool startTrigger = false;
         bool stopTrigger = false;
         bool pauseTrigger = false;
+
+        Entity target = NULL_ENTITY;
+
+        float speed = 1;
 
         FunctionSubscribe<void()> onStart;
         FunctionSubscribe<void()> onPause;
