@@ -9,6 +9,7 @@
 #include "util/FunctionSubscribe.h"
 #include "math/Rect.h"
 #include "util/ThreadUtils.h"
+#include <atomic>
 
 namespace Supernova {
 
