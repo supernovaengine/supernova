@@ -125,11 +125,6 @@ public class MainActivity extends Activity {
 
 			// for accessibility alerts in Google Play Console
 			glSurfaceView.setContentDescription("opengl view");
-			final int childCount = ((ViewGroup) this.findViewById(android.R.id.content)).getChildCount();
-			for (int i = 0; i < childCount; i++) {
-				View v =  ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(i);
-				v.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
-			}
 
 			edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 				@Override
