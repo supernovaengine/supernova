@@ -14,6 +14,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
@@ -124,6 +125,11 @@ public class MainActivity extends Activity {
 
 			// for accessibility alerts in Google Play Console
 			glSurfaceView.setContentDescription("opengl view");
+			final int childCount = ((ViewGroup) this.findViewById(android.R.id.content)).getChildCount();
+			for (int i = 0; i < childCount; i++) {
+				View v =  ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(i);
+				v.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+			}
 
 			edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 				@Override
