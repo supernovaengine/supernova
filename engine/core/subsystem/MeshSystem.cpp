@@ -299,10 +299,10 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     }
 
     for (int i = 0; i < mesh.numSubmeshes; i++){
+        addSubmeshAttribute(mesh.submeshes[i], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indexMap[i].size(), mesh.indices.getCount() * sizeof(uint16_t), false);
 
-        mesh.indices.setValues(
-            mesh.indices.getCount(), mesh.indices.getAttribute(AttributeType::INDEX),
-            indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
+        mesh.indices.setValues(mesh.indices.getCount(), mesh.indices.getAttribute(AttributeType::INDEX), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
+        mesh.indices.setRenderAttributes(false);
 
         //TODO: necessary?
         //if (indexMap[i].size() == 0) {
