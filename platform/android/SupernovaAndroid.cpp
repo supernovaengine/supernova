@@ -4,7 +4,7 @@
 #include <android/log.h>
 #include <stdarg.h>
 #include <android/asset_manager.h>
-#include "AndroidJNI.h"
+#include "NativeEngine.h"
 
 int android_read(void* cookie, char* buf, int size) {
     return AAsset_read((AAsset*)cookie, buf, size);
@@ -28,31 +28,23 @@ SupernovaAndroid::SupernovaAndroid(){
 }
 
 int SupernovaAndroid::getScreenWidth(){
-    JNIEnv* env = AndroidJNI::getEnv();
-    return env->CallIntMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getScreenWidthRef);
+    return NativeEngine::getInstance()->getSurfWidth();
 }
 
 int SupernovaAndroid::getScreenHeight(){
-    JNIEnv* env = AndroidJNI::getEnv();
-    return env->CallIntMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getScreenHeightRef);
+    return NativeEngine::getInstance()->getSurfHeight();
 }
 
 void SupernovaAndroid::showVirtualKeyboard(){
-    JNIEnv* env = AndroidJNI::getEnv();
-    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::showSoftKeyboardRef);
+    GameActivity_showSoftInput(NativeEngine::getInstance()->getActivity(), 0);
 }
 
 void SupernovaAndroid::hideVirtualKeyboard(){
-    JNIEnv* env = AndroidJNI::getEnv();
-    env->CallVoidMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::hideSoftKeyboardRef);
+    GameActivity_hideSoftInput(NativeEngine::getInstance()->getActivity(), 0);
 }
 
 std::string SupernovaAndroid::getUserDataPath() {
-    JNIEnv* env = AndroidJNI::getEnv();
-    jstring rv = (jstring)env->CallObjectMethod(AndroidJNI::mainActivityObjRef, AndroidJNI::getUserDataPathRef);
-    std::string value = env->GetStringUTFChars(rv, 0);
-    env->DeleteLocalRef(rv);
-    return value;
+    return NativeEngine::getInstance()->getActivity()->internalDataPath;
 }
 
 FILE* SupernovaAndroid::platformFopen(const char* fname, const char* mode) {
@@ -68,7 +60,7 @@ FILE* SupernovaAndroid::platformFopen(const char* fname, const char* mode) {
     }
 
     if(mode[0] == 'w') return NULL;
-    AAsset* asset = AAssetManager_open(AndroidJNI::android_asset_manager, path.c_str(), 0);
+    AAsset* asset = AAssetManager_open(NativeEngine::getInstance()->getAssetManager(), path.c_str(), 0);
     if(!asset) return NULL;
     return funopen(asset, android_read, android_write, android_seek, android_close);
 }
@@ -90,50 +82,62 @@ void SupernovaAndroid::platformLog(const int type, const char *fmt, va_list args
 }
 
 bool SupernovaAndroid::getBoolForKey(const char *key, bool defaultValue){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    bool value = env->CallBooleanMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::getBoolForKeyRef, strKey, defaultValue);
+    bool value = env->CallBooleanMethod(jniData.userSettingsObjRef, jniData.getBoolForKeyRef, strKey, defaultValue);
     env->DeleteLocalRef(strKey);
     return value;
 }
 
 int SupernovaAndroid::getIntegerForKey(const char *key, int defaultValue){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    int value = env->CallIntMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::getIntegerForKeyRef, strKey, defaultValue);
+    int value = env->CallIntMethod(jniData.userSettingsObjRef, jniData.getIntegerForKeyRef, strKey, defaultValue);
     env->DeleteLocalRef(strKey);
     return value;
 }
 
 long SupernovaAndroid::getLongForKey(const char *key, long defaultValue){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    long value = env->CallLongMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::getLongForKeyRef, strKey, defaultValue);
+    long value = env->CallLongMethod(jniData.userSettingsObjRef, jniData.getLongForKeyRef, strKey, defaultValue);
     env->DeleteLocalRef(strKey);
     return value;
 }
 
 float SupernovaAndroid::getFloatForKey(const char *key, float defaultValue){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    float value = env->CallFloatMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::getFloatForKeyRef, strKey, defaultValue);
+    float value = env->CallFloatMethod(jniData.userSettingsObjRef, jniData.getFloatForKeyRef, strKey, defaultValue);
     env->DeleteLocalRef(strKey);
     return value;
 }
 
 double SupernovaAndroid::getDoubleForKey(const char *key, double defaultValue){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    double value = env->CallDoubleMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::getDoubleForKeyRef, strKey, defaultValue);
+    double value = env->CallDoubleMethod(jniData.userSettingsObjRef, jniData.getDoubleForKeyRef, strKey, defaultValue);
     env->DeleteLocalRef(strKey);
     return value;
 }
 
 std::string SupernovaAndroid::getStringForKey(const char *key, std::string defaultValue){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
     jstring strDefaultValue = env->NewStringUTF(defaultValue.c_str());
-    jstring rv = (jstring)env->CallObjectMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::getStringForKeyRef, strKey, strDefaultValue);
+    jstring rv = (jstring)env->CallObjectMethod(jniData.userSettingsObjRef, jniData.getStringForKeyRef, strKey, strDefaultValue);
     std::string value = env->GetStringUTFChars(rv, 0);
     env->DeleteLocalRef(strKey);
     env->DeleteLocalRef(strDefaultValue);
@@ -142,85 +146,111 @@ std::string SupernovaAndroid::getStringForKey(const char *key, std::string defau
 }
 
 void SupernovaAndroid::setBoolForKey(const char *key, bool value){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::setBoolForKeyRef, strKey, value);
+    env->CallVoidMethod(jniData.userSettingsObjRef, jniData.setBoolForKeyRef, strKey, value);
     env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::setIntegerForKey(const char *key, int value){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::setIntegerForKeyRef, strKey, value);
+    env->CallVoidMethod(jniData.userSettingsObjRef, jniData.setIntegerForKeyRef, strKey, value);
     env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::setLongForKey(const char *key, long value){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::setLongForKeyRef, strKey, value);
+    env->CallVoidMethod(jniData.userSettingsObjRef, jniData.setLongForKeyRef, strKey, value);
     env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::setFloatForKey(const char *key, float value){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::setFloatForKeyRef, strKey, value);
+    env->CallVoidMethod(jniData.userSettingsObjRef, jniData.setFloatForKeyRef, strKey, value);
     env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::setDoubleForKey(const char *key, double value){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::setDoubleForKeyRef, strKey, value);
+    env->CallVoidMethod(jniData.userSettingsObjRef, jniData.setDoubleForKeyRef, strKey, value);
     env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::setStringForKey(const char* key, std::string value){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
     jstring strValue = env->NewStringUTF(value.c_str());
-    env->CallVoidMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::setStringForKeyRef, strKey, strValue);
+    env->CallVoidMethod(jniData.userSettingsObjRef, jniData.setStringForKeyRef, strKey, strValue);
     env->DeleteLocalRef(strKey);
     env->DeleteLocalRef(strValue);
 }
 
 void SupernovaAndroid::removeKey(const char* key){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strKey = env->NewStringUTF(key);
-    env->CallVoidMethod(AndroidJNI::userSettingsObjRef, AndroidJNI::removeKeyRef, strKey);
+    env->CallVoidMethod(jniData.userSettingsObjRef, jniData.removeKeyRef, strKey);
     env->DeleteLocalRef(strKey);
 }
 
 void SupernovaAndroid::initializeAdMob(){
-    JNIEnv* env = AndroidJNI::getEnv();
-    env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::initializeAdMob);
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
+    env->CallVoidMethod(jniData.admobWrapperObjRef, jniData.initializeAdMob);
 }
 
 void SupernovaAndroid::tagForChildDirectedTreatmentAdMob(bool enable){
-    JNIEnv* env = AndroidJNI::getEnv();
-    env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::tagForChildDirectedTreatmentAdMob, enable);
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
+    env->CallVoidMethod(jniData.admobWrapperObjRef, jniData.tagForChildDirectedTreatmentAdMob, enable);
 }
 
 void SupernovaAndroid::tagForUnderAgeOfConsentAdMob(bool enable){
-    JNIEnv* env = AndroidJNI::getEnv();
-    env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::tagForUnderAgeOfConsentAdMob, enable);
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
+    env->CallVoidMethod(jniData.admobWrapperObjRef, jniData.tagForUnderAgeOfConsentAdMob, enable);
 }
 
 void SupernovaAndroid::loadInterstitialAd(std::string adUnitID){
-    JNIEnv* env = AndroidJNI::getEnv();
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
     jstring strAdUnitID = env->NewStringUTF(adUnitID.c_str());
-    env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::loadInterstitialAd, strAdUnitID);
+    env->CallVoidMethod(jniData.admobWrapperObjRef, jniData.loadInterstitialAd, strAdUnitID);
     env->DeleteLocalRef(strAdUnitID);
 }
 
 bool SupernovaAndroid::isInterstitialAdLoaded(){
-    JNIEnv* env = AndroidJNI::getEnv();
-    bool value = env->CallBooleanMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::isInterstitialAdLoaded);
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
+    bool value = env->CallBooleanMethod(jniData.admobWrapperObjRef, jniData.isInterstitialAdLoaded);
     return value;
 }
 
 void SupernovaAndroid::showInterstitialAd(){
-    JNIEnv* env = AndroidJNI::getEnv();
-    env->CallVoidMethod(AndroidJNI::admobWrapperObjRef, AndroidJNI::showInterstitialAd);
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
+    env->CallVoidMethod(jniData.admobWrapperObjRef, jniData.showInterstitialAd);
 }

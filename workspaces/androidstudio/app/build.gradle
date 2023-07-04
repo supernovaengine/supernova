@@ -19,6 +19,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
         externalNativeBuild {
             cmake {
                 abiFilters "arm64-v8a"
@@ -26,7 +27,7 @@ android {
                 abiFilters "armeabi-v7a"
                 abiFilters "x86_64"
 
-                arguments "-DANDROID_STL=c++_static", "-DPROJECT_ROOT="+projectSourceRootAbs
+                arguments "-DANDROID_STL=c++_shared", "-DPROJECT_ROOT="+projectSourceRootAbs
             }
         }
     }
@@ -48,6 +49,10 @@ android {
         }
     }
 
+    buildFeatures {
+        prefab true
+    }
+
     sourceSets {
         main {
             java.srcDirs = [supernovaRootAbs+'/platform/android/java']
@@ -59,5 +64,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-ads:22.0.0'
+    implementation "com.google.android.gms:play-services-ads:22.0.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "androidx.games:games-activity:2.0.2"
 }

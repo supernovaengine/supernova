@@ -149,19 +149,27 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
     set(APP_NAME supernova-android) # Android uses a fixed library name
 
     if( ANDROID_ABI MATCHES "^arm(eabi)?(-v7a)?(64-v8a)?$" )
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon")
+        #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon")
         set(IS_ARM ON)
     endif()
 
     set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/android)
 
     list(APPEND PLATFORM_SOURCE
-        ${PLATFORM_ROOT}/AndroidJNI.cpp
         ${PLATFORM_ROOT}/SupernovaAndroid.cpp
+        ${PLATFORM_ROOT}/AndroidMain.cpp
+        ${PLATFORM_ROOT}/NativeEngine.cpp
     )
 
+    # UnsatsifiedLinkError for the com.google.androidgamesdk.GameActivity.initializeNativeCode
+    # https://developer.android.com/games/agdk/game-activity/migrate-native-activity#issue
+    set(CMAKE_SHARED_LINKER_FLAGS
+            "${CMAKE_SHARED_LINKER_FLAGS} -u Java_com_google_androidgamesdk_GameActivity_initializeNativeCode")
+
+    find_package(game-activity REQUIRED CONFIG)
+
     list(APPEND PLATFORM_LIBS
-        log android EGL ${OPENGL_LIB} OpenSLES
+        log android EGL ${OPENGL_LIB} OpenSLES game-activity::game-activity_static
     )
 endif()
 
@@ -498,7 +506,7 @@ target_compile_options(
 
 target_link_libraries(
     ${APP_NAME}
- 
+
     supernova
     ${PLATFORM_LIBS}
  )
