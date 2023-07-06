@@ -8,6 +8,8 @@
 #include <android/log.h>
 #include <android/window.h>
 #include <cstring>
+#include <codecvt>
+#include <locale>
 #include <assert.h>
 
 #include "SupernovaAndroid.h"
@@ -57,6 +59,9 @@ static NativeEngine *_singleton = NULL;
 // workaround for internal bug b/149866792
 static NativeEngineSavedState appState = {false};
 
+static std::string textInputBuffer;
+static bool firstInput;
+
 
 NativeEngine::NativeEngine(struct android_app *app) {
     mApp = app;
@@ -75,6 +80,17 @@ NativeEngine::NativeEngine(struct android_app *app) {
     mIsFirstFrame = true;
 
     app->motionEventFilter = all_motion_filter;
+
+    // Flags to control how the IME behaves.
+    // https://developer.android.com/reference/android/text/InputType
+    constexpr int InputType_dot_TYPE_CLASS_TEXT = 1;
+    constexpr int InputType_dot_TYPE_TEXT_FLAG_NO_SUGGESTIONS = 524288;
+    // https://developer.android.com/reference/android/view/inputmethod/EditorInfo
+    constexpr int IME_ACTION_NONE = 1;
+    constexpr int IME_FLAG_NO_FULLSCREEN = 33554432;
+
+    //TODO: add support to input suggestions
+    GameActivity_setImeEditorInfo(app->activity, InputType_dot_TYPE_CLASS_TEXT, IME_ACTION_NONE, IME_FLAG_NO_FULLSCREEN);
 
     if (app->savedState != NULL) {
         // we are starting with previously saved state -- restore it
@@ -142,6 +158,25 @@ int NativeEngine::getScreenDensity(){
     return mScreenDensity;
 }
 
+void NativeEngine::showSoftInput(){
+    textInputBuffer = "";
+    firstInput = true;
+
+    mGameTextInputState.text_UTF8 = textInputBuffer.data();
+    mGameTextInputState.text_length = textInputBuffer.length();
+    mGameTextInputState.selection.start = textInputBuffer.length();
+    mGameTextInputState.selection.end = textInputBuffer.length();
+    mGameTextInputState.composingRegion.start = -1;
+    mGameTextInputState.composingRegion.end = -1;
+
+    GameActivity_setTextInputState(mApp->activity, &mGameTextInputState);
+    GameActivity_showSoftInput(NativeEngine::getInstance()->getActivity(), 0);
+}
+
+void NativeEngine::hideSoftInput(){
+    GameActivity_hideSoftInput(NativeEngine::getInstance()->getActivity(), 0);
+}
+
 AAssetManager* NativeEngine::getAssetManager(){
     return mApp->activity->assetManager;
 }
@@ -194,12 +229,22 @@ void NativeEngine::gameLoop() {
 
         if (mApp->textInputState) {
                 GameActivity_getTextInputState(mApp->activity, [](void *context, const GameTextInputState *state) {
-                    auto engine = static_cast<NativeEngine *>(context);
                     if (!context || !state) return;
-                    //Supernova::Log::verbose("Test %s", state->text_UTF8);
-                    Supernova::Engine::systemCharInput(state->text_UTF8[state->text_length-1]);
-                }, this);
+                    if (textInputBuffer.length() < state->text_length) {
+                        // text_length is different from utf16Text.length and state->(selection or composingRegion) with unicode chars
+                        if (state->text_length > 0) {
+                            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > convert;
+                            std::wstring utf16Text = convert.from_bytes(state->text_UTF8);
 
+                            // getting only the last character
+                            Supernova::Engine::systemCharInput(utf16Text.back());
+                        }
+                    }else if (!firstInput){
+                        Supernova::Engine::systemCharInput('\b');
+                    }
+                    textInputBuffer = std::string(state->text_UTF8, state->text_length);
+                    firstInput = false;
+                }, this);
             mApp->textInputState = 0;
         }
 

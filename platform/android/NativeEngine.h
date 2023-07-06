@@ -71,6 +71,8 @@ private:
 
     bool mIsFirstFrame;
 
+    GameTextInputState mGameTextInputState;
+
     int mSystemBarOffset;
 
     bool initDisplay();
@@ -119,6 +121,9 @@ public:
     int getSurfWidth();
     int getSurfHeight();
     int getScreenDensity();
+
+    void showSoftInput();
+    void hideSoftInput();
 
     AAssetManager* getAssetManager();
 };

@@ -36,11 +36,11 @@ int SupernovaAndroid::getScreenHeight(){
 }
 
 void SupernovaAndroid::showVirtualKeyboard(){
-    GameActivity_showSoftInput(NativeEngine::getInstance()->getActivity(), 0);
+    NativeEngine::getInstance()->showSoftInput();
 }
 
 void SupernovaAndroid::hideVirtualKeyboard(){
-    GameActivity_hideSoftInput(NativeEngine::getInstance()->getActivity(), 0);
+    NativeEngine::getInstance()->hideSoftInput();
 }
 
 std::string SupernovaAndroid::getUserDataPath() {
