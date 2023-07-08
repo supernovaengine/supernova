@@ -49,7 +49,7 @@ float Engine::framerate = 0;
 float Engine::updateTime = 0.03;
 
 std::atomic<bool> Engine::viewLoaded = false;
-std::atomic<bool> Engine::shutdownCalled = false;
+std::atomic<bool> Engine::viewDestroyed = false;
 std::atomic<bool> Engine::paused = false;
 
 thread_local bool Engine::asyncThread = false;
@@ -59,6 +59,7 @@ Semaphore Engine::drawSemaphore;
 //-----Supernova user events-----
 FunctionSubscribe<void()> Engine::onViewLoaded;
 FunctionSubscribe<void()> Engine::onViewChanged;
+FunctionSubscribe<void()> Engine::onViewDestroyed;
 FunctionSubscribe<void()> Engine::onDraw;
 FunctionSubscribe<void()> Engine::onUpdate;
 FunctionSubscribe<void()> Engine::onPause;
@@ -379,8 +380,8 @@ bool Engine::isAsyncThread(){
     return asyncThread;
 }
 
-bool Engine::isShutdownCalled(){
-    return shutdownCalled;
+bool Engine::isViewDestroyed(){
+    return viewDestroyed;
 }
 
 void Engine::calculateCanvas(){
@@ -422,7 +423,7 @@ void Engine::systemInit(int argc, char* argv[]){
     lastTime = 0;
     updateTimeCount = 0;
     viewLoaded = false;
-    shutdownCalled = false;
+    viewDestroyed = false;
     paused = false;
 
     loadSemaphore.release();
@@ -559,26 +560,30 @@ void Engine::systemDraw(){
     AudioSystem::checkActive();
 }
 
-void Engine::systemShutdown(){
+void Engine::systemViewDestroyed(){
+    Engine::onViewDestroyed.call();
+
     loadSemaphore.acquire();
-
-    Engine::onShutdown.call();
-
-    LuaBinding::cleanup();
 
     for (int i = 0; i < numScenes; i++){
         scenes[i]->destroy();
     }
 
+    SystemRender::shutdown();
+
+    viewDestroyed = true;
+    loadSemaphore.release();
+}
+
+void Engine::systemShutdown(){
+    Engine::onShutdown.call();
+
+    LuaBinding::cleanup();
+
     TexturePool::clear();
     ShaderPool::clear();
 
     removeAllSceneLayers();
-
-    SystemRender::shutdown();
-
-    shutdownCalled = true;
-    loadSemaphore.release();
 }
 
 void Engine::systemPause(){

@@ -191,7 +191,7 @@ bool NativeEngine::initGLObjects() {
 
 void NativeEngine::killGLObjects() {
     if (mHasGLObjects) {
-        //Supernova::Engine::systemViewDestroyed()
+        Supernova::Engine::systemViewDestroyed();
         mHasGLObjects = false;
     }
 }

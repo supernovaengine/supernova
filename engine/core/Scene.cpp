@@ -187,7 +187,7 @@ void Scene::setEnableUIEvents(bool enableUIEvents){
 
 void Scene::load(){
 	Engine::getLoadSemaphore().acquire();
-	if (!Engine::isShutdownCalled()) {
+	if (!Engine::isViewDestroyed) {
 		for (auto const &pair: systems) {
 			pair.second->load();
 		}

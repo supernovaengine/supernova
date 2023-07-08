@@ -66,6 +66,7 @@ static CGSize _screenSize;
 
 - (void)destroyView
 {
+    Supernova::Engine::systemViewDestroyed();
     Supernova::Engine::systemShutdown();
 }
 

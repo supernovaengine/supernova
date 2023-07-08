@@ -66,6 +66,7 @@ static void sokol_event(const sapp_event* e) {
 }
 
 void sokol_cleanup(void) {
+    Supernova::Engine::systemViewDestroyed();
     Supernova::Engine::systemShutdown();
 }
 

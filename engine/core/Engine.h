@@ -86,7 +86,7 @@ namespace Supernova {
         static float updateTime;
 
         static std::atomic<bool> viewLoaded;
-        static std::atomic<bool> shutdownCalled;
+        static std::atomic<bool> viewDestroyed;
         static std::atomic<bool> paused;
 
         thread_local static bool asyncThread;
@@ -162,13 +162,14 @@ namespace Supernova {
         static void commitThreadQueue();
         static void endAsyncThread();
         static bool isAsyncThread();
-        static bool isShutdownCalled();
+        static bool isViewDestroyed();
 
         //-----Supernova API functions-----
         static void systemInit(int argc, char* argv[]);
         static void systemViewLoaded();
         static void systemViewChanged();
         static void systemDraw();
+        static void systemViewDestroyed();
         static void systemShutdown();
 
         static void systemPause();
@@ -194,6 +195,7 @@ namespace Supernova {
         //-----Supernova user events-----
         static FunctionSubscribe<void()> onViewLoaded;
         static FunctionSubscribe<void()> onViewChanged;
+        static FunctionSubscribe<void()> onViewDestroyed;
         static FunctionSubscribe<void()> onDraw;
         static FunctionSubscribe<void()> onUpdate;
         static FunctionSubscribe<void()> onPause;

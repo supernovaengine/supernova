@@ -109,6 +109,7 @@ int SupernovaGLFW::init(int argc, char **argv){
         glfwPollEvents();
     }
 
+    Supernova::Engine::systemViewDestroyed();
     Supernova::Engine::systemShutdown();
     glfwTerminate();
     return 0;

@@ -132,9 +132,11 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticFunction("commitThreadQueue", &Engine::commitThreadQueue)
         .addStaticFunction("endAsyncThread", &Engine::endAsyncThread)
         .addStaticFunction("isAsyncThread", &Engine::isAsyncThread)
+        .addStaticFunction("isViewDestroyed", &Engine::isViewDestroyed)
 
         .addStaticProperty("onViewLoaded", [] () { return &Engine::onViewLoaded; }, [] (lua_State* L) { Engine::onViewLoaded = L; })
         .addStaticProperty("onCanvasChanged", [] () { return &Engine::onViewChanged; }, [] (lua_State* L) { Engine::onViewChanged = L; })
+        .addStaticProperty("onViewDestroyed", [] () { return &Engine::onViewDestroyed; }, [] (lua_State* L) { Engine::onViewDestroyed = L; })
         .addStaticProperty("onDraw", [] () { return &Engine::onDraw; }, [] (lua_State* L) { Engine::onDraw = L; })
         .addStaticProperty("onUpdate", [] () { return &Engine::onUpdate; }, [] (lua_State* L) { Engine::onUpdate = L; })
         .addStaticProperty("onPause", [] () { return &Engine::onPause; }, [] (lua_State* L) { Engine::onPause = L; })
