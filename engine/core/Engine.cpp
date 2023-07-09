@@ -571,6 +571,9 @@ void Engine::systemViewDestroyed(){
 
     SystemRender::shutdown();
 
+    TexturePool::clear();
+    ShaderPool::clear();
+
     viewDestroyed = true;
     loadSemaphore.release();
 }
@@ -579,9 +582,6 @@ void Engine::systemShutdown(){
     Engine::onShutdown.call();
 
     LuaBinding::cleanup();
-
-    TexturePool::clear();
-    ShaderPool::clear();
 
     removeAllSceneLayers();
 }
