@@ -7,6 +7,7 @@
 #include <game-activity/native_app_glue/android_native_app_glue.h>
 #include <android/log.h>
 #include <android/window.h>
+#include <swappy/swappyGL.h>
 #include <cstring>
 #include <codecvt>
 #include <locale>
@@ -101,6 +102,10 @@ NativeEngine::NativeEngine(struct android_app *app) {
     assert(_singleton == NULL);
     _singleton = this;
 
+    // initialize Swappy to adjuest swap timing properly.
+    SwappyGL_init(getJniEnv(), mApp->activity->javaGameActivity);
+    SwappyGL_setSwapIntervalNS(SWAPPY_SWAP_60FPS);
+
     setupJNI();
 
     Supernova::Engine::systemInit(0, nullptr);
@@ -108,6 +113,8 @@ NativeEngine::NativeEngine(struct android_app *app) {
 
 NativeEngine::~NativeEngine() {
     Supernova::Engine::systemShutdown();
+
+    SwappyGL_destroy();
 
     killContext();
 
@@ -506,8 +513,8 @@ void NativeEngine::doFrame() {
     Supernova::Engine::systemDraw();
 
     // swap buffers
-    if (EGL_FALSE == eglSwapBuffers(mEglDisplay, mEglSurface)) {
-        Supernova::Log::error("NativeEngine: eglSwapBuffers failed, EGL error %d", eglGetError());
+    if (!SwappyGL_swap(mEglDisplay, mEglSurface)) {        // failed to swap buffers...
+        Supernova::Log::error("NativeEngine: SwappyGL_swap failed, EGL error %d", eglGetError());
         handleEglError(eglGetError());
     }
 
@@ -735,6 +742,7 @@ void NativeEngine::handleCommand(int32_t cmd) {
         case APP_CMD_INIT_WINDOW:
             if (mApp->window != NULL) {
                 mHasWindow = true;
+                SwappyGL_setWindow(mApp->window);
                 if (mApp->savedStateSize == sizeof(mState) && mApp->savedState != nullptr) {
                     mState = *((NativeEngineSavedState *) mApp->savedState);
                     mHasFocus = mState.mHasFocus;

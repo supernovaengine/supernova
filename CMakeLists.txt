@@ -167,9 +167,16 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
             "${CMAKE_SHARED_LINKER_FLAGS} -u Java_com_google_androidgamesdk_GameActivity_initializeNativeCode")
 
     find_package(game-activity REQUIRED CONFIG)
+    find_package(games-frame-pacing REQUIRED CONFIG)
 
     list(APPEND PLATFORM_LIBS
-        log android EGL ${OPENGL_LIB} OpenSLES game-activity::game-activity_static
+        ${OPENGL_LIB} 
+        log 
+        android 
+        EGL 
+        OpenSLES 
+        game-activity::game-activity_static
+        games-frame-pacing::swappy_static
     )
 endif()
 
