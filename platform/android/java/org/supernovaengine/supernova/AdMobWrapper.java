@@ -2,6 +2,7 @@ package org.supernovaengine.supernova;
 
 import android.app.Activity;
 import android.content.Context;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -138,11 +139,15 @@ public class AdMobWrapper {
     public void showInterstitialAd() {
         activity.runOnUiThread(new Runnable() {
             @Override public void run() {
+                // avoid show ads when Firebase Test Lab
+                String testLabSetting = Settings.System.getString(activity.getContentResolver(), "firebase.test.lab");
+                if (!"true".equals(testLabSetting)) {
 
-                if (isInterstitialAdLoaded()) {
-                    interstitialAd.show(activity);
+                    if (isInterstitialAdLoaded()) {
+                        interstitialAd.show(activity);
+                    }
+
                 }
-
             }
         });
     }
