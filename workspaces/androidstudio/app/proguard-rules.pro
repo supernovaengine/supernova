@@ -16,6 +16,4 @@
 #   public *;
 #}
 
--keepclassmembers class org.supernovaengine.supernova.* {
-   public *;
-}
+-keep class org.supernovaengine.supernova.* {*;}

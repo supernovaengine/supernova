@@ -214,21 +214,21 @@ void SupernovaAndroid::initializeAdMob(){
     JniData& jniData = NativeEngine::getInstance()->getJniData();
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
 
-    env->CallVoidMethod(jniData.admobWrapperObjRef, jniData.initializeAdMob);
+    env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.initializeAdMob);
 }
 
 void SupernovaAndroid::tagForChildDirectedTreatmentAdMob(bool enable){
     JniData& jniData = NativeEngine::getInstance()->getJniData();
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
 
-    env->CallVoidMethod(jniData.admobWrapperObjRef, jniData.tagForChildDirectedTreatmentAdMob, enable);
+    env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.tagForChildDirectedTreatmentAdMob, enable);
 }
 
 void SupernovaAndroid::tagForUnderAgeOfConsentAdMob(bool enable){
     JniData& jniData = NativeEngine::getInstance()->getJniData();
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
 
-    env->CallVoidMethod(jniData.admobWrapperObjRef, jniData.tagForUnderAgeOfConsentAdMob, enable);
+    env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.tagForUnderAgeOfConsentAdMob, enable);
 }
 
 void SupernovaAndroid::loadInterstitialAd(std::string adUnitID){
@@ -236,7 +236,7 @@ void SupernovaAndroid::loadInterstitialAd(std::string adUnitID){
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
 
     jstring strAdUnitID = env->NewStringUTF(adUnitID.c_str());
-    env->CallVoidMethod(jniData.admobWrapperObjRef, jniData.loadInterstitialAd, strAdUnitID);
+    env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.loadInterstitialAd, strAdUnitID);
     env->DeleteLocalRef(strAdUnitID);
 }
 
@@ -244,7 +244,7 @@ bool SupernovaAndroid::isInterstitialAdLoaded(){
     JniData& jniData = NativeEngine::getInstance()->getJniData();
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
 
-    bool value = env->CallBooleanMethod(jniData.admobWrapperObjRef, jniData.isInterstitialAdLoaded);
+    bool value = env->CallBooleanMethod(jniData.adMobWrapperObjRef, jniData.isInterstitialAdLoaded);
     return value;
 }
 
@@ -252,5 +252,5 @@ void SupernovaAndroid::showInterstitialAd(){
     JniData& jniData = NativeEngine::getInstance()->getJniData();
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
 
-    env->CallVoidMethod(jniData.admobWrapperObjRef, jniData.showInterstitialAd);
+    env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.showInterstitialAd);
 }

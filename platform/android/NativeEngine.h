@@ -16,13 +16,13 @@ struct JniData{
     jclass gameActivityClsRef;
 
     jmethodID getUserSettingsRef;
-    jmethodID getAdmobWrapperRef;
+    jmethodID getAdMobWrapperRef;
 
     jobject userSettingsObjRef;
     jclass userSettingsClsRef;
 
-    jobject admobWrapperObjRef;
-    jclass admobWrapperClsRef;
+    jobject adMobWrapperObjRef;
+    jclass adMobWrapperClsRef;
 
     jmethodID getBoolForKeyRef;
     jmethodID getIntegerForKeyRef;

@@ -268,13 +268,13 @@ void NativeEngine::setupJNI(){
     mJniData.gameActivityClsRef = env->GetObjectClass(mJniData.gameActivityObjRef);
 
     mJniData.getUserSettingsRef = env->GetMethodID(mJniData.gameActivityClsRef, "getUserSettings", "()Lorg/supernovaengine/supernova/UserSettings;");
-    mJniData.getAdmobWrapperRef = env->GetMethodID(mJniData.gameActivityClsRef, "getAdMobWrapper", "()Lorg/supernovaengine/supernova/AdMobWrapper;");
+    mJniData.getAdMobWrapperRef = env->GetMethodID(mJniData.gameActivityClsRef, "getAdMobWrapper", "()Lorg/supernovaengine/supernova/AdMobWrapper;");
 
     mJniData.userSettingsObjRef = env->CallObjectMethod(mJniData.gameActivityObjRef, mJniData.getUserSettingsRef);
     mJniData.userSettingsClsRef = env->GetObjectClass(mJniData.userSettingsObjRef);
 
-    mJniData.admobWrapperObjRef = env->CallObjectMethod(mJniData.gameActivityObjRef, mJniData.getAdmobWrapperRef);
-    mJniData.admobWrapperClsRef = env->GetObjectClass(mJniData.admobWrapperObjRef);
+    mJniData.adMobWrapperObjRef = env->CallObjectMethod(mJniData.gameActivityObjRef, mJniData.getAdMobWrapperRef);
+    mJniData.adMobWrapperClsRef = env->GetObjectClass(mJniData.adMobWrapperObjRef);
 
     mJniData.getBoolForKeyRef = env->GetMethodID(mJniData.userSettingsClsRef, "getBoolForKey", "(Ljava/lang/String;Z)Z");
     mJniData.getIntegerForKeyRef = env->GetMethodID(mJniData.userSettingsClsRef, "getIntegerForKey", "(Ljava/lang/String;I)I");
@@ -292,12 +292,12 @@ void NativeEngine::setupJNI(){
 
     mJniData.removeKeyRef = env->GetMethodID(mJniData.userSettingsClsRef, "removeKey", "(Ljava/lang/String;)V");
 
-    mJniData.initializeAdMob = env->GetMethodID(mJniData.admobWrapperClsRef, "initialize","()V");
-    mJniData.tagForChildDirectedTreatmentAdMob = env->GetMethodID(mJniData.admobWrapperClsRef, "tagForChildDirectedTreatment","(Z)V");
-    mJniData.tagForUnderAgeOfConsentAdMob = env->GetMethodID(mJniData.admobWrapperClsRef, "tagForUnderAgeOfConsent","(Z)V");
-    mJniData.loadInterstitialAd = env->GetMethodID(mJniData.admobWrapperClsRef, "loadInterstitialAd","(Ljava/lang/String;)V");
-    mJniData.isInterstitialAdLoaded = env->GetMethodID(mJniData.admobWrapperClsRef, "isInterstitialAdLoaded","()Z");
-    mJniData.showInterstitialAd = env->GetMethodID(mJniData.admobWrapperClsRef, "showInterstitialAd","()V");
+    mJniData.initializeAdMob = env->GetMethodID(mJniData.adMobWrapperClsRef, "initialize","()V");
+    mJniData.tagForChildDirectedTreatmentAdMob = env->GetMethodID(mJniData.adMobWrapperClsRef, "tagForChildDirectedTreatment","(Z)V");
+    mJniData.tagForUnderAgeOfConsentAdMob = env->GetMethodID(mJniData.adMobWrapperClsRef, "tagForUnderAgeOfConsent","(Z)V");
+    mJniData.loadInterstitialAd = env->GetMethodID(mJniData.adMobWrapperClsRef, "loadInterstitialAd","(Ljava/lang/String;)V");
+    mJniData.isInterstitialAdLoaded = env->GetMethodID(mJniData.adMobWrapperClsRef, "isInterstitialAdLoaded","()Z");
+    mJniData.showInterstitialAd = env->GetMethodID(mJniData.adMobWrapperClsRef, "showInterstitialAd","()V");
 }
 
 bool NativeEngine::initDisplay() {
