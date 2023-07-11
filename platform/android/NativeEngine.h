@@ -6,6 +6,7 @@
 #include <jni.h>
 #include <android/asset_manager.h>
 #include <game-activity/GameActivity.h>
+#include <string>
 
 struct NativeEngineSavedState {
     bool mHasFocus;
@@ -63,6 +64,9 @@ private:
     int mApiVersion;
     int mScreenDensity;
     uint64_t mActiveAxisIds;
+
+    std::string mInternalDataPath;
+    std::string mExternalDataPath;
 
     JNIEnv *mJniEnv;
     JniData mJniData;
@@ -124,6 +128,9 @@ public:
 
     void showSoftInput();
     void hideSoftInput();
+
+    std::string getInternalDataPath();
+    std::string getExternalDataPath();
 
     AAssetManager* getAssetManager();
 };

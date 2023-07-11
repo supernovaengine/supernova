@@ -80,6 +80,9 @@ NativeEngine::NativeEngine(struct android_app *app) {
     memset(&mState, 0, sizeof(mState));
     mIsFirstFrame = true;
 
+    mInternalDataPath = mApp->activity->internalDataPath;
+    mExternalDataPath = mApp->activity->externalDataPath;
+
     app->motionEventFilter = all_motion_filter;
 
     // Flags to control how the IME behaves.
@@ -182,6 +185,14 @@ void NativeEngine::showSoftInput(){
 
 void NativeEngine::hideSoftInput(){
     GameActivity_hideSoftInput(NativeEngine::getInstance()->getActivity(), 0);
+}
+
+std::string NativeEngine::getInternalDataPath(){
+    return mInternalDataPath;
+}
+
+std::string NativeEngine::getExternalDataPath(){
+    return mExternalDataPath;
 }
 
 AAssetManager* NativeEngine::getAssetManager(){

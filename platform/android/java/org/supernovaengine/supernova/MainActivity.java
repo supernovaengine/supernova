@@ -54,6 +54,12 @@ public class MainActivity extends GameActivity {
 		super.onCreate(savedInstanceState);
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		hideSystemUI();
+	}
+
 	public UserSettings getUserSettings() {
 		return userSettings;
 	}

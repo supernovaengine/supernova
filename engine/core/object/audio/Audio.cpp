@@ -34,17 +34,23 @@ void Audio::play(){
     AudioComponent& audio = getComponent<AudioComponent>();
 
     audio.startTrigger = true;
+    audio.pauseTrigger = false;
+    audio.stopTrigger = false;
 }
 
 void Audio::pause(){
     AudioComponent& audio = getComponent<AudioComponent>();
 
+    audio.startTrigger = false;
     audio.pauseTrigger = true;
+    audio.stopTrigger = false;
 }
 
 void Audio::stop(){
     AudioComponent& audio = getComponent<AudioComponent>();
 
+    audio.startTrigger = false;
+    audio.pauseTrigger = false;
     audio.stopTrigger = true;
 }
 

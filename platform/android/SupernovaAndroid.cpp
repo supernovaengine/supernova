@@ -44,7 +44,7 @@ void SupernovaAndroid::hideVirtualKeyboard(){
 }
 
 std::string SupernovaAndroid::getUserDataPath() {
-    return NativeEngine::getInstance()->getActivity()->internalDataPath;
+    return NativeEngine::getInstance()->getInternalDataPath();
 }
 
 FILE* SupernovaAndroid::platformFopen(const char* fname, const char* mode) {
