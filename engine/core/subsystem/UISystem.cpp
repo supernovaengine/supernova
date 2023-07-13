@@ -1072,7 +1072,7 @@ void UISystem::eventOnPointerDown(float x, float y){
             
             if (signature.test(scene->getComponentType<ButtonComponent>())){
                 ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-                if (!button.disabled){
+                if (!button.disabled && !button.pressed){
                     ui.texture = button.texturePressed;
                     ui.needUpdateTexture = true;
                     button.onPress.call();
