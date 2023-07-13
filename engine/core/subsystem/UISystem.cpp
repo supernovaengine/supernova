@@ -1111,13 +1111,11 @@ void UISystem::eventOnPointerUp(float x, float y){
 
             if (signature.test(scene->getComponentType<ButtonComponent>())){
                 ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-                if (!button.disabled){
+                if (!button.disabled && button.pressed){
                     ui.texture = button.textureNormal;
                     ui.needUpdateTexture = true;
-                    if (button.pressed){
-                        button.pressed = false;
-                        button.onRelease.call();
-                    }
+                    button.pressed = false;
+                    button.onRelease.call();
                 }
             }
 
