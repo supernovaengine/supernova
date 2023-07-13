@@ -49,11 +49,9 @@ float Engine::framerate = 0;
 float Engine::updateTime = 0.03;
 
 std::atomic<bool> Engine::viewLoaded = false;
-std::atomic<bool> Engine::viewDestroyed = false;
 std::atomic<bool> Engine::paused = false;
 
 thread_local bool Engine::asyncThread = false;
-Semaphore Engine::loadSemaphore;
 Semaphore Engine::drawSemaphore;
 
 //-----Supernova user events-----
@@ -355,14 +353,6 @@ float Engine::getDeltatime(){
     return deltatime;
 }
 
-Semaphore& Engine::getLoadSemaphore(){
-    return loadSemaphore;
-}
-
-Semaphore& Engine::getDrawSemaphore(){
-    return drawSemaphore;
-}
-
 void Engine::startAsyncThread(){
     asyncThread = true;
 }
@@ -380,8 +370,8 @@ bool Engine::isAsyncThread(){
     return asyncThread;
 }
 
-bool Engine::isViewDestroyed(){
-    return viewDestroyed;
+bool Engine::isViewLoaded(){
+    return viewLoaded;
 }
 
 void Engine::calculateCanvas(){
@@ -423,10 +413,8 @@ void Engine::systemInit(int argc, char* argv[]){
     lastTime = 0;
     updateTimeCount = 0;
     viewLoaded = false;
-    viewDestroyed = false;
     paused = false;
 
-    loadSemaphore.release();
     drawSemaphore.release();
 
     stm_setup();
@@ -446,11 +434,13 @@ void Engine::systemInit(int argc, char* argv[]){
 
 void Engine::systemViewLoaded(){
     SystemRender::setup();
+
+    viewLoaded = true;
     onViewLoaded.call();
+    
     for (int i = 0; i < numScenes; i++){
         scenes[i]->load();
     }
-    viewLoaded = true;
 }
 
 void Engine::systemViewChanged(){
@@ -561,9 +551,8 @@ void Engine::systemDraw(){
 }
 
 void Engine::systemViewDestroyed(){
+    viewLoaded = false;
     Engine::onViewDestroyed.call();
-
-    loadSemaphore.acquire();
 
     for (int i = 0; i < numScenes; i++){
         scenes[i]->destroy();
@@ -573,9 +562,6 @@ void Engine::systemViewDestroyed(){
 
     TexturePool::clear();
     ShaderPool::clear();
-
-    viewDestroyed = true;
-    loadSemaphore.release();
 }
 
 void Engine::systemShutdown(){

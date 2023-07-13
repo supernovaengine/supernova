@@ -51,7 +51,7 @@ FILE* SupernovaAndroid::platformFopen(const char* fname, const char* mode) {
     std::string path = fname;
 
     //Return regular fopen if writable path is in path
-    if (path.find(getUserDataPath()) != std::string::npos) {
+    if (!NativeEngine::getInstance() || path.find(getUserDataPath()) != std::string::npos) {
         return fopen(path.c_str(), mode);
     }
 

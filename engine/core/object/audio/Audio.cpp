@@ -21,7 +21,10 @@ int Audio::loadAudio(std::string filename){
 
     audio.filename = filename;
 
-    return scene->getSystem<AudioSystem>()->loadAudio(audio, entity);
+    if (Engine::isViewLoaded())
+        return scene->getSystem<AudioSystem>()->loadAudio(audio, entity);
+    else
+        return false;
 }
 
 void Audio::destroyAudio(){

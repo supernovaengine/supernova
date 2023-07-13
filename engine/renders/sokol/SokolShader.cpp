@@ -175,6 +175,7 @@ bool SokolShader::createShader(ShaderData& shaderData){
             img->sampler_type = samplerToSokolType(stage->textures[t].samplerType);
         }
     }
+
     if (Engine::isAsyncThread()){
         shader = SokolCmdQueue::add_command_make_shader(shader_desc);
     }else{

@@ -186,13 +186,11 @@ void Scene::setEnableUIEvents(bool enableUIEvents){
 }
 
 void Scene::load(){
-	Engine::getLoadSemaphore().acquire();
-	if (!Engine::isViewDestroyed) {
-		for (auto const &pair: systems) {
+	for (auto const &pair: systems) {
+		if (Engine::isViewLoaded()){
 			pair.second->load();
 		}
 	}
-	Engine::getLoadSemaphore().release();
 }
 
 void Scene::destroy(){

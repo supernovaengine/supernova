@@ -129,7 +129,7 @@ NativeEngine::~NativeEngine() {
 }
 
 NativeEngine *NativeEngine::getInstance() {
-    assert(_singleton != NULL);
+    //assert(_singleton != NULL);
     return _singleton;
 }
 

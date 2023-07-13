@@ -86,12 +86,10 @@ namespace Supernova {
         static float updateTime;
 
         static std::atomic<bool> viewLoaded;
-        static std::atomic<bool> viewDestroyed;
         static std::atomic<bool> paused;
 
         thread_local static bool asyncThread;
 
-        static Semaphore loadSemaphore;
         static Semaphore drawSemaphore;
         
         static bool transformCoordPos(float& x, float& y);
@@ -155,14 +153,11 @@ namespace Supernova {
         static float getFramerate();
         static float getDeltatime();
 
-        static Semaphore& getLoadSemaphore();
-        static Semaphore& getDrawSemaphore();
-
         static void startAsyncThread();
         static void commitThreadQueue();
         static void endAsyncThread();
         static bool isAsyncThread();
-        static bool isViewDestroyed();
+        static bool isViewLoaded();
 
         //-----Supernova API functions-----
         static void systemInit(int argc, char* argv[]);

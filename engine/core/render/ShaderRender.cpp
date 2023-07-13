@@ -5,6 +5,7 @@
 #include "ShaderRender.h"
 
 #include "SystemRender.h"
+#include "Engine.h"
 
 using namespace Supernova;
 
@@ -23,13 +24,17 @@ ShaderRender::~ShaderRender(){
 }
 
 bool ShaderRender::createShader(ShaderData& shaderData){
-    this->shaderData = shaderData;
+    if (Engine::isViewLoaded()) {
+        this->shaderData = shaderData;
 
-    bool ret = backend.createShader(this->shaderData);
+        bool ret = backend.createShader(this->shaderData);
 
-    SystemRender::scheduleCleanup(ShaderRender::cleanupShader, &(this->shaderData));
-    
-    return ret;
+        SystemRender::scheduleCleanup(ShaderRender::cleanupShader, &(this->shaderData));
+        
+        return ret;
+    }else{
+        return false;
+    }
 }
 
 void ShaderRender::destroyShader(){

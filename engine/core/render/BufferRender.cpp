@@ -1,4 +1,5 @@
 #include "BufferRender.h"
+#include "Engine.h"
 
 using namespace Supernova;
 
@@ -16,7 +17,10 @@ BufferRender::~BufferRender(){
 }
 
 bool BufferRender::createBuffer(unsigned int size, void* data, BufferType type, BufferUsage usage){
-    return backend.createBuffer(size, data, type, usage);
+    if (Engine::isViewLoaded())
+        return backend.createBuffer(size, data, type, usage);
+    else
+        return false;
 }
 
 void BufferRender::updateBuffer(unsigned int size, void* data){

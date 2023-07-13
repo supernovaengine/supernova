@@ -1,4 +1,5 @@
 #include "FramebufferRender.h"
+#include "Engine.h"
 
 using namespace Supernova;
 
@@ -16,7 +17,10 @@ FramebufferRender::~FramebufferRender(){
 }
 
 bool FramebufferRender::createFramebuffer(TextureType textureType, int width, int height, TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV, bool shadowMap){
-    return backend.createFramebuffer(textureType, width, height, minFilter, magFilter, wrapU, wrapV, shadowMap);
+    if (Engine::isViewLoaded())
+        return backend.createFramebuffer(textureType, width, height, minFilter, magFilter, wrapU, wrapV, shadowMap);
+    else
+        return false;
 }
 
 void FramebufferRender::destroyFramebuffer(){

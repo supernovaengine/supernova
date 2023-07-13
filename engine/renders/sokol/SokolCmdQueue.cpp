@@ -214,19 +214,19 @@ void SokolCmdQueue::wait_for_flush()
 				switch (command.type)
 				{
 				case SokolRenderCommand::TYPE::MAKE_BUFFER:
-					sg_init_buffer(command.make_buffer.buffer, command.make_buffer.desc);
+					//sg_init_buffer(command.make_buffer.buffer, command.make_buffer.desc);
 					break;
 				case SokolRenderCommand::TYPE::MAKE_IMAGE:
-					sg_init_image(command.make_image.image, command.make_image.desc);
+					//sg_init_image(command.make_image.image, command.make_image.desc);
 					break;
 				case SokolRenderCommand::TYPE::MAKE_SHADER:
-					sg_init_shader(command.make_shader.shader, command.make_shader.desc);
+					//sg_init_shader(command.make_shader.shader, command.make_shader.desc);
 					break;
 				case SokolRenderCommand::TYPE::MAKE_PIPELINE:
-					sg_init_pipeline(command.make_pipeline.pipeline, command.make_pipeline.desc);
+					//sg_init_pipeline(command.make_pipeline.pipeline, command.make_pipeline.desc);
 					break;
 				case SokolRenderCommand::TYPE::MAKE_PASS:
-					sg_init_pass(command.make_pass.pass, command.make_pass.desc);
+					//sg_init_pass(command.make_pass.pass, command.make_pass.desc);
 					break;
 				case SokolRenderCommand::TYPE::DESTROY_BUFFER:
 					sg_uninit_buffer(command.destroy_buffer.buffer);
