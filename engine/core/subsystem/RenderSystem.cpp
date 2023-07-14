@@ -2248,6 +2248,9 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 }
 
 void RenderSystem::changeLoaded(void* data){
+	if (!Engine::isViewLoaded())
+		return;
+
 	check_load_t* loadObj = (check_load_t*)data;
 
 	Scene* scene = loadObj->scene;
