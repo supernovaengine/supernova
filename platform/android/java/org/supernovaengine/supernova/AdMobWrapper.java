@@ -44,41 +44,6 @@ public class AdMobWrapper {
                     @Override
                     public void onInitializationComplete(InitializationStatus initializationStatus) {}
                 });
-
-                ConsentDebugSettings debugSettings = new ConsentDebugSettings.Builder(activity)
-                        .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
-                        .addTestDeviceHashedId("TEST-DEVICE-HASHED-ID")
-                        .build();
-
-                // Set tag for under age of consent. false means users are not under
-                // age.
-                ConsentRequestParameters params = new ConsentRequestParameters
-                        .Builder()
-                        //.setConsentDebugSettings(debugSettings)
-                        .setTagForUnderAgeOfConsent(false)
-                        .build();
-
-                consentInformation = UserMessagingPlatform.getConsentInformation(activity);
-                //consentInformation.reset();
-                consentInformation.requestConsentInfoUpdate(
-                        activity,
-                        params,
-                        new ConsentInformation.OnConsentInfoUpdateSuccessListener() {
-                            @Override
-                            public void onConsentInfoUpdateSuccess() {
-                                // The consent information state was updated.
-                                // You are now ready to check if a form is available.
-                                if (consentInformation.isConsentFormAvailable()) {
-                                    //loadForm();
-                                }
-                            }
-                        },
-                        new ConsentInformation.OnConsentInfoUpdateFailureListener() {
-                            @Override
-                            public void onConsentInfoUpdateFailure(FormError formError) {
-                                // Handle the error.
-                            }
-                        });
             }
         });
     }
@@ -98,11 +63,6 @@ public class AdMobWrapper {
                         .setTagForChildDirectedTreatment(tagValue)
                         .build();
                 MobileAds.setRequestConfiguration(requestConfiguration);
-
-                ConsentRequestParameters params = new ConsentRequestParameters
-                        .Builder()
-                        .setTagForUnderAgeOfConsent(false)
-                        .build();
             }
         });
     }
@@ -126,7 +86,52 @@ public class AdMobWrapper {
         });
     }
 
-    public void loadForm() {
+    public void requestConsent(){
+        boolean tagUnderAgeCOnsent = false;
+        if (MobileAds.getRequestConfiguration().getTagForChildDirectedTreatment() == RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE){
+            tagUnderAgeCOnsent = true;
+        }
+        if (MobileAds.getRequestConfiguration().getTagForUnderAgeOfConsent() == RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE){
+            tagUnderAgeCOnsent = true;
+        }
+
+        ConsentDebugSettings debugSettings = new ConsentDebugSettings.Builder(activity)
+                .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+                .addTestDeviceHashedId("TEST-DEVICE-HASHED-ID")
+                .build();
+
+        // Set tag for under age of consent. false means users are not under
+        // age.
+        ConsentRequestParameters params = new ConsentRequestParameters
+                .Builder()
+                //.setConsentDebugSettings(debugSettings)
+                .setTagForUnderAgeOfConsent(tagUnderAgeCOnsent)
+                .build();
+
+        consentInformation = UserMessagingPlatform.getConsentInformation(activity);
+        //consentInformation.reset();
+        consentInformation.requestConsentInfoUpdate(
+                activity,
+                params,
+                new ConsentInformation.OnConsentInfoUpdateSuccessListener() {
+                    @Override
+                    public void onConsentInfoUpdateSuccess() {
+                        // The consent information state was updated.
+                        // You are now ready to check if a form is available.
+                        if (consentInformation.isConsentFormAvailable()) {
+                            loadForm();
+                        }
+                    }
+                },
+                new ConsentInformation.OnConsentInfoUpdateFailureListener() {
+                    @Override
+                    public void onConsentInfoUpdateFailure(FormError formError) {
+                        // Handle the error.
+                    }
+                });
+    }
+
+    private void loadForm() {
         // Loads a consent form. Must be called on the main thread.
         UserMessagingPlatform.loadConsentForm(
                 activity,
