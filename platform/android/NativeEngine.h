@@ -42,8 +42,6 @@ struct JniData{
     jmethodID removeKeyRef;
 
     jmethodID initializeAdMob;
-    jmethodID tagForChildDirectedTreatmentAdMob;
-    jmethodID tagForUnderAgeOfConsentAdMob;
     jmethodID loadInterstitialAd;
     jmethodID isInterstitialAdLoaded;
     jmethodID showInterstitialAd;

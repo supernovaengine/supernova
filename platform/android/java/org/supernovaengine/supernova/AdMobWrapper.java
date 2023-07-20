@@ -36,7 +36,7 @@ public class AdMobWrapper {
         this.activity = activity;
     }
 
-    public void initialize(){
+    public void initialize(boolean tagForChildDirectedTreatment, boolean tagForUnderAgeOfConsent){
         activity.runOnUiThread(new Runnable() {
             @Override public void run() {
                 // Initialize the Mobile Ads SDK.
@@ -44,11 +44,16 @@ public class AdMobWrapper {
                     @Override
                     public void onInitializationComplete(InitializationStatus initializationStatus) {}
                 });
+
+                setTagForChildDirectedTreatment(tagForChildDirectedTreatment);
+                setTagForUnderAgeOfConsent(tagForUnderAgeOfConsent);
+
+                requestConsent(tagForChildDirectedTreatment || tagForUnderAgeOfConsent);
             }
         });
     }
 
-    public void tagForChildDirectedTreatment(boolean enable){
+    private void setTagForChildDirectedTreatment(boolean enable){
         activity.runOnUiThread(new Runnable() {
             @Override public void run() {
                 int tagValue;
@@ -67,7 +72,7 @@ public class AdMobWrapper {
         });
     }
 
-    public void tagForUnderAgeOfConsent(boolean enable){
+    private void setTagForUnderAgeOfConsent(boolean enable){
         activity.runOnUiThread(new Runnable() {
             @Override public void run() {
                 int tagValue;
@@ -86,30 +91,24 @@ public class AdMobWrapper {
         });
     }
 
-    public void requestConsent(){
-        boolean tagUnderAgeCOnsent = false;
-        if (MobileAds.getRequestConfiguration().getTagForChildDirectedTreatment() == RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE){
-            tagUnderAgeCOnsent = true;
-        }
-        if (MobileAds.getRequestConfiguration().getTagForUnderAgeOfConsent() == RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE){
-            tagUnderAgeCOnsent = true;
-        }
-
-        ConsentDebugSettings debugSettings = new ConsentDebugSettings.Builder(activity)
-                .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
-                .addTestDeviceHashedId("TEST-DEVICE-HASHED-ID")
-                .build();
+    private void requestConsent(boolean tagForUnderAgeConsent){
+        //ConsentDebugSettings debugSettings = new ConsentDebugSettings.Builder(activity)
+        //        .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
+        //        .addTestDeviceHashedId("TEST-DEVICE-HASHED-ID")
+        //        .build();
 
         // Set tag for under age of consent. false means users are not under
         // age.
         ConsentRequestParameters params = new ConsentRequestParameters
                 .Builder()
+                // call requestConsentInfoUpdate() without setting this value, your app logs the required ID hash when run
                 //.setConsentDebugSettings(debugSettings)
-                .setTagForUnderAgeOfConsent(tagUnderAgeCOnsent)
+                .setTagForUnderAgeOfConsent(tagForUnderAgeConsent)
                 .build();
 
         consentInformation = UserMessagingPlatform.getConsentInformation(activity);
         //consentInformation.reset();
+
         consentInformation.requestConsentInfoUpdate(
                 activity,
                 params,
@@ -118,9 +117,6 @@ public class AdMobWrapper {
                     public void onConsentInfoUpdateSuccess() {
                         // The consent information state was updated.
                         // You are now ready to check if a form is available.
-                        if (consentInformation.isConsentFormAvailable()) {
-                            loadForm();
-                        }
                     }
                 },
                 new ConsentInformation.OnConsentInfoUpdateFailureListener() {
@@ -145,10 +141,6 @@ public class AdMobWrapper {
                                     new ConsentForm.OnConsentFormDismissedListener() {
                                         @Override
                                         public void onConsentFormDismissed(FormError formError) {
-                                            if (consentInformation.getConsentStatus() == ConsentInformation.ConsentStatus.OBTAINED) {
-                                                // App can start requesting ads.
-                                            }
-
                                             // Handle dismissal by reloading form.
                                             loadForm();
                                         }
@@ -169,52 +161,57 @@ public class AdMobWrapper {
         activity.runOnUiThread(new Runnable() {
             @Override public void run() {
 
-                AdRequest adRequest = new AdRequest.Builder().build();
-                InterstitialAd.load(
-                        activity,
-                        adUnitID,
-                        adRequest,
-                        new InterstitialAdLoadCallback() {
-                            @Override
-                            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                                // The mInterstitialAd reference will be null until
-                                // an ad is loaded.
-                                AdMobWrapper.this.interstitialAd = interstitialAd;
+                if (consentInformation.isConsentFormAvailable()) {
+                    loadForm();
+                }
 
-                                interstitialAd.setFullScreenContentCallback(
-                                        new FullScreenContentCallback() {
-                                            @Override
-                                            public void onAdDismissedFullScreenContent() {
-                                                // Called when fullscreen content is dismissed.
-                                                // Make sure to set your reference to null so you don't
-                                                // show it a second time.
-                                                AdMobWrapper.this.interstitialAd = null;
-                                            }
+                if (consentInformation.getConsentStatus() == ConsentInformation.ConsentStatus.OBTAINED) {
+                    AdRequest adRequest = new AdRequest.Builder().build();
+                    InterstitialAd.load(
+                            activity,
+                            adUnitID,
+                            adRequest,
+                            new InterstitialAdLoadCallback() {
+                                @Override
+                                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                                    // The mInterstitialAd reference will be null until
+                                    // an ad is loaded.
+                                    AdMobWrapper.this.interstitialAd = interstitialAd;
 
-                                            @Override
-                                            public void onAdFailedToShowFullScreenContent(AdError adError) {
-                                                // Called when fullscreen content failed to show.
-                                                // Make sure to set your reference to null so you don't
-                                                // show it a second time.
-                                                AdMobWrapper.this.interstitialAd = null;
-                                                Log.e("Supernova", "The ad failed to show.");
-                                            }
+                                    interstitialAd.setFullScreenContentCallback(
+                                            new FullScreenContentCallback() {
+                                                @Override
+                                                public void onAdDismissedFullScreenContent() {
+                                                    // Called when fullscreen content is dismissed.
+                                                    // Make sure to set your reference to null so you don't
+                                                    // show it a second time.
+                                                    AdMobWrapper.this.interstitialAd = null;
+                                                }
 
-                                            @Override
-                                            public void onAdShowedFullScreenContent() {
-                                                // Called when fullscreen content is shown.
-                                            }
-                                        });
-                            }
+                                                @Override
+                                                public void onAdFailedToShowFullScreenContent(AdError adError) {
+                                                    // Called when fullscreen content failed to show.
+                                                    // Make sure to set your reference to null so you don't
+                                                    // show it a second time.
+                                                    AdMobWrapper.this.interstitialAd = null;
+                                                    Log.e("Supernova", "The ad failed to show.");
+                                                }
 
-                            @Override
-                            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                                // Handle the error
-                                Log.e("Supernova", loadAdError.getMessage());
-                                interstitialAd = null;
-                            }
-                        });
+                                                @Override
+                                                public void onAdShowedFullScreenContent() {
+                                                    // Called when fullscreen content is shown.
+                                                }
+                                            });
+                                }
 
+                                @Override
+                                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                                    // Handle the error
+                                    Log.e("Supernova", loadAdError.getMessage());
+                                    interstitialAd = null;
+                                }
+                            });
+                }
             }
         });
 

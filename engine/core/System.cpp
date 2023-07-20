@@ -207,16 +207,8 @@ void System::removeKey(const char *key){
     XMLUtils::removeKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
 }
 
-void System::initializeAdMob(){
+void System::initializeAdMob(bool tagForChildDirectedTreatment, bool tagForUnderAgeOfConsent){
     Log::error("Cannot initialize AdMob in this system");
-}
-
-void System::tagForChildDirectedTreatmentAdMob(bool enable){
-    Log::error("Cannot tagForChildDirectedTreatment AdMob in this system");
-}
-
-void System::tagForUnderAgeOfConsentAdMob(bool enable){
-    Log::error("Cannot tagForUnderAgeOfConsent AdMob in this system");
 }
 
 void System::loadInterstitialAd(std::string adUnitID){

@@ -210,25 +210,11 @@ void SupernovaAndroid::removeKey(const char* key){
     env->DeleteLocalRef(strKey);
 }
 
-void SupernovaAndroid::initializeAdMob(){
+void SupernovaAndroid::initializeAdMob(bool tagForChildDirectedTreatment, bool tagForUnderAgeOfConsent){
     JniData& jniData = NativeEngine::getInstance()->getJniData();
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
 
-    env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.initializeAdMob);
-}
-
-void SupernovaAndroid::tagForChildDirectedTreatmentAdMob(bool enable){
-    JniData& jniData = NativeEngine::getInstance()->getJniData();
-    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
-
-    env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.tagForChildDirectedTreatmentAdMob, enable);
-}
-
-void SupernovaAndroid::tagForUnderAgeOfConsentAdMob(bool enable){
-    JniData& jniData = NativeEngine::getInstance()->getJniData();
-    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
-
-    env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.tagForUnderAgeOfConsentAdMob, enable);
+    env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.initializeAdMob, tagForChildDirectedTreatment, tagForUnderAgeOfConsent);
 }
 
 void SupernovaAndroid::loadInterstitialAd(std::string adUnitID){

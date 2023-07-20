@@ -79,9 +79,7 @@ namespace Supernova {
         virtual void removeKey(const char *key);
 
         // Google AdMob SDK
-        virtual void initializeAdMob();
-        virtual void tagForChildDirectedTreatmentAdMob(bool enable);
-        virtual void tagForUnderAgeOfConsentAdMob(bool enable);
+        virtual void initializeAdMob(bool tagForChildDirectedTreatment = false, bool tagForUnderAgeOfConsent = false);
         virtual void loadInterstitialAd(std::string adUnitID);
         virtual bool isInterstitialAdLoaded();
         virtual void showInterstitialAd();

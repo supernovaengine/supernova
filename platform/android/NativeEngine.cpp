@@ -303,9 +303,7 @@ void NativeEngine::setupJNI(){
 
     mJniData.removeKeyRef = env->GetMethodID(mJniData.userSettingsClsRef, "removeKey", "(Ljava/lang/String;)V");
 
-    mJniData.initializeAdMob = env->GetMethodID(mJniData.adMobWrapperClsRef, "initialize","()V");
-    mJniData.tagForChildDirectedTreatmentAdMob = env->GetMethodID(mJniData.adMobWrapperClsRef, "tagForChildDirectedTreatment","(Z)V");
-    mJniData.tagForUnderAgeOfConsentAdMob = env->GetMethodID(mJniData.adMobWrapperClsRef, "tagForUnderAgeOfConsent","(Z)V");
+    mJniData.initializeAdMob = env->GetMethodID(mJniData.adMobWrapperClsRef, "initialize","(ZZ)V");
     mJniData.loadInterstitialAd = env->GetMethodID(mJniData.adMobWrapperClsRef, "loadInterstitialAd","(Ljava/lang/String;)V");
     mJniData.isInterstitialAdLoaded = env->GetMethodID(mJniData.adMobWrapperClsRef, "isInterstitialAdLoaded","()Z");
     mJniData.showInterstitialAd = env->GetMethodID(mJniData.adMobWrapperClsRef, "showInterstitialAd","()V");
