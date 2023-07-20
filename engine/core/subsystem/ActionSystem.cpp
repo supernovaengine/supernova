@@ -123,14 +123,13 @@ void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& ac
 
             if (timeDiff >= 0) {
                 //TODO: Support loop actions
-                if (timeDiff <= duration) {
-                    ActionComponent& iaction = scene->getComponent<ActionComponent>(animcomp.actions[i].action);
-                    if (iaction.state != ActionState::Running) {
-                        actionStart(animcomp.actions[i].action);
-                    }
-                    iaction.speed = action.speed;
-                    iaction.timecount = timeDiff * action.speed;
-                }else{
+                ActionComponent& iaction = scene->getComponent<ActionComponent>(animcomp.actions[i].action);
+                if (iaction.state != ActionState::Running) {
+                    actionStart(animcomp.actions[i].action);
+                }
+                iaction.speed = action.speed;
+                iaction.timecount = timeDiff * action.speed;
+                if (timeDiff > duration) {
                     totalActionsPassed++;
                 }
             }
