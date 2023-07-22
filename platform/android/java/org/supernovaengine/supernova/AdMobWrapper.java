@@ -91,7 +91,7 @@ public class AdMobWrapper {
         });
     }
 
-    private void requestConsent(boolean tagForUnderAgeConsent){
+    private void requestConsent(boolean tagForUnderAgeOfConsent){
         //ConsentDebugSettings debugSettings = new ConsentDebugSettings.Builder(activity)
         //        .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
         //        .addTestDeviceHashedId("TEST-DEVICE-HASHED-ID")
@@ -103,7 +103,7 @@ public class AdMobWrapper {
                 .Builder()
                 // call requestConsentInfoUpdate() without setting this value, your app logs the required ID hash when run
                 //.setConsentDebugSettings(debugSettings)
-                .setTagForUnderAgeOfConsent(tagForUnderAgeConsent)
+                .setTagForUnderAgeOfConsent(tagForUnderAgeOfConsent)
                 .build();
 
         consentInformation = UserMessagingPlatform.getConsentInformation(activity);
@@ -127,44 +127,40 @@ public class AdMobWrapper {
                 });
     }
 
-    private void loadForm() {
-        // Loads a consent form. Must be called on the main thread.
-        UserMessagingPlatform.loadConsentForm(
-                activity,
-                new UserMessagingPlatform.OnConsentFormLoadSuccessListener() {
-                    @Override
-                    public void onConsentFormLoadSuccess(ConsentForm consentForm) {
-                        AdMobWrapper.this.consentForm = consentForm;
-                        if (consentInformation.getConsentStatus() == ConsentInformation.ConsentStatus.REQUIRED) {
-                            consentForm.show(
-                                    activity,
-                                    new ConsentForm.OnConsentFormDismissedListener() {
-                                        @Override
-                                        public void onConsentFormDismissed(FormError formError) {
-                                            // Handle dismissal by reloading form.
-                                            loadForm();
-                                        }
-                                    });
-                        }
-                    }
-                },
-                new UserMessagingPlatform.OnConsentFormLoadFailureListener() {
-                    @Override
-                    public void onConsentFormLoadFailure(FormError formError) {
-                        // Handle Error.
-                    }
-                }
-        );
-    }
-
     public void loadInterstitialAd(String adUnitID) {
         activity.runOnUiThread(new Runnable() {
             @Override public void run() {
-
+                // load consent form
                 if (consentInformation.isConsentFormAvailable()) {
-                    loadForm();
+                    UserMessagingPlatform.loadConsentForm(
+                            activity,
+                            new UserMessagingPlatform.OnConsentFormLoadSuccessListener() {
+                                @Override
+                                public void onConsentFormLoadSuccess(ConsentForm consentForm) {
+                                    AdMobWrapper.this.consentForm = consentForm;
+                                    if (consentInformation.getConsentStatus() == ConsentInformation.ConsentStatus.REQUIRED) {
+                                        consentForm.show(
+                                                activity,
+                                                new ConsentForm.OnConsentFormDismissedListener() {
+                                                    @Override
+                                                    public void onConsentFormDismissed(FormError formError) {
+                                                        // Handle dismissal by reloading form.
+                                                        loadInterstitialAd(adUnitID);
+                                                    }
+                                                });
+                                    }
+                                }
+                            },
+                            new UserMessagingPlatform.OnConsentFormLoadFailureListener() {
+                                @Override
+                                public void onConsentFormLoadFailure(FormError formError) {
+                                    // Handle Error.
+                                }
+                            }
+                    );
                 }
 
+                // load ad
                 if (consentInformation.getConsentStatus() == ConsentInformation.ConsentStatus.OBTAINED) {
                     AdRequest adRequest = new AdRequest.Builder().build();
                     InterstitialAd.load(

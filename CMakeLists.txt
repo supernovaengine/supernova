@@ -393,8 +393,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
 
         # To run on iOS simulator
         ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/FBLPromises.xcframework/ios-arm64_x86_64-simulator/FBLPromises.framework
-        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleAppMeasurement.xcframework/ios-arm64_i386_x86_64-simulator/GoogleAppMeasurement.framework
-        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleAppMeasurementIdentitySupport.xcframework/ios-arm64_i386_x86_64-simulator/GoogleAppMeasurementIdentitySupport.framework
+        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleAppMeasurement.xcframework/ios-arm64_x86_64-simulator/GoogleAppMeasurement.framework
+        ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleAppMeasurementIdentitySupport.xcframework/ios-arm64_x86_64-simulator/GoogleAppMeasurementIdentitySupport.framework
         ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleMobileAds.xcframework/ios-arm64_x86_64-simulator/GoogleMobileAds.framework
         ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleUtilities.xcframework/ios-arm64_x86_64-simulator/GoogleUtilities.framework
         ${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/UserMessagingPlatform.xcframework/ios-arm64_x86_64-simulator/UserMessagingPlatform.framework
@@ -402,8 +402,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
 
         # TODO: use here to run on real iOS devices
         #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/FBLPromises.xcframework/ios-arm64/FBLPromises.framework
-        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleAppMeasurement.xcframework/ios-arm64_armv7/GoogleAppMeasurement.framework
-        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleAppMeasurementIdentitySupport.xcframework/ios-arm64_armv7/GoogleAppMeasurementIdentitySupport.framework
+        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleAppMeasurement.xcframework/ios-arm64/GoogleAppMeasurement.framework
+        #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleAppMeasurementIdentitySupport.xcframework/ios-arm64/GoogleAppMeasurementIdentitySupport.framework
         #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleMobileAds.xcframework/ios-arm64/GoogleMobileAds.framework
         #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/GoogleUtilities.xcframework/ios-arm64/GoogleUtilities.framework
         #${PLATFORM_ROOT}/GoogleMobileAdsSdkiOS-10.8.0/UserMessagingPlatform.xcframework/ios-arm64_armv7/UserMessagingPlatform.framework

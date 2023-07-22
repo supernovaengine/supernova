@@ -28,7 +28,7 @@
 - (nonnull instancetype)init {
     
     _rootController = (ViewController*)[[(AppDelegate*) [[UIApplication sharedApplication]delegate] window] rootViewController];
-
+    
     return self;
 }
 
@@ -38,52 +38,8 @@
     [self setTagForChildDirectedTreatment: tagForChildDirectedTreatment];
     [self setTagForUnderAgeOfConsent: tagForUnderAgeOfConsent];
     
-    //UMPDebugSettings *debugSettings = [[UMPDebugSettings alloc] init];
-    //debugSettings.testDeviceIdentifiers = @[ GADSimulatorID ];
-    //debugSettings.geography = UMPDebugGeographyEEA;
+    [self requestConsent: (tagForChildDirectedTreatment || tagForUnderAgeOfConsent)];
     
-    // Create a UMPRequestParameters object.
-    // Set tag for under age of consent. Here NO means users are not under age.
-    UMPRequestParameters *parameters = [[UMPRequestParameters alloc] init];
-    //parameters.debugSettings = debugSettings;
-    parameters.tagForUnderAgeOfConsent = tagForChildDirectedTreatment || tagForUnderAgeOfConsent;
-    
-    //[UMPConsentInformation.sharedInstance reset];
-    
-    // Request an update to the consent information.
-    [UMPConsentInformation.sharedInstance
-        requestConsentInfoUpdateWithParameters:parameters
-                             completionHandler:^(NSError* _Nullable error) {
-                               // The consent information has updated.
-                               if (error) {
-                                   // Handle the error.
-                               } else {
-                                   // The consent information state was updated.
-                                   // You are now ready to see if a form is available.
-                               }
-                             }];
-}
-
-- (void)loadForm {
-  [UMPConsentForm loadWithCompletionHandler:^(UMPConsentForm *form, NSError *loadError) {
-      if (loadError) {
-          // Handle the error.
-          NSLog(@"Failed to load consent form with error: %@", [loadError localizedDescription]);
-      } else {
-          // Present the form. You can also hold on to the reference to present
-          // later.
-          if (UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusRequired) {
-              [form
-               presentFromViewController:self->_rootController
-                    completionHandler:^(NSError *_Nullable dismissError) {
-                        // Handle dismissal by reloading form.
-                        [self loadForm];
-                    }];
-          } else {
-              // Keep the form available for changes to user consent.
-          }
-      }
-  }];
 }
 
 - (void)setTagForChildDirectedTreatment:(Boolean)tagForChildDirectedTreatment {
@@ -102,12 +58,59 @@
     }
 }
 
+- (void)requestConsent:(Boolean)tagForUnderAgeOfConsent {
+    //UMPDebugSettings *debugSettings = [[UMPDebugSettings alloc] init];
+    //debugSettings.testDeviceIdentifiers = @[ GADSimulatorID ];
+    //debugSettings.geography = UMPDebugGeographyEEA;
+    
+    // Create a UMPRequestParameters object.
+    // Set tag for under age of consent. Here NO means users are not under age.
+    UMPRequestParameters *parameters = [[UMPRequestParameters alloc] init];
+    //parameters.debugSettings = debugSettings;
+    parameters.tagForUnderAgeOfConsent = tagForUnderAgeOfConsent;
+    
+    //[UMPConsentInformation.sharedInstance reset];
+    
+    // Request an update to the consent information.
+    [UMPConsentInformation.sharedInstance
+     requestConsentInfoUpdateWithParameters:parameters
+     completionHandler:^(NSError* _Nullable error) {
+        // The consent information has updated.
+        if (error) {
+            // Handle the error.
+        } else {
+            // The consent information state was updated.
+            // You are now ready to see if a form is available.
+        }
+    }];
+}
+
 - (void)loadInterstitial:(NSString *)adUnitID {
+    // load consent form
     UMPFormStatus formStatus = UMPConsentInformation.sharedInstance.formStatus;
     if (formStatus == UMPFormStatusAvailable) {
-        [self loadForm];
+        [UMPConsentForm loadWithCompletionHandler:^(UMPConsentForm *form, NSError *loadError) {
+            if (loadError) {
+                // Handle the error.
+                NSLog(@"Failed to load consent form with error: %@", [loadError localizedDescription]);
+            } else {
+                // Present the form. You can also hold on to the reference to present
+                // later.
+                if (UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusRequired) {
+                    [form
+                     presentFromViewController:self->_rootController
+                          completionHandler:^(NSError *_Nullable dismissError) {
+                              // Handle dismissal by reloading form.
+                            [self loadInterstitial:adUnitID];
+                          }];
+                } else {
+                    // Keep the form available for changes to user consent.
+                }
+            }
+        }];
     }
     
+    // load ad
     if (UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusObtained) {
         GADRequest *request = [GADRequest request];
         [GADInterstitialAd
