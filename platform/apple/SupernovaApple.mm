@@ -192,21 +192,9 @@ void SupernovaApple::removeKey(const char *key){
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:[NSString stringWithUTF8String:key]];
 }
 
-void SupernovaApple::initializeAdMob(){
+void SupernovaApple::initializeAdMob(bool tagForChildDirectedTreatment, bool tagForUnderAgeOfConsent){
 #if TARGET_OS_IPHONE
-    [admob initializeAdMob];
-#endif
-}
-
-void SupernovaApple::tagForChildDirectedTreatmentAdMob(bool enable){
-#if TARGET_OS_IPHONE
-    [admob tagForChildDirectedTreatment:enable];
-#endif
-}
-
-void SupernovaApple::tagForUnderAgeOfConsentAdMob(bool enable){
-#if TARGET_OS_IPHONE
-    [admob tagForUnderAgeOfConsent:enable];
+    [admob initializeAdMob: tagForChildDirectedTreatment and:tagForUnderAgeOfConsent];
 #endif
 }
 

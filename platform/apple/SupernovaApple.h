@@ -41,9 +41,7 @@ public:
 
     virtual void removeKey(const char *key);
 
-    virtual void initializeAdMob();
-    virtual void tagForChildDirectedTreatmentAdMob(bool enable);
-    virtual void tagForUnderAgeOfConsentAdMob(bool enable);
+    virtual void initializeAdMob(bool tagForChildDirectedTreatment, bool tagForUnderAgeOfConsent);
     virtual void loadInterstitialAd(std::string adUnitID);
     virtual bool isInterstitialAdLoaded();
     virtual void showInterstitialAd();

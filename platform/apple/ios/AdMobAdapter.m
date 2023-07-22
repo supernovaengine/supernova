@@ -11,6 +11,8 @@
 #import "ViewController.h"
 #import "Renderer.h"
 
+#include <UserMessagingPlatform/UserMessagingPlatform.h>
+
 @import GoogleMobileAds;
 
 @interface AdMobAdapter () <GADFullScreenContentDelegate>
@@ -30,39 +32,96 @@
     return self;
 }
 
-- (void)initializeAdMob {
+- (void)initializeAdMob:(Boolean)tagForChildDirectedTreatment and:(Boolean)tagForUnderAgeOfConsent {
     [GADMobileAds.sharedInstance startWithCompletionHandler:nil];
+    
+    [self setTagForChildDirectedTreatment: tagForChildDirectedTreatment];
+    [self setTagForUnderAgeOfConsent: tagForUnderAgeOfConsent];
+    
+    //UMPDebugSettings *debugSettings = [[UMPDebugSettings alloc] init];
+    //debugSettings.testDeviceIdentifiers = @[ GADSimulatorID ];
+    //debugSettings.geography = UMPDebugGeographyEEA;
+    
+    // Create a UMPRequestParameters object.
+    // Set tag for under age of consent. Here NO means users are not under age.
+    UMPRequestParameters *parameters = [[UMPRequestParameters alloc] init];
+    //parameters.debugSettings = debugSettings;
+    parameters.tagForUnderAgeOfConsent = tagForChildDirectedTreatment || tagForUnderAgeOfConsent;
+    
+    //[UMPConsentInformation.sharedInstance reset];
+    
+    // Request an update to the consent information.
+    [UMPConsentInformation.sharedInstance
+        requestConsentInfoUpdateWithParameters:parameters
+                             completionHandler:^(NSError* _Nullable error) {
+                               // The consent information has updated.
+                               if (error) {
+                                   // Handle the error.
+                               } else {
+                                   // The consent information state was updated.
+                                   // You are now ready to see if a form is available.
+                               }
+                             }];
 }
 
-- (void)tagForChildDirectedTreatment:(Boolean)enable {
-    if (enable){
-        [GADMobileAds.sharedInstance.requestConfiguration tagForChildDirectedTreatment:YES];
+- (void)loadForm {
+  [UMPConsentForm loadWithCompletionHandler:^(UMPConsentForm *form, NSError *loadError) {
+      if (loadError) {
+          // Handle the error.
+          NSLog(@"Failed to load consent form with error: %@", [loadError localizedDescription]);
+      } else {
+          // Present the form. You can also hold on to the reference to present
+          // later.
+          if (UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusRequired) {
+              [form
+               presentFromViewController:self->_rootController
+                    completionHandler:^(NSError *_Nullable dismissError) {
+                        // Handle dismissal by reloading form.
+                        [self loadForm];
+                    }];
+          } else {
+              // Keep the form available for changes to user consent.
+          }
+      }
+  }];
+}
+
+- (void)setTagForChildDirectedTreatment:(Boolean)tagForChildDirectedTreatment {
+    if (tagForChildDirectedTreatment){
+        GADMobileAds.sharedInstance.requestConfiguration.tagForChildDirectedTreatment = @YES;
     }else{
-        [GADMobileAds.sharedInstance.requestConfiguration tagForChildDirectedTreatment:NO];
+        GADMobileAds.sharedInstance.requestConfiguration.tagForChildDirectedTreatment = @NO;
     }
 }
 
-- (void)tagForUnderAgeOfConsent:(Boolean)enable {
-    if (enable){
-        [GADMobileAds.sharedInstance.requestConfiguration tagForUnderAgeOfConsent:YES];
+- (void)setTagForUnderAgeOfConsent:(Boolean)tagForUnderAgeOfConsent {
+    if (tagForUnderAgeOfConsent){
+        GADMobileAds.sharedInstance.requestConfiguration.tagForUnderAgeOfConsent = @YES;
     }else{
-        [GADMobileAds.sharedInstance.requestConfiguration tagForUnderAgeOfConsent:NO];
+        GADMobileAds.sharedInstance.requestConfiguration.tagForUnderAgeOfConsent = @NO;
     }
 }
 
 - (void)loadInterstitial:(NSString *)adUnitID {
-    GADRequest *request = [GADRequest request];
-    [GADInterstitialAd
-     loadWithAdUnitID:adUnitID
-     request:request
-     completionHandler:^(GADInterstitialAd *ad, NSError *error) {
-        if (error) {
-            NSLog(@"Failed to load interstitial ad with error: %@", [error localizedDescription]);
-            return;
-        }
-        self.interstitial = ad;
-        self.interstitial.fullScreenContentDelegate = self;
-    }];
+    UMPFormStatus formStatus = UMPConsentInformation.sharedInstance.formStatus;
+    if (formStatus == UMPFormStatusAvailable) {
+        [self loadForm];
+    }
+    
+    if (UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusObtained) {
+        GADRequest *request = [GADRequest request];
+        [GADInterstitialAd
+         loadWithAdUnitID:adUnitID
+         request:request
+         completionHandler:^(GADInterstitialAd *ad, NSError *error) {
+            if (error) {
+                NSLog(@"Failed to load interstitial ad with error: %@", [error localizedDescription]);
+                return;
+            }
+            self.interstitial = ad;
+            self.interstitial.fullScreenContentDelegate = self;
+        }];
+    }
 }
 
 - (bool)isInterstitialAdLoaded {

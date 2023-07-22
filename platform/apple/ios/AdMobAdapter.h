@@ -11,11 +11,7 @@
 
 - (nonnull instancetype)init;
 
-- (void)initializeAdMob;
-
-- (void)tagForChildDirectedTreatment:(Boolean)enable;
-
-- (void)tagForUnderAgeOfConsent:(Boolean)enable;
+- (void)initializeAdMob:(Boolean)tagForChildDirectedTreatment and:(Boolean)tagForUnderAgeOfConsent;
 
 - (void)loadInterstitial:(nonnull NSString *)adUnitID;
 
