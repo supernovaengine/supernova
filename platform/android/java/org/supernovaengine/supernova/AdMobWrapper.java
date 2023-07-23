@@ -161,7 +161,8 @@ public class AdMobWrapper {
                 }
 
                 // load ad
-                if (consentInformation.getConsentStatus() == ConsentInformation.ConsentStatus.OBTAINED) {
+                if (consentInformation.getConsentStatus() == ConsentInformation.ConsentStatus.OBTAINED ||
+                        consentInformation.getConsentStatus() == ConsentInformation.ConsentStatus.NOT_REQUIRED) {
                     AdRequest adRequest = new AdRequest.Builder().build();
                     InterstitialAd.load(
                             activity,

@@ -112,8 +112,8 @@
     }
     
     // load ad
-    if ((UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusObtained) ||
-        (UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusNotRequired)){
+    if (UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusObtained ||
+        UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusNotRequired){
         GADRequest *request = [GADRequest request];
         [GADInterstitialAd
          loadWithAdUnitID:adUnitID
