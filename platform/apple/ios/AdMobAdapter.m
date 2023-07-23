@@ -78,6 +78,7 @@
         // The consent information has updated.
         if (error) {
             // Handle the error.
+            NSLog(@"Failed to request consent form with error: %@", [error localizedDescription]);
         } else {
             // The consent information state was updated.
             // You are now ready to see if a form is available.
@@ -111,7 +112,8 @@
     }
     
     // load ad
-    if (UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusObtained) {
+    if ((UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusObtained) ||
+        (UMPConsentInformation.sharedInstance.consentStatus == UMPConsentStatusNotRequired)){
         GADRequest *request = [GADRequest request];
         [GADInterstitialAd
          loadWithAdUnitID:adUnitID
