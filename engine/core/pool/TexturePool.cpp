@@ -66,7 +66,9 @@ void TexturePool::remove(std::string id){
 			getMap().erase(id);
 		}
 	}else{
-		Log::debug("Trying to destroy a not existent texture: %s", id.c_str());
+		if (Engine::isViewLoaded()){
+			Log::debug("Trying to destroy a non existent texture: %s", id.c_str());
+		}
 	}
 }
 

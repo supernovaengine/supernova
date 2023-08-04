@@ -140,7 +140,9 @@ void ShaderPool::remove(ShaderType shaderType, std::string properties){
 			getMap().erase(shaderStr);
 		}
 	}else{
-		Log::debug("Trying to destroy a not existent shader");
+		if (Engine::isViewLoaded()){
+			Log::debug("Trying to destroy a non existent shader");
+		}
 	}
 }
 

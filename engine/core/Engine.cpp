@@ -554,6 +554,7 @@ void Engine::systemViewDestroyed(){
     viewLoaded = false;
     Engine::onViewDestroyed.call();
 
+    //TODO: must destroy all scenes (even if not a layer)
     for (int i = 0; i < numScenes; i++){
         scenes[i]->destroy();
     }
