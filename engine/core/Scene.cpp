@@ -64,7 +64,6 @@ Scene::Scene(){
 	camera = NULL_ENTITY;
 	defaultCamera = NULL_ENTITY;
 
-	mainScene = false;
 	backgroundColor = Vector4(0.0, 0.0, 0.0, 1.0); //sRGB
 	shadowsPCF = true;
 
@@ -72,7 +71,7 @@ Scene::Scene(){
 	ambientLight = Vector3(1.0, 1.0, 1.0);
 	ambientFactor = 0.2;
 
-	enableUIEvents = true;
+	enableUIEvents = false;
 
 	if (camera == NULL_ENTITY){
 		camera = createDefaultCamera();
@@ -115,14 +114,6 @@ Entity Scene::createDefaultCamera(){
 	camera.transparentSort = false;
 
 	return defaultCamera;
-}
-
-void Scene::setMainScene(bool mainScene){
-	this->mainScene = mainScene;
-}
-
-bool Scene::isMainScene() const{
-	return mainScene;
 }
 
 void Scene::setBackgroundColor(Vector4 color){
@@ -175,6 +166,13 @@ bool Scene::isSceneAmbientLightEnabled() const{
 
 void Scene::setSceneAmbientLightEnabled(bool hasSceneAmbientLight){
 	this->hasSceneAmbientLight = hasSceneAmbientLight;
+}
+
+bool Scene::canReceiveUIEvents(){
+	if (Engine::getLastScene() == this || this->enableUIEvents){
+		return true;
+	}
+	return false;
 }
 
 bool Scene::isEnableUIEvents() const{

@@ -55,7 +55,6 @@ namespace Supernova{
 	private:
 
 		Entity camera;
-		bool mainScene;
 		Entity defaultCamera;
 
 		Vector4 backgroundColor;
@@ -90,9 +89,6 @@ namespace Supernova{
 		void setCamera(Entity camera);
 		Entity getCamera() const;
 
-		void setMainScene(bool mainScene);
-		bool isMainScene() const;
-
 		void setBackgroundColor(Vector4 color);
 		void setBackgroundColor(float red, float green, float blue);
 		Vector4 getBackgroundColor() const;
@@ -109,6 +105,8 @@ namespace Supernova{
 
 		bool isSceneAmbientLightEnabled() const;
 		void setSceneAmbientLightEnabled(bool hasSceneAmbientLight);
+
+		bool canReceiveUIEvents();
 
 		bool isEnableUIEvents() const;
 		void setEnableUIEvents(bool enableUIEvents);

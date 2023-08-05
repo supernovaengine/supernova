@@ -2664,7 +2664,7 @@ void RenderSystem::draw(){
 			continue; // camera is not used
 		}
 
-		if (scene->isMainScene() || camera.renderToTexture){
+		if (Engine::getMainScene() == scene || camera.renderToTexture){
 			sceneRender.setClearColor(scene->getBackgroundColor());
 		}
 		

@@ -22,6 +22,8 @@ using namespace Supernova;
 Scene* Engine::scenes[MAX_SCENE_LAYERS] = {NULL};
 size_t Engine::numScenes = 0;
 
+Scene* Engine::mainScene = NULL;
+
 int Engine::canvasWidth;
 int Engine::canvasHeight;
 
@@ -84,7 +86,8 @@ void Engine::setScene(Scene* scene){
 
     numScenes = 0;
     if (scene){
-        includeScene(0, scene, true);
+        includeScene(0, scene);
+        mainScene = scene;
 
         for (int i = 0; i < MAX_SCENE_LAYERS; i++){
             if (scenes[i]){
@@ -118,7 +121,7 @@ void Engine::addSceneLayer(Scene* scene){
                 break;
             }
             if (!scenes[i]){
-                includeScene(i, scene, false);
+                includeScene(i, scene);
 
                 numScenes++;
                 foundSlot = true;
@@ -167,9 +170,23 @@ void Engine::removeAllSceneLayers(){
         drawSemaphore.release();
 }
 
-void Engine::includeScene(size_t index, Scene* scene, bool mainScene){
+Scene* Engine::getMainScene(){
+    return mainScene;
+}
+
+Scene* Engine::getLastScene(){
+    int index = 0;
+    for (int i = 1; i < MAX_SCENE_LAYERS; i++){
+        if (scenes[i]){
+            index = i;
+        }
+    }
+
+    return scenes[index];
+}
+
+void Engine::includeScene(size_t index, Scene* scene){
     scenes[index] = scene;
-    scene->setMainScene(mainScene);
     if (viewLoaded){
         scene->load();
         scene->updateSizeFromCamera();
@@ -614,7 +631,7 @@ void Engine::systemTouchStart(int pointer, float x, float y){
         }
 
         for (int i = 0; i < numScenes; i++){
-            if (scenes[i]->isEnableUIEvents())
+            if (scenes[i]->canReceiveUIEvents())
                 scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
         }
     }
@@ -635,7 +652,7 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
         }
 
         for (int i = 0; i < numScenes; i++){
-            if (scenes[i]->isEnableUIEvents())
+            if (scenes[i]->canReceiveUIEvents())
                 scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
         }
     }
@@ -680,7 +697,7 @@ void Engine::systemMouseDown(int button, float x, float y, int mods){
         }
 
         for (int i = 0; i < numScenes; i++){
-            if (scenes[i]->isEnableUIEvents())
+            if (scenes[i]->canReceiveUIEvents())
                 if (button == S_MOUSE_BUTTON_1)
                     scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
         }
@@ -703,7 +720,7 @@ void Engine::systemMouseUp(int button, float x, float y, int mods){
         }
 
         for (int i = 0; i < numScenes; i++){
-            if (scenes[i]->isEnableUIEvents())
+            if (scenes[i]->canReceiveUIEvents())
                 if (button == S_MOUSE_BUTTON_1)
                     scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
         }
@@ -773,7 +790,7 @@ void Engine::systemCharInput(wchar_t codepoint){
     onCharInput.call(codepoint);
 
     for (int i = 0; i < numScenes; i++){
-        if (scenes[i]->isEnableUIEvents())
+        if (scenes[i]->canReceiveUIEvents())
             scenes[i]->getSystem<UISystem>()->eventOnCharInput(codepoint);
     }
 }
