@@ -495,7 +495,7 @@ void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& sh
 
 bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 
-	if (!Engine::isViewLoaded) 
+	if (!Engine::isViewLoaded()) 
 		return false;
 
 	std::map<std::string, Buffer*> buffers;
@@ -975,7 +975,7 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 
 bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
 
-	if (!Engine::isViewLoaded) 
+	if (!Engine::isViewLoaded()) 
 		return false;
 
 	if (!terrain.heightMapLoaded)
@@ -1208,7 +1208,7 @@ void RenderSystem::destroyTerrain(Entity entity, TerrainComponent& terrain){
 
 bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, bool isText){
 
-	if (!Engine::isViewLoaded) 
+	if (!Engine::isViewLoaded()) 
 		return false;
 
 	ObjectRender& render = uirender.render;
@@ -1360,7 +1360,7 @@ void RenderSystem::destroyUI(Entity entity, UIComponent& uirender){
 
 bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
 
-	if (!Engine::isViewLoaded) 
+	if (!Engine::isViewLoaded()) 
 		return false;
 
 	ObjectRender& render = particles.render;
@@ -1481,7 +1481,7 @@ void RenderSystem::destroyParticles(Entity entity, ParticlesComponent& particles
 
 bool RenderSystem::loadSky(Entity entity, SkyComponent& sky){
 
-	if (!Engine::isViewLoaded) 
+	if (!Engine::isViewLoaded()) 
 		return false;	
 
 	createSky(sky);

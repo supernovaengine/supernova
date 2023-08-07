@@ -11,7 +11,7 @@ def supernovaRootAbs = file(supernovaRoot).toString()
 // def platformVersion = 12    //openGLES 2 min api level
 
 android {
-    compileSdkVersion 33
+    compileSdk 33
     defaultConfig {
         applicationId "com.yourcompany.project"
         minSdkVersion 19
