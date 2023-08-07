@@ -724,6 +724,58 @@ void UISystem::destroy(){
 void UISystem::draw(){
 }
 
+void UISystem::createOrUpdateUiComponent(double dt, UILayoutComponent& layout, Entity entity, Signature signature){
+    if (signature.test(scene->getComponentType<UIComponent>())){
+        UIComponent& ui = scene->getComponent<UIComponent>(entity);
+
+        // Texts
+        if (signature.test(scene->getComponentType<TextComponent>())){
+            TextComponent& text = scene->getComponent<TextComponent>(entity);
+
+            createOrUpdateText(text, ui, layout);
+        }
+
+        // UI Polygons
+        if (signature.test(scene->getComponentType<PolygonComponent>())){
+            PolygonComponent& polygon = scene->getComponent<PolygonComponent>(entity);
+
+            createOrUpdatePolygon(polygon, ui, layout);
+        }
+
+        // Images
+        if (signature.test(scene->getComponentType<ImageComponent>())){
+            ImageComponent& img = scene->getComponent<ImageComponent>(entity);
+
+            createOrUpdateImage(img, ui, layout);
+
+            // Buttons
+            if (signature.test(scene->getComponentType<ButtonComponent>())){
+                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+
+                if (button.needUpdateButton){
+                    updateButton(entity, button, img, ui, layout);
+
+                    button.needUpdateButton = false;
+                }
+            }
+
+            // Textedits
+            if (signature.test(scene->getComponentType<TextEditComponent>())){
+                TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
+
+                if (textedit.needUpdateTextEdit){
+                    updateTextEdit(entity, textedit, img, ui, layout);
+
+                    textedit.needUpdateTextEdit = false;
+                }
+
+                blinkCursorTextEdit(dt, textedit, ui);
+            }
+        }
+
+    }
+}
+
 void UISystem::update(double dt){
 
     // need to be ordered by Transform
@@ -734,6 +786,8 @@ void UISystem::update(double dt){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
+
+        createOrUpdateUiComponent(dt, layout, entity, signature);
 
         if (signature.test(scene->getComponentType<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
@@ -758,9 +812,6 @@ void UISystem::update(double dt){
                     }
                 }
 
-                //TODO: Fix when container child is an image not loaded yet and size is 0.
-                //      Container size is setted without this image size and it keeps small.
-                //      To test: Use a container with defined size image and other non defined size.
                 layout.width = (layout.width > 0)? layout.width : genWidth;
                 layout.height = (layout.height > 0)? layout.height : genHeight;
 
@@ -913,55 +964,7 @@ void UISystem::update(double dt){
             layout.needUpdateSizes = false;
         }
 
-        if (signature.test(scene->getComponentType<UIComponent>())){
-            UIComponent& ui = scene->getComponent<UIComponent>(entity);
-
-            // Texts
-            if (signature.test(scene->getComponentType<TextComponent>())){
-                TextComponent& text = scene->getComponent<TextComponent>(entity);
-
-                createOrUpdateText(text, ui, layout);
-            }
-
-            // UI Polygons
-            if (signature.test(scene->getComponentType<PolygonComponent>())){
-                PolygonComponent& polygon = scene->getComponent<PolygonComponent>(entity);
-
-                createOrUpdatePolygon(polygon, ui, layout);
-            }
-
-            // Images
-            if (signature.test(scene->getComponentType<ImageComponent>())){
-                ImageComponent& img = scene->getComponent<ImageComponent>(entity);
-
-                createOrUpdateImage(img, ui, layout);
-
-                // Buttons
-                if (signature.test(scene->getComponentType<ButtonComponent>())){
-                    ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-
-                    if (button.needUpdateButton){
-                        updateButton(entity, button, img, ui, layout);
-                        
-                        button.needUpdateButton = false;
-                    }
-                }
-
-                // Textedits
-                if (signature.test(scene->getComponentType<TextEditComponent>())){
-                    TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
-
-                    if (textedit.needUpdateTextEdit){
-                        updateTextEdit(entity, textedit, img, ui, layout);
-
-                        textedit.needUpdateTextEdit = false;
-                    }
-
-                    blinkCursorTextEdit(dt, textedit, ui);
-                }
-            }
-
-        }
+        createOrUpdateUiComponent(dt, layout, entity, signature);
 
         if (signature.test(scene->getComponentType<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);

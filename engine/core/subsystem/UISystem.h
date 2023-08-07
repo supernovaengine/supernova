@@ -26,6 +26,8 @@ namespace Supernova{
 
 		std::string eventId;
 
+		void createOrUpdateUiComponent(double dt, UILayoutComponent& layout, Entity entity, Signature signature);
+
 		//Image
 		bool createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
 
