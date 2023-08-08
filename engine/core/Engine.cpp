@@ -568,6 +568,8 @@ void Engine::systemDraw(){
 }
 
 void Engine::systemViewDestroyed(){
+    drawSemaphore.acquire();
+    
     viewLoaded = false;
     Engine::onViewDestroyed.call();
 
@@ -580,6 +582,8 @@ void Engine::systemViewDestroyed(){
 
     TexturePool::clear();
     ShaderPool::clear();
+
+    drawSemaphore.release();
 }
 
 void Engine::systemShutdown(){
