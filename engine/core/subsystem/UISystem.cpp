@@ -280,6 +280,7 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
 
     labellayout.width = 0;
     labellayout.height = 0;
+    labeltext.needUpdateText = true;
     createOrUpdateText(labeltext, labelui, labellayout);
     
     labellayout.anchorPreset = AnchorPreset::CENTER;
@@ -339,6 +340,7 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
     TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
 
+    text.needUpdateText = true;
     createOrUpdateText(text, textui, textlayout);
 
     if (layout.height == 0){
