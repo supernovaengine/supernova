@@ -35,8 +35,8 @@ int SupernovaAndroid::getScreenHeight(){
     return NativeEngine::getInstance()->getSurfHeight();
 }
 
-void SupernovaAndroid::showVirtualKeyboard(){
-    NativeEngine::getInstance()->showSoftInput();
+void SupernovaAndroid::showVirtualKeyboard(std::wstring text){
+    NativeEngine::getInstance()->showSoftInput(text);
 }
 
 void SupernovaAndroid::hideVirtualKeyboard(){

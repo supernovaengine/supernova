@@ -1086,7 +1086,13 @@ void UISystem::eventOnPointerDown(float x, float y){
             }
 
             if (signature.test(scene->getComponentType<TextEditComponent>())){
-                System::instance().showVirtualKeyboard();
+                TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
+                TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
+
+                std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+                std::wstring utf16Text = convert.from_bytes(text.text);
+
+                System::instance().showVirtualKeyboard(utf16Text);
             }else{
                 System::instance().hideVirtualKeyboard();
             }

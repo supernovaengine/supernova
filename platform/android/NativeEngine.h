@@ -124,7 +124,7 @@ public:
     int getSurfHeight();
     int getScreenDensity();
 
-    void showSoftInput();
+    void showSoftInput(std::wstring text);
     void hideSoftInput();
 
     std::string getInternalDataPath();

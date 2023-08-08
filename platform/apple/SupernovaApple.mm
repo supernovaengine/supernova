@@ -56,7 +56,7 @@ int SupernovaApple::getScreenHeight(){
     return Renderer.screenSize.height;
 }
 
-void SupernovaApple::showVirtualKeyboard(){
+void SupernovaApple::showVirtualKeyboard(std::wstring text){
 #if TARGET_OS_IPHONE
     [Renderer.view becomeFirstResponder];
 #endif

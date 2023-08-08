@@ -59,7 +59,7 @@ sg_context_desc System::getSokolContext(){
     return {};
 }
 
-void System::showVirtualKeyboard(){
+void System::showVirtualKeyboard(std::wstring text){
 
 }
 

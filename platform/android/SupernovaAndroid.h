@@ -18,7 +18,7 @@ public:
     virtual int getScreenWidth();
     virtual int getScreenHeight();
 
-	virtual void showVirtualKeyboard();
+	virtual void showVirtualKeyboard(std::wstring text);
 	virtual void hideVirtualKeyboard();
 
 	std::string getUserDataPath();

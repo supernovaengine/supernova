@@ -60,8 +60,7 @@ static NativeEngine *_singleton = NULL;
 // workaround for internal bug b/149866792
 static NativeEngineSavedState appState = {false};
 
-static std::string textInputBuffer;
-static bool firstInput;
+static std::wstring textInputBuffer;
 
 
 NativeEngine::NativeEngine(struct android_app *app) {
@@ -92,8 +91,7 @@ NativeEngine::NativeEngine(struct android_app *app) {
     // https://developer.android.com/reference/android/view/inputmethod/EditorInfo
     constexpr int IME_ACTION_NONE = 1;
     constexpr int IME_FLAG_NO_FULLSCREEN = 33554432;
-
-    //TODO: add support to input suggestions
+    
     GameActivity_setImeEditorInfo(app->activity, InputType_dot_TYPE_CLASS_TEXT, IME_ACTION_NONE, IME_FLAG_NO_FULLSCREEN);
 
     if (app->savedState != NULL) {
@@ -168,14 +166,16 @@ int NativeEngine::getScreenDensity(){
     return mScreenDensity;
 }
 
-void NativeEngine::showSoftInput(){
-    textInputBuffer = "";
-    firstInput = true;
+void NativeEngine::showSoftInput(std::wstring text){
+    textInputBuffer = text;
 
-    mGameTextInputState.text_UTF8 = textInputBuffer.data();
-    mGameTextInputState.text_length = textInputBuffer.length();
-    mGameTextInputState.selection.start = textInputBuffer.length();
-    mGameTextInputState.selection.end = textInputBuffer.length();
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+    std::string strInputBuffer = convert.to_bytes(textInputBuffer);
+
+    mGameTextInputState.text_UTF8 = strInputBuffer.data();
+    mGameTextInputState.text_length = strInputBuffer.length();
+    mGameTextInputState.selection.start = strInputBuffer.length();
+    mGameTextInputState.selection.end = strInputBuffer.length();
     mGameTextInputState.composingRegion.start = -1;
     mGameTextInputState.composingRegion.end = -1;
 
@@ -248,20 +248,28 @@ void NativeEngine::gameLoop() {
         if (mApp->textInputState) {
                 GameActivity_getTextInputState(mApp->activity, [](void *context, const GameTextInputState *state) {
                     if (!context || !state) return;
-                    if (textInputBuffer.length() < state->text_length) {
-                        // text_length is different from utf16Text.length and state->(selection or composingRegion) with unicode chars
-                        if (state->text_length > 0) {
-                            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > convert;
-                            std::wstring utf16Text = convert.from_bytes(state->text_UTF8);
 
-                            // getting only the last character
-                            Supernova::Engine::systemCharInput(utf16Text.back());
-                        }
-                    }else if (!firstInput){
+                    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+                    std::wstring utf16Text = convert.from_bytes(state->text_UTF8);
+
+                    while (textInputBuffer.length() > utf16Text.length()){
+                        textInputBuffer.pop_back();
                         Supernova::Engine::systemCharInput('\b');
                     }
-                    textInputBuffer = std::string(state->text_UTF8, state->text_length);
-                    firstInput = false;
+
+                    int pos = 0;
+                    while (textInputBuffer[pos] == utf16Text[pos] and pos < textInputBuffer.length()){
+                        pos++;
+                    }
+
+                    for (int i = pos; i < textInputBuffer.length(); i++){
+                        Supernova::Engine::systemCharInput('\b');
+                    }
+                    for (int i = pos; i < utf16Text.length(); i++){
+                        Supernova::Engine::systemCharInput(utf16Text[i]);
+                    }
+                    textInputBuffer = utf16Text;
+
                 }, this);
             mApp->textInputState = 0;
         }
