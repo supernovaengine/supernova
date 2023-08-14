@@ -13,6 +13,7 @@ include_directories(libs/soloud/include)
 include_directories(libs/tinyobjloader)
 include_directories(libs/tinygltf)
 include_directories(libs/tinyxml2)
+include_directories(libs/box2d/include/box2d)
 
 add_subdirectory(libs/sokol)
 add_subdirectory(libs/lua)
@@ -21,6 +22,7 @@ add_subdirectory(libs/soloud)
 add_subdirectory(libs/tinyobjloader)
 add_subdirectory(libs/tinygltf)
 add_subdirectory(libs/tinyxml2)
+add_subdirectory(libs/box2d)
 
 if(DEFINED NO_LUA_INIT)
     add_definitions("-DNO_LUA_INIT=${NO_LUA_INIT}")
@@ -58,8 +60,7 @@ endif()
 target_link_libraries(
     supernova
 
-    sokol lua stb tinyobjloader tinygltf tinyxml2 soloud
-    #box2d
+    sokol lua stb tinyobjloader tinygltf tinyxml2 soloud box2d
 )
 
 set_target_properties(
