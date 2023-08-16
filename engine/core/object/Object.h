@@ -59,6 +59,8 @@ namespace Supernova{
         void setModelMatrix(Matrix4 modelMatrix);
 
         void updateTransform();
+
+        void createRectangularBody(float width, float height);
     };
 
 }

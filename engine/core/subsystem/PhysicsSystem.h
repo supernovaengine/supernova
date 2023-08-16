@@ -6,14 +6,26 @@
 #define PHYSICSSYSTEM_H
 
 #include "SubSystem.h"
+#include "component/Body2DComponent.h"
+
+class b2World;
 
 namespace Supernova{
 
 	class PhysicsSystem : public SubSystem {
 
+	private:
+		b2World* world2D;
+
 	public:
 		PhysicsSystem(Scene* scene);
 		virtual ~PhysicsSystem();
+
+		void createBody2D(Entity entity);
+		void addRectangleShape2D(Entity entity, float width, float height);
+
+		bool loadBody2D(Body2DComponent& body);
+		void destroyBody2D(Body2DComponent& body);
 
 		virtual void load();
 		virtual void destroy();

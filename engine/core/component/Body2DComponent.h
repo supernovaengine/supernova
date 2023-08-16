@@ -4,9 +4,10 @@
 #include "Supernova.h"
 
 #define MAX_SHAPES 10
-#define MAX_SHAPE_VERTICES 30
 
 class b2Body;
+class b2Shape;
+class b2Fixture;
 
 namespace Supernova{
 
@@ -19,15 +20,16 @@ namespace Supernova{
 
     struct CollisionShape2D{
         CollisionShape2DType type = CollisionShape2DType::POLYGON;
-        float radius = 0;
-        float center = 0;
-        Vector2 vertices[MAX_SHAPE_VERTICES];
+
+        b2Shape* shape = NULL;
+        b2Fixture* fixture = NULL;
     };
 
     struct Body2DComponent{
-        b2Body* groundBody = NULL;
+        b2Body* body = NULL;
 
         CollisionShape2D shapes[MAX_SHAPES];
+        int numShapes = 0;
     };
 
 }

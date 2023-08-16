@@ -456,7 +456,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .beginClass<System>("System")
         .addStaticFunction("getScreenWidth", [] () { return System::instance().getScreenWidth(); })
         .addStaticFunction("getScreenHeight", [] () { return System::instance().getScreenHeight(); })
-        .addStaticFunction("showVirtualKeyboard", [] () { System::instance().showVirtualKeyboard(); })
+        .addStaticFunction("showVirtualKeyboard", [] (std::wstring text) { System::instance().showVirtualKeyboard(text); })
         .addStaticFunction("hideVirtualKeyboard", [] () { System::instance().hideVirtualKeyboard(); })
         .addStaticFunction("isFullscreen", [] () { return System::instance().isFullscreen(); })
         .addStaticFunction("requestFullscreen", [] () { System::instance().requestFullscreen(); })

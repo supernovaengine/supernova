@@ -5,6 +5,7 @@
 #include "Object.h"
 
 #include "subsystem/RenderSystem.h"
+#include "subsystem/PhysicsSystem.h"
 
 using namespace Supernova;
 
@@ -198,4 +199,9 @@ void Object::updateTransform(){
     Transform& transform = getComponent<Transform>();
 
     scene->getSystem<RenderSystem>()->updateTransform(transform);
+}
+
+void Object::createRectangularBody(float width, float height){
+    scene->getSystem<PhysicsSystem>()->createBody2D(entity);
+    scene->getSystem<PhysicsSystem>()->addRectangleShape2D(entity, width, height);
 }
