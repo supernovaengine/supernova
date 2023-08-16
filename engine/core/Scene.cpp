@@ -12,6 +12,7 @@
 #include "subsystem/UISystem.h"
 #include "subsystem/ActionSystem.h"
 #include "subsystem/AudioSystem.h"
+#include "subsystem/PhysicsSystem.h"
 #include "util/Color.h"
 
 using namespace Supernova;
@@ -54,7 +55,9 @@ Scene::Scene(){
 	registerComponent<TerrainComponent>();
 	registerComponent<AudioComponent>();
 	registerComponent<TilemapComponent>();
+	registerComponent<Body2DComponent>();
 
+	registerSystem<PhysicsSystem>();
 	registerSystem<ActionSystem>();
 	registerSystem<MeshSystem>();
 	registerSystem<UISystem>();

@@ -48,6 +48,7 @@
 #include "component/TerrainComponent.h"
 #include "component/AudioComponent.h"
 #include "component/TilemapComponent.h"
+#include "component/Body2DComponent.h"
 
 namespace Supernova{
 
