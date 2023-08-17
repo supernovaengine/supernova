@@ -48,7 +48,7 @@ float Engine::updateTimeCount = 0;
 double Engine::deltatime = 0;
 float Engine::framerate = 0;
 
-float Engine::updateTime = 0.03;
+float Engine::updateTime = 0.01667; //60Hz
 
 std::atomic<bool> Engine::viewLoaded = false;
 std::atomic<bool> Engine::paused = false;
@@ -425,7 +425,7 @@ void Engine::systemInit(int argc, char* argv[]){
     Engine::setUseDegrees(true);
     Engine::setAutomaticTransparency(true);
     Engine::setAllowEventsOutCanvas(false);
-    Engine::setFixedTimeSceneUpdate(false);
+    Engine::setFixedTimeSceneUpdate(true);
 
     lastTime = 0;
     updateTimeCount = 0;

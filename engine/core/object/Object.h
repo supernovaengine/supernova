@@ -62,8 +62,8 @@ namespace Supernova{
         void updateTransform();
 
         // 2D physics
-        void createBody2D();
         Body2D getBody2D();
+        void removeBody2D();
     };
 
 }

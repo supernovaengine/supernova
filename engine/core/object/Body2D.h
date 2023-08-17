@@ -21,6 +21,18 @@ namespace Supernova{
         void setShape2DDensity(size_t index, float density);
         void setShape2DFriction(size_t index, float friction);
         void setShape2DRestitution(size_t index, float restitution);
+
+        void setLinearVelocity(Vector2 linearVelocity);
+        void setAngularVelocity(float angularVelocity);
+        void setLinearDuamping(float linearDamping);
+        void setAngularDamping(float angularDamping);
+        void setAllowSleep(bool allowSleep);
+        void setAwake(bool awake);
+        void setFixedRotation(bool fixedRotation);
+        void setBullet(bool bullet);
+        void setType(Body2DType type);
+        void setEnable(bool enable);
+        void setGravityScale(float gravityScale);
     };
 }
 

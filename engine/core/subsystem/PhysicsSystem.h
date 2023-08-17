@@ -16,12 +16,14 @@ namespace Supernova{
 
 	private:
 		b2World* world2D;
+		float pointsToMeterScale;
 
 	public:
 		PhysicsSystem(Scene* scene);
 		virtual ~PhysicsSystem();
 
 		void createBody2D(Entity entity);
+		void removeBody2D(Entity entity);
 		int addRectShape2D(Entity entity, float width, float height);
 
         void setShape2DDensity(Entity entity, size_t index, float density);

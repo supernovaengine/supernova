@@ -201,10 +201,11 @@ void Object::updateTransform(){
     scene->getSystem<RenderSystem>()->updateTransform(transform);
 }
 
-void Object::createBody2D(){
-    scene->getSystem<PhysicsSystem>()->createBody2D(entity);;
+Body2D Object::getBody2D(){
+    scene->getSystem<PhysicsSystem>()->createBody2D(entity);
+    return Body2D(scene, entity);
 }
 
-Body2D Object::getBody2D(){
-    return Body2D(scene, entity);
+void Object::removeBody2D(){
+    scene->getSystem<PhysicsSystem>()->removeBody2D(entity);
 }

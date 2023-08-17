@@ -18,6 +18,7 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
 	this->scene = scene;
 
     this->world2D = NULL;
+    this->pointsToMeterScale = 64.0;
 }
 
 PhysicsSystem::~PhysicsSystem(){
@@ -35,6 +36,15 @@ void PhysicsSystem::createBody2D(Entity entity){
     }
 }
 
+void PhysicsSystem::removeBody2D(Entity entity){
+    Signature signature = scene->getSignature(entity);
+
+    if (signature.test(scene->getComponentType<Body2DComponent>())){
+        destroyBody2D(scene->getComponent<Body2DComponent>(entity));
+        scene->removeComponent<Body2DComponent>(entity);
+    }
+}
+
 int PhysicsSystem::addRectShape2D(Entity entity, float width, float height){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
@@ -43,7 +53,7 @@ int PhysicsSystem::addRectShape2D(Entity entity, float width, float height){
             body->shapes[body->numShapes].shape = new b2PolygonShape();
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
-            ((b2PolygonShape*)body->shapes[body->numShapes].shape)->SetAsBox(width, height);
+            ((b2PolygonShape*)body->shapes[body->numShapes].shape)->SetAsBox(width/pointsToMeterScale, height/pointsToMeterScale);
 
             body->numShapes++;
 
@@ -127,7 +137,7 @@ void PhysicsSystem::destroyBody2D(Body2DComponent& body){
 
 void PhysicsSystem::load(){
     if (!world2D){
-        b2Vec2 gravity(0.0f, -10.0f);
+        b2Vec2 gravity(0.0f, 10.0f);
         world2D = new b2World(gravity);
     }
 }
@@ -148,13 +158,34 @@ void PhysicsSystem::update(double dt){
 
         bool isNewBody = loadBody2D(body);
 
+        if (body.needUpdate){
+            body.body->SetLinearVelocity(b2Vec2(body.linearVelocity.x, body.linearVelocity.y));
+            body.body->SetAngularVelocity(body.angularVelocity);
+            body.body->SetLinearDamping(body.linearDamping);
+            body.body->SetAngularDamping(body.angularDamping);
+            body.body->SetSleepingAllowed(body.allowSleep);
+            body.body->SetAwake(body.awake);
+            body.body->SetFixedRotation(body.fixedRotation);
+            body.body->SetBullet(body.bullet);
+            body.body->SetEnabled(body.enable);
+            body.body->SetGravityScale(body.gravityScale);
+
+            if (body.type == Body2DType::STATIC){
+                body.body->SetType(b2_staticBody);
+            }else if (body.type == Body2DType::kINEMATIC){
+                body.body->SetType(b2_kinematicBody);
+            }else if (body.type == Body2DType::DYNAMIC){
+                body.body->SetType(b2_dynamicBody);
+            }
+
+            body.needUpdate = false;
+        }
+
         if (signature.test(scene->getComponentType<Transform>())){
 		    Transform& transform = scene->getComponent<Transform>(entity);
 
             if (isNewBody || transform.needUpdate){
-                float scale = 1.0;
-
-                b2Vec2 bPosition(transform.worldPosition.x / scale, transform.worldPosition.y / scale);
+                b2Vec2 bPosition(transform.worldPosition.x / pointsToMeterScale, transform.worldPosition.y / pointsToMeterScale);
                 body.body->SetTransform(bPosition, transform.worldRotation.getRoll());
             }
         }
@@ -177,9 +208,7 @@ void PhysicsSystem::update(double dt){
         if (signature.test(scene->getComponentType<Transform>())){
 		    Transform& transform = scene->getComponent<Transform>(entity);
 
-            float scale = 1.0;
-
-            Vector3 nPosition = Vector3(position.x * scale, position.y * scale, transform.worldPosition.z);
+            Vector3 nPosition = Vector3(position.x * pointsToMeterScale, position.y * pointsToMeterScale, transform.worldPosition.z);
             if (transform.position != nPosition){
                 transform.position = nPosition;
                 transform.needUpdate = true;

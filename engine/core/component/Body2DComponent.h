@@ -18,6 +18,12 @@ namespace Supernova{
         CHAIN
     };
 
+    enum class Body2DType{
+        STATIC,
+        kINEMATIC,
+        DYNAMIC
+    };
+
     struct CollisionShape2D{
         CollisionShape2DType type = CollisionShape2DType::POLYGON;
 
@@ -28,8 +34,22 @@ namespace Supernova{
     struct Body2DComponent{
         b2Body* body = NULL;
 
+        Vector2 linearVelocity = Vector2(0.0f, 0.0f);
+        float angularVelocity = 0.0f;
+        float linearDamping = 0.0f;
+        float angularDamping = 0.0f;
+        bool allowSleep = true;
+        bool awake = true;
+        bool fixedRotation = false;
+        bool bullet = false;
+        Body2DType type = Body2DType::STATIC;
+        bool enable = true;
+        float gravityScale = 1.0f;
+
         CollisionShape2D shapes[MAX_SHAPES];
         int numShapes = 0;
+
+        bool needUpdate = true;
     };
 
 }
