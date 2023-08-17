@@ -35,7 +35,7 @@ void PhysicsSystem::createBody2D(Entity entity){
     }
 }
 
-void PhysicsSystem::addRectangleShape2D(Entity entity, float width, float height){
+int PhysicsSystem::addRectShape2D(Entity entity, float width, float height){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
@@ -46,9 +46,46 @@ void PhysicsSystem::addRectangleShape2D(Entity entity, float width, float height
             ((b2PolygonShape*)body->shapes[body->numShapes].shape)->SetAsBox(width, height);
 
             body->numShapes++;
+
+            return (body->numShapes - 1);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
+    }
+
+    return -1;
+}
+
+void PhysicsSystem::setShape2DDensity(Entity entity, size_t index, float density){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body && body->shapes[body->numShapes].fixture){
+        body->shapes[body->numShapes].fixture->SetDensity(density);
+        if (body->body){
+            body->body->ResetMassData();
+        }
+    }else{
+        Log::error("Cannot set density of non existent body");
+    }
+}
+
+void PhysicsSystem::setShape2DFriction(Entity entity, size_t index, float friction){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body && body->shapes[body->numShapes].fixture){
+        body->shapes[body->numShapes].fixture->SetFriction(friction);
+    }else{
+        Log::error("Cannot set friction of non existent body");
+    }
+}
+
+void PhysicsSystem::setShape2DRestitution(Entity entity, size_t index, float restitution){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body && body->shapes[body->numShapes].fixture){
+        body->shapes[body->numShapes].fixture->SetRestitution(restitution);
+    }else{
+        Log::error("Cannot set restitution of non existent body");
     }
 }
 

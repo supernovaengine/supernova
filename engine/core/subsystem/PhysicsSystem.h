@@ -22,7 +22,11 @@ namespace Supernova{
 		virtual ~PhysicsSystem();
 
 		void createBody2D(Entity entity);
-		void addRectangleShape2D(Entity entity, float width, float height);
+		int addRectShape2D(Entity entity, float width, float height);
+
+        void setShape2DDensity(Entity entity, size_t index, float density);
+        void setShape2DFriction(Entity entity, size_t index, float friction);
+        void setShape2DRestitution(Entity entity, size_t index, float restitution);
 
 		bool loadBody2D(Body2DComponent& body);
 		void destroyBody2D(Body2DComponent& body);

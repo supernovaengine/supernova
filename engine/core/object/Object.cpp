@@ -201,7 +201,10 @@ void Object::updateTransform(){
     scene->getSystem<RenderSystem>()->updateTransform(transform);
 }
 
-void Object::createRectangularBody(float width, float height){
-    scene->getSystem<PhysicsSystem>()->createBody2D(entity);
-    scene->getSystem<PhysicsSystem>()->addRectangleShape2D(entity, width, height);
+void Object::createBody2D(){
+    scene->getSystem<PhysicsSystem>()->createBody2D(entity);;
+}
+
+Body2D Object::getBody2D(){
+    return Body2D(scene, entity);
 }

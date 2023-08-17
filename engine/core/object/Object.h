@@ -6,6 +6,7 @@
 #define OBJECT_H
 
 #include "EntityHandle.h"
+#include "Body2D.h"
 
 namespace Supernova{
 
@@ -60,7 +61,9 @@ namespace Supernova{
 
         void updateTransform();
 
-        void createRectangularBody(float width, float height);
+        // 2D physics
+        void createBody2D();
+        Body2D getBody2D();
     };
 
 }
