@@ -25,10 +25,16 @@ namespace Supernova{
     };
 
     struct CollisionShape2D{
-        CollisionShape2DType type = CollisionShape2DType::POLYGON;
-
         b2Shape* shape = NULL;
         b2Fixture* fixture = NULL;
+
+        CollisionShape2DType type = CollisionShape2DType::POLYGON;
+        float friction = 0.2f;
+		float restitution = 0.0f;
+		float density = 0.0f;
+		float sensor = false;
+
+        bool needUpdate = true;
     };
 
     struct Body2DComponent{

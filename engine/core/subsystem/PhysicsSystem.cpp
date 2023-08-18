@@ -66,39 +66,6 @@ int PhysicsSystem::addRectShape2D(Entity entity, float width, float height){
     return -1;
 }
 
-void PhysicsSystem::setShape2DDensity(Entity entity, size_t index, float density){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body && body->shapes[body->numShapes].fixture){
-        body->shapes[body->numShapes].fixture->SetDensity(density);
-        if (body->body){
-            body->body->ResetMassData();
-        }
-    }else{
-        Log::error("Cannot set density of non existent body");
-    }
-}
-
-void PhysicsSystem::setShape2DFriction(Entity entity, size_t index, float friction){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body && body->shapes[body->numShapes].fixture){
-        body->shapes[body->numShapes].fixture->SetFriction(friction);
-    }else{
-        Log::error("Cannot set friction of non existent body");
-    }
-}
-
-void PhysicsSystem::setShape2DRestitution(Entity entity, size_t index, float restitution){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body && body->shapes[body->numShapes].fixture){
-        body->shapes[body->numShapes].fixture->SetRestitution(restitution);
-    }else{
-        Log::error("Cannot set restitution of non existent body");
-    }
-}
-
 bool PhysicsSystem::loadBody2D(Body2DComponent& body){
     if (world2D && !body.body){
         b2BodyDef bodyDef;
@@ -181,6 +148,23 @@ void PhysicsSystem::update(double dt){
             body.needUpdate = false;
         }
 
+        for (int i = 0; i < body.numShapes; i++){
+            if (body.shapes[i].needUpdate){
+                float oldDensity = body.shapes[i].fixture->GetDensity();
+
+                body.shapes[i].fixture->SetDensity(body.shapes[i].density);
+                body.shapes[i].fixture->SetFriction(body.shapes[i].friction);
+                body.shapes[i].fixture->SetRestitution(body.shapes[i].restitution);
+                body.shapes[i].fixture->SetSensor(body.shapes[i].sensor);
+
+                if (oldDensity != body.shapes[i].density){
+                    body.body->ResetMassData();
+                }
+
+                body.shapes[i].needUpdate = false;
+            }
+        }
+
         if (signature.test(scene->getComponentType<Transform>())){
 		    Transform& transform = scene->getComponent<Transform>(entity);
 
@@ -223,6 +207,11 @@ void PhysicsSystem::update(double dt){
             }
 
         }
+
+        body.linearVelocity = Vector2(body.body->GetLinearVelocity().x, body.body->GetLinearVelocity().y);
+        body.angularVelocity = body.body->GetAngularVelocity();
+        body.awake = body.body->IsAwake();
+        body.enable = body.body->IsEnabled();
     }
 }
 
