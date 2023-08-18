@@ -7,8 +7,10 @@
 
 #include "SubSystem.h"
 #include "component/Body2DComponent.h"
+#include "component/Joint2DComponent.h"
 
 class b2World;
+class b2Body;
 
 namespace Supernova{
 
@@ -26,8 +28,13 @@ namespace Supernova{
 		void removeBody2D(Entity entity);
 		int addRectShape2D(Entity entity, float width, float height);
 
+		b2Body* getBody(Entity entity);
+
 		bool loadBody2D(Body2DComponent& body);
 		void destroyBody2D(Body2DComponent& body);
+
+		bool loadJoint2D(Joint2DComponent& joint);
+		void destroyJoint2D(Joint2DComponent& joint);
 
 		virtual void load();
 		virtual void destroy();

@@ -46,7 +46,7 @@ namespace Supernova{
         void setFixedRotation(bool fixedRotation);
         void setBullet(bool bullet);
         void setType(Body2DType type);
-        void setEnabled(bool enable);
+        void setEnabled(bool enabled);
         void setGravityScale(float gravityScale);
 
         Vector2 getLinearVelocity() const;

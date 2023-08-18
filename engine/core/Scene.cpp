@@ -56,6 +56,7 @@ Scene::Scene(){
 	registerComponent<AudioComponent>();
 	registerComponent<TilemapComponent>();
 	registerComponent<Body2DComponent>();
+	registerComponent<Joint2DComponent>();
 
 	registerSystem<PhysicsSystem>();
 	registerSystem<ActionSystem>();

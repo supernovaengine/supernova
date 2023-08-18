@@ -49,6 +49,7 @@
 #include "component/AudioComponent.h"
 #include "component/TilemapComponent.h"
 #include "component/Body2DComponent.h"
+#include "component/Joint2DComponent.h"
 
 namespace Supernova{
 

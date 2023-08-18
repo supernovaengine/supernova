@@ -11,9 +11,31 @@
 
 using namespace Supernova;
 
+b2BodyType getBodyType(Body2DType type){
+    if (type == Body2DType::STATIC){
+        return b2_staticBody;
+    }else if (type == Body2DType::kINEMATIC){
+        return b2_kinematicBody;
+    }else if (type == Body2DType::DYNAMIC){
+        return b2_dynamicBody;
+    }
+
+    return b2_staticBody;
+}
+
+b2JointType getJointType(Joint2DType type){
+    if (type == Joint2DType::DISTANCE){
+        return e_distanceJoint;
+    }else if (type == Joint2DType::REVOLUTE){
+        return e_revoluteJoint;
+    }
+
+    return e_unknownJoint;
+}
+
 
 PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
-	signature.set(scene->getComponentType<Transform>());
+	signature.set(scene->getComponentType<Body2DComponent>());
 
 	this->scene = scene;
 
@@ -66,16 +88,47 @@ int PhysicsSystem::addRectShape2D(Entity entity, float width, float height){
     return -1;
 }
 
+b2Body* PhysicsSystem::getBody(Entity entity){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        return body->body;
+    }
+
+    return NULL;
+}
+
 bool PhysicsSystem::loadBody2D(Body2DComponent& body){
     if (world2D && !body.body){
         b2BodyDef bodyDef;
         bodyDef.position.Set(0.0f, 0.0f);
         bodyDef.angle = 0.0f;
-        bodyDef.type = b2_dynamicBody;
+        bodyDef.linearVelocity = b2Vec2(body.linearVelocity.x, body.linearVelocity.y);
+        bodyDef.angularVelocity = body.angularVelocity;
+        bodyDef.linearDamping = body.linearDamping;
+        bodyDef.angularDamping = body.angularDamping;
+        bodyDef.allowSleep = body.allowSleep;
+        bodyDef.awake = body.awake;
+        bodyDef.fixedRotation = body.fixedRotation;
+        bodyDef.bullet = body.bullet;
+        bodyDef.enabled = body.enabled;
+        bodyDef.gravityScale = body.gravityScale;
+        bodyDef.type = getBodyType(body.type);
+
+        body.needUpdate = false;
 
         body.body = world2D->CreateBody(&bodyDef);
 
         for (int i = 0; i < body.numShapes; i++){
+            b2FixtureDef fixtureDef;
+
+            fixtureDef.density = body.shapes[i].density;
+            fixtureDef.friction = body.shapes[i].friction;
+            fixtureDef.restitution = body.shapes[i].restitution;
+            fixtureDef.isSensor = body.shapes[i].sensor;
+
+            body.shapes[i].needUpdate = false;
+
             body.shapes[i].fixture = body.body->CreateFixture(body.shapes[i].shape, 1.0f);
         }
 
@@ -102,6 +155,33 @@ void PhysicsSystem::destroyBody2D(Body2DComponent& body){
     }
 }
 
+bool PhysicsSystem::loadJoint2D(Joint2DComponent& joint){
+    if (world2D && !joint.joint){
+        b2JointDef jointDef;
+        jointDef.bodyA = getBody(joint.bodyA);
+        jointDef.bodyB = getBody(joint.bodyB);
+        jointDef.collideConnected = joint.collideConnected;
+        jointDef.type = getJointType(joint.type);
+
+        joint.needUpdate = false;
+
+        joint.joint = world2D->CreateJoint(&jointDef);
+
+        return true;
+    }
+
+    return false;
+}
+
+void PhysicsSystem::destroyJoint2D(Joint2DComponent& joint){
+    if (world2D && joint.joint){
+        world2D->DestroyJoint(joint.joint);
+
+        joint.joint = NULL;
+    }
+}
+
+
 void PhysicsSystem::load(){
     if (!world2D){
         b2Vec2 gravity(0.0f, 10.0f);
@@ -118,6 +198,8 @@ void PhysicsSystem::destroy(){
 
 void PhysicsSystem::update(double dt){
 	auto bodies2d = scene->getComponentArray<Body2DComponent>();
+    auto joints2d = scene->getComponentArray<Joint2DComponent>();
+
 	for (int i = 0; i < bodies2d->size(); i++){
 		Body2DComponent& body = bodies2d->getComponentFromIndex(i);
 		Entity entity = bodies2d->getEntity(i);
@@ -134,16 +216,9 @@ void PhysicsSystem::update(double dt){
             body.body->SetAwake(body.awake);
             body.body->SetFixedRotation(body.fixedRotation);
             body.body->SetBullet(body.bullet);
-            body.body->SetEnabled(body.enable);
+            body.body->SetEnabled(body.enabled);
             body.body->SetGravityScale(body.gravityScale);
-
-            if (body.type == Body2DType::STATIC){
-                body.body->SetType(b2_staticBody);
-            }else if (body.type == Body2DType::kINEMATIC){
-                body.body->SetType(b2_kinematicBody);
-            }else if (body.type == Body2DType::DYNAMIC){
-                body.body->SetType(b2_dynamicBody);
-            }
+            body.body->SetType(getBodyType(body.type));
 
             body.needUpdate = false;
         }
@@ -172,6 +247,23 @@ void PhysicsSystem::update(double dt){
                 b2Vec2 bPosition(transform.worldPosition.x / pointsToMeterScale, transform.worldPosition.y / pointsToMeterScale);
                 body.body->SetTransform(bPosition, transform.worldRotation.getRoll());
             }
+        }
+    }
+
+	for (int i = 0; i < joints2d->size(); i++){
+		Joint2DComponent& joint = joints2d->getComponentFromIndex(i);
+		Entity entity = joints2d->getEntity(i);
+		Signature signature = scene->getSignature(entity);
+
+        loadJoint2D(joint);
+
+        if (joint.needUpdate){
+            if (joint.type == Joint2DType::DISTANCE){
+                b2DistanceJoint* distJoint = (b2DistanceJoint*)joint.joint;
+                //distJoint.se
+            }
+
+            joint.needUpdate = false;
         }
     }
 
@@ -211,7 +303,7 @@ void PhysicsSystem::update(double dt){
         body.linearVelocity = Vector2(body.body->GetLinearVelocity().x, body.body->GetLinearVelocity().y);
         body.angularVelocity = body.body->GetAngularVelocity();
         body.awake = body.body->IsAwake();
-        body.enable = body.body->IsEnabled();
+        body.enabled = body.body->IsEnabled();
     }
 }
 

@@ -224,11 +224,11 @@ void Body2D::setType(Body2DType type){
     }
 }
 
-void Body2D::setEnabled(bool enable){
+void Body2D::setEnabled(bool enabled){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.enable != enable){
-        body.enable = enable;
+    if (body.enabled != enabled){
+        body.enabled = enabled;
 
         body.needUpdate = true;
     }
@@ -301,7 +301,7 @@ Body2DType Body2D::getType() const{
 bool Body2D::isEnabled() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.enable;
+    return body.enabled;
 }
 
 float Body2D::getGravityScale() const{

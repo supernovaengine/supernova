@@ -49,7 +49,7 @@ namespace Supernova{
         bool fixedRotation = false;
         bool bullet = false;
         Body2DType type = Body2DType::STATIC;
-        bool enable = true;
+        bool enabled = true;
         float gravityScale = 1.0f;
 
         CollisionShape2D shapes[MAX_SHAPES];
