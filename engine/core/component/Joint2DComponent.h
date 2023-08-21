@@ -3,32 +3,33 @@
 
 #include "Supernova.h"
 
+class b2JointDef;
 class b2Joint;
 
 namespace Supernova{
 
     enum class Joint2DType{
         DISTANCE,
-        REVOLUTE
+        REVOLUTE,
+        PRISMATIC,
+        PULLEY,
+        GEAR,
+        MOUSE,
+        WHEEL,
+        WELD,
+        ROPE,
+        FRICTION,
+        MOTOR
     };
 
     struct Joint2DComponent{
+        b2JointDef* jointDef = NULL;
         b2Joint* joint = NULL;
 
         Entity bodyA;
         Entity bodyB;
         Joint2DType type = Joint2DType::DISTANCE;
         bool collideConnected = false;
-
-		Vector2 localAnchorA = Vector2(0.0f, 0.0f);
-		Vector2 localAnchorB = Vector2(0.0f, 0.0f);
-		float referenceAngle = 0.0f;
-		float lowerAngle = 0.0f;
-		float upperAngle = 0.0f;
-		float maxMotorTorque = 0.0f;
-		float motorSpeed = 0.0f;
-		float enableLimit = false;
-		float enableMotor = false;
 
         bool needUpdate = true;
     };
