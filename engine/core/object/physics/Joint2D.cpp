@@ -32,5 +32,5 @@ Joint2D& Joint2D::operator=(const Joint2D& rhs){
 }
 
 void Joint2D::initDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB){
-    scene->getSystem<PhysicsSystem>()->getBody(1);
+    scene->getSystem<PhysicsSystem>()->initDistanceJoint(entity, bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB);
 }

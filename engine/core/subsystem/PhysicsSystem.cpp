@@ -39,7 +39,9 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
 
 	this->scene = scene;
 
-    this->world2D = NULL;
+    //this->world2D = NULL;
+    b2Vec2 gravity(0.0f, 10.0f);
+    world2D = new b2World(gravity);
     this->pointsToMeterScale = 64.0;
 }
 
@@ -119,19 +121,6 @@ bool PhysicsSystem::loadBody2D(Body2DComponent& body){
 
         body.body = world2D->CreateBody(&bodyDef);
 
-        for (int i = 0; i < body.numShapes; i++){
-            b2FixtureDef fixtureDef;
-
-            fixtureDef.density = body.shapes[i].density;
-            fixtureDef.friction = body.shapes[i].friction;
-            fixtureDef.restitution = body.shapes[i].restitution;
-            fixtureDef.isSensor = body.shapes[i].sensor;
-
-            body.shapes[i].needUpdate = false;
-
-            body.shapes[i].fixture = body.body->CreateFixture(body.shapes[i].shape, 1.0f);
-        }
-
         return true;
     }
 
@@ -143,10 +132,7 @@ void PhysicsSystem::destroyBody2D(Body2DComponent& body){
     // all the memory reserved for bodies, fixtures, and joints is freed
     if (world2D && body.body){
         for (int i = 0; i < body.numShapes; i++){
-            body.body->DestroyFixture(body.shapes[i].fixture);
-
-            body.shapes[i].shape = NULL;
-            body.shapes[i].fixture = NULL;
+            destroyShape2D(body, i);
         }
 
         world2D->DestroyBody(body.body);
@@ -155,15 +141,43 @@ void PhysicsSystem::destroyBody2D(Body2DComponent& body){
     }
 }
 
+bool PhysicsSystem::loadShape2D(Body2DComponent& body, size_t index){
+    if (world2D && !body.shapes[index].fixture){
+        b2FixtureDef fixtureDef;
+
+        fixtureDef.density = body.shapes[index].density;
+        fixtureDef.friction = body.shapes[index].friction;
+        fixtureDef.restitution = body.shapes[index].restitution;
+        fixtureDef.isSensor = body.shapes[index].sensor;
+
+        body.shapes[index].needUpdate = false;
+
+        body.shapes[index].fixture = body.body->CreateFixture(body.shapes[index].shape, 0.0);
+
+        return true;
+    }
+
+    return false;
+}
+
+void PhysicsSystem::destroyShape2D(Body2DComponent& body, size_t index){
+    if (world2D && body.shapes[index].fixture){
+        body.body->DestroyFixture(body.shapes[index].fixture);
+
+        body.shapes[index].shape = NULL;
+        body.shapes[index].fixture = NULL;
+    }
+}
+
 bool PhysicsSystem::loadJoint2D(Joint2DComponent& joint){
     if (world2D && !joint.joint){
         if (!joint.jointDef){
             joint.jointDef = new b2JointDef();
         }
-        joint.jointDef->bodyA = getBody(joint.bodyA);
-        joint.jointDef->bodyB = getBody(joint.bodyB);
-        joint.jointDef->collideConnected = joint.collideConnected;
-        joint.jointDef->type = getJointType(joint.type);
+        //joint.jointDef->bodyA = getBody(joint.bodyA);
+        //joint.jointDef->bodyB = getBody(joint.bodyB);
+        //joint.jointDef->collideConnected = joint.collideConnected;
+        //joint.jointDef->type = getJointType(joint.type);
 
         joint.needUpdate = false;
 
@@ -207,6 +221,7 @@ void PhysicsSystem::initDistanceJoint(Entity entity, Entity bodyA, Entity bodyB,
 
         b2Vec2 anchorA(worldAnchorOnBodyA.x, worldAnchorOnBodyA.y);
         b2Vec2 anchorb(worldAnchorOnBodyB.x, worldAnchorOnBodyB.y);
+
 
         ((b2DistanceJointDef*)joint.jointDef)->Initialize(myBodyA.body, myBodyB.body, anchorA, anchorb);
     }else{
@@ -258,6 +273,8 @@ void PhysicsSystem::update(double dt){
         }
 
         for (int i = 0; i < body.numShapes; i++){
+            loadShape2D(body, i);
+
             if (body.shapes[i].needUpdate){
                 float oldDensity = body.shapes[i].fixture->GetDensity();
 
