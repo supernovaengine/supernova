@@ -39,9 +39,7 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
 
 	this->scene = scene;
 
-    //this->world2D = NULL;
-    b2Vec2 gravity(0.0f, 10.0f);
-    world2D = new b2World(gravity);
+    this->world2D = NULL;
     this->pointsToMeterScale = 64.0;
 }
 
@@ -149,10 +147,11 @@ bool PhysicsSystem::loadShape2D(Body2DComponent& body, size_t index){
         fixtureDef.friction = body.shapes[index].friction;
         fixtureDef.restitution = body.shapes[index].restitution;
         fixtureDef.isSensor = body.shapes[index].sensor;
+        fixtureDef.shape = body.shapes[index].shape;
 
         body.shapes[index].needUpdate = false;
 
-        body.shapes[index].fixture = body.body->CreateFixture(body.shapes[index].shape, 0.0);
+        body.shapes[index].fixture = body.body->CreateFixture(&fixtureDef);
 
         return true;
     }
@@ -171,21 +170,36 @@ void PhysicsSystem::destroyShape2D(Body2DComponent& body, size_t index){
 
 bool PhysicsSystem::loadJoint2D(Joint2DComponent& joint){
     if (world2D && !joint.joint){
-        if (!joint.jointDef){
-            joint.jointDef = new b2JointDef();
+        Signature signatureA = scene->getSignature(joint.bodyA);
+        Signature signatureB = scene->getSignature(joint.bodyB);
+
+        if (signatureA.test(scene->getComponentType<Body2DComponent>()) && signatureB.test(scene->getComponentType<Body2DComponent>())){
+            b2JointDef* jointDef;
+
+            Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(joint.bodyA);
+            Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(joint.bodyB);
+
+            if (joint.type == Joint2DType::DISTANCE){
+                b2Vec2 anchorA(joint.worldAnchorOnBodyA.x / pointsToMeterScale, joint.worldAnchorOnBodyA.y / pointsToMeterScale);
+                b2Vec2 anchorb(joint.worldAnchorOnBodyB.x / pointsToMeterScale, joint.worldAnchorOnBodyB.y / pointsToMeterScale);
+
+                jointDef = new b2DistanceJointDef();
+                ((b2DistanceJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body, anchorA, anchorb);
+            }
+
+            jointDef->collideConnected = joint.collideConnected;
+            jointDef->type = getJointType(joint.type);
+
+            joint.needUpdate = false;
+
+            joint.joint = world2D->CreateJoint(jointDef);
+
+            delete jointDef;
+
+            return true;
+        }else{
+            Log::error("Cannot create joint, error in bodyA or bodyB");
         }
-        //joint.jointDef->bodyA = getBody(joint.bodyA);
-        //joint.jointDef->bodyB = getBody(joint.bodyB);
-        //joint.jointDef->collideConnected = joint.collideConnected;
-        //joint.jointDef->type = getJointType(joint.type);
-
-        joint.needUpdate = false;
-
-        joint.joint = world2D->CreateJoint(joint.jointDef);
-
-        delete joint.jointDef;
-
-        return true;
     }
 
     return false;
@@ -197,38 +211,6 @@ void PhysicsSystem::destroyJoint2D(Joint2DComponent& joint){
 
         joint.joint = NULL;
     }
-
-    if (joint.jointDef){
-        delete joint.jointDef;
-    }
-}
-
-void PhysicsSystem::initDistanceJoint(Entity entity, Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB){
-    Joint2DComponent joint = scene->getComponent<Joint2DComponent>(entity);
-
-    if (joint.jointDef){
-        delete joint.jointDef;
-    }
-
-    joint.jointDef = new b2DistanceJointDef();
-
-    Signature signatureA = scene->getSignature(bodyA);
-    Signature signatureB = scene->getSignature(bodyB);
-
-    if (signatureA.test(scene->getComponentType<Body2DComponent>()) && signatureB.test(scene->getComponentType<Body2DComponent>())){
-        Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
-        Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
-
-        b2Vec2 anchorA(worldAnchorOnBodyA.x, worldAnchorOnBodyA.y);
-        b2Vec2 anchorb(worldAnchorOnBodyB.x, worldAnchorOnBodyB.y);
-
-
-        ((b2DistanceJointDef*)joint.jointDef)->Initialize(myBodyA.body, myBodyB.body, anchorA, anchorb);
-    }else{
-        Log::error("Cannot create joint, error in bodyA or bodyB");
-    }
-
-    //joint.joint
 }
 
 void PhysicsSystem::load(){

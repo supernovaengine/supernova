@@ -31,6 +31,13 @@ Joint2D& Joint2D::operator=(const Joint2D& rhs){
     return *this;
 }
 
-void Joint2D::initDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB){
-    scene->getSystem<PhysicsSystem>()->initDistanceJoint(entity, bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB);
+void Joint2D::setDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::DISTANCE;
+
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.worldAnchorOnBodyA = worldAnchorOnBodyA;
+    joint.worldAnchorOnBodyB = worldAnchorOnBodyB;
 }

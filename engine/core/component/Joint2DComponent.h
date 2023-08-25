@@ -23,13 +23,15 @@ namespace Supernova{
     };
 
     struct Joint2DComponent{
-        b2JointDef* jointDef = NULL;
         b2Joint* joint = NULL;
 
         Entity bodyA;
         Entity bodyB;
         Joint2DType type = Joint2DType::DISTANCE;
         bool collideConnected = false;
+
+        Vector2 worldAnchorOnBodyA;
+        Vector2 worldAnchorOnBodyB;
 
         bool needUpdate = true;
     };

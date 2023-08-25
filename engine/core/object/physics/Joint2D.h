@@ -18,7 +18,7 @@ namespace Supernova{
         Joint2D(const Joint2D& rhs);
         Joint2D& operator=(const Joint2D& rhs);
 
-        void initDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB);
+        void setDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB);
 
     };
 }

@@ -27,13 +27,7 @@ Body2D& Body2D::operator=(const Body2D& rhs){
 }
 
 int Body2D::createRectShape2D(float width, float height){
-    int index = scene->getSystem<PhysicsSystem>()->addRectShape2D(entity, width, height);
-
-    if (index >= 0){
-        scene->getSystem<PhysicsSystem>()->loadShape2D(getComponent<Body2DComponent>(), index);
-    }
-
-    return index;
+    return scene->getSystem<PhysicsSystem>()->addRectShape2D(entity, width, height);
 }
 
 void Body2D::setShape2DDensity(float density){

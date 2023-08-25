@@ -39,8 +39,6 @@ namespace Supernova{
 		bool loadJoint2D(Joint2DComponent& joint);
 		void destroyJoint2D(Joint2DComponent& joint);
 
-        void initDistanceJoint(Entity entity, Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB);
-
 		virtual void load();
 		virtual void destroy();
 		virtual void update(double dt);
