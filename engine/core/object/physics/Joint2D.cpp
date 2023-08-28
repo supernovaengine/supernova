@@ -38,6 +38,65 @@ void Joint2D::setDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOn
 
     joint.bodyA = bodyA;
     joint.bodyB = bodyB;
-    joint.worldAnchorOnBodyA = worldAnchorOnBodyA;
-    joint.worldAnchorOnBodyB = worldAnchorOnBodyB;
+    joint.anchorA = worldAnchorOnBodyA;
+    joint.anchorB = worldAnchorOnBodyB;
+
+    joint.needUpdate = true;
+}
+
+void Joint2D::setRevoluteJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::REVOLUTE;
+
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchorA = worldAnchor;
+    joint.anchorB = worldAnchor;
+
+    joint.needUpdate = true;
+}
+
+void Joint2D::setPrismaticJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor, Vector2 worldAxis){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::PRISMATIC;
+
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchorA = worldAnchor;
+    joint.anchorB = worldAnchor;
+    joint.axis = worldAxis;
+
+    joint.needUpdate = true;
+}
+
+void Joint2D::setPulleyJoint(Entity bodyA, Entity bodyB, Vector2 groundAnchorA, Vector2 groundAnchorB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB, Vector2 worldAxis, float ratio){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::PULLEY;
+
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.groundAnchorA = groundAnchorA;
+    joint.groundAnchorB = groundAnchorB;
+    joint.anchorA = worldAnchorOnBodyA;
+    joint.anchorB = worldAnchorOnBodyB;
+    joint.ratio = ratio;
+
+    joint.needUpdate = true;
+}
+
+void Joint2D::setGearJoint(Entity bodyA, Entity bodyB, Entity revoluteJoint, Entity prismaticJoint, float ratio){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::PULLEY;
+
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.joint1 = revoluteJoint;
+    joint.joint2 = prismaticJoint;
+    joint.ratio = ratio;
+
+    joint.needUpdate = true;
 }

@@ -23,16 +23,6 @@ b2BodyType getBodyType(Body2DType type){
     return b2_staticBody;
 }
 
-b2JointType getJointType(Joint2DType type){
-    if (type == Joint2DType::DISTANCE){
-        return e_distanceJoint;
-    }else if (type == Joint2DType::REVOLUTE){
-        return e_revoluteJoint;
-    }
-
-    return e_unknownJoint;
-}
-
 
 PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
 	signature.set(scene->getComponentType<Body2DComponent>());
@@ -174,29 +164,72 @@ bool PhysicsSystem::loadJoint2D(Joint2DComponent& joint){
         Signature signatureB = scene->getSignature(joint.bodyB);
 
         if (signatureA.test(scene->getComponentType<Body2DComponent>()) && signatureB.test(scene->getComponentType<Body2DComponent>())){
-            b2JointDef* jointDef;
+            b2JointDef* jointDef = NULL;
 
             Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(joint.bodyA);
             Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(joint.bodyB);
 
             if (joint.type == Joint2DType::DISTANCE){
-                b2Vec2 anchorA(joint.worldAnchorOnBodyA.x / pointsToMeterScale, joint.worldAnchorOnBodyA.y / pointsToMeterScale);
-                b2Vec2 anchorb(joint.worldAnchorOnBodyB.x / pointsToMeterScale, joint.worldAnchorOnBodyB.y / pointsToMeterScale);
+                b2Vec2 anchorA(joint.anchorA.x / pointsToMeterScale, joint.anchorA.y / pointsToMeterScale);
+                b2Vec2 anchorB(joint.anchorB.x / pointsToMeterScale, joint.anchorB.y / pointsToMeterScale);
 
                 jointDef = new b2DistanceJointDef();
-                ((b2DistanceJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body, anchorA, anchorb);
+                ((b2DistanceJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body, anchorA, anchorB);
+            }else if(joint.type == Joint2DType::REVOLUTE){
+                b2Vec2 anchor(joint.anchorA.x / pointsToMeterScale, joint.anchorA.y / pointsToMeterScale);
+
+                jointDef = new b2RevoluteJointDef();
+                ((b2RevoluteJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body, anchor);
+            }else if(joint.type == Joint2DType::PRISMATIC){
+                b2Vec2 anchor(joint.anchorA.x / pointsToMeterScale, joint.anchorA.y / pointsToMeterScale);
+                b2Vec2 axis(joint.axis.x, joint.axis.y);
+
+                jointDef = new b2PrismaticJointDef();
+                ((b2PrismaticJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body, anchor, axis);
+            }else if(joint.type == Joint2DType::PULLEY){
+                b2Vec2 anchorA(joint.anchorA.x / pointsToMeterScale, joint.anchorA.y / pointsToMeterScale);
+                b2Vec2 anchorB(joint.anchorB.x / pointsToMeterScale, joint.anchorB.y / pointsToMeterScale);
+                b2Vec2 groundA(joint.groundAnchorA.x / pointsToMeterScale, joint.groundAnchorA.y / pointsToMeterScale);
+                b2Vec2 groundB(joint.groundAnchorB.x / pointsToMeterScale, joint.groundAnchorB.y / pointsToMeterScale);
+
+                jointDef = new b2PulleyJointDef();
+                ((b2PulleyJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body, groundA, groundB, anchorA, anchorB, joint.ratio);
+            }else if(joint.type == Joint2DType::GEAR){
+
+                Signature signatureJ1 = scene->getSignature(joint.joint1);
+                Signature signatureJ2 = scene->getSignature(joint.joint2);
+
+                if (signatureJ1.test(scene->getComponentType<Joint2DComponent>()) && signatureJ2.test(scene->getComponentType<Joint2DComponent>())){
+                    Joint2DComponent myJoint1 = scene->getComponent<Joint2DComponent>(joint.joint1);
+                    Joint2DComponent myJoint2 = scene->getComponent<Joint2DComponent>(joint.joint2);
+
+                    if (myJoint1.joint && myJoint2.joint){
+                        jointDef = new b2GearJointDef();
+                        ((b2GearJointDef*)jointDef)->joint1 = myJoint1.joint;
+                        ((b2GearJointDef*)jointDef)->joint2 = myJoint2.joint;
+                        ((b2GearJointDef*)jointDef)->bodyA = myBodyA.body;
+                        ((b2GearJointDef*)jointDef)->bodyB = myBodyB.body;
+                        ((b2GearJointDef*)jointDef)->ratio = joint.ratio;
+                    }else{
+                        Log::error("Cannot create joint, joint1 or joint2 not created");
+                    }
+                }else{
+                    Log::error("Cannot create joint, error in joint1 or joint2");
+                }
+
             }
+            if (jointDef){
+                jointDef->collideConnected = joint.collideConnected;
+                joint.joint = world2D->CreateJoint(jointDef);
 
-            jointDef->collideConnected = joint.collideConnected;
-            jointDef->type = getJointType(joint.type);
+                joint.needUpdate = false;
 
-            joint.needUpdate = false;
+                delete jointDef;
 
-            joint.joint = world2D->CreateJoint(jointDef);
-
-            delete jointDef;
-
-            return true;
+                return true;
+            }else{
+                Log::error("Cannot create joint");
+            }
         }else{
             Log::error("Cannot create joint, error in bodyA or bodyB");
         }

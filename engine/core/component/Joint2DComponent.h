@@ -30,8 +30,14 @@ namespace Supernova{
         Joint2DType type = Joint2DType::DISTANCE;
         bool collideConnected = false;
 
-        Vector2 worldAnchorOnBodyA;
-        Vector2 worldAnchorOnBodyB;
+        Vector2 anchorA;
+        Vector2 anchorB;
+        Vector2 axis;
+        Vector2 groundAnchorA;
+        Vector2 groundAnchorB;
+        float ratio = 0;
+        Entity joint1 = NULL_ENTITY;
+        Entity joint2 = NULL_ENTITY;
 
         bool needUpdate = true;
     };
