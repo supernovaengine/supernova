@@ -37,13 +37,6 @@
 #include "b2_broad_phase.h"
 #include "b2_dynamic_tree.h"
 
-#include "b2_body.h"
-#include "b2_contact.h"
-#include "b2_fixture.h"
-#include "b2_time_step.h"
-#include "b2_world.h"
-#include "b2_world_callbacks.h"
-
 #include "b2_distance_joint.h"
 #include "b2_friction_joint.h"
 #include "b2_gear_joint.h"
@@ -54,5 +47,12 @@
 #include "b2_revolute_joint.h"
 #include "b2_weld_joint.h"
 #include "b2_wheel_joint.h"
+
+#include "b2_body.h"
+#include "b2_contact.h"
+#include "b2_fixture.h"
+#include "b2_time_step.h"
+#include "b2_world.h"
+#include "b2_world_callbacks.h"
 
 #endif
