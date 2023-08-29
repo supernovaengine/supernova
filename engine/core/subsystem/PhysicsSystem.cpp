@@ -216,8 +216,35 @@ bool PhysicsSystem::loadJoint2D(Joint2DComponent& joint){
                 }else{
                     Log::error("Cannot create joint, error in joint1 or joint2");
                 }
+            }else if(joint.type == Joint2DType::MOUSE){
+                b2Vec2 myTarget(joint.target.x / pointsToMeterScale, joint.target.y / pointsToMeterScale);
 
+                jointDef = new b2MouseJointDef();
+                ((b2MouseJointDef*)jointDef)->bodyA = myBodyA.body;
+                ((b2MouseJointDef*)jointDef)->bodyB = myBodyB.body;
+                ((b2MouseJointDef*)jointDef)->target = myTarget;
+            }else if(joint.type == Joint2DType::WHEEL){
+                b2Vec2 anchor(joint.anchorA.x / pointsToMeterScale, joint.anchorA.y / pointsToMeterScale);
+                b2Vec2 axis(joint.axis.x, joint.axis.y);
+
+                jointDef = new b2WheelJointDef();
+                ((b2WheelJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body, anchor, axis);
+            }else if(joint.type == Joint2DType::WELD){
+                b2Vec2 anchor(joint.anchorA.x / pointsToMeterScale, joint.anchorA.y / pointsToMeterScale);
+
+                jointDef = new b2WeldJointDef();
+                ((b2WeldJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body, anchor);
+            }else if(joint.type == Joint2DType::FRICTION){
+                b2Vec2 anchor(joint.anchorA.x / pointsToMeterScale, joint.anchorA.y / pointsToMeterScale);
+
+                jointDef = new b2FrictionJointDef();
+                ((b2FrictionJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body, anchor);
+            }else if(joint.type == Joint2DType::MOTOR){
+
+                jointDef = new b2MotorJointDef();
+                ((b2MotorJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body);
             }
+
             if (jointDef){
                 jointDef->collideConnected = joint.collideConnected;
                 joint.joint = world2D->CreateJoint(jointDef);
@@ -230,6 +257,7 @@ bool PhysicsSystem::loadJoint2D(Joint2DComponent& joint){
             }else{
                 Log::error("Cannot create joint");
             }
+
         }else{
             Log::error("Cannot create joint, error in bodyA or bodyB");
         }

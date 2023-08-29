@@ -17,7 +17,7 @@ namespace Supernova{
         MOUSE,
         WHEEL,
         WELD,
-        ROPE,
+        //ROPE, // not used by Box2D
         FRICTION,
         MOTOR
     };
@@ -38,6 +38,7 @@ namespace Supernova{
         float ratio = 0;
         Entity joint1 = NULL_ENTITY;
         Entity joint2 = NULL_ENTITY;
+        Vector2 target;
 
         bool needUpdate = true;
     };

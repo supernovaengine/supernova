@@ -100,3 +100,66 @@ void Joint2D::setGearJoint(Entity bodyA, Entity bodyB, Entity revoluteJoint, Ent
 
     joint.needUpdate = true;
 }
+
+void Joint2D::setMouseJoint(Entity body, Vector2 target){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::MOUSE;
+
+    joint.bodyA = body;
+    joint.bodyB = body;
+    joint.target = target;
+
+    joint.needUpdate = true;
+}
+
+void Joint2D::setWheelJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor, Vector2 worldAxis){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::WHEEL;
+
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchorA = worldAnchor;
+    joint.anchorB = worldAnchor;
+    joint.axis = worldAxis;
+
+    joint.needUpdate = true;
+}
+
+void Joint2D::setWeldJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::WELD;
+
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchorA = worldAnchor;
+    joint.anchorB = worldAnchor;
+
+    joint.needUpdate = true;
+}
+
+void Joint2D::setFrictionJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::FRICTION;
+
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchorA = worldAnchor;
+    joint.anchorB = worldAnchor;
+
+    joint.needUpdate = true;
+}
+
+void Joint2D::setMotorJoint(Entity bodyA, Entity bodyB){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::MOTOR;
+
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+
+    joint.needUpdate = true;
+}
