@@ -243,6 +243,13 @@ bool PhysicsSystem::loadJoint2D(Joint2DComponent& joint){
 
                 jointDef = new b2MotorJointDef();
                 ((b2MotorJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body);
+            }else if(joint.type == Joint2DType::ROPE){ // uses distance joint
+                b2Vec2 anchorA(joint.anchorA.x / pointsToMeterScale, joint.anchorA.y / pointsToMeterScale);
+                b2Vec2 anchorB(joint.anchorB.x / pointsToMeterScale, joint.anchorB.y / pointsToMeterScale);
+
+                jointDef = new b2DistanceJointDef();
+                ((b2DistanceJointDef*)jointDef)->Initialize(myBodyA.body, myBodyB.body, anchorA, anchorB);
+                ((b2DistanceJointDef*)jointDef)->minLength = 0;
             }
 
             if (jointDef){

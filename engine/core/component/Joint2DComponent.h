@@ -17,9 +17,9 @@ namespace Supernova{
         MOUSE,
         WHEEL,
         WELD,
-        //ROPE, // not used by Box2D
         FRICTION,
-        MOTOR
+        MOTOR,
+        ROPE
     };
 
     struct Joint2DComponent{

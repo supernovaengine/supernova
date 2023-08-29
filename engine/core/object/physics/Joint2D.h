@@ -28,6 +28,7 @@ namespace Supernova{
         void setWeldJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor);
         void setFrictionJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor);
         void setMotorJoint(Entity bodyA, Entity bodyB);
+        void setRopeJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB);
     };
 }
 

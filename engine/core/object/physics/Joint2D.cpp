@@ -163,3 +163,16 @@ void Joint2D::setMotorJoint(Entity bodyA, Entity bodyB){
 
     joint.needUpdate = true;
 }
+
+void Joint2D::setRopeJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+
+    joint.type = Joint2DType::ROPE;
+
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchorA = worldAnchorOnBodyA;
+    joint.anchorB = worldAnchorOnBodyB;
+
+    joint.needUpdate = true;
+}
