@@ -11,26 +11,16 @@
 
 using namespace Supernova;
 
-b2BodyType getBodyType(Body2DType type){
-    if (type == Body2DType::STATIC){
-        return b2_staticBody;
-    }else if (type == Body2DType::kINEMATIC){
-        return b2_kinematicBody;
-    }else if (type == Body2DType::DYNAMIC){
-        return b2_dynamicBody;
-    }
-
-    return b2_staticBody;
-}
-
 
 PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
 	signature.set(scene->getComponentType<Body2DComponent>());
 
 	this->scene = scene;
 
-    this->world2D = NULL;
     this->pointsToMeterScale = 64.0;
+
+    b2Vec2 gravity(0.0f, 10.0f);
+    world2D = new b2World(gravity);
 }
 
 PhysicsSystem::~PhysicsSystem(){
@@ -93,19 +83,6 @@ bool PhysicsSystem::loadBody2D(Body2DComponent& body){
         b2BodyDef bodyDef;
         bodyDef.position.Set(0.0f, 0.0f);
         bodyDef.angle = 0.0f;
-        bodyDef.linearVelocity = b2Vec2(body.linearVelocity.x, body.linearVelocity.y);
-        bodyDef.angularVelocity = body.angularVelocity;
-        bodyDef.linearDamping = body.linearDamping;
-        bodyDef.angularDamping = body.angularDamping;
-        bodyDef.allowSleep = body.allowSleep;
-        bodyDef.awake = body.awake;
-        bodyDef.fixedRotation = body.fixedRotation;
-        bodyDef.bullet = body.bullet;
-        bodyDef.enabled = body.enabled;
-        bodyDef.gravityScale = body.gravityScale;
-        bodyDef.type = getBodyType(body.type);
-
-        body.needUpdate = false;
 
         body.body = world2D->CreateBody(&bodyDef);
 
@@ -132,14 +109,7 @@ void PhysicsSystem::destroyBody2D(Body2DComponent& body){
 bool PhysicsSystem::loadShape2D(Body2DComponent& body, size_t index){
     if (world2D && !body.shapes[index].fixture){
         b2FixtureDef fixtureDef;
-
-        fixtureDef.density = body.shapes[index].density;
-        fixtureDef.friction = body.shapes[index].friction;
-        fixtureDef.restitution = body.shapes[index].restitution;
-        fixtureDef.isSensor = body.shapes[index].sensor;
         fixtureDef.shape = body.shapes[index].shape;
-
-        body.shapes[index].needUpdate = false;
 
         body.shapes[index].fixture = body.body->CreateFixture(&fixtureDef);
 
@@ -282,10 +252,6 @@ void PhysicsSystem::destroyJoint2D(Joint2DComponent& joint){
 }
 
 void PhysicsSystem::load(){
-    if (!world2D){
-        b2Vec2 gravity(0.0f, 10.0f);
-        world2D = new b2World(gravity);
-    }
 }
 
 void PhysicsSystem::destroy(){
@@ -304,49 +270,12 @@ void PhysicsSystem::update(double dt){
 		Entity entity = bodies2d->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-        bool isNewBody = loadBody2D(body);
-
-        if (body.needUpdate){
-            body.body->SetLinearVelocity(b2Vec2(body.linearVelocity.x, body.linearVelocity.y));
-            body.body->SetAngularVelocity(body.angularVelocity);
-            body.body->SetLinearDamping(body.linearDamping);
-            body.body->SetAngularDamping(body.angularDamping);
-            body.body->SetSleepingAllowed(body.allowSleep);
-            body.body->SetAwake(body.awake);
-            body.body->SetFixedRotation(body.fixedRotation);
-            body.body->SetBullet(body.bullet);
-            body.body->SetEnabled(body.enabled);
-            body.body->SetGravityScale(body.gravityScale);
-            body.body->SetType(getBodyType(body.type));
-
-            body.needUpdate = false;
-        }
-
-        for (int i = 0; i < body.numShapes; i++){
-            loadShape2D(body, i);
-
-            if (body.shapes[i].needUpdate){
-                float oldDensity = body.shapes[i].fixture->GetDensity();
-
-                body.shapes[i].fixture->SetDensity(body.shapes[i].density);
-                body.shapes[i].fixture->SetFriction(body.shapes[i].friction);
-                body.shapes[i].fixture->SetRestitution(body.shapes[i].restitution);
-                body.shapes[i].fixture->SetSensor(body.shapes[i].sensor);
-
-                if (oldDensity != body.shapes[i].density){
-                    body.body->ResetMassData();
-                }
-
-                body.shapes[i].needUpdate = false;
-            }
-        }
-
         if (signature.test(scene->getComponentType<Transform>())){
 		    Transform& transform = scene->getComponent<Transform>(entity);
 
-            if (isNewBody || transform.needUpdate){
-                b2Vec2 bPosition(transform.worldPosition.x / pointsToMeterScale, transform.worldPosition.y / pointsToMeterScale);
-                body.body->SetTransform(bPosition, transform.worldRotation.getRoll());
+            if (transform.needUpdate){
+                b2Vec2 bPosition(transform.position.x / pointsToMeterScale, transform.position.y / pointsToMeterScale);
+                body.body->SetTransform(bPosition, transform.rotation.getRoll());
             }
         }
     }
@@ -397,11 +326,6 @@ void PhysicsSystem::update(double dt){
             }
 
         }
-
-        body.linearVelocity = Vector2(body.body->GetLinearVelocity().x, body.body->GetLinearVelocity().y);
-        body.angularVelocity = body.body->GetAngularVelocity();
-        body.awake = body.body->IsAwake();
-        body.enabled = body.body->IsEnabled();
     }
 }
 

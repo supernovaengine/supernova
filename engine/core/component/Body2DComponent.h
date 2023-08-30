@@ -29,33 +29,13 @@ namespace Supernova{
         b2Fixture* fixture = NULL;
 
         CollisionShape2DType type = CollisionShape2DType::POLYGON;
-        float friction = 0.2f;
-		float restitution = 0.0f;
-		float density = 0.0f;
-		float sensor = false;
-
-        bool needUpdate = true;
     };
 
     struct Body2DComponent{
         b2Body* body = NULL;
 
-        Vector2 linearVelocity = Vector2(0.0f, 0.0f);
-        float angularVelocity = 0.0f;
-        float linearDamping = 0.0f;
-        float angularDamping = 0.0f;
-        bool allowSleep = true;
-        bool awake = true;
-        bool fixedRotation = false;
-        bool bullet = false;
-        Body2DType type = Body2DType::STATIC;
-        bool enabled = true;
-        float gravityScale = 1.0f;
-
         CollisionShape2D shapes[MAX_SHAPES];
         int numShapes = 0;
-
-        bool needUpdate = true;
     };
 
 }

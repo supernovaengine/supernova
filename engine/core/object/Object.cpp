@@ -203,6 +203,7 @@ void Object::updateTransform(){
 
 Body2D Object::getBody2D(){
     scene->getSystem<PhysicsSystem>()->createBody2D(entity);
+    scene->getSystem<PhysicsSystem>()->loadBody2D(getComponent<Body2DComponent>());
     return Body2D(scene, entity);
 }
 

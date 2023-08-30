@@ -6,8 +6,37 @@
 
 #include "subsystem/PhysicsSystem.h"
 #include "component/Body2DComponent.h"
+#include "box2d.h"
 
 using namespace Supernova;
+
+b2BodyType getBodyTypeToB2(Body2DType type){
+    if (type == Body2DType::STATIC){
+        return b2_staticBody;
+    }else if (type == Body2DType::kINEMATIC){
+        return b2_kinematicBody;
+    }else if (type == Body2DType::DYNAMIC){
+        return b2_dynamicBody;
+    }
+
+    return b2_staticBody;
+}
+
+Body2DType getB2ToBodyType(b2BodyType type){
+    if (type == b2_staticBody){
+        return Body2DType::STATIC;
+    }else if (type == b2_kinematicBody){
+        return Body2DType::kINEMATIC;
+    }else if (type == b2_dynamicBody){
+        return Body2DType::DYNAMIC;
+    }
+
+    return Body2DType::STATIC;
+}
+
+Vector2 getB2ToVector2(b2Vec2 vec2){
+    return Vector2(vec2.x, vec2.y);
+}
 
 Body2D::Body2D(Scene* scene, Entity entity): EntityHandle(scene, entity){
 
@@ -27,7 +56,11 @@ Body2D& Body2D::operator=(const Body2D& rhs){
 }
 
 int Body2D::createRectShape2D(float width, float height){
-    return scene->getSystem<PhysicsSystem>()->addRectShape2D(entity, width, height);
+    int index = scene->getSystem<PhysicsSystem>()->addRectShape2D(entity, width, height);
+    if (index >= 0){
+        scene->getSystem<PhysicsSystem>()->loadShape2D(getComponent<Body2DComponent>(), index);
+    }
+    return index;
 }
 
 void Body2D::setShape2DDensity(float density){
@@ -46,11 +79,8 @@ void Body2D::setShape2DDensity(size_t index, float density){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
-        if (body.shapes[index].density != density){
-            body.shapes[index].density = density;
-
-            body.shapes[index].needUpdate = true;
-        }
+        body.shapes[index].fixture->SetDensity(density);
+        body.body->ResetMassData();
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -60,11 +90,7 @@ void Body2D::setShape2DFriction(size_t index, float friction){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
-        if (body.shapes[index].friction != friction){
-            body.shapes[index].friction = friction;
-
-            body.shapes[index].needUpdate = true;
-        }
+        body.shapes[index].fixture->SetFriction(friction);
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -74,11 +100,7 @@ void Body2D::setShape2DRestitution(size_t index, float restitution){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
-        if (body.shapes[index].restitution != restitution){
-            body.shapes[index].restitution = restitution;
-
-            body.shapes[index].needUpdate = true;
-        }
+        body.shapes[index].fixture->SetRestitution(restitution);
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -101,7 +123,7 @@ float Body2D::getShape2DDensity(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
-        return body.shapes[index].density;
+        return body.shapes[index].fixture->GetDensity();
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -113,7 +135,7 @@ float Body2D::getShape2DFriction(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
-        return body.shapes[index].friction;
+        return body.shapes[index].fixture->GetFriction();
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -125,7 +147,7 @@ float Body2D::getShape2DRestitution(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
-        return body.shapes[index].restitution;
+        return body.shapes[index].fixture->GetRestitution();
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -137,176 +159,134 @@ float Body2D::getShape2DRestitution(size_t index) const{
 void Body2D::setLinearVelocity(Vector2 linearVelocity){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.linearVelocity != linearVelocity){
-        body.linearVelocity = linearVelocity;
-
-        body.needUpdate = true;
-    }
+    body.body->SetLinearVelocity(b2Vec2(linearVelocity.x, linearVelocity.y));
 }
 
 void Body2D::setAngularVelocity(float angularVelocity){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.angularVelocity != angularVelocity){
-        body.angularVelocity = angularVelocity;
-
-        body.needUpdate = true;
-    }
+    body.body->SetAngularVelocity(angularVelocity);
 }
 
 void Body2D::setLinearDamping(float linearDamping){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.linearDamping != linearDamping){
-        body.linearDamping = linearDamping;
-
-        body.needUpdate = true;
-    }
+    body.body->SetLinearDamping(linearDamping);
 }
 
 void Body2D::setAngularDamping(float angularDamping){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.angularDamping != angularDamping){
-        body.angularDamping = angularDamping;
-
-        body.needUpdate = true;
-    }
+    body.body->SetAngularDamping(angularDamping);
 }
 
 void Body2D::setAllowSleep(bool allowSleep){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.allowSleep != allowSleep){
-        body.allowSleep = allowSleep;
-
-        body.needUpdate = true;
-    }
+    body.body->SetSleepingAllowed(allowSleep);
 }
 
 void Body2D::setAwake(bool awake){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.awake != awake){
-        body.awake = awake;
-
-        body.needUpdate = true;
-    }
+    body.body->SetAwake(awake);
 }
 
 void Body2D::setFixedRotation(bool fixedRotation){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.fixedRotation != fixedRotation){
-        body.fixedRotation = fixedRotation;
-
-        body.needUpdate = true;
-    }
+    body.body->SetFixedRotation(fixedRotation);
 }
 
 void Body2D::setBullet(bool bullet){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.bullet != bullet){
-        body.bullet = bullet;
-
-        body.needUpdate = true;
-    }
+    body.body->SetBullet(bullet);
 }
 
 void Body2D::setType(Body2DType type){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.type != type){
-        body.type = type;
-
-        body.needUpdate = true;
-    }
+    body.body->SetType(getBodyTypeToB2(type));
 }
 
 void Body2D::setEnabled(bool enabled){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.enabled != enabled){
-        body.enabled = enabled;
-
-        body.needUpdate = true;
-    }
+    body.body->SetEnabled(enabled);
 }
 
 void Body2D::setGravityScale(float gravityScale){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.gravityScale != gravityScale){
-        body.gravityScale = gravityScale;
-
-        body.needUpdate = true;
-    }
+    body.body->SetGravityScale(gravityScale);
 }
 
 Vector2 Body2D::getLinearVelocity() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.linearVelocity;
+    b2Vec2 vec = body.body->GetLinearVelocity();
+
+    return Vector2(vec.x, vec.y);
 }
 
 float Body2D::getAngularVelocity() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.angularVelocity;
+    return body.body->GetAngularVelocity();
 }
 
 float Body2D::getLinearDamping() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.linearDamping;
+    return body.body->GetLinearDamping();
 }
 
 float Body2D::getAngularDamping() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.angularDamping;
+    return body.body->GetAngularDamping();
 }
 
 bool Body2D::isAllowSleep() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.allowSleep;
+    return body.body->IsSleepingAllowed();
 }
 
 bool Body2D::isAwake() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.awake;
+    return body.body->IsAwake();
 }
 
 bool Body2D::isFixedRotation() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.fixedRotation;
+    return body.body->IsFixedRotation();
 }
 
 bool Body2D::isBullet() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.bullet;
+    return body.body->IsBullet();
 }
 
 Body2DType Body2D::getType() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.type;
+    return getB2ToBodyType(body.body->GetType());
 }
 
 bool Body2D::isEnabled() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.enabled;
+    return body.body->IsEnabled();
 }
 
 float Body2D::getGravityScale() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    return body.gravityScale;
+    return body.body->GetGravityScale();
 }
 
