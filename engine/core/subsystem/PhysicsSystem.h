@@ -11,6 +11,7 @@
 
 class b2World;
 class b2Body;
+class b2Shape;
 
 namespace Supernova{
 
@@ -33,7 +34,7 @@ namespace Supernova{
 		bool loadBody2D(Body2DComponent& body);
 		void destroyBody2D(Body2DComponent& body);
 
-		bool loadShape2D(Body2DComponent& body, size_t index);
+		bool loadShape2D(Body2DComponent& body, b2Shape* shape, size_t index);
 		void destroyShape2D(Body2DComponent& body, size_t index);
 
 		bool loadJoint2D(Joint2DComponent& joint);

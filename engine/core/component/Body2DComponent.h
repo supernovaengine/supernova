@@ -25,7 +25,6 @@ namespace Supernova{
     };
 
     struct CollisionShape2D{
-        b2Shape* shape = NULL;
         b2Fixture* fixture = NULL;
 
         CollisionShape2DType type = CollisionShape2DType::POLYGON;

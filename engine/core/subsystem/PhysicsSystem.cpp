@@ -52,10 +52,13 @@ int PhysicsSystem::addRectShape2D(Entity entity, float width, float height){
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].shape = new b2PolygonShape();
+
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
-            ((b2PolygonShape*)body->shapes[body->numShapes].shape)->SetAsBox(width/pointsToMeterScale, height/pointsToMeterScale);
+            b2PolygonShape shape;
+            shape.SetAsBox(width/pointsToMeterScale, height/pointsToMeterScale);
+
+            loadShape2D(*body, &shape, body->numShapes);
 
             body->numShapes++;
 
@@ -106,10 +109,10 @@ void PhysicsSystem::destroyBody2D(Body2DComponent& body){
     }
 }
 
-bool PhysicsSystem::loadShape2D(Body2DComponent& body, size_t index){
+bool PhysicsSystem::loadShape2D(Body2DComponent& body, b2Shape* shape, size_t index){
     if (world2D && !body.shapes[index].fixture){
         b2FixtureDef fixtureDef;
-        fixtureDef.shape = body.shapes[index].shape;
+        fixtureDef.shape = shape;
 
         body.shapes[index].fixture = body.body->CreateFixture(&fixtureDef);
 
@@ -123,7 +126,6 @@ void PhysicsSystem::destroyShape2D(Body2DComponent& body, size_t index){
     if (world2D && body.shapes[index].fixture){
         body.body->DestroyFixture(body.shapes[index].fixture);
 
-        body.shapes[index].shape = NULL;
         body.shapes[index].fixture = NULL;
     }
 }
