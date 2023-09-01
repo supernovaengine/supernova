@@ -30,7 +30,7 @@ namespace Supernova{
         void setMotorJoint(Entity bodyA, Entity bodyB);
         void setRopeJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB);
 
-        
+        Joint2DType getType();
     };
 }
 

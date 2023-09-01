@@ -502,21 +502,7 @@ void PhysicsSystem::update(double dt){
 
         body.newBody = false;
     }
-/*
-	for (int i = 0; i < joints2d->size(); i++){
-		Joint2DComponent& joint = joints2d->getComponentFromIndex(i);
-		Entity entity = joints2d->getEntity(i);
-		Signature signature = scene->getSignature(entity);
 
-        if (joint.needUpdate){
-            destroyJoint2D(joint);
-
-            joint.needUpdate = false;
-        }
-
-        loadJoint2D(joint);
-    }
-*/
     if (bodies2d->size() > 0){
         int32 velocityIterations = 6;
         int32 positionIterations = 2;
