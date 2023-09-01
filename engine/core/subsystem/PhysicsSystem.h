@@ -12,6 +12,7 @@
 class b2World;
 class b2Body;
 class b2Shape;
+class b2JointDef;
 
 namespace Supernova{
 
@@ -20,6 +21,8 @@ namespace Supernova{
 	private:
 		b2World* world2D;
 		float pointsToMeterScale;
+
+		void updateBodyPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway);
 
 	public:
 		PhysicsSystem(Scene* scene);
@@ -37,7 +40,17 @@ namespace Supernova{
 		bool loadShape2D(Body2DComponent& body, b2Shape* shape, size_t index);
 		void destroyShape2D(Body2DComponent& body, size_t index);
 
-		bool loadJoint2D(Joint2DComponent& joint);
+		bool loadDistanceJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB);
+		bool loadRevoluteJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor);
+		bool loadPrismaticJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor, Vector2 axis);
+		bool loadPulleyJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 groundAnchorA, Vector2 groundAnchorB, Vector2 anchorA, Vector2 anchorB, Vector2 axis, float ratio);
+		bool loadGearJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Entity revoluteJoint, Entity prismaticJoint, float ratio);
+		bool loadMouseJoint2D(Joint2DComponent& joint, Entity body, Vector2 target);
+		bool loadWheelJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor, Vector2 axis);
+		bool loadWeldJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor);
+		bool loadFrictionJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor);
+		bool loadMotorJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB);
+		bool loadRopeJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB);
 		void destroyJoint2D(Joint2DComponent& joint);
 
 		virtual void load();

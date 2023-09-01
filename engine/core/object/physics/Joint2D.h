@@ -18,7 +18,7 @@ namespace Supernova{
         Joint2D(const Joint2D& rhs);
         Joint2D& operator=(const Joint2D& rhs);
 
-        void setDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB);
+        void setDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB);    
         void setRevoluteJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor);
         void setPrismaticJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor, Vector2 worldAxis);
         void setPulleyJoint(Entity bodyA, Entity bodyB, Vector2 groundAnchorA, Vector2 groundAnchorB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB, Vector2 worldAxis, float ratio);
@@ -29,6 +29,8 @@ namespace Supernova{
         void setFrictionJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor);
         void setMotorJoint(Entity bodyA, Entity bodyB);
         void setRopeJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB);
+
+        
     };
 }
 

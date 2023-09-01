@@ -35,6 +35,8 @@ namespace Supernova{
 
         CollisionShape2D shapes[MAX_SHAPES];
         int numShapes = 0;
+
+        bool newBody = true;
     };
 
 }
