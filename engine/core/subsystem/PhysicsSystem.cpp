@@ -7,6 +7,7 @@
 #include "util/Angle.h"
 
 #include "box2d.h"
+#include "util/Box2DContactListener.h"
 
 
 using namespace Supernova;
@@ -21,12 +22,20 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
 
     b2Vec2 gravity(0.0f, 10.0f);
     world2D = new b2World(gravity);
+  
+    contactListener2D = new Box2DContactListener(this);
+
+    world2D->SetContactListener(contactListener2D);
 }
 
 PhysicsSystem::~PhysicsSystem(){
     if (world2D){
         delete world2D;
         world2D = NULL;
+    }
+
+    if (contactListener2D){
+        delete contactListener2D;
     }
 }
 

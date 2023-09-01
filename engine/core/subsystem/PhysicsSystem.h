@@ -16,17 +16,24 @@ class b2JointDef;
 
 namespace Supernova{
 
+	class Box2DContactListener;
+	
+
 	class PhysicsSystem : public SubSystem {
 
 	private:
 		b2World* world2D;
 		float pointsToMeterScale;
 
+		Box2DContactListener* contactListener2D;
+
 		void updateBodyPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway);
 
 	public:
 		PhysicsSystem(Scene* scene);
 		virtual ~PhysicsSystem();
+
+		FunctionSubscribe<void()> beginContact2D;
 
 		void createBody2D(Entity entity);
 		void removeBody2D(Entity entity);
