@@ -9,6 +9,8 @@
 
 namespace Supernova{
 
+    class Object;
+
     class Body2D: public EntityHandle{
     public:
         Body2D(Scene* scene, Entity entity);
@@ -16,6 +18,8 @@ namespace Supernova{
 
         Body2D(const Body2D& rhs);
         Body2D& operator=(const Body2D& rhs);
+
+        Object getAttachedObject();
 
         int createRectShape2D(float width, float height);
 

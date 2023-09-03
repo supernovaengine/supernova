@@ -8,6 +8,7 @@
 #include "SubSystem.h"
 #include "component/Body2DComponent.h"
 #include "component/Joint2DComponent.h"
+#include "object/physics/Contact2D.h"
 
 class b2World;
 class b2Body;
@@ -33,7 +34,8 @@ namespace Supernova{
 		PhysicsSystem(Scene* scene);
 		virtual ~PhysicsSystem();
 
-		FunctionSubscribe<void()> beginContact2D;
+		FunctionSubscribe<void(Contact2D)> beginContact2D;
+		FunctionSubscribe<void(Contact2D)> endContact2D;
 
 		void createBody2D(Entity entity);
 		void removeBody2D(Entity entity);
@@ -41,7 +43,7 @@ namespace Supernova{
 
 		b2Body* getBody(Entity entity);
 
-		bool loadBody2D(Body2DComponent& body);
+		bool loadBody2D(Entity entity);
 		void destroyBody2D(Body2DComponent& body);
 
 		bool loadShape2D(Body2DComponent& body, b2Shape* shape, size_t index);

@@ -23,7 +23,7 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     b2Vec2 gravity(0.0f, 10.0f);
     world2D = new b2World(gravity);
   
-    contactListener2D = new Box2DContactListener(this);
+    contactListener2D = new Box2DContactListener(scene, this);
 
     world2D->SetContactListener(contactListener2D);
 }
@@ -55,7 +55,7 @@ void PhysicsSystem::createBody2D(Entity entity){
 
     if (!signature.test(scene->getComponentType<Body2DComponent>())){
         scene->addComponent<Body2DComponent>(entity, {});
-        loadBody2D(scene->getComponent<Body2DComponent>(entity));
+        loadBody2D(entity);
     }
 }
 
@@ -102,11 +102,12 @@ b2Body* PhysicsSystem::getBody(Entity entity){
     return NULL;
 }
 
-bool PhysicsSystem::loadBody2D(Body2DComponent& body){
+bool PhysicsSystem::loadBody2D(Entity entity){
+    Body2DComponent& body = scene->getComponent<Body2DComponent>(entity);
+
     if (world2D && !body.body){
         b2BodyDef bodyDef;
-        bodyDef.position.Set(0.0f, 0.0f);
-        bodyDef.angle = 0.0f;
+        bodyDef.userData.pointer = entity;
 
         body.body = world2D->CreateBody(&bodyDef);
         body.newBody = true;
@@ -135,6 +136,7 @@ bool PhysicsSystem::loadShape2D(Body2DComponent& body, b2Shape* shape, size_t in
     if (world2D && !body.shapes[index].fixture){
         b2FixtureDef fixtureDef;
         fixtureDef.shape = shape;
+        fixtureDef.userData.pointer = index;
 
         body.shapes[index].fixture = body.body->CreateFixture(&fixtureDef);
 

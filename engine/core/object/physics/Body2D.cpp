@@ -4,6 +4,7 @@
 
 #include "Body2D.h"
 
+#include "object/Object.h"
 #include "subsystem/PhysicsSystem.h"
 #include "component/Body2DComponent.h"
 #include "box2d.h"
@@ -48,6 +49,10 @@ Body2D::~Body2D(){
 
 Body2D::Body2D(const Body2D& rhs): EntityHandle(rhs){
     
+}
+
+Object Body2D::getAttachedObject(){
+    return Object(scene, entity);
 }
 
 Body2D& Body2D::operator=(const Body2D& rhs){
