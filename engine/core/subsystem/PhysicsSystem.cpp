@@ -39,6 +39,14 @@ PhysicsSystem::~PhysicsSystem(){
     }
 }
 
+float PhysicsSystem::getPointsToMeterScale(){
+    return pointsToMeterScale;
+}
+
+void PhysicsSystem::setPointsToMeterScale(float pointsToMeterScale){
+    this->pointsToMeterScale = pointsToMeterScale;
+}
+
 void PhysicsSystem::updateBodyPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway){
     if (signature.test(scene->getComponentType<Transform>())){
         Transform& transform = scene->getComponent<Transform>(entity);
@@ -77,7 +85,7 @@ int PhysicsSystem::addRectShape2D(Entity entity, float width, float height){
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
             b2PolygonShape shape;
-            shape.SetAsBox(width/pointsToMeterScale, height/pointsToMeterScale);
+            shape.SetAsBox(width / pointsToMeterScale, height / pointsToMeterScale);
 
             loadShape2D(*body, &shape, body->numShapes);
 

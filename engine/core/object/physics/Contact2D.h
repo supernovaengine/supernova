@@ -7,8 +7,10 @@
 
 #include "Entity.h"
 #include "Body2D.h"
+#include "Manifold2D.h"
 
 class b2Contact;
+class b2Manifold;
 
 namespace Supernova{
 
@@ -23,6 +25,10 @@ namespace Supernova{
 
         Contact2D(const Contact2D& rhs);
         Contact2D& operator=(const Contact2D& rhs);
+
+        b2Contact* getBox2DContact();
+
+        Manifold2D getManifold();
 
         bool isTouching() const;
 

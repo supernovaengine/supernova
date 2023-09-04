@@ -30,6 +30,14 @@ Contact2D& Contact2D::operator=(const Contact2D& rhs){
     return *this;
 }
 
+b2Contact* Contact2D::getBox2DContact(){
+    return contact;
+}
+
+Manifold2D Contact2D::getManifold(){
+    return Manifold2D(scene, contact->GetManifold());
+}
+
 bool Contact2D::isTouching() const{
     return contact->IsTouching();
 }
