@@ -30,7 +30,7 @@ Contact2D& Contact2D::operator=(const Contact2D& rhs){
     return *this;
 }
 
-bool Contact2D::isTouching(){
+bool Contact2D::isTouching() const{
     return contact->IsTouching();
 }
 
@@ -60,4 +60,44 @@ Body2D Contact2D::getBodyObjectB(){
 
 size_t Contact2D::getFixtureIndexB(){
     return contact->GetFixtureB()->GetUserData().pointer;
+}
+
+bool Contact2D::isEnabled() const{
+    return contact->IsEnabled();
+}
+
+void Contact2D::setEnabled(bool enabled){
+    contact->SetEnabled(enabled);
+}
+
+float Contact2D::getFriction() const{
+    return contact->GetFriction();
+}
+
+void Contact2D::setFriction(float friction){
+    contact->SetFriction(friction);
+}
+
+void Contact2D::resetFriction(){
+    contact->ResetFriction();
+}
+
+float Contact2D::getRestitution() const{
+    return contact->GetRestitution();
+}
+
+void Contact2D::setRestitution(float restitution){
+    contact->SetRestitution(restitution);
+}
+
+void Contact2D::resetRestitution(){
+    contact->ResetRestitution();
+}
+
+float Contact2D::getTangentSpeed() const{
+    return contact->GetTangentSpeed();
+}
+
+void Contact2D::setTangentSpeed(float tangentSpeed){
+    contact->SetTangentSpeed(tangentSpeed);
 }

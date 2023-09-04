@@ -24,7 +24,7 @@ namespace Supernova{
         Contact2D(const Contact2D& rhs);
         Contact2D& operator=(const Contact2D& rhs);
 
-        bool isTouching();
+        bool isTouching() const;
 
         Entity getBodyA();
         Body2D getBodyObjectA();
@@ -33,6 +33,22 @@ namespace Supernova{
         Entity getBodyB();
         Body2D getBodyObjectB();
         size_t getFixtureIndexB();
+
+        bool isEnabled() const;
+        void setEnabled(bool enabled);
+
+        float getFriction() const;
+        void setFriction(float friction);
+
+        void resetFriction();
+
+        float getRestitution() const;
+        void setRestitution(float restitution);
+
+        void resetRestitution();
+
+        float getTangentSpeed() const;
+        void setTangentSpeed(float tangentSpeed);
     };
 }
 
