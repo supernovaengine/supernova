@@ -5,8 +5,7 @@
 #ifndef MANIFOLD2D_H
 #define MANIFOLD2D_H
 
-#include "Entity.h"
-#include "Body2D.h"
+#include "Scene.h"
 
 class b2Manifold;
 

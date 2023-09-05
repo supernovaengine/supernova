@@ -8,6 +8,7 @@
 #include "Entity.h"
 #include "Body2D.h"
 #include "Manifold2D.h"
+#include "WorldManifold2D.h"
 
 class b2Contact;
 class b2Manifold;
@@ -29,6 +30,7 @@ namespace Supernova{
         b2Contact* getBox2DContact();
 
         Manifold2D getManifold();
+        WorldManifold2D getWorldManifold();
 
         bool isTouching() const;
 

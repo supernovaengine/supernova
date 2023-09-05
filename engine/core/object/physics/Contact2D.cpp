@@ -38,6 +38,10 @@ Manifold2D Contact2D::getManifold(){
     return Manifold2D(scene, contact->GetManifold());
 }
 
+WorldManifold2D Contact2D::getWorldManifold(){
+    return WorldManifold2D(scene, contact->GetWorldManifold());
+}
+
 bool Contact2D::isTouching() const{
     return contact->IsTouching();
 }
