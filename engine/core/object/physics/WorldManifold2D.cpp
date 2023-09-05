@@ -9,28 +9,41 @@
 
 using namespace Supernova;
 
-WorldManifold2D::WorldManifold2D(Scene* scene, b2WorldManifold* worldmanifold){
+WorldManifold2D::WorldManifold2D(Scene* scene){
     this->scene = scene;
-    this->worldmanifold = worldmanifold;
+    this->worldmanifold = new b2WorldManifold();
 }
 
 WorldManifold2D::~WorldManifold2D(){
-
+    delete this->worldmanifold;
 }
 
 WorldManifold2D::WorldManifold2D(const WorldManifold2D& rhs){
     scene = rhs.scene;
-    worldmanifold = rhs.worldmanifold;
-
+    memcpy(&worldmanifold, &rhs.worldmanifold, sizeof(b2WorldManifold));
 }
 
 WorldManifold2D& WorldManifold2D::operator=(const WorldManifold2D& rhs){
     scene = rhs.scene;
-    worldmanifold = rhs.worldmanifold;
+    memcpy(&worldmanifold, &rhs.worldmanifold, sizeof(b2WorldManifold));
     
     return *this;
 }
 
-b2WorldManifold* Manifold2D::getBox2DWorldManifold(){
+b2WorldManifold* WorldManifold2D::getBox2DWorldManifold(){
     return worldmanifold;
+}
+
+Vector2 WorldManifold2D::getNormal() const{
+    return Vector2(worldmanifold->normal.x, worldmanifold->normal.y);
+}
+
+Vector2 WorldManifold2D::getPoint(size_t index) const{
+    //TODO: check index by b2_maxManifoldPoints
+    return Vector2(worldmanifold->points[index].x, worldmanifold->points[index].y);
+}
+
+float WorldManifold2D::getSeparations(size_t index) const{
+    //TODO: check index by b2_maxManifoldPoints
+    return worldmanifold->separations[index];
 }

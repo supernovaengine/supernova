@@ -24,6 +24,7 @@ namespace Supernova{
 
         public:
             Manifold2D(Scene* scene, b2Manifold* manifold);
+            Manifold2D(Scene* scene, const b2Manifold* manifold);
             virtual ~Manifold2D();
 
             Manifold2D(const Manifold2D& rhs);

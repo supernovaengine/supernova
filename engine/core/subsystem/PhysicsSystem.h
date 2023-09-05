@@ -9,6 +9,8 @@
 #include "component/Body2DComponent.h"
 #include "component/Joint2DComponent.h"
 #include "object/physics/Contact2D.h"
+#include "object/physics/Manifold2D.h"
+#include "object/physics/ContactImpulse2D.h"
 
 class b2World;
 class b2Body;
@@ -39,6 +41,8 @@ namespace Supernova{
 
 		FunctionSubscribe<void(Contact2D)> beginContact2D;
 		FunctionSubscribe<void(Contact2D)> endContact2D;
+		FunctionSubscribe<void(Contact2D, Manifold2D)> preSolve2D;
+		FunctionSubscribe<void(Contact2D, ContactImpulse2D)> postSolve2D;
 
 		void createBody2D(Entity entity);
 		void removeBody2D(Entity entity);

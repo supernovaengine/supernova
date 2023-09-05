@@ -39,7 +39,9 @@ Manifold2D Contact2D::getManifold(){
 }
 
 WorldManifold2D Contact2D::getWorldManifold(){
-    return WorldManifold2D(scene, contact->GetWorldManifold());
+    WorldManifold2D worldManifold(scene);
+    contact->GetWorldManifold(worldManifold.getBox2DWorldManifold());
+    return worldManifold;
 }
 
 bool Contact2D::isTouching() const{

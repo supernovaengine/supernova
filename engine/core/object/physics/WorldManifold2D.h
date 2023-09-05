@@ -17,7 +17,7 @@ namespace Supernova{
             b2WorldManifold* worldmanifold;
 
         public:
-            WorldManifold2D(Scene* scene, b2WorldManifold* worldmanifold);
+            WorldManifold2D(Scene* scene);
             virtual ~WorldManifold2D();
 
             WorldManifold2D(const WorldManifold2D& rhs);
@@ -26,8 +26,8 @@ namespace Supernova{
             b2WorldManifold* getBox2DWorldManifold();
 
             Vector2 getNormal() const;
-            Vector2 getPoint() const;
-            float getSeparations() const;
+            Vector2 getPoint(size_t index) const;
+            float getSeparations(size_t index) const;
     };
 }
 

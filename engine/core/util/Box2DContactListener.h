@@ -9,6 +9,8 @@
 #include "box2d.h"
 #include "subsystem/PhysicsSystem.h"
 #include "object/physics/Contact2D.h"
+#include "object/physics/Manifold2D.h"
+#include "object/physics/ContactImpulse2D.h"
 
 namespace Supernova{
 
@@ -32,11 +34,13 @@ namespace Supernova{
             physicsSystem->endContact2D.call(Contact2D(scene, contact));
         }
         
-        void PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
-        { /* handle pre-solve event */ }
+        void PreSolve(b2Contact* contact, const b2Manifold* oldManifold){
+            physicsSystem->preSolve2D.call(Contact2D(scene, contact), Manifold2D(scene, oldManifold));
+        }
         
-        void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
-        { /* handle post-solve event */ }
+        void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse){
+            physicsSystem->postSolve2D.call(Contact2D(scene, contact), ContactImpulse2D(impulse));
+        }
     };
 
 }
