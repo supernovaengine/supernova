@@ -204,6 +204,19 @@
 		7162FE712597C99C0075B97D /* SupernovaApple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7162FE302597C7990075B97D /* SupernovaApple.mm */; };
 		7162FEAC25993F810075B97D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FEAB25993F810075B97D /* main.cpp */; };
 		7162FEAD25993F810075B97D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FEAB25993F810075B97D /* main.cpp */; };
+		71651FEE2AA804B4008D9BF5 /* WorldManifold2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FE62AA804B3008D9BF5 /* WorldManifold2D.cpp */; };
+		71651FEF2AA804B4008D9BF5 /* WorldManifold2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FE62AA804B3008D9BF5 /* WorldManifold2D.cpp */; };
+		71651FF02AA804B4008D9BF5 /* WorldManifold2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 71651FE72AA804B3008D9BF5 /* WorldManifold2D.h */; };
+		71651FF12AA804B4008D9BF5 /* Contact2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 71651FE82AA804B4008D9BF5 /* Contact2D.h */; };
+		71651FF22AA804B4008D9BF5 /* Manifold2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 71651FE92AA804B4008D9BF5 /* Manifold2D.h */; };
+		71651FF32AA804B4008D9BF5 /* ContactImpulse2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 71651FEA2AA804B4008D9BF5 /* ContactImpulse2D.h */; };
+		71651FF42AA804B4008D9BF5 /* ContactImpulse2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FEB2AA804B4008D9BF5 /* ContactImpulse2D.cpp */; };
+		71651FF52AA804B4008D9BF5 /* ContactImpulse2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FEB2AA804B4008D9BF5 /* ContactImpulse2D.cpp */; };
+		71651FF62AA804B4008D9BF5 /* Manifold2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FEC2AA804B4008D9BF5 /* Manifold2D.cpp */; };
+		71651FF72AA804B4008D9BF5 /* Manifold2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FEC2AA804B4008D9BF5 /* Manifold2D.cpp */; };
+		71651FF82AA804B4008D9BF5 /* Contact2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FED2AA804B4008D9BF5 /* Contact2D.cpp */; };
+		71651FF92AA804B4008D9BF5 /* Contact2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FED2AA804B4008D9BF5 /* Contact2D.cpp */; };
+		71651FFB2AA804D4008D9BF5 /* Box2DContactListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 71651FFA2AA804D4008D9BF5 /* Box2DContactListener.h */; };
 		7170A3CB2818A87E0003E965 /* BoneComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 7170A3C92818A87E0003E965 /* BoneComponent.h */; };
 		7170A3CC2818A87E0003E965 /* ModelComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 7170A3CA2818A87E0003E965 /* ModelComponent.h */; };
 		7170A3D42818A8A30003E965 /* Bone.h in Headers */ = {isa = PBXBuildFile; fileRef = 7170A3CD2818A8A30003E965 /* Bone.h */; };
@@ -1146,6 +1159,15 @@
 		7162FE2F2597C7990075B97D /* SupernovaApple.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupernovaApple.h; sourceTree = "<group>"; };
 		7162FE302597C7990075B97D /* SupernovaApple.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = SupernovaApple.mm; sourceTree = "<group>"; };
 		7162FEAB25993F810075B97D /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		71651FE62AA804B3008D9BF5 /* WorldManifold2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldManifold2D.cpp; sourceTree = "<group>"; };
+		71651FE72AA804B3008D9BF5 /* WorldManifold2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldManifold2D.h; sourceTree = "<group>"; };
+		71651FE82AA804B4008D9BF5 /* Contact2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Contact2D.h; sourceTree = "<group>"; };
+		71651FE92AA804B4008D9BF5 /* Manifold2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Manifold2D.h; sourceTree = "<group>"; };
+		71651FEA2AA804B4008D9BF5 /* ContactImpulse2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactImpulse2D.h; sourceTree = "<group>"; };
+		71651FEB2AA804B4008D9BF5 /* ContactImpulse2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContactImpulse2D.cpp; sourceTree = "<group>"; };
+		71651FEC2AA804B4008D9BF5 /* Manifold2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Manifold2D.cpp; sourceTree = "<group>"; };
+		71651FED2AA804B4008D9BF5 /* Contact2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Contact2D.cpp; sourceTree = "<group>"; };
+		71651FFA2AA804D4008D9BF5 /* Box2DContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box2DContactListener.h; sourceTree = "<group>"; };
 		7170A3C92818A87E0003E965 /* BoneComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoneComponent.h; sourceTree = "<group>"; };
 		7170A3CA2818A87E0003E965 /* ModelComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelComponent.h; sourceTree = "<group>"; };
 		7170A3CD2818A8A30003E965 /* Bone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bone.h; sourceTree = "<group>"; };
@@ -1881,6 +1903,7 @@
 				71ED64C428B45E0B005D2D96 /* Angle.h */,
 				71165BBD282981BE00CF79C1 /* Base64.cpp */,
 				71165BBE282981BE00CF79C1 /* Base64.h */,
+				71651FFA2AA804D4008D9BF5 /* Box2DContactListener.h */,
 				7105A55628B305910092EA05 /* Color.cpp */,
 				7105A55728B305910092EA05 /* Color.h */,
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
@@ -2723,10 +2746,18 @@
 		71E824872A9C23A600C8E6F2 /* physics */ = {
 			isa = PBXGroup;
 			children = (
-				71E824882A9C23A600C8E6F2 /* Joint2D.cpp */,
-				71E824892A9C23A600C8E6F2 /* Joint2D.h */,
 				71E8248A2A9C23A600C8E6F2 /* Body2D.cpp */,
 				71E8248B2A9C23A600C8E6F2 /* Body2D.h */,
+				71651FED2AA804B4008D9BF5 /* Contact2D.cpp */,
+				71651FE82AA804B4008D9BF5 /* Contact2D.h */,
+				71651FEB2AA804B4008D9BF5 /* ContactImpulse2D.cpp */,
+				71651FEA2AA804B4008D9BF5 /* ContactImpulse2D.h */,
+				71E824882A9C23A600C8E6F2 /* Joint2D.cpp */,
+				71E824892A9C23A600C8E6F2 /* Joint2D.h */,
+				71651FEC2AA804B4008D9BF5 /* Manifold2D.cpp */,
+				71651FE92AA804B4008D9BF5 /* Manifold2D.h */,
+				71651FE62AA804B3008D9BF5 /* WorldManifold2D.cpp */,
+				71651FE72AA804B3008D9BF5 /* WorldManifold2D.h */,
 			);
 			path = physics;
 			sourceTree = "<group>";
@@ -2842,6 +2873,7 @@
 				71E544FE284D5BB700C68FAB /* Animation.h in Headers */,
 				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
 				710506B0297F4483002DD23C /* Shape.h in Headers */,
+				71651FF22AA804B4008D9BF5 /* Manifold2D.h in Headers */,
 				71ABBD4127A879B9001CE3AF /* ButtonComponent.h in Headers */,
 				71D7494E296731A800348AB8 /* FogComponent.h in Headers */,
 				71FCE4C528E0FA31003C5217 /* LuaBridge.h in Headers */,
@@ -2855,6 +2887,8 @@
 				71ABBD1E277A31BA001CE3AF /* Text.h in Headers */,
 				71E54505284D5BB700C68FAB /* TranslateTracks.h in Headers */,
 				71E54517284D5BE000C68FAB /* TranslateTracksComponent.h in Headers */,
+				71651FF02AA804B4008D9BF5 /* WorldManifold2D.h in Headers */,
+				71651FFB2AA804D4008D9BF5 /* Box2DContactListener.h in Headers */,
 				71E54514284D5BE000C68FAB /* ScaleTracksComponent.h in Headers */,
 				717AD992292FC30A007D7DB5 /* Framebuffer.h in Headers */,
 				71ABBD4B27A87A2E001CE3AF /* MeshSystem.h in Headers */,
@@ -2862,6 +2896,7 @@
 				71BE620025B1DB22006D6E02 /* System.h in Headers */,
 				71E54508284D5BB700C68FAB /* MorphTracks.h in Headers */,
 				71ABBD10277A313C001CE3AF /* AlphaAction.h in Headers */,
+				71651FF12AA804B4008D9BF5 /* Contact2D.h in Headers */,
 				71ABBD2B277A3210001CE3AF /* STBText.h in Headers */,
 				71CC839726B8C4D800EEBB93 /* Light.h in Headers */,
 				717D9B4127337850002C0803 /* ParticlesAnimationComponent.h in Headers */,
@@ -2904,6 +2939,7 @@
 				71E54518284D5BE000C68FAB /* KeyframeTracksComponent.h in Headers */,
 				71ABBD4027A879B9001CE3AF /* MeshPolygonComponent.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
+				71651FF32AA804B4008D9BF5 /* ContactImpulse2D.h in Headers */,
 				713E581627BA9D1300376680 /* TextEditComponent.h in Headers */,
 				718FDDF62837CA9A00AF314C /* glsl300es.h in Headers */,
 				71E824852A9C238900C8E6F2 /* Body2DComponent.h in Headers */,
@@ -3692,6 +3728,7 @@
 				713D8293259D307F00567F9F /* Scene.cpp in Sources */,
 				717D9B3E2733783D002C0803 /* ParticlesAnimation.cpp in Sources */,
 				7105A56D28B305B20092EA05 /* IOClassesLua.cpp in Sources */,
+				71651FF72AA804B4008D9BF5 /* Manifold2D.cpp in Sources */,
 				713D8294259D307F00567F9F /* Data.cpp in Sources */,
 				71E8248D2A9C23A600C8E6F2 /* Joint2D.cpp in Sources */,
 				71451BBF270CA16200712643 /* ActionSystem.cpp in Sources */,
@@ -3709,6 +3746,7 @@
 				71ABBD2A277A3210001CE3AF /* STBText.cpp in Sources */,
 				71451BE3270CA17F00712643 /* ScaleAction.cpp in Sources */,
 				713D8297259D307F00567F9F /* FileData.cpp in Sources */,
+				71651FF52AA804B4008D9BF5 /* ContactImpulse2D.cpp in Sources */,
 				71451BEC270CA2C900712643 /* Sprite.cpp in Sources */,
 				717AD98F29211976007D7DB5 /* Container.cpp in Sources */,
 				713D8298259D307F00567F9F /* ShaderRender.cpp in Sources */,
@@ -3743,6 +3781,7 @@
 				713E580727BA9CB700376680 /* MeshPolygon.cpp in Sources */,
 				71BE624425B1DB9E006D6E02 /* ShaderPool.cpp in Sources */,
 				717AD96E290B661A007D7DB5 /* AudioSystem.cpp in Sources */,
+				71651FF92AA804B4008D9BF5 /* Contact2D.cpp in Sources */,
 				71BE622125B1DB83006D6E02 /* TextureData.cpp in Sources */,
 				713D82A8259D307F00567F9F /* Camera.cpp in Sources */,
 				713D82A9259D307F00567F9F /* Object.cpp in Sources */,
@@ -3756,6 +3795,7 @@
 				71451BE0270CA17F00712643 /* PositionAction.cpp in Sources */,
 				71ABBD4527A879D4001CE3AF /* Button.cpp in Sources */,
 				713D82AD259D307F00567F9F /* RenderSystem.cpp in Sources */,
+				71651FEF2AA804B4008D9BF5 /* WorldManifold2D.cpp in Sources */,
 				713D82AE259D307F00567F9F /* Engine.cpp in Sources */,
 				71ABBD1D277A31BA001CE3AF /* Text.cpp in Sources */,
 				71ABBD4A27A87A2E001CE3AF /* MeshSystem.cpp in Sources */,
@@ -3844,6 +3884,7 @@
 				7162FE0E2596A5BE0075B97D /* SokolShader.cpp in Sources */,
 				717D9B3D2733783D002C0803 /* ParticlesAnimation.cpp in Sources */,
 				7105A56C28B305B20092EA05 /* IOClassesLua.cpp in Sources */,
+				71651FF62AA804B4008D9BF5 /* Manifold2D.cpp in Sources */,
 				7162FE0F2596A5BE0075B97D /* SokolTexture.cpp in Sources */,
 				71E8248C2A9C23A600C8E6F2 /* Joint2D.cpp in Sources */,
 				71451BBE270CA16200712643 /* ActionSystem.cpp in Sources */,
@@ -3861,6 +3902,7 @@
 				71ABBD29277A3210001CE3AF /* STBText.cpp in Sources */,
 				71451BE2270CA17F00712643 /* ScaleAction.cpp in Sources */,
 				7162FD1325963AE00075B97D /* Scene.cpp in Sources */,
+				71651FF42AA804B4008D9BF5 /* ContactImpulse2D.cpp in Sources */,
 				71451BEB270CA2C900712643 /* Sprite.cpp in Sources */,
 				717AD98E29211976007D7DB5 /* Container.cpp in Sources */,
 				7162FD1625963AE00075B97D /* Data.cpp in Sources */,
@@ -3895,6 +3937,7 @@
 				7162FD3725963AE00075B97D /* Rect.cpp in Sources */,
 				713E580627BA9CB700376680 /* MeshPolygon.cpp in Sources */,
 				717AD96D290B661A007D7DB5 /* AudioSystem.cpp in Sources */,
+				71651FF82AA804B4008D9BF5 /* Contact2D.cpp in Sources */,
 				71BE624325B1DB9E006D6E02 /* ShaderPool.cpp in Sources */,
 				71BE622025B1DB83006D6E02 /* TextureData.cpp in Sources */,
 				7162FD3925963AE00075B97D /* Quaternion.cpp in Sources */,
@@ -3908,6 +3951,7 @@
 				7162FD3D25963AE00075B97D /* Plane.cpp in Sources */,
 				71451BDF270CA17F00712643 /* PositionAction.cpp in Sources */,
 				71ABBD4427A879D4001CE3AF /* Button.cpp in Sources */,
+				71651FEE2AA804B4008D9BF5 /* WorldManifold2D.cpp in Sources */,
 				7162FD4325963AE00075B97D /* Camera.cpp in Sources */,
 				71ABBD1C277A31BA001CE3AF /* Text.cpp in Sources */,
 				71ABBD4927A87A2E001CE3AF /* MeshSystem.cpp in Sources */,
