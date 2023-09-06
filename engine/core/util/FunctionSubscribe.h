@@ -158,12 +158,17 @@ namespace Supernova {
                     function(args...);
                 };
             } else {
-                for (auto& function : functions)
-                {
-                    return function(args...);
-                };
-                return Ret();
+                return callRet(args..., Ret());
             }
+        }
+
+        template<typename T>
+        Ret callRet(Args... args, T def){
+            for (auto& function : functions)
+            {
+                return function(args...);
+            };
+            return def;
         }
 
         Ret operator()(Args... args)

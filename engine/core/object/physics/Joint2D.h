@@ -18,6 +18,8 @@ namespace Supernova{
         Joint2D(const Joint2D& rhs);
         Joint2D& operator=(const Joint2D& rhs);
 
+        b2Joint* getBox2DJoint() const;
+
         void setDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB);    
         void setRevoluteJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor);
         void setPrismaticJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor, Vector2 worldAxis);

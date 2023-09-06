@@ -20,6 +20,7 @@ class b2JointDef;
 namespace Supernova{
 
 	class Box2DContactListener;
+	class Box2DContactFilter;
 	
 
 	class PhysicsSystem : public SubSystem {
@@ -29,6 +30,7 @@ namespace Supernova{
 		float pointsToMeterScale;
 
 		Box2DContactListener* contactListener2D;
+		Box2DContactFilter* contactFilter2D;
 
 		void updateBodyPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway);
 
@@ -43,6 +45,8 @@ namespace Supernova{
 		FunctionSubscribe<void(Contact2D)> endContact2D;
 		FunctionSubscribe<void(Contact2D, Manifold2D)> preSolve2D;
 		FunctionSubscribe<void(Contact2D, ContactImpulse2D)> postSolve2D;
+
+		FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)> shouldCollide2D;
 
 		void createBody2D(Entity entity);
 		void removeBody2D(Entity entity);

@@ -51,6 +51,24 @@ Body2D::Body2D(const Body2D& rhs): EntityHandle(rhs){
     
 }
 
+b2Body* Body2D::getBox2DBody() const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    return body.body;
+}
+
+b2Fixture* Body2D::getBox2DFixture(size_t index) const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    if (index >=0 && index < MAX_SHAPES){
+        return body.shapes[index].fixture;
+    }else{
+        Log::error("Cannot find shape %i of body", index);
+    }
+
+    return NULL;
+}
+
 Object Body2D::getAttachedObject(){
     return Object(scene, entity);
 }

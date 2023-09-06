@@ -19,6 +19,9 @@ namespace Supernova{
         Body2D(const Body2D& rhs);
         Body2D& operator=(const Body2D& rhs);
 
+        b2Body* getBox2DBody() const;
+        b2Fixture* getBox2DFixture(size_t index) const;
+
         Object getAttachedObject();
 
         int createRectShape(float width, float height);

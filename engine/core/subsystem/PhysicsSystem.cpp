@@ -8,7 +8,7 @@
 
 #include "box2d.h"
 #include "util/Box2DContactListener.h"
-
+#include "util/Box2DContactFilter.h"
 
 using namespace Supernova;
 
@@ -24,8 +24,10 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     world2D = new b2World(gravity);
   
     contactListener2D = new Box2DContactListener(scene, this);
+    contactFilter2D = new Box2DContactFilter(scene, this);
 
     world2D->SetContactListener(contactListener2D);
+    world2D->SetContactFilter(contactFilter2D);
 }
 
 PhysicsSystem::~PhysicsSystem(){
@@ -36,6 +38,10 @@ PhysicsSystem::~PhysicsSystem(){
 
     if (contactListener2D){
         delete contactListener2D;
+    }
+
+    if (contactFilter2D){
+        delete contactFilter2D;
     }
 }
 
