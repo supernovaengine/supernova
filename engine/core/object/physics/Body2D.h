@@ -21,24 +21,24 @@ namespace Supernova{
 
         Object getAttachedObject();
 
-        int createRectShape2D(float width, float height);
+        int createRectShape(float width, float height);
 
 
-        void setShape2DDensity(float density);
-        void setShape2DFriction(float friction);
-        void setShape2DRestitution(float restitution);
+        void setShapeDensity(float density);
+        void setShapeFriction(float friction);
+        void setShapeRestitution(float restitution);
 
-        void setShape2DDensity(size_t index, float density);
-        void setShape2DFriction(size_t index, float friction);
-        void setShape2DRestitution(size_t index, float restitution);
+        void setShapeDensity(size_t index, float density);
+        void setShapeFriction(size_t index, float friction);
+        void setShapeRestitution(size_t index, float restitution);
 
-        float getShape2DDensity() const;
-        float getShape2DFriction() const;
-        float getShape2DRestitution() const;
+        float getShapeDensity() const;
+        float getShapeFriction() const;
+        float getShapeRestitution() const;
 
-        float getShape2DDensity(size_t index) const;
-        float getShape2DFriction(size_t index) const;
-        float getShape2DRestitution(size_t index) const;
+        float getShapeDensity(size_t index) const;
+        float getShapeFriction(size_t index) const;
+        float getShapeRestitution(size_t index) const;
 
 
         void setLinearVelocity(Vector2 linearVelocity);

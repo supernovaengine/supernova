@@ -60,24 +60,24 @@ Body2D& Body2D::operator=(const Body2D& rhs){
     return *this;
 }
 
-int Body2D::createRectShape2D(float width, float height){
+int Body2D::createRectShape(float width, float height){
     int index = scene->getSystem<PhysicsSystem>()->addRectShape2D(entity, width, height);
     return index;
 }
 
-void Body2D::setShape2DDensity(float density){
-    setShape2DDensity(0, density);
+void Body2D::setShapeDensity(float density){
+    setShapeDensity(0, density);
 }
 
-void Body2D::setShape2DFriction(float friction){
-    setShape2DFriction(0, friction);
+void Body2D::setShapeFriction(float friction){
+    setShapeFriction(0, friction);
 }
 
-void Body2D::setShape2DRestitution(float restitution){
-    setShape2DRestitution(0, restitution);
+void Body2D::setShapeRestitution(float restitution){
+    setShapeRestitution(0, restitution);
 }
 
-void Body2D::setShape2DDensity(size_t index, float density){
+void Body2D::setShapeDensity(size_t index, float density){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
@@ -88,7 +88,7 @@ void Body2D::setShape2DDensity(size_t index, float density){
     }
 }
 
-void Body2D::setShape2DFriction(size_t index, float friction){
+void Body2D::setShapeFriction(size_t index, float friction){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
@@ -98,7 +98,7 @@ void Body2D::setShape2DFriction(size_t index, float friction){
     }
 }
 
-void Body2D::setShape2DRestitution(size_t index, float restitution){
+void Body2D::setShapeRestitution(size_t index, float restitution){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
@@ -108,20 +108,20 @@ void Body2D::setShape2DRestitution(size_t index, float restitution){
     }
 }
 
-float Body2D::getShape2DDensity() const{
-    return getShape2DDensity(0);
+float Body2D::getShapeDensity() const{
+    return getShapeDensity(0);
 }
 
-float Body2D::getShape2DFriction() const{
-    return getShape2DFriction(0);
+float Body2D::getShapeFriction() const{
+    return getShapeFriction(0);
 }
 
-float Body2D::getShape2DRestitution() const{
-    return getShape2DRestitution(0);
+float Body2D::getShapeRestitution() const{
+    return getShapeRestitution(0);
 }
 
 
-float Body2D::getShape2DDensity(size_t index) const{
+float Body2D::getShapeDensity(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
@@ -133,7 +133,7 @@ float Body2D::getShape2DDensity(size_t index) const{
     return -1;
 }
 
-float Body2D::getShape2DFriction(size_t index) const{
+float Body2D::getShapeFriction(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){
@@ -145,7 +145,7 @@ float Body2D::getShape2DFriction(size_t index) const{
     return -1;
 }
 
-float Body2D::getShape2DRestitution(size_t index) const{
+float Body2D::getShapeRestitution(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >=0 && index < MAX_SHAPES){

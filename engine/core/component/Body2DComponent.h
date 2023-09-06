@@ -24,6 +24,7 @@ namespace Supernova{
         DYNAMIC
     };
 
+    // fixture in Box2D
     struct CollisionShape2D{
         b2Fixture* fixture = NULL;
 

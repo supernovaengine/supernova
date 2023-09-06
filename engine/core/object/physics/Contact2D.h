@@ -34,13 +34,13 @@ namespace Supernova{
 
         bool isTouching() const;
 
-        Entity getBodyA() const;
-        Body2D getBodyObjectA() const;
-        size_t getFixtureIndexA() const;
+        Entity getBodyEntityA() const;
+        Body2D getBodyA() const;
+        size_t getShapeIndexA() const; // fixture in Box2D
 
-        Entity getBodyB() const;
-        Body2D getBodyObjectB() const;
-        size_t getFixtureIndexB() const;
+        Entity getBodyEntityB() const;
+        Body2D getBodyB() const;
+        size_t getShapeIndexB() const; // fixture in Box2D
 
         bool isEnabled() const;
         void setEnabled(bool enabled);

@@ -48,31 +48,31 @@ bool Contact2D::isTouching() const{
     return contact->IsTouching();
 }
 
-Entity Contact2D::getBodyA() const{
+Entity Contact2D::getBodyEntityA() const{
     return contact->GetFixtureA()->GetBody()->GetUserData().pointer;
 }
 
-Body2D Contact2D::getBodyObjectA() const{
-    Body2D body2d(scene, getBodyA());
+Body2D Contact2D::getBodyA() const{
+    Body2D body2d(scene, getBodyEntityA());
 
     return body2d;
 }
 
-size_t Contact2D::getFixtureIndexA() const{
+size_t Contact2D::getShapeIndexA() const{
     return contact->GetFixtureA()->GetUserData().pointer;
 }
 
-Entity Contact2D::getBodyB() const{
+Entity Contact2D::getBodyEntityB() const{
     return contact->GetFixtureB()->GetBody()->GetUserData().pointer;
 }
 
-Body2D Contact2D::getBodyObjectB() const{
-    Body2D body2d(scene, getBodyB());
+Body2D Contact2D::getBodyB() const{
+    Body2D body2d(scene, getBodyEntityB());
 
     return body2d;
 }
 
-size_t Contact2D::getFixtureIndexB() const{
+size_t Contact2D::getShapeIndexB() const{
     return contact->GetFixtureB()->GetUserData().pointer;
 }
 
