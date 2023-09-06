@@ -30,15 +30,15 @@ Contact2D& Contact2D::operator=(const Contact2D& rhs){
     return *this;
 }
 
-b2Contact* Contact2D::getBox2DContact(){
+b2Contact* Contact2D::getBox2DContact() const{
     return contact;
 }
 
-Manifold2D Contact2D::getManifold(){
+Manifold2D Contact2D::getManifold() const{
     return Manifold2D(scene, contact->GetManifold());
 }
 
-WorldManifold2D Contact2D::getWorldManifold(){
+WorldManifold2D Contact2D::getWorldManifold() const{
     WorldManifold2D worldManifold(scene);
     contact->GetWorldManifold(worldManifold.getBox2DWorldManifold());
     return worldManifold;
@@ -48,31 +48,31 @@ bool Contact2D::isTouching() const{
     return contact->IsTouching();
 }
 
-Entity Contact2D::getBodyA(){
+Entity Contact2D::getBodyA() const{
     return contact->GetFixtureA()->GetBody()->GetUserData().pointer;
 }
 
-Body2D Contact2D::getBodyObjectA(){
+Body2D Contact2D::getBodyObjectA() const{
     Body2D body2d(scene, getBodyA());
 
     return body2d;
 }
 
-size_t Contact2D::getFixtureIndexA(){
+size_t Contact2D::getFixtureIndexA() const{
     return contact->GetFixtureA()->GetUserData().pointer;
 }
 
-Entity Contact2D::getBodyB(){
+Entity Contact2D::getBodyB() const{
     return contact->GetFixtureB()->GetBody()->GetUserData().pointer;
 }
 
-Body2D Contact2D::getBodyObjectB(){
+Body2D Contact2D::getBodyObjectB() const{
     Body2D body2d(scene, getBodyB());
 
     return body2d;
 }
 
-size_t Contact2D::getFixtureIndexB(){
+size_t Contact2D::getFixtureIndexB() const{
     return contact->GetFixtureB()->GetUserData().pointer;
 }
 

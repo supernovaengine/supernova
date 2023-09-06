@@ -27,20 +27,20 @@ namespace Supernova{
         Contact2D(const Contact2D& rhs);
         Contact2D& operator=(const Contact2D& rhs);
 
-        b2Contact* getBox2DContact();
+        b2Contact* getBox2DContact() const;
 
-        Manifold2D getManifold();
-        WorldManifold2D getWorldManifold();
+        Manifold2D getManifold() const;
+        WorldManifold2D getWorldManifold() const;
 
         bool isTouching() const;
 
-        Entity getBodyA();
-        Body2D getBodyObjectA();
-        size_t getFixtureIndexA();
+        Entity getBodyA() const;
+        Body2D getBodyObjectA() const;
+        size_t getFixtureIndexA() const;
 
-        Entity getBodyB();
-        Body2D getBodyObjectB();
-        size_t getFixtureIndexB();
+        Entity getBodyB() const;
+        Body2D getBodyObjectB() const;
+        size_t getFixtureIndexB() const;
 
         bool isEnabled() const;
         void setEnabled(bool enabled);

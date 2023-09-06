@@ -9,15 +9,9 @@
 
 using namespace Supernova;
 
-Manifold2D::Manifold2D(Scene* scene, b2Manifold* manifold){
+Manifold2D::Manifold2D(Scene* scene, const b2Manifold* manifold){
     this->scene = scene;
     this->manifold = manifold;
-}
-
-Manifold2D::Manifold2D(Scene* scene, const b2Manifold* manifold){
-    //TODO: not editable manifold
-    this->scene = scene;
-    memcpy(&this->manifold, &manifold, sizeof(b2Manifold));
 }
 
 Manifold2D::~Manifold2D(){
@@ -37,23 +31,23 @@ Manifold2D& Manifold2D::operator=(const Manifold2D& rhs){
     return *this;
 }
 
-b2Manifold* Manifold2D::getBox2DManifold(){
+const b2Manifold* Manifold2D::getBox2DManifold() const{
     return manifold;
 }
 
-Vector2 Manifold2D::getManifoldPointLocalPoint(int32_t index){
+Vector2 Manifold2D::getManifoldPointLocalPoint(int32_t index) const{
     //TODO: check index by b2_maxManifoldPoints
     float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
     b2Vec2 localPoint = manifold->points[index].localPoint;
     return Vector2(localPoint.x * pointsToMeterScale, localPoint.y * pointsToMeterScale);
 }
 
-float Manifold2D::getManifoldPointNormalImpulse(int32_t index){
+float Manifold2D::getManifoldPointNormalImpulse(int32_t index) const{
     //TODO: check index by b2_maxManifoldPoints
     return manifold->points[index].normalImpulse;
 }
 
-float Manifold2D::getManifoldPointTangentImpulse(int32_t index){
+float Manifold2D::getManifoldPointTangentImpulse(int32_t index) const{
     //TODO: check index by b2_maxManifoldPoints
     return manifold->points[index].tangentImpulse;
 }

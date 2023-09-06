@@ -24,9 +24,9 @@ namespace Supernova{
 
         const b2ContactImpulse* getBox2DContactImpulse() const;
 
-        int32_t getCount();
-        float getNormalImpulses(int32_t index);
-        float getTangentImpulses(int32_t index);
+        int32_t getCount() const;
+        float getNormalImpulses(int32_t index) const;
+        float getTangentImpulses(int32_t index) const;
     };
 }
 

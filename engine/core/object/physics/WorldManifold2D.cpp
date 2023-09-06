@@ -30,7 +30,7 @@ WorldManifold2D& WorldManifold2D::operator=(const WorldManifold2D& rhs){
     return *this;
 }
 
-b2WorldManifold* WorldManifold2D::getBox2DWorldManifold(){
+b2WorldManifold* WorldManifold2D::getBox2DWorldManifold() const{
     return worldmanifold;
 }
 

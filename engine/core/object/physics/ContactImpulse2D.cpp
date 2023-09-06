@@ -30,16 +30,16 @@ const b2ContactImpulse* ContactImpulse2D::getBox2DContactImpulse() const{
     return contactImpulse;
 }
 
-int32_t ContactImpulse2D::getCount(){
+int32_t ContactImpulse2D::getCount() const{
     return contactImpulse->count;
 }
 
-float ContactImpulse2D::getNormalImpulses(int32_t index){
+float ContactImpulse2D::getNormalImpulses(int32_t index) const{
     //TODO: check index by b2_maxManifoldPoints
     return contactImpulse->normalImpulses[index];
 }
 
-float ContactImpulse2D::getTangentImpulses(int32_t index){
+float ContactImpulse2D::getTangentImpulses(int32_t index) const{
     //TODO: check index by b2_maxManifoldPoints
     return contactImpulse->tangentImpulses[index];
 }

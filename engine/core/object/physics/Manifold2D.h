@@ -20,21 +20,20 @@ namespace Supernova{
     class Manifold2D{
         private:
             Scene* scene;
-            b2Manifold* manifold;
+            const b2Manifold* manifold;
 
         public:
-            Manifold2D(Scene* scene, b2Manifold* manifold);
             Manifold2D(Scene* scene, const b2Manifold* manifold);
             virtual ~Manifold2D();
 
             Manifold2D(const Manifold2D& rhs);
             Manifold2D& operator=(const Manifold2D& rhs);
 
-            b2Manifold* getBox2DManifold();
+            const b2Manifold* getBox2DManifold() const;
     
-            Vector2 getManifoldPointLocalPoint(int32_t index);
-            float getManifoldPointNormalImpulse(int32_t index);
-            float getManifoldPointTangentImpulse(int32_t index);
+            Vector2 getManifoldPointLocalPoint(int32_t index) const;
+            float getManifoldPointNormalImpulse(int32_t index) const;
+            float getManifoldPointTangentImpulse(int32_t index) const;
 
             Vector2 getLocalNormal() const;
             Vector2 getLocalPoint() const;

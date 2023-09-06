@@ -23,7 +23,7 @@ namespace Supernova{
             WorldManifold2D(const WorldManifold2D& rhs);
             WorldManifold2D& operator=(const WorldManifold2D& rhs);
 
-            b2WorldManifold* getBox2DWorldManifold();
+            b2WorldManifold* getBox2DWorldManifold() const;
 
             Vector2 getNormal() const;
             Vector2 getPoint(size_t index) const;
