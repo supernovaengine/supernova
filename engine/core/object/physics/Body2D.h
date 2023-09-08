@@ -67,6 +67,33 @@ namespace Supernova{
         Body2DType getType() const;
         bool isEnabled() const;
         float getGravityScale() const;
+
+        void setFilterCategoryBits(uint16_t categoryBits);
+        void setFilterMaskBits(uint16_t maskBits);
+        void setFilterGroupIndex(int16_t groupIndex);
+
+        void setFilterCategoryBits(size_t shapeIndex, uint16_t categoryBits);
+        void setFilterMaskBits(size_t shapeIndex, uint16_t maskBits);
+        void setFilterGroupIndex(size_t shapeIndex, int16_t groupIndex);
+
+        uint16_t getFilterCategoryBits() const;
+        uint16_t getFilterMaskBits() const;
+        int16_t getFilterGroupIndex() const;
+
+        uint16_t getFilterCategoryBits(size_t shapeIndex) const;
+        uint16_t getFilterMaskBits(size_t shapeIndex) const;
+        int16_t getFilterGroupIndex(size_t shapeIndex) const;
+
+        float getMass() const;
+        float getInertia() const;
+        Vector2 getLinearVelocity(Vector2 worldPoint) const;
+
+        void applyForce(const Vector2& force, const Vector2& point, bool wake);
+        void applyForceToCenter(const Vector2& force, bool wake);
+        void applyTorque(float torque, bool wake);
+        void applyLinearImpulse(const Vector2& impulse, const Vector2& point, bool wake);
+        void applyLinearImpulseToCenter(const Vector2& impulse, bool wake);
+        void applyAngularImpulse(float impulse, bool wake);
     };
 }
 

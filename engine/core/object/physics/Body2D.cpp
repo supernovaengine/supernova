@@ -60,7 +60,7 @@ b2Body* Body2D::getBox2DBody() const{
 b2Fixture* Body2D::getBox2DFixture(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >=0 && index < MAX_SHAPES){
+    if (index >= 0 && index < MAX_SHAPES){
         return body.shapes[index].fixture;
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -98,7 +98,7 @@ void Body2D::setShapeRestitution(float restitution){
 void Body2D::setShapeDensity(size_t index, float density){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >=0 && index < MAX_SHAPES){
+    if (index >= 0 && index < MAX_SHAPES){
         body.shapes[index].fixture->SetDensity(density);
         body.body->ResetMassData();
     }else{
@@ -109,7 +109,7 @@ void Body2D::setShapeDensity(size_t index, float density){
 void Body2D::setShapeFriction(size_t index, float friction){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >=0 && index < MAX_SHAPES){
+    if (index >= 0 && index < MAX_SHAPES){
         body.shapes[index].fixture->SetFriction(friction);
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -119,7 +119,7 @@ void Body2D::setShapeFriction(size_t index, float friction){
 void Body2D::setShapeRestitution(size_t index, float restitution){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >=0 && index < MAX_SHAPES){
+    if (index >= 0 && index < MAX_SHAPES){
         body.shapes[index].fixture->SetRestitution(restitution);
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -142,7 +142,7 @@ float Body2D::getShapeRestitution() const{
 float Body2D::getShapeDensity(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >=0 && index < MAX_SHAPES){
+    if (index >= 0 && index < MAX_SHAPES){
         return body.shapes[index].fixture->GetDensity();
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -154,7 +154,7 @@ float Body2D::getShapeDensity(size_t index) const{
 float Body2D::getShapeFriction(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >=0 && index < MAX_SHAPES){
+    if (index >= 0 && index < MAX_SHAPES){
         return body.shapes[index].fixture->GetFriction();
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -166,7 +166,7 @@ float Body2D::getShapeFriction(size_t index) const{
 float Body2D::getShapeRestitution(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >=0 && index < MAX_SHAPES){
+    if (index >= 0 && index < MAX_SHAPES){
         return body.shapes[index].fixture->GetRestitution();
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -308,5 +308,166 @@ float Body2D::getGravityScale() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     return body.body->GetGravityScale();
+}
+
+void Body2D::setFilterCategoryBits(uint16_t categoryBits){
+    setFilterCategoryBits(0, categoryBits);
+}
+
+void Body2D::setFilterMaskBits(uint16_t maskBits){
+    setFilterMaskBits(0, maskBits);
+}
+
+void Body2D::setFilterGroupIndex(int16_t groupIndex){
+    setFilterGroupIndex(0, groupIndex);
+}
+
+void Body2D::setFilterCategoryBits(size_t shapeIndex, uint16_t categoryBits){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+        b2Filter filter = body.shapes[shapeIndex].fixture->GetFilterData();
+        
+        filter.categoryBits = categoryBits;
+        
+        body.shapes[shapeIndex].fixture->SetFilterData(filter);
+    }else{
+        Log::error("Cannot find shape %i of body", shapeIndex);
+    }
+}
+
+void Body2D::setFilterMaskBits(size_t shapeIndex, uint16_t maskBits){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    
+    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+        b2Filter filter = body.shapes[shapeIndex].fixture->GetFilterData();
+        
+        filter.maskBits = maskBits;
+        
+        body.shapes[shapeIndex].fixture->SetFilterData(filter);
+    }else{
+        Log::error("Cannot find shape %i of body", shapeIndex);
+    }
+}
+
+void Body2D::setFilterGroupIndex(size_t shapeIndex, int16_t groupIndex){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    
+    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+        b2Filter filter = body.shapes[shapeIndex].fixture->GetFilterData();
+        
+        filter.groupIndex = groupIndex;
+        
+        body.shapes[shapeIndex].fixture->SetFilterData(filter);
+    }else{
+        Log::error("Cannot find shape %i of body", shapeIndex);
+    }
+}
+
+uint16_t Body2D::getFilterCategoryBits() const{
+    return getFilterCategoryBits(0);
+}
+
+uint16_t Body2D::getFilterMaskBits() const{
+    return getFilterMaskBits(0);
+}
+
+int16_t Body2D::getFilterGroupIndex() const{
+    return getFilterGroupIndex(0);
+}
+
+uint16_t Body2D::getFilterCategoryBits(size_t shapeIndex) const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+        return body.shapes[shapeIndex].fixture->GetFilterData().categoryBits;
+    }else{
+        Log::error("Cannot find shape %i of body", shapeIndex);
+    }
+
+    return 0;
+}
+
+uint16_t Body2D::getFilterMaskBits(size_t shapeIndex) const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    
+    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+        return body.shapes[shapeIndex].fixture->GetFilterData().maskBits;
+    }else{
+        Log::error("Cannot find shape %i of body", shapeIndex);
+    }
+
+    return 0;
+}
+
+int16_t Body2D::getFilterGroupIndex(size_t shapeIndex) const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    
+    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+        return body.shapes[shapeIndex].fixture->GetFilterData().categoryBits;
+    }else{
+        Log::error("Cannot find shape %i of body", shapeIndex);
+    }
+
+    return -1;
+}
+
+float Body2D::getMass() const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    return body.body->GetMass();
+}
+
+float Body2D::getInertia() const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    return body.body->GetInertia();
+}
+
+Vector2 Body2D::getLinearVelocity(Vector2 worldPoint) const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+
+    b2Vec2 ret = body.body->GetLinearVelocityFromWorldPoint(b2Vec2(worldPoint.x / pointsToMeterScale, worldPoint.y / pointsToMeterScale));
+
+    return Vector2(ret.x * pointsToMeterScale, ret.y * pointsToMeterScale);
+}
+
+void Body2D::applyForce(const Vector2& force, const Vector2& point, bool wake){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+
+    body.body->ApplyForce(b2Vec2(force.x, force.y), b2Vec2(point.x / pointsToMeterScale, point.y / pointsToMeterScale), wake);
+}
+
+void Body2D::applyForceToCenter(const Vector2& force, bool wake){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    body.body->ApplyForceToCenter(b2Vec2(force.x, force.y), wake);
+}
+
+void Body2D::applyTorque(float torque, bool wake){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    body.body->ApplyTorque(torque, wake);
+}
+
+void Body2D::applyLinearImpulse(const Vector2& impulse, const Vector2& point, bool wake){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+
+    body.body->ApplyLinearImpulse(b2Vec2(impulse.x, impulse.y), b2Vec2(point.x / pointsToMeterScale, point.y / pointsToMeterScale), wake);
+}
+
+void Body2D::applyLinearImpulseToCenter(const Vector2& impulse, bool wake){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    body.body->ApplyLinearImpulseToCenter(b2Vec2(impulse.x, impulse.y), wake);
+}
+
+void Body2D::applyAngularImpulse(float impulse, bool wake){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    body.body->ApplyAngularImpulse(impulse, wake);
 }
 
