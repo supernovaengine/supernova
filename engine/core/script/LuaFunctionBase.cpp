@@ -5,9 +5,14 @@
 #include "LuaFunction.h"
 
 #include "util/StringUtils.h"
+#include "object/physics/Body2D.h"
+#include "object/physics/Contact2D.h"
+#include "object/physics/Manifold2D.h"
+#include "object/physics/ContactImpulse2D.h"
 #include "LuaBinding.h"
 
 #include "lua.hpp"
+#include "LuaBridge.h"
 #include <stdexcept>
 
 using namespace Supernova;
@@ -95,6 +100,30 @@ void LuaFunctionBase::push_value(lua_State *vm, const std::string &s){
 
 void LuaFunctionBase::push_value(lua_State *vm, wchar_t s){
     lua_pushstring(vm, StringUtils::toUTF8(s).c_str());
+}
+
+void LuaFunctionBase::push_value(lua_State *vm, size_t n){
+    lua_pushnumber(vm, n); 
+}
+
+void LuaFunctionBase::push_value(lua_State *vm, Body2D o){
+    if (!luabridge::push<Body2D>(vm, o))
+        throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
+}
+
+void LuaFunctionBase::push_value(lua_State *vm, Contact2D o){
+    if (!luabridge::push<Contact2D>(vm, o))
+        throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
+}
+
+void LuaFunctionBase::push_value(lua_State *vm, Manifold2D o){
+    if (!luabridge::push<Manifold2D>(vm, o))
+        throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
+}
+
+void LuaFunctionBase::push_value(lua_State *vm, ContactImpulse2D o){
+    if (!luabridge::push<ContactImpulse2D>(vm, o))
+        throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
 }
 
 template <>

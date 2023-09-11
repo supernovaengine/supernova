@@ -7,6 +7,11 @@ typedef struct lua_State lua_State;
 
 namespace Supernova{
 
+    class Body2D;
+    class Contact2D;
+    class Manifold2D;
+    class ContactImpulse2D;
+
     // the base function wrapper class
     class LuaFunctionBase{
 
@@ -35,6 +40,11 @@ namespace Supernova{
         void push_value(lua_State *vm, bool b);
         void push_value(lua_State *vm, const std::string &s);
         void push_value(lua_State *vm, wchar_t s);
+        void push_value(lua_State *vm, size_t n);
+        void push_value(lua_State *vm, Body2D o);
+        void push_value(lua_State *vm, Contact2D o);
+        void push_value(lua_State *vm, Manifold2D o);
+        void push_value(lua_State *vm, ContactImpulse2D o);
 
         // other overloads, for stuff like userdata or C functions
 

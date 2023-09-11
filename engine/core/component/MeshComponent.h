@@ -12,6 +12,7 @@
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
 #include "buffer/ExternalBuffer.h"
+#include "math/Rect.h"
 #include <map>
 #include <memory>
 

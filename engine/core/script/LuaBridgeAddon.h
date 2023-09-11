@@ -60,6 +60,11 @@ namespace luabridge
     template<> struct Stack<ContainerType> : EnumWrapper<ContainerType>{};
     template<> struct Stack<PivotPreset> : EnumWrapper<PivotPreset>{};
 
+    template<> struct Stack<CollisionShape2DType> : EnumWrapper<CollisionShape2DType>{};
+    template<> struct Stack<Body2DType> : EnumWrapper<Body2DType>{};
+    template<> struct Stack<Joint2DType> : EnumWrapper<Joint2DType>{};
+    template<> struct Stack<Manifold2DType> : EnumWrapper<Manifold2DType>{};
+
     template <>
     struct Stack <Touch>
     {

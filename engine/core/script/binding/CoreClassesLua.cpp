@@ -15,6 +15,10 @@
 #include "Log.h"
 #include "Input.h"
 #include "System.h"
+#include "Body2D.h"
+#include "Contact2D.h"
+#include "Manifold2D.h"
+#include "ContactImpulse2D.h"
 
 using namespace Supernova;
 
@@ -200,6 +204,34 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("__call", &FunctionSubscribe<float(float)>::call)
         .addFunction("call", &FunctionSubscribe<float(float)>::call)
         .addFunction("add", (bool (FunctionSubscribe<float(float)>::*)(const std::string&, lua_State*))&FunctionSubscribe<float(float)>::add)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<FunctionSubscribe<void(Contact2D)>>("FunctionSubscribe_V_C")
+        .addFunction("__call", &FunctionSubscribe<void(Contact2D)>::call)
+        .addFunction("call", &FunctionSubscribe<void(Contact2D)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<void(Contact2D)>::*)(const std::string&, lua_State*))&FunctionSubscribe<void(Contact2D)>::add)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<FunctionSubscribe<void(Contact2D, Manifold2D)>>("FunctionSubscribe_V_CM")
+        .addFunction("__call", &FunctionSubscribe<void(Contact2D, Manifold2D)>::call)
+        .addFunction("call", &FunctionSubscribe<void(Contact2D, Manifold2D)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<void(Contact2D, Manifold2D)>::*)(const std::string&, lua_State*))&FunctionSubscribe<void(Contact2D, Manifold2D)>::add)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<FunctionSubscribe<void(Contact2D, ContactImpulse2D)>>("FunctionSubscribe_V_CC")
+        .addFunction("__call", &FunctionSubscribe<void(Contact2D, ContactImpulse2D)>::call)
+        .addFunction("call", &FunctionSubscribe<void(Contact2D, ContactImpulse2D)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<void(Contact2D, ContactImpulse2D)>::*)(const std::string&, lua_State*))&FunctionSubscribe<void(Contact2D, ContactImpulse2D)>::add)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)>>("FunctionSubscribe_B_BSBS")
+        .addFunction("__call", &FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)>::call)
+        .addFunction("call", &FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)>::*)(const std::string&, lua_State*))&FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)>::add)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

@@ -45,7 +45,7 @@ PhysicsSystem::~PhysicsSystem(){
     }
 }
 
-float PhysicsSystem::getPointsToMeterScale(){
+float PhysicsSystem::getPointsToMeterScale() const{
     return pointsToMeterScale;
 }
 

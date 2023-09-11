@@ -14,7 +14,7 @@ using namespace Supernova;
 b2BodyType getBodyTypeToB2(Body2DType type){
     if (type == Body2DType::STATIC){
         return b2_staticBody;
-    }else if (type == Body2DType::kINEMATIC){
+    }else if (type == Body2DType::KINEMATIC){
         return b2_kinematicBody;
     }else if (type == Body2DType::DYNAMIC){
         return b2_dynamicBody;
@@ -27,7 +27,7 @@ Body2DType getB2ToBodyType(b2BodyType type){
     if (type == b2_staticBody){
         return Body2DType::STATIC;
     }else if (type == b2_kinematicBody){
-        return Body2DType::kINEMATIC;
+        return Body2DType::KINEMATIC;
     }else if (type == b2_dynamicBody){
         return Body2DType::DYNAMIC;
     }
@@ -310,19 +310,19 @@ float Body2D::getGravityScale() const{
     return body.body->GetGravityScale();
 }
 
-void Body2D::setFilterCategoryBits(uint16_t categoryBits){
-    setFilterCategoryBits(0, categoryBits);
+void Body2D::setCategoryBitsFilter(uint16_t categoryBits){
+    setCategoryBitsFilter(0, categoryBits);
 }
 
-void Body2D::setFilterMaskBits(uint16_t maskBits){
-    setFilterMaskBits(0, maskBits);
+void Body2D::setMaskBitsFilter(uint16_t maskBits){
+    setMaskBitsFilter(0, maskBits);
 }
 
-void Body2D::setFilterGroupIndex(int16_t groupIndex){
-    setFilterGroupIndex(0, groupIndex);
+void Body2D::setGroupIndexFilter(int16_t groupIndex){
+    setGroupIndexFilter(0, groupIndex);
 }
 
-void Body2D::setFilterCategoryBits(size_t shapeIndex, uint16_t categoryBits){
+void Body2D::setCategoryBitsFilter(size_t shapeIndex, uint16_t categoryBits){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
@@ -336,7 +336,7 @@ void Body2D::setFilterCategoryBits(size_t shapeIndex, uint16_t categoryBits){
     }
 }
 
-void Body2D::setFilterMaskBits(size_t shapeIndex, uint16_t maskBits){
+void Body2D::setMaskBitsFilter(size_t shapeIndex, uint16_t maskBits){
     Body2DComponent& body = getComponent<Body2DComponent>();
     
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
@@ -350,7 +350,7 @@ void Body2D::setFilterMaskBits(size_t shapeIndex, uint16_t maskBits){
     }
 }
 
-void Body2D::setFilterGroupIndex(size_t shapeIndex, int16_t groupIndex){
+void Body2D::setGroupIndexFilter(size_t shapeIndex, int16_t groupIndex){
     Body2DComponent& body = getComponent<Body2DComponent>();
     
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
@@ -364,19 +364,19 @@ void Body2D::setFilterGroupIndex(size_t shapeIndex, int16_t groupIndex){
     }
 }
 
-uint16_t Body2D::getFilterCategoryBits() const{
-    return getFilterCategoryBits(0);
+uint16_t Body2D::getCategoryBitsFilter() const{
+    return getCategoryBitsFilter(0);
 }
 
-uint16_t Body2D::getFilterMaskBits() const{
-    return getFilterMaskBits(0);
+uint16_t Body2D::getMaskBitsFilter() const{
+    return getMaskBitsFilter(0);
 }
 
-int16_t Body2D::getFilterGroupIndex() const{
-    return getFilterGroupIndex(0);
+int16_t Body2D::getGroupIndexFilter() const{
+    return getGroupIndexFilter(0);
 }
 
-uint16_t Body2D::getFilterCategoryBits(size_t shapeIndex) const{
+uint16_t Body2D::getCategoryBitsFilter(size_t shapeIndex) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
@@ -388,7 +388,7 @@ uint16_t Body2D::getFilterCategoryBits(size_t shapeIndex) const{
     return 0;
 }
 
-uint16_t Body2D::getFilterMaskBits(size_t shapeIndex) const{
+uint16_t Body2D::getMaskBitsFilter(size_t shapeIndex) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
     
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
@@ -400,7 +400,7 @@ uint16_t Body2D::getFilterMaskBits(size_t shapeIndex) const{
     return 0;
 }
 
-int16_t Body2D::getFilterGroupIndex(size_t shapeIndex) const{
+int16_t Body2D::getGroupIndexFilter(size_t shapeIndex) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
     
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
@@ -424,7 +424,7 @@ float Body2D::getInertia() const{
     return body.body->GetInertia();
 }
 
-Vector2 Body2D::getLinearVelocity(Vector2 worldPoint) const{
+Vector2 Body2D::getLinearVelocityFromWorldPoint(Vector2 worldPoint) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
     float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
 

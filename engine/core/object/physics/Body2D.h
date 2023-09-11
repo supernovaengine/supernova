@@ -6,6 +6,11 @@
 #define BODY2D_H
 
 #include "EntityHandle.h"
+#include "math/Vector2.h"
+#include "component/Body2DComponent.h"
+
+class b2Body;
+class b2Fixture;
 
 namespace Supernova{
 
@@ -68,25 +73,25 @@ namespace Supernova{
         bool isEnabled() const;
         float getGravityScale() const;
 
-        void setFilterCategoryBits(uint16_t categoryBits);
-        void setFilterMaskBits(uint16_t maskBits);
-        void setFilterGroupIndex(int16_t groupIndex);
+        void setCategoryBitsFilter(uint16_t categoryBits);
+        void setMaskBitsFilter(uint16_t maskBits);
+        void setGroupIndexFilter(int16_t groupIndex);
 
-        void setFilterCategoryBits(size_t shapeIndex, uint16_t categoryBits);
-        void setFilterMaskBits(size_t shapeIndex, uint16_t maskBits);
-        void setFilterGroupIndex(size_t shapeIndex, int16_t groupIndex);
+        void setCategoryBitsFilter(size_t shapeIndex, uint16_t categoryBits);
+        void setMaskBitsFilter(size_t shapeIndex, uint16_t maskBits);
+        void setGroupIndexFilter(size_t shapeIndex, int16_t groupIndex);
 
-        uint16_t getFilterCategoryBits() const;
-        uint16_t getFilterMaskBits() const;
-        int16_t getFilterGroupIndex() const;
+        uint16_t getCategoryBitsFilter() const;
+        uint16_t getMaskBitsFilter() const;
+        int16_t getGroupIndexFilter() const;
 
-        uint16_t getFilterCategoryBits(size_t shapeIndex) const;
-        uint16_t getFilterMaskBits(size_t shapeIndex) const;
-        int16_t getFilterGroupIndex(size_t shapeIndex) const;
+        uint16_t getCategoryBitsFilter(size_t shapeIndex) const;
+        uint16_t getMaskBitsFilter(size_t shapeIndex) const;
+        int16_t getGroupIndexFilter(size_t shapeIndex) const;
 
         float getMass() const;
         float getInertia() const;
-        Vector2 getLinearVelocity(Vector2 worldPoint) const;
+        Vector2 getLinearVelocityFromWorldPoint(Vector2 worldPoint) const;
 
         void applyForce(const Vector2& force, const Vector2& point, bool wake);
         void applyForceToCenter(const Vector2& force, bool wake);

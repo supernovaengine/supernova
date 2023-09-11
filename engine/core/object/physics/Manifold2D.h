@@ -11,12 +11,6 @@ class b2Manifold;
 
 namespace Supernova{
 
-    enum class Manifold2DType{
-        CIRCLES,
-        FACEA,
-        FACEB
-    };
-
     class Manifold2D{
         private:
             Scene* scene;

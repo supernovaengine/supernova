@@ -20,8 +20,14 @@ namespace Supernova{
 
     enum class Body2DType{
         STATIC,
-        kINEMATIC,
+        KINEMATIC,
         DYNAMIC
+    };
+
+    enum class Manifold2DType{
+        CIRCLES,
+        FACEA,
+        FACEB
     };
 
     // fixture in Box2D

@@ -7,6 +7,7 @@
 #include "lua.hpp"
 
 #include "LuaBridge.h"
+#include "LuaBridgeAddon.h"
 
 #include "ecs/Entity.h"
 #include "ecs/Signature.h"
@@ -15,6 +16,7 @@
 
 //TODO: Add all systems
 #include "subsystem/AudioSystem.h"
+#include "subsystem/PhysicsSystem.h"
 
 //TODO: Add all components and properties
 #include "component/ActionComponent.h"
@@ -103,6 +105,12 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addStaticFunction("resumeAll", &AudioSystem::resumeAll)
         .addStaticFunction("checkActive", &AudioSystem::checkActive)
         .addStaticProperty("globalVolume", &AudioSystem::getGlobalVolume,  &AudioSystem::setGlobalVolume)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<PhysicsSystem>("PhysicsSystem")
+        .addProperty("pointsToMeterScale", &PhysicsSystem::getPointsToMeterScale,  &PhysicsSystem::setPointsToMeterScale)
+        .addProperty("beginContact2D", [] (PhysicsSystem* self, lua_State* L) { return &self->beginContact2D; }, [] (PhysicsSystem* self, lua_State* L) { self->beginContact2D = L; })
         .endClass();
 
     luabridge::getGlobalNamespace(L)

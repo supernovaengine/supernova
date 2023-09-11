@@ -38,7 +38,7 @@ namespace Supernova{
 		PhysicsSystem(Scene* scene);
 		virtual ~PhysicsSystem();
 
-		float getPointsToMeterScale();
+		float getPointsToMeterScale() const;
 		void setPointsToMeterScale(float pointsToMeterScale);
 
 		FunctionSubscribe<void(Contact2D)> beginContact2D;
