@@ -111,6 +111,10 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .beginClass<PhysicsSystem>("PhysicsSystem")
         .addProperty("pointsToMeterScale", &PhysicsSystem::getPointsToMeterScale,  &PhysicsSystem::setPointsToMeterScale)
         .addProperty("beginContact2D", [] (PhysicsSystem* self, lua_State* L) { return &self->beginContact2D; }, [] (PhysicsSystem* self, lua_State* L) { self->beginContact2D = L; })
+        .addProperty("endContact2D", [] (PhysicsSystem* self, lua_State* L) { return &self->endContact2D; }, [] (PhysicsSystem* self, lua_State* L) { self->endContact2D = L; })
+        .addProperty("preSolve2D", [] (PhysicsSystem* self, lua_State* L) { return &self->preSolve2D; }, [] (PhysicsSystem* self, lua_State* L) { self->preSolve2D = L; })
+        .addProperty("postSolve2D", [] (PhysicsSystem* self, lua_State* L) { return &self->postSolve2D; }, [] (PhysicsSystem* self, lua_State* L) { self->postSolve2D = L; })
+        .addProperty("shouldCollide2D", [] (PhysicsSystem* self, lua_State* L) { return &self->shouldCollide2D; }, [] (PhysicsSystem* self, lua_State* L) { self->shouldCollide2D = L; })
         .endClass();
 
     luabridge::getGlobalNamespace(L)
