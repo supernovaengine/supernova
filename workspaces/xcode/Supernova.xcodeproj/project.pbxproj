@@ -25,6 +25,7 @@
 		7105A56B28B305B20092EA05 /* UtilClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A56028B305B20092EA05 /* UtilClassesLua.cpp */; };
 		7105A56C28B305B20092EA05 /* IOClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A56128B305B20092EA05 /* IOClassesLua.cpp */; };
 		7105A56D28B305B20092EA05 /* IOClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105A56128B305B20092EA05 /* IOClassesLua.cpp */; };
+		7105CAA52AB110FD007C91BA /* Box2DContactFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 7105CAA42AB110FC007C91BA /* Box2DContactFilter.h */; };
 		7108CB7C28F8F2B600FF7AC6 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7108CB7A28F8F2B600FF7AC6 /* tinyxml2.cpp */; };
 		7108CB7D28F8F2B600FF7AC6 /* tinyxml2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7108CB7A28F8F2B600FF7AC6 /* tinyxml2.cpp */; };
 		7108CB7E28F8F2B600FF7AC6 /* tinyxml2.h in Headers */ = {isa = PBXBuildFile; fileRef = 7108CB7B28F8F2B600FF7AC6 /* tinyxml2.h */; };
@@ -971,6 +972,7 @@
 		7105A55F28B305B20092EA05 /* ECSClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ECSClassesLua.cpp; sourceTree = "<group>"; };
 		7105A56028B305B20092EA05 /* UtilClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UtilClassesLua.cpp; sourceTree = "<group>"; };
 		7105A56128B305B20092EA05 /* IOClassesLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOClassesLua.cpp; sourceTree = "<group>"; };
+		7105CAA42AB110FC007C91BA /* Box2DContactFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box2DContactFilter.h; sourceTree = "<group>"; };
 		7108CB7A28F8F2B600FF7AC6 /* tinyxml2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml2.cpp; sourceTree = "<group>"; };
 		7108CB7B28F8F2B600FF7AC6 /* tinyxml2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml2.h; sourceTree = "<group>"; };
 		710AD69A25B604BE00A7B12F /* liblua-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "liblua-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1903,6 +1905,7 @@
 				71ED64C428B45E0B005D2D96 /* Angle.h */,
 				71165BBD282981BE00CF79C1 /* Base64.cpp */,
 				71165BBE282981BE00CF79C1 /* Base64.h */,
+				7105CAA42AB110FC007C91BA /* Box2DContactFilter.h */,
 				71651FFA2AA804D4008D9BF5 /* Box2DContactListener.h */,
 				7105A55628B305910092EA05 /* Color.cpp */,
 				7105A55728B305910092EA05 /* Color.h */,
@@ -2914,6 +2917,7 @@
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
 				71451BF0270CA2C900712643 /* Sprite.h in Headers */,
 				717AD98D29211976007D7DB5 /* Container.h in Headers */,
+				7105CAA52AB110FD007C91BA /* Box2DContactFilter.h in Headers */,
 				71ABBD3D279116E1001CE3AF /* UniqueToken.h in Headers */,
 				71E54513284D5BE000C68FAB /* MorphTracksComponent.h in Headers */,
 				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,

@@ -115,11 +115,11 @@ int PhysicsSystem::createPolygonShape2D(Entity entity, std::vector<Vector2> vert
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
             b2PolygonShape polygon;
-            b2Vec2 b2vertices[vertices.size()];
+            std::vector<b2Vec2> b2vertices(vertices.size());
             for (int i = 0; i < vertices.size(); i++){
                 b2vertices[i].Set(vertices[i].x / pointsToMeterScale, vertices[i].y / pointsToMeterScale);
             }
-            polygon.Set(b2vertices, vertices.size());
+            polygon.Set(&b2vertices[0], (int)vertices.size());
 
             loadShape2D(*body, &polygon, body->numShapes);
 
@@ -222,11 +222,11 @@ int PhysicsSystem::createLoopChainShape2D(Entity entity, std::vector<Vector2> ve
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
             b2ChainShape chain;
-            b2Vec2 b2vertices[vertices.size()];
+            std::vector<b2Vec2> b2vertices(vertices.size());
             for (int i = 0; i < vertices.size(); i++){
                 b2vertices[i].Set(vertices[i].x / pointsToMeterScale, vertices[i].y / pointsToMeterScale);
             }
-            chain.CreateLoop(b2vertices, vertices.size());
+            chain.CreateLoop(&b2vertices[0], (int)vertices.size());
 
             loadShape2D(*body, &chain, body->numShapes);
 
@@ -250,13 +250,13 @@ int PhysicsSystem::createChainShape2D(Entity entity, std::vector<Vector2> vertic
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
             b2ChainShape chain;
-            b2Vec2 b2vertices[vertices.size()];
+            std::vector<b2Vec2> b2vertices(vertices.size());
             for (int i = 0; i < vertices.size(); i++){
                 b2vertices[i].Set(vertices[i].x / pointsToMeterScale, vertices[i].y / pointsToMeterScale);
             }
             b2Vec2 pv(prevVertex.x / pointsToMeterScale, prevVertex.y / pointsToMeterScale);
             b2Vec2 nv(nextVertex.x / pointsToMeterScale, nextVertex.y / pointsToMeterScale);
-            chain.CreateChain(b2vertices, vertices.size(), pv, nv);
+            chain.CreateChain(&b2vertices[0], (int)vertices.size(), pv, nv);
 
             loadShape2D(*body, &chain, body->numShapes);
 
