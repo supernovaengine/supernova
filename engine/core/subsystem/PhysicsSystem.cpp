@@ -106,6 +106,182 @@ int PhysicsSystem::addRectShape2D(Entity entity, float width, float height){
     return -1;
 }
 
+int PhysicsSystem::addPolygonShape2D(Entity entity, std::vector<Vector2> vertices){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+
+            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+
+            b2PolygonShape polygon;
+            b2Vec2 b2vertices[vertices.size()];
+            for (int i = 0; i < vertices.size(); i++){
+                b2vertices[i].Set(vertices[i].x / pointsToMeterScale, vertices[i].y / pointsToMeterScale);
+            }
+            polygon.Set(b2vertices, vertices.size());
+
+            loadShape2D(*body, &polygon, body->numShapes);
+
+            body->numShapes++;
+
+            return (body->numShapes - 1);
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        }
+    }
+
+    return -1;
+}
+
+int PhysicsSystem::addCircleShape2D(Entity entity, Vector2 center, float radius){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+
+            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+
+            b2CircleShape circle;
+            circle.m_p.Set(center.x / pointsToMeterScale, center.y / pointsToMeterScale);
+            circle.m_radius = radius / pointsToMeterScale;
+
+            loadShape2D(*body, &circle, body->numShapes);
+
+            body->numShapes++;
+
+            return (body->numShapes - 1);
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        }
+    }
+
+    return -1;
+}
+
+int PhysicsSystem::addTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+
+            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+
+            b2EdgeShape edge;
+            b2Vec2 v1(vertice1.x / pointsToMeterScale, vertice1.y / pointsToMeterScale);
+            b2Vec2 v2(vertice2.x / pointsToMeterScale, vertice2.y / pointsToMeterScale);
+            edge.SetTwoSided(v1, v2);
+
+            loadShape2D(*body, &edge, body->numShapes);
+
+            body->numShapes++;
+
+            return (body->numShapes - 1);
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        }
+    }
+
+    return -1;
+}
+
+int PhysicsSystem::addOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+
+            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+
+            b2EdgeShape edge;
+            b2Vec2 v0(vertice0.x / pointsToMeterScale, vertice0.y / pointsToMeterScale);
+            b2Vec2 v1(vertice1.x / pointsToMeterScale, vertice1.y / pointsToMeterScale);
+            b2Vec2 v2(vertice2.x / pointsToMeterScale, vertice2.y / pointsToMeterScale);
+            b2Vec2 v3(vertice3.x / pointsToMeterScale, vertice3.y / pointsToMeterScale);
+            edge.SetOneSided(v0, v1, v2, v3);
+
+            loadShape2D(*body, &edge, body->numShapes);
+
+            body->numShapes++;
+
+            return (body->numShapes - 1);
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        }
+    }
+
+    return -1;
+}
+
+int PhysicsSystem::addLoopChainShape2D(Entity entity, std::vector<Vector2> vertices){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+
+            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+
+            b2ChainShape chain;
+            b2Vec2 b2vertices[vertices.size()];
+            for (int i = 0; i < vertices.size(); i++){
+                b2vertices[i].Set(vertices[i].x / pointsToMeterScale, vertices[i].y / pointsToMeterScale);
+            }
+            chain.CreateLoop(b2vertices, vertices.size());
+
+            loadShape2D(*body, &chain, body->numShapes);
+
+            body->numShapes++;
+
+            return (body->numShapes - 1);
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        }
+    }
+
+    return -1;
+}
+
+int PhysicsSystem::addChainShape2D(Entity entity, std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+
+            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+
+            b2ChainShape chain;
+            b2Vec2 b2vertices[vertices.size()];
+            for (int i = 0; i < vertices.size(); i++){
+                b2vertices[i].Set(vertices[i].x / pointsToMeterScale, vertices[i].y / pointsToMeterScale);
+            }
+            b2Vec2 pv(prevVertex.x / pointsToMeterScale, prevVertex.y / pointsToMeterScale);
+            b2Vec2 nv(nextVertex.x / pointsToMeterScale, nextVertex.y / pointsToMeterScale);
+            chain.CreateChain(b2vertices, vertices.size(), pv, nv);
+
+            loadShape2D(*body, &chain, body->numShapes);
+
+            body->numShapes++;
+
+            return (body->numShapes - 1);
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        }
+    }
+
+    return -1;
+}
+
+void PhysicsSystem::removeAllShapes(Entity entity){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        for (int i = 0; i < body->numShapes; i++){
+            destroyShape2D(*body, i);
+        }
+        body->numShapes = 0;
+    }
+}
+
 b2Body* PhysicsSystem::getBody(Entity entity){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
@@ -139,6 +315,7 @@ void PhysicsSystem::destroyBody2D(Body2DComponent& body){
         for (int i = 0; i < body.numShapes; i++){
             destroyShape2D(body, i);
         }
+        body.numShapes = 0;
 
         world2D->DestroyBody(body.body);
 

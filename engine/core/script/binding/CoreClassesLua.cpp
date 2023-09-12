@@ -20,6 +20,7 @@
 #include "Manifold2D.h"
 #include "ContactImpulse2D.h"
 #include "AudioSystem.h"
+#include "PhysicsSystem.h"
 
 using namespace Supernova;
 
@@ -330,7 +331,8 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("moveChildUp", &Scene::moveChildUp)
         .addFunction("moveChildDown", &Scene::moveChildDown)
         .addFunction("moveChildToLast", &Scene::moveChildToLast)
-        .addFunction("getAudioSystem", [] (Scene* self, lua_State* L) -> AudioSystem* { return self->getSystem<AudioSystem>().get(); })
+        .addFunction("getAudioSystem", [] (Scene* self, lua_State* L) { return self->getSystem<AudioSystem>().get(); })
+        .addFunction("getPhysicsSystem", [] (Scene* self, lua_State* L) { return self->getSystem<PhysicsSystem>().get(); })
         .endClass();
 
     luabridge::getGlobalNamespace(L)
