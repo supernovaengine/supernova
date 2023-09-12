@@ -582,6 +582,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (Scene*, Entity)> ()
         .addFunction("getAttachedObject", &Body2D::getAttachedObject)
         .addFunction("createRectShape", &Body2D::createRectShape)
+        .addFunction("createPolygonShape2D", &Body2D::createPolygonShape2D)
+        .addFunction("createCircleShape2D", &Body2D::createCircleShape2D)
+        .addFunction("createTwoSidedEdgeShape2D", &Body2D::createTwoSidedEdgeShape2D)
+        .addFunction("createOneSidedEdgeShape2D", &Body2D::createOneSidedEdgeShape2D)
+        .addFunction("createLoopChainShape2D", &Body2D::createLoopChainShape2D)
+        .addFunction("createChainShape2D", &Body2D::createChainShape2D)
+        .addFunction("removeAllShapes", &Body2D::removeAllShapes)
         .addProperty("shapeDensity", &Body2D::getShapeDensity, &Body2D::setShapeDensity)
         .addFunction("setShapeDensity", 
             luabridge::overload<float>(&Body2D::setShapeDensity),

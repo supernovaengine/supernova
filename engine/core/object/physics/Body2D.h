@@ -30,7 +30,14 @@ namespace Supernova{
         Object getAttachedObject();
 
         int createRectShape(float width, float height);
+        int createPolygonShape2D(std::vector<Vector2> vertices);
+        int createCircleShape2D(Vector2 center, float radius);
+        int createTwoSidedEdgeShape2D(Vector2 vertice1, Vector2 vertice2);
+        int createOneSidedEdgeShape2D(Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3);
+        int createLoopChainShape2D(std::vector<Vector2> vertices);
+        int createChainShape2D(std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex);
 
+        void removeAllShapes();
 
         void setShapeDensity(float density);
         void setShapeFriction(float friction);

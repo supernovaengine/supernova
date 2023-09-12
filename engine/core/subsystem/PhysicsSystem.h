@@ -51,13 +51,13 @@ namespace Supernova{
 		void createBody2D(Entity entity);
 		void removeBody2D(Entity entity);
 
-		int addRectShape2D(Entity entity, float width, float height);
-		int addPolygonShape2D(Entity entity, std::vector<Vector2> vertices);
-		int addCircleShape2D(Entity entity, Vector2 center, float radius);
-		int addTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2);
-		int addOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3);
-		int addLoopChainShape2D(Entity entity, std::vector<Vector2> vertices);
-		int addChainShape2D(Entity entity, std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex);
+		int createRectShape2D(Entity entity, float width, float height);
+		int createPolygonShape2D(Entity entity, std::vector<Vector2> vertices);
+		int createCircleShape2D(Entity entity, Vector2 center, float radius);
+		int createTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2);
+		int createOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3);
+		int createLoopChainShape2D(Entity entity, std::vector<Vector2> vertices);
+		int createChainShape2D(Entity entity, std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex);
 
 		void removeAllShapes(Entity entity);
 

@@ -82,7 +82,7 @@ void PhysicsSystem::removeBody2D(Entity entity){
     }
 }
 
-int PhysicsSystem::addRectShape2D(Entity entity, float width, float height){
+int PhysicsSystem::createRectShape2D(Entity entity, float width, float height){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
@@ -106,7 +106,7 @@ int PhysicsSystem::addRectShape2D(Entity entity, float width, float height){
     return -1;
 }
 
-int PhysicsSystem::addPolygonShape2D(Entity entity, std::vector<Vector2> vertices){
+int PhysicsSystem::createPolygonShape2D(Entity entity, std::vector<Vector2> vertices){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
@@ -134,7 +134,7 @@ int PhysicsSystem::addPolygonShape2D(Entity entity, std::vector<Vector2> vertice
     return -1;
 }
 
-int PhysicsSystem::addCircleShape2D(Entity entity, Vector2 center, float radius){
+int PhysicsSystem::createCircleShape2D(Entity entity, Vector2 center, float radius){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
@@ -159,7 +159,7 @@ int PhysicsSystem::addCircleShape2D(Entity entity, Vector2 center, float radius)
     return -1;
 }
 
-int PhysicsSystem::addTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2){
+int PhysicsSystem::createTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
@@ -185,7 +185,7 @@ int PhysicsSystem::addTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vecto
     return -1;
 }
 
-int PhysicsSystem::addOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3){
+int PhysicsSystem::createOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
@@ -213,7 +213,7 @@ int PhysicsSystem::addOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vecto
     return -1;
 }
 
-int PhysicsSystem::addLoopChainShape2D(Entity entity, std::vector<Vector2> vertices){
+int PhysicsSystem::createLoopChainShape2D(Entity entity, std::vector<Vector2> vertices){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
@@ -241,7 +241,7 @@ int PhysicsSystem::addLoopChainShape2D(Entity entity, std::vector<Vector2> verti
     return -1;
 }
 
-int PhysicsSystem::addChainShape2D(Entity entity, std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex){
+int PhysicsSystem::createChainShape2D(Entity entity, std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
