@@ -83,32 +83,37 @@ int Body2D::createRectShape(float width, float height){
     return index;
 }
 
-int Body2D::createPolygonShape2D(std::vector<Vector2> vertices){
+int Body2D::createCenteredRectShape(float width, float height, Vector2 center, float angle){
+    int index = scene->getSystem<PhysicsSystem>()->createCenteredRectShape2D(entity, width, height, center, angle);
+    return index;
+}
+
+int Body2D::createPolygonShape(std::vector<Vector2> vertices){
     int index = scene->getSystem<PhysicsSystem>()->createPolygonShape2D(entity, vertices);
     return index;
 }
 
-int Body2D::createCircleShape2D(Vector2 center, float radius){
+int Body2D::createCircleShape(Vector2 center, float radius){
     int index = scene->getSystem<PhysicsSystem>()->createCircleShape2D(entity, center, radius);
     return index;
 }
 
-int Body2D::createTwoSidedEdgeShape2D(Vector2 vertice1, Vector2 vertice2){
+int Body2D::createTwoSidedEdgeShape(Vector2 vertice1, Vector2 vertice2){
     int index = scene->getSystem<PhysicsSystem>()->createTwoSidedEdgeShape2D(entity, vertice1, vertice2);
     return index;
 }
 
-int Body2D::createOneSidedEdgeShape2D(Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3){
+int Body2D::createOneSidedEdgeShape(Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3){
     int index = scene->getSystem<PhysicsSystem>()->createOneSidedEdgeShape2D(entity, vertice0, vertice1, vertice2, vertice3);
     return index;
 }
 
-int Body2D::createLoopChainShape2D(std::vector<Vector2> vertices){
+int Body2D::createLoopChainShape(std::vector<Vector2> vertices){
     int index = scene->getSystem<PhysicsSystem>()->createLoopChainShape2D(entity, vertices);
     return index;
 }
 
-int Body2D::createChainShape2D(std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex){
+int Body2D::createChainShape(std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex){
     int index = scene->getSystem<PhysicsSystem>()->createChainShape2D(entity, vertices, prevVertex, nextVertex);
     return index;
 }

@@ -52,6 +52,7 @@ namespace Supernova{
 		void removeBody2D(Entity entity);
 
 		int createRectShape2D(Entity entity, float width, float height);
+		int createCenteredRectShape2D(Entity entity, float width, float height, Vector2 center, float angle);
 		int createPolygonShape2D(Entity entity, std::vector<Vector2> vertices);
 		int createCircleShape2D(Entity entity, Vector2 center, float radius);
 		int createTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2);

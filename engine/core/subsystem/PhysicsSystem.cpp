@@ -59,7 +59,7 @@ void PhysicsSystem::updateBodyPosition(Signature signature, Entity entity, Body2
 
         if (transform.needUpdate || updateAnyway){
             b2Vec2 bPosition(transform.position.x / pointsToMeterScale, transform.position.y / pointsToMeterScale);
-            body.body->SetTransform(bPosition, transform.rotation.getRoll());
+            body.body->SetTransform(bPosition, Angle::defaultToRad(transform.rotation.getRoll()));
         }
     }
 }
@@ -91,7 +91,43 @@ int PhysicsSystem::createRectShape2D(Entity entity, float width, float height){
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
             b2PolygonShape shape;
-            shape.SetAsBox(width / pointsToMeterScale, height / pointsToMeterScale);
+            // same as shape.SetAsBox but using center on left corner
+            shape.m_count = 4;
+            shape.m_vertices[0].Set(0, 0);
+            shape.m_vertices[1].Set( width / pointsToMeterScale, 0);
+            shape.m_vertices[2].Set( width / pointsToMeterScale,  height / pointsToMeterScale);
+            shape.m_vertices[3].Set(0,  height / pointsToMeterScale);
+            shape.m_normals[0].Set(0.0f, -1.0f);
+            shape.m_normals[1].Set(1.0f, 0.0f);
+            shape.m_normals[2].Set(0.0f, 1.0f);
+            shape.m_normals[3].Set(-1.0f, 0.0f);
+            shape.m_centroid.SetZero();
+
+            loadShape2D(*body, &shape, body->numShapes);
+
+            body->numShapes++;
+
+            return (body->numShapes - 1);
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        }
+    }
+
+    return -1;
+}
+
+int PhysicsSystem::createCenteredRectShape2D(Entity entity, float width, float height, Vector2 center, float angle){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+
+            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+
+            b2PolygonShape shape;
+            float halfW = width / 2.0 / pointsToMeterScale;
+            float halfH = height / 2.0 / pointsToMeterScale;
+            shape.SetAsBox(halfW, halfH, b2Vec2(center.x / pointsToMeterScale, center.y / pointsToMeterScale), Angle::defaultToRad(angle));
 
             loadShape2D(*body, &shape, body->numShapes);
 
