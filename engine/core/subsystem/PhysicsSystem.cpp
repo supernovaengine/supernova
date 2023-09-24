@@ -10,7 +10,94 @@
 #include "util/Box2DContactListener.h"
 #include "util/Box2DContactFilter.h"
 
+
+#include "Jolt/Jolt.h"
+
+#include "Jolt/RegisterTypes.h"
+#include "Jolt/Core/Factory.h"
+#include "Jolt/Core/TempAllocator.h"
+#include "Jolt/Core/JobSystemThreadPool.h"
+#include "Jolt/Physics/PhysicsSettings.h"
+#include "Jolt/Physics/PhysicsSystem.h"
+#include "Jolt/Physics/Collision/Shape/BoxShape.h"
+#include "Jolt/Physics/Collision/Shape/SphereShape.h"
+#include "Jolt/Physics/Body/BodyCreationSettings.h"
+#include "Jolt/Physics/Body/BodyActivationListener.h"
+
+
+// Based on: https://github.com/jrouwe/JoltPhysics/blob/master/HelloWorld/HelloWorld.cpp
+namespace Layers
+{
+	static constexpr JPH::ObjectLayer NON_MOVING = 0;
+	static constexpr JPH::ObjectLayer MOVING = 1;
+	static constexpr JPH::ObjectLayer NUM_LAYERS = 2;
+};
+namespace BroadPhaseLayers
+{
+	static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
+	static constexpr JPH::BroadPhaseLayer MOVING(1);
+	static constexpr uint NUM_LAYERS(2);
+};
+
+
+
 using namespace Supernova;
+
+
+
+class ObjectLayerPairFilterImpl : public JPH::ObjectLayerPairFilter{
+public:
+	virtual bool ShouldCollide(JPH::ObjectLayer inObject1, JPH::ObjectLayer inObject2) const override{
+		switch (inObject1)
+		{
+		case Layers::NON_MOVING:
+			return inObject2 == Layers::MOVING; // Non moving only collides with moving
+		case Layers::MOVING:
+			return true; // Moving collides with everything
+		default:
+			JPH_ASSERT(false);
+			return false;
+		}
+	}
+};
+
+class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface{
+private:
+	JPH::BroadPhaseLayer mObjectToBroadPhase[Layers::NUM_LAYERS];
+
+public:
+	BPLayerInterfaceImpl(){
+		// Create a mapping table from object to broad phase layer
+		mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
+		mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
+	}
+
+	virtual uint GetNumBroadPhaseLayers() const override{
+		return BroadPhaseLayers::NUM_LAYERS;
+	}
+
+	virtual JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const override{
+		JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
+		return mObjectToBroadPhase[inLayer];
+	}
+};
+
+/// Class that determines if an object layer can collide with a broadphase layer
+class ObjectVsBroadPhaseLayerFilterImpl : public JPH::ObjectVsBroadPhaseLayerFilter{
+public:
+	virtual bool ShouldCollide(JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2) const override{
+		switch (inLayer1)
+		{
+		case Layers::NON_MOVING:
+			return inLayer2 == BroadPhaseLayers::MOVING;
+		case Layers::MOVING:
+			return true;
+		default:
+			JPH_ASSERT(false);
+			return false;
+		}
+	}
+};
 
 
 PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
@@ -28,21 +115,31 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
 
     world2D->SetContactListener(contactListener2D);
     world2D->SetContactFilter(contactFilter2D);
+
+
+	const uint cMaxBodies = 1024;
+	const uint cNumBodyMutexes = 0;
+	const uint cMaxBodyPairs = 1024;
+	const uint cMaxContactConstraints = 1024;
+
+    broad_phase_layer_interface = new BPLayerInterfaceImpl();
+	object_vs_broadphase_layer_filter = new ObjectVsBroadPhaseLayerFilterImpl();
+	object_vs_object_layer_filter = new ObjectLayerPairFilterImpl();
+
+	// Now we can create the actual physics system.
+	world3D = new JPH::PhysicsSystem();
+	world3D->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *broad_phase_layer_interface, *object_vs_broadphase_layer_filter, *object_vs_object_layer_filter);
 }
 
 PhysicsSystem::~PhysicsSystem(){
-    if (world2D){
-        delete world2D;
-        world2D = NULL;
-    }
+    delete world2D;
+    delete contactListener2D;
+    delete contactFilter2D;
 
-    if (contactListener2D){
-        delete contactListener2D;
-    }
-
-    if (contactFilter2D){
-        delete contactFilter2D;
-    }
+    delete world3D;
+    delete broad_phase_layer_interface;
+    delete object_vs_broadphase_layer_filter;
+    delete object_vs_object_layer_filter;
 }
 
 float PhysicsSystem::getPointsToMeterScale() const{

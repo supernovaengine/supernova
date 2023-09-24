@@ -17,6 +17,14 @@ class b2Body;
 class b2Shape;
 class b2JointDef;
 
+
+namespace JPH{
+	class PhysicsSystem;
+};
+class BPLayerInterfaceImpl;
+class ObjectVsBroadPhaseLayerFilterImpl;
+class ObjectLayerPairFilterImpl;
+
 namespace Supernova{
 
 	class Box2DContactListener;
@@ -31,6 +39,12 @@ namespace Supernova{
 
 		Box2DContactListener* contactListener2D;
 		Box2DContactFilter* contactFilter2D;
+
+		JPH::PhysicsSystem* world3D;
+
+		BPLayerInterfaceImpl* broad_phase_layer_interface;
+		ObjectVsBroadPhaseLayerFilterImpl* object_vs_broadphase_layer_filter;
+		ObjectLayerPairFilterImpl* object_vs_object_layer_filter;
 
 		void updateBodyPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway);
 
