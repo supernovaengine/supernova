@@ -3,16 +3,39 @@
 // (c) 2023 Eduardo Doria.
 //
 
-#ifndef Box2DContactListener_h
-#define Box2DContactListener_h
+#ifndef Box2DAux_h
+#define Box2DAux_h
 
 #include "box2d.h"
 #include "subsystem/PhysicsSystem.h"
-#include "object/physics/Contact2D.h"
-#include "object/physics/Manifold2D.h"
-#include "object/physics/ContactImpulse2D.h"
 
 namespace Supernova{
+
+    class Box2DContactFilter : public b2ContactFilter{
+    private:
+        Scene* scene;
+        PhysicsSystem* physicsSystem;
+
+    public:
+
+        Box2DContactFilter(Scene* scene, PhysicsSystem* physicsSystem){
+            this->scene = scene;
+            this->physicsSystem = physicsSystem;
+        }
+        
+        bool ShouldCollide(b2Fixture* fixtureA, b2Fixture* fixtureB){
+            size_t shapeIndexA = fixtureA->GetUserData().pointer;
+            Entity entityA = fixtureA->GetBody()->GetUserData().pointer;
+            Body2D bodyA(scene, entityA);
+
+            size_t shapeIndexB = fixtureB->GetUserData().pointer;
+            Entity entityB = fixtureB->GetBody()->GetUserData().pointer;
+            Body2D bodyB(scene, entityB);
+
+            return physicsSystem->shouldCollide2D.callRet(bodyA, shapeIndexA, bodyB, shapeIndexB, true);
+        }
+    };
+
 
     class Box2DContactListener : public b2ContactListener{
     private:
@@ -45,4 +68,4 @@ namespace Supernova{
 
 }
 
-#endif //Box2DContactListener_h
+#endif //Box2DAux_h
