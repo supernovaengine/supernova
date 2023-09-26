@@ -74,7 +74,13 @@ namespace Supernova{
 		int createLoopChainShape2D(Entity entity, std::vector<Vector2> vertices);
 		int createChainShape2D(Entity entity, std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex);
 
-		void removeAllShapes(Entity entity);
+		void removeAllShapes2D(Entity entity);
+
+		void createBody3D(Entity entity);
+		void removeBody3D(Entity entity);
+
+		void createBoxShape3D(Entity entity, float width, float height, float depth);
+		void createSphereShape3D(Entity entity);
 
 		b2Body* getBody(Entity entity);
 

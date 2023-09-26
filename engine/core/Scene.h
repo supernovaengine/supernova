@@ -50,6 +50,7 @@
 #include "component/TilemapComponent.h"
 #include "component/Body2DComponent.h"
 #include "component/Joint2DComponent.h"
+#include "component/Body3DComponent.h"
 
 namespace Supernova{
 

@@ -30,10 +30,10 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     world2D->SetContactFilter(contactFilter2D);
 
 
-	const uint cMaxBodies = 1024;
-	const uint cNumBodyMutexes = 0;
-	const uint cMaxBodyPairs = 1024;
-	const uint cMaxContactConstraints = 1024;
+	const unsigned int cMaxBodies = 1024;
+	const unsigned int cNumBodyMutexes = 0;
+	const unsigned int cMaxBodyPairs = 1024;
+	const unsigned int cMaxContactConstraints = 1024;
 
     broad_phase_layer_interface = new BPLayerInterfaceImpl();
 	object_vs_broadphase_layer_filter = new ObjectVsBroadPhaseLayerFilterImpl();
@@ -323,7 +323,7 @@ int PhysicsSystem::createChainShape2D(Entity entity, std::vector<Vector2> vertic
     return -1;
 }
 
-void PhysicsSystem::removeAllShapes(Entity entity){
+void PhysicsSystem::removeAllShapes2D(Entity entity){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
@@ -332,6 +332,54 @@ void PhysicsSystem::removeAllShapes(Entity entity){
         }
         body->numShapes = 0;
     }
+}
+
+void PhysicsSystem::createBody3D(Entity entity){
+    Signature signature = scene->getSignature(entity);
+
+    if (!signature.test(scene->getComponentType<Body3DComponent>())){
+        scene->addComponent<Body3DComponent>(entity, {});
+        //loadBody2D(entity);
+    }
+}
+
+void PhysicsSystem::removeBody3D(Entity entity){
+    Signature signature = scene->getSignature(entity);
+
+    if (signature.test(scene->getComponentType<Body3DComponent>())){
+        //destroyBody2D(scene->getComponent<Body3DComponent>(entity));
+        scene->removeComponent<Body3DComponent>(entity);
+    }
+}
+
+void PhysicsSystem::createBoxShape3D(Entity entity, float width, float height, float depth){
+	JPH::BoxShapeSettings shape_settings(JPH::Vec3(width, height, depth));
+
+	JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+	JPH::ShapeRefC shape = shape_result.Get();
+
+	JPH::BodyCreationSettings settings(shape, JPH::Vec3(0.0, -1.0, 0.0), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING);
+
+    JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
+
+	JPH::Body *body = body_interface.CreateBody(settings);
+
+	body_interface.AddBody(body->GetID(), JPH::EActivation::DontActivate);
+}
+
+void PhysicsSystem::createSphereShape3D(Entity entity){
+	JPH::SphereShapeSettings shape_settings(1.0f);
+
+	JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+	JPH::ShapeRefC shape = shape_result.Get();
+
+	JPH::BodyCreationSettings settings(shape, JPH::Vec3(0.0, 2.0, 0.0), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING);
+
+    JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
+
+	JPH::Body *body = body_interface.CreateBody(settings);
+
+	body_interface.AddBody(body->GetID(), JPH::EActivation::Activate);
 }
 
 b2Body* PhysicsSystem::getBody(Entity entity){

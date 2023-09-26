@@ -125,7 +125,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("createOneSidedEdgeShape2D", &PhysicsSystem::createOneSidedEdgeShape2D)
         .addFunction("createLoopChainShape2D", &PhysicsSystem::createLoopChainShape2D)
         .addFunction("createChainShape2D", &PhysicsSystem::createChainShape2D)
-        .addFunction("removeAllShapes", &PhysicsSystem::removeAllShapes)
+        .addFunction("removeAllShapes2D", &PhysicsSystem::removeAllShapes2D)
         .addFunction("loadBody2D", &PhysicsSystem::loadBody2D)
         .addFunction("destroyBody2D", &PhysicsSystem::destroyBody2D)
         .addFunction("loadShape2D", &PhysicsSystem::loadShape2D)

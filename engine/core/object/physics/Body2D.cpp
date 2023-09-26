@@ -119,7 +119,7 @@ int Body2D::createChainShape(std::vector<Vector2> vertices, Vector2 prevVertex, 
 }
 
 void Body2D::removeAllShapes(){
-    scene->getSystem<PhysicsSystem>()->removeAllShapes(entity);
+    scene->getSystem<PhysicsSystem>()->removeAllShapes2D(entity);
 }
 
 void Body2D::setShapeDensity(float density){
