@@ -62,7 +62,7 @@ public:
 		mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
 	}
 
-	virtual uint GetNumBroadPhaseLayers() const override{
+	virtual unsigned int GetNumBroadPhaseLayers() const override{
 		return BroadPhaseLayers::NUM_LAYERS;
 	}
 
