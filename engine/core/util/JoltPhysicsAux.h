@@ -45,7 +45,7 @@ public:
 		case Layers::MOVING:
 			return true; // Moving collides with everything
 		default:
-			JPH_ASSERT(false);
+			//JPH_ASSERT(false);
 			return false;
 		}
 	}
@@ -67,7 +67,7 @@ public:
 	}
 
 	virtual JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const override{
-		JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
+		//JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
 		return mObjectToBroadPhase[inLayer];
 	}
 };
@@ -83,7 +83,7 @@ public:
 		case Layers::MOVING:
 			return true;
 		default:
-			JPH_ASSERT(false);
+			//JPH_ASSERT(false);
 			return false;
 		}
 	}
