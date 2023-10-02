@@ -29,6 +29,8 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     world2D->SetContactListener(contactListener2D);
     world2D->SetContactFilter(contactFilter2D);
 
+    // https://github.com/jrouwe/JoltPhysics/issues/244
+    JPH::RegisterDefaultAllocator();
 
 	const unsigned int cMaxBodies = 1024;
 	const unsigned int cNumBodyMutexes = 0;
