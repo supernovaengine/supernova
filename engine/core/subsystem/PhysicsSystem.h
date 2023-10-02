@@ -20,6 +20,8 @@ class b2JointDef;
 
 namespace JPH{
 	class PhysicsSystem;
+	class TempAllocatorImpl;
+	class JobSystemThreadPool;
 };
 class BPLayerInterfaceImpl;
 class ObjectVsBroadPhaseLayerFilterImpl;
@@ -40,13 +42,15 @@ namespace Supernova{
 		Box2DContactListener* contactListener2D;
 		Box2DContactFilter* contactFilter2D;
 
+        JPH::TempAllocatorImpl* temp_allocator;
+        JPH::JobSystemThreadPool* job_system;
 		JPH::PhysicsSystem* world3D;
 
 		BPLayerInterfaceImpl* broad_phase_layer_interface;
 		ObjectVsBroadPhaseLayerFilterImpl* object_vs_broadphase_layer_filter;
 		ObjectLayerPairFilterImpl* object_vs_object_layer_filter;
 
-		void updateBodyPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway);
+		void updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway);
 
 	public:
 		PhysicsSystem(Scene* scene);

@@ -209,3 +209,12 @@ Body2D Object::getBody2D(){
 void Object::removeBody2D(){
     scene->getSystem<PhysicsSystem>()->removeBody2D(entity);
 }
+
+Body3D Object::getBody3D(){
+    scene->getSystem<PhysicsSystem>()->createBody3D(entity);
+    return Body3D(scene, entity);
+}
+
+void Object::removeBody3D(){
+    scene->getSystem<PhysicsSystem>()->removeBody3D(entity);
+}

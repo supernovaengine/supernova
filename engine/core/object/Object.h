@@ -7,6 +7,7 @@
 
 #include "EntityHandle.h"
 #include "Body2D.h"
+#include "Body3D.h"
 
 namespace Supernova{
 
@@ -64,6 +65,10 @@ namespace Supernova{
         // 2D physics
         Body2D getBody2D();
         void removeBody2D();
+
+        // 3D physics
+        Body3D getBody3D();
+        void removeBody3D();
     };
 
 }
