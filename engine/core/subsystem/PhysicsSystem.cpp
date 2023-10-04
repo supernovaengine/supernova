@@ -32,27 +32,37 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     // https://github.com/jrouwe/JoltPhysics/issues/244
     JPH::RegisterDefaultAllocator();
 
-	const unsigned int cMaxBodies = 1024;
-	const unsigned int cNumBodyMutexes = 0;
-	const unsigned int cMaxBodyPairs = 1024;
-	const unsigned int cMaxContactConstraints = 1024;
+    // Install callbacks
+    //JPH::Trace = TraceImpl;
+    //JPH_IF_ENABLE_ASSERTS(AssertFailed = AssertFailedImpl;)
+
+    // Create a factory
+    JPH::Factory::sInstance = new JPH::Factory();
+
+    // Register all Jolt physics types
+    JPH::RegisterTypes();
+
+    const unsigned int cMaxBodies = 1024;
+    const unsigned int cNumBodyMutexes = 0;
+    const unsigned int cMaxBodyPairs = 1024;
+    const unsigned int cMaxContactConstraints = 1024;
 
     broad_phase_layer_interface = new BPLayerInterfaceImpl();
-	object_vs_broadphase_layer_filter = new ObjectVsBroadPhaseLayerFilterImpl();
-	object_vs_object_layer_filter = new ObjectLayerPairFilterImpl();
+    object_vs_broadphase_layer_filter = new ObjectVsBroadPhaseLayerFilterImpl();
+    object_vs_object_layer_filter = new ObjectLayerPairFilterImpl();
 
-	// Now we can create the actual physics system.
-	world3D = new JPH::PhysicsSystem();
-	world3D->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *broad_phase_layer_interface, *object_vs_broadphase_layer_filter, *object_vs_object_layer_filter);
+    // Now we can create the actual physics system.
+    world3D = new JPH::PhysicsSystem();
+    world3D->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *broad_phase_layer_interface, *object_vs_broadphase_layer_filter, *object_vs_object_layer_filter);
 
     temp_allocator = new JPH::TempAllocatorImpl(10 * 1024 * 1024);
     job_system = new JPH::JobSystemThreadPool (JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1);
 
-    MyBodyActivationListener body_activation_listener;
-	world3D->SetBodyActivationListener(&body_activation_listener);
+    //MyBodyActivationListener body_activation_listener;
+	//world3D->SetBodyActivationListener(&body_activation_listener);
 
-    MyContactListener contact_listener;
-	world3D->SetContactListener(&contact_listener);
+    //MyContactListener contact_listener;
+	//world3D->SetContactListener(&contact_listener);
 }
 
 PhysicsSystem::~PhysicsSystem(){
@@ -66,6 +76,10 @@ PhysicsSystem::~PhysicsSystem(){
     delete broad_phase_layer_interface;
     delete object_vs_broadphase_layer_filter;
     delete object_vs_object_layer_filter;
+
+    JPH::UnregisterTypes();
+
+    delete JPH::Factory::sInstance;
 }
 
 float PhysicsSystem::getPointsToMeterScale() const{
@@ -859,6 +873,7 @@ void PhysicsSystem::update(double dt){
             //if (transform.needUpdate || updateAnyway){
                 JPH::Vec3 jPosition(transform.position.x, transform.position.y, transform.position.z);
                 JPH::Quat jQuat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
                 body.body->SetPositionAndRotationInternal(jPosition, jQuat);
             //}
         }
