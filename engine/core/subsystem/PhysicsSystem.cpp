@@ -54,6 +54,7 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     // Now we can create the actual physics system.
     world3D = new JPH::PhysicsSystem();
     world3D->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *broad_phase_layer_interface, *object_vs_broadphase_layer_filter, *object_vs_object_layer_filter);
+    world3D->SetGravity(JPH::Vec3(0, -9.81f, 0));
 
     temp_allocator = new JPH::TempAllocatorImpl(10 * 1024 * 1024);
     job_system = new JPH::JobSystemThreadPool (JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1);
@@ -77,9 +78,8 @@ PhysicsSystem::~PhysicsSystem(){
     delete object_vs_broadphase_layer_filter;
     delete object_vs_object_layer_filter;
 
-    JPH::UnregisterTypes();
-
-    delete JPH::Factory::sInstance;
+    //delete JPH::Factory::sInstance;
+    //JPH::UnregisterTypes();
 }
 
 float PhysicsSystem::getPointsToMeterScale() const{
@@ -374,33 +374,43 @@ void PhysicsSystem::removeBody3D(Entity entity){
 }
 
 void PhysicsSystem::createBoxShape3D(Entity entity, float width, float height, float depth){
-	JPH::BoxShapeSettings shape_settings(JPH::Vec3(width, height, depth));
+    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
-	JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
-	JPH::ShapeRefC shape = shape_result.Get();
+    if (body){
+        JPH::BoxShapeSettings shape_settings(JPH::Vec3(width, height, depth));
 
-	JPH::BodyCreationSettings settings(shape, JPH::Vec3(0.0, -1.0, 0.0), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING);
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        JPH::ShapeRefC shape = shape_result.Get();
 
-    JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
+        JPH::BodyCreationSettings settings(shape, JPH::Vec3(0.0, -1.0, 0.0), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING);
 
-	JPH::Body *body = body_interface.CreateBody(settings);
+        JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
 
-	body_interface.AddBody(body->GetID(), JPH::EActivation::DontActivate);
+        body->body = body_interface.CreateBody(settings);
+        body->newBody = true;
+
+        body_interface.AddBody(body->body->GetID(), JPH::EActivation::DontActivate);
+    }
 }
 
 void PhysicsSystem::createSphereShape3D(Entity entity){
-	JPH::SphereShapeSettings shape_settings(1.0f);
+    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
-	JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
-	JPH::ShapeRefC shape = shape_result.Get();
+    if (body){
+        JPH::SphereShapeSettings shape_settings(1.0f);
 
-	JPH::BodyCreationSettings settings(shape, JPH::Vec3(0.0, 2.0, 0.0), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING);
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        JPH::ShapeRefC shape = shape_result.Get();
 
-    JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
+        JPH::BodyCreationSettings settings(shape, JPH::Vec3(0.0, 2.0, 0.0), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING);
 
-	JPH::Body *body = body_interface.CreateBody(settings);
+        JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
 
-	body_interface.AddBody(body->GetID(), JPH::EActivation::Activate);
+        body->body = body_interface.CreateBody(settings);
+        body->newBody = true;
+
+        body_interface.AddBody(body->body->GetID(), JPH::EActivation::Activate);
+    }
 }
 
 b2Body* PhysicsSystem::getBody(Entity entity){
@@ -806,10 +816,7 @@ void PhysicsSystem::load(){
 }
 
 void PhysicsSystem::destroy(){
-    if (world2D){
-        delete world2D;
-        world2D = NULL;
-    }
+
 }
 
 void PhysicsSystem::update(double dt){
@@ -821,9 +828,11 @@ void PhysicsSystem::update(double dt){
 		Entity entity = bodies2d->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-        updateBody2DPosition(signature, entity, body, body.newBody);
+        if (body.body){
+            updateBody2DPosition(signature, entity, body, body.newBody);
 
-        body.newBody = false;
+            body.newBody = false;
+        }
     }
 
     if (bodies2d->size() > 0){
@@ -838,25 +847,27 @@ void PhysicsSystem::update(double dt){
 		Entity entity = bodies2d->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-        b2Vec2 position = body.body->GetPosition();
-        float angle = body.body->GetAngle();
-        if (signature.test(scene->getComponentType<Transform>())){
-		    Transform& transform = scene->getComponent<Transform>(entity);
+        if (body.body){
+            b2Vec2 position = body.body->GetPosition();
+            float angle = body.body->GetAngle();
+            if (signature.test(scene->getComponentType<Transform>())){
+                Transform& transform = scene->getComponent<Transform>(entity);
 
-            Vector3 nPosition = Vector3(position.x * pointsToMeterScale, position.y * pointsToMeterScale, transform.worldPosition.z);
-            if (transform.position != nPosition){
-                transform.position = nPosition;
-                transform.needUpdate = true;
+                Vector3 nPosition = Vector3(position.x * pointsToMeterScale, position.y * pointsToMeterScale, transform.worldPosition.z);
+                if (transform.position != nPosition){
+                    transform.position = nPosition;
+                    transform.needUpdate = true;
+                }
+
+                if (transform.worldRotation.getRoll() != angle){
+                    Quaternion rotation;
+                    rotation.fromAngle(Angle::radToDefault(angle));
+
+                    transform.rotation = rotation;
+                    transform.needUpdate = true;
+                }
+
             }
-
-            if (transform.worldRotation.getRoll() != angle){
-                Quaternion rotation;
-                rotation.fromAngle(Angle::radToDefault(angle));
-
-                transform.rotation = rotation;
-                transform.needUpdate = true;
-            }
-
         }
     }
 
@@ -867,18 +878,20 @@ void PhysicsSystem::update(double dt){
 		Entity entity = bodies3d->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<Transform>())){
-            Transform& transform = scene->getComponent<Transform>(entity);
+        if (body.body){
+            if (signature.test(scene->getComponentType<Transform>())){
+                Transform& transform = scene->getComponent<Transform>(entity);
 
-            //if (transform.needUpdate || updateAnyway){
-                JPH::Vec3 jPosition(transform.position.x, transform.position.y, transform.position.z);
-                JPH::Quat jQuat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+                if (transform.needUpdate || body.newBody){
+                    JPH::Vec3 jPosition(transform.position.x, transform.position.y, transform.position.z);
+                    JPH::Quat jQuat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
-                body.body->SetPositionAndRotationInternal(jPosition, jQuat);
-            //}
+                    body.body->SetPositionAndRotationInternal(jPosition, jQuat);
+                }
+            }
+
+            body.newBody = false;
         }
-
-        //body.newBody = false;
     }
 
     if (bodies3d->size() > 0){
@@ -893,23 +906,25 @@ void PhysicsSystem::update(double dt){
 		Entity entity = bodies3d->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-        JPH::RVec3 position = body.body->GetPosition();
-        JPH::Quat rotation = body.body->GetRotation();
-        if (signature.test(scene->getComponentType<Transform>())){
-		    Transform& transform = scene->getComponent<Transform>(entity);
+        if (body.body){
+            JPH::RVec3 position = body.body->GetPosition();
+            JPH::Quat rotation = body.body->GetRotation();
+            if (signature.test(scene->getComponentType<Transform>())){
+                Transform& transform = scene->getComponent<Transform>(entity);
 
-            Vector3 nPosition = Vector3(position.GetX(), position.GetY(), position.GetZ());
-            if (transform.position != nPosition){
-                transform.position = nPosition;
-                transform.needUpdate = true;
+                Vector3 nPosition = Vector3(position.GetX(), position.GetY(), position.GetZ());
+                if (transform.position != nPosition){
+                    transform.position = nPosition;
+                    transform.needUpdate = true;
+                }
+
+                Quaternion nRotation = Quaternion(rotation.GetW(), rotation.GetX(), rotation.GetY(), rotation.GetZ());
+                if (transform.rotation != nRotation){
+                    transform.rotation = nRotation;
+                    transform.needUpdate = true;
+                }
+
             }
-
-            Quaternion nRotation = Quaternion(rotation.GetW(), rotation.GetX(), rotation.GetY(), rotation.GetZ());
-            if (transform.rotation != nRotation){
-                transform.rotation = nRotation;
-                transform.needUpdate = true;
-            }
-
         }
     }
 }
