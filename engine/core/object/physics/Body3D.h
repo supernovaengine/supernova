@@ -32,6 +32,9 @@ namespace Supernova{
         void createBoxShape(float width, float height, float depth);
         void createSphereShape();
 
+        void setLinearVelocity(Vector3 linearVelocity);
+        Vector3 getLinearVelocity() const;
+
     };
 }
 

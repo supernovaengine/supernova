@@ -217,8 +217,9 @@ float Body2D::getShapeRestitution(size_t index) const{
 
 void Body2D::setLinearVelocity(Vector2 linearVelocity){
     Body2DComponent& body = getComponent<Body2DComponent>();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
 
-    body.body->SetLinearVelocity(b2Vec2(linearVelocity.x, linearVelocity.y));
+    body.body->SetLinearVelocity(b2Vec2(linearVelocity.x * pointsToMeterScale, linearVelocity.y * pointsToMeterScale));
 }
 
 void Body2D::setAngularVelocity(float angularVelocity){
@@ -284,9 +285,10 @@ void Body2D::setGravityScale(float gravityScale){
 Vector2 Body2D::getLinearVelocity() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
     b2Vec2 vec = body.body->GetLinearVelocity();
 
-    return Vector2(vec.x, vec.y);
+    return Vector2(vec.x / pointsToMeterScale, vec.y / pointsToMeterScale);
 }
 
 float Body2D::getAngularVelocity() const{

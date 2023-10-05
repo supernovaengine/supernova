@@ -40,3 +40,17 @@ void Body3D::createBoxShape(float width, float height, float depth){
 void Body3D::createSphereShape(){
     scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity);
 }
+
+void Body3D::setLinearVelocity(Vector3 linearVelocity){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    body.body->SetLinearVelocity(JPH::Vec3(linearVelocity.x, linearVelocity.y, linearVelocity.z));
+}
+
+Vector3 Body3D::getLinearVelocity() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    JPH::Vec3 vec = body.body->GetLinearVelocity();
+
+    return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
+}
