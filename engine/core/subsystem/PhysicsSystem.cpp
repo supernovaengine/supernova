@@ -101,6 +101,30 @@ void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Bod
     }
 }
 
+void PhysicsSystem::createGenericJoltBody(Body3DComponent& body, BodyType type, const JPH::Shape* shape){
+    JPH::ObjectLayer layer = Layers::NON_MOVING;
+    JPH::EMotionType joltType = JPH::EMotionType::Static;
+    JPH::EActivation activation = JPH::EActivation::DontActivate;
+    if (type == BodyType::DYNAMIC){
+        layer = Layers::MOVING;
+        joltType = JPH::EMotionType::Dynamic;
+        activation = JPH::EActivation::Activate;
+    }else if (type == BodyType::KINEMATIC){
+        layer = Layers::MOVING;
+        joltType = JPH::EMotionType::Kinematic;
+        activation = JPH::EActivation::Activate;
+    }
+
+    JPH::BodyCreationSettings settings(shape, JPH::Vec3(0.0, 0.0, 0.0), JPH::Quat::sIdentity(), joltType, layer);
+
+    JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
+
+    body.body = body_interface.CreateBody(settings);
+    body.newBody = true;
+
+    body_interface.AddBody(body.body->GetID(), activation);
+}
+
 void PhysicsSystem::createBody2D(Entity entity){
     Signature signature = scene->getSignature(entity);
 
@@ -373,7 +397,7 @@ void PhysicsSystem::removeBody3D(Entity entity){
     }
 }
 
-void PhysicsSystem::createBoxShape3D(Entity entity, float width, float height, float depth){
+void PhysicsSystem::createBoxShape3D(Entity entity, BodyType type, float width, float height, float depth){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
@@ -382,35 +406,29 @@ void PhysicsSystem::createBoxShape3D(Entity entity, float width, float height, f
         JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
         JPH::ShapeRefC shape = shape_result.Get();
 
-        JPH::BodyCreationSettings settings(shape, JPH::Vec3(0.0, -1.0, 0.0), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING);
-
-        JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
-
-        body->body = body_interface.CreateBody(settings);
-        body->newBody = true;
-
-        body_interface.AddBody(body->body->GetID(), JPH::EActivation::DontActivate);
+        createGenericJoltBody(*body, type, shape.GetPtr());
     }
 }
 
-void PhysicsSystem::createSphereShape3D(Entity entity){
+void PhysicsSystem::createSphereShape3D(Entity entity, BodyType type, float radius){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
-        JPH::SphereShapeSettings shape_settings(1.0f);
+        JPH::SphereShapeSettings shape_settings(radius);
 
         JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
         JPH::ShapeRefC shape = shape_result.Get();
 
-        JPH::BodyCreationSettings settings(shape, JPH::Vec3(0.0, 2.0, 0.0), JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING);
-
-        JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
-
-        body->body = body_interface.CreateBody(settings);
-        body->newBody = true;
-
-        body_interface.AddBody(body->body->GetID(), JPH::EActivation::Activate);
+        createGenericJoltBody(*body, type, shape.GetPtr());
     }
+}
+
+b2World* PhysicsSystem::getWorld2D() const{
+     return world2D;
+}
+
+JPH::PhysicsSystem* PhysicsSystem::getWorld3D() const{
+    return world3D;
 }
 
 b2Body* PhysicsSystem::getBody(Entity entity){

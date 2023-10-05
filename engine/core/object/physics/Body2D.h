@@ -65,7 +65,7 @@ namespace Supernova{
         void setAwake(bool awake);
         void setFixedRotation(bool fixedRotation);
         void setBullet(bool bullet);
-        void setType(Body2DType type);
+        void setType(BodyType type);
         void setEnabled(bool enabled);
         void setGravityScale(float gravityScale);
 
@@ -77,7 +77,7 @@ namespace Supernova{
         bool isAwake() const;
         bool isFixedRotation() const;
         bool isBullet() const;
-        Body2DType getType() const;
+        BodyType getType() const;
         bool isEnabled() const;
         float getGravityScale() const;
 

@@ -18,12 +18,6 @@ namespace Supernova{
         CHAIN
     };
 
-    enum class Body2DType{
-        STATIC,
-        KINEMATIC,
-        DYNAMIC
-    };
-
     enum class Manifold2DType{
         CIRCLES,
         FACEA,

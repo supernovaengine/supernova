@@ -19,6 +19,7 @@ class b2JointDef;
 
 
 namespace JPH{
+	class Shape;
 	class PhysicsSystem;
 	class TempAllocatorImpl;
 	class JobSystemThreadPool;
@@ -52,6 +53,8 @@ namespace Supernova{
 
 		void updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway);
 
+		void createGenericJoltBody(Body3DComponent& body, BodyType type, const JPH::Shape* shape);
+
 	public:
 		PhysicsSystem(Scene* scene);
 		virtual ~PhysicsSystem();
@@ -83,8 +86,11 @@ namespace Supernova{
 		void createBody3D(Entity entity);
 		void removeBody3D(Entity entity);
 
-		void createBoxShape3D(Entity entity, float width, float height, float depth);
-		void createSphereShape3D(Entity entity);
+		void createBoxShape3D(Entity entity, BodyType type, float width, float height, float depth);
+		void createSphereShape3D(Entity entity, BodyType type, float radius);
+
+		b2World* getWorld2D() const;
+		JPH::PhysicsSystem* getWorld3D() const;
 
 		b2Body* getBody(Entity entity);
 

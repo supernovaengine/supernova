@@ -11,6 +11,30 @@
 
 using namespace Supernova;
 
+JPH::EMotionType getBodyTypeToJolt(BodyType type){
+    if (type == BodyType::STATIC){
+        return JPH::EMotionType::Static;
+    }else if (type == BodyType::KINEMATIC){
+        return JPH::EMotionType::Kinematic;
+    }else if (type == BodyType::DYNAMIC){
+        return JPH::EMotionType::Dynamic;
+    }
+
+    return JPH::EMotionType::Static;;
+}
+
+BodyType getJoltToBodyType(JPH::EMotionType type){
+    if (type == JPH::EMotionType::Static){
+        return BodyType::STATIC;
+    }else if (type == JPH::EMotionType::Kinematic){
+        return BodyType::KINEMATIC;
+    }else if (type == JPH::EMotionType::Dynamic){
+        return BodyType::DYNAMIC;
+    }
+
+    return BodyType::STATIC;
+}
+
 Body3D::Body3D(Scene* scene, Entity entity): EntityHandle(scene, entity){
 
 }
@@ -33,12 +57,12 @@ Object Body3D::getAttachedObject(){
     return Object(scene, entity);
 }
 
-void Body3D::createBoxShape(float width, float height, float depth){
-    scene->getSystem<PhysicsSystem>()->createBoxShape3D(entity, width, height, depth);
+void Body3D::createBoxShape(BodyType type, float width, float height, float depth){
+    scene->getSystem<PhysicsSystem>()->createBoxShape3D(entity, type, width, height, depth);
 }
 
-void Body3D::createSphereShape(){
-    scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity);
+void Body3D::createSphereShape(BodyType type, float radius){
+    scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity, type, radius);
 }
 
 void Body3D::setLinearVelocity(Vector3 linearVelocity){
@@ -53,4 +77,23 @@ Vector3 Body3D::getLinearVelocity() const{
     JPH::Vec3 vec = body.body->GetLinearVelocity();
 
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
+}
+
+void Body3D::setType(BodyType type){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+    JPH::BodyInterface &body_interface = world->GetBodyInterface();
+
+    body_interface.SetMotionType(body.body->GetID(), getBodyTypeToJolt(type), JPH::EActivation::Activate);
+
+    //body.body.
+
+    //body.body->SetMotionType(getBodyTypeToJolt(type), JPH::EActivation::Activate);
+}
+
+BodyType Body3D::getType() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    return getJoltToBodyType(body.body->GetMotionType());
 }

@@ -50,6 +50,12 @@ namespace Supernova {
         WGPU
     };
 
+    enum class BodyType{
+        STATIC,
+        KINEMATIC,
+        DYNAMIC
+    };
+
     class Engine {
         
     private:

@@ -77,10 +77,10 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
-        .beginNamespace("Body2DType")
-        .addProperty("STATIC", Body2DType::STATIC)
-        .addProperty("KINEMATIC", Body2DType::KINEMATIC)
-        .addProperty("DYNAMIC", Body2DType::DYNAMIC)
+        .beginNamespace("BodyType")
+        .addProperty("STATIC", BodyType::STATIC)
+        .addProperty("KINEMATIC", BodyType::KINEMATIC)
+        .addProperty("DYNAMIC", BodyType::DYNAMIC)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)

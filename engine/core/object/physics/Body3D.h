@@ -29,11 +29,14 @@ namespace Supernova{
 
         Object getAttachedObject();
 
-        void createBoxShape(float width, float height, float depth);
-        void createSphereShape();
+        void createBoxShape(BodyType type, float width, float height, float depth);
+        void createSphereShape(BodyType type, float radius);
 
         void setLinearVelocity(Vector3 linearVelocity);
         Vector3 getLinearVelocity() const;
+
+        void setType(BodyType type);
+        BodyType getType() const;
 
     };
 }

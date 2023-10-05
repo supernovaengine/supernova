@@ -5,34 +5,34 @@
 #include "Body2D.h"
 
 #include "object/Object.h"
-#include "subsystem/PhysicsSystem.h"
 #include "component/Body2DComponent.h"
+#include "subsystem/PhysicsSystem.h"
 #include "box2d.h"
 
 using namespace Supernova;
 
-b2BodyType getBodyTypeToB2(Body2DType type){
-    if (type == Body2DType::STATIC){
+b2BodyType getBodyTypeToB2(BodyType type){
+    if (type == BodyType::STATIC){
         return b2_staticBody;
-    }else if (type == Body2DType::KINEMATIC){
+    }else if (type == BodyType::KINEMATIC){
         return b2_kinematicBody;
-    }else if (type == Body2DType::DYNAMIC){
+    }else if (type == BodyType::DYNAMIC){
         return b2_dynamicBody;
     }
 
     return b2_staticBody;
 }
 
-Body2DType getB2ToBodyType(b2BodyType type){
+BodyType getB2ToBodyType(b2BodyType type){
     if (type == b2_staticBody){
-        return Body2DType::STATIC;
+        return BodyType::STATIC;
     }else if (type == b2_kinematicBody){
-        return Body2DType::KINEMATIC;
+        return BodyType::KINEMATIC;
     }else if (type == b2_dynamicBody){
-        return Body2DType::DYNAMIC;
+        return BodyType::DYNAMIC;
     }
 
-    return Body2DType::STATIC;
+    return BodyType::STATIC;
 }
 
 Vector2 getB2ToVector2(b2Vec2 vec2){
@@ -264,7 +264,7 @@ void Body2D::setBullet(bool bullet){
     body.body->SetBullet(bullet);
 }
 
-void Body2D::setType(Body2DType type){
+void Body2D::setType(BodyType type){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     body.body->SetType(getBodyTypeToB2(type));
@@ -333,7 +333,7 @@ bool Body2D::isBullet() const{
     return body.body->IsBullet();
 }
 
-Body2DType Body2D::getType() const{
+BodyType Body2D::getType() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     return getB2ToBodyType(body.body->GetType());
