@@ -53,7 +53,7 @@ namespace Supernova{
 
 		void updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway);
 
-		void createGenericJoltBody(Body3DComponent& body, BodyType type, const JPH::Shape* shape);
+		void createGenericJoltBody(Entity entity, Body3DComponent& body, BodyType type, const JPH::Shape* shape);
 
 	public:
 		PhysicsSystem(Scene* scene);

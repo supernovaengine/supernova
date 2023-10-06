@@ -101,7 +101,7 @@ void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Bod
     }
 }
 
-void PhysicsSystem::createGenericJoltBody(Body3DComponent& body, BodyType type, const JPH::Shape* shape){
+void PhysicsSystem::createGenericJoltBody(Entity entity, Body3DComponent& body, BodyType type, const JPH::Shape* shape){
     JPH::ObjectLayer layer = Layers::NON_MOVING;
     JPH::EMotionType joltType = JPH::EMotionType::Static;
     JPH::EActivation activation = JPH::EActivation::DontActivate;
@@ -120,6 +120,7 @@ void PhysicsSystem::createGenericJoltBody(Body3DComponent& body, BodyType type, 
     JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
 
     body.body = body_interface.CreateBody(settings);
+    body.body->SetUserData(entity);
     body.newBody = true;
 
     body_interface.AddBody(body.body->GetID(), activation);
@@ -404,9 +405,13 @@ void PhysicsSystem::createBoxShape3D(Entity entity, BodyType type, float width, 
         JPH::BoxShapeSettings shape_settings(JPH::Vec3(width, height, depth));
 
         JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
-        JPH::ShapeRefC shape = shape_result.Get();
+        if (shape_result.IsValid()){
+            JPH::ShapeRefC shape = shape_result.Get();
 
-        createGenericJoltBody(*body, type, shape.GetPtr());
+            createGenericJoltBody(entity, *body, type, shape.GetPtr());
+        }else{
+            Log::error("Cannot create shape for 3D Body: %u", entity);
+        }
     }
 }
 
@@ -417,9 +422,13 @@ void PhysicsSystem::createSphereShape3D(Entity entity, BodyType type, float radi
         JPH::SphereShapeSettings shape_settings(radius);
 
         JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
-        JPH::ShapeRefC shape = shape_result.Get();
+        if (shape_result.IsValid()){
+            JPH::ShapeRefC shape = shape_result.Get();
 
-        createGenericJoltBody(*body, type, shape.GetPtr());
+            createGenericJoltBody(entity, *body, type, shape.GetPtr());
+        }else{
+            Log::error("Cannot create shape for 3D Body: %u", entity);
+        }
     }
 }
 
