@@ -113,6 +113,8 @@ namespace Supernova{
 		bool loadRopeJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB);
 		void destroyJoint2D(Joint2DComponent& joint);
 
+		bool loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchorA, Vector3 anchorB);
+
 		virtual void load();
 		virtual void destroy();
 		virtual void update(double dt);

@@ -58,6 +58,7 @@ Scene::Scene(){
 	registerComponent<Body2DComponent>();
 	registerComponent<Joint2DComponent>();
 	registerComponent<Body3DComponent>();
+	registerComponent<Joint3DComponent>();
 
 	registerSystem<PhysicsSystem>();
 	registerSystem<ActionSystem>();

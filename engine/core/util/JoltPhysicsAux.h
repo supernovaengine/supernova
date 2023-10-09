@@ -18,6 +18,9 @@
 #include "Jolt/Physics/Body/BodyCreationSettings.h"
 #include "Jolt/Physics/Body/BodyActivationListener.h"
 
+#include "Jolt/Physics/Constraints/FixedConstraint.h"
+#include "Jolt/Physics/Constraints/DistanceConstraint.h"
+
 
 // Based on: https://github.com/jrouwe/JoltPhysics/blob/master/HelloWorld/HelloWorld.cpp
 namespace Layers
