@@ -12,16 +12,7 @@ namespace Supernova{
     enum class Joint3DType{
         FIXED,
         DISTANCE,
-        REVOLUTE,
-        PRISMATIC,
-        PULLEY,
-        GEAR,
-        MOUSE,
-        WHEEL,
-        WELD,
-        FRICTION,
-        MOTOR,
-        ROPE
+        POINT
     };
 
     struct Joint3DComponent{

@@ -20,7 +20,9 @@ namespace Supernova{
 
         JPH::TwoBodyConstraint* getJoltJoint() const;
 
+        void setFixedJoint(Entity bodyA, Entity bodyB); 
         void setDistanceJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchorOnBodyA, Vector3 worldAnchorOnBodyB);    
+        void setPointJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchor);
 
         Joint3DType getType();
     };

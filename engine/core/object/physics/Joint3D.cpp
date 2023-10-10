@@ -37,6 +37,14 @@ JPH::TwoBodyConstraint* Joint3D::getJoltJoint() const{
     return joint.joint;
 }
 
+void Joint3D::setFixedJoint(Entity bodyA, Entity bodyB){
+    scene->getSystem<PhysicsSystem>()->loadFixedJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB);
+}
+
 void Joint3D::setDistanceJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchorOnBodyA, Vector3 worldAnchorOnBodyB){
-    //scene->getSystem<PhysicsSystem>()->loadDistanceJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB);
+    scene->getSystem<PhysicsSystem>()->loadDistanceJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB);
+}
+
+void Joint3D::setPointJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchor){
+    scene->getSystem<PhysicsSystem>()->loadPointJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchor);
 }

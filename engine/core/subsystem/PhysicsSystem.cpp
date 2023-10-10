@@ -852,6 +852,33 @@ void PhysicsSystem::destroyJoint2D(Joint2DComponent& joint){
     }
 }
 
+bool PhysicsSystem::loadFixedJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        JPH::FixedConstraintSettings settings;
+        settings.mAutoDetectPoint = true;
+
+        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+        world3D->AddConstraint(joint.joint);
+        joint.type = Joint3DType::FIXED;
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
 bool PhysicsSystem::loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchorA, Vector3 anchorB){
     Signature signatureA = scene->getSignature(bodyA);
     Signature signatureB = scene->getSignature(bodyB);
@@ -867,13 +894,42 @@ bool PhysicsSystem::loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, E
         JPH::DistanceConstraintSettings settings;
         settings.mPoint1 = JPH::Vec3(anchorA.x, anchorA.y, anchorA.z);
         settings.mPoint2 = JPH::Vec3(anchorB.x, anchorB.y, anchorB.z);
-
         //settings.mMinDistance = 4.0f;
         //settings.mMaxDistance = 8.0f;
 
         joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
 
         world3D->AddConstraint(joint.joint);
+        joint.type = Joint3DType::DISTANCE;
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
+bool PhysicsSystem::loadPointJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchor){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+
+        JPH::PointConstraintSettings settings;
+        settings.mPoint1 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
+        settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
+
+        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+        world3D->AddConstraint(joint.joint);
+        joint.type = Joint3DType::POINT;
 
     }else{
         Log::error("Cannot create joint, error in bodyA or bodyB");
