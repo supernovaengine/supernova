@@ -52,6 +52,7 @@ namespace Supernova{
 		ObjectLayerPairFilterImpl* object_vs_object_layer_filter;
 
 		void updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway);
+		void updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body, bool updateAnyway);
 
 		void createGenericJoltBody(Entity entity, Body3DComponent& body, BodyType type, const JPH::Shape* shape);
 

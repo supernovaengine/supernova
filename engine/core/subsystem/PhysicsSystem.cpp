@@ -101,6 +101,19 @@ void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Bod
     }
 }
 
+void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body, bool updateAnyway){
+    if (signature.test(scene->getComponentType<Transform>())){
+        Transform& transform = scene->getComponent<Transform>(entity);
+
+        if (transform.needUpdate || updateAnyway){
+            JPH::Vec3 jPosition(transform.position.x, transform.position.y, transform.position.z);
+            JPH::Quat jQuat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+
+            body.body->SetPositionAndRotationInternal(jPosition, jQuat);
+        }
+    }
+}
+
 void PhysicsSystem::createGenericJoltBody(Entity entity, Body3DComponent& body, BodyType type, const JPH::Shape* shape){
     JPH::ObjectLayer layer = Layers::NON_MOVING;
     JPH::EMotionType joltType = JPH::EMotionType::Static;
@@ -848,15 +861,15 @@ bool PhysicsSystem::loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, E
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        //updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        //updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
 
         JPH::DistanceConstraintSettings settings;
         settings.mPoint1 = JPH::Vec3(anchorA.x, anchorA.y, anchorA.z);
         settings.mPoint2 = JPH::Vec3(anchorB.x, anchorB.y, anchorB.z);
 
-        settings.mMinDistance = 4.0f;
-        settings.mMaxDistance = 8.0f;
+        //settings.mMinDistance = 4.0f;
+        //settings.mMaxDistance = 8.0f;
 
         joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
 
@@ -937,16 +950,7 @@ void PhysicsSystem::update(double dt){
 		Signature signature = scene->getSignature(entity);
 
         if (body.body){
-            if (signature.test(scene->getComponentType<Transform>())){
-                Transform& transform = scene->getComponent<Transform>(entity);
-
-                if (transform.needUpdate || body.newBody){
-                    JPH::Vec3 jPosition(transform.position.x, transform.position.y, transform.position.z);
-                    JPH::Quat jQuat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
-
-                    body.body->SetPositionAndRotationInternal(jPosition, jQuat);
-                }
-            }
+            updateBody3DPosition(signature, entity, body, body.newBody);
 
             body.newBody = false;
         }
