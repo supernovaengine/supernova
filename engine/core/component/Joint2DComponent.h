@@ -19,7 +19,7 @@ namespace Supernova{
         WELD,
         FRICTION,
         MOTOR,
-        ROPE
+        ROPE // distance in Box2D
     };
 
     struct Joint2DComponent{

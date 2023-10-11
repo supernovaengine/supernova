@@ -22,6 +22,12 @@
 #include "Jolt/Physics/Constraints/DistanceConstraint.h"
 #include "Jolt/Physics/Constraints/PointConstraint.h"
 #include "Jolt/Physics/Constraints/HingeConstraint.h"
+#include "Jolt/Physics/Constraints/ConeConstraint.h"
+#include "Jolt/Physics/Constraints/SliderConstraint.h"
+#include "Jolt/Physics/Constraints/SwingTwistConstraint.h"
+#include "Jolt/Physics/Constraints/SixDOFConstraint.h"
+#include "Jolt/Physics/Constraints/PathConstraint.h"
+#include "Jolt/Physics/Constraints/PathConstraintPathHermite.h"
 
 
 // Based on: https://github.com/jrouwe/JoltPhysics/blob/master/HelloWorld/HelloWorld.cpp

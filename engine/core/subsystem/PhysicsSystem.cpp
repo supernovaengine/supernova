@@ -923,8 +923,7 @@ bool PhysicsSystem::loadPointJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         updateBody3DPosition(signatureB, bodyB, myBodyB, true);
 
         JPH::PointConstraintSettings settings;
-        settings.mPoint1 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
-        settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
+        settings.mPoint1 = settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
 
         joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
 
@@ -952,17 +951,180 @@ bool PhysicsSystem::loadHingeJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         updateBody3DPosition(signatureB, bodyB, myBodyB, true);
 
         JPH::HingeConstraintSettings settings;
-        settings.mPoint1 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
-        settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
-        settings.mHingeAxis1 = JPH::Vec3(axis.x, axis.y, axis.z);
-        settings.mHingeAxis2 = JPH::Vec3(axis.x, axis.y, axis.z);
-        settings.mNormalAxis1 = JPH::Vec3(normal.x, normal.y, normal.z);
-        settings.mNormalAxis2 = JPH::Vec3(normal.x, normal.y, normal.z);
+        settings.mPoint1 = settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
+        settings.mHingeAxis1 = settings.mHingeAxis2 = JPH::Vec3(axis.x, axis.y, axis.z);
+        settings.mNormalAxis1 = settings.mNormalAxis2 = JPH::Vec3(normal.x, normal.y, normal.z);
 
         joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::HINGE;
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
+bool PhysicsSystem::loadConeJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchor, Vector3 twistAxis){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+
+        JPH::ConeConstraintSettings settings;
+        settings.mPoint1 = settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
+        settings.mTwistAxis1 = settings.mTwistAxis2 = JPH::Vec3(twistAxis.x, twistAxis.y, twistAxis.z);
+
+        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+        world3D->AddConstraint(joint.joint);
+        joint.type = Joint3DType::CONE;
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
+bool PhysicsSystem::loadPrismaticJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 sliderAxis, float limitsMin, float limitsMax){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+
+        JPH::SliderConstraintSettings settings;
+        settings.mAutoDetectPoint = true;
+        settings.SetSliderAxis(JPH::Vec3(sliderAxis.x, sliderAxis.y, sliderAxis.z));
+		settings.mLimitsMin = limitsMin;
+		settings.mLimitsMax = limitsMax;
+
+        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+        world3D->AddConstraint(joint.joint);
+        joint.type = Joint3DType::PRISMATIC;
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
+bool PhysicsSystem::loadSwingTwistJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchor, Vector3 twistAxis, Vector3 planeAxis, float normalHalfConeAngle, float planeHalfConeAngle, float twistMinAngle, float twistMaxAngle){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+
+        JPH::SwingTwistConstraintSettings settings;
+        settings.mPosition1 = settings.mPosition2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
+        settings.mTwistAxis1 = settings.mTwistAxis2 = JPH::Vec3(twistAxis.x, twistAxis.y, twistAxis.z);
+        settings.mPlaneAxis1 = settings.mPlaneAxis2 = JPH::Vec3(planeAxis.x, planeAxis.y, planeAxis.z);
+        settings.mNormalHalfConeAngle = Angle::defaultToRad(normalHalfConeAngle);
+        settings.mPlaneHalfConeAngle = Angle::defaultToRad(planeHalfConeAngle);
+        settings.mTwistMinAngle = Angle::defaultToRad(twistMinAngle);
+        settings.mTwistMaxAngle = Angle::defaultToRad(twistMaxAngle);
+
+        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+        world3D->AddConstraint(joint.joint);
+        joint.type = Joint3DType::SWINGTWIST;
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
+bool PhysicsSystem::loadSixDOFJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchorA, Vector3 anchorB, Vector3 axisX, Vector3 axisY){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+
+        JPH::SixDOFConstraintSettings settings;
+        settings.mPosition1 = JPH::Vec3(anchorA.x, anchorA.y, anchorA.z);
+        settings.mPosition2 = JPH::Vec3(anchorB.x, anchorB.y, anchorB.z);
+        settings.mAxisX1 = settings.mAxisX2 = JPH::Vec3(axisX.x, axisX.y, axisX.z);
+        settings.mAxisY1 = settings.mAxisY2 = JPH::Vec3(axisY.x, axisY.y, axisY.z);
+
+        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+        world3D->AddConstraint(joint.joint);
+        joint.type = Joint3DType::SIXDOF;
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
+bool PhysicsSystem::loadPathJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, std::vector<Vector3> positions, std::vector<Vector3> tangents, std::vector<Vector3> normals, Vector3 pathPosition, bool isLooping){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+
+        JPH::Ref<JPH::PathConstraintPathHermite> path = new JPH::PathConstraintPathHermite;
+
+        if (positions.size() != normals.size() != tangents.size()){
+            Log::error("Cannot create joint, positions size is different from normals and tangents");
+            return false;
+        }
+
+        for (int i = 0; i < positions.size(); i++){
+            path->AddPoint(JPH::Vec3(positions[i].x, positions[i].y, positions[i].z), JPH::Vec3(tangents[i].x, tangents[i].y, tangents[i].z), JPH::Vec3(normals[i].x, normals[i].y, normals[i].z));
+        }
+        path->SetIsLooping(isLooping);
+
+        JPH::PathConstraintSettings settings;
+        settings.mPath = path;
+        settings.mPathPosition = JPH::Vec3(pathPosition.x, pathPosition.y, pathPosition.z);
+
+        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+        world3D->AddConstraint(joint.joint);
+        joint.type = Joint3DType::PATH;
 
     }else{
         Log::error("Cannot create joint, error in bodyA or bodyB");

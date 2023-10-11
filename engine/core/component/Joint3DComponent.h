@@ -13,7 +13,12 @@ namespace Supernova{
         FIXED,
         DISTANCE,
         POINT,
-        HINGE
+        HINGE,
+        CONE,
+        PRISMATIC, // slider in Jolt
+        SWINGTWIST,
+        SIXDOF,
+        PATH
     };
 
     struct Joint3DComponent{
