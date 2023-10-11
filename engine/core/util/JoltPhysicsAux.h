@@ -21,6 +21,7 @@
 #include "Jolt/Physics/Constraints/FixedConstraint.h"
 #include "Jolt/Physics/Constraints/DistanceConstraint.h"
 #include "Jolt/Physics/Constraints/PointConstraint.h"
+#include "Jolt/Physics/Constraints/HingeConstraint.h"
 
 
 // Based on: https://github.com/jrouwe/JoltPhysics/blob/master/HelloWorld/HelloWorld.cpp

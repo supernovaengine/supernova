@@ -12,7 +12,8 @@ namespace Supernova{
     enum class Joint3DType{
         FIXED,
         DISTANCE,
-        POINT
+        POINT,
+        HINGE
     };
 
     struct Joint3DComponent{

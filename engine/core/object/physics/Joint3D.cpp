@@ -48,3 +48,7 @@ void Joint3D::setDistanceJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchorOn
 void Joint3D::setPointJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchor){
     scene->getSystem<PhysicsSystem>()->loadPointJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchor);
 }
+
+void Joint3D::setHingeJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchor, Vector3 axis, Vector3 normal){
+    scene->getSystem<PhysicsSystem>()->loadHingeJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchor, axis, normal);
+}

@@ -939,6 +939,39 @@ bool PhysicsSystem::loadPointJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
     return true;
 }
 
+bool PhysicsSystem::loadHingeJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchor, Vector3 axis, Vector3 normal){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+
+        JPH::HingeConstraintSettings settings;
+        settings.mPoint1 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
+        settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
+        settings.mHingeAxis1 = JPH::Vec3(axis.x, axis.y, axis.z);
+        settings.mHingeAxis2 = JPH::Vec3(axis.x, axis.y, axis.z);
+        settings.mNormalAxis1 = JPH::Vec3(normal.x, normal.y, normal.z);
+        settings.mNormalAxis2 = JPH::Vec3(normal.x, normal.y, normal.z);
+
+        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+        world3D->AddConstraint(joint.joint);
+        joint.type = Joint3DType::HINGE;
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
 void PhysicsSystem::load(){
 }
 
