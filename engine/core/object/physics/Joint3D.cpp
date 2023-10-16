@@ -73,6 +73,18 @@ void Joint3D::setPathJoint(Entity bodyA, Entity bodyB, std::vector<Vector3> posi
     scene->getSystem<PhysicsSystem>()->loadPathJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, positions, tangents, normals, pathPosition, isLooping);
 }
 
+void Joint3D::setGearJoint(Entity bodyA, Entity bodyB, Entity hingeA, Entity hingeB, int numTeethGearA, int numTeethGearB){
+    scene->getSystem<PhysicsSystem>()->loadGearJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, hingeA, hingeB, numTeethGearA, numTeethGearB);
+}
+
+void Joint3D::setRackAndPinionJoint(Entity bodyA, Entity bodyB, Entity hinge, Entity slider, int numTeethRack, int numTeethGear, int rackLength){
+    scene->getSystem<PhysicsSystem>()->loadRackAndPinionJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, hinge, slider, numTeethRack, numTeethGear, rackLength);
+}
+
+void Joint3D::setPulleyJoint(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 worldAnchorOnBodyA, Vector3 worldAnchorOnBodyB, Vector3 fixedPointA, Vector3 fixedPointB){
+    scene->getSystem<PhysicsSystem>()->loadPulleyJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB, fixedPointA, fixedPointB);
+}
+
 Joint3DType Joint3D::getType(){
     Joint3DComponent& joint = getComponent<Joint3DComponent>();
 

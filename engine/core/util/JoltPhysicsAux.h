@@ -17,6 +17,7 @@
 #include "Jolt/Physics/Collision/Shape/SphereShape.h"
 #include "Jolt/Physics/Body/BodyCreationSettings.h"
 #include "Jolt/Physics/Body/BodyActivationListener.h"
+#include "Jolt/Physics/Collision/GroupFilterTable.h"
 
 #include "Jolt/Physics/Constraints/FixedConstraint.h"
 #include "Jolt/Physics/Constraints/DistanceConstraint.h"
@@ -28,6 +29,9 @@
 #include "Jolt/Physics/Constraints/SixDOFConstraint.h"
 #include "Jolt/Physics/Constraints/PathConstraint.h"
 #include "Jolt/Physics/Constraints/PathConstraintPathHermite.h"
+#include "Jolt/Physics/Constraints/GearConstraint.h"
+#include "Jolt/Physics/Constraints/RackAndPinionConstraint.h"
+#include "Jolt/Physics/Constraints/PulleyConstraint.h"
 
 
 // Based on: https://github.com/jrouwe/JoltPhysics/blob/master/HelloWorld/HelloWorld.cpp

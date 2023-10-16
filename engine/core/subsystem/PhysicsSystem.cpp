@@ -1134,6 +1134,149 @@ bool PhysicsSystem::loadPathJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
     return true;
 }
 
+bool PhysicsSystem::loadGearJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Entity hingeA, Entity hingeB, int numTeethGearA, int numTeethGearB){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+    Signature signatureHingeA = scene->getSignature(hingeA);
+    Signature signatureHingeB = scene->getSignature(hingeB);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+
+        if (signatureHingeA.test(scene->getComponentType<Joint3DComponent>()) && signatureHingeB.test(scene->getComponentType<Joint3DComponent>())){
+
+            Joint3DComponent myHingeA = scene->getComponent<Joint3DComponent>(hingeA);
+            Joint3DComponent myHingeB = scene->getComponent<Joint3DComponent>(hingeB);
+
+            if ((myHingeA.type != Joint3DType::HINGE) || (myHingeB.type != Joint3DType::HINGE)){
+                Log::error("Cannot create joint, hingeA or hingeB is not hinge type");
+                return false;
+            }
+
+            // Disable collision between gears
+            JPH::Ref<JPH::GroupFilterTable> group_filter = new JPH::GroupFilterTable(2);
+            group_filter->DisableCollision(0, 1);
+            myBodyA.body->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 0));
+            myBodyB.body->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 1));
+
+            JPH::HingeConstraintSettings* hingeSetA = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHingeA.joint)->GetConstraintSettings().GetPtr();
+            JPH::HingeConstraintSettings* hingeSetB = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHingeB.joint)->GetConstraintSettings().GetPtr();
+
+            JPH::GearConstraintSettings settings;
+            settings.mHingeAxis1 = hingeSetA->mHingeAxis1;
+            settings.mHingeAxis2 = hingeSetB->mHingeAxis1;
+            settings.SetRatio(numTeethGearA, numTeethGearB);
+
+            joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+            ((JPH::GearConstraint *)joint.joint)->SetConstraints(myHingeA.joint, myHingeB.joint);
+            world3D->AddConstraint(joint.joint);
+            joint.type = Joint3DType::GEAR;
+        }else{
+            Log::error("Cannot create joint, error in hingeA or hingeB");
+            return false;
+        }
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
+bool PhysicsSystem::loadRackAndPinionJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Entity hinge, Entity slider, int numTeethRack, int numTeethGear, int rackLength){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+    Signature signatureHinge = scene->getSignature(hinge);
+    Signature signatureSlider = scene->getSignature(slider);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+
+        if (signatureHinge.test(scene->getComponentType<Joint3DComponent>()) && signatureSlider.test(scene->getComponentType<Joint3DComponent>())){
+
+            Joint3DComponent myHinge = scene->getComponent<Joint3DComponent>(hinge);
+            Joint3DComponent mySlider = scene->getComponent<Joint3DComponent>(slider);
+
+            if ((myHinge.type != Joint3DType::HINGE) || (mySlider.type != Joint3DType::PRISMATIC)){
+                Log::error("Cannot create joint, hinge or slider is not hinge and prismatic (slider) types");
+                return false;
+            }
+
+            // Disable collision between gears
+            JPH::Ref<JPH::GroupFilterTable> group_filter = new JPH::GroupFilterTable(2);
+            group_filter->DisableCollision(0, 1);
+            myBodyA.body->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 0));
+            myBodyB.body->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 1));
+
+            JPH::HingeConstraintSettings* hingeSetA = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHinge.joint)->GetConstraintSettings().GetPtr();
+            JPH::SliderConstraintSettings* sliderSetB = (JPH::SliderConstraintSettings*)((JPH::SliderConstraint*)mySlider.joint)->GetConstraintSettings().GetPtr();
+
+            JPH::RackAndPinionConstraintSettings settings;
+            settings.mHingeAxis = hingeSetA->mHingeAxis1;
+            settings.mSliderAxis = sliderSetB->mSliderAxis2;
+            settings.SetRatio(numTeethRack, rackLength, numTeethGear);
+
+            joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+            ((JPH::GearConstraint *)joint.joint)->SetConstraints(myHinge.joint, mySlider.joint);
+            world3D->AddConstraint(joint.joint);
+            joint.type = Joint3DType::RACKANDPINON;
+        }else{
+            Log::error("Cannot create joint, error in hinge or slider");
+            return false;
+        }
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
+bool PhysicsSystem::loadPulleyJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchorA, Vector3 anchorB, Vector3 fixedPointA, Vector3 fixedPointB){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
+
+    if (signatureA.test(scene->getComponentType<Body3DComponent>()) && signatureB.test(scene->getComponentType<Body3DComponent>())){
+
+        Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
+        Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
+
+        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
+        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+
+        JPH::PulleyConstraintSettings settings;
+        settings.mBodyPoint1 = JPH::Vec3(anchorA.x, anchorA.y, anchorA.z);
+        settings.mBodyPoint2 = JPH::Vec3(anchorB.x, anchorB.y, anchorB.z);
+        settings.mFixedPoint1 = JPH::Vec3(fixedPointA.x, fixedPointA.y, fixedPointA.z);
+        settings.mFixedPoint2 = JPH::Vec3(fixedPointB.x, fixedPointB.y, fixedPointB.z);
+
+        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+
+        world3D->AddConstraint(joint.joint);
+        joint.type = Joint3DType::PULLEY;
+
+    }else{
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    return true;
+}
+
 void PhysicsSystem::load(){
 }
 

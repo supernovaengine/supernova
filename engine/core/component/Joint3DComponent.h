@@ -18,7 +18,10 @@ namespace Supernova{
         PRISMATIC, // slider in Jolt
         SWINGTWIST,
         SIXDOF,
-        PATH
+        PATH,
+        GEAR,
+        RACKANDPINON,
+        PULLEY
     };
 
     struct Joint3DComponent{
