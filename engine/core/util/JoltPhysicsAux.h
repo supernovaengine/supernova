@@ -106,14 +106,22 @@ public:
 
 namespace Supernova{
 
-	class MyBodyActivationListener : public JPH::BodyActivationListener{
+	class JoltActivationListener : public JPH::BodyActivationListener{
+	private:
+        Scene* scene;
+        PhysicsSystem* physicsSystem;
 	public:
+        JoltActivationListener(Scene* scene, PhysicsSystem* physicsSystem){
+            this->scene = scene;
+            this->physicsSystem = physicsSystem;
+        }
+
 		virtual void OnBodyActivated(const JPH::BodyID &inBodyID, uint64_t inBodyUserData) override{
-			//cout << "A body got activated" << endl;
+			printf("A body got activated\n");
 		}
 
 		virtual void OnBodyDeactivated(const JPH::BodyID &inBodyID, uint64_t inBodyUserData) override{
-			//cout << "A body went to sleep" << endl;
+			printf("A body went to sleep\n");
 		}
 	};
 
@@ -129,24 +137,21 @@ namespace Supernova{
 
 		// See: ContactListener
 		virtual JPH::ValidateResult	OnContactValidate(const JPH::Body &inBody1, const JPH::Body &inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult &inCollisionResult) override{
-			//cout << "Contact validate callback" << endl;
 			printf("OnContactValidate\n");
 			// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
 			return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
 		}
 
 		virtual void OnContactAdded(const JPH::Body &inBody1, const JPH::Body &inBody2, const JPH::ContactManifold &inManifold, JPH::ContactSettings &ioSettings) override{
-			//cout << "A contact was added" << endl;
+			scene->getSystem<PhysicsSystem>()->onContactAdded3D(inBody1.GetUserData(), inBody2.GetUserData());
 			printf("OnContactAdded\n");
 		}
 
 		virtual void OnContactPersisted(const JPH::Body &inBody1, const JPH::Body &inBody2, const JPH::ContactManifold &inManifold, JPH::ContactSettings &ioSettings) override{
-			//cout << "A contact was persisted" << endl;
 			printf("OnContactPersisted\n");
 		}
 
 		virtual void OnContactRemoved(const JPH::SubShapeIDPair &inSubShapePair) override{
-			//cout << "A contact was removed" << endl;
 			printf("OnContactRemoved\n");
 		}
 	};

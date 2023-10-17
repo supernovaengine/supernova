@@ -59,8 +59,8 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     temp_allocator = new JPH::TempAllocatorImpl(10 * 1024 * 1024);
     job_system = new JPH::JobSystemThreadPool (JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1);
 
-    //MyBodyActivationListener body_activation_listener;
-	//world3D->SetBodyActivationListener(&body_activation_listener);
+    activationListener3D = new JoltActivationListener(scene, this);
+    world3D->SetBodyActivationListener(activationListener3D);
 
     contactListener3D = new JoltContactListener(scene, this);
     world3D->SetContactListener(contactListener3D);
@@ -72,6 +72,7 @@ PhysicsSystem::~PhysicsSystem(){
     delete contactListener2D;
     delete contactFilter2D;
 
+    delete activationListener3D;
     delete contactListener3D;
 
     delete world3D;

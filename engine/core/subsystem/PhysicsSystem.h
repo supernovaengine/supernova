@@ -33,6 +33,7 @@ namespace Supernova{
 	class Box2DContactListener;
 	class Box2DContactFilter;
 
+	class JoltActivationListener;
 	class JoltContactListener;
 	
 
@@ -45,6 +46,7 @@ namespace Supernova{
 		Box2DContactListener* contactListener2D;
 		Box2DContactFilter* contactFilter2D;
 
+		JoltActivationListener* activationListener3D;
 		JoltContactListener* contactListener3D;
 
         JPH::TempAllocatorImpl* temp_allocator;
@@ -72,6 +74,8 @@ namespace Supernova{
 		FunctionSubscribe<void(Contact2D, Manifold2D)> preSolve2D;
 		FunctionSubscribe<void(Contact2D, ContactImpulse2D)> postSolve2D;
 
+		//FunctionSubscribe<void(Entity, Entity)> onBodyActivated3D;
+		//FunctionSubscribe<void(Entity, Entity)> onBodyDeactivated3D;
 		FunctionSubscribe<void(Entity, Entity)> onContactAdded3D;
 		//FunctionSubscribe<void(Entity, Entity)> onContactPersisted3D;
 		//FunctionSubscribe<void(Entity, Entity)> onContactRemoved3D;
