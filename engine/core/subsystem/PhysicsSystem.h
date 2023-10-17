@@ -32,6 +32,8 @@ namespace Supernova{
 
 	class Box2DContactListener;
 	class Box2DContactFilter;
+
+	class JoltContactListener;
 	
 
 	class PhysicsSystem : public SubSystem {
@@ -42,6 +44,8 @@ namespace Supernova{
 
 		Box2DContactListener* contactListener2D;
 		Box2DContactFilter* contactFilter2D;
+
+		JoltContactListener* contactListener3D;
 
         JPH::TempAllocatorImpl* temp_allocator;
         JPH::JobSystemThreadPool* job_system;
@@ -67,6 +71,10 @@ namespace Supernova{
 		FunctionSubscribe<void(Contact2D)> endContact2D;
 		FunctionSubscribe<void(Contact2D, Manifold2D)> preSolve2D;
 		FunctionSubscribe<void(Contact2D, ContactImpulse2D)> postSolve2D;
+
+		FunctionSubscribe<void(Entity, Entity)> onContactAdded3D;
+		//FunctionSubscribe<void(Entity, Entity)> onContactPersisted3D;
+		//FunctionSubscribe<void(Entity, Entity)> onContactRemoved3D;
 
 		FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)> shouldCollide2D;
 

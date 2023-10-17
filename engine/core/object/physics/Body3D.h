@@ -38,6 +38,8 @@ namespace Supernova{
         void setType(BodyType type);
         BodyType getType() const;
 
+        void applyForce(const Vector3& force, const Vector3& point);
+
     };
 }
 

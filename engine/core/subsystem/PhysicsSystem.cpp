@@ -62,14 +62,17 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     //MyBodyActivationListener body_activation_listener;
 	//world3D->SetBodyActivationListener(&body_activation_listener);
 
-    //MyContactListener contact_listener;
-	//world3D->SetContactListener(&contact_listener);
+    contactListener3D = new JoltContactListener(scene, this);
+    world3D->SetContactListener(contactListener3D);
 }
 
 PhysicsSystem::~PhysicsSystem(){
     delete world2D;
+
     delete contactListener2D;
     delete contactFilter2D;
+
+    delete contactListener3D;
 
     delete world3D;
     delete temp_allocator;
@@ -134,6 +137,9 @@ void PhysicsSystem::createGenericJoltBody(Entity entity, Body3DComponent& body, 
 
     body.body = body_interface.CreateBody(settings);
     body.body->SetUserData(entity);
+    //if (type != BodyType::STATIC){
+    //    body.body->SetAllowSleeping(false);
+    //}
     body.newBody = true;
 
     body_interface.AddBody(body.body->GetID(), activation);

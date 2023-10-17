@@ -49,7 +49,6 @@ Body3D::Body3D(const Body3D& rhs): EntityHandle(rhs){
 
 JPH::Body* Body3D::getJoltBody() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
-
     return body.body;
 }
 
@@ -96,4 +95,10 @@ BodyType Body3D::getType() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     return getJoltToBodyType(body.body->GetMotionType());
+}
+
+void Body3D::applyForce(const Vector3& force, const Vector3& point){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    body.body->AddForce(JPH::Vec3(force.x, force.y, force.z), JPH::Vec3(point.x, point.y, point.z));
 }
