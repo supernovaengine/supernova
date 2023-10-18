@@ -5,7 +5,9 @@
 #ifndef JoltPhysicsAux_h
 #define JoltPhysicsAux_h
 
+#include "subsystem/PhysicsSystem.h"
 #include "object/physics/Body3D.h"
+#include "object/physics/CollideShapeResult3D.h"
 
 #include "Jolt/Jolt.h"
 
@@ -145,7 +147,7 @@ namespace Supernova{
 			Entity entity2 = inBody2.GetUserData();
 			Body3D body2(scene, entity2);
 
-			if (!physicsSystem->shouldCollide3D.callRet(body1, body2, true)){
+			if (!physicsSystem->shouldCollide3D.callRet(body1, body2, Vector3(inBaseOffset.GetX(), inBaseOffset.GetY(), inBaseOffset.GetZ()), CollideShapeResult3D(scene, &inCollisionResult), true)){
 				return JPH::ValidateResult::RejectAllContactsForThisBodyPair;
 			}
 

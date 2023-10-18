@@ -12,6 +12,7 @@
 #include "object/physics/Manifold2D.h"
 #include "object/physics/ContactImpulse2D.h"
 #include "object/physics/Body3D.h"
+#include "object/physics/CollideShapeResult3D.h"
 
 class b2World;
 class b2Body;
@@ -83,7 +84,7 @@ namespace Supernova{
 		//FunctionSubscribe<void(Entity, Entity)> onContactPersisted3D;
 		//FunctionSubscribe<void(Entity, Entity)> onContactRemoved3D;
 
-		FunctionSubscribe<bool(Body3D, Body3D)> shouldCollide3D;
+		FunctionSubscribe<bool(Body3D, Body3D, Vector3, CollideShapeResult3D)> shouldCollide3D;
 
 		void createBody2D(Entity entity);
 		void removeBody2D(Entity entity);
