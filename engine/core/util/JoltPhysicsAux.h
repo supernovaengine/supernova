@@ -5,6 +5,8 @@
 #ifndef JoltPhysicsAux_h
 #define JoltPhysicsAux_h
 
+#include "object/physics/Body3D.h"
+
 #include "Jolt/Jolt.h"
 
 #include "Jolt/RegisterTypes.h"
@@ -137,14 +139,27 @@ namespace Supernova{
 
 		// See: ContactListener
 		virtual JPH::ValidateResult	OnContactValidate(const JPH::Body &inBody1, const JPH::Body &inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult &inCollisionResult) override{
-			printf("OnContactValidate\n");
-			// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
+			Entity entity1 = inBody1.GetUserData();
+			Body3D body1(scene, entity1);
+
+			Entity entity2 = inBody2.GetUserData();
+			Body3D body2(scene, entity2);
+
+			if (!physicsSystem->shouldCollide3D.callRet(body1, body2, true)){
+				return JPH::ValidateResult::RejectAllContactsForThisBodyPair;
+			}
+
 			return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
 		}
 
 		virtual void OnContactAdded(const JPH::Body &inBody1, const JPH::Body &inBody2, const JPH::ContactManifold &inManifold, JPH::ContactSettings &ioSettings) override{
-			scene->getSystem<PhysicsSystem>()->onContactAdded3D(inBody1.GetUserData(), inBody2.GetUserData());
-			printf("OnContactAdded\n");
+			Entity entity1 = inBody1.GetUserData();
+			Body3D body1(scene, entity1);
+
+			Entity entity2 = inBody2.GetUserData();
+			Body3D body2(scene, entity2);
+
+			physicsSystem->onContactAdded3D(body1, body2);
 		}
 
 		virtual void OnContactPersisted(const JPH::Body &inBody1, const JPH::Body &inBody2, const JPH::ContactManifold &inManifold, JPH::ContactSettings &ioSettings) override{
