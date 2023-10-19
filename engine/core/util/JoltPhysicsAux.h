@@ -162,15 +162,29 @@ namespace Supernova{
 			Entity entity2 = inBody2.GetUserData();
 			Body3D body2(scene, entity2);
 
-			physicsSystem->onContactAdded3D(body1, body2, Contact3D(scene, &inManifold));
+			physicsSystem->onContactAdded3D(body1, body2, Contact3D(scene, &inManifold, &ioSettings));
 		}
 
 		virtual void OnContactPersisted(const JPH::Body &inBody1, const JPH::Body &inBody2, const JPH::ContactManifold &inManifold, JPH::ContactSettings &ioSettings) override{
-			printf("OnContactPersisted\n");
+			Entity entity1 = inBody1.GetUserData();
+			Body3D body1(scene, entity1);
+
+			Entity entity2 = inBody2.GetUserData();
+			Body3D body2(scene, entity2);
+
+			physicsSystem->onContactPersisted3D(body1, body2, Contact3D(scene, &inManifold, &ioSettings));
 		}
 
 		virtual void OnContactRemoved(const JPH::SubShapeIDPair &inSubShapePair) override{
-			printf("OnContactRemoved\n");
+			JPH::BodyInterface &body_interface = physicsSystem->getWorld3D()->GetBodyInterface();
+
+			Body3D body1(scene, body_interface.GetUserData(inSubShapePair.GetBody1ID()));
+			Body3D body2(scene, body_interface.GetUserData(inSubShapePair.GetBody2ID()));
+
+			int32_t subShapeID1 = inSubShapePair.GetSubShapeID1().GetValue();
+			int32_t subShapeID2 = inSubShapePair.GetSubShapeID2().GetValue();
+
+			physicsSystem->onContactRemoved3D(body1, body2, (int)subShapeID1, (int)subShapeID2);
 		}
 	};
 
