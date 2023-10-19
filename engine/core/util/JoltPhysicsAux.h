@@ -8,6 +8,7 @@
 #include "subsystem/PhysicsSystem.h"
 #include "object/physics/Body3D.h"
 #include "object/physics/CollideShapeResult3D.h"
+#include "object/physics/Contact3D.h"
 
 #include "Jolt/Jolt.h"
 
@@ -121,11 +122,11 @@ namespace Supernova{
         }
 
 		virtual void OnBodyActivated(const JPH::BodyID &inBodyID, uint64_t inBodyUserData) override{
-			printf("A body got activated\n");
+			physicsSystem->onBodyActivated3D(Body3D(scene, inBodyUserData));
 		}
 
 		virtual void OnBodyDeactivated(const JPH::BodyID &inBodyID, uint64_t inBodyUserData) override{
-			printf("A body went to sleep\n");
+			physicsSystem->onBodyDeactivated3D(Body3D(scene, inBodyUserData));
 		}
 	};
 
@@ -161,7 +162,7 @@ namespace Supernova{
 			Entity entity2 = inBody2.GetUserData();
 			Body3D body2(scene, entity2);
 
-			physicsSystem->onContactAdded3D(body1, body2);
+			physicsSystem->onContactAdded3D(body1, body2, Contact3D(scene, &inManifold));
 		}
 
 		virtual void OnContactPersisted(const JPH::Body &inBody1, const JPH::Body &inBody2, const JPH::ContactManifold &inManifold, JPH::ContactSettings &ioSettings) override{
