@@ -92,7 +92,7 @@ bool Contact3D::isSensor() const{
     return contactSettings->mIsSensor;
 }
 
-void Contact3D::setSensor(bool sensor){
+void Contact3D::setIsSensor(bool sensor){
     contactSettings->mIsSensor = sensor;
 }
 

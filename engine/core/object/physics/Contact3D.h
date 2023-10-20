@@ -49,7 +49,7 @@ namespace Supernova{
         void setCombinedRestitution(float combinedRestitution);
 
         bool isSensor() const;
-        void setSensor(bool sensor);
+        void setIsSensor(bool sensor);
     };
 }
 
