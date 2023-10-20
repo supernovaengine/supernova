@@ -97,6 +97,12 @@ BodyType Body3D::getType() const{
     return getJoltToBodyType(body.body->GetMotionType());
 }
 
+uint32_t Body3D::getID() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    return body.body->GetID().GetIndex();
+}
+
 void Body3D::applyForce(const Vector3& force, const Vector3& point){
     Body3DComponent& body = getComponent<Body3DComponent>();
 

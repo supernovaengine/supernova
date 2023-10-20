@@ -83,7 +83,7 @@ namespace Supernova{
 		FunctionSubscribe<void(Body3D)> onBodyDeactivated3D;
 		FunctionSubscribe<void(Body3D, Body3D, Contact3D)> onContactAdded3D;
 		FunctionSubscribe<void(Body3D, Body3D, Contact3D)> onContactPersisted3D;
-		FunctionSubscribe<void(Body3D, Body3D, int, int)> onContactRemoved3D;
+		FunctionSubscribe<void(unsigned int, unsigned int, int, int)> onContactRemoved3D;
 
 		FunctionSubscribe<bool(Body3D, Body3D, Vector3, CollideShapeResult3D)> shouldCollide3D;
 

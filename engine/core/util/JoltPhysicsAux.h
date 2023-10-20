@@ -176,15 +176,13 @@ namespace Supernova{
 		}
 
 		virtual void OnContactRemoved(const JPH::SubShapeIDPair &inSubShapePair) override{
-			JPH::BodyInterface &body_interface = physicsSystem->getWorld3D()->GetBodyInterface();
-
-			Body3D body1(scene, body_interface.GetUserData(inSubShapePair.GetBody1ID()));
-			Body3D body2(scene, body_interface.GetUserData(inSubShapePair.GetBody2ID()));
+			uint32_t bodyID1 = inSubShapePair.GetBody1ID().GetIndex();
+			uint32_t bodyID2 = inSubShapePair.GetBody2ID().GetIndex();
 
 			int32_t subShapeID1 = inSubShapePair.GetSubShapeID1().GetValue();
 			int32_t subShapeID2 = inSubShapePair.GetSubShapeID2().GetValue();
 
-			physicsSystem->onContactRemoved3D(body1, body2, (int)subShapeID1, (int)subShapeID2);
+			physicsSystem->onContactRemoved3D((unsigned int)bodyID1, (unsigned int)bodyID2, (int)subShapeID1, (int)subShapeID2);
 		}
 	};
 
