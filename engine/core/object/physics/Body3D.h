@@ -63,13 +63,22 @@ namespace Supernova{
         void setAngularVelocityClamped(Vector3 angularVelocity);
 
         // center of mass
-        Vector3 getPointVelocityCOM(Vector3 pointRelativeToCOM);
-        Vector3 getPointVelocity(Vector3 point);
+        Vector3 getPointVelocityCOM(Vector3 pointRelativeToCOM) const;
+        Vector3 getPointVelocity(Vector3 point) const;
+
+        Vector3 getAccumulatedForce() const;
+        Vector3 getAccumulatedTorque() const;
+        Matrix4 getInverseInertia() const;
 
         void applyForce(const Vector3& force);
         void applyForce(const Vector3& force, const Vector3& point);
         void applyTorque(const Vector3& torque);
+        void applyImpulse(const Vector3& impulse);
+        void applyImpulse(const Vector3& impulse, const Vector3& point);
+        void applyAngularImpulse(const Vector3& angularImpulse);
+        bool applyBuoyancyImpulse(const Vector3& surfacePosition, const Vector3& surfaceNormal, const float buoyancy, const float linearDrag, const float angularDrag, const Vector3& fluidVelocity, const Vector3& gravity, const float deltaTime);
 
+        Vector3 getCenterOfMassPosition();
     };
 }
 

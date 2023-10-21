@@ -195,7 +195,7 @@ void Body3D::setAngularVelocityClamped(Vector3 angularVelocity){
     body.body->SetAngularVelocityClamped(JPH::Vec3(angularVelocity.x, angularVelocity.y, angularVelocity.z));
 }
 
-Vector3 Body3D::getPointVelocityCOM(Vector3 pointRelativeToCOM){
+Vector3 Body3D::getPointVelocityCOM(Vector3 pointRelativeToCOM) const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     JPH::Vec3 vec = body.body->GetPointVelocityCOM(JPH::Vec3(pointRelativeToCOM.x, pointRelativeToCOM.y, pointRelativeToCOM.z));
@@ -203,7 +203,7 @@ Vector3 Body3D::getPointVelocityCOM(Vector3 pointRelativeToCOM){
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
 
-Vector3 Body3D::getPointVelocity(Vector3 point){
+Vector3 Body3D::getPointVelocity(Vector3 point) const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     JPH::Vec3 vec = body.body->GetPointVelocity(JPH::Vec3(point.x, point.y, point.z));
@@ -211,6 +211,34 @@ Vector3 Body3D::getPointVelocity(Vector3 point){
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
 
+Vector3 Body3D::getAccumulatedForce() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    JPH::Vec3 vec = body.body->GetAccumulatedForce();
+
+    return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
+}
+
+Vector3 Body3D::getAccumulatedTorque() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    JPH::Vec3 vec = body.body->GetAccumulatedTorque();
+
+    return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
+}
+
+Matrix4 Body3D::getInverseInertia() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    JPH::Mat44 mat = body.body->GetInverseInertia();
+
+    Matrix4 retMat;
+    for (int i = 0; i < 4; i++){
+        retMat.setColumn(i, Vector4(mat.GetColumn4(i).GetX(), mat.GetColumn4(i).GetY(), mat.GetColumn4(i).GetZ(), mat.GetColumn4(i).GetW()));
+    }
+
+    return retMat;
+}
 
 void Body3D::applyForce(const Vector3& force){
     Body3DComponent& body = getComponent<Body3DComponent>();
@@ -228,4 +256,41 @@ void Body3D::applyTorque(const Vector3& torque){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     body.body->AddTorque(JPH::Vec3(torque.x, torque.y, torque.z));
+}
+
+void Body3D::applyImpulse(const Vector3& impulse){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    body.body->AddImpulse(JPH::Vec3(impulse.x, impulse.y, impulse.z));
+}
+
+void Body3D::applyImpulse(const Vector3& impulse, const Vector3& point){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    body.body->AddImpulse(JPH::Vec3(impulse.x, impulse.y, impulse.z), JPH::Vec3(point.x, point.y, point.z));
+}
+
+void Body3D::applyAngularImpulse(const Vector3& angularImpulse){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    body.body->AddAngularImpulse(JPH::Vec3(angularImpulse.x, angularImpulse.y, angularImpulse.z));
+}
+
+bool Body3D::applyBuoyancyImpulse(const Vector3& surfacePosition, const Vector3& surfaceNormal, const float buoyancy, const float linearDrag, const float angularDrag, const Vector3& fluidVelocity, const Vector3& gravity, const float deltaTime){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    JPH::Vec3 surPos = JPH::Vec3(surfacePosition.x, surfacePosition.y, surfacePosition.z);
+    JPH::Vec3 surNor = JPH::Vec3(surfaceNormal.x, surfaceNormal.y, surfaceNormal.z);
+    JPH::Vec3 fluVel = JPH::Vec3(fluidVelocity.x, fluidVelocity.y, fluidVelocity.z);
+    JPH::Vec3 grav = JPH::Vec3(gravity.x, gravity.y, gravity.z);
+
+    return body.body->ApplyBuoyancyImpulse(surPos, surNor, buoyancy, linearDrag, angularDrag, fluVel, grav, deltaTime);
+}
+
+Vector3 Body3D::getCenterOfMassPosition(){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    JPH::Vec3 vec = body.body->GetCenterOfMassPosition();
+
+    return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
