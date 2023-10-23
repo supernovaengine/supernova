@@ -422,7 +422,7 @@ void PhysicsSystem::createBoxShape3D(Entity entity, BodyType type, float width, 
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
-        JPH::BoxShapeSettings shape_settings(JPH::Vec3(width, height, depth));
+        JPH::BoxShapeSettings shape_settings(JPH::Vec3(width/2.0, height/2.0, depth/2.0));
 
         JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
         if (shape_result.IsValid()){
