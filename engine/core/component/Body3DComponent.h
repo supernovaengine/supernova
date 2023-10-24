@@ -11,7 +11,8 @@ namespace Supernova{
 
     struct Body3DComponent{
         JPH::Body *body = NULL;
-
+        
+        BodyType type = BodyType::DYNAMIC;
         bool newBody = true;
     };
 

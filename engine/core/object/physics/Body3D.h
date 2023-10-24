@@ -29,8 +29,8 @@ namespace Supernova{
 
         Object getAttachedObject();
 
-        void createBoxShape(BodyType type, float width, float height, float depth);
-        void createSphereShape(BodyType type, float radius);
+        void createBoxShape(float width, float height, float depth);
+        void createSphereShape(float radius);
 
         void setType(BodyType type);
         BodyType getType() const;

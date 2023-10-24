@@ -63,7 +63,7 @@ namespace Supernova{
 		void updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway);
 		void updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body, bool updateAnyway);
 
-		void createGenericJoltBody(Entity entity, Body3DComponent& body, BodyType type, const JPH::Shape* shape);
+		void createGenericJoltBody(Entity entity, Body3DComponent& body, const JPH::Shape* shape);
 
 	public:
 		PhysicsSystem(Scene* scene);
@@ -104,8 +104,9 @@ namespace Supernova{
 		void createBody3D(Entity entity);
 		void removeBody3D(Entity entity);
 
-		void createBoxShape3D(Entity entity, BodyType type, float width, float height, float depth);
-		void createSphereShape3D(Entity entity, BodyType type, float radius);
+		void createBoxShape3D(Entity entity, float width, float height, float depth);
+		void createSphereShape3D(Entity entity, float radius);
+		void createMeshShape3D(Entity entity, float radius);
 
 		b2World* getWorld2D() const;
 		JPH::PhysicsSystem* getWorld3D() const;

@@ -118,15 +118,15 @@ void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Bod
     }
 }
 
-void PhysicsSystem::createGenericJoltBody(Entity entity, Body3DComponent& body, BodyType type, const JPH::Shape* shape){
+void PhysicsSystem::createGenericJoltBody(Entity entity, Body3DComponent& body, const JPH::Shape* shape){
     JPH::ObjectLayer layer = Layers::NON_MOVING;
     JPH::EMotionType joltType = JPH::EMotionType::Static;
     JPH::EActivation activation = JPH::EActivation::DontActivate;
-    if (type == BodyType::DYNAMIC){
+    if (body.type == BodyType::DYNAMIC){
         layer = Layers::MOVING;
         joltType = JPH::EMotionType::Dynamic;
         activation = JPH::EActivation::Activate;
-    }else if (type == BodyType::KINEMATIC){
+    }else if (body.type == BodyType::KINEMATIC){
         layer = Layers::MOVING;
         joltType = JPH::EMotionType::Kinematic;
         activation = JPH::EActivation::Activate;
@@ -418,7 +418,7 @@ void PhysicsSystem::removeBody3D(Entity entity){
     }
 }
 
-void PhysicsSystem::createBoxShape3D(Entity entity, BodyType type, float width, float height, float depth){
+void PhysicsSystem::createBoxShape3D(Entity entity, float width, float height, float depth){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
@@ -428,14 +428,14 @@ void PhysicsSystem::createBoxShape3D(Entity entity, BodyType type, float width, 
         if (shape_result.IsValid()){
             JPH::ShapeRefC shape = shape_result.Get();
 
-            createGenericJoltBody(entity, *body, type, shape.GetPtr());
+            createGenericJoltBody(entity, *body, shape.GetPtr());
         }else{
             Log::error("Cannot create shape for 3D Body: %u", entity);
         }
     }
 }
 
-void PhysicsSystem::createSphereShape3D(Entity entity, BodyType type, float radius){
+void PhysicsSystem::createSphereShape3D(Entity entity, float radius){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
@@ -445,10 +445,50 @@ void PhysicsSystem::createSphereShape3D(Entity entity, BodyType type, float radi
         if (shape_result.IsValid()){
             JPH::ShapeRefC shape = shape_result.Get();
 
-            createGenericJoltBody(entity, *body, type, shape.GetPtr());
+            createGenericJoltBody(entity, *body, shape.GetPtr());
         }else{
             Log::error("Cannot create shape for 3D Body: %u", entity);
         }
+    }
+}
+
+void PhysicsSystem::createMeshShape3D(Entity entity, float radius){
+    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
+
+    if (body){
+
+        uint32 max_material_index = 0;
+        JPH::TriangleList triangles;
+        for (int x = -10; x < 10; ++x){
+            for (int z = -10; z < 10; ++z)
+            {
+                float x1 = 10.0f * x;
+                float z1 = 10.0f * z;
+                float x2 = x1 + 10.0f;
+                float z2 = z1 + 10.0f;
+
+                JPH::Float3 v1 = JPH::Float3(x1, 0, z1);
+                JPH::Float3 v2 = JPH::Float3(x2, 0, z1);
+                JPH::Float3 v3 = JPH::Float3(x1, 0, z2);
+                JPH::Float3 v4 = JPH::Float3(x2, 0, z2);
+
+                uint32 material_index = uint32((JPH::Vec3(v1) + JPH::Vec3(v2) + JPH::Vec3(v3) + JPH::Vec3(v4)).Length() / 40.0f);
+                max_material_index = JPH::max(max_material_index, material_index);
+                triangles.push_back(JPH::Triangle(v1, v3, v4, material_index));
+                triangles.push_back(JPH::Triangle(v1, v4, v2, material_index));
+            }
+        }
+
+        //JPH::MeshShapeSettings shape_settings(triangles);
+
+        //JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        //if (shape_result.IsValid()){
+        //    JPH::ShapeRefC shape = shape_result.Get();
+
+        //    createGenericJoltBody(entity, *body, shape.GetPtr());
+        //}else{
+        //    Log::error("Cannot create shape for 3D Body: %u", entity);
+        //}
     }
 }
 

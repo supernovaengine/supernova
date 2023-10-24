@@ -56,12 +56,12 @@ Object Body3D::getAttachedObject(){
     return Object(scene, entity);
 }
 
-void Body3D::createBoxShape(BodyType type, float width, float height, float depth){
-    scene->getSystem<PhysicsSystem>()->createBoxShape3D(entity, type, width, height, depth);
+void Body3D::createBoxShape(float width, float height, float depth){
+    scene->getSystem<PhysicsSystem>()->createBoxShape3D(entity, width, height, depth);
 }
 
-void Body3D::createSphereShape(BodyType type, float radius){
-    scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity, type, radius);
+void Body3D::createSphereShape(float radius){
+    scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity, radius);
 }
 
 void Body3D::setType(BodyType type){
@@ -70,8 +70,17 @@ void Body3D::setType(BodyType type){
     JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
     JPH::BodyInterface &body_interface = world->GetBodyInterface();
 
-    //TODO: activate?
-    body_interface.SetMotionType(body.body->GetID(), getBodyTypeToJolt(type), JPH::EActivation::Activate);
+    body.type = type;
+
+    if (body.body){
+        JPH::EActivation activation = JPH::EActivation::DontActivate;
+
+        if (type != BodyType::STATIC){
+            activation = JPH::EActivation::Activate;
+        }
+
+        body_interface.SetMotionType(body.body->GetID(), getBodyTypeToJolt(type), activation);
+    }
 }
 
 BodyType Body3D::getType() const{
