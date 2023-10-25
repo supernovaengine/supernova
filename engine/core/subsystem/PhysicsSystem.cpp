@@ -452,43 +452,40 @@ void PhysicsSystem::createSphereShape3D(Entity entity, float radius){
     }
 }
 
-void PhysicsSystem::createMeshShape3D(Entity entity, float radius){
+void PhysicsSystem::createMeshShape3D(Entity entity){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
+        float halfWidth = 10;
+        float halfDepth = 10;
 
-        uint32 max_material_index = 0;
-        JPH::TriangleList triangles;
-        for (int x = -10; x < 10; ++x){
-            for (int z = -10; z < 10; ++z)
-            {
-                float x1 = 10.0f * x;
-                float z1 = 10.0f * z;
-                float x2 = x1 + 10.0f;
-                float z2 = z1 + 10.0f;
+        JPH::VertexList vertices;
+		vertices.resize(4);
+        vertices[0] = JPH::Float3(-halfWidth, 0, -halfDepth);
+        vertices[1] = JPH::Float3(-halfWidth, 0, halfDepth);
+        vertices[2] = JPH::Float3(halfWidth, 0, halfDepth);
+        vertices[3] = JPH::Float3(halfWidth, 0, -halfDepth);
 
-                JPH::Float3 v1 = JPH::Float3(x1, 0, z1);
-                JPH::Float3 v2 = JPH::Float3(x2, 0, z1);
-                JPH::Float3 v3 = JPH::Float3(x1, 0, z2);
-                JPH::Float3 v4 = JPH::Float3(x2, 0, z2);
+        JPH::IndexedTriangleList indices;
+		indices.resize(2);
+        indices[0].mIdx[0] = 0;
+        indices[0].mIdx[1] = 1;
+        indices[0].mIdx[2] = 2;
 
-                uint32 material_index = uint32((JPH::Vec3(v1) + JPH::Vec3(v2) + JPH::Vec3(v3) + JPH::Vec3(v4)).Length() / 40.0f);
-                max_material_index = JPH::max(max_material_index, material_index);
-                triangles.push_back(JPH::Triangle(v1, v3, v4, material_index));
-                triangles.push_back(JPH::Triangle(v1, v4, v2, material_index));
-            }
+        indices[1].mIdx[0] = 0;
+        indices[1].mIdx[1] = 2;
+        indices[1].mIdx[2] = 3;
+
+        JPH::MeshShapeSettings shape_settings(vertices, indices);
+
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (shape_result.IsValid()){
+            JPH::ShapeRefC shape = shape_result.Get();
+
+            createGenericJoltBody(entity, *body, shape.GetPtr());
+        }else{
+            Log::error("Cannot create shape for 3D Body: %u", entity);
         }
-
-        //JPH::MeshShapeSettings shape_settings(triangles);
-
-        //JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
-        //if (shape_result.IsValid()){
-        //    JPH::ShapeRefC shape = shape_result.Get();
-
-        //    createGenericJoltBody(entity, *body, shape.GetPtr());
-        //}else{
-        //    Log::error("Cannot create shape for 3D Body: %u", entity);
-        //}
     }
 }
 

@@ -64,6 +64,10 @@ void Body3D::createSphereShape(float radius){
     scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity, radius);
 }
 
+void Body3D::createMeshShape(){
+    scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity);
+}
+
 void Body3D::setType(BodyType type){
     Body3DComponent& body = getComponent<Body3DComponent>();
 

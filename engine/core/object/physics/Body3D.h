@@ -31,6 +31,7 @@ namespace Supernova{
 
         void createBoxShape(float width, float height, float depth);
         void createSphereShape(float radius);
+        void createMeshShape();
 
         void setType(BodyType type);
         BodyType getType() const;

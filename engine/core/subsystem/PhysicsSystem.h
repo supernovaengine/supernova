@@ -106,7 +106,7 @@ namespace Supernova{
 
 		void createBoxShape3D(Entity entity, float width, float height, float depth);
 		void createSphereShape3D(Entity entity, float radius);
-		void createMeshShape3D(Entity entity, float radius);
+		void createMeshShape3D(Entity entity);
 
 		b2World* getWorld2D() const;
 		JPH::PhysicsSystem* getWorld3D() const;
