@@ -452,31 +452,65 @@ void PhysicsSystem::createSphereShape3D(Entity entity, float radius){
     }
 }
 
-void PhysicsSystem::createMeshShape3D(Entity entity){
+void PhysicsSystem::createMeshShape3D(Entity entity, std::vector<Vector3> vertices, std::vector<uint16_t> indices){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
-        float halfWidth = 10;
-        float halfDepth = 10;
 
-        JPH::VertexList vertices;
-		vertices.resize(4);
-        vertices[0] = JPH::Float3(-halfWidth, 0, -halfDepth);
-        vertices[1] = JPH::Float3(-halfWidth, 0, halfDepth);
-        vertices[2] = JPH::Float3(halfWidth, 0, halfDepth);
-        vertices[3] = JPH::Float3(halfWidth, 0, -halfDepth);
+        JPH::VertexList jvertices;
+		jvertices.resize(vertices.size());
+        for (int i = 0; i < vertices.size(); i++){
+            jvertices[i] = JPH::Float3(vertices[i].x, vertices[i].y, vertices[i].z);
+        }
 
-        JPH::IndexedTriangleList indices;
-		indices.resize(2);
-        indices[0].mIdx[0] = 0;
-        indices[0].mIdx[1] = 1;
-        indices[0].mIdx[2] = 2;
+        JPH::IndexedTriangleList jindices;
+        int indicesize = int(indices.size() / 3);
+		jindices.resize(indicesize);
+        for (int i = 0; i < indicesize; i++){
+            for (int j = 0; j < 3; j++){
+                jindices[i].mIdx[j] = indices[(3*i)+j];
+            }
+        }
 
-        indices[1].mIdx[0] = 0;
-        indices[1].mIdx[1] = 2;
-        indices[1].mIdx[2] = 3;
+        JPH::MeshShapeSettings shape_settings(jvertices, jindices);
 
-        JPH::MeshShapeSettings shape_settings(vertices, indices);
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (shape_result.IsValid()){
+            JPH::ShapeRefC shape = shape_result.Get();
+
+            createGenericJoltBody(entity, *body, shape.GetPtr());
+        }else{
+            Log::error("Cannot create shape for 3D Body: %u", entity);
+        }
+    }
+}
+
+void PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
+    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
+
+    if (body){
+
+        JPH::VertexList jvertices;
+        int verticesize = int(mesh.buffer.getCount());
+		jvertices.resize(verticesize);
+        Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
+        for (int i = 0; i < verticesize; i++){
+            Vector3 vertice = mesh.buffer.getVector3(attVertex, i);
+            jvertices[i] = JPH::Float3(vertice.x, vertice.y, vertice.z);
+        }
+
+        JPH::IndexedTriangleList jindices;
+        int indicesize = int(mesh.indices.getCount() / 3);
+		jindices.resize(indicesize);
+        Attribute* attIndex = mesh.indices.getAttribute(AttributeType::INDEX);
+        for (int i = 0; i < indicesize; i++){
+            for (int j = 0; j < 3; j++){
+                uint16_t indice = mesh.indices.getUInt16(attIndex, (3*i)+j);
+                jindices[i].mIdx[j] = indice;
+            }
+        }
+
+        JPH::MeshShapeSettings shape_settings(jvertices, jindices);
 
         JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
         if (shape_result.IsValid()){
