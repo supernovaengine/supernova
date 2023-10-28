@@ -535,17 +535,19 @@ void PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
 
         if (jindices.size() == 0){
             Log::error("Cannot create mesh shape without indices for 3D Body: %u", entity);
-        }
-
-        JPH::MeshShapeSettings shape_settings(jvertices, jindices);
-
-        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
-        if (shape_result.IsValid()){
-            JPH::ShapeRefC shape = shape_result.Get();
-
-            createGenericJoltBody(entity, *body, shape.GetPtr());
+        }else if (jvertices.size() == 0){
+            Log::error("Cannot create mesh shape without vertices for 3D Body: %u", entity);
         }else{
-            Log::error("Cannot create shape for 3D Body: %u", entity);
+            JPH::MeshShapeSettings shape_settings(jvertices, jindices);
+
+            JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+            if (shape_result.IsValid()){
+                JPH::ShapeRefC shape = shape_result.Get();
+
+                createGenericJoltBody(entity, *body, shape.GetPtr());
+            }else{
+                Log::error("Cannot create shape for 3D Body: %u", entity);
+            }
         }
     }
 }
