@@ -509,24 +509,32 @@ void PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
             if (buf.second->isRenderAttributes()) {
                 if (buf.second->getType() == BufferType::INDEX_BUFFER){
                     int indicesize = int(buf.second->getCount() / 3);
-                    jindices.resize(indicesize);
                     Attribute* attIndex = buf.second->getAttribute(AttributeType::INDEX);
-                    for (int i = 0; i < indicesize; i++){
-                        for (int j = 0; j < 3; j++){
-                            uint16_t indice = buf.second->getUInt16(attIndex, (3*i)+j);
-                            jindices[i].mIdx[j] = indice;
+                    if (attIndex){
+                        jindices.resize(indicesize);
+                        for (int i = 0; i < indicesize; i++){
+                            for (int j = 0; j < 3; j++){
+                                uint16_t indice = buf.second->getUInt16(attIndex, (3*i)+j);
+                                jindices[i].mIdx[j] = indice;
+                            }
                         }
                     }
                 }else{
                     int verticesize = int(buf.second->getCount());
-                    jvertices.resize(verticesize);
                     Attribute* attVertex = buf.second->getAttribute(AttributeType::POSITION);
-                    for (int i = 0; i < verticesize; i++){
-                        Vector3 vertice = buf.second->getVector3(attVertex, i);
-                        jvertices[i] = JPH::Float3(vertice.x, vertice.y, vertice.z);
+                    if (attVertex){
+                        jvertices.resize(verticesize);
+                        for (int i = 0; i < verticesize; i++){
+                            Vector3 vertice = buf.second->getVector3(attVertex, i);
+                            jvertices[i] = JPH::Float3(vertice.x, vertice.y, vertice.z);
+                        }
                     }
                 }
             }
+        }
+
+        if (jindices.size() == 0){
+            Log::error("Cannot create mesh shape without indices for 3D Body: %u", entity);
         }
 
         JPH::MeshShapeSettings shape_settings(jvertices, jindices);
