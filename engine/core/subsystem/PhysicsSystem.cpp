@@ -452,6 +452,81 @@ void PhysicsSystem::createSphereShape3D(Entity entity, float radius){
     }
 }
 
+void PhysicsSystem::createCapsuleShape3D(Entity entity, float halfHeight, float radius){
+    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
+
+    if (body){
+        JPH::CapsuleShapeSettings shape_settings(halfHeight, radius);
+
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (shape_result.IsValid()){
+            JPH::ShapeRefC shape = shape_result.Get();
+
+            createGenericJoltBody(entity, *body, shape.GetPtr());
+        }else{
+            Log::error("Cannot create shape for 3D Body: %u", entity);
+        }
+    }
+}
+
+void PhysicsSystem::createTaperedCapsuleShape3D(Entity entity, float halfHeight, float topRadius, float bottomRadius){
+    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
+
+    if (body){
+        JPH::TaperedCapsuleShapeSettings shape_settings(halfHeight, topRadius, bottomRadius);
+
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (shape_result.IsValid()){
+            JPH::ShapeRefC shape = shape_result.Get();
+
+            createGenericJoltBody(entity, *body, shape.GetPtr());
+        }else{
+            Log::error("Cannot create shape for 3D Body: %u", entity);
+        }
+    }
+}
+
+void PhysicsSystem::createCylinderShape3D(Entity entity, float halfHeight, float radius){
+    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
+
+    if (body){
+        JPH::CylinderShapeSettings shape_settings(halfHeight, radius);
+
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (shape_result.IsValid()){
+            JPH::ShapeRefC shape = shape_result.Get();
+
+            createGenericJoltBody(entity, *body, shape.GetPtr());
+        }else{
+            Log::error("Cannot create shape for 3D Body: %u", entity);
+        }
+    }
+}
+
+void PhysicsSystem::createConvexHullShape3D(Entity entity, std::vector<Vector3> vertices){
+    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
+
+    if (body){
+
+        JPH::Array<JPH::Vec3> jvertices;
+		jvertices.resize(vertices.size());
+        for (int i = 0; i < vertices.size(); i++){
+            jvertices[i] = JPH::Vec3(vertices[i].x, vertices[i].y, vertices[i].z);
+        }
+
+        JPH::ConvexHullShapeSettings shape_settings(jvertices);
+
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (shape_result.IsValid()){
+            JPH::ShapeRefC shape = shape_result.Get();
+
+            createGenericJoltBody(entity, *body, shape.GetPtr());
+        }else{
+            Log::error("Cannot create shape for 3D Body: %u", entity);
+        }
+    }
+}
+
 void PhysicsSystem::createMeshShape3D(Entity entity, std::vector<Vector3> vertices, std::vector<uint16_t> indices){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
@@ -550,6 +625,28 @@ void PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
             }
         }
     }
+}
+
+void PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& terrain){
+    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
+
+    if (body){
+        JPH::Vec3 mTerrainOffset =JPH::Vec3(-0.5f, 0.0f, -0.5f);
+		JPH::Vec3 mTerrainScale = JPH::Vec3(5.0f, 1.0f, 5.0f);
+        uint32 mTerrainSize = 1;
+
+        JPH::HeightFieldShapeSettings shape_settings((float*)terrain.heightMap.getData().getData(), mTerrainOffset, mTerrainScale, mTerrainSize);
+
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (shape_result.IsValid()){
+            JPH::ShapeRefC shape = shape_result.Get();
+
+            createGenericJoltBody(entity, *body, shape.GetPtr());
+        }else{
+            Log::error("Cannot create shape for 3D Body: %u", entity);
+        }
+    }
+
 }
 
 b2World* PhysicsSystem::getWorld2D() const{

@@ -106,8 +106,13 @@ namespace Supernova{
 
 		void createBoxShape3D(Entity entity, float width, float height, float depth);
 		void createSphereShape3D(Entity entity, float radius);
+		void createCapsuleShape3D(Entity entity, float halfHeight, float radius);
+		void createTaperedCapsuleShape3D(Entity entity, float halfHeight, float topRadius, float bottomRadius);
+		void createCylinderShape3D(Entity entity, float halfHeight, float radius);
+		void createConvexHullShape3D(Entity entity, std::vector<Vector3> vertices);
 		void createMeshShape3D(Entity entity, std::vector<Vector3> vertices, std::vector<uint16_t> indices);
 		void createMeshShape3D(Entity entity, MeshComponent& mesh);
+		void createHeightFieldShape3D(Entity entity, TerrainComponent& terrain);
 
 		b2World* getWorld2D() const;
 		JPH::PhysicsSystem* getWorld3D() const;

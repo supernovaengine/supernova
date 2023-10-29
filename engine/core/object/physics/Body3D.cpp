@@ -64,12 +64,32 @@ void Body3D::createSphereShape(float radius){
     scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity, radius);
 }
 
+void Body3D::createCapsuleShape(float halfHeight, float radius){
+    scene->getSystem<PhysicsSystem>()->createCapsuleShape3D(entity, halfHeight, radius);
+}
+
+void Body3D::createTaperedCapsuleShape(float halfHeight, float topRadius, float bottomRadius){
+    scene->getSystem<PhysicsSystem>()->createTaperedCapsuleShape3D(entity, halfHeight, topRadius, bottomRadius);
+}
+
+void Body3D::createCylinderShape(float halfHeight, float radius){
+    scene->getSystem<PhysicsSystem>()->createCylinderShape3D(entity, halfHeight, radius);
+}
+
+void Body3D::createConvexHullShape(std::vector<Vector3> vertices){
+    scene->getSystem<PhysicsSystem>()->createConvexHullShape3D(entity, vertices);
+}
+
 void Body3D::createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices){
     scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, vertices, indices);
 }
 
 void Body3D::createMeshShape(){
     scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, getComponent<MeshComponent>());
+}
+
+void Body3D::createHeightFieldShape(){
+    scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>());
 }
 
 void Body3D::setType(BodyType type){

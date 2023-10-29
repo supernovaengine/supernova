@@ -31,8 +31,13 @@ namespace Supernova{
 
         void createBoxShape(float width, float height, float depth);
         void createSphereShape(float radius);
+        void createCapsuleShape(float halfHeight, float radius);
+        void createTaperedCapsuleShape(float halfHeight, float topRadius, float bottomRadius);
+        void createCylinderShape(float halfHeight, float radius);
+        void createConvexHullShape(std::vector<Vector3> vertices);
         void createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices);
         void createMeshShape();
+        void createHeightFieldShape();
 
         void setType(BodyType type);
         BodyType getType() const;
