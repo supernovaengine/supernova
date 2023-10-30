@@ -47,6 +47,11 @@ Body3D::Body3D(const Body3D& rhs): EntityHandle(rhs){
     
 }
 
+Body3D& Body3D::operator=(const Body3D& rhs){
+
+    return *this;
+}
+
 JPH::Body* Body3D::getJoltBody() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
     return body.body;

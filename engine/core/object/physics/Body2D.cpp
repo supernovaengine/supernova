@@ -51,6 +51,11 @@ Body2D::Body2D(const Body2D& rhs): EntityHandle(rhs){
     
 }
 
+Body2D& Body2D::operator=(const Body2D& rhs){
+
+    return *this;
+}
+
 b2Body* Body2D::getBox2DBody() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
@@ -71,11 +76,6 @@ b2Fixture* Body2D::getBox2DFixture(size_t index) const{
 
 Object Body2D::getAttachedObject(){
     return Object(scene, entity);
-}
-
-Body2D& Body2D::operator=(const Body2D& rhs){
-
-    return *this;
 }
 
 int Body2D::createRectShape(float width, float height){

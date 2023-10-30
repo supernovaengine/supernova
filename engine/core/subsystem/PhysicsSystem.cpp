@@ -631,9 +631,9 @@ void PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& te
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
-        JPH::Vec3 mTerrainOffset =JPH::Vec3(-0.5f, 0.0f, -0.5f);
-		JPH::Vec3 mTerrainScale = JPH::Vec3(5.0f, 1.0f, 5.0f);
-        uint32 mTerrainSize = 1;
+        JPH::Vec3 mTerrainOffset = JPH::Vec3::sZero();
+        JPH::Vec3 mTerrainScale = JPH::Vec3::sReplicate(1.0f);
+        unsigned int mTerrainSize = terrain.heightMap.getWidth();
 
         JPH::HeightFieldShapeSettings shape_settings((float*)terrain.heightMap.getData().getData(), mTerrainOffset, mTerrainScale, mTerrainSize);
 
