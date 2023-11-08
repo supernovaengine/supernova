@@ -70,6 +70,8 @@ namespace Supernova {
 
         bool isTransparent();
 
+        int getNearestPowerOfTwo();
+
         // render callback clean function
         static void cleanupTexture(void* data);
     };

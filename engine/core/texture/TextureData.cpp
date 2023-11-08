@@ -373,6 +373,10 @@ bool TextureData::isTransparent(){
     return transparent;
 }
 
+int TextureData::getNearestPowerOfTwo(){
+    return getNearestPowerOfTwo(std::min(width, height));
+}
+
 void TextureData::cleanupTexture(void* data){
     TextureData* texData = (TextureData*)data;
     if (texData->data){

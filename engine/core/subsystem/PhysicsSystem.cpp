@@ -631,11 +631,32 @@ void PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& te
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
-        JPH::Vec3 mTerrainOffset = JPH::Vec3::sZero();
-        JPH::Vec3 mTerrainScale = JPH::Vec3::sReplicate(1.0f);
-        unsigned int mTerrainSize = terrain.heightMap.getWidth();
+        TextureData& textureData = terrain.heightMap.getData();
 
-        JPH::HeightFieldShapeSettings shape_settings((float*)terrain.heightMap.getData().getData(), mTerrainOffset, mTerrainScale, mTerrainSize);
+        int heightFieldSamples = textureData.getNearestPowerOfTwo();
+        if (heightFieldSamples > std::min(textureData.getOriginalWidth(), textureData.getOriginalHeight())){
+            heightFieldSamples = heightFieldSamples / 2;
+        }
+
+        JPH::Vec3 terrainOffset = JPH::Vec3(-terrain.terrainSize/2.0, 0.0f ,-terrain.terrainSize/2.0);
+        JPH::Vec3 terrainScale = JPH::Vec3(terrain.terrainSize/heightFieldSamples, terrain.maxHeight, terrain.terrainSize/heightFieldSamples);
+
+		float *samples = new float [heightFieldSamples * heightFieldSamples];
+
+        for (int x = 0; x < heightFieldSamples; x++){
+            for (int y = 0; y < heightFieldSamples; y++){
+                TextureData& textureData = terrain.heightMap.getData();
+
+                int posX = floor(textureData.getWidth() * x / heightFieldSamples);
+                int posY = floor(textureData.getHeight() * y / heightFieldSamples);
+
+                float val = textureData.getColorComponent(posX, posY, 0) / 255.0f;
+
+                samples[x + (y * heightFieldSamples)] = val;
+            }
+        }
+
+        JPH::HeightFieldShapeSettings shape_settings(samples, terrainOffset, terrainScale, heightFieldSamples);
 
         JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
         if (shape_result.IsValid()){
@@ -645,6 +666,8 @@ void PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& te
         }else{
             Log::error("Cannot create shape for 3D Body: %u", entity);
         }
+
+        delete samples;
     }
 
 }
@@ -1572,10 +1595,12 @@ void PhysicsSystem::update(double dt){
             if (signature.test(scene->getComponentType<Transform>())){
                 Transform& transform = scene->getComponent<Transform>(entity);
 
-                Vector3 nPosition = Vector3(position.GetX(), position.GetY(), position.GetZ());
-                if (transform.position != nPosition){
-                    transform.position = nPosition;
-                    transform.needUpdate = true;
+                if (!std::isnan(position.GetX()) && !std::isnan(position.GetY()) && !std::isnan(position.GetZ())){
+                    Vector3 nPosition = Vector3(position.GetX(), position.GetY(), position.GetZ());
+                    if (transform.position != nPosition){
+                        transform.position = nPosition;
+                        transform.needUpdate = true;
+                    }
                 }
 
                 Quaternion nRotation = Quaternion(rotation.GetW(), rotation.GetX(), rotation.GetY(), rotation.GetZ());
@@ -1587,6 +1612,7 @@ void PhysicsSystem::update(double dt){
             }
         }
     }
+    
 }
 
 void PhysicsSystem::draw(){
