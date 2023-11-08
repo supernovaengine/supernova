@@ -38,6 +38,7 @@ namespace Supernova{
         void createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices);
         void createMeshShape();
         void createHeightFieldShape();
+        void createHeightFieldShape(unsigned int samplesSize);
 
         void setType(BodyType type);
         BodyType getType() const;

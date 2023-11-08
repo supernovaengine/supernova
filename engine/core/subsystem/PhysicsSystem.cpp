@@ -627,36 +627,44 @@ void PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
     }
 }
 
-void PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& terrain){
+void PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& terrain, unsigned int samplesSize){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
+
+    float logsamples = log2(samplesSize);
+    if (ceil(logsamples) != floor(logsamples)) {
+        Log::error("Cannot create terrain shape. Must insert a power of two samplesSize, not: %u", samplesSize);
+        return;
+    }
 
     if (body){
         TextureData& textureData = terrain.heightMap.getData();
 
-        int heightFieldSamples = textureData.getNearestPowerOfTwo();
-        if (heightFieldSamples > std::min(textureData.getOriginalWidth(), textureData.getOriginalHeight())){
-            heightFieldSamples = heightFieldSamples / 2;
-        }
-
-        JPH::Vec3 terrainOffset = JPH::Vec3(-terrain.terrainSize/2.0, 0.0f ,-terrain.terrainSize/2.0);
-        JPH::Vec3 terrainScale = JPH::Vec3(terrain.terrainSize/heightFieldSamples, terrain.maxHeight, terrain.terrainSize/heightFieldSamples);
-
-		float *samples = new float [heightFieldSamples * heightFieldSamples];
-
-        for (int x = 0; x < heightFieldSamples; x++){
-            for (int y = 0; y < heightFieldSamples; y++){
-                TextureData& textureData = terrain.heightMap.getData();
-
-                int posX = floor(textureData.getWidth() * x / heightFieldSamples);
-                int posY = floor(textureData.getHeight() * y / heightFieldSamples);
-
-                float val = textureData.getColorComponent(posX, posY, 0) / 255.0f;
-
-                samples[x + (y * heightFieldSamples)] = val;
+        if (samplesSize == 0){
+            samplesSize = textureData.getNearestPowerOfTwo();
+            if (samplesSize > std::min(textureData.getOriginalWidth(), textureData.getOriginalHeight())){
+                samplesSize = samplesSize / 2;
             }
         }
 
-        JPH::HeightFieldShapeSettings shape_settings(samples, terrainOffset, terrainScale, heightFieldSamples);
+        JPH::Vec3 terrainOffset = JPH::Vec3(-terrain.terrainSize/2.0, 0.0f ,-terrain.terrainSize/2.0);
+        JPH::Vec3 terrainScale = JPH::Vec3(terrain.terrainSize/samplesSize, terrain.maxHeight, terrain.terrainSize/samplesSize);
+
+		float *samples = new float [samplesSize * samplesSize];
+
+        for (int x = 0; x < samplesSize; x++){
+            for (int y = 0; y < samplesSize; y++){
+                TextureData& textureData = terrain.heightMap.getData();
+
+                int posX = floor(textureData.getWidth() * x / samplesSize);
+                int posY = floor(textureData.getHeight() * y / samplesSize);
+
+                float val = textureData.getColorComponent(posX, posY, 0) / 255.0f;
+
+                samples[x + (y * samplesSize)] = val;
+            }
+        }
+
+        JPH::HeightFieldShapeSettings shape_settings(samples, terrainOffset, terrainScale, samplesSize);
 
         JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
         if (shape_result.IsValid()){
@@ -669,7 +677,6 @@ void PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& te
 
         delete samples;
     }
-
 }
 
 b2World* PhysicsSystem::getWorld2D() const{

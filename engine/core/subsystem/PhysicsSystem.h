@@ -112,7 +112,7 @@ namespace Supernova{
 		void createConvexHullShape3D(Entity entity, std::vector<Vector3> vertices);
 		void createMeshShape3D(Entity entity, std::vector<Vector3> vertices, std::vector<uint16_t> indices);
 		void createMeshShape3D(Entity entity, MeshComponent& mesh);
-		void createHeightFieldShape3D(Entity entity, TerrainComponent& terrain);
+		void createHeightFieldShape3D(Entity entity, TerrainComponent& terrain, unsigned int samplesSize);
 
 		b2World* getWorld2D() const;
 		JPH::PhysicsSystem* getWorld3D() const;

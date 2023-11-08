@@ -94,7 +94,11 @@ void Body3D::createMeshShape(){
 }
 
 void Body3D::createHeightFieldShape(){
-    scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>());
+    scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>(), 0);
+}
+
+void Body3D::createHeightFieldShape(unsigned int samplesSize){
+    scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>(), samplesSize);
 }
 
 void Body3D::setType(BodyType type){
