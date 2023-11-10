@@ -863,6 +863,16 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
     terrain.buffer.addAttribute(AttributeType::POSITION, 3);
 	terrain.buffer.addAttribute(AttributeType::NORMAL, 3);
 
+    if (scene->getCamera() == NULL_ENTITY){
+        Log::error("Cannot create terrain without defined camera in scene");
+        return;
+    }
+
+    if (MAX_TERRAINGRID < (terrain.rootGridSize*terrain.rootGridSize)){
+        Log::error("Cannot create full terrain, increase MAX_TERRAINGRID to %u", (terrain.rootGridSize*terrain.rootGridSize));
+        return;
+    }
+
     terrain.indices.clear();
 
     terrain.heightMap.setReleaseDataAfterLoad(false);
@@ -870,17 +880,10 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
     if (!terrain.heightMap.load()){
         Log::error("Terrain must have a heightmap");
         return;
-    }else{
-        terrain.heightMapLoaded = true;
     }
 
     size_t idealSize = getTerrainGridArraySize(terrain.rootGridSize, terrain.levels);
     terrain.nodes.resize(idealSize);
-
-    if (MAX_TERRAINGRID < (terrain.rootGridSize*terrain.rootGridSize)){
-        Log::error("Cannot create full terrain, increase MAX_TERRAINGRID to %u", (terrain.rootGridSize*terrain.rootGridSize));
-        return;
-    }
 
     terrain.fullResNode = createPlaneNodeBuffer(terrain, 1, 1, terrain.resolution, terrain.resolution);
     terrain.halfResNode = createPlaneNodeBuffer(terrain, 1, 1, terrain.resolution/2, terrain.resolution/2);
@@ -925,6 +928,8 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
             createTerrainNode(terrain, xPos-offset, zPos-offset, rootNodeSize, terrain.levels);
         }
     }
+
+    terrain.heightMapLoaded = true;
 
 }
 

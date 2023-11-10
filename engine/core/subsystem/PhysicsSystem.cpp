@@ -630,6 +630,11 @@ void PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
 void PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& terrain, unsigned int samplesSize){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
+    if (!terrain.heightMapLoaded){
+        Log::error("Cannot create heightfield shape without heightmap image loaded");
+        return;
+    }
+
     float logsamples = log2(samplesSize);
     if (ceil(logsamples) != floor(logsamples)) {
         Log::error("Cannot create terrain shape. Must insert a power of two samplesSize, not: %u", samplesSize);

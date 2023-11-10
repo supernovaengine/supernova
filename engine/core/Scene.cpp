@@ -78,10 +78,6 @@ Scene::Scene(){
 	ambientFactor = 0.2;
 
 	enableUIEvents = false;
-
-	if (camera == NULL_ENTITY){
-		camera = createDefaultCamera();
-	}
 }
 
 Scene::~Scene(){
@@ -190,6 +186,10 @@ void Scene::setEnableUIEvents(bool enableUIEvents){
 }
 
 void Scene::load(){
+	if (camera == NULL_ENTITY){
+		camera = createDefaultCamera();
+	}
+	
 	for (auto const &pair: systems) {
 		if (Engine::isViewLoaded()){
 			pair.second->load();
