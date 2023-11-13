@@ -171,17 +171,18 @@ bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutCompo
         text.stbtext = new STBText();
     }
 
+    std::string fontId = text.font;
+    if (text.font.empty())
+        fontId = "font";
+    fontId = fontId + std::string("|") + std::to_string(text.fontSize);
+
     TextureData* textureData = text.stbtext->load(text.font, text.fontSize);
     if (!textureData) {
         Log::error("Cannot load font atlas from: %s", text.font.c_str());
         return false;
     }
 
-    std::string fontId = text.font;
-    if (text.font.empty())
-        fontId = "font";
-
-    ui.texture.setData(*textureData, fontId + std::string("|") + std::to_string(text.fontSize));
+    ui.texture.setData(*textureData, fontId);
     ui.texture.setReleaseDataAfterLoad(true);
 
     ui.needUpdateTexture = true;

@@ -44,13 +44,14 @@ Texture::Texture(std::string path){
 Texture::Texture(TextureData data, std::string id){
     this->render = NULL;
     this->framebuffer = NULL;
-    this->data[0] = data;
+    this->data = std::make_shared<std::array<TextureData,6>>();
+    this->data->at(0) = data;
     this->id = id;
     this->type = TextureType::TEXTURE_2D;
     this->numFaces = 1;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
-    this->needLoad = true;
+    this->needLoad = false;
 
     this->minFilter = TextureFilter::LINEAR;
     this->magFilter = TextureFilter::LINEAR;
@@ -65,8 +66,8 @@ Texture::Texture(const Texture& rhs){
     id = rhs.id;
     for (int i = 0; i < 6; i++){
         paths[i] = rhs.paths[i];
-        data[i] = rhs.data[i];
     }
+    data = rhs.data;
     numFaces = rhs.numFaces;
     loadFromPath = rhs.loadFromPath;
     releaseDataAfterLoad = rhs.releaseDataAfterLoad;
@@ -84,8 +85,8 @@ Texture& Texture::operator=(const Texture& rhs){
     id = rhs.id;
     for (int i = 0; i < 6; i++){
         paths[i] = rhs.paths[i];
-        data[i] = rhs.data[i];
     }
+    data = rhs.data;
     numFaces = rhs.numFaces;
     loadFromPath = rhs.loadFromPath;
     releaseDataAfterLoad = rhs.releaseDataAfterLoad;
@@ -160,14 +161,15 @@ void Texture::setPath(std::string path){
 void Texture::setData(TextureData data, std::string id){
     destroy();
 
-    this->data[0] = data;
+    this->data = std::make_shared<std::array<TextureData,6>>();
+    this->data->at(0) = data;
     this->id = id;
     this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_2D;
     this->numFaces = 1;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
-    this->needLoad = true;
+    this->needLoad = false;
 }
 
 void Texture::setCubePath(size_t index, std::string path){
@@ -232,26 +234,36 @@ bool Texture::load(){
     if (!needLoad)
         return false;
 
+    if (!loadFromPath)
+        return false;
+
     numFaces = 1;
 	if (type == TextureType::TEXTURE_CUBE){
 		numFaces = 6;
 	}
 
-    if (loadFromPath){
-	    for (int f = 0; f < numFaces; f++){
-            if (paths[f].empty() && type == TextureType::TEXTURE_CUBE){
-            	Log::error("Cube texture is missing textures");
-			    return false;
-            }
-    	    data[f].loadTextureFromFile(paths[f].c_str());
-
-            if (Engine::getTextureStrategy() == TextureStrategy::FIT){
-                data[f].fitPowerOfTwo();
-            }else if (Engine::getTextureStrategy() == TextureStrategy::RESIZE){
-                data[f].resizePowerOfTwo();
-            }
-	    }
+    data = TextureDataPool::get(id);
+    if (data){
+        return false;
     }
+
+    this->data = std::make_shared<std::array<TextureData,6>>();
+
+    for (int f = 0; f < numFaces; f++){
+        if (paths[f].empty() && type == TextureType::TEXTURE_CUBE){
+            Log::error("Cube texture is missing textures");
+            return false;
+        }
+        data->at(f).loadTextureFromFile(paths[f].c_str());
+
+        if (Engine::getTextureStrategy() == TextureStrategy::FIT){
+            data->at(f).fitPowerOfTwo();
+        }else if (Engine::getTextureStrategy() == TextureStrategy::RESIZE){
+            data->at(f).resizePowerOfTwo();
+        }
+    }
+
+    data = TextureDataPool::get(id, *data.get());
 
     needLoad = false;
 
@@ -260,9 +272,15 @@ bool Texture::load(){
 
 void Texture::destroy(){
     if (!id.empty() && render){
+
 	    render.reset();
         render = NULL;
 	    TexturePool::remove(id);
+
+        data.reset();
+        data = NULL;
+        TextureDataPool::remove(id);
+
         if (!framebuffer){
             needLoad = true;
         }
@@ -278,18 +296,19 @@ TextureRender* Texture::getRender(){
     render = TexturePool::get(id);
 
     if (render){
+        data = TextureDataPool::get(id);
         return render.get();
     }
 
     load();
 
     if (!id.empty()){
-        render = TexturePool::get(id, type, data, minFilter, magFilter, wrapU, wrapV);
+        render = TexturePool::get(id, type, *data.get(), minFilter, magFilter, wrapU, wrapV);
     }
 
-    if (releaseDataAfterLoad){
+    if (data && releaseDataAfterLoad){
         for (int f = 0; f < numFaces; f++){
-            SystemRender::scheduleCleanup(TextureData::cleanupTexture, &data[f]);
+            SystemRender::scheduleCleanup(TextureData::cleanupTexture, &data->at(f));
         }
     }
 
@@ -305,7 +324,7 @@ std::string Texture::getPath(size_t index){
 }
 
 TextureData& Texture::getData(size_t index){
-    return data[index];
+    return data->at(index);
 }
 
 int Texture::getWidth(){
@@ -332,7 +351,7 @@ bool Texture::isReleaseDataAfterLoad() const{
 
 void Texture::releaseData(){
     for (int f = 0; f < numFaces; f++){
-        data[f].releaseImageData();
+        data->at(f).releaseImageData();
     }
 }
 

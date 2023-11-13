@@ -20,7 +20,7 @@ namespace Supernova{
 
     public:
         static std::shared_ptr<std::array<TextureData,6>> get(std::string id);
-        static std::shared_ptr<std::array<TextureData,6>> get(std::string id, TextureType type, TextureData data[6], TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV);
+        static std::shared_ptr<std::array<TextureData,6>> get(std::string id, std::array<TextureData,6> data);
         static void remove(std::string id);
 
         // necessary for engine shutdown

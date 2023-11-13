@@ -5,6 +5,7 @@
 #include "texture/Framebuffer.h"
 #include "texture/TextureData.h"
 #include "pool/TexturePool.h"
+#include "pool/TextureDataPool.h"
 #include <string>
 #include <memory>
 
@@ -20,7 +21,7 @@ namespace Supernova{
             std::string id;
 
             std::string paths[6];
-            TextureData data[6];
+            std::shared_ptr<std::array<TextureData,6>> data = NULL;
 
             int numFaces;
 
