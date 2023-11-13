@@ -12,7 +12,7 @@ namespace Supernova{
 
     class Texture{
         private:
-            std::shared_ptr<TexturePoolData> renderAndData = NULL;
+            std::shared_ptr<TextureRender> render = NULL;
             Framebuffer* framebuffer;
             unsigned long lastFramebufferVersion = 0;
 

@@ -12,20 +12,15 @@
 
 namespace Supernova{
 
-    struct TexturePoolData{
-        TextureRender render;
-        TextureData data[6];
-    };
-
-    typedef std::map< std::string, std::shared_ptr<TexturePoolData> > textures_t;
+    typedef std::map< std::string, std::shared_ptr<TextureRender> > textures_t;
 
     class TexturePool{
     private:
         static textures_t& getMap();
 
     public:
-        static std::shared_ptr<TexturePoolData> get(std::string id);
-        static std::shared_ptr<TexturePoolData> get(std::string id, TextureType type, TextureData data[6], TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV);
+        static std::shared_ptr<TextureRender> get(std::string id);
+        static std::shared_ptr<TextureRender> get(std::string id, TextureType type, TextureData data[6], TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV);
         static void remove(std::string id);
 
         // necessary for engine shutdown

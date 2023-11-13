@@ -11,7 +11,7 @@
 using namespace Supernova;
 
 Texture::Texture(){
-    this->renderAndData = NULL;
+    this->render = NULL;
     this->framebuffer = NULL;
     this->numFaces = 1;
     this->loadFromPath = false;
@@ -25,7 +25,7 @@ Texture::Texture(){
 }
 
 Texture::Texture(std::string path){
-    this->renderAndData = NULL;
+    this->render = NULL;
     this->framebuffer = NULL;
     this->paths[0] = path;
     this->id = path;
@@ -42,7 +42,7 @@ Texture::Texture(std::string path){
 }
 
 Texture::Texture(TextureData data, std::string id){
-    this->renderAndData = NULL;
+    this->render = NULL;
     this->framebuffer = NULL;
     this->data[0] = data;
     this->id = id;
@@ -59,7 +59,7 @@ Texture::Texture(TextureData data, std::string id){
 }
 
 Texture::Texture(const Texture& rhs){
-    renderAndData = rhs.renderAndData;
+    render = rhs.render;
     framebuffer = rhs.framebuffer;
     type = rhs.type;
     id = rhs.id;
@@ -78,7 +78,7 @@ Texture::Texture(const Texture& rhs){
 }
 
 Texture& Texture::operator=(const Texture& rhs){
-    renderAndData = rhs.renderAndData;
+    render = rhs.render;
     framebuffer = rhs.framebuffer;
     type = rhs.type;
     id = rhs.id;
@@ -229,19 +229,8 @@ bool Texture::load(){
     if (framebuffer)
         return true;
 
-    if (renderAndData)
-        return true;
-
     if (!needLoad)
         return false;
-
-    renderAndData = TexturePool::get(id);
-    if (renderAndData){
-        for (int f = 0; f < 6; f++){
-            data[f] = renderAndData->data[f];
-        }
-        return true;
-    }
 
     numFaces = 1;
 	if (type == TextureType::TEXTURE_CUBE){
@@ -264,23 +253,15 @@ bool Texture::load(){
 	    }
     }
 
-	renderAndData = TexturePool::get(id, type, data, minFilter, magFilter, wrapU, wrapV);
-
-    if (releaseDataAfterLoad){
-        for (int f = 0; f < numFaces; f++){
-            SystemRender::scheduleCleanup(TextureData::cleanupTexture, &data[f]);
-        }
-    }
-
     needLoad = false;
 
     return true;
 }
 
 void Texture::destroy(){
-    if (!id.empty() && renderAndData){
-	    renderAndData.reset();
-        renderAndData = NULL;
+    if (!id.empty() && render){
+	    render.reset();
+        render = NULL;
 	    TexturePool::remove(id);
         if (!framebuffer){
             needLoad = true;
@@ -294,13 +275,29 @@ TextureRender* Texture::getRender(){
         return &framebuffer->getRender().getColorTexture();
     }
 
-    if (needLoad && !renderAndData)
-        load();
+    render = TexturePool::get(id);
 
-    if (!needLoad && !renderAndData)
-        return NULL;
+    if (render){
+        return render.get();
+    }
 
-    return &renderAndData->render;
+    load();
+
+    if (!id.empty()){
+        render = TexturePool::get(id, type, data, minFilter, magFilter, wrapU, wrapV);
+    }
+
+    if (releaseDataAfterLoad){
+        for (int f = 0; f < numFaces; f++){
+            SystemRender::scheduleCleanup(TextureData::cleanupTexture, &data[f]);
+        }
+    }
+
+    if (render){
+        return render.get();
+    }
+
+    return NULL;
 }
 
 std::string Texture::getPath(size_t index){
@@ -340,7 +337,7 @@ void Texture::releaseData(){
 }
 
 bool Texture::empty(){
-    if (!needLoad && !renderAndData)
+    if (!needLoad && !render)
         return true;
 
     return false;

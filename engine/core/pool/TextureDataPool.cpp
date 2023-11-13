@@ -2,31 +2,31 @@
 // (c) 2023 Eduardo Doria.
 //
 
-#include "TexturePool.h"
+#include "TextureDataPool.h"
 
 #include "Engine.h"
 #include "Log.h"
 
 using namespace Supernova;
 
-textures_t& TexturePool::getMap(){
+texturesdata_t& TextureDataPool::getMap(){
     //To prevent similar problem of static init fiasco but on deinitialization
     //https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
-    static textures_t* map = new textures_t();
+    static texturesdata_t* map = new texturesdata_t();
     return *map;
 };
 
-std::shared_ptr<TextureRender> TexturePool::get(std::string id){
+std::shared_ptr<std::array<TextureData,6>> TextureDataPool::get(std::string id){
 	auto& shared = getMap()[id];
 
 	if (shared.use_count() > 0){
 		return shared;
 	}
 
-	return NULL;
+	return std::make_shared<std::array<TextureData,6>>();
 }
 
-std::shared_ptr<TextureRender> TexturePool::get(std::string id, TextureType type, TextureData data[6], TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
+std::shared_ptr<std::array<TextureData,6>> TextureDataPool::get(std::string id, TextureType type, TextureData data[6], TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
 	auto& shared = getMap()[id];
 
 	if (shared.use_count() > 0){
@@ -38,7 +38,7 @@ std::shared_ptr<TextureRender> TexturePool::get(std::string id, TextureType type
 		numFaces = 6;
 	}
 
-	const auto resource =  std::make_shared<TextureRender>();
+	const auto resource =  std::make_shared<std::array<TextureData,6>>();
 
 	void* data_array[6];
 	size_t size_array[6];
@@ -46,20 +46,22 @@ std::shared_ptr<TextureRender> TexturePool::get(std::string id, TextureType type
 	for (int f = 0; f < numFaces; f++){
 		data_array[f] = data[f].getData();
 		size_array[f] = (size_t)data[f].getSize();
+
+        (*resource)[f] = data[f];
 	}
 
-	resource->createTexture(id, data[0].getWidth(), data[0].getHeight(), data[0].getColorFormat(), type, numFaces, data_array, size_array, minFilter, magFilter, wrapU, wrapV);
+	//resource->render.createTexture(id, data[0].getWidth(), data[0].getHeight(), data[0].getColorFormat(), type, numFaces, data_array, size_array, minFilter, magFilter, wrapU, wrapV);
 	//Log::debug("Create texture %s", id.c_str());
-	shared = resource;
+	//shared = resource;
 
 	return resource;
 }
 
-void TexturePool::remove(std::string id){
+void TextureDataPool::remove(std::string id){
 	if (getMap().count(id)){
 		auto& shared = getMap()[id];
 		if (shared.use_count() <= 1){
-			shared->destroyTexture();
+			//shared->render.destroyTexture();
 			//Log::debug("Remove texture %s", id.c_str());
 			getMap().erase(id);
 		}
@@ -70,10 +72,10 @@ void TexturePool::remove(std::string id){
 	}
 }
 
-void TexturePool::clear(){
+void TextureDataPool::clear(){
 	for (auto& it: getMap()) {
-		if (it.second)
-			it.second->destroyTexture();
+		//if (it.second)
+			//it.second->render.destroyTexture();
 	}
 	//Log::debug("Remove all textures");
 	getMap().clear();
