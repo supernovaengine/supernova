@@ -428,6 +428,9 @@
 		71451BEC270CA2C900712643 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BE7270CA2C900712643 /* Sprite.cpp */; };
 		71451BF0270CA2C900712643 /* Sprite.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BEA270CA2C900712643 /* Sprite.h */; };
 		71451BF4270CA3EA00712643 /* FrameData.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BF2270CA3EA00712643 /* FrameData.h */; };
+		714741FB2B029F7D00C891FF /* TextureDataPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 714741F92B029F7D00C891FF /* TextureDataPool.h */; };
+		714741FC2B029F7D00C891FF /* TextureDataPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714741FA2B029F7D00C891FF /* TextureDataPool.cpp */; };
+		714741FD2B029F7D00C891FF /* TextureDataPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714741FA2B029F7D00C891FF /* TextureDataPool.cpp */; };
 		714BBF7427148B85004A15EE /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714BBF7227148B84004A15EE /* Particles.cpp */; };
 		714BBF7527148B85004A15EE /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714BBF7227148B84004A15EE /* Particles.cpp */; };
 		7158F43F259C2C82006E55D3 /* Renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7158F43E259C2C82006E55D3 /* Renderer.mm */; };
@@ -1781,6 +1784,8 @@
 		71451BE7270CA2C900712643 /* Sprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sprite.cpp; sourceTree = "<group>"; };
 		71451BEA270CA2C900712643 /* Sprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sprite.h; sourceTree = "<group>"; };
 		71451BF2270CA3EA00712643 /* FrameData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrameData.h; sourceTree = "<group>"; };
+		714741F92B029F7D00C891FF /* TextureDataPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureDataPool.h; sourceTree = "<group>"; };
+		714741FA2B029F7D00C891FF /* TextureDataPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureDataPool.cpp; sourceTree = "<group>"; };
 		714BBF7127148B69004A15EE /* ParticlesComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParticlesComponent.h; sourceTree = "<group>"; };
 		714BBF7227148B84004A15EE /* Particles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particles.cpp; sourceTree = "<group>"; };
 		714BBF7327148B84004A15EE /* Particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particles.h; sourceTree = "<group>"; };
@@ -3873,6 +3878,8 @@
 			children = (
 				71BE623525B1DB9E006D6E02 /* ShaderPool.cpp */,
 				71BE623725B1DB9E006D6E02 /* ShaderPool.h */,
+				714741FA2B029F7D00C891FF /* TextureDataPool.cpp */,
+				714741F92B029F7D00C891FF /* TextureDataPool.h */,
 				71BE623425B1DB9E006D6E02 /* TexturePool.cpp */,
 				71BE623625B1DB9E006D6E02 /* TexturePool.h */,
 			);
@@ -4316,6 +4323,7 @@
 				71ABBD4627A879D4001CE3AF /* Button.h in Headers */,
 				71EA6DA52AE20B8C00CA9A75 /* Contact3D.h in Headers */,
 				71ED64C728B45E0B005D2D96 /* Angle.h in Headers */,
+				714741FB2B029F7D00C891FF /* TextureDataPool.h in Headers */,
 				7105CAB42AD61CB6007C91BA /* Body3D.h in Headers */,
 				71E824862A9C238900C8E6F2 /* Joint2DComponent.h in Headers */,
 				717AD9862919E1CB007D7DB5 /* UILayout.h in Headers */,
@@ -5421,6 +5429,7 @@
 				713D8296259D307F00567F9F /* File.cpp in Sources */,
 				71ABBD2A277A3210001CE3AF /* STBText.cpp in Sources */,
 				71451BE3270CA17F00712643 /* ScaleAction.cpp in Sources */,
+				714741FD2B029F7D00C891FF /* TextureDataPool.cpp in Sources */,
 				713D8297259D307F00567F9F /* FileData.cpp in Sources */,
 				71651FF52AA804B4008D9BF5 /* ContactImpulse2D.cpp in Sources */,
 				71451BEC270CA2C900712643 /* Sprite.cpp in Sources */,
@@ -5581,6 +5590,7 @@
 				7162FD1225963AE00075B97D /* Log.cpp in Sources */,
 				71ABBD29277A3210001CE3AF /* STBText.cpp in Sources */,
 				71451BE2270CA17F00712643 /* ScaleAction.cpp in Sources */,
+				714741FC2B029F7D00C891FF /* TextureDataPool.cpp in Sources */,
 				7162FD1325963AE00075B97D /* Scene.cpp in Sources */,
 				71651FF42AA804B4008D9BF5 /* ContactImpulse2D.cpp in Sources */,
 				71451BEB270CA2C900712643 /* Sprite.cpp in Sources */,
