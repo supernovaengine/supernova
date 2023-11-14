@@ -51,7 +51,7 @@ Texture::Texture(TextureData data, std::string id){
     this->numFaces = 1;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
-    this->needLoad = false;
+    this->needLoad = true;
 
     this->minFilter = TextureFilter::LINEAR;
     this->magFilter = TextureFilter::LINEAR;
@@ -169,7 +169,20 @@ void Texture::setData(TextureData data, std::string id){
     this->numFaces = 1;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
-    this->needLoad = false;
+    this->needLoad = true;
+}
+
+void Texture::setId(std::string id){
+    destroy();
+
+    this->data = NULL;
+    this->id = id;
+    this->framebuffer = NULL;
+    this->type = TextureType::TEXTURE_2D;
+    this->numFaces = 1;
+    this->loadFromPath = false;
+    this->releaseDataAfterLoad = false;
+    this->needLoad = true;
 }
 
 void Texture::setCubePath(size_t index, std::string path){
@@ -234,32 +247,33 @@ bool Texture::load(){
     if (!needLoad)
         return false;
 
-    if (!loadFromPath)
-        return false;
-
     numFaces = 1;
 	if (type == TextureType::TEXTURE_CUBE){
 		numFaces = 6;
 	}
 
-    data = TextureDataPool::get(id);
-    if (data){
-        return false;
-    }
-
-    this->data = std::make_shared<std::array<TextureData,6>>();
-
-    for (int f = 0; f < numFaces; f++){
-        if (paths[f].empty() && type == TextureType::TEXTURE_CUBE){
-            Log::error("Cube texture is missing textures");
+    if (!data){
+        data = TextureDataPool::get(id);
+        if (data){
             return false;
         }
-        data->at(f).loadTextureFromFile(paths[f].c_str());
+    }
 
-        if (Engine::getTextureStrategy() == TextureStrategy::FIT){
-            data->at(f).fitPowerOfTwo();
-        }else if (Engine::getTextureStrategy() == TextureStrategy::RESIZE){
-            data->at(f).resizePowerOfTwo();
+    if (loadFromPath){
+        this->data = std::make_shared<std::array<TextureData,6>>();
+
+        for (int f = 0; f < numFaces; f++){
+            if (paths[f].empty() && type == TextureType::TEXTURE_CUBE){
+                Log::error("Cube texture is missing textures");
+                return false;
+            }
+            data->at(f).loadTextureFromFile(paths[f].c_str());
+
+            if (Engine::getTextureStrategy() == TextureStrategy::FIT){
+                data->at(f).fitPowerOfTwo();
+            }else if (Engine::getTextureStrategy() == TextureStrategy::RESIZE){
+                data->at(f).resizePowerOfTwo();
+            }
         }
     }
 

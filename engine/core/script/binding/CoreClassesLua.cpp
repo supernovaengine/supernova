@@ -241,6 +241,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addConstructor <void (*) (void), void (*) (std::string), void (*) (TextureData, std::string)> ()
         .addFunction("setPath", &Texture::setPath)
         .addFunction("setData", &Texture::setData)
+        .addFunction("setId", &Texture::setId)
         .addFunction("setCubePath", &Texture::setCubePath)
         .addFunction("setCubePaths", &Texture::setCubePaths)
         .addFunction("setFramebuffer", &Texture::setFramebuffer)

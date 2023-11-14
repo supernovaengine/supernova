@@ -42,6 +42,7 @@ namespace Supernova{
 
             void setPath(std::string path);
             void setData(TextureData data, std::string id);
+            void setId(std::string id);
             void setCubePath(size_t index, std::string path);
             void setCubePaths(std::string front, std::string back, std::string left, std::string right, std::string up, std::string down);
             void setFramebuffer(Framebuffer* framebuffer);
