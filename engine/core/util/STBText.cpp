@@ -17,9 +17,14 @@ STBText::STBText() {
     descent = 0;
     lineGap = 0;
     lineHeight = 0;
+
+    textureData = NULL;
 }
 
 STBText::~STBText() {
+    if (textureData){
+        delete textureData;
+    }
 }
 
 void STBText::tryFindBitmapSize(const stbtt_fontinfo *info, float scale){
@@ -136,7 +141,12 @@ TextureData* STBText::load(std::string fontpath, unsigned int fontSize){
     stbtt_PackEnd(&context);
 
     unsigned int textureSize = atlasWidth * atlasHeight * sizeof(unsigned char);
-    return new TextureData(atlasWidth, atlasHeight, textureSize, ColorFormat::RED, 1, (void*)atlasData);
+
+    if (textureData){
+        delete textureData;
+    }
+    textureData = new TextureData(atlasWidth, atlasHeight, textureSize, ColorFormat::RED, 1, (void*)atlasData);
+    return textureData;
 }
 
 void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
@@ -280,5 +290,8 @@ void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>
         width = maxX1 - minX0;
     if (!fixedHeight)
         height = lineCount * lineHeight;
+}
 
+TextureData* STBText::getTextureData(){
+    return textureData;
 }

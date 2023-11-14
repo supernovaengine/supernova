@@ -25,7 +25,7 @@ namespace Supernova{
         bool pivotBaseline = false;
         bool pivotCentered = false;
 
-        STBText* stbtext = NULL;
+        std::shared_ptr<STBText> stbtext = NULL;
 
         bool needReload = false;
         bool needUpdateText = true;

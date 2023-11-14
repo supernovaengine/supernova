@@ -13,6 +13,7 @@
 #include "System.h"
 #include "util/STBText.h"
 #include "util/StringUtils.h"
+#include "pool/FontPool.h"
 
 using namespace Supernova;
 
@@ -167,22 +168,21 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
 }
 
 bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
-    if (!text.stbtext){
-        text.stbtext = new STBText();
-    }
-
     std::string fontId = text.font;
     if (text.font.empty())
         fontId = "font";
     fontId = fontId + std::string("|") + std::to_string(text.fontSize);
 
-    TextureData* textureData = text.stbtext->load(text.font, text.fontSize);
-    if (!textureData) {
-        Log::error("Cannot load font atlas from: %s", text.font.c_str());
-        return false;
+    text.stbtext = FontPool::get(fontId);
+    if (!text.stbtext){
+        text.stbtext = FontPool::get(fontId, text.font, text.fontSize);
+        if (!text.stbtext) {
+            Log::error("Cannot load font atlas from: %s", text.font.c_str());
+            return false;
+        }
     }
 
-    ui.texture.setData(*textureData, fontId);
+    ui.texture.setData(*text.stbtext->getTextureData(), fontId);
     ui.texture.setReleaseDataAfterLoad(true);
 
     ui.needUpdateTexture = true;
@@ -990,7 +990,8 @@ void UISystem::entityDestroyed(Entity entity){
 
         destroyText(text);
         if (text.stbtext){
-            delete text.stbtext;
+            text.stbtext.reset();
+            text.stbtext = NULL;
         }
     }
     if (signature.test(scene->getComponentType<ButtonComponent>())){

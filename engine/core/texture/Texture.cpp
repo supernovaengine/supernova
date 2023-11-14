@@ -173,16 +173,7 @@ void Texture::setData(TextureData data, std::string id){
 }
 
 void Texture::setId(std::string id){
-    destroy();
-
-    this->data = NULL;
     this->id = id;
-    this->framebuffer = NULL;
-    this->type = TextureType::TEXTURE_2D;
-    this->numFaces = 1;
-    this->loadFromPath = false;
-    this->releaseDataAfterLoad = false;
-    this->needLoad = true;
 }
 
 void Texture::setCubePath(size_t index, std::string path){

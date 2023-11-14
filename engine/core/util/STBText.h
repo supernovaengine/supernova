@@ -31,6 +31,8 @@ namespace Supernova {
         float lineGap;
         int lineHeight;
 
+        TextureData* textureData;
+
         void tryFindBitmapSize(const stbtt_fontinfo *info, float scale);
 
     public:
@@ -45,6 +47,8 @@ namespace Supernova {
         TextureData* load(std::string fontpath, unsigned int fontSize);
         void createText(std::string text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
                         int& width, int& height, bool fixedWidth, bool fixedHeight, bool multiline, bool invert);
+
+        TextureData* getTextureData();
         
     };
     

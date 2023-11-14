@@ -12,7 +12,9 @@
 #include "subsystem/RenderSystem.h"
 #include "subsystem/UISystem.h"
 #include "pool/TexturePool.h"
+#include "pool/TextureDataPool.h"
 #include "pool/ShaderPool.h"
+#include "pool/FontPool.h"
 
 #include "sokol_time.h"
 
@@ -581,7 +583,9 @@ void Engine::systemViewDestroyed(){
     SystemRender::shutdown();
 
     TexturePool::clear();
+    TextureDataPool::clear();
     ShaderPool::clear();
+    FontPool::clear();
 
     drawSemaphore.release();
 }
