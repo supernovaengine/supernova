@@ -9,6 +9,7 @@
 #include "texture/TextureData.h"
 #include <map>
 #include <memory>
+#include <array>
 
 namespace Supernova{
 
