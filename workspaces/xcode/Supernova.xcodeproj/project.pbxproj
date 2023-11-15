@@ -433,6 +433,9 @@
 		714741FD2B029F7D00C891FF /* TextureDataPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714741FA2B029F7D00C891FF /* TextureDataPool.cpp */; };
 		714BBF7427148B85004A15EE /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714BBF7227148B84004A15EE /* Particles.cpp */; };
 		714BBF7527148B85004A15EE /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714BBF7227148B84004A15EE /* Particles.cpp */; };
+		7157764E2B050C230049C970 /* FontPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 7157764C2B050C230049C970 /* FontPool.h */; };
+		7157764F2B050C230049C970 /* FontPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157764D2B050C230049C970 /* FontPool.cpp */; };
+		715776502B050C230049C970 /* FontPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157764D2B050C230049C970 /* FontPool.cpp */; };
 		7158F43F259C2C82006E55D3 /* Renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7158F43E259C2C82006E55D3 /* Renderer.mm */; };
 		7158F440259C2C82006E55D3 /* Renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7158F43E259C2C82006E55D3 /* Renderer.mm */; };
 		715CB114288CD3F60049344B /* TerrainComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 715CB113288CD3F60049344B /* TerrainComponent.h */; };
@@ -1789,6 +1792,8 @@
 		714BBF7127148B69004A15EE /* ParticlesComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParticlesComponent.h; sourceTree = "<group>"; };
 		714BBF7227148B84004A15EE /* Particles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particles.cpp; sourceTree = "<group>"; };
 		714BBF7327148B84004A15EE /* Particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particles.h; sourceTree = "<group>"; };
+		7157764C2B050C230049C970 /* FontPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontPool.h; sourceTree = "<group>"; };
+		7157764D2B050C230049C970 /* FontPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontPool.cpp; sourceTree = "<group>"; };
 		7158F43D259C2C82006E55D3 /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
 		7158F43E259C2C82006E55D3 /* Renderer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Renderer.mm; sourceTree = "<group>"; };
 		715CB113288CD3F60049344B /* TerrainComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TerrainComponent.h; sourceTree = "<group>"; };
@@ -3876,6 +3881,8 @@
 		71BE623325B1DB9E006D6E02 /* pool */ = {
 			isa = PBXGroup;
 			children = (
+				7157764D2B050C230049C970 /* FontPool.cpp */,
+				7157764C2B050C230049C970 /* FontPool.h */,
 				71BE623525B1DB9E006D6E02 /* ShaderPool.cpp */,
 				71BE623725B1DB9E006D6E02 /* ShaderPool.h */,
 				714741FA2B029F7D00C891FF /* TextureDataPool.cpp */,
@@ -4229,6 +4236,7 @@
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
 				71E544FE284D5BB700C68FAB /* Animation.h in Headers */,
 				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
+				7157764E2B050C230049C970 /* FontPool.h in Headers */,
 				710506B0297F4483002DD23C /* Shape.h in Headers */,
 				71651FF22AA804B4008D9BF5 /* Manifold2D.h in Headers */,
 				71ABBD4127A879B9001CE3AF /* ButtonComponent.h in Headers */,
@@ -5461,6 +5469,7 @@
 				713E580E27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AF25BB18DC00965B51 /* StringUtils.cpp in Sources */,
 				7105A56728B305B20092EA05 /* MathClassesLua.cpp in Sources */,
+				715776502B050C230049C970 /* FontPool.cpp in Sources */,
 				713D82A5259D307F00567F9F /* Plane.cpp in Sources */,
 				71CC83A326B8C54A00EEBB93 /* SBSReader.cpp in Sources */,
 				713E580727BA9CB700376680 /* MeshPolygon.cpp in Sources */,
@@ -5622,6 +5631,7 @@
 				713E580D27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AE25BB18DC00965B51 /* StringUtils.cpp in Sources */,
 				7105A56628B305B20092EA05 /* MathClassesLua.cpp in Sources */,
+				7157764F2B050C230049C970 /* FontPool.cpp in Sources */,
 				7162FD3225963AE00075B97D /* Matrix3.cpp in Sources */,
 				71CC83A226B8C54A00EEBB93 /* SBSReader.cpp in Sources */,
 				7162FD3725963AE00075B97D /* Rect.cpp in Sources */,
