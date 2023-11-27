@@ -714,5 +714,24 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getTangentImpulses", &ContactImpulse2D::getTangentImpulses)
         .endClass();
 
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Body3D, EntityHandle>("Body3D")
+        .addConstructor <void (Scene*, Entity)> ()
+        .addFunction("getAttachedObject", &Body3D::getAttachedObject)
+        .addFunction("createBoxShape", &Body3D::createBoxShape)
+        .addFunction("createSphereShape", &Body3D::createSphereShape)
+        .addFunction("createCapsuleShape", &Body3D::createCapsuleShape)
+        .addFunction("createTaperedCapsuleShape", &Body3D::createTaperedCapsuleShape)
+        .addFunction("createCylinderShape", &Body3D::createCylinderShape)
+        .addFunction("createConvexHullShape", &Body3D::createConvexHullShape)
+        .addFunction("createMeshShape", 
+            luabridge::overload<>(&Body3D::createMeshShape),
+            luabridge::overload<std::vector<Vector3>, std::vector<uint16_t>>(&Body3D::createMeshShape))
+        .addFunction("createHeightFieldShape", 
+            luabridge::overload<>(&Body3D::createHeightFieldShape),
+            luabridge::overload<unsigned int>(&Body3D::createHeightFieldShape))
+        .addProperty("type", &Body3D::getType, &Body3D::setType)
+        .endClass();
+
 #endif //DISABLE_LUA_BINDINGS
 }

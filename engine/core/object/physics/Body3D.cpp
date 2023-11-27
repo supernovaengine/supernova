@@ -85,12 +85,12 @@ void Body3D::createConvexHullShape(std::vector<Vector3> vertices){
     scene->getSystem<PhysicsSystem>()->createConvexHullShape3D(entity, vertices);
 }
 
-void Body3D::createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices){
-    scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, vertices, indices);
-}
-
 void Body3D::createMeshShape(){
     scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, getComponent<MeshComponent>());
+}
+
+void Body3D::createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices){
+    scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, vertices, indices);
 }
 
 void Body3D::createHeightFieldShape(){
