@@ -115,8 +115,10 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("preSolve2D", [] (PhysicsSystem* self, lua_State* L) { return &self->preSolve2D; }, [] (PhysicsSystem* self, lua_State* L) { self->preSolve2D = L; })
         .addProperty("postSolve2D", [] (PhysicsSystem* self, lua_State* L) { return &self->postSolve2D; }, [] (PhysicsSystem* self, lua_State* L) { self->postSolve2D = L; })
         .addProperty("shouldCollide2D", [] (PhysicsSystem* self, lua_State* L) { return &self->shouldCollide2D; }, [] (PhysicsSystem* self, lua_State* L) { self->shouldCollide2D = L; })
+
         .addFunction("createBody2D", &PhysicsSystem::createBody2D)
         .addFunction("removeBody2D", &PhysicsSystem::removeBody2D)
+
         .addFunction("createRectShape2D", &PhysicsSystem::createRectShape2D)
         .addFunction("createCenteredRectShape2D", &PhysicsSystem::createCenteredRectShape2D)
         .addFunction("createPolygonShape2D", &PhysicsSystem::createPolygonShape2D)
@@ -126,10 +128,25 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("createLoopChainShape2D", &PhysicsSystem::createLoopChainShape2D)
         .addFunction("createChainShape2D", &PhysicsSystem::createChainShape2D)
         .addFunction("removeAllShapes2D", &PhysicsSystem::removeAllShapes2D)
+
+        .addFunction("createBody3D", &PhysicsSystem::createBody3D)
+        .addFunction("removeBody3D", &PhysicsSystem::removeBody3D)
+        .addFunction("createBoxShape3D", &PhysicsSystem::createBoxShape3D)
+        .addFunction("createSphereShape3D", &PhysicsSystem::createSphereShape3D)
+        .addFunction("createCapsuleShape3D", &PhysicsSystem::createCapsuleShape3D)
+        .addFunction("createTaperedCapsuleShape3D", &PhysicsSystem::createTaperedCapsuleShape3D)
+        .addFunction("createCylinderShape3D", &PhysicsSystem::createCylinderShape3D)
+        .addFunction("createConvexHullShape3D", &PhysicsSystem::createConvexHullShape3D)
+        .addFunction("createMeshShape3D", 
+            luabridge::overload<Entity , std::vector<Vector3>, std::vector<uint16_t>>(&PhysicsSystem::createMeshShape3D),
+            luabridge::overload<Entity, MeshComponent&>(&PhysicsSystem::createMeshShape3D))
+        .addFunction("createHeightFieldShape3D", &PhysicsSystem::createHeightFieldShape3D)
+
         .addFunction("loadBody2D", &PhysicsSystem::loadBody2D)
         .addFunction("destroyBody2D", &PhysicsSystem::destroyBody2D)
         .addFunction("loadShape2D", &PhysicsSystem::loadShape2D)
         .addFunction("destroyShape2D", &PhysicsSystem::destroyShape2D)
+
         .addFunction("loadDistanceJoint2D", &PhysicsSystem::loadDistanceJoint2D)
         .addFunction("loadRevoluteJoint2D", &PhysicsSystem::loadRevoluteJoint2D)
         .addFunction("loadPrismaticJoint2D", &PhysicsSystem::loadPrismaticJoint2D)
@@ -142,6 +159,19 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("loadMotorJoint2D", &PhysicsSystem::loadMotorJoint2D)
         .addFunction("loadRopeJoint2D", &PhysicsSystem::loadRopeJoint2D)
         .addFunction("destroyJoint2D", &PhysicsSystem::destroyJoint2D)
+
+        .addFunction("loadFixedJoint3D", &PhysicsSystem::loadFixedJoint3D)
+        .addFunction("loadDistanceJoint3D", &PhysicsSystem::loadDistanceJoint3D)
+        .addFunction("loadPointJoint3D", &PhysicsSystem::loadPointJoint3D)
+        .addFunction("loadHingeJoint3D", &PhysicsSystem::loadHingeJoint3D)
+        .addFunction("loadConeJoint3D", &PhysicsSystem::loadConeJoint3D)
+        .addFunction("loadPrismaticJoint3D", &PhysicsSystem::loadPrismaticJoint3D)
+        .addFunction("loadSwingTwistJoint3D", &PhysicsSystem::loadSwingTwistJoint3D)
+        .addFunction("loadSixDOFJoint3D", &PhysicsSystem::loadSixDOFJoint3D)
+        .addFunction("loadPathJoint3D", &PhysicsSystem::loadPathJoint3D)
+        .addFunction("loadGearJoint3D", &PhysicsSystem::loadGearJoint3D)
+        .addFunction("loadRackAndPinionJoint3D", &PhysicsSystem::loadRackAndPinionJoint3D)
+        .addFunction("loadPulleyJoint3D", &PhysicsSystem::loadPulleyJoint3D)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

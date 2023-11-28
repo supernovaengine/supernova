@@ -37,6 +37,10 @@
 #include "ContactImpulse2D.h"
 #include "Manifold2D.h"
 #include "WorldManifold2D.h"
+#include "Body3D.h"
+#include "Joint3D.h"
+#include "Contact3D.h"
+#include "CollideShapeResult3D.h"
 
 using namespace Supernova;
 
@@ -96,6 +100,22 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("FRICTION", Joint2DType::FRICTION)
         .addProperty("MOTOR", Joint2DType::MOTOR)
         .addProperty("ROPE", Joint2DType::ROPE)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("Joint3DType")
+        .addProperty("FIXED", Joint3DType::FIXED)
+        .addProperty("DISTANCE", Joint3DType::DISTANCE)
+        .addProperty("POINT", Joint3DType::POINT)
+        .addProperty("HINGE", Joint3DType::HINGE)
+        .addProperty("CONE", Joint3DType::CONE)
+        .addProperty("PRISMATIC", Joint3DType::PRISMATIC)
+        .addProperty("SWINGTWIST", Joint3DType::SWINGTWIST)
+        .addProperty("SIXDOF", Joint3DType::SIXDOF)
+        .addProperty("PATH", Joint3DType::PATH)
+        .addProperty("GEAR", Joint3DType::GEAR)
+        .addProperty("RACKANDPINON", Joint3DType::RACKANDPINON)
+        .addProperty("PULLEY", Joint3DType::PULLEY)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
@@ -656,6 +676,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Joint2D>("Joint2D")
+        .addConstructor <void (Scene*), void (Scene*, Entity)> ()
         .addFunction("setDistanceJoint", &Joint2D::setDistanceJoint)
         .addFunction("setRevoluteJoint", &Joint2D::setRevoluteJoint)
         .addFunction("setPrismaticJoint", &Joint2D::setPrismaticJoint)
@@ -756,6 +777,48 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("applyAngularImpulse", &Body3D::applyAngularImpulse)
         .addFunction("applyBuoyancyImpulse", &Body3D::applyBuoyancyImpulse)
         .addFunction("getCenterOfMassPosition", &Body3D::getCenterOfMassPosition)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Joint3D>("Joint3D")
+        .addConstructor <void (Scene*), void (Scene*, Entity)> ()
+        .addFunction("setFixedJoint", &Joint3D::setFixedJoint)
+        .addFunction("setDistanceJoint", &Joint3D::setDistanceJoint)
+        .addFunction("setPointJoint", &Joint3D::setPointJoint)
+        .addFunction("setHingeJoint", &Joint3D::setHingeJoint)
+        .addFunction("setConeJoint", &Joint3D::setConeJoint)
+        .addFunction("setPrismaticJoint", &Joint3D::setPrismaticJoint)
+        .addFunction("setSwingTwistJoint", &Joint3D::setSwingTwistJoint)
+        .addFunction("setSixDOFJoint", &Joint3D::setSixDOFJoint)
+        .addFunction("setPathJoint", &Joint3D::setPathJoint)
+        .addFunction("setGearJoint", &Joint3D::setGearJoint)
+        .addFunction("setRackAndPinionJoint", &Joint3D::setRackAndPinionJoint)
+        .addFunction("setPulleyJoint", &Joint3D::setPulleyJoint)
+        .addFunction("getType", &Joint3D::getType)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Contact3D>("Contact2D")
+        .addFunction("getBaseOffset", &Contact3D::getBaseOffset)
+        .addFunction("getWorldSpaceNormal", &Contact3D::getWorldSpaceNormal)
+        .addFunction("getPenetrationDepth", &Contact3D::getPenetrationDepth)
+        .addFunction("getSubShapeID1", &Contact3D::getSubShapeID1)
+        .addFunction("getSubShapeID12", &Contact3D::getSubShapeID12)
+        .addFunction("getRelativeContactPointsOnA", &Contact3D::getRelativeContactPointsOnA)
+        .addFunction("getRelativeContactPointsOnB", &Contact3D::getRelativeContactPointsOnB)
+        .addProperty("combinedFriction", &Contact3D::getCombinedFriction, &Contact3D::setCombinedFriction)
+        .addProperty("combinedRestitution", &Contact3D::getCombinedRestitution, &Contact3D::setCombinedRestitution)
+        .addProperty("sensor", &Contact3D::isSensor, &Contact3D::setIsSensor)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<CollideShapeResult3D>("CollideShapeResult3D")
+        .addFunction("getContactPointOnA", &CollideShapeResult3D::getContactPointOnA)
+        .addFunction("getContactPointOnB", &CollideShapeResult3D::getContactPointOnB)
+        .addFunction("getPenetrationAxis", &CollideShapeResult3D::getPenetrationAxis)
+        .addFunction("getSubShapeID1", &CollideShapeResult3D::getSubShapeID1)
+        .addFunction("getSubShapeID2", &CollideShapeResult3D::getSubShapeID2)
+        .addFunction("getBodyID2", &CollideShapeResult3D::getBodyID2)
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS
