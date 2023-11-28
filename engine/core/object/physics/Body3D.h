@@ -39,7 +39,7 @@ namespace Supernova{
         void createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices);
         void createHeightFieldShape();
         void createHeightFieldShape(unsigned int samplesSize);
-        //TODO:
+        //TODO: missing compound shapes
         // StaticCompoundShape
         // MutableCompoundShape
 

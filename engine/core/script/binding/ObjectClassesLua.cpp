@@ -731,6 +731,31 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<>(&Body3D::createHeightFieldShape),
             luabridge::overload<unsigned int>(&Body3D::createHeightFieldShape))
         .addProperty("type", &Body3D::getType, &Body3D::setType)
+        .addFunction("canBeKinematicOrDynamic", &Body3D::canBeKinematicOrDynamic)
+        .addProperty("sensor", &Body3D::isSensor, &Body3D::setIsSensor)
+        .addProperty("collisionGroupID", &Body3D::getCollisionGroupID, &Body3D::setCollisionGroupID)
+        .addProperty("sllowSleeping", &Body3D::isAllowSleeping, &Body3D::setAllowSleeping)
+        .addProperty("friction", &Body3D::getFriction, &Body3D::setFriction)
+        .addProperty("restitution", &Body3D::getRestitution, &Body3D::setRestitution)
+        .addProperty("linearVelocity", &Body3D::getLinearVelocity, &Body3D::setLinearVelocity)
+        .addFunction("setLinearVelocityClamped", &Body3D::setLinearVelocityClamped)
+        .addProperty("angularVelocity", &Body3D::getAngularVelocity, &Body3D::setAngularVelocity)
+        .addFunction("setAngularVelocityClamped", &Body3D::setAngularVelocityClamped)
+        .addFunction("getPointVelocityCOM", &Body3D::getPointVelocityCOM)
+        .addFunction("getPointVelocity", &Body3D::getPointVelocity)
+        .addFunction("getAccumulatedForce", &Body3D::getAccumulatedForce)
+        .addFunction("getAccumulatedTorque", &Body3D::getAccumulatedTorque)
+        .addFunction("getInverseInertia", &Body3D::getInverseInertia)
+        .addFunction("applyForce", 
+            luabridge::overload<const Vector3&>(&Body3D::applyForce),
+            luabridge::overload<const Vector3&, const Vector3&>(&Body3D::applyForce))
+        .addFunction("applyTorque", &Body3D::applyTorque)
+        .addFunction("applyImpulse", 
+            luabridge::overload<const Vector3&>(&Body3D::applyImpulse),
+            luabridge::overload<const Vector3&, const Vector3&>(&Body3D::applyImpulse))
+        .addFunction("applyAngularImpulse", &Body3D::applyAngularImpulse)
+        .addFunction("applyBuoyancyImpulse", &Body3D::applyBuoyancyImpulse)
+        .addFunction("getCenterOfMassPosition", &Body3D::getCenterOfMassPosition)
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS
