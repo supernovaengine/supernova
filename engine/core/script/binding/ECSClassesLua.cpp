@@ -144,6 +144,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
 
         .addFunction("loadBody2D", &PhysicsSystem::loadBody2D)
         .addFunction("destroyBody2D", &PhysicsSystem::destroyBody2D)
+        .addFunction("destroyBody3D", &PhysicsSystem::destroyBody3D)
         .addFunction("loadShape2D", &PhysicsSystem::loadShape2D)
         .addFunction("destroyShape2D", &PhysicsSystem::destroyShape2D)
 
@@ -172,6 +173,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("loadGearJoint3D", &PhysicsSystem::loadGearJoint3D)
         .addFunction("loadRackAndPinionJoint3D", &PhysicsSystem::loadRackAndPinionJoint3D)
         .addFunction("loadPulleyJoint3D", &PhysicsSystem::loadPulleyJoint3D)
+        .addFunction("destroyJoint3D", &PhysicsSystem::destroyJoint3D)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

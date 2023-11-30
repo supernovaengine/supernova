@@ -413,7 +413,7 @@ void PhysicsSystem::removeBody3D(Entity entity){
     Signature signature = scene->getSignature(entity);
 
     if (signature.test(scene->getComponentType<Body3DComponent>())){
-        //destroyBody2D(scene->getComponent<Body3DComponent>(entity));
+        destroyBody3D(scene->getComponent<Body3DComponent>(entity));
         scene->removeComponent<Body3DComponent>(entity);
     }
 }
@@ -728,6 +728,15 @@ void PhysicsSystem::destroyBody2D(Body2DComponent& body){
         body.numShapes = 0;
 
         world2D->DestroyBody(body.body);
+
+        body.body = NULL;
+    }
+}
+
+void PhysicsSystem::destroyBody3D(Body3DComponent& body){
+    if (world3D && body.body){
+        JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
+        body_interface.RemoveBody(body.body->GetID());
 
         body.body = NULL;
     }
@@ -1516,6 +1525,14 @@ bool PhysicsSystem::loadPulleyJoint3D(Joint3DComponent& joint, Entity bodyA, Ent
     return true;
 }
 
+void PhysicsSystem::destroyJoint3D(Joint3DComponent& joint){
+    if (world3D && joint.joint){
+        world3D->RemoveConstraint(joint.joint);
+
+        joint.joint = NULL;
+    }
+}
+
 void PhysicsSystem::load(){
 }
 
@@ -1637,7 +1654,13 @@ void PhysicsSystem::entityDestroyed(Entity entity){
     if (signature.test(scene->getComponentType<Body2DComponent>())){
         destroyBody2D(scene->getComponent<Body2DComponent>(entity));
     }
+    if (signature.test(scene->getComponentType<Body3DComponent>())){
+        destroyBody3D(scene->getComponent<Body3DComponent>(entity));
+    }
     if (signature.test(scene->getComponentType<Joint2DComponent>())){
         destroyJoint2D(scene->getComponent<Joint2DComponent>(entity));
+    }
+    if (signature.test(scene->getComponentType<Joint3DComponent>())){
+        destroyJoint3D(scene->getComponent<Joint3DComponent>(entity));
     }
 }

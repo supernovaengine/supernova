@@ -122,6 +122,8 @@ namespace Supernova{
 		bool loadBody2D(Entity entity);
 		void destroyBody2D(Body2DComponent& body);
 
+		void destroyBody3D(Body3DComponent& body);
+
 		bool loadShape2D(Body2DComponent& body, b2Shape* shape, size_t index);
 		void destroyShape2D(Body2DComponent& body, size_t index);
 
@@ -150,6 +152,7 @@ namespace Supernova{
 		bool loadGearJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Entity hingeA, Entity hingeB, int numTeethGearA, int numTeethGearB);
 		bool loadRackAndPinionJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Entity hinge, Entity slider, int numTeethRack, int numTeethGear, int rackLength);
 		bool loadPulleyJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchorA, Vector3 anchorB, Vector3 fixedPointA, Vector3 fixedPointB);
+		void destroyJoint3D(Joint3DComponent& joint);
 
 		virtual void load();
 		virtual void destroy();
