@@ -2,6 +2,7 @@
 #define LUA_FUNCTIONBASE_H
 
 #include <string>
+#include "math/Vector3.h"
 
 typedef struct lua_State lua_State;
 
@@ -11,6 +12,9 @@ namespace Supernova{
     class Contact2D;
     class Manifold2D;
     class ContactImpulse2D;
+    class Body3D;
+    class Contact3D;
+    class CollideShapeResult3D;
 
     // the base function wrapper class
     class LuaFunctionBase{
@@ -35,16 +39,21 @@ namespace Supernova{
         // are implicitly convertible to one of the types
 
         void push_value(lua_State *vm, int n);
+        void push_value(lua_State *vm, unsigned int n);
         void push_value(lua_State *vm, float n);
         void push_value(lua_State *vm, long n);
         void push_value(lua_State *vm, bool b);
         void push_value(lua_State *vm, const std::string &s);
         void push_value(lua_State *vm, wchar_t s);
         void push_value(lua_State *vm, size_t n);
+        void push_value(lua_State *vm, Vector3 n);
         void push_value(lua_State *vm, Body2D o);
         void push_value(lua_State *vm, Contact2D o);
         void push_value(lua_State *vm, Manifold2D o);
         void push_value(lua_State *vm, ContactImpulse2D o);
+        void push_value(lua_State *vm, Body3D o);
+        void push_value(lua_State *vm, Contact3D o);
+        void push_value(lua_State *vm, CollideShapeResult3D o);
 
         // other overloads, for stuff like userdata or C functions
 

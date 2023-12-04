@@ -9,6 +9,9 @@
 #include "object/physics/Contact2D.h"
 #include "object/physics/Manifold2D.h"
 #include "object/physics/ContactImpulse2D.h"
+#include "object/physics/Body3D.h"
+#include "object/physics/Contact3D.h"
+#include "object/physics/CollideShapeResult3D.h"
 #include "LuaBinding.h"
 
 #include "lua.hpp"
@@ -82,6 +85,10 @@ void LuaFunctionBase::push_value(lua_State *vm, int n){
     lua_pushinteger(vm, n); 
 }
 
+void LuaFunctionBase::push_value(lua_State *vm, unsigned int n){ 
+    lua_pushinteger(vm, n); 
+}
+
 void LuaFunctionBase::push_value(lua_State *vm, float n){
     lua_pushnumber(vm, n); 
 }
@@ -106,6 +113,11 @@ void LuaFunctionBase::push_value(lua_State *vm, size_t n){
     lua_pushnumber(vm, n); 
 }
 
+void LuaFunctionBase::push_value(lua_State *vm, Vector3 o){
+    if (!luabridge::push<Vector3>(vm, o))
+        throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
+}
+
 void LuaFunctionBase::push_value(lua_State *vm, Body2D o){
     if (!luabridge::push<Body2D>(vm, o))
         throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
@@ -123,6 +135,21 @@ void LuaFunctionBase::push_value(lua_State *vm, Manifold2D o){
 
 void LuaFunctionBase::push_value(lua_State *vm, ContactImpulse2D o){
     if (!luabridge::push<ContactImpulse2D>(vm, o))
+        throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
+}
+
+void LuaFunctionBase::push_value(lua_State *vm, Body3D o){
+    if (!luabridge::push<Body3D>(vm, o))
+        throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
+}
+
+void LuaFunctionBase::push_value(lua_State *vm, Contact3D o){
+    if (!luabridge::push<Contact3D>(vm, o))
+        throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
+}
+
+void LuaFunctionBase::push_value(lua_State *vm, CollideShapeResult3D o){
+    if (!luabridge::push<CollideShapeResult3D>(vm, o))
         throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
 }
 
