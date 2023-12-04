@@ -24,11 +24,11 @@ namespace Supernova{
         }
         
         bool ShouldCollide(b2Fixture* fixtureA, b2Fixture* fixtureB){
-            size_t shapeIndexA = fixtureA->GetUserData().pointer;
+            unsigned long shapeIndexA = fixtureA->GetUserData().pointer;
             Entity entityA = fixtureA->GetBody()->GetUserData().pointer;
             Body2D bodyA(scene, entityA);
 
-            size_t shapeIndexB = fixtureB->GetUserData().pointer;
+            unsigned long shapeIndexB = fixtureB->GetUserData().pointer;
             Entity entityB = fixtureB->GetBody()->GetUserData().pointer;
             Body2D bodyB(scene, entityB);
 

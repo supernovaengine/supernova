@@ -77,7 +77,7 @@ namespace Supernova{
 		FunctionSubscribe<void(Contact2D, Manifold2D)> preSolve2D;
 		FunctionSubscribe<void(Contact2D, ContactImpulse2D)> postSolve2D;
 
-		FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)> shouldCollide2D;
+		FunctionSubscribe<bool(Body2D, unsigned long, Body2D, unsigned long)> shouldCollide2D;
 
 		FunctionSubscribe<void(Body3D)> onBodyActivated3D;
 		FunctionSubscribe<void(Body3D)> onBodyDeactivated3D;

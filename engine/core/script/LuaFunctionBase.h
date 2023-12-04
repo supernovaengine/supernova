@@ -42,10 +42,10 @@ namespace Supernova{
         void push_value(lua_State *vm, unsigned int n);
         void push_value(lua_State *vm, float n);
         void push_value(lua_State *vm, long n);
+        void push_value(lua_State *vm, unsigned long n);
         void push_value(lua_State *vm, bool b);
         void push_value(lua_State *vm, const std::string &s);
         void push_value(lua_State *vm, wchar_t s);
-        void push_value(lua_State *vm, size_t n);
         void push_value(lua_State *vm, Vector3 n);
         void push_value(lua_State *vm, Body2D o);
         void push_value(lua_State *vm, Contact2D o);

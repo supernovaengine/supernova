@@ -233,10 +233,10 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .beginClass<FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)>>("FunctionSubscribe_B_B2SB2S")
-        .addFunction("__call", &FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)>::call)
-        .addFunction("call", &FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)>::call)
-        .addFunction("add", (bool (FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)>::*)(const std::string&, lua_State*))&FunctionSubscribe<bool(Body2D, size_t, Body2D, size_t)>::add)
+        .beginClass<FunctionSubscribe<bool(Body2D, unsigned long, Body2D, unsigned long)>>("FunctionSubscribe_B_B2ULB2UL")
+        .addFunction("__call", &FunctionSubscribe<bool(Body2D, unsigned long, Body2D, unsigned long)>::call)
+        .addFunction("call", &FunctionSubscribe<bool(Body2D, unsigned long, Body2D, unsigned long)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<bool(Body2D, unsigned long, Body2D, unsigned long)>::*)(const std::string&, lua_State*))&FunctionSubscribe<bool(Body2D, unsigned long, Body2D, unsigned long)>::add)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

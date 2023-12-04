@@ -97,6 +97,10 @@ void LuaFunctionBase::push_value(lua_State *vm, long n){
     lua_pushnumber(vm, n); 
 }
 
+void LuaFunctionBase::push_value(lua_State *vm, unsigned long n){
+    lua_pushnumber(vm, n); 
+}
+
 void LuaFunctionBase::push_value(lua_State *vm, bool b){
     lua_pushboolean(vm, b);
 }
@@ -107,10 +111,6 @@ void LuaFunctionBase::push_value(lua_State *vm, const std::string &s){
 
 void LuaFunctionBase::push_value(lua_State *vm, wchar_t s){
     lua_pushstring(vm, StringUtils::toUTF8(s).c_str());
-}
-
-void LuaFunctionBase::push_value(lua_State *vm, size_t n){
-    lua_pushnumber(vm, n); 
 }
 
 void LuaFunctionBase::push_value(lua_State *vm, Vector3 o){
