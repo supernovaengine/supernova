@@ -798,7 +798,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .beginClass<Contact3D>("Contact2D")
+        .beginClass<Contact3D>("Contact3D")
         .addFunction("getBaseOffset", &Contact3D::getBaseOffset)
         .addFunction("getWorldSpaceNormal", &Contact3D::getWorldSpaceNormal)
         .addFunction("getPenetrationDepth", &Contact3D::getPenetrationDepth)
