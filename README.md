@@ -40,11 +40,10 @@ Live samples: https://samples.supernovaengine.org/
 * 3D audio
 * Cross-platform persistence system
 * Multithreading support
-* 2D physics
+* 2D and 3D physics
 
 ## Upcoming features
 
- * 3D physics
  * Instancing
  * More UI components
  * Water
@@ -84,6 +83,7 @@ https://docs.supernovaengine.org/
 * tinyobjloader - https://github.com/tinyobjloader/tinyobjloader - MIT license
 * tinyxml2 - https://github.com/leethomason/tinyxml2 - Zlib License
 * Box2D - https://github.com/erincatto/box2d - MIT license
+* JoltPhysics - https://github.com/jrouwe/JoltPhysics - MIT license
 
 ## License
 

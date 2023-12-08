@@ -18,10 +18,10 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
 
 	this->scene = scene;
 
-    this->pointsToMeterScale = 64.0;
+    this->gravity = Vector3(0, -9.81f, 0);
+    this->pointsToMeterScale2D = 64.0;
 
-    b2Vec2 gravity(0.0f, 10.0f);
-    world2D = new b2World(gravity);
+    world2D = new b2World(b2Vec2(this->gravity.x, this->gravity.y));
   
     contactListener2D = new Box2DContactListener(scene, this);
     contactFilter2D = new Box2DContactFilter(scene, this);
@@ -54,7 +54,7 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     // Now we can create the actual physics system.
     world3D = new JPH::PhysicsSystem();
     world3D->Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *broad_phase_layer_interface, *object_vs_broadphase_layer_filter, *object_vs_object_layer_filter);
-    world3D->SetGravity(JPH::Vec3(0, -9.81f, 0));
+    world3D->SetGravity(JPH::Vec3(this->gravity.x, this->gravity.y, this->gravity.z));
 
     temp_allocator = new JPH::TempAllocatorImpl(10 * 1024 * 1024);
     job_system = new JPH::JobSystemThreadPool (JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1);
@@ -86,12 +86,24 @@ PhysicsSystem::~PhysicsSystem(){
     //JPH::UnregisterTypes();
 }
 
-float PhysicsSystem::getPointsToMeterScale() const{
-    return pointsToMeterScale;
+Vector3 PhysicsSystem::getGravity() const{
+    return gravity;
 }
 
-void PhysicsSystem::setPointsToMeterScale(float pointsToMeterScale){
-    this->pointsToMeterScale = pointsToMeterScale;
+void PhysicsSystem::setGravity(Vector3 gravity){
+    if (this->gravity != gravity){
+        this->gravity = gravity;
+        world2D->SetGravity(b2Vec2(gravity.x, gravity.y));
+        world3D->SetGravity(JPH::Vec3(gravity.x, gravity.y, gravity.z));
+    }
+}
+
+float PhysicsSystem::getPointsToMeterScale2D() const{
+    return pointsToMeterScale2D;
+}
+
+void PhysicsSystem::setPointsToMeterScale2D(float pointsToMeterScale2D){
+    this->pointsToMeterScale2D = pointsToMeterScale2D;
 }
 
 void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway){
@@ -99,7 +111,7 @@ void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Bod
         Transform& transform = scene->getComponent<Transform>(entity);
 
         if (transform.needUpdate || updateAnyway){
-            b2Vec2 bPosition(transform.position.x / pointsToMeterScale, transform.position.y / pointsToMeterScale);
+            b2Vec2 bPosition(transform.position.x / pointsToMeterScale2D, transform.position.y / pointsToMeterScale2D);
             body.body->SetTransform(bPosition, Angle::defaultToRad(transform.rotation.getRoll()));
         }
     }
@@ -176,9 +188,9 @@ int PhysicsSystem::createRectShape2D(Entity entity, float width, float height){
             // same as shape.SetAsBox but using center on left corner
             shape.m_count = 4;
             shape.m_vertices[0].Set(0, 0);
-            shape.m_vertices[1].Set( width / pointsToMeterScale, 0);
-            shape.m_vertices[2].Set( width / pointsToMeterScale,  height / pointsToMeterScale);
-            shape.m_vertices[3].Set(0,  height / pointsToMeterScale);
+            shape.m_vertices[1].Set( width / pointsToMeterScale2D, 0);
+            shape.m_vertices[2].Set( width / pointsToMeterScale2D,  height / pointsToMeterScale2D);
+            shape.m_vertices[3].Set(0,  height / pointsToMeterScale2D);
             shape.m_normals[0].Set(0.0f, -1.0f);
             shape.m_normals[1].Set(1.0f, 0.0f);
             shape.m_normals[2].Set(0.0f, 1.0f);
@@ -207,9 +219,9 @@ int PhysicsSystem::createCenteredRectShape2D(Entity entity, float width, float h
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
             b2PolygonShape shape;
-            float halfW = width / 2.0 / pointsToMeterScale;
-            float halfH = height / 2.0 / pointsToMeterScale;
-            shape.SetAsBox(halfW, halfH, b2Vec2(center.x / pointsToMeterScale, center.y / pointsToMeterScale), Angle::defaultToRad(angle));
+            float halfW = width / 2.0 / pointsToMeterScale2D;
+            float halfH = height / 2.0 / pointsToMeterScale2D;
+            shape.SetAsBox(halfW, halfH, b2Vec2(center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D), Angle::defaultToRad(angle));
 
             loadShape2D(*body, &shape, body->numShapes);
 
@@ -235,7 +247,7 @@ int PhysicsSystem::createPolygonShape2D(Entity entity, std::vector<Vector2> vert
             b2PolygonShape polygon;
             std::vector<b2Vec2> b2vertices(vertices.size());
             for (int i = 0; i < vertices.size(); i++){
-                b2vertices[i].Set(vertices[i].x / pointsToMeterScale, vertices[i].y / pointsToMeterScale);
+                b2vertices[i].Set(vertices[i].x / pointsToMeterScale2D, vertices[i].y / pointsToMeterScale2D);
             }
             polygon.Set(&b2vertices[0], (int)vertices.size());
 
@@ -261,8 +273,8 @@ int PhysicsSystem::createCircleShape2D(Entity entity, Vector2 center, float radi
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
             b2CircleShape circle;
-            circle.m_p.Set(center.x / pointsToMeterScale, center.y / pointsToMeterScale);
-            circle.m_radius = radius / pointsToMeterScale;
+            circle.m_p.Set(center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D);
+            circle.m_radius = radius / pointsToMeterScale2D;
 
             loadShape2D(*body, &circle, body->numShapes);
 
@@ -286,8 +298,8 @@ int PhysicsSystem::createTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Ve
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
             b2EdgeShape edge;
-            b2Vec2 v1(vertice1.x / pointsToMeterScale, vertice1.y / pointsToMeterScale);
-            b2Vec2 v2(vertice2.x / pointsToMeterScale, vertice2.y / pointsToMeterScale);
+            b2Vec2 v1(vertice1.x / pointsToMeterScale2D, vertice1.y / pointsToMeterScale2D);
+            b2Vec2 v2(vertice2.x / pointsToMeterScale2D, vertice2.y / pointsToMeterScale2D);
             edge.SetTwoSided(v1, v2);
 
             loadShape2D(*body, &edge, body->numShapes);
@@ -312,10 +324,10 @@ int PhysicsSystem::createOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Ve
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
             b2EdgeShape edge;
-            b2Vec2 v0(vertice0.x / pointsToMeterScale, vertice0.y / pointsToMeterScale);
-            b2Vec2 v1(vertice1.x / pointsToMeterScale, vertice1.y / pointsToMeterScale);
-            b2Vec2 v2(vertice2.x / pointsToMeterScale, vertice2.y / pointsToMeterScale);
-            b2Vec2 v3(vertice3.x / pointsToMeterScale, vertice3.y / pointsToMeterScale);
+            b2Vec2 v0(vertice0.x / pointsToMeterScale2D, vertice0.y / pointsToMeterScale2D);
+            b2Vec2 v1(vertice1.x / pointsToMeterScale2D, vertice1.y / pointsToMeterScale2D);
+            b2Vec2 v2(vertice2.x / pointsToMeterScale2D, vertice2.y / pointsToMeterScale2D);
+            b2Vec2 v3(vertice3.x / pointsToMeterScale2D, vertice3.y / pointsToMeterScale2D);
             edge.SetOneSided(v0, v1, v2, v3);
 
             loadShape2D(*body, &edge, body->numShapes);
@@ -342,7 +354,7 @@ int PhysicsSystem::createLoopChainShape2D(Entity entity, std::vector<Vector2> ve
             b2ChainShape chain;
             std::vector<b2Vec2> b2vertices(vertices.size());
             for (int i = 0; i < vertices.size(); i++){
-                b2vertices[i].Set(vertices[i].x / pointsToMeterScale, vertices[i].y / pointsToMeterScale);
+                b2vertices[i].Set(vertices[i].x / pointsToMeterScale2D, vertices[i].y / pointsToMeterScale2D);
             }
             chain.CreateLoop(&b2vertices[0], (int)vertices.size());
 
@@ -370,10 +382,10 @@ int PhysicsSystem::createChainShape2D(Entity entity, std::vector<Vector2> vertic
             b2ChainShape chain;
             std::vector<b2Vec2> b2vertices(vertices.size());
             for (int i = 0; i < vertices.size(); i++){
-                b2vertices[i].Set(vertices[i].x / pointsToMeterScale, vertices[i].y / pointsToMeterScale);
+                b2vertices[i].Set(vertices[i].x / pointsToMeterScale2D, vertices[i].y / pointsToMeterScale2D);
             }
-            b2Vec2 pv(prevVertex.x / pointsToMeterScale, prevVertex.y / pointsToMeterScale);
-            b2Vec2 nv(nextVertex.x / pointsToMeterScale, nextVertex.y / pointsToMeterScale);
+            b2Vec2 pv(prevVertex.x / pointsToMeterScale2D, prevVertex.y / pointsToMeterScale2D);
+            b2Vec2 nv(nextVertex.x / pointsToMeterScale2D, nextVertex.y / pointsToMeterScale2D);
             chain.CreateChain(&b2vertices[0], (int)vertices.size(), pv, nv);
 
             loadShape2D(*body, &chain, body->numShapes);
@@ -776,8 +788,8 @@ bool PhysicsSystem::loadDistanceJoint2D(Joint2DComponent& joint, Entity bodyA, E
         updateBody2DPosition(signatureA, bodyA, myBodyA, true);
         updateBody2DPosition(signatureB, bodyB, myBodyB, true);
 
-        b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale, anchorA.y / pointsToMeterScale);
-        b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale, anchorB.y / pointsToMeterScale);
+        b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D);
+        b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D);
 
         b2DistanceJointDef jointDef;
         jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchorA, myAnchorB);
@@ -805,7 +817,7 @@ bool PhysicsSystem::loadRevoluteJoint2D(Joint2DComponent& joint, Entity bodyA, E
         updateBody2DPosition(signatureA, bodyA, myBodyA, true);
         updateBody2DPosition(signatureB, bodyB, myBodyB, true);
 
-        b2Vec2 myAnchor(anchor.x / pointsToMeterScale, anchor.y / pointsToMeterScale);
+        b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
 
         b2RevoluteJointDef jointDef;
         jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchor);
@@ -833,7 +845,7 @@ bool PhysicsSystem::loadPrismaticJoint2D(Joint2DComponent& joint, Entity bodyA, 
         updateBody2DPosition(signatureA, bodyA, myBodyA, true);
         updateBody2DPosition(signatureB, bodyB, myBodyB, true);
 
-        b2Vec2 myAnchor(anchor.x / pointsToMeterScale, anchor.y / pointsToMeterScale);
+        b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
         b2Vec2 myAxis(axis.x, axis.y);
 
         b2PrismaticJointDef jointDef;
@@ -862,10 +874,10 @@ bool PhysicsSystem::loadPulleyJoint2D(Joint2DComponent& joint, Entity bodyA, Ent
         updateBody2DPosition(signatureA, bodyA, myBodyA, true);
         updateBody2DPosition(signatureB, bodyB, myBodyB, true);
 
-        b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale, anchorA.y / pointsToMeterScale);
-        b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale, anchorB.y / pointsToMeterScale);
-        b2Vec2 myGroundA(groundAnchorA.x / pointsToMeterScale, groundAnchorA.y / pointsToMeterScale);
-        b2Vec2 myGroundB(groundAnchorB.x / pointsToMeterScale, groundAnchorB.y / pointsToMeterScale);
+        b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D);
+        b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D);
+        b2Vec2 myGroundA(groundAnchorA.x / pointsToMeterScale2D, groundAnchorA.y / pointsToMeterScale2D);
+        b2Vec2 myGroundB(groundAnchorB.x / pointsToMeterScale2D, groundAnchorB.y / pointsToMeterScale2D);
 
         b2PulleyJointDef jointDef;
         jointDef.Initialize(myBodyA.body, myBodyB.body, myGroundA, myGroundB, myAnchorA, myAnchorB, ratio);
@@ -933,7 +945,7 @@ bool PhysicsSystem::loadMouseJoint2D(Joint2DComponent& joint, Entity body, Vecto
 
         updateBody2DPosition(signature, body, myBody, true);
 
-        b2Vec2 myTarget(target.x / pointsToMeterScale, target.y / pointsToMeterScale);
+        b2Vec2 myTarget(target.x / pointsToMeterScale2D, target.y / pointsToMeterScale2D);
 
         b2MouseJointDef jointDef;
         jointDef.bodyA = myBody.body;
@@ -963,7 +975,7 @@ bool PhysicsSystem::loadWheelJoint2D(Joint2DComponent& joint, Entity bodyA, Enti
         updateBody2DPosition(signatureA, bodyA, myBodyA, true);
         updateBody2DPosition(signatureB, bodyB, myBodyB, true);
 
-        b2Vec2 myAnchor(anchor.x / pointsToMeterScale, anchor.y / pointsToMeterScale);
+        b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
         b2Vec2 myAxis(axis.x, axis.y);
 
         b2WheelJointDef jointDef;
@@ -992,7 +1004,7 @@ bool PhysicsSystem::loadWeldJoint2D(Joint2DComponent& joint, Entity bodyA, Entit
         updateBody2DPosition(signatureA, bodyA, myBodyA, true);
         updateBody2DPosition(signatureB, bodyB, myBodyB, true);
 
-        b2Vec2 myAnchor(anchor.x / pointsToMeterScale, anchor.y / pointsToMeterScale);
+        b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
 
         b2WeldJointDef jointDef;
         jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchor);
@@ -1020,7 +1032,7 @@ bool PhysicsSystem::loadFrictionJoint2D(Joint2DComponent& joint, Entity bodyA, E
         updateBody2DPosition(signatureA, bodyA, myBodyA, true);
         updateBody2DPosition(signatureB, bodyB, myBodyB, true);
 
-        b2Vec2 myAnchor(anchor.x / pointsToMeterScale, anchor.y / pointsToMeterScale);
+        b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
 
         b2FrictionJointDef jointDef;
         jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchor);
@@ -1074,8 +1086,8 @@ bool PhysicsSystem::loadRopeJoint2D(Joint2DComponent& joint, Entity bodyA, Entit
         updateBody2DPosition(signatureA, bodyA, myBodyA, true);
         updateBody2DPosition(signatureB, bodyB, myBodyB, true);
 
-        b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale, anchorA.y / pointsToMeterScale);
-        b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale, anchorB.y / pointsToMeterScale);
+        b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D);
+        b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D);
 
         b2DistanceJointDef jointDef;
         jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchorA, myAnchorB);
@@ -1574,7 +1586,7 @@ void PhysicsSystem::update(double dt){
             if (signature.test(scene->getComponentType<Transform>())){
                 Transform& transform = scene->getComponent<Transform>(entity);
 
-                Vector3 nPosition = Vector3(position.x * pointsToMeterScale, position.y * pointsToMeterScale, transform.worldPosition.z);
+                Vector3 nPosition = Vector3(position.x * pointsToMeterScale2D, position.y * pointsToMeterScale2D, transform.worldPosition.z);
                 if (transform.position != nPosition){
                     transform.position = nPosition;
                     transform.needUpdate = true;

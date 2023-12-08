@@ -37,7 +37,7 @@ const b2Manifold* Manifold2D::getBox2DManifold() const{
 
 Vector2 Manifold2D::getManifoldPointLocalPoint(int32_t index) const{
     //TODO: check index by b2_maxManifoldPoints
-    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
     b2Vec2 localPoint = manifold->points[index].localPoint;
     return Vector2(localPoint.x * pointsToMeterScale, localPoint.y * pointsToMeterScale);
 }
@@ -54,12 +54,12 @@ float Manifold2D::getManifoldPointTangentImpulse(int32_t index) const{
 
 
 Vector2 Manifold2D::getLocalNormal() const{
-    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
     return Vector2(manifold->localNormal.x * pointsToMeterScale, manifold->localNormal.y * pointsToMeterScale);
 }
 
 Vector2 Manifold2D::getLocalPoint() const{
-    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
     return Vector2(manifold->localPoint.x * pointsToMeterScale, manifold->localPoint.y * pointsToMeterScale);
 }
 

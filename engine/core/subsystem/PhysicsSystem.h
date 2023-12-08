@@ -43,8 +43,10 @@ namespace Supernova{
 	class PhysicsSystem : public SubSystem {
 
 	private:
+		Vector3 gravity;
+
 		b2World* world2D;
-		float pointsToMeterScale;
+		float pointsToMeterScale2D;
 
 		Box2DContactListener* contactListener2D;
 		Box2DContactFilter* contactFilter2D;
@@ -69,8 +71,11 @@ namespace Supernova{
 		PhysicsSystem(Scene* scene);
 		virtual ~PhysicsSystem();
 
-		float getPointsToMeterScale() const;
-		void setPointsToMeterScale(float pointsToMeterScale);
+		Vector3 getGravity() const;
+		void setGravity(Vector3 gravity);
+
+		float getPointsToMeterScale2D() const;
+		void setPointsToMeterScale2D(float pointsToMeterScale2D);
 
 		FunctionSubscribe<void(Contact2D)> beginContact2D;
 		FunctionSubscribe<void(Contact2D)> endContact2D;

@@ -217,7 +217,7 @@ float Body2D::getShapeRestitution(size_t index) const{
 
 void Body2D::setLinearVelocity(Vector2 linearVelocity){
     Body2DComponent& body = getComponent<Body2DComponent>();
-    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
     body.body->SetLinearVelocity(b2Vec2(linearVelocity.x * pointsToMeterScale, linearVelocity.y * pointsToMeterScale));
 }
@@ -285,7 +285,7 @@ void Body2D::setGravityScale(float gravityScale){
 Vector2 Body2D::getLinearVelocity() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
     b2Vec2 vec = body.body->GetLinearVelocity();
 
     return Vector2(vec.x / pointsToMeterScale, vec.y / pointsToMeterScale);
@@ -467,7 +467,7 @@ float Body2D::getInertia() const{
 
 Vector2 Body2D::getLinearVelocityFromWorldPoint(Vector2 worldPoint) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
-    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
     b2Vec2 ret = body.body->GetLinearVelocityFromWorldPoint(b2Vec2(worldPoint.x / pointsToMeterScale, worldPoint.y / pointsToMeterScale));
 
@@ -476,7 +476,7 @@ Vector2 Body2D::getLinearVelocityFromWorldPoint(Vector2 worldPoint) const{
 
 void Body2D::applyForce(const Vector2& force, const Vector2& point, bool wake){
     Body2DComponent& body = getComponent<Body2DComponent>();
-    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
     body.body->ApplyForce(b2Vec2(force.x, force.y), b2Vec2(point.x / pointsToMeterScale, point.y / pointsToMeterScale), wake);
 }
@@ -495,7 +495,7 @@ void Body2D::applyTorque(float torque, bool wake){
 
 void Body2D::applyLinearImpulse(const Vector2& impulse, const Vector2& point, bool wake){
     Body2DComponent& body = getComponent<Body2DComponent>();
-    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale();
+    float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
     body.body->ApplyLinearImpulse(b2Vec2(impulse.x, impulse.y), b2Vec2(point.x / pointsToMeterScale, point.y / pointsToMeterScale), wake);
 }
