@@ -73,6 +73,8 @@ namespace Supernova{
 
 		Vector3 getGravity() const;
 		void setGravity(Vector3 gravity);
+		void setGravity(float x, float y);
+		void setGravity(float x, float y, float z);
 
 		float getPointsToMeterScale2D() const;
 		void setPointsToMeterScale2D(float pointsToMeterScale2D);

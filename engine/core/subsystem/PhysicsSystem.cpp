@@ -98,6 +98,14 @@ void PhysicsSystem::setGravity(Vector3 gravity){
     }
 }
 
+void PhysicsSystem::setGravity(float x, float y){
+    setGravity(Vector3(x, y, 0));
+}
+
+void PhysicsSystem::setGravity(float x, float y, float z){
+    setGravity(Vector3(x, y, z));
+}
+
 float PhysicsSystem::getPointsToMeterScale2D() const{
     return pointsToMeterScale2D;
 }
