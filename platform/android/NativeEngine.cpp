@@ -15,6 +15,7 @@
 
 #include "SupernovaAndroid.h"
 #include "Engine.h"
+#include "Input.h"
 #include "Log.h"
 
 #define MAX_GL_ERRORS 200

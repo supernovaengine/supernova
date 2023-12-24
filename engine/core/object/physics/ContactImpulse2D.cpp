@@ -13,7 +13,6 @@ ContactImpulse2D::ContactImpulse2D(const b2ContactImpulse* contactImpulse){
 }
 
 ContactImpulse2D::~ContactImpulse2D(){
-    this->contactImpulse = contactImpulse;
 }
 
 ContactImpulse2D::ContactImpulse2D(const ContactImpulse2D& rhs){
