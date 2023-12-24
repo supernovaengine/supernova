@@ -1,7 +1,7 @@
 #ifndef ROTATETRACKS_COMPONENT_H
 #define ROTATETRACKS_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 
 namespace Supernova{
 

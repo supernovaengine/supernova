@@ -1,7 +1,7 @@
 #ifndef SPRITEANIMATION_COMPONENT_H
 #define SPRITEANIMATION_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 
 namespace Supernova{
 

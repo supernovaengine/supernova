@@ -1,7 +1,7 @@
 #ifndef KEYFRAMETRACKS_COMPONENT_H
 #define KEYFRAMETRACKS_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 
 namespace Supernova{
 

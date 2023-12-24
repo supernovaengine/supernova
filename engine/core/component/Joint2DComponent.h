@@ -1,7 +1,7 @@
 #ifndef JOINT2D_COMPONENT_H
 #define JOINT2D_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 
 class b2JointDef;
 class b2Joint;

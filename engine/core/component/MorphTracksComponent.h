@@ -1,7 +1,7 @@
 #ifndef MORPHTRACKS_COMPONENT_H
 #define MORPHTRACKS_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 
 namespace Supernova{
 

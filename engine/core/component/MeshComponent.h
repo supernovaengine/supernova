@@ -1,7 +1,7 @@
 #ifndef MESH_COMPONENT_H
 #define MESH_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 #include "math/Vector3.h"
 #include "math/Quaternion.h"
 #include "buffer/Buffer.h"

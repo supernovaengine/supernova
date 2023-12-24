@@ -1,7 +1,7 @@
 #ifndef BODY2D_COMPONENT_H
 #define BODY2D_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 
 #define MAX_SHAPES 10
 

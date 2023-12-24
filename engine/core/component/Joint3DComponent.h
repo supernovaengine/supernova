@@ -1,7 +1,7 @@
 #ifndef JOINT3D_COMPONENT_H
 #define JOINT3D_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 
 namespace JPH{
     class TwoBodyConstraint;

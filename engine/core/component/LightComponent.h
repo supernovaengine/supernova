@@ -5,7 +5,7 @@
 #include "component/CameraComponent.h"
 #include "component/Transform.h"
 #include "render/FramebufferRender.h"
-#include "Supernova.h"
+#include "Engine.h"
 
 namespace Supernova{
 

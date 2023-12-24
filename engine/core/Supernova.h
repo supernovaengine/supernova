@@ -5,62 +5,179 @@
 #ifndef supernova_h
 #define supernova_h
 
-#ifndef MAX_SCENE_LAYERS
-#define MAX_SCENE_LAYERS 5
-#endif
-
-#ifndef MAX_LIGHTS
-#define MAX_LIGHTS 6
-#endif
-
-#ifndef MAX_SHADOWSMAP
-#define MAX_SHADOWSMAP 6
-#endif
-
-#ifndef MAX_SHADOWSCUBEMAP
-#define MAX_SHADOWSCUBEMAP 1
-#endif
-
-#ifndef MAX_SHADOWCASCADES
-#define MAX_SHADOWCASCADES 4
-#endif
-
-#ifndef MAX_SUBMESHES
-#define MAX_SUBMESHES 4
-#endif
-
-#ifndef MAX_TILEMAP_TILESRECT
-#define MAX_TILEMAP_TILESRECT 200
-#endif
-
-#ifndef MAX_TILEMAP_TILES
-#define MAX_TILEMAP_TILES 200
-#endif
-
-#ifndef MAX_SPRITE_FRAMES
-#define MAX_SPRITE_FRAMES 64
-#endif
-
-#ifndef MAX_BONES
-#define MAX_BONES 70
-#endif
-
-#ifndef MAX_MORPHTARGETS
-#define MAX_MORPHTARGETS 8
-#endif
-
-#ifndef MAX_EXTERNAL_BUFFERS
-#define MAX_EXTERNAL_BUFFERS 10
-#endif
-
-// to prevent tiled texture getting part of neighborhood tile
-#ifndef TEXTURE_CUT_FACTOR
-#define TEXTURE_CUT_FACTOR 1.0
-#endif
-
 #include "Engine.h"
+#include "Log.h"
 #include "Input.h"
+#include "Scene.h"
+#include "System.h"
 
-void init();
+#include "action/Action.h"
+#include "action/AlphaAction.h"
+#include "action/Animation.h"
+#include "action/ColorAction.h"
+#include "action/Ease.h"
+#include "action/keyframe/MorphTracks.h"
+#include "action/keyframe/RotateTracks.h"
+#include "action/keyframe/ScaleTracks.h"
+#include "action/keyframe/TranslateTracks.h"
+#include "action/ParticlesAnimation.h"
+#include "action/PositionAction.h"
+#include "action/RotationAction.h"
+#include "action/ScaleAction.h"
+#include "action/SpriteAnimation.h"
+#include "action/TimedAction.h"
+
+#include "buffer/Attribute.h"
+#include "buffer/Buffer.h"
+#include "buffer/ExternalBuffer.h"
+#include "buffer/IndexBuffer.h"
+#include "buffer/InterleavedBuffer.h"
+
+#include "component/ActionComponent.h"
+#include "component/AlphaActionComponent.h"
+#include "component/AnimationComponent.h"
+#include "component/AudioComponent.h"
+#include "component/Body2DComponent.h"
+#include "component/Body3DComponent.h"
+#include "component/BoneComponent.h"
+#include "component/ButtonComponent.h"
+#include "component/CameraComponent.h"
+#include "component/ColorActionComponent.h"
+#include "component/FogComponent.h"
+#include "component/ImageComponent.h"
+#include "component/Joint2DComponent.h"
+#include "component/Joint3DComponent.h"
+#include "component/KeyframeTracksComponent.h"
+#include "component/LightComponent.h"
+#include "component/MeshComponent.h"
+#include "component/MeshPolygonComponent.h"
+#include "component/ModelComponent.h"
+#include "component/MorphTracksComponent.h"
+#include "component/ParticlesAnimationComponent.h"
+#include "component/ParticlesComponent.h"
+#include "component/PolygonComponent.h"
+#include "component/PositionActionComponent.h"
+#include "component/RotateTracksComponent.h"
+#include "component/RotationActionComponent.h"
+#include "component/ScaleActionComponent.h"
+#include "component/ScaleTracksComponent.h"
+#include "component/SkyComponent.h"
+#include "component/SpriteAnimationComponent.h"
+#include "component/SpriteComponent.h"
+#include "component/TerrainComponent.h"
+#include "component/TextComponent.h"
+#include "component/TextEditComponent.h"
+#include "component/TilemapComponent.h"
+#include "component/TimedActionComponent.h"
+#include "component/Transform.h"
+#include "component/TranslateTracksComponent.h"
+#include "component/UIComponent.h"
+#include "component/UIContainerComponent.h"
+#include "component/UILayoutComponent.h"
+
+#include "ecs/ComponentArray.h"
+#include "ecs/ComponentManager.h"
+#include "ecs/Entity.h"
+#include "ecs/EntityManager.h"
+#include "ecs/Signature.h"
+#include "ecs/SubSystem.h"
+
+#include "io/Data.h"
+#include "io/FileData.h"
+#include "io/File.h"
+#include "io/UserSettings.h"
+
+#include "math/AlignedBox.h"
+#include "math/Matrix3.h"
+#include "math/Matrix4.h"
+#include "math/Plane.h"
+#include "math/Quaternion.h"
+#include "math/Ray.h"
+#include "math/Rect.h"
+#include "math/Vector2.h"
+#include "math/Vector3.h"
+#include "math/Vector4.h"
+
+#include "object/audio/Audio.h"
+#include "object/Bone.h"
+#include "object/Camera.h"
+#include "object/EntityHandle.h"
+#include "object/environment/Fog.h"
+#include "object/environment/SkyBox.h"
+#include "object/Light.h"
+#include "object/Mesh.h"
+#include "object/MeshPolygon.h"
+#include "object/Model.h"
+#include "object/Object.h"
+#include "object/Particles.h"
+#include "object/physics/Body2D.h"
+#include "object/physics/Body3D.h"
+#include "object/physics/CollideShapeResult3D.h"
+#include "object/physics/Contact2D.h"
+#include "object/physics/Contact3D.h"
+#include "object/physics/ContactImpulse2D.h"
+#include "object/physics/Joint2D.h"
+#include "object/physics/Joint3D.h"
+#include "object/physics/Manifold2D.h"
+#include "object/physics/WorldManifold2D.h"
+#include "object/Shape.h"
+#include "object/Sprite.h"
+#include "object/Terrain.h"
+#include "object/Tilemap.h"
+#include "object/ui/Button.h"
+#include "object/ui/Container.h"
+#include "object/ui/Image.h"
+#include "object/ui/Polygon.h"
+#include "object/ui/TextEdit.h"
+#include "object/ui/Text.h"
+#include "object/ui/UILayout.h"
+
+//#include "pool/FontPool.h"
+#include "pool/ShaderPool.h"
+#include "pool/TextureDataPool.h"
+#include "pool/TexturePool.h"
+#include "render/BufferRender.h"
+#include "render/FramebufferRender.h"
+#include "render/ObjectRender.h"
+#include "render/Render.h"
+#include "render/SceneRender.h"
+#include "render/ShaderRender.h"
+#include "render/SystemRender.h"
+#include "render/TextureRender.h"
+
+#include "script/LuaBinding.h"
+//#include "script/LuaBridgeAddon.h"
+#include "script/LuaFunctionBase.h"
+#include "script/LuaFunction.h"
+#include "script/LuaScript.h"
+
+#include "shader/SBSReader.h"
+#include "shader/ShaderData.h"
+
+#include "subsystem/ActionSystem.h"
+#include "subsystem/AudioSystem.h"
+#include "subsystem/MeshSystem.h"
+#include "subsystem/PhysicsSystem.h"
+#include "subsystem/RenderSystem.h"
+#include "subsystem/UISystem.h"
+
+#include "texture/Framebuffer.h"
+#include "texture/Material.h"
+#include "texture/TextureData.h"
+#include "texture/Texture.h"
+
+#include "util/Angle.h"
+#include "util/Base64.h"
+//#include "util/Box2DAux.h"
+#include "util/Color.h"
+//#include "util/DefaultFont.h"
+#include "util/FrameData.h"
+#include "util/FunctionSubscribe.h"
+//#include "util/JoltPhysicsAux.h"
+//#include "util/STBText.h"
+#include "util/StringUtils.h"
+#include "util/ThreadUtils.h"
+#include "util/UniqueToken.h"
+//#include "util/XMLUtils.h"
 
 #endif /* supernova_h */

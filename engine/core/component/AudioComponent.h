@@ -1,7 +1,7 @@
 #ifndef AUDIO_COMPONENT_H
 #define AUDIO_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 
 namespace SoLoud{
     class Wav;

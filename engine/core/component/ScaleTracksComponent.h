@@ -1,7 +1,7 @@
 #ifndef SCALETRACKS_COMPONENT_H
 #define SCALETRACKS_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 
 namespace Supernova{
 

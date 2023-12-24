@@ -1,7 +1,7 @@
 #ifndef ACTION_COMPONENT_H
 #define ACTION_COMPONENT_H
 
-#include "Supernova.h"
+#include "Engine.h"
 
 namespace Supernova{
 

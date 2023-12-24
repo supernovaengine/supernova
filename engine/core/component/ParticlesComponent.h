@@ -4,7 +4,7 @@
 #include "buffer/Buffer.h"
 #include "texture/Texture.h"
 #include "util/FrameData.h"
-#include "Supernova.h"
+#include "Engine.h"
 #include "buffer/ExternalBuffer.h"
 
 namespace Supernova{

@@ -22,7 +22,7 @@
 #include "render/SceneRender.h"
 #include "render/BufferRender.h"
 #include "render/FramebufferRender.h"
-#include "Supernova.h"
+#include "Engine.h"
 #include <map>
 #include <memory>
 #include <queue>

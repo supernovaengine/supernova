@@ -2,7 +2,7 @@
 #define SPRITE_COMPONENT_H
 
 #include "util/FrameData.h"
-#include "Supernova.h"
+#include "Engine.h"
 
 namespace Supernova{
 
