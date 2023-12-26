@@ -13,6 +13,8 @@
 
 - (void)initializeAdMob:(Boolean)tagForChildDirectedTreatment and:(Boolean)tagForUnderAgeOfConsent;
 
+- (void)setMaxAdContentRating:(int)rating;
+
 - (void)loadInterstitial:(nonnull NSString *)adUnitID;
 
 - (bool)isInterstitialAdLoaded;

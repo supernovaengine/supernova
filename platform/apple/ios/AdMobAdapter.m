@@ -39,7 +39,21 @@
     [self setTagForUnderAgeOfConsent: tagForUnderAgeOfConsent];
     
     [self requestConsent: (tagForChildDirectedTreatment || tagForUnderAgeOfConsent)];
-    
+}
+
+- (void)setMaxAdContentRating:(int)rating {
+    if (rating == 1){
+        GADMobileAds.sharedInstance.requestConfiguration.maxAdContentRating = 
+            GADMaxAdContentRatingGeneral;
+    }else if (rating == 2){
+        GADMobileAds.sharedInstance.requestConfiguration.maxAdContentRating = GADMaxAdContentRatingParentalGuidance;
+    }else if (rating == 3){
+        GADMobileAds.sharedInstance.requestConfiguration.maxAdContentRating =
+            GADMaxAdContentRatingTeen;
+    }else if (rating == 4){
+        GADMobileAds.sharedInstance.requestConfiguration.maxAdContentRating =
+            GADMaxAdContentRatingMatureAudience;
+    }
 }
 
 - (void)setTagForChildDirectedTreatment:(Boolean)tagForChildDirectedTreatment {

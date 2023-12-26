@@ -198,6 +198,22 @@ void SupernovaApple::initializeAdMob(bool tagForChildDirectedTreatment, bool tag
 #endif
 }
 
+void SupernovaApple::setMaxAdContentRating(Supernova::AdMobRating rating){
+    int irating = 0;
+    if (rating == Supernova::AdMobRating::General){
+        irating = 1;
+    }else if (rating == Supernova::AdMobRating::ParentalGuidance){
+        irating = 2;
+    }else if (rating == Supernova::AdMobRating::Teen){
+        irating = 3;
+    }else if (rating == Supernova::AdMobRating::MatureAudience){
+        irating = 4;
+    }
+#if TARGET_OS_IPHONE
+    [admob setMaxAdContentRating: irating];
+#endif
+}
+
 void SupernovaApple::loadInterstitialAd(std::string adUnitID){
 #if TARGET_OS_IPHONE
     [admob loadInterstitial:[NSString stringWithUTF8String:adUnitID.c_str()]];
