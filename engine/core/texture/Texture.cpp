@@ -235,6 +235,15 @@ bool Texture::load(){
     if (framebuffer)
         return true;
 
+    if (data){
+        return true;
+    }else{
+        data = TextureDataPool::get(id);
+        if (data){
+            return true;
+        }
+    }
+
     if (!needLoad)
         return false;
 
@@ -242,13 +251,6 @@ bool Texture::load(){
 	if (type == TextureType::TEXTURE_CUBE){
 		numFaces = 6;
 	}
-
-    if (!data){
-        data = TextureDataPool::get(id);
-        if (data){
-            return false;
-        }
-    }
 
     if (loadFromPath){
         this->data = std::make_shared<std::array<TextureData,6>>();

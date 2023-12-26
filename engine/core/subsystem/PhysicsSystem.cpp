@@ -700,7 +700,7 @@ void PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& te
             Log::error("Cannot create shape for 3D Body: %u", entity);
         }
 
-        delete samples;
+        delete[] samples;
     }
 }
 
