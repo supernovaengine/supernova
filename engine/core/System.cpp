@@ -211,6 +211,10 @@ void System::initializeAdMob(bool tagForChildDirectedTreatment, bool tagForUnder
     Log::error("Cannot initialize AdMob in this system");
 }
 
+void System::setMaxAdContentRating(AdMobRating rating){
+    Log::error("Cannot set AdMob rating in this system");
+}
+
 void System::loadInterstitialAd(std::string adUnitID){
     Log::error("Cannot load InterstitialAd in this system");
 }

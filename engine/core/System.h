@@ -17,6 +17,13 @@
 #include "sokol_gfx.h"
 
 namespace Supernova {
+    enum class AdMobRating{
+        General,
+        ParentalGuidance,
+        Teen,
+        MatureAudience
+    };
+
     class System {
     protected:
 
@@ -80,6 +87,7 @@ namespace Supernova {
 
         // Google AdMob SDK
         virtual void initializeAdMob(bool tagForChildDirectedTreatment = false, bool tagForUnderAgeOfConsent = false);
+        virtual void setMaxAdContentRating(AdMobRating rating);
         virtual void loadInterstitialAd(std::string adUnitID);
         virtual bool isInterstitialAdLoaded();
         virtual void showInterstitialAd();

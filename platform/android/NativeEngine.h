@@ -42,6 +42,7 @@ struct JniData{
     jmethodID removeKeyRef;
 
     jmethodID initializeAdMob;
+    jmethodID setMaxAdContentRating;
     jmethodID loadInterstitialAd;
     jmethodID isInterstitialAdLoaded;
     jmethodID showInterstitialAd;

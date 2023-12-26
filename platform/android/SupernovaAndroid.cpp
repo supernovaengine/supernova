@@ -217,6 +217,24 @@ void SupernovaAndroid::initializeAdMob(bool tagForChildDirectedTreatment, bool t
     env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.initializeAdMob, tagForChildDirectedTreatment, tagForUnderAgeOfConsent);
 }
 
+void SupernovaAndroid::setMaxAdContentRating(Supernova::AdMobRating rating){
+    int irating = 0;
+    if (rating == Supernova::AdMobRating::General){
+        irating = 1;
+    }else if (rating == Supernova::AdMobRating::ParentalGuidance){
+        irating = 2;
+    }else if (rating == Supernova::AdMobRating::Teen){
+        irating = 3;
+    }else if (rating == Supernova::AdMobRating::MatureAudience){
+        irating = 4;
+    }
+
+    JniData& jniData = NativeEngine::getInstance()->getJniData();
+    JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
+
+    env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.setMaxAdContentRating, irating);
+}
+
 void SupernovaAndroid::loadInterstitialAd(std::string adUnitID){
     JniData& jniData = NativeEngine::getInstance()->getJniData();
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();

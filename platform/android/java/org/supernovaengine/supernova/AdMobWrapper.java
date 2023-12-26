@@ -53,6 +53,31 @@ public class AdMobWrapper {
         });
     }
 
+    private void setMaxAdContentRating(int rating){
+        activity.runOnUiThread(new Runnable() {
+            @Override public void run() {
+                String tagValue;
+                if (rating == 1) {
+                    tagValue = RequestConfiguration.MAX_AD_CONTENT_RATING_G;
+                }else if (rating == 2){
+                    tagValue = RequestConfiguration.MAX_AD_CONTENT_RATING_PG;
+                }else if (rating == 3){
+                    tagValue = RequestConfiguration.MAX_AD_CONTENT_RATING_T;
+                }else if (rating == 4){
+                    tagValue = RequestConfiguration.MAX_AD_CONTENT_RATING_MA;
+                }else{
+                    tagValue = RequestConfiguration.MAX_AD_CONTENT_RATING_UNSPECIFIED;
+                }
+
+                RequestConfiguration requestConfiguration = MobileAds.getRequestConfiguration()
+                        .toBuilder()
+                        .setMaxAdContentRating(tagValue)
+                        .build();
+                MobileAds.setRequestConfiguration(requestConfiguration);
+            }
+        });
+    }
+
     private void setTagForChildDirectedTreatment(boolean enable){
         activity.runOnUiThread(new Runnable() {
             @Override public void run() {

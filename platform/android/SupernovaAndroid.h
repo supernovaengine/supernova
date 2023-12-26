@@ -43,6 +43,7 @@ public:
 	virtual void removeKey(const char* key);
 
 	virtual void initializeAdMob(bool tagForChildDirectedTreatment, bool tagForUnderAgeOfConsent);
+    virtual void setMaxAdContentRating(Supernova::AdMobRating rating);
 	virtual void loadInterstitialAd(std::string adUnitID);
 	virtual bool isInterstitialAdLoaded();
 	virtual void showInterstitialAd();
