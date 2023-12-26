@@ -106,6 +106,14 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("AdMobRating")
+        .addProperty("General", AdMobRating::General)
+        .addProperty("ParentalGuidance", AdMobRating::ParentalGuidance)
+        .addProperty("Teen", AdMobRating::Teen)
+        .addProperty("MatureAudience", AdMobRating::MatureAudience)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<Engine>("Engine")
 
         .addStaticProperty("scene", &Engine::getScene, &Engine::setScene)
@@ -534,13 +542,22 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticFunction("getUserDataPath", [] () { return System::instance().getUserDataPath(); })
         .addStaticFunction("getLuaPath", [] () { return System::instance().getLuaPath(); })
         .addStaticFunction("getShaderPath", [] () { return System::instance().getShaderPath(); })
+
         //UserSettings not need here
+
         .addStaticFunction("initializeAdMob", [] () { return System::instance().initializeAdMob(); })
+        .addStaticFunction("setMaxAdContentRating", [] (AdMobRating rating) { return System::instance().setMaxAdContentRating(rating); })
         .addStaticFunction("loadInterstitialAd", [] (std::string adUnitID) { return System::instance().loadInterstitialAd(adUnitID); })
         .addStaticFunction("isInterstitialAdLoaded", [] () { return System::instance().isInterstitialAdLoaded(); })
         .addStaticFunction("showInterstitialAd", [] () { return System::instance().showInterstitialAd(); })
+
         .addStaticFunction("initializeCrazyGamesSDK", [] () { return System::instance().initializeCrazyGamesSDK(); })
         .addStaticFunction("showCrazyGamesAd", [] (std::string type) { return System::instance().showCrazyGamesAd(type); })
+        .addStaticFunction("happytimeCrazyGames", [] () { return System::instance().happytimeCrazyGames(); })
+        .addStaticFunction("gameplayStartCrazyGames", [] () { return System::instance().gameplayStartCrazyGames(); })
+        .addStaticFunction("gameplayStopCrazyGames", [] () { return System::instance().gameplayStopCrazyGames(); })
+        .addStaticFunction("loadingStartCrazyGames", [] () { return System::instance().loadingStartCrazyGames(); })
+        .addStaticFunction("loadingStopCrazyGames", [] () { return System::instance().loadingStopCrazyGames(); })
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS
