@@ -31,6 +31,9 @@ namespace Supernova{
         void setTexture(std::string path);
         void setTexture(Framebuffer* framebuffer);
 
+        void setTextureCutFactor(float textureCutFactor);
+        float getTextureCutFactor() const;
+
         void setColor(Vector4 color);
         void setColor(const float red, const float green, const float blue, const float alpha);
         void setColor(const float red, const float green, const float blue);

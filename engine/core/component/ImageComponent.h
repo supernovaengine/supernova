@@ -14,6 +14,8 @@ namespace Supernova{
         int patchMarginTop = 0;
         int patchMarginBottom = 0;
 
+        float textureCutFactor = 0.0;
+
         bool needUpdatePatches = true;
     };
 

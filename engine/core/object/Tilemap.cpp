@@ -46,6 +46,21 @@ int Tilemap::findTileByString(std::string name){
     return -1;
 }
 
+void Tilemap::setTextureCutFactor(float textureCutFactor){
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+    
+    if (tilemap.textureCutFactor != textureCutFactor){
+        tilemap.textureCutFactor = textureCutFactor;
+        tilemap.needUpdateTilemap = true;
+    }
+}
+
+float Tilemap::getTextureCutFactor() const{
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+    
+    return tilemap.textureCutFactor;
+}
+
 void Tilemap::addRect(int id, std::string name, std::string texture, TextureFilter texFilter, Rect rect){
     MeshComponent& mesh = getComponent<MeshComponent>();
     TilemapComponent& tilemap = getComponent<TilemapComponent>();

@@ -98,6 +98,21 @@ bool Sprite::isFlipY() const{
     return spritecomp.flipY;
 }
 
+void Sprite::setTextureCutFactor(float textureCutFactor){
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+    
+    if (spritecomp.textureCutFactor != textureCutFactor){
+        spritecomp.textureCutFactor = textureCutFactor;
+        spritecomp.needUpdateSprite = true;
+    }
+}
+
+float Sprite::getTextureCutFactor() const{
+    SpriteComponent& spritecomp = getComponent<SpriteComponent>();
+    
+    return spritecomp.textureCutFactor;
+}
+
 void Sprite::setTextureRect(float x, float y, float width, float height){
     setTextureRect(Rect(x, y, width, height));
 }

@@ -20,6 +20,9 @@ namespace Supernova{
         int findRectByString(std::string name);
         int findTileByString(std::string name);
 
+        void setTextureCutFactor(float textureCutFactor);
+        float getTextureCutFactor() const;
+
         void addRect(int id, std::string name, std::string texture, TextureFilter texFilter, Rect rect);
         void addRect(int id, std::string name, std::string texture, Rect rect);
         void addRect(int id, std::string name, Rect rect);

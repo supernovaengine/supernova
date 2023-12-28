@@ -30,6 +30,8 @@ namespace Supernova{
         bool automaticFlipY = true;
         bool flipY = false;
 
+        float textureCutFactor = 0.0;
+
         unsigned int reserveTiles = 10;
         unsigned int numTiles = 0;
         

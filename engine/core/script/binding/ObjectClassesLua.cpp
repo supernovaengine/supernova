@@ -324,6 +324,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("findRectByString", &Tilemap::findRectByString)
         .addFunction("findTileByString", &Tilemap::findTileByString)
+        .addProperty("textureCutFactor", &Tilemap::getTextureCutFactor, &Tilemap::setTextureCutFactor)
         .addFunction("addRect", 
             luabridge::overload<int, std::string, std::string, TextureFilter, Rect>(&Tilemap::addRect),
             luabridge::overload<int, std::string, std::string, Rect>(&Tilemap::addRect),
@@ -415,6 +416,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("width", &Sprite::getWidth, &Sprite::setWidth)
         .addProperty("height", &Sprite::getHeight, &Sprite::setHeight)
         .addProperty("flipY", &Sprite::isFlipY, &Sprite::setFlipY)
+        .addProperty("textureCutFactor", &Sprite::getTextureCutFactor, &Sprite::setTextureCutFactor)
         .addProperty("textureRect", &Sprite::getTextureRect, (void(Sprite::*)(Rect))&Sprite::setTextureRect)
         .addFunction("setTextureRect",(void(Sprite::*)(float, float, float, float)) &Sprite::setTextureRect)
         .addProperty("pivotPreset", &Sprite::getPivotPreset, &Sprite::setPivotPreset)
@@ -441,7 +443,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<UILayout, Object>("UILayout")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setSize", &UILayout::setSize)
-        .addProperty("width", &UILayout::getWidth, &Image::setWidth)
+        .addProperty("width", &UILayout::getWidth, &UILayout::setWidth)
         .addProperty("height", &UILayout::getHeight, &UILayout::setHeight)
         .addFunction("setAnchorPoints", &UILayout::setAnchorPoints)
         .addProperty("anchorPointLeft", &UILayout::getAnchorPointLeft, &UILayout::setAnchorPointLeft)
@@ -456,7 +458,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("anchorPreset", &UILayout::getAnchorPreset, &UILayout::setAnchorPreset)
         .addProperty("usingAnchors", &UILayout::isUsingAnchors, &UILayout::setUsingAnchors)
         .addProperty("ignoreScissor", &UILayout::isIgnoreScissor, &UILayout::setIgnoreScissor)
-        .addFunction("getUILayoutComponent", &Image::getComponent<UILayoutComponent>)
+        .addFunction("getUILayoutComponent", &UILayout::getComponent<UILayoutComponent>)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -527,6 +529,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Image::setTexture),
             luabridge::overload<Framebuffer*>(&Image::setTexture))
+        .addProperty("textureCutFactor", &Image::getTextureCutFactor, &Image::setTextureCutFactor)
         .addProperty("color", &Image::getColor, (void(Image::*)(Vector4))&Image::setColor)
         .addFunction("setColor", 
             luabridge::overload<const float, const float, const float>(&Image::setColor),

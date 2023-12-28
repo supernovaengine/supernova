@@ -123,6 +123,21 @@ void Image::setTexture(Framebuffer* framebuffer){
     ui.needUpdateTexture = true;
 }
 
+void Image::setTextureCutFactor(float textureCutFactor){
+    ImageComponent& img = getComponent<ImageComponent>();
+    
+    if (img.textureCutFactor != textureCutFactor){
+        img.textureCutFactor = textureCutFactor;
+        img.needUpdatePatches = true;
+    }
+}
+
+float Image::getTextureCutFactor() const{
+    ImageComponent& img = getComponent<ImageComponent>();
+    
+    return img.textureCutFactor;
+}
+
 void Image::setColor(Vector4 color){
     UIComponent& ui = getComponent<UIComponent>();
 

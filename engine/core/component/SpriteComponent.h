@@ -25,6 +25,8 @@ namespace Supernova{
         bool automaticFlipY = true;
         bool flipY = false;
 
+        float textureCutFactor = 0.0;
+
         FrameData framesRect[MAX_SPRITE_FRAMES];
 
         PivotPreset pivotPreset = PivotPreset::BOTTOM_LEFT;

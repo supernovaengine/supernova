@@ -490,6 +490,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("height", &TilemapComponent::height)
         .addProperty("automaticFlipY", &TilemapComponent::automaticFlipY)
         .addProperty("flipY", &TilemapComponent::flipY)
+        .addProperty("textureCutFactor", &TilemapComponent::textureCutFactor)
         .addProperty("reserveTiles", &TilemapComponent::reserveTiles)
         .addProperty("numTiles", &TilemapComponent::numTiles)
         //.addProperty("tilesRect", &TilemapComponent::tilesRect)

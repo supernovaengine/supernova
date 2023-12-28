@@ -53,11 +53,6 @@
 #define MAX_EXTERNAL_BUFFERS 10
 #endif
 
-// to prevent tiled texture getting part of neighborhood tile
-#ifndef TEXTURE_CUT_FACTOR
-#define TEXTURE_CUT_FACTOR 1.0
-#endif
-
 #include "util/FunctionSubscribe.h"
 #include "math/Rect.h"
 #include "util/ThreadUtils.h"
