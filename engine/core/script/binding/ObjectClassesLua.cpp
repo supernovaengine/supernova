@@ -669,6 +669,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getMass", &Body2D::getMass)
         .addFunction("getInertia", &Body2D::getInertia)
         .addFunction("getLinearVelocityFromWorldPoint", &Body2D::getLinearVelocityFromWorldPoint)
+        .addFunction("resetMassData", &Body2D::resetMassData)
         .addFunction("applyForce", &Body2D::applyForce)
         .addFunction("applyForceToCenter", &Body2D::applyForceToCenter)
         .addFunction("applyTorque", &Body2D::applyTorque)

@@ -101,6 +101,8 @@ namespace Supernova{
         float getInertia() const;
         Vector2 getLinearVelocityFromWorldPoint(Vector2 worldPoint) const;
 
+        void resetMassData();
+
         void applyForce(const Vector2& force, const Vector2& point, bool wake);
         void applyForceToCenter(const Vector2& force, bool wake);
         void applyTorque(float torque, bool wake);

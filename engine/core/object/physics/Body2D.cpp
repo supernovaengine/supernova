@@ -474,6 +474,12 @@ Vector2 Body2D::getLinearVelocityFromWorldPoint(Vector2 worldPoint) const{
     return Vector2(ret.x * pointsToMeterScale, ret.y * pointsToMeterScale);
 }
 
+void Body2D::resetMassData(){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    body.body->ResetMassData();
+}
+
 void Body2D::applyForce(const Vector2& force, const Vector2& point, bool wake){
     Body2DComponent& body = getComponent<Body2DComponent>();
     float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
