@@ -278,15 +278,19 @@ bool Texture::load(){
 }
 
 void Texture::destroy(){
-    if (!id.empty() && render){
+    if (!id.empty()){
 
-	    render.reset();
-        render = NULL;
-	    TexturePool::remove(id);
+        if (render) {
+            render.reset();
+            render = NULL;
+            TexturePool::remove(id);
+        }
 
-        data.reset();
-        data = NULL;
-        TextureDataPool::remove(id);
+        if (data) {
+            data.reset();
+            data = NULL;
+            TextureDataPool::remove(id);
+        }
 
         if (!framebuffer){
             needLoad = true;
