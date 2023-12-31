@@ -50,6 +50,9 @@ namespace Supernova{
 
         bool canBeKinematicOrDynamic() const;
 
+        void activate();
+        void deactivate();
+
         bool isSensor() const;
         void setIsSensor(bool sensor);
 

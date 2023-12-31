@@ -139,6 +139,24 @@ bool Body3D::canBeKinematicOrDynamic() const{
     return body.body->CanBeKinematicOrDynamic();
 }
 
+void Body3D::activate(){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+    JPH::BodyInterface &body_interface = world->GetBodyInterface();
+
+    body_interface.ActivateBody(body.body->GetID());
+}
+
+void Body3D::deactivate(){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+    JPH::BodyInterface &body_interface = world->GetBodyInterface();
+
+    body_interface.DeactivateBody(body.body->GetID());
+}
+
 bool Body3D::isSensor() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 

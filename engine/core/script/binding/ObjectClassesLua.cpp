@@ -757,6 +757,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<unsigned int>(&Body3D::createHeightFieldShape))
         .addProperty("type", &Body3D::getType, &Body3D::setType)
         .addFunction("canBeKinematicOrDynamic", &Body3D::canBeKinematicOrDynamic)
+        .addFunction("activate", &Body3D::activate)
+        .addFunction("deactivate", &Body3D::deactivate)
         .addProperty("sensor", &Body3D::isSensor, &Body3D::setIsSensor)
         .addProperty("collisionGroupID", &Body3D::getCollisionGroupID, &Body3D::setCollisionGroupID)
         .addProperty("sllowSleeping", &Body3D::isAllowSleeping, &Body3D::setAllowSleeping)
