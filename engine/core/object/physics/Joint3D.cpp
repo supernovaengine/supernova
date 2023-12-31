@@ -27,6 +27,7 @@ Joint3D::Joint3D(const Joint3D& rhs): EntityHandle(rhs){
 }
 
 Joint3D& Joint3D::operator=(const Joint3D& rhs){
+    EntityHandle::operator =(rhs);
 
     return *this;
 }

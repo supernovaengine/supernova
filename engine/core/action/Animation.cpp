@@ -25,6 +25,7 @@ Animation::Animation(const Animation& rhs): Action(rhs){
 }
 
 Animation& Animation::operator=(const Animation& rhs){
+    Action::operator =(rhs);
 
     return *this;
 }

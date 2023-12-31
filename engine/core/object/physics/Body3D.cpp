@@ -48,6 +48,7 @@ Body3D::Body3D(const Body3D& rhs): EntityHandle(rhs){
 }
 
 Body3D& Body3D::operator=(const Body3D& rhs){
+    EntityHandle::operator =(rhs);
 
     return *this;
 }

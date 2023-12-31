@@ -2,7 +2,7 @@
 #define BUFFER_H
 
 //
-// (c) 2019 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #include <string>
@@ -37,6 +37,9 @@ namespace Supernova {
     public:
         Buffer();
         virtual ~Buffer();
+
+        Buffer(const Buffer& rhs);
+        Buffer& operator=(const Buffer& rhs);
 
         virtual bool resize(size_t pos);
         virtual void clear();

@@ -27,6 +27,7 @@ Joint2D::Joint2D(const Joint2D& rhs): EntityHandle(rhs){
 }
 
 Joint2D& Joint2D::operator=(const Joint2D& rhs){
+    EntityHandle::operator =(rhs);
 
     return *this;
 }

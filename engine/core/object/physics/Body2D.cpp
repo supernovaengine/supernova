@@ -52,6 +52,7 @@ Body2D::Body2D(const Body2D& rhs): EntityHandle(rhs){
 }
 
 Body2D& Body2D::operator=(const Body2D& rhs){
+    EntityHandle::operator =(rhs);
 
     return *this;
 }

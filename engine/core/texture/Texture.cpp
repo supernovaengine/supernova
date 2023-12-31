@@ -46,6 +46,7 @@ Texture::Texture(TextureData data, std::string id){
     this->framebuffer = NULL;
     this->data = std::make_shared<std::array<TextureData,6>>();
     this->data->at(0) = data;
+    this->data = TextureDataPool::get(id, *this->data.get());
     this->id = id;
     this->type = TextureType::TEXTURE_2D;
     this->numFaces = 1;
@@ -163,6 +164,7 @@ void Texture::setData(TextureData data, std::string id){
 
     this->data = std::make_shared<std::array<TextureData,6>>();
     this->data->at(0) = data;
+    this->data = TextureDataPool::get(id, *this->data.get());
     this->id = id;
     this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_2D;
@@ -342,6 +344,9 @@ int Texture::getWidth(){
     if (this->framebuffer){
         return framebuffer->getWidth();
     }
+    if (!data){
+        return 0;
+    }
     return getData().getOriginalWidth();
 }
 
@@ -349,7 +354,17 @@ int Texture::getHeight(){
     if (this->framebuffer){
         return framebuffer->getHeight();
     }
+    if (!data){
+        return 0;
+    }
     return getData().getOriginalHeight();
+}
+
+bool Texture::isTransparent(){
+    if (!data){
+        return false;
+    }
+    return getData().isTransparent();
 }
 
 void Texture::setReleaseDataAfterLoad(bool releaseDataAfterLoad){

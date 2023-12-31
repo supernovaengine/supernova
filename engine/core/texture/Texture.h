@@ -64,6 +64,7 @@ namespace Supernova{
 
             int getWidth();
             int getHeight();
+            bool isTransparent();
 
             void setReleaseDataAfterLoad(bool releaseDataAfterLoad);
             bool isReleaseDataAfterLoad() const;

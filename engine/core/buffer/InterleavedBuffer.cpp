@@ -1,5 +1,5 @@
 //
-// (c) 2019 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #include "InterleavedBuffer.h"
@@ -9,11 +9,32 @@
 using namespace Supernova;
 
 InterleavedBuffer::InterleavedBuffer(): Buffer(){
+    vectorBuffer.clear();
     vertexSize = 0;
+
+    data = &vectorBuffer[0];
 }
 
 InterleavedBuffer::~InterleavedBuffer(){
 
+}
+
+InterleavedBuffer::InterleavedBuffer(const InterleavedBuffer& rhs): Buffer(rhs){
+    vectorBuffer = rhs.vectorBuffer;
+    vertexSize = rhs.vertexSize;
+
+    data = &vectorBuffer[0];
+}
+
+InterleavedBuffer& InterleavedBuffer::operator=(const InterleavedBuffer& rhs){
+    Buffer::operator =(rhs);
+
+    vectorBuffer = rhs.vectorBuffer;
+    vertexSize = rhs.vertexSize;
+
+    data = &vectorBuffer[0];
+
+    return *this;
 }
 
 bool InterleavedBuffer::resize(size_t pos) {

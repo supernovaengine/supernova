@@ -1,5 +1,5 @@
 //
-// (c) 2019 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #include "IndexBuffer.h"
@@ -11,10 +11,28 @@ IndexBuffer::IndexBuffer(): Buffer(){
     createIndexAttribute();
 
     type = BufferType::INDEX_BUFFER;
+
+    data = &vectorBuffer[0];
 }
 
 IndexBuffer::~IndexBuffer(){
 
+}
+
+IndexBuffer::IndexBuffer(const IndexBuffer& rhs): Buffer(rhs){
+    vectorBuffer = rhs.vectorBuffer;
+
+    data = &vectorBuffer[0];
+}
+
+IndexBuffer& IndexBuffer::operator=(const IndexBuffer& rhs){
+    Buffer::operator =(rhs);
+
+    vectorBuffer = rhs.vectorBuffer;
+
+    data = &vectorBuffer[0];
+
+    return *this;
 }
 
 void IndexBuffer::createIndexAttribute(){

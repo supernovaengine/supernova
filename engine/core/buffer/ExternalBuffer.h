@@ -1,5 +1,5 @@
 //
-// (c) 2019 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #ifndef EXTERNALBUFFER_H
@@ -18,6 +18,9 @@ namespace Supernova {
     public:
         ExternalBuffer();
         virtual ~ExternalBuffer();
+
+        ExternalBuffer(const ExternalBuffer& rhs);
+        ExternalBuffer& operator=(const ExternalBuffer& rhs);
 
         void setData(unsigned char* data, size_t size);
 

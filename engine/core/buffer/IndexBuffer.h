@@ -1,5 +1,5 @@
 //
-// (c) 2019 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #ifndef INDEXBUFFER_H
@@ -18,6 +18,9 @@ namespace Supernova {
     public:
         IndexBuffer();
         virtual ~IndexBuffer();
+
+        IndexBuffer(const IndexBuffer& rhs);
+        IndexBuffer& operator=(const IndexBuffer& rhs);
 
         void createIndexAttribute();
 

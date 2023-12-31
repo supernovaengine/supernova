@@ -25,8 +25,9 @@ Sprite::Sprite(const Sprite& rhs): Mesh(rhs){
 }
 
 Sprite& Sprite::operator=(const Sprite& rhs){
+    Mesh::operator =(rhs);
+
     animation = rhs.animation;
-    Mesh::operator=(rhs);
 
     return *this;
 }

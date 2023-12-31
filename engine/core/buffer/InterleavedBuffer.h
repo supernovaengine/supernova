@@ -1,5 +1,5 @@
 //
-// (c) 2019 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #ifndef INTERLEAVEDBUFFER_H
@@ -25,6 +25,9 @@ namespace Supernova{
     public:
         InterleavedBuffer();
         virtual ~InterleavedBuffer();
+
+        InterleavedBuffer(const InterleavedBuffer& rhs);
+        InterleavedBuffer& operator=(const InterleavedBuffer& rhs);
 
         virtual bool resize(size_t pos);
         virtual void clearAll();

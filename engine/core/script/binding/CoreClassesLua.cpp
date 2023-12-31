@@ -291,6 +291,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("getData", &Texture::getData)
         .addFunction("getWidth", &Texture::getWidth)
         .addFunction("getHeight", &Texture::getHeight)
+        .addFunction("isTransparent", &Texture::isTransparent)
         .addProperty("releaseDataAfterLoad", &Texture::isReleaseDataAfterLoad, &Texture::setReleaseDataAfterLoad)
         .addFunction("releaseData", &Texture::releaseData)
         .addFunction("empty", &Texture::empty)

@@ -1,5 +1,5 @@
 //
-// (c) 2019 Eduardo Doria.
+// (c) 2023 Eduardo Doria.
 //
 
 #include "Buffer.h"
@@ -10,33 +10,51 @@
 using namespace Supernova;
 
 Buffer::Buffer(){
-    const int len = 3;
-    std::string randName;
-    randName.resize(len);
+    attributes.clear();
+    count = 0;
+    type = BufferType::VERTEX_BUFFER;
+    usage = BufferUsage::IMMUTABLE;
 
     data = NULL;
     size = 0;
     stride = 0;
 
     renderAttributes = true;
-
-    type = BufferType::VERTEX_BUFFER;
-    usage = BufferUsage::IMMUTABLE;
-/*
-    static const char alphanum[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-
-    for (int i = 0; i < len; ++i) {
-        randName[i] = alphanum[std::rand() % (sizeof(alphanum) - 1)];
-    }
-
-    name = "buffer|" + randName;
-*/
 }
 
 Buffer::~Buffer(){
+}
+
+Buffer::Buffer(const Buffer& rhs){
+    attributes = rhs.attributes;
+    count = rhs.count;
+    type = rhs.type;
+    usage = rhs.usage;
+
+    data = rhs.data;
+    size = rhs.size;
+    stride = rhs.stride;
+
+    renderAttributes = rhs.renderAttributes;
+
+    render = rhs.render;
+}
+
+Buffer& Buffer::operator=(const Buffer& rhs){
+    attributes = rhs.attributes;
+    count = rhs.count;
+    type = rhs.type;
+    usage = rhs.usage;
+
+    data = rhs.data;
+    size = rhs.size;
+    stride = rhs.stride;
+
+    renderAttributes = rhs.renderAttributes;
+
+    render = rhs.render;
+
+    return *this;
 }
 
 bool Buffer::resize(size_t pos){
