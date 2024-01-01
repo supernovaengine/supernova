@@ -121,6 +121,8 @@ void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Bod
         if (transform.needUpdate || updateAnyway){
             b2Vec2 bPosition(transform.position.x / pointsToMeterScale2D, transform.position.y / pointsToMeterScale2D);
             body.body->SetTransform(bPosition, Angle::defaultToRad(transform.rotation.getRoll()));
+
+            body.body->SetAwake(true);
         }
     }
 }
