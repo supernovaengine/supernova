@@ -30,6 +30,7 @@ namespace Supernova{
         Object getAttachedObject();
 
         int createRectShape(float width, float height);
+        int createCenteredRectShape(float width, float height);
         int createCenteredRectShape(float width, float height, Vector2 center, float angle);
         int createPolygonShape(std::vector<Vector2> vertices);
         int createCircleShape(Vector2 center, float radius);

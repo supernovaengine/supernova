@@ -84,6 +84,10 @@ int Body2D::createRectShape(float width, float height){
     return index;
 }
 
+int Body2D::createCenteredRectShape(float width, float height){
+    return createCenteredRectShape(width, height, Vector2(0, 0), 0);
+}
+
 int Body2D::createCenteredRectShape(float width, float height, Vector2 center, float angle){
     int index = scene->getSystem<PhysicsSystem>()->createCenteredRectShape2D(entity, width, height, center, angle);
     return index;

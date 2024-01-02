@@ -1,5 +1,7 @@
 #include "Vector2.h"
 
+#include "Vector3.h"
+
 using namespace Supernova;
 
 const Vector2 Vector2::ZERO( 0, 0);
@@ -30,6 +32,11 @@ Vector2::Vector2( const int afCoordinate[2] ){
 }
 
 Vector2::Vector2( float* const r ): x( r[0] ), y( r[1] ){
+}
+
+Vector2::Vector2( const Vector3 vec3 ){
+    x = vec3.x;
+    y = vec3.y;
 }
 
 std::string Vector2::toString() const{

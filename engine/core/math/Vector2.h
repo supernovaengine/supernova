@@ -17,6 +17,8 @@ Supernova::Vector2 operator - (const float lhs, const Supernova::Vector2& rhs);
 
 namespace Supernova {
 
+    class Vector3;
+
     class Vector2
     {
     public:
@@ -40,6 +42,8 @@ namespace Supernova {
         explicit Vector2( const int afCoordinate[2] );
 
         explicit Vector2( float* const r );
+
+        explicit Vector2( const Vector3 vec3 );
 
         std::string toString() const;
 

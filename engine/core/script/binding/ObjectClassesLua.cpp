@@ -605,7 +605,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (Scene*, Entity)> ()
         .addFunction("getAttachedObject", &Body2D::getAttachedObject)
         .addFunction("createRectShape", &Body2D::createRectShape)
-        .addFunction("createCenteredRectShape", &Body2D::createCenteredRectShape)
+        .addFunction("createCenteredRectShape", 
+            luabridge::overload<float, float>(&Body2D::createCenteredRectShape),
+            luabridge::overload<float, float, Vector2, float>(&Body2D::createCenteredRectShape))
         .addFunction("createPolygonShape", &Body2D::createPolygonShape)
         .addFunction("createCircleShape", &Body2D::createCircleShape)
         .addFunction("createTwoSidedEdgeShape", &Body2D::createTwoSidedEdgeShape)
