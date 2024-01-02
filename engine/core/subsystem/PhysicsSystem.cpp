@@ -735,6 +735,7 @@ bool PhysicsSystem::loadBody2D(Entity entity){
         bodyDef.userData.pointer = entity;
 
         body.body = world2D->CreateBody(&bodyDef);
+        body.body->SetType(b2_dynamicBody);
         body.newBody = true;
 
         return true;

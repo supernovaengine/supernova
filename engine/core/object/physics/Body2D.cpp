@@ -20,7 +20,7 @@ b2BodyType getBodyTypeToB2(BodyType type){
         return b2_dynamicBody;
     }
 
-    return b2_staticBody;
+    return b2_dynamicBody;
 }
 
 BodyType getB2ToBodyType(b2BodyType type){
@@ -32,7 +32,7 @@ BodyType getB2ToBodyType(b2BodyType type){
         return BodyType::DYNAMIC;
     }
 
-    return BodyType::STATIC;
+    return BodyType::DYNAMIC;
 }
 
 Vector2 getB2ToVector2(b2Vec2 vec2){
