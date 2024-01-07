@@ -50,7 +50,7 @@
 #endif
 
 #ifndef MAX_EXTERNAL_BUFFERS
-#define MAX_EXTERNAL_BUFFERS 10
+#define MAX_EXTERNAL_BUFFERS 12
 #endif
 
 #include "util/FunctionSubscribe.h"

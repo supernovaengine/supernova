@@ -1630,9 +1630,22 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
                 }
             }
             if (attrib.first.compare("JOINTS_0") == 0){
-                //TODO: Check if type is UNSIGNED_SHORT because Sokol normalize it
                 attType = AttributeType::BONEIDS;
                 foundAttrs = true;
+
+                if (accessor.normalized){
+                    if (dataType == AttributeDataType::BYTE){
+                        mesh.normalizedAdjust = 127.0;
+                    }else if (dataType == AttributeDataType::UNSIGNED_BYTE){
+                        mesh.normalizedAdjust = 255.0;
+                    }else if (dataType == AttributeDataType::SHORT){
+                        mesh.normalizedAdjust = 32767.0;
+                    }
+                }
+                // Sokol always normalize unsigned short
+                if (dataType == AttributeDataType::UNSIGNED_SHORT){
+                    mesh.normalizedAdjust = 65535.0;
+                }
             }
             if (attrib.first.compare("WEIGHTS_0") == 0){
                 attType = AttributeType::BONEWEIGHTS;

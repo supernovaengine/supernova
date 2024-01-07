@@ -869,7 +869,7 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 			}
 
 			if (mesh.submeshes[i].hasSkinning){
-				render.applyUniformBlock(mesh.submeshes[i].slotVSSkinning, ShaderStageType::VERTEX, sizeof(float) * 16 * MAX_BONES, &mesh.bonesMatrix);
+				render.applyUniformBlock(mesh.submeshes[i].slotVSSkinning, ShaderStageType::VERTEX, sizeof(float) * 16 * MAX_BONES + (sizeof(float) * 4), &mesh.bonesMatrix);
 			}
 
 			if (mesh.submeshes[i].hasMorphTarget){
@@ -905,7 +905,7 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams){
 			depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 32, &vsDepthParams);
 
 			if (mesh.submeshes[i].hasSkinning){
-				depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthSkinning, ShaderStageType::VERTEX, sizeof(float) * 16 * MAX_BONES, &mesh.bonesMatrix);
+				depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthSkinning, ShaderStageType::VERTEX, sizeof(float) * 16 * MAX_BONES + (sizeof(float) * 4), &mesh.bonesMatrix);
 			}
 			if (mesh.submeshes[i].hasMorphTarget){
 				if (!mesh.submeshes[i].hasMorphNormal && !mesh.submeshes[i].hasMorphTangent){
