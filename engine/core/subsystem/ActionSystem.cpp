@@ -589,7 +589,7 @@ void ActionSystem::rotateTracksUpdate(KeyframeTracksComponent& keyframe, RotateT
         previousRotation = rotatetracks.values[keyframe.index-1];
     }
 
-    transform.rotation = previousRotation + keyframe.interpolation * (rotatetracks.values[keyframe.index] - previousRotation);
+    transform.rotation = transform.rotation.slerp(keyframe.interpolation, previousRotation, rotatetracks.values[keyframe.index]);
     transform.needUpdate = true;
 }
 
