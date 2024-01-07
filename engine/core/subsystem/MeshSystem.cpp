@@ -1633,23 +1633,28 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
                 attType = AttributeType::BONEIDS;
                 foundAttrs = true;
 
-                if (accessor.normalized){
-                    if (dataType == AttributeDataType::BYTE){
-                        mesh.normalizedAdjust = 127.0;
-                    }else if (dataType == AttributeDataType::UNSIGNED_BYTE){
-                        mesh.normalizedAdjust = 255.0;
-                    }else if (dataType == AttributeDataType::SHORT){
-                        mesh.normalizedAdjust = 32767.0;
-                    }
-                }
                 // Sokol always normalize unsigned short
                 if (dataType == AttributeDataType::UNSIGNED_SHORT){
-                    mesh.normalizedAdjust = 65535.0;
+                    mesh.normAdjustJoint = 65535.0;
                 }
             }
             if (attrib.first.compare("WEIGHTS_0") == 0){
                 attType = AttributeType::BONEWEIGHTS;
                 foundAttrs = true;
+
+                if (accessor.normalized){
+                    if (dataType == AttributeDataType::BYTE){
+                        mesh.normAdjustWeight = 127.0;
+                    }else if (dataType == AttributeDataType::UNSIGNED_BYTE){
+                        mesh.normAdjustWeight = 255.0;
+                    }else if (dataType == AttributeDataType::SHORT){
+                        mesh.normAdjustWeight = 32767.0;
+                    }
+                }
+                // Sokol always normalize unsigned short
+                if (dataType == AttributeDataType::UNSIGNED_SHORT){
+                    mesh.normAdjustWeight = 65535.0;
+                }
             }
 
             if (foundAttrs) {

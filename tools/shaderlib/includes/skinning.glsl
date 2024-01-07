@@ -4,17 +4,17 @@
 
     uniform u_vs_skinning {
         mat4 bonesMatrix[MAX_BONES];
-        vec4 ajustnorm; //needed "expand" the normalized vertex (x)
+        vec4 normAdjust; //needed "expand" the normalized values - Joints (x), weights (y)
     };
 #endif
 
 mat4 getBoneTransform(){
     mat4 boneTransform = mat4(0.0);
     #ifdef HAS_SKINNING
-        boneTransform += bonesMatrix[int(a_boneIds[0] * ajustnorm.x)] * a_boneWeights[0];
-        boneTransform += bonesMatrix[int(a_boneIds[1] * ajustnorm.x)] * a_boneWeights[1];
-        boneTransform += bonesMatrix[int(a_boneIds[2] * ajustnorm.x)] * a_boneWeights[2];
-        boneTransform += bonesMatrix[int(a_boneIds[3] * ajustnorm.x)] * a_boneWeights[3];
+        boneTransform += bonesMatrix[int(a_boneIds[0] * normAdjust.x)] * (a_boneWeights[0] * normAdjust.y);
+        boneTransform += bonesMatrix[int(a_boneIds[1] * normAdjust.x)] * (a_boneWeights[1] * normAdjust.y);
+        boneTransform += bonesMatrix[int(a_boneIds[2] * normAdjust.x)] * (a_boneWeights[2] * normAdjust.y);
+        boneTransform += bonesMatrix[int(a_boneIds[3] * normAdjust.x)] * (a_boneWeights[3] * normAdjust.y);
     #endif
 
     return boneTransform;

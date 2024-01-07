@@ -78,7 +78,8 @@ namespace Supernova{
         unsigned int numSubmeshes = 0;
 
         Matrix4 bonesMatrix[MAX_BONES];
-        float normalizedAdjust = 1;
+        float normAdjustJoint = 1;
+        float normAdjustWeight = 1;
 
         float morphWeights[MAX_MORPHTARGETS];
 
