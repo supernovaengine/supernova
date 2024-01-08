@@ -1858,8 +1858,6 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
 
         model.animations.push_back(anim);
 
-        float endTime = 0;
-
         for (size_t j = 0; j < animation.channels.size(); j++) {
 
             const tinygltf::AnimationChannel &channel = animation.channels[j];
@@ -1884,10 +1882,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
                 float *values = (float *) (&model.gltfModel->buffers[bufferViewOut.buffer].data.at(0) +
                                            bufferViewOut.byteOffset + accessorOut.byteOffset);
 
-                float trackEndTime = timeValues[accessorIn.count - 1];
-
-                if (trackEndTime > endTime)
-                    endTime = trackEndTime;
+                float duration = timeValues[accessorIn.count - 1];
 
                 Entity track;
 
@@ -1955,7 +1950,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
                     } else {
                         actiontrack.target = entity;
                     }
-                    animcomp.actions.push_back({0, trackEndTime, track});
+                    animcomp.actions.push_back({0, duration, track});
                 }else{
                     scene->destroyEntity(track);
                 }
@@ -1964,9 +1959,6 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
                 Log::error("Cannot load animation: %s, channel %i: no float elements", animation.name.c_str(), j);
             }
         }
-
-        if ((animcomp.endTime > endTime) || (animcomp.endTime == 0))
-            animcomp.endTime = endTime;
 
         // need to get here because other actions were created
         ActionComponent& anim_actioncomp = scene->getComponent<ActionComponent>(anim);

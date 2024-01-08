@@ -7,7 +7,7 @@ namespace Supernova{
 
     struct ActionFrame{
         float startTime;
-        float endTime;
+        float duration;
         Entity action;
     };
 
@@ -17,8 +17,6 @@ namespace Supernova{
         bool loop = false;
 
         std::string name;
-
-        float endTime = 0;
     };
 
     

@@ -203,7 +203,6 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .deriveClass<Animation, Action>("Animation")
         .addConstructor <void(Scene*), void(Scene*, Entity)> ()
         .addProperty("loop", &Animation::isLoop, &Animation::setLoop)
-        .addProperty("endTime", &Animation::getEndTime, &Animation::setEndTime)
         .addProperty("ownedActions", &Animation::isOwnedActions, &Animation::setOwnedActions)
         .addProperty("name", &Animation::getName, &Animation::setName)
         .addFunction("addActionFrame", 

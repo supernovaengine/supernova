@@ -115,7 +115,6 @@ void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& ac
     for (int i = 0; i < animcomp.actions.size(); i++){
 
         float timeDiff = action.timecount - animcomp.actions[i].startTime;
-        float duration = (animcomp.actions[i].endTime - animcomp.actions[i].startTime) / action.speed;
 
         Signature isignature = scene->getSignature(animcomp.actions[i].action);
 
@@ -127,9 +126,10 @@ void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& ac
                 if (iaction.state != ActionState::Running) {
                     actionStart(animcomp.actions[i].action);
                 }
-                iaction.speed = action.speed;
-                iaction.timecount = timeDiff * action.speed;
-                if (timeDiff > duration) {
+
+                iaction.timecount = timeDiff * iaction.speed;
+
+                if (timeDiff > (animcomp.actions[i].duration / iaction.speed)) {
                     totalActionsPassed++;
                 }
             }
@@ -138,7 +138,7 @@ void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& ac
 
     }
 
-    if (totalActionsPassed == animcomp.actions.size() || action.timecount >= (animcomp.endTime / action.speed)) {
+    if (totalActionsPassed == animcomp.actions.size()) {
         if (!animcomp.loop) {
             actionStop(entity);
             //onFinish.call(object);

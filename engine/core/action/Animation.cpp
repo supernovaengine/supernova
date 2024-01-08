@@ -42,18 +42,6 @@ void Animation::setLoop(bool loop){
     animation.loop = loop;
 }
 
-void Animation::setEndTime(float endTime){
-    AnimationComponent& animation = getComponent<AnimationComponent>();
-
-    animation.endTime = endTime;
-}
-
-float Animation::getEndTime() const{
-    AnimationComponent& animation = getComponent<AnimationComponent>();
-
-    return animation.endTime;
-}
-
 bool Animation::isOwnedActions() const{
     AnimationComponent& animation = getComponent<AnimationComponent>();
 
@@ -78,21 +66,17 @@ void Animation::setName(const std::string &name) {
     animation.name = name;
 }
 
-void Animation::addActionFrame(float startTime, float endTime, Entity action, Entity target){
+void Animation::addActionFrame(float startTime, float duration, Entity action, Entity target){
     AnimationComponent& animation = getComponent<AnimationComponent>();
     ActionComponent& actioncomp = getComponent<ActionComponent>();
 
     ActionFrame actionFrame;
 
     actionFrame.startTime = startTime;
-    actionFrame.endTime = endTime;
+    actionFrame.duration = duration;
     actionFrame.action = action;
 
     animation.actions.push_back(actionFrame);
-
-    if ((animation.endTime == 0) || (animation.endTime < endTime)){
-        animation.endTime = endTime;
-    }
 
     if (target != NULL_ENTITY){
         actioncomp.target = target;
@@ -109,8 +93,8 @@ void Animation::addActionFrame(float startTime, Entity timedaction, Entity targe
     addActionFrame(startTime, startTime + timedactioncomp.duration, timedaction, target);
 }
 
-void Animation::addActionFrame(float startTime, float endTime, Entity action){
-    addActionFrame(startTime, endTime, action, getTarget());
+void Animation::addActionFrame(float startTime, float duration, Entity action){
+    addActionFrame(startTime, duration, action, getTarget());
 }
 
 void Animation::addActionFrame(float startTime, Entity timedaction){

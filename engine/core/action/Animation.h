@@ -21,18 +21,15 @@ namespace Supernova{
         bool isLoop() const;
         void setLoop(bool loop);
 
-        void setEndTime(float endTime);
-        float getEndTime() const;
-
         bool isOwnedActions() const;
         void setOwnedActions(bool ownedActions);
 
         const std::string &getName() const;
         void setName(const std::string &name);
 
-        void addActionFrame(float startTime, float endTime, Entity action, Entity target);
+        void addActionFrame(float startTime, float duration, Entity action, Entity target);
         void addActionFrame(float startTime, Entity timedaction, Entity target);
-        void addActionFrame(float startTime, float endTime, Entity action);
+        void addActionFrame(float startTime, float duration, Entity action);
         void addActionFrame(float startTime, Entity timedaction);
         ActionFrame getActionFrame(unsigned int index);
         void clearActionFrames();
