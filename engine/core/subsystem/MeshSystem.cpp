@@ -1664,7 +1664,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
                 }
                 addSubmeshAttribute(mesh.submeshes[i], bufferName, attType, elements, dataType, accessor.count, accessor.byteOffset, accessor.normalized);
             } else
-                Log::warn("Model attribute missing: %s", attrib.first.c_str());
+                Log::warn("Model attribute unused: %s", attrib.first.c_str());
 
         }
 
