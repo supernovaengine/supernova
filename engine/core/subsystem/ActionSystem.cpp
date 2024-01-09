@@ -1,5 +1,5 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #include "ActionSystem.h"
@@ -138,7 +138,7 @@ void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& ac
 
     }
 
-    if (totalActionsPassed == animcomp.actions.size()) {
+    if (totalActionsPassed == animcomp.actions.size() || (animcomp.duration >= 0 && action.timecount >= (animcomp.duration / action.speed))) {
         if (!animcomp.loop) {
             actionStop(entity);
             //onFinish.call(object);

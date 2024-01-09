@@ -1,5 +1,5 @@
 //
-// (c) 2022 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #ifndef ANIMATION_H
@@ -27,11 +27,20 @@ namespace Supernova{
         const std::string &getName() const;
         void setName(const std::string &name);
 
+        const float &getDuration() const;
+        void setDuration(const float &duration);
+
         void addActionFrame(float startTime, float duration, Entity action, Entity target);
         void addActionFrame(float startTime, Entity timedaction, Entity target);
         void addActionFrame(float startTime, float duration, Entity action);
         void addActionFrame(float startTime, Entity timedaction);
-        ActionFrame getActionFrame(unsigned int index);
+
+        size_t getActionFrameSize() const;
+        ActionFrame& getActionFrame(unsigned int index);
+        void setActionFrameStartTime(unsigned int index, float startTime);
+        void setActionFrameDuration(unsigned int index, float duration);
+        void setActionFrameEntity(unsigned int index, Entity action);
+
         void clearActionFrames();
     };
 }

@@ -1,5 +1,5 @@
 //
-// (c) 2022 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #include "LuaBinding.h"
@@ -210,7 +210,11 @@ void LuaBinding::registerActionClasses(lua_State *L){
             luabridge::overload<float, Entity, Entity>(&Animation::addActionFrame),
             luabridge::overload<float, float, Entity>(&Animation::addActionFrame),
             luabridge::overload<float, Entity>(&Animation::addActionFrame))
+        .addFunction("getActionFrameSize", &Animation::getActionFrameSize)
         .addFunction("getActionFrame", &Animation::getActionFrame)
+        .addFunction("setActionFrameStartTime", &Animation::setActionFrameStartTime)
+        .addFunction("setActionFrameDuration", &Animation::setActionFrameDuration)
+        .addFunction("setActionFrameEntity", &Animation::setActionFrameEntity)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

@@ -1,5 +1,5 @@
 //
-// (c) 2022 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #include "Animation.h"
@@ -66,6 +66,18 @@ void Animation::setName(const std::string &name) {
     animation.name = name;
 }
 
+const float &Animation::getDuration() const{
+    AnimationComponent& animation = getComponent<AnimationComponent>();
+
+    return animation.duration;
+}
+
+void Animation::setDuration(const float &duration){
+    AnimationComponent& animation = getComponent<AnimationComponent>();
+
+    animation.duration = duration;
+}
+
 void Animation::addActionFrame(float startTime, float duration, Entity action, Entity target){
     AnimationComponent& animation = getComponent<AnimationComponent>();
     ActionComponent& actioncomp = getComponent<ActionComponent>();
@@ -87,6 +99,12 @@ void Animation::addActionFrame(float startTime, float duration, Entity action, E
     }
 }
 
+size_t Animation::getActionFrameSize() const{
+    AnimationComponent& animation = getComponent<AnimationComponent>();
+
+    return animation.actions.size();
+}
+
 void Animation::addActionFrame(float startTime, Entity timedaction, Entity target){
     TimedActionComponent& timedactioncomp = scene->getComponent<TimedActionComponent>(timedaction);
 
@@ -101,14 +119,47 @@ void Animation::addActionFrame(float startTime, Entity timedaction){
     addActionFrame(startTime, timedaction, getTarget());
 }
 
-ActionFrame Animation::getActionFrame(unsigned int index){
+ActionFrame& Animation::getActionFrame(unsigned int index){
     AnimationComponent& animation = getComponent<AnimationComponent>();
 
     try{
         return animation.actions.at(index);
     }catch (const std::out_of_range& e){
-		Log::error("Retrieving non-existent action: %s", e.what());
-		throw;
+        Log::error("Retrieving non-existent action: %s", e.what());
+        throw;
+	}
+}
+
+void Animation::setActionFrameStartTime(unsigned int index, float startTime){
+    AnimationComponent& animation = getComponent<AnimationComponent>();
+
+    try{
+        animation.actions.at(index).startTime = startTime;
+    }catch (const std::out_of_range& e){
+        Log::error("Retrieving non-existent action: %s", e.what());
+        throw;
+	}
+}
+
+void Animation::setActionFrameDuration(unsigned int index, float duration){
+    AnimationComponent& animation = getComponent<AnimationComponent>();
+
+    try{
+        animation.actions.at(index).duration = duration;
+    }catch (const std::out_of_range& e){
+        Log::error("Retrieving non-existent action: %s", e.what());
+        throw;
+	}
+}
+
+void Animation::setActionFrameEntity(unsigned int index, Entity action){
+    AnimationComponent& animation = getComponent<AnimationComponent>();
+
+    try{
+        animation.actions.at(index).action = action;
+    }catch (const std::out_of_range& e){
+        Log::error("Retrieving non-existent action: %s", e.what());
+        throw;
 	}
 }
 

@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef ANIMATION_COMPONENT_H
 #define ANIMATION_COMPONENT_H
 
@@ -6,9 +10,9 @@
 namespace Supernova{
 
     struct ActionFrame{
-        float startTime;
-        float duration;
-        Entity action;
+        float startTime = 0;
+        float duration = 0;
+        Entity action = NULL_ENTITY;
     };
 
     struct AnimationComponent{
@@ -17,6 +21,8 @@ namespace Supernova{
         bool loop = false;
 
         std::string name;
+
+        float duration = -1; // -1 is infinite
     };
 
     

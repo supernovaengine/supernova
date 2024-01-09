@@ -1,5 +1,5 @@
 //
-// (c) 2022 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #include "LuaBinding.h"
@@ -209,6 +209,22 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("onPause", [] (ActionComponent* self, lua_State* L) { return &self->onPause; }, [] (ActionComponent* self, lua_State* L) { self->onPause = L; })
         .addProperty("onStop", [] (ActionComponent* self, lua_State* L) { return &self->onStop; }, [] (ActionComponent* self, lua_State* L) { self->onStop = L; })
         .addProperty("onStep", [] (ActionComponent* self, lua_State* L) { return &self->onStep; }, [] (ActionComponent* self, lua_State* L) { self->onStep = L; })
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<ActionFrame>("ActionFrame")
+        .addProperty("startTime", &ActionFrame::startTime)
+        .addProperty("duration", &ActionFrame::duration)
+        .addProperty("action", &ActionFrame::action)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<AnimationComponent>("AnimationComponent")
+        .addProperty("actions", &AnimationComponent::actions)
+        .addProperty("ownedActions", &AnimationComponent::ownedActions)
+        .addProperty("loop", &AnimationComponent::loop)
+        .addProperty("m", &AnimationComponent::name)
+        .addProperty("duration", &AnimationComponent::duration)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
