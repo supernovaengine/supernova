@@ -35,11 +35,13 @@ namespace Supernova {
 				
 				MAKE_BUFFER,
 				MAKE_IMAGE,
+				MAKE_SAMPLER,
 				MAKE_SHADER,
 				MAKE_PIPELINE,
 				MAKE_PASS,
 				DESTROY_BUFFER,
 				DESTROY_IMAGE,
+				DESTROY_SAMPLER,
 				DESTROY_SHADER,
 				DESTROY_PIPELINE,
 				DESTROY_PASS,
@@ -85,6 +87,12 @@ namespace Supernova {
 				sg_image_desc desc;
 				sg_image image;
 			} make_image;
+
+			struct
+			{
+				sg_sampler_desc desc;
+				sg_sampler sampler;
+			} make_sampler;
 			
 			struct
 			{
@@ -113,6 +121,11 @@ namespace Supernova {
 			{
 				sg_image image;
 			} destroy_image;
+			
+			struct
+			{
+				sg_sampler sampler;
+			} destroy_sampler;
 			
 			struct
 			{
@@ -241,12 +254,14 @@ namespace Supernova {
 		
 		static sg_buffer add_command_make_buffer(const sg_buffer_desc& desc);
 		static sg_image add_command_make_image(const sg_image_desc& desc);
+		static sg_sampler add_command_make_sampler(const sg_sampler_desc& desc);
 		static sg_shader add_command_make_shader(const sg_shader_desc& desc);
 		static sg_pipeline add_command_make_pipeline(const sg_pipeline_desc& desc);
 		static sg_pass add_command_make_pass(const sg_pass_desc& desc);
 		
 		static void add_command_destroy_buffer(sg_buffer buffer);
 		static void add_command_destroy_image(sg_image image);
+		static void add_command_destroy_sampler(sg_sampler sampler);
 		static void add_command_destroy_shader(sg_shader shader);
 		static void add_command_destroy_pipeline(sg_pipeline pipeline);
 		static void add_command_destroy_pass(sg_pass pass);
@@ -283,6 +298,7 @@ namespace Supernova {
 
 		static void dealloc_buffer_cb(void* cleanup_data) { sg_dealloc_buffer({(uint32_t)(uintptr_t)cleanup_data}); }
 		static void dealloc_image_cb(void* cleanup_data) { sg_dealloc_image({(uint32_t)(uintptr_t)cleanup_data}); }
+		static void dealloc_sampler_cb(void* cleanup_data) { sg_dealloc_sampler({(uint32_t)(uintptr_t)cleanup_data}); }
 		static void dealloc_shader_cb(void* cleanup_data) { sg_dealloc_shader({(uint32_t)(uintptr_t)cleanup_data}); }
 		static void dealloc_pipeline_cb(void* cleanup_data) { sg_dealloc_pipeline({(uint32_t)(uintptr_t)cleanup_data}); }
 		static void dealloc_pass_cb(void* cleanup_data) { sg_dealloc_pass({(uint32_t)(uintptr_t)cleanup_data}); }

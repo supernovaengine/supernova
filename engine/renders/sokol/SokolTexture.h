@@ -16,9 +16,11 @@ namespace Supernova{
 
     private:
         sg_image image;
+        sg_sampler sampler;
 
         sg_image_type getTextureType(TextureType textureType);
         sg_filter getFilter(TextureFilter textureFilter);
+        sg_filter getFilterMipmap(TextureFilter textureFilter);
         sg_wrap getWrap(TextureWrap textureWrap);
 
         sg_image generateMipmaps(const sg_image_desc* desc_);
@@ -42,6 +44,7 @@ namespace Supernova{
         void destroyTexture();
 
         sg_image get();
+        sg_sampler getSampler();
     };
 }
 

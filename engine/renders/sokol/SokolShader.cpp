@@ -81,16 +81,16 @@ sg_uniform_type SokolShader::flattenedUniformToSokolType(ShaderUniformType type)
     return SG_UNIFORMTYPE_INVALID;
 }
 
-sg_sampler_type SokolShader::samplerToSokolType(TextureSamplerType type){
+sg_image_sample_type SokolShader::samplerToSokolType(TextureSamplerType type){
     if (type == TextureSamplerType::FLOAT){
-        return SG_SAMPLERTYPE_FLOAT;
+        return SG_IMAGESAMPLETYPE_FLOAT;
     }else if (type == TextureSamplerType::UINT){
-        return SG_SAMPLERTYPE_UINT;
+        return SG_IMAGESAMPLETYPE_UINT;
     }else if (type == TextureSamplerType::SINT){
-        return SG_SAMPLERTYPE_SINT;
+        return SG_IMAGESAMPLETYPE_SINT;
     }
 
-    return SG_SAMPLERTYPE_FLOAT;
+    return SG_IMAGESAMPLETYPE_FLOAT;
 }
 
 sg_image_type SokolShader::textureToSokolType(TextureType type){
@@ -170,9 +170,28 @@ bool SokolShader::createShader(ShaderData& shaderData){
         //textures
         for (int t = 0; t < stage->textures.size(); t++) {
             sg_shader_image_desc* img = &stage_desc->images[stage->textures[t].binding];
-            img->name = stage->textures[t].name.c_str();
+            sg_shader_sampler_desc* sampler = &stage_desc->samplers[stage->textures[t].binding];
+            sg_shader_image_sampler_pair_desc* imgsamplerpair = &stage_desc->image_sampler_pairs[stage->textures[t].binding];
+
+            img->used = true;
             img->image_type = textureToSokolType(stage->textures[t].type);
-            img->sampler_type = samplerToSokolType(stage->textures[t].samplerType);
+            img->sample_type = samplerToSokolType(stage->textures[t].samplerType);
+
+            sampler->used = true;
+            if (stage->textures[t].samplerType == TextureSamplerType::FLOAT){
+                sampler->sampler_type = SG_SAMPLERTYPE_FILTERING;
+            }else if (stage->textures[t].samplerType == TextureSamplerType::UINT){
+                sampler->sampler_type = SG_SAMPLERTYPE_NONFILTERING;
+            }else if (stage->textures[t].samplerType == TextureSamplerType::SINT){
+                sampler->sampler_type = SG_SAMPLERTYPE_NONFILTERING;
+            }else{
+                sampler->sampler_type = SG_SAMPLERTYPE_FILTERING;
+            }
+
+            imgsamplerpair->used = true;
+            imgsamplerpair->image_slot = stage->textures[t].binding;
+            imgsamplerpair->sampler_slot = stage->textures[t].binding;
+            imgsamplerpair->glsl_name = stage->textures[t].name.c_str();
         }
     }
 

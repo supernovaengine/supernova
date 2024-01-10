@@ -13,12 +13,14 @@ using namespace Supernova;
 
 SokolTexture::SokolTexture(){
     image.id = SG_INVALID_ID;
+    sampler.id = SG_INVALID_ID;
 }
 
-SokolTexture::SokolTexture(const SokolTexture& rhs): image(rhs.image) {}
+SokolTexture::SokolTexture(const SokolTexture& rhs): image(rhs.image), sampler(rhs.sampler) {}
 
 SokolTexture& SokolTexture::operator=(const SokolTexture& rhs){ 
-    image = rhs.image; 
+    image = rhs.image;
+    sampler = rhs.sampler;
     return *this;
 }
 
@@ -37,17 +39,23 @@ sg_filter SokolTexture::getFilter(TextureFilter textureFilter){
         return SG_FILTER_LINEAR;
     }else if (textureFilter == TextureFilter::NEAREST){
         return SG_FILTER_NEAREST;
-    }else if (textureFilter == TextureFilter::LINEAR_MIPMAP_LINEAR){
-        return SG_FILTER_LINEAR_MIPMAP_LINEAR;
-    }else if (textureFilter == TextureFilter::LINEAR_MIPMAP_NEAREST){
-        return SG_FILTER_LINEAR_MIPMAP_NEAREST;
-    }else if (textureFilter == TextureFilter::NEAREST_MIPMAP_NEAREST){
-        return SG_FILTER_NEAREST_MIPMAP_NEAREST;
-    }else if (textureFilter == TextureFilter::NEAREST_MIPMAP_LINEAR){
-        return SG_FILTER_NEAREST_MIPMAP_LINEAR;
     }
 
-    return SG_FILTER_LINEAR;
+    return SG_FILTER_NONE;
+}
+
+sg_filter SokolTexture::getFilterMipmap(TextureFilter textureFilter){
+    if (textureFilter == TextureFilter::LINEAR_MIPMAP_LINEAR){
+        return SG_FILTER_LINEAR;
+    }else if (textureFilter == TextureFilter::LINEAR_MIPMAP_NEAREST){
+        return SG_FILTER_NEAREST;
+    }else if (textureFilter == TextureFilter::NEAREST_MIPMAP_NEAREST){
+        return SG_FILTER_NEAREST;
+    }else if (textureFilter == TextureFilter::NEAREST_MIPMAP_LINEAR){
+        return SG_FILTER_LINEAR;
+    }
+
+    return SG_FILTER_NONE;
 }
 
 sg_wrap SokolTexture::getWrap(TextureWrap textureWrap){
@@ -204,21 +212,21 @@ bool SokolTexture::createTexture(
     image_desc.height = height;
     image_desc.pixel_format = pixelFormat;
     image_desc.num_slices = 1;
-    image_desc.min_filter = getFilter(minFilter);
-    image_desc.mag_filter = getFilter(magFilter);
-    image_desc.wrap_u = getWrap(wrapU);
-    image_desc.wrap_v = getWrap(wrapV);
     image_desc.label = label.c_str();
+
+    sg_sampler_desc sampler_desc = {0};
+    sampler_desc.min_filter = getFilter(minFilter);
+    sampler_desc.mag_filter = getFilter(magFilter);
+    sampler_desc.mipmap_filter = getFilterMipmap(minFilter);
+    sampler_desc.wrap_u = getWrap(wrapU);
+    sampler_desc.wrap_v = getWrap(wrapV);
 
     for (int f = 0; f < numFaces; f++){
         image_desc.data.subimage[f][0].ptr = data[f];
         image_desc.data.subimage[f][0].size = size[f];
     }
 
-    if (image_desc.min_filter == SG_FILTER_LINEAR_MIPMAP_LINEAR || 
-            image_desc.min_filter == SG_FILTER_LINEAR_MIPMAP_NEAREST ||
-            image_desc.min_filter == SG_FILTER_NEAREST_MIPMAP_LINEAR || 
-            image_desc.min_filter == SG_FILTER_NEAREST_MIPMAP_NEAREST){
+    if (sampler_desc.mipmap_filter == SG_FILTER_LINEAR || sampler_desc.mipmap_filter == SG_FILTER_NEAREST){
         image = generateMipmaps(&image_desc);
     }else{
         if (Engine::isAsyncThread()){
@@ -227,8 +235,13 @@ bool SokolTexture::createTexture(
             image = sg_make_image(image_desc);
         }
     }
+    if (Engine::isAsyncThread()){
+        sampler = SokolCmdQueue::add_command_make_sampler(sampler_desc);
+    }else{
+        sampler = sg_make_sampler(sampler_desc);
+    }
 
-    if (image.id != SG_INVALID_ID)
+    if (image.id != SG_INVALID_ID && sampler.id != SG_INVALID_ID)
         return true;
 
     return false;
@@ -242,10 +255,14 @@ bool SokolTexture::createFramebufferTexture(
     img_desc.type = getTextureType(type);
     img_desc.width = width;
     img_desc.height = height;
-    img_desc.min_filter = getFilter(minFilter);
-    img_desc.mag_filter = getFilter(magFilter);
-    img_desc.wrap_u = getWrap(wrapU);
-    img_desc.wrap_v = getWrap(wrapV);
+
+    sg_sampler_desc sampler_desc = {0};
+    sampler_desc.min_filter = getFilter(minFilter);
+    sampler_desc.mag_filter = getFilter(magFilter);
+    sampler_desc.mipmap_filter = getFilterMipmap(minFilter);
+    sampler_desc.wrap_u = getWrap(wrapU);
+    sampler_desc.wrap_v = getWrap(wrapV);
+
     if (shadowMap){ //if not set Sokol gets default from sg_desc.context.sample_count
         img_desc.sample_count = 1;
     }
@@ -259,11 +276,13 @@ bool SokolTexture::createFramebufferTexture(
 
     if (Engine::isAsyncThread()){
         image = SokolCmdQueue::add_command_make_image(img_desc);
+        sampler = SokolCmdQueue::add_command_make_sampler(sampler_desc);
     }else{
         image = sg_make_image(img_desc);
+        sampler = sg_make_sampler(sampler_desc);
     }
 
-    if (image.id != SG_INVALID_ID)
+    if (image.id != SG_INVALID_ID && sampler.id != SG_INVALID_ID)
         return true;
 
     return false;
@@ -277,10 +296,22 @@ void SokolTexture::destroyTexture(){
             sg_destroy_image(image);
         }
     }
+    if (sampler.id != SG_INVALID_ID && sg_isvalid()){
+        if (Engine::isAsyncThread()){
+            SokolCmdQueue::add_command_destroy_sampler(sampler);
+        }else{
+            sg_destroy_sampler(sampler);
+        }
+    }
 
     image.id = SG_INVALID_ID;
+    sampler.id = SG_INVALID_ID;
 }
 
 sg_image SokolTexture::get(){
     return image;
+}
+
+sg_sampler SokolTexture::getSampler(){
+    return sampler;
 }

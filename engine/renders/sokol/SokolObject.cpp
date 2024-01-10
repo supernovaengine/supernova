@@ -161,10 +161,13 @@ void SokolObject::addShader(ShaderRender* shader){
 void SokolObject::addTexture(int slotTexture, ShaderStageType stage, TextureRender* texture){
     if (slotTexture != -1){
         sg_image image = texture->backend.get();
+        sg_sampler sampler = texture->backend.getSampler();
         if (stage == ShaderStageType::VERTEX){
-            bind.vs_images[slotTexture] = image;
+            bind.vs.images[slotTexture] = image;
+            bind.vs.samplers[slotTexture] = sampler;
         }else if (stage == ShaderStageType::FRAGMENT){
-            bind.fs_images[slotTexture] = image;
+            bind.fs.images[slotTexture] = image;
+            bind.fs.samplers[slotTexture] = sampler;
         }
     }
 }

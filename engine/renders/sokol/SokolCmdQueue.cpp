@@ -105,6 +105,9 @@ void SokolCmdQueue::execute_commands(bool resource_only)
 			case SokolRenderCommand::TYPE::MAKE_IMAGE:
 				sg_init_image(command.make_image.image, command.make_image.desc);
 				break;
+			case SokolRenderCommand::TYPE::MAKE_SAMPLER:
+				sg_init_sampler(command.make_sampler.sampler, command.make_sampler.desc);
+				break;
 			case SokolRenderCommand::TYPE::MAKE_SHADER:
 				sg_init_shader(command.make_shader.shader, command.make_shader.desc);
 				break;
@@ -119,6 +122,9 @@ void SokolCmdQueue::execute_commands(bool resource_only)
 				break;
 			case SokolRenderCommand::TYPE::DESTROY_IMAGE:
 				sg_uninit_image(command.destroy_image.image);
+				break;
+			case SokolRenderCommand::TYPE::DESTROY_SAMPLER:
+				sg_uninit_sampler(command.destroy_sampler.sampler);
 				break;
 			case SokolRenderCommand::TYPE::DESTROY_SHADER:
 				sg_uninit_shader(command.destroy_shader.shader);
@@ -219,6 +225,9 @@ void SokolCmdQueue::wait_for_flush()
 				case SokolRenderCommand::TYPE::MAKE_IMAGE:
 					//sg_init_image(command.make_image.image, command.make_image.desc);
 					break;
+				case SokolRenderCommand::TYPE::MAKE_SAMPLER:
+					//sg_init_sampler(command.make_sampler.sampler, command.sampler.desc);
+					break;
 				case SokolRenderCommand::TYPE::MAKE_SHADER:
 					//sg_init_shader(command.make_shader.shader, command.make_shader.desc);
 					break;
@@ -233,6 +242,9 @@ void SokolCmdQueue::wait_for_flush()
 					break;
 				case SokolRenderCommand::TYPE::DESTROY_IMAGE:
 					sg_uninit_image(command.destroy_image.image);
+					break;
+				case SokolRenderCommand::TYPE::DESTROY_SAMPLER:
+					sg_uninit_sampler(command.destroy_sampler.sampler);
 					break;
 				case SokolRenderCommand::TYPE::DESTROY_SHADER:
 					sg_uninit_shader(command.destroy_shader.shader);
@@ -312,6 +324,23 @@ sg_image SokolCmdQueue::add_command_make_image(const sg_image_desc& desc)
 
 // ----------------------------------------------------------------------------------------------------
 
+sg_sampler SokolCmdQueue::add_command_make_sampler(const sg_sampler_desc& desc)
+{
+	// add command
+	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::MAKE_SAMPLER);
+
+	// copy args
+	command.make_sampler.desc = desc;
+
+	// alloc sampler
+	command.make_sampler.sampler = sg_alloc_sampler();
+
+	// return sampler
+	return command.make_sampler.sampler;
+}
+
+// ----------------------------------------------------------------------------------------------------
+
 sg_shader SokolCmdQueue::add_command_make_shader(const sg_shader_desc& desc)
 {
 	// add command
@@ -387,6 +416,20 @@ void SokolCmdQueue::add_command_destroy_image(sg_image image)
 
 	// schedule cleanup
 	schedule_cleanup(dealloc_image_cb, (void*)(uintptr_t)command.destroy_image.image.id);
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+void SokolCmdQueue::add_command_destroy_sampler(sg_sampler sampler)
+{
+	// add command
+	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::DESTROY_SAMPLER);
+
+	// copy args
+	command.destroy_sampler.sampler = sampler;
+
+	// schedule cleanup
+	schedule_cleanup(dealloc_sampler_cb, (void*)(uintptr_t)command.destroy_sampler.sampler.id);
 }
 
 // ----------------------------------------------------------------------------------------------------
