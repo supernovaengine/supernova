@@ -149,7 +149,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
     set(APP_NAME supernova-android) # Android uses a fixed library name
 
     if( ANDROID_ABI MATCHES "^arm(eabi)?(-v7a)?(64-v8a)?$" )
-        #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=neon")
+        #add_compile_options("-march=armv8.2a+fp16")
+        if( ANDROID_ABI MATCHES "^arm(eabi)?(-v7a)?$" )
+            add_compile_options("-mfpu=fp-armv8") # for stb_image_resize2.h
+        endif()
         set(IS_ARM ON)
     endif()
 
