@@ -849,10 +849,10 @@
 		71D74956296731F200348AB8 /* EntityHandle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71D74950296731F100348AB8 /* EntityHandle.cpp */; };
 		71D74957296731F200348AB8 /* EntityHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 71D74951296731F200348AB8 /* EntityHandle.h */; };
 		71D74958296731F200348AB8 /* Tilemap.h in Headers */ = {isa = PBXBuildFile; fileRef = 71D74952296731F200348AB8 /* Tilemap.h */; };
-		71D9B63629B563B500F00B88 /* stb_image_resize.h in Headers */ = {isa = PBXBuildFile; fileRef = 71D9B63429B563B500F00B88 /* stb_image_resize.h */; };
-		71D9B63729B563B500F00B88 /* stb_image_resize.h in Headers */ = {isa = PBXBuildFile; fileRef = 71D9B63429B563B500F00B88 /* stb_image_resize.h */; };
-		71D9B63829B563B500F00B88 /* stb_image_resize.c in Sources */ = {isa = PBXBuildFile; fileRef = 71D9B63529B563B500F00B88 /* stb_image_resize.c */; };
-		71D9B63929B563B500F00B88 /* stb_image_resize.c in Sources */ = {isa = PBXBuildFile; fileRef = 71D9B63529B563B500F00B88 /* stb_image_resize.c */; };
+		71D9B63629B563B500F00B88 /* stb_image_resize2.h in Headers */ = {isa = PBXBuildFile; fileRef = 71D9B63429B563B500F00B88 /* stb_image_resize2.h */; };
+		71D9B63729B563B500F00B88 /* stb_image_resize2.h in Headers */ = {isa = PBXBuildFile; fileRef = 71D9B63429B563B500F00B88 /* stb_image_resize2.h */; };
+		71D9B63829B563B500F00B88 /* stb_image_resize2.c in Sources */ = {isa = PBXBuildFile; fileRef = 71D9B63529B563B500F00B88 /* stb_image_resize2.c */; };
+		71D9B63929B563B500F00B88 /* stb_image_resize2.c in Sources */ = {isa = PBXBuildFile; fileRef = 71D9B63529B563B500F00B88 /* stb_image_resize2.c */; };
 		71E36BB525D599C000EFEED4 /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71E36BB325D599C000EFEED4 /* tiny_obj_loader.cc */; };
 		71E36BB625D599C000EFEED4 /* tiny_obj_loader.h in Headers */ = {isa = PBXBuildFile; fileRef = 71E36BB425D599C000EFEED4 /* tiny_obj_loader.h */; };
 		71E36BC625D599E200EFEED4 /* libtinyobjloader-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71E36B8C25D5999C00EFEED4 /* libtinyobjloader-macos.a */; };
@@ -2132,8 +2132,8 @@
 		71D74950296731F100348AB8 /* EntityHandle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EntityHandle.cpp; sourceTree = "<group>"; };
 		71D74951296731F200348AB8 /* EntityHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EntityHandle.h; sourceTree = "<group>"; };
 		71D74952296731F200348AB8 /* Tilemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tilemap.h; sourceTree = "<group>"; };
-		71D9B63429B563B500F00B88 /* stb_image_resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_resize.h; sourceTree = "<group>"; };
-		71D9B63529B563B500F00B88 /* stb_image_resize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image_resize.c; sourceTree = "<group>"; };
+		71D9B63429B563B500F00B88 /* stb_image_resize2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_resize2.h; sourceTree = "<group>"; };
+		71D9B63529B563B500F00B88 /* stb_image_resize2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image_resize2.c; sourceTree = "<group>"; };
 		71E36B5225D5994100EFEED4 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
 		71E36B5325D5994100EFEED4 /* Model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Model.cpp; sourceTree = "<group>"; };
 		71E36B5425D5994100EFEED4 /* Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mesh.cpp; sourceTree = "<group>"; };
@@ -3846,8 +3846,8 @@
 		71BE61B925B1DA3E006D6E02 /* stb */ = {
 			isa = PBXGroup;
 			children = (
-				71D9B63529B563B500F00B88 /* stb_image_resize.c */,
-				71D9B63429B563B500F00B88 /* stb_image_resize.h */,
+				71D9B63529B563B500F00B88 /* stb_image_resize2.c */,
+				71D9B63429B563B500F00B88 /* stb_image_resize2.h */,
 				71BE61C225B1DA3E006D6E02 /* stb_image_write.c */,
 				71BE61BD25B1DA3E006D6E02 /* stb_image_write.h */,
 				71BE61BB25B1DA3E006D6E02 /* stb_image.c */,
@@ -4201,7 +4201,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71D9B63729B563B500F00B88 /* stb_image_resize.h in Headers */,
+				71D9B63729B563B500F00B88 /* stb_image_resize2.h in Headers */,
 				710AD6D425B6053400A7B12F /* stb_vorbis.h in Headers */,
 				710AD6D525B6053400A7B12F /* stb_image_write.h in Headers */,
 				710AD6D625B6053400A7B12F /* stb_rect_pack.h in Headers */,
@@ -4434,7 +4434,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71D9B63629B563B500F00B88 /* stb_image_resize.h in Headers */,
+				71D9B63629B563B500F00B88 /* stb_image_resize2.h in Headers */,
 				71BE61CE25B1DA3E006D6E02 /* stb_vorbis.h in Headers */,
 				71BE61C725B1DA3E006D6E02 /* stb_image_write.h in Headers */,
 				71BE61C825B1DA3E006D6E02 /* stb_rect_pack.h in Headers */,
@@ -5385,7 +5385,7 @@
 				710AD6DC25B6053400A7B12F /* stb_truetype.c in Sources */,
 				710AD6DD25B6053400A7B12F /* stb_image.c in Sources */,
 				710AD6DE25B6053400A7B12F /* stb_image_write.c in Sources */,
-				71D9B63929B563B500F00B88 /* stb_image_resize.c in Sources */,
+				71D9B63929B563B500F00B88 /* stb_image_resize2.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5810,7 +5810,7 @@
 				71BE61C525B1DA3E006D6E02 /* stb_truetype.c in Sources */,
 				71BE61C625B1DA3E006D6E02 /* stb_image.c in Sources */,
 				71BE61CC25B1DA3E006D6E02 /* stb_image_write.c in Sources */,
-				71D9B63829B563B500F00B88 /* stb_image_resize.c in Sources */,
+				71D9B63829B563B500F00B88 /* stb_image_resize2.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

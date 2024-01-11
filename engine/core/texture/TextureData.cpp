@@ -14,7 +14,7 @@
 #include "io/Data.h"
 #include "stb_image.h"
 #if RESIZE_WITH_STB
-#include "stb_image_resize.h"
+#include "stb_image_resize2.h"
 #endif
 #include "Log.h"
 #include "Texture.h"
@@ -237,8 +237,19 @@ void TextureData::resize(int newWidth, int newHeight){
 
         #if RESIZE_WITH_STB
 
-        stbir_resize_uint8((unsigned char*)data, width, height, 0,
-	                   newData, newWidth, newHeight, 0, channels);
+        stbir_pixel_layout pixel_layout = stbir_pixel_layout::STBIR_RGBA;
+        if (channels == 1){
+            pixel_layout = stbir_pixel_layout::STBIR_1CHANNEL;
+        }else if (channels == 2){
+            pixel_layout = stbir_pixel_layout::STBIR_2CHANNEL;
+        }else if (channels == 3){
+            pixel_layout = stbir_pixel_layout::STBIR_RGB;
+        }else if (channels == 4){
+            pixel_layout = stbir_pixel_layout::STBIR_RGBA;
+        }
+
+        stbir_resize_uint8_linear((unsigned char*)data, width, height, 0,
+	                   newData, newWidth, newHeight, 0, pixel_layout);
 
         #else
 

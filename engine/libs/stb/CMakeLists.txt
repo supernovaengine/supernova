@@ -9,7 +9,7 @@ add_library(
     stb_truetype.c
     stb_image.c
     stb_image_write.c
-    stb_image_resize.c
+    stb_image_resize2.c
 
 )
 
