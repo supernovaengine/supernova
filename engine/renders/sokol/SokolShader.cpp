@@ -148,7 +148,7 @@ bool SokolShader::createShader(ShaderData& shaderData){
     
         // uniform blocks
         for (int ub = 0; ub < stage->uniformblocks.size(); ub++) {
-            sg_shader_uniform_block_desc* ubdesc = &stage_desc->uniform_blocks[stage->uniformblocks[ub].binding];
+            sg_shader_uniform_block_desc* ubdesc = &stage_desc->uniform_blocks[ub];
             ubdesc->size = roundup(stage->uniformblocks[ub].sizeBytes, 16);
             ubdesc->layout = SG_UNIFORMLAYOUT_STD140;
             // GL/GLES always flatten UBs if same type inside to not declare individual uniforms and use only one glUniform4fv call
@@ -169,9 +169,9 @@ bool SokolShader::createShader(ShaderData& shaderData){
 
         //textures
         for (int t = 0; t < stage->textures.size(); t++) {
-            sg_shader_image_desc* img = &stage_desc->images[stage->textures[t].binding];
-            sg_shader_sampler_desc* sampler = &stage_desc->samplers[stage->textures[t].binding];
-            sg_shader_image_sampler_pair_desc* imgsamplerpair = &stage_desc->image_sampler_pairs[stage->textures[t].binding];
+            sg_shader_image_desc* img = &stage_desc->images[t];
+            sg_shader_sampler_desc* sampler = &stage_desc->samplers[t];
+            sg_shader_image_sampler_pair_desc* imgsamplerpair = &stage_desc->image_sampler_pairs[t];
 
             img->used = true;
             img->image_type = textureToSokolType(stage->textures[t].type);
@@ -189,8 +189,8 @@ bool SokolShader::createShader(ShaderData& shaderData){
             }
 
             imgsamplerpair->used = true;
-            imgsamplerpair->image_slot = stage->textures[t].binding;
-            imgsamplerpair->sampler_slot = stage->textures[t].binding;
+            imgsamplerpair->image_slot = t;
+            imgsamplerpair->sampler_slot = t;
             imgsamplerpair->glsl_name = stage->textures[t].name.c_str();
         }
     }
