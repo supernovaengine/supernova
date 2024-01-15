@@ -42,35 +42,35 @@ Shadow getShadowCubeConf(int index){
 vec4 getShadowMap(int index, vec2 coords) {
     if (index == 0){
         #if MAX_SHADOWSMAP >= 1
-        return texture(u_shadowMap1, coords);
+        return texture(sampler2D(u_shadowMap1, u_shadowMap1_smp), coords);
         #endif
     }else if (index == 1){
         #if MAX_SHADOWSMAP >= 2
-        return texture(u_shadowMap2, coords);
+        return texture(sampler2D(u_shadowMap2, u_shadowMap2_smp), coords);
         #endif
     }else if (index == 2){
         #if MAX_SHADOWSMAP >= 3
-        return texture(u_shadowMap3, coords);
+        return texture(sampler2D(u_shadowMap3, u_shadowMap3_smp), coords);
         #endif
     }else if (index == 3){
         #if MAX_SHADOWSMAP >= 4
-        return texture(u_shadowMap4, coords);
+        return texture(sampler2D(u_shadowMap4, u_shadowMap4_smp), coords);
         #endif
     }else if (index == 4){
         #if MAX_SHADOWSMAP >= 5
-        return texture(u_shadowMap5, coords);
+        return texture(sampler2D(u_shadowMap5, u_shadowMap5_smp), coords);
         #endif
     }else if (index == 5){
         #if MAX_SHADOWSMAP >= 6
-        return texture(u_shadowMap6, coords);
+        return texture(sampler2D(u_shadowMap6, u_shadowMap6_smp), coords);
         #endif
     }else if (index == 6){
         #if MAX_SHADOWSMAP >= 7
-        return texture(u_shadowMap7, coords);
+        return texture(sampler2D(u_shadowMap7, u_shadowMap7_smp), coords);
         #endif
     }else if (index == 7){
         #if MAX_SHADOWSMAP >= 8
-        return texture(u_shadowMap8, coords);
+        return texture(sampler2D(u_shadowMap8, u_shadowMap8_smp), coords);
         #endif
     }
 
@@ -81,19 +81,19 @@ vec4 getShadowCubeMap(int index, vec3 coords) {
     index -= MAX_SHADOWSMAP;
     if (index == 0){
         #if MAX_SHADOWSCUBEMAP >= 1
-        return texture(u_shadowCubeMap1, coords);
+        return texture(samplerCube(u_shadowCubeMap1, u_shadowCubeMap1_smp), coords);
         #endif
     }else if (index == 1){
         #if MAX_SHADOWSCUBEMAP >= 2
-        return texture(u_shadowCubeMap2, coords);
+        return texture(samplerCube(u_shadowCubeMap2, u_shadowCubeMap2_smp), coords);
         #endif
     }else if (index == 2){
         #if MAX_SHADOWSCUBEMAP >= 3
-        return texture(u_shadowCubeMap3, coords);
+        return texture(samplerCube(u_shadowCubeMap3, u_shadowCubeMap3_smp), coords);
         #endif
     }else if (index == 3){
         #if MAX_SHADOWSCUBEMAP >= 4
-        return texture(u_shadowCubeMap4, coords);
+        return texture(samplerCube(u_shadowCubeMap4, u_shadowCubeMap4_smp), coords);
         #endif
     }
 

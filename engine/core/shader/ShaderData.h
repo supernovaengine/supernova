@@ -46,6 +46,20 @@ namespace Supernova {
         TextureSamplerType samplerType;
     };
 
+    struct ShaderSampler {
+        std::string name;
+        int set;
+        int binding;
+        SamplerType type;
+    };
+
+    struct ShaderTextureSampler {
+        std::string name;
+        std::string textureName;
+        std::string samplerName;
+        int binding;
+    };
+
     struct ShaderBinSource{
         unsigned char* data = NULL;
         uint32_t size;
@@ -61,6 +75,8 @@ namespace Supernova {
         std::vector<ShaderAttr> attributes;
         std::vector<ShaderUniformBlock> uniformblocks;
         std::vector<ShaderTexture> textures;
+        std::vector<ShaderSampler> samplers;
+        std::vector<ShaderTextureSampler> textureSamplersPair;
     };
 
     class ShaderData {
@@ -79,7 +95,7 @@ namespace Supernova {
 
         int getAttrIndex(AttributeType type);
         int getUniformBlockIndex(UniformBlockType type, ShaderStageType stage);
-        int getTextureIndex(TextureShaderType type, ShaderStageType stage);
+        std::pair<int, int> getTextureIndex(TextureShaderType type, ShaderStageType stage);
 
         void releaseSourceData();
     };

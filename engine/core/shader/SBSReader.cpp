@@ -10,7 +10,7 @@
 
 #define makefourcc(_a, _b, _c, _d) (((uint32_t)(_a) | ((uint32_t)(_b) << 8) | ((uint32_t)(_c) << 16) | ((uint32_t)(_d) << 24)))
 
-#define SBS_NAME_SIZE 32
+#define SBS_NAME_SIZE 64
 
 //----------Begin SBS format---------------
 #pragma pack(push, 1)
@@ -53,9 +53,13 @@
 #define SBS_TEXTURE_CUBE        makefourcc('C', 'U', 'B', 'E')
 #define SBS_TEXTURE_ARRAY       makefourcc('A', 'R', 'R', 'A')
 
-#define SBS_SAMPLERTYPE_FLOAT   makefourcc('T', 'F', 'L', 'T')
-#define SBS_SAMPLERTYPE_SINT    makefourcc('T', 'I', 'N', 'T')
-#define SBS_SAMPLERTYPE_UINT    makefourcc('T', 'U', 'I', 'T')
+#define SBS_TEXTURE_SAMPLERTYPE_FLOAT   makefourcc('T', 'F', 'L', 'T')
+#define SBS_TEXTURE_SAMPLERTYPE_SINT    makefourcc('T', 'I', 'N', 'T')
+#define SBS_TEXTURE_SAMPLERTYPE_UINT    makefourcc('T', 'U', 'I', 'T')
+#define SBS_TEXTURE_SAMPLERTYPE_DEPTH   makefourcc('T', 'D', 'P', 'H')
+
+#define SBS_SAMPLERTYPE_FILTERING     makefourcc('S', 'F', 'I', 'L')
+#define SBS_SAMPLERTYPE_COMPARISON    makefourcc('S', 'C', 'O', 'M')
 
 struct sbs_chunk {
     uint32_t sbs_version;
@@ -74,6 +78,8 @@ struct sbs_chunk_refl {
     char     name[SBS_NAME_SIZE];
     uint32_t num_inputs;
     uint32_t num_textures;
+    uint32_t num_samplers;
+    uint32_t num_texture_samplers;
     uint32_t num_uniform_blocks;
     uint32_t num_uniforms;
 };
@@ -92,6 +98,20 @@ struct sbs_refl_texture {
     int32_t  binding;
     uint32_t type;
     uint32_t sampler_type;
+};
+
+struct sbs_refl_sampler {
+    char     name[SBS_NAME_SIZE];
+    uint32_t set;
+    int32_t  binding;
+    uint32_t type;
+}; 
+
+struct sbs_refl_texture_sampler {
+    char     name[SBS_NAME_SIZE];
+    char     texture_name[SBS_NAME_SIZE];
+    char     sampler_name[SBS_NAME_SIZE];
+    int32_t  binding;
 }; 
 
 struct sbs_refl_uniformblock {
@@ -163,7 +183,7 @@ bool SBSReader::read(FileData& file){
     sbs_chunk sinfo;
     file.read((unsigned char*)&sinfo, sizeof(sinfo));
 
-    if (sinfo.sbs_version != 100){
+    if (sinfo.sbs_version != 110){
         Log::error("Invalid sbs file version");
         return false;
     }
@@ -272,17 +292,50 @@ bool SBSReader::read(FileData& file){
                     texture.type = TextureType::TEXTURE_2D;
                 }
 
-                if (t.sampler_type == SBS_SAMPLERTYPE_FLOAT){
+                if (t.sampler_type == SBS_TEXTURE_SAMPLERTYPE_FLOAT){
                     texture.samplerType = TextureSamplerType::FLOAT;
-                }else if (t.sampler_type == SBS_SAMPLERTYPE_UINT){
+                }else if (t.sampler_type == SBS_TEXTURE_SAMPLERTYPE_UINT){
                     texture.samplerType = TextureSamplerType::UINT;
-                }else if (t.sampler_type == SBS_SAMPLERTYPE_SINT){
+                }else if (t.sampler_type == SBS_TEXTURE_SAMPLERTYPE_SINT){
                     texture.samplerType = TextureSamplerType::SINT;
+                }else if (t.sampler_type == SBS_TEXTURE_SAMPLERTYPE_DEPTH){
+                    texture.samplerType = TextureSamplerType::DEPTH;
                 }else{
                     texture.samplerType = TextureSamplerType::FLOAT;
                 }
 
                 shaderStage->textures.push_back(texture);
+            }
+
+            for (uint32_t i = 0; i < refl_chunk.num_samplers; i++) {
+                sbs_refl_sampler sm;
+                file.read((unsigned char*)&sm, sizeof(sm));
+
+                ShaderSampler sampler;
+                sampler.name = std::string(sm.name);
+                sampler.set = sm.set;
+                sampler.binding = sm.binding;
+
+                if (sm.type == SBS_SAMPLERTYPE_COMPARISON){
+                    sampler.type = SamplerType::COMPARISON;
+                }else if (sm.type == SBS_SAMPLERTYPE_FILTERING){
+                    sampler.type = SamplerType::FILTERING;
+                }
+
+                shaderStage->samplers.push_back(sampler);
+            }
+
+            for (uint32_t i = 0; i < refl_chunk.num_texture_samplers; i++) {
+                sbs_refl_texture_sampler tsm;
+                file.read((unsigned char*)&tsm, sizeof(tsm));
+
+                ShaderTextureSampler texturesampler;
+                texturesampler.name = std::string(tsm.name);
+                texturesampler.textureName = std::string(tsm.texture_name);
+                texturesampler.samplerName = std::string(tsm.sampler_name);
+                texturesampler.binding = tsm.binding;
+
+                shaderStage->textureSamplersPair.push_back(texturesampler);
             }
 
             for (uint32_t i = 0; i < refl_chunk.num_uniform_blocks; i++) {

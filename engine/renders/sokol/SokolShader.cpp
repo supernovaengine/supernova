@@ -81,7 +81,7 @@ sg_uniform_type SokolShader::flattenedUniformToSokolType(ShaderUniformType type)
     return SG_UNIFORMTYPE_INVALID;
 }
 
-sg_image_sample_type SokolShader::samplerToSokolType(TextureSamplerType type){
+sg_image_sample_type SokolShader::textureSamplerToSokolType(TextureSamplerType type){
     if (type == TextureSamplerType::FLOAT){
         return SG_IMAGESAMPLETYPE_FLOAT;
     }else if (type == TextureSamplerType::UINT){
@@ -105,6 +105,16 @@ sg_image_type SokolShader::textureToSokolType(TextureType type){
     }
 
     return SG_IMAGETYPE_2D;
+}
+
+sg_sampler_type SokolShader::samplerToSokolType(SamplerType type){
+    if (type == SamplerType::COMPARISON){
+        return SG_SAMPLERTYPE_COMPARISON;
+    }else if (type == SamplerType::FILTERING){
+        return SG_SAMPLERTYPE_FILTERING;
+    }
+
+    return SG_SAMPLERTYPE_NONFILTERING;
 }
 
 bool SokolShader::createShader(ShaderData& shaderData){
@@ -167,31 +177,45 @@ bool SokolShader::createShader(ShaderData& shaderData){
             }
         }
 
-        //textures
+        // textures
         for (int t = 0; t < stage->textures.size(); t++) {
             sg_shader_image_desc* img = &stage_desc->images[t];
-            sg_shader_sampler_desc* sampler = &stage_desc->samplers[t];
-            sg_shader_image_sampler_pair_desc* imgsamplerpair = &stage_desc->image_sampler_pairs[t];
 
             img->used = true;
             img->image_type = textureToSokolType(stage->textures[t].type);
-            img->sample_type = samplerToSokolType(stage->textures[t].samplerType);
+            img->sample_type = textureSamplerToSokolType(stage->textures[t].samplerType);
+        }
+
+        // samplers
+        for (int s = 0; s < stage->samplers.size(); s++) {
+            sg_shader_sampler_desc* sampler = &stage_desc->samplers[s];
 
             sampler->used = true;
-            if (stage->textures[t].samplerType == TextureSamplerType::FLOAT){
-                sampler->sampler_type = SG_SAMPLERTYPE_FILTERING;
-            }else if (stage->textures[t].samplerType == TextureSamplerType::UINT){
-                sampler->sampler_type = SG_SAMPLERTYPE_NONFILTERING;
-            }else if (stage->textures[t].samplerType == TextureSamplerType::SINT){
-                sampler->sampler_type = SG_SAMPLERTYPE_NONFILTERING;
-            }else{
-                sampler->sampler_type = SG_SAMPLERTYPE_FILTERING;
+            sampler->sampler_type = samplerToSokolType(stage->samplers[s].type);
+        }
+
+        // texture sampler pair
+        for (int ts = 0; ts < stage->textureSamplersPair.size(); ts++) {
+            sg_shader_image_sampler_pair_desc* imgsamplerpair = &stage_desc->image_sampler_pairs[ts];
+
+            // get texture index
+            int texIndex = -1;
+            for (int t = 0; t < stage->textures.size(); t++){
+                if (stage->textures[t].name == stage->textureSamplersPair[ts].textureName)
+                    texIndex = t;
+            }
+
+            // get sampler index
+            int samIndex = -1;
+            for (int s = 0; s < stage->samplers.size(); s++){
+                if (stage->samplers[s].name == stage->textureSamplersPair[ts].samplerName)
+                    samIndex = s;
             }
 
             imgsamplerpair->used = true;
-            imgsamplerpair->image_slot = t;
-            imgsamplerpair->sampler_slot = t;
-            imgsamplerpair->glsl_name = stage->textures[t].name.c_str();
+            imgsamplerpair->image_slot = texIndex;
+            imgsamplerpair->sampler_slot = samIndex;
+            imgsamplerpair->glsl_name = stage->textureSamplersPair[ts].name.c_str();
         }
     }
 

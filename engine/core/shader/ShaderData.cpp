@@ -188,7 +188,7 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
     return uniIndex;
 }
 
-int ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
+std::pair<int, int> ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
     std::string texstr;
     
     if (type == TextureShaderType::BASECOLOR){
@@ -239,7 +239,7 @@ int ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
 
     if (texstr.empty()){
         Log::error("Trying to get a not mapped texture");
-        return -1;
+        return std::pair(-1, -1);
     }
 
     int sIndex = -1;
@@ -248,15 +248,33 @@ int ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
             sIndex = s;
     }
 
+
     int texIndex = -1;
+    int samIndex = -1;
     if (sIndex != -1){
+
+        // get texture index
         for (int t = 0; t < stages[sIndex].textures.size(); t++){
             if (stages[sIndex].textures[t].name == texstr)
                 texIndex = t;
         }
+
+        // get sampler name by texture
+        std::string samplerName;
+        for (int ts = 0; ts < stages[sIndex].textureSamplersPair.size(); ts++){
+            if (stages[sIndex].textureSamplersPair[ts].textureName == texstr){
+                samplerName = stages[sIndex].textureSamplersPair[ts].samplerName;
+            }
+        }
+
+        // get sampler index
+        for (int s = 0; s < stages[sIndex].samplers.size(); s++){
+            if (stages[sIndex].samplers[s].name == samplerName)
+                samIndex = s;
+        }
     }
 
-    return texIndex;
+    return std::pair(texIndex, samIndex);
 }
 
 void ShaderData::releaseSourceData(){

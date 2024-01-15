@@ -139,7 +139,13 @@ namespace Supernova{
     enum class TextureSamplerType {
         SINT,
         UINT,
-        FLOAT
+        FLOAT,
+        DEPTH
+    };
+
+    enum class SamplerType {
+        COMPARISON,
+        FILTERING
     };
 
     enum class ColorFormat{

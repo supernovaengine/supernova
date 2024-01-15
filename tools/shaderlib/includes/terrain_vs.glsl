@@ -1,4 +1,5 @@
-uniform sampler2D u_heightMap;
+uniform texture2D u_heightMap;
+uniform sampler u_heightMap_smp;
 
 uniform u_vs_terrainParams {
     vec3 eyePos;
@@ -31,7 +32,7 @@ vec2 morphVertex(vec2 gridPos, vec2 worldPos, float morph) {
 }
 
 float getHeight(vec3 position) {
-    return texture(u_heightMap, (position.xz + (terrain.size/2.0)) / terrain.size).r * terrain.maxHeight;
+    return texture(sampler2D(u_heightMap, u_heightMap_smp), (position.xz + (terrain.size/2.0)) / terrain.size).r * terrain.maxHeight;
 }
 
 // must be called BEFORE getTerrainNormal because morphValue

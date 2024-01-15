@@ -22,12 +22,17 @@ in vec2 v_uv2;
 
 out vec4 g_finalColor;
 
-uniform sampler2D u_baseColorTexture;
+uniform texture2D u_baseColorTexture;
+uniform sampler u_baseColor_smp;
 #ifndef MATERIAL_UNLIT
-    uniform sampler2D u_metallicRoughnessTexture;
-    uniform sampler2D u_normalTexture;
-    uniform sampler2D u_occlusionTexture;
-    uniform sampler2D u_emissiveTexture;
+    uniform texture2D u_metallicRoughnessTexture;
+    uniform texture2D u_normalTexture;
+    uniform texture2D u_occlusionTexture;
+    uniform texture2D u_emissiveTexture;
+    uniform sampler u_metallicRoughness_smp;
+    uniform sampler u_normal_smp;
+    uniform sampler u_occlusion_smp;
+    uniform sampler u_emissive_smp;
 #endif
 
 uniform u_fs_pbrParams {
@@ -62,41 +67,53 @@ uniform u_fs_pbrParams {
     in float v_clipSpacePosZ;
 
     #if MAX_SHADOWSMAP >= 1
-    uniform sampler2D u_shadowMap1;
+    uniform texture2D u_shadowMap1;
+    uniform sampler u_shadowMap1_smp;
     #endif
     #if MAX_SHADOWSMAP >= 2
-    uniform sampler2D u_shadowMap2;
+    uniform texture2D u_shadowMap2;
+    uniform sampler u_shadowMap2_smp;
     #endif
     #if MAX_SHADOWSMAP >= 3
-    uniform sampler2D u_shadowMap3;
+    uniform texture2D u_shadowMap3;
+    uniform sampler u_shadowMap3_smp;
     #endif
     #if MAX_SHADOWSMAP >= 4
-    uniform sampler2D u_shadowMap4;
+    uniform texture2D u_shadowMap4;
+    uniform sampler u_shadowMap4_smp;
     #endif
     #if MAX_SHADOWSMAP >= 5
-    uniform sampler2D u_shadowMap5;
+    uniform texture2D u_shadowMap5;
+    uniform sampler u_shadowMap5_smp;
     #endif
     #if MAX_SHADOWSMAP >= 6
-    uniform sampler2D u_shadowMap6;
+    uniform texture2D u_shadowMap6;
+    uniform sampler u_shadowMap6_smp;
     #endif
     #if MAX_SHADOWSMAP >= 7
-    uniform sampler2D u_shadowMap7;
+    uniform texture2D u_shadowMap7;
+    uniform sampler u_shadowMap7_smp;
     #endif
     #if MAX_SHADOWSMAP >= 8
-    uniform sampler2D u_shadowMap8;
+    uniform texture2D u_shadowMap8;
+    uniform sampler u_shadowMap8_smp;
     #endif
 
     #if MAX_SHADOWSCUBEMAP >= 1
-    uniform samplerCube u_shadowCubeMap1;
+    uniform textureCube u_shadowCubeMap1;
+    uniform sampler u_shadowCubeMap1_smp;
     #endif
     #if MAX_SHADOWSCUBEMAP >= 2
-    uniform samplerCube u_shadowCubeMap2;
+    uniform textureCube u_shadowCubeMap2;
+    uniform sampler u_shadowCubeMap2_smp;
     #endif
     #if MAX_SHADOWSCUBEMAP >= 3
-    uniform samplerCube u_shadowCubeMap3;
+    uniform textureCube u_shadowCubeMap3;
+    uniform sampler u_shadowCubeMap3_smp;
     #endif
     #if MAX_SHADOWSCUBEMAP >= 4
-    uniform samplerCube u_shadowCubeMap4;
+    uniform textureCube u_shadowCubeMap4;
+    uniform sampler u_shadowCubeMap4_smp;
     #endif
 #endif
 

@@ -31,7 +31,7 @@ void ObjectRender::addShader(ShaderRender* shader){
     backend.addShader(shader);
 }
 
-void ObjectRender::addTexture(int slotTexture, ShaderStageType stage, TextureRender* texture){
+void ObjectRender::addTexture(std::pair<int, int> slotTexture, ShaderStageType stage, TextureRender* texture){
     backend.addTexture(slotTexture, stage, texture);
 }
 

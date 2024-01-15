@@ -66,7 +66,7 @@ namespace Supernova{
         void addIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset);
         void addAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized);
         void addShader(ShaderRender* shader);
-        void addTexture(int slotTexture, ShaderStageType stage, TextureRender* texture);
+        void addTexture(std::pair<int, int> slotTexture, ShaderStageType stage, TextureRender* texture);
         void endLoad(uint8_t pipelines);
 
         void beginDraw(PipelineType pipType);

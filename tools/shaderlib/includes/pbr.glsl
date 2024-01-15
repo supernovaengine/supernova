@@ -21,7 +21,7 @@ vec4 getVertexColor(){
 
 vec4 getBaseColor(){
     vec4 baseColor = pbrParams.baseColorFactor;
-    baseColor *= sRGBToLinear(texture(u_baseColorTexture, v_uv1));
+    baseColor *= sRGBToLinear(texture(sampler2D(u_baseColorTexture, u_baseColor_smp), v_uv1));
     return baseColor * getVertexColor();
 }
 #ifndef MATERIAL_UNLIT
@@ -30,7 +30,7 @@ vec4 getBaseColor(){
         info.perceptualRoughness = pbrParams.roughnessFactor;
         // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
         // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
-        vec4 mrSample = texture(u_metallicRoughnessTexture, v_uv1);
+        vec4 mrSample = texture(sampler2D(u_metallicRoughnessTexture, u_metallicRoughness_smp), v_uv1);
         info.perceptualRoughness *= mrSample.g;
         info.metallic *= mrSample.b;
         // Achromatic f0 based on IOR.
@@ -41,11 +41,11 @@ vec4 getBaseColor(){
     }
 
     vec4 getOcclusionTexture(){
-        return texture(u_occlusionTexture, v_uv1);
+        return texture(sampler2D(u_occlusionTexture, u_occlusion_smp), v_uv1);
     }
 
     vec4 getEmissiveTexture(){
-        return texture(u_emissiveTexture, v_uv1);
+        return texture(sampler2D(u_emissiveTexture, u_emissive_smp), v_uv1);
     }
 #endif
 
@@ -77,7 +77,7 @@ NormalInfo getNormalInfo(){
 
     // Compute pertubed normals:
     #ifdef HAS_NORMAL_MAP
-        n = texture(u_normalTexture, UV).rgb * 2.0 - vec3(1.0);
+        n = texture(sampler2D(u_normalTexture, u_normal_smp), UV).rgb * 2.0 - vec3(1.0);
         n *= vec3(normalScale, normalScale, 1.0);
         n = mat3(t, b, ng) * normalize(n);
     #else

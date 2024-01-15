@@ -374,7 +374,7 @@ bool RenderSystem::checkPBRFrabebufferUpdate(Material& material){
 
 void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool castShadows){
 	TextureRender* textureRender = NULL;
-	int slotTex = -1;
+	std::pair<int, int> slotTex(-1, -1);
 
 	textureRender = material.baseColorTexture.getRender();
 	slotTex = shaderData.getTextureIndex(TextureShaderType::BASECOLOR, ShaderStageType::FRAGMENT);
@@ -455,7 +455,7 @@ void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 
 void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& shaderData){
 	TextureRender* textureRender = NULL;
-	int slotTex = -1;
+	std::pair<int, int> slotTex(-1, -1);
 
 	textureRender = terrain.heightMap.getRender();
 	slotTex = shaderData.getTextureIndex(TextureShaderType::HEIGHTMAP, ShaderStageType::VERTEX);
