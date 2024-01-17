@@ -1,9 +1,7 @@
 TinyXML-2
 =========
 
-![Build](https://github.com/leethomason/tinyxml2/actions/workflows/test.yml/badge.svg)
-
-![TinyXML-2 Logo](http://www.grinninglizard.com/tinyxml2/TinyXML2_small.png)
+[![Test](https://github.com/leethomason/tinyxml2/actions/workflows/test.yml/badge.svg)](https://github.com/leethomason/tinyxml2/actions/workflows/test.yml)
 
 TinyXML-2 is a simple, small, efficient, C++ XML parser that can be
 easily integrated into other programs.
@@ -93,7 +91,7 @@ by the Document. When the Document is deleted, so are all the nodes it contains.
 
 ### White Space
 
-#### Whitespace Preservation (default)
+#### Whitespace Preservation (default, PRESERVE_WHITESPACE)
 
 Microsoft has an excellent article on white space: http://msdn.microsoft.com/en-us/library/ms256097.aspx
 
@@ -125,7 +123,7 @@ valuable. TinyXML-2 sees these as the same XML:
 
 	<document><data>1</data><data>2</data><data>3</data></document>
 
-#### Whitespace Collapse
+#### Whitespace Collapse (COLLAPSE_WHITESPACE)
 
 For some applications, it is preferable to collapse whitespace. Collapsing
 whitespace gives you "HTML-like" behavior, which is sometimes more suitable
@@ -143,7 +141,15 @@ However, you may also use COLLAPSE_WHITESPACE, which will:
 Note that (currently) there is a performance impact for using COLLAPSE_WHITESPACE.
 It essentially causes the XML to be parsed twice.
 
-#### Error Reporting
+#### Pedantic Whitespace (PEDANTIC_WHITESPACE)
+
+For applications that need to know about text nodes that are composed entirely of 
+whitespace, PEDANTIC_WHITESPACE is available. PEDANTIC_WHITESPACE maintains all the
+whilespace between elements. 
+
+PEDANTIC_WHITESPACE is a new mode and not as tested as the other whitespace modes.
+
+### Error Reporting
 
 TinyXML-2 reports the line number of any errors in an XML document that
 cannot be parsed correctly. In addition, all nodes (elements, declarations,
@@ -263,10 +269,9 @@ Generally speaking, the intent is that you simply include the tinyxml2.cpp and
 tinyxml2.h files in your project and build with your other source code.
 
 There is also a CMake build included. CMake is the general build for TinyXML-2.
-Additional build systems are costly to maintain, and tend to bit-rot. 
 
-A Visual Studio project is included, but that is largely for developer convenience,
-and is not intended to integrate well with other builds.
+(Additional build systems are costly to maintain, and tend to bit-rot. They are
+being removed over time.)
 
 Building TinyXML-2 - Using vcpkg
 --------------------------------
