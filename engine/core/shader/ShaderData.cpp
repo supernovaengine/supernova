@@ -181,7 +181,7 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
     if (sIndex != -1){
         for (int u = 0; u < stages[sIndex].uniformblocks.size(); u++){
             if (stages[sIndex].uniformblocks[u].name == ustr)
-                uniIndex = u;
+                uniIndex = stages[sIndex].uniformblocks[u].binding;
         }
     }
 
@@ -256,7 +256,7 @@ std::pair<int, int> ShaderData::getTextureIndex(TextureShaderType type, ShaderSt
         // get texture index
         for (int t = 0; t < stages[sIndex].textures.size(); t++){
             if (stages[sIndex].textures[t].name == texstr)
-                texIndex = t;
+                texIndex = stages[sIndex].textures[t].binding;
         }
 
         // get sampler name by texture
@@ -270,7 +270,7 @@ std::pair<int, int> ShaderData::getTextureIndex(TextureShaderType type, ShaderSt
         // get sampler index
         for (int s = 0; s < stages[sIndex].samplers.size(); s++){
             if (stages[sIndex].samplers[s].name == samplerName)
-                samIndex = s;
+                samIndex = stages[sIndex].samplers[s].binding;
         }
     }
 

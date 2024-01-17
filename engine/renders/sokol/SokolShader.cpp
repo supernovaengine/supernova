@@ -158,7 +158,7 @@ bool SokolShader::createShader(ShaderData& shaderData){
     
         // uniform blocks
         for (int ub = 0; ub < stage->uniformblocks.size(); ub++) {
-            sg_shader_uniform_block_desc* ubdesc = &stage_desc->uniform_blocks[ub];
+            sg_shader_uniform_block_desc* ubdesc = &stage_desc->uniform_blocks[stage->uniformblocks[ub].binding];
             ubdesc->size = roundup(stage->uniformblocks[ub].sizeBytes, 16);
             ubdesc->layout = SG_UNIFORMLAYOUT_STD140;
             // GL/GLES always flatten UBs if same type inside to not declare individual uniforms and use only one glUniform4fv call
@@ -179,7 +179,7 @@ bool SokolShader::createShader(ShaderData& shaderData){
 
         // textures
         for (int t = 0; t < stage->textures.size(); t++) {
-            sg_shader_image_desc* img = &stage_desc->images[t];
+            sg_shader_image_desc* img = &stage_desc->images[stage->textures[t].binding];
 
             img->used = true;
             img->image_type = textureToSokolType(stage->textures[t].type);
@@ -188,7 +188,7 @@ bool SokolShader::createShader(ShaderData& shaderData){
 
         // samplers
         for (int s = 0; s < stage->samplers.size(); s++) {
-            sg_shader_sampler_desc* sampler = &stage_desc->samplers[s];
+            sg_shader_sampler_desc* sampler = &stage_desc->samplers[stage->samplers[s].binding];
 
             sampler->used = true;
             sampler->sampler_type = samplerToSokolType(stage->samplers[s].type);
@@ -196,20 +196,20 @@ bool SokolShader::createShader(ShaderData& shaderData){
 
         // texture sampler pair
         for (int ts = 0; ts < stage->textureSamplersPair.size(); ts++) {
-            sg_shader_image_sampler_pair_desc* imgsamplerpair = &stage_desc->image_sampler_pairs[ts];
+            sg_shader_image_sampler_pair_desc* imgsamplerpair = &stage_desc->image_sampler_pairs[stage->textureSamplersPair[ts].binding];
 
             // get texture index
             int texIndex = -1;
             for (int t = 0; t < stage->textures.size(); t++){
                 if (stage->textures[t].name == stage->textureSamplersPair[ts].textureName)
-                    texIndex = t;
+                    texIndex = stage->textures[t].binding;
             }
 
             // get sampler index
             int samIndex = -1;
             for (int s = 0; s < stage->samplers.size(); s++){
                 if (stage->samplers[s].name == stage->textureSamplersPair[ts].samplerName)
-                    samIndex = s;
+                    samIndex = stage->samplers[s].binding;
             }
 
             imgsamplerpair->used = true;
