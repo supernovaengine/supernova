@@ -39,6 +39,14 @@ sg_filter SokolTexture::getFilter(TextureFilter textureFilter){
         return SG_FILTER_LINEAR;
     }else if (textureFilter == TextureFilter::NEAREST){
         return SG_FILTER_NEAREST;
+    }else if (textureFilter == TextureFilter::LINEAR_MIPMAP_LINEAR){
+        return SG_FILTER_LINEAR;
+    }else if (textureFilter == TextureFilter::LINEAR_MIPMAP_NEAREST){
+        return SG_FILTER_LINEAR;
+    }else if (textureFilter == TextureFilter::NEAREST_MIPMAP_NEAREST){
+        return SG_FILTER_NEAREST;
+    }else if (textureFilter == TextureFilter::NEAREST_MIPMAP_LINEAR){
+        return SG_FILTER_NEAREST;
     }
 
     return SG_FILTER_NONE;
