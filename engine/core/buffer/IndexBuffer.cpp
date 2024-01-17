@@ -12,7 +12,8 @@ IndexBuffer::IndexBuffer(): Buffer(){
 
     type = BufferType::INDEX_BUFFER;
 
-    data = &vectorBuffer[0];
+    if (vectorBuffer.size() > 0)
+        data = &vectorBuffer[0];
 }
 
 IndexBuffer::~IndexBuffer(){
@@ -22,7 +23,8 @@ IndexBuffer::~IndexBuffer(){
 IndexBuffer::IndexBuffer(const IndexBuffer& rhs): Buffer(rhs){
     vectorBuffer = rhs.vectorBuffer;
 
-    data = &vectorBuffer[0];
+    if (vectorBuffer.size() > 0)
+        data = &vectorBuffer[0];
 }
 
 IndexBuffer& IndexBuffer::operator=(const IndexBuffer& rhs){
@@ -30,7 +32,8 @@ IndexBuffer& IndexBuffer::operator=(const IndexBuffer& rhs){
 
     vectorBuffer = rhs.vectorBuffer;
 
-    data = &vectorBuffer[0];
+    if (vectorBuffer.size() > 0)
+        data = &vectorBuffer[0];
 
     return *this;
 }
@@ -46,7 +49,8 @@ bool IndexBuffer::resize(size_t pos) {
     if (pos >= vectorBuffer.size()) {
         vectorBuffer.resize(pos);
 
-        data = &vectorBuffer[0];
+        if (vectorBuffer.size() > 0)
+            data = &vectorBuffer[0];
         size = vectorBuffer.size();
     }
 
