@@ -1,11 +1,12 @@
 // https://github.com/kunitoki/LuaBridge3
-// Copyright 2022, Lucio Asnaghi
+// Copyright 2023, Lucio Asnaghi
 // SPDX-License-Identifier: MIT
 
 // clang-format off
 
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstddef>
@@ -40,6 +41,7 @@
 #error LuaBridge 3 requires a compliant C++17 compiler, or C++17 has not been enabled !
 #endif
 
+#if !defined(LUABRIDGE_HAS_EXCEPTIONS)
 #if defined(_MSC_VER)
 #if _CPPUNWIND || _HAS_EXCEPTIONS
 #define LUABRIDGE_HAS_EXCEPTIONS 1
@@ -59,11 +61,22 @@
 #define LUABRIDGE_HAS_EXCEPTIONS 0
 #endif
 #endif
+#endif
+
+#if LUABRIDGE_HAS_EXCEPTIONS
+#define LUABRIDGE_IF_EXCEPTIONS(...) __VA_ARGS__
+#define LUABRIDGE_IF_NO_EXCEPTIONS(...)
+#else
+#define LUABRIDGE_IF_EXCEPTIONS(...)
+#define LUABRIDGE_IF_NO_EXCEPTIONS(...) __VA_ARGS__
+#endif
 
 #if defined(LUAU_FASTMATH_BEGIN)
 #define LUABRIDGE_ON_LUAU 1
 #elif defined(LUAJIT_VERSION)
 #define LUABRIDGE_ON_LUAJIT 1
+#elif defined(RAVI_OPTION_STRING2)
+#define LUABRIDGE_ON_RAVI 1
 #elif defined(LUA_VERSION_NUM)
 #define LUABRIDGE_ON_LUA 1
 #else
@@ -78,8 +91,24 @@
 #define LUABRIDGE_SAFE_STACK_CHECKS 1
 #endif
 
-#if !defined(LUABRIDGE_RAISE_UNREGISTERED_CLASS_USAGE) && LUABRIDGE_HAS_EXCEPTIONS
+#if !defined(LUABRIDGE_SAFE_LUA_C_EXCEPTION_HANDLING)
+#define LUABRIDGE_SAFE_LUA_C_EXCEPTION_HANDLING 0
+#endif
+
+#if !defined(LUABRIDGE_RAISE_UNREGISTERED_CLASS_USAGE)
+#if LUABRIDGE_HAS_EXCEPTIONS
 #define LUABRIDGE_RAISE_UNREGISTERED_CLASS_USAGE 1
+#else
+#define LUABRIDGE_RAISE_UNREGISTERED_CLASS_USAGE 0
+#endif
+#endif
+
+#if !defined(LUABRIDGE_ASSERT)
+#if defined(NDEBUG) && !defined(LUABRIDGE_FORCE_ASSERT_RELEASE)
+#define LUABRIDGE_ASSERT(expr) ((void)(expr))
+#else
+#define LUABRIDGE_ASSERT(expr) assert(expr)
+#endif
 #endif
 
 
@@ -97,7 +126,7 @@ constexpr void unused(Args&&...)
 #if LUABRIDGE_ON_LUAU
 inline int luaL_ref(lua_State* L, int idx)
 {
-    assert(idx == LUA_REGISTRYINDEX);
+    LUABRIDGE_ASSERT(idx == LUA_REGISTRYINDEX);
 
     const int ref = lua_ref(L, -1);
 
@@ -139,6 +168,11 @@ inline int lua_error_x(lua_State* L)
     return 0;
 }
 
+inline int lua_getstack_x(lua_State* L, int level, lua_Debug* ar)
+{
+    return lua_getinfo(L, level, "nlS", ar);
+}
+
 inline int lua_getstack_info_x(lua_State* L, int level, const char* what, lua_Debug* ar)
 {
     return lua_getinfo(L, level, what, ar);
@@ -167,6 +201,11 @@ inline void lua_pushcclosure_x(lua_State* L, lua_CFunction fn, int n)
 inline int lua_error_x(lua_State* L)
 {
     return lua_error(L);
+}
+
+inline int lua_getstack_x(lua_State* L, int level, lua_Debug* ar)
+{
+    return lua_getstack(L, level, ar);
 }
 
 inline int lua_getstack_info_x(lua_State* L, int level, const char* what, lua_Debug* ar)
@@ -200,14 +239,14 @@ inline lua_Integer to_integerx(lua_State* L, int idx, int* isnum)
         {
             if (isnum)
                 *isnum = 1;
-            
+
             return int_n;
         }
     }
 
     if (isnum)
         *isnum = 0;
-    
+
     return 0;
 }
 
@@ -226,12 +265,13 @@ inline int lua_absindex(lua_State* L, int idx)
 }
 #endif
 
-inline void lua_rawgetp(lua_State* L, int idx, const void* p)
+inline int lua_rawgetp(lua_State* L, int idx, const void* p)
 {
     idx = lua_absindex(L, idx);
     luaL_checkstack(L, 1, "not enough stack slots");
     lua_pushlightuserdata(L, const_cast<void*>(p));
     lua_rawget(L, idx);
+    return lua_type(L, -1);
 }
 
 inline void lua_rawsetp(lua_State* L, int idx, const void* p)
@@ -264,6 +304,25 @@ inline int lua_compare(lua_State* L, int idx1, int idx2, int op)
         return 0;
     }
 }
+
+#if ! LUABRIDGE_ON_LUAJIT
+inline void* luaL_testudata(lua_State* L, int ud, const char* tname)
+{
+    void* p = lua_touserdata(L, ud);
+    if (p == nullptr)
+        return nullptr;
+
+    if (! lua_getmetatable(L, ud))
+        return nullptr;
+
+    luaL_getmetatable(L, tname);
+    if (! lua_rawequal(L, -1, -2))
+        p = nullptr;
+
+    lua_pop(L, 2);
+    return p;
+}
+#endif
 
 inline int get_length(lua_State* L, int idx)
 {
@@ -314,7 +373,7 @@ void throw_or_assert(Args&&... args)
     throw T(std::forward<Args>(args)...);
 #else
     unused(std::forward<Args>(args)...);
-    assert(false);
+    LUABRIDGE_ASSERT(false);
 #endif
 }
 
@@ -370,7 +429,7 @@ inline lua_State* main_thread(lua_State* threadL)
         lua_pop(threadL, 1);
         return L;
     }
-    assert(false); 
+    LUABRIDGE_ASSERT(false); 
     lua_pop(threadL, 1);
     return threadL;
 #else
@@ -381,17 +440,22 @@ inline lua_State* main_thread(lua_State* threadL)
 #endif
 }
 
-inline void rawgetfield(lua_State* L, int index, char const* key)
+inline int rawgetfield(lua_State* L, int index, const char* key)
 {
-    assert(lua_istable(L, index));
+    LUABRIDGE_ASSERT(lua_istable(L, index));
     index = lua_absindex(L, index);
     lua_pushstring(L, key);
+#if LUA_VERSION_NUM <= 502
     lua_rawget(L, index);
+    return lua_type(L, -1);
+#else
+    return lua_rawget(L, index);
+#endif
 }
 
-inline void rawsetfield(lua_State* L, int index, char const* key)
+inline void rawsetfield(lua_State* L, int index, const char* key)
 {
-    assert(lua_istable(L, index));
+    LUABRIDGE_ASSERT(lua_istable(L, index));
     index = lua_absindex(L, index);
     lua_pushstring(L, key);
     lua_insert(L, -2);
@@ -410,7 +474,7 @@ inline void rawsetfield(lua_State* L, int index, char const* key)
 
 [[nodiscard]] inline int table_length(lua_State* L, int index)
 {
-    assert(lua_istable(L, index));
+    LUABRIDGE_ASSERT(lua_istable(L, index));
 
     int items_count = 0;
 
@@ -436,6 +500,14 @@ template <class T>
     return reinterpret_cast<T*>(aligned_address);
 }
 
+template <std::size_t Alignment, class T, std::enable_if_t<std::is_pointer_v<T>, int> = 0>
+[[nodiscard]] bool is_aligned(T address) noexcept
+{
+    static_assert(Alignment > 0u);
+
+    return (reinterpret_cast<std::uintptr_t>(address) & (Alignment - 1u)) == 0u;
+}
+
 template <class T>
 [[nodiscard]] constexpr size_t maximum_space_needed_to_align() noexcept
 {
@@ -445,7 +517,7 @@ template <class T>
 template <class T>
 int lua_deleteuserdata_aligned(lua_State* L)
 {
-    assert(isfulluserdata(L, 1));
+    LUABRIDGE_ASSERT(isfulluserdata(L, 1));
 
     T* aligned = align<T>(lua_touserdata(L, 1));
     aligned->~T();
@@ -478,13 +550,22 @@ void* lua_newuserdata_aligned(lua_State* L, Args&&... args)
     return pointer;
 }
 
-inline int raise_lua_error(lua_State *L, const char *fmt, ...)
+inline int raise_lua_error(lua_State* L, const char* fmt, ...)
 {
     va_list argp;
     va_start(argp, fmt);
+    lua_pushvfstring(L, fmt, argp);
+    va_end(argp);
+
+    const char* message = lua_tostring(L, -1);
+    if (message != nullptr)
+    {
+        if (auto str = std::string_view(message); !str.empty() && str[0] == '[')
+            return lua_error_x(L);
+    }
 
     bool pushed_error = false;
-    for (int level = 2; level > 0; --level)
+    for (int level = 1; level <= 2; ++level)
     {
         lua_Debug ar;
 
@@ -508,8 +589,8 @@ inline int raise_lua_error(lua_State *L, const char *fmt, ...)
     if (! pushed_error)
         lua_pushliteral(L, "");
 
-    lua_pushvfstring(L, fmt, argp);
-    va_end(argp);
+    lua_pushvalue(L, -2);
+    lua_remove(L, -3);
     lua_concat(L, 2);
 
     return lua_error_x(L);
@@ -527,23 +608,23 @@ constexpr bool is_integral_representable_by(T value)
             return true;
 
         if constexpr (std::is_unsigned_v<T>)
-            return value <= static_cast<T>(std::numeric_limits<U>::max());
-        
-        return value >= static_cast<T>(std::numeric_limits<U>::min())
-            && static_cast<U>(value) <= std::numeric_limits<U>::max();
+            return value <= static_cast<T>((std::numeric_limits<U>::max)());
+
+        return value >= static_cast<T>((std::numeric_limits<U>::min)())
+            && static_cast<U>(value) <= (std::numeric_limits<U>::max)();
     }
 
     if constexpr (sizeof(T) < sizeof(U))
     {
-        return static_cast<U>(value) >= std::numeric_limits<U>::min()
-            && static_cast<U>(value) <= std::numeric_limits<U>::max();
+        return static_cast<U>(value) >= (std::numeric_limits<U>::min)()
+            && static_cast<U>(value) <= (std::numeric_limits<U>::max)();
     }
 
     if constexpr (std::is_unsigned_v<T>)
-        return value <= static_cast<T>(std::numeric_limits<U>::max());
+        return value <= static_cast<T>((std::numeric_limits<U>::max)());
 
-    return value >= static_cast<T>(std::numeric_limits<U>::min())
-        && value <= static_cast<T>(std::numeric_limits<U>::max());
+    return value >= static_cast<T>((std::numeric_limits<U>::min)())
+        && value <= static_cast<T>((std::numeric_limits<U>::max)());
 }
 
 template <class U = lua_Integer>
@@ -563,11 +644,11 @@ constexpr bool is_floating_point_representable_by(T value)
         return true;
 
     if constexpr (sizeof(T) < sizeof(U))
-        return static_cast<U>(value) >= -std::numeric_limits<U>::max()
-            && static_cast<U>(value) <= std::numeric_limits<U>::max();
+        return static_cast<U>(value) >= -(std::numeric_limits<U>::max)()
+            && static_cast<U>(value) <= (std::numeric_limits<U>::max)();
 
-    return value >= static_cast<T>(-std::numeric_limits<U>::max())
-        && value <= static_cast<T>(std::numeric_limits<U>::max());
+    return value >= static_cast<T>(-(std::numeric_limits<U>::max)())
+        && value <= static_cast<T>((std::numeric_limits<U>::max)());
 }
 
 template <class U = lua_Number>
@@ -640,7 +721,7 @@ struct ErrorCategory : std::error_category
             return "The native floating point can't fit inside a lua number";
 
         case ErrorCode::InvalidTypeCast:
-            return "The lua object can't be casted to desired type";
+            return "The lua object can't be cast to desired type";
 
         case ErrorCode::InvalidTableSizeInCast:
             return "The lua table has different size than expected";
@@ -729,6 +810,19 @@ struct is_nothrow_swappable
     : std::is_nothrow_swappable_with<std::add_lvalue_reference_t<T>, std::add_lvalue_reference_t<T>>
 {
 };
+
+template <class T, class = void>
+struct has_member_message : std::false_type
+{
+};
+
+template <class T>
+struct has_member_message<T, std::void_t<decltype(std::declval<T>().message())>> : std::true_type
+{
+};
+
+template <class T>
+inline static constexpr bool has_member_message_v = has_member_message<T>::value;
 } 
 
 template <class T, class E>
@@ -939,9 +1033,7 @@ public:
     {
     }
 
-    ~expected_storage()
-    {
-    }
+    ~expected_storage() = default;
 
     constexpr const E& error() const noexcept
     {
@@ -959,33 +1051,33 @@ private:
 };
 
 template <class T, class E, bool IsCopyConstructible, bool IsMoveConstructible>
-class ExpectedBaseTrivial
+class expected_base_trivial
 {
-    using this_type = ExpectedBaseTrivial<T, E, IsCopyConstructible, IsMoveConstructible>;
+    using this_type = expected_base_trivial<T, E, IsCopyConstructible, IsMoveConstructible>;
 
 protected:
     using storage_type = expected_storage<T, E>;
 
-    constexpr ExpectedBaseTrivial() noexcept
+    constexpr expected_base_trivial() noexcept
         : valid_(true)
     {
     }
 
     template <class... Args>
-    constexpr ExpectedBaseTrivial(std::in_place_t, Args&&... args) noexcept
+    constexpr expected_base_trivial(std::in_place_t, Args&&... args) noexcept
         : storage_(std::in_place, std::forward<Args>(args)...)
         , valid_(true)
     {
     }
 
     template <class... Args>
-    constexpr ExpectedBaseTrivial(UnexpectType, Args&&... args) noexcept
+    constexpr expected_base_trivial(UnexpectType, Args&&... args) noexcept
         : storage_(unexpect, std::forward<Args>(args)...)
         , valid_(false)
     {
     }
 
-    ExpectedBaseTrivial(const ExpectedBaseTrivial& other) noexcept
+    expected_base_trivial(const expected_base_trivial& other) noexcept
     {
         if (other.valid_)
         {
@@ -997,7 +1089,7 @@ protected:
         }
     }
 
-    ExpectedBaseTrivial(ExpectedBaseTrivial&& other) noexcept
+    expected_base_trivial(expected_base_trivial&& other) noexcept
     {
         if (other.valid_)
         {
@@ -1009,7 +1101,7 @@ protected:
         }
     }
 
-    ~ExpectedBaseTrivial() noexcept = default;
+    ~expected_base_trivial() noexcept = default;
 
     constexpr const T& value() const noexcept
     {
@@ -1080,33 +1172,33 @@ private:
 };
 
 template <class T, class E, bool IsCopyConstructible, bool IsMoveConstructible>
-class ExpectedBaseNonTrivial
+class expected_base_non_trivial
 {
-    using this_type = ExpectedBaseNonTrivial<T, E, IsCopyConstructible, IsMoveConstructible>;
+    using this_type = expected_base_non_trivial<T, E, IsCopyConstructible, IsMoveConstructible>;
 
 protected:
     using storage_type = expected_storage<T, E>;
 
-    constexpr ExpectedBaseNonTrivial() noexcept(std::is_nothrow_default_constructible_v<storage_type>)
+    constexpr expected_base_non_trivial() noexcept(std::is_nothrow_default_constructible_v<storage_type>)
         : valid_(true)
     {
     }
 
     template <class... Args>
-    constexpr ExpectedBaseNonTrivial(std::in_place_t, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, std::in_place_t, Args...>)
+    constexpr expected_base_non_trivial(std::in_place_t, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, std::in_place_t, Args...>)
         : storage_(std::in_place, std::forward<Args>(args)...)
         , valid_(true)
     {
     }
 
     template <class... Args>
-    constexpr ExpectedBaseNonTrivial(UnexpectType, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, UnexpectType, Args...>)
+    constexpr expected_base_non_trivial(UnexpectType, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, UnexpectType, Args...>)
         : storage_(unexpect, std::forward<Args>(args)...)
         , valid_(false)
     {
     }
 
-    ExpectedBaseNonTrivial(const ExpectedBaseNonTrivial& other)
+    expected_base_non_trivial(const expected_base_non_trivial& other)
     {
         if (other.valid_)
         {
@@ -1118,7 +1210,7 @@ protected:
         }
     }
 
-    ExpectedBaseNonTrivial(ExpectedBaseNonTrivial&& other)
+    expected_base_non_trivial(expected_base_non_trivial&& other) noexcept
     {
         if (other.valid_)
         {
@@ -1130,7 +1222,7 @@ protected:
         }
     }
 
-    ~ExpectedBaseNonTrivial() noexcept(noexcept(std::declval<this_type>().destroy()))
+    ~expected_base_non_trivial()
     {
         destroy();
     }
@@ -1212,35 +1304,35 @@ private:
 };
 
 template <class T, class E, bool IsMoveConstructible>
-class ExpectedBaseNonTrivial<T, E, false, IsMoveConstructible>
+class expected_base_non_trivial<T, E, false, IsMoveConstructible>
 {
-    using this_type = ExpectedBaseNonTrivial<T, E, false, IsMoveConstructible>;
+    using this_type = expected_base_non_trivial<T, E, false, IsMoveConstructible>;
 
 protected:
     using storage_type = expected_storage<T, E>;
 
-    constexpr ExpectedBaseNonTrivial() noexcept(std::is_nothrow_default_constructible_v<storage_type>)
+    constexpr expected_base_non_trivial() noexcept(std::is_nothrow_default_constructible_v<storage_type>)
         : valid_(true)
     {
     }
 
     template <class... Args>
-    constexpr ExpectedBaseNonTrivial(std::in_place_t, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, std::in_place_t, Args...>)
+    constexpr expected_base_non_trivial(std::in_place_t, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, std::in_place_t, Args...>)
         : storage_(std::in_place, std::forward<Args>(args)...)
         , valid_(true)
     {
     }
 
     template <class... Args>
-    constexpr ExpectedBaseNonTrivial(UnexpectType, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, UnexpectType, Args...>)
+    constexpr expected_base_non_trivial(UnexpectType, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, UnexpectType, Args...>)
         : storage_(unexpect, std::forward<Args>(args)...)
         , valid_(false)
     {
     }
 
-    ExpectedBaseNonTrivial(const ExpectedBaseNonTrivial& other) = delete;
+    expected_base_non_trivial(const expected_base_non_trivial& other) = delete;
 
-    ExpectedBaseNonTrivial(ExpectedBaseNonTrivial&& other)
+    expected_base_non_trivial(expected_base_non_trivial&& other) noexcept
     {
         if (other.valid_)
         {
@@ -1252,7 +1344,7 @@ protected:
         }
     }
 
-    ~ExpectedBaseNonTrivial() noexcept(noexcept(std::declval<this_type>().destroy()))
+    ~expected_base_non_trivial()
     {
         destroy();
     }
@@ -1334,34 +1426,34 @@ private:
 };
 
 template <class T, class E, bool IsCopyConstructible>
-class ExpectedBaseNonTrivial<T, E, IsCopyConstructible, false>
+class expected_base_non_trivial<T, E, IsCopyConstructible, false>
 {
-    using this_type = ExpectedBaseNonTrivial<T, E, IsCopyConstructible, false>;
+    using this_type = expected_base_non_trivial<T, E, IsCopyConstructible, false>;
 
 protected:
     using storage_type = expected_storage<T, E>;
 
     template <class U = storage_type, class = std::enable_if_t<std::is_default_constructible_v<U>>>
-    constexpr ExpectedBaseNonTrivial() noexcept(std::is_nothrow_default_constructible_v<storage_type>)
+    constexpr expected_base_non_trivial() noexcept(std::is_nothrow_default_constructible_v<storage_type>)
         : valid_(true)
     {
     }
 
     template <class... Args>
-    constexpr ExpectedBaseNonTrivial(std::in_place_t, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, std::in_place_t, Args...>)
+    constexpr expected_base_non_trivial(std::in_place_t, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, std::in_place_t, Args...>)
         : storage_(std::in_place, std::forward<Args>(args)...)
         , valid_(true)
     {
     }
 
     template <class... Args>
-    constexpr ExpectedBaseNonTrivial(UnexpectType, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, UnexpectType, Args...>)
+    constexpr expected_base_non_trivial(UnexpectType, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, UnexpectType, Args...>)
         : storage_(unexpect, std::forward<Args>(args)...)
         , valid_(false)
     {
     }
 
-    ExpectedBaseNonTrivial(const ExpectedBaseNonTrivial& other)
+    expected_base_non_trivial(const expected_base_non_trivial& other)
     {
         if (other.valid_)
         {
@@ -1373,9 +1465,9 @@ protected:
         }
     }
 
-    ExpectedBaseNonTrivial(ExpectedBaseNonTrivial&& other) = delete;
+    expected_base_non_trivial(expected_base_non_trivial&& other) = delete;
 
-    ~ExpectedBaseNonTrivial() noexcept(noexcept(std::declval<this_type>().destroy()))
+    ~expected_base_non_trivial()
     {
         destroy();
     }
@@ -1457,38 +1549,38 @@ private:
 };
 
 template <class T, class E>
-class ExpectedBaseNonTrivial<T, E, false, false>
+class expected_base_non_trivial<T, E, false, false>
 {
-    using this_type = ExpectedBaseNonTrivial<T, E, false, false>;
+    using this_type = expected_base_non_trivial<T, E, false, false>;
 
 protected:
     using storage_type = expected_storage<T, E>;
 
     template <class U = storage_type, class = std::enable_if_t<std::is_default_constructible_v<U>>>
-    constexpr ExpectedBaseNonTrivial() noexcept(std::is_nothrow_default_constructible_v<storage_type>)
+    constexpr expected_base_non_trivial() noexcept(std::is_nothrow_default_constructible_v<storage_type>)
         : valid_(true)
     {
     }
 
     template <class... Args>
-    constexpr ExpectedBaseNonTrivial(std::in_place_t, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, std::in_place_t, Args...>)
+    constexpr expected_base_non_trivial(std::in_place_t, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, std::in_place_t, Args...>)
         : storage_(std::in_place, std::forward<Args>(args)...)
         , valid_(true)
     {
     }
 
     template <class... Args>
-    constexpr ExpectedBaseNonTrivial(UnexpectType, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, UnexpectType, Args...>)
+    constexpr expected_base_non_trivial(UnexpectType, Args&&... args) noexcept(std::is_nothrow_constructible_v<storage_type, UnexpectType, Args...>)
         : storage_(unexpect, std::forward<Args>(args)...)
         , valid_(false)
     {
     }
 
-    ExpectedBaseNonTrivial(const ExpectedBaseNonTrivial& other) = delete;
+    expected_base_non_trivial(const expected_base_non_trivial& other) = delete;
 
-    ExpectedBaseNonTrivial(ExpectedBaseNonTrivial&& other) = delete;
+    expected_base_non_trivial(expected_base_non_trivial&& other) = delete;
 
-    ~ExpectedBaseNonTrivial() noexcept(noexcept(std::declval<this_type>().destroy()))
+    ~expected_base_non_trivial()
     {
         destroy();
     }
@@ -1570,10 +1662,10 @@ private:
 };
 
 template <class T, class E, bool IsCopyConstructible, bool IsMoveConstructible>
-using ExpectedBase = std::conditional_t<
+using expected_base = std::conditional_t<
     (std::is_void_v<T> || std::is_trivially_destructible_v<T>) && std::is_trivially_destructible_v<E>,
-    ExpectedBaseTrivial<T, E, IsCopyConstructible, IsMoveConstructible>,
-    ExpectedBaseNonTrivial<T, E, IsCopyConstructible, IsMoveConstructible>>;
+    expected_base_trivial<T, E, IsCopyConstructible, IsMoveConstructible>,
+    expected_base_non_trivial<T, E, IsCopyConstructible, IsMoveConstructible>>;
 
 }  
 
@@ -1642,19 +1734,41 @@ template <class E>
 class BadExpectedAccess;
 
 template <>
-class BadExpectedAccess<void> : public std::exception
+class BadExpectedAccess<void> : public std::runtime_error
 {
+    template <class T>
+    friend class BadExpectedAccess;
+
+    BadExpectedAccess(std::in_place_t) noexcept
+        : std::runtime_error("Bad access to expected value")
+    {
+    }
+
 public:
-    explicit BadExpectedAccess() noexcept
+    BadExpectedAccess() noexcept
+        : BadExpectedAccess(std::in_place)
+    {
+    }
+
+    explicit BadExpectedAccess(const std::string& message) noexcept
+        : std::runtime_error(message)
     {
     }
 };
+
 template <class E>
-class BadExpectedAccess : public BadExpectedAccess<void>
+class BadExpectedAccess : public std::runtime_error
 {
 public:
     explicit BadExpectedAccess(E error) noexcept(std::is_nothrow_constructible_v<E, E&&>)
-        : error_(std::move(error))
+        : std::runtime_error([](const E& error)
+            {
+                if constexpr (detail::has_member_message_v<E>)
+                    return error.message();
+                else
+                    return "Bad access to expected value";
+            }(error))
+        , error_(std::move(error))
     {
     }
 
@@ -1698,11 +1812,11 @@ struct is_unexpected<Unexpected<E>> : std::true_type
 };
 
 template <class T, class E>
-class Expected : public detail::ExpectedBase<T, E, std::is_copy_constructible_v<T>, std::is_move_constructible_v<T>>
+class Expected : public detail::expected_base<T, E, std::is_copy_constructible_v<T>, std::is_move_constructible_v<T>>
 {
     static_assert(!std::is_reference_v<E> && !std::is_void_v<E>, "Unexpected type can't be a reference or void");
 
-    using base_type = detail::ExpectedBase<T, E, std::is_copy_constructible_v<T>, std::is_move_constructible_v<T>>;
+    using base_type = detail::expected_base<T, E, std::is_copy_constructible_v<T>, std::is_move_constructible_v<T>>;
     using this_type = Expected<T, E>;
 
 public:
@@ -1810,7 +1924,7 @@ public:
         return *this;
     }
 
-    Expected& operator=(Expected&& other)
+    Expected& operator=(Expected&& other) noexcept
     {
         if (other.hasValue())
         {
@@ -1927,7 +2041,7 @@ public:
         return base_type::valid();
     }
 
-    constexpr const T& value() const&
+    constexpr const T& value() const& LUABRIDGE_IF_NO_EXCEPTIONS(noexcept)
     {
 #if LUABRIDGE_HAS_EXCEPTIONS
         if (!hasValue())
@@ -1937,7 +2051,7 @@ public:
         return base_type::value();
     }
 
-    constexpr T& value() &
+    constexpr T& value() & LUABRIDGE_IF_NO_EXCEPTIONS(noexcept)
     {
 #if LUABRIDGE_HAS_EXCEPTIONS
         if (!hasValue())
@@ -1947,7 +2061,7 @@ public:
         return base_type::value();
     }
 
-    constexpr const T&& value() const&& noexcept
+    constexpr const T&& value() const&& LUABRIDGE_IF_NO_EXCEPTIONS(noexcept)
     {
 #if LUABRIDGE_HAS_EXCEPTIONS
         if (!hasValue())
@@ -1957,7 +2071,7 @@ public:
         return std::move(base_type::value());
     }
 
-    constexpr T&& value() &&
+    constexpr T&& value() && LUABRIDGE_IF_NO_EXCEPTIONS(noexcept)
     {
 #if LUABRIDGE_HAS_EXCEPTIONS
         if (!hasValue())
@@ -2010,11 +2124,11 @@ private:
 };
 
 template <class E>
-class Expected<void, E> : public detail::ExpectedBase<void, E, std::is_copy_constructible_v<E>, std::is_move_constructible_v<E>>
+class Expected<void, E> : public detail::expected_base<void, E, std::is_copy_constructible_v<E>, std::is_move_constructible_v<E>>
 {
     static_assert(!std::is_reference_v<E> && !std::is_void_v<E>, "Unexpected type can't be a reference or void");
 
-    using base_type = detail::ExpectedBase<void, E, std::is_copy_constructible_v<E>, std::is_move_constructible_v<E>>;
+    using base_type = detail::expected_base<void, E, std::is_copy_constructible_v<E>, std::is_move_constructible_v<E>>;
     using this_type = Expected<void, E>;
 
 public:
@@ -2268,17 +2382,17 @@ namespace luabridge {
 
 struct Result
 {
-    Result() = default;
+    Result() noexcept = default;
 
     Result(std::error_code ec) noexcept
         : m_ec(ec)
     {
     }
 
-    Result(const Result&) = default;
-    Result(Result&&) = default;
-    Result& operator=(const Result&) = default;
-    Result& operator=(Result&&) = default;
+    Result(const Result&) noexcept = default;
+    Result(Result&&) noexcept = default;
+    Result& operator=(const Result&) noexcept = default;
+    Result& operator=(Result&&) noexcept = default;
 
     explicit operator bool() const noexcept
     {
@@ -2300,6 +2414,14 @@ struct Result
         return m_ec.message();
     }
 
+#if LUABRIDGE_HAS_EXCEPTIONS
+    void throw_on_error() const
+    {
+        if (m_ec)
+            throw std::system_error(m_ec);
+    }
+#endif
+
 private:
     std::error_code m_ec;
 };
@@ -2307,7 +2429,7 @@ private:
 template <class T>
 struct TypeResult
 {
-    TypeResult() = default;
+    TypeResult() noexcept = default;
 
     template <class U, class = std::enable_if_t<std::is_convertible_v<U, T> && !std::is_same_v<std::decay_t<U>, std::error_code>>>
     TypeResult(U&& value) noexcept
@@ -2320,12 +2442,12 @@ struct TypeResult
     {
     }
 
-    TypeResult(const TypeResult&) = default;
-    TypeResult(TypeResult&&) = default;
-    TypeResult& operator=(const TypeResult&) = default;
-    TypeResult& operator=(TypeResult&&) = default;
+    TypeResult(const TypeResult&) noexcept = default;
+    TypeResult(TypeResult&&) noexcept = default;
+    TypeResult& operator=(const TypeResult&) noexcept = default;
+    TypeResult& operator=(TypeResult&&) noexcept = default;
 
-    explicit operator bool() const
+    explicit operator bool() const noexcept
     {
         return m_value.hasValue();
     }
@@ -2350,6 +2472,23 @@ struct TypeResult
         return m_value.value();
     }
 
+    T operator*() const&&
+    {
+        return std::move(m_value.value());
+    }
+
+    template <class U>
+    T valueOr(U&& defaultValue) const&
+    {
+        return m_value.valueOr(std::forward<U>(defaultValue));
+    }
+
+    template <class U>
+    T valueOr(U&& defaultValue) &&
+    {
+        return m_value.valueOr(std::forward<U>(defaultValue));
+    }
+
     std::error_code error() const
     {
         return m_value.error();
@@ -2364,6 +2503,14 @@ struct TypeResult
     {
         return m_value.error().message();
     }
+
+#if LUABRIDGE_HAS_EXCEPTIONS
+    void throw_on_error() const
+    {
+        if (! m_value.hasValue())
+            throw std::system_error(m_value.error());
+    }
+#endif
 
 private:
     Expected<T, std::error_code> m_value;
@@ -2398,6 +2545,146 @@ inline bool operator!=(const U& lhs, const TypeResult<U>& rhs) noexcept
 
 // End File: Source/LuaBridge/detail/Result.h
 
+// Begin File: Source/LuaBridge/detail/ClassInfo.h
+
+#if defined __clang__ || defined __GNUC__
+#define LUABRIDGE_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#define LUABRIDGE_PRETTY_FUNCTION_PREFIX '='
+#define LUABRIDGE_PRETTY_FUNCTION_SUFFIX ']'
+#elif defined _MSC_VER
+#define LUABRIDGE_PRETTY_FUNCTION __FUNCSIG__
+#define LUABRIDGE_PRETTY_FUNCTION_PREFIX '<'
+#define LUABRIDGE_PRETTY_FUNCTION_SUFFIX '>'
+#endif
+
+namespace luabridge {
+namespace detail {
+
+[[nodiscard]] constexpr auto fnv1a(const char* s, std::size_t count) noexcept
+{
+    uint32_t seed = 2166136261u;
+
+    for (std::size_t i = 0; i < count; ++i)
+        seed = static_cast<uint32_t>(static_cast<uint32_t>(seed ^ static_cast<uint8_t>(*s++)) * 16777619u);
+
+    if constexpr (sizeof(void*) == 8)
+        return static_cast<uint64_t>(seed);
+    else
+        return seed;
+}
+
+template <class T>
+[[nodiscard]] static constexpr auto typeName() noexcept
+{
+    constexpr std::string_view prettyName{ LUABRIDGE_PRETTY_FUNCTION };
+
+    constexpr auto first = prettyName.find_first_not_of(' ', prettyName.find_first_of(LUABRIDGE_PRETTY_FUNCTION_PREFIX) + 1);
+
+    return prettyName.substr(first, prettyName.find_last_of(LUABRIDGE_PRETTY_FUNCTION_SUFFIX) - first);
+}
+
+template <class T, auto = typeName<T>().find_first_of('.')>
+[[nodiscard]] static constexpr auto typeHash() noexcept
+{
+    constexpr auto stripped = typeName<T>();
+
+    return fnv1a(stripped.data(), stripped.size());
+}
+
+[[nodiscard]] inline void* getExceptionsKey() noexcept
+{
+    return reinterpret_cast<void*>(0xc7);
+}
+
+[[nodiscard]] inline const void* getTypeKey() noexcept
+{
+    return reinterpret_cast<void*>(0x71);
+}
+
+[[nodiscard]] inline const void* getConstKey() noexcept
+{
+    return reinterpret_cast<void*>(0xc07);
+}
+
+[[nodiscard]] inline const void* getClassKey() noexcept
+{
+    return reinterpret_cast<void*>(0xc1a);
+}
+
+[[nodiscard]] inline const void* getClassOptionsKey() noexcept
+{
+    return reinterpret_cast<void*>(0xc2b);
+}
+
+[[nodiscard]] inline const void* getPropgetKey() noexcept
+{
+    return reinterpret_cast<void*>(0x6e7);
+}
+
+[[nodiscard]] inline const void* getPropsetKey() noexcept
+{
+    return reinterpret_cast<void*>(0x5e7);
+}
+
+[[nodiscard]] inline const void* getStaticKey() noexcept
+{
+    return reinterpret_cast<void*>(0x57a);
+}
+
+[[nodiscard]] inline const void* getParentKey() noexcept
+{
+    return reinterpret_cast<void*>(0xdad);
+}
+
+[[nodiscard]] inline const void* getIndexFallbackKey()
+{
+    return reinterpret_cast<void*>(0x81ca);
+}
+
+[[nodiscard]] inline const void* getIndexExtensibleKey()
+{
+    return reinterpret_cast<void*>(0x81cb);
+}
+
+[[nodiscard]] inline const void* getNewIndexFallbackKey()
+{
+    return reinterpret_cast<void*>(0x8107);
+}
+
+[[nodiscard]] inline const void* getNewIndexExtensibleKey()
+{
+    return reinterpret_cast<void*>(0x8108);
+}
+
+template <class T>
+[[nodiscard]] const void* getStaticRegistryKey() noexcept
+{
+    static auto value = typeHash<T>();
+
+    return reinterpret_cast<void*>(value);
+}
+
+template <class T>
+[[nodiscard]] const void* getClassRegistryKey() noexcept
+{
+    static auto value = typeHash<T>() ^ 1;
+
+    return reinterpret_cast<void*>(value);
+}
+
+template <class T>
+[[nodiscard]] const void* getConstRegistryKey() noexcept
+{
+    static auto value = typeHash<T>() ^ 2;
+
+    return reinterpret_cast<void*>(value);
+}
+} 
+} 
+
+
+// End File: Source/LuaBridge/detail/ClassInfo.h
+
 // Begin File: Source/LuaBridge/detail/LuaException.h
 
 namespace luabridge {
@@ -2423,7 +2710,7 @@ public:
 
     static void raise(lua_State* L, std::error_code code)
     {
-        assert(areExceptionsEnabled());
+        LUABRIDGE_ASSERT(areExceptionsEnabled(L));
 
 #if LUABRIDGE_HAS_EXCEPTIONS
         throw LuaException(L, code, FromLua{});
@@ -2434,14 +2721,22 @@ public:
 #endif
     }
 
-    static bool areExceptionsEnabled() noexcept
+    static bool areExceptionsEnabled(lua_State* L) noexcept
     {
-        return exceptionsEnabled();
+        lua_pushlightuserdata(L, detail::getExceptionsKey());
+        lua_gettable(L, LUA_REGISTRYINDEX);
+
+        const bool enabled = lua_isboolean(L, -1) ? static_cast<bool>(lua_toboolean(L, -1)) : false;
+        lua_pop(L, 1);
+
+        return enabled;
     }
 
     static void enableExceptions(lua_State* L) noexcept
     {
-        exceptionsEnabled() = true;
+        lua_pushlightuserdata(L, detail::getExceptionsKey());
+        lua_pushboolean(L, true);
+        lua_settable(L, LUA_REGISTRYINDEX);
 
 #if LUABRIDGE_HAS_EXCEPTIONS && LUABRIDGE_ON_LUAJIT
         lua_pushlightuserdata(L, (void*)luajitWrapperCallback);
@@ -2512,12 +2807,6 @@ private:
     }
 #endif
 
-    static bool& exceptionsEnabled()
-    {
-        static bool areExceptionsEnabled = false;
-        return areExceptionsEnabled;
-    }
-
     lua_State* m_L = nullptr;
     std::error_code m_code;
     std::string m_what;
@@ -2530,7 +2819,7 @@ inline void enableExceptions(lua_State* L) noexcept
 #else
     unused(L);
 
-    assert(false); 
+    LUABRIDGE_ASSERT(false); 
 #endif
 }
 
@@ -2539,129 +2828,26 @@ inline void enableExceptions(lua_State* L) noexcept
 
 // End File: Source/LuaBridge/detail/LuaException.h
 
-// Begin File: Source/LuaBridge/detail/ClassInfo.h
-
-#if defined __clang__ || defined __GNUC__
-#define LUABRIDGE_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#define LUABRIDGE_PRETTY_FUNCTION_PREFIX '='
-#define LUABRIDGE_PRETTY_FUNCTION_SUFFIX ']'
-#elif defined _MSC_VER
-#define LUABRIDGE_PRETTY_FUNCTION __FUNCSIG__
-#define LUABRIDGE_PRETTY_FUNCTION_PREFIX '<'
-#define LUABRIDGE_PRETTY_FUNCTION_SUFFIX '>'
-#endif
-
-namespace luabridge {
-namespace detail {
-
-[[nodiscard]] constexpr auto fnv1a(const char* s, std::size_t count) noexcept
-{
-    uint32_t seed = 2166136261u;
-
-    for (std::size_t i = 0; i < count; ++i)
-        seed ^= static_cast<uint32_t>(*s++) * 16777619u;
-
-    if constexpr (sizeof(void*) == 8)
-        return static_cast<uint64_t>(seed);
-    else
-        return seed;
-}
-
-template <class T>
-[[nodiscard]] static constexpr auto typeName() noexcept
-{
-    constexpr std::string_view prettyName{ LUABRIDGE_PRETTY_FUNCTION };
-
-    constexpr auto first = prettyName.find_first_not_of(' ', prettyName.find_first_of(LUABRIDGE_PRETTY_FUNCTION_PREFIX) + 1);
-
-    return prettyName.substr(first, prettyName.find_last_of(LUABRIDGE_PRETTY_FUNCTION_SUFFIX) - first);
-}
-
-template <class T, auto = typeName<T>().find_first_of('.')>
-[[nodiscard]] static constexpr auto typeHash() noexcept
-{
-    constexpr auto stripped = typeName<T>();
-
-    return fnv1a(stripped.data(), stripped.size());
-}
-
-[[nodiscard]] inline const void* getTypeKey() noexcept
-{
-    return reinterpret_cast<void*>(0x71);
-}
-
-[[nodiscard]] inline const void* getConstKey() noexcept
-{
-    return reinterpret_cast<void*>(0xc07);
-}
-
-[[nodiscard]] inline const void* getClassKey() noexcept
-{
-    return reinterpret_cast<void*>(0xc1a);
-}
-
-[[nodiscard]] inline const void* getPropgetKey() noexcept
-{
-    return reinterpret_cast<void*>(0x6e7);
-}
-
-[[nodiscard]] inline const void* getPropsetKey() noexcept
-{
-    return reinterpret_cast<void*>(0x5e7);
-}
-
-[[nodiscard]] inline const void* getStaticKey() noexcept
-{
-    return reinterpret_cast<void*>(0x57a);
-}
-
-[[nodiscard]] inline const void* getParentKey() noexcept
-{
-    return reinterpret_cast<void*>(0xdad);
-}
-
-[[nodiscard]] inline const void* getIndexFallbackKey()
-{
-  return reinterpret_cast<void*>(0x81ca);
-}
-
-[[nodiscard]] inline const void* getNewIndexFallbackKey()
-{
-  return reinterpret_cast<void*>(0x8107);
-}
-
-template <class T>
-[[nodiscard]] const void* getStaticRegistryKey() noexcept
-{
-    static auto value = typeHash<T>();
-
-    return reinterpret_cast<void*>(value);
-}
-
-template <class T>
-[[nodiscard]] const void* getClassRegistryKey() noexcept
-{
-    static auto value = typeHash<T>() ^ 1;
-
-    return reinterpret_cast<void*>(value);
-}
-
-template <class T>
-[[nodiscard]] const void* getConstRegistryKey() noexcept
-{
-    static auto value = typeHash<T>() ^ 2;
-
-    return reinterpret_cast<void*>(value);
-}
-} 
-} 
-
-
-// End File: Source/LuaBridge/detail/ClassInfo.h
-
 // Begin File: Source/LuaBridge/detail/TypeTraits.h
 
 namespace luabridge {
+namespace detail {
+template <template <class...> class C, class... Ts>
+std::true_type is_base_of_template_impl(const C<Ts...>*);
+
+template <template <class...> class C>
+std::false_type is_base_of_template_impl(...);
+
+template <class T, template <class...> class C>
+using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*>()));
+
+template <class T, template <class...> class C>
+static inline constexpr bool is_base_of_template_v = is_base_of_template<T, C>::value;
+
+template <class... Args>
+constexpr bool dependent_false = false;
+
+} 
 
 template <class T>
 struct ContainerTraits
@@ -2674,13 +2860,20 @@ struct ContainerTraits
 template <class T>
 struct ContainerTraits<std::shared_ptr<T>>
 {
-    static_assert(std::is_base_of_v<std::enable_shared_from_this<T>, T>);
-    
     using Type = T;
 
-    static std::shared_ptr<T> construct(T* t)
+    template <class U = T>
+    static std::shared_ptr<U> construct(U* t)
     {
-        return t->shared_from_this();
+        if constexpr (detail::is_base_of_template_v<U, std::enable_shared_from_this>)
+        {
+            return std::static_pointer_cast<U>(t->shared_from_this());
+        }
+        else
+        {
+            static_assert(detail::dependent_false<U>,
+                "Failed reconstructing the reference count of the object instance, class must inherit from std::enable_shared_from_this");
+        }
     }
 
     static T* get(const std::shared_ptr<T>& c)
@@ -2705,7 +2898,7 @@ private:
     static constexpr yes& test(...);
 
 public:
-    static constexpr bool value = sizeof(test<ContainerTraits<T>>(0)) == sizeof(yes);
+    static constexpr bool value = sizeof(test<ContainerTraits<T>>(nullptr)) == sizeof(yes);
 };
 
 } 
@@ -2734,27 +2927,20 @@ private:
                               const void* registryClassKey,
                               bool canBeConst)
     {
-        index = lua_absindex(L, index);
-
-        lua_getmetatable(L, index); 
-        if (!lua_istable(L, -1))
+        const int result = lua_getmetatable(L, index); 
+        if (result == 0 || !lua_istable(L, -1))
         {
             lua_rawgetp(L, LUA_REGISTRYINDEX, registryClassKey); 
             return throwBadArg(L, index);
         }
 
         lua_rawgetp(L, -1, getConstKey()); 
-        assert(lua_istable(L, -1) || lua_isnil(L, -1));
+        LUABRIDGE_ASSERT(lua_istable(L, -1) || lua_isnil(L, -1));
 
-        bool isConst = lua_isnil(L, -1); 
-        if (isConst && canBeConst)
-        {
-            lua_rawgetp(L, LUA_REGISTRYINDEX, registryConstKey); 
-        }
-        else
-        {
-            lua_rawgetp(L, LUA_REGISTRYINDEX, registryClassKey); 
-        }
+        const bool isConst = lua_isnil(L, -1); 
+        lua_rawgetp(L, LUA_REGISTRYINDEX, (isConst && canBeConst)
+            ? registryConstKey
+            : registryClassKey); 
 
         lua_insert(L, -3); 
         lua_pop(L, 1); 
@@ -2781,13 +2967,11 @@ private:
 
     }
 
-    static bool isInstance(lua_State* L, int index, const void* registryClassKey)
+    static bool isInstance(lua_State* L, int index, const void* registryKey)
     {
-        index = lua_absindex(L, index);
-
-        int result = lua_getmetatable(L, index); 
+        const auto result = lua_getmetatable(L, index); 
         if (result == 0)
-            return false; 
+            return false;
 
         if (!lua_istable(L, -1))
         {
@@ -2795,7 +2979,7 @@ private:
             return false;
         }
 
-        lua_rawgetp(L, LUA_REGISTRYINDEX, registryClassKey); 
+        lua_rawgetp(L, LUA_REGISTRYINDEX, registryKey); 
         lua_insert(L, -2); 
 
         for (;;)
@@ -2810,17 +2994,19 @@ private:
 
             if (lua_isnil(L, -1)) 
             {
+                
                 lua_pop(L, 3); 
                 return false;
             }
 
             lua_remove(L, -2); 
         }
+
     }
 
     static Userdata* throwBadArg(lua_State* L, int index)
     {
-        assert(lua_istable(L, -1) || lua_isnil(L, -1)); 
+        LUABRIDGE_ASSERT(lua_istable(L, -1) || lua_isnil(L, -1)); 
 
         const char* expected = 0;
         if (lua_isnil(L, -1)) 
@@ -2831,9 +3017,10 @@ private:
         {
             lua_rawgetp(L, -1, getTypeKey()); 
             expected = lua_tostring(L, -1);
+            lua_pop(L, 1); 
         }
 
-        const char* got = 0;
+        const char* got = nullptr;
         if (lua_isuserdata(L, index))
         {
             lua_getmetatable(L, index); 
@@ -2841,14 +3028,17 @@ private:
             {
                 lua_rawgetp(L, -1, getTypeKey()); 
                 if (lua_isstring(L, -1))
-                {
                     got = lua_tostring(L, -1);
-                }
+
+                lua_pop(L, 1); 
             }
+
+            lua_pop(L, 1); 
         }
 
         if (!got)
         {
+            lua_pop(L, 1); 
             got = lua_typename(L, lua_type(L, index));
         }
 
@@ -2871,18 +3061,18 @@ public:
         if (lua_isnil(L, index))
             return nullptr;
 
-        return static_cast<T*>(getClass(L,
-                                        index,
-                                        detail::getConstRegistryKey<T>(),
-                                        detail::getClassRegistryKey<T>(),
-                                        canBeConst)
-                                   ->getPointer());
+        auto* clazz = getClass(L, index, detail::getConstRegistryKey<T>(), detail::getClassRegistryKey<T>(), canBeConst);
+        if (! clazz)
+            return nullptr;
+
+        return static_cast<T*>(clazz->getPointer());
     }
 
     template <class T>
     static bool isInstance(lua_State* L, int index)
     {
-        return isInstance(L, index, detail::getClassRegistryKey<T>());
+        return isInstance(L, index, detail::getClassRegistryKey<T>())
+            || isInstance(L, index, detail::getConstRegistryKey<T>());
     }
 
 protected:
@@ -2899,6 +3089,10 @@ protected:
 template <class T>
 class UserdataValue : public Userdata
 {
+    using AlignType = typename std::conditional_t<alignof(T) <= alignof(double), T, void*>;
+
+    static constexpr int MaxPadding = alignof(T) <= alignof(AlignType) ? 0 : alignof(T) - alignof(AlignType) + 1;
+
 public:
     UserdataValue(const UserdataValue&) = delete;
     UserdataValue operator=(const UserdataValue&) = delete;
@@ -2977,7 +3171,10 @@ public:
     T* getObject() noexcept
     {
         
-        return reinterpret_cast<T*>(&m_storage);
+        if constexpr (MaxPadding == 0)
+            return reinterpret_cast<T*>(&m_storage[0]);
+        else
+            return reinterpret_cast<T*>(&m_storage[0] + m_storage[sizeof(m_storage) - 1]);
     }
 
 private:
@@ -2985,9 +3182,18 @@ private:
     UserdataValue() noexcept
         : Userdata()
     {
+        if constexpr (MaxPadding > 0)
+        {
+            uintptr_t offset = reinterpret_cast<uintptr_t>(&m_storage[0]) % alignof(T);
+            if (offset > 0)
+                offset = alignof(T) - offset;
+
+            assert(offset < MaxPadding);
+            m_storage[sizeof(m_storage) - 1] = static_cast<unsigned char>(offset);
+        }
     }
 
-    std::aligned_storage_t<sizeof(T), alignof(T)> m_storage;
+    alignas(AlignType) unsigned char m_storage[sizeof(T) + MaxPadding];
 };
 
 class UserdataPtr : public Userdata
@@ -3045,7 +3251,7 @@ private:
     explicit UserdataPtr(void* ptr)
     {
         
-        assert(ptr != nullptr);
+        LUABRIDGE_ASSERT(ptr != nullptr);
         m_p = ptr;
     }
 };
@@ -3099,10 +3305,10 @@ private:
     UserdataValueExternal(void* ptr, void (*dealloc)(T*)) noexcept
     {
         
-        assert(ptr != nullptr);
+        LUABRIDGE_ASSERT(ptr != nullptr);
         m_p = ptr;
 
-        assert(dealloc != nullptr);
+        LUABRIDGE_ASSERT(dealloc != nullptr);
         m_dealloc = dealloc;
     }
 
@@ -3341,6 +3547,11 @@ struct RefStackHelper<T, false>
 {
     using ReturnType = TypeResult<std::reference_wrapper<T>>;
 
+    static Result push(lua_State* L, T& t)
+    {
+        return UserdataPtr::push(L, std::addressof(t));
+    }
+
     static Result push(lua_State* L, const T& t)
     {
         return UserdataPtr::push(L, std::addressof(t));
@@ -3441,7 +3652,8 @@ struct StackOpSelector<T*, true>
 
     static ReturnType get(lua_State* L, int index) { return Userdata::get<T>(L, index, false); }
 
-    static bool isInstance(lua_State* L, int index) { return Userdata::isInstance<T>(L, index); }
+    template <class U = T>
+    static bool isInstance(lua_State* L, int index) { return Userdata::isInstance<U>(L, index); }
 };
 
 template <class T>
@@ -3453,7 +3665,8 @@ struct StackOpSelector<const T*, true>
 
     static ReturnType get(lua_State* L, int index) { return Userdata::get<T>(L, index, true); }
 
-    static bool isInstance(lua_State* L, int index) { return Userdata::isInstance<T>(L, index); }
+    template <class U = T>
+    static bool isInstance(lua_State* L, int index) { return Userdata::isInstance<U>(L, index); }
 };
 
 template <class T>
@@ -3462,11 +3675,12 @@ struct StackOpSelector<T&, true>
     using Helper = RefStackHelper<T, IsContainer<T>::value>;
     using ReturnType = typename Helper::ReturnType;
 
-    static Result push(lua_State* L, T& value) { return UserdataPtr::push(L, &value); }
+    static Result push(lua_State* L, T& value) { return Helper::push(L, value); }
 
     static ReturnType get(lua_State* L, int index) { return Helper::get(L, index); }
 
-    static bool isInstance(lua_State* L, int index) { return Userdata::isInstance<T>(L, index); }
+    template <class U = T>
+    static bool isInstance(lua_State* L, int index) { return Userdata::isInstance<U>(L, index); }
 };
 
 template <class T>
@@ -3479,7 +3693,8 @@ struct StackOpSelector<const T&, true>
 
     static ReturnType get(lua_State* L, int index) { return Helper::get(L, index); }
 
-    static bool isInstance(lua_State* L, int index) { return Userdata::isInstance<T>(L, index); }
+    template <class U = T>
+    static bool isInstance(lua_State* L, int index) { return Userdata::isInstance<U>(L, index); }
 };
 
 } 
@@ -3591,7 +3806,7 @@ struct Stack<lua_CFunction>
 
     [[nodiscard]] static bool isInstance(lua_State* L, int index)
     {
-        return lua_iscfunction(L, index);
+        return lua_iscfunction(L, index) != 0;
     }
 };
 
@@ -3697,6 +3912,7 @@ struct Stack<char>
     }
 };
 
+#if !defined(__BORLANDC__)
 template <>
 struct Stack<int8_t>
 {
@@ -3732,6 +3948,7 @@ struct Stack<int8_t>
         return false;
     }
 };
+#endif
 
 template <>
 struct Stack<unsigned char>
@@ -4264,15 +4481,20 @@ struct Stack<const char*>
         if (str != nullptr)
             lua_pushstring(L, str);
         else
-            lua_pushlstring(L, "", 0);
+            lua_pushnil(L);
 
         return {};
     }
 
     [[nodiscard]] static TypeResult<const char*> get(lua_State* L, int index)
     {
-        if (lua_type(L, index) != LUA_TSTRING)
+        const bool isNil = lua_isnil(L, index);
+
+        if (!isNil && lua_type(L, index) != LUA_TSTRING)
             return makeErrorCode(ErrorCode::InvalidTypeCast);
+
+        if (isNil)
+            return nullptr;
 
         std::size_t length = 0;
         const char* str = lua_tolstring(L, index, &length);
@@ -4284,7 +4506,7 @@ struct Stack<const char*>
 
     [[nodiscard]] static bool isInstance(lua_State* L, int index)
     {
-        return lua_type(L, index) == LUA_TSTRING;
+        return lua_isnil(L, index) || lua_type(L, index) == LUA_TSTRING;
     }
 };
 
@@ -4398,7 +4620,8 @@ struct Stack<std::optional<T>>
 
     [[nodiscard]] static TypeResult<Type> get(lua_State* L, int index)
     {
-        if (lua_type(L, index) == LUA_TNIL)
+        const auto type = lua_type(L, index);
+        if (type == LUA_TNIL || type == LUA_TNONE)
             return std::nullopt;
 
         auto result = Stack<T>::get(L, index);
@@ -4410,7 +4633,8 @@ struct Stack<std::optional<T>>
 
     [[nodiscard]] static bool isInstance(lua_State* L, int index)
     {
-        return lua_isnil(L, index) || Stack<T>::isInstance(L, index);
+        const auto type = lua_type(L, index);
+        return (type == LUA_TNIL || type == LUA_TNONE) || Stack<T>::isInstance(L, index);
     }
 };
 
@@ -4483,11 +4707,7 @@ private:
 
         auto result = Stack<T>::push(L, std::get<Index>(p));
         if (! result)
-        {
-            lua_pushnil(L);
-            lua_settable(L, -3);
             return result;
-        }
 
         lua_settable(L, -3);
 
@@ -4584,11 +4804,7 @@ private:
 
         auto result = Stack<T>::push(L, std::get<Index>(t));
         if (! result)
-        {
-            lua_pushnil(L);
-            lua_settable(L, -3);
             return result;
-        }
 
         lua_settable(L, -3);
 
@@ -4670,6 +4886,68 @@ struct Stack<T[N]>
     }
 };
 
+template <>
+struct Stack<void*>
+{
+    [[nodiscard]] static Result push(lua_State* L, void* ptr)
+    {
+#if LUABRIDGE_SAFE_STACK_CHECKS
+        if (! lua_checkstack(L, 1))
+            return makeErrorCode(ErrorCode::LuaStackOverflow);
+#endif
+
+        lua_pushlightuserdata(L, ptr);
+        return {};
+    }
+
+    [[nodiscard]] static TypeResult<void*> get(lua_State* L, int index)
+    {
+        if (lua_isnil(L, index))
+            return nullptr;
+
+        if (lua_islightuserdata(L, index))
+            return lua_touserdata(L, index);
+
+        return makeErrorCode(ErrorCode::InvalidTypeCast);
+    }
+
+    [[nodiscard]] static bool isInstance(lua_State* L, int index)
+    {
+        return lua_islightuserdata(L, index) || lua_isnil(L, index);
+    }
+};
+
+template <>
+struct Stack<const void*>
+{
+    [[nodiscard]] static Result push(lua_State* L, const void* ptr)
+    {
+#if LUABRIDGE_SAFE_STACK_CHECKS
+        if (! lua_checkstack(L, 1))
+            return makeErrorCode(ErrorCode::LuaStackOverflow);
+#endif
+
+        lua_pushlightuserdata(L, const_cast<void*>(ptr));
+        return {};
+    }
+
+    [[nodiscard]] static TypeResult<const void*> get(lua_State* L, int index)
+    {
+        if (lua_isnil(L, index))
+            return nullptr;
+
+        if (lua_islightuserdata(L, index))
+            return lua_touserdata(L, index);
+
+        return makeErrorCode(ErrorCode::InvalidTypeCast);
+    }
+
+    [[nodiscard]] static bool isInstance(lua_State* L, int index)
+    {
+        return lua_islightuserdata(L, index) || lua_isnil(L, index);
+    }
+};
+
 namespace detail {
 
 template <class T>
@@ -4701,7 +4979,10 @@ struct StackOpSelector<T*, false>
 {
     using ReturnType = TypeResult<T>;
 
-    static Result push(lua_State* L, T* value) { return Stack<T>::push(L, *value); }
+    static Result push(lua_State* L, T* value)
+    {
+        return value ? Stack<T>::push(L, *value) : Stack<std::nullptr_t>::push(L, nullptr);
+    }
 
     static ReturnType get(lua_State* L, int index) { return Stack<T>::get(L, index); }
 
@@ -4713,7 +4994,10 @@ struct StackOpSelector<const T*, false>
 {
     using ReturnType = TypeResult<T>;
 
-    static Result push(lua_State* L, const T* value) { return Stack<T>::push(L, *value); }
+    static Result push(lua_State* L, const T* value)
+    {
+        return value ? Stack<T>::push(L, *value) : Stack<std::nullptr_t>::push(L, nullptr);
+    }
 
     static ReturnType get(lua_State* L, int index) { return Stack<T>::get(L, index); }
 
@@ -4872,6 +5156,136 @@ struct Stack<std::array<T, Size>>
 
 // End File: Source/LuaBridge/Array.h
 
+// Begin File: Source/LuaBridge/Dump.h
+
+namespace luabridge {
+namespace detail {
+inline void putIndent(std::ostream& stream, unsigned level)
+{
+    for (unsigned i = 0; i < level; ++i)
+        stream << "    ";
+}
+} 
+
+inline void dumpTable(lua_State* L, int index, unsigned maxDepth = 1, unsigned level = 0, bool newLine = true, std::ostream& stream = std::cerr);
+
+inline void dumpValue(lua_State* L, int index, unsigned maxDepth = 1, unsigned level = 0, bool newLine = true, std::ostream& stream = std::cerr)
+{
+    const int type = lua_type(L, index);
+    switch (type)
+    {
+    case LUA_TNIL:
+        stream << "nil";
+        break;
+
+    case LUA_TBOOLEAN:
+        stream << (lua_toboolean(L, index) ? "true" : "false");
+        break;
+
+    case LUA_TNUMBER:
+        stream << lua_tonumber(L, index);
+        break;
+
+    case LUA_TSTRING:
+        stream << '"' << lua_tostring(L, index) << '"';
+        break;
+
+    case LUA_TFUNCTION:
+        if (lua_iscfunction(L, index))
+            stream << "cfunction@" << lua_topointer(L, index);
+        else
+            stream << "function@" << lua_topointer(L, index);
+        break;
+
+    case LUA_TTHREAD:
+        stream << "thread@" << lua_tothread(L, index);
+        break;
+
+    case LUA_TLIGHTUSERDATA:
+        stream << "lightuserdata@" << lua_touserdata(L, index);
+        break;
+
+    case LUA_TTABLE:
+        dumpTable(L, index, maxDepth, level, false, stream);
+        break;
+
+    case LUA_TUSERDATA:
+        stream << "userdata@" << lua_touserdata(L, index);
+        break;
+
+    default:
+        stream << lua_typename(L, type);
+        break;
+    }
+
+    if (newLine)
+        stream << '\n';
+}
+
+inline void dumpTable(lua_State* L, int index, unsigned maxDepth, unsigned level, bool newLine, std::ostream& stream)
+{
+    stream << "table@" << lua_topointer(L, index);
+
+    if (level > maxDepth)
+    {
+        if (newLine)
+            stream << '\n';
+
+        return;
+    }
+
+    index = lua_absindex(L, index);
+
+    stream << " {";
+
+    int valuesCount = 0;
+
+    lua_pushnil(L); 
+    while (lua_next(L, index))
+    {
+        stream << '\n';
+        detail::putIndent(stream, level + 1);
+
+        dumpValue(L, -2, maxDepth, level + 1, false, stream); 
+        stream << ": ";
+        dumpValue(L, -1, maxDepth, level + 1, false, stream); 
+        stream << ",";
+
+        lua_pop(L, 1); 
+
+        ++valuesCount;
+    }
+
+    if (valuesCount > 0)
+    {
+        stream << '\n';
+        detail::putIndent(stream, level);
+    }
+
+    stream << "}";
+
+    if (newLine)
+        stream << '\n';
+}
+
+inline void dumpState(lua_State* L, unsigned maxDepth = 1, std::ostream& stream = std::cerr)
+{
+    stream << "----------------------------------------------" << '\n';
+
+    int top = lua_gettop(L);
+    for (int i = 1; i <= top; ++i)
+    {
+        stream << "stack #" << i << " (" << -(top - i + 1) << "): ";
+
+        dumpValue(L, i, maxDepth, 0, true, stream);
+    }
+}
+
+} 
+
+
+// End File: Source/LuaBridge/Dump.h
+
 // Begin File: Source/LuaBridge/List.h
 
 namespace luabridge {
@@ -4951,9 +5365,9 @@ namespace detail {
 
 [[noreturn]] inline void unreachable()
 {
-#if __GNUC__ 
+#if defined(__GNUC__) 
     __builtin_unreachable();
-#elif _MSC_VER 
+#elif defined(_MSC_VER) 
     __assume(false);
 #endif
 }
@@ -5024,7 +5438,7 @@ struct function_traits_impl<R (C::*)(Args...) const noexcept> : function_traits_
 {
 };
 
-#if _MSC_VER && _M_IX86 
+#if defined(_MSC_VER) && defined(_M_IX86) 
 template <class R, class... Args>
 struct function_traits_impl<R __stdcall(Args...)> : function_traits_base<false, false, R, Args...>
 {
@@ -5062,6 +5476,46 @@ struct function_traits_impl<R (__stdcall C::*)(Args...) noexcept> : function_tra
 
 template <class C, class R, class... Args>
 struct function_traits_impl<R (__stdcall C::*)(Args...) const noexcept> : function_traits_base<true, true, R, Args...>
+{
+};
+
+template <class R, class... Args>
+struct function_traits_impl<R __fastcall(Args...)> : function_traits_base<false, false, R, Args...>
+{
+};
+
+template <class R, class... Args>
+struct function_traits_impl<R (__fastcall *)(Args...)> : function_traits_base<false, false, R, Args...>
+{
+};
+
+template <class C, class R, class... Args>
+struct function_traits_impl<R (__fastcall C::*)(Args...)> : function_traits_base<true, false, R, Args...>
+{
+};
+
+template <class C, class R, class... Args>
+struct function_traits_impl<R (__fastcall C::*)(Args...) const> : function_traits_base<true, true, R, Args...>
+{
+};
+
+template <class R, class... Args>
+struct function_traits_impl<R __fastcall(Args...) noexcept> : function_traits_base<false, false, R, Args...>
+{
+};
+
+template <class R, class... Args>
+struct function_traits_impl<R (__fastcall *)(Args...) noexcept> : function_traits_base<false, false, R, Args...>
+{
+};
+
+template <class C, class R, class... Args>
+struct function_traits_impl<R (__fastcall C::*)(Args...) noexcept> : function_traits_base<true, false, R, Args...>
+{
+};
+
+template <class C, class R, class... Args>
+struct function_traits_impl<R (__fastcall C::*)(Args...) const noexcept> : function_traits_base<true, true, R, Args...>
 {
 };
 #endif
@@ -5239,7 +5693,7 @@ inline static constexpr bool is_proxy_member_function_v =
 template <class T, class F>
 inline static constexpr bool is_const_proxy_function_v =
     is_proxy_member_function_v<T, F> &&
-    std::is_const_v<std::remove_pointer_t<function_argument_or_void_t<0, F>>>;
+    std::is_const_v<std::remove_reference_t<std::remove_pointer_t<function_argument_or_void_t<0, F>>>>;
 
 template <class, class>
 struct function_arity_excluding
@@ -5312,17 +5766,163 @@ using remove_first_type_t = typename remove_first_type<T>::type;
 
 // End File: Source/LuaBridge/detail/FuncTraits.h
 
+// Begin File: Source/LuaBridge/detail/FlagSet.h
+
+namespace luabridge {
+
+template <class T, class... Ts>
+class FlagSet
+{
+    static_assert(std::is_integral_v<T>);
+
+public:
+    constexpr FlagSet() noexcept = default;
+
+    constexpr void set(FlagSet other) noexcept
+    {
+        flags |= other.flags;
+    }
+
+    constexpr FlagSet withSet(FlagSet other) const noexcept
+    {
+        FlagSet result { flags };
+        result.flags |= other.flags;
+        return result;
+    }
+
+    constexpr void unset(FlagSet other) noexcept
+    {
+        flags &= ~other.flags;
+    }
+
+    constexpr FlagSet withUnset(FlagSet other) const noexcept
+    {
+        FlagSet result { flags };
+        result.flags &= ~other.flags;
+        return result;
+    }
+
+    constexpr bool test(FlagSet other) const noexcept
+    {
+        return (flags & other.flags) != 0;
+    }
+
+    constexpr FlagSet operator|(FlagSet other) const noexcept
+    {
+        return FlagSet(flags | other.flags);
+    }
+
+    constexpr FlagSet operator&(FlagSet other) const noexcept
+    {
+        return FlagSet(flags & other.flags);
+    }
+
+    constexpr FlagSet operator~() const noexcept
+    {
+        return FlagSet(~flags);
+    }
+
+    constexpr T toUnderlying() const noexcept
+    {
+        return flags;
+    }
+
+    std::string toString() const
+    {
+        std::string result;
+        result.reserve(sizeof(T) * std::numeric_limits<uint8_t>::digits);
+
+        (result.append((mask<Ts>() & flags) ? "1" : "0"), ...);
+
+        for (std::size_t i = sizeof...(Ts); i < sizeof(T) * std::numeric_limits<uint8_t>::digits; ++i)
+            result.append("0");
+
+        std::reverse(result.begin(), result.end());
+
+        return result;
+    }
+
+    template <class... Us>
+    static constexpr FlagSet Value() noexcept
+    {
+        return FlagSet{ mask<Us...>() };
+    }
+
+    template <class U>
+    static constexpr auto fromUnderlying(U newFlags) noexcept
+        -> std::enable_if_t<std::is_integral_v<U> && std::is_convertible_v<U, T>, FlagSet>
+    {
+        return { static_cast<T>(newFlags) };
+    }
+
+private:
+    template <class U, class V, class... Us>
+    static constexpr T indexOf() noexcept
+    {
+        if constexpr (std::is_same_v<U, V>)
+            return static_cast<T>(0);
+        else
+            return static_cast<T>(1) + indexOf<U, Us...>();
+    }
+
+    template <class... Us>
+    static constexpr T mask() noexcept
+    {
+        return ((static_cast<T>(1) << indexOf<Us, Ts...>()) | ...);
+    }
+
+    constexpr FlagSet(T flags) noexcept
+        : flags(flags)
+    {
+    }
+
+    T flags = 0;
+};
+
+} 
+
+
+// End File: Source/LuaBridge/detail/FlagSet.h
+
+// Begin File: Source/LuaBridge/detail/Options.h
+
+namespace luabridge {
+
+namespace detail {
+struct OptionExtensibleClass;
+struct OptionAllowOverridingMethods;
+struct OptionVisibleMetatables;
+} 
+
+using Options = FlagSet<uint32_t,
+    detail::OptionExtensibleClass,
+    detail::OptionAllowOverridingMethods,
+    detail::OptionVisibleMetatables>;
+
+static inline constexpr Options defaultOptions = Options();
+
+static inline constexpr Options extensibleClass = Options::Value<detail::OptionExtensibleClass>();
+
+static inline constexpr Options allowOverridingMethods = Options::Value<detail::OptionAllowOverridingMethods>();
+
+static inline constexpr Options visibleMetatables = Options::Value<detail::OptionVisibleMetatables>();
+
+} 
+
+
+// End File: Source/LuaBridge/detail/Options.h
+
 // Begin File: Source/LuaBridge/detail/CFunctions.h
 
 namespace luabridge {
 namespace detail {
 
 template <class T>
-auto unwrap_argument_or_error(lua_State* L, std::size_t index)
+auto unwrap_argument_or_error(lua_State* L, std::size_t index, std::size_t start)
 {
-    auto result = Stack<T>::get(L, static_cast<int>(index));
+    auto result = Stack<T>::get(L, static_cast<int>(index + start));
     if (! result)
-        luaL_error(L, "Error decoding argument #%d: %s", static_cast<int>(index), result.message().c_str());
+        raise_lua_error(L, "Error decoding argument #%d: %s", static_cast<int>(index + 1), result.message().c_str());
 
     return std::move(*result);
 }
@@ -5330,7 +5930,7 @@ auto unwrap_argument_or_error(lua_State* L, std::size_t index)
 template <class ArgsPack, std::size_t Start, std::size_t... Indices>
 auto make_arguments_list_impl(lua_State* L, std::index_sequence<Indices...>)
 {
-    return tupleize(unwrap_argument_or_error<std::tuple_element_t<Indices, ArgsPack>>(L, Start + Indices)...);
+    return tupleize(unwrap_argument_or_error<std::tuple_element_t<Indices, ArgsPack>>(L, Indices, Start)...);
 }
 
 template <class ArgsPack, std::size_t Start>
@@ -5377,33 +5977,215 @@ auto pop_arguments(lua_State* L, std::tuple<Types...>& t)
     return pop_arguments<Start, Index + 1, Types...>(L, t);
 }
 
+template <class T = void, class... Args>
+constexpr auto make_array(Args&&... args)
+{
+    if constexpr (std::is_same_v<void, T>)
+        return std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
+    else
+        return std::array<T, sizeof...(Args)>{{ std::forward<Args>(args)... }};
+}
+
+inline bool is_metamethod(std::string_view method_name)
+{
+    static constexpr auto metamethods = make_array<std::string_view>(
+        "__add",
+        "__band",
+        "__bnot",
+        "__bor",
+        "__bxor",
+        "__call",
+        "__close",
+        "__concat",
+        "__div",
+        "__eq",
+        "__gc",
+        "__idiv",
+        "__index",
+        "__ipairs",
+        "__le",
+        "__len",
+        "__lt",
+        "__metatable",
+        "__mod",
+        "__mode",
+        "__mul",
+        "__name",
+        "__newindex",
+        "__pairs",
+        "__pow",
+        "__shl",
+        "__shr",
+        "__sub",
+        "__tostring",
+        "__unm"
+    );
+
+    if (method_name.size() <= 2 || method_name[0] != '_' || method_name[1] != '_')
+        return false;
+
+    auto result = std::lower_bound(metamethods.begin(), metamethods.end(), method_name);
+    return result != metamethods.end() && *result == method_name;
+}
+
+inline std::string make_super_method_name(const char* name)
+{
+    LUABRIDGE_ASSERT(name != nullptr);
+
+    return (std::string_view(name).find("_") == 0u)
+        ? (std::string("super") + name)
+        : (std::string("super_") + name);
+}
+
+inline Options get_class_options(lua_State* L, int index)
+{
+    LUABRIDGE_ASSERT(lua_istable(L, index)); 
+
+    Options options = defaultOptions;
+
+    lua_rawgetp(L, index, getClassOptionsKey()); 
+    if (lua_isnumber(L, -1))
+        options = Options::fromUnderlying(lua_tointeger(L, -1));
+
+    lua_pop(L, 1);
+
+    return options;
+}
+
+inline void push_class_or_const_table(lua_State* L, int index)
+{
+    LUABRIDGE_ASSERT(lua_istable(L, index)); 
+
+    lua_rawgetp(L, index, getClassKey()); 
+    if (! lua_istable(L, -1)) 
+    {
+        lua_pop(L, 1); 
+
+        lua_rawgetp(L, index, getConstKey()); 
+        if (! lua_istable(L, -1)) 
+            return;
+    }
+}
+
+inline std::optional<int> try_call_index_fallback(lua_State* L)
+{
+    LUABRIDGE_ASSERT(lua_istable(L, -1)); 
+
+    lua_rawgetp(L, -1, getIndexFallbackKey()); 
+    if (! lua_iscfunction(L, -1))
+    {
+        lua_pop(L, 1); 
+        return std::nullopt;
+    }
+
+    lua_pushvalue(L, 1); 
+    lua_pushvalue(L, 2); 
+    lua_call(L, 2, 1); 
+
+    if (! lua_isnoneornil(L, -1))
+    {
+        lua_remove(L, -2); 
+        return 1;
+    }
+
+    lua_pop(L, 1); 
+    return std::nullopt;
+}
+
+template <bool IsObject>
+inline std::optional<int> try_call_index_extensible(lua_State* L, const char* key)
+{
+    LUABRIDGE_ASSERT(lua_istable(L, -1)); 
+
+    if constexpr (IsObject)
+        push_class_or_const_table(L, -1); 
+    else
+        lua_rawgetp(L, -1, getStaticKey()); 
+
+    LUABRIDGE_ASSERT(lua_istable(L, -1)); 
+    rawgetfield(L, -1, key); 
+
+    if (! lua_isnoneornil(L, -1)) 
+    {
+        lua_remove(L, -2); 
+        lua_remove(L, -2); 
+        return 1;
+    }
+
+    lua_pop(L, 2); 
+    return std::nullopt;
+}
+
+template <bool IsObject>
 inline int index_metamethod(lua_State* L)
 {
 #if LUABRIDGE_SAFE_STACK_CHECKS
     luaL_checkstack(L, 3, detail::error_lua_stack_overflow);
 #endif
 
-    assert(lua_istable(L, 1) || lua_isuserdata(L, 1)); 
+    LUABRIDGE_ASSERT(lua_istable(L, 1) || lua_isuserdata(L, 1)); 
 
     lua_getmetatable(L, 1); 
-    assert(lua_istable(L, -1));
+    LUABRIDGE_ASSERT(lua_istable(L, -1));
+
+    const char* key = lua_tostring(L, 2);
+    if (key != nullptr && is_metamethod(key))
+    {
+        lua_pushnil(L);
+        return 1;
+    }
 
     for (;;)
     {
+        if constexpr (IsObject)
+        {
+            
+            if (auto result = try_call_index_fallback(L))
+                return *result;
+        }
+
+        if (lua_istable(L, 1))
+        {
+            if constexpr (IsObject)
+                lua_pushvalue(L, 1); 
+            else
+                push_class_or_const_table(L, -1); 
+
+            if (lua_istable(L, -1))
+            {
+                lua_pushvalue(L, 2); 
+                lua_rawget(L, -2); 
+                lua_remove(L, -2); 
+                if (! lua_isnil(L, -1)) 
+                {
+                    lua_remove(L, -2); 
+                    return 1;
+                }
+            }
+
+            lua_pop(L, 1); 
+        }
+
         lua_pushvalue(L, 2); 
         lua_rawget(L, -2); 
-
-        if (lua_iscfunction(L, -1)) 
+        if (! lua_isnil(L, -1)) 
         {
             lua_remove(L, -2); 
             return 1;
         }
 
-        assert(lua_isnil(L, -1)); 
+        LUABRIDGE_ASSERT(lua_isnil(L, -1)); 
         lua_pop(L, 1); 
 
+        const Options options = get_class_options(L, -1); 
+        if (options.test(extensibleClass | allowOverridingMethods))
+        {
+            if (auto result = try_call_index_extensible<IsObject>(L, key))
+                return *result;
+        }
+
         lua_rawgetp(L, -1, getPropgetKey()); 
-        assert(lua_istable(L, -1));
+        LUABRIDGE_ASSERT(lua_istable(L, -1));
 
         lua_pushvalue(L, 2); 
         lua_rawget(L, -2); 
@@ -5417,59 +6199,147 @@ inline int index_metamethod(lua_State* L)
             return 1;
         }
 
-        assert(lua_isnil(L, -1)); 
+        LUABRIDGE_ASSERT(lua_isnil(L, -1)); 
         lua_pop(L, 1); 
 
         lua_rawgetp(L, -1, getParentKey()); 
-
         if (lua_isnil(L, -1)) 
         {
-            lua_pop(L, 1); 
-            lua_rawgetp(L, -1, getIndexFallbackKey()); 
-            lua_remove(L, -2); 
-            if (lua_iscfunction(L, -1))
-            {
-                lua_pushvalue(L, 1); 
-                lua_pushvalue(L, 2); 
-                lua_call(L, 2, 1); 
-            }
-            else
-            {
-                lua_pop(L, 1);
-                lua_pushnil(L);
-            }
+            lua_pop(L, 2); 
+            break;
+        }
 
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
+        lua_remove(L, -2); 
+    }
+
+    lua_getmetatable(L, 1); 
+    LUABRIDGE_ASSERT(lua_istable(L, -1));
+
+    for (;;)
+    {
+        const Options options = get_class_options(L, -1); 
+
+        if (options.test(extensibleClass | ~allowOverridingMethods))
+        {
+            if (auto result = try_call_index_extensible<IsObject>(L, key))
+                return *result;
+        }
+
+        lua_rawgetp(L, -1, getParentKey()); 
+        if (lua_isnil(L, -1)) 
+        {
+            lua_remove(L, -2); 
             return 1;
         }
 
-        assert(lua_istable(L, -1)); 
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
         lua_remove(L, -2); 
     }
 
 }
 
-inline int newindex_metamethod(lua_State* L, bool pushSelf)
+inline std::optional<int> try_call_newindex_fallback(lua_State* L)
+{
+    LUABRIDGE_ASSERT(lua_istable(L, -1)); 
+
+    lua_rawgetp(L, -1, getNewIndexFallbackKey()); 
+    if (! lua_iscfunction(L, -1))
+    {
+        lua_pop(L, 1); 
+        return std::nullopt;
+    }
+
+    lua_pushvalue(L, 1); 
+    lua_pushvalue(L, 2); 
+    lua_pushvalue(L, 3); 
+    lua_call(L, 3, 0); 
+
+    return 0;
+}
+
+inline std::optional<int> try_call_newindex_extensible(lua_State* L, const char* key)
+{
+    LUABRIDGE_ASSERT(key != nullptr);
+    LUABRIDGE_ASSERT(lua_istable(L, -1)); 
+
+    lua_pushvalue(L, -1); 
+
+    for (;;)
+    {
+        push_class_or_const_table(L, -1); 
+        if (! lua_istable(L, -1)) 
+        {
+            lua_pop(L, 2); 
+            return std::nullopt;
+        }
+
+        lua_pushvalue(L, 2); 
+        lua_rawget(L, -2); 
+
+        if (! lua_isnil(L, -1)) 
+        {
+            if (! lua_iscfunction(L, -1))
+            {
+                lua_pop(L, 1);
+                break;
+            }
+
+            const Options options = get_class_options(L, -2); 
+            if (! options.test(allowOverridingMethods))
+                luaL_error(L, "immutable member '%s'", key);
+
+            rawsetfield(L, -2, make_super_method_name(key).c_str()); 
+            break;
+        }
+
+        lua_pop(L, 1); 
+
+        lua_rawgetp(L, -2, getParentKey()); 
+        if (lua_isnil(L, -1)) 
+        {
+            lua_pop(L, 1); 
+            break;
+        }
+
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
+        lua_remove(L, -2); 
+        lua_remove(L, -2); 
+    }
+
+    lua_remove(L, -2); 
+    lua_getmetatable(L, -1); 
+    lua_pushvalue(L, 3); 
+    rawsetfield(L, -2, key); 
+
+    lua_pop(L, 2); 
+
+    return 0;
+}
+
+template <bool IsObject>
+inline int newindex_metamethod(lua_State* L)
 {
 #if LUABRIDGE_SAFE_STACK_CHECKS
     luaL_checkstack(L, 3, detail::error_lua_stack_overflow);
 #endif
 
-    assert(lua_istable(L, 1) || lua_isuserdata(L, 1)); 
+    LUABRIDGE_ASSERT(lua_istable(L, 1) || lua_isuserdata(L, 1)); 
 
     lua_getmetatable(L, 1); 
-    assert(lua_istable(L, -1));
+    LUABRIDGE_ASSERT(lua_istable(L, -1));
+
+    const char* key = lua_tostring(L, 2);
 
     for (;;)
     {
+        const Options options = get_class_options(L, -1);
+
         lua_rawgetp(L, -1, getPropsetKey()); 
-
         if (lua_isnil(L, -1)) 
-        {
-            lua_pop(L, 2); 
-            luaL_error(L, "No member named '%s'", lua_tostring(L, 2));
-        }
+            luaL_error(L, "no member named '%s'", key);
 
-        assert(lua_istable(L, -1));
+        LUABRIDGE_ASSERT(lua_istable(L, -1));
 
         lua_pushvalue(L, 2); 
         lua_rawget(L, -2); 
@@ -5478,38 +6348,37 @@ inline int newindex_metamethod(lua_State* L, bool pushSelf)
         if (lua_iscfunction(L, -1)) 
         {
             lua_remove(L, -2); 
-            if (pushSelf)
+            if constexpr (IsObject)
                 lua_pushvalue(L, 1); 
             lua_pushvalue(L, 3); 
-            lua_call(L, pushSelf ? 2 : 1, 0); 
+            lua_call(L, IsObject ? 2 : 1, 0); 
             return 0;
         }
 
-        assert(lua_isnil(L, -1)); 
+        LUABRIDGE_ASSERT(lua_isnil(L, -1)); 
         lua_pop(L, 1); 
 
-        lua_rawgetp(L, -1, getParentKey()); 
-
-        if (lua_isnil(L, -1)) 
+        if constexpr (IsObject)
         {
-            lua_pop(L, 1); 
-            lua_rawgetp(L, -1, getNewIndexFallbackKey()); 
-            if (lua_iscfunction(L, -1))
+            
+            if (auto result = try_call_newindex_fallback(L))
+                return *result;
+        }
+        else
+        {
+            
+            if (options.test(extensibleClass))
             {
-                lua_pushvalue(L, 1); 
-                lua_pushvalue(L, 2); 
-                lua_pushvalue(L, 3); 
-                lua_call(L, 3, 1); 
-                return 0;
+                if (auto result = try_call_newindex_extensible(L, key))
+                    return *result;
             }
-
-            lua_pop(L, 1); 
-            lua_pop(L, 1); 
-            luaL_error(L, "No writable member '%s'", lua_tostring(L, 2));
-            return 0;
         }
 
-        assert(lua_istable(L, -1)); 
+        lua_rawgetp(L, -1, getParentKey()); 
+        if (lua_isnil(L, -1)) 
+            luaL_error(L, "no writable member '%s'", key);
+
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
         lua_remove(L, -2); 
 
     }
@@ -5517,32 +6386,39 @@ inline int newindex_metamethod(lua_State* L, bool pushSelf)
     return 0;
 }
 
-inline int newindex_object_metamethod(lua_State* L)
-{
-    return newindex_metamethod(L, true);
-}
-
-inline int newindex_static_metamethod(lua_State* L)
-{
-    return newindex_metamethod(L, false);
-}
-
 inline int read_only_error(lua_State* L)
 {
-    std::string s;
+    std::stringstream ss;
 
-    s = s + "'" + lua_tostring(L, lua_upvalueindex(1)) + "' is read-only";
+    ss << "'" << lua_tostring(L, lua_upvalueindex(1)) << "' is read-only";
 
-    luaL_error(L, "%s", s.c_str());
+    raise_lua_error(L, "%s", ss.str().c_str());
 
     return 0;
+}
+
+template <class C>
+static int tostring_metamethod(lua_State* L)
+{
+    const void* ptr = lua_topointer(L, 1);
+
+    lua_getmetatable(L, -1); 
+    lua_rawgetp(L, -1, getTypeKey()); 
+    lua_remove(L, -2); 
+
+    std::stringstream ss;
+    ss << ": 0x" << std::hex << reinterpret_cast<std::uintptr_t>(const_cast<void*>(ptr));
+    lua_pushstring(L, ss.str().c_str()); 
+    lua_concat(L, 2); 
+
+    return 1;
 }
 
 template <class C>
 static int gc_metamethod(lua_State* L)
 {
     Userdata* ud = Userdata::getExact<C>(L, 1);
-    assert(ud);
+    LUABRIDGE_ASSERT(ud);
 
     ud->~Userdata();
 
@@ -5557,10 +6433,10 @@ struct property_getter<T, void>
 {
     static int call(lua_State* L)
     {
-        assert(lua_islightuserdata(L, lua_upvalueindex(1)));
+        LUABRIDGE_ASSERT(lua_islightuserdata(L, lua_upvalueindex(1)));
 
         T* ptr = static_cast<T*>(lua_touserdata(L, lua_upvalueindex(1)));
-        assert(ptr != nullptr);
+        LUABRIDGE_ASSERT(ptr != nullptr);
 
         auto result = Stack<T&>::push(L, *ptr);
         if (! result)
@@ -5569,26 +6445,6 @@ struct property_getter<T, void>
         return 1;
     }
 };
-
-#if 0
-template <class T>
-struct property_getter<std::reference_wrapper<T>, void>
-{
-    static int call(lua_State* L)
-    {
-        assert(lua_islightuserdata(L, lua_upvalueindex(1)));
-
-        std::reference_wrapper<T>* ptr = static_cast<std::reference_wrapper<T>*>(lua_touserdata(L, lua_upvalueindex(1)));
-        assert(ptr != nullptr);
-
-        auto result = Stack<T&>::push(L, ptr->get());
-        if (! result)
-            luaL_error(L, "%s", result.message().c_str());
-
-        return 1;
-    }
-};
-#endif
 
 template <class T, class C>
 struct property_getter
@@ -5628,9 +6484,9 @@ inline void add_property_getter(lua_State* L, const char* name, int tableIndex)
     luaL_checkstack(L, 2, detail::error_lua_stack_overflow);
 #endif
 
-    assert(name != nullptr);
-    assert(lua_istable(L, tableIndex));
-    assert(lua_iscfunction(L, -1)); 
+    LUABRIDGE_ASSERT(name != nullptr);
+    LUABRIDGE_ASSERT(lua_istable(L, tableIndex));
+    LUABRIDGE_ASSERT(lua_iscfunction(L, -1)); 
 
     lua_rawgetp(L, tableIndex, getPropgetKey()); 
     lua_pushvalue(L, -2); 
@@ -5646,10 +6502,10 @@ struct property_setter<T, void>
 {
     static int call(lua_State* L)
     {
-        assert(lua_islightuserdata(L, lua_upvalueindex(1)));
+        LUABRIDGE_ASSERT(lua_islightuserdata(L, lua_upvalueindex(1)));
 
         T* ptr = static_cast<T*>(lua_touserdata(L, lua_upvalueindex(1)));
-        assert(ptr != nullptr);
+        LUABRIDGE_ASSERT(ptr != nullptr);
 
         auto result = Stack<T>::get(L, 1);
         if (! result)
@@ -5660,24 +6516,6 @@ struct property_setter<T, void>
         return 0;
     }
 };
-
-#if 0
-template <class T>
-struct property_setter<std::reference_wrapper<T>, void>
-{
-    static int call(lua_State* L)
-    {
-        assert(lua_islightuserdata(L, lua_upvalueindex(1)));
-
-        std::reference_wrapper<T>* ptr = static_cast<std::reference_wrapper<T>*>(lua_touserdata(L, lua_upvalueindex(1)));
-        assert(ptr != nullptr);
-
-        ptr->get() = Stack<T>::get(L, 1);
-
-        return 0;
-    }
-};
-#endif
 
 template <class T, class C>
 struct property_setter
@@ -5716,9 +6554,9 @@ inline void add_property_setter(lua_State* L, const char* name, int tableIndex)
     luaL_checkstack(L, 2, detail::error_lua_stack_overflow);
 #endif
 
-    assert(name != nullptr);
-    assert(lua_istable(L, tableIndex));
-    assert(lua_iscfunction(L, -1)); 
+    LUABRIDGE_ASSERT(name != nullptr);
+    LUABRIDGE_ASSERT(lua_istable(L, tableIndex));
+    LUABRIDGE_ASSERT(lua_iscfunction(L, -1)); 
 
     lua_rawgetp(L, tableIndex, getPropsetKey()); 
     lua_pushvalue(L, -2); 
@@ -5831,14 +6669,14 @@ struct function<void, ArgsPack, Start>
 template <class F, class T>
 int invoke_member_function(lua_State* L)
 {
-    using FnTraits = detail::function_traits<F>;
+    using FnTraits = function_traits<F>;
 
-    assert(isfulluserdata(L, lua_upvalueindex(1)));
+    LUABRIDGE_ASSERT(isfulluserdata(L, lua_upvalueindex(1)));
 
     T* ptr = Userdata::get<T>(L, 1, false);
 
     const F& func = *static_cast<const F*>(lua_touserdata(L, lua_upvalueindex(1)));
-    assert(func != nullptr);
+    LUABRIDGE_ASSERT(func != nullptr);
 
     return function<typename FnTraits::result_type, typename FnTraits::argument_types, 2>::call(L, ptr, func);
 }
@@ -5846,14 +6684,14 @@ int invoke_member_function(lua_State* L)
 template <class F, class T>
 int invoke_const_member_function(lua_State* L)
 {
-    using FnTraits = detail::function_traits<F>;
+    using FnTraits = function_traits<F>;
 
-    assert(isfulluserdata(L, lua_upvalueindex(1)));
+    LUABRIDGE_ASSERT(isfulluserdata(L, lua_upvalueindex(1)));
 
     const T* ptr = Userdata::get<T>(L, 1, true);
 
     const F& func = *static_cast<const F*>(lua_touserdata(L, lua_upvalueindex(1)));
-    assert(func != nullptr);
+    LUABRIDGE_ASSERT(func != nullptr);
 
     return function<typename FnTraits::result_type, typename FnTraits::argument_types, 2>::call(L, ptr, func);
 }
@@ -5863,14 +6701,28 @@ int invoke_member_cfunction(lua_State* L)
 {
     using F = int (T::*)(lua_State * L);
 
-    assert(isfulluserdata(L, lua_upvalueindex(1)));
+    LUABRIDGE_ASSERT(isfulluserdata(L, lua_upvalueindex(1)));
 
     T* t = Userdata::get<T>(L, 1, false);
 
     const F& func = *static_cast<const F*>(lua_touserdata(L, lua_upvalueindex(1)));
-    assert(func != nullptr);
+    LUABRIDGE_ASSERT(func != nullptr);
 
-    return (t->*func)(L);
+#if LUABRIDGE_HAS_EXCEPTIONS
+    try
+    {
+#endif
+        return (t->*func)(L);
+
+#if LUABRIDGE_HAS_EXCEPTIONS
+    }
+    catch (const std::exception& e)
+    {
+        raise_lua_error(L, "%s", e.what());
+    }
+    
+    return 0;
+#endif
 }
 
 template <class T>
@@ -5878,25 +6730,39 @@ int invoke_const_member_cfunction(lua_State* L)
 {
     using F = int (T::*)(lua_State * L) const;
 
-    assert(isfulluserdata(L, lua_upvalueindex(1)));
+    LUABRIDGE_ASSERT(isfulluserdata(L, lua_upvalueindex(1)));
 
     const T* t = Userdata::get<T>(L, 1, true);
 
     const F& func = *static_cast<const F*>(lua_touserdata(L, lua_upvalueindex(1)));
-    assert(func != nullptr);
+    LUABRIDGE_ASSERT(func != nullptr);
 
-    return (t->*func)(L);
+#if LUABRIDGE_HAS_EXCEPTIONS
+    try
+    {
+#endif
+        return (t->*func)(L);
+
+#if LUABRIDGE_HAS_EXCEPTIONS
+    }
+    catch (const std::exception& e)
+    {
+        raise_lua_error(L, "%s", e.what());
+    }
+    
+    return 0;
+#endif
 }
 
 template <class F>
 int invoke_proxy_function(lua_State* L)
 {
-    using FnTraits = detail::function_traits<F>;
+    using FnTraits = function_traits<F>;
 
-    assert(lua_islightuserdata(L, lua_upvalueindex(1)));
+    LUABRIDGE_ASSERT(lua_islightuserdata(L, lua_upvalueindex(1)));
 
     auto func = reinterpret_cast<F>(lua_touserdata(L, lua_upvalueindex(1)));
-    assert(func != nullptr);
+    LUABRIDGE_ASSERT(func != nullptr);
 
     return function<typename FnTraits::result_type, typename FnTraits::argument_types, 1>::call(L, func);
 }
@@ -5904,13 +6770,47 @@ int invoke_proxy_function(lua_State* L)
 template <class F>
 int invoke_proxy_functor(lua_State* L)
 {
-    using FnTraits = detail::function_traits<F>;
+    using FnTraits = function_traits<F>;
 
-    assert(isfulluserdata(L, lua_upvalueindex(1)));
+    LUABRIDGE_ASSERT(isfulluserdata(L, lua_upvalueindex(1)));
 
     auto& func = *align<F>(lua_touserdata(L, lua_upvalueindex(1)));
 
     return function<typename FnTraits::result_type, typename FnTraits::argument_types, 1>::call(L, func);
+}
+
+#if LUABRIDGE_SAFE_LUA_C_EXCEPTION_HANDLING && LUABRIDGE_HAS_EXCEPTIONS
+inline int invoke_safe_cfunction(lua_State* L)
+{
+    LUABRIDGE_ASSERT(lua_iscfunction(L, lua_upvalueindex(1)));
+
+    auto func = lua_tocfunction(L, lua_upvalueindex(1));
+    
+    try
+    {
+        return func(L);
+    }
+    catch (const std::exception& e)
+    {
+        raise_lua_error(L, "%s", e.what());
+    }
+
+    return 0;
+}
+#endif
+
+template <class F>
+int invoke_proxy_constructor(lua_State* L)
+{
+    using FnTraits = function_traits<F>;
+
+    LUABRIDGE_ASSERT(isfulluserdata(L, lua_upvalueindex(1)));
+
+    auto& func = *align<F>(lua_touserdata(L, lua_upvalueindex(1)));
+
+    function<void, typename FnTraits::argument_types, 1>::call(L, func);
+
+    return 1;
 }
 
 template <bool Member>
@@ -5920,7 +6820,7 @@ inline int try_overload_functions(lua_State* L)
     const int effective_args = nargs - (Member ? 1 : 0);
 
     lua_pushvalue(L, lua_upvalueindex(1));
-    assert(lua_istable(L, -1));
+    LUABRIDGE_ASSERT(lua_istable(L, -1));
     const int idx_overloads = nargs + 1;
     const int num_overloads = get_length(L, idx_overloads);
 
@@ -5931,10 +6831,10 @@ inline int try_overload_functions(lua_State* L)
     lua_pushnil(L);  
     while (lua_next(L, idx_overloads) != 0)
     {
-        assert(lua_istable(L, -1));
+        LUABRIDGE_ASSERT(lua_istable(L, -1));
 
         lua_rawgeti(L, -1, 1);
-        assert(lua_isnumber(L, -1));
+        LUABRIDGE_ASSERT(lua_isnumber(L, -1));
 
         const int overload_arity = static_cast<int>(lua_tointeger(L, -1));
         if (overload_arity >= 0 && overload_arity != effective_args)
@@ -5951,7 +6851,7 @@ inline int try_overload_functions(lua_State* L)
 
         lua_pushnumber(L, 2);
         lua_gettable(L, -2);
-        assert(lua_isfunction(L, -1));
+        LUABRIDGE_ASSERT(lua_isfunction(L, -1));
 
         for (int i = 1; i <= nargs; ++i)
             lua_pushvalue(L, i);
@@ -5960,8 +6860,7 @@ inline int try_overload_functions(lua_State* L)
         if (err == LUABRIDGE_LUA_OK)
         {
             
-            const int nresults = lua_gettop(L) - nargs - 4; 
-            return nresults;
+            return lua_gettop(L) - nargs - 4; 
         }
         else if (err == LUA_ERRRUN)
         {
@@ -5992,7 +6891,12 @@ inline int try_overload_functions(lua_State* L)
 
 inline void push_function(lua_State* L, lua_CFunction fp)
 {
+#if LUABRIDGE_SAFE_LUA_C_EXCEPTION_HANDLING && LUABRIDGE_HAS_EXCEPTIONS
     lua_pushcfunction_x(L, fp);
+    lua_pushcclosure_x(L, invoke_safe_cfunction, 1);
+#else    
+    lua_pushcfunction_x(L, fp);
+#endif
 }
 
 template <class ReturnType, class... Params>
@@ -6023,7 +6927,12 @@ inline void push_function(lua_State* L, F&& f)
 template <class T>
 void push_member_function(lua_State* L, lua_CFunction fp)
 {
+#if LUABRIDGE_SAFE_LUA_C_EXCEPTION_HANDLING && LUABRIDGE_HAS_EXCEPTIONS
     lua_pushcfunction_x(L, fp);
+    lua_pushcclosure_x(L, invoke_safe_cfunction, 1);
+#else    
+    lua_pushcfunction_x(L, fp);
+#endif
 }
 
 template <class T, class ReturnType, class... Params>
@@ -6142,35 +7051,16 @@ void push_member_function(lua_State* L, int (U::*mfp)(lua_State*) const)
 }
 
 template <class T, class Args>
-struct constructor;
-
-template <class T>
-struct constructor<T, void>
-{
-    using empty = std::tuple<>;
-
-    static T* call(const empty&)
-    {
-        return new T;
-    }
-
-    static T* call(void* ptr, const empty&)
-    {
-        return new (ptr) T;
-    }
-};
-
-template <class T, class Args>
 struct constructor
 {
-    static T* call(const Args& args)
+    static T* construct(const Args& args)
     {
         auto alloc = [](auto&&... args) { return new T(std::forward<decltype(args)>(args)...); };
 
         return std::apply(alloc, args);
     }
 
-    static T* call(void* ptr, const Args& args)
+    static T* construct(void* ptr, const Args& args)
     {
         auto alloc = [ptr](auto&&... args) { return new (ptr) T(std::forward<decltype(args)>(args)...); };
 
@@ -6188,11 +7078,17 @@ struct placement_constructor
 
         return std::apply(alloc, args);
     }
+};
 
-    template <class F>
-    static T* construct(void* ptr, const F& func)
+template <class C>
+struct container_constructor
+{
+    template <class F, class Args>
+    static C construct(const F& func, const Args& args)
     {
-        return func(ptr);
+        auto alloc = [&func](auto&&... args) { return func(std::forward<decltype(args)>(args)...); };
+
+        return std::apply(alloc, args);
     }
 };
 
@@ -6206,12 +7102,6 @@ struct external_constructor
 
         return std::apply(alloc, args);
     }
-
-    template <class F>
-    static T* construct(const F& func)
-    {
-        return func();
-    }
 };
 
 template <class C, class Args>
@@ -6219,11 +7109,25 @@ int constructor_container_proxy(lua_State* L)
 {
     using T = typename ContainerTraits<C>::Type;
 
-    T* object = detail::constructor<T, Args>::call(detail::make_arguments_list<Args, 2>(L));
+    T* object = nullptr;
+    
+#if LUABRIDGE_HAS_EXCEPTIONS
+    try
+    {
+#endif
+        object = constructor<T, Args>::construct(detail::make_arguments_list<Args, 2>(L));
 
-    auto result = detail::UserdataSharedHelper<C, false>::push(L, object);
+#if LUABRIDGE_HAS_EXCEPTIONS
+    }
+    catch (const std::exception& e)
+    {
+        raise_lua_error(L, "%s", e.what());
+    }
+#endif
+
+    auto result = UserdataSharedHelper<C, false>::push(L, object);
     if (! result)
-        luaL_error(L, "%s", result.message().c_str());
+        raise_lua_error(L, "%s", result.message().c_str());
 
     return 1;
 }
@@ -6231,13 +7135,28 @@ int constructor_container_proxy(lua_State* L)
 template <class T, class Args>
 int constructor_placement_proxy(lua_State* L)
 {
+    auto args = make_arguments_list<Args, 2>(L);
+
     std::error_code ec;
-    auto* value = detail::UserdataValue<T>::place(L, ec);
+    auto* value = UserdataValue<T>::place(L, ec);
     if (! value)
-        luaL_error(L, "%s", ec.message().c_str());
+        raise_lua_error(L, "%s", ec.message().c_str());
 
-    detail::constructor<T, Args>::call(value->getObject(), detail::make_arguments_list<Args, 2>(L));
+#if LUABRIDGE_HAS_EXCEPTIONS
+    try
+    {
+#endif
 
+        constructor<T, Args>::construct(value->getObject(), std::move(args));
+
+#if LUABRIDGE_HAS_EXCEPTIONS
+    }
+    catch (const std::exception& e)
+    {
+        raise_lua_error(L, "%s", e.what());
+    }
+#endif
+        
     value->commit();
 
     return 1;
@@ -6253,20 +7172,35 @@ struct constructor_forwarder
 
     T* operator()(lua_State* L)
     {
-        std::error_code ec;
-        auto* value = UserdataValue<T>::place(L, ec);
-        if (! value)
-            luaL_error(L, "%s", ec.message().c_str());
-
         using FnTraits = function_traits<F>;
         using FnArgs = remove_first_type_t<typename FnTraits::argument_types>;
 
-        T* obj = placement_constructor<T>::construct(
-            value->getObject(), m_func, make_arguments_list<FnArgs, 2>(L));
+        auto args = make_arguments_list<FnArgs, 2>(L);
+
+        std::error_code ec;
+        auto* value = UserdataValue<T>::place(L, ec);
+        if (! value)
+            raise_lua_error(L, "%s", ec.message().c_str());
+
+        T* object = nullptr;
+        
+#if LUABRIDGE_HAS_EXCEPTIONS
+        try
+        {
+#endif
+            object = placement_constructor<T>::construct(value->getObject(), m_func, std::move(args));
+
+#if LUABRIDGE_HAS_EXCEPTIONS
+        }
+        catch (const std::exception& e)
+        {
+            raise_lua_error(L, "%s", e.what());
+        }
+#endif
 
         value->commit();
 
-        return obj;
+        return object;
     }
 
 private:
@@ -6287,14 +7221,28 @@ struct factory_forwarder
         using FnTraits = function_traits<Alloc>;
         using FnArgs = typename FnTraits::argument_types;
 
-        T* obj = external_constructor<T>::construct(m_alloc, make_arguments_list<FnArgs, 0>(L));
+        T* object = nullptr;
+        
+#if LUABRIDGE_HAS_EXCEPTIONS
+        try
+        {
+#endif
+            object = external_constructor<T>::construct(m_alloc, make_arguments_list<FnArgs, 0>(L));
+
+#if LUABRIDGE_HAS_EXCEPTIONS
+        }
+        catch (const std::exception& e)
+        {
+            raise_lua_error(L, "%s", e.what());
+        }
+#endif
 
         std::error_code ec;
-        auto* value = UserdataValueExternal<T>::place(L, obj, m_dealloc, ec);
+        auto* value = UserdataValueExternal<T>::place(L, object, m_dealloc, ec);
         if (! value)
-            luaL_error(L, "%s", ec.message().c_str());
+            raise_lua_error(L, "%s", ec.message().c_str());
 
-        return obj;
+        return object;
     }
 
 private:
@@ -6302,11 +7250,134 @@ private:
     Dealloc m_dealloc;
 };
 
+template <class C, class F>
+struct container_forwarder
+{
+    explicit container_forwarder(F f)
+        : m_func(std::move(f))
+    {
+    }
+
+    C operator()(lua_State* L)
+    {
+        using FnTraits = function_traits<F>;
+        using FnArgs = typename FnTraits::argument_types;
+
+        C object;
+        
+#if LUABRIDGE_HAS_EXCEPTIONS
+        try
+        {
+#endif
+            object = container_constructor<C>::construct(m_func, make_arguments_list<FnArgs, 2>(L));
+
+#if LUABRIDGE_HAS_EXCEPTIONS
+        }
+        catch (const std::exception& e)
+        {
+            raise_lua_error(L, "%s", e.what());
+        }
+#endif
+
+        auto result = UserdataSharedHelper<C, false>::push(L, object);
+        if (! result)
+            raise_lua_error(L, "%s", result.message().c_str());
+
+        return object;
+    }
+
+private:
+    F m_func;
+};
+
 } 
 } 
 
 
 // End File: Source/LuaBridge/detail/CFunctions.h
+
+// Begin File: Source/LuaBridge/detail/Enum.h
+
+namespace luabridge {
+
+template <class T, T... Values>
+struct Enum
+{
+    static_assert(std::is_enum_v<T>);
+
+    using Type = std::underlying_type_t<T>;
+
+    [[nodiscard]] static Result push(lua_State* L, T value)
+    {
+        return Stack<Type>::push(L, static_cast<Type>(value));
+    }
+
+    [[nodiscard]] static TypeResult<T> get(lua_State* L, int index)
+    {
+        const auto result = Stack<Type>::get(L, index);
+        if (! result)
+            return result.error();
+
+        if constexpr (sizeof...(Values) > 0)
+        {
+            constexpr Type values[] = { static_cast<Type>(Values)... };
+            for (std::size_t i = 0; i < sizeof...(Values); ++i)
+            {
+                if (values[i] == *result)
+                    return static_cast<T>(*result);
+            }
+
+            return makeErrorCode(ErrorCode::InvalidTypeCast);
+        }
+        else
+        {
+            return static_cast<T>(*result);
+        }
+    }
+
+    [[nodiscard]] static bool isInstance(lua_State* L, int index)
+    {
+        return lua_type(L, index) == LUA_TNUMBER;
+    }
+};
+
+} 
+
+
+// End File: Source/LuaBridge/detail/Enum.h
+
+// Begin File: Source/LuaBridge/detail/Globals.h
+
+namespace luabridge {
+
+template <class T>
+TypeResult<T> getGlobal(lua_State* L, const char* name)
+{
+    lua_getglobal(L, name);
+
+    auto result = luabridge::Stack<T>::get(L, -1);
+
+    lua_pop(L, 1);
+
+    return result;
+}
+
+template <class T>
+bool setGlobal(lua_State* L, T&& t, const char* name)
+{
+    if (auto result = push(L, std::forward<T>(t)))
+    {
+        lua_setglobal(L, name);
+        return true;
+    }
+
+    return false;
+}
+
+} 
+
+
+// End File: Source/LuaBridge/detail/Globals.h
 
 // Begin File: Source/LuaBridge/detail/LuaRef.h
 
@@ -6348,14 +7419,14 @@ protected:
     {
     };
 
-    LuaRefBase(lua_State* L)
+    LuaRefBase(lua_State* L) noexcept
         : m_L(L)
     {
     }
 
     int createRef() const
     {
-        impl().push();
+        impl().push(m_L);
 
         return luaL_ref(m_L, LUA_REGISTRYINDEX);
     }
@@ -6373,7 +7444,7 @@ public:
 
         lua_getglobal(m_L, "tostring");
 
-        impl().push();
+        impl().push(m_L);
 
         lua_call(m_L, 1, 1);
 
@@ -6427,31 +7498,13 @@ public:
         return m_L;
     }
 
-    void push(lua_State* L) const
-    {
-        assert(equalstates(L, m_L));
-        (void) L;
-
-        impl().push();
-    }
-
-    void pop(lua_State* L)
-    {
-        assert(equalstates(L, m_L));
-        (void) L;
-
-        impl().pop();
-    }
-
     int type() const
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
-        const int refType = lua_type(m_L, -1);
-
-        return refType;
+        return lua_type(m_L, -1);
     }
 
     bool isNil() const { return type() == LUA_TNIL; }
@@ -6481,27 +7534,32 @@ public:
         return metatable.isTable() && metatable["__call"].isFunction();
     }
 
+    std::optional<std::string> getClassName()
+    {
+        if (! isUserdata())
+            return std::nullopt;
+
+        const StackRestore stackRestore(m_L);
+
+        impl().push(m_L);
+        if (! lua_getmetatable(m_L, -1))
+            return std::nullopt;
+
+        lua_rawgetp(m_L, -1, detail::getTypeKey());
+        if (lua_isstring(m_L, -1))
+            return lua_tostring(m_L, -1);
+
+        return std::nullopt;
+    }
+
     template <class T>
     TypeResult<T> cast() const
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
-        if constexpr (std::is_enum_v<T>)
-        {
-            using U = std::underlying_type_t<T>;
-
-            auto result = Stack<U>::get(m_L, -1);
-            if (! result)
-                return result.error();
-
-            return static_cast<T>(*result);
-        }
-        else
-        {
-            return Stack<T>::get(m_L, -1);
-        }
+        return Stack<T>::get(m_L, -1);
     }
 
     template <class T>
@@ -6509,18 +7567,9 @@ public:
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
-        if constexpr (std::is_enum_v<T>)
-        {
-            using U = std::underlying_type_t<T>;
-
-            return static_cast<T>(*Stack<U>::get(m_L, -1));
-        }
-        else
-        {
-            return *Stack<T>::get(m_L, -1);
-        }
+        return *Stack<T>::get(m_L, -1);
     }
 
     template <class T>
@@ -6528,18 +7577,9 @@ public:
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
-        if constexpr (std::is_enum_v<T>)
-        {
-            using U = std::underlying_type_t<T>;
-
-            return Stack<U>::isInstance(m_L, -1);
-        }
-        else
-        {
-            return Stack<T>::isInstance(m_L, -1);
-        }
+        return Stack<T>::isInstance(m_L, -1);
     }
 
     template <class T>
@@ -6555,7 +7595,7 @@ public:
 
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
         if (! lua_getmetatable(m_L, -1))
             return LuaRef(m_L);
@@ -6568,7 +7608,7 @@ public:
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
         if (! Stack<T>::push(m_L, rhs))
             return false;
@@ -6587,7 +7627,7 @@ public:
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
         if (! Stack<T>::push(m_L, rhs))
             return false;
@@ -6605,7 +7645,7 @@ public:
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
         if (! Stack<T>::push(m_L, rhs))
             return false;
@@ -6623,7 +7663,7 @@ public:
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
         if (! Stack<T>::push(m_L, rhs))
             return false;
@@ -6641,7 +7681,7 @@ public:
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
         if (! Stack<T>::push(m_L, rhs))
             return false;
@@ -6659,7 +7699,7 @@ public:
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
         if (! Stack<T>::push(m_L, v))
             return false;
@@ -6671,7 +7711,7 @@ public:
     {
         const StackRestore stackRestore(m_L);
 
-        impl().push();
+        impl().push(m_L);
 
         return get_length(m_L, -1);
     }
@@ -6773,19 +7813,24 @@ class LuaRef : public LuaRefBase<LuaRef, LuaRef>
             return *this;
         }
 
-        using LuaRefBase::push;
-
         void push() const
         {
+            push(m_L);
+        }
+
+        void push(lua_State* L) const
+        {
+            LUABRIDGE_ASSERT(equalstates(L, m_L));
+
 #if LUABRIDGE_SAFE_STACK_CHECKS
-            if (! lua_checkstack(m_L, 3))
+            if (! lua_checkstack(L, 3))
                 return;
 #endif
 
-            lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_tableRef);
-            lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_keyRef);
-            lua_gettable(m_L, -2);
-            lua_remove(m_L, -2); 
+            lua_rawgeti(L, LUA_REGISTRYINDEX, m_tableRef);
+            lua_rawgeti(L, LUA_REGISTRYINDEX, m_keyRef);
+            lua_gettable(L, -2);
+            lua_remove(L, -2); 
         }
 
         template <class T>
@@ -6808,7 +7853,7 @@ class LuaRef : public LuaRefBase<LuaRef, LuaRef>
     friend struct Stack<TableItem>;
     friend struct Stack<TableItem&>;
 
-    LuaRef(lua_State* L, FromStack)
+    LuaRef(lua_State* L, FromStack) noexcept
         : LuaRefBase(L)
         , m_ref(luaL_ref(m_L, LUA_REGISTRYINDEX))
     {
@@ -6829,7 +7874,7 @@ class LuaRef : public LuaRefBase<LuaRef, LuaRef>
 
 public:
     
-    LuaRef(lua_State* L)
+    LuaRef(lua_State* L) noexcept
         : LuaRefBase(L)
         , m_ref(LUA_NOREF)
     {
@@ -6858,7 +7903,7 @@ public:
     {
     }
 
-    LuaRef(LuaRef&& other)
+    LuaRef(LuaRef&& other) noexcept
         : LuaRefBase(other.m_L)
         , m_ref(std::exchange(other.m_ref, LUA_NOREF))
     {
@@ -6911,7 +7956,7 @@ public:
         return *this;
     }
 
-    LuaRef& operator=(LuaRef&& rhs)
+    LuaRef& operator=(LuaRef&& rhs) noexcept
     {
         if (m_ref != LUA_NOREF)
             luaL_unref(m_L, LUA_REGISTRYINDEX, m_ref);
@@ -6944,24 +7989,45 @@ public:
         return *this;
     }
 
-    using LuaRefBase::push;
-
     void push() const
     {
+        push(m_L);
+    }
+
+    void push(lua_State* L) const
+    {
+        LUABRIDGE_ASSERT(equalstates(L, m_L));
+
 #if LUABRIDGE_SAFE_STACK_CHECKS
-        if (! lua_checkstack(m_L, 1))
+        if (! lua_checkstack(L, 1))
             return;
 #endif
 
-        lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_ref);
+        lua_rawgeti(L, LUA_REGISTRYINDEX, m_ref);
     }
 
     void pop()
     {
-        if (m_ref != LUA_NOREF)
-            luaL_unref(m_L, LUA_REGISTRYINDEX, m_ref);
+        pop(m_L);
+    }
 
-        m_ref = luaL_ref(m_L, LUA_REGISTRYINDEX);
+    void pop(lua_State* L)
+    {
+        LUABRIDGE_ASSERT(equalstates(L, m_L));
+
+        if (m_ref != LUA_NOREF)
+            luaL_unref(L, LUA_REGISTRYINDEX, m_ref);
+
+        m_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+    }
+
+    void moveTo(lua_State* newL)
+    {
+        push();
+
+        lua_xmove(m_L, newL, 1);
+
+        m_L = newL;
     }
 
     template <class T>
@@ -7024,7 +8090,7 @@ public:
     }
 
 private:
-    void swap(LuaRef& other)
+    void swap(LuaRef& other) noexcept
     {
         using std::swap;
 
@@ -7190,13 +8256,13 @@ public:
 
     LuaRef operator[](std::size_t index) const
     {
-        assert(m_ec == std::error_code());
+        LUABRIDGE_ASSERT(m_ec == std::error_code());
 
         if (std::holds_alternative<std::vector<LuaRef>>(m_data))
         {
             const auto& values = std::get<std::vector<LuaRef>>(m_data);
 
-            assert(index < values.size());
+            LUABRIDGE_ASSERT(index < values.size());
             return values[index];
         }
 
@@ -7268,17 +8334,17 @@ LuaResult call(const LuaRef& object, Args&&... args)
         }
     }
 
-    int code = lua_pcall(L, sizeof...(Args), LUA_MULTRET, 0);
+    const int code = lua_pcall(L, sizeof...(Args), LUA_MULTRET, 0);
     if (code != LUABRIDGE_LUA_OK)
     {
         auto ec = makeErrorCode(ErrorCode::LuaFunctionCallFailed);
 
 #if LUABRIDGE_HAS_EXCEPTIONS
-        if (LuaException::areExceptionsEnabled())
+        if (LuaException::areExceptionsEnabled(L))
             LuaException::raise(L, ec);
-#else
-        return LuaResult::errorFromStack(L, ec);
 #endif
+
+        return LuaResult::errorFromStack(L, ec);
     }
 
     return LuaResult::valuesFromStack(L, stackTop);
@@ -7289,7 +8355,7 @@ inline int pcall(lua_State* L, int nargs = 0, int nresults = 0, int msgh = 0)
     const int code = lua_pcall(L, nargs, nresults, msgh);
 
 #if LUABRIDGE_HAS_EXCEPTIONS
-    if (code != LUABRIDGE_LUA_OK && LuaException::areExceptionsEnabled())
+    if (code != LUABRIDGE_LUA_OK && LuaException::areExceptionsEnabled(L))
         LuaException::raise(L, makeErrorCode(ErrorCode::LuaFunctionCallFailed));
 #endif
 
@@ -7344,7 +8410,7 @@ public:
 
     bool operator!=(const Iterator& rhs) const
     {
-        assert(m_L == rhs.m_L);
+        LUABRIDGE_ASSERT(m_L == rhs.m_L);
 
         return ! m_table.rawequal(rhs.m_table) || ! m_key.rawequal(rhs.m_key);
     }
@@ -7450,78 +8516,10 @@ inline Range pairs(const LuaRef& table)
 
 // End File: Source/LuaBridge/detail/Iterator.h
 
-// Begin File: Source/LuaBridge/detail/Security.h
-
-namespace luabridge {
-
-class Security
-{
-public:
-    static bool hideMetatables() noexcept
-    {
-        return getSettings().hideMetatables;
-    }
-
-    static void setHideMetatables(bool shouldHide) noexcept
-    {
-        getSettings().hideMetatables = shouldHide;
-    }
-
-private:
-    struct Settings
-    {
-        Settings() noexcept
-            : hideMetatables(true)
-        {
-        }
-
-        bool hideMetatables;
-    };
-
-    static Settings& getSettings() noexcept
-    {
-        static Settings settings;
-        return settings;
-    }
-};
-
-template <class T>
-TypeResult<T> getGlobal(lua_State* L, const char* name)
-{
-    lua_getglobal(L, name);
-
-    auto result = luabridge::Stack<T>::get(L, -1);
-    
-    lua_pop(L, 1);
-    
-    return result;
-}
-
-template <class T>
-bool setGlobal(lua_State* L, T&& t, const char* name)
-{
-    if (auto result = push(L, std::forward<T>(t)))
-    {
-        lua_setglobal(L, name);
-        return true;
-    }
-
-    return false;
-}
-
-inline void setHideMetatables(bool shouldHide) noexcept
-{
-    Security::setHideMetatables(shouldHide);
-}
-
-} 
-
-
-// End File: Source/LuaBridge/detail/Security.h
-
 // Begin File: Source/LuaBridge/detail/Namespace.h
 
 namespace luabridge {
+
 namespace detail {
 
 class Registrar
@@ -7540,17 +8538,21 @@ protected:
     {
     }
 
-    Registrar(const Registrar& rhs)
+    Registrar(const Registrar& rhs) = delete;
+
+    Registrar(Registrar&& rhs)
         : L(rhs.L)
         , m_stackSize(std::exchange(rhs.m_stackSize, 0))
         , m_skipStackPops(std::exchange(rhs.m_skipStackPops, 0))
     {
     }
 
-    Registrar& operator=(const Registrar& rhs)
+    Registrar& operator=(const Registrar& rhs) = delete;
+
+    Registrar& operator=(Registrar&& rhs)
     {
-        m_stackSize = rhs.m_stackSize;
-        m_skipStackPops = rhs.m_skipStackPops;
+        m_stackSize = std::exchange(rhs.m_stackSize, 0);
+        m_skipStackPops = std::exchange(rhs.m_skipStackPops, 0);
 
         return *this;
     }
@@ -7560,7 +8562,7 @@ protected:
         const int popsCount = m_stackSize - m_skipStackPops;
         if (popsCount > 0)
         {
-            assert(popsCount <= lua_gettop(L));
+            LUABRIDGE_ASSERT(popsCount <= lua_gettop(L));
 
             lua_pop(L, popsCount);
         }
@@ -7575,8 +8577,8 @@ protected:
     }
 
     lua_State* const L = nullptr;
-    int mutable m_stackSize = 0;
-    int mutable m_skipStackPops = 0;
+    int m_stackSize = 0;
+    int m_skipStackPops = 0;
 };
 
 } 
@@ -7588,11 +8590,11 @@ class Namespace : public detail::Registrar
     
     static int luaError(lua_State* L, std::string message)
     {
-        assert(lua_isstring(L, lua_upvalueindex(1)));
+        LUABRIDGE_ASSERT(lua_isstring(L, lua_upvalueindex(1)));
         std::string s;
 
         lua_Debug ar;
-    
+
         int result = lua_getstack(L, 2, &ar);
         if (result != 0)
         {
@@ -7618,8 +8620,8 @@ class Namespace : public detail::Registrar
     class ClassBase : public detail::Registrar
     {
     public:
-        explicit ClassBase(Namespace& parent)
-            : Registrar(parent)
+        explicit ClassBase(Namespace parent)
+            : Registrar(std::move(parent))
         {
         }
 
@@ -7627,9 +8629,9 @@ class Namespace : public detail::Registrar
 
     protected:
         
-        void createConstTable(const char* name, bool trueConst = true)
+        void createConstTable(const char* name, bool trueConst, Options options)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
 
             std::string type_name = std::string(trueConst ? "const " : "") + name;
 
@@ -7637,30 +8639,33 @@ class Namespace : public detail::Registrar
             lua_pushvalue(L, -1); 
             lua_setmetatable(L, -2); 
 
-            lua_pushstring(L, type_name.c_str());
+            pushunsigned(L, options.toUnderlying()); 
+            lua_rawsetp(L, -2, detail::getClassOptionsKey()); 
+
+            lua_pushstring(L, type_name.c_str()); 
             lua_rawsetp(L, -2, detail::getTypeKey()); 
 
-            lua_pushcfunction_x(L, &detail::index_metamethod);
-            rawsetfield(L, -2, "__index");
+            lua_pushcfunction_x(L, &detail::index_metamethod<true>); 
+            rawsetfield(L, -2, "__index"); 
 
-            lua_pushcfunction_x(L, &detail::newindex_object_metamethod);
-            rawsetfield(L, -2, "__newindex");
+            lua_pushcfunction_x(L, &detail::newindex_metamethod<true>); 
+            rawsetfield(L, -2, "__newindex"); 
 
-            lua_newtable(L);
-            lua_rawsetp(L, -2, detail::getPropgetKey());
+            lua_newtable(L); 
+            lua_rawsetp(L, -2, detail::getPropgetKey()); 
 
-            if (Security::hideMetatables())
+            if (! options.test(visibleMetatables))
             {
-                lua_pushnil(L);
+                lua_pushboolean(L, 0);
                 rawsetfield(L, -2, "__metatable");
             }
         }
 
-        void createClassTable(const char* name)
+        void createClassTable(const char* name, Options options)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
 
-            createConstTable(name, false); 
+            createConstTable(name, false, options); 
 
             lua_newtable(L); 
             lua_rawsetp(L, -2, detail::getPropsetKey()); 
@@ -7672,9 +8677,9 @@ class Namespace : public detail::Registrar
             lua_rawsetp(L, -3, detail::getClassKey()); 
         }
 
-        void createStaticTable(const char* name)
+        void createStaticTable(const char* name, Options options)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
 
             lua_newtable(L); 
             lua_newtable(L); 
@@ -7683,16 +8688,13 @@ class Namespace : public detail::Registrar
             lua_insert(L, -2); 
             rawsetfield(L, -5, name); 
 
-#if 0
-            lua_pushlightuserdata(L, this);
-            lua_pushcclosure_x(L, &tostringMetaMethod, 1);
-            rawsetfield(L, -2, "__tostring");
-#endif
+            pushunsigned(L, options.toUnderlying()); 
+            lua_rawsetp(L, -2, detail::getClassOptionsKey()); 
 
-            lua_pushcfunction_x(L, &detail::index_metamethod);
+            lua_pushcfunction_x(L, &detail::index_metamethod<false>);
             rawsetfield(L, -2, "__index");
 
-            lua_pushcfunction_x(L, &detail::newindex_static_metamethod);
+            lua_pushcfunction_x(L, &detail::newindex_metamethod<false>);
             rawsetfield(L, -2, "__newindex");
 
             lua_newtable(L); 
@@ -7704,9 +8706,9 @@ class Namespace : public detail::Registrar
             lua_pushvalue(L, -2); 
             lua_rawsetp(L, -2, detail::getClassKey()); 
 
-            if (Security::hideMetatables())
+            if (! options.test(visibleMetatables))
             {
-                lua_pushnil(L);
+                lua_pushboolean(L, 0);
                 rawsetfield(L, -2, "__metatable");
             }
         }
@@ -7714,9 +8716,9 @@ class Namespace : public detail::Registrar
         void assertStackState() const
         {
             
-            assert(lua_istable(L, -3));
-            assert(lua_istable(L, -2));
-            assert(lua_istable(L, -1));
+            LUABRIDGE_ASSERT(lua_istable(L, -3));
+            LUABRIDGE_ASSERT(lua_istable(L, -2));
+            LUABRIDGE_ASSERT(lua_istable(L, -1));
         }
     };
 
@@ -7725,11 +8727,11 @@ class Namespace : public detail::Registrar
     {
     public:
         
-        Class(const char* name, Namespace& parent)
-            : ClassBase(parent)
+        Class(const char* name, Namespace parent, Options options)
+            : ClassBase(std::move(parent))
         {
-            assert(name != nullptr);
-            assert(lua_istable(L, -1)); 
+            LUABRIDGE_ASSERT(name != nullptr);
+            LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
             rawgetfield(L, -1, name); 
 
@@ -7737,22 +8739,32 @@ class Namespace : public detail::Registrar
             {
                 lua_pop(L, 1); 
 
-                createConstTable(name); 
+                createConstTable(name, true, options); 
+                ++m_stackSize;
 #if !defined(LUABRIDGE_ON_LUAU)
                 lua_pushcfunction_x(L, &detail::gc_metamethod<T>); 
                 rawsetfield(L, -2, "__gc"); 
 #endif
-                ++m_stackSize;
+                lua_pushcfunction_x(L, &detail::tostring_metamethod<T>);
+                rawsetfield(L, -2, "__tostring");
 
-                createClassTable(name); 
+                createClassTable(name, options); 
+                ++m_stackSize;
 #if !defined(LUABRIDGE_ON_LUAU)
                 lua_pushcfunction_x(L, &detail::gc_metamethod<T>); 
                 rawsetfield(L, -2, "__gc"); 
 #endif
+
+                lua_pushcfunction_x(L, &detail::tostring_metamethod<T>);
+                rawsetfield(L, -2, "__tostring");
+
+                createStaticTable(name, options); 
                 ++m_stackSize;
 
-                createStaticTable(name); 
-                ++m_stackSize;
+                lua_pushvalue(L, -1); 
+                lua_rawsetp(L, -2, detail::getStaticKey()); 
+                lua_pushvalue(L, -1); 
+                lua_rawsetp(L, -3, detail::getStaticKey()); 
 
                 lua_pushvalue(L, -1); 
                 lua_rawsetp(L, LUA_REGISTRYINDEX, detail::getStaticRegistryKey<T>()); 
@@ -7763,8 +8775,12 @@ class Namespace : public detail::Registrar
             }
             else
             {
-                assert(lua_istable(L, -1)); 
+                LUABRIDGE_ASSERT(lua_istable(L, -1)); 
                 ++m_stackSize;
+
+                lua_getmetatable(L, -1); 
+                lua_insert(L, -2); 
+                lua_pop(L, 1); 
 
                 lua_rawgetp(L, LUA_REGISTRYINDEX, detail::getConstRegistryKey<T>()); 
                 lua_insert(L, -2); 
@@ -7776,28 +8792,37 @@ class Namespace : public detail::Registrar
             }
         }
 
-        Class(const char* name, Namespace& parent, void const* const staticKey)
-            : ClassBase(parent)
+        Class(const char* name, Namespace parent, const void* const staticKey, Options options)
+            : ClassBase(std::move(parent))
         {
-            assert(name != nullptr);
-            assert(lua_istable(L, -1)); 
+            LUABRIDGE_ASSERT(name != nullptr);
+            LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
-            createConstTable(name); 
+            createConstTable(name, true, options); 
+            ++m_stackSize;
 #if !defined(LUABRIDGE_ON_LUAU)
             lua_pushcfunction_x(L, &detail::gc_metamethod<T>); 
             rawsetfield(L, -2, "__gc"); 
 #endif
-            ++m_stackSize;
+            lua_pushcfunction_x(L, &detail::tostring_metamethod<T>);
+            rawsetfield(L, -2, "__tostring");
 
-            createClassTable(name); 
+            createClassTable(name, options); 
+            ++m_stackSize;
 #if !defined(LUABRIDGE_ON_LUAU)
             lua_pushcfunction_x(L, &detail::gc_metamethod<T>); 
             rawsetfield(L, -2, "__gc"); 
 #endif
+            lua_pushcfunction_x(L, &detail::tostring_metamethod<T>);
+            rawsetfield(L, -2, "__tostring");
+
+            createStaticTable(name, options); 
             ++m_stackSize;
 
-            createStaticTable(name); 
-            ++m_stackSize;
+            lua_pushvalue(L, -1); 
+            lua_rawsetp(L, -2, detail::getStaticKey()); 
+            lua_pushvalue(L, -1); 
+            lua_rawsetp(L, -3, detail::getStaticKey()); 
 
             lua_rawgetp(L, LUA_REGISTRYINDEX, staticKey); 
             if (lua_isnil(L, -1)) 
@@ -7808,13 +8833,13 @@ class Namespace : public detail::Registrar
                 return;
             }
 
-            assert(lua_istable(L, -1)); 
+            LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
             lua_rawgetp(L, -1, detail::getClassKey()); 
-            assert(lua_istable(L, -1));
+            LUABRIDGE_ASSERT(lua_istable(L, -1));
 
             lua_rawgetp(L, -1, detail::getConstKey()); 
-            assert(lua_istable(L, -1));
+            LUABRIDGE_ASSERT(lua_istable(L, -1));
 
             lua_rawsetp(L, -6, detail::getParentKey()); 
             lua_rawsetp(L, -4, detail::getParentKey()); 
@@ -7830,17 +8855,18 @@ class Namespace : public detail::Registrar
 
         Namespace endClass()
         {
-            assert(m_stackSize > 3);
+            LUABRIDGE_ASSERT(m_stackSize > 3);
 
             m_stackSize -= 3;
             lua_pop(L, 3);
-            return Namespace(*this);
+
+            return Namespace(std::move(*this));
         }
 
-        template <class U, class = std::enable_if_t<!std::is_invocable_v<U>>>
+        template <class U, class = std::enable_if_t<std::is_base_of_v<U, LuaRef> || !std::is_invocable_v<U>>>
         Class<T>& addStaticProperty(const char* name, const U* value)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             lua_pushlightuserdata(L, const_cast<U*>(value)); 
@@ -7855,10 +8881,10 @@ class Namespace : public detail::Registrar
             return *this;
         }
 
-        template <class U, class = std::enable_if_t<!std::is_invocable_v<U>>>
+        template <class U, class = std::enable_if_t<std::is_base_of_v<U, LuaRef> || !std::is_invocable_v<U>>>
         Class<T>& addStaticProperty(const char* name, U* value, bool isWritable = true)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             lua_pushlightuserdata(L, value); 
@@ -7884,7 +8910,7 @@ class Namespace : public detail::Registrar
         template <class U>
         Class<T>& addStaticProperty(const char* name, U (*get)(), void (*set)(U) = nullptr)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             lua_pushlightuserdata(L, reinterpret_cast<void*>(get)); 
@@ -7910,7 +8936,7 @@ class Namespace : public detail::Registrar
         template <class U>
         Class<T>& addStaticProperty(const char* name, U (*get)() noexcept, void (*set)(U) noexcept = nullptr)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             lua_pushlightuserdata(L, reinterpret_cast<void*>(get)); 
@@ -7936,7 +8962,7 @@ class Namespace : public detail::Registrar
         template <class Getter, class = std::enable_if_t<!std::is_pointer_v<Getter>>>
         Class<T>& addStaticProperty(const char* name, Getter get)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             using GetType = decltype(get);
@@ -7951,7 +8977,7 @@ class Namespace : public detail::Registrar
         template <class Getter, class Setter, class = std::enable_if_t<!std::is_pointer_v<Getter> && !std::is_pointer_v<Setter>>>
         Class<T>& addStaticProperty(const char* name, Getter get, Setter set)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             using GetType = decltype(get);
@@ -7972,7 +8998,7 @@ class Namespace : public detail::Registrar
         auto addStaticFunction(const char* name, Functions... functions)
             -> std::enable_if_t<(detail::is_callable_v<Functions> && ...) && (sizeof...(Functions) > 0), Class<T>&>
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             if constexpr (sizeof...(Functions) == 1)
@@ -8023,7 +9049,7 @@ class Namespace : public detail::Registrar
 
             using MemberPtrType = decltype(mp);
 
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             new (lua_newuserdata_x<MemberPtrType>(L, sizeof(MemberPtrType))) MemberPtrType(mp); 
@@ -8048,7 +9074,7 @@ class Namespace : public detail::Registrar
             using GetType = TG (T::*)() const;
             using SetType = void (T::*)(TS);
 
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             new (lua_newuserdata_x<GetType>(L, sizeof(GetType))) GetType(get); 
@@ -8073,7 +9099,7 @@ class Namespace : public detail::Registrar
             using GetType = TG (T::*)() const noexcept;
             using SetType = void (T::*)(TS) noexcept;
 
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             new (lua_newuserdata_x<GetType>(L, sizeof(GetType))) GetType(get); 
@@ -8098,7 +9124,7 @@ class Namespace : public detail::Registrar
             using GetType = TG (T::*)(lua_State*) const;
             using SetType = void (T::*)(TS, lua_State*);
 
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             new (lua_newuserdata_x<GetType>(L, sizeof(GetType))) GetType(get); 
@@ -8123,7 +9149,7 @@ class Namespace : public detail::Registrar
             using GetType = TG (T::*)(lua_State*) const noexcept;
             using SetType = void (T::*)(TS, lua_State*) noexcept;
 
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             new (lua_newuserdata_x<GetType>(L, sizeof(GetType))) GetType(get); 
@@ -8145,7 +9171,7 @@ class Namespace : public detail::Registrar
         template <class TG, class TS = TG>
         Class<T>& addProperty(const char* name, TG (*get)(const T*), void (*set)(T*, TS) = nullptr)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             lua_pushlightuserdata(L, reinterpret_cast<void*>(get)); 
@@ -8167,7 +9193,7 @@ class Namespace : public detail::Registrar
         template <class TG, class TS = TG>
         Class<T>& addProperty(const char* name, TG (*get)(const T*) noexcept, void (*set)(T*, TS) noexcept = nullptr)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             lua_pushlightuserdata(L, reinterpret_cast<void*>(get)); 
@@ -8188,7 +9214,7 @@ class Namespace : public detail::Registrar
 
         Class<T>& addProperty(const char* name, lua_CFunction get, lua_CFunction set = nullptr)
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             lua_pushcfunction_x(L, get);
@@ -8211,7 +9237,7 @@ class Namespace : public detail::Registrar
             using FirstArg = detail::function_argument_t<0, Getter>;
             static_assert(std::is_same_v<std::decay_t<std::remove_pointer_t<FirstArg>>, T>);
 
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             using GetType = decltype(get);
@@ -8233,7 +9259,7 @@ class Namespace : public detail::Registrar
             using FirstArg = detail::function_argument_t<0, Setter>;
             static_assert(std::is_same_v<std::decay_t<std::remove_pointer_t<FirstArg>>, T>);
 
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             using SetType = decltype(set);
@@ -8249,7 +9275,7 @@ class Namespace : public detail::Registrar
         auto addFunction(const char* name, Functions... functions)
             -> std::enable_if_t<(detail::is_callable_v<Functions> && ...) && (sizeof...(Functions) > 0), Class<T>&>
         {
-            assert(name != nullptr);
+            LUABRIDGE_ASSERT(name != nullptr);
             assertStackState(); 
 
             if (name == std::string_view("__gc"))
@@ -8307,7 +9333,7 @@ class Namespace : public detail::Registrar
 
                     } (), ...);
 
-                    assert(idx > 1);
+                    LUABRIDGE_ASSERT(idx > 1);
 
                     lua_pushcclosure_x(L, &detail::try_overload_functions<true>, 1);
                     lua_pushvalue(L, -1); 
@@ -8342,7 +9368,7 @@ class Namespace : public detail::Registrar
 
                     } (), ...);
 
-                    assert(idx > 1);
+                    LUABRIDGE_ASSERT(idx > 1);
 
                     lua_pushcclosure_x(L, &detail::try_overload_functions<true>, 1);
                     rawsetfield(L, -3, name); 
@@ -8395,6 +9421,61 @@ class Namespace : public detail::Registrar
             return *this;
         }
 
+        template <class... Functions>
+        auto addConstructor(Functions... functions)
+            -> std::enable_if_t<(detail::is_callable_v<Functions> && ...) && (sizeof...(Functions) > 0), Class<T>&>
+        {
+            static_assert(((detail::function_arity_excluding_v<Functions, lua_State*> >= 1) && ...));
+            static_assert(((std::is_same_v<detail::function_argument_t<0, Functions>, void*>) && ...));
+
+            assertStackState(); 
+
+            if constexpr (sizeof...(Functions) == 1)
+            {
+                ([&]
+                {
+                    using F = detail::constructor_forwarder<T, Functions>;
+
+                    lua_newuserdata_aligned<F>(L, F(std::move(functions))); 
+                    lua_pushcclosure_x(L, &detail::invoke_proxy_constructor<F>, 1); 
+
+                } (), ...);
+            }
+            else
+            {
+                
+                lua_createtable(L, static_cast<int>(sizeof...(Functions)), 0); 
+
+                int idx = 1;
+
+                ([&]
+                {
+                    using F = detail::constructor_forwarder<T, Functions>;
+
+                    lua_createtable(L, 2, 0); 
+                    lua_pushinteger(L, 1);
+                    if constexpr (detail::is_any_cfunction_pointer_v<Functions>)
+                        lua_pushinteger(L, -1);
+                    else
+                        lua_pushinteger(L, static_cast<int>(detail::function_arity_excluding_v<Functions, lua_State*>) - 1); 
+                    lua_settable(L, -3);
+                    lua_pushinteger(L, 2);
+                    lua_newuserdata_aligned<F>(L, F(std::move(functions)));
+                    lua_pushcclosure_x(L, &detail::invoke_proxy_constructor<F>, 1);
+                    lua_settable(L, -3);
+                    lua_rawseti(L, -2, idx);
+                    ++idx;
+
+                } (), ...);
+
+                lua_pushcclosure_x(L, &detail::try_overload_functions<true>, 1);
+            }
+
+            rawsetfield(L, -2, "__call"); 
+
+            return *this;
+        }
+
         template <class C, class... Functions>
         auto addConstructorFrom()
             -> std::enable_if_t<(sizeof...(Functions) > 0), Class<T>&>
@@ -8438,12 +9519,11 @@ class Namespace : public detail::Registrar
             return *this;
         }
 
-        template <class... Functions>
-        auto addConstructor(Functions... functions)
+        template <class C, class... Functions>
+        auto addConstructorFrom(Functions... functions)
             -> std::enable_if_t<(detail::is_callable_v<Functions> && ...) && (sizeof...(Functions) > 0), Class<T>&>
         {
-            static_assert(((detail::function_arity_excluding_v<Functions, lua_State*> >= 1) && ...));
-            static_assert(((std::is_same_v<detail::function_argument_t<0, Functions>, void*>) && ...));
+            static_assert(((std::is_same_v<detail::function_result_t<Functions>, C>) && ...));
 
             assertStackState(); 
 
@@ -8451,7 +9531,10 @@ class Namespace : public detail::Registrar
             {
                 ([&]
                 {
-                    detail::push_function(L, detail::constructor_forwarder<T, Functions>(std::move(functions))); 
+                    using F = detail::container_forwarder<C, Functions>;
+
+                    lua_newuserdata_aligned<F>(L, F(std::move(functions))); 
+                    lua_pushcclosure_x(L, &detail::invoke_proxy_constructor<F>, 1); 
 
                 } (), ...);
             }
@@ -8464,15 +9547,18 @@ class Namespace : public detail::Registrar
 
                 ([&]
                 {
+                    using F = detail::container_forwarder<C, Functions>;
+
                     lua_createtable(L, 2, 0); 
                     lua_pushinteger(L, 1);
                     if constexpr (detail::is_any_cfunction_pointer_v<Functions>)
                         lua_pushinteger(L, -1);
                     else
-                        lua_pushinteger(L, static_cast<int>(detail::function_arity_excluding_v<Functions, lua_State*>) - 1); 
+                        lua_pushinteger(L, static_cast<int>(detail::function_arity_excluding_v<Functions, lua_State*>));
                     lua_settable(L, -3);
                     lua_pushinteger(L, 2);
-                    detail::push_function(L, detail::constructor_forwarder<T, Functions>(std::move(functions)));
+                    lua_newuserdata_aligned<F>(L, F(std::move(functions)));
+                    lua_pushcclosure_x(L, &detail::invoke_proxy_constructor<F>, 1);
                     lua_settable(L, -3);
                     lua_rawseti(L, -2, idx);
                     ++idx;
@@ -8492,7 +9578,10 @@ class Namespace : public detail::Registrar
         {
             assertStackState(); 
 
-            detail::push_function(L, detail::factory_forwarder<T, Allocator, Deallocator>(std::move(allocator), std::move(deallocator)));
+            using F = detail::factory_forwarder<T, Allocator, Deallocator>;
+
+            lua_newuserdata_aligned<F>(L, F(std::move(allocator), std::move(deallocator))); 
+            lua_pushcclosure_x(L, &detail::invoke_proxy_constructor<F>, 1); 
             rawsetfield(L, -2, "__call"); 
 
             return *this;
@@ -8586,8 +9675,8 @@ class Namespace : public detail::Registrar
     class Table : public detail::Registrar
     {
     public:
-        explicit Table(const char* name, Namespace& parent)
-            : Registrar(parent)
+        explicit Table(const char* name, Namespace parent)
+            : Registrar(std::move(parent))
         {
             lua_newtable(L); 
             lua_pushvalue(L, -1); 
@@ -8607,8 +9696,8 @@ class Namespace : public detail::Registrar
         {
             using FnType = decltype(function);
 
-            assert(name != nullptr);
-            assert(lua_istable(L, -1)); 
+            LUABRIDGE_ASSERT(name != nullptr);
+            LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
             lua_newuserdata_aligned<FnType>(L, std::move(function)); 
             lua_pushcclosure_x(L, &detail::invoke_proxy_functor<FnType>, 1); 
@@ -8622,8 +9711,8 @@ class Namespace : public detail::Registrar
         {
             using FnType = decltype(function);
 
-            assert(name != nullptr);
-            assert(lua_istable(L, -1)); 
+            LUABRIDGE_ASSERT(name != nullptr);
+            LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
             lua_newuserdata_aligned<FnType>(L, std::move(function)); 
             lua_pushcclosure_x(L, &detail::invoke_proxy_functor<FnType>, 1); 
@@ -8634,14 +9723,15 @@ class Namespace : public detail::Registrar
 
         Namespace endTable()
         {
-            assert(m_stackSize > 2);
+            LUABRIDGE_ASSERT(m_stackSize > 2);
 
             m_stackSize -= 2;
             lua_pop(L, 2);
-            return Namespace(*this);
+
+            return Namespace(std::move(*this));
         }
     };
-    
+
 private:
     struct FromStack {};
 
@@ -8653,34 +9743,38 @@ private:
         ++m_stackSize;
     }
 
-    Namespace(lua_State* L, FromStack)
+    Namespace(lua_State* L, Options options, FromStack)
         : Registrar(L, 1)
     {
-        assert(lua_istable(L, -1));
+        LUABRIDGE_ASSERT(lua_istable(L, -1));
 
+        lua_pushvalue(L, -1); 
+
+        lua_setmetatable(L, -2); 
+
+        lua_pushcfunction_x(L, &detail::index_metamethod<false>);
+        rawsetfield(L, -2, "__index"); 
+
+        lua_newtable(L); 
+        lua_rawsetp(L, -2, detail::getPropgetKey()); 
+
+        lua_newtable(L); 
+        lua_rawsetp(L, -2, detail::getPropsetKey()); 
+
+        if (! options.test(visibleMetatables))
         {
-            lua_pushvalue(L, -1); 
-
-            lua_setmetatable(L, -2); 
-
-            lua_pushcfunction_x(L, &detail::index_metamethod);
-            rawsetfield(L, -2, "__index"); 
-
-            lua_newtable(L); 
-            lua_rawsetp(L, -2, detail::getPropgetKey()); 
-
-            lua_newtable(L); 
-            lua_rawsetp(L, -2, detail::getPropsetKey()); 
+            lua_pushboolean(L, 0);
+            rawsetfield(L, -2, "__metatable");
         }
 
         ++m_stackSize;
     }
 
-    Namespace(const char* name, Namespace& parent)
-        : Registrar(parent)
+    Namespace(const char* name, Namespace parent, Options options)
+        : Registrar(std::move(parent))
     {
-        assert(name != nullptr);
-        assert(lua_istable(L, -1)); 
+        LUABRIDGE_ASSERT(name != nullptr);
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
         rawgetfield(L, -1, name); 
 
@@ -8693,10 +9787,10 @@ private:
 
             lua_setmetatable(L, -2); 
 
-            lua_pushcfunction_x(L, &detail::index_metamethod);
+            lua_pushcfunction_x(L, &detail::index_metamethod<false>);
             rawsetfield(L, -2, "__index"); 
 
-            lua_pushcfunction_x(L, &detail::newindex_static_metamethod);
+            lua_pushcfunction_x(L, &detail::newindex_metamethod<false>);
             rawsetfield(L, -2, "__newindex"); 
 
             lua_newtable(L); 
@@ -8705,6 +9799,12 @@ private:
             lua_newtable(L); 
             lua_rawsetp(L, -2, detail::getPropsetKey()); 
 
+            if (! options.test(visibleMetatables))
+            {
+                lua_pushboolean(L, 0);
+                rawsetfield(L, -2, "__metatable");
+            }
+
             lua_pushvalue(L, -1); 
             rawsetfield(L, -3, name); 
         }
@@ -8712,13 +9812,13 @@ private:
         ++m_stackSize;
     }
 
-    explicit Namespace(ClassBase& child)
-        : Registrar(child)
+    explicit Namespace(ClassBase child)
+        : Registrar(std::move(child))
     {
     }
 
-    explicit Namespace(Table& child)
-        : Registrar(child)
+    explicit Namespace(Table child)
+        : Registrar(std::move(child))
     {
     }
 
@@ -8731,15 +9831,15 @@ public:
         return Namespace(L);
     }
 
-    static Namespace getNamespaceFromStack(lua_State* L)
+    static Namespace getNamespaceFromStack(lua_State* L, Options options = defaultOptions)
     {
-        return Namespace(L, FromStack{});
+        return Namespace(L, options, FromStack{});
     }
 
-    Namespace beginNamespace(const char* name)
+    Namespace beginNamespace(const char* name, Options options = defaultOptions)
     {
         assertIsActive();
-        return Namespace(name, *this);
+        return Namespace(name, std::move(*this), options);
     }
 
     Namespace endNamespace()
@@ -8748,13 +9848,14 @@ public:
         {
             throw_or_assert<std::logic_error>("endNamespace() called on global namespace");
 
-            return Namespace(*this);
+            return Namespace(std::move(*this));
         }
 
-        assert(m_stackSize > 1);
+        LUABRIDGE_ASSERT(m_stackSize > 1);
         --m_stackSize;
         lua_pop(L, 1);
-        return Namespace(*this);
+
+        return Namespace(std::move(*this));
     }
 
     template <class T>
@@ -8767,8 +9868,8 @@ public:
             return *this;
         }
 
-        assert(name != nullptr);
-        assert(lua_istable(L, -1)); 
+        LUABRIDGE_ASSERT(name != nullptr);
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
         if constexpr (std::is_enum_v<T>)
         {
@@ -8790,7 +9891,7 @@ public:
         return *this;
     }
 
-    template <class T>
+    template <class T, class = std::enable_if_t<std::is_base_of_v<T, LuaRef> || !std::is_invocable_v<T>>>
     Namespace& addProperty(const char* name, T* value, bool isWritable = true)
     {
         if (m_stackSize == 1)
@@ -8800,8 +9901,8 @@ public:
             return *this;
         }
 
-        assert(name != nullptr);
-        assert(lua_istable(L, -1)); 
+        LUABRIDGE_ASSERT(name != nullptr);
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
         lua_pushlightuserdata(L, value); 
         lua_pushcclosure_x(L, &detail::property_getter<T>::call, 1); 
@@ -8823,6 +9924,31 @@ public:
         return *this;
     }
 
+    template <class T, class = std::enable_if_t<std::is_base_of_v<T, LuaRef> || !std::is_invocable_v<T>>>
+    Namespace& addProperty(const char* name, const T* value)
+    {
+        if (m_stackSize == 1)
+        {
+            throw_or_assert<std::logic_error>("addProperty() called on global namespace");
+
+            return *this;
+        }
+
+        LUABRIDGE_ASSERT(name != nullptr);
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
+
+        lua_pushlightuserdata(L, const_cast<T*>(value)); 
+        lua_pushcclosure_x(L, &detail::property_getter<T>::call, 1); 
+        detail::add_property_getter(L, name, -2); 
+
+        lua_pushstring(L, name); 
+        lua_pushcclosure_x(L, &detail::read_only_error, 1); 
+
+        detail::add_property_setter(L, name, -2); 
+
+        return *this;
+    }
+
     template <class TG, class TS = TG>
     Namespace& addProperty(const char* name, TG (*get)(), void (*set)(TS) = nullptr)
     {
@@ -8833,8 +9959,8 @@ public:
             return *this;
         }
 
-        assert(name != nullptr);
-        assert(lua_istable(L, -1)); 
+        LUABRIDGE_ASSERT(name != nullptr);
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
         lua_pushlightuserdata(L, reinterpret_cast<void*>(get)); 
         lua_pushcclosure_x(L, &detail::invoke_proxy_function<TG (*)()>, 1); 
@@ -8866,8 +9992,8 @@ public:
             return *this;
         }
 
-        assert(name != nullptr);
-        assert(lua_istable(L, -1)); 
+        LUABRIDGE_ASSERT(name != nullptr);
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
         lua_pushlightuserdata(L, reinterpret_cast<void*>(get)); 
         lua_pushcclosure_x(L, &detail::invoke_proxy_function<TG (*)() noexcept>, 1); 
@@ -8889,28 +10015,15 @@ public:
         return *this;
     }
 
-    template <class Getter, class = std::enable_if_t<!std::is_pointer_v<Getter>>>
+    template <class Getter, class = std::enable_if_t<!std::is_pointer_v<Getter> && std::is_invocable_v<Getter>>>
     Namespace& addProperty(const char* name, Getter get)
     {
-        assert(name != nullptr);
-        assert(lua_istable(L, -1)); 
+        LUABRIDGE_ASSERT(name != nullptr);
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
-        if constexpr (std::is_enum_v<Getter>)
-        {
-            using U = std::underlying_type_t<Getter>;
-
-            auto enumGet = [get = std::move(get)] { return static_cast<U>(get); };
-
-            using GetType = decltype(enumGet);
-            lua_newuserdata_aligned<GetType>(L, std::move(enumGet)); 
-            lua_pushcclosure_x(L, &detail::invoke_proxy_functor<GetType>, 1); 
-        }
-        else
-        {
-            using GetType = decltype(get);
-            lua_newuserdata_aligned<GetType>(L, std::move(get)); 
-            lua_pushcclosure_x(L, &detail::invoke_proxy_functor<GetType>, 1); 
-        }
+        using GetType = decltype(get);
+        lua_newuserdata_aligned<GetType>(L, std::move(get)); 
+        lua_pushcclosure_x(L, &detail::invoke_proxy_functor<GetType>, 1); 
 
         detail::add_property_getter(L, name, -2); 
 
@@ -8921,11 +10034,15 @@ public:
         return *this;
     }
 
-    template <class Getter, class Setter, class = std::enable_if_t<!std::is_pointer_v<Getter> && !std::is_pointer_v<Setter>>>
+    template <class Getter, class Setter, class = std::enable_if_t<
+        !std::is_pointer_v<Getter>
+            && std::is_invocable_v<Getter>
+            && !std::is_pointer_v<Setter>
+            && std::is_invocable_v<Setter, std::invoke_result_t<Getter>>>>
     Namespace& addProperty(const char* name, Getter get, Setter set)
     {
-        assert(name != nullptr);
-        assert(lua_istable(L, -1)); 
+        LUABRIDGE_ASSERT(name != nullptr);
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
         addProperty<Getter>(name, std::move(get));
 
@@ -8940,8 +10057,8 @@ public:
 
     Namespace& addProperty(const char* name, lua_CFunction get, lua_CFunction set = nullptr)
     {
-        assert(name != nullptr);
-        assert(lua_istable(L, -1)); 
+        LUABRIDGE_ASSERT(name != nullptr);
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
         lua_pushcfunction_x(L, get); 
         detail::add_property_getter(L, name, -2); 
@@ -8965,8 +10082,8 @@ public:
     auto addFunction(const char* name, Functions... functions)
         -> std::enable_if_t<(detail::is_callable_v<Functions> && ...) && (sizeof...(Functions) > 0), Namespace&>
     {
-        assert(name != nullptr);
-        assert(lua_istable(L, -1)); 
+        LUABRIDGE_ASSERT(name != nullptr);
+        LUABRIDGE_ASSERT(lua_istable(L, -1)); 
 
         if constexpr (sizeof...(Functions) == 1)
         {
@@ -9012,21 +10129,21 @@ public:
     Table beginTable(const char* name)
     {
         assertIsActive();
-        return Table(name, *this);
+        return Table(name, std::move(*this));
     }
 
     template <class T>
-    Class<T> beginClass(const char* name)
+    Class<T> beginClass(const char* name, Options options = defaultOptions)
     {
         assertIsActive();
-        return Class<T>(name, *this);
+        return Class<T>(name, std::move(*this), options);
     }
 
     template <class Derived, class Base>
-    Class<Derived> deriveClass(const char* name)
+    Class<Derived> deriveClass(const char* name, Options options = defaultOptions)
     {
         assertIsActive();
-        return Class<Derived>(name, *this, detail::getStaticRegistryKey<Base>());
+        return Class<Derived>(name, std::move(*this), detail::getStaticRegistryKey<Base>(), options);
     }
 };
 
@@ -9053,46 +10170,61 @@ inline void registerMainThread(lua_State* L)
 // Begin File: Source/LuaBridge/detail/Overload.h
 
 namespace luabridge {
-namespace detail {
 
 template <class... Args>
-struct non_const_overload
+struct NonConstOverload
 {
     template <class R, class T>
     constexpr auto operator()(R (T::*ptr)(Args...)) const noexcept -> decltype(ptr)
     {
         return ptr;
     }
+
+    template <class R, class T>
+    static constexpr auto with(R (T::*ptr)(Args...)) noexcept -> decltype(ptr)
+    {
+        return ptr;
+    }
 };
 
 template <class... Args>
-struct const_overload
+struct ConstOverload
 {
     template <class R, class T>
     constexpr auto operator()(R (T::*ptr)(Args...) const) const noexcept -> decltype(ptr)
     {
         return ptr;
     }
+
+    template <class R, class T>
+    static constexpr auto with(R (T::*ptr)(Args...) const) noexcept -> decltype(ptr)
+    {
+        return ptr;
+    }
 };
 
 template <class... Args>
-struct overload : const_overload<Args...>, non_const_overload<Args...>
+struct Overload : ConstOverload<Args...>, NonConstOverload<Args...>
 {
-    using const_overload<Args...>::operator();
-    using non_const_overload<Args...>::operator();
+    using ConstOverload<Args...>::operator();
+    using NonConstOverload<Args...>::operator();
 
     template <class R>
     constexpr auto operator()(R (*ptr)(Args...)) const noexcept -> decltype(ptr)
     {
         return ptr;
     }
+
+    template <class R, class T>
+    static constexpr auto with(R (T::*ptr)(Args...)) noexcept -> decltype(ptr)
+    {
+        return ptr;
+    }
 };
 
-} 
-
-template <class... Args> constexpr detail::overload<Args...> overload = {};
-template <class... Args> constexpr detail::const_overload<Args...> constOverload = {};
-template <class... Args> constexpr detail::non_const_overload<Args...> nonConstOverload = {};
+template <class... Args> [[maybe_unused]] constexpr Overload<Args...> overload = {};
+template <class... Args> [[maybe_unused]] constexpr ConstOverload<Args...> constOverload = {};
+template <class... Args> [[maybe_unused]] constexpr NonConstOverload<Args...> nonConstOverload = {};
 
 } 
 
@@ -9108,7 +10240,7 @@ class ScopeGuard
 {
 public:
     template <class V>
-    ScopeGuard(V&& v)
+    explicit ScopeGuard(V&& v)
         : m_func(std::forward<V>(v))
         , m_shouldRun(true)
     {
@@ -9120,7 +10252,7 @@ public:
             m_func();
     }
 
-    void reset()
+    void reset() noexcept
     {
         m_shouldRun = false;
     }
@@ -9224,192 +10356,6 @@ struct Stack<std::map<K, V>>
 
 // End File: Source/LuaBridge/Map.h
 
-// Begin File: Source/LuaBridge/RefCountedObject.h
-
-namespace luabridge {
-
-template<class CounterType>
-class RefCountedObjectType
-{
-public:
-    
-    inline void incReferenceCount() const { ++refCount; }
-
-    inline void decReferenceCount() const
-    {
-        assert(getReferenceCount() > 0);
-
-        if (--refCount == 0)
-            delete this;
-    }
-
-    inline int getReferenceCount() const { return static_cast<int>(refCount); }
-
-protected:
-    
-    RefCountedObjectType() : refCount() {}
-
-    virtual ~RefCountedObjectType()
-    {
-        
-        assert(getReferenceCount() == 0);
-    }
-
-private:
-    
-    CounterType mutable refCount;
-};
-
-typedef RefCountedObjectType<int> RefCountedObject;
-
-template<class ReferenceCountedObjectClass>
-class RefCountedObjectPtr
-{
-public:
-    
-    typedef ReferenceCountedObjectClass ReferencedType;
-
-    inline RefCountedObjectPtr() : referencedObject(0) {}
-
-    inline RefCountedObjectPtr(ReferenceCountedObjectClass* const refCountedObject)
-        : referencedObject(refCountedObject)
-    {
-        if (refCountedObject != 0)
-            refCountedObject->incReferenceCount();
-    }
-
-    inline RefCountedObjectPtr(const RefCountedObjectPtr& other)
-        : referencedObject(other.referencedObject)
-    {
-        if (referencedObject != 0)
-            referencedObject->incReferenceCount();
-    }
-
-    inline RefCountedObjectPtr(RefCountedObjectPtr&& other)
-        : referencedObject(other.referencedObject)
-    {
-        other.referencedObject = 0;
-    }
-
-    template<class DerivedClass>
-    inline RefCountedObjectPtr(const RefCountedObjectPtr<DerivedClass>& other)
-        : referencedObject(static_cast<ReferenceCountedObjectClass*>(other.getObject()))
-    {
-        if (referencedObject != 0)
-            referencedObject->incReferenceCount();
-    }
-
-    RefCountedObjectPtr& operator=(const RefCountedObjectPtr& other)
-    {
-        return operator=(other.referencedObject);
-    }
-
-    template<class DerivedClass>
-    RefCountedObjectPtr& operator=(const RefCountedObjectPtr<DerivedClass>& other)
-    {
-        return operator=(static_cast<ReferenceCountedObjectClass*>(other.getObject()));
-    }
-
-    RefCountedObjectPtr& operator=(RefCountedObjectPtr&& other)
-    {
-        using std::swap;
-
-        swap(referencedObject, other.referencedObject);
-
-        return *this;
-    }
-
-    RefCountedObjectPtr& operator=(ReferenceCountedObjectClass* const newObject)
-    {
-        if (referencedObject != newObject)
-        {
-            if (newObject != 0)
-                newObject->incReferenceCount();
-
-            ReferenceCountedObjectClass* const oldObject = referencedObject;
-            referencedObject = newObject;
-
-            if (oldObject != 0)
-                oldObject->decReferenceCount();
-        }
-
-        return *this;
-    }
-
-    ~RefCountedObjectPtr()
-    {
-        if (referencedObject != 0)
-            referencedObject->decReferenceCount();
-    }
-
-    operator ReferenceCountedObjectClass*() const { return referencedObject; }
-
-    ReferenceCountedObjectClass* operator->() const { return referencedObject; }
-
-    ReferenceCountedObjectClass* getObject() const { return referencedObject; }
-
-private:
-    
-    ReferenceCountedObjectClass* referencedObject;
-};
-
-template<class ReferenceCountedObjectClass>
-bool operator==(const RefCountedObjectPtr<ReferenceCountedObjectClass>& object1,
-                ReferenceCountedObjectClass* const object2)
-{
-    return object1.getObject() == object2;
-}
-
-template<class ReferenceCountedObjectClass>
-bool operator==(const RefCountedObjectPtr<ReferenceCountedObjectClass>& object1,
-                const RefCountedObjectPtr<ReferenceCountedObjectClass>& object2)
-{
-    return object1.getObject() == object2.getObject();
-}
-
-template<class ReferenceCountedObjectClass>
-bool operator==(ReferenceCountedObjectClass* object1,
-                RefCountedObjectPtr<ReferenceCountedObjectClass>& object2)
-{
-    return object1 == object2.getObject();
-}
-
-template<class ReferenceCountedObjectClass>
-bool operator!=(const RefCountedObjectPtr<ReferenceCountedObjectClass>& object1,
-                const ReferenceCountedObjectClass* object2)
-{
-    return object1.getObject() != object2;
-}
-
-template<class ReferenceCountedObjectClass>
-bool operator!=(const RefCountedObjectPtr<ReferenceCountedObjectClass>& object1,
-                RefCountedObjectPtr<ReferenceCountedObjectClass>& object2)
-{
-    return object1.getObject() != object2.getObject();
-}
-
-template<class ReferenceCountedObjectClass>
-bool operator!=(ReferenceCountedObjectClass* object1,
-                RefCountedObjectPtr<ReferenceCountedObjectClass>& object2)
-{
-    return object1 != object2.getObject();
-}
-
-template<class T>
-struct ContainerTraits<RefCountedObjectPtr<T>>
-{
-    using Type = T;
-
-    static RefCountedObjectPtr<T> construct(T* c) { return c; }
-
-    static T* get(RefCountedObjectPtr<T> const& c) { return c.getObject(); }
-};
-
-} 
-
-
-// End File: Source/LuaBridge/RefCountedObject.h
-
 // Begin File: Source/LuaBridge/Set.h
 
 namespace luabridge {
@@ -9449,7 +10395,7 @@ struct Stack<std::set<K>>
     [[nodiscard]] static TypeResult<Type> get(lua_State* L, int index)
     {
         if (!lua_istable(L, index))
-            return makeUnexpected(makeErrorCode(ErrorCode::InvalidTypeCast));
+            return makeErrorCode(ErrorCode::InvalidTypeCast);
 
         const StackRestore stackRestore(L);
 
@@ -9462,7 +10408,7 @@ struct Stack<std::set<K>>
         {
             auto item = Stack<K>::get(L, -1);
             if (! item)
-                return makeUnexpected(makeErrorCode(ErrorCode::InvalidTypeCast));
+                return makeErrorCode(ErrorCode::InvalidTypeCast);
 
             set.emplace(*item);
             lua_pop(L, 1);
@@ -9630,117 +10576,5 @@ struct Stack<std::vector<T>>
 
 
 // End File: Source/LuaBridge/Vector.h
-
-// Begin File: Source/LuaBridge/detail/Dump.h
-
-namespace luabridge {
-namespace debug {
-
-inline void putIndent(std::ostream& stream, unsigned level)
-{
-    for (unsigned i = 0; i < level; ++i)
-    {
-        stream << "  ";
-    }
-}
-
-inline void dumpTable(lua_State* L, int index, std::ostream& stream, unsigned level);
-
-inline void dumpValue(lua_State* L, int index, std::ostream& stream, unsigned level = 0)
-{
-    const int type = lua_type(L, index);
-    switch (type)
-    {
-    case LUA_TNIL:
-        stream << "nil";
-        break;
-
-    case LUA_TBOOLEAN:
-        stream << (lua_toboolean(L, index) ? "true" : "false");
-        break;
-
-    case LUA_TNUMBER:
-        stream << lua_tonumber(L, index);
-        break;
-
-    case LUA_TSTRING:
-        stream << '"' << lua_tostring(L, index) << '"';
-        break;
-
-    case LUA_TFUNCTION:
-        if (lua_iscfunction(L, index))
-        {
-            stream << "cfunction@" << lua_topointer(L, index);
-        }
-        else
-        {
-            stream << "function@" << lua_topointer(L, index);
-        }
-        break;
-
-    case LUA_TTHREAD:
-        stream << "thread@" << lua_tothread(L, index);
-        break;
-
-    case LUA_TLIGHTUSERDATA:
-        stream << "lightuserdata@" << lua_touserdata(L, index);
-        break;
-
-    case LUA_TTABLE:
-        dumpTable(L, index, stream, level);
-        break;
-
-    case LUA_TUSERDATA:
-        stream << "userdata@" << lua_touserdata(L, index);
-        break;
-
-    default:
-        stream << lua_typename(L, type);
-        ;
-        break;
-    }
-}
-
-inline void dumpTable(lua_State* L, int index, std::ostream& stream, unsigned level = 0)
-{
-    stream << "table@" << lua_topointer(L, index);
-
-    if (level > 0)
-    {
-        return;
-    }
-
-    index = lua_absindex(L, index);
-    stream << " {";
-    lua_pushnil(L); 
-    while (lua_next(L, index))
-    {
-        stream << "\n";
-        putIndent(stream, level + 1);
-        dumpValue(L, -2, stream, level + 1); 
-        stream << ": ";
-        dumpValue(L, -1, stream, level + 1); 
-        lua_pop(L, 1); 
-    }
-    putIndent(stream, level);
-    stream << "\n}";
-}
-
-inline void dumpState(lua_State* L, std::ostream& stream = std::cerr)
-{
-    int top = lua_gettop(L);
-    for (int i = 1; i <= top; ++i)
-    {
-        stream << "stack #" << i << ": ";
-        dumpValue(L, i, stream, 0);
-        stream << "\n";
-    }
-}
-
-} 
-} 
-
-
-// End File: Source/LuaBridge/detail/Dump.h
 // clang-format on
 

@@ -277,10 +277,10 @@ void LuaBinding::registerMathClasses(lua_State *L){
             auto table = luabridge::newTable(L);
             table.push(L);
             luabridge::getNamespaceFromStack(L)
-                .addProperty("NO_SIDE", Plane::Side::NO_SIDE)
-                .addProperty("POSITIVE_SIDE", Plane::Side::POSITIVE_SIDE)
-                .addProperty("NEGATIVE_SIDE", Plane::Side::NEGATIVE_SIDE)
-                .addProperty("BOTH_SIDE", Plane::Side::BOTH_SIDE);
+                .addVariable("NO_SIDE", Plane::Side::NO_SIDE)
+                .addVariable("POSITIVE_SIDE", Plane::Side::POSITIVE_SIDE)
+                .addVariable("NEGATIVE_SIDE", Plane::Side::NEGATIVE_SIDE)
+                .addVariable("BOTH_SIDE", Plane::Side::BOTH_SIDE);
             table.pop();
             return table;
         })
@@ -336,9 +336,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
             auto table = luabridge::newTable(L);
             table.push(L);
             luabridge::getNamespaceFromStack(L)
-                .addProperty("BOXTYPE_NULL", AlignedBox::BoxType::BOXTYPE_NULL)
-                .addProperty("BOXTYPE_FINITE", AlignedBox::BoxType::BOXTYPE_FINITE)
-                .addProperty("BOXTYPE_INFINITE", AlignedBox::BoxType::BOXTYPE_INFINITE);
+                .addVariable("BOXTYPE_NULL", AlignedBox::BoxType::BOXTYPE_NULL)
+                .addVariable("BOXTYPE_FINITE", AlignedBox::BoxType::BOXTYPE_FINITE)
+                .addVariable("BOXTYPE_INFINITE", AlignedBox::BoxType::BOXTYPE_INFINITE);
             table.pop();
             return table;
             })
@@ -346,14 +346,14 @@ void LuaBinding::registerMathClasses(lua_State *L){
             auto table = luabridge::newTable(L);
             table.push(L);
             luabridge::getNamespaceFromStack(L)
-                .addProperty("FAR_LEFT_BOTTOM", AlignedBox::CornerEnum::FAR_LEFT_BOTTOM)
-                .addProperty("FAR_LEFT_TOP", AlignedBox::CornerEnum::FAR_LEFT_TOP)
-                .addProperty("FAR_RIGHT_TOP", AlignedBox::CornerEnum::FAR_RIGHT_TOP)
-                .addProperty("FAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::FAR_RIGHT_BOTTOM)
-                .addProperty("NEAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::NEAR_RIGHT_BOTTOM)
-                .addProperty("NEAR_LEFT_BOTTOM", AlignedBox::CornerEnum::NEAR_LEFT_BOTTOM)
-                .addProperty("NEAR_LEFT_TOP", AlignedBox::CornerEnum::NEAR_LEFT_TOP)
-                .addProperty("NEAR_RIGHT_TOP", AlignedBox::CornerEnum::NEAR_RIGHT_TOP);
+                .addVariable("FAR_LEFT_BOTTOM", AlignedBox::CornerEnum::FAR_LEFT_BOTTOM)
+                .addVariable("FAR_LEFT_TOP", AlignedBox::CornerEnum::FAR_LEFT_TOP)
+                .addVariable("FAR_RIGHT_TOP", AlignedBox::CornerEnum::FAR_RIGHT_TOP)
+                .addVariable("FAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::FAR_RIGHT_BOTTOM)
+                .addVariable("NEAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::NEAR_RIGHT_BOTTOM)
+                .addVariable("NEAR_LEFT_BOTTOM", AlignedBox::CornerEnum::NEAR_LEFT_BOTTOM)
+                .addVariable("NEAR_LEFT_TOP", AlignedBox::CornerEnum::NEAR_LEFT_TOP)
+                .addVariable("NEAR_RIGHT_TOP", AlignedBox::CornerEnum::NEAR_RIGHT_TOP);
             table.pop();
             return table;
             })
