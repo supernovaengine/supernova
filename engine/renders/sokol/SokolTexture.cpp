@@ -161,7 +161,7 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
                 {
                     for (int y = 0; y < target_height; ++y)
                     {
-                        uint16_t colors[8] = { 0 };
+                        //uint16_t colors[8] = { 0 };
                         for (int chanell = 0; chanell < pixel_size; ++chanell)
                         {
                             int color = 0;
