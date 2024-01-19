@@ -1,6 +1,8 @@
 #version 450
 
-in vec3 v_position;
+#ifndef MATERIAL_UNLIT
+    in vec3 v_position;
+#endif
 
 #ifdef HAS_NORMALS
 #ifdef HAS_TANGENTS
@@ -10,8 +12,13 @@ in vec3 v_position;
 #endif
 #endif
 
-in vec2 v_uv1;
-in vec2 v_uv2;
+#ifdef HAS_UV_SET1
+    in vec2 v_uv1;
+#endif
+
+#ifdef HAS_UV_SET1
+    in vec2 v_uv2;
+#endif
 
 #ifdef HAS_VERTEX_COLOR_VEC3
     in vec3 v_color;
@@ -228,10 +235,12 @@ void main() {
             f_diffuse += pbrParams.ambientLight * pow(pbrParams.ambientFactor, GAMMA) * baseColor.rgb;
         #endif
 
-        float ao = getOcclusionTexture().r;
-        f_diffuse = mix(f_diffuse, f_diffuse * ao, occlusionStrength);
-        // apply ambient occlusion too all lighting that is not punctual
-        f_specular = mix(f_specular, f_specular * ao, occlusionStrength);
+        #ifdef HAS_UV_SET1
+            float ao = getOcclusionTexture().r;
+            f_diffuse = mix(f_diffuse, f_diffuse * ao, occlusionStrength);
+            // apply ambient occlusion too all lighting that is not punctual
+            f_specular = mix(f_specular, f_specular * ao, occlusionStrength);
+        #endif
 
         // Apply light sources
         #ifdef USE_PUNCTUAL
@@ -297,7 +306,9 @@ void main() {
         #endif
 
         f_emissive = pbrParams.emissiveFactor;
-        f_emissive *= sRGBToLinear(getEmissiveTexture().rgb);
+        #ifdef HAS_UV_SET1
+            f_emissive *= sRGBToLinear(getEmissiveTexture().rgb);
+        #endif
 
         vec3 color = f_emissive + f_diffuse + f_specular;
 

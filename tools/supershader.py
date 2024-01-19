@@ -284,7 +284,7 @@ def generate(shaders, langs, engine_root, verbose, max_lights, max_shadowsmap, m
 
             if verbose:
                 print(get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--output-type", "binary", "--defines", "'"+defines+"'")
-            command = subprocess.run([get_bin_exec(), "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--output-type", "binary", "--defines", defines], capture_output=True)
+            command = subprocess.run(["/home/eduardo/Development/supershader/build/src/supershader", "--lang", lang, "--vert", vert, "--frag", frag, "--output", output, "--output-type", "binary", "--defines", defines], capture_output=True)
 
             sys.stdout.buffer.write(command.stdout)
             sys.stderr.buffer.write(command.stderr)

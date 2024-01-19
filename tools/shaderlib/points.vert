@@ -8,8 +8,10 @@ in vec3 a_position;
 
 in float a_pointsize;
 
-in float a_pointrotation;
-out float v_pointrotation;
+#ifdef HAS_TEXTURE
+    in float a_pointrotation;
+    out float v_pointrotation;
+#endif
 
 #ifdef HAS_VERTEX_COLOR_VEC3
     in vec3 a_color;
@@ -29,7 +31,9 @@ out float v_pointrotation;
 
 void main() {
 
-    v_pointrotation = a_pointrotation;
+    #ifdef HAS_TEXTURE
+        v_pointrotation = a_pointrotation;
+    #endif
 
     #if defined(HAS_VERTEX_COLOR_VEC3) || defined(HAS_VERTEX_COLOR_VEC4)
         v_color = a_color;

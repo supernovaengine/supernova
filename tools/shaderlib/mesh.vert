@@ -13,7 +13,10 @@ uniform u_vs_pbrParams {
 #endif
 
 in vec3 a_position;
-out vec3 v_position;
+
+#ifndef MATERIAL_UNLIT
+    out vec3 v_position;
+#endif
 
 #ifdef HAS_NORMALS
     in vec3 a_normal;
@@ -33,14 +36,13 @@ out vec3 v_position;
 
 #ifdef HAS_UV_SET1
     in vec2 a_texcoord1;
+    out vec2 v_uv1;
 #endif
 
 #ifdef HAS_UV_SET2
     in vec2 a_texcoord2;
+    out vec2 v_uv2;
 #endif
-
-out vec2 v_uv1;
-out vec2 v_uv2;
 
 #ifdef HAS_VERTEX_COLOR_VEC3
     in vec3 a_color;
@@ -109,7 +111,10 @@ void main() {
 
     vec4 pos = getPosition(boneTransform);
     vec4 worldPos = pbrParams.modelMatrix * pos;
-    v_position = vec3(worldPos.xyz) / worldPos.w;
+    
+    #ifndef MATERIAL_UNLIT
+        v_position = vec3(worldPos.xyz) / worldPos.w;
+    #endif
 
     #ifdef HAS_NORMALS
     #ifdef HAS_TANGENTS
@@ -123,17 +128,21 @@ void main() {
     #endif
     #endif
 
-    v_uv1 = vec2(0.0, 0.0);
-    v_uv2 = vec2(0.0, 0.0);
+    #ifdef HAS_UV_SET1
+        v_uv1 = vec2(0.0, 0.0);
+    #endif
+    #ifdef HAS_UV_SET2
+        v_uv2 = vec2(0.0, 0.0);
+    #endif
 
     #ifdef HAS_UV_SET1
         v_uv1 = a_texcoord1;
         #ifdef HAS_TEXTURERECT
             v_uv1 = a_texcoord1 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
         #endif
-    #endif
-    #ifdef HAS_TERRAIN
-        v_uv1 = getTerrainTiledTexture(pos.xyz);
+        #ifdef HAS_TERRAIN
+            v_uv1 = getTerrainTiledTexture(pos.xyz);
+        #endif
     #endif
 
     #ifdef HAS_UV_SET2

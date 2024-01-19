@@ -17,9 +17,10 @@ uniform u_vs_terrainNodeParams {
     float resolution; //int
 } terrainNode;
 
-out vec2 v_terrainTextureCoords;
-out vec2 v_terrainTextureDetailTiled;
-
+#ifndef DEPTH_SHADER
+    out vec2 v_terrainTextureCoords;
+    out vec2 v_terrainTextureDetailTiled;
+#endif
 
 float morphFactor;
 
@@ -81,8 +82,10 @@ vec3 getTerrainNormal(vec3 normal, vec3 position){
     return normal;
 }
 
-vec2 getTerrainTiledTexture(vec3 position){
-    v_terrainTextureCoords = (position.xz + (terrain.size/2.0)) / terrain.size;
-    v_terrainTextureDetailTiled = v_terrainTextureCoords * float(terrain.textureDetailTiles);
-    return v_terrainTextureCoords * float(terrain.textureBaseTiles);
-}
+#ifndef DEPTH_SHADER
+    vec2 getTerrainTiledTexture(vec3 position){
+        v_terrainTextureCoords = (position.xz + (terrain.size/2.0)) / terrain.size;
+        v_terrainTextureDetailTiled = v_terrainTextureCoords * float(terrain.textureDetailTiles);
+        return v_terrainTextureCoords * float(terrain.textureBaseTiles);
+    }
+#endif
