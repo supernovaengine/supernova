@@ -16,7 +16,7 @@
     in vec2 v_uv1;
 #endif
 
-#ifdef HAS_UV_SET1
+#ifdef HAS_UV_SET2
     in vec2 v_uv2;
 #endif
 
