@@ -217,6 +217,8 @@ void SokolObject::endLoad(uint8_t pipelines){
 
         pip_rtt_desc.face_winding = SG_FACEWINDING_CW;
 
+        pip_rtt_desc.sample_count = 1;
+
         pip_rtt_desc.depth.write_enabled = true;
         pip_rtt_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
 

@@ -271,9 +271,9 @@ bool SokolTexture::createFramebufferTexture(
     sampler_desc.wrap_u = getWrap(wrapU);
     sampler_desc.wrap_v = getWrap(wrapV);
 
-    if (shadowMap){ //if not set Sokol gets default from sg_desc.context.sample_count
-        img_desc.sample_count = 1;
-    }
+    //if not set Sokol gets default from sg_desc.context.sample_count
+    img_desc.sample_count = 1;
+
     if (depth){
         img_desc.pixel_format = SG_PIXELFORMAT_DEPTH;
         img_desc.label = "framebuffer-depth-image";
