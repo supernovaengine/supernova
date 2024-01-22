@@ -11,10 +11,10 @@
 JPH_NAMESPACE_BEGIN
 
 /// Fixed constraint settings, used to create a fixed constraint
-class FixedConstraintSettings final : public TwoBodyConstraintSettings
+class JPH_EXPORT FixedConstraintSettings final : public TwoBodyConstraintSettings
 {
 public:
-	JPH_DECLARE_SERIALIZABLE_VIRTUAL(FixedConstraintSettings)
+	JPH_DECLARE_SERIALIZABLE_VIRTUAL(JPH_EXPORT, FixedConstraintSettings)
 
 	// See: ConstraintSettings::SaveBinaryState
 	virtual void				SaveBinaryState(StreamOut &inStream) const override;
@@ -45,7 +45,7 @@ protected:
 
 /// A fixed constraint welds two bodies together removing all degrees of freedom between them.
 /// This variant uses euler angles for the rotation constraint.
-class FixedConstraint final : public TwoBodyConstraint
+class JPH_EXPORT FixedConstraint final : public TwoBodyConstraint
 {
 public:
 	JPH_OVERRIDE_NEW_DELETE
@@ -71,13 +71,13 @@ public:
 	virtual Mat44				GetConstraintToBody1Matrix() const override					{ return Mat44::sTranslation(mLocalSpacePosition1); }
 	virtual Mat44				GetConstraintToBody2Matrix() const override					{ return Mat44::sRotationTranslation(mInvInitialOrientation, mLocalSpacePosition2); }
 
-	///@name Get Lagrange multiplier from last physics update (relates to how much force/torque was applied to satisfy the constraint)
+	///@name Get Lagrange multiplier from last physics update (the linear/angular impulse applied to satisfy the constraint)
 	inline Vec3					GetTotalLambdaPosition() const								{ return mPointConstraintPart.GetTotalLambda(); }
 	inline Vec3					GetTotalLambdaRotation() const								{ return mRotationConstraintPart.GetTotalLambda(); }
 
 private:
 	// CONFIGURATION PROPERTIES FOLLOW
-		
+
 	// Local space constraint positions
 	Vec3						mLocalSpacePosition1;
 	Vec3						mLocalSpacePosition2;

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Core/NonCopyable.h>
 
 JPH_NAMESPACE_BEGIN
 
@@ -15,7 +16,7 @@ class ObjectLayerFilter;
 class BodyFilter;
 
 /// Class that does collision detection between wheels and ground
-class VehicleCollisionTester : public RefTarget<VehicleCollisionTester>
+class JPH_EXPORT VehicleCollisionTester : public RefTarget<VehicleCollisionTester>, public NonCopyable
 {
 public:
 	JPH_OVERRIDE_NEW_DELETE
@@ -66,7 +67,7 @@ protected:
 };
 
 /// Collision tester that tests collision using a raycast
-class VehicleCollisionTesterRay : public VehicleCollisionTester
+class JPH_EXPORT VehicleCollisionTesterRay : public VehicleCollisionTester
 {
 public:
 	JPH_OVERRIDE_NEW_DELETE
@@ -86,7 +87,7 @@ private:
 };
 
 /// Collision tester that tests collision using a sphere cast
-class VehicleCollisionTesterCastSphere : public VehicleCollisionTester
+class JPH_EXPORT VehicleCollisionTesterCastSphere : public VehicleCollisionTester
 {
 public:
 	JPH_OVERRIDE_NEW_DELETE
@@ -108,7 +109,7 @@ private:
 };
 
 /// Collision tester that tests collision using a cylinder shape
-class VehicleCollisionTesterCastCylinder : public VehicleCollisionTester
+class JPH_EXPORT VehicleCollisionTesterCastCylinder : public VehicleCollisionTester
 {
 public:
 	JPH_OVERRIDE_NEW_DELETE

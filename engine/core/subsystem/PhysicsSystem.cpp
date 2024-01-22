@@ -1634,9 +1634,8 @@ void PhysicsSystem::update(double dt){
 
     if (bodies3d->size() > 0){
 		const int cCollisionSteps = 1;
-        const int cIntegrationSubSteps = 1;
 
-		world3D->Update(dt, cCollisionSteps, cIntegrationSubSteps, temp_allocator, job_system);
+		world3D->Update(dt, cCollisionSteps, temp_allocator, job_system);
 	}
 
 	for (int i = 0; i < bodies3d->size(); i++){

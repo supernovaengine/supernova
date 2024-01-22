@@ -38,7 +38,7 @@ For more information see the [Architecture and API documentation](https://jrouwe
 
 ## Features
 
-* Simulation of rigid bodies of various shapes using continous collision detection:
+* Simulation of rigid bodies of various shapes using continuous collision detection:
 	* Sphere.
 	* Box.
 	* Capsule.
@@ -76,15 +76,19 @@ For more information see the [Architecture and API documentation](https://jrouwe
 * Game character simulation (capsule)
 	* Rigid body character. Moves during the physics simulation. Cheapest option and most accurate collision response between character and dynamic bodies.
 	* Virtual character. Does not have a rigid body in the world but simulates one using collision checks. Updated outside of the physics update for more control. Less accurate interaction with dynamic bodies.
-* Vehicle simulation of wheeled and tracked vehicles.
+* Vehicles
+	* Wheeled vehicles.
+	* Tracked vehicles.
+	* Motorcycles.
+* Soft body simulation (e.g. a soft ball or piece of cloth).
 * Water buoyancy calculations.
 * An optional double precision mode that allows large worlds.
 
 ## Supported Platforms
 
-* Windows (VS2019, VS2022) x86/x64/ARM/ARM64 (Desktop/UWP)
+* Windows (VS2019, VS2022) x86/x64/ARM32/ARM64 (Desktop/UWP)
 * Linux (tested on Ubuntu 22.04) x64/ARM64
-* Android (tested on Android 10) x64/ARM64
+* Android (tested on Android 14) x86/x64/ARM32/ARM64
 * Platform Blue (a popular game console) x64
 * macOS (tested on Monterey) x64/ARM64
 * iOS (tested on iOS 15) x64/ARM64
@@ -102,7 +106,7 @@ For more information see the [Architecture and API documentation](https://jrouwe
 * It doesn't make use of compiler generated RTTI or exceptions.
 * If you want to run on Platform Blue you'll need to provide your own build environment and PlatformBlue.h file due to NDA requirements (see Core.h for further info).
 
-For build instructions go to the [Build](Build/README.md) section. When upgrading from an older version of the library go to the [API Changes](Docs/APIChanges.md) section.
+For build instructions go to the [Build](Build/README.md) section. When upgrading from an older version of the library go to the [Release Notes](Docs/ReleaseNotes.md) or [API Changes](Docs/APIChanges.md) sections.
 
 ## Folder Structure
 
@@ -132,6 +136,12 @@ For build instructions go to the [Build](Build/README.md) section. When upgradin
 * [Godot](https://github.com/godot-jolt/godot-jolt)
 * [Source Engine](https://github.com/Joshua-Ashton/VPhysics-Jolt)
 
+See [a list of projects that use Jolt Physics here](Docs/ProjectsUsingJolt.md).
+
 ## License
 
 The project is distributed under the [MIT license](LICENSE).
+
+## Contributions
+
+All contributions are welcome! If you intend to make larger changes, please discuss first in the GitHub Discussion section. For non-trivial changes, we require that you agree to a [Contributor Agreement](ContributorAgreement.md). When you create a PR, [CLA assistant](https://cla-assistant.io/) will prompt you to sign it.

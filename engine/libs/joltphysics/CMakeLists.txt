@@ -34,6 +34,8 @@ add_library(
 	${JOLT_PHYSICS_ROOT}/Core/IssueReporting.h
 	${JOLT_PHYSICS_ROOT}/Core/JobSystem.h
 	${JOLT_PHYSICS_ROOT}/Core/JobSystem.inl
+	${JOLT_PHYSICS_ROOT}/Core/JobSystemSingleThreaded.cpp
+	${JOLT_PHYSICS_ROOT}/Core/JobSystemSingleThreaded.h
 	${JOLT_PHYSICS_ROOT}/Core/JobSystemThreadPool.cpp
 	${JOLT_PHYSICS_ROOT}/Core/JobSystemThreadPool.h
 	${JOLT_PHYSICS_ROOT}/Core/JobSystemWithBarrier.cpp
@@ -60,6 +62,7 @@ add_library(
 	${JOLT_PHYSICS_ROOT}/Core/StaticArray.h
 	${JOLT_PHYSICS_ROOT}/Core/StreamIn.h
 	${JOLT_PHYSICS_ROOT}/Core/StreamOut.h
+	${JOLT_PHYSICS_ROOT}/Core/StreamUtils.h
 	${JOLT_PHYSICS_ROOT}/Core/StreamWrapper.h
 	${JOLT_PHYSICS_ROOT}/Core/StringTools.cpp
 	${JOLT_PHYSICS_ROOT}/Core/StringTools.h
@@ -125,7 +128,6 @@ add_library(
 	${JOLT_PHYSICS_ROOT}/Math/Real.h
 	${JOLT_PHYSICS_ROOT}/Math/Swizzle.h
 	${JOLT_PHYSICS_ROOT}/Math/Trigonometry.h
-	${JOLT_PHYSICS_ROOT}/Math/UVec4.cpp
 	${JOLT_PHYSICS_ROOT}/Math/UVec4.h
 	${JOLT_PHYSICS_ROOT}/Math/UVec4.inl
 	${JOLT_PHYSICS_ROOT}/Math/UVec8.h
@@ -161,6 +163,7 @@ add_library(
 	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableObject.h
 	${JOLT_PHYSICS_ROOT}/ObjectStream/TypeDeclarations.cpp
 	${JOLT_PHYSICS_ROOT}/ObjectStream/TypeDeclarations.h
+	${JOLT_PHYSICS_ROOT}/Physics/Body/AllowedDOFs.h
 	${JOLT_PHYSICS_ROOT}/Physics/Body/Body.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Body/Body.h
 	${JOLT_PHYSICS_ROOT}/Physics/Body/Body.inl
@@ -179,6 +182,7 @@ add_library(
 	${JOLT_PHYSICS_ROOT}/Physics/Body/BodyManager.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Body/BodyManager.h
 	${JOLT_PHYSICS_ROOT}/Physics/Body/BodyPair.h
+	${JOLT_PHYSICS_ROOT}/Physics/Body/BodyType.h
 	${JOLT_PHYSICS_ROOT}/Physics/Body/MassProperties.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Body/MassProperties.h
 	${JOLT_PHYSICS_ROOT}/Physics/Body/MotionProperties.cpp
@@ -337,6 +341,8 @@ add_library(
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SixDOFConstraint.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SliderConstraint.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SliderConstraint.h
+	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SpringSettings.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SpringSettings.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SwingTwistConstraint.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/SwingTwistConstraint.h
 	${JOLT_PHYSICS_ROOT}/Physics/Constraints/TwoBodyConstraint.cpp
@@ -361,6 +367,15 @@ add_library(
 	${JOLT_PHYSICS_ROOT}/Physics/PhysicsUpdateContext.h
 	${JOLT_PHYSICS_ROOT}/Physics/Ragdoll/Ragdoll.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Ragdoll/Ragdoll.h
+	${JOLT_PHYSICS_ROOT}/Physics/SoftBody/SoftBodyCreationSettings.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/SoftBody/SoftBodyCreationSettings.h
+	${JOLT_PHYSICS_ROOT}/Physics/SoftBody/SoftBodyMotionProperties.h
+	${JOLT_PHYSICS_ROOT}/Physics/SoftBody/SoftBodyMotionProperties.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/SoftBody/SoftBodyShape.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/SoftBody/SoftBodyShape.h
+	${JOLT_PHYSICS_ROOT}/Physics/SoftBody/SoftBodySharedSettings.cpp
+	${JOLT_PHYSICS_ROOT}/Physics/SoftBody/SoftBodySharedSettings.h
+	${JOLT_PHYSICS_ROOT}/Physics/SoftBody/SoftBodyVertex.h
 	${JOLT_PHYSICS_ROOT}/Physics/StateRecorder.h
 	${JOLT_PHYSICS_ROOT}/Physics/StateRecorderImpl.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/StateRecorderImpl.h
