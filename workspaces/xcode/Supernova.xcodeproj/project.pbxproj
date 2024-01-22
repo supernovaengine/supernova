@@ -91,8 +91,6 @@
 		7105CD062AD61DA6007C91BA /* TriangleSplitterLongestAxis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105CB442AD61DA4007C91BA /* TriangleSplitterLongestAxis.cpp */; };
 		7105CD082AD61DA6007C91BA /* TriangleSplitterBinning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105CB462AD61DA4007C91BA /* TriangleSplitterBinning.cpp */; };
 		7105CD092AD61DA6007C91BA /* TriangleSplitterBinning.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105CB462AD61DA4007C91BA /* TriangleSplitterBinning.cpp */; };
-		7105CD0F2AD61DA6007C91BA /* UVec4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105CB4E2AD61DA4007C91BA /* UVec4.cpp */; };
-		7105CD102AD61DA6007C91BA /* UVec4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105CB4E2AD61DA4007C91BA /* UVec4.cpp */; };
 		7105CD252AD61DA6007C91BA /* Vec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105CB6B2AD61DA4007C91BA /* Vec3.cpp */; };
 		7105CD262AD61DA6007C91BA /* Vec3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105CB6B2AD61DA4007C91BA /* Vec3.cpp */; };
 		7105CD282AD61DA6007C91BA /* Indexify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7105CB6E2AD61DA4007C91BA /* Indexify.cpp */; };
@@ -496,6 +494,16 @@
 		71651FF72AA804B4008D9BF5 /* Manifold2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FEC2AA804B4008D9BF5 /* Manifold2D.cpp */; };
 		71651FF82AA804B4008D9BF5 /* Contact2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FED2AA804B4008D9BF5 /* Contact2D.cpp */; };
 		71651FF92AA804B4008D9BF5 /* Contact2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FED2AA804B4008D9BF5 /* Contact2D.cpp */; };
+		716A72E62B5DF9CC00DDE179 /* SpringSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72E42B5DF9CC00DDE179 /* SpringSettings.cpp */; };
+		716A72E72B5DF9CC00DDE179 /* SpringSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72E42B5DF9CC00DDE179 /* SpringSettings.cpp */; };
+		716A72F42B5DFA0E00DDE179 /* SoftBodySharedSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72EA2B5DFA0E00DDE179 /* SoftBodySharedSettings.cpp */; };
+		716A72F52B5DFA0E00DDE179 /* SoftBodySharedSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72EA2B5DFA0E00DDE179 /* SoftBodySharedSettings.cpp */; };
+		716A72F62B5DFA0E00DDE179 /* SoftBodyMotionProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72ED2B5DFA0E00DDE179 /* SoftBodyMotionProperties.cpp */; };
+		716A72F72B5DFA0E00DDE179 /* SoftBodyMotionProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72ED2B5DFA0E00DDE179 /* SoftBodyMotionProperties.cpp */; };
+		716A72F82B5DFA0E00DDE179 /* SoftBodyShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72EE2B5DFA0E00DDE179 /* SoftBodyShape.cpp */; };
+		716A72F92B5DFA0E00DDE179 /* SoftBodyShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72EE2B5DFA0E00DDE179 /* SoftBodyShape.cpp */; };
+		716A72FA2B5DFA0E00DDE179 /* SoftBodyCreationSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72F22B5DFA0E00DDE179 /* SoftBodyCreationSettings.cpp */; };
+		716A72FB2B5DFA0E00DDE179 /* SoftBodyCreationSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72F22B5DFA0E00DDE179 /* SoftBodyCreationSettings.cpp */; };
 		7170A3CB2818A87E0003E965 /* BoneComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 7170A3C92818A87E0003E965 /* BoneComponent.h */; };
 		7170A3CC2818A87E0003E965 /* ModelComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 7170A3CA2818A87E0003E965 /* ModelComponent.h */; };
 		7170A3D42818A8A30003E965 /* Bone.h in Headers */ = {isa = PBXBuildFile; fileRef = 7170A3CD2818A8A30003E965 /* Bone.h */; };
@@ -1383,7 +1391,6 @@
 		7105CB4B2AD61DA4007C91BA /* Mat44.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Mat44.inl; sourceTree = "<group>"; };
 		7105CB4C2AD61DA4007C91BA /* UVec8.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UVec8.h; sourceTree = "<group>"; };
 		7105CB4D2AD61DA4007C91BA /* DVec3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DVec3.h; sourceTree = "<group>"; };
-		7105CB4E2AD61DA4007C91BA /* UVec4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UVec4.cpp; sourceTree = "<group>"; };
 		7105CB4F2AD61DA4007C91BA /* Double3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Double3.h; sourceTree = "<group>"; };
 		7105CB502AD61DA4007C91BA /* Swizzle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Swizzle.h; sourceTree = "<group>"; };
 		7105CB512AD61DA4007C91BA /* Mat44.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mat44.h; sourceTree = "<group>"; };
@@ -1900,6 +1907,20 @@
 		71651FEB2AA804B4008D9BF5 /* ContactImpulse2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContactImpulse2D.cpp; sourceTree = "<group>"; };
 		71651FEC2AA804B4008D9BF5 /* Manifold2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Manifold2D.cpp; sourceTree = "<group>"; };
 		71651FED2AA804B4008D9BF5 /* Contact2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Contact2D.cpp; sourceTree = "<group>"; };
+		716A72E22B5DF9A500DDE179 /* AllowedDOFs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AllowedDOFs.h; sourceTree = "<group>"; };
+		716A72E32B5DF9B700DDE179 /* BodyType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BodyType.h; sourceTree = "<group>"; };
+		716A72E42B5DF9CC00DDE179 /* SpringSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpringSettings.cpp; sourceTree = "<group>"; };
+		716A72E52B5DF9CC00DDE179 /* SpringSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpringSettings.h; sourceTree = "<group>"; };
+		716A72EA2B5DFA0E00DDE179 /* SoftBodySharedSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoftBodySharedSettings.cpp; sourceTree = "<group>"; };
+		716A72EB2B5DFA0E00DDE179 /* SoftBodySharedSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftBodySharedSettings.h; sourceTree = "<group>"; };
+		716A72EC2B5DFA0E00DDE179 /* SoftBodyUpdateContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftBodyUpdateContext.h; sourceTree = "<group>"; };
+		716A72ED2B5DFA0E00DDE179 /* SoftBodyMotionProperties.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoftBodyMotionProperties.cpp; sourceTree = "<group>"; };
+		716A72EE2B5DFA0E00DDE179 /* SoftBodyShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoftBodyShape.cpp; sourceTree = "<group>"; };
+		716A72EF2B5DFA0E00DDE179 /* SoftBodyCreationSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftBodyCreationSettings.h; sourceTree = "<group>"; };
+		716A72F02B5DFA0E00DDE179 /* SoftBodyVertex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftBodyVertex.h; sourceTree = "<group>"; };
+		716A72F12B5DFA0E00DDE179 /* SoftBodyShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftBodyShape.h; sourceTree = "<group>"; };
+		716A72F22B5DFA0E00DDE179 /* SoftBodyCreationSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoftBodyCreationSettings.cpp; sourceTree = "<group>"; };
+		716A72F32B5DFA0E00DDE179 /* SoftBodyMotionProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftBodyMotionProperties.h; sourceTree = "<group>"; };
 		7170A3C92818A87E0003E965 /* BoneComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BoneComponent.h; sourceTree = "<group>"; };
 		7170A3CA2818A87E0003E965 /* ModelComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelComponent.h; sourceTree = "<group>"; };
 		7170A3CD2818A8A30003E965 /* Bone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bone.h; sourceTree = "<group>"; };
@@ -2650,7 +2671,6 @@
 				7105CB4B2AD61DA4007C91BA /* Mat44.inl */,
 				7105CB4C2AD61DA4007C91BA /* UVec8.h */,
 				7105CB4D2AD61DA4007C91BA /* DVec3.h */,
-				7105CB4E2AD61DA4007C91BA /* UVec4.cpp */,
 				7105CB4F2AD61DA4007C91BA /* Double3.h */,
 				7105CB502AD61DA4007C91BA /* Swizzle.h */,
 				7105CB512AD61DA4007C91BA /* Mat44.h */,
@@ -2724,33 +2744,34 @@
 		7105CB8B2AD61DA5007C91BA /* Physics */ = {
 			isa = PBXGroup;
 			children = (
-				7105CB8C2AD61DA5007C91BA /* PhysicsSettings.h */,
-				7105CB8D2AD61DA5007C91BA /* Constraints */,
-				7105CBC12AD61DA5007C91BA /* PhysicsScene.cpp */,
-				7105CBC22AD61DA5007C91BA /* Vehicle */,
-				7105CBDB2AD61DA5007C91BA /* PhysicsUpdateContext.h */,
-				7105CBDC2AD61DA5007C91BA /* PhysicsLock.h */,
-				7105CBDD2AD61DA5007C91BA /* Character */,
-				7105CBE42AD61DA5007C91BA /* Ragdoll */,
 				7105CBE72AD61DA5007C91BA /* Body */,
-				7105CC012AD61DA5007C91BA /* DeterminismLog.h */,
-				7105CC022AD61DA5007C91BA /* IslandBuilder.h */,
-				7105CC032AD61DA5007C91BA /* EActivation.h */,
-				7105CC042AD61DA5007C91BA /* StateRecorderImpl.h */,
-				7105CC052AD61DA5007C91BA /* IslandBuilder.cpp */,
-				7105CC062AD61DA5007C91BA /* EPhysicsUpdateError.h */,
-				7105CC072AD61DA5007C91BA /* PhysicsSystem.cpp */,
-				7105CC082AD61DA5007C91BA /* StateRecorderImpl.cpp */,
-				7105CC092AD61DA5007C91BA /* PhysicsUpdateContext.cpp */,
-				7105CC0A2AD61DA5007C91BA /* LargeIslandSplitter.cpp */,
-				7105CC0B2AD61DA5007C91BA /* PhysicsSystem.h */,
-				7105CC0C2AD61DA5007C91BA /* LargeIslandSplitter.h */,
-				7105CC0D2AD61DA5007C91BA /* StateRecorder.h */,
-				7105CC0E2AD61DA5007C91BA /* PhysicsScene.h */,
-				7105CC0F2AD61DA5007C91BA /* PhysicsStepListener.h */,
-				7105CC102AD61DA5007C91BA /* DeterminismLog.cpp */,
+				7105CBDD2AD61DA5007C91BA /* Character */,
 				7105CC112AD61DA5007C91BA /* Collision */,
+				7105CB8D2AD61DA5007C91BA /* Constraints */,
+				7105CC102AD61DA5007C91BA /* DeterminismLog.cpp */,
+				7105CC012AD61DA5007C91BA /* DeterminismLog.h */,
+				7105CC032AD61DA5007C91BA /* EActivation.h */,
+				7105CC062AD61DA5007C91BA /* EPhysicsUpdateError.h */,
+				7105CC052AD61DA5007C91BA /* IslandBuilder.cpp */,
+				7105CC022AD61DA5007C91BA /* IslandBuilder.h */,
+				7105CC0A2AD61DA5007C91BA /* LargeIslandSplitter.cpp */,
+				7105CC0C2AD61DA5007C91BA /* LargeIslandSplitter.h */,
 				7105CC772AD61DA5007C91BA /* PhysicsLock.cpp */,
+				7105CBDC2AD61DA5007C91BA /* PhysicsLock.h */,
+				7105CBC12AD61DA5007C91BA /* PhysicsScene.cpp */,
+				7105CC0E2AD61DA5007C91BA /* PhysicsScene.h */,
+				7105CB8C2AD61DA5007C91BA /* PhysicsSettings.h */,
+				7105CC0F2AD61DA5007C91BA /* PhysicsStepListener.h */,
+				7105CC072AD61DA5007C91BA /* PhysicsSystem.cpp */,
+				7105CC0B2AD61DA5007C91BA /* PhysicsSystem.h */,
+				7105CC092AD61DA5007C91BA /* PhysicsUpdateContext.cpp */,
+				7105CBDB2AD61DA5007C91BA /* PhysicsUpdateContext.h */,
+				7105CBE42AD61DA5007C91BA /* Ragdoll */,
+				716A72E92B5DFA0E00DDE179 /* SoftBody */,
+				7105CC0D2AD61DA5007C91BA /* StateRecorder.h */,
+				7105CC082AD61DA5007C91BA /* StateRecorderImpl.cpp */,
+				7105CC042AD61DA5007C91BA /* StateRecorderImpl.h */,
+				7105CBC22AD61DA5007C91BA /* Vehicle */,
 			);
 			path = Physics;
 			sourceTree = "<group>";
@@ -2758,45 +2779,47 @@
 		7105CB8D2AD61DA5007C91BA /* Constraints */ = {
 			isa = PBXGroup;
 			children = (
-				7105CB8E2AD61DA5007C91BA /* HingeConstraint.cpp */,
-				7105CB8F2AD61DA5007C91BA /* ConstraintPart */,
-				7105CB9C2AD61DA5007C91BA /* TwoBodyConstraint.h */,
 				7105CB9D2AD61DA5007C91BA /* ConeConstraint.cpp */,
-				7105CB9E2AD61DA5007C91BA /* PathConstraint.cpp */,
+				7105CBA22AD61DA5007C91BA /* ConeConstraint.h */,
+				7105CBA42AD61DA5007C91BA /* Constraint.cpp */,
+				7105CBB12AD61DA5007C91BA /* Constraint.h */,
+				7105CBB32AD61DA5007C91BA /* ConstraintManager.cpp */,
+				7105CBB02AD61DA5007C91BA /* ConstraintManager.h */,
+				7105CB8F2AD61DA5007C91BA /* ConstraintPart */,
 				7105CB9F2AD61DA5007C91BA /* ContactConstraintManager.cpp */,
+				7105CBA92AD61DA5007C91BA /* ContactConstraintManager.h */,
+				7105CBAB2AD61DA5007C91BA /* DistanceConstraint.cpp */,
+				7105CBB82AD61DA5007C91BA /* DistanceConstraint.h */,
+				7105CBB22AD61DA5007C91BA /* FixedConstraint.cpp */,
+				7105CBAA2AD61DA5007C91BA /* FixedConstraint.h */,
 				7105CBA02AD61DA5007C91BA /* GearConstraint.cpp */,
 				7105CBA12AD61DA5007C91BA /* GearConstraint.h */,
-				7105CBA22AD61DA5007C91BA /* ConeConstraint.h */,
-				7105CBA32AD61DA5007C91BA /* SixDOFConstraint.h */,
-				7105CBA42AD61DA5007C91BA /* Constraint.cpp */,
-				7105CBA52AD61DA5007C91BA /* SliderConstraint.cpp */,
-				7105CBA62AD61DA5007C91BA /* PathConstraintPathHermite.h */,
+				7105CB8E2AD61DA5007C91BA /* HingeConstraint.cpp */,
 				7105CBA72AD61DA5007C91BA /* HingeConstraint.h */,
 				7105CBA82AD61DA5007C91BA /* MotorSettings.cpp */,
-				7105CBA92AD61DA5007C91BA /* ContactConstraintManager.h */,
-				7105CBAA2AD61DA5007C91BA /* FixedConstraint.h */,
-				7105CBAB2AD61DA5007C91BA /* DistanceConstraint.cpp */,
-				7105CBAC2AD61DA5007C91BA /* PathConstraintPathHermite.cpp */,
-				7105CBAD2AD61DA5007C91BA /* TwoBodyConstraint.cpp */,
-				7105CBAE2AD61DA5007C91BA /* SwingTwistConstraint.h */,
-				7105CBAF2AD61DA5007C91BA /* PulleyConstraint.h */,
-				7105CBB02AD61DA5007C91BA /* ConstraintManager.h */,
-				7105CBB12AD61DA5007C91BA /* Constraint.h */,
-				7105CBB22AD61DA5007C91BA /* FixedConstraint.cpp */,
-				7105CBB32AD61DA5007C91BA /* ConstraintManager.cpp */,
-				7105CBB42AD61DA5007C91BA /* SixDOFConstraint.cpp */,
-				7105CBB52AD61DA5007C91BA /* RackAndPinionConstraint.h */,
-				7105CBB62AD61DA5007C91BA /* PathConstraintPath.cpp */,
-				7105CBB72AD61DA5007C91BA /* RackAndPinionConstraint.cpp */,
-				7105CBB82AD61DA5007C91BA /* DistanceConstraint.h */,
-				7105CBB92AD61DA5007C91BA /* PointConstraint.h */,
-				7105CBBA2AD61DA5007C91BA /* PointConstraint.cpp */,
-				7105CBBB2AD61DA5007C91BA /* PathConstraint.h */,
-				7105CBBC2AD61DA5007C91BA /* PathConstraintPath.h */,
-				7105CBBD2AD61DA5007C91BA /* SwingTwistConstraint.cpp */,
 				7105CBBE2AD61DA5007C91BA /* MotorSettings.h */,
+				7105CB9E2AD61DA5007C91BA /* PathConstraint.cpp */,
+				7105CBBB2AD61DA5007C91BA /* PathConstraint.h */,
+				7105CBB62AD61DA5007C91BA /* PathConstraintPath.cpp */,
+				7105CBBC2AD61DA5007C91BA /* PathConstraintPath.h */,
+				7105CBAC2AD61DA5007C91BA /* PathConstraintPathHermite.cpp */,
+				7105CBA62AD61DA5007C91BA /* PathConstraintPathHermite.h */,
+				7105CBBA2AD61DA5007C91BA /* PointConstraint.cpp */,
+				7105CBB92AD61DA5007C91BA /* PointConstraint.h */,
 				7105CBBF2AD61DA5007C91BA /* PulleyConstraint.cpp */,
+				7105CBAF2AD61DA5007C91BA /* PulleyConstraint.h */,
+				7105CBB72AD61DA5007C91BA /* RackAndPinionConstraint.cpp */,
+				7105CBB52AD61DA5007C91BA /* RackAndPinionConstraint.h */,
+				7105CBB42AD61DA5007C91BA /* SixDOFConstraint.cpp */,
+				7105CBA32AD61DA5007C91BA /* SixDOFConstraint.h */,
+				7105CBA52AD61DA5007C91BA /* SliderConstraint.cpp */,
 				7105CBC02AD61DA5007C91BA /* SliderConstraint.h */,
+				716A72E42B5DF9CC00DDE179 /* SpringSettings.cpp */,
+				716A72E52B5DF9CC00DDE179 /* SpringSettings.h */,
+				7105CBBD2AD61DA5007C91BA /* SwingTwistConstraint.cpp */,
+				7105CBAE2AD61DA5007C91BA /* SwingTwistConstraint.h */,
+				7105CBAD2AD61DA5007C91BA /* TwoBodyConstraint.cpp */,
+				7105CB9C2AD61DA5007C91BA /* TwoBodyConstraint.h */,
 			);
 			path = Constraints;
 			sourceTree = "<group>";
@@ -2876,31 +2899,33 @@
 		7105CBE72AD61DA5007C91BA /* Body */ = {
 			isa = PBXGroup;
 			children = (
-				7105CBE82AD61DA5007C91BA /* BodyInterface.cpp */,
-				7105CBE92AD61DA5007C91BA /* BodyLockInterface.h */,
-				7105CBEA2AD61DA5007C91BA /* Body.inl */,
-				7105CBEB2AD61DA5007C91BA /* BodyFilter.h */,
-				7105CBEC2AD61DA5007C91BA /* MotionProperties.cpp */,
-				7105CBED2AD61DA5007C91BA /* BodyCreationSettings.cpp */,
-				7105CBEE2AD61DA5007C91BA /* BodyPair.h */,
-				7105CBEF2AD61DA5007C91BA /* BodyManager.h */,
-				7105CBF02AD61DA5007C91BA /* MassProperties.cpp */,
-				7105CBF12AD61DA5007C91BA /* Body.h */,
-				7105CBF22AD61DA5007C91BA /* BodyInterface.h */,
-				7105CBF32AD61DA5007C91BA /* BodyAccess.h */,
-				7105CBF42AD61DA5007C91BA /* BodyCreationSettings.h */,
-				7105CBF52AD61DA5007C91BA /* MotionType.h */,
-				7105CBF62AD61DA5007C91BA /* BodyID.h */,
-				7105CBF72AD61DA5007C91BA /* BodyLockMulti.h */,
-				7105CBF82AD61DA5007C91BA /* MotionProperties.inl */,
+				716A72E22B5DF9A500DDE179 /* AllowedDOFs.h */,
 				7105CBF92AD61DA5007C91BA /* Body.cpp */,
-				7105CBFA2AD61DA5007C91BA /* BodyManager.cpp */,
-				7105CBFB2AD61DA5007C91BA /* MotionQuality.h */,
-				7105CBFC2AD61DA5007C91BA /* BodyLock.h */,
-				7105CBFD2AD61DA5007C91BA /* MotionProperties.h */,
-				7105CBFE2AD61DA5007C91BA /* MassProperties.h */,
+				7105CBF12AD61DA5007C91BA /* Body.h */,
+				7105CBEA2AD61DA5007C91BA /* Body.inl */,
 				7105CBFF2AD61DA5007C91BA /* BodyAccess.cpp */,
+				7105CBF32AD61DA5007C91BA /* BodyAccess.h */,
 				7105CC002AD61DA5007C91BA /* BodyActivationListener.h */,
+				7105CBED2AD61DA5007C91BA /* BodyCreationSettings.cpp */,
+				7105CBF42AD61DA5007C91BA /* BodyCreationSettings.h */,
+				7105CBEB2AD61DA5007C91BA /* BodyFilter.h */,
+				7105CBF62AD61DA5007C91BA /* BodyID.h */,
+				7105CBE82AD61DA5007C91BA /* BodyInterface.cpp */,
+				7105CBF22AD61DA5007C91BA /* BodyInterface.h */,
+				7105CBFC2AD61DA5007C91BA /* BodyLock.h */,
+				7105CBE92AD61DA5007C91BA /* BodyLockInterface.h */,
+				7105CBF72AD61DA5007C91BA /* BodyLockMulti.h */,
+				7105CBFA2AD61DA5007C91BA /* BodyManager.cpp */,
+				7105CBEF2AD61DA5007C91BA /* BodyManager.h */,
+				7105CBEE2AD61DA5007C91BA /* BodyPair.h */,
+				716A72E32B5DF9B700DDE179 /* BodyType.h */,
+				7105CBF02AD61DA5007C91BA /* MassProperties.cpp */,
+				7105CBFE2AD61DA5007C91BA /* MassProperties.h */,
+				7105CBEC2AD61DA5007C91BA /* MotionProperties.cpp */,
+				7105CBFD2AD61DA5007C91BA /* MotionProperties.h */,
+				7105CBF82AD61DA5007C91BA /* MotionProperties.inl */,
+				7105CBFB2AD61DA5007C91BA /* MotionQuality.h */,
+				7105CBF52AD61DA5007C91BA /* MotionType.h */,
 			);
 			path = Body;
 			sourceTree = "<group>";
@@ -3581,6 +3606,23 @@
 			);
 			name = project;
 			path = ../../project;
+			sourceTree = "<group>";
+		};
+		716A72E92B5DFA0E00DDE179 /* SoftBody */ = {
+			isa = PBXGroup;
+			children = (
+				716A72F22B5DFA0E00DDE179 /* SoftBodyCreationSettings.cpp */,
+				716A72EF2B5DFA0E00DDE179 /* SoftBodyCreationSettings.h */,
+				716A72ED2B5DFA0E00DDE179 /* SoftBodyMotionProperties.cpp */,
+				716A72F32B5DFA0E00DDE179 /* SoftBodyMotionProperties.h */,
+				716A72EE2B5DFA0E00DDE179 /* SoftBodyShape.cpp */,
+				716A72F12B5DFA0E00DDE179 /* SoftBodyShape.h */,
+				716A72EA2B5DFA0E00DDE179 /* SoftBodySharedSettings.cpp */,
+				716A72EB2B5DFA0E00DDE179 /* SoftBodySharedSettings.h */,
+				716A72EC2B5DFA0E00DDE179 /* SoftBodyUpdateContext.h */,
+				716A72F02B5DFA0E00DDE179 /* SoftBodyVertex.h */,
+			);
+			path = SoftBody;
 			sourceTree = "<group>";
 		};
 		7170A3CF2818A8A30003E965 /* environment */ = {
@@ -5081,13 +5123,13 @@
 				7105CE392AD61DA6007C91BA /* MutableCompoundShape.cpp in Sources */,
 				7105CE2E2AD61DA6007C91BA /* BoxShape.cpp in Sources */,
 				7105CDD62AD61DA6007C91BA /* Body.cpp in Sources */,
-				7105CD0F2AD61DA6007C91BA /* UVec4.cpp in Sources */,
 				7105CE812AD61DA7007C91BA /* ObjectStream.cpp in Sources */,
 				7105CD972AD61DA6007C91BA /* VehicleTrack.cpp in Sources */,
 				7105CDAC2AD61DA6007C91BA /* WheeledVehicleController.cpp in Sources */,
 				7105CCF32AD61DA6007C91BA /* SkeletalAnimation.cpp in Sources */,
 				7105CD8C2AD61DA6007C91BA /* PulleyConstraint.cpp in Sources */,
 				7105CE682AD61DA6007C91BA /* TransformedShape.cpp in Sources */,
+				716A72F62B5DFA0E00DDE179 /* SoftBodyMotionProperties.cpp in Sources */,
 				7105CD812AD61DA6007C91BA /* RackAndPinionConstraint.cpp in Sources */,
 				7105CE8B2AD61DA7007C91BA /* SerializableObject.cpp in Sources */,
 				7105CDEA2AD61DA6007C91BA /* StateRecorderImpl.cpp in Sources */,
@@ -5126,6 +5168,7 @@
 				7105CCCF2AD61DA5007C91BA /* LinearCurve.cpp in Sources */,
 				7105CDA22AD61DA6007C91BA /* VehicleConstraint.cpp in Sources */,
 				7105CCC92AD61DA5007C91BA /* IssueReporting.cpp in Sources */,
+				716A72F82B5DFA0E00DDE179 /* SoftBodyShape.cpp in Sources */,
 				7105CE362AD61DA6007C91BA /* HeightFieldShape.cpp in Sources */,
 				7105CE8D2AD61DA7007C91BA /* ObjectStreamBinaryOut.cpp in Sources */,
 				7105CD592AD61DA6007C91BA /* ConeConstraint.cpp in Sources */,
@@ -5143,6 +5186,7 @@
 				7105CE502AD61DA6007C91BA /* BroadPhaseBruteForce.cpp in Sources */,
 				7105CD5D2AD61DA6007C91BA /* ContactConstraintManager.cpp in Sources */,
 				7105CE1D2AD61DA6007C91BA /* MeshShape.cpp in Sources */,
+				716A72E62B5DF9CC00DDE179 /* SpringSettings.cpp in Sources */,
 				7105CE412AD61DA6007C91BA /* ManifoldBetweenTwoFaces.cpp in Sources */,
 				7105CCDE2AD61DA5007C91BA /* JobSystemWithBarrier.cpp in Sources */,
 				7105CE752AD61DA7007C91BA /* CastConvexVsTriangles.cpp in Sources */,
@@ -5165,6 +5209,7 @@
 				7105CE972AD61DA7007C91BA /* TypeDeclarations.cpp in Sources */,
 				7105CCA62AD61DA5007C91BA /* Memory.cpp in Sources */,
 				7105CDE52AD61DA6007C91BA /* IslandBuilder.cpp in Sources */,
+				716A72FA2B5DFA0E00DDE179 /* SoftBodyCreationSettings.cpp in Sources */,
 				7105CD082AD61DA6007C91BA /* TriangleSplitterBinning.cpp in Sources */,
 				7105CD282AD61DA6007C91BA /* Indexify.cpp in Sources */,
 				7105CE5B2AD61DA6007C91BA /* QuadTree.cpp in Sources */,
@@ -5176,6 +5221,7 @@
 				7105CCFE2AD61DA6007C91BA /* TriangleSplitter.cpp in Sources */,
 				7105CDCD2AD61DA6007C91BA /* MassProperties.cpp in Sources */,
 				7105CD002AD61DA6007C91BA /* TriangleSplitterMorton.cpp in Sources */,
+				716A72F42B5DFA0E00DDE179 /* SoftBodySharedSettings.cpp in Sources */,
 				7105CE932AD61DA7007C91BA /* ObjectStreamTextOut.cpp in Sources */,
 				7105CE2C2AD61DA6007C91BA /* ScaledShape.cpp in Sources */,
 				7105CD7C2AD61DA6007C91BA /* SixDOFConstraint.cpp in Sources */,
@@ -5219,13 +5265,13 @@
 				7105CE3A2AD61DA6007C91BA /* MutableCompoundShape.cpp in Sources */,
 				7105CE2F2AD61DA6007C91BA /* BoxShape.cpp in Sources */,
 				7105CDD72AD61DA6007C91BA /* Body.cpp in Sources */,
-				7105CD102AD61DA6007C91BA /* UVec4.cpp in Sources */,
 				7105CE822AD61DA7007C91BA /* ObjectStream.cpp in Sources */,
 				7105CD982AD61DA6007C91BA /* VehicleTrack.cpp in Sources */,
 				7105CDAD2AD61DA6007C91BA /* WheeledVehicleController.cpp in Sources */,
 				7105CCF42AD61DA6007C91BA /* SkeletalAnimation.cpp in Sources */,
 				7105CD8D2AD61DA6007C91BA /* PulleyConstraint.cpp in Sources */,
 				7105CE692AD61DA6007C91BA /* TransformedShape.cpp in Sources */,
+				716A72F72B5DFA0E00DDE179 /* SoftBodyMotionProperties.cpp in Sources */,
 				7105CD822AD61DA6007C91BA /* RackAndPinionConstraint.cpp in Sources */,
 				7105CE8C2AD61DA7007C91BA /* SerializableObject.cpp in Sources */,
 				7105CDEB2AD61DA6007C91BA /* StateRecorderImpl.cpp in Sources */,
@@ -5264,6 +5310,7 @@
 				7105CCD02AD61DA5007C91BA /* LinearCurve.cpp in Sources */,
 				7105CDA32AD61DA6007C91BA /* VehicleConstraint.cpp in Sources */,
 				7105CCCA2AD61DA5007C91BA /* IssueReporting.cpp in Sources */,
+				716A72F92B5DFA0E00DDE179 /* SoftBodyShape.cpp in Sources */,
 				7105CE372AD61DA6007C91BA /* HeightFieldShape.cpp in Sources */,
 				7105CE8E2AD61DA7007C91BA /* ObjectStreamBinaryOut.cpp in Sources */,
 				7105CD5A2AD61DA6007C91BA /* ConeConstraint.cpp in Sources */,
@@ -5281,6 +5328,7 @@
 				7105CE512AD61DA6007C91BA /* BroadPhaseBruteForce.cpp in Sources */,
 				7105CD5E2AD61DA6007C91BA /* ContactConstraintManager.cpp in Sources */,
 				7105CE1E2AD61DA6007C91BA /* MeshShape.cpp in Sources */,
+				716A72E72B5DF9CC00DDE179 /* SpringSettings.cpp in Sources */,
 				7105CE422AD61DA6007C91BA /* ManifoldBetweenTwoFaces.cpp in Sources */,
 				7105CCDF2AD61DA5007C91BA /* JobSystemWithBarrier.cpp in Sources */,
 				7105CE762AD61DA7007C91BA /* CastConvexVsTriangles.cpp in Sources */,
@@ -5303,6 +5351,7 @@
 				7105CE982AD61DA7007C91BA /* TypeDeclarations.cpp in Sources */,
 				7105CCA72AD61DA5007C91BA /* Memory.cpp in Sources */,
 				7105CDE62AD61DA6007C91BA /* IslandBuilder.cpp in Sources */,
+				716A72FB2B5DFA0E00DDE179 /* SoftBodyCreationSettings.cpp in Sources */,
 				7105CD092AD61DA6007C91BA /* TriangleSplitterBinning.cpp in Sources */,
 				7105CD292AD61DA6007C91BA /* Indexify.cpp in Sources */,
 				7105CE5C2AD61DA6007C91BA /* QuadTree.cpp in Sources */,
@@ -5314,6 +5363,7 @@
 				7105CCFF2AD61DA6007C91BA /* TriangleSplitter.cpp in Sources */,
 				7105CDCE2AD61DA6007C91BA /* MassProperties.cpp in Sources */,
 				7105CD012AD61DA6007C91BA /* TriangleSplitterMorton.cpp in Sources */,
+				716A72F52B5DFA0E00DDE179 /* SoftBodySharedSettings.cpp in Sources */,
 				7105CE942AD61DA7007C91BA /* ObjectStreamTextOut.cpp in Sources */,
 				7105CE2D2AD61DA6007C91BA /* ScaledShape.cpp in Sources */,
 				7105CD7D2AD61DA6007C91BA /* SixDOFConstraint.cpp in Sources */,
