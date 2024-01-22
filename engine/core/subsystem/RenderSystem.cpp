@@ -991,10 +991,15 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
 
 	bool p_unlit = false;
 	bool p_punctual = false;
+	bool p_hasTexture1 = false;
 	bool p_hasNormal = false;
 	bool p_castShadows = false;
 	bool p_shadowsPCF = false;
 
+
+	if (terrain.material.baseColorTexture.getRender() || terrain.blendMap.getRender()){
+		p_hasTexture1 = true;
+	}
 	if (hasLights){
 		p_punctual = true;
 
@@ -1010,7 +1015,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
 	}
 
 	terrain.shaderProperties = ShaderPool::getMeshProperties(
-					p_unlit, false, false, p_punctual, 
+					p_unlit, p_hasTexture1, false, p_punctual, 
 					p_castShadows, p_shadowsPCF, p_hasNormal, false, 
 					false, false, false, false, 
 					hasFog, false, false, false, false,
@@ -2819,7 +2824,7 @@ void RenderSystem::draw(){
 			"\n"
 			"-------------------\n"
 			"Supernova is missing some shaders, you need to use Supershader tool to create these shaders in project assets directory.\n"
-			"Go to directory \"tools/supershader\" and execute the command:\n"
+			"Go to directory \"tools/\" and execute the command:\n"
 			"\n"
 			"> python3 supershader.py -s \"%s\" -l %s\n"
 			"-------------------"
