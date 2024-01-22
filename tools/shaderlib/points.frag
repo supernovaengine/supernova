@@ -2,7 +2,9 @@
 
 out vec4 g_finalColor;
 
-in float v_pointrotation;
+#ifdef HAS_TEXTURE
+    in float v_pointrotation;
+#endif
 
 #ifdef HAS_VERTEX_COLOR_VEC3
     in vec3 v_color;
