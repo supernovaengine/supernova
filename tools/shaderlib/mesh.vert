@@ -35,7 +35,9 @@ in vec3 a_position;
 #endif
 
 #ifdef HAS_UV_SET1
-    in vec2 a_texcoord1;
+    #ifndef HAS_TERRAIN
+        in vec2 a_texcoord1;
+    #endif
     out vec2 v_uv1;
 #endif
 
@@ -136,11 +138,12 @@ void main() {
     #endif
 
     #ifdef HAS_UV_SET1
-        v_uv1 = a_texcoord1;
-        #ifdef HAS_TEXTURERECT
-            v_uv1 = a_texcoord1 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
-        #endif
-        #ifdef HAS_TERRAIN
+        #ifndef HAS_TERRAIN
+            v_uv1 = a_texcoord1;
+            #ifdef HAS_TEXTURERECT
+                v_uv1 = a_texcoord1 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
+            #endif
+        #else
             v_uv1 = getTerrainTiledTexture(pos.xyz);
         #endif
     #endif
