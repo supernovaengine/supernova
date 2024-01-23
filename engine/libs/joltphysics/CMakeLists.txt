@@ -4,12 +4,8 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(JOLT_PHYSICS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Jolt)
 
-add_library(
-
-	joltphysics
-
-    STATIC
-
+# Source files
+set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/AABBTree/AABBTreeBuilder.cpp
 	${JOLT_PHYSICS_ROOT}/AABBTree/AABBTreeBuilder.h
 	${JOLT_PHYSICS_ROOT}/AABBTree/AABBTreeToBuffer.h
@@ -438,6 +434,23 @@ add_library(
 	${JOLT_PHYSICS_ROOT}/TriangleSplitter/TriangleSplitterMorton.h
 )
 
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
+	# Add natvis file
+	set(JOLT_PHYSICS_SRC_FILES ${JOLT_PHYSICS_SRC_FILES} ${JOLT_PHYSICS_ROOT}/Jolt.natvis)
+endif()
+
+# Group source files
+source_group(TREE ${JOLT_PHYSICS_ROOT} FILES ${JOLT_PHYSICS_SRC_FILES})
+
+
+add_library(
+	joltphysics 
+	
+	STATIC 
+	
+	${JOLT_PHYSICS_SRC_FILES}
+)
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_options(
         joltphysics 
@@ -455,3 +468,132 @@ set_target_properties(
 
     CXX_STANDARD 17
 )
+
+
+# Jolt.cmake configuration
+
+target_precompile_headers(joltphysics PRIVATE ${JOLT_PHYSICS_ROOT}/Jolt.h)
+target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Debug>:_DEBUG;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER>")
+target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Release>:NDEBUG;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER>")
+target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Distribution>:NDEBUG>")
+target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:ReleaseASAN>:NDEBUG;JPH_PROFILE_ENABLED;JPH_DISABLE_TEMP_ALLOCATOR;JPH_DISABLE_CUSTOM_ALLOCATOR;JPH_DEBUG_RENDERER>")
+target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:ReleaseUBSAN>:NDEBUG;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER>")
+target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:ReleaseCoverage>:NDEBUG>")
+
+# Setting floating point exceptions
+if (FLOATING_POINT_EXCEPTIONS_ENABLED AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Debug>:JPH_FLOATING_POINT_EXCEPTIONS_ENABLED>")
+	target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Release>:JPH_FLOATING_POINT_EXCEPTIONS_ENABLED>")
+endif()
+
+# Setting double precision flag
+if (DOUBLE_PRECISION)
+	target_compile_definitions(joltphysics PUBLIC JPH_DOUBLE_PRECISION)
+endif()
+
+# Setting to attempt cross platform determinism
+if (CROSS_PLATFORM_DETERMINISTIC)
+	target_compile_definitions(joltphysics PUBLIC JPH_CROSS_PLATFORM_DETERMINISTIC)
+endif()
+
+# Setting to determine number of bits in ObjectLayer
+if (OBJECT_LAYER_BITS)
+	target_compile_definitions(joltphysics PUBLIC JPH_OBJECT_LAYER_BITS=${OBJECT_LAYER_BITS})
+endif()
+
+# Setting to periodically trace broadphase stats to help determine if the broadphase layer configuration is optimal
+if (TRACK_BROADPHASE_STATS)
+	target_compile_definitions(joltphysics PUBLIC JPH_TRACK_BROADPHASE_STATS)
+endif()
+
+# Setting to periodically trace narrowphase stats to help determine which collision queries could be optimized
+if (TRACK_NARROWPHASE_STATS)
+	target_compile_definitions(joltphysics PUBLIC JPH_TRACK_NARROWPHASE_STATS)
+endif()
+
+# Emit the instruction set definitions to ensure that child projects use the same settings even if they override the used instruction sets (a mismatch causes link errors)
+function(EMIT_X86_INSTRUCTION_SET_DEFINITIONS)
+	if (USE_AVX512)
+		target_compile_definitions(joltphysics PUBLIC JPH_USE_AVX512)
+	endif()
+	if (USE_AVX2)
+		target_compile_definitions(joltphysics PUBLIC JPH_USE_AVX2)
+	endif()
+	if (USE_AVX)
+		target_compile_definitions(joltphysics PUBLIC JPH_USE_AVX)
+	endif()
+	if (USE_SSE4_1)
+		target_compile_definitions(joltphysics PUBLIC JPH_USE_SSE4_1)
+	endif()
+	if (USE_SSE4_2)
+		target_compile_definitions(joltphysics PUBLIC JPH_USE_SSE4_2)
+	endif()
+	if (USE_LZCNT)
+		target_compile_definitions(joltphysics PUBLIC JPH_USE_LZCNT)
+	endif()
+	if (USE_TZCNT)
+		target_compile_definitions(joltphysics PUBLIC JPH_USE_TZCNT)
+	endif()
+	if (USE_F16C)
+		target_compile_definitions(joltphysics PUBLIC JPH_USE_F16C)
+	endif()
+	if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
+		target_compile_definitions(joltphysics PUBLIC JPH_USE_FMADD)
+	endif()
+endfunction()
+
+# Add the compiler commandline flags to select the right instruction sets
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+	if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86" OR "${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
+		if (USE_AVX512)
+			target_compile_options(joltphysics PUBLIC /arch:AVX512)
+		elseif (USE_AVX2)
+			target_compile_options(joltphysics PUBLIC /arch:AVX2)
+		elseif (USE_AVX)
+			target_compile_options(joltphysics PUBLIC /arch:AVX)
+		endif()
+		EMIT_X86_INSTRUCTION_SET_DEFINITIONS()
+	endif()
+else()
+	if (XCODE)
+		# XCode builds for multiple architectures, we can't set global flags
+	elseif (CROSS_COMPILE_ARM OR CMAKE_OSX_ARCHITECTURES MATCHES "arm64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+		# ARM64 uses no special commandline flags
+	elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64")
+		# x64
+		if (USE_AVX512)
+			target_compile_options(joltphysics PUBLIC -mavx512f -mavx512vl -mavx512dq -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c)
+		elseif (USE_AVX2)
+			target_compile_options(joltphysics PUBLIC -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c)
+		elseif (USE_AVX)
+			target_compile_options(joltphysics PUBLIC -mavx -mpopcnt)
+		elseif (USE_SSE4_2)
+			target_compile_options(joltphysics PUBLIC -msse4.2 -mpopcnt)
+		elseif (USE_SSE4_1)
+			target_compile_options(joltphysics PUBLIC -msse4.1)
+		else()
+			target_compile_options(joltphysics PUBLIC -msse2)
+		endif()
+		if (USE_LZCNT)
+			target_compile_options(joltphysics PUBLIC -mlzcnt)
+		endif()
+		if (USE_TZCNT)
+			target_compile_options(joltphysics PUBLIC -mbmi)
+		endif()
+		if (USE_F16C)
+			target_compile_options(joltphysics PUBLIC -mf16c)
+		endif()
+		if (USE_FMADD AND NOT CROSS_PLATFORM_DETERMINISTIC)
+			target_compile_options(joltphysics PUBLIC -mfma)
+		endif()
+
+		# On 32-bit builds we need to default to using SSE instructions, the x87 FPU instructions have higher intermediate precision
+		# which will cause problems in the collision detection code (the effect is similar to leaving FMA on, search for
+		# JPH_PRECISE_MATH_ON for the locations where this is a problem).
+		if (NOT MSVC)
+			target_compile_options(joltphysics PUBLIC -mfpmath=sse)
+		endif()
+
+		EMIT_X86_INSTRUCTION_SET_DEFINITIONS()
+	endif()
+endif()

@@ -136,9 +136,7 @@ void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Bod
             JPH::Quat jQuat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
             JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
-            body_interface.ActivateBody(body.body->GetID());
-
-            body.body->SetPositionAndRotationInternal(jPosition, jQuat);
+            body_interface.SetPositionAndRotation(body.body->GetID(), jPosition, jQuat, JPH::EActivation::Activate);
         }
     }
 }
