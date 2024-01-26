@@ -174,7 +174,6 @@ namespace Supernova{
 
 		// camera
 		void updateCameraSize(Entity entity);
-		float getCameraFar(CameraComponent& camera);
 		bool isInsideCamera(CameraComponent& camera, const AlignedBox& box);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& point);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius);

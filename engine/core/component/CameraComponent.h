@@ -6,6 +6,11 @@
 #include "math/Plane.h"
 #include "texture/Framebuffer.h"
 
+#define DEFAULT_ORTHO_NEAR          -10
+#define DEFAULT_ORTHO_FAR           10
+#define DEFAULT_PERSPECTIVE_NEAR    1
+#define DEFAULT_PERSPECTIVE_FAR     200
+
 namespace Supernova{
 
     enum class CameraType{
@@ -42,13 +47,12 @@ namespace Supernova{
         float right = 10;
         float bottom = 0;
         float top = 10;
-        float orthoNear = -10;
-        float orthoFar = 10;
 
-        float y_fov = 0.75;
+        float yfov = 0.75;
         float aspect = 1.0;
-        float perspectiveNear = 1;
-        float perspectiveFar = 200;
+
+        float near = -10;
+        float far = 10;
 
         bool needUpdateFrustumPlanes = true;
         Plane frustumPlanes[6];

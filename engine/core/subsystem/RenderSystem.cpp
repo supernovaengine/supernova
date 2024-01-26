@@ -1687,11 +1687,11 @@ void RenderSystem::updateTransform(Transform& transform){
 void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 	//Update ProjectionMatrix
 	if (camera.type == CameraType::CAMERA_2D){
-		camera.projectionMatrix = Matrix4::orthoMatrix(camera.left, camera.right, camera.top, camera.bottom, camera.orthoNear, camera.orthoFar);
+		camera.projectionMatrix = Matrix4::orthoMatrix(camera.left, camera.right, camera.top, camera.bottom, camera.near, camera.far);
 	}else if (camera.type == CameraType::CAMERA_ORTHO) {
-		camera.projectionMatrix = Matrix4::orthoMatrix(camera.left, camera.right, camera.bottom, camera.top, camera.orthoNear, camera.orthoFar);
+		camera.projectionMatrix = Matrix4::orthoMatrix(camera.left, camera.right, camera.bottom, camera.top, camera.near, camera.far);
 	}else if (camera.type == CameraType::CAMERA_PERSPECTIVE){
-		camera.projectionMatrix = Matrix4::perspectiveMatrix(camera.y_fov, camera.aspect, camera.perspectiveNear, camera.perspectiveFar);
+		camera.projectionMatrix = Matrix4::perspectiveMatrix(camera.yfov, camera.aspect, camera.near, camera.far);
 	}
 
 	if (transform.parent != NULL_ENTITY){
@@ -1957,14 +1957,6 @@ void RenderSystem::updateCameraSize(Entity entity){
 	}
 }
 
-float RenderSystem::getCameraFar(CameraComponent& camera){
-	if (camera.type == CameraType::CAMERA_PERSPECTIVE){
-		return camera.perspectiveFar;
-	}else{
-		return camera.orthoFar;
-	}
-}
-
 bool RenderSystem::isInsideCamera(CameraComponent& camera, const AlignedBox& box){
     if (box.isNull() || box.isInfinite())
         return false;
@@ -1975,7 +1967,7 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const AlignedBox& box
     Vector3 halfSize = box.getHalfSize();
 
     for (int plane = 0; plane < 6; ++plane){
-        if (plane == FRUSTUM_PLANE_FAR && getCameraFar(camera) == 0)
+        if (plane == FRUSTUM_PLANE_FAR && camera.far == 0)
             continue;
 
         Plane::Side side = camera.frustumPlanes[plane].getSide(centre, halfSize);
@@ -1991,7 +1983,7 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& point)
     updateCameraFrustumPlanes(camera);
 
     for (int plane = 0; plane < 6; ++plane){
-        if (plane == FRUSTUM_PLANE_FAR && getCameraFar(camera) == 0)
+        if (plane == FRUSTUM_PLANE_FAR && camera.far == 0)
             continue;
 
         if (camera.frustumPlanes[plane].getSide(point) == Plane::Side::NEGATIVE_SIDE){
@@ -2006,7 +1998,7 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& center
     updateCameraFrustumPlanes(camera);
 
     for (int plane = 0; plane < 6; ++plane){
-        if (plane == FRUSTUM_PLANE_FAR && getCameraFar(camera) == 0)
+        if (plane == FRUSTUM_PLANE_FAR && camera.far == 0)
             continue;
 
         if (camera.frustumPlanes[plane].getDistance(center) < -radius){
@@ -2063,17 +2055,11 @@ bool RenderSystem::updateCameraFrustumPlanes(CameraComponent& camera){
 
 void RenderSystem::configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera){
 	if (light.shadowCameraNearFar.x == 0.0){
-		if (camera.type == CameraType::CAMERA_PERSPECTIVE)
-			light.shadowCameraNearFar.x = camera.perspectiveNear;
-		else
-			light.shadowCameraNearFar.x = camera.orthoNear;
+		light.shadowCameraNearFar.x = camera.near;
 	}
 	if (light.shadowCameraNearFar.y == 0.0){
 		if (light.range == 0.0){
-			if (camera.type == CameraType::CAMERA_PERSPECTIVE)
-				light.shadowCameraNearFar.y = camera.perspectiveFar;
-			else
-				light.shadowCameraNearFar.y = camera.orthoFar;
+			light.shadowCameraNearFar.y = camera.far;
 		}else{
 			light.shadowCameraNearFar.y = light.range;
 		}
@@ -2141,8 +2127,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 			//TODO: light directional cascades is only considering main camera
 			if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
 
-				float zFar = camera.perspectiveFar;
-				float zNear = camera.perspectiveNear;
+				float zFar = camera.far;
+				float zNear = camera.near;
 				float fov = 0;
 				float ratio = 1;
 

@@ -19,7 +19,31 @@ namespace Supernova{
         void activate();
 
         void setOrtho(float left, float right, float bottom, float top, float near, float far);
-        void setPerspective(float y_fov, float aspect, float near, float far);
+        void setPerspective(float yfov, float aspect, float near, float far);
+
+        void setNear(float near);
+        float getNear() const;
+
+        void setFar(float far);
+        float getFar() const;
+
+        void setLeft(float left);
+        float getLeft() const;
+
+        void setRight(float right);
+        float getRight() const;
+
+        void setBottom(float bottom);
+        float getBottom() const;
+
+        void setTop(float top);
+        float getTop() const;
+
+        void setAspect(float aspect);
+        float getAspect() const;
+
+        void setYFov(float yfov);
+        float getYFov() const;
 
         void setType(CameraType type);
         CameraType getType() const;

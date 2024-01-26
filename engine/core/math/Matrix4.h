@@ -72,7 +72,7 @@ namespace Supernova {
         static Matrix4 lookAtMatrix(Vector3 eye, Vector3 center, Vector3 up);
         static Matrix4 frustumMatrix(float left, float right, float bottom, float top, float near, float far);
         static Matrix4 orthoMatrix(float l, float r, float b, float t, float n, float f);
-        static Matrix4 perspectiveMatrix(float y_fov, float aspect, float near, float far);
+        static Matrix4 perspectiveMatrix(float yfov, float aspect, float near, float far);
 
         void decompose(Vector3& position, Vector3& scale, Quaternion& rotation);
     };

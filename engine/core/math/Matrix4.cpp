@@ -586,9 +586,9 @@ Matrix4 Matrix4::orthoMatrix(float left, float right, float bottom, float top, f
     return r;
 }
 
-Matrix4 Matrix4::perspectiveMatrix(float y_fov, float aspect, float near, float far){
+Matrix4 Matrix4::perspectiveMatrix(float yfov, float aspect, float near, float far){
 
-    float const a = 1.f / tan(y_fov / 2.f);
+    float const a = 1.f / tan(yfov / 2.f);
 
     Matrix4 r;
 

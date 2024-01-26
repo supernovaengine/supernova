@@ -23,11 +23,11 @@ Camera::Camera(Scene* scene): Object(scene){
     cameraComponent.right = Engine::getCanvasWidth();
     cameraComponent.bottom = 0;
     cameraComponent.top = Engine::getCanvasHeight();
-    cameraComponent.orthoNear = -10;
-    cameraComponent.orthoFar = 10;
+    cameraComponent.near = DEFAULT_ORTHO_NEAR;
+    cameraComponent.far = DEFAULT_ORTHO_FAR;
 
     //PERSPECTIVE
-    cameraComponent.y_fov = 0.75;
+    cameraComponent.yfov = 0.75;
 
     if (Engine::getCanvasWidth() != 0 && Engine::getCanvasHeight() != 0) {
         cameraComponent.aspect = (float) Engine::getCanvasWidth() / (float) Engine::getCanvasHeight();
@@ -35,8 +35,8 @@ Camera::Camera(Scene* scene): Object(scene){
         cameraComponent.aspect = 1.0;
     }
 
-    cameraComponent.perspectiveNear = 1;
-    cameraComponent.perspectiveFar = 200;
+    cameraComponent.near = DEFAULT_PERSPECTIVE_NEAR;
+    cameraComponent.far = DEFAULT_PERSPECTIVE_FAR;
 
     // default CameraComponent is CAMERA_2D
     cameraComponent.type = CameraType::CAMERA_PERSPECTIVE;
@@ -58,27 +58,165 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
     camera.right = right;
     camera.bottom = bottom;
     camera.top = top;
-    camera.orthoNear = near;
-    camera.orthoFar = far;
+    camera.near = near;
+    camera.far = far;
     
     camera.automatic = false;
 
     camera.needUpdate = true;
 }
 
-void Camera::setPerspective(float y_fov, float aspect, float near, float far){
+void Camera::setPerspective(float yfov, float aspect, float near, float far){
     CameraComponent& camera = getComponent<CameraComponent>();
 
     camera.type = CameraType::CAMERA_PERSPECTIVE;
 
-    camera.y_fov = Angle::defaultToRad(y_fov);
+    camera.yfov = Angle::defaultToRad(yfov);
     camera.aspect = aspect;
-    camera.perspectiveNear = near;
-    camera.perspectiveFar = far;
+    camera.near = near;
+    camera.far = far;
     
     camera.automatic = false;
 
     camera.needUpdate = true;
+}
+
+void Camera::setNear(float near){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    if (camera.near != near){
+        camera.near = near;
+
+        camera.needUpdate = true;
+    }
+}
+
+float Camera::getNear() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return camera.near;
+}
+
+void Camera::setFar(float far){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    if (camera.far != far){
+        camera.far = far;
+
+        camera.needUpdate = true;
+    }
+}
+
+float Camera::getFar() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return camera.far;
+}
+
+void Camera::setLeft(float left){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    if (camera.left != left){
+        camera.left = left;
+
+        camera.automatic = false;
+
+        camera.needUpdate = true;
+    }
+}
+
+float Camera::getLeft() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return camera.left;
+}
+
+void Camera::setRight(float right){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    if (camera.right != right){
+        camera.right = right;
+
+        camera.automatic = false;
+
+        camera.needUpdate = true;
+    }
+}
+
+float Camera::getRight() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return camera.right;
+}
+
+void Camera::setBottom(float bottom){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    if (camera.bottom != bottom){
+        camera.bottom = bottom;
+
+        camera.automatic = false;
+
+        camera.needUpdate = true;
+    }
+}
+
+float Camera::getBottom() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return camera.bottom;
+}
+
+void Camera::setTop(float top){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    if (camera.top != top){
+        camera.top = top;
+
+        camera.automatic = false;
+
+        camera.needUpdate = true;
+    }
+}
+
+float Camera::getTop() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return camera.top;
+}
+
+void Camera::setAspect(float aspect){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    if (camera.aspect != aspect){
+        camera.aspect = aspect;
+
+        camera.automatic = false;
+
+        camera.needUpdate = true;
+    }
+}
+
+float Camera::getAspect() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return camera.aspect;
+}
+
+void Camera::setYFov(float yfov){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    if (camera.yfov != Angle::defaultToRad(yfov)){
+        camera.yfov = Angle::defaultToRad(yfov);
+
+        camera.needUpdate = true;
+    }
+}
+
+float Camera::getYFov() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return Angle::radToDefault(camera.yfov);
 }
 
 void Camera::setType(CameraType type){
