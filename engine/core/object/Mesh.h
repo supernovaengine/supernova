@@ -28,6 +28,12 @@ namespace Supernova{
         Vector4 getColor() const;
         float getAlpha() const;
 
+        void setPrimitiveType(PrimitiveType primitiveType);
+        PrimitiveType getPrimitiveType() const;
+
+        void setPrimitiveType(unsigned int submesh, PrimitiveType primitiveType);
+        PrimitiveType getPrimitiveType(unsigned int submesh) const;
+
         Material& getMaterial(unsigned int submesh = 0);
     };
 }

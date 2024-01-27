@@ -67,6 +67,30 @@ float Mesh::getAlpha() const{
     return getColor().w;
 }
 
+void Mesh::setPrimitiveType(PrimitiveType primitiveType){
+    setPrimitiveType(0, primitiveType);
+}
+
+PrimitiveType Mesh::getPrimitiveType() const{
+    return getPrimitiveType(0);
+}
+
+void Mesh::setPrimitiveType(unsigned int submesh, PrimitiveType primitiveType){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    if (mesh.submeshes[submesh].primitiveType != primitiveType){
+        mesh.submeshes[submesh].primitiveType = primitiveType;
+
+        mesh.needReload = true;
+    }
+}
+
+PrimitiveType Mesh::getPrimitiveType(unsigned int submesh) const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.submeshes[submesh].primitiveType;
+}
+
 Material& Mesh::getMaterial(unsigned int submesh){
     MeshComponent& mesh = getComponent<MeshComponent>();
 

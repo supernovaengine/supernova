@@ -272,6 +272,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<const float, const float, const float>(&Mesh::setColor),
             luabridge::overload<const float, const float, const float, const float>(&Mesh::setColor))
         .addProperty("alpha", &Mesh::getAlpha, &Mesh::setAlpha)
+        .addProperty("primitiveType", &Mesh::getPrimitiveType, &Mesh::setPrimitiveType)
+        .addFunction("setPrimitiveType", 
+            luabridge::overload<PrimitiveType>(&Mesh::setPrimitiveType),
+            luabridge::overload<unsigned int, PrimitiveType>(&Mesh::setPrimitiveType))
+        .addFunction("getPrimitiveType", 
+            luabridge::overload<>(&Mesh::getPrimitiveType),
+            luabridge::overload<unsigned int>(&Mesh::getPrimitiveType))
         .addFunction("getMaterial", &Mesh::getMaterial)
         .endClass();
 
