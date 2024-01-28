@@ -328,6 +328,10 @@
 		71165BBF282981BE00CF79C1 /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71165BBD282981BE00CF79C1 /* Base64.cpp */; };
 		71165BC0282981BE00CF79C1 /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71165BBD282981BE00CF79C1 /* Base64.cpp */; };
 		71165BC1282981BE00CF79C1 /* Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 71165BBE282981BE00CF79C1 /* Base64.h */; };
+		7126757E2B65F4470031089C /* LinesComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 7126757D2B65F4470031089C /* LinesComponent.h */; };
+		712675812B65F45D0031089C /* Lines.h in Headers */ = {isa = PBXBuildFile; fileRef = 7126757F2B65F45D0031089C /* Lines.h */; };
+		712675822B65F45D0031089C /* Lines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 712675802B65F45D0031089C /* Lines.cpp */; };
+		712675832B65F45D0031089C /* Lines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 712675802B65F45D0031089C /* Lines.cpp */; };
 		7128CEE425BA705600965B51 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7128CEE325BA705600965B51 /* Main.storyboard */; };
 		7128CFAD25BA717500965B51 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7128CFAA25BA717500965B51 /* LaunchScreen.storyboard */; };
 		7128CFAE25BA717500965B51 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7128CFAB25BA717500965B51 /* Main.storyboard */; };
@@ -1729,6 +1733,9 @@
 		711607112A0D86500052A9C3 /* UserMessagingPlatform.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = UserMessagingPlatform.xcframework; path = "../../platform/apple/GoogleMobileAdsSdkiOS-10.14.0/UserMessagingPlatform.xcframework"; sourceTree = "<group>"; };
 		71165BBD282981BE00CF79C1 /* Base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Base64.cpp; sourceTree = "<group>"; };
 		71165BBE282981BE00CF79C1 /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
+		7126757D2B65F4470031089C /* LinesComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinesComponent.h; sourceTree = "<group>"; };
+		7126757F2B65F45D0031089C /* Lines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lines.h; sourceTree = "<group>"; };
+		712675802B65F45D0031089C /* Lines.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lines.cpp; sourceTree = "<group>"; };
 		7128CEE325BA705600965B51 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		7128CFAA25BA717500965B51 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7128CFAB25BA717500965B51 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -3352,6 +3359,7 @@
 				7105CAAB2AD61C7A007C91BA /* Joint3DComponent.h */,
 				71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */,
 				71CC839226B8C49B00EEBB93 /* LightComponent.h */,
+				7126757D2B65F4470031089C /* LinesComponent.h */,
 				7162FC4525962A0E0075B97D /* MeshComponent.h */,
 				71ABBD3E27A879B9001CE3AF /* MeshPolygonComponent.h */,
 				7170A3CA2818A87E0003E965 /* ModelComponent.h */,
@@ -3421,6 +3429,8 @@
 				7170A3CF2818A8A30003E965 /* environment */,
 				71CC839326B8C4D800EEBB93 /* Light.cpp */,
 				71CC839426B8C4D800EEBB93 /* Light.h */,
+				712675802B65F45D0031089C /* Lines.cpp */,
+				7126757F2B65F45D0031089C /* Lines.h */,
 				71E36B5425D5994100EFEED4 /* Mesh.cpp */,
 				71E36B5525D5994100EFEED4 /* Mesh.h */,
 				713E580427BA9CB700376680 /* MeshPolygon.cpp */,
@@ -4271,6 +4281,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				712675812B65F45D0031089C /* Lines.h in Headers */,
 				71D74957296731F200348AB8 /* EntityHandle.h in Headers */,
 				718FDDF72837CA9A00AF314C /* glsl100.h in Headers */,
 				71E54516284D5BE000C68FAB /* RotateTracksComponent.h in Headers */,
@@ -4294,6 +4305,7 @@
 				71ABBD382791167A001CE3AF /* UIComponent.h in Headers */,
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
 				71ABBD1E277A31BA001CE3AF /* Text.h in Headers */,
+				7126757E2B65F4470031089C /* LinesComponent.h in Headers */,
 				71E54505284D5BB700C68FAB /* TranslateTracks.h in Headers */,
 				71EA6DA62AE20B8C00CA9A75 /* CollideShapeResult3D.h in Headers */,
 				71E54517284D5BE000C68FAB /* TranslateTracksComponent.h in Headers */,
@@ -5515,6 +5527,7 @@
 				713D82A2259D307F00567F9F /* Rect.cpp in Sources */,
 				713D82A3259D307F00567F9F /* Quaternion.cpp in Sources */,
 				7185BF9128BAFC2000B82865 /* ActionClassesLua.cpp in Sources */,
+				712675832B65F45D0031089C /* Lines.cpp in Sources */,
 				713D82A4259D307F00567F9F /* AlignedBox.cpp in Sources */,
 				713E580E27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AF25BB18DC00965B51 /* StringUtils.cpp in Sources */,
@@ -5677,6 +5690,7 @@
 				7162FD2D25963AE00075B97D /* Vector2.cpp in Sources */,
 				7162FD2E25963AE00075B97D /* Matrix4.cpp in Sources */,
 				7185BF9028BAFC2000B82865 /* ActionClassesLua.cpp in Sources */,
+				712675822B65F45D0031089C /* Lines.cpp in Sources */,
 				7162FD3125963AE00075B97D /* Ray.cpp in Sources */,
 				713E580D27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AE25BB18DC00965B51 /* StringUtils.cpp in Sources */,
