@@ -39,6 +39,7 @@ Scene::Scene(){
 	registerComponent<AlphaActionComponent>();
 	registerComponent<ParticlesComponent>();
 	registerComponent<ParticlesAnimationComponent>();
+	registerComponent<LinesComponent>();
 	registerComponent<TextComponent>();
 	registerComponent<UIComponent>();
 	registerComponent<ImageComponent>();

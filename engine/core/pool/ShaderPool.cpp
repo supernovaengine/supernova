@@ -88,10 +88,10 @@ std::string ShaderPool::getShaderStr(ShaderType shaderType, std::string properti
 		str = "ui";
 	}else if (shaderType == ShaderType::DEPTH){
 		str = "depth";
-	}else if (shaderType == ShaderType::LINES){
-		str = "lines";
 	}else if (shaderType == ShaderType::POINTS){
 		str = "points";
+	}else if (shaderType == ShaderType::LINES){
+		str = "lines";
 	}
 
 	if (str.empty())
@@ -236,6 +236,17 @@ std::string ShaderPool::getPointsProperties(bool texture, bool vertexColorVec3, 
 		prop += "Vc4";
 	if (textureRect)
 		prop += "Txr";
+
+	return prop;
+}
+
+std::string ShaderPool::getLinesProperties(bool vertexColorVec3, bool vertexColorVec4){
+	std::string prop;
+
+	if (vertexColorVec3)
+		prop += "Vc3";
+	if (vertexColorVec4)
+		prop += "Vc4";
 
 	return prop;
 }

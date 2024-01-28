@@ -84,24 +84,13 @@ namespace Supernova{
         UI_VS_PARAMS,
         UI_FS_PARAMS,
         POINTS_VS_PARAMS,
+        LINES_VS_PARAMS,
         VS_SKINNING,
         DEPTH_VS_SKINNING,
         VS_MORPHTARGET,
         DEPTH_VS_MORPHTARGET,
         TERRAIN_VS_PARAMS,
         TERRAINNODE_VS_PARAMS
-        /*
-        TERRAINSIZE,
-        TERRAINMAXHEIGHT,
-        TERRAINRESOLUTION,
-        TERRAINNODEPOS,
-        TERRAINNODESIZE,
-        TERRAINNODERANGE,
-        TERRAINNODERESOLUTION,
-        TERRAINTEXTUREBASETILES,
-        TERRAINTEXTUREDETAILTILES,
-        BLENDMAPCOLORINDEX
-        */
     };
 
     enum class TextureShaderType{

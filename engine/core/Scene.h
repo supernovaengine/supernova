@@ -33,6 +33,7 @@
 #include "component/AlphaActionComponent.h"
 #include "component/ParticlesComponent.h"
 #include "component/ParticlesAnimationComponent.h"
+#include "component/LinesComponent.h"
 #include "component/TextComponent.h"
 #include "component/UIComponent.h"
 #include "component/ButtonComponent.h"

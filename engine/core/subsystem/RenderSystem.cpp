@@ -106,6 +106,11 @@ void RenderSystem::destroy(){
 			if (particles.loaded){
 				destroyParticles(entity, particles);
 			}
+		}else if (signature.test(scene->getComponentType<LinesComponent>())){
+			LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
+			if (lines.loaded){
+				destroyLines(entity, lines);
+			}
 		}else if (signature.test(scene->getComponentType<LightComponent>())){
 			LightComponent& light = scene->getComponent<LightComponent>(entity);
 			destroyLight(light);
@@ -1435,6 +1440,53 @@ bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
 	return true;
 }
 
+bool RenderSystem::loadLines(Entity entity, LinesComponent& lines){
+
+	if (!Engine::isViewLoaded()) 
+		return false;
+
+	ObjectRender& render = lines.render;
+
+	render.beginLoad(PrimitiveType::LINES);
+
+	lines.shaderProperties = ShaderPool::getLinesProperties(false, true);
+	lines.shader = ShaderPool::get(ShaderType::LINES, lines.shaderProperties);
+	if (!lines.shader->isCreated())
+		return false;
+	render.addShader(lines.shader.get());
+	ShaderData& shaderData = lines.shader.get()->shaderData;
+
+	lines.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::LINES_VS_PARAMS, ShaderStageType::VERTEX);
+
+	createLines(lines);
+
+	size_t bufferSize = lines.buffer.getSize();
+	size_t minBufferSize = lines.minBufferCount * lines.buffer.getStride();
+	if (minBufferSize > bufferSize)
+		bufferSize = minBufferSize;
+
+	if (bufferSize == 0)
+		return false;
+
+	lines.buffer.getRender()->createBuffer(bufferSize, lines.buffer.getData(), lines.buffer.getType(), lines.buffer.getUsage());
+	if (lines.buffer.isRenderAttributes()) {
+        for (auto const &attr : lines.buffer.getAttributes()) {
+			render.addAttribute(shaderData.getAttrIndex(attr.first), lines.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), lines.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+        }
+    }
+	if (lines.buffer.getUsage() != BufferUsage::IMMUTABLE){
+		lines.needUpdateBuffer = true;
+	}
+
+	render.endLoad(PIP_DEFAULT | PIP_RTT);
+
+	lines.needReload = false;
+	lines.loadCalled = true;
+	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
+
+	return true;
+}
+
 void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture){
 	if (particles.loaded && particles.buffer.getSize() > 0){
 
@@ -1480,6 +1532,42 @@ void RenderSystem::destroyParticles(Entity entity, ParticlesComponent& particles
 
 	//Shaders uniforms
 	particles.slotVSParams = -1;
+
+	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
+}
+
+void RenderSystem::drawLines(LinesComponent& lines, Transform& transform, Transform& camTransform, bool renderToTexture){
+	if (lines.loaded && lines.buffer.getSize() > 0){
+
+		if (lines.needUpdateBuffer){
+			lines.buffer.getRender()->updateBuffer(lines.buffer.getSize(), lines.buffer.getData());
+			lines.needUpdateBuffer = false;
+		}
+
+		ObjectRender& render = lines.render;
+
+		render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
+		render.applyUniformBlock(lines.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
+		render.draw(lines.lines.size() * 2);
+	}
+}
+
+void RenderSystem::destroyLines(Entity entity, LinesComponent& lines){
+	if (!lines.loaded)
+		return;
+
+	//Destroy shader
+	lines.shader.reset();
+	ShaderPool::remove(ShaderType::LINES, lines.shaderProperties);
+
+	//Destroy render
+	lines.render.destroy();
+
+	//Destroy buffer
+	lines.buffer.getRender()->destroyBuffer();
+
+	//Shaders uniforms
+	lines.slotVSParams = -1;
 
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
@@ -1876,6 +1964,24 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
 
 }
 
+void RenderSystem::createLines(LinesComponent& lines){
+
+	lines.buffer.clear();
+	lines.buffer.addAttribute(AttributeType::POSITION, 3);
+	lines.buffer.addAttribute(AttributeType::COLOR, 4);
+
+	Attribute* attVertex = lines.buffer.getAttribute(AttributeType::POSITION);
+	Attribute* attColor = lines.buffer.getAttribute(AttributeType::COLOR);
+
+	for (int i = 0; i < lines.lines.size(); i++){
+		lines.buffer.addVector3(attVertex, lines.lines[i].pointA);
+		lines.buffer.addVector3(attVertex, lines.lines[i].pointB);
+
+		lines.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+		lines.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+}
+
 void RenderSystem::createSky(SkyComponent& sky){
 	sky.buffer.clear();
 	sky.buffer.addAttribute(AttributeType::POSITION, 3);
@@ -2269,6 +2375,11 @@ void RenderSystem::changeLoaded(void* data){
 
 		particles.loaded = true;
 
+	}else if (signature.test(scene->getComponentType<LinesComponent>())){
+		LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
+
+		lines.loaded = true;
+
 	}else if (signature.test(scene->getComponentType<SkyComponent>())){
 		SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
 
@@ -2309,6 +2420,12 @@ void RenderSystem::changeDestroy(void* data){
 
 		particles.loaded = false;
 		particles.loadCalled = false;
+
+	}else if (signature.test(scene->getComponentType<LinesComponent>())){
+		LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
+
+		lines.loaded = false;
+		lines.loadCalled = false;
 
 	}else if (signature.test(scene->getComponentType<SkyComponent>())){
 		SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
@@ -2500,6 +2617,14 @@ void RenderSystem::update(double dt){
 			}
 			if (!particles.loadCalled){
 				loadParticles(entity, particles);
+			}
+		}else if (signature.test(scene->getComponentType<LinesComponent>())){
+			LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
+			if (lines.loaded && lines.needReload){
+				destroyLines(entity, lines);
+			}
+			if (!lines.loadCalled){
+				loadLines(entity, lines);
 			}
 		}
 
@@ -2776,6 +2901,12 @@ void RenderSystem::draw(){
 				if (transform.visible)
 					drawParticles(particles, transform, cameraTransform, camera.renderToTexture);
 
+			}else if (signature.test(scene->getComponentType<LinesComponent>())){
+				LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
+
+				if (transform.visible)
+					drawLines(lines, transform, cameraTransform, camera.renderToTexture);
+
 			}
 
 			if (hasActiveScissor){
@@ -2844,6 +2975,10 @@ void RenderSystem::entityDestroyed(Entity entity){
 
 	if (signature.test(scene->getComponentType<ParticlesComponent>())){
 		destroyParticles(entity, scene->getComponent<ParticlesComponent>(entity));
+	}
+
+	if (signature.test(scene->getComponentType<LinesComponent>())){
+		destroyLines(entity, scene->getComponent<LinesComponent>(entity));
 	}
 
 	if (signature.test(scene->getComponentType<SkyComponent>())){

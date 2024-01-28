@@ -152,6 +152,8 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
         ustr = "u_vs_spriteParams";
     }else if (type == UniformBlockType::POINTS_VS_PARAMS){
         ustr = "u_vs_pointsParams";
+    }else if (type == UniformBlockType::LINES_VS_PARAMS){
+        ustr = "u_vs_linesParams";
     }else if (type == UniformBlockType::VS_SKINNING){
         ustr = "u_vs_skinning";
     }else if (type == UniformBlockType::DEPTH_VS_SKINNING){

@@ -105,6 +105,7 @@
 #include "object/environment/Fog.h"
 #include "object/environment/SkyBox.h"
 #include "object/Light.h"
+#include "object/Lines.h"
 #include "object/Mesh.h"
 #include "object/MeshPolygon.h"
 #include "object/Model.h"

@@ -15,6 +15,7 @@
 #include "component/CameraComponent.h"
 #include "component/LightComponent.h"
 #include "component/ParticlesComponent.h"
+#include "component/LinesComponent.h"
 #include "component/TerrainComponent.h"
 #include "component/SpriteComponent.h"
 #include "component/Transform.h"
@@ -124,6 +125,9 @@ namespace Supernova{
 		AlignedBox getTerrainNodeAlignedBox(Transform& transform, TerrainNode& terrainNode);
 		bool isTerrainNodeInSphere(Vector3 position, float radius, const AlignedBox& box);
 
+		// lines
+		void createLines(LinesComponent& lines);
+
 		// sky
 		void createSky(SkyComponent& sky);
 
@@ -145,6 +149,9 @@ namespace Supernova{
 		void drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void destroyParticles(Entity entity, ParticlesComponent& particles);
 
+		void drawLines(LinesComponent& lines, Transform& transform, Transform& camTransform, bool renderToTexture);
+		void destroyLines(Entity entity, LinesComponent& lines);
+
 		void drawSky(SkyComponent& sky, bool renderToTexture);
 		void destroySky(Entity entity, SkyComponent& sky);
 
@@ -165,6 +172,7 @@ namespace Supernova{
 		bool loadMesh(Entity entity, MeshComponent& mesh);
 		bool loadTerrain(Entity entity, TerrainComponent& terrain);
 		bool loadParticles(Entity entity, ParticlesComponent& particles);
+		bool loadLines(Entity entity, LinesComponent& lines);
 		bool loadUI(Entity entity, UIComponent& uirender, bool isText);
 		bool loadSky(Entity entity, SkyComponent& sky);
 
