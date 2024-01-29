@@ -24,6 +24,7 @@
 #include "Model.h"
 #include "MeshPolygon.h"
 #include "Particles.h"
+#include "Lines.h"
 #include "Sprite.h"
 #include "Text.h"
 #include "Image.h"
@@ -422,6 +423,23 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTexture", 
             luabridge::overload<std::string>(&Particles::setTexture),
             luabridge::overload<Framebuffer*>(&Particles::setTexture))
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Lines, Object>("Lines")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("addLine", 
+            luabridge::overload<Vector3, Vector3>(&Lines::addLine),
+            luabridge::overload<Vector3, Vector3, Vector3>(&Lines::addLine),
+            luabridge::overload<Vector3, Vector3, Vector4>(&Lines::addLine),
+            luabridge::overload<Vector3, Vector3, Vector4, Vector4>(&Lines::addLine))
+        .addFunction("getLine", &Lines::getLine)
+        .addFunction("setLine", &Lines::setLine)
+        .addFunction("setLinePointA", &Lines::setLinePointA)
+        .addFunction("setLinePointB", &Lines::setLinePointB)
+        .addFunction("setLineColorA", &Lines::setLineColorA)
+        .addFunction("setLineColorB", &Lines::setLineColorB)
+        .addFunction("clearLines", &Lines::clearLines)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

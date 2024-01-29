@@ -8,16 +8,17 @@ namespace Supernova{
 
     struct LineData{
         Vector3 pointA = Vector3(0,0,0);
+        Vector4 colorA = Vector4(1,1,1,1);
+
         Vector3 pointB = Vector3(0,0,0);
+        Vector4 colorB = Vector4(1,1,1,1);
     };
 
     struct LinesComponent{
         bool loaded = false;
         bool loadCalled = false;
 
-        InterleavedBuffer buffer;
-
-        unsigned int minBufferCount = 0;
+        ExternalBuffer buffer;
 
         std::vector<LineData> lines;
 
@@ -26,7 +27,6 @@ namespace Supernova{
         std::string shaderProperties;
         int slotVSParams = -1;
 
-        bool needUpdate = true;
         bool needUpdateBuffer = false;
         bool needReload = false;
     };

@@ -501,6 +501,14 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
+        .beginClass<LineData>("LineData")
+        .addProperty("pointA", &LineData::pointA)
+        .addProperty("pointB", &LineData::pointB)
+        .addProperty("colorA", &LineData::colorA)
+        .addProperty("colorB", &LineData::colorB)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<TilemapComponent>("TilemapComponent")
         .addProperty("width", &TilemapComponent::width)
         .addProperty("height", &TilemapComponent::height)

@@ -1445,6 +1445,9 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines){
 	if (!Engine::isViewLoaded()) 
 		return false;
 
+	if (lines.lines.size() == 0)
+		return false;
+
 	ObjectRender& render = lines.render;
 
 	render.beginLoad(PrimitiveType::LINES);
@@ -1458,12 +1461,16 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines){
 
 	lines.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::LINES_VS_PARAMS, ShaderStageType::VERTEX);
 
-	createLines(lines);
+	lines.buffer.clear();
+	lines.buffer.addAttribute(AttributeType::POSITION, 3, 0);
+	lines.buffer.addAttribute(AttributeType::COLOR, 4, 3 * sizeof(float));
+	lines.buffer.setStride(7 * sizeof(float));
+	lines.buffer.setRenderAttributes(true);
+	lines.buffer.setUsage(BufferUsage::DYNAMIC);
+
+	lines.buffer.setData((unsigned char*)(&lines.lines.at(0)), sizeof(LineData)*lines.lines.size());
 
 	size_t bufferSize = lines.buffer.getSize();
-	size_t minBufferSize = lines.minBufferCount * lines.buffer.getStride();
-	if (minBufferSize > bufferSize)
-		bufferSize = minBufferSize;
 
 	if (bufferSize == 0)
 		return false;
@@ -1577,8 +1584,52 @@ bool RenderSystem::loadSky(Entity entity, SkyComponent& sky){
 	if (!Engine::isViewLoaded()) 
 		return false;	
 
-	createSky(sky);
+	sky.buffer.clear();
+	sky.buffer.addAttribute(AttributeType::POSITION, 3);
 
+	Attribute* attVertex = sky.buffer.getAttribute(AttributeType::POSITION);
+
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+
+	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
+
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
+	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
 	ObjectRender* render = &sky.render;
 
 	render->beginLoad(PrimitiveType::TRIANGLES);
@@ -1962,73 +2013,6 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
         return true;
     }
 
-}
-
-void RenderSystem::createLines(LinesComponent& lines){
-
-	lines.buffer.clear();
-	lines.buffer.addAttribute(AttributeType::POSITION, 3);
-	lines.buffer.addAttribute(AttributeType::COLOR, 4);
-
-	Attribute* attVertex = lines.buffer.getAttribute(AttributeType::POSITION);
-	Attribute* attColor = lines.buffer.getAttribute(AttributeType::COLOR);
-
-	for (int i = 0; i < lines.lines.size(); i++){
-		lines.buffer.addVector3(attVertex, lines.lines[i].pointA);
-		lines.buffer.addVector3(attVertex, lines.lines[i].pointB);
-
-		lines.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-		lines.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
-	}
-}
-
-void RenderSystem::createSky(SkyComponent& sky){
-	sky.buffer.clear();
-	sky.buffer.addAttribute(AttributeType::POSITION, 3);
-
-	Attribute* attVertex = sky.buffer.getAttribute(AttributeType::POSITION);
-
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-
-	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f,  1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f,  1.0f, -1.0f));
-
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f, -1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(-1.0f, -1.0f,  1.0f));
-	sky.buffer.addVector3(attVertex, Vector3(1.0f, -1.0f,  1.0f));
 }
 
 void RenderSystem::updateCameraSize(Entity entity){
