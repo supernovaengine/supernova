@@ -191,6 +191,9 @@ def create_c_header(engine_root):
         headerfile.write("\n\n")
         headerfile.write("#include <string>")
         headerfile.write("\n\n")
+
+        filesshaderlist[lang].sort()
+
         for file in filesshaderlist[lang]:
             sbsfile = open(file, "rb")
             encodedShader = base64.b64encode(sbsfile.read()).decode("utf-8")
