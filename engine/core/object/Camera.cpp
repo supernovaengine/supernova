@@ -367,8 +367,8 @@ void Camera::moveForward(float distance){
 
         viewCenter.normalize();
 
-        camera.view = camera.view + (viewCenter.normalize() * distance);
-        transf.position = transf.position + (viewCenter.normalize() * distance);
+        camera.view = camera.view + (viewCenter * distance);
+        transf.position = transf.position + (viewCenter * distance);
 
         transf.needUpdate = true;
         camera.needUpdate = true;
@@ -386,8 +386,10 @@ void Camera::walkForward(float distance){
 
         Vector3 walkVector = viewCenter - aux;
 
-        camera.view = camera.view + (walkVector.normalize() * distance);
-        transf.position = transf.position + (walkVector.normalize() * distance);
+        walkVector.normalize();
+
+        camera.view = camera.view + (walkVector * distance);
+        transf.position = transf.position + (walkVector * distance);
 
         transf.needUpdate = true;
         camera.needUpdate = true;
@@ -403,8 +405,10 @@ void Camera::slide(float distance){
 
         Vector3 slideVector = viewCenter.crossProduct(camera.up);
 
-        camera.view = camera.view + (slideVector.normalize() * distance);
-        transf.position = transf.position + (slideVector.normalize() * distance);
+        slideVector.normalize();
+
+        camera.view = camera.view + (slideVector * distance);
+        transf.position = transf.position + (slideVector * distance);
 
         transf.needUpdate = true;
         camera.needUpdate = true;
