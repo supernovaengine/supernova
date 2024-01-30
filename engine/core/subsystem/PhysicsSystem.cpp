@@ -604,20 +604,20 @@ void PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
         JPH::VertexList jvertices;
 
         for (auto const& buf : buffers){
-            if (buf.second->isRenderAttributes()) {
-                if (buf.second->getType() == BufferType::INDEX_BUFFER){
-                    int indicesize = int(buf.second->getCount() / 3);
-                    Attribute* attIndex = buf.second->getAttribute(AttributeType::INDEX);
-                    if (attIndex){
-                        jindices.resize(indicesize);
-                        for (int i = 0; i < indicesize; i++){
-                            for (int j = 0; j < 3; j++){
-                                uint16_t indice = buf.second->getUInt16(attIndex, (3*i)+j);
-                                jindices[i].mIdx[j] = indice;
-                            }
+            if (buf.second->getType() == BufferType::INDEX_BUFFER){
+                int indicesize = int(buf.second->getCount() / 3);
+                Attribute* attIndex = buf.second->getAttribute(AttributeType::INDEX);
+                if (attIndex){
+                    jindices.resize(indicesize);
+                    for (int i = 0; i < indicesize; i++){
+                        for (int j = 0; j < 3; j++){
+                            uint16_t indice = buf.second->getUInt16(attIndex, (3*i)+j);
+                            jindices[i].mIdx[j] = indice;
                         }
                     }
-                }else{
+                }
+            }else{
+                if (buf.second->isRenderAttributes()) {
                     int verticesize = int(buf.second->getCount());
                     Attribute* attVertex = buf.second->getAttribute(AttributeType::POSITION);
                     if (attVertex){
