@@ -14,6 +14,8 @@ namespace Supernova {
 
         float w, x, y, z;
 
+        static const Quaternion IDENTITY;
+
         Quaternion();
         Quaternion( const float fW, const float fX, const float fY, const float fZ );
         explicit Quaternion( float* const r );

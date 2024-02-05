@@ -79,6 +79,10 @@ Object Body2D::getAttachedObject(){
     return Object(scene, entity);
 }
 
+void Body2D::load(){
+    scene->getSystem<PhysicsSystem>()->loadBody2D(entity);
+}
+
 int Body2D::createRectShape(float width, float height){
     int index = scene->getSystem<PhysicsSystem>()->createRectShape2D(entity, width, height);
     return index;

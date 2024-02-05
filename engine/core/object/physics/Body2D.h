@@ -29,6 +29,8 @@ namespace Supernova{
 
         Object getAttachedObject();
 
+        void load();
+
         int createRectShape(float width, float height);
         int createCenteredRectShape(float width, float height);
         int createCenteredRectShape(float width, float height, Vector2 center, float angle);

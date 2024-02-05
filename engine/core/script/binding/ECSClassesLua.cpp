@@ -149,15 +149,18 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("createCylinderShape3D", &PhysicsSystem::createCylinderShape3D)
         .addFunction("createConvexHullShape3D", &PhysicsSystem::createConvexHullShape3D)
         .addFunction("createMeshShape3D", 
-            luabridge::overload<Entity , std::vector<Vector3>, std::vector<uint16_t>>(&PhysicsSystem::createMeshShape3D),
+            luabridge::overload<Entity, Vector3, Quaternion, std::vector<Vector3>, std::vector<uint16_t>>(&PhysicsSystem::createMeshShape3D),
             luabridge::overload<Entity, MeshComponent&>(&PhysicsSystem::createMeshShape3D))
         .addFunction("createHeightFieldShape3D", &PhysicsSystem::createHeightFieldShape3D)
 
         .addFunction("loadBody2D", &PhysicsSystem::loadBody2D)
         .addFunction("destroyBody2D", &PhysicsSystem::destroyBody2D)
+        .addFunction("loadBody3D", &PhysicsSystem::loadBody3D)
         .addFunction("destroyBody3D", &PhysicsSystem::destroyBody3D)
         .addFunction("loadShape2D", &PhysicsSystem::loadShape2D)
         .addFunction("destroyShape2D", &PhysicsSystem::destroyShape2D)
+        .addFunction("loadShape3D", &PhysicsSystem::loadShape3D)
+        .addFunction("destroyShape3D", &PhysicsSystem::destroyShape3D)
 
         .addFunction("loadDistanceJoint2D", &PhysicsSystem::loadDistanceJoint2D)
         .addFunction("loadRevoluteJoint2D", &PhysicsSystem::loadRevoluteJoint2D)

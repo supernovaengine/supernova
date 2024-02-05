@@ -29,18 +29,26 @@ namespace Supernova{
 
         Object getAttachedObject();
 
-        void createBoxShape(float width, float height, float depth);
-        void createSphereShape(float radius);
-        void createCapsuleShape(float halfHeight, float radius);
-        void createTaperedCapsuleShape(float halfHeight, float topRadius, float bottomRadius);
-        void createCylinderShape(float halfHeight, float radius);
-        void createConvexHullShape(std::vector<Vector3> vertices);
-        void createMeshShape();
-        void createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices);
-        void createHeightFieldShape();
-        void createHeightFieldShape(unsigned int samplesSize);
-        //TODO: missing compound shapes
-        // StaticCompoundShape
+        void load();
+
+        int createBoxShape(float width, float height, float depth);
+        int createBoxShape(Vector3 position, Quaternion rotation, float width, float height, float depth);
+        int createSphereShape(float radius);
+        int createSphereShape(Vector3 position, Quaternion rotation, float radius);
+        int createCapsuleShape(float halfHeight, float radius);
+        int createCapsuleShape(Vector3 position, Quaternion rotation, float halfHeight, float radius);
+        int createTaperedCapsuleShape(float halfHeight, float topRadius, float bottomRadius);
+        int createTaperedCapsuleShape(Vector3 position, Quaternion rotation, float halfHeight, float topRadius, float bottomRadius);
+        int createCylinderShape(float halfHeight, float radius);
+        int createCylinderShape(Vector3 position, Quaternion rotation, float halfHeight, float radius);
+        int createConvexHullShape(std::vector<Vector3> vertices);
+        int createConvexHullShape(Vector3 position, Quaternion rotation, std::vector<Vector3> vertices);
+        int createMeshShape();
+        int createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices);
+        int createMeshShape(Vector3 position, Quaternion rotation, std::vector<Vector3> vertices, std::vector<uint16_t> indices);
+        int createHeightFieldShape();
+        int createHeightFieldShape(unsigned int samplesSize);
+        //TODO:
         // MutableCompoundShape
 
         void setType(BodyType type);

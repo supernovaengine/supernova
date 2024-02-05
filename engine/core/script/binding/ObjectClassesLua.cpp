@@ -82,6 +82,18 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("CollisionShape3DType")
+        .addVariable("SPHERE", CollisionShape3DType::SPHERE)
+        .addVariable("BOX", CollisionShape3DType::BOX)
+        .addVariable("CAPSULE", CollisionShape3DType::CAPSULE)
+        .addVariable("TAPERED_CAPSULE", CollisionShape3DType::TAPERED_CAPSULE)
+        .addVariable("CYLINDER", CollisionShape3DType::CYLINDER)
+        .addVariable("CONVEX_HULL", CollisionShape3DType::CONVEX_HULL)
+        .addVariable("MESH", CollisionShape3DType::MESH)
+        .addVariable("HEIGHTFIELD", CollisionShape3DType::HEIGHTFIELD)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginNamespace("BodyType")
         .addVariable("STATIC", BodyType::STATIC)
         .addVariable("KINEMATIC", BodyType::KINEMATIC)
@@ -778,15 +790,28 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<Body3D, EntityHandle>("Body3D")
         .addConstructor <void (Scene*, Entity)> ()
         .addFunction("getAttachedObject", &Body3D::getAttachedObject)
-        .addFunction("createBoxShape", &Body3D::createBoxShape)
-        .addFunction("createSphereShape", &Body3D::createSphereShape)
-        .addFunction("createCapsuleShape", &Body3D::createCapsuleShape)
-        .addFunction("createTaperedCapsuleShape", &Body3D::createTaperedCapsuleShape)
-        .addFunction("createCylinderShape", &Body3D::createCylinderShape)
-        .addFunction("createConvexHullShape", &Body3D::createConvexHullShape)
+        .addFunction("createBoxShape", 
+            luabridge::overload<float, float, float>(&Body3D::createBoxShape),
+            luabridge::overload<Vector3, Quaternion, float, float, float>(&Body3D::createBoxShape))
+        .addFunction("createSphereShape", 
+            luabridge::overload<float>(&Body3D::createSphereShape),
+            luabridge::overload<Vector3, Quaternion, float>(&Body3D::createSphereShape))
+        .addFunction("createCapsuleShape", 
+            luabridge::overload<float, float>(&Body3D::createCapsuleShape),
+            luabridge::overload<Vector3, Quaternion, float, float>(&Body3D::createCapsuleShape))
+        .addFunction("createTaperedCapsuleShape", 
+            luabridge::overload<float, float, float>(&Body3D::createTaperedCapsuleShape),
+            luabridge::overload<Vector3, Quaternion, float, float, float>(&Body3D::createTaperedCapsuleShape))
+        .addFunction("createCylinderShape", 
+            luabridge::overload<float, float>(&Body3D::createCylinderShape),
+            luabridge::overload<Vector3, Quaternion, float, float>(&Body3D::createCylinderShape))
+        .addFunction("createConvexHullShape", 
+            luabridge::overload<std::vector<Vector3>>(&Body3D::createConvexHullShape),
+            luabridge::overload<Vector3, Quaternion, std::vector<Vector3>>(&Body3D::createConvexHullShape))
         .addFunction("createMeshShape", 
             luabridge::overload<>(&Body3D::createMeshShape),
-            luabridge::overload<std::vector<Vector3>, std::vector<uint16_t>>(&Body3D::createMeshShape))
+            luabridge::overload<std::vector<Vector3>, std::vector<uint16_t>>(&Body3D::createMeshShape),
+            luabridge::overload<Vector3, Quaternion, std::vector<Vector3>, std::vector<uint16_t>>(&Body3D::createMeshShape))
         .addFunction("createHeightFieldShape", 
             luabridge::overload<>(&Body3D::createHeightFieldShape),
             luabridge::overload<unsigned int>(&Body3D::createHeightFieldShape))

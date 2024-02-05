@@ -62,44 +62,76 @@ Object Body3D::getAttachedObject(){
     return Object(scene, entity);
 }
 
-void Body3D::createBoxShape(float width, float height, float depth){
-    scene->getSystem<PhysicsSystem>()->createBoxShape3D(entity, width, height, depth);
+void Body3D::load(){
+    scene->getSystem<PhysicsSystem>()->loadBody3D(entity);
 }
 
-void Body3D::createSphereShape(float radius){
-    scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity, radius);
+int Body3D::createBoxShape(float width, float height, float depth){
+    return scene->getSystem<PhysicsSystem>()->createBoxShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, width, height, depth);
 }
 
-void Body3D::createCapsuleShape(float halfHeight, float radius){
-    scene->getSystem<PhysicsSystem>()->createCapsuleShape3D(entity, halfHeight, radius);
+int Body3D::createBoxShape(Vector3 position, Quaternion rotation, float width, float height, float depth){
+    return scene->getSystem<PhysicsSystem>()->createBoxShape3D(entity, position, rotation, width, height, depth);
 }
 
-void Body3D::createTaperedCapsuleShape(float halfHeight, float topRadius, float bottomRadius){
-    scene->getSystem<PhysicsSystem>()->createTaperedCapsuleShape3D(entity, halfHeight, topRadius, bottomRadius);
+int Body3D::createSphereShape(float radius){
+    return scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, radius);
 }
 
-void Body3D::createCylinderShape(float halfHeight, float radius){
-    scene->getSystem<PhysicsSystem>()->createCylinderShape3D(entity, halfHeight, radius);
+int Body3D::createSphereShape(Vector3 position, Quaternion rotation, float radius){
+    return scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity, position, rotation, radius);
 }
 
-void Body3D::createConvexHullShape(std::vector<Vector3> vertices){
-    scene->getSystem<PhysicsSystem>()->createConvexHullShape3D(entity, vertices);
+int Body3D::createCapsuleShape(float halfHeight, float radius){
+    return scene->getSystem<PhysicsSystem>()->createCapsuleShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, halfHeight, radius);
 }
 
-void Body3D::createMeshShape(){
-    scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, getComponent<MeshComponent>());
+int Body3D::createCapsuleShape(Vector3 position, Quaternion rotation, float halfHeight, float radius){
+    return scene->getSystem<PhysicsSystem>()->createCapsuleShape3D(entity, position, rotation, halfHeight, radius);
 }
 
-void Body3D::createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices){
-    scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, vertices, indices);
+int Body3D::createTaperedCapsuleShape(float halfHeight, float topRadius, float bottomRadius){
+    return scene->getSystem<PhysicsSystem>()->createTaperedCapsuleShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, halfHeight, topRadius, bottomRadius);
 }
 
-void Body3D::createHeightFieldShape(){
-    scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>(), 0);
+int Body3D::createTaperedCapsuleShape(Vector3 position, Quaternion rotation, float halfHeight, float topRadius, float bottomRadius){
+    return scene->getSystem<PhysicsSystem>()->createTaperedCapsuleShape3D(entity, position, rotation, halfHeight, topRadius, bottomRadius);
 }
 
-void Body3D::createHeightFieldShape(unsigned int samplesSize){
-    scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>(), samplesSize);
+int Body3D::createCylinderShape(float halfHeight, float radius){
+    return scene->getSystem<PhysicsSystem>()->createCylinderShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, halfHeight, radius);
+}
+
+int Body3D::createCylinderShape(Vector3 position, Quaternion rotation, float halfHeight, float radius){
+    return scene->getSystem<PhysicsSystem>()->createCylinderShape3D(entity, position, rotation, halfHeight, radius); 
+}
+
+int Body3D::createConvexHullShape(std::vector<Vector3> vertices){
+    return scene->getSystem<PhysicsSystem>()->createConvexHullShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, vertices);
+}
+
+int Body3D::createConvexHullShape(Vector3 position, Quaternion rotation, std::vector<Vector3> vertices){
+    return scene->getSystem<PhysicsSystem>()->createConvexHullShape3D(entity, position, rotation, vertices);
+}
+
+int Body3D::createMeshShape(){
+    return scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, getComponent<MeshComponent>());
+}
+
+int Body3D::createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices){
+    return scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, vertices, indices);
+}
+
+int Body3D::createMeshShape(Vector3 position, Quaternion rotation, std::vector<Vector3> vertices, std::vector<uint16_t> indices){
+    return scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, position, rotation, vertices, indices);
+}
+
+int Body3D::createHeightFieldShape(){
+    return scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>(), 0);
+}
+
+int Body3D::createHeightFieldShape(unsigned int samplesSize){
+    return scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>(), samplesSize);
 }
 
 void Body3D::setType(BodyType type){

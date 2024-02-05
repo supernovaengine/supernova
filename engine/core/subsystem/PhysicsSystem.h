@@ -26,6 +26,7 @@ namespace JPH{
 	class PhysicsSystem;
 	class TempAllocatorImpl;
 	class JobSystemThreadPool;
+	class ShapeSettings;
 };
 class BPLayerInterfaceImpl;
 class ObjectVsBroadPhaseLayerFilterImpl;
@@ -111,15 +112,15 @@ namespace Supernova{
 		void createBody3D(Entity entity);
 		void removeBody3D(Entity entity);
 
-		void createBoxShape3D(Entity entity, float width, float height, float depth);
-		void createSphereShape3D(Entity entity, float radius);
-		void createCapsuleShape3D(Entity entity, float halfHeight, float radius);
-		void createTaperedCapsuleShape3D(Entity entity, float halfHeight, float topRadius, float bottomRadius);
-		void createCylinderShape3D(Entity entity, float halfHeight, float radius);
-		void createConvexHullShape3D(Entity entity, std::vector<Vector3> vertices);
-		void createMeshShape3D(Entity entity, std::vector<Vector3> vertices, std::vector<uint16_t> indices);
-		void createMeshShape3D(Entity entity, MeshComponent& mesh);
-		void createHeightFieldShape3D(Entity entity, TerrainComponent& terrain, unsigned int samplesSize);
+		int createBoxShape3D(Entity entity, Vector3 position, Quaternion rotation, float width, float height, float depth);
+		int createSphereShape3D(Entity entity, Vector3 position, Quaternion rotation, float radius);
+		int createCapsuleShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float radius);
+		int createTaperedCapsuleShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float topRadius, float bottomRadius);
+		int createCylinderShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float radius);
+		int createConvexHullShape3D(Entity entity, Vector3 position, Quaternion rotation, std::vector<Vector3> vertices);
+		int createMeshShape3D(Entity entity, Vector3 position, Quaternion rotation, std::vector<Vector3> vertices, std::vector<uint16_t> indices);
+		int createMeshShape3D(Entity entity, MeshComponent& mesh);
+		int createHeightFieldShape3D(Entity entity, TerrainComponent& terrain, unsigned int samplesSize);
 
 		b2World* getWorld2D() const;
 		JPH::PhysicsSystem* getWorld3D() const;
@@ -129,10 +130,14 @@ namespace Supernova{
 		bool loadBody2D(Entity entity);
 		void destroyBody2D(Body2DComponent& body);
 
+		bool loadBody3D(Entity entity);
 		void destroyBody3D(Body3DComponent& body);
 
-		bool loadShape2D(Body2DComponent& body, b2Shape* shape, size_t index);
+		int loadShape2D(Body2DComponent& body, b2Shape* shape);
 		void destroyShape2D(Body2DComponent& body, size_t index);
+
+		int loadShape3D(Body3DComponent& body, const Vector3& position, const Quaternion& rotation, JPH::ShapeSettings* shapeSettings);
+		void destroyShape3D(Body3DComponent& body, size_t index);
 
 		bool loadDistanceJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB);
 		bool loadRevoluteJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor);

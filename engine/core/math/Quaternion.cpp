@@ -12,6 +12,8 @@
 
 using namespace Supernova;
 
+const Quaternion Quaternion::IDENTITY( 1, 0, 0, 0 );
+
 Quaternion::Quaternion()
     : w(1), x(0), y(0), z(0){
 }
