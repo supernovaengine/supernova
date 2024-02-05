@@ -18,6 +18,9 @@ namespace Supernova{
     class Object;
 
     class Body3D: public EntityHandle{
+    protected:
+        void checkBody(const Body3DComponent& body) const;
+
     public:
         Body3D(Scene* scene, Entity entity);
         virtual ~Body3D();

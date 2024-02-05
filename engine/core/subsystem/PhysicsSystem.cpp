@@ -851,7 +851,7 @@ int PhysicsSystem::loadShape3D(Body3DComponent& body, const Vector3& position, c
 
 void PhysicsSystem::destroyShape3D(Body3DComponent& body, size_t index){
     if (world3D && body.shapes[index].shape){
-        delete body.shapes[index].shape;
+        body.shapes[index].shape->Release();
 
         body.shapes[index].shape = NULL;
     }

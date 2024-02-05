@@ -17,6 +17,9 @@ namespace Supernova{
     class Object;
 
     class Body2D: public EntityHandle{
+    protected:
+        void checkBody(const Body2DComponent& body) const;
+
     public:
         Body2D(Scene* scene, Entity entity);
         virtual ~Body2D();

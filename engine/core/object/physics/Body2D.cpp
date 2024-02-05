@@ -57,9 +57,17 @@ Body2D& Body2D::operator=(const Body2D& rhs){
     return *this;
 }
 
+void Body2D::checkBody(const Body2DComponent& body) const{
+    if (!body.body){
+        Log::error("Body2D is not loaded");
+        throw std::runtime_error("Body2D is not loaded");;
+    }
+}
+
 b2Body* Body2D::getBox2DBody() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body;
 }
 
@@ -228,72 +236,84 @@ void Body2D::setLinearVelocity(Vector2 linearVelocity){
     Body2DComponent& body = getComponent<Body2DComponent>();
     float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
+    checkBody(body);
     body.body->SetLinearVelocity(b2Vec2(linearVelocity.x * pointsToMeterScale, linearVelocity.y * pointsToMeterScale));
 }
 
 void Body2D::setAngularVelocity(float angularVelocity){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->SetAngularVelocity(angularVelocity);
 }
 
 void Body2D::setLinearDamping(float linearDamping){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->SetLinearDamping(linearDamping);
 }
 
 void Body2D::setAngularDamping(float angularDamping){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->SetAngularDamping(angularDamping);
 }
 
 void Body2D::setAllowSleep(bool allowSleep){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->SetSleepingAllowed(allowSleep);
 }
 
 void Body2D::setAwake(bool awake){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->SetAwake(awake);
 }
 
 void Body2D::setFixedRotation(bool fixedRotation){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->SetFixedRotation(fixedRotation);
 }
 
 void Body2D::setBullet(bool bullet){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->SetBullet(bullet);
 }
 
 void Body2D::setType(BodyType type){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->SetType(getBodyTypeToB2(type));
 }
 
 void Body2D::setEnabled(bool enabled){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->SetEnabled(enabled);
 }
 
 void Body2D::setGravityScale(float gravityScale){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->SetGravityScale(gravityScale);
 }
 
 Vector2 Body2D::getLinearVelocity() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
     b2Vec2 vec = body.body->GetLinearVelocity();
 
@@ -303,60 +323,70 @@ Vector2 Body2D::getLinearVelocity() const{
 float Body2D::getAngularVelocity() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->GetAngularVelocity();
 }
 
 float Body2D::getLinearDamping() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->GetLinearDamping();
 }
 
 float Body2D::getAngularDamping() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->GetAngularDamping();
 }
 
 bool Body2D::isAllowSleep() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->IsSleepingAllowed();
 }
 
 bool Body2D::isAwake() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->IsAwake();
 }
 
 bool Body2D::isFixedRotation() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->IsFixedRotation();
 }
 
 bool Body2D::isBullet() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->IsBullet();
 }
 
 BodyType Body2D::getType() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return getB2ToBodyType(body.body->GetType());
 }
 
 bool Body2D::isEnabled() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->IsEnabled();
 }
 
 float Body2D::getGravityScale() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->GetGravityScale();
 }
 
@@ -465,12 +495,14 @@ int16_t Body2D::getGroupIndexFilter(size_t shapeIndex) const{
 float Body2D::getMass() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->GetMass();
 }
 
 float Body2D::getInertia() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     return body.body->GetInertia();
 }
 
@@ -478,6 +510,7 @@ Vector2 Body2D::getLinearVelocityFromWorldPoint(Vector2 worldPoint) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
     float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
+    checkBody(body);
     b2Vec2 ret = body.body->GetLinearVelocityFromWorldPoint(b2Vec2(worldPoint.x / pointsToMeterScale, worldPoint.y / pointsToMeterScale));
 
     return Vector2(ret.x * pointsToMeterScale, ret.y * pointsToMeterScale);
@@ -486,6 +519,7 @@ Vector2 Body2D::getLinearVelocityFromWorldPoint(Vector2 worldPoint) const{
 void Body2D::resetMassData(){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->ResetMassData();
 }
 
@@ -493,18 +527,21 @@ void Body2D::applyForce(const Vector2& force, const Vector2& point, bool wake){
     Body2DComponent& body = getComponent<Body2DComponent>();
     float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
+    checkBody(body);
     body.body->ApplyForce(b2Vec2(force.x, force.y), b2Vec2(point.x / pointsToMeterScale, point.y / pointsToMeterScale), wake);
 }
 
 void Body2D::applyForceToCenter(const Vector2& force, bool wake){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->ApplyForceToCenter(b2Vec2(force.x, force.y), wake);
 }
 
 void Body2D::applyTorque(float torque, bool wake){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->ApplyTorque(torque, wake);
 }
 
@@ -512,18 +549,21 @@ void Body2D::applyLinearImpulse(const Vector2& impulse, const Vector2& point, bo
     Body2DComponent& body = getComponent<Body2DComponent>();
     float pointsToMeterScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
+    checkBody(body);
     body.body->ApplyLinearImpulse(b2Vec2(impulse.x, impulse.y), b2Vec2(point.x / pointsToMeterScale, point.y / pointsToMeterScale), wake);
 }
 
 void Body2D::applyLinearImpulseToCenter(const Vector2& impulse, bool wake){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->ApplyLinearImpulseToCenter(b2Vec2(impulse.x, impulse.y), wake);
 }
 
 void Body2D::applyAngularImpulse(float impulse, bool wake){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    checkBody(body);
     body.body->ApplyAngularImpulse(impulse, wake);
 }
 
