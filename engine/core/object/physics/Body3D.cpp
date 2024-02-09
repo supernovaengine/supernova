@@ -9,6 +9,8 @@
 #include "component/Body3DComponent.h"
 #include "util/JoltPhysicsAux.h"
 
+#include <iostream>
+
 using namespace Supernova;
 
 JPH::EMotionType getBodyTypeToJolt(BodyType type){
@@ -141,6 +143,46 @@ int Body3D::createHeightFieldShape(){
 
 int Body3D::createHeightFieldShape(unsigned int samplesSize){
     return scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>(), samplesSize);
+}
+
+void Body3D::setShapeDensity(float density){
+    setShapeDensity(0, density);
+}
+
+void Body3D::setShapeDensity(size_t index, float density){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    if (index >= 0 && index < body.numShapes){
+        JPH::ConvexShape* shape = dynamic_cast<JPH::ConvexShape*>(body.shapes[index].shape);
+        if (shape){
+            shape->SetDensity(density);
+        }else{
+            Log::warn("The shape %i does not have density", index);
+        }
+    }else{
+        Log::error("Cannot find shape %i of body", index);
+    }
+}
+
+float Body3D::getShapeDensity() const{
+    return getShapeDensity(0);
+}
+
+float Body3D::getShapeDensity(size_t index) const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    if (index >= 0 && index < body.numShapes){
+        JPH::ConvexShape* shape = dynamic_cast<JPH::ConvexShape*>(body.shapes[index].shape);
+        if (shape){
+            return shape->GetDensity();
+        }else{
+            Log::warn("The shape %i does not have density", index);
+        }
+    }else{
+        Log::error("Cannot find shape %i of body", index);
+    }
+
+    return 0;
 }
 
 void Body3D::setType(BodyType type){

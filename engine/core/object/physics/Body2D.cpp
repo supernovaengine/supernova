@@ -163,7 +163,7 @@ void Body2D::setShapeRestitution(float restitution){
 void Body2D::setShapeDensity(size_t index, float density){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >= 0 && index < MAX_SHAPES){
+    if (index >= 0 && index < body.numShapes){
         body.shapes[index].fixture->SetDensity(density);
         body.body->ResetMassData();
     }else{
@@ -174,7 +174,7 @@ void Body2D::setShapeDensity(size_t index, float density){
 void Body2D::setShapeFriction(size_t index, float friction){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >= 0 && index < MAX_SHAPES){
+    if (index >= 0 && index < body.numShapes){
         body.shapes[index].fixture->SetFriction(friction);
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -184,7 +184,7 @@ void Body2D::setShapeFriction(size_t index, float friction){
 void Body2D::setShapeRestitution(size_t index, float restitution){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >= 0 && index < MAX_SHAPES){
+    if (index >= 0 && index < body.numShapes){
         body.shapes[index].fixture->SetRestitution(restitution);
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -207,7 +207,7 @@ float Body2D::getShapeRestitution() const{
 float Body2D::getShapeDensity(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >= 0 && index < MAX_SHAPES){
+    if (index >= 0 && index < body.numShapes){
         return body.shapes[index].fixture->GetDensity();
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -219,7 +219,7 @@ float Body2D::getShapeDensity(size_t index) const{
 float Body2D::getShapeFriction(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >= 0 && index < MAX_SHAPES){
+    if (index >= 0 && index < body.numShapes){
         return body.shapes[index].fixture->GetFriction();
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -231,7 +231,7 @@ float Body2D::getShapeFriction(size_t index) const{
 float Body2D::getShapeRestitution(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >= 0 && index < MAX_SHAPES){
+    if (index >= 0 && index < body.numShapes){
         return body.shapes[index].fixture->GetRestitution();
     }else{
         Log::error("Cannot find shape %i of body", index);

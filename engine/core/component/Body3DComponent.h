@@ -23,7 +23,7 @@ namespace Supernova{
 
     // shape in jolt
     struct CollisionShape3D{
-        const JPH::Shape* shape = NULL;
+        JPH::Shape* shape = NULL;
         Vector3 position = Vector3::ZERO;
         Quaternion rotation = Quaternion::IDENTITY;
 
