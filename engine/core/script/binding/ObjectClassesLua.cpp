@@ -815,6 +815,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("createHeightFieldShape", 
             luabridge::overload<>(&Body3D::createHeightFieldShape),
             luabridge::overload<unsigned int>(&Body3D::createHeightFieldShape))
+        .addProperty("shapeDensity", &Body3D::getShapeDensity, &Body3D::setShapeDensity)
+        .addFunction("setShapeDensity", 
+            luabridge::overload<float>(&Body3D::setShapeDensity),
+            luabridge::overload<size_t, float>(&Body3D::setShapeDensity))
+        .addFunction("getShapeDensity", 
+            luabridge::overload<>(&Body3D::getShapeDensity),
+            luabridge::overload<size_t>(&Body3D::getShapeDensity))
         .addProperty("type", &Body3D::getType, &Body3D::setType)
         .addFunction("canBeKinematicOrDynamic", &Body3D::canBeKinematicOrDynamic)
         .addFunction("activate", &Body3D::activate)
