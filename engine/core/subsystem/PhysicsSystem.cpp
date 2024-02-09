@@ -810,6 +810,11 @@ int PhysicsSystem::loadShape2D(Body2DComponent& body, b2Shape* shape){
         fixtureDef.shape = shape;
         fixtureDef.userData.pointer = body.numShapes;
 
+        if (!body.body){
+            Log::error("Cannot create 2D body shape without loaded body");
+            return -1;
+        }
+
         body.shapes[body.numShapes].fixture = body.body->CreateFixture(&fixtureDef);
 
         body.numShapes++;
