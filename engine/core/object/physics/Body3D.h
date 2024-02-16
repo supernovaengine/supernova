@@ -72,6 +72,17 @@ namespace Supernova{
         bool isSensor() const;
         void setIsSensor(bool sensor);
 
+        void setAllowedAllMotion();
+        void setAllowedOnlyTranslation();
+        void setAllowedOnlyRotation();
+        void setAllowedOnly2DPlane();
+
+        float getMass() const;
+        void setMass(float mass);
+
+        float getGravityFactor() const;
+        void setGravityFactor(float gravityFactor);
+
         unsigned int getCollisionGroupID() const;
         void setCollisionGroupID(unsigned int group);
 

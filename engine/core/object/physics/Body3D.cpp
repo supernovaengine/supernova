@@ -259,6 +259,72 @@ void Body3D::setIsSensor(bool sensor){
     body.body->SetIsSensor(sensor);
 }
 
+void Body3D::setAllowedAllMotion(){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+
+    body.body->GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::All, body.body->GetShape()->GetMassProperties());
+}
+
+void Body3D::setAllowedOnlyTranslation(){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+
+    body.body->GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::TranslationX | JPH::EAllowedDOFs::TranslationY | JPH::EAllowedDOFs::TranslationZ, body.body->GetShape()->GetMassProperties());
+}
+
+void Body3D::setAllowedOnlyRotation(){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+
+    body.body->GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::RotationX | JPH::EAllowedDOFs::RotationZ | JPH::EAllowedDOFs::RotationZ, body.body->GetShape()->GetMassProperties());
+}
+
+void Body3D::setAllowedOnly2DPlane(){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+
+    body.body->GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::Plane2D, body.body->GetShape()->GetMassProperties());
+}
+
+float Body3D::getMass() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+
+    return body.body->GetShape()->GetMassProperties().mMass;
+}
+
+void Body3D::setMass(float mass){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+
+    JPH::MassProperties massProperties = body.body->GetShape()->GetMassProperties();
+    massProperties.mMass = mass;
+    body.body->GetMotionProperties()->SetMassProperties(body.body->GetMotionProperties()->GetAllowedDOFs(), massProperties);
+}
+
+float Body3D::getGravityFactor() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+
+    return body.body->GetMotionProperties()->GetGravityFactor();
+}
+
+void Body3D::setGravityFactor(float gravityFactor){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+
+    body.body->GetMotionProperties()->SetGravityFactor(gravityFactor);
+}
+
 unsigned int Body3D::getCollisionGroupID() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
