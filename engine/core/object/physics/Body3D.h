@@ -77,6 +77,13 @@ namespace Supernova{
         void setAllowedOnlyRotation();
         void setAllowedOnly2DPlane();
 
+        void addAllowedTransactionX();
+        void addAllowedTransactionY();
+        void addAllowedTransactionZ();
+        void addAllowedRotationX();
+        void addAllowedRotationY();
+        void addAllowedRotationZ();
+
         float getMass() const;
         void setMass(float mass);
 
