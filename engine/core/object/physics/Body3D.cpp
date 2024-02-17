@@ -259,7 +259,7 @@ void Body3D::setIsSensor(bool sensor){
     body.body->SetIsSensor(sensor);
 }
 
-void Body3D::setAllowedAllMotion(){
+void Body3D::setAllowedDOFsAll(){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
@@ -267,23 +267,7 @@ void Body3D::setAllowedAllMotion(){
     body.body->GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::All, body.body->GetShape()->GetMassProperties());
 }
 
-void Body3D::setAllowedOnlyTranslation(){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    body.body->GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::TranslationX | JPH::EAllowedDOFs::TranslationY | JPH::EAllowedDOFs::TranslationZ, body.body->GetShape()->GetMassProperties());
-}
-
-void Body3D::setAllowedOnlyRotation(){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    body.body->GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::RotationX | JPH::EAllowedDOFs::RotationY | JPH::EAllowedDOFs::RotationZ, body.body->GetShape()->GetMassProperties());
-}
-
-void Body3D::setAllowedOnly2DPlane(){
+void Body3D::setAllowedDOFs2DPlane(){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
@@ -291,54 +275,34 @@ void Body3D::setAllowedOnly2DPlane(){
     body.body->GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::Plane2D, body.body->GetShape()->GetMassProperties());
 }
 
-void Body3D::addAllowedTransactionX(){
+void Body3D::setAllowedDOFs(bool translationX, bool translationY, bool translationZ, bool rotationX, bool rotationY, bool rotationZ){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
 
-    body.body->GetMotionProperties()->SetMassProperties(body.body->GetMotionProperties()->GetAllowedDOFs() | JPH::EAllowedDOFs::TranslationX, body.body->GetShape()->GetMassProperties());
+    JPH::EAllowedDOFs allowedDOFs;
+
+    if (translationX){
+        allowedDOFs |= JPH::EAllowedDOFs::TranslationX;
+    }
+    if (translationY){
+        allowedDOFs |= JPH::EAllowedDOFs::TranslationY;
+    }
+    if (translationZ){
+        allowedDOFs |= JPH::EAllowedDOFs::TranslationZ;
+    }
+    if (rotationX){
+        allowedDOFs |= JPH::EAllowedDOFs::RotationX;
+    }
+    if (rotationY){
+        allowedDOFs |= JPH::EAllowedDOFs::RotationY;
+    }
+    if (rotationZ){
+        allowedDOFs |= JPH::EAllowedDOFs::RotationZ;
+    }
+
+    body.body->GetMotionProperties()->SetMassProperties(allowedDOFs, body.body->GetShape()->GetMassProperties());
 }
-
-void Body3D::addAllowedTransactionY(){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    body.body->GetMotionProperties()->SetMassProperties(body.body->GetMotionProperties()->GetAllowedDOFs() | JPH::EAllowedDOFs::TranslationY, body.body->GetShape()->GetMassProperties());
-}
-
-void Body3D::addAllowedTransactionZ(){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    body.body->GetMotionProperties()->SetMassProperties(body.body->GetMotionProperties()->GetAllowedDOFs() | JPH::EAllowedDOFs::TranslationZ, body.body->GetShape()->GetMassProperties());
-}
-
-void Body3D::addAllowedRotationX(){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    body.body->GetMotionProperties()->SetMassProperties(body.body->GetMotionProperties()->GetAllowedDOFs() | JPH::EAllowedDOFs::RotationX, body.body->GetShape()->GetMassProperties());
-}
-
-void Body3D::addAllowedRotationY(){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    body.body->GetMotionProperties()->SetMassProperties(body.body->GetMotionProperties()->GetAllowedDOFs() | JPH::EAllowedDOFs::RotationY, body.body->GetShape()->GetMassProperties());
-}
-
-void Body3D::addAllowedRotationZ(){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    body.body->GetMotionProperties()->SetMassProperties(body.body->GetMotionProperties()->GetAllowedDOFs() | JPH::EAllowedDOFs::RotationZ, body.body->GetShape()->GetMassProperties());
-}
-
 
 float Body3D::getMass() const{
     Body3DComponent& body = getComponent<Body3DComponent>();

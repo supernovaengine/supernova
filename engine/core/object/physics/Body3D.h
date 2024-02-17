@@ -72,17 +72,9 @@ namespace Supernova{
         bool isSensor() const;
         void setIsSensor(bool sensor);
 
-        void setAllowedAllMotion();
-        void setAllowedOnlyTranslation();
-        void setAllowedOnlyRotation();
-        void setAllowedOnly2DPlane();
-
-        void addAllowedTransactionX();
-        void addAllowedTransactionY();
-        void addAllowedTransactionZ();
-        void addAllowedRotationX();
-        void addAllowedRotationY();
-        void addAllowedRotationZ();
+        void setAllowedDOFsAll();
+        void setAllowedDOFs2DPlane();
+        void setAllowedDOFs(bool translationX, bool translationY, bool translationZ, bool rotationX, bool rotationY, bool rotationZ);
 
         float getMass() const;
         void setMass(float mass);
