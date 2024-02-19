@@ -7,6 +7,7 @@
 
 #include "Object.h"
 #include "component/CameraComponent.h"
+#include "math/Ray.h"
 
 namespace Supernova{
 
@@ -79,6 +80,8 @@ namespace Supernova{
 
         void setTransparentSort(bool transparentSort);
         bool isTransparentSort() const;
+
+        Ray pointsToRay(float x, float y);
 
         void updateCamera();
     };

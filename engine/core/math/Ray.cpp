@@ -1,5 +1,6 @@
 #include "Ray.h"
 
+#include "util/JoltPhysicsAux.h"
 #include <stdlib.h>
 
 using namespace Supernova;
@@ -49,14 +50,6 @@ Vector3 Ray::getPoint(float distance){
     return Vector3(origin + (direction * distance));
 }
 
-Vector3 Ray::intersectionPoint(Plane plane) {
-    return getPoint(intersects(plane));
-}
-
-Vector3 Ray::intersectionPoint(AlignedBox box) {
-    return getPoint(intersects(box));
-}
-
 float Ray::intersects(Plane plane) {
     float denom = plane.normal.dotProduct(getDirection());
 
@@ -71,6 +64,10 @@ float Ray::intersects(Plane plane) {
     }
 
     return -1;
+}
+
+Vector3 Ray::intersectionPoint(Plane plane) {
+    return getPoint(intersects(plane));
 }
 
 float Ray::intersects(AlignedBox box){
@@ -157,5 +154,47 @@ float Ray::intersects(AlignedBox box){
         return lowt;
 
     return -1;
+}
 
+Vector3 Ray::intersectionPoint(AlignedBox box) {
+    return getPoint(intersects(box));
+}
+
+float Ray::intersects(Body3D& body){
+    Body3DComponent& bodycomp = body.getComponent<Body3DComponent>();
+
+    if (bodycomp.body){
+        JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
+        JPH::SubShapeIDCreator id_creator;
+        JPH::RayCastResult hit;
+
+        if (bodycomp.body->GetShape()->CastRay(ray, id_creator, hit)){
+            return hit.mFraction;
+        }
+    }
+
+    return -1;
+}
+
+Vector3 Ray::intersectionPoint(Body3D& body) {
+    return getPoint(intersects(body));
+}
+
+float Ray::intersects(Scene& scene){
+    JPH::PhysicsSystem* world = scene.getSystem<PhysicsSystem>()->getWorld3D();
+
+    if (world){
+        JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
+        JPH::RayCastResult hit;
+
+        if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit)){
+            return hit.mFraction;
+        }
+    }
+
+    return -1;
+}
+
+Vector3 Ray::intersectionPoint(Scene& scene){
+    return getPoint(intersects(scene));
 }

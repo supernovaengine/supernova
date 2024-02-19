@@ -468,6 +468,39 @@ bool Camera::isTransparentSort() const{
     return camera.transparentSort;
 }
 
+Ray Camera::pointsToRay(float x, float y){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    float normalized_x, normalized_y;
+
+    if (camera.type == CameraType::CAMERA_2D){
+        normalized_x = ((2 * x) / Engine::getCanvasWidth()) -1;
+        normalized_y = ((2 * y) / Engine::getCanvasHeight()) -1;
+    }else{
+        normalized_x = ((2 * x) / Engine::getCanvasWidth()) -1;
+        normalized_y = -(((2 * y) / Engine::getCanvasHeight()) -1);
+    }
+
+    Vector4 near_point_ndc = {normalized_x, normalized_y, -1, 1};
+    Vector4 far_point_ndc = {normalized_x, normalized_y,  1, 1};
+
+    Vector4 near_point_world, far_point_world;
+    Matrix4 inverseViewProjection = camera.viewProjectionMatrix.inverse();
+
+    near_point_world = inverseViewProjection * near_point_ndc;
+    far_point_world = inverseViewProjection * far_point_ndc;
+
+    near_point_world.divideByW();
+    far_point_world.divideByW();
+
+    Vector3 near_point_ray = {near_point_world[0], near_point_world[1], near_point_world[2]};
+    Vector3 far_point_ray = {far_point_world[0], far_point_world[1], far_point_world[2]};
+    Vector3 vector_between;
+    vector_between = far_point_ray - near_point_ray;
+
+    return Ray(near_point_ray, vector_between);
+}
+
 void Camera::updateCamera(){
     Transform& transform = getComponent<Transform>();
     CameraComponent& camera = getComponent<CameraComponent>();

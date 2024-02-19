@@ -19,6 +19,9 @@
 #include "Jolt/Physics/PhysicsSettings.h"
 #include "Jolt/Physics/PhysicsSystem.h"
 
+#include "Jolt/Physics/Collision/RayCast.h"
+#include "Jolt/Physics/Collision/CastResult.h"
+
 #include "Jolt/Physics/Collision/Shape/BoxShape.h"
 #include "Jolt/Physics/Collision/Shape/SphereShape.h"
 #include "Jolt/Physics/Collision/Shape/CapsuleShape.h"
