@@ -59,7 +59,7 @@ float Ray::intersects(Plane plane) {
     }else{
         float nom = plane.normal.dotProduct(getOrigin()) + plane.d;
         float dist = -(nom/denom);
-        if (dist >= 0)
+        if ((dist >= 0) && (dist <= 1)) // anything beyond this length will not be a hit
             return dist;
     }
 
@@ -151,7 +151,8 @@ float Ray::intersects(AlignedBox box){
     }
 
     if (hit)
-        return lowt;
+        if ((lowt >= 0) && (lowt <= 1)) // anything beyond this length will not be a hit
+            return lowt;
 
     return -1;
 }
@@ -160,7 +161,7 @@ Vector3 Ray::intersectionPoint(AlignedBox box) {
     return getPoint(intersects(box));
 }
 
-float Ray::intersects(Body3D& body){
+float Ray::intersects(Body3D body){
     Body3DComponent& bodycomp = body.getComponent<Body3DComponent>();
 
     if (bodycomp.body){
@@ -176,12 +177,34 @@ float Ray::intersects(Body3D& body){
     return -1;
 }
 
-Vector3 Ray::intersectionPoint(Body3D& body) {
+Vector3 Ray::intersectionPoint(Body3D body) {
     return getPoint(intersects(body));
 }
 
-float Ray::intersects(Scene& scene){
-    JPH::PhysicsSystem* world = scene.getSystem<PhysicsSystem>()->getWorld3D();
+float Ray::intersects(Body3D body, size_t shape){
+    Body3DComponent& bodycomp = body.getComponent<Body3DComponent>();
+
+    if (bodycomp.body){
+        JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
+        JPH::SubShapeIDCreator id_creator;
+        JPH::RayCastResult hit;
+
+        if (shape < bodycomp.numShapes){
+            if (bodycomp.shapes[shape].shape->CastRay(ray, id_creator, hit)){
+                return hit.mFraction;
+            }
+        }
+    }
+
+    return -1;
+}
+
+Vector3 Ray::intersectionPoint(Body3D body, size_t shape){
+    return getPoint(intersects(body, shape));
+}
+
+float Ray::intersects(Scene* scene){
+    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
 
     if (world){
         JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
@@ -195,6 +218,6 @@ float Ray::intersects(Scene& scene){
     return -1;
 }
 
-Vector3 Ray::intersectionPoint(Scene& scene){
+Vector3 Ray::intersectionPoint(Scene* scene){
     return getPoint(intersects(scene));
 }

@@ -13,7 +13,7 @@ namespace Supernova {
     private:
 
         Vector3 origin;
-        Vector3 direction;
+        Vector3 direction; // direction and length of the ray (anything beyond this length will not be a hit)
 
     public:
 
@@ -38,11 +38,14 @@ namespace Supernova {
         float intersects(AlignedBox box);
         Vector3 intersectionPoint(AlignedBox box);
 
-        float intersects(Body3D& body);
-        Vector3 intersectionPoint(Body3D& body);
+        float intersects(Body3D body);
+        Vector3 intersectionPoint(Body3D body);
 
-        float intersects(Scene& scene);
-        Vector3 intersectionPoint(Scene& scene);
+        float intersects(Body3D body, size_t shape);
+        Vector3 intersectionPoint(Body3D body, size_t shape);
+
+        float intersects(Scene* scene);
+        Vector3 intersectionPoint(Scene* scene);
     };
     
 }
