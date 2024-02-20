@@ -367,10 +367,16 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("getPoint", &Ray::getPoint)
         .addFunction("intersects", 
             luabridge::overload<AlignedBox>(&Ray::intersects),
-            luabridge::overload<Plane>(&Ray::intersects))
+            luabridge::overload<Plane>(&Ray::intersects),
+            luabridge::overload<Body3D>(&Ray::intersects),
+            luabridge::overload<Body3D, size_t>(&Ray::intersects),
+            luabridge::overload<Scene*>(&Ray::intersects))
         .addFunction("intersectionPoint", 
             luabridge::overload<AlignedBox>(&Ray::intersectionPoint),
-            luabridge::overload<Plane>(&Ray::intersectionPoint))
+            luabridge::overload<Plane>(&Ray::intersectionPoint),
+            luabridge::overload<Body3D>(&Ray::intersectionPoint),
+            luabridge::overload<Body3D, size_t>(&Ray::intersectionPoint),
+            luabridge::overload<Scene*>(&Ray::intersectionPoint))
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

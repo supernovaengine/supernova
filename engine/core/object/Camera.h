@@ -81,7 +81,7 @@ namespace Supernova{
         void setTransparentSort(bool transparentSort);
         bool isTransparentSort() const;
 
-        Ray pointsToRay(float x, float y);
+        Ray screenToRay(float x, float y);
 
         void updateCamera();
     };

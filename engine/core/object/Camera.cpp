@@ -468,7 +468,7 @@ bool Camera::isTransparentSort() const{
     return camera.transparentSort;
 }
 
-Ray Camera::pointsToRay(float x, float y){
+Ray Camera::screenToRay(float x, float y){
     CameraComponent& camera = getComponent<CameraComponent>();
 
     float normalized_x, normalized_y;
