@@ -220,13 +220,19 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Quaternion>("Quaternion")
-        .addConstructor<void(), void(float, float, float, float)>()
+        .addConstructor<
+            void(), 
+            void(const float, const float, const float, const float), 
+            void(const float, const float, const float),
+            void(const Vector3*),
+            void(const Vector3&, const Vector3&, const Vector3&)>()
         .addFunction("__tostring", &Quaternion::toString)
         .addFunction("__eq", &Quaternion::operator==)
         .addFunction("__sub", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator-)
         .addFunction("__add", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator+)
         .addFunction("__mul", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator*)
         .addFunction("__unm", (Quaternion (Quaternion::*)() const)&Quaternion::operator-)
+        .addFunction("fromEulerAngles", &Quaternion::fromEulerAngles)
         .addFunction("fromAxes", 
             luabridge::overload<const Vector3*>(&Quaternion::fromAxes),
             luabridge::overload<const Vector3&, const Vector3&, const Vector3&>(&Quaternion::fromAxes))

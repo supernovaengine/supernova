@@ -19,6 +19,7 @@ namespace Supernova {
         Quaternion();
         Quaternion( const float fW, const float fX, const float fY, const float fZ );
         explicit Quaternion( float* const r );
+        Quaternion(const float xAngle, const float yAngle, const float zAngle);
         Quaternion(const Vector3* akAxis);
         Quaternion(const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);
 
@@ -47,6 +48,7 @@ namespace Supernova {
 
         void swap(Quaternion& other);
 
+        void fromEulerAngles(const float xAngle, const float yAngle, const float zAngle);
         void fromAxes (const Vector3* akAxis);
         void fromAxes (const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);
         void fromRotationMatrix (const Matrix4& kRot);

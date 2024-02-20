@@ -26,10 +26,13 @@ Quaternion::Quaternion( float* const r )
     : w( r[0] ), x( r[1] ), y( r[2] ), z( r[3] ){
 }
 
+Quaternion::Quaternion(const float xAngle, const float yAngle, const float zAngle){
+    this->fromEulerAngles(xAngle, yAngle, zAngle);
+}
+
 Quaternion::Quaternion(const Vector3* akAxis){
     this->fromAxes(akAxis);
 }
-
 
 Quaternion::Quaternion(const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis){
     this->fromAxes(xaxis, yaxis, zaxis);
@@ -158,6 +161,16 @@ void Quaternion::swap(Quaternion& other){
     std::swap(x, other.x);
     std::swap(y, other.y);
     std::swap(z, other.z);
+}
+
+void Quaternion::fromEulerAngles(const float xAngle, const float yAngle, const float zAngle){
+    Quaternion qx, qy, qz;
+
+    qx.fromAngleAxis(xAngle, Vector3(1,0,0));
+    qy.fromAngleAxis(yAngle, Vector3(0,1,0));
+    qz.fromAngleAxis(zAngle, Vector3(0,0,1));
+
+    *this = (qz * (qy * qx)); //order ZYX
 }
 
 void Quaternion::fromAxes (const Vector3* akAxis){

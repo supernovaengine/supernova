@@ -68,13 +68,7 @@ void Object::setRotation(Quaternion rotation){
 }
 
 void Object::setRotation(const float xAngle, const float yAngle, const float zAngle){
-    Quaternion qx, qy, qz;
-
-    qx.fromAngleAxis(xAngle, Vector3(1,0,0));
-    qy.fromAngleAxis(yAngle, Vector3(0,1,0));
-    qz.fromAngleAxis(zAngle, Vector3(0,0,1));
-
-    setRotation(qz * (qy * qx)); //order ZYX
+    setRotation(Quaternion(xAngle, yAngle, zAngle));
 }
 
 Quaternion Object::getRotation() const{
