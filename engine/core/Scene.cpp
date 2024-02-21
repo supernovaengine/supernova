@@ -61,11 +61,11 @@ Scene::Scene(){
 	registerComponent<Body3DComponent>();
 	registerComponent<Joint3DComponent>();
 
-	registerSystem<PhysicsSystem>();
 	registerSystem<ActionSystem>();
 	registerSystem<MeshSystem>();
 	registerSystem<UISystem>();
 	registerSystem<RenderSystem>();
+	registerSystem<PhysicsSystem>();
 	registerSystem<AudioSystem>();
 
 	camera = NULL_ENTITY;

@@ -114,29 +114,39 @@ void PhysicsSystem::setPointsToMeterScale2D(float pointsToMeterScale2D){
     this->pointsToMeterScale2D = pointsToMeterScale2D;
 }
 
-void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body, bool updateAnyway){
+void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body){
     if (signature.test(scene->getComponentType<Transform>())){
         Transform& transform = scene->getComponent<Transform>(entity);
+        if (body.body){
+            b2Vec2 bNewPosition(transform.worldPosition.x / pointsToMeterScale2D, transform.worldPosition.y / pointsToMeterScale2D);
+            float bNewAngle = Angle::defaultToRad(transform.worldRotation.getRoll());
 
-        if (transform.needUpdate || updateAnyway){
-            b2Vec2 bPosition(transform.position.x / pointsToMeterScale2D, transform.position.y / pointsToMeterScale2D);
-            body.body->SetTransform(bPosition, Angle::defaultToRad(transform.rotation.getRoll()));
+            b2Vec2 bPosition = body.body->GetPosition();
+            float bAngle = body.body->GetAngle();
 
-            body.body->SetAwake(true);
+            if (bPosition != bNewPosition || bAngle != bNewAngle){
+                body.body->SetTransform(bNewPosition, bNewAngle);
+                body.body->SetAwake(true);
+            }
         }
     }
 }
 
-void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body, bool updateAnyway){
+void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body){
     if (signature.test(scene->getComponentType<Transform>())){
         Transform& transform = scene->getComponent<Transform>(entity);
-
-        if (transform.needUpdate || updateAnyway){
-            JPH::Vec3 jPosition(transform.position.x, transform.position.y, transform.position.z);
-            JPH::Quat jQuat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+        if (body.body){
+            JPH::Vec3 jNewPosition(transform.worldPosition.x, transform.worldPosition.y, transform.worldPosition.z);
+            JPH::Quat jNewQuat(transform.worldRotation.x, transform.worldRotation.y, transform.worldRotation.z, transform.worldRotation.w);
 
             JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
-            body_interface.SetPositionAndRotation(body.body->GetID(), jPosition, jQuat, JPH::EActivation::Activate);
+            JPH::Vec3 jPosition;
+            JPH::Quat jQuat;
+            body_interface.GetPositionAndRotation(body.body->GetID(), jPosition, jQuat);
+
+            if (jPosition != jNewPosition || jQuat != jNewQuat){
+                body_interface.SetPositionAndRotation(body.body->GetID(), jNewPosition, jNewQuat, JPH::EActivation::Activate);
+            }
         }
     }
 }
@@ -871,8 +881,8 @@ bool PhysicsSystem::loadDistanceJoint2D(Joint2DComponent& joint, Entity bodyA, E
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
 
-        updateBody2DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody2DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody2DPosition(signatureA, bodyA, myBodyA);
+        updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D);
         b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D);
@@ -900,8 +910,8 @@ bool PhysicsSystem::loadRevoluteJoint2D(Joint2DComponent& joint, Entity bodyA, E
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
 
-        updateBody2DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody2DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody2DPosition(signatureA, bodyA, myBodyA);
+        updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
 
@@ -928,8 +938,8 @@ bool PhysicsSystem::loadPrismaticJoint2D(Joint2DComponent& joint, Entity bodyA, 
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
 
-        updateBody2DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody2DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody2DPosition(signatureA, bodyA, myBodyA);
+        updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
         b2Vec2 myAxis(axis.x, axis.y);
@@ -957,8 +967,8 @@ bool PhysicsSystem::loadPulleyJoint2D(Joint2DComponent& joint, Entity bodyA, Ent
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
 
-        updateBody2DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody2DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody2DPosition(signatureA, bodyA, myBodyA);
+        updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D);
         b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D);
@@ -996,8 +1006,8 @@ bool PhysicsSystem::loadGearJoint2D(Joint2DComponent& joint, Entity bodyA, Entit
             Joint2DComponent myRevoluteJoint = scene->getComponent<Joint2DComponent>(revoluteJoint);
             Joint2DComponent myPrismaticJoint = scene->getComponent<Joint2DComponent>(prismaticJoint);
 
-            updateBody2DPosition(signatureA, bodyA, myBodyA, true);
-            updateBody2DPosition(signatureB, bodyB, myBodyB, true);
+            updateBody2DPosition(signatureA, bodyA, myBodyA);
+            updateBody2DPosition(signatureB, bodyB, myBodyB);
 
             b2GearJointDef jointDef;
             jointDef.joint1 = myRevoluteJoint.joint;
@@ -1029,7 +1039,7 @@ bool PhysicsSystem::loadMouseJoint2D(Joint2DComponent& joint, Entity body, Vecto
 
         Body2DComponent myBody = scene->getComponent<Body2DComponent>(body);
 
-        updateBody2DPosition(signature, body, myBody, true);
+        updateBody2DPosition(signature, body, myBody);
 
         b2Vec2 myTarget(target.x / pointsToMeterScale2D, target.y / pointsToMeterScale2D);
 
@@ -1058,8 +1068,8 @@ bool PhysicsSystem::loadWheelJoint2D(Joint2DComponent& joint, Entity bodyA, Enti
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
 
-        updateBody2DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody2DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody2DPosition(signatureA, bodyA, myBodyA);
+        updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
         b2Vec2 myAxis(axis.x, axis.y);
@@ -1087,8 +1097,8 @@ bool PhysicsSystem::loadWeldJoint2D(Joint2DComponent& joint, Entity bodyA, Entit
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
 
-        updateBody2DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody2DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody2DPosition(signatureA, bodyA, myBodyA);
+        updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
 
@@ -1115,8 +1125,8 @@ bool PhysicsSystem::loadFrictionJoint2D(Joint2DComponent& joint, Entity bodyA, E
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
 
-        updateBody2DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody2DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody2DPosition(signatureA, bodyA, myBodyA);
+        updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
 
@@ -1143,8 +1153,8 @@ bool PhysicsSystem::loadMotorJoint2D(Joint2DComponent& joint, Entity bodyA, Enti
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
 
-        updateBody2DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody2DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody2DPosition(signatureA, bodyA, myBodyA);
+        updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2MotorJointDef jointDef;
         jointDef.Initialize(myBodyA.body, myBodyB.body);
@@ -1169,8 +1179,8 @@ bool PhysicsSystem::loadRopeJoint2D(Joint2DComponent& joint, Entity bodyA, Entit
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
 
-        updateBody2DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody2DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody2DPosition(signatureA, bodyA, myBodyA);
+        updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D);
         b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D);
@@ -1207,8 +1217,8 @@ bool PhysicsSystem::loadFixedJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
         JPH::FixedConstraintSettings settings;
         settings.mAutoDetectPoint = true;
 
@@ -1234,8 +1244,8 @@ bool PhysicsSystem::loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, E
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         JPH::DistanceConstraintSettings settings;
         settings.mPoint1 = JPH::Vec3(anchorA.x, anchorA.y, anchorA.z);
@@ -1265,8 +1275,8 @@ bool PhysicsSystem::loadPointJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         JPH::PointConstraintSettings settings;
         settings.mPoint1 = settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
@@ -1293,8 +1303,8 @@ bool PhysicsSystem::loadHingeJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         JPH::HingeConstraintSettings settings;
         settings.mPoint1 = settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
@@ -1323,8 +1333,8 @@ bool PhysicsSystem::loadConeJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         JPH::ConeConstraintSettings settings;
         settings.mPoint1 = settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
@@ -1352,8 +1362,8 @@ bool PhysicsSystem::loadPrismaticJoint3D(Joint3DComponent& joint, Entity bodyA, 
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         JPH::SliderConstraintSettings settings;
         settings.mAutoDetectPoint = true;
@@ -1383,8 +1393,8 @@ bool PhysicsSystem::loadSwingTwistJoint3D(Joint3DComponent& joint, Entity bodyA,
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         JPH::SwingTwistConstraintSettings settings;
         settings.mPosition1 = settings.mPosition2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
@@ -1417,8 +1427,8 @@ bool PhysicsSystem::loadSixDOFJoint3D(Joint3DComponent& joint, Entity bodyA, Ent
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         JPH::SixDOFConstraintSettings settings;
         settings.mPosition1 = JPH::Vec3(anchorA.x, anchorA.y, anchorA.z);
@@ -1448,8 +1458,8 @@ bool PhysicsSystem::loadPathJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         JPH::Ref<JPH::PathConstraintPathHermite> path = new JPH::PathConstraintPathHermite;
 
@@ -1491,8 +1501,8 @@ bool PhysicsSystem::loadGearJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         if (signatureHingeA.test(scene->getComponentType<Joint3DComponent>()) && signatureHingeB.test(scene->getComponentType<Joint3DComponent>())){
 
@@ -1547,8 +1557,8 @@ bool PhysicsSystem::loadRackAndPinionJoint3D(Joint3DComponent& joint, Entity bod
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         if (signatureHinge.test(scene->getComponentType<Joint3DComponent>()) && signatureSlider.test(scene->getComponentType<Joint3DComponent>())){
 
@@ -1601,8 +1611,8 @@ bool PhysicsSystem::loadPulleyJoint3D(Joint3DComponent& joint, Entity bodyA, Ent
         Body3DComponent myBodyA = scene->getComponent<Body3DComponent>(bodyA);
         Body3DComponent myBodyB = scene->getComponent<Body3DComponent>(bodyB);
 
-        updateBody3DPosition(signatureA, bodyA, myBodyA, true);
-        updateBody3DPosition(signatureB, bodyB, myBodyB, true);
+        updateBody3DPosition(signatureA, bodyA, myBodyA);
+        updateBody3DPosition(signatureB, bodyB, myBodyB);
 
         JPH::PulleyConstraintSettings settings;
         settings.mBodyPoint1 = JPH::Vec3(anchorA.x, anchorA.y, anchorA.z);
@@ -1648,7 +1658,7 @@ void PhysicsSystem::update(double dt){
 		Signature signature = scene->getSignature(entity);
 
         if (body.body){
-            updateBody2DPosition(signature, entity, body, body.newBody);
+            updateBody2DPosition(signature, entity, body);
 
             body.newBody = false;
         }
@@ -1698,7 +1708,7 @@ void PhysicsSystem::update(double dt){
 		Signature signature = scene->getSignature(entity);
 
         if (body.body){
-            updateBody3DPosition(signature, entity, body, body.newBody);
+            updateBody3DPosition(signature, entity, body);
 
             body.newBody = false;
         }
