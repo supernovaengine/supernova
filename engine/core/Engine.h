@@ -253,6 +253,7 @@ namespace Supernova {
         static FunctionSubscribe<void()> onViewDestroyed;
         static FunctionSubscribe<void()> onDraw;
         static FunctionSubscribe<void()> onUpdate;
+        static FunctionSubscribe<void()> onPostUpdate;
         static FunctionSubscribe<void()> onPause;
         static FunctionSubscribe<void()> onResume;
         static FunctionSubscribe<void()> onShutdown;

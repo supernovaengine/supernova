@@ -64,6 +64,7 @@ FunctionSubscribe<void()> Engine::onViewChanged;
 FunctionSubscribe<void()> Engine::onViewDestroyed;
 FunctionSubscribe<void()> Engine::onDraw;
 FunctionSubscribe<void()> Engine::onUpdate;
+FunctionSubscribe<void()> Engine::onPostUpdate;
 FunctionSubscribe<void()> Engine::onPause;
 FunctionSubscribe<void()> Engine::onResume;
 FunctionSubscribe<void()> Engine::onShutdown;
@@ -543,6 +544,7 @@ void Engine::systemDraw(){
                 for (int i = 0; i < numScenes; i++) {
                     scenes[i]->update(updateTime);
                 }
+                Engine::onPostUpdate.call();
             }
         }
         if (updateLoops > 100) {
@@ -553,6 +555,7 @@ void Engine::systemDraw(){
             for (int i = 0; i < numScenes; i++) {
                 scenes[i]->update(deltatime);
             }
+            Engine::onPostUpdate.call();
         }
     }
 
