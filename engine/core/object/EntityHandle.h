@@ -25,6 +25,7 @@ namespace Supernova{
         EntityHandle(const EntityHandle& rhs);
         EntityHandle& operator=(const EntityHandle& rhs);
 
+        Scene* getScene() const;
         Entity getEntity() const;
 
         template <typename T>

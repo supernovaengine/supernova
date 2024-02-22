@@ -4,6 +4,7 @@
 #include "math/Vector3.h"
 #include "math/Plane.h"
 #include "math/AlignedBox.h"
+#include "object/physics/Body2D.h"
 #include "object/physics/Body3D.h"
 
 namespace Supernova {
@@ -37,6 +38,9 @@ namespace Supernova {
 
         float intersects(AlignedBox box);
         Vector3 intersectionPoint(AlignedBox box);
+
+        float intersects(Body2D body);
+        Vector3 intersectionPoint(Body2D body);
 
         float intersects(Body3D body);
         Vector3 intersectionPoint(Body3D body);

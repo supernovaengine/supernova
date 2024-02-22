@@ -37,6 +37,10 @@ EntityHandle& EntityHandle::operator=(const EntityHandle& rhs){
     return *this;
 }
 
+Scene* EntityHandle::getScene() const{
+    return scene;
+}
+
 Entity EntityHandle::getEntity() const{
     return entity;
 }

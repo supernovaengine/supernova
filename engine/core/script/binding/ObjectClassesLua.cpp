@@ -141,6 +141,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .beginClass<EntityHandle>("EntityHandle")
         .addConstructor <void (Scene*)> ()
+        .addProperty("scene", &EntityHandle::getScene)
         .addProperty("entity", &EntityHandle::getEntity)
         .endClass();
 
@@ -650,6 +651,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<Body2D, EntityHandle>("Body2D")
         .addConstructor <void (Scene*, Entity)> ()
         .addFunction("getAttachedObject", &Body2D::getAttachedObject)
+        .addProperty("pointsToMeterScale", &Body2D::getPointsToMeterScale)
+        .addFunction("load", &Body2D::load)
         .addFunction("createRectShape", &Body2D::createRectShape)
         .addFunction("createCenteredRectShape", 
             luabridge::overload<float, float>(&Body2D::createCenteredRectShape),
@@ -791,6 +794,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<Body3D, EntityHandle>("Body3D")
         .addConstructor <void (Scene*, Entity)> ()
         .addFunction("getAttachedObject", &Body3D::getAttachedObject)
+        .addFunction("load", &Body3D::load)
         .addFunction("createBoxShape", 
             luabridge::overload<float, float, float>(&Body3D::createBoxShape),
             luabridge::overload<Vector3, Quaternion, float, float, float>(&Body3D::createBoxShape))

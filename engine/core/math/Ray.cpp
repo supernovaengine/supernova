@@ -1,5 +1,6 @@
 #include "Ray.h"
 
+#include "util/Box2DAux.h"
 #include "util/JoltPhysicsAux.h"
 #include <stdlib.h>
 
@@ -161,6 +162,38 @@ Vector3 Ray::intersectionPoint(AlignedBox box) {
     return getPoint(intersects(box));
 }
 
+float Ray::intersects(Body2D body){
+    Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
+    if (bodycomp.body){
+
+        float ptmScale = body.getPointsToMeterScale();
+
+        Vector3 end = origin + direction;
+
+        b2RayCastInput input;
+        input.p1 = b2Vec2(origin.x / ptmScale, origin.y / ptmScale);
+        input.p2 = b2Vec2(end.x / ptmScale, end.y / ptmScale);
+        input.maxFraction = 1;
+/*
+        for (b2Fixture* f = bodycomp.body->GetFixtureList(); f; f = f->GetNext()) {
+            b2RayCastOutput output;
+            if ( ! f->RayCast( &output, input ) )
+                continue;
+            if ( output.fraction < closestFraction ) {
+                closestFraction = output.fraction;
+                intersectionNormal = output.normal;
+            }
+        }
+*/
+    }
+
+    return -1;
+}
+
+Vector3 Ray::intersectionPoint(Body2D body){
+    return getPoint(intersects(body));
+}
+
 float Ray::intersects(Body3D body){
     Body3DComponent& bodycomp = body.getComponent<Body3DComponent>();
 
@@ -172,6 +205,9 @@ float Ray::intersects(Body3D body){
         if (bodycomp.body->GetShape()->CastRay(ray, id_creator, hit)){
             return hit.mFraction;
         }
+
+        // getting normal
+        //bodycomp.body->GetShape()->GetSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
     }
 
     return -1;
@@ -193,6 +229,9 @@ float Ray::intersects(Body3D body, size_t shape){
             if (bodycomp.shapes[shape].shape->CastRay(ray, id_creator, hit)){
                 return hit.mFraction;
             }
+
+            // getting normal
+            //bodycomp.shapes[shape].shape->GetSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
         }
     }
 
@@ -210,9 +249,17 @@ float Ray::intersects(Scene* scene){
         JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
         JPH::RayCastResult hit;
 
+        //if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, JPH::SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::NON_MOVING), JPH::SpecifiedObjectLayerFilter(Layers::NON_MOVING))){
         if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit)){
             return hit.mFraction;
         }
+
+        // getting normal
+        //JPH::BodyLockRead lock(world->GetBodyLockInterface(), hit.mBodyID);
+		//if (lock.Succeeded()){
+		//	const JPH::Body &hit_body = lock.GetBody();
+        //    JPH::Vec3 normal = hit_body.GetWorldSpaceSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
+        //}
     }
 
     return -1;

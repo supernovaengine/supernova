@@ -32,6 +32,8 @@ namespace Supernova{
 
         Object getAttachedObject();
 
+        float getPointsToMeterScale() const;
+
         void load();
 
         int createRectShape(float width, float height);
