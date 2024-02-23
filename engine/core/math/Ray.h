@@ -18,6 +18,11 @@ namespace Supernova {
 
     public:
 
+        enum class SceneTestType{
+            ALL_2D_BODIES,
+            ALL_3D_BODIES
+        };
+
         Ray();
         Ray(const Ray &ray);
         Ray(Vector3 origin, Vector3 direction);
@@ -42,14 +47,17 @@ namespace Supernova {
         float intersects(Body2D body);
         Vector3 intersectionPoint(Body2D body);
 
+        float intersects(Body2D body, size_t shape);
+        Vector3 intersectionPoint(Body2D body, size_t shape);
+
         float intersects(Body3D body);
         Vector3 intersectionPoint(Body3D body);
 
         float intersects(Body3D body, size_t shape);
         Vector3 intersectionPoint(Body3D body, size_t shape);
 
-        float intersects(Scene* scene);
-        Vector3 intersectionPoint(Scene* scene);
+        float intersects(Scene* scene, SceneTestType raytest);
+        Vector3 intersectionPoint(Scene* scene, SceneTestType raytest);
     };
     
 }

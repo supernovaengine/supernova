@@ -66,6 +66,69 @@ namespace Supernova{
         }
     };
 
+
+    struct B2_API Box2DWorldRayCastOutput{
+        b2Fixture* fixture;
+        b2Vec2 point;
+	    b2Vec2 normal;
+	    float fraction;
+    };
+
+
+    class Box2DRayCastCallback : public b2RayCastCallback{
+    private:
+
+        std::vector<Box2DWorldRayCastOutput>* outputs;
+        bool returnAllResults;
+        uint16_t collisionGroup;
+        uint16_t collisionMask;
+
+	public:
+
+        Box2DRayCastCallback(std::vector<Box2DWorldRayCastOutput>* outputs){
+            this->outputs = outputs;
+            this->returnAllResults = true;
+            this->collisionGroup = (uint16_t)~0u;
+            this->collisionMask = (uint16_t)~0u;
+        }
+
+        Box2DRayCastCallback(std::vector<Box2DWorldRayCastOutput>* outputs, bool returnAllResults){
+            this->outputs = outputs;
+            this->returnAllResults = returnAllResults;
+            this->collisionGroup = (uint16_t)~0u;
+            this->collisionMask = (uint16_t)~0u;
+        }
+
+        Box2DRayCastCallback(std::vector<Box2DWorldRayCastOutput>* outputs, bool returnAllResults, uint16_t collisionGroup, uint16_t collisionMask){
+            this->outputs = outputs;
+            this->returnAllResults = returnAllResults;
+            this->collisionGroup = collisionGroup;
+            this->collisionMask = collisionMask;
+        }
+
+		float ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float fraction){
+            if (fixture->IsSensor())
+                return -1.f;
+
+            if ((fixture->GetFilterData().categoryBits & collisionMask) && (fixture->GetFilterData().maskBits & collisionGroup)){
+                // fraction return to fint the closest intersection
+                // return 1 to store all intersections
+                // https://www.iforce2d.net/b2dtut/world-querying
+                if (returnAllResults){
+                    outputs->push_back({fixture, point, normal, fraction});
+                    return 1.0f;
+                }else{
+                    outputs->clear();
+                    outputs->push_back({fixture, point, normal, fraction});
+                    return fraction;
+                }
+
+            }
+
+            return -1.f;
+        }
+    };
+
 }
 
 #endif //Box2DAux_h

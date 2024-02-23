@@ -174,17 +174,26 @@ float Ray::intersects(Body2D body){
         input.p1 = b2Vec2(origin.x / ptmScale, origin.y / ptmScale);
         input.p2 = b2Vec2(end.x / ptmScale, end.y / ptmScale);
         input.maxFraction = 1;
-/*
+
+        float closestFraction = FLT_MAX;
+        b2Vec2 intersectionNormal(0,0);
         for (b2Fixture* f = bodycomp.body->GetFixtureList(); f; f = f->GetNext()) {
             b2RayCastOutput output;
-            if ( ! f->RayCast( &output, input ) )
-                continue;
-            if ( output.fraction < closestFraction ) {
-                closestFraction = output.fraction;
-                intersectionNormal = output.normal;
+            int32 childCount = f->GetShape()->GetChildCount();
+            for (int32 c = 0; c < childCount; c++) {
+                if ( ! f->RayCast( &output, input, c ) )
+                    continue;
+                if ( output.fraction < closestFraction ) {
+                    closestFraction = output.fraction;
+                    intersectionNormal = output.normal;
+                }
             }
         }
-*/
+
+        if (closestFraction >= 0 && closestFraction <= 1){
+            return closestFraction;
+        }
+
     }
 
     return -1;
@@ -192,6 +201,45 @@ float Ray::intersects(Body2D body){
 
 Vector3 Ray::intersectionPoint(Body2D body){
     return getPoint(intersects(body));
+}
+
+float Ray::intersects(Body2D body, size_t shape){
+    Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
+    if (bodycomp.body){
+
+        float ptmScale = body.getPointsToMeterScale();
+
+        Vector3 end = origin + direction;
+
+        b2RayCastInput input;
+        input.p1 = b2Vec2(origin.x / ptmScale, origin.y / ptmScale);
+        input.p2 = b2Vec2(end.x / ptmScale, end.y / ptmScale);
+        input.maxFraction = 1;
+
+        float closestFraction = FLT_MAX;
+        b2Vec2 intersectionNormal(0,0);
+        b2RayCastOutput output;
+        int32 childCount = bodycomp.shapes[shape].fixture->GetShape()->GetChildCount();
+        for (int32 c = 0; c < childCount; c++) {
+            if ( ! bodycomp.shapes[shape].fixture->RayCast( &output, input, c ) )
+                continue;
+            if ( output.fraction < closestFraction ) {
+                closestFraction = output.fraction;
+                intersectionNormal = output.normal;
+            }
+        }
+
+        if (closestFraction >= 0 && closestFraction <= 1){
+            return closestFraction;
+        }
+
+    }
+
+    return -1;
+}
+
+Vector3 Ray::intersectionPoint(Body2D body, size_t shape){
+    return getPoint(intersects(body, shape));
 }
 
 float Ray::intersects(Body3D body){
@@ -242,29 +290,64 @@ Vector3 Ray::intersectionPoint(Body3D body, size_t shape){
     return getPoint(intersects(body, shape));
 }
 
-float Ray::intersects(Scene* scene){
-    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+float Ray::intersects(Scene* scene, SceneTestType raytest){
 
-    if (world){
-        JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
-        JPH::RayCastResult hit;
+    if (raytest == SceneTestType::ALL_2D_BODIES){
+        b2World* world = scene->getSystem<PhysicsSystem>()->getWorld2D();
 
-        //if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, JPH::SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::NON_MOVING), JPH::SpecifiedObjectLayerFilter(Layers::NON_MOVING))){
-        if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit)){
-            return hit.mFraction;
+        if (world){
+            std::vector<Box2DWorldRayCastOutput> outputs;
+
+            Box2DRayCastCallback* rayCastCallback2D = new Box2DRayCastCallback(&outputs, false);
+
+            float ptmScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
+
+            Vector3 end = origin + direction;
+            b2Vec2 p1 = b2Vec2(origin.x / ptmScale, origin.y / ptmScale);
+            b2Vec2 p2 = b2Vec2(end.x / ptmScale, end.y / ptmScale);
+
+            world->RayCast(rayCastCallback2D, p1, p2);
+
+            delete rayCastCallback2D;
+
+            float closestFraction = FLT_MAX;
+            b2Vec2 intersectionNormal(0,0);
+            for (size_t i = 0; i < outputs.size(); i++){
+                    if ( outputs[i].fraction < closestFraction ) {
+                        closestFraction = outputs[i].fraction;
+                        intersectionNormal = outputs[i].normal;
+                    }
+            }
+
+            if (closestFraction >= 0 && closestFraction <= 1){
+                return closestFraction;
+            }
         }
 
-        // getting normal
-        //JPH::BodyLockRead lock(world->GetBodyLockInterface(), hit.mBodyID);
-		//if (lock.Succeeded()){
-		//	const JPH::Body &hit_body = lock.GetBody();
-        //    JPH::Vec3 normal = hit_body.GetWorldSpaceSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
-        //}
+    }else if (raytest == SceneTestType::ALL_3D_BODIES){
+        JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+
+        if (world){
+            JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
+            JPH::RayCastResult hit;
+
+            //if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, JPH::SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::NON_MOVING), JPH::SpecifiedObjectLayerFilter(Layers::NON_MOVING))){
+            if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit)){
+                return hit.mFraction;
+            }
+
+            // getting normal
+            //JPH::BodyLockRead lock(world->GetBodyLockInterface(), hit.mBodyID);
+            //if (lock.Succeeded()){
+            //	const JPH::Body &hit_body = lock.GetBody();
+            //    JPH::Vec3 normal = hit_body.GetWorldSpaceSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
+            //}
+        }
     }
 
     return -1;
 }
 
-Vector3 Ray::intersectionPoint(Scene* scene){
-    return getPoint(intersects(scene));
+Vector3 Ray::intersectionPoint(Scene* scene, SceneTestType raytest){
+    return getPoint(intersects(scene, raytest));
 }
