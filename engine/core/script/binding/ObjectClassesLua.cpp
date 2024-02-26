@@ -205,6 +205,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("updateTransform", &Object::updateTransform)
         .addFunction("getBody2D", &Object::getBody2D)
         .addFunction("removeBody2D", &Object::removeBody2D)
+        .addFunction("getBody3D", &Object::getBody3D)
+        .addFunction("removeBody3D", &Object::removeBody3D)
+        .addFunction("getRay", &Object::getRay)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

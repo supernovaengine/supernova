@@ -27,11 +27,20 @@ namespace luabridge
     template<> struct Stack<Plane::Side> : EnumWrapper<Plane::Side>{};
     template<> struct Stack<AlignedBox::BoxType> : EnumWrapper<AlignedBox::BoxType>{};
     template<> struct Stack<AlignedBox::CornerEnum> : EnumWrapper<AlignedBox::CornerEnum>{};
-    template<> struct Stack<Ray::SceneTestType> : EnumWrapper<Ray::SceneTestType>{};
+    
+    template<> struct Stack<RayTestType> : EnumWrapper<RayTestType>{};
 }
 
 void LuaBinding::registerMathClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("RayTestType")
+        .addVariable("STATIC_2D_BODIES", RayTestType::STATIC_2D_BODIES)
+        .addVariable("ALL_2D_BODIES", RayTestType::ALL_2D_BODIES)
+        .addVariable("STATIC_3D_BODIES", RayTestType::STATIC_3D_BODIES)
+        .addVariable("ALL_3D_BODIES", RayTestType::ALL_3D_BODIES)
+        .endNamespace();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector2>("Vector2")
@@ -379,7 +388,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             luabridge::overload<Body2D, size_t>(&Ray::intersects),
             luabridge::overload<Body3D>(&Ray::intersects),
             luabridge::overload<Body3D, size_t>(&Ray::intersects),
-            luabridge::overload<Scene*, Ray::SceneTestType>(&Ray::intersects))
+            luabridge::overload<Scene*, RayTestType>(&Ray::intersects))
         .addFunction("intersectionPoint", 
             luabridge::overload<AlignedBox>(&Ray::intersectionPoint),
             luabridge::overload<Plane>(&Ray::intersectionPoint),
@@ -387,16 +396,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             luabridge::overload<Body2D, size_t>(&Ray::intersectionPoint),
             luabridge::overload<Body3D>(&Ray::intersectionPoint),
             luabridge::overload<Body3D, size_t>(&Ray::intersectionPoint),
-            luabridge::overload<Scene*, Ray::SceneTestType>(&Ray::intersectionPoint))
-        .addStaticProperty("SceneTestType", [](lua_State* L) {
-            auto table = luabridge::newTable(L);
-            table.push(L);
-            luabridge::getNamespaceFromStack(L)
-                .addVariable("ALL_2D_BODIES", Ray::SceneTestType::ALL_2D_BODIES)
-                .addVariable("ALL_3D_BODIES", Ray::SceneTestType::ALL_3D_BODIES);
-            table.pop();
-            return table;
-            })
+            luabridge::overload<Scene*, RayTestType>(&Ray::intersectionPoint))
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

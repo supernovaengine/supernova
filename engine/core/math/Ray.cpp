@@ -290,15 +290,20 @@ Vector3 Ray::intersectionPoint(Body3D body, size_t shape){
     return getPoint(intersects(body, shape));
 }
 
-float Ray::intersects(Scene* scene, SceneTestType raytest){
+float Ray::intersects(Scene* scene, RayTestType raytest){
 
-    if (raytest == SceneTestType::ALL_2D_BODIES){
+    if (raytest == RayTestType::ALL_2D_BODIES || raytest == RayTestType::STATIC_2D_BODIES){
         b2World* world = scene->getSystem<PhysicsSystem>()->getWorld2D();
 
         if (world){
             std::vector<Box2DWorldRayCastOutput> outputs;
 
-            Box2DRayCastCallback* rayCastCallback2D = new Box2DRayCastCallback(&outputs, false);
+            bool onlyStatic = false;
+            if (raytest == RayTestType::STATIC_2D_BODIES){
+                onlyStatic = true;
+            }
+
+            Box2DRayCastCallback* rayCastCallback2D = new Box2DRayCastCallback(&outputs, false, onlyStatic);
 
             float ptmScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
@@ -324,16 +329,21 @@ float Ray::intersects(Scene* scene, SceneTestType raytest){
             }
         }
 
-    }else if (raytest == SceneTestType::ALL_3D_BODIES){
+    }else if (raytest == RayTestType::ALL_3D_BODIES || raytest == RayTestType::STATIC_3D_BODIES){
         JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
 
         if (world){
             JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
             JPH::RayCastResult hit;
 
-            //if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, JPH::SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::NON_MOVING), JPH::SpecifiedObjectLayerFilter(Layers::NON_MOVING))){
-            if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit)){
-                return hit.mFraction;
+            if (raytest == RayTestType::STATIC_3D_BODIES){
+                if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, JPH::SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::NON_MOVING), JPH::SpecifiedObjectLayerFilter(Layers::NON_MOVING))){
+                    return hit.mFraction;
+                }
+            }else{
+                if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit)){
+                    return hit.mFraction;
+                }
             }
 
             // getting normal
@@ -348,6 +358,6 @@ float Ray::intersects(Scene* scene, SceneTestType raytest){
     return -1;
 }
 
-Vector3 Ray::intersectionPoint(Scene* scene, SceneTestType raytest){
+Vector3 Ray::intersectionPoint(Scene* scene, RayTestType raytest){
     return getPoint(intersects(scene, raytest));
 }

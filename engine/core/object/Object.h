@@ -8,6 +8,7 @@
 #include "EntityHandle.h"
 #include "Body2D.h"
 #include "Body3D.h"
+#include "math/Ray.h"
 
 namespace Supernova{
 
@@ -69,6 +70,8 @@ namespace Supernova{
         // 3D physics
         Body3D getBody3D();
         void removeBody3D();
+
+        Ray getRay(Vector3 direction);
     };
 
 }

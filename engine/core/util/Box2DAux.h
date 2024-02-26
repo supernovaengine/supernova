@@ -80,6 +80,7 @@ namespace Supernova{
 
         std::vector<Box2DWorldRayCastOutput>* outputs;
         bool returnAllResults;
+        bool onlyStatic;
         uint16_t collisionGroup;
         uint16_t collisionMask;
 
@@ -88,6 +89,7 @@ namespace Supernova{
         Box2DRayCastCallback(std::vector<Box2DWorldRayCastOutput>* outputs){
             this->outputs = outputs;
             this->returnAllResults = true;
+            this->onlyStatic = false;
             this->collisionGroup = (uint16_t)~0u;
             this->collisionMask = (uint16_t)~0u;
         }
@@ -95,19 +97,32 @@ namespace Supernova{
         Box2DRayCastCallback(std::vector<Box2DWorldRayCastOutput>* outputs, bool returnAllResults){
             this->outputs = outputs;
             this->returnAllResults = returnAllResults;
+            this->onlyStatic = false;
             this->collisionGroup = (uint16_t)~0u;
             this->collisionMask = (uint16_t)~0u;
         }
 
-        Box2DRayCastCallback(std::vector<Box2DWorldRayCastOutput>* outputs, bool returnAllResults, uint16_t collisionGroup, uint16_t collisionMask){
+        Box2DRayCastCallback(std::vector<Box2DWorldRayCastOutput>* outputs, bool returnAllResults, bool onlyStatic){
             this->outputs = outputs;
             this->returnAllResults = returnAllResults;
+            this->onlyStatic = onlyStatic;
+            this->collisionGroup = (uint16_t)~0u;
+            this->collisionMask = (uint16_t)~0u;
+        }
+
+        Box2DRayCastCallback(std::vector<Box2DWorldRayCastOutput>* outputs, bool returnAllResults, bool onlyStatic, uint16_t collisionGroup, uint16_t collisionMask){
+            this->outputs = outputs;
+            this->returnAllResults = returnAllResults;
+            this->onlyStatic = onlyStatic;
             this->collisionGroup = collisionGroup;
             this->collisionMask = collisionMask;
         }
 
 		float ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float fraction){
             if (fixture->IsSensor())
+                return -1.f;
+
+            if (onlyStatic && fixture->GetBody()->GetType() != b2BodyType::b2_staticBody)
                 return -1.f;
 
             if ((fixture->GetFilterData().categoryBits & collisionMask) && (fixture->GetFilterData().maskBits & collisionGroup)){

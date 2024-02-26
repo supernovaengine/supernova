@@ -212,3 +212,7 @@ Body3D Object::getBody3D(){
 void Object::removeBody3D(){
     scene->getSystem<PhysicsSystem>()->removeBody3D(entity);
 }
+
+Ray Object::getRay(Vector3 direction){
+    return Ray(getWorldPosition(), direction);
+}
