@@ -119,16 +119,8 @@ void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Bod
         Transform& transform = scene->getComponent<Transform>(entity);
         if (body.body){
 
-            b2Vec2 bNewPosition(transform.worldPosition.x / pointsToMeterScale2D, transform.worldPosition.y / pointsToMeterScale2D);
-            float bNewAngle = Angle::defaultToRad(transform.worldRotation.getRoll());
-
-            if (body.newBody && transform.needUpdate){
-                bNewPosition = b2Vec2(transform.position.x / pointsToMeterScale2D, transform.position.y / pointsToMeterScale2D);
-                bNewAngle = Angle::defaultToRad(transform.rotation.getRoll());
-                if (transform.parent != NULL_ENTITY){
-                    Log::warn("Body position and rotation cannot be obtained from world: %u (%s)", entity, transform.name.c_str());
-                }
-            }
+            b2Vec2 bNewPosition(transform.position.x / pointsToMeterScale2D, transform.position.y / pointsToMeterScale2D);
+            float bNewAngle = Angle::defaultToRad(transform.rotation.getRoll());
 
             b2Vec2 bPosition = body.body->GetPosition();
             float bAngle = body.body->GetAngle();
@@ -145,16 +137,8 @@ void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Bod
     if (signature.test(scene->getComponentType<Transform>())){
         Transform& transform = scene->getComponent<Transform>(entity);
         if (body.body){
-            JPH::Vec3 jNewPosition(transform.worldPosition.x, transform.worldPosition.y, transform.worldPosition.z);
-            JPH::Quat jNewQuat(transform.worldRotation.x, transform.worldRotation.y, transform.worldRotation.z, transform.worldRotation.w);
-
-            if (body.newBody && transform.needUpdate){
-                jNewPosition = JPH::Vec3(transform.position.x, transform.position.y, transform.position.z);
-                jNewQuat = JPH::Quat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
-                if (transform.parent != NULL_ENTITY){
-                    Log::warn("Body position and rotation cannot be obtained from world: %u (%s)", entity, transform.name.c_str());
-                }
-            }
+            JPH::Vec3 jNewPosition(transform.position.x, transform.position.y, transform.position.z);
+            JPH::Quat jNewQuat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
 
             JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
             JPH::Vec3 jPosition;
