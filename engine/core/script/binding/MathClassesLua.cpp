@@ -34,17 +34,22 @@ namespace luabridge
 void LuaBinding::registerMathClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
 
-    luabridge::getGlobalNamespace(L)
-        .beginNamespace("RayTestType")
-        .addVariable("STATIC_2D_BODIES", RayTestType::STATIC_2D_BODIES)
-        .addVariable("ALL_2D_BODIES", RayTestType::ALL_2D_BODIES)
-        .addVariable("STATIC_3D_BODIES", RayTestType::STATIC_3D_BODIES)
-        .addVariable("ALL_3D_BODIES", RayTestType::ALL_3D_BODIES)
-        .endNamespace();
+        static const Vector2 ZERO;
+        static const Vector2 UNIT_X;
+        static const Vector2 UNIT_Y;
+        static const Vector2 NEGATIVE_UNIT_X;
+        static const Vector2 NEGATIVE_UNIT_Y;
+        static const Vector2 UNIT_SCALE;
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector2>("Vector2")
         .addConstructor<void(), void(float, float)>()
+        .addStaticProperty("ZERO", &Vector2::ZERO)
+        .addStaticProperty("UNIT_X", &Vector2::UNIT_X)
+        .addStaticProperty("UNIT_Y", &Vector2::UNIT_Y)
+        .addStaticProperty("NEGATIVE_UNIT_X", &Vector2::NEGATIVE_UNIT_X)
+        .addStaticProperty("NEGATIVE_UNIT_Y", &Vector2::NEGATIVE_UNIT_Y)
+        .addStaticProperty("UNIT_SCALE", &Vector2::UNIT_SCALE)
         .addProperty("x", &Vector2::x, true)
         .addProperty("y", &Vector2::y, true)
         .addFunction("__tostring", &Vector2::toString)
@@ -78,6 +83,11 @@ void LuaBinding::registerMathClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector3>("Vector3")
         .addConstructor<void(), void(float, float, float)>()
+        .addStaticProperty("ZERO", &Vector3::ZERO)
+        .addStaticProperty("UNIT_X", &Vector3::UNIT_X)
+        .addStaticProperty("UNIT_Y", &Vector3::UNIT_Y)
+        .addStaticProperty("UNIT_Z", &Vector3::UNIT_Z)
+        .addStaticProperty("UNIT_SCALE", &Vector3::UNIT_SCALE)
         .addProperty("x", &Vector3::x, true)
         .addProperty("y", &Vector3::y, true)
         .addProperty("z", &Vector3::z, true)
@@ -110,6 +120,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector4>("Vector4")
         .addConstructor<void(), void(float, float, float, float)>()
+        .addStaticProperty("ZERO", &Vector4::ZERO)
         .addProperty("x", &Vector4::x, true)
         .addProperty("y", &Vector4::y, true)
         .addProperty("z", &Vector4::z, true)
@@ -236,6 +247,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             void(const float, const float, const float),
             void(const Vector3*),
             void(const Vector3&, const Vector3&, const Vector3&)>()
+        .addStaticProperty("IDENTITY", &Quaternion::IDENTITY)
         .addFunction("__tostring", &Quaternion::toString)
         .addFunction("__eq", &Quaternion::operator==)
         .addFunction("__sub", (Quaternion (Quaternion::*)(const Quaternion&) const)&Quaternion::operator-)
@@ -376,8 +388,25 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("RayTestType")
+        .addVariable("STATIC_2D_BODIES", RayTestType::STATIC_2D_BODIES)
+        .addVariable("ALL_2D_BODIES", RayTestType::ALL_2D_BODIES)
+        .addVariable("STATIC_3D_BODIES", RayTestType::STATIC_3D_BODIES)
+        .addVariable("ALL_3D_BODIES", RayTestType::ALL_3D_BODIES)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<RayReturn>("RayReturn")
+        .addProperty("hit", &RayReturn::hit)
+        .addProperty("distance", &RayReturn::distance)
+        .addProperty("point", &RayReturn::point)
+        .addProperty("normal", &RayReturn::normal)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<Ray>("Ray")
         .addConstructor<void(), void(Vector3, Vector3)>()
+        .addStaticProperty("NO_HIT", &Ray::NO_HIT)
         .addProperty("origin", &Ray::getOrigin, &Ray::setOrigin)
         .addProperty("direction", &Ray::getDirection, &Ray::setDirection)
         .addFunction("getPoint", &Ray::getPoint)

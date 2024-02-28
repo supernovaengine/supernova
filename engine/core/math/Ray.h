@@ -16,6 +16,13 @@ namespace Supernova {
         ALL_3D_BODIES
     };
 
+    struct RayReturn{
+        bool hit;
+        float distance;
+        Vector3 point;
+        Vector3 normal;
+    };
+
     class Ray{
 
     private:
@@ -24,6 +31,9 @@ namespace Supernova {
         Vector3 direction; // direction and length of the ray (anything beyond this length will not be a hit)
 
     public:
+
+        static const RayReturn NO_HIT;
+
         Ray();
         Ray(const Ray &ray);
         Ray(Vector3 origin, Vector3 direction);
@@ -39,25 +49,25 @@ namespace Supernova {
 
         Vector3 getPoint(float distance);
 
-        float intersects(Plane plane);
+        RayReturn intersects(Plane plane);
         Vector3 intersectionPoint(Plane plane);
 
-        float intersects(AlignedBox box);
+        RayReturn intersects(AlignedBox box);
         Vector3 intersectionPoint(AlignedBox box);
 
-        float intersects(Body2D body);
+        RayReturn intersects(Body2D body);
         Vector3 intersectionPoint(Body2D body);
 
-        float intersects(Body2D body, size_t shape);
+        RayReturn intersects(Body2D body, size_t shape);
         Vector3 intersectionPoint(Body2D body, size_t shape);
 
-        float intersects(Body3D body);
+        RayReturn intersects(Body3D body);
         Vector3 intersectionPoint(Body3D body);
 
-        float intersects(Body3D body, size_t shape);
+        RayReturn intersects(Body3D body, size_t shape);
         Vector3 intersectionPoint(Body3D body, size_t shape);
 
-        float intersects(Scene* scene, RayTestType raytest);
+        RayReturn intersects(Scene* scene, RayTestType raytest);
         Vector3 intersectionPoint(Scene* scene, RayTestType raytest);
     };
     
