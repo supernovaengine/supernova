@@ -64,7 +64,7 @@ RayReturn Ray::intersects(Plane plane) {
         float nom = plane.normal.dotProduct(getOrigin()) + plane.d;
         float dist = -(nom/denom);
         if ((dist >= 0) && (dist <= 1)) // anything beyond this length will not be a hit
-            return {true, dist, getPoint(dist), Vector3::ZERO};
+            return {true, dist, getPoint(dist), plane.normal};
     }
 
     return NO_HIT;
@@ -155,8 +155,26 @@ RayReturn Ray::intersects(AlignedBox box){
     }
 
     if (hit)
-        if ((lowt >= 0) && (lowt <= 1)) // anything beyond this length will not be a hit
-            return {true, lowt, getPoint(lowt), Vector3::ZERO};
+        if ((lowt >= 0) && (lowt <= 1)){ // anything beyond this length will not be a hit
+
+            Vector3 point = getPoint(lowt);
+            Vector3 normal = Vector3::ZERO;
+
+            if (point.x == min.x)
+                normal = Vector3(-1, 0, 0); // Left face
+            if (point.x == max.x)
+                normal = Vector3(1, 0, 0); // Right face
+            if (point.y == min.y)
+                normal = Vector3(0, -1, 0); // Bottom face
+            if (point.y == max.y)
+                normal = Vector3(0, 1, 0); // Top face
+            if (point.z == min.z)
+                normal = Vector3(0, 0, -1); // Front face
+            if (point.z == max.z)
+                normal = Vector3(0, 0, 1); // Back face
+
+            return {true, lowt, point, normal};
+        }
 
     return NO_HIT;
 }
@@ -336,15 +354,15 @@ RayReturn Ray::intersects(Scene* scene, RayTestType raytest){
             JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
             JPH::RayCastResult hit;
 
-            JPH::BroadPhaseLayer broadPhaseLayer = {};
-            JPH::ObjectLayer objectLayer = {};
+            bool castRay = false;
 
             if (raytest == RayTestType::STATIC_3D_BODIES){
-                broadPhaseLayer = BroadPhaseLayers::NON_MOVING;
-                objectLayer = Layers::NON_MOVING;
+                castRay = world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, JPH::SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::NON_MOVING), JPH::SpecifiedObjectLayerFilter(Layers::NON_MOVING));
+            }else{
+                castRay = world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit);
             }
 
-            if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, JPH::SpecifiedBroadPhaseLayerFilter(broadPhaseLayer), JPH::SpecifiedObjectLayerFilter(objectLayer))){
+            if (castRay){
                 JPH::BodyLockRead lock(world->GetBodyLockInterface(), hit.mBodyID);
                 JPH::Vec3 normal;
                 if (lock.Succeeded()){
