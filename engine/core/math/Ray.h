@@ -21,6 +21,8 @@ namespace Supernova {
         float distance;
         Vector3 point;
         Vector3 normal;
+        Entity body;
+        size_t shapeIndex;
     };
 
     class Ray{

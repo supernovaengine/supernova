@@ -7,7 +7,7 @@
 using namespace Supernova;
 
 
-const RayReturn Ray::NO_HIT( {false, -1, Vector3::ZERO, Vector3::ZERO} );
+const RayReturn Ray::NO_HIT( {false, -1, Vector3::ZERO, Vector3::ZERO, NULL_ENTITY, 0} );
 
 Ray::Ray(){
 
@@ -64,7 +64,7 @@ RayReturn Ray::intersects(Plane plane) {
         float nom = plane.normal.dotProduct(getOrigin()) + plane.d;
         float dist = -(nom/denom);
         if ((dist >= 0) && (dist <= 1)) // anything beyond this length will not be a hit
-            return {true, dist, getPoint(dist), plane.normal};
+            return {true, dist, getPoint(dist), plane.normal, NULL_ENTITY, 0};
     }
 
     return NO_HIT;
@@ -90,7 +90,7 @@ RayReturn Ray::intersects(AlignedBox box){
 
     // inside box
     if ( rayorig > min && rayorig < max ) {
-        return {true, 0, getPoint(0), Vector3::ZERO};
+        return {true, 0, getPoint(0), Vector3::ZERO, NULL_ENTITY, 0};
     }
 
     // Min x
@@ -173,7 +173,7 @@ RayReturn Ray::intersects(AlignedBox box){
             if (point.z == max.z)
                 normal = Vector3(0, 0, 1); // Back face
 
-            return {true, lowt, point, normal};
+            return {true, lowt, point, normal, NULL_ENTITY, 0};
         }
 
     return NO_HIT;
@@ -198,6 +198,7 @@ RayReturn Ray::intersects(Body2D body){
 
         float closestFraction = FLT_MAX;
         b2Vec2 intersectionNormal(0,0);
+        size_t shapeIndex = 0;
         for (b2Fixture* f = bodycomp.body->GetFixtureList(); f; f = f->GetNext()) {
             b2RayCastOutput output;
             int32 childCount = f->GetShape()->GetChildCount();
@@ -207,12 +208,13 @@ RayReturn Ray::intersects(Body2D body){
                 if ( output.fraction < closestFraction ) {
                     closestFraction = output.fraction;
                     intersectionNormal = output.normal;
+                    shapeIndex = f->GetUserData().pointer;
                 }
             }
         }
 
         if (closestFraction >= 0 && closestFraction <= 1){
-            return {true, closestFraction, getPoint(closestFraction), Vector3(intersectionNormal.x, intersectionNormal.y, 0)};
+            return {true, closestFraction, getPoint(closestFraction), Vector3(intersectionNormal.x, intersectionNormal.y, 0), body.getEntity(), shapeIndex};
         }
 
     }
@@ -251,7 +253,7 @@ RayReturn Ray::intersects(Body2D body, size_t shape){
         }
 
         if (closestFraction >= 0 && closestFraction <= 1){
-            return {true, closestFraction, getPoint(closestFraction), Vector3(intersectionNormal.x, intersectionNormal.y, 0)};
+            return {true, closestFraction, getPoint(closestFraction), Vector3(intersectionNormal.x, intersectionNormal.y, 0), body.getEntity(), shape};
         }
 
     }
@@ -273,8 +275,11 @@ RayReturn Ray::intersects(Body3D body){
 
         JPH::Vec3 normal = bodycomp.body->GetShape()->GetSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
 
+        // this shape ID is NOT shape index of shapes array in Box3DComponent
+        uint32 shapeID = hit.mSubShapeID2.GetValue();
+
         if (bodycomp.body->GetShape()->CastRay(ray, id_creator, hit)){
-            return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ())};
+            return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), body.getEntity(), shapeID};
         }
     }
 
@@ -297,7 +302,7 @@ RayReturn Ray::intersects(Body3D body, size_t shape){
             if (bodycomp.shapes[shape].shape->CastRay(ray, id_creator, hit)){
                 JPH::Vec3 normal = bodycomp.shapes[shape].shape->GetSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
 
-                return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ())};
+                return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), body.getEntity(), shape};
             }
         }
     }
@@ -335,15 +340,19 @@ RayReturn Ray::intersects(Scene* scene, RayTestType raytest){
 
             float closestFraction = FLT_MAX;
             b2Vec2 intersectionNormal(0,0);
+            Entity entity = NULL_ENTITY;
+            size_t shapeIndex = 0;
             for (size_t i = 0; i < outputs.size(); i++){
                     if ( outputs[i].fraction < closestFraction ) {
                         closestFraction = outputs[i].fraction;
                         intersectionNormal = outputs[i].normal;
+                        entity = outputs[i].fixture->GetBody()->GetUserData().pointer;
+                        shapeIndex = outputs[i].fixture->GetUserData().pointer;
                     }
             }
 
             if (closestFraction >= 0 && closestFraction <= 1){
-                return {true, closestFraction, getPoint(closestFraction), Vector3(intersectionNormal.x, intersectionNormal.y, 0)};
+                return {true, closestFraction, getPoint(closestFraction), Vector3(intersectionNormal.x, intersectionNormal.y, 0), entity, shapeIndex};
             }
         }
 
@@ -365,12 +374,17 @@ RayReturn Ray::intersects(Scene* scene, RayTestType raytest){
             if (castRay){
                 JPH::BodyLockRead lock(world->GetBodyLockInterface(), hit.mBodyID);
                 JPH::Vec3 normal;
+                Entity entity = NULL_ENTITY;
                 if (lock.Succeeded()){
                     const JPH::Body &hit_body = lock.GetBody();
                     normal = hit_body.GetWorldSpaceSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
+                    entity = hit_body.GetUserData();
                 }
 
-                return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ())};
+                // this shape ID is NOT shape index of shapes array in Box3DComponent
+                uint32 shapeID = hit.mSubShapeID2.GetValue();
+
+                return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), entity, shapeID};
             }
 
         }

@@ -401,6 +401,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addProperty("distance", &RayReturn::distance)
         .addProperty("point", &RayReturn::point)
         .addProperty("normal", &RayReturn::normal)
+        .addProperty("body", &RayReturn::body)
+        .addProperty("shapeIndex", &RayReturn::shapeIndex)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
