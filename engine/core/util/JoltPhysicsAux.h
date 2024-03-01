@@ -211,7 +211,7 @@ namespace Supernova{
 			size_t shapeIndex1 = body_interface.GetShape(inSubShapePair.GetBody1ID())->GetSubShapeUserData(inSubShapePair.GetSubShapeID1());
 			size_t shapeIndex2 = body_interface.GetShape(inSubShapePair.GetBody2ID())->GetSubShapeUserData(inSubShapePair.GetSubShapeID2());
 
-			physicsSystem->onContactRemoved3D(Body3D(scene, entity1), Body3D(scene, entity2), shapeIndex1, shapeIndex2);
+			physicsSystem->onContactRemoved3D(Body3D(scene, entity1), Body3D(scene, entity2), (unsigned long)shapeIndex1, (unsigned long)shapeIndex2);
 		}
 	};
 
