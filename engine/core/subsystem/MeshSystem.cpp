@@ -1318,6 +1318,112 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
 }
 
+void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
+    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
+    mesh.numSubmeshes = 1;
+
+	mesh.buffer.clear();
+	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.addAttribute(AttributeType::COLOR, 4);
+
+    Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
+    Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
+    Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
+    Attribute* attColor = mesh.buffer.getAttribute(AttributeType::COLOR);
+
+    float x, y, z;                                  // vertex position
+    float radius;                                   // radius for each stack
+
+    std::vector<float> sideNormals = getCylinderSideNormals(baseRadius, topRadius, height, slices);
+    std::vector<float> unitCircleVertices = buildUnitCircleVertices(slices);
+
+    // put vertices of side cylinder to array by scaling unit circle
+    for(int i = 0; i <= stacks; ++i){
+        y = -(height * 0.5f) + (float)i / stacks * height;      // vertex position y
+        radius = baseRadius + (float)i / stacks * (topRadius - baseRadius);     // lerp
+        float t = 1.0f - (float)i / stacks;   // top-to-bottom
+
+        for(int j = 0, k = 0; j <= slices; ++j, k += 3){
+            x = unitCircleVertices[k];
+            z = unitCircleVertices[k+2];
+            mesh.buffer.addVector3(attVertex, Vector3(x * radius, y, z * radius));
+            mesh.buffer.addVector3(attNormal, Vector3(sideNormals[k], sideNormals[k+1], sideNormals[k+2]));
+            mesh.buffer.addVector2(attTexcoord, Vector2((float)j / slices, t));
+            mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        }
+    }
+/*
+    // remember where the base.top vertices start
+    unsigned int baseVertexIndex = mesh.buffer.getCount();
+
+    float xz;                                    // vertex position
+    float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
+    float s, t;                                     // vertex texCoord
+
+    float sectorStep = 2 * M_PI / slices;
+    float stackStep = M_PI / stacks;
+    float sectorAngle, stackAngle;
+
+    for(int i = 0; i <= (stacks/2.0); ++i){
+        stackAngle = M_PI / 2 - i * stackStep;      // starting from pi/2 to -pi/2
+        xz = radius * cosf(stackAngle);             // r * cos(u)
+        y = radius * sinf(stackAngle);              // r * sin(u)
+
+        // add (sectorCount+1) vertices per stack
+        // the first and last vertices have same position and normal, but different tex coords
+        for(int j = 0; j <= slices; ++j){
+            sectorAngle = j * sectorStep;           // starting from 0 to 2pi
+
+            // vertex position (x, y, z)
+            x = xz * cosf(sectorAngle);             // r * cos(u) * cos(v)
+            z = xz * sinf(sectorAngle);             // r * cos(u) * sin(v)
+            mesh.buffer.addVector3(attVertex, Vector3(x, y, z));
+
+            // normalized vertex normal (nx, ny, nz)
+            nx = x * lengthInv;
+            ny = y * lengthInv;
+            nz = z * lengthInv;
+            mesh.buffer.addVector3(attNormal, Vector3(nx, ny, nz));
+
+            // vertex tex coord (s, t) range between [0, 1]
+            s = (float)j / slices;
+            t = (float)i / stacks;
+            mesh.buffer.addVector2(attTexcoord, Vector2(s, t));
+
+            // vertex color (white)
+            mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+        }
+    }
+*/
+    std::vector<uint16_t> indices;
+
+    // put indices for sides
+    unsigned int k1, k2;
+    for(int i = 0; i < stacks; ++i){
+        k1 = i * (slices + 1);     // bebinning of current stack
+        k2 = k1 + slices + 1;      // beginning of next stack
+
+        for(int j = 0; j < slices; ++j, ++k1, ++k2){
+            // 2 trianles per sector
+            indices.push_back(k1);
+            indices.push_back(k1 + 1);
+            indices.push_back(k2);
+
+            indices.push_back(k2);
+            indices.push_back(k1 + 1);
+            indices.push_back(k2 + 1);
+        }
+    }
+
+    mesh.indices.setValues(
+        0, mesh.indices.getAttribute(AttributeType::INDEX),
+        indices.size(), (char*)&indices[0], sizeof(uint16_t));
+}
+
 void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsigned int sides, unsigned int rings){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
