@@ -1,5 +1,5 @@
 //
-// (c) 2022 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #include "LuaBinding.h"
@@ -263,10 +263,10 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .beginClass<FunctionSubscribe<void(unsigned int, unsigned int, int, int)>>("FunctionSubscribe_V_UUII")
-        .addFunction("__call", &FunctionSubscribe<void(unsigned int, unsigned int, int, int)>::call)
-        .addFunction("call", &FunctionSubscribe<void(unsigned int, unsigned int, int, int)>::call)
-        .addFunction("add", (bool (FunctionSubscribe<void(unsigned int, unsigned int, int, int)>::*)(const std::string&, lua_State*))&FunctionSubscribe<void(unsigned int, unsigned int, int, int)>::add)
+        .beginClass<FunctionSubscribe<void(Body3D, Body3D, size_t, size_t)>>("FunctionSubscribe_V_B3B3STST")
+        .addFunction("__call", &FunctionSubscribe<void(Body3D, Body3D, size_t, size_t)>::call)
+        .addFunction("call", &FunctionSubscribe<void(Body3D, Body3D, size_t, size_t)>::call)
+        .addFunction("add", (bool (FunctionSubscribe<void(Body3D, Body3D, size_t, size_t)>::*)(const std::string&, lua_State*))&FunctionSubscribe<void(Body3D, Body3D, size_t, size_t)>::add)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

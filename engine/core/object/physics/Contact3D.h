@@ -1,5 +1,5 @@
 //
-// (c) 2023 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #ifndef Contact3D_H
@@ -9,6 +9,7 @@
 #include "Body3D.h"
 
 namespace JPH{
+    class Body;
     class ContactManifold;
     class ContactSettings;
 }
@@ -18,11 +19,13 @@ namespace Supernova{
     class Contact3D{
     private:
         Scene* scene;
+        const JPH::Body* body1;
+        const JPH::Body* body2;
         const JPH::ContactManifold* contactManifold;
         JPH::ContactSettings* contactSettings;
 
     public:
-        Contact3D(Scene* scene, const JPH::ContactManifold* contactManifold, JPH::ContactSettings* contactSettings);
+        Contact3D(Scene* scene, const JPH::Body* body1, const JPH::Body* body2, const JPH::ContactManifold* contactManifold, JPH::ContactSettings* contactSettings);
         virtual ~Contact3D();
 
         Contact3D(const Contact3D& rhs);
@@ -35,8 +38,8 @@ namespace Supernova{
         Vector3 getBaseOffset() const;
         Vector3 getWorldSpaceNormal() const;
         float getPenetrationDepth() const;
-        int32_t getSubShapeID1() const;
-        int32_t getSubShapeID12() const;
+        size_t getShapeIndex1() const;
+        size_t getShapeIndex2() const;
         Vector3 getRelativeContactPointsOnA(size_t index) const;
         Vector3 getRelativeContactPointsOnB(size_t index) const;
 

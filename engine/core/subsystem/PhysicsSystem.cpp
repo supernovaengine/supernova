@@ -1,5 +1,5 @@
 //
-// (c) 2023 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #include "PhysicsSystem.h"
@@ -669,21 +669,10 @@ int PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& ter
 
         JPH::HeightFieldShapeSettings shape_settings(samples, terrainOffset, terrainScale, samplesSize);
 
-        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
-        if (shape_result.IsValid()){
-            JPH::Shape* shape = shape_result.Get();
-            shape->SetEmbedded();
-            shape->SetUserData(body->numShapes);
-
-            body->shapes[body->numShapes].shape = shape;
-
-            body->numShapes++;
-        }else{
-            Log::error("Cannot create shape for 3D Body: %u", entity);
-        }
+        int shapeIndex = loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
 
         delete[] samples;
-        return (body->numShapes - 1);
+        return shapeIndex;
     }
 
     return -1;

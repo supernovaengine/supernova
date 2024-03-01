@@ -1,5 +1,5 @@
 //
-// (c) 2022 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #include "LuaBinding.h"
@@ -888,8 +888,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getBaseOffset", &Contact3D::getBaseOffset)
         .addFunction("getWorldSpaceNormal", &Contact3D::getWorldSpaceNormal)
         .addFunction("getPenetrationDepth", &Contact3D::getPenetrationDepth)
-        .addFunction("getSubShapeID1", &Contact3D::getSubShapeID1)
-        .addFunction("getSubShapeID12", &Contact3D::getSubShapeID12)
+        .addFunction("getShapeIndex1", &Contact3D::getShapeIndex1)
+        .addFunction("getShapeIndex2", &Contact3D::getShapeIndex2)
         .addFunction("getRelativeContactPointsOnA", &Contact3D::getRelativeContactPointsOnA)
         .addFunction("getRelativeContactPointsOnB", &Contact3D::getRelativeContactPointsOnB)
         .addProperty("combinedFriction", &Contact3D::getCombinedFriction, &Contact3D::setCombinedFriction)
@@ -902,9 +902,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getContactPointOnA", &CollideShapeResult3D::getContactPointOnA)
         .addFunction("getContactPointOnB", &CollideShapeResult3D::getContactPointOnB)
         .addFunction("getPenetrationAxis", &CollideShapeResult3D::getPenetrationAxis)
-        .addFunction("getSubShapeID1", &CollideShapeResult3D::getSubShapeID1)
-        .addFunction("getSubShapeID2", &CollideShapeResult3D::getSubShapeID2)
-        .addFunction("getBodyID2", &CollideShapeResult3D::getBodyID2)
+        .addFunction("getShapeIndex1", &CollideShapeResult3D::getShapeIndex1)
+        .addFunction("getShapeIndex2", &CollideShapeResult3D::getShapeIndex2)
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

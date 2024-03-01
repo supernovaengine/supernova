@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #include "Ray.h"
 
 #include "util/Box2DAux.h"
@@ -275,11 +279,10 @@ RayReturn Ray::intersects(Body3D body){
 
         JPH::Vec3 normal = bodycomp.body->GetShape()->GetSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
 
-        // this shape ID is NOT shape index of shapes array in Box3DComponent
-        uint32 shapeID = hit.mSubShapeID2.GetValue();
+        size_t shapeIndex = bodycomp.body->GetShape()->GetSubShapeUserData(hit.mSubShapeID2);
 
         if (bodycomp.body->GetShape()->CastRay(ray, id_creator, hit)){
-            return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), body.getEntity(), shapeID};
+            return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), body.getEntity(), shapeIndex};
         }
     }
 
@@ -372,19 +375,18 @@ RayReturn Ray::intersects(Scene* scene, RayTestType raytest){
             }
 
             if (castRay){
-                JPH::BodyLockRead lock(world->GetBodyLockInterface(), hit.mBodyID);
                 JPH::Vec3 normal;
                 Entity entity = NULL_ENTITY;
+                size_t shapeIndex = 0;
+                JPH::BodyLockRead lock(world->GetBodyLockInterface(), hit.mBodyID);
                 if (lock.Succeeded()){
                     const JPH::Body &hit_body = lock.GetBody();
                     normal = hit_body.GetWorldSpaceSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
                     entity = hit_body.GetUserData();
+                    shapeIndex = hit_body.GetShape()->GetSubShapeUserData(hit.mSubShapeID2);
                 }
 
-                // this shape ID is NOT shape index of shapes array in Box3DComponent
-                uint32 shapeID = hit.mSubShapeID2.GetValue();
-
-                return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), entity, shapeID};
+                return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), entity, shapeIndex};
             }
 
         }

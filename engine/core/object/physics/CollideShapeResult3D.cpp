@@ -1,16 +1,19 @@
 //
-// (c) 2023 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #include "CollideShapeResult3D.h"
 
 #include "Jolt/Jolt.h"
+#include "Jolt/Physics/Body/Body.h"
 #include "Jolt/Physics/Collision/CollideShape.h"
 
 using namespace Supernova;
 
-CollideShapeResult3D::CollideShapeResult3D(Scene* scene, const JPH::CollideShapeResult* collideShapeResult){
+CollideShapeResult3D::CollideShapeResult3D(Scene* scene, const JPH::Body* body1, const JPH::Body* body2, const JPH::CollideShapeResult* collideShapeResult){
     this->scene = scene;
+    this->body1 = body1;
+    this->body2 = body2;
     this->collideShapeResult = collideShapeResult;
 }
 
@@ -20,12 +23,15 @@ CollideShapeResult3D::~CollideShapeResult3D(){
 
 CollideShapeResult3D::CollideShapeResult3D(const CollideShapeResult3D& rhs){
     scene = rhs.scene;
+    body1 = rhs.body1;
+    body2 = rhs.body2;
     collideShapeResult = rhs.collideShapeResult;
-
 }
 
 CollideShapeResult3D& CollideShapeResult3D::operator=(const CollideShapeResult3D& rhs){
     scene = rhs.scene;
+    body1 = rhs.body1;
+    body2 = rhs.body2;
     collideShapeResult = rhs.collideShapeResult;
     
     return *this;
@@ -47,14 +53,10 @@ Vector3 CollideShapeResult3D::getPenetrationAxis() const{
     return Vector3(collideShapeResult->mPenetrationAxis.GetX(), collideShapeResult->mPenetrationAxis.GetY(), collideShapeResult->mPenetrationAxis.GetZ());
 }
 
-int32_t CollideShapeResult3D::getSubShapeID1() const{
-    return collideShapeResult->mSubShapeID1.GetValue();
+size_t CollideShapeResult3D::getShapeIndex1() const{
+    return body1->GetShape()->GetSubShapeUserData(collideShapeResult->mSubShapeID1);
 }
 
-int32_t CollideShapeResult3D::getSubShapeID2() const{
-    return collideShapeResult->mSubShapeID2.GetValue();
-}
-
-int32_t CollideShapeResult3D::getBodyID2() const{
-    return collideShapeResult->mBodyID2.GetIndex();
+size_t CollideShapeResult3D::getShapeIndex2() const{
+    return body2->GetShape()->GetSubShapeUserData(collideShapeResult->mSubShapeID2);
 }

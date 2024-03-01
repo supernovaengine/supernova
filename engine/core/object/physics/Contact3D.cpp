@@ -1,16 +1,19 @@
 //
-// (c) 2023 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #include "Contact3D.h"
 
 #include "Jolt/Jolt.h"
+#include "Jolt/Physics/Body/Body.h"
 #include "Jolt/Physics/Collision/ContactListener.h"
 
 using namespace Supernova;
 
-Contact3D::Contact3D(Scene* scene, const JPH::ContactManifold* contactManifold, JPH::ContactSettings* contactSettings){
+Contact3D::Contact3D(Scene* scene, const JPH::Body* body1, const JPH::Body* body2, const JPH::ContactManifold* contactManifold, JPH::ContactSettings* contactSettings){
     this->scene = scene;
+    this->body1 = body1;
+    this->body2 = body2;
     this->contactManifold = contactManifold;
     this->contactSettings = contactSettings;
 }
@@ -21,13 +24,16 @@ Contact3D::~Contact3D(){
 
 Contact3D::Contact3D(const Contact3D& rhs){
     scene = rhs.scene;
+    body1 = rhs.body1;
+    body2 = rhs.body2;
     contactManifold = rhs.contactManifold;
     contactSettings = rhs.contactSettings;
-
 }
 
 Contact3D& Contact3D::operator=(const Contact3D& rhs){
     scene = rhs.scene;
+    body1 = rhs.body1;
+    body2 = rhs.body2;
     contactManifold = rhs.contactManifold;
     contactSettings = rhs.contactSettings;
     
@@ -54,12 +60,12 @@ float Contact3D::getPenetrationDepth() const{
     return contactManifold->mPenetrationDepth;
 }
 
-int32_t Contact3D::getSubShapeID1() const{
-    return contactManifold->mSubShapeID1.GetValue();
+size_t Contact3D::getShapeIndex1() const{
+    return body1->GetShape()->GetSubShapeUserData(contactManifold->mSubShapeID1);
 }
 
-int32_t Contact3D::getSubShapeID12() const{
-    return contactManifold->mSubShapeID2.GetValue();
+size_t Contact3D::getShapeIndex2() const{
+    return body2->GetShape()->GetSubShapeUserData(contactManifold->mSubShapeID2);
 }
 
 Vector3 Contact3D::getRelativeContactPointsOnA(size_t index) const{

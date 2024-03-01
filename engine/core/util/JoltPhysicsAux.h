@@ -175,7 +175,7 @@ namespace Supernova{
 			Entity entity2 = inBody2.GetUserData();
 			Body3D body2(scene, entity2);
 
-			if (!physicsSystem->shouldCollide3D.callRet(body1, body2, Vector3(inBaseOffset.GetX(), inBaseOffset.GetY(), inBaseOffset.GetZ()), CollideShapeResult3D(scene, &inCollisionResult), true)){
+			if (!physicsSystem->shouldCollide3D.callRet(body1, body2, Vector3(inBaseOffset.GetX(), inBaseOffset.GetY(), inBaseOffset.GetZ()), CollideShapeResult3D(scene, &inBody1, &inBody2, &inCollisionResult), true)){
 				return JPH::ValidateResult::RejectAllContactsForThisBodyPair;
 			}
 
@@ -189,7 +189,7 @@ namespace Supernova{
 			Entity entity2 = inBody2.GetUserData();
 			Body3D body2(scene, entity2);
 
-			physicsSystem->onContactAdded3D(body1, body2, Contact3D(scene, &inManifold, &ioSettings));
+			physicsSystem->onContactAdded3D(body1, body2, Contact3D(scene, &inBody1, &inBody2, &inManifold, &ioSettings));
 		}
 
 		virtual void OnContactPersisted(const JPH::Body &inBody1, const JPH::Body &inBody2, const JPH::ContactManifold &inManifold, JPH::ContactSettings &ioSettings) override{
@@ -199,17 +199,19 @@ namespace Supernova{
 			Entity entity2 = inBody2.GetUserData();
 			Body3D body2(scene, entity2);
 
-			physicsSystem->onContactPersisted3D(body1, body2, Contact3D(scene, &inManifold, &ioSettings));
+			physicsSystem->onContactPersisted3D(body1, body2, Contact3D(scene, &inBody1, &inBody2, &inManifold, &ioSettings));
 		}
 
 		virtual void OnContactRemoved(const JPH::SubShapeIDPair &inSubShapePair) override{
-			uint32_t bodyID1 = inSubShapePair.GetBody1ID().GetIndex();
-			uint32_t bodyID2 = inSubShapePair.GetBody2ID().GetIndex();
+			JPH::BodyInterface &body_interface = physicsSystem->getWorld3D()->GetBodyInterfaceNoLock();
 
-			int32_t subShapeID1 = inSubShapePair.GetSubShapeID1().GetValue();
-			int32_t subShapeID2 = inSubShapePair.GetSubShapeID2().GetValue();
+			Entity entity1 = body_interface.GetUserData(inSubShapePair.GetBody1ID());
+			Entity entity2 = body_interface.GetUserData(inSubShapePair.GetBody2ID());
 
-			physicsSystem->onContactRemoved3D((unsigned int)bodyID1, (unsigned int)bodyID2, (int)subShapeID1, (int)subShapeID2);
+			size_t shapeIndex1 = body_interface.GetShape(inSubShapePair.GetBody1ID())->GetSubShapeUserData(inSubShapePair.GetSubShapeID1());
+			size_t shapeIndex2 = body_interface.GetShape(inSubShapePair.GetBody2ID())->GetSubShapeUserData(inSubShapePair.GetSubShapeID2());
+
+			physicsSystem->onContactRemoved3D(Body3D(scene, entity1), Body3D(scene, entity2), shapeIndex1, shapeIndex2);
 		}
 	};
 

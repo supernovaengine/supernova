@@ -1,5 +1,5 @@
 //
-// (c) 2023 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #ifndef CollideShapeResult3D_H
@@ -9,6 +9,7 @@
 #include "Body3D.h"
 
 namespace JPH{
+    class Body;
     class CollideShapeResult;
 }
 
@@ -17,10 +18,12 @@ namespace Supernova{
     class CollideShapeResult3D{
     private:
         Scene* scene;
+        const JPH::Body* body1;
+        const JPH::Body* body2;
         const JPH::CollideShapeResult* collideShapeResult;
 
     public:
-        CollideShapeResult3D(Scene* scene, const JPH::CollideShapeResult* collideShapeResult);
+        CollideShapeResult3D(Scene* scene, const JPH::Body* body1, const JPH::Body* body2, const JPH::CollideShapeResult* collideShapeResult);
         virtual ~CollideShapeResult3D();
 
         CollideShapeResult3D(const CollideShapeResult3D& rhs);
@@ -31,9 +34,8 @@ namespace Supernova{
         Vector3 getContactPointOnA() const;
         Vector3 getContactPointOnB() const;
         Vector3 getPenetrationAxis() const;
-        int32_t getSubShapeID1() const;
-        int32_t getSubShapeID2() const;
-        int32_t getBodyID2() const;
+        size_t getShapeIndex1() const;
+        size_t getShapeIndex2() const;
     };
 }
 
