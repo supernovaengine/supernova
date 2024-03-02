@@ -1378,8 +1378,8 @@ void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius,
 
     std::vector<uint16_t> indices;
 
-    for (int i = 0; i < stacks + 1; ++i) {
-        for (int j = 0; j < slices; ++j) {
+    for (int i = 0; i < (stacks + 1); ++i) {
+        for (int j = 0; j < (slices + 1); ++j) {
             int first = (i * (slices + 1)) + j;
             int second = first + slices + 1;
 
