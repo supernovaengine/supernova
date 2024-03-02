@@ -317,6 +317,11 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<float, float, float>(&Shape::createCylinder),
             luabridge::overload<float, float, unsigned int, unsigned int>(&Shape::createCylinder),
             luabridge::overload<float, float, float, unsigned int, unsigned int>(&Shape::createCylinder))
+        .addFunction("createCapsule", 
+            luabridge::overload<float, float>(&Shape::createCapsule),
+            luabridge::overload<float, float, float>(&Shape::createCapsule),
+            luabridge::overload<float, float, unsigned int, unsigned int>(&Shape::createCapsule),
+            luabridge::overload<float, float, float, unsigned int, unsigned int>(&Shape::createCapsule))
         .addFunction("createTorus", 
             luabridge::overload<float, float>(&Shape::createTorus),
             luabridge::overload<float, float, unsigned int, unsigned int>(&Shape::createTorus))

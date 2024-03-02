@@ -30,6 +30,8 @@ namespace Supernova{
 
         void createCapsule(float radius, float height);
         void createCapsule(float baseRadius, float topRadius, float height);
+        void createCapsule(float radius, float height, unsigned int slices, unsigned int stacks);
+        void createCapsule(float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks);
 
         void createTorus(float radius, float ringRadius);
         void createTorus(float radius, float ringRadius, unsigned int sides, unsigned int rings);

@@ -42,14 +42,6 @@ void Shape::createCylinder(float radius, float height){
     scene->getSystem<MeshSystem>()->createCylinder(entity, radius, radius, height);
 }
 
-void Shape::createCapsule(float radius, float height){
-    scene->getSystem<MeshSystem>()->createCapsule(entity, radius, radius, height);
-}
-
-void Shape::createCapsule(float baseRadius, float topRadius, float height){
-    scene->getSystem<MeshSystem>()->createCapsule(entity, baseRadius, topRadius, height);
-}
-
 void Shape::createCylinder(float baseRadius, float topRadius, float height){
     scene->getSystem<MeshSystem>()->createCylinder(entity, baseRadius, topRadius, height);
 }
@@ -60,6 +52,22 @@ void Shape::createCylinder(float radius, float height, unsigned int slices, unsi
 
 void Shape::createCylinder(float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
     scene->getSystem<MeshSystem>()->createCylinder(entity, baseRadius, topRadius, height, slices, stacks);
+}
+
+void Shape::createCapsule(float radius, float height){
+    scene->getSystem<MeshSystem>()->createCapsule(entity, radius, radius, height);
+}
+
+void Shape::createCapsule(float baseRadius, float topRadius, float height){
+    scene->getSystem<MeshSystem>()->createCapsule(entity, baseRadius, topRadius, height);
+}
+
+void Shape::createCapsule(float radius, float height, unsigned int slices, unsigned int stacks){
+    scene->getSystem<MeshSystem>()->createCapsule(entity, radius, radius, height, slices, stacks);
+}
+
+void Shape::createCapsule(float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
+    scene->getSystem<MeshSystem>()->createCapsule(entity, baseRadius, topRadius, height, slices, stacks);
 }
 
 void Shape::createTorus(float radius, float ringRadius){
