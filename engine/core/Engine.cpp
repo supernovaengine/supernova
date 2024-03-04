@@ -34,15 +34,15 @@ int Engine::preferredCanvasHeight;
 
 Rect Engine::viewRect;
 
-Scaling Engine::scalingMode;
-TextureStrategy Engine::textureStrategy;
+Scaling Engine::scalingMode = Scaling::FITWIDTH;
+TextureStrategy Engine::textureStrategy = TextureStrategy::RESIZE;
 
-bool Engine::callMouseInTouchEvent;
-bool Engine::callTouchInMouseEvent;
-bool Engine::useDegrees;
-bool Engine::automaticTransparency;
-bool Engine::allowEventsOutCanvas;
-bool Engine::fixedTimeSceneUpdate;
+bool Engine::callMouseInTouchEvent = false;
+bool Engine::callTouchInMouseEvent = false;
+bool Engine::useDegrees = true;
+bool Engine::automaticTransparency = true;
+bool Engine::allowEventsOutCanvas = false;
+bool Engine::fixedTimeSceneUpdate = true;
 
 uint64_t Engine::lastTime = 0;
 float Engine::updateTimeCount = 0;
@@ -421,14 +421,6 @@ void Engine::calculateCanvas(){
 void Engine::systemInit(int argc, char* argv[]){
 
     Engine::setCanvasSize(1000,480);
-    Engine::setScalingMode(Scaling::FITWIDTH);
-    Engine::setTextureStrategy(TextureStrategy::RESIZE);
-    Engine::setCallMouseInTouchEvent(false);
-    Engine::setCallTouchInMouseEvent(false);
-    Engine::setUseDegrees(true);
-    Engine::setAutomaticTransparency(true);
-    Engine::setAllowEventsOutCanvas(false);
-    Engine::setFixedTimeSceneUpdate(true);
 
     lastTime = 0;
     updateTimeCount = 0;
