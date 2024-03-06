@@ -60,6 +60,10 @@ namespace Supernova{
         bool isCylindricalBillboard() const;
 
         void setModelMatrix(Matrix4 modelMatrix);
+        Matrix4 getModelMatrix() const;
+
+        Matrix4 getNormalMatrix() const;
+        Matrix4 getModelViewProjectionMatrix() const;
 
         void updateTransform();
 

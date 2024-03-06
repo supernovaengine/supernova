@@ -257,6 +257,7 @@ void Body3D::setIsSensor(bool sensor){
 
     checkBody(body);
     body.body->SetIsSensor(sensor);
+    body.body->SetSensorDetectsStatic(true);
 }
 
 void Body3D::setAllowedDOFsAll(){

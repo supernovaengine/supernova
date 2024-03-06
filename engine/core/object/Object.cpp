@@ -165,6 +165,21 @@ void Object::setModelMatrix(Matrix4 modelMatrix){
     transform.staticObject = true;
 }
 
+Matrix4 Object::getModelMatrix() const{
+    Transform& transform = getComponent<Transform>();
+    return transform.modelMatrix;
+}
+
+Matrix4 Object::getNormalMatrix() const{
+    Transform& transform = getComponent<Transform>();
+    return transform.normalMatrix;
+}
+
+Matrix4 Object::getModelViewProjectionMatrix() const{
+    Transform& transform = getComponent<Transform>();
+    return transform.modelViewProjectionMatrix;
+}
+
 void Object::addChild(Object* child){
     scene->addEntityChild(this->entity, child->entity);
 }
