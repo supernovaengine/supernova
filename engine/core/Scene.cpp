@@ -64,8 +64,8 @@ Scene::Scene(){
 	registerSystem<ActionSystem>();
 	registerSystem<MeshSystem>();
 	registerSystem<UISystem>();
-	registerSystem<PhysicsSystem>();
 	registerSystem<RenderSystem>();
+	registerSystem<PhysicsSystem>();
 	registerSystem<AudioSystem>();
 
 	camera = NULL_ENTITY;

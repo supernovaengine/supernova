@@ -137,8 +137,16 @@ void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Bod
     if (signature.test(scene->getComponentType<Transform>())){
         Transform& transform = scene->getComponent<Transform>(entity);
         if (body.body){
-            JPH::Vec3 jNewPosition(transform.position.x, transform.position.y, transform.position.z);
-            JPH::Quat jNewQuat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+            JPH::Vec3 jNewPosition(transform.worldPosition.x, transform.worldPosition.y, transform.worldPosition.z);
+            JPH::Quat jNewQuat(transform.worldRotation.x, transform.worldRotation.y, transform.worldRotation.z, transform.worldRotation.w);
+
+            if (body.newBody && transform.needUpdate){
+                jNewPosition = JPH::Vec3(transform.position.x, transform.position.y, transform.position.z);
+                jNewQuat = JPH::Quat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+                if (transform.parent != NULL_ENTITY){
+                    Log::warn("Body position and rotation cannot be obtained from world: %u (%s)", entity, transform.name.c_str());
+                }
+            }
 
             JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
             JPH::Vec3 jPosition;
@@ -1723,16 +1731,24 @@ void PhysicsSystem::update(double dt){
 
                 if (!std::isnan(position.GetX()) && !std::isnan(position.GetY()) && !std::isnan(position.GetZ())){
                     Vector3 nPosition = Vector3(position.GetX(), position.GetY(), position.GetZ());
+                    Quaternion nRotation = Quaternion(rotation.GetW(), rotation.GetX(), rotation.GetY(), rotation.GetZ());
+
+                    if (transform.parent != NULL_ENTITY){
+                        Transform& transformParent = scene->getComponent<Transform>(transform.parent);
+
+                        nPosition = transformParent.modelMatrix.inverse() * nPosition;
+                        nRotation = transformParent.worldRotation.inverse() * nRotation;
+                    }
+
                     if (transform.position != nPosition){
                         transform.position = nPosition;
                         transform.needUpdate = true;
                     }
-                }
 
-                Quaternion nRotation = Quaternion(rotation.GetW(), rotation.GetX(), rotation.GetY(), rotation.GetZ());
-                if (transform.rotation != nRotation){
-                    transform.rotation = nRotation;
-                    transform.needUpdate = true;
+                    if (transform.rotation != nRotation){
+                        transform.rotation = nRotation;
+                        transform.needUpdate = true;
+                    }
                 }
 
             }
