@@ -72,8 +72,8 @@ namespace Supernova{
         bool isSensor() const;
         void setIsSensor(bool sensor);
 
-        bool isSensorDetectsStatic() const;
-        void setSensorDetectsStatic(bool sensorDetectsStatic);
+        bool isCollideKinematicVsNonDynamic() const;
+        void setCollideKinematicVsNonDynamic(bool collideKinematicVsNonDynamic);
 
         void setAllowedDOFsAll();
         void setAllowedDOFs2DPlane();

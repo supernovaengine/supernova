@@ -845,7 +845,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("activate", &Body3D::activate)
         .addFunction("deactivate", &Body3D::deactivate)
         .addProperty("sensor", &Body3D::isSensor, &Body3D::setIsSensor)
-        .addProperty("sensorDetectsStatic", &Body3D::isSensorDetectsStatic, &Body3D::setSensorDetectsStatic)
+        .addProperty("collideKinematicVsNonDynamic", &Body3D::isCollideKinematicVsNonDynamic, &Body3D::setCollideKinematicVsNonDynamic)
         .addFunction("setAllowedDOFsAll", &Body3D::setAllowedDOFsAll)
         .addFunction("setAllowedDOFs2DPlane", &Body3D::setAllowedDOFs2DPlane)
         .addFunction("setAllowedDOFs", &Body3D::setAllowedDOFs)

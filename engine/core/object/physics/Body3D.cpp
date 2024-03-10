@@ -259,18 +259,18 @@ void Body3D::setIsSensor(bool sensor){
     body.body->SetIsSensor(sensor);
 }
 
-bool Body3D::isSensorDetectsStatic() const{
+bool Body3D::isCollideKinematicVsNonDynamic() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    return body.body->SensorDetectsStatic();
+    return body.body->GetCollideKinematicVsNonDynamic();
 }
 
-void Body3D::setSensorDetectsStatic(bool sensorDetectsStatic){
+void Body3D::setCollideKinematicVsNonDynamic(bool collideKinematicVsNonDynamic){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    body.body->SetSensorDetectsStatic(sensorDetectsStatic);
+    body.body->SetCollideKinematicVsNonDynamic(collideKinematicVsNonDynamic);
 }
 
 void Body3D::setAllowedDOFsAll(){

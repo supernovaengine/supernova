@@ -19,7 +19,7 @@
 
 JPH_NAMESPACE_BEGIN
 
-CharacterVirtual::CharacterVirtual(const CharacterVirtualSettings *inSettings, RVec3Arg inPosition, QuatArg inRotation, PhysicsSystem *inSystem) :
+CharacterVirtual::CharacterVirtual(const CharacterVirtualSettings *inSettings, RVec3Arg inPosition, QuatArg inRotation, uint64 inUserData, PhysicsSystem *inSystem) :
 	CharacterBase(inSettings, inSystem),
 	mBackFaceMode(inSettings->mBackFaceMode),
 	mPredictiveContactDistance(inSettings->mPredictiveContactDistance),
@@ -33,7 +33,8 @@ CharacterVirtual::CharacterVirtual(const CharacterVirtualSettings *inSettings, R
 	mPenetrationRecoverySpeed(inSettings->mPenetrationRecoverySpeed),
 	mShapeOffset(inSettings->mShapeOffset),
 	mPosition(inPosition),
-	mRotation(inRotation)
+	mRotation(inRotation),
+	mUserData(inUserData)
 {
 	// Copy settings
 	SetMaxStrength(inSettings->mMaxStrength);
@@ -96,6 +97,7 @@ void CharacterVirtual::sFillContactProperties(const CharacterVirtual *inCharacte
 	outContact.mBodyB = inResult.mBodyID2;
 	outContact.mSubShapeIDB = inResult.mSubShapeID2;
 	outContact.mMotionTypeB = inBody.GetMotionType();
+	outContact.mIsSensorB = inBody.IsSensor();
 	outContact.mUserData = inBody.GetUserData();
 	outContact.mMaterial = inCollector.GetContext()->GetMaterial(inResult.mSubShapeID2);
 }
@@ -159,16 +161,10 @@ void CharacterVirtual::ContactCollector::AddHit(const CollideShapeResult &inResu
 	BodyLockRead lock(mSystem->GetBodyLockInterface(), inResult.mBodyID2);
 	if (lock.SucceededAndIsInBroadPhase())
 	{
-		// We don't collide with sensors, note that you should set up your collision layers so that sensors don't collide with the character.
-		// Rejecting the contact here means a lot of extra work for the collision detection system.
-		const Body &body = lock.GetBody();
-		if (!body.IsSensor())
-		{
-			mContacts.emplace_back();
-			Contact &contact = mContacts.back();
-			sFillContactProperties(mCharacter, contact, body, mUp, mBaseOffset, *this, inResult);
-			contact.mFraction = 0.0f;
-		}
+		mContacts.emplace_back();
+		Contact &contact = mContacts.back();
+		sFillContactProperties(mCharacter, contact, lock.GetBody(), mUp, mBaseOffset, *this, inResult);
+		contact.mFraction = 0.0f;
 	}
 }
 
@@ -193,8 +189,7 @@ void CharacterVirtual::ContactCastCollector::AddHit(const ShapeCastResult &inRes
 			if (!lock.SucceededAndIsInBroadPhase())
 				return;
 
-			// We don't collide with sensors, note that you should set up your collision layers so that sensors don't collide with the character.
-			// Rejecting the contact here means a lot of extra work for the collision detection system.
+			// Sweeps don't result in OnContactAdded callbacks so we can ignore sensors here
 			const Body &body = lock.GetBody();
 			if (body.IsSensor())
 				return;
@@ -444,6 +439,10 @@ bool CharacterVirtual::HandleContact(Vec3Arg inVelocity, Constraint &ioConstrain
 		mListener->OnContactAdded(this, contact.mBodyB, contact.mSubShapeIDB, contact.mPosition, -contact.mContactNormal, settings);
 	contact.mCanPushCharacter = settings.mCanPushCharacter;
 
+	// We don't have any further interaction with sensors beyond an OnContactAdded notification
+	if (contact.mIsSensorB)
+		return false;
+
 	// If body B cannot receive an impulse, we're done
 	if (!settings.mCanReceiveImpulses || contact.mMotionTypeB != EMotionType::Dynamic)
 		return true;
@@ -642,7 +641,7 @@ void CharacterVirtual::SolveConstraints(Vec3Arg inVelocity, float inDeltaTime, f
 		// Get the normal of the plane we're hitting
 		Vec3 plane_normal = constraint->mPlane.GetNormal();
 
-		// If we're hitting a steep slope we cancel the velocity towards the slope first so that we don't end up slidinng up the slope
+		// If we're hitting a steep slope we cancel the velocity towards the slope first so that we don't end up sliding up the slope
 		// (we may hit the slope before the vertical wall constraint we added which will result in a small movement up causing jitter in the character movement)
 		if (constraint->mIsSteepSlope)
 		{
@@ -762,7 +761,7 @@ void CharacterVirtual::UpdateSupportingContact(bool inSkipContactVelocityCheck, 
 			&& c.mDistance < mCollisionTolerance
 			&& (inSkipContactVelocityCheck || c.mSurfaceNormal.Dot(mLinearVelocity - c.mLinearVelocity) <= 1.0e-4f))
 		{
-			if (ValidateContact(c))
+			if (ValidateContact(c) && !c.mIsSensorB)
 				c.mHadCollision = true;
 			else
 				c.mWasDiscarded = true;
@@ -1257,7 +1256,7 @@ bool CharacterVirtual::WalkStairs(float inDeltaTime, Vec3Arg inStepUp, Vec3Arg i
 #endif // JPH_DEBUG_RENDERER
 
 	// Move down towards the floor.
-	// Note that we travel the same amount down as we travelled up with the specified extra
+	// Note that we travel the same amount down as we traveled up with the specified extra
 	Vec3 down = -up + inStepDownExtra;
 	if (!GetFirstContactForSweep(new_position, down, contact, dummy_ignored_contacts, inBroadPhaseLayerFilter, inObjectLayerFilter, inBodyFilter, inShapeFilter))
 		return false; // No floor found, we're in mid air, cancel stair walk
