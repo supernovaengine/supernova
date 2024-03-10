@@ -248,7 +248,20 @@ float Vector2::dotProduct(const Vector2& vec) const{
 }
 
 
-float Vector2::normalize(){
+Vector2& Vector2::normalize(){
+    float fLength = sqrt( x * x + y * y);
+    
+    if ( fLength > float(0.0f) )
+    {
+        float fInvLength = 1.0f / fLength;
+        x *= fInvLength;
+        y *= fInvLength;
+    }
+    
+    return *this;
+}
+
+float Vector2::normalizeL(){
     float fLength = sqrt( x * x + y * y);
     
     if ( fLength > float(0.0f) )

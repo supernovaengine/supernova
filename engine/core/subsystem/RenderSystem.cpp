@@ -1809,13 +1809,13 @@ void RenderSystem::updateTransform(Transform& transform){
 
 		transform.modelMatrix = transformParent.modelMatrix * transform.modelMatrix;
 
-    	transform.worldRotation = transformParent.worldRotation * transform.rotation;
+		transform.worldRotation = (transformParent.worldRotation * transform.rotation).normalize();
 		transform.worldScale = transformParent.worldScale * transform.scale;
-    	transform.worldPosition = transform.modelMatrix * Vector3(0,0,0);
+		transform.worldPosition = transform.modelMatrix * Vector3(0,0,0);
 	}else{
 		transform.worldRotation = transform.rotation;
-    	transform.worldScale = transform.scale;
-    	transform.worldPosition = transform.position;
+		transform.worldScale = transform.scale;
+		transform.worldPosition = transform.position;
 	}
 
 	if (hasLights){

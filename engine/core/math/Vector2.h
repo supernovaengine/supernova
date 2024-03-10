@@ -112,7 +112,9 @@ namespace Supernova {
         float squaredDistance(const Vector2& rhs) const;
         float dotProduct(const Vector2& vec) const;
 
-        float normalize();
+        Vector2& normalize();
+        float normalizeL();
+
         Vector2 midPoint( const Vector2& vec ) const;
 
         void makeFloor( const Vector2& cmp );

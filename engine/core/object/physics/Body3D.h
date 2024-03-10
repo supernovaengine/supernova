@@ -72,6 +72,9 @@ namespace Supernova{
         bool isSensor() const;
         void setIsSensor(bool sensor);
 
+        bool isSensorDetectsStatic() const;
+        void setSensorDetectsStatic(bool sensorDetectsStatic);
+
         void setAllowedDOFsAll();
         void setAllowedDOFs2DPlane();
         void setAllowedDOFs(bool translationX, bool translationY, bool translationZ, bool rotationX, bool rotationY, bool rotationZ);

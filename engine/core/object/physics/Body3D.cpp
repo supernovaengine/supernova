@@ -257,7 +257,20 @@ void Body3D::setIsSensor(bool sensor){
 
     checkBody(body);
     body.body->SetIsSensor(sensor);
-    body.body->SetSensorDetectsStatic(true);
+}
+
+bool Body3D::isSensorDetectsStatic() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+    return body.body->SensorDetectsStatic();
+}
+
+void Body3D::setSensorDetectsStatic(bool sensorDetectsStatic){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+    body.body->SetSensorDetectsStatic(sensorDetectsStatic);
 }
 
 void Body3D::setAllowedDOFsAll(){

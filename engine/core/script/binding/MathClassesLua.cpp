@@ -71,6 +71,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("squaredDistance", &Vector2::squaredDistance)
         .addFunction("dotProduct", &Vector2::dotProduct)
         .addFunction("normalize", &Vector2::normalize)
+        .addFunction("normalizeL", &Vector2::normalizeL)
         .addFunction("midPoint", &Vector2::midPoint)
         .addFunction("makeFloor", &Vector2::makeFloor)
         .addFunction("makeCeil", &Vector2::makeCeil)
@@ -246,7 +247,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
             void(const float, const float, const float, const float), 
             void(const float, const float, const float),
             void(const Vector3*),
-            void(const Vector3&, const Vector3&, const Vector3&)>()
+            void(const Vector3&, const Vector3&, const Vector3&),
+            void(const float, const Vector3&)>()
         .addStaticProperty("IDENTITY", &Quaternion::IDENTITY)
         .addFunction("__tostring", &Quaternion::toString)
         .addFunction("__eq", &Quaternion::operator==)
@@ -275,7 +277,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("slerpExtraSpins", &Quaternion::slerpExtraSpins)
         .addFunction("squad", &Quaternion::squad)
         .addFunction("nlerp", &Quaternion::nlerp)
-        .addFunction("normalise", &Quaternion::normalise)
+        .addFunction("normalize", &Quaternion::normalize)
+        .addFunction("normalizeL", &Quaternion::normalizeL)
         .addFunction("getRoll", &Quaternion::getRoll)
         .addFunction("getPitch", &Quaternion::getPitch)
         .addFunction("getYaw", &Quaternion::getYaw)

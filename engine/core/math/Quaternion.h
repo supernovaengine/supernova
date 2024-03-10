@@ -22,6 +22,7 @@ namespace Supernova {
         Quaternion(const float xAngle, const float yAngle, const float zAngle);
         Quaternion(const Vector3* akAxis);
         Quaternion(const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);
+        Quaternion(const float angle, const Vector3& rkAxis);
 
         std::string toString() const;
 
@@ -71,7 +72,8 @@ namespace Supernova {
         Quaternion slerpExtraSpins (float fT, const Quaternion& rkP, const Quaternion& rkQ, int iExtraSpins);
         Quaternion squad (float fT, const Quaternion& rkP, const Quaternion& rkA, const Quaternion& rkB, const Quaternion& rkQ);
         Quaternion nlerp(float fT, const Quaternion& rkP, const Quaternion& rkQ, bool shortestPath = false);
-        float normalise(void);
+        Quaternion& normalize(void);
+        float normalizeL(void);
         float getRoll() const;
         float getPitch() const;
         float getYaw() const;

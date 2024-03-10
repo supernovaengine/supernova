@@ -38,6 +38,10 @@ Quaternion::Quaternion(const Vector3& xaxis, const Vector3& yaxis, const Vector3
     this->fromAxes(xaxis, yaxis, zaxis);
 }
 
+Quaternion::Quaternion(const float angle, const Vector3& rkAxis){
+    this->fromAngleAxis(angle, rkAxis);
+}
+
 std::string Quaternion::toString() const{
     return "Quaternion(" + std::to_string(w) + ", " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")"; 
 }
@@ -494,7 +498,15 @@ Quaternion Quaternion::squad (float fT, const Quaternion& rkP, const Quaternion&
     return slerp(fSlerpT, kSlerpP ,kSlerpQ);
 }
 
-float Quaternion::normalise(void)
+Quaternion& Quaternion::normalize(void)
+{
+    float len = norm();
+    float factor = 1.0f / sqrt(len);
+    *this = *this * factor;
+    return *this;
+}
+
+float Quaternion::normalizeL(void)
 {
     float len = norm();
     float factor = 1.0f / sqrt(len);
@@ -557,6 +569,6 @@ Quaternion Quaternion::nlerp(float fT, const Quaternion& rkP, const Quaternion& 
     {
         result = rkP + fT * (rkQ - rkP);
     }
-    result.normalise();
+    result.normalize();
     return result;
 }

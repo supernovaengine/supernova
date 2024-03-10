@@ -119,8 +119,16 @@ void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Bod
         Transform& transform = scene->getComponent<Transform>(entity);
         if (body.body){
 
-            b2Vec2 bNewPosition(transform.position.x / pointsToMeterScale2D, transform.position.y / pointsToMeterScale2D);
-            float bNewAngle = Angle::defaultToRad(transform.rotation.getRoll());
+            b2Vec2 bNewPosition(transform.worldPosition.x / pointsToMeterScale2D, transform.worldPosition.y / pointsToMeterScale2D);
+            float bNewAngle = Angle::defaultToRad(transform.worldRotation.getRoll());
+
+            if (body.newBody && transform.needUpdate){
+                bNewPosition = b2Vec2(transform.position.x / pointsToMeterScale2D, transform.position.y / pointsToMeterScale2D);
+                bNewAngle = Angle::defaultToRad(transform.rotation.getRoll());
+                if (transform.parent != NULL_ENTITY){
+                    Log::warn("Body position and rotation cannot be obtained from world: %u (%s)", entity, transform.name.c_str());
+                }
+            }
 
             b2Vec2 bPosition = body.body->GetPosition();
             float bAngle = body.body->GetAngle();
@@ -1681,16 +1689,22 @@ void PhysicsSystem::update(double dt){
                 Transform& transform = scene->getComponent<Transform>(entity);
 
                 Vector3 nPosition = Vector3(position.x * pointsToMeterScale2D, position.y * pointsToMeterScale2D, transform.worldPosition.z);
+                Quaternion nRotation = Quaternion(Angle::radToDefault(angle), Vector3(0, 0, 1));
+
+                if (transform.parent != NULL_ENTITY){
+                    Transform& transformParent = scene->getComponent<Transform>(transform.parent);
+
+                    nPosition = transformParent.modelMatrix.inverse() * nPosition;
+                    nRotation = transformParent.worldRotation.inverse() * nRotation;
+                }
+
                 if (transform.position != nPosition){
                     transform.position = nPosition;
                     transform.needUpdate = true;
                 }
 
-                if (transform.worldRotation.getRoll() != angle){
-                    Quaternion rotation;
-                    rotation.fromAngle(Angle::radToDefault(angle));
-
-                    transform.rotation = rotation;
+                if (transform.rotation != nRotation){
+                    transform.rotation = nRotation;
                     transform.needUpdate = true;
                 }
 
