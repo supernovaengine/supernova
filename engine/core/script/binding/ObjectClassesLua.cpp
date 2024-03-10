@@ -463,6 +463,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setLinePointB", &Lines::setLinePointB)
         .addFunction("setLineColorA", &Lines::setLineColorA)
         .addFunction("setLineColorB", &Lines::setLineColorB)
+        .addFunction("setLineColor", 
+            luabridge::overload<size_t, Vector3>(&Lines::setLineColor),
+            luabridge::overload<size_t, Vector4>(&Lines::setLineColor))
         .addFunction("clearLines", &Lines::clearLines)
         .endClass();
 

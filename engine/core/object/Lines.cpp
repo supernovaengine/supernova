@@ -101,6 +101,21 @@ void Lines::setLineColorB(size_t index, Vector4 colorB){
     }
 }
 
+void Lines::setLineColor(size_t index, Vector3 color){
+    setLineColor(index, Vector4(color, 1.0));
+}
+
+void Lines::setLineColor(size_t index, Vector4 color){
+    LinesComponent& linescomp = getComponent<LinesComponent>();
+
+    if (linescomp.lines.at(index).colorA != color || linescomp.lines.at(index).colorB != color){
+        linescomp.lines.at(index).colorA = color;
+        linescomp.lines.at(index).colorB = color;
+
+        linescomp.needReload = true;
+    }
+}
+
 void Lines::clearLines(){
     LinesComponent& linescomp = getComponent<LinesComponent>();
 

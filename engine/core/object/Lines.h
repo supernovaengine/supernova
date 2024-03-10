@@ -29,6 +29,9 @@ namespace Supernova{
         void setLineColorA(size_t index, Vector4 colorA);
         void setLineColorB(size_t index, Vector4 colorB);
 
+        void setLineColor(size_t index, Vector3 color);
+        void setLineColor(size_t index, Vector4 color);
+
         void clearLines();
     };
 }
