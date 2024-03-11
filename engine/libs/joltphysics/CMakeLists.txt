@@ -4,7 +4,7 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(JOLT_PHYSICS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Jolt)
 
-option(OBJECT_LAYER_BITS "Number of bits in ObjectLayer" 32)
+set(OBJECT_LAYER_BITS 32)
 
 # Source files
 set(JOLT_PHYSICS_SRC_FILES

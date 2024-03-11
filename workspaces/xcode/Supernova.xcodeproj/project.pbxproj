@@ -1733,6 +1733,17 @@
 		711607112A0D86500052A9C3 /* UserMessagingPlatform.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = UserMessagingPlatform.xcframework; path = "../../platform/apple/GoogleMobileAdsSdkiOS-10.14.0/UserMessagingPlatform.xcframework"; sourceTree = "<group>"; };
 		71165BBD282981BE00CF79C1 /* Base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Base64.cpp; sourceTree = "<group>"; };
 		71165BBE282981BE00CF79C1 /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
+		7125BA382B9E82890056851E /* ObjectLayerPairFilterTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectLayerPairFilterTable.h; sourceTree = "<group>"; };
+		7125BA392B9E82890056851E /* InternalEdgeRemovingCollector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InternalEdgeRemovingCollector.h; sourceTree = "<group>"; };
+		7125BA3A2B9E82890056851E /* CollideSoftBodyVerticesVsTriangles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollideSoftBodyVerticesVsTriangles.h; sourceTree = "<group>"; };
+		7125BA3B2B9E82890056851E /* ObjectLayerPairFilterMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectLayerPairFilterMask.h; sourceTree = "<group>"; };
+		7125BA3C2B9E82A20056851E /* ObjectVsBroadPhaseLayerFilterMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectVsBroadPhaseLayerFilterMask.h; sourceTree = "<group>"; };
+		7125BA3D2B9E82A30056851E /* ObjectVsBroadPhaseLayerFilterTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectVsBroadPhaseLayerFilterTable.h; sourceTree = "<group>"; };
+		7125BA3E2B9E82A30056851E /* BroadPhaseLayerInterfaceMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BroadPhaseLayerInterfaceMask.h; sourceTree = "<group>"; };
+		7125BA3F2B9E82A30056851E /* BroadPhaseLayerInterfaceTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BroadPhaseLayerInterfaceTable.h; sourceTree = "<group>"; };
+		7125BA402B9E82DB0056851E /* CalculateSolverSteps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CalculateSolverSteps.h; sourceTree = "<group>"; };
+		7125BA412B9E83030056851E /* SoftBodyContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftBodyContactListener.h; sourceTree = "<group>"; };
+		7125BA422B9E83040056851E /* SoftBodyManifold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoftBodyManifold.h; sourceTree = "<group>"; };
 		7126757D2B65F4470031089C /* LinesComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinesComponent.h; sourceTree = "<group>"; };
 		7126757F2B65F45D0031089C /* Lines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lines.h; sourceTree = "<group>"; };
 		712675802B65F45D0031089C /* Lines.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lines.cpp; sourceTree = "<group>"; };
@@ -2786,6 +2797,7 @@
 		7105CB8D2AD61DA5007C91BA /* Constraints */ = {
 			isa = PBXGroup;
 			children = (
+				7125BA402B9E82DB0056851E /* CalculateSolverSteps.h */,
 				7105CB9D2AD61DA5007C91BA /* ConeConstraint.cpp */,
 				7105CBA22AD61DA5007C91BA /* ConeConstraint.h */,
 				7105CBA42AD61DA5007C91BA /* Constraint.cpp */,
@@ -2940,54 +2952,58 @@
 		7105CC112AD61DA5007C91BA /* Collision */ = {
 			isa = PBXGroup;
 			children = (
-				7105CC122AD61DA5007C91BA /* CastSphereVsTriangles.cpp */,
-				7105CC132AD61DA5007C91BA /* CollisionGroup.cpp */,
-				7105CC142AD61DA5007C91BA /* CollisionCollector.h */,
-				7105CC152AD61DA5007C91BA /* PhysicsMaterialSimple.cpp */,
-				7105CC162AD61DA5007C91BA /* CollidePointResult.h */,
-				7105CC172AD61DA5007C91BA /* CollideSphereVsTriangles.h */,
-				7105CC182AD61DA5007C91BA /* Shape */,
-				7105CC442AD61DA5007C91BA /* CollideConvexVsTriangles.h */,
-				7105CC452AD61DA5007C91BA /* ObjectLayer.h */,
-				7105CC462AD61DA5007C91BA /* CollisionGroup.h */,
-				7105CC472AD61DA5007C91BA /* GroupFilter.h */,
-				7105CC482AD61DA5007C91BA /* BackFaceMode.h */,
-				7105CC492AD61DA5007C91BA /* ManifoldBetweenTwoFaces.cpp */,
 				7105CC4A2AD61DA5007C91BA /* AABoxCast.h */,
-				7105CC4B2AD61DA5007C91BA /* CollisionDispatch.h */,
-				7105CC4C2AD61DA5007C91BA /* ShapeCast.h */,
-				7105CC4D2AD61DA5007C91BA /* CastConvexVsTriangles.h */,
-				7105CC4E2AD61DA5007C91BA /* PhysicsMaterialSimple.h */,
-				7105CC4F2AD61DA5007C91BA /* CollideSphereVsTriangles.cpp */,
-				7105CC502AD61DA5007C91BA /* CollisionDispatch.cpp */,
-				7105CC512AD61DA5007C91BA /* ContactListener.h */,
-				7105CC522AD61DA5007C91BA /* EstimateCollisionResponse.h */,
-				7105CC532AD61DA5007C91BA /* PhysicsMaterial.h */,
-				7105CC542AD61DA5007C91BA /* CastSphereVsTriangles.h */,
+				7105CC6E2AD61DA5007C91BA /* ActiveEdgeMode.h */,
+				7105CC732AD61DA5007C91BA /* ActiveEdges.h */,
+				7105CC482AD61DA5007C91BA /* BackFaceMode.h */,
 				7105CC552AD61DA5007C91BA /* BroadPhase */,
-				7105CC602AD61DA5007C91BA /* SortReverseAndStore.h */,
-				7105CC612AD61DA5007C91BA /* NarrowPhaseStats.h */,
-				7105CC622AD61DA5007C91BA /* ShapeFilter.h */,
-				7105CC632AD61DA5007C91BA /* CollideConvexVsTriangles.cpp */,
-				7105CC642AD61DA5007C91BA /* GroupFilter.cpp */,
-				7105CC652AD61DA5007C91BA /* GroupFilterTable.cpp */,
+				7105CC712AD61DA5007C91BA /* CastConvexVsTriangles.cpp */,
+				7105CC4D2AD61DA5007C91BA /* CastConvexVsTriangles.h */,
 				7105CC662AD61DA5007C91BA /* CastResult.h */,
-				7105CC672AD61DA5007C91BA /* TransformedShape.cpp */,
+				7105CC122AD61DA5007C91BA /* CastSphereVsTriangles.cpp */,
+				7105CC542AD61DA5007C91BA /* CastSphereVsTriangles.h */,
+				7105CC752AD61DA5007C91BA /* CollectFacesMode.h */,
+				7105CC632AD61DA5007C91BA /* CollideConvexVsTriangles.cpp */,
+				7105CC442AD61DA5007C91BA /* CollideConvexVsTriangles.h */,
+				7105CC162AD61DA5007C91BA /* CollidePointResult.h */,
+				7105CC6D2AD61DA5007C91BA /* CollideShape.h */,
+				7125BA3A2B9E82890056851E /* CollideSoftBodyVerticesVsTriangles.h */,
+				7105CC4F2AD61DA5007C91BA /* CollideSphereVsTriangles.cpp */,
+				7105CC172AD61DA5007C91BA /* CollideSphereVsTriangles.h */,
+				7105CC142AD61DA5007C91BA /* CollisionCollector.h */,
+				7105CC6C2AD61DA5007C91BA /* CollisionCollectorImpl.h */,
+				7105CC502AD61DA5007C91BA /* CollisionDispatch.cpp */,
+				7105CC4B2AD61DA5007C91BA /* CollisionDispatch.h */,
+				7105CC132AD61DA5007C91BA /* CollisionGroup.cpp */,
+				7105CC462AD61DA5007C91BA /* CollisionGroup.h */,
+				7105CC512AD61DA5007C91BA /* ContactListener.h */,
+				7105CC6B2AD61DA5007C91BA /* EstimateCollisionResponse.cpp */,
+				7105CC522AD61DA5007C91BA /* EstimateCollisionResponse.h */,
+				7105CC642AD61DA5007C91BA /* GroupFilter.cpp */,
+				7105CC472AD61DA5007C91BA /* GroupFilter.h */,
+				7105CC652AD61DA5007C91BA /* GroupFilterTable.cpp */,
+				7105CC762AD61DA5007C91BA /* GroupFilterTable.h */,
+				7125BA392B9E82890056851E /* InternalEdgeRemovingCollector.h */,
+				7105CC492AD61DA5007C91BA /* ManifoldBetweenTwoFaces.cpp */,
 				7105CC682AD61DA5007C91BA /* ManifoldBetweenTwoFaces.h */,
+				7105CC722AD61DA5007C91BA /* NarrowPhaseQuery.cpp */,
 				7105CC692AD61DA5007C91BA /* NarrowPhaseQuery.h */,
 				7105CC6A2AD61DA5007C91BA /* NarrowPhaseStats.cpp */,
-				7105CC6B2AD61DA5007C91BA /* EstimateCollisionResponse.cpp */,
-				7105CC6C2AD61DA5007C91BA /* CollisionCollectorImpl.h */,
-				7105CC6D2AD61DA5007C91BA /* CollideShape.h */,
-				7105CC6E2AD61DA5007C91BA /* ActiveEdgeMode.h */,
-				7105CC6F2AD61DA5007C91BA /* RayCast.h */,
-				7105CC702AD61DA5007C91BA /* TransformedShape.h */,
-				7105CC712AD61DA5007C91BA /* CastConvexVsTriangles.cpp */,
-				7105CC722AD61DA5007C91BA /* NarrowPhaseQuery.cpp */,
-				7105CC732AD61DA5007C91BA /* ActiveEdges.h */,
+				7105CC612AD61DA5007C91BA /* NarrowPhaseStats.h */,
+				7105CC452AD61DA5007C91BA /* ObjectLayer.h */,
+				7125BA3B2B9E82890056851E /* ObjectLayerPairFilterMask.h */,
+				7125BA382B9E82890056851E /* ObjectLayerPairFilterTable.h */,
 				7105CC742AD61DA5007C91BA /* PhysicsMaterial.cpp */,
-				7105CC752AD61DA5007C91BA /* CollectFacesMode.h */,
-				7105CC762AD61DA5007C91BA /* GroupFilterTable.h */,
+				7105CC532AD61DA5007C91BA /* PhysicsMaterial.h */,
+				7105CC152AD61DA5007C91BA /* PhysicsMaterialSimple.cpp */,
+				7105CC4E2AD61DA5007C91BA /* PhysicsMaterialSimple.h */,
+				7105CC6F2AD61DA5007C91BA /* RayCast.h */,
+				7105CC182AD61DA5007C91BA /* Shape */,
+				7105CC4C2AD61DA5007C91BA /* ShapeCast.h */,
+				7105CC622AD61DA5007C91BA /* ShapeFilter.h */,
+				7105CC602AD61DA5007C91BA /* SortReverseAndStore.h */,
+				7105CC672AD61DA5007C91BA /* TransformedShape.cpp */,
+				7105CC702AD61DA5007C91BA /* TransformedShape.h */,
 			);
 			path = Collision;
 			sourceTree = "<group>";
@@ -3045,14 +3061,18 @@
 		7105CC552AD61DA5007C91BA /* BroadPhase */ = {
 			isa = PBXGroup;
 			children = (
-				7105CC562AD61DA5007C91BA /* BroadPhaseBruteForce.cpp */,
-				7105CC572AD61DA5007C91BA /* BroadPhase.h */,
 				7105CC582AD61DA5007C91BA /* BroadPhase.cpp */,
+				7105CC572AD61DA5007C91BA /* BroadPhase.h */,
+				7105CC562AD61DA5007C91BA /* BroadPhaseBruteForce.cpp */,
+				7105CC5C2AD61DA5007C91BA /* BroadPhaseBruteForce.h */,
+				7105CC5D2AD61DA5007C91BA /* BroadPhaseLayer.h */,
+				7125BA3E2B9E82A30056851E /* BroadPhaseLayerInterfaceMask.h */,
+				7125BA3F2B9E82A30056851E /* BroadPhaseLayerInterfaceTable.h */,
 				7105CC592AD61DA5007C91BA /* BroadPhaseQuadTree.cpp */,
 				7105CC5A2AD61DA5007C91BA /* BroadPhaseQuadTree.h */,
 				7105CC5B2AD61DA5007C91BA /* BroadPhaseQuery.h */,
-				7105CC5C2AD61DA5007C91BA /* BroadPhaseBruteForce.h */,
-				7105CC5D2AD61DA5007C91BA /* BroadPhaseLayer.h */,
+				7125BA3C2B9E82A20056851E /* ObjectVsBroadPhaseLayerFilterMask.h */,
+				7125BA3D2B9E82A30056851E /* ObjectVsBroadPhaseLayerFilterTable.h */,
 				7105CC5E2AD61DA5007C91BA /* QuadTree.cpp */,
 				7105CC5F2AD61DA5007C91BA /* QuadTree.h */,
 			);
@@ -3621,8 +3641,10 @@
 		716A72E92B5DFA0E00DDE179 /* SoftBody */ = {
 			isa = PBXGroup;
 			children = (
+				7125BA412B9E83030056851E /* SoftBodyContactListener.h */,
 				716A72F22B5DFA0E00DDE179 /* SoftBodyCreationSettings.cpp */,
 				716A72EF2B5DFA0E00DDE179 /* SoftBodyCreationSettings.h */,
+				7125BA422B9E83040056851E /* SoftBodyManifold.h */,
 				716A72ED2B5DFA0E00DDE179 /* SoftBodyMotionProperties.cpp */,
 				716A72F32B5DFA0E00DDE179 /* SoftBodyMotionProperties.h */,
 				716A72EE2B5DFA0E00DDE179 /* SoftBodyShape.cpp */,
@@ -6331,10 +6353,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					SUPERNOVA_APPLE,
-				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../engine/core",
 					"$(SRCROOT)/../../engine/renders",
@@ -6355,10 +6373,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					SUPERNOVA_APPLE,
-				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../engine/core",
 					"$(SRCROOT)/../../engine/renders",
@@ -6459,6 +6473,8 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
+					SUPERNOVA_APPLE,
+					"JPH_OBJECT_LAYER_BITS=32",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -6511,6 +6527,10 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					SUPERNOVA_APPLE,
+					"JPH_OBJECT_LAYER_BITS=32",
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -6589,7 +6609,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../engine/core",
 					"$(SRCROOT)/../../engine/renders",
@@ -6647,10 +6666,6 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					SUPERNOVA_APPLE,
-				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../engine/core",
 					"$(SRCROOT)/../../engine/renders",
@@ -6674,10 +6689,6 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					SUPERNOVA_APPLE,
-				);
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/../../engine/core",
 					"$(SRCROOT)/../../engine/renders",
@@ -6741,7 +6752,7 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"$(inherited)",
 					WITH_MINIAUDIO,
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/stb";
@@ -6761,7 +6772,10 @@
 				EXECUTABLE_PREFIX = lib;
 				GCC_ENABLE_CPP_EXCEPTIONS = YES;
 				GCC_ENABLE_CPP_RTTI = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = WITH_MINIAUDIO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					WITH_MINIAUDIO,
+				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/stb";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -6776,7 +6790,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"$(inherited)",
 					WITH_MINIAUDIO,
 				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/stb";
@@ -6794,7 +6808,10 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CODE_SIGN_STYLE = Automatic;
-				GCC_PREPROCESSOR_DEFINITIONS = WITH_MINIAUDIO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					WITH_MINIAUDIO,
+				);
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../engine/libs/stb";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				OTHER_LDFLAGS = "-ObjC";
