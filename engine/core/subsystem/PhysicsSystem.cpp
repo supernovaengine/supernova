@@ -47,9 +47,9 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     const unsigned int cMaxBodyPairs = 1024;
     const unsigned int cMaxContactConstraints = 1024;
 
-    broad_phase_layer_interface = new BPLayerInterfaceImpl();
-    object_vs_broadphase_layer_filter = new ObjectVsBroadPhaseLayerFilterImpl();
-    object_vs_object_layer_filter = new ObjectLayerPairFilterImpl();
+    broad_phase_layer_interface = new JPH::BroadPhaseLayerInterfaceMask(1);
+    object_vs_broadphase_layer_filter = new JPH::ObjectVsBroadPhaseLayerFilterMask(*broad_phase_layer_interface);
+    object_vs_object_layer_filter = new JPH::ObjectLayerPairFilterMask();
 
     // Now we can create the actual physics system.
     world3D = new JPH::PhysicsSystem();
@@ -169,15 +169,15 @@ void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Bod
 }
 
 void PhysicsSystem::createGenericJoltBody(Entity entity, Body3DComponent& body, const JPH::Shape* shape){
-    JPH::ObjectLayer layer = Layers::NON_MOVING;
+    JPH::ObjectLayer layer = JPH::ObjectLayerPairFilterMask::sGetObjectLayer(1);
     JPH::EMotionType joltType = JPH::EMotionType::Static;
     JPH::EActivation activation = JPH::EActivation::DontActivate;
     if (body.type == BodyType::DYNAMIC){
-        layer = Layers::MOVING;
+        layer = JPH::ObjectLayerPairFilterMask::sGetObjectLayer(1);
         joltType = JPH::EMotionType::Dynamic;
         activation = JPH::EActivation::Activate;
     }else if (body.type == BodyType::KINEMATIC){
-        layer = Layers::MOVING;
+        layer = JPH::ObjectLayerPairFilterMask::sGetObjectLayer(1);
         joltType = JPH::EMotionType::Kinematic;
         activation = JPH::EActivation::Activate;
     }

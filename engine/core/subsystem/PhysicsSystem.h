@@ -27,6 +27,10 @@ namespace JPH{
 	class TempAllocatorImpl;
 	class JobSystemThreadPool;
 	class ShapeSettings;
+
+	class BroadPhaseLayerInterfaceMask;
+	class ObjectVsBroadPhaseLayerFilterMask;
+	class ObjectLayerPairFilterMask;
 };
 class BPLayerInterfaceImpl;
 class ObjectVsBroadPhaseLayerFilterImpl;
@@ -59,9 +63,9 @@ namespace Supernova{
         JPH::JobSystemThreadPool* job_system;
 		JPH::PhysicsSystem* world3D;
 
-		BPLayerInterfaceImpl* broad_phase_layer_interface;
-		ObjectVsBroadPhaseLayerFilterImpl* object_vs_broadphase_layer_filter;
-		ObjectLayerPairFilterImpl* object_vs_object_layer_filter;
+		JPH::BroadPhaseLayerInterfaceMask* broad_phase_layer_interface;
+		JPH::ObjectVsBroadPhaseLayerFilterMask* object_vs_broadphase_layer_filter;
+		JPH::ObjectLayerPairFilterMask* object_vs_object_layer_filter;
 
 		void updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body);
 		void updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body);
