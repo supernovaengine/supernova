@@ -85,13 +85,13 @@ namespace Supernova{
         float getGravityFactor() const;
         void setGravityFactor(float gravityFactor);
 
-        void setBitsFilter(uint32_t category, uint32_t mask);
+        void setBitsFilter(uint16_t category, uint16_t mask);
 
-        uint32_t getCategoryBitsFilter() const;
-        void setCategoryBitsFilter(uint32_t category);
+        uint16_t getCategoryBitsFilter() const;
+        void setCategoryBitsFilter(uint16_t category);
 
-        uint32_t getMaskBitsFilter() const;
-        void setMaskBitsFilter(uint32_t mask);
+        uint16_t getMaskBitsFilter() const;
+        void setMaskBitsFilter(uint16_t mask);
 
         uint32_t getCollisionGroupID() const;
         void setCollisionGroupID(uint32_t group);

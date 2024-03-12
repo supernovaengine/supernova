@@ -352,7 +352,7 @@ void Body3D::setGravityFactor(float gravityFactor){
     body.body->GetMotionProperties()->SetGravityFactor(gravityFactor);
 }
 
-void Body3D::setBitsFilter(uint32_t category, uint32_t mask){
+void Body3D::setBitsFilter(uint16_t category, uint16_t mask){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
@@ -362,7 +362,7 @@ void Body3D::setBitsFilter(uint32_t category, uint32_t mask){
     body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(category, mask));
 }
 
-uint32_t Body3D::getCategoryBitsFilter() const{
+uint16_t Body3D::getCategoryBitsFilter() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
@@ -374,7 +374,7 @@ uint32_t Body3D::getCategoryBitsFilter() const{
     return JPH::ObjectLayerPairFilterMask::sGetGroup(objectLayer);
 }
 
-void Body3D::setCategoryBitsFilter(uint32_t category){
+void Body3D::setCategoryBitsFilter(uint16_t category){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
@@ -387,7 +387,7 @@ void Body3D::setCategoryBitsFilter(uint32_t category){
     body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(category, mask));
 }
 
-uint32_t Body3D::getMaskBitsFilter() const{
+uint16_t Body3D::getMaskBitsFilter() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
@@ -399,7 +399,7 @@ uint32_t Body3D::getMaskBitsFilter() const{
     return JPH::ObjectLayerPairFilterMask::sGetMask(objectLayer);
 }
 
-void Body3D::setMaskBitsFilter(uint32_t mask){
+void Body3D::setMaskBitsFilter(uint16_t mask){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);

@@ -28,7 +28,7 @@ namespace luabridge
     template<> struct Stack<AlignedBox::BoxType> : EnumWrapper<AlignedBox::BoxType>{};
     template<> struct Stack<AlignedBox::CornerEnum> : EnumWrapper<AlignedBox::CornerEnum>{};
     
-    template<> struct Stack<RayTestType> : EnumWrapper<RayTestType>{};
+    template<> struct Stack<RayFilter> : EnumWrapper<RayFilter>{};
 }
 
 void LuaBinding::registerMathClasses(lua_State *L){
@@ -391,11 +391,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .beginNamespace("RayTestType")
-        .addVariable("STATIC_2D_BODIES", RayTestType::STATIC_2D_BODIES)
-        .addVariable("ALL_2D_BODIES", RayTestType::ALL_2D_BODIES)
-        .addVariable("STATIC_3D_BODIES", RayTestType::STATIC_3D_BODIES)
-        .addVariable("ALL_3D_BODIES", RayTestType::ALL_3D_BODIES)
+        .beginNamespace("RayFilter")
+        .addVariable("BODY_2D", RayFilter::BODY_2D)
+        .addVariable("BODY_3D", RayFilter::BODY_3D)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
@@ -422,15 +420,10 @@ void LuaBinding::registerMathClasses(lua_State *L){
             luabridge::overload<Body2D, size_t>(&Ray::intersects),
             luabridge::overload<Body3D>(&Ray::intersects),
             luabridge::overload<Body3D, size_t>(&Ray::intersects),
-            luabridge::overload<Scene*, RayTestType>(&Ray::intersects))
-        .addFunction("intersectionPoint", 
-            luabridge::overload<AlignedBox>(&Ray::intersectionPoint),
-            luabridge::overload<Plane>(&Ray::intersectionPoint),
-            luabridge::overload<Body2D>(&Ray::intersectionPoint),
-            luabridge::overload<Body2D, size_t>(&Ray::intersectionPoint),
-            luabridge::overload<Body3D>(&Ray::intersectionPoint),
-            luabridge::overload<Body3D, size_t>(&Ray::intersectionPoint),
-            luabridge::overload<Scene*, RayTestType>(&Ray::intersectionPoint))
+            luabridge::overload<Scene*, RayFilter>(&Ray::intersects),
+            luabridge::overload<Scene*, RayFilter, bool>(&Ray::intersects),
+            luabridge::overload<Scene*, RayFilter, uint16_t, uint16_t>(&Ray::intersects),
+            luabridge::overload<Scene*, RayFilter, bool, uint16_t, uint16_t>(&Ray::intersects))
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

@@ -74,10 +74,6 @@ RayReturn Ray::intersects(Plane plane) {
     return NO_HIT;
 }
 
-Vector3 Ray::intersectionPoint(Plane plane) {
-    return getPoint(intersects(plane).distance);
-}
-
 RayReturn Ray::intersects(AlignedBox box){
 
     if (box.isNull()) return NO_HIT;
@@ -183,10 +179,6 @@ RayReturn Ray::intersects(AlignedBox box){
     return NO_HIT;
 }
 
-Vector3 Ray::intersectionPoint(AlignedBox box) {
-    return getPoint(intersects(box).distance);
-}
-
 RayReturn Ray::intersects(Body2D body){
     Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
     if (bodycomp.body){
@@ -226,10 +218,6 @@ RayReturn Ray::intersects(Body2D body){
     return NO_HIT;
 }
 
-Vector3 Ray::intersectionPoint(Body2D body){
-    return getPoint(intersects(body).distance);
-}
-
 RayReturn Ray::intersects(Body2D body, size_t shape){
     Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
     if (bodycomp.body){
@@ -265,10 +253,6 @@ RayReturn Ray::intersects(Body2D body, size_t shape){
     return NO_HIT;
 }
 
-Vector3 Ray::intersectionPoint(Body2D body, size_t shape){
-    return getPoint(intersects(body, shape).distance);
-}
-
 RayReturn Ray::intersects(Body3D body){
     Body3DComponent& bodycomp = body.getComponent<Body3DComponent>();
 
@@ -287,10 +271,6 @@ RayReturn Ray::intersects(Body3D body){
     }
 
     return NO_HIT;
-}
-
-Vector3 Ray::intersectionPoint(Body3D body) {
-    return getPoint(intersects(body).distance);
 }
 
 RayReturn Ray::intersects(Body3D body, size_t shape){
@@ -313,23 +293,26 @@ RayReturn Ray::intersects(Body3D body, size_t shape){
     return NO_HIT;
 }
 
-Vector3 Ray::intersectionPoint(Body3D body, size_t shape){
-    return getPoint(intersects(body, shape).distance);
+RayReturn Ray::intersects(Scene* scene, RayFilter raytest){
+    return intersects(scene, raytest, false);
 }
 
-RayReturn Ray::intersects(Scene* scene, RayTestType raytest){
-    if (raytest == RayTestType::ALL_2D_BODIES || raytest == RayTestType::STATIC_2D_BODIES){
+RayReturn Ray::intersects(Scene* scene, RayFilter raytest, bool onlyStatic){
+    return intersects(scene, raytest, onlyStatic, (uint16_t)~0u, (uint16_t)~0u);
+}
+
+RayReturn Ray::intersects(Scene* scene, RayFilter raytest, uint16_t categoryBits, uint16_t maskBits){
+    return intersects(scene, raytest, false, categoryBits, maskBits);
+}
+
+RayReturn Ray::intersects(Scene* scene, RayFilter raytest, bool onlyStatic, uint16_t categoryBits, uint16_t maskBits){
+    if (raytest == RayFilter::BODY_2D){
         b2World* world = scene->getSystem<PhysicsSystem>()->getWorld2D();
 
         if (world){
             std::vector<Box2DWorldRayCastOutput> outputs;
 
-            bool onlyStatic = false;
-            if (raytest == RayTestType::STATIC_2D_BODIES){
-                onlyStatic = true;
-            }
-
-            Box2DRayCastCallback* rayCastCallback2D = new Box2DRayCastCallback(&outputs, false, onlyStatic);
+            Box2DRayCastCallback* rayCastCallback2D = new Box2DRayCastCallback(&outputs, false, onlyStatic, categoryBits, maskBits);
 
             float ptmScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
@@ -359,14 +342,16 @@ RayReturn Ray::intersects(Scene* scene, RayTestType raytest){
             }
         }
 
-    }else if (raytest == RayTestType::ALL_3D_BODIES || raytest == RayTestType::STATIC_3D_BODIES){
+    }else if (raytest == RayFilter::BODY_3D){
         JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
 
         if (world){
             JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
             JPH::RayCastResult hit;
 
-            if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, { }, { }, OnlyStaticBodyFilter(raytest == RayTestType::STATIC_3D_BODIES))){
+            JPH::ObjectLayer objectLayer = JPH::ObjectLayerPairFilterMask::sGetObjectLayer(categoryBits, maskBits);
+
+            if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, { }, JPH::DefaultObjectLayerFilter(JPH::ObjectLayerPairFilterMask(), objectLayer), OnlyStaticBodyFilter(onlyStatic))){
                 JPH::Vec3 normal;
                 Entity entity = NULL_ENTITY;
                 size_t shapeIndex = 0;
@@ -385,8 +370,4 @@ RayReturn Ray::intersects(Scene* scene, RayTestType raytest){
     }
 
     return NO_HIT;
-}
-
-Vector3 Ray::intersectionPoint(Scene* scene, RayTestType raytest){
-    return getPoint(intersects(scene, raytest).distance);
 }
