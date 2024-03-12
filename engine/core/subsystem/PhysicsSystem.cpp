@@ -1654,6 +1654,11 @@ void PhysicsSystem::addBroadPhaseLayer3D(uint8_t index, uint32_t groupsToInclude
 void PhysicsSystem::addBroadPhaseLayer3D(uint8_t index, uint32_t groupsToInclude, uint32_t groupsToExclude){
     if (index >= 0 && index < MAX_BROADPHASELAYER_3D){
         broad_phase_layer_interface->ConfigureLayer(JPH::BroadPhaseLayer(index), groupsToInclude, groupsToExclude);
+
+        auto bodies3d = scene->getComponentArray<Body3DComponent>();
+        if (bodies3d->size() > 0){
+            Log::warn("BroadPhaseLayers should be add before any 3D body creation");
+        }
     }else{
         Log::error("BroadPhaseLayer index should be from 0 to %i, increase MAX_BROADPHASELAYER_3D to more layers", (MAX_BROADPHASELAYER_3D-1));
     }
@@ -1668,7 +1673,6 @@ void PhysicsSystem::destroy(){
 
 void PhysicsSystem::update(double dt){
 	auto bodies2d = scene->getComponentArray<Body2DComponent>();
-    auto joints2d = scene->getComponentArray<Joint2DComponent>();
 
 	for (int i = 0; i < bodies2d->size(); i++){
 		Body2DComponent& body = bodies2d->getComponentFromIndex(i);

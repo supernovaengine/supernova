@@ -352,17 +352,17 @@ void Body3D::setGravityFactor(float gravityFactor){
     body.body->GetMotionProperties()->SetGravityFactor(gravityFactor);
 }
 
-void Body3D::setBitsFilter(uint32_t group, uint32_t mask){
+void Body3D::setBitsFilter(uint32_t category, uint32_t mask){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
     JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
     JPH::BodyInterface &body_interface = world->GetBodyInterface();
 
-    body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(group, mask));
+    body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(category, mask));
 }
 
-uint32_t Body3D::getGroupBitsFilter() const{
+uint32_t Body3D::getCategoryBitsFilter() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
@@ -374,7 +374,7 @@ uint32_t Body3D::getGroupBitsFilter() const{
     return JPH::ObjectLayerPairFilterMask::sGetGroup(objectLayer);
 }
 
-void Body3D::setGroupBitsFilter(uint32_t group){
+void Body3D::setCategoryBitsFilter(uint32_t category){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
@@ -384,7 +384,7 @@ void Body3D::setGroupBitsFilter(uint32_t group){
     JPH::ObjectLayer objectLayer = body_interface.GetObjectLayer(body.body->GetID());
     uint32_t mask = JPH::ObjectLayerPairFilterMask::sGetMask(objectLayer);
 
-    body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(group, mask));
+    body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(category, mask));
 }
 
 uint32_t Body3D::getMaskBitsFilter() const{

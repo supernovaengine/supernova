@@ -856,7 +856,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("gravityFactor", &Body3D::getGravityFactor, &Body3D::setGravityFactor)
         .addProperty("collisionGroupID", &Body3D::getCollisionGroupID, &Body3D::setCollisionGroupID)
         .addFunction("setBitsFilter", &Body3D::setBitsFilter)
-        .addProperty("groupBitsFilter", &Body3D::getGroupBitsFilter, &Body3D::setGroupBitsFilter)
+        .addProperty("categoryBitsFilter", &Body3D::getCategoryBitsFilter, &Body3D::setCategoryBitsFilter)
         .addProperty("maskBitsFilter", &Body3D::getMaskBitsFilter, &Body3D::setMaskBitsFilter)
         .addProperty("sllowSleeping", &Body3D::isAllowSleeping, &Body3D::setAllowSleeping)
         .addProperty("friction", &Body3D::getFriction, &Body3D::setFriction)
