@@ -188,6 +188,10 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("loadRackAndPinionJoint3D", &PhysicsSystem::loadRackAndPinionJoint3D)
         .addFunction("loadPulleyJoint3D", &PhysicsSystem::loadPulleyJoint3D)
         .addFunction("destroyJoint3D", &PhysicsSystem::destroyJoint3D)
+
+        .addFunction("addBroadPhaseLayer3D", 
+            luabridge::overload<uint8_t, uint32_t>(&PhysicsSystem::addBroadPhaseLayer3D),
+            luabridge::overload<uint8_t, uint32_t, uint32_t>(&PhysicsSystem::addBroadPhaseLayer3D))
         .endClass();
 
     luabridge::getGlobalNamespace(L)

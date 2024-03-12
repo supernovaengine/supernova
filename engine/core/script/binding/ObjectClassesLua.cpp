@@ -709,6 +709,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("type", &Body2D::getType, &Body2D::setType)
         .addProperty("enabled", &Body2D::isEnabled, &Body2D::setEnabled)
         .addProperty("gravityScale", &Body2D::getGravityScale, &Body2D::setGravityScale)
+        .addFunction("setBitsFilter", 
+            luabridge::overload<uint16_t, uint16_t>(&Body2D::setBitsFilter),
+            luabridge::overload<size_t, uint16_t, uint16_t>(&Body2D::setBitsFilter))
         .addProperty("categoryBitsFilter", &Body2D::getCategoryBitsFilter, &Body2D::setCategoryBitsFilter)
         .addFunction("setCategoryBitsFilter", 
             luabridge::overload<uint16_t>(&Body2D::setCategoryBitsFilter),
@@ -852,6 +855,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("mass", &Body3D::getMass, &Body3D::setMass)
         .addProperty("gravityFactor", &Body3D::getGravityFactor, &Body3D::setGravityFactor)
         .addProperty("collisionGroupID", &Body3D::getCollisionGroupID, &Body3D::setCollisionGroupID)
+        .addFunction("setBitsFilter", &Body3D::setBitsFilter)
+        .addProperty("groupBitsFilter", &Body3D::getGroupBitsFilter, &Body3D::setGroupBitsFilter)
+        .addProperty("maskBitsFilter", &Body3D::getMaskBitsFilter, &Body3D::setMaskBitsFilter)
         .addProperty("sllowSleeping", &Body3D::isAllowSleeping, &Body3D::setAllowSleeping)
         .addProperty("friction", &Body3D::getFriction, &Body3D::setFriction)
         .addProperty("restitution", &Body3D::getRestitution, &Body3D::setRestitution)

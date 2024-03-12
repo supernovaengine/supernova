@@ -352,14 +352,74 @@ void Body3D::setGravityFactor(float gravityFactor){
     body.body->GetMotionProperties()->SetGravityFactor(gravityFactor);
 }
 
-unsigned int Body3D::getCollisionGroupID() const{
+void Body3D::setBitsFilter(uint32_t group, uint32_t mask){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+    JPH::BodyInterface &body_interface = world->GetBodyInterface();
+
+    body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(group, mask));
+}
+
+uint32_t Body3D::getGroupBitsFilter() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+    JPH::BodyInterface &body_interface = world->GetBodyInterface();
+
+    JPH::ObjectLayer objectLayer = body_interface.GetObjectLayer(body.body->GetID());
+
+    return JPH::ObjectLayerPairFilterMask::sGetGroup(objectLayer);
+}
+
+void Body3D::setGroupBitsFilter(uint32_t group){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+    JPH::BodyInterface &body_interface = world->GetBodyInterface();
+
+    JPH::ObjectLayer objectLayer = body_interface.GetObjectLayer(body.body->GetID());
+    uint32_t mask = JPH::ObjectLayerPairFilterMask::sGetMask(objectLayer);
+
+    body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(group, mask));
+}
+
+uint32_t Body3D::getMaskBitsFilter() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+    JPH::BodyInterface &body_interface = world->GetBodyInterface();
+
+    JPH::ObjectLayer objectLayer = body_interface.GetObjectLayer(body.body->GetID());
+
+    return JPH::ObjectLayerPairFilterMask::sGetMask(objectLayer);
+}
+
+void Body3D::setMaskBitsFilter(uint32_t mask){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+    JPH::BodyInterface &body_interface = world->GetBodyInterface();
+
+    JPH::ObjectLayer objectLayer = body_interface.GetObjectLayer(body.body->GetID());
+    uint32_t group = JPH::ObjectLayerPairFilterMask::sGetGroup(objectLayer);
+
+    body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(group, mask));
+}
+
+uint32_t Body3D::getCollisionGroupID() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
     return body.body->GetCollisionGroup().GetGroupID();
 }
 
-void Body3D::setCollisionGroupID(unsigned int group){
+void Body3D::setCollisionGroupID(uint32_t group){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);

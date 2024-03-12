@@ -89,6 +89,9 @@ namespace Supernova{
         bool isEnabled() const;
         float getGravityScale() const;
 
+        void setBitsFilter(uint16_t categoryBits, uint16_t maskBits);
+        void setBitsFilter(size_t shapeIndex, uint16_t categoryBits, uint16_t maskBits);
+
         void setCategoryBitsFilter(uint16_t categoryBits);
         void setMaskBitsFilter(uint16_t maskBits);
         void setGroupIndexFilter(int16_t groupIndex);

@@ -47,7 +47,7 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     const unsigned int cMaxBodyPairs = 1024;
     const unsigned int cMaxContactConstraints = 1024;
 
-    broad_phase_layer_interface = new JPH::BroadPhaseLayerInterfaceMask(1);
+    broad_phase_layer_interface = new JPH::BroadPhaseLayerInterfaceMask(MAX_BROADPHASELAYER_3D);
     object_vs_broadphase_layer_filter = new JPH::ObjectVsBroadPhaseLayerFilterMask(*broad_phase_layer_interface);
     object_vs_object_layer_filter = new JPH::ObjectLayerPairFilterMask();
 
@@ -1644,6 +1644,18 @@ void PhysicsSystem::destroyJoint3D(Joint3DComponent& joint){
         world3D->RemoveConstraint(joint.joint);
 
         joint.joint = NULL;
+    }
+}
+
+void PhysicsSystem::addBroadPhaseLayer3D(uint8_t index, uint32_t groupsToInclude){
+    addBroadPhaseLayer3D(index, groupsToInclude, 0);
+}
+
+void PhysicsSystem::addBroadPhaseLayer3D(uint8_t index, uint32_t groupsToInclude, uint32_t groupsToExclude){
+    if (index >= 0 && index < MAX_BROADPHASELAYER_3D){
+        broad_phase_layer_interface->ConfigureLayer(JPH::BroadPhaseLayer(index), groupsToInclude, groupsToExclude);
+    }else{
+        Log::error("BroadPhaseLayer index should be from 0 to %i, increase MAX_BROADPHASELAYER_3D to more layers", (MAX_BROADPHASELAYER_3D-1));
     }
 }
 

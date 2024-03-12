@@ -366,15 +366,7 @@ RayReturn Ray::intersects(Scene* scene, RayTestType raytest){
             JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
             JPH::RayCastResult hit;
 
-            bool castRay = false;
-
-            //if (raytest == RayTestType::STATIC_3D_BODIES){
-                //castRay = world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, JPH::SpecifiedBroadPhaseLayerFilter(BroadPhaseLayers::NON_MOVING), JPH::SpecifiedObjectLayerFilter(Layers::NON_MOVING));
-            //}else{
-                castRay = world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit);
-            //}
-
-            if (castRay){
+            if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, { }, { }, OnlyStaticBodyFilter(raytest == RayTestType::STATIC_3D_BODIES))){
                 JPH::Vec3 normal;
                 Entity entity = NULL_ENTITY;
                 size_t shapeIndex = 0;

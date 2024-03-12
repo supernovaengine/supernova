@@ -170,6 +170,9 @@ namespace Supernova{
 		bool loadPulleyJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchorA, Vector3 anchorB, Vector3 fixedPointA, Vector3 fixedPointB);
 		void destroyJoint3D(Joint3DComponent& joint);
 
+		void addBroadPhaseLayer3D(uint8_t index, uint32_t groupsToInclude);
+		void addBroadPhaseLayer3D(uint8_t index, uint32_t groupsToInclude, uint32_t groupsToExclude);
+
 		virtual void load();
 		virtual void destroy();
 		virtual void update(double dt);

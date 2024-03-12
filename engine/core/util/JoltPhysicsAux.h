@@ -57,6 +57,23 @@
 
 namespace Supernova{
 
+	class OnlyStaticBodyFilter : public JPH::BodyFilter{
+	private:
+		bool onlyStatic;
+
+	public:
+		explicit OnlyStaticBodyFilter(const bool onlyStatic){
+			this->onlyStatic = onlyStatic;
+		}
+
+		virtual bool ShouldCollideLocked(const JPH::Body &inBody) const override{
+			if (onlyStatic && inBody.GetMotionType() != JPH::EMotionType::Static){
+				return false;
+			}
+			return true;
+		}
+	};
+
 	class JoltActivationListener : public JPH::BodyActivationListener{
 	private:
         Scene* scene;

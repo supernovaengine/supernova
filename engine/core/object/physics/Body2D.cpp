@@ -403,6 +403,25 @@ float Body2D::getGravityScale() const{
     return body.body->GetGravityScale();
 }
 
+void Body2D::setBitsFilter(uint16_t categoryBits, uint16_t maskBits){
+    setBitsFilter(0, categoryBits, maskBits);
+}
+
+void Body2D::setBitsFilter(size_t shapeIndex, uint16_t categoryBits, uint16_t maskBits){
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+        b2Filter filter = body.shapes[shapeIndex].fixture->GetFilterData();
+        
+        filter.categoryBits = categoryBits;
+        filter.maskBits = maskBits;
+        
+        body.shapes[shapeIndex].fixture->SetFilterData(filter);
+    }else{
+        Log::error("Cannot find shape %i of body", shapeIndex);
+    }
+}
+
 void Body2D::setCategoryBitsFilter(uint16_t categoryBits){
     setCategoryBitsFilter(0, categoryBits);
 }

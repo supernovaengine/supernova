@@ -53,6 +53,10 @@
 #define MAX_EXTERNAL_BUFFERS 12
 #endif
 
+#ifndef MAX_BROADPHASELAYER_3D
+#define MAX_BROADPHASELAYER_3D 6
+#endif
+
 #include "util/FunctionSubscribe.h"
 #include "math/Rect.h"
 #include "util/ThreadUtils.h"
