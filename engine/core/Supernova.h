@@ -87,7 +87,7 @@
 #include "io/File.h"
 #include "io/UserSettings.h"
 
-#include "math/AlignedBox.h"
+#include "math/AABB.h"
 #include "math/Matrix3.h"
 #include "math/Matrix4.h"
 #include "math/Plane.h"

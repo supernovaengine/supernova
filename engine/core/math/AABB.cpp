@@ -1,25 +1,25 @@
-#include "AlignedBox.h"
+#include "AABB.h"
 
 #include "Plane.h"
 #include "Log.h"
 
 using namespace Supernova;
 
-AlignedBox::AlignedBox()
+AABB::AABB()
         : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
     setMinimum( -0.5, -0.5, -0.5 );
     setMaximum( 0.5, 0.5, 0.5 );
     mBoxType = BOXTYPE_NULL;
 }
 
-AlignedBox::AlignedBox(BoxType bt)
+AABB::AABB(BoxType bt)
         : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
     setMinimum( -0.5, -0.5, -0.5 );
     setMaximum( 0.5, 0.5, 0.5 );
     mBoxType = bt;
 }
 
-AlignedBox::AlignedBox(const AlignedBox & rkBox)
+AABB::AABB(const AABB & rkBox)
         : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
     if (rkBox.isNull())
         setNull();
@@ -29,22 +29,22 @@ AlignedBox::AlignedBox(const AlignedBox & rkBox)
         setExtents( rkBox.mMinimum, rkBox.mMaximum );
 }
 
-AlignedBox::AlignedBox( const Vector3& min, const Vector3& max )
+AABB::AABB( const Vector3& min, const Vector3& max )
         : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
     setExtents( min, max );
 }
 
-AlignedBox::AlignedBox(float mx, float my, float mz, float Mx, float My, float Mz )
+AABB::AABB(float mx, float my, float mz, float Mx, float My, float Mz )
         : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
     setExtents( mx, my, mz, Mx, My, Mz );
 }
 
-AlignedBox::~AlignedBox() {
+AABB::~AABB() {
     if (mCorners)
         delete mCorners;
 }
 
-AlignedBox& AlignedBox::operator=(const AlignedBox& rhs) {
+AABB& AABB::operator=(const AABB& rhs) {
     if (rhs.isNull())
         setNull();
     else if (rhs.isInfinite())
@@ -55,7 +55,7 @@ AlignedBox& AlignedBox::operator=(const AlignedBox& rhs) {
     return *this;
 }
 
-bool AlignedBox::operator== (const AlignedBox& rhs) const {
+bool AABB::operator== (const AABB& rhs) const {
     if (this->mBoxType != rhs.mBoxType)
         return false;
 
@@ -66,76 +66,76 @@ bool AlignedBox::operator== (const AlignedBox& rhs) const {
            this->mMaximum == rhs.mMaximum;
 }
 
-bool AlignedBox::operator!= (const AlignedBox& rhs) const {
+bool AABB::operator!= (const AABB& rhs) const {
     return !(*this == rhs);
 }
 
 
-const Vector3& AlignedBox::getMinimum() const {
+const Vector3& AABB::getMinimum() const {
     return mMinimum;
 }
 
-Vector3& AlignedBox::getMinimum() {
+Vector3& AABB::getMinimum() {
     return mMinimum;
 }
 
-const Vector3& AlignedBox::getMaximum() const {
+const Vector3& AABB::getMaximum() const {
     return mMaximum;
 }
 
-Vector3& AlignedBox::getMaximum() {
+Vector3& AABB::getMaximum() {
     return mMaximum;
 }
 
-void AlignedBox::setMinimum( const Vector3& vec ) {
+void AABB::setMinimum( const Vector3& vec ) {
     mBoxType = BOXTYPE_FINITE;
     mMinimum = vec;
 }
 
-void AlignedBox::setMinimum( float x, float y, float z ) {
+void AABB::setMinimum( float x, float y, float z ) {
     mBoxType = BOXTYPE_FINITE;
     mMinimum.x = x;
     mMinimum.y = y;
     mMinimum.z = z;
 }
 
-void AlignedBox::setMinimumX(float x) {
+void AABB::setMinimumX(float x) {
     mMinimum.x = x;
 }
 
-void AlignedBox::setMinimumY(float y) {
+void AABB::setMinimumY(float y) {
     mMinimum.y = y;
 }
 
-void AlignedBox::setMinimumZ(float z){
+void AABB::setMinimumZ(float z){
     mMinimum.z = z;
 }
 
-void AlignedBox::setMaximum( const Vector3& vec ) {
+void AABB::setMaximum( const Vector3& vec ) {
     mBoxType = BOXTYPE_FINITE;
     mMaximum = vec;
 }
 
-void AlignedBox::setMaximum( float x, float y, float z ) {
+void AABB::setMaximum( float x, float y, float z ) {
     mBoxType = BOXTYPE_FINITE;
     mMaximum.x = x;
     mMaximum.y = y;
     mMaximum.z = z;
 }
 
-void AlignedBox::setMaximumX( float x ) {
+void AABB::setMaximumX( float x ) {
     mMaximum.x = x;
 }
 
-void AlignedBox::setMaximumY( float y ) {
+void AABB::setMaximumY( float y ) {
     mMaximum.y = y;
 }
 
-void AlignedBox::setMaximumZ( float z ) {
+void AABB::setMaximumZ( float z ) {
     mMaximum.z = z;
 }
 
-void AlignedBox::setExtents( const Vector3& min, const Vector3& max ) {
+void AABB::setExtents( const Vector3& min, const Vector3& max ) {
     //TODO: Put error
     //The minimum corner of the box must be less than or equal to maximum corner
     assert( min.x <= max.x && min.y <= max.y && min.z <= max.z );
@@ -145,7 +145,7 @@ void AlignedBox::setExtents( const Vector3& min, const Vector3& max ) {
     mMaximum = max;
 }
 
-void AlignedBox::setExtents(float mx, float my, float mz, float Mx, float My, float Mz ) {
+void AABB::setExtents(float mx, float my, float mz, float Mx, float My, float Mz ) {
     //TODO: Put error
     //The minimum corner of the box must be less than or equal to maximum corner
     assert( mx <= Mx && my <= My && mz <= Mz );
@@ -161,7 +161,7 @@ void AlignedBox::setExtents(float mx, float my, float mz, float Mx, float My, fl
     mMaximum.z = Mz;
 }
 
-const Vector3* AlignedBox::getAllCorners(void) const {
+const Vector3* AABB::getAllCorners(void) const {
     //TODO: Put error
     //Can't get corners of a null or infinite AAB
     assert( mBoxType == BOXTYPE_FINITE );
@@ -182,7 +182,7 @@ const Vector3* AlignedBox::getAllCorners(void) const {
     return mCorners;
 }
 
-Vector3 AlignedBox::getCorner(CornerEnum cornerToGet) const {
+Vector3 AABB::getCorner(CornerEnum cornerToGet) const {
     switch(cornerToGet)
     {
         case FAR_LEFT_BOTTOM:
@@ -206,7 +206,7 @@ Vector3 AlignedBox::getCorner(CornerEnum cornerToGet) const {
     }
 }
 
-void AlignedBox::merge( const AlignedBox& rhs ) {
+void AABB::merge( const AABB& rhs ) {
     if ((rhs.mBoxType == BOXTYPE_NULL) || (mBoxType == BOXTYPE_INFINITE)) {
         return;
     }else if (rhs.mBoxType == BOXTYPE_INFINITE) {
@@ -223,7 +223,7 @@ void AlignedBox::merge( const AlignedBox& rhs ) {
     }
 }
 
-void AlignedBox::merge( const Vector3& point ) {
+void AABB::merge( const Vector3& point ) {
     switch (mBoxType)
     {
         case BOXTYPE_NULL:
@@ -244,7 +244,7 @@ void AlignedBox::merge( const Vector3& point ) {
     assert( false );
 }
 
-void AlignedBox::transform( const Matrix4& matrix ) {
+void AABB::transform( const Matrix4& matrix ) {
     if( mBoxType != BOXTYPE_FINITE )
         return;
 
@@ -288,27 +288,27 @@ void AlignedBox::transform( const Matrix4& matrix ) {
     merge( matrix * currentCorner );
 }
 
-void AlignedBox::setNull() {
+void AABB::setNull() {
     mBoxType = BOXTYPE_NULL;
 }
 
-bool AlignedBox::isNull(void) const {
+bool AABB::isNull(void) const {
     return (mBoxType == BOXTYPE_NULL);
 }
 
-bool AlignedBox::isFinite(void) const {
+bool AABB::isFinite(void) const {
     return (mBoxType == BOXTYPE_FINITE);
 }
 
-void AlignedBox::setInfinite() {
+void AABB::setInfinite() {
     mBoxType = BOXTYPE_INFINITE;
 }
 
-bool AlignedBox::isInfinite(void) const {
+bool AABB::isInfinite(void) const {
     return (mBoxType == BOXTYPE_INFINITE);
 }
 
-bool AlignedBox::intersects(const AlignedBox& b2) const {
+bool AABB::intersects(const AABB& b2) const {
     if (this->isNull() || b2.isNull())
         return false;
 
@@ -333,11 +333,11 @@ bool AlignedBox::intersects(const AlignedBox& b2) const {
 
 }
 
-bool AlignedBox::intersects(const Plane& p) const {
+bool AABB::intersects(const Plane& p) const {
     return (p.getSide(*this) == Plane::Side::BOTH_SIDE);
 }
 
-bool AlignedBox::intersects(const Vector3& v) const {
+bool AABB::intersects(const Vector3& v) const {
     switch (mBoxType)
     {
         case BOXTYPE_NULL:
@@ -357,9 +357,9 @@ bool AlignedBox::intersects(const Vector3& v) const {
     }
 }
 
-AlignedBox AlignedBox::intersection(const AlignedBox& b2) const {
+AABB AABB::intersection(const AABB& b2) const {
     if (this->isNull() || b2.isNull()) {
-        return AlignedBox();
+        return AABB();
     } else if (this->isInfinite()) {
         return b2;
     } else if (b2.isInfinite()) {
@@ -375,13 +375,13 @@ AlignedBox AlignedBox::intersection(const AlignedBox& b2) const {
     if (intMin.x < intMax.x &&
         intMin.y < intMax.y &&
         intMin.z < intMax.z) {
-        return AlignedBox(intMin, intMax);
+        return AABB(intMin, intMax);
     }
 
-    return AlignedBox();
+    return AABB();
 }
 
-float AlignedBox::volume(void) const {
+float AABB::volume(void) const {
     switch (mBoxType)
     {
         case BOXTYPE_NULL:
@@ -402,7 +402,7 @@ float AlignedBox::volume(void) const {
     }
 }
 
-void AlignedBox::scale(const Vector3& s) {
+void AABB::scale(const Vector3& s) {
     if (mBoxType != BOXTYPE_FINITE)
         return;
 
@@ -411,7 +411,7 @@ void AlignedBox::scale(const Vector3& s) {
     setExtents(min, max);
 }
 
-Vector3 AlignedBox::getCenter(void) const {
+Vector3 AABB::getCenter(void) const {
     //TODO: Put error
     //Can't get center of a null or infinite AAB
     assert( mBoxType == BOXTYPE_FINITE );
@@ -422,7 +422,7 @@ Vector3 AlignedBox::getCenter(void) const {
             (mMaximum.z + mMinimum.z) * 0.5f);
 }
 
-Vector3 AlignedBox::getSize(void) const {
+Vector3 AABB::getSize(void) const {
     switch (mBoxType)
     {
         case BOXTYPE_NULL:
@@ -443,7 +443,7 @@ Vector3 AlignedBox::getSize(void) const {
     }
 }
 
-Vector3 AlignedBox::getHalfSize(void) const {
+Vector3 AABB::getHalfSize(void) const {
     switch (mBoxType)
     {
         case BOXTYPE_NULL:
@@ -464,7 +464,7 @@ Vector3 AlignedBox::getHalfSize(void) const {
     }
 }
 
-bool AlignedBox::contains(const Vector3& v) const {
+bool AABB::contains(const Vector3& v) const {
     if (isNull())
         return false;
     if (isInfinite())
@@ -475,7 +475,7 @@ bool AlignedBox::contains(const Vector3& v) const {
            mMinimum.z <= v.z && v.z <= mMaximum.z;
 }
 
-float AlignedBox::squaredDistance(const Vector3& v) const {
+float AABB::squaredDistance(const Vector3& v) const {
 
     if (this->contains(v))
         return 0;
@@ -502,11 +502,11 @@ float AlignedBox::squaredDistance(const Vector3& v) const {
     }
 }
 
-float AlignedBox::distance (const Vector3& v) const {
+float AABB::distance (const Vector3& v) const {
     return sqrt(squaredDistance(v));
 }
 
-bool AlignedBox::contains(const AlignedBox& other) const {
+bool AABB::contains(const AABB& other) const {
     if (other.isNull() || this->isInfinite())
         return true;
 

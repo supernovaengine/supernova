@@ -18,15 +18,15 @@
 #include "Rect.h"
 #include "Ray.h"
 #include "Plane.h"
-#include "AlignedBox.h"
+#include "AABB.h"
 
 using namespace Supernova;
 
 namespace luabridge
 {
     template<> struct Stack<Plane::Side> : EnumWrapper<Plane::Side>{};
-    template<> struct Stack<AlignedBox::BoxType> : EnumWrapper<AlignedBox::BoxType>{};
-    template<> struct Stack<AlignedBox::CornerEnum> : EnumWrapper<AlignedBox::CornerEnum>{};
+    template<> struct Stack<AABB::BoxType> : EnumWrapper<AABB::BoxType>{};
+    template<> struct Stack<AABB::CornerEnum> : EnumWrapper<AABB::CornerEnum>{};
     
     template<> struct Stack<RayFilter> : EnumWrapper<RayFilter>{};
 }
@@ -297,7 +297,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("getSide", 
             luabridge::overload<const Vector3&>(&Plane::getSide),
             luabridge::overload<const Vector3&, const Vector3&>(&Plane::getSide),
-            luabridge::overload<const AlignedBox&>(&Plane::getSide))
+            luabridge::overload<const AABB&>(&Plane::getSide))
         .addFunction("getDistance", &Plane::getDistance)
         .addFunction("redefine", 
             luabridge::overload<const Vector3&, const Vector3&, const Vector3&>(&Plane::redefine),
@@ -318,58 +318,58 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .beginClass<AlignedBox>("AlignedBox")
+        .beginClass<AABB>("AABB")
         .addConstructor<
             void(), 
-            void(AlignedBox::BoxType), 
+            void(AABB::BoxType), 
             void(const Vector3&, const Vector3&), 
             void(float, float, float, float, float, float)>()
-        .addProperty("minimum", (const Vector3&(AlignedBox::*)() const)&AlignedBox::getMinimum, (void(AlignedBox::*)(const Vector3&))&AlignedBox::setMinimum)
-        .addFunction("setMinimum", (void(AlignedBox::*)(float, float, float))&AlignedBox::setMinimum)
-        .addFunction("setMinimumX", &AlignedBox::setMinimumX)
-        .addFunction("setMinimumY", &AlignedBox::setMinimumY)
-        .addFunction("setMinimumZ", &AlignedBox::setMinimumZ)
-        .addProperty("maximum", (const Vector3&(AlignedBox::*)() const)&AlignedBox::getMaximum, (void(AlignedBox::*)(const Vector3&))&AlignedBox::setMaximum)
-        .addFunction("setMaximum", (void(AlignedBox::*)(float, float, float))&AlignedBox::setMaximum)
-        .addFunction("setMaximumX", &AlignedBox::setMaximumX)
-        .addFunction("setMaximumY", &AlignedBox::setMaximumY)
-        .addFunction("setMaximumZ", &AlignedBox::setMaximumZ)
+        .addProperty("minimum", (const Vector3&(AABB::*)() const)&AABB::getMinimum, (void(AABB::*)(const Vector3&))&AABB::setMinimum)
+        .addFunction("setMinimum", (void(AABB::*)(float, float, float))&AABB::setMinimum)
+        .addFunction("setMinimumX", &AABB::setMinimumX)
+        .addFunction("setMinimumY", &AABB::setMinimumY)
+        .addFunction("setMinimumZ", &AABB::setMinimumZ)
+        .addProperty("maximum", (const Vector3&(AABB::*)() const)&AABB::getMaximum, (void(AABB::*)(const Vector3&))&AABB::setMaximum)
+        .addFunction("setMaximum", (void(AABB::*)(float, float, float))&AABB::setMaximum)
+        .addFunction("setMaximumX", &AABB::setMaximumX)
+        .addFunction("setMaximumY", &AABB::setMaximumY)
+        .addFunction("setMaximumZ", &AABB::setMaximumZ)
         .addFunction("setExtents", 
-            luabridge::overload<const Vector3&, const Vector3&>(&AlignedBox::setExtents),
-            luabridge::overload<float, float, float, float, float, float>(&AlignedBox::setExtents))
-        .addFunction("getAllCorners", &AlignedBox::getAllCorners)
-        .addFunction("getCorner", &AlignedBox::getCorner)
+            luabridge::overload<const Vector3&, const Vector3&>(&AABB::setExtents),
+            luabridge::overload<float, float, float, float, float, float>(&AABB::setExtents))
+        .addFunction("getAllCorners", &AABB::getAllCorners)
+        .addFunction("getCorner", &AABB::getCorner)
         .addFunction("merge", 
-            luabridge::overload<const AlignedBox&>(&AlignedBox::merge),
-            luabridge::overload<const Vector3&>(&AlignedBox::merge))
-        .addFunction("transform", &AlignedBox::transform)
-        .addFunction("isNull", &AlignedBox::isNull)
-        .addFunction("setNull", &AlignedBox::setNull)
-        .addFunction("isFinite", &AlignedBox::isFinite)
-        .addFunction("isInfinite", &AlignedBox::isInfinite)
-        .addFunction("setInfinite", &AlignedBox::isNull)
+            luabridge::overload<const AABB&>(&AABB::merge),
+            luabridge::overload<const Vector3&>(&AABB::merge))
+        .addFunction("transform", &AABB::transform)
+        .addFunction("isNull", &AABB::isNull)
+        .addFunction("setNull", &AABB::setNull)
+        .addFunction("isFinite", &AABB::isFinite)
+        .addFunction("isInfinite", &AABB::isInfinite)
+        .addFunction("setInfinite", &AABB::isNull)
         .addFunction("intersects", 
-            luabridge::overload<const AlignedBox&>(&AlignedBox::intersects),
-            luabridge::overload<const Plane&>(&AlignedBox::intersects),
-            luabridge::overload<const Vector3&>(&AlignedBox::intersects))
-        .addFunction("intersection", &AlignedBox::intersection)
-        .addFunction("volume", &AlignedBox::volume)
-        .addFunction("scale", &AlignedBox::scale)
-        .addFunction("getCenter", &AlignedBox::getCenter)
-        .addFunction("getSize", &AlignedBox::getSize)
-        .addFunction("getHalfSize", &AlignedBox::getHalfSize)
+            luabridge::overload<const AABB&>(&AABB::intersects),
+            luabridge::overload<const Plane&>(&AABB::intersects),
+            luabridge::overload<const Vector3&>(&AABB::intersects))
+        .addFunction("intersection", &AABB::intersection)
+        .addFunction("volume", &AABB::volume)
+        .addFunction("scale", &AABB::scale)
+        .addFunction("getCenter", &AABB::getCenter)
+        .addFunction("getSize", &AABB::getSize)
+        .addFunction("getHalfSize", &AABB::getHalfSize)
         .addFunction("contains", 
-            luabridge::overload<const AlignedBox&>(&AlignedBox::contains),
-            luabridge::overload<const Vector3&>(&AlignedBox::contains))
-        .addFunction("squaredDistance", &AlignedBox::squaredDistance)
-        .addFunction("distance", &AlignedBox::distance)
+            luabridge::overload<const AABB&>(&AABB::contains),
+            luabridge::overload<const Vector3&>(&AABB::contains))
+        .addFunction("squaredDistance", &AABB::squaredDistance)
+        .addFunction("distance", &AABB::distance)
         .addStaticProperty("BoxType", [](lua_State* L) {
             auto table = luabridge::newTable(L);
             table.push(L);
             luabridge::getNamespaceFromStack(L)
-                .addVariable("BOXTYPE_NULL", AlignedBox::BoxType::BOXTYPE_NULL)
-                .addVariable("BOXTYPE_FINITE", AlignedBox::BoxType::BOXTYPE_FINITE)
-                .addVariable("BOXTYPE_INFINITE", AlignedBox::BoxType::BOXTYPE_INFINITE);
+                .addVariable("BOXTYPE_NULL", AABB::BoxType::BOXTYPE_NULL)
+                .addVariable("BOXTYPE_FINITE", AABB::BoxType::BOXTYPE_FINITE)
+                .addVariable("BOXTYPE_INFINITE", AABB::BoxType::BOXTYPE_INFINITE);
             table.pop();
             return table;
             })
@@ -377,14 +377,14 @@ void LuaBinding::registerMathClasses(lua_State *L){
             auto table = luabridge::newTable(L);
             table.push(L);
             luabridge::getNamespaceFromStack(L)
-                .addVariable("FAR_LEFT_BOTTOM", AlignedBox::CornerEnum::FAR_LEFT_BOTTOM)
-                .addVariable("FAR_LEFT_TOP", AlignedBox::CornerEnum::FAR_LEFT_TOP)
-                .addVariable("FAR_RIGHT_TOP", AlignedBox::CornerEnum::FAR_RIGHT_TOP)
-                .addVariable("FAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::FAR_RIGHT_BOTTOM)
-                .addVariable("NEAR_RIGHT_BOTTOM", AlignedBox::CornerEnum::NEAR_RIGHT_BOTTOM)
-                .addVariable("NEAR_LEFT_BOTTOM", AlignedBox::CornerEnum::NEAR_LEFT_BOTTOM)
-                .addVariable("NEAR_LEFT_TOP", AlignedBox::CornerEnum::NEAR_LEFT_TOP)
-                .addVariable("NEAR_RIGHT_TOP", AlignedBox::CornerEnum::NEAR_RIGHT_TOP);
+                .addVariable("FAR_LEFT_BOTTOM", AABB::CornerEnum::FAR_LEFT_BOTTOM)
+                .addVariable("FAR_LEFT_TOP", AABB::CornerEnum::FAR_LEFT_TOP)
+                .addVariable("FAR_RIGHT_TOP", AABB::CornerEnum::FAR_RIGHT_TOP)
+                .addVariable("FAR_RIGHT_BOTTOM", AABB::CornerEnum::FAR_RIGHT_BOTTOM)
+                .addVariable("NEAR_RIGHT_BOTTOM", AABB::CornerEnum::NEAR_RIGHT_BOTTOM)
+                .addVariable("NEAR_LEFT_BOTTOM", AABB::CornerEnum::NEAR_LEFT_BOTTOM)
+                .addVariable("NEAR_LEFT_TOP", AABB::CornerEnum::NEAR_LEFT_TOP)
+                .addVariable("NEAR_RIGHT_TOP", AABB::CornerEnum::NEAR_RIGHT_TOP);
             table.pop();
             return table;
             })
@@ -414,7 +414,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addProperty("direction", &Ray::getDirection, &Ray::setDirection)
         .addFunction("getPoint", &Ray::getPoint)
         .addFunction("intersects", 
-            luabridge::overload<AlignedBox>(&Ray::intersects),
+            luabridge::overload<AABB>(&Ray::intersects),
             luabridge::overload<Plane>(&Ray::intersects),
             luabridge::overload<Body2D>(&Ray::intersects),
             luabridge::overload<Body2D, size_t>(&Ray::intersects),

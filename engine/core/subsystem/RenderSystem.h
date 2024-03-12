@@ -122,8 +122,8 @@ namespace Supernova{
 		// terrain
 		void setTerrainNodeIndex(TerrainComponent& terrain, TerrainNode& terrainNode, size_t size, size_t offset);
 		bool terrainNodeLODSelect(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform, TerrainNode& terrainNode, int lodLevel);
-		AlignedBox getTerrainNodeAlignedBox(Transform& transform, TerrainNode& terrainNode);
-		bool isTerrainNodeInSphere(Vector3 position, float radius, const AlignedBox& box);
+		AABB getTerrainNodeAABB(Transform& transform, TerrainNode& terrainNode);
+		bool isTerrainNodeInSphere(Vector3 position, float radius, const AABB& box);
 
 		float lerp(float a, float b, float fraction);
 
@@ -176,7 +176,7 @@ namespace Supernova{
 
 		// camera
 		void updateCameraSize(Entity entity);
-		bool isInsideCamera(CameraComponent& camera, const AlignedBox& box);
+		bool isInsideCamera(CameraComponent& camera, const AABB& box);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& point);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius);
 	

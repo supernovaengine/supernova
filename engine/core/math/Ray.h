@@ -3,7 +3,7 @@
 
 #include "math/Vector3.h"
 #include "math/Plane.h"
-#include "math/AlignedBox.h"
+#include "math/AABB.h"
 #include "object/physics/Body2D.h"
 #include "object/physics/Body3D.h"
 
@@ -50,7 +50,7 @@ namespace Supernova {
         Vector3 getPoint(float distance);
 
         RayReturn intersects(Plane plane);
-        RayReturn intersects(AlignedBox box);
+        RayReturn intersects(AABB box);
         RayReturn intersects(Body2D body);
         RayReturn intersects(Body2D body, size_t shape);
         RayReturn intersects(Body3D body);

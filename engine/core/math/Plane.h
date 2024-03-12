@@ -2,7 +2,7 @@
 #define Plane_h
 
 #include "Vector3.h"
-#include "AlignedBox.h"
+#include "AABB.h"
 
 namespace Supernova{
     
@@ -34,7 +34,7 @@ namespace Supernova{
 
         Side getSide (const Vector3& rkPoint) const;
         Side getSide (const Vector3& centre, const Vector3& halfSize) const;
-        Side getSide (const AlignedBox& rkBox) const;
+        Side getSide (const AABB& rkBox) const;
 
         float getDistance (const Vector3& rkPoint) const;
 

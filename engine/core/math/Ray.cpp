@@ -74,7 +74,7 @@ RayReturn Ray::intersects(Plane plane) {
     return NO_HIT;
 }
 
-RayReturn Ray::intersects(AlignedBox box){
+RayReturn Ray::intersects(AABB box){
 
     if (box.isNull()) return NO_HIT;
     if (box.isInfinite()) return NO_HIT;

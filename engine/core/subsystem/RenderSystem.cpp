@@ -16,7 +16,7 @@
 #include "math/Vector3.h"
 #include "util/Angle.h"
 #include "buffer/ExternalBuffer.h"
-#include "math/AlignedBox.h"
+#include "math/AABB.h"
 #include <memory>
 #include <cmath>
 
@@ -1940,7 +1940,7 @@ void RenderSystem::setTerrainNodeIndex(TerrainComponent& terrain, TerrainNode& t
 	}
 }
 
-AlignedBox RenderSystem::getTerrainNodeAlignedBox(Transform& transform, TerrainNode& terrainNode){
+AABB RenderSystem::getTerrainNodeAABB(Transform& transform, TerrainNode& terrainNode){
     float halfSize = terrainNode.size/2;
     Vector3 worldHalfScale(halfSize * transform.worldScale.x, 1, halfSize * transform.worldScale.z);
     Vector3 worldPosition = transform.modelMatrix * Vector3(terrainNode.position.x, 0, terrainNode.position.y);
@@ -1948,10 +1948,10 @@ AlignedBox RenderSystem::getTerrainNodeAlignedBox(Transform& transform, TerrainN
     Vector3 c1 = Vector3(worldPosition.x - worldHalfScale.x, terrainNode.minHeight, worldPosition.z - worldHalfScale.z);
     Vector3 c2 = Vector3(worldPosition.x + worldHalfScale.x, terrainNode.maxHeight, worldPosition.z + worldHalfScale.z);
 
-    return AlignedBox(c1, c2);
+    return AABB(c1, c2);
 };
 
-bool RenderSystem::isTerrainNodeInSphere(Vector3 position, float radius, const AlignedBox& box) {
+bool RenderSystem::isTerrainNodeInSphere(Vector3 position, float radius, const AABB& box) {
 	float r2 = radius*radius;
 
 	Vector3 c1 = box.getMinimum();
@@ -1973,7 +1973,7 @@ bool RenderSystem::isTerrainNodeInSphere(Vector3 position, float radius, const A
 bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform, TerrainNode& terrainNode, int lodLevel){
     terrainNode.currentRange = terrain.ranges[lodLevel];
 
-    AlignedBox box = getTerrainNodeAlignedBox(transform, terrainNode);
+    AABB box = getTerrainNodeAABB(transform, terrainNode);
 
     if (!isTerrainNodeInSphere(cameraTransform.worldPosition, terrain.ranges[lodLevel], box)) {
         return false;
@@ -2047,7 +2047,7 @@ void RenderSystem::updateCameraSize(Entity entity){
 	}
 }
 
-bool RenderSystem::isInsideCamera(CameraComponent& camera, const AlignedBox& box){
+bool RenderSystem::isInsideCamera(CameraComponent& camera, const AABB& box){
     if (box.isNull() || box.isInfinite())
         return false;
 

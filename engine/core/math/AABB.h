@@ -1,5 +1,5 @@
-#ifndef AlignedBox_h
-#define AlignedBox_h
+#ifndef AABB_h
+#define AABB_h
 
 #include "Vector3.h"
 #include "Matrix4.h"
@@ -8,7 +8,7 @@ namespace Supernova{
 
     class Plane;
     
-    class AlignedBox{
+    class AABB{
 
     public:
 
@@ -38,17 +38,17 @@ namespace Supernova{
 
     public:
 
-        AlignedBox();
-        AlignedBox(BoxType e);
-        AlignedBox(const AlignedBox & rkBox);
-        AlignedBox(const Vector3& min, const Vector3& max);
-        AlignedBox(float mx, float my, float mz, float Mx, float My, float Mz);
+        AABB();
+        AABB(BoxType e);
+        AABB(const AABB & rkBox);
+        AABB(const Vector3& min, const Vector3& max);
+        AABB(float mx, float my, float mz, float Mx, float My, float Mz);
 
-        ~AlignedBox();
+        ~AABB();
 
-        AlignedBox& operator=(const AlignedBox& rhs);
-        bool operator== (const AlignedBox& rhs) const;
-        bool operator!= (const AlignedBox& rhs) const;
+        AABB& operator=(const AABB& rhs);
+        bool operator== (const AABB& rhs) const;
+        bool operator!= (const AABB& rhs) const;
 
         const Vector3& getMinimum() const;
         Vector3& getMinimum();
@@ -76,7 +76,7 @@ namespace Supernova{
 
         Vector3 getCorner(CornerEnum cornerToGet) const;
 
-        void merge( const AlignedBox& rhs );
+        void merge( const AABB& rhs );
         void merge( const Vector3& point );
 
         void transform( const Matrix4& matrix );
@@ -87,11 +87,11 @@ namespace Supernova{
         void setInfinite();
         bool isInfinite(void) const;
 
-        bool intersects(const AlignedBox& b2) const;
+        bool intersects(const AABB& b2) const;
         bool intersects(const Plane& p) const;
         bool intersects(const Vector3& v) const;
 
-        AlignedBox intersection(const AlignedBox& b2) const;
+        AABB intersection(const AABB& b2) const;
 
         float volume(void) const;
 
@@ -102,7 +102,7 @@ namespace Supernova{
         Vector3 getHalfSize(void) const;
 
         bool contains(const Vector3& v) const;
-        bool contains(const AlignedBox& other) const;
+        bool contains(const AABB& other) const;
 
         float squaredDistance(const Vector3& v) const;
         float distance (const Vector3& v) const;
@@ -111,4 +111,4 @@ namespace Supernova{
     
 }
 
-#endif /* AlignedBox_h */
+#endif /* AABB_h */
