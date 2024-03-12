@@ -369,7 +369,7 @@
 		713D82A1259D307F00567F9F /* Matrix3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5125962A0E0075B97D /* Matrix3.cpp */; };
 		713D82A2259D307F00567F9F /* Rect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5625962A0E0075B97D /* Rect.cpp */; };
 		713D82A3259D307F00567F9F /* Quaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5825962A0E0075B97D /* Quaternion.cpp */; };
-		713D82A4259D307F00567F9F /* AlignedBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5A25962A0E0075B97D /* AlignedBox.cpp */; };
+		713D82A4259D307F00567F9F /* AABB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5A25962A0E0075B97D /* AABB.cpp */; };
 		713D82A5259D307F00567F9F /* Plane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5C25962A0E0075B97D /* Plane.cpp */; };
 		713D82A8259D307F00567F9F /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC6425962A0E0075B97D /* Camera.cpp */; };
 		713D82A9259D307F00567F9F /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC6625962A0E0075B97D /* Object.cpp */; };
@@ -464,7 +464,7 @@
 		7162FD3225963AE00075B97D /* Matrix3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5125962A0E0075B97D /* Matrix3.cpp */; };
 		7162FD3725963AE00075B97D /* Rect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5625962A0E0075B97D /* Rect.cpp */; };
 		7162FD3925963AE00075B97D /* Quaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5825962A0E0075B97D /* Quaternion.cpp */; };
-		7162FD3B25963AE00075B97D /* AlignedBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5A25962A0E0075B97D /* AlignedBox.cpp */; };
+		7162FD3B25963AE00075B97D /* AABB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5A25962A0E0075B97D /* AABB.cpp */; };
 		7162FD3D25963AE00075B97D /* Plane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC5C25962A0E0075B97D /* Plane.cpp */; };
 		7162FD4325963AE00075B97D /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC6425962A0E0075B97D /* Camera.cpp */; };
 		7162FD4525963AE00075B97D /* Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7162FC6625962A0E0075B97D /* Object.cpp */; };
@@ -1857,7 +1857,7 @@
 		7162FC4B25962A0E0075B97D /* Vector2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector2.h; sourceTree = "<group>"; };
 		7162FC4C25962A0E0075B97D /* Vector2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vector2.cpp; sourceTree = "<group>"; };
 		7162FC4D25962A0E0075B97D /* Matrix4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Matrix4.cpp; sourceTree = "<group>"; };
-		7162FC4E25962A0E0075B97D /* AlignedBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlignedBox.h; sourceTree = "<group>"; };
+		7162FC4E25962A0E0075B97D /* AABB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AABB.h; sourceTree = "<group>"; };
 		7162FC4F25962A0E0075B97D /* Quaternion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Quaternion.h; sourceTree = "<group>"; };
 		7162FC5025962A0E0075B97D /* Ray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Ray.cpp; sourceTree = "<group>"; };
 		7162FC5125962A0E0075B97D /* Matrix3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Matrix3.cpp; sourceTree = "<group>"; };
@@ -1868,7 +1868,7 @@
 		7162FC5725962A0E0075B97D /* Vector4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector4.h; sourceTree = "<group>"; };
 		7162FC5825962A0E0075B97D /* Quaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Quaternion.cpp; sourceTree = "<group>"; };
 		7162FC5925962A0E0075B97D /* Ray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ray.h; sourceTree = "<group>"; };
-		7162FC5A25962A0E0075B97D /* AlignedBox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AlignedBox.cpp; sourceTree = "<group>"; };
+		7162FC5A25962A0E0075B97D /* AABB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AABB.cpp; sourceTree = "<group>"; };
 		7162FC5B25962A0E0075B97D /* Matrix3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Matrix3.h; sourceTree = "<group>"; };
 		7162FC5C25962A0E0075B97D /* Plane.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Plane.cpp; sourceTree = "<group>"; };
 		7162FC5D25962A0E0075B97D /* Vector3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector3.h; sourceTree = "<group>"; };
@@ -3412,8 +3412,8 @@
 		7162FC4825962A0E0075B97D /* math */ = {
 			isa = PBXGroup;
 			children = (
-				7162FC5A25962A0E0075B97D /* AlignedBox.cpp */,
-				7162FC4E25962A0E0075B97D /* AlignedBox.h */,
+				7162FC5A25962A0E0075B97D /* AABB.cpp */,
+				7162FC4E25962A0E0075B97D /* AABB.h */,
 				7162FC5125962A0E0075B97D /* Matrix3.cpp */,
 				7162FC5B25962A0E0075B97D /* Matrix3.h */,
 				7162FC4D25962A0E0075B97D /* Matrix4.cpp */,
@@ -5550,7 +5550,7 @@
 				713D82A3259D307F00567F9F /* Quaternion.cpp in Sources */,
 				7185BF9128BAFC2000B82865 /* ActionClassesLua.cpp in Sources */,
 				712675832B65F45D0031089C /* Lines.cpp in Sources */,
-				713D82A4259D307F00567F9F /* AlignedBox.cpp in Sources */,
+				713D82A4259D307F00567F9F /* AABB.cpp in Sources */,
 				713E580E27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AF25BB18DC00965B51 /* StringUtils.cpp in Sources */,
 				7105A56728B305B20092EA05 /* MathClassesLua.cpp in Sources */,
@@ -5728,7 +5728,7 @@
 				71BE622025B1DB83006D6E02 /* TextureData.cpp in Sources */,
 				71EA6DA72AE20B8C00CA9A75 /* CollideShapeResult3D.cpp in Sources */,
 				7162FD3925963AE00075B97D /* Quaternion.cpp in Sources */,
-				7162FD3B25963AE00075B97D /* AlignedBox.cpp in Sources */,
+				7162FD3B25963AE00075B97D /* AABB.cpp in Sources */,
 				7170A3DB2818A8A30003E965 /* Fog.cpp in Sources */,
 				71BE623825B1DB9E006D6E02 /* LuaBinding.cpp in Sources */,
 				71D74953296731F200348AB8 /* Tilemap.cpp in Sources */,
