@@ -423,7 +423,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
             luabridge::overload<Scene*, RayFilter>(&Ray::intersects),
             luabridge::overload<Scene*, RayFilter, bool>(&Ray::intersects),
             luabridge::overload<Scene*, RayFilter, uint16_t, uint16_t>(&Ray::intersects),
-            luabridge::overload<Scene*, RayFilter, bool, uint16_t, uint16_t>(&Ray::intersects))
+            luabridge::overload<Scene*, RayFilter, bool, uint16_t, uint16_t>(&Ray::intersects),
+            luabridge::overload<Scene*, uint8_t>(&Ray::intersects),
+            luabridge::overload<Scene*, uint8_t, uint16_t, uint16_t>(&Ray::intersects))
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS

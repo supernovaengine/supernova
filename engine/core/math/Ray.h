@@ -59,6 +59,8 @@ namespace Supernova {
         RayReturn intersects(Scene* scene, RayFilter raytest, bool onlyStatic);
         RayReturn intersects(Scene* scene, RayFilter raytest, uint16_t categoryBits, uint16_t maskBits);
         RayReturn intersects(Scene* scene, RayFilter raytest, bool onlyStatic, uint16_t categoryBits, uint16_t maskBits);
+        RayReturn intersects(Scene* scene, uint8_t broadPhaseLayer3D); // only 3D bodies
+        RayReturn intersects(Scene* scene, uint8_t broadPhaseLayer3D, uint16_t categoryBits, uint16_t maskBits); // only 3D bodies
     };
     
 }

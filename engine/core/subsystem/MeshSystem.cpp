@@ -1914,8 +1914,6 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
         }
     }
 
-    clearAnimations(model);
-
     for (size_t i = 0; i < model.gltfModel->animations.size(); i++) {
         const tinygltf::Animation &animation = model.gltfModel->animations[i];
 
@@ -2081,6 +2079,8 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
     ModelComponent& model = scene->getComponent<ModelComponent>(entity);
     Transform& transform = scene->getComponent<Transform>(entity);
+
+    destroyModel(model);
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;

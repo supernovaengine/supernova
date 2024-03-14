@@ -365,7 +365,38 @@ RayReturn Ray::intersects(Scene* scene, RayFilter raytest, bool onlyStatic, uint
 
                 return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), entity, shapeIndex};
             }
+        }
+    }
 
+    return NO_HIT;
+}
+
+RayReturn Ray::intersects(Scene* scene, uint8_t broadPhaseLayer3D){
+    return intersects(scene, broadPhaseLayer3D, (uint16_t)~0u, (uint16_t)~0u);
+}
+
+RayReturn Ray::intersects(Scene* scene, uint8_t broadPhaseLayer3D, uint16_t categoryBits, uint16_t maskBits){
+    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+
+    if (world && broadPhaseLayer3D < MAX_BROADPHASELAYER_3D){
+        JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
+        JPH::RayCastResult hit;
+
+        JPH::ObjectLayer objectLayer = JPH::ObjectLayerPairFilterMask::sGetObjectLayer(categoryBits, maskBits);
+
+        if (world->GetNarrowPhaseQuery().CastRay(JPH::RRayCast(ray), hit, JPH::SpecifiedBroadPhaseLayerFilter(JPH::BroadPhaseLayer(broadPhaseLayer3D)), JPH::DefaultObjectLayerFilter(JPH::ObjectLayerPairFilterMask(), objectLayer))){
+            JPH::Vec3 normal;
+            Entity entity = NULL_ENTITY;
+            size_t shapeIndex = 0;
+            JPH::BodyLockRead lock(world->GetBodyLockInterface(), hit.mBodyID);
+            if (lock.Succeeded()){
+                const JPH::Body &hit_body = lock.GetBody();
+                normal = hit_body.GetWorldSpaceSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
+                entity = hit_body.GetUserData();
+                shapeIndex = hit_body.GetShape()->GetSubShapeUserData(hit.mSubShapeID2);
+            }
+
+            return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), entity, shapeIndex};
         }
     }
 

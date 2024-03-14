@@ -85,8 +85,10 @@ Scene::~Scene(){
 	destroy();
 
 	std::vector<Entity> entityList = entityManager.getEntityList();
-	for(int entity : entityList){
-		destroyEntity(entity);
+	while(entityList.size() > 0){
+		destroyEntity(entityList.front());
+		// some entities can destroy other entities (ex: models)
+		entityList = entityManager.getEntityList();
 	}
 
 }
