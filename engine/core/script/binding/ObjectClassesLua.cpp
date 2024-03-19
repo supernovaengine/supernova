@@ -811,6 +811,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (Scene*, Entity)> ()
         .addFunction("getAttachedObject", &Body3D::getAttachedObject)
         .addFunction("load", &Body3D::load)
+        .addProperty("lockBodies", &Body3D::isLockBodies, &Body3D::setLockBodies)
         .addFunction("createBoxShape", 
             luabridge::overload<float, float, float>(&Body3D::createBoxShape),
             luabridge::overload<Vector3, Quaternion, float, float, float>(&Body3D::createBoxShape))

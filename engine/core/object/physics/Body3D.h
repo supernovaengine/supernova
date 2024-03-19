@@ -11,6 +11,7 @@
 
 namespace JPH{
     class Body;
+    class BodyInterface;
 }
 
 namespace Supernova{
@@ -18,8 +19,13 @@ namespace Supernova{
     class Object;
 
     class Body3D: public EntityHandle{
+    private:
+        bool lockBodies;
+
     protected:
         void checkBody(const Body3DComponent& body) const;
+
+        JPH::BodyInterface& getBodyInterface() const;
 
     public:
         Body3D(Scene* scene, Entity entity);
@@ -33,6 +39,9 @@ namespace Supernova{
         Object getAttachedObject();
 
         void load();
+
+        void setLockBodies(bool lockBodies);
+        bool isLockBodies() const;
 
         int createBoxShape(float width, float height, float depth);
         int createBoxShape(Vector3 position, Quaternion rotation, float width, float height, float depth);
