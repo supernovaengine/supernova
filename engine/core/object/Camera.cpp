@@ -415,6 +415,21 @@ void Camera::slide(float distance){
     }
 }
 
+void Camera::zoom(float distance){
+    if (distance != 0){
+        CameraComponent& camera = getComponent<CameraComponent>();
+        Transform& transf = getComponent<Transform>();
+
+        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
+
+        viewCenter.normalize();
+
+        transf.position = transf.position + (viewCenter * distance);
+
+        transf.needUpdate = true;
+    }
+}
+
 void Camera::setRenderToTexture(bool renderToTexture){
     CameraComponent& camera = getComponent<CameraComponent>();
 

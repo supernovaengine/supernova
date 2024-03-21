@@ -70,6 +70,7 @@ namespace Supernova{
         void moveForward(float distance);
         void walkForward(float distance);
         void slide(float distance);
+        void zoom(float distance);
 
         void setRenderToTexture(bool renderToTexture);
         bool isRenderToTexture() const;
