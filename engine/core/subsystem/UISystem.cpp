@@ -29,20 +29,23 @@ UISystem::~UISystem(){
 
 bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
 
-    if (!ui.texture.load())
-        return false;
-    
+    ui.texture.load();
     unsigned int texWidth = ui.texture.getWidth();
     unsigned int texHeight = ui.texture.getHeight();
 
     if (texWidth == 0 || texHeight == 0){
-        Log::warn("Cannot create UI image without texture");
-        return false;
+        texWidth = layout.width;
+        texHeight = layout.height;
     }
 
     if (layout.width == 0 && layout.height == 0){
         layout.width = texWidth;
         layout.height = texHeight;
+    }
+
+    if (layout.width == 0 || layout.height == 0){
+        Log::warn("Cannot create UI image without size");
+        return false;
     }
 
     ui.primitiveType = PrimitiveType::TRIANGLES;
@@ -261,6 +264,25 @@ void UISystem::createButtonLabel(Entity entity, ButtonComponent& button){
         scene->addComponent<TextComponent>(button.label, {});
 
         scene->addEntityChild(entity, button.label);
+
+        UIComponent& uilabel = scene->getComponent<UIComponent>(button.label);
+        uilabel.color = Vector4(0.0, 0.0, 0.0, 1.0);
+    }
+}
+
+void UISystem::createPanelTitle(Entity entity, PanelComponent& panel){
+    if (panel.title == NULL_ENTITY){
+        panel.title = scene->createEntity();
+
+        scene->addComponent<Transform>(panel.title, {});
+        scene->addComponent<UILayoutComponent>(panel.title, {});
+        scene->addComponent<UIComponent>(panel.title, {});
+        scene->addComponent<TextComponent>(panel.title, {});
+
+        scene->addEntityChild(entity, panel.title);
+
+        UIComponent& uititle = scene->getComponent<UIComponent>(panel.title);
+        uititle.color = Vector4(0.0, 0.0, 0.0, 1.0);
     }
 }
 

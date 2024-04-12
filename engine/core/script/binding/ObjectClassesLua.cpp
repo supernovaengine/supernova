@@ -608,7 +608,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("labelColor", &Button::getLabelColor, (void(Button::*)(Vector4))&Button::setLabelColor)
         .addFunction("setLabelColor", (void(Button::*)(const float, const float, const float, const float))&Button::setLabelColor)
         .addProperty("labelFont", &Button::getLabelFont, &Button::setLabelFont)
-        .addProperty("fontSize", &Button::getFontSize, &Button::setFontSize)
+        .addProperty("labelFontSize", &Button::getLabelFontSize, &Button::setLabelFontSize)
         .addFunction("setTextureNormal", (void(Button::*)(std::string))&Button::setTextureNormal)
         .addFunction("setTexturePressed", (void(Button::*)(std::string))&Button::setTexturePressed)
         .addFunction("setTextureDisabled", (void(Button::*)(std::string))&Button::setTextureDisabled)

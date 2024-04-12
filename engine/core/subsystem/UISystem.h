@@ -13,6 +13,7 @@
 #include "component/ImageComponent.h"
 #include "component/UIComponent.h"
 #include "component/ButtonComponent.h"
+#include "component/PanelComponent.h"
 #include "component/PolygonComponent.h"
 #include "component/TextEditComponent.h"
 #include "component/Transform.h"
@@ -70,6 +71,7 @@ namespace Supernova{
 
 		// advanced UIs
 		void createButtonLabel(Entity entity, ButtonComponent& button);
+		void createPanelTitle(Entity entity, PanelComponent& panel);
 		void createTextEditObjects(Entity entity, TextEditComponent& textedit);
 
 		virtual void load();

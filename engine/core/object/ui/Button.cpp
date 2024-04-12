@@ -10,9 +10,6 @@ Button::Button(Scene* scene): Image(scene){
 
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     scene->getSystem<UISystem>()->createButtonLabel(entity, btcomp);
-
-    UIComponent& uilabel = scene->getComponent<UIComponent>(btcomp.label);
-    uilabel.color = Vector4(0.0, 0.0, 0.0, 1.0);
 }
 
 Text Button::getLabelObject() const{
@@ -71,7 +68,7 @@ std::string Button::getLabelFont() const{
     return textcomp.font;
 }
 
-void Button::setFontSize(unsigned int fontSize){
+void Button::setLabelFontSize(unsigned int fontSize){
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
 
     getLabelObject().setFontSize(fontSize);
@@ -79,7 +76,7 @@ void Button::setFontSize(unsigned int fontSize){
     btcomp.needUpdateButton = true;
 }
 
-unsigned int Button::getFontSize() const{
+unsigned int Button::getLabelFontSize() const{
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
 
     return getLabelObject().getFontSize();

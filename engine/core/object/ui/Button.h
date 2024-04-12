@@ -26,8 +26,8 @@ namespace Supernova{
         void setLabelFont(std::string font);
         std::string getLabelFont() const;
 
-        void setFontSize(unsigned int fontSize);
-        unsigned int getFontSize() const;
+        void setLabelFontSize(unsigned int fontSize);
+        unsigned int getLabelFontSize() const;
 
         void setTextureNormal(std::string path);
         void setTexturePressed(std::string path);
