@@ -9,18 +9,24 @@ Panel::Panel(Scene* scene): Image(scene){
     addComponent<PanelComponent>({});
 
     PanelComponent& panelcomp = getComponent<PanelComponent>();
-    scene->getSystem<UISystem>()->createPanelTitle(entity, panelcomp);
+    scene->getSystem<UISystem>()->createPanelObjects(entity, panelcomp);
 }
 
-Text Panel::getTitleObject() const{
+Container Panel::getTitleContainerObject() const{
     PanelComponent& panelcomp = getComponent<PanelComponent>();
 
-    return Text(scene, panelcomp.title);
+    return Container(scene, panelcomp.titlecontainer);
+}
+
+Text Panel::getTitleTextObject() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    return Text(scene, panelcomp.titletext);
 }
 
 void Panel::setTitle(std::string text){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
-    TextComponent& textcomp = scene->getComponent<TextComponent>(panelcomp.title);
+    TextComponent& textcomp = scene->getComponent<TextComponent>(panelcomp.titletext);
 
     if (textcomp.text != text){
         textcomp.text = text;
@@ -30,14 +36,14 @@ void Panel::setTitle(std::string text){
 
 std::string Panel::getTitle() const{
     PanelComponent& panelcomp = getComponent<PanelComponent>();
-    TextComponent& textcomp = scene->getComponent<TextComponent>(panelcomp.title);
+    TextComponent& textcomp = scene->getComponent<TextComponent>(panelcomp.titletext);
 
     return textcomp.text;
 }
 
 void Panel::setTitleColor(Vector4 color){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
-    UIComponent& uititle = scene->getComponent<UIComponent>(panelcomp.title);
+    UIComponent& uititle = scene->getComponent<UIComponent>(panelcomp.titletext);
 
     uititle.color = color;
 }
@@ -48,7 +54,7 @@ void Panel::setTitleColor(const float red, const float green, const float blue, 
 
 Vector4 Panel::getTitleColor() const{
     PanelComponent& panelcomp = getComponent<PanelComponent>();
-    UIComponent& uititle = scene->getComponent<UIComponent>(panelcomp.title);
+    UIComponent& uititle = scene->getComponent<UIComponent>(panelcomp.titletext);
 
     return uititle.color;
 }
@@ -56,14 +62,14 @@ Vector4 Panel::getTitleColor() const{
 void Panel::setTitleFont(std::string font){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
 
-    getTitleObject().setFont(font);
+    getTitleTextObject().setFont(font);
 
     panelcomp.needUpdatePanel = true;
 }
 
 std::string Panel::getTitleFont() const{
     PanelComponent& panelcomp = getComponent<PanelComponent>();
-    TextComponent& textcomp = scene->getComponent<TextComponent>(panelcomp.title);
+    TextComponent& textcomp = scene->getComponent<TextComponent>(panelcomp.titletext);
 
     return textcomp.font;
 }
@@ -71,7 +77,7 @@ std::string Panel::getTitleFont() const{
 void Panel::setTitleFontSize(unsigned int fontSize){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
 
-    getTitleObject().setFontSize(fontSize);
+    getTitleTextObject().setFontSize(fontSize);
 
     panelcomp.needUpdatePanel = true;
 }
@@ -79,5 +85,5 @@ void Panel::setTitleFontSize(unsigned int fontSize){
 unsigned int Panel::getTitleFontSize() const{
     PanelComponent& panelcomp = getComponent<PanelComponent>();
 
-    return getTitleObject().getFontSize();
+    return getTitleTextObject().getFontSize();
 }

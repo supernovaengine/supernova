@@ -10,6 +10,9 @@ Container::Container(Scene* scene): UILayout(scene){
     addComponent<UIContainerComponent>({});
 }
 
+Container::Container(Scene* scene, Entity entity): UILayout(scene, entity){
+}
+
 void Container::setType(ContainerType type){
     UIContainerComponent& container = getComponent<UIContainerComponent>();
 

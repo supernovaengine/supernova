@@ -264,89 +264,29 @@ void UISystem::createButtonLabel(Entity entity, ButtonComponent& button){
         scene->addComponent<TextComponent>(button.label, {});
 
         scene->addEntityChild(entity, button.label);
-
-        UIComponent& uilabel = scene->getComponent<UIComponent>(button.label);
-        uilabel.color = Vector4(0.0, 0.0, 0.0, 1.0);
     }
 }
 
-void UISystem::createPanelTitle(Entity entity, PanelComponent& panel){
-    if (panel.title == NULL_ENTITY){
-        panel.title = scene->createEntity();
+void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
+    if (panel.titlecontainer == NULL_ENTITY){
+        panel.titlecontainer = scene->createEntity();
 
-        scene->addComponent<Transform>(panel.title, {});
-        scene->addComponent<UILayoutComponent>(panel.title, {});
-        scene->addComponent<UIComponent>(panel.title, {});
-        scene->addComponent<TextComponent>(panel.title, {});
+        scene->addComponent<Transform>(panel.titlecontainer, {});
+        scene->addComponent<UILayoutComponent>(panel.titlecontainer, {});
+        scene->addComponent<UIContainerComponent>(panel.titlecontainer, {});
 
-        scene->addEntityChild(entity, panel.title);
-
-        UIComponent& uititle = scene->getComponent<UIComponent>(panel.title);
-        uititle.color = Vector4(0.0, 0.0, 0.0, 1.0);
+        scene->addEntityChild(entity, panel.titlecontainer);
     }
-}
+    if (panel.titletext == NULL_ENTITY){
+        panel.titletext = scene->createEntity();
 
-void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
-    createButtonLabel(entity, button);
+        scene->addComponent<Transform>(panel.titletext, {});
+        scene->addComponent<UILayoutComponent>(panel.titletext, {});
+        scene->addComponent<UIComponent>(panel.titletext, {});
+        scene->addComponent<TextComponent>(panel.titletext, {});
 
-    if (!ui.loaded){
-        if (!button.textureNormal.load()){
-            button.textureNormal = ui.texture;
-        }
-        button.textureNormal.load();
-        button.texturePressed.load();
-        button.textureDisabled.load();
+        scene->addEntityChild(panel.titlecontainer, panel.titletext);
     }
-
-    Transform& labeltransform = scene->getComponent<Transform>(button.label);
-    TextComponent& labeltext = scene->getComponent<TextComponent>(button.label);
-    UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
-    UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
-
-    labellayout.width = 0;
-    labellayout.height = 0;
-    labeltext.needUpdateText = true;
-    createOrUpdateText(labeltext, labelui, labellayout);
-    
-    labellayout.anchorPreset = AnchorPreset::CENTER;
-    labellayout.usingAnchors = true;
-
-    if (button.disabled){
-        if (ui.texture != button.textureDisabled){
-            ui.texture = button.textureDisabled;
-            ui.needUpdateTexture = true;
-        }
-    }else{
-        if (!button.pressed){
-            if (ui.texture != button.textureNormal){
-                ui.texture = button.textureNormal;
-                ui.needUpdateTexture = true;
-            }
-        }else{
-            if (ui.texture != button.texturePressed){
-                ui.texture = button.texturePressed;
-                ui.needUpdateTexture = true;
-            }
-        }
-    }
-}
-
-void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
-    createPanelTitle(entity, panel);
-
-    Transform& titletransform = scene->getComponent<Transform>(panel.title);
-    TextComponent& titletext = scene->getComponent<TextComponent>(panel.title);
-    UIComponent& titleui = scene->getComponent<UIComponent>(panel.title);
-    UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.title);
-
-    titlelayout.width = 0;
-    titlelayout.height = 0;
-    titletext.needUpdateText = true;
-    createOrUpdateText(titletext, titleui, titlelayout);
-    
-    titlelayout.anchorPreset = AnchorPreset::CENTER_TOP;
-    titlelayout.ignoreScissor = true;
-    titlelayout.usingAnchors = true;
 }
 
 void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit){
@@ -372,6 +312,80 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
         scene->addEntityChild(entity, textedit.cursor);
     }
 
+}
+
+void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
+    createButtonLabel(entity, button);
+
+    if (!ui.loaded){
+        if (!button.textureNormal.load()){
+            button.textureNormal = ui.texture;
+        }
+        button.textureNormal.load();
+        button.texturePressed.load();
+        button.textureDisabled.load();
+    }
+
+    Transform& labeltransform = scene->getComponent<Transform>(button.label);
+    TextComponent& labeltext = scene->getComponent<TextComponent>(button.label);
+    UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
+    UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
+
+    labelui.color = Vector4(0.0, 0.0, 0.0, 1.0);
+    labellayout.width = 0;
+    labellayout.height = 0;
+    labellayout.anchorPreset = AnchorPreset::CENTER;
+    labellayout.usingAnchors = true;
+
+    labeltext.needUpdateText = true;
+    createOrUpdateText(labeltext, labelui, labellayout);
+
+    if (button.disabled){
+        if (ui.texture != button.textureDisabled){
+            ui.texture = button.textureDisabled;
+            ui.needUpdateTexture = true;
+        }
+    }else{
+        if (!button.pressed){
+            if (ui.texture != button.textureNormal){
+                ui.texture = button.textureNormal;
+                ui.needUpdateTexture = true;
+            }
+        }else{
+            if (ui.texture != button.texturePressed){
+                ui.texture = button.texturePressed;
+                ui.needUpdateTexture = true;
+            }
+        }
+    }
+}
+
+void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
+    createPanelObjects(entity, panel);
+
+    UIContainerComponent& containerui = scene->getComponent<UIContainerComponent>(panel.titlecontainer);
+    UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.titlecontainer);
+
+    containerlayout.anchorPreset = AnchorPreset::TOP_WIDE;
+    containerlayout.ignoreScissor = true;
+    containerlayout.usingAnchors = true;
+    containerlayout.height = img.patchMarginTop;
+    containerui.type = ContainerType::HORIZONTAL;
+
+    Transform& titletransform = scene->getComponent<Transform>(panel.titletext);
+    TextComponent& titletext = scene->getComponent<TextComponent>(panel.titletext);
+    UIComponent& titleui = scene->getComponent<UIComponent>(panel.titletext);
+    UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.titletext);
+
+    titleui.color = Vector4(0.0, 0.0, 0.0, 1.0);
+    titlelayout.width = 0;
+    titlelayout.height = 0;
+    titlelayout.anchorPreset = AnchorPreset::CENTER;
+    titlelayout.ignoreScissor = true;
+    titlelayout.usingAnchors = true;
+
+    titletext.needUpdateText = true;
+    createOrUpdateText(titletext, titleui, titlelayout);
 }
 
 void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
@@ -958,6 +972,10 @@ void UISystem::update(double dt){
             }else{
                 UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
                 if (parentlayout){
+                    if (parentlayout->ignoreScissor){
+                        layout.ignoreScissor = true;
+                    }
+
                     Rect boxRect = Rect(0, 0, parentlayout->width, parentlayout->height);
 
                     UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
@@ -1070,8 +1088,11 @@ void UISystem::entityDestroyed(Entity entity){
         PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
 
         destroyPanel(panel);
-        if (panel.title != NULL_ENTITY){
-            scene->destroyEntity(panel.title);
+        if (panel.titletext != NULL_ENTITY){
+            scene->destroyEntity(panel.titletext);
+        }
+        if (panel.titlecontainer != NULL_ENTITY){
+            scene->destroyEntity(panel.titlecontainer);
         }
     }
     if (signature.test(scene->getComponentType<TextEditComponent>())){

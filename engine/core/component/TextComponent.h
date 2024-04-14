@@ -13,7 +13,7 @@ namespace Supernova{
 
         std::string font = "";
         std::string text = "";
-        unsigned int fontSize = 30;
+        unsigned int fontSize = 20;
         bool multiline = true;
         unsigned int maxTextSize = 100;
 

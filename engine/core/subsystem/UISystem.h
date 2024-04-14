@@ -75,7 +75,7 @@ namespace Supernova{
 
 		// advanced UIs
 		void createButtonLabel(Entity entity, ButtonComponent& button);
-		void createPanelTitle(Entity entity, PanelComponent& panel);
+		void createPanelObjects(Entity entity, PanelComponent& panel);
 		void createTextEditObjects(Entity entity, TextEditComponent& textedit);
 
 		virtual void load();

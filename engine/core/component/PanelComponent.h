@@ -10,7 +10,8 @@
 namespace Supernova{
 
     struct PanelComponent{
-        Entity title = NULL_ENTITY;
+        Entity titlecontainer = NULL_ENTITY;
+        Entity titletext = NULL_ENTITY;
 
         bool needUpdatePanel = true;
     };

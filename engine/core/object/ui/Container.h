@@ -12,6 +12,7 @@ namespace Supernova{
 
     public:
         Container(Scene* scene);
+        Container(Scene* scene, Entity entity);
         
         void setType(ContainerType type);
         ContainerType getType() const;

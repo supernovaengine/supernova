@@ -7,6 +7,7 @@
 
 #include "Image.h"
 #include "Text.h"
+#include "Container.h"
 
 namespace Supernova{
     class Panel: public Image{
@@ -14,7 +15,8 @@ namespace Supernova{
     public:
         Panel(Scene* scene);
 
-        Text getTitleObject() const;
+        Container getTitleContainerObject() const;
+        Text getTitleTextObject() const;
 
         void setTitle(std::string text);
         std::string getTitle() const;
