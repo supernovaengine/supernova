@@ -331,6 +331,24 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
     }
 }
 
+void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
+    createPanelTitle(entity, panel);
+
+    Transform& titletransform = scene->getComponent<Transform>(panel.title);
+    TextComponent& titletext = scene->getComponent<TextComponent>(panel.title);
+    UIComponent& titleui = scene->getComponent<UIComponent>(panel.title);
+    UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.title);
+
+    titlelayout.width = 0;
+    titlelayout.height = 0;
+    titletext.needUpdateText = true;
+    createOrUpdateText(titletext, titleui, titlelayout);
+    
+    titlelayout.anchorPreset = AnchorPreset::CENTER_TOP;
+    titlelayout.ignoreScissor = true;
+    titlelayout.usingAnchors = true;
+}
+
 void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit){
     if (textedit.text == NULL_ENTITY){
         textedit.text = scene->createEntity();
@@ -715,6 +733,10 @@ void UISystem::destroyButton(ButtonComponent& button){
     button.needUpdateButton = true;
 }
 
+void UISystem::destroyPanel(PanelComponent& panel){
+    panel.needUpdatePanel = true;
+}
+
 void UISystem::destroyTextEdit(TextEditComponent& textedit){
     textedit.needUpdateTextEdit = true;
 }
@@ -783,6 +805,17 @@ void UISystem::createOrUpdateUiComponent(double dt, UILayoutComponent& layout, E
                     updateButton(entity, button, img, ui, layout);
 
                     button.needUpdateButton = false;
+                }
+            }
+
+            // Panels
+            if (signature.test(scene->getComponentType<PanelComponent>())){
+                PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+
+                if (panel.needUpdatePanel){
+                    updatePanel(entity, panel, img, ui, layout);
+
+                    panel.needUpdatePanel = false;
                 }
             }
 
@@ -934,10 +967,17 @@ void UISystem::update(double dt){
 
                     ImageComponent* parentimage = scene->findComponent<ImageComponent>(transform.parent);
                     if (parentimage){
-                        boxRect.setX(boxRect.getX() + parentimage->patchMarginLeft);
-                        boxRect.setWidth(boxRect.getWidth() - parentimage->patchMarginRight - parentimage->patchMarginLeft);
-                        boxRect.setY(boxRect.getY() + parentimage->patchMarginTop);
-                        boxRect.setHeight(boxRect.getHeight() - parentimage->patchMarginBottom - parentimage->patchMarginTop);
+                        if (!layout.ignoreScissor){
+                            boxRect.setX(boxRect.getX() + parentimage->patchMarginLeft);
+                            boxRect.setWidth(boxRect.getWidth() - parentimage->patchMarginRight - parentimage->patchMarginLeft);
+                            boxRect.setY(boxRect.getY() + parentimage->patchMarginTop);
+                            boxRect.setHeight(boxRect.getHeight() - parentimage->patchMarginBottom - parentimage->patchMarginTop);
+                        }else{
+                            boxRect.setX(boxRect.getX());
+                            boxRect.setWidth(boxRect.getWidth());
+                            boxRect.setY(boxRect.getY());
+                            boxRect.setHeight(boxRect.getHeight());
+                        }
                     }
 
                     abAnchorLeft = (boxRect.getWidth() * layout.anchorPointLeft) + boxRect.getX();
@@ -1024,6 +1064,14 @@ void UISystem::entityDestroyed(Entity entity){
         destroyButton(button);
         if (button.label != NULL_ENTITY){
             scene->destroyEntity(button.label);
+        }
+    }
+    if (signature.test(scene->getComponentType<PanelComponent>())){
+        PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+
+        destroyPanel(panel);
+        if (panel.title != NULL_ENTITY){
+            scene->destroyEntity(panel.title);
         }
     }
     if (signature.test(scene->getComponentType<TextEditComponent>())){

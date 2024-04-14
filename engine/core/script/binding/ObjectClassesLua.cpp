@@ -29,6 +29,7 @@
 #include "Text.h"
 #include "Image.h"
 #include "Button.h"
+#include "Panel.h"
 #include "TextEdit.h"
 #include "Container.h"
 #include "Audio.h"
@@ -614,6 +615,18 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTextureDisabled", (void(Button::*)(std::string))&Button::setTextureDisabled)
         .addProperty("disabled", &Button::getDisabled, &Button::setDisabled)
         .addFunction("getButtonComponent", &Button::getComponent<ButtonComponent>)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Panel, Image>("Panel")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("getTitleObject", &Panel::getTitleObject)
+        .addProperty("title", &Panel::getTitle, &Panel::setTitle)
+        .addProperty("titleColor", &Panel::getTitleColor, (void(Panel::*)(Vector4))&Panel::setTitleColor)
+        .addFunction("setTitleColor", (void(Panel::*)(const float, const float, const float, const float))&Panel::setTitleColor)
+        .addProperty("titleFont", &Panel::getTitleFont, &Panel::setTitleFont)
+        .addProperty("titleFontSize", &Panel::getTitleFontSize, &Panel::setTitleFontSize)
+        .addFunction("getPanelComponent", &Panel::getComponent<PanelComponent>)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

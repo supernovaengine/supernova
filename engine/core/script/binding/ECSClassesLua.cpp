@@ -307,6 +307,12 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
+        .beginClass<PanelComponent>("PanelComponent")
+        .addProperty("title", &PanelComponent::title)
+        .addProperty("needUpdatePanel", &PanelComponent::needUpdatePanel)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<ParticleLifeInitializer>("ParticleLifeInitializer")
         .addProperty("minLife", &ParticleLifeInitializer::minLife)
         .addProperty("maxLife", &ParticleLifeInitializer::maxLife)

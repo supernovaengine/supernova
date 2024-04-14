@@ -39,6 +39,9 @@ namespace Supernova{
 		//Button
 		void updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
 
+		//Panel
+		void updatePanel(Entity entity, PanelComponent& panel, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
+
 		//TextEdit
 		void updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
 		void blinkCursorTextEdit(double dt, TextEditComponent& textedit, UIComponent& ui);
@@ -53,6 +56,7 @@ namespace Supernova{
 
 		void destroyText(TextComponent& text);
 		void destroyButton(ButtonComponent& button);
+		void destroyPanel(PanelComponent& panel);
 		void destroyTextEdit(TextEditComponent& textedit);
 
 	public:
