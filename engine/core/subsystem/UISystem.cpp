@@ -879,6 +879,9 @@ void UISystem::update(double dt){
                         }else if (container.type == ContainerType::VERTICAL){
                             genWidth = std::max(genWidth, (int)container.boxes[b].rect.getWidth());
                             genHeight += container.boxes[b].rect.getHeight();
+                        }else if (container.type == ContainerType::FLOAT){
+                            genWidth += container.boxes[b].rect.getWidth();
+                            genHeight = std::max(genHeight, (int)container.boxes[b].rect.getHeight());
                         }
                     }
                     if (container.boxes[b].expand){
@@ -910,6 +913,21 @@ void UISystem::update(double dt){
                                 container.boxes[b].rect.setHeight(container.boxes[b].rect.getHeight() + (diff / numBoxExpand));
                             }
                             container.boxes[b].rect.setWidth(layout.width);
+                        }else if (container.type == ContainerType::FLOAT){
+                            if (b < (container.numBoxes-1)){
+                                container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
+                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY());
+                            }
+                            //if (container.boxes[b].expand){
+                            //    float diff = layout.width - genWidth;
+                            //    container.boxes[b].rect.setWidth(container.boxes[b].rect.getWidth() + (diff / numBoxExpand));
+                            //}
+                            if ((container.boxes[b].rect.getX()+container.boxes[b].rect.getWidth()) > layout.width){
+                                container.boxes[b].rect.setX(0);
+                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + genHeight);
+
+                            }
+                            container.boxes[b].rect.setHeight(genHeight);
                         }
                     }
                 }
