@@ -15,6 +15,9 @@ Image::Image(Scene* scene): UILayout(scene){
     addComponent<ImageComponent>({});
 }
 
+Image::Image(Scene* scene, Entity entity): UILayout(scene, entity){
+}
+
 bool Image::createImage(){
     ImageComponent& img = getComponent<ImageComponent>();
     UIComponent& ui = getComponent<UIComponent>();

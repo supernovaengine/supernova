@@ -45,6 +45,7 @@ Scene::Scene(){
 	registerComponent<ImageComponent>();
 	registerComponent<ButtonComponent>();
 	registerComponent<PanelComponent>();
+	registerComponent<ScrollbarComponent>();
 	registerComponent<TextEditComponent>();
 	registerComponent<MeshPolygonComponent>();
 	registerComponent<PolygonComponent>();

@@ -62,6 +62,7 @@
 #include "component/RotationActionComponent.h"
 #include "component/ScaleActionComponent.h"
 #include "component/ScaleTracksComponent.h"
+#include "component/ScrollbarComponent.h"
 #include "component/SkyComponent.h"
 #include "component/SpriteAnimationComponent.h"
 #include "component/SpriteComponent.h"
@@ -131,8 +132,9 @@
 #include "object/ui/Image.h"
 #include "object/ui/Panel.h"
 #include "object/ui/Polygon.h"
-#include "object/ui/TextEdit.h"
+#include "object/ui/Scrollbar.h"
 #include "object/ui/Text.h"
+#include "object/ui/TextEdit.h"
 #include "object/ui/UILayout.h"
 
 //#include "pool/FontPool.h"

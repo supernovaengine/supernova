@@ -14,6 +14,7 @@
 #include "component/UIComponent.h"
 #include "component/ButtonComponent.h"
 #include "component/PanelComponent.h"
+#include "component/ScrollbarComponent.h"
 #include "component/PolygonComponent.h"
 #include "component/TextEditComponent.h"
 #include "component/Transform.h"
@@ -57,6 +58,7 @@ namespace Supernova{
 		void destroyText(TextComponent& text);
 		void destroyButton(ButtonComponent& button);
 		void destroyPanel(PanelComponent& panel);
+		void destroyScrollbar(ScrollbarComponent& scrollbar);
 		void destroyTextEdit(TextEditComponent& textedit);
 
 	public:
@@ -74,8 +76,9 @@ namespace Supernova{
 		bool createOrUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout);
 
 		// advanced UIs
-		void createButtonLabel(Entity entity, ButtonComponent& button);
+		void createButtonObjects(Entity entity, ButtonComponent& button);
 		void createPanelObjects(Entity entity, PanelComponent& panel);
+		void createScrollbarObjects(Entity entity, ScrollbarComponent& scrollbar);
 		void createTextEditObjects(Entity entity, TextEditComponent& textedit);
 
 		virtual void load();

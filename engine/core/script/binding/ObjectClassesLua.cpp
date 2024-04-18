@@ -30,6 +30,7 @@
 #include "Image.h"
 #include "Button.h"
 #include "Panel.h"
+#include "Scrollbar.h"
 #include "TextEdit.h"
 #include "Container.h"
 #include "Audio.h"
@@ -628,6 +629,21 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("titleFont", &Panel::getTitleFont, &Panel::setTitleFont)
         .addProperty("titleFontSize", &Panel::getTitleFontSize, &Panel::setTitleFontSize)
         .addFunction("getPanelComponent", &Panel::getComponent<PanelComponent>)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .deriveClass<Scrollbar, Image>("Scrollbar")
+        .addConstructor <void (*) (Scene*)> ()
+        .addFunction("getBarObject", &Scrollbar::getBarObject)
+        .addFunction("setBarTexture", 
+            luabridge::overload<std::string>(&Scrollbar::setBarTexture),
+            luabridge::overload<Framebuffer*>(&Scrollbar::setBarTexture))
+        .addProperty("barColor", &Scrollbar::getBarColor, (void(Image::*)(Vector4))&Scrollbar::setBarColor)
+        .addFunction("setBarColor", 
+            luabridge::overload<const float, const float, const float>(&Scrollbar::setBarColor),
+            luabridge::overload<const float, const float, const float, const float>(&Scrollbar::setBarColor))
+        .addProperty("barAlpha", &Scrollbar::getBarAlpha, &Scrollbar::setBarAlpha)
+        .addFunction("getScrollbarComponent", &Panel::getComponent<ScrollbarComponent>)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

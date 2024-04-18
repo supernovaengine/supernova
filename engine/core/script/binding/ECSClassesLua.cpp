@@ -315,6 +315,12 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
+        .beginClass<ScrollbarComponent>("ScrollbarComponent")
+        .addProperty("bar", &ScrollbarComponent::bar)
+        .addProperty("needUpdateScrollbar", &ScrollbarComponent::needUpdateScrollbar)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<ParticleLifeInitializer>("ParticleLifeInitializer")
         .addProperty("minLife", &ParticleLifeInitializer::minLife)
         .addProperty("maxLife", &ParticleLifeInitializer::maxLife)

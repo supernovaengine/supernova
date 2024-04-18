@@ -9,7 +9,7 @@ Button::Button(Scene* scene): Image(scene){
     addComponent<ButtonComponent>({});
 
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
-    scene->getSystem<UISystem>()->createButtonLabel(entity, btcomp);
+    scene->getSystem<UISystem>()->createButtonObjects(entity, btcomp);
 }
 
 Text Button::getLabelObject() const{

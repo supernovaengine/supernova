@@ -38,6 +38,7 @@
 #include "component/UIComponent.h"
 #include "component/ButtonComponent.h"
 #include "component/PanelComponent.h"
+#include "component/ScrollbarComponent.h"
 #include "component/TextEditComponent.h"
 #include "component/MeshPolygonComponent.h"
 #include "component/PolygonComponent.h"

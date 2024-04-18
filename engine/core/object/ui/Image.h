@@ -11,6 +11,7 @@ namespace Supernova{
     class Image: public UILayout{
     public:
         Image(Scene* scene);
+        Image(Scene* scene, Entity entity);
 
         bool createImage();
         bool load();

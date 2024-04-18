@@ -254,7 +254,7 @@ void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponen
         ui.needUpdateBuffer = true;
 }
 
-void UISystem::createButtonLabel(Entity entity, ButtonComponent& button){
+void UISystem::createButtonObjects(Entity entity, ButtonComponent& button){
     if (button.label == NULL_ENTITY){
         button.label = scene->createEntity();
 
@@ -289,6 +289,19 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
     }
 }
 
+void UISystem::createScrollbarObjects(Entity entity, ScrollbarComponent& scrollbar){
+    if (scrollbar.bar == NULL_ENTITY){
+        scrollbar.bar = scene->createEntity();
+
+        scene->addComponent<Transform>(scrollbar.bar, {});
+        scene->addComponent<UILayoutComponent>(scrollbar.bar, {});
+        scene->addComponent<UIComponent>(scrollbar.bar, {});
+        scene->addComponent<TextComponent>(scrollbar.bar, {});
+
+        scene->addEntityChild(entity, scrollbar.bar);
+    }
+}
+
 void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit){
     if (textedit.text == NULL_ENTITY){
         textedit.text = scene->createEntity();
@@ -315,7 +328,7 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
 }
 
 void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
-    createButtonLabel(entity, button);
+    createButtonObjects(entity, button);
 
     if (!ui.loaded){
         if (!button.textureNormal.load()){
@@ -737,6 +750,11 @@ void UISystem::destroyText(TextComponent& text){
     text.needReload = false;
 
     text.needUpdateText = true;
+
+    if (text.stbtext){
+        text.stbtext.reset();
+        text.stbtext = NULL;
+    }
 }
 
 void UISystem::destroyButton(ButtonComponent& button){
@@ -745,14 +763,46 @@ void UISystem::destroyButton(ButtonComponent& button){
     button.textureDisabled.destroy();
 
     button.needUpdateButton = true;
+
+    if (button.label != NULL_ENTITY){
+        scene->destroyEntity(button.label);
+        button.label = NULL_ENTITY;
+    }
 }
 
 void UISystem::destroyPanel(PanelComponent& panel){
     panel.needUpdatePanel = true;
+
+    if (panel.titletext != NULL_ENTITY){
+        scene->destroyEntity(panel.titletext);
+        panel.titletext = NULL_ENTITY;
+    }
+    if (panel.titlecontainer != NULL_ENTITY){
+        scene->destroyEntity(panel.titlecontainer);
+        panel.titlecontainer = NULL_ENTITY;
+    }
+}
+
+void UISystem::destroyScrollbar(ScrollbarComponent& scrollbar){
+    scrollbar.needUpdateScrollbar = true;
+
+    if (scrollbar.bar != NULL_ENTITY){
+        scene->destroyEntity(scrollbar.bar);
+        scrollbar.bar = NULL_ENTITY;
+    }
 }
 
 void UISystem::destroyTextEdit(TextEditComponent& textedit){
     textedit.needUpdateTextEdit = true;
+
+    if (textedit.text != NULL_ENTITY){
+        scene->destroyEntity(textedit.text);
+        textedit.text = NULL_ENTITY;
+    }
+    if (textedit.cursor != NULL_ENTITY){
+        scene->destroyEntity(textedit.cursor);
+        textedit.cursor = NULL_ENTITY;
+    }
 }
 
 void UISystem::load(){
@@ -775,6 +825,16 @@ void UISystem::destroy(){
             ButtonComponent &button = scene->getComponent<ButtonComponent>(entity);
 
             destroyButton(button);
+        }
+        if (signature.test(scene->getComponentType<PanelComponent>())){
+            PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+
+            destroyPanel(panel);
+        }
+        if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+            ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+
+            destroyScrollbar(scrollbar);
         }
         if (signature.test(scene->getComponentType<TextEditComponent>())) {
             TextEditComponent &textedit = scene->getComponent<TextEditComponent>(entity);
@@ -1091,29 +1151,21 @@ void UISystem::entityDestroyed(Entity entity){
         TextComponent& text = scene->getComponent<TextComponent>(entity);
 
         destroyText(text);
-        if (text.stbtext){
-            text.stbtext.reset();
-            text.stbtext = NULL;
-        }
     }
     if (signature.test(scene->getComponentType<ButtonComponent>())){
         ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
 
         destroyButton(button);
-        if (button.label != NULL_ENTITY){
-            scene->destroyEntity(button.label);
-        }
     }
     if (signature.test(scene->getComponentType<PanelComponent>())){
         PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
 
         destroyPanel(panel);
-        if (panel.titletext != NULL_ENTITY){
-            scene->destroyEntity(panel.titletext);
-        }
-        if (panel.titlecontainer != NULL_ENTITY){
-            scene->destroyEntity(panel.titlecontainer);
-        }
+    }
+    if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+        ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+
+        destroyScrollbar(scrollbar);
     }
     if (signature.test(scene->getComponentType<TextEditComponent>())){
         TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
