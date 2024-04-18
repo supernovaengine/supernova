@@ -638,12 +638,12 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setBarTexture", 
             luabridge::overload<std::string>(&Scrollbar::setBarTexture),
             luabridge::overload<Framebuffer*>(&Scrollbar::setBarTexture))
-        .addProperty("barColor", &Scrollbar::getBarColor, (void(Image::*)(Vector4))&Scrollbar::setBarColor)
+        .addProperty("barColor", &Scrollbar::getBarColor, (void(Scrollbar::*)(Vector4))&Scrollbar::setBarColor)
         .addFunction("setBarColor", 
             luabridge::overload<const float, const float, const float>(&Scrollbar::setBarColor),
             luabridge::overload<const float, const float, const float, const float>(&Scrollbar::setBarColor))
         .addProperty("barAlpha", &Scrollbar::getBarAlpha, &Scrollbar::setBarAlpha)
-        .addFunction("getScrollbarComponent", &Panel::getComponent<ScrollbarComponent>)
+        .addFunction("getScrollbarComponent", &Scrollbar::getComponent<ScrollbarComponent>)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

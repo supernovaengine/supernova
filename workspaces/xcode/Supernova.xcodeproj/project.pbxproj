@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		71033D662BD1A7D200D81FB5 /* ScrollbarComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71033D652BD1A7D200D81FB5 /* ScrollbarComponent.h */; };
+		71033D692BD1A7F100D81FB5 /* Scrollbar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71033D672BD1A7F000D81FB5 /* Scrollbar.cpp */; };
+		71033D6A2BD1A7F100D81FB5 /* Scrollbar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71033D672BD1A7F000D81FB5 /* Scrollbar.cpp */; };
+		71033D6B2BD1A7F100D81FB5 /* Scrollbar.h in Headers */ = {isa = PBXBuildFile; fileRef = 71033D682BD1A7F000D81FB5 /* Scrollbar.h */; };
 		710506AE297F4483002DD23C /* Shape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 710506AC297F4483002DD23C /* Shape.cpp */; };
 		710506AF297F4483002DD23C /* Shape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 710506AC297F4483002DD23C /* Shape.cpp */; };
 		710506B0297F4483002DD23C /* Shape.h in Headers */ = {isa = PBXBuildFile; fileRef = 710506AD297F4483002DD23C /* Shape.h */; };
@@ -1285,6 +1289,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		71033D652BD1A7D200D81FB5 /* ScrollbarComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScrollbarComponent.h; sourceTree = "<group>"; };
+		71033D672BD1A7F000D81FB5 /* Scrollbar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scrollbar.cpp; sourceTree = "<group>"; };
+		71033D682BD1A7F000D81FB5 /* Scrollbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scrollbar.h; sourceTree = "<group>"; };
 		710506AC297F4483002DD23C /* Shape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shape.cpp; sourceTree = "<group>"; };
 		710506AD297F4483002DD23C /* Shape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shape.h; sourceTree = "<group>"; };
 		7105A55628B305910092EA05 /* Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Color.cpp; sourceTree = "<group>"; };
@@ -3400,6 +3407,7 @@
 				71451BBB270C9D1000712643 /* RotationActionComponent.h */,
 				71451BB8270C9D0F00712643 /* ScaleActionComponent.h */,
 				71E5450E284D5BDF00C68FAB /* ScaleTracksComponent.h */,
+				71033D652BD1A7D200D81FB5 /* ScrollbarComponent.h */,
 				71CC839126B8C49B00EEBB93 /* SkyComponent.h */,
 				71451BB7270C9D0F00712643 /* SpriteAnimationComponent.h */,
 				71451BB2270C9D0F00712643 /* SpriteComponent.h */,
@@ -3848,6 +3856,8 @@
 				7181A0AF2BC8B6CB00AC230B /* Panel.h */,
 				713E580A27BA9CE400376680 /* Polygon.cpp */,
 				713E580C27BA9CE400376680 /* Polygon.h */,
+				71033D672BD1A7F000D81FB5 /* Scrollbar.cpp */,
+				71033D682BD1A7F000D81FB5 /* Scrollbar.h */,
 				71ABBD18277A31BA001CE3AF /* Text.cpp */,
 				71ABBD19277A31BA001CE3AF /* Text.h */,
 				713E580927BA9CE400376680 /* TextEdit.cpp */,
@@ -4366,6 +4376,7 @@
 				713E581227BA9CE400376680 /* Polygon.h in Headers */,
 				71393EE928F8EF9F0074442E /* XMLUtils.h in Headers */,
 				71FCE4C228E0FA01003C5217 /* LuaBridgeAddon.h in Headers */,
+				71033D6B2BD1A7F100D81FB5 /* Scrollbar.h in Headers */,
 				715CB114288CD3F60049344B /* TerrainComponent.h in Headers */,
 				7170A3D42818A8A30003E965 /* Bone.h in Headers */,
 				7128D11D25C2356200965B51 /* SokolSystem.h in Headers */,
@@ -4393,6 +4404,7 @@
 				7170A3CC2818A87E0003E965 /* ModelComponent.h in Headers */,
 				713E580827BA9CB700376680 /* MeshPolygon.h in Headers */,
 				71ABBD23277A31E6001CE3AF /* UISystem.h in Headers */,
+				71033D662BD1A7D200D81FB5 /* ScrollbarComponent.h in Headers */,
 				71E54518284D5BE000C68FAB /* KeyframeTracksComponent.h in Headers */,
 				71ABBD4027A879B9001CE3AF /* MeshPolygonComponent.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
@@ -5579,6 +5591,7 @@
 				71EA6DA82AE20B8C00CA9A75 /* CollideShapeResult3D.cpp in Sources */,
 				713D82A9259D307F00567F9F /* Object.cpp in Sources */,
 				7170A3DC2818A8A30003E965 /* Fog.cpp in Sources */,
+				71033D6A2BD1A7F100D81FB5 /* Scrollbar.cpp in Sources */,
 				71BE623925B1DB9E006D6E02 /* LuaBinding.cpp in Sources */,
 				71451BD2270CA17F00712643 /* SpriteAnimation.cpp in Sources */,
 				71D74954296731F200348AB8 /* Tilemap.cpp in Sources */,
@@ -5743,6 +5756,7 @@
 				71EA6DA72AE20B8C00CA9A75 /* CollideShapeResult3D.cpp in Sources */,
 				7162FD3925963AE00075B97D /* Quaternion.cpp in Sources */,
 				7162FD3B25963AE00075B97D /* AABB.cpp in Sources */,
+				71033D692BD1A7F100D81FB5 /* Scrollbar.cpp in Sources */,
 				7170A3DB2818A8A30003E965 /* Fog.cpp in Sources */,
 				71BE623825B1DB9E006D6E02 /* LuaBinding.cpp in Sources */,
 				71D74953296731F200348AB8 /* Tilemap.cpp in Sources */,
