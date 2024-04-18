@@ -871,6 +871,7 @@ void UISystem::update(double dt){
                 int genWidth = 0;
                 int genHeight = 0;
                 int numBoxExpand = 0;
+                int maxWidth = 0;
                 for (int b = 0; b < container.numBoxes; b++){
                     if (container.boxes[b].layout != NULL_ENTITY){
                         if (container.type == ContainerType::HORIZONTAL){
@@ -882,6 +883,7 @@ void UISystem::update(double dt){
                         }else if (container.type == ContainerType::FLOAT){
                             genWidth += container.boxes[b].rect.getWidth();
                             genHeight = std::max(genHeight, (int)container.boxes[b].rect.getHeight());
+                            maxWidth = std::max(maxWidth, (int)container.boxes[b].rect.getWidth());
                         }
                     }
                     if (container.boxes[b].expand){
@@ -918,14 +920,14 @@ void UISystem::update(double dt){
                                 container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
                                 container.boxes[b].rect.setY(container.boxes[b+1].rect.getY());
                             }
-                            //if (container.boxes[b].expand){
-                            //    float diff = layout.width - genWidth;
-                            //    container.boxes[b].rect.setWidth(container.boxes[b].rect.getWidth() + (diff / numBoxExpand));
-                            //}
+                            if (container.boxes[b].expand){
+                                int numObjInLine = floor((float)layout.width / (float)maxWidth);
+                                float diff = layout.width - (numObjInLine * maxWidth);
+                                container.boxes[b].rect.setWidth(maxWidth + (diff / numObjInLine));
+                            }
                             if ((container.boxes[b].rect.getX()+container.boxes[b].rect.getWidth()) > layout.width){
                                 container.boxes[b].rect.setX(0);
                                 container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + genHeight);
-
                             }
                             container.boxes[b].rect.setHeight(genHeight);
                         }
