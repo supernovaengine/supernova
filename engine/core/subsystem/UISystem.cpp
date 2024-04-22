@@ -264,6 +264,9 @@ void UISystem::createButtonObjects(Entity entity, ButtonComponent& button){
         scene->addComponent<TextComponent>(button.label, {});
 
         scene->addEntityChild(entity, button.label);
+
+        UIComponent& uilabel = scene->getComponent<UIComponent>(button.label);
+        uilabel.color = Vector4(0.0, 0.0, 0.0, 1.0);
     }
 }
 
@@ -296,9 +299,13 @@ void UISystem::createScrollbarObjects(Entity entity, ScrollbarComponent& scrollb
         scene->addComponent<Transform>(scrollbar.bar, {});
         scene->addComponent<UILayoutComponent>(scrollbar.bar, {});
         scene->addComponent<UIComponent>(scrollbar.bar, {});
-        scene->addComponent<TextComponent>(scrollbar.bar, {});
+        scene->addComponent<ImageComponent>(scrollbar.bar, {});
 
         scene->addEntityChild(entity, scrollbar.bar);
+
+        UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
+        barlayout.height = 10;
+        barlayout.width = 10;
     }
 }
 
@@ -312,6 +319,9 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
         scene->addComponent<TextComponent>(textedit.text, {});
 
         scene->addEntityChild(entity, textedit.text);
+
+        UIComponent& uitext = scene->getComponent<UIComponent>(textedit.text);
+        uitext.color = Vector4(0.0, 0.0, 0.0, 1.0);
     }
 
     if (textedit.cursor == NULL_ENTITY){
@@ -344,7 +354,6 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
     UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
     UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
 
-    labelui.color = Vector4(0.0, 0.0, 0.0, 1.0);
     labellayout.width = 0;
     labellayout.height = 0;
     labellayout.anchorPreset = AnchorPreset::CENTER;
@@ -399,6 +408,33 @@ void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent&
 
     titletext.needUpdateText = true;
     createOrUpdateText(titletext, titleui, titlelayout);
+}
+
+void UISystem::updateScrollbar(Entity entity, ScrollbarComponent& scrollbar, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
+    createScrollbarObjects(entity, scrollbar);
+
+    Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
+    ImageComponent& barimage = scene->getComponent<ImageComponent>(scrollbar.bar);
+    UIComponent& barui = scene->getComponent<UIComponent>(scrollbar.bar);
+    UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
+
+    //barlayout.width = 50;
+    //barlayout.height = 50;
+    //barlayout.needUpdateSizes = true;
+
+    //bartransform.position = Vector3(0, 30, 0);
+    //bartransform.needUpdate = true;
+
+    barlayout.anchorPointLeft = 0;
+    barlayout.anchorPointTop = 0.5;
+    barlayout.anchorPointRight = 1;
+    barlayout.anchorPointBottom = 0.5;
+    barlayout.anchorOffsetLeft = 0;
+    barlayout.anchorOffsetTop = -floor(barlayout.height / 2.0);
+    barlayout.anchorOffsetRight = 0;
+    barlayout.anchorOffsetBottom = ceil(barlayout.height / 2.0);
+    barlayout.anchorPreset = AnchorPreset::NONE;
+    barlayout.usingAnchors = true;
 }
 
 void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
@@ -890,6 +926,17 @@ void UISystem::createOrUpdateUiComponent(double dt, UILayoutComponent& layout, E
                     updatePanel(entity, panel, img, ui, layout);
 
                     panel.needUpdatePanel = false;
+                }
+            }
+
+            // Scrollbar
+            if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+                ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+
+                if (scrollbar.needUpdateScrollbar){
+                    updateScrollbar(entity, scrollbar, img, ui, layout);
+
+                    scrollbar.needUpdateScrollbar = false;
                 }
             }
 

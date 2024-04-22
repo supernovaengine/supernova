@@ -43,6 +43,9 @@ namespace Supernova{
 		//Panel
 		void updatePanel(Entity entity, PanelComponent& panel, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
 
+		//Scrollbar
+		void updateScrollbar(Entity entity, ScrollbarComponent& scrollbar, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
+
 		//TextEdit
 		void updateTextEdit(Entity entity, TextEditComponent& textedit, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
 		void blinkCursorTextEdit(double dt, TextEditComponent& textedit, UIComponent& ui);

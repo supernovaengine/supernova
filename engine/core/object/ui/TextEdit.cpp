@@ -10,9 +10,6 @@ TextEdit::TextEdit(Scene* scene): Image(scene){
 
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
     scene->getSystem<UISystem>()->createTextEditObjects(entity, tecomp);
-
-    UIComponent& uitext = scene->getComponent<UIComponent>(tecomp.text);
-    uitext.color = Vector4(0.0, 0.0, 0.0, 1.0);
 }
 
 Text TextEdit::getTextObject() const{
