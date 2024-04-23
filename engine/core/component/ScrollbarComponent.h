@@ -11,6 +11,8 @@ namespace Supernova{
 
     struct ScrollbarComponent{
         Entity bar = NULL_ENTITY;
+        int barSize = 10;
+        bool barPointerDown = false;
 
         bool needUpdateScrollbar = true;
     };

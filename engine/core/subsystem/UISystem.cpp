@@ -265,8 +265,10 @@ void UISystem::createButtonObjects(Entity entity, ButtonComponent& button){
 
         scene->addEntityChild(entity, button.label);
 
-        UIComponent& uilabel = scene->getComponent<UIComponent>(button.label);
-        uilabel.color = Vector4(0.0, 0.0, 0.0, 1.0);
+        UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
+        UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
+        labelui.color = Vector4(0.0, 0.0, 0.0, 1.0);
+        labellayout.ignoreEvents = true;
     }
 }
 
@@ -279,6 +281,9 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
         scene->addComponent<UIContainerComponent>(panel.titlecontainer, {});
 
         scene->addEntityChild(entity, panel.titlecontainer);
+
+        UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.titlecontainer);
+        containerlayout.ignoreEvents = true;
     }
     if (panel.titletext == NULL_ENTITY){
         panel.titletext = scene->createEntity();
@@ -289,6 +294,9 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
         scene->addComponent<TextComponent>(panel.titletext, {});
 
         scene->addEntityChild(panel.titlecontainer, panel.titletext);
+
+        UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.titletext);
+        titlelayout.ignoreEvents = true;
     }
 }
 
@@ -304,8 +312,9 @@ void UISystem::createScrollbarObjects(Entity entity, ScrollbarComponent& scrollb
         scene->addEntityChild(entity, scrollbar.bar);
 
         UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
-        barlayout.height = 10;
-        barlayout.width = 10;
+        barlayout.height = scrollbar.barSize;
+        barlayout.width = scrollbar.barSize;
+        barlayout.ignoreEvents = true;
     }
 }
 
@@ -320,8 +329,10 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
 
         scene->addEntityChild(entity, textedit.text);
 
-        UIComponent& uitext = scene->getComponent<UIComponent>(textedit.text);
-        uitext.color = Vector4(0.0, 0.0, 0.0, 1.0);
+        UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
+        UILayoutComponent& textlayout = scene->getComponent<UILayoutComponent>(textedit.text);
+        textui.color = Vector4(0.0, 0.0, 0.0, 1.0);
+        textlayout.ignoreEvents = true;
     }
 
     if (textedit.cursor == NULL_ENTITY){
@@ -333,8 +344,10 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
         scene->addComponent<PolygonComponent>(textedit.cursor, {});
 
         scene->addEntityChild(entity, textedit.cursor);
-    }
 
+        UILayoutComponent& cursorlayout = scene->getComponent<UILayoutComponent>(textedit.cursor);
+        cursorlayout.ignoreEvents = true;
+    }
 }
 
 void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
@@ -1265,7 +1278,7 @@ void UISystem::eventOnPointerDown(float x, float y){
             Transform& transform = scene->getComponent<Transform>(entity);
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-            if (isCoordInside(x, y, transform, layout)){ //TODO: isCoordInside to polygon
+            if (isCoordInside(x, y, transform, layout) && !layout.ignoreEvents){ //TODO: isCoordInside to polygon
                 if (signature.test(scene->getComponentType<ButtonComponent>()) || 
                     signature.test(scene->getComponentType<TextEditComponent>()) ||
                     signature.test(scene->getComponentType<ImageComponent>())){
@@ -1311,6 +1324,16 @@ void UISystem::eventOnPointerDown(float x, float y){
                 System::instance().hideVirtualKeyboard();
             }
 
+            if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+                ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+                Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
+                UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
+
+                if (isCoordInside(x, y, bartransform, barlayout)){
+                    scrollbar.barPointerDown = true;
+                }
+            }
+
             ui.onPointerDown(x - transform.worldPosition.x, y - transform.worldPosition.y);
 
             if (!ui.focused){
@@ -1344,6 +1367,16 @@ void UISystem::eventOnPointerUp(float x, float y){
                 }
             }
 
+            if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+                ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+                Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
+                UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
+
+                if (isCoordInside(x, y, bartransform, barlayout)){
+                    scrollbar.barPointerDown = false;
+                }
+            }
+
             ui.onPointerUp(x - transform.worldPosition.x, y - transform.worldPosition.y);
         }
     }
@@ -1363,7 +1396,7 @@ void UISystem::eventOnPointerMove(float x, float y){
             if (signature.test(scene->getComponentType<Transform>())){
                 Transform& transform = scene->getComponent<Transform>(entity);
 
-                if ((!ui.pointerMoved) && isCoordInside(x, y, transform, layout)){
+                if ((!ui.pointerMoved) && isCoordInside(x, y, transform, layout) && !layout.ignoreEvents){
                     lastUI = i;
                 }
             }

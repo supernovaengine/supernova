@@ -261,6 +261,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("containerBoxIndex", &UILayoutComponent::containerBoxIndex)
         .addProperty("scissor", &UILayoutComponent::scissor)
         .addProperty("ignoreScissor", &UILayoutComponent::ignoreScissor)
+        .addProperty("ignoreEvents", &UILayoutComponent::ignoreEvents)
         .addProperty("needUpdateSizes", &UILayoutComponent::needUpdateSizes)
         .endClass();
 
@@ -317,6 +318,8 @@ void LuaBinding::registerECSClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .beginClass<ScrollbarComponent>("ScrollbarComponent")
         .addProperty("bar", &ScrollbarComponent::bar)
+        .addProperty("barSize", &ScrollbarComponent::barSize)
+        .addProperty("barPointerDown", &ScrollbarComponent::barPointerDown)
         .addProperty("needUpdateScrollbar", &ScrollbarComponent::needUpdateScrollbar)
         .endClass();
 

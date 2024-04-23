@@ -48,6 +48,7 @@ namespace Supernova{
 
         Rect scissor = Rect(0, 0, 0, 0);
         bool ignoreScissor = false; // ignore parent scissor
+        bool ignoreEvents = false;
 
         bool needUpdateSizes = false;
     };
