@@ -635,6 +635,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<Scrollbar, Image>("Scrollbar")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("getBarObject", &Scrollbar::getBarObject)
+        .addProperty("type", &Scrollbar::getType, &Scrollbar::setType)
+        .addProperty("barSize", &Scrollbar::getBarSize, &Scrollbar::setBarSize)
         .addFunction("setBarTexture", 
             luabridge::overload<std::string>(&Scrollbar::setBarTexture),
             luabridge::overload<Framebuffer*>(&Scrollbar::setBarTexture))

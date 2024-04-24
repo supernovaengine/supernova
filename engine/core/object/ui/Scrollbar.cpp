@@ -17,6 +17,32 @@ Image Scrollbar::getBarObject() const{
     return Image(scene, scrollcomp.bar);
 }
 
+void Scrollbar::setType(ScrollbarType type){
+    ScrollbarComponent& scrollcomp = getComponent<ScrollbarComponent>();
+
+    scrollcomp.type = type;
+    scrollcomp.needUpdateScrollbar = true;
+}
+
+ScrollbarType Scrollbar::getType() const{
+    ScrollbarComponent& scrollcomp = getComponent<ScrollbarComponent>();
+
+    return scrollcomp.type;
+}
+
+void Scrollbar::setBarSize(int size){
+    ScrollbarComponent& scrollcomp = getComponent<ScrollbarComponent>();
+
+    scrollcomp.barSize = size;
+    scrollcomp.needUpdateScrollbar = true;
+}
+
+int Scrollbar::getBarSize() const{
+    ScrollbarComponent& scrollcomp = getComponent<ScrollbarComponent>();
+
+    return scrollcomp.barSize;
+}
+
 void Scrollbar::setBarTexture(std::string path){
     getBarObject().setTexture(path);
 }

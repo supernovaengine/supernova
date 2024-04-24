@@ -93,6 +93,12 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("ScrollbarType")
+        .addVariable("VERTICAL", ScrollbarType::VERTICAL)
+        .addVariable("HORIZONTAL", ScrollbarType::HORIZONTAL)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginNamespace("FogType")
         .addVariable("LINEAR", FogType::LINEAR)
         .addVariable("EXPONENTIAL", FogType::EXPONENTIAL)
@@ -318,6 +324,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .beginClass<ScrollbarComponent>("ScrollbarComponent")
         .addProperty("bar", &ScrollbarComponent::bar)
+        .addProperty("type", &ScrollbarComponent::type)
         .addProperty("barSize", &ScrollbarComponent::barSize)
         .addProperty("barPointerDown", &ScrollbarComponent::barPointerDown)
         .addProperty("barPointerPos", &ScrollbarComponent::barPointerPos)

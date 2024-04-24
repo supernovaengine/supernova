@@ -439,14 +439,25 @@ void UISystem::updateScrollbar(Entity entity, ScrollbarComponent& scrollbar, Ima
     //bartransform.position = Vector3(0, 30, 0);
     //bartransform.needUpdate = true;
 
-    barlayout.anchorPointLeft = 0;
-    barlayout.anchorPointTop = 0.5;
-    barlayout.anchorPointRight = 1;
-    barlayout.anchorPointBottom = 0.5;
-    barlayout.anchorOffsetLeft = 0;
-    barlayout.anchorOffsetTop = -floor(barlayout.height / 2.0);
-    barlayout.anchorOffsetRight = 0;
-    barlayout.anchorOffsetBottom = ceil(barlayout.height / 2.0);
+    if (scrollbar.type == ScrollbarType::VERTICAL){
+        barlayout.anchorPointLeft = 0;
+        barlayout.anchorPointTop = 0.5;
+        barlayout.anchorPointRight = 1;
+        barlayout.anchorPointBottom = 0.5;
+        barlayout.anchorOffsetLeft = 0;
+        barlayout.anchorOffsetTop = -floor(barlayout.height / 2.0);
+        barlayout.anchorOffsetRight = 0;
+        barlayout.anchorOffsetBottom = ceil(barlayout.height / 2.0);
+    }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
+        barlayout.anchorPointLeft = 0.5;
+        barlayout.anchorPointTop = 0;
+        barlayout.anchorPointRight = 0.5;
+        barlayout.anchorPointBottom = 1;
+        barlayout.anchorOffsetLeft = -floor(barlayout.width / 2.0);
+        barlayout.anchorOffsetTop = 0;
+        barlayout.anchorOffsetRight = ceil(barlayout.width / 2.0);
+        barlayout.anchorOffsetBottom = 0;
+    }
     barlayout.anchorPreset = AnchorPreset::NONE;
     barlayout.usingAnchors = true;
 }
@@ -1332,7 +1343,11 @@ void UISystem::eventOnPointerDown(float x, float y){
 
                 if (isCoordInside(x, y, bartransform, barlayout)){
                     scrollbar.barPointerDown = true;
-                    scrollbar.barPointerPos = y - transform.position.y - bartransform.position.y;
+                    if (scrollbar.type == ScrollbarType::VERTICAL){
+                        scrollbar.barPointerPos = y - transform.position.y - bartransform.position.y;
+                    }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
+                        scrollbar.barPointerPos = x - transform.position.x - bartransform.position.x;
+                    }
                 }
             }
 
@@ -1407,9 +1422,31 @@ void UISystem::eventOnPointerMove(float x, float y){
             UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
 
             if (scrollbar.barPointerDown){
-                float pos = (y - transform.position.y + ((scrollbar.barSize / 2.0) - scrollbar.barPointerPos)) / layout.height;
-                barlayout.anchorPointTop = pos;
-                barlayout.anchorPointBottom = pos;
+
+                float pos = 0;
+                float halfBar = 0;
+
+                if (scrollbar.type == ScrollbarType::VERTICAL){
+                    pos = (y - transform.position.y + ((scrollbar.barSize / 2.0) - scrollbar.barPointerPos)) / layout.height;
+                    halfBar = (scrollbar.barSize / 2.0) / layout.height;
+                }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
+                    pos = (x - transform.position.x + ((scrollbar.barSize / 2.0) - scrollbar.barPointerPos)) / layout.width;
+                    halfBar = (scrollbar.barSize / 2.0) / layout.width;
+                }
+
+                if (pos < halfBar){
+                    pos = halfBar;
+                }else if (pos > (1.0 - halfBar)){
+                    pos = (1.0 - halfBar);
+                }
+
+                if (scrollbar.type == ScrollbarType::VERTICAL){
+                    barlayout.anchorPointTop = pos;
+                    barlayout.anchorPointBottom = pos;
+                }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
+                    barlayout.anchorPointLeft = pos;
+                    barlayout.anchorPointRight = pos;
+                }
             }
         }
     }

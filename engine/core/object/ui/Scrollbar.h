@@ -17,6 +17,12 @@ namespace Supernova{
 
         Image getBarObject() const;
 
+        void setType(ScrollbarType type);
+        ScrollbarType getType() const;
+
+        void setBarSize(int size);
+        int getBarSize() const;
+
         void setBarTexture(std::string path);
         void setBarTexture(Framebuffer* framebuffer);
 

@@ -9,9 +9,17 @@
 
 namespace Supernova{
 
+    enum class ScrollbarType{
+        VERTICAL,
+        HORIZONTAL
+    };
+
     struct ScrollbarComponent{
         Entity bar = NULL_ENTITY;
+        ScrollbarType type = ScrollbarType::VERTICAL;
+
         int barSize = 50;
+
         bool barPointerDown = false;
         float barPointerPos = -1;
 
