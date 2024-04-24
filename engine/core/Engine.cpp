@@ -673,6 +673,11 @@ void Engine::systemTouchMove(int pointer, float x, float y){
             Engine::onMouseMove.call(x, y, 0);
             //-----------------
         }
+
+        for (int i = 0; i < numScenes; i++){
+            if (scenes[i]->canReceiveUIEvents())
+                scenes[i]->getSystem<UISystem>()->eventOnPointerMove(x, y);
+        }
     }
 }
 
@@ -745,6 +750,12 @@ void Engine::systemMouseMove(float x, float y, int mods){
                 Engine::onTouchMove.call(0, x, y);
             }
             //-----------------
+        }
+
+        for (int i = 0; i < numScenes; i++){
+            if (scenes[i]->canReceiveUIEvents())
+                if (Input::isMousePressed(S_MOUSE_BUTTON_1))
+                    scenes[i]->getSystem<UISystem>()->eventOnPointerMove(x, y);
         }
     }
 }

@@ -320,6 +320,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("bar", &ScrollbarComponent::bar)
         .addProperty("barSize", &ScrollbarComponent::barSize)
         .addProperty("barPointerDown", &ScrollbarComponent::barPointerDown)
+        .addProperty("barPointerPos", &ScrollbarComponent::barPointerPos)
         .addProperty("needUpdateScrollbar", &ScrollbarComponent::needUpdateScrollbar)
         .endClass();
 

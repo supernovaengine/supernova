@@ -22,6 +22,7 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
     signature.set(scene->getComponentType<UILayoutComponent>());
 
     eventId.clear();
+    lastUIFromPointer = -1;
 }
 
 UISystem::~UISystem(){
@@ -431,7 +432,7 @@ void UISystem::updateScrollbar(Entity entity, ScrollbarComponent& scrollbar, Ima
     UIComponent& barui = scene->getComponent<UIComponent>(scrollbar.bar);
     UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
 
-    //barlayout.width = 50;
+    //barlayout.width = layout.width;
     //barlayout.height = 50;
     //barlayout.needUpdateSizes = true;
 
@@ -1267,7 +1268,7 @@ void UISystem::eventOnCharInput(wchar_t codepoint){
 
 void UISystem::eventOnPointerDown(float x, float y){
     auto layouts = scene->getComponentArray<UILayoutComponent>();
-    int lastUI = -1;
+    lastUIFromPointer = -1;
 
     for (int i = 0; i < layouts->size(); i++){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
@@ -1282,7 +1283,7 @@ void UISystem::eventOnPointerDown(float x, float y){
                 if (signature.test(scene->getComponentType<ButtonComponent>()) || 
                     signature.test(scene->getComponentType<TextEditComponent>()) ||
                     signature.test(scene->getComponentType<ImageComponent>())){
-                    lastUI = i;
+                    lastUIFromPointer = i;
                 }
             }
 
@@ -1293,9 +1294,9 @@ void UISystem::eventOnPointerDown(float x, float y){
         }
     }
 
-    if (lastUI != -1){
-        UILayoutComponent& layout = layouts->getComponentFromIndex(lastUI);
-        Entity entity = layouts->getEntity(lastUI);
+    if (lastUIFromPointer != -1){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(lastUIFromPointer);
+        Entity entity = layouts->getEntity(lastUIFromPointer);
         Signature signature = scene->getSignature(entity);
 
         if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
@@ -1331,6 +1332,7 @@ void UISystem::eventOnPointerDown(float x, float y){
 
                 if (isCoordInside(x, y, bartransform, barlayout)){
                     scrollbar.barPointerDown = true;
+                    scrollbar.barPointerPos = y - transform.position.y - bartransform.position.y;
                 }
             }
 
@@ -1384,30 +1386,10 @@ void UISystem::eventOnPointerUp(float x, float y){
 
 void UISystem::eventOnPointerMove(float x, float y){
     auto layouts = scene->getComponentArray<UILayoutComponent>();
-    int lastUI = -1;
 
-    for (int i = 0; i < layouts->size(); i++){
-        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
-
-        Entity entity = layouts->getEntity(i);
-        Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<UIComponent>())){
-            UIComponent& ui = scene->getComponent<UIComponent>(entity);
-            if (signature.test(scene->getComponentType<Transform>())){
-                Transform& transform = scene->getComponent<Transform>(entity);
-
-                if ((!ui.pointerMoved) && isCoordInside(x, y, transform, layout) && !layout.ignoreEvents){
-                    lastUI = i;
-                }
-            }
-
-            ui.pointerMoved = false;
-        }
-    }
-
-    if (lastUI != -1){
-        UILayoutComponent& layout = layouts->getComponentFromIndex(lastUI);
-        Entity entity = layouts->getEntity(lastUI);
+    if (lastUIFromPointer != -1){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(lastUIFromPointer);
+        Entity entity = layouts->getEntity(lastUIFromPointer);
         Signature signature = scene->getSignature(entity);
 
         if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
@@ -1416,6 +1398,19 @@ void UISystem::eventOnPointerMove(float x, float y){
 
             ui.onPointerMove.call(x - transform.worldPosition.x, y - transform.worldPosition.y);
             ui.pointerMoved = true;
+        }
+
+        if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+            ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+            Transform& transform = scene->getComponent<Transform>(entity);
+            Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
+            UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
+
+            if (scrollbar.barPointerDown){
+                float pos = (y - transform.position.y + ((scrollbar.barSize / 2.0) - scrollbar.barPointerPos)) / layout.height;
+                barlayout.anchorPointTop = pos;
+                barlayout.anchorPointBottom = pos;
+            }
         }
     }
 }

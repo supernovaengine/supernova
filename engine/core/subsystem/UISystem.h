@@ -27,6 +27,7 @@ namespace Supernova{
     private:
 
 		std::string eventId;
+		int lastUIFromPointer;
 
 		void createOrUpdateUiComponent(double dt, UILayoutComponent& layout, Entity entity, Signature signature);
 
