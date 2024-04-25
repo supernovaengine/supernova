@@ -112,9 +112,11 @@ jobs:
         if: ${{ startsWith(matrix.config.os, 'macos') }}
         run: |
           brew install cmake ninja
+          pip3 install --upgrade --break-system-packages click
 
       - name: Install dependencies
-        run: pip3 install --upgrade --break-system-packages click
+        if: ${{ !startsWith(matrix.config.os, 'macos') }}
+        run: pip3 install --upgrade click
 
       - name: Build
         run: |
