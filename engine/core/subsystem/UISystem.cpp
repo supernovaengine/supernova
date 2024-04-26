@@ -432,9 +432,6 @@ void UISystem::updateScrollbar(Entity entity, ScrollbarComponent& scrollbar, Ima
     UIComponent& barui = scene->getComponent<UIComponent>(scrollbar.bar);
     UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
 
-    if (scrollbar.barSize > layout.height || scrollbar.barSize > layout.height){
-        scrollbar.barSize = std::min(layout.height, layout.width);
-    }
     if (scrollbar.barSize < 1){
         scrollbar.barSize = 1;
     }
@@ -1366,9 +1363,9 @@ void UISystem::eventOnPointerDown(float x, float y){
                 if (isCoordInside(x, y, bartransform, barlayout)){
                     scrollbar.barPointerDown = true;
                     if (scrollbar.type == ScrollbarType::VERTICAL){
-                        scrollbar.barPointerPos = y - transform.position.y - bartransform.position.y;
+                        scrollbar.barPointerPos = y - transform.worldPosition.y - bartransform.position.y;
                     }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
-                        scrollbar.barPointerPos = x - transform.position.x - bartransform.position.x;
+                        scrollbar.barPointerPos = x - transform.worldPosition.x - bartransform.position.x;
                     }
                 }
             }
@@ -1449,10 +1446,10 @@ void UISystem::eventOnPointerMove(float x, float y){
                 float halfBar = 0;
 
                 if (scrollbar.type == ScrollbarType::VERTICAL){
-                    pos = (y - transform.position.y + ((scrollbar.barSize / 2.0) - scrollbar.barPointerPos)) / layout.height;
+                    pos = (y - transform.worldPosition.y + ((scrollbar.barSize / 2.0) - scrollbar.barPointerPos)) / layout.height;
                     halfBar = (scrollbar.barSize / 2.0) / layout.height;
                 }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
-                    pos = (x - transform.position.x + ((scrollbar.barSize / 2.0) - scrollbar.barPointerPos)) / layout.width;
+                    pos = (x - transform.worldPosition.x + ((scrollbar.barSize / 2.0) - scrollbar.barPointerPos)) / layout.width;
                     halfBar = (scrollbar.barSize / 2.0) / layout.width;
                 }
 
