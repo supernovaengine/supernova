@@ -637,6 +637,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getBarObject", &Scrollbar::getBarObject)
         .addProperty("type", &Scrollbar::getType, &Scrollbar::setType)
         .addProperty("barSize", &Scrollbar::getBarSize, &Scrollbar::setBarSize)
+        .addProperty("step", &Scrollbar::getStep, &Scrollbar::setStep)
         .addFunction("setBarTexture", 
             luabridge::overload<std::string>(&Scrollbar::setBarTexture),
             luabridge::overload<Framebuffer*>(&Scrollbar::setBarTexture))

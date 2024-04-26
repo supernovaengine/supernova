@@ -23,6 +23,9 @@ namespace Supernova{
         void setBarSize(int size);
         int getBarSize() const;
 
+        void setStep(float step);
+        float getStep() const;
+
         void setBarTexture(std::string path);
         void setBarTexture(Framebuffer* framebuffer);
 

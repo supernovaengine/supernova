@@ -19,6 +19,7 @@ namespace Supernova{
         ScrollbarType type = ScrollbarType::VERTICAL;
 
         int barSize = 50;
+        float step = 0; // from 0 to 1
 
         bool barPointerDown = false;
         float barPointerPos = -1;

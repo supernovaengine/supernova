@@ -43,6 +43,19 @@ int Scrollbar::getBarSize() const{
     return scrollcomp.barSize;
 }
 
+void Scrollbar::setStep(float step){
+    ScrollbarComponent& scrollcomp = getComponent<ScrollbarComponent>();
+
+    scrollcomp.step = step;
+    scrollcomp.needUpdateScrollbar = true;
+}
+
+float Scrollbar::getStep() const{
+    ScrollbarComponent& scrollcomp = getComponent<ScrollbarComponent>();
+
+    return scrollcomp.step;
+}
+
 void Scrollbar::setBarTexture(std::string path){
     getBarObject().setTexture(path);
 }
