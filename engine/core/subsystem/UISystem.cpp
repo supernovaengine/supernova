@@ -439,8 +439,6 @@ void UISystem::updateScrollbar(Entity entity, ScrollbarComponent& scrollbar, Ima
     if (barlayout.height != scrollbar.barSize || barlayout.width != scrollbar.barSize){
         barlayout.height = scrollbar.barSize;
         barlayout.width = scrollbar.barSize;
-
-        barlayout.needUpdateSizes = true;
     }
 
     float halfBar = 0;
@@ -1215,6 +1213,12 @@ void UISystem::update(double dt){
                 TextComponent& text = scene->getComponent<TextComponent>(entity);
 
                 text.needUpdateText = true;
+            }
+
+            if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+                ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+
+                scrollbar.needUpdateScrollbar = true;
             }
 
             layout.needUpdateSizes = false;
