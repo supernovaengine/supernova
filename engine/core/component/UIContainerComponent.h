@@ -23,6 +23,12 @@ namespace Supernova{
         ContainerType type = ContainerType::VERTICAL;
 
         int numBoxes = 0;
+        int fixedWidth = 0;
+        int fixedHeight = 0;
+        int maxWidth = 0;
+        int maxHeight = 0;
+        int numBoxExpand = 0;
+
         ContainerBox boxes[MAX_CONTAINER_BOXES];
     };
     

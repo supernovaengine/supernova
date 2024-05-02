@@ -1017,70 +1017,41 @@ void UISystem::update(double dt){
             // configuring all container boxes
             if (container.numBoxes > 0){
 
-                int genWidth = 0;
-                int genHeight = 0;
-                int numBoxExpand = 0;
-                int maxWidth = 0;
+                container.fixedWidth = 0;
+                container.fixedHeight = 0;
+                container.numBoxExpand = 0;
+                container.maxWidth = 0;
+                container.maxHeight = 0;
+                int totalWidth = 0;
+                int totalHeight = 0;
                 for (int b = 0; b < container.numBoxes; b++){
                     if (container.boxes[b].layout != NULL_ENTITY){
-                        if (container.type == ContainerType::HORIZONTAL){
-                            genWidth += container.boxes[b].rect.getWidth();
-                            genHeight = std::max(genHeight, (int)container.boxes[b].rect.getHeight());
-                        }else if (container.type == ContainerType::VERTICAL){
-                            genWidth = std::max(genWidth, (int)container.boxes[b].rect.getWidth());
-                            genHeight += container.boxes[b].rect.getHeight();
-                        }else if (container.type == ContainerType::FLOAT){
-                            genWidth += container.boxes[b].rect.getWidth();
-                            genHeight = std::max(genHeight, (int)container.boxes[b].rect.getHeight());
-                            maxWidth = std::max(maxWidth, (int)container.boxes[b].rect.getWidth());
+                        if (!container.boxes[b].expand){
+                            container.fixedWidth += container.boxes[b].rect.getWidth();
                         }
+                        if (!container.boxes[b].expand){
+                            container.fixedHeight += container.boxes[b].rect.getHeight();
+                        }
+                        totalWidth += container.boxes[b].rect.getWidth();
+                        totalHeight += container.boxes[b].rect.getHeight();
+                        container.maxHeight = std::max(container.maxHeight, (int)container.boxes[b].rect.getHeight());
+                        container.maxWidth = std::max(container.maxWidth, (int)container.boxes[b].rect.getWidth());
                     }
                     if (container.boxes[b].expand){
-                        numBoxExpand++;
+                        container.numBoxExpand++;
                     }
                 }
 
-                layout.width = (layout.width > 0)? layout.width : genWidth;
-                layout.height = (layout.height > 0)? layout.height : genHeight;
 
-                for (int b = (container.numBoxes-1); b >= 0; b--){
-                    if (container.boxes[b].layout != NULL_ENTITY){
-                        // container.boxes[b].rect in setted by entity size in last iteration
-                        if (container.type == ContainerType::HORIZONTAL){
-                            if (b < (container.numBoxes-1)){
-                                container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
-                            }
-                            if (container.boxes[b].expand){
-                                float diff = layout.width - genWidth;
-                                container.boxes[b].rect.setWidth(container.boxes[b].rect.getWidth() + (diff / numBoxExpand));
-                            }
-                            container.boxes[b].rect.setHeight(layout.height);
-                        }else if (container.type == ContainerType::VERTICAL){
-                            if (b < (container.numBoxes-1)){
-                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + container.boxes[b+1].rect.getHeight());
-                            }
-                            if (container.boxes[b].expand){
-                                float diff = layout.height - genHeight;
-                                container.boxes[b].rect.setHeight(container.boxes[b].rect.getHeight() + (diff / numBoxExpand));
-                            }
-                            container.boxes[b].rect.setWidth(layout.width);
-                        }else if (container.type == ContainerType::FLOAT){
-                            if (b < (container.numBoxes-1)){
-                                container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
-                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY());
-                            }
-                            if (container.boxes[b].expand){
-                                int numObjInLine = floor((float)layout.width / (float)maxWidth);
-                                float diff = layout.width - (numObjInLine * maxWidth);
-                                container.boxes[b].rect.setWidth(maxWidth + (diff / numObjInLine));
-                            }
-                            if ((container.boxes[b].rect.getX()+container.boxes[b].rect.getWidth()) > layout.width){
-                                container.boxes[b].rect.setX(0);
-                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + genHeight);
-                            }
-                            container.boxes[b].rect.setHeight(genHeight);
-                        }
-                    }
+                if (container.type == ContainerType::HORIZONTAL){
+                    layout.width = (layout.width > 0)? layout.width : totalWidth;
+                    layout.height = (layout.height > 0)? layout.height : container.maxHeight;
+                }else if (container.type == ContainerType::VERTICAL){
+                    layout.width = (layout.width > 0)? layout.width : container.maxWidth;
+                    layout.height = (layout.height > 0)? layout.height : totalHeight;
+                }else if (container.type == ContainerType::FLOAT){
+                    layout.width = (layout.width > 0)? layout.width : totalWidth;
+                    layout.height = (layout.height > 0)? layout.height : container.maxHeight;
                 }
             }
         }
@@ -1201,6 +1172,68 @@ void UISystem::update(double dt){
                 layout.anchorOffsetBottom = layout.height + transform.position.y - abAnchorBottom;
             }
         }
+
+        if (signature.test(scene->getComponentType<UIContainerComponent>())){
+            UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
+            // configuring all container boxes
+            if (container.numBoxes > 0){
+
+                for (int b = (container.numBoxes-1); b >= 0; b--){
+                    if (container.boxes[b].layout != NULL_ENTITY){
+                        if (container.type == ContainerType::HORIZONTAL){
+                            if (b < (container.numBoxes-1)){
+                                container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
+                            }
+                            if (container.boxes[b].rect.getWidth() >= layout.width){
+                                container.boxes[b].rect.setWidth(layout.width / container.numBoxes);
+                            }
+                            if (container.boxes[b].expand){
+                                float diff = layout.width - container.fixedWidth;
+                                if ((diff / container.numBoxExpand) > container.boxes[b].rect.getWidth()) {
+                                    container.boxes[b].rect.setWidth(diff / container.numBoxExpand);
+                                }
+                            }
+                            container.boxes[b].rect.setHeight(layout.height);
+                        }else if (container.type == ContainerType::VERTICAL){
+                            if (b < (container.numBoxes-1)){
+                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + container.boxes[b+1].rect.getHeight());
+                            }
+                            if (container.boxes[b].rect.getHeight() >= layout.height){
+                                container.boxes[b].rect.setHeight(layout.height / container.numBoxes);
+                            }
+                            if (container.boxes[b].expand){
+                                float diff = layout.height - container.fixedHeight;
+                                if ((diff / container.numBoxExpand) > container.boxes[b].rect.getWidth()) {
+                                    container.boxes[b].rect.setHeight(diff / container.numBoxExpand);
+                                }
+                            }
+                            container.boxes[b].rect.setWidth(layout.width);
+                        }else if (container.type == ContainerType::FLOAT){
+                            if (b < (container.numBoxes-1)){
+                                container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
+                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY());
+                            }
+                            if (container.boxes[b].expand){
+                                int numObjInLine = floor((float)layout.width / (float)container.maxWidth);
+                                float diff = layout.width - (numObjInLine * container.maxWidth);
+                                container.boxes[b].rect.setWidth(container.maxWidth + (diff / numObjInLine));
+                            }
+                            if ((container.boxes[b].rect.getX()+container.boxes[b].rect.getWidth()) > layout.width){
+                                container.boxes[b].rect.setX(0);
+                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + container.maxHeight);
+                            }
+                            container.boxes[b].rect.setHeight(container.maxHeight);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < layouts->size(); i++){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
+        Entity entity = layouts->getEntity(i);
+        Signature signature = scene->getSignature(entity);
 
         if (layout.needUpdateSizes){
             if (signature.test(scene->getComponentType<ImageComponent>())){
