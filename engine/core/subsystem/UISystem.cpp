@@ -1178,6 +1178,7 @@ void UISystem::update(double dt){
             // configuring all container boxes
             if (container.numBoxes > 0){
 
+                int usedSize = 0;
                 for (int b = (container.numBoxes-1); b >= 0; b--){
                     if (container.boxes[b].layout != NULL_ENTITY){
                         if (container.type == ContainerType::HORIZONTAL){
@@ -1189,8 +1190,12 @@ void UISystem::update(double dt){
                             }
                             if (container.boxes[b].expand){
                                 float diff = layout.width - container.fixedWidth;
-                                if ((diff / container.numBoxExpand) > container.boxes[b].rect.getWidth()) {
-                                    container.boxes[b].rect.setWidth(diff / container.numBoxExpand);
+                                float sizeInc = (diff / container.numBoxExpand) - usedSize;
+                                if (sizeInc >= container.boxes[b].rect.getWidth()) {
+                                    container.boxes[b].rect.setWidth(sizeInc);
+                                    usedSize = 0;
+                                }else{
+                                    usedSize += container.boxes[b].rect.getWidth() - sizeInc;
                                 }
                             }
                             container.boxes[b].rect.setHeight(layout.height);
@@ -1203,8 +1208,12 @@ void UISystem::update(double dt){
                             }
                             if (container.boxes[b].expand){
                                 float diff = layout.height - container.fixedHeight;
-                                if ((diff / container.numBoxExpand) > container.boxes[b].rect.getWidth()) {
-                                    container.boxes[b].rect.setHeight(diff / container.numBoxExpand);
+                                float sizeInc = (diff / container.numBoxExpand) - usedSize;
+                                if (sizeInc >= container.boxes[b].rect.getHeight()) {
+                                    container.boxes[b].rect.setHeight(sizeInc);
+                                    usedSize = 0;
+                                }else{
+                                    usedSize += container.boxes[b].rect.getHeight() - sizeInc;
                                 }
                             }
                             container.boxes[b].rect.setWidth(layout.width);
