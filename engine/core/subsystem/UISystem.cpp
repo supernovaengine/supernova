@@ -1195,7 +1195,7 @@ void UISystem::update(double dt){
                                     container.boxes[b].rect.setWidth(sizeInc);
                                     usedSize = 0;
                                 }else{
-                                    usedSize += container.boxes[b].rect.getWidth() - sizeInc;
+                                    usedSize += container.boxes[b].rect.getWidth();
                                 }
                             }
                             container.boxes[b].rect.setHeight(layout.height);
@@ -1213,7 +1213,7 @@ void UISystem::update(double dt){
                                     container.boxes[b].rect.setHeight(sizeInc);
                                     usedSize = 0;
                                 }else{
-                                    usedSize += container.boxes[b].rect.getHeight() - sizeInc;
+                                    usedSize += container.boxes[b].rect.getHeight();
                                 }
                             }
                             container.boxes[b].rect.setWidth(layout.width);
