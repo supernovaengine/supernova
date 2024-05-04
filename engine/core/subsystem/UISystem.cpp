@@ -995,7 +995,6 @@ void UISystem::createOrUpdateUiComponent(double dt, UILayoutComponent& layout, E
                 blinkCursorTextEdit(dt, textedit, ui);
             }
         }
-
     }
 }
 
@@ -1004,7 +1003,47 @@ void UISystem::update(double dt){
     // need to be ordered by Transform
     auto layouts = scene->getComponentArray<UILayoutComponent>();
 
-    // reverse Transform order
+    for (int i = 0; i < layouts->size(); i++){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
+        Entity entity = layouts->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+
+        if (signature.test(scene->getComponentType<UIContainerComponent>())){
+            UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
+            // reseting all container boxes
+            for (int b = 0; b < container.numBoxes; b++){
+                container.boxes[b].layout = NULL_ENTITY;
+            }
+            container.numBoxes = 0;
+        }
+
+        if (signature.test(scene->getComponentType<Transform>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
+            if (transform.visible){
+                UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
+                if (parentlayout){
+                    UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
+                    if (parentcontainer){
+                        if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
+                            layout.containerBoxIndex = parentcontainer->numBoxes;
+                            if (!layout.usingAnchors){
+                                layout.anchorPreset = AnchorPreset::TOP_LEFT;
+                                layout.usingAnchors = true;
+                            }
+                            parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
+
+                            parentcontainer->numBoxes = parentcontainer->numBoxes + 1;
+                        }else{
+                            transform.parent = NULL_ENTITY;
+                            Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // reverse Transform order to get sizes
     for (int i = layouts->size()-1; i >= 0; i--){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
         Entity entity = layouts->getEntity(i);
@@ -1058,27 +1097,9 @@ void UISystem::update(double dt){
 
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
-            if (transform.visible){
-                UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
-                if (parentlayout){
-                    UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
-                    if (parentcontainer){
-                        if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
-                            layout.containerBoxIndex = parentcontainer->numBoxes;
-                            if (!layout.usingAnchors){
-                                layout.anchorPreset = AnchorPreset::TOP_LEFT;
-                                layout.usingAnchors = true;
-                            }
-                            parentcontainer->boxes[layout.containerBoxIndex].layout = entity;
-                            parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
-
-                            parentcontainer->numBoxes = parentcontainer->numBoxes + 1;
-                        }else{
-                            transform.parent = NULL_ENTITY;
-                            Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
-                        }
-                    }
-                }
+            UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
+            if (parentcontainer && layout.containerBoxIndex >= 0){
+                parentcontainer->boxes[layout.containerBoxIndex].rect = Rect(0, 0, layout.width, layout.height);
             }
         }
     }
@@ -1179,11 +1200,11 @@ void UISystem::update(double dt){
             if (container.numBoxes > 0){
 
                 int usedSize = 0;
-                for (int b = (container.numBoxes-1); b >= 0; b--){
+                for (int b = 0; b < container.numBoxes; b++){
                     if (container.boxes[b].layout != NULL_ENTITY){
                         if (container.type == ContainerType::HORIZONTAL){
-                            if (b < (container.numBoxes-1)){
-                                container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
+                            if (b > 0){
+                                container.boxes[b].rect.setX(container.boxes[b-1].rect.getX() + container.boxes[b-1].rect.getWidth());
                             }
                             if (container.boxes[b].rect.getWidth() >= layout.width){
                                 container.boxes[b].rect.setWidth(layout.width / container.numBoxes);
@@ -1200,8 +1221,8 @@ void UISystem::update(double dt){
                             }
                             container.boxes[b].rect.setHeight(layout.height);
                         }else if (container.type == ContainerType::VERTICAL){
-                            if (b < (container.numBoxes-1)){
-                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + container.boxes[b+1].rect.getHeight());
+                            if (b > 0){
+                                container.boxes[b].rect.setY(container.boxes[b-1].rect.getY() + container.boxes[b-1].rect.getHeight());
                             }
                             if (container.boxes[b].rect.getHeight() >= layout.height){
                                 container.boxes[b].rect.setHeight(layout.height / container.numBoxes);
@@ -1218,9 +1239,9 @@ void UISystem::update(double dt){
                             }
                             container.boxes[b].rect.setWidth(layout.width);
                         }else if (container.type == ContainerType::FLOAT){
-                            if (b < (container.numBoxes-1)){
-                                container.boxes[b].rect.setX(container.boxes[b+1].rect.getX() + container.boxes[b+1].rect.getWidth());
-                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY());
+                            if (b > 0){
+                                container.boxes[b].rect.setX(container.boxes[b-1].rect.getX() + container.boxes[b-1].rect.getWidth());
+                                container.boxes[b].rect.setY(container.boxes[b-1].rect.getY());
                             }
                             if (container.boxes[b].expand){
                                 int numObjInLine = floor((float)layout.width / (float)container.maxWidth);
@@ -1229,7 +1250,7 @@ void UISystem::update(double dt){
                             }
                             if ((container.boxes[b].rect.getX()+container.boxes[b].rect.getWidth()) > layout.width){
                                 container.boxes[b].rect.setX(0);
-                                container.boxes[b].rect.setY(container.boxes[b+1].rect.getY() + container.maxHeight);
+                                container.boxes[b].rect.setY(container.boxes[b-1].rect.getY() + container.maxHeight);
                             }
                             container.boxes[b].rect.setHeight(container.maxHeight);
                         }
@@ -1237,12 +1258,6 @@ void UISystem::update(double dt){
                 }
             }
         }
-    }
-
-    for (int i = 0; i < layouts->size(); i++){
-        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
-        Entity entity = layouts->getEntity(i);
-        Signature signature = scene->getSignature(entity);
 
         if (layout.needUpdateSizes){
             if (signature.test(scene->getComponentType<ImageComponent>())){
@@ -1267,15 +1282,6 @@ void UISystem::update(double dt){
         }
 
         createOrUpdateUiComponent(dt, layout, entity, signature);
-
-        if (signature.test(scene->getComponentType<UIContainerComponent>())){
-            UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
-            // reseting all container boxes
-            for (int b = 0; b < container.numBoxes; b++){
-                container.boxes[b].layout = NULL_ENTITY;
-            }
-            container.numBoxes = 0;
-        }
         
     }
 
