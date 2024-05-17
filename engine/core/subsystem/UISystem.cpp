@@ -274,29 +274,29 @@ void UISystem::createButtonObjects(Entity entity, ButtonComponent& button){
 }
 
 void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
-    if (panel.titlecontainer == NULL_ENTITY){
-        panel.titlecontainer = scene->createEntity();
+    if (panel.headercontainer == NULL_ENTITY){
+        panel.headercontainer = scene->createEntity();
 
-        scene->addComponent<Transform>(panel.titlecontainer, {});
-        scene->addComponent<UILayoutComponent>(panel.titlecontainer, {});
-        scene->addComponent<UIContainerComponent>(panel.titlecontainer, {});
+        scene->addComponent<Transform>(panel.headercontainer, {});
+        scene->addComponent<UILayoutComponent>(panel.headercontainer, {});
+        scene->addComponent<UIContainerComponent>(panel.headercontainer, {});
 
-        scene->addEntityChild(entity, panel.titlecontainer);
+        scene->addEntityChild(entity, panel.headercontainer);
 
-        UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.titlecontainer);
+        UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
         containerlayout.ignoreEvents = true;
     }
-    if (panel.titletext == NULL_ENTITY){
-        panel.titletext = scene->createEntity();
+    if (panel.headertext == NULL_ENTITY){
+        panel.headertext = scene->createEntity();
 
-        scene->addComponent<Transform>(panel.titletext, {});
-        scene->addComponent<UILayoutComponent>(panel.titletext, {});
-        scene->addComponent<UIComponent>(panel.titletext, {});
-        scene->addComponent<TextComponent>(panel.titletext, {});
+        scene->addComponent<Transform>(panel.headertext, {});
+        scene->addComponent<UILayoutComponent>(panel.headertext, {});
+        scene->addComponent<UIComponent>(panel.headertext, {});
+        scene->addComponent<TextComponent>(panel.headertext, {});
 
-        scene->addEntityChild(panel.titlecontainer, panel.titletext);
+        scene->addEntityChild(panel.headercontainer, panel.headertext);
 
-        UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.titletext);
+        UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.headertext);
         titlelayout.ignoreEvents = true;
     }
 }
@@ -399,19 +399,19 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
 void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
     createPanelObjects(entity, panel);
 
-    UIContainerComponent& containerui = scene->getComponent<UIContainerComponent>(panel.titlecontainer);
-    UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.titlecontainer);
+    UIContainerComponent& containerui = scene->getComponent<UIContainerComponent>(panel.headercontainer);
+    UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
 
     containerlayout.anchorPreset = AnchorPreset::TOP_WIDE;
     containerlayout.ignoreScissor = true;
     containerlayout.usingAnchors = true;
-    containerlayout.height = img.patchMarginTop;
+    containerlayout.height = img.patchMarginTop - img.patchMarginBottom;
     containerui.type = ContainerType::HORIZONTAL;
 
-    Transform& titletransform = scene->getComponent<Transform>(panel.titletext);
-    TextComponent& titletext = scene->getComponent<TextComponent>(panel.titletext);
-    UIComponent& titleui = scene->getComponent<UIComponent>(panel.titletext);
-    UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.titletext);
+    Transform& titletransform = scene->getComponent<Transform>(panel.headertext);
+    TextComponent& headertext = scene->getComponent<TextComponent>(panel.headertext);
+    UIComponent& titleui = scene->getComponent<UIComponent>(panel.headertext);
+    UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.headertext);
 
     titleui.color = Vector4(0.0, 0.0, 0.0, 1.0);
     titlelayout.width = 0;
@@ -420,8 +420,8 @@ void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent&
     titlelayout.ignoreScissor = true;
     titlelayout.usingAnchors = true;
 
-    titletext.needUpdateText = true;
-    createOrUpdateText(titletext, titleui, titlelayout);
+    headertext.needUpdateText = true;
+    createOrUpdateText(headertext, titleui, titlelayout);
 }
 
 void UISystem::updateScrollbar(Entity entity, ScrollbarComponent& scrollbar, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
@@ -851,13 +851,13 @@ void UISystem::destroyButton(ButtonComponent& button){
 void UISystem::destroyPanel(PanelComponent& panel){
     panel.needUpdatePanel = true;
 
-    if (panel.titletext != NULL_ENTITY){
-        scene->destroyEntity(panel.titletext);
-        panel.titletext = NULL_ENTITY;
+    if (panel.headertext != NULL_ENTITY){
+        scene->destroyEntity(panel.headertext);
+        panel.headertext = NULL_ENTITY;
     }
-    if (panel.titlecontainer != NULL_ENTITY){
-        scene->destroyEntity(panel.titlecontainer);
-        panel.titlecontainer = NULL_ENTITY;
+    if (panel.headercontainer != NULL_ENTITY){
+        scene->destroyEntity(panel.headercontainer);
+        panel.headercontainer = NULL_ENTITY;
     }
 }
 

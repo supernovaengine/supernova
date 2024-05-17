@@ -15,8 +15,8 @@ namespace Supernova{
     public:
         Panel(Scene* scene);
 
-        Container getTitleContainerObject() const;
-        Text getTitleTextObject() const;
+        Container getHeaderContainerObject() const;
+        Text getHeaderTextObject() const;
 
         void setTitle(std::string text);
         std::string getTitle() const;
