@@ -39,7 +39,7 @@ void Button::setLabelColor(Vector4 color){
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     UIComponent& uilabel = scene->getComponent<UIComponent>(btcomp.label);
 
-    uilabel.color = color;
+    uilabel.color = Color::sRGBToLinear(color);
 }
 
 void Button::setLabelColor(const float red, const float green, const float blue, const float alpha){

@@ -316,6 +316,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<PanelComponent>("PanelComponent")
+        .addProperty("headerimage", &PanelComponent::headerimage)
         .addProperty("headercontainer", &PanelComponent::headercontainer)
         .addProperty("headertext", &PanelComponent::headertext)
         .addProperty("needUpdatePanel", &PanelComponent::needUpdatePanel)

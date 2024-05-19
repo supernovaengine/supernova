@@ -44,7 +44,7 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
         layout.height = texHeight;
     }
 
-    if (layout.width == 0 || layout.height == 0){
+    if ((layout.width == 0 || layout.height == 0) && layout.anchorPreset == AnchorPreset::NONE){
         Log::warn("Cannot create UI image without size");
         return false;
     }
@@ -274,6 +274,21 @@ void UISystem::createButtonObjects(Entity entity, ButtonComponent& button){
 }
 
 void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
+    if (panel.headerimage == NULL_ENTITY){
+        panel.headerimage = scene->createEntity();
+
+        scene->addComponent<Transform>(panel.headerimage, {});
+        scene->addComponent<UILayoutComponent>(panel.headerimage, {});
+        scene->addComponent<UIComponent>(panel.headerimage, {});
+        scene->addComponent<ImageComponent>(panel.headerimage, {});
+
+        scene->addEntityChild(entity, panel.headerimage);
+
+        UILayoutComponent& headerimagelayout = scene->getComponent<UILayoutComponent>(panel.headerimage);
+        headerimagelayout.height = 1;
+        headerimagelayout.width = 1;
+        headerimagelayout.ignoreEvents = true;
+    }
     if (panel.headercontainer == NULL_ENTITY){
         panel.headercontainer = scene->createEntity();
 
@@ -281,7 +296,7 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
         scene->addComponent<UILayoutComponent>(panel.headercontainer, {});
         scene->addComponent<UIContainerComponent>(panel.headercontainer, {});
 
-        scene->addEntityChild(entity, panel.headercontainer);
+        scene->addEntityChild(panel.headerimage, panel.headercontainer);
 
         UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
         containerlayout.ignoreEvents = true;
@@ -399,13 +414,19 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
 void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
     createPanelObjects(entity, panel);
 
+    UILayoutComponent& headerimagelayout = scene->getComponent<UILayoutComponent>(panel.headerimage);
+
+    headerimagelayout.anchorPreset = AnchorPreset::TOP_WIDE;
+    headerimagelayout.ignoreScissor = true;
+    headerimagelayout.usingAnchors = true;
+    headerimagelayout.height = img.patchMarginTop - img.patchMarginBottom;
+
     UIContainerComponent& containerui = scene->getComponent<UIContainerComponent>(panel.headercontainer);
     UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
 
-    containerlayout.anchorPreset = AnchorPreset::TOP_WIDE;
+    containerlayout.anchorPreset = AnchorPreset::FULL_LAYOUT;
     containerlayout.ignoreScissor = true;
     containerlayout.usingAnchors = true;
-    containerlayout.height = img.patchMarginTop - img.patchMarginBottom;
     containerui.type = ContainerType::HORIZONTAL;
 
     Transform& titletransform = scene->getComponent<Transform>(panel.headertext);
@@ -416,7 +437,7 @@ void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent&
     titleui.color = Vector4(0.0, 0.0, 0.0, 1.0);
     titlelayout.width = 0;
     titlelayout.height = 0;
-    titlelayout.anchorPreset = AnchorPreset::CENTER;
+    titlelayout.anchorPreset = panel.titleAnchorPreset;
     titlelayout.ignoreScissor = true;
     titlelayout.usingAnchors = true;
 
@@ -858,6 +879,10 @@ void UISystem::destroyPanel(PanelComponent& panel){
     if (panel.headercontainer != NULL_ENTITY){
         scene->destroyEntity(panel.headercontainer);
         panel.headercontainer = NULL_ENTITY;
+    }
+    if (panel.headerimage != NULL_ENTITY){
+        scene->destroyEntity(panel.headerimage);
+        panel.headerimage = NULL_ENTITY;
     }
 }
 

@@ -53,7 +53,7 @@ void TextEdit::setTextColor(Vector4 color){
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
     UIComponent& uitext = scene->getComponent<UIComponent>(tecomp.text);
 
-    uitext.color = color;
+    uitext.color = Color::sRGBToLinear(color);
 }
 
 void TextEdit::setTextColor(const float red, const float green, const float blue, const float alpha){

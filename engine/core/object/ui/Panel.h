@@ -15,11 +15,15 @@ namespace Supernova{
     public:
         Panel(Scene* scene);
 
+        Image getHeaderImageObject() const;
         Container getHeaderContainerObject() const;
         Text getHeaderTextObject() const;
 
         void setTitle(std::string text);
         std::string getTitle() const;
+
+        void setTitleAnchorPreset(AnchorPreset titleAnchorPreset);
+        AnchorPreset getTitleAnchorPreset() const;
 
         void setTitleColor(Vector4 color);
         void setTitleColor(const float red, const float green, const float blue, const float alpha);
@@ -30,6 +34,13 @@ namespace Supernova{
 
         void setTitleFontSize(unsigned int fontSize);
         unsigned int getTitleFontSize() const;
+
+        void setHeaderColor(Vector4 color);
+        void setHeaderColor(const float red, const float green, const float blue, const float alpha);
+        Vector4 getHeaderColor() const;
+
+        void setHeaderPatchMargin(int margin);
+        void setHeaderTexture(std::string path);
     };
 }
 
