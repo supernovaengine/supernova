@@ -319,6 +319,8 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("headerimage", &PanelComponent::headerimage)
         .addProperty("headercontainer", &PanelComponent::headercontainer)
         .addProperty("headertext", &PanelComponent::headertext)
+        .addProperty("titleAnchorPreset", &PanelComponent::titleAnchorPreset)
+        .addProperty("headerPointerDown", &PanelComponent::headerPointerDown)
         .addProperty("needUpdatePanel", &PanelComponent::needUpdatePanel)
         .endClass();
 

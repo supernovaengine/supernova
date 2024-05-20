@@ -16,6 +16,8 @@ namespace Supernova{
 
         AnchorPreset titleAnchorPreset = AnchorPreset::CENTER;
 
+        bool headerPointerDown = false;
+
         bool needUpdatePanel = true;
     };
 

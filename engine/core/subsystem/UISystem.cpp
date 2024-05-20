@@ -23,6 +23,7 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
 
     eventId.clear();
     lastUIFromPointer = -1;
+    lastPointerPos = Vector2(-1, -1);
 }
 
 UISystem::~UISystem(){
@@ -1374,8 +1375,10 @@ void UISystem::eventOnCharInput(wchar_t codepoint){
 }
 
 void UISystem::eventOnPointerDown(float x, float y){
-    auto layouts = scene->getComponentArray<UILayoutComponent>();
     lastUIFromPointer = -1;
+    lastPointerPos = Vector2(x, y);
+
+    auto layouts = scene->getComponentArray<UILayoutComponent>();
 
     for (int i = 0; i < layouts->size(); i++){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
@@ -1387,9 +1390,7 @@ void UISystem::eventOnPointerDown(float x, float y){
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
             if (isCoordInside(x, y, transform, layout) && !layout.ignoreEvents){ //TODO: isCoordInside to polygon
-                if (signature.test(scene->getComponentType<ButtonComponent>()) || 
-                    signature.test(scene->getComponentType<TextEditComponent>()) ||
-                    signature.test(scene->getComponentType<ImageComponent>())){
+                if (signature.test(scene->getComponentType<ImageComponent>())){
                     lastUIFromPointer = i;
                 }
             }
@@ -1447,6 +1448,16 @@ void UISystem::eventOnPointerDown(float x, float y){
                 }
             }
 
+            if (signature.test(scene->getComponentType<PanelComponent>())){
+                PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+                Transform& headertransform = scene->getComponent<Transform>(panel.headercontainer);
+                UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
+
+                if (isCoordInside(x, y, headertransform, headerlayout)){
+                    panel.headerPointerDown = true;
+                }
+            }
+
             ui.onPointerDown(x - transform.worldPosition.x, y - transform.worldPosition.y);
 
             if (!ui.focused){
@@ -1460,6 +1471,8 @@ void UISystem::eventOnPointerDown(float x, float y){
 }
 
 void UISystem::eventOnPointerUp(float x, float y){
+    lastPointerPos = Vector2(-1, -1);
+
     auto layouts = scene->getComponentArray<UILayoutComponent>();
     for (int i = 0; i < layouts->size(); i++){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
@@ -1487,6 +1500,16 @@ void UISystem::eventOnPointerUp(float x, float y){
 
                 if (isCoordInside(x, y, bartransform, barlayout)){
                     scrollbar.barPointerDown = false;
+                }
+            }
+
+            if (signature.test(scene->getComponentType<PanelComponent>())){
+                PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+                Transform& headertransform = scene->getComponent<Transform>(panel.headercontainer);
+                UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
+
+                if (isCoordInside(x, y, headertransform, headerlayout)){
+                    panel.headerPointerDown = false;
                 }
             }
 
@@ -1547,7 +1570,19 @@ void UISystem::eventOnPointerMove(float x, float y){
                 }
             }
         }
+
+        if (signature.test(scene->getComponentType<PanelComponent>())){
+            PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+            Transform& transform = scene->getComponent<Transform>(entity);
+            if (panel.headerPointerDown){
+                Vector2 movement = Vector2(x, y) - lastPointerPos;
+                transform.position += Vector3(movement.x, movement.y, 0);
+                transform.needUpdate = true;
+            }
+        }
     }
+
+    lastPointerPos = Vector2(x, y);
 }
 
 bool UISystem::isCoordInside(float x, float y, Transform& transform, UILayoutComponent& layout){
