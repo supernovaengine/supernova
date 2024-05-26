@@ -89,6 +89,10 @@ namespace Supernova {
 			size_t length = endIndex - startIndex + 1;
 			size_t oldIndex = startIndex;
 
+			if ((newIndex + length) > componentArray.size()){
+				newIndex = componentArray.size() - length;
+			}
+
 			std::vector<Entity> tmp(length);
 			for (int i = 0; i < length; i++){
 				tmp[i] = indexToEntityMap[oldIndex+i];

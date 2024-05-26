@@ -313,8 +313,7 @@ void Scene::addEntityChild(Entity parent, Entity child){
 				if (length == 1) {
 					transforms->moveEntityToIndex(child, newIndex);
 				} else {
-					transforms->moveEntityRangeToIndex(child, transforms->getEntity(lastChild),
-													   newIndex);
+					transforms->moveEntityRangeToIndex(child, transforms->getEntity(lastChild), newIndex);
 				}
 			}
 
@@ -392,6 +391,7 @@ void Scene::moveChildAux(Entity entity, bool increase, bool stopIfFound){
 		auto transforms = componentManager.getComponentArray<Transform>();
 
 		size_t entityIndex = transforms->getIndex(entity);
+		//auto teste = transforms->getComponent(entity);
 		Entity entityParent = transforms->getComponent(entity).parent;
 
 		size_t nextIndex = entityIndex;
@@ -416,8 +416,14 @@ void Scene::moveChildAux(Entity entity, bool increase, bool stopIfFound){
 			}
 		}
 
-		if (nextIndex != entityIndex)
-			transforms->moveEntityToIndex(entity, nextIndex);
+		if (nextIndex != entityIndex){
+			Entity lastChildEntity = transforms->getEntity(findBranchLastIndex(entity));
+			if (entity == lastChildEntity){
+				transforms->moveEntityToIndex(entity, nextIndex);
+			}else{
+				transforms->moveEntityRangeToIndex(entity, lastChildEntity, nextIndex);
+			}
+		}
 	}
 
 	sortComponentsByTransform(entitySignature);
