@@ -188,8 +188,8 @@ void Object::addChild(Entity child){
     scene->addEntityChild(this->entity, child);
 }
 
-void Object::moveToFirst(){
-    scene->moveChildToFirst(this->entity);
+void Object::moveToTop(){
+    scene->moveChildToTop(this->entity);
 }
 
 void Object::moveUp(){
@@ -200,8 +200,8 @@ void Object::moveDown(){
     scene->moveChildDown(this->entity);
 }
 
-void Object::moveToLast(){
-    scene->moveChildToLast(this->entity);
+void Object::moveToBottom(){
+    scene->moveChildToBottom(this->entity);
 }
 
 void Object::updateTransform(){

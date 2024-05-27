@@ -128,10 +128,10 @@ namespace Supernova{
 
 		void addEntityChild(Entity parent, Entity child);
 
-		void moveChildToFirst(Entity entity);
+		void moveChildToTop(Entity entity);
 		void moveChildUp(Entity entity);
 		void moveChildDown(Entity entity);
-		void moveChildToLast(Entity entity);
+		void moveChildToBottom(Entity entity);
 	
 	    // Component methods
 

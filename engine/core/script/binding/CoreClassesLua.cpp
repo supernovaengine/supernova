@@ -369,10 +369,10 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("createEntity", &Scene::createEntity)
         .addFunction("destroyEntity", &Scene::destroyEntity)
         .addFunction("addEntityChild", &Scene::addEntityChild)
-        .addFunction("moveChildToFirst", &Scene::moveChildToFirst)
+        .addFunction("moveChildToTop", &Scene::moveChildToTop)
         .addFunction("moveChildUp", &Scene::moveChildUp)
         .addFunction("moveChildDown", &Scene::moveChildDown)
-        .addFunction("moveChildToLast", &Scene::moveChildToLast)
+        .addFunction("moveChildToBottom", &Scene::moveChildToBottom)
         .addFunction("getAudioSystem", [] (Scene* self, lua_State* L) { return self->getSystem<AudioSystem>().get(); })
         .addFunction("getPhysicsSystem", [] (Scene* self, lua_State* L) { return self->getSystem<PhysicsSystem>().get(); })
         .endClass();

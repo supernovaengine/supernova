@@ -182,10 +182,10 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("addChild", 
             luabridge::overload<Object*>(&Object::addChild),
             luabridge::overload<Entity>(&Object::addChild))
-        .addFunction("moveToFirst", &Object::moveToFirst)
+        .addFunction("moveToTop", &Object::moveToTop)
         .addFunction("moveUp", &Object::moveUp)
         .addFunction("moveDown", &Object::moveDown)
-        .addFunction("moveToLast", &Object::moveToLast)
+        .addFunction("moveToBottom", &Object::moveToBottom)
         .addProperty("name", &Object::getName, &Object::setName)
         .addProperty("position", &Object::getPosition, (void(Object::*)(Vector3))&Object::setPosition)
         .addFunction("setPosition", 

@@ -432,7 +432,7 @@ void Scene::moveChildAux(Entity entity, bool increase, bool stopIfFound){
 	sortComponentsByTransform(entitySignature);
 }
 
-void Scene::moveChildToFirst(Entity entity){
+void Scene::moveChildToTop(Entity entity){
 	moveChildAux(entity, true, false);
 }
 
@@ -444,6 +444,6 @@ void Scene::moveChildDown(Entity entity){
 	moveChildAux(entity, false, true);
 }
 
-void Scene::moveChildToLast(Entity entity){
+void Scene::moveChildToBottom(Entity entity){
 	moveChildAux(entity, false, false);
 }

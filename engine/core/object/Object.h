@@ -21,10 +21,10 @@ namespace Supernova{
         void addChild(Object* child);
         void addChild(Entity child);
 
-        void moveToFirst();
+        void moveToTop();
         void moveUp();
         void moveDown();
-        void moveToLast();
+        void moveToBottom();
 
         void setName(std::string name);
         std::string getName() const;
