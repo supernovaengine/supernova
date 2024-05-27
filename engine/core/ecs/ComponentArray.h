@@ -89,8 +89,9 @@ namespace Supernova {
 			size_t length = endIndex - startIndex + 1;
 			size_t oldIndex = startIndex;
 
-			if ((newIndex + length) > componentArray.size()){
-				newIndex = componentArray.size() - length;
+			if (newIndex < 0 || (newIndex + length) > componentArray.size()){
+				Log::error("Cannot move entity range out of array");
+				return;
 			}
 
 			std::vector<Entity> tmp(length);

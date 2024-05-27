@@ -417,11 +417,14 @@ void Scene::moveChildAux(Entity entity, bool increase, bool stopIfFound){
 		}
 
 		if (nextIndex != entityIndex){
-			Entity lastChildEntity = transforms->getEntity(findBranchLastIndex(entity));
-			if (entity == lastChildEntity){
+			size_t lastChildIndex = findBranchLastIndex(entity);
+			size_t length = lastChildIndex - entityIndex + 1;
+
+			if (length == 1){
 				transforms->moveEntityToIndex(entity, nextIndex);
 			}else{
-				transforms->moveEntityRangeToIndex(entity, lastChildEntity, nextIndex);
+				nextIndex = nextIndex - length + 1;
+				transforms->moveEntityRangeToIndex(entity, transforms->getEntity(lastChildIndex), nextIndex);
 			}
 		}
 	}
