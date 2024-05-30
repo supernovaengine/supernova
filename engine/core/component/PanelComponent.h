@@ -16,6 +16,9 @@ namespace Supernova{
 
         AnchorPreset titleAnchorPreset = AnchorPreset::CENTER;
 
+        bool canMove = true;
+        bool canTopOnFocus = true;
+
         bool headerPointerDown = false;
 
         bool needUpdatePanel = true;

@@ -1452,11 +1452,15 @@ void UISystem::eventOnPointerDown(float x, float y){
                 Transform& headertransform = scene->getComponent<Transform>(panel.headercontainer);
                 UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
 
-                if (isCoordInside(x, y, headertransform, headerlayout)){
-                    panel.headerPointerDown = true;
+                if (panel.canMove){
+                    if (isCoordInside(x, y, headertransform, headerlayout)){
+                        panel.headerPointerDown = true;
+                    }
                 }
 
-                scene->moveChildToTop(lastUIFromPointer);
+                if (panel.canTopOnFocus){
+                    scene->moveChildToTop(lastUIFromPointer);
+                }
             }
 
             ui.onPointerDown(x - transform.worldPosition.x, y - transform.worldPosition.y);

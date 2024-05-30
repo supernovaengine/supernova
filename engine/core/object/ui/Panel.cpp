@@ -134,3 +134,23 @@ void Panel::setHeaderPatchMargin(int margin){
 void Panel::setHeaderTexture(std::string path){
     getHeaderImageObject().setTexture(path);
 }
+
+void Panel::setCanMove(const bool canMove){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+    panelcomp.canMove = canMove;
+}
+
+bool Panel::isCanMove() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+    return panelcomp.canMove;
+}
+
+void Panel::setCanTopOnFocus(const bool canTopOnFocus){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+    panelcomp.canTopOnFocus = canTopOnFocus;
+}
+
+bool Panel::isCanTopOnFocus() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+    return panelcomp.canTopOnFocus;
+}

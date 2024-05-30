@@ -41,6 +41,12 @@ namespace Supernova{
 
         void setHeaderPatchMargin(int margin);
         void setHeaderTexture(std::string path);
+
+        void setCanMove(const bool canMove);
+        bool isCanMove() const;
+
+        void setCanTopOnFocus(const bool canTopOnFocus);
+        bool isCanTopOnFocus() const;
     };
 }
 
