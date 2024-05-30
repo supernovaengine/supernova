@@ -20,8 +20,8 @@ namespace Supernova{
         void setType(ScrollbarType type);
         ScrollbarType getType() const;
 
-        void setBarSize(int size);
-        int getBarSize() const;
+        void setBarSize(float size);
+        float getBarSize() const;
 
         void setStep(float step);
         float getStep() const;

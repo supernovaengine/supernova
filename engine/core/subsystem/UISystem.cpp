@@ -329,8 +329,8 @@ void UISystem::createScrollbarObjects(Entity entity, ScrollbarComponent& scrollb
         scene->addEntityChild(entity, scrollbar.bar);
 
         UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
-        barlayout.height = scrollbar.barSize;
-        barlayout.width = scrollbar.barSize;
+        barlayout.height = 1;
+        barlayout.width = 1;
         barlayout.ignoreEvents = true;
     }
 }
@@ -454,26 +454,31 @@ void UISystem::updateScrollbar(Entity entity, ScrollbarComponent& scrollbar, Ima
     UIComponent& barui = scene->getComponent<UIComponent>(scrollbar.bar);
     UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
 
-    if (scrollbar.barSize < 1){
+    if (scrollbar.barSize > 1){
         scrollbar.barSize = 1;
+    }else if (scrollbar.barSize < 0){
+        scrollbar.barSize = 0;
     }
 
-    if (barlayout.height != scrollbar.barSize || barlayout.width != scrollbar.barSize){
-        barlayout.height = scrollbar.barSize;
-        barlayout.width = scrollbar.barSize;
+    if (scrollbar.step > 1){
+        scrollbar.step = 1;
+    }else if (scrollbar.step < 0){
+        scrollbar.step = 0;
     }
 
+    float barSizePixel = 0;
     float halfBar = 0;
     if (scrollbar.type == ScrollbarType::VERTICAL){
-        halfBar = (scrollbar.barSize / 2.0) / layout.height;
+        barSizePixel = layout.height * scrollbar.barSize;
+        halfBar = (barSizePixel / 2.0) / layout.height;
     }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
-        halfBar = (scrollbar.barSize / 2.0) / layout.width;
+        barSizePixel = layout.width * scrollbar.barSize;
+        halfBar = (barSizePixel / 2.0) / layout.width;
     }
 
-    if (scrollbar.step > 1.0){
-        scrollbar.step = 1.0;
-    }else if (scrollbar.step < 0.0){
-        scrollbar.step = 0.0;
+    if (barlayout.height != barSizePixel || barlayout.width != barSizePixel){
+        barlayout.height = barSizePixel;
+        barlayout.width = barSizePixel;
     }
 
     float pos = (scrollbar.step * ((1.0 - halfBar) - halfBar)) + halfBar;
@@ -1550,11 +1555,13 @@ void UISystem::eventOnPointerMove(float x, float y){
                 float halfBar = 0;
 
                 if (scrollbar.type == ScrollbarType::VERTICAL){
-                    pos = (y - transform.worldPosition.y + ((scrollbar.barSize / 2.0) - scrollbar.barPointerPos)) / layout.height;
-                    halfBar = (scrollbar.barSize / 2.0) / layout.height;
+                    float barSizePixel = layout.height * scrollbar.barSize;
+                    pos = (y - transform.worldPosition.y + ((barSizePixel / 2.0) - scrollbar.barPointerPos)) / layout.height;
+                    halfBar = (barSizePixel / 2.0) / layout.height;
                 }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
-                    pos = (x - transform.worldPosition.x + ((scrollbar.barSize / 2.0) - scrollbar.barPointerPos)) / layout.width;
-                    halfBar = (scrollbar.barSize / 2.0) / layout.width;
+                    float barSizePixel = layout.width * scrollbar.barSize;
+                    pos = (x - transform.worldPosition.x + ((barSizePixel / 2.0) - scrollbar.barPointerPos)) / layout.width;
+                    halfBar = (barSizePixel / 2.0) / layout.width;
                 }
 
                 if (pos < halfBar){
@@ -1563,7 +1570,12 @@ void UISystem::eventOnPointerMove(float x, float y){
                     pos = (1.0 - halfBar);
                 }
 
-                scrollbar.step = (pos - halfBar) / ((1.0 - halfBar) - halfBar);
+                float newStep = (pos - halfBar) / ((1.0 - halfBar) - halfBar);
+
+                if (newStep != scrollbar.step){
+                    scrollbar.step = newStep;
+                    scrollbar.onChange.call();
+                }
 
                 if (scrollbar.type == ScrollbarType::VERTICAL){
                     barlayout.anchorPointTop = pos;

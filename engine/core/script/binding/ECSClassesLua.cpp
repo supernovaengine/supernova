@@ -330,6 +330,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .beginClass<ScrollbarComponent>("ScrollbarComponent")
         .addProperty("bar", &ScrollbarComponent::bar)
         .addProperty("type", &ScrollbarComponent::type)
+        .addProperty("onChange", [] (ScrollbarComponent* self, lua_State* L) { return &self->onChange; }, [] (ScrollbarComponent* self, lua_State* L) { self->onChange = L; })
         .addProperty("barSize", &ScrollbarComponent::barSize)
         .addProperty("step", &ScrollbarComponent::step)
         .addProperty("barPointerDown", &ScrollbarComponent::barPointerDown)

@@ -30,14 +30,14 @@ ScrollbarType Scrollbar::getType() const{
     return scrollcomp.type;
 }
 
-void Scrollbar::setBarSize(int size){
+void Scrollbar::setBarSize(float size){
     ScrollbarComponent& scrollcomp = getComponent<ScrollbarComponent>();
 
     scrollcomp.barSize = size;
     scrollcomp.needUpdateScrollbar = true;
 }
 
-int Scrollbar::getBarSize() const{
+float Scrollbar::getBarSize() const{
     ScrollbarComponent& scrollcomp = getComponent<ScrollbarComponent>();
 
     return scrollcomp.barSize;

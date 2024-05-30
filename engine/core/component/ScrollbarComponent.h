@@ -18,7 +18,9 @@ namespace Supernova{
         Entity bar = NULL_ENTITY;
         ScrollbarType type = ScrollbarType::VERTICAL;
 
-        int barSize = 50;
+        FunctionSubscribe<void()> onChange;
+
+        float barSize = 0.5;  // from 0 to 1
         float step = 0; // from 0 to 1
 
         bool barPointerDown = false;
