@@ -71,9 +71,9 @@ namespace Supernova{
 		virtual ~UISystem();
 
 		void eventOnCharInput(wchar_t codepoint);
-		void eventOnPointerDown(float x, float y);
-		void eventOnPointerUp(float x, float y);
-		void eventOnPointerMove(float x, float y);
+		bool eventOnPointerDown(float x, float y);
+		bool eventOnPointerUp(float x, float y);
+		bool eventOnPointerMove(float x, float y);
 
 		// basic UIs
 		bool createOrUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout);

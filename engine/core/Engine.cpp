@@ -42,7 +42,10 @@ bool Engine::callTouchInMouseEvent = false;
 bool Engine::useDegrees = true;
 bool Engine::automaticTransparency = true;
 bool Engine::allowEventsOutCanvas = false;
+bool Engine::ignoreEventsHandledByUI = true;
 bool Engine::fixedTimeSceneUpdate = true;
+
+bool Engine::uiEventReceived = false;
 
 uint64_t Engine::lastTime = 0;
 float Engine::updateTimeCount = 0;
@@ -287,6 +290,18 @@ void Engine::setAllowEventsOutCanvas(bool allowEventsOutCanvas){
 
 bool Engine::isAllowEventsOutCanvas(){
     return allowEventsOutCanvas;
+}
+
+void Engine::setIgnoreEventsHandledByUI(bool ignoreEventsHandledByUI){
+    Engine::ignoreEventsHandledByUI = ignoreEventsHandledByUI;
+}
+
+bool Engine::isIgnoreEventsHandledByUI(){
+    return ignoreEventsHandledByUI;
+}
+
+bool Engine::isUIEventReceived(){
+    return uiEventReceived;
 }
 
 void Engine::setFixedTimeSceneUpdate(bool fixedTimeSceneUpdate) {
@@ -623,20 +638,26 @@ void Engine::systemTouchStart(int pointer, float x, float y){
     if (transformCoordPos(x, y)){
         //-----------------
         Input::addTouch(pointer, x, y);
-        Engine::onTouchStart.call(pointer, x, y);
-        //-----------------
-        if (Engine::isCallMouseInTouchEvent()){
-            //-----------------
-            Input::addMousePressed(S_MOUSE_BUTTON_1);
-            Input::setMousePosition(x, y);
-            Engine::onMouseDown.call(S_MOUSE_BUTTON_1, x, y, 0);
-            //-----------------
-        }
 
+        uiEventReceived = false;
         for (int i = 0; i < numScenes; i++){
             if (scenes[i]->canReceiveUIEvents())
-                scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
+                if (scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y))
+                    uiEventReceived = true;
         }
+
+        if (!ignoreEventsHandledByUI || !uiEventReceived){
+            Engine::onTouchStart.call(pointer, x, y);
+            //-----------------
+            if (Engine::isCallMouseInTouchEvent()){
+                //-----------------
+                Input::addMousePressed(S_MOUSE_BUTTON_1);
+                Input::setMousePosition(x, y);
+                Engine::onMouseDown.call(S_MOUSE_BUTTON_1, x, y, 0);
+                //-----------------
+            }
+        }
+        uiEventReceived = false;
     }
 }
 
@@ -644,20 +665,26 @@ void Engine::systemTouchEnd(int pointer, float x, float y){
     if (transformCoordPos(x, y)){
         //-----------------
         Input::removeTouch(pointer);
-        Engine::onTouchEnd.call(pointer, x, y);
-        //-----------------
-        if (Engine::isCallMouseInTouchEvent()){
-            //-----------------
-            Input::releaseMousePressed(S_MOUSE_BUTTON_1);
-            Input::setMousePosition(x, y);
-            Engine::onMouseUp.call(S_MOUSE_BUTTON_1, x, y, 0);
-            //-----------------
-        }
 
+        uiEventReceived = false;
         for (int i = 0; i < numScenes; i++){
             if (scenes[i]->canReceiveUIEvents())
-                scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
+                if (scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y))
+                    uiEventReceived = true;
         }
+
+        if (!ignoreEventsHandledByUI || !uiEventReceived){
+            Engine::onTouchEnd.call(pointer, x, y);
+            //-----------------
+            if (Engine::isCallMouseInTouchEvent()){
+                //-----------------
+                Input::releaseMousePressed(S_MOUSE_BUTTON_1);
+                Input::setMousePosition(x, y);
+                Engine::onMouseUp.call(S_MOUSE_BUTTON_1, x, y, 0);
+                //-----------------
+            }
+        }
+        uiEventReceived = false;
     }
 }
 
@@ -665,19 +692,25 @@ void Engine::systemTouchMove(int pointer, float x, float y){
     if (transformCoordPos(x, y)){
         //-----------------
         Input::setTouchPosition(pointer, x, y);
-        Engine::onTouchMove.call(pointer, x, y);
-        //-----------------
-        if (Engine::isCallMouseInTouchEvent()){
-            //-----------------
-            Input::setMousePosition(x, y);
-            Engine::onMouseMove.call(x, y, 0);
-            //-----------------
-        }
 
+        uiEventReceived = false;
         for (int i = 0; i < numScenes; i++){
             if (scenes[i]->canReceiveUIEvents())
-                scenes[i]->getSystem<UISystem>()->eventOnPointerMove(x, y);
+                if (scenes[i]->getSystem<UISystem>()->eventOnPointerMove(x, y))
+                    uiEventReceived = true;
         }
+
+        if (!ignoreEventsHandledByUI || !uiEventReceived){
+            Engine::onTouchMove.call(pointer, x, y);
+            //-----------------
+            if (Engine::isCallMouseInTouchEvent()){
+                //-----------------
+                Input::setMousePosition(x, y);
+                Engine::onMouseMove.call(x, y, 0);
+                //-----------------
+            }
+        }
+        uiEventReceived = false;
     }
 }
 
@@ -695,20 +728,26 @@ void Engine::systemMouseDown(int button, float x, float y, int mods){
         Input::setMousePosition(x, y);
         if (mods != 0)
             Input::setModifiers(mods);
-        Engine::onMouseDown.call(button, x, y, mods);
-        //-----------------
-        if (Engine::isCallTouchInMouseEvent()){
-            //-----------------
-            Input::addTouch(0, x, y);
-            Engine::onTouchStart.call(0, x, y);
-            //-----------------
-        }
 
+        uiEventReceived = false;
         for (int i = 0; i < numScenes; i++){
             if (scenes[i]->canReceiveUIEvents())
                 if (button == S_MOUSE_BUTTON_1)
-                    scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y);
+                    if (scenes[i]->getSystem<UISystem>()->eventOnPointerDown(x, y))
+                        uiEventReceived = true;
         }
+
+        if (!ignoreEventsHandledByUI || !uiEventReceived){
+            Engine::onMouseDown.call(button, x, y, mods);
+            //-----------------
+            if (Engine::isCallTouchInMouseEvent()){
+                //-----------------
+                Input::addTouch(0, x, y);
+                Engine::onTouchStart.call(0, x, y);
+                //-----------------
+            }
+        }
+        uiEventReceived = false;
     }
 }
 void Engine::systemMouseUp(int button, float x, float y, int mods){
@@ -718,20 +757,26 @@ void Engine::systemMouseUp(int button, float x, float y, int mods){
         Input::setMousePosition(x, y);
         if (mods != 0)
             Input::setModifiers(mods);
-        Engine::onMouseUp.call(button, x, y, mods);
-        //-----------------
-        if (Engine::isCallTouchInMouseEvent()){
-            //-----------------
-            Input::removeTouch(0);
-            Engine::onTouchEnd.call(0, x, y);
-            //-----------------
-        }
 
+        uiEventReceived = false;
         for (int i = 0; i < numScenes; i++){
             if (scenes[i]->canReceiveUIEvents())
                 if (button == S_MOUSE_BUTTON_1)
-                    scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y);
+                    if (scenes[i]->getSystem<UISystem>()->eventOnPointerUp(x, y))
+                        uiEventReceived = true;
         }
+
+        if (!ignoreEventsHandledByUI || !uiEventReceived){
+            Engine::onMouseUp.call(button, x, y, mods);
+            //-----------------
+            if (Engine::isCallTouchInMouseEvent()){
+                //-----------------
+                Input::removeTouch(0);
+                Engine::onTouchEnd.call(0, x, y);
+                //-----------------
+            }
+        }
+        uiEventReceived = false;
     }
 }
 
@@ -741,22 +786,28 @@ void Engine::systemMouseMove(float x, float y, int mods){
         Input::setMousePosition(x, y);
         if (mods != 0)
             Input::setModifiers(mods);
-        Engine::onMouseMove.call(x, y, mods);
-        //-----------------
-        if (Engine::isCallTouchInMouseEvent()){
-            //-----------------
-            if (Input::isMousePressed(S_MOUSE_BUTTON_LEFT) || Input::isMousePressed(S_MOUSE_BUTTON_RIGHT)){
-                Input::setTouchPosition(0, x, y);
-                Engine::onTouchMove.call(0, x, y);
-            }
-            //-----------------
-        }
 
+        uiEventReceived = false;
         for (int i = 0; i < numScenes; i++){
             if (scenes[i]->canReceiveUIEvents())
                 if (Input::isMousePressed(S_MOUSE_BUTTON_1))
-                    scenes[i]->getSystem<UISystem>()->eventOnPointerMove(x, y);
+                    if (scenes[i]->getSystem<UISystem>()->eventOnPointerMove(x, y))
+                        uiEventReceived = true;
         }
+
+        if (!ignoreEventsHandledByUI || !uiEventReceived){
+            Engine::onMouseMove.call(x, y, mods);
+            //-----------------
+            if (Engine::isCallTouchInMouseEvent()){
+                //-----------------
+                if (Input::isMousePressed(S_MOUSE_BUTTON_LEFT) || Input::isMousePressed(S_MOUSE_BUTTON_RIGHT)){
+                    Input::setTouchPosition(0, x, y);
+                    Engine::onTouchMove.call(0, x, y);
+                }
+                //-----------------
+            }
+        }
+        uiEventReceived = false;
     }
 }
 

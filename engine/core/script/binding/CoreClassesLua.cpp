@@ -138,6 +138,8 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticProperty("useDegrees", &Engine::isUseDegrees, &Engine::setUseDegrees)
         .addStaticProperty("automaticTransparency", &Engine::isAutomaticTransparency, &Engine::setAutomaticTransparency)
         .addStaticProperty("allowEventsOutCanvas", &Engine::isAllowEventsOutCanvas, &Engine::setAllowEventsOutCanvas)
+        .addStaticProperty("ignoreEventsHandledByUI", &Engine::isIgnoreEventsHandledByUI, &Engine::setIgnoreEventsHandledByUI)
+        .addStaticFunction("isUIEventReceived", &Engine::isUIEventReceived)
         .addStaticProperty("fixedTimeSceneUpdate", &Engine::isFixedTimeSceneUpdate, &Engine::setFixedTimeSceneUpdate)
         .addStaticProperty("updateTime", &Engine::getUpdateTime, &Engine::setUpdateTime)
         .addStaticFunction("setUpdateTimeMS", &Engine::setUpdateTimeMS)

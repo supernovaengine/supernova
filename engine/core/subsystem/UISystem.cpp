@@ -1379,7 +1379,7 @@ void UISystem::eventOnCharInput(wchar_t codepoint){
     }
 }
 
-void UISystem::eventOnPointerDown(float x, float y){
+bool UISystem::eventOnPointerDown(float x, float y){
     lastUIFromPointer = NULL_ENTITY;
     lastPointerPos = Vector2(x, y);
 
@@ -1478,9 +1478,14 @@ void UISystem::eventOnPointerDown(float x, float y){
     }else{
         System::instance().hideVirtualKeyboard();
     }
+
+    if (lastUIFromPointer != NULL_ENTITY)
+        return true;
+
+    return false;
 }
 
-void UISystem::eventOnPointerUp(float x, float y){
+bool UISystem::eventOnPointerUp(float x, float y){
     lastPointerPos = Vector2(-1, -1);
 
     auto layouts = scene->getComponentArray<UILayoutComponent>();
@@ -1526,9 +1531,16 @@ void UISystem::eventOnPointerUp(float x, float y){
             ui.onPointerUp(x - transform.worldPosition.x, y - transform.worldPosition.y);
         }
     }
+
+    if (lastUIFromPointer != NULL_ENTITY){
+        lastUIFromPointer = NULL_ENTITY;
+        return true;
+    }
+
+    return false;
 }
 
-void UISystem::eventOnPointerMove(float x, float y){
+bool UISystem::eventOnPointerMove(float x, float y){
     auto layouts = scene->getComponentArray<UILayoutComponent>();
 
     if (lastUIFromPointer != NULL_ENTITY){
@@ -1599,6 +1611,11 @@ void UISystem::eventOnPointerMove(float x, float y){
     }
 
     lastPointerPos = Vector2(x, y);
+
+    if (lastUIFromPointer != NULL_ENTITY)
+        return true;
+
+    return false;
 }
 
 bool UISystem::isCoordInside(float x, float y, Transform& transform, UILayoutComponent& layout){

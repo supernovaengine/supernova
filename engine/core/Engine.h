@@ -136,6 +136,10 @@ namespace Supernova {
 
         static bool allowEventsOutCanvas;
 
+        static bool ignoreEventsHandledByUI;
+
+        static bool uiEventReceived;
+
         static bool fixedTimeSceneUpdate;
 
         static uint64_t lastTime;
@@ -201,6 +205,11 @@ namespace Supernova {
 
         static void setAllowEventsOutCanvas(bool allowEventsOutCanvas);
         static bool isAllowEventsOutCanvas();
+
+        static void setIgnoreEventsHandledByUI(bool ignoreEventsHandledByUI);
+        static bool isIgnoreEventsHandledByUI();
+
+        static bool isUIEventReceived();
         
         static void setFixedTimeSceneUpdate(bool fixedTimeSceneUpdate);
         static bool isFixedTimeSceneUpdate();
