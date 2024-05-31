@@ -1,5 +1,5 @@
 //
-// (c) 2019 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #ifndef ATTRIBUTE_H

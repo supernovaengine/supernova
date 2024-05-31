@@ -2,7 +2,7 @@
 #define BUFFER_H
 
 //
-// (c) 2023 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #include <string>

@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef BODY2D_COMPONENT_H
 #define BODY2D_COMPONENT_H
 

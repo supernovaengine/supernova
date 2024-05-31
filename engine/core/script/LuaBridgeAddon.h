@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef LuaBridgeAddon_h
 #define LuaBridgeAddon_h
 

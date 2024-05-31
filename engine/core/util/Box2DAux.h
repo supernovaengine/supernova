@@ -1,6 +1,6 @@
 
 //
-// (c) 2023 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #ifndef Box2DAux_h

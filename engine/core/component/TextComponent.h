@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef TEXT_COMPONENT_H
 #define TEXT_COMPONENT_H
 

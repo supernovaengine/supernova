@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef AUDIO_COMPONENT_H
 #define AUDIO_COMPONENT_H
 

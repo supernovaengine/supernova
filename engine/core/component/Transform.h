@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 

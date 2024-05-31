@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef TRANSLATETRACKS_COMPONENT_H
 #define TRANSLATETRACKS_COMPONENT_H
 

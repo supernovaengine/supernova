@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #include "Angle.h"
 
 #include "Engine.h"

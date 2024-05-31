@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef TIMEDACTION_COMPONENT_H
 #define TIMEDACTION_COMPONENT_H
 

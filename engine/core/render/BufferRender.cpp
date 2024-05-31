@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #include "BufferRender.h"
 #include "Engine.h"
 

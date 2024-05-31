@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef KEYFRAMETRACKS_COMPONENT_H
 #define KEYFRAMETRACKS_COMPONENT_H
 

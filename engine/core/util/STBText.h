@@ -1,3 +1,6 @@
+//
+// (c) 2024 Eduardo Doria.
+//
 
 #ifndef STBText_h
 #define STBText_h

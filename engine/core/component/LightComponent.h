@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef LIGHT_COMPONENT_H
 #define LIGHT_COMPONENT_H
 

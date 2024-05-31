@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef LUA_FUNCTION_H
 #define LUA_FUNCTION_H
 

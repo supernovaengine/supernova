@@ -1,5 +1,5 @@
 //
-// (c) 2021 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #ifndef SCALEACTION_H

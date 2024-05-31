@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef PARTICLES_COMPONENT_H
 #define PARTICLES_COMPONENT_H
 

@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef UI_LAYOUT_COMPONENT_H
 #define UI_LAYOUT_COMPONENT_H
 

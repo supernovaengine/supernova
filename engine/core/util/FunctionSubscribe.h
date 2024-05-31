@@ -3,7 +3,7 @@
  */
 
 //
-// (c) 2020 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #ifndef FUNCTIONSUBSCRIBE_H

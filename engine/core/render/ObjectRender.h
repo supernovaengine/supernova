@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef ObjectRender_h
 #define ObjectRender_h
 

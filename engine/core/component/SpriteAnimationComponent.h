@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef SPRITEANIMATION_COMPONENT_H
 #define SPRITEANIMATION_COMPONENT_H
 

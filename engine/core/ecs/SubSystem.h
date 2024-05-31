@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef SUBSYSTEM_H
 #define SUBSYSTEM_H
 

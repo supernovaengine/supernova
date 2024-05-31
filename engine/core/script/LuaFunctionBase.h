@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef LUA_FUNCTIONBASE_H
 #define LUA_FUNCTIONBASE_H
 

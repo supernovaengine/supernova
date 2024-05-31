@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef ACTION_COMPONENT_H
 #define ACTION_COMPONENT_H
 

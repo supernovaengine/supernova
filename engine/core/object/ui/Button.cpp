@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #include "Button.h"
 
 #include "component/TextComponent.h"

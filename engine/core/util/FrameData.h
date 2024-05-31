@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef FRAMEDATA_H
 #define FRAMEDATA_H
 

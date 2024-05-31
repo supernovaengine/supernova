@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef SKY_COMPONENT_H
 #define SKY_COMPONENT_H
 

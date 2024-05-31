@@ -1,3 +1,6 @@
+//
+// (c) 2024 Eduardo Doria.
+//
 
 #ifndef angle_h
 #define angle_h

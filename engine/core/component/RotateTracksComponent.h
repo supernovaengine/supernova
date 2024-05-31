@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef ROTATETRACKS_COMPONENT_H
 #define ROTATETRACKS_COMPONENT_H
 

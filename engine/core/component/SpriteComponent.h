@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef SPRITE_COMPONENT_H
 #define SPRITE_COMPONENT_H
 

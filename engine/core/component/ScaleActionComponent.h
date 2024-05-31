@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef SCALEACTION_COMPONENT_H
 #define SCALEACTION_COMPONENT_H
 

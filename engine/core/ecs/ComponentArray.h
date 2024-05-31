@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef COMPONENTARRAY_H
 #define COMPONENTARRAY_H
     

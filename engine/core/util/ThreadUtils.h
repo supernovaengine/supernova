@@ -2,6 +2,10 @@
 // Based on: https://github.com/oviano/sokol-multithread
 // ---------------------------------------
 
+//
+// (c) 2024 Eduardo Doria.
+//
+
 // not using 'semaphore.h' file name to avoid errors when building Android with Mac
 #ifndef ThreadUtils_H
 #define ThreadUtils_H

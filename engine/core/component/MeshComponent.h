@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef MESH_COMPONENT_H
 #define MESH_COMPONENT_H
 

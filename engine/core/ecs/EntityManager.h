@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef ENTITYMANAGER_H
 #define ENTITYMANAGER_H
 

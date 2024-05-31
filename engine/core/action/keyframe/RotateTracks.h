@@ -1,5 +1,5 @@
 //
-// (c) 2022 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #ifndef ROTATETRACKS_H

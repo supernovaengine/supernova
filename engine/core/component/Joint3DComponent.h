@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef JOINT3D_COMPONENT_H
 #define JOINT3D_COMPONENT_H
 

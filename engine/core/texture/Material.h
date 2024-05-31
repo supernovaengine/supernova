@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef MATERIAL_H
 #define MATERIAL_H
 

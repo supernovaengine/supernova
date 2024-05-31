@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef TERRAIN_COMPONENT_H
 #define TERRAIN_COMPONENT_H
 

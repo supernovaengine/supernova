@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef DefaultFont_h
 #define DefaultFont_h
 

@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef ROTATIONACTION_COMPONENT_H
 #define ROTATIONACTION_COMPONENT_H
 

@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef MORPHTRACKS_COMPONENT_H
 #define MORPHTRACKS_COMPONENT_H
 

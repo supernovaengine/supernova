@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef FOG_COMPONENT_H
 #define FOG_COMPONENT_H
 

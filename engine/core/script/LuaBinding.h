@@ -1,5 +1,5 @@
 //
-// (c) 2020 Eduardo Doria.
+// (c) 2024 Eduardo Doria.
 //
 
 #ifndef luabinding_h

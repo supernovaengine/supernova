@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef TEXTURE_H
 #define TEXTURE_H
 

@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef SCALETRACKS_COMPONENT_H
 #define SCALETRACKS_COMPONENT_H
 

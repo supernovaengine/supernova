@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef CAMERA_COMPONENT_H
 #define CAMERA_COMPONENT_H
 

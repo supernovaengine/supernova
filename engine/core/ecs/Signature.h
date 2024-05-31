@@ -1,3 +1,7 @@
+//
+// (c) 2024 Eduardo Doria.
+//
+
 #ifndef SIGNATURE_H
 #define SIGNATURE_H
 
