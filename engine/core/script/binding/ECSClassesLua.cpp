@@ -254,6 +254,8 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .beginClass<UILayoutComponent>("UILayoutComponent")
         .addProperty("width", &UILayoutComponent::width)
         .addProperty("height", &UILayoutComponent::height)
+        .addProperty("uiTransform", &UILayoutComponent::uiTransform)
+        .addProperty("uiPosition", &UILayoutComponent::uiPosition)
         .addProperty("anchorPointLeft", &UILayoutComponent::anchorPointLeft)
         .addProperty("anchorPointTop", &UILayoutComponent::anchorPointTop)
         .addProperty("anchorPointRight", &UILayoutComponent::anchorPointRight)

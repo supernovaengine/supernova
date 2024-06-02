@@ -7,6 +7,8 @@
 
 #include "util/FunctionSubscribe.h"
 #include "math/Rect.h"
+#include "math/Quaternion.h"
+#include "math/Matrix4.h"
 
 namespace Supernova{
 
@@ -34,6 +36,12 @@ namespace Supernova{
         // UI part
         int width = 0;
         int height = 0;
+
+        Matrix4 uiTransform;
+
+        Vector3 uiPosition;
+        Vector3 uiScale;
+        Quaternion uiRotation;
 
         float anchorPointLeft = 0;
         float anchorPointTop = 0;

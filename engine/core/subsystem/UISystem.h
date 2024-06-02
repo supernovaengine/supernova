@@ -55,7 +55,8 @@ namespace Supernova{
 		//UI Polygon
 		void createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout);
 
-		bool isCoordInside(float x, float y, Transform& transform, UILayoutComponent& layout);
+		bool isCoordInside(float x, float y, UILayoutComponent& layout);
+		bool isCoordInside(float x, float y, Vector2 worldPosition, Quaternion worldRotation, Vector3 worldScale, int width, int height);
 
 		void applyAnchorPreset(UILayoutComponent& layout);
 		void changeFlipY(UIComponent& ui, CameraComponent& camera);
