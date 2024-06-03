@@ -615,6 +615,41 @@ Matrix4 Matrix4::perspectiveMatrix(float yfov, float aspect, float near, float f
     return r;
 }
 
+Matrix4 Matrix4::getPositionMatrix(){
+    return Matrix4(
+            1.0, 0.0, 0.0, matrix[3][0],
+            0.0, 1.0, 0.0, matrix[3][1],
+            0.0, 0.0, 1.0, matrix[3][2],
+            0.0, 0.0, 0.0, 1.0);
+}
+
+Matrix4 Matrix4::getScaleMatrix(){
+    Vector3 scale;
+
+    scale.x = Vector3(matrix[0][0], matrix[0][1], matrix[0][2]).length();
+    scale.y = Vector3(matrix[1][0], matrix[1][1], matrix[1][2]).length();
+    scale.z = Vector3(matrix[2][0], matrix[2][1], matrix[2][2]).length();
+
+    if (determinant() < 0) scale = -scale;
+
+    return Matrix4(
+            scale.x, 0.0, 0.0, 0.0,
+            0.0, scale.y, 0.0, 0.0,
+            0.0, 0.0, scale.z, 0.0,
+            0.0, 0.0, 0.0, 1.0);
+}
+
+Matrix4 Matrix4::getRotationMatrix(){
+    Quaternion rotation;
+
+    Matrix4 scale = getScaleMatrix();
+    return Matrix4(
+            matrix[0][0]/scale[0][0], matrix[1][0]/scale[1][1], matrix[2][0]/scale[2][2], 0.0,
+            matrix[0][1]/scale[0][0], matrix[1][1]/scale[1][1], matrix[2][1]/scale[2][2], 0.0,
+            matrix[0][2]/scale[0][0], matrix[1][2]/scale[1][1], matrix[2][2]/scale[2][2], 0.0,
+            0.0, 0.0, 0.0, 1.0);
+}
+
 void Matrix4::decompose(Vector3& position, Vector3& scale, Quaternion& rotation){
     position.x = matrix[3][0];
 	position.y = matrix[3][1];

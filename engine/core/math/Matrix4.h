@@ -74,6 +74,11 @@ namespace Supernova {
         static Matrix4 orthoMatrix(float l, float r, float b, float t, float n, float f);
         static Matrix4 perspectiveMatrix(float yfov, float aspect, float near, float far);
 
+        // recovering the scale, rotation and translation matrices from the model matrix
+        Matrix4 getPositionMatrix();
+        Matrix4 getScaleMatrix();
+        Matrix4 getRotationMatrix();
+
         void decompose(Vector3& position, Vector3& scale, Quaternion& rotation);
     };
     

@@ -237,6 +237,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addStaticFunction("frustumMatrix", &Matrix4::frustumMatrix)
         .addStaticFunction("orthoMatrix", &Matrix4::orthoMatrix)
         .addStaticFunction("perspectiveMatrix", &Matrix4::perspectiveMatrix)
+        .addFunction("getPositionMatrix", &Matrix4::getPositionMatrix)
+        .addFunction("getScaleMatrix", &Matrix4::getScaleMatrix)
+        .addFunction("getRotationMatrix", &Matrix4::getRotationMatrix)
         .addFunction("decompose", &Matrix4::decompose)
         .endClass();
 

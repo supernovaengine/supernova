@@ -223,36 +223,37 @@ void Quaternion::fromAxes (const Vector3& xaxis, const Vector3& yaxis, const Vec
 
 }
 
-void Quaternion::fromRotationMatrix (const Matrix4& kRot){
-
-    float trace = kRot[0][0]+kRot[1][1]+kRot[2][2];
-    float root;
-
-    if ( trace > 0.0 ) {
-        root = sqrt(trace + 1.0f);
-        w = 0.5f*root;
-        root = 0.5f/root;
-        x = (kRot[1][2]-kRot[2][1])*root;
-        y = (kRot[2][0]-kRot[0][2])*root;
-        z = (kRot[0][1]-kRot[1][0])*root;
+Quaternion& Quaternion::fromRotationMatrix (const Matrix4& kRot){
+    float trace = kRot[0][0] + kRot[1][1] + kRot[2][2];
+    if (trace > 0) {
+        float s = 0.5f / sqrtf(trace + 1.0f);
+        w = 0.25f / s;
+        x = (kRot[1][2] - kRot[2][1]) * s;
+        y = (kRot[2][0] - kRot[0][2]) * s;
+        z = (kRot[0][1] - kRot[1][0]) * s;
     } else {
-        static size_t s_iNext[3] = { 1, 2, 0 };
-        size_t i = 0;
-        if ( kRot[1][1] > kRot[0][0] )
-            i = 1;
-        if ( kRot[2][2] > kRot[i][i] )
-            i = 2;
-        size_t j = s_iNext[i];
-        size_t k = s_iNext[j];
-
-        root = sqrt(kRot[i][i]-kRot[j][j]-kRot[k][k] + 1.0f);
-        float* apkQuat[3] = { &x, &y, &z };
-        *apkQuat[i] = 0.5f*root;
-        root = 0.5f/root;
-        w = (kRot[j][k]-kRot[k][j])*root;
-        *apkQuat[j] = (kRot[i][j]+kRot[j][i])*root;
-        *apkQuat[k] = (kRot[i][k]+kRot[k][i])*root;
+        if (kRot[0][0] > kRot[1][1] && kRot[0][0] > kRot[2][2]) {
+            float s = 2.0f * sqrtf(1.0f + kRot[0][0] - kRot[1][1] - kRot[2][2]);
+            w = (kRot[1][2] - kRot[2][1]) / s;
+            x = 0.25f * s;
+            y = (kRot[1][0] + kRot[0][1]) / s;
+            z = (kRot[2][0] + kRot[0][2]) / s;
+        } else if (kRot[1][1] > kRot[2][2]) {
+            float s = 2.0f * sqrtf(1.0f + kRot[1][1] - kRot[0][0] - kRot[2][2]);
+            w = (kRot[2][0] - kRot[0][2]) / s;
+            x = (kRot[1][0] + kRot[0][1]) / s;
+            y = 0.25f * s;
+            z = (kRot[2][1] + kRot[1][2]) / s;
+        } else {
+            float s = 2.0f * sqrtf(1.0f + kRot[2][2] - kRot[0][0] - kRot[1][1]);
+            w = (kRot[0][1] - kRot[1][0]) / s;
+            x = (kRot[2][0] + kRot[0][2]) / s;
+            y = (kRot[2][1] + kRot[1][2]) / s;
+            z = 0.25f * s;
+        }
     }
+
+    return *this;
 }
 
 Matrix4 Quaternion::getRotationMatrix(){
