@@ -1801,18 +1801,18 @@ void RenderSystem::updateTransform(Transform& transform){
 		Matrix4 translateMatrix = Matrix4::translateMatrix(transform.position);
 		Matrix4 rotationMatrix = transform.rotation.getRotationMatrix();
 
-		transform.modelMatrix = translateMatrix * rotationMatrix * scaleMatrix;
+		transform.localMatrix = translateMatrix * rotationMatrix * scaleMatrix;
 	}
 
 	if (transform.parent != NULL_ENTITY){
-		auto transformParent = scene->getComponent<Transform>(transform.parent);
+		Transform& transformParent = scene->getComponent<Transform>(transform.parent);
 
-		transform.modelMatrix = transformParent.modelMatrix * transform.modelMatrix;
+		transform.modelMatrix = transformParent.modelMatrix * transform.localMatrix;
 
-		transform.worldRotation = (transformParent.worldRotation * transform.rotation).normalize();
-		transform.worldScale = transformParent.worldScale * transform.scale;
-		transform.worldPosition = transform.modelMatrix * Vector3(0,0,0);
+		transform.modelMatrix.decompose(transform.worldPosition, transform.worldScale, transform.worldRotation);
 	}else{
+		transform.modelMatrix = transform.localMatrix;
+
 		transform.worldRotation = transform.rotation;
 		transform.worldScale = transform.scale;
 		transform.worldPosition = transform.position;

@@ -159,10 +159,15 @@ bool Object::isCylindricalBillboard() const{
     return transform.cylindricalBillboard;
 }
 
-void Object::setModelMatrix(Matrix4 modelMatrix){
+void Object::setLocalMatrix(Matrix4 localMatrix){
     Transform& transform = getComponent<Transform>();
-    transform.modelMatrix = modelMatrix;
+    transform.localMatrix = localMatrix;
     transform.staticObject = true;
+}
+
+Matrix4 Object::getLocalMatrix() const{
+    Transform& transform = getComponent<Transform>();
+    return transform.localMatrix;
 }
 
 Matrix4 Object::getModelMatrix() const{

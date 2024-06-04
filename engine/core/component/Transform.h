@@ -23,6 +23,8 @@ namespace Supernova{
         Quaternion worldRotation;
         Vector3 worldScale;
 
+        Matrix4 localMatrix;
+
         Matrix4 modelMatrix;
         Matrix4 normalMatrix;
         Matrix4 modelViewProjectionMatrix;

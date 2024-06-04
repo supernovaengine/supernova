@@ -1051,11 +1051,7 @@ void UISystem::update(double dt){
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
-            Matrix4 scaleMatrix = Matrix4::scaleMatrix(transform.scale);
-            Matrix4 translateMatrix = Matrix4::translateMatrix(transform.position);
-            Matrix4 rotationMatrix = transform.rotation.getRotationMatrix();
-
-            layout.uiTransform = translateMatrix * rotationMatrix * scaleMatrix;
+            layout.uiTransform = transform.localMatrix;
 
             UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
             if (parentlayout){
