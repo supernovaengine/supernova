@@ -56,6 +56,8 @@ namespace Supernova{
         AnchorPreset anchorPreset = AnchorPreset::NONE;
         bool usingAnchors = false;
 
+        int resizeMargin = 5;
+
         int containerBoxIndex = -1;
 
         Rect scissor = Rect(0, 0, 0, 0);

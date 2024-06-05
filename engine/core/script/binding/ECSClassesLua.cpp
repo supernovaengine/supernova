@@ -266,6 +266,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("anchorOffsetBottom", &UILayoutComponent::anchorOffsetBottom)
         .addProperty("anchorPreset", &UILayoutComponent::anchorPreset)
         .addProperty("usingAnchors", &UILayoutComponent::usingAnchors)
+        .addProperty("resizeMargin", &UILayoutComponent::resizeMargin)
         .addProperty("containerBoxIndex", &UILayoutComponent::containerBoxIndex)
         .addProperty("scissor", &UILayoutComponent::scissor)
         .addProperty("ignoreScissor", &UILayoutComponent::ignoreScissor)

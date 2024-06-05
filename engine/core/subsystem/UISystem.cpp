@@ -1460,6 +1460,72 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 PanelComponent& panel = scene->getComponent<PanelComponent>(lastUIFromPointer);
                 UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
 
+                int minX;
+                int minY;
+                int maxX;
+                int maxY;
+
+                AABB edgeRight;
+                AABB edgeRightBottom;
+                AABB edgeBottom;
+                AABB edgeLeftBottom;
+                AABB edgeLeft;
+
+                // right
+                minX = layout.uiPosition.x + layout.width - layout.resizeMargin;
+                minY = layout.uiPosition.y + headerlayout.height;
+                maxX = layout.uiPosition.x + layout.width;
+                maxY = layout.uiPosition.y + layout.height - layout.resizeMargin;
+                edgeRight = AABB(minX, minY, 0, maxX, maxY, 0);
+
+                // right-bottom
+                minX = layout.uiPosition.x + layout.width - layout.resizeMargin;
+                minY = layout.uiPosition.y + layout.height - layout.resizeMargin;
+                maxX = layout.uiPosition.x + layout.width;
+                maxY = layout.uiPosition.y + layout.height;
+                edgeRightBottom = AABB(minX, minY, 0, maxX, maxY, 0);
+
+                // bottom
+                minX = layout.uiPosition.x + layout.resizeMargin;
+                minY = layout.uiPosition.y + layout.height - layout.resizeMargin;
+                maxX = layout.uiPosition.x + layout.width - layout.resizeMargin;
+                maxY = layout.uiPosition.y + layout.height;
+                edgeBottom = AABB(minX, minY, 0, maxX, maxY, 0);
+
+                // left-bottom
+                minX = layout.uiPosition.x;
+                minY = layout.uiPosition.y + layout.height - layout.resizeMargin;
+                maxX = layout.uiPosition.x + layout.resizeMargin;
+                maxY = layout.uiPosition.y + layout.height;
+                edgeLeftBottom = AABB(minX, minY, 0, maxX, maxY, 0);
+
+                // left
+                minX = layout.uiPosition.x;
+                minY = layout.uiPosition.y + headerlayout.height;
+                maxX = layout.uiPosition.x + layout.resizeMargin;
+                maxY = layout.uiPosition.y + layout.height - layout.resizeMargin;
+                edgeLeft = AABB(minX, minY, 0, maxX, maxY, 0);
+
+                if (isCoordInside(x, y, edgeRight, layout.uiRotation, layout.uiScale)){
+                    //printf("Right\n");
+                }
+
+                if (isCoordInside(x, y, edgeRightBottom, layout.uiRotation, layout.uiScale)){
+                    //printf("RightBottom\n");
+                }
+
+                if (isCoordInside(x, y, edgeBottom, layout.uiRotation, layout.uiScale)){
+                    //printf("Bottom\n");
+                }
+
+                if (isCoordInside(x, y, edgeLeftBottom, layout.uiRotation, layout.uiScale)){
+                    //printf("LeftBottom\n");
+                }
+
+                if (isCoordInside(x, y, edgeLeft, layout.uiRotation, layout.uiScale)){
+                    //printf("Left\n");
+                }
+
                 if (panel.canMove){
                     if (isCoordInside(x, y, headerlayout)){
                         panel.headerPointerDown = true;
@@ -1621,7 +1687,18 @@ bool UISystem::eventOnPointerMove(float x, float y){
 
 bool UISystem::isCoordInside(float x, float y, UILayoutComponent& layout){
     Vector3 point = layout.uiRotation.getRotationMatrix() * Vector3(x, y, 0);
-    Vector2 center = Vector2(0, 0);
+
+    if (point.x >= (layout.uiPosition.x) &&
+        point.x <= (layout.uiPosition.x + abs(layout.width * layout.uiScale.x)) &&
+        point.y >= (layout.uiPosition.y) &&
+        point.y <= (layout.uiPosition.y + abs(layout.height * layout.uiScale.y))) {
+        return true;
+    }
+    return false;
+}
+
+bool UISystem::isCoordInside(float x, float y, UILayoutComponent& layout, Vector2 center){
+    Vector3 point = layout.uiRotation.getRotationMatrix() * Vector3(x, y, 0);
 
     if (point.x >= (layout.uiPosition.x - center.x) &&
         point.x <= (layout.uiPosition.x - center.x + abs(layout.width * layout.uiScale.x)) &&
@@ -1632,14 +1709,15 @@ bool UISystem::isCoordInside(float x, float y, UILayoutComponent& layout){
     return false;
 }
 
-bool UISystem::isCoordInside(float x, float y, Vector2 worldPosition, Quaternion worldRotation, Vector3 worldScale, int width, int height){
+bool UISystem::isCoordInside(float x, float y, AABB aabb, Quaternion worldRotation, Vector3 worldScale){
     Vector3 point = worldRotation.getRotationMatrix() * Vector3(x, y, 0);
-    Vector2 center = Vector2(0, 0);
 
-    if (point.x >= (worldPosition.x - center.x) &&
-        point.x <= (worldPosition.x - center.x + abs(width * worldScale.x)) &&
-        point.y >= (worldPosition.y - center.y) &&
-        point.y <= (worldPosition.y - center.y + abs(height * worldScale.y))) {
+    Vector3 size = aabb.getSize();
+
+    if (point.x >= (aabb.getMinimum().x) &&
+        point.x <= (aabb.getMinimum().x + abs(size.x * worldScale.x)) &&
+        point.y >= (aabb.getMinimum().y) &&
+        point.y <= (aabb.getMinimum().y + abs(size.y * worldScale.y))) {
         return true;
     }
     return false;
