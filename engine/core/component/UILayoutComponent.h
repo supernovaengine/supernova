@@ -37,12 +37,6 @@ namespace Supernova{
         int width = 0;
         int height = 0;
 
-        Matrix4 uiTransform;
-
-        Vector3 uiPosition;
-        Vector3 uiScale;
-        Quaternion uiRotation;
-
         float anchorPointLeft = 0;
         float anchorPointTop = 0;
         float anchorPointRight = 0;

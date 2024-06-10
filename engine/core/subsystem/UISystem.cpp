@@ -1050,13 +1050,8 @@ void UISystem::update(double dt){
 
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
-
-            layout.uiTransform = transform.localMatrix;
-
             UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
             if (parentlayout){
-                layout.uiTransform = parentlayout->uiTransform * layout.uiTransform;
-
                 UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
                 if (parentcontainer && transform.visible){
                     if (parentcontainer->numBoxes < MAX_CONTAINER_BOXES){
@@ -1073,15 +1068,7 @@ void UISystem::update(double dt){
                         Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
                     }
                 }
-            }else{
-                // getting parent of first UI
-                Transform* parenttransform = scene->findComponent<Transform>(transform.parent);
-                if (parenttransform){
-                    layout.uiTransform = parenttransform->localMatrix * layout.uiTransform;
-                }
             }
-
-            layout.uiTransform.decompose(layout.uiPosition, layout.uiScale, layout.uiRotation);
         }
     }
 
@@ -1402,9 +1389,10 @@ bool UISystem::eventOnPointerDown(float x, float y){
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
         if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-            if (isCoordInside(x, y, layout) && !layout.ignoreEvents){ //TODO: isCoordInside to polygon
+            if (isCoordInside(x, y, transform, layout) && !layout.ignoreEvents){ //TODO: isCoordInside to polygon
                 if (signature.test(scene->getComponentType<ImageComponent>())){
                     lastUIFromPointer = entity;
                 }
@@ -1452,18 +1440,19 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
                 UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
 
-                if (isCoordInside(x, y, barlayout)){
+                if (isCoordInside(x, y, bartransform, barlayout)){
                     scrollbar.barPointerDown = true;
                     if (scrollbar.type == ScrollbarType::VERTICAL){
-                        scrollbar.barPointerPos = y - layout.uiPosition.y - bartransform.position.y;
+                        scrollbar.barPointerPos = y - transform.worldPosition.y - bartransform.position.y;
                     }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
-                        scrollbar.barPointerPos = x - layout.uiPosition.x - bartransform.position.x;
+                        scrollbar.barPointerPos = x - transform.worldPosition.x - bartransform.position.x;
                     }
                 }
             }
 
             if (signature.test(scene->getComponentType<PanelComponent>())){
                 PanelComponent& panel = scene->getComponent<PanelComponent>(lastUIFromPointer);
+                Transform& headertransform = scene->getComponent<Transform>(panel.headercontainer);
                 UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
 
                 int minX;
@@ -1477,63 +1466,67 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 AABB edgeLeftBottom;
                 AABB edgeLeft;
 
+                Vector2 scaledSize = Vector2(layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
+                Vector2 scaledResizeSize = Vector2(layout.resizeMargin * transform.worldScale.x, layout.resizeMargin * transform.worldScale.y);
+                float scaledHeaderHeight = headerlayout.height * transform.worldScale.y;
+
                 // right
-                minX = layout.uiPosition.x + layout.width - layout.resizeMargin;
-                minY = layout.uiPosition.y + headerlayout.height;
-                maxX = layout.uiPosition.x + layout.width;
-                maxY = layout.uiPosition.y + layout.height - layout.resizeMargin;
+                minX = transform.worldPosition.x + scaledSize.x - scaledResizeSize.x;
+                minY = transform.worldPosition.y + scaledHeaderHeight;
+                maxX = transform.worldPosition.x + scaledSize.x;
+                maxY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y - 1;
                 edgeRight = AABB(minX, minY, 0, maxX, maxY, 0);
 
                 // right-bottom
-                minX = layout.uiPosition.x + layout.width - layout.resizeMargin;
-                minY = layout.uiPosition.y + layout.height - layout.resizeMargin;
-                maxX = layout.uiPosition.x + layout.width;
-                maxY = layout.uiPosition.y + layout.height;
+                minX = transform.worldPosition.x + scaledSize.x - scaledResizeSize.x;
+                minY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y;
+                maxX = transform.worldPosition.x + scaledSize.x;
+                maxY = transform.worldPosition.y + scaledSize.y;
                 edgeRightBottom = AABB(minX, minY, 0, maxX, maxY, 0);
 
                 // bottom
-                minX = layout.uiPosition.x + layout.resizeMargin;
-                minY = layout.uiPosition.y + layout.height - layout.resizeMargin;
-                maxX = layout.uiPosition.x + layout.width - layout.resizeMargin;
-                maxY = layout.uiPosition.y + layout.height;
+                minX = transform.worldPosition.x + scaledResizeSize.x + 1;
+                minY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y;
+                maxX = transform.worldPosition.x + scaledSize.x - scaledResizeSize.x - 1;
+                maxY = transform.worldPosition.y + scaledSize.y;
                 edgeBottom = AABB(minX, minY, 0, maxX, maxY, 0);
 
                 // left-bottom
-                minX = layout.uiPosition.x;
-                minY = layout.uiPosition.y + layout.height - layout.resizeMargin;
-                maxX = layout.uiPosition.x + layout.resizeMargin;
-                maxY = layout.uiPosition.y + layout.height;
+                minX = transform.worldPosition.x;
+                minY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y;
+                maxX = transform.worldPosition.x + scaledResizeSize.x;
+                maxY = transform.worldPosition.y + scaledSize.y;
                 edgeLeftBottom = AABB(minX, minY, 0, maxX, maxY, 0);
 
                 // left
-                minX = layout.uiPosition.x;
-                minY = layout.uiPosition.y + headerlayout.height;
-                maxX = layout.uiPosition.x + layout.resizeMargin;
-                maxY = layout.uiPosition.y + layout.height - layout.resizeMargin;
+                minX = transform.worldPosition.x;
+                minY = transform.worldPosition.y + scaledHeaderHeight;
+                maxX = transform.worldPosition.x + scaledResizeSize.x;
+                maxY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y - 1;
                 edgeLeft = AABB(minX, minY, 0, maxX, maxY, 0);
 
-                if (isCoordInside(x, y, edgeRight, layout.uiRotation, layout.uiScale)){
+                if (edgeRight.contains(Vector3(x, y, 0))){
                     //printf("Right\n");
                 }
 
-                if (isCoordInside(x, y, edgeRightBottom, layout.uiRotation, layout.uiScale)){
+                if (edgeRightBottom.contains(Vector3(x, y, 0))){
                     //printf("RightBottom\n");
                 }
 
-                if (isCoordInside(x, y, edgeBottom, layout.uiRotation, layout.uiScale)){
+                if (edgeBottom.contains(Vector3(x, y, 0))){
                     //printf("Bottom\n");
                 }
 
-                if (isCoordInside(x, y, edgeLeftBottom, layout.uiRotation, layout.uiScale)){
+                if (edgeLeftBottom.contains(Vector3(x, y, 0))){
                     //printf("LeftBottom\n");
                 }
 
-                if (isCoordInside(x, y, edgeLeft, layout.uiRotation, layout.uiScale)){
+                if (edgeLeft.contains(Vector3(x, y, 0))){
                     //printf("Left\n");
                 }
 
                 if (panel.canMove){
-                    if (isCoordInside(x, y, headerlayout)){
+                    if (isCoordInside(x, y, headertransform, headerlayout)){
                         panel.headerPointerDown = true;
                     }
                 }
@@ -1543,7 +1536,7 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 }
             }
 
-            ui.onPointerDown(x - layout.uiPosition.x, y - layout.uiPosition.y);
+            ui.onPointerDown(x - transform.worldPosition.x, y - transform.worldPosition.y);
 
             if (!ui.focused){
                 ui.focused = true;
@@ -1585,23 +1578,25 @@ bool UISystem::eventOnPointerUp(float x, float y){
 
             if (signature.test(scene->getComponentType<ScrollbarComponent>())){
                 ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+                Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
                 UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
 
-                if (isCoordInside(x, y, barlayout)){
+                if (isCoordInside(x, y, bartransform, barlayout)){
                     scrollbar.barPointerDown = false;
                 }
             }
 
             if (signature.test(scene->getComponentType<PanelComponent>())){
                 PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+                Transform& headertransform = scene->getComponent<Transform>(panel.headercontainer);
                 UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
 
-                if (isCoordInside(x, y, headerlayout)){
+                if (isCoordInside(x, y, headertransform, headerlayout)){
                     panel.headerPointerDown = false;
                 }
             }
 
-            ui.onPointerUp(x - layout.uiPosition.x, y - layout.uiPosition.y);
+            ui.onPointerUp(x - transform.worldPosition.x, y - transform.worldPosition.y);
         }
     }
 
@@ -1624,7 +1619,7 @@ bool UISystem::eventOnPointerMove(float x, float y){
             Transform& transform = scene->getComponent<Transform>(lastUIFromPointer);
             UIComponent& ui = scene->getComponent<UIComponent>(lastUIFromPointer);
 
-            ui.onPointerMove.call(x - layout.uiPosition.x, y - layout.uiPosition.y);
+            ui.onPointerMove.call(x - transform.worldPosition.x, y - transform.worldPosition.y);
             ui.pointerMoved = true;
         }
 
@@ -1641,11 +1636,11 @@ bool UISystem::eventOnPointerMove(float x, float y){
 
                 if (scrollbar.type == ScrollbarType::VERTICAL){
                     float barSizePixel = layout.height * scrollbar.barSize;
-                    pos = (y - layout.uiPosition.y + ((barSizePixel / 2.0) - scrollbar.barPointerPos)) / layout.height;
+                    pos = (y - transform.worldPosition.y + ((barSizePixel / 2.0) - scrollbar.barPointerPos)) / layout.height;
                     halfBar = (barSizePixel / 2.0) / layout.height;
                 }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
                     float barSizePixel = layout.width * scrollbar.barSize;
-                    pos = (x - layout.uiPosition.x + ((barSizePixel / 2.0) - scrollbar.barPointerPos)) / layout.width;
+                    pos = (x - transform.worldPosition.x + ((barSizePixel / 2.0) - scrollbar.barPointerPos)) / layout.width;
                     halfBar = (barSizePixel / 2.0) / layout.width;
                 }
 
@@ -1691,39 +1686,25 @@ bool UISystem::eventOnPointerMove(float x, float y){
     return false;
 }
 
-bool UISystem::isCoordInside(float x, float y, UILayoutComponent& layout){
-    Vector3 point = layout.uiRotation.getRotationMatrix() * Vector3(x, y, 0);
+bool UISystem::isCoordInside(float x, float y, Transform& transform, UILayoutComponent& layout){
+    Vector3 point = transform.worldRotation.getRotationMatrix() * Vector3(x, y, 0);
 
-    if (point.x >= (layout.uiPosition.x) &&
-        point.x <= (layout.uiPosition.x + abs(layout.width * layout.uiScale.x)) &&
-        point.y >= (layout.uiPosition.y) &&
-        point.y <= (layout.uiPosition.y + abs(layout.height * layout.uiScale.y))) {
+    if (point.x >= (transform.worldPosition.x) &&
+        point.x <= (transform.worldPosition.x + abs(layout.width * transform.worldScale.x)) &&
+        point.y >= (transform.worldPosition.y) &&
+        point.y <= (transform.worldPosition.y + abs(layout.height * transform.worldScale.y))) {
         return true;
     }
     return false;
 }
 
-bool UISystem::isCoordInside(float x, float y, UILayoutComponent& layout, Vector2 center){
-    Vector3 point = layout.uiRotation.getRotationMatrix() * Vector3(x, y, 0);
+bool UISystem::isCoordInside(float x, float y, Transform& transform, UILayoutComponent& layout, Vector2 center){
+    Vector3 point = transform.worldRotation.getRotationMatrix() * Vector3(x, y, 0);
 
-    if (point.x >= (layout.uiPosition.x - center.x) &&
-        point.x <= (layout.uiPosition.x - center.x + abs(layout.width * layout.uiScale.x)) &&
-        point.y >= (layout.uiPosition.y - center.y) &&
-        point.y <= (layout.uiPosition.y - center.y + abs(layout.height * layout.uiScale.y))) {
-        return true;
-    }
-    return false;
-}
-
-bool UISystem::isCoordInside(float x, float y, AABB aabb, Quaternion worldRotation, Vector3 worldScale){
-    Vector3 point = worldRotation.getRotationMatrix() * Vector3(x, y, 0);
-
-    Vector3 size = aabb.getSize();
-
-    if (point.x >= (aabb.getMinimum().x) &&
-        point.x <= (aabb.getMinimum().x + abs(size.x * worldScale.x)) &&
-        point.y >= (aabb.getMinimum().y) &&
-        point.y <= (aabb.getMinimum().y + abs(size.y * worldScale.y))) {
+    if (point.x >= (transform.worldPosition.x - center.x) &&
+        point.x <= (transform.worldPosition.x - center.x + abs(layout.width * transform.worldScale.x)) &&
+        point.y >= (transform.worldPosition.y - center.y) &&
+        point.y <= (transform.worldPosition.y - center.y + abs(layout.height * transform.worldScale.y))) {
         return true;
     }
     return false;
