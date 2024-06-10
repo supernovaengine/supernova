@@ -1073,6 +1073,12 @@ void UISystem::update(double dt){
                         Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
                     }
                 }
+            }else{
+                // getting parent of first UI
+                Transform* parenttransform = scene->findComponent<Transform>(transform.parent);
+                if (parenttransform){
+                    layout.uiTransform = parenttransform->localMatrix * layout.uiTransform;
+                }
             }
 
             layout.uiTransform.decompose(layout.uiPosition, layout.uiScale, layout.uiRotation);
