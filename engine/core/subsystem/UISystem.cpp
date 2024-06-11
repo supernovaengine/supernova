@@ -1448,9 +1448,9 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 if (isCoordInside(x, y, bartransform, barlayout)){
                     scrollbar.barPointerDown = true;
                     if (scrollbar.type == ScrollbarType::VERTICAL){
-                        scrollbar.barPointerPos = y - transform.worldPosition.y - bartransform.position.y;
+                        scrollbar.barPointerPos = y - transform.worldPosition.y - (bartransform.position.y * bartransform.worldScale.y);
                     }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
-                        scrollbar.barPointerPos = x - transform.worldPosition.x - bartransform.position.x;
+                        scrollbar.barPointerPos = x - transform.worldPosition.x - (bartransform.position.x * bartransform.worldScale.x);
                     }
                 }
             }
@@ -1650,13 +1650,13 @@ bool UISystem::eventOnPointerMove(float x, float y){
                 float halfBar = 0;
 
                 if (scrollbar.type == ScrollbarType::VERTICAL){
-                    float barSizePixel = layout.height * scrollbar.barSize;
-                    pos = (y - transform.worldPosition.y + ((barSizePixel / 2.0) - scrollbar.barPointerPos)) / layout.height;
-                    halfBar = (barSizePixel / 2.0) / layout.height;
+                    float barSizePixel = (layout.height * scrollbar.barSize) * transform.worldScale.y;
+                    pos = (y - transform.worldPosition.y + ((barSizePixel / 2.0) - scrollbar.barPointerPos)) / (layout.height * transform.worldScale.y);
+                    halfBar = (barSizePixel / 2.0) / (layout.height * transform.worldScale.y);
                 }else if (scrollbar.type == ScrollbarType::HORIZONTAL){
-                    float barSizePixel = layout.width * scrollbar.barSize;
-                    pos = (x - transform.worldPosition.x + ((barSizePixel / 2.0) - scrollbar.barPointerPos)) / layout.width;
-                    halfBar = (barSizePixel / 2.0) / layout.width;
+                    float barSizePixel = (layout.width * scrollbar.barSize) * transform.worldScale.x;
+                    pos = (x - transform.worldPosition.x + ((barSizePixel / 2.0) - scrollbar.barPointerPos)) / (layout.width * transform.worldScale.x);
+                    halfBar = (barSizePixel / 2.0) / (layout.width * transform.worldScale.x);
                 }
 
                 if (pos < halfBar){
