@@ -23,6 +23,7 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
 
     eventId.clear();
     lastUIFromPointer = NULL_ENTITY;
+    lastPanelFromPointer = NULL_ENTITY;
     lastPointerPos = Vector2(-1, -1);
 }
 
@@ -1379,6 +1380,7 @@ void UISystem::eventOnCharInput(wchar_t codepoint){
 
 bool UISystem::eventOnPointerDown(float x, float y){
     lastUIFromPointer = NULL_ENTITY;
+    lastPanelFromPointer = NULL_ENTITY;
     lastPointerPos = Vector2(x, y);
 
     auto layouts = scene->getComponentArray<UILayoutComponent>();
@@ -1395,6 +1397,9 @@ bool UISystem::eventOnPointerDown(float x, float y){
             if (isCoordInside(x, y, transform, layout) && !layout.ignoreEvents){ //TODO: isCoordInside to polygon
                 if (signature.test(scene->getComponentType<ImageComponent>())){
                     lastUIFromPointer = entity;
+                }
+                if (signature.test(scene->getComponentType<PanelComponent>())){
+                    lastPanelFromPointer = entity;
                 }
             }
 
@@ -1547,6 +1552,14 @@ bool UISystem::eventOnPointerDown(float x, float y){
         System::instance().hideVirtualKeyboard();
     }
 
+    if (lastPanelFromPointer != NULL_ENTITY){
+        PanelComponent& panel = scene->getComponent<PanelComponent>(lastPanelFromPointer);
+
+        if (panel.canTopOnFocus){
+            scene->moveChildToTop(lastPanelFromPointer);
+        }
+    }
+
     if (lastUIFromPointer != NULL_ENTITY)
         return true;
 
@@ -1599,6 +1612,8 @@ bool UISystem::eventOnPointerUp(float x, float y){
             ui.onPointerUp(x - transform.worldPosition.x, y - transform.worldPosition.y);
         }
     }
+
+    lastPanelFromPointer = NULL_ENTITY;
 
     if (lastUIFromPointer != NULL_ENTITY){
         lastUIFromPointer = NULL_ENTITY;
@@ -1672,7 +1687,7 @@ bool UISystem::eventOnPointerMove(float x, float y){
             Transform& transform = scene->getComponent<Transform>(lastUIFromPointer);
             if (panel.headerPointerDown){
                 Vector2 movement = Vector2(x, y) - lastPointerPos;
-                transform.position += Vector3(movement.x, movement.y, 0);
+                transform.position += Vector3(movement.x / transform.worldScale.x, movement.y / transform.worldScale.y, 0);
                 transform.needUpdate = true;
             }
         }
