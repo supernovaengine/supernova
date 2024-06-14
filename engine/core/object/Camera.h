@@ -13,6 +13,10 @@ namespace Supernova{
 
     class Camera: public Object{
 
+    private:
+        void applyOrthoDefaults(CameraComponent& cameraComponent);
+        void applyPerspectiveDefaults(CameraComponent& cameraComponent);
+
     public:
         Camera(Scene* scene);
         Camera(Scene* scene, Entity entity);

@@ -14,19 +14,24 @@ Camera::Camera(Scene* scene): Object(scene){
     addComponent<CameraComponent>({});
 
     CameraComponent& cameraComponent = getComponent<CameraComponent>();
-    Transform& transform = getComponent<Transform>();
+    applyPerspectiveDefaults(cameraComponent);
+    // default CameraComponent is CAMERA_2D
+    cameraComponent.type = CameraType::CAMERA_PERSPECTIVE;
+}
 
-    transform.position = Vector3(0, 0, 1);
+Camera::Camera(Scene* scene, Entity entity): Object(scene, entity){
+}
 
-    //ORTHO
+void Camera::applyOrthoDefaults(CameraComponent& cameraComponent){
     cameraComponent.left = 0;
     cameraComponent.right = Engine::getCanvasWidth();
     cameraComponent.bottom = 0;
     cameraComponent.top = Engine::getCanvasHeight();
     cameraComponent.near = DEFAULT_ORTHO_NEAR;
     cameraComponent.far = DEFAULT_ORTHO_FAR;
+}
 
-    //PERSPECTIVE
+void Camera::applyPerspectiveDefaults(CameraComponent& cameraComponent){
     cameraComponent.yfov = 0.75;
 
     if (Engine::getCanvasWidth() != 0 && Engine::getCanvasHeight() != 0) {
@@ -37,12 +42,6 @@ Camera::Camera(Scene* scene): Object(scene){
 
     cameraComponent.near = DEFAULT_PERSPECTIVE_NEAR;
     cameraComponent.far = DEFAULT_PERSPECTIVE_FAR;
-
-    // default CameraComponent is CAMERA_2D
-    cameraComponent.type = CameraType::CAMERA_PERSPECTIVE;
-}
-
-Camera::Camera(Scene* scene, Entity entity): Object(scene, entity){
 }
 
 void Camera::activate(){
@@ -224,6 +223,12 @@ void Camera::setType(CameraType type){
     
     if (camera.type != type){
         camera.type = type;
+
+        if (camera.type == CameraType::CAMERA_PERSPECTIVE){
+            applyPerspectiveDefaults(camera);
+        }else{
+            applyOrthoDefaults(camera);
+        }
 
         camera.needUpdate = true;
     }
