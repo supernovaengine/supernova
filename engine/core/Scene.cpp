@@ -131,6 +131,10 @@ void Scene::setBackgroundColor(float red, float green, float blue){
 	setBackgroundColor(Vector4(red, green, blue, 1.0));
 }
 
+void Scene::setBackgroundColor(float red, float green, float blue, float alpha){
+	setBackgroundColor(Vector4(red, green, blue, alpha));
+}
+
 Vector4 Scene::getBackgroundColor() const{
 	return backgroundColor;
 }
@@ -176,7 +180,7 @@ void Scene::setSceneAmbientLightEnabled(bool hasSceneAmbientLight){
 }
 
 bool Scene::canReceiveUIEvents(){
-	if (Engine::getLastScene() == this || this->enableUIEvents){
+	if (Engine::getLastScene() == this && this->enableUIEvents){
 		return true;
 	}
 	return false;

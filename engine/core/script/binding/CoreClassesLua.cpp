@@ -359,7 +359,9 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("update", &Scene::update)
         .addProperty("camera", &Scene::getCamera, &Scene::setCamera)
         .addProperty("backgroundColor", &Scene::getBackgroundColor, (void (Scene::*)(Vector4))&Scene::setBackgroundColor)
-        .addFunction("setBackgroundColor", (void (Scene::*)(float, float, float))&Scene::setBackgroundColor)
+        .addFunction("setBackgroundColor", 
+            luabridge::overload<float, float, float>(&Scene::setBackgroundColor),
+            luabridge::overload<float, float, float, float>(&Scene::setBackgroundColor))
         .addProperty("shadowsPCF", &Scene::isShadowsPCF, &Scene::setShadowsPCF)
         .addProperty("ambientLightColor", &Scene::getAmbientLightColor, (void (Scene::*)(Vector3))&Scene::setAmbientLight)
         .addProperty("ambientLightFactor", &Scene::getAmbientLightFactor, (void (Scene::*)(float))&Scene::setAmbientLight)

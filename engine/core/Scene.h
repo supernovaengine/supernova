@@ -98,6 +98,7 @@ namespace Supernova{
 
 		void setBackgroundColor(Vector4 color);
 		void setBackgroundColor(float red, float green, float blue);
+		void setBackgroundColor(float red, float green, float blue, float alpha);
 		Vector4 getBackgroundColor() const;
 
 		void setShadowsPCF(bool shadowsPCF);
