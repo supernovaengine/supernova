@@ -227,7 +227,7 @@ void SokolObject::endLoad(uint8_t pipelines){
         pip_rtt_desc.colors[0].blend.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA;
         pip_rtt_desc.colors[0].blend.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
         pip_rtt_desc.colors[0].blend.src_factor_alpha = SG_BLENDFACTOR_ONE;
-        pip_rtt_desc.colors[0].blend.dst_factor_alpha = SG_BLENDFACTOR_ONE;
+        pip_rtt_desc.colors[0].blend.dst_factor_alpha = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
 
         pip_rtt_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
         pip_rtt_desc.colors[0].pixel_format = SG_PIXELFORMAT_RGBA8;
