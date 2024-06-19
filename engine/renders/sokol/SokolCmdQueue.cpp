@@ -85,7 +85,7 @@ void SokolCmdQueue::execute_commands(bool resource_only)
 		for (const auto& command : m_commands[m_commit_commands_index])
 		{
 			// ignore command?
-			if (resource_only && !(command.type >= SokolRenderCommand::TYPE::MAKE_BUFFER && command.type <= SokolRenderCommand::TYPE::DESTROY_PASS))
+			if (resource_only && !(command.type >= SokolRenderCommand::TYPE::MAKE_BUFFER && command.type <= SokolRenderCommand::TYPE::DESTROY_ATTACHMENTS))
 			{
 				continue;
 			}
@@ -114,8 +114,8 @@ void SokolCmdQueue::execute_commands(bool resource_only)
 			case SokolRenderCommand::TYPE::MAKE_PIPELINE:
 				sg_init_pipeline(command.make_pipeline.pipeline, command.make_pipeline.desc);
 				break;
-			case SokolRenderCommand::TYPE::MAKE_PASS:
-				sg_init_pass(command.make_pass.pass, command.make_pass.desc);
+			case SokolRenderCommand::TYPE::MAKE_ATTACHMENTS:
+				sg_init_attachments(command.make_attachments.attachments, command.make_attachments.desc);
 				break;
 			case SokolRenderCommand::TYPE::DESTROY_BUFFER:
 				sg_uninit_buffer(command.destroy_buffer.buffer);
@@ -132,8 +132,8 @@ void SokolCmdQueue::execute_commands(bool resource_only)
 			case SokolRenderCommand::TYPE::DESTROY_PIPELINE:
 				sg_uninit_pipeline(command.destroy_pipeline.pipeline);
 				break;
-			case SokolRenderCommand::TYPE::DESTROY_PASS:
-				sg_uninit_pass(command.destroy_pass.pass);
+			case SokolRenderCommand::TYPE::DESTROY_ATTACHMENTS:
+				sg_uninit_attachments(command.destroy_attachments.attachments);
 				break;
 			case SokolRenderCommand::TYPE::UPDATE_BUFFER:
 				sg_update_buffer(command.update_buffer.buffer, command.update_buffer.data);
@@ -144,11 +144,8 @@ void SokolCmdQueue::execute_commands(bool resource_only)
 			case SokolRenderCommand::TYPE::UPDATE_IMAGE:
 				sg_update_image(command.update_image.image, command.update_image.data);
 				break;
-			case SokolRenderCommand::TYPE::BEGIN_DEFAULT_PASS:
-				sg_begin_default_pass(command.begin_default_pass.pass_action, command.begin_default_pass.width, command.begin_default_pass.height);
-				break;
 			case SokolRenderCommand::TYPE::BEGIN_PASS:
-				sg_begin_pass(command.begin_pass.pass, command.begin_pass.pass_action);
+				sg_begin_pass(command.begin_pass.pass);
 				break;
 			case SokolRenderCommand::TYPE::APPLY_VIEWPORT:
 				sg_apply_viewport(command.apply_viewport.x, command.apply_viewport.y, command.apply_viewport.width, command.apply_viewport.height, command.apply_viewport.origin_top_left);
@@ -234,8 +231,8 @@ void SokolCmdQueue::wait_for_flush()
 				case SokolRenderCommand::TYPE::MAKE_PIPELINE:
 					//sg_init_pipeline(command.make_pipeline.pipeline, command.make_pipeline.desc);
 					break;
-				case SokolRenderCommand::TYPE::MAKE_PASS:
-					//sg_init_pass(command.make_pass.pass, command.make_pass.desc);
+				case SokolRenderCommand::TYPE::MAKE_ATTACHMENTS:
+					//sg_init_attachments(command.make_attachments.attachments, command.make_attachments.desc);
 					break;
 				case SokolRenderCommand::TYPE::DESTROY_BUFFER:
 					sg_uninit_buffer(command.destroy_buffer.buffer);
@@ -252,8 +249,8 @@ void SokolCmdQueue::wait_for_flush()
 				case SokolRenderCommand::TYPE::DESTROY_PIPELINE:
 					sg_uninit_pipeline(command.destroy_pipeline.pipeline);
 					break;
-				case SokolRenderCommand::TYPE::DESTROY_PASS:
-					sg_uninit_pass(command.destroy_pass.pass);
+				case SokolRenderCommand::TYPE::DESTROY_ATTACHMENTS:
+					sg_uninit_attachments(command.destroy_attachments.attachments);
 					break;
 				default:
 					break;
@@ -375,19 +372,19 @@ sg_pipeline SokolCmdQueue::add_command_make_pipeline(const sg_pipeline_desc& des
 
 // ----------------------------------------------------------------------------------------------------
 
-sg_pass SokolCmdQueue::add_command_make_pass(const sg_pass_desc& desc)
+sg_attachments SokolCmdQueue::add_command_make_attachments(const sg_attachments_desc& desc)
 {
 	// add command
-	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::MAKE_PASS);
+	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::MAKE_ATTACHMENTS);
 
 	// copy args
-	command.make_pass.desc = desc;
+	command.make_attachments.desc = desc;
 
-	// alloc pass
-	command.make_pass.pass = sg_alloc_pass();
+	// alloc attachments
+	command.make_attachments.attachments = sg_alloc_attachments();
 	
-	// return pass
-	return command.make_pass.pass;
+	// return attachments
+	return command.make_attachments.attachments;
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -462,16 +459,16 @@ void SokolCmdQueue::add_command_destroy_pipeline(sg_pipeline pipeline)
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdQueue::add_command_destroy_pass(sg_pass pass)
+void SokolCmdQueue::add_command_destroy_attachments(sg_attachments atts)
 {
 	// add command
-	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::DESTROY_PASS);
+	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::DESTROY_ATTACHMENTS);
 
 	// copy args
-	command.destroy_pass.pass = pass;
+	command.destroy_attachments.attachments = atts;
 
 	// schedule cleanup
-	schedule_cleanup(dealloc_pass_cb, (void*)(uintptr_t)command.destroy_pass.pass.id);
+	schedule_cleanup(dealloc_attachments_cb, (void*)(uintptr_t)command.destroy_attachments.attachments.id);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -512,27 +509,13 @@ void SokolCmdQueue::add_command_update_image(sg_image image, const sg_image_data
 
 // ----------------------------------------------------------------------------------------------------
 
-void SokolCmdQueue::add_command_begin_default_pass(const sg_pass_action& pass_action, int width, int height)
-{
-	// add command
-	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::BEGIN_DEFAULT_PASS);
-
-	// copy args
-	command.begin_default_pass.pass_action = pass_action;
-	command.begin_default_pass.width = width;
-	command.begin_default_pass.height = height;
-}
-
-// ----------------------------------------------------------------------------------------------------
-
-void SokolCmdQueue::add_command_begin_pass(sg_pass pass, const sg_pass_action& pass_action)
+void SokolCmdQueue::add_command_begin_pass(const sg_pass& pass)
 {
 	// add command
 	SokolRenderCommand& command = m_commands[m_pending_commands_index].emplace_back(SokolRenderCommand::TYPE::BEGIN_PASS);
 
 	// copy args
 	command.begin_pass.pass = pass;
-	command.begin_pass.pass_action = pass_action;
 }
 
 // ----------------------------------------------------------------------------------------------------

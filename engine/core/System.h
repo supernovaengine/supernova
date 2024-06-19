@@ -60,7 +60,8 @@ namespace Supernova {
         // *******
         // Used only for engine
         // *******
-        virtual sg_context_desc getSokolContext();
+        virtual sg_environment getSokolEnvironment();
+        virtual sg_swapchain getSokolSwapchain();
 
         virtual FILE* platformFopen(const char* fname, const char* mode);
         virtual bool syncFileSystem();

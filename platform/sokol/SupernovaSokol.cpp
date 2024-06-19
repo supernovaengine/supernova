@@ -16,8 +16,12 @@ int SupernovaSokol::getScreenHeight(){
     return sapp_height();
 }
 
-sg_context_desc SupernovaSokol::getSokolContext(){
-    return sapp_sgcontext();
+sg_environment SupernovaSokol::getSokolEnvironment(){
+    return sglue_environment();
+}
+
+sg_swapchain SupernovaSokol::getSokolSwapchain(){
+    return sglue_swapchain();
 }
 
 bool SupernovaSokol::isFullscreen(){

@@ -12,7 +12,8 @@ public:
     virtual int getScreenWidth();
     virtual int getScreenHeight();
 
-    virtual sg_context_desc getSokolContext();
+    virtual sg_environment getSokolEnvironment();
+    virtual sg_swapchain getSokolSwapchain();
 
     virtual bool isFullscreen();
     virtual void requestFullscreen();

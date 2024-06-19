@@ -55,7 +55,11 @@ System& System::instance(){
     return *instance;
 }
 
-sg_context_desc System::getSokolContext(){
+sg_environment System::getSokolEnvironment(){
+    return {};
+}
+
+sg_swapchain System::getSokolSwapchain(){
     return {};
 }
 

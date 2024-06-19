@@ -2769,7 +2769,7 @@ void RenderSystem::draw(){
 		}
 		
 		if (!camera.renderToTexture){
-			sceneRender.startDefaultFrameBuffer(System::instance().getScreenWidth(), System::instance().getScreenHeight());
+			sceneRender.startFrameBuffer();
 			sceneRender.applyViewport(Engine::getViewRect());
 		}else{
 			if (!camera.framebuffer->isCreated()){

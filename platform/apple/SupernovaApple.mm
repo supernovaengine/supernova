@@ -36,7 +36,7 @@ SupernovaApple::~SupernovaApple(){
 #endif
 }
 
-sg_context_desc SupernovaApple::getSokolContext(){
+sg_environment SupernovaApple::getSokolEnvironment(){
     return {
         .sample_count = (int)Renderer.view.sampleCount,
         .metal = {

@@ -28,7 +28,7 @@ void SokolSystem::setup(){
     sg_desc desc = {0};
     desc.buffer_pool_size = 1024; //default: 128
     desc.pipeline_pool_size = 512; //default: 64
-    desc.context = System::instance().getSokolContext();
+    desc.environment = System::instance().getSokolEnvironment();
 
     sg_setup(&desc);
 

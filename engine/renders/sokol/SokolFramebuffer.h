@@ -15,7 +15,7 @@ namespace Supernova{
     class SokolFramebuffer{
 
     private:
-        sg_pass pass[6];
+        sg_attachments attachments[6];
 
         TextureRender colorTexture;
         TextureRender depthTexture;
@@ -31,7 +31,7 @@ namespace Supernova{
 
         TextureRender& getColorTexture();
 
-        sg_pass get(size_t face);
+        sg_attachments get(size_t face);
     };
 }
 

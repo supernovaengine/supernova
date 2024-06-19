@@ -11,19 +11,19 @@ using namespace Supernova;
 
 SokolFramebuffer::SokolFramebuffer(){
     for (int i = 0; i < 6; i++){
-        pass[i].id = SG_INVALID_ID;
+        attachments[i].id = SG_INVALID_ID;
     }
 }
 
 SokolFramebuffer::SokolFramebuffer(const SokolFramebuffer& rhs){
     for (int i = 0; i < 6; i++){
-        pass[i] = rhs.pass[i];
+        attachments[i] = rhs.attachments[i];
     }
 }
 
 SokolFramebuffer& SokolFramebuffer::operator=(const SokolFramebuffer& rhs){
     for (int i = 0; i < 6; i++){
-        pass[i] = rhs.pass[i];
+        attachments[i] = rhs.attachments[i];
     }
     return *this;
 }
@@ -39,16 +39,16 @@ bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int
     size_t faces = (textureType == TextureType::TEXTURE_CUBE)? 6 : 1;
 
     for (int i = 0; i < faces; i++){
-        sg_pass_desc pass_desc = {0};
-        pass_desc.color_attachments[0].image = colorTexture.backend.get();
-        pass_desc.color_attachments[0].slice = i;
-        pass_desc.depth_stencil_attachment.image = depthTexture.backend.get();
-        pass_desc.label = "shadow-map-pass";
+        sg_attachments_desc attachments_desc = {0};
+        attachments_desc.colors[0].image = colorTexture.backend.get();
+        attachments_desc.colors[0].slice = i;
+        attachments_desc.depth_stencil.image = depthTexture.backend.get();
+        attachments_desc.label = "shadow-map-pass";
 
         if (Engine::isAsyncThread()){
-            pass[i] = SokolCmdQueue::add_command_make_pass(pass_desc);
+            attachments[i] = SokolCmdQueue::add_command_make_attachments(attachments_desc);
         }else{
-            pass[i] = sg_make_pass(pass_desc);
+            attachments[i] = sg_make_attachments(attachments_desc);
         }
     }
 
@@ -56,12 +56,12 @@ bool SokolFramebuffer::createFramebuffer(TextureType textureType, int width, int
 }
 
 void SokolFramebuffer::destroyFramebuffer(){
-    if (pass[0].id != SG_INVALID_ID && sg_isvalid()){
+    if (attachments[0].id != SG_INVALID_ID && sg_isvalid()){
         for (int i = 0; i < 6; i++){
             if (Engine::isAsyncThread()){
-                SokolCmdQueue::add_command_destroy_pass(pass[i]);
+                SokolCmdQueue::add_command_destroy_attachments(attachments[i]);
             }else{
-                sg_destroy_pass(pass[i]);
+                sg_destroy_attachments(attachments[i]);
             }
         }
         colorTexture.destroyTexture();
@@ -69,12 +69,12 @@ void SokolFramebuffer::destroyFramebuffer(){
     }
 
     for (int i = 0; i < 6; i++){
-        pass[i].id = SG_INVALID_ID;
+        attachments[i].id = SG_INVALID_ID;
     }
 }
 
 bool SokolFramebuffer::isCreated(){
-    if (pass[0].id != SG_INVALID_ID)
+    if (attachments[0].id != SG_INVALID_ID)
         return true;
 
     return false;
@@ -84,6 +84,6 @@ TextureRender& SokolFramebuffer::getColorTexture(){
     return colorTexture;
 }
 
-sg_pass SokolFramebuffer::get(size_t face){
-    return pass[face];
+sg_attachments SokolFramebuffer::get(size_t face){
+    return attachments[face];
 }

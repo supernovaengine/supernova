@@ -11,7 +11,7 @@ public:
     
     virtual ~SupernovaApple();
     
-    virtual sg_context_desc getSokolContext();
+    virtual sg_environment getSokolEnvironment();
 
     virtual int getScreenWidth();
     virtual int getScreenHeight();

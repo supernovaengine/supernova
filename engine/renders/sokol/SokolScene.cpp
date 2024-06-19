@@ -12,7 +12,7 @@
 using namespace Supernova;
 
 SokolScene::SokolScene(){
-    pass_action = {0};
+    //pass_action = {0};
     pass_action.colors[0].load_action = SG_LOADACTION_LOAD;
 }
 
@@ -33,14 +33,19 @@ void SokolScene::setClearColor(Vector4 clearColor){
 }
 
 void SokolScene::startFrameBuffer(FramebufferRender* framebuffer, size_t face){
-    sg_pass pass = framebuffer->backend.get(face);
-    //SokolCmdQueue::add_command_begin_pass(pass, pass_action);
-    sg_begin_pass(pass, pass_action);
+    sg_pass pass = {0};
+    pass.action = pass_action;
+    pass.attachments = framebuffer->backend.get(face);
+    //SokolCmdQueue::add_command_begin_pass(pass);
+    sg_begin_pass(pass);
 }
 
-void SokolScene::startDefaultFrameBuffer(int width, int height){
-    //SokolCmdQueue::add_command_begin_default_pass(pass_action, width, height);
-    sg_begin_default_pass(pass_action, width, height);
+void SokolScene::startFrameBuffer(){
+    sg_pass pass = {0};
+    pass.action = pass_action;
+    pass.swapchain = System::instance().getSokolSwapchain();
+    //SokolCmdQueue::add_command_begin_pass(pass);
+    sg_begin_pass(pass);
 }
 
 void SokolScene::applyViewport(Rect rect){

@@ -27,8 +27,8 @@ void SceneRender::startFrameBuffer(FramebufferRender* framebuffer, size_t face){
     backend.startFrameBuffer(framebuffer, face);
 }
 
-void SceneRender::startDefaultFrameBuffer(int width, int height){
-    backend.startDefaultFrameBuffer(width, height);
+void SceneRender::startFrameBuffer(){
+    backend.startFrameBuffer();
 }
 
 void SceneRender::applyViewport(Rect rect){
