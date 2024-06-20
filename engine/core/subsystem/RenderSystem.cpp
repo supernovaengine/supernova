@@ -2703,7 +2703,7 @@ void RenderSystem::draw(){
 		auto meshes = scene->getComponentArray<MeshComponent>();
 		auto terrains = scene->getComponentArray<TerrainComponent>();
 
-		depthRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
+		sceneRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
 		
 		for (int l = 0; l < lights->size(); l++){
 			LightComponent& light = lights->getComponentFromIndex(l);
@@ -2724,7 +2724,7 @@ void RenderSystem::draw(){
 						fb = 0;
 					}
 
-					depthRender.startFrameBuffer(&light.framebuffer[fb], face);
+					sceneRender.startFrameBuffer(&light.framebuffer[fb], face);
 					for (int i = 0; i < meshes->size(); i++){
 						MeshComponent& mesh = meshes->getComponentFromIndex(i);
 						Entity entity = meshes->getEntity(i);
@@ -2747,7 +2747,7 @@ void RenderSystem::draw(){
 							}
 						}
 					}
-					depthRender.endFrameBuffer();
+					sceneRender.endFrameBuffer();
 				}
 			}
 		}

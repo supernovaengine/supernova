@@ -76,7 +76,6 @@ namespace Supernova{
 
 		Scene* scene;
 		SceneRender sceneRender;
-		SceneRender depthRender;
 
 		static uint32_t pixelsWhite[64];
 		static uint32_t pixelsBlack[64];
