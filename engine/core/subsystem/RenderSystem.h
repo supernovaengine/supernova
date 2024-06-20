@@ -20,7 +20,7 @@
 #include "component/SpriteComponent.h"
 #include "component/Transform.h"
 #include "render/ObjectRender.h"
-#include "render/SceneRender.h"
+#include "render/CameraRender.h"
 #include "render/BufferRender.h"
 #include "render/FramebufferRender.h"
 #include "Engine.h"
@@ -75,7 +75,6 @@ namespace Supernova{
 		};
 
 		Scene* scene;
-		SceneRender sceneRender;
 
 		static uint32_t pixelsWhite[64];
 		static uint32_t pixelsBlack[64];

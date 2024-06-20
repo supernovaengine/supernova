@@ -145,7 +145,7 @@
 #include "render/FramebufferRender.h"
 #include "render/ObjectRender.h"
 #include "render/Render.h"
-#include "render/SceneRender.h"
+#include "render/CameraRender.h"
 #include "render/ShaderRender.h"
 #include "render/SystemRender.h"
 #include "render/TextureRender.h"

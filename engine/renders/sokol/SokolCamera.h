@@ -2,8 +2,8 @@
 // (c) 2024 Eduardo Doria.
 //
 
-#ifndef sokolscene_h
-#define sokolscene_h
+#ifndef SokolCamera_h
+#define SokolCamera_h
 
 #include "math/Rect.h"
 #include "math/Vector4.h"
@@ -12,16 +12,16 @@
 #include "sokol_gfx.h"
 
 namespace Supernova{
-    class SokolScene{
+    class SokolCamera{
 
     private:
-        sg_pass_action pass_action;
+        sg_pass pass;
 
     public:
-        SokolScene();
-        SokolScene(const SokolScene& rhs);
-        SokolScene& operator=(const SokolScene& rhs);
-        virtual ~SokolScene();
+        SokolCamera();
+        SokolCamera(const SokolCamera& rhs);
+        SokolCamera& operator=(const SokolCamera& rhs);
+        virtual ~SokolCamera();
 
         void setClearColor(Vector4 clearColor);
 
@@ -35,4 +35,4 @@ namespace Supernova{
     };
 }
 
-#endif //sokolscene_h
+#endif //SokolCamera_h

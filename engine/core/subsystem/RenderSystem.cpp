@@ -2702,8 +2702,6 @@ void RenderSystem::draw(){
 		auto lights = scene->getComponentArray<LightComponent>();
 		auto meshes = scene->getComponentArray<MeshComponent>();
 		auto terrains = scene->getComponentArray<TerrainComponent>();
-
-		sceneRender.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
 		
 		for (int l = 0; l < lights->size(); l++){
 			LightComponent& light = lights->getComponentFromIndex(l);
@@ -2723,8 +2721,9 @@ void RenderSystem::draw(){
 						face = c;
 						fb = 0;
 					}
+					light.cameras[c].render.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
 
-					sceneRender.startFrameBuffer(&light.framebuffer[fb], face);
+					light.cameras[c].render.startFrameBuffer(&light.framebuffer[fb], face);
 					for (int i = 0; i < meshes->size(); i++){
 						MeshComponent& mesh = meshes->getComponentFromIndex(i);
 						Entity entity = meshes->getEntity(i);
@@ -2747,7 +2746,7 @@ void RenderSystem::draw(){
 							}
 						}
 					}
-					sceneRender.endFrameBuffer();
+					light.cameras[c].render.endFrameBuffer();
 				}
 			}
 		}
@@ -2765,17 +2764,17 @@ void RenderSystem::draw(){
 		}
 
 		if (Engine::getMainScene() == scene || camera.renderToTexture){
-			sceneRender.setClearColor(scene->getBackgroundColor());
+			camera.render.setClearColor(scene->getBackgroundColor());
 		}
 		
 		if (!camera.renderToTexture){
-			sceneRender.startFrameBuffer();
-			sceneRender.applyViewport(Engine::getViewRect());
+			camera.render.startFrameBuffer();
+			camera.render.applyViewport(Engine::getViewRect());
 		}else{
 			if (!camera.framebuffer->isCreated()){
 				createFramebuffer(camera);
 			}
-			sceneRender.startFrameBuffer(&camera.framebuffer->getRender());
+			camera.render.startFrameBuffer(&camera.framebuffer->getRender());
 		}
 
 		//---------Draw opaque meshes and UI----------
@@ -2821,7 +2820,7 @@ void RenderSystem::draw(){
 						parentScissor = parentLayout.scissor;
 						if (!parentScissor.isZero()){
 							if (!layout.ignoreScissor){
-								sceneRender.applyScissor(parentScissor);
+								camera.render.applyScissor(parentScissor);
 								hasActiveScissor = true;
 							}
 							layout.scissor = parentScissor;
@@ -2894,7 +2893,7 @@ void RenderSystem::draw(){
 			}
 
 			if (hasActiveScissor){
-				sceneRender.applyScissor(Rect(0, 0, System::instance().getScreenWidth(), System::instance().getScreenHeight()));
+				camera.render.applyScissor(Rect(0, 0, System::instance().getScreenWidth(), System::instance().getScreenHeight()));
 				hasActiveScissor = false;
 			}
 		}
@@ -2909,7 +2908,7 @@ void RenderSystem::draw(){
 			transparentMeshes.pop();
 		}
 
-		sceneRender.endFrameBuffer();
+		camera.render.endFrameBuffer();
 
 	}
 

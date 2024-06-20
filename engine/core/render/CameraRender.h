@@ -2,23 +2,23 @@
 // (c) 2024 Eduardo Doria.
 //
 
-#ifndef SceneRender_h
-#define SceneRender_h
+#ifndef CameraRender_h
+#define CameraRender_h
 
 #include "math/Rect.h"
-#include "sokol/SokolScene.h"
+#include "sokol/SokolCamera.h"
 
 namespace Supernova{
-    class SceneRender{        
+    class CameraRender{        
     public:
         //***Backend***
-        SokolScene backend;
+        SokolCamera backend;
         //***
 
-        SceneRender();
-        SceneRender(const SceneRender& rhs);
-        SceneRender& operator=(const SceneRender& rhs);
-        virtual ~SceneRender();
+        CameraRender();
+        CameraRender(const CameraRender& rhs);
+        CameraRender& operator=(const CameraRender& rhs);
+        virtual ~CameraRender();
 
         void setClearColor(Vector4 clearColor);
 
@@ -33,4 +33,4 @@ namespace Supernova{
 }
 
 
-#endif /* SceneRender_h */
+#endif /* CameraRender_h */

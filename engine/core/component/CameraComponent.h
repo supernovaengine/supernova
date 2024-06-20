@@ -9,6 +9,7 @@
 #include "math/Matrix4.h"
 #include "math/Plane.h"
 #include "texture/Framebuffer.h"
+#include "render/CameraRender.h"
 
 #define DEFAULT_ORTHO_NEAR          -10
 #define DEFAULT_ORTHO_FAR           10
@@ -60,6 +61,8 @@ namespace Supernova{
 
         bool needUpdateFrustumPlanes = true;
         Plane frustumPlanes[6];
+
+        CameraRender render;
 
 		bool renderToTexture = false;
         // need to be a pointer to not lost reference when component changes position
