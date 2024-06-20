@@ -8,6 +8,7 @@
 #include "sokol_gfx.h"
 #include "SokolCmdQueue.h"
 #include "Engine.h"
+#include "Log.h"
 
 // Render thread
 // 
@@ -23,12 +24,32 @@
 
 using namespace Supernova;
 
+void sokol_log(const char* tag,                // e.g. 'sg'
+                    uint32_t log_level,             // 0=panic, 1=error, 2=warn, 3=info
+                    uint32_t log_item_id,           // SG_LOGITEM_*
+                    const char* message_or_null,    // a message string, may be nullptr in release mode
+                    uint32_t line_nr,               // line number in sokol_gfx.h
+                    const char* filename_or_null,   // source filename, may be nullptr in release mode
+                    void* user_data){
+    if (log_level == 0){
+        Log::print("(PANIC): %s\n", message_or_null);
+    }else if (log_level == 1){
+        Log::error("%s\n", message_or_null);
+    }else if (log_level == 2){
+        Log::warn("%s\n", message_or_null);
+    }else if (log_level == 3){
+        Log::verbose("%s\n", message_or_null);
+    }
+}
+
+
 void SokolSystem::setup(){
     /* setup sokol_gfx */
     sg_desc desc = {0};
     desc.buffer_pool_size = 1024; //default: 128
     desc.pipeline_pool_size = 512; //default: 64
     desc.environment = System::instance().getSokolEnvironment();
+    desc.logger.func = sokol_log;
 
     sg_setup(&desc);
 

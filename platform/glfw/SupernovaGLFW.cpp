@@ -41,7 +41,7 @@ int SupernovaGLFW::init(int argc, char **argv){
     glfwInit();
     glfwWindowHint(GLFW_SAMPLES, (sampleCount == 1) ? 0 : sampleCount);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     window = glfwCreateWindow(windowWidth, windowHeight, "Supernova", 0, 0);

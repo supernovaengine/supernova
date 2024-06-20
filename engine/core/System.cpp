@@ -129,7 +129,7 @@ void System::platformLog(const int type, const char *fmt, va_list args){
     }
 
     if ((type == S_LOG_VERBOSE) || (type == S_LOG_DEBUG) || (type == S_LOG_WARN) || (type == S_LOG_ERROR))
-        printf("( %s ): ", priority);
+        printf("(%s): ", priority);
 
     vprintf(fmt, args);
     printf("\n");
