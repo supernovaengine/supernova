@@ -21,7 +21,7 @@ using namespace Supernova;
 
 
 
-lua_State *LuaBinding::luastate;
+lua_State *LuaBinding::luastate = NULL;
 
 
 LuaBinding::LuaBinding() {
@@ -44,9 +44,9 @@ lua_State* LuaBinding::getLuaState(){
 }
 
 void LuaBinding::luaCallback(int nargs, int nresults, int msgh){
-    int status = lua_pcall(LuaBinding::getLuaState(), nargs, nresults, msgh);
+    int status = lua_pcall(luastate, nargs, nresults, msgh);
     if (status != 0){
-        Log::error("Lua Error: %s", lua_tostring(LuaBinding::getLuaState(), -1));
+        Log::error("Lua Error: %s", lua_tostring(luastate, -1));
     }
 }
 
@@ -74,7 +74,7 @@ void LuaBinding::stackDump (lua_State *L) {
 
 int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
 
-    lua_State *L = LuaBinding::getLuaState();
+    lua_State *L = luastate;
 
     // Add the package loader to the package.loaders table.
     lua_getglobal(L, "package");
@@ -108,7 +108,8 @@ int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
 
 // Note it can be done in the same way with Sol2: https://github.com/ThePhD/sol2/issues/692
 int LuaBinding::setLuaPath(const char* path) {
-    lua_State *L = LuaBinding::getLuaState();
+
+    lua_State *L = luastate;
 
     lua_getglobal( L, "package" );
     if(lua_isnil(L, -1))
@@ -179,7 +180,7 @@ int LuaBinding::handleLuaError(lua_State* L) {
 
 void LuaBinding::init(){
 
-    lua_State *L = LuaBinding::getLuaState();
+    lua_State *L = luastate;
 
     std::string luadir = std::string("lua") + System::instance().getDirSeparator();
 
@@ -231,9 +232,8 @@ void LuaBinding::registerClasses(lua_State *L){
 
 
 void LuaBinding::cleanup(){
-    lua_State *L = LuaBinding::getLuaState();
-
-    if (L) {
-        lua_close(L);
+    if (luastate) {
+        lua_close(luastate);
+        luastate = NULL;
     }
 }
