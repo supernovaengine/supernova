@@ -56,11 +56,28 @@ System& System::instance(){
 }
 
 sg_environment System::getSokolEnvironment(){
-    return {};
+    sg_environment env = {};
+
+    env.defaults.sample_count = 1;
+    env.defaults.color_format = SG_PIXELFORMAT_RGBA8;
+    env.defaults.depth_format = SG_PIXELFORMAT_DEPTH_STENCIL;
+
+    return env;
 }
 
 sg_swapchain System::getSokolSwapchain(){
-    return {};
+    sg_swapchain swapchain = { 0 };
+
+    swapchain.width = getScreenWidth();
+    swapchain.height = getScreenHeight();
+    swapchain.sample_count = 1;
+    swapchain.color_format = SG_PIXELFORMAT_RGBA8;
+    swapchain.depth_format = SG_PIXELFORMAT_DEPTH_STENCIL;
+
+    // we just assume here that the GL framebuffer is always 0
+    swapchain.gl.framebuffer = 0;
+
+    return swapchain;
 }
 
 void System::showVirtualKeyboard(std::wstring text){
