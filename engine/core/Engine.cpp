@@ -462,6 +462,8 @@ void Engine::systemInit(int argc, char* argv[]){
 void Engine::systemViewLoaded(){
     SystemRender::setup();
 
+    asyncThread = false;
+
     viewLoaded = true;
     onViewLoaded.call();
     

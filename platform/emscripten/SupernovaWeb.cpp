@@ -12,6 +12,14 @@
 #include "Log.h"
 #include "AudioSystem.h"
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
+
+std::string SupernovaWeb::canvas;
+
 int SupernovaWeb::syncWaitTime;
 bool SupernovaWeb::enabledIDB;
 
@@ -92,6 +100,8 @@ int SupernovaWeb::getScreenHeight(){
 
 int SupernovaWeb::init(int argc, char **argv){
 
+    canvas = "#canvas";
+
     int sWidth = 960;
     int sHeight = 540;
     if ((argv[1] != NULL && argv[1] != 0) && (argv[2] != NULL && argv[2] != 0)){
@@ -99,25 +109,29 @@ int SupernovaWeb::init(int argc, char **argv){
         sHeight = atoi(argv[2]);
     }
 
+    bool antiAlias = true;
+
     EMSCRIPTEN_RESULT ret = emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, true, key_callback);
     ret = emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, true, key_callback);
     ret = emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, true, key_callback);
-    ret = emscripten_set_mousedown_callback("#canvas", 0, true, mouse_callback);
-    ret = emscripten_set_mouseup_callback("#canvas", 0, true, mouse_callback);
-    ret = emscripten_set_mousemove_callback("#canvas", 0, true, mouse_callback);
-    ret = emscripten_set_mouseenter_callback("#canvas", 0, true, mouse_callback);
-    ret = emscripten_set_mouseleave_callback("#canvas", 0, true, mouse_callback);
-    ret = emscripten_set_wheel_callback("#canvas", 0, true, wheel_callback);
-    ret = emscripten_set_touchstart_callback("#canvas", 0, true, touch_callback);
-    ret = emscripten_set_touchmove_callback("#canvas", 0, true, touch_callback);
-    ret = emscripten_set_touchend_callback("#canvas", 0, true, touch_callback);
-    ret = emscripten_set_touchcancel_callback("#canvas", 0, true, touch_callback);
-    ret = emscripten_set_webglcontextlost_callback("#canvas", 0, true, webgl_context_callback);
-    ret = emscripten_set_webglcontextrestored_callback("#canvas", 0, true, webgl_context_callback);
+    ret = emscripten_set_mousedown_callback(canvas.c_str(), 0, true, mouse_callback);
+    ret = emscripten_set_mouseup_callback(canvas.c_str(), 0, true, mouse_callback);
+    ret = emscripten_set_mousemove_callback(canvas.c_str(), 0, true, mouse_callback);
+    ret = emscripten_set_mouseenter_callback(canvas.c_str(), 0, true, mouse_callback);
+    ret = emscripten_set_mouseleave_callback(canvas.c_str(), 0, true, mouse_callback);
+    ret = emscripten_set_wheel_callback(canvas.c_str(), 0, true, wheel_callback);
+    ret = emscripten_set_touchstart_callback(canvas.c_str(), 0, true, touch_callback);
+    ret = emscripten_set_touchmove_callback(canvas.c_str(), 0, true, touch_callback);
+    ret = emscripten_set_touchend_callback(canvas.c_str(), 0, true, touch_callback);
+    ret = emscripten_set_touchcancel_callback(canvas.c_str(), 0, true, touch_callback);
+    ret = emscripten_set_webglcontextlost_callback(canvas.c_str(), 0, true, webgl_context_callback);
+    ret = emscripten_set_webglcontextrestored_callback(canvas.c_str(), 0, true, webgl_context_callback);
 
-    //Removed because emscripten_set_canvas_element_size is not working on this callback
-    //ret = emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, 0, 1, fullscreenchange_callback);
-    //ret = emscripten_set_resize_callback("#canvas", 0, 1, canvasresize_callback);
+    // necessary if canvas size is relative by window
+    //ret = emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, resize_callback);
+
+    // removed because emscripten_set_canvas_element_size is not working on this callback
+    //ret = emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, 1, fullscreenchange_callback);
 
     syncWaitTime = 0;
     enabledIDB = false;
@@ -130,8 +144,6 @@ int SupernovaWeb::init(int argc, char **argv){
 	);
 
     Supernova::Engine::systemInit(argc, argv);
-
-    bool antiAlias = false;
 
     sampleCount = (antiAlias) ? 4 : 1;
 
@@ -148,7 +160,7 @@ int SupernovaWeb::init(int argc, char **argv){
     attr.majorVersion = 2;
     attr.minorVersion = 0;
     attr.antialias = antiAlias;
-    EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_create_context("#canvas", &attr);
+    EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_create_context(canvas.c_str(), &attr);
     
     emscripten_webgl_make_context_current(ctx);
 
@@ -157,13 +169,13 @@ int SupernovaWeb::init(int argc, char **argv){
     Supernova::Engine::systemViewLoaded();
     changeCanvasSize(sWidth, sHeight);
 
-    emscripten_set_main_loop(renderLoop, 0, 1);
+    emscripten_request_animation_frame_loop(renderLoop, 0);
 
     return 0;
 }
 
 void SupernovaWeb::changeCanvasSize(int width, int height){
-    emscripten_set_canvas_element_size("#canvas", width, height);
+    emscripten_set_canvas_element_size(canvas.c_str(), width, height);
 
     SupernovaWeb::screenWidth = width;
     SupernovaWeb::screenHeight = height;
@@ -185,7 +197,7 @@ void SupernovaWeb::requestFullscreen(){
     strategy.canvasResizedCallback = canvas_resize;
     strategy.canvasResizedCallbackUserData = NULL;
 
-    EMSCRIPTEN_RESULT ret = emscripten_request_fullscreen_strategy("#canvas", 1, &strategy);
+    EMSCRIPTEN_RESULT ret = emscripten_request_fullscreen_strategy(canvas.c_str(), 1, &strategy);
 }
 
 void SupernovaWeb::exitFullscreen(){
@@ -204,12 +216,13 @@ sg_environment SupernovaWeb::getSokolEnvironment(){
 
 sg_swapchain SupernovaWeb::getSokolSwapchain(){
     return (sg_swapchain) {
-        .width = getScreenWidth(),
-        .height = getScreenHeight(),
+        .width = (int)screenWidth,
+        .height = (int)screenHeight,
         .sample_count = sampleCount,
         .color_format = SG_PIXELFORMAT_RGBA8,
         .depth_format = SG_PIXELFORMAT_DEPTH_STENCIL,
         .gl = {
+            // we just assume here that the GL framebuffer is always 0
             .framebuffer = 0,
         }
     };
@@ -226,7 +239,7 @@ bool SupernovaWeb::syncFileSystem(){
     return true;
 }
 
-void SupernovaWeb::renderLoop(){    
+EM_BOOL SupernovaWeb::renderLoop(double time, void* userdata){
     Supernova::Engine::systemDraw();
 
     if (syncWaitTime > 0) {
@@ -240,17 +253,27 @@ void SupernovaWeb::renderLoop(){
 	        );
         }
     }
+
+    return EM_TRUE;
+}
+
+EM_BOOL SupernovaWeb::resize_callback(int event_type, const EmscriptenUiEvent* ui_event, void* user_data){
+    int w, h;
+    emscripten_get_canvas_element_size(canvas.c_str(), &w, &h);
+    changeCanvasSize(w, h);
+
+    return EM_TRUE;
 }
 
 EM_BOOL SupernovaWeb::canvas_resize(int eventType, const void *reserved, void *userData){
     int w, h;
-    emscripten_get_canvas_element_size("#canvas", &w, &h);
+    emscripten_get_canvas_element_size(canvas.c_str(), &w, &h);
 
     SupernovaWeb::screenWidth = w;
     SupernovaWeb::screenHeight = h;
     Supernova::Engine::systemViewChanged();
 
-    return 0;
+    return EM_TRUE;
 }
 
 wchar_t SupernovaWeb::toCodepoint(const std::string &u){
@@ -336,7 +359,7 @@ EM_BOOL SupernovaWeb::key_callback(int eventType, const EmscriptenKeyboardEvent 
         }
     }
 
-    return 0;
+    return EM_TRUE;
 }
 
 EM_BOOL SupernovaWeb::mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData) {
@@ -369,7 +392,7 @@ EM_BOOL SupernovaWeb::mouse_callback(int eventType, const EmscriptenMouseEvent *
         Supernova::Engine::systemMouseLeave();
     }
 
-    return 0;
+    return EM_TRUE;
 }
 
 EM_BOOL SupernovaWeb::wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData) {
@@ -389,7 +412,7 @@ EM_BOOL SupernovaWeb::wheel_callback(int eventType, const EmscriptenWheelEvent *
 
     Supernova::Engine::systemMouseScroll(scale * (float)e->deltaX, scale * (float)e->deltaY, modifiers);
 
-  return 0;
+  return EM_TRUE;
 }
 
 EM_BOOL SupernovaWeb::touch_callback(int emsc_type, const EmscriptenTouchEvent* emsc_event, void* user_data) {
@@ -432,7 +455,7 @@ EM_BOOL SupernovaWeb::webgl_context_callback(int emsc_type, const void* reserved
         default:                                    break;
     }
 
-    return true;
+    return EM_TRUE;
 }
 
 int SupernovaWeb::supernova_mouse_button(int button){
