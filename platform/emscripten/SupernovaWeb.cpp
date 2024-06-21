@@ -15,8 +15,10 @@
 int SupernovaWeb::syncWaitTime;
 bool SupernovaWeb::enabledIDB;
 
-int SupernovaWeb::screenWidth;
-int SupernovaWeb::screenHeight;
+int SupernovaWeb::screenWidth = 0;
+int SupernovaWeb::screenHeight = 0;
+
+int SupernovaWeb::sampleCount = 0;
 
 extern "C" {
     EMSCRIPTEN_KEEPALIVE 
@@ -129,6 +131,10 @@ int SupernovaWeb::init(int argc, char **argv){
 
     Supernova::Engine::systemInit(argc, argv);
 
+    bool antiAlias = false;
+
+    sampleCount = (antiAlias) ? 4 : 1;
+
     EmscriptenWebGLContextAttributes attr;
     emscripten_webgl_init_context_attributes(&attr);
     attr.alpha = true;
@@ -141,6 +147,7 @@ int SupernovaWeb::init(int argc, char **argv){
     attr.premultipliedAlpha = true;
     attr.majorVersion = 2;
     attr.minorVersion = 0;
+    attr.antialias = antiAlias;
     EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_create_context("#canvas", &attr);
     
     emscripten_webgl_make_context_current(ctx);
@@ -183,6 +190,29 @@ void SupernovaWeb::requestFullscreen(){
 
 void SupernovaWeb::exitFullscreen(){
     EMSCRIPTEN_RESULT ret = emscripten_exit_fullscreen();
+}
+
+sg_environment SupernovaWeb::getSokolEnvironment(){
+    return (sg_environment){
+        .defaults = {
+            .color_format = SG_PIXELFORMAT_RGBA8,
+            .depth_format = SG_PIXELFORMAT_DEPTH_STENCIL,
+            .sample_count = sampleCount,
+        }
+    };
+}
+
+sg_swapchain SupernovaWeb::getSokolSwapchain(){
+    return (sg_swapchain) {
+        .width = getScreenWidth(),
+        .height = getScreenHeight(),
+        .sample_count = sampleCount,
+        .color_format = SG_PIXELFORMAT_RGBA8,
+        .depth_format = SG_PIXELFORMAT_DEPTH_STENCIL,
+        .gl = {
+            .framebuffer = 0,
+        }
+    };
 }
 
 std::string SupernovaWeb::getUserDataPath(){

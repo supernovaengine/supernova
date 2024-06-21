@@ -14,6 +14,8 @@ private:
     static int screenWidth;
     static int screenHeight;
 
+    static int sampleCount;
+
     static EM_BOOL key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData);
     static EM_BOOL mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData);
     static EM_BOOL wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData);
@@ -44,6 +46,9 @@ public:
     virtual bool isFullscreen();
     virtual void requestFullscreen();
     virtual void exitFullscreen();
+
+    virtual sg_environment getSokolEnvironment();
+    virtual sg_swapchain getSokolSwapchain();
 
     virtual std::string getUserDataPath();
 
