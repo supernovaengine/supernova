@@ -48,6 +48,8 @@ public:
     virtual int getScreenWidth();
     virtual int getScreenHeight();
 
+    virtual int getSampleCount();
+
     virtual bool isFullscreen();
     virtual void requestFullscreen();
     virtual void exitFullscreen();

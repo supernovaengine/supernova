@@ -98,6 +98,10 @@ int SupernovaWeb::getScreenHeight(){
     return screenHeight;
 }
 
+int SupernovaWeb::getSampleCount(){
+    return sampleCount;
+}
+
 int SupernovaWeb::init(int argc, char **argv){
 
     canvas = "#canvas";
@@ -202,30 +206,6 @@ void SupernovaWeb::requestFullscreen(){
 
 void SupernovaWeb::exitFullscreen(){
     EMSCRIPTEN_RESULT ret = emscripten_exit_fullscreen();
-}
-
-sg_environment SupernovaWeb::getSokolEnvironment(){
-    return (sg_environment){
-        .defaults = {
-            .color_format = SG_PIXELFORMAT_RGBA8,
-            .depth_format = SG_PIXELFORMAT_DEPTH_STENCIL,
-            .sample_count = sampleCount,
-        }
-    };
-}
-
-sg_swapchain SupernovaWeb::getSokolSwapchain(){
-    return (sg_swapchain) {
-        .width = (int)screenWidth,
-        .height = (int)screenHeight,
-        .sample_count = sampleCount,
-        .color_format = SG_PIXELFORMAT_RGBA8,
-        .depth_format = SG_PIXELFORMAT_DEPTH_STENCIL,
-        .gl = {
-            // we just assume here that the GL framebuffer is always 0
-            .framebuffer = 0,
-        }
-    };
 }
 
 std::string SupernovaWeb::getUserDataPath(){

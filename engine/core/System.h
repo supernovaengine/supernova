@@ -43,6 +43,8 @@ namespace Supernova {
         virtual int getScreenWidth() = 0;
         virtual int getScreenHeight() = 0;
 
+        virtual int getSampleCount();
+
         virtual void showVirtualKeyboard(std::wstring text = L"");
         virtual void hideVirtualKeyboard();
 

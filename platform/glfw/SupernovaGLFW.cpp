@@ -18,7 +18,6 @@ double SupernovaGLFW::mousePosX;
 double SupernovaGLFW::mousePosY;
 
 int SupernovaGLFW::sampleCount;
-bool SupernovaGLFW::noDepthBuffer;
 
 GLFWwindow* SupernovaGLFW::window;
 GLFWmonitor* SupernovaGLFW::monitor;
@@ -33,7 +32,6 @@ int SupernovaGLFW::init(int argc, char **argv){
     windowHeight = 540;
 
     sampleCount = 1;
-    noDepthBuffer = true;
 
     Supernova::Engine::systemInit(argc, argv);
 
@@ -130,28 +128,8 @@ int SupernovaGLFW::getScreenHeight(){
     return SupernovaGLFW::screenHeight;
 }
 
-sg_environment SupernovaGLFW::getSokolEnvironment(){
-    return (sg_environment) {
-        .defaults = {
-            .color_format = SG_PIXELFORMAT_RGBA8,
-            .depth_format = noDepthBuffer ? SG_PIXELFORMAT_NONE : SG_PIXELFORMAT_DEPTH_STENCIL,
-            .sample_count = sampleCount,
-        },
-    };
-}
-
-sg_swapchain SupernovaGLFW::getSokolSwapchain(){
-    return (sg_swapchain) {
-        .width = getScreenWidth(),
-        .height = getScreenHeight(),
-        .sample_count = sampleCount,
-        .color_format = SG_PIXELFORMAT_RGBA8,
-        .depth_format = noDepthBuffer ? SG_PIXELFORMAT_NONE : SG_PIXELFORMAT_DEPTH_STENCIL,
-        .gl = {
-            // we just assume here that the GL framebuffer is always 0
-            .framebuffer = 0,
-        }
-    };
+int SupernovaGLFW::getSampleCount(){
+    return SupernovaGLFW::sampleCount;
 }
 
 bool SupernovaGLFW::isFullscreen(){
