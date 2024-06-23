@@ -54,9 +54,6 @@ public:
     virtual void requestFullscreen();
     virtual void exitFullscreen();
 
-    virtual sg_environment getSokolEnvironment();
-    virtual sg_swapchain getSokolSwapchain();
-
     virtual std::string getUserDataPath();
 
     virtual bool syncFileSystem();
