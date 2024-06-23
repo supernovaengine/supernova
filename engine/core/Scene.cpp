@@ -80,7 +80,7 @@ Scene::Scene(){
 	ambientLight = Vector3(1.0, 1.0, 1.0);
 	ambientFactor = 0.2;
 
-	enableUIEvents = false;
+	enableUIEvents = true;
 }
 
 Scene::~Scene(){
