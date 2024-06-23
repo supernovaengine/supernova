@@ -11,18 +11,6 @@
 static AdMobAdapter* admob = nil;
 #endif
 
-static const void* osx_mtk_get_render_pass_descriptor(void* user_data) {
-    //assert(user_data == (void*)0xABCDABCD);
-    //(void)user_data;
-    return (__bridge const void*) [Renderer.view currentRenderPassDescriptor];
-}
-
-static const void* osx_mtk_get_drawable(void* user_data) {
-    //assert(user_data == (void*)0xABCDABCD);
-    //(void)user_data;
-    return (__bridge const void*) [Renderer.view currentDrawable];
-}
-
 SupernovaApple::SupernovaApple(){
 #if TARGET_OS_IPHONE
     if (!admob)
@@ -37,13 +25,29 @@ SupernovaApple::~SupernovaApple(){
 }
 
 sg_environment SupernovaApple::getSokolEnvironment(){
-    return {
-        .sample_count = (int)Renderer.view.sampleCount,
+    return (sg_environment) {
+        .defaults = {
+            .sample_count = (int)Renderer.view.sampleCount,
+            .color_format = SG_PIXELFORMAT_BGRA8,
+            .depth_format = SG_PIXELFORMAT_DEPTH_STENCIL,
+        },
         .metal = {
             .device = (__bridge const void*) Renderer.view.device,
-            .renderpass_descriptor_userdata_cb = osx_mtk_get_render_pass_descriptor,
-            .drawable_userdata_cb = osx_mtk_get_drawable
-            //.user_data = (void*)0xABCDABCD
+        }
+    };
+}
+
+sg_swapchain SupernovaApple::getSokolSwapchain(){
+    return (sg_swapchain) {
+        .width = (int)Renderer.screenSize.width,
+        .height = (int)Renderer.screenSize.height,
+        .sample_count = (int)Renderer.view.sampleCount,
+        .color_format = SG_PIXELFORMAT_BGRA8,
+        .depth_format = SG_PIXELFORMAT_DEPTH_STENCIL,
+        .metal = {
+            .current_drawable = (__bridge const void*) [Renderer.view currentDrawable],
+            .depth_stencil_texture = (__bridge const void*) [Renderer.view depthStencilTexture],
+            .msaa_color_texture = (__bridge const void*) [Renderer.view multisampleColorTexture],
         }
     };
 }
@@ -54,6 +58,10 @@ int SupernovaApple::getScreenWidth(){
 
 int SupernovaApple::getScreenHeight(){
     return Renderer.screenSize.height;
+}
+
+int SupernovaApple::getSampleCount(){
+    return (int)Renderer.view.sampleCount;
 }
 
 void SupernovaApple::showVirtualKeyboard(std::wstring text){

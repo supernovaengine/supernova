@@ -12,10 +12,13 @@ public:
     virtual ~SupernovaApple();
     
     virtual sg_environment getSokolEnvironment();
+    virtual sg_swapchain getSokolSwapchain();
 
     virtual int getScreenWidth();
     virtual int getScreenHeight();
     
+    virtual int getSampleCount();
+
     virtual void showVirtualKeyboard(std::wstring text);
     virtual void hideVirtualKeyboard();
     
