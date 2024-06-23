@@ -84,11 +84,11 @@ jobs:
           }
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install Emscripten
         if: ${{ startsWith(matrix.config.platform, 'web') }}
-        uses: mymindstorm/setup-emsdk@v11
+        uses: mymindstorm/setup-emsdk@v14
         with:
           version: latest
         
