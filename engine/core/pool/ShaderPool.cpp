@@ -9,7 +9,7 @@
 #include "shader/SBSReader.h"
 #include "util/Base64.h"
 
-#ifdef SOKOL_GLCORE33
+#ifdef SOKOL_GLCORE
 #include "glsl330.h"
 #endif
 #ifdef SOKOL_GLES3

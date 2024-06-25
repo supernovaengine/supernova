@@ -354,7 +354,7 @@ Platform Engine::getPlatform(){
 }
 
 GraphicBackend Engine::getGraphicBackend(){
-#if defined(SOKOL_GLCORE33)
+#if defined(SOKOL_GLCORE)
     return GraphicBackend::GLCORE33;
 #elif defined(SOKOL_GLES3)
     return GraphicBackend::GLES3;
