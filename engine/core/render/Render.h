@@ -97,6 +97,30 @@ namespace Supernova{
         TERRAINNODE_VS_PARAMS
     };
 
+    enum class StorageBufferType{
+        PBR_VS_PARAMS,
+        MATERIAL,
+        PBR_FS_PARAMS,
+        FS_LIGHTING,
+        FS_FOG,
+        VS_SHADOWS,
+        FS_SHADOWS,
+        SKY_VS_PARAMS,
+        SKY_FS_PARAMS,
+        DEPTH_VS_PARAMS,
+        SPRITE_VS_PARAMS,
+        UI_VS_PARAMS,
+        UI_FS_PARAMS,
+        POINTS_VS_PARAMS,
+        LINES_VS_PARAMS,
+        VS_SKINNING,
+        DEPTH_VS_SKINNING,
+        VS_MORPHTARGET,
+        DEPTH_VS_MORPHTARGET,
+        TERRAIN_VS_PARAMS,
+        TERRAINNODE_VS_PARAMS
+    };
+
     enum class TextureShaderType{
         BASECOLOR,
         EMISSIVE,
@@ -183,6 +207,10 @@ namespace Supernova{
         INT2,
         INT3,
         INT4
+    };
+
+    enum class ShaderStorageBufferType{
+        STRUCT
     };
 
     enum class ShaderUniformType{

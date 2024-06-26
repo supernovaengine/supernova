@@ -10,7 +10,7 @@
 #include "util/Base64.h"
 
 #ifdef SOKOL_GLCORE
-#include "glsl330.h"
+#include "glsl430.h"
 #endif
 #ifdef SOKOL_GLES3
 #include "glsl300es.h"
@@ -43,7 +43,7 @@ std::vector<std::string>& ShaderPool::getMissingShaders(){
 
 std::string ShaderPool::getShaderLangStr(){
 	if (Engine::getGraphicBackend() == GraphicBackend::GLCORE33){
-		return "glsl330";
+		return "glsl430";
 	}else if (Engine::getGraphicBackend() == GraphicBackend::GLES3){
 		return "glsl300es";
 	}else if (Engine::getGraphicBackend() == GraphicBackend::METAL){

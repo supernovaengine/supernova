@@ -48,6 +48,8 @@
 #define SBS_UNIFORMTYPE_MAT3     makefourcc('M', 'A', 'T', '3')
 #define SBS_UNIFORMTYPE_MAT4     makefourcc('M', 'A', 'T', '4')
 
+#define SBS_STORAGEBUFFERTYPE_STRUCT     makefourcc('S', 'T', 'R', 'C')
+
 #define SBS_TEXTURE_2D          makefourcc('2', 'D', ' ', ' ')
 #define SBS_TEXTURE_3D          makefourcc('3', 'D', ' ', ' ')
 #define SBS_TEXTURE_CUBE        makefourcc('C', 'U', 'B', 'E')
@@ -82,6 +84,7 @@ struct sbs_chunk_refl {
     uint32_t num_texture_samplers;
     uint32_t num_uniform_blocks;
     uint32_t num_uniforms;
+    uint32_t num_storage_buffers;
 };
 
 struct sbs_refl_input {
@@ -129,6 +132,16 @@ struct sbs_refl_uniform {
     uint32_t type;
     uint32_t array_count;
     uint32_t offset;
+};
+
+struct sbs_refl_storagebuffer {
+    char     name[SBS_NAME_SIZE];
+    char     inst_name[SBS_NAME_SIZE];
+    uint32_t set;
+    int32_t  binding;
+    uint32_t size_bytes;
+    bool     readonly;
+    uint32_t type;
 };
 
 #pragma pack(pop)
@@ -183,7 +196,7 @@ bool SBSReader::read(FileData& file){
     sbs_chunk sinfo;
     file.read((unsigned char*)&sinfo, sizeof(sinfo));
 
-    if (sinfo.sbs_version != 110){
+    if (sinfo.sbs_version != 120){
         Log::error("Invalid sbs file version");
         return false;
     }
@@ -384,6 +397,24 @@ bool SBSReader::read(FileData& file){
                 }
 
                 shaderStage->uniformblocks.push_back(uniformblock);
+            }
+
+            for (uint32_t i = 0; i < refl_chunk.num_storage_buffers; i++) {
+                sbs_refl_storagebuffer sb;
+                file.read((unsigned char*)&sb, sizeof(sb));
+
+                ShaderStorageBuffer storagebuffer;
+                storagebuffer.name = std::string(sb.name);
+                storagebuffer.instName = std::string(sb.inst_name);
+                storagebuffer.set = sb.set;
+                storagebuffer.binding = sb.binding;
+                storagebuffer.sizeBytes = sb.size_bytes;
+                storagebuffer.readonly = sb.readonly;
+                if (sb.type == SBS_STORAGEBUFFERTYPE_STRUCT){
+                    storagebuffer.type = ShaderStorageBufferType::STRUCT;
+                }
+
+                shaderStage->storagebuffers.push_back(storagebuffer);
             }
         }
 

@@ -38,6 +38,17 @@ namespace Supernova {
         std::vector<ShaderUniform> uniforms;
     };
 
+    struct ShaderStorageBuffer {
+        std::string name;
+        std::string instName;
+        int  set;
+        int  binding;
+        unsigned int sizeBytes;
+        bool readonly;
+
+        ShaderStorageBufferType type;
+    };
+
     struct ShaderTexture {
         std::string name;
         int set;
@@ -74,6 +85,7 @@ namespace Supernova {
 
         std::vector<ShaderAttr> attributes;
         std::vector<ShaderUniformBlock> uniformblocks;
+        std::vector<ShaderStorageBuffer> storagebuffers;
         std::vector<ShaderTexture> textures;
         std::vector<ShaderSampler> samplers;
         std::vector<ShaderTextureSampler> textureSamplersPair;
@@ -95,6 +107,7 @@ namespace Supernova {
 
         int getAttrIndex(AttributeType type);
         int getUniformBlockIndex(UniformBlockType type, ShaderStageType stage);
+        int getStorageBufferIndex(StorageBufferType type, ShaderStageType stage);
         std::pair<int, int> getTextureIndex(TextureShaderType type, ShaderStageType stage);
 
         void releaseSourceData();

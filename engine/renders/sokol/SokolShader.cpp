@@ -177,6 +177,14 @@ bool SokolShader::createShader(ShaderData& shaderData){
             }
         }
 
+        // storage buffers
+        for (int sb = 0; sb < stage->storagebuffers.size(); sb++) {
+            sg_shader_storage_buffer_desc* sbdesc = &stage_desc->storage_buffers[stage->storagebuffers[sb].binding];
+
+            sbdesc->used = true;
+            sbdesc->readonly = stage->storagebuffers[sb].readonly;
+        }
+
         // textures
         for (int t = 0; t < stage->textures.size(); t++) {
             sg_shader_image_desc* img = &stage_desc->images[stage->textures[t].binding];

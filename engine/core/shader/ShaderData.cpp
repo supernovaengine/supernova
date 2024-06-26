@@ -190,6 +190,73 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
     return uniIndex;
 }
 
+int ShaderData::getStorageBufferIndex(StorageBufferType type, ShaderStageType stage){
+    std::string ustr;
+    
+    if (type == StorageBufferType::PBR_VS_PARAMS){
+        ustr = "u_vs_pbrParams";
+    }else if (type == StorageBufferType::PBR_FS_PARAMS){
+        ustr = "u_fs_pbrParams";
+    }else if (type == StorageBufferType::FS_LIGHTING){
+        ustr = "u_fs_lighting";
+    }else if (type == StorageBufferType::FS_FOG){
+        ustr = "u_fs_fog";
+    }else if (type == StorageBufferType::VS_SHADOWS){
+        ustr = "u_vs_shadows";
+    }else if (type == StorageBufferType::FS_SHADOWS){
+        ustr = "u_fs_shadows";
+    }else if (type == StorageBufferType::SKY_VS_PARAMS){
+        ustr = "u_vs_skyParams";
+    }else if (type == StorageBufferType::SKY_FS_PARAMS){
+        ustr = "u_fs_skyParams";
+    }else if (type == StorageBufferType::DEPTH_VS_PARAMS){
+        ustr = "u_vs_depthParams";
+    }else if (type == StorageBufferType::UI_VS_PARAMS){
+        ustr = "u_vs_uiParams";
+    }else if (type == StorageBufferType::UI_FS_PARAMS){
+        ustr = "u_fs_uiParams";
+    }else if (type == StorageBufferType::SPRITE_VS_PARAMS){
+        ustr = "u_vs_spriteParams";
+    }else if (type == StorageBufferType::POINTS_VS_PARAMS){
+        ustr = "u_vs_pointsParams";
+    }else if (type == StorageBufferType::LINES_VS_PARAMS){
+        ustr = "u_vs_linesParams";
+    }else if (type == StorageBufferType::VS_SKINNING){
+        ustr = "u_vs_skinning";
+    }else if (type == StorageBufferType::DEPTH_VS_SKINNING){
+        ustr = "u_vs_skinning";
+    }else if (type == StorageBufferType::VS_MORPHTARGET){
+        ustr = "u_vs_morphtarget";
+    }else if (type == StorageBufferType::DEPTH_VS_MORPHTARGET){
+        ustr = "u_vs_morphtarget";
+    }else if (type == StorageBufferType::TERRAIN_VS_PARAMS){
+        ustr = "u_vs_terrainParams";
+    }else if (type == StorageBufferType::TERRAINNODE_VS_PARAMS){
+        ustr = "u_vs_terrainNodeParams";
+    }
+
+    if (ustr.empty()){
+        Log::error("Trying to get a not mapped storage buffer");
+        return -1;
+    }
+
+    int sIndex = -1;
+    for (int s = 0; s < stages.size(); s++){
+        if (stages[s].type == stage)
+            sIndex = s;
+    }
+
+    int sbIndex = -1;
+    if (sIndex != -1){
+        for (int u = 0; u < stages[sIndex].storagebuffers.size(); u++){
+            if (stages[sIndex].storagebuffers[u].name == ustr)
+                sbIndex = stages[sIndex].storagebuffers[u].binding;
+        }
+    }
+
+    return sbIndex;
+}
+
 std::pair<int, int> ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
     std::string texstr;
     
