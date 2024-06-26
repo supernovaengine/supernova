@@ -23,7 +23,7 @@ jobs:
             backend_name: "OpenGL",
             os: windows-latest,
             platform: "windows",
-            gfx_backend: "glcore33",
+            gfx_backend: "glcore",
             app_backend: "sokol"
           }
         - {
@@ -31,7 +31,7 @@ jobs:
             backend_name: "OpenGL",
             os: ubuntu-latest,
             platform: "linux",
-            gfx_backend: "glcore33",
+            gfx_backend: "glcore",
             app_backend: "sokol"
           }
         - {
@@ -39,7 +39,7 @@ jobs:
             backend_name: "OpenGL",
             os: ubuntu-latest,
             platform: "linux",
-            gfx_backend: "glcore33",
+            gfx_backend: "glcore",
             app_backend: "glfw"
           }
         - {
@@ -55,7 +55,7 @@ jobs:
             backend_name: "OpenGL",
             os: macos-latest,
             platform: "macos",
-            gfx_backend: "glcore33",
+            gfx_backend: "glcore",
             app_backend: "sokol"
           }
         - {

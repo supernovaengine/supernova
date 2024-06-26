@@ -96,7 +96,7 @@ namespace Supernova {
     };
 
     enum class GraphicBackend{
-        GLCORE33,
+        GLCORE,
         GLES3,
         D3D11,
         METAL,

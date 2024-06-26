@@ -52,7 +52,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginNamespace("GraphicBackend")
-        .addVariable("GLCORE33", GraphicBackend::GLCORE33)
+        .addVariable("GLCORE", GraphicBackend::GLCORE)
         .addVariable("GLES3", GraphicBackend::GLES3)
         .addVariable("D3D11", GraphicBackend::D3D11)
         .addVariable("METAL", GraphicBackend::METAL)

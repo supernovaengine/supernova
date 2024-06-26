@@ -51,7 +51,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         list(APPEND SOKOL_LINK_LIBRARIES "-framework Cocoa")
-        if(GRAPHIC_BACKEND STREQUAL "glcore33")
+        if(GRAPHIC_BACKEND STREQUAL "glcore")
             list(APPEND SOKOL_LINK_LIBRARIES "-framework OpenGL")
         elseif(GRAPHIC_BACKEND STREQUAL "metal")
             list(APPEND SOKOL_LINK_LIBRARIES "-framework Metal -framework MetalKit -framework Quartz")

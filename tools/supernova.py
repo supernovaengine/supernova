@@ -109,7 +109,7 @@ def create_build_dir(name):
 @click.option('--output', '-o', type=click.Path(), help="Output directory")
 @click.option('--build/--no-build', '-b', default=False, help="Build or no build generated Xcode project")
 @click.option('--debug/--no-debug', '-d', default=False, help="Build type Debug or Release")
-@click.option('--graphic-backend', '-g', type=click.Choice(['glcore33', 'gles3', 'metal', 'd3d11'], case_sensitive=False), help="Preferred graphic API")
+@click.option('--graphic-backend', '-g', type=click.Choice(['glcore', 'gles3', 'metal', 'd3d11'], case_sensitive=False), help="Preferred graphic API")
 @click.option('--app-backend', '-m', type=click.Choice(['emscripten', 'android', 'sokol', 'glfw', 'apple'], case_sensitive=False), help="Preferred application API")
 @click.option('--no-cpp-init', is_flag=True, help="No call C++ init on project start")
 @click.option('--no-lua-init', is_flag=True, help="No call Lua on project start")
