@@ -27,13 +27,14 @@ namespace Supernova {
 
         void beginLoad(PrimitiveType primitiveType);
         void addIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset);
-        void addAttribute(int slotAttribute, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized);
+        void addAttribute(int slot, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized);
+        void addStorageBuffer(int slot, ShaderStageType stage, BufferRender* buffer);
         void addShader(ShaderRender* shader);
-        void addTexture(std::pair<int, int> slotTexture, ShaderStageType stage, TextureRender* texture);
+        void addTexture(std::pair<int, int> slot, ShaderStageType stage, TextureRender* texture);
         void endLoad(uint8_t pipelines);
 
         void beginDraw(PipelineType pipType);
-        void applyUniformBlock(int slotUniform, ShaderStageType stage, unsigned int count, void* data);
+        void applyUniformBlock(int slot, ShaderStageType stage, unsigned int count, void* data);
         void draw(int vertexCount);
 
         void destroy();
