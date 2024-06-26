@@ -195,7 +195,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     #endif()
 
     if(GRAPHIC_BACKEND STREQUAL "glcore33")
-        add_definitions("-DSOKOL_GLCORE33")
+        add_definitions("-DSOKOL_GLCORE")
     elseif(GRAPHIC_BACKEND STREQUAL "d3d11")
         add_definitions("-DSOKOL_D3D11")
     endif()
@@ -229,7 +229,7 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if(GRAPHIC_BACKEND STREQUAL "glcore33")
-        add_definitions("-DSOKOL_GLCORE33")
+        add_definitions("-DSOKOL_GLCORE")
     endif()
 
     add_definitions("-DWITH_MINIAUDIO") # For SoLoud
@@ -276,7 +276,7 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     if(GRAPHIC_BACKEND STREQUAL "glcore33")
-        add_definitions("-DSOKOL_GLCORE33")
+        add_definitions("-DSOKOL_GLCORE")
     elseif(GRAPHIC_BACKEND STREQUAL "metal")
         add_definitions("-DSOKOL_METAL")
     endif()
