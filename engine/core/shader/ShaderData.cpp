@@ -193,7 +193,7 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
 int ShaderData::getStorageBufferIndex(StorageBufferType type, ShaderStageType stage){
     std::string ustr;
     
-    if (type == StorageBufferType::SBO_VERTEX){
+    if (type == StorageBufferType::VS_VERTEX){
         ustr = "sbo_vertex";
     }
 

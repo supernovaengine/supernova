@@ -17,7 +17,8 @@ namespace Supernova{
 
     enum class BufferType{
         VERTEX_BUFFER,
-        INDEX_BUFFER
+        INDEX_BUFFER,
+        STORAGE_BUFFER
     };
 
     enum class BufferUsage{ //see sokol_gfx.h for details
@@ -98,7 +99,7 @@ namespace Supernova{
     };
 
     enum class StorageBufferType{
-        SBO_VERTEX
+        VS_VERTEX // for future use only
     };
 
     enum class TextureShaderType{

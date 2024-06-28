@@ -34,6 +34,8 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
         vbuf_desc.type = SG_BUFFERTYPE_VERTEXBUFFER;
     } else if (type == BufferType::INDEX_BUFFER){
         vbuf_desc.type = SG_BUFFERTYPE_INDEXBUFFER;
+    } else if (type == BufferType::STORAGE_BUFFER){
+        vbuf_desc.type = SG_BUFFERTYPE_STORAGEBUFFER;
     }
 
     if (usage == BufferUsage::IMMUTABLE){
