@@ -17,6 +17,9 @@ Camera::Camera(Scene* scene): Object(scene){
     applyPerspectiveDefaults(cameraComponent);
     // default CameraComponent is CAMERA_2D
     cameraComponent.type = CameraType::CAMERA_PERSPECTIVE;
+
+    Transform& transform = getComponent<Transform>();
+    transform.position = Vector3(0, 0, 1.0);
 }
 
 Camera::Camera(Scene* scene, Entity entity): Object(scene, entity){
