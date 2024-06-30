@@ -22,6 +22,12 @@ Text TextEdit::getTextObject() const{
     return Text(scene, tecomp.text);
 }
 
+Polygon TextEdit::getCursorObject() const{
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+
+    return Polygon(scene, tecomp.cursor);
+}
+
 void TextEdit::setDisabled(bool disabled){
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
 

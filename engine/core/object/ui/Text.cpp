@@ -15,10 +15,6 @@ Text::Text(Scene* scene): UILayout(scene){
 Text::Text(Scene* scene, Entity entity): UILayout(scene, entity){
 }
 
-Text::~Text() {
-
-}
-
 bool Text::createText(){
     TextComponent& textcomp = getComponent<TextComponent>();
     UIComponent& ui = getComponent<UIComponent>();

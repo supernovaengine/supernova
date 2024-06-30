@@ -15,7 +15,6 @@ namespace Supernova{
     public:
         Text(Scene* scene);
         Text(Scene* scene, Entity entity);
-        virtual ~Text();
 
         bool createText();
         bool load();

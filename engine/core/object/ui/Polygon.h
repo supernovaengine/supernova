@@ -12,6 +12,7 @@ namespace Supernova{
 
     public:
         Polygon(Scene* scene);
+        Polygon(Scene* scene, Entity entity);
 
         bool createPolygon();
         bool load();

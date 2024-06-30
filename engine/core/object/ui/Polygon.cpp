@@ -16,6 +16,9 @@ Polygon::Polygon(Scene* scene): UILayout(scene){
     addComponent<PolygonComponent>({});
 }
 
+Polygon::Polygon(Scene* scene, Entity entity): UILayout(scene, entity){
+}
+
 bool Polygon::createPolygon(){
     PolygonComponent& pcomp = getComponent<PolygonComponent>();
     UIComponent& ui = getComponent<UIComponent>();

@@ -7,6 +7,7 @@
 
 #include "Image.h"
 #include "Text.h"
+#include "Polygon.h"
 
 namespace Supernova{
     class TextEdit: public Image{
@@ -15,6 +16,7 @@ namespace Supernova{
         TextEdit(Scene* scene);
 
         Text getTextObject() const;
+        Polygon getCursorObject() const;
 
         void setDisabled(bool disabled);
         bool getDisabled() const;

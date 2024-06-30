@@ -1677,7 +1677,7 @@ bool UISystem::eventOnPointerMove(float x, float y){
 
                 if (newStep != scrollbar.step){
                     scrollbar.step = newStep;
-                    scrollbar.onChange.call();
+                    scrollbar.onChange.call(scrollbar.step);
                 }
 
                 if (scrollbar.type == ScrollbarType::VERTICAL){
