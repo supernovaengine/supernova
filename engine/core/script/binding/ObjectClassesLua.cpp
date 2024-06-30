@@ -615,6 +615,18 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTextureNormal", (void(Button::*)(std::string))&Button::setTextureNormal)
         .addFunction("setTexturePressed", (void(Button::*)(std::string))&Button::setTexturePressed)
         .addFunction("setTextureDisabled", (void(Button::*)(std::string))&Button::setTextureDisabled)
+        .addProperty("colorNormal", &Button::getColorNormal, (void(Button::*)(Vector4))&Button::setColorNormal)
+        .addFunction("setColorNormal", 
+            luabridge::overload<const float, const float, const float>(&Button::setColorNormal),
+            luabridge::overload<const float, const float, const float, const float>(&Button::setColorNormal))
+        .addProperty("colorPressed", &Button::getColorPressed, (void(Button::*)(Vector4))&Button::setColorPressed)
+        .addFunction("setColorPressed", 
+            luabridge::overload<const float, const float, const float>(&Button::setColorPressed),
+            luabridge::overload<const float, const float, const float, const float>(&Button::setColorPressed))
+        .addProperty("colorDisabled", &Button::getColorDisabled, (void(Button::*)(Vector4))&Button::setColorDisabled)
+        .addFunction("setColorDisabled", 
+            luabridge::overload<const float, const float, const float>(&Button::setColorDisabled),
+            luabridge::overload<const float, const float, const float, const float>(&Button::setColorDisabled))
         .addProperty("disabled", &Button::getDisabled, &Button::setDisabled)
         .addFunction("getButtonComponent", &Button::getComponent<ButtonComponent>)
         .endClass();
@@ -665,10 +677,18 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("disabled", &TextEdit::getDisabled, &TextEdit::setDisabled)
         .addProperty("text", &TextEdit::getText, &TextEdit::setText)
         .addProperty("textColor", &TextEdit::getTextColor, (void(TextEdit::*)(Vector4))&TextEdit::setTextColor)
-        .addFunction("setTextColor", (void(TextEdit::*)(const float, const float, const float, const float))&TextEdit::setTextColor)
+        .addFunction("setTextColor", 
+            luabridge::overload<const float, const float, const float>(&TextEdit::setTextColor),
+            luabridge::overload<const float, const float, const float, const float>(&TextEdit::setTextColor))
         .addProperty("textFont", &TextEdit::getTextFont, &TextEdit::setTextFont)
         .addProperty("fontSize", &TextEdit::getFontSize, &TextEdit::setFontSize)
         .addProperty("maxTextSize", &TextEdit::getMaxTextSize, &TextEdit::setMaxTextSize)
+        .addProperty("cursorColor", &TextEdit::getCursorColor, (void(TextEdit::*)(Vector4))&TextEdit::setCursorColor)
+        .addFunction("setCursorColor", 
+            luabridge::overload<const float, const float, const float>(&TextEdit::setCursorColor),
+            luabridge::overload<const float, const float, const float, const float>(&TextEdit::setCursorColor))
+        .addProperty("cursorBlink", &TextEdit::getCursorBlink, &TextEdit::setCursorBlink)
+        .addProperty("cursorWidth", &TextEdit::getCursorWidth, &TextEdit::setCursorWidth)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

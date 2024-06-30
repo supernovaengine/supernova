@@ -64,11 +64,15 @@ void TextEdit::setTextColor(const float red, const float green, const float blue
     setTextColor(Vector4(red, green, blue, alpha));
 }
 
+void TextEdit::setTextColor(const float red, const float green, const float blue){
+    setTextColor(Vector4(red, green, blue, getTextColor().w));
+}
+
 Vector4 TextEdit::getTextColor() const{
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
     UIComponent& uitext = scene->getComponent<UIComponent>(tecomp.text);
 
-    return uitext.color;
+    return Color::linearTosRGB(uitext.color);
 }
 
 void TextEdit::setTextFont(std::string font){
@@ -106,4 +110,49 @@ void TextEdit::setMaxTextSize(unsigned int maxTextSize){
 
 unsigned int TextEdit::getMaxTextSize() const{
     return getTextObject().getMaxTextSize();
+}
+
+void TextEdit::setCursorBlink(float cursorBlink){
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+
+    tecomp.cursorBlink = cursorBlink;
+}
+
+float TextEdit::getCursorBlink() const{
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+
+    return tecomp.cursorBlink;
+}
+
+void TextEdit::setCursorWidth(float cursorWidth){
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+    if (tecomp.cursorWidth != cursorWidth){
+        tecomp.cursorWidth = cursorWidth;
+        tecomp.needUpdateTextEdit = true;
+    }
+}
+
+float TextEdit::getCursorWidth() const{
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+
+    return tecomp.cursorWidth;
+}
+
+void TextEdit::setCursorColor(Vector4 color){
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+    tecomp.needUpdateTextEdit = true;
+    tecomp.cursorColor = Color::sRGBToLinear(color);
+}
+
+void TextEdit::setCursorColor(const float red, const float green, const float blue, const float alpha){
+    setCursorColor(Vector4(red, green, blue, alpha));
+}
+
+void TextEdit::setCursorColor(const float red, const float green, const float blue){
+    setCursorColor(Vector4(red, green, blue, getCursorColor().w));
+}
+
+Vector4 TextEdit::getCursorColor() const{
+    TextEditComponent& tecomp = getComponent<TextEditComponent>();
+    return Color::linearTosRGB(tecomp.cursorColor);
 }

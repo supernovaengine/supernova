@@ -17,6 +17,10 @@ namespace Supernova{
         Texture texturePressed;
         Texture textureDisabled;
 
+        Vector4 colorNormal = Vector4(1.0, 1.0, 1.0, 1.0);  //linear color
+        Vector4 colorPressed = Vector4(1.0, 1.0, 1.0, 1.0);  //linear color
+        Vector4 colorDisabled = Vector4(1.0, 1.0, 1.0, 1.0);  //linear color
+
         FunctionSubscribe<void()> onPress;
         FunctionSubscribe<void()> onRelease;
 

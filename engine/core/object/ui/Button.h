@@ -33,6 +33,21 @@ namespace Supernova{
         void setTexturePressed(std::string path);
         void setTextureDisabled(std::string path);
 
+        void setColorNormal(Vector4 color);
+        void setColorNormal(const float red, const float green, const float blue, const float alpha);
+        void setColorNormal(const float red, const float green, const float blue);
+        Vector4 getColorNormal() const;
+
+        void setColorPressed(Vector4 color);
+        void setColorPressed(const float red, const float green, const float blue, const float alpha);
+        void setColorPressed(const float red, const float green, const float blue);
+        Vector4 getColorPressed() const;
+
+        void setColorDisabled(Vector4 color);
+        void setColorDisabled(const float red, const float green, const float blue, const float alpha);
+        void setColorDisabled(const float red, const float green, const float blue);
+        Vector4 getColorDisabled() const;
+
         void setDisabled(bool disabled);
         bool getDisabled() const;
     };

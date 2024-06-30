@@ -375,6 +375,9 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
         if (!button.textureNormal.load()){
             button.textureNormal = ui.texture;
         }
+        if (button.colorNormal == Vector4(1.0, 1.0, 1.0, 1.0)){
+            button.colorNormal = ui.color;
+        }
         button.textureNormal.load();
         button.texturePressed.load();
         button.textureDisabled.load();
@@ -398,17 +401,20 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
             ui.texture = button.textureDisabled;
             ui.needUpdateTexture = true;
         }
+        ui.color = button.colorDisabled;
     }else{
         if (!button.pressed){
             if (ui.texture != button.textureNormal){
                 ui.texture = button.textureNormal;
                 ui.needUpdateTexture = true;
             }
+            ui.color = button.colorNormal;
         }else{
             if (ui.texture != button.texturePressed){
                 ui.texture = button.texturePressed;
                 ui.needUpdateTexture = true;
             }
+            ui.color = button.colorPressed;
         }
     }
 }
@@ -577,7 +583,7 @@ void UISystem::blinkCursorTextEdit(double dt, TextEditComponent& textedit, UICom
     Transform& cursortransform = scene->getComponent<Transform>(textedit.cursor);
 
     if (ui.focused){
-        if (textedit.cursorBlinkTimer > 0.6) {
+        if (textedit.cursorBlinkTimer > textedit.cursorBlink) {
             cursortransform.visible = !cursortransform.visible;
             textedit.cursorBlinkTimer = 0;
         }
@@ -1422,6 +1428,7 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 ButtonComponent& button = scene->getComponent<ButtonComponent>(lastUIFromPointer);
                 if (!button.disabled && !button.pressed){
                     ui.texture = button.texturePressed;
+                    ui.color = button.colorPressed;
                     ui.needUpdateTexture = true;
                     button.onPress.call();
                     button.pressed = true;
@@ -1583,6 +1590,7 @@ bool UISystem::eventOnPointerUp(float x, float y){
                 ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
                 if (!button.disabled && button.pressed){
                     ui.texture = button.textureNormal;
+                    ui.color = button.colorNormal;
                     ui.needUpdateTexture = true;
                     button.pressed = false;
                     button.onRelease.call();

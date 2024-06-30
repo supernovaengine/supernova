@@ -13,10 +13,11 @@ namespace Supernova{
         Entity text = NULL_ENTITY;
         Entity cursor = NULL_ENTITY;
 
-        float cursorBlinkTimer = 0;
+        float cursorBlink = 0.6;
         float cursorWidth = 2;
-        Vector4 cursorColor = Vector4(0.0, 0.0, 0.0, 1.0);
+        Vector4 cursorColor = Vector4(0.0, 0.0, 0.0, 1.0); //linear
 
+        float cursorBlinkTimer = 0;
         bool disabled = false;
 
         bool needUpdateTextEdit = true;
