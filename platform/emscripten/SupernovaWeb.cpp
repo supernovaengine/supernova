@@ -242,7 +242,7 @@ EM_BOOL SupernovaWeb::resize_callback(int event_type, const EmscriptenUiEvent* u
     emscripten_get_canvas_element_size(canvas.c_str(), &w, &h);
     changeCanvasSize(w, h);
 
-    return EM_TRUE;
+    return 0;
 }
 
 EM_BOOL SupernovaWeb::canvas_resize(int eventType, const void *reserved, void *userData){
@@ -253,7 +253,7 @@ EM_BOOL SupernovaWeb::canvas_resize(int eventType, const void *reserved, void *u
     SupernovaWeb::screenHeight = h;
     Supernova::Engine::systemViewChanged();
 
-    return EM_TRUE;
+    return 0;
 }
 
 wchar_t SupernovaWeb::toCodepoint(const std::string &u){
@@ -339,7 +339,7 @@ EM_BOOL SupernovaWeb::key_callback(int eventType, const EmscriptenKeyboardEvent 
         }
     }
 
-    return EM_TRUE;
+    return 0;
 }
 
 EM_BOOL SupernovaWeb::mouse_callback(int eventType, const EmscriptenMouseEvent *e, void *userData) {
@@ -372,7 +372,7 @@ EM_BOOL SupernovaWeb::mouse_callback(int eventType, const EmscriptenMouseEvent *
         Supernova::Engine::systemMouseLeave();
     }
 
-    return EM_TRUE;
+    return 0;
 }
 
 EM_BOOL SupernovaWeb::wheel_callback(int eventType, const EmscriptenWheelEvent *e, void *userData) {
@@ -392,7 +392,7 @@ EM_BOOL SupernovaWeb::wheel_callback(int eventType, const EmscriptenWheelEvent *
 
     Supernova::Engine::systemMouseScroll(scale * (float)e->deltaX, scale * (float)e->deltaY, modifiers);
 
-  return EM_TRUE;
+  return 0;
 }
 
 EM_BOOL SupernovaWeb::touch_callback(int emsc_type, const EmscriptenTouchEvent* emsc_event, void* user_data) {
@@ -435,7 +435,7 @@ EM_BOOL SupernovaWeb::webgl_context_callback(int emsc_type, const void* reserved
         default:                                    break;
     }
 
-    return EM_TRUE;
+    return 0;
 }
 
 int SupernovaWeb::supernova_mouse_button(int button){
