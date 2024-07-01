@@ -1124,9 +1124,12 @@ void UISystem::update(double dt){
                 }else if (container.type == ContainerType::VERTICAL){
                     layout.width = (layout.width > container.maxWidth)? layout.width : container.maxWidth;
                     layout.height = (layout.height > totalHeight)? layout.height : totalHeight;
-                }else if (container.type == ContainerType::FLOAT){
+                }else if (container.type == ContainerType::HORIZONTAL_FLOAT){
                     layout.width = (layout.width > totalWidth)? layout.width : totalWidth;
                     // layout.height is calculated later
+                }else if (container.type == ContainerType::VERTICAL_FLOAT){
+                    // layout.width is calculated later
+                    layout.height = (layout.height > totalHeight)? layout.height : totalHeight;
                 }
             }
         }
@@ -1236,12 +1239,19 @@ void UISystem::update(double dt){
         if (signature.test(scene->getComponentType<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
             int numObjInLine = 0;
-            if (container.type == ContainerType::FLOAT){
+            if (container.type == ContainerType::HORIZONTAL_FLOAT){
                 numObjInLine = floor((float)layout.width / (float)container.maxWidth);
                 int numLines = ceil((float)container.numBoxes / (float)numObjInLine);
 
                 if (layout.height < numLines * container.maxHeight){
                     layout.height = numLines * container.maxHeight;
+                }
+            }else if (container.type == ContainerType::VERTICAL_FLOAT){
+                numObjInLine = floor((float)layout.height / (float)container.maxHeight);
+                int numLines = ceil((float)container.numBoxes / (float)numObjInLine);
+
+                if (layout.width < numLines * container.maxWidth){
+                    layout.width = numLines * container.maxWidth;
                 }
             }
             // configuring all container boxes
@@ -1286,7 +1296,7 @@ void UISystem::update(double dt){
                                 }
                             }
                             container.boxes[b].rect.setWidth(layout.width);
-                        }else if (container.type == ContainerType::FLOAT){
+                        }else if (container.type == ContainerType::HORIZONTAL_FLOAT){
                             if (b > 0){
                                 container.boxes[b].rect.setX(container.boxes[b-1].rect.getX() + container.boxes[b-1].rect.getWidth());
                                 container.boxes[b].rect.setY(container.boxes[b-1].rect.getY());
@@ -1300,6 +1310,20 @@ void UISystem::update(double dt){
                                 container.boxes[b].rect.setY(container.boxes[b-1].rect.getY() + container.maxHeight);
                             }
                             container.boxes[b].rect.setHeight(container.maxHeight);
+                        }else if (container.type == ContainerType::VERTICAL_FLOAT){
+                            if (b > 0){
+                                container.boxes[b].rect.setX(container.boxes[b-1].rect.getX());
+                                container.boxes[b].rect.setY(container.boxes[b-1].rect.getY() + container.boxes[b-1].rect.getHeight());
+                            }
+                            if (container.boxes[b].expand){
+                                float diff = layout.height - (numObjInLine * container.maxHeight);
+                                container.boxes[b].rect.setHeight(container.maxHeight + (diff / numObjInLine));
+                            }
+                            if ((container.boxes[b].rect.getY()+container.boxes[b].rect.getHeight()) > layout.height){
+                                container.boxes[b].rect.setX(container.boxes[b-1].rect.getX() + container.maxWidth);
+                                container.boxes[b].rect.setY(0);
+                            }
+                            container.boxes[b].rect.setWidth(container.maxWidth);
                         }
                     }
                 }
