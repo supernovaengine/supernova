@@ -1119,13 +1119,13 @@ void UISystem::update(double dt){
 
 
                 if (container.type == ContainerType::HORIZONTAL){
-                    layout.width = (layout.width > 0)? layout.width : totalWidth;
-                    layout.height = (layout.height > 0)? layout.height : container.maxHeight;
+                    layout.width = (layout.width > totalWidth)? layout.width : totalWidth;
+                    layout.height = (layout.height > container.maxHeight)? layout.height : container.maxHeight;
                 }else if (container.type == ContainerType::VERTICAL){
-                    layout.width = (layout.width > 0)? layout.width : container.maxWidth;
-                    layout.height = (layout.height > 0)? layout.height : totalHeight;
+                    layout.width = (layout.width > container.maxWidth)? layout.width : container.maxWidth;
+                    layout.height = (layout.height > totalHeight)? layout.height : totalHeight;
                 }else if (container.type == ContainerType::FLOAT){
-                    layout.width = (layout.width > 0)? layout.width : totalWidth;
+                    layout.width = (layout.width > totalWidth)? layout.width : totalWidth;
                     // layout.height is calculated later
                 }
             }
