@@ -262,6 +262,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("anchorOffsetTop", &UILayoutComponent::anchorOffsetTop)
         .addProperty("anchorOffsetRight", &UILayoutComponent::anchorOffsetRight)
         .addProperty("anchorOffsetBottom", &UILayoutComponent::anchorOffsetBottom)
+        .addProperty("positionOffset", &UILayoutComponent::positionOffset)
         .addProperty("anchorPreset", &UILayoutComponent::anchorPreset)
         .addProperty("usingAnchors", &UILayoutComponent::usingAnchors)
         .addProperty("resizeMargin", &UILayoutComponent::resizeMargin)

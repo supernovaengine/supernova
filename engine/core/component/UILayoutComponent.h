@@ -9,6 +9,7 @@
 #include "math/Rect.h"
 #include "math/Quaternion.h"
 #include "math/Matrix4.h"
+#include "math/Vector2.h"
 
 namespace Supernova{
 
@@ -46,6 +47,8 @@ namespace Supernova{
         int anchorOffsetTop = 0;
         int anchorOffsetRight = 0;
         int anchorOffsetBottom = 0;
+
+        Vector2 positionOffset = Vector2(0, 0); // for anchors
 
         AnchorPreset anchorPreset = AnchorPreset::NONE;
         bool usingAnchors = false;

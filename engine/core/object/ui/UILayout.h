@@ -43,6 +43,11 @@ namespace Supernova{
         int getAnchorOffsetRight() const;
         int getAnchorOffsetBottom() const;
 
+        void setPositionXOffset(float xOffset);
+        void setPositionYOffset(float yOffset);
+        void setPositionOffset(Vector2 positionOffset);
+        Vector2 getPositionOffset() const;
+
         void setAnchorPreset(AnchorPreset anchorPreset);
         AnchorPreset getAnchorPreset() const;
 

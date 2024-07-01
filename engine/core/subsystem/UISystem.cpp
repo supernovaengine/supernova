@@ -1126,7 +1126,7 @@ void UISystem::update(double dt){
                     layout.height = (layout.height > 0)? layout.height : totalHeight;
                 }else if (container.type == ContainerType::FLOAT){
                     layout.width = (layout.width > 0)? layout.width : totalWidth;
-                    layout.height = (layout.height > 0)? layout.height : container.maxHeight;
+                    // layout.height is calculated later
                 }
             }
         }
@@ -1207,19 +1207,22 @@ void UISystem::update(double dt){
                 float posX = abAnchorLeft + layout.anchorOffsetLeft;
                 float posY = abAnchorTop + layout.anchorOffsetTop;
 
-                if (posX != transform.position.x || posY != transform.position.y){
-                    transform.position.x = posX;
-                    transform.position.y = posY;
-                    transform.needUpdate = true;
-                }
-
-                float width = abAnchorRight - transform.position.x + layout.anchorOffsetRight;
-                float height = abAnchorBottom - transform.position.y + layout.anchorOffsetBottom;
+                float width = abAnchorRight - posX + layout.anchorOffsetRight;
+                float height = abAnchorBottom - posY + layout.anchorOffsetBottom;
 
                 if (width != layout.width || height != layout.height){
                     layout.width = width;
                     layout.height = height;
                     layout.needUpdateSizes = true;
+                }
+
+                posX += layout.positionOffset.x;
+                posY += layout.positionOffset.y;
+
+                if (posX != transform.position.x || posY != transform.position.y){
+                    transform.position.x = posX;
+                    transform.position.y = posY;
+                    transform.needUpdate = true;
                 }
 
             }else{
@@ -1232,6 +1235,15 @@ void UISystem::update(double dt){
 
         if (signature.test(scene->getComponentType<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
+            int numObjInLine = 0;
+            if (container.type == ContainerType::FLOAT){
+                numObjInLine = floor((float)layout.width / (float)container.maxWidth);
+                int numLines = ceil((float)container.numBoxes / (float)numObjInLine);
+
+                if (layout.height < numLines * container.maxHeight){
+                    layout.height = numLines * container.maxHeight;
+                }
+            }
             // configuring all container boxes
             if (container.numBoxes > 0){
 
@@ -1280,7 +1292,6 @@ void UISystem::update(double dt){
                                 container.boxes[b].rect.setY(container.boxes[b-1].rect.getY());
                             }
                             if (container.boxes[b].expand){
-                                int numObjInLine = floor((float)layout.width / (float)container.maxWidth);
                                 float diff = layout.width - (numObjInLine * container.maxWidth);
                                 container.boxes[b].rect.setWidth(container.maxWidth + (diff / numObjInLine));
                             }

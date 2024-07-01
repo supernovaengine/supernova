@@ -196,6 +196,30 @@ int UILayout::getAnchorOffsetBottom() const{
     return layout.anchorOffsetBottom;
 }
 
+void UILayout::setPositionXOffset(float xOffset){
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    layout.positionOffset = Vector2(xOffset, layout.positionOffset.y);
+}
+
+void UILayout::setPositionYOffset(float yOffset){
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    layout.positionOffset = Vector2(layout.positionOffset.x, yOffset);
+}
+
+void UILayout::setPositionOffset(Vector2 positionOffset){
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    layout.positionOffset = positionOffset;
+}
+
+Vector2 UILayout::getPositionOffset() const{
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    return layout.positionOffset;
+}
+
 void UILayout::setAnchorPreset(AnchorPreset anchorPreset){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
