@@ -30,6 +30,7 @@ namespace Supernova{
 		Entity lastUIFromPointer;
 		Entity lastPanelFromPointer;
 		Vector2 lastPointerPos;
+		Vector2 panelSizeAcc; // to add accumulation from float to int
 
 		void createOrUpdateUiComponent(double dt, UILayoutComponent& layout, Entity entity, Signature signature);
 

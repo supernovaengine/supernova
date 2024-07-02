@@ -650,7 +650,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setHeaderColor", (void(Panel::*)(const float, const float, const float, const float))&Panel::setHeaderColor)
         .addFunction("setHeaderPatchMargin", &Panel::setHeaderPatchMargin)
         .addFunction("setHeaderTexture", &Panel::setHeaderTexture)
+        .addFunction("setWindowProperties", &Panel::setWindowProperties)
         .addProperty("canMove", &Panel::isCanMove, &Panel::setCanMove)
+        .addProperty("canResize", &Panel::isCanResize, &Panel::setCanResize)
         .addProperty("canTopOnFocus", &Panel::isCanTopOnFocus, &Panel::setCanTopOnFocus)
         .addFunction("getPanelComponent", &Panel::getComponent<PanelComponent>)
         .endClass();

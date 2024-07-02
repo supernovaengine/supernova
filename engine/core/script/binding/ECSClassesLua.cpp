@@ -327,6 +327,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("headertext", &PanelComponent::headertext)
         .addProperty("titleAnchorPreset", &PanelComponent::titleAnchorPreset)
         .addProperty("canMove", &PanelComponent::canMove)
+        .addProperty("canResize", &PanelComponent::canResize)
         .addProperty("canTopOnFocus", &PanelComponent::canTopOnFocus)
         .addProperty("headerPointerDown", &PanelComponent::headerPointerDown)
         .addProperty("needUpdatePanel", &PanelComponent::needUpdatePanel)

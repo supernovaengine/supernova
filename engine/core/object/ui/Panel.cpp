@@ -139,6 +139,13 @@ void Panel::setHeaderTexture(std::string path){
     getHeaderImageObject().setTexture(path);
 }
 
+void Panel::setWindowProperties(const bool canMove, const bool canResize, const bool canTopOnFocus){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+    panelcomp.canMove = canMove;
+    panelcomp.canResize = canResize;
+    panelcomp.canTopOnFocus = canTopOnFocus;
+}
+
 void Panel::setCanMove(const bool canMove){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
     panelcomp.canMove = canMove;
@@ -147,6 +154,16 @@ void Panel::setCanMove(const bool canMove){
 bool Panel::isCanMove() const{
     PanelComponent& panelcomp = getComponent<PanelComponent>();
     return panelcomp.canMove;
+}
+
+void Panel::setCanResize(const bool canResize){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+    panelcomp.canResize = canResize;
+}
+
+bool Panel::isCanResize() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+    return panelcomp.canResize;
 }
 
 void Panel::setCanTopOnFocus(const bool canTopOnFocus){

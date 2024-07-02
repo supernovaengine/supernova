@@ -1552,34 +1552,27 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 maxY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y - 1;
                 edgeLeft = AABB(minX, minY, 0, maxX, maxY, 0);
 
-                if (edgeRight.contains(Vector3(x, y, 0))){
-                    //printf("Right\n");
-                }
-
-                if (edgeRightBottom.contains(Vector3(x, y, 0))){
-                    //printf("RightBottom\n");
-                }
-
-                if (edgeBottom.contains(Vector3(x, y, 0))){
-                    //printf("Bottom\n");
-                }
-
-                if (edgeLeftBottom.contains(Vector3(x, y, 0))){
-                    //printf("LeftBottom\n");
-                }
-
-                if (edgeLeft.contains(Vector3(x, y, 0))){
-                    //printf("Left\n");
+                if (panel.canResize){
+                    panelSizeAcc = Vector2(0, 0);
+                    if (edgeRight.contains(Vector3(x, y, 0))){
+                        panel.edgePointerDown = PanelEdge::RIGHT;
+                    }else if (edgeRightBottom.contains(Vector3(x, y, 0))){
+                        panel.edgePointerDown = PanelEdge::RIGHT_BOTTOM;
+                    }else if (edgeBottom.contains(Vector3(x, y, 0))){
+                        panel.edgePointerDown = PanelEdge::BOTTOM;
+                    }else if (edgeLeftBottom.contains(Vector3(x, y, 0))){
+                        panel.edgePointerDown = PanelEdge::LEFT_BOTTOM;
+                    }else if (edgeLeft.contains(Vector3(x, y, 0))){
+                        panel.edgePointerDown = PanelEdge::LEFT;
+                    }else{
+                        panel.edgePointerDown = PanelEdge::NONE;
+                    }
                 }
 
                 if (panel.canMove){
                     if (isCoordInside(x, y, headertransform, headerlayout)){
                         panel.headerPointerDown = true;
                     }
-                }
-
-                if (panel.canTopOnFocus){
-                    scene->moveChildToTop(lastUIFromPointer);
                 }
             }
 
@@ -1644,12 +1637,9 @@ bool UISystem::eventOnPointerUp(float x, float y){
 
             if (signature.test(scene->getComponentType<PanelComponent>())){
                 PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
-                Transform& headertransform = scene->getComponent<Transform>(panel.headercontainer);
-                UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
 
-                if (isCoordInside(x, y, headertransform, headerlayout)){
-                    panel.headerPointerDown = false;
-                }
+                panel.headerPointerDown = false;
+                panel.edgePointerDown = PanelEdge::NONE;
             }
 
             ui.onPointerUp(x - transform.worldPosition.x, y - transform.worldPosition.y);
@@ -1672,6 +1662,8 @@ bool UISystem::eventOnPointerMove(float x, float y){
     if (lastUIFromPointer != NULL_ENTITY){
         UILayoutComponent& layout = layouts->getComponentFromIndex(layouts->getIndex(lastUIFromPointer));
         Signature signature = scene->getSignature(lastUIFromPointer);
+
+        Vector2 pointerDiff = Vector2(x, y) - lastPointerPos;
 
         if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
             Transform& transform = scene->getComponent<Transform>(lastUIFromPointer);
@@ -1729,9 +1721,34 @@ bool UISystem::eventOnPointerMove(float x, float y){
             PanelComponent& panel = scene->getComponent<PanelComponent>(lastUIFromPointer);
             Transform& transform = scene->getComponent<Transform>(lastUIFromPointer);
             if (panel.headerPointerDown){
-                Vector2 movement = Vector2(x, y) - lastPointerPos;
-                transform.position += Vector3(movement.x / transform.worldScale.x, movement.y / transform.worldScale.y, 0);
+                transform.position += Vector3(pointerDiff.x / transform.worldScale.x, pointerDiff.y / transform.worldScale.y, 0);
                 transform.needUpdate = true;
+            }
+            if (panel.edgePointerDown != PanelEdge::NONE){
+                panelSizeAcc += Vector2(pointerDiff.x / transform.worldScale.x, pointerDiff.y / transform.worldScale.y);
+                if (panel.edgePointerDown == PanelEdge::RIGHT){
+                    layout.width += (int)panelSizeAcc.x;
+                    layout.needUpdateSizes = true;
+                }else if (panel.edgePointerDown == PanelEdge::RIGHT_BOTTOM){
+                    layout.width += (int)panelSizeAcc.x;
+                    layout.height += (int)panelSizeAcc.y;
+                    layout.needUpdateSizes = true;
+                }else if (panel.edgePointerDown == PanelEdge::BOTTOM){
+                    layout.height += (int)panelSizeAcc.y;
+                    layout.needUpdateSizes = true;
+                }else if (panel.edgePointerDown == PanelEdge::LEFT_BOTTOM){
+                    transform.position += Vector3(pointerDiff.x / transform.worldScale.x, 0, 0);
+                    transform.needUpdate = true;
+                    layout.width -= (int)panelSizeAcc.x;
+                    layout.height += (int)panelSizeAcc.y;
+                    layout.needUpdateSizes = true;
+                }else if (panel.edgePointerDown == PanelEdge::LEFT){
+                    transform.position += Vector3(pointerDiff.x / transform.worldScale.x, 0, 0);
+                    transform.needUpdate = true;
+                    layout.width -= (int)panelSizeAcc.x;
+                    layout.needUpdateSizes = true;
+                }
+                panelSizeAcc -= Vector2((int)panelSizeAcc.x, (int)panelSizeAcc.y);
             }
         }
     }
