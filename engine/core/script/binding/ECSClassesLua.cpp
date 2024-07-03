@@ -333,6 +333,8 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("canResize", &PanelComponent::canResize)
         .addProperty("canTopOnFocus", &PanelComponent::canTopOnFocus)
         .addProperty("headerPointerDown", &PanelComponent::headerPointerDown)
+        .addProperty("onMove", [] (PanelComponent* self, lua_State* L) { return &self->onMove; }, [] (PanelComponent* self, lua_State* L) { self->onMove = L; })
+        .addProperty("onResize", [] (PanelComponent* self, lua_State* L) { return &self->onResize; }, [] (PanelComponent* self, lua_State* L) { self->onResize = L; })
         .addProperty("needUpdatePanel", &PanelComponent::needUpdatePanel)
         .endClass();
 

@@ -1748,6 +1748,8 @@ bool UISystem::eventOnPointerMove(float x, float y){
             if (panel.headerPointerDown){
                 transform.position += Vector3(pointerDiff.x / transform.worldScale.x, pointerDiff.y / transform.worldScale.y, 0);
                 transform.needUpdate = true;
+
+                panel.onMove.call();
             }
             if (panel.edgePointerDown != PanelEdge::NONE){
                 panelSizeAcc += Vector2(pointerDiff.x / transform.worldScale.x, pointerDiff.y / transform.worldScale.y);
@@ -1780,6 +1782,8 @@ bool UISystem::eventOnPointerMove(float x, float y){
                     layout.height = panel.minHeight;
                 }
                 panelSizeAcc -= Vector2((int)panelSizeAcc.x, (int)panelSizeAcc.y);
+
+                panel.onResize.call(layout.width, layout.height);
             }
         }
     }

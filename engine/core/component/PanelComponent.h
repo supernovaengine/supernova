@@ -35,6 +35,9 @@ namespace Supernova{
         bool headerPointerDown = false;
         PanelEdge edgePointerDown = PanelEdge::NONE;
 
+        FunctionSubscribe<void()> onMove;
+        FunctionSubscribe<void(int, int)> onResize;
+
         bool needUpdatePanel = true;
     };
 
