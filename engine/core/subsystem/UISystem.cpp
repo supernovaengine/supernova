@@ -46,8 +46,8 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
         layout.height = texHeight;
     }
 
-    if ((layout.width == 0 || layout.height == 0) && layout.anchorPreset == AnchorPreset::NONE){
-        Log::warn("Cannot create UI image without size");
+    if ((layout.width == 0 || layout.height == 0)){
+        //Log::warn("Cannot create UI image without size");
         return false;
     }
 
@@ -457,14 +457,20 @@ void UISystem::updateScrollbar(Entity entity, ScrollbarComponent& scrollbar, Ima
 
     if (scrollbar.barSize > 1){
         scrollbar.barSize = 1;
+        if (scrollbar.step != 0){
+            scrollbar.step = 0;
+            scrollbar.onChange.call(scrollbar.step);
+        }
     }else if (scrollbar.barSize < 0){
         scrollbar.barSize = 0;
     }
 
     if (scrollbar.step > 1){
         scrollbar.step = 1;
+        scrollbar.onChange.call(scrollbar.step);
     }else if (scrollbar.step < 0){
         scrollbar.step = 0;
+        scrollbar.onChange.call(scrollbar.step);
     }
 
     float barSizePixel = 0;
@@ -1246,16 +1252,12 @@ void UISystem::update(double dt){
                 numObjInLine = floor((float)layout.width / (float)container.maxWidth);
                 int numLines = ceil((float)container.numBoxes / (float)numObjInLine);
 
-                if (layout.height < numLines * container.maxHeight){
-                    layout.height = numLines * container.maxHeight;
-                }
+                layout.height = numLines * container.maxHeight;
             }else if (container.type == ContainerType::VERTICAL_FLOAT){
                 numObjInLine = floor((float)layout.height / (float)container.maxHeight);
                 int numLines = ceil((float)container.numBoxes / (float)numObjInLine);
 
-                if (layout.width < numLines * container.maxWidth){
-                    layout.width = numLines * container.maxWidth;
-                }
+                layout.width = numLines * container.maxWidth;
             }
             // configuring all container boxes
             if (container.numBoxes > 0){
@@ -1703,7 +1705,7 @@ bool UISystem::eventOnPointerMove(float x, float y){
             Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
             UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
 
-            if (scrollbar.barPointerDown){
+            if (scrollbar.barPointerDown && scrollbar.barSize < 1.0){
 
                 float pos = 0;
                 float halfBar = 0;

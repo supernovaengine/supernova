@@ -202,10 +202,22 @@ void UILayout::setPositionXOffset(float xOffset){
     layout.positionOffset = Vector2(xOffset, layout.positionOffset.y);
 }
 
+float UILayout::getPositionXOffset() const{
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    return layout.positionOffset.x;
+}
+
 void UILayout::setPositionYOffset(float yOffset){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
     layout.positionOffset = Vector2(layout.positionOffset.x, yOffset);
+}
+
+float UILayout::getPositionYOffset() const{
+    UILayoutComponent& layout = getComponent<UILayoutComponent>();
+
+    return layout.positionOffset.y;
 }
 
 void UILayout::setPositionOffset(Vector2 positionOffset){
