@@ -1,6 +1,7 @@
 #include "Vector2.h"
 
 #include "Vector3.h"
+#include "Vector4.h"
 
 using namespace Supernova;
 
@@ -12,31 +13,31 @@ const Vector2 Vector2::NEGATIVE_UNIT_X( -1,  0);
 const Vector2 Vector2::NEGATIVE_UNIT_Y(  0, -1);
 const Vector2 Vector2::UNIT_SCALE(1, 1);
 
-Vector2::Vector2()
-        : x(0), y(0){
-}
+Vector2::Vector2() : x(0), y(0){ }
 
-Vector2::Vector2(const float fX, const float fY )
-: x( fX ), y( fY ){
-}
+Vector2::Vector2(const float fX, const float fY ): x( fX ), y( fY ){ }
 
-Vector2::Vector2( const float scaler ): x( scaler), y( scaler ){
-}
+Vector2::Vector2( const float scaler ): x( scaler), y( scaler ){ }
 
-Vector2::Vector2( const float afCoordinate[2] ): x( afCoordinate[0] ),y( afCoordinate[1] ){
-}
+Vector2::Vector2( const float afCoordinate[2] ): x( afCoordinate[0] ),y( afCoordinate[1] ){ }
 
 Vector2::Vector2( const int afCoordinate[2] ){
     x = (float)afCoordinate[0];
     y = (float)afCoordinate[1];
 }
 
-Vector2::Vector2( float* const r ): x( r[0] ), y( r[1] ){
-}
+Vector2::Vector2( float* const r ): x( r[0] ), y( r[1] ){ }
 
-Vector2::Vector2( const Vector3 vec3 ){
+Vector2::Vector2( const Vector2& v ): x( v.x ), y( v.y ){ }
+
+Vector2::Vector2( const Vector3& vec3 ){
     x = vec3.x;
     y = vec3.y;
+}
+
+Vector2::Vector2( const Vector4& vec4 ){
+    x = vec4.x;
+    y = vec4.y;
 }
 
 std::string Vector2::toString() const{

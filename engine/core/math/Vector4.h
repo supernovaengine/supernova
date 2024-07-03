@@ -2,8 +2,8 @@
 #ifndef vector4_h
 #define vector4_h
 
-#include "Vector3.h"
 #include <algorithm>
+#include <string>
 #include <assert.h>
 #include <math.h>
 
@@ -18,61 +18,50 @@ Supernova::Vector4 operator - (const float lhs, const Supernova::Vector4& rhs);
 
 namespace Supernova {
 
+    class Vector2;
+    class Vector3;
+
     class Vector4
     {
     public:
         float x, y, z, w;
         
         static const Vector4 ZERO;
+        static const Vector4 UNIT_X;
+        static const Vector4 UNIT_Y;
+        static const Vector4 UNIT_Z;
+        static const Vector4 UNIT_W;
+        static const Vector4 UNIT_SCALE;
 
         Vector4();
 
         Vector4( const float fX, const float fY, const float fZ, const float fW );
-
-        explicit Vector4( const float afCoordinate[4] );
-
-        explicit Vector4( const int afCoordinate[4] );
-
-        explicit Vector4( float* const r );
-
-        explicit Vector4( const float scaler );
-
-        explicit Vector4( const Vector3& rhs );
-
-        explicit Vector4( const Vector3& rhs, const float fW );
+        Vector4( const float afCoordinate[4] );
+        Vector4( const int afCoordinate[4] );
+        Vector4( float* const r );
+        Vector4( const float scaler );
+        Vector4( const Vector2& rhs, const float fZ, const float fW );
+        Vector4( const Vector3& rhs, const float fW );
+        Vector4( const Vector4& rhs );
 
         std::string toString() const;
 
-
         float operator [] ( const size_t i ) const;
-
         float& operator [] ( const size_t i );
-
         Vector4& operator = ( const Vector4& rkVector );
-
         Vector4& operator = ( const float fScalar);
-
         bool operator == ( const Vector4& rkVector ) const;
-
         bool operator != ( const Vector4& rkVector ) const;
-
         Vector4& operator = (const Vector3& rhs);
 
         // arithmetic operations
         Vector4 operator + ( const Vector4& rkVector ) const;
-
         Vector4 operator - ( const Vector4& rkVector ) const;
-
         Vector4 operator * ( const float fScalar ) const;
-
         Vector4 operator * ( const Vector4& rhs) const;
-
         Vector4 operator / ( const float fScalar ) const;
-
         Vector4 operator / ( const Vector4& rhs) const;
-
         const Vector4& operator + () const;
-
         Vector4 operator - () const;
 
         friend Vector4 (::operator *) ( const float fScalar, const Vector4& rkVector );
@@ -83,23 +72,15 @@ namespace Supernova {
         friend Vector4 (::operator -) (const float lhs, const Vector4& rhs);
 
         Vector4& operator += ( const Vector4& rkVector );
-
         Vector4& operator -= ( const Vector4& rkVector );
-
         Vector4& operator *= ( const float fScalar );
-
         Vector4& operator += ( const float fScalar );
-
         Vector4& operator -= ( const float fScalar );
-
         Vector4& operator *= ( const Vector4& rkVector );
-
         Vector4& operator /= ( const float fScalar );
-
         Vector4& operator /= ( const Vector4& rkVector );
 
         bool operator < ( const Vector4& v ) const;
-
         bool operator > ( const Vector4& v ) const;
 
         void swap(Vector4& other);

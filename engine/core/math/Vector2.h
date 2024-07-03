@@ -18,6 +18,7 @@ Supernova::Vector2 operator - (const float lhs, const Supernova::Vector2& rhs);
 namespace Supernova {
 
     class Vector3;
+    class Vector4;
 
     class Vector2
     {
@@ -32,49 +33,31 @@ namespace Supernova {
         static const Vector2 UNIT_SCALE;
 
         Vector2();
-
-        Vector2(const float fX, const float fY );
-
-        explicit Vector2( const float scaler );
-
-        explicit Vector2( const float afCoordinate[2] );
-
-        explicit Vector2( const int afCoordinate[2] );
-
-        explicit Vector2( float* const r );
-
-        explicit Vector2( const Vector3 vec3 );
+        Vector2( const float fX, const float fY );
+        Vector2( const float scaler );
+        Vector2( const float afCoordinate[2] );
+        Vector2( const int afCoordinate[2] );
+        Vector2( float* const r );
+        Vector2( const Vector2& v );
+        Vector2( const Vector3& vec3 );
+        Vector2( const Vector4& vec4 );
 
         std::string toString() const;
 
-
         float operator [] ( const size_t i ) const;
-
         float& operator [] ( const size_t i );
-
         Vector2& operator = ( const Vector2& rkVector );
-
         Vector2& operator = ( const float fScalar);
-
         bool operator == ( const Vector2& rkVector ) const;
-
         bool operator != ( const Vector2& rkVector ) const;
 
-
         Vector2 operator + ( const Vector2& rkVector ) const;
-
         Vector2 operator - ( const Vector2& rkVector ) const;
-
         Vector2 operator * ( const float fScalar ) const;
-
         Vector2 operator * ( const Vector2& rhs) const;
-
         Vector2 operator / ( const float fScalar ) const;
-
         Vector2 operator / ( const Vector2& rhs) const;
-
         const Vector2& operator + () const;
-
         Vector2 operator - () const;
 
         friend Vector2 (::operator *) ( const float fScalar, const Vector2& rkVector );
@@ -85,25 +68,16 @@ namespace Supernova {
         friend Vector2 (::operator -) (const float lhs, const Vector2& rhs);
 
         Vector2& operator += ( const Vector2& rkVector );
-
         Vector2& operator += ( const float fScaler );
-
         Vector2& operator -= ( const Vector2& rkVector );
-
         Vector2& operator -= ( const float fScaler );
-
         Vector2& operator *= ( const float fScalar );
-
         Vector2& operator *= ( const Vector2& rkVector );
-
         Vector2& operator /= ( const float fScalar );
-
         Vector2& operator /= ( const Vector2& rkVector );
 
         bool operator < ( const Vector2& rhs ) const;
-
         bool operator > ( const Vector2& rhs ) const;
-
 
         void swap(Vector2& other);
         float length () const;

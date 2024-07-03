@@ -43,7 +43,12 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector2>("Vector2")
-        .addConstructor<void(), void(float, float)>()
+        .addConstructor<
+            void(), 
+            void(const float, const float), 
+            void(Vector2),
+            void(Vector3), 
+            void(Vector4)>()
         .addStaticProperty("ZERO", &Vector2::ZERO)
         .addStaticProperty("UNIT_X", &Vector2::UNIT_X)
         .addStaticProperty("UNIT_Y", &Vector2::UNIT_Y)
@@ -83,7 +88,12 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector3>("Vector3")
-        .addConstructor<void(), void(float, float, float)>()
+        .addConstructor<
+            void(), 
+            void(const float, const float, const float), 
+            void(Vector2, const float),
+            void(Vector3), 
+            void(Vector4)>()
         .addStaticProperty("ZERO", &Vector3::ZERO)
         .addStaticProperty("UNIT_X", &Vector3::UNIT_X)
         .addStaticProperty("UNIT_Y", &Vector3::UNIT_Y)
@@ -120,8 +130,18 @@ void LuaBinding::registerMathClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector4>("Vector4")
-        .addConstructor<void(), void(float, float, float, float)>()
+        .addConstructor<
+            void(), 
+            void(const float, const float, const float, const float), 
+            void(Vector2, const float, const float),
+            void(Vector3, const float), 
+            void(Vector4)>()
         .addStaticProperty("ZERO", &Vector4::ZERO)
+        .addStaticProperty("UNIT_X", &Vector4::UNIT_X)
+        .addStaticProperty("UNIT_Y", &Vector4::UNIT_Y)
+        .addStaticProperty("UNIT_Z", &Vector4::UNIT_Z)
+        .addStaticProperty("UNIT_W", &Vector4::UNIT_W)
+        .addStaticProperty("UNIT_SCALE", &Vector4::UNIT_SCALE)
         .addProperty("x", &Vector4::x, true)
         .addProperty("y", &Vector4::y, true)
         .addProperty("z", &Vector4::z, true)
