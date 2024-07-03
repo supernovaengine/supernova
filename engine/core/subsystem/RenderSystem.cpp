@@ -2810,7 +2810,6 @@ void RenderSystem::draw(){
 				UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
 
 				Rect parentScissor;
-				bool hasParentScissor = false;
 
 				if (transform.parent != NULL_ENTITY){
 					Signature parentSignature = scene->getSignature(transform.parent);
@@ -2821,10 +2820,10 @@ void RenderSystem::draw(){
 						if (!parentScissor.isZero()){
 							if (!layout.ignoreScissor){
 								camera.render.applyScissor(parentScissor);
+								layout.scissor = parentScissor;
+
 								hasActiveScissor = true;
 							}
-							layout.scissor = parentScissor;
-							hasParentScissor = true;
 						}
 					}
 				}
@@ -2833,7 +2832,7 @@ void RenderSystem::draw(){
 					ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
 					layout.scissor = getScissorRect(layout, img, transform, camera);
-					if (hasParentScissor){
+					if (hasActiveScissor){
 						layout.scissor = layout.scissor.fitOnRect(parentScissor);
 					}
 				}
