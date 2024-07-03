@@ -112,7 +112,7 @@ void Rect::setRect(Rect rect){
     setRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
 }
 
-Rect& Rect::fitOnRect(Rect& rect){
+Rect& Rect::fitOnRect(Rect rect){
     if (x < rect.getX())
         x = rect.getX();
 
@@ -132,6 +132,16 @@ Rect& Rect::fitOnRect(Rect& rect){
         height = 0;
 
     return *this;
+}
+
+bool Rect::contains(Vector2 point){
+    if (point.x >= x &&
+        point.x <= (x + width) &&
+        point.y >= y &&
+        point.y <= (y + height)) {
+        return true;
+    }
+    return false;
 }
 
 bool Rect::isNormalized(){

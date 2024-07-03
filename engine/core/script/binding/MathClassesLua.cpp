@@ -158,6 +158,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             luabridge::overload<Rect>(&Rect::setRect),
             luabridge::overload<float, float, float, float>(&Rect::setRect))
         .addFunction("fitOnRect", &Rect::fitOnRect)
+        .addFunction("contains", &Rect::contains)
         .addFunction("isNormalized", &Rect::isNormalized)
         .addFunction("isZero", &Rect::isZero)
         .endClass();

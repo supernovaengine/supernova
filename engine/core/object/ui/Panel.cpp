@@ -139,6 +139,43 @@ void Panel::setHeaderTexture(std::string path){
     getHeaderImageObject().setTexture(path);
 }
 
+void Panel::setMinSize(int minWidth, int minHeight){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    panelcomp.minWidth = minWidth;
+    panelcomp.minHeight = minHeight;
+
+    panelcomp.needUpdatePanel = true;
+}
+
+void Panel::setMinWidth(int minWidth){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    panelcomp.minWidth = minWidth;
+
+    panelcomp.needUpdatePanel = true;
+}
+
+void Panel::setMinHeight(int minHeight){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    panelcomp.minHeight = minHeight;
+
+    panelcomp.needUpdatePanel = true;
+}
+
+int Panel::getMinWidth() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    return panelcomp.minWidth;
+}
+
+int Panel::getMinHeight() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    return panelcomp.minHeight;
+}
+
 void Panel::setWindowProperties(const bool canMove, const bool canResize, const bool canTopOnFocus){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
     panelcomp.canMove = canMove;

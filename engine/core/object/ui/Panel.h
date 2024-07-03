@@ -42,6 +42,13 @@ namespace Supernova{
         void setHeaderPatchMargin(int margin);
         void setHeaderTexture(std::string path);
 
+        void setMinSize(int minWidth, int minHeight);
+        void setMinWidth(int minWidth);
+        void setMinHeight(int minHeight);
+
+        int getMinWidth() const;
+        int getMinHeight() const;
+
         void setWindowProperties(const bool canMove, const bool canResize, const bool canTopOnFocus);
 
         void setCanMove(const bool canMove);

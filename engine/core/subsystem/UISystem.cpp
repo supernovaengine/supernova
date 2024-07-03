@@ -449,6 +449,19 @@ void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent&
     titlelayout.ignoreScissor = true;
     titlelayout.usingAnchors = true;
 
+    if (panel.minWidth > layout.width){
+        panel.minWidth = layout.width;
+    }
+    if (panel.minHeight > layout.height){
+        panel.minHeight = layout.height;
+    }
+    if (panel.minWidth < (img.patchMarginLeft + img.patchMarginRight)){
+        panel.minWidth = img.patchMarginLeft + img.patchMarginRight;
+    }
+    if (panel.minHeight < (img.patchMarginTop + img.patchMarginBottom)){
+        panel.minHeight = img.patchMarginTop + img.patchMarginBottom;
+    }
+
     headertext.needUpdateText = true;
     createOrUpdateText(headertext, titleui, titlelayout);
 }
@@ -1075,6 +1088,15 @@ void UISystem::update(double dt){
                         Log::error("The UI container has exceeded the maximum allowed of %i children. Please, increase MAX_CONTAINER_BOXES value.", MAX_CONTAINER_BOXES);
                     }
                 }
+
+                PanelComponent* parentpanel = scene->findComponent<PanelComponent>(transform.parent);
+                if (parentpanel){
+                    layout.panel = transform.parent;
+                }
+
+                if (parentlayout->panel != NULL_ENTITY){
+                    layout.panel = parentlayout->panel;
+                }
             }
         }
     }
@@ -1431,22 +1453,43 @@ bool UISystem::eventOnPointerDown(float x, float y){
 
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
+        if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
-            UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-            if (isCoordInside(x, y, transform, layout) && !layout.ignoreEvents){ //TODO: isCoordInside to polygon
-                if (signature.test(scene->getComponentType<ImageComponent>())){
-                    lastUIFromPointer = entity;
+            if (signature.test(scene->getComponentType<ImageComponent>())){
+                Rect uirect(transform.worldPosition.x, transform.worldPosition.y, layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
+
+                if (layout.panel != NULL_ENTITY){
+                    Transform& paneltransform =  scene->getComponent<Transform>(layout.panel);
+                    UILayoutComponent& panellayout =  scene->getComponent<UILayoutComponent>(layout.panel);
+                    ImageComponent& panelimage =  scene->getComponent<ImageComponent>(layout.panel);
+
+                    float x = paneltransform.worldPosition.x + (panelimage.patchMarginLeft * paneltransform.worldScale.x);
+                    float y = paneltransform.worldPosition.y + (panelimage.patchMarginTop * paneltransform.worldScale.y);
+                    float width = (panellayout.width - (panelimage.patchMarginLeft + panelimage.patchMarginRight)) * paneltransform.worldScale.x;
+                    float height = (panellayout.height - (panelimage.patchMarginTop + panelimage.patchMarginBottom)) * paneltransform.worldScale.y;
+
+                    uirect = uirect.fitOnRect(Rect(x, y, width, height));
                 }
+
+                if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){ //TODO: inside to polygon
+                    lastUIFromPointer = entity;
+                    lastPanelFromPointer = layout.panel;
+                }
+
                 if (signature.test(scene->getComponentType<PanelComponent>())){
-                    lastPanelFromPointer = entity;
+                    if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){
+                        lastPanelFromPointer = entity;
+                    }
                 }
             }
 
-            if (ui.focused){
-                ui.focused = false;
-                ui.onLostFocus.call();
+            if (signature.test(scene->getComponentType<UIComponent>())){
+                UIComponent& ui = scene->getComponent<UIComponent>(entity);
+                if (ui.focused){
+                    ui.focused = false;
+                    ui.onLostFocus.call();
+                }
             }
         }
     }
@@ -1720,6 +1763,7 @@ bool UISystem::eventOnPointerMove(float x, float y){
         if (signature.test(scene->getComponentType<PanelComponent>())){
             PanelComponent& panel = scene->getComponent<PanelComponent>(lastUIFromPointer);
             Transform& transform = scene->getComponent<Transform>(lastUIFromPointer);
+            ImageComponent& image = scene->getComponent<ImageComponent>(lastUIFromPointer);
             if (panel.headerPointerDown){
                 transform.position += Vector3(pointerDiff.x / transform.worldScale.x, pointerDiff.y / transform.worldScale.y, 0);
                 transform.needUpdate = true;
@@ -1747,6 +1791,12 @@ bool UISystem::eventOnPointerMove(float x, float y){
                     transform.needUpdate = true;
                     layout.width -= (int)panelSizeAcc.x;
                     layout.needUpdateSizes = true;
+                }
+                if (layout.width < panel.minWidth){
+                    layout.width = panel.minWidth;
+                }
+                if (layout.height < panel.minHeight){
+                    layout.height = panel.minHeight;
                 }
                 panelSizeAcc -= Vector2((int)panelSizeAcc.x, (int)panelSizeAcc.y);
             }

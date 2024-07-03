@@ -53,6 +53,8 @@ namespace Supernova{
         AnchorPreset anchorPreset = AnchorPreset::NONE;
         bool usingAnchors = false;
 
+        Entity panel = NULL_ENTITY;
+
         int resizeMargin = 5;
 
         int containerBoxIndex = -1;

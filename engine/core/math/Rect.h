@@ -6,6 +6,7 @@
 // (c) 2018 Eduardo Doria.
 //
 
+#include "Vector2.h"
 #include "Vector4.h"
 #include <string>
 
@@ -46,7 +47,9 @@ namespace Supernova {
         void setRect(float x, float y, float width, float height);
         void setRect(Rect rect);
 
-        Rect& fitOnRect(Rect& rect);
+        Rect& fitOnRect(Rect rect);
+
+        bool contains(Vector2 point);
 
         bool isNormalized();
         bool isZero();
