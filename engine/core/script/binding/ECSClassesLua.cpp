@@ -89,8 +89,8 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .beginNamespace("ContainerType")
         .addVariable("VERTICAL", ContainerType::VERTICAL)
         .addVariable("HORIZONTAL", ContainerType::HORIZONTAL)
-        .addVariable("VERTICAL_FLOAT", ContainerType::VERTICAL_FLOAT)
-        .addVariable("HORIZONTAL_FLOAT", ContainerType::HORIZONTAL_FLOAT)
+        .addVariable("VERTICAL_WRAP", ContainerType::VERTICAL_WRAP)
+        .addVariable("HORIZONTAL_WRAP", ContainerType::HORIZONTAL_WRAP)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)

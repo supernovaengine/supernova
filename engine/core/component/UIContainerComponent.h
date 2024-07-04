@@ -14,8 +14,8 @@ namespace Supernova{
     enum class ContainerType{
         VERTICAL,
         HORIZONTAL,
-        VERTICAL_FLOAT,
-        HORIZONTAL_FLOAT
+        VERTICAL_WRAP,
+        HORIZONTAL_WRAP
     };
 
     struct ContainerBox{
