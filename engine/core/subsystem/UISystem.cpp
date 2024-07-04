@@ -1250,11 +1250,13 @@ void UISystem::update(double dt){
             int numObjInLine = 0;
             if (container.type == ContainerType::HORIZONTAL_WRAP){
                 numObjInLine = floor((float)layout.width / (float)container.maxWidth);
+                if (numObjInLine < 1) numObjInLine = 1;
                 int numLines = ceil((float)container.numBoxes / (float)numObjInLine);
 
                 layout.height = numLines * container.maxHeight;
             }else if (container.type == ContainerType::VERTICAL_WRAP){
                 numObjInLine = floor((float)layout.height / (float)container.maxHeight);
+                if (numObjInLine < 1) numObjInLine = 1;
                 int numLines = ceil((float)container.numBoxes / (float)numObjInLine);
 
                 layout.width = numLines * container.maxWidth;
