@@ -114,6 +114,21 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("CursorType")
+        .addVariable("DEFAULT", CursorType::DEFAULT)
+        .addVariable("ARROW", CursorType::ARROW)
+        .addVariable("IBEAM", CursorType::IBEAM)
+        .addVariable("CROSSHAIR", CursorType::CROSSHAIR)
+        .addVariable("POINTING_HAND", CursorType::POINTING_HAND)
+        .addVariable("RESIZE_EW", CursorType::RESIZE_EW)
+        .addVariable("RESIZE_NS", CursorType::RESIZE_NS)
+        .addVariable("RESIZE_NWSE", CursorType::RESIZE_NWSE)
+        .addVariable("RESIZE_NESW", CursorType::RESIZE_NESW)
+        .addVariable("RESIZE_ALL", CursorType::RESIZE_ALL)
+        .addVariable("NOT_ALLOWED", CursorType::NOT_ALLOWED)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<Engine>("Engine")
 
         .addStaticProperty("scene", &Engine::getScene, &Engine::setScene)
@@ -144,6 +159,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticProperty("updateTime", &Engine::getUpdateTime, &Engine::setUpdateTime)
         .addStaticFunction("setUpdateTimeMS", &Engine::setUpdateTimeMS)
         .addStaticProperty("sceneUpdateTime", &Engine::getSceneUpdateTime)
+        .addStaticProperty("mouseCursor", &Engine::getMouseCursor, &Engine::setMouseCursor)
         .addStaticProperty("platform", &Engine::getPlatform)
         .addStaticProperty("graphicBackend", &Engine::getGraphicBackend)
         .addStaticProperty("openGL", &Engine::isOpenGL)

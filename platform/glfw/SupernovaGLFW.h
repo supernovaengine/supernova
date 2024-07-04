@@ -45,6 +45,8 @@ public:
     virtual void requestFullscreen();
     virtual void exitFullscreen();
 
+    virtual void setMouseCursor(Supernova::CursorType type);
+
     virtual std::string getAssetPath();
     virtual std::string getUserDataPath();
     virtual std::string getLuaPath();

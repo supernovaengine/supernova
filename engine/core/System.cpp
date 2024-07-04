@@ -80,6 +80,10 @@ sg_swapchain System::getSokolSwapchain(){
     return swapchain;
 }
 
+void System::setMouseCursor(CursorType type){
+
+}
+
 int System::getSampleCount(){
     return 1;
 }

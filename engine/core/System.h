@@ -24,6 +24,20 @@ namespace Supernova {
         MatureAudience
     };
 
+    enum class CursorType{
+        DEFAULT,
+        ARROW,
+        IBEAM,
+        CROSSHAIR,
+        POINTING_HAND,
+        RESIZE_EW,
+        RESIZE_NS,
+        RESIZE_NWSE,
+        RESIZE_NESW,
+        RESIZE_ALL,
+        NOT_ALLOWED
+    };
+
     class System {
     protected:
 
@@ -64,6 +78,8 @@ namespace Supernova {
         // *******
         virtual sg_environment getSokolEnvironment();
         virtual sg_swapchain getSokolSwapchain();
+
+        virtual void setMouseCursor(CursorType type);
 
         virtual FILE* platformFopen(const char* fname, const char* mode);
         virtual bool syncFileSystem();

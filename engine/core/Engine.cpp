@@ -4,7 +4,6 @@
 
 #include "Engine.h"
 #include "Scene.h"
-#include "System.h"
 #include "Input.h"
 #include "render/SystemRender.h"
 #include "script/LuaBinding.h"
@@ -57,6 +56,8 @@ float Engine::updateTime = 0.01667; //60Hz
 
 std::atomic<bool> Engine::viewLoaded = false;
 std::atomic<bool> Engine::paused = false;
+
+CursorType Engine::mouseCursorType = CursorType::DEFAULT;
 
 thread_local bool Engine::asyncThread = false;
 Semaphore Engine::drawSemaphore;
@@ -332,6 +333,17 @@ float Engine::getSceneUpdateTime(){
     }
 }
 
+void Engine::setMouseCursor(CursorType type){
+    if (viewLoaded){
+        System::instance().setMouseCursor(type);
+    }
+    mouseCursorType = type;
+}
+
+CursorType Engine::getMouseCursor(){
+    return mouseCursorType;
+}
+
 Platform Engine::getPlatform(){
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     return Platform::Windows;
@@ -461,6 +473,10 @@ void Engine::systemInit(int argc, char* argv[]){
 
 void Engine::systemViewLoaded(){
     SystemRender::setup();
+
+    if (mouseCursorType != CursorType::DEFAULT){
+        System::instance().setMouseCursor(mouseCursorType);
+    }
 
     asyncThread = false;
 

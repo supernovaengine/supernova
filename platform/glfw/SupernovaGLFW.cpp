@@ -159,6 +159,38 @@ void SupernovaGLFW::exitFullscreen(){
     glfwSetWindowMonitor(window, nullptr,  windowPosX, windowPosY, windowWidth, windowHeight, 0);
 }
 
+void SupernovaGLFW::setMouseCursor(Supernova::CursorType type){
+    GLFWcursor* cursor = NULL;
+
+    if (type == Supernova::CursorType::ARROW){
+        cursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    }else if (type == Supernova::CursorType::IBEAM){
+        cursor = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+    }else if (type == Supernova::CursorType::CROSSHAIR){
+        cursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+    }else if (type == Supernova::CursorType::POINTING_HAND){
+        cursor = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
+    }else if (type == Supernova::CursorType::RESIZE_EW){
+        cursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+    }else if (type == Supernova::CursorType::RESIZE_NS){
+        cursor = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+    }else if (type == Supernova::CursorType::RESIZE_NWSE){
+        cursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+    }else if (type == Supernova::CursorType::RESIZE_NESW){
+        cursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+    }else if (type == Supernova::CursorType::RESIZE_ALL){
+        cursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+    }else if (type == Supernova::CursorType::NOT_ALLOWED){
+        cursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    }
+
+    if (cursor) {
+        glfwSetCursor(window, cursor);
+    } else {
+        // Handle error: cursor creation failed
+    }
+}
+
 std::string SupernovaGLFW::getAssetPath(){
     return "assets";
 }

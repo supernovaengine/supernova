@@ -47,6 +47,8 @@ namespace luabridge
     template<> struct Stack<PrimitiveType> : EnumWrapper<PrimitiveType>{};
     template<> struct Stack<TextureFilter> : EnumWrapper<TextureFilter>{};
     template<> struct Stack<TextureWrap> : EnumWrapper<TextureWrap>{};
+    template<> struct Stack<AdMobRating> : EnumWrapper<AdMobRating>{};
+    template<> struct Stack<CursorType> : EnumWrapper<CursorType>{};
 
     template<> struct Stack<FogType> : EnumWrapper<FogType>{};
     template<> struct Stack<CameraType> : EnumWrapper<CameraType>{};

@@ -57,6 +57,7 @@
 #define MAX_BROADPHASELAYER_3D 6
 #endif
 
+#include "System.h"
 #include "util/FunctionSubscribe.h"
 #include "math/Rect.h"
 #include "util/ThreadUtils.h"
@@ -153,6 +154,8 @@ namespace Supernova {
         static std::atomic<bool> viewLoaded;
         static std::atomic<bool> paused;
 
+        static CursorType mouseCursorType;
+
         thread_local static bool asyncThread;
 
         static Semaphore drawSemaphore;
@@ -219,6 +222,9 @@ namespace Supernova {
         static float getUpdateTime();
 
         static float getSceneUpdateTime();
+
+        static void setMouseCursor(CursorType type);
+        static CursorType getMouseCursor();
         
         static Platform getPlatform();
         static GraphicBackend getGraphicBackend();
