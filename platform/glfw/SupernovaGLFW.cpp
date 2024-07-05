@@ -169,19 +169,47 @@ void SupernovaGLFW::setMouseCursor(Supernova::CursorType type){
     }else if (type == Supernova::CursorType::CROSSHAIR){
         cursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
     }else if (type == Supernova::CursorType::POINTING_HAND){
+        #ifdef GLFW_POINTING_HAND_CURSOR
+        cursor = glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR);
+        #else
         cursor = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
+        #endif
     }else if (type == Supernova::CursorType::RESIZE_EW){
+        #ifdef GLFW_RESIZE_EW_CURSOR
+        cursor = glfwCreateStandardCursor(GLFW_RESIZE_EW_CURSOR);
+        #else
         cursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+        #endif
     }else if (type == Supernova::CursorType::RESIZE_NS){
+        #ifdef GLFW_RESIZE_NS_CURSOR
+        cursor = glfwCreateStandardCursor(GLFW_RESIZE_NS_CURSOR);
+        #else
         cursor = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+        #endif
     }else if (type == Supernova::CursorType::RESIZE_NWSE){
+        #ifdef GLFW_RESIZE_NWSE_CURSOR
+        cursor = glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR);
+        #else
         cursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+        #endif
     }else if (type == Supernova::CursorType::RESIZE_NESW){
+        #ifdef GLFW_RESIZE_NESW_CURSOR
+        cursor = glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR);
+        #else
         cursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+        #endif
     }else if (type == Supernova::CursorType::RESIZE_ALL){
+        #ifdef GLFW_RESIZE_ALL_CURSOR
+        cursor = glfwCreateStandardCursor(GLFW_RESIZE_ALL_CURSOR);
+        #else
         cursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+        #endif
     }else if (type == Supernova::CursorType::NOT_ALLOWED){
+        #ifdef GLFW_NOT_ALLOWED_CURSOR
+        cursor = glfwCreateStandardCursor(GLFW_NOT_ALLOWED_CURSOR);
+        #else
         cursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+        #endif
     }
 
     if (cursor) {
