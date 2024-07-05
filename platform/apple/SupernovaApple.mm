@@ -52,6 +52,55 @@ sg_swapchain SupernovaApple::getSokolSwapchain(){
     };
 }
 
+#if defined(TARGET_OS_IPHONE) && !TARGET_OS_IPHONE
+// undocumented methods for creating cursors (see GLFW 3.4 and imgui_impl_osx.mm)
+@interface NSCursor()
++ (id)_windowResizeNorthWestSouthEastCursor;
++ (id)_windowResizeNorthEastSouthWestCursor;
++ (id)_windowResizeNorthSouthCursor;
++ (id)_windowResizeEastWestCursor;
+@end
+#endif
+
+void SupernovaApple::setMouseCursor(Supernova::CursorType type){
+#if defined(TARGET_OS_IPHONE) && !TARGET_OS_IPHONE
+    NSCursor* cursor;
+    if (type == Supernova::CursorType::ARROW){
+        cursor = [NSCursor IBeamCursor];
+    }else if (type == Supernova::CursorType::IBEAM){
+        cursor = [NSCursor IBeamCursor];
+    }else if (type == Supernova::CursorType::CROSSHAIR){
+        cursor = [NSCursor crosshairCursor];
+    }else if (type == Supernova::CursorType::POINTING_HAND){
+        cursor = [NSCursor pointingHandCursor];
+    }else if (type == Supernova::CursorType::RESIZE_EW){
+        cursor = [NSCursor respondsToSelector:@selector(_windowResizeEastWestCursor)] ? [NSCursor _windowResizeEastWestCursor] : [NSCursor resizeLeftRightCursor];
+    }else if (type == Supernova::CursorType::RESIZE_NS){
+        cursor = [NSCursor respondsToSelector:@selector(_windowResizeNorthSouthCursor)] ? [NSCursor _windowResizeNorthSouthCursor] : [NSCursor resizeUpDownCursor];
+    }else if (type == Supernova::CursorType::RESIZE_NWSE){
+        cursor = [NSCursor respondsToSelector:@selector(_windowResizeNorthWestSouthEastCursor)] ? [NSCursor _windowResizeNorthWestSouthEastCursor] : [NSCursor closedHandCursor];
+    }else if (type == Supernova::CursorType::RESIZE_NESW){
+        cursor = [NSCursor respondsToSelector:@selector(_windowResizeNorthEastSouthWestCursor)] ? [NSCursor _windowResizeNorthEastSouthWestCursor] : [NSCursor closedHandCursor];
+    }else if (type == Supernova::CursorType::RESIZE_ALL){
+        cursor = [NSCursor closedHandCursor];
+    }else if (type == Supernova::CursorType::NOT_ALLOWED){
+        cursor = [NSCursor operationNotAllowedCursor];
+    }
+
+    [cursor set];
+#endif
+}
+
+void SupernovaApple::setShowCursor(bool showCursor){
+#if defined(TARGET_OS_IPHONE) && !TARGET_OS_IPHONE
+    if (!showCursor){
+        [NSCursor hide];
+    }else{
+        [NSCursor unhide];
+    }
+#endif
+}
+
 int SupernovaApple::getScreenWidth(){
     return Renderer.screenSize.width;
 }

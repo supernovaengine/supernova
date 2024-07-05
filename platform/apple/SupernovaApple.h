@@ -14,6 +14,9 @@ public:
     virtual sg_environment getSokolEnvironment();
     virtual sg_swapchain getSokolSwapchain();
 
+    virtual void setMouseCursor(Supernova::CursorType type);
+    virtual void setShowCursor(bool showCursor);
+
     virtual int getScreenWidth();
     virtual int getScreenHeight();
     

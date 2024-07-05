@@ -95,6 +95,9 @@ static const NSRange _emptyRange = { NSNotFound, 0 };
 
 - (void)mouseEntered:(NSEvent*)event {
     Supernova::Engine::systemMouseEnter();
+    if (Supernova::Engine::getMouseCursor() != Supernova::CursorType::ARROW){
+        Supernova::Engine::setMouseCursor(Supernova::Engine::getMouseCursor());
+    }
 }
 
 - (void)mouseExited:(NSEvent*)event {
