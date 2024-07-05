@@ -57,7 +57,8 @@ float Engine::updateTime = 0.01667; //60Hz
 std::atomic<bool> Engine::viewLoaded = false;
 std::atomic<bool> Engine::paused = false;
 
-CursorType Engine::mouseCursorType = CursorType::DEFAULT;
+CursorType Engine::mouseCursorType = CursorType::ARROW;
+bool Engine::showCursor = true;
 
 thread_local bool Engine::asyncThread = false;
 Semaphore Engine::drawSemaphore;
@@ -344,6 +345,17 @@ CursorType Engine::getMouseCursor(){
     return mouseCursorType;
 }
 
+void Engine::setShowCursor(bool showCursor){
+    if (viewLoaded){
+        System::instance().setShowCursor(showCursor);
+    }
+    Engine::showCursor = showCursor;
+}
+
+bool Engine::isShowCursor(){
+    return showCursor;
+}
+
 Platform Engine::getPlatform(){
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
     return Platform::Windows;
@@ -474,8 +486,11 @@ void Engine::systemInit(int argc, char* argv[]){
 void Engine::systemViewLoaded(){
     SystemRender::setup();
 
-    if (mouseCursorType != CursorType::DEFAULT){
+    if (mouseCursorType != CursorType::ARROW){
         System::instance().setMouseCursor(mouseCursorType);
+    }
+    if (!showCursor){
+        System::instance().setShowCursor(showCursor);
     }
 
     asyncThread = false;

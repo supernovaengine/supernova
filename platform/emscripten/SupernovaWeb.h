@@ -54,6 +54,9 @@ public:
     virtual void requestFullscreen();
     virtual void exitFullscreen();
 
+    virtual void setMouseCursor(Supernova::CursorType type);
+    virtual void setShowCursor(bool showCursor);
+
     virtual std::string getUserDataPath();
 
     virtual bool syncFileSystem();

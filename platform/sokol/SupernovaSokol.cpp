@@ -62,6 +62,9 @@ void SupernovaSokol::setMouseCursor(Supernova::CursorType type){
     }
 }
 
+void SupernovaSokol::setShowCursor(bool showCursor){
+    sapp_show_mouse(showCursor);
+}
 
 std::string SupernovaSokol::getAssetPath(){
     return "assets";

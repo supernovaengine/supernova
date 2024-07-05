@@ -115,7 +115,6 @@ void LuaBinding::registerCoreClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginNamespace("CursorType")
-        .addVariable("DEFAULT", CursorType::DEFAULT)
         .addVariable("ARROW", CursorType::ARROW)
         .addVariable("IBEAM", CursorType::IBEAM)
         .addVariable("CROSSHAIR", CursorType::CROSSHAIR)

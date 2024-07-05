@@ -191,6 +191,14 @@ void SupernovaGLFW::setMouseCursor(Supernova::CursorType type){
     }
 }
 
+void SupernovaGLFW::setShowCursor(bool showCursor){
+    if (showCursor){
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }else{
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    }
+}
+
 std::string SupernovaGLFW::getAssetPath(){
     return "assets";
 }

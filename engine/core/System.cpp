@@ -84,6 +84,10 @@ void System::setMouseCursor(CursorType type){
 
 }
 
+void System::setShowCursor(bool showCursor){
+
+}
+
 int System::getSampleCount(){
     return 1;
 }

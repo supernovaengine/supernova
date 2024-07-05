@@ -25,8 +25,7 @@ namespace Supernova {
     };
 
     enum class CursorType{
-        DEFAULT,
-        ARROW,
+        ARROW, // default
         IBEAM,
         CROSSHAIR,
         POINTING_HAND,
@@ -80,6 +79,7 @@ namespace Supernova {
         virtual sg_swapchain getSokolSwapchain();
 
         virtual void setMouseCursor(CursorType type);
+        virtual void setShowCursor(bool showCursor);
 
         virtual FILE* platformFopen(const char* fname, const char* mode);
         virtual bool syncFileSystem();

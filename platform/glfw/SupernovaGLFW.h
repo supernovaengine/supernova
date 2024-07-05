@@ -46,6 +46,7 @@ public:
     virtual void exitFullscreen();
 
     virtual void setMouseCursor(Supernova::CursorType type);
+    virtual void setShowCursor(bool showCursor);
 
     virtual std::string getAssetPath();
     virtual std::string getUserDataPath();

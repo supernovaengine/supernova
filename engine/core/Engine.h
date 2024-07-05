@@ -155,6 +155,7 @@ namespace Supernova {
         static std::atomic<bool> paused;
 
         static CursorType mouseCursorType;
+        static bool showCursor;
 
         thread_local static bool asyncThread;
 
@@ -225,6 +226,9 @@ namespace Supernova {
 
         static void setMouseCursor(CursorType type);
         static CursorType getMouseCursor();
+
+        static void setShowCursor(bool showCursor);
+        static bool isShowCursor();
         
         static Platform getPlatform();
         static GraphicBackend getGraphicBackend();

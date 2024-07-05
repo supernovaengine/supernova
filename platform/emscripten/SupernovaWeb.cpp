@@ -208,6 +208,45 @@ void SupernovaWeb::exitFullscreen(){
     EMSCRIPTEN_RESULT ret = emscripten_exit_fullscreen();
 }
 
+void SupernovaWeb::setMouseCursor(Supernova::CursorType type){
+    std::string cursor;
+
+    if (type == Supernova::CursorType::ARROW){
+        cursor = "default";
+    }else if (type == Supernova::CursorType::IBEAM){
+        cursor = "text";
+    }else if (type == Supernova::CursorType::CROSSHAIR){
+        cursor = "crosshair";
+    }else if (type == Supernova::CursorType::POINTING_HAND){
+        cursor = "pointer";
+    }else if (type == Supernova::CursorType::RESIZE_EW){
+        cursor = "ew-resize";
+    }else if (type == Supernova::CursorType::RESIZE_NS){
+        cursor = "ns-resize";
+    }else if (type == Supernova::CursorType::RESIZE_NWSE){
+        cursor = "nwse-resize";
+    }else if (type == Supernova::CursorType::RESIZE_NESW){
+        cursor = "nesw-resize";
+    }else if (type == Supernova::CursorType::RESIZE_ALL){
+        cursor = "all-scroll";
+    }else if (type == Supernova::CursorType::NOT_ALLOWED){
+        cursor = "not-allowed";
+    }else{
+        cursor = "auto";
+    }
+
+    EM_ASM({Module.canvas.style.cursor = UTF8ToString($0);}, cursor.c_str());
+
+}
+
+void SupernovaWeb::setShowCursor(bool showCursor){
+    if (!showCursor){
+        EM_ASM({Module.canvas.style.cursor = UTF8ToString($0);}, "none");
+    }else{
+        setMouseCursor(Supernova::Engine::getMouseCursor());
+    }
+}
+
 std::string SupernovaWeb::getUserDataPath(){
     return "/datafs";
 }
