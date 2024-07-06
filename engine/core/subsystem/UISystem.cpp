@@ -1040,6 +1040,65 @@ void UISystem::createOrUpdateUiComponent(double dt, UILayoutComponent& layout, E
     }
 }
 
+void UISystem::getPanelEdges(const UILayoutComponent& layout, const Transform& transform, const UILayoutComponent& headerlayout,  Rect& edgeRight, Rect& edgeRightBottom, Rect& edgeBottom, Rect& edgeLeftBottom, Rect& edgeLeft){
+    int minX;
+    int minY;
+    int width;
+    int height;
+
+    Vector2 scaledSize = Vector2(layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
+    Vector2 scaledResizeSize = Vector2(layout.resizeMargin * transform.worldScale.x, layout.resizeMargin * transform.worldScale.y);
+    float scaledHeaderHeight = headerlayout.height * transform.worldScale.y;
+
+    // right
+    minX = transform.worldPosition.x + scaledSize.x - scaledResizeSize.x;
+    minY = transform.worldPosition.y + scaledHeaderHeight;
+    width = scaledResizeSize.x;
+    height = scaledSize.y - scaledResizeSize.y - scaledHeaderHeight - 1;
+    edgeRight = Rect(minX, minY, width, height);
+
+    // right-bottom
+    minX = transform.worldPosition.x + scaledSize.x - scaledResizeSize.x;
+    minY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y;
+    width = scaledResizeSize.x;
+    height = scaledResizeSize.y;
+    edgeRightBottom = Rect(minX, minY, width, height);
+
+    // bottom
+    minX = transform.worldPosition.x + scaledResizeSize.x + 1;
+    minY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y;
+    width = scaledSize.x - 2;
+    height = scaledResizeSize.y;
+    edgeBottom = Rect(minX, minY, width, height);
+
+    // left-bottom
+    minX = transform.worldPosition.x;
+    minY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y;
+    width = scaledResizeSize.x;
+    height = scaledResizeSize.y;
+    edgeLeftBottom = Rect(minX, minY, width, height);
+
+    // left
+    minX = transform.worldPosition.x;
+    minY = transform.worldPosition.y + scaledHeaderHeight;
+    width = scaledResizeSize.x;
+    height = scaledSize.y - scaledResizeSize.y - scaledHeaderHeight - 1;
+    edgeLeft = Rect(minX, minY, width, height);
+}
+
+Rect UISystem::fitOnPanel(Rect uiRect, Entity parentPanel){
+    Transform& paneltransform =  scene->getComponent<Transform>(parentPanel);
+    UILayoutComponent& panellayout =  scene->getComponent<UILayoutComponent>(parentPanel);
+    ImageComponent& panelimage =  scene->getComponent<ImageComponent>(parentPanel);
+
+    float x = paneltransform.worldPosition.x + (panelimage.patchMarginLeft * paneltransform.worldScale.x);
+    float y = paneltransform.worldPosition.y + (panelimage.patchMarginTop * paneltransform.worldScale.y);
+    float width = (panellayout.width - (panelimage.patchMarginLeft + panelimage.patchMarginRight)) * paneltransform.worldScale.x;
+    float height = (panellayout.height - (panelimage.patchMarginTop + panelimage.patchMarginBottom)) * paneltransform.worldScale.y;
+
+    return uiRect.fitOnRect(Rect(x, y, width, height));
+}
+
 void UISystem::update(double dt){
 
     // need to be ordered by Transform
@@ -1445,16 +1504,7 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 Rect uirect(transform.worldPosition.x, transform.worldPosition.y, layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
 
                 if (layout.panel != NULL_ENTITY){
-                    Transform& paneltransform =  scene->getComponent<Transform>(layout.panel);
-                    UILayoutComponent& panellayout =  scene->getComponent<UILayoutComponent>(layout.panel);
-                    ImageComponent& panelimage =  scene->getComponent<ImageComponent>(layout.panel);
-
-                    float x = paneltransform.worldPosition.x + (panelimage.patchMarginLeft * paneltransform.worldScale.x);
-                    float y = paneltransform.worldPosition.y + (panelimage.patchMarginTop * paneltransform.worldScale.y);
-                    float width = (panellayout.width - (panelimage.patchMarginLeft + panelimage.patchMarginRight)) * paneltransform.worldScale.x;
-                    float height = (panellayout.height - (panelimage.patchMarginTop + panelimage.patchMarginBottom)) * paneltransform.worldScale.y;
-
-                    uirect = uirect.fitOnRect(Rect(x, y, width, height));
+                    uirect = fitOnPanel(uirect, layout.panel);
                 }
 
                 if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){ //TODO: inside to polygon
@@ -1530,67 +1580,24 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 Transform& headertransform = scene->getComponent<Transform>(panel.headercontainer);
                 UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
 
-                int minX;
-                int minY;
-                int maxX;
-                int maxY;
-
-                AABB edgeRight;
-                AABB edgeRightBottom;
-                AABB edgeBottom;
-                AABB edgeLeftBottom;
-                AABB edgeLeft;
-
-                Vector2 scaledSize = Vector2(layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
-                Vector2 scaledResizeSize = Vector2(layout.resizeMargin * transform.worldScale.x, layout.resizeMargin * transform.worldScale.y);
-                float scaledHeaderHeight = headerlayout.height * transform.worldScale.y;
-
-                // right
-                minX = transform.worldPosition.x + scaledSize.x - scaledResizeSize.x;
-                minY = transform.worldPosition.y + scaledHeaderHeight;
-                maxX = transform.worldPosition.x + scaledSize.x;
-                maxY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y - 1;
-                edgeRight = AABB(minX, minY, 0, maxX, maxY, 0);
-
-                // right-bottom
-                minX = transform.worldPosition.x + scaledSize.x - scaledResizeSize.x;
-                minY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y;
-                maxX = transform.worldPosition.x + scaledSize.x;
-                maxY = transform.worldPosition.y + scaledSize.y;
-                edgeRightBottom = AABB(minX, minY, 0, maxX, maxY, 0);
-
-                // bottom
-                minX = transform.worldPosition.x + scaledResizeSize.x + 1;
-                minY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y;
-                maxX = transform.worldPosition.x + scaledSize.x - scaledResizeSize.x - 1;
-                maxY = transform.worldPosition.y + scaledSize.y;
-                edgeBottom = AABB(minX, minY, 0, maxX, maxY, 0);
-
-                // left-bottom
-                minX = transform.worldPosition.x;
-                minY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y;
-                maxX = transform.worldPosition.x + scaledResizeSize.x;
-                maxY = transform.worldPosition.y + scaledSize.y;
-                edgeLeftBottom = AABB(minX, minY, 0, maxX, maxY, 0);
-
-                // left
-                minX = transform.worldPosition.x;
-                minY = transform.worldPosition.y + scaledHeaderHeight;
-                maxX = transform.worldPosition.x + scaledResizeSize.x;
-                maxY = transform.worldPosition.y + scaledSize.y - scaledResizeSize.y - 1;
-                edgeLeft = AABB(minX, minY, 0, maxX, maxY, 0);
+                Rect edgeRight;
+                Rect edgeRightBottom;
+                Rect edgeBottom;
+                Rect edgeLeftBottom;
+                Rect edgeLeft;
+                getPanelEdges(layout, transform, headerlayout, edgeRight, edgeRightBottom, edgeBottom, edgeLeftBottom, edgeLeft);
 
                 if (panel.canResize){
                     panelSizeAcc = Vector2(0, 0);
-                    if (edgeRight.contains(Vector3(x, y, 0))){
+                    if (edgeRight.contains(Vector2(x, y))){
                         panel.edgePointerDown = PanelEdge::RIGHT;
-                    }else if (edgeRightBottom.contains(Vector3(x, y, 0))){
+                    }else if (edgeRightBottom.contains(Vector2(x, y))){
                         panel.edgePointerDown = PanelEdge::RIGHT_BOTTOM;
-                    }else if (edgeBottom.contains(Vector3(x, y, 0))){
+                    }else if (edgeBottom.contains(Vector2(x, y))){
                         panel.edgePointerDown = PanelEdge::BOTTOM;
-                    }else if (edgeLeftBottom.contains(Vector3(x, y, 0))){
+                    }else if (edgeLeftBottom.contains(Vector2(x, y))){
                         panel.edgePointerDown = PanelEdge::LEFT_BOTTOM;
-                    }else if (edgeLeft.contains(Vector3(x, y, 0))){
+                    }else if (edgeLeft.contains(Vector2(x, y))){
                         panel.edgePointerDown = PanelEdge::LEFT;
                     }else{
                         panel.edgePointerDown = PanelEdge::NONE;
@@ -1687,6 +1694,62 @@ bool UISystem::eventOnPointerUp(float x, float y){
 bool UISystem::eventOnPointerMove(float x, float y){
     auto layouts = scene->getComponentArray<UILayoutComponent>();
 
+    CursorType cursor = CursorType::ARROW;
+
+    for (int i = 0; i < layouts->size(); i++){
+        UILayoutComponent& layout = layouts->getComponentFromIndex(i);
+
+        Entity entity = layouts->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+        if (signature.test(scene->getComponentType<Transform>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
+
+            if (signature.test(scene->getComponentType<ImageComponent>())){
+                Rect uirect(transform.worldPosition.x, transform.worldPosition.y, layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
+
+                if (layout.panel != NULL_ENTITY){
+                    uirect = fitOnPanel(uirect, layout.panel);
+                }
+
+                if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){
+                    cursor = CursorType::ARROW;
+
+                    if (signature.test(scene->getComponentType<TextEditComponent>())){
+                        cursor = CursorType::IBEAM;
+
+                    }else if (signature.test(scene->getComponentType<PanelComponent>())){
+                        PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+
+                        UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
+                        Transform& transform = scene->getComponent<Transform>(entity);
+                        UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
+
+                        Rect edgeRight;
+                        Rect edgeRightBottom;
+                        Rect edgeBottom;
+                        Rect edgeLeftBottom;
+                        Rect edgeLeft;
+                        getPanelEdges(layout, transform, headerlayout, edgeRight, edgeRightBottom, edgeBottom, edgeLeftBottom, edgeLeft);
+
+                        if (panel.canResize){
+                            if (edgeRight.contains(Vector2(x, y))){
+                                cursor = CursorType::RESIZE_EW;
+                            }else if (edgeRightBottom.contains(Vector2(x, y))){
+                                cursor = CursorType::RESIZE_NWSE;
+                            }else if (edgeBottom.contains(Vector2(x, y))){
+                                cursor = CursorType::RESIZE_NS;
+                            }else if (edgeLeftBottom.contains(Vector2(x, y))){
+                                cursor = CursorType::RESIZE_NESW;
+                            }else if (edgeLeft.contains(Vector2(x, y))){
+                                cursor = CursorType::RESIZE_EW;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if (lastUIFromPointer != NULL_ENTITY){
         UILayoutComponent& layout = layouts->getComponentFromIndex(layouts->getIndex(lastUIFromPointer));
         Signature signature = scene->getSignature(lastUIFromPointer);
@@ -1760,24 +1823,29 @@ bool UISystem::eventOnPointerMove(float x, float y){
                 if (panel.edgePointerDown == PanelEdge::RIGHT){
                     layout.width += (int)panelSizeAcc.x;
                     layout.needUpdateSizes = true;
+                    cursor = CursorType::RESIZE_EW;
                 }else if (panel.edgePointerDown == PanelEdge::RIGHT_BOTTOM){
                     layout.width += (int)panelSizeAcc.x;
                     layout.height += (int)panelSizeAcc.y;
                     layout.needUpdateSizes = true;
+                    cursor = CursorType::RESIZE_NWSE;
                 }else if (panel.edgePointerDown == PanelEdge::BOTTOM){
                     layout.height += (int)panelSizeAcc.y;
                     layout.needUpdateSizes = true;
+                    cursor = CursorType::RESIZE_NS;
                 }else if (panel.edgePointerDown == PanelEdge::LEFT_BOTTOM){
                     transform.position += Vector3(pointerDiff.x / transform.worldScale.x, 0, 0);
                     transform.needUpdate = true;
                     layout.width -= (int)panelSizeAcc.x;
                     layout.height += (int)panelSizeAcc.y;
                     layout.needUpdateSizes = true;
+                    cursor = CursorType::RESIZE_NESW;
                 }else if (panel.edgePointerDown == PanelEdge::LEFT){
                     transform.position += Vector3(pointerDiff.x / transform.worldScale.x, 0, 0);
                     transform.needUpdate = true;
                     layout.width -= (int)panelSizeAcc.x;
                     layout.needUpdateSizes = true;
+                    cursor = CursorType::RESIZE_EW;
                 }
                 if (layout.width < panel.minWidth){
                     layout.width = panel.minWidth;
@@ -1791,6 +1859,8 @@ bool UISystem::eventOnPointerMove(float x, float y){
             }
         }
     }
+
+    Engine::setMouseCursor(cursor);
 
     lastPointerPos = Vector2(x, y);
 

@@ -180,7 +180,7 @@ namespace Supernova{
 	    T& getComponentFromIndex(size_t index) {
 		    return componentManager.getComponentFromIndex<T>(index);
 	    }
-	
+
 	    template<typename T>
 	    ComponentType getComponentType(){
 		    return componentManager.getComponentType<T>();

@@ -823,9 +823,8 @@ void Engine::systemMouseMove(float x, float y, int mods){
         uiEventReceived = false;
         for (int i = 0; i < numScenes; i++){
             if (scenes[i]->canReceiveUIEvents())
-                if (Input::isMousePressed(S_MOUSE_BUTTON_1))
-                    if (scenes[i]->getSystem<UISystem>()->eventOnPointerMove(x, y))
-                        uiEventReceived = true;
+                if (scenes[i]->getSystem<UISystem>()->eventOnPointerMove(x, y))
+                    uiEventReceived = true;
         }
 
         if (!ignoreEventsHandledByUI || !uiEventReceived){
