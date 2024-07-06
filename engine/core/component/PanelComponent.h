@@ -28,6 +28,8 @@ namespace Supernova{
         int minWidth = 0;
         int minHeight = 0;
 
+        int resizeMargin = 5;
+
         bool canMove = true;
         bool canResize = true;
         bool canTopOnFocus = true;

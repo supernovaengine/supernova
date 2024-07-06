@@ -49,6 +49,9 @@ namespace Supernova{
         int getMinWidth() const;
         int getMinHeight() const;
 
+        void setResizeMargin(int resizeMargin);
+        int getResizeMargin() const;
+
         void setWindowProperties(const bool canMove, const bool canResize, const bool canTopOnFocus);
 
         void setCanMove(const bool canMove);

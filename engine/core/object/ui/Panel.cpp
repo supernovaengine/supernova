@@ -176,6 +176,20 @@ int Panel::getMinHeight() const{
     return panelcomp.minHeight;
 }
 
+void Panel::setResizeMargin(int resizeMargin){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    panelcomp.resizeMargin = resizeMargin;
+
+    panelcomp.needUpdatePanel = true;
+}
+
+int Panel::getResizeMargin() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    return panelcomp.resizeMargin;
+}
+
 void Panel::setWindowProperties(const bool canMove, const bool canResize, const bool canTopOnFocus){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
     panelcomp.canMove = canMove;

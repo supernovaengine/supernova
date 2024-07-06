@@ -653,6 +653,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setMinSize", &Panel::setMinSize)
         .addProperty("minWidth", &Panel::getMinWidth, &Panel::setMinWidth)
         .addProperty("minHeight", &Panel::getMinHeight, &Panel::setMinHeight)
+        .addProperty("resizeMargin", &Panel::getResizeMargin, &Panel::setResizeMargin)
         .addFunction("setWindowProperties", &Panel::setWindowProperties)
         .addProperty("canMove", &Panel::isCanMove, &Panel::setCanMove)
         .addProperty("canResize", &Panel::isCanResize, &Panel::setCanResize)

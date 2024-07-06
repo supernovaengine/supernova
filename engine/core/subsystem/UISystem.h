@@ -33,7 +33,7 @@ namespace Supernova{
 		Vector2 panelSizeAcc; // to add accumulation from float to int
 
 		void createOrUpdateUiComponent(double dt, UILayoutComponent& layout, Entity entity, Signature signature);
-		void getPanelEdges(const UILayoutComponent& layout, const Transform& transform, const UILayoutComponent& headerlayout,  Rect& edgeRight, Rect& edgeRightBottom, Rect& edgeBottom, Rect& edgeLeftBottom, Rect& edgeLeft);
+		void getPanelEdges(const PanelComponent& panel, const UILayoutComponent& layout, const Transform& transform, const UILayoutComponent& headerlayout,  Rect& edgeRight, Rect& edgeRightBottom, Rect& edgeBottom, Rect& edgeLeftBottom, Rect& edgeLeft);
 		Rect fitOnPanel(Rect uiRect, Entity parentPanel);
 
 		//Image

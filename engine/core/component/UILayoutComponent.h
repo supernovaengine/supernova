@@ -55,8 +55,6 @@ namespace Supernova{
 
         Entity panel = NULL_ENTITY;
 
-        int resizeMargin = 5;
-
         int containerBoxIndex = -1;
 
         Rect scissor = Rect(0, 0, 0, 0);

@@ -267,6 +267,14 @@ void UISystem::createButtonObjects(Entity entity, ButtonComponent& button){
         scene->addComponent<TextComponent>(button.label, {});
 
         scene->addEntityChild(entity, button.label);
+
+        UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
+        UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
+
+        labelui.color = Vector4(0.0, 0.0, 0.0, 1.0);
+        labellayout.ignoreEvents = true;
+        labellayout.anchorPreset = AnchorPreset::CENTER;
+        labellayout.usingAnchors = true;
     }
 }
 
@@ -280,6 +288,15 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
         scene->addComponent<ImageComponent>(panel.headerimage, {});
 
         scene->addEntityChild(entity, panel.headerimage);
+
+        UIComponent& headerui = scene->getComponent<UIComponent>(panel.headerimage);
+        UILayoutComponent& headerimagelayout = scene->getComponent<UILayoutComponent>(panel.headerimage);
+
+        headerui.color = Vector4(0, 0, 0, 0);
+        headerimagelayout.ignoreEvents = true;
+        headerimagelayout.anchorPreset = AnchorPreset::TOP_WIDE;
+        headerimagelayout.ignoreScissor = true;
+        headerimagelayout.usingAnchors = true;
     }
     if (panel.headercontainer == NULL_ENTITY){
         panel.headercontainer = scene->createEntity();
@@ -289,6 +306,14 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
         scene->addComponent<UIContainerComponent>(panel.headercontainer, {});
 
         scene->addEntityChild(panel.headerimage, panel.headercontainer);
+
+        UIContainerComponent& containerui = scene->getComponent<UIContainerComponent>(panel.headercontainer);
+        UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
+
+        containerlayout.ignoreEvents = true;
+        containerlayout.anchorPreset = AnchorPreset::FULL_LAYOUT;
+        containerlayout.usingAnchors = true;
+        containerui.type = ContainerType::HORIZONTAL;
     }
     if (panel.headertext == NULL_ENTITY){
         panel.headertext = scene->createEntity();
@@ -299,6 +324,15 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
         scene->addComponent<TextComponent>(panel.headertext, {});
 
         scene->addEntityChild(panel.headercontainer, panel.headertext);
+
+        UIComponent& titleui = scene->getComponent<UIComponent>(panel.headertext);
+        UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.headertext);
+
+        titleui.color = Vector4(0.0, 0.0, 0.0, 1.0);
+        titlelayout.ignoreEvents = true;
+        titlelayout.anchorPreset = panel.titleAnchorPreset;
+        //titlelayout.ignoreScissor = true; // to hide header text in small panels
+        titlelayout.usingAnchors = true;
     }
 }
 
@@ -312,6 +346,10 @@ void UISystem::createScrollbarObjects(Entity entity, ScrollbarComponent& scrollb
         scene->addComponent<ImageComponent>(scrollbar.bar, {});
 
         scene->addEntityChild(entity, scrollbar.bar);
+
+        UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
+
+        barlayout.ignoreEvents = true;
     }
 }
 
@@ -325,6 +363,11 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
         scene->addComponent<TextComponent>(textedit.text, {});
 
         scene->addEntityChild(entity, textedit.text);
+
+        UILayoutComponent& textlayout = scene->getComponent<UILayoutComponent>(textedit.text);
+        UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
+        textui.color = Vector4(0.0, 0.0, 0.0, 1.0);
+        textlayout.ignoreEvents = true;
     }
 
     if (textedit.cursor == NULL_ENTITY){
@@ -336,6 +379,10 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
         scene->addComponent<PolygonComponent>(textedit.cursor, {});
 
         scene->addEntityChild(entity, textedit.cursor);
+
+        UILayoutComponent& cursorlayout = scene->getComponent<UILayoutComponent>(textedit.cursor);
+
+        cursorlayout.ignoreEvents = true;
     }
 }
 
@@ -354,17 +401,9 @@ void UISystem::updateButton(Entity entity, ButtonComponent& button, ImageCompone
         button.textureDisabled.load();
     }
 
-    Transform& labeltransform = scene->getComponent<Transform>(button.label);
     TextComponent& labeltext = scene->getComponent<TextComponent>(button.label);
     UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
     UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
-
-    labelui.color = Vector4(0.0, 0.0, 0.0, 1.0);
-    labellayout.ignoreEvents = true;
-    labellayout.width = 0;
-    labellayout.height = 0;
-    labellayout.anchorPreset = AnchorPreset::CENTER;
-    labellayout.usingAnchors = true;
 
     labeltext.needUpdateText = true;
     createOrUpdateText(labeltext, labelui, labellayout);
@@ -397,34 +436,7 @@ void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent&
 
     UILayoutComponent& headerimagelayout = scene->getComponent<UILayoutComponent>(panel.headerimage);
 
-    headerimagelayout.height = 1;
-    headerimagelayout.width = 1;
-    headerimagelayout.ignoreEvents = true;
-    headerimagelayout.anchorPreset = AnchorPreset::TOP_WIDE;
-    headerimagelayout.ignoreScissor = true;
-    headerimagelayout.usingAnchors = true;
-    headerimagelayout.height = img.patchMarginTop - img.patchMarginBottom;
-
-    UIContainerComponent& containerui = scene->getComponent<UIContainerComponent>(panel.headercontainer);
-    UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
-
-    containerlayout.ignoreEvents = true;
-    containerlayout.anchorPreset = AnchorPreset::FULL_LAYOUT;
-    containerlayout.usingAnchors = true;
-    containerui.type = ContainerType::HORIZONTAL;
-
-    Transform& titletransform = scene->getComponent<Transform>(panel.headertext);
-    TextComponent& headertext = scene->getComponent<TextComponent>(panel.headertext);
-    UIComponent& titleui = scene->getComponent<UIComponent>(panel.headertext);
-    UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.headertext);
-
-    titleui.color = Vector4(0.0, 0.0, 0.0, 1.0);
-    titlelayout.ignoreEvents = true;
-    titlelayout.width = 0;
-    titlelayout.height = 0;
-    titlelayout.anchorPreset = panel.titleAnchorPreset;
-    //titlelayout.ignoreScissor = true; // to hide header text in small panels
-    titlelayout.usingAnchors = true;
+    headerimagelayout.height = img.patchMarginTop - panel.resizeMargin;
 
     if (panel.minWidth > layout.width){
         panel.minWidth = layout.width;
@@ -439,6 +451,11 @@ void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent&
         panel.minHeight = img.patchMarginTop + img.patchMarginBottom;
     }
 
+    UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.headertext);
+    UIComponent& titleui = scene->getComponent<UIComponent>(panel.headertext);
+    TextComponent& headertext = scene->getComponent<TextComponent>(panel.headertext);
+
+    titlelayout.anchorPreset = panel.titleAnchorPreset;
     headertext.needUpdateText = true;
     createOrUpdateText(headertext, titleui, titlelayout);
 }
@@ -446,14 +463,7 @@ void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent&
 void UISystem::updateScrollbar(Entity entity, ScrollbarComponent& scrollbar, ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
     createScrollbarObjects(entity, scrollbar);
 
-    Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
-    ImageComponent& barimage = scene->getComponent<ImageComponent>(scrollbar.bar);
-    UIComponent& barui = scene->getComponent<UIComponent>(scrollbar.bar);
     UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
-
-    barlayout.height = 1;
-    barlayout.width = 1;
-    barlayout.ignoreEvents = true;
 
     if (scrollbar.barSize > 1){
         scrollbar.barSize = 1;
@@ -522,8 +532,6 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
     TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
 
-    textui.color = Vector4(0.0, 0.0, 0.0, 1.0);
-    textlayout.ignoreEvents = true;
     text.needUpdateText = true;
     createOrUpdateText(text, textui, textlayout);
 
@@ -558,8 +566,6 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
     UILayoutComponent& cursorlayout = scene->getComponent<UILayoutComponent>(textedit.cursor);
     UIComponent& cursorui = scene->getComponent<UIComponent>(textedit.cursor);
     PolygonComponent& cursor = scene->getComponent<PolygonComponent>(textedit.cursor);
-
-    cursorlayout.ignoreEvents = true;
 
     createOrUpdatePolygon(cursor, cursorui, cursorlayout);
 
@@ -1040,14 +1046,14 @@ void UISystem::createOrUpdateUiComponent(double dt, UILayoutComponent& layout, E
     }
 }
 
-void UISystem::getPanelEdges(const UILayoutComponent& layout, const Transform& transform, const UILayoutComponent& headerlayout,  Rect& edgeRight, Rect& edgeRightBottom, Rect& edgeBottom, Rect& edgeLeftBottom, Rect& edgeLeft){
+void UISystem::getPanelEdges(const PanelComponent& panel, const UILayoutComponent& layout, const Transform& transform, const UILayoutComponent& headerlayout,  Rect& edgeRight, Rect& edgeRightBottom, Rect& edgeBottom, Rect& edgeLeftBottom, Rect& edgeLeft){
     int minX;
     int minY;
     int width;
     int height;
 
     Vector2 scaledSize = Vector2(layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
-    Vector2 scaledResizeSize = Vector2(layout.resizeMargin * transform.worldScale.x, layout.resizeMargin * transform.worldScale.y);
+    Vector2 scaledResizeSize = Vector2(panel.resizeMargin * transform.worldScale.x, panel.resizeMargin * transform.worldScale.y);
     float scaledHeaderHeight = headerlayout.height * transform.worldScale.y;
 
     // right
@@ -1585,7 +1591,7 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 Rect edgeBottom;
                 Rect edgeLeftBottom;
                 Rect edgeLeft;
-                getPanelEdges(layout, transform, headerlayout, edgeRight, edgeRightBottom, edgeBottom, edgeLeftBottom, edgeLeft);
+                getPanelEdges(panel, layout, transform, headerlayout, edgeRight, edgeRightBottom, edgeBottom, edgeLeftBottom, edgeLeft);
 
                 if (panel.canResize){
                     panelSizeAcc = Vector2(0, 0);
@@ -1729,7 +1735,7 @@ bool UISystem::eventOnPointerMove(float x, float y){
                         Rect edgeBottom;
                         Rect edgeLeftBottom;
                         Rect edgeLeft;
-                        getPanelEdges(layout, transform, headerlayout, edgeRight, edgeRightBottom, edgeBottom, edgeLeftBottom, edgeLeft);
+                        getPanelEdges(panel, layout, transform, headerlayout, edgeRight, edgeRightBottom, edgeBottom, edgeLeftBottom, edgeLeft);
 
                         if (panel.canResize){
                             if (edgeRight.contains(Vector2(x, y))){
