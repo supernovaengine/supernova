@@ -26,12 +26,13 @@ namespace Supernova {
 
         Vector3();
         Vector3( const float nx, const float ny, const float nz );
-        Vector3( const float v[3] );
-        Vector3( int v[3] );
-        Vector3( float* const v );
-        Vector3( const Vector2& vec2, const float nz );
         Vector3( const Vector3& v );
-        Vector3( const Vector4& vec4 );
+        explicit Vector3( const float v[3] );
+        explicit Vector3( const int v[3] );
+        explicit Vector3( float* const v );
+        explicit Vector3( const float scaler );
+        explicit Vector3( const Vector2& vec2, const float nz );
+        explicit Vector3( const Vector4& vec4 );
 
         std::string toString() const;
 

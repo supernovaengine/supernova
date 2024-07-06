@@ -34,13 +34,13 @@ namespace Supernova {
 
         Vector2();
         Vector2( const float fX, const float fY );
-        Vector2( const float scaler );
-        Vector2( const float afCoordinate[2] );
-        Vector2( const int afCoordinate[2] );
-        Vector2( float* const r );
         Vector2( const Vector2& v );
-        Vector2( const Vector3& vec3 );
-        Vector2( const Vector4& vec4 );
+        explicit Vector2( const float scaler );
+        explicit Vector2( const float afCoordinate[2] );
+        explicit Vector2( const int afCoordinate[2] );
+        explicit Vector2( float* const r );
+        explicit Vector2( const Vector3& vec3 );
+        explicit Vector2( const Vector4& vec4 );
 
         std::string toString() const;
 

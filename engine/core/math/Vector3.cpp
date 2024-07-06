@@ -18,15 +18,17 @@ Vector3::Vector3()
 
 Vector3::Vector3( const float nx, const float ny, const float nz ) : x(nx), y(ny), z(nz) {}
 
+Vector3::Vector3( const Vector3& v ) : x(v.x), y(v.y), z(v.z) {}
+
 Vector3::Vector3( const float v[3] ) : x(v[0]), y(v[1]), z(v[2]) {}
 
-Vector3::Vector3( int v[3] ): x((float)v[0]), y((float)v[1]), z((float)v[2]) {}
+Vector3::Vector3( const int v[3] ): x((float)v[0]), y((float)v[1]), z((float)v[2]) {}
 
 Vector3::Vector3( float* const v ) : x(v[0]), y(v[1]), z(v[2]) {}
 
-Vector3::Vector3( const Vector2& vec2, const float nz ) : x(vec2.x), y(vec2.y), z(nz) {}
+Vector3::Vector3( const float scaler ): x( scaler ), y( scaler ), z( scaler ){ }
 
-Vector3::Vector3( const Vector3& v ) : x(v.x), y(v.y), z(v.z) {}
+Vector3::Vector3( const Vector2& vec2, const float nz ) : x(vec2.x), y(vec2.y), z(nz) {}
 
 Vector3::Vector3( const Vector4& vec4 ) : x(vec4.x), y(vec4.y), z(vec4.z) {}
 

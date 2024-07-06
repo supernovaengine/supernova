@@ -17,6 +17,8 @@ Vector4::Vector4() : x(0), y(0), z(0), w(0){ }
 
 Vector4::Vector4( const float fX, const float fY, const float fZ, const float fW ): x( fX ), y( fY ), z( fZ ), w( fW){ }
 
+Vector4::Vector4( const Vector4& rhs ): x(rhs.x), y(rhs.y), z(rhs.z), w(rhs.w){ }
+
 Vector4::Vector4( const float afCoordinate[4] ): x( afCoordinate[0] ),y( afCoordinate[1] ),z( afCoordinate[2] ),w( afCoordinate[3] ){ }
 
 Vector4::Vector4( const int afCoordinate[4] ){
@@ -33,8 +35,6 @@ Vector4::Vector4( const float scaler ): x( scaler ), y( scaler ), z( scaler ), w
 Vector4::Vector4( const Vector2& rhs, const float fZ, const float fW ): x(rhs.x), y(rhs.y), z(fZ), w(fW){ }
 
 Vector4::Vector4( const Vector3& rhs, const float fW ): x(rhs.x), y(rhs.y), z(rhs.z), w(fW){ }
-
-Vector4::Vector4( const Vector4& rhs ): x(rhs.x), y(rhs.y), z(rhs.z), w(rhs.w){ }
 
 std::string Vector4::toString() const{
     return "Vector4(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ", " + std::to_string(w) + ")"; 

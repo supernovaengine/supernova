@@ -17,6 +17,8 @@ Vector2::Vector2() : x(0), y(0){ }
 
 Vector2::Vector2(const float fX, const float fY ): x( fX ), y( fY ){ }
 
+Vector2::Vector2( const Vector2& v ): x( v.x ), y( v.y ){ }
+
 Vector2::Vector2( const float scaler ): x( scaler), y( scaler ){ }
 
 Vector2::Vector2( const float afCoordinate[2] ): x( afCoordinate[0] ),y( afCoordinate[1] ){ }
@@ -27,8 +29,6 @@ Vector2::Vector2( const int afCoordinate[2] ){
 }
 
 Vector2::Vector2( float* const r ): x( r[0] ), y( r[1] ){ }
-
-Vector2::Vector2( const Vector2& v ): x( v.x ), y( v.y ){ }
 
 Vector2::Vector2( const Vector3& vec3 ){
     x = vec3.x;

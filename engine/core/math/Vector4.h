@@ -34,15 +34,14 @@ namespace Supernova {
         static const Vector4 UNIT_SCALE;
 
         Vector4();
-
         Vector4( const float fX, const float fY, const float fZ, const float fW );
-        Vector4( const float afCoordinate[4] );
-        Vector4( const int afCoordinate[4] );
-        Vector4( float* const r );
-        Vector4( const float scaler );
-        Vector4( const Vector2& rhs, const float fZ, const float fW );
-        Vector4( const Vector3& rhs, const float fW );
         Vector4( const Vector4& rhs );
+        explicit Vector4( const float afCoordinate[4] );
+        explicit Vector4( const int afCoordinate[4] );
+        explicit Vector4( float* const r );
+        explicit Vector4( const float scaler );
+        explicit Vector4( const Vector2& rhs, const float fZ, const float fW );
+        explicit Vector4( const Vector3& rhs, const float fW );
 
         std::string toString() const;
 
