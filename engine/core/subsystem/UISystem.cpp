@@ -294,9 +294,13 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
 
         headerui.color = Vector4(0, 0, 0, 0);
         headerimagelayout.ignoreEvents = true;
-        headerimagelayout.anchorPreset = AnchorPreset::TOP_WIDE;
         headerimagelayout.ignoreScissor = true;
         headerimagelayout.usingAnchors = true;
+        // same of TOP_WIDE
+        headerimagelayout.anchorPointLeft = 0;
+        headerimagelayout.anchorPointTop = 0;
+        headerimagelayout.anchorPointRight = 1;
+        headerimagelayout.anchorPointBottom = 0;
     }
     if (panel.headercontainer == NULL_ENTITY){
         panel.headercontainer = scene->createEntity();
@@ -436,7 +440,17 @@ void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent&
 
     UILayoutComponent& headerimagelayout = scene->getComponent<UILayoutComponent>(panel.headerimage);
 
-    headerimagelayout.height = img.patchMarginTop - panel.resizeMargin;
+    if (panel.defaultHeaderMargin){
+        panel.headerMarginLeft = img.patchMarginLeft;
+        panel.headerMarginRight = img.patchMarginRight;
+        panel.headerMarginTop = img.patchMarginBottom;
+        panel.headerMarginBottom = img.patchMarginBottom;
+    }
+
+    headerimagelayout.anchorOffsetLeft = panel.headerMarginLeft;
+    headerimagelayout.anchorOffsetTop = panel.headerMarginTop;
+    headerimagelayout.anchorOffsetRight = -panel.headerMarginRight;
+    headerimagelayout.anchorOffsetBottom = img.patchMarginTop - panel.headerMarginBottom;
 
     if (panel.minWidth > layout.width){
         panel.minWidth = layout.width;
@@ -444,11 +458,11 @@ void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent&
     if (panel.minHeight > layout.height){
         panel.minHeight = layout.height;
     }
-    if (panel.minWidth < (img.patchMarginLeft + img.patchMarginRight)){
-        panel.minWidth = img.patchMarginLeft + img.patchMarginRight;
+    if (panel.minWidth < (img.patchMarginLeft + img.patchMarginRight + 1)){
+        panel.minWidth = img.patchMarginLeft + img.patchMarginRight + 1;
     }
-    if (panel.minHeight < (img.patchMarginTop + img.patchMarginBottom)){
-        panel.minHeight = img.patchMarginTop + img.patchMarginBottom;
+    if (panel.minHeight < (img.patchMarginTop + img.patchMarginBottom + 1)){
+        panel.minHeight = img.patchMarginTop + img.patchMarginBottom + 1;
     }
 
     UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.headertext);
@@ -1631,7 +1645,7 @@ bool UISystem::eventOnPointerDown(float x, float y){
     if (lastPanelFromPointer != NULL_ENTITY){
         PanelComponent& panel = scene->getComponent<PanelComponent>(lastPanelFromPointer);
 
-        if (panel.canTopOnFocus){
+        if (panel.canBringToFront){
             scene->moveChildToTop(lastPanelFromPointer);
         }
     }

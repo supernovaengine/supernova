@@ -139,6 +139,78 @@ void Panel::setHeaderTexture(std::string path){
     getHeaderImageObject().setTexture(path);
 }
 
+void Panel::setHeaderMargin(int left, int top, int right, int bottom){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    panelcomp.headerMarginLeft = left;
+    panelcomp.headerMarginTop = top;
+    panelcomp.headerMarginRight = right;
+    panelcomp.headerMarginBottom = bottom;
+
+    panelcomp.defaultHeaderMargin = false;
+    panelcomp.needUpdatePanel = true;
+}
+
+void Panel::setHeaderMarginLeft(int left){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    panelcomp.headerMarginLeft = left;
+
+    panelcomp.defaultHeaderMargin = false;
+    panelcomp.needUpdatePanel = true;
+}
+
+int Panel::getHeaderMarginLeft() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    return panelcomp.headerMarginLeft;
+}
+
+void Panel::setHeaderMarginTop(int top){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    panelcomp.headerMarginTop = top;
+
+    panelcomp.defaultHeaderMargin = false;
+    panelcomp.needUpdatePanel = true;
+}
+
+int Panel::getHeaderMarginTop() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    return panelcomp.headerMarginTop;
+}
+
+void Panel::setHeaderMarginRight(int right){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    panelcomp.headerMarginRight = right;
+
+    panelcomp.defaultHeaderMargin = false;
+    panelcomp.needUpdatePanel = true;
+}
+
+int Panel::getHeaderMarginRight() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    return panelcomp.headerMarginRight;
+}
+
+void Panel::setHeaderMarginBottom(int bottom){
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    panelcomp.headerMarginBottom = bottom;
+
+    panelcomp.defaultHeaderMargin = false;
+    panelcomp.needUpdatePanel = true;
+}
+
+int Panel::getHeaderMarginBottom() const{
+    PanelComponent& panelcomp = getComponent<PanelComponent>();
+
+    return panelcomp.headerMarginBottom;
+}
+
 void Panel::setMinSize(int minWidth, int minHeight){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
 
@@ -190,11 +262,11 @@ int Panel::getResizeMargin() const{
     return panelcomp.resizeMargin;
 }
 
-void Panel::setWindowProperties(const bool canMove, const bool canResize, const bool canTopOnFocus){
+void Panel::setWindowProperties(const bool canMove, const bool canResize, const bool canBringToFront){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
     panelcomp.canMove = canMove;
     panelcomp.canResize = canResize;
-    panelcomp.canTopOnFocus = canTopOnFocus;
+    panelcomp.canBringToFront = canBringToFront;
 }
 
 void Panel::setCanMove(const bool canMove){
@@ -217,12 +289,12 @@ bool Panel::isCanResize() const{
     return panelcomp.canResize;
 }
 
-void Panel::setCanTopOnFocus(const bool canTopOnFocus){
+void Panel::setCanBringToFront(const bool canBringToFront){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
-    panelcomp.canTopOnFocus = canTopOnFocus;
+    panelcomp.canBringToFront = canBringToFront;
 }
 
-bool Panel::isCanTopOnFocus() const{
+bool Panel::isCanBringToFront() const{
     PanelComponent& panelcomp = getComponent<PanelComponent>();
-    return panelcomp.canTopOnFocus;
+    return panelcomp.canBringToFront;
 }

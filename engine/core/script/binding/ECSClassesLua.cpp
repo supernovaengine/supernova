@@ -331,7 +331,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("resizeMargin", &PanelComponent::resizeMargin)
         .addProperty("canMove", &PanelComponent::canMove)
         .addProperty("canResize", &PanelComponent::canResize)
-        .addProperty("canTopOnFocus", &PanelComponent::canTopOnFocus)
+        .addProperty("canBringToFront", &PanelComponent::canBringToFront)
         .addProperty("headerPointerDown", &PanelComponent::headerPointerDown)
         .addProperty("onMove", [] (PanelComponent* self, lua_State* L) { return &self->onMove; }, [] (PanelComponent* self, lua_State* L) { self->onMove = L; })
         .addProperty("onResize", [] (PanelComponent* self, lua_State* L) { return &self->onResize; }, [] (PanelComponent* self, lua_State* L) { self->onResize = L; })

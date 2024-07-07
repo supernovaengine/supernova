@@ -42,6 +42,20 @@ namespace Supernova{
         void setHeaderPatchMargin(int margin);
         void setHeaderTexture(std::string path);
 
+        void setHeaderMargin(int left, int top, int right, int bottom);
+
+        void setHeaderMarginLeft(int left);
+        int getHeaderMarginLeft() const;
+
+        void setHeaderMarginTop(int top);
+        int getHeaderMarginTop() const;
+
+        void setHeaderMarginRight(int right);
+        int getHeaderMarginRight() const;
+
+        void setHeaderMarginBottom(int bottom);
+        int getHeaderMarginBottom() const;
+
         void setMinSize(int minWidth, int minHeight);
         void setMinWidth(int minWidth);
         void setMinHeight(int minHeight);
@@ -52,7 +66,7 @@ namespace Supernova{
         void setResizeMargin(int resizeMargin);
         int getResizeMargin() const;
 
-        void setWindowProperties(const bool canMove, const bool canResize, const bool canTopOnFocus);
+        void setWindowProperties(const bool canMove, const bool canResize, const bool canBringToFront);
 
         void setCanMove(const bool canMove);
         bool isCanMove() const;
@@ -60,8 +74,8 @@ namespace Supernova{
         void setCanResize(const bool canResize);
         bool isCanResize() const;
 
-        void setCanTopOnFocus(const bool canTopOnFocus);
-        bool isCanTopOnFocus() const;
+        void setCanBringToFront(const bool canBringToFront);
+        bool isCanBringToFront() const;
     };
 }
 

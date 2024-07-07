@@ -28,11 +28,18 @@ namespace Supernova{
         int minWidth = 0;
         int minHeight = 0;
 
+        int headerMarginLeft = 0;
+        int headerMarginTop = 0;
+        int headerMarginRight = 0;
+        int headerMarginBottom = 0;
+
+        bool defaultHeaderMargin = true;
+
         int resizeMargin = 5;
 
         bool canMove = true;
         bool canResize = true;
-        bool canTopOnFocus = true;
+        bool canBringToFront = true;
 
         bool headerPointerDown = false;
         PanelEdge edgePointerDown = PanelEdge::NONE;
