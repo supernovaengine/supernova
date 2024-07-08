@@ -199,6 +199,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setScale", (void(Object::*)(const float))&Object::setScale)
         .addFunction("getWorldScale", &Object::getWorldScale)
         .addProperty("visible", &Object::isVisible, &Object::setVisible)
+        .addFunction("setVisibleOnly", &Object::setVisibleOnly)
         .addFunction("setBillboard", (void(Object::*)(bool, bool, bool))&Object::setBillboard)
         .addProperty("billboard", &Object::isBillboard, (void(Object::*)(bool))&Object::setBillboard)
         .addProperty("fakeBillboard", &Object::isFakeBillboard, &Object::setFakeBillboard)

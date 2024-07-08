@@ -47,6 +47,7 @@ namespace Supernova{
 
         void setVisible(bool visible);
         bool isVisible() const;
+        void setVisibleOnly(bool visible);
 
         void setBillboard(bool billboard, bool fake, bool cylindrical);
 

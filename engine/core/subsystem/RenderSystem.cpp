@@ -2501,18 +2501,23 @@ void RenderSystem::update(double dt){
 	auto transforms = scene->getComponentArray<Transform>();
 	auto cameras = scene->getComponentArray<CameraComponent>();
 
-	std::vector<Entity> parentList;
 	for (int i = 0; i < transforms->size(); i++){
 		Transform& transform = transforms->getComponentFromIndex(i);
 
-		// Finding childs
-		if (std::find(parentList.begin(), parentList.end(), transform.parent) != parentList.end()){
-			transform.needUpdate = true;
+		if (transform.parent != NULL_ENTITY){
+			Transform& transformParent = scene->getComponent<Transform>(transform.parent);
+
+			if (transformParent.needUpdate){
+				transform.needUpdate = true;
+			}
+
+			if (transformParent.needUpdateChildVisibility){
+				transform.visible = transformParent.visible;
+				transform.needUpdateChildVisibility = true;
+			}
 		}
 
 		if (transform.needUpdate){
-			Entity entity = transforms->getEntity(i);
-			parentList.push_back(entity);
 			updateTransform(transform);
 		}
 	}
@@ -2678,6 +2683,7 @@ void RenderSystem::update(double dt){
 			particles.needUpdate = false;
 		}
 
+		transform.needUpdateChildVisibility = false;
 		transform.needUpdate = false;
 	}
 

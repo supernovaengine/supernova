@@ -41,6 +41,7 @@ namespace Supernova{
         bool fakeBillboard = false;
         bool cylindricalBillboard = false;
 
+        bool needUpdateChildVisibility = false;
         bool needUpdate = true;
     };
 

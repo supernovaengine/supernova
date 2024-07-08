@@ -108,11 +108,17 @@ Vector3 Object::getWorldScale() const{
 void Object::setVisible(bool visible){
     Transform& transform = getComponent<Transform>();
     transform.visible = visible;
+    transform.needUpdateChildVisibility = true;
 }
 
 bool Object::isVisible() const{
     Transform& transform = getComponent<Transform>();
     return transform.visible;
+}
+
+void Object::setVisibleOnly(bool visible){
+    Transform& transform = getComponent<Transform>();
+    transform.visible = visible;
 }
 
 void Object::setBillboard(bool billboard, bool fake, bool cylindrical){
