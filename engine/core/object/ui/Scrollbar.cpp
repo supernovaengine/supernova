@@ -91,3 +91,11 @@ Vector4 Scrollbar::getBarColor() const{
 float Scrollbar::getBarAlpha() const{
     return getBarObject().getAlpha();
 }
+
+void Scrollbar::setBarPatchMargin(int margin){
+    getBarObject().setPatchMargin(margin);
+}
+
+void Scrollbar::setBarPatchMargin(int marginLeft, int marginRight, int marginTop, int marginBottom){
+    getBarObject().setPatchMargin(marginLeft, marginRight, marginTop, marginBottom);
+}

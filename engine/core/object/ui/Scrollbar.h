@@ -35,6 +35,9 @@ namespace Supernova{
         void setBarAlpha(const float alpha);
         Vector4 getBarColor() const;
         float getBarAlpha() const;
+
+        void setBarPatchMargin(int margin);
+        void setBarPatchMargin(int marginLeft, int marginRight, int marginTop, int marginBottom);
     };
 }
 

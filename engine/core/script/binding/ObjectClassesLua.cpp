@@ -682,6 +682,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<const float, const float, const float>(&Scrollbar::setBarColor),
             luabridge::overload<const float, const float, const float, const float>(&Scrollbar::setBarColor))
         .addProperty("barAlpha", &Scrollbar::getBarAlpha, &Scrollbar::setBarAlpha)
+        .addFunction("setBarPatchMargin", 
+            luabridge::overload<int>(&Scrollbar::setBarPatchMargin),
+            luabridge::overload<int, int, int, int>(&Scrollbar::setBarPatchMargin))
         .addFunction("getScrollbarComponent", &Scrollbar::getComponent<ScrollbarComponent>)
         .endClass();
 
