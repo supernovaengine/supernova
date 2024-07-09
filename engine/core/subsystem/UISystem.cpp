@@ -1475,7 +1475,22 @@ void UISystem::entityDestroyed(Entity entity){
     }
 }
 
-void UISystem::eventOnCharInput(wchar_t codepoint){
+bool UISystem::isTextEditFocused(){
+    auto textedits = scene->getComponentArray<TextEditComponent>();
+    for (int i = 0; i < textedits->size(); i++){
+        Entity entity = textedits->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+        if (signature.test(scene->getComponentType<UIComponent>())){
+            UIComponent& ui = scene->getComponent<UIComponent>(entity);
+            if (ui.focused){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool UISystem::eventOnCharInput(wchar_t codepoint){
     auto layouts = scene->getComponentArray<UILayoutComponent>();
     for (int i = 0; i < layouts->size(); i++){
         UILayoutComponent& layout = layouts->getComponentFromIndex(i);
@@ -1501,9 +1516,13 @@ void UISystem::eventOnCharInput(wchar_t codepoint){
                 text.needUpdateText = true;
 
                 textedit.needUpdateTextEdit = true;
+
+                return true;
             }
         }
     }
+
+    return false;
 }
 
 bool UISystem::eventOnPointerDown(float x, float y){
@@ -1706,6 +1725,8 @@ bool UISystem::eventOnPointerUp(float x, float y){
 
     if (lastUIFromPointer != NULL_ENTITY){
         lastUIFromPointer = NULL_ENTITY;
+
+        Engine::setMouseCursor(CursorType::ARROW);
         return true;
     }
 

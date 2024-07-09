@@ -75,7 +75,9 @@ namespace Supernova{
 		UISystem(Scene* scene);
 		virtual ~UISystem();
 
-		void eventOnCharInput(wchar_t codepoint);
+		bool isTextEditFocused();
+
+		bool eventOnCharInput(wchar_t codepoint);
 		bool eventOnPointerDown(float x, float y);
 		bool eventOnPointerUp(float x, float y);
 		bool eventOnPointerMove(float x, float y);
