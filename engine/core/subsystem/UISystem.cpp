@@ -316,6 +316,7 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
 
         containerlayout.ignoreEvents = true;
         containerlayout.anchorPreset = AnchorPreset::FULL_LAYOUT;
+        containerlayout.ignoreScissor = true;
         containerlayout.usingAnchors = true;
         containerui.type = ContainerType::HORIZONTAL;
     }

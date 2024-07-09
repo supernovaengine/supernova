@@ -1791,7 +1791,6 @@ Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img
 
 	}
 
-
 	return Rect(objScreenPosX, objScreenPosY, objScreenWidth, objScreenHeight);
 }
 
@@ -2898,7 +2897,11 @@ void RenderSystem::draw(){
 			}
 
 			if (hasActiveScissor){
-				camera.render.applyScissor(Rect(0, 0, System::instance().getScreenWidth(), System::instance().getScreenHeight()));
+				if (!camera.renderToTexture){
+					camera.render.applyScissor(Rect(0, 0, System::instance().getScreenWidth(), System::instance().getScreenHeight()));
+				}else{
+					camera.render.applyScissor(Rect(0, 0, camera.framebuffer->getWidth(), camera.framebuffer->getHeight()));
+				}
 				hasActiveScissor = false;
 			}
 		}
