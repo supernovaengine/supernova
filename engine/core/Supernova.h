@@ -6,8 +6,8 @@
 #define supernova_h
 
 #include "Engine.h"
-#include "Log.h"
 #include "Input.h"
+#include "Log.h"
 #include "Scene.h"
 #include "System.h"
 
@@ -49,6 +49,7 @@
 #include "component/Joint3DComponent.h"
 #include "component/KeyframeTracksComponent.h"
 #include "component/LightComponent.h"
+#include "component/LinesComponent.h"
 #include "component/MeshComponent.h"
 #include "component/MeshPolygonComponent.h"
 #include "component/ModelComponent.h"
@@ -133,19 +134,20 @@
 #include "object/ui/Panel.h"
 #include "object/ui/Polygon.h"
 #include "object/ui/Scrollbar.h"
-#include "object/ui/Text.h"
 #include "object/ui/TextEdit.h"
+#include "object/ui/Text.h"
 #include "object/ui/UILayout.h"
 
 //#include "pool/FontPool.h"
 #include "pool/ShaderPool.h"
 #include "pool/TextureDataPool.h"
 #include "pool/TexturePool.h"
+
 #include "render/BufferRender.h"
+#include "render/CameraRender.h"
 #include "render/FramebufferRender.h"
 #include "render/ObjectRender.h"
 #include "render/Render.h"
-#include "render/CameraRender.h"
 #include "render/ShaderRender.h"
 #include "render/SystemRender.h"
 #include "render/TextureRender.h"

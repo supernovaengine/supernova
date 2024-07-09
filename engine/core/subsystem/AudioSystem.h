@@ -29,6 +29,8 @@ namespace Supernova{
 		Vector3 cameraLastPosition;
 
 	public:
+		AudioSystem(Scene* scene);
+
 		static void stopAll();
 		static void pauseAll();
 		static void resumeAll();
@@ -36,8 +38,6 @@ namespace Supernova{
 
 		static void setGlobalVolume(float volume);
 		static float getGlobalVolume();
-
-		AudioSystem(Scene* scene);
 
         bool loadAudio(AudioComponent& audio, Entity entity);
 		void destroyAudio(AudioComponent& audio);

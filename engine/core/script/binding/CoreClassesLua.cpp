@@ -22,8 +22,13 @@
 #include "Body3D.h"
 #include "Contact3D.h"
 #include "CollideShapeResult3D.h"
-#include "AudioSystem.h"
-#include "PhysicsSystem.h"
+
+#include "subsystem/ActionSystem.h"
+#include "subsystem/AudioSystem.h"
+#include "subsystem/MeshSystem.h"
+#include "subsystem/PhysicsSystem.h"
+#include "subsystem/RenderSystem.h"
+#include "subsystem/UISystem.h"
 
 using namespace Supernova;
 
@@ -413,8 +418,12 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("moveChildUp", &Scene::moveChildUp)
         .addFunction("moveChildDown", &Scene::moveChildDown)
         .addFunction("moveChildToBottom", &Scene::moveChildToBottom)
+        .addFunction("getActionSystem", [] (Scene* self, lua_State* L) { return self->getSystem<ActionSystem>().get(); })
         .addFunction("getAudioSystem", [] (Scene* self, lua_State* L) { return self->getSystem<AudioSystem>().get(); })
+        .addFunction("getMeshSystem", [] (Scene* self, lua_State* L) { return self->getSystem<MeshSystem>().get(); })
         .addFunction("getPhysicsSystem", [] (Scene* self, lua_State* L) { return self->getSystem<PhysicsSystem>().get(); })
+        .addFunction("getRenderSystem", [] (Scene* self, lua_State* L) { return self->getSystem<RenderSystem>().get(); })
+        .addFunction("getUISystem", [] (Scene* self, lua_State* L) { return self->getSystem<UISystem>().get(); })
         .endClass();
 
     luabridge::getGlobalNamespace(L)

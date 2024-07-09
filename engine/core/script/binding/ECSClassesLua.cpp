@@ -14,9 +14,12 @@
 #include "ecs/EntityManager.h"
 #include "ecs/ComponentArray.h"
 
-//TODO: Add all systems
+#include "subsystem/ActionSystem.h"
 #include "subsystem/AudioSystem.h"
+#include "subsystem/MeshSystem.h"
 #include "subsystem/PhysicsSystem.h"
+#include "subsystem/RenderSystem.h"
+#include "subsystem/UISystem.h"
 
 //TODO: Add all components and properties
 #include "component/ActionComponent.h"
@@ -107,12 +110,31 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginClass<ActionSystem>("ActionSystem")
+        .addFunction("actionStart", &ActionSystem::actionStart)
+        .addFunction("actionStop", &ActionSystem::actionStop)
+        .addFunction("actionPause", &ActionSystem::actionPause)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<AudioSystem>("AudioSystem")
         .addStaticFunction("stopAll", &AudioSystem::stopAll)
         .addStaticFunction("pauseAll", &AudioSystem::pauseAll)
         .addStaticFunction("resumeAll", &AudioSystem::resumeAll)
         .addStaticFunction("checkActive", &AudioSystem::checkActive)
         .addStaticProperty("globalVolume", &AudioSystem::getGlobalVolume,  &AudioSystem::setGlobalVolume)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<MeshSystem>("MeshSystem")
+        .addFunction("createPlane", &MeshSystem::createPlane)
+        .addFunction("createBox", &MeshSystem::createBox)
+        .addFunction("createSphere", &MeshSystem::createSphere)
+        .addFunction("createCylinder", &MeshSystem::createCylinder)
+        .addFunction("createCapsule", &MeshSystem::createCapsule)
+        .addFunction("createTorus", &MeshSystem::createTorus)
+        .addFunction("loadGLTF", &MeshSystem::loadGLTF)
+        .addFunction("loadOBJ", &MeshSystem::loadOBJ)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -200,6 +222,20 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("addBroadPhaseLayer3D", 
             luabridge::overload<uint8_t, uint32_t>(&PhysicsSystem::addBroadPhaseLayer3D),
             luabridge::overload<uint8_t, uint32_t, uint32_t>(&PhysicsSystem::addBroadPhaseLayer3D))
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<RenderSystem>("RenderSystem")
+        .addFunction("updateCameraSize", &RenderSystem::updateCameraSize)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<UISystem>("UISystem")
+        .addFunction("isTextEditFocused", &UISystem::isTextEditFocused)
+        .addFunction("eventOnCharInput", &UISystem::eventOnCharInput)
+        .addFunction("eventOnPointerDown", &UISystem::eventOnPointerDown)
+        .addFunction("eventOnPointerUp", &UISystem::eventOnPointerUp)
+        .addFunction("eventOnPointerMove", &UISystem::eventOnPointerMove)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
