@@ -66,7 +66,7 @@ void SupernovaApple::setMouseCursor(Supernova::CursorType type){
 #if defined(TARGET_OS_IPHONE) && !TARGET_OS_IPHONE
     NSCursor* cursor;
     if (type == Supernova::CursorType::ARROW){
-        cursor = [NSCursor IBeamCursor];
+        cursor = [NSCursor arrowCursor];
     }else if (type == Supernova::CursorType::IBEAM){
         cursor = [NSCursor IBeamCursor];
     }else if (type == Supernova::CursorType::CROSSHAIR){
