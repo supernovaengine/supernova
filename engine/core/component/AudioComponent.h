@@ -49,7 +49,7 @@ namespace Supernova{
 
         double volume = 1;
         float speed = 1;
-        float pan = 0; // -1 is left, 0 is middle and and 1 is right
+        float pan = 0; // -1 is left, 0 is middle and 1 is right
         bool looping = false;
         double loopingPoint = 0;
         bool protectVoice = false;
