@@ -28,6 +28,9 @@ namespace Supernova{
         Scene* getScene() const;
         Entity getEntity() const;
 
+        bool isEntityOwned() const;
+        void setEntityOwned(bool entityOwned);
+
         template <typename T>
         void addComponent(T &&component) {
             scene->addComponent<T>(entity, std::forward<T>(component));

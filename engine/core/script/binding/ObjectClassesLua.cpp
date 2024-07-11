@@ -145,6 +145,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (Scene*)> ()
         .addProperty("scene", &EntityHandle::getScene)
         .addProperty("entity", &EntityHandle::getEntity)
+        .addProperty("entityOwned", &EntityHandle::isEntityOwned, &EntityHandle::setEntityOwned)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

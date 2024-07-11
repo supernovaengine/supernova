@@ -58,6 +58,8 @@
 
 namespace Supernova{
 
+	class Camera;
+
 	class Scene{
 	private:
 
@@ -93,6 +95,7 @@ namespace Supernova{
 
 		void updateSizeFromCamera();
 
+		void setCamera(Camera* camera);
 		void setCamera(Entity camera);
 		Entity getCamera() const;
 

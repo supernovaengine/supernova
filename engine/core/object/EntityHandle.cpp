@@ -44,3 +44,11 @@ Scene* EntityHandle::getScene() const{
 Entity EntityHandle::getEntity() const{
     return entity;
 }
+
+bool EntityHandle::isEntityOwned() const{
+    return entityOwned;
+}
+
+void EntityHandle::setEntityOwned(bool entityOwned){
+    this->entityOwned = entityOwned;
+}

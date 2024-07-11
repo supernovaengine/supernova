@@ -7,6 +7,8 @@
 #include "object/Camera.h"
 #include "Engine.h"
 
+#include "object/Camera.h"
+
 #include "subsystem/RenderSystem.h"
 #include "subsystem/MeshSystem.h"
 #include "subsystem/UISystem.h"
@@ -93,6 +95,10 @@ Scene::~Scene(){
 		entityList = entityManager.getEntityList();
 	}
 
+}
+
+void Scene::setCamera(Camera* camera){
+	setCamera(camera->getEntity());
 }
 
 void Scene::setCamera(Entity camera){
