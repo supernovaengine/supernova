@@ -186,6 +186,11 @@ void PhysicsSystem::createGenericJoltBody(Entity entity, Body3DComponent& body, 
 
     JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
 
+    if(body.overrideMassProperties){
+        settings.mOverrideMassProperties = JPH::EOverrideMassProperties::MassAndInertiaProvided;
+        settings.mMassPropertiesOverride.SetMassAndInertiaOfSolidBox(JPH::Vec3(body.solidBoxSize.x, body.solidBoxSize.y, body.solidBoxSize.z), body.solidBoxDensity);
+    }
+
     body.body = body_interface.CreateBody(settings);
     body.body->SetUserData(entity);
     //if (type != BodyType::STATIC){
@@ -525,7 +530,6 @@ int PhysicsSystem::createConvexHullShape3D(Entity entity, Vector3 position, Quat
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-
             body->shapes[body->numShapes].type = CollisionShape3DType::CONVEX_HULL;
 
             JPH::Array<JPH::Vec3> jvertices;
@@ -550,7 +554,6 @@ int PhysicsSystem::createMeshShape3D(Entity entity, Vector3 position, Quaternion
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-
             body->shapes[body->numShapes].type = CollisionShape3DType::MESH;
 
             JPH::VertexList jvertices;
@@ -583,58 +586,121 @@ int PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
+        if (body->numShapes < MAX_SHAPES){
+            body->shapes[body->numShapes].type = CollisionShape3DType::MESH;
 
-        std::map<std::string, Buffer*> buffers;
+            std::map<std::string, Buffer*> buffers;
 
-        if (mesh.buffer.getSize() > 0){
-            buffers["vertices"] = &mesh.buffer;
-        }
-        if (mesh.indices.getSize() > 0){
-            buffers["indices"] = &mesh.indices;
-        }
-        for (int i = 0; i < mesh.numExternalBuffers; i++){
-            buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
-        }
+            if (mesh.buffer.getSize() > 0){
+                buffers["vertices"] = &mesh.buffer;
+            }
+            if (mesh.indices.getSize() > 0){
+                buffers["indices"] = &mesh.indices;
+            }
+            for (int i = 0; i < mesh.numExternalBuffers; i++){
+                buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
+            }
 
-        JPH::IndexedTriangleList jindices;
-        JPH::VertexList jvertices;
+            Buffer* indexBuffer = NULL;
+            Attribute indexAttr;
 
-        for (auto const& buf : buffers){
-            if (buf.second->getType() == BufferType::INDEX_BUFFER){
-                int indicesize = int(buf.second->getCount() / 3);
-                Attribute* attIndex = buf.second->getAttribute(AttributeType::INDEX);
-                if (attIndex){
-                    jindices.resize(indicesize);
-                    for (int i = 0; i < indicesize; i++){
-                        for (int j = 0; j < 3; j++){
-                            uint16_t indice = buf.second->getUInt16(attIndex, (3*i)+j);
-                            jindices[i].mIdx[j] = indice;
-                        }
+            Buffer* vertexBuffer = NULL;
+            Attribute vertexAttr;
+
+            for (auto const& buf : buffers){
+                if (buf.second->getType() == BufferType::INDEX_BUFFER){
+                    if (buf.second->getAttribute(AttributeType::INDEX)){
+                        indexBuffer = buf.second;
+                        indexAttr = *buf.second->getAttribute(AttributeType::INDEX);
                     }
-                }
-            }else{
-                if (buf.second->isRenderAttributes()) {
-                    int verticesize = int(buf.second->getCount());
-                    Attribute* attVertex = buf.second->getAttribute(AttributeType::POSITION);
-                    if (attVertex){
-                        jvertices.resize(verticesize);
-                        for (int i = 0; i < verticesize; i++){
-                            Vector3 vertice = buf.second->getVector3(attVertex, i);
-                            jvertices[i] = JPH::Float3(vertice.x, vertice.y, vertice.z);
-                        }
+                }else{
+                    if (buf.second->getAttribute(AttributeType::POSITION)) {
+                        vertexBuffer = buf.second;
+                        vertexAttr = *buf.second->getAttribute(AttributeType::POSITION);
                     }
                 }
             }
-        }
 
-        if (jindices.size() == 0){
-            Log::error("Cannot create mesh shape without indices for 3D Body: %u", entity);
-        }else if (jvertices.size() == 0){
-            Log::error("Cannot create mesh shape without vertices for 3D Body: %u", entity);
-        }else{
-            JPH::MeshShapeSettings shape_settings(jvertices, jindices);
+            if (mesh.numSubmeshes > 1){
+                Log::warn("Using only first submesh to create 3D Body of entity: %u", entity);
+            }
 
-            return loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
+            if (mesh.submeshes[0].primitiveType != PrimitiveType::TRIANGLES){
+                Log::error("Cannot create mesh shape of non triangles mesh for 3D Body entity: %u", entity);
+                return -1;
+            }
+
+            for (auto const& attr : mesh.submeshes[0].attributes){
+                if (attr.first == AttributeType::INDEX){
+                    indexBuffer = buffers[attr.second.getBuffer()];
+                    indexAttr = attr.second;
+                }
+                if (attr.first == AttributeType::POSITION){
+                    vertexBuffer = buffers[attr.second.getBuffer()];
+                    vertexAttr = attr.second;
+                }
+            }
+
+            if (indexAttr.getCount() > 0){
+
+                JPH::IndexedTriangleList jindices;
+                JPH::VertexList jvertices;
+
+                int numIdxTriangles = int(indexAttr.getCount() / 3);
+                jindices.resize(numIdxTriangles);
+                for (int i = 0; i < numIdxTriangles; i++){
+                    for (int j = 0; j < 3; j++){
+                         uint32_t indice;
+                        if (indexAttr.getDataType() == AttributeDataType::UNSIGNED_INT){
+                            indice = indexBuffer->getUInt32(&indexAttr, (3*i)+j);
+                        }else if (indexAttr.getDataType() == AttributeDataType::UNSIGNED_SHORT){
+                            indice = indexBuffer->getUInt16(&indexAttr, (3*i)+j);
+                        }
+                        jindices[i].mIdx[j] = indice;
+                    }
+                }
+
+                int verticesize = int(vertexAttr.getCount());
+                jvertices.resize(verticesize);
+                for (int i = 0; i < verticesize; i++){
+                    Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i);
+                    jvertices[i] = JPH::Float3(vertice.x, vertice.y, vertice.z);
+                }
+
+                if (jindices.size() == 0){
+                    Log::error("Cannot create mesh shape without indices for 3D Body entity: %u", entity);
+                }else if (jvertices.size() == 0){
+                    Log::error("Cannot create mesh shape without vertices for 3D Body entity: %u", entity);
+                }else{
+                    JPH::MeshShapeSettings shape_settings(jvertices, jindices);
+
+                    return loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
+                }
+
+            }else{
+
+                JPH::TriangleList jtriangles;
+
+                int verticesize = int(vertexAttr.getCount());
+                int numTriangles = verticesize / 3;
+                jtriangles.resize(numTriangles);
+                for (int i = 0; i < numTriangles; i++){
+                    for (int j = 0; j < 3; j++){
+                        Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, (3*i)+j);
+                         jtriangles[i].mV[j] = JPH::Float3(vertice.x, vertice.y, vertice.z);
+                    }
+                }
+
+                if (jtriangles.size() == 0){
+                    Log::error("Cannot create mesh shape without vertices for 3D Body entity: %u", entity);
+                }else{
+                    JPH::MeshShapeSettings shape_settings(jtriangles);
+
+                    return loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
+                }
+
+            }
+
         }
     }
 
@@ -656,39 +722,43 @@ int PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& ter
     }
 
     if (body){
-        TextureData& textureData = terrain.heightMap.getData();
+        if (body->numShapes < MAX_SHAPES){
+            body->shapes[body->numShapes].type = CollisionShape3DType::HEIGHTFIELD;
 
-        if (samplesSize == 0){
-            samplesSize = textureData.getNearestPowerOfTwo();
-            if (samplesSize > std::min(textureData.getOriginalWidth(), textureData.getOriginalHeight())){
-                samplesSize = samplesSize / 2;
+            TextureData& textureData = terrain.heightMap.getData();
+
+            if (samplesSize == 0){
+                samplesSize = textureData.getNearestPowerOfTwo();
+                if (samplesSize > std::min(textureData.getOriginalWidth(), textureData.getOriginalHeight())){
+                    samplesSize = samplesSize / 2;
+                }
             }
-        }
 
-        JPH::Vec3 terrainOffset = JPH::Vec3(-terrain.terrainSize/2.0, 0.0f ,-terrain.terrainSize/2.0);
-        JPH::Vec3 terrainScale = JPH::Vec3(terrain.terrainSize/samplesSize, terrain.maxHeight, terrain.terrainSize/samplesSize);
+            JPH::Vec3 terrainOffset = JPH::Vec3(-terrain.terrainSize/2.0, 0.0f ,-terrain.terrainSize/2.0);
+            JPH::Vec3 terrainScale = JPH::Vec3(terrain.terrainSize/samplesSize, terrain.maxHeight, terrain.terrainSize/samplesSize);
 
-		float *samples = new float [samplesSize * samplesSize];
+            float *samples = new float [samplesSize * samplesSize];
 
-        for (int x = 0; x < samplesSize; x++){
-            for (int y = 0; y < samplesSize; y++){
-                TextureData& textureData = terrain.heightMap.getData();
+            for (int x = 0; x < samplesSize; x++){
+                for (int y = 0; y < samplesSize; y++){
+                    TextureData& textureData = terrain.heightMap.getData();
 
-                int posX = floor(textureData.getWidth() * x / samplesSize);
-                int posY = floor(textureData.getHeight() * y / samplesSize);
+                    int posX = floor(textureData.getWidth() * x / samplesSize);
+                    int posY = floor(textureData.getHeight() * y / samplesSize);
 
-                float val = textureData.getColorComponent(posX, posY, 0) / 255.0f;
+                    float val = textureData.getColorComponent(posX, posY, 0) / 255.0f;
 
-                samples[x + (y * samplesSize)] = val;
+                    samples[x + (y * samplesSize)] = val;
+                }
             }
+
+            JPH::HeightFieldShapeSettings shape_settings(samples, terrainOffset, terrainScale, samplesSize);
+
+            int shapeIndex = loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
+
+            delete[] samples;
+            return shapeIndex;
         }
-
-        JPH::HeightFieldShapeSettings shape_settings(samples, terrainOffset, terrainScale, samplesSize);
-
-        int shapeIndex = loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
-
-        delete[] samples;
-        return shapeIndex;
     }
 
     return -1;
@@ -749,6 +819,19 @@ bool PhysicsSystem::loadBody3D(Entity entity){
 
     if (world3D && !body.body){
 
+        for (int i = 0; i < body.numShapes; i++){
+            if (body.type != BodyType::STATIC){
+                if (body.shapes[i].type == CollisionShape3DType::HEIGHTFIELD){
+                    Log::error("Heightfild body should be static for 3D Body entity: %u", entity);
+                    return false;
+                }
+                if (body.shapes[i].type == CollisionShape3DType::MESH && !body.overrideMassProperties){
+                    Log::error("Mesh body should be static or with mass and inertia overridden for 3D Body entity: %u", entity);
+                    return false;
+                }
+            }
+        }
+
         if (body.numShapes > 1){
 
             JPH::StaticCompoundShapeSettings compound_shape;
@@ -766,7 +849,7 @@ bool PhysicsSystem::loadBody3D(Entity entity){
 
                 createGenericJoltBody(entity, body, shape.GetPtr());
             }else{
-                Log::error("Cannot create StaticCompoundShape for 3D Body: %u", entity);
+                Log::error("Cannot create StaticCompoundShape for 3D Body entity: %u", entity);
                 return false;
             }
 
@@ -786,7 +869,7 @@ bool PhysicsSystem::loadBody3D(Entity entity){
 
                     createGenericJoltBody(entity, body, shape.GetPtr());
                 }else{
-                    Log::error("Cannot create RotatedTranslatedShapeSettings for 3D Body: %u", entity);
+                    Log::error("Cannot create RotatedTranslatedShapeSettings for 3D Body entity: %u", entity);
                     return false;
                 }
 
@@ -796,7 +879,7 @@ bool PhysicsSystem::loadBody3D(Entity entity){
             }
 
         }else{
-            Log::error("Cannot load body without shapes: %u", entity);
+            Log::error("Cannot load body without shapes, entity: %u", entity);
             return false;
         }
 

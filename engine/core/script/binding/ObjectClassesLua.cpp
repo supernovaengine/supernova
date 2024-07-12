@@ -936,6 +936,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setAllowedDOFs2DPlane", &Body3D::setAllowedDOFs2DPlane)
         .addFunction("setAllowedDOFs", &Body3D::setAllowedDOFs)
         .addProperty("mass", &Body3D::getMass, &Body3D::setMass)
+        .addFunction("setOverrideMassAndInertia", &Body3D::setOverrideMassAndInertia)
         .addProperty("gravityFactor", &Body3D::getGravityFactor, &Body3D::setGravityFactor)
         .addProperty("collisionGroupID", &Body3D::getCollisionGroupID, &Body3D::setCollisionGroupID)
         .addFunction("setBitsFilter", &Body3D::setBitsFilter)

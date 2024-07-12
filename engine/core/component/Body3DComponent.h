@@ -39,6 +39,10 @@ namespace Supernova{
 
         CollisionShape3D shapes[MAX_SHAPES];
         int numShapes = 0;
+
+        bool overrideMassProperties = false;
+        Vector3 solidBoxSize;
+        float solidBoxDensity;
         
         BodyType type = BodyType::DYNAMIC;
         bool newBody = true;

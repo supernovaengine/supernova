@@ -344,6 +344,18 @@ void Body3D::setMass(float mass){
     body.body->GetMotionProperties()->SetMassProperties(body.body->GetMotionProperties()->GetAllowedDOFs(), massProperties);
 }
 
+void Body3D::setOverrideMassAndInertia(Vector3 solidBoxSize, float solidBoxDensity){
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    if (!body.body){
+        body.solidBoxSize = solidBoxSize;
+        body.solidBoxDensity = solidBoxDensity;
+        body.overrideMassProperties = true;
+    }else{
+        Log::error("Cannot override mass and inertia of loaded body");
+    }
+}
+
 float Body3D::getGravityFactor() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 

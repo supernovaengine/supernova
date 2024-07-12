@@ -91,6 +91,8 @@ namespace Supernova{
         float getMass() const;
         void setMass(float mass);
 
+        void setOverrideMassAndInertia(Vector3 solidBoxSize, float solidBoxDensity);
+
         float getGravityFactor() const;
         void setGravityFactor(float gravityFactor);
 

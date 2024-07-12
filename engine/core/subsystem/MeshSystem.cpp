@@ -1636,7 +1636,14 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
             mat.emissiveFactor[1],
             mat.emissiveFactor[2]);
 
-        loadGLTFBuffer(indexAccessor.bufferView, mesh, model, 0, loadedBuffers);
+        int indexStride = 0;
+        if (indexType == AttributeDataType::UNSIGNED_SHORT){
+            indexStride = sizeof(uint16_t);
+        }else if (indexType == AttributeDataType::UNSIGNED_INT){
+            indexStride = sizeof(uint32_t);
+        }
+
+        loadGLTFBuffer(indexAccessor.bufferView, mesh, model, indexStride, loadedBuffers);
 
         addSubmeshAttribute(mesh.submeshes[i], getBufferName(indexAccessor.bufferView, model), AttributeType::INDEX, 1, indexType, indexAccessor.count, indexAccessor.byteOffset, false);
 
