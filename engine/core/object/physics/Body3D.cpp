@@ -132,6 +132,10 @@ int Body3D::createCylinderShape(Vector3 position, Quaternion rotation, float hal
     return scene->getSystem<PhysicsSystem>()->createCylinderShape3D(entity, position, rotation, halfHeight, radius); 
 }
 
+int Body3D::createConvexHullShape(){
+    return scene->getSystem<PhysicsSystem>()->createConvexHullShape3D(entity, getComponent<MeshComponent>(), getComponent<Transform>());
+}
+
 int Body3D::createConvexHullShape(std::vector<Vector3> vertices){
     return scene->getSystem<PhysicsSystem>()->createConvexHullShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, vertices);
 }
@@ -141,7 +145,7 @@ int Body3D::createConvexHullShape(Vector3 position, Quaternion rotation, std::ve
 }
 
 int Body3D::createMeshShape(){
-    return scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, getComponent<MeshComponent>());
+    return scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, getComponent<MeshComponent>(), getComponent<Transform>());
 }
 
 int Body3D::createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices){
@@ -464,6 +468,10 @@ float Body3D::getFriction() const{
 
 void Body3D::setFriction(float friction){
     Body3DComponent& body = getComponent<Body3DComponent>();
+
+    if (friction < 0 || friction > 1){
+        Log::warn("Friction should be 0 and 1, 0 = no friction");
+    }
 
     checkBody(body);
     getBodyInterface().SetFriction(body.body->GetID(), friction);

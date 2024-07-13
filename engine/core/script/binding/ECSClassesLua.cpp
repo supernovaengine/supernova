@@ -177,10 +177,12 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("createCapsuleShape3D", &PhysicsSystem::createCapsuleShape3D)
         .addFunction("createTaperedCapsuleShape3D", &PhysicsSystem::createTaperedCapsuleShape3D)
         .addFunction("createCylinderShape3D", &PhysicsSystem::createCylinderShape3D)
-        .addFunction("createConvexHullShape3D", &PhysicsSystem::createConvexHullShape3D)
+        .addFunction("createConvexHullShape3D", 
+            luabridge::overload<Entity, Vector3, Quaternion, std::vector<Vector3>>(&PhysicsSystem::createConvexHullShape3D),
+            luabridge::overload<Entity, MeshComponent&, Transform&>(&PhysicsSystem::createConvexHullShape3D))
         .addFunction("createMeshShape3D", 
             luabridge::overload<Entity, Vector3, Quaternion, std::vector<Vector3>, std::vector<uint16_t>>(&PhysicsSystem::createMeshShape3D),
-            luabridge::overload<Entity, MeshComponent&>(&PhysicsSystem::createMeshShape3D))
+            luabridge::overload<Entity, MeshComponent&, Transform&>(&PhysicsSystem::createMeshShape3D))
         .addFunction("createHeightFieldShape3D", &PhysicsSystem::createHeightFieldShape3D)
 
         .addFunction("loadBody2D", &PhysicsSystem::loadBody2D)

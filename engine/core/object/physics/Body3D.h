@@ -53,6 +53,7 @@ namespace Supernova{
         int createTaperedCapsuleShape(Vector3 position, Quaternion rotation, float halfHeight, float topRadius, float bottomRadius);
         int createCylinderShape(float halfHeight, float radius);
         int createCylinderShape(Vector3 position, Quaternion rotation, float halfHeight, float radius);
+        int createConvexHullShape();
         int createConvexHullShape(std::vector<Vector3> vertices);
         int createConvexHullShape(Vector3 position, Quaternion rotation, std::vector<Vector3> vertices);
         int createMeshShape();

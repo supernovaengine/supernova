@@ -909,7 +909,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("createCylinderShape", 
             luabridge::overload<float, float>(&Body3D::createCylinderShape),
             luabridge::overload<Vector3, Quaternion, float, float>(&Body3D::createCylinderShape))
-        .addFunction("createConvexHullShape", 
+        .addFunction("createConvexHullShape",
+            luabridge::overload<>(&Body3D::createConvexHullShape),
             luabridge::overload<std::vector<Vector3>>(&Body3D::createConvexHullShape),
             luabridge::overload<Vector3, Quaternion, std::vector<Vector3>>(&Body3D::createConvexHullShape))
         .addFunction("createMeshShape", 

@@ -122,8 +122,9 @@ namespace Supernova{
 		int createTaperedCapsuleShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float topRadius, float bottomRadius);
 		int createCylinderShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float radius);
 		int createConvexHullShape3D(Entity entity, Vector3 position, Quaternion rotation, std::vector<Vector3> vertices);
+		int createConvexHullShape3D(Entity entity, MeshComponent& mesh, Transform& transform);
 		int createMeshShape3D(Entity entity, Vector3 position, Quaternion rotation, std::vector<Vector3> vertices, std::vector<uint16_t> indices);
-		int createMeshShape3D(Entity entity, MeshComponent& mesh);
+		int createMeshShape3D(Entity entity, MeshComponent& mesh, Transform& transform);
 		int createHeightFieldShape3D(Entity entity, TerrainComponent& terrain, unsigned int samplesSize);
 
 		b2World* getWorld2D() const;

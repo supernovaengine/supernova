@@ -549,6 +549,65 @@ int PhysicsSystem::createConvexHullShape3D(Entity entity, Vector3 position, Quat
     return -1;
 }
 
+int PhysicsSystem::createConvexHullShape3D(Entity entity, MeshComponent& mesh, Transform& transform){
+    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+            body->shapes[body->numShapes].type = CollisionShape3DType::CONVEX_HULL;
+
+            std::map<std::string, Buffer*> buffers;
+
+            if (mesh.buffer.getSize() > 0){
+                buffers["vertices"] = &mesh.buffer;
+            }
+            for (int i = 0; i < mesh.numExternalBuffers; i++){
+                buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
+            }
+
+            Buffer* vertexBuffer = NULL;
+            Attribute vertexAttr;
+
+            for (auto const& buf : buffers){
+                if (buf.second->getAttribute(AttributeType::POSITION)) {
+                    vertexBuffer = buf.second;
+                    vertexAttr = *buf.second->getAttribute(AttributeType::POSITION);
+                }
+            }
+
+            if (mesh.numSubmeshes > 1){
+                Log::warn("Using only first submesh to create 3D Body of entity: %u", entity);
+            }
+
+            for (auto const& attr : mesh.submeshes[0].attributes){
+                if (attr.first == AttributeType::POSITION){
+                    vertexBuffer = buffers[attr.second.getBuffer()];
+                    vertexAttr = attr.second;
+                }
+            }
+
+            JPH::Array<JPH::Vec3> jvertices;
+            int verticesize = int(vertexAttr.getCount());
+            jvertices.resize(verticesize);
+            for (int i = 0; i < verticesize; i++){
+                Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i) * transform.scale;
+                jvertices[i] = JPH::Vec3(vertice.x, vertice.y, vertice.z);
+            }
+
+            if (jvertices.size() == 0){
+                Log::error("Cannot create convex hull shape without vertices for 3D Body entity: %u", entity);
+            }else{
+                JPH::ConvexHullShapeSettings shape_settings(jvertices);
+
+                return loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
+            }
+
+        }
+    }
+
+    return -1;
+}
+
 int PhysicsSystem::createMeshShape3D(Entity entity, Vector3 position, Quaternion rotation, std::vector<Vector3> vertices, std::vector<uint16_t> indices){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
@@ -582,7 +641,7 @@ int PhysicsSystem::createMeshShape3D(Entity entity, Vector3 position, Quaternion
     return -1;
 }
 
-int PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
+int PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh, Transform& transform){
     Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
 
     if (body){
@@ -663,7 +722,7 @@ int PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
                 int verticesize = int(vertexAttr.getCount());
                 jvertices.resize(verticesize);
                 for (int i = 0; i < verticesize; i++){
-                    Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i);
+                    Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i) * transform.scale;
                     jvertices[i] = JPH::Float3(vertice.x, vertice.y, vertice.z);
                 }
 
@@ -686,8 +745,8 @@ int PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh){
                 jtriangles.resize(numTriangles);
                 for (int i = 0; i < numTriangles; i++){
                     for (int j = 0; j < 3; j++){
-                        Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, (3*i)+j);
-                         jtriangles[i].mV[j] = JPH::Float3(vertice.x, vertice.y, vertice.z);
+                        Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, (3*i)+j) * transform.scale;
+                        jtriangles[i].mV[j] = JPH::Float3(vertice.x, vertice.y, vertice.z);
                     }
                 }
 
