@@ -8,6 +8,7 @@
 #include "Engine.h"
 #include "math/Vector3.h"
 #include "math/Quaternion.h"
+#include "math/AABB.h"
 #include "buffer/Buffer.h"
 #include "render/ObjectRender.h"
 #include "render/TextureRender.h"
@@ -86,6 +87,8 @@ namespace Supernova{
         float normAdjustWeight = 1;
 
         float morphWeights[MAX_MORPHTARGETS];
+
+        AABB aabb;
 
         bool castShadows = true;
         bool transparent = false;

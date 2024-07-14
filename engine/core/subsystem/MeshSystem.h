@@ -75,6 +75,8 @@ namespace Supernova{
 		bool createOrUpdateMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
 		bool createOrUpdateTilemap(TilemapComponent& tilemap, MeshComponent& mesh);
 
+		void calculateMeshAABB(MeshComponent& mesh);
+
 		virtual void load();
 		virtual void destroy();
         virtual void update(double dt);

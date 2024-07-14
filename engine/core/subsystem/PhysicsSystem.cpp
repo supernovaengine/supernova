@@ -586,6 +586,11 @@ int PhysicsSystem::createConvexHullShape3D(Entity entity, MeshComponent& mesh, T
                 }
             }
 
+            if (vertexAttr.getDataType() != AttributeDataType::FLOAT){
+                Log::error("Cannot create convex hull shape of non float position vertex for 3D Body entity: %u", entity);
+                return -1;
+            }
+
             JPH::Array<JPH::Vec3> jvertices;
             int verticesize = int(vertexAttr.getCount());
             jvertices.resize(verticesize);
@@ -698,6 +703,11 @@ int PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh, Transfo
                     vertexBuffer = buffers[attr.second.getBuffer()];
                     vertexAttr = attr.second;
                 }
+            }
+
+            if (vertexAttr.getDataType() != AttributeDataType::FLOAT){
+                Log::error("Cannot create mesh shape of non float position vertex for 3D Body entity: %u", entity);
+                return -1;
             }
 
             if (indexAttr.getCount() > 0){

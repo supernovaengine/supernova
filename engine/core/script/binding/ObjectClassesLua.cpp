@@ -305,6 +305,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getPrimitiveType", 
             luabridge::overload<>(&Mesh::getPrimitiveType),
             luabridge::overload<unsigned int>(&Mesh::getPrimitiveType))
+        .addFunction("getAABB", &Mesh::getAABB)
         .addFunction("getMaterial", &Mesh::getMaterial)
         .endClass();
 

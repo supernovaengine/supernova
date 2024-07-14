@@ -705,6 +705,63 @@ void MeshSystem::clearAnimations(ModelComponent& model){
     model.animations.clear();
 }
 
+void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
+    std::map<std::string, Buffer*> buffers;
+
+    if (mesh.buffer.getSize() > 0){
+        buffers["vertices"] = &mesh.buffer;
+    }
+    for (int i = 0; i < mesh.numExternalBuffers; i++){
+        buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
+    }
+
+    Buffer* vertexBuffer = NULL;
+    Attribute vertexAttr;
+
+    for (auto const& buf : buffers){
+        if (buf.second->getAttribute(AttributeType::POSITION)) {
+            vertexBuffer = buf.second;
+            vertexAttr = *buf.second->getAttribute(AttributeType::POSITION);
+        }
+    }
+
+    float minX = std::numeric_limits<float>::max();
+    float minY = std::numeric_limits<float>::max();
+    float minZ = std::numeric_limits<float>::max();
+    float maxX = std::numeric_limits<float>::min();
+    float maxY = std::numeric_limits<float>::min();
+    float maxZ = std::numeric_limits<float>::min();
+
+    for (size_t i = 0; i < mesh.numSubmeshes; i++) {
+        for (auto const& attr : mesh.submeshes[i].attributes){
+            if (attr.first == AttributeType::POSITION){
+                vertexBuffer = buffers[attr.second.getBuffer()];
+                vertexAttr = attr.second;
+            }
+        }
+
+        if (vertexAttr.getDataType() != AttributeDataType::FLOAT){
+            return;
+        }
+
+        int verticesize = int(vertexAttr.getCount());
+        for (int i = 0; i < verticesize; i++){
+            Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i);
+
+            minX = std::min(minX, vertice.x);
+            minY = std::min(minX, vertice.y);
+            minZ = std::min(minX, vertice.z);
+
+            maxX = std::max(maxX, vertice.x);
+            maxY = std::max(maxX, vertice.y);
+            maxZ = std::max(maxX, vertice.z);
+        }
+
+        if (verticesize > 0){
+            mesh.aabb = AABB(minX, minY, minZ, maxX, maxY, maxZ);
+        }
+    }
+}
 
 TerrainNodeIndex MeshSystem::createPlaneNodeBuffer(TerrainComponent& terrain, int width, int height, int widthSegments, int heightSegments){
     float width_half = (float)width / 2;
@@ -976,6 +1033,8 @@ void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned i
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
+
+    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createBox(Entity entity, float width, float height, float depth, unsigned int tiles){
@@ -1102,6 +1161,8 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         36, (char*)&indices_array[0], sizeof(uint16_t));
+
+    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, unsigned int stacks){
@@ -1190,6 +1251,8 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
+
+    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
@@ -1316,6 +1379,8 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
+
+    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
@@ -1396,6 +1461,8 @@ void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius,
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
+
+    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsigned int sides, unsigned int rings){
@@ -1465,6 +1532,8 @@ void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsi
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
+
+    calculateMeshAABB(mesh);
 }
 
 bool MeshSystem::loadGLTF(Entity entity, std::string filename){
@@ -2079,6 +2148,8 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
 */
     std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
 
+    calculateMeshAABB(mesh);
+
     return true;
 }
 
@@ -2241,6 +2312,8 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
 
         std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
     }
+
+    calculateMeshAABB(mesh);
 
     return true;
 }

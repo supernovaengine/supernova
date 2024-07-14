@@ -91,6 +91,12 @@ PrimitiveType Mesh::getPrimitiveType(unsigned int submesh) const{
     return mesh.submeshes[submesh].primitiveType;
 }
 
+AABB Mesh::getAABB(){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.aabb;
+}
+
 Material& Mesh::getMaterial(unsigned int submesh){
     MeshComponent& mesh = getComponent<MeshComponent>();
 

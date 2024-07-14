@@ -34,6 +34,8 @@ namespace Supernova{
         void setPrimitiveType(unsigned int submesh, PrimitiveType primitiveType);
         PrimitiveType getPrimitiveType(unsigned int submesh) const;
 
+        AABB getAABB();
+
         Material& getMaterial(unsigned int submesh = 0);
     };
 }
