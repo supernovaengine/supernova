@@ -18,10 +18,14 @@ namespace Supernova {
 
     public:
 
+        static Vector3 linearTosRGB(float r, float g, float b);
         static Vector3 linearTosRGB(Vector3 color);
+        static Vector4 linearTosRGB(float r, float g, float b, float a);
         static Vector4 linearTosRGB(Vector4 color);
 
+        static Vector3 sRGBToLinear(float r, float g, float b);
         static Vector3 sRGBToLinear(Vector3 srgbIn);
+        static Vector4 sRGBToLinear(float r, float g, float b, float a);
         static Vector4 sRGBToLinear(Vector4 srgbIn);
 
     };
