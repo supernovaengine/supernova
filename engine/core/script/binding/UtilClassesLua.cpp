@@ -35,8 +35,16 @@ void LuaBinding::registerUtilClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Color>("Color")
-        .addStaticFunction("linearTosRGB", (Vector4(*)(Vector4))&Color::linearTosRGB)
-        .addStaticFunction("sRGBToLinear", (Vector4(*)(Vector4))&Color::sRGBToLinear)
+        .addStaticFunction("linearTosRGB", 
+            luabridge::overload<Vector3>(&Color::linearTosRGB),
+            luabridge::overload<Vector4>(&Color::linearTosRGB),
+            luabridge::overload<const float, const float, const float>(&Color::linearTosRGB),
+            luabridge::overload<const float, const float, const float, const float>(&Color::linearTosRGB))
+        .addStaticFunction("sRGBToLinear", 
+            luabridge::overload<Vector3>(&Color::sRGBToLinear),
+            luabridge::overload<Vector4>(&Color::sRGBToLinear),
+            luabridge::overload<const float, const float, const float>(&Color::sRGBToLinear),
+            luabridge::overload<const float, const float, const float, const float>(&Color::sRGBToLinear))
         .endClass();
 
 #endif //DISABLE_LUA_BINDINGS
