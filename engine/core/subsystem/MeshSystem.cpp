@@ -715,13 +715,19 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
         buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
     }
 
-    Buffer* vertexBuffer = NULL;
-    Attribute vertexAttr;
+    std::vector<std::tuple<Buffer*, Attribute>> vertexBuffers;
 
     for (auto const& buf : buffers){
         if (buf.second->getAttribute(AttributeType::POSITION)) {
-            vertexBuffer = buf.second;
-            vertexAttr = *buf.second->getAttribute(AttributeType::POSITION);
+            vertexBuffers.push_back(std::make_tuple(buf.second, *buf.second->getAttribute(AttributeType::POSITION)));
+        }
+    }
+
+    for (size_t i = 0; i < mesh.numSubmeshes; i++) {
+        for (auto const& attr : mesh.submeshes[i].attributes){
+            if (attr.first == AttributeType::POSITION){
+                vertexBuffers.push_back(std::make_tuple(buffers[attr.second.getBuffer()], attr.second));
+            }
         }
     }
 
@@ -732,15 +738,12 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
     float maxY = std::numeric_limits<float>::min();
     float maxZ = std::numeric_limits<float>::min();
 
-    for (size_t i = 0; i < mesh.numSubmeshes; i++) {
-        for (auto const& attr : mesh.submeshes[i].attributes){
-            if (attr.first == AttributeType::POSITION){
-                vertexBuffer = buffers[attr.second.getBuffer()];
-                vertexAttr = attr.second;
-            }
-        }
+    for (size_t i = 0; i < vertexBuffers.size(); i++) {
+        Buffer* vertexBuffer = std::get<0>(vertexBuffers[i]);
+        Attribute vertexAttr = std::get<1>(vertexBuffers[i]);
 
         if (vertexAttr.getDataType() != AttributeDataType::FLOAT){
+            // cannot create AABB of non float position vertex
             return;
         }
 

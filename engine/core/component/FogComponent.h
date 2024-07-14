@@ -17,8 +17,8 @@ namespace Supernova{
 
     struct FogComponent{
         FogType type = FogType::LINEAR;
-		Vector3 color = Color::sRGBToLinear(Vector3(0.8, 0.8, 0.8)); //linear
-		float density = 0.01; //for  exponential fog
+		Vector3 color = Color::sRGBToLinear(Vector3(0.8, 0.8, 0.8)); // linear color
+		float density = 0.01; // for exponential fog
 		float linearStart = 10;
 		float linearEnd = 60;
     };
