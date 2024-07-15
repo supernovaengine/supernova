@@ -715,21 +715,10 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
         buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
     }
 
-    std::vector<std::tuple<Buffer*, Attribute>> vertexBuffers;
+    bool hasVertices = false;
 
-    for (auto const& buf : buffers){
-        if (buf.second->getAttribute(AttributeType::POSITION)) {
-            vertexBuffers.push_back(std::make_tuple(buf.second, *buf.second->getAttribute(AttributeType::POSITION)));
-        }
-    }
-
-    for (size_t i = 0; i < mesh.numSubmeshes; i++) {
-        for (auto const& attr : mesh.submeshes[i].attributes){
-            if (attr.first == AttributeType::POSITION){
-                vertexBuffers.push_back(std::make_tuple(buffers[attr.second.getBuffer()], attr.second));
-            }
-        }
-    }
+    Buffer* vertexBuffer = NULL;
+    Attribute vertexAttr;
 
     float minX = std::numeric_limits<float>::max();
     float minY = std::numeric_limits<float>::max();
@@ -738,9 +727,20 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
     float maxY = std::numeric_limits<float>::min();
     float maxZ = std::numeric_limits<float>::min();
 
-    for (size_t i = 0; i < vertexBuffers.size(); i++) {
-        Buffer* vertexBuffer = std::get<0>(vertexBuffers[i]);
-        Attribute vertexAttr = std::get<1>(vertexBuffers[i]);
+    for (auto const& buf : buffers){
+        if (buf.second->getAttribute(AttributeType::POSITION)) {
+            vertexBuffer = buf.second;
+            vertexAttr = *buf.second->getAttribute(AttributeType::POSITION);
+        }
+    }
+
+    for (size_t i = 0; i < mesh.numSubmeshes; i++) {
+        for (auto const& attr : mesh.submeshes[i].attributes){
+            if (attr.first == AttributeType::POSITION){
+                vertexBuffer = buffers[attr.second.getBuffer()];
+                vertexAttr = attr.second;
+            }
+        }
 
         if (vertexAttr.getDataType() != AttributeDataType::FLOAT){
             // cannot create AABB of non float position vertex
@@ -758,11 +758,13 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
             maxX = std::max(maxX, vertice.x);
             maxY = std::max(maxX, vertice.y);
             maxZ = std::max(maxX, vertice.z);
-        }
 
-        if (verticesize > 0){
-            mesh.aabb = AABB(minX, minY, minZ, maxX, maxY, maxZ);
+            hasVertices = true;
         }
+    }
+
+    if (hasVertices){
+        mesh.aabb = AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 }
 
@@ -1546,6 +1548,9 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
 
     destroyModel(model);
 
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
+    mesh.numSubmeshes = 1;
+
     if (!model.gltfModel)
         model.gltfModel = new tinygltf::Model();
 
@@ -2163,6 +2168,9 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
 
     destroyModel(model);
 
+    mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
+    mesh.numSubmeshes = 1;
+
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
@@ -2195,7 +2203,9 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
 
         mesh.indices.clear();
 
-        mesh.numSubmeshes = materials.size();
+        if (materials.size() > 0){
+            mesh.numSubmeshes = materials.size();
+        }
 
         for (size_t i = 0; i < materials.size(); i++) {
 
