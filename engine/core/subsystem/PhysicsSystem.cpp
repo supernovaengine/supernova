@@ -605,6 +605,8 @@ int PhysicsSystem::createConvexHullShape3D(Entity entity, MeshComponent& mesh, T
                 return loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
             }
 
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
     }
 
@@ -772,6 +774,8 @@ int PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh, Transfo
                 }
             }
 
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
     }
 
