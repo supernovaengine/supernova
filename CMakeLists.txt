@@ -25,6 +25,9 @@ if (NOT EXISTS "${PROJECT_ROOT}")
 endif()
 file(TO_CMAKE_PATH ${PROJECT_ROOT} PROJECT_ROOT)
 
+add_definitions("-DDEFAULT_WINDOW_WIDTH=960")
+add_definitions("-DDEFAULT_WINDOW_HEIGHT=540")
+
 if(NOT GRAPHIC_BACKEND)
     if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
         set(GRAPHIC_BACKEND "gles3")

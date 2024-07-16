@@ -80,8 +80,8 @@ sapp_desc sokol_main(int argc, char* argv[]) {
     app_desc.frame_cb = sokol_frame;
     app_desc.event_cb = sokol_event;
     app_desc.cleanup_cb = sokol_cleanup;
-    app_desc.width = 960;
-    app_desc.height = 540;
+    app_desc.width = DEFAULT_WINDOW_WIDTH;
+    app_desc.height = DEFAULT_WINDOW_HEIGHT;
     app_desc.sample_count = 4;
     app_desc.window_title = "Supernova";
 

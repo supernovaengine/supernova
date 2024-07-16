@@ -23,8 +23,8 @@ std::string SupernovaWeb::canvas;
 int SupernovaWeb::syncWaitTime;
 bool SupernovaWeb::enabledIDB;
 
-int SupernovaWeb::screenWidth = 0;
-int SupernovaWeb::screenHeight = 0;
+int SupernovaWeb::screenWidth;
+int SupernovaWeb::screenHeight;
 
 int SupernovaWeb::sampleCount = 0;
 
@@ -106,8 +106,8 @@ int SupernovaWeb::init(int argc, char **argv){
 
     canvas = "#canvas";
 
-    int sWidth = 960;
-    int sHeight = 540;
+    int sWidth = DEFAULT_WINDOW_WIDTH;
+    int sHeight = DEFAULT_WINDOW_HEIGHT;
     if ((argv[1] != NULL && argv[1] != 0) && (argv[2] != NULL && argv[2] != 0)){
         sWidth = atoi(argv[1]);
         sHeight = atoi(argv[2]);
