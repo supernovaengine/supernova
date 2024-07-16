@@ -1866,7 +1866,11 @@ void RenderSystem::updateSkyViewProjection(SkyComponent& sky, CameraComponent& c
 	skyViewMatrix.set(1,3,0);
 	skyViewMatrix.set(0,3,0);
 
-	sky.skyViewProjectionMatrix = camera.projectionMatrix * skyViewMatrix;
+	Matrix4 rotationMatrix = Quaternion(0, sky.rotation, 0).getRotationMatrix();
+
+	sky.skyViewProjectionMatrix = camera.projectionMatrix * skyViewMatrix * rotationMatrix;
+
+	sky.needUpdateSky = false;
 }
 
 void RenderSystem::updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentParticles){
@@ -2551,7 +2555,7 @@ void RenderSystem::update(double dt){
 	if (skys->size() > 0){
 		SkyComponent& sky = skys->getComponentFromIndex(0);
 		Entity entity = skys->getEntity(0);
-		if (mainCamera.needUpdate){
+		if (mainCamera.needUpdate || sky.needUpdateSky){
 			if (!hasMultipleCameras){
 				updateSkyViewProjection(sky, mainCamera);
 			}

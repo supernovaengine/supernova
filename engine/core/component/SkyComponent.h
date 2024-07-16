@@ -26,7 +26,10 @@ namespace Supernova{
         Texture texture;
         Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0); //sRGB
 
+        float rotation = 0;
+
         bool needUpdateTexture = false;
+        bool needUpdateSky = true;
     };
     
 }

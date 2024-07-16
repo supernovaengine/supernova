@@ -175,6 +175,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<const float, const float, const float>(&SkyBox::setColor),
             luabridge::overload<const float, const float, const float, const float>(&SkyBox::setColor))
         .addProperty("alpha", &SkyBox::getAlpha, &SkyBox::setAlpha)
+        .addProperty("rotation", &SkyBox::getRotation, &SkyBox::setRotation)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

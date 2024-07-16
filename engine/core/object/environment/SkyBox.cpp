@@ -111,3 +111,16 @@ float SkyBox::getAlpha() const{
 
     return sky.color.w;
 }
+
+void SkyBox::setRotation(float angle){
+    SkyComponent& sky = getComponent<SkyComponent>();
+
+    sky.rotation = angle;
+    sky.needUpdateSky = true;
+}
+
+float SkyBox::getRotation() const{
+    SkyComponent& sky = getComponent<SkyComponent>();
+
+    return sky.rotation;
+}

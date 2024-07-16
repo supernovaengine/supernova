@@ -33,6 +33,8 @@ namespace Supernova{
         Vector4 getColor() const;
         float getAlpha() const;
 
+        void setRotation(float angle);
+        float getRotation() const;
     };
 }
 
