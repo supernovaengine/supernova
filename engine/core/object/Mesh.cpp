@@ -97,6 +97,12 @@ AABB Mesh::getAABB(){
     return mesh.aabb;
 }
 
+unsigned int Mesh::getNumSubmeshes() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.numSubmeshes;
+}
+
 Material& Mesh::getMaterial(unsigned int submesh){
     MeshComponent& mesh = getComponent<MeshComponent>();
 

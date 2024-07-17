@@ -730,7 +730,9 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 			mesh.submeshes[i].vertexCount = mesh.vertexCount;
 		}
 
-		render.endLoad(PIP_DEFAULT | PIP_RTT);
+		if (!render.endLoad(PIP_DEFAULT | PIP_RTT)){
+			return false;
+		}
 
 		//----------Start depth shader---------------
 		if (hasShadows && mesh.castShadows){
@@ -811,7 +813,9 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 				}
 			}
 
-			depthRender.endLoad(PIP_DEPTH);
+			if (!depthRender.endLoad(PIP_DEPTH)){
+				return false;
+			}
 		}
 		//----------End depth shader---------------
 	}
@@ -1066,7 +1070,9 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
 	// empty to create index_type
 	terrain.render.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, 0);
 
-	terrain.render.endLoad(PIP_DEFAULT | PIP_RTT);
+	if (!terrain.render.endLoad(PIP_DEFAULT | PIP_RTT)){
+		return false;
+	}
 
 	//----------Start depth shader---------------
 	if (hasShadows && terrain.castShadows){
@@ -1088,7 +1094,9 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
 		// empty to create index_type
 		terrain.depthRender.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, 0);
 
-		terrain.depthRender.endLoad(PIP_DEPTH);
+		if (!terrain.depthRender.endLoad(PIP_DEPTH)){
+			return false;
+		}
 	}
 	//----------End depth shader---------------
 
@@ -1292,7 +1300,9 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, bool isText){
 	
 	uirender.needUpdateTexture = false;
 
-	render.endLoad(PIP_DEFAULT | PIP_RTT);
+	if (!render.endLoad(PIP_DEFAULT | PIP_RTT)){
+		return false;
+	}
 
 	uirender.needReload = false;
 	uirender.loadCalled = true;
@@ -1431,7 +1441,9 @@ bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
 
 	particles.needUpdateTexture = false;
 
-	render.endLoad(PIP_DEFAULT | PIP_RTT);
+	if (!render.endLoad(PIP_DEFAULT | PIP_RTT)){
+		return false;
+	}
 
 	particles.needReload = false;
 	particles.loadCalled = true;
@@ -1485,7 +1497,9 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines){
 		lines.needUpdateBuffer = true;
 	}
 
-	render.endLoad(PIP_DEFAULT | PIP_RTT);
+	if (!render.endLoad(PIP_DEFAULT | PIP_RTT)){
+		return false;
+	}
 
 	lines.needReload = false;
 	lines.loadCalled = true;
@@ -1660,7 +1674,9 @@ bool RenderSystem::loadSky(Entity entity, SkyComponent& sky){
         }
     }
 
-	render->endLoad(PIP_DEFAULT | PIP_RTT);
+	if (!render->endLoad(PIP_DEFAULT | PIP_RTT)){
+		return false;
+	}
 
 	sky.loadCalled = true;
 	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});

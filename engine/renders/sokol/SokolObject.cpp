@@ -184,7 +184,7 @@ void SokolObject::addTexture(std::pair<int, int> slot, ShaderStageType stage, Te
     }
 }
 
-void SokolObject::endLoad(uint8_t pipelines){
+bool SokolObject::endLoad(uint8_t pipelines){
 
     if (pipelines & (int)PipelineType::PIP_DEPTH) {
         sg_pipeline_desc pip_depth_desc = pipeline_desc;
@@ -200,6 +200,10 @@ void SokolObject::endLoad(uint8_t pipelines){
             depth_pip = SokolCmdQueue::add_command_make_pipeline(pip_depth_desc);
         }else{
             depth_pip = sg_make_pipeline(pip_depth_desc);
+        }
+
+        if (depth_pip.id == SG_INVALID_ID){
+            return false;
         }
     }
 
@@ -221,6 +225,10 @@ void SokolObject::endLoad(uint8_t pipelines){
             pip = SokolCmdQueue::add_command_make_pipeline(pip_default_desc);
         }else{
             pip = sg_make_pipeline(pip_default_desc);
+        }
+
+        if (pip.id == SG_INVALID_ID){
+            return false;
         }
     }
 
@@ -249,8 +257,13 @@ void SokolObject::endLoad(uint8_t pipelines){
         }else{
             rtt_pip = sg_make_pipeline(pip_rtt_desc);
         }
+
+        if (rtt_pip.id == SG_INVALID_ID){
+            return false;
+        }
     }
-    
+
+    return true;
 }
 
 void SokolObject::beginDraw(PipelineType pipType){

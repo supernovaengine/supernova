@@ -43,8 +43,8 @@ void ObjectRender::addTexture(std::pair<int, int> slot, ShaderStageType stage, T
     backend.addTexture(slot, stage, texture);
 }
 
-void ObjectRender::endLoad(uint8_t pipelines){
-    backend.endLoad(pipelines);
+bool ObjectRender::endLoad(uint8_t pipelines){
+    return backend.endLoad(pipelines);
 }
 
 void ObjectRender::beginDraw(PipelineType pipType){

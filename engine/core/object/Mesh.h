@@ -36,6 +36,8 @@ namespace Supernova{
 
         AABB getAABB();
 
+        unsigned int getNumSubmeshes() const;
+
         Material& getMaterial(unsigned int submesh = 0);
     };
 }

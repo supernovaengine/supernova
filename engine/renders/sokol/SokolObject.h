@@ -68,7 +68,7 @@ namespace Supernova{
         void addStorageBuffer(int slot, ShaderStageType stage, BufferRender* buffer);
         void addShader(ShaderRender* shader);
         void addTexture(std::pair<int, int> slot, ShaderStageType stage, TextureRender* texture);
-        void endLoad(uint8_t pipelines);
+        bool endLoad(uint8_t pipelines);
 
         void beginDraw(PipelineType pipType);
         void applyUniformBlock(int slot, ShaderStageType stage, unsigned int count, void* data);
