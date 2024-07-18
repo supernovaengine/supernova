@@ -38,6 +38,8 @@ namespace Supernova{
 
     public:
 
+        static const AABB ZERO;
+
         AABB();
         AABB(BoxType e);
         AABB(const AABB & rkBox);
@@ -46,7 +48,7 @@ namespace Supernova{
 
         ~AABB();
 
-        AABB& operator=(const AABB& rhs);
+        AABB& operator= (const AABB& rhs);
         bool operator== (const AABB& rhs) const;
         bool operator!= (const AABB& rhs) const;
 

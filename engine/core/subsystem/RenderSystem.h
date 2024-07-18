@@ -127,8 +127,8 @@ namespace Supernova{
 
 	protected:
 
-		void drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, bool renderToTexture);
-		void drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams);
+		bool drawMesh(MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture);
+		bool drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams);
 		void destroyMesh(Entity entity, MeshComponent& mesh);
 
 		void drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture);

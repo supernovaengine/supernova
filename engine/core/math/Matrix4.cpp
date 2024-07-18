@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include "math/Quaternion.h"
+#include "math/AABB.h"
 
 using namespace Supernova;
 
@@ -135,6 +136,14 @@ Vector4 Matrix4::operator*(const Vector4 &v) const{
     }
 
     return Vector4(prod[0] ,prod[1] ,prod[2], prod[3]);
+}
+
+AABB Matrix4::operator*(const AABB &aabb) const{
+    AABB resul = aabb;
+
+    resul.transform(*this);
+
+    return resul;
 }
 
 const float* Matrix4::operator[](int iCol) const{

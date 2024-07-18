@@ -827,8 +827,12 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 	return true;
 }
 
-void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform& camTransform, bool renderToTexture){
+bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture){
 	if (mesh.loaded){
+
+		if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(camera, mesh.worldAABB)) {
+			return false;
+		}
 
 		if (mesh.needUpdateBuffer){
 			if (mesh.buffer.getUsage() != BufferUsage::IMMUTABLE)
@@ -861,7 +865,7 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 
 			if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
 				mesh.needReload = true;
-				return;
+				return false;
 			}
 
 			if (hasFog){
@@ -904,16 +908,23 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 			render.draw(mesh.submeshes[i].vertexCount);
 		}
 	}
+
+	return true;
 }
 
-void RenderSystem::drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams){
+bool RenderSystem::drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams){
 	if (mesh.loaded && mesh.castShadows){
+
+		//if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(camera, mesh.worldAABB)) {
+		//	return false;
+		//}
+
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& depthRender = mesh.submeshes[i].depthRender;
 
 			if (!depthRender.beginDraw(PIP_DEPTH)){
 				mesh.needReload = true;
-				return;
+				return false;
 			}
 
 			//model, mvp matrix
@@ -933,6 +944,8 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams){
 			depthRender.draw(mesh.submeshes[i].vertexCount);
 		}
 	}
+
+	return true;
 }
 
 void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
@@ -2019,10 +2032,12 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
     AABB box = getTerrainNodeAABB(transform, terrainNode);
 
     if (!isTerrainNodeInSphere(cameraTransform.worldPosition, terrain.ranges[lodLevel], box)) {
+		// no node or child nodes were selected
         return false;
     }
 
     if (!isInsideCamera(camera, box)) {
+		// return true to parent node does not select itself over area
         return true;
     }
 
@@ -2702,6 +2717,12 @@ void RenderSystem::update(double dt){
 
 		if (transform.needUpdate){
 
+			if (signature.test(scene->getComponentType<MeshComponent>())){
+				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+				mesh.worldAABB = transform.localMatrix * mesh.aabb;
+			}
+
 			if (signature.test(scene->getComponentType<ModelComponent>())){
 				ModelComponent& model = scene->getComponent<ModelComponent>(entity);
 
@@ -2905,7 +2926,7 @@ void RenderSystem::draw(){
 				if (transform.visible){
 					if (!mesh.transparent || !camera.transparentSort){
 						//Draw opaque meshes if transparency is not necessary
-						drawMesh(mesh, transform, cameraTransform, camera.renderToTexture);
+						drawMesh(mesh, transform, camera, cameraTransform, camera.renderToTexture);
 					}else{
 						transparentMeshes.push({&mesh, &transform, transform.distanceToCamera});
 					}
@@ -2967,7 +2988,7 @@ void RenderSystem::draw(){
 			TransparentMeshesData meshData = transparentMeshes.top();
 
 			//Draw transparent meshes
-			drawMesh(*meshData.mesh, *meshData.transform, cameraTransform, camera.renderToTexture);
+			drawMesh(*meshData.mesh, *meshData.transform, camera, cameraTransform, camera.renderToTexture);
 
 			transparentMeshes.pop();
 		}

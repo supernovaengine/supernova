@@ -752,12 +752,12 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
             Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i);
 
             minX = std::min(minX, vertice.x);
-            minY = std::min(minX, vertice.y);
-            minZ = std::min(minX, vertice.z);
+            minY = std::min(minY, vertice.y);
+            minZ = std::min(minZ, vertice.z);
 
             maxX = std::max(maxX, vertice.x);
-            maxY = std::max(maxX, vertice.y);
-            maxZ = std::max(maxX, vertice.z);
+            maxY = std::max(maxY, vertice.y);
+            maxZ = std::max(maxZ, vertice.z);
 
             hasVertices = true;
         }

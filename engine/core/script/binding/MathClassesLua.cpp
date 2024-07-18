@@ -348,6 +348,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             void(AABB::BoxType), 
             void(const Vector3&, const Vector3&), 
             void(float, float, float, float, float, float)>()
+        .addStaticProperty("ZERO", &AABB::ZERO)
         .addProperty("minimum", (const Vector3&(AABB::*)() const)&AABB::getMinimum, (void(AABB::*)(const Vector3&))&AABB::setMinimum)
         .addFunction("setMinimum", (void(AABB::*)(float, float, float))&AABB::setMinimum)
         .addFunction("setMinimumX", &AABB::setMinimumX)

@@ -5,6 +5,9 @@
 
 using namespace Supernova;
 
+const AABB AABB::ZERO( 0, 0, 0, 0, 0, 0 );
+
+
 AABB::AABB()
         : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
     setMinimum( -0.5, -0.5, -0.5 );
@@ -44,7 +47,7 @@ AABB::~AABB() {
         delete mCorners;
 }
 
-AABB& AABB::operator=(const AABB& rhs) {
+AABB& AABB::operator= (const AABB& rhs) {
     if (rhs.isNull())
         setNull();
     else if (rhs.isInfinite())
