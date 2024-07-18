@@ -18,7 +18,7 @@ Lines::~Lines(){
 bool Lines::load(){
     LinesComponent& linescomp = getComponent<LinesComponent>();
 
-    return scene->getSystem<RenderSystem>()->loadLines(entity, linescomp);
+    return scene->getSystem<RenderSystem>()->loadLines(entity, linescomp, PIP_DEFAULT | PIP_RTT);
 }
 
 void Lines::addLine(Vector3 pointA, Vector3 pointB){

@@ -29,7 +29,7 @@ bool Image::createImage(){
 bool Image::load(){
     UIComponent& ui = getComponent<UIComponent>();
 
-    return scene->getSystem<RenderSystem>()->loadUI(entity, ui, false);
+    return scene->getSystem<RenderSystem>()->loadUI(entity, ui, PIP_DEFAULT | PIP_RTT, false);
 }
 
 void Image::setPatchMargin(int margin){

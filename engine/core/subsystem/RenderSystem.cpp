@@ -498,7 +498,7 @@ void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& sh
 		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 }
 
-bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
+bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipelines){
 
 	if (!Engine::isViewLoaded()) 
 		return false;
@@ -730,7 +730,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh){
 			mesh.submeshes[i].vertexCount = mesh.vertexCount;
 		}
 
-		if (!render.endLoad(PIP_DEFAULT | PIP_RTT)){
+		if (!render.endLoad(pipelines)){
 			return false;
 		}
 
@@ -982,7 +982,7 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
-bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
+bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t pipelines){
 
 	if (!Engine::isViewLoaded()) 
 		return false;
@@ -1070,7 +1070,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain){
 	// empty to create index_type
 	terrain.render.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, 0);
 
-	if (!terrain.render.endLoad(PIP_DEFAULT | PIP_RTT)){
+	if (!terrain.render.endLoad(pipelines)){
 		return false;
 	}
 
@@ -1224,7 +1224,7 @@ void RenderSystem::destroyTerrain(Entity entity, TerrainComponent& terrain){
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
-bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, bool isText){
+bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, uint8_t pipelines, bool isText){
 
 	if (!Engine::isViewLoaded()) 
 		return false;
@@ -1300,7 +1300,7 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, bool isText){
 	
 	uirender.needUpdateTexture = false;
 
-	if (!render.endLoad(PIP_DEFAULT | PIP_RTT)){
+	if (!render.endLoad(pipelines)){
 		return false;
 	}
 
@@ -1378,7 +1378,7 @@ void RenderSystem::destroyUI(Entity entity, UIComponent& uirender){
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
-bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
+bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles, uint8_t pipelines){
 
 	if (!Engine::isViewLoaded()) 
 		return false;
@@ -1441,7 +1441,7 @@ bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
 
 	particles.needUpdateTexture = false;
 
-	if (!render.endLoad(PIP_DEFAULT | PIP_RTT)){
+	if (!render.endLoad(pipelines)){
 		return false;
 	}
 
@@ -1452,7 +1452,7 @@ bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles){
 	return true;
 }
 
-bool RenderSystem::loadLines(Entity entity, LinesComponent& lines){
+bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipelines){
 
 	if (!Engine::isViewLoaded()) 
 		return false;
@@ -1497,7 +1497,7 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines){
 		lines.needUpdateBuffer = true;
 	}
 
-	if (!render.endLoad(PIP_DEFAULT | PIP_RTT)){
+	if (!render.endLoad(pipelines)){
 		return false;
 	}
 
@@ -1593,7 +1593,7 @@ void RenderSystem::destroyLines(Entity entity, LinesComponent& lines){
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
-bool RenderSystem::loadSky(Entity entity, SkyComponent& sky){
+bool RenderSystem::loadSky(Entity entity, SkyComponent& sky, uint8_t pipelines){
 
 	if (!Engine::isViewLoaded()) 
 		return false;	
@@ -1674,7 +1674,7 @@ bool RenderSystem::loadSky(Entity entity, SkyComponent& sky){
         }
     }
 
-	if (!render->endLoad(PIP_DEFAULT | PIP_RTT)){
+	if (!render->endLoad(pipelines)){
 		return false;
 	}
 
@@ -2542,6 +2542,7 @@ void RenderSystem::update(double dt){
 	}
 
 	Entity mainCameraEntity = scene->getCamera();
+	uint8_t pipelines = 0;
 
 	hasMultipleCameras = false;
 	for (int i = 0; i < cameras->size(); i++){
@@ -2550,6 +2551,14 @@ void RenderSystem::update(double dt){
 		Transform& cameraTransform = scene->getComponent<Transform>(cameraEntity);
 		if (camera.renderToTexture && cameraEntity != mainCameraEntity){
 			hasMultipleCameras = true;
+		}
+
+		if (cameraEntity == mainCameraEntity && !camera.renderToTexture){
+			pipelines |= PIP_DEFAULT;
+		}
+
+		if (camera.renderToTexture){
+			pipelines |= PIP_RTT;
 		}
 
 		if (cameraTransform.needUpdate){
@@ -2578,7 +2587,7 @@ void RenderSystem::update(double dt){
 		}
 
 		if (!sky.loadCalled){
-			loadSky(entity, sky);
+			loadSky(entity, sky, pipelines);
 		}
 	}
 
@@ -2594,7 +2603,7 @@ void RenderSystem::update(double dt){
 				destroyMesh(entity, mesh);
 			}
 			if (!mesh.loadCalled){
-				loadMesh(entity, mesh);
+				loadMesh(entity, mesh, pipelines);
 			}
 		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
 			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
@@ -2602,7 +2611,7 @@ void RenderSystem::update(double dt){
 				destroyTerrain(entity, terrain);
 			}
 			if (!terrain.loadCalled){
-				loadTerrain(entity, terrain);
+				loadTerrain(entity, terrain, pipelines);
 			}
 		}else if (signature.test(scene->getComponentType<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
@@ -2615,7 +2624,7 @@ void RenderSystem::update(double dt){
 					destroyUI(entity, ui);
 				}
 				if (!ui.loadCalled){
-					loadUI(entity, ui, isText);
+					loadUI(entity, ui, pipelines, isText);
 				}
 			}
 		}else if (signature.test(scene->getComponentType<ParticlesComponent>())){
@@ -2624,7 +2633,7 @@ void RenderSystem::update(double dt){
 				destroyParticles(entity, particles);
 			}
 			if (!particles.loadCalled){
-				loadParticles(entity, particles);
+				loadParticles(entity, particles, pipelines);
 			}
 		}else if (signature.test(scene->getComponentType<LinesComponent>())){
 			LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
@@ -2632,7 +2641,7 @@ void RenderSystem::update(double dt){
 				destroyLines(entity, lines);
 			}
 			if (!lines.loadCalled){
-				loadLines(entity, lines);
+				loadLines(entity, lines, pipelines);
 			}
 		}
 

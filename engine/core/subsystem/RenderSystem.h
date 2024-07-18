@@ -161,12 +161,12 @@ namespace Supernova{
 		RenderSystem(Scene* scene);
 		virtual ~RenderSystem();
 
-		bool loadMesh(Entity entity, MeshComponent& mesh);
-		bool loadTerrain(Entity entity, TerrainComponent& terrain);
-		bool loadParticles(Entity entity, ParticlesComponent& particles);
-		bool loadLines(Entity entity, LinesComponent& lines);
-		bool loadUI(Entity entity, UIComponent& uirender, bool isText);
-		bool loadSky(Entity entity, SkyComponent& sky);
+		bool loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipelines);
+		bool loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t pipelines);
+		bool loadParticles(Entity entity, ParticlesComponent& particles, uint8_t pipelines);
+		bool loadLines(Entity entity, LinesComponent& lines, uint8_t pipelines);
+		bool loadUI(Entity entity, UIComponent& uirender, uint8_t pipelines, bool isText);
+		bool loadSky(Entity entity, SkyComponent& sky, uint8_t pipelines);
 
 		void updateFramebuffer(CameraComponent& camera);
 		void updateTransform(Transform& transform);

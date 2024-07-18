@@ -19,7 +19,7 @@ Particles::~Particles(){
 bool Particles::load(){
     ParticlesComponent& particomp = getComponent<ParticlesComponent>();
 
-    return scene->getSystem<RenderSystem>()->loadParticles(entity, particomp);
+    return scene->getSystem<RenderSystem>()->loadParticles(entity, particomp, PIP_DEFAULT | PIP_RTT);
 }
 
 void Particles::setMaxParticles(unsigned int maxParticles){
