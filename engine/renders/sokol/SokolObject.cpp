@@ -266,17 +266,28 @@ bool SokolObject::endLoad(uint8_t pipelines){
     return true;
 }
 
-void SokolObject::beginDraw(PipelineType pipType){
+bool SokolObject::beginDraw(PipelineType pipType){
     if (pipType == PipelineType::PIP_DEPTH){
+        if (depth_pip.id == SG_INVALID_ID){
+            return false;
+        }
         //SokolCmdQueue::add_command_apply_pipeline(depth_pip);
         sg_apply_pipeline(depth_pip);
     }else if (pipType == PipelineType::PIP_RTT){
+        if (rtt_pip.id == SG_INVALID_ID){
+            return false;
+        }
         //SokolCmdQueue::add_command_apply_pipeline(rtt_pip);
         sg_apply_pipeline(rtt_pip);
     }else{
+        if (pip.id == SG_INVALID_ID){
+            return false;
+        }
         //SokolCmdQueue::add_command_apply_pipeline(pip);
         sg_apply_pipeline(pip);
     }
+
+    return true;
 }
 
 void SokolObject::applyUniformBlock(int slot, ShaderStageType stage, unsigned int count, void* data){

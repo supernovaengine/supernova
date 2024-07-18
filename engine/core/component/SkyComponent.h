@@ -30,6 +30,7 @@ namespace Supernova{
 
         bool needUpdateTexture = false;
         bool needUpdateSky = true;
+        bool needReload = false;
     };
     
 }

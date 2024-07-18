@@ -33,7 +33,7 @@ namespace Supernova {
         void addTexture(std::pair<int, int> slot, ShaderStageType stage, TextureRender* texture);
         bool endLoad(uint8_t pipelines);
 
-        void beginDraw(PipelineType pipType);
+        bool beginDraw(PipelineType pipType);
         void applyUniformBlock(int slot, ShaderStageType stage, unsigned int count, void* data);
         void draw(int vertexCount);
 

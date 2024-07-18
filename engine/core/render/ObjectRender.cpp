@@ -47,8 +47,8 @@ bool ObjectRender::endLoad(uint8_t pipelines){
     return backend.endLoad(pipelines);
 }
 
-void ObjectRender::beginDraw(PipelineType pipType){
-    backend.beginDraw(pipType);
+bool ObjectRender::beginDraw(PipelineType pipType){
+    return backend.beginDraw(pipType);
 }
 
 void ObjectRender::applyUniformBlock(int slot, ShaderStageType stage, unsigned int count, void* data){

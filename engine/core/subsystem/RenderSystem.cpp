@@ -75,7 +75,7 @@ void RenderSystem::destroy(){
 	if (skys->size() > 0){
 		SkyComponent& sky = skys->getComponentFromIndex(0);
 		Entity entity = skys->getEntity(0);
-		if (sky.loadCalled){
+		if (sky.loaded){
 			destroySky(entity, sky);;
 		}
 	}
@@ -859,7 +859,10 @@ void RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, Transform
 				mesh.submeshes[i].material.ambientLight = scene->getAmbientLightColor();
 			}
 
-			render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
+			if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
+				mesh.needReload = true;
+				return;
+			}
 
 			if (hasFog){
 				render.applyUniformBlock(mesh.submeshes[i].slotFSFog, ShaderStageType::FRAGMENT, sizeof(float) * 8, &fs_fog);
@@ -908,7 +911,10 @@ void RenderSystem::drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams){
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& depthRender = mesh.submeshes[i].depthRender;
 
-			depthRender.beginDraw(PIP_DEPTH);
+			if (!depthRender.beginDraw(PIP_DEPTH)){
+				mesh.needReload = true;
+				return;
+			}
 
 			//model, mvp matrix
 			depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 32, &vsDepthParams);
@@ -1123,7 +1129,10 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 			terrain.material.ambientLight = scene->getAmbientLightColor();
 		}
 
-		terrain.render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
+		if (!terrain.render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
+			terrain.needReload = true;
+			return;
+		}
 
 		if (hasLights){
 			terrain.render.applyUniformBlock(terrain.slotFSLighting, ShaderStageType::FRAGMENT, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
@@ -1156,7 +1165,10 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 
 void RenderSystem::drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams){
 	if (terrain.loaded && terrain.castShadows){
-		terrain.depthRender.beginDraw(PIP_DEPTH);
+		if (!terrain.depthRender.beginDraw(PIP_DEPTH)){
+			terrain.needReload = true;
+			return;
+		}
 
 		//model, mvp matrix
 		terrain.depthRender.applyUniformBlock(terrain.slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 32, &vsDepthParams);
@@ -1338,7 +1350,10 @@ void RenderSystem::drawUI(UIComponent& uirender, Transform& transform, bool rend
 
 		ObjectRender& render = uirender.render;
 
-		render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
+		if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
+			uirender.needReload = true;
+			return;
+		}
 		render.applyUniformBlock(uirender.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		//Color
 		render.applyUniformBlock(uirender.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &uirender.color);
@@ -1527,7 +1542,10 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 
 		ObjectRender& render = particles.render;
 
-		render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
+		if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
+			particles.needReload = true;
+			return;
+		}
 		render.applyUniformBlock(particles.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		render.draw(particles.numVisible);
 	}
@@ -1567,7 +1585,10 @@ void RenderSystem::drawLines(LinesComponent& lines, Transform& transform, Transf
 
 		ObjectRender& render = lines.render;
 
-		render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
+		if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
+			lines.needReload = true;
+			return;
+		}
 		render.applyUniformBlock(lines.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		render.draw(lines.lines.size() * 2);
 	}
@@ -1698,7 +1719,10 @@ void RenderSystem::drawSky(SkyComponent& sky, bool renderToTexture){
 
 		ObjectRender& render = sky.render;
 
-		render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT);
+		if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
+			sky.needReload = true;
+			return;
+		}
 		render.applyUniformBlock(sky.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &sky.skyViewProjectionMatrix);
 		render.applyUniformBlock(sky.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &sky.color);
 		render.draw(36);
@@ -2586,6 +2610,9 @@ void RenderSystem::update(double dt){
 			}
 		}
 
+		if (sky.loaded && sky.needReload){
+			destroySky(entity, sky);
+		}
 		if (!sky.loadCalled){
 			loadSky(entity, sky, pipelines);
 		}
