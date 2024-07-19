@@ -133,6 +133,8 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
 
     if (mesh.loaded)
         mesh.needUpdateBuffer = true;
+
+    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
@@ -187,6 +189,8 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
 
     if (mesh.loaded)
         mesh.needUpdateBuffer = true;
+
+    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
@@ -321,6 +325,8 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     }
 
     tilemap.numTiles = numTiles;
+
+    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh){
@@ -2462,6 +2468,15 @@ void MeshSystem::update(double dt){
 		TerrainComponent& terrain = terrains->getComponentFromIndex(i);
 
         createOrUpdateTerrain(terrain);
+    }
+
+    auto meshes = scene->getComponentArray<MeshComponent>();
+    for (int i = 0; i < meshes->size(); i++){
+		MeshComponent& mesh = meshes->getComponentFromIndex(i);
+
+        if (mesh.aabb == AABB::ZERO){
+            calculateMeshAABB(mesh);
+        }
     }
 
 }
