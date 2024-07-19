@@ -59,7 +59,6 @@ namespace Supernova{
         float near = -10;
         float far = 10;
 
-        bool needUpdateFrustumPlanes = true;
         Plane frustumPlanes[6];
 
         CameraRender render;

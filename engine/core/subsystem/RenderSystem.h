@@ -128,23 +128,23 @@ namespace Supernova{
 	protected:
 
 		bool drawMesh(MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture);
-		bool drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams);
+		bool drawMeshDepth(MeshComponent& mesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams);
 		void destroyMesh(Entity entity, MeshComponent& mesh);
 
-		void drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture);
+		bool drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams);
 		void destroyTerrain(Entity entity, TerrainComponent& terrain);
 
-		void drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture);
+		bool drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture);
 		void destroyUI(Entity entity, UIComponent& uirender);
 
-		void drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture);
+		bool drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void destroyParticles(Entity entity, ParticlesComponent& particles);
 
-		void drawLines(LinesComponent& lines, Transform& transform, Transform& camTransform, bool renderToTexture);
+		bool drawLines(LinesComponent& lines, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void destroyLines(Entity entity, LinesComponent& lines);
 
-		void drawSky(SkyComponent& sky, bool renderToTexture);
+		bool drawSky(SkyComponent& sky, bool renderToTexture);
 		void destroySky(Entity entity, SkyComponent& sky);
 
 		void destroyLight(LightComponent& light);
@@ -154,7 +154,7 @@ namespace Supernova{
 		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);
 		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentParticles);
 		void updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
-		bool updateCameraFrustumPlanes(CameraComponent& camera);
+		void updateCameraFrustumPlanes(const Matrix4 viewProjectionMatrix, Plane* frustumPlanes);
 
 	public:
 
@@ -174,6 +174,7 @@ namespace Supernova{
 
 		// camera
 		void updateCameraSize(Entity entity);
+		bool isInsideCamera(const float cameraFar, const Plane frustumPlanes[6], const AABB& box);
 		bool isInsideCamera(CameraComponent& camera, const AABB& box);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& point);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius);

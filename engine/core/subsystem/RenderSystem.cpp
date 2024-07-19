@@ -912,12 +912,12 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 	return true;
 }
 
-bool RenderSystem::drawMeshDepth(MeshComponent& mesh, vs_depth_t vsDepthParams){
+bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams){
 	if (mesh.loaded && mesh.castShadows){
 
-		//if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(camera, mesh.worldAABB)) {
-		//	return false;
-		//}
+		if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(cameraFar, frustumPlanes, mesh.worldAABB)) {
+			return false;
+		}
 
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& depthRender = mesh.submeshes[i].depthRender;
@@ -1126,7 +1126,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 	return true;
 }
 
-void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture){
+bool RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture){
 	if (terrain.loaded){
 		bool needUpdateFramebuffer = checkPBRFrabebufferUpdate(terrain.material);
 
@@ -1144,7 +1144,7 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 
 		if (!terrain.render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
 			terrain.needReload = true;
-			return;
+			return false;
 		}
 
 		if (hasLights){
@@ -1174,6 +1174,8 @@ void RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 			}
 		}
 	}
+
+	return true;
 }
 
 void RenderSystem::drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams){
@@ -1336,7 +1338,7 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, uint8_t pipeline
 	return true;
 }
 
-void RenderSystem::drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture){
+bool RenderSystem::drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture){
 	if (uirender.loaded && uirender.buffer.getSize() > 0){
 
 		if (uirender.needUpdateTexture || uirender.texture.isFramebufferOutdated()){
@@ -1365,7 +1367,7 @@ void RenderSystem::drawUI(UIComponent& uirender, Transform& transform, bool rend
 
 		if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
 			uirender.needReload = true;
-			return;
+			return false;
 		}
 		render.applyUniformBlock(uirender.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		//Color
@@ -1373,6 +1375,8 @@ void RenderSystem::drawUI(UIComponent& uirender, Transform& transform, bool rend
 		render.draw(uirender.vertexCount);
 
 	}
+
+	return true;
 }
 
 void RenderSystem::destroyUI(Entity entity, UIComponent& uirender){
@@ -1536,7 +1540,7 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipel
 	return true;
 }
 
-void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture){
+bool RenderSystem::drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture){
 	if (particles.loaded && particles.buffer.getSize() > 0){
 
 		if (particles.needUpdateTexture || particles.texture.isFramebufferOutdated()){
@@ -1557,11 +1561,13 @@ void RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 
 		if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
 			particles.needReload = true;
-			return;
+			return false;
 		}
 		render.applyUniformBlock(particles.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		render.draw(particles.numVisible);
 	}
+
+	return true;
 }
 
 void RenderSystem::destroyParticles(Entity entity, ParticlesComponent& particles){
@@ -1588,7 +1594,7 @@ void RenderSystem::destroyParticles(Entity entity, ParticlesComponent& particles
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
-void RenderSystem::drawLines(LinesComponent& lines, Transform& transform, Transform& camTransform, bool renderToTexture){
+bool RenderSystem::drawLines(LinesComponent& lines, Transform& transform, Transform& camTransform, bool renderToTexture){
 	if (lines.loaded && lines.buffer.getSize() > 0){
 
 		if (lines.needUpdateBuffer){
@@ -1600,11 +1606,13 @@ void RenderSystem::drawLines(LinesComponent& lines, Transform& transform, Transf
 
 		if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
 			lines.needReload = true;
-			return;
+			return false;
 		}
 		render.applyUniformBlock(lines.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		render.draw(lines.lines.size() * 2);
 	}
+
+	return true;
 }
 
 void RenderSystem::destroyLines(Entity entity, LinesComponent& lines){
@@ -1718,7 +1726,7 @@ bool RenderSystem::loadSky(Entity entity, SkyComponent& sky, uint8_t pipelines){
 	return true;
 }
 
-void RenderSystem::drawSky(SkyComponent& sky, bool renderToTexture){
+bool RenderSystem::drawSky(SkyComponent& sky, bool renderToTexture){
 	if (sky.loaded){
 
 		if (sky.needUpdateTexture || sky.texture.isFramebufferOutdated()){
@@ -1734,12 +1742,14 @@ void RenderSystem::drawSky(SkyComponent& sky, bool renderToTexture){
 
 		if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
 			sky.needReload = true;
-			return;
+			return false;
 		}
 		render.applyUniformBlock(sky.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &sky.skyViewProjectionMatrix);
 		render.applyUniformBlock(sky.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &sky.color);
 		render.draw(36);
 	}
+
+	return true;
 }
 
 void RenderSystem::destroySky(Entity entity, SkyComponent& sky){
@@ -1905,7 +1915,7 @@ void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 	//Update ViewProjectionMatrix
 	camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
 
-	camera.needUpdateFrustumPlanes = true;
+	updateCameraFrustumPlanes(camera.viewProjectionMatrix, camera.frustumPlanes);
 }
 
 void RenderSystem::updateSkyViewProjection(SkyComponent& sky, CameraComponent& camera){
@@ -2105,20 +2115,18 @@ void RenderSystem::updateCameraSize(Entity entity){
 	}
 }
 
-bool RenderSystem::isInsideCamera(CameraComponent& camera, const AABB& box){
+bool RenderSystem::isInsideCamera(const float cameraFar, const Plane frustumPlanes[6], const AABB& box){
     if (box.isNull() || box.isInfinite())
         return false;
-
-    updateCameraFrustumPlanes(camera);
 
     Vector3 centre = box.getCenter();
     Vector3 halfSize = box.getHalfSize();
 
     for (int plane = 0; plane < 6; ++plane){
-        if (plane == FRUSTUM_PLANE_FAR && camera.far == 0)
+        if (plane == FRUSTUM_PLANE_FAR && cameraFar == 0)
             continue;
 
-        Plane::Side side = camera.frustumPlanes[plane].getSide(centre, halfSize);
+        Plane::Side side = frustumPlanes[plane].getSide(centre, halfSize);
         if (side == Plane::Side::NEGATIVE_SIDE){
             return false;
         }
@@ -2127,9 +2135,11 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const AABB& box){
     return true;
 }
 
-bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& point){
-    updateCameraFrustumPlanes(camera);
+bool RenderSystem::isInsideCamera(CameraComponent& camera, const AABB& box){
+    return isInsideCamera(camera.far, camera.frustumPlanes, box);
+}
 
+bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& point){
     for (int plane = 0; plane < 6; ++plane){
         if (plane == FRUSTUM_PLANE_FAR && camera.far == 0)
             continue;
@@ -2143,8 +2153,6 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& point)
 }
 
 bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius){
-    updateCameraFrustumPlanes(camera);
-
     for (int plane = 0; plane < 6; ++plane){
         if (plane == FRUSTUM_PLANE_FAR && camera.far == 0)
             continue;
@@ -2157,48 +2165,42 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& center
     return true;
 }
 
-bool RenderSystem::updateCameraFrustumPlanes(CameraComponent& camera){
-    if (!camera.needUpdateFrustumPlanes)
-        return false;
+void RenderSystem::updateCameraFrustumPlanes(const Matrix4 viewProjectionMatrix, Plane* frustumPlanes){
 
-    camera.needUpdateFrustumPlanes = false;
+    frustumPlanes[FRUSTUM_PLANE_LEFT].normal.x = viewProjectionMatrix[0][3] + viewProjectionMatrix[0][0];
+    frustumPlanes[FRUSTUM_PLANE_LEFT].normal.y = viewProjectionMatrix[1][3] + viewProjectionMatrix[1][0];
+    frustumPlanes[FRUSTUM_PLANE_LEFT].normal.z = viewProjectionMatrix[2][3] + viewProjectionMatrix[2][0];
+    frustumPlanes[FRUSTUM_PLANE_LEFT].d = viewProjectionMatrix[3][3] + viewProjectionMatrix[3][0];
 
-    camera.frustumPlanes[FRUSTUM_PLANE_LEFT].normal.x = camera.viewProjectionMatrix[0][3] + camera.viewProjectionMatrix[0][0];
-    camera.frustumPlanes[FRUSTUM_PLANE_LEFT].normal.y = camera.viewProjectionMatrix[1][3] + camera.viewProjectionMatrix[1][0];
-    camera.frustumPlanes[FRUSTUM_PLANE_LEFT].normal.z = camera.viewProjectionMatrix[2][3] + camera.viewProjectionMatrix[2][0];
-    camera.frustumPlanes[FRUSTUM_PLANE_LEFT].d = camera.viewProjectionMatrix[3][3] + camera.viewProjectionMatrix[3][0];
+    frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.x = viewProjectionMatrix[0][3] - viewProjectionMatrix[0][0];
+    frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.y = viewProjectionMatrix[1][3] - viewProjectionMatrix[1][0];
+    frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.z = viewProjectionMatrix[2][3] - viewProjectionMatrix[2][0];
+    frustumPlanes[FRUSTUM_PLANE_RIGHT].d = viewProjectionMatrix[3][3] - viewProjectionMatrix[3][0];
 
-    camera.frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.x = camera.viewProjectionMatrix[0][3] - camera.viewProjectionMatrix[0][0];
-    camera.frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.y = camera.viewProjectionMatrix[1][3] - camera.viewProjectionMatrix[1][0];
-    camera.frustumPlanes[FRUSTUM_PLANE_RIGHT].normal.z = camera.viewProjectionMatrix[2][3] - camera.viewProjectionMatrix[2][0];
-    camera.frustumPlanes[FRUSTUM_PLANE_RIGHT].d = camera.viewProjectionMatrix[3][3] - camera.viewProjectionMatrix[3][0];
+    frustumPlanes[FRUSTUM_PLANE_TOP].normal.x = viewProjectionMatrix[0][3] - viewProjectionMatrix[0][1];
+    frustumPlanes[FRUSTUM_PLANE_TOP].normal.y = viewProjectionMatrix[1][3] - viewProjectionMatrix[1][1];
+    frustumPlanes[FRUSTUM_PLANE_TOP].normal.z = viewProjectionMatrix[2][3] - viewProjectionMatrix[2][1];
+    frustumPlanes[FRUSTUM_PLANE_TOP].d = viewProjectionMatrix[3][3] - viewProjectionMatrix[3][1];
 
-    camera.frustumPlanes[FRUSTUM_PLANE_TOP].normal.x = camera.viewProjectionMatrix[0][3] - camera.viewProjectionMatrix[0][1];
-    camera.frustumPlanes[FRUSTUM_PLANE_TOP].normal.y = camera.viewProjectionMatrix[1][3] - camera.viewProjectionMatrix[1][1];
-    camera.frustumPlanes[FRUSTUM_PLANE_TOP].normal.z = camera.viewProjectionMatrix[2][3] - camera.viewProjectionMatrix[2][1];
-    camera.frustumPlanes[FRUSTUM_PLANE_TOP].d = camera.viewProjectionMatrix[3][3] - camera.viewProjectionMatrix[3][1];
+    frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.x = viewProjectionMatrix[0][3] + viewProjectionMatrix[0][1];
+    frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.y = viewProjectionMatrix[1][3] + viewProjectionMatrix[1][1];
+    frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.z = viewProjectionMatrix[2][3] + viewProjectionMatrix[2][1];
+    frustumPlanes[FRUSTUM_PLANE_BOTTOM].d = viewProjectionMatrix[3][3] + viewProjectionMatrix[3][1];
 
-    camera.frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.x = camera.viewProjectionMatrix[0][3] + camera.viewProjectionMatrix[0][1];
-    camera.frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.y = camera.viewProjectionMatrix[1][3] + camera.viewProjectionMatrix[1][1];
-    camera.frustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.z = camera.viewProjectionMatrix[2][3] + camera.viewProjectionMatrix[2][1];
-    camera.frustumPlanes[FRUSTUM_PLANE_BOTTOM].d = camera.viewProjectionMatrix[3][3] + camera.viewProjectionMatrix[3][1];
+    frustumPlanes[FRUSTUM_PLANE_NEAR].normal.x = viewProjectionMatrix[0][3] + viewProjectionMatrix[0][2];
+    frustumPlanes[FRUSTUM_PLANE_NEAR].normal.y = viewProjectionMatrix[1][3] + viewProjectionMatrix[1][2];
+    frustumPlanes[FRUSTUM_PLANE_NEAR].normal.z = viewProjectionMatrix[2][3] + viewProjectionMatrix[2][2];
+    frustumPlanes[FRUSTUM_PLANE_NEAR].d = viewProjectionMatrix[3][3] + viewProjectionMatrix[3][2];
 
-    camera.frustumPlanes[FRUSTUM_PLANE_NEAR].normal.x = camera.viewProjectionMatrix[0][3] + camera.viewProjectionMatrix[0][2];
-    camera.frustumPlanes[FRUSTUM_PLANE_NEAR].normal.y = camera.viewProjectionMatrix[1][3] + camera.viewProjectionMatrix[1][2];
-    camera.frustumPlanes[FRUSTUM_PLANE_NEAR].normal.z = camera.viewProjectionMatrix[2][3] + camera.viewProjectionMatrix[2][2];
-    camera.frustumPlanes[FRUSTUM_PLANE_NEAR].d = camera.viewProjectionMatrix[3][3] + camera.viewProjectionMatrix[3][2];
-
-    camera.frustumPlanes[FRUSTUM_PLANE_FAR].normal.x = camera.viewProjectionMatrix[0][3] - camera.viewProjectionMatrix[0][2];
-    camera.frustumPlanes[FRUSTUM_PLANE_FAR].normal.y = camera.viewProjectionMatrix[1][3] - camera.viewProjectionMatrix[1][2];
-    camera.frustumPlanes[FRUSTUM_PLANE_FAR].normal.z = camera.viewProjectionMatrix[2][3] - camera.viewProjectionMatrix[2][2];
-    camera.frustumPlanes[FRUSTUM_PLANE_FAR].d = camera.viewProjectionMatrix[3][3] - camera.viewProjectionMatrix[3][2];
+    frustumPlanes[FRUSTUM_PLANE_FAR].normal.x = viewProjectionMatrix[0][3] - viewProjectionMatrix[0][2];
+    frustumPlanes[FRUSTUM_PLANE_FAR].normal.y = viewProjectionMatrix[1][3] - viewProjectionMatrix[1][2];
+    frustumPlanes[FRUSTUM_PLANE_FAR].normal.z = viewProjectionMatrix[2][3] - viewProjectionMatrix[2][2];
+    frustumPlanes[FRUSTUM_PLANE_FAR].d = viewProjectionMatrix[3][3] - viewProjectionMatrix[3][2];
 
     for (int i=0; i<6; i++){
-        float length = camera.frustumPlanes[i].normal.normalizeL();
-        camera.frustumPlanes[i].d /= length;
+        float length = frustumPlanes[i].normal.normalizeL();
+        frustumPlanes[i].d /= length;
     }
-
-    return true;
 }
 
 void RenderSystem::configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera){
@@ -2326,6 +2328,7 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 					light.cameras[ca].lightViewProjectionMatrix = projectionMatrix[ca] * viewMatrix;
 					light.cameras[ca].nearFar = Vector2(splitNear[ca], splitFar[ca]);
+					updateCameraFrustumPlanes(light.cameras[ca].lightViewProjectionMatrix, light.cameras[ca].frustumPlanes);
 				}
 				
 			} else {
@@ -2341,7 +2344,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 				light.cameras[0].lightViewProjectionMatrix = projectionMatrix[0] * viewMatrix;
 				light.cameras[0].nearFar = Vector2(-1, 1);
-				
+				updateCameraFrustumPlanes(light.cameras[0].lightViewProjectionMatrix, light.cameras[0].frustumPlanes);
+
 			}
 
 		}else if (light.type == LightType::SPOT){
@@ -2356,6 +2360,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 			light.cameras[0].lightViewProjectionMatrix = projectionMatrix * viewMatrix;
 			light.cameras[0].nearFar = light.shadowCameraNearFar;
+			updateCameraFrustumPlanes(light.cameras[0].lightViewProjectionMatrix, light.cameras[0].frustumPlanes);
+
 		}else if (light.type == LightType::POINT){
 			Matrix4 projectionMatrix;
 			Matrix4 viewMatrix[6];
@@ -2379,6 +2385,7 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 			for (int f = 0; f < 6; f++){
 				light.cameras[f].lightViewProjectionMatrix = projectionMatrix * viewMatrix[f];
 				light.cameras[f].nearFar = calculedNearFar;
+				updateCameraFrustumPlanes(light.cameras[f].lightViewProjectionMatrix, light.cameras[f].frustumPlanes);
 			}
 		}
 		
@@ -2813,7 +2820,7 @@ void RenderSystem::draw(){
 
 						if (transform){
 							if (transform->visible){
-								drawMeshDepth(mesh, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
+								drawMeshDepth(mesh, light.cameras[c].nearFar.y, light.cameras[c].frustumPlanes, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
 							}
 						}
 					}

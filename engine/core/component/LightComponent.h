@@ -22,6 +22,7 @@ namespace Supernova{
     struct LightCamera{
         CameraRender render;
         Matrix4 lightViewProjectionMatrix;
+        Plane frustumPlanes[6];
         // for point light all cameras are same calculated value that is used by distanceToDepthValue in shader
         Vector2 nearFar = Vector2(0.0, 0.0);
     };
