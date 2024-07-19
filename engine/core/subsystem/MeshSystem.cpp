@@ -1622,9 +1622,17 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
 
     tinygltf::Mesh gltfmesh = model.gltfModel->meshes[meshIndex];
 
-    mesh.numSubmeshes = gltfmesh.primitives.size();
+    if (gltfmesh.primitives.size() > 0){
+        mesh.numSubmeshes = gltfmesh.primitives.size();
 
-    for (size_t i = 0; i < gltfmesh.primitives.size(); i++) {
+    }
+
+    if (mesh.numSubmeshes > MAX_SUBMESHES){
+        Log::error("Model %s has more submeshes then MAX_SUBMESHES. Please increase MAX_SUBMESHES", filename.c_str());
+        mesh.numSubmeshes = MAX_SUBMESHES;
+    }
+
+    for (size_t i = 0; i < mesh.numSubmeshes; i++) {
 
         mesh.submeshes[i].attributes.clear();
 
@@ -2211,9 +2219,15 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
 
         if (materials.size() > 0){
             mesh.numSubmeshes = materials.size();
+
         }
 
-        for (size_t i = 0; i < materials.size(); i++) {
+        if (mesh.numSubmeshes > MAX_SUBMESHES){
+            Log::error("Model %s has more submeshes then MAX_SUBMESHES. Please increase MAX_SUBMESHES", filename.c_str());
+            mesh.numSubmeshes = MAX_SUBMESHES;
+        }
+
+        for (size_t i = 0; i < mesh.numSubmeshes; i++) {
 
             mesh.submeshes[i].attributes.clear();
 

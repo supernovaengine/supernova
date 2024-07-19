@@ -1540,30 +1540,32 @@ bool UISystem::eventOnPointerDown(float x, float y){
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
-            if (signature.test(scene->getComponentType<ImageComponent>())){
-                Rect uirect(transform.worldPosition.x, transform.worldPosition.y, layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
+            if (transform.visible){
+                if (signature.test(scene->getComponentType<ImageComponent>())){
+                    Rect uirect(transform.worldPosition.x, transform.worldPosition.y, layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
 
-                if (layout.panel != NULL_ENTITY){
-                    uirect = fitOnPanel(uirect, layout.panel);
-                }
+                    if (layout.panel != NULL_ENTITY){
+                        uirect = fitOnPanel(uirect, layout.panel);
+                    }
 
-                if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){ //TODO: inside to polygon
-                    lastUIFromPointer = entity;
-                    lastPanelFromPointer = layout.panel;
-                }
+                    if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){ //TODO: inside to polygon
+                        lastUIFromPointer = entity;
+                        lastPanelFromPointer = layout.panel;
+                    }
 
-                if (signature.test(scene->getComponentType<PanelComponent>())){
-                    if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){
-                        lastPanelFromPointer = entity;
+                    if (signature.test(scene->getComponentType<PanelComponent>())){
+                        if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){
+                            lastPanelFromPointer = entity;
+                        }
                     }
                 }
-            }
 
-            if (signature.test(scene->getComponentType<UIComponent>())){
-                UIComponent& ui = scene->getComponent<UIComponent>(entity);
-                if (ui.focused){
-                    ui.focused = false;
-                    ui.onLostFocus.call();
+                if (signature.test(scene->getComponentType<UIComponent>())){
+                    UIComponent& ui = scene->getComponent<UIComponent>(entity);
+                    if (ui.focused){
+                        ui.focused = false;
+                        ui.onLostFocus.call();
+                    }
                 }
             }
         }
@@ -1689,32 +1691,34 @@ bool UISystem::eventOnPointerUp(float x, float y){
             Transform& transform = scene->getComponent<Transform>(entity);
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-            if (signature.test(scene->getComponentType<ButtonComponent>())){
-                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-                if (!button.disabled && button.pressed){
-                    ui.texture = button.textureNormal;
-                    ui.color = button.colorNormal;
-                    ui.needUpdateTexture = true;
-                    button.pressed = false;
-                    button.onRelease.call();
+            if (transform.visible){
+                if (signature.test(scene->getComponentType<ButtonComponent>())){
+                    ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+                    if (!button.disabled && button.pressed){
+                        ui.texture = button.textureNormal;
+                        ui.color = button.colorNormal;
+                        ui.needUpdateTexture = true;
+                        button.pressed = false;
+                        button.onRelease.call();
+                    }
                 }
-            }
 
-            if (signature.test(scene->getComponentType<ScrollbarComponent>())){
-                ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
-                Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
-                UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
+                if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+                    ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+                    Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
+                    UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
 
-                if (isCoordInside(x, y, bartransform, barlayout)){
-                    scrollbar.barPointerDown = false;
+                    if (isCoordInside(x, y, bartransform, barlayout)){
+                        scrollbar.barPointerDown = false;
+                    }
                 }
-            }
 
-            if (signature.test(scene->getComponentType<PanelComponent>())){
-                PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+                if (signature.test(scene->getComponentType<PanelComponent>())){
+                    PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
 
-                panel.headerPointerDown = false;
-                panel.edgePointerDown = PanelEdge::NONE;
+                    panel.headerPointerDown = false;
+                    panel.edgePointerDown = PanelEdge::NONE;
+                }
             }
 
             ui.onPointerUp(x - transform.worldPosition.x, y - transform.worldPosition.y);
@@ -1746,44 +1750,46 @@ bool UISystem::eventOnPointerMove(float x, float y){
         if (signature.test(scene->getComponentType<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
-            if (signature.test(scene->getComponentType<ImageComponent>())){
-                Rect uirect(transform.worldPosition.x, transform.worldPosition.y, layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
+            if (transform.visible){
+                if (signature.test(scene->getComponentType<ImageComponent>())){
+                    Rect uirect(transform.worldPosition.x, transform.worldPosition.y, layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
 
-                if (layout.panel != NULL_ENTITY){
-                    uirect = fitOnPanel(uirect, layout.panel);
-                }
+                    if (layout.panel != NULL_ENTITY){
+                        uirect = fitOnPanel(uirect, layout.panel);
+                    }
 
-                if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){
-                    cursor = CursorType::ARROW;
+                    if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){
+                        cursor = CursorType::ARROW;
 
-                    if (signature.test(scene->getComponentType<TextEditComponent>())){
-                        cursor = CursorType::IBEAM;
+                        if (signature.test(scene->getComponentType<TextEditComponent>())){
+                            cursor = CursorType::IBEAM;
 
-                    }else if (signature.test(scene->getComponentType<PanelComponent>())){
-                        PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+                        }else if (signature.test(scene->getComponentType<PanelComponent>())){
+                            PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
 
-                        UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
-                        Transform& transform = scene->getComponent<Transform>(entity);
-                        UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
+                            UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
+                            Transform& transform = scene->getComponent<Transform>(entity);
+                            UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
 
-                        Rect edgeRight;
-                        Rect edgeRightBottom;
-                        Rect edgeBottom;
-                        Rect edgeLeftBottom;
-                        Rect edgeLeft;
-                        getPanelEdges(panel, layout, transform, headerlayout, edgeRight, edgeRightBottom, edgeBottom, edgeLeftBottom, edgeLeft);
+                            Rect edgeRight;
+                            Rect edgeRightBottom;
+                            Rect edgeBottom;
+                            Rect edgeLeftBottom;
+                            Rect edgeLeft;
+                            getPanelEdges(panel, layout, transform, headerlayout, edgeRight, edgeRightBottom, edgeBottom, edgeLeftBottom, edgeLeft);
 
-                        if (panel.canResize){
-                            if (edgeRight.contains(Vector2(x, y))){
-                                cursor = CursorType::RESIZE_EW;
-                            }else if (edgeRightBottom.contains(Vector2(x, y))){
-                                cursor = CursorType::RESIZE_NWSE;
-                            }else if (edgeBottom.contains(Vector2(x, y))){
-                                cursor = CursorType::RESIZE_NS;
-                            }else if (edgeLeftBottom.contains(Vector2(x, y))){
-                                cursor = CursorType::RESIZE_NESW;
-                            }else if (edgeLeft.contains(Vector2(x, y))){
-                                cursor = CursorType::RESIZE_EW;
+                            if (panel.canResize){
+                                if (edgeRight.contains(Vector2(x, y))){
+                                    cursor = CursorType::RESIZE_EW;
+                                }else if (edgeRightBottom.contains(Vector2(x, y))){
+                                    cursor = CursorType::RESIZE_NWSE;
+                                }else if (edgeBottom.contains(Vector2(x, y))){
+                                    cursor = CursorType::RESIZE_NS;
+                                }else if (edgeLeftBottom.contains(Vector2(x, y))){
+                                    cursor = CursorType::RESIZE_NESW;
+                                }else if (edgeLeft.contains(Vector2(x, y))){
+                                    cursor = CursorType::RESIZE_EW;
+                                }
                             }
                         }
                     }
