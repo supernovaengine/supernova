@@ -1691,34 +1691,32 @@ bool UISystem::eventOnPointerUp(float x, float y){
             Transform& transform = scene->getComponent<Transform>(entity);
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-            if (transform.visible){
-                if (signature.test(scene->getComponentType<ButtonComponent>())){
-                    ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-                    if (!button.disabled && button.pressed){
-                        ui.texture = button.textureNormal;
-                        ui.color = button.colorNormal;
-                        ui.needUpdateTexture = true;
-                        button.pressed = false;
-                        button.onRelease.call();
-                    }
+            if (signature.test(scene->getComponentType<ButtonComponent>())){
+                ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+                if (!button.disabled && button.pressed){
+                    ui.texture = button.textureNormal;
+                    ui.color = button.colorNormal;
+                    ui.needUpdateTexture = true;
+                    button.pressed = false;
+                    button.onRelease.call();
                 }
+            }
 
-                if (signature.test(scene->getComponentType<ScrollbarComponent>())){
-                    ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
-                    Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
-                    UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
+            if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+                ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+                Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
+                UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
 
-                    if (isCoordInside(x, y, bartransform, barlayout)){
-                        scrollbar.barPointerDown = false;
-                    }
+                if (isCoordInside(x, y, bartransform, barlayout)){
+                    scrollbar.barPointerDown = false;
                 }
+            }
 
-                if (signature.test(scene->getComponentType<PanelComponent>())){
-                    PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+            if (signature.test(scene->getComponentType<PanelComponent>())){
+                PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
 
-                    panel.headerPointerDown = false;
-                    panel.edgePointerDown = PanelEdge::NONE;
-                }
+                panel.headerPointerDown = false;
+                panel.edgePointerDown = PanelEdge::NONE;
             }
 
             ui.onPointerUp(x - transform.worldPosition.x, y - transform.worldPosition.y);
