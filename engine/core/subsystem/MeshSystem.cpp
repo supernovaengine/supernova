@@ -132,7 +132,7 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
         6, (char*)&indices_array[0], sizeof(uint16_t));
 
     if (mesh.loaded)
-        mesh.needUpdateBuffer = true;
+        mesh.needUpdateBuffer = true; // buffer is not immutable
 
     calculateMeshAABB(mesh);
 }
@@ -188,7 +188,7 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
     polygon.height = (int)(max_Y - min_Y);
 
     if (mesh.loaded)
-        mesh.needUpdateBuffer = true;
+        mesh.needReload = true;
 
     calculateMeshAABB(mesh);
 }
@@ -320,7 +320,7 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
         if (tilemap.numTiles < numTiles){
             mesh.needReload = true;
         }else{
-            mesh.needUpdateBuffer = true;
+            mesh.needUpdateBuffer = true; // buffer is not immutable
         }
     }
 
@@ -1045,6 +1045,9 @@ void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned i
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
 
+    if (mesh.loaded)
+        mesh.needReload = true;
+
     calculateMeshAABB(mesh);
 }
 
@@ -1173,6 +1176,9 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         36, (char*)&indices_array[0], sizeof(uint16_t));
 
+    if (mesh.loaded)
+        mesh.needReload = true;
+
     calculateMeshAABB(mesh);
 }
 
@@ -1262,6 +1268,9 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
+
+    if (mesh.loaded)
+        mesh.needReload = true;
 
     calculateMeshAABB(mesh);
 }
@@ -1391,6 +1400,9 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
 
+    if (mesh.loaded)
+        mesh.needReload = true;
+
     calculateMeshAABB(mesh);
 }
 
@@ -1473,6 +1485,9 @@ void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius,
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
 
+    if (mesh.loaded)
+        mesh.needReload = true;
+
     calculateMeshAABB(mesh);
 }
 
@@ -1543,6 +1558,9 @@ void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsi
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
+
+    if (mesh.loaded)
+        mesh.needReload = true;
 
     calculateMeshAABB(mesh);
 }
@@ -2170,6 +2188,9 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
 */
     std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
 
+    if (mesh.loaded)
+        mesh.needReload = true;
+
     calculateMeshAABB(mesh);
 
     return true;
@@ -2345,6 +2366,9 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
 
         std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
     }
+
+    if (mesh.loaded)
+        mesh.needReload = true;
 
     calculateMeshAABB(mesh);
 
