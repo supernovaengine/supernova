@@ -498,7 +498,7 @@ void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& sh
 		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 }
 
-bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipelines){
+bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipelines, bool instanced){
 
 	if (!Engine::isViewLoaded()) 
 		return false;
@@ -546,14 +546,14 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 
 	for (int i = 0; i < mesh.numSubmeshes; i++){
 
+		ObjectRender& render = mesh.submeshes[i].render;
+
 		mesh.submeshes[i].hasNormalMap = false;
 		mesh.submeshes[i].hasTangent = false;
 		mesh.submeshes[i].hasVertexColor4 = false;
 		mesh.submeshes[i].hasSkinning = false;
 		mesh.submeshes[i].hasMorphTarget = false;
 		mesh.submeshes[i].hasMorphNormal = false;
-
-		ObjectRender& render = mesh.submeshes[i].render;
 
 		render.beginLoad(mesh.submeshes[i].primitiveType);
 
@@ -649,7 +649,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 						p_castShadows, p_shadowsPCF, p_hasNormal, p_hasNormalMap, 
 						p_hasTangent, false, mesh.submeshes[i].hasVertexColor4, mesh.submeshes[i].hasTextureRect, 
 						hasFog, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent,
-						false);
+						false, instanced);
 		mesh.submeshes[i].shader = ShaderPool::get(ShaderType::MESH, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
 			mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(
@@ -662,6 +662,27 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			return false;
 		render.addShader(mesh.submeshes[i].shader.get());
 		ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
+
+		if (instanced){
+			InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(entity);
+
+			instmesh.buffer.clear();
+			instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIX, 16, 0, true);
+			instmesh.buffer.setStride(16 * sizeof(float));
+
+			instmesh.buffer.setRenderAttributes(false);
+			instmesh.buffer.setInstanceBuffer(true);
+			instmesh.buffer.setUsage(BufferUsage::STREAM);
+
+			// Now buffer size is zero than it needed to be calculated
+			size_t bufferSize = instmesh.maxInstances * instmesh.buffer.getStride();
+
+			instmesh.buffer.getRender()->createBuffer(bufferSize, instmesh.buffer.getData(), instmesh.buffer.getType(), instmesh.buffer.getUsage());
+			Attribute* instMatrixAttr = instmesh.buffer.getAttribute(AttributeType::INSTANCEMATRIX);
+			render.addAttribute(shaderData.getAttrIndex(AttributeType::INSTANCEMATRIX), instmesh.buffer.getRender(), instMatrixAttr->getElements(), instMatrixAttr->getDataType(), instmesh.buffer.getStride(), instMatrixAttr->getOffset(), instMatrixAttr->getNormalized(), instMatrixAttr->getPerInstance());
+
+			instmesh.needUpdateBuffer = true;
+		}
 
 		mesh.submeshes[i].slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
 		mesh.submeshes[i].slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
@@ -705,7 +726,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 					render.addIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
 				}else{
 					for (auto const &attr : buf.second->getAttributes()) {
-						render.addAttribute(shaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+						render.addAttribute(shaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 					}
 				}
         	}
@@ -717,7 +738,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 					indexCount = attr.second.getCount();
 					render.addIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
 				}else{
-					render.addAttribute(shaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+					render.addAttribute(shaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 				}
 			}else{
 				Log::error("Cannot load submesh attribute from buffer name: %s", attr.second.getBuffer().c_str());
@@ -762,11 +783,11 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 					}else{
 						for (auto const &attr : buf.second->getAttributes()){
 							if (attr.first == AttributeType::POSITION){
-								depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+								depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 							}
 							if (mesh.submeshes[i].hasSkinning){
 								if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
-									depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+									depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 								}
 							}
 							if (mesh.submeshes[i].hasMorphTarget){
@@ -777,7 +798,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 									attr.first == AttributeType::MORPHNORMAL0 || attr.first == AttributeType::MORPHNORMAL1 ||
 									attr.first == AttributeType::MORPHNORMAL2 || attr.first == AttributeType::MORPHNORMAL3 ||
 									attr.first == AttributeType::MORPHTANGENT0 || attr.first == AttributeType::MORPHTANGENT1){
-									depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized());
+									depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 								}
 							}
 						}
@@ -790,11 +811,11 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 					if (attr.first == AttributeType::INDEX){
 						depthRender.addIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
 					}else if (attr.first == AttributeType::POSITION){
-						depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+						depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 					}
 					if (mesh.submeshes[i].hasSkinning){
 						if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
-							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 						}
 					}
 					if (mesh.submeshes[i].hasMorphTarget){
@@ -805,7 +826,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 							attr.first == AttributeType::MORPHNORMAL0 || attr.first == AttributeType::MORPHNORMAL1 ||
 							attr.first == AttributeType::MORPHNORMAL2 || attr.first == AttributeType::MORPHNORMAL3 ||
 							attr.first == AttributeType::MORPHTANGENT0 || attr.first == AttributeType::MORPHTANGENT1){
-							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized());
+							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 						}
 					}
 				}else{
@@ -827,7 +848,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 	return true;
 }
 
-bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture){
+bool RenderSystem::drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture){
 	if (mesh.loaded){
 
 		if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(camera, mesh.worldAABB)) {
@@ -845,6 +866,13 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 			}
 
 			mesh.needUpdateBuffer = false;
+		}
+		unsigned int instanceCount = 1;
+		if (instmesh){
+			if (instmesh->needUpdateBuffer){
+				instmesh->buffer.getRender()->updateBuffer(instmesh->buffer.getSize(), instmesh->buffer.getData());
+				instanceCount = instmesh->buffer.getCount();
+			}
 		}
 
 		for (int i = 0; i < mesh.numSubmeshes; i++){
@@ -905,7 +933,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 			//model, normal and mvp matrix
 			render.applyUniformBlock(mesh.submeshes[i].slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 48, &transform.modelMatrix);
 
-			render.draw(mesh.submeshes[i].vertexCount);
+			render.draw(mesh.submeshes[i].vertexCount, instanceCount);
 		}
 	}
 
@@ -941,7 +969,7 @@ bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, con
 				}
 			}
 
-			depthRender.draw(mesh.submeshes[i].vertexCount);
+			depthRender.draw(mesh.submeshes[i].vertexCount, 1);
 		}
 	}
 
@@ -1047,7 +1075,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 					p_castShadows, p_shadowsPCF, p_hasNormal, false, 
 					false, false, false, false, 
 					hasFog, false, false, false, false,
-					true);
+					true, false);
 	terrain.shader = ShaderPool::get(ShaderType::MESH, terrain.shaderProperties);
 	if (hasShadows && terrain.castShadows){
 		terrain.depthShaderProperties = ShaderPool::getDepthMeshProperties(
@@ -1083,7 +1111,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 
 	for (auto const &attr : terrain.buffer.getAttributes()) {
 		if (terrain.buffer.isRenderAttributes()) {
-			terrain.render.addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+			terrain.render.addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 		}
 	}
 	// empty to create index_type
@@ -1107,7 +1135,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 
 		for (auto const &attr : terrain.buffer.getAttributes()) {
 			if (attr.first == AttributeType::POSITION){
-				terrain.depthRender.addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+				terrain.depthRender.addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 			}
 		}
 		// empty to create index_type
@@ -1170,7 +1198,7 @@ bool RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 			if (terrain.nodes[i].visible){
 				terrain.render.applyUniformBlock(terrain.slotVSTerrainNode, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.nodes[i].position);
 				terrain.render.addIndex(terrain.indices.getRender(), terrain.nodes[i].indexAttribute.getDataType(), terrain.nodes[i].indexAttribute.getOffset());
-				terrain.render.draw(terrain.nodes[i].indexAttribute.getCount());
+				terrain.render.draw(terrain.nodes[i].indexAttribute.getCount(), 1);
 			}
 		}
 	}
@@ -1194,7 +1222,7 @@ void RenderSystem::drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDept
 			if (terrain.nodes[i].visible){
 				terrain.depthRender.applyUniformBlock(terrain.slotVSTerrainNode, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.nodes[i].position);
 				terrain.depthRender.addIndex(terrain.indices.getRender(), terrain.nodes[i].indexAttribute.getDataType(), terrain.nodes[i].indexAttribute.getOffset());
-				terrain.depthRender.draw(terrain.nodes[i].indexAttribute.getCount());
+				terrain.depthRender.draw(terrain.nodes[i].indexAttribute.getCount(), 1);
 			}
 		}
 	}
@@ -1298,7 +1326,7 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, uint8_t pipeline
 	uirender.buffer.getRender()->createBuffer(bufferSize, uirender.buffer.getData(), uirender.buffer.getType(), uirender.buffer.getUsage());
 	if (uirender.buffer.isRenderAttributes()) {
         for (auto const &attr : uirender.buffer.getAttributes()) {
-			render.addAttribute(shaderData.getAttrIndex(attr.first), uirender.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), uirender.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+			render.addAttribute(shaderData.getAttrIndex(attr.first), uirender.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), uirender.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
         }
     }
 	if (uirender.buffer.getUsage() != BufferUsage::IMMUTABLE){
@@ -1372,7 +1400,7 @@ bool RenderSystem::drawUI(UIComponent& uirender, Transform& transform, bool rend
 		render.applyUniformBlock(uirender.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		//Color
 		render.applyUniformBlock(uirender.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &uirender.color);
-		render.draw(uirender.vertexCount);
+		render.draw(uirender.vertexCount, 1);
 
 	}
 
@@ -1461,12 +1489,11 @@ bool RenderSystem::loadParticles(Entity entity, ParticlesComponent& particles, u
 	particles.buffer.getRender()->createBuffer(bufferSize, particles.buffer.getData(), particles.buffer.getType(), particles.buffer.getUsage());
 	if (particles.buffer.isRenderAttributes()) {
         for (auto const &attr : particles.buffer.getAttributes()) {
-			render.addAttribute(shaderData.getAttrIndex(attr.first), particles.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), particles.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+			render.addAttribute(shaderData.getAttrIndex(attr.first), particles.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), particles.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
         }
     }
-	if (particles.buffer.getUsage() != BufferUsage::IMMUTABLE){
-		particles.needUpdateBuffer = true;
-	}
+
+	particles.needUpdateBuffer = true;
 
 	if (textureRender)
 		render.addTexture(shaderData.getTextureIndex(TextureShaderType::POINTS, ShaderStageType::FRAGMENT), ShaderStageType::FRAGMENT, textureRender);
@@ -1522,7 +1549,7 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipel
 	lines.buffer.getRender()->createBuffer(bufferSize, lines.buffer.getData(), lines.buffer.getType(), lines.buffer.getUsage());
 	if (lines.buffer.isRenderAttributes()) {
         for (auto const &attr : lines.buffer.getAttributes()) {
-			render.addAttribute(shaderData.getAttrIndex(attr.first), lines.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), lines.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+			render.addAttribute(shaderData.getAttrIndex(attr.first), lines.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), lines.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
         }
     }
 	if (lines.buffer.getUsage() != BufferUsage::IMMUTABLE){
@@ -1564,7 +1591,7 @@ bool RenderSystem::drawParticles(ParticlesComponent& particles, Transform& trans
 			return false;
 		}
 		render.applyUniformBlock(particles.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
-		render.draw(particles.numVisible);
+		render.draw(particles.numVisible, 1);
 	}
 
 	return true;
@@ -1609,7 +1636,7 @@ bool RenderSystem::drawLines(LinesComponent& lines, Transform& transform, Transf
 			return false;
 		}
 		render.applyUniformBlock(lines.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
-		render.draw(lines.lines.size() * 2);
+		render.draw(lines.lines.size() * 2, 1);
 	}
 
 	return true;
@@ -1712,7 +1739,7 @@ bool RenderSystem::loadSky(Entity entity, SkyComponent& sky, uint8_t pipelines){
 
 	if (sky.buffer.isRenderAttributes()) {
         for (auto const &attr : sky.buffer.getAttributes()) {
-			render->addAttribute(shaderData.getAttrIndex(attr.first), sky.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), sky.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized());
+			render->addAttribute(shaderData.getAttrIndex(attr.first), sky.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), sky.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(),  attr.second.getPerInstance());
         }
     }
 
@@ -1746,7 +1773,7 @@ bool RenderSystem::drawSky(SkyComponent& sky, bool renderToTexture){
 		}
 		render.applyUniformBlock(sky.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 16, &sky.skyViewProjectionMatrix);
 		render.applyUniformBlock(sky.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &sky.color);
-		render.draw(36);
+		render.draw(36, 1);
 	}
 
 	return true;
@@ -2203,6 +2230,43 @@ void RenderSystem::updateCameraFrustumPlanes(const Matrix4 viewProjectionMatrix,
     }
 }
 
+void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentInstances){
+	instmesh.shaderInstances.clear();
+	instmesh.shaderInstances.reserve(instmesh.instances.size());
+
+	instmesh.numVisible = 0;
+	size_t instancesSize = (instmesh.instances.size() < instmesh.maxInstances)? instmesh.instances.size() : instmesh.maxInstances;
+	for (int i = 0; i < instancesSize; i++){
+		//if (instmesh.instances[i].life > particles.particles[i].time){
+		instmesh.shaderInstances.push_back({});
+		instmesh.shaderInstances[instmesh.numVisible].instanceMatrix = instmesh.instances[i].instanceMatrix;
+		instmesh.numVisible++;
+		//}
+	}
+
+	if (sortTransparentInstances){
+		auto comparePoints = [&transform, &camTransform](const InstanceData& a, const InstanceData& b) -> bool {
+			Vector3 positionA = Vector3(a.instanceMatrix[3][0], a.instanceMatrix[3][1], a.instanceMatrix[3][2]);
+			Vector3 positionB = Vector3(b.instanceMatrix[3][0], b.instanceMatrix[3][1], b.instanceMatrix[3][2]);
+
+			float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * positionA)).length();
+			float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * positionB)).length();
+			return distanceToCameraA > distanceToCameraB;
+		};
+		std::sort(instmesh.shaderInstances.begin(), instmesh.shaderInstances.end(), comparePoints);
+	}
+
+	if (instmesh.numVisible > 0){
+		instmesh.buffer.setData((unsigned char*)(&instmesh.shaderInstances.at(0)), sizeof(ParticleShaderData)*instmesh.numVisible);
+	}else{
+		instmesh.buffer.setData((unsigned char*)nullptr, 0);
+	}
+
+	if (mesh.loaded)
+		instmesh.needUpdateBuffer = true;
+
+}
+
 void RenderSystem::configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera){
 	if (light.shadowCameraNearFar.x == 0.0){
 		light.shadowCameraNearFar.x = camera.near;
@@ -2648,11 +2712,15 @@ void RenderSystem::update(double dt){
 
 		if (signature.test(scene->getComponentType<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+			bool instanced = false;
+			if (signature.test(scene->getComponentType<InstancedMeshComponent>())){
+				instanced = true;
+			}
 			if (mesh.loaded && mesh.needReload){
 				destroyMesh(entity, mesh);
 			}
 			if (!mesh.loadCalled){
-				loadMesh(entity, mesh, pipelines);
+				loadMesh(entity, mesh, pipelines, instanced);
 			}
 		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
 			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
@@ -2728,6 +2796,19 @@ void RenderSystem::update(double dt){
 				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
 				mesh.worldAABB = transform.localMatrix * mesh.aabb;
+
+				if (signature.test(scene->getComponentType<InstancedMeshComponent>())){
+					InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(entity);
+
+					bool sortTransparentInstances = mesh.transparent && mainCamera.type != CameraType::CAMERA_2D;
+
+					if (instmesh.needUpdateInstances || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentInstances)){
+						if (!hasMultipleCameras || !sortTransparentInstances){
+							updateInstancedMesh(instmesh, mesh, transform, mainCamera, mainCameraTransform, sortTransparentInstances);
+						}
+					}
+
+				}
 			}
 
 			if (signature.test(scene->getComponentType<ModelComponent>())){
@@ -2933,9 +3014,9 @@ void RenderSystem::draw(){
 				if (transform.visible){
 					if (!mesh.transparent || !camera.transparentSort){
 						//Draw opaque meshes if transparency is not necessary
-						drawMesh(mesh, transform, camera, cameraTransform, camera.renderToTexture);
+						drawMesh(mesh, scene->findComponent<InstancedMeshComponent>(entity), transform, camera, cameraTransform, camera.renderToTexture);
 					}else{
-						transparentMeshes.push({&mesh, &transform, transform.distanceToCamera});
+						transparentMeshes.push({&mesh, scene->findComponent<InstancedMeshComponent>(entity), &transform, transform.distanceToCamera});
 					}
 				}
 
@@ -2995,7 +3076,7 @@ void RenderSystem::draw(){
 			TransparentMeshesData meshData = transparentMeshes.top();
 
 			//Draw transparent meshes
-			drawMesh(*meshData.mesh, *meshData.transform, camera, cameraTransform, camera.renderToTexture);
+			drawMesh(*meshData.mesh, meshData.instmesh, *meshData.transform, camera, cameraTransform, camera.renderToTexture);
 
 			transparentMeshes.pop();
 		}

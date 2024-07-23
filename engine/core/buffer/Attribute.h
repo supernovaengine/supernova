@@ -22,11 +22,12 @@ namespace Supernova {
         size_t offset;
         unsigned int count;
         bool normalized;
+        bool perInstance;
 
     public:
 
         Attribute();
-        Attribute(AttributeDataType dataType, std::string bufferName, unsigned int elements, size_t offset, bool normalized);
+        Attribute(AttributeDataType dataType, std::string bufferName, unsigned int elements, size_t offset, bool normalized, bool perInstance);
         Attribute(const Attribute& a);
         virtual ~Attribute();
 
@@ -49,6 +50,9 @@ namespace Supernova {
 
         bool getNormalized() const;
         void setNormalized(bool normalized);
+
+        bool getPerInstance() const;
+        void setPerInstance(bool perInstance);
 
     };
 

@@ -118,7 +118,7 @@ void SokolObject::addIndex(BufferRender* buffer, AttributeDataType dataType, siz
     }
 }
 
-void SokolObject::addAttribute(int slot, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
+void SokolObject::addAttribute(int slot, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized, bool perInstance){
     if (slot != -1){
         sg_buffer vbuf = buffer->backend.get();
 
@@ -142,6 +142,10 @@ void SokolObject::addAttribute(int slot, BufferRender* buffer, unsigned int elem
             bufferToBindSlot[{vbuf.id, bufferOffset}] = bindSlotIndex;
 
             pipeline_desc.layout.buffers[bindSlotIndex].stride = stride;
+
+            if (perInstance){
+                pipeline_desc.layout.buffers[bindSlotIndex].step_func = SG_VERTEXSTEP_PER_INSTANCE;
+            }
 
             bindSlotIndex++;
         }
@@ -303,11 +307,11 @@ void SokolObject::applyUniformBlock(int slot, ShaderStageType stage, unsigned in
     }
 }
 
-void SokolObject::draw(int vertexCount){
+void SokolObject::draw(unsigned int vertexCount, unsigned int instanceCount){
     //SokolCmdQueue::add_command_apply_bindings(bind);
     sg_apply_bindings(bind);
     //SokolCmdQueue::add_command_draw(0, vertexCount, 1);
-    sg_draw(0, vertexCount, 1);
+    sg_draw(0, vertexCount, instanceCount);
 }
 
 void SokolObject::destroy(){

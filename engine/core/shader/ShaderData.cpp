@@ -99,6 +99,8 @@ int ShaderData::getAttrIndex(AttributeType type){
         attrstr = "a_morphTangent0";
     }else if (type == AttributeType::MORPHTANGENT1){
         attrstr = "a_morphTangent1";
+    }else if (type == AttributeType::INSTANCEMATRIX){
+        attrstr = "i_matrix";
     }
 
     if (attrstr.empty()){

@@ -65,6 +65,10 @@ in vec3 a_position;
     out float v_clipSpacePosZ;
 #endif
 
+#ifdef HAS_INSTANCING
+    in mat4 i_matrix;
+#endif
+
 #include "includes/skinning.glsl"
 #include "includes/morphtarget.glsl"
 #ifdef HAS_TERRAIN
@@ -165,7 +169,11 @@ void main() {
     }
     #endif
 
-    gl_Position = pbrParams.mvpMatrix * pos;
+    #ifdef HAS_INSTANCING
+        gl_Position = pbrParams.mvpMatrix * i_matrix * pos;
+    #else
+        gl_Position = pbrParams.mvpMatrix * pos;
+    #endif
 
     #ifdef USE_SHADOWS
         v_clipSpacePosZ = gl_Position.z;

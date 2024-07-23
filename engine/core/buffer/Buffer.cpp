@@ -20,6 +20,7 @@ Buffer::Buffer(){
     stride = 0;
 
     renderAttributes = true;
+    instanceBuffer = false;
 }
 
 Buffer::~Buffer(){
@@ -36,6 +37,7 @@ Buffer::Buffer(const Buffer& rhs){
     stride = rhs.stride;
 
     renderAttributes = rhs.renderAttributes;
+    instanceBuffer = rhs.instanceBuffer;
 
     render = rhs.render;
 }
@@ -51,6 +53,7 @@ Buffer& Buffer::operator=(const Buffer& rhs){
     stride = rhs.stride;
 
     renderAttributes = rhs.renderAttributes;
+    instanceBuffer = rhs.instanceBuffer;
 
     render = rhs.render;
 
@@ -89,6 +92,17 @@ void Buffer::addAttribute(AttributeType attribute, AttributeDataType dataType, u
     attData.setDataType(dataType);
     attData.setElements(elements);
     attData.setOffset(offset);
+
+    addAttribute(attribute, attData);
+}
+
+void Buffer::addAttribute(AttributeType attribute, unsigned int elements, size_t offset, bool perInstance){
+    Attribute attData;
+    attData.setCount(0);
+    attData.setDataType(AttributeDataType::FLOAT);
+    attData.setElements(elements);
+    attData.setOffset(offset);
+    attData.setPerInstance(perInstance);
 
     addAttribute(attribute, attData);
 }
@@ -385,4 +399,12 @@ bool Buffer::isRenderAttributes() const {
 
 void Buffer::setRenderAttributes(bool renderAttributes) {
     Buffer::renderAttributes = renderAttributes;
+}
+
+bool Buffer::isInstanceBuffer() const{
+    return instanceBuffer;
+}
+
+void Buffer::setInstanceBuffer(bool instanceBuffer){
+    Buffer::instanceBuffer = instanceBuffer;
 }

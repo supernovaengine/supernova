@@ -27,8 +27,8 @@ void ObjectRender::addIndex(BufferRender* buffer, AttributeDataType dataType, si
     backend.addIndex(buffer, dataType, offset);
 }
 
-void ObjectRender::addAttribute(int slot, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized){
-    backend.addAttribute(slot, buffer, elements, dataType, stride, offset, normalized);
+void ObjectRender::addAttribute(int slot, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized, bool perInstance){
+    backend.addAttribute(slot, buffer, elements, dataType, stride, offset, normalized, perInstance);
 }
 
 void ObjectRender::addStorageBuffer(int slot, ShaderStageType stage, BufferRender* buffer){
@@ -55,8 +55,8 @@ void ObjectRender::applyUniformBlock(int slot, ShaderStageType stage, unsigned i
     backend.applyUniformBlock(slot, stage, count, data);
 }
 
-void ObjectRender::draw(int vertexCount){
-    backend.draw(vertexCount);
+void ObjectRender::draw(unsigned int vertexCount, unsigned int instanceCount){
+    backend.draw(vertexCount, instanceCount);
 }
 
 void ObjectRender::destroy(){

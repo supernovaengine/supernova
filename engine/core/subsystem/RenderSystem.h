@@ -7,6 +7,7 @@
 
 #include "SubSystem.h"
 #include "component/MeshComponent.h"
+#include "component/InstancedMeshComponent.h"
 #include "component/ModelComponent.h"
 #include "component/SkyComponent.h"
 #include "component/UILayoutComponent.h"
@@ -64,6 +65,7 @@ namespace Supernova{
 	private:
 		struct TransparentMeshesData{
 			MeshComponent* mesh;
+			InstancedMeshComponent* instmesh;
 			Transform* transform;
 			float distanceToCamera;
 		};
@@ -127,7 +129,7 @@ namespace Supernova{
 
 	protected:
 
-		bool drawMesh(MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture);
+		bool drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture);
 		bool drawMeshDepth(MeshComponent& mesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams);
 		void destroyMesh(Entity entity, MeshComponent& mesh);
 
@@ -155,13 +157,14 @@ namespace Supernova{
 		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentParticles);
 		void updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 		void updateCameraFrustumPlanes(const Matrix4 viewProjectionMatrix, Plane* frustumPlanes);
+		void updateInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentInstances);
 
 	public:
 
 		RenderSystem(Scene* scene);
 		virtual ~RenderSystem();
 
-		bool loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipelines);
+		bool loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipelines, bool instanced);
 		bool loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t pipelines);
 		bool loadParticles(Entity entity, ParticlesComponent& particles, uint8_t pipelines);
 		bool loadLines(Entity entity, LinesComponent& lines, uint8_t pipelines);

@@ -13,15 +13,17 @@ Attribute::Attribute(){
     setOffset(0);
     setCount(0);
     setNormalized(true);
+    setPerInstance(false);
 }
 
-Attribute::Attribute(AttributeDataType dataType, std::string bufferName, unsigned int elements, size_t offset, bool normalized){
+Attribute::Attribute(AttributeDataType dataType, std::string bufferName, unsigned int elements, size_t offset, bool normalized, bool perInstance){
     setDataType(dataType);
     setBuffer(bufferName);
     setElements(elements);
     setOffset(offset);
     setCount(0);
     setNormalized(normalized);
+    setPerInstance(perInstance);
 }
 
 Attribute::~Attribute(){
@@ -35,6 +37,7 @@ Attribute::Attribute(const Attribute& a){
     this->offset = a.offset;
     this->count = a.count;
     this->normalized = a.normalized;
+    this->perInstance = a.perInstance;
 }
 
 Attribute& Attribute::operator = (const Attribute& a){
@@ -44,6 +47,7 @@ Attribute& Attribute::operator = (const Attribute& a){
     this->offset = a.offset;
     this->count = a.count;
     this->normalized = a.normalized;
+    this->perInstance = a.perInstance;
 
     return *this;
 }
@@ -94,4 +98,12 @@ bool Attribute::getNormalized() const {
 
 void Attribute::setNormalized(bool normalized) {
     this->normalized = normalized;
+}
+
+bool Attribute::getPerInstance() const {
+    return perInstance;
+}
+
+void Attribute::setPerInstance(bool perInstance) {
+    this->perInstance = perInstance;
 }

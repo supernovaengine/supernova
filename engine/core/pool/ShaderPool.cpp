@@ -150,7 +150,7 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 						bool punctual, bool shadows, bool shadowsPCF, bool normals, bool normalMap, 
 						bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect, 
 						bool fog, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent,
-						bool terrain){
+						bool terrain, bool instanced){
 	std::string prop;
 
 	if (unlit)
@@ -189,6 +189,8 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 		prop += "Mtg";
 	if (terrain)
 		prop += "Ter";
+	if (instanced)
+		prop += "Ist";
 
 	return prop;
 }

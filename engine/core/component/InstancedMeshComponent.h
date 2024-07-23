@@ -16,9 +16,12 @@ namespace Supernova{
         ExternalBuffer buffer;
 
         std::vector<InstanceData> instances;
+        std::vector<InstanceData> shaderInstances; //must be sorted
 
         unsigned int maxInstances = 100;
+        unsigned int numVisible = 0;
 
+        bool needUpdateBuffer = false;
         bool needUpdateInstances = true;
     };
 

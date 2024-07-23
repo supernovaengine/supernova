@@ -31,6 +31,7 @@ namespace Supernova {
         unsigned int stride;
 
         bool renderAttributes;
+        bool instanceBuffer;
 
         BufferRender render;
 
@@ -47,6 +48,7 @@ namespace Supernova {
         void clearAll();
 
         void addAttribute(AttributeType attribute, AttributeDataType dataType, unsigned int elements, size_t offset);
+        void addAttribute(AttributeType attribute, unsigned int elements, size_t offset, bool perInstance);
         void addAttribute(AttributeType attribute, unsigned int elements, size_t offset);
         void addAttribute(AttributeType attribute, Attribute Attribute);
 
@@ -108,6 +110,9 @@ namespace Supernova {
 
         bool isRenderAttributes() const;
         void setRenderAttributes(bool renderAttributes);
+
+        bool isInstanceBuffer() const;
+        void setInstanceBuffer(bool instanceBuffer);
     };
 
 }

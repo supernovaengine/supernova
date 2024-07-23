@@ -53,6 +53,8 @@ def get_define(property):
         return 'HAS_MORPHTANGENT'
     elif property == 'Ter':
         return 'HAS_TERRAIN'
+    elif property == 'Ist':
+        return 'HAS_INSTANCING'
     else:
         sys.exit('Not found value for property: '+property)
 
