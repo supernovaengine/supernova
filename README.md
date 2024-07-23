@@ -47,6 +47,8 @@ Live samples: https://samples.supernovaengine.org/
  * Instancing
  * More UI components
  * Water
+ * Editor
+ * Networking
 
 ## Samples
 

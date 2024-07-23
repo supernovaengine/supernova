@@ -1859,9 +1859,9 @@ Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img
 
 void RenderSystem::updateTransform(Transform& transform){
 	if (!transform.staticObject){
-		Matrix4 scaleMatrix = Matrix4::scaleMatrix(transform.scale);
 		Matrix4 translateMatrix = Matrix4::translateMatrix(transform.position);
 		Matrix4 rotationMatrix = transform.rotation.getRotationMatrix();
+		Matrix4 scaleMatrix = Matrix4::scaleMatrix(transform.scale);
 
 		transform.localMatrix = translateMatrix * rotationMatrix * scaleMatrix;
 	}

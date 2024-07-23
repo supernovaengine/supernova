@@ -68,6 +68,9 @@ namespace Supernova{
 		bool loadGLTF(Entity entity, std::string filename);
 		bool loadOBJ(Entity entity, std::string filename);
 
+		void createInstancedMesh(Entity entity);
+		void removeInstancedMesh(Entity entity);
+
 		void destroyModel(ModelComponent& model);
 
 		bool createOrUpdateSprite(SpriteComponent& sprite, MeshComponent& mesh);

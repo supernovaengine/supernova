@@ -40,6 +40,11 @@ namespace Supernova{
         unsigned int getNumSubmeshes() const;
 
         Material& getMaterial(unsigned int submesh = 0);
+
+        void createInstances();
+        void removeInstances();
+
+        void addInstance(Vector3 position, Quaternion rotation, Vector3 scale);
     };
 }
 

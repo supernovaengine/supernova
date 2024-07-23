@@ -6,6 +6,7 @@
 #include "render/ObjectRender.h"
 #include "util/Color.h"
 #include "subsystem/RenderSystem.h"
+#include "subsystem/MeshSystem.h"
 
 using namespace Supernova;
 
@@ -113,4 +114,24 @@ Material& Mesh::getMaterial(unsigned int submesh){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return mesh.submeshes[submesh].material;
+}
+
+void Mesh::createInstances(){
+    scene->getSystem<MeshSystem>()->createInstancedMesh(entity);
+}
+
+void Mesh::removeInstances(){
+    scene->getSystem<MeshSystem>()->removeInstancedMesh(entity);
+}
+
+void Mesh::addInstance(Vector3 position, Quaternion rotation, Vector3 scale){
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    Matrix4 translateMatrix = Matrix4::translateMatrix(position);
+    Matrix4 rotationMatrix = rotation.getRotationMatrix();
+    Matrix4 scaleMatrix = Matrix4::scaleMatrix(scale);
+
+    instmesh.instances.push_back({translateMatrix * rotationMatrix * scaleMatrix});
+
+    instmesh.needUpdateInstances = true;
 }

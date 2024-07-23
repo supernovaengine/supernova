@@ -310,6 +310,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getWorldAABB", &Mesh::getWorldAABB)
         .addFunction("getNumSubmeshes", &Mesh::getNumSubmeshes)
         .addFunction("getMaterial", &Mesh::getMaterial)
+        .addFunction("createInstances", &Mesh::createInstances)
+        .addFunction("removeInstances", &Mesh::removeInstances)
+        .addFunction("addInstance", &Mesh::addInstance)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

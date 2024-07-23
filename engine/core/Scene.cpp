@@ -64,6 +64,7 @@ Scene::Scene(){
 	registerComponent<Joint2DComponent>();
 	registerComponent<Body3DComponent>();
 	registerComponent<Joint3DComponent>();
+	registerComponent<InstancedMeshComponent>();
 
 	registerSystem<ActionSystem>();
 	registerSystem<MeshSystem>();

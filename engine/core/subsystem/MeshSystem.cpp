@@ -2375,6 +2375,24 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
     return true;
 }
 
+void MeshSystem::createInstancedMesh(Entity entity){
+    Signature signature = scene->getSignature(entity);
+
+    if (!signature.test(scene->getComponentType<InstancedMeshComponent>())){
+        scene->addComponent<InstancedMeshComponent>(entity, {});
+        //loadBody3D(entity);
+    }
+}
+
+void MeshSystem::removeInstancedMesh(Entity entity){
+    Signature signature = scene->getSignature(entity);
+
+    if (signature.test(scene->getComponentType<InstancedMeshComponent>())){
+        //destroyInstancedMesh(scene->getComponent<Body3DComponent>(entity));
+        scene->removeComponent<InstancedMeshComponent>(entity);
+    }
+}
+
 void MeshSystem::destroyModel(ModelComponent& model){
     if (model.gltfModel){
         delete model.gltfModel;

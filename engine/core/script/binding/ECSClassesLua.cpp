@@ -135,6 +135,8 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("createTorus", &MeshSystem::createTorus)
         .addFunction("loadGLTF", &MeshSystem::loadGLTF)
         .addFunction("loadOBJ", &MeshSystem::loadOBJ)
+        .addFunction("createInstancedMesh", &MeshSystem::createInstancedMesh)
+        .addFunction("removeInstancedMesh", &MeshSystem::removeInstancedMesh)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
