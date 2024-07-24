@@ -62,7 +62,10 @@ namespace Supernova{
         MORPHNORMAL3,
         MORPHTANGENT0,
         MORPHTANGENT1,
-        INSTANCEMATRIX
+        INSTANCEMATRIXCOL1,
+        INSTANCEMATRIXCOL2,
+        INSTANCEMATRIXCOL3,
+        INSTANCEMATRIXCOL4
     };
 
     enum class AttributeDataType{

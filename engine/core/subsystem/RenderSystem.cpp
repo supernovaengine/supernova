@@ -667,7 +667,10 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(entity);
 
 			instmesh.buffer.clear();
-			instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIX, 16, 0, true);
+			instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL1, 4, 0, true);
+			instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL2, 4, 4, true);
+			instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL3, 4, 8, true);
+			instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL4, 4, 12, true);
 			instmesh.buffer.setStride(16 * sizeof(float));
 
 			instmesh.buffer.setRenderAttributes(false);
@@ -678,8 +681,9 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			size_t bufferSize = instmesh.maxInstances * instmesh.buffer.getStride();
 
 			instmesh.buffer.getRender()->createBuffer(bufferSize, instmesh.buffer.getData(), instmesh.buffer.getType(), instmesh.buffer.getUsage());
-			Attribute* instMatrixAttr = instmesh.buffer.getAttribute(AttributeType::INSTANCEMATRIX);
-			render.addAttribute(shaderData.getAttrIndex(AttributeType::INSTANCEMATRIX), instmesh.buffer.getRender(), instMatrixAttr->getElements(), instMatrixAttr->getDataType(), instmesh.buffer.getStride(), instMatrixAttr->getOffset(), instMatrixAttr->getNormalized(), instMatrixAttr->getPerInstance());
+			for (auto const &attr : instmesh.buffer.getAttributes()) {
+				render.addAttribute(shaderData.getAttrIndex(attr.first), instmesh.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), instmesh.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+			}
 
 			instmesh.needUpdateBuffer = true;
 		}
@@ -871,7 +875,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmes
 		if (instmesh){
 			if (instmesh->needUpdateBuffer){
 				instmesh->buffer.getRender()->updateBuffer(instmesh->buffer.getSize(), instmesh->buffer.getData());
-				instanceCount = instmesh->buffer.getCount();
+				instanceCount = instmesh->numVisible;
 			}
 		}
 
@@ -2257,7 +2261,7 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 	}
 
 	if (instmesh.numVisible > 0){
-		instmesh.buffer.setData((unsigned char*)(&instmesh.shaderInstances.at(0)), sizeof(ParticleShaderData)*instmesh.numVisible);
+		instmesh.buffer.setData((unsigned char*)(&instmesh.shaderInstances.at(0)), sizeof(InstanceData)*instmesh.numVisible);
 	}else{
 		instmesh.buffer.setData((unsigned char*)nullptr, 0);
 	}

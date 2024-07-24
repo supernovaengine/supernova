@@ -66,7 +66,10 @@ in vec3 a_position;
 #endif
 
 #ifdef HAS_INSTANCING
-    in mat4 i_matrix;
+    in vec4 i_matrix_col1;
+    in vec4 i_matrix_col2;
+    in vec4 i_matrix_col3;
+    in vec4 i_matrix_col4;
 #endif
 
 #include "includes/skinning.glsl"
@@ -170,7 +173,8 @@ void main() {
     #endif
 
     #ifdef HAS_INSTANCING
-        gl_Position = pbrParams.mvpMatrix * i_matrix * pos;
+        mat4 instanceMatrix = mat4(i_matrix_col1, i_matrix_col2, i_matrix_col3, i_matrix_col4);
+        gl_Position = pbrParams.mvpMatrix * instanceMatrix * pos;
     #else
         gl_Position = pbrParams.mvpMatrix * pos;
     #endif
