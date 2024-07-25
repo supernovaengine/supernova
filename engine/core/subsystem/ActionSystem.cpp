@@ -378,7 +378,41 @@ void ActionSystem::applyParticleInitializers(size_t idx, PointParticlesComponent
 
     PointParticleRotationInitializer& rotInit = partanim.rotationInitializer;
     particles.particles[idx].rotation = Angle::defaultToRad(getFloatInitializerValue(rotInit.minRotation, rotInit.maxRotation));
+}
 
+void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
+
+    ParticleLifeInitializer& lifeInit = particles.lifeInitializer;
+    particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
+
+    ParticlePositionInitializer& posInit = particles.positionInitializer;
+    Vector4 pos = instmesh.instances[idx].instanceMatrix.column(3);
+    instmesh.instances[idx].instanceMatrix.setColumn(3, Vector4(getVector3InitializerValue(posInit.minPosition, posInit.maxPosition), pos.w));
+
+    ParticleVelocityInitializer& velInit = particles.velocityInitializer;
+    particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
+
+    ParticleAccelerationInitializer& accInit = particles.accelerationInitializer;
+    particles.particles[idx].acceleration = getVector3InitializerValue(accInit.minAcceleration, accInit.maxAcceleration);
+/*
+    ParticleColorInitializer& colInit = particles.colorInitializer;
+    particles.particles[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
+    if (particles.colorInitializer.useSRGB){
+        particles.particles[idx].color = Color::sRGBToLinear(particles.particles[idx].color);
+    }
+
+    ParticleAlphaInitializer& alpInit = particles.alphaInitializer;
+    particles.particles[idx].color.w = getFloatInitializerValue(alpInit.minAlpha, alpInit.maxAlpha);
+
+    ParticleSizeInitializer& sizeInit = particles.sizeInitializer;
+    particles.particles[idx].size = getFloatInitializerValue(sizeInit.minSize, sizeInit.maxSize);
+
+    ParticleSpriteInitializer& spriteInit = particles.spriteInitializer;
+    particles.particles[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, particles);
+
+    ParticleRotationInitializer& rotInit = particles.rotationInitializer;
+    particles.particles[idx].rotation = Angle::defaultToRad(getFloatInitializerValue(rotInit.minRotation, rotInit.maxRotation));
+*/
 }
 
 float ActionSystem::getTimeFromParticleTime(float& time, float& fromTime, float& toTime){

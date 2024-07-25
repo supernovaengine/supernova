@@ -23,6 +23,7 @@
 #include "component/PointParticlesComponent.h"
 #include "component/ParticlesAnimationComponent.h"
 #include "component/ParticlesComponent.h"
+#include "component/InstancedMeshComponent.h"
 #include "component/AnimationComponent.h"
 #include "component/KeyframeTracksComponent.h"
 #include "component/TranslateTracksComponent.h"
@@ -72,6 +73,7 @@ namespace Supernova{
 		Vector3 getVector3InitializerValue(Vector3& min, Vector3& max);
 		Rect getSpriteInitializerValue(std::vector<int>& frames, PointParticlesComponent& particles);
 		void applyParticleInitializers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 
 		float getTimeFromParticleTime(float& time, float& fromTime, float& toTime);
 		float getFloatModifierValue(float& value, float& fromValue, float& toValue);
