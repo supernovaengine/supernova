@@ -39,7 +39,7 @@ Scene::Scene(){
 	registerComponent<ScaleActionComponent>();
 	registerComponent<ColorActionComponent>();
 	registerComponent<AlphaActionComponent>();
-	registerComponent<ParticlesComponent>();
+	registerComponent<PointParticlesComponent>();
 	registerComponent<ParticlesAnimationComponent>();
 	registerComponent<LinesComponent>();
 	registerComponent<TextComponent>();
@@ -380,8 +380,8 @@ void Scene::sortComponentsByTransform(Signature entitySignature){
 	}
 
 	// Particles component
-	if (entitySignature.test(getComponentType<ParticlesComponent>())){
-		auto particles = componentManager.getComponentArray<ParticlesComponent>();
+	if (entitySignature.test(getComponentType<PointParticlesComponent>())){
+		auto particles = componentManager.getComponentArray<PointParticlesComponent>();
 		particles->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 

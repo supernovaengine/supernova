@@ -20,7 +20,7 @@
 #include "component/ScaleActionComponent.h"
 #include "component/ColorActionComponent.h"
 #include "component/AlphaActionComponent.h"
-#include "component/ParticlesComponent.h"
+#include "component/PointParticlesComponent.h"
 #include "component/ParticlesAnimationComponent.h"
 #include "component/AnimationComponent.h"
 #include "component/KeyframeTracksComponent.h"
@@ -64,21 +64,21 @@ namespace Supernova{
 		void alphaActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, UIComponent& uirender);
 
 		//Particle helpers functions
-		int findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+		int findUnusedParticle(PointParticlesComponent& particles, ParticlesAnimationComponent& partanim);
 
 		float getFloatInitializerValue(float& min, float& max);
 		Vector3 getVector3InitializerValue(Vector3& min, Vector3& max);
-		Rect getSpriteInitializerValue(std::vector<int>& frames, ParticlesComponent& particles);
-		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+		Rect getSpriteInitializerValue(std::vector<int>& frames, PointParticlesComponent& particles);
+		void applyParticleInitializers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim);
 
 		float getTimeFromParticleTime(float& time, float& fromTime, float& toTime);
 		float getFloatModifierValue(float& value, float& fromValue, float& toValue);
 		Vector3 getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue);
-		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, ParticlesComponent& particles);
-		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, PointParticlesComponent& particles);
+		void applyParticleModifiers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim);
 
-		void particleActionStart(ParticlesAnimationComponent& partanim, ParticlesComponent& particles);
-		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, ParticlesComponent& particles);
+		void particleActionStart(ParticlesAnimationComponent& partanim, PointParticlesComponent& particles);
+		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, PointParticlesComponent& particles);
 
 		//Keyframe
 		void keyframeUpdate(double dt, ActionComponent& action, KeyframeTracksComponent& keyframe);

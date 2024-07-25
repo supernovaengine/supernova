@@ -37,8 +37,8 @@ void ActionSystem::actionStart(Entity entity){
 
         if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
             ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
-            if (targetSignature.test(scene->getComponentType<ParticlesComponent>()) ){
-                ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(action.target);
+            if (targetSignature.test(scene->getComponentType<PointParticlesComponent>()) ){
+                PointParticlesComponent& particles = scene->getComponent<PointParticlesComponent>(action.target);
 
                 particleActionStart(partanim, particles);
 
@@ -277,7 +277,7 @@ void ActionSystem::alphaActionUIUpdate(double dt, ActionComponent& action, Timed
     uirender.color.w = alphaaction.startAlpha + alpha;
 }
 
-int ActionSystem::findUnusedParticle(ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
+int ActionSystem::findUnusedParticle(PointParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
     for (int i=partanim.lastUsedParticle; i<particles.particles.size(); i++){
         if (particles.particles[i].life <= particles.particles[i].time){
@@ -314,7 +314,7 @@ Vector3 ActionSystem::getVector3InitializerValue(Vector3& min, Vector3& max){
     return max;
 }
 
-Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, ParticlesComponent& particles){
+Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointParticlesComponent& particles){
     if (frames.size() > 0){
         int id = frames[int(frames.size()*rand()/(RAND_MAX + 1.0))];
 
@@ -326,7 +326,7 @@ Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, Particles
     return Rect(0,0,1,1);
 }
 
-void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
+void ActionSystem::applyParticleInitializers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
     ParticleLifeInitializer& lifeInit = partanim.lifeInitializer;
     particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
@@ -376,7 +376,7 @@ Vector3 ActionSystem::getVector3ModifierValue(float& value, Vector3& fromValue, 
     return fromValue + ((toValue - fromValue) * value);
 }
 
-Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, ParticlesComponent& particles){
+Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, PointParticlesComponent& particles){
     if (frames.size() > 0){
         int id = frames[(int)(frames.size() * value)];
 
@@ -388,7 +388,7 @@ Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames
     return Rect(0,0,1,1);
 }
 
-void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, ParticlesAnimationComponent& partanim){
+void ActionSystem::applyParticleModifiers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
     float particleTime = particles.particles[idx].time;
     float value;
@@ -454,7 +454,7 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     }
 }
 
-void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, ParticlesComponent& particles){
+void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, PointParticlesComponent& particles){
     if (partanim.sizeInitializer.minSize == 0 && partanim.sizeInitializer.maxSize == 0){
         float size = std::max(particles.texture.getWidth(), particles.texture.getHeight());
         partanim.sizeInitializer.minSize = size;
@@ -474,7 +474,7 @@ void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, Pa
     partanim.lastUsedParticle = 0;
 }
 
-void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, ParticlesComponent& particles){
+void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, PointParticlesComponent& particles){
     if (partanim.emitter){
         partanim.newParticlesCount += dt * partanim.rate;
 
@@ -709,8 +709,8 @@ void ActionSystem::update(double dt){
             if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
                 ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
 
-                if (targetSignature.test(scene->getComponentType<ParticlesComponent>())){
-                    ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(action.target);
+                if (targetSignature.test(scene->getComponentType<PointParticlesComponent>())){
+                    PointParticlesComponent& particles = scene->getComponent<PointParticlesComponent>(action.target);
 
                     particlesActionUpdate(dt, entity, action, partanim, particles);
                     if (action.state != ActionState::Running) continue;

@@ -15,7 +15,7 @@
 #include "component/ImageComponent.h"
 #include "component/CameraComponent.h"
 #include "component/LightComponent.h"
-#include "component/ParticlesComponent.h"
+#include "component/PointParticlesComponent.h"
 #include "component/LinesComponent.h"
 #include "component/TerrainComponent.h"
 #include "component/SpriteComponent.h"
@@ -140,8 +140,8 @@ namespace Supernova{
 		bool drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture);
 		void destroyUI(Entity entity, UIComponent& uirender);
 
-		bool drawParticles(ParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture);
-		void destroyParticles(Entity entity, ParticlesComponent& particles);
+		bool drawParticles(PointParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture);
+		void destroyParticles(Entity entity, PointParticlesComponent& particles);
 
 		bool drawLines(LinesComponent& lines, Transform& transform, Transform& camTransform, bool renderToTexture);
 		void destroyLines(Entity entity, LinesComponent& lines);
@@ -154,7 +154,7 @@ namespace Supernova{
 		
 		void updateSkyViewProjection(SkyComponent& sky, CameraComponent& camera);
 		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);
-		void updateParticles(ParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentParticles);
+		void updateParticles(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentParticles);
 		void updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 		void updateCameraFrustumPlanes(const Matrix4 viewProjectionMatrix, Plane* frustumPlanes);
 		void updateInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentInstances);
@@ -166,7 +166,7 @@ namespace Supernova{
 
 		bool loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshComponent* instmesh, uint8_t pipelines);
 		bool loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t pipelines);
-		bool loadParticles(Entity entity, ParticlesComponent& particles, uint8_t pipelines);
+		bool loadParticles(Entity entity, PointParticlesComponent& particles, uint8_t pipelines);
 		bool loadLines(Entity entity, LinesComponent& lines, uint8_t pipelines);
 		bool loadUI(Entity entity, UIComponent& uirender, uint8_t pipelines, bool isText);
 		bool loadSky(Entity entity, SkyComponent& sky, uint8_t pipelines);

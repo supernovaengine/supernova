@@ -2,8 +2,8 @@
 // (c) 2024 Eduardo Doria.
 //
 
-#ifndef PARTICLES_COMPONENT_H
-#define PARTICLES_COMPONENT_H
+#ifndef POINT_PARTICLES_COMPONENT_H
+#define POINT_PARTICLES_COMPONENT_H
 
 #include "buffer/Buffer.h"
 #include "texture/Texture.h"
@@ -35,7 +35,7 @@ namespace Supernova{
         Rect textureRect;
     };
 
-    struct ParticlesComponent{
+    struct PointParticlesComponent{
         bool loaded = false;
         bool loadCalled = false;
 
@@ -67,4 +67,4 @@ namespace Supernova{
     
 }
 
-#endif //PARTICLES_COMPONENT_H
+#endif //POINT_PARTICLES_COMPONENT_H
