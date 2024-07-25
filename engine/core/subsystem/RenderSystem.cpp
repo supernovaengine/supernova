@@ -104,7 +104,7 @@ void RenderSystem::destroy(){
 		}else if (signature.test(scene->getComponentType<PointParticlesComponent>())){
 			PointParticlesComponent& particles = scene->getComponent<PointParticlesComponent>(entity);
 			if (particles.loaded){
-				destroyParticles(entity, particles);
+				destroyPoints(entity, particles);
 			}
 		}else if (signature.test(scene->getComponentType<LinesComponent>())){
 			LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
@@ -1454,7 +1454,7 @@ void RenderSystem::destroyUI(Entity entity, UIComponent& uirender){
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
-bool RenderSystem::loadParticles(Entity entity, PointParticlesComponent& particles, uint8_t pipelines){
+bool RenderSystem::loadPoints(Entity entity, PointParticlesComponent& particles, uint8_t pipelines){
 
 	if (!Engine::isViewLoaded()) 
 		return false;
@@ -1583,7 +1583,7 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipel
 	return true;
 }
 
-bool RenderSystem::drawParticles(PointParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture){
+bool RenderSystem::drawPoints(PointParticlesComponent& particles, Transform& transform, Transform& camTransform, bool renderToTexture){
 	if (particles.loaded && particles.buffer.getSize() > 0){
 
 		if (particles.needUpdateTexture || particles.texture.isFramebufferOutdated()){
@@ -1613,7 +1613,7 @@ bool RenderSystem::drawParticles(PointParticlesComponent& particles, Transform& 
 	return true;
 }
 
-void RenderSystem::destroyParticles(Entity entity, PointParticlesComponent& particles){
+void RenderSystem::destroyPoints(Entity entity, PointParticlesComponent& particles){
 	if (!particles.loaded)
 		return;
 
@@ -1979,7 +1979,7 @@ void RenderSystem::updateSkyViewProjection(SkyComponent& sky, CameraComponent& c
 	sky.needUpdateSky = false;
 }
 
-void RenderSystem::updateParticles(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform){
+void RenderSystem::updatePoints(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform){
 	particles.shaderParticles.clear();
 	particles.shaderParticles.reserve(particles.particles.size());
 
@@ -2012,7 +2012,7 @@ void RenderSystem::updateParticles(PointParticlesComponent& particles, Transform
 		particles.needUpdateBuffer = true;
 }
 
-void RenderSystem::sortParticles(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform){
+void RenderSystem::sortPoints(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform){
 	auto comparePoints = [&transform, &camTransform](const PointParticleShaderData& a, const PointParticleShaderData& b) -> bool {
 		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
 		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
@@ -2781,10 +2781,10 @@ void RenderSystem::update(double dt){
 		}else if (signature.test(scene->getComponentType<PointParticlesComponent>())){
 			PointParticlesComponent& particles = scene->getComponent<PointParticlesComponent>(entity);
 			if (particles.loaded && particles.needReload){
-				destroyParticles(entity, particles);
+				destroyPoints(entity, particles);
 			}
 			if (!particles.loadCalled){
-				loadParticles(entity, particles, pipelines);
+				loadPoints(entity, particles, pipelines);
 			}
 		}else if (signature.test(scene->getComponentType<LinesComponent>())){
 			LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
@@ -2860,12 +2860,12 @@ void RenderSystem::update(double dt){
 			bool sortTransparentParticles = particles.transparent && mainCamera.type != CameraType::CAMERA_2D;
 
 			if (particles.needUpdate){
-				updateParticles(particles, transform, mainCamera, mainCameraTransform);
+				updatePoints(particles, transform, mainCamera, mainCameraTransform);
 			}
 
 			if (particles.needUpdate || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentParticles)){
 				if (!hasMultipleCameras || !sortTransparentParticles){
-					sortParticles(particles, transform, mainCamera, mainCameraTransform);
+					sortPoints(particles, transform, mainCamera, mainCameraTransform);
 				}
 			}
 
@@ -3083,11 +3083,11 @@ void RenderSystem::draw(){
 				bool sortTransparentParticles = particles.transparent && camera.type != CameraType::CAMERA_2D;
 
 				if (hasMultipleCameras && sortTransparentParticles){
-					sortParticles(particles, transform, camera, cameraTransform);
+					sortPoints(particles, transform, camera, cameraTransform);
 				}
 
 				if (transform.visible)
-					drawParticles(particles, transform, cameraTransform, camera.renderToTexture);
+					drawPoints(particles, transform, cameraTransform, camera.renderToTexture);
 
 			}else if (signature.test(scene->getComponentType<LinesComponent>())){
 				LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
@@ -3166,7 +3166,7 @@ void RenderSystem::entityDestroyed(Entity entity){
 	}
 
 	if (signature.test(scene->getComponentType<PointParticlesComponent>())){
-		destroyParticles(entity, scene->getComponent<PointParticlesComponent>(entity));
+		destroyPoints(entity, scene->getComponent<PointParticlesComponent>(entity));
 	}
 
 	if (signature.test(scene->getComponentType<LinesComponent>())){

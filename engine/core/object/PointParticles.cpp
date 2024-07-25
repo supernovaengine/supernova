@@ -19,7 +19,7 @@ PointParticles::~PointParticles(){
 bool PointParticles::load(){
     PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
 
-    return scene->getSystem<RenderSystem>()->loadParticles(entity, particomp, PIP_DEFAULT | PIP_RTT);
+    return scene->getSystem<RenderSystem>()->loadPoints(entity, particomp, PIP_DEFAULT | PIP_RTT);
 }
 
 void PointParticles::setMaxParticles(unsigned int maxParticles){
