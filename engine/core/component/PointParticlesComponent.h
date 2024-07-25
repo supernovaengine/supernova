@@ -13,7 +13,7 @@
 
 namespace Supernova{
 
-    struct ParticleData{
+    struct PointParticleData{
         Vector3 position = Vector3(0,0,0);
         Vector4 color = Vector4(1,1,1,1);
         float size = 1;
@@ -27,7 +27,7 @@ namespace Supernova{
         float time = 0;
     };
 
-    struct ParticleShaderData{
+    struct PointParticleShaderData{
         Vector3 position;
         Vector4 color;
         float size;
@@ -41,8 +41,8 @@ namespace Supernova{
 
         ExternalBuffer buffer;
 
-        std::vector<ParticleData> particles;
-        std::vector<ParticleShaderData> shaderParticles; //must be sorted
+        std::vector<PointParticleData> particles;
+        std::vector<PointParticleShaderData> shaderParticles; //must be sorted
 
         FrameData framesRect[MAX_SPRITE_FRAMES];
 

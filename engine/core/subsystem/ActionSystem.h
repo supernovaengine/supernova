@@ -22,6 +22,7 @@
 #include "component/AlphaActionComponent.h"
 #include "component/PointParticlesComponent.h"
 #include "component/ParticlesAnimationComponent.h"
+#include "component/ParticlesComponent.h"
 #include "component/AnimationComponent.h"
 #include "component/KeyframeTracksComponent.h"
 #include "component/TranslateTracksComponent.h"
@@ -65,6 +66,7 @@ namespace Supernova{
 
 		//Particle helpers functions
 		int findUnusedParticle(PointParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+		int findUnusedParticle(ParticlesComponent& particles);
 
 		float getFloatInitializerValue(float& min, float& max);
 		Vector3 getVector3InitializerValue(Vector3& min, Vector3& max);

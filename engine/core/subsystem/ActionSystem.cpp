@@ -298,6 +298,27 @@ int ActionSystem::findUnusedParticle(PointParticlesComponent& particles, Particl
     return -1;
 }
 
+int ActionSystem::findUnusedParticle(ParticlesComponent& particles){
+
+    for (int i=particles.lastUsedParticle; i<particles.particles.size(); i++){
+        if (particles.particles[i].life <= particles.particles[i].time){
+            particles.lastUsedParticle = i;
+            return i;
+        }
+    }
+
+    if (particles.loop){
+        for (int i=0; i<particles.lastUsedParticle; i++){
+            if (particles.particles[i].life <= particles.particles[i].time){
+                particles.lastUsedParticle = i;
+                return i;
+            }
+        }
+    }
+
+    return -1;
+}
+
 float ActionSystem::getFloatInitializerValue(float& min, float& max){
     if (min != max) {
         return min + ((max - min) * (float) rand() / (float) RAND_MAX);
@@ -328,34 +349,34 @@ Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointPart
 
 void ActionSystem::applyParticleInitializers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
-    ParticleLifeInitializer& lifeInit = partanim.lifeInitializer;
+    PointParticleLifeInitializer& lifeInit = partanim.lifeInitializer;
     particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
 
-    ParticlePositionInitializer& posInit = partanim.positionInitializer;
+    PointParticlePositionInitializer& posInit = partanim.positionInitializer;
     particles.particles[idx].position = getVector3InitializerValue(posInit.minPosition, posInit.maxPosition);
 
-    ParticleVelocityInitializer& velInit = partanim.velocityInitializer;
+    PointParticleVelocityInitializer& velInit = partanim.velocityInitializer;
     particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
 
-    ParticleAccelerationInitializer& accInit = partanim.accelerationInitializer;
+    PointParticleAccelerationInitializer& accInit = partanim.accelerationInitializer;
     particles.particles[idx].acceleration = getVector3InitializerValue(accInit.minAcceleration, accInit.maxAcceleration);
 
-    ParticleColorInitializer& colInit = partanim.colorInitializer;
+    PointParticleColorInitializer& colInit = partanim.colorInitializer;
     particles.particles[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
     if (partanim.colorInitializer.useSRGB){
         particles.particles[idx].color = Color::sRGBToLinear(particles.particles[idx].color);
     }
 
-    ParticleAlphaInitializer& alpInit = partanim.alphaInitializer;
+    PointParticleAlphaInitializer& alpInit = partanim.alphaInitializer;
     particles.particles[idx].color.w = getFloatInitializerValue(alpInit.minAlpha, alpInit.maxAlpha);
 
-    ParticleSizeInitializer& sizeInit = partanim.sizeInitializer;
+    PointParticleSizeInitializer& sizeInit = partanim.sizeInitializer;
     particles.particles[idx].size = getFloatInitializerValue(sizeInit.minSize, sizeInit.maxSize);
 
-    ParticleSpriteInitializer& spriteInit = partanim.spriteInitializer;
+    PointParticleSpriteInitializer& spriteInit = partanim.spriteInitializer;
     particles.particles[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, particles);
 
-    ParticleRotationInitializer& rotInit = partanim.rotationInitializer;
+    PointParticleRotationInitializer& rotInit = partanim.rotationInitializer;
     particles.particles[idx].rotation = Angle::defaultToRad(getFloatInitializerValue(rotInit.minRotation, rotInit.maxRotation));
 
 }
@@ -394,28 +415,28 @@ void ActionSystem::applyParticleModifiers(size_t idx, PointParticlesComponent& p
     float value;
     float time;
 
-    ParticlePositionModifier& posMod = partanim.positionModifier;
+    PointParticlePositionModifier& posMod = partanim.positionModifier;
     time = getTimeFromParticleTime(particleTime, posMod.fromTime, posMod.toTime);
     value = posMod.function.call(time);
     if (value >= 0 && value <= 1){
         particles.particles[idx].position = getVector3ModifierValue(value, posMod.fromPosition, posMod.toPosition);
     }
 
-    ParticleVelocityModifier& velMod = partanim.velocityModifier;
+    PointParticleVelocityModifier& velMod = partanim.velocityModifier;
     time = getTimeFromParticleTime(particleTime, velMod.fromTime, velMod.toTime);
     value = velMod.function.call(time);
     if (value >= 0 && value <= 1){
         particles.particles[idx].velocity = getVector3ModifierValue(value, velMod.fromVelocity, velMod.toVelocity);
     }
 
-    ParticleAccelerationModifier& accMod = partanim.accelerationModifier;
+    PointParticleAccelerationModifier& accMod = partanim.accelerationModifier;
     time = getTimeFromParticleTime(particleTime, accMod.fromTime, accMod.toTime);
     value = accMod.function.call(time);
     if (value >= 0 && value <= 1){
         particles.particles[idx].acceleration = getVector3ModifierValue(value, accMod.fromAcceleration, accMod.toAcceleration);
     }
 
-    ParticleColorModifier& colMod = partanim.colorModifier;
+    PointParticleColorModifier& colMod = partanim.colorModifier;
     time = getTimeFromParticleTime(particleTime, colMod.fromTime, colMod.toTime);
     value = colMod.function.call(time);
     if (value >= 0 && value <= 1){
@@ -425,28 +446,28 @@ void ActionSystem::applyParticleModifiers(size_t idx, PointParticlesComponent& p
         }
     }
 
-    ParticleAlphaModifier& alpMod = partanim.alphaModifier;
+    PointParticleAlphaModifier& alpMod = partanim.alphaModifier;
     time = getTimeFromParticleTime(particleTime, alpMod.fromTime, alpMod.toTime);
     value = alpMod.function.call(time);
     if (value >= 0 && value <= 1){
         particles.particles[idx].color.w = getFloatModifierValue(value, alpMod.fromAlpha, alpMod.toAlpha);
     }
 
-    ParticleSizeModifier& sizeMod = partanim.sizeModifier;
+    PointParticleSizeModifier& sizeMod = partanim.sizeModifier;
     time = getTimeFromParticleTime(particleTime, sizeMod.fromTime, sizeMod.toTime);
     value = sizeMod.function.call(time);
     if (value >= 0 && value <= 1){
         particles.particles[idx].size = getFloatModifierValue(value, sizeMod.fromSize, sizeMod.toSize);
     }
 
-    ParticleSpriteModifier& spriteMod = partanim.spriteModifier;
+    PointParticleSpriteModifier& spriteMod = partanim.spriteModifier;
     time = getTimeFromParticleTime(particleTime, spriteMod.fromTime, spriteMod.toTime);
     value = spriteMod.function.call(time);
     if (value >= 0 && value <= 1){
         particles.particles[idx].textureRect = getSpriteModifierValue(value, spriteMod.frames, particles);
     }
 
-    ParticleRotationModifier& rotMod = partanim.rotationModifier;
+    PointParticleRotationModifier& rotMod = partanim.rotationModifier;
     time = getTimeFromParticleTime(particleTime, rotMod.fromTime, rotMod.toTime);
     value = rotMod.function.call(time);
     if (value >= 0 && value <= 1){

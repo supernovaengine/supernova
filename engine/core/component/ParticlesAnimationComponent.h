@@ -9,17 +9,17 @@
 
 namespace Supernova{
 
-    struct ParticleLifeInitializer{
+    struct PointParticleLifeInitializer{
         float minLife = 10;
         float maxLife = 10;
     };
 
-    struct ParticlePositionInitializer{
+    struct PointParticlePositionInitializer{
         Vector3 minPosition = Vector3(0,0,0);
         Vector3 maxPosition = Vector3(0,0,0);
     };
 
-    struct ParticlePositionModifier{
+    struct PointParticlePositionModifier{
         float fromTime = 0;
         float toTime = 0;
 
@@ -29,12 +29,12 @@ namespace Supernova{
         FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
-    struct ParticleVelocityInitializer{
+    struct PointParticleVelocityInitializer{
         Vector3 minVelocity = Vector3(0,0,0);
         Vector3 maxVelocity = Vector3(0,0,0);
     };
 
-    struct ParticleVelocityModifier{
+    struct PointParticleVelocityModifier{
         float fromTime = 0;
         float toTime = 0;
 
@@ -44,12 +44,12 @@ namespace Supernova{
         FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
-    struct ParticleAccelerationInitializer{
+    struct PointParticleAccelerationInitializer{
         Vector3 minAcceleration = Vector3(0,0,0);
         Vector3 maxAcceleration = Vector3(0,0,0);
     };
 
-    struct ParticleAccelerationModifier{
+    struct PointParticleAccelerationModifier{
         float fromTime = 0;
         float toTime = 0;
 
@@ -59,14 +59,14 @@ namespace Supernova{
         FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
-    struct ParticleColorInitializer{
+    struct PointParticleColorInitializer{
         Vector3 minColor = Vector3(1,1,1);
         Vector3 maxColor = Vector3(1,1,1);
 
         bool useSRGB = true;
     };
 
-    struct ParticleColorModifier{
+    struct PointParticleColorModifier{
         float fromTime = 0;
         float toTime = 0;
 
@@ -78,12 +78,12 @@ namespace Supernova{
         bool useSRGB = true;
     };
 
-    struct ParticleAlphaInitializer{
+    struct PointParticleAlphaInitializer{
         float minAlpha = 1;
         float maxAlpha = 1;
     };
 
-    struct ParticleAlphaModifier{
+    struct PointParticleAlphaModifier{
         float fromTime = 0;
         float toTime = 0;
 
@@ -93,12 +93,12 @@ namespace Supernova{
         FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
-    struct ParticleSizeInitializer{
+    struct PointParticleSizeInitializer{
         float minSize = 0;
         float maxSize = 0;
     };
 
-    struct ParticleSizeModifier{
+    struct PointParticleSizeModifier{
         float fromTime = 0;
         float toTime = 0;
 
@@ -108,11 +108,11 @@ namespace Supernova{
         FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
-    struct ParticleSpriteInitializer{
+    struct PointParticleSpriteInitializer{
         std::vector<int> frames;
     };
 
-    struct ParticleSpriteModifier{
+    struct PointParticleSpriteModifier{
         float fromTime = 0;
         float toTime = 0;
 
@@ -121,12 +121,12 @@ namespace Supernova{
         FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
     };
 
-    struct ParticleRotationInitializer{
+    struct PointParticleRotationInitializer{
         float minRotation = 0;
         float maxRotation = 0;
     };
 
-    struct ParticleRotationModifier{
+    struct PointParticleRotationModifier{
         float fromTime = 0;
         float toTime = 0;
 
@@ -146,31 +146,31 @@ namespace Supernova{
         int rate = 5; //per second
         int maxPerUpdate = 100;
 
-        ParticleLifeInitializer lifeInitializer;
+        PointParticleLifeInitializer lifeInitializer;
 
-        ParticlePositionInitializer positionInitializer;
-        ParticlePositionModifier positionModifier;
+        PointParticlePositionInitializer positionInitializer;
+        PointParticlePositionModifier positionModifier;
 
-        ParticleVelocityInitializer velocityInitializer;
-        ParticleVelocityModifier velocityModifier;
+        PointParticleVelocityInitializer velocityInitializer;
+        PointParticleVelocityModifier velocityModifier;
 
-        ParticleAccelerationInitializer accelerationInitializer;
-        ParticleAccelerationModifier accelerationModifier;
+        PointParticleAccelerationInitializer accelerationInitializer;
+        PointParticleAccelerationModifier accelerationModifier;
 
-        ParticleColorInitializer colorInitializer;
-        ParticleColorModifier colorModifier;
+        PointParticleColorInitializer colorInitializer;
+        PointParticleColorModifier colorModifier;
 
-        ParticleAlphaInitializer alphaInitializer;
-        ParticleAlphaModifier alphaModifier;
+        PointParticleAlphaInitializer alphaInitializer;
+        PointParticleAlphaModifier alphaModifier;
 
-        ParticleSizeInitializer sizeInitializer;
-        ParticleSizeModifier sizeModifier;
+        PointParticleSizeInitializer sizeInitializer;
+        PointParticleSizeModifier sizeModifier;
 
-        ParticleSpriteInitializer spriteInitializer;
-        ParticleSpriteModifier spriteModifier;
+        PointParticleSpriteInitializer spriteInitializer;
+        PointParticleSpriteModifier spriteModifier;
 
-        ParticleRotationInitializer rotationInitializer;
-        ParticleRotationModifier rotationModifier;
+        PointParticleRotationInitializer rotationInitializer;
+        PointParticleRotationModifier rotationModifier;
     };
 
 }

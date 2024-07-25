@@ -2003,7 +2003,7 @@ void RenderSystem::updateParticles(PointParticlesComponent& particles, Transform
 	}
 
 	if (sortTransparentParticles){
-		auto comparePoints = [&transform, &camTransform](const ParticleShaderData& a, const ParticleShaderData& b) -> bool {
+		auto comparePoints = [&transform, &camTransform](const PointParticleShaderData& a, const PointParticleShaderData& b) -> bool {
 			float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
 			float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
 			return distanceToCameraA > distanceToCameraB;
@@ -2012,7 +2012,7 @@ void RenderSystem::updateParticles(PointParticlesComponent& particles, Transform
 	}
 
 	if (particles.numVisible > 0){
-		particles.buffer.setData((unsigned char*)(&particles.shaderParticles.at(0)), sizeof(ParticleShaderData)*particles.numVisible);
+		particles.buffer.setData((unsigned char*)(&particles.shaderParticles.at(0)), sizeof(PointParticleShaderData)*particles.numVisible);
 	}else{
 		particles.buffer.setData((unsigned char*)nullptr, 0);
 	}
