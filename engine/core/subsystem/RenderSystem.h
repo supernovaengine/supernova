@@ -154,10 +154,13 @@ namespace Supernova{
 		
 		void updateSkyViewProjection(SkyComponent& sky, CameraComponent& camera);
 		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);
-		void updateParticles(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentParticles);
+		void updateParticles(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform);
 		void updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 		void updateCameraFrustumPlanes(const Matrix4 viewProjectionMatrix, Plane* frustumPlanes);
-		void updateInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentInstances);
+		void updateInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform);
+
+		void sortParticles(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform);
+		void sortInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform);
 
 	public:
 

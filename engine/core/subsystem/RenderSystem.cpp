@@ -1979,7 +1979,7 @@ void RenderSystem::updateSkyViewProjection(SkyComponent& sky, CameraComponent& c
 	sky.needUpdateSky = false;
 }
 
-void RenderSystem::updateParticles(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentParticles){
+void RenderSystem::updateParticles(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform){
 	particles.shaderParticles.clear();
 	particles.shaderParticles.reserve(particles.particles.size());
 
@@ -2002,20 +2002,23 @@ void RenderSystem::updateParticles(PointParticlesComponent& particles, Transform
 		}
 	}
 
-	if (sortTransparentParticles){
-		auto comparePoints = [&transform, &camTransform](const PointParticleShaderData& a, const PointParticleShaderData& b) -> bool {
-			float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
-			float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
-			return distanceToCameraA > distanceToCameraB;
-		};
-		std::sort(particles.shaderParticles.begin(), particles.shaderParticles.end(), comparePoints);
-	}
-
 	if (particles.numVisible > 0){
 		particles.buffer.setData((unsigned char*)(&particles.shaderParticles.at(0)), sizeof(PointParticleShaderData)*particles.numVisible);
 	}else{
 		particles.buffer.setData((unsigned char*)nullptr, 0);
 	}
+
+	if (particles.loaded)
+		particles.needUpdateBuffer = true;
+}
+
+void RenderSystem::sortParticles(PointParticlesComponent& particles, Transform& transform, CameraComponent& camera, Transform& camTransform){
+	auto comparePoints = [&transform, &camTransform](const PointParticleShaderData& a, const PointParticleShaderData& b) -> bool {
+		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
+		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
+		return distanceToCameraA > distanceToCameraB;
+	};
+	std::sort(particles.shaderParticles.begin(), particles.shaderParticles.end(), comparePoints);
 
 	if (particles.loaded)
 		particles.needUpdateBuffer = true;
@@ -2246,7 +2249,7 @@ void RenderSystem::updateCameraFrustumPlanes(const Matrix4 viewProjectionMatrix,
     }
 }
 
-void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool sortTransparentInstances){
+void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform){
 	instmesh.shaderInstances.clear();
 	instmesh.shaderInstances.reserve(instmesh.instances.size());
 
@@ -2260,18 +2263,6 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 		//}
 	}
 
-	if (sortTransparentInstances){
-		auto comparePoints = [&transform, &camTransform](const InstanceData& a, const InstanceData& b) -> bool {
-			Vector3 positionA = Vector3(a.instanceMatrix[3][0], a.instanceMatrix[3][1], a.instanceMatrix[3][2]);
-			Vector3 positionB = Vector3(b.instanceMatrix[3][0], b.instanceMatrix[3][1], b.instanceMatrix[3][2]);
-
-			float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * positionA)).length();
-			float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * positionB)).length();
-			return distanceToCameraA > distanceToCameraB;
-		};
-		std::sort(instmesh.shaderInstances.begin(), instmesh.shaderInstances.end(), comparePoints);
-	}
-
 	if (instmesh.numVisible > 0){
 		instmesh.buffer.setData((unsigned char*)(&instmesh.shaderInstances.at(0)), sizeof(InstanceData)*instmesh.numVisible);
 	}else{
@@ -2280,7 +2271,21 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 
 	if (mesh.loaded)
 		instmesh.needUpdateBuffer = true;
+}
 
+void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform){
+	auto comparePoints = [&transform, &camTransform](const InstanceData& a, const InstanceData& b) -> bool {
+		Vector3 positionA = Vector3(a.instanceMatrix[3][0], a.instanceMatrix[3][1], a.instanceMatrix[3][2]);
+		Vector3 positionB = Vector3(b.instanceMatrix[3][0], b.instanceMatrix[3][1], b.instanceMatrix[3][2]);
+
+		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * positionA)).length();
+		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * positionB)).length();
+		return distanceToCameraA > distanceToCameraB;
+	};
+	std::sort(instmesh.shaderInstances.begin(), instmesh.shaderInstances.end(), comparePoints);
+
+	if (mesh.loaded)
+		instmesh.needUpdateBuffer = true;
 }
 
 void RenderSystem::configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera){
@@ -2732,11 +2737,17 @@ void RenderSystem::update(double dt){
 			InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
 			if (instmesh){
 				bool sortTransparentInstances = mesh.transparent && mainCamera.type != CameraType::CAMERA_2D;
+
+				if (instmesh->needUpdateInstances){
+					updateInstancedMesh(*instmesh, mesh, transform, mainCamera, mainCameraTransform);
+				}
+
 				if (instmesh->needUpdateInstances || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentInstances)){
 					if (!hasMultipleCameras || !sortTransparentInstances){
-						updateInstancedMesh(*instmesh, mesh, transform, mainCamera, mainCameraTransform, sortTransparentInstances);
+						sortInstancedMesh(*instmesh, mesh, transform, mainCamera, mainCameraTransform);
 					}
 				}
+
 				instmesh->needUpdateInstances = false;
 			}
 			if (mesh.loaded && mesh.needReload){
@@ -2848,9 +2859,13 @@ void RenderSystem::update(double dt){
 
 			bool sortTransparentParticles = particles.transparent && mainCamera.type != CameraType::CAMERA_2D;
 
+			if (particles.needUpdate){
+				updateParticles(particles, transform, mainCamera, mainCameraTransform);
+			}
+
 			if (particles.needUpdate || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentParticles)){
 				if (!hasMultipleCameras || !sortTransparentParticles){
-					updateParticles(particles, transform, mainCamera, mainCameraTransform, sortTransparentParticles);
+					sortParticles(particles, transform, mainCamera, mainCameraTransform);
 				}
 			}
 
@@ -3029,7 +3044,7 @@ void RenderSystem::draw(){
 						bool sortTransparentInstances = mesh.transparent && camera.type != CameraType::CAMERA_2D;
 
 						if (hasMultipleCameras && sortTransparentInstances){
-							updateInstancedMesh(*instmesh, mesh, transform, camera, cameraTransform, sortTransparentInstances);
+							sortInstancedMesh(*instmesh, mesh, transform, camera, cameraTransform);
 						}
 					}
 
@@ -3068,7 +3083,7 @@ void RenderSystem::draw(){
 				bool sortTransparentParticles = particles.transparent && camera.type != CameraType::CAMERA_2D;
 
 				if (hasMultipleCameras && sortTransparentParticles){
-					updateParticles(particles, transform, camera, cameraTransform, sortTransparentParticles);
+					sortParticles(particles, transform, camera, cameraTransform);
 				}
 
 				if (transform.visible)

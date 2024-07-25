@@ -18,7 +18,7 @@ namespace Supernova{
         std::vector<InstanceData> instances;
         std::vector<InstanceData> shaderInstances; //must be sorted
 
-        unsigned int maxInstances = 100;
+        unsigned int maxInstances = 1000;
         unsigned int numVisible = 0;
 
         bool needUpdateBuffer = false;
