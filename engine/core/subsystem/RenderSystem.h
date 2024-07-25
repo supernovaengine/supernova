@@ -130,7 +130,7 @@ namespace Supernova{
 	protected:
 
 		bool drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture);
-		bool drawMeshDepth(MeshComponent& mesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams);
+		bool drawMeshDepth(MeshComponent& mesh, InstancedMeshComponent* instmesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams);
 		void destroyMesh(Entity entity, MeshComponent& mesh);
 
 		bool drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture);
@@ -164,7 +164,7 @@ namespace Supernova{
 		RenderSystem(Scene* scene);
 		virtual ~RenderSystem();
 
-		bool loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipelines, bool instanced);
+		bool loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshComponent* instmesh, uint8_t pipelines);
 		bool loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t pipelines);
 		bool loadParticles(Entity entity, ParticlesComponent& particles, uint8_t pipelines);
 		bool loadLines(Entity entity, LinesComponent& lines, uint8_t pipelines);

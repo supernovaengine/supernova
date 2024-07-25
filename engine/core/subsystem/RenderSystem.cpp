@@ -498,7 +498,7 @@ void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& sh
 		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 }
 
-bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipelines, bool instanced){
+bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshComponent* instmesh, uint8_t pipelines){
 
 	if (!Engine::isViewLoaded()) 
 		return false;
@@ -542,6 +542,26 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		buf.second->getRender()->createBuffer(buf.second->getSize(), buf.second->getData(), buf.second->getType(), buf.second->getUsage());
 		bufferNameToRender[buf.first] = buf.second->getRender();
 		bufferStride[buf.first] = buf.second->getStride();
+	}
+
+	if (instmesh){
+		instmesh->buffer.clear();
+		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL1, 4, 0, true);
+		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL2, 4, 4 * sizeof(float), true);
+		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL3, 4, 8 * sizeof(float), true);
+		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL4, 4, 12 * sizeof(float), true);
+		instmesh->buffer.setStride(16 * sizeof(float));
+
+		instmesh->buffer.setRenderAttributes(false);
+		instmesh->buffer.setInstanceBuffer(true);
+		instmesh->buffer.setUsage(BufferUsage::STREAM);
+
+		// Now buffer size is zero than it needed to be calculated
+		size_t bufferSize = instmesh->maxInstances * instmesh->buffer.getStride();
+
+		instmesh->buffer.getRender()->createBuffer(bufferSize, instmesh->buffer.getData(), instmesh->buffer.getType(), instmesh->buffer.getUsage());
+
+		instmesh->needUpdateBuffer = true;
 	}
 
 	for (int i = 0; i < mesh.numSubmeshes; i++){
@@ -649,11 +669,11 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 						p_castShadows, p_shadowsPCF, p_hasNormal, p_hasNormalMap, 
 						p_hasTangent, false, mesh.submeshes[i].hasVertexColor4, mesh.submeshes[i].hasTextureRect, 
 						hasFog, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent,
-						false, instanced);
+						false, (instmesh)?true:false);
 		mesh.submeshes[i].shader = ShaderPool::get(ShaderType::MESH, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
 			mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(
-				mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent, false);
+				mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent, false, (instmesh)?true:false);
 			mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, mesh.submeshes[i].depthShaderProperties);
 			if (!mesh.submeshes[i].depthShader->isCreated())
 				return false;
@@ -662,31 +682,6 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			return false;
 		render.addShader(mesh.submeshes[i].shader.get());
 		ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
-
-		if (instanced){
-			InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(entity);
-
-			instmesh.buffer.clear();
-			instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL1, 4, 0, true);
-			instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL2, 4, 4, true);
-			instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL3, 4, 8, true);
-			instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL4, 4, 12, true);
-			instmesh.buffer.setStride(16 * sizeof(float));
-
-			instmesh.buffer.setRenderAttributes(false);
-			instmesh.buffer.setInstanceBuffer(true);
-			instmesh.buffer.setUsage(BufferUsage::STREAM);
-
-			// Now buffer size is zero than it needed to be calculated
-			size_t bufferSize = instmesh.maxInstances * instmesh.buffer.getStride();
-
-			instmesh.buffer.getRender()->createBuffer(bufferSize, instmesh.buffer.getData(), instmesh.buffer.getType(), instmesh.buffer.getUsage());
-			for (auto const &attr : instmesh.buffer.getAttributes()) {
-				render.addAttribute(shaderData.getAttrIndex(attr.first), instmesh.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), instmesh.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
-			}
-
-			instmesh.needUpdateBuffer = true;
-		}
 
 		mesh.submeshes[i].slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
 		mesh.submeshes[i].slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
@@ -746,6 +741,12 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 				}
 			}else{
 				Log::error("Cannot load submesh attribute from buffer name: %s", attr.second.getBuffer().c_str());
+			}
+		}
+
+		if (instmesh){
+			for (auto const &attr : instmesh->buffer.getAttributes()) {
+				render.addAttribute(shaderData.getAttrIndex(attr.first), instmesh->buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), instmesh->buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 			}
 		}
 
@@ -835,6 +836,12 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 					}
 				}else{
 					Log::error("Cannot load (depth) submesh attribute from buffer name: %s", attr.second.getBuffer().c_str());
+				}
+			}
+
+			if (instmesh){
+				for (auto const &attr : instmesh->buffer.getAttributes()) {
+					depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), instmesh->buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), instmesh->buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 				}
 			}
 
@@ -944,7 +951,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmes
 	return true;
 }
 
-bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams){
+bool RenderSystem::drawMeshDepth(MeshComponent& mesh, InstancedMeshComponent* instmesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams){
 	if (mesh.loaded && mesh.castShadows){
 
 		if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(cameraFar, frustumPlanes, mesh.worldAABB)) {
@@ -957,6 +964,11 @@ bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, con
 			if (!depthRender.beginDraw(PIP_DEPTH)){
 				mesh.needReload = true;
 				return false;
+			}
+
+			unsigned int instanceCount = 1;
+			if (instmesh){
+				instanceCount = instmesh->numVisible;
 			}
 
 			//model, mvp matrix
@@ -973,7 +985,7 @@ bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, con
 				}
 			}
 
-			depthRender.draw(mesh.submeshes[i].vertexCount, 1);
+			depthRender.draw(mesh.submeshes[i].vertexCount, instanceCount);
 		}
 	}
 
@@ -1083,7 +1095,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 	terrain.shader = ShaderPool::get(ShaderType::MESH, terrain.shaderProperties);
 	if (hasShadows && terrain.castShadows){
 		terrain.depthShaderProperties = ShaderPool::getDepthMeshProperties(
-			false, false, false, false, true);
+			false, false, false, false, true, false);
 		terrain.depthShader = ShaderPool::get(ShaderType::DEPTH, terrain.depthShaderProperties);
 		if (!terrain.depthShader->isCreated())
 			return false;
@@ -2716,15 +2728,22 @@ void RenderSystem::update(double dt){
 
 		if (signature.test(scene->getComponentType<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-			bool instanced = false;
-			if (signature.test(scene->getComponentType<InstancedMeshComponent>())){
-				instanced = true;
+
+			InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
+			if (instmesh){
+				bool sortTransparentInstances = mesh.transparent && mainCamera.type != CameraType::CAMERA_2D;
+				if (instmesh->needUpdateInstances || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentInstances)){
+					if (!hasMultipleCameras || !sortTransparentInstances){
+						updateInstancedMesh(*instmesh, mesh, transform, mainCamera, mainCameraTransform, sortTransparentInstances);
+					}
+				}
+				instmesh->needUpdateInstances = false;
 			}
 			if (mesh.loaded && mesh.needReload){
 				destroyMesh(entity, mesh);
 			}
 			if (!mesh.loadCalled){
-				loadMesh(entity, mesh, pipelines, instanced);
+				loadMesh(entity, mesh, instmesh, pipelines);
 			}
 		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
 			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
@@ -2800,19 +2819,6 @@ void RenderSystem::update(double dt){
 				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
 				mesh.worldAABB = transform.localMatrix * mesh.aabb;
-
-				if (signature.test(scene->getComponentType<InstancedMeshComponent>())){
-					InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(entity);
-
-					bool sortTransparentInstances = mesh.transparent && mainCamera.type != CameraType::CAMERA_2D;
-
-					if (instmesh.needUpdateInstances || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentInstances)){
-						if (!hasMultipleCameras || !sortTransparentInstances){
-							updateInstancedMesh(instmesh, mesh, transform, mainCamera, mainCameraTransform, sortTransparentInstances);
-						}
-					}
-
-				}
 			}
 
 			if (signature.test(scene->getComponentType<ModelComponent>())){
@@ -2905,7 +2911,8 @@ void RenderSystem::draw(){
 
 						if (transform){
 							if (transform->visible){
-								drawMeshDepth(mesh, light.cameras[c].nearFar.y, light.cameras[c].frustumPlanes, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
+								InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
+								drawMeshDepth(mesh, instmesh, light.cameras[c].nearFar.y, light.cameras[c].frustumPlanes, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
 							}
 						}
 					}
@@ -3016,11 +3023,21 @@ void RenderSystem::draw(){
 				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
 				if (transform.visible){
+
+					InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
+					if (instmesh){
+						bool sortTransparentInstances = mesh.transparent && camera.type != CameraType::CAMERA_2D;
+
+						if (hasMultipleCameras && sortTransparentInstances){
+							updateInstancedMesh(*instmesh, mesh, transform, camera, cameraTransform, sortTransparentInstances);
+						}
+					}
+
 					if (!mesh.transparent || !camera.transparentSort){
 						//Draw opaque meshes if transparency is not necessary
-						drawMesh(mesh, scene->findComponent<InstancedMeshComponent>(entity), transform, camera, cameraTransform, camera.renderToTexture);
+						drawMesh(mesh, instmesh, transform, camera, cameraTransform, camera.renderToTexture);
 					}else{
-						transparentMeshes.push({&mesh, scene->findComponent<InstancedMeshComponent>(entity), &transform, transform.distanceToCamera});
+						transparentMeshes.push({&mesh, instmesh, &transform, transform.distanceToCamera});
 					}
 				}
 

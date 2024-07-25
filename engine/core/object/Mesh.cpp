@@ -22,8 +22,8 @@ bool Mesh::load(){
 
     InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
 
-    //TODO: check mesh pipelines and instanced before call
-    return scene->getSystem<RenderSystem>()->loadMesh(entity, mesh, PIP_DEFAULT | PIP_RTT, instmesh?true:false);
+    //TODO: check mesh pipelines before call
+    return scene->getSystem<RenderSystem>()->loadMesh(entity, mesh, instmesh, PIP_DEFAULT | PIP_RTT);
 }
 
 void Mesh::setTexture(std::string path){
