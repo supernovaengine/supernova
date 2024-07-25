@@ -2250,21 +2250,25 @@ void RenderSystem::updateCameraFrustumPlanes(const Matrix4 viewProjectionMatrix,
 }
 
 void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform){
-	instmesh.shaderInstances.clear();
-	instmesh.shaderInstances.reserve(instmesh.instances.size());
+	instmesh.renderInstances.clear();
+	instmesh.renderInstances.reserve(instmesh.instances.size());
 
 	instmesh.numVisible = 0;
 	size_t instancesSize = (instmesh.instances.size() < instmesh.maxInstances)? instmesh.instances.size() : instmesh.maxInstances;
 	for (int i = 0; i < instancesSize; i++){
 		//if (instmesh.instances[i].life > particles.particles[i].time){
-		instmesh.shaderInstances.push_back({});
-		instmesh.shaderInstances[instmesh.numVisible].instanceMatrix = instmesh.instances[i].instanceMatrix;
+		Matrix4 translateMatrix = Matrix4::translateMatrix(instmesh.instances[i].position);
+		Matrix4 rotationMatrix = instmesh.instances[i].rotation.getRotationMatrix();
+		Matrix4 scaleMatrix = Matrix4::scaleMatrix(instmesh.instances[i].scale);
+
+		instmesh.renderInstances.push_back({});
+		instmesh.renderInstances[instmesh.numVisible].instanceMatrix = translateMatrix * rotationMatrix * scaleMatrix;
 		instmesh.numVisible++;
 		//}
 	}
 
 	if (instmesh.numVisible > 0){
-		instmesh.buffer.setData((unsigned char*)(&instmesh.shaderInstances.at(0)), sizeof(InstanceData)*instmesh.numVisible);
+		instmesh.buffer.setData((unsigned char*)(&instmesh.renderInstances.at(0)), sizeof(InstanceRenderData)*instmesh.numVisible);
 	}else{
 		instmesh.buffer.setData((unsigned char*)nullptr, 0);
 	}
@@ -2274,7 +2278,7 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 }
 
 void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform){
-	auto comparePoints = [&transform, &camTransform](const InstanceData& a, const InstanceData& b) -> bool {
+	auto comparePoints = [&transform, &camTransform](const InstanceRenderData& a, const InstanceRenderData& b) -> bool {
 		Vector3 positionA = Vector3(a.instanceMatrix[3][0], a.instanceMatrix[3][1], a.instanceMatrix[3][2]);
 		Vector3 positionB = Vector3(b.instanceMatrix[3][0], b.instanceMatrix[3][1], b.instanceMatrix[3][2]);
 
@@ -2282,7 +2286,7 @@ void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshCompo
 		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * positionB)).length();
 		return distanceToCameraA > distanceToCameraB;
 	};
-	std::sort(instmesh.shaderInstances.begin(), instmesh.shaderInstances.end(), comparePoints);
+	std::sort(instmesh.renderInstances.begin(), instmesh.renderInstances.end(), comparePoints);
 
 	if (mesh.loaded)
 		instmesh.needUpdateBuffer = true;

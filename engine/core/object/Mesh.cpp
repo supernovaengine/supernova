@@ -130,11 +130,7 @@ void Mesh::removeInstances(){
 void Mesh::addInstance(Vector3 position, Quaternion rotation, Vector3 scale){
     InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
-    Matrix4 translateMatrix = Matrix4::translateMatrix(position);
-    Matrix4 rotationMatrix = rotation.getRotationMatrix();
-    Matrix4 scaleMatrix = Matrix4::scaleMatrix(scale);
-
-    instmesh.instances.push_back({translateMatrix * rotationMatrix * scaleMatrix});
+    instmesh.instances.push_back({position, rotation, scale});
 
     instmesh.needUpdateInstances = true;
 }

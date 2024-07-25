@@ -386,8 +386,7 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
     particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
 
     ParticlePositionInitializer& posInit = particles.positionInitializer;
-    Vector4 pos = instmesh.instances[idx].instanceMatrix.column(3);
-    instmesh.instances[idx].instanceMatrix.setColumn(3, Vector4(getVector3InitializerValue(posInit.minPosition, posInit.maxPosition), pos.w));
+    instmesh.instances[idx].position = getVector3InitializerValue(posInit.minPosition, posInit.maxPosition);
 
     ParticleVelocityInitializer& velInit = particles.velocityInitializer;
     particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
