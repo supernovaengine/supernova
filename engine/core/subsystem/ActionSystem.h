@@ -80,9 +80,12 @@ namespace Supernova{
 		Vector3 getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue);
 		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, PointParticlesComponent& particles);
 		void applyParticleModifiers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim);
+		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 
 		void particleActionStart(ParticlesAnimationComponent& partanim, PointParticlesComponent& particles);
+		void particleActionStart(ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, PointParticlesComponent& particles);
+		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 
 		//Keyframe
 		void keyframeUpdate(double dt, ActionComponent& action, KeyframeTracksComponent& keyframe);

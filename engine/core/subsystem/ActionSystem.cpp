@@ -35,6 +35,16 @@ void ActionSystem::actionStart(Entity entity){
             }
         }
 
+        if (signature.test(scene->getComponentType<ParticlesComponent>())){
+            ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+            if (targetSignature.test(scene->getComponentType<InstancedMeshComponent>()) ){
+                InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(action.target);
+
+                particleActionStart(particles, instmesh);
+
+            }
+        }
+
         if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
             ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
             if (targetSignature.test(scene->getComponentType<PointParticlesComponent>()) ){
@@ -443,7 +453,6 @@ Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames
 }
 
 void ActionSystem::applyParticleModifiers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim){
-
     float particleTime = particles.particles[idx].time;
     float value;
     float time;
@@ -508,6 +517,72 @@ void ActionSystem::applyParticleModifiers(size_t idx, PointParticlesComponent& p
     }
 }
 
+void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
+    float particleTime = particles.particles[idx].time;
+    float value;
+    float time;
+
+    ParticlePositionModifier& posMod = particles.positionModifier;
+    time = getTimeFromParticleTime(particleTime, posMod.fromTime, posMod.toTime);
+    value = posMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        instmesh.instances[idx].position = getVector3ModifierValue(value, posMod.fromPosition, posMod.toPosition);
+    }
+
+    ParticleVelocityModifier& velMod = particles.velocityModifier;
+    time = getTimeFromParticleTime(particleTime, velMod.fromTime, velMod.toTime);
+    value = velMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].velocity = getVector3ModifierValue(value, velMod.fromVelocity, velMod.toVelocity);
+    }
+
+    ParticleAccelerationModifier& accMod = particles.accelerationModifier;
+    time = getTimeFromParticleTime(particleTime, accMod.fromTime, accMod.toTime);
+    value = accMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].acceleration = getVector3ModifierValue(value, accMod.fromAcceleration, accMod.toAcceleration);
+    }
+    /*
+    ParticleColorModifier& colMod = partanim.colorModifier;
+    time = getTimeFromParticleTime(particleTime, colMod.fromTime, colMod.toTime);
+    value = colMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].color = getVector3ModifierValue(value, colMod.fromColor, colMod.toColor);
+        if (partanim.colorModifier.useSRGB){
+            particles.particles[idx].color = Color::sRGBToLinear(particles.particles[idx].color);
+        }
+    }
+
+    ParticleAlphaModifier& alpMod = partanim.alphaModifier;
+    time = getTimeFromParticleTime(particleTime, alpMod.fromTime, alpMod.toTime);
+    value = alpMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].color.w = getFloatModifierValue(value, alpMod.fromAlpha, alpMod.toAlpha);
+    }
+
+    ParticleSizeModifier& sizeMod = partanim.sizeModifier;
+    time = getTimeFromParticleTime(particleTime, sizeMod.fromTime, sizeMod.toTime);
+    value = sizeMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].size = getFloatModifierValue(value, sizeMod.fromSize, sizeMod.toSize);
+    }
+
+    ParticleSpriteModifier& spriteMod = partanim.spriteModifier;
+    time = getTimeFromParticleTime(particleTime, spriteMod.fromTime, spriteMod.toTime);
+    value = spriteMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].textureRect = getSpriteModifierValue(value, spriteMod.frames, particles);
+    }
+
+    ParticleRotationModifier& rotMod = partanim.rotationModifier;
+    time = getTimeFromParticleTime(particleTime, rotMod.fromTime, rotMod.toTime);
+    value = rotMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].rotation = Angle::defaultToRad(getFloatModifierValue(value, rotMod.fromRotation, rotMod.toRotation));
+    }
+    */
+}
+
 void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, PointParticlesComponent& particles){
     if (partanim.sizeInitializer.minSize == 0 && partanim.sizeInitializer.maxSize == 0){
         float size = std::max(particles.texture.getWidth(), particles.texture.getHeight());
@@ -526,6 +601,31 @@ void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, Po
     partanim.emitter = true;
     partanim.newParticlesCount = 0;
     partanim.lastUsedParticle = 0;
+}
+
+void ActionSystem::particleActionStart(ParticlesComponent& particles, InstancedMeshComponent& instmesh){
+    //if (particles.sizeInitializer.minSize == 0 && particles.sizeInitializer.maxSize == 0){
+        //float size = std::max(particles.texture.getWidth(), particles.texture.getHeight());
+        //partanim.sizeInitializer.minSize = size;
+        //partanim.sizeInitializer.maxSize = size;
+    //}
+
+    // Creating particles
+    particles.particles.clear();
+    instmesh.instances.clear();
+    for (int i = 0; i < particles.maxParticles; i++){
+        particles.particles.push_back({});
+        particles.particles.back().life = 0;
+        particles.particles.back().time = 0;
+
+        instmesh.instances.push_back({});
+
+        instmesh.needUpdateInstances = true;
+    }
+
+    particles.emitter = true;
+    particles.newParticlesCount = 0;
+    particles.lastUsedParticle = 0;
 }
 
 void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, PointParticlesComponent& particles){
@@ -583,6 +683,66 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
     }
 
     if (!existParticles && !partanim.emitter){
+        actionStop(entity);
+        //onFinish.call(object);
+    }
+}
+
+void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
+    if (particles.emitter){
+        particles.newParticlesCount += dt * particles.rate;
+
+        int newparticles = (int)particles.newParticlesCount;
+        particles.newParticlesCount -= newparticles;
+        if (newparticles > particles.maxPerUpdate)
+            newparticles = particles.maxPerUpdate;
+
+        for(int i=0; i<newparticles; i++){
+            int particleIndex = findUnusedParticle(particles);
+
+            if (particleIndex >= 0){
+                particles.particles[particleIndex].time = 0;
+                applyParticleInitializers(particleIndex, particles, instmesh);
+                instmesh.needUpdateInstances = true;
+            }else{
+                if (!particles.loop)
+                    particles.emitter = false;
+                break;
+            }
+        }
+    }
+
+    bool existParticles = false;
+    for(int i=0; i<particles.particles.size(); i++){
+
+        float life = particles.particles[i].life;
+        float time = particles.particles[i].time;
+
+        if(life > time){
+
+            applyParticleModifiers(i, particles, instmesh);
+
+            Vector3 velocity = particles.particles[i].velocity;
+            Vector3 position = instmesh.instances[i].position;
+            Vector3 acceleration = particles.particles[i].acceleration;
+
+            velocity += acceleration * dt * 0.5f;
+            position += velocity * dt;
+            time += dt;
+
+            particles.particles[i].time = time;
+            particles.particles[i].velocity = velocity;
+            instmesh.instances[i].position = position;
+
+            existParticles = true;
+
+            instmesh.needUpdateInstances = true;
+
+            //printf("1.Particle %i life %f time %f position %f %f %f\n", i, life, time, position.x, position.y, position.z);
+        }
+    }
+
+    if (!existParticles && !particles.emitter){
         actionStop(entity);
         //onFinish.call(object);
     }
@@ -760,6 +920,16 @@ void ActionSystem::update(double dt){
             }
 
             //Particles
+            if (signature.test(scene->getComponentType<ParticlesComponent>())){
+                ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+
+                if (targetSignature.test(scene->getComponentType<InstancedMeshComponent>())){
+                    InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(action.target);
+
+                    particlesActionUpdate(dt, entity, action, particles, instmesh);
+                    if (action.state != ActionState::Running) continue;
+                }
+            }
             if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
                 ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
 
