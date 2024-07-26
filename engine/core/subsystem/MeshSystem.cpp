@@ -2380,7 +2380,12 @@ void MeshSystem::createInstancedMesh(Entity entity){
 
     if (!signature.test(scene->getComponentType<InstancedMeshComponent>())){
         scene->addComponent<InstancedMeshComponent>(entity, {});
-        //loadBody3D(entity);
+
+        if (signature.test(scene->getComponentType<MeshComponent>())){
+            MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+            if (mesh.loaded)
+                mesh.needReload = true;
+        }
     }
 }
 
@@ -2390,6 +2395,12 @@ void MeshSystem::removeInstancedMesh(Entity entity){
     if (signature.test(scene->getComponentType<InstancedMeshComponent>())){
         //destroyInstancedMesh(scene->getComponent<Body3DComponent>(entity));
         scene->removeComponent<InstancedMeshComponent>(entity);
+
+        if (signature.test(scene->getComponentType<MeshComponent>())){
+            MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+            if (mesh.loaded)
+                mesh.needReload = true;
+        }
     }
 }
 

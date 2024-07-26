@@ -37,6 +37,13 @@ void ActionSystem::actionStart(Entity entity){
 
         if (signature.test(scene->getComponentType<ParticlesComponent>())){
             ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
+            if (targetSignature.test(scene->getComponentType<MeshComponent>()) && !targetSignature.test(scene->getComponentType<InstancedMeshComponent>())){
+                MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
+                scene->addComponent<InstancedMeshComponent>(action.target, {});
+                targetSignature = scene->getSignature(action.target);
+                if (mesh.loaded)
+                    mesh.needReload = true;
+            }
             if (targetSignature.test(scene->getComponentType<InstancedMeshComponent>()) ){
                 InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(action.target);
 
