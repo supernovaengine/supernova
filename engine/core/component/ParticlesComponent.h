@@ -152,7 +152,6 @@ namespace Supernova{
         std::vector<ParticleData> particles;
 
         unsigned int maxParticles = 100;
-        unsigned int numVisible = 0;
 
         // animation
         float newParticlesCount = 0;

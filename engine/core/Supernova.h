@@ -58,6 +58,7 @@
 #include "component/PanelComponent.h"
 #include "component/ParticlesAnimationComponent.h"
 #include "component/ParticlesComponent.h"
+#include "component/PointsComponent.h"
 #include "component/PointParticlesComponent.h"
 #include "component/PolygonComponent.h"
 #include "component/PositionActionComponent.h"

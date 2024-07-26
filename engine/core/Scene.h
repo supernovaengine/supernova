@@ -32,6 +32,7 @@
 #include "component/ColorActionComponent.h"
 #include "component/AlphaActionComponent.h"
 #include "component/ParticlesComponent.h"
+#include "component/PointsComponent.h"
 #include "component/PointParticlesComponent.h"
 #include "component/ParticlesAnimationComponent.h"
 #include "component/LinesComponent.h"

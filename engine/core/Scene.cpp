@@ -40,6 +40,7 @@ Scene::Scene(){
 	registerComponent<ColorActionComponent>();
 	registerComponent<AlphaActionComponent>();
 	registerComponent<ParticlesComponent>();
+	registerComponent<PointsComponent>();
 	registerComponent<PointParticlesComponent>();
 	registerComponent<ParticlesAnimationComponent>();
 	registerComponent<LinesComponent>();
