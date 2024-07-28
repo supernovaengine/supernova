@@ -34,6 +34,7 @@ namespace Supernova{
 
         FrameData framesRect[MAX_SPRITE_FRAMES];
 
+        unsigned int maxPoints = 100;
         unsigned int numVisible = 0;
 
         ObjectRender render;

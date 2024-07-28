@@ -17,14 +17,14 @@ namespace Supernova{
 
         bool load();
 
-        void setMaxParticles(unsigned int maxParticles);
-        unsigned int getMaxParticles() const;
+        void setMaxPoints(unsigned int maxPoints);
+        unsigned int getMaxPoints() const;
 
-        void addParticle(Vector3 position);
-        void addParticle(Vector3 position, Vector4 color);
-        void addParticle(Vector3 position, Vector4 color, float size, float rotation);
-        void addParticle(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect);
-        void addParticle(float x, float y, float z);
+        void addPoint(Vector3 position);
+        void addPoint(Vector3 position, Vector4 color);
+        void addPoint(Vector3 position, Vector4 color, float size, float rotation);
+        void addPoint(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect);
+        void addPoint(float x, float y, float z);
 
         void addSpriteFrame(int id, std::string name, Rect rect);
         void addSpriteFrame(std::string name, float x, float y, float width, float height);

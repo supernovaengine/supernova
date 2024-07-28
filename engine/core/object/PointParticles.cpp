@@ -17,90 +17,90 @@ PointParticles::~PointParticles(){
 }
 
 bool PointParticles::load(){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
 
-    return scene->getSystem<RenderSystem>()->loadPoints(entity, particomp, PIP_DEFAULT | PIP_RTT);
+    return scene->getSystem<RenderSystem>()->loadPoints(entity, pointscomp, PIP_DEFAULT | PIP_RTT);
 }
 
-void PointParticles::setMaxParticles(unsigned int maxParticles){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
+void PointParticles::setMaxPoints(unsigned int maxPoints){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
 
-    if (particomp.maxParticles != maxParticles){
-        particomp.maxParticles = maxParticles;
+    if (pointscomp.maxPoints != maxPoints){
+        pointscomp.maxPoints = maxPoints;
 
-        particomp.needReload = true;
+        pointscomp.needReload = true;
     }
 }
 
 unsigned int PointParticles::getMaxParticles() const{
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
+    PointsComponent& particomp = getComponent<PointsComponent>();
 
     return particomp.maxParticles;
 }
 
-void PointParticles::addParticle(Vector3 position){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
-    particomp.particles.push_back({position, Vector4(1.0f, 1.0f, 1.0f, 1.0f), 30, 0, Rect(0, 0, 1, 1)});
+void PointParticles::addPoint(Vector3 position){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+    pointscomp.points.push_back({position, Vector4(1.0f, 1.0f, 1.0f, 1.0f), 30, 0, Rect(0, 0, 1, 1)});
 
-    particomp.needUpdate = true;
+    pointscomp.needUpdate = true;
 }
 
-void PointParticles::addParticle(Vector3 position, Vector4 color){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
-    particomp.particles.push_back({position, color, 30, 0, Rect(0, 0, 1, 1)});
+void PointParticles::addPoint(Vector3 position, Vector4 color){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+    pointscomp.particles.push_back({position, color, 30, 0, Rect(0, 0, 1, 1)});
 
-    particomp.needUpdate = true;
+    pointscomp.needUpdate = true;
 }
 
-void PointParticles::addParticle(Vector3 position, Vector4 color, float size, float rotation){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
-    particomp.particles.push_back({position, color, size, Angle::defaultToRad(rotation), Rect(0, 0, 1, 1)});
+void PointParticles::addPoint(Vector3 position, Vector4 color, float size, float rotation){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+    pointscomp.points.push_back({position, color, size, Angle::defaultToRad(rotation), Rect(0, 0, 1, 1)});
 
-    particomp.needUpdate = true;
+    pointscomp.needUpdate = true;
 }
 
-void PointParticles::addParticle(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
-    particomp.particles.push_back({position, color, size, Angle::defaultToRad(rotation), textureRect});
-    particomp.hasTextureRect = true;
+void PointParticles::addPoint(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+    pointscomp.points.push_back({position, color, size, Angle::defaultToRad(rotation), textureRect});
+    pointscomp.hasTextureRect = true;
 
-    particomp.needUpdate = true;
+    pointscomp.needUpdate = true;
 }
 
-void PointParticles::addParticle(float x, float y, float z){
-   addParticle(Vector3(x, y, z));
+void PointParticles::addPoint(float x, float y, float z){
+   addPoint(Vector3(x, y, z));
 }
 
 void PointParticles::setTexture(std::string path){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
 
-    particomp.texture.setPath(path);
+    pointscomp.texture.setPath(path);
 
-    particomp.needUpdateTexture = true;
+    pointscomp.needUpdateTexture = true;
 }
 
 void PointParticles::setTexture(Framebuffer* framebuffer){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
 
-    particomp.texture.setFramebuffer(framebuffer);
+    pointscomp.texture.setFramebuffer(framebuffer);
 
-    particomp.needUpdateTexture = true;
+    pointscomp.needUpdateTexture = true;
 }
 
 void PointParticles::addSpriteFrame(int id, std::string name, Rect rect){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
     if (id >= 0 && id < MAX_SPRITE_FRAMES){
-        particomp.framesRect[id] = {true, name, rect};
+        pointscomp.framesRect[id] = {true, name, rect};
     }else{
         Log::error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
     }
 }
 
 void PointParticles::addSpriteFrame(std::string name, float x, float y, float width, float height){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
 
     int id = 0;
-    while ( (particomp.framesRect[id].active = true) && (id < MAX_SPRITE_FRAMES) ) {
+    while ( (pointscomp.framesRect[id].active = true) && (id < MAX_SPRITE_FRAMES) ) {
         id++;
     }
 
@@ -120,16 +120,16 @@ void PointParticles::addSpriteFrame(Rect rect){
 }
 
 void PointParticles::removeSpriteFrame(int id){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
-    particomp.framesRect[id].active = false;
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+    pointscomp.framesRect[id].active = false;
 }
 
 void PointParticles::removeSpriteFrame(std::string name){
-    PointParticlesComponent& particomp = getComponent<PointParticlesComponent>();
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
 
     for (int id = 0; id < MAX_SPRITE_FRAMES; id++){
-        if (particomp.framesRect[id].name == name){
-            particomp.framesRect[id].active = false;
+        if (pointscomp.framesRect[id].name == name){
+            pointsomp.framesRect[id].active = false;
         }
     }
 }
