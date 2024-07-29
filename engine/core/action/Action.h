@@ -18,6 +18,9 @@ namespace Supernova{
         void pause();
         void stop();
 
+        void setOwnedTarget(bool ownedTarget);
+        bool getOwnedTarget() const;
+
         void setTarget(Entity target);
         Entity getTarget() const;
 

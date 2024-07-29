@@ -43,6 +43,8 @@ namespace Supernova{
 		void actionComponentPause(ActionComponent& action);
 		void actionUpdate(double dt, ActionComponent& action);
 
+		void actionDestroy(ActionComponent& action);
+
 		void animationUpdate(double dt, Entity entity, ActionComponent& action, AnimationComponent& animcomp);
 		void animationDestroy(AnimationComponent& animcomp);
 

@@ -122,6 +122,12 @@ void ActionSystem::actionUpdate(double dt, ActionComponent& action){
     action.onStep.call();
 }
 
+void ActionSystem::actionDestroy(ActionComponent& action){
+    if (action.ownedTarget && action.target != NULL_ENTITY){
+        scene->destroyEntity(action.target);
+    }
+}
+
 void ActionSystem::animationUpdate(double dt, Entity entity, ActionComponent& action, AnimationComponent& animcomp){
     int totalActionsPassed = 0;
 
@@ -817,7 +823,6 @@ void ActionSystem::load(){
 }
 
 void ActionSystem::destroy(){
-
     auto actions = scene->getComponentArray<ActionComponent>();
     for (int i = 0; i < actions->size(); i++) {
         ActionComponent &action = actions->getComponentFromIndex(i);
@@ -1046,9 +1051,13 @@ void ActionSystem::update(double dt){
 }
 
 void ActionSystem::entityDestroyed(Entity entity){
-	Signature signature = scene->getSignature(entity);
+    Signature signature = scene->getSignature(entity);
 
-	if (signature.test(scene->getComponentType<AnimationComponent>())){
-		animationDestroy(scene->getComponent<AnimationComponent>(entity));
-	}
+    if (signature.test(scene->getComponentType<ActionComponent>())){
+        actionDestroy(scene->getComponent<ActionComponent>(entity));
+    }
+
+    if (signature.test(scene->getComponentType<AnimationComponent>())){
+        animationDestroy(scene->getComponent<AnimationComponent>(entity));
+    }
 }

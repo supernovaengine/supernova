@@ -34,6 +34,18 @@ void Action::stop(){
     action.stopTrigger = true;
 }
 
+void Action::setOwnedTarget(bool ownedTarget){
+    ActionComponent& action = getComponent<ActionComponent>();
+
+    action.ownedTarget = ownedTarget;
+}
+
+bool Action::getOwnedTarget() const{
+    ActionComponent& action = getComponent<ActionComponent>();
+
+    return action.ownedTarget;
+}
+
 void Action::setTarget(Entity target){
     ActionComponent& action = getComponent<ActionComponent>();
 

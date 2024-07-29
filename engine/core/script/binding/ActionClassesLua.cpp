@@ -78,6 +78,7 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addFunction("start", &Action::start)
         .addFunction("pause", &Action::pause)
         .addFunction("stop", &Action::stop)
+        .addProperty("ownedTarget", &Action::getOwnedTarget, &Action::setOwnedTarget)
         .addProperty("target", &Action::getTarget, &Action::setTarget)
         .addProperty("speed", &Action::getSpeed, &Action::setSpeed)
         .addFunction("isRunning", &Action::isRunning)

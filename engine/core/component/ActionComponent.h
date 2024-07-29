@@ -23,6 +23,8 @@ namespace Supernova{
         bool stopTrigger = false;
         bool pauseTrigger = false;
 
+        bool ownedTarget = false;
+
         Entity target = NULL_ENTITY;
 
         float speed = 1;
