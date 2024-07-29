@@ -364,6 +364,18 @@ Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointPart
     return Rect(0,0,1,1);
 }
 
+Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointsComponent& points){
+    if (frames.size() > 0){
+        int id = frames[int(frames.size()*rand()/(RAND_MAX + 1.0))];
+
+        if (id >= 0 && id < MAX_SPRITE_FRAMES && points.framesRect[id].active){
+            return points.framesRect[id].rect;
+        }
+    }
+
+    return Rect(0,0,1,1);
+}
+
 void ActionSystem::applyParticleInitializers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim){
 
     PointParticleLifeInitializer& lifeInit = partanim.lifeInitializer;
@@ -398,7 +410,6 @@ void ActionSystem::applyParticleInitializers(size_t idx, PointParticlesComponent
 }
 
 void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
-
     ParticleLifeInitializer& lifeInit = particles.lifeInitializer;
     particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
 
@@ -431,6 +442,38 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
 */
 }
 
+void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, PointsComponent& points){
+    ParticleLifeInitializer& lifeInit = particles.lifeInitializer;
+    particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
+
+    ParticlePositionInitializer& posInit = particles.positionInitializer;
+    points.points[idx].position = getVector3InitializerValue(posInit.minPosition, posInit.maxPosition);
+
+    ParticleVelocityInitializer& velInit = particles.velocityInitializer;
+    particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
+
+    ParticleAccelerationInitializer& accInit = particles.accelerationInitializer;
+    particles.particles[idx].acceleration = getVector3InitializerValue(accInit.minAcceleration, accInit.maxAcceleration);
+
+    ParticleColorInitializer& colInit = particles.colorInitializer;
+    points.points[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
+    if (particles.colorInitializer.useSRGB){
+        points.points[idx].color = Color::sRGBToLinear(points.points[idx].color);
+    }
+
+    ParticleAlphaInitializer& alpInit = particles.alphaInitializer;
+    points.points[idx].color.w = getFloatInitializerValue(alpInit.minAlpha, alpInit.maxAlpha);
+
+    ParticleSizeInitializer& sizeInit = particles.sizeInitializer;
+    points.points[idx].size = getFloatInitializerValue(sizeInit.minSize, sizeInit.maxSize);
+
+    ParticleSpriteInitializer& spriteInit = particles.spriteInitializer;
+    points.points[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, points);
+
+    ParticleRotationInitializer& rotInit = particles.rotationInitializer;
+    points.points[idx].rotation = Angle::defaultToRad(getFloatInitializerValue(rotInit.minRotation, rotInit.maxRotation));
+}
+
 float ActionSystem::getTimeFromParticleTime(float& time, float& fromTime, float& toTime){
     if ((fromTime != toTime) && (time >= fromTime) && (time <= toTime)) {
         return (time - fromTime) / (toTime - fromTime);
@@ -453,6 +496,18 @@ Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames
 
         if (id >= 0 && id < MAX_SPRITE_FRAMES && particles.framesRect[id].active){
             return particles.framesRect[id].rect;
+        }
+    }
+
+    return Rect(0,0,1,1);
+}
+
+Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, PointsComponent& points){
+    if (frames.size() > 0){
+        int id = frames[(int)(frames.size() * value)];
+
+        if (id >= 0 && id < MAX_SPRITE_FRAMES && points.framesRect[id].active){
+            return points.framesRect[id].rect;
         }
     }
 
@@ -590,6 +645,71 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     */
 }
 
+void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, PointsComponent& points){
+    float particleTime = particles.particles[idx].time;
+    float value;
+    float time;
+
+    ParticlePositionModifier& posMod = particles.positionModifier;
+    time = getTimeFromParticleTime(particleTime, posMod.fromTime, posMod.toTime);
+    value = posMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        points.points[idx].position = getVector3ModifierValue(value, posMod.fromPosition, posMod.toPosition);
+    }
+
+    ParticleVelocityModifier& velMod = particles.velocityModifier;
+    time = getTimeFromParticleTime(particleTime, velMod.fromTime, velMod.toTime);
+    value = velMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].velocity = getVector3ModifierValue(value, velMod.fromVelocity, velMod.toVelocity);
+    }
+
+    ParticleAccelerationModifier& accMod = particles.accelerationModifier;
+    time = getTimeFromParticleTime(particleTime, accMod.fromTime, accMod.toTime);
+    value = accMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        particles.particles[idx].acceleration = getVector3ModifierValue(value, accMod.fromAcceleration, accMod.toAcceleration);
+    }
+
+    ParticleColorModifier& colMod = particles.colorModifier;
+    time = getTimeFromParticleTime(particleTime, colMod.fromTime, colMod.toTime);
+    value = colMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        points.points[idx].color = getVector3ModifierValue(value, colMod.fromColor, colMod.toColor);
+        if (particles.colorModifier.useSRGB){
+            points.points[idx].color = Color::sRGBToLinear(points.points[idx].color);
+        }
+    }
+
+    ParticleAlphaModifier& alpMod = particles.alphaModifier;
+    time = getTimeFromParticleTime(particleTime, alpMod.fromTime, alpMod.toTime);
+    value = alpMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        points.points[idx].color.w = getFloatModifierValue(value, alpMod.fromAlpha, alpMod.toAlpha);
+    }
+
+    ParticleSizeModifier& sizeMod = particles.sizeModifier;
+    time = getTimeFromParticleTime(particleTime, sizeMod.fromTime, sizeMod.toTime);
+    value = sizeMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        points.points[idx].size = getFloatModifierValue(value, sizeMod.fromSize, sizeMod.toSize);
+    }
+
+    ParticleSpriteModifier& spriteMod = particles.spriteModifier;
+    time = getTimeFromParticleTime(particleTime, spriteMod.fromTime, spriteMod.toTime);
+    value = spriteMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        points.points[idx].textureRect = getSpriteModifierValue(value, spriteMod.frames, points);
+    }
+
+    ParticleRotationModifier& rotMod = particles.rotationModifier;
+    time = getTimeFromParticleTime(particleTime, rotMod.fromTime, rotMod.toTime);
+    value = rotMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        points.points[idx].rotation = Angle::defaultToRad(getFloatModifierValue(value, rotMod.fromRotation, rotMod.toRotation));
+    }
+}
+
 void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, PointParticlesComponent& particles){
     if (partanim.sizeInitializer.minSize == 0 && partanim.sizeInitializer.maxSize == 0){
         float size = std::max(particles.texture.getWidth(), particles.texture.getHeight());
@@ -628,6 +748,31 @@ void ActionSystem::particleActionStart(ParticlesComponent& particles, InstancedM
         instmesh.instances.push_back({});
 
         instmesh.needUpdateInstances = true;
+    }
+
+    particles.emitter = true;
+    particles.newParticlesCount = 0;
+    particles.lastUsedParticle = 0;
+}
+
+void ActionSystem::particleActionStart(ParticlesComponent& particles, PointsComponent& points){
+    if (particles.sizeInitializer.minSize == 0 && particles.sizeInitializer.maxSize == 0){
+        float size = std::max(points.texture.getWidth(), points.texture.getHeight());
+        particles.sizeInitializer.minSize = size;
+        particles.sizeInitializer.maxSize = size;
+    }
+
+    // Creating particles
+    particles.particles.clear();
+    points.points.clear();
+    for (int i = 0; i < particles.maxParticles; i++){
+        particles.particles.push_back({});
+        particles.particles.back().life = 0;
+        particles.particles.back().time = 0;
+
+        points.points.push_back({});
+
+        points.needUpdate = true;
     }
 
     particles.emitter = true;
@@ -743,9 +888,74 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
 
             existParticles = true;
 
+            instmesh.instances[i].visible = true;
             instmesh.needUpdateInstances = true;
 
             //printf("1.Particle %i life %f time %f position %f %f %f\n", i, life, time, position.x, position.y, position.z);
+        }else{
+            instmesh.instances[i].visible = false;
+        }
+    }
+
+    if (!existParticles && !particles.emitter){
+        actionStop(entity);
+        //onFinish.call(object);
+    }
+}
+
+void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesComponent& particles, PointsComponent& points){
+    if (particles.emitter){
+        particles.newParticlesCount += dt * particles.rate;
+
+        int newparticles = (int)particles.newParticlesCount;
+        particles.newParticlesCount -= newparticles;
+        if (newparticles > particles.maxPerUpdate)
+            newparticles = particles.maxPerUpdate;
+
+        for(int i=0; i<newparticles; i++){
+            int particleIndex = findUnusedParticle(particles);
+
+            if (particleIndex >= 0){
+                particles.particles[particleIndex].time = 0;
+                applyParticleInitializers(particleIndex, particles, points);
+                points.needUpdate = true;
+            }else{
+                if (!particles.loop)
+                    particles.emitter = false;
+                break;
+            }
+        }
+    }
+
+    bool existParticles = false;
+    for(int i=0; i<particles.particles.size(); i++){
+
+        float life = particles.particles[i].life;
+        float time = particles.particles[i].time;
+
+        if(life > time){
+            applyParticleModifiers(i, particles, points);
+
+            Vector3 velocity = particles.particles[i].velocity;
+            Vector3 position = points.points[i].position;
+            Vector3 acceleration = particles.particles[i].acceleration;
+
+            velocity += acceleration * dt * 0.5f;
+            position += velocity * dt;
+            time += dt;
+
+            particles.particles[i].time = time;
+            particles.particles[i].velocity = velocity;
+            points.points[i].position = position;
+
+            existParticles = true;
+
+            points.points[i].visible = true;
+            points.needUpdate = true;
+
+            //printf("1.Particle %i life %f time %f position %f %f %f\n", i, life, time, position.x, position.y, position.z);
+        }else{
+            points.points[i].visible = false;
         }
     }
 

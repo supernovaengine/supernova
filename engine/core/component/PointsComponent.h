@@ -15,6 +15,7 @@ namespace Supernova{
         float size = 1;
         float rotation = 0;
         Rect textureRect = Rect(0,0,1,1);
+        bool visible = false;
     };
 
     struct PointsRenderData{

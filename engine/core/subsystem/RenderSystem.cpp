@@ -1991,7 +1991,7 @@ void RenderSystem::updatePoints(PointsComponent& points, Transform& transform, C
 	points.numVisible = 0;
 	size_t pointsSize = (points.points.size() < points.maxPoints)? points.points.size() : points.maxPoints;
 	for (int i = 0; i < pointsSize; i++){
-		//if (points.points[i].life > particles.particles[i].time){
+		if (points.points[i].visible){
 			points.renderPoints.push_back({});
 			points.renderPoints[points.numVisible].position = points.points[i].position;
 			points.renderPoints[points.numVisible].color = points.points[i].color;
@@ -1999,7 +1999,7 @@ void RenderSystem::updatePoints(PointsComponent& points, Transform& transform, C
 			points.renderPoints[points.numVisible].rotation = points.points[i].rotation;
 			points.renderPoints[points.numVisible].textureRect = points.points[i].textureRect;
 			points.numVisible++;
-		//}
+		}
 	}
 
 	if (points.numVisible > 0){
@@ -2256,15 +2256,15 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 	instmesh.numVisible = 0;
 	size_t instancesSize = (instmesh.instances.size() < instmesh.maxInstances)? instmesh.instances.size() : instmesh.maxInstances;
 	for (int i = 0; i < instancesSize; i++){
-		//if (instmesh.instances[i].life > particles.particles[i].time){
-		Matrix4 translateMatrix = Matrix4::translateMatrix(instmesh.instances[i].position);
-		Matrix4 rotationMatrix = instmesh.instances[i].rotation.getRotationMatrix();
-		Matrix4 scaleMatrix = Matrix4::scaleMatrix(instmesh.instances[i].scale);
+		if (instmesh.instances[i].visible){
+			Matrix4 translateMatrix = Matrix4::translateMatrix(instmesh.instances[i].position);
+			Matrix4 rotationMatrix = instmesh.instances[i].rotation.getRotationMatrix();
+			Matrix4 scaleMatrix = Matrix4::scaleMatrix(instmesh.instances[i].scale);
 
-		instmesh.renderInstances.push_back({});
-		instmesh.renderInstances[instmesh.numVisible].instanceMatrix = translateMatrix * rotationMatrix * scaleMatrix;
-		instmesh.numVisible++;
-		//}
+			instmesh.renderInstances.push_back({});
+			instmesh.renderInstances[instmesh.numVisible].instanceMatrix = translateMatrix * rotationMatrix * scaleMatrix;
+			instmesh.numVisible++;
+		}
 	}
 
 	if (instmesh.numVisible > 0){
