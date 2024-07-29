@@ -42,12 +42,22 @@ void Points::addPoint(Vector3 position){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
     pointscomp.points.push_back({position, Vector4(1.0f, 1.0f, 1.0f, 1.0f), 30, 0, Rect(0, 0, 1, 1), true});
 
+    if (pointscomp.maxPoints < pointscomp.points.size()){
+        pointscomp.maxPoints = pointscomp.maxPoints * 2;
+        pointscomp.needReload = true;
+    }
+
     pointscomp.needUpdate = true;
 }
 
 void Points::addPoint(Vector3 position, Vector4 color){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
     pointscomp.points.push_back({position, color, 30, 0, Rect(0, 0, 1, 1), true});
+
+    if (pointscomp.maxPoints < pointscomp.points.size()){
+        pointscomp.maxPoints = pointscomp.maxPoints * 2;
+        pointscomp.needReload = true;
+    }
 
     pointscomp.needUpdate = true;
 }
@@ -56,12 +66,23 @@ void Points::addPoint(Vector3 position, Vector4 color, float size, float rotatio
     PointsComponent& pointscomp = getComponent<PointsComponent>();
     pointscomp.points.push_back({position, color, size, Angle::defaultToRad(rotation), Rect(0, 0, 1, 1), true});
 
+    if (pointscomp.maxPoints < pointscomp.points.size()){
+        pointscomp.maxPoints = pointscomp.maxPoints * 2;
+        pointscomp.needReload = true;
+    }
+
     pointscomp.needUpdate = true;
 }
 
 void Points::addPoint(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
     pointscomp.points.push_back({position, color, size, Angle::defaultToRad(rotation), textureRect, true});
+
+    if (pointscomp.maxPoints < pointscomp.points.size()){
+        pointscomp.maxPoints = pointscomp.maxPoints * 2;
+        pointscomp.needReload = true;
+    }
+
     pointscomp.hasTextureRect = true;
 
     pointscomp.needUpdate = true;
