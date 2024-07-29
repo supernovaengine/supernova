@@ -42,7 +42,6 @@ Scene::Scene(){
 	registerComponent<ParticlesComponent>();
 	registerComponent<PointsComponent>();
 	registerComponent<PointParticlesComponent>();
-	registerComponent<ParticlesAnimationComponent>();
 	registerComponent<LinesComponent>();
 	registerComponent<TextComponent>();
 	registerComponent<UIComponent>();

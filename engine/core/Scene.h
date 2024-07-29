@@ -34,7 +34,6 @@
 #include "component/ParticlesComponent.h"
 #include "component/PointsComponent.h"
 #include "component/PointParticlesComponent.h"
-#include "component/ParticlesAnimationComponent.h"
 #include "component/LinesComponent.h"
 #include "component/TextComponent.h"
 #include "component/UIComponent.h"

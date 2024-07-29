@@ -637,7 +637,7 @@
 		717D9B3D2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
 		717D9B3E2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
 		717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B3C2733783D002C0803 /* ParticlesAnimation.h */; };
-		717D9B4127337850002C0803 /* ParticlesAnimationComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */; };
+		717D9B4127337850002C0803 /* ParticlesComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B4027337850002C0803 /* ParticlesComponent.h */; };
 		717D9B4E27338381002C0803 /* lua in Resources */ = {isa = PBXBuildFile; fileRef = 717D9B4D273382C8002C0803 /* lua */; };
 		717D9B4F27338382002C0803 /* lua in Resources */ = {isa = PBXBuildFile; fileRef = 717D9B4D273382C8002C0803 /* lua */; };
 		7181A0AD2BC8B6B400AC230B /* PanelComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 7181A0AC2BC8B6B400AC230B /* PanelComponent.h */; };
@@ -2043,7 +2043,7 @@
 		717AD991292FC30A007D7DB5 /* Framebuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Framebuffer.cpp; sourceTree = "<group>"; };
 		717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlesAnimation.cpp; sourceTree = "<group>"; };
 		717D9B3C2733783D002C0803 /* ParticlesAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimation.h; sourceTree = "<group>"; };
-		717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimationComponent.h; sourceTree = "<group>"; };
+		717D9B4027337850002C0803 /* ParticlesComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesComponent.h; sourceTree = "<group>"; };
 		717D9B4D273382C8002C0803 /* lua */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lua; sourceTree = "<group>"; };
 		7181A0AC2BC8B6B400AC230B /* PanelComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PanelComponent.h; sourceTree = "<group>"; };
 		7181A0AE2BC8B6CB00AC230B /* Panel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Panel.cpp; sourceTree = "<group>"; };
@@ -3399,7 +3399,7 @@
 				7170A3CA2818A87E0003E965 /* ModelComponent.h */,
 				71E5450D284D5BDF00C68FAB /* MorphTracksComponent.h */,
 				7181A0AC2BC8B6B400AC230B /* PanelComponent.h */,
-				717D9B4027337850002C0803 /* ParticlesAnimationComponent.h */,
+				717D9B4027337850002C0803 /* ParticlesComponent.h */,
 				714BBF7127148B69004A15EE /* PointParticlesComponent.h */,
 				713E581327BA9D1300376680 /* PolygonComponent.h */,
 				71451BB5270C9D0F00712643 /* PositionActionComponent.h */,
@@ -4364,7 +4364,7 @@
 				71651FF12AA804B4008D9BF5 /* Contact2D.h in Headers */,
 				71ABBD2B277A3210001CE3AF /* STBText.h in Headers */,
 				71CC839726B8C4D800EEBB93 /* Light.h in Headers */,
-				717D9B4127337850002C0803 /* ParticlesAnimationComponent.h in Headers */,
+				717D9B4127337850002C0803 /* ParticlesComponent.h in Headers */,
 				715CB119288CD40E0049344B /* Terrain.h in Headers */,
 				71CC839A26B8C4FD00EEBB93 /* FramebufferRender.h in Headers */,
 				7105CAA92AD61BD5007C91BA /* Box2DAux.h in Headers */,

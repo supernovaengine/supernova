@@ -50,14 +50,10 @@ void ActionSystem::actionStart(Entity entity){
                 particleActionStart(particles, instmesh);
 
             }
-        }
+            if (targetSignature.test(scene->getComponentType<PointsComponent>()) ){
+                PointsComponent& points = scene->getComponent<PointsComponent>(action.target);
 
-        if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
-            ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
-            if (targetSignature.test(scene->getComponentType<PointParticlesComponent>()) ){
-                PointParticlesComponent& particles = scene->getComponent<PointParticlesComponent>(action.target);
-
-                particleActionStart(partanim, particles);
+                particleActionStart(particles, points);
 
             }
         }
@@ -294,27 +290,6 @@ void ActionSystem::alphaActionUIUpdate(double dt, ActionComponent& action, Timed
     uirender.color.w = alphaaction.startAlpha + alpha;
 }
 
-int ActionSystem::findUnusedParticle(PointParticlesComponent& particles, ParticlesAnimationComponent& partanim){
-
-    for (int i=partanim.lastUsedParticle; i<particles.particles.size(); i++){
-        if (particles.particles[i].life <= particles.particles[i].time){
-            partanim.lastUsedParticle = i;
-            return i;
-        }
-    }
-
-    if (partanim.loop){
-        for (int i=0; i<partanim.lastUsedParticle; i++){
-            if (particles.particles[i].life <= particles.particles[i].time){
-                partanim.lastUsedParticle = i;
-                return i;
-            }
-        }
-    }
-
-    return -1;
-}
-
 int ActionSystem::findUnusedParticle(ParticlesComponent& particles){
 
     for (int i=particles.lastUsedParticle; i<particles.particles.size(); i++){
@@ -374,39 +349,6 @@ Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointsCom
     }
 
     return Rect(0,0,1,1);
-}
-
-void ActionSystem::applyParticleInitializers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim){
-
-    PointParticleLifeInitializer& lifeInit = partanim.lifeInitializer;
-    particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
-
-    PointParticlePositionInitializer& posInit = partanim.positionInitializer;
-    particles.particles[idx].position = getVector3InitializerValue(posInit.minPosition, posInit.maxPosition);
-
-    PointParticleVelocityInitializer& velInit = partanim.velocityInitializer;
-    particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
-
-    PointParticleAccelerationInitializer& accInit = partanim.accelerationInitializer;
-    particles.particles[idx].acceleration = getVector3InitializerValue(accInit.minAcceleration, accInit.maxAcceleration);
-
-    PointParticleColorInitializer& colInit = partanim.colorInitializer;
-    particles.particles[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
-    if (partanim.colorInitializer.useSRGB){
-        particles.particles[idx].color = Color::sRGBToLinear(particles.particles[idx].color);
-    }
-
-    PointParticleAlphaInitializer& alpInit = partanim.alphaInitializer;
-    particles.particles[idx].color.w = getFloatInitializerValue(alpInit.minAlpha, alpInit.maxAlpha);
-
-    PointParticleSizeInitializer& sizeInit = partanim.sizeInitializer;
-    particles.particles[idx].size = getFloatInitializerValue(sizeInit.minSize, sizeInit.maxSize);
-
-    PointParticleSpriteInitializer& spriteInit = partanim.spriteInitializer;
-    particles.particles[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, particles);
-
-    PointParticleRotationInitializer& rotInit = partanim.rotationInitializer;
-    particles.particles[idx].rotation = Angle::defaultToRad(getFloatInitializerValue(rotInit.minRotation, rotInit.maxRotation));
 }
 
 void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
@@ -512,71 +454,6 @@ Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames
     }
 
     return Rect(0,0,1,1);
-}
-
-void ActionSystem::applyParticleModifiers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim){
-    float particleTime = particles.particles[idx].time;
-    float value;
-    float time;
-
-    PointParticlePositionModifier& posMod = partanim.positionModifier;
-    time = getTimeFromParticleTime(particleTime, posMod.fromTime, posMod.toTime);
-    value = posMod.function.call(time);
-    if (value >= 0 && value <= 1){
-        particles.particles[idx].position = getVector3ModifierValue(value, posMod.fromPosition, posMod.toPosition);
-    }
-
-    PointParticleVelocityModifier& velMod = partanim.velocityModifier;
-    time = getTimeFromParticleTime(particleTime, velMod.fromTime, velMod.toTime);
-    value = velMod.function.call(time);
-    if (value >= 0 && value <= 1){
-        particles.particles[idx].velocity = getVector3ModifierValue(value, velMod.fromVelocity, velMod.toVelocity);
-    }
-
-    PointParticleAccelerationModifier& accMod = partanim.accelerationModifier;
-    time = getTimeFromParticleTime(particleTime, accMod.fromTime, accMod.toTime);
-    value = accMod.function.call(time);
-    if (value >= 0 && value <= 1){
-        particles.particles[idx].acceleration = getVector3ModifierValue(value, accMod.fromAcceleration, accMod.toAcceleration);
-    }
-
-    PointParticleColorModifier& colMod = partanim.colorModifier;
-    time = getTimeFromParticleTime(particleTime, colMod.fromTime, colMod.toTime);
-    value = colMod.function.call(time);
-    if (value >= 0 && value <= 1){
-        particles.particles[idx].color = getVector3ModifierValue(value, colMod.fromColor, colMod.toColor);
-        if (partanim.colorModifier.useSRGB){
-            particles.particles[idx].color = Color::sRGBToLinear(particles.particles[idx].color);
-        }
-    }
-
-    PointParticleAlphaModifier& alpMod = partanim.alphaModifier;
-    time = getTimeFromParticleTime(particleTime, alpMod.fromTime, alpMod.toTime);
-    value = alpMod.function.call(time);
-    if (value >= 0 && value <= 1){
-        particles.particles[idx].color.w = getFloatModifierValue(value, alpMod.fromAlpha, alpMod.toAlpha);
-    }
-
-    PointParticleSizeModifier& sizeMod = partanim.sizeModifier;
-    time = getTimeFromParticleTime(particleTime, sizeMod.fromTime, sizeMod.toTime);
-    value = sizeMod.function.call(time);
-    if (value >= 0 && value <= 1){
-        particles.particles[idx].size = getFloatModifierValue(value, sizeMod.fromSize, sizeMod.toSize);
-    }
-
-    PointParticleSpriteModifier& spriteMod = partanim.spriteModifier;
-    time = getTimeFromParticleTime(particleTime, spriteMod.fromTime, spriteMod.toTime);
-    value = spriteMod.function.call(time);
-    if (value >= 0 && value <= 1){
-        particles.particles[idx].textureRect = getSpriteModifierValue(value, spriteMod.frames, particles);
-    }
-
-    PointParticleRotationModifier& rotMod = partanim.rotationModifier;
-    time = getTimeFromParticleTime(particleTime, rotMod.fromTime, rotMod.toTime);
-    value = rotMod.function.call(time);
-    if (value >= 0 && value <= 1){
-        particles.particles[idx].rotation = Angle::defaultToRad(getFloatModifierValue(value, rotMod.fromRotation, rotMod.toRotation));
-    }
 }
 
 void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
@@ -710,26 +587,6 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     }
 }
 
-void ActionSystem::particleActionStart(ParticlesAnimationComponent& partanim, PointParticlesComponent& particles){
-    if (partanim.sizeInitializer.minSize == 0 && partanim.sizeInitializer.maxSize == 0){
-        float size = std::max(particles.texture.getWidth(), particles.texture.getHeight());
-        partanim.sizeInitializer.minSize = size;
-        partanim.sizeInitializer.maxSize = size;
-    }
-
-    // Creating particles
-    particles.particles.clear();
-    for (int i = 0; i < particles.maxParticles; i++){
-        particles.particles.push_back({});
-        particles.particles.back().life = 0;
-        particles.particles.back().time = 0;
-    }
-
-    partanim.emitter = true;
-    partanim.newParticlesCount = 0;
-    partanim.lastUsedParticle = 0;
-}
-
 void ActionSystem::particleActionStart(ParticlesComponent& particles, InstancedMeshComponent& instmesh){
     //if (particles.sizeInitializer.minSize == 0 && particles.sizeInitializer.maxSize == 0){
         //float size = std::max(particles.texture.getWidth(), particles.texture.getHeight());
@@ -778,66 +635,6 @@ void ActionSystem::particleActionStart(ParticlesComponent& particles, PointsComp
     particles.emitter = true;
     particles.newParticlesCount = 0;
     particles.lastUsedParticle = 0;
-}
-
-void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, PointParticlesComponent& particles){
-    if (partanim.emitter){
-        partanim.newParticlesCount += dt * partanim.rate;
-
-        int newparticles = (int)partanim.newParticlesCount;
-        partanim.newParticlesCount -= newparticles;
-        if (newparticles > partanim.maxPerUpdate)
-            newparticles = partanim.maxPerUpdate;
-
-        for(int i=0; i<newparticles; i++){
-            int particleIndex = findUnusedParticle(particles, partanim);
-
-            if (particleIndex >= 0){
-                particles.particles[particleIndex].time = 0;
-                applyParticleInitializers(particleIndex, particles, partanim);
-                particles.needUpdate = true;
-            }else{
-                if (!partanim.loop)
-                    partanim.emitter = false;
-                break;
-            }
-        }
-    }
-
-    bool existParticles = false;
-    for(int i=0; i<particles.particles.size(); i++){
-
-        float life = particles.particles[i].life;
-        float time = particles.particles[i].time;
-
-        if(life > time){
-
-            applyParticleModifiers(i, particles, partanim);
-
-            Vector3 velocity = particles.particles[i].velocity;
-            Vector3 position = particles.particles[i].position;
-            Vector3 acceleration = particles.particles[i].acceleration;
-
-            velocity += acceleration * dt * 0.5f;
-            position += velocity * dt;
-            time += dt;
-
-            particles.particles[i].time = time;
-            particles.particles[i].velocity = velocity;
-            particles.particles[i].position = position;
-
-            existParticles = true;
-
-            particles.needUpdate = true;
-
-            //printf("1.Particle %i life %f time %f position %f %f %f\n", i, life, time, position.x, position.y, position.z);
-        }
-    }
-
-    if (!existParticles && !partanim.emitter){
-        actionStop(entity);
-        //onFinish.call(object);
-    }
 }
 
 void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
@@ -1146,14 +943,10 @@ void ActionSystem::update(double dt){
                     particlesActionUpdate(dt, entity, action, particles, instmesh);
                     if (action.state != ActionState::Running) continue;
                 }
-            }
-            if (signature.test(scene->getComponentType<ParticlesAnimationComponent>())){
-                ParticlesAnimationComponent& partanim = scene->getComponent<ParticlesAnimationComponent>(entity);
+                if (targetSignature.test(scene->getComponentType<PointsComponent>())){
+                    PointsComponent& points = scene->getComponent<PointsComponent>(action.target);
 
-                if (targetSignature.test(scene->getComponentType<PointParticlesComponent>())){
-                    PointParticlesComponent& particles = scene->getComponent<PointParticlesComponent>(action.target);
-
-                    particlesActionUpdate(dt, entity, action, partanim, particles);
+                    particlesActionUpdate(dt, entity, action, particles, points);
                     if (action.state != ActionState::Running) continue;
                 }
             }

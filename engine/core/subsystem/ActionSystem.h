@@ -22,7 +22,6 @@
 #include "component/AlphaActionComponent.h"
 #include "component/PointParticlesComponent.h"
 #include "component/PointsComponent.h"
-#include "component/ParticlesAnimationComponent.h"
 #include "component/ParticlesComponent.h"
 #include "component/InstancedMeshComponent.h"
 #include "component/AnimationComponent.h"
@@ -67,14 +66,12 @@ namespace Supernova{
 		void alphaActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, UIComponent& uirender);
 
 		//Particle helpers functions
-		int findUnusedParticle(PointParticlesComponent& particles, ParticlesAnimationComponent& partanim);
 		int findUnusedParticle(ParticlesComponent& particles);
 
 		float getFloatInitializerValue(float& min, float& max);
 		Vector3 getVector3InitializerValue(Vector3& min, Vector3& max);
 		Rect getSpriteInitializerValue(std::vector<int>& frames, PointParticlesComponent& particles);
 		Rect getSpriteInitializerValue(std::vector<int>& frames, PointsComponent& points);
-		void applyParticleInitializers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim);
 		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, PointsComponent& points);
 
@@ -83,14 +80,11 @@ namespace Supernova{
 		Vector3 getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue);
 		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, PointParticlesComponent& particles);
 		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, PointsComponent& points);
-		void applyParticleModifiers(size_t idx, PointParticlesComponent& particles, ParticlesAnimationComponent& partanim);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, PointsComponent& points);
 
-		void particleActionStart(ParticlesAnimationComponent& partanim, PointParticlesComponent& particles);
 		void particleActionStart(ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void particleActionStart(ParticlesComponent& particles, PointsComponent& points);
-		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesAnimationComponent& partanim, PointParticlesComponent& particles);
 		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesComponent& particles, PointsComponent& points);
 
