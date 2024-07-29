@@ -327,18 +327,6 @@ Vector3 ActionSystem::getVector3InitializerValue(Vector3& min, Vector3& max){
     return max;
 }
 
-Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointParticlesComponent& particles){
-    if (frames.size() > 0){
-        int id = frames[int(frames.size()*rand()/(RAND_MAX + 1.0))];
-
-        if (id >= 0 && id < MAX_SPRITE_FRAMES && particles.framesRect[id].active){
-            return particles.framesRect[id].rect;
-        }
-    }
-
-    return Rect(0,0,1,1);
-}
-
 Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointsComponent& points){
     if (frames.size() > 0){
         int id = frames[int(frames.size()*rand()/(RAND_MAX + 1.0))];
@@ -430,18 +418,6 @@ float ActionSystem::getFloatModifierValue(float& value, float& fromValue, float&
 
 Vector3 ActionSystem::getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue){
     return fromValue + ((toValue - fromValue) * value);
-}
-
-Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, PointParticlesComponent& particles){
-    if (frames.size() > 0){
-        int id = frames[(int)(frames.size() * value)];
-
-        if (id >= 0 && id < MAX_SPRITE_FRAMES && particles.framesRect[id].active){
-            return particles.framesRect[id].rect;
-        }
-    }
-
-    return Rect(0,0,1,1);
 }
 
 Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, PointsComponent& points){

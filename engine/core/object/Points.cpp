@@ -9,7 +9,7 @@
 using namespace Supernova;
 
 Points::Points(Scene* scene): Object(scene){
-    addComponent<PointParticlesComponent>({});
+    addComponent<PointsComponent>({});
 }
 
 Points::~Points(){

@@ -41,7 +41,6 @@ Scene::Scene(){
 	registerComponent<AlphaActionComponent>();
 	registerComponent<ParticlesComponent>();
 	registerComponent<PointsComponent>();
-	registerComponent<PointParticlesComponent>();
 	registerComponent<LinesComponent>();
 	registerComponent<TextComponent>();
 	registerComponent<UIComponent>();
@@ -350,6 +349,12 @@ void Scene::sortComponentsByTransform(Signature entitySignature){
 		meshes->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
+	// InstancedMesh component
+	if (entitySignature.test(getComponentType<InstancedMeshComponent>())){
+		auto instmeshes = componentManager.getComponentArray<InstancedMeshComponent>();
+		instmeshes->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
+	}
+
 	// Model component
 	if (entitySignature.test(getComponentType<ModelComponent>())){
 		auto models = componentManager.getComponentArray<ModelComponent>();
@@ -380,10 +385,16 @@ void Scene::sortComponentsByTransform(Signature entitySignature){
 		ui->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
-	// Particles component
-	if (entitySignature.test(getComponentType<PointParticlesComponent>())){
-		auto particles = componentManager.getComponentArray<PointParticlesComponent>();
-		particles->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
+	// Points component
+	if (entitySignature.test(getComponentType<PointsComponent>())){
+		auto points = componentManager.getComponentArray<PointsComponent>();
+		points->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
+	}
+
+	// Lines component
+	if (entitySignature.test(getComponentType<PointsComponent>())){
+		auto points = componentManager.getComponentArray<PointsComponent>();
+		points->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// Audio component

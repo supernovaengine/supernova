@@ -20,7 +20,6 @@
 #include "component/ScaleActionComponent.h"
 #include "component/ColorActionComponent.h"
 #include "component/AlphaActionComponent.h"
-#include "component/PointParticlesComponent.h"
 #include "component/PointsComponent.h"
 #include "component/ParticlesComponent.h"
 #include "component/InstancedMeshComponent.h"
@@ -70,7 +69,6 @@ namespace Supernova{
 
 		float getFloatInitializerValue(float& min, float& max);
 		Vector3 getVector3InitializerValue(Vector3& min, Vector3& max);
-		Rect getSpriteInitializerValue(std::vector<int>& frames, PointParticlesComponent& particles);
 		Rect getSpriteInitializerValue(std::vector<int>& frames, PointsComponent& points);
 		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, PointsComponent& points);
@@ -78,7 +76,6 @@ namespace Supernova{
 		float getTimeFromParticleTime(float& time, float& fromTime, float& toTime);
 		float getFloatModifierValue(float& value, float& fromValue, float& toValue);
 		Vector3 getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue);
-		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, PointParticlesComponent& particles);
 		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, PointsComponent& points);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, PointsComponent& points);
