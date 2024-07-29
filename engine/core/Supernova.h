@@ -116,7 +116,7 @@
 #include "object/MeshPolygon.h"
 #include "object/Model.h"
 #include "object/Object.h"
-#include "object/PointParticles.h"
+#include "object/Points.h"
 #include "object/physics/Body2D.h"
 #include "object/physics/Body3D.h"
 #include "object/physics/CollideShapeResult3D.h"

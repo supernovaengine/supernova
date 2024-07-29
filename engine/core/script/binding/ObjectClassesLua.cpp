@@ -23,7 +23,7 @@
 #include "Bone.h"
 #include "Model.h"
 #include "MeshPolygon.h"
-#include "PointParticles.h"
+#include "Points.h"
 #include "Lines.h"
 #include "Sprite.h"
 #include "Text.h"
@@ -440,26 +440,26 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .deriveClass<PointParticles, Object>("PointParticles")
+        .deriveClass<Points, Object>("Points")
         .addConstructor <void (*) (Scene*)> ()
-        .addProperty("maxParticles", &PointParticles::getMaxParticles, &PointParticles::setMaxParticles)
-        .addFunction("addParticle", 
-            luabridge::overload<Vector3>(&PointParticles::addParticle),
-            luabridge::overload<Vector3, Vector4>(&PointParticles::addParticle),
-            luabridge::overload<Vector3, Vector4, float, float>(&PointParticles::addParticle),
-            luabridge::overload<Vector3, Vector4, float, float, Rect>(&PointParticles::addParticle),
-            luabridge::overload<float, float, float>(&PointParticles::addParticle))
+        .addProperty("maxPoints", &Points::getMaxPoints, &Points::setMaxPoints)
+        .addFunction("addPoint", 
+            luabridge::overload<Vector3>(&Points::addPoint),
+            luabridge::overload<Vector3, Vector4>(&Points::addPoint),
+            luabridge::overload<Vector3, Vector4, float, float>(&Points::addPoint),
+            luabridge::overload<Vector3, Vector4, float, float, Rect>(&Points::addPoint),
+            luabridge::overload<float, float, float>(&Points::addPoint))
         .addFunction("addSpriteFrame", 
-            luabridge::overload<int, std::string, Rect>(&PointParticles::addSpriteFrame),
-            luabridge::overload<std::string, float, float, float, float>(&PointParticles::addSpriteFrame),
-            luabridge::overload<float, float, float, float>(&PointParticles::addSpriteFrame),
-            luabridge::overload<Rect>(&PointParticles::addSpriteFrame))
+            luabridge::overload<int, std::string, Rect>(&Points::addSpriteFrame),
+            luabridge::overload<std::string, float, float, float, float>(&Points::addSpriteFrame),
+            luabridge::overload<float, float, float, float>(&Points::addSpriteFrame),
+            luabridge::overload<Rect>(&Points::addSpriteFrame))
         .addFunction("removeSpriteFrame", 
-            luabridge::overload<int>(&PointParticles::removeSpriteFrame),
-            luabridge::overload<std::string>(&PointParticles::removeSpriteFrame))
+            luabridge::overload<int>(&Points::removeSpriteFrame),
+            luabridge::overload<std::string>(&Points::removeSpriteFrame))
         .addFunction("setTexture", 
-            luabridge::overload<std::string>(&PointParticles::setTexture),
-            luabridge::overload<Framebuffer*>(&PointParticles::setTexture))
+            luabridge::overload<std::string>(&Points::setTexture),
+            luabridge::overload<Framebuffer*>(&Points::setTexture))
         .endClass();
 
     luabridge::getGlobalNamespace(L)

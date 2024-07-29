@@ -5,6 +5,8 @@
 #ifndef POINTS_COMPONENT_H
 #define POINTS_COMPONENT_H
 
+#include "util/FrameData.h"
+
 namespace Supernova{
 
     struct PointsData{

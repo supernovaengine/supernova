@@ -2,18 +2,18 @@
 // (c) 2024 Eduardo Doria.
 //
 
-#ifndef POINTPARTICLES_H
-#define POINTPARTICLES_H
+#ifndef POINTS_H
+#define POINTS_H
 
 #include "Object.h"
 #include "buffer/ExternalBuffer.h"
 
 namespace Supernova{
 
-    class PointParticles: public Object{
+    class Points: public Object{
     public:
-        PointParticles(Scene* scene);
-        virtual ~PointParticles();
+        Points(Scene* scene);
+        virtual ~Points();
 
         bool load();
 
@@ -38,4 +38,4 @@ namespace Supernova{
     };
 }
 
-#endif //POINTPARTICLES_H
+#endif //POINTS_H
