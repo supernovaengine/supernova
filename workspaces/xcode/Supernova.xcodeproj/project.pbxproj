@@ -437,8 +437,6 @@
 		714741FB2B029F7D00C891FF /* TextureDataPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 714741F92B029F7D00C891FF /* TextureDataPool.h */; };
 		714741FC2B029F7D00C891FF /* TextureDataPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714741FA2B029F7D00C891FF /* TextureDataPool.cpp */; };
 		714741FD2B029F7D00C891FF /* TextureDataPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714741FA2B029F7D00C891FF /* TextureDataPool.cpp */; };
-		714BBF7427148B85004A15EE /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714BBF7227148B84004A15EE /* Particles.cpp */; };
-		714BBF7527148B85004A15EE /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714BBF7227148B84004A15EE /* Particles.cpp */; };
 		7157764E2B050C230049C970 /* FontPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 7157764C2B050C230049C970 /* FontPool.h */; };
 		7157764F2B050C230049C970 /* FontPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157764D2B050C230049C970 /* FontPool.cpp */; };
 		715776502B050C230049C970 /* FontPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157764D2B050C230049C970 /* FontPool.cpp */; };
@@ -634,9 +632,6 @@
 		717AD992292FC30A007D7DB5 /* Framebuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 717AD990292FC30A007D7DB5 /* Framebuffer.h */; };
 		717AD993292FC30A007D7DB5 /* Framebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD991292FC30A007D7DB5 /* Framebuffer.cpp */; };
 		717AD994292FC30A007D7DB5 /* Framebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717AD991292FC30A007D7DB5 /* Framebuffer.cpp */; };
-		717D9B3D2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
-		717D9B3E2733783D002C0803 /* ParticlesAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */; };
-		717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B3C2733783D002C0803 /* ParticlesAnimation.h */; };
 		717D9B4127337850002C0803 /* ParticlesComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 717D9B4027337850002C0803 /* ParticlesComponent.h */; };
 		717D9B4E27338381002C0803 /* lua in Resources */ = {isa = PBXBuildFile; fileRef = 717D9B4D273382C8002C0803 /* lua */; };
 		717D9B4F27338382002C0803 /* lua in Resources */ = {isa = PBXBuildFile; fileRef = 717D9B4D273382C8002C0803 /* lua */; };
@@ -1061,6 +1056,13 @@
 		71ED64C528B45E0B005D2D96 /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ED64C328B45E0B005D2D96 /* Angle.cpp */; };
 		71ED64C628B45E0B005D2D96 /* Angle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ED64C328B45E0B005D2D96 /* Angle.cpp */; };
 		71ED64C728B45E0B005D2D96 /* Angle.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ED64C428B45E0B005D2D96 /* Angle.h */; };
+		71F225452C58736B006ED3CA /* InstancedMeshComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F225442C58736B006ED3CA /* InstancedMeshComponent.h */; };
+		71F225482C587388006ED3CA /* Particles.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F225462C587388006ED3CA /* Particles.h */; };
+		71F225492C587388006ED3CA /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F225472C587388006ED3CA /* Particles.cpp */; };
+		71F2254A2C587388006ED3CA /* Particles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F225472C587388006ED3CA /* Particles.cpp */; };
+		71F2254D2C58740F006ED3CA /* Points.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F2254B2C58740E006ED3CA /* Points.h */; };
+		71F2254E2C58740F006ED3CA /* Points.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F2254C2C58740E006ED3CA /* Points.cpp */; };
+		71F2254F2C58740F006ED3CA /* Points.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F2254C2C58740E006ED3CA /* Points.cpp */; };
 		71F97B21262D1E2B00CD6F2B /* tiny_gltf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */; };
 		71F97B22262D1E2B00CD6F2B /* tiny_gltf.h in Headers */ = {isa = PBXBuildFile; fileRef = 71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */; };
 		71F97B43262D1E6500CD6F2B /* libstb-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BE612625B1D088006D6E02 /* libstb-macos.a */; };
@@ -1826,8 +1828,6 @@
 		714741F92B029F7D00C891FF /* TextureDataPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureDataPool.h; sourceTree = "<group>"; };
 		714741FA2B029F7D00C891FF /* TextureDataPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureDataPool.cpp; sourceTree = "<group>"; };
 		714BBF7127148B69004A15EE /* PointsComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PointsComponent.h; sourceTree = "<group>"; };
-		714BBF7227148B84004A15EE /* Particles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particles.cpp; sourceTree = "<group>"; };
-		714BBF7327148B84004A15EE /* Particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particles.h; sourceTree = "<group>"; };
 		7157764C2B050C230049C970 /* FontPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontPool.h; sourceTree = "<group>"; };
 		7157764D2B050C230049C970 /* FontPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontPool.cpp; sourceTree = "<group>"; };
 		7158F43D259C2C82006E55D3 /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
@@ -2041,8 +2041,6 @@
 		717AD98C29211976007D7DB5 /* Container.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Container.cpp; sourceTree = "<group>"; };
 		717AD990292FC30A007D7DB5 /* Framebuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Framebuffer.h; sourceTree = "<group>"; };
 		717AD991292FC30A007D7DB5 /* Framebuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Framebuffer.cpp; sourceTree = "<group>"; };
-		717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParticlesAnimation.cpp; sourceTree = "<group>"; };
-		717D9B3C2733783D002C0803 /* ParticlesAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesAnimation.h; sourceTree = "<group>"; };
 		717D9B4027337850002C0803 /* ParticlesComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticlesComponent.h; sourceTree = "<group>"; };
 		717D9B4D273382C8002C0803 /* lua */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lua; sourceTree = "<group>"; };
 		7181A0AC2BC8B6B400AC230B /* PanelComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PanelComponent.h; sourceTree = "<group>"; };
@@ -2328,6 +2326,11 @@
 		71EA6DA42AE20B8C00CA9A75 /* Contact3D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Contact3D.cpp; sourceTree = "<group>"; };
 		71ED64C328B45E0B005D2D96 /* Angle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Angle.cpp; sourceTree = "<group>"; };
 		71ED64C428B45E0B005D2D96 /* Angle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Angle.h; sourceTree = "<group>"; };
+		71F225442C58736B006ED3CA /* InstancedMeshComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstancedMeshComponent.h; sourceTree = "<group>"; };
+		71F225462C587388006ED3CA /* Particles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particles.h; sourceTree = "<group>"; };
+		71F225472C587388006ED3CA /* Particles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particles.cpp; sourceTree = "<group>"; };
+		71F2254B2C58740E006ED3CA /* Points.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Points.h; sourceTree = "<group>"; };
+		71F2254C2C58740E006ED3CA /* Points.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Points.cpp; sourceTree = "<group>"; };
 		71F97AD2262D1DF200CD6F2B /* libtinygltf-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinygltf-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_gltf.cc; sourceTree = "<group>"; };
 		71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_gltf.h; sourceTree = "<group>"; };
@@ -3207,8 +3210,8 @@
 				71451BC7270CA17F00712643 /* ColorAction.h */,
 				71451BC9270CA17F00712643 /* Ease.h */,
 				71E544F5284D5BB700C68FAB /* keyframe */,
-				717D9B3B2733783D002C0803 /* ParticlesAnimation.cpp */,
-				717D9B3C2733783D002C0803 /* ParticlesAnimation.h */,
+				71F225472C587388006ED3CA /* Particles.cpp */,
+				71F225462C587388006ED3CA /* Particles.h */,
 				71451BCC270CA17F00712643 /* PositionAction.cpp */,
 				71451BC3270CA17F00712643 /* PositionAction.h */,
 				71451BCA270CA17F00712643 /* RotationAction.cpp */,
@@ -3389,6 +3392,7 @@
 				71451BB3270C9D0F00712643 /* ColorActionComponent.h */,
 				71D7494C296731A800348AB8 /* FogComponent.h */,
 				717AD9872919E1E9007D7DB5 /* ImageComponent.h */,
+				71F225442C58736B006ED3CA /* InstancedMeshComponent.h */,
 				71E824842A9C238900C8E6F2 /* Joint2DComponent.h */,
 				7105CAAB2AD61C7A007C91BA /* Joint3DComponent.h */,
 				71E54512284D5BE000C68FAB /* KeyframeTracksComponent.h */,
@@ -3475,9 +3479,9 @@
 				71E36B5225D5994100EFEED4 /* Model.h */,
 				7162FC6625962A0E0075B97D /* Object.cpp */,
 				7162FC6825962A0E0075B97D /* Object.h */,
-				714BBF7227148B84004A15EE /* Particles.cpp */,
-				714BBF7327148B84004A15EE /* Particles.h */,
 				71E824872A9C23A600C8E6F2 /* physics */,
+				71F2254C2C58740E006ED3CA /* Points.cpp */,
+				71F2254B2C58740E006ED3CA /* Points.h */,
 				710506AC297F4483002DD23C /* Shape.cpp */,
 				710506AD297F4483002DD23C /* Shape.h */,
 				71451BE7270CA2C900712643 /* Sprite.cpp */,
@@ -4340,11 +4344,13 @@
 				7105CAAD2AD61C7A007C91BA /* Joint3DComponent.h in Headers */,
 				71D7494E296731A800348AB8 /* FogComponent.h in Headers */,
 				71FCE4C528E0FA31003C5217 /* LuaBridge.h in Headers */,
+				71F225482C587388006ED3CA /* Particles.h in Headers */,
 				71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */,
 				718FDDF52837CA9A00AF314C /* msl21ios.h in Headers */,
 				71E824962A9C242B00C8E6F2 /* PhysicsSystem.h in Headers */,
 				718FDDF92837CA9A00AF314C /* glsl330.h in Headers */,
 				717AD96A290B6602007D7DB5 /* Audio.h in Headers */,
+				71F2254D2C58740F006ED3CA /* Points.h in Headers */,
 				71ABBD382791167A001CE3AF /* UIComponent.h in Headers */,
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
 				71ABBD1E277A31BA001CE3AF /* Text.h in Headers */,
@@ -4367,6 +4373,7 @@
 				717D9B4127337850002C0803 /* ParticlesComponent.h in Headers */,
 				715CB119288CD40E0049344B /* Terrain.h in Headers */,
 				71CC839A26B8C4FD00EEBB93 /* FramebufferRender.h in Headers */,
+				71F225452C58736B006ED3CA /* InstancedMeshComponent.h in Headers */,
 				7105CAA92AD61BD5007C91BA /* Box2DAux.h in Headers */,
 				71E824912A9C23A600C8E6F2 /* Body2D.h in Headers */,
 				718FDDFA2837CA9A00AF314C /* hlsl5.h in Headers */,
@@ -4420,7 +4427,6 @@
 				71D74958296731F200348AB8 /* Tilemap.h in Headers */,
 				71BE623F25B1DB9E006D6E02 /* LuaBinding.h in Headers */,
 				71FCE4C128E0FA01003C5217 /* LuaFunctionBase.h in Headers */,
-				717D9B3F2733783D002C0803 /* ParticlesAnimation.h in Headers */,
 				713E581127BA9CE400376680 /* TextEdit.h in Headers */,
 				71E5450B284D5BB700C68FAB /* RotateTracks.h in Headers */,
 				71CC83A426B8C54A00EEBB93 /* ShaderData.h in Headers */,
@@ -5526,7 +5532,6 @@
 				71ABBD0F277A313C001CE3AF /* AlphaAction.cpp in Sources */,
 				71BE624225B1DB9E006D6E02 /* TexturePool.cpp in Sources */,
 				713D8293259D307F00567F9F /* Scene.cpp in Sources */,
-				717D9B3E2733783D002C0803 /* ParticlesAnimation.cpp in Sources */,
 				7105A56D28B305B20092EA05 /* IOClassesLua.cpp in Sources */,
 				71651FF72AA804B4008D9BF5 /* Manifold2D.cpp in Sources */,
 				713D8294259D307F00567F9F /* Data.cpp in Sources */,
@@ -5538,7 +5543,6 @@
 				7181A0B12BC8B6CB00AC230B /* Panel.cpp in Sources */,
 				71CC839626B8C4D800EEBB93 /* Light.cpp in Sources */,
 				71E824952A9C242B00C8E6F2 /* PhysicsSystem.cpp in Sources */,
-				714BBF7527148B85004A15EE /* Particles.cpp in Sources */,
 				713D8295259D307F00567F9F /* UserSettings.cpp in Sources */,
 				71A41CB629AC3D7C006953D3 /* SokolCmdQueue.cpp in Sources */,
 				7105A56B28B305B20092EA05 /* UtilClassesLua.cpp in Sources */,
@@ -5593,6 +5597,7 @@
 				7170A3DC2818A8A30003E965 /* Fog.cpp in Sources */,
 				71033D6A2BD1A7F100D81FB5 /* Scrollbar.cpp in Sources */,
 				71BE623925B1DB9E006D6E02 /* LuaBinding.cpp in Sources */,
+				71F2254F2C58740F006ED3CA /* Points.cpp in Sources */,
 				71451BD2270CA17F00712643 /* SpriteAnimation.cpp in Sources */,
 				71D74954296731F200348AB8 /* Tilemap.cpp in Sources */,
 				715CB118288CD40E0049344B /* Terrain.cpp in Sources */,
@@ -5608,6 +5613,7 @@
 				71ABBD25277A31E6001CE3AF /* UISystem.cpp in Sources */,
 				713D82AF259D307F00567F9F /* InterleavedBuffer.cpp in Sources */,
 				71E54500284D5BB700C68FAB /* Animation.cpp in Sources */,
+				71F2254A2C587388006ED3CA /* Particles.cpp in Sources */,
 				717AD994292FC30A007D7DB5 /* Framebuffer.cpp in Sources */,
 				7128D11F25C2356200965B51 /* SokolSystem.cpp in Sources */,
 				7105A56528B305B20092EA05 /* CoreClassesLua.cpp in Sources */,
@@ -5691,7 +5697,6 @@
 				71ABBD0E277A313C001CE3AF /* AlphaAction.cpp in Sources */,
 				71BE624125B1DB9E006D6E02 /* TexturePool.cpp in Sources */,
 				7162FE0E2596A5BE0075B97D /* SokolShader.cpp in Sources */,
-				717D9B3D2733783D002C0803 /* ParticlesAnimation.cpp in Sources */,
 				7105A56C28B305B20092EA05 /* IOClassesLua.cpp in Sources */,
 				71651FF62AA804B4008D9BF5 /* Manifold2D.cpp in Sources */,
 				7162FE0F2596A5BE0075B97D /* SokolTexture.cpp in Sources */,
@@ -5703,7 +5708,6 @@
 				7181A0B02BC8B6CB00AC230B /* Panel.cpp in Sources */,
 				71CC839526B8C4D800EEBB93 /* Light.cpp in Sources */,
 				71E824942A9C242B00C8E6F2 /* PhysicsSystem.cpp in Sources */,
-				714BBF7427148B85004A15EE /* Particles.cpp in Sources */,
 				7162FE102596A5BE0075B97D /* SokolCamera.cpp in Sources */,
 				71A41CB529AC3D7C006953D3 /* SokolCmdQueue.cpp in Sources */,
 				7105A56A28B305B20092EA05 /* UtilClassesLua.cpp in Sources */,
@@ -5758,6 +5762,7 @@
 				7162FD3B25963AE00075B97D /* AABB.cpp in Sources */,
 				71033D692BD1A7F100D81FB5 /* Scrollbar.cpp in Sources */,
 				7170A3DB2818A8A30003E965 /* Fog.cpp in Sources */,
+				71F2254E2C58740F006ED3CA /* Points.cpp in Sources */,
 				71BE623825B1DB9E006D6E02 /* LuaBinding.cpp in Sources */,
 				71D74953296731F200348AB8 /* Tilemap.cpp in Sources */,
 				71451BD1270CA17F00712643 /* SpriteAnimation.cpp in Sources */,
@@ -5773,6 +5778,7 @@
 				71ABBD24277A31E6001CE3AF /* UISystem.cpp in Sources */,
 				7162FD4525963AE00075B97D /* Object.cpp in Sources */,
 				71E544FF284D5BB700C68FAB /* Animation.cpp in Sources */,
+				71F225492C587388006ED3CA /* Particles.cpp in Sources */,
 				717AD993292FC30A007D7DB5 /* Framebuffer.cpp in Sources */,
 				7128D11E25C2356200965B51 /* SokolSystem.cpp in Sources */,
 				7105A56428B305B20092EA05 /* CoreClassesLua.cpp in Sources */,
