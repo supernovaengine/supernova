@@ -67,10 +67,14 @@ namespace Supernova{
         void setSpriteModifier(float fromTime, float toTime, std::vector<int> frames);
         void setSpriteModifier(float fromTime, float toTime, std::vector<int> frames, EaseType functionType);
 
+        void setRotationInitializer(Quaternion rotation);
         void setRotationInitializer(float rotation);
+        void setRotationInitializer(Quaternion minRotation, Quaternion maxRotation);
         void setRotationInitializer(float minRotation, float maxRotation);
         void setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation);
+        void setRotationModifier(float fromTime, float toTime, Quaternion fromRotation, Quaternion toRotation);
         void setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation, EaseType functionType);
+        void setRotationModifier(float fromTime, float toTime, Quaternion fromRotation, Quaternion toRotation, EaseType functionType);
     };
 }
 

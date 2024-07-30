@@ -126,18 +126,22 @@ namespace Supernova{
     };
 
     struct ParticleRotationInitializer{
-        float minRotation = 0;
-        float maxRotation = 0;
+        Quaternion minRotation;
+        Quaternion maxRotation;
+
+        bool shortestPath = false;
     };
 
     struct ParticleRotationModifier{
         float fromTime = 0;
         float toTime = 0;
 
-        float fromRotation = 0;
-        float toRotation = 0;
+        Quaternion fromRotation;
+        Quaternion toRotation;
 
         FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
+
+        bool shortestPath = false;
     };
 
     struct ParticleData{

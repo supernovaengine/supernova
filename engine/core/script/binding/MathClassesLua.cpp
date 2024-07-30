@@ -297,10 +297,14 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("unitInverse", &Quaternion::unitInverse)
         .addFunction("exp", &Quaternion::exp)
         .addFunction("log", &Quaternion::log)
-        .addFunction("slerp", &Quaternion::slerp)
-        .addFunction("slerpExtraSpins", &Quaternion::slerpExtraSpins)
-        .addFunction("squad", &Quaternion::squad)
-        .addFunction("nlerp", &Quaternion::nlerp)
+        .addStaticFunction("slerp", 
+            luabridge::overload<float, const Quaternion&, const Quaternion&>(&Quaternion::slerp),
+            luabridge::overload<float, const Quaternion&, const Quaternion&, bool>(&Quaternion::slerp))
+        .addStaticFunction("slerpExtraSpins", &Quaternion::slerpExtraSpins)
+        .addStaticFunction("nlerp", 
+            luabridge::overload<float, const Quaternion&, const Quaternion&>(&Quaternion::nlerp),
+            luabridge::overload<float, const Quaternion&, const Quaternion&, bool>(&Quaternion::nlerp))
+        .addStaticFunction("squad", &Quaternion::squad)
         .addFunction("normalize", &Quaternion::normalize)
         .addFunction("normalizeL", &Quaternion::normalizeL)
         .addFunction("getRoll", &Quaternion::getRoll)

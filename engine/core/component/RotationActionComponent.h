@@ -12,6 +12,8 @@ namespace Supernova{
     struct RotationActionComponent{
         Quaternion endRotation;
         Quaternion startRotation;
+
+        bool shortestPath = false;
     };
 
 }

@@ -185,10 +185,14 @@ void LuaBinding::registerActionClasses(lua_State *L){
             luabridge::overload<float, float, std::vector<int>, EaseType>(&Particles::setSpriteModifier))
         .addFunction("setRotationInitializer", 
             luabridge::overload<float>(&Particles::setRotationInitializer),
-            luabridge::overload<float, float>(&Particles::setRotationInitializer))
+            luabridge::overload<float, float>(&Particles::setRotationInitializer),
+            luabridge::overload<Quaternion>(&Particles::setRotationInitializer),
+            luabridge::overload<Quaternion, Quaternion>(&Particles::setRotationInitializer))
         .addFunction("setRotationModifier", 
             luabridge::overload<float, float, float, float>(&Particles::setRotationModifier),
-            luabridge::overload<float, float, float, float, EaseType>(&Particles::setRotationModifier))
+            luabridge::overload<float, float, float, float, EaseType>(&Particles::setRotationModifier),
+            luabridge::overload<float, float, Quaternion, Quaternion>(&Particles::setRotationModifier),
+            luabridge::overload<float, float, Quaternion, Quaternion, EaseType>(&Particles::setRotationModifier))
         .addFunction("getParticlesomponent", &Particles::getComponent<ParticlesComponent>)
         .endClass();
 

@@ -506,6 +506,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .beginClass<ParticleRotationInitializer>("ParticleRotationInitializer")
         .addProperty("minRotation", &ParticleRotationInitializer::minRotation)
         .addProperty("maxRotation", &ParticleRotationInitializer::maxRotation)
+        .addProperty("shortestPath", &ParticleRotationInitializer::shortestPath)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -515,6 +516,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("fromRotation", &ParticleRotationModifier::fromRotation)
         .addProperty("toRotation", &ParticleRotationModifier::toRotation)
         .addProperty("function", [] (ParticleRotationModifier* self, lua_State* L) { return &self->function; }, [] (ParticleRotationModifier* self, lua_State* L) { self->function = L; })
+        .addProperty("shortestPath", &ParticleRotationModifier::shortestPath)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

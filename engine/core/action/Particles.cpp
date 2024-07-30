@@ -268,22 +268,47 @@ void Particles::setSpriteModifier(float fromTime, float toTime, std::vector<int>
     partAnim.spriteModifier.function = Ease::getFunction(functionType);
 }
 
+void Particles::setRotationInitializer(Quaternion rotation){
+    setRotationInitializer(rotation, rotation);
+}
+
 void Particles::setRotationInitializer(float rotation){
     setRotationInitializer(rotation, rotation);
 }
 
-void Particles::setRotationInitializer(float minRotation, float maxRotation){
+void Particles::setRotationInitializer(Quaternion minRotation, Quaternion maxRotation){
     ParticlesComponent& partAnim = getComponent<ParticlesComponent>();
 
     partAnim.rotationInitializer.minRotation = minRotation;
     partAnim.rotationInitializer.maxRotation = maxRotation;
 }
 
+void Particles::setRotationInitializer(float minRotation, float maxRotation){
+    ParticlesComponent& partAnim = getComponent<ParticlesComponent>();
+
+    partAnim.rotationInitializer.minRotation = Quaternion(0, 0, minRotation);
+    partAnim.rotationInitializer.maxRotation = Quaternion(0, 0, maxRotation);
+}
+
 void Particles::setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation){
     setRotationModifier(fromTime, toTime, fromRotation, toRotation, EaseType::LINEAR);
 }
 
+void Particles::setRotationModifier(float fromTime, float toTime, Quaternion fromRotation, Quaternion toRotation){
+    setRotationModifier(fromTime, toTime, fromRotation, toRotation, EaseType::LINEAR);
+}
+
 void Particles::setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation, EaseType functionType){
+    ParticlesComponent& partAnim = getComponent<ParticlesComponent>();
+
+    partAnim.rotationModifier.fromTime = fromTime;
+    partAnim.rotationModifier.toTime = toTime;
+    partAnim.rotationModifier.fromRotation = Quaternion(0, 0, fromRotation);
+    partAnim.rotationModifier.toRotation = Quaternion(0, 0, toRotation);;
+    partAnim.rotationModifier.function = Ease::getFunction(functionType);
+}
+
+void Particles::setRotationModifier(float fromTime, float toTime, Quaternion fromRotation, Quaternion toRotation, EaseType functionType){
     ParticlesComponent& partAnim = getComponent<ParticlesComponent>();
 
     partAnim.rotationModifier.fromTime = fromTime;

@@ -444,8 +444,12 @@ bool Quaternion::equals(const Quaternion& rhs) const
     return ( fabs(matching-1.0) < 0.001 );
 }
 
-Quaternion Quaternion::slerp(float t, Quaternion q1, Quaternion q2)
+Quaternion Quaternion::slerp(float t, const Quaternion& q1, const Quaternion& q2)
 {
+    return slerp(t, q1, q2, true);
+}
+
+Quaternion Quaternion::slerp(float t, const Quaternion& q1, const Quaternion& q2, bool shortestPath){
     float w1, x1, y1, z1, w2, x2, y2, z2, w3, x3, y3, z3;
 
     float theta, mult1, mult2;
@@ -453,11 +457,13 @@ Quaternion Quaternion::slerp(float t, Quaternion q1, Quaternion q2)
     w1 = q1.w; x1 = q1.x; y1 = q1.y; z1 = q1.z;
     w2 = q2.w; x2 = q2.x; y2 = q2.y; z2 = q2.z;
 
-    if (w1*w2 + x1*x2 + y1*y2 + z1*z2 < 0) {
-        w2 = -w2; x2 = -x2; y2 = -y2; z2 = -z2;
+    float dot = w1*w2 + x1*x2 + y1*y2 + z1*z2;
+
+    if (dot < 0 && shortestPath) {
+        w2 = -w2; x2 = -x2; y2 = -y2; z2 = -z2; dot = -dot;
     }
 
-    theta = acos(w1*w2 + x1*x2 + y1*y2 + z1*z2);
+    theta = acos(dot);
 
     if (theta > FLT_EPSILON) {
         mult1 = sin( (1-t)*theta ) / sin( theta );
@@ -489,6 +495,27 @@ Quaternion Quaternion::slerpExtraSpins (float fT, const Quaternion& rkP, const Q
     float fCoeff0 = sin((1.0f-fT)*fAngle - fPhase)*fInvSin;
     float fCoeff1 = sin(fT*fAngle + fPhase)*fInvSin;
     return fCoeff0*rkP + fCoeff1*rkQ;
+}
+
+Quaternion Quaternion::nlerp(float fT, const Quaternion& rkP, const Quaternion& rkQ)
+{
+    return nlerp(fT, rkP, rkQ, false);
+}
+
+Quaternion Quaternion::nlerp(float fT, const Quaternion& rkP, const Quaternion& rkQ, bool shortestPath)
+{
+    Quaternion result;
+    float fCos = rkP.dot(rkQ);
+    if (fCos < 0.0f && shortestPath)
+    {
+        result = rkP + fT * ((-rkQ) - rkP);
+    }
+    else
+    {
+        result = rkP + fT * (rkQ - rkP);
+    }
+    result.normalize();
+    return result;
 }
 
 Quaternion Quaternion::squad (float fT, const Quaternion& rkP, const Quaternion& rkA, const Quaternion& rkB, const Quaternion& rkQ)
@@ -556,20 +583,4 @@ float Quaternion::getYaw() const
 
         // Vector3(fTxz+fTwy, fTyz-fTwx, 1.0-(fTxx+fTyy));
         return Angle::radToDefault(atan2(fTxz+fTwy, 1.0f-(fTxx+fTyy)));
-}
-
-Quaternion Quaternion::nlerp(float fT, const Quaternion& rkP, const Quaternion& rkQ, bool shortestPath)
-{
-    Quaternion result;
-    float fCos = rkP.dot(rkQ);
-    if (fCos < 0.0f && shortestPath)
-    {
-        result = rkP + fT * ((-rkQ) - rkP);
-    }
-    else
-    {
-        result = rkP + fT * (rkQ - rkP);
-    }
-    result.normalize();
-    return result;
 }

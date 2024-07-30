@@ -256,7 +256,7 @@ void ActionSystem::positionActionUpdate(double dt, ActionComponent& action, Time
 }
 
 void ActionSystem::rotationActionUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, RotationActionComponent& rotaction, Transform& transform){
-    transform.rotation = transform.rotation.slerp(timedaction.value, rotaction.startRotation, rotaction.endRotation);
+    transform.rotation = Quaternion::slerp(timedaction.value, rotaction.startRotation, rotaction.endRotation, rotaction.shortestPath);
     transform.needUpdate = true;
 }
 
@@ -333,6 +333,13 @@ Vector3 ActionSystem::getVector3InitializerValue(Vector3& min, Vector3& max){
     return max;
 }
 
+Quaternion ActionSystem::getQuaternionInitializerValue(Quaternion& min, Quaternion& max, bool shortestPath){
+    if (min != max) {
+        return Quaternion::slerp((float) rand() / (float) RAND_MAX, min, max, shortestPath);
+    }
+    return max;
+}
+
 Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointsComponent& points){
     if (frames.size() > 0){
         int id = frames[int(frames.size()*rand()/(RAND_MAX + 1.0))];
@@ -360,7 +367,7 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
 
     ParticleColorInitializer& colInit = particles.colorInitializer;
     instmesh.instances[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
-    if (particles.colorInitializer.useSRGB){
+    if (colInit.useSRGB){
         instmesh.instances[idx].color = Color::sRGBToLinear(instmesh.instances[idx].color);
     }
 
@@ -374,7 +381,7 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
     particles.particles[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, particles);
 */
     ParticleRotationInitializer& rotInit = particles.rotationInitializer;
-    instmesh.instances[idx].rotation.fromAngleAxis(getFloatInitializerValue(rotInit.minRotation, rotInit.maxRotation), Vector3(0,0,1));
+    instmesh.instances[idx].rotation = getQuaternionInitializerValue(rotInit.minRotation, rotInit.maxRotation, rotInit.shortestPath);
 
 }
 
@@ -393,7 +400,7 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
 
     ParticleColorInitializer& colInit = particles.colorInitializer;
     points.points[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
-    if (particles.colorInitializer.useSRGB){
+    if (colInit.useSRGB){
         points.points[idx].color = Color::sRGBToLinear(points.points[idx].color);
     }
 
@@ -407,7 +414,7 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
     points.points[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, points);
 
     ParticleRotationInitializer& rotInit = particles.rotationInitializer;
-    points.points[idx].rotation = Angle::defaultToRad(getFloatInitializerValue(rotInit.minRotation, rotInit.maxRotation));
+    points.points[idx].rotation = Angle::defaultToRad(getQuaternionInitializerValue(rotInit.minRotation, rotInit.maxRotation, rotInit.shortestPath).getRoll());
 }
 
 float ActionSystem::getTimeFromParticleTime(float& time, float& fromTime, float& toTime){
@@ -424,6 +431,10 @@ float ActionSystem::getFloatModifierValue(float& value, float& fromValue, float&
 
 Vector3 ActionSystem::getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue){
     return fromValue + ((toValue - fromValue) * value);
+}
+
+Quaternion ActionSystem::getQuaternionModifierValue(float& value, Quaternion& fromValue, Quaternion& toValue, bool shortestPath){
+    return Quaternion::slerp(value, fromValue, toValue, shortestPath);
 }
 
 Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, PointsComponent& points){
@@ -469,7 +480,7 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     value = colMod.function.call(time);
     if (value >= 0 && value <= 1){
         instmesh.instances[idx].color = getVector3ModifierValue(value, colMod.fromColor, colMod.toColor);
-        if (particles.colorModifier.useSRGB){
+        if (colMod.useSRGB){
             instmesh.instances[idx].color = Color::sRGBToLinear(instmesh.instances[idx].color);
         }
     }
@@ -499,7 +510,7 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     time = getTimeFromParticleTime(particleTime, rotMod.fromTime, rotMod.toTime);
     value = rotMod.function.call(time);
     if (value >= 0 && value <= 1){
-        instmesh.instances[idx].rotation.fromAngleAxis(getFloatModifierValue(value, rotMod.fromRotation, rotMod.toRotation), Vector3(0,0,1));
+        instmesh.instances[idx].rotation = getQuaternionModifierValue(value, rotMod.fromRotation, rotMod.toRotation, rotMod.shortestPath);
     }
 
 }
@@ -535,7 +546,7 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     value = colMod.function.call(time);
     if (value >= 0 && value <= 1){
         points.points[idx].color = getVector3ModifierValue(value, colMod.fromColor, colMod.toColor);
-        if (particles.colorModifier.useSRGB){
+        if (colMod.useSRGB){
             points.points[idx].color = Color::sRGBToLinear(points.points[idx].color);
         }
     }
@@ -565,7 +576,7 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     time = getTimeFromParticleTime(particleTime, rotMod.fromTime, rotMod.toTime);
     value = rotMod.function.call(time);
     if (value >= 0 && value <= 1){
-        points.points[idx].rotation = Angle::defaultToRad(getFloatModifierValue(value, rotMod.fromRotation, rotMod.toRotation));
+        points.points[idx].rotation = Angle::defaultToRad(getQuaternionModifierValue(value, rotMod.fromRotation, rotMod.toRotation, rotMod.shortestPath).getRoll());
     }
 }
 
@@ -799,7 +810,7 @@ void ActionSystem::rotateTracksUpdate(KeyframeTracksComponent& keyframe, RotateT
         previousRotation = rotatetracks.values[keyframe.index-1];
     }
 
-    transform.rotation = transform.rotation.slerp(keyframe.interpolation, previousRotation, rotatetracks.values[keyframe.index]);
+    transform.rotation = Quaternion::slerp(keyframe.interpolation, previousRotation, rotatetracks.values[keyframe.index]);
     transform.needUpdate = true;
 }
 

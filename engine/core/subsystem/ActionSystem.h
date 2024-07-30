@@ -71,6 +71,7 @@ namespace Supernova{
 
 		float getFloatInitializerValue(float& min, float& max);
 		Vector3 getVector3InitializerValue(Vector3& min, Vector3& max);
+		Quaternion getQuaternionInitializerValue(Quaternion& min, Quaternion& max, bool shortestPath);
 		Rect getSpriteInitializerValue(std::vector<int>& frames, PointsComponent& points);
 		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, PointsComponent& points);
@@ -78,6 +79,7 @@ namespace Supernova{
 		float getTimeFromParticleTime(float& time, float& fromTime, float& toTime);
 		float getFloatModifierValue(float& value, float& fromValue, float& toValue);
 		Vector3 getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue);
+		Quaternion getQuaternionModifierValue(float& value, Quaternion& fromValue, Quaternion& toValue, bool shortestPath);
 		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, PointsComponent& points);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, PointsComponent& points);
