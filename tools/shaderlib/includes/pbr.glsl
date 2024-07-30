@@ -12,7 +12,7 @@ vec4 getVertexColor(){
     #ifdef HAS_VERTEX_COLOR_VEC3
         color.rgb = v_color.rgb;
     #endif
-    #ifdef HAS_VERTEX_COLOR_VEC4
+    #if defined(HAS_VERTEX_COLOR_VEC4) || defined(HAS_INSTANCING)
         color = v_color;
     #endif
 

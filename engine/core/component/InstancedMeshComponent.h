@@ -12,11 +12,13 @@ namespace Supernova{
         Vector3 position = Vector3(0,0,0);
         Quaternion rotation;
         Vector3 scale = Vector3(1,1,1);
+        Vector4 color = Vector4(1.0, 0.0, 1.0, 1.0);  //linear color;
         bool visible = false;
     };
 
     struct InstanceRenderData{
         Matrix4 instanceMatrix;
+        Vector4 color;
     };
 
     struct InstancedMeshComponent{

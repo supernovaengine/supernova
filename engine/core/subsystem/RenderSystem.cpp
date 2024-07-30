@@ -550,7 +550,8 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL2, 4, 4 * sizeof(float), true);
 		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL3, 4, 8 * sizeof(float), true);
 		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL4, 4, 12 * sizeof(float), true);
-		instmesh->buffer.setStride(16 * sizeof(float));
+		instmesh->buffer.addAttribute(AttributeType::INSTANCECOLOR, 4, 16 * sizeof(float), true);
+		instmesh->buffer.setStride(20 * sizeof(float));
 
 		instmesh->buffer.setRenderAttributes(false);
 		instmesh->buffer.setInstanceBuffer(true);
@@ -2263,6 +2264,7 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 
 			instmesh.renderInstances.push_back({});
 			instmesh.renderInstances[instmesh.numVisible].instanceMatrix = translateMatrix * rotationMatrix * scaleMatrix;
+			instmesh.renderInstances[instmesh.numVisible].color = instmesh.instances[i].color;
 			instmesh.numVisible++;
 		}
 	}

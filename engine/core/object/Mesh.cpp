@@ -131,7 +131,10 @@ void Mesh::addInstance(Vector3 position, Quaternion rotation, Vector3 scale){
     MeshComponent& mesh = getComponent<MeshComponent>();
     InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
-    instmesh.instances.push_back({position, rotation, scale, true});
+    instmesh.instances.push_back({});
+    instmesh.instances.back().position = position;
+    instmesh.instances.back().rotation = rotation;
+    instmesh.instances.back().scale = scale;
 
     if (instmesh.maxInstances < instmesh.instances.size()){
         instmesh.maxInstances = instmesh.maxInstances * 2;

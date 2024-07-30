@@ -357,25 +357,25 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
 
     ParticleAccelerationInitializer& accInit = particles.accelerationInitializer;
     particles.particles[idx].acceleration = getVector3InitializerValue(accInit.minAcceleration, accInit.maxAcceleration);
-/*
+
     ParticleColorInitializer& colInit = particles.colorInitializer;
-    particles.particles[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
+    instmesh.instances[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
     if (particles.colorInitializer.useSRGB){
-        particles.particles[idx].color = Color::sRGBToLinear(particles.particles[idx].color);
+        instmesh.instances[idx].color = Color::sRGBToLinear(instmesh.instances[idx].color);
     }
 
     ParticleAlphaInitializer& alpInit = particles.alphaInitializer;
-    particles.particles[idx].color.w = getFloatInitializerValue(alpInit.minAlpha, alpInit.maxAlpha);
-
+    instmesh.instances[idx].color.w = getFloatInitializerValue(alpInit.minAlpha, alpInit.maxAlpha);
+/*
     ParticleSizeInitializer& sizeInit = particles.sizeInitializer;
     particles.particles[idx].size = getFloatInitializerValue(sizeInit.minSize, sizeInit.maxSize);
 
     ParticleSpriteInitializer& spriteInit = particles.spriteInitializer;
     particles.particles[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, particles);
-
-    ParticleRotationInitializer& rotInit = particles.rotationInitializer;
-    particles.particles[idx].rotation = Angle::defaultToRad(getFloatInitializerValue(rotInit.minRotation, rotInit.maxRotation));
 */
+    ParticleRotationInitializer& rotInit = particles.rotationInitializer;
+    instmesh.instances[idx].rotation.fromAngleAxis(getFloatInitializerValue(rotInit.minRotation, rotInit.maxRotation), Vector3(0,0,1));
+
 }
 
 void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, PointsComponent& points){
@@ -463,24 +463,24 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     if (value >= 0 && value <= 1){
         particles.particles[idx].acceleration = getVector3ModifierValue(value, accMod.fromAcceleration, accMod.toAcceleration);
     }
-    /*
-    ParticleColorModifier& colMod = partanim.colorModifier;
+
+    ParticleColorModifier& colMod = particles.colorModifier;
     time = getTimeFromParticleTime(particleTime, colMod.fromTime, colMod.toTime);
     value = colMod.function.call(time);
     if (value >= 0 && value <= 1){
-        particles.particles[idx].color = getVector3ModifierValue(value, colMod.fromColor, colMod.toColor);
-        if (partanim.colorModifier.useSRGB){
-            particles.particles[idx].color = Color::sRGBToLinear(particles.particles[idx].color);
+        instmesh.instances[idx].color = getVector3ModifierValue(value, colMod.fromColor, colMod.toColor);
+        if (particles.colorModifier.useSRGB){
+            instmesh.instances[idx].color = Color::sRGBToLinear(instmesh.instances[idx].color);
         }
     }
 
-    ParticleAlphaModifier& alpMod = partanim.alphaModifier;
+    ParticleAlphaModifier& alpMod = particles.alphaModifier;
     time = getTimeFromParticleTime(particleTime, alpMod.fromTime, alpMod.toTime);
     value = alpMod.function.call(time);
     if (value >= 0 && value <= 1){
-        particles.particles[idx].color.w = getFloatModifierValue(value, alpMod.fromAlpha, alpMod.toAlpha);
+        instmesh.instances[idx].color.w = getFloatModifierValue(value, alpMod.fromAlpha, alpMod.toAlpha);
     }
-
+/*
     ParticleSizeModifier& sizeMod = partanim.sizeModifier;
     time = getTimeFromParticleTime(particleTime, sizeMod.fromTime, sizeMod.toTime);
     value = sizeMod.function.call(time);
@@ -494,14 +494,14 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     if (value >= 0 && value <= 1){
         particles.particles[idx].textureRect = getSpriteModifierValue(value, spriteMod.frames, particles);
     }
-
-    ParticleRotationModifier& rotMod = partanim.rotationModifier;
+    */
+    ParticleRotationModifier& rotMod = particles.rotationModifier;
     time = getTimeFromParticleTime(particleTime, rotMod.fromTime, rotMod.toTime);
     value = rotMod.function.call(time);
     if (value >= 0 && value <= 1){
-        particles.particles[idx].rotation = Angle::defaultToRad(getFloatModifierValue(value, rotMod.fromRotation, rotMod.toRotation));
+        instmesh.instances[idx].rotation.fromAngleAxis(getFloatModifierValue(value, rotMod.fromRotation, rotMod.toRotation), Vector3(0,0,1));
     }
-    */
+
 }
 
 void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, PointsComponent& points){

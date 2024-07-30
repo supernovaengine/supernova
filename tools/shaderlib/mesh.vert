@@ -53,6 +53,8 @@ in vec3 a_position;
 
 #ifdef HAS_VERTEX_COLOR_VEC4
     in vec4 a_color;
+#endif
+#if defined(HAS_VERTEX_COLOR_VEC4) || defined(HAS_INSTANCING)
     out vec4 v_color;
 #endif
 
@@ -70,6 +72,7 @@ in vec3 a_position;
     in vec4 i_matrix_col2;
     in vec4 i_matrix_col3;
     in vec4 i_matrix_col4;
+    in vec4 i_color;
 #endif
 
 #include "includes/skinning.glsl"
@@ -162,8 +165,16 @@ void main() {
         #endif
     #endif
 
-    #if defined(HAS_VERTEX_COLOR_VEC3) || defined(HAS_VERTEX_COLOR_VEC4)
-        v_color = a_color;
+    #ifdef HAS_INSTANCING
+        #if defined(HAS_VERTEX_COLOR_VEC3) || defined(HAS_VERTEX_COLOR_VEC4)
+            v_color = a_color * i_color;
+        #else
+            v_color = i_color;
+        #endif
+    #else
+        #if defined(HAS_VERTEX_COLOR_VEC3) || defined(HAS_VERTEX_COLOR_VEC4)
+            v_color = a_color;
+        #endif
     #endif
 
     #ifdef USE_SHADOWS

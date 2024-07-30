@@ -23,7 +23,7 @@
 #ifdef HAS_VERTEX_COLOR_VEC3
     in vec3 v_color;
 #endif
-#ifdef HAS_VERTEX_COLOR_VEC4
+#if defined(HAS_VERTEX_COLOR_VEC4) || defined(HAS_INSTANCING)
     in vec4 v_color;
 #endif
 

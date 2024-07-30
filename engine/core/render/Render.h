@@ -65,7 +65,8 @@ namespace Supernova{
         INSTANCEMATRIXCOL1,
         INSTANCEMATRIXCOL2,
         INSTANCEMATRIXCOL3,
-        INSTANCEMATRIXCOL4
+        INSTANCEMATRIXCOL4,
+        INSTANCECOLOR
     };
 
     enum class AttributeDataType{
