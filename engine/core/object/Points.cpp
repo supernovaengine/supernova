@@ -83,7 +83,10 @@ void Points::addPoint(Vector3 position, Vector4 color, float size, float rotatio
         pointscomp.needReload = true;
     }
 
-    pointscomp.hasTextureRect = true;
+    if (!pointscomp.hasTextureRect){
+        pointscomp.hasTextureRect = true;
+        pointscomp.needReload = true;
+    }
 
     pointscomp.needUpdate = true;
 }
@@ -112,6 +115,10 @@ void Points::addSpriteFrame(int id, std::string name, Rect rect){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
     if (id >= 0 && id < MAX_SPRITE_FRAMES){
         pointscomp.framesRect[id] = {true, name, rect};
+        if (!pointscomp.hasTextureRect){
+            pointscomp.hasTextureRect = true;
+            pointscomp.needReload = true;
+        }
     }else{
         Log::error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
     }
@@ -143,6 +150,17 @@ void Points::addSpriteFrame(Rect rect){
 void Points::removeSpriteFrame(int id){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
     pointscomp.framesRect[id].active = false;
+
+    bool hasActive = false;
+    for (int id = 0; id < MAX_SPRITE_FRAMES; id++){
+        if (pointscomp.framesRect[id].active){
+            hasActive = true;
+        }
+    }
+    if (!hasActive && pointscomp.hasTextureRect){
+        pointscomp.hasTextureRect = false;
+        pointscomp.needReload = true;
+    }
 }
 
 void Points::removeSpriteFrame(std::string name){
@@ -152,5 +170,16 @@ void Points::removeSpriteFrame(std::string name){
         if (pointscomp.framesRect[id].name == name){
             pointscomp.framesRect[id].active = false;
         }
+    }
+
+    bool hasActive = false;
+    for (int id = 0; id < MAX_SPRITE_FRAMES; id++){
+        if (pointscomp.framesRect[id].active){
+            hasActive = true;
+        }
+    }
+    if (!hasActive && pointscomp.hasTextureRect){
+        pointscomp.hasTextureRect = false;
+        pointscomp.needReload = true;
     }
 }
