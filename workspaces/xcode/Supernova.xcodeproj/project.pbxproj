@@ -433,7 +433,7 @@
 		71451BEB270CA2C900712643 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BE7270CA2C900712643 /* Sprite.cpp */; };
 		71451BEC270CA2C900712643 /* Sprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71451BE7270CA2C900712643 /* Sprite.cpp */; };
 		71451BF0270CA2C900712643 /* Sprite.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BEA270CA2C900712643 /* Sprite.h */; };
-		71451BF4270CA3EA00712643 /* FrameData.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BF2270CA3EA00712643 /* FrameData.h */; };
+		71451BF4270CA3EA00712643 /* SpriteFrameData.h in Headers */ = {isa = PBXBuildFile; fileRef = 71451BF2270CA3EA00712643 /* SpriteFrameData.h */; };
 		714741FB2B029F7D00C891FF /* TextureDataPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 714741F92B029F7D00C891FF /* TextureDataPool.h */; };
 		714741FC2B029F7D00C891FF /* TextureDataPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714741FA2B029F7D00C891FF /* TextureDataPool.cpp */; };
 		714741FD2B029F7D00C891FF /* TextureDataPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714741FA2B029F7D00C891FF /* TextureDataPool.cpp */; };
@@ -1824,7 +1824,7 @@
 		71451BD0270CA17F00712643 /* TimedAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimedAction.h; sourceTree = "<group>"; };
 		71451BE7270CA2C900712643 /* Sprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sprite.cpp; sourceTree = "<group>"; };
 		71451BEA270CA2C900712643 /* Sprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sprite.h; sourceTree = "<group>"; };
-		71451BF2270CA3EA00712643 /* FrameData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrameData.h; sourceTree = "<group>"; };
+		71451BF2270CA3EA00712643 /* SpriteFrameData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteFrameData.h; sourceTree = "<group>"; };
 		714741F92B029F7D00C891FF /* TextureDataPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureDataPool.h; sourceTree = "<group>"; };
 		714741FA2B029F7D00C891FF /* TextureDataPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureDataPool.cpp; sourceTree = "<group>"; };
 		714BBF7127148B69004A15EE /* PointsComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PointsComponent.h; sourceTree = "<group>"; };
@@ -3324,7 +3324,7 @@
 				7105A55628B305910092EA05 /* Color.cpp */,
 				7105A55728B305910092EA05 /* Color.h */,
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
-				71451BF2270CA3EA00712643 /* FrameData.h */,
+				71451BF2270CA3EA00712643 /* SpriteFrameData.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
 				7105CAA62AD61BD5007C91BA /* JoltPhysicsAux.h */,
 				71ABBD26277A3210001CE3AF /* STBText.cpp */,
@@ -4407,7 +4407,7 @@
 				71E54515284D5BE000C68FAB /* AnimationComponent.h in Headers */,
 				71ABBD2C277A3210001CE3AF /* DefaultFont.h in Headers */,
 				71ABBD14277A3166001CE3AF /* AlphaActionComponent.h in Headers */,
-				71451BF4270CA3EA00712643 /* FrameData.h in Headers */,
+				71451BF4270CA3EA00712643 /* SpriteFrameData.h in Headers */,
 				7170A3CC2818A87E0003E965 /* ModelComponent.h in Headers */,
 				713E580827BA9CB700376680 /* MeshPolygon.h in Headers */,
 				71ABBD23277A31E6001CE3AF /* UISystem.h in Headers */,

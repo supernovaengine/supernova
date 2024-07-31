@@ -7,7 +7,7 @@
 
 #include "buffer/Buffer.h"
 #include "texture/Texture.h"
-#include "util/FrameData.h"
+#include "util/SpriteFrameData.h"
 #include "Engine.h"
 #include "buffer/ExternalBuffer.h"
 

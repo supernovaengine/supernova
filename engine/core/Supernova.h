@@ -178,7 +178,7 @@
 //#include "util/Box2DAux.h"
 #include "util/Color.h"
 //#include "util/DefaultFont.h"
-#include "util/FrameData.h"
+#include "util/SpriteFrameData.h"
 #include "util/FunctionSubscribe.h"
 //#include "util/JoltPhysicsAux.h"
 //#include "util/STBText.h"

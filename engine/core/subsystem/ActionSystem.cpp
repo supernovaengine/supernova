@@ -177,7 +177,7 @@ void ActionSystem::animationDestroy(AnimationComponent& animcomp){
 
 void ActionSystem::setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
     if (spriteanim.frameIndex < MAX_SPRITE_FRAMES){
-        FrameData frameData = sprite.framesRect[spriteanim.frames[spriteanim.frameIndex]];
+        SpriteFrameData frameData = sprite.framesRect[spriteanim.frames[spriteanim.frameIndex]];
         if (frameData.active)
             mesh.submeshes[0].textureRect = frameData.rect;
     }

@@ -5,7 +5,7 @@
 #ifndef POINTS_COMPONENT_H
 #define POINTS_COMPONENT_H
 
-#include "util/FrameData.h"
+#include "util/SpriteFrameData.h"
 
 namespace Supernova{
 
@@ -35,7 +35,7 @@ namespace Supernova{
         std::vector<PointsData> points;
         std::vector<PointsRenderData> renderPoints; //must be sorted
 
-        FrameData framesRect[MAX_SPRITE_FRAMES];
+        SpriteFrameData framesRect[MAX_SPRITE_FRAMES];
 
         unsigned int maxPoints = 100;
         unsigned int numVisible = 0;

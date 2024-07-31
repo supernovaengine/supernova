@@ -2,14 +2,14 @@
 // (c) 2024 Eduardo Doria.
 //
 
-#ifndef FRAMEDATA_H
-#define FRAMEDATA_H
+#ifndef SPRITEFRAMEDATA_H
+#define SPRITEFRAMEDATA_H
 
 #include "math/Rect.h"
 
 namespace Supernova{
 
-    struct FrameData{
+    struct SpriteFrameData{
         bool active = false;
         std::string name;
         Rect rect;
@@ -17,4 +17,4 @@ namespace Supernova{
 
 }
 
-#endif //FRAMEDATA_H
+#endif //SPRITEFRAMEDATA_H
