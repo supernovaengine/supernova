@@ -26,6 +26,8 @@ namespace Supernova {
 
         std::string toString() const;
         
+        float operator [] ( const size_t i ) const;
+        float& operator [] ( const size_t i );
         Rect& operator = (const Rect& t);
         Rect& operator = (const Vector4& v);
         bool operator == (const Rect& t);

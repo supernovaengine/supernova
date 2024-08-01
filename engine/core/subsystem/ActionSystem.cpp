@@ -340,6 +340,18 @@ Quaternion ActionSystem::getQuaternionInitializerValue(Quaternion& min, Quaterni
     return max;
 }
 
+Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, SpriteComponent& sprite){
+    if (frames.size() > 0){
+        int id = frames[int(frames.size()*rand()/(RAND_MAX + 1.0))];
+
+        if (id >= 0 && id < MAX_SPRITE_FRAMES && sprite.framesRect[id].active){
+            return sprite.framesRect[id].rect;
+        }
+    }
+
+    return Rect(0,0,1,1);
+}
+
 Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointsComponent& points){
     if (frames.size() > 0){
         int id = frames[int(frames.size()*rand()/(RAND_MAX + 1.0))];
@@ -352,7 +364,7 @@ Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointsCom
     return Rect(0,0,1,1);
 }
 
-void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
+void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh, SpriteComponent* sprite){
     ParticleLifeInitializer& lifeInit = particles.lifeInitializer;
     particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
 
@@ -376,10 +388,12 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
 /*
     ParticleSizeInitializer& sizeInit = particles.sizeInitializer;
     particles.particles[idx].size = getFloatInitializerValue(sizeInit.minSize, sizeInit.maxSize);
-
-    ParticleSpriteInitializer& spriteInit = particles.spriteInitializer;
-    particles.particles[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, particles);
 */
+    if (sprite){
+        ParticleSpriteInitializer& spriteInit = particles.spriteInitializer;
+        instmesh.instances[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, *sprite);
+    }
+
     ParticleRotationInitializer& rotInit = particles.rotationInitializer;
     instmesh.instances[idx].rotation = getQuaternionInitializerValue(rotInit.minRotation, rotInit.maxRotation, rotInit.shortestPath);
 
@@ -437,6 +451,18 @@ Quaternion ActionSystem::getQuaternionModifierValue(float& value, Quaternion& fr
     return Quaternion::slerp(value, fromValue, toValue, shortestPath);
 }
 
+Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, SpriteComponent& sprite){
+    if (frames.size() > 0){
+        int id = frames[(int)(frames.size() * value)];
+
+        if (id >= 0 && id < MAX_SPRITE_FRAMES && sprite.framesRect[id].active){
+            return sprite.framesRect[id].rect;
+        }
+    }
+
+    return Rect(0,0,1,1);
+}
+
 Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, PointsComponent& points){
     if (frames.size() > 0){
         int id = frames[(int)(frames.size() * value)];
@@ -449,7 +475,7 @@ Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames
     return Rect(0,0,1,1);
 }
 
-void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
+void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh, SpriteComponent* sprite){
     float particleTime = particles.particles[idx].time;
     float value;
     float time;
@@ -498,14 +524,16 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     if (value >= 0 && value <= 1){
         particles.particles[idx].size = getFloatModifierValue(value, sizeMod.fromSize, sizeMod.toSize);
     }
-
-    ParticleSpriteModifier& spriteMod = partanim.spriteModifier;
-    time = getTimeFromParticleTime(particleTime, spriteMod.fromTime, spriteMod.toTime);
-    value = spriteMod.function.call(time);
-    if (value >= 0 && value <= 1){
-        particles.particles[idx].textureRect = getSpriteModifierValue(value, spriteMod.frames, particles);
+*/
+    if (sprite){
+        ParticleSpriteModifier& spriteMod = particles.spriteModifier;
+        time = getTimeFromParticleTime(particleTime, spriteMod.fromTime, spriteMod.toTime);
+        value = spriteMod.function.call(time);
+        if (value >= 0 && value <= 1){
+            instmesh.instances[idx].textureRect = getSpriteModifierValue(value, spriteMod.frames, *sprite);
+        }
     }
-    */
+
     ParticleRotationModifier& rotMod = particles.rotationModifier;
     time = getTimeFromParticleTime(particleTime, rotMod.fromTime, rotMod.toTime);
     value = rotMod.function.call(time);
@@ -630,7 +658,9 @@ void ActionSystem::particleActionStart(ParticlesComponent& particles, PointsComp
     particles.lastUsedParticle = 0;
 }
 
-void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
+void ActionSystem::particlesActionUpdate(double dt, Entity entity, Entity target, ActionComponent& action, ParticlesComponent& particles, InstancedMeshComponent& instmesh){
+    SpriteComponent* sprite = scene->findComponent<SpriteComponent>(target);
+
     if (particles.emitter){
         particles.newParticlesCount += dt * particles.rate;
 
@@ -644,7 +674,7 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
 
             if (particleIndex >= 0){
                 particles.particles[particleIndex].time = 0;
-                applyParticleInitializers(particleIndex, particles, instmesh);
+                applyParticleInitializers(particleIndex, particles, instmesh, sprite);
                 instmesh.needUpdateInstances = true;
             }else{
                 if (!particles.loop)
@@ -662,7 +692,7 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
 
         if(life > time){
 
-            applyParticleModifiers(i, particles, instmesh);
+            applyParticleModifiers(i, particles, instmesh, sprite);
 
             Vector3 velocity = particles.particles[i].velocity;
             Vector3 position = instmesh.instances[i].position;
@@ -693,7 +723,7 @@ void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionCompone
     }
 }
 
-void ActionSystem::particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesComponent& particles, PointsComponent& points){
+void ActionSystem::particlesActionUpdate(double dt, Entity entity, Entity target, ActionComponent& action, ParticlesComponent& particles, PointsComponent& points){
     if (particles.emitter){
         particles.newParticlesCount += dt * particles.rate;
 
@@ -932,13 +962,13 @@ void ActionSystem::update(double dt){
                 if (targetSignature.test(scene->getComponentType<InstancedMeshComponent>())){
                     InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(action.target);
 
-                    particlesActionUpdate(dt, entity, action, particles, instmesh);
+                    particlesActionUpdate(dt, entity, action.target, action, particles, instmesh);
                     if (action.state != ActionState::Running) continue;
                 }
                 if (targetSignature.test(scene->getComponentType<PointsComponent>())){
                     PointsComponent& points = scene->getComponent<PointsComponent>(action.target);
 
-                    particlesActionUpdate(dt, entity, action, particles, points);
+                    particlesActionUpdate(dt, entity, action.target, action, particles, points);
                     if (action.state != ActionState::Running) continue;
                 }
             }

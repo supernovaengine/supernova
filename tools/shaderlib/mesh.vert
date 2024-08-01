@@ -73,6 +73,7 @@ in vec3 a_position;
     in vec4 i_matrix_col3;
     in vec4 i_matrix_col4;
     in vec4 i_color;
+    in vec4 i_textureRect;
 #endif
 
 #include "includes/skinning.glsl"
@@ -151,7 +152,10 @@ void main() {
         #ifndef HAS_TERRAIN
             v_uv1 = a_texcoord1;
             #ifdef HAS_TEXTURERECT
-                v_uv1 = a_texcoord1 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
+                v_uv1 = v_uv1 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
+            #endif
+            #ifdef HAS_INSTANCING
+                v_uv1 = v_uv1 * i_textureRect.zw + i_textureRect.xy;
             #endif
         #else
             v_uv1 = getTerrainTiledTexture(pos.xyz);
@@ -161,7 +165,10 @@ void main() {
     #ifdef HAS_UV_SET2
         v_uv2 = a_texcoord2;
         #ifdef HAS_TEXTURERECT
-            v_uv2 = a_texcoord2 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
+            v_uv2 = v_uv2 * spriteParams.textureRect.zw + spriteParams.textureRect.xy;
+        #endif
+        #ifdef HAS_INSTANCING
+            v_uv2 = v_uv2 * i_textureRect.zw + i_textureRect.xy;
         #endif
     #endif
 

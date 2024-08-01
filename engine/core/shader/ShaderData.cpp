@@ -109,6 +109,8 @@ int ShaderData::getAttrIndex(AttributeType type){
         attrstr = "i_matrix_col4";
     }else if (type == AttributeType::INSTANCECOLOR){
         attrstr = "i_color";
+    }else if (type == AttributeType::INSTANCETEXTURERECT){
+        attrstr = "i_textureRect";
     }
 
     if (attrstr.empty()){

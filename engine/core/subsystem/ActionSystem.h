@@ -72,22 +72,24 @@ namespace Supernova{
 		float getFloatInitializerValue(float& min, float& max);
 		Vector3 getVector3InitializerValue(Vector3& min, Vector3& max);
 		Quaternion getQuaternionInitializerValue(Quaternion& min, Quaternion& max, bool shortestPath);
+		Rect getSpriteInitializerValue(std::vector<int>& frames, SpriteComponent& sprite);
 		Rect getSpriteInitializerValue(std::vector<int>& frames, PointsComponent& points);
-		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
+		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh, SpriteComponent* sprite);
 		void applyParticleInitializers(size_t idx, ParticlesComponent& particles, PointsComponent& points);
 
 		float getTimeFromParticleTime(float& time, float& fromTime, float& toTime);
 		float getFloatModifierValue(float& value, float& fromValue, float& toValue);
 		Vector3 getVector3ModifierValue(float& value, Vector3& fromValue, Vector3& toValue);
 		Quaternion getQuaternionModifierValue(float& value, Quaternion& fromValue, Quaternion& toValue, bool shortestPath);
+		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, SpriteComponent& sprite);
 		Rect getSpriteModifierValue(float& value, std::vector<int>& frames, PointsComponent& points);
-		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
+		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh, SpriteComponent* sprite);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, PointsComponent& points);
 
 		void particleActionStart(ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void particleActionStart(ParticlesComponent& particles, PointsComponent& points);
-		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
-		void particlesActionUpdate(double dt, Entity entity, ActionComponent& action, ParticlesComponent& particles, PointsComponent& points);
+		void particlesActionUpdate(double dt, Entity entity, Entity target, ActionComponent& action, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
+		void particlesActionUpdate(double dt, Entity entity, Entity target, ActionComponent& action, ParticlesComponent& particles, PointsComponent& points);
 
 		//Keyframe
 		void keyframeUpdate(double dt, ActionComponent& action, KeyframeTracksComponent& keyframe);

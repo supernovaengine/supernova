@@ -31,6 +31,18 @@ Rect::Rect(const Vector4& v){
     this->height = v.w;
 }
 
+float Rect::operator [] ( const size_t i ) const{
+    assert( i < 4 );
+
+    return *(&x+i);
+}
+
+float& Rect::operator [] ( const size_t i ){
+    assert( i < 4 );
+
+    return *(&x+i);
+}
+
 Rect& Rect::operator = (const Rect& t){
     this->x = t.x;
     this->y = t.y;
