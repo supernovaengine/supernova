@@ -520,6 +520,21 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
+        .beginClass<ParticleScaleInitializer>("ParticleScaleInitializer")
+        .addProperty("minScale", &ParticleScaleInitializer::minScale)
+        .addProperty("maxScale", &ParticleScaleInitializer::maxScale)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<ParticleScaleModifier>("ParticleScaleModifier")
+        .addProperty("fromTime", &ParticleScaleModifier::fromTime)
+        .addProperty("toTime", &ParticleScaleModifier::toTime)
+        .addProperty("fromScale", &ParticleScaleModifier::fromScale)
+        .addProperty("toScale", &ParticleScaleModifier::toScale)
+        .addProperty("function", [] (ParticleScaleModifier* self, lua_State* L) { return &self->function; }, [] (ParticleScaleModifier* self, lua_State* L) { self->function = L; })
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<ParticlesComponent>("ParticlesComponent")
         .addProperty("newParticlesCount", &ParticlesComponent::newParticlesCount)
         .addProperty("lastUsedParticle", &ParticlesComponent::lastUsedParticle)
@@ -544,6 +559,8 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("spriteModifier", &ParticlesComponent::spriteModifier)
         .addProperty("rotationInitializer", &ParticlesComponent::rotationInitializer)
         .addProperty("rotationModifier", &ParticlesComponent::rotationModifier)
+        .addProperty("scaleInitializer", &ParticlesComponent::scaleInitializer)
+        .addProperty("scaleModifier", &ParticlesComponent::scaleModifier)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

@@ -75,6 +75,11 @@ namespace Supernova{
         void setRotationModifier(float fromTime, float toTime, Quaternion fromRotation, Quaternion toRotation);
         void setRotationModifier(float fromTime, float toTime, float fromRotation, float toRotation, EaseType functionType);
         void setRotationModifier(float fromTime, float toTime, Quaternion fromRotation, Quaternion toRotation, EaseType functionType);
+
+        void setScaleInitializer(Vector3 scale);
+        void setScaleInitializer(Vector3 minScale, Vector3 maxScale);
+        void setScaleModifier(float fromTime, float toTime, Vector3 fromScale, Vector3 toScale);
+        void setScaleModifier(float fromTime, float toTime, Vector3 fromScale, Vector3 toScale, EaseType functionType);
     };
 }
 

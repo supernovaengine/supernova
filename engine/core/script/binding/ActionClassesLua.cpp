@@ -193,6 +193,12 @@ void LuaBinding::registerActionClasses(lua_State *L){
             luabridge::overload<float, float, float, float, EaseType>(&Particles::setRotationModifier),
             luabridge::overload<float, float, Quaternion, Quaternion>(&Particles::setRotationModifier),
             luabridge::overload<float, float, Quaternion, Quaternion, EaseType>(&Particles::setRotationModifier))
+        .addFunction("setScaleInitializer", 
+            luabridge::overload<Vector3>(&Particles::setScaleInitializer),
+            luabridge::overload<Vector3, Vector3>(&Particles::setScaleInitializer))
+        .addFunction("setScaleModifier", 
+            luabridge::overload<float, float, Vector3, Vector3>(&Particles::setScaleModifier),
+            luabridge::overload<float, float, Vector3, Vector3, EaseType>(&Particles::setScaleModifier))
         .addFunction("getParticlesomponent", &Particles::getComponent<ParticlesComponent>)
         .endClass();
 

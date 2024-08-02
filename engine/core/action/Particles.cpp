@@ -317,3 +317,29 @@ void Particles::setRotationModifier(float fromTime, float toTime, Quaternion fro
     partAnim.rotationModifier.toRotation = toRotation;
     partAnim.rotationModifier.function = Ease::getFunction(functionType);
 }
+
+void Particles::setScaleInitializer(Vector3 scale){
+    setScaleInitializer(scale, scale);
+}
+
+void Particles::setScaleInitializer(Vector3 minScale, Vector3 maxScale){
+    ParticlesComponent& partAnim = getComponent<ParticlesComponent>();
+
+    partAnim.scaleInitializer.minScale = minScale;
+    partAnim.scaleInitializer.maxScale = maxScale;
+}
+
+void Particles::setScaleModifier(float fromTime, float toTime, Vector3 fromScale, Vector3 toScale){
+    setScaleModifier(fromTime, toTime, fromScale, toScale, EaseType::LINEAR);
+}
+
+void Particles::setScaleModifier(float fromTime, float toTime, Vector3 fromScale, Vector3 toScale, EaseType functionType){
+    ParticlesComponent& partAnim = getComponent<ParticlesComponent>();
+
+    partAnim.scaleModifier.fromTime = fromTime;
+    partAnim.scaleModifier.toTime = toTime;
+    partAnim.scaleModifier.fromScale = fromScale;
+    partAnim.scaleModifier.toScale = toScale;
+    partAnim.scaleModifier.function = Ease::getFunction(functionType);
+}
+

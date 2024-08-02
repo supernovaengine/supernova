@@ -144,6 +144,21 @@ namespace Supernova{
         bool shortestPath = false;
     };
 
+    struct ParticleScaleInitializer{
+        Vector3 minScale = Vector3(1,1,1);
+        Vector3 maxScale = Vector3(1,1,1);
+    };
+
+    struct ParticleScaleModifier{
+        float fromTime = 0;
+        float toTime = 0;
+
+        Vector3 fromScale = Vector3(1,1,1);
+        Vector3 toScale = Vector3(1,1,1);
+
+        FunctionSubscribe<float(float)> function = std::function<float(float)>(Ease::linear);
+    };
+
     struct ParticleData{
         float life = 1;
         Vector3 velocity = Vector3(0,0,0);
@@ -192,6 +207,9 @@ namespace Supernova{
 
         ParticleRotationInitializer rotationInitializer;
         ParticleRotationModifier rotationModifier;
+
+        ParticleScaleInitializer scaleInitializer;
+        ParticleScaleModifier scaleModifier;
     };
     
 }

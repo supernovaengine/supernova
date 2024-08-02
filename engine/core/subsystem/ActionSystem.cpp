@@ -385,10 +385,9 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
 
     ParticleAlphaInitializer& alpInit = particles.alphaInitializer;
     instmesh.instances[idx].color.w = getFloatInitializerValue(alpInit.minAlpha, alpInit.maxAlpha);
-/*
-    ParticleSizeInitializer& sizeInit = particles.sizeInitializer;
-    particles.particles[idx].size = getFloatInitializerValue(sizeInit.minSize, sizeInit.maxSize);
-*/
+
+    // size initializer is not applicable to instanced meshes
+
     if (sprite){
         ParticleSpriteInitializer& spriteInit = particles.spriteInitializer;
         instmesh.instances[idx].textureRect = getSpriteInitializerValue(spriteInit.frames, *sprite);
@@ -396,6 +395,9 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
 
     ParticleRotationInitializer& rotInit = particles.rotationInitializer;
     instmesh.instances[idx].rotation = getQuaternionInitializerValue(rotInit.minRotation, rotInit.maxRotation, rotInit.shortestPath);
+
+    ParticleScaleInitializer& scaInit = particles.scaleInitializer;
+    instmesh.instances[idx].scale = getVector3InitializerValue(scaInit.minScale, scaInit.maxScale);
 
 }
 
@@ -429,6 +431,8 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
 
     ParticleRotationInitializer& rotInit = particles.rotationInitializer;
     points.points[idx].rotation = Angle::defaultToRad(getQuaternionInitializerValue(rotInit.minRotation, rotInit.maxRotation, rotInit.shortestPath).getRoll());
+
+    // scale initializer is not applicable to points
 }
 
 float ActionSystem::getTimeFromParticleTime(float& time, float& fromTime, float& toTime){
@@ -517,14 +521,9 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     if (value >= 0 && value <= 1){
         instmesh.instances[idx].color.w = getFloatModifierValue(value, alpMod.fromAlpha, alpMod.toAlpha);
     }
-/*
-    ParticleSizeModifier& sizeMod = partanim.sizeModifier;
-    time = getTimeFromParticleTime(particleTime, sizeMod.fromTime, sizeMod.toTime);
-    value = sizeMod.function.call(time);
-    if (value >= 0 && value <= 1){
-        particles.particles[idx].size = getFloatModifierValue(value, sizeMod.fromSize, sizeMod.toSize);
-    }
-*/
+
+    // size modifier is not applicable to instanced meshes
+
     if (sprite){
         ParticleSpriteModifier& spriteMod = particles.spriteModifier;
         time = getTimeFromParticleTime(particleTime, spriteMod.fromTime, spriteMod.toTime);
@@ -539,6 +538,13 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     value = rotMod.function.call(time);
     if (value >= 0 && value <= 1){
         instmesh.instances[idx].rotation = getQuaternionModifierValue(value, rotMod.fromRotation, rotMod.toRotation, rotMod.shortestPath);
+    }
+
+    ParticleScaleModifier& scaMod = particles.scaleModifier;
+    time = getTimeFromParticleTime(particleTime, scaMod.fromTime, scaMod.toTime);
+    value = scaMod.function.call(time);
+    if (value >= 0 && value <= 1){
+        instmesh.instances[idx].scale = getVector3ModifierValue(value, scaMod.fromScale, scaMod.toScale);
     }
 
 }
@@ -606,15 +612,11 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     if (value >= 0 && value <= 1){
         points.points[idx].rotation = Angle::defaultToRad(getQuaternionModifierValue(value, rotMod.fromRotation, rotMod.toRotation, rotMod.shortestPath).getRoll());
     }
+
+    // scale modifier is not applicable to points
 }
 
 void ActionSystem::particleActionStart(ParticlesComponent& particles, InstancedMeshComponent& instmesh){
-    //if (particles.sizeInitializer.minSize == 0 && particles.sizeInitializer.maxSize == 0){
-        //float size = std::max(particles.texture.getWidth(), particles.texture.getHeight());
-        //partanim.sizeInitializer.minSize = size;
-        //partanim.sizeInitializer.maxSize = size;
-    //}
-
     // Creating particles
     particles.particles.clear();
     instmesh.instances.clear();
