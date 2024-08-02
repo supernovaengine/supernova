@@ -6,6 +6,7 @@
 #define ACTION_H
 
 #include "object/EntityHandle.h"
+#include "object/Object.h"
 
 namespace Supernova{
     class Action: public EntityHandle{
@@ -21,6 +22,7 @@ namespace Supernova{
         void setOwnedTarget(bool ownedTarget);
         bool getOwnedTarget() const;
 
+        void setTarget(Object* target);
         void setTarget(Entity target);
         Entity getTarget() const;
 

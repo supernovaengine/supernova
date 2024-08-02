@@ -46,6 +46,10 @@ bool Action::getOwnedTarget() const{
     return action.ownedTarget;
 }
 
+void Action::setTarget(Object* target){
+    setTarget(target->getEntity());
+}
+
 void Action::setTarget(Entity target){
     ActionComponent& action = getComponent<ActionComponent>();
 
