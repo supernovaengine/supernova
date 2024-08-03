@@ -147,6 +147,8 @@ namespace Supernova{
     struct ParticleScaleInitializer{
         Vector3 minScale = Vector3(1,1,1);
         Vector3 maxScale = Vector3(1,1,1);
+
+        bool linearSort = true; // only for initializer
     };
 
     struct ParticleScaleModifier{

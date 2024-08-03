@@ -324,11 +324,19 @@ float ActionSystem::getFloatInitializerValue(float& min, float& max){
     return max;
 }
 
-Vector3 ActionSystem::getVector3InitializerValue(Vector3& min, Vector3& max){
+Vector3 ActionSystem::getVector3InitializerValue(Vector3& min, Vector3& max, bool linearSort){
     if (min != max) {
-        return Vector3( min.x + ((max.x - min.x) * (float) rand() / (float) RAND_MAX),
-                        min.y + ((max.y - min.y) * (float) rand() / (float) RAND_MAX),
-                        min.z + ((max.z - min.z) * (float) rand() / (float) RAND_MAX));
+        if (!linearSort){
+            return Vector3( min.x + ((max.x - min.x) * (float) rand() / (float) RAND_MAX),
+                            min.y + ((max.y - min.y) * (float) rand() / (float) RAND_MAX),
+                            min.z + ((max.z - min.z) * (float) rand() / (float) RAND_MAX));
+        }else{
+            float factor = (float) rand() / (float) RAND_MAX;
+
+            return Vector3( min.x + ((max.x - min.x) * factor),
+                            min.y + ((max.y - min.y) * factor),
+                            min.z + ((max.z - min.z) * factor));
+        }
     }
     return max;
 }
@@ -369,16 +377,16 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
     particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
 
     ParticlePositionInitializer& posInit = particles.positionInitializer;
-    instmesh.instances[idx].position = getVector3InitializerValue(posInit.minPosition, posInit.maxPosition);
+    instmesh.instances[idx].position = getVector3InitializerValue(posInit.minPosition, posInit.maxPosition, false);
 
     ParticleVelocityInitializer& velInit = particles.velocityInitializer;
-    particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
+    particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity, false);
 
     ParticleAccelerationInitializer& accInit = particles.accelerationInitializer;
-    particles.particles[idx].acceleration = getVector3InitializerValue(accInit.minAcceleration, accInit.maxAcceleration);
+    particles.particles[idx].acceleration = getVector3InitializerValue(accInit.minAcceleration, accInit.maxAcceleration, false);
 
     ParticleColorInitializer& colInit = particles.colorInitializer;
-    instmesh.instances[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
+    instmesh.instances[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor, false);
     if (colInit.useSRGB){
         instmesh.instances[idx].color = Color::sRGBToLinear(instmesh.instances[idx].color);
     }
@@ -397,7 +405,7 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
     instmesh.instances[idx].rotation = getQuaternionInitializerValue(rotInit.minRotation, rotInit.maxRotation, rotInit.shortestPath);
 
     ParticleScaleInitializer& scaInit = particles.scaleInitializer;
-    instmesh.instances[idx].scale = getVector3InitializerValue(scaInit.minScale, scaInit.maxScale);
+    instmesh.instances[idx].scale = getVector3InitializerValue(scaInit.minScale, scaInit.maxScale, scaInit.linearSort);
 
 }
 
@@ -406,16 +414,16 @@ void ActionSystem::applyParticleInitializers(size_t idx, ParticlesComponent& par
     particles.particles[idx].life = getFloatInitializerValue(lifeInit.minLife, lifeInit.maxLife);
 
     ParticlePositionInitializer& posInit = particles.positionInitializer;
-    points.points[idx].position = getVector3InitializerValue(posInit.minPosition, posInit.maxPosition);
+    points.points[idx].position = getVector3InitializerValue(posInit.minPosition, posInit.maxPosition, false);
 
     ParticleVelocityInitializer& velInit = particles.velocityInitializer;
-    particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity);
+    particles.particles[idx].velocity = getVector3InitializerValue(velInit.minVelocity, velInit.maxVelocity, false);
 
     ParticleAccelerationInitializer& accInit = particles.accelerationInitializer;
-    particles.particles[idx].acceleration = getVector3InitializerValue(accInit.minAcceleration, accInit.maxAcceleration);
+    particles.particles[idx].acceleration = getVector3InitializerValue(accInit.minAcceleration, accInit.maxAcceleration, false);
 
     ParticleColorInitializer& colInit = particles.colorInitializer;
-    points.points[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor);
+    points.points[idx].color = getVector3InitializerValue(colInit.minColor, colInit.maxColor, false);
     if (colInit.useSRGB){
         points.points[idx].color = Color::sRGBToLinear(points.points[idx].color);
     }

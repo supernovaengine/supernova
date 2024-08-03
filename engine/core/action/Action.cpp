@@ -53,6 +53,12 @@ void Action::setTarget(Object* target){
 void Action::setTarget(Entity target){
     ActionComponent& action = getComponent<ActionComponent>();
 
+    // restart
+    if (action.state == ActionState::Running){
+        action.stopTrigger = true;
+        action.startTrigger = true;
+    }
+
     action.target = target;
 }
 

@@ -70,7 +70,7 @@ namespace Supernova{
 		int findUnusedParticle(ParticlesComponent& particles);
 
 		float getFloatInitializerValue(float& min, float& max);
-		Vector3 getVector3InitializerValue(Vector3& min, Vector3& max);
+		Vector3 getVector3InitializerValue(Vector3& min, Vector3& max, bool linearSort);
 		Quaternion getQuaternionInitializerValue(Quaternion& min, Quaternion& max, bool shortestPath);
 		Rect getSpriteInitializerValue(std::vector<int>& frames, SpriteComponent& sprite);
 		Rect getSpriteInitializerValue(std::vector<int>& frames, PointsComponent& points);
