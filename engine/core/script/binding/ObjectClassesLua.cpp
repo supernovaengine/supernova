@@ -310,9 +310,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getWorldAABB", &Mesh::getWorldAABB)
         .addFunction("getNumSubmeshes", &Mesh::getNumSubmeshes)
         .addFunction("getMaterial", &Mesh::getMaterial)
-        .addFunction("createInstances", &Mesh::createInstances)
-        .addFunction("removeInstances", &Mesh::removeInstances)
-        .addFunction("addInstance", &Mesh::addInstance)
+        .addFunction("createInstancedMesh", &Mesh::createInstancedMesh)
+        .addFunction("removeInstancedMesh", &Mesh::removeInstancedMesh)
+        .addFunction("addInstance",
+            luabridge::overload<Vector3, Quaternion, Vector3>(&Mesh::addInstance),
+            luabridge::overload<Vector3, Quaternion, Vector3, Vector4>(&Mesh::addInstance),
+            luabridge::overload<Vector3, Quaternion, Vector3, Vector4, Rect>(&Mesh::addInstance))
+        .addFunction("clearInstances", &Mesh::clearInstances)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -449,6 +453,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<Vector3, Vector4, float, float>(&Points::addPoint),
             luabridge::overload<Vector3, Vector4, float, float, Rect>(&Points::addPoint),
             luabridge::overload<float, float, float>(&Points::addPoint))
+        .addFunction("clearPoints", &Points::clearPoints)
         .addFunction("addSpriteFrame", 
             luabridge::overload<int, std::string, Rect>(&Points::addSpriteFrame),
             luabridge::overload<std::string, float, float, float, float>(&Points::addSpriteFrame),

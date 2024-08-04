@@ -26,6 +26,8 @@ namespace Supernova{
         void addPoint(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect);
         void addPoint(float x, float y, float z);
 
+        void clearPoints();
+
         void addSpriteFrame(int id, std::string name, Rect rect);
         void addSpriteFrame(std::string name, float x, float y, float width, float height);
         void addSpriteFrame(float x, float y, float width, float height);

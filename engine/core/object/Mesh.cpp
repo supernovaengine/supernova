@@ -119,27 +119,67 @@ Material& Mesh::getMaterial(unsigned int submesh){
     return mesh.submeshes[submesh].material;
 }
 
-void Mesh::createInstances(){
+void Mesh::createInstancedMesh(){
     scene->getSystem<MeshSystem>()->createInstancedMesh(entity);
 }
 
-void Mesh::removeInstances(){
+void Mesh::removeInstancedMesh(){
     scene->getSystem<MeshSystem>()->removeInstancedMesh(entity);
 }
 
-void Mesh::addInstance(Vector3 position, Quaternion rotation, Vector3 scale){
+void Mesh::addInstance(InstanceData instance){
+    createInstancedMesh();
+
     MeshComponent& mesh = getComponent<MeshComponent>();
     InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
-    instmesh.instances.push_back({});
-    instmesh.instances.back().position = position;
-    instmesh.instances.back().rotation = rotation;
-    instmesh.instances.back().scale = scale;
+    instmesh.instances.push_back(instance);
 
     if (instmesh.maxInstances < instmesh.instances.size()){
         instmesh.maxInstances = instmesh.maxInstances * 2;
         mesh.needReload = true;
     }
+
+    instmesh.needUpdateInstances = true;
+}
+
+void Mesh::addInstance(Vector3 position, Quaternion rotation, Vector3 scale){
+    InstanceData instance = {};
+
+    instance.position = position;
+    instance.rotation = rotation;
+    instance.scale = scale;
+
+    addInstance(instance);
+}
+
+void Mesh::addInstance(Vector3 position, Quaternion rotation, Vector3 scale, Vector4 color){
+    InstanceData instance = {};
+
+    instance.position = position;
+    instance.rotation = rotation;
+    instance.scale = scale;
+    instance.color = color;
+
+    addInstance(instance);
+}
+
+void Mesh::addInstance(Vector3 position, Quaternion rotation, Vector3 scale, Vector4 color, Rect textureRect){
+    InstanceData instance = {};
+
+    instance.position = position;
+    instance.rotation = rotation;
+    instance.scale = scale;
+    instance.color = color;
+    instance.textureRect = textureRect;
+
+    addInstance(instance);
+}
+
+void Mesh::clearInstances(){
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    instmesh.instances.clear();
 
     instmesh.needUpdateInstances = true;
 }

@@ -95,6 +95,13 @@ void Points::addPoint(float x, float y, float z){
    addPoint(Vector3(x, y, z));
 }
 
+void Points::clearPoints(){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+    pointscomp.points.clear();
+
+    pointscomp.needUpdate = true;
+}
+
 void Points::setTexture(std::string path){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
 

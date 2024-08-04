@@ -12,6 +12,9 @@
 namespace Supernova{
 
     class Mesh: public Object{
+    private:
+        void addInstance(InstanceData instance);
+
     public:
         Mesh(Scene* scene);
         virtual ~Mesh();
@@ -41,10 +44,13 @@ namespace Supernova{
 
         Material& getMaterial(unsigned int submesh = 0);
 
-        void createInstances();
-        void removeInstances();
+        void createInstancedMesh();
+        void removeInstancedMesh();
 
         void addInstance(Vector3 position, Quaternion rotation, Vector3 scale);
+        void addInstance(Vector3 position, Quaternion rotation, Vector3 scale, Vector4 color);
+        void addInstance(Vector3 position, Quaternion rotation, Vector3 scale, Vector4 color, Rect textureRect);
+        void clearInstances();
     };
 }
 
