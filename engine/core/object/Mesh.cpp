@@ -143,6 +143,18 @@ void Mesh::addInstance(InstanceData instance){
     instmesh.needUpdateInstances = true;
 }
 
+void Mesh::addInstance(Vector3 position){
+    InstanceData instance = {};
+
+    instance.position = position;
+
+    addInstance(instance);
+}
+
+void Mesh::addInstance(float x, float y, float z){
+    addInstance(Vector3(x, y, z));
+}
+
 void Mesh::addInstance(Vector3 position, Quaternion rotation, Vector3 scale){
     InstanceData instance = {};
 
@@ -174,6 +186,104 @@ void Mesh::addInstance(Vector3 position, Quaternion rotation, Vector3 scale, Vec
     instance.textureRect = textureRect;
 
     addInstance(instance);
+}
+
+InstanceData& Mesh::getInstance(size_t index){
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    return instmesh.instances.at(index);
+}
+
+void Mesh::updateInstance(size_t index, InstanceData instance){
+    createInstancedMesh();
+
+    MeshComponent& mesh = getComponent<MeshComponent>();
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    instmesh.instances.at(index) = instance;
+
+    instmesh.needUpdateInstances = true;
+}
+
+void Mesh::updateInstance(size_t index, Vector3 position){
+    InstanceData& instance = getInstance(index);
+
+    instance.position = position;
+
+    updateInstance(index, instance);
+}
+
+void Mesh::updateInstance(size_t index, float x, float y, float z){
+    updateInstance(index, Vector3(x, y, z));
+}
+
+void Mesh::updateInstance(size_t index, Vector3 position, Quaternion rotation, Vector3 scale){
+    InstanceData& instance = getInstance(index);
+
+    instance.position = position;
+    instance.rotation = rotation;
+    instance.scale = scale;
+
+    updateInstance(index, instance);
+}
+
+void Mesh::updateInstance(size_t index, Vector3 position, Quaternion rotation, Vector3 scale, Vector4 color){
+    InstanceData& instance = getInstance(index);
+
+    instance.position = position;
+    instance.rotation = rotation;
+    instance.scale = scale;
+    instance.color = color;
+
+    updateInstance(index, instance);
+}
+
+void Mesh::updateInstance(size_t index, Vector3 position, Quaternion rotation, Vector3 scale, Vector4 color, Rect textureRect){
+    InstanceData& instance = getInstance(index);
+
+    instance.position = position;
+    instance.rotation = rotation;
+    instance.scale = scale;
+    instance.color = color;
+    instance.textureRect = textureRect;
+
+    updateInstance(index, instance);
+}
+
+void Mesh::removeInstance(size_t index){
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    instmesh.instances.erase(instmesh.instances.begin() + index);
+
+    instmesh.needUpdateInstances = true;
+}
+
+bool Mesh::isInstanceVisible(size_t index){
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    return instmesh.instances.at(index).visible;
+}
+
+void Mesh::setInstanceVisible(size_t index, bool visible) const{
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    if (instmesh.instances.at(index).visible != visible){
+        instmesh.instances.at(index).visible = visible;
+
+        instmesh.needUpdateInstances = true;
+    }
+}
+
+void Mesh::updateInstances(){
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    instmesh.needUpdateInstances = true;
+}
+
+size_t Mesh::getNumInstances(){
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    return instmesh.instances.size();
 }
 
 void Mesh::clearInstances(){

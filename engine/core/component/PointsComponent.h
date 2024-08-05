@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct PointsData{
+    struct PointData{
         Vector3 position = Vector3(0,0,0);
         Vector4 color = Vector4(1,1,1,1);
         float size = 1;
@@ -18,7 +18,7 @@ namespace Supernova{
         bool visible = false;
     };
 
-    struct PointsRenderData{
+    struct PointRenderData{
         Vector3 position;
         Vector4 color;
         float size;
@@ -32,8 +32,8 @@ namespace Supernova{
 
         ExternalBuffer buffer;
 
-        std::vector<PointsData> points;
-        std::vector<PointsRenderData> renderPoints; //must be sorted
+        std::vector<PointData> points;
+        std::vector<PointRenderData> renderPoints; //must be sorted
 
         SpriteFrameData framesRect[MAX_SPRITE_FRAMES];
 

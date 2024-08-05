@@ -26,6 +26,8 @@ namespace Supernova{
 
         std::vector<LineData> lines;
 
+        unsigned int maxLines = 100;
+
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
         std::string shaderProperties;

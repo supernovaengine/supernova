@@ -1559,7 +1559,7 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipel
 
 	lines.buffer.setData((unsigned char*)(&lines.lines.at(0)), sizeof(LineData)*lines.lines.size());
 
-	size_t bufferSize = lines.buffer.getSize();
+	size_t bufferSize = lines.maxLines * lines.buffer.getStride();
 
 	if (bufferSize == 0)
 		return false;
@@ -2005,7 +2005,7 @@ void RenderSystem::updatePoints(PointsComponent& points, Transform& transform, C
 	}
 
 	if (points.numVisible > 0){
-		points.buffer.setData((unsigned char*)(&points.renderPoints.at(0)), sizeof(PointsRenderData)*points.numVisible);
+		points.buffer.setData((unsigned char*)(&points.renderPoints.at(0)), sizeof(PointRenderData)*points.numVisible);
 	}else{
 		points.buffer.setData((unsigned char*)nullptr, 0);
 	}
@@ -2015,7 +2015,7 @@ void RenderSystem::updatePoints(PointsComponent& points, Transform& transform, C
 }
 
 void RenderSystem::sortPoints(PointsComponent& points, Transform& transform, CameraComponent& camera, Transform& camTransform){
-	auto comparePoints = [&transform, &camTransform](const PointsRenderData& a, const PointsRenderData& b) -> bool {
+	auto comparePoints = [&transform, &camTransform](const PointRenderData& a, const PointRenderData& b) -> bool {
 		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
 		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
 		return distanceToCameraA > distanceToCameraB;

@@ -313,9 +313,25 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("createInstancedMesh", &Mesh::createInstancedMesh)
         .addFunction("removeInstancedMesh", &Mesh::removeInstancedMesh)
         .addFunction("addInstance",
+            luabridge::overload<InstanceData>(&Mesh::addInstance),
+            luabridge::overload<Vector3>(&Mesh::addInstance),
+            luabridge::overload<float, float, float>(&Mesh::addInstance),
             luabridge::overload<Vector3, Quaternion, Vector3>(&Mesh::addInstance),
             luabridge::overload<Vector3, Quaternion, Vector3, Vector4>(&Mesh::addInstance),
             luabridge::overload<Vector3, Quaternion, Vector3, Vector4, Rect>(&Mesh::addInstance))
+        .addFunction("getInstance", &Mesh::getInstance)
+        .addFunction("updateInstance",
+            luabridge::overload<size_t, InstanceData>(&Mesh::updateInstance),
+            luabridge::overload<size_t, Vector3>(&Mesh::updateInstance),
+            luabridge::overload<size_t, float, float, float>(&Mesh::updateInstance),
+            luabridge::overload<size_t, Vector3, Quaternion, Vector3>(&Mesh::updateInstance),
+            luabridge::overload<size_t, Vector3, Quaternion, Vector3, Vector4>(&Mesh::updateInstance),
+            luabridge::overload<size_t, Vector3, Quaternion, Vector3, Vector4, Rect>(&Mesh::updateInstance))
+        .addFunction("removeInstance", &Mesh::removeInstance)
+        .addFunction("isInstanceVisible", &Mesh::isInstanceVisible)
+        .addFunction("setInstanceVisible", &Mesh::setInstanceVisible)
+        .addFunction("updateInstances", &Mesh::updateInstances)
+        .addFunction("getNumInstances", &Mesh::getNumInstances)
         .addFunction("clearInstances", &Mesh::clearInstances)
         .endClass();
 
@@ -448,11 +464,25 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (*) (Scene*)> ()
         .addProperty("maxPoints", &Points::getMaxPoints, &Points::setMaxPoints)
         .addFunction("addPoint", 
+            luabridge::overload<PointData>(&Points::addPoint),
             luabridge::overload<Vector3>(&Points::addPoint),
+            luabridge::overload<float, float, float>(&Points::addPoint),
             luabridge::overload<Vector3, Vector4>(&Points::addPoint),
             luabridge::overload<Vector3, Vector4, float, float>(&Points::addPoint),
-            luabridge::overload<Vector3, Vector4, float, float, Rect>(&Points::addPoint),
-            luabridge::overload<float, float, float>(&Points::addPoint))
+            luabridge::overload<Vector3, Vector4, float, float, Rect>(&Points::addPoint))
+        .addFunction("getPoint", &Points::getPoint)
+        .addFunction("updatePoint", 
+            luabridge::overload<size_t, PointData>(&Points::updatePoint),
+            luabridge::overload<size_t, Vector3>(&Points::updatePoint),
+            luabridge::overload<size_t, float, float, float>(&Points::updatePoint),
+            luabridge::overload<size_t, Vector3, Vector4>(&Points::updatePoint),
+            luabridge::overload<size_t, Vector3, Vector4, float, float>(&Points::updatePoint),
+            luabridge::overload<size_t, Vector3, Vector4, float, float, Rect>(&Points::updatePoint))
+        .addFunction("removePoint", &Points::removePoint)
+        .addFunction("isPointVisible", &Points::isPointVisible)
+        .addFunction("setPointVisible", &Points::setPointVisible)
+        .addFunction("updatePoints", &Points::updatePoints)
+        .addFunction("getNumPoints", &Points::getNumPoints)
         .addFunction("clearPoints", &Points::clearPoints)
         .addFunction("addSpriteFrame", 
             luabridge::overload<int, std::string, Rect>(&Points::addSpriteFrame),
@@ -470,20 +500,24 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .deriveClass<Lines, Object>("Lines")
         .addConstructor <void (*) (Scene*)> ()
+        .addProperty("maxLines", &Lines::getMaxLines, &Lines::setMaxLines)
         .addFunction("addLine", 
             luabridge::overload<Vector3, Vector3>(&Lines::addLine),
             luabridge::overload<Vector3, Vector3, Vector3>(&Lines::addLine),
             luabridge::overload<Vector3, Vector3, Vector4>(&Lines::addLine),
             luabridge::overload<Vector3, Vector3, Vector4, Vector4>(&Lines::addLine))
         .addFunction("getLine", &Lines::getLine)
-        .addFunction("setLine", &Lines::setLine)
-        .addFunction("setLinePointA", &Lines::setLinePointA)
-        .addFunction("setLinePointB", &Lines::setLinePointB)
-        .addFunction("setLineColorA", &Lines::setLineColorA)
-        .addFunction("setLineColorB", &Lines::setLineColorB)
-        .addFunction("setLineColor", 
-            luabridge::overload<size_t, Vector3>(&Lines::setLineColor),
-            luabridge::overload<size_t, Vector4>(&Lines::setLineColor))
+        .addFunction("updateLine", 
+            luabridge::overload<size_t, Vector3, Vector3>(&Lines::updateLine),
+            luabridge::overload<size_t, Vector3, Vector3, Vector3>(&Lines::updateLine),
+            luabridge::overload<size_t, Vector3, Vector3, Vector4>(&Lines::updateLine),
+            luabridge::overload<size_t, Vector3, Vector3, Vector4, Vector4>(&Lines::updateLine),
+            luabridge::overload<size_t, Vector3>(&Lines::updateLine),
+            luabridge::overload<size_t, Vector4>(&Lines::updateLine),
+            luabridge::overload<size_t, Vector4, Vector4>(&Lines::updateLine))
+        .addFunction("removeLine", &Lines::removeLine)
+        .addFunction("updateLines", &Lines::updateLines)
+        .addFunction("getNumLines", &Lines::getNumLines)
         .addFunction("clearLines", &Lines::clearLines)
         .endClass();
 

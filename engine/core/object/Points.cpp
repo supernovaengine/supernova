@@ -38,52 +38,16 @@ unsigned int Points::getMaxPoints() const{
     return pointscomp.maxPoints;
 }
 
-void Points::addPoint(Vector3 position){
+void Points::addPoint(PointData point){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
-    pointscomp.points.push_back({position, Vector4(1.0f, 1.0f, 1.0f, 1.0f), 30, 0, Rect(0, 0, 1, 1), true});
+    pointscomp.points.push_back(point);
 
     if (pointscomp.maxPoints < pointscomp.points.size()){
         pointscomp.maxPoints = pointscomp.maxPoints * 2;
         pointscomp.needReload = true;
     }
 
-    pointscomp.needUpdate = true;
-}
-
-void Points::addPoint(Vector3 position, Vector4 color){
-    PointsComponent& pointscomp = getComponent<PointsComponent>();
-    pointscomp.points.push_back({position, color, 30, 0, Rect(0, 0, 1, 1), true});
-
-    if (pointscomp.maxPoints < pointscomp.points.size()){
-        pointscomp.maxPoints = pointscomp.maxPoints * 2;
-        pointscomp.needReload = true;
-    }
-
-    pointscomp.needUpdate = true;
-}
-
-void Points::addPoint(Vector3 position, Vector4 color, float size, float rotation){
-    PointsComponent& pointscomp = getComponent<PointsComponent>();
-    pointscomp.points.push_back({position, color, size, Angle::defaultToRad(rotation), Rect(0, 0, 1, 1), true});
-
-    if (pointscomp.maxPoints < pointscomp.points.size()){
-        pointscomp.maxPoints = pointscomp.maxPoints * 2;
-        pointscomp.needReload = true;
-    }
-
-    pointscomp.needUpdate = true;
-}
-
-void Points::addPoint(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect){
-    PointsComponent& pointscomp = getComponent<PointsComponent>();
-    pointscomp.points.push_back({position, color, size, Angle::defaultToRad(rotation), textureRect, true});
-
-    if (pointscomp.maxPoints < pointscomp.points.size()){
-        pointscomp.maxPoints = pointscomp.maxPoints * 2;
-        pointscomp.needReload = true;
-    }
-
-    if (!pointscomp.hasTextureRect){
+    if (point.textureRect != Rect(0,0,1,1) && !pointscomp.hasTextureRect){
         pointscomp.hasTextureRect = true;
         pointscomp.needReload = true;
     }
@@ -91,8 +55,144 @@ void Points::addPoint(Vector3 position, Vector4 color, float size, float rotatio
     pointscomp.needUpdate = true;
 }
 
+void Points::addPoint(Vector3 position){
+    PointData point = {};
+
+    point.position = position;
+
+    addPoint(point);
+}
+
 void Points::addPoint(float x, float y, float z){
    addPoint(Vector3(x, y, z));
+}
+
+void Points::addPoint(Vector3 position, Vector4 color){
+    PointData point = {};
+
+    point.position = position;
+    point.color = color;
+
+    addPoint(point);
+}
+
+void Points::addPoint(Vector3 position, Vector4 color, float size, float rotation){
+    PointData point = {};
+
+    point.position = position;
+    point.color = color;
+    point.size = size;
+    point.rotation = rotation;
+
+    addPoint(point);
+}
+
+void Points::addPoint(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect){
+    PointData point = {};
+
+    point.position = position;
+    point.color = color;
+    point.size = size;
+    point.rotation = rotation;
+    point.textureRect = textureRect;
+
+    addPoint(point);
+}
+
+PointData& Points::getPoint(size_t index){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+    return pointscomp.points.at(index);
+}
+
+void Points::updatePoint(size_t index, PointData point){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+    pointscomp.points.at(index) = point;
+
+    if (point.textureRect != Rect(0,0,1,1) && !pointscomp.hasTextureRect){
+        pointscomp.hasTextureRect = true;
+        pointscomp.needReload = true;
+    }
+
+    pointscomp.needUpdate = true;
+}
+
+void Points::updatePoint(size_t index, Vector3 position){
+    PointData point = getPoint(index);
+
+    point.position = position;
+
+    updatePoint(index, point);
+}
+
+void Points::updatePoint(size_t index, float x, float y, float z){
+    updatePoint(index, Vector3(x, y, z));
+}
+
+void Points::updatePoint(size_t index, Vector3 position, Vector4 color){
+    PointData point = getPoint(index);
+
+    point.position = position;
+    point.color = color;
+
+    updatePoint(index, point);
+}
+
+void Points::updatePoint(size_t index, Vector3 position, Vector4 color, float size, float rotation){
+    PointData point = getPoint(index);
+
+    point.position = position;
+    point.color = color;
+    point.size = size;
+    point.rotation = rotation;
+
+    updatePoint(index, point);
+}
+
+void Points::updatePoint(size_t index, Vector3 position, Vector4 color, float size, float rotation, Rect textureRect){
+    PointData point = getPoint(index);
+
+    point.position = position;
+    point.color = color;
+    point.size = size;
+    point.rotation = rotation;
+    point.textureRect = textureRect;
+
+    updatePoint(index, point);
+}
+
+void Points::removePoint(size_t index){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+
+    pointscomp.points.erase(pointscomp.points.begin() + index);
+
+    pointscomp.needUpdate = true;
+}
+
+bool Points::isPointVisible(size_t index){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+
+    return pointscomp.points.at(index).visible;
+}
+
+void Points::setPointVisible(size_t index, bool visible) const{
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+
+    if (pointscomp.points.at(index).visible != visible){
+        pointscomp.points.at(index).visible = visible;
+
+        pointscomp.needUpdate = true;
+    }
+}
+
+void Points::updatePoints(){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+
+    pointscomp.needUpdate = true;
+}
+
+size_t Points::getNumPoints(){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+    return pointscomp.points.size();
 }
 
 void Points::clearPoints(){

@@ -633,5 +633,25 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addProperty("needUpdateTilemap", &TilemapComponent::needUpdateTilemap)
         .endClass();
 
+    luabridge::getGlobalNamespace(L)
+        .beginClass<PointData>("PointData")
+        .addProperty("position", &PointData::position)
+        .addProperty("color", &PointData::color)
+        .addProperty("size", &PointData::size)
+        .addProperty("rotation", &PointData::rotation)
+        .addProperty("textureRect", &PointData::textureRect)
+        .addProperty("visible", &PointData::visible)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<InstanceData>("InstanceData")
+        .addProperty("position", &InstanceData::position)
+        .addProperty("rotation", &InstanceData::rotation)
+        .addProperty("scale", &InstanceData::scale)
+        .addProperty("color", &InstanceData::color)
+        .addProperty("textureRect", &InstanceData::textureRect)
+        .addProperty("visible", &InstanceData::visible)
+        .endClass();
+
 #endif //DISABLE_LUA_BINDINGS
 }

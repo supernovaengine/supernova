@@ -12,9 +12,6 @@
 namespace Supernova{
 
     class Mesh: public Object{
-    private:
-        void addInstance(InstanceData instance);
-
     public:
         Mesh(Scene* scene);
         virtual ~Mesh();
@@ -47,9 +44,30 @@ namespace Supernova{
         void createInstancedMesh();
         void removeInstancedMesh();
 
+        void addInstance(InstanceData instance);
+        void addInstance(Vector3 position);
+        void addInstance(float x, float y, float z);
         void addInstance(Vector3 position, Quaternion rotation, Vector3 scale);
         void addInstance(Vector3 position, Quaternion rotation, Vector3 scale, Vector4 color);
         void addInstance(Vector3 position, Quaternion rotation, Vector3 scale, Vector4 color, Rect textureRect);
+
+        InstanceData& getInstance(size_t index);
+
+        void updateInstance(size_t index, InstanceData instance);
+        void updateInstance(size_t index, Vector3 position);
+        void updateInstance(size_t index, float x, float y, float z);
+        void updateInstance(size_t index, Vector3 position, Quaternion rotation, Vector3 scale);
+        void updateInstance(size_t index, Vector3 position, Quaternion rotation, Vector3 scale, Vector4 color);
+        void updateInstance(size_t index, Vector3 position, Quaternion rotation, Vector3 scale, Vector4 color, Rect textureRect);
+
+        void removeInstance(size_t index);
+
+        bool isInstanceVisible(size_t index);
+        void setInstanceVisible(size_t index, bool visible) const;
+
+        void updateInstances();
+        size_t getNumInstances();
+
         void clearInstances();
     };
 }

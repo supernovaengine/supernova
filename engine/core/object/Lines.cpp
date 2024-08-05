@@ -21,99 +21,178 @@ bool Lines::load(){
     return scene->getSystem<RenderSystem>()->loadLines(entity, linescomp, PIP_DEFAULT | PIP_RTT);
 }
 
+void Lines::setMaxLines(unsigned int maxLines){
+    LinesComponent& linescomp = getComponent<LinesComponent>();
+
+    if (linescomp.maxLines != maxLines){
+        linescomp.maxLines = maxLines;
+
+        linescomp.needReload = true;
+    }
+}
+
+unsigned int Lines::getMaxLines() const{
+    LinesComponent& linescomp = getComponent<LinesComponent>();
+
+    return linescomp.maxLines;
+}
+
+void Lines::addLine(LineData line){
+    LinesComponent& linescomp = getComponent<LinesComponent>();
+
+    linescomp.lines.push_back(line);
+
+    if (linescomp.maxLines < linescomp.lines.size()){
+        linescomp.maxLines = linescomp.maxLines * 2;
+        linescomp.needReload = true;
+    }else{
+        linescomp.needUpdateBuffer = true;
+    }
+}
+
 void Lines::addLine(Vector3 pointA, Vector3 pointB){
-    addLine(pointA, pointB, Vector4(1,1,1,1), Vector4(1,1,1,1));
+    LineData line = {};
+
+    line.pointA = pointA;
+    line.pointB = pointB;
+
+    addLine(line);
 }
 
 void Lines::addLine(Vector3 pointA, Vector3 pointB, Vector3 color){
-    addLine(pointA, pointB, Vector4(color, 1.0));
+    LineData line = {};
+
+    line.pointA = pointA;
+    line.pointB = pointB;
+    line.colorA = Vector4(color, line.colorA.z);
+    line.colorB = Vector4(color, line.colorB.z);
+
+    addLine(line);
 }
 
 void Lines::addLine(Vector3 pointA, Vector3 pointB, Vector4 color){
-    addLine(pointA, pointB, color, color);
+    LineData line = {};
+
+    line.pointA = pointA;
+    line.pointB = pointB;
+    line.colorA = color;
+    line.colorB = color;
+
+    addLine(line);
 }
 
 void Lines::addLine(Vector3 pointA, Vector3 pointB, Vector4 colorA, Vector4 colorB){
-    LinesComponent& linescomp = getComponent<LinesComponent>();
+    LineData line = {};
 
-    linescomp.lines.push_back({pointA, colorA, pointB, colorB});
+    line.pointA = pointA;
+    line.pointB = pointB;
+    line.colorA = colorA;
+    line.colorB = colorB;
 
-    linescomp.needReload = true;
+    addLine(line);
 }
 
-LineData Lines::getLine(size_t index) const{
+LineData& Lines::getLine(size_t index){
     LinesComponent& linescomp = getComponent<LinesComponent>();
 
     return linescomp.lines.at(index);
 }
 
-void Lines::setLine(size_t index, LineData lineData){
+void Lines::updateLine(size_t index, LineData line){
     LinesComponent& linescomp = getComponent<LinesComponent>();
 
-    if (linescomp.lines.at(index). pointA != lineData. pointA || 
-        linescomp.lines.at(index). pointB != lineData. pointB ||
-        linescomp.lines.at(index). colorA != lineData. colorA ||
-        linescomp.lines.at(index). colorB != lineData. colorB){
-        linescomp.lines.at(index) = lineData;
+    linescomp.lines.at(index) = line;
 
-        linescomp.needReload = true;
-    }
-    
+    linescomp.needUpdateBuffer = true;
 }
 
-void Lines::setLinePointA(size_t index, Vector3 pointA){
+void Lines::updateLine(size_t index, Vector3 pointA, Vector3 pointB){
+    LineData line = getLine(index);
+
+    line.pointA = pointA;
+    line.pointB = pointB;
+
+    updateLine(index, line);
+}
+
+void Lines::updateLine(size_t index, Vector3 pointA, Vector3 pointB, Vector3 color){
+    LineData line = getLine(index);
+
+    line.pointA = pointA;
+    line.pointB = pointB;
+    line.colorA = Vector4(color, line.colorA.z);
+    line.colorB = Vector4(color, line.colorB.z);
+
+    updateLine(index, line);
+}
+
+void Lines::updateLine(size_t index, Vector3 pointA, Vector3 pointB, Vector4 color){
+    LineData line = getLine(index);
+
+    line.pointA = pointA;
+    line.pointB = pointB;
+    line.colorA = color;
+    line.colorB = color;
+
+    updateLine(index, line);
+}
+
+void Lines::updateLine(size_t index, Vector3 pointA, Vector3 pointB, Vector4 colorA, Vector4 colorB){
+    LineData line = getLine(index);
+
+    line.pointA = pointA;
+    line.pointB = pointB;
+    line.colorA = colorA;
+    line.colorB = colorB;
+
+    updateLine(index, line);
+}
+
+void Lines::updateLine(size_t index, Vector3 color){
+    LineData line = getLine(index);
+
+    line.colorA = Vector4(color, line.colorA.z);
+    line.colorB = Vector4(color, line.colorB.z);
+
+    updateLine(index, line);
+}
+
+void Lines::updateLine(size_t index, Vector4 color){
+    LineData line = getLine(index);
+
+    line.colorA = color;
+    line.colorB = color;
+
+    updateLine(index, line);
+}
+
+void Lines::updateLine(size_t index, Vector4 colorA, Vector4 colorB){
+    LineData line = getLine(index);
+
+    line.colorA = colorA;
+    line.colorB = colorB;
+
+    updateLine(index, line);
+}
+
+void Lines::removeLine(size_t index){
     LinesComponent& linescomp = getComponent<LinesComponent>();
 
-    if (linescomp.lines.at(index).pointA != pointA){
-        linescomp.lines.at(index).pointA = pointA;
+    linescomp.lines.erase(linescomp.lines.begin() + index);
 
-        linescomp.needReload = true;
-    }
+    linescomp.needUpdateBuffer = true;
 }
 
-void Lines::setLinePointB(size_t index, Vector3 pointB){
+void Lines::updateLines(){
     LinesComponent& linescomp = getComponent<LinesComponent>();
 
-    if (linescomp.lines.at(index).pointB != pointB){
-        linescomp.lines.at(index).pointB = pointB;
-        
-        linescomp.needReload = true;
-    }
+    linescomp.needUpdateBuffer = true;
 }
 
-void Lines::setLineColorA(size_t index, Vector4 colorA){
+size_t Lines::getNumLines(){
     LinesComponent& linescomp = getComponent<LinesComponent>();
 
-    if (linescomp.lines.at(index).colorA != colorA){
-        linescomp.lines.at(index).colorA = colorA;
-        
-        linescomp.needReload = true;
-    }
-}
-
-void Lines::setLineColorB(size_t index, Vector4 colorB){
-    LinesComponent& linescomp = getComponent<LinesComponent>();
-
-    if (linescomp.lines.at(index).colorB != colorB){
-        linescomp.lines.at(index).colorB = colorB;
-        
-        linescomp.needReload = true;
-    }
-}
-
-void Lines::setLineColor(size_t index, Vector3 color){
-    setLineColor(index, Vector4(color, 1.0));
-}
-
-void Lines::setLineColor(size_t index, Vector4 color){
-    LinesComponent& linescomp = getComponent<LinesComponent>();
-
-    if (linescomp.lines.at(index).colorA != color || linescomp.lines.at(index).colorB != color){
-        linescomp.lines.at(index).colorA = color;
-        linescomp.lines.at(index).colorB = color;
-
-        linescomp.needReload = true;
-    }
+    return linescomp.lines.size();
 }
 
 void Lines::clearLines(){

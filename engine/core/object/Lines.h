@@ -16,21 +16,30 @@ namespace Supernova{
 
         bool load();
 
+        void setMaxLines(unsigned int maxLines);
+        unsigned int getMaxLines() const;
+
+        void addLine(LineData line);
         void addLine(Vector3 pointA, Vector3 pointB);
         void addLine(Vector3 pointA, Vector3 pointB, Vector3 color);
         void addLine(Vector3 pointA, Vector3 pointB, Vector4 color);
         void addLine(Vector3 pointA, Vector3 pointB, Vector4 colorA, Vector4 colorB);
 
-        LineData getLine(size_t index) const;
-        void setLine(size_t index, LineData lineData);
+        LineData& getLine(size_t index);
 
-        void setLinePointA(size_t index, Vector3 pointA);
-        void setLinePointB(size_t index, Vector3 pointB);
-        void setLineColorA(size_t index, Vector4 colorA);
-        void setLineColorB(size_t index, Vector4 colorB);
+        void updateLine(size_t index, LineData line);
+        void updateLine(size_t index, Vector3 pointA, Vector3 pointB);
+        void updateLine(size_t index, Vector3 pointA, Vector3 pointB, Vector3 color);
+        void updateLine(size_t index, Vector3 pointA, Vector3 pointB, Vector4 color);
+        void updateLine(size_t index, Vector3 pointA, Vector3 pointB, Vector4 colorA, Vector4 colorB);
+        void updateLine(size_t index, Vector3 color);
+        void updateLine(size_t index, Vector4 color);
+        void updateLine(size_t index, Vector4 colorA, Vector4 colorB);
 
-        void setLineColor(size_t index, Vector3 color);
-        void setLineColor(size_t index, Vector4 color);
+        void removeLine(size_t index);
+
+        void updateLines();
+        size_t getNumLines();
 
         void clearLines();
     };

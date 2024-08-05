@@ -20,11 +20,29 @@ namespace Supernova{
         void setMaxPoints(unsigned int maxPoints);
         unsigned int getMaxPoints() const;
 
+        void addPoint(PointData point);
         void addPoint(Vector3 position);
+        void addPoint(float x, float y, float z);
         void addPoint(Vector3 position, Vector4 color);
         void addPoint(Vector3 position, Vector4 color, float size, float rotation);
         void addPoint(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect);
-        void addPoint(float x, float y, float z);
+
+        PointData& getPoint(size_t index);
+
+        void updatePoint(size_t index, PointData point);
+        void updatePoint(size_t index, Vector3 position);
+        void updatePoint(size_t index, float x, float y, float z);
+        void updatePoint(size_t index, Vector3 position, Vector4 color);
+        void updatePoint(size_t index, Vector3 position, Vector4 color, float size, float rotation);
+        void updatePoint(size_t index, Vector3 position, Vector4 color, float size, float rotation, Rect textureRect);
+
+        void removePoint(size_t index);
+
+        bool isPointVisible(size_t index);
+        void setPointVisible(size_t index, bool visible) const;
+
+        void updatePoints();
+        size_t getNumPoints();
 
         void clearPoints();
 
