@@ -44,6 +44,9 @@ namespace Supernova{
         void createInstancedMesh();
         void removeInstancedMesh();
 
+        void setMaxInstances(unsigned int maxInstances);
+        unsigned int getMaxInstances() const;
+
         void addInstance(InstanceData instance);
         void addInstance(Vector3 position);
         void addInstance(float x, float y, float z);

@@ -86,7 +86,7 @@ namespace Supernova{
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, InstancedMeshComponent& instmesh, SpriteComponent* sprite);
 		void applyParticleModifiers(size_t idx, ParticlesComponent& particles, PointsComponent& points);
 
-		void particleActionStart(ParticlesComponent& particles, InstancedMeshComponent& instmesh);
+		void particleActionStart(ParticlesComponent& particles, InstancedMeshComponent& instmesh, MeshComponent& mesh);
 		void particleActionStart(ParticlesComponent& particles, PointsComponent& points);
 		void particlesActionUpdate(double dt, Entity entity, Entity target, ActionComponent& action, ParticlesComponent& particles, InstancedMeshComponent& instmesh);
 		void particlesActionUpdate(double dt, Entity entity, Entity target, ActionComponent& action, ParticlesComponent& particles, PointsComponent& points);

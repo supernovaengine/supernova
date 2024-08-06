@@ -70,6 +70,7 @@ namespace Supernova{
 
 		void createInstancedMesh(Entity entity);
 		void removeInstancedMesh(Entity entity);
+		bool hasInstancedMesh(Entity entity) const;
 
 		void destroyModel(ModelComponent& model);
 

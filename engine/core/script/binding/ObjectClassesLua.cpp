@@ -312,6 +312,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getMaterial", &Mesh::getMaterial)
         .addFunction("createInstancedMesh", &Mesh::createInstancedMesh)
         .addFunction("removeInstancedMesh", &Mesh::removeInstancedMesh)
+        .addProperty("maxInstances", &Mesh::getMaxInstances, &Mesh::setMaxInstances)
         .addFunction("addInstance",
             luabridge::overload<InstanceData>(&Mesh::addInstance),
             luabridge::overload<Vector3>(&Mesh::addInstance),

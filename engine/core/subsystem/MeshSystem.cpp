@@ -2404,6 +2404,12 @@ void MeshSystem::removeInstancedMesh(Entity entity){
     }
 }
 
+bool MeshSystem::hasInstancedMesh(Entity entity) const{
+    Signature signature = scene->getSignature(entity);
+
+    return signature.test(scene->getComponentType<InstancedMeshComponent>());
+}
+
 void MeshSystem::destroyModel(ModelComponent& model){
     if (model.gltfModel){
         delete model.gltfModel;

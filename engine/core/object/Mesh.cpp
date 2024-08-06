@@ -127,6 +127,32 @@ void Mesh::removeInstancedMesh(){
     scene->getSystem<MeshSystem>()->removeInstancedMesh(entity);
 }
 
+void Mesh::setMaxInstances(unsigned int maxInstances){
+    if (scene->getSystem<MeshSystem>()->hasInstancedMesh(entity)){
+        MeshComponent& mesh = getComponent<MeshComponent>();
+        InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+        if (instmesh.maxInstances != maxInstances){
+            instmesh.maxInstances = maxInstances;
+
+            mesh.needReload = true;
+        }
+    }else{
+        Log::error("There is no instanced mesh component in this mesh");
+    }
+}
+
+unsigned int Mesh::getMaxInstances() const{
+    if (scene->getSystem<MeshSystem>()->hasInstancedMesh(entity)){
+        InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+        return instmesh.maxInstances;
+    }
+
+    Log::error("There is no instanced mesh component in this mesh");
+    return 0;
+}
+
 void Mesh::addInstance(InstanceData instance){
     createInstancedMesh();
 

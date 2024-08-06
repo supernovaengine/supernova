@@ -37,18 +37,19 @@ void ActionSystem::actionStart(Entity entity){
 
         if (signature.test(scene->getComponentType<ParticlesComponent>())){
             ParticlesComponent& particles = scene->getComponent<ParticlesComponent>(entity);
-            if (targetSignature.test(scene->getComponentType<MeshComponent>()) && !targetSignature.test(scene->getComponentType<InstancedMeshComponent>())){
+            if (targetSignature.test(scene->getComponentType<MeshComponent>())) {
                 MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
-                scene->addComponent<InstancedMeshComponent>(action.target, {});
-                targetSignature = scene->getSignature(action.target);
-                if (mesh.loaded)
-                    mesh.needReload = true;
-            }
-            if (targetSignature.test(scene->getComponentType<InstancedMeshComponent>()) ){
+
+                if (!targetSignature.test(scene->getComponentType<InstancedMeshComponent>())){
+                    scene->addComponent<InstancedMeshComponent>(action.target, {});
+                    targetSignature = scene->getSignature(action.target);
+                    if (mesh.loaded)
+                        mesh.needReload = true;
+                }
+
                 InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(action.target);
 
-                particleActionStart(particles, instmesh);
-
+                particleActionStart(particles, instmesh, mesh);
             }
             if (targetSignature.test(scene->getComponentType<PointsComponent>()) ){
                 PointsComponent& points = scene->getComponent<PointsComponent>(action.target);
@@ -624,7 +625,7 @@ void ActionSystem::applyParticleModifiers(size_t idx, ParticlesComponent& partic
     // scale modifier is not applicable to points
 }
 
-void ActionSystem::particleActionStart(ParticlesComponent& particles, InstancedMeshComponent& instmesh){
+void ActionSystem::particleActionStart(ParticlesComponent& particles, InstancedMeshComponent& instmesh, MeshComponent& mesh){
     // Creating particles
     particles.particles.clear();
     instmesh.instances.clear();
@@ -636,6 +637,12 @@ void ActionSystem::particleActionStart(ParticlesComponent& particles, InstancedM
         instmesh.instances.push_back({});
 
         instmesh.needUpdateInstances = true;
+    }
+
+    if (instmesh.maxInstances != particles.maxParticles){
+        instmesh.maxInstances = particles.maxParticles;
+
+        mesh.needReload = true;
     }
 
     particles.emitter = true;
@@ -661,6 +668,12 @@ void ActionSystem::particleActionStart(ParticlesComponent& particles, PointsComp
         points.points.push_back({});
 
         points.needUpdate = true;
+    }
+
+    if (points.maxPoints != particles.maxParticles){
+        points.maxPoints = particles.maxParticles;
+
+        points.needReload = true;
     }
 
     particles.emitter = true;
