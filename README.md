@@ -41,10 +41,10 @@ Live samples: https://samples.supernovaengine.org/
 * Cross-platform persistence system
 * Multithreading support
 * 2D and 3D physics
+* Instancing
 
 ## Upcoming features
 
- * Instancing
  * More UI components
  * Water
  * Editor
