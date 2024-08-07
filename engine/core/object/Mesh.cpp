@@ -127,8 +127,54 @@ void Mesh::removeInstancedMesh(){
     scene->getSystem<MeshSystem>()->removeInstancedMesh(entity);
 }
 
+bool Mesh::hasInstancedMesh() const{
+    return scene->getSystem<MeshSystem>()->hasInstancedMesh(entity);
+}
+
+void Mesh::setInstancedBillboard(bool billboard, bool cylindrical){
+    createInstancedMesh();
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    instmesh.instancedBillboard = billboard;
+    instmesh.instancedCylindricalBillboard = cylindrical;
+}
+
+void Mesh::setInstancedBillboard(bool billboard){
+    createInstancedMesh();
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    instmesh.instancedBillboard = billboard;
+}
+
+bool Mesh::isInstancedBillboard() const{
+    if (hasInstancedMesh()){
+        InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+        return instmesh.instancedBillboard;
+    }
+
+    return false;
+}
+
+void Mesh::setInstancedCylindricalBillboard(bool cylindricalBillboard){
+    createInstancedMesh();
+    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+    instmesh.instancedCylindricalBillboard = cylindricalBillboard;
+}
+
+bool Mesh::isInstancedCylindricalBillboard() const{
+    if (hasInstancedMesh()){
+        InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+
+        return instmesh.instancedCylindricalBillboard;
+    }
+
+    return false;
+}
+
 void Mesh::setMaxInstances(unsigned int maxInstances){
-    if (scene->getSystem<MeshSystem>()->hasInstancedMesh(entity)){
+    if (hasInstancedMesh()){
         MeshComponent& mesh = getComponent<MeshComponent>();
         InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
@@ -143,7 +189,7 @@ void Mesh::setMaxInstances(unsigned int maxInstances){
 }
 
 unsigned int Mesh::getMaxInstances() const{
-    if (scene->getSystem<MeshSystem>()->hasInstancedMesh(entity)){
+    if (hasInstancedMesh()){
         InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
         return instmesh.maxInstances;
@@ -285,37 +331,57 @@ void Mesh::removeInstance(size_t index){
 }
 
 bool Mesh::isInstanceVisible(size_t index){
-    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+    if (hasInstancedMesh()){
+        InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
-    return instmesh.instances.at(index).visible;
+        return instmesh.instances.at(index).visible;
+    }
+
+    return false;
 }
 
 void Mesh::setInstanceVisible(size_t index, bool visible) const{
-    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+    if (hasInstancedMesh()){
+        InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
-    if (instmesh.instances.at(index).visible != visible){
-        instmesh.instances.at(index).visible = visible;
+        if (instmesh.instances.at(index).visible != visible){
+            instmesh.instances.at(index).visible = visible;
 
-        instmesh.needUpdateInstances = true;
+            instmesh.needUpdateInstances = true;
+        }
+    }else{
+        Log::error("Cannot set instances visibility. Instances are not created");
     }
 }
 
 void Mesh::updateInstances(){
-    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+    if (hasInstancedMesh()){
+        InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
-    instmesh.needUpdateInstances = true;
+        instmesh.needUpdateInstances = true;
+    }else{
+        Log::error("Cannot update instances. Instances are not created");
+    }
 }
 
 size_t Mesh::getNumInstances(){
-    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+    if (hasInstancedMesh()){
+        InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
-    return instmesh.instances.size();
+        return instmesh.instances.size();
+    }
+
+    return 0;
 }
 
 void Mesh::clearInstances(){
-    InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
+    if (hasInstancedMesh()){
+        InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
-    instmesh.instances.clear();
+        instmesh.instances.clear();
 
-    instmesh.needUpdateInstances = true;
+        instmesh.needUpdateInstances = true;
+    }else{
+        Log::error("Cannot clear instances. Instances are not created");
+    }
 }

@@ -43,6 +43,15 @@ namespace Supernova{
 
         void createInstancedMesh();
         void removeInstancedMesh();
+        bool hasInstancedMesh() const;
+
+        void setInstancedBillboard(bool billboard, bool cylindrical);
+
+        void setInstancedBillboard(bool billboard);
+        bool isInstancedBillboard() const;
+
+        void setInstancedCylindricalBillboard(bool cylindricalBillboard);
+        bool isInstancedCylindricalBillboard() const;
 
         void setMaxInstances(unsigned int maxInstances);
         unsigned int getMaxInstances() const;

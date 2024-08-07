@@ -2255,13 +2255,33 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 	instmesh.renderInstances.clear();
 	instmesh.renderInstances.reserve(instmesh.instances.size());
 
+	Quaternion bRotation;
+	if (instmesh.instancedBillboard){
+		Vector3 camPos = camTransform.worldPosition;
+		if (instmesh.instancedCylindricalBillboard){
+			camPos.y = transform.worldPosition.y;
+		}
+
+		//if ((camPos - transform.worldPosition).normalize() != camera.worldUp.normalize()){
+		Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp).inverse();
+		bRotation.fromRotationMatrix(m1);
+		bRotation = transform.worldRotation.inverse() * bRotation;
+		//}
+	}
+
 	instmesh.numVisible = 0;
 	size_t instancesSize = (instmesh.instances.size() < instmesh.maxInstances)? instmesh.instances.size() : instmesh.maxInstances;
 	for (int i = 0; i < instancesSize; i++){
 		if (instmesh.instances[i].visible){
 			Matrix4 translateMatrix = Matrix4::translateMatrix(instmesh.instances[i].position);
-			Matrix4 rotationMatrix = instmesh.instances[i].rotation.getRotationMatrix();
+			Matrix4 rotationMatrix;
 			Matrix4 scaleMatrix = Matrix4::scaleMatrix(instmesh.instances[i].scale);
+
+			if (instmesh.instancedBillboard){
+				rotationMatrix = bRotation.getRotationMatrix();
+			}else{
+				rotationMatrix = instmesh.instances[i].rotation.getRotationMatrix();
+			}
 
 			instmesh.renderInstances.push_back({});
 			instmesh.renderInstances[instmesh.numVisible].instanceMatrix = translateMatrix * rotationMatrix * scaleMatrix;
@@ -2282,12 +2302,8 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 }
 
 void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform){
-	Vector3 camDir;
-	if (transform.billboard && !transform.fakeBillboard && !transform.cylindricalBillboard){
-		camDir = (camTransform.worldPosition - transform.worldPosition).normalize();
-	}else{
-		camDir = (camTransform.worldPosition - camera.worldView).normalize();
-	}
+	Vector3 camDir = (camTransform.worldPosition - transform.worldPosition).normalize();
+	//Vector3 camDir = (camTransform.worldPosition - camera.worldView).normalize();
 
 	auto comparePoints = [&transform, &camDir](const InstanceRenderData& a, const InstanceRenderData& b) -> bool {
 		Vector3 positionA = Vector3(a.instanceMatrix[3][0], a.instanceMatrix[3][1], a.instanceMatrix[3][2]);
@@ -2753,12 +2769,15 @@ void RenderSystem::update(double dt){
 			if (instmesh){
 				bool sortTransparentInstances = mesh.transparent && mainCamera.type != CameraType::CAMERA_2D;
 
-				if (instmesh->needUpdateInstances){
+				if (instmesh->needUpdateInstances && !instmesh->instancedBillboard){
 					updateInstancedMesh(*instmesh, mesh, transform, mainCamera, mainCameraTransform);
 				}
 
 				if (instmesh->needUpdateInstances || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentInstances)){
 					if (!hasMultipleCameras || !sortTransparentInstances){
+						if (instmesh->instancedBillboard){
+							updateInstancedMesh(*instmesh, mesh, transform, mainCamera, mainCameraTransform);
+						}
 						sortInstancedMesh(*instmesh, mesh, transform, mainCamera, mainCameraTransform);
 					}
 				}
@@ -3059,6 +3078,9 @@ void RenderSystem::draw(){
 						bool sortTransparentInstances = mesh.transparent && camera.type != CameraType::CAMERA_2D;
 
 						if (hasMultipleCameras && sortTransparentInstances){
+							if (instmesh->instancedBillboard){
+								updateInstancedMesh(*instmesh, mesh, transform, camera, cameraTransform);
+							}
 							sortInstancedMesh(*instmesh, mesh, transform, camera, cameraTransform);
 						}
 					}

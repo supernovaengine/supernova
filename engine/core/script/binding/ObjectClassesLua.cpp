@@ -312,6 +312,10 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getMaterial", &Mesh::getMaterial)
         .addFunction("createInstancedMesh", &Mesh::createInstancedMesh)
         .addFunction("removeInstancedMesh", &Mesh::removeInstancedMesh)
+        .addFunction("hasInstancedMesh", &Mesh::hasInstancedMesh)
+        .addFunction("setInstancedBillboard", (void(Mesh::*)(bool, bool))&Mesh::setInstancedBillboard)
+        .addProperty("instancedBillboard", &Mesh::isInstancedBillboard, (void(Mesh::*)(bool))&Mesh::setInstancedBillboard)
+        .addProperty("instancedCylindricalBillboard", &Mesh::isInstancedCylindricalBillboard, &Mesh::setInstancedCylindricalBillboard)
         .addProperty("maxInstances", &Mesh::getMaxInstances, &Mesh::setMaxInstances)
         .addFunction("addInstance",
             luabridge::overload<InstanceData>(&Mesh::addInstance),

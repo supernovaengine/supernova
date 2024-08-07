@@ -33,6 +33,9 @@ namespace Supernova{
         unsigned int maxInstances = 100;
         unsigned int numVisible = 0;
 
+        bool instancedBillboard = false;
+        bool instancedCylindricalBillboard = false;
+
         bool needUpdateBuffer = false;
         bool needUpdateInstances = true;
     };
