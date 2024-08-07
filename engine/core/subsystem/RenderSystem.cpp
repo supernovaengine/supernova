@@ -2015,10 +2015,10 @@ void RenderSystem::updatePoints(PointsComponent& points, Transform& transform, C
 }
 
 void RenderSystem::sortPoints(PointsComponent& points, Transform& transform, CameraComponent& camera, Transform& camTransform){
-	auto comparePoints = [&transform, &camTransform](const PointRenderData& a, const PointRenderData& b) -> bool {
-		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * a.position)).length();
-		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * b.position)).length();
-		return distanceToCameraA > distanceToCameraB;
+	Vector3 camDir = (camTransform.worldPosition - camera.worldView).normalize();
+
+	auto comparePoints = [&transform, &camDir](const PointRenderData& a, const PointRenderData& b) -> bool {
+		return (transform.modelMatrix * a.position).dotProduct(camDir) < (transform.modelMatrix * b.position).dotProduct(camDir);
 	};
 	std::sort(points.renderPoints.begin(), points.renderPoints.end(), comparePoints);
 
@@ -2282,13 +2282,18 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 }
 
 void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform){
-	auto comparePoints = [&transform, &camTransform](const InstanceRenderData& a, const InstanceRenderData& b) -> bool {
+	Vector3 camDir;
+	if (transform.billboard && !transform.fakeBillboard && !transform.cylindricalBillboard){
+		camDir = (camTransform.worldPosition - transform.worldPosition).normalize();
+	}else{
+		camDir = (camTransform.worldPosition - camera.worldView).normalize();
+	}
+
+	auto comparePoints = [&transform, &camDir](const InstanceRenderData& a, const InstanceRenderData& b) -> bool {
 		Vector3 positionA = Vector3(a.instanceMatrix[3][0], a.instanceMatrix[3][1], a.instanceMatrix[3][2]);
 		Vector3 positionB = Vector3(b.instanceMatrix[3][0], b.instanceMatrix[3][1], b.instanceMatrix[3][2]);
 
-		float distanceToCameraA = (camTransform.worldPosition - (transform.modelMatrix * positionA)).length();
-		float distanceToCameraB = (camTransform.worldPosition - (transform.modelMatrix * positionB)).length();
-		return distanceToCameraA > distanceToCameraB;
+		return (transform.modelMatrix * positionA).dotProduct(camDir) < (transform.modelMatrix * positionB).dotProduct(camDir);
 	};
 	std::sort(instmesh.renderInstances.begin(), instmesh.renderInstances.end(), comparePoints);
 
