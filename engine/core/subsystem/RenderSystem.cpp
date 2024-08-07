@@ -2592,37 +2592,39 @@ void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent
 		if (transform.cylindricalBillboard)
 			camPos.y = transform.worldPosition.y;
 
-		Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp).inverse();
+		if ((camPos - transform.worldPosition).normalize() != camera.worldUp.normalize()){
+			Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp).inverse();
 
-		Quaternion oldRotation = transform.rotation;
+			Quaternion oldRotation = transform.rotation;
 
-		transform.rotation.fromRotationMatrix(m1);
-		if (transform.parent != NULL_ENTITY){
-			auto transformParent = scene->getComponent<Transform>(transform.parent);
-			transform.rotation = transformParent.worldRotation.inverse() * transform.rotation;
-		}
+			transform.rotation.fromRotationMatrix(m1);
+			if (transform.parent != NULL_ENTITY){
+				auto transformParent = scene->getComponent<Transform>(transform.parent);
+				transform.rotation = transformParent.worldRotation.inverse() * transform.rotation;
+			}
 
-		if (transform.rotation != oldRotation){
-			transform.needUpdate = true;
+			if (transform.rotation != oldRotation){
+				transform.needUpdate = true;
 
-			std::vector<Entity> parentList;
-			auto transforms = scene->getComponentArray<Transform>();
-			for (int i = index; i < transforms->size(); i++){
-				Transform& transform = transforms->getComponentFromIndex(i);
+				std::vector<Entity> parentList;
+				auto transforms = scene->getComponentArray<Transform>();
+				for (int i = index; i < transforms->size(); i++){
+					Transform& transform = transforms->getComponentFromIndex(i);
 
-				// Finding childs
-				if (i > index){
-					if (std::find(parentList.begin(), parentList.end(), transform.parent) != parentList.end()){
-						transform.needUpdate = true;
-					}else{
-						break;
+					// Finding childs
+					if (i > index){
+						if (std::find(parentList.begin(), parentList.end(), transform.parent) != parentList.end()){
+							transform.needUpdate = true;
+						}else{
+							break;
+						}
 					}
-				}
 
-				if (transform.needUpdate){
-					Entity entity = transforms->getEntity(i);
-					parentList.push_back(entity);
-					updateTransform(transform);
+					if (transform.needUpdate){
+						Entity entity = transforms->getEntity(i);
+						parentList.push_back(entity);
+						updateTransform(transform);
+					}
 				}
 			}
 		}
