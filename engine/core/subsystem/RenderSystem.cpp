@@ -2283,7 +2283,7 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 
 void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform){
 	Vector3 camDir;
-	if (mesh.billboard && !mesh.fakeBillboard && !mesh.cylindricalBillboard){
+	if (transform.billboard && !transform.fakeBillboard && !transform.cylindricalBillboard){
 		camDir = (camTransform.worldPosition - transform.worldPosition).normalize();
 	}else{
 		camDir = (camTransform.worldPosition - camera.worldView).normalize();
@@ -2584,12 +2584,12 @@ void RenderSystem::changeDestroy(void* data){
 	delete (check_load_t*)data;
 }
 
-void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform, bool billboard, bool fakeBillboard, bool cylindricalBillboard){
-	if (billboard && !fakeBillboard){
+void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
+	if (transform.billboard && !transform.fakeBillboard){
 
 		Vector3 camPos = cameraTransform.worldPosition;
 
-		if (cylindricalBillboard)
+		if (transform.cylindricalBillboard)
 			camPos.y = transform.worldPosition.y;
 
 		Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp).inverse();
@@ -2629,7 +2629,7 @@ void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent
 
 	}
 
-	if (billboard && fakeBillboard){
+	if (transform.billboard && transform.fakeBillboard){
 		
 		Matrix4 modelViewMatrix = camera.viewMatrix * transform.modelMatrix;
 
@@ -2637,7 +2637,7 @@ void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent
 		modelViewMatrix.set(0, 1, 0.0);
 		modelViewMatrix.set(0, 2, 0.0);
 
-		if (!cylindricalBillboard) {
+		if (!transform.cylindricalBillboard) {
 			modelViewMatrix.set(1, 0, 0.0);
 			modelViewMatrix.set(1, 1, transform.worldScale.y);
 			modelViewMatrix.set(1, 2, 0.0);
@@ -2744,16 +2744,8 @@ void RenderSystem::update(double dt){
 		Entity entity = transforms->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-		bool billboard = false;
-		bool fakeBillboard = false;
-		bool cylindricalBillboard = false;
-
 		if (signature.test(scene->getComponentType<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
-			billboard = mesh.billboard;
-			fakeBillboard = mesh.fakeBillboard;
-			cylindricalBillboard = mesh.cylindricalBillboard;
 
 			InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
 			if (instmesh){
@@ -2821,7 +2813,7 @@ void RenderSystem::update(double dt){
 
 			// need to be updated for every camera
 			if (!hasMultipleCameras){
-				updateMVP(i, transform, mainCamera, mainCameraTransform, billboard, fakeBillboard, cylindricalBillboard);
+				updateMVP(i, transform, mainCamera, mainCameraTransform);
 
 				if (signature.test(scene->getComponentType<TerrainComponent>())){
 					TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
@@ -3019,12 +3011,7 @@ void RenderSystem::draw(){
 			}
 
 			if (hasMultipleCameras){
-				if (signature.test(scene->getComponentType<MeshComponent>())){
-					MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-					updateMVP(i, transform, camera, cameraTransform, mesh.billboard, mesh.fakeBillboard, mesh.cylindricalBillboard);
-				}else{
-					updateMVP(i, transform, camera, cameraTransform, false, false, false);
-				}
+				updateMVP(i, transform, camera, cameraTransform);
 			}
 
 			// apply scissor on UI

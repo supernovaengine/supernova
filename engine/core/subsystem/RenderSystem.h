@@ -102,7 +102,7 @@ namespace Supernova{
 		static void changeLoaded(void* data);
 		static void changeDestroy(void* data);
 
-		void updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform, bool billboard, bool fakeBillboard, bool cylindricalBillboard);
+		void updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 
 		void createFramebuffer(CameraComponent& camera);
 		void createEmptyTextures();

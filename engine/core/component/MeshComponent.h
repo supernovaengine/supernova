@@ -94,10 +94,6 @@ namespace Supernova{
         bool castShadows = true;
         bool transparent = false;
 
-        bool billboard = false;
-        bool fakeBillboard = false;
-        bool cylindricalBillboard = false;
-
         bool needUpdateBuffer = false;
         bool needReload = false;
     };
