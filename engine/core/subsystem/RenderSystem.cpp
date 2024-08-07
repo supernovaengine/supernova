@@ -2262,11 +2262,11 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 			camPos.y = transform.worldPosition.y;
 		}
 
-		//if ((camPos - transform.worldPosition).normalize() != camera.worldUp.normalize()){
-		Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp).inverse();
-		bRotation.fromRotationMatrix(m1);
-		bRotation = transform.worldRotation.inverse() * bRotation;
-		//}
+		if ((camPos - transform.worldPosition).crossProduct(camera.worldUp).length() != 0){ // check if not parallel
+			Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp).inverse();
+			bRotation.fromRotationMatrix(m1);
+			bRotation = transform.worldRotation.inverse() * bRotation;
+		}
 	}
 
 	instmesh.numVisible = 0;
@@ -2608,7 +2608,7 @@ void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent
 		if (transform.cylindricalBillboard)
 			camPos.y = transform.worldPosition.y;
 
-		if ((camPos - transform.worldPosition).normalize() != camera.worldUp.normalize()){
+		if ((camPos - transform.worldPosition).crossProduct(camera.worldUp).length() != 0){ // check if not parallel
 			Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp).inverse();
 
 			Quaternion oldRotation = transform.rotation;
