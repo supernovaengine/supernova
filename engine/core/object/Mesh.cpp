@@ -119,6 +119,50 @@ Material& Mesh::getMaterial(unsigned int submesh){
     return mesh.submeshes[submesh].material;
 }
 
+void Mesh::setBillboard(bool billboard, bool fake, bool cylindrical){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.billboard = billboard;
+    mesh.fakeBillboard = fake;
+    mesh.cylindricalBillboard = cylindrical;
+}
+
+void Mesh::setBillboard(bool billboard){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.billboard = billboard;
+}
+
+bool Mesh::isBillboard() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.billboard;
+}
+
+void Mesh::setFakeBillboard(bool fakeBillboard){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.fakeBillboard = fakeBillboard;
+}
+
+bool Mesh::isFakeBillboard() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.fakeBillboard;
+}
+
+void Mesh::setCylindricalBillboard(bool cylindricalBillboard){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.cylindricalBillboard = cylindricalBillboard;
+}
+
+bool Mesh::isCylindricalBillboard() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.cylindricalBillboard;
+}
+
 void Mesh::createInstancedMesh(){
     scene->getSystem<MeshSystem>()->createInstancedMesh(entity);
 }

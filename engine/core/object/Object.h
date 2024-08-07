@@ -49,17 +49,6 @@ namespace Supernova{
         bool isVisible() const;
         void setVisibleOnly(bool visible);
 
-        void setBillboard(bool billboard, bool fake, bool cylindrical);
-
-        void setBillboard(bool billboard);
-        bool isBillboard() const;
-
-        void setFakeBillboard(bool fakeBillboard);
-        bool isFakeBillboard() const;
-
-        void setCylindricalBillboard(bool cylindricalBillboard);
-        bool isCylindricalBillboard() const;
-
         void setLocalMatrix(Matrix4 localMatrix);
         Matrix4 getLocalMatrix() const;
 

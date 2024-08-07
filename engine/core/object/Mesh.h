@@ -41,6 +41,17 @@ namespace Supernova{
 
         Material& getMaterial(unsigned int submesh = 0);
 
+        void setBillboard(bool billboard, bool fake, bool cylindrical);
+
+        void setBillboard(bool billboard);
+        bool isBillboard() const;
+
+        void setFakeBillboard(bool fakeBillboard);
+        bool isFakeBillboard() const;
+
+        void setCylindricalBillboard(bool cylindricalBillboard);
+        bool isCylindricalBillboard() const;
+
         void createInstancedMesh();
         void removeInstancedMesh();
 

@@ -121,50 +121,6 @@ void Object::setVisibleOnly(bool visible){
     transform.visible = visible;
 }
 
-void Object::setBillboard(bool billboard, bool fake, bool cylindrical){
-    Transform& transform = getComponent<Transform>();
-
-    transform.billboard = billboard;
-    transform.fakeBillboard = fake;
-    transform.cylindricalBillboard = cylindrical;
-}
-
-void Object::setBillboard(bool billboard){
-    Transform& transform = getComponent<Transform>();
-
-    transform.billboard = billboard;
-}
-
-bool Object::isBillboard() const{
-    Transform& transform = getComponent<Transform>();
-
-    return transform.billboard;
-}
-
-void Object::setFakeBillboard(bool fakeBillboard){
-    Transform& transform = getComponent<Transform>();
-
-    transform.fakeBillboard = fakeBillboard;
-}
-
-bool Object::isFakeBillboard() const{
-    Transform& transform = getComponent<Transform>();
-
-    return transform.fakeBillboard;
-}
-
-void Object::setCylindricalBillboard(bool cylindricalBillboard){
-    Transform& transform = getComponent<Transform>();
-
-    transform.cylindricalBillboard = cylindricalBillboard;
-}
-
-bool Object::isCylindricalBillboard() const{
-    Transform& transform = getComponent<Transform>();
-
-    return transform.cylindricalBillboard;
-}
-
 void Object::setLocalMatrix(Matrix4 localMatrix){
     Transform& transform = getComponent<Transform>();
     transform.localMatrix = localMatrix;
