@@ -2271,6 +2271,7 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 		}
 	}
 
+	mesh.aabb = AABB::ZERO;
 	instmesh.numVisible = 0;
 	size_t instancesSize = (instmesh.instances.size() < instmesh.maxInstances)? instmesh.instances.size() : instmesh.maxInstances;
 	for (int i = 0; i < instancesSize; i++){
