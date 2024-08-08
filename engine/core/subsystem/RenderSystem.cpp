@@ -2255,6 +2255,8 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 	instmesh.renderInstances.clear();
 	instmesh.renderInstances.reserve(instmesh.instances.size());
 
+	// considering instances billboard the position of main object with camera
+	// to consider per instance position need to insert this part in instances loop
 	Quaternion bRotation;
 	if (instmesh.instancedBillboard){
 		Vector3 camPos = camTransform.worldPosition;
@@ -2283,13 +2285,19 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 				rotationMatrix = instmesh.instances[i].rotation.getRotationMatrix();
 			}
 
+			Matrix4 instanceMatrix = translateMatrix * rotationMatrix * scaleMatrix;
+
 			instmesh.renderInstances.push_back({});
-			instmesh.renderInstances[instmesh.numVisible].instanceMatrix = translateMatrix * rotationMatrix * scaleMatrix;
+			instmesh.renderInstances[instmesh.numVisible].instanceMatrix = instanceMatrix;
 			instmesh.renderInstances[instmesh.numVisible].color = instmesh.instances[i].color;
 			instmesh.renderInstances[instmesh.numVisible].textureRect = instmesh.instances[i].textureRect;
 			instmesh.numVisible++;
+
+			mesh.aabb.merge(instanceMatrix * mesh.verticesAABB);
 		}
 	}
+
+	mesh.worldAABB = transform.localMatrix * mesh.aabb;
 
 	if (instmesh.numVisible > 0){
 		instmesh.buffer.setData((unsigned char*)(&instmesh.renderInstances.at(0)), sizeof(InstanceRenderData)*instmesh.numVisible);

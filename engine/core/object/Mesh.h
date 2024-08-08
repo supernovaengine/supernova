@@ -35,6 +35,7 @@ namespace Supernova{
         PrimitiveType getPrimitiveType(unsigned int submesh) const;
 
         AABB getAABB();
+        AABB getVerticesAABB();
         AABB getWorldAABB();
 
         unsigned int getNumSubmeshes() const;

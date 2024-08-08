@@ -721,17 +721,10 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
         buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
     }
 
-    bool hasVertices = false;
-
     Buffer* vertexBuffer = NULL;
     Attribute vertexAttr;
 
-    float minX = std::numeric_limits<float>::max();
-    float minY = std::numeric_limits<float>::max();
-    float minZ = std::numeric_limits<float>::max();
-    float maxX = std::numeric_limits<float>::min();
-    float maxY = std::numeric_limits<float>::min();
-    float maxZ = std::numeric_limits<float>::min();
+    mesh.verticesAABB = AABB::ZERO;
 
     for (auto const& buf : buffers){
         if (buf.second->getAttribute(AttributeType::POSITION)) {
@@ -757,21 +750,11 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
         for (int i = 0; i < verticesize; i++){
             Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i);
 
-            minX = std::min(minX, vertice.x);
-            minY = std::min(minY, vertice.y);
-            minZ = std::min(minZ, vertice.z);
-
-            maxX = std::max(maxX, vertice.x);
-            maxY = std::max(maxY, vertice.y);
-            maxZ = std::max(maxZ, vertice.z);
-
-            hasVertices = true;
+            mesh.verticesAABB.merge(vertice);
         }
     }
 
-    if (hasVertices){
-        mesh.aabb = AABB(minX, minY, minZ, maxX, maxY, maxZ);
-    }
+    mesh.aabb = mesh.verticesAABB;
 }
 
 TerrainNodeIndex MeshSystem::createPlaneNodeBuffer(TerrainComponent& terrain, int width, int height, int widthSegments, int heightSegments){
@@ -2398,6 +2381,7 @@ void MeshSystem::removeInstancedMesh(Entity entity){
 
         if (signature.test(scene->getComponentType<MeshComponent>())){
             MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+            mesh.aabb = mesh.verticesAABB;
             if (mesh.loaded)
                 mesh.needReload = true;
         }

@@ -101,6 +101,12 @@ AABB Mesh::getAABB(){
     return mesh.aabb;
 }
 
+AABB Mesh::getVerticesAABB(){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.verticesAABB;
+}
+
 AABB Mesh::getWorldAABB(){
     MeshComponent& mesh = getComponent<MeshComponent>();
 

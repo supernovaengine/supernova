@@ -89,7 +89,8 @@ namespace Supernova{
         float morphWeights[MAX_MORPHTARGETS];
 
         AABB aabb = AABB::ZERO;
-        AABB worldAABB = AABB::ZERO;
+        AABB verticesAABB = AABB::ZERO; // is not influenced by instances
+        AABB worldAABB; // initially NULL
 
         bool castShadows = true;
         bool transparent = false;
