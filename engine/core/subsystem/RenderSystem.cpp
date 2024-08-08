@@ -2255,8 +2255,6 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 	instmesh.renderInstances.clear();
 	instmesh.renderInstances.reserve(instmesh.instances.size());
 
-	// considering instances billboard the position of main object with camera
-	// to consider per instance position need to insert this part in instances loop
 	Quaternion bRotation;
 	if (instmesh.instancedBillboard){
 		Vector3 camPos = camTransform.worldPosition;
@@ -2264,11 +2262,9 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 			camPos.y = transform.worldPosition.y;
 		}
 
-		if ((camPos - transform.worldPosition).crossProduct(camera.worldUp).length() != 0){ // check if not parallel
-			Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp).inverse();
-			bRotation.fromRotationMatrix(m1);
-			bRotation = transform.worldRotation.inverse() * bRotation;
-		}
+		Matrix4 m1 = camera.viewMatrix.inverse();
+		bRotation.fromRotationMatrix(m1);
+		bRotation = transform.worldRotation.inverse() * bRotation;
 	}
 
 	mesh.aabb = AABB::ZERO;
@@ -2311,8 +2307,7 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 }
 
 void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform){
-	Vector3 camDir = (camTransform.worldPosition - transform.worldPosition).normalize();
-	//Vector3 camDir = (camTransform.worldPosition - camera.worldView).normalize();
+	Vector3 camDir = camDir = (camTransform.worldPosition - camera.worldView).normalize();
 
 	auto comparePoints = [&transform, &camDir](const InstanceRenderData& a, const InstanceRenderData& b) -> bool {
 		Vector3 positionA = Vector3(a.instanceMatrix[3][0], a.instanceMatrix[3][1], a.instanceMatrix[3][2]);

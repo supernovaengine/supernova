@@ -143,13 +143,19 @@ void Mesh::setInstancedBillboard(bool billboard, bool cylindrical){
 
     instmesh.instancedBillboard = billboard;
     instmesh.instancedCylindricalBillboard = cylindrical;
+
+    instmesh.needUpdateInstances = true;
 }
 
 void Mesh::setInstancedBillboard(bool billboard){
     createInstancedMesh();
     InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
-    instmesh.instancedBillboard = billboard;
+    if (instmesh.instancedBillboard != billboard){
+        instmesh.instancedBillboard = billboard;
+
+        instmesh.needUpdateInstances = true;
+    }
 }
 
 bool Mesh::isInstancedBillboard() const{
@@ -166,7 +172,11 @@ void Mesh::setInstancedCylindricalBillboard(bool cylindricalBillboard){
     createInstancedMesh();
     InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
-    instmesh.instancedCylindricalBillboard = cylindricalBillboard;
+    if (instmesh.instancedCylindricalBillboard != cylindricalBillboard){
+        instmesh.instancedCylindricalBillboard = cylindricalBillboard;
+
+        instmesh.needUpdateInstances = true;
+    }
 }
 
 bool Mesh::isInstancedCylindricalBillboard() const{
@@ -356,7 +366,7 @@ void Mesh::setInstanceVisible(size_t index, bool visible) const{
             instmesh.needUpdateInstances = true;
         }
     }else{
-        Log::error("Cannot set instances visibility. Instances are not created");
+        Log::error("There is no instanced mesh component in this mesh");
     }
 }
 
@@ -366,7 +376,7 @@ void Mesh::updateInstances(){
 
         instmesh.needUpdateInstances = true;
     }else{
-        Log::error("Cannot update instances. Instances are not created");
+        Log::error("There is no instanced mesh component in this mesh");
     }
 }
 
@@ -388,6 +398,6 @@ void Mesh::clearInstances(){
 
         instmesh.needUpdateInstances = true;
     }else{
-        Log::error("Cannot clear instances. Instances are not created");
+        Log::error("There is no instanced mesh component in this mesh");
     }
 }
