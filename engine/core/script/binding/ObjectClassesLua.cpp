@@ -311,6 +311,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getWorldAABB", &Mesh::getWorldAABB)
         .addFunction("getNumSubmeshes", &Mesh::getNumSubmeshes)
         .addFunction("getMaterial", &Mesh::getMaterial)
+        .addProperty("castShadows", &Mesh::isCastShadows, &Mesh::setCastShadows)
         .addFunction("createInstancedMesh", &Mesh::createInstancedMesh)
         .addFunction("removeInstancedMesh", &Mesh::removeInstancedMesh)
         .addFunction("hasInstancedMesh", &Mesh::hasInstancedMesh)
@@ -391,6 +392,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("textureDetailTiles", &Terrain::getTextureDetailTiles, &Terrain::setTextureDetailTiles)
         .addProperty("rootGridSize", &Terrain::getRootGridSize, &Terrain::setRootGridSize)
         .addProperty("levels", &Terrain::getLevels, &Terrain::setLevels)
+        .addProperty("castShadows", &Terrain::isCastShadows, &Terrain::setCastShadows)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

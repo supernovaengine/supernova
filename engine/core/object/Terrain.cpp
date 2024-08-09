@@ -244,3 +244,15 @@ int Terrain::getLevels() const{
 
     return (int)terrain.levels;
 }
+
+void Terrain::setCastShadows(bool castShadows){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    terrain.castShadows = castShadows;
+}
+
+bool Terrain::isCastShadows() const{
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return terrain.castShadows;
+}

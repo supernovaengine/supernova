@@ -42,6 +42,9 @@ namespace Supernova{
 
         Material& getMaterial(unsigned int submesh = 0);
 
+        void setCastShadows(bool castShadows);
+        bool isCastShadows() const;
+
         void createInstancedMesh();
         void removeInstancedMesh();
         bool hasInstancedMesh() const;

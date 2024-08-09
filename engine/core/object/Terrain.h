@@ -58,6 +58,9 @@ namespace Supernova{
 
         void setLevels(int levels);
         int getLevels() const;
+
+        void setCastShadows(bool castShadows);
+        bool isCastShadows() const;
     };
 
 }

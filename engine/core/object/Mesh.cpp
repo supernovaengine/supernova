@@ -125,6 +125,18 @@ Material& Mesh::getMaterial(unsigned int submesh){
     return mesh.submeshes[submesh].material;
 }
 
+void Mesh::setCastShadows(bool castShadows){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.castShadows = castShadows;
+}
+
+bool Mesh::isCastShadows() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.castShadows;
+}
+
 void Mesh::createInstancedMesh(){
     scene->getSystem<MeshSystem>()->createInstancedMesh(entity);
 }
