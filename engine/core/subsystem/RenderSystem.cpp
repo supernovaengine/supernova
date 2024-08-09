@@ -377,7 +377,7 @@ bool RenderSystem::checkPBRFrabebufferUpdate(Material& material){
 		material.emissiveTexture.isFramebufferOutdated() );
 }
 
-void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool castShadows){
+void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool shadows){
 	TextureRender* textureRender = NULL;
 	std::pair<int, int> slotTex(-1, -1);
 
@@ -417,7 +417,7 @@ void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 		else
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
 
-		if (hasShadows && castShadows){
+		if (hasShadows && shadows){
 			size_t num2DShadows = 0;
 			size_t numCubeShadows = 0;
 			auto lights = scene->getComponentArray<LightComponent>();
@@ -640,7 +640,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 		bool p_hasNormalMap = false;
 		bool p_hasNormal = false;
 		bool p_hasTangent = false;
-		bool p_castShadows = false;
+		bool p_receiveShadows = false;
 		bool p_shadowsPCF = false;
 
 		if (mesh.submeshes[i].hasTexture1){
@@ -656,8 +656,8 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 			if (mesh.submeshes[i].hasNormalMap){
 				p_hasNormalMap = true;
 			}
-			if (hasShadows && mesh.castShadows){
-				p_castShadows = true;
+			if (hasShadows && mesh.receiveShadows){
+				p_receiveShadows = true;
 				if (scene->isShadowsPCF()){
 					p_shadowsPCF = true;
 				}
@@ -668,7 +668,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 
 		mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(
 						p_unlit, p_hasTexture1, false, p_punctual, 
-						p_castShadows, p_shadowsPCF, p_hasNormal, p_hasNormalMap, 
+						p_receiveShadows, p_shadowsPCF, p_hasNormal, p_hasNormalMap, 
 						p_hasTangent, false, mesh.submeshes[i].hasVertexColor4, mesh.submeshes[i].hasTextureRect, 
 						hasFog, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent,
 						false, (instmesh)?true:false);
@@ -692,7 +692,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 		}
 		if (hasLights){
 			mesh.submeshes[i].slotFSLighting = shaderData.getUniformBlockIndex(UniformBlockType::FS_LIGHTING, ShaderStageType::FRAGMENT);
-			if (hasShadows && mesh.castShadows){
+			if (hasShadows && mesh.receiveShadows){
 				mesh.submeshes[i].slotVSShadows = shaderData.getUniformBlockIndex(UniformBlockType::VS_SHADOWS, ShaderStageType::VERTEX);
 				mesh.submeshes[i].slotFSShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOWS, ShaderStageType::FRAGMENT);
 			}
@@ -707,7 +707,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 			mesh.submeshes[i].slotVSMorphTarget = shaderData.getUniformBlockIndex(UniformBlockType::VS_MORPHTARGET, ShaderStageType::VERTEX);
 		}
 
-		loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.castShadows);
+		loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
 
 		mesh.submeshes[i].needUpdateTexture = false;
 
@@ -895,7 +895,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmes
 
 			if (mesh.submeshes[i].needUpdateTexture || needUpdateFramebuffer){
 				ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
-				loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.castShadows);
+				loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
 
 				mesh.submeshes[i].needUpdateTexture = false;
 			}
@@ -915,7 +915,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmes
 
 			if (hasLights){
 				render.applyUniformBlock(mesh.submeshes[i].slotFSLighting, ShaderStageType::FRAGMENT, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
-				if (hasShadows && mesh.castShadows){
+				if (hasShadows && mesh.receiveShadows){
 					render.applyUniformBlock(mesh.submeshes[i].slotVSShadows, ShaderStageType::VERTEX, sizeof(float) * (16 * MAX_SHADOWSMAP), &vs_shadows);
 					render.applyUniformBlock(mesh.submeshes[i].slotFSShadows, ShaderStageType::FRAGMENT, sizeof(float) * (4 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP)), &fs_shadows);
 				}
@@ -1067,7 +1067,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 	bool p_punctual = false;
 	bool p_hasTexture1 = false;
 	bool p_hasNormal = false;
-	bool p_castShadows = false;
+	bool p_receiveShadows = false;
 	bool p_shadowsPCF = false;
 
 
@@ -1078,8 +1078,8 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 		p_punctual = true;
 
 		p_hasNormal = true;
-		if (hasShadows && terrain.castShadows){
-			p_castShadows = true;
+		if (hasShadows && terrain.receiveShadows){
+			p_receiveShadows = true;
 			if (scene->isShadowsPCF()){
 				p_shadowsPCF = true;
 			}
@@ -1090,7 +1090,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 
 	terrain.shaderProperties = ShaderPool::getMeshProperties(
 					p_unlit, p_hasTexture1, false, p_punctual, 
-					p_castShadows, p_shadowsPCF, p_hasNormal, false, 
+					p_receiveShadows, p_shadowsPCF, p_hasNormal, false, 
 					false, false, false, false, 
 					hasFog, false, false, false, false,
 					true, false);
@@ -1114,7 +1114,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 	}
 	if (hasLights){
 		terrain.slotFSLighting = shaderData.getUniformBlockIndex(UniformBlockType::FS_LIGHTING, ShaderStageType::FRAGMENT);
-		if (hasShadows && terrain.castShadows){
+		if (hasShadows && terrain.receiveShadows){
 			terrain.slotVSShadows = shaderData.getUniformBlockIndex(UniformBlockType::VS_SHADOWS, ShaderStageType::VERTEX);
 			terrain.slotFSShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOWS, ShaderStageType::FRAGMENT);
 		}
@@ -1122,7 +1122,7 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 	terrain.slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS, ShaderStageType::VERTEX);
 	terrain.slotVSTerrainNode = shaderData.getUniformBlockIndex(UniformBlockType::TERRAINNODE_VS_PARAMS, ShaderStageType::VERTEX);
 
-	loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.castShadows);
+	loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.receiveShadows);
 	loadTerrainTextures(terrain, shaderData);
 
 	terrain.needUpdateTexture = false;
@@ -1178,7 +1178,7 @@ bool RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 
 		if (terrain.needUpdateTexture || needUpdateFramebuffer){
 			ShaderData& shaderData = terrain.shader.get()->shaderData;
-			loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.castShadows);
+			loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.receiveShadows);
 			loadTerrainTextures(terrain, shaderData);
 
 			terrain.needUpdateTexture = false;
@@ -1195,7 +1195,7 @@ bool RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 
 		if (hasLights){
 			terrain.render.applyUniformBlock(terrain.slotFSLighting, ShaderStageType::FRAGMENT, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
-			if (hasShadows && terrain.castShadows){
+			if (hasShadows && terrain.receiveShadows){
 				terrain.render.applyUniformBlock(terrain.slotVSShadows, ShaderStageType::VERTEX, sizeof(float) * (16 * MAX_SHADOWSMAP), &vs_shadows);
 				terrain.render.applyUniformBlock(terrain.slotFSShadows, ShaderStageType::FRAGMENT, sizeof(float) * (4 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP)), &fs_shadows);
 			}

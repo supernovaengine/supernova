@@ -312,6 +312,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getNumSubmeshes", &Mesh::getNumSubmeshes)
         .addFunction("getMaterial", &Mesh::getMaterial)
         .addProperty("castShadows", &Mesh::isCastShadows, &Mesh::setCastShadows)
+        .addProperty("receiveShadows", &Mesh::isReceiveShadows, &Mesh::setReceiveShadows)
         .addFunction("createInstancedMesh", &Mesh::createInstancedMesh)
         .addFunction("removeInstancedMesh", &Mesh::removeInstancedMesh)
         .addFunction("hasInstancedMesh", &Mesh::hasInstancedMesh)
@@ -393,6 +394,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("rootGridSize", &Terrain::getRootGridSize, &Terrain::setRootGridSize)
         .addProperty("levels", &Terrain::getLevels, &Terrain::setLevels)
         .addProperty("castShadows", &Terrain::isCastShadows, &Terrain::setCastShadows)
+        .addProperty("receiveShadows", &Terrain::isReceiveShadows, &Terrain::setReceiveShadows)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

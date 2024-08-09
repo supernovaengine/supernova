@@ -93,6 +93,7 @@ namespace Supernova{
         AABB worldAABB; // initially NULL
 
         bool castShadows = true;
+        bool receiveShadows = true;
         bool transparent = false;
 
         bool needUpdateBuffer = false;

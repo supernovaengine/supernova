@@ -69,6 +69,7 @@ namespace Supernova{
         int slotVSDepthParams = -1;
 
         bool castShadows = true;
+        bool receiveShadows = true;
 
         Texture heightMap;
         Texture blendMap;

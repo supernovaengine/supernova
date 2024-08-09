@@ -137,6 +137,22 @@ bool Mesh::isCastShadows() const{
     return mesh.castShadows;
 }
 
+void Mesh::setReceiveShadows(bool receiveShadows){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    if (mesh.receiveShadows != receiveShadows){
+        mesh.receiveShadows = receiveShadows;
+
+        mesh.needReload = true;
+    }
+}
+
+bool Mesh::isReceiveShadows() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.receiveShadows;
+}
+
 void Mesh::createInstancedMesh(){
     scene->getSystem<MeshSystem>()->createInstancedMesh(entity);
 }

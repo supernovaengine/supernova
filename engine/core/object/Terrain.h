@@ -61,6 +61,9 @@ namespace Supernova{
 
         void setCastShadows(bool castShadows);
         bool isCastShadows() const;
+
+        void setReceiveShadows(bool receiveShadows);
+        bool isReceiveShadows() const;
     };
 
 }

@@ -256,3 +256,19 @@ bool Terrain::isCastShadows() const{
 
     return terrain.castShadows;
 }
+
+void Terrain::setReceiveShadows(bool receiveShadows){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    if (terrain.receiveShadows != receiveShadows){
+        terrain.receiveShadows = receiveShadows;
+
+        terrain.needReload = true;
+    }
+}
+
+bool Terrain::isReceiveShadows() const{
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return terrain.receiveShadows;
+}
