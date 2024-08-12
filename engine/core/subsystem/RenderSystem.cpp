@@ -1058,8 +1058,13 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 	if (terrain.buffer.getSize() == 0 || terrain.indices.getSize() == 0)
 		return false;
 
+	size_t bufferSize = pow(terrain.rootGridSize, 2) * pow(terrain.levels, 2) * terrain.nodesbuffer.getStride();
+
+	terrain.nodesbuffer.getRender()->createBuffer(bufferSize, terrain.nodesbuffer.getData(), terrain.nodesbuffer.getType(), terrain.nodesbuffer.getUsage());
 	terrain.buffer.getRender()->createBuffer(terrain.buffer.getSize(), terrain.buffer.getData(), terrain.buffer.getType(), terrain.buffer.getUsage());
 	terrain.indices.getRender()->createBuffer(terrain.indices.getSize(), terrain.indices.getData(), terrain.indices.getType(), terrain.indices.getUsage());
+
+	terrain.needUpdateNodesBuffer = true;
 
 	terrain.render.beginLoad(PrimitiveType::TRIANGLES);
 
@@ -1120,20 +1125,25 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 		}
 	}
 	terrain.slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS, ShaderStageType::VERTEX);
-	terrain.slotVSTerrainNode = shaderData.getUniformBlockIndex(UniformBlockType::TERRAINNODE_VS_PARAMS, ShaderStageType::VERTEX);
 
 	loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.receiveShadows);
 	loadTerrainTextures(terrain, shaderData);
 
 	terrain.needUpdateTexture = false;
 
+	for (auto const &attr : terrain.nodesbuffer.getAttributes()) {
+		if (terrain.nodesbuffer.isRenderAttributes()) {
+			terrain.render.addAttribute(shaderData.getAttrIndex(attr.first), terrain.nodesbuffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.nodesbuffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+		}
+	}
 	for (auto const &attr : terrain.buffer.getAttributes()) {
 		if (terrain.buffer.isRenderAttributes()) {
 			terrain.render.addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 		}
 	}
-	// empty to create index_type
-	terrain.render.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, 0);
+
+	// TODO: only using highres
+	terrain.render.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.fullResNode.indexOffset);
 
 	if (!terrain.render.endLoad(pipelines)){
 		return false;
@@ -1149,15 +1159,18 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 
 		terrain.slotVSDepthParams = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_PARAMS, ShaderStageType::VERTEX);
 
-		terrain.depthRender.addTexture(shaderData.getTextureIndex(TextureShaderType::HEIGHTMAP, ShaderStageType::VERTEX), ShaderStageType::VERTEX, terrain.heightMap.getRender());
+		terrain.depthRender.addTexture(depthShaderData.getTextureIndex(TextureShaderType::HEIGHTMAP, ShaderStageType::VERTEX), ShaderStageType::VERTEX, terrain.heightMap.getRender());
 
+		for (auto const &attr : terrain.nodesbuffer.getAttributes()) {
+			terrain.depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), terrain.nodesbuffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.nodesbuffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+		}
 		for (auto const &attr : terrain.buffer.getAttributes()) {
 			if (attr.first == AttributeType::POSITION){
-				terrain.depthRender.addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+				terrain.depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 			}
 		}
-		// empty to create index_type
-		terrain.depthRender.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, 0);
+		// TODO: only using highres
+		terrain.depthRender.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.fullResNode.indexOffset);
 
 		if (!terrain.depthRender.endLoad(PIP_DEPTH)){
 			return false;
@@ -1212,13 +1225,13 @@ bool RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 
 		terrain.render.applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.eyePos);
 
-		for (int i = 0; i < terrain.numNodes; i++){
-			if (terrain.nodes[i].visible){
-				terrain.render.applyUniformBlock(terrain.slotVSTerrainNode, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.nodes[i].position);
-				terrain.render.addIndex(terrain.indices.getRender(), terrain.nodes[i].indexAttribute.getDataType(), terrain.nodes[i].indexAttribute.getOffset());
-				terrain.render.draw(terrain.nodes[i].indexAttribute.getCount(), 1);
-			}
+		if (terrain.needUpdateNodesBuffer){
+			terrain.nodesbuffer.getRender()->updateBuffer(terrain.nodesbuffer.getSize(), terrain.nodesbuffer.getData());
+
+			terrain.needUpdateNodesBuffer = false;
 		}
+
+		terrain.render.draw(terrain.fullResNode.indexCount, terrain.nodesbuffer.getCount());
 	}
 
 	return true;
@@ -1236,13 +1249,7 @@ void RenderSystem::drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDept
 
 		terrain.depthRender.applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.eyePos);
 
-		for (int i = 0; i < terrain.numNodes; i++){
-			if (terrain.nodes[i].visible){
-				terrain.depthRender.applyUniformBlock(terrain.slotVSTerrainNode, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.nodes[i].position);
-				terrain.depthRender.addIndex(terrain.indices.getRender(), terrain.nodes[i].indexAttribute.getDataType(), terrain.nodes[i].indexAttribute.getOffset());
-				terrain.depthRender.draw(terrain.nodes[i].indexAttribute.getCount(), 1);
-			}
-		}
+		terrain.depthRender.draw(terrain.fullResNode.indexCount, terrain.nodesbuffer.getCount());
 	}
 }
 
@@ -1284,12 +1291,12 @@ void RenderSystem::destroyTerrain(Entity entity, TerrainComponent& terrain){
 	terrain.slotVSShadows = -1;
 	terrain.slotFSShadows = -1;
 	terrain.slotVSTerrain = -1;
-	terrain.slotVSTerrainNode = -1;
 
 	terrain.slotVSDepthParams = -1;
 
 	//Destroy buffers
 	//terrain.buffer.clearAll();
+	terrain.nodesbuffer.getRender()->destroyBuffer();
 	terrain.buffer.getRender()->destroyBuffer();
 	//terrain.indices.clearAll();
 	terrain.indices.getRender()->destroyBuffer();
@@ -2032,25 +2039,15 @@ void RenderSystem::updateTerrain(TerrainComponent& terrain, Transform& transform
 			terrain.nodes[i].visible = false;
 		}
 
+		terrain.nodesbuffer.clear();
+
 		for (int i = 0; i < (terrain.rootGridSize*terrain.rootGridSize); i++){
 			terrainNodeLODSelect(terrain, transform, camera, cameraTransform, terrain.nodes[terrain.grid[i]], terrain.levels-1);
 		}
 
+		terrain.needUpdateNodesBuffer = true;
+
 		terrain.eyePos = Vector3(cameraTransform.worldPosition.x, cameraTransform.worldPosition.y, cameraTransform.worldPosition.z);
-	}
-}
-
-void RenderSystem::setTerrainNodeIndex(TerrainComponent& terrain, TerrainNode& terrainNode, size_t size, size_t offset){
-	terrainNode.indexAttribute.setElements(1);
-	terrainNode.indexAttribute.setDataType(AttributeDataType::UNSIGNED_SHORT);
-	terrainNode.indexAttribute.setCount(size);
-	terrainNode.indexAttribute.setOffset(offset);
-	terrainNode.indexAttribute.setNormalized(false);
-
-	if (terrainNode.hasChilds){
-		for (int i = 0; i < 4; i++){
-			setTerrainNodeIndex(terrain, terrain.nodes[terrainNode.childs[i]], size, offset);
-		}
 	}
 }
 
@@ -2103,7 +2100,10 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
         //Full resolution
         terrainNode.resolution = terrain.resolution;
 		terrainNode.visible = true;
-		setTerrainNodeIndex(terrain, terrainNode, terrain.fullResNode.indexCount, terrain.fullResNode.indexOffset * sizeof(uint16_t));
+		terrain.nodesbuffer.addVector2(AttributeType::TERRAINNODEPOSITION, terrainNode.position);
+		terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODESIZE, terrainNode.size);
+		terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERANGE, terrainNode.currentRange);
+		terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERESOLUTION, terrainNode.resolution);
 
         return true;
     } else {
@@ -2112,7 +2112,10 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
             //Full resolution
 			terrainNode.resolution = terrain.resolution;
 			terrainNode.visible = true;
-			setTerrainNodeIndex(terrain, terrainNode, terrain.fullResNode.indexCount, terrain.fullResNode.indexOffset * sizeof(uint16_t));
+			terrain.nodesbuffer.addVector2(AttributeType::TERRAINNODEPOSITION, terrainNode.position);
+			terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODESIZE, terrainNode.size);
+			terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERANGE, terrainNode.currentRange);
+			terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERESOLUTION, terrainNode.resolution);
         } else {
             for (int i = 0; i < 4; i++) {
                 TerrainNode& child = terrain.nodes[terrainNode.childs[i]];
@@ -2121,7 +2124,10 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
                     child.resolution = terrain.resolution / 2;
                     child.currentRange = terrainNode.currentRange;
 					child.visible = true;
-					setTerrainNodeIndex(terrain, child, terrain.halfResNode.indexCount, terrain.halfResNode.indexOffset * sizeof(uint16_t));
+					terrain.nodesbuffer.addVector2(AttributeType::TERRAINNODEPOSITION, terrainNode.position);
+					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODESIZE, terrainNode.size);
+					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERANGE, terrainNode.currentRange);
+					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERESOLUTION, terrainNode.resolution);
                 }
             }
         }

@@ -10,12 +10,11 @@ uniform u_vs_terrainParams {
     float textureDetailTiles; //int
 } terrain;
 
-uniform u_vs_terrainNodeParams {
-    vec2 pos;
-    float size;
-    float range;
-    float resolution; //int
-} terrainNode;
+// instancing part
+in vec2 i_terrainnode_pos;
+in float i_terrainnode_size;
+in float i_terrainnode_range;
+in float i_terrainnode_resolution; //int
 
 #ifndef DEPTH_SHADER
     out vec2 v_terrainTextureCoords;
@@ -26,10 +25,10 @@ float morphFactor;
 
 
 vec2 morphVertex(vec2 gridPos, vec2 worldPos, float morph) {
-    vec2 gridDim = vec2(terrainNode.resolution, terrainNode.resolution);
+    vec2 gridDim = vec2(i_terrainnode_resolution, i_terrainnode_resolution);
 
     vec2 fracPart = fract(gridPos * gridDim.xy * 0.5) * 2.0 / gridDim.xy;
-    return worldPos - fracPart * terrainNode.size * morph;
+    return worldPos - fracPart * i_terrainnode_size * morph;
 }
 
 float getHeight(vec3 position) {
@@ -38,8 +37,8 @@ float getHeight(vec3 position) {
 
 // must be called BEFORE getTerrainNormal because morphValue
 vec3 getTerrainPosition(vec3 pos, mat4 modelMatrix){
-    pos = terrainNode.size * pos;
-    pos = pos + vec3(terrainNode.pos[0], 0.0, terrainNode.pos[1]);
+    pos = i_terrainnode_size * pos;
+    pos = pos + vec3(i_terrainnode_pos[0], 0.0, i_terrainnode_pos[1]);
 
     pos = vec3(pos.x, getHeight(pos), pos.z);
 
@@ -48,7 +47,7 @@ vec3 getTerrainPosition(vec3 pos, mat4 modelMatrix){
 
     float dist = distance(terrain.eyePos, vec3(modelMatrix * vec4(pos, 1.0)));
 
-    float nextlevel_thresh = ((terrainNode.range - dist) / terrainNode.size * terrainNode.resolution / float(terrain.resolution));
+    float nextlevel_thresh = ((i_terrainnode_range - dist) / i_terrainnode_size * i_terrainnode_resolution / float(terrain.resolution));
     morphFactor = 1.0 - smoothstep(morphStart, morphEnd, nextlevel_thresh);
 
     pos.xz = morphVertex(a_position.xz, pos.xz, morphFactor);
@@ -60,7 +59,7 @@ vec3 getTerrainPosition(vec3 pos, mat4 modelMatrix){
 
 vec3 getTerrainNormal(vec3 normal, vec3 position){
     #ifdef HAS_NORMALS
-        float delta = (morphFactor + 1.0) * terrainNode.size / float(terrainNode.resolution);
+        float delta = (morphFactor + 1.0) * i_terrainnode_size / float(i_terrainnode_resolution);
 
         vec3 dA = delta * normalize(cross(normal.yzx, normal));
         vec3 dB = delta * normalize(cross(dA, normal));

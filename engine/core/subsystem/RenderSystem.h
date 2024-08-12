@@ -120,7 +120,6 @@ namespace Supernova{
 		Rect getScissorRect(UILayoutComponent& layout, ImageComponent& img, Transform& transform, CameraComponent& camera);
 
 		// terrain
-		void setTerrainNodeIndex(TerrainComponent& terrain, TerrainNode& terrainNode, size_t size, size_t offset);
 		bool terrainNodeLODSelect(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform, TerrainNode& terrainNode, int lodLevel);
 		AABB getTerrainNodeAABB(Transform& transform, TerrainNode& terrainNode);
 		bool isTerrainNodeInSphere(Vector3 position, float radius, const AABB& box);

@@ -34,6 +34,7 @@ namespace Supernova{
         virtual void clear();
 
         void addAttribute(AttributeType attribute, int elements);
+        void addAttribute(AttributeType attribute, int elements, bool perInstance);
 
     };
 

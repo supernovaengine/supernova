@@ -67,7 +67,11 @@ namespace Supernova{
         INSTANCEMATRIXCOL3,
         INSTANCEMATRIXCOL4,
         INSTANCECOLOR,
-        INSTANCETEXTURERECT
+        INSTANCETEXTURERECT,
+        TERRAINNODEPOSITION,
+        TERRAINNODESIZE,
+        TERRAINNODERANGE,
+        TERRAINNODERESOLUTION
     };
 
     enum class AttributeDataType{
@@ -100,8 +104,7 @@ namespace Supernova{
         DEPTH_VS_SKINNING,
         VS_MORPHTARGET,
         DEPTH_VS_MORPHTARGET,
-        TERRAIN_VS_PARAMS,
-        TERRAINNODE_VS_PARAMS
+        TERRAIN_VS_PARAMS
     };
 
     enum class StorageBufferType{

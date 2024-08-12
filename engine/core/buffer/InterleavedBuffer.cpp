@@ -66,12 +66,17 @@ void InterleavedBuffer::clear(){
 }
 
 void InterleavedBuffer::addAttribute(AttributeType attribute, int elements){
+    addAttribute(attribute, elements, false);
+}
+
+void InterleavedBuffer::addAttribute(AttributeType attribute, int elements, bool perInstance){
     if (vectorBuffer.size() == 0) {
         Attribute attData;
         attData.setCount(0);
         attData.setElements(elements);
         attData.setDataType(AttributeDataType::FLOAT);
         attData.setOffset(vertexSize);
+        attData.setPerInstance(perInstance);
 
         vertexSize += elements * sizeof(float);
 

@@ -111,6 +111,14 @@ int ShaderData::getAttrIndex(AttributeType type){
         attrstr = "i_color";
     }else if (type == AttributeType::INSTANCETEXTURERECT){
         attrstr = "i_textureRect";
+    }else if (type == AttributeType::TERRAINNODEPOSITION){
+        attrstr = "i_terrainnode_pos";
+    }else if (type == AttributeType::TERRAINNODESIZE){
+        attrstr = "i_terrainnode_size";
+    }else if (type == AttributeType::TERRAINNODERANGE){
+        attrstr = "i_terrainnode_range";
+    }else if (type == AttributeType::TERRAINNODERESOLUTION){
+        attrstr = "i_terrainnode_resolution";
     }
 
     if (attrstr.empty()){
@@ -176,8 +184,6 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
         ustr = "u_vs_morphtarget";
     }else if (type == UniformBlockType::TERRAIN_VS_PARAMS){
         ustr = "u_vs_terrainParams";
-    }else if (type == UniformBlockType::TERRAINNODE_VS_PARAMS){
-        ustr = "u_vs_terrainNodeParams";
     }
 
     if (ustr.empty()){

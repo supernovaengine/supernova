@@ -20,8 +20,6 @@ namespace Supernova{
     };
 
     struct TerrainNode{
-        Attribute indexAttribute;
-
         //-----u_vs_terrainNodeParams
         Vector2 position = Vector2(0, 0);
         float size = 0;
@@ -45,6 +43,7 @@ namespace Supernova{
 
         Material material;
 
+        InterleavedBuffer nodesbuffer;
         InterleavedBuffer buffer;
         IndexBuffer indices;
 
@@ -64,7 +63,6 @@ namespace Supernova{
         int slotVSShadows = -1;
         int slotFSShadows = -1;
         int slotVSTerrain = -1;
-        int slotVSTerrainNode = -1;
 
         int slotVSDepthParams = -1;
 
@@ -106,6 +104,7 @@ namespace Supernova{
 
         bool needUpdateTerrain = true;
         bool needUpdateTexture = false;
+        bool needUpdateNodesBuffer = false;
         bool needReload = false;
     };
     
