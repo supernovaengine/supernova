@@ -2124,10 +2124,10 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
                     child.resolution = terrain.resolution / 2;
                     child.currentRange = terrainNode.currentRange;
 					child.visible = true;
-					terrain.nodesbuffer.addVector2(AttributeType::TERRAINNODEPOSITION, terrainNode.position);
-					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODESIZE, terrainNode.size);
-					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERANGE, terrainNode.currentRange);
-					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERESOLUTION, terrainNode.resolution);
+					terrain.nodesbuffer.addVector2(AttributeType::TERRAINNODEPOSITION, child.position);
+					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODESIZE, child.size);
+					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERANGE, child.currentRange);
+					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERESOLUTION, child.resolution);
                 }
             }
         }
