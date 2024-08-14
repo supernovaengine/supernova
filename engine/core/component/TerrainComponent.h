@@ -43,12 +43,13 @@ namespace Supernova{
 
         Material material;
 
-        InterleavedBuffer nodesbuffer;
+        // 0 for fullRes and 1 for halfRes
+        InterleavedBuffer nodesbuffer[2];
         InterleavedBuffer buffer;
         IndexBuffer indices;
 
-        ObjectRender render;
-        ObjectRender depthRender;
+        ObjectRender render[2];
+        ObjectRender depthRender[2];
 
         std::shared_ptr<ShaderRender> shader;
         std::shared_ptr<ShaderRender> depthShader;

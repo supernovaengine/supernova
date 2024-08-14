@@ -910,14 +910,16 @@ void MeshSystem::createTerrainNode(TerrainComponent& terrain, float x, float y, 
 }
 
 void MeshSystem::createTerrain(TerrainComponent& terrain){
-    terrain.nodesbuffer.clear();
-    terrain.nodesbuffer.addAttribute(AttributeType::TERRAINNODEPOSITION, 2, true);
-    terrain.nodesbuffer.addAttribute(AttributeType::TERRAINNODESIZE, 1, true);
-    terrain.nodesbuffer.addAttribute(AttributeType::TERRAINNODERANGE, 1, true);
-    terrain.nodesbuffer.addAttribute(AttributeType::TERRAINNODERESOLUTION, 1, true);
-    terrain.nodesbuffer.setRenderAttributes(true);
-    terrain.nodesbuffer.setInstanceBuffer(true);
-    terrain.nodesbuffer.setUsage(BufferUsage::STREAM);
+    for (int s = 0; s < 2; s++){
+        terrain.nodesbuffer[s].clear();
+        terrain.nodesbuffer[s].addAttribute(AttributeType::TERRAINNODEPOSITION, 2, true);
+        terrain.nodesbuffer[s].addAttribute(AttributeType::TERRAINNODESIZE, 1, true);
+        terrain.nodesbuffer[s].addAttribute(AttributeType::TERRAINNODERANGE, 1, true);
+        terrain.nodesbuffer[s].addAttribute(AttributeType::TERRAINNODERESOLUTION, 1, true);
+        terrain.nodesbuffer[s].setRenderAttributes(true);
+        terrain.nodesbuffer[s].setInstanceBuffer(true);
+        terrain.nodesbuffer[s].setUsage(BufferUsage::STREAM);
+    }
 
     terrain.buffer.clear();
     terrain.buffer.addAttribute(AttributeType::POSITION, 3);

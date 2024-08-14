@@ -458,44 +458,44 @@ void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 	}
 }
 
-void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ShaderData& shaderData){
+void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData){
 	TextureRender* textureRender = NULL;
 	std::pair<int, int> slotTex(-1, -1);
 
 	textureRender = terrain.heightMap.getRender();
 	slotTex = shaderData.getTextureIndex(TextureShaderType::HEIGHTMAP, ShaderStageType::VERTEX);
 	if (textureRender)
-		terrain.render.addTexture(slotTex, ShaderStageType::VERTEX, textureRender);
+		render.addTexture(slotTex, ShaderStageType::VERTEX, textureRender);
 	else
-		terrain.render.addTexture(slotTex, ShaderStageType::VERTEX, &emptyWhite);
+		render.addTexture(slotTex, ShaderStageType::VERTEX, &emptyWhite);
 
 	textureRender = terrain.blendMap.getRender();
 	slotTex = shaderData.getTextureIndex(TextureShaderType::BLENDMAP, ShaderStageType::FRAGMENT);
 	if (textureRender)
-		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
 	else
-		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
 
 	textureRender = terrain.textureDetailRed.getRender();
 	slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_RED, ShaderStageType::FRAGMENT);
 	if (textureRender)
-		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
 	else
-		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 
 	textureRender = terrain.textureDetailGreen.getRender();
 	slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_GREEN, ShaderStageType::FRAGMENT);
 	if (textureRender)
-		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
 	else
-		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 
 	textureRender = terrain.textureDetailBlue.getRender();
 	slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_BLUE, ShaderStageType::FRAGMENT);
 	if (textureRender)
-		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
 	else
-		terrain.render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 }
 
 bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshComponent* instmesh, uint8_t pipelines){
@@ -1058,15 +1058,15 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 	if (terrain.buffer.getSize() == 0 || terrain.indices.getSize() == 0)
 		return false;
 
-	size_t bufferSize = pow(terrain.rootGridSize, 2) * pow(terrain.levels, 2) * terrain.nodesbuffer.getStride();
+	for (int s = 0; s < 2; s++){
+		size_t bufferSize = pow(terrain.rootGridSize, 2) * pow(terrain.levels, 2) * terrain.nodesbuffer[s].getStride() / 2;
+		terrain.nodesbuffer[s].getRender()->createBuffer(bufferSize, terrain.nodesbuffer[s].getData(), terrain.nodesbuffer[s].getType(), terrain.nodesbuffer[s].getUsage());
+	}
 
-	terrain.nodesbuffer.getRender()->createBuffer(bufferSize, terrain.nodesbuffer.getData(), terrain.nodesbuffer.getType(), terrain.nodesbuffer.getUsage());
 	terrain.buffer.getRender()->createBuffer(terrain.buffer.getSize(), terrain.buffer.getData(), terrain.buffer.getType(), terrain.buffer.getUsage());
 	terrain.indices.getRender()->createBuffer(terrain.indices.getSize(), terrain.indices.getData(), terrain.indices.getType(), terrain.indices.getUsage());
 
 	terrain.needUpdateNodesBuffer = true;
-
-	terrain.render.beginLoad(PrimitiveType::TRIANGLES);
 
 	bool p_unlit = false;
 	bool p_punctual = false;
@@ -1109,74 +1109,86 @@ bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t
 	}
 	if (!terrain.shader->isCreated())
 		return false;
-	terrain.render.addShader(terrain.shader.get());
-	ShaderData& shaderData = terrain.shader.get()->shaderData;
 
-	terrain.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
-	terrain.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
-	if (hasFog){
-		terrain.slotFSFog = shaderData.getUniformBlockIndex(UniformBlockType::FS_FOG, ShaderStageType::FRAGMENT);
-	}
-	if (hasLights){
-		terrain.slotFSLighting = shaderData.getUniformBlockIndex(UniformBlockType::FS_LIGHTING, ShaderStageType::FRAGMENT);
-		if (hasShadows && terrain.receiveShadows){
-			terrain.slotVSShadows = shaderData.getUniformBlockIndex(UniformBlockType::VS_SHADOWS, ShaderStageType::VERTEX);
-			terrain.slotFSShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOWS, ShaderStageType::FRAGMENT);
+	for (int s = 0; s < 2; s++){
+		terrain.render[s].beginLoad(PrimitiveType::TRIANGLES);
+
+		terrain.render[s].addShader(terrain.shader.get());
+		ShaderData& shaderData = terrain.shader.get()->shaderData;
+
+		terrain.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
+		terrain.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
+		if (hasFog){
+			terrain.slotFSFog = shaderData.getUniformBlockIndex(UniformBlockType::FS_FOG, ShaderStageType::FRAGMENT);
 		}
-	}
-	terrain.slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS, ShaderStageType::VERTEX);
-
-	loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.receiveShadows);
-	loadTerrainTextures(terrain, shaderData);
-
-	terrain.needUpdateTexture = false;
-
-	for (auto const &attr : terrain.nodesbuffer.getAttributes()) {
-		if (terrain.nodesbuffer.isRenderAttributes()) {
-			terrain.render.addAttribute(shaderData.getAttrIndex(attr.first), terrain.nodesbuffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.nodesbuffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
-		}
-	}
-	for (auto const &attr : terrain.buffer.getAttributes()) {
-		if (terrain.buffer.isRenderAttributes()) {
-			terrain.render.addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
-		}
-	}
-
-	// TODO: only using highres
-	terrain.render.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.fullResNode.indexOffset);
-
-	if (!terrain.render.endLoad(pipelines)){
-		return false;
-	}
-
-	//----------Start depth shader---------------
-	if (hasShadows && terrain.castShadows){
-
-		terrain.depthRender.beginLoad(PrimitiveType::TRIANGLES);
-
-		terrain.depthRender.addShader(terrain.depthShader.get());
-		ShaderData& depthShaderData = terrain.depthShader.get()->shaderData;
-
-		terrain.slotVSDepthParams = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_PARAMS, ShaderStageType::VERTEX);
-
-		terrain.depthRender.addTexture(depthShaderData.getTextureIndex(TextureShaderType::HEIGHTMAP, ShaderStageType::VERTEX), ShaderStageType::VERTEX, terrain.heightMap.getRender());
-
-		for (auto const &attr : terrain.nodesbuffer.getAttributes()) {
-			terrain.depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), terrain.nodesbuffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.nodesbuffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
-		}
-		for (auto const &attr : terrain.buffer.getAttributes()) {
-			if (attr.first == AttributeType::POSITION){
-				terrain.depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+		if (hasLights){
+			terrain.slotFSLighting = shaderData.getUniformBlockIndex(UniformBlockType::FS_LIGHTING, ShaderStageType::FRAGMENT);
+			if (hasShadows && terrain.receiveShadows){
+				terrain.slotVSShadows = shaderData.getUniformBlockIndex(UniformBlockType::VS_SHADOWS, ShaderStageType::VERTEX);
+				terrain.slotFSShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOWS, ShaderStageType::FRAGMENT);
 			}
 		}
-		// TODO: only using highres
-		terrain.depthRender.addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.fullResNode.indexOffset);
+		terrain.slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS, ShaderStageType::VERTEX);
 
-		if (!terrain.depthRender.endLoad(PIP_DEPTH)){
+		loadPBRTextures(terrain.material, shaderData, terrain.render[s], terrain.receiveShadows);
+		loadTerrainTextures(terrain, terrain.render[s], shaderData);
+
+		terrain.needUpdateTexture = false;
+
+		for (auto const &attr : terrain.nodesbuffer[s].getAttributes()) {
+			if (terrain.nodesbuffer[s].isRenderAttributes()) {
+				terrain.render[s].addAttribute(shaderData.getAttrIndex(attr.first), terrain.nodesbuffer[s].getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.nodesbuffer[s].getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+			}
+		}
+		for (auto const &attr : terrain.buffer.getAttributes()) {
+			if (terrain.buffer.isRenderAttributes()) {
+				terrain.render[s].addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+			}
+		}
+
+		if (s == 0){
+			terrain.render[s].addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.fullResNode.indexOffset * sizeof(uint16_t));
+		}else{
+			terrain.render[s].addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.halfResNode.indexOffset * sizeof(uint16_t));
+		}
+
+		if (!terrain.render[s].endLoad(pipelines)){
 			return false;
 		}
+
+		//----------Start depth shader---------------
+		if (hasShadows && terrain.castShadows){
+
+			terrain.depthRender[s].beginLoad(PrimitiveType::TRIANGLES);
+
+			terrain.depthRender[s].addShader(terrain.depthShader.get());
+			ShaderData& depthShaderData = terrain.depthShader.get()->shaderData;
+
+			terrain.slotVSDepthParams = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_PARAMS, ShaderStageType::VERTEX);
+
+			terrain.depthRender[s].addTexture(depthShaderData.getTextureIndex(TextureShaderType::HEIGHTMAP, ShaderStageType::VERTEX), ShaderStageType::VERTEX, terrain.heightMap.getRender());
+
+			for (auto const &attr : terrain.nodesbuffer[s].getAttributes()) {
+				terrain.depthRender[s].addAttribute(depthShaderData.getAttrIndex(attr.first), terrain.nodesbuffer[s].getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.nodesbuffer[s].getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+			}
+			for (auto const &attr : terrain.buffer.getAttributes()) {
+				if (attr.first == AttributeType::POSITION){
+					terrain.depthRender[s].addAttribute(depthShaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+				}
+			}
+
+			if (s == 0){
+				terrain.depthRender[s].addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.fullResNode.indexOffset * sizeof(uint16_t));
+			}else{
+				terrain.depthRender[s].addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.halfResNode.indexOffset * sizeof(uint16_t));
+			}
+
+			if (!terrain.depthRender[s].endLoad(PIP_DEPTH)){
+				return false;
+			}
+		}
+		//----------End depth shader---------------
 	}
-	//----------End depth shader---------------
 
 	terrain.needReload = false;
 	terrain.loadCalled = true;
@@ -1191,47 +1203,58 @@ bool RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 
 		if (terrain.needUpdateTexture || needUpdateFramebuffer){
 			ShaderData& shaderData = terrain.shader.get()->shaderData;
-			loadPBRTextures(terrain.material, shaderData, terrain.render, terrain.receiveShadows);
-			loadTerrainTextures(terrain, shaderData);
+			for (int s = 0; s < 2; s++){
+				loadPBRTextures(terrain.material, shaderData, terrain.render[s], terrain.receiveShadows);
+				loadTerrainTextures(terrain, terrain.render[s], shaderData);
+			}
 
 			terrain.needUpdateTexture = false;
 		}
+
+		if (terrain.needUpdateNodesBuffer){
+			for (int s = 0; s < 2; s++){
+				terrain.nodesbuffer[s].getRender()->updateBuffer(terrain.nodesbuffer[s].getSize(), terrain.nodesbuffer[s].getData());
+			}
+
+			terrain.needUpdateNodesBuffer = false;
+		}
+
 		if (scene->isSceneAmbientLightEnabled()){
 			terrain.material.ambientFactor = scene->getAmbientLightFactor();
 			terrain.material.ambientLight = scene->getAmbientLightColor();
 		}
 
-		if (!terrain.render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
-			terrain.needReload = true;
-			return false;
-		}
+		for (int s = 0; s < 2; s++){
+			if (!terrain.render[s].beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
+				terrain.needReload = true;
+				return false;
+			}
 
-		if (hasLights){
-			terrain.render.applyUniformBlock(terrain.slotFSLighting, ShaderStageType::FRAGMENT, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
-			if (hasShadows && terrain.receiveShadows){
-				terrain.render.applyUniformBlock(terrain.slotVSShadows, ShaderStageType::VERTEX, sizeof(float) * (16 * MAX_SHADOWSMAP), &vs_shadows);
-				terrain.render.applyUniformBlock(terrain.slotFSShadows, ShaderStageType::FRAGMENT, sizeof(float) * (4 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP)), &fs_shadows);
+			if (hasLights){
+				terrain.render[s].applyUniformBlock(terrain.slotFSLighting, ShaderStageType::FRAGMENT, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
+				if (hasShadows && terrain.receiveShadows){
+					terrain.render[s].applyUniformBlock(terrain.slotVSShadows, ShaderStageType::VERTEX, sizeof(float) * (16 * MAX_SHADOWSMAP), &vs_shadows);
+					terrain.render[s].applyUniformBlock(terrain.slotFSShadows, ShaderStageType::FRAGMENT, sizeof(float) * (4 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP)), &fs_shadows);
+				}
+			}
+
+			if (hasLights){
+				terrain.render[s].applyUniformBlock(terrain.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 16, &terrain.material);
+			}else{
+				terrain.render[s].applyUniformBlock(terrain.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &terrain.material);
+			}
+
+			//model, normal and mvp matrix
+			terrain.render[s].applyUniformBlock(terrain.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 48, &transform.modelMatrix);
+
+			terrain.render[s].applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.eyePos);
+
+			if (s == 0){
+				terrain.render[s].draw(terrain.fullResNode.indexCount, terrain.nodesbuffer[s].getCount());
+			}else{
+				terrain.render[s].draw(terrain.halfResNode.indexCount, terrain.nodesbuffer[s].getCount());
 			}
 		}
-
-		if (hasLights){
-			terrain.render.applyUniformBlock(terrain.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 16, &terrain.material);
-		}else{
-			terrain.render.applyUniformBlock(terrain.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &terrain.material);
-		}
-
-		//model, normal and mvp matrix
-		terrain.render.applyUniformBlock(terrain.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 48, &transform.modelMatrix);
-
-		terrain.render.applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.eyePos);
-
-		if (terrain.needUpdateNodesBuffer){
-			terrain.nodesbuffer.getRender()->updateBuffer(terrain.nodesbuffer.getSize(), terrain.nodesbuffer.getData());
-
-			terrain.needUpdateNodesBuffer = false;
-		}
-
-		terrain.render.draw(terrain.fullResNode.indexCount, terrain.nodesbuffer.getCount());
 	}
 
 	return true;
@@ -1239,17 +1262,23 @@ bool RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, 
 
 void RenderSystem::drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams){
 	if (terrain.loaded && terrain.castShadows){
-		if (!terrain.depthRender.beginDraw(PIP_DEPTH)){
-			terrain.needReload = true;
-			return;
+		for (int s = 0; s < 2; s++){
+			if (!terrain.depthRender[s].beginDraw(PIP_DEPTH)){
+				terrain.needReload = true;
+				return;
+			}
+
+			//model, mvp matrix
+			terrain.depthRender[s].applyUniformBlock(terrain.slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 32, &vsDepthParams);
+
+			terrain.depthRender[s].applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.eyePos);
+
+			if (s == 0){
+				terrain.depthRender[s].draw(terrain.fullResNode.indexCount, terrain.nodesbuffer[s].getCount());
+			}else{
+				terrain.depthRender[s].draw(terrain.halfResNode.indexCount, terrain.nodesbuffer[s].getCount());
+			}
 		}
-
-		//model, mvp matrix
-		terrain.depthRender.applyUniformBlock(terrain.slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 32, &vsDepthParams);
-
-		terrain.depthRender.applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.eyePos);
-
-		terrain.depthRender.draw(terrain.fullResNode.indexCount, terrain.nodesbuffer.getCount());
 	}
 }
 
@@ -1280,8 +1309,10 @@ void RenderSystem::destroyTerrain(Entity entity, TerrainComponent& terrain){
 	terrain.textureDetailBlue.destroy();
 
 	//Destroy render
-	terrain.render.destroy();
-	terrain.depthRender.destroy();
+	for (int s = 0; s < 2; s++){
+		terrain.render[s].destroy();
+		terrain.depthRender[s].destroy();
+	}
 
 	//Shaders uniforms
 	terrain.slotVSParams = -1;
@@ -1296,7 +1327,9 @@ void RenderSystem::destroyTerrain(Entity entity, TerrainComponent& terrain){
 
 	//Destroy buffers
 	//terrain.buffer.clearAll();
-	terrain.nodesbuffer.getRender()->destroyBuffer();
+	for (int s = 0; s < 2; s++){
+		terrain.nodesbuffer[s].getRender()->destroyBuffer();
+	}
 	terrain.buffer.getRender()->destroyBuffer();
 	//terrain.indices.clearAll();
 	terrain.indices.getRender()->destroyBuffer();
@@ -2039,7 +2072,9 @@ void RenderSystem::updateTerrain(TerrainComponent& terrain, Transform& transform
 			terrain.nodes[i].visible = false;
 		}
 
-		terrain.nodesbuffer.clear();
+		for (int s = 0; s < 2; s++){
+			terrain.nodesbuffer[s].clear();
+		}
 
 		for (int i = 0; i < (terrain.rootGridSize*terrain.rootGridSize); i++){
 			terrainNodeLODSelect(terrain, transform, camera, cameraTransform, terrain.nodes[terrain.grid[i]], terrain.levels-1);
@@ -2100,10 +2135,10 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
         //Full resolution
         terrainNode.resolution = terrain.resolution;
 		terrainNode.visible = true;
-		terrain.nodesbuffer.addVector2(AttributeType::TERRAINNODEPOSITION, terrainNode.position);
-		terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODESIZE, terrainNode.size);
-		terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERANGE, terrainNode.currentRange);
-		terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERESOLUTION, terrainNode.resolution);
+		terrain.nodesbuffer[0].addVector2(AttributeType::TERRAINNODEPOSITION, terrainNode.position);
+		terrain.nodesbuffer[0].addFloat(AttributeType::TERRAINNODESIZE, terrainNode.size);
+		terrain.nodesbuffer[0].addFloat(AttributeType::TERRAINNODERANGE, terrainNode.currentRange);
+		terrain.nodesbuffer[0].addFloat(AttributeType::TERRAINNODERESOLUTION, terrainNode.resolution);
 
         return true;
     } else {
@@ -2112,10 +2147,10 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
             //Full resolution
 			terrainNode.resolution = terrain.resolution;
 			terrainNode.visible = true;
-			terrain.nodesbuffer.addVector2(AttributeType::TERRAINNODEPOSITION, terrainNode.position);
-			terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODESIZE, terrainNode.size);
-			terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERANGE, terrainNode.currentRange);
-			terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERESOLUTION, terrainNode.resolution);
+			terrain.nodesbuffer[0].addVector2(AttributeType::TERRAINNODEPOSITION, terrainNode.position);
+			terrain.nodesbuffer[0].addFloat(AttributeType::TERRAINNODESIZE, terrainNode.size);
+			terrain.nodesbuffer[0].addFloat(AttributeType::TERRAINNODERANGE, terrainNode.currentRange);
+			terrain.nodesbuffer[0].addFloat(AttributeType::TERRAINNODERESOLUTION, terrainNode.resolution);
         } else {
             for (int i = 0; i < 4; i++) {
                 TerrainNode& child = terrain.nodes[terrainNode.childs[i]];
@@ -2124,10 +2159,10 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
                     child.resolution = terrain.resolution / 2;
                     child.currentRange = terrainNode.currentRange;
 					child.visible = true;
-					terrain.nodesbuffer.addVector2(AttributeType::TERRAINNODEPOSITION, child.position);
-					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODESIZE, child.size);
-					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERANGE, child.currentRange);
-					terrain.nodesbuffer.addFloat(AttributeType::TERRAINNODERESOLUTION, child.resolution);
+					terrain.nodesbuffer[1].addVector2(AttributeType::TERRAINNODEPOSITION, child.position);
+					terrain.nodesbuffer[1].addFloat(AttributeType::TERRAINNODESIZE, child.size);
+					terrain.nodesbuffer[1].addFloat(AttributeType::TERRAINNODERANGE, child.currentRange);
+					terrain.nodesbuffer[1].addFloat(AttributeType::TERRAINNODERESOLUTION, child.resolution);
                 }
             }
         }

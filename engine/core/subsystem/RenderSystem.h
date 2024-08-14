@@ -116,7 +116,7 @@ namespace Supernova{
 		Matrix4 getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv);
 		bool checkPBRFrabebufferUpdate(Material& material);
 		void loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool shadows);
-		void loadTerrainTextures(TerrainComponent& terrain, ShaderData& shaderData);
+		void loadTerrainTextures(TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData);
 		Rect getScissorRect(UILayoutComponent& layout, ImageComponent& img, Transform& transform, CameraComponent& camera);
 
 		// terrain
