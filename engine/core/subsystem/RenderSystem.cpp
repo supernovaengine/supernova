@@ -545,22 +545,8 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 	}
 
 	if (instmesh){
-		instmesh->buffer.clear();
-		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL1, 4, 0, true);
-		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL2, 4, 4 * sizeof(float), true);
-		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL3, 4, 8 * sizeof(float), true);
-		instmesh->buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL4, 4, 12 * sizeof(float), true);
-		instmesh->buffer.addAttribute(AttributeType::INSTANCECOLOR, 4, 16 * sizeof(float), true);
-		instmesh->buffer.addAttribute(AttributeType::INSTANCETEXTURERECT, 4, 20 * sizeof(float), true);
-		instmesh->buffer.setStride(24 * sizeof(float));
-
-		instmesh->buffer.setRenderAttributes(false);
-		instmesh->buffer.setInstanceBuffer(true);
-		instmesh->buffer.setUsage(BufferUsage::STREAM);
-
 		// Now buffer size is zero than it needed to be calculated
 		size_t bufferSize = instmesh->maxInstances * instmesh->buffer.getStride();
-
 		instmesh->buffer.getRender()->createBuffer(bufferSize, instmesh->buffer.getData(), instmesh->buffer.getType(), instmesh->buffer.getUsage());
 
 		instmesh->needUpdateBuffer = true;

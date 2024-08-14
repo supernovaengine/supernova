@@ -7,6 +7,7 @@
 #include "Scene.h"
 #include "util/Color.h"
 #include "util/Angle.h"
+#include "subsystem/MeshSystem.h"
 
 using namespace Supernova;
 
@@ -41,7 +42,7 @@ void ActionSystem::actionStart(Entity entity){
                 MeshComponent& mesh = scene->getComponent<MeshComponent>(action.target);
 
                 if (!targetSignature.test(scene->getComponentType<InstancedMeshComponent>())){
-                    scene->addComponent<InstancedMeshComponent>(action.target, {});
+                    scene->getSystem<MeshSystem>()->createInstancedMesh(action.target);
                     targetSignature = scene->getSignature(action.target);
                     if (mesh.loaded)
                         mesh.needReload = true;
