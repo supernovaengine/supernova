@@ -51,8 +51,8 @@ namespace Supernova{
 		float getTerrainHeight(TerrainComponent& terrain, float x, float y);
 		float maxTerrainHeightArea(TerrainComponent& terrain, float x, float z, float w, float h);
 		float minTerrainHeightArea(TerrainComponent& terrain, float x, float z, float w, float h);
-		TerrainNodeIndex createPlaneNodeBuffer(TerrainComponent& terrain, int width, int height, int widthSegments, int heightSegments);
-		void createTerrain(TerrainComponent& terrain);
+		void createPlaneNodeSubmesh(unsigned int submeshIndex, TerrainComponent& terrain, MeshComponent& mesh, int width, int height, int widthSegments, int heightSegments);
+		void createTerrain(TerrainComponent& terrain, MeshComponent& mesh);
 		void createTerrainNode(TerrainComponent& terrain, float x, float y, float size, int lodDepth);
 
 	public:
@@ -75,7 +75,7 @@ namespace Supernova{
 		void destroyModel(ModelComponent& model);
 
 		bool createOrUpdateSprite(SpriteComponent& sprite, MeshComponent& mesh);
-		bool createOrUpdateTerrain(TerrainComponent& terrain);
+		bool createOrUpdateTerrain(TerrainComponent& terrain, MeshComponent& mesh);
 		bool createOrUpdateMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
 		bool createOrUpdateTilemap(TilemapComponent& tilemap, MeshComponent& mesh);
 

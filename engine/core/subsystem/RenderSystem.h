@@ -66,6 +66,7 @@ namespace Supernova{
 		struct TransparentMeshesData{
 			MeshComponent* mesh;
 			InstancedMeshComponent* instmesh;
+			TerrainComponent* terrain;
 			Transform* transform;
 			float distanceToCamera;
 		};
@@ -128,13 +129,9 @@ namespace Supernova{
 
 	protected:
 
-		bool drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture);
-		bool drawMeshDepth(MeshComponent& mesh, InstancedMeshComponent* instmesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams);
+		bool drawMesh(MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture, InstancedMeshComponent* instmesh, TerrainComponent* terrain);
+		bool drawMeshDepth(MeshComponent& mesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams, InstancedMeshComponent* instmesh, TerrainComponent* terrain);
 		void destroyMesh(Entity entity, MeshComponent& mesh);
-
-		bool drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture);
-		void drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams);
-		void destroyTerrain(Entity entity, TerrainComponent& terrain);
 
 		bool drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture);
 		void destroyUI(Entity entity, UIComponent& uirender);
@@ -166,8 +163,7 @@ namespace Supernova{
 		RenderSystem(Scene* scene);
 		virtual ~RenderSystem();
 
-		bool loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshComponent* instmesh, uint8_t pipelines);
-		bool loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t pipelines);
+		bool loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipelines, InstancedMeshComponent* instmesh, TerrainComponent* terrain);
 		bool loadPoints(Entity entity, PointsComponent& points, uint8_t pipelines);
 		bool loadLines(Entity entity, LinesComponent& lines, uint8_t pipelines);
 		bool loadUI(Entity entity, UIComponent& uirender, uint8_t pipelines, bool isText);

@@ -371,21 +371,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
-        .deriveClass<Terrain, Object>("Terrain")
+        .deriveClass<Terrain, Mesh>("Terrain")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setHeightMap", (void(Terrain::*)(std::string))&Terrain::setHeightMap)
         .addFunction("setBlendMap", (void(Terrain::*)(std::string))&Terrain::setBlendMap)
         .addFunction("setTextureDetailRed", (void(Terrain::*)(std::string))&Terrain::setTextureDetailRed)
         .addFunction("setTextureDetailGreen", (void(Terrain::*)(std::string))&Terrain::setTextureDetailGreen)
         .addFunction("setTextureDetailBlue", (void(Terrain::*)(std::string))&Terrain::setTextureDetailBlue)
-        .addFunction("setTexture", 
-            luabridge::overload<std::string>(&Terrain::setTexture),
-            luabridge::overload<Framebuffer*>(&Terrain::setTexture))
-        .addProperty("color", &Terrain::getColor, (void(Terrain::*)(Vector4))&Terrain::setColor)
-        .addFunction("setColor", 
-            luabridge::overload<const float, const float, const float>(&Terrain::setColor),
-            luabridge::overload<const float, const float, const float, const float>(&Terrain::setColor))
-        .addProperty("alpha", &Terrain::getAlpha, &Terrain::setAlpha)
         .addProperty("size", &Terrain::getSize, &Terrain::setSize)
         .addProperty("maxHeight", &Terrain::getMaxHeight, &Terrain::setMaxHeight)
         .addProperty("resolution", &Terrain::getResolution, &Terrain::setResolution)
@@ -393,8 +385,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("textureDetailTiles", &Terrain::getTextureDetailTiles, &Terrain::setTextureDetailTiles)
         .addProperty("rootGridSize", &Terrain::getRootGridSize, &Terrain::setRootGridSize)
         .addProperty("levels", &Terrain::getLevels, &Terrain::setLevels)
-        .addProperty("castShadows", &Terrain::isCastShadows, &Terrain::setCastShadows)
-        .addProperty("receiveShadows", &Terrain::isReceiveShadows, &Terrain::setReceiveShadows)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

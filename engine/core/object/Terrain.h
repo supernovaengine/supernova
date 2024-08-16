@@ -5,17 +5,16 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 
-#include "Object.h"
+#include "Mesh.h"
 
 namespace Supernova{
 
-    class Terrain: public Object{
+    class Terrain: public Mesh{
 
     public:
         Terrain(Scene* scene);
         virtual ~Terrain();
 
-        bool load();
         bool createTerrain();
 
         void setHeightMap(std::string path);
@@ -27,16 +26,6 @@ namespace Supernova{
         void setTextureDetailRed(std::string path);
         void setTextureDetailGreen(std::string path);
         void setTextureDetailBlue(std::string path);
-
-        void setTexture(std::string path);
-        void setTexture(Framebuffer* framebuffer);
-
-        void setColor(Vector4 color);
-        void setColor(const float red, const float green, const float blue, const float alpha);
-        void setColor(const float red, const float green, const float blue);
-        void setAlpha(const float alpha);
-        Vector4 getColor() const;
-        float getAlpha() const;
 
         void setSize(float size);
         float getSize() const;
@@ -58,12 +47,6 @@ namespace Supernova{
 
         void setLevels(int levels);
         int getLevels() const;
-
-        void setCastShadows(bool castShadows);
-        bool isCastShadows() const;
-
-        void setReceiveShadows(bool receiveShadows);
-        bool isReceiveShadows() const;
     };
 
 }

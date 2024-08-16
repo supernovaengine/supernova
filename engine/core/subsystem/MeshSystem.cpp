@@ -757,7 +757,7 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
     mesh.aabb = mesh.verticesAABB;
 }
 
-TerrainNodeIndex MeshSystem::createPlaneNodeBuffer(TerrainComponent& terrain, int width, int height, int widthSegments, int heightSegments){
+void MeshSystem::createPlaneNodeSubmesh(unsigned int submeshIndex, TerrainComponent& terrain, MeshComponent& mesh, int width, int height, int widthSegments, int heightSegments){
     float width_half = (float)width / 2;
     float height_half = (float)height / 2;
 
@@ -770,12 +770,12 @@ TerrainNodeIndex MeshSystem::createPlaneNodeBuffer(TerrainComponent& terrain, in
     float segment_width = (float)width / gridX;
     float segment_height = (float)height / gridY;
 
-    Attribute* attVertex = terrain.buffer.getAttribute(AttributeType::POSITION);
-    Attribute* attNormal = terrain.buffer.getAttribute(AttributeType::NORMAL);
+    Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
+    Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
 
-    Attribute* attIndice = terrain.indices.getAttribute(AttributeType::INDEX);
+    Attribute* attIndice = mesh.indices.getAttribute(AttributeType::INDEX);
 
-    int bufferCount = terrain.buffer.getCount();
+    int bufferCount = mesh.buffer.getCount();
 
     for (int iy = 0; iy < gridY1; iy++) {
         float y = iy * segment_height - height_half;
@@ -783,13 +783,13 @@ TerrainNodeIndex MeshSystem::createPlaneNodeBuffer(TerrainComponent& terrain, in
 
             float x = ix * segment_width - width_half;
 
-            terrain.buffer.addVector3(attVertex, Vector3(x, 0, -y));
-            terrain.buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
+            mesh.buffer.addVector3(attVertex, Vector3(x, 0, -y));
+            mesh.buffer.addVector3(attNormal, Vector3(0.0f, 1.0f, 0.0f));
         }
     }
 
     unsigned int bufferIndexCount = 0;
-    unsigned int bufferIndexOffset = terrain.indices.getCount();
+    unsigned int bufferIndexOffset = mesh.indices.getCount();
 
     for (int iy = 0; iy < gridY; iy++) {
         for (int ix = 0; ix < gridX; ix++) {
@@ -799,20 +799,20 @@ TerrainNodeIndex MeshSystem::createPlaneNodeBuffer(TerrainComponent& terrain, in
             int c = ( ix + 1 ) + gridX1 * ( iy + 1 );
             int d = ( ix + 1 ) + gridX1 * iy;
 
-            terrain.indices.addUInt16(attIndice, a + bufferCount);
-            terrain.indices.addUInt16(attIndice, b + bufferCount);
-            terrain.indices.addUInt16(attIndice, d + bufferCount);
+            mesh.indices.addUInt16(attIndice, a + bufferCount);
+            mesh.indices.addUInt16(attIndice, b + bufferCount);
+            mesh.indices.addUInt16(attIndice, d + bufferCount);
 
-            terrain.indices.addUInt16(attIndice, b + bufferCount);
-            terrain.indices.addUInt16(attIndice, c + bufferCount);
-            terrain.indices.addUInt16(attIndice, d + bufferCount);
+            mesh.indices.addUInt16(attIndice, b + bufferCount);
+            mesh.indices.addUInt16(attIndice, c + bufferCount);
+            mesh.indices.addUInt16(attIndice, d + bufferCount);
 
             bufferIndexCount += 6;
 
         }
     }
 
-    return {bufferIndexCount, bufferIndexOffset};
+    addSubmeshAttribute(mesh.submeshes[submeshIndex], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, bufferIndexCount, bufferIndexOffset * sizeof(uint16_t), false);
 }
 
 size_t MeshSystem::getTerrainGridArraySize(int rootGridSize, int levels){
@@ -909,7 +909,7 @@ void MeshSystem::createTerrainNode(TerrainComponent& terrain, float x, float y, 
     }
 }
 
-void MeshSystem::createTerrain(TerrainComponent& terrain){
+void MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
     for (int s = 0; s < 2; s++){
         terrain.nodesbuffer[s].clear();
         terrain.nodesbuffer[s].addAttribute(AttributeType::TERRAINNODEPOSITION, 2, true);
@@ -921,9 +921,9 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
         terrain.nodesbuffer[s].setUsage(BufferUsage::STREAM);
     }
 
-    terrain.buffer.clear();
-    terrain.buffer.addAttribute(AttributeType::POSITION, 3);
-	terrain.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
 
     if (scene->getCamera() == NULL_ENTITY){
         Log::error("Cannot create terrain without defined camera in scene");
@@ -935,7 +935,7 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
         return;
     }
 
-    terrain.indices.clear();
+    mesh.indices.clear();
 
     terrain.heightMap.setReleaseDataAfterLoad(false);
 
@@ -947,8 +947,11 @@ void MeshSystem::createTerrain(TerrainComponent& terrain){
     size_t idealSize = getTerrainGridArraySize(terrain.rootGridSize, terrain.levels);
     terrain.nodes.resize(idealSize);
 
-    terrain.fullResNode = createPlaneNodeBuffer(terrain, 1, 1, terrain.resolution, terrain.resolution);
-    terrain.halfResNode = createPlaneNodeBuffer(terrain, 1, 1, terrain.resolution/2, terrain.resolution/2);
+    mesh.numSubmeshes = 2;
+    // fullRes submesh
+    createPlaneNodeSubmesh(0, terrain, mesh, 1, 1, terrain.resolution, terrain.resolution);
+    // halfRes submesh
+    createPlaneNodeSubmesh(1, terrain, mesh, 1, 1, terrain.resolution/2, terrain.resolution/2);
 
     float rootNodeSize = terrain.terrainSize / terrain.rootGridSize;
 
@@ -2453,9 +2456,9 @@ bool MeshSystem::createOrUpdateSprite(SpriteComponent& sprite, MeshComponent& me
     return true;
 }
 
-bool MeshSystem::createOrUpdateTerrain(TerrainComponent& terrain){
+bool MeshSystem::createOrUpdateTerrain(TerrainComponent& terrain, MeshComponent& mesh){
     if (terrain.needUpdateTerrain){
-        createTerrain(terrain);
+        createTerrain(terrain, mesh);
 
         terrain.needUpdateTerrain = false;
     }
@@ -2549,7 +2552,14 @@ void MeshSystem::update(double dt){
     for (int i = 0; i < terrains->size(); i++){
 		TerrainComponent& terrain = terrains->getComponentFromIndex(i);
 
-        createOrUpdateTerrain(terrain);
+        Entity entity = terrains->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+
+        if (signature.test(scene->getComponentType<MeshComponent>())){
+            MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+            createOrUpdateTerrain(terrain, mesh);
+        }
     }
 
     auto meshes = scene->getComponentArray<MeshComponent>();

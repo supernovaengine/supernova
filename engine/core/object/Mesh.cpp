@@ -20,10 +20,11 @@ Mesh::~Mesh(){
 bool Mesh::load(){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
+    TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
     InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
 
     //TODO: check mesh pipelines before call
-    return scene->getSystem<RenderSystem>()->loadMesh(entity, mesh, instmesh, PIP_DEFAULT | PIP_RTT);
+    return scene->getSystem<RenderSystem>()->loadMesh(entity, mesh, PIP_DEFAULT | PIP_RTT, instmesh, terrain);
 }
 
 void Mesh::setTexture(std::string path){

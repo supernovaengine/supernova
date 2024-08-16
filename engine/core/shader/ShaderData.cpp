@@ -184,6 +184,8 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
         ustr = "u_vs_morphtarget";
     }else if (type == UniformBlockType::TERRAIN_VS_PARAMS){
         ustr = "u_vs_terrainParams";
+    }else if (type == UniformBlockType::DEPTH_TERRAIN_VS_PARAMS){
+        ustr = "u_vs_terrainParams";
     }
 
     if (ustr.empty()){

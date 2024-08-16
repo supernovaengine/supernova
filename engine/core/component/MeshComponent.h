@@ -45,10 +45,12 @@ namespace Supernova{
         int slotFSShadows = -1;
         int slotVSSkinning = -1;
         int slotVSMorphTarget = -1;
+        int slotVSTerrain = -1;
 
         int slotVSDepthParams = -1;
         int slotVSDepthSkinning = -1;
         int slotVSDepthMorphTarget = -1;
+        int slotVSDepthTerrain = -1;
 
         Rect textureRect = Rect(0.0, 0.0, 1.0, 1.0);
 

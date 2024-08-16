@@ -76,7 +76,7 @@ void RenderSystem::destroy(){
 		SkyComponent& sky = skys->getComponentFromIndex(0);
 		Entity entity = skys->getEntity(0);
 		if (sky.loaded){
-			destroySky(entity, sky);;
+			destroySky(entity, sky);
 		}
 	}
 
@@ -90,11 +90,6 @@ void RenderSystem::destroy(){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 			if (mesh.loaded){
 				destroyMesh(entity, mesh);
-			}
-		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
-			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
-			if (terrain.loaded){
-				destroyTerrain(entity, terrain);
 			}
 		}else if (signature.test(scene->getComponentType<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
@@ -498,10 +493,17 @@ void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ObjectRender& 
 		render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 }
 
-bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshComponent* instmesh, uint8_t pipelines){
+bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipelines, InstancedMeshComponent* instmesh, TerrainComponent* terrain){
 
 	if (!Engine::isViewLoaded()) 
 		return false;
+
+	if (terrain && !terrain->heightMapLoaded)
+		return false;
+
+	if (terrain && instmesh){
+		Log::warn("Terrain cannot be an InstancedMesh");
+	}
 
 	std::map<std::string, Buffer*> buffers;
 	std::map<std::string, BufferRender*> bufferNameToRender;
@@ -550,6 +552,16 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 		instmesh->buffer.getRender()->createBuffer(bufferSize, instmesh->buffer.getData(), instmesh->buffer.getType(), instmesh->buffer.getUsage());
 
 		instmesh->needUpdateBuffer = true;
+	}
+
+	if (terrain){
+		for (int s = 0; s < 2; s++){
+			size_t bufferSize = pow(terrain->rootGridSize, 2) * pow(terrain->levels, 2) * terrain->nodesbuffer[s].getStride() / 2;
+			terrain->nodesbuffer[s].getRender()->createBuffer(bufferSize, terrain->nodesbuffer[s].getData(), terrain->nodesbuffer[s].getType(), terrain->nodesbuffer[s].getUsage());
+		}
+
+		// using same material in both terrain submeshes
+		mesh.submeshes[1].material = mesh.submeshes[0].material;
 	}
 
 	for (int i = 0; i < mesh.numSubmeshes; i++){
@@ -632,6 +644,9 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 		if (mesh.submeshes[i].hasTexture1){
 			p_hasTexture1 = true;
 		}
+		if (terrain && terrain->blendMap.getRender()){
+			p_hasTexture1 = true;
+		}
 		if (hasLights){
 			p_punctual = true;
 
@@ -657,7 +672,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 						p_receiveShadows, p_shadowsPCF, p_hasNormal, p_hasNormalMap, 
 						p_hasTangent, false, mesh.submeshes[i].hasVertexColor4, mesh.submeshes[i].hasTextureRect, 
 						hasFog, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent,
-						false, (instmesh)?true:false);
+						(terrain)?true:false, (instmesh)?true:false);
 		mesh.submeshes[i].shader = ShaderPool::get(ShaderType::MESH, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
 			mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(
@@ -694,6 +709,18 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 		}
 
 		loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
+
+		if (terrain){
+			mesh.submeshes[i].slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS, ShaderStageType::VERTEX);
+
+			loadTerrainTextures(*terrain, mesh.submeshes[i].render, shaderData);
+
+			terrain->needUpdateTexture = false;
+
+			for (auto const &attr : terrain->nodesbuffer[i].getAttributes()) {
+				render.addAttribute(shaderData.getAttrIndex(attr.first), terrain->nodesbuffer[i].getRender(), attr.second.getElements(), attr.second.getDataType(), terrain->nodesbuffer[i].getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+			}
+		}
 
 		mesh.submeshes[i].needUpdateTexture = false;
 
@@ -764,6 +791,14 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 			}
 			if (mesh.submeshes[i].hasMorphTarget){
 				mesh.submeshes[i].slotVSDepthMorphTarget = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_MORPHTARGET, ShaderStageType::VERTEX);
+			}
+
+			if (terrain){
+				mesh.submeshes[i].slotVSDepthTerrain = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_TERRAIN_VS_PARAMS, ShaderStageType::VERTEX);
+
+				for (auto const &attr : terrain->nodesbuffer[i].getAttributes()) {
+					depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), terrain->nodesbuffer[i].getRender(), attr.second.getElements(), attr.second.getDataType(), terrain->nodesbuffer[i].getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+				}
 			}
 
 			for (auto const& buf : buffers){
@@ -847,10 +882,10 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, InstancedMeshCom
 	return true;
 }
 
-bool RenderSystem::drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture){
+bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform, bool renderToTexture, InstancedMeshComponent* instmesh, TerrainComponent* terrain){
 	if (mesh.loaded){
 
-		if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(camera, mesh.worldAABB)) {
+		if (!terrain && mesh.worldAABB != AABB::ZERO && !isInsideCamera(camera, mesh.worldAABB)) {
 			return false;
 		}
 
@@ -874,8 +909,29 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmes
 			}
 		}
 
+		if (terrain && terrain->needUpdateNodesBuffer){
+			for (int s = 0; s < 2; s++){
+				terrain->nodesbuffer[s].getRender()->updateBuffer(terrain->nodesbuffer[s].getSize(), terrain->nodesbuffer[s].getData());
+			}
+
+			terrain->needUpdateNodesBuffer = false;
+		}
+
+		if (terrain && terrain->needUpdateTerrain){
+			for (int s = 0; s < 2; s++){
+				ShaderData& shaderData = mesh.submeshes[s].shader.get()->shaderData;
+				loadTerrainTextures(*terrain, mesh.submeshes[s].render, shaderData);
+			}
+
+			terrain->needUpdateTerrain = false;
+		}
+
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& render = mesh.submeshes[i].render;
+
+			if (terrain){
+				instanceCount = terrain->nodesbuffer[i].getCount();
+			}
 
 			bool needUpdateFramebuffer = checkPBRFrabebufferUpdate(mesh.submeshes[i].material);
 
@@ -885,6 +941,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmes
 
 				mesh.submeshes[i].needUpdateTexture = false;
 			}
+
 			if (scene->isSceneAmbientLightEnabled()){
 				mesh.submeshes[i].material.ambientFactor = scene->getAmbientLightFactor();
 				mesh.submeshes[i].material.ambientLight = scene->getAmbientLightColor();
@@ -929,6 +986,10 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmes
 				render.applyUniformBlock(mesh.submeshes[i].slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &mesh.submeshes[i].material);
 			}
 
+			if (terrain){
+				render.applyUniformBlock(mesh.submeshes[i].slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &(terrain->eyePos));
+			}
+
 			//model, normal and mvp matrix
 			render.applyUniformBlock(mesh.submeshes[i].slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 48, &transform.modelMatrix);
 
@@ -939,7 +1000,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, InstancedMeshComponent* instmes
 	return true;
 }
 
-bool RenderSystem::drawMeshDepth(MeshComponent& mesh, InstancedMeshComponent* instmesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams){
+bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams, InstancedMeshComponent* instmesh, TerrainComponent* terrain){
 	if (mesh.loaded && mesh.castShadows){
 
 		if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(cameraFar, frustumPlanes, mesh.worldAABB)) {
@@ -973,6 +1034,10 @@ bool RenderSystem::drawMeshDepth(MeshComponent& mesh, InstancedMeshComponent* in
 				}
 			}
 
+			if (terrain){
+				depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &(terrain->eyePos));
+			}
+
 			depthRender.draw(mesh.submeshes[i].vertexCount, instanceCount);
 		}
 	}
@@ -981,6 +1046,9 @@ bool RenderSystem::drawMeshDepth(MeshComponent& mesh, InstancedMeshComponent* in
 }
 
 void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
+	InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
+	TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
+
 	if (!mesh.loaded)
 		return;
 
@@ -1001,6 +1069,25 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 		submesh.material.occlusionTexture.destroy();
 		submesh.material.emissiveTexture.destroy();
 
+		if (terrain){
+			//Destroy terrain texture
+			terrain->heightMap.destroy();
+			terrain->blendMap.destroy();
+			terrain->textureDetailRed.destroy();
+			terrain->textureDetailGreen.destroy();
+			terrain->textureDetailBlue.destroy();
+
+			//Destroy terrain buffer
+			for (int s = 0; s < 2; s++){
+				terrain->nodesbuffer[s].getRender()->destroyBuffer();
+			}
+		}
+
+		if (instmesh){
+			//Destroy instmesh buffer
+			instmesh->buffer.getRender()->destroyBuffer();
+		}
+
 		//Destroy render
 		submesh.render.destroy();
 		submesh.depthRender.destroy();
@@ -1014,10 +1101,12 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 		submesh.slotFSShadows = -1;
 		submesh.slotVSSkinning = -1;
 		submesh.slotVSMorphTarget = -1;
+		submesh.slotVSTerrain = -1;
 
 		submesh.slotVSDepthParams = -1;
 		submesh.slotVSDepthSkinning = -1;
 		submesh.slotVSDepthMorphTarget = -1;
+		submesh.slotVSDepthTerrain = -1;
 	}
 
 	//Destroy buffer
@@ -1029,296 +1118,6 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 		//mesh.eBuffers[i].clearAll();
 		mesh.eBuffers[i].getRender()->destroyBuffer();
 	}
-
-	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
-}
-
-bool RenderSystem::loadTerrain(Entity entity, TerrainComponent& terrain, uint8_t pipelines){
-
-	if (!Engine::isViewLoaded()) 
-		return false;
-
-	if (!terrain.heightMapLoaded)
-		return false;
-
-	if (terrain.buffer.getSize() == 0 || terrain.indices.getSize() == 0)
-		return false;
-
-	for (int s = 0; s < 2; s++){
-		size_t bufferSize = pow(terrain.rootGridSize, 2) * pow(terrain.levels, 2) * terrain.nodesbuffer[s].getStride() / 2;
-		terrain.nodesbuffer[s].getRender()->createBuffer(bufferSize, terrain.nodesbuffer[s].getData(), terrain.nodesbuffer[s].getType(), terrain.nodesbuffer[s].getUsage());
-	}
-
-	terrain.buffer.getRender()->createBuffer(terrain.buffer.getSize(), terrain.buffer.getData(), terrain.buffer.getType(), terrain.buffer.getUsage());
-	terrain.indices.getRender()->createBuffer(terrain.indices.getSize(), terrain.indices.getData(), terrain.indices.getType(), terrain.indices.getUsage());
-
-	terrain.needUpdateNodesBuffer = true;
-
-	bool p_unlit = false;
-	bool p_punctual = false;
-	bool p_hasTexture1 = false;
-	bool p_hasNormal = false;
-	bool p_receiveShadows = false;
-	bool p_shadowsPCF = false;
-
-
-	if (terrain.material.baseColorTexture.getRender() || terrain.blendMap.getRender()){
-		p_hasTexture1 = true;
-	}
-	if (hasLights){
-		p_punctual = true;
-
-		p_hasNormal = true;
-		if (hasShadows && terrain.receiveShadows){
-			p_receiveShadows = true;
-			if (scene->isShadowsPCF()){
-				p_shadowsPCF = true;
-			}
-		}
-	}else{
-		p_unlit = true;
-	}
-
-	terrain.shaderProperties = ShaderPool::getMeshProperties(
-					p_unlit, p_hasTexture1, false, p_punctual, 
-					p_receiveShadows, p_shadowsPCF, p_hasNormal, false, 
-					false, false, false, false, 
-					hasFog, false, false, false, false,
-					true, false);
-	terrain.shader = ShaderPool::get(ShaderType::MESH, terrain.shaderProperties);
-	if (hasShadows && terrain.castShadows){
-		terrain.depthShaderProperties = ShaderPool::getDepthMeshProperties(
-			false, false, false, false, true, false);
-		terrain.depthShader = ShaderPool::get(ShaderType::DEPTH, terrain.depthShaderProperties);
-		if (!terrain.depthShader->isCreated())
-			return false;
-	}
-	if (!terrain.shader->isCreated())
-		return false;
-
-	for (int s = 0; s < 2; s++){
-		terrain.render[s].beginLoad(PrimitiveType::TRIANGLES);
-
-		terrain.render[s].addShader(terrain.shader.get());
-		ShaderData& shaderData = terrain.shader.get()->shaderData;
-
-		terrain.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_PARAMS, ShaderStageType::VERTEX);
-		terrain.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_PARAMS, ShaderStageType::FRAGMENT);
-		if (hasFog){
-			terrain.slotFSFog = shaderData.getUniformBlockIndex(UniformBlockType::FS_FOG, ShaderStageType::FRAGMENT);
-		}
-		if (hasLights){
-			terrain.slotFSLighting = shaderData.getUniformBlockIndex(UniformBlockType::FS_LIGHTING, ShaderStageType::FRAGMENT);
-			if (hasShadows && terrain.receiveShadows){
-				terrain.slotVSShadows = shaderData.getUniformBlockIndex(UniformBlockType::VS_SHADOWS, ShaderStageType::VERTEX);
-				terrain.slotFSShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOWS, ShaderStageType::FRAGMENT);
-			}
-		}
-		terrain.slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS, ShaderStageType::VERTEX);
-
-		loadPBRTextures(terrain.material, shaderData, terrain.render[s], terrain.receiveShadows);
-		loadTerrainTextures(terrain, terrain.render[s], shaderData);
-
-		terrain.needUpdateTexture = false;
-
-		for (auto const &attr : terrain.nodesbuffer[s].getAttributes()) {
-			if (terrain.nodesbuffer[s].isRenderAttributes()) {
-				terrain.render[s].addAttribute(shaderData.getAttrIndex(attr.first), terrain.nodesbuffer[s].getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.nodesbuffer[s].getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
-			}
-		}
-		for (auto const &attr : terrain.buffer.getAttributes()) {
-			if (terrain.buffer.isRenderAttributes()) {
-				terrain.render[s].addAttribute(shaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
-			}
-		}
-
-		if (s == 0){
-			terrain.render[s].addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.fullResNode.indexOffset * sizeof(uint16_t));
-		}else{
-			terrain.render[s].addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.halfResNode.indexOffset * sizeof(uint16_t));
-		}
-
-		if (!terrain.render[s].endLoad(pipelines)){
-			return false;
-		}
-
-		//----------Start depth shader---------------
-		if (hasShadows && terrain.castShadows){
-
-			terrain.depthRender[s].beginLoad(PrimitiveType::TRIANGLES);
-
-			terrain.depthRender[s].addShader(terrain.depthShader.get());
-			ShaderData& depthShaderData = terrain.depthShader.get()->shaderData;
-
-			terrain.slotVSDepthParams = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_PARAMS, ShaderStageType::VERTEX);
-
-			terrain.depthRender[s].addTexture(depthShaderData.getTextureIndex(TextureShaderType::HEIGHTMAP, ShaderStageType::VERTEX), ShaderStageType::VERTEX, terrain.heightMap.getRender());
-
-			for (auto const &attr : terrain.nodesbuffer[s].getAttributes()) {
-				terrain.depthRender[s].addAttribute(depthShaderData.getAttrIndex(attr.first), terrain.nodesbuffer[s].getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.nodesbuffer[s].getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
-			}
-			for (auto const &attr : terrain.buffer.getAttributes()) {
-				if (attr.first == AttributeType::POSITION){
-					terrain.depthRender[s].addAttribute(depthShaderData.getAttrIndex(attr.first), terrain.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), terrain.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
-				}
-			}
-
-			if (s == 0){
-				terrain.depthRender[s].addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.fullResNode.indexOffset * sizeof(uint16_t));
-			}else{
-				terrain.depthRender[s].addIndex(terrain.indices.getRender(), AttributeDataType::UNSIGNED_SHORT, terrain.halfResNode.indexOffset * sizeof(uint16_t));
-			}
-
-			if (!terrain.depthRender[s].endLoad(PIP_DEPTH)){
-				return false;
-			}
-		}
-		//----------End depth shader---------------
-	}
-
-	terrain.needReload = false;
-	terrain.loadCalled = true;
-	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
-
-	return true;
-}
-
-bool RenderSystem::drawTerrain(TerrainComponent& terrain, Transform& transform, Transform& camTransform, bool renderToTexture){
-	if (terrain.loaded){
-		bool needUpdateFramebuffer = checkPBRFrabebufferUpdate(terrain.material);
-
-		if (terrain.needUpdateTexture || needUpdateFramebuffer){
-			ShaderData& shaderData = terrain.shader.get()->shaderData;
-			for (int s = 0; s < 2; s++){
-				loadPBRTextures(terrain.material, shaderData, terrain.render[s], terrain.receiveShadows);
-				loadTerrainTextures(terrain, terrain.render[s], shaderData);
-			}
-
-			terrain.needUpdateTexture = false;
-		}
-
-		if (terrain.needUpdateNodesBuffer){
-			for (int s = 0; s < 2; s++){
-				terrain.nodesbuffer[s].getRender()->updateBuffer(terrain.nodesbuffer[s].getSize(), terrain.nodesbuffer[s].getData());
-			}
-
-			terrain.needUpdateNodesBuffer = false;
-		}
-
-		if (scene->isSceneAmbientLightEnabled()){
-			terrain.material.ambientFactor = scene->getAmbientLightFactor();
-			terrain.material.ambientLight = scene->getAmbientLightColor();
-		}
-
-		for (int s = 0; s < 2; s++){
-			if (!terrain.render[s].beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
-				terrain.needReload = true;
-				return false;
-			}
-
-			if (hasLights){
-				terrain.render[s].applyUniformBlock(terrain.slotFSLighting, ShaderStageType::FRAGMENT, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
-				if (hasShadows && terrain.receiveShadows){
-					terrain.render[s].applyUniformBlock(terrain.slotVSShadows, ShaderStageType::VERTEX, sizeof(float) * (16 * MAX_SHADOWSMAP), &vs_shadows);
-					terrain.render[s].applyUniformBlock(terrain.slotFSShadows, ShaderStageType::FRAGMENT, sizeof(float) * (4 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP)), &fs_shadows);
-				}
-			}
-
-			if (hasLights){
-				terrain.render[s].applyUniformBlock(terrain.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 16, &terrain.material);
-			}else{
-				terrain.render[s].applyUniformBlock(terrain.slotFSParams, ShaderStageType::FRAGMENT, sizeof(float) * 4, &terrain.material);
-			}
-
-			//model, normal and mvp matrix
-			terrain.render[s].applyUniformBlock(terrain.slotVSParams, ShaderStageType::VERTEX, sizeof(float) * 48, &transform.modelMatrix);
-
-			terrain.render[s].applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.eyePos);
-
-			if (s == 0){
-				terrain.render[s].draw(terrain.fullResNode.indexCount, terrain.nodesbuffer[s].getCount());
-			}else{
-				terrain.render[s].draw(terrain.halfResNode.indexCount, terrain.nodesbuffer[s].getCount());
-			}
-		}
-	}
-
-	return true;
-}
-
-void RenderSystem::drawTerrainDepth(TerrainComponent& terrain, vs_depth_t vsDepthParams){
-	if (terrain.loaded && terrain.castShadows){
-		for (int s = 0; s < 2; s++){
-			if (!terrain.depthRender[s].beginDraw(PIP_DEPTH)){
-				terrain.needReload = true;
-				return;
-			}
-
-			//model, mvp matrix
-			terrain.depthRender[s].applyUniformBlock(terrain.slotVSDepthParams, ShaderStageType::VERTEX, sizeof(float) * 32, &vsDepthParams);
-
-			terrain.depthRender[s].applyUniformBlock(terrain.slotVSTerrain, ShaderStageType::VERTEX, sizeof(float) * 8, &terrain.eyePos);
-
-			if (s == 0){
-				terrain.depthRender[s].draw(terrain.fullResNode.indexCount, terrain.nodesbuffer[s].getCount());
-			}else{
-				terrain.depthRender[s].draw(terrain.halfResNode.indexCount, terrain.nodesbuffer[s].getCount());
-			}
-		}
-	}
-}
-
-void RenderSystem::destroyTerrain(Entity entity, TerrainComponent& terrain){
-	if (!terrain.loaded)
-		return;
-
-	terrain.heightMap.releaseData();
-
-	//Destroy shader
-	terrain.shader.reset();
-	ShaderPool::remove(ShaderType::MESH, terrain.shaderProperties);
-	if (hasShadows && terrain.castShadows)
-		ShaderPool::remove(ShaderType::DEPTH, terrain.depthShaderProperties);
-
-	//Destroy PBR texture
-	terrain.material.baseColorTexture.destroy();
-	terrain.material.metallicRoughnessTexture.destroy();
-	terrain.material.normalTexture.destroy();
-	terrain.material.occlusionTexture.destroy();
-	terrain.material.emissiveTexture.destroy();
-
-	//Destroy terrain texture
-	terrain.heightMap.destroy();
-	terrain.blendMap.destroy();
-	terrain.textureDetailRed.destroy();
-	terrain.textureDetailGreen.destroy();
-	terrain.textureDetailBlue.destroy();
-
-	//Destroy render
-	for (int s = 0; s < 2; s++){
-		terrain.render[s].destroy();
-		terrain.depthRender[s].destroy();
-	}
-
-	//Shaders uniforms
-	terrain.slotVSParams = -1;
-	terrain.slotFSParams = -1;
-	terrain.slotFSLighting = -1;
-	terrain.slotFSFog = -1;
-	terrain.slotVSShadows = -1;
-	terrain.slotFSShadows = -1;
-	terrain.slotVSTerrain = -1;
-
-	terrain.slotVSDepthParams = -1;
-
-	//Destroy buffers
-	//terrain.buffer.clearAll();
-	for (int s = 0; s < 2; s++){
-		terrain.nodesbuffer[s].getRender()->destroyBuffer();
-	}
-	terrain.buffer.getRender()->destroyBuffer();
-	//terrain.indices.clearAll();
-	terrain.indices.getRender()->destroyBuffer();
 
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
@@ -2559,11 +2358,6 @@ void RenderSystem::changeLoaded(void* data){
 
 		uirender.loaded = true;
 
-	}else if (signature.test(scene->getComponentType<TerrainComponent>())){
-		TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
-
-		terrain.loaded = true;
-
 	}else if (signature.test(scene->getComponentType<PointsComponent>())){
 		PointsComponent& points = scene->getComponent<PointsComponent>(entity);
 
@@ -2602,12 +2396,6 @@ void RenderSystem::changeDestroy(void* data){
 
 		uirender.loaded = false;
 		uirender.loadCalled = false;
-
-	}else if (signature.test(scene->getComponentType<TerrainComponent>())){
-		TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
-
-		terrain.loaded = false;
-		terrain.loadCalled = false;
 
 	}else if (signature.test(scene->getComponentType<PointsComponent>())){
 		PointsComponent& points = scene->getComponent<PointsComponent>(entity);
@@ -2796,6 +2584,8 @@ void RenderSystem::update(double dt){
 		if (signature.test(scene->getComponentType<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
+			TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
+
 			InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
 			if (instmesh){
 				bool sortTransparentInstances = mesh.transparent && mainCamera.type != CameraType::CAMERA_2D;
@@ -2819,15 +2609,7 @@ void RenderSystem::update(double dt){
 				destroyMesh(entity, mesh);
 			}
 			if (!mesh.loadCalled){
-				loadMesh(entity, mesh, instmesh, pipelines);
-			}
-		}else if (signature.test(scene->getComponentType<TerrainComponent>())){
-			TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
-			if (terrain.loaded && terrain.needReload){
-				destroyTerrain(entity, terrain);
-			}
-			if (!terrain.loadCalled){
-				loadTerrain(entity, terrain, pipelines);
+				loadMesh(entity, mesh, pipelines, instmesh, terrain);
 			}
 		}else if (signature.test(scene->getComponentType<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
@@ -2992,21 +2774,12 @@ void RenderSystem::draw(){
 						if (transform){
 							if (transform->visible){
 								InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
-								drawMeshDepth(mesh, instmesh, light.cameras[c].nearFar.y, light.cameras[c].frustumPlanes, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
+								TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
+								drawMeshDepth(mesh, light.cameras[c].nearFar.y, light.cameras[c].frustumPlanes, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix}, instmesh, terrain);
 							}
 						}
 					}
-					for (int i = 0; i < terrains->size(); i++){
-						TerrainComponent& terrain = terrains->getComponentFromIndex(i);
-						Entity entity = terrains->getEntity(i);
-						Transform* transform = scene->findComponent<Transform>(entity);
 
-						if (transform){
-							if (transform->visible){
-								drawTerrainDepth(terrain, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix});
-							}
-						}
-					}
 					light.cameras[c].render.endFrameBuffer();
 				}
 			}
@@ -3116,23 +2889,17 @@ void RenderSystem::draw(){
 						}
 					}
 
+					TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
+					if (terrain && hasMultipleCameras){
+						updateTerrain(*terrain, transform, camera, cameraTransform);
+					}
+
 					if (!mesh.transparent || !camera.transparentSort){
 						//Draw opaque meshes if transparency is not necessary
-						drawMesh(mesh, instmesh, transform, camera, cameraTransform, camera.renderToTexture);
+						drawMesh(mesh, transform, camera, cameraTransform, camera.renderToTexture, instmesh, terrain);
 					}else{
-						transparentMeshes.push({&mesh, instmesh, &transform, transform.distanceToCamera});
+						transparentMeshes.push({&mesh, instmesh, terrain, &transform, transform.distanceToCamera});
 					}
-				}
-
-			}else if (signature.test(scene->getComponentType<TerrainComponent>())){
-				TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
-
-				if (hasMultipleCameras){
-					updateTerrain(terrain, transform, camera, cameraTransform);
-				}
-
-				if (transform.visible){
-					drawTerrain(terrain, transform, cameraTransform, camera.renderToTexture);
 				}
 
 			}else if (signature.test(scene->getComponentType<UIComponent>())){
@@ -3180,7 +2947,7 @@ void RenderSystem::draw(){
 			TransparentMeshesData meshData = transparentMeshes.top();
 
 			//Draw transparent meshes
-			drawMesh(*meshData.mesh, meshData.instmesh, *meshData.transform, camera, cameraTransform, camera.renderToTexture);
+			drawMesh(*meshData.mesh, *meshData.transform, camera, cameraTransform, camera.renderToTexture, meshData.instmesh, meshData.terrain);
 
 			transparentMeshes.pop();
 		}
@@ -3223,10 +2990,6 @@ void RenderSystem::entityDestroyed(Entity entity){
 
 	if (signature.test(scene->getComponentType<MeshComponent>())){
 		destroyMesh(entity, scene->getComponent<MeshComponent>(entity));
-	}
-
-	if (signature.test(scene->getComponentType<TerrainComponent>())){
-		destroyTerrain(entity, scene->getComponent<TerrainComponent>(entity));
 	}
 
 	if (signature.test(scene->getComponentType<UIComponent>())){

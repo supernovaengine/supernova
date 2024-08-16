@@ -104,7 +104,8 @@ namespace Supernova{
         DEPTH_VS_SKINNING,
         VS_MORPHTARGET,
         DEPTH_VS_MORPHTARGET,
-        TERRAIN_VS_PARAMS
+        TERRAIN_VS_PARAMS,
+        DEPTH_TERRAIN_VS_PARAMS
     };
 
     enum class StorageBufferType{

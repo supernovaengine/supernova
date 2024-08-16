@@ -14,11 +14,6 @@
 
 namespace Supernova{
 
-    struct TerrainNodeIndex{
-        unsigned int indexCount;
-        unsigned int indexOffset;
-    };
-
     struct TerrainNode{
         //-----u_vs_terrainNodeParams
         Vector2 position = Vector2(0, 0);
@@ -38,46 +33,14 @@ namespace Supernova{
     };
 
     struct TerrainComponent{
-        bool loaded = false;
-        bool loadCalled = false;
-
-        Material material;
-
         // 0 for fullRes and 1 for halfRes
         InterleavedBuffer nodesbuffer[2];
-        InterleavedBuffer buffer;
-        IndexBuffer indices;
-
-        ObjectRender render[2];
-        ObjectRender depthRender[2];
-
-        std::shared_ptr<ShaderRender> shader;
-        std::shared_ptr<ShaderRender> depthShader;
-
-        std::string shaderProperties;
-        std::string depthShaderProperties;
-
-        int slotVSParams = -1;
-        int slotFSParams = -1;
-        int slotFSLighting = -1;
-        int slotFSFog = -1;
-        int slotVSShadows = -1;
-        int slotFSShadows = -1;
-        int slotVSTerrain = -1;
-
-        int slotVSDepthParams = -1;
-
-        bool castShadows = true;
-        bool receiveShadows = true;
 
         Texture heightMap;
         Texture blendMap;
         Texture textureDetailRed;
         Texture textureDetailGreen;
         Texture textureDetailBlue;
-
-        TerrainNodeIndex fullResNode = {0, 0};
-        TerrainNodeIndex halfResNode = {0, 0};
 
         bool autoSetRanges = true;
         bool heightMapLoaded = false;
@@ -106,7 +69,6 @@ namespace Supernova{
         bool needUpdateTerrain = true;
         bool needUpdateTexture = false;
         bool needUpdateNodesBuffer = false;
-        bool needReload = false;
     };
     
 }

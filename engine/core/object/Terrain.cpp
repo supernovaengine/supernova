@@ -10,7 +10,7 @@
 
 using namespace Supernova;
 
-Terrain::Terrain(Scene* scene): Object(scene){
+Terrain::Terrain(Scene* scene): Mesh(scene){
     addComponent<TerrainComponent>({});
 }
 
@@ -18,16 +18,11 @@ Terrain::~Terrain(){
 
 }
 
-bool Terrain::load(){
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    return scene->getSystem<RenderSystem>()->loadTerrain(entity, terrain, PIP_DEFAULT | PIP_RTT);
-}
-
 bool Terrain::createTerrain(){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
+    MeshComponent& mesh = getComponent<MeshComponent>();
 
-    return scene->getSystem<MeshSystem>()->createOrUpdateTerrain(terrain);
+    return scene->getSystem<MeshSystem>()->createOrUpdateTerrain(terrain, mesh);
 }
 
 void Terrain::setHeightMap(std::string path){
@@ -86,51 +81,6 @@ void Terrain::setTextureDetailBlue(std::string path){
     terrain.needUpdateTexture = true;
 }
 
-void Terrain::setTexture(std::string path){
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    terrain.material.baseColorTexture.setPath(path);
-
-    terrain.needUpdateTexture = true;
-}
-
-void Terrain::setTexture(Framebuffer* framebuffer){
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    terrain.material.baseColorTexture.setFramebuffer(framebuffer);
-
-    terrain.needUpdateTexture = true;
-}
-
-void Terrain::setColor(Vector4 color){
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    terrain.material.baseColorFactor = Color::sRGBToLinear(color);
-}
-
-void Terrain::setColor(const float red, const float green, const float blue, const float alpha){
-    setColor(Vector4(red, green, blue, alpha));
-}
-
-void Terrain::setColor(const float red, const float green, const float blue){
-    setColor(Vector4(red, green, blue, getColor().w));
-}
-
-void Terrain::setAlpha(const float alpha){
-    Vector4 color = getColor();
-    setColor(Vector4(color.x, color.y, color.z, alpha));
-}
-
-Vector4 Terrain::getColor() const{
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    return Color::linearTosRGB(terrain.material.baseColorFactor);
-}
-
-float Terrain::getAlpha() const{
-    return getColor().w;
-}
-
 void Terrain::setSize(float size){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
     Transform& transform = getComponent<Transform>();
@@ -166,13 +116,14 @@ float Terrain::getMaxHeight() const{
 
 void Terrain::setResolution(int resolution){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
+    MeshComponent& mesh = getComponent<MeshComponent>();
     Transform& transform = getComponent<Transform>();
 
     if (terrain.resolution != resolution){
         terrain.resolution = resolution;
 
         terrain.needUpdateTerrain = true;
-        terrain.needReload = true;
+        mesh.needReload = true;
         transform.needUpdate = true;
     }
 }
@@ -209,13 +160,14 @@ int Terrain::getTextureDetailTiles() const{
 
 void Terrain::setRootGridSize(int rootGridSize){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
+    MeshComponent& mesh = getComponent<MeshComponent>();
     Transform& transform = getComponent<Transform>();
 
     if (terrain.rootGridSize != rootGridSize){
         terrain.rootGridSize = rootGridSize;
 
         terrain.needUpdateTerrain = true;
-        terrain.needReload = true;
+        mesh.needReload = true;
         transform.needUpdate = true;
     }
 }
@@ -228,13 +180,14 @@ int Terrain::getRootGridSize() const{
 
 void Terrain::setLevels(int levels){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
+    MeshComponent& mesh = getComponent<MeshComponent>();
     Transform& transform = getComponent<Transform>();
 
     if (terrain.levels != levels){
         terrain.levels = levels;
 
         terrain.needUpdateTerrain = true;
-        terrain.needReload = true;
+        mesh.needReload = true;
         transform.needUpdate = true;
     }
 }
@@ -243,32 +196,4 @@ int Terrain::getLevels() const{
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     return (int)terrain.levels;
-}
-
-void Terrain::setCastShadows(bool castShadows){
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    terrain.castShadows = castShadows;
-}
-
-bool Terrain::isCastShadows() const{
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    return terrain.castShadows;
-}
-
-void Terrain::setReceiveShadows(bool receiveShadows){
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    if (terrain.receiveShadows != receiveShadows){
-        terrain.receiveShadows = receiveShadows;
-
-        terrain.needReload = true;
-    }
-}
-
-bool Terrain::isReceiveShadows() const{
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    return terrain.receiveShadows;
 }
