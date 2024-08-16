@@ -14,6 +14,7 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/AABBTree/NodeCodec/NodeCodecQuadTreeHalfFloat.h
 	${JOLT_PHYSICS_ROOT}/AABBTree/TriangleCodec/TriangleCodecIndexed8BitPackSOA4Flags.h
 	${JOLT_PHYSICS_ROOT}/Core/ARMNeon.h
+	${JOLT_PHYSICS_ROOT}/Core/Array.h
 	${JOLT_PHYSICS_ROOT}/Core/Atomics.h
 	${JOLT_PHYSICS_ROOT}/Core/ByteBuffer.h
 	${JOLT_PHYSICS_ROOT}/Core/Color.cpp
@@ -55,6 +56,7 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Core/Result.h
 	${JOLT_PHYSICS_ROOT}/Core/RTTI.cpp
 	${JOLT_PHYSICS_ROOT}/Core/RTTI.h
+	${JOLT_PHYSICS_ROOT}/Core/ScopeExit.h
 	${JOLT_PHYSICS_ROOT}/Core/Semaphore.cpp
 	${JOLT_PHYSICS_ROOT}/Core/Semaphore.h
 	${JOLT_PHYSICS_ROOT}/Core/StaticArray.h
@@ -138,29 +140,8 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Math/Vec8.h
 	${JOLT_PHYSICS_ROOT}/Math/Vec8.inl
 	${JOLT_PHYSICS_ROOT}/Math/Vector.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/GetPrimitiveTypeOfType.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStream.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStream.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryIn.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryIn.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryOut.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryOut.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamIn.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamIn.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamOut.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamOut.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextIn.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextIn.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextOut.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextOut.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTypes.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttribute.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttributeEnum.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttributeTyped.h
 	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableObject.cpp
 	${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableObject.h
-	${JOLT_PHYSICS_ROOT}/ObjectStream/TypeDeclarations.cpp
-	${JOLT_PHYSICS_ROOT}/ObjectStream/TypeDeclarations.h
 	${JOLT_PHYSICS_ROOT}/Physics/Body/AllowedDOFs.h
 	${JOLT_PHYSICS_ROOT}/Physics/Body/Body.cpp
 	${JOLT_PHYSICS_ROOT}/Physics/Body/Body.h
@@ -420,6 +401,8 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/Renderer/DebugRendererPlayback.h
 	${JOLT_PHYSICS_ROOT}/Renderer/DebugRendererRecorder.cpp
 	${JOLT_PHYSICS_ROOT}/Renderer/DebugRendererRecorder.h
+	${JOLT_PHYSICS_ROOT}/Renderer/DebugRendererSimple.cpp
+	${JOLT_PHYSICS_ROOT}/Renderer/DebugRendererSimple.h
 	${JOLT_PHYSICS_ROOT}/Skeleton/SkeletalAnimation.cpp
 	${JOLT_PHYSICS_ROOT}/Skeleton/SkeletalAnimation.h
 	${JOLT_PHYSICS_ROOT}/Skeleton/Skeleton.cpp
@@ -446,6 +429,33 @@ set(JOLT_PHYSICS_SRC_FILES
 	${JOLT_PHYSICS_ROOT}/TriangleSplitter/TriangleSplitterMorton.cpp
 	${JOLT_PHYSICS_ROOT}/TriangleSplitter/TriangleSplitterMorton.h
 )
+
+if (ENABLE_OBJECT_STREAM)
+	set(JOLT_PHYSICS_SRC_FILES
+		${JOLT_PHYSICS_SRC_FILES}
+		${JOLT_PHYSICS_ROOT}/ObjectStream/GetPrimitiveTypeOfType.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStream.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStream.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryIn.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryIn.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryOut.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamBinaryOut.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamIn.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamIn.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamOut.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamOut.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextIn.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextIn.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextOut.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTextOut.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/ObjectStreamTypes.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttribute.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttributeEnum.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/SerializableAttributeTyped.h
+		${JOLT_PHYSICS_ROOT}/ObjectStream/TypeDeclarations.cpp
+		${JOLT_PHYSICS_ROOT}/ObjectStream/TypeDeclarations.h
+	)
+endif()
 
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
 	# Add natvis file
@@ -485,18 +495,74 @@ set_target_properties(
 
 # Jolt.cmake configuration
 
-target_precompile_headers(joltphysics PRIVATE ${JOLT_PHYSICS_ROOT}/Jolt.h)
-target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Debug>:_DEBUG;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER>")
-target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Release>:NDEBUG;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER>")
-target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Distribution>:NDEBUG>")
-target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:ReleaseASAN>:NDEBUG;JPH_PROFILE_ENABLED;JPH_DISABLE_TEMP_ALLOCATOR;JPH_DISABLE_CUSTOM_ALLOCATOR;JPH_DEBUG_RENDERER>")
-target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:ReleaseUBSAN>:NDEBUG;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER>")
-target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:ReleaseCoverage>:NDEBUG>")
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
+	# Add natvis file
+	set(JOLT_PHYSICS_SRC_FILES ${JOLT_PHYSICS_SRC_FILES} ${JOLT_PHYSICS_ROOT}/Jolt.natvis)
+endif()
+
+# Group source files
+source_group(TREE ${JOLT_PHYSICS_ROOT} FILES ${JOLT_PHYSICS_SRC_FILES})
+
+if (BUILD_SHARED_LIBS)
+	# Set default visibility to hidden
+	set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+
+	if (GENERATE_DEBUG_SYMBOLS)
+		if (MSVC)
+			# MSVC specific option to enable PDB generation
+			set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG:FASTLINK")
+		else()
+			# Clang/GCC option to enable debug symbol generation
+			set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -g")
+		endif()
+	endif()
+
+	# Set linker flags for other build types to be the same as release
+	set(CMAKE_SHARED_LINKER_FLAGS_RELEASEASAN "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
+	set(CMAKE_SHARED_LINKER_FLAGS_RELEASEUBSAN "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
+	set(CMAKE_SHARED_LINKER_FLAGS_RELEASECOVERAGE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
+	set(CMAKE_SHARED_LINKER_FLAGS_DISTRIBUTION "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
+
+	# Public define to instruct user code to import Jolt symbols (rather than use static linking)
+	target_compile_definitions(joltphysics PUBLIC JPH_SHARED_LIBRARY)
+
+	# Private define to instruct the library to export symbols for shared linking
+	target_compile_definitions(joltphysics PRIVATE JPH_BUILD_SHARED_LIBRARY)
+endif()
+
+# Use repository as include directory when building, install directory when installing
+target_include_directories(joltphysics PUBLIC
+	$<BUILD_INTERFACE:${PHYSICS_REPO_ROOT}>
+	$<INSTALL_INTERFACE:include/>)
+
+# Code coverage doesn't work when using precompiled headers
+target_precompile_headers(joltphysics PRIVATE "$<$<NOT:$<CONFIG:ReleaseCoverage>>:${JOLT_PHYSICS_ROOT}/Jolt.h>")
+
+if (NOT CPP_EXCEPTIONS_ENABLED)
+	# Disable use of exceptions in MSVC's STL
+	target_compile_definitions(joltphysics PUBLIC $<$<BOOL:${MSVC}>:_HAS_EXCEPTIONS=0>)
+endif()
+
+# Set the debug/non-debug build flags
+target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Debug>:_DEBUG>")
+target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Release,Distribution,ReleaseASAN,ReleaseUBSAN,ReleaseCoverage>:NDEBUG>")
+
+# ASAN should use the default allocators
+target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:ReleaseASAN>:JPH_DISABLE_TEMP_ALLOCATOR;JPH_DISABLE_CUSTOM_ALLOCATOR>")
 
 # Setting floating point exceptions
 if (FLOATING_POINT_EXCEPTIONS_ENABLED AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Debug>:JPH_FLOATING_POINT_EXCEPTIONS_ENABLED>")
-	target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Release>:JPH_FLOATING_POINT_EXCEPTIONS_ENABLED>")
+	target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Debug,Release>:JPH_FLOATING_POINT_EXCEPTIONS_ENABLED>")
+endif()
+
+# Setting the disable custom allocator flag
+if (DISABLE_CUSTOM_ALLOCATOR)
+	target_compile_definitions(joltphysics PUBLIC JPH_DISABLE_CUSTOM_ALLOCATOR)
+endif()
+
+# Setting enable asserts flag
+if (USE_ASSERTS)
+	target_compile_definitions(joltphysics PUBLIC JPH_ENABLE_ASSERTS)
 endif()
 
 # Setting double precision flag
@@ -514,6 +580,10 @@ if (OBJECT_LAYER_BITS)
 	target_compile_definitions(joltphysics PUBLIC JPH_OBJECT_LAYER_BITS=${OBJECT_LAYER_BITS})
 endif()
 
+if (USE_STD_VECTOR)
+	target_compile_definitions(joltphysics PUBLIC JPH_USE_STD_VECTOR)
+endif()
+
 # Setting to periodically trace broadphase stats to help determine if the broadphase layer configuration is optimal
 if (TRACK_BROADPHASE_STATS)
 	target_compile_definitions(joltphysics PUBLIC JPH_TRACK_BROADPHASE_STATS)
@@ -522,6 +592,25 @@ endif()
 # Setting to periodically trace narrowphase stats to help determine which collision queries could be optimized
 if (TRACK_NARROWPHASE_STATS)
 	target_compile_definitions(joltphysics PUBLIC JPH_TRACK_NARROWPHASE_STATS)
+endif()
+
+# Enable the debug renderer
+if (DEBUG_RENDERER_IN_DISTRIBUTION)
+	target_compile_definitions(joltphysics PUBLIC "JPH_DEBUG_RENDERER")
+elseif (DEBUG_RENDERER_IN_DEBUG_AND_RELEASE)
+	target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Debug,Release,ReleaseASAN,ReleaseUBSAN>:JPH_DEBUG_RENDERER>")
+endif()
+
+# Enable the profiler
+if (PROFILER_IN_DISTRIBUTION)
+	target_compile_definitions(joltphysics PUBLIC "JPH_PROFILE_ENABLED")
+elseif (PROFILER_IN_DEBUG_AND_RELEASE)
+	target_compile_definitions(joltphysics PUBLIC "$<$<CONFIG:Debug,Release,ReleaseASAN,ReleaseUBSAN>:JPH_PROFILE_ENABLED>")
+endif()
+
+# Compile the ObjectStream class and RTTI attribute information
+if (ENABLE_OBJECT_STREAM)
+	target_compile_definitions(joltphysics PUBLIC JPH_OBJECT_STREAM)
 endif()
 
 # Emit the instruction set definitions to ensure that child projects use the same settings even if they override the used instruction sets (a mismatch causes link errors)
@@ -572,8 +661,19 @@ else()
 		# XCode builds for multiple architectures, we can't set global flags
 	elseif (CROSS_COMPILE_ARM OR CMAKE_OSX_ARCHITECTURES MATCHES "arm64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
 		# ARM64 uses no special commandline flags
-	elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64")
-		# x64
+	elseif (EMSCRIPTEN)
+		if (USE_WASM_SIMD)
+			# Jolt currently doesn't implement the WASM specific SIMD intrinsics so uses the SSE 4.2 intrinsics
+			# See: https://emscripten.org/docs/porting/simd.html#webassembly-simd-intrinsics
+			# Note that this does not require the browser to actually support SSE 4.2 it merely means that it can translate those instructions to WASM SIMD instructions
+			target_compile_options(joltphysics PUBLIC -msimd128 -msse4.2)
+		endif()
+	elseif ("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "i386")
+		# x86 and x86_64
+		# On 32-bit builds we need to default to using SSE instructions, the x87 FPU instructions have higher intermediate precision
+		# which will cause problems in the collision detection code (the effect is similar to leaving FMA on, search for
+		# JPH_PRECISE_MATH_ON for the locations where this is a problem).
+
 		if (USE_AVX512)
 			target_compile_options(joltphysics PUBLIC -mavx512f -mavx512vl -mavx512dq -mavx2 -mbmi -mpopcnt -mlzcnt -mf16c)
 		elseif (USE_AVX2)
@@ -600,9 +700,6 @@ else()
 			target_compile_options(joltphysics PUBLIC -mfma)
 		endif()
 
-		# On 32-bit builds we need to default to using SSE instructions, the x87 FPU instructions have higher intermediate precision
-		# which will cause problems in the collision detection code (the effect is similar to leaving FMA on, search for
-		# JPH_PRECISE_MATH_ON for the locations where this is a problem).
 		if (NOT MSVC)
 			target_compile_options(joltphysics PUBLIC -mfpmath=sse)
 		endif()
