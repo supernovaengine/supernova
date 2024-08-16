@@ -57,7 +57,7 @@ namespace Supernova{
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;
         unsigned int vertexCount = 0;
         
-        bool hasTexture1 = false;
+        bool hasTexCoord1 = false;
         bool hasNormalMap = false;
         bool hasTangent = false;
         bool hasVertexColor4 = false;

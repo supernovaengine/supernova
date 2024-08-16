@@ -581,7 +581,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         	if (buf.second->isRenderAttributes()) {
             	for (auto const &attr : buf.second->getAttributes()) {
 					if (attr.first == AttributeType::TEXCOORD1){
-						mesh.submeshes[i].hasTexture1 = true;
+						mesh.submeshes[i].hasTexCoord1 = true;
 					}
 					if (attr.first == AttributeType::TANGENT){
 						mesh.submeshes[i].hasTangent = true;
@@ -606,7 +606,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
     	}
 		for (auto const& attr : mesh.submeshes[i].attributes){
 			if (attr.first == AttributeType::TEXCOORD1){
-				mesh.submeshes[i].hasTexture1 = true;
+				mesh.submeshes[i].hasTexCoord1 = true;
 			}
 			if (attr.first == AttributeType::TANGENT){
 				mesh.submeshes[i].hasTangent = true;
@@ -641,7 +641,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		bool p_receiveShadows = false;
 		bool p_shadowsPCF = false;
 
-		if (mesh.submeshes[i].hasTexture1){
+		if (mesh.submeshes[i].hasTexCoord1 || mesh.submeshes[i].material.baseColorTexture.getRender()){
 			p_hasTexture1 = true;
 		}
 		if (terrain && terrain->blendMap.getRender()){
