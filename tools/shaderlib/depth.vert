@@ -23,10 +23,7 @@ out vec2 v_projZW;
     #include "includes/terrain_vs.glsl"
 #endif
 
-void main() {
-
-    mat4 lightMVPMatrix = depthParams.lightVPMatrix * depthParams.modelMatrix;
-
+vec4 getPosition(mat4 boneTransform){
     vec3 pos = a_position;
 
     pos = getMorphPosition(pos);
@@ -35,12 +32,22 @@ void main() {
         pos = getTerrainPosition(pos, depthParams.modelMatrix);
     #endif
 
+    return vec4(pos, 1.0);
+}
+
+void main() {
+    mat4 lightMVPMatrix = depthParams.lightVPMatrix * depthParams.modelMatrix;
+
+    mat4 boneTransform = getBoneTransform();
+
     #ifdef HAS_INSTANCING
         mat4 instanceMatrix = mat4(i_matrix_col1, i_matrix_col2, i_matrix_col3, i_matrix_col4);
-        gl_Position = lightMVPMatrix * instanceMatrix * vec4(pos, 1.0);
+        vec4 pos = instanceMatrix *  getPosition(boneTransform);
     #else
-        gl_Position = lightMVPMatrix * vec4(pos, 1.0);
+        vec4 pos = getPosition(boneTransform);
     #endif
+
+    gl_Position = lightMVPMatrix * pos;
 
     v_projZW = gl_Position.zw;
     #ifndef IS_GLSL

@@ -122,7 +122,13 @@ vec3 getTangent(mat4 boneTransform){
 void main() {
     mat4 boneTransform = getBoneTransform();
 
-    vec4 pos = getPosition(boneTransform);
+    #ifdef HAS_INSTANCING
+        mat4 instanceMatrix = mat4(i_matrix_col1, i_matrix_col2, i_matrix_col3, i_matrix_col4);
+        vec4 pos = instanceMatrix * getPosition(boneTransform);
+    #else
+        vec4 pos = getPosition(boneTransform);
+    #endif
+
     vec4 worldPos = pbrParams.modelMatrix * pos;
     
     #ifndef MATERIAL_UNLIT
@@ -190,12 +196,7 @@ void main() {
     }
     #endif
 
-    #ifdef HAS_INSTANCING
-        mat4 instanceMatrix = mat4(i_matrix_col1, i_matrix_col2, i_matrix_col3, i_matrix_col4);
-        gl_Position = pbrParams.mvpMatrix * instanceMatrix * pos;
-    #else
-        gl_Position = pbrParams.mvpMatrix * pos;
-    #endif
+    gl_Position = pbrParams.mvpMatrix * pos;
 
     #ifdef USE_SHADOWS
         v_clipSpacePosZ = gl_Position.z;
